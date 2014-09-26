@@ -19,7 +19,7 @@ namespace Belle2 {
 
     /**
      * Class to hold reconstructed track, interface to fortran.
-     *  Input to TOPreco.
+     * Input to TOPreco.
      */
 
     class TOPtrack {
@@ -39,143 +39,143 @@ namespace Belle2 {
        * @param Pz track momentum component z
        * @param Tlen track length from IP
        * @param Q track charge
-       * @param Lund LUND code (optional)
+       * @param pdg PDG code (optional)
        */
       TOPtrack(double x, double y, double z, double Px, double Py, double Pz,
-               double Tlen, int Q, int Lund = 0);
+               double Tlen, int Q, int pdg = 0);
 
       /**
-       * get x
+       * Return position component
        * @return  spatial position x
        */
-      double X() {return m_X;}
+      double getX() {return m_x;}
 
       /**
-       * get y
+       * Return position component
        * @return  spatial position y
        */
-      double Y() {return m_Y;}
+      double getY() {return m_y;}
 
       /**
-       * get z
+       * Return position component
        * @return  spatial position z
        */
-      double Z() {return m_Z;}
+      double getZ() {return m_z;}
 
       /**
-       * get momentum x
+       * Return momentum component
        * @return  momentum component x
        */
-      double Px() {return m_Px;}
+      double getPx() {return m_px;}
 
       /**
-       * get momentum y
+       * Return momentum component
        * @return  momentum component y
        */
-      double Py() {return m_Py;}
+      double getPy() {return m_py;}
 
       /**
-       * get momentum z
+       * Return momentum component
        * @return  momentum component z
        */
-      double Pz() {return m_Pz;}
+      double getPz() {return m_pz;}
 
       /**
-       * get track length from IP to current position
+       * Return track length from IP to current position
        * @return track length from IP
        */
-      double Tlen() {return m_Tlen;}
+      double getTrackLength() {return m_trackLength;}
 
       /**
-       * get time-of-flight from IP to current position for given charged stable
-       * @param Lund PDG code
+       * Return time-of-flight from IP to current position for given charged stable
+       * @param PDGcode PDG code
        * @return time-of-flight
        */
-      double Tof(int Lund);
+      double getTOF(int PDGcode);
 
       /**
-       * set track length from time-of-flight and particle mass
+       * Set track length from time-of-flight and particle mass
        * @param tof time-of-flight
        * @param mass particle mass
        */
       void setTrackLength(double tof, double mass);
 
       /**
-       * get momentum magnitude
+       * Return momentum magnitude
        * @return momentum
        */
-      double p() {return sqrt(m_Px * m_Px + m_Py * m_Py + m_Pz * m_Pz);}
+      double getP() {return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);}
 
       /**
-       * get momentum polar angle
+       * Return momentum polar angle
        * @return momentum polar angle
        */
-      double theta() {return acos(m_Pz / p());}
+      double getTheta() {return acos(m_pz / getP());}
 
       /**
-       * get momentum azimuthal angle
+       * Return momentum azimuthal angle
        * @return momentum azimuthal angle
        */
-      double phi() {return atan2(m_Py, m_Px);}
+      double getPhi() {return atan2(m_py, m_px);}
 
       /**
-       * get LUND code
-       * @return LUND code
+       * Return PDG code
+       * @return PDG code
        */
-      int Lund() {return m_LUND;}
+      int getPDGcode() {return m_pdg;}
 
       /**
-       * get first label
+       * Return first label
        * @return label
        */
-      int Label() {return m_Label[0];}
+      int getLabel() {return m_label[0];}
 
       /**
-       * get label i
+       * Return label i
        * @param i label index (i=0...9)
        * @return label
        */
-      int Label(unsigned int i) {if (i < 10) {return m_Label[i];} else {return 0;}}
+      int getLabel(unsigned int i) {if (i < 10) {return m_label[i];} else {return 0;}}
 
       /**
-       * set label i
+       * Set label i
        * @param i label index (i=0...9)
        * @param label label to store
        */
-      void setLabel(unsigned int i, int label) {if (i < 10) m_Label[i] = label;}
+      void setLabel(unsigned int i, int label) {if (i < 10) m_label[i] = label;}
 
       /**
-       * get charge
+       * Return charge
        * @return charge
        */
-      int Q() {return m_Q;}
+      int getCharge() {return m_charge;}
 
       /**
-       * get internal particle code
+       * Return internal particle code
        * @return internal particle code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=unknown
        */
-      int Hyp();
+      int getHypID();
 
       /**
-       * get bar ID
-       * @return bar ID if hit, else -1
+       * Return bar ID
+       * @return bar ID, if track hits the bar, otherwise 0
        */
-      int QbarID() {return m_QbarID;}
+      int getBarID() {return m_barID;}
 
       /**
-       * check if track is at TOP
+       * Check if toTop() was already called
        * @return true or false
        */
       bool atTop() {return m_atTop;}
 
       /**
-       * propagate track to TOP counter
-       * @return bar ID if hit, else -1
+       * Propagate track to TOP counter (assuming uniform B field along z)
+       * @return bar ID, if track hits the bar, otherwise 0
        */
       int toTop();
 
       /**
-       * smear track
+       * Smear track
        * @param sig_x sigma in x
        * @param sig_z sigma in z
        * @param sig_theta sigma in theta
@@ -186,21 +186,21 @@ namespace Belle2 {
       /**
        * print track parameters to std output
        */
-      void Dump();
+      void dump();
 
     private:
-      double m_X;      /**< point */
-      double m_Y;      /**< point */
-      double m_Z;      /**< point */
-      double m_Px;     /**< momentum */
-      double m_Py;     /**< momentum */
-      double m_Pz;     /**< momentum */
-      double m_Tlen;   /**< track length from IP to point */
-      int m_Q;         /**< charge */
-      int m_LUND;      /**< LUND code (optional) */
-      int m_Label[10]; /**< labels (optional) */
+      double m_x;      /**< point */
+      double m_y;      /**< point */
+      double m_z;      /**< point */
+      double m_px;     /**< momentum */
+      double m_py;     /**< momentum */
+      double m_pz;     /**< momentum */
+      double m_trackLength;   /**< track length from IP to point */
+      int m_charge;    /**< charge */
+      int m_pdg;       /**< PDG code (optional) */
+      int m_label[10]; /**< labels (optional) */
       bool m_atTop;    /**< true, if toTop() called */
-      int m_QbarID;    /**< bar ID or -1 */
+      int m_barID;     /**< bar ID or -1 */
     };
 
   } // end top namespace

@@ -46,7 +46,7 @@ namespace Belle2 {
        * @param NumHyp number of mass hypotheses
        * @param HypID internal codes in the same order as Masses[]
        */
-      void SetHypID(int NumHyp, int HypID[]);
+      void setHypID(int NumHyp, int HypID[]);
 
       /**
        * set maximum for photon times (allows to set it lower than TDC range)
@@ -60,7 +60,7 @@ namespace Belle2 {
       /**
        * clear data list
        */
-      void Clear();
+      void clearData();
 
       /**
        * add data
@@ -68,12 +68,12 @@ namespace Belle2 {
        * @param chID channel ID
        * @param TDC digitized time
        */
-      int AddData(int QbarID, int chID, int TDC);
+      int addData(int QbarID, int chID, int TDC);
 
       /**
        * get size of data list
        */
-      int DataSize();
+      int getDataSize();
 
       /**
        * run reconstruction
@@ -87,20 +87,20 @@ namespace Belle2 {
        * @param Q track charge
        * @param HYP true hypothesis
        */
-      void Reconstruct(double X, double Y, double Z, double Tlen,
+      void reconstruct(double X, double Y, double Z, double Tlen,
                        double Px, double Py, double Pz, int Q, int HYP = 0);
 
       /**
        * run reconstruction
        * @param trk track
        */
-      void Reconstruct(TOPtrack& trk);
+      void reconstruct(TOPtrack& trk);
 
       /**
        * get status
        * @return status: 1=OK, 0=out of acceptance, -1=inside gap
        */
-      int Flag();
+      int getFlag();
 
       /**
        * get reconstruction results
@@ -109,7 +109,7 @@ namespace Belle2 {
        * @param ExpNphot expected number of photons for Masses[]
        * @param Nphot measured number of photons
        */
-      void GetLogL(int Size, double LogL[], double ExpNphot[], int& Nphot);
+      void getLogL(int Size, double LogL[], double ExpNphot[], int& Nphot);
 
       /**
        * get track hit at the bar in Local or Global frame
@@ -121,26 +121,26 @@ namespace Belle2 {
        * @param Mom track momentum
        * @param QbarID bar ID if hit, else -1
        */
-      void GetHit(int LocGlob, double R[3], double Dir[3], double& Len,
-                  double& Tlen, double& Mom, int& QbarID);
+      void getTrackHit(int LocGlob, double R[3], double Dir[3], double& Len,
+                       double& Tlen, double& Mom, int& QbarID);
 
       /**
        * print log likelihoods to std output
        * @param NumHyp number of hypotheses
        */
-      void DumpLogL(int NumHyp);
+      void dumpLogL(int NumHyp);
 
       /**
        * print track to std output
        * @param LocGlob in Local or Global frame
        */
-      void DumpHit(int LocGlob);
+      void dumpTrackHit(int LocGlob);
 
       /**
        * get pulls: size
        * @return: size
        */
-      int PullSize();
+      int getPullSize();
 
       /**
        * get pulls: K-th pull
@@ -151,7 +151,7 @@ namespace Belle2 {
        * @param PhiCer azimuthal Cerenkov angle
        * @param Wt weight
        */
-      void GetPull(int K, double& T, double& T0, double& Wid, double& PhiCer,
+      void getPull(int K, double& T, double& T0, double& Wid, double& PhiCer,
                    double& Wt);
 
       /**
@@ -160,7 +160,7 @@ namespace Belle2 {
        * @param t time
        * @param mass mass
        */
-      double PDF(int chID, double t, double mass);
+      double getPDF(int chID, double t, double mass);
 
       /**
        * set track beta (for beta resolution studies)

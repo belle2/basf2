@@ -33,27 +33,29 @@ namespace Belle2 {
       set_top_par_(&b, &s);
     }
 
-    void TOPreco::SetHypID(int NumHyp, int HypID[])
+    void TOPreco::setHypID(int NumHyp, int HypID[])
     {
       rtra_set_hypid_(&NumHyp, HypID);
     }
 
-    void TOPreco::Clear()
+    void TOPreco::clearData()
     {
       data_clear_();
       rtra_clear_();
     }
 
-    int TOPreco::AddData(int QbarID, int chID, int TDC)
+    int TOPreco::addData(int QbarID, int chID, int TDC)
     {
       int status;
+      QbarID--; // 0-based ID used in fortran
+      chID--;   // 0-based ID used in fortran
       data_put_(&QbarID, &chID, &TDC, &status);
       return status;
     }
 
-    int TOPreco::DataSize() {return data_getnum_();}
+    int TOPreco::getDataSize() {return data_getnum_();}
 
-    void TOPreco::Reconstruct(double X, double Y, double Z, double Tlen,
+    void TOPreco::reconstruct(double X, double Y, double Z, double Tlen,
                               double Px, double Py, double Pz, int Q, int HYP)
     {
       m_HYP = HYP;
@@ -66,28 +68,32 @@ namespace Belle2 {
       top_reco_();
     }
 
-    void TOPreco::Reconstruct(TOPtrack& trk)
+    void TOPreco::reconstruct(TOPtrack& trk)
     {
-      m_HYP = trk.Hyp();
-      float x = (float) trk.X(); float y = (float) trk.Y();
-      float z = (float) trk.Z(); float t = float(trk.Tlen() / Const::speedOfLight);
-      float px = (float) trk.Px(); float py = (float) trk.Py();
-      float pz = (float) trk.Pz();
-      int Q = trk.Q();
-      int REF = 0; int MCREF = trk.Label();
+      m_HYP = trk.getHypID();
+      float x = (float) trk.getX();
+      float y = (float) trk.getY();
+      float z = (float) trk.getZ();
+      float t = float(trk.getTrackLength() / Const::speedOfLight);
+      float px = (float) trk.getPx();
+      float py = (float) trk.getPy();
+      float pz = (float) trk.getPz();
+      int Q = trk.getCharge();
+      int REF = 0;
+      int MCREF = trk.getLabel(); // has no effect, can be set to 0
       rtra_clear_();
       rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &m_HYP, &REF, &MCREF);
       top_reco_();
 
     }
 
-    int TOPreco::Flag()
+    int TOPreco::getFlag()
     {
       int K = 1;
       return rtra_getflag_(&K);
     }
 
-    void TOPreco::GetLogL(int Size, double LogL[], double ExpNphot[], int& Nphot)
+    void TOPreco::getLogL(int Size, double LogL[], double ExpNphot[], int& Nphot)
     {
       int K = 1;
       float logl[Size], sfot[Size];
@@ -99,8 +105,8 @@ namespace Belle2 {
       }
     }
 
-    void TOPreco::GetHit(int LocGlob, double R[3], double Dir[3], double& Len,
-                         double& Tlen, double& Mom, int& QbarID)
+    void TOPreco::getTrackHit(int LocGlob, double R[3], double Dir[3], double& Len,
+                              double& Tlen, double& Mom, int& QbarID)
     {
       int K = 1;
       float r[3], dir[3], len, tof, p;
@@ -112,12 +118,12 @@ namespace Belle2 {
       Len = len; Tlen = tof * Const::speedOfLight; Mom = p;
     }
 
-    void TOPreco::DumpLogL(int Size)
+    void TOPreco::dumpLogL(int Size)
     {
       double logl[Size], sfot[Size];
       int hypid[Size];
       int Nphot;
-      GetLogL(Size, logl, sfot, Nphot);
+      getLogL(Size, logl, sfot, Nphot);
       rtra_get_hypid_(&Size, hypid);
 
       int i_max = 0;
@@ -127,7 +133,7 @@ namespace Belle2 {
       }
 
       using namespace std;
-      cout << "TOPreco::DumpLogL: Flag=" << Flag();
+      cout << "TOPreco::dumpLogL: Flag=" << getFlag();
       cout << "  Detected Photons=" << Nphot << endl;
       cout << " i HypID   LogL   ExpPhot" << endl;
       cout << showpoint << fixed << right;
@@ -142,15 +148,15 @@ namespace Belle2 {
       }
     }
 
-    void TOPreco::DumpHit(int LocGlob)
+    void TOPreco::dumpTrackHit(int LocGlob)
     {
       double r[3], dir[3], len, Tlen, p;
       int QbarID;
-      GetHit(LocGlob, r, dir, len, Tlen, p, QbarID);
+      getTrackHit(LocGlob, r, dir, len, Tlen, p, QbarID);
 
       using namespace std;
       cout << showpoint << fixed << right;
-      cout << "TOPreco::DumpHit: QbarID=" << QbarID;
+      cout << "TOPreco::dumpTrackHit: QbarID=" << QbarID;
       cout << "  Len=" << setprecision(2) << len;
       cout << "cm  Tlen=" << setprecision(1) << Tlen;
       cout << "cm  p=" << setprecision(2) << p << "GeV/c" << endl;
@@ -169,14 +175,14 @@ namespace Belle2 {
       else {cout << " (global)" << endl;}
     }
 
-    int TOPreco::PullSize()
+    int TOPreco::getPullSize()
     {
       int n;
       getnum_pulls_(&n);
       return n;
     }
 
-    void TOPreco::GetPull(int K, double& T, double& T0, double& Wid, double& PhiCer,
+    void TOPreco::getPull(int K, double& T, double& T0, double& Wid, double& PhiCer,
                           double& Wt)
     {
       float t, t0, wid, fic, wt;
@@ -186,7 +192,7 @@ namespace Belle2 {
       T = t; T0 = t0; Wid = wid; PhiCer = fic; Wt = wt;
     }
 
-    double TOPreco::PDF(int chID, double T, double Mass)
+    double TOPreco::getPDF(int chID, double T, double Mass)
     {
       float t = (float) T; float mass = (float) Mass;
       return get_pdf_(&chID, &t, &mass);

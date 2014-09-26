@@ -41,7 +41,7 @@ namespace Belle2 {
      * @param Z1 backward border of TOP volume
      * @param Z2 forward border of TOP volume
      */
-    inline void TOPvolume(double R1, double R2, double Z1, double Z2)
+    inline void setTOPvolume(double R1, double R2, double Z1, double Z2)
     {
       float r1 = (float) R1; float r2 = (float) R2;
       float z1 = (float) Z1; float z2 = (float) Z2;

@@ -45,7 +45,7 @@ namespace Belle2 {
 
       if (m_configured) return;
 
-      TOPvolume(m_R1, m_R2, m_Z1, m_Z2);
+      setTOPvolume(m_R1, m_R2, m_Z1, m_Z2);
 
       // get magnetic field at TOP
       TVector3 point(0, m_topgp->getRadius(), 0);

@@ -15,7 +15,6 @@
 #include <top/modules/TOPReconstruction/TOPReconstructorModule.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPutil.h>
 #include <top/reconstruction/TOPconfigure.h>
 
 // Hit classes
@@ -171,14 +170,14 @@ namespace Belle2 {
     if (m_maxTime > 0) reco.setTmax(m_maxTime);
 
     // clear reconstruction object
-    reco.Clear();
+    reco.clearData();
 
     // add photons
     StoreArray<TOPDigit> topDigits(m_inputDigits);
     for (int i = 0; i < topDigits.getEntries(); ++i) {
       const TOPDigit* data = topDigits[i];
       if (data->getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        reco.AddData(data->getBarID() - 1, data->getChannelID() - 1, data->getTDC());
+        reco.addData(data->getBarID(), data->getChannelID(), data->getTDC());
     }
 
     // use pion hypothesis for track extrapolation
@@ -223,20 +222,21 @@ namespace Belle2 {
       }
 
       // reconstruct
-      reco.Reconstruct(trk);
+      reco.reconstruct(trk);
       if (m_debugLevel > 1) {
-        trk.Dump();
-        reco.DumpHit(Local);
-        reco.DumpLogL(c_Nhyp);
+        trk.dump();
+        reco.dumpTrackHit(Local);
+        reco.dumpLogL(c_Nhyp);
       }
 
       // get results
       double logl[c_Nhyp], expPhot[c_Nhyp];
       int nphot;
-      reco.GetLogL(c_Nhyp, logl, expPhot, nphot);
+      reco.getLogL(c_Nhyp, logl, expPhot, nphot);
 
       // store results
-      TOPLikelihood* topL = topLikelihoods.appendNew(reco.Flag(), logl, nphot, expPhot);
+      TOPLikelihood* topL = topLikelihoods.appendNew(reco.getFlag(),
+                                                     logl, nphot, expPhot);
 
       // make relations:
       track->addRelationTo(topL);

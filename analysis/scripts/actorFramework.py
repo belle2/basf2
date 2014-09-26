@@ -187,6 +187,8 @@ class Play(object):
         # If there are no ready actors, the resolution of the dependencies is finished (and maybe incomplete).
         if verbose:
             print "Start execution of Sequence"
+        if nProcesses > 1:
+            p = multiprocessing.pool.ThreadPool(processes=nProcesses)
         actors = [actor for actor in self.seq]
         results = dict()
         results['path'] = True
@@ -212,14 +214,15 @@ class Play(object):
                     actor.provides = actor(c)
                     global_lock.release()
                     return actor
-                p = multiprocessing.pool.ThreadPool(processes=nProcesses)
                 ready = p.map(_execute_actor_parallel, ready)
             else:
                 for actor in ready:
+                    global_lock.acquire()
                     results['path'] = actor.path = basf2.create_path()
                     results['hash'] = ''
                     results['hash'] = create_hash([results[r] for r in actor.requires])
                     actor.provides = actor(results)
+                    global_lock.release()
             if verbose:
                 print "Updating result dictionary"
             for actor in ready:

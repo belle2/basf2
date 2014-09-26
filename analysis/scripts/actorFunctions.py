@@ -512,7 +512,7 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, '__needed__': False}
 
 
-def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticleNTuples, mcCounts, particles):
+def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticleNTuples, cpuTimeSummaryPlaceholders, mcCounts, particles):
     """
     Creates a pdf summarizing all networks trained.
         @param finalStateParticlePlaceholders list of all tex placeholder dictionaries of fsp
@@ -528,7 +528,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     for ntuple in finalParticleNTuples:
         if ntuple is not None:
             finalParticlePlaceholders.append(automaticReporting.createMBCTexFile(ntuple))
-    placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, mcCounts, particles)
+    placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
 
     subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/nordbert.pdf')), shell=True)
     for i in range(0, 2):
@@ -546,3 +546,38 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
 
     B2INFO("Created analysis summary pdf file.")
     return {'FEIsummary.pdf': None, '__needed__': False}
+
+
+def SaveModuleStatistics(path, hash, finalParticleSignalProbabilities):
+    """
+    Creates .root file that contains statistics for all modules running in final execution.
+        @param path the basf2 path
+        @param hash of all input parameters
+        @param finalParticleSignalProbabilities used to start execution after all final particles are completed
+        @return root file name
+    """
+
+    filename = 'moduleStatistics_' + hash + '.root'
+    if not os.path.isfile(filename):
+        output = register_module('RootOutput')
+        output.param('outputFileName', filename)
+        output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
+        output.param('branchNamesPersistent', ['ProcessStatistics'])
+        path.add_module(output)
+        B2INFO("SaveModuleStatistics: Added RootOutput")
+        return {}
+
+    return {'ModuleStatisticsFile': filename}
+
+
+def WriteCPUTimeSummary(channelNames, inputLists, mcCounts, moduleStatisticsFile):
+    """
+    Creates CPU time summary
+        @param mcCounts
+        @param moduleStatisticsFile file name of the TFile containing actual statistics
+        @return ?
+    """
+    stats = automaticReporting.getModuleStatsFromFile(moduleStatisticsFile)
+    placeholders = automaticReporting.createCPUTimeTexFile(channelNames, inputLists, mcCounts, moduleStatisticsFile, stats)
+
+    return {'CPUTimeSummary': placeholders}

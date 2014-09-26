@@ -57,6 +57,27 @@ def prettifyDecayString(decayString):
     return decayString
 
 
+def formatTime(seconds, onlyMostSignificant=True):
+    """
+    Return string describing a duration in a natural format
+    """
+    minutes = int(seconds / 60)
+    hours = int(minutes / 60)
+    minutes %= 60
+    seconds = int(seconds % 60)
+    string = ''
+    if hours != 0:
+        string += "%dh" % (hours)
+        if onlyMostSignificant:
+            return string
+    if minutes != 0:
+        string += "%dm" % (minutes)
+        if onlyMostSignificant:
+            return string
+    string += "%ds" % (seconds)
+    return string
+
+
 def purity(x, y):
     if x == 0:
         return 0.0
@@ -89,7 +110,7 @@ def createTexFile(filename, templateFilename, placeholders):
     B2INFO("Write tex file " + filename + ".")
 
 
-def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, mcCounts, particles):
+def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles):
 
     placeholders = {}
 
@@ -140,6 +161,8 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     placeholders['mbcInputs'] = ''
     for particlePlaceholder in finalParticlePlaceholders:
         placeholders['mbcInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
+
+    placeholders['cpuTimeSummary'] = '\input{' + cpuTimeSummaryPlaceholders['texFile'] + '}\n'
 
     placeholders['NSignal'] = 0
     placeholders['NBackground'] = 0
@@ -753,3 +776,79 @@ def sendMail():
     #server.login(fromMail, 'Not necessary for kit.edu :-)')
     server.sendmail(fromMail, toMails, msg.as_string())
     server.quit()
+
+
+def getModuleStatsFromFile(filename):
+    """
+    Gets a vector of ModuleStatistics objects from given file.
+    """
+
+    tfile = ROOT.TFile(filename)
+    persistentTree = tfile.Get('persistent')
+    numEntries = persistentTree.GetEntriesFast()
+    if numEntries != 1:
+        raise runtime_error("expected excatly one entry, got %d instead" % (numEntries))
+    persistentTree.GetEntry(0)
+    # Clone() needed so we actually own the object (original dies when tfile is deleted)
+    stats = persistentTree.ProcessStatistics.Clone()
+
+    return stats.getAll()
+
+
+def createCPUTimeTexFile(channelNames, inputLists, mcCounts, moduleStatisticsFile, stats):
+    """
+    Creates CPU time summary .tex file
+        @param stats ProcessStatistics object to interpret
+        @return placeholders
+    """
+
+    time_global_seconds = 0
+    statTable = []
+    moduleTypes = ('ParticleSelector', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatching', 'TMVAExpert', 'Other')
+    for name, plist in zip(channelNames, inputLists):
+        if plist is None:
+            continue
+        moduleDict = {}
+        for mType in moduleTypes:
+            moduleDict[mType] = 0.0
+
+        matchingModules = [m for m in stats if plist in m.getName()]
+        time_total_seconds = 0
+        for m in matchingModules:
+            moduleName = m.getName().split('_')[0]
+            time_seconds = m.getTimeSum(m.c_Event) / 1e9
+            if moduleName in moduleDict:
+                moduleDict[moduleName] += time_seconds
+            else:
+                moduleDict['Other'] += time_seconds
+            time_total_seconds += time_seconds
+
+        for m in moduleDict:
+            moduleDict[m] /= time_total_seconds
+            moduleDict[m] *= 100
+
+        shortName = prettifyDecayString(name)
+        statTable.append([shortName, time_total_seconds, moduleDict])
+        time_global_seconds += time_total_seconds
+
+    # fill cpuTimeStatistics placeholder
+    placeholders = {}
+    colours = ["orange", "blue", "red", "green", "cyan", "purple"]
+    placeholders['colourList'] = ', '.join('"%s"' % (c) for c in colours)
+    placeholders['numColoursMinusOne'] = len(colours) - 1
+    placeholders['barLegend'] = '' + ', '.join('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colours, moduleTypes))
+    placeholders['cpuTimeStatistics'] = ''
+    rowString = '{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\\% \\\\\n'
+    for row in statTable:
+        moduleDict = row[2]
+        bargraph = '\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % tuple(moduleDict[key] for key in moduleTypes)
+        timePercent = row[1] / time_global_seconds * 100
+        placeholders['cpuTimeStatistics'] += rowString.format(name=row[0], bargraph=bargraph, time=formatTime(row[1]), timePerCandidate=0, timePercent=timePercent)
+    placeholders['cpuTimeStatistics'] += '\\bottomrule\n'
+    placeholders['cpuTimeStatistics'] += rowString.format(name='Total', bargraph='', time=formatTime(time_global_seconds), timePerCandidate=0, timePercent=100)
+
+    placeholders['texFile'] = 'CPUTimeSummary_' + moduleStatisticsFile + '.tex'
+    if not os.path.isfile(placeholders['texFile']):
+        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationCPUTimeTemplate.tex', placeholders)
+
+    return placeholders

@@ -10,9 +10,7 @@
 
 #ifndef NTUPLEEVENTMETADATATOOL_H
 #define NTUPLEEVENTMETADATATOOL_H
-#include <boost/function.hpp>
 #include <analysis/dataobjects/Particle.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
@@ -26,10 +24,6 @@ namespace Belle2 {
     int m_iRun;
     /** Event number. */
     int m_iEvent;
-    /** Number of candidates for this event. */
-    int m_nCands;
-    /** Index of the current candidate. */
-    int m_iCand;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

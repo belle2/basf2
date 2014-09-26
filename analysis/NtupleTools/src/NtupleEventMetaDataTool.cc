@@ -11,8 +11,6 @@
 #include <analysis/NtupleTools/NtupleEventMetaDataTool.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <TBranch.h>
-#include <TParameter.h>
 #include <string>
 
 using namespace Belle2;

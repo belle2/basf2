@@ -29,6 +29,7 @@ import ROOT
 import pdg
 
 import actorFramework
+from basf2 import *
 from actorFunctions import *
 
 import collections
@@ -235,12 +236,13 @@ class Preloader(object):
             return False
 
 
-def FullEventInterpretation(path, particles):
+def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
     """
     The Full Event Interpretation algorithm.
     Alle the Actors defined above are added to the playuence and are executed in an order which fulfills all requirements.
     This function returns if no more Actors can be called without violating some requirements.
-        @param path the basf2 module path
+        @param user_selection_path the basf2 module path
+        @param user_analysis_path the basf2 module path
         @param particles playuence of particle objects which shall be reconstructed by this algorithm
     """
 
@@ -256,7 +258,8 @@ def FullEventInterpretation(path, particles):
     play = actorFramework.Play()
 
     # Add preload resource of available
-    play.addProperty('preloader', Preloader(args.preload))
+    preloader = Preloader(args.preload)
+    play.addProperty('preloader', preloader)
 
     # Than add the properties of the particles to the play
     for particle in particles:
@@ -277,7 +280,13 @@ def FullEventInterpretation(path, particles):
     # Add top-level actors
     play.addActor(CountMCParticles, names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
     play.addActor(LoadGeometry)
-    play.addActor(LoadParticles)
+
+    if user_selection_path is None:
+        play.addActor(LoadParticles)
+        play.addProperty('runs_in_ROE', False)
+    else:
+        play.addProperty('particleLoader', str(serialize_path(user_selection_path)))
+        play.addProperty('runs_in_ROE', True)
 
     # In the first act we reconstruct the particles
     for particle in particles:
@@ -440,4 +449,27 @@ def FullEventInterpretation(path, particles):
         play.addNeeded('SignalProbability_{i}'.format(i=finalParticle.identifier))
         play.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
 
-    return play.run(path, args.verbose, args.nProcesses)
+    fei_path = create_path()
+    finished_training = play.run(fei_path, args.verbose, args.nProcesses)
+    print fei_path
+    is_first_run = not preloader.treeContainsObject('Particles')
+
+    path = create_path()
+    if user_selection_path is None:
+        path.add_module(register_module('RootInput'))
+
+    if finished_training:
+        if user_selection_path is not None:
+            path.add_path(user_selection_path)
+        path.add_path(fei_path)
+        if user_analysis_path is not None:
+            path.add_path(user_analysis_path)
+    else:
+        fei_path.add_module(register_module('RootOutput'))
+        if is_first_run and user_selection_path is not None:
+            path.add_path(user_selection_path)
+            path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
+        else:
+            path.add_module(register_module('RootInput'))
+            path.add_path(fei_path)
+    return path

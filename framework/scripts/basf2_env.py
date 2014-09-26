@@ -29,15 +29,26 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 fw = Framework()
 
 
+def serialize_value(module, parameter):
+    return serialize_path(parameter.values) if parameter.name == 'path' and module.type() == 'SubEvent' else parameter.values
+
+
+def deserialize_value(module, parameter_state):
+    return deserialize_path(parameter_state['values']) if parameter_state['name'] == 'path' and module.type() == 'SubEvent' else parameter_state['values']
+
+
 def serialize_module(module):
-    return {'name': module.name(), 'type': module.type(), 'parameters': [{'name': parameter.name, 'values': parameter.values} for parameter in module.available_params() if parameter.setInSteering]}
+    return {'name': module.name(), 'type': module.type(), 'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
+            'parameters': [{'name': parameter.name, 'values': serialize_value(module, parameter)} for parameter in module.available_params() if parameter.setInSteering]}
 
 
 def deserialize_module(module_state):
     module = fw.register_module(module_state['type'])
     module.set_name(module_state['name'])
+    if module_state['flag']:
+        module.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
     for parameter_state in module_state['parameters']:
-        module.param(parameter_state['name'], parameter_state['values'])
+        module.param(parameter_state['name'], deserialize_value(module, parameter_state))
     return module
 
 

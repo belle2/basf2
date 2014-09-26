@@ -596,9 +596,9 @@ def makeDiagPlotPerParticle(nTuple, plotName):
 
     nbins = 100
     probabilityVar = ROOT.Belle2.Variable.makeROOTCompatible('getExtraInfo(SignalProbability)')
-    bgHist = ROOT.TH1F('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
+    bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
     variables.Project('background' + probabilityVar, probabilityVar, '!isSignal')
-    signalHist = ROOT.TH1F('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
+    signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
     variables.Project('signal' + probabilityVar, probabilityVar, 'isSignal')
     makeDiagPlot(signalHist, bgHist, plotName)
 
@@ -614,9 +614,9 @@ def makeDiagPlotPerChannel(tmvaFilename, plotName, methodName):
     nbins = 100
     varPrefix = ''  # there's also a prob_MethodName variable, but not sure what it is. it definitely looks odd.
     probabilityVar = varPrefix + methodName
-    bgHist = ROOT.TH1F('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
+    bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
     testTree.Project('background' + probabilityVar, probabilityVar, 'className == "Background"')
-    signalHist = ROOT.TH1F('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
+    signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
     testTree.Project('signal' + probabilityVar, probabilityVar, 'className == "Signal"')
     makeDiagPlot(signalHist, bgHist, plotName)
 
@@ -699,7 +699,7 @@ def makeMbcPlot(fileName, outputFileName):
     l = canvas.GetListOfPrimitives()
     for i in range(l.GetEntries()):
         hist = l[i]
-        if isinstance(hist, ROOT.TH1F):
+        if isinstance(hist, ROOT.TH1D):
             hist.GetXaxis().SetRangeUser(5.24, 5.29)
             break
 

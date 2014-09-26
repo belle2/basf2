@@ -21,7 +21,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 
-#include <TH1F.h>
+#include <TH1D.h>
 
 #include <algorithm>
 

@@ -60,7 +60,7 @@ def CountMCParticles(path, names):
 
     counter = {}
     for branch in [str(k.GetName()) for k in countNtuple.GetListOfBranches()]:
-        hallo = ROOT.TH1F('hallo', 'hallo', 1, 0, countNtuple.GetMaximum(branch) + 1)
+        hallo = ROOT.TH1D('hallo', 'hallo', 1, 0, countNtuple.GetMaximum(branch) + 1)
         countNtuple.Project('hallo', branch, branch)
         counter[getpdg(branch)] = hallo.Integral()
         del hallo

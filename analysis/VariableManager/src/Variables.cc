@@ -737,6 +737,20 @@ namespace Belle2 {
 
     // RestOfEvent related --------------------------------------------------
 
+    double nRemainingTracksInRestOfEvent(const Particle* particle)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      int roe_tracks = roe->getTracks().size();
+      int par_tracks = 0;
+      const auto& daughters = particle->getFinalStateDaughters();
+      for (const auto & daughter : daughters) {
+        int pdg = abs(daughter->getPDGCode());
+        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
+          par_tracks++;
+      }
+      return roe_tracks - par_tracks;
+    }
+
     double isInRestOfEvent(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -1856,6 +1870,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
+    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent, "Returns number of tracks in ROE - number of tracks of given particle");
 
     REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("particleMCStatus", particleMCStatus, "Returns mcStatus of related MCParticle or -1 if MCParticle relation is not set.");

@@ -570,14 +570,14 @@ def SaveModuleStatistics(path, hash, finalParticleSignalProbabilities):
     return {'ModuleStatisticsFile': filename}
 
 
-def WriteCPUTimeSummary(channelNames, inputLists, mcCounts, moduleStatisticsFile):
+def WriteCPUTimeSummary(channelNames, inputLists, channelPlaceholders, mcCounts, moduleStatisticsFile):
     """
     Creates CPU time summary
         @param mcCounts
         @param moduleStatisticsFile file name of the TFile containing actual statistics
-        @return ?
+        @return dictionary of placeholders used in the .tex file
     """
     stats = automaticReporting.getModuleStatsFromFile(moduleStatisticsFile)
-    placeholders = automaticReporting.createCPUTimeTexFile(channelNames, inputLists, mcCounts, moduleStatisticsFile, stats)
+    placeholders = automaticReporting.createCPUTimeTexFile(channelNames, inputLists, channelPlaceholders, mcCounts, moduleStatisticsFile, stats)
 
     return {'CPUTimeSummary': placeholders}

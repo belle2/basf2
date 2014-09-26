@@ -412,14 +412,17 @@ def FullEventInterpretation(path, particles):
         play.addActor(SaveModuleStatistics,
                       finalParticleSignalProbabilities=['SignalProbability_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles])
 
-        #get channelName and corresponding inputList (in two lists, sadly)
+        #get channelName and corresponding inputList and placeholders (in separate lists, sadly)
         channelNames = ['Name_{i}'.format(i=p.identifier) for p in particles if p.isFSP]
         channelNames += ['Name_{c}'.format(c=channel.name) for p in particles for channel in p.channels]
         inputLists = ['RawParticleList_{i}'.format(i=p.identifier) for p in particles if p.isFSP]
         inputLists += ['RawParticleList_{c}'.format(c=channel.name) for p in particles for channel in p.channels]
+        channelPlaceholders = ['Placeholders_{i}'.format(i=p.identifier) for p in particles if p.isFSP]
+        channelPlaceholders += ['Placeholders_{c}'.format(c=channel.name) for p in particles for channel in p.channels]
         play.addActor(WriteCPUTimeSummary,
                       channelNames=channelNames,
                       inputLists=inputLists,
+                      channelPlaceholders=channelPlaceholders,
                       mcCounts='mcCounts',
                       moduleStatisticsFile='ModuleStatisticsFile')
 

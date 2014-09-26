@@ -57,24 +57,30 @@ def prettifyDecayString(decayString):
     return decayString
 
 
-def formatTime(seconds, onlyMostSignificant=True):
+def formatTime(seconds):
     """
     Return string describing a duration in a natural format
     """
     minutes = int(seconds / 60)
     hours = int(minutes / 60)
     minutes %= 60
+    ms = int(seconds * 1000) % 1000
+    us = int(seconds * 1000 * 1000) % 1000
     seconds = int(seconds % 60)
     string = ''
     if hours != 0:
         string += "%dh" % (hours)
-        if onlyMostSignificant:
-            return string
     if minutes != 0:
         string += "%dm" % (minutes)
-        if onlyMostSignificant:
-            return string
-    string += "%ds" % (seconds)
+    if seconds != 0 and hours == 0:
+        string += "%ds" % (seconds)
+    if ms != 0 and hours == 0 and minutes == 0 and seconds == 0:
+        string += "%dms" % (ms)
+    if us != 0 and hours == 0 and minutes == 0 and seconds == 0 and ms == 0:
+        string += "%d$\mu$s" % (us)
+
+    if hours == 0 and minutes == 0 and seconds == 0 and ms == 0 and us == 0:
+        string += '<1$\mu$s'
     return string
 
 
@@ -795,41 +801,47 @@ def getModuleStatsFromFile(filename):
     return stats.getAll()
 
 
-def createCPUTimeTexFile(channelNames, inputLists, mcCounts, moduleStatisticsFile, stats):
+def createCPUTimeTexFile(channelNames, inputLists, channelPlaceholders, mcCounts, moduleStatisticsFile, stats):
     """
     Creates CPU time summary .tex file
         @param stats ProcessStatistics object to interpret
         @return placeholders
     """
 
-    time_global_seconds = 0
+    sum_time_seconds = 0
+    sum_trueCandidates = 0
+    sum_allCandidates = 0
     statTable = []
     moduleTypes = ('ParticleSelector', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatching', 'TMVAExpert', 'Other')
-    for name, plist in zip(channelNames, inputLists):
+    for name, plist, currentPlaceholders in zip(channelNames, inputLists, channelPlaceholders):
         if plist is None:
             continue
-        moduleDict = {}
+        cpuPerModuleType = {}
         for mType in moduleTypes:
-            moduleDict[mType] = 0.0
+            cpuPerModuleType[mType] = 0.0
 
         matchingModules = [m for m in stats if plist in m.getName()]
         time_total_seconds = 0
         for m in matchingModules:
             moduleName = m.getName().split('_')[0]
             time_seconds = m.getTimeSum(m.c_Event) / 1e9
-            if moduleName in moduleDict:
-                moduleDict[moduleName] += time_seconds
+            if moduleName in cpuPerModuleType:
+                cpuPerModuleType[moduleName] += time_seconds
             else:
-                moduleDict['Other'] += time_seconds
+                cpuPerModuleType['Other'] += time_seconds
             time_total_seconds += time_seconds
 
-        for m in moduleDict:
-            moduleDict[m] /= time_total_seconds
-            moduleDict[m] *= 100
+        for m in cpuPerModuleType:
+            cpuPerModuleType[m] /= time_total_seconds
+            cpuPerModuleType[m] *= 100
 
         shortName = prettifyDecayString(name)
-        statTable.append([shortName, time_total_seconds, moduleDict])
-        time_global_seconds += time_total_seconds
+        trueCandidates = currentPlaceholders['mvaNSignal']
+        allCandidates = trueCandidates + currentPlaceholders['mvaNBackground']
+        statTable.append([shortName, time_total_seconds, cpuPerModuleType, trueCandidates, allCandidates])
+        sum_time_seconds += time_total_seconds
+        sum_trueCandidates += trueCandidates
+        sum_allCandidates += allCandidates
 
     # fill cpuTimeStatistics placeholder
     placeholders = {}
@@ -840,12 +852,13 @@ def createCPUTimeTexFile(channelNames, inputLists, mcCounts, moduleStatisticsFil
     placeholders['cpuTimeStatistics'] = ''
     rowString = '{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\\% \\\\\n'
     for row in statTable:
-        moduleDict = row[2]
-        bargraph = '\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % tuple(moduleDict[key] for key in moduleTypes)
-        timePercent = row[1] / time_global_seconds * 100
-        placeholders['cpuTimeStatistics'] += rowString.format(name=row[0], bargraph=bargraph, time=formatTime(row[1]), timePerCandidate=0, timePercent=timePercent)
+        cpuPerModuleType = row[2]
+        bargraph = '\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % tuple(cpuPerModuleType[key] for key in moduleTypes)
+        timePerCandidate = formatTime(row[1] * 1.0 / row[4]) + ' (' + formatTime(row[1] * 1.0 / row[3]) + ')'
+        timePercent = row[1] / sum_time_seconds * 100
+        placeholders['cpuTimeStatistics'] += rowString.format(name=row[0], bargraph=bargraph, time=formatTime(row[1]), timePerCandidate=timePerCandidate, timePercent=timePercent)
     placeholders['cpuTimeStatistics'] += '\\bottomrule\n'
-    placeholders['cpuTimeStatistics'] += rowString.format(name='Total', bargraph='', time=formatTime(time_global_seconds), timePerCandidate=0, timePercent=100)
+    placeholders['cpuTimeStatistics'] += rowString.format(name='Total', bargraph='', time=formatTime(sum_time_seconds), timePerCandidate='', timePercent=100)
 
     placeholders['texFile'] = 'CPUTimeSummary_' + moduleStatisticsFile + '.tex'
     if not os.path.isfile(placeholders['texFile']):

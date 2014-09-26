@@ -10,6 +10,8 @@
 #pragma link C++ class Belle2::RootMergeable<TTree>+;
 #pragma link C++ class Belle2::RootMergeable<TNtuple>+;
 #pragma link C++ class Belle2::RootMergeable<TH1F>+;
+#pragma link C++ class Belle2::RootMergeable<TH1D>+;
 #pragma link C++ class Belle2::RootMergeable<TH2F>+;
+#pragma link C++ class Belle2::RootMergeable<TH2D>+;
 
 #endif

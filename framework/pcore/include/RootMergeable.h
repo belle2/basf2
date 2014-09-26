@@ -15,6 +15,7 @@
 #include <TFile.h>
 #include <TList.h>
 #include <TH1F.h>
+#include <TH1D.h>
 #include <TH2F.h>
 #include <TNtuple.h>
 

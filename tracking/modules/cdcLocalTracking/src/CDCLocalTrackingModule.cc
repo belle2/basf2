@@ -109,13 +109,13 @@ void CDCLocalTrackingModule::event()
   // Definitions need callgrind.h
 
 
-  //fetch the CDCHits from the datastore
+  // Fetch the CDCHits from the datastore
   B2DEBUG(100, "Getting the CDCHits from the data store");
   StoreArray <CDCHit> storedCDCHits;
   B2DEBUG(100, "  storedCDCHits.getEntries() == " << storedCDCHits.getEntries());
 
 
-  //create the wirehits
+  // Create the wirehits - translate the CDCHits and attach the geometry.
   B2DEBUG(100, "Creating all CDCWireHits");
   CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   size_t nHits = wireHitTopology.fill();
@@ -124,14 +124,15 @@ void CDCLocalTrackingModule::event()
     return;
   }
 
-  //build the segments
+  // Stage one
+  // Build the segments
   m_recoSegments.clear();
   m_segmentWorker.generate(m_recoSegments);
   B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
 
 
-
-  //build the gfTracks
+  // Stage two
+  // Build the gfTracks
   StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandColName);
   storedGFTrackCands.create();
   //m_segmentTripleTrackingWorker.apply(m_recoSegments, storedGFTrackCands);

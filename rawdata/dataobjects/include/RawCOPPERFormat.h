@@ -33,7 +33,7 @@
 #define EECL_ID  0x06000000 // tentative
 #define BKLM_ID  0x07000000 // tentative
 #define EKLM_ID  0x08000000 // tentative
-
+#define TRGDATA_ID  0x09000000 // tentative
 
 
 namespace Belle2 {

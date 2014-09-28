@@ -270,10 +270,15 @@ void V0FinderModule::event()
 
     const std::vector<Belle2::MCParticle*>& daughters = MCpart->getDaughters();
     if (daughters.size() != 2)
-      // Kshort can go to pi- pi+ gamma (BR = 1.8 x 10^-3).  A quick
-      // perusal of the PDG shows no other significant displaced
-      // decays to two charged particles + neutrals.  They will not be
-      // matched.
+      // We match V0 candidates by looking for particles decaying into
+      // two oppositely charged particles instead of listing the possible PDG ids
+      // and then looking whether the correct kind of decay took
+      // place.  This approach is more general but it will miss decays
+      // with an additional (soft) neutral which would also show as
+      // V0.  In particular Kshort can go to pi- pi+ gamma (BR = 1.8 x
+      // 10^-3).  A quick perusal of the PDG shows no other
+      // significant displaced decays to two charged particles +
+      // neutrals.
       continue;
     const MCParticle* daughterPlus = 0;
     const MCParticle* daughterMinus = 0;
@@ -287,7 +292,8 @@ void V0FinderModule::event()
       daughterMinus = daughters[1];
 
     if (!daughterPlus || !daughterMinus) {
-      // Not a V0
+      // Not a V0, need both positively charged and negatively charged
+      // daughter.
       continue;
     }
 
@@ -307,7 +313,7 @@ void V0FinderModule::event()
       }
 
       if (daughterPlus == V0PartPlus && daughterMinus == V0PartMinus) {
-        // establish relation
+        // Establish relation.
         V0s[j]->addRelationTo(MCpart);
       }
     }

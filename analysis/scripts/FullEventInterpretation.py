@@ -324,6 +324,10 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
     # In the second act pre and post cuts are calculated
     for particle in particles:
         if particle.isFSP:
+            play.addActor(FSPDistribution,
+                          identifier='Identifier_{i}'.format(i=particle.identifier),
+                          inputList='RawParticleList_{i}'.format(i=particle.identifier),
+                          mvaConfig='MVAConfig_{i}'.format(i=particle.identifier))
             play.addActor(PostCutDetermination,
                           identifier='Identifier_{i}'.format(i=particle.identifier),
                           postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
@@ -359,7 +363,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               identifier='Identifier_{i}'.format(i=particle.identifier),
                               mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
                               particleList='RawParticleList_{i}'.format(i=particle.identifier),
-                              preCut='None',
+                              distribution='Distribution_{i}'.format(i=particle.identifier),
                               additionalDependencies='None')
             else:
                 for channel in particle.channels:
@@ -373,7 +377,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
                                   identifier='Name_{c}'.format(c=channel.name),
                                   mvaConfig='MVAConfig_{c}'.format(c=channel.name),
                                   particleList='RawParticleList_{c}'.format(c=channel.name),
-                                  preCut='PreCut_{c}'.format(c=channel.name),
+                                  distribution='PreCut_{c}'.format(c=channel.name),
                                   additionalDependencies=additionalDependencies)
 
                 play.addCollection('SignalProbability_{i}'.format(i=particle.identifier), ['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
@@ -410,6 +414,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
                               postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
                               postCut='PostCut_{i}'.format(i=particle.identifier),
+                              distribution='Distribution_{i}'.format(i=particle.identifier),
                               nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier))
             else:
                 play.addActor(WriteAnalysisFileForCombinedParticle,
@@ -470,6 +475,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
             path.add_path(user_selection_path)
             path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
         else:
-            path.add_module(register_module('RootInput'))
+            if user_selection_path is not None:
+                path.add_module(register_module('RootInput'))
             path.add_path(fei_path)
     return path

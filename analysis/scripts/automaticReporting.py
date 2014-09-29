@@ -205,17 +205,16 @@ def createMBCTexFile(ntuple):
     return placeholders
 
 
-def createFSParticleTexFile(placeholders, nTuple, mcCounts):
+def createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution):
     """
     Creates a tex document with Training plots
         @param mvaConfig configuration for mva
-        @param signalProbability config filename for TMVA training
     """
     placeholders['particleNTrueSignal'] = mcCounts.get(str(abs(pdg.from_name(placeholders['particleName']))), 0)
-    placeholders['particleNSignal'] = placeholders['mvaNSignal']
-    placeholders['particleNBackground'] = placeholders['mvaNBackground']
-    placeholders['particleNSignalAfterPreCut'] = placeholders['mvaNSignal']
-    placeholders['particleNBackgroundAfterPreCut'] = placeholders['mvaNBackground']
+    placeholders['particleNSignal'] = distribution['nSignal']
+    placeholders['particleNBackground'] = distribution['nBackground']
+    placeholders['particleNSignalAfterPreCut'] = distribution['nSignal']
+    placeholders['particleNBackgroundAfterPreCut'] = distribution['nBackground']
 
     rootfile = ROOT.TFile(nTuple)
     tree = rootfile.Get('variables')
@@ -595,7 +594,7 @@ def makeDiagPlotPerParticle(nTuple, plotName):
         raise RuntimeError('variables is empty')
 
     nbins = 100
-    probabilityVar = ROOT.Belle2.Variable.makeROOTCompatible('getExtraInfo(SignalProbability)')
+    probabilityVar = 'getExtraInfoSignalProbability'  # ROOT.Belle2.Variable.makeROOTCompatible('getExtraInfo(SignalProbability)')
     bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
     variables.Project('background' + probabilityVar, probabilityVar, '!isSignal')
     signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)

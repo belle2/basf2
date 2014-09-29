@@ -24,6 +24,13 @@ class MockPath(object):
         return self.mmodules
 
 
+mvaConfig = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
+    target='isSignal'
+)
+
+
 class TestCountMCParticles(unittest.TestCase):
     """ Unittest class """
     def setUp(self):
@@ -39,6 +46,24 @@ class TestCountMCParticles(unittest.TestCase):
         self.assertListEqual(parameters['variables'], ['NumberOfMCParticlesInEvent(11)', 'NumberOfMCParticlesInEvent(22)', 'NumberOfMCParticlesInEvent(411)'])
         self.assertEqual(parameters['fileName'], 'mcParticlesCount.root')
         self.assertEqual(parameters['treeName'], 'mccounts')
+
+
+class TestFSPDistribution(unittest.TestCase):
+    """ Unittest class """
+    def setUp(self):
+        """ Unittest function """
+        self.path = MockPath()
+
+    def test_standard(self):
+        """ Unittest function """
+        result = FSPDistribution(self.path, 'e+', 'e+:listname', mvaConfig)
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertListEqual(parameters['variables'], [mvaConfig.target])
+        self.assertEqual(parameters['fileName'], 'e+:listname_909c951ba071fbd12a835b6ae140398d380c9185.root')
+        self.assertEqual(parameters['treeName'], 'distribution')
+        self.assertEqual(parameters['particleList'], 'e+:listname')
 
 
 class TestSelectParticleList(unittest.TestCase):
@@ -190,12 +215,6 @@ class TestFitVertex(unittest.TestCase):
         self.assertDictEqual(result, {'VertexFit_UniqueChannelName': None})
         self.assertEqual(len(self.path.modules()), 0)
 
-
-mvaConfig = Particle.MVAConfiguration(
-    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
-    target='isSignal'
-)
 
 preCutConfig = Particle.PreCutConfiguration(
     variable='M',
@@ -430,7 +449,7 @@ class TestSignalProbability(unittest.TestCase):
 
     def test_standard_expert_sampling(self):
         """ Unittest function """
-        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, {'nSignal': 1e8, 'nBackground': 2e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, {'nSignal': 2e8, 'nBackground': 4e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_Identifier': self.standardFilename + '.config'})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -439,7 +458,7 @@ class TestSignalProbability(unittest.TestCase):
         self.assertEqual(parameters['signalFraction'], -1)
         self.assertEqual(parameters['signalProbabilityName'], 'SignalProbability')
         self.assertEqual(parameters['signalClass'], 1)
-        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 20, 1: 10})
+        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 21, 1: 11})
         self.assertEqual(parameters['listNames'], ['D+:1'])
 
     def test_standard_teacher(self):
@@ -462,7 +481,7 @@ class TestSignalProbability(unittest.TestCase):
         """ Unittest function """
         os.remove(self.standardFilename + '.root')
         os.remove(self.standardFilename + '.config')
-        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, {'nSignal': 1e8, 'nBackground': 2e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, {'nSignal': 2e8, 'nBackground': 4e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -471,7 +490,7 @@ class TestSignalProbability(unittest.TestCase):
         self.assertEqual(parameters['variables'], mvaConfig.variables)
         self.assertEqual(parameters['target'], mvaConfig.target)
         self.assertEqual(parameters['doNotTrain'], True)
-        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 20, 1: 10})
+        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 21, 1: 11})
         self.assertEqual(parameters['listNames'], ['D+:1'])
 
     def test_missing_additional_dependencies(self):

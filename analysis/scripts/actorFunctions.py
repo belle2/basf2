@@ -69,6 +69,37 @@ def CountMCParticles(path, names):
     return {'mcCounts': counter}
 
 
+def FSPDistribution(path, identifier, inputList, mvaConfig):
+    """
+    Returns signal and background distribution of FSP
+    Counts the number of MC Particles for every pdg code in all events
+        @param path the basf2 path
+        @param identifier unique identifier of the particle
+        @param inputList particle list name
+        @param mvaConfig configuration for the multivariate analysis
+    """
+    B2INFO("Calculate signal and background candiates of FSP {i}".format(i=inputList))
+    hash = actorFramework.create_hash([identifier, inputList, mvaConfig.target])
+    filename = removeJPsiSlash('{i}_{h}.root'.format(i=inputList, h=hash))
+
+    if not os.path.isfile(filename):
+        output = register_module('VariablesToNtuple')
+        output.param('particleList', inputList)
+        output.param('variables', [mvaConfig.target])
+        output.param('fileName', filename)
+        output.param('treeName', 'distribution')
+        path.add_module(output)
+        B2INFO("Add VariableToNtuple to count signal and background candiates of FSP {i}".format(i=inputList))
+        return {}
+
+    rootfile = ROOT.TFile(filename)
+    distribution = rootfile.Get('distribution')
+    result = {'nSignal': distribution.GetEntries(mvaConfig.target + ' == 1'), 'nBackground': distribution.GetEntries(mvaConfig.target + ' == 0')}
+    print result
+    B2INFO("Calculated signal and background candiates of FSP {i}".format(i=inputList))
+    return {'Distribution_{i}'.format(i=identifier): result}
+
+
 def LoadParticles(path, preloader):
     """
     Loads Particles
@@ -316,7 +347,7 @@ def PostCutDetermination(identifier, postCutConfig, signalProbabilities):
         return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
 
 
-def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig, preCut, additionalDependencies):
+def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig, distribution, additionalDependencies):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
@@ -326,7 +357,7 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
         @param additionalDependencies for variables like SignalProbability of daughters or VertexFit
-        @param preCut applied preCut with information about number of background an signal events, None for FSP TODO not yet in hash
+        @param distribution information about number of background an signal events
         @return Resource named SignalProbability_{identifier} providing config filename
     """
     B2INFO("Enter: Calculate SignalProbability for {i}.".format(i=identifier))
@@ -339,20 +370,28 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
 
     maxEvents = int(1e7)
     inverseSamplingRates = {}
-    if preCut is not None:
-        if preCut['nBackground'] > maxEvents:
-            inverseSamplingRates[0] = int(preCut['nBackground'] / maxEvents)
-        if preCut is not None and preCut['nSignal'] > maxEvents:
-            inverseSamplingRates[1] = int(preCut['nSignal'] / maxEvents)
+    if distribution['nBackground'] > maxEvents:
+        inverseSamplingRates[0] = int(distribution['nBackground'] / maxEvents) + 1
+    if distribution['nSignal'] > maxEvents:
+        inverseSamplingRates[1] = int(distribution['nSignal'] / maxEvents) + 1
+
+    Nbins = 'NbinsMVAPdf=50:'
+    if distribution['nSignal'] > 1e5:
+        Nbins = 'NbinsMVAPdf=100:'
+    if distribution['nSignal'] > 1e6:
+        Nbins = 'NbinsMVAPdf=200:'
+
+    print inverseSamplingRates
 
     if not os.path.isfile(rootFilename):
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
         teacher.param('prefix', removeJPsiSlash(particleList + '_' + hash))
-        teacher.param('methods', [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
+        teacher.param('methods', [(mvaConfig.name, mvaConfig.type, Nbins + mvaConfig.config)])  # Add number of bins for pdfs
         teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
         teacher.param('prepareOption', 'SplitMode=random:!V')
         teacher.param('variables', mvaConfig.variables)
+        teacher.param('createMVAPDFs', True)
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
         teacher.param('inverseSamplingRates', inverseSamplingRates)
@@ -366,7 +405,7 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
         command = ("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
                    " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
                    " --maxEventsPerClass {maxEvents}"
-                   " > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config=mvaConfig.config,
+                   " > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config='CreateMVAPdfs:' + Nbins + mvaConfig.config,
                                               target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
                                               foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
                                               poption='SplitMode=random:!V', maxEvents=maxEvents,
@@ -385,8 +424,8 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
         expert.set_name('TMVAExpert_' + particleList)
         expert.param('prefix', removeJPsiSlash(particleList + '_' + hash))
         expert.param('method', mvaConfig.name)
-        #expert.param('signalFraction', -2)  # Use signalFraction from training
-        expert.param('signalFraction', -1)  # No transformation of output
+        expert.param('signalFraction', -2)  # Use signalFraction from training
+        #expert.param('signalFraction', -1)  # No transformation of output
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalClass', 1)
         expert.param('inverseSamplingRates', inverseSamplingRates)
@@ -464,7 +503,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     return {'Placeholders_{c}'.format(c=channelName): placeholders, '__needed__': False}
 
 
-def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signalProbability, postCutConfig, postCut, nTuple, mcCounts):
+def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signalProbability, postCutConfig, postCut, distribution, nTuple, mcCounts):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName valid pdg particle name
@@ -474,6 +513,7 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
         @param postCutConfig configuration for postCut
         @param postCut
         @param mcCounts
+        @param distribution
         @return Resource named Placeholders_{particleName}:{particleLabel} providing latex placeholders of this particle
     """
 
@@ -483,7 +523,7 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
     placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
 
-    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
+    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut, distribution)
     placeholders = automaticReporting.createFSParticleTexFile(placeholders, nTuple, mcCounts)
 
     B2INFO("Written analysis tex file for final state particle {p} with label {l}.".format(p=particleName, l=particleLabel))

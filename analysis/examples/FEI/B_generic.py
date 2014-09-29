@@ -311,7 +311,7 @@ pre_BPlus = Particle.PreCutConfiguration(
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     efficiency=0.95,
     purity=0.0001,
-    userCut='Mbc > 5.2 and abs(deltaE) < 0.5'
+    userCut='Mbc > 5.2 and -0.15 < deltaE < 0.1'
 )
 
 p = Particle('B+', mva_BPlus, pre_BPlus)
@@ -379,7 +379,7 @@ pre_B0 = Particle.PreCutConfiguration(
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     efficiency=0.95,
     purity=0.0001,
-    userCut='Mbc > 5.2 and abs(deltaE) < 0.5'
+    userCut='Mbc > 5.2 and -0.15 < deltaE < 0.1'
 )
 
 p = Particle('B0', mva_B0, pre_B0)

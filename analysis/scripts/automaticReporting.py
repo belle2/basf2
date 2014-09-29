@@ -705,7 +705,7 @@ def makeCosBDLPlot(fileName, outputFileName):
         first_plot = False
 
         testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
+        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignalAcceptMissingNeutrino', 'same')
         color -= 1
 
     l = canvas.GetListOfPrimitives()

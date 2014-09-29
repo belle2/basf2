@@ -22,6 +22,7 @@ import actorFramework
 import preCutDetermination
 import automaticReporting
 
+import re
 import os
 import subprocess
 import json
@@ -244,6 +245,10 @@ def FitVertex(path, hash, preloader, channelName, particleList, daughterVertices
     if preloader.particleListHasVertexFit(particleList):
         B2INFO("Preloaded fitted vertex for channel {c}.".format(c=channelName))
         return {'VertexFit_{c}'.format(c=channelName): hash, '__needed__': False}
+
+    if re.findall(r"[\w']+", channelName).count('pi0') > 1:
+        B2INFO("Ignore vertex fit for this channel because multiple pi0 are not supported yet {c}.".format(c=channelName))
+        return {'VertexFit_{c}'.format(c=channelName): hash}
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + particleList)

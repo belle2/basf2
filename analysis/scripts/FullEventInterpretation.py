@@ -478,4 +478,5 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
             if user_selection_path is not None:
                 path.add_module(register_module('RootInput'))
             path.add_path(fei_path)
+    path.add_module(register_module('ProgressBar'))
     return path

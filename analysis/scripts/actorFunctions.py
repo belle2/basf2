@@ -26,7 +26,6 @@ import os
 import subprocess
 import json
 from string import Template
-import IPython
 
 
 def removeJPsiSlash(filename):

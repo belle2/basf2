@@ -634,7 +634,7 @@ const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, EWir
     wPos.SetX(m_FWirPosMisalign[layerID][cellID][0]);
     wPos.SetY(m_FWirPosMisalign[layerID][cellID][1]);
     wPos.SetZ(m_FWirPosMisalign[layerID][cellID][2]);
-  } else {
+  } else if (set == c_Base) {
     wPos.SetX(m_FWirPos        [layerID][cellID][0]);
     wPos.SetY(m_FWirPos        [layerID][cellID][1]);
     wPos.SetZ(m_FWirPos        [layerID][cellID][2]);
@@ -648,16 +648,13 @@ const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, doub
   double yf_sag = 0.;
   getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
 
-  TVector3 wPos(m_FWirPosAlign[layerID][cellID][0],
-                yf_sag,
+  TVector3 wPos(m_FWirPosAlign[layerID][cellID][0], yf_sag,
                 m_FWirPosAlign[layerID][cellID][2]);
   if (set == c_Misaligned) {
     wPos.SetX(m_FWirPosMisalign[layerID][cellID][0]);
-    wPos.SetY(yf_sag);
     wPos.SetZ(m_FWirPosMisalign[layerID][cellID][2]);
-  } else {
+  } else if (set == c_Base) {
     wPos.SetX(m_FWirPos        [layerID][cellID][0]);
-    wPos.SetY(yf_sag);
     wPos.SetZ(m_FWirPos        [layerID][cellID][2]);
   }
   return wPos;
@@ -673,7 +670,7 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID, EWi
     wPos.SetX(m_BWirPosMisalign[layerID][cellID][0]);
     wPos.SetY(m_BWirPosMisalign[layerID][cellID][1]);
     wPos.SetZ(m_BWirPosMisalign[layerID][cellID][2]);
-  } else {
+  } else if (set == c_Base) {
     wPos.SetX(m_BWirPos        [layerID][cellID][0]);
     wPos.SetY(m_BWirPos        [layerID][cellID][1]);
     wPos.SetZ(m_BWirPos        [layerID][cellID][2]);
@@ -687,16 +684,13 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID, dou
   double yf_sag = 0.;
   getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
 
-  TVector3 wPos(m_BWirPosAlign[layerID][cellID][0],
-                yb_sag,
+  TVector3 wPos(m_BWirPosAlign[layerID][cellID][0], yb_sag,
                 m_BWirPosAlign[layerID][cellID][2]);
   if (set == c_Misaligned) {
     wPos.SetX(m_BWirPosMisalign[layerID][cellID][0]);
-    wPos.SetY(yb_sag);
     wPos.SetZ(m_BWirPosMisalign[layerID][cellID][2]);
-  } else {
+  } else if (set == c_Base) {
     wPos.SetX(m_BWirPos        [layerID][cellID][0]);
-    wPos.SetY(yb_sag);
     wPos.SetZ(m_BWirPos        [layerID][cellID][2]);
   }
   return wPos;

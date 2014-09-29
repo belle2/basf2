@@ -55,6 +55,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
 
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.", string("RootOutput.root"));
+  addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride, "Ignore override of filname via command line argument -o. Useful if you have multiple output modules in one path.", false);
   addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticeable effect.", 1);
   addParam("splitLevel", m_splitLevel, "Branch split level. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used.", 99);
   addParam("updateFileCatalog", m_updateFileCatalog, "Flag that specifies whether the file metadata catalog is updated.", true);

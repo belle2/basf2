@@ -188,24 +188,31 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     return placeholders
 
 
-def createMBCTexFile(ntuple):
+def createMoneyPlotTexFile(ntuple, type):
     """
-    Creates a tex document with MBC Plot frmo the given ntuple
+    Creates a tex document with MBC or CosBDL Plot from the given ntuple
         @param ntuple the ntuple containing the needed information
     """
     placeholders = {}
-    mbcFilename = ntuple[:-5] + '_mbc.pdf'
-    if not os.path.isfile(mbcFilename):
-        makeMbcPlot(ntuple, mbcFilename)
-    placeholders['mbcPlot'] = mbcFilename
-    placeholders['texFile'] = ntuple[:-5] + '_mbc.tex'
-    placeholders['particleName'] = mbcFilename[4:].split(':', 1)[0]
+    moneyFilename = ntuple[:-5] + '_money.pdf'
+    if not os.path.isfile(moneyFilename):
+        if type == 'Mbc':
+            template_file = 'analysis/scripts/FEI/templates/MBCTemplate.tex'
+            makeMbcPlot(ntuple, moneyFilename)
+        elif type == 'CosBDL':
+            template_file = 'analysis/scripts/FEI/templates/CosBDLTemplate.tex'
+            makeCosBDLPlot(ntuple, moneyFilename)
+        else:
+            raise RuntimeError('Unkown money plot type')
+    placeholders['moneyPlot'] = moneyFilename
+    placeholders['texFile'] = ntuple[:-5] + '_money.tex'
+    placeholders['particleName'] = moneyFilename[4:].split(':', 1)[0]
     if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/MBCTemplate.tex', placeholders)
+        createTexFile(placeholders['texFile'], template_file, placeholders)
     return placeholders
 
 
-def createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution):
+def createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution, mvaConfig):
     """
     Creates a tex document with Training plots
         @param mvaConfig configuration for mva
@@ -224,7 +231,7 @@ def createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution):
     hash = actorFramework.create_hash([placeholders])
     placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['particleDiagPlot']):
-        makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'])
+        makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'], mvaConfig)
     placeholders['texFile'] = '{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/FSParticleTemplate.tex', placeholders)
@@ -232,7 +239,7 @@ def createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution):
     return placeholders
 
 
-def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts):
+def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts, mvaConfig):
     """
     Creates a tex document with the PreCut and Training plots
         @param placeholders dictionary with values for every placeholder in the latex-template
@@ -273,8 +280,8 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
 
     rootfile = ROOT.TFile(nTuple)
     tree = rootfile.Get('variables')
-    placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries('isSignal'))
-    placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!isSignal'))
+    placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries(mvaConfig.target))
+    placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!' + mvaConfig.target))
 
     for channelPlaceholder in channelPlaceholders:
         placeholders['particleNSignal'] += int(channelPlaceholder['channelNSignal'])
@@ -289,7 +296,7 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
     hash = actorFramework.create_hash([placeholders])
     placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['particleDiagPlot']):
-        makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'])
+        makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'], mvaConfig)
     placeholders['texFile'] = removeJPsiSlash('{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/CombinedParticleTemplate.tex', placeholders)
@@ -585,7 +592,7 @@ def makeROCPlot(tmvaFilename, plotName):
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
-def makeDiagPlotPerParticle(nTuple, plotName):
+def makeDiagPlotPerParticle(nTuple, plotName, mvaConfig):
 
     nTupleFile = ROOT.TFile(nTuple)
     variables = nTupleFile.Get('variables')
@@ -596,9 +603,9 @@ def makeDiagPlotPerParticle(nTuple, plotName):
     nbins = 100
     probabilityVar = 'getExtraInfoSignalProbability'  # ROOT.Belle2.Variable.makeROOTCompatible('getExtraInfo(SignalProbability)')
     bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
-    variables.Project('background' + probabilityVar, probabilityVar, '!isSignal')
+    variables.Project('background' + probabilityVar, probabilityVar, '!' + mvaConfig.target)
     signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
-    variables.Project('signal' + probabilityVar, probabilityVar, 'isSignal')
+    variables.Project('signal' + probabilityVar, probabilityVar, mvaConfig.target)
     makeDiagPlot(signalHist, bgHist, plotName)
 
 
@@ -660,6 +667,51 @@ def makeDiagPlot(signalHist, bgHist, plotName):
     diagonal.SetLineColor(ROOT.kAzure)
     diagonal.Draw()
     canvas.SaveAs(plotName)
+
+
+def makeCosBDLPlot(fileName, outputFileName):
+    """
+    Using the TNTuple in 'fileName', save CosThetaBDL plot in 'outputFileName'.
+    Shows effect of different cuts on SignalProbability, plus signal distribution.
+    """
+    ntupleFile = ROOT.TFile(fileName)
+    ntupleName = 'variables'
+
+    testTree = ntupleFile.Get(ntupleName)
+    if testTree.GetEntries() == 0:
+        raise RuntimeError('Couldn\'t find TNtuple "' + ntupleName + '" in file ' + ntupleFile)
+
+    plotTitle = 'CosThetaBDL plot'
+    ROOT.gStyle.SetOptStat(0)
+    canvas = ROOT.TCanvas(plotTitle, plotTitle, 600, 400)
+    canvas.cd()
+
+    #testTree.SetLineColor(ROOT.kBlack)
+    #testTree.Draw('Mbc', 'Mbc > 5.23', '')
+    #testTree.SetLineStyle(ROOT.kDotted)
+    #testTree.Draw('Mbc', '!isSignal', 'same')
+    color = ROOT.kRed + 4
+    first_plot = True
+    for cut in [0.01, 0.1, 0.5]:
+        testTree.SetLineColor(int(color))
+        testTree.SetLineStyle(ROOT.kSolid)
+        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && getExtraInfoSignalProbability > ' + str(cut), '' if first_plot else 'same')
+        first_plot = False
+
+        testTree.SetLineStyle(ROOT.kDotted)
+        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
+        color -= 1
+
+    l = canvas.GetListOfPrimitives()
+    for i in range(l.GetEntries()):
+        hist = l[i]
+        if isinstance(hist, ROOT.TH1D):
+            hist.GetXaxis().SetRangeUser(-10, 10)
+            break
+
+    canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
+
+    canvas.SaveAs(outputFileName)
 
 
 def makeMbcPlot(fileName, outputFileName):

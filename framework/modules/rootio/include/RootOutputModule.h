@@ -66,6 +66,8 @@ namespace Belle2 {
 
     /** Return the used output file, taking into account -o argument to basf2. */
     std::string getOutputFile() const {
+      if (m_ignoreCommandLineOverride)
+        return m_outputFileName;
       const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
       if (!outputFileArgument.empty())
         return outputFileArgument;
@@ -164,6 +166,10 @@ namespace Belle2 {
     /** Highest event number in highest run.
      */
     unsigned long m_eventHigh;
+
+    /** Ignore filename override from command line
+     */
+    bool m_ignoreCommandLineOverride;
   };
 } // end namespace Belle2
 

@@ -24,15 +24,12 @@
 }
 
 \FloatBarrier
-\begin{table}[h]
-  \centering
-  \caption{Total CPU time spent in event() calls for each channel. Bars show ${barLegend}, in this order. Does not include I/O, initalisation, training, post-cuts etc.}
-  \begin{tabular}{lrcrr}
+  \begin{longtable}{lrcrr}
+  \caption{Total CPU time spent in event() calls for each channel. Bars show ${barLegend}, in this order. Does not include I/O, initalisation, training, post-cuts etc.}\\
     \toprule
     Decay & CPU time & by module & per (true) candidate & Relative time \\
     \midrule
     ${cpuTimeStatistics}
     \bottomrule
-  \end{tabular}
-\end{table}
+  \end{longtable}
 \FloatBarrier

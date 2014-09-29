@@ -391,6 +391,9 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
     # The last act creates the automatic reporting summary pdf
     finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
+    play.addActor(SaveModuleStatistics,
+                  finalParticleSignalProbabilities=['SignalProbability_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles])
+
     if args.makeSummary:
         for particle in particles:
             for channel in particle.channels:
@@ -422,9 +425,6 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               particleLabel='Label_{i}'.format(i=particle.identifier),
                               channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
                               nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier))
-
-        play.addActor(SaveModuleStatistics,
-                      finalParticleSignalProbabilities=['SignalProbability_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles])
 
         #get channelName and corresponding inputList and placeholders (in separate lists, sadly)
         channelNames = ['Name_{i}'.format(i=p.identifier) for p in particles if p.isFSP]

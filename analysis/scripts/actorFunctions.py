@@ -463,7 +463,7 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
         output.param('particleList', particleList)
-        output.param('variables', ['getExtraInfo(SignalProbability)', 'isSignal', 'Mbc', 'mcStatus'])
+        output.param('variables', ['getExtraInfo(SignalProbability)', 'isSignal', 'isSignalAcceptMissingNeutrino', 'Mbc', 'mcStatus', 'cosThetaBetweenParticleAndTrueB'])
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)
@@ -496,6 +496,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     placeholders['particleLabel'] = particleLabel
     placeholders['channelName'] = channelName
     placeholders['isIgnored'] = False
+    placeholders['mvaConfigObject'] = mvaConfig
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
 
@@ -528,8 +529,8 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
     placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
 
-    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut, distribution)
-    placeholders = automaticReporting.createFSParticleTexFile(placeholders, nTuple, mcCounts)
+    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
+    placeholders = automaticReporting.createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution, mvaConfig)
 
     B2INFO("Written analysis tex file for final state particle {p} with label {l}.".format(p=particleName, l=particleLabel))
     return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, '__needed__': False}
@@ -551,7 +552,8 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
 
-    placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts)
+    mvaConfig = channelPlaceholders[0]['mvaConfigObject']
+    placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts, mvaConfig)
 
     B2INFO("Written analysis tex file for intermediate particle {p} with label {l}.".format(p=particleName, l=particleLabel))
     return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, '__needed__': False}
@@ -571,8 +573,9 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     B2INFO("Create analysis summary pdf file.")
     finalParticlePlaceholders = []
     for ntuple in finalParticleNTuples:
+        type = 'CosBDL' if 'semileptonic' in ntuple else 'Mbc'
         if ntuple is not None:
-            finalParticlePlaceholders.append(automaticReporting.createMBCTexFile(ntuple))
+            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, type))
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
 
     subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/nordbert.pdf')), shell=True)
@@ -602,16 +605,19 @@ def SaveModuleStatistics(path, hash, finalParticleSignalProbabilities):
         @return root file name
     """
 
+    B2INFO("Enter: SaveModuleStatistics")
     filename = 'moduleStatistics_' + hash + '.root'
     if not os.path.isfile(filename):
         output = register_module('RootOutput')
         output.param('outputFileName', filename)
         output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
         output.param('branchNamesPersistent', ['ProcessStatistics'])
+        output.param('ignoreCommandLineOverride', True)
         path.add_module(output)
         B2INFO("SaveModuleStatistics: Added RootOutput")
         return {}
 
+    B2INFO("Provided SaveModuleStatistics")
     return {'ModuleStatisticsFile': filename}
 
 

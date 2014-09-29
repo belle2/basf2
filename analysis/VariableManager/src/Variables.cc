@@ -160,6 +160,22 @@ namespace Belle2 {
       return std::cos(part->getVertex().Angle(part->getMomentum()));
     }
 
+    double cosThetaBetweenParticleAndTrueB(const Particle* part)
+    {
+      PCmsLabTransform T;
+      double e_Beam = T.getCMSEnergy() / 2;
+      double m_B = 5.2794; //Only true for B^+ or B^0
+      double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
+
+      TLorentzVector p = T.rotateLabToCms() * part->get4Vector();
+      double e_d = p.E();
+      double m_d = p.M();
+      double p_d = p.Rho();
+
+      double theta_Bd = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d) / (2 * p_B * p_d);
+      return theta_Bd;
+    }
+
     // vertex or POCA in respect to IP ------------------------------
 
     double particleDX(const Particle* part)
@@ -1808,6 +1824,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("cth_CMS", particleCosTheta_CMS, "CMS momentum cosine of polar angle");
     REGISTER_VARIABLE("phi_CMS", particlePhi_CMS, "CMS momentum azimuthal angle in degrees");
 
+    REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB", cosThetaBetweenParticleAndTrueB, "cosine of angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector", cosAngleBetweenMomentumAndVertexVector, "cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
     REGISTER_VARIABLE("distance", particleDistance, "distance relative to interaction point");
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance, "significance of distance relative to interaction point");

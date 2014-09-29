@@ -80,7 +80,7 @@ def formatTime(seconds):
         string += "%d$\mu$s" % (us)
 
     if hours == 0 and minutes == 0 and seconds == 0 and ms == 0 and us == 0:
-        string += '<1$\mu$s'
+        string += '$<1\mu$s'
     return string
 
 
@@ -562,7 +562,13 @@ def addHyphenations(someString):
     """
     Adds hyphenations after brackets, and for common variables.
     """
-    return someString.replace('(', r'(\allowbreak ').replace('getExtraInfo', r'get\-Ex\-tra\-In\-fo').replace('SignalProbability', r'Sig\-nal\-Prob\-a\-bil\-i\-ty')
+    substitutes = {
+        '(': r'(\allowbreak ',
+        'getExtraInfo': r'get\-Ex\-tra\-In\-fo',
+        'SignalProbability': r'Sig\-nal\-Prob\-a\-bil\-i\-ty'}
+    for key, value in substitutes.iteritems():
+        someString = someString.replace(key, value)
+    return someString
 
 
 def escapeForRegExp(someString):

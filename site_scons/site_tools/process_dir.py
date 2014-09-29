@@ -27,18 +27,11 @@ def get_files(path_name, release_dir):
     if release_dir:
         save_dir = os.getcwd()
         os.chdir(release_dir)
-        result = Glob(path_name)
-        for entry in result[:]:
-            if os.path.isdir(str(entry)):
-                result.remove(entry)
+    result = Glob(path_name)
+    files = [f for f in result if not os.path.isdir(str(f))]
+    if release_dir:
         os.chdir(save_dir)
-        return result
-    else:
-        result = Glob(path_name)
-        for entry in result[:]:
-            if os.path.isdir(str(entry)):
-                result.remove(entry)
-        return result
+    return files
 
 
 def real_path(path_name, release_dir):

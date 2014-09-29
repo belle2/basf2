@@ -67,8 +67,9 @@ namespace Belle2 {
     /** Exception thrown when execution is stopped by a signal. */
     class StoppedBySignalException : public std::runtime_error {
     public:
+      /** Constructor. */
       StoppedBySignalException(int signal);
-      int signal;
+      int signal; /**< see 'man 7 signal'. */
     };
 
 

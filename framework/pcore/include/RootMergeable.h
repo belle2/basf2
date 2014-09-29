@@ -36,13 +36,14 @@ namespace Belle2 {
      }
      \endcode
    *
-   * This should work out of the box for TNtuple, TH1F and TH2F. Additional template instantiations need
+   * This should work out of the box for TTree, TNtuple, TH1F, TH2F, TH1D, and TH2D. Additional template instantiations need
    * an entry in framework/pcore/include/linkdef.h, please contact the framework librarian if your use
    * case requires other classes.
    *
    * Be aware that for larger histograms, this way of sharing the data may not be a good idea.
    * E.g. for hundred thousand bins, basf2 would transfer about half a MegaByte in each event,
-   * which may take a significant fraction of total processing time.
+   * which may take a significant fraction of total processing time. Trees or Ntuples will however
+   * only transfer the newly added data, which is probably manageable.
    *
    * TODO: after construction, I should probably do SetDirectory(null) directly, and offer a function to set it explicitly.
    *

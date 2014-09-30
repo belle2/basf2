@@ -68,6 +68,9 @@ NonRootDataExportModule::NonRootDataExportModule() : Module()
   // note to myself. Format needed by gsi is listed at personal log p.91, format needed by rudi (simpleMatlab) is listed in p. 162,165
   addParam("writeSecMaps", m_PARAMwriteSecMaps, "if you want to output an extra file for secMaps (sector-relations) simply write the names of the sectorMaps into that list of names here (same coding as for VXDTF)", writeSecMaps);
   addParam("eventCounter", m_PARAMeventCounter, "adds this number to the m_eventCounter (useful for looping shell scripts)", int(0));
+
+  m_eventCounter = 0;
+  m_runCounter = 0;
 }
 
 

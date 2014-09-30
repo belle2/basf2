@@ -642,10 +642,10 @@ void TFRedesignModule::the_real_event()
 
   createClusterInfo();
 
-  /// means: is true when at least one pass wants PXD hits
+  /// means: is true when at least one pass wants PXD hits:
   if (m_usePXDHits == true) assignPXDHitsToSectors();
 
-  /// means: is true when at least one pass wants SVD hits
+  /// means: is true when at least one pass wants SVD hits:
   if (m_useSVDHits == true) assignSVDHitsToSectors();
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
@@ -5096,6 +5096,7 @@ void TFRedesignModule::InitializeInConstructor()
   m_calcQiType = -1;
   m_calcSeedType = -1;
   m_aktpassNumber  = -1;
+  m_badSectorRangeCtr = 0;
 }
 
 

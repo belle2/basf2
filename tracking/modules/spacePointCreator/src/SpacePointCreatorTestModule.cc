@@ -41,8 +41,9 @@ SpacePointCreatorTestModule::SpacePointCreatorTestModule() :
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
            "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module", string(""));
-//   addParam("OnlySingleClusterSpacePoints", m_onlySingleClusterSpacePoints,
-//            "standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters", bool(false));
+
+  m_pxdClustersIndex = 0;
+  m_svdClustersIndex = 0;
 }
 
 

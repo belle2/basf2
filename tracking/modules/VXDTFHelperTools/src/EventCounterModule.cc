@@ -528,4 +528,5 @@ void EventCounterModule::InitializeCounters()
   m_svdStripCounter4U = 0;
   m_svdStripCounter4V = 0;
   m_svdClusterCounter = 0;
+  m_svdClusterCombinationsCounter = 0;
 }

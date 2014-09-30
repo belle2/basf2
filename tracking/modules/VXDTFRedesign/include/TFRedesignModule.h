@@ -212,7 +212,6 @@ namespace Belle2 {
       boostClock::time_point stopTimer; /**< will be resetted severall times, stores the toc-part for duration measurements */
       unsigned int evtNumber; /**< number of current event */
       unsigned int nPXDClusters; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
-      unsigned int numTELCluster; /**< number of TELClusters (=number of TEL hits when tf in TEL is activated) */
       unsigned int nSVDClusters; /**< number of svdClusters */
       unsigned int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
       unsigned int segFinderActivated; /**< number of segments which survived the segfinder. every segment of any pass will be counted  */

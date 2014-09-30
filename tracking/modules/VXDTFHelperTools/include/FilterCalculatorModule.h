@@ -420,6 +420,12 @@ namespace Belle2 {
       m_totalHitCounter = 0;
       m_longTrackCounter = 0;
       m_badFilterValueCtr = 0;
+      m_longTrackletCounter = 0;
+      m_numOfLayers = 0;
+      m_rootFilePtr = NULL;
+      m_treeEventWisePtr = NULL;
+      m_rootpTValuesInLayer1Ptr = NULL;
+      m_rootmomValuesInLayer1Ptr = NULL;
     }
 
     template<class Tmpl>
@@ -499,7 +505,7 @@ namespace Belle2 {
     bool m_PARAMlogDeltaPtHighOccupancy; /**< set 'true' if you want to log delta Pt between segments  - high occupancy mode */
     bool m_PARAMlogDeltaSlopeHighOccupancyRZ; /**< set 'true' if you want to log delta slopes in r-z-plane between segments  - high occupancy mode */
     bool m_PARAMlogHelixParameterHighOccupancyFit; /**< set 'true' if you want to log delta ((helix-circle-segment-angle) / deltaZ)  - high occupancy mode */
-    bool m_PARAMlogSlopeHighOccupancyRZHighOccupancy; /**< set 'true' to log slope in r-z-plane for line of 2 trackHits  - high occupancy mode */
+//     bool m_PARAMlogSlopeHighOccupancyRZ; /**< set 'true' to log slope in r-z-plane for line of 2 trackHits  - high occupancy mode */
     bool m_PARAMlogTRadiusHighOccupancytoIPDistance; /**< set 'true' to log the difference between the radius of the track circle in x-y-plan and the distance of the center of the circle tdeltaSOverZo the IP  - high occupancy mode */
     bool m_PARAMlogDeltaDistCircleCenterHighOccupancy; /**< set 'true' to compare the distance of the calculated centers of track circles  - high occupancy mode */
 

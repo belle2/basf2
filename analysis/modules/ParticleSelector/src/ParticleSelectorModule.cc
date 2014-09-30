@@ -86,11 +86,15 @@ namespace Belle2 {
 
 
     StoreObjPtr<ParticleList> particleList(m_listName);
-    DataStore::EStoreFlags flags = m_persistent ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-    particleList.registerInDataStore(flags);
-    if (!m_isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
-      antiParticleList.registerInDataStore(flags);
+    if (!particleList.isOptional()) {
+      //if it doesn't exist:
+
+      DataStore::EStoreFlags flags = m_persistent ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+      particleList.registerInDataStore(flags);
+      if (!m_isSelfConjugatedParticle) {
+        StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
+        antiParticleList.registerInDataStore(flags);
+      }
     }
 
     m_cut.init(m_cutParameter);

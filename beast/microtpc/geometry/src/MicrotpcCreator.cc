@@ -260,8 +260,8 @@ namespace Belle2 {
         //create sensitive volume
         G4double dx_GasTPC = 2.5 * CLHEP::cm;
         G4double dy_GasTPC = 2.5 * CLHEP::cm;
-        G4double dz_GasTPC = (z_Ring[23] - dz_Ring - z_GEM[1] - dz_GEM) / 2. * CLHEP::cm; //13.5 * CLHEP::cm;
-        //cout << " dz_GasTPC " << dz_GasTPC << endl;
+        G4double dz_GasTPC = (z_Ring[23] - dz_Ring - z_GEM[1] - dz_GEM) / 2.; //13.5 * CLHEP::cm;
+        cout << " dz_GasTPC " << dz_GasTPC / CLHEP::cm << endl;
         G4Box* s_GasTPC = new G4Box("s_GasTPC", dx_GasTPC, dy_GasTPC, dz_GasTPC);
         G4LogicalVolume* l_GasTPC = new G4LogicalVolume(s_GasTPC, geometry::Materials::get(matGas), "l_GasTPC", 0, m_sensitive);
 

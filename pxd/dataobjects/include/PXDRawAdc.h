@@ -25,7 +25,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDRawAdc():
-      m_sensorID(0), m_dhp_header(0) {};
+      m_sensorID(0), m_dhp_header(0), m_adcs() {};
 
 
     /**
@@ -33,7 +33,7 @@ namespace Belle2 {
      * @param data raw data pointer
      */
     PXDRawAdc(VxdID sensorID, void* data, bool pedestal_flag):
-      m_sensorID(sensorID) {
+      m_sensorID(sensorID) , m_adcs() {
       unsigned char* d = (unsigned char*)data;
       m_dhp_header = ((unsigned short*)data)[2];
       d += 8; // Skip DHH and DHP header, data is 64kb large (+ 8 bytes)

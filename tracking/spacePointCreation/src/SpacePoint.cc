@@ -24,7 +24,9 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
                        unsigned short nameIndex,
                        const VXD::SensorInfoBase* aSensorInfo) :
   m_vxdID(pxdCluster->getSensorID()),
-  m_nameIndex(nameIndex)
+  m_nameIndex(nameIndex),
+  m_qualityIndicator(0.5),
+  m_isAssigned(false)
 {
   if (pxdCluster == NULL) { throw InvalidNumberOfClusters(); }
   m_indexNumbers.push_back(indexNumber);
@@ -55,7 +57,9 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
 SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clusters,
                        unsigned short nameIndex,
                        const VXD::SensorInfoBase* aSensorInfo) :
-  m_nameIndex(nameIndex)
+  m_nameIndex(nameIndex),
+  m_qualityIndicator(0.5),
+  m_isAssigned(false)
 {
   unsigned int nClusters = clusters.size();
   double uCoord = 0; // 0 = center of Sensor
@@ -181,27 +185,6 @@ std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(const 
 
   return { localUPosition, localVPosition };
 }
-
-
-
-// std::pair<double, double> SpacePoint::convertToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
-// {
-//   //We need some handle to translate IDs to local and global
-//   // coordinates.
-//   if (aSensorInfo == NULL) {
-//     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-//   }
-//
-//   // Changed by Stefan F
-//   double localUPosition = hitNormalized.first - (0.5 * aSensorInfo->getUSize());
-//   double localVPosition = hitNormalized.second - (0.5 * aSensorInfo->getVSize());
-//
-//   // old ones:
-//   //   double localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
-//   //   double localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
-//
-//   return (make_pair(localUPosition, localVPosition));
-// }
 
 
 

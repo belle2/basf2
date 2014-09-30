@@ -9,6 +9,9 @@
  **************************************************************************/
 #pragma once
 
+// tracking
+#include <tracking/spacePointCreation/SpacePointMetaInfo.h>
+
 // framework
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -21,8 +24,6 @@
 #include <pxd/dataobjects/PXDCluster.h>
 //svd
 #include <svd/dataobjects/SVDCluster.h>
-// tracking
-#include <tracking/spacePointCreation/SpacePointMetaInfo.h>
 // genfit
 #include <genfit/PlanarMeasurement.h>
 
@@ -55,8 +56,9 @@ namespace Belle2 {
 
 
     /** Default constructor for the ROOT IO. */
-    SpacePoint()
-    {}
+    SpacePoint() :
+      m_qualityIndicator(0.5),
+      m_isAssigned(false) {}
 
 
 
@@ -174,17 +176,6 @@ namespace Belle2 {
 
 
 
-    /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
-     *
-     * first parameter is the hit in sensor-independent (real) coordinates stored as a pair of floats.
-     * second parameter is the coded vxdID, which carries the sensorID.
-     * third parameter, a sensorInfo can be passed for testing purposes.
-     *  If no sensorInfo is passed, the member gets its own pointer to it.
-     */
-//     static std::pair<double, double> convertToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
-
-
-
     /** converts a local hit on a given sensor into global coordinates.
      *
      * so this practically does what sensorInfo::pointToGlobal is doing, the difference is, that you do not need to have the sensorInfo beforehand (it will be retrieved using the VxdID)
@@ -218,6 +209,33 @@ namespace Belle2 {
       if (value > higher) { value = higher; }
     }
 
+
+
+    /** returns the current state of assignment - returns true if it is assigned and therefore blocked for reuse. */
+    bool getAssignmentState() const {return m_isAssigned; }
+
+
+
+    /** returns the current estimation for the quality of that spacePoint.
+     *
+     * returns value between 0-1, 1 means "good", 0 means "bad".
+     * */
+    unsigned int getQualityEstimation() const {return m_qualityIndicator; }
+
+
+
+// setter:
+
+    /** sets the state of assignment - set true if it is assigned and therefore blocked for reuse. */
+    void setAssignmentState(bool newState) { m_isAssigned = newState; }
+
+
+
+    /** sets the estimation for the quality of that spacePoint.
+     *
+     * set value between 0-1, 1 means "good", 0 means "bad".
+     * */
+    void setQualityEstimation(unsigned int newQI) {m_qualityIndicator = newQI; }
 
 
   protected:
@@ -296,6 +314,20 @@ namespace Belle2 {
 
 
 
-    ClassDef(SpacePoint, 4) // last member added: m_nameIndex;, last removed: m_metaInfo
+    /** stores a quality indicator.
+     *
+     * The value shall be between 0-1, where 1 means "good" and 0 means "bad".
+     * Standard is 0.5.
+     * */
+    unsigned int m_qualityIndicator;
+
+
+
+    /** stores whether this spacePoint has already been assigned or not */
+    bool m_isAssigned;
+
+
+
+    ClassDef(SpacePoint, 5) // last member added: m_qualityIndicator & m_isAssigned, last removed: m_metaInfo
   };
 }

@@ -28,6 +28,8 @@ TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
   SpacePoint::m_vxdID = telCluster->getSensorID();
   if (telCluster == NULL) { throw SpacePoint::InvalidNumberOfClusters(); }
   SpacePoint::m_indexNumbers.push_back(indexNumber);
+  SpacePoint::m_qualityIndicator = 0.5;
+  SpacePoint::m_isAssigned = false;
 
   //We need some handle to translate IDs to local and global
   // coordinates.

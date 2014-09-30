@@ -62,7 +62,7 @@ namespace Belle2 {
     void DiamondCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -77,9 +77,9 @@ namespace Belle2 {
 
         //create diamond volume
         G4Box* s_DIAMOND = new G4Box("s_DIAMOND",
-                                     activeParams.getLength("diamond_dx")*Unit::cm,
-                                     activeParams.getLength("diamond_dy")*Unit::cm,
-                                     activeParams.getLength("diamond_dz")*Unit::cm);
+                                     activeParams.getLength("diamond_dx")*CLHEP::cm,
+                                     activeParams.getLength("diamond_dy")*CLHEP::cm,
+                                     activeParams.getLength("diamond_dz")*CLHEP::cm);
 
         string matDIAMOND = activeParams.getString("MaterialDIAMOND");
         G4LogicalVolume* l_DIAMOND = new G4LogicalVolume(s_DIAMOND, geometry::Materials::get(matDIAMOND), "l_DIAMOND", 0, m_sensitive);
@@ -89,9 +89,9 @@ namespace Belle2 {
 
         //position diamond volume
         G4ThreeVector DIAMONDpos = G4ThreeVector(
-                                     activeParams.getLength("x_diamond") * Unit::cm,
-                                     activeParams.getLength("y_diamond") * Unit::cm,
-                                     activeParams.getLength("z_diamond") * Unit::cm
+                                     activeParams.getLength("x_diamond") * CLHEP::cm,
+                                     activeParams.getLength("y_diamond") * CLHEP::cm,
+                                     activeParams.getLength("z_diamond") * CLHEP::cm
                                    );
 
         G4RotationMatrix* rot_diamond = new G4RotationMatrix();

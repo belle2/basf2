@@ -62,7 +62,7 @@ namespace Belle2 {
     void SddCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -76,12 +76,12 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         //create sdd volume
-        G4double startAngle = 0.*Unit::deg;
-        G4double spanningAngle = 360.*Unit::deg;
+        G4double startAngle = 0.*CLHEP::deg;
+        G4double spanningAngle = 360.*CLHEP::deg;
         G4Tubs* s_SDD = new G4Tubs("s_SDD",
-                                   activeParams.getLength("sdd_innerRadius")*Unit::cm,
-                                   activeParams.getLength("sdd_outerRadius")*Unit::cm,
-                                   activeParams.getLength("sdd_hz")*Unit::cm,
+                                   activeParams.getLength("sdd_innerRadius")*CLHEP::cm,
+                                   activeParams.getLength("sdd_outerRadius")*CLHEP::cm,
+                                   activeParams.getLength("sdd_hz")*CLHEP::cm,
                                    startAngle, spanningAngle);
 
         string matSDD = activeParams.getString("MaterialSDD");
@@ -92,9 +92,9 @@ namespace Belle2 {
 
         //position sdd volume
         G4ThreeVector SDDpos = G4ThreeVector(
-                                 activeParams.getLength("x_sdd") * Unit::cm,
-                                 activeParams.getLength("y_sdd") * Unit::cm,
-                                 activeParams.getLength("z_sdd") * Unit::cm
+                                 activeParams.getLength("x_sdd") * CLHEP::cm,
+                                 activeParams.getLength("y_sdd") * CLHEP::cm,
+                                 activeParams.getLength("z_sdd") * CLHEP::cm
                                );
 
         G4RotationMatrix* rot_sdd = new G4RotationMatrix();

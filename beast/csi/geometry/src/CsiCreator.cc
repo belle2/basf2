@@ -62,7 +62,7 @@ namespace Belle2 {
     void CsiCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -77,15 +77,15 @@ namespace Belle2 {
 
         //create csi volume
         G4Trap* s_CSI = new G4Trap("s_CSI",
-                                   activeParams.getLength("cDz") / 2.*Unit::mm ,
+                                   activeParams.getLength("cDz") / 2.*CLHEP::mm ,
                                    activeParams.getLength("cDtheta") ,
                                    activeParams.getLength("cDphi") ,
-                                   activeParams.getLength("cDy1") / 2.*Unit::mm ,
-                                   activeParams.getLength("cDx2") / 2.*Unit::mm ,
-                                   activeParams.getLength("cDx1") / 2.*Unit::mm , 0,
-                                   activeParams.getLength("cDy2") / 2.*Unit::mm ,
-                                   activeParams.getLength("cDx4") / 2.*Unit::mm ,
-                                   activeParams.getLength("cDx3") / 2.*Unit::mm , 0);
+                                   activeParams.getLength("cDy1") / 2.*CLHEP::mm ,
+                                   activeParams.getLength("cDx2") / 2.*CLHEP::mm ,
+                                   activeParams.getLength("cDx1") / 2.*CLHEP::mm , 0,
+                                   activeParams.getLength("cDy2") / 2.*CLHEP::mm ,
+                                   activeParams.getLength("cDx4") / 2.*CLHEP::mm ,
+                                   activeParams.getLength("cDx3") / 2.*CLHEP::mm , 0);
 
         G4LogicalVolume* l_CSI = new G4LogicalVolume(s_CSI, geometry::Materials::get("CSI"), "l_CSI", 0, m_sensitive);
 
@@ -98,8 +98,8 @@ namespace Belle2 {
         G4Transform3D phi_init = G4RotateZ3D(activeParams.getLength("k_phi_init"));
         G4Transform3D tilt_z = G4RotateY3D(activeParams.getLength("k_z_TILTED"));
         G4Transform3D tilt_phi = G4RotateZ3D(activeParams.getLength("k_phi_TILTED"));
-        G4Transform3D position = G4Translate3D(activeParams.getLength("k_zC") * tan(activeParams.getLength("k_z_TILTED")) * Unit::cm, 0,
-                                               activeParams.getLength("k_zC") * Unit::cm);
+        G4Transform3D position = G4Translate3D(activeParams.getLength("k_zC") * tan(activeParams.getLength("k_z_TILTED")) * CLHEP::cm, 0,
+                                               activeParams.getLength("k_zC") * CLHEP::cm);
         G4Transform3D pos_phi = G4RotateZ3D(activeParams.getLength("k_phiC"));
         G4Transform3D Tr = pos_phi * position * tilt_phi * tilt_z * phi_init * theta_init;
         //cout << "rotation  " << Tr.getRotation() << " translation " << Tr.getTranslation() << endl;

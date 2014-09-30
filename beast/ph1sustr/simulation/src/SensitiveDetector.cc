@@ -48,11 +48,11 @@ namespace Belle2 {
       //Get Track information
       const G4Track& track    = *step->GetTrack();
       const int trackID       = track.GetTrackID();
-      const double depEnergy  = step->GetTotalEnergyDeposit() * Unit::MeV;
+      const double depEnergy  = step->GetTotalEnergyDeposit() * CLHEP::MeV;
       //const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
 
       //Ignore everything below 1eV
-      if (depEnergy < Unit::eV) return false;
+      if (depEnergy < CLHEP::eV) return false;
 
 
 

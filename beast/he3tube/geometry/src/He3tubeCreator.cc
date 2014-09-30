@@ -73,7 +73,7 @@ namespace Belle2 {
       gHe3->AddElement(eHe3, 1);
 
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -87,12 +87,12 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         //create he3tube
-        G4double startAngle = 0.*Unit::deg;
-        G4double spanningAngle = 360.*Unit::deg;
+        G4double startAngle = 0.*CLHEP::deg;
+        G4double spanningAngle = 360.*CLHEP::deg;
         G4Tubs* s_He3TUBE = new G4Tubs("s_He3TUBE",
-                                       activeParams.getLength("tube_innerRadius")*Unit::cm,
-                                       activeParams.getLength("tube_outerRadius")*Unit::cm,
-                                       activeParams.getLength("tube_hz")*Unit::cm,
+                                       activeParams.getLength("tube_innerRadius")*CLHEP::cm,
+                                       activeParams.getLength("tube_outerRadius")*CLHEP::cm,
+                                       activeParams.getLength("tube_hz")*CLHEP::cm,
                                        startAngle, spanningAngle);
 
         string matTube = activeParams.getString("MaterialTube");
@@ -100,9 +100,9 @@ namespace Belle2 {
 
         //position he3tube volume
         G4ThreeVector He3TUBEpos = G4ThreeVector(
-                                     activeParams.getLength("x_he3tube") * Unit::cm,
-                                     activeParams.getLength("y_he3tube") * Unit::cm,
-                                     activeParams.getLength("z_he3tube") * Unit::cm
+                                     activeParams.getLength("x_he3tube") * CLHEP::cm,
+                                     activeParams.getLength("y_he3tube") * CLHEP::cm,
+                                     activeParams.getLength("z_he3tube") * CLHEP::cm
                                    );
 
         G4RotationMatrix* rot_he3tube = new G4RotationMatrix();
@@ -117,23 +117,23 @@ namespace Belle2 {
         G4double EndcapinnerRadius = 0.;
         G4Tubs* s_He3endcap = new G4Tubs("s_He3endcap",
                                          EndcapinnerRadius,
-                                         activeParams.getLength("tube_outerRadius")*Unit::cm,
-                                         activeParams.getLength("endcap_hz")*Unit::cm,
+                                         activeParams.getLength("tube_outerRadius")*CLHEP::cm,
+                                         activeParams.getLength("endcap_hz")*CLHEP::cm,
                                          startAngle, spanningAngle);
 
         G4LogicalVolume* l_He3endcap = new G4LogicalVolume(s_He3endcap, geometry::Materials::get(matTube), "l_He3endcap");
 
         //position endcaps
         G4ThreeVector He3endcapposTop = G4ThreeVector(
-                                          activeParams.getLength("x_he3tube") * Unit::cm,
-                                          activeParams.getLength("y_he3tube") * Unit::cm,
-                                          activeParams.getLength("z_he3tube") * Unit::cm + activeParams.getLength("tube_hz") * Unit::cm + activeParams.getLength("endcap_hz") * Unit::cm
+                                          activeParams.getLength("x_he3tube") * CLHEP::cm,
+                                          activeParams.getLength("y_he3tube") * CLHEP::cm,
+                                          activeParams.getLength("z_he3tube") * CLHEP::cm + activeParams.getLength("tube_hz") * CLHEP::cm + activeParams.getLength("endcap_hz") * CLHEP::cm
                                         );
 
         G4ThreeVector He3endcapposBot = G4ThreeVector(
-                                          activeParams.getLength("x_he3tube") * Unit::cm,
-                                          activeParams.getLength("y_he3tube") * Unit::cm,
-                                          activeParams.getLength("z_he3tube") * Unit::cm - activeParams.getLength("tube_hz") * Unit::cm - activeParams.getLength("endcap_hz") * Unit::cm
+                                          activeParams.getLength("x_he3tube") * CLHEP::cm,
+                                          activeParams.getLength("y_he3tube") * CLHEP::cm,
+                                          activeParams.getLength("z_he3tube") * CLHEP::cm - activeParams.getLength("tube_hz") * CLHEP::cm - activeParams.getLength("endcap_hz") * CLHEP::cm
                                         );
 
         new G4PVPlacement(rot_he3tube, He3endcapposTop, l_He3endcap, "p_He3endcapTop", &topVolume, false, 1);
@@ -143,8 +143,8 @@ namespace Belle2 {
         G4double GasinnerRadius = 0.;
         G4Tubs* s_iHe3Gas = new G4Tubs("s_iHe3Gas",
                                        GasinnerRadius,
-                                       activeParams.getLength("tube_innerRadius")*Unit::cm,
-                                       activeParams.getLength("tube_hz")*Unit::cm,
+                                       activeParams.getLength("tube_innerRadius")*CLHEP::cm,
+                                       activeParams.getLength("tube_hz")*CLHEP::cm,
                                        startAngle, spanningAngle);
 
         //string matGas = activeParams.getString("MaterialGas");
@@ -155,8 +155,8 @@ namespace Belle2 {
         //create he3 actif gas
         G4Tubs* s_He3Gas = new G4Tubs("s_He3Gas",
                                       GasinnerRadius,
-                                      activeParams.getLength("gas_outerRadius")*Unit::cm,
-                                      activeParams.getLength("gas_hz")*Unit::cm,
+                                      activeParams.getLength("gas_outerRadius")*CLHEP::cm,
+                                      activeParams.getLength("gas_hz")*CLHEP::cm,
                                       startAngle, spanningAngle);
 
         G4LogicalVolume* l_He3Gas = new G4LogicalVolume(s_He3Gas, gHe3, "l_He3Gas", 0, m_sensitive);

@@ -62,7 +62,7 @@ namespace Belle2 {
     void Fei4Creator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -77,9 +77,9 @@ namespace Belle2 {
 
         //create fei4 volume
         G4Box* s_FEI4 = new G4Box("s_FEI4",
-                                  activeParams.getLength("fei4_dx")*Unit::cm,
-                                  activeParams.getLength("fei4_dy")*Unit::cm,
-                                  activeParams.getLength("fei4_dz")*Unit::cm);
+                                  activeParams.getLength("fei4_dx")*CLHEP::cm,
+                                  activeParams.getLength("fei4_dy")*CLHEP::cm,
+                                  activeParams.getLength("fei4_dz")*CLHEP::cm);
 
         string matFEI4 = activeParams.getString("MaterialFEI4");
         G4LogicalVolume* l_FEI4 = new G4LogicalVolume(s_FEI4, geometry::Materials::get(matFEI4), "l_FEI4", 0, m_sensitive);
@@ -89,9 +89,9 @@ namespace Belle2 {
 
         //position fei4 volume
         G4ThreeVector FEI4pos = G4ThreeVector(
-                                  activeParams.getLength("x_fei4") * Unit::cm,
-                                  activeParams.getLength("y_fei4") * Unit::cm,
-                                  activeParams.getLength("z_fei4") * Unit::cm
+                                  activeParams.getLength("x_fei4") * CLHEP::cm,
+                                  activeParams.getLength("y_fei4") * CLHEP::cm,
+                                  activeParams.getLength("z_fei4") * CLHEP::cm
                                 );
 
         G4RotationMatrix* rot_fei4 = new G4RotationMatrix();

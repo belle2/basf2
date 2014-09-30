@@ -62,7 +62,7 @@ namespace Belle2 {
     void Ph1sustrCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -77,13 +77,13 @@ namespace Belle2 {
 
         //create ph1sustr volume
         G4Trap* s_PH1SUSTR = new G4Trap("s_PH1SUSTR",
-                                        activeParams.getLength("cDz") / 2.*Unit::mm , 0 , 0,
-                                        activeParams.getLength("cDy1") / 2.*Unit::mm ,
-                                        activeParams.getLength("cDx1") / 2.*Unit::mm ,
-                                        activeParams.getLength("cDx2") / 2.*Unit::mm , 0,
-                                        activeParams.getLength("cDy2") / 2.*Unit::mm ,
-                                        activeParams.getLength("cDx3") / 2.*Unit::mm ,
-                                        activeParams.getLength("cDx4") / 2.*Unit::mm , 0);
+                                        activeParams.getLength("cDz") / 2.*CLHEP::mm , 0 , 0,
+                                        activeParams.getLength("cDy1") / 2.*CLHEP::mm ,
+                                        activeParams.getLength("cDx1") / 2.*CLHEP::mm ,
+                                        activeParams.getLength("cDx2") / 2.*CLHEP::mm , 0,
+                                        activeParams.getLength("cDy2") / 2.*CLHEP::mm ,
+                                        activeParams.getLength("cDx3") / 2.*CLHEP::mm ,
+                                        activeParams.getLength("cDx4") / 2.*CLHEP::mm , 0);
 
 
         G4LogicalVolume* l_PH1SUSTR = new G4LogicalVolume(s_PH1SUSTR, geometry::Materials::get("PH1SUSTR"), "l_PH1SUSTR", 0, m_sensitive);
@@ -93,9 +93,9 @@ namespace Belle2 {
 
         //position ph1sustr volume
         G4ThreeVector PH1SUSTRpos = G4ThreeVector(
-                                      activeParams.getLength("x_ph1sustr") * Unit::cm,
-                                      activeParams.getLength("y_ph1sustr") * Unit::cm,
-                                      activeParams.getLength("z_ph1sustr") * Unit::cm
+                                      activeParams.getLength("x_ph1sustr") * CLHEP::cm,
+                                      activeParams.getLength("y_ph1sustr") * CLHEP::cm,
+                                      activeParams.getLength("z_ph1sustr") * CLHEP::cm
                                     );
 
         G4RotationMatrix* rot_ph1sustr = new G4RotationMatrix();

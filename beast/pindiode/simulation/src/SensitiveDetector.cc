@@ -48,29 +48,29 @@ namespace Belle2 {
       //Get Track information
       const G4Track& track    = *step->GetTrack();
       const int trackID       = track.GetTrackID();
-      const double depEnergy  = step->GetTotalEnergyDeposit() * Unit::MeV;
-      const double nielEnergy = step->GetNonIonizingEnergyDeposit() * Unit::MeV;
+      const double depEnergy  = step->GetTotalEnergyDeposit() * CLHEP::MeV;
+      const double nielEnergy = step->GetNonIonizingEnergyDeposit() * CLHEP::MeV;
       const G4ThreeVector G4tkPos = step->GetTrack()->GetPosition();
       float tkPos[3];
-      tkPos[0] = G4tkPos.x() * Unit::cm;
-      tkPos[1] = G4tkPos.y() * Unit::cm;
-      tkPos[2] = G4tkPos.z() * Unit::cm;
+      tkPos[0] = G4tkPos.x() * CLHEP::cm;
+      tkPos[1] = G4tkPos.y() * CLHEP::cm;
+      tkPos[2] = G4tkPos.z() * CLHEP::cm;
       const G4ThreeVector G4tkMom = step->GetTrack()->GetMomentum();
       float tkMom[3];
-      tkMom[0] = G4tkMom.x() * Unit::MeV;
-      tkMom[1] = G4tkMom.y() * Unit::MeV;
-      tkMom[2] = G4tkMom.z() * Unit::MeV;
+      tkMom[0] = G4tkMom.x() * CLHEP::MeV;
+      tkMom[1] = G4tkMom.y() * CLHEP::MeV;
+      tkMom[2] = G4tkMom.z() * CLHEP::MeV;
       const G4ThreeVector G4tkMomDir = step->GetTrack()->GetMomentumDirection();
       float tkMomDir[3];
-      tkMomDir[0] = G4tkMomDir.x() * Unit::MeV;
-      tkMomDir[1] = G4tkMomDir.y() * Unit::MeV;
-      tkMomDir[2] = G4tkMomDir.z() * Unit::MeV;
+      tkMomDir[0] = G4tkMomDir.x() * CLHEP::MeV;
+      tkMomDir[1] = G4tkMomDir.y() * CLHEP::MeV;
+      tkMomDir[2] = G4tkMomDir.z() * CLHEP::MeV;
       const int tkPDG = step->GetTrack()->GetDefinition()->GetPDGEncoding();
       const double tkKEnergy = step->GetTrack()->GetKineticEnergy();
       const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
       const double GlTime = step->GetPreStepPoint()->GetGlobalTime();
       //Ignore everything below 1eV
-      if (depEnergy < Unit::eV) return false;
+      if (depEnergy < CLHEP::eV) return false;
 
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;

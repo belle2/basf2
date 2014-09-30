@@ -62,7 +62,7 @@ namespace Belle2 {
     void PindiodeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -76,26 +76,26 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         //create pindiode container volume
-        G4double dx_box = 2. / 2.*Unit::cm;
-        G4double dy_box = 1. / 2.*Unit::cm;
-        G4double dz_box = 1. / 2.*Unit::cm;
+        G4double dx_box = 2. / 2.*CLHEP::cm;
+        G4double dy_box = 1. / 2.*CLHEP::cm;
+        G4double dz_box = 1. / 2.*CLHEP::cm;
         G4VSolid* s_Box = new G4Box("s_box", dx_box, dy_box, dz_box);
 
-        G4double dx_hole = (20. - 2.*2.05) / 2.*Unit::mm;
-        G4double dy_hole = (10. - 2.*2.05) / 2.*Unit::mm;
-        G4double dz_hole = 5.1 / 2.*Unit::mm;
+        G4double dx_hole = (20. - 2.*2.05) / 2.*CLHEP::mm;
+        G4double dy_hole = (10. - 2.*2.05) / 2.*CLHEP::mm;
+        G4double dz_hole = 5.1 / 2.*CLHEP::mm;
         G4VSolid* s_Hole = new G4Box("s_Hole", dx_hole, dy_hole, dz_hole);
         s_Box = new G4SubtractionSolid("s_Box", s_Box, s_Hole, 0, G4ThreeVector(0, 0, dz_box - dz_hole));
 
         G4LogicalVolume* l_Box = new G4LogicalVolume(s_Box, geometry::Materials::get("Al6061"), "l_Box");
 
         //create pindiode volumes
-        G4double dx_diode = 2.65 / 2.*Unit::mm;
-        G4double dy_diode = 2.65 / 2.*Unit::mm;
-        G4double dz_diode = 0.25 / 2.*Unit::mm;
+        G4double dx_diode = 2.65 / 2.*CLHEP::mm;
+        G4double dy_diode = 2.65 / 2.*CLHEP::mm;
+        G4double dz_diode = 0.25 / 2.*CLHEP::mm;
         G4Box* s_PINDIODE1 = new G4Box("s_PINDIODE1", dx_diode, dy_diode, dz_diode);
         G4Box* s_PINDIODE2 = new G4Box("s_PINDIODE2", dx_diode, dy_diode, dz_diode);
-        G4double dz_layer = 0.01 / 2.*Unit::mm;
+        G4double dz_layer = 0.01 / 2.*CLHEP::mm;
         G4Box* s_layer = new G4Box("s_layer", dx_diode, dy_diode, dz_layer);
 
         G4LogicalVolume* l_PINDIODE1 = new G4LogicalVolume(s_PINDIODE1, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_PINDIODE1", 0, m_sensitive);
@@ -108,9 +108,9 @@ namespace Belle2 {
 
         //position pindiode assembly
         G4ThreeVector PINDIODEpos = G4ThreeVector(
-                                      activeParams.getLength("x_pindiode") * Unit::cm,
-                                      activeParams.getLength("y_pindiode") * Unit::cm,
-                                      activeParams.getLength("z_pindiode") * Unit::cm
+                                      activeParams.getLength("x_pindiode") * CLHEP::cm,
+                                      activeParams.getLength("y_pindiode") * CLHEP::cm,
+                                      activeParams.getLength("z_pindiode") * CLHEP::cm
                                     );
         //pindiode 1 position
         G4ThreeVector PINDIODEpos1 = G4ThreeVector(2.*  dx_diode, 0, 0);

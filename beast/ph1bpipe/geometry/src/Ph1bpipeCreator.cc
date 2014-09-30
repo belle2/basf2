@@ -63,7 +63,7 @@ namespace Belle2 {
     void Ph1bpipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -78,12 +78,12 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         //create ph1bpipe volume
-        G4double startAngle = 0.*Unit::deg;
-        G4double spanningAngle = 360.*Unit::deg;
+        G4double startAngle = 0.*CLHEP::deg;
+        G4double spanningAngle = 360.*CLHEP::deg;
         G4Tubs* s_PH1BPIPE = new G4Tubs("s_PH1BPIPE",
-                                        activeParams.getLength("pipe_innerRadius")*Unit::cm,
-                                        activeParams.getLength("pipe_outerRadius")*Unit::cm,
-                                        activeParams.getLength("pipe_hz")*Unit::cm,
+                                        activeParams.getLength("pipe_innerRadius")*CLHEP::cm,
+                                        activeParams.getLength("pipe_outerRadius")*CLHEP::cm,
+                                        activeParams.getLength("pipe_hz")*CLHEP::cm,
                                         startAngle, spanningAngle);
 
         string matPipe = activeParams.getString("MaterialPipe");
@@ -94,9 +94,9 @@ namespace Belle2 {
 
         //position ph1bpipe volume
         G4ThreeVector PH1BPIPEpos = G4ThreeVector(
-                                      activeParams.getLength("x_ph1bpipe") * Unit::cm,
-                                      activeParams.getLength("y_ph1bpipe") * Unit::cm,
-                                      activeParams.getLength("z_ph1bpipe") * Unit::cm
+                                      activeParams.getLength("x_ph1bpipe") * CLHEP::cm,
+                                      activeParams.getLength("y_ph1bpipe") * CLHEP::cm,
+                                      activeParams.getLength("z_ph1bpipe") * CLHEP::cm
                                     );
 
         //geometry::setColor(*l_PH1BPIPE, "#006699");
@@ -105,24 +105,24 @@ namespace Belle2 {
 
         //create endcaps
         G4Tubs* s_PH1BPIPEendcap = new G4Tubs("s_PH1BPIPEendcap",
-                                              activeParams.getLength("endcap_innerRadius")*Unit::cm,
-                                              activeParams.getLength("endcap_outerRadius")*Unit::cm,
-                                              activeParams.getLength("endcap_hz")*Unit::cm,
+                                              activeParams.getLength("endcap_innerRadius")*CLHEP::cm,
+                                              activeParams.getLength("endcap_outerRadius")*CLHEP::cm,
+                                              activeParams.getLength("endcap_hz")*CLHEP::cm,
                                               startAngle, spanningAngle);
 
         G4LogicalVolume* l_PH1BPIPEendcap = new G4LogicalVolume(s_PH1BPIPEendcap, geometry::Materials::get(matPipe), "l_PH1BPIPEendcap", 0, m_sensitive);
 
         //position endcaps
         G4ThreeVector PH1BPIPEendcapposTop = G4ThreeVector(
-                                               activeParams.getLength("x_ph1bpipe") * Unit::cm,
-                                               activeParams.getLength("y_ph1bpipe") * Unit::cm,
-                                               activeParams.getLength("z_ph1bpipe") * Unit::cm + activeParams.getLength("pipe_hz") * Unit::cm + activeParams.getLength("endcap_hz") * Unit::cm
+                                               activeParams.getLength("x_ph1bpipe") * CLHEP::cm,
+                                               activeParams.getLength("y_ph1bpipe") * CLHEP::cm,
+                                               activeParams.getLength("z_ph1bpipe") * CLHEP::cm + activeParams.getLength("pipe_hz") * CLHEP::cm + activeParams.getLength("endcap_hz") * CLHEP::cm
                                              );
 
         G4ThreeVector PH1BPIPEendcapposBot = G4ThreeVector(
-                                               activeParams.getLength("x_ph1bpipe") * Unit::cm,
-                                               activeParams.getLength("y_ph1bpipe") * Unit::cm,
-                                               activeParams.getLength("z_ph1bpipe") * Unit::cm - activeParams.getLength("pipe_hz") * Unit::cm - activeParams.getLength("endcap_hz") * Unit::cm
+                                               activeParams.getLength("x_ph1bpipe") * CLHEP::cm,
+                                               activeParams.getLength("y_ph1bpipe") * CLHEP::cm,
+                                               activeParams.getLength("z_ph1bpipe") * CLHEP::cm - activeParams.getLength("pipe_hz") * CLHEP::cm - activeParams.getLength("endcap_hz") * CLHEP::cm
                                              );
 
         new G4PVPlacement(0, PH1BPIPEendcapposTop, l_PH1BPIPEendcap, "p_PH1BPIPEendcapTop", &topVolume, false, 1);
@@ -132,29 +132,29 @@ namespace Belle2 {
       */
 
       //create ph1bpipe volume
-      G4double startAngle = 0.*Unit::deg;
-      G4double spanningAngle = 360.*Unit::deg;
+      G4double startAngle = 0.*CLHEP::deg;
+      G4double spanningAngle = 360.*CLHEP::deg;
       /*G4Tubs* s_PH1BPIPE = new G4Tubs("s_PH1BPIPE",
-                                      content.getLength("pipe_innerRadius")*Unit::cm,
-                                      content.getLength("pipe_outerRadius")*Unit::cm,
-                                      content.getLength("pipe_hz")*Unit::cm,
+                                      content.getLength("pipe_innerRadius")*CLHEP::cm,
+                                      content.getLength("pipe_outerRadius")*CLHEP::cm,
+                                      content.getLength("pipe_hz")*CLHEP::cm,
                                       startAngle, spanningAngle);*/
 
       G4VSolid* s_PH1BPIPE1 = new G4Ellipsoid("s_PH1BPIPE1",
-                                              content.getLength("pipe_outerRadius_x")*Unit::cm,
-                                              content.getLength("pipe_outerRadius_y")*Unit::cm,
-                                              content.getLength("pipe_hz")*Unit::cm,
-                                              -2.* content.getLength("pipe_hz")*Unit::cm, 2.* content.getLength("pipe_hz")*Unit::cm);
+                                              content.getLength("pipe_outerRadius_x")*CLHEP::cm,
+                                              content.getLength("pipe_outerRadius_y")*CLHEP::cm,
+                                              content.getLength("pipe_hz")*CLHEP::cm,
+                                              -2.* content.getLength("pipe_hz")*CLHEP::cm, 2.* content.getLength("pipe_hz")*CLHEP::cm);
 
       G4VSolid* s_PH1BPIPE2 = new G4Ellipsoid("s_PH1BPIPE2",
-                                              content.getLength("pipe_innerRadius_x")*Unit::cm,
-                                              content.getLength("pipe_innerRadius_y")*Unit::cm,
-                                              content.getLength("pipe_hz")*Unit::cm,
-                                              -2.* content.getLength("pipe_hz")*Unit::cm, 2.* content.getLength("pipe_hz")*Unit::cm);
+                                              content.getLength("pipe_innerRadius_x")*CLHEP::cm,
+                                              content.getLength("pipe_innerRadius_y")*CLHEP::cm,
+                                              content.getLength("pipe_hz")*CLHEP::cm,
+                                              -2.* content.getLength("pipe_hz")*CLHEP::cm, 2.* content.getLength("pipe_hz")*CLHEP::cm);
       /*G4VSolid* s_PH1BPIPE2 = new G4Tubs("s_PH1BPIPE2",
-                                         content.getLength("pipe_innerRadius_x")*Unit::cm,
-                                         content.getLength("pipe_innerRadius_y")*Unit::cm,
-                                         content.getLength("pipe_hz")*Unit::cm,
+                                         content.getLength("pipe_innerRadius_x")*CLHEP::cm,
+                                         content.getLength("pipe_innerRadius_y")*CLHEP::cm,
+                                         content.getLength("pipe_hz")*CLHEP::cm,
                                          startAngle, spanningAngle);*/
 
       G4VSolid* s_PH1BPIPE = new G4SubtractionSolid("s_PH1BPIPE", s_PH1BPIPE1, s_PH1BPIPE2);
@@ -169,9 +169,9 @@ namespace Belle2 {
 
       //position central ph1bpipe volume
       G4ThreeVector PH1BPIPEpos = G4ThreeVector(
-                                    content.getLength("x_ph1bpipe") * Unit::cm,
-                                    content.getLength("y_ph1bpipe") * Unit::cm,
-                                    content.getLength("z_ph1bpipe") * Unit::cm
+                                    content.getLength("x_ph1bpipe") * CLHEP::cm,
+                                    content.getLength("y_ph1bpipe") * CLHEP::cm,
+                                    content.getLength("z_ph1bpipe") * CLHEP::cm
                                   );
 
       //geometry::setColor(*l_PH1BPIPE, "#006699");
@@ -180,9 +180,9 @@ namespace Belle2 {
 
       //create central endcaps
       G4Tubs* s_PH1BPIPEendcap = new G4Tubs("s_PH1BPIPEendcap",
-                                            content.getLength("endcap_innerRadius")*Unit::cm,
-                                            content.getLength("endcap_outerRadius")*Unit::cm,
-                                            content.getLength("endcap_hz")*Unit::cm,
+                                            content.getLength("endcap_innerRadius")*CLHEP::cm,
+                                            content.getLength("endcap_outerRadius")*CLHEP::cm,
+                                            content.getLength("endcap_hz")*CLHEP::cm,
                                             startAngle, spanningAngle);
 
       //G4LogicalVolume* l_PH1BPIPEendcap = new G4LogicalVolume(s_PH1BPIPEendcap, geometry::Materials::get(matPipe), "l_PH1BPIPEendcap", 0, m_sensitive);
@@ -190,15 +190,15 @@ namespace Belle2 {
 
       //position central endcaps
       G4ThreeVector PH1BPIPEendcapposTop = G4ThreeVector(
-                                             content.getLength("x_ph1bpipe") * Unit::cm,
-                                             content.getLength("y_ph1bpipe") * Unit::cm,
-                                             content.getLength("z_ph1bpipe") * Unit::cm + content.getLength("pipe_hz") * Unit::cm + content.getLength("endcap_hz") * Unit::cm
+                                             content.getLength("x_ph1bpipe") * CLHEP::cm,
+                                             content.getLength("y_ph1bpipe") * CLHEP::cm,
+                                             content.getLength("z_ph1bpipe") * CLHEP::cm + content.getLength("pipe_hz") * CLHEP::cm + content.getLength("endcap_hz") * CLHEP::cm
                                            );
 
       G4ThreeVector PH1BPIPEendcapposBot = G4ThreeVector(
-                                             content.getLength("x_ph1bpipe") * Unit::cm,
-                                             content.getLength("y_ph1bpipe") * Unit::cm,
-                                             content.getLength("z_ph1bpipe") * Unit::cm - content.getLength("pipe_hz") * Unit::cm - content.getLength("endcap_hz") * Unit::cm
+                                             content.getLength("x_ph1bpipe") * CLHEP::cm,
+                                             content.getLength("y_ph1bpipe") * CLHEP::cm,
+                                             content.getLength("z_ph1bpipe") * CLHEP::cm - content.getLength("pipe_hz") * CLHEP::cm - content.getLength("endcap_hz") * CLHEP::cm
                                            );
 
       //place the central endcaps
@@ -207,44 +207,44 @@ namespace Belle2 {
 
       //create x shape tubes
       G4VSolid* s_Xshape1 = new G4Tubs("s_Xshape1",
-                                       content.getLength("xpipe_innerRadius")*Unit::cm,
-                                       content.getLength("xpipe_outerRadius")*Unit::cm,
-                                       content.getLength("xpipe_hz")*Unit::cm,
+                                       content.getLength("xpipe_innerRadius")*CLHEP::cm,
+                                       content.getLength("xpipe_outerRadius")*CLHEP::cm,
+                                       content.getLength("xpipe_hz")*CLHEP::cm,
                                        startAngle, spanningAngle);
       G4VSolid* s_Xshape2 = new G4Tubs("s_Xshape2",
-                                       content.getLength("xpipe_innerRadius")*Unit::cm,
-                                       content.getLength("xpipe_outerRadius")*Unit::cm,
-                                       content.getLength("xpipe_hz")*Unit::cm,
+                                       content.getLength("xpipe_innerRadius")*CLHEP::cm,
+                                       content.getLength("xpipe_outerRadius")*CLHEP::cm,
+                                       content.getLength("xpipe_hz")*CLHEP::cm,
                                        startAngle, spanningAngle);
       //make the union
       G4Transform3D transform_X = G4Translate3D(0., 0., 0.);
-      transform_X = transform_X * G4RotateY3D(0.083 * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(0.083 * CLHEP::rad);
       G4VSolid* s_X = new G4UnionSolid("s_Xshape1+s_Xshape2", s_Xshape1, s_Xshape2, transform_X);
 
       //substract central parts
       transform_X = G4Translate3D(
-                      content.getLength("x_ph1bpipe") * Unit::cm,
-                      content.getLength("y_ph1bpipe") * Unit::cm,
-                      content.getLength("z_ph1bpipe") * Unit::cm + content.getLength("pipe_hz") * Unit::cm + content.getLength("endcap_hz") * Unit::cm
+                      content.getLength("x_ph1bpipe") * CLHEP::cm,
+                      content.getLength("y_ph1bpipe") * CLHEP::cm,
+                      content.getLength("z_ph1bpipe") * CLHEP::cm + content.getLength("pipe_hz") * CLHEP::cm + content.getLength("endcap_hz") * CLHEP::cm
                     );
-      transform_X = transform_X * G4RotateY3D(0.083 / 2. * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(0.083 / 2. * CLHEP::rad);
       s_X = new G4SubtractionSolid("s_X1", s_X, s_PH1BPIPEendcap, transform_X);
       transform_X = G4Translate3D(
-                      content.getLength("x_ph1bpipe") * Unit::cm,
-                      content.getLength("y_ph1bpipe") * Unit::cm,
-                      content.getLength("z_ph1bpipe") * Unit::cm - content.getLength("pipe_hz") * Unit::cm - content.getLength("endcap_hz") * Unit::cm
+                      content.getLength("x_ph1bpipe") * CLHEP::cm,
+                      content.getLength("y_ph1bpipe") * CLHEP::cm,
+                      content.getLength("z_ph1bpipe") * CLHEP::cm - content.getLength("pipe_hz") * CLHEP::cm - content.getLength("endcap_hz") * CLHEP::cm
                     );
-      transform_X = transform_X * G4RotateY3D(0.083 / 2. * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(0.083 / 2. * CLHEP::rad);
       s_X = new G4SubtractionSolid("s_X2", s_X, s_PH1BPIPEendcap, transform_X);
       transform_X = G4Translate3D(0, 0, 0);
-      transform_X = transform_X * G4RotateY3D(0.083 / 2. * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(0.083 / 2. * CLHEP::rad);
       s_X = new G4SubtractionSolid("s_X3", s_X, s_PH1BPIPE, transform_X);
 
       //G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, m_sensitive);
       G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, 0);
 
       transform_X = G4Translate3D(0, 0, 0);
-      transform_X = transform_X * G4RotateY3D(-0.083 / 2. * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(-0.083 / 2. * CLHEP::rad);
       new G4PVPlacement(transform_X, l_X, "p_X", &topVolume, false, 1);
 
     }

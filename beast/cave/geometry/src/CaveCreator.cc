@@ -62,7 +62,7 @@ namespace Belle2 {
     void CaveCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * Unit::um);
+      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
@@ -77,9 +77,9 @@ namespace Belle2 {
 
         //create cave volume
         G4Box* s_CAVE = new G4Box("s_CAVE",
-                                  activeParams.getLength("px")*Unit::cm ,
-                                  activeParams.getLength("py")*Unit::cm ,
-                                  activeParams.getLength("pz")*Unit::cm);
+                                  activeParams.getLength("px")*CLHEP::cm ,
+                                  activeParams.getLength("py")*CLHEP::cm ,
+                                  activeParams.getLength("pz")*CLHEP::cm);
 
         //G4LogicalVolume* l_CAVE = new G4LogicalVolume(s_CAVE, geometry::Materials::get("CAVE"), "l_CAVE", 0, m_sensitive);
         G4LogicalVolume* l_CAVE = new G4LogicalVolume(s_CAVE, geometry::Materials::get("CAVE"), "l_CAVE", 0, 0);
@@ -89,9 +89,9 @@ namespace Belle2 {
 
         //position cave volume
         G4ThreeVector CAVEpos = G4ThreeVector(
-                                  activeParams.getLength("x_cave") * Unit::cm,
-                                  activeParams.getLength("y_cave") * Unit::cm,
-                                  activeParams.getLength("z_cave") * Unit::cm
+                                  activeParams.getLength("x_cave") * CLHEP::cm,
+                                  activeParams.getLength("y_cave") * CLHEP::cm,
+                                  activeParams.getLength("z_cave") * CLHEP::cm
                                 );
 
         G4RotationMatrix* rot_cave = new G4RotationMatrix();

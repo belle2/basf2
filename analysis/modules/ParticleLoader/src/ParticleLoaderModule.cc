@@ -190,7 +190,7 @@ namespace Belle2 {
       }
     }
 
-    // load reconstructed neutral KLM cluster's as photons
+    // load reconstructed neutral KLM cluster's as Klongs
     for (int i = 0; i < KLMClusters.getEntries(); i++) {
       const KLMCluster* cluster      = KLMClusters[i];
 
@@ -208,6 +208,8 @@ namespace Belle2 {
           newPart->addRelationTo(mcParticle);
       }
     }
+
+
 
     //B2INFO("ParticleLoader::loadFromReconstruction size=" << particles.getEntries());
   }

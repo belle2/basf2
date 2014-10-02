@@ -148,7 +148,7 @@ namespace Belle2 {
     /** Init module statistics: Set name from module if still empty and
      * remember initialization index for display
      */
-    void initModule(Module* module);
+    void initModule(const Module* module);
 
 
     /**
@@ -161,17 +161,7 @@ namespace Belle2 {
     }
 
     /** get m_stats index for given module, inserting it if not found. */
-    int getIndex(const Module* module) {
-      auto indexIt = m_modulesToStatsIndex.find(module);
-      if (indexIt == m_modulesToStatsIndex.end()) {
-        int index = m_stats.size();
-        m_modulesToStatsIndex[module] = index;
-        m_stats.emplace_back();
-        return index;
-      } else {
-        return indexIt->second;
-      }
-    }
+    int getIndex(const Module* module);
 #endif
 
     /** Merge other ProcessStatistics object into this one. */

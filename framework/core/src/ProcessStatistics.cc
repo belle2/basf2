@@ -22,10 +22,23 @@ using namespace Belle2;
 
 ClassImp(ProcessStatistics);
 
-void ProcessStatistics::initModule(Module* module)
+int ProcessStatistics::getIndex(const Module* module)
+{
+  auto indexIt = m_modulesToStatsIndex.find(module);
+  if (indexIt == m_modulesToStatsIndex.end()) {
+    int index = m_stats.size();
+    m_modulesToStatsIndex[module] = index;
+    m_stats.emplace_back();
+    initModule(module);
+    return index;
+  } else {
+    return indexIt->second;
+  }
+}
+void ProcessStatistics::initModule(const Module* module)
 {
   int index = getIndex(module);
-  ModuleStatistics& stats = m_stats[index];
+  ModuleStatistics& stats = m_stats.at(index);
   if (stats.getName().empty()) {
     stats.setName(module->getName());
   }
@@ -113,7 +126,6 @@ void ProcessStatistics::merge(const Mergeable* other)
         m_stats.back().setIndex(m_stats.size() - 1);
       }
     }
-    //B2WARNING("finished:" << this->getStatisticsString());
   }
 }
 

@@ -270,6 +270,9 @@ namespace Belle2 {
       /** Test inequality. */
       bool operator!=(const ParticleType& o) const { return !((*this) == o); }
 
+      /** dummy dereferencing for range-based for. */
+      ParticleType& operator*() { return *this; }
+
       /** Prefix increment.
        *
        * Incrementing past the last element of a set will return an invalid particle.
@@ -325,6 +328,11 @@ namespace Belle2 {
         \code
         B2INFO("index -> PDG code");
         const Const::ParticleSet set = Const::chargedStableSet;
+        //via range-based for
+        for(const Const::ChargedStable& pdgIter : set) {
+          B2INFO(pdgIter.getIndex() << " -> " << pdgIter.getPDGCode());
+        }
+        //or, using iterator syntax:
         for(Const::ChargedStable pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
           B2INFO(pdgIter.getIndex() << " -> " << pdgIter.getPDGCode());
         }

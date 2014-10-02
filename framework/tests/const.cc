@@ -60,8 +60,8 @@ namespace {
     EXPECT_EQ(0, (postfix++).getIndex());
 
     int size = 0;
-    for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
-      Const::ChargedStable c = pdgIter; //creating the restricted type should work
+    //note: iterating over the restricted type (ParticleType would work, too)
+    for (const Const::ChargedStable & pdgIter : set) {
 
       int pdg = pdgIter.getPDGCode();
       unsigned int index = c.getIndex();
@@ -85,6 +85,12 @@ namespace {
         default:
           EXPECT_TRUE(false) << "Index >4 encountered?";
       }
+      size++;
+    }
+    EXPECT_EQ(5, size);
+
+    size = 0;
+    for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
       size++;
     }
     EXPECT_EQ(5, size);

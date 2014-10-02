@@ -71,7 +71,6 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::initialize()
   {
-
     // magnetic field
     m_Bfield = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
     // RAVE setup
@@ -653,6 +652,11 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::doRaveFit(Particle* mother)
   {
     if (mother->getNDaughters() < 2) return false;
+
+    if (m_withConstraint == "") analysis::RaveSetup::getInstance()->unsetBeamSpot();
+    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube")
+      analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
+
 
     analysis::RaveKinematicVertexFitter rf;
     if (m_fitType == "mass") rf.setVertFit(false);

@@ -61,9 +61,9 @@ namespace {
 
     int size = 0;
     //note: iterating over the restricted type (ParticleType would work, too)
-    for (const Const::ChargedStable & pdgIter : set) {
+    for (const Const::ChargedStable & c : set) {
 
-      int pdg = pdgIter.getPDGCode();
+      int pdg = c.getPDGCode();
       unsigned int index = c.getIndex();
 
       switch (index) {

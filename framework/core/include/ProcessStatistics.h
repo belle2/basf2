@@ -100,10 +100,10 @@ namespace Belle2 {
                                     const std::vector<Belle2::ModuleStatistics>* modules = 0) const;
 
     /** Get global statistics. */
-    ModuleStatistics& getGlobal() { return m_global; }
+    const ModuleStatistics& getGlobal() const { return m_global; }
 
     /** Get entire statistics map. */
-    std::vector<Belle2::ModuleStatistics>& getAll() { return m_stats; }
+    const std::vector<Belle2::ModuleStatistics>& getAll() const { return m_stats; }
 
 //We don't want CINT to see anything about Module
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
@@ -156,7 +156,7 @@ namespace Belle2 {
      * @param module Shared pointer to the Module for which the
      *               statistics should be obtained
      */
-    ModuleStatistics& getStatistics(Module* module) {
+    ModuleStatistics& getStatistics(const Module* module) {
       return m_stats[getIndex(module)];
     }
 

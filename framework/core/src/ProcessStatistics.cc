@@ -39,7 +39,7 @@ void ProcessStatistics::initModule(const Module* module)
 {
   int index = getIndex(module);
   ModuleStatistics& stats = m_stats.at(index);
-  if (stats.getName().empty()) {
+  if (module and stats.getName().empty()) {
     stats.setName(module->getName());
   }
   stats.setIndex(index);
@@ -47,9 +47,8 @@ void ProcessStatistics::initModule(const Module* module)
 
 string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const std::vector<ModuleStatistics>* modules) const
 {
-  ProcessStatistics* thisNonConst = const_cast<ProcessStatistics*>(this);
-  const ModuleStatistics& global = thisNonConst->getGlobal();
-  if (!modules) modules = &(thisNonConst->getAll());
+  const ModuleStatistics& global = getGlobal();
+  if (!modules) modules = &(getAll());
   stringstream out;
   int moduleNameLength = 21; //minimum: 80 characters
   const int lengthOfRest = 80 - moduleNameLength;

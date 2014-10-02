@@ -481,7 +481,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
     if not is_first_run:
         # when preloader is used, make sure we also reload the statistics
-        for module in path:
+        for module in path.modules():
             if module.type() == 'RootInput':
                 module.param('excludeBranchNamesPersistent', [])
 

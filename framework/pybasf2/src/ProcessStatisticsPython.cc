@@ -12,7 +12,6 @@
 #include <boost/format.hpp>
 
 #include <framework/pybasf2/ProcessStatisticsPython.h>
-#include <framework/core/ProcessStatistics.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -74,6 +73,28 @@ boost::python::list ProcessStatisticsPython::getAll()
   return result;
 }
 
+const ModuleStatistics* ProcessStatisticsPython::get(ModulePtr module)
+{
+  if (!getWrapped())
+    return nullptr;
+  return &getWrapped()->getStatistics(module.get());
+}
+
+const ModuleStatistics* ProcessStatisticsPython::getGlobal()
+{
+  if (!getWrapped())
+    return nullptr;
+  return &getWrapped()->getGlobal();
+
+}
+void ProcessStatisticsPython::clear()
+{
+  if (!getWrapped())
+    return;
+  getWrapped()->clear();
+}
+
+
 //used to make python aware of default arguments
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_timeSum_overloads, getTimeSum, 0, 1)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_timeMean_overloads, getTimeMean, 0, 1)
@@ -99,9 +120,9 @@ void ProcessStatisticsPython::exposePythonAPI()
   .def("__str__", &ProcessStatisticsPython::getStatisticsString, getStatistics_overloads())
   .def("__call__", &ProcessStatisticsPython::getStatisticsString, getStatistics_overloads())
   .def("__call__", &ProcessStatisticsPython::getModuleStatistics, getModuleStatistics_overloads())
-  //.def("get", &ProcessStatisticsPython::get, return_value_policy<reference_existing_object>())
-  //.def("clear", &ProcessStatisticsPython::clear)
-  //.def_readonly("framework", &ProcessStatisticsPython::m_global) //TODO reenable
+  .def("get", &ProcessStatisticsPython::get, return_value_policy<reference_existing_object>())
+  .def("getGlobal", &ProcessStatisticsPython::getGlobal, return_value_policy<reference_existing_object>())
+  .def("clear", &ProcessStatisticsPython::clear)
   .def_readonly("modules", &ProcessStatisticsPython::getAll)
   ;
 

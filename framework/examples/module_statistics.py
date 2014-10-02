@@ -88,7 +88,7 @@ print 'EventInfoSetter needed %.3f ms in total' % (eventinfo_total / 1e6)
 stats.name = "FooBar"
 
 # Print total processing time
-framework_total = statistics.framework.time_sum(statistics.TOTAL)
+framework_total = statistics.getGlobal().time_sum(statistics.TOTAL)
 print 'Total processing time: %.3f ms' % (framework_total / 1e6)
 
 # Calculate estimate for framework overhead

@@ -71,8 +71,17 @@ namespace Belle2 {
       getWrapped()->getStatistics(module).setName(name);
     }
 
+    /** Get statistics for given module. */
+    const ModuleStatistics* get(boost::shared_ptr<Module> module);
+
+    /** Get statistics for the framework itself. */
+    const ModuleStatistics* getGlobal();
+
     /** Get statistics for all modules as python list */
     boost::python::list getAll();
+
+    /** Clear collected statistics but keep names of modules */
+    void clear();
 
     /** Define python wrappers to make functionality avaiable in python */
     static void exposePythonAPI();

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # showTMVAResults.sh TMVA.root
 # Shows Control Plots for a training stored in root file created by TMVATeacher
 

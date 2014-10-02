@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 collectionDirectory="FEI"
 jobDirectory="jobs"

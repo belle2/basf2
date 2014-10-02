@@ -30,7 +30,7 @@ namespace Belle2 {
       c_MissKlong           = 64, /**< A Klong is missing (not reconstructed). */
       c_MisID               = 128, /**< One of the charged final state particles is mis-identified. */
       c_AddedWrongParticle  = 256, /**< A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
-      c_InternalError       = 512, /**< There was an error in MC matching. Not a valid match. */
+      c_InternalError       = 512, /**< There was an error in MC matching. Not a valid match. Might indicate fake/background track or cluster. */
     };
 
     /**

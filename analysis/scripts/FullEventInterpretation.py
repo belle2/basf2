@@ -478,5 +478,12 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
             if user_selection_path is not None:
                 path.add_module(register_module('RootInput'))
             path.add_path(fei_path)
+
+    if not is_first_run:
+        # when preloader is used, make sure we also reload the statistics
+        for module in path:
+            if module.type() == 'RootInput':
+                module.param('excludeBranchNamesPersistent', [])
+
     path.add_module(register_module('ProgressBar'))
     return path

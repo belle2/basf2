@@ -73,7 +73,7 @@ namespace Belle2 {
   private:
     typedef std::vector<DataStore::StoreEntry*> StoreEntries;   /**< Vector of entries in the data store. */
 
-    /** Actually performs the reading from the tree into m_objects. */
+    /** Actually performs the reading from the tree */
     void readTree();
 
     /**
@@ -91,6 +91,9 @@ namespace Belle2 {
 
     /** Read data of the current event from the parents. */
     bool readParentTrees();
+
+    /** Loads given entry from persistent tree. */
+    void readPersistentEntry(long entry);
 
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */

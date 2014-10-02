@@ -13,6 +13,7 @@
 
 #include <framework/modules/rootio/RootIOUtilities.h>
 #include <framework/core/InputController.h>
+#include <framework/pcore/Mergeable.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -117,7 +118,7 @@ void RootInputModule::initialize()
   B2INFO("Opened tree '" + c_treeNames[DataStore::c_Event] + "' with " + m_tree->GetEntries() << " entries.");
 
   connectBranches(m_persistent, DataStore::c_Persistent, &m_persistentStoreEntries);
-  m_persistent->GetEntry(0);
+  readPersistentEntry(0);
 
   if (!connectBranches(m_tree, DataStore::c_Event, &m_storeEntries)) {
     delete m_tree;
@@ -201,16 +202,7 @@ void RootInputModule::readTree()
   if (prevFile != m_tree->GetCurrentFile()->GetName()) {
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     B2DEBUG(100, "File changed, loading persistent data.");
-    for (auto entry : m_persistentStoreEntries) {
-      entry->resetForGetEntry();
-    }
-    bytesRead = m_persistent->GetEntry(m_tree->GetTreeNumber());
-    for (auto entry : m_persistentStoreEntries) {
-      entry->ptr = entry->object;
-    }
-    if (bytesRead <= 0) {
-      B2FATAL("Could not read 'persistent' entry " << m_tree->GetTreeNumber() << " in file " << m_tree->GetCurrentFile()->GetName());
-    }
+    readPersistentEntry(m_tree->GetTreeNumber());
     StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
     FileCatalog::Instance().getParentMetaData(m_parentLevel, 0, *fileMetaData, m_parentMetaData);
     m_currentParent.resize(0);
@@ -272,10 +264,6 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
     tree->SetBranchAddress(branch->GetName(), &(entry.object));
     if (storeEntries) storeEntries->push_back(&entry);
 
-    //Read the persistent objects
-    if (durability == DataStore::c_Persistent) {
-      entry.ptr = entry.object;
-    }
 
     //Keep track of already connected branches
     m_connectedBranches[durability].insert(branchName);
@@ -439,8 +427,33 @@ bool RootInputModule::readParentTrees()
   return true;
 }
 
+void RootInputModule::readPersistentEntry(long entry)
+{
+  for (auto entry : m_persistentStoreEntries) {
+    bool isMergeable = entry->object->InheritsFrom(Mergeable::Class());
+    TObject* copyOfPreviousVersion = nullptr;
+    if (isMergeable) {
+      copyOfPreviousVersion = entry->object->Clone();
+    }
+    entry->resetForGetEntry();
+    //ptr stores old value (or nullptr)
+    entry->ptr = copyOfPreviousVersion;
+  }
 
-//on initialize create parents tree from catalog
-//              create datastore entries, (deactivate unused branches)
-//map id -> TTree
-//TChain: check for new file -> load FileMetaData
+  int bytesRead = m_persistent->GetEntry(entry);
+  if (bytesRead <= 0) {
+    B2FATAL("Could not read 'persistent' TTree #" << entry << " in file " << m_tree->GetCurrentFile()->GetName());
+  }
+
+  for (auto entry : m_persistentStoreEntries) {
+    bool isMergeable = entry->object->InheritsFrom(Mergeable::Class());
+    if (isMergeable) {
+      const Mergeable* oldObj = static_cast<Mergeable*>(entry->ptr);
+      Mergeable* newObj = static_cast<Mergeable*>(entry->object);
+      newObj->merge(oldObj);
+
+      delete entry->ptr;
+    }
+    entry->ptr = entry->object;
+  }
+}

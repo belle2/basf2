@@ -85,7 +85,7 @@ namespace Belle2 {
   class ProcessStatistics : public Mergeable {
   public:
     /** Constructor. */
-    ProcessStatistics(): m_global("global"), m_globalTime(0), m_globalMemory(0), m_moduleTime(0), m_moduleMemory(0), m_suspendedTime(0), m_suspendedMemory(0) { }
+    ProcessStatistics(): m_global("Total"), m_globalTime(0), m_globalMemory(0), m_moduleTime(0), m_moduleMemory(0), m_suspendedTime(0), m_suspendedMemory(0) { }
 
     /**
      * Return string with statistics for all modules.
@@ -139,7 +139,7 @@ namespace Belle2 {
     }
 
     /** Stop module counter and attribute values to appropriate module */
-    void stopModule(Module* module, ModuleStatistics::EStatisticCounters type) {
+    void stopModule(const Module* module, ModuleStatistics::EStatisticCounters type) {
       setCounters(m_moduleTime, m_moduleMemory,
                   m_moduleTime, m_moduleMemory);
       m_stats[getIndex(module)].add(type, m_moduleTime, m_moduleMemory);
@@ -161,7 +161,7 @@ namespace Belle2 {
     }
 
     /** get m_stats index for given module, inserting it if not found. */
-    int getIndex(Module* module) {
+    int getIndex(const Module* module) {
       auto indexIt = m_modulesToStatsIndex.find(module);
       if (indexIt == m_modulesToStatsIndex.end()) {
         int index = m_stats.size();
@@ -195,17 +195,14 @@ namespace Belle2 {
      * @param startMemory value to subtract from heap size
      */
     void setCounters(double& time, double& memory,
-                     double startTime = 0, double startMemory = 0) {
-      time = Utils::getClock() - startTime;
-      memory = Utils::getMemoryKB() - startMemory;
-    }
+                     double startTime = 0, double startMemory = 0);
 
     /** Statistics object for global time and memory consumption */
     ModuleStatistics m_global;
     /** module statistics */
     std::vector<Belle2::ModuleStatistics> m_stats;
 
-    std::map<Module*, int> m_modulesToStatsIndex; //!< transient, maps Module* to m_stats index
+    std::map<const Module*, int> m_modulesToStatsIndex; //!< transient, maps Module* to m_stats index
 
     //the following are used for the (process-local) time-keeping
 

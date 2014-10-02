@@ -10,6 +10,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/ProcessStatistics.h>
+
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -82,14 +83,37 @@ void ProcessStatistics::merge(const Mergeable* other)
 
   m_global.update(otherObject->m_global);
 
-  for (unsigned int i = 0; i < otherObject->m_stats.size(); i++) {
-    ModuleStatistics& myStats = m_stats[i];
-    const ModuleStatistics& otherStats = otherObject->m_stats[i];
-    if (myStats.getName() == otherStats.getName()) {
-      myStats.update(otherStats);
-    } else {
-      B2ERROR("mismatch in module names in statistics?");
+  if (m_stats.size() == otherObject->m_stats.size()) {
+    //fast version for merging between processes
+    for (unsigned int i = 0; i < otherObject->m_stats.size(); i++) {
+      ModuleStatistics& myStats = m_stats[i];
+      const ModuleStatistics& otherStats = otherObject->m_stats[i];
+      if (myStats.getName() == otherStats.getName()) {
+        myStats.update(otherStats);
+      } else {
+        B2ERROR("mismatch in module names in statistics. ProcessStatistics::merge() can only merge statistics that contain exactly the same modules.");
+      }
     }
+  } else {
+    //slow merging if we have different number of modules
+    for (const auto & otherStats : otherObject->m_stats) {
+      //find name in our statistics
+      bool found = false;
+      for (ModuleStatistics & myStats : m_stats) {
+        if (myStats.getName() == otherStats.getName()) {
+          myStats.update(otherStats);
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        //add module at end
+        m_stats.emplace_back(otherStats);
+        m_stats.back().setIndex(m_stats.size() - 1);
+      }
+    }
+    //B2WARNING("finished:" << this->getStatisticsString());
   }
 }
 
@@ -97,4 +121,11 @@ void ProcessStatistics::clear()
 {
   m_global.clear();
   for (auto & stats : m_stats) { stats.clear(); }
+}
+
+void ProcessStatistics::setCounters(double& time, double& memory,
+                                    double startTime, double startMemory)
+{
+  time = Utils::getClock() - startTime;
+  memory = Utils::getMemoryKB() - startMemory;
 }

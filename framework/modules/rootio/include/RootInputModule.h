@@ -133,8 +133,10 @@ namespace Belle2 {
     /** Already connected branches. */
     std::set<std::string> m_connectedBranches[DataStore::c_NDurabilityTypes];
 
-    /** Vector of DataStore entries that we are supposed to read in. */
+    /** Vector of DataStore entries of event durability that we are supposed to read in. */
     StoreEntries m_storeEntries;
+    /** Vector of DataStore entries of persistent durability that we are supposed to read in. */
+    StoreEntries m_persistentStoreEntries;
 
     /** Tree of parent metadata */
     FileCatalog::ParentMetaData m_parentMetaData;

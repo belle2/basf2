@@ -116,7 +116,7 @@ void RootInputModule::initialize()
   B2INFO("Opened tree '" + c_treeNames[DataStore::c_Persistent] + "' with " + m_persistent->GetEntries() << " entries.");
   B2INFO("Opened tree '" + c_treeNames[DataStore::c_Event] + "' with " + m_tree->GetEntries() << " entries.");
 
-  connectBranches(m_persistent, DataStore::c_Persistent, 0);
+  connectBranches(m_persistent, DataStore::c_Persistent, &m_persistentStoreEntries);
   m_persistent->GetEntry(0);
 
   if (!connectBranches(m_tree, DataStore::c_Event, &m_storeEntries)) {
@@ -192,16 +192,22 @@ void RootInputModule::readTree()
     }
   }
 
-  const TFile* prevFile = m_tree->GetCurrentFile();
+  const string prevFile = m_tree->GetCurrentFile()->GetName();
   int bytesRead = m_tree->GetEntry(m_counterNumber);
   if (bytesRead <= 0) {
     B2FATAL("Could not read 'tree' entry " << m_counterNumber << " in file " << m_tree->GetCurrentFile()->GetName());
   }
 
-  if (prevFile != m_tree->GetCurrentFile()) {
+  if (prevFile != m_tree->GetCurrentFile()->GetName()) {
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     B2DEBUG(100, "File changed, loading persistent data.");
+    for (auto entry : m_persistentStoreEntries) {
+      entry->resetForGetEntry();
+    }
     bytesRead = m_persistent->GetEntry(m_tree->GetTreeNumber());
+    for (auto entry : m_persistentStoreEntries) {
+      entry->ptr = entry->object;
+    }
     if (bytesRead <= 0) {
       B2FATAL("Could not read 'persistent' entry " << m_tree->GetTreeNumber() << " in file " << m_tree->GetCurrentFile()->GetName());
     }

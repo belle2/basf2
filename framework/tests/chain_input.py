@@ -14,17 +14,28 @@ class NoopModule(Module):
 class TestModule(Module):
     """Test to read relations in the input files."""
 
+    ##event counter
+    iEvent = 0
+
     def event(self):
         """reimplementation of Module::event().
 
         prints PXD true and simhit indices, using relations
         """
+        filemetadata = Belle2.PyStoreObj('FileMetaData', 1)
+        nevents = filemetadata.obj().getEvents()
+        if self.iEvent < 12 and not nevents == 12:
+            B2FATAL("FileMetaData from file 1 not loaded!")
+        elif self.iEvent >= 12 and not nevents == 15:
+            B2FATAL("FileMetaData from file 2 not loaded!")
 
         simhits = Belle2.PyStoreArray('PXDSimHits')
         for hit in simhits:
             relations = hit.getRelationsFrom("PXDTrueHits")
             for truehit in relations:
                 print 'truehit %d => hit %d' % (truehit.getArrayIndex(), hit.getArrayIndex())
+
+        self.iEvent += 1
 
 
 input = register_module('RootInput')

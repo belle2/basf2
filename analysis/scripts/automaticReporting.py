@@ -848,12 +848,15 @@ def getModuleStatsFromFile(filename):
 
     tfile = ROOT.TFile(filename)
     persistentTree = tfile.Get('persistent')
-    numEntries = persistentTree.GetEntriesFast()
-    if numEntries != 1:
-        raise runtime_error("expected excatly one entry, got %d instead" % (numEntries))
     persistentTree.GetEntry(0)
     # Clone() needed so we actually own the object (original dies when tfile is deleted)
     stats = persistentTree.ProcessStatistics.Clone()
+
+    # merge statistics from all persistent trees into 'stats'
+    numEntries = persistentTree.GetEntriesFast()
+    for i in range(1, numEntries):
+        persistentTree.GetEntry(i)
+        stats.merge(persistentTree.ProcessStatistics)
 
     return stats.getAll()
 

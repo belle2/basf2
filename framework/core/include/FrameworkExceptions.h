@@ -53,6 +53,6 @@ namespace Belle2 {
 }
 
 #else
-/** Macro that defines an exception with the given message template. */
+/** Dummy version for CINT. */
 #define BELLE2_DEFINE_EXCEPTION(ClassName, Message)
 #endif

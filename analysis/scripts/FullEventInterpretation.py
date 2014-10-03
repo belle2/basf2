@@ -241,8 +241,8 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
     The Full Event Interpretation algorithm.
     Alle the Actors defined above are added to the playuence and are executed in an order which fulfills all requirements.
     This function returns if no more Actors can be called without violating some requirements.
-        @param user_selection_path the basf2 module path
-        @param user_analysis_path the basf2 module path
+        @param user_selection_path basf2 module path to execute before any tag-side reconstruction. Should load data, select signal side and create a 'RestOfEvents' list
+        @param user_analysis_path basf2 module path to execute after training is finished
         @param particles playuence of particle objects which shall be reconstructed by this algorithm
     """
 

@@ -462,6 +462,7 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
+        output.set_name('VariablesToNtuple_' + particleList)
         output.param('particleList', particleList)
         output.param('variables', ['getExtraInfo(SignalProbability)', 'isSignal', 'isSignalAcceptMissingNeutrino', 'Mbc', 'mcStatus', 'cosThetaBetweenParticleAndTrueB'])
         output.param('fileName', filename)

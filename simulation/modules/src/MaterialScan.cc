@@ -189,13 +189,13 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
   addParam("spherical.minTheta",  m_spherical.minU,
            "Theta start angle", 17.);
   addParam("spherical.maxTheta",  m_spherical.maxU,
-           "Theta start angle", 150.);
+           "Theta stop angle", 150.);
   addParam("spherical.nPhi",      m_spherical.nV,
            "Number of rays in phi", 200);
   addParam("spherical.minPhi",    m_spherical.minV,
            "Phi start angle", 0.);
   addParam("spherical.maxPhi",    m_spherical.maxV,
-           "Phi start angle", 360.);
+           "Phi stop angle", 360.);
   addParam("spherical.maxDepth",  m_spherical.maxDepth,
            "Maximum scan depth in cm. The ray will be killed after having "
            "reached the maximum Depth. <=0 means no Limit.", -1.0);
@@ -229,9 +229,10 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
            "reached the maximum Depth. <=0 means no Limit.", -1.0);
   addParam("planar.custom",       m_customPlane,
            "Parameters of the plane when choosing custom. This is supposed to "
-           "be a list of 9 values, the first three are the coordinates of the "
-           "plane origin, the second three is the direction of U and the last "
-           "three are the direction of V", m_customPlane);
+           "be a list of 9 values: The first three are the coordinates of the "
+           "plane origin. The second three are the direction of U in the "
+           "r-phi coordinates. The last three are the direction of V in the "
+           "coordinates parallel to the detector axis (beamline). ", m_customPlane);
   addParam("planar.ignored",      m_planar.ignoredMaterials,
            "Names of Materials which should be ignored when doing the scan", m_planar.ignoredMaterials);
   addParam("planar.splitByMaterials", m_planar.splitByMaterials,

@@ -17,6 +17,10 @@
 extern "C" {
   void set_beta_rq_(float*);
   void set_tmax_(float*);
+  void set_pdf_opt_(int*);
+  float get_logl_(float*, float*);
+  int data_getnum_();
+
 }
 
 namespace Belle2 {
@@ -33,7 +37,15 @@ namespace Belle2 {
     class TOPreco {
     public:
       /**
-       * constructor
+       * Options for PDF:
+       *   rough: no dependence on y
+       *   fine:  y dependent PDF everywhere
+       *   optimal: y dependent PDF only where necessary (default)
+       */
+      enum PDFoption {c_Rough = 0, c_Fine, c_Optimal};
+
+      /**
+       * Constructor
        * @param NumHyp number of mass hypotheses
        * @param Masses masses
        * @param BkgPerQbar estimation for minimal number of background hits
@@ -42,15 +54,21 @@ namespace Belle2 {
       TOPreco(int NumHyp, double Masses[], double BkgPerQbar = 0, double ScaleN0 = 1);
 
       /**
-       * set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other
+       * Set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other
        * @param NumHyp number of mass hypotheses
        * @param HypID internal codes in the same order as Masses[]
        */
       void setHypID(int NumHyp, int HypID[]);
 
       /**
-       * set maximum for photon times (allows to set it lower than TDC range)
-       * @param Tmax maximum time [ns]
+       * Set mass of the particle hypothesis (overrides settings in the constructor)
+       * @param mass mass
+       */
+      void setMass(double mass);
+
+      /**
+       * Set maximum for photon times (allows to set it lower than TDC range)
+       * @param Tmax maximum time [ns], Tmax = 0: set to default TDC range
        */
       void setTmax(double Tmax) {
         float tmax = (float) Tmax;
@@ -58,12 +76,21 @@ namespace Belle2 {
       }
 
       /**
-       * clear data list
+       * Set PDF option
+       * @param opt option - see definition of PDFoption
+       */
+      void setPDFoption(PDFoption opt) {
+        int iopt = opt;
+        set_pdf_opt_(&iopt);
+      }
+
+      /**
+       * Clear data list
        */
       void clearData();
 
       /**
-       * add data
+       * Add data
        * @param QbarID bar ID
        * @param chID channel ID
        * @param TDC digitized time
@@ -71,12 +98,14 @@ namespace Belle2 {
       int addData(int QbarID, int chID, int TDC);
 
       /**
-       * get size of data list
+       * Return size of data list
        */
-      int getDataSize();
+      int getDataSize() {
+        return data_getnum_();
+      }
 
       /**
-       * run reconstruction
+       * Run reconstruction
        * @param X track spatial position x
        * @param Y track spatial position y
        * @param Z track spatial position z
@@ -91,19 +120,19 @@ namespace Belle2 {
                        double Px, double Py, double Pz, int Q, int HYP = 0);
 
       /**
-       * run reconstruction
+       * Run reconstruction
        * @param trk track
        */
       void reconstruct(TOPtrack& trk);
 
       /**
-       * get status
+       * Return status
        * @return status: 1=OK, 0=out of acceptance, -1=inside gap
        */
       int getFlag();
 
       /**
-       * get reconstruction results
+       * Get reconstruction results
        * @param Size size of arrays
        * @param LogL log likelihoods for Masses[]
        * @param ExpNphot expected number of photons for Masses[]
@@ -111,8 +140,21 @@ namespace Belle2 {
        */
       void getLogL(int Size, double LogL[], double ExpNphot[], int& Nphot);
 
+
       /**
-       * get track hit at the bar in Local or Global frame
+       * Return log likelihood for the last mass hypothesis using time-shifted PDF
+       * @param timeShift time shift of PDF to the left
+       * @param timeWindow size of time window within which the photons are accepted
+       * @return log likelihood
+       */
+      double getLogL(double timeShift, double timeWindow) {
+        float t0 = (float) timeShift;
+        float twin = (float) timeWindow;
+        return get_logl_(&t0, &twin);
+      }
+
+      /**
+       * Return track hit at the bar in Local or Global frame
        * @param LocGlob select Local or Global frame
        * @param R track spatial position
        * @param Dir track direction (unit vector)
@@ -125,25 +167,25 @@ namespace Belle2 {
                        double& Tlen, double& Mom, int& QbarID);
 
       /**
-       * print log likelihoods to std output
+       * Print log likelihoods to std output
        * @param NumHyp number of hypotheses
        */
       void dumpLogL(int NumHyp);
 
       /**
-       * print track to std output
+       * Print track to std output
        * @param LocGlob in Local or Global frame
        */
       void dumpTrackHit(int LocGlob);
 
       /**
-       * get pulls: size
+       * Get pulls: size
        * @return: size
        */
       int getPullSize();
 
       /**
-       * get pulls: K-th pull
+       * Get pulls: K-th pull
        * @param K counter
        * @param T photon time
        * @param T0 PDF mean time
@@ -155,7 +197,7 @@ namespace Belle2 {
                    double& Wt);
 
       /**
-       * get PDF for channel chID at time t for mass hypothesis mass
+       * Return PDF for channel chID at time t for mass hypothesis mass
        * @param chID channel ID
        * @param t time
        * @param mass mass
@@ -163,21 +205,21 @@ namespace Belle2 {
       double getPDF(int chID, double t, double mass);
 
       /**
-       * set track beta (for beta resolution studies)
+       * Set track beta (for beta resolution studies)
        * if beta>0 this value is used instead of beta from momentum and mass
        * @param beta beta value
        */
       void setBeta(double beta) {m_beta = beta; float bt = beta; set_beta_rq_(&bt);};
 
       /**
-       * return track beta
+       * Return track beta
        * @return beta value
        */
-      double getBeta() {return m_beta;};
+      double getBeta() const {return m_beta;};
 
 
     private:
-      int m_HYP;      /**< true hypothesis*/
+      int m_hypID;    /**< true hypothesis ID */
       double m_beta;  /**< beta value, if set */
 
     };

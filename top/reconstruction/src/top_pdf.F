@@ -22,6 +22,8 @@
       DATA NCH /3*0/
       DATA BETA_RQ /0./
       DATA STORE_OPT /.TRUE./
+      DATA PDF_OPT /2/
+
       INTEGER NUMCH
       INTEGER NN, ICH, LR, L, K, I
       REAL ZW(0:1), ZD, ZB, ZM, DZEXT
@@ -544,14 +546,13 @@ c--   calculate PDF parameters
       IMPLICIT NONE
       INTEGER M                 ! module number
 #include "TOP_GEO.fi"
-#include "TOP_EXT.fi"
 #include "TOP_PIK.fi"
 #include "TOP_PAR.fi"
 #include "TOP_DATA.fi"
 
-      INTEGER LR, I, ICH, II
-      INTEGER N_BGR
-      REAL S(0:1), B(0:1), F
+      INTEGER N_BGR, I
+      INTEGER ICH, NUMCH
+      REAL S
       INTEGER M_OLD /-1/
       SAVE M_OLD
 
@@ -569,29 +570,14 @@ c--   calculate PDF parameters
       IF(M.EQ.M_OLD) RETURN
       M_OLD=M
 
-      DO LR=0,1
-         S(LR)=0.
-         II=QBAR_EXT(LR,M)
-         IF(II.GT.0) THEN
-            B(LR)=EXT_YUP(II)-EXT_YDN(II)
-         ELSE
-            B(LR)=QBAR_B(M)
-         ENDIF
-         IF(LR_FLAG(LR).NE.1) CYCLE
-         DO I=0,NCH(LR)-1
-            ICH=I+LR*NCH(LR-1)
-            S(LR)=S(LR)+PIK_DXCH(ICH)*PIK_DYCH(ICH)
-         ENDDO
+      NUMCH=NCH(0)+NCH(1)
+      S=0.
+      DO ICH=0,NUMCH-1
+         S=S+PIK_DXCH(ICH)*PIK_DYCH(ICH)
       ENDDO
-      F=1.
-      IF(LR_FLAG(0).EQ.1.AND.LR_FLAG(1).EQ.1) F=2.
-      DO LR=0,1
-         IF(LR_FLAG(LR).NE.1) CYCLE
-         IF(S(LR).EQ.0) S(LR)=1.
-         DO I=0,NCH(LR)-1
-            ICH=I+LR*NCH(LR-1)
-            PIK_BGR(ICH)=PIK_DXCH(ICH)*PIK_DYCH(ICH)/S(LR)/F/T_MAX
-         ENDDO
+      IF(S.EQ.0) S=1.
+      DO ICH=0,NUMCH-1
+         PIK_BGR(ICH)=PIK_DXCH(ICH)*PIK_DYCH(ICH)/S/T_MAX
       ENDDO
 
       END

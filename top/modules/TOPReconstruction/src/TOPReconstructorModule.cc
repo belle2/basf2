@@ -34,7 +34,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 // ROOT
 #include <TVector3.h>
@@ -65,17 +64,14 @@ namespace Belle2 {
     m_Z2(0)
   {
     // Set description
-    setDescription("Reconstruction for TOP counter. Uses reconstructed tracks extrapolated to TOP and TOPDigits to calculate log likelihoods for e, mu, pi, K, p.");
+    setDescription("Reconstruction for TOP counter. Uses reconstructed tracks "
+                   "extrapolated to TOP and TOPDigits to calculate log likelihoods "
+                   "for charged stable particles");
 
     // Set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("inputTracks", m_inputTracks, "Mdst tracks", string(""));
-    addParam("inputExtHits", m_inputExtHits, "Extrapolated tracks", string(""));
-    addParam("inputDigits", m_inputDigits, "TOP digits", string(""));
-    addParam("inputBarHits", m_inputBarHits, "MCParticle hits at bars", string(""));
-    addParam("outputLikelihoods", m_outputLikelihoods, "TOP likelihoods", string(""));
     addParam("minBkgPerBar", m_minBkgPerBar,
              "Minimal number of background photons per bar", 0.0);
     addParam("scaleN0", m_scaleN0, "Scale factor for N0", 1.0);
@@ -91,32 +87,34 @@ namespace Belle2 {
 
   }
 
+
   TOPReconstructorModule::~TOPReconstructorModule()
   {
   }
+
 
   void TOPReconstructorModule::initialize()
   {
     // input
 
-    StoreArray<TOPDigit> topDigits(m_inputDigits);
+    StoreArray<TOPDigit> topDigits;
     topDigits.isRequired();
 
-    StoreArray<Track> tracks(m_inputTracks);
+    StoreArray<Track> tracks;
     tracks.isRequired();
 
-    StoreArray<ExtHit> extHits(m_inputExtHits);
+    StoreArray<ExtHit> extHits;
     extHits.isRequired();
 
     StoreArray<MCParticle> mcParticles;
     mcParticles.isOptional();
 
-    StoreArray<TOPBarHit> barHits(m_inputBarHits);
+    StoreArray<TOPBarHit> barHits;
     barHits.isOptional();
 
     // output
 
-    StoreArray<TOPLikelihood> topLikelihoods(m_outputLikelihoods);
+    StoreArray<TOPLikelihood> topLikelihoods;
     topLikelihoods.registerInDataStore();
     topLikelihoods.registerRelationTo(extHits);
     topLikelihoods.registerRelationTo(barHits);
@@ -153,67 +151,46 @@ namespace Belle2 {
 
   void TOPReconstructorModule::beginRun()
   {
-
   }
 
   void TOPReconstructorModule::event()
   {
 
     // output: log likelihoods
-    StoreArray<TOPLikelihood> topLikelihoods(m_outputLikelihoods);
+
+    StoreArray<TOPLikelihood> topLikelihoods;
     topLikelihoods.create();
 
     // create reconstruction object
+
     TOPreco reco(c_Nhyp, m_Masses, m_minBkgPerBar, m_scaleN0);
 
     // set time limit for photons lower than that given by TDC range (optional)
+
     if (m_maxTime > 0) reco.setTmax(m_maxTime);
 
     // clear reconstruction object
+
     reco.clearData();
 
     // add photons
-    StoreArray<TOPDigit> topDigits(m_inputDigits);
+
+    StoreArray<TOPDigit> topDigits;
     for (int i = 0; i < topDigits.getEntries(); ++i) {
       const TOPDigit* data = topDigits[i];
       if (data->getHitQuality() == TOPDigit::EHitQuality::c_Good)
         reco.addData(data->getBarID(), data->getChannelID(), data->getTDC());
     }
 
-    // use pion hypothesis for track extrapolation
-    Const::ChargedStable chargedStable = Const::pion;
-
     // reconstruct track-by-track and store the results
-    StoreArray<Track> tracks(m_inputTracks);
+
+    StoreArray<Track> tracks;
     for (int i = 0; i < tracks.getEntries(); ++i) {
-
       const Track* track = tracks[i];
-      const ExtHit* extHit = getExtHit(track, chargedStable);
-      if (!extHit) continue;
 
-      TVector3 point = extHit->getPosition();
-      double x = point.X();
-      double y = point.Y();
-      double z = point.Z();
-      TVector3 momentum = extHit->getMomentum();
-      double px = momentum.X();
-      double py = momentum.Y();
-      double pz = momentum.Z();
-
-      const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
-      if (!fitResult) {
-        B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
-        continue;
-      }
-      int charge = fitResult->getChargeSign();
-
-      const MCParticle* particle = track->getRelated<MCParticle>();
-      int truePDGCode = 0;
-      if (particle) truePDGCode = particle->getPDG();
-
-      TOPtrack trk(x, y, z, px, py, pz, 0.0, charge, truePDGCode);
-      double tof = extHit->getTOF();
-      trk.setTrackLength(tof, chargedStable.getMass());
+      // construct TOPtrack from mdst track
+      TOPtrack trk(track);
+      if (!trk.isValid()) continue;
 
       // optional track smearing (needed for some MC studies)
       if (m_smearTrack) {
@@ -237,14 +214,10 @@ namespace Belle2 {
       // store results
       TOPLikelihood* topL = topLikelihoods.appendNew(reco.getFlag(),
                                                      logl, nphot, expPhot);
-
       // make relations:
       track->addRelationTo(topL);
-      topL->addRelationTo(extHit);
-      if (particle) {
-        const TOPBarHit* barHit = particle->getRelated<TOPBarHit>(m_inputBarHits);
-        topL->addRelationTo(barHit);
-      }
+      topL->addRelationTo(trk.getExtHit());
+      topL->addRelationTo(trk.getBarHit());
     }
 
   }
@@ -252,47 +225,13 @@ namespace Belle2 {
 
   void TOPReconstructorModule::endRun()
   {
-
   }
 
   void TOPReconstructorModule::terminate()
   {
-
-  }
-
-  void TOPReconstructorModule::printModuleParams() const
-  {
-
   }
 
 
-  const ExtHit* TOPReconstructorModule::getExtHit(const Track* track,
-                                                  Const::ChargedStable chargedStable)
-  {
-
-    Const::EDetector myDetID = Const::EDetector::TOP;
-    int NumBars = m_topgp->getNbars();
-    int pdgCode = abs(chargedStable.getPDGCode());
-
-    RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>(m_inputExtHits);
-    for (unsigned i = 0; i < extHits.size(); i++) {
-      const ExtHit* extHit = extHits[i];
-      if (abs(extHit->getPdgCode()) != pdgCode) continue;
-      if (extHit->getDetectorID() != myDetID) continue;
-      if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumBars) continue;
-      if (extHit->getStatus() != EXT_ENTER) continue;
-      TVector3 point = extHit->getPosition(); // do I need to x-check?
-      double x = point.X();
-      double y = point.Y();
-      double z = point.Z();
-      if (z < m_Z1 || z > m_Z2) continue;
-      double r = sqrt(x * x + y * y);
-      if (r < m_R1 || r > m_R2) continue;
-      return extHit;
-    }
-    return 0;
-
-  }
 
 } // end Belle2 namespace
 

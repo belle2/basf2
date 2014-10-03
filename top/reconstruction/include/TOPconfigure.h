@@ -31,13 +31,13 @@ namespace Belle2 {
       /**
        * print configuration to std output (using fortran print)
        */
-      void print() {top_geo_dump_();}
+      void print() const {top_geo_dump_();}
 
       /**
        * Returns configuration status
        * @return status
        */
-      bool isConfigured() {return m_configured;}
+      bool isConfigured() const {return m_configured;}
 
       /**
        * Returns inner radius of space for TOP bars
@@ -63,6 +63,12 @@ namespace Belle2 {
        */
       double getZ2() const {return m_Z2;}
 
+      /**
+       * Returns time range of TDC
+       * @return time range
+       */
+      double getTDCTimeRange() const {return m_timeRange;}
+
     private:
       static bool m_configured; /**< set to true when done */
       TOPGeometryPar* m_topgp;   /**< geometry parameters */
@@ -70,6 +76,7 @@ namespace Belle2 {
       double m_R2;   /**< outer radius */
       double m_Z1;   /**< backward z */
       double m_Z2;   /**< forward z */
+      double m_timeRange; /**< time range of TDC */
 
     };
 

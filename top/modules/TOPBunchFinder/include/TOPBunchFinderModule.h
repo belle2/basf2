@@ -3,53 +3,38 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric,  Dan Santel                                *
+ * Contributors: Marko Staric                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPDQMMODULE_H
-#define TOPDQMMODULE_H
-
-// I copied 6 lines below from PXDDQMModule.h - is it realy needed?
-#undef DQM
-#ifndef DQM
-#include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
+#ifndef TOPBUNCHFINDERMODULE_H
+#define TOPBUNCHFINDERMODULE_H
 
 #include <framework/core/Module.h>
-#include <top/geometry/TOPGeometryPar.h>
+#include <framework/gearbox/Const.h>
 #include <string>
-#include <vector>
-#include "TH1F.h"
-#include "TH2F.h"
 
 namespace Belle2 {
 
+  class DedxLikelihood;
+
   /**
-   * TOP DQM histogrammer
+   *
    */
-  class TOPDQMModule : public HistoModule {
+  class TOPBunchFinderModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    TOPDQMModule();
+    TOPBunchFinderModule();
 
     /**
      * Destructor
      */
-    virtual ~TOPDQMModule();
-
-    /**
-     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
-     * to be placed in this function.
-    */
-    virtual void defineHisto();
+    virtual ~TOPBunchFinderModule();
 
     /**
      * Initialize the Module.
@@ -82,16 +67,20 @@ namespace Belle2 {
 
   private:
 
-    // module parameters
-    std::string m_histogramDirectoryName; /**< histogram directory in ROOT file */
+    int m_bunchHalfRange; /**< half range of relative bunch numbers */
+    double m_maxTime;   /**< time limit for photons */
 
-    // TOP geometry parameters
-    TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters */
+    double m_bunchTimeSep; /**< time between two bunches */
 
-    // histograms
-    TH1F* m_barHits;  /**< number of hits per bar */
-    std::vector<TH1F*> m_channelHits;   /**< number of hits per channel for each bar */
-    std::vector<TH1F*> m_hitTimes;   /**< time distribution for each bar */
+    std::vector<int> m_xxx;
+    std::vector<int> m_yyy[20];
+
+
+    /**
+     * Return mass of the most probable charged stable particle using dEdx likelihoods
+     * @return mass
+     */
+    double getMostProbableMass(const DedxLikelihood* dedx) const;
 
   };
 

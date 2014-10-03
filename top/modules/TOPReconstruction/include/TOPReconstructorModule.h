@@ -15,11 +15,6 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <string>
 
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <framework/gearbox/Const.h>
-
-
 namespace Belle2 {
 
   /**
@@ -73,29 +68,10 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
 
   private:
 
-    // Private methods
-
-    /**
-     * Return extrapolated hit on TOP, if any
-     * @param track a pointer to reconstructed track
-     * @param chargedStable particle hypothesis used for extrapolation
-     * @return a pointer to extrapolated hit or NULL
-     */
-    const ExtHit* getExtHit(const Track* track, Const::ChargedStable chargedStable);
-
     // Module steering parameters
-    std::string m_inputTracks;       /**< reconstructed tracks (input) */
-    std::string m_inputExtHits;      /**< Ext reconstructed hits (input) */
-    std::string m_inputDigits;       /**< Digitized data (input) */
-    std::string m_inputBarHits;      /**< MC particle hit (to set relation to) */
-    std::string m_outputLikelihoods; /**< TOP log likelihoods (output) */
     double m_minBkgPerBar;    /**< minimal assumed background photons per bar */
     double m_scaleN0;         /**< scale factor for N0 */
     double m_sigmaRphi;    /**< track smearing in Rphi (r.m.s) */

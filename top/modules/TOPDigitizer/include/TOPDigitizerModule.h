@@ -82,8 +82,6 @@ namespace Belle2 {
      */
     double PMT_TTS();
 
-    std::string m_inputSimHits;    /**< Input collection name */
-    std::string m_outputDigits;    /**< Output collection name */
     double m_timeZeroJitter;       /**< r.m.s of T0 jitter */
     double m_electronicJitter;     /**< r.m.s of electronic jitter */
     double m_electronicEfficiency; /**< electronic efficiency */

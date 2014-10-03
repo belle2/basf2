@@ -61,8 +61,6 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("storeDigitsName", m_storeDigitsName, "TOPDigits StoreArray name",
-             string(""));
     addParam("histogramDirectoryName", m_histogramDirectoryName,
              "histogram directory in ROOT file", string("top"));
 
@@ -124,7 +122,7 @@ namespace Belle2 {
     // Register histograms (calls back defineHisto)
     REG_HISTOGRAM;
 
-    StoreArray<TOPDigit>::required(m_storeDigitsName);
+    StoreArray<TOPDigit>::required;
 
   }
 
@@ -135,7 +133,7 @@ namespace Belle2 {
   void TOPDQMModule::event()
   {
 
-    StoreArray<TOPDigit> digits(m_storeDigitsName);
+    StoreArray<TOPDigit> digits;
 
     for (TOPDigit & digit : digits) {
       m_barHits->Fill(digit.getBarID());

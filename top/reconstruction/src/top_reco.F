@@ -237,7 +237,6 @@
       LOGICAL FLAG
 #include "TOP_DATA.fi"
 #include "TOP_TRACK.fi"
-#include "TOP_PMT.fi"
 #include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
       INTEGER I, ICH, M, NUMCH
@@ -264,6 +263,74 @@
          ENDIF
       ENDDO
       PLKH=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
+
+      END
+
+
+      REAL FUNCTION GET_LOGL(T0,TWIN)
+
+      IMPLICIT NONE
+      REAL T0                   ! time shift
+      REAL TWIN                 ! time window
+#include "TOP_DATA.fi"
+#include "TOP_RTRA.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_TDC.fi"
+#include "TOP_PIK.fi"
+      INTEGER I, ICH, M, NUMCH, NFOT
+      REAL P, T, F, SFOT, PLKH, PS, PB
+      REAL TOP_SIGNAL, TOP_BGR, POIS_LOG
+
+      GET_LOGL=0.
+      IF(N_RTRA.NE.1) RETURN
+      IF(RTRA_FLAG(1).NE.1) RETURN
+
+      CALL  GET_NEW_NORM(T0,TWIN,PS,PB)
+      SFOT=STFS*PS+STFB*PB
+      IF(SFOT.EQ.0) RETURN
+
+      PLKH=0.
+      NFOT=0
+      NUMCH=NCH(0)+NCH(1)
+      P=STFS*PS/SFOT
+      IF(PS.EQ.0) PS=1.         ! to prevent F=nan 
+      DO I=1,N_DATA
+         M=DATA_MOD(I)
+         IF(M.EQ.MODUL) THEN
+            ICH=DATA_ICH(I)
+            IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
+            T=(DATA_TDC(I)+.5)*TDC_DT+TDC_T0
+            IF(T.LT.0.OR.T.GT.TWIN) CYCLE
+            NFOT=NFOT+1
+            F=P*TOP_SIGNAL(T+T0,ICH)/PS+(1-P)*TOP_BGR(T+T0,ICH)/PB
+            PLKH=PLKH+LOG(F)
+         ENDIF
+      ENDDO
+      GET_LOGL=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
+
+      END
+
+
+      SUBROUTINE GET_NEW_NORM(T0,TWIN,PS,PB)
+      
+      IMPLICIT NONE
+      REAL T0                   ! time shift
+      REAL TWIN                 ! time window
+      REAL PS, PB               ! new normalizations for signal and background
+#include "TOP_PIK.fi"
+      INTEGER ICH, NUMCH, K
+
+      PS=0.
+      NUMCH=NCH(0)+NCH(1)
+      DO ICH=0,NUMCH-1
+         DO K=1,NUM_PIK(ICH)
+            IF(PIK_POZ(K,ICH).LT.T0) CYCLE
+            IF(PIK_POZ(K,ICH).GT.T0+TWIN) CYCLE
+            PS=PS+PIK_NPH(K,ICH)
+         ENDDO
+      ENDDO
+
+      PB=TWIN/T_MAX
 
       END
 
@@ -322,6 +389,50 @@
       ELSE
          POIS_LOG=N*LOG(MEAN)-MEAN
       ENDIF
+
+      END
+
+
+      SUBROUTINE SET_PHTIMES(FORCE)
+
+      IMPLICIT NONE
+      LOGICAL FORCE             ! true to force y-scan
+#include "TOP_DATA.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TDC.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PHTIM.fi"
+      DATA FORCE_SCAN /.TRUE./
+
+      INTEGER ICHX, NUMCH, I, M, ICH
+      INTEGER IX, IY, IPMTX, IPMTY, LR
+      REAL T
+
+      FORCE_SCAN=FORCE
+      IF(FORCE) RETURN
+
+      DO ICHX=0,NUM_CHX
+         NUM_PHOT(ICHX)=0
+      ENDDO
+
+      NUMCH=NCH(0)+NCH(1)
+      DO I=1,N_DATA
+         M=DATA_MOD(I)
+         IF(M.EQ.MODUL) THEN
+            ICH=DATA_ICH(I)
+            IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
+            T=(DATA_TDC(I)+.5)*TDC_DT+TDC_T0
+            IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
+            CALL ICHIII(ICH,M,IX,IY,IPMTX,IPMTY,LR)
+            IF(LR.LT.0) CYCLE
+            ICHX=IPMTX*PMT_NX+IX
+            IF(ICHX.GE.NUM_CHX) CYCLE
+            NUM_PHOT(ICHX)=NUM_PHOT(ICHX)+1
+            IF(NUM_PHOT(ICHX).GT.MAX_PHOT) CYCLE
+            PH_TIMES(NUM_PHOT(ICHX),ICHX)=T
+         ENDIF
+      ENDDO
 
       END
 
@@ -473,46 +584,13 @@
       END
 
 
-      SUBROUTINE SET_PHTIMES(FORCE)
+      SUBROUTINE SET_PDF_OPT(OPT)
 
       IMPLICIT NONE
-      LOGICAL FORCE             ! true to force y-scan
-#include "TOP_DATA.fi"
-#include "TOP_TRACK.fi"
+      INTEGER OPT
 #include "TOP_PIK.fi"
-#include "TOP_TDC.fi"
-#include "TOP_PMT.fi"
-#include "TOP_PHTIM.fi"
-      DATA FORCE_SCAN /.TRUE./
 
-      INTEGER ICHX, NUMCH, I, M, ICH
-      INTEGER IX, IY, IPMTX, IPMTY, LR
-      REAL T
-
-      FORCE_SCAN=FORCE
-      IF(FORCE) RETURN
-
-      DO ICHX=0,NUM_CHX
-         NUM_PHOT(ICHX)=0
-      ENDDO
-
-      NUMCH=NCH(0)+NCH(1)
-      DO I=1,N_DATA
-         M=DATA_MOD(I)
-         IF(M.EQ.MODUL) THEN
-            ICH=DATA_ICH(I)
-            IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
-            T=(DATA_TDC(I)+.5)*TDC_DT+TDC_T0
-            IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
-            CALL ICHIII(ICH,M,IX,IY,IPMTX,IPMTY,LR)
-            IF(LR.LT.0) CYCLE
-            ICHX=IPMTX*PMT_NX+IX
-            IF(ICHX.GE.NUM_CHX) CYCLE
-            NUM_PHOT(ICHX)=NUM_PHOT(ICHX)+1
-            IF(NUM_PHOT(ICHX).GT.MAX_PHOT) CYCLE
-            PH_TIMES(NUM_PHOT(ICHX),ICHX)=T
-         ENDIF
-      ENDDO
+      PDF_OPT=OPT
 
       END
 

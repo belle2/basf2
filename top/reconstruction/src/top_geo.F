@@ -2,7 +2,7 @@
 ! TOP counter for Belle: initialization of/interface to TOP_GEO
 !                        quartz data, mirror reflectivity
 ! M. Staric, mar-2009, feb-2010, sept-2011, jan-2012
-! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! units: GeV, GeV/c, cm, ns, cm/ns, T, nm 
 !-----------------------------------------------------------------------
 
       SUBROUTINE SET_TOPVOL(R1,R2,Z1,Z2)

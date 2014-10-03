@@ -1,75 +1,100 @@
-//*****************************************************************************
-//-----------------------------------------------------------------------------
-// Fast simulation and reconstruction package for TOP counter (F77 core)
-// M. Staric, Jan-2010, March-2010, Sept-2011
-//-----------------------------------------------------------------------------
-//
-// TOPtrack.cc
-// C++ interface to F77 functions: track
-//-----------------------------------------------------------------------------
-//*****************************************************************************
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marko Staric                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <iostream>
 #include <iomanip>
 #include <math.h>
 #include <stdlib.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPf77fun.h>
 #include <TRandom3.h>
+// top
+#include <top/reconstruction/TOPtrack.h>
+#include <top/geometry/TOPGeometryPar.h>
+// framework aux
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+// DataStore classes
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <top/dataobjects/TOPBarHit.h>
+
+extern "C" {
+  void track2top_(float*, float*, float*, float*, int*); // from top_geo.F
+}
 
 namespace Belle2 {
   namespace TOP {
 
-    /**
-     * Gaussian random number
-     * @param sigma: sigma
-     */
-    inline double GaussRnd(double sigma) {return gRandom->Gaus(0., sigma);}
+    TOPtrack::TOPtrack(): m_valid(false), m_trackLength(0.0), m_charge(0), m_pdg(0),
+      m_atTop(false), m_barID(0),
+      m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
+    {}
 
-    TOPtrack::TOPtrack()
-    {
-      m_x = 0;
-      m_y = 0;
-      m_z = 0;
-      m_px = 0;
-      m_py = 0;
-      m_pz = 0;
-      m_trackLength = 0;
-      m_charge = 0;
-      m_pdg = 0;
-      for (int i = 0; i < 10; i++) m_label[i] = 0;
-      m_atTop = false;
-      m_barID = 0;
-    }
 
     TOPtrack::TOPtrack(double x, double y, double z,
-                       double Px, double Py, double Pz,
-                       double Tlen, int Q, int Lund)
+                       double px, double py, double pz,
+                       double Tlen, int Q, int pdg):
+      m_valid(true), m_position(x, y, z), m_momentum(px, py, pz),
+      m_trackLength(Tlen), m_charge(Q), m_pdg(pdg),
+      m_atTop(false), m_barID(0),
+      m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
+    {}
+
+
+    TOPtrack::TOPtrack(const Track* track, const Const::ChargedStable& chargedStable):
+      m_valid(false), m_trackLength(0.0), m_charge(0), m_pdg(0),
+      m_atTop(false), m_barID(0),
+      m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
     {
-      m_x = x;
-      m_y = y;
-      m_z = z;
-      m_px = Px;
-      m_py = Py;
-      m_pz = Pz;
-      m_trackLength = Tlen;
-      m_charge = Q;
-      m_pdg = Lund;
-      for (int i = 0; i < 10; i++) m_label[i] = 0;
-      m_atTop = false;
-      m_barID = 0;
+
+      if (!track) return;
+
+      // set pointers first
+      m_track = track;
+
+      Const::EDetector myDetID = Const::EDetector::TOP;
+      int NumBars = TOPGeometryPar::Instance()->getNbars();
+      int pdgCode = abs(chargedStable.getPDGCode());
+
+      RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>();
+      for (unsigned i = 0; i < extHits.size(); i++) {
+        const ExtHit* extHit = extHits[i];
+        if (abs(extHit->getPdgCode()) != pdgCode) continue;
+        if (extHit->getDetectorID() != myDetID) continue;
+        if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumBars) continue;
+        if (extHit->getStatus() != EXT_ENTER) continue;
+        m_extHit = extHit;
+      }
+      if (!m_extHit) return;
+
+      m_mcParticle = track->getRelated<MCParticle>();
+      if (m_mcParticle) m_barHit = m_mcParticle->getRelated<TOPBarHit>();
+
+      // set track parameters
+      m_position = m_extHit->getPosition();
+      m_momentum = m_extHit->getMomentum();
+      setTrackLength(m_extHit->getTOF(), chargedStable);
+      const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
+      if (!fitResult) {
+        B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
+        return;
+      }
+      m_charge = fitResult->getChargeSign();
+      if (m_mcParticle) m_pdg = m_mcParticle->getPDG();
+      m_barID = m_extHit->getCopyID();
+      m_valid = true;
     }
 
-    double TOPtrack::getTOF(int Lund)
-    {
-      int lundc[5] = {11, 13, 211, 321, 2212};
-      double masses[5] = {.511E-3, .10566, .13957, .49368, .93827};
 
-      double mass = 0;
-      for (int i = 0; i < 5; i++) {
-        if (abs(Lund) == lundc[i]) {mass = masses[i]; break;}
-      }
+    double TOPtrack::getTOF(double mass) const
+    {
       double pmom = getP();
       double beta = pmom / sqrt(pmom * pmom + mass * mass);
       return m_trackLength / beta / Const::speedOfLight;
@@ -82,7 +107,7 @@ namespace Belle2 {
       m_trackLength = tof * Const::speedOfLight * beta;
     }
 
-    int TOPtrack::getHypID()
+    int TOPtrack::getHypID() const
     {
       int lundc[5] = {11, 13, 211, 321, 2212};
       for (int i = 0; i < 5; i++) {
@@ -95,13 +120,19 @@ namespace Belle2 {
     {
       if (m_atTop) return m_barID;
 
-      float r[3] = {(float) m_x, (float) m_y, (float) m_z};
-      float p[3] = {(float) m_px, (float) m_py, (float) m_pz};
+      float r[3] = {(float) m_position.X(),
+                    (float) m_position.Y(),
+                    (float) m_position.Z()
+                   };
+      float p[3] = {(float) m_momentum.X(),
+                    (float) m_momentum.Y(),
+                    (float) m_momentum.Z()
+                   };
       float q = (float) m_charge;
       float t; int m;
       track2top_(r, p, &q, &t, &m);
-      m_x = r[0]; m_y = r[1]; m_z = r[2];
-      m_px = p[0]; m_py = p[1]; m_pz = p[2];
+      m_position.SetXYZ(r[0], r[1], r[2]);
+      m_momentum.SetXYZ(p[0], p[1], p[2]);
       m_trackLength += t * Const::speedOfLight;
       m_atTop = true;
       m_barID = m + 1;
@@ -113,33 +144,34 @@ namespace Belle2 {
     {
       double p = getP();
       if (p == 0) return;
-      double theta = acos(m_pz / p) + GaussRnd(sig_theta);
-      double phi = atan2(m_py, m_px) + GaussRnd(sig_phi);
-      m_px = p * cos(phi) * sin(theta);
-      m_py = p * sin(phi) * sin(theta);
-      m_pz = p * cos(theta);
+      double theta = getTheta() + gRandom->Gaus(0., sig_theta);
+      double phi = getPhi() + gRandom->Gaus(0., sig_phi);
+      m_momentum.SetX(p * cos(phi) * sin(theta));
+      m_momentum.SetY(p * sin(phi) * sin(theta));
+      m_momentum.SetZ(p * cos(theta));
 
-      m_z += GaussRnd(sig_z);
-      double dx = GaussRnd(sig_x);
-      if (m_x * m_x + m_y * m_y != 0) phi = atan2(m_y, m_x);
-      m_x += dx * sin(phi);
-      m_y -= dx * cos(phi);
+      double rho = gRandom->Gaus(0., sig_x);
+      if (m_position.Perp() != 0) phi = atan2(m_position.Y(), m_position.X());
+      double x = m_position.X() + rho * sin(phi);
+      double y = m_position.Y() - rho * cos(phi);
+      double z = m_position.Z() + gRandom->Gaus(0., sig_z);
+      m_position.SetXYZ(x, y, z);
+
     }
 
-    void TOPtrack::dump()
+    void TOPtrack::dump() const
     {
       double pi = 4 * atan(1);
       using namespace std;
-      cout << "TOPtrack::dump(): labels";
-      for (int i = 0; i < 10; i++) cout << " " << m_label[i];
+      cout << "TOPtrack::dump(): ";
       cout << " PDG=" << m_pdg;
       cout << " charge=" << m_charge << endl;
       cout << "  p=" << setprecision(3) << getP() << " GeV/c";
       cout << "  theta=" << setprecision(3) << getTheta() / pi * 180;
       cout << "  phi=" << setprecision(3) << getPhi() / pi * 180 << endl;
-      cout << "  x=" << m_x << " cm";
-      cout << "  y=" << m_y << " cm";
-      cout << "  z=" << m_z << " cm\n";
+      cout << "  x=" << getX() << " cm";
+      cout << "  y=" << getY() << " cm";
+      cout << "  z=" << getZ() << " cm\n";
       cout << "  trackLength=" << setprecision(4) << m_trackLength << " cm";
       cout << "  atTop=" << m_atTop;
       cout << "  barID=" << m_barID;

@@ -29,7 +29,8 @@ namespace Belle2 {
       m_R1(0),
       m_R2(0),
       m_Z1(0),
-      m_Z2(0)
+      m_Z2(0),
+      m_timeRange(0)
 
     {
       if (!m_topgp) B2FATAL("TOPconfigure: no geometry available");
@@ -42,6 +43,8 @@ namespace Belle2 {
       m_R2 = sqrt(x * x + y * y);
       m_Z1 = m_topgp->getZ1() - m_topgp->getWLength();
       m_Z2 = m_topgp->getZ2();
+      // TDC time range
+      m_timeRange = (1 << m_topgp->getTDCbits()) * m_topgp->getTDCbitwidth();
 
       if (m_configured) return;
 

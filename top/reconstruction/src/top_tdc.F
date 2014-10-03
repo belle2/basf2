@@ -26,6 +26,22 @@
       END
 
 
+      SUBROUTINE SET_TMAX(TMAX)
+      
+      IMPLICIT NONE
+      REAL TMAX
+#include "TOP_TDC.fi"
+#include "TOP_PIK.fi"
+      
+      IF(TMAX.GT.0) THEN
+         T_MAX=TMAX
+      ELSE
+         T_MAX=TIME_RANGE
+      ENDIF
+      
+      END
+
+
       SUBROUTINE SET_CFD(DT, DELT)
       
       IMPLICIT NONE
@@ -38,15 +54,4 @@
 
       END
 
-
-      SUBROUTINE SET_TMAX(TMAX)
-      
-      IMPLICIT NONE
-      REAL TMAX
-#include "TOP_PIK.fi"
-      
-      IF(TMAX.LE.0) RETURN
-      T_MAX=MIN(T_MAX,TMAX)
-      
-      END
 

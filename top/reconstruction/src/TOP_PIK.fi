@@ -38,6 +38,7 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
       REAL D_THC                        ! d(theta_Cer)
       REAL BETA_RQ                      ! if >0 this value is used for beta
       LOGICAL STORE_OPT                 ! if true store only poz, wid, nph, fic
+      INTEGER PDF_OPT                   ! options: 0 w/o yscan, 1 w/ yscan, 2 optimal
 
       COMMON /TOP_PIK/ NCH,
      &     PIK_XCH, PIK_YCH, PIK_DXCH, PIK_DYCH, PIK_BGR, 
@@ -47,7 +48,7 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
      &     PIK_XD, PIK_YD, PIK_TYP,
      &     STFS, STFB, LR_FLAG,
      &     MASS_HYP, BETA, TOF, FOT0, PTOT, T_MAX, C_THC, S_THC,
-     &	   TH0_SIP, D_THC, BETA_RQ, STORE_OPT
+     &	   TH0_SIP, D_THC, BETA_RQ, STORE_OPT, PDF_OPT
 
 
       

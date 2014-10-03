@@ -20,7 +20,7 @@ namespace Belle2 {
   namespace TOP {
 
     TOPreco::TOPreco(int Num, double Masses[], double BkgPerQbar, double ScaleN0):
-      m_HYP(0), m_beta(0.0)
+      m_hypID(0), m_beta(0.0)
     {
       data_clear_();
       rtra_clear_();
@@ -31,11 +31,23 @@ namespace Belle2 {
       rtra_set_hypo_(&Num, masses);
       float b = (float) BkgPerQbar; float s = (float) ScaleN0;
       set_top_par_(&b, &s);
+      setPDFoption(c_Optimal); // default option
+      setTmax(0); // use default (TDC range)
+      setBeta(0); // use default: beta from momentum and mass
     }
 
     void TOPreco::setHypID(int NumHyp, int HypID[])
     {
       rtra_set_hypid_(&NumHyp, HypID);
+    }
+
+    void TOPreco::setMass(double Mass)
+    {
+      int Num = 1;
+      float mass = (float) Mass;
+      rtra_set_hypo_(&Num, &mass);
+      int HypID = 0;
+      rtra_set_hypid_(&Num, &HypID);
     }
 
     void TOPreco::clearData()
@@ -53,38 +65,29 @@ namespace Belle2 {
       return status;
     }
 
-    int TOPreco::getDataSize() {return data_getnum_();}
 
     void TOPreco::reconstruct(double X, double Y, double Z, double Tlen,
                               double Px, double Py, double Pz, int Q, int HYP)
     {
-      m_HYP = HYP;
-      float x = (float) X; float y = (float) Y; float z = (float) Z;
+      m_hypID = HYP;
+      float x = (float) X;
+      float y = (float) Y;
+      float z = (float) Z;
       float t = float(Tlen / Const::speedOfLight);
-      float px = (float) Px; float py = (float) Py; float pz = (float) Pz;
+      float px = (float) Px;
+      float py = (float) Py;
+      float pz = (float) Pz;
       int REF = 0; int MCREF = 0;
       rtra_clear_();
-      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &m_HYP, &REF, &MCREF);
+      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &m_hypID, &REF, &MCREF);
       top_reco_();
     }
 
     void TOPreco::reconstruct(TOPtrack& trk)
     {
-      m_HYP = trk.getHypID();
-      float x = (float) trk.getX();
-      float y = (float) trk.getY();
-      float z = (float) trk.getZ();
-      float t = float(trk.getTrackLength() / Const::speedOfLight);
-      float px = (float) trk.getPx();
-      float py = (float) trk.getPy();
-      float pz = (float) trk.getPz();
-      int Q = trk.getCharge();
-      int REF = 0;
-      int MCREF = trk.getLabel(); // has no effect, can be set to 0
-      rtra_clear_();
-      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &m_HYP, &REF, &MCREF);
-      top_reco_();
-
+      m_hypID = trk.getHypID();
+      reconstruct(trk.getX(), trk.getY(), trk.getZ(), trk.getTrackLength(),
+                  trk.getPx(), trk.getPy(), trk.getPz(), trk.getCharge(), m_hypID);
     }
 
     int TOPreco::getFlag()
@@ -143,7 +146,7 @@ namespace Belle2 {
         cout << setw(10) << setprecision(2) << logl[i];
         cout << setw(8) << setprecision(2) << sfot[i];
         if (i == i_max) cout << " <";
-        if (hypid[i] == m_HYP) cout << " <-- truth";
+        if (hypid[i] == m_hypID) cout << " <-- truth";
         cout << endl;
       }
     }

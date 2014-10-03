@@ -56,10 +56,6 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("inputSimHits", m_inputSimHits, "Input collection name (TOPSimHits)",
-             string(""));
-    addParam("outputDigits", m_outputDigits, "Output collection name (TOPDigits)",
-             string(""));
     addParam("timeZeroJitter", m_timeZeroJitter, "r.m.s of T0 jitter [ns]", 25e-3);
     addParam("electronicJitter", m_electronicJitter,
              "r.m.s of electronic jitter [ns]", 50e-3);
@@ -78,7 +74,7 @@ namespace Belle2 {
   {
     // input
 
-    StoreArray<TOPSimHit> topSimHits(m_inputSimHits);
+    StoreArray<TOPSimHit> topSimHits;
     topSimHits.isRequired();
 
     StoreArray<MCParticle> mcParticles;
@@ -86,7 +82,7 @@ namespace Belle2 {
 
     // output
 
-    StoreArray<TOPDigit> topDigits(m_outputDigits);
+    StoreArray<TOPDigit> topDigits;
     topDigits.registerInDataStore();
     topDigits.registerRelationTo(topSimHits);
     topDigits.registerRelationTo(mcParticles);
@@ -106,10 +102,10 @@ namespace Belle2 {
   {
 
     // input: simulated hits
-    StoreArray<TOPSimHit> topSimHits(m_inputSimHits);
+    StoreArray<TOPSimHit> topSimHits;
 
     // output: digitized hits
-    StoreArray<TOPDigit> topDigits(m_outputDigits);
+    StoreArray<TOPDigit> topDigits;
 
     m_topgp->setBasfUnits();
 

@@ -353,7 +353,7 @@ namespace Belle2 {
 
       /** Copy constructor to make sure particles belong to correct set. */
       ParticleSet(const ParticleSet& other) {
-        for (ParticleType pdgIter = other.begin(); pdgIter != other.end(); ++pdgIter) {
+        for (ParticleType pdgIter : other) {
           add(pdgIter);
         }
       }
@@ -374,7 +374,7 @@ namespace Belle2 {
       const ParticleType& at(unsigned int index) const {
         if (index < m_particles.size())
           return m_particles[index];
-        return end();
+        return invalidParticle;
       }
 
       /** Returns first particle. */
@@ -385,15 +385,16 @@ namespace Belle2 {
       }
 
       /** Returns an invalid particle to check if iteration should be stopped. */
-      const ParticleType& end() const {
+      ParticleType end() const {
         return invalidParticle;
       }
 
       /** Returns particle in set with given PDG code, or invalidParticle if not found. */
       const ParticleType& find(int pdg) const {
-        for (ParticleType pdgIter = begin(); pdgIter != end(); ++pdgIter)
+        for (ParticleType pdgIter : *this) {
           if (pdgIter.getPDGCode() == pdg)
             return m_particles[pdgIter.getIndex()];
+        }
 
         return invalidParticle;
       }

@@ -3,19 +3,32 @@
 
 from basf2 import *
 
-# Example of using BeamBkgTagSetter module to set the background tag variable in SimHits
-# and to store background sample equivalent time (realTime) into BackgroundMetaData
+# ---------------------------------------------------------------------------------------
+# Example of preparing BG file to be used with BeamBkgMixer.
+#
+# BeamBkgTagSetter module is used to set the background tag variable in SimHits and
+# to store background sample equivalent time (realTime) in BackgroundMetaData.
+#
+# This example uses pre-simulated BG sample (an ordinady root file with SimHits) as input.
+# Alternatively, RootInput can be replaced with the full BG simulation.
+#
 # Note: if BackgroundMetaData already exists it will be overwritten!
+#
+# Two steering parameters of the module have to be specified:
+#   - backgroundType: type of the background,
+#                     valid types can be obtained by basf2 -m BeamBkgTagSetter
+#   - realTime: time in nano seconds that corresponds to BG sample
+# ---------------------------------------------------------------------------------------
 
 set_log_level(LogLevel.WARNING)
 
-# background (collision) files
-indir = '~nakayama/basf2_opt/release_201312_8th/Work_MCgen/output1/'  # at KEKCC
+# background (collision) file
+indir = '~/nakayama/bgMC/release_201406_9thMCgen/output/'  # at KEKCC
 outdir = 'beamBkg/'  # output directory
 
 bkgType = 'Touschek_LER'
-realTime = 10.0e3  # nano seconds
-fileName = bkgType + '_10us.root'
+realTime = 100.0e3  # nano seconds
+fileName = bkgType + '_100us.root'
 inFile = indir + fileName
 outFile = outdir + fileName
 

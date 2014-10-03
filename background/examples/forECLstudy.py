@@ -5,11 +5,8 @@ from basf2 import *
 import glob
 
 # ----------------------------------------------------------------------------------
-# This example shows all possibilities of steering BG mixing with BeamBkgMixer.
-#
-# For simplicity no particle generator and/or geant simulation is included,
-# digitization and event reconstruction is also not done. The output root file
-# will contain SimHits from BG.
+# This example is maybe useful for tuning ECL digitizer on pure BG.
+# If needed, ParticleGun and FullSim can be added in btw. Geometry and BeamBkgMixer
 # ----------------------------------------------------------------------------------
 
 set_log_level(LogLevel.INFO)
@@ -49,24 +46,23 @@ main.add_module(gearbox)
 geometry = register_module('Geometry')
 main.add_module(geometry)
 
-# particle generator and FullSim module go here
+# if needed, ParticleGun and FullSim must be added here
 
-# Mix beam background
+# Mix beam background with wide time window for ECL
 bkgmixer = register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)  # specify BG files
-bkgmixer.param('components', ['CDC', 'TOP', 'ECL'])  # mix BG only for those components
-bkgmixer.param('minTime', -5000)  # set time window start time [ns]
-bkgmixer.param('maxTime', 10000)  # set time window stop time [ns]
-bkgmixer.param('scaleFactors', [('Coulomb_LER', 1.05), ('Coulomb_HER', 1.08),
-               ('RBB_LER', 0.8)])
-               # scale rates of some backgrounds
+bkgmixer.param('components', ['ECL'])  # mix BG only for ECL
+bkgmixer.param('minTime', -4000)  # set time window start time [ns]
+bkgmixer.param('maxTime', 16000)  # set time window stop time [ns]
 main.add_module(bkgmixer)
 
-# digitizers, clusterizers and reconstruction modules go here
+# ECL digitization
+ecl_digitizer = register_module('ECLDigitizer')
+main.add_module(ecl_digitizer)
 
 # Output
 output = register_module('RootOutput')
-output.param('outputFileName', 'testMixer.root')
+output.param('outputFileName', 'forECLstudy.root')
 main.add_module(output)
 
 # Show progress of processing

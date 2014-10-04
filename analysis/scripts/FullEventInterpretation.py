@@ -169,6 +169,7 @@ class Preloader(object):
             self.rootfile = ROOT.TFile(filename)
             self.tree = self.rootfile.Get('tree')
             self.persistent = self.rootfile.Get('persistent')
+            self.particles = ROOT.TClonesArray("Belle2::Particle")
 
     def __str__(self):
         """
@@ -195,6 +196,7 @@ class Preloader(object):
         """
         particleList = Belle2.ParticleList()
         self.tree.SetBranchAddress(particleListName, particleList)
+        self.tree.SetBranchAddress("Particles", self.particles)
         i = 0
         N = self.tree.GetEntries()
         while i < N:
@@ -204,9 +206,12 @@ class Preloader(object):
                     vec = particleList.getList(k, j)
                     if len(vec) > 0:
                         self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
-                        return self.tree.Particles[vec[0]]
+                        part = self.particles[vec[0]]
+                        self.tree.ResetBranchAddress(self.tree.GetBranch("Particles"))
+                        return part
             i += 1
         self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
+        self.tree.ResetBranchAddress(self.tree.GetBranch("Particles"))
         return None
 
     def particleListHasSignalProbability(self, particleListName):
@@ -215,6 +220,7 @@ class Preloader(object):
         """
         if self.treeContainsObject(particleListName):
             p = self.getFirstParticleInList(particleListName)
+            print p
             if p is None:
                 return False
             mapId = p.getExtraInfoMap()

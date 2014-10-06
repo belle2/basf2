@@ -11,7 +11,7 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <pxd/geometry/SensorInfo.h>
+#include <vxd/dataobjects/VxdID.h> //<pxd/geometry/SensorInfo.h>
 #include <pxd/dataobjects/PXDDigit.h>
 
 namespace Belle2 {

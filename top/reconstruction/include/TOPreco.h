@@ -132,14 +132,39 @@ namespace Belle2 {
       int getFlag();
 
       /**
-       * Get reconstruction results
+       * Return expected number of photons (signal + background) for i-th mass hypothesis
+       * @param i index of mass hypothesis
+       * @return expected number of photons
+       */
+      double getExpectedPhotons(int i = 0);
+
+      /**
+       * Return expected number of background photons
+       * @return expected number of background
+       */
+      double getExpectedBG();
+
+      /**
+       * Return number of measured photons
+       * @return number of photons
+       */
+      int getNumOfPhotons();
+
+      /**
+       * Return log likelihood for i-th mass hypothesis
+       * @param i index of mass hypothesis
+       * @return log likelihood
+       */
+      double getLogL(int i = 0);
+
+      /**
+       * Get all reconstruction results at once
        * @param Size size of arrays
        * @param LogL log likelihoods for Masses[]
        * @param ExpNphot expected number of photons for Masses[]
        * @param Nphot measured number of photons
        */
       void getLogL(int Size, double LogL[], double ExpNphot[], int& Nphot);
-
 
       /**
        * Return log likelihood for the last mass hypothesis using time-shifted PDF

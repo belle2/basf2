@@ -16,7 +16,8 @@ c--   TOP_RTRA.fi: reconstructed tracks
       REAL RTRA_P(NSIZ_RTRA)             ! momentum [GeV/c]
       REAL RTRA_CHARGE(NSIZ_RTRA)        ! charge (+1/-1) 
       REAL RTRA_PLKH(NHYP_SIZ,NSIZ_RTRA) ! log likelihoods 
-      REAL RTRA_SFOT(NHYP_SIZ,NSIZ_RTRA) ! expected number of photons 
+      REAL RTRA_SFOT(NHYP_SIZ,NSIZ_RTRA) ! expected number of all photons 
+      REAL RTRA_BFOT(NSIZ_RTRA)          ! expected number of background photons 
       INTEGER RTRA_NFOT(NSIZ_RTRA)       ! number of detected photons 
       INTEGER RTRA_FLAG(NSIZ_RTRA)       ! flag 
       INTEGER RTRA_MOD(NSIZ_RTRA)        ! modul number 
@@ -30,7 +31,7 @@ c--   TOP_RTRA.fi: reconstructed tracks
 
       COMMON /TOP_RTRA/ NHYP, RTRA_MASS, RTRA_HYPID,
      &     N_RTRA, RTRA_R0, RTRA_DIR, RTRA_T0, RTRA_P, RTRA_CHARGE, 
-     &     RTRA_PLKH, RTRA_SFOT, RTRA_NFOT, RTRA_FLAG, 
+     &     RTRA_PLKH, RTRA_SFOT, RTRA_BFOT, RTRA_NFOT, RTRA_FLAG, 
      &     RTRA_MOD, RTRA_TR, RTRA_TDIR, RTRA_TLEN, 
      &     RTRA_TOFC0, RTRA_MTRA, RTRA_REF, RTRA_HYP
 

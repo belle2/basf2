@@ -24,6 +24,7 @@
             RTRA_PLKH(K,ITRA)=0.
             RTRA_SFOT(K,ITRA)=0.
          ENDDO
+         RTRA_BFOT(ITRA)=0.
          RTRA_NFOT(ITRA)=0
          RTRA_FLAG(ITRA)=0
       ENDDO
@@ -51,7 +52,8 @@
          RTRA_TOFC0(ITRA)=TOF_C0
          CALL LIKELIHOOD(NHYP,RTRA_MASS,RTRA_HYPID,
      &        RTRA_T0(ITRA),RTRA_HYP(ITRA),
-     &        RTRA_PLKH(1,ITRA),RTRA_NFOT(ITRA),RTRA_SFOT(1,ITRA))
+     &        RTRA_PLKH(1,ITRA),RTRA_NFOT(ITRA),RTRA_SFOT(1,ITRA),
+     &        RTRA_BFOT(ITRA))
       ENDDO
 
       END
@@ -204,7 +206,7 @@
       END
      
       
-      SUBROUTINE LIKELIHOOD(NHYP,MASS,HYPID,T0,HYP,PLKH,NFOT,SFOT)
+      SUBROUTINE LIKELIHOOD(NHYP,MASS,HYPID,T0,HYP,PLKH,NFOT,SFOT,BFOT)
 
       IMPLICIT NONE
       INTEGER NHYP              ! number of hyphotheses [in]
@@ -214,7 +216,8 @@
       INTEGER HYP               ! hypothesis to histogram pulls
       REAL PLKH(NHYP)           ! log likelihoods [out]
       INTEGER NFOT              ! number of photons [out]
-      REAL SFOT(NHYP)           ! expected num of photons [out]
+      REAL SFOT(NHYP)           ! expected num of all photons [out]
+      REAL BFOT                 ! expected num of bg. photons [out]
 
       INTEGER I
       
@@ -222,18 +225,19 @@
 
       DO I=1,NHYP
          CALL TOP_SET_PDF(MASS(I),T0)
-         CALL FILL_LKH(PLKH(I),NFOT,SFOT(I),HYPID(I).EQ.HYP)
+         CALL FILL_LKH(PLKH(I),NFOT,SFOT(I),BFOT,HYPID(I).EQ.HYP)
       ENDDO
 
       END
 
 
-      SUBROUTINE FILL_LKH(PLKH,NFOT,SFOT,FLAG)
+      SUBROUTINE FILL_LKH(PLKH,NFOT,SFOT,BFOT,FLAG)
 
       IMPLICIT NONE
       REAL PLKH
       INTEGER NFOT
       REAL SFOT
+      REAL BFOT
       LOGICAL FLAG
 #include "TOP_DATA.fi"
 #include "TOP_TRACK.fi"
@@ -246,6 +250,7 @@
       PLKH=0.
       NFOT=0
       SFOT=STFS+STFB
+      BFOT=STFB
       IF(SFOT.EQ.0) RETURN
       NUMCH=NCH(0)+NCH(1)
       P=STFS/SFOT
@@ -254,7 +259,7 @@
          IF(M.EQ.MODUL) THEN
             ICH=DATA_ICH(I)
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
-            T=(DATA_TDC(I)+.5)*TDC_DT+TDC_T0
+            T=DATA_TIME(I)
             IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
             NFOT=NFOT+1
             F=P*TOP_SIGNAL(T,ICH)+(1-P)*TOP_BGR(T,ICH)
@@ -293,13 +298,13 @@
       NFOT=0
       NUMCH=NCH(0)+NCH(1)
       P=STFS*PS/SFOT
-      IF(PS.EQ.0) PS=1.         ! to prevent F=nan 
+      IF(PS.EQ.0) PS=1.         ! to prevent NaN's 
       DO I=1,N_DATA
          M=DATA_MOD(I)
          IF(M.EQ.MODUL) THEN
             ICH=DATA_ICH(I)
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
-            T=(DATA_TDC(I)+.5)*TDC_DT+TDC_T0
+            T=DATA_TIME(I)
             IF(T.LT.0.OR.T.GT.TWIN) CYCLE
             NFOT=NFOT+1
             F=P*TOP_SIGNAL(T+T0,ICH)/PS+(1-P)*TOP_BGR(T+T0,ICH)/PB
@@ -422,7 +427,7 @@
          IF(M.EQ.MODUL) THEN
             ICH=DATA_ICH(I)
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
-            T=(DATA_TDC(I)+.5)*TDC_DT+TDC_T0
+            T=DATA_TIME(I)
             IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
             CALL ICHIII(ICH,M,IX,IY,IPMTX,IPMTY,LR)
             IF(LR.LT.0) CYCLE

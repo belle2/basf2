@@ -65,7 +65,11 @@ extern "C" {
   void rtra_put_(float*, float*, float*, float*, float*, float*, float*,
                  int*, int*, int*, int*);
   int rtra_getnum_();
-  int rtra_getflag_(int*);
+  float rtra_get_plkh_(int*, int*);
+  float rtra_get_sfot_(int*, int*);
+  float rtra_get_bfot_(int*);
+  int rtra_get_nfot_(int*);
+  int rtra_get_flag_(int*);
   void rtra_get_(int*, float*, float*, int*, int*, int*, int*, int*);
   void rtra_gethit_(int*, int*, float*, float*, float*, float*, float*, int*);
 

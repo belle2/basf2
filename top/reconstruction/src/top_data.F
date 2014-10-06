@@ -46,6 +46,7 @@
       DATA_MOD(K)=MDN
       DATA_ICH(K)=ICH
       DATA_TDC(K)=TDC
+      DATA_TIME(K)= (TDC+0.5)*TDC_DT+TDC_T0
       N_DATA=K
       KK=K
 

@@ -93,7 +93,33 @@ namespace Belle2 {
     int TOPreco::getFlag()
     {
       int K = 1;
-      return rtra_getflag_(&K);
+      return rtra_get_flag_(&K);
+    }
+
+    double TOPreco::getExpectedPhotons(int i)
+    {
+      int K = 1;
+      i++;
+      return rtra_get_sfot_(&K, &i);
+    }
+
+    double TOPreco::getExpectedBG()
+    {
+      int K = 1;
+      return rtra_get_bfot_(&K);
+    }
+
+    int TOPreco::getNumOfPhotons()
+    {
+      int K = 1;
+      return rtra_get_nfot_(&K);
+    }
+
+    double TOPreco::getLogL(int i)
+    {
+      int K = 1;
+      i++;
+      return rtra_get_plkh_(&K, &i);
     }
 
     void TOPreco::getLogL(int Size, double LogL[], double ExpNphot[], int& Nphot)

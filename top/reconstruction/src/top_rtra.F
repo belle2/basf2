@@ -133,16 +133,74 @@ c      ENDIF
       END
 
 
-      INTEGER FUNCTION RTRA_GETFLAG(K)
+      REAL FUNCTION RTRA_GET_PLKH(K,I)
+
+      IMPLICIT NONE
+      INTEGER K                 ! index (row#) in TOP_RTRA [in]
+      INTEGER I                 ! hypothesis index
+#include "TOP_RTRA.fi"
+      
+      IF(K.GT.0.AND.K.LE.N_RTRA.AND.I.GT.0.AND.I.LE.NHYP) THEN
+         RTRA_GET_PLKH=RTRA_PLKH(I,K)
+      ELSE
+         RTRA_GET_PLKH=0.
+      ENDIF
+      END
+
+
+      REAL FUNCTION RTRA_GET_SFOT(K,I)
+
+      IMPLICIT NONE
+      INTEGER K                 ! index (row#) in TOP_RTRA [in]
+      INTEGER I                 ! hypothesis index
+#include "TOP_RTRA.fi"
+      
+      IF(K.GT.0.AND.K.LE.N_RTRA.AND.I.GT.0.AND.I.LE.NHYP) THEN
+         RTRA_GET_SFOT=RTRA_SFOT(I,K)
+      ELSE
+         RTRA_GET_SFOT=0.
+      ENDIF
+      END
+
+
+      REAL FUNCTION RTRA_GET_BFOT(K)
 
       IMPLICIT NONE
       INTEGER K                 ! index (row#) in TOP_RTRA [in]
 #include "TOP_RTRA.fi"
       
       IF(K.GT.0.AND.K.LE.N_RTRA) THEN
-         RTRA_GETFLAG=RTRA_FLAG(K)
+         RTRA_GET_BFOT=RTRA_BFOT(K)
       ELSE
-         RTRA_GETFLAG=0
+         RTRA_GET_BFOT=0.
+      ENDIF
+      END
+
+
+      INTEGER FUNCTION RTRA_GET_NFOT(K)
+
+      IMPLICIT NONE
+      INTEGER K                 ! index (row#) in TOP_RTRA [in]
+#include "TOP_RTRA.fi"
+      
+      IF(K.GT.0.AND.K.LE.N_RTRA) THEN
+         RTRA_GET_NFOT=RTRA_NFOT(K)
+      ELSE
+         RTRA_GET_NFOT=0
+      ENDIF
+      END
+
+
+      INTEGER FUNCTION RTRA_GET_FLAG(K)
+
+      IMPLICIT NONE
+      INTEGER K                 ! index (row#) in TOP_RTRA [in]
+#include "TOP_RTRA.fi"
+      
+      IF(K.GT.0.AND.K.LE.N_RTRA) THEN
+         RTRA_GET_FLAG=RTRA_FLAG(K)
+      ELSE
+         RTRA_GET_FLAG=0
       ENDIF
       END
 

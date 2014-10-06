@@ -112,7 +112,7 @@ namespace Belle2 {
     int n = 2 * m_bunchHalfRange + 1;
     for (int i = 0; i < n; i++) {
       m_xxx.push_back(0);
-      for (int k = 0; k < 20; k++) m_yyy[k].push_back(0);
+      for (int k = 0; k < 10; k++) m_yyy[k].push_back(0);
     }
   }
 
@@ -176,7 +176,7 @@ namespace Belle2 {
     }
 
     m_xxx[i0]++;
-    int k = numTrk < 20 ? numTrk : 19;
+    int k = numTrk < 10 ? numTrk : 9;
     m_yyy[k][i0]++;
 
     //    cout << numTrk <<" "<<i0<<" "<<t0[i0]<<endl;
@@ -196,7 +196,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < m_xxx.size(); i++) cout << m_xxx[i] << " ";
     cout << endl;
     cout << endl;
-    for (int k = 0; k < 20; k++) {
+    for (int k = 0; k < 10; k++) {
       int n = 0;
       cout << k << "  ";
       for (unsigned i = 0; i < m_yyy[k].size(); i++) {

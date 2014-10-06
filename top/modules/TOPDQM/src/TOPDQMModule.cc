@@ -122,7 +122,7 @@ namespace Belle2 {
     // Register histograms (calls back defineHisto)
     REG_HISTOGRAM;
 
-    StoreArray<TOPDigit>::required;
+    StoreArray<TOPDigit>::required();
 
   }
 

@@ -20,7 +20,7 @@ namespace Belle2 {
   class DedxLikelihood;
 
   /**
-   *
+   * Bunch finder
    */
   class TOPBunchFinderModule : public Module {
 
@@ -72,8 +72,8 @@ namespace Belle2 {
 
     double m_bunchTimeSep; /**< time between two bunches */
 
-    std::vector<int> m_xxx;
-    std::vector<int> m_yyy[20];
+    std::vector<int> m_xxx; /**< for development - to be removed later */
+    std::vector<int> m_yyy[10]; /**< for development - to be removed later */
 
 
     /**

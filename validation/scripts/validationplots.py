@@ -524,6 +524,8 @@ def get_style(index):
                    ROOT.TAttLine(ROOT.kAzure - 3, 1, 2),
                    ROOT.TAttLine(ROOT.kTeal - 6, 10, 2)]
 
+    if not index:
+        index = 0
     return line_styles[index % len(line_styles)]
 
 

@@ -44,7 +44,7 @@ def add_posttracking_reconstruction(path, components=None):
     """
 
     # track extrapolation
-    if components is None or 'CDC' in components and 'ECL' in components:
+    if components is None or 'CDC' in components:
         ext = register_module('Ext')
         path.add_module(ext)
 

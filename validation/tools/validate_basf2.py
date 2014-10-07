@@ -522,7 +522,7 @@ def find_creator(outputfile, package):
     # Loop over all candidates and check if they have 'outputfile' listed
     # under their outputs
     for candidate in candidates:
-        if outputfile in candidate.header.get('output', []):
+        if candidate.header and outputfile in candidate.header.get('output', []):
             results.append(candidate)
 
     # Return our results and warn if there is more than one creator

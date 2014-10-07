@@ -41,17 +41,19 @@ class Cluster:
         # local machine. The information can be extracted from $BELLE2_TOOLS,
         # $BELLE2_RELEASE_DIR and $BELLE2_LOCAL_DIR
 
-        ## Path to the basf2 tools
+        ## Path to the basf2 tools and central/local release
         self.tools = self.adjust_path(os.environ['BELLE2_TOOLS'])
         belle2_release_dir = os.environ.get('BELLE2_RELEASE_DIR', None)
         belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
 
-        ## The default command for setuprel (may include options?)
+        ## The command for setuprel (and setoption)
         self.setuprel = 'setuprel'
         if belle2_release_dir is not None:
             self.setuprel += ' ' + belle2_release_dir.split('/')[-1]
         if belle2_local_dir is not None:
             self.setuprel = 'MY_BELLE2_DIR=' + self.adjust_path(belle2_local_dir) + ' ' + self.setuprel
+        if os.environ.get('BELLE2_OPTION') != 'debug':
+            self.setuprel += '; setoption ' + os.environ.get('BELLE2_OPTION')
 
         # Write to log which revision we are using
         self.logger.debug('Setting up the following release: {0}'

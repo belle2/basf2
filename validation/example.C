@@ -1,3 +1,12 @@
+/*
+<header>
+  <input>EvtGenSimRec.root</input>
+  <contact>tkuhr</contact>
+  <description>This example shows how to read in a data file and produce an output file with a 1D validation plot, a 2D validation plot, and a numerical validation output.
+It also demonstrates how a description of the displayed data and the instructions for the check by the shifter can be added.</description>
+</header>
+*/
+
 void example()
 {
   // open the file with simulated and reconstructed EvtGen particles

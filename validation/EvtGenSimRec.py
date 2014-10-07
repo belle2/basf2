@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <output>EvtGenSimRec.root</output>
+  <contact>tkuhr</contact>
+  <description>This steering file produces 100 generic BBbar events with EvtGen, runs the detector simulation with mixed in background, and performs the standard reconstruction.</description>
+</header>
+"""
+
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction

@@ -23,7 +23,7 @@
 namespace Belle2 {
   class Particle;
 
-  /** Selects the Particle with the highest value of 'variable' in the input list and remove all other particles from the list.
+  /** Selects Particles with the highest values of 'variable' in the input list and removes all other particles from the list. The remaining list is sorted from best to worst candidate.
   */
   class BestCandidateSelectionModule : public Module {
   public:
@@ -41,6 +41,7 @@ namespace Belle2 {
     std::string m_inputListName; /**< name of input particle list. */
     std::string m_variableName; /**< Variable which defines the candidate ranking. */
     bool m_selectLowest; /**< Select the candidate with the lowest value (instead of highest). */
+    int m_numBest; /**< Number of best candidates to keep. */
 
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
     const Variable::Manager::Var* m_variable; /**< Variable which defines the candidate ranking. */

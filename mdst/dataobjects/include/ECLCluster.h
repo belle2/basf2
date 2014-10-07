@@ -275,7 +275,7 @@ namespace Belle2 {
     TVector3 getclusterPosition() const {
       float cluster_x =  m_R * sin(m_Theta) * cos(m_Phi);
       float cluster_y =  m_R * sin(m_Theta) * sin(m_Phi);
-      float cluster_z =  m_R * cos(m_Phi);
+      float cluster_z =  m_R * cos(m_Theta);
       return TVector3(cluster_x, cluster_y, cluster_z);
     }
 

@@ -59,8 +59,8 @@ namespace Belle2 {
     addParam("listName", m_listName, "name of particle list", string(""));
     addParam("confidenceLevel", m_confidenceLevel,
              "required confidence level of fit to keep particles in the list", 0.001);
-    addParam("MCAssociation", m_useBrecoMCassociation,
-             "true: use standard Breco MC association. false: use internal MC association", false);
+    addParam("MCAssociation", m_useMCassociation,
+             "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
     addParam("useConstraint", m_useConstraint,
              "Choose spatial constraint for the Tag Vertex fit: boostcut,boost,breco,no ", string("boostcut"));
     //addParam("EventType", m_EventType, "Btag decay type", std::string(""));
@@ -115,12 +115,13 @@ namespace Belle2 {
     // output
     StoreArray<Vertex> verArray;
 
+    analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
     for (unsigned i = 0; i < plist->getListSize(); i++) {
       Particle* particle =  plist->getParticle(i);
       bool ok = doVertexFit(particle);
-      if (ok) BtagMCVertex(particle);
+      if (ok && (m_useMCassociation == "breco" || m_useMCassociation == "internal")) BtagMCVertex(particle);
       if (ok) deltaT(particle);
 
       if (!ok) toRemove.push_back(particle->getArrayIndex());
@@ -144,6 +145,10 @@ namespace Belle2 {
 
     }
     plist->removeParticles(toRemove);
+
+//free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
+    analysis::RaveSetup::getInstance()->reset();
+
   }
 
   void TagVertexModule::endRun()
@@ -384,7 +389,7 @@ namespace Belle2 {
       MCParticle* mc = mcParticles[i];
       if (TMath::Abs(mc->getPDG()) == TMath::Abs(Breco->getPDGCode())) {
 
-        if (m_useBrecoMCassociation) {
+        if (m_useMCassociation == "breco") {
           StoreArray<MCParticle> mcParticles;
           const MCParticle* mcBr = Breco->getRelated<MCParticle>();
           m_MCVertReco = mcBr->getDecayVertex();
@@ -394,7 +399,7 @@ namespace Belle2 {
             isBreco = false;
           }
         } else {
-          isBreco = compBrecoBgen(Breco, mc);
+          if (m_useMCassociation == "internal") isBreco = compBrecoBgen(Breco, mc);
         }
         if (isBreco) {
           m_MCVertReco = mc->getDecayVertex();

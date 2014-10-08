@@ -820,8 +820,8 @@ def buildRestOfEvent(list_name, only_good_ecl=True, path=analysis_main):
 
 def TagV(
     list_name,
-    confidenceLevel,
-    MCassociation=True,
+    MCassociation='',
+    confidenceLevel=0.001,
     useConstraint='boostcut',
     path=analysis_main,
     ):

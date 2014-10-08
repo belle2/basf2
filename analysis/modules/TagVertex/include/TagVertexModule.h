@@ -82,10 +82,10 @@ namespace Belle2 {
   private:
 
     //std::string m_EventType;      /**< Btag decay type */
-    std::string m_listName;       /**< Breco particle list name */
-    double m_confidenceLevel;     /**< required fit confidence level */
-    bool m_useBrecoMCassociation; /**< use standard Breco particle MCparticle association */
-    std::string m_useConstraint;  /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
+    std::string m_listName;         /**< Breco particle list name */
+    double m_confidenceLevel;       /**< required fit confidence level */
+    std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
+    std::string m_useConstraint;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
 
     double m_Bfield;              /**< magnetic field from data base */
     std::vector<Belle2::Track*> tagTracks;  /**< tracks of the rest of the event */

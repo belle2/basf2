@@ -1,5 +1,7 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+# !/usr/bin/env python
 
 #################################################################
 #                                                               #
@@ -15,12 +17,12 @@ from reconstruction import add_reconstruction
 import glob
 import argparse
 
-argument_parser = argparse.ArgumentParser("Options")
+argument_parser = argparse.ArgumentParser('Options')
 
-argument_parser.add_argument("-i", "--input-files", type=str,
+argument_parser.add_argument('-i', '--input-files', type=str,
                              default='../trackingEfficiency_pt_*GeV.root',
                              help='ROOT files with simulated events.')
-argument_parser.add_argument("-o", "--output-files", type=str,
+argument_parser.add_argument('-o', '--output-files', type=str,
                              default='../trackingEfficiency_FinalData.root',
                              help='ROOT file with tracking efficiency info.')
 

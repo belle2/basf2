@@ -48,7 +48,7 @@
 #include <TMath.h>
 #include <TMatrixT.h>
 #include <TMatrixTSym.h>
-#include <TMatrixDEigen.h>
+#include <TMatrixDSymEigen.h>
 #include <TROOT.h>
 #include <TVector2.h>
 #include <TVectorD.h>
@@ -90,6 +90,7 @@ EventDisplay::EventDisplay() :
   squareRootFormalism_(false),
   dPVal_(1.E-3),
   dRelChi2_(0.2),
+  dChi2Ref_(1.),
   nMinIter_(2),
   nMaxIter_(4),
   nMaxFailed_(-1),
@@ -323,6 +324,7 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
         case RefKalman:
           fitter.reset(new KalmanFitterRefTrack(nMaxIter_, dPVal_));
           fitter->setMultipleMeasurementHandling(mmHandling_);
+          static_cast<KalmanFitterRefTrack*>(fitter.get())->setDeltaChi2Ref(dChi2Ref_);
           break;
 
         case DafSimple:
@@ -331,6 +333,7 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
           break;
         case DafRef:
           fitter.reset(new DAF());
+          ( static_cast<KalmanFitterRefTrack*>( (static_cast<DAF*>(fitter.get()))->getKalman() ) )->setDeltaChi2Ref(dChi2Ref_);
           break;
 
       }
@@ -530,7 +533,8 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
 
 
       // loop over MeasurementOnPlanes
-      for (unsigned int iMeas = 0; iMeas < fi->getNumMeasurements(); ++iMeas) {
+      unsigned int nMeas = fi->getNumMeasurements();
+      for (unsigned int iMeas = 0; iMeas < nMeas; ++iMeas) {
 
         if (iMeas > 0 && wire_hit)
           break;
@@ -591,6 +595,13 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
         // finished drawing planes ------------------------------------------------------------
 
         // draw track if corresponding option is set ------------------------------------------
+        if (j == 0) {
+          if (drawBackward_) {
+              MeasuredStateOnPlane update ( *fi->getBackwardUpdate() );
+              update.extrapolateBy(-3.);
+              makeLines(&update, fi->getBackwardUpdate(), rep, kMagenta, 1, drawTrackMarkers_, drawErrors_, 1);
+          }
+        }
         if (j > 0 && prevFi != NULL) {
           if(drawTrack_) {
             makeLines(prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, drawTrackMarkers_, drawErrors_, 3);
@@ -598,10 +609,17 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
               makeLines(prevFittedState, fittedState, rep, charge > 0 ? kRed : kBlue, 1, false, drawErrors_, 0, 0);
             }
           }
-          if (drawForward_)
+          if (drawForward_) {
             makeLines(prevFi->getForwardUpdate(), fi->getForwardPrediction(), rep, kCyan, 1, drawTrackMarkers_, drawErrors_, 1, 0);
-          if (drawBackward_)
+            if (j == numhits-1) {
+              MeasuredStateOnPlane update ( *fi->getForwardUpdate() );
+              update.extrapolateBy(3.);
+              makeLines(fi->getForwardUpdate(), &update, rep, kCyan, 1, drawTrackMarkers_, drawErrors_, 1, 0);
+            }
+          }
+          if (drawBackward_) {
             makeLines(prevFi->getBackwardPrediction(), fi->getBackwardUpdate(), rep, kMagenta, 1, drawTrackMarkers_, drawErrors_, 1);
+          }
           // draw reference track if corresponding option is set ------------------------------------------
           if(drawRefTrack_ && fi->hasReferenceState() && prevFi->hasReferenceState())
             makeLines(prevFi->getReferenceState(), fi->getReferenceState(), rep, charge > 0 ? kRed + 2 : kBlue + 2, 2, drawTrackMarkers_, false, 3);
@@ -669,13 +687,13 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
               gEve->AddElement(hit_box);
             } else {
               // calculate eigenvalues to draw error-ellipse ----------------------------
-              TMatrixDEigen eigen_values(hit_cov);
+              TMatrixDSymEigen eigen_values(hit_cov);
               TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
               cov_shape->IncDenyDestroy();
-              TMatrixT<double> ev = eigen_values.GetEigenValues();
+              TVectorT<double> ev = eigen_values.GetEigenValues();
               TMatrixT<double> eVec = eigen_values.GetEigenVectors();
-              double pseudo_res_0 = errorScale_*std::sqrt(ev(0,0));
-              double pseudo_res_1 = errorScale_*std::sqrt(ev(1,1));
+              double pseudo_res_0 = errorScale_*std::sqrt(ev(0));
+              double pseudo_res_1 = errorScale_*std::sqrt(ev(1));
               // finished calcluating, got the values -----------------------------------
 
               // do autoscaling if necessary --------------------------------------------
@@ -723,11 +741,11 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
           if(space_hit) {
             {
               // get eigenvalues of covariance to know how to draw the ellipsoid ------------
-              TMatrixDEigen eigen_values(m->getRawHitCov());
+              TMatrixDSymEigen eigen_values(m->getRawHitCov());
               TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
               cov_shape->IncDenyDestroy();
               cov_shape->SetShape(new TGeoSphere(0.,1.));
-              TMatrixT<double> ev = eigen_values.GetEigenValues();
+              TVectorT<double> ev = eigen_values.GetEigenValues();
               TMatrixT<double> eVec = eigen_values.GetEigenVectors();
               TVector3 eVec1(eVec(0,0),eVec(1,0),eVec(2,0));
               TVector3 eVec2(eVec(0,1),eVec(1,1),eVec(2,1));
@@ -751,9 +769,9 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
               }
 
               // set the scaled eigenvalues -------------------------------------------------
-              double pseudo_res_0 = errorScale_*std::sqrt(ev(0,0));
-              double pseudo_res_1 = errorScale_*std::sqrt(ev(1,1));
-              double pseudo_res_2 = errorScale_*std::sqrt(ev(2,2));
+              double pseudo_res_0 = errorScale_*std::sqrt(ev(0));
+              double pseudo_res_1 = errorScale_*std::sqrt(ev(1));
+              double pseudo_res_2 = errorScale_*std::sqrt(ev(2));
               if(drawScaleMan_) { // override again if necessary
                 pseudo_res_0 = errorScale_*0.5;
                 pseudo_res_1 = errorScale_*0.5;
@@ -798,13 +816,13 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
 
             {
               // calculate eigenvalues to draw error-ellipse ----------------------------
-              TMatrixDEigen eigen_values(hit_cov);
+              TMatrixDSymEigen eigen_values(hit_cov);
               TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
               cov_shape->IncDenyDestroy();
-              TMatrixT<double> ev = eigen_values.GetEigenValues();
+              TVectorT<double> ev = eigen_values.GetEigenValues();
               TMatrixT<double> eVec = eigen_values.GetEigenVectors();
-              double pseudo_res_0 = errorScale_*std::sqrt(ev(0,0));
-              double pseudo_res_1 = errorScale_*std::sqrt(ev(1,1));
+              double pseudo_res_0 = errorScale_*std::sqrt(ev(0));
+              double pseudo_res_1 = errorScale_*std::sqrt(ev(1));
               // finished calcluating, got the values -----------------------------------
 
               // do autoscaling if necessary --------------------------------------------
@@ -1042,15 +1060,15 @@ void EventDisplay::makeLines(const StateOnPlane* prevState, const StateOnPlane* 
       rep->getPosMomCov(*measuredState, position, direction, cov);
 
       // get eigenvalues & -vectors
-      TMatrixDEigen eigen_values(cov.GetSub(0,2, 0,2));
-      TMatrixT<double> ev = eigen_values.GetEigenValues();
+      TMatrixDSymEigen eigen_values(cov.GetSub(0,2, 0,2));
+      TVectorT<double> ev = eigen_values.GetEigenValues();
       TMatrixT<double> eVec = eigen_values.GetEigenVectors();
       TVector3 eVec1, eVec2;
       // limit
       static const double maxErr = 1000.;
-      double ev0 = std::min(ev(0,0), maxErr);
-      double ev1 = std::min(ev(1,1), maxErr);
-      double ev2 = std::min(ev(2,2), maxErr);
+      double ev0 = std::min(ev(0), maxErr);
+      double ev1 = std::min(ev(1), maxErr);
+      double ev2 = std::min(ev(2), maxErr);
 
       // get two largest eigenvalues/-vectors
       if (ev0 < ev1 && ev0 < ev2) {
@@ -1108,13 +1126,13 @@ void EventDisplay::makeLines(const StateOnPlane* prevState, const StateOnPlane* 
       rep->getPosMomCov(stateCopy, position, direction, cov);
 
       // get eigenvalues & -vectors
-      TMatrixDEigen eigen_values2(cov.GetSub(0,2, 0,2));
+      TMatrixDSymEigen eigen_values2(cov.GetSub(0,2, 0,2));
       ev = eigen_values2.GetEigenValues();
       eVec = eigen_values2.GetEigenVectors();
       // limit
-      ev0 = std::min(ev(0,0), maxErr);
-      ev1 = std::min(ev(1,1), maxErr);
-      ev2 = std::min(ev(2,2), maxErr);
+      ev0 = std::min(ev(0), maxErr);
+      ev1 = std::min(ev(1), maxErr);
+      ev2 = std::min(ev(2), maxErr);
 
       // get two largest eigenvalues/-vectors
       if (ev0 < ev1 && ev0 < ev2) {
@@ -1504,6 +1522,18 @@ void EventDisplay::makeGui() {
   frmMain2->AddFrame(hf);
 
   hf = new TGHorizontalFrame(frmMain2); {
+    guiDChi2Ref_ = new TGNumberEntry(hf, dChi2Ref_, 6,9999, TGNumberFormat::kNESReal,
+                          TGNumberFormat::kNEANonNegative,
+                          TGNumberFormat::kNELLimitMinMax,
+                          0, 999);
+    hf->AddFrame(guiDChi2Ref_);
+    guiDChi2Ref_->Connect("ValueSet(Long_t)", "genfit::EventDisplay", fh, "guiSetDrawParams()");
+    lbl = new TGLabel(hf, "min chi^2 change for re-calculating reference track (Ref Kalman)");
+    hf->AddFrame(lbl);
+  }
+  frmMain2->AddFrame(hf);
+
+  hf = new TGHorizontalFrame(frmMain2); {
     guiNMinIter_ = new TGNumberEntry(hf, nMinIter_, 6,999, TGNumberFormat::kNESInteger,
                           TGNumberFormat::kNEANonNegative,
                           TGNumberFormat::kNELLimitMinMax,
@@ -1605,6 +1635,7 @@ void EventDisplay::guiSetDrawParams(){
   squareRootFormalism_ = guiSquareRootFormalism_->IsOn();
   dPVal_ = guiDPVal_->GetNumberEntry()->GetNumber();
   dRelChi2_ = guiRelChi2_->GetNumberEntry()->GetNumber();
+  dChi2Ref_ = guiDChi2Ref_->GetNumberEntry()->GetNumber();
   nMinIter_ = guiNMinIter_->GetNumberEntry()->GetNumber();
   nMaxIter_ = guiNMaxIter_->GetNumberEntry()->GetNumber();
   nMaxFailed_ = guiNMaxFailed_->GetNumberEntry()->GetNumber();

@@ -103,6 +103,7 @@ def run_simulation(path, pt_value, output_filename):
         'xVertexParams': [0.0],
         'yVertexParams': [0.0],
         'zVertexParams': [0.0],
+        'thetaGeneration': 'uniformCos',
         }
 
     pgun.param(param_pgun)

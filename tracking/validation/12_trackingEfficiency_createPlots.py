@@ -1,5 +1,7 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+# !/usr/bin/env python
 
 #################################################################
 #                                                               #
@@ -43,8 +45,8 @@ def main():
     option_parser = OptionParser()
     option_parser.add_option('-i', '--input-file', dest='input_file',
                              default='../trackingEfficiency_FinalData.root',
-                             help='Root file with '
-                                  'StandardTrackingPerformance output.')
+                             help='Root file with StandardTrackingPerformance output.'
+                             )
     option_parser.add_option('-o', '--output-file', dest='output_file',
                              default='TrackingValidation.root',
                              help='Root file with all histograms.')
@@ -93,11 +95,19 @@ def main():
 
     draw_pvalue(data_tree)
 
-    draw_residua(data_tree, "x", "x_gen")
-    draw_residua(data_tree, "y", "y_gen")
-    draw_residua(data_tree, "z", "z_gen")
+    draw_residua(data_tree, 'x', 'x_gen')
+    draw_residua(data_tree, 'y', 'y_gen')
+    draw_residua(data_tree, 'z', 'z_gen')
 
-    draw_residua(data_tree, "pt", "pt_gen", bins=200, ledge=-0.1, uedge=0.1)
+    draw_residua(
+        data_tree,
+        'pt',
+        'pt_gen',
+        bins=200,
+        ledge=-0.1,
+        uedge=0.1,
+        normalize=1,
+        )
 
     # close output file
     output_root_file.Close()
@@ -108,9 +118,10 @@ def draw_pvalue(data_tree):
     Create a histogram of the pValue of the track fits
     """
 
-    hist_pvalue = TH1F('hpValue', 'hpValue', 100, 0, 1)
-
     number_entries = data_tree.GetEntries()
+    # Normalize number of bins to number of events to keep plots comparable.
+    hist_pvalue = TH1F('hpValue', 'p-Value Distribution',
+                       math.trunc(number_entries / 200), 0., 1.)
 
     for entry in xrange(number_entries):
         data_tree.GetEntry(entry)
@@ -119,7 +130,7 @@ def draw_pvalue(data_tree):
             pvalue = data_tree.GetLeaf('pValue').GetValue()
         except ReferenceError:
             print 'The variable "pValue" doesn\'t exist in the tree "%s".\nLeave this function without plotting the variable.' \
-                  % data_tree.GetName()
+                % data_tree.GetName()
             return
 
         if pvalue is -999:
@@ -132,7 +143,7 @@ def draw_pvalue(data_tree):
     hist_pvalue.SetYTitle('number of entries')
 
     description = 'Distibution of pValues of the single tracks (Contact: %s).' \
-                  % CONTACT_PERSON['Email']
+        % CONTACT_PERSON['Email']
     check = 'Should be a flat distribution.'
 
     hist_pvalue.GetListOfFunctions().Add(TNamed('Description', description))
@@ -168,7 +179,7 @@ def calculate_efficiency_in_pt(data_tree):
 
     check = 'The efficiency should be stable for higher pt values.'
     efficiency_hist.GetListOfFunctions().Add(TNamed('Description',
-                                                    description))
+            description))
     efficiency_hist.GetListOfFunctions().Add(TNamed('Check', check))
 
     # loop over bins and calculate efficiency and error of efficiency
@@ -181,16 +192,14 @@ def calculate_efficiency_in_pt(data_tree):
             number_reconstructed = hist_pt_rec.GetBinContent(ibin)
             efficiency = number_reconstructed / number_generated
             error = math.sqrt(number_reconstructed * (number_generated
-                                                      - number_reconstructed) / pow(
-                number_generated,
-                3))
+                              - number_reconstructed) / pow(number_generated,
+                              3))
             # set according bin to the efficiency value and add errorbar
         efficiency_hist.SetBinContent(ibin, efficiency)
         efficiency_hist.SetBinError(ibin, error)
 
-    efficiency_hist.SetTitle(
-        'Tracking efficiency in bins of transverse momentum pt.'
-    )
+    efficiency_hist.SetTitle('Tracking efficiency in bins of transverse momentum pt.'
+                             )
     efficiency_hist.SetXTitle('pt in GeV')
     efficiency_hist.SetYTitle('efficiency')
 
@@ -212,10 +221,7 @@ def generate_cos_theta_plot(data_tree, pt_value):
 
     data_tree.Draw('cosTheta_gen>>hCosGen',
                    'pt_gen>(%.2f - %f) &&pt_gen<(%.2f + %f)' % (pt_value,
-                                                                DELTA_PT,
-                                                                pt_value,
-                                                                DELTA_PT),
-                   'goff')
+                   DELTA_PT, pt_value, DELTA_PT), 'goff')
     data_tree.Draw('cosTheta_gen>>hCosRec',
                    'pt_gen>(%.2f - %f) &&pt_gen<(%.2f + %f) && pt != -999'
                    % (pt_value, DELTA_PT, pt_value, DELTA_PT), 'goff')
@@ -229,7 +235,7 @@ def generate_cos_theta_plot(data_tree, pt_value):
                            'hEfficiencyPt%.2fGeV' % pt_value, number_bins,
                            cos_lower, cos_upper)
     efficiency_hist.GetListOfFunctions().Add(TNamed('Description',
-                                                    description))
+            description))
     efficiency_hist.GetListOfFunctions().Add(TNamed('Check', check))
     for ibin in range(1, number_bins + 1):
         efficiency = 0
@@ -240,9 +246,8 @@ def generate_cos_theta_plot(data_tree, pt_value):
             number_reconstructed = hist_cos_rec.GetBinContent(ibin)
             efficiency = number_reconstructed / number_generated
             error = math.sqrt(number_reconstructed * (number_generated
-                                                      - number_reconstructed) / pow(
-                number_generated,
-                3))
+                              - number_reconstructed) / pow(number_generated,
+                              3))
 
         efficiency_hist.SetBinContent(ibin, efficiency)
         efficiency_hist.SetBinError(ibin, error)
@@ -251,69 +256,6 @@ def generate_cos_theta_plot(data_tree, pt_value):
     efficiency_hist.SetXTitle('cos #Theta')
     efficiency_hist.SetYTitle('efficiency')
     efficiency_hist.Write()
-
-
-def calculate_momentum_resolution(data_tree, pt_value_condition):
-    """
-    Create histogram of the relative resolution of transverse momentum in
-    bins of transverse momentum
-    """
-
-    number_entries = data_tree.GetEntries()
-
-    pt_values = []
-    pt_values_gen = []
-    residuums = []
-
-    nbins = 200
-    pt_lower = -0.1
-    pt_upper = 0.1
-
-    hist_residuum = TH1F('hResiduumPt%.2f' % pt_value_condition,
-                         'hResiduumPt%.2f' % pt_value_condition, nbins,
-                         pt_lower, pt_upper)
-    hist_residuum.SetTitle('Momentum residuals for pt = %.2f'
-                           % pt_value_condition)
-    hist_residuum.SetXTitle('(pt_{rec} - pt_{gen}) in GeV')
-    hist_residuum.SetYTitle('number of entries/(%.3f GeV)' % ((pt_upper
-                                                               - pt_lower) / nbins))
-
-    description = \
-        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the difference of the generated transverse momentum pt_{gen} = %.2f GeV and the reconstructed transverse momentum pt_{rec} for all successfully fitted tracks. (Contact: %s)' \
-        % (pt_value_condition, CONTACT_PERSON['Email'])
-
-    check = 'Residuals should be distributed around 0 GeV.'
-    hist_residuum.GetListOfFunctions().Add(TNamed('Description', description))
-    hist_residuum.GetListOfFunctions().Add(TNamed('Check', check))
-    # loop over all entries in data_tree
-    for ientry in range(number_entries):
-        data_tree.GetEntry(ientry)  # load entry
-
-        pt_value_gen = data_tree.GetLeaf('pt_gen').GetValue()
-        # generated value is equal chosen pt value
-        if pt_value_condition + DELTA_PT > pt_value_gen > pt_value_condition \
-                - DELTA_PT:
-
-            # load reconstructed pt value
-            pt_value = data_tree.GetLeaf('pt').GetValue()
-
-            # if the track was not fitted pt == -999
-            if pt_value != -999:
-                residuums.append(pt_value - pt_value_gen)
-                pt_values.append(pt_value)
-                pt_values_gen.append(pt_value_gen)
-                hist_residuum.Fill(pt_value - pt_value_gen)
-
-    # no track was fitted or chosen pt value is not in data_tree
-    if len(residuums) == 0:
-        return pt_value_condition, -999, -999
-
-    hist_residuum.Write()
-    # calculate width of residuum distribution == momentum resolution
-    sigma_pt = hist_residuum.GetRMS(1)
-    sigma_pt_error = hist_residuum.GetRMSError(1)
-
-    return pt_value_condition, sigma_pt, sigma_pt_error
 
 
 def create_momentum_resolution_plot(data_tree):
@@ -359,13 +301,18 @@ def create_momentum_resolution_plot(data_tree):
 
     check = ''
     hist_resolution.GetListOfFunctions().Add(TNamed('Description',
-                                                    description))
+            description))
     hist_resolution.GetListOfFunctions().Add(TNamed('Check', check))
+    # Get a log scale on the plot.  The first way is my hackish way of
+    # doing this, which is currently available on the buildbot
+    # (2014-10-08).  The second is the way suggested for the future.
+    hist_resolution.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'))
+    hist_resolution.GetListOfFunctions().Add(TNamed('Options', 'logy'))
 
     hist_resolution.Write()
 
-    #fit_parameters = fit_resolution(fit_pt_values, fit_pt_res_values, 1, fit_pt_res_errors)
 
+    # fit_parameters = fit_resolution(fit_pt_values, fit_pt_res_values, 1, fit_pt_res_errors)
 
 def get_scaled_rms_90(values, scale_factor=0.79):
     """
@@ -377,15 +324,14 @@ def get_scaled_rms_90(values, scale_factor=0.79):
 
     number_entries = len(values)
 
-    list = sorted(values)
+    (vMin, vMax) = (np.percentile(values, 5), np.percentile(values, 95))
+    final_list = np.array(values)[np.logical_and(values > vMin, values < vMax)]
 
-    final_list = list[int(0.05 * number_entries):-int(0.05 * number_entries)]
-    final_list = [value * value for value in final_list]
-    rms_90 = np.sqrt(np.mean(final_list)) / scale_factor
+    rms_90 = np.sqrt(np.mean(np.square(final_list))) / scale_factor
 
     rms_error = rms_90 / (scale_factor * np.sqrt(2 * len(final_list)))
 
-    return rms_90, rms_error
+    return (rms_90, rms_error)
 
 
 def value_in_list(test_value, value_list):
@@ -395,9 +341,9 @@ def value_in_list(test_value, value_list):
 
     for value in value_list:
         if value - DELTA_PT < test_value < value + DELTA_PT:
-            return True, value
+            return (True, value)
 
-    return False, -999
+    return (False, -999)
 
 
 def calculate_momentum_resolution2(data_tree):
@@ -425,14 +371,14 @@ def calculate_momentum_resolution2(data_tree):
                     delta_pt_dict[test_object[1]].append(pt - pt_gen)
                 except KeyError:
                     print 'pt = %0.2f is not generated and not used as key. Abort!' \
-                          % test_object[1]
+                        % test_object[1]
                     sys.exit(1)
     pt_resolutions = {}
 
     print '********************************'
     print 'Momentum resolution:'
     for key in sorted(delta_pt_dict):
-        rms90, rms_error = get_scaled_rms_90(delta_pt_dict[key])
+        (rms90, rms_error) = get_scaled_rms_90(delta_pt_dict[key])
         pt_resolutions[key] = [rms90, rms_error]
         print 'pt = %0.2f: sigma/pt = %0.4f' % (key, rms90 / key)
 
@@ -440,11 +386,11 @@ def calculate_momentum_resolution2(data_tree):
 
 
 def fit_resolution(
-        x_value_list,
-        y_value_list,
-        degree,
-        y_value_errors=None,
-):
+    x_value_list,
+    y_value_list,
+    degree,
+    y_value_errors=None,
+    ):
     """
     Fit a polynomial to data
 
@@ -456,26 +402,28 @@ def fit_resolution(
 
     @param y_value_errors list of corresponding errors on y x_values
     """
+
     try:
         import scipy.optimize
     except ImportError:
-        print "Module scipy.optimize is not installed. Fit cannot be done."
+        print 'Module scipy.optimize is not installed. Fit cannot be done.'
         return []
 
-    #weights = None
-    #if y_value_errors is not None:
+    # weights = None
+    # if y_value_errors is not None:
     #    weights = [1 / x ** 2 for x in y_value_errors]
     #
-    #parameters = np.polyfit(x_value_list, y_value_list, degree, w=weights,
+    # parameters = np.polyfit(x_value_list, y_value_list, degree, w=weights,
     #                        cov=True)
 
     x_value_list = np.array(x_value_list)
     y_value_list = np.array(y_value_list)
     y_value_errors = np.array(y_value_errors)
 
-    par_opt, par_cov = scipy.optimize.curve_fit(fit_function_sigma_pt_over_pt,
-                                                x_value_list, y_value_list,
-                                                [0.002, 0.003], sigma=y_value_errors)
+    (par_opt, par_cov) = \
+        scipy.optimize.curve_fit(fit_function_sigma_pt_over_pt, x_value_list,
+                                 y_value_list, [0.002, 0.003],
+                                 sigma=y_value_errors)
 
     print par_opt, par_cov
 
@@ -524,8 +472,7 @@ def draw_impact_parameter(data_tree):
             px = data_tree.GetLeaf('px').GetValue()
             py = data_tree.GetLeaf('py').GetValue()
 
-            d0 = d0_sign([poca_x, poca_y], [px, py]) * np.sqrt(poca_x * poca_x
-                                                               + poca_y * poca_y)
+            d0 = d0_sign([poca_x, poca_y], [px, py]) * np.hypot(poca_x, poca_y)
 
             impact_param_d[test_object[1]].append(d0)
             impact_param_z[test_object[1]].append(poca_z - z_gen)
@@ -534,13 +481,12 @@ def draw_impact_parameter(data_tree):
     d0_resolutions = {}
     z_resolutions = {}
     for key in sorted(impact_param_d):
-        d0_resolution, d0_error = get_scaled_rms_90(impact_param_d[key])
+        (d0_resolution, d0_error) = get_scaled_rms_90(impact_param_d[key])
         d0_resolutions[key] = [d0_resolution, d0_error]
-        z_resolution, z_error = get_scaled_rms_90(impact_param_z[key])
+        (z_resolution, z_error) = get_scaled_rms_90(impact_param_z[key])
         z_resolutions[key] = [z_resolution, z_error]
         print 'pt = %0.2f: sigma_d0 = %0.4f, sigma_z = %0.4f' % (key,
-                                                                 d0_resolution,
-                                                                 z_resolution)
+                d0_resolution, z_resolution)
 
     number_bins = 62
     lower_edge = -0.025
@@ -551,19 +497,31 @@ def draw_impact_parameter(data_tree):
     hist_impact_parameter_d0.SetTitle('d0 resolution')
     hist_impact_parameter_d0.SetXTitle('pt in GeV/c')
     hist_impact_parameter_d0.SetYTitle('#sigma_{d0}')
+    # Get a log scale on the plot.  The first way is my hackish way of
+    # doing this, which is currently available on the buildbot
+    # (2014-10-08).  The second is the way suggested for the future.
+    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'
+            ))
+    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('Options', 'logy'
+            ))
 
     hist_impact_parameter_z = TH1F('hzresolution', 'hzresolution',
                                    number_bins, lower_edge, upper_edge)
     hist_impact_parameter_z.SetTitle('z resolution')
     hist_impact_parameter_z.SetXTitle('pt in GeV/c')
     hist_impact_parameter_z.SetYTitle('#sigma_{z}')
+    # Get a log scale on the plot.  The first way is my hackish way of
+    # doing this, which is currently available on the buildbot
+    # (2014-10-08).  The second is the way suggested for the future.
+    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'))
+    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('Options', 'logy'))
 
     for pt in PT_VALUES:
         ibin = hist_impact_parameter_d0.FindBin(pt)
-        if (d0_resolutions[pt][0] > 0 and d0_resolutions[pt][1] > 0):
+        if d0_resolutions[pt][0] > 0 and d0_resolutions[pt][1] > 0:
             hist_impact_parameter_d0.SetBinContent(ibin, d0_resolutions[pt][0])
             hist_impact_parameter_d0.SetBinError(ibin, d0_resolutions[pt][1])
-        if (z_resolutions[pt][0] > 0 and z_resolutions[pt][1] > 0):
+        if z_resolutions[pt][0] > 0 and z_resolutions[pt][1] > 0:
             hist_impact_parameter_z.SetBinContent(ibin, z_resolutions[pt][0])
             hist_impact_parameter_z.SetBinError(ibin, z_resolutions[pt][1])
 
@@ -599,11 +557,25 @@ def d0_sign(vector_d, momentum):
     phi_momentum = np.arctan2(momentum[1], momentum[0])
     phi_d = np.arctan2(vector_d[1], vector_d[0])
 
-    return np.sign(phi_momentum - phi_d)
+    diff = phi_momentum - phi_d
+    # Catch corner cases.  For clarity, don't return early.
+    if diff > np.pi:
+        diff = diff - 2 * np.pi
+    elif diff < -np.pi:
+        diff = 2 * np.pi + diff
+
+    return np.sign(diff)
 
 
-def draw_residua(data_tree, variable_name, gen_variable_name,
-                 bins=100, ledge=-0.01, uedge=0.01):
+def draw_residua(
+    data_tree,
+    variable_name,
+    gen_variable_name,
+    bins=100,
+    ledge=-0.01,
+    uedge=0.01,
+    normalize=0,
+    ):
     """
     Write histogram of difference of variable_name (reconstructed) and
     gen_variable_name (generated) in gDirectory
@@ -613,26 +585,34 @@ def draw_residua(data_tree, variable_name, gen_variable_name,
 
     histograms = {}
     for pt_value in PT_VALUES:
-        histograms[pt_value] = TH1F("h%sResiduum_%0.2fGeV" %
-                                    (variable_name, pt_value),
-                                    "h%sResiduum_%0.2fGeV" %
-                                    (variable_name, pt_value),
-                                    bins, ledge, uedge)
+        histograms[pt_value] = TH1F('h%sResiduum_%0.2fGeV' % (variable_name,
+                                    pt_value), 'h%sResiduum_%0.2fGeV'
+                                    % (variable_name, pt_value), bins, ledge,
+                                    uedge)
 
     for index in xrange(number_entries):
         data_tree.GetEntry(index)
 
         variable_reconstructed = data_tree.GetLeaf(variable_name).GetValue()
         if variable_reconstructed != -999:
-            variable_generated = data_tree.GetLeaf(gen_variable_name).GetValue()
-            pt_gen = round(data_tree.GetLeaf("pt_gen").GetValue(), 2)
+            variable_generated = \
+                data_tree.GetLeaf(gen_variable_name).GetValue()
+            pt_gen = round(data_tree.GetLeaf('pt_gen').GetValue(), 2)
             if pt_gen in PT_VALUES:
-                histograms[pt_gen].Fill(variable_reconstructed
-                                        - variable_generated)
+                if normalize:
+                    histograms[pt_gen].Fill((variable_reconstructed
+                            - variable_generated) / variable_generated)
+                else:
+                    histograms[pt_gen].Fill(variable_reconstructed
+                            - variable_generated)
 
-    for pt, hist in histograms.iteritems():
+    for (pt, hist) in histograms.iteritems():
         scale_histogram(hist)
-        hist.SetXTitle(variable_name + " - " + gen_variable_name)
+        if normalize:
+            hist.SetXTitle('(%s - %s) / %s' % (variable_name,
+                           gen_variable_name, gen_variable_name))
+        else:
+            hist.SetXTitle('(%s - %s)' % (variable_name, gen_variable_name))
         hist.Write()
 
 

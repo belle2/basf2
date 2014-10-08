@@ -394,5 +394,3 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
     step = slDist;
   }
 }
-
-} /* End of namespace genfit */

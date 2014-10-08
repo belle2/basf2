@@ -16,6 +16,8 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
+#include <genfit/FieldManager.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 
@@ -94,6 +96,9 @@ void StandardTrackingPerformanceModule::event()
   m_nReconstructedChargedStableTracks = 0;
   m_nFittedChargedStabletracks = 0;
 
+  double Bx, By, Bz;
+  genfit::FieldManager::getInstance()->getFieldVal(0, 0, 0, Bx, By, Bz);
+
   BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
@@ -123,12 +128,13 @@ void StandardTrackingPerformanceModule::event()
         if (fitResult != NULL) { // valid TrackFitResult found
           m_nFittedChargedStabletracks++;
           // write some data to the root tree
-          m_trackProperties.cosTheta = fitResult->getMomentum().CosTheta();
-          m_trackProperties.ptot = fitResult->getMomentum().Mag();
-          m_trackProperties.pt = fitResult->getMomentum().Pt();
-          m_trackProperties.px = fitResult->getMomentum().Px();
-          m_trackProperties.py = fitResult->getMomentum().Py();
-          m_trackProperties.pz = fitResult->getMomentum().Pz();
+          TVector3 mom = fitResult->getMomentum(Bz / 10);
+          m_trackProperties.cosTheta = mom.CosTheta();
+          m_trackProperties.ptot = mom.Mag();
+          m_trackProperties.pt = mom.Pt();
+          m_trackProperties.px = mom.Px();
+          m_trackProperties.py = mom.Py();
+          m_trackProperties.pz = mom.Pz();
           m_trackProperties.x = fitResult->getPosition().X();
           m_trackProperties.y = fitResult->getPosition().Y();
           m_trackProperties.z = fitResult->getPosition().Z();

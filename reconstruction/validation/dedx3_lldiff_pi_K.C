@@ -1,7 +1,6 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <output>dedx_LLdiff_pi_K.root</output>
   <contact>cpulvermacher</contact>
 </header>
 */

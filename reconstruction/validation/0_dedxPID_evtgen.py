@@ -3,7 +3,6 @@
 
 """
 <header>
-  <input></input>
   <output>EvtGenSimRec_dedx.root</output>
   <contact>cpulvermacher</contact>
 </header>

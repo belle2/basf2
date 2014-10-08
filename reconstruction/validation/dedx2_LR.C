@@ -1,7 +1,6 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <output>dedx_LRplots.root</output>
   <contact>cpulvermacher</contact>
 </header>
 */

@@ -109,13 +109,6 @@ GenFitterModule::GenFitterModule() :
   addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module). NOT IMPLEMENTED!", string(""));
 
   addParam("DAFTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
-  addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
-  addParam("noiseBetheBloch", m_noiseBetheBloch, "activate the material effect: NoiseBetheBloch", true);
-  addParam("noiseCoulomb", m_noiseCoulomb, "activate the material effect: NoiseCoulomb", true);
-  addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", true);
-  addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", true);
-  addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
-  addParam("MSCModel", m_mscModel, "Multiple scattering model", string("Highland"));
   addParam("resolveWireHitAmbi", m_resolveWireHitAmbi, "Determines how the ambiguity in wire hits is to be dealt with.  This only makes sense for the Kalman fitters.  Values are either 'default' (use the default for the respective fitter algorithm), 'weightedAverage', 'unweightedClosestToReference' (default for the Kalman filter), or 'unweightedClosestToPrediction' (default for the Kalman filter without reference track).", string("default"));
 
   addParam("beamSpot", m_beamSpot, "point to which the fitted track will be extrapolated in order to put together the TrackFitResults", vector<double>(3, 0.0));
@@ -158,28 +151,32 @@ void GenFitterModule::initialize()
   RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
 
 
-  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-  }
-  //pass the magnetic field to genfit
-  if (!genfit::FieldManager::getInstance()->isInitialized())
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
-  genfit::FieldManager::getInstance()->useCache();
+  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
+    B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
 
-  if (!genfit::MaterialEffects::getInstance()->isInitialized())
+    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+      geoManager.createTGeoRepresentation();
+    }
     genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-  // activate / deactivate material effects in genfit
-  if (m_noEffects == true) {
-    genfit::MaterialEffects::getInstance()->setNoEffects(true);
-  } else {
-    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(m_energyLossBetheBloch);
-    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(m_noiseBetheBloch);
-    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(m_noiseCoulomb);
-    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(m_energyLossBrems);
-    genfit::MaterialEffects::getInstance()->setNoiseBrems(m_noiseBrems);
+
+    // activate / deactivate material effects in genfit
+    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
+    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
+
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
   }
-  genfit::MaterialEffects::getInstance()->setMscModel(m_mscModel);
+
+  if (!genfit::FieldManager::getInstance()->isInitialized()) {
+    B2WARNING("Magnetic field not set up, doing this myself.");
+
+    //pass the magnetic field to genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::FieldManager::getInstance()->useCache();
+  }
 
   //read the pdgCode options and set attributes accordingly
   int nPdgCodes = m_pdgCodes.size();
@@ -439,18 +436,23 @@ void GenFitterModule::event()
         //gfTrack.Print();
         bool fitSuccess = gfTrack.hasFitStatus(trackRep);
         genfit::FitStatus* fs = 0;
+        genfit::KalmanFitStatus* kfs = 0;
         if (fitSuccess) {
           fs = gfTrack.getFitStatus(trackRep);
           fitSuccess = fitSuccess && fs->isFitted();
           fitSuccess = fitSuccess && fs->isFitConverged();
+          kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
+          fitSuccess = fitSuccess && kfs;
         }
         B2DEBUG(99, "-----> Fit results:");
         B2DEBUG(99, "       Fitted and converged: " << fitSuccess);
         if (fitSuccess) {
-          B2DEBUG(99, "       Chi2 of the fit: " << fs->getChi2());
-          B2DEBUG(99, "       NDF of the fit: " << fs->getNdf());
+          B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
+          //B2DEBUG(99,"       Forward Chi2: "<<gfTrack.getForwardChi2());
+          B2DEBUG(99, "       NDF of the fit: " << kfs->getBackwardNdf());
           //Calculate probability
-          B2DEBUG(99, "       pValue of the fit: " << fs->getPVal());
+          double pValue = gfTrack.getFitStatus()->getPVal();
+          B2DEBUG(99, "       pValue of the fit: " << pValue);
         }
 
         if (!fitSuccess) {    //if fit failed

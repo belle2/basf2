@@ -124,6 +124,11 @@ def add_reconstruction(path, components=None):
         use_vxd = components is None or 'SVD' in components
         use_cdc = components is None or 'CDC' in components
 
+        # Material effects for all track extrapolations
+        material_effects = register_module('SetupGenfitExtrapolation')
+        material_effects.param('whichGeometry', 'TGeo')
+        path.add_module(material_effects)
+
         # CDC track finder: trasan
         if use_cdc:
             cdc_trackcands = ''
@@ -186,6 +191,11 @@ def add_mc_reconstruction(path, components=None):
     # tracking
     if components is None or 'PXD' in components or 'SVD' in components \
             or 'CDC' in components:
+
+        # Material effects for all track extrapolations
+        material_effects = register_module('SetupGenfitExtrapolation')
+        material_effects.param('whichGeometry', 'TGeo')
+        path.add_module(material_effects)
 
         # find MCTracks in CDC, SVD, and PXD
         mc_trackfinder = register_module('TrackFinderMCTruth')

@@ -42,14 +42,6 @@ void RaveSetup::initialize(int verbosity, double magneticField)
   if (getRawInstance()->m_initialized)
     getRawInstance()->reset();
   //now setup everything for the use of GFRave
-//  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
-//    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-//    geoManager.createTGeoRepresentation();
-//    //pass the magnetic field to genfit
-//    GFFieldManager::getInstance()->init(new GFGeant4Field());
-//    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
-//    GFMaterialEffects::getInstance()->setMscModel("Highland");
-//  }
 //  getRawInstance()->m_GFRaveVertexFactory = new GFRaveVertexFactory(verbosity, true);
 
 

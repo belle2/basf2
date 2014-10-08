@@ -189,14 +189,8 @@ void DedxPIDModule::initialize()
   CDCGeometryPar::Instance();
   VXD::GeoCache::getInstance();
 
-  if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
-    //convert geant4 geometry to TGeo geometry
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-
-    //initialize some things for genfit
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
-    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
+    B2FATAL("Need to have  SetupGenfitExtrapolationModule in path before this one.");
   }
 }
 

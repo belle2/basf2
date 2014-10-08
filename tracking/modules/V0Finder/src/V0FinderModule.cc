@@ -67,17 +67,32 @@ void V0FinderModule::initialize()
   StoreArray<V0>::registerPersistent(m_V0ColName);
   RelationArray::registerPersistent<V0, MCParticle> (m_V0ColName, "");
 
-  if (gGeoManager == NULL) {
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
+  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
+    B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
+
+    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+      geoManager.createTGeoRepresentation();
+    }
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
+    // activate / deactivate material effects in genfit
+    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
+    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
+
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
   }
 
-  if (!genfit::FieldManager::getInstance()->isInitialized())
-  { genfit::FieldManager::getInstance()->init(new GFGeant4Field()); }
-  if (!genfit::MaterialEffects::getInstance()->isInitialized())
-  { genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface()); }
+  if (!genfit::FieldManager::getInstance()->isInitialized()) {
+    B2WARNING("Magnetic field not set up, doing this myself.");
 
-  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+    //pass the magnetic field to genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::FieldManager::getInstance()->useCache();
+  }
 
   std::unique_ptr<genfit::GFRaveVertexFactory> p(new genfit::GFRaveVertexFactory());
   m_vertexFactory = std::move(p);

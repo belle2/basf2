@@ -6591,17 +6591,29 @@ void VXDTFModule::prepareExternalTools()
   /// genfit::TrackCandidate
   StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
 
-  if (gGeoManager == NULL) {
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
+  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
+    B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
+
+    if (!gGeoManager) { //setup geometry and B-field for Genfit if not already there
+      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+      geoManager.createTGeoRepresentation();
+    }
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
+    // activate / deactivate material effects in genfit
+    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
+    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
+
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
   }
 
-  if (!genfit::FieldManager::getInstance()->isInitialized())
-  { genfit::FieldManager::getInstance()->init(new GFGeant4Field()); }
-  if (!genfit::MaterialEffects::getInstance()->isInitialized())
-  { genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface()); }
-
-  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+  if (!genfit::FieldManager::getInstance()->isInitialized()) {
+    //pass the magnetic field to genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+  }
 
   /// temporary members for testing purposes (minimal testing routines)
   if (m_TESTERexpandedTestingRoutines == true) {

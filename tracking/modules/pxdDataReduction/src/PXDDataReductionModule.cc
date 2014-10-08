@@ -80,16 +80,28 @@ void PXDDataReductionModule::initialize()
   RelationArray::registerPersistent<PXDIntercept, ROIid>(m_PXDInterceptListName, m_ROIListName);
 
 
-  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
+  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
+    B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
+
+    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+      geoManager.createTGeoRepresentation();
+    }
     //pass the magnetic field to genfit
     genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::FieldManager::getInstance()->useCache();
+
     genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
+    // activate / deactivate material effects in genfit
+    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
+    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
+
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
   }
-
-  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
-
 
 }
 

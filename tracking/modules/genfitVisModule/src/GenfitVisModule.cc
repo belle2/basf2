@@ -45,15 +45,29 @@ GenfitVisModule::GenfitVisModule() : Module()
 
 void GenfitVisModule::initialize()
 {
-  if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
-    //convert geant4 geometry to TGeo geometry
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-
-    //initialize some things for genfit
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
+    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+      geoManager.createTGeoRepresentation();
+    }
     genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
 
+    // activate / deactivate material effects in genfit
+    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
+    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
+
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+  }
+
+  if (!genfit::FieldManager::getInstance()->isInitialized()) {
+    B2WARNING("Magnetic field not set up, doing this myself.  Please use SetupGenfitExtrapolationModule.");
+
+    //pass the magnetic field to genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::FieldManager::getInstance()->useCache();
   }
 
   m_display = genfit::EventDisplay::getInstance();

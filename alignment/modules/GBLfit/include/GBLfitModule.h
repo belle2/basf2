@@ -92,13 +92,6 @@ namespace Belle2 {
     bool m_usePdgCodeFromTrackCand;                  /**< flag to indicate if PDG code will be taken from genfit::TrackCand or from user input in m_pdgCodes*/
     std::ofstream HelixParam;                        /**< Text output file name */
     std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
-    bool m_energyLossBetheBloch;                     /**< Determines if calculation of energy loss is on/off in Genfit */
-    bool m_noiseBetheBloch;                          /**< Determines if calculation of energy loss variance is on/off in Genfit */
-    bool m_noiseCoulomb;                             /**< Determines if calculation of multiple scattering covariance matrix on/off in Genfit */
-    bool m_energyLossBrems;                          /**< Determines if calculation of bremsstrahlung energy loss is on/off in Genfit */
-    bool m_noiseBrems;                               /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
-    bool m_noEffects;                                /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
-    std::string m_mscModel;                          /**< Multiple scattering model */
     std::string m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF is, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
     std::vector<double> m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
     genfit::GblFitter m_gbl;                         /**< General Broken Line interface class object. */

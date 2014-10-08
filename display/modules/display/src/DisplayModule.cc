@@ -81,11 +81,6 @@ void DisplayModule::initialize()
     //convert geant4 geometry to TGeo geometry
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
-
-    //initialize some things for genfit
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
-    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-
   }
   if (!gGeoManager) {
     B2ERROR("Couldn't create TGeo geometry!");

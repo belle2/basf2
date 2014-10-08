@@ -113,13 +113,6 @@ GBLfitModule::GBLfitModule() :
   addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
   addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
 
-  addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
-  addParam("noiseBetheBloch", m_noiseBetheBloch, "activate the material effect: NoiseBetheBloch", false);
-  addParam("noiseCoulomb", m_noiseCoulomb, "activate the material effect: NoiseCoulomb", false);
-  addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", true);
-  addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", false);
-  addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
-  addParam("MSCModel", m_mscModel, "Multiple scattering model", string("Highland"));
   addParam("resolveWireHitAmbi", m_resolveWireHitAmbi, "Determines how the ambiguity in wire hits is to be dealt with.  This only makes sense for the Kalman fitters.  Values are either 'default' (use the default for the respective fitter algorithm), 'weightedAverage', 'unweightedClosestToReference' (default for the Kalman filter), or 'unweightedClosestToPrediction' (default for the Kalman filter without reference track).", string("default"));
 
   addParam("beamSpot", m_beamSpot, "point to which the fitted track will be extrapolated in order to put together the TrackFitResults", vector<double>(3, 0.0));
@@ -182,28 +175,28 @@ void GBLfitModule::initialize()
   RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
 
-  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-  }
-  //pass the magnetic field to genfit
-  if (!genfit::FieldManager::getInstance()->isInitialized())
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
-  genfit::FieldManager::getInstance()->useCache();
+  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
+    B2WARNING("Material effects not set up, doing this myself with default values.");
 
-  if (!genfit::MaterialEffects::getInstance()->isInitialized())
+    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+      geoManager.createTGeoRepresentation();
+    }
+    //pass the magnetic field to genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::FieldManager::getInstance()->useCache();
+
     genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-  // activate / deactivate material effects in genfit
-  if (m_noEffects == true) {
-    genfit::MaterialEffects::getInstance()->setNoEffects(true);
-  } else {
-    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(m_energyLossBetheBloch);
-    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(m_noiseBetheBloch);
-    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(m_noiseCoulomb);
-    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(m_energyLossBrems);
-    genfit::MaterialEffects::getInstance()->setNoiseBrems(m_noiseBrems);
+
+    // activate / deactivate material effects in genfit
+    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
+    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
+
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
   }
-  genfit::MaterialEffects::getInstance()->setMscModel(m_mscModel);
 
   //read the pdgCode options and set attributes accordingly
   int nPdgCodes = m_pdgCodes.size();

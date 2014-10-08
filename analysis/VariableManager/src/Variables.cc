@@ -756,6 +756,8 @@ namespace Belle2 {
     double nRemainingTracksInRestOfEvent(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      if (not roe.isValid())
+        return 0.0;
       int roe_tracks = roe->getTracks().size();
       int par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
@@ -770,6 +772,8 @@ namespace Belle2 {
     double isInRestOfEvent(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      if (not roe.isValid())
+        return 1.0;
       const auto& tracks = roe->getTracks();
       if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
         return 1.0;

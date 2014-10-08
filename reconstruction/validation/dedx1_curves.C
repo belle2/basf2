@@ -1,3 +1,11 @@
+/*
+<header>
+  <input>EvtGenSimRec_dedx.root</input>
+  <output>dedx_curves.root</output>
+  <contact>cpulvermacher</contact>
+</header>
+*/
+
 #include <TFile.h>
 #include <TMath.h>
 #include <TTree.h>

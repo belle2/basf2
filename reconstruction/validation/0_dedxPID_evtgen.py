@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input></input>
+  <output>EvtGenSimRec_dedx.root</output>
+  <contact>cpulvermacher</contact>
+</header>
+"""
+
 import os
 from basf2 import *
 from simulation import *

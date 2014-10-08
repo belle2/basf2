@@ -278,10 +278,14 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
     else:
         placeholders['postCutRange'] = 'Ignored'
 
-    rootfile = ROOT.TFile(nTuple)
-    tree = rootfile.Get('variables')
-    placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries(mvaConfig.target))
-    placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!' + mvaConfig.target))
+    if nTuple is not None:
+        rootfile = ROOT.TFile(nTuple)
+        tree = rootfile.Get('variables')
+        placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries(mvaConfig.target))
+        placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!' + mvaConfig.target))
+    else:
+        placeholders['particleNSignalAfterPostCut'] = 0
+        placeholders['particleNBackgroundAfterPostCut'] = 0
 
     for channelPlaceholder in channelPlaceholders:
         placeholders['particleNSignal'] += int(channelPlaceholder['channelNSignal'])
@@ -600,18 +604,19 @@ def makeROCPlot(tmvaFilename, plotName):
 
 def makeDiagPlotPerParticle(nTuple, plotName, mvaConfig):
 
-    nTupleFile = ROOT.TFile(nTuple)
-    variables = nTupleFile.Get('variables')
-
-    if variables.GetEntries() == 0:
-        raise RuntimeError('variables is empty')
-
     nbins = 100
     probabilityVar = 'getExtraInfoSignalProbability'  # ROOT.Belle2.Variable.makeROOTCompatible('getExtraInfo(SignalProbability)')
     bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
-    variables.Project('background' + probabilityVar, probabilityVar, '!' + mvaConfig.target)
     signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
-    variables.Project('signal' + probabilityVar, probabilityVar, mvaConfig.target)
+
+    if nTuple is not None:
+        nTupleFile = ROOT.TFile(nTuple)
+        variables = nTupleFile.Get('variables')
+
+        if variables.GetEntries() == 0:
+            raise RuntimeError('variables is empty')
+        variables.Project('background' + probabilityVar, probabilityVar, '!' + mvaConfig.target)
+        variables.Project('signal' + probabilityVar, probabilityVar, mvaConfig.target)
     makeDiagPlot(signalHist, bgHist, plotName)
 
 

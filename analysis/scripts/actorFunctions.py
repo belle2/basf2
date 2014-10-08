@@ -574,8 +574,8 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     B2INFO("Create analysis summary pdf file.")
     finalParticlePlaceholders = []
     for ntuple in finalParticleNTuples:
-        type = 'CosBDL' if 'semileptonic' in ntuple else 'Mbc'
         if ntuple is not None:
+            type = 'CosBDL' if 'semileptonic' in ntuple else 'Mbc'
             finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, type))
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
 

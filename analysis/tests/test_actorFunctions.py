@@ -441,7 +441,7 @@ class TestSignalProbability(unittest.TestCase):
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['prefix'], 'D+:1_hash')
         self.assertEqual(parameters['method'], mvaConfig.name)
-        self.assertEqual(parameters['signalFraction'], -1)
+        self.assertEqual(parameters['signalFraction'], -2)
         self.assertEqual(parameters['signalProbabilityName'], 'SignalProbability')
         self.assertEqual(parameters['signalClass'], 1)
         self.assertDictEqual(parameters['inverseSamplingRates'], {})
@@ -455,10 +455,10 @@ class TestSignalProbability(unittest.TestCase):
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['prefix'], 'D+:1_hash')
         self.assertEqual(parameters['method'], mvaConfig.name)
-        self.assertEqual(parameters['signalFraction'], -1)
+        self.assertEqual(parameters['signalFraction'], -2)
         self.assertEqual(parameters['signalProbabilityName'], 'SignalProbability')
         self.assertEqual(parameters['signalClass'], 1)
-        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 21, 1: 11})
+        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 41, 1: 21})
         self.assertEqual(parameters['listNames'], ['D+:1'])
 
     def test_standard_teacher(self):
@@ -470,7 +470,7 @@ class TestSignalProbability(unittest.TestCase):
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['prefix'], 'D+:1_hash')
-        self.assertEqual(parameters['methods'], [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
+        self.assertEqual(parameters['methods'], [(mvaConfig.name, mvaConfig.type, 'NbinsMVAPdf=50:' + mvaConfig.config)])
         self.assertEqual(parameters['variables'], mvaConfig.variables)
         self.assertEqual(parameters['target'], mvaConfig.target)
         self.assertEqual(parameters['doNotTrain'], True)
@@ -486,11 +486,11 @@ class TestSignalProbability(unittest.TestCase):
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['prefix'], 'D+:1_hash')
-        self.assertEqual(parameters['methods'], [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
+        self.assertEqual(parameters['methods'], [(mvaConfig.name, mvaConfig.type, 'NbinsMVAPdf=200:' + mvaConfig.config)])
         self.assertEqual(parameters['variables'], mvaConfig.variables)
         self.assertEqual(parameters['target'], mvaConfig.target)
         self.assertEqual(parameters['doNotTrain'], True)
-        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 21, 1: 11})
+        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 41, 1: 21})
         self.assertEqual(parameters['listNames'], ['D+:1'])
 
     def test_missing_additional_dependencies(self):

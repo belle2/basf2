@@ -422,26 +422,26 @@ void test2_Validation_B2JpsiKS(){
   int iiCand;  
   
   recoTree->SetBranchAddress("B0_P4",      &fB0_P4);  
-  recoTree->SetBranchAddress("B0_KS0_P4",    &fB0_KS0_P4);  
-  recoTree->SetBranchAddress("B0_JPsi_P4",   &fB0_JPsi_P4);  
-  recoTree->SetBranchAddress("B0_KS0_pi0_P4",  &fB0_KS0_pi0_P4);  
-  recoTree->SetBranchAddress("B0_KS0_pi1_P4", &fB0_KS0_pi1_P4);  
+  recoTree->SetBranchAddress("B0_K_S0_P4",    &fB0_KS0_P4);  
+  recoTree->SetBranchAddress("B0_Jpsi_P4",   &fB0_JPsi_P4);  
+  recoTree->SetBranchAddress("B0_K_S0_pi0_P4",  &fB0_KS0_pi0_P4);  
+  recoTree->SetBranchAddress("B0_K_S0_pi1_P4", &fB0_KS0_pi1_P4);  
 
   recoTree->SetBranchAddress("B0_mbc",     &fB0_mbc);  
   recoTree->SetBranchAddress("B0_deltae",  &fB0_deltae);  
 
-  recoTree->SetBranchAddress("B0_JPsi_mu0_mcPDG",   &iB0_JPsi_mu0_mcPDG);  
-  recoTree->SetBranchAddress("B0_JPsi_mu1_mcPDG",   &iB0_JPsi_mu1_mcPDG);  
-  recoTree->SetBranchAddress("B0_KS0_pi0_mcPDG",  &iB0_KS0_pi0_mcPDG);  
-  recoTree->SetBranchAddress("B0_KS0_pi1_mcPDG", &iB0_KS0_pi1_mcPDG);  
+  recoTree->SetBranchAddress("B0_Jpsi_mu0_mcPDG",   &iB0_JPsi_mu0_mcPDG);  
+  recoTree->SetBranchAddress("B0_Jpsi_mu1_mcPDG",   &iB0_JPsi_mu1_mcPDG);  
+  recoTree->SetBranchAddress("B0_K_S0_pi0_mcPDG",  &iB0_KS0_pi0_mcPDG);  
+  recoTree->SetBranchAddress("B0_K_S0_pi1_mcPDG", &iB0_KS0_pi1_mcPDG);  
 
-  recoTree->SetBranchAddress("B0_JPsi_mu0_MC_MOTHER_ID",   &iB0_JPsi_mu0_MC_MOTHER_ID);  
-  recoTree->SetBranchAddress("B0_JPsi_mu1_MC_MOTHER_ID",   &iB0_JPsi_mu1_MC_MOTHER_ID);  
-  recoTree->SetBranchAddress("B0_KS0_pi0_MC_MOTHER_ID",  &iB0_KS0_pi0_MC_MOTHER_ID);  
-  recoTree->SetBranchAddress("B0_KS0_pi1_MC_MOTHER_ID", &iB0_KS0_pi1_MC_MOTHER_ID);  
+  recoTree->SetBranchAddress("B0_Jpsi_mu0_MC_MOTHER_ID",   &iB0_JPsi_mu0_MC_MOTHER_ID);  
+  recoTree->SetBranchAddress("B0_Jpsi_mu1_MC_MOTHER_ID",   &iB0_JPsi_mu1_MC_MOTHER_ID);  
+  recoTree->SetBranchAddress("B0_K_S0_pi0_MC_MOTHER_ID",  &iB0_KS0_pi0_MC_MOTHER_ID);  
+  recoTree->SetBranchAddress("B0_K_S0_pi1_MC_MOTHER_ID", &iB0_KS0_pi1_MC_MOTHER_ID);  
 
-  recoTree->SetBranchAddress("B0_KS0_pi0_MC_GD_MOTHER_ID",  &iB0_KS0_pi0_MC_GD_MOTHER_ID);  
-  recoTree->SetBranchAddress("B0_KS0_pi1_MC_GD_MOTHER_ID", &iB0_KS0_pi1_MC_GD_MOTHER_ID);  
+  recoTree->SetBranchAddress("B0_K_S0_pi0_MC_GD_MOTHER_ID",  &iB0_KS0_pi0_MC_GD_MOTHER_ID);  
+  recoTree->SetBranchAddress("B0_K_S0_pi1_MC_GD_MOTHER_ID", &iB0_KS0_pi1_MC_GD_MOTHER_ID);  
   
   recoTree->SetBranchAddress("nCands", &inCands);  
   recoTree->SetBranchAddress("iCand", &iiCand);  

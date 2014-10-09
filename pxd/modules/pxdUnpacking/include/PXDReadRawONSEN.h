@@ -11,10 +11,6 @@
 #define PXDREADRAWONSEN_H
 
 
-#include <string>
-#include <vector>
-#include <stdlib.h>
-
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
@@ -24,6 +20,11 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawPXD.h>
+
+#include <string>
+#include <vector>
+#include <stdlib.h>
+
 
 namespace Belle2 {
 

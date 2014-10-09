@@ -66,6 +66,10 @@ PXDPackerModule::PXDPackerModule() :
   Module(),
   m_storeRaws()
 {
+  m_trigger_nr = 0;
+  m_packed_events = 0;
+  m_run_nr_word1 = 0;
+  m_run_nr_word2 = 0;
   //Set module properties
   setDescription("Pack PXD Hits to raw data object");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -80,7 +84,7 @@ void PXDPackerModule::initialize()
 {
   B2INFO("PXD Packer --> Init");
   //Register output collections
-  m_storeRaws.registerAsPersistent(m_RawPXDsName);
+  m_storeRaws.registerInDataStore(m_RawPXDsName);
   storeDigits.required(m_PXDDigitsName);
 
   m_packed_events = 0;
@@ -490,7 +494,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id, int dhh_reformat)
       }
     }
   }
-  if (!empty && m_current_frame.size() & 0x3) {
+  if (!empty && (m_current_frame.size() & 0x3)) {
     B2INFO("Repeat last rowstart to align to 32bit.");
     append_int16(last_rowstart);
   }

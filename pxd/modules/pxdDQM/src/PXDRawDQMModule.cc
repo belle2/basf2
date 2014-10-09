@@ -10,6 +10,7 @@
 
 #include <pxd/modules/pxdDQM/PXDRawDQMModule.h>
 
+#include "TDirectory.h"
 #include <string>
 
 using namespace std;
@@ -30,10 +31,15 @@ PXDRawDQMModule::PXDRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_s
   //Set module properties
   setDescription("Monitor raw PXD");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("pxdraw"));
 }
 
 void PXDRawDQMModule::defineHisto()
 {
+  // Create a separate histogram directory and cd into it.
+  TDirectory* oldDir = gDirectory;
+  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+
   hrawPxdPackets = new TH1F("hrawPxdPackets", "Pxd Raw Packet Nr;Nr per Event", 16, 0, 16);
   hrawPxdPacketSize = new TH1F("hrawPxdPacketSize", "Pxd Raw Packetsize;Words per packet", 1024, 0, 1024);
   hrawPxdHitMapAll  = new TH2F("hrawPxdHitMapAll", "Pxd Raw Hit Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 370, 0, 3700, 350, 0, 3500);
@@ -50,11 +56,16 @@ void PXDRawDQMModule::defineHisto()
     hrawPxdHitsCommonMode[i]  = new TH1F(("hrawPxdHitsCommonMode" + s).c_str(), ("Pxd Raw Hit Common Mode, " + s + ";Value").c_str(), 256, 0, 256);
     hrawPxdHitsTimeWindow[i]  = new TH1F(("hrawPxdHitsTimeWindow" + s).c_str(), ("Pxd Raw Hit Time Window (framenr*1024-startrow), " + s + ";Time [a.u.]").c_str(), 8192, -1024, 8192 - 1024);
   }
+
+  // cd back to root directory
+  oldDir->cd();
 }
 
 void PXDRawDQMModule::initialize()
 {
   REG_HISTOGRAM
+  m_storeRawPxdrarray.required();
+  m_storeRawHits.required();
 }
 
 void PXDRawDQMModule::beginRun()

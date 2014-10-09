@@ -46,6 +46,8 @@ namespace Belle2 {
 
     private:
 
+      std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+
       /** Storearray for raw data packets  */
       StoreArray<RawPXD> m_storeRawPxdrarray;
       /** Storearray for raw pixels   */
@@ -77,8 +79,6 @@ namespace Belle2 {
       TH1F* hrawPxdHitsCommonMode[64];
       /** Histogram raw pixel trigger window */
       TH1F* hrawPxdHitsTimeWindow[64];
-
-      //map<int,int> sensor_to_histindex;
 
       virtual void defineHisto();
 

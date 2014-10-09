@@ -35,7 +35,7 @@ recotools = [
     'PID',
     '^pi+',
     ]
-ntupleTree('pituple', 'StdVeryLoosePi+', recotools)
+ntupleTree('pituple', 'pi+:all', recotools)
 # Save the truth tracks to ntuple
 findMCDecay('truthPi+', 'pi+')
 truthtools = [
@@ -70,7 +70,7 @@ recotoolsGamma = [
     'PID',
     '^gamma',
     ]
-ntupleTree('gammatuple', 'StdPhoton', recotoolsGamma)
+ntupleTree('gammatuple', 'gamma:all', recotoolsGamma)
 findMCDecay('truthGamma', 'gamma')
 truthtoolsGamma = [
     'EventMetaData',
@@ -100,6 +100,8 @@ pi0tools = [
     'pi0 -> ^gamma ^gamma',
     'Kinematics',
     '^pi0 -> ^gamma ^gamma',
+    'InvMass',
+    '^pi0 -> gamma gamma',
     'MCReconstructible',
     'pi0 -> ^gamma ^gamma',
     'MCHierarchy',
@@ -112,6 +114,8 @@ pi0truthtools = [
     'pi0',
     'Kinematics',
     '^pi0 -> ^gamma ^gamma',
+    'InvMass',
+    '^pi0 -> gamma gamma',
     'MCReconstructible',
     'pi0 -> ^gamma ^gamma',
     ]

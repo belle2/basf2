@@ -319,7 +319,7 @@ namespace Belle2 {
      * The value shall be between 0-1, where 1 means "good" and 0 means "bad".
      * Standard is 0.5.
      * */
-    unsigned int m_qualityIndicator;
+    double m_qualityIndicator;
 
 
 
@@ -328,6 +328,6 @@ namespace Belle2 {
 
 
 
-    ClassDef(SpacePoint, 5) // last member added: m_qualityIndicator & m_isAssigned, last removed: m_metaInfo
+    ClassDef(SpacePoint, 6) // last member added: m_qualityIndicator & m_isAssigned, last removed: m_metaInfo
   };
 }

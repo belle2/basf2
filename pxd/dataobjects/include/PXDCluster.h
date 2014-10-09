@@ -139,7 +139,7 @@ namespace Belle2 {
     /** Get cluster start cell in v direction.
      * @return first row contributing to the cluster.
      */
-    unsigned short getVStart() const { return m_uStart; }
+    unsigned short getVStart() const { return m_vStart; }
 
   protected:
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/

@@ -24,7 +24,7 @@ REG_MODULE(BestCandidateSelection)
 BestCandidateSelectionModule::BestCandidateSelectionModule():
   m_variable(nullptr)
 {
-  setDescription("Selects Particles with the highest values of 'variable' in the input list and removes all other particles from the list. The remaining list is sorted from best to worst candidate (each charge, e.g. B+/B-, separately).");
+  setDescription("Selects Particles with the highest values of 'variable' in the input list and removes all other particles from the list. Particles will receive an extra-info field '${variable}_rank' containing their rank as an integer starting at 1 (best). The remaining list is sorted from best to worst candidate (each charge, e.g. B+/B-, separately).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("particleList", m_inputListName, "Name of the ParticleList to reduce to the best candidates");
@@ -82,10 +82,16 @@ void BestCandidateSelectionModule::event()
   if (m_numBest == 0)
     cutoff = valueToIndex.cend();
 
+  const std::string extraInfoName(m_variableName + "_rank");
+
   //remove everything but best candidates
   //everything in range [begin, cutoff) is to be kept
   m_inputList->clear();
+  int rank = 1;
   for (auto it = valueToIndex.cbegin(); it != cutoff; ++it) {
-    m_inputList->addParticle(particles[it->second]);
+    Particle* p = particles[it->second];
+    p->addExtraInfo(extraInfoName, rank);
+    m_inputList->addParticle(p);
+    rank++;
   }
 }

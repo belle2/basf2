@@ -38,7 +38,7 @@
 #include <TSystem.h>
 #include <TTree.h>
 
-#include <Belle2Labels.h>
+//#include <Belle2Labels.h>
 
 #define NBINSP 25
 #define MAXP 2.5
@@ -165,7 +165,7 @@ void pi_plots(bool runOffline) {
 
     canvasResolution->Clear();
     h_PResolutionPi->Draw();
-    if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+    //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Momentum Resolution");
 
     canvasResolution->Clear();
@@ -179,14 +179,14 @@ void pi_plots(bool runOffline) {
         yerms[i] = h_PResPi[i]->GetRMSError()/x[i];
         yemean[i] = h_PResPi[i]->GetMeanError()/x[i];
         h_PResPi[i]->Draw();
-        if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
-        Belle2Labels(0.1, 0.96, Form( "%.1f < p_{T}(#pi)(GeV) < %.1f", i*0.1, (i+1)*0.1 ) );
+        //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+        //Belle2Labels(0.1, 0.96, Form( "%.1f < p_{T}(#pi)(GeV) < %.1f", i*0.1, (i+1)*0.1 ) );
         canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"1/pT in bins of pT");
     }
     for(int i=0; i<NBINSP; i++) {
         h_dzResPi[i]->Draw();
-        if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
-        Belle2Labels(0.1, 0.96, Form( "%.1f < p_{T}(#pi)(GeV) < %.1f", i*0.1, (i+1)*0.1 ) );
+        //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+        //Belle2Labels(0.1, 0.96, Form( "%.1f < p_{T}(#pi)(GeV) < %.1f", i*0.1, (i+1)*0.1 ) );
         canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"dz");
     }
 
@@ -207,7 +207,7 @@ void pi_plots(bool runOffline) {
     graphResolution->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
     graphResolution->GetYaxis()->SetTitle("#sigma(p_{T})/p_{T}");
     graphResolution->GetXaxis()->SetTitle("p_{T} (#pi) GeV");
-    if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+    //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Resolution in bins of pT");
     canvasResolution->Clear();
 
@@ -224,7 +224,7 @@ void pi_plots(bool runOffline) {
     graphBias->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
     graphBias->GetYaxis()->SetTitle("Mean Bias (Rec-True)/Mean");
     graphBias->GetXaxis()->SetTitle("p_{T} (#pi) GeV");
-    if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+    //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Resolution in bins of pT");
     canvasResolution->Clear();
 
@@ -250,7 +250,7 @@ void pi_plots(bool runOffline) {
     graphZResolution->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
     graphZResolution->GetYaxis()->SetTitle("#sigma(z)");
     graphZResolution->GetXaxis()->SetTitle("p_{T}(#pi) GeV");
-    if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+    //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"z Resolution in bins of pT");
     canvasResolution->Clear();
 
@@ -338,7 +338,7 @@ void photon_plots(bool runOffline) {
         canvasResolution->cd(i+1);
         h_PGamm[i]->DrawNormalized("");
         h_PTruthGamm[i]->DrawNormalized("same");
-        Belle2Labels(0.1, 0.96, Form( "ECL: %s", regions[i] ) );
+        //Belle2Labels(0.1, 0.96, Form( "ECL: %s", regions[i] ) );
         if(i==0)    leg->Draw();
     }
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"), Form("Photon energy"));
@@ -361,18 +361,18 @@ void photon_plots(bool runOffline) {
             //------------------------------------------------------------------------------
             canvasResolution->cd(i+1);
             h_EResGamm[i][j]->Draw("histo");
-            if(i==0)Belle2Labels(0.3, 0.96, Form( "ECL: %s %10.1f < E(#gamma) GeV < %.1f",regions[i], j*0.1, (j+1)*0.1 ) );
-            else Belle2Labels(0.3, 0.96, Form( "ECL: %s",regions[i] ) );
+            //if(i==0)Belle2Labels(0.3, 0.96, Form( "ECL: %s %10.1f < E(#gamma) GeV < %.1f",regions[i], j*0.1, (j+1)*0.1 ) );
+            //else Belle2Labels(0.3, 0.96, Form( "ECL: %s",regions[i] ) );
         }
-        if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
+        //if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
         canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"), Form("Photon energy resolution %d", j));
     }
     for( int i=0; i<ECL; i++ ) {
         canvasResolution->cd(i+1);
         h_Resolution_2D[i]->Draw("box");
-        Belle2Labels(0.3, 0.96, Form( "ECL: %s", regions[i] ) );
+        //Belle2Labels(0.3, 0.96, Form( "ECL: %s", regions[i] ) );
     }
-    if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
+    //if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector response for photons");
 
     canvasResolution->Clear();
@@ -403,7 +403,7 @@ void photon_plots(bool runOffline) {
         frame->GetYaxis()->SetTitle("#sigma(E)/E");
         frame->GetXaxis()->SetTitle("E (#gamma) GeV");
         graphResolution->Draw("2");
-        if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
+        //if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
         canvasResolution->Update();
         canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector resolution for photons");
 
@@ -419,7 +419,7 @@ void photon_plots(bool runOffline) {
         frame->GetYaxis()->SetTitle("Mean Bias (Rec-Truth)/Mean");
         frame->GetXaxis()->SetTitle("E (#gamma) GeV");
         graphBias->Draw("2");
-        if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
+        //if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
         canvasResolution->Update();
         canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector resolution for photons");
     }
@@ -444,3 +444,4 @@ void test2_Validation_Resolution(bool runOffline=false) {
     photon_plots(runOffline);
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf]"));
 }
+

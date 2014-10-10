@@ -32,7 +32,7 @@
 #include <TStyle.h>
 #include <TTree.h>
 
-#include "Belle2Labels.h"
+//#include "Belle2Labels.h"
 
 void plot( TH1F** histo, TCanvas* canvas ) {
     THStack* stack = new THStack;
@@ -53,7 +53,7 @@ void plot( TH1F** histo, TCanvas* canvas ) {
 
 void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forward,2=barrel,3=backward,4=endcap
     if(runOffline) {
-        gROOT->LoadMacro("Belle2Labels.C");
+        gROOT->LoadMacro("//Belle2Labels.C");
     }
 
     TFile* output = new TFile("test2_Validation_PID_output.root", "recreate");
@@ -230,7 +230,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
             multigraph_ROC->GetXaxis()->SetTitle( Form("(%s #rightarrow %s) Efficiency",names[Hypo],names[Hypo] ) );
             multigraph_ROC->GetYaxis()->SetTitle(Form("(%s #rightarrow %s) Fake rate",names[Hypo2],names[Hypo]));
             legROC->Draw();
-            Belle2Labels(0.5,0.95,Form("PID(%s)",names[Hypo]));
+            //Belle2Labels(0.5,0.95,Form("PID(%s)",names[Hypo]));
             c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: ROC %s #rightarrow %s",names[Hypo2],names[Hypo]));
             c_pidvalidation->Clear();
 
@@ -238,34 +238,34 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
             multigraph_Rejection->GetXaxis()->SetTitle( Form("(%s #rightarrow %s) Efficiency",names[Hypo],names[Hypo] ) );
             multigraph_Rejection->GetYaxis()->SetTitle(Form("(%s #rightarrow %s) Rejection",names[Hypo2],names[Hypo]));
             legROC->Draw();
-            Belle2Labels(0.5,0.95,Form("PID(%s)",names[Hypo]));
+            //Belle2Labels(0.5,0.95,Form("PID(%s)",names[Hypo]));
             c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: Rejection %s #rightarrow %s",names[Hypo2],names[Hypo]));
             c_pidvalidation->Clear();
         }
 
         plot( h_trk_P, c_pidvalidation );
-        if(runOffline) Belle2Labels(0.5,0.9,"Belle II Validation");
+        //if(runOffline)Belle2Labels(0.5,0.9,"Belle II Validation");
         legHist->Draw();
         c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: P noPID, %s hypothesis",names[Hypo]));
 
         plot( h_trk_CosTh, c_pidvalidation );
-        if(runOffline) Belle2Labels(0.5,0.9,"Belle II Validation");
+        //if(runOffline)Belle2Labels(0.5,0.9,"Belle II Validation");
         legHist->Draw();
         c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: cos#theta noPID, %s hypothesis",names[Hypo]));
 
         plot( h_trk_Ppass, c_pidvalidation );
-        if(runOffline) Belle2Labels(0.5,0.9,"Belle II Validation");
+        //if(runOffline)Belle2Labels(0.5,0.9,"Belle II Validation");
         legHist->Draw();
         c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: P PID, %s hypothesis",names[Hypo]));
 
         plot( h_trk_CosTh_pass, c_pidvalidation );
-        if(runOffline) Belle2Labels(0.5,0.9,"Belle II Validation");
+        //if(runOffline)Belle2Labels(0.5,0.9,"Belle II Validation");
         legHist->Draw();
         c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: cos#theta PID, %s hypothesis",names[Hypo]));
 
         c_pidvalidation->SetLogy(1);
         plot( h_trk_PID, c_pidvalidation );
-        if(runOffline) Belle2Labels(0.5,0.9,"Belle II Validation");
+        //if(runOffline)Belle2Labels(0.5,0.9,"Belle II Validation");
         legHist->Draw();
         c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: PID, %s hypothesis",names[Hypo]));
         c_pidvalidation->SetLogy(0);
@@ -306,7 +306,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
         multigraph_P->Draw("ap");
         multigraph_P->GetXaxis()->SetTitle(h_trk_P[0]->GetXaxis()->GetTitle());
         multigraph_P->GetYaxis()->SetTitle("Efficiency");
-        Belle2Labels(0.5,0.95,Form("PID(%s)>0.5",names[Hypo]));
+        //Belle2Labels(0.5,0.95,Form("PID(%s)>0.5",names[Hypo]));
         c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: Efficiency, %s hypothesis",names[Hypo]));
 
         if(runOffline) {
@@ -318,8 +318,8 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
             multigraph_offline_P->Draw("ap");
             multigraph_offline_P->GetXaxis()->SetTitle(h_trk_P[0]->GetXaxis()->GetTitle());
             multigraph_offline_P->GetYaxis()->SetTitle("Efficiency");
-            if(region==4) Belle2Labels(0.5,0.9,"Endcaps");
-            if(region==2) Belle2Labels(0.5,0.9,"Barrel");
+            //if(region==4)Belle2Labels(0.5,0.9,"Endcaps");
+            //if(region==2)Belle2Labels(0.5,0.9,"Barrel");
             c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: Efficiency, %s hypothesis",names[Hypo]));
         }
 
@@ -353,8 +353,8 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
             multigraph_offline_CosTh->Draw("ap");
             multigraph_offline_CosTh->GetXaxis()->SetTitle(h_trk_CosTh[0]->GetXaxis()->GetTitle());
             multigraph_offline_CosTh->GetYaxis()->SetTitle("Efficiency");
-            if(region==4) Belle2Labels(0.5,0.9,"Endcaps");
-            if(region==2) Belle2Labels(0.5,0.9,"Barrel");
+            //if(region==4)Belle2Labels(0.5,0.9,"Endcaps");
+            //if(region==2)Belle2Labels(0.5,0.9,"Barrel");
             c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: Efficiency, %s hypothesis",names[Hypo]));
         }
         TFile* outFile = new TFile("test2_Validation_PID_output.root", "update");
@@ -367,3 +367,4 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
     c_pidvalidation->Print("test2_Validation_PID_plots.pdf","");
     c_pidvalidation->Print("test2_Validation_PID_plots.pdf]");
 }
+

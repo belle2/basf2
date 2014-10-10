@@ -35,7 +35,7 @@
 #include <TSystem.h>
 #include <TTree.h>
 
-#include <Belle2Labels.h>
+//#include <Belle2Labels.h>
 
 #ifndef __CINT__
 #include <RooGlobalFunc.h>
@@ -171,7 +171,7 @@ void test2_Validation_B2Dpi() {
     canvas->cd(3);
     h_md0->Draw();
     canvas->cd();
-    Belle2Labels(0.3, 0.96, "B^{-} -> D^{0}(K^{-}#pi^{+})#pi^{-}" );
+    //Belle2Labels(0.3, 0.96, "B^{-} -> D^{0}(K^{-}#pi^{+})#pi^{-}" );
     canvas->Print("test2_Validation_Breco_plots.pdf");
 
     //Determine the D0 mass resolution
@@ -207,7 +207,7 @@ void test2_Validation_B2Dpi() {
     canvas->Clear();
     canvas->cd();
     framex->Draw("");
-    Belle2Labels(0.3, 0.95, "B^{-} -> D^{0}(K^{-}#pi^{+})#pi^{-}" );
+    //Belle2Labels(0.3, 0.95, "B^{-} -> D^{0}(K^{-}#pi^{+})#pi^{-}" );
     canvas->Print("test2_Validation_Breco_plots.pdf");
 
     double nreco           = h_mbc->Integral();
@@ -367,7 +367,7 @@ void test2_Validation_B2JpsiKS() {
     h_mkstruthmatch->SetLineStyle(2);
     h_mkstruthmatch->Draw("same");
     canvas->cd();
-    Belle2Labels(0.3, 0.96, "B^{0}->J/#psi(#mu^{+}#mu^{-}) K_{S}(#pi^{+}#pi^{-})" );
+    //Belle2Labels(0.3, 0.96, "B^{0}->J/#psi(#mu^{+}#mu^{-}) K_{S}(#pi^{+}#pi^{-})" );
     canvas->Print("test2_Validation_Breco_plots.pdf");
 
     //Determine the jpsi mass resolution
@@ -415,7 +415,7 @@ void test2_Validation_B2JpsiKS() {
     canvas->Clear();
     canvas->cd();
     framex->Draw("");
-    Belle2Labels(0.3, 0.96, "B^{0}->J/#psi(#mu^{+}#mu^{-}) K_{S}(#pi^{+}#pi^{-})" );
+    //Belle2Labels(0.3, 0.96, "B^{0}->J/#psi(#mu^{+}#mu^{-}) K_{S}(#pi^{+}#pi^{-})" );
     canvas->Print("test2_Validation_Breco_plots.pdf");
 
     double nreco           = h_mbc->Integral();
@@ -581,7 +581,7 @@ void test2_Validation_B2Kstgamma() {
     h_mksttruthmatch->SetLineStyle(2);
     h_mksttruthmatch->Draw("same");
     canvas->cd();
-    Belle2Labels(0.3, 0.96, "B^{0}->K^{*0}(K^{-}#pi^{+}) #gamma)" );
+    //Belle2Labels(0.3, 0.96, "B^{0}->K^{*0}(K^{-}#pi^{+}) #gamma)" );
     canvas->Print("test2_Validation_Breco_plots.pdf");
 
     double nreco           = h_mbc->Integral();
@@ -740,7 +740,7 @@ void test2_Validation_B2rho0gamma() {
     h_mrhotruthmatch->SetLineStyle(2);
     h_mrhotruthmatch->Draw("same");
     canvas->cd();
-    Belle2Labels(0.3, 0.96, "B^{0}->#rho^{0}(#pi^{-}#pi^{+}) #gamma" );
+    //Belle2Labels(0.3, 0.96, "B^{0}->#rho^{0}(#pi^{-}#pi^{+}) #gamma" );
     canvas->Print("test2_Validation_Breco_plots.pdf");
 
     double nreco           = h_mbc->Integral();
@@ -774,3 +774,4 @@ void test2_Validation_Breco() {
     test2_Validation_B2rho0gamma();
     c1.Print("test2_Validation_Breco_plots.pdf]");
 }
+

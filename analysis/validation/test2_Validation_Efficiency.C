@@ -30,7 +30,7 @@
 #include <TTree.h>
 #include <TVector3.h>
 
-#include <Belle2Labels.h>
+//#include <Belle2Labels.h>
 
 enum hypo {pion=0, photon=1};
 const int pid[] = {211, 22};
@@ -58,7 +58,7 @@ void efficiency_and_plots( TH1* truth, TH1* reco, TGraphAsymmErrors* efficiency,
         reco->Draw();
         truth->Draw("same");
     }
-    Belle2Labels(0.4, 0.96, Form( "%s", sTitle.c_str() ) );
+    //Belle2Labels(0.4, 0.96, Form( "%s", sTitle.c_str() ) );
     leg->Draw();
     //canvas->Print( Form("%s",sOutput.c_str()), Form("sTitle:%s truth and reco", sTitle.c_str()) );
     canvas->Print( Form("%s",sOutput.c_str()), Form("%s truth and reco", sTitle.c_str()) );
@@ -93,7 +93,7 @@ void efficiency_and_plots( TH1* truth, TH1* reco, TGraphAsymmErrors* efficiency,
     if (sTitle.find(sTrack) != std::string::npos)   efficiency->GetYaxis()->SetTitle("Track efficiency");
     else                                            efficiency->GetYaxis()->SetTitle("Photon efficiency");
 
-    Belle2Labels(0.4, 0.96, Form( "%s", sTitle.c_str() ) );
+    //Belle2Labels(0.4, 0.96, Form( "%s", sTitle.c_str() ) );
     //canvas->Print( Form("%s",sOutput.c_str()), Form("sTitle:%s efficiency", sTitle.c_str()) );
     canvas->Print( Form("%s",sOutput.c_str()), Form("%s efficiency", sTitle.c_str()) );
     efficiency->SetName(Form("%s", sTitle.c_str()));
@@ -490,3 +490,4 @@ void test2_Validation_Efficiency(bool runOffline=false) {
 
     maincanvas->Print("test2_Validation_Efficiency_plots.pdf]");
 }
+

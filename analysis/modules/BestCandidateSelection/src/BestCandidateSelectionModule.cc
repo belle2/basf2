@@ -14,6 +14,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <map>
+
 using namespace std;
 using namespace Belle2;
 
@@ -66,32 +68,26 @@ void BestCandidateSelectionModule::event()
   }
 
   //create list of particle index and the corresponding value of variable
-  std::map<double, unsigned int, decltype(betterThan)> valueToIndex(betterThan);
-  unsigned int numParticles = m_inputList->getListSize();
+  std::multimap<double, unsigned int, decltype(betterThan)> valueToIndex(betterThan);
+  const unsigned int numParticles = m_inputList->getListSize();
   for (unsigned int i = 0; i < numParticles; i++) {
     const Particle* p = m_inputList->getParticle(i);
     double value = m_variable->function(p);
-    valueToIndex[value] = p->getArrayIndex();
+    valueToIndex.emplace(value, p->getArrayIndex());
   }
-
-  auto cutoff = valueToIndex.cbegin();
-  int iCandidate = 0;
-  for (; cutoff != valueToIndex.cend() && iCandidate < m_numBest; ++cutoff) {
-    iCandidate++;
-  }
-  if (m_numBest == 0)
-    cutoff = valueToIndex.cend();
 
   const std::string extraInfoName(m_variableName + "_rank");
 
   //remove everything but best candidates
-  //everything in range [begin, cutoff) is to be kept
   m_inputList->clear();
   int rank = 1;
-  for (auto it = valueToIndex.cbegin(); it != cutoff; ++it) {
-    Particle* p = particles[it->second];
+  for (const auto & candidate : valueToIndex) {
+    Particle* p = particles[candidate.second];
     p->addExtraInfo(extraInfoName, rank);
     m_inputList->addParticle(p);
     rank++;
+
+    if (m_numBest != 0 and rank > m_numBest)
+      break;
   }
 }

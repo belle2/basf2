@@ -32,7 +32,7 @@ unsigned long int Belle2::Variable::findMatchedParenthesis(std::string str, char
     }
 
     if (count > 0)
-      throw std::runtime_error("String has an invalid format: " + str);
+      throw std::runtime_error("Variable string has an invalid format: " + str);
   }
   return end - 1;
 }

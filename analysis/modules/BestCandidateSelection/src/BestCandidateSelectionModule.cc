@@ -73,7 +73,7 @@ void BestCandidateSelectionModule::event()
   for (unsigned int i = 0; i < numParticles; i++) {
     const Particle* p = m_inputList->getParticle(i);
     double value = m_variable->function(p);
-    valueToIndex.emplace(value, p->getArrayIndex());
+    valueToIndex.insert(std::make_pair(value, p->getArrayIndex()));
   }
 
   const std::string extraInfoName(m_variableName + "_rank");

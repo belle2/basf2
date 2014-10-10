@@ -15,14 +15,7 @@ def inputMdst(filename, path=analysis_main):
     @param modules are added to this path
     """
 
-    roinput = register_module('RootInput')
-    roinput.param('inputFileName', filename)
-    path.add_module(roinput)
-    progress = register_module('Progress')
-    path.add_module(progress)
-
-    gearbox = register_module('Gearbox')
-    path.add_module(gearbox)
+    inputMdstList([filename], path)
 
 
 def inputMdstList(filelist, path=analysis_main):
@@ -788,7 +781,7 @@ def summaryOfLists(particleLists, path=analysis_main):
 
 def matchMCTruth(list_name, path=analysis_main):
     """
-    Performs MC matching (sets relation Particle<->MCParticle) for
+    Performs MC matching (sets relation Particle->MCParticle) for
     all particles (and its (grand)^N-daughter particles) in the specified
     ParticleList.
 

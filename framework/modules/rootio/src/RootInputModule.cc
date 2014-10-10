@@ -223,7 +223,7 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
   //Go over the branchlist and connect the branches with DataStore entries
   const TObjArray* branches = tree->GetListOfBranches();
   if (!branches) {
-    B2ERROR("Tree '" << tree->GetName() << "' doesn't contain any branches!");
+    B2FATAL("Tree '" << tree->GetName() << "' doesn't contain any branches!");
     return false;
   }
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {

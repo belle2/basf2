@@ -9,6 +9,15 @@ from stdFSParticles import *
 from stdLooseFSParticles import *
 from stdLightMesons import *
 
+# filelistMix = \
+#    ['/group/belle2/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s00/mixed_e0001r000*_s00_BGx1.mdst.root'
+#     ]
+# filelistChg = \
+#    ['/group/belle2/MC/generic/charged/mcprod1405/BGx1/mc35_charged_BGx1_s00/charged_e0001r000*_s00_BGx1.mdst.root'
+#     ]
+# filelist = filelistMix + filelistChg
+# inputMdstList(filelist)
+
 inputMdst('../GenericB_GENSIMRECtoDST.dst.root')
 loadReconstructedParticles()
 stdFSParticles()
@@ -16,7 +25,7 @@ stdLooseFSParticles()
 stdLightMesons()
 
 # ----> NtupleMaker module
-ntupleFile('../GenericB.ntup.root')
+ntupleFile('../my_GenericB.ntup.root')
 ##########
 # Save the tracks to ntuple
 recotools = [
@@ -37,7 +46,9 @@ recotools = [
     ]
 ntupleTree('pituple', 'pi+:all', recotools)
 # Save the truth tracks to ntuple
+# findMCDecay doesn't yet save complex conjugate mode, this is why I have 2 lists
 findMCDecay('truthPi+', 'pi+')
+findMCDecay('truthPi-', 'pi-')
 truthtools = [
     'EventMetaData',
     '^pi+',
@@ -53,13 +64,13 @@ truthtools = [
     '^pi+',
     ]
 ntupleTree('truthpituple', 'truthPi+', truthtools)
+ntupleTree('truthpituplem', 'truthPi-', truthtools)
+
 # Save the photons to ntuple
 recotoolsGamma = [
     'EventMetaData',
     '^gamma',
     'Kinematics',
-    '^gamma',
-    'Track',
     '^gamma',
     'MCTruth',
     '^gamma',
@@ -67,7 +78,7 @@ recotoolsGamma = [
     '^gamma',
     'MCReconstructible',
     '^gamma',
-    'PID',
+    'Cluster',
     '^gamma',
     ]
 ntupleTree('gammatuple', 'gamma:all', recotoolsGamma)
@@ -93,7 +104,7 @@ ntupleTree('truthgammatuple', 'truthGamma', truthtoolsGamma)
 matchMCTruth('pi0:all')
 pi0tools = [
     'EventMetaData',
-    'pi0',
+    '^pi0',
     'MCTruth',
     'pi0 -> ^gamma ^gamma',
     'MCKinematics',
@@ -101,7 +112,7 @@ pi0tools = [
     'Kinematics',
     '^pi0 -> ^gamma ^gamma',
     'InvMass',
-    '^pi0 -> gamma gamma',
+    '^pi0',
     'MCReconstructible',
     'pi0 -> ^gamma ^gamma',
     'MCHierarchy',
@@ -111,11 +122,11 @@ ntupleTree('pi0tuple', 'pi0:all', pi0tools)
 findMCDecay('truthpi0', 'pi0 => gamma gamma')
 pi0truthtools = [
     'EventMetaData',
-    'pi0',
+    '^pi0',
     'Kinematics',
     '^pi0 -> ^gamma ^gamma',
     'InvMass',
-    '^pi0 -> gamma gamma',
+    '^pi0',
     'MCReconstructible',
     'pi0 -> ^gamma ^gamma',
     ]
@@ -125,42 +136,42 @@ ntupleTree('truthpi0tuple', 'truthpi0', pi0truthtools)
 matchMCTruth('K_S0:loose')
 kstools = [
     'EventMetaData',
-    'K_S0',
+    '^K_S0',
     'MCTruth',
     '^K_S0 -> ^pi- ^pi+',
     'Kinematics',
-    '^K_S0 -> ^pi- ^pi+',
+    '^K_S0 -> ^pi- ^pi+InvMass',
+    '^K_S0',
+    'Vertex',
+    'K_S0 -> ^pi- ^pi+',
+    'MCVertex',
+    'K_S0 -> ^pi- ^pi+',
     ]
 ntupleTree('kstuple', 'K_S0:loose', kstools)
 
 ##########
+# StdPhi must be added
 # check the Phi candidates
-matchMCTruth('StdPhi')
-phitools = [
-    'EventMetaData',
-    'phi',
-    'MCTruth',
-    '^phi -> ^K- ^K+',
-    'Kinematics',
-    '^phi -> ^K- ^K+',
-    ]
-ntupleTree('phituple', 'StdPhi', phitools)
+# matchMCTruth('StdPhi')
+# phitools = [    'EventMetaData',    '^phi',    'MCTruth',    '^phi -> ^K- ^K+',    'Kinematics',    '^phi -> ^K- ^K+',    ]
+# ntupleTree('phituple', 'StdPhi', phitools)
 
 ##########
 # dump all event summary information
 eventtools = [
     'EventMetaData',
-    'B-',
+    '^B-',
     'RecoStats',
-    'B-',
+    '^B-',
     'DetectorStatsRec',
-    'B-',
+    '^B-',
     'DetectorStatsSim',
-    'B-',
+    '^B-',
     ]
 ntupleTree('eventtuple', '', eventtools)
 
-summaryOfLists(['StdPhi', 'K_S0:loose'])
+# summaryOfLists(['StdPhi', 'K_S0:loose'])
+summaryOfLists(['K_S0:loose'])
 
 # ----> start processing of modules
 process(analysis_main)

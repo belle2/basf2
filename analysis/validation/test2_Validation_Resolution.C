@@ -2,421 +2,445 @@
 // Validation_Resolution.cc
 // Check the Reconstruction resolution
 // Look at single particles, and use truth matching
-// 
-// Phillip Urquijo
-// June 30, 2013
 //
-#include "TChain.h"
-#include "TCanvas.h"
-#include "TF1.h"
-#include "TF2.h"
-#include "TH2F.h"
-#include "TH1F.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include "TTree.h"
-#include "TSystem.h"
-#include "TROOT.h"
-#include <TLorentzVector.h>
-#include <TVector3.h>
-#include "TGraphAsymmErrors.h"
-#include "TLegend.h"
-#include "TSystem.h"
-#include "TCut.h"
-#include "TF1.h"
-#include "TH1.h"
-#include "TF2.h"
-#include "TH2.h"
-#include "TMinuit.h"
-#include "TGraphErrors.h"
-#include "TTree.h"
-#include "TFile.h"
+// Phillip Urquijo, Luis Pesantez
+// June 30, 2013
+// Update: Oct 11, 2014
+//
+
 #include <vector>
-#include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <TStyle.h>
-#include "TEventList.h"
+#include <iostream>
+#include <string>
+
+#include "TApplication.h"
+#include <TChain.h>
+#include <TCanvas.h>
+#include <TDirectory.h>
+#include <TError.h>
+#include <TFile.h>
+#include <TGraph.h>
+#include <TGraphAsymmErrors.h>
+#include <TGraphErrors.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <THStack.h>
+#include <TLatex.h>
+#include <TLegend.h>
+#include <TList.h>
+#include <TLorentzVector.h>
+#include <TPad.h>
 #include <TROOT.h>
 #include <TSelector.h>
-#include <TFractionFitter.h>
-#include "THStack.h"
-#include "TLegend.h"
-#include "TPaveLabel.h"
-#include "TFriendElement.h"
-#include "TPad.h"
-#include "TPaveText.h"
-#include "TLatex.h"
+#include <TStyle.h>
+#include <TSpectrum.h>
+#include <TSystem.h>
+#include <TTree.h>
 
-#include <string>
-#include <TLorentzVector.h>
-#include "TMinuit.h"
-#include "TObjectTable.h"
-#include "TColor.h"
-#include "TRandom3.h"
-#include "TRolke.h"
-#include "TGraphErrors.h"
-#include "TGraphAsymmErrors.h"
-#include "TGraph.h"
-#include <TLorentzVector.h>
-#include <TVector3.h>
+#include <Belle2Labels.h>
 
-#define NRESBINS 25 
-#define NRESMAXP 2.5
+#define NBINSP 25
+#define MAXP 2.5
+#define MINP 0.0
 
-const int nthbins=10;
-const float thlow=-1.;
-const float thhigh=1.;
+#define NBINSTH 10
+#define MAXTH 1.0
+#define MINTH -1.0
 
-const int npbins=20;
-const int npgbins=24;
-const float plow=0.;
-const float phigh=1.2;
-const float pghigh=2.4;
+#define MINRES -0.05
+#define MAXRES 0.05
 
-const int nresbins=50;
-const float reslow=-0.05;
-const float reshigh=0.05;
-
-const float reswidth=(float)NRESMAXP/(float)NRESBINS;
-const float dzreswidth=1/((float)NRESMAXP/(float)NRESBINS);
+const float reswidth=(float)MAXP/(float)NBINSP;
+const float dzreswidth=1/((float)MAXP/(float)NBINSP);
 
 enum hypo { pion=0, kaon=1, electron=2, muon=3, proton=4, photon=5, ntypes=6};
-const int pid[] = {211,321,11,13,2212,22};
-const float pdgmasses[] = {0.13957,0.49367,0.000511,0.105658,0.93827,0.};
-const char *names[] = { "pi", "k", "e", "mu", "p","gamma"};
+const int pid[] = {211, 321, 11, 13, 2212, 22};
+const float pdgmasses[] = {0.13957, 0.49367, 0.000511, 0.105658, 0.93827, 0.};
+const char *names[] = { "pi", "k", "e", "mu", "p", "gamma"};
+enum ecl_regions {All=0, FW=1, Barrel=2, BW=3, ECL=4};
+const char* regions[]= { "All", "FW", "Barrel", "BW" };
 
-//void test2_Validation_Resolution_Tracks(TString,bool);
-//void test2_Validation_Resolution_Photons(TString,bool);
+double x[NBINSP], yrms[NBINSP], xe[NBINSP], yerms[NBINSP];
+double ymean[NBINSP], yemean[NBINSP];
 
-void test2_Validation_Resolution(bool runOffline=false){
+TCanvas *canvasResolution = new TCanvas ("canvasResolution","canvasResolution",1000,800);
 
-  if(runOffline){
-    SetBelle2Style();
-    gROOT->LoadMacro("Belle2Labels.C");
-  }
-
-  TString testfile ("../GenericB.ntup.root");
-  TCanvas *maincanvas = new TCanvas ("maincanvas","maincanvas");
-  maincanvas->Print("resolution.pdf[");
-  test2_Validation_Resolution_Tracks(testfile,runOffline);
-  test2_Validation_Resolution_Photons(testfile,runOffline);
-  maincanvas->Print("resolution.pdf]");
+int find_bin( float pt ) {
+    int bin = (int)(pt/reswidth);
+    if( bin<NBINSP )   return bin;
+    else return NBINSP-1;
 }
 
-void test2_Validation_Resolution_Tracks(TString testfile, bool runOffline){
-  
-  
+void pi_plots(bool runOffline) {
+    TString infile (Form( "../GenericB.ntup.root" ) );
+    TChain* recoTree = new TChain("pituple");
+    recoTree->AddFile(infile);
 
-  /*  Take the pituple prepared by the NtupleMaker */
-  TChain * recoTree = new TChain("pituple");
-  recoTree->AddFile(testfile);
+    TList* list = new TList;
+    //Lab momentum
+    TH1F* h_PPi     = new TH1F("PPi", ";p_{T}(#pi) GeV;N", NBINSP, MINP, MAXP);
+    list->Add(h_PPi);
+    TH1F* h_PTruthPi= new TH1F("PTruthPi", ";p_{T}(#pi) truth GeV;N", NBINSP, MINP, MAXP);
+    list->Add(h_PTruthPi);
+    TH1F* h_PResolutionPi= new TH1F("PResolutionPi", ";#sigma(p)/p;N", NBINSP, MINRES, MAXRES);
+    list->Add(h_PResolutionPi);
+    //Lab cos(theta)
+    TH1F* h_CosThPi      = new TH1F("CosThPi", ";cos#theta(#pi) ;N", NBINSTH, MINTH, MAXTH);
+    list->Add(h_CosThPi);
+    TH1F* h_CosThTruthPi = new TH1F("CosThTruthPi", ";cos#theta(#pi) truth ;N", NBINSTH, MINTH, MAXTH);
+    list->Add(h_CosThTruthPi);
 
-  //Lab momentum
-  TH1F * h_PpiResolution= new TH1F("P_piResolution"       ,";#sigma(P)/p;N"     ,nresbins,reslow,reshigh);
-  //Lab cos(theta)
-  TH1F * h_cosThpi      = new TH1F("CosTheta_pi",";cos#theta(#pi) ;N" ,nthbins,thlow,thhigh);	
-  
-  TH1F * h_PpiRes[NRESBINS];
-  TH1F * h_dzRes[NRESBINS];
-  for(int ipbin=0;ipbin<NRESBINS;ipbin++)
-    h_PpiRes[ipbin]= new TH1F(Form("P_piRes_%d", ipbin),
-			      ";p_{T}(#pi) GeV;Arbitrary Normalisation" ,200,-0.05,.05);
-
-  TH2F * h_Resolution   = new TH2F("Resolution" ,";p_{T}(#pi) GeV;#sigma(p_{T})/p_{T}"           ,npbins,plow,phigh,10,0.001, .5);
-  TH2F * h_Resolutionc   = new TH2F("Resolutionc" ,";p_{T}(#pi) GeV;Mean Bias (Rec-True)/Mean"   ,npbins,plow,phigh,10,-0.005, 0.015);
- 
-  for(int ipbin=0;ipbin<NRESBINS;ipbin++)
-    h_dzRes[ipbin]= new TH1F(Form("dz_Res_%d", ipbin),";dz;Arbitrary Normalisation"       ,100,0.,1000.);
-  
-  TH2F * h_dzResolution   = new TH2F("dzResolution" ,";p_{T};#sigma(dz) #mu m"            ,npbins,plow,phigh,10,0., 200);
-
-  float fpi_TruthP;  
-  float fpi_P4[4];  
-  float fpi_TruthP4[4];  
-  float fpi_PIDpi;  
-  float fpi_PIDk;  
-  float fpi_PIDe;  
-  float fpi_PIDmu;  
-  float fpi_PIDp;  
-  float fpi_dz;  
-  int ipi_mcPDG;  
-  recoTree->SetBranchAddress("pi_TruthP",  &fpi_TruthP);  
-  recoTree->SetBranchAddress("pi_mcPDG", &ipi_mcPDG);  
-  recoTree->SetBranchAddress("pi_TruthP4",      &fpi_TruthP4);  
-  recoTree->SetBranchAddress("pi_P4",      &fpi_P4);  
-  recoTree->SetBranchAddress("pi_PIDpi",   &fpi_PIDpi);  
-  recoTree->SetBranchAddress("pi_PIDk",    &fpi_PIDk);  
-  recoTree->SetBranchAddress("pi_PIDe",    &fpi_PIDe);  
-  recoTree->SetBranchAddress("pi_PIDmu",   &fpi_PIDmu);  
-  recoTree->SetBranchAddress("pi_PIDp",    &fpi_PIDp);  
-  recoTree->SetBranchAddress("pi_dz",    &fpi_dz);  
-  
-  for(Int_t iloop=0;iloop<recoTree->GetEntries();iloop++) {
-    recoTree->GetEntry(iloop);
-    TLorentzVector lv_pi(fpi_P4);  
-    TLorentzVector lv_pi_truth(fpi_TruthP4);  
-    int pdgid=abs(ipi_mcPDG);
-    
-    if(pdgid==pid[pion]){
-      h_PpiResolution->Fill((lv_pi.Pt()-lv_pi_truth.Pt())/lv_pi_truth.Pt());
-      h_cosThpi->Fill(lv_pi.CosTheta());
-      
-      for(int ipbin=0;ipbin<NRESBINS;ipbin++)
-	if(lv_pi_truth.Pt()>=(float)ipbin*reswidth && lv_pi_truth.Pt()<((float)ipbin+1)*reswidth)
-	  h_PpiRes[ipbin]->Fill(lv_pi.Pt()-lv_pi_truth.Pt());
-      
-      for(int ipbin=0;ipbin<NRESBINS;ipbin++)
-	if(lv_pi_truth.Pt()>=(float)ipbin*reswidth && lv_pi_truth.Pt()<((float)ipbin+1)*reswidth)h_dzRes[ipbin]->Fill(fpi_dz*1000);
-      
-      }
-      
+    TH1F* h_PResPi[NBINSP];
+    TH1F* h_dzResPi[NBINSP];
+    for(int ipbin=0; ipbin<NBINSP; ipbin++) {
+        h_PResPi[ipbin]= new TH1F(Form("PResPi_%d", ipbin), ";p_{T}(#pi) (Rec-True) GeV;Arbitrary Normalisation", 200, -0.05, .05);
+        list->Add(h_PResPi[ipbin]);
+        h_dzResPi[ipbin] = new TH1F(Form("dzResPi_%d", ipbin), ";dz;Arbitrary Normalisation",     100, 0., 1000.);
+        list->Add(h_dzResPi[ipbin]);
     }
 
-  TCanvas *tc = new TCanvas ("tc","tcReco");
-  tc->cd()->SetLogy(1);
-  h_PpiResolution->SetLineColor(kRed);
-  h_PpiResolution->Draw();
-  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
+    TH2F* h_Resolution_2D  = new TH2F("Resolution_2D", ";p_{T}(#pi) Rec GeV;p_{T}(#pi) Truth GeV", NBINSP, MINP, MAXP, NBINSP, MINP, MAXP);
+    TH2F* h_dzResolution  = new TH2F("dzResolution", ";p_{T};#sigma(dz) #mu m", NBINSP, MINP, MAXP, 10, 0., 200);
 
-  tc->cd()->SetLogy(0);
-  h_cosThpi->SetLineColor(kRed);
-  h_cosThpi->Draw();
-  
-  tc->Print("resolution.pdf","Title: Momentum Resolution");
-  
-  double xpoints[NRESBINS], ypoints[NRESBINS], xepoints[NRESBINS], yepoints[NRESBINS];
-  double ypointsmean[NRESBINS], yepointsmean[NRESBINS];
-  
-  for(int ipbin=0;ipbin<NRESBINS;ipbin++){
-    h_PpiRes[ipbin]->Scale(1/h_PpiRes[ipbin]->Integral());
-    xpoints[ipbin] = (float)ipbin*reswidth+reswidth/2.;
-    ypoints[ipbin] = h_PpiRes[ipbin]->GetRMS()/xpoints[ipbin];
-    ypointsmean[ipbin] = h_PpiRes[ipbin]->GetMean()/xpoints[ipbin];
-    xepoints[ipbin] = reswidth/2.;
-    yepoints[ipbin] = h_PpiRes[ipbin]->GetRMSError()/xpoints[ipbin];
-    yepointsmean[ipbin] = h_PpiRes[ipbin]->GetMeanError()/xpoints[ipbin];
-  }
-  
-  h_PpiRes[NRESBINS-1]->SetLineColor(NRESBINS);
-  h_PpiRes[NRESBINS-1]->Draw("");
-  
-  for(int ipbin=NRESBINS-2;ipbin>-1;ipbin--){
-    h_PpiRes[ipbin]->SetLineColor(ipbin+1);
-    h_PpiRes[ipbin]->Draw("same");
-  }
-  
-  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-  tc->Print("resolution.pdf","Title: 1/pT in bins of pT");
-  
-  tc->Clear();
-  tc->Divide(2,2);
-  for(int i=0;i<NRESBINS;i++){
-    tc->cd(i%4+1);
-    h_PpiRes[i]->SetLineColor(kBlue);
-    h_PpiRes[i]->Draw();
-    if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-    if((i+1)%4==0)  tc->Print("resolution.pdf",Form("Title:  1/pT in bins of pT %d",(i+1)/4));
-  }
-  
-  
-  tc->Clear();
-  tc->cd()->SetLogy(1);
-  tc->cd()->SetGridy(1);
-  tc->cd()->SetGridx(1);
-  TGraphErrors *tg = new TGraphErrors(NRESBINS,xpoints,ypoints,xepoints,yepoints);
-  h_Resolution->Draw();
-  tg->SetMinimum(0.001);
-  tg->SetFillColor(kBlue);
-  tg->SetMarkerColor(kBlue);
-  tg->SetMarkerStyle(21);
-  tg->Draw("2p");
-  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-  tc->Print("resolution.pdf","Title: Resolution in bins of pT");
-  tc->Clear();
-  tc->cd()->SetLogy(0);
-  
-  TGraphErrors *tg2 = new TGraphErrors(NRESBINS,xpoints,ypointsmean,xepoints,yepointsmean);
-  h_Resolutionc->Draw();
-  tg2->SetMinimum(0.001);
-  tg2->SetFillColor(kBlue);
-  tg2->Draw("2");
-  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-  tc->Print("resolution.pdf","Title: Resolution in bins of pT");
-  tc->Clear();
+    Float_t pi_P;
+    Float_t pi_P4[4];
+    Float_t pi_z0;
+    Int_t   pi_mcPDG;
+    Float_t pi_TruthP;
+    Float_t pi_TruthP4[4];
 
-  for(int ipbin=0;ipbin<NRESBINS;ipbin++){
-    cout<<h_dzRes[ipbin]->GetRMS()<<" "<<h_dzRes[ipbin]->GetRMSError()<<endl;
-    xpoints[ipbin] = (float)ipbin*reswidth+reswidth/2.;
-    ypoints[ipbin] = h_dzRes[ipbin]->GetRMS();
-    xepoints[ipbin] = reswidth/2.;
-    yepoints[ipbin] = h_dzRes[ipbin]->GetRMSError();
-  }
-  
+    recoTree->SetBranchAddress("pi_P", &pi_P);
+    recoTree->SetBranchAddress("pi_P4", pi_P4);
+    recoTree->SetBranchAddress("pi_z0", &pi_z0);
+    recoTree->SetBranchAddress("pi_mcPDG", &pi_mcPDG);
+    recoTree->SetBranchAddress("pi_TruthP", &pi_TruthP);
+    recoTree->SetBranchAddress("pi_TruthP4", pi_TruthP4);
 
-  TFile* output = new TFile("ResolutionValidationTracks.root", "recreate");
+    for(Int_t iloop=0; iloop<recoTree->GetEntries(); iloop++) {
+        recoTree->GetEntry(iloop);
 
-  //Resolution plot of integrated data.
-  TH1F *h_output_PpiResolution = (TH1F*)h_PpiResolution->Clone("P_output_piResolution");
-  h_output_PpiResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction resolution of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. A Generic BBbar sample is used."));
-  h_output_PpiResolution->GetListOfFunctions()->Add(new TNamed("Check", "Consistent width and mean."));
-  
-  //Resolution in bins of pT
-  TH1F * h_outputResolution   = new TH1F("outputResolution" ,";p_{T}(#pi) GeV;#sigma(p_{T})/p_{T}"           ,npbins,plow,phigh);
-  h_outputResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction resolution of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
-  h_outputResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+        if(abs(pi_mcPDG)==pid[pion]) {
+            TLorentzVector p4_pi(pi_P4);
+            TLorentzVector p4_truth_pi(pi_TruthP4);;
+            float pBias = (p4_pi.Pt()-p4_truth_pi.Pt())/p4_truth_pi.Pt();
+            int pt_bin = find_bin( p4_pi.Pt() );
 
-  for(int i=0;i<NRESBINS;i++){
-    double tgx, tgy, tgye;
-    tg->GetPoint(i,tgx,tgy);
-    tgye=tg->GetErrorY(i);
-    h_outputResolution->SetBinContent(i+1,tgy);
-    h_outputResolution->SetBinError(i+1,tgye);
-  }
+            h_PPi->Fill(p4_pi.Pt());
+            h_PTruthPi->Fill(p4_truth_pi.Pt());
+            h_PResolutionPi->Fill(pBias);
+            h_Resolution_2D->Fill(p4_pi.Pt(), p4_truth_pi.Pt());
 
-  //Bias in bins of pT
+            h_CosThPi->Fill(p4_pi.CosTheta());
+            h_CosThTruthPi->Fill(p4_truth_pi.CosTheta());
 
-  TH1F * h_outputBias   = new TH1F("outputBias" ,";p_{T}(#pi) GeV;Mean Bias (Rec-True)/Mean"   ,npbins,plow,phigh);
-  h_outputBias->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction pT bias of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
-  h_outputBias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low pT tracks < 100 MeV exhibit larger relative bias."));
+            h_PResPi[pt_bin]->Fill(p4_pi.Pt()-p4_truth_pi.Pt());
+            h_dzResPi[pt_bin]->Fill(pi_z0*1000);
+            h_dzResolution->Fill(p4_pi.Pt(), pi_z0);
+        }
+    }
 
-  for(int i=0;i<NRESBINS;i++){
-    double tgx, tgy, tgye;
-    tg2->GetPoint(i,tgx,tgy);
-    tgye=tg2->GetErrorY(i);
-    h_outputBias->SetBinContent(i+1,tgy);
-    h_outputBias->SetBinError(i+1,tgye);
-  }
+    TLegend* leg = new TLegend(0.3,0.2,0.5,0.35);
+    leg->SetFillColor(0);
 
+    h_PTruthPi->SetLineColor(kRed);
+    leg->AddEntry(h_PTruthPi,"Truth","l");
+    leg->AddEntry(h_PPi,"Reco","l");
 
-  output->Write();
-  output->Close();
- 
+    h_PPi->DrawNormalized("");
+    h_PTruthPi->DrawNormalized("same");
+    leg->Draw();
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Momentum");
+
+    canvasResolution->Clear();
+    h_Resolution_2D->Draw("box");
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector response for pions");
+
+    canvasResolution->Clear();
+    h_CosThTruthPi->SetLineColor(kRed);
+    h_CosThPi->DrawNormalized();
+    h_CosThTruthPi->DrawNormalized("same");
+    leg->Draw();
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"CosTheta");
+
+    canvasResolution->Clear();
+    h_PResolutionPi->Draw();
+    if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Momentum Resolution");
+
+    canvasResolution->Clear();
+
+    for(int i=0; i<NBINSP; i++) {
+        h_PResPi[i]->Scale(1/h_PResPi[i]->Integral());
+        x[i] = (float)i*reswidth+reswidth/2.;
+        yrms[i] = h_PResPi[i]->GetRMS()/x[i];
+        ymean[i] = h_PResPi[i]->GetMean()/x[i];
+        xe[i] = reswidth/2.;
+        yerms[i] = h_PResPi[i]->GetRMSError()/x[i];
+        yemean[i] = h_PResPi[i]->GetMeanError()/x[i];
+        h_PResPi[i]->Draw();
+        if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+        Belle2Labels(0.1, 0.96, Form( "%.1f < p_{T}(#pi)(GeV) < %.1f", i*0.1, (i+1)*0.1 ) );
+        canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"1/pT in bins of pT");
+    }
+    for(int i=0; i<NBINSP; i++) {
+        h_dzResPi[i]->Draw();
+        if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+        Belle2Labels(0.1, 0.96, Form( "%.1f < p_{T}(#pi)(GeV) < %.1f", i*0.1, (i+1)*0.1 ) );
+        canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"dz");
+    }
+
+    canvasResolution->Clear();
+    canvasResolution->cd()->SetGridy(1);
+    canvasResolution->cd()->SetGridx(1);
+
+    TGraphErrors *graphResolution = new TGraphErrors(NBINSP, x, yrms, xe, yerms);
+    graphResolution->SetName("graphResolution");
+    graphResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction PT resolution of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
+    graphResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+    list->Add(graphResolution);
+    graphResolution->SetFillColor(kBlue);
+    graphResolution->SetMarkerColor(kBlue);
+    graphResolution->Draw("2a");
+    graphResolution->SetMinimum(0.00);
+    graphResolution->SetMaximum(0.03);
+    graphResolution->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
+    graphResolution->GetYaxis()->SetTitle("#sigma(p_{T})/p_{T}");
+    graphResolution->GetXaxis()->SetTitle("p_{T} (#pi) GeV");
+    if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Resolution in bins of pT");
+    canvasResolution->Clear();
+
+    TGraphErrors *graphBias = new TGraphErrors(NBINSP,x,ymean,xe,yemean);
+    graphBias->SetName("graphBias");
+    graphBias->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction pT bias of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
+    graphBias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low pT tracks < 100 MeV exhibit larger relative bias."));
+    list->Add(graphBias);
+    graphBias->SetFillColor(kBlue);
+    graphBias->SetMarkerColor(kBlue);
+    graphBias->Draw("2a");
+    graphBias->SetMinimum(-0.002);
+    graphBias->SetMaximum(0.002);
+    graphBias->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
+    graphBias->GetYaxis()->SetTitle("Mean Bias (Rec-True)/Mean");
+    graphBias->GetXaxis()->SetTitle("p_{T} (#pi) GeV");
+    if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Resolution in bins of pT");
+    canvasResolution->Clear();
+
+    for(int i=0; i<NBINSP; i++) {
+        h_dzResPi[i]->Scale(1/h_dzResPi[i]->Integral());
+        x[i] = (float)i*reswidth+reswidth/2.;
+        yrms[i] = h_dzResPi[i]->GetRMS();
+        xe[i] = reswidth/2.;
+        yerms[i] = h_dzResPi[i]->GetRMSError();
+    }
+
+    //z0 Bias in bins of pT
+    TGraphErrors *graphZResolution = new TGraphErrors(NBINSP, x, yrms, xe, yerms);
+    graphZResolution->SetName("graphZResolution");
+    graphZResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction dz of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
+    graphZResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+    list->Add(graphZResolution);
+    graphZResolution->SetFillColor(kBlue);
+    graphZResolution->SetMarkerColor(kBlue);
+    graphZResolution->Draw("2a");
+    graphZResolution->SetMinimum(0.00);
+    graphZResolution->SetMaximum(250);
+    graphZResolution->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
+    graphZResolution->GetYaxis()->SetTitle("#sigma(z)");
+    graphZResolution->GetXaxis()->SetTitle("p_{T}(#pi) GeV");
+    if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"z Resolution in bins of pT");
+    canvasResolution->Clear();
+
+    TFile* output = new TFile(Form("test2_Validation_Resolution_output.root"), "update");
+    TDirectory* dir = output->mkdir("Tracks");
+    dir->cd();
+    list->Write();
+    output->Close();
 }
 
+void photon_plots(bool runOffline) {
+    TString infile (Form( "../GenericB.ntup.root" ) );
+    TChain* recoTree = new TChain("gammatuple");
+    recoTree->AddFile(infile);
+    TH1F* h_PGamm[ECL];
+    TH1F* h_PTruthGamm[ECL];
+    TH1F* h_PResolutionGamm[ECL];
+    TH1F* h_EResGamm[ECL][NBINSP];
+    TH2F* h_Resolution_2D[ECL];
+    //Energy
+    TList* list = new TList;
+    for( int i=0; i<ECL; i++ ) {
+        h_PGamm[i]= new TH1F(Form("PGamm_%s",regions[i]), ";E(#gamma) GeV;N", NBINSP, MINP, MAXP);
+        list->Add( h_PGamm[i] );
+        h_PTruthGamm[i]= new TH1F(Form("PTruthGamm_%s",regions[i]), ";E(#gamma) truth GeV;N", NBINSP, MINP, MAXP);
+        list->Add( h_PTruthGamm[i] );
+        h_PResolutionGamm[i]= new TH1F(Form("PResolutionGamm_%s",regions[i]), ";#sigma(E)/E;N", 50, -2, 1);
+        list->Add( h_PResolutionGamm[i] );
 
-void test2_Validation_Resolution_Photons(TString testfile,bool runOffline){
-  
-  TChain * recoTree = new TChain("gammatuple");
-  recoTree->AddFile(testfile);
-  TH1F * h_Resolution[NRESBINS];
-  for(int i=0;i<NRESBINS;i++)h_Resolution[i]= new TH1F(Form("Resolution%d",i), ";E(#gamma) Rec-Truth;" ,100,-0.1,0.04);
-  TH2F * h_Resolution_2D = new TH2F("Resolution2D", ";E(#gamma) Rec GeV;E(#gamma) Truth GeV"     ,100,0.,3.0,100,0.,3.0);
-  TH2F * h_Resolutionb   = new TH2F("Resolutionb" ,";E (#gamma) GeV;#sigma(E)/E"           ,npgbins,plow,pghigh,10,0., .25);
-  TH2F * h_Resolutionc   = new TH2F("Resolutionc" ,";E (#gamma) GeV;Mean Bias (Rec-Truth)/Mean"  ,npgbins,plow,pghigh,10,-0.1, 0.0);
-
-  
-  float fgamma_TruthP;  
-  float fgamma_P;  
-  int igamma_mcPDG;  
-  
-  recoTree->SetBranchAddress("gamma_mcPDG", &igamma_mcPDG);  
-  recoTree->SetBranchAddress("gamma_TruthP", &fgamma_TruthP);  
-  recoTree->SetBranchAddress("gamma_P",      &fgamma_P);  
-  
-  for(Int_t iloop=0;iloop<recoTree->GetEntries();iloop++) {
-    
-    recoTree->GetEntry(iloop);
-    int pdgid=abs(igamma_mcPDG);
-    if(pdgid==22){
-      for(int i=0;i<NRESBINS;i++)if(fgamma_TruthP>=i*reswidth && fgamma_TruthP<(i+1)*reswidth)h_Resolution[i]->Fill((fgamma_P-fgamma_TruthP));
-      h_Resolution_2D->Fill(fgamma_P,fgamma_TruthP);
+        for(int j=0; j<NBINSP; j++) {
+            h_EResGamm[i][j]= new TH1F(Form("EResGamm_%s_%d",regions[i],j), ";E(#gamma) Rec-Truth;N", 100, -0.35, 0.15);
+            list->Add( h_EResGamm[i][j] );
+        }
+        h_Resolution_2D[i] = new TH2F(Form("Resolution_2D_%s",regions[i]), ";E(#gamma) Rec GeV;E(#gamma) Truth GeV", NBINSP, MINP, MAXP, NBINSP, MINP, MAXP);
+        list->Add( h_Resolution_2D[i] );
     }
-  }
 
+    Float_t gamma_P;
+    Float_t gamma_P4[4];
+    Int_t   gamma_mcPDG;
+    Float_t gamma_TruthP;
+    Float_t gamma_TruthP4[4];
 
-  
-  TCanvas *tc = new TCanvas ("tc","tcReco");
-  tc->Divide(2,2);
-  for(int i=0;i<NRESBINS;i++){
-    tc->cd(i%4+1);
-    h_Resolution[i]->Draw();
-    cout<<h_Resolution[i]->GetMean()<<" "<<h_Resolution[i]->GetRMS()<<endl;
-    if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-    if((i+1)%4==0)  tc->Print("resolution.pdf",Form("Title: Photon energy resolution %d",(i+1)/4));
-  }
-  
-  double xpoints[NRESBINS], ypoints[NRESBINS], xepoints[NRESBINS], yepoints[NRESBINS];
+    recoTree->SetBranchAddress("gamma_P", &gamma_P);
+    recoTree->SetBranchAddress("gamma_P4", gamma_P4);
+    recoTree->SetBranchAddress("gamma_mcPDG", &gamma_mcPDG);
+    recoTree->SetBranchAddress("gamma_TruthP", &gamma_TruthP);
+    recoTree->SetBranchAddress("gamma_TruthP4", gamma_TruthP4);
 
-  double ypointsmean[NRESBINS],yepointsmean[NRESBINS];
- 
-  for(int ipbin=0;ipbin<NRESBINS;ipbin++){
-    h_Resolution[ipbin]->Scale(1/h_Resolution[ipbin]->Integral());
-    xpoints[ipbin] = (float)ipbin*reswidth+reswidth/2.;
-    ypoints[ipbin] = h_Resolution[ipbin]->GetRMS()/xpoints[ipbin];
-    ypointsmean[ipbin] = h_Resolution[ipbin]->GetMean()/xpoints[ipbin];
-    cout<<"ypoints res "<<ypoints[ipbin]<<endl;
+    int region=0;
+    for(Int_t iloop=0; iloop<recoTree->GetEntries(); iloop++) {
+        recoTree->GetEntry(iloop);
+        TLorentzVector lv_gamma(gamma_TruthP4);
+        if(lv_gamma.Theta()>2.71 || lv_gamma.Theta()<0.21) continue;
+        if((lv_gamma.Theta()<0.58 && lv_gamma.Theta()>=0.21) ) region=1; //forward
+        if((lv_gamma.Theta()<2.23 && lv_gamma.Theta()>=0.58) ) region=2; //barrel
+        if((lv_gamma.Theta()<2.71 && lv_gamma.Theta()>=2.23) ) region=3; //backward
 
-    xepoints[ipbin] = reswidth/2.;
-    yepoints[ipbin] = h_Resolution[ipbin]->GetRMSError()/xpoints[ipbin];
-    yepointsmean[ipbin] = h_Resolution[ipbin]->GetMeanError()/xpoints[ipbin];
-  }
-  tc->Clear();
-  // tc->cd()->SetLogy(1);
-  tc->cd()->SetGridy(1);
-  tc->cd()->SetGridx(1);
-  TGraphErrors *tg = new TGraphErrors(NRESBINS,xpoints,ypoints,xepoints,yepoints);
-  h_Resolutionb->SetMinimum(0.00001);
-  h_Resolutionb->Draw();
-  tc->Update();
-  tg->SetMinimum(0.0001);
-  tg->SetFillColor(kBlue);
-  tg->SetMarkerColor(kBlue);
-  tg->SetMarkerStyle(21);
-  tg->Draw("2p");
-  tc->Update();
-  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-  tc->Print("resolution.pdf","Title: Detector resolution for photons");
-  
-  tc->Clear();
-  tc->cd()->SetLogy(0);
+        if(abs(gamma_mcPDG)==pid[photon]) {
+            float pBias = (gamma_P-gamma_TruthP)/gamma_TruthP;
+            int p_bin = find_bin( gamma_P );
 
-  TGraphErrors *tg2 = new TGraphErrors(NRESBINS,xpoints,ypointsmean,xepoints,yepointsmean);
-  h_Resolutionc->Draw();
-  tg2->SetFillColor(kBlue);
-  tg2->Draw("2");
-  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-  tc->Print("resolution.pdf","Title: Detector resolution for photons");
+            h_PGamm[0]->Fill(gamma_P);
+            h_PGamm[region]->Fill(gamma_P);
+            h_PTruthGamm[0]->Fill(gamma_TruthP);
+            h_PTruthGamm[region]->Fill(gamma_TruthP);
+            h_PResolutionGamm[0]->Fill(pBias);
+            h_PResolutionGamm[region]->Fill(pBias);
 
+            h_EResGamm[0][p_bin]->Fill(gamma_P-gamma_TruthP);
+            h_EResGamm[region][p_bin]->Fill(gamma_P-gamma_TruthP);
+            h_Resolution_2D[0]->Fill(gamma_P, gamma_TruthP);
+            h_Resolution_2D[region]->Fill(gamma_P, gamma_TruthP);
+        }
+    }
+    canvasResolution->Divide(2,2);
+    for( int i=0; i<ECL; i++ ) {
+        h_PTruthGamm[i]->SetLineColor(kRed);
 
-  tc->Clear();
-  h_Resolution_2D->Draw("box");
-  if(runOffline)BELLE2Label(0.4,0.9,"Simulation (Preliminary)");
-  tc->Print("resolution.pdf","Title: Detector response for photons");
-  
-  ////////////////////////////
+        TLegend* leg = new TLegend(0.3,0.2,0.5,0.35);
+        leg->SetFillColor(0);
+        leg->AddEntry(h_PTruthGamm[i],"Truth","l");
+        leg->AddEntry(h_PGamm[i],"Reco","l");
 
-  TFile* output = new TFile("ResolutionValidationPhotons.root", "recreate");
+        canvasResolution->cd(i+1);
+        h_PGamm[i]->DrawNormalized("");
+        h_PTruthGamm[i]->DrawNormalized("same");
+        Belle2Labels(0.1, 0.96, Form( "ECL: %s", regions[i] ) );
+        if(i==0)    leg->Draw();
+    }
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"), Form("Photon energy"));
 
-  //Resolution in bins of E
-  TH1F * h_outputResolution   = new TH1F("outputResolutionb" ,";E (#gamma) GeV;#sigma(E)/sqrt(E)" ,npgbins,plow,pghigh);
-  h_outputResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction resolution of truth-matched photons in bins of true energy. Sigma is determined from getRMS. A Generic BBbar sample is used."));
-  h_outputResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Broad at low energy, flattens to <0.2 after E>0.2 GeV"));
+    for(int j=0; j<NBINSP; j++) {
+        for( int i=0; i<ECL; i++ ) {
+            //------------------------------------------------------------------------------
+            // This is only to find weird peaks in the resolution plots
+            // I found peaks for Ereco=0 and no BG
+            // All events in the peaks have:
+            // - flag "SeenInECL"==1
+            // - TruthP<0.2
+            // - P<0.05
+            //------------------------------------------------------------------------------
+            //TSpectrum *s = new TSpectrum(5);
+            //Int_t nfound = s->Search(h_EResGamm[i][j],2,"new");
+            //Float_t *xpeaks = s->GetPositionX();
+            //for( int n=0; n<nfound; n++ )   cout << xpeaks[n] << "\t";
+            //cout << endl;
+            //------------------------------------------------------------------------------
+            canvasResolution->cd(i+1);
+            h_EResGamm[i][j]->Draw("histo");
+            if(i==0)Belle2Labels(0.3, 0.96, Form( "ECL: %s %10.1f < E(#gamma) GeV < %.1f",regions[i], j*0.1, (j+1)*0.1 ) );
+            else Belle2Labels(0.3, 0.96, Form( "ECL: %s",regions[i] ) );
+        }
+        if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
+        canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"), Form("Photon energy resolution %d", j));
+    }
+    for( int i=0; i<ECL; i++ ) {
+        canvasResolution->cd(i+1);
+        h_Resolution_2D[i]->Draw("box");
+        Belle2Labels(0.3, 0.96, Form( "ECL: %s", regions[i] ) );
+    }
+    if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector response for photons");
 
-  for(int i=0;i<npgbins;i++){
-    double tgx, tgy, tgye;
-    tg->GetPoint(i,tgx,tgy);
-    tgye=tg->GetErrorY(i);
-    h_outputResolution->SetBinContent(i+1,tgy);
-    h_outputResolution->SetBinError(i+1,tgye);
-  }
+    canvasResolution->Clear();
+    canvasResolution->SetGridx(1);
+    canvasResolution->SetGridy(1);
+    for( int i=0; i<ECL; i++ ) {
+        for(int j=0; j<NBINSP; j++) {
+            h_EResGamm[i][j]->Scale(1/h_EResGamm[i][j]->Integral());
+            x[j] = (float)j*reswidth+reswidth/2.;
+            yrms[j]  = h_EResGamm[i][j]->GetRMS()/x[j];
+            ymean[j] = h_EResGamm[i][j]->GetMean()/x[j];
 
-  //Bias in bins of pT
+            xe[j] = reswidth/2.;
+            yerms[j]  = h_EResGamm[i][j]->GetRMSError()/x[j];
+            yemean[j] = h_EResGamm[i][j]->GetMeanError()/x[j];
+        }
 
-  TH1F * h_outputBias   = new TH1F("outputBiasb" ,";E (#gamma) GeV;Mean Bias (Rec-True)/Mean"   ,npgbins,plow,phigh);
-  h_outputBias->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction Energy bias of truth-matched photons in bins of true energy. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
-  h_outputBias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low E tracks < 200 MeV exhibit larger relative bias up to 10%."));
+        TGraphErrors *graphResolution = new TGraphErrors(NBINSP, x, yrms, xe, yerms);
+        graphResolution->SetName(Form("graphResolution_%s",regions[i]));
+        graphResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction resolution of truth-matched photons in bins of true energy. Sigma is determined from getRMS. A Generic BBbar sample is used."));
+        graphResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Broad at low energy, flattens to <0.2 after E>0.2 GeV"));
+        list->Add(graphResolution);
+        graphResolution->SetFillColor(kBlue);
+        graphResolution->SetMarkerColor(kBlue);
 
-  for(int i=0;i<npgbins;i++){
-    double tgx, tgy, tgye;
-    tg2->GetPoint(i,tgx,tgy);
-    tgye=tg2->GetErrorY(i);
-    h_outputBias->SetBinContent(i+1,tgy);
-    h_outputBias->SetBinError(i+1,tgye);
-  }
+        TH1 *frame = canvasResolution->DrawFrame(h_PGamm[i]->GetBinLowEdge(1),0.0,
+                     h_PGamm[i]->GetBinLowEdge(h_PGamm[i]->GetNbinsX()+1),0.4);
+        frame->GetYaxis()->SetTitle("#sigma(E)/E");
+        frame->GetXaxis()->SetTitle("E (#gamma) GeV");
+        graphResolution->Draw("2");
+        if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
+        canvasResolution->Update();
+        canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector resolution for photons");
 
+        TGraphErrors *graphBias = new TGraphErrors(NBINSP, x, ymean, xe, yemean);
+        graphBias->SetName(Form("graphBias_%s",regions[i]));
+        graphBias->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction Energy bias of truth-matched photons in bins of true energy. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
+        graphBias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low E tracks < 200 MeV exhibit larger relative bias up to 10%."));
+        list->Add(graphBias);
+        graphBias->SetFillColor(kBlue);
 
-  output->Write();
-  output->Close();
+        frame = canvasResolution->DrawFrame(h_PGamm[i]->GetBinLowEdge(1),-0.5,
+                                            h_PGamm[i]->GetBinLowEdge(h_PGamm[i]->GetNbinsX()+1),0.1);
+        frame->GetYaxis()->SetTitle("Mean Bias (Rec-Truth)/Mean");
+        frame->GetXaxis()->SetTitle("E (#gamma) GeV");
+        graphBias->Draw("2");
+        if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
+        canvasResolution->Update();
+        canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector resolution for photons");
+    }
+
+    ////////////////////////////
+    TFile* output = new TFile(Form("test2_Validation_Resolution_output.root"), "update");
+    TDirectory* dir = output->mkdir("Photons");
+    dir->cd();
+    list->Write();
+
+    output->Close();
+}
+
+void test2_Validation_Resolution(bool runOffline=false) {
+    gErrorIgnoreLevel = kError;
+
+    TFile* output = new TFile(Form("test2_Validation_Resolution_output.root"), "recreate");
+    output->Close();
+
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf["));
+    pi_plots(runOffline);
+    photon_plots(runOffline);
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf]"));
 }

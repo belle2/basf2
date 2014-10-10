@@ -37,7 +37,8 @@ tools = [
     'MCHierarchy',
     'B0 -> [K*0 -> ^K+ ^pi-] ^gamma',
     'PID',
-    'B0 -> [K*0 -> ^K+ ^pi-] gamma']
+    'B0 -> [K*0 -> ^K+ ^pi-] gamma',
+    ]
 
 ntupleTree('Bd_Kstgamma_tuple', 'B0', tools)
 
@@ -51,7 +52,8 @@ eventtools = [
     'DetectorStatsRec',
     'B-',
     'DetectorStatsSim',
-    'B-']
+    'B-',
+    ]
 
 ntupleTree('eventtuple', '', eventtools)
 
@@ -62,3 +64,4 @@ process(analysis_main)
 
 # ----> Print call statistics
 print statistics
+

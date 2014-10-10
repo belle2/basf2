@@ -24,13 +24,13 @@ REG_MODULE(BestCandidateSelection)
 BestCandidateSelectionModule::BestCandidateSelectionModule():
   m_variable(nullptr)
 {
-  setDescription("Selects Particles with the highest values of 'variable' in the input list and removes all other particles from the list. The remaining list is sorted from best to worst candidate.");
+  setDescription("Selects Particles with the highest values of 'variable' in the input list and removes all other particles from the list. The remaining list is sorted from best to worst candidate (each charge, e.g. B+/B-, separately).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("particleList", m_inputListName, "Name of the ParticleList to reduce to the best candidates");
   addParam("variable", m_variableName, "Variable which defines the candidate ranking (see selectLowest for ordering)");
   addParam("selectLowest", m_selectLowest, "Candidate with lower value are better (default: higher is better))", false);
-  addParam("numBest", m_numBest, "Keep this many of the best candidates (0: keep all)", 1);
+  addParam("numBest", m_numBest, "Keep this many of the best candidates (0: keep all)", 0);
 
 }
 

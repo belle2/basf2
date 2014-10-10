@@ -169,6 +169,10 @@ def add_reconstruction(path, components=None):
         trackfitter = register_module('GenFitter')
         path.add_module(trackfitter)
 
+        # V0 finding
+        v0finder = register_module('V0Finder')
+        path.add_module(v0finder)
+
         # dE/dx PID
         dEdxPID = register_module('DedxPID')
         dEdxPID.param('useSVD', use_vxd)

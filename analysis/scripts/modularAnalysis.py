@@ -368,6 +368,61 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def rankByHighest(
+    particleList,
+    variable,
+    numBest=0,
+    path=analysis_main,
+    ):
+    """
+    Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
+    in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
+    (each charge, e.g. B+/B-, separately).
+    This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
+    a non-zero value for 'numBest'.
+
+    @param particleList  The input ParticleList
+    @param variable      Variable to order Particles by.
+    @param numBest       If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
+    @param path          modules are added to this path
+    """
+
+    bcs = register_module('BestCandidateSelection')
+    bcs.set_name('BestCandidateSelection_' + particleList + '_' + variable)
+    bcs.param('particleList', particleList)
+    bcs.param('variable', variable)
+    bcs.param('numBest', numBest)
+    path.add_module(bcs)
+
+
+def rankByLowest(
+    particleList,
+    variable,
+    numBest=0,
+    path=analysis_main,
+    ):
+    """
+    Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
+    in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
+    (each charge, e.g. B+/B-, separately).
+    This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
+    a non-zero value for 'numBest'.
+
+    @param particleList  The input ParticleList
+    @param variable      Variable to order Particles by.
+    @param numBest       If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
+    @param path          modules are added to this path
+    """
+
+    bcs = register_module('BestCandidateSelection')
+    bcs.set_name('BestCandidateSelection_' + particleList + '_' + variable)
+    bcs.param('particleList', particleList)
+    bcs.param('variable', variable)
+    bcs.param('numBest', numBest)
+    bcs.param('selectLowest', True)
+    path.add_module(bcs)
+
+
 def trainTMVAMethod(
     decayString,
     variables,

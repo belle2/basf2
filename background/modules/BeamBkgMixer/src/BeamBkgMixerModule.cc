@@ -76,9 +76,8 @@ namespace Belle2 {
     addParam("maxTime", m_maxTime,
              "Time window upper edge in nano seconds", 800.0);
     addParam("scaleFactors", m_scaleFactors,
-             "Factors to scale rates of backgrounds. Possible tag names: "
-             "Coulomb_LER, Coulomb_HER, RBB_LER, RBB_HER, Touschek_LER, "
-             "Touschek_HER, twoPhoton, other ",
+             "Factors to scale rates of backgrounds. "
+             "Possible tag names: " + m_bgTypes.getBGTypes(),
              m_scaleFactors);
     addParam("components", m_components,
              "Detector components to be included, empty list means all components",
@@ -190,6 +189,9 @@ namespace Belle2 {
 
     for (auto scaleFactor : m_scaleFactors) {
       std::string type = std::get<0>(scaleFactor);
+      if (m_bgTypes.getTag(type) == 0)
+        B2ERROR("Unknown beam background type found in 'scaleFactors': " << type << "\n"
+                "Possible are: " + m_bgTypes.getBGTypes());
       for (auto & bkg : m_backgrounds) {
         if (type == bkg.type)
           bkg.scaleFactor =  std::get<1>(scaleFactor);

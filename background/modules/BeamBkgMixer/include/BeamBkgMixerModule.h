@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <simulation/dataobjects/SimHitBase.h>
+#include <simulation/background/BeamBGTypes.h>
 #include <string>
 
 #include "TFile.h"
@@ -201,6 +202,8 @@ namespace Belle2 {
     bool m_ECL; /**< true if found in m_components */
     bool m_BKLM; /**< true if found in m_components */
     bool m_EKLM; /**< true if found in m_components */
+
+    background::BeamBGTypes m_bgTypes;  /**< defined BG types */
 
   };
 

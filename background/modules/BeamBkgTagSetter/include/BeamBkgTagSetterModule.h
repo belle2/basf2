@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <simulation/dataobjects/SimHitBase.h>
+#include <simulation/background/BeamBGTypes.h>
 #include <string>
 
 namespace Belle2 {
@@ -72,10 +73,11 @@ namespace Belle2 {
 
   private:
 
-    std::string m_backgroundType; /**< beam background type */
+    std::string m_backgroundType; /**< BG type */
     double m_realTime; /**< real time that corresponds to beam background sample */
 
-    SimHitBase::BG_TAG m_backgroundTag; /**< background tag to set */
+    background::BeamBGTypes m_bgTypes;  /**< defined BG types */
+    SimHitBase::BG_TAG m_backgroundTag; /**< background tag to set (from BG type) */
 
     /**
      * functions that set background tag in SimHits

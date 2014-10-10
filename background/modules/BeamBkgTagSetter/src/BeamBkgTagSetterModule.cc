@@ -10,7 +10,6 @@
 
 // Own include
 #include <background/modules/BeamBkgTagSetter/BeamBkgTagSetterModule.h>
-
 #include <framework/core/ModuleManager.h>
 
 // framework - DataStore
@@ -58,12 +57,16 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Sets beam background tag variable in SimHits; returns true if at least one of the SimHit store arrays has entries. Return value can be used to discard empty events at output.");
+    setDescription("Sets beam background tag variable in SimHits; "
+                   "returns true if at least one of the SimHit store arrays "
+                   "has entries. Return value can be used to discard empty "
+                   "events at output.");
 
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("backgroundType", m_backgroundType, "one of: Coulomb_LER, Coulomb_HER, RBB_LER, RBB_HER, Touschek_LER, Touschek_HER, twoPhoton, other");
+    addParam("backgroundType", m_backgroundType,
+             "one of: " + m_bgTypes.getBGTypes());
     addParam("realTime", m_realTime,
              "real time in nano seconds that corresponds to background samle");
 
@@ -77,21 +80,10 @@ namespace Belle2 {
   {
     if (m_realTime <= 0) B2FATAL("invalid realTime: " << m_realTime);
 
-    std::unordered_map<std::string, SimHitBase::BG_TAG> tag;
-    tag["Coulomb_LER"] = SimHitBase::bg_Coulomb_LER;
-    tag["Coulomb_HER"] = SimHitBase::bg_Coulomb_HER;
-    tag["RBB_LER"] = SimHitBase::bg_RBB_LER;
-    tag["RBB_HER"] = SimHitBase::bg_RBB_HER;
-    tag["Touschek_LER"] = SimHitBase::bg_Touschek_LER;
-    tag["Touschek_HER"] = SimHitBase::bg_Touschek_HER;
-    tag["twoPhoton"] = SimHitBase::bg_twoPhoton;
-    tag["other"] = SimHitBase::bg_other;
-
-    m_backgroundTag = tag[m_backgroundType];
-
+    m_backgroundTag = m_bgTypes.getTag(m_backgroundType);
     if (m_backgroundTag == 0) {
-      B2WARNING("Unknown beam background: " << m_backgroundType <<
-                ", will be tagged as SimHitBase::bg_other");
+      B2ERROR("Unknown beam background type: " << m_backgroundType << "\n"
+              "Possible are: " + m_bgTypes.getBGTypes());
       m_backgroundTag = SimHitBase::bg_other;
     }
 

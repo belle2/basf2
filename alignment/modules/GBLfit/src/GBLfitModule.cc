@@ -149,13 +149,7 @@ GBLfitModule::~GBLfitModule()
 
 void GBLfitModule::initialize()
 {
-  //file = new TFile("test.root","recreate");
-  //hist = new TH1F("pvalue", "pvalue", 100, 0., 1.);
-  //chi2 = new TH1F("chi2", "chi2", 100, 0., 40.);
-  //chi2ondf = new TH1F("chi2ondf", "chi2/ndf", 100, 0., 10.);
-
-
-
+  /*
   StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
 
   StoreArray<Track>::registerPersistent();
@@ -169,11 +163,31 @@ void GBLfitModule::initialize()
     //TODO: implementation might also need different name for TrackFitResults?
   }
 
-  RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
+  StoreArray::registerRelationTo<StoreArray<genfit::Track> >(MCParticles);
   RelationArray::registerPersistent<MCParticle, Track> ();
   RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
+  */
+
+  StoreArray<Track> tracks;
+  StoreArray<TrackFitResult> trackfitresults;
+  StoreArray < genfit::Track > gf2tracks;
+  StoreArray < genfit::TrackCand > trackcands(m_gfTrackCandsColName);
+  StoreArray<MCParticle> mcparticles;
+
+  trackcands.isRequired();
+
+  tracks.registerPersistent();
+  trackfitresults.registerPersistent();
+  gf2tracks.registerPersistent();
+  trackcands.registerPersistent();
+
+  gf2tracks.registerRelationTo(mcparticles);
+  mcparticles.registerRelationTo(tracks);
+  gf2tracks.registerRelationTo(trackfitresults);
+  trackcands.registerRelationTo(trackfitresults);
+  trackcands.registerRelationTo(gf2tracks);
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2WARNING("Material effects not set up, doing this myself with default values.");
@@ -463,8 +477,7 @@ void GBLfitModule::event()
         }
       }
 
-      //B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ", Tel: " << nTel << ")");
-      B2DEBUG(99, "            (SVD: " << nSVD << ", PXD: " << nPXD << ", Tel: " << nTel << ")");
+      B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ", Tel: " << nTel << ")");
 
       if (aTrackCandPointer->getNHits() < 3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
         B2WARNING("GBLfit: only " << aTrackCandPointer->getNHits() << " were assigned to the Track! This Track will not be fitted!");
@@ -472,47 +485,50 @@ void GBLfitModule::event()
         continue;
       }
 
+      // SVD cluster combination ------------------------------------------------------------------------------------------------
+      if (m_useClusters) {
+        try {
+          genfit::PlanarMeasurement* planarMeas1(NULL);
+          genfit::PlanarMeasurement* planarMeas2(NULL);
+          for (unsigned int i = 0; i < gfTrack.getNumPoints() - 1; ++i) {
+            //if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 1)
+            //  continue;
+            planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i)->getRawMeasurement(0));
+            planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i + 1)->getRawMeasurement(0));
 
-      try {
-        // Now combine SVDRecoHits if any (they are already placed at the same track point - by genfit::Track constructor)
-        genfit::PlanarMeasurement* planarMeas1(NULL);
-        genfit::PlanarMeasurement* planarMeas2(NULL);
-        for (unsigned int i = 0; i < gfTrack.getNumPoints(); ++i) {
-          if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 2)
-            continue;
-          planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i)->getRawMeasurement(0));
-          planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i)->getRawMeasurement(1));
-
-          if (planarMeas1 != NULL && planarMeas2 != NULL &&
-              planarMeas1->getDetId() == planarMeas2->getDetId() &&
-              planarMeas1->getPlaneId() != -1 &&   // -1 is default plane id
-              planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
-            Belle2::SVDRecoHit* hit1 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas1);
-            Belle2::SVDRecoHit* hit2 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas2);
-            Belle2::SVDRecoHit* hitU(NULL);
-            Belle2::SVDRecoHit* hitV(NULL);
-            if (hit1 && hit2) {
-              // We have to decide U/V now (else SVDRecoHit2D could throw FATAL)
-              if (hit1->isU() && !hit2->isU()) {
-                hitU = hit1;
-                hitV = hit2;
-              } else if (!hit1->isU() && hit2->isU()) {
-                hitU = hit2;
-                hitV = hit1;
-              } else {
-                continue;
+            if (planarMeas1 != NULL && planarMeas2 != NULL &&
+                planarMeas1->getDetId() == planarMeas2->getDetId() &&
+                planarMeas1->getPlaneId() != -1 &&   // -1 is default plane id
+                planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
+              Belle2::SVDRecoHit* hit1 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas1);
+              Belle2::SVDRecoHit* hit2 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas2);
+              Belle2::SVDRecoHit* hitU(NULL);
+              Belle2::SVDRecoHit* hitV(NULL);
+              if (hit1 && hit2) {
+                // We have to decide U/V now (else SVDRecoHit2D could throw FATAL)
+                if (hit1->isU() && !hit2->isU()) {
+                  hitU = hit1;
+                  hitV = hit2;
+                } else if (!hit1->isU() && hit2->isU()) {
+                  hitU = hit2;
+                  hitV = hit1;
+                } else {
+                  continue;
+                }
+                Belle2::SVDRecoHit2D* hit = new Belle2::SVDRecoHit2D(*hitU, *hitV);
+                // insert measurement before point i (increases number of currect point to i+1)
+                gfTrack.insertMeasurement(hit, i);
+                // now delete current point (at its original place, we have the new 2D recohit)
+                gfTrack.deletePoint(i + 1);
+                gfTrack.deletePoint(i + 1);
               }
-              Belle2::SVDRecoHit2D* hit = new Belle2::SVDRecoHit2D(*hitU, *hitV);
-              // insert measurement before point i (increases number of currect point to i+1)
-              gfTrack.insertMeasurement(hit, i);
-              // now delete current point (at its original place, we have the new 2D recohit)
-              gfTrack.deletePoint(i + 1);
             }
           }
+        } catch (...) {
+          B2FATAL("Hit combination of SVD clusters in genfit::Track failed.");
         }
-      } catch (...) {
-        B2FATAL("Hit combination of SVD clusters in genfit::Track failed.");
       }
+      // end of SVD cluster combination -------------------------------------------------------------------------------------
 
       /*
       //now fit the track

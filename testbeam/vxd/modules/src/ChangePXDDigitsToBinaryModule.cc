@@ -47,7 +47,7 @@ void ChangePXDDigitsToBinaryModule::initialize()
 {
   StoreArray<PXDDigit> PXDDigits(m_storeDigitsName);
   PXDDigits.isRequired();
-  PXDDigits.registerAsPersistent();
+  PXDDigits.registerInDataStore();
   // Store actuall name of the collection
   m_storeDigitsName = PXDDigits.getName();
   // Convert string representation of ids into VxdIDs

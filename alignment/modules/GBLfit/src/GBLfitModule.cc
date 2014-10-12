@@ -133,7 +133,7 @@ GBLfitModule::GBLfitModule() :
   addParam("resortHits", m_resortHits, "GBL: Sort hits by extrapolation before fit. Turn on if you see a lot of 'Extrapolation stepped back by ...' errors. The candidates should be already sorted!", bool(true));
   addParam("recalcJacobians", m_recalcJacobians, "GBL: Recalculate Jacobians/planes: 0=do not recalc, 1=after 1st fit, 2=1 & after 2nd fit, etc. Use '1' for 1 iteration + output to mille or if iteration>=2 ", int(0));
 
-  addParam("useOldGbl", m_useOldGbl, "GBL: Use old GBL interface ", bool(true));
+  addParam("useOldGbl", m_useOldGbl, "GBL: Use old GBL interface ", bool(false));
 
 
   m_failedFitCounter = 0;

@@ -83,7 +83,6 @@ REG_MODULE(GenFitterVXDTB)
 GenFitterVXDTBModule::GenFitterVXDTBModule() :
   Module()
 {
-
   setDescription(
     "Uses GenFit2 to fit tracks with support for EUDET telescopes. Needs genfit::TrackCands as input and provides genfit::Tracks and Tracks as output.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -142,7 +141,7 @@ void GenFitterVXDTBModule::initialize()
 
   m_failedGFTrackCandFitCounter = 0;
   m_successfulGFTrackCandFitCounter = 0;
-
+  /*
   StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
 
   StoreArray<Track>::registerPersistent();
@@ -150,17 +149,36 @@ void GenFitterVXDTBModule::initialize()
   StoreArray < genfit::Track >::registerPersistent(m_gfTracksColName);
   StoreArray < genfit::TrackCand >::registerPersistent();
 
-  if (!m_tracksColName.empty() and m_tracksColName != "Tracks") {
-    B2ERROR("Setting a collection name with TracksColName is not implemented.");
-    //TODO: implementation might also need different name for TrackFitResults?
-  }
-
   RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
   RelationArray::registerPersistent<MCParticle, Track> ();
   RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
+  */
 
+  if (!m_tracksColName.empty() and m_tracksColName != "Tracks") {
+    B2ERROR("Setting a collection name with TracksColName is not implemented.");
+    //TODO: implementation might also need different name for TrackFitResults?
+  }
+
+  StoreArray<Track> tracks;
+  StoreArray<TrackFitResult> trackfitresults;
+  StoreArray < genfit::Track > gf2tracks;
+  StoreArray < genfit::TrackCand > trackcands(m_gfTrackCandsColName);
+  StoreArray<MCParticle> mcparticles;
+
+  trackcands.isRequired();
+
+  tracks.registerPersistent();
+  trackfitresults.registerPersistent();
+  gf2tracks.registerPersistent();
+  trackcands.registerPersistent();
+
+  gf2tracks.registerRelationTo(mcparticles);
+  mcparticles.registerRelationTo(tracks);
+  gf2tracks.registerRelationTo(trackfitresults);
+  trackcands.registerRelationTo(trackfitresults);
+  trackcands.registerRelationTo(gf2tracks);
 
   if (m_createTextFile) {
     HelixParam.open("HelixParam.txt");

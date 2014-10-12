@@ -77,7 +77,7 @@ void TelClusterizerModule::initialize()
   StoreArray<TelTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  storeClusters.registerAsPersistent();
+  storeClusters.registerInDataStore();
   storeDigits.required();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
@@ -88,14 +88,14 @@ void TelClusterizerModule::initialize()
   RelationArray relDigitMCParticles(storeDigits, storeMCParticles);
   RelationArray relDigitTrueHits(storeDigits, storeTrueHits);
 
-  relClusterDigits.registerAsPersistent();
+  relClusterDigits.registerInDataStore();
   //Relations to Simulation objects are only needed if the parent one already
   //exists
   if (relDigitTrueHits.isOptional()) {
-    relClusterTrueHits.registerAsPersistent();
+    relClusterTrueHits.registerInDataStore();
   }
   if (relDigitMCParticles.isOptional()) {
-    relClusterMCParticles.registerAsPersistent();
+    relClusterMCParticles.registerInDataStore();
   }
 
   //Now save all names to speed creation later, mainly if they had default names

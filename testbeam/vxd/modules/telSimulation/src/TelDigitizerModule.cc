@@ -71,7 +71,7 @@ void TelDigitizerModule::initialize()
   StoreArray<TelSimHit> storeSimHits("");
   StoreArray<TelTrueHit> storeTrueHits("");
 
-  storeDigits.registerAsPersistent();
+  storeDigits.registerInDataStore();
   /* This always makes problems.
   storeMCParticles.required();
   storeSimHits.required();
@@ -83,8 +83,8 @@ void TelDigitizerModule::initialize()
   RelationArray relTrueHitsToSimHits(storeTrueHits, storeSimHits);
   RelationArray relMCParticlesToSimHits(storeMCParticles, storeSimHits);
 
-  relDigitsToMCParticles.registerAsPersistent();
-  relDigitsToTrueHits.registerAsPersistent();
+  relDigitsToMCParticles.registerInDataStore();
+  relDigitsToTrueHits.registerInDataStore();
 
   // Save names for easy retrieval
   m_storeMCParticlesName = storeMCParticles.getName();

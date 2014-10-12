@@ -102,12 +102,14 @@ TrackFinderMCVXDTBModule::~TrackFinderMCVXDTBModule()
 
 void TrackFinderMCVXDTBModule::initialize()
 {
-  StoreArray<MCParticle>::required();
+  StoreArray<MCParticle> mcpartcles;
+  mcpartcles.isRequired();
 
   //output store arrays have to be registered in initialize()
-  StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand> trackcands(m_gfTrackCandsColName);
+  trackcands.registerPersistent(m_gfTrackCandsColName);
 
-  RelationArray::registerPersistent<genfit::TrackCand, MCParticle>(m_gfTrackCandsColName, "");
+  trackcands.registerRelationTo(mcpartcles);
 
   // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
   m_particleProperties = 0;

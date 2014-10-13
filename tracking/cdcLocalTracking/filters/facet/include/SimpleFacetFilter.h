@@ -12,12 +12,12 @@
 #define SIMPLEFACETFILTER_H_
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
     /// Filter for the constuction of good facets based on simple criterions.
-    class SimpleFacetFilter : public UsedTObject {
+    class SimpleFacetFilter : public SwitchableRootificationBase {
 
     public:
       /// Constructor using default direction of flight deviation cut off.
@@ -43,7 +43,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make SimpleFacetFilter a ROOT class.
-      ClassDefInCDCLocalTracking(SimpleFacetFilter, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(SimpleFacetFilter, 1);
 
     }; // end class SimpleFacetFilter
   } //end namespace CDCLocalTracking

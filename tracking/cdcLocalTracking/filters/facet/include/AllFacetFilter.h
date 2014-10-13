@@ -12,13 +12,13 @@
 #define ALLFACETFILTER_H_
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Filter for the constuction of good facets based on simple criterions.
-    class AllFacetFilter : public UsedTObject {
+    class AllFacetFilter : public SwitchableRootificationBase {
 
 
 
@@ -41,7 +41,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make AllFacetFilter a ROOT class.
-      ClassDefInCDCLocalTracking(AllFacetFilter, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(AllFacetFilter, 1);
 
 
     }; //end class AllFacetFilter

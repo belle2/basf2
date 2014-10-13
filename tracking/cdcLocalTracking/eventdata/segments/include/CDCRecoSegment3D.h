@@ -51,7 +51,7 @@ namespace Belle2 {
       CDCTrajectory2D m_trajectory2D;
 
       /// ROOT Macro to make CDCRecoSegment3D a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRecoSegment3D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoSegment3D, 1);
 
 
     };

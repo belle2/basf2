@@ -13,14 +13,14 @@
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Filter for the constuction of axial to stereo segment pairs based on Monte Carlo information.
-    class MCAxialStereoSegmentPairFilter : public UsedTObject {
+    class MCAxialStereoSegmentPairFilter : public SwitchableRootificationBase {
 
     public:
 
@@ -47,7 +47,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make MCAxialStereoSegmentPairFilter a ROOT class.
-      ClassDefInCDCLocalTracking(MCAxialStereoSegmentPairFilter, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(MCAxialStereoSegmentPairFilter, 1);
 
     }; // end class MCAxialStereoSegmentPairFilter
 

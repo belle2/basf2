@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCRecoHit3D)
+CDCLOCALTRACKING_SwitchableClassImp(CDCRecoHit3D)
 
 CDCRecoHit3D::CDCRecoHit3D():
   m_rlWireHit(nullptr),

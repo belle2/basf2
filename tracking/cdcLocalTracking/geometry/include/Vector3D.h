@@ -15,7 +15,7 @@
 
 #include <TVector3.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/numerics/numerics.h>
 
@@ -27,11 +27,11 @@ namespace Belle2 {
 
     ///A three dimensional vector
     /** A three dimensional vector which is equiped with the expected vector methods. \n
-     *  It inherits from UsedTObject which can be inject the inheritance to TObject \n
+     *  It inherits from SwitchableRootificationBase which can be inject the inheritance to TObject \n
      *  for monitoring purposes but may be empty for maximal performance. \n
      *  Also this vector can be used whereever a TVector3 is expected syntactically.
      */
-    class Vector3D : public CDCLocalTracking::UsedTObject {
+    class Vector3D : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -346,7 +346,7 @@ namespace Belle2 {
     private:
 
       /// ROOT Macro to make Vector3D a ROOT class.
-      ClassDefInCDCLocalTracking(Vector3D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(Vector3D, 1);
 
     }; //class
 

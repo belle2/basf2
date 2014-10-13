@@ -12,7 +12,7 @@
 
 #include <TVector3.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
@@ -29,7 +29,7 @@ namespace Belle2 {
      *  This class presents this trajectory projection by a line representation in sz space.
      *  The s coordinate is interpreted as the transvers travel distance, hence  \n
      *  the part of the travel distance see in the xy projection. */
-    class CDCTrajectorySZ : public CDCLocalTracking::UsedTObject {
+    class CDCTrajectorySZ : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -174,7 +174,7 @@ namespace Belle2 {
       UncertainSZLine m_szLine; ///< Memory for the line representation
 
       /// ROOT Macro to make CDCTrajectorySZ a ROOT class.
-      ClassDefInCDCLocalTracking(CDCTrajectorySZ, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCTrajectorySZ, 1);
 
     }; //class
   } // namespace CDCLocalTracking

@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCGenHit)
+CDCLOCALTRACKING_SwitchableClassImp(CDCGenHit)
 
 CDCGenHit::CDCGenHit():
   m_wire(&(CDCWire::getLowest())),

@@ -15,7 +15,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #endif
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class serving as a storage of observed drift circles to present to the Riemann fitter
-    class CDCObservations2D : public UsedTObject {
+    class CDCObservations2D : public SwitchableRootificationBase {
 
     public:
 #ifndef __CINT__
@@ -360,7 +360,7 @@ namespace Belle2 {
       std::vector<FloatType> m_observations; ///< Memory for the individual observations. Arrangement of values is x,y, drift raduis, weight, x, y, .....
 
       /** ROOT Macro to make CDCObservation2D a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCObservations2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCObservations2D, 1);
 
     }; //class
 

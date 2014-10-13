@@ -12,7 +12,7 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
@@ -29,7 +29,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class representating the sense wire arrangement in the whole of the central drift chamber.
-    class CDCWireHitTopology : public UsedTObject {
+    class CDCWireHitTopology : public SwitchableRootificationBase {
 
     public:
       /// A Range of const CDCWireHits - usable with range based for
@@ -93,7 +93,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCWireTopology a ROOT class
-      ClassDefInCDCLocalTracking(CDCWireHitTopology, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCWireHitTopology, 1);
 
     }; //class
 

@@ -37,7 +37,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make CDCKarimakiFitter a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCKarimakiFitter, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCKarimakiFitter, 1);
 
     }; //class
   } // end namespace CDCLocalTracking

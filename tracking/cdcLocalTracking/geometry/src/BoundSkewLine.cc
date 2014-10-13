@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(BoundSkewLine)
+CDCLOCALTRACKING_SwitchableClassImp(BoundSkewLine)
 
 /// Constuctor for a skew line between forward and backward point
 BoundSkewLine::BoundSkewLine(

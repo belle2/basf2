@@ -19,7 +19,7 @@ using namespace Eigen;
 
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(RiemannsMethod)
+CDCLOCALTRACKING_SwitchableClassImp(RiemannsMethod)
 
 RiemannsMethod::RiemannsMethod() :
   m_lineConstrained(false),

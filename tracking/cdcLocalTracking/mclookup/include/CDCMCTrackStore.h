@@ -12,7 +12,7 @@
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 #include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
 

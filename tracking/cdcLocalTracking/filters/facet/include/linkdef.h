@@ -1,6 +1,6 @@
 #ifdef __CINT__
 
-#include <tracking/cdcLocalTracking/mockroot/ToggleMockRoot.h>
+#include <tracking/cdcLocalTracking/config/CDCLocalTrackingConfig.h>
 
 #pragma link off all globals;
 #pragma link off all classes;

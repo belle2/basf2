@@ -16,7 +16,7 @@ using namespace Eigen;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCObservations2D)
+CDCLOCALTRACKING_SwitchableClassImp(CDCObservations2D)
 
 
 CDCObservations2D::CDCObservations2D()

@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
-    class ExtendedRiemannsMethod : public CDCLocalTracking::UsedTObject {
+    class ExtendedRiemannsMethod : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
       ///Empty constructor
@@ -59,7 +59,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make ExtendedRiemannsMethod a ROOT class.*/
-      ClassDefInCDCLocalTracking(ExtendedRiemannsMethod, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(ExtendedRiemannsMethod, 1);
 
     }; //class
   } // end namespace CDCLocalTracking

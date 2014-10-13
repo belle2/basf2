@@ -13,7 +13,7 @@
 #include <vector>
 #include <algorithm>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
@@ -209,7 +209,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCGenHitVector a ROOT class.
-      ClassDefInCDCLocalTracking(CDCGenHitVector, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCGenHitVector, 1);
 
     }; //class
 

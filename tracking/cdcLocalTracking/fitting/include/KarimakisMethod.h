@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class implementing the Karimaki fit for two dimensional trajectory circle
-    class KarimakisMethod : public CDCLocalTracking::UsedTObject {
+    class KarimakisMethod : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
       ///Empty constructor
@@ -49,7 +49,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make KarimakisMethod a ROOT class.*/
-      ClassDefInCDCLocalTracking(KarimakisMethod, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(KarimakisMethod, 1);
 
     }; //class
   } // end namespace CDCLocalTracking

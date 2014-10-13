@@ -13,7 +13,7 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "CDCWireHit.h"
@@ -22,7 +22,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class representing an oriented hit wire including a hypotheses whether the causing track passes left or right
-    class CDCRLWireHit : public UsedTObject {
+    class CDCRLWireHit : public SwitchableRootificationBase {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -183,7 +183,7 @@ namespace Belle2 {
       RightLeftInfo m_rlInfo; ///< Memory for the right left passage information of the oriented wire hit.
 
       /// ROOT Macro to make CDCRLWireHit a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRLWireHit, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRLWireHit, 1);
 
     }; //class CDCRLWireHit
 

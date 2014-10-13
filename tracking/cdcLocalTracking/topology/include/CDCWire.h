@@ -24,7 +24,7 @@
 
 #include "StereoType.h"
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
@@ -44,7 +44,7 @@ namespace Belle2 {
      * which you can get with the static getInstance() functions. \n
      * There is rarely a need for constructing a wire object it should be avoided for speed reasons.
      */
-    class CDCWire : public CDCLocalTracking::UsedTObject {
+    class CDCWire : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
       /// A wire pointer pair as returned from getNeighborsOutward(), getNeighborsInward()
@@ -365,7 +365,7 @@ namespace Belle2 {
     private:
 
       /// ROOT Macro to make CDCWire a ROOT class.
-      ClassDefInCDCLocalTracking(CDCWire, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCWire, 1);
 
     }; //class
 

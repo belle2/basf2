@@ -11,7 +11,7 @@
 #define CDCWIRESUPERLAYER_H
 
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "CDCWireLayer.h"
@@ -34,7 +34,7 @@ namespace Belle2 {
      * which you can get with the static getInstance() functions. \n
      * There is rarely a need for constructing a superlayer object and \n
      * it should be avoided for speed reasons. */
-    class CDCWireSuperLayer : public CDCLocalTracking::UsedTObject {
+    class CDCWireSuperLayer : public CDCLocalTracking::SwitchableRootificationBase {
 
 
     public:
@@ -308,7 +308,7 @@ namespace Belle2 {
       FloatType m_refPolarRZSlope;
 
       /** ROOT Macro to make CDCWireSuperLayer a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCWireSuperLayer, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCWireSuperLayer, 1);
 
     }; //class
 

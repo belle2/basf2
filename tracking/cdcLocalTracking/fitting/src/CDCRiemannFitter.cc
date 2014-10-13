@@ -19,7 +19,7 @@ using namespace Eigen;
 
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCRiemannFitter)
+CDCLOCALTRACKING_SwitchableClassImp(CDCRiemannFitter)
 
 
 namespace {

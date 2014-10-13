@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Worker for building all facets without a filter applied. This is mainly a helper to evaluate a filter.
-    class AllFacetWorker : public UsedTObject {
+    class AllFacetWorker : public SwitchableRootificationBase {
 
     public:
       /** Constructor. */
@@ -62,7 +62,7 @@ namespace Belle2 {
       CDCRecoFacetCollection m_recoFacets;
 
       /// ROOT Macro to make AllFacetWorker a ROOT class.
-      ClassDefInCDCLocalTracking(AllFacetWorker, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(AllFacetWorker, 1);
 
     }; // end class AllFacetWorker
   } //end namespace CDCLocalTracking

@@ -10,7 +10,7 @@
 #ifndef CDCSZFITTER_H
 #define CDCSZFITTER_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
@@ -20,7 +20,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class implementing the z coordinate over travel distance line fit.
-    class CDCSZFitter : public CDCLocalTracking::UsedTObject {
+    class CDCSZFitter : public CDCLocalTracking::SwitchableRootificationBase {
     public:
 
       /// Default constructor for ROOT.
@@ -109,7 +109,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCSZFitter a ROOT class.
-      ClassDefInCDCLocalTracking(CDCSZFitter, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCSZFitter, 1);
 
 
 

@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCAxialAxialSegmentPair)
+CDCLOCALTRACKING_SwitchableClassImp(CDCAxialAxialSegmentPair)
 
 
 

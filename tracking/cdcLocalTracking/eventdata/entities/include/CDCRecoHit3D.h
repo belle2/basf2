@@ -16,7 +16,7 @@
 
 //#include <TVector3.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -42,7 +42,7 @@ namespace Belle2 {
      *  the two dimensional tracking as the arc length.
      */
 
-    class CDCRecoHit3D : public CDCLocalTracking::UsedTObject {
+    class CDCRecoHit3D : public CDCLocalTracking::SwitchableRootificationBase {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -304,7 +304,7 @@ namespace Belle2 {
       FloatType m_perpS; ///< Memory for the travel distance as see in the xy projection.
 
       /// ROOT Macro to make CDCRecoHit3D a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRecoHit3D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoHit3D, 1);
 
     }; //class
 

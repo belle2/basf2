@@ -12,7 +12,7 @@
 
 #include <utility>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "CDCRLWireHit.h"
@@ -26,7 +26,7 @@ namespace Belle2 {
      *  The first is taken as a single, while the second and the third are group into a pair.
      *  In this way we can save some object creations during lookups of a triple following this one,
      *  since the projection to the last pair can be done by reference.*/
-    class CDCRLWireHitTriple : public UsedTObject {
+    class CDCRLWireHitTriple : public SwitchableRootificationBase {
 
     public:
 
@@ -240,7 +240,7 @@ namespace Belle2 {
       CDCRLWireHitPair m_rearRLWireHitPair; ///< Memory for the reference to the remaining two oriented wire hits
 
       /// ROOT Macro to make CDCRLWireHitTriple a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRLWireHitTriple, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRLWireHitTriple, 1);
 
     }; //end class CDCRLWireHitTriple
   } // end namespace CDCLocalTracking

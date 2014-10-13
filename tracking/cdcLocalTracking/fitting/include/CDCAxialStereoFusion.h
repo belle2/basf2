@@ -10,7 +10,7 @@
 #ifndef CDCAXIALSTEREOFUSION_H
 #define CDCAXIALSTEREOFUSION_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectories.h>
@@ -23,7 +23,7 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    class CDCAxialStereoFusion : public UsedTObject {
+    class CDCAxialStereoFusion : public SwitchableRootificationBase {
 
     public:
       static TMatrixD calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
@@ -48,7 +48,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make CDCAxialStereoFusion a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCAxialStereoFusion, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCAxialStereoFusion, 1);
 
     }; // end class
   } // end namespace CDCLocalTracking

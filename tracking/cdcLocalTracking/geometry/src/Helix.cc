@@ -19,7 +19,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(PerigeeCircle)
+CDCLOCALTRACKING_SwitchableClassImp(PerigeeCircle)
 
 
 

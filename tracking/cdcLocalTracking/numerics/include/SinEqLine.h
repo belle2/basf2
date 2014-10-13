@@ -18,7 +18,7 @@
 #include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/SignType.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 #include <framework/logging/Logger.h>
 
@@ -38,7 +38,7 @@ namespace Belle2 {
      *  However only a range of indices corresponds to realized solutions. For non existent solutions NAN is returned.
      *  Note that for fabs(slope) >= 1 there are no more local maxima. In this case only a single solution exists, which is always returned for any index.
      */
-    class SinEqLine : public UsedTObject {
+    class SinEqLine : public SwitchableRootificationBase {
 
     public:
       /// Constructor taking the line that shall be superimposed with the sin curve.
@@ -159,7 +159,7 @@ namespace Belle2 {
       FloatType m_intercept;
 
       /// ROOT Macro to make SinEqLine a ROOT class.
-      ClassDefInCDCLocalTracking(SinEqLine, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(SinEqLine, 1);
 
     };
 

@@ -12,7 +12,7 @@
 
 #include <cmath>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "Vector2D.h"
@@ -157,7 +157,7 @@ namespace Belle2 {
       size_t m_ndf;
 
       /// ROOT Macro to make UncertainSZLine a ROOT class.
-      ClassDefInCDCLocalTracking(UncertainSZLine, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(UncertainSZLine, 1);
 
     }; //class
 

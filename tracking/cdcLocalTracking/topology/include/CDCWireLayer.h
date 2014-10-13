@@ -12,7 +12,7 @@
 
 #include <TVector3.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
@@ -33,7 +33,7 @@ namespace Belle2 {
      * which you can get with the static getInstance() functions. \n
      * There is rarely a need for constructing a layer object and \n
      * it should be avoided for speed reasons. */
-    class CDCWireLayer : public CDCLocalTracking::UsedTObject {
+    class CDCWireLayer : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
       /// The underlying container type storing range of wires referenced by this class
@@ -307,7 +307,7 @@ namespace Belle2 {
       //@}
 
       /** ROOT Macro to make CDCWireLayer a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCWireLayer, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCWireLayer, 1);
 
     }; //class
 

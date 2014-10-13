@@ -14,7 +14,7 @@
 #include <math.h>
 #include <iostream>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/numerics/numerics.h>
@@ -26,11 +26,11 @@ namespace Belle2 {
     ///A two dimensional vector
     /** A two dimensional vector which is equiped with functions for correct handeling \n
      *  of orientation related issues in addition to the expected vector methods. \n
-     *  It inherits from UsedTObject which can be inject the inheritance to TObject \n
+     *  It inherits from SwitchableRootificationBase which can be inject the inheritance to TObject \n
      *  for monitoring purposes but may be empty for maximal performance. \n
      *  Also this vector can be used whereever a TVector2 is expected syntactically.
      */
-    class Vector2D : public CDCLocalTracking::UsedTObject {
+    class Vector2D : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -383,7 +383,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make Vector2D a ROOT class.
-      ClassDefInCDCLocalTracking(Vector2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(Vector2D, 1);
 
     }; //class
 

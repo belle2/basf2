@@ -12,7 +12,7 @@
 
 #include <cmath>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "TMatrixD.h"
@@ -315,7 +315,7 @@ namespace Belle2 {
       FloatType m_impact; ///< Memory for the signed impact parameter
 
       /// ROOT Macro to make PerigeeCircle a ROOT class.
-      ClassDefInCDCLocalTracking(PerigeeCircle, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(PerigeeCircle, 1);
 
     }; //class
 

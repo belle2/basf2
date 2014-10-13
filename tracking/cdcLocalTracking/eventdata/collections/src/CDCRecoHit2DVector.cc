@@ -14,6 +14,6 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCRecoHit2DVector)
+CDCLOCALTRACKING_SwitchableClassImp(CDCRecoHit2DVector)
 
 

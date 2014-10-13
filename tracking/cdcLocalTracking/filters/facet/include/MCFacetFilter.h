@@ -12,14 +12,14 @@
 #define MCFACETFILTER_H_
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
 
     /// Filter for the constuction of good facets based on monte carlo information
-    class MCFacetFilter : public UsedTObject {
+    class MCFacetFilter : public SwitchableRootificationBase {
 
     public:
       /// Empty Constructor.
@@ -45,7 +45,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make MCFacetFilter a ROOT class.
-      ClassDefInCDCLocalTracking(MCFacetFilter, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(MCFacetFilter, 1);
 
     }; // end class MCFacetFilter
   } //end namespace CDCLocalTracking

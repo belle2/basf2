@@ -12,7 +12,7 @@
 
 #include <cmath>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "Vector2D.h"
@@ -192,7 +192,7 @@ namespace Belle2 {
       size_t m_ndf;
 
       /// ROOT Macro to make UncertainPerigeeCircle a ROOT class.
-      ClassDefInCDCLocalTracking(UncertainPerigeeCircle, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(UncertainPerigeeCircle, 1);
 
     }; //class
 

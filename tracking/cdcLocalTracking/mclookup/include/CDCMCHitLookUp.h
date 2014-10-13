@@ -11,7 +11,7 @@
 #define CDCMCHITLOOKUP_H
 
 #include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

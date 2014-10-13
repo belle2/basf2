@@ -17,7 +17,7 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 using namespace CDC;
 
-ClassImpInCDCLocalTracking(CDCWireTopology)
+CDCLOCALTRACKING_SwitchableClassImp(CDCWireTopology)
 
 
 void CDCWireTopology::initialize()

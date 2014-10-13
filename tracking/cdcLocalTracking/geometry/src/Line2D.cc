@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
-ClassImpInCDCLocalTracking(Line2D)
+CDCLOCALTRACKING_SwitchableClassImp(Line2D)
 
 
 Vector2D Line2D::intersection(const Line2D& line) const

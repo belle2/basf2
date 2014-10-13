@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// A pair of oriented wire hits
-    class CDCRLWireHitPair : public UsedTObject {
+    class CDCRLWireHitPair : public SwitchableRootificationBase {
 
     public:
 
@@ -167,7 +167,7 @@ namespace Belle2 {
       const CDCRLWireHit* m_toRLWireHit;   ///< Memory for the reference to the second oriented wire hit
 
       /// ROOT Macro to make CDCRLWireHitPair a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRLWireHitPair, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRLWireHitPair, 1);
 
     }; //end class CDCRLWireHitPair
   } //end namespace CDCLocalTracking

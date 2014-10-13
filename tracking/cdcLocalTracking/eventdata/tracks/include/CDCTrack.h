@@ -10,7 +10,7 @@
 #ifndef CDCTRACK_H
 #define CDCTRACK_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoHit3D.h>
@@ -147,7 +147,7 @@ namespace Belle2 {
       ForwardBackwardInfo m_fbInfo; ///< Memory for the forward backward indicator
 
       /// ROOT Macro to make CDCTrack a ROOT class.
-      ClassDefInCDCLocalTracking(CDCTrack, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCTrack, 1);
 
     }; //class
 

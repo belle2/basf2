@@ -21,7 +21,7 @@ using namespace Eigen;
 
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(ExtendedRiemannsMethod)
+CDCLOCALTRACKING_SwitchableClassImp(ExtendedRiemannsMethod)
 
 
 ExtendedRiemannsMethod::ExtendedRiemannsMethod() :

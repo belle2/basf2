@@ -14,7 +14,7 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 
@@ -34,7 +34,7 @@ namespace Belle2 {
      *  It contains an AutomataCell since we want to use it with the Clusterizer which makes use of the cell state. \n
      *  Additionally contains references to both the CDCWire instance from the CDCTopology and the CDCHit from the StoreArray of the event. \n
      */
-    class CDCWireHit : public UsedTObject {
+    class CDCWireHit : public SwitchableRootificationBase {
 
     public:
 
@@ -258,7 +258,7 @@ namespace Belle2 {
       AutomatonCell m_automatonCell;
 
       /// ROOT Macro to make CDCWireHit a ROOT class.
-      ClassDefInCDCLocalTracking(CDCWireHit, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCWireHit, 1);
 
     }; //class
 

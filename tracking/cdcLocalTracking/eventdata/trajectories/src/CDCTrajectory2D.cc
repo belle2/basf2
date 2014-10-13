@@ -21,7 +21,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCTrajectory2D)
+CDCLOCALTRACKING_SwitchableClassImp(CDCTrajectory2D)
 
 
 

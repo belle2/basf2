@@ -17,7 +17,7 @@
 
 #include <cdc/dataobjects/WireID.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
@@ -38,7 +38,7 @@ namespace Belle2 {
      *  Also there are methods for getting to the closest and secondary of each wire. \n
      *  The class does provide the memory for all instances of wires, layers and superlayers by its self.
      */
-    class CDCWireTopology : public CDCLocalTracking::UsedTObject {
+    class CDCWireTopology : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
       /// The underlying container type storing range of wires represented by this class
@@ -608,7 +608,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCWireTopology a ROOT class
-      ClassDefInCDCLocalTracking(CDCWireTopology, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCWireTopology, 1);
 
     }; //class
 

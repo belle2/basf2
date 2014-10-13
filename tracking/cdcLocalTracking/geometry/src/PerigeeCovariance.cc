@@ -15,7 +15,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(PerigeeCovariance)
+CDCLOCALTRACKING_SwitchableClassImp(PerigeeCovariance)
 
 void PerigeeCovariance::reverse()
 {

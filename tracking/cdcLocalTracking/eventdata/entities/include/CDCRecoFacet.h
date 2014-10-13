@@ -12,7 +12,7 @@
 
 #include <utility>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 
@@ -198,7 +198,7 @@ namespace Belle2 {
 
 
       /// ROOT Macro to make CDCRecoFacet a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRecoFacet, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoFacet, 1);
 
     }; //class
 

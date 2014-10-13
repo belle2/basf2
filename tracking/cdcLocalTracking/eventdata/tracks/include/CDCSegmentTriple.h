@@ -10,7 +10,7 @@
 #ifndef CDCSEGMENTTRIPLE_H
 #define CDCSEGMENTTRIPLE_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 
@@ -132,7 +132,7 @@ namespace Belle2 {
       mutable CDCTrajectorySZ m_trajectorySZ; ///< Memory of the linear trajectory in the sz direction assoziated with the triple.
 
       /** ROOT Macro to make CDCSegmentTriple a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCSegmentTriple, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCSegmentTriple, 1);
 
     }; //class
 

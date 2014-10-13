@@ -10,7 +10,7 @@
 #ifndef CDCRLWIREHITSEGMENT_H_
 #define CDCRLWIREHITSEGMENT_H_
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
@@ -81,7 +81,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCRLWireHitSegment a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRLWireHitSegment, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRLWireHitSegment, 1);
 
     }; //end class CDCRLWireHitSegment
 

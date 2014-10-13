@@ -29,7 +29,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCWireHitCluster a ROOT class.
-      ClassDefInCDCLocalTracking(CDCWireHitCluster, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCWireHitCluster, 1);
 
 
 

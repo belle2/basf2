@@ -13,7 +13,7 @@
 #include <vector>
 #include <algorithm>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 //Unpacked version for ROOT dictionary generation
 #include <tracking/cdcLocalTracking/topology/CDCWireUnpackedFromNamespaces.h>
@@ -25,7 +25,7 @@ namespace Belle2 {
 
     /// A generic vector which keeps track if its elements are sorted and speeds up lookups accordingly.
     template<class T>
-    class SortableVector : public UsedTObject {
+    class SortableVector : public SwitchableRootificationBase {
 
     private:
       typedef std::vector<T> Container; ///< std::vector to be wrapped
@@ -440,7 +440,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make SortableVector a ROOT class.
-      ClassDefInCDCLocalTracking(SortableVector, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(SortableVector, 1);
 
     }; //class
 

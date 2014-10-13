@@ -10,7 +10,7 @@
 #ifndef CDCRECOSEGMENT2D_H_
 #define CDCRECOSEGMENT2D_H_
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoHit2DVector.h>
@@ -150,7 +150,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCRecoSegment2D a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRecoSegment2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoSegment2D, 1);
 
 
 

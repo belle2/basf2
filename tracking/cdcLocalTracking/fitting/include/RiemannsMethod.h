@@ -10,7 +10,7 @@
 #ifndef RIEMANNSMETHOD_H
 #define RIEMANNSMETHOD_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
 
@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
-    class RiemannsMethod : public CDCLocalTracking::UsedTObject {
+    class RiemannsMethod : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
       ///Empty constructor
@@ -63,7 +63,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make RiemannsMethod a ROOT class.*/
-      ClassDefInCDCLocalTracking(RiemannsMethod, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(RiemannsMethod, 1);
 
     }; //class
 

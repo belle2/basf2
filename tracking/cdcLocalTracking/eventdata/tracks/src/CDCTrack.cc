@@ -18,7 +18,7 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 using namespace genfit;
 
-ClassImpInCDCLocalTracking(CDCTrack)
+CDCLOCALTRACKING_SwitchableClassImp(CDCTrack)
 
 
 

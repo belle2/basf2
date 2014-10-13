@@ -12,7 +12,7 @@
 
 #include <cmath>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
 
@@ -29,7 +29,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Particle trajectory as it is seen in xy projection
-    class CDCTrajectory2D : public CDCLocalTracking::UsedTObject {
+    class CDCTrajectory2D : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -434,7 +434,7 @@ namespace Belle2 {
       //Vector2D m_startPos2D;
 
       /// ROOT Macro to make CDCTrajectory2D a ROOT class.
-      ClassDefInCDCLocalTracking(CDCTrajectory2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCTrajectory2D, 1);
 
     }; //class
 

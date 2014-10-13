@@ -11,7 +11,7 @@
 #define BOUNDSKEWLINE_H
 
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/numerics/numerics.h>
 
@@ -36,7 +36,7 @@ namespace Belle2 {
      * @brief A three dimensional limited line
      *
      */
-    class BoundSkewLine : public CDCLocalTracking::UsedTObject {
+    class BoundSkewLine : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -233,7 +233,7 @@ namespace Belle2 {
     private:
 
       /// ROOT Macro to make BoundSkewLine a ROOT class.
-      ClassDefInCDCLocalTracking(BoundSkewLine, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(BoundSkewLine, 1);
 
 
     }; //class

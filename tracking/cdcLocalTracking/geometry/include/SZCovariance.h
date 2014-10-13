@@ -16,7 +16,7 @@
 #include "TMatrixD.h"
 
 #include <framework/logging/Logger.h>
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 
 #include "HelixParameterIndex.h"
 
@@ -25,7 +25,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class representing the covariance matrix of a set of perigee parameters.
-    class SZCovariance : public UsedTObject {
+    class SZCovariance : public SwitchableRootificationBase {
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -141,7 +141,7 @@ namespace Belle2 {
       TMatrixDSym m_matrix;
 
       /// ROOT Macro to make SZCovariance a ROOT class.
-      ClassDefInCDCLocalTracking(SZCovariance, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(SZCovariance, 1);
 
     }; //class
 

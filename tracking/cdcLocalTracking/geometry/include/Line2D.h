@@ -10,7 +10,7 @@
 #ifndef LINE2D_H
 #define LINE2D_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "Vector2D.h"
@@ -28,7 +28,7 @@ namespace Belle2 {
      *  This naturally corresponds to a direction of positiv advance being the tangential \n
      *  to the line (-n2 ,n1) \n
      *  This line is best suited for linear least square fits. */
-    class Line2D : public CDCLocalTracking::UsedTObject {
+    class Line2D : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -330,7 +330,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make Line2D a ROOT class.
-      ClassDefInCDCLocalTracking(Line2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(Line2D, 1);
 
     }; //class
   } // namespace CDCLocalTracking

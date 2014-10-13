@@ -12,7 +12,7 @@
 
 #include <cmath>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "Vector2D.h"
@@ -39,7 +39,7 @@ namespace Belle2 {
      *  Additionally we can represent a line with same parameters by setting n3 = 0. Compare Line2D.
      */
 
-    class GeneralizedCircle : public CDCLocalTracking::UsedTObject {
+    class GeneralizedCircle : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -480,7 +480,7 @@ namespace Belle2 {
       FloatType m_n0; ///< Memory for the first parameter
 
       /// ROOT Macro to make GeneralizedCircle a ROOT class.
-      ClassDefInCDCLocalTracking(GeneralizedCircle, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(GeneralizedCircle, 1);
 
     }; //class
 

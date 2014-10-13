@@ -8,44 +8,50 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MOCKROOT_H_
-#define MOCKROOT_H_
+#ifndef SWITCHABLEROOTIFICATIONBASE_H_
+#define SWITCHABLEROOTIFICATIONBASE_H_
 
-#include "ToggleMockRoot.h"
+#include "RootificationBase.h"
+
 #include <tracking/cdcLocalTracking/config/CDCLocalTrackingConfig.h>
-#include <TObject.h>
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
 
-    //ROOT defines
-    //TObject
-    //ClassDef(ClassName, ClassVersion);
-    //ClassImp(ClassName);
+    // BASF2 defines
+    // RelationsObject
+    // ClassDef(ClassName, ClassVersion);
+    // ClassImp(ClassName);
+    // to be used for a full blown rootification.
+    // Using theses as base class and macro in a user object
+    // enables access from Python as well as access through the DataStore
 
-    // we fake it in case we do not want to use ROOT
+    // In the scons build system you can activate the additional compile time macro using
+    // scons --extra-ccflags='-DCDCLOCALTRACKING_USE_ROOT'.
+    // Forgeting to give the flag should result in the correct
+    // default behaviour, which is to build without ROOT support. This avoids that one
+    // accidentally checks in a version with ROOT switch on.
 
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
-
     /// Typedef the normal TObject as the base class of the track finder in case the ROOT inheritance is switched on.
-    typedef TObject UsedTObject;
+    typedef RootificationBase SwitchableRootificationBase;
 
-#define ClassDefInCDCLocalTracking(ClassName,ClassVersion) ClassDef(ClassName, ClassVersion)
-#define ClassImpInCDCLocalTracking(ClassName) ClassImp(ClassName);
+#define CDCLOCALTRACKING_SwitchableClassDef(ClassName,ClassVersion) ClassDef(ClassName,ClassVersion);
+#define CDCLOCALTRACKING_SwitchableClassImp(ClassName) ClassImp(ClassName);
 
 #else
     // Do not use the ROOT inheritance in all Tracking objects
     // Use an empty base class instead
     /// Empty base class for the switched of ROOT inheritance
-    class MockTObject { ; };
+    class SwitchableRootificationBaseificationBase { ; };
 
     /// Typedef the empty class as the base class of the track finder in case the ROOT inheritance is switched off.
-    typedef MockTObject UsedTObject;
+    typedef  SwitchableRootificationBaseificationBase SwitchableRootificationBase;
 
-#define ClassDefInCDCLocalTracking(ClassName,ClassVersion)
-#define ClassImpInCDCLocalTracking(ClassName)
+#define CDCLOCALTRACKING_SwitchableClassDef(ClassName,ClassVersion)
+#define CDCLOCALTRACKING_SwitchableClassImp(ClassName)
 
 #endif
 
@@ -55,4 +61,4 @@ namespace Belle2 {
 } //end namespace Belle2
 
 
-#endif //TOGGLEMOCKROOT_H_  
+#endif // SWITCHABLEROOTIFICATIONBASE_H_

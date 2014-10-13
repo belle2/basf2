@@ -13,14 +13,14 @@
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class MCAxialAxialSegmentPairFilter : public UsedTObject {
+    class MCAxialAxialSegmentPairFilter : public SwitchableRootificationBase {
 
     public:
 
@@ -46,7 +46,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make MCAxialAxialSegmentPairFilter a ROOT class.
-      ClassDefInCDCLocalTracking(MCAxialAxialSegmentPairFilter, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(MCAxialAxialSegmentPairFilter, 1);
 
     }; // end class MCAxialAxialSegmentPairFilter
 

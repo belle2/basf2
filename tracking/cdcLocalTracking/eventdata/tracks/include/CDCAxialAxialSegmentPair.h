@@ -10,7 +10,7 @@
 #ifndef CDCAXIALAXIALSEGMENTPAIR_H
 #define CDCAXIALAXIALSEGMENTPAIR_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 
@@ -21,7 +21,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class representing a pair of reconstructed axial segements in adjacent superlayer
-    class CDCAxialAxialSegmentPair : public UsedTObject {
+    class CDCAxialAxialSegmentPair : public SwitchableRootificationBase {
     public:
 
       /// Default constructor - for ROOT compatability
@@ -162,7 +162,7 @@ namespace Belle2 {
       mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
 
       /** ROOT Macro to make CDCAxialAxialSegmentPair a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCAxialAxialSegmentPair, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCAxialAxialSegmentPair, 1);
 
     }; //end class CDCAxialAxialSegmentPair
 

@@ -14,7 +14,7 @@
 
 #include "TVectorD.h"
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "HelixParameterIndex.h"
@@ -29,7 +29,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Extension of the generalized circle also caching the perigee coordinates.
-    class Helix : public CDCLocalTracking::UsedTObject {
+    class Helix : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -245,7 +245,7 @@ namespace Belle2 {
       Line2D m_lineSZ;
 
       /// ROOT Macro to make Helix a ROOT class.
-      ClassDefInCDCLocalTracking(Helix, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(Helix, 1);
 
     }; //class
 

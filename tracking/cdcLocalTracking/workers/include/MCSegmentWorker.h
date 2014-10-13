@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Worker for building reconstructed segments form wirehits using reconstructed facets
-    class MCSegmentWorker : public UsedTObject {
+    class MCSegmentWorker : public SwitchableRootificationBase {
 
     public:
       /** Constructor. */
@@ -65,7 +65,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make MCSegmentWorker a ROOT class.
-      ClassDefInCDCLocalTracking(MCSegmentWorker, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(MCSegmentWorker, 1);
 
 
 

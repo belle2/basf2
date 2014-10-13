@@ -10,7 +10,7 @@
 #ifndef CDCFITTER2D_H
 #define CDCFITTER2D_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
@@ -123,7 +123,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make CDCFitter2D a ROOT class.*/
-      ClassDefInCDCLocalTracking(CDCFitter2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCFitter2D, 1);
 
     }; //class
 

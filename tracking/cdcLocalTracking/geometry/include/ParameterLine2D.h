@@ -12,7 +12,7 @@
 
 #include <TVector3.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "Vector2D.h"
@@ -29,7 +29,7 @@ namespace Belle2 {
      *  this line defines a direction of positiv advance ( the tangential vector ) as well as \n
      *  a right and a left half plane.
      */
-    class ParameterLine2D : public CDCLocalTracking::UsedTObject {
+    class ParameterLine2D : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -272,7 +272,7 @@ namespace Belle2 {
 
     private:
       /** ROOT Macro to make ParameterLine2D a ROOT class if CDCLOCALTRACKING_USE_ROOT was defined*/
-      ClassDefInCDCLocalTracking(ParameterLine2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(ParameterLine2D, 1);
 
     }; //class
   } // namespace CDCLocalTracking

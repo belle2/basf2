@@ -10,7 +10,7 @@
 #ifndef CIRCLE2D_H
 #define CIRCLE2D_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "Vector2D.h"
@@ -25,7 +25,7 @@ namespace Belle2 {
      *  The convension is that positiv radii correspond to a counterclockwise orientation of the circle,
      *  while negative radii are for the clockwise orientation.
      */
-    class Circle2D : public CDCLocalTracking::UsedTObject {
+    class Circle2D : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
 
@@ -256,7 +256,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make Circle2D a ROOT class.
-      ClassDefInCDCLocalTracking(Circle2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(Circle2D, 1);
 
     }; //class
   } // namespace CDCLocalTracking

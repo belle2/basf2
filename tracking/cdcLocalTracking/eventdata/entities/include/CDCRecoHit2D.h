@@ -12,7 +12,7 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "CDCWireHit.h"
@@ -29,7 +29,7 @@ namespace Belle2 {
      *  the hit wire lies to the right or to the left of the particle trajectory causing the hit. The later readily \n
      *  indicates a flight direction from the reconstructed it, if a tangential approch of the trajectory to the \n
      *  drift circle is assumed. */
-    class CDCRecoHit2D : public CDCLocalTracking::UsedTObject {
+    class CDCRecoHit2D : public CDCLocalTracking::SwitchableRootificationBase {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -264,7 +264,7 @@ namespace Belle2 {
       Vector2D m_recoDisp2D; ///< Memory for the displacement fo the assoziated wire reference position
 
       /// ROOT Macro to make CDCRecoHit2D a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRecoHit2D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoHit2D, 1);
 
     }; //class CDCRecoHit2D
 

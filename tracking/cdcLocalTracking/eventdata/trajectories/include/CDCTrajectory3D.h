@@ -12,7 +12,7 @@
 
 #include <cmath>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
 
@@ -34,7 +34,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Particle full three dimensional trajectory.
-    class CDCTrajectory3D : public CDCLocalTracking::UsedTObject {
+    class CDCTrajectory3D : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -242,7 +242,7 @@ namespace Belle2 {
       UncertainHelix m_localHelix;
 
       /// ROOT Macro to make CDCTrajectory3D a ROOT class.
-      ClassDefInCDCLocalTracking(CDCTrajectory3D, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCTrajectory3D, 1);
 
     }; //class
 

@@ -15,7 +15,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(SZCovariance)
+CDCLOCALTRACKING_SwitchableClassImp(SZCovariance)
 
 void SZCovariance::reverse()
 {

@@ -15,5 +15,5 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
-ClassImpInCDCLocalTracking(CDCRecoTangentVector)
+CDCLOCALTRACKING_SwitchableClassImp(CDCRecoTangentVector)
 

@@ -10,7 +10,7 @@
 #ifndef AUTOMATONCELL_H
 #define AUTOMATONCELL_H
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "CellWeight.h"
@@ -26,7 +26,7 @@ namespace Belle2 {
      *  is not worth a full point, but a probability measure which is additiv. The points that can be gained by picking \n
      *  this cell are stored in the cell weight property. Moreover the class defines status flags to be set and/or read by\n
      *  the cellular automaton. */
-    class AutomatonCell : public CDCLocalTracking::UsedTObject {
+    class AutomatonCell : public CDCLocalTracking::SwitchableRootificationBase {
 
     public:
       typedef unsigned CellFlags; ///< Type for the additional status flags of cells in the cellular automata
@@ -179,7 +179,7 @@ namespace Belle2 {
       mutable CellState m_state; ///< Storage for the cell state set by the cellular automata
 
       /** ROOT Macro to make AutomatonCell a ROOT class.*/
-      ClassDefInCDCLocalTracking(AutomatonCell, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(AutomatonCell, 1);
 
     }; //class
 

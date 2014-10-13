@@ -22,7 +22,7 @@ using namespace boost::math;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(PerigeeCircle)
+CDCLOCALTRACKING_SwitchableClassImp(PerigeeCircle)
 
 
 

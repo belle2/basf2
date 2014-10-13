@@ -17,7 +17,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(CDCMCSegmentLookUp)
+CDCLOCALTRACKING_SwitchableClassImp(CDCMCSegmentLookUp)
 
 
 CDCMCSegmentLookUp::CDCMCSegmentLookUp()

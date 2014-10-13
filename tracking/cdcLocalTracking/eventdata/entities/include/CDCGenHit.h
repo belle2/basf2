@@ -15,7 +15,7 @@
 
 #include <cdc/dataobjects/WireID.h>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
@@ -33,7 +33,7 @@ namespace Belle2 {
         purposes being a drop in replacement for a concrete hit type.
     */
 
-    class CDCGenHit : public UsedTObject {
+    class CDCGenHit : public SwitchableRootificationBase {
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -139,7 +139,7 @@ namespace Belle2 {
       Vector2D m_dummyPos; ///< Memory for the dummy position for distance measures
 
       /// ROOT Macro to make CDCGenHit a ROOT class.
-      ClassDefInCDCLocalTracking(CDCGenHit, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCGenHit, 1);
 
     }; //end class GenHit
   } //end namespace CDCLocalTracking

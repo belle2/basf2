@@ -12,7 +12,7 @@
 
 #include <vector>
 
-#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
+#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include <tracking/cdcLocalTracking/geometry/ParameterLine2D.h>
@@ -191,7 +191,7 @@ namespace Belle2 {
       ParameterLine2D m_line;///< Memory for the line between the two touching points. The first touch point at(0), second at(1).
 
       /// ROOT Macro to make CDCRecoTangent a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRecoTangent, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoTangent, 1);
 
     }; //class
 

@@ -30,7 +30,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCRecoFacetVector a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRecoFacetVector, 1);
+      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoFacetVector, 1);
 
     }; //class CDCRecoFacetVector
 

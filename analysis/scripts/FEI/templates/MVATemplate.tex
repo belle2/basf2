@@ -1,6 +1,5 @@
-\FloatBarrier
 \subsubsection{MVA}
-\FloatBarrier
+
 \begin{center}
 \begin{longtable}{p{5cm}p{7cm}rr}
   \caption{List of variables used in the training.}\\
@@ -11,25 +10,15 @@
     \bottomrule
 \end{longtable}
 \end{center}
-\FloatBarrier
-\begin{figure}[h]
-  \centering
-  \begin{subfigure}[b]{0.32\textwidth}
-    \includegraphics[width=\textwidth]{${mvaROCPlot}}
-    \caption{Purity over efficiency plot}
-  \end{subfigure}\hfill
-  \begin{subfigure}[b]{0.32\textwidth}
-    \includegraphics[width=\textwidth]{${mvaOvertrainingPlot}}
-    \caption{Overtraining plot}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.32\textwidth}
-    \includegraphics[width=\textwidth]{${mvaDiagPlot}}
-    \caption{Diag plot}
-  \end{subfigure}
-  \caption{TMVA Plots for ${mvaType}/${mvaName} using the following configuration: ${mvaConfig}.
-           Used target was variable \emph{${mvaTarget}}. The training used ${mvaNTrainSignal} signal
-           and ${mvaNTrainBackground} background events. The test sample contained ${mvaNTestSignal} signal
-           and ${mvaNTestBackground} background events.}
-\end{figure}
-\FloatBarrier
+
+
+\includegraphics[width=0.32\textwidth]{${mvaROCPlot}}
+\includegraphics[width=0.32\textwidth]{${mvaOvertrainingPlot}}
+\includegraphics[width=0.32\textwidth]{${mvaDiagPlot}}
+
+
+TMVA Plots for ${mvaType}/${mvaName} using the following configuration: ${mvaConfig}.
+Used target was variable \emph{${mvaTarget}}. The training used ${mvaNTrainSignal} signal
+and ${mvaNTrainBackground} background events. The test sample contained ${mvaNTestSignal} signal
+and ${mvaNTestBackground} background events.
+

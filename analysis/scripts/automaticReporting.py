@@ -467,7 +467,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaLogFilename'] = signalProbability[:-7] + '.log'  # Strip .config of filename
         placeholders['mvaName'] = mvaConfig.name
         placeholders['mvaType'] = mvaConfig.type
-        placeholders['mvaConfig'] = mvaConfig.config
+        placeholders['mvaConfig'] = addHyphenations(mvaConfig.config)
         placeholders['mvaTarget'] = mvaConfig.target
 
         from variables import variables
@@ -568,9 +568,12 @@ def addHyphenations(someString):
     Adds hyphenations after brackets, and for common variables.
     """
     substitutes = {
+        '=': r'=\allowbreak ',
+        ':': r':\allowbreak ',
         '(': r'(\allowbreak ',
         'getExtraInfo': r'get\-Ex\-tra\-In\-fo',
-        'SignalProbability': r'Sig\-nal\-Prob\-a\-bil\-i\-ty'}
+        'SignalProbability': r'Sig\-nal\-Prob\-a\-bil\-i\-ty',
+        'cosAngleBetweenMomentumAndVertexVector': r'cosAngle\-Between\-Momentum\-And\-Vertex\-Vector'}
     for key, value in substitutes.iteritems():
         someString = someString.replace(key, value)
     return someString
@@ -721,7 +724,8 @@ def makeCosBDLPlot(fileName, outputFileName):
             hist.GetXaxis().SetRangeUser(-10, 10)
             break
 
-    canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
+    legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
+    legend.SetFillStyle(0)
 
     canvas.SaveAs(outputFileName)
 
@@ -766,8 +770,8 @@ def makeMbcPlot(fileName, outputFileName):
             hist.GetXaxis().SetRangeUser(5.24, 5.29)
             break
 
-    canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
-
+    legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
+    legend.SetFillStyle(0)
     canvas.SaveAs(outputFileName)
 
 

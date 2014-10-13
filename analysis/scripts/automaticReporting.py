@@ -195,15 +195,16 @@ def createMoneyPlotTexFile(ntuple, type):
     """
     placeholders = {}
     moneyFilename = ntuple[:-5] + '_money.pdf'
-    if not os.path.isfile(moneyFilename):
-        if type == 'Mbc':
-            template_file = 'analysis/scripts/FEI/templates/MBCTemplate.tex'
+    if type == 'Mbc':
+        template_file = 'analysis/scripts/FEI/templates/MBCTemplate.tex'
+        if not os.path.isfile(moneyFilename):
             makeMbcPlot(ntuple, moneyFilename)
-        elif type == 'CosBDL':
-            template_file = 'analysis/scripts/FEI/templates/CosBDLTemplate.tex'
+    elif type == 'CosBDL':
+        template_file = 'analysis/scripts/FEI/templates/CosBDLTemplate.tex'
+        if not os.path.isfile(moneyFilename):
             makeCosBDLPlot(ntuple, moneyFilename)
-        else:
-            raise RuntimeError('Unkown money plot type')
+    else:
+        raise RuntimeError('Unkown money plot type')
     placeholders['moneyPlot'] = moneyFilename
     placeholders['texFile'] = ntuple[:-5] + '_money.tex'
     placeholders['particleName'] = moneyFilename[4:].split(':', 1)[0]

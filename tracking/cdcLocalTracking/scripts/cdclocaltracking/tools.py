@@ -2,7 +2,25 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import functools
+import collections
+import argparse
+
+
+class DefaultHelpArgumentParser(argparse.ArgumentParser):
+
+    """An argparse.Argument parse slightly changed such 
+    that it always prints an extended help message incase of a parsing error."""
+
+    def error(self, message):
+        """Method invoked when a parsing error occured.
+        Writes an extended help over the base ArgumentParser.
+        """
+
+        self.print_help()
+        sys.stderr.write('error: %s\n' % message)
+        sys.exit(2)
 
 
 class ChDirContext(object):
@@ -73,6 +91,10 @@ def vector_iterator(v):
     """
 
     return (v.at(i) for i in xrange(v.size()))
+
+
+def is_iterable_collection(obj):
+    return isinstance(obj, collections.Iterable)
 
 
 def is_primary(mcParticle):

@@ -24,6 +24,7 @@ CDCMCHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp
 
 # Rootified data objects
 CDCAxialStereoSegmentPair = Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair
+CDCRecoSegment2D = Belle2.CDCLocalTracking.CDCRecoSegment2D
 
 # Rootified fitter objects
 CDCRiemannFitter = Belle2.CDCLocalTracking.CDCRiemannFitter
@@ -38,8 +39,11 @@ class MCSegmenterModule(Module):
     def default_fit_method(segment):
         return CDCRiemannFitter.getFitter().fit(segment)
 
-    def __init__(self, fit_method=None):
+    def __init__(self, allow_backward=False, fit_method=None):
         """Initalizes the module and sets up the method, with which the segments ought to be fitted."""
+
+        ## Indicates if also segments that are reverse to the actual track should be generated.
+        self.allow_backward = allow_backward
 
         ## Method used to fit the individual segments
         self.fit_method = fit_method
@@ -62,15 +66,10 @@ class MCSegmenterModule(Module):
 
         self.theMCHitLookUp.fill()
         self.theWireHitTopology.fill()
-        self.mcSegmentWorker.generate()
-        self.fit()
+        self.mcSegmentWorker.generate(self.allow_backward)
+        self.fitStoredSegments()
 
-    def terminate(self):
-        """Terminates the segment worker"""
-
-        self.mcSegmentWorker.terminate()
-
-    def fit(self):
+    def fitStoredSegments(self):
         """Executes a fit on each segment generated"""
 
         segments = Belle2.PyStoreArray('CDCRecoSegment2Ds')
@@ -79,6 +78,12 @@ class MCSegmenterModule(Module):
             fit = fit_method(segment)
             if fit is not None:
                 segment.setTrajectory2D(fit)
+
+    def terminate(self):
+        """Terminates the segment worker"""
+
+        self.mcSegmentWorker.terminate()
+        print 'MCSegmenter terminates'
 
 
 class MCAxialStereoPairCreatorModule(Module):
@@ -90,8 +95,18 @@ class MCAxialStereoPairCreatorModule(Module):
         CDCAxialStereoFusion.reconstructFuseTrajectories(axialStereoSegmentPair,
                 True)
 
-    def __init__(self, create_mc_true_only=True, fit_method=None):
+    def __init__(
+        self,
+        create_mc_true_only=True,
+        allow_backward=False,
+        fit_method=None,
+        ):
+
+        ## Limit the segment pair generation that are aligned in a true track
         self.create_mc_true_only = create_mc_true_only
+
+        ## Give a positive decision for segment pairs that are aligned in the opposite direction of a true track.
+        self.allow_backward = allow_backward
 
         ## Method used to fit the individual segments
         self.fit_method = fit_method
@@ -106,6 +121,8 @@ class MCAxialStereoPairCreatorModule(Module):
         self.mcAxialStereoSegmentPairFilter.initialize()
 
         CDCAxialStereoSegmentPair.registerStoreArray()
+        CDCAxialStereoSegmentPair.registerRelationTo('CDCRecoSegment2Ds')
+        CDCRecoSegment2D.registerRelationTo('CDCAxialStereoSegmentPairs')
 
     def event(self):
         """Generates valid axial stereo segment pairs from the CDCRecoSegment2Ds 
@@ -130,6 +147,7 @@ class MCAxialStereoPairCreatorModule(Module):
                                 segmentsForISuperLayerOut)
 
         self.fitStoredPairs()
+        self.addRelationsToSegments()
 
     def getSegmentsByISuperLayer(self):
         """Returns a list of lists of segments where the index of the first list is the superlayer id of the segments contained at that position"""
@@ -149,6 +167,7 @@ class MCAxialStereoPairCreatorModule(Module):
 
         mcAxialStereoSegmentPairFilter = self.mcAxialStereoSegmentPairFilter
         create_mc_true_only = self.create_mc_true_only
+        allow_backward = self.allow_backward
         axialStereoSegmentPair = CDCAxialStereoSegmentPair()
 
         for (startSegment, endSegment) in itertools.product(startSegments,
@@ -159,7 +178,8 @@ class MCAxialStereoPairCreatorModule(Module):
             axialStereoSegmentPair.clearTrajectory3D()
 
             mcWeight = \
-                mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair)
+                mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair,
+                    allow_backward)
 
             if mcWeight == mcWeight or not create_mc_true_only:
                 axialStereoSegmentPair.getAutomatonCell().setCellWeight(mcWeight)
@@ -172,6 +192,17 @@ class MCAxialStereoPairCreatorModule(Module):
         for axialStereoSegmentPair in \
             CDCAxialStereoSegmentPair.getStoreArray():
             fit_method(axialStereoSegmentPair)
+
+    def addRelationsToSegments(self):
+        """Adds relations from start segments to the pairs and from the pairs to the end segments."""
+
+        for axialStereoSegmentPair in \
+            CDCAxialStereoSegmentPair.getStoreArray():
+            startSegment = axialStereoSegmentPair.getStartSegment()
+            endSegment = axialStereoSegmentPair.getEndSegment()
+
+            startSegment.addRelationTo(axialStereoSegmentPair)
+            axialStereoSegmentPair.addRelationTo(endSegment)
 
     def terminate(self):
         self.mcAxialStereoSegmentPairFilter.terminate()

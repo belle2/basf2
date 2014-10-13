@@ -54,10 +54,11 @@ namespace Belle2 {
      */
     bool MillepedeIIalignmentExecutePede();
 
-    /**
+    /*
      * A function to read xml alignment files
-     */
+       NOT Implemented
     bool MillepedeIIalignmentReadXML(const string& xml_filename);
+    */
 
     /**
      * A function to write xml alignment files

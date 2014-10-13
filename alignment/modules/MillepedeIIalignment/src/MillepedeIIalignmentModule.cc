@@ -132,7 +132,7 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentExecutePede()
   // now open millepede.end file to see what happened (we need hiher pede version)
   return ok;
 }
-
+/*
 bool MillepedeIIalignmentModule::MillepedeIIalignmentReadXML(const string& xml_filename)
 {
 
@@ -147,7 +147,7 @@ bool MillepedeIIalignmentModule::MillepedeIIalignmentReadXML(const string& xml_f
   // read_xml(xml_filename, propertyTree);
   return ok;
 }
-
+*/
 void MillepedeIIalignmentModule::readResWriteXml(const string& xml_filename, int type)
 {
 

@@ -382,55 +382,46 @@ void GBLfitModule::event()
 
       genfit::MeasurementFactory<genfit::AbsMeasurement> factory;
 
-      genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit>* PXDProducer =  NULL;
-#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-      genfit::MeasurementProducer <TelTrueHit, TelRecoHit>* TelProducer =  NULL;
-#endif
-      genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D>* SVDProducer =  NULL;
-      //TODO: CDC
-      genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
-
-      genfit::MeasurementProducer <PXDCluster, PXDRecoHit>* pxdClusterProducer = NULL;
-#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-      genfit::MeasurementProducer <TelCluster, TelRecoHit>* telClusterProducer = NULL;
-#endif
-      genfit::MeasurementProducer <SVDCluster, SVDRecoHit>* svdClusterProducer = NULL;
-
       //create MeasurementProducers for PXD, SVD and CDC and add producers to the factory with correct detector Id
       if (m_useClusters == false) { // use the trueHits
         if (pxdTrueHits.getEntries()) {
+          genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit>* PXDProducer =  NULL;
           PXDProducer =  new genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
           factory.addProducer(Const::PXD, PXDProducer);
         }
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
         if (telTrueHits.getEntries()) {
+          genfit::MeasurementProducer <TelTrueHit, TelRecoHit>* TelProducer =  NULL;
           TelProducer =  new genfit::MeasurementProducer <TelTrueHit, TelRecoHit> (telTrueHits.getPtr());
           factory.addProducer(Const::TEST, TelProducer);
         }
 #endif
         if (svdTrueHits.getEntries()) {
+          genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D>* SVDProducer =  NULL;
           SVDProducer =  new genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
           factory.addProducer(Const::SVD, SVDProducer);
         }
       } else {
         if (nPXDClusters) {
+          genfit::MeasurementProducer <PXDCluster, PXDRecoHit>* pxdClusterProducer = NULL;
           pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
           factory.addProducer(Const::PXD, pxdClusterProducer);
         }
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
         if (nTelClusters) {
+          genfit::MeasurementProducer <TelCluster, TelRecoHit>* telClusterProducer = NULL;
           telClusterProducer =  new genfit::MeasurementProducer <TelCluster, TelRecoHit> (telClusters.getPtr());
           factory.addProducer(Const::TEST, telClusterProducer);
         }
 #endif
         if (nSVDClusters) {
+          genfit::MeasurementProducer <SVDCluster, SVDRecoHit>* svdClusterProducer = NULL;
           svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
           factory.addProducer(Const::SVD, svdClusterProducer);
         }
       }
       if (cdcHits.getEntries()) {
-        //B2WARNING("GBLfit: CDC hits not yet supported. Will be ignored during track construction.");
-        //TODO: CDC
+        genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
         CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
         factory.addProducer(Const::CDC, CDCProducer);
       }
@@ -488,13 +479,11 @@ void GBLfitModule::event()
       // SVD cluster combination ------------------------------------------------------------------------------------------------
       if (m_useClusters) {
         try {
-          genfit::PlanarMeasurement* planarMeas1(NULL);
-          genfit::PlanarMeasurement* planarMeas2(NULL);
           for (unsigned int i = 0; i < gfTrack.getNumPoints() - 1; ++i) {
             //if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 1)
             //  continue;
-            planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i)->getRawMeasurement(0));
-            planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i + 1)->getRawMeasurement(0));
+            genfit::PlanarMeasurement* planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i)->getRawMeasurement(0));
+            genfit::PlanarMeasurement* planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i + 1)->getRawMeasurement(0));
 
             if (planarMeas1 != NULL && planarMeas2 != NULL &&
                 planarMeas1->getDetId() == planarMeas2->getDetId() &&
@@ -502,9 +491,9 @@ void GBLfitModule::event()
                 planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
               Belle2::SVDRecoHit* hit1 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas1);
               Belle2::SVDRecoHit* hit2 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas2);
-              Belle2::SVDRecoHit* hitU(NULL);
-              Belle2::SVDRecoHit* hitV(NULL);
               if (hit1 && hit2) {
+                Belle2::SVDRecoHit* hitU(NULL);
+                Belle2::SVDRecoHit* hitV(NULL);
                 // We have to decide U/V now (else SVDRecoHit2D could throw FATAL)
                 if (hit1->isU() && !hit2->isU()) {
                   hitU = hit1;
@@ -607,9 +596,9 @@ void GBLfitModule::event()
 
         //gfTrack.Print();
         bool fitSuccess = gfTrack.hasFitStatus(trackRep);
-        genfit::FitStatus* fs = 0;
         genfit::GblFitStatus* gfs = 0;
         if (fitSuccess) {
+          genfit::FitStatus* fs = 0;
           fs = gfTrack.getFitStatus(trackRep);
           fitSuccess = fitSuccess && fs->isFitted();
           //fitSuccess = fitSuccess && fs->isFitConverged();

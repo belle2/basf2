@@ -13,6 +13,8 @@ from basf2 import *
 from simulation import *
 from reconstruction import *
 
+set_random_seed(56423)
+
 print os.getcwd()
 
 main = create_path()
@@ -30,17 +32,13 @@ generator.param('nTracks', 8.0)
 generator.param('pdgCodes', pdgs)
 main.add_module(generator)
 
-#no EKLM
+#only up to CDC
 components = [
-    'MagneticField',
+    'MagneticFieldConstant4LimitedRCDC',
     'BeamPipe',
     'PXD',
     'SVD',
     'CDC',
-    'TOP',
-    'ARICH',
-    'BKLM',
-    'ECL',
 ]
 add_simulation(main, components)
 

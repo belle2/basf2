@@ -12,6 +12,7 @@ env['LIBS'] = [
     'cdc', 'cdc_dataobjects',
     'simulation_dataobjects',
     'framework',
+    'framework_pybasf2',
     'geometry',
     'Geom',
 #   'genfit2',

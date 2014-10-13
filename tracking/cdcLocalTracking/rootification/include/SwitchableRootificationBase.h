@@ -13,6 +13,9 @@
 
 #include "RootificationBase.h"
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/pybasf2/PyStoreArray.h>
+
 #include <tracking/cdcLocalTracking/config/CDCLocalTrackingConfig.h>
 
 namespace Belle2 {
@@ -38,7 +41,31 @@ namespace Belle2 {
     /// Typedef the normal TObject as the base class of the track finder in case the ROOT inheritance is switched on.
     typedef RootificationBase SwitchableRootificationBase;
 
-#define CDCLOCALTRACKING_SwitchableClassDef(ClassName,ClassVersion) ClassDef(ClassName,ClassVersion);
+#define CDCLOCALTRACKING_SwitchableClassDef(ClassName,ClassVersion) \
+  ClassDef(ClassName,ClassVersion);         \
+public:               \
+  /** Register a *transient* store array on the DataStore.*/    \
+  static void registerStoreArray()                \
+  { StoreArray< ClassName >::registerTransient(); }     \
+  \
+private:                \
+  /** Get the default name of the StoreArray for this class.*/    \
+  static std::string getStoreArrayName()        \
+  { return DataStore::arrayName< ClassName >(""); }     \
+  \
+public:               \
+  /** Looks up the StoreArray and returns it as a PyStoreArray. */  \
+  static PyStoreArray getStoreArray()         \
+  { return PyStoreArray(getStoreArrayName()); }       \
+  \
+  /** Copies the object to the StoreArray. */       \
+  /** Returns a reference to the newly created object*/     \
+  ClassName * copyToStoreArray() const {        \
+    StoreArray< ClassName > storeArray;         \
+    return storeArray.appendNew(*this);         \
+  }                 \
+private:                \
+   
 #define CDCLOCALTRACKING_SwitchableClassImp(ClassName) ClassImp(ClassName);
 
 #else

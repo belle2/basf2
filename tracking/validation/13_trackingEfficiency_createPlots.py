@@ -3,7 +3,7 @@
 
 # !/usr/bin/env python
 
-#################################################################
+# ################################################################
 #                                                               #
 #     script creates efficiency vs pt plots and stores them     #
 #     in a root file                                            #
@@ -12,6 +12,15 @@
 #    michael.ziegler2@kit.edu                                   #
 #                                                               #
 #################################################################
+
+"""
+<header>
+    <input>trackingEfficiency_FinalData.root</input>
+    <output>TrackingValidation.root</output>
+    <contact>michael.ziegler2@kit.edu</contact>
+    <description>Create momentum resolution, impact parameter resolution and efficiency plots.</description>
+</header
+"""
 
 from __future__ import division
 
@@ -45,8 +54,7 @@ def main():
     option_parser = OptionParser()
     option_parser.add_option('-i', '--input-file', dest='input_file',
                              default='../trackingEfficiency_FinalData.root',
-                             help='Root file with StandardTrackingPerformance output.'
-                             )
+                             help='Root file with StandardTrackingPerformance output.')
     option_parser.add_option('-o', '--output-file', dest='output_file',
                              default='TrackingValidation.root',
                              help='Root file with all histograms.')
@@ -84,7 +92,9 @@ def main():
     # create efficiency in bins of pt plot
     calculate_efficiency_in_pt(data_tree)
 
-    for pt_value in PT_VALUES:
+    pt_of_interest = [0.25, 1.]
+
+    for pt_value in pt_of_interest:
         # create plots of efficiency in bins of cos Theta for different pt
         generate_cos_theta_plot(data_tree, pt_value)
 
@@ -94,6 +104,29 @@ def main():
     draw_impact_parameter(data_tree)
 
     draw_pvalue(data_tree)
+
+    draw_residua(data_tree, 'x', 'x_gen', pt_of_interest=pt_of_interest)
+    draw_residua(data_tree, 'y', 'y_gen', pt_of_interest=pt_of_interest)
+    draw_residua(data_tree, 'z', 'z_gen', pt_of_interest=pt_of_interest)
+
+    draw_residua(
+        data_tree,
+        'pt',
+        'pt_gen',
+        bins=200,
+        ledge=-0.1,
+        uedge=0.1,
+        normalize=1,
+        pt_of_interest=pt_of_interest)
+
+    # write additional plots in sub dir
+    sub_dir = 'additionalPlots'
+    output_root_file.mkdir(sub_dir)
+    output_root_file.cd(sub_dir)
+
+    for pt_value in PT_VALUES:
+        # create plots of efficiency in bins of cos Theta for different pt
+        generate_cos_theta_plot(data_tree, pt_value)
 
     draw_residua(data_tree, 'x', 'x_gen')
     draw_residua(data_tree, 'y', 'y_gen')
@@ -106,8 +139,7 @@ def main():
         bins=200,
         ledge=-0.1,
         uedge=0.1,
-        normalize=1,
-        )
+        normalize=1)
 
     # close output file
     output_root_file.Close()
@@ -130,7 +162,7 @@ def draw_pvalue(data_tree):
             pvalue = data_tree.GetLeaf('pValue').GetValue()
         except ReferenceError:
             print 'The variable "pValue" doesn\'t exist in the tree "%s".\nLeave this function without plotting the variable.' \
-                % data_tree.GetName()
+                  % data_tree.GetName()
             return
 
         if pvalue is -999:
@@ -143,7 +175,7 @@ def draw_pvalue(data_tree):
     hist_pvalue.SetYTitle('number of entries')
 
     description = 'Distibution of pValues of the single tracks (Contact: %s).' \
-        % CONTACT_PERSON['Email']
+                  % CONTACT_PERSON['Email']
     check = 'Should be a flat distribution.'
 
     hist_pvalue.GetListOfFunctions().Add(TNamed('Description', description))
@@ -174,13 +206,13 @@ def calculate_efficiency_in_pt(data_tree):
     efficiency_hist.SetMaximum(1.05)
 
     description = \
-        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. This plot shows the single track reconstruction efficiency over the transverse momentum. (Contact: %s)' \
-        % CONTACT_PERSON['Email']
+        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. This plot shows the single track reconstruction efficiency over the transverse momentum.'
 
     check = 'The efficiency should be stable for higher pt values.'
     efficiency_hist.GetListOfFunctions().Add(TNamed('Description',
-            description))
+                                                    description))
     efficiency_hist.GetListOfFunctions().Add(TNamed('Check', check))
+    efficiency_hist.GetListOfFunctions().Add(TNamed('Contact', CONTACT_PERSON['Email']))
 
     # loop over bins and calculate efficiency and error of efficiency
     for ibin in xrange(1, number_bins + 1):
@@ -192,14 +224,13 @@ def calculate_efficiency_in_pt(data_tree):
             number_reconstructed = hist_pt_rec.GetBinContent(ibin)
             efficiency = number_reconstructed / number_generated
             error = math.sqrt(number_reconstructed * (number_generated
-                              - number_reconstructed) / pow(number_generated,
-                              3))
+                                                      - number_reconstructed) / pow(number_generated,
+                                                                                    3))
             # set according bin to the efficiency value and add errorbar
         efficiency_hist.SetBinContent(ibin, efficiency)
         efficiency_hist.SetBinError(ibin, error)
 
-    efficiency_hist.SetTitle('Tracking efficiency in bins of transverse momentum pt.'
-                             )
+    efficiency_hist.SetTitle('Tracking efficiency in bins of transverse momentum pt.')
     efficiency_hist.SetXTitle('pt in GeV')
     efficiency_hist.SetYTitle('efficiency')
 
@@ -221,22 +252,24 @@ def generate_cos_theta_plot(data_tree, pt_value):
 
     data_tree.Draw('cosTheta_gen>>hCosGen',
                    'pt_gen>(%.2f - %f) &&pt_gen<(%.2f + %f)' % (pt_value,
-                   DELTA_PT, pt_value, DELTA_PT), 'goff')
+                                                                DELTA_PT, pt_value, DELTA_PT), 'goff')
     data_tree.Draw('cosTheta_gen>>hCosRec',
                    'pt_gen>(%.2f - %f) &&pt_gen<(%.2f + %f) && pt != -999'
                    % (pt_value, DELTA_PT, pt_value, DELTA_PT), 'goff')
 
     description = \
-        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the single track reconstruction efficiency in bins of the polar angle for the fixed transverse momentum pt = %.2f GeV. (Contact: %s)' \
-        % (pt_value, CONTACT_PERSON['Email'])
+        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the single track reconstruction efficiency in bins of the polar angle for the fixed transverse momentum pt = %.2f GeV.'
     check = 'Stable efficiency over the hole range of the polar angle.'
 
     efficiency_hist = TH1F('hEfficiencyPt%.2fGeV' % pt_value,
                            'hEfficiencyPt%.2fGeV' % pt_value, number_bins,
                            cos_lower, cos_upper)
     efficiency_hist.GetListOfFunctions().Add(TNamed('Description',
-            description))
+                                                    description))
     efficiency_hist.GetListOfFunctions().Add(TNamed('Check', check))
+    efficiency_hist.GetListOfFunctions().Add(TNamed('Contact',
+                                                    CONTACT_PERSON['Email']))
+
     for ibin in range(1, number_bins + 1):
         efficiency = 0
         error = 0
@@ -246,8 +279,8 @@ def generate_cos_theta_plot(data_tree, pt_value):
             number_reconstructed = hist_cos_rec.GetBinContent(ibin)
             efficiency = number_reconstructed / number_generated
             error = math.sqrt(number_reconstructed * (number_generated
-                              - number_reconstructed) / pow(number_generated,
-                              3))
+                                                      - number_reconstructed) / pow(number_generated,
+                                                                                    3))
 
         efficiency_hist.SetBinContent(ibin, efficiency)
         efficiency_hist.SetBinError(ibin, error)
@@ -296,13 +329,15 @@ def create_momentum_resolution_plot(data_tree):
     hist_resolution.SetYTitle('#sigma_{pt}/pt')
 
     description = \
-        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (200 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the relative momentum resolution of the transverse momentum over transverse momentum. (Contact: %s)' \
-        % CONTACT_PERSON['Email']
+        'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (200 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. The plot shows the relative momentum resolution of the transverse momentum over transverse momentum.'
 
     check = ''
     hist_resolution.GetListOfFunctions().Add(TNamed('Description',
-            description))
+                                                    description))
     hist_resolution.GetListOfFunctions().Add(TNamed('Check', check))
+    hist_resolution.GetListOfFunctions().Add(TNamed('Contact',
+                                                    CONTACT_PERSON['Email']))
+
     # Get a log scale on the plot.  The first way is my hackish way of
     # doing this, which is currently available on the buildbot
     # (2014-10-08).  The second is the way suggested for the future.
@@ -313,6 +348,7 @@ def create_momentum_resolution_plot(data_tree):
 
 
     # fit_parameters = fit_resolution(fit_pt_values, fit_pt_res_values, 1, fit_pt_res_errors)
+
 
 def get_scaled_rms_90(values, scale_factor=0.79):
     """
@@ -371,7 +407,7 @@ def calculate_momentum_resolution2(data_tree):
                     delta_pt_dict[test_object[1]].append(pt - pt_gen)
                 except KeyError:
                     print 'pt = %0.2f is not generated and not used as key. Abort!' \
-                        % test_object[1]
+                          % test_object[1]
                     sys.exit(1)
     pt_resolutions = {}
 
@@ -386,11 +422,11 @@ def calculate_momentum_resolution2(data_tree):
 
 
 def fit_resolution(
-    x_value_list,
-    y_value_list,
-    degree,
-    y_value_errors=None,
-    ):
+        x_value_list,
+        y_value_list,
+        degree,
+        y_value_errors=None,
+):
     """
     Fit a polynomial to data
 
@@ -486,7 +522,7 @@ def draw_impact_parameter(data_tree):
         (z_resolution, z_error) = get_scaled_rms_90(impact_param_z[key])
         z_resolutions[key] = [z_resolution, z_error]
         print 'pt = %0.2f: sigma_d0 = %0.4f, sigma_z = %0.4f' % (key,
-                d0_resolution, z_resolution)
+                                                                 d0_resolution, z_resolution)
 
     number_bins = 62
     lower_edge = -0.025
@@ -500,10 +536,10 @@ def draw_impact_parameter(data_tree):
     # Get a log scale on the plot.  The first way is my hackish way of
     # doing this, which is currently available on the buildbot
     # (2014-10-08).  The second is the way suggested for the future.
-    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'
-            ))
-    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('Options', 'logy'
-            ))
+    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'))
+    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('Options', 'logy'))
+    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('Contact',
+                                                             CONTACT_PERSON['Email']))
 
     hist_impact_parameter_z = TH1F('hzresolution', 'hzresolution',
                                    number_bins, lower_edge, upper_edge)
@@ -515,6 +551,8 @@ def draw_impact_parameter(data_tree):
     # (2014-10-08).  The second is the way suggested for the future.
     hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'))
     hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('Options', 'logy'))
+    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('Contact',
+                                                            CONTACT_PERSON['Email']))
 
     for pt in PT_VALUES:
         ibin = hist_impact_parameter_d0.FindBin(pt)
@@ -568,25 +606,31 @@ def d0_sign(vector_d, momentum):
 
 
 def draw_residua(
-    data_tree,
-    variable_name,
-    gen_variable_name,
-    bins=100,
-    ledge=-0.01,
-    uedge=0.01,
-    normalize=0,
-    ):
+        data_tree,
+        variable_name,
+        gen_variable_name,
+        bins=100,
+        ledge=-0.01,
+        uedge=0.01,
+        normalize=0,
+        pt_of_interest=None,
+):
     """
     Write histogram of difference of variable_name (reconstructed) and
     gen_variable_name (generated) in gDirectory
     """
 
+    if pt_of_interest is None:
+        used_pts = PT_VALUES
+    else:
+        used_pts = [pt for pt in pt_of_interest if pt in PT_VALUES]
+
     number_entries = data_tree.GetEntries()
 
     histograms = {}
-    for pt_value in PT_VALUES:
+    for pt_value in used_pts:
         histograms[pt_value] = TH1F('h%sResiduum_%0.2fGeV' % (variable_name,
-                                    pt_value), 'h%sResiduum_%0.2fGeV'
+                                                              pt_value), 'h%sResiduum_%0.2fGeV'
                                     % (variable_name, pt_value), bins, ledge,
                                     uedge)
 
@@ -598,21 +642,22 @@ def draw_residua(
             variable_generated = \
                 data_tree.GetLeaf(gen_variable_name).GetValue()
             pt_gen = round(data_tree.GetLeaf('pt_gen').GetValue(), 2)
-            if pt_gen in PT_VALUES:
+            if pt_gen in used_pts:
                 if normalize:
                     histograms[pt_gen].Fill((variable_reconstructed
-                            - variable_generated) / variable_generated)
+                                             - variable_generated) / variable_generated)
                 else:
                     histograms[pt_gen].Fill(variable_reconstructed
-                            - variable_generated)
+                                            - variable_generated)
 
     for (pt, hist) in histograms.iteritems():
         scale_histogram(hist)
         if normalize:
             hist.SetXTitle('(%s - %s) / %s' % (variable_name,
-                           gen_variable_name, gen_variable_name))
+                                               gen_variable_name, gen_variable_name))
         else:
             hist.SetXTitle('(%s - %s)' % (variable_name, gen_variable_name))
+        hist.GetListOfFunctions().Add(TNamed('Contact', CONTACT_PERSON['Email']))
         hist.Write()
 
 

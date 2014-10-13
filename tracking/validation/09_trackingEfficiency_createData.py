@@ -13,6 +13,14 @@
 #                                                               #
 #################################################################
 
+"""
+<header>
+    <output>trackingEfficiency_pt_2.00GeV.root</header>
+    <contact>michael.ziegler2@kit.edu</contact>
+    <description>Create events with 10 muon tracks with fixed pt value.</description>
+</header>
+"""
+
 from basf2 import *
 from tracking_efficiency_helpers import run_simulation, get_generated_pt_value
 
@@ -29,4 +37,3 @@ path = create_path()
 run_simulation(path, pt_value, output_filename)
 
 process(path)
-

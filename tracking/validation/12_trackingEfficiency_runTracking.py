@@ -11,7 +11,18 @@
 #    michael.ziegler2@kit.edu                                   #
 #                                                               #
 #################################################################
-
+"""
+<header>
+    <input>trackingEfficiency_pt_0.10GeV.root,trackingEfficiency_pt_0.25GeV.root,
+    trackingEfficiency_pt_0.40GeV.root,trackingEfficiency_pt_0.60GeV.root,
+    trackingEfficiency_pt_1.00GeV.root,trackingEfficiency_pt_1.50GeV.root,
+    trackingEfficiency_pt_2.00GeV.root,trackingEfficiency_pt_3.00GeV.root,
+    trackingEfficiency_pt_4.00GeV.root</input>
+    <output>trackingEfficiency_FinalData.root</header>
+    <contact>michael.ziegler2@kit.edu</contact>
+    <description>Run standard tracking on input files and write out information of the reconstructed tracks.</description>
+</header>
+"""
 from basf2 import *
 from reconstruction import add_reconstruction
 import glob

@@ -172,7 +172,7 @@ def create_path_from_parsed_arguments(arguments):
 
     root_input_file_path = getattr(arguments, 'root_input_file', None)
     if root_input_file_path:
-        return create_load_events_path(root_input_file)
+        return create_load_events_path(root_input_file_path)
     else:
         generator_name = arguments.generator
         n_events = arguments.n_events
@@ -279,7 +279,7 @@ def is_root_input_file(file_path):
     Simple test only checks if file exists and ends with ".root"
     """
 
-    return os.path.isfile(bkg_file_path) and bkg_file_path.endswith('.root')
+    return os.path.isfile(file_path) and file_path.endswith('.root')
 
 
 def is_bkg_file(bkg_file_path):
@@ -506,7 +506,7 @@ def add_load_events(path, root_input_file_path):
     geometry_module = basf2.register_module('Geometry')
     components = get_tracking_components()
     geometry_params = {'components': components}
-    geometry_module.params(geometry_params)
+    geometry_module.param(geometry_params)
     path.add_module(geometry_module)
 
 

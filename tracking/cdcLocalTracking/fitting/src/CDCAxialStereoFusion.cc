@@ -102,12 +102,16 @@ namespace {
 
     if (not startSegment.getTrajectory2D().isFitted()) {
       B2WARNING("Start segment not fitted.");
-      return CDCTrajectory3D();
+      CDCTrajectory3D result;
+      result.setChi2(NAN);
+      return result;
     }
 
     if (not endSegment.getTrajectory2D().isFitted()) {
       B2WARNING("End segment not fitted.");
-      return CDCTrajectory3D();
+      CDCTrajectory3D result;
+      result.setChi2(NAN);
+      return result;
     }
 
     CDCTrajectory2D startTrajectory2D = startSegment.getTrajectory2D();

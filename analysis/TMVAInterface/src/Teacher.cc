@@ -283,11 +283,11 @@ namespace Belle2 {
       // The options nTrain_Background and nTest_Background (same for *_Signal) are applied
       // after this transformation to vectors, therefore they're too late to prevent a allocation of huge amount of memory
       // if one has many backgruond events.
-      if (m_tree->get().GetEntries(signalCut) > maxEventsPerClass)
+      if ((unsigned long int)m_tree->get().GetEntries(signalCut) > maxEventsPerClass)
         factory.AddSignalTree(m_tree->get().CopyTree(signalCut)->CopyTree("", "", signalEvents));
       else
         factory.AddSignalTree(m_tree->get().CopyTree(signalCut));
-      if (m_tree->get().GetEntries(backgroundCut) > maxEventsPerClass)
+      if ((unsigned long int)m_tree->get().GetEntries(backgroundCut) > maxEventsPerClass)
         factory.AddBackgroundTree(m_tree->get().CopyTree(backgroundCut)->CopyTree("", "", backgroundEvents));
       else
         factory.AddBackgroundTree(m_tree->get().CopyTree(backgroundCut));

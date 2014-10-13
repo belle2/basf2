@@ -32,6 +32,9 @@ Level3Module::Level3Module()
     m_tFinder(FTFinder::instance()),
     m_cFinder(FCFinder::instance())
 {
+  // confirmed the result of parallel processing on Oct.13 2014
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   setDescription("Level3 is the Level-3 software trigger module.");
 
   //---

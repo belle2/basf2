@@ -456,8 +456,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaNBackgroundAfterPostCut'] = 0
         if 'ignoreReason' not in placeholders:
             placeholders['ignoreReason'] = """Due too low statistics after the pre cut, we didn\'t perfom a training in this channel.
-                                              This means there were less than 100 signal or 100 background events in the given sample.
-                                              Or the determined pre cut range is smaller than 1e-4."""
+                                              This means there were less than 1000 signal or 1000 background events in the given sample."""
     else:
         ROOT.gROOT.SetBatch(True)
 

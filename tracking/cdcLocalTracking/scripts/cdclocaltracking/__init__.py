@@ -17,26 +17,42 @@ import itertools
 
 import tools
 
+CDCWireHitTopology = Belle2.CDCLocalTracking.CDCWireHitTopology
+
+# Lookup
+CDCMCHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp
+
+# Rootified data objects
+CDCAxialStereoSegmentPair = Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair
+
+# Rootified fitter objects
+CDCRiemannFitter = Belle2.CDCLocalTracking.CDCRiemannFitter
+CDCAxialStereoFusion = Belle2.CDCLocalTracking.CDCAxialStereoFusion
+
 
 class MCSegmenterModule(Module):
 
     """Simple module to generate segment to the DataStore."""
 
-    def __init__(self,
-                 fit_method=Belle2.CDCLocalTracking.CDCRiemannFitter.getFitter().fit):
+    @staticmethod
+    def default_fit_method(segment):
+        return CDCRiemannFitter.getFitter().fit(segment)
+
+    def __init__(self, fit_method=None):
         """Initalizes the module and sets up the method, with which the segments ought to be fitted."""
 
         ## Method used to fit the individual segments
         self.fit_method = fit_method
+        if not fit_method:
+            self.fit_method = self.default_fit_method
+
         super(MCSegmenterModule, self).__init__()
 
     def initialize(self):
         """Initializes the segment worker"""
 
-        self.theMCHitLookUp = \
-            Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
-        self.theWireHitTopology = \
-            Belle2.CDCLocalTracking.CDCWireHitTopology.getInstance()
+        self.theMCHitLookUp = CDCMCHitLookUp.getInstance()
+        self.theWireHitTopology = CDCWireHitTopology.getInstance()
 
         self.mcSegmentWorker = Belle2.CDCLocalTracking.MCSegmentWorker()
         self.mcSegmentWorker.initialize()
@@ -61,45 +77,41 @@ class MCSegmenterModule(Module):
         fit_method = self.fit_method
         for segment in segments:
             fit = fit_method(segment)
-            segment.setTrajectory2D(fit)
+            if fit is not None:
+                segment.setTrajectory2D(fit)
 
 
-class MCAxialStereoPairCreator:
+class MCAxialStereoPairCreatorModule(Module):
 
     @staticmethod
     def default_fit_method(axialStereoSegmentPair):
-        Belle2.CDCLocalTracking.CDCAxialStereoFusion.reconstructFuseTrajectories(axialStereoSegmentPair,
+        """Default method to fit the generated segment pairs."""
+
+        CDCAxialStereoFusion.reconstructFuseTrajectories(axialStereoSegmentPair,
                 True)
 
     def __init__(self, create_mc_true_only=True, fit_method=None):
         self.create_mc_true_only = create_mc_true_only
-        self.fit_method = \
-            (fit_method if fit_method else self.default_fit_method)
 
-        self.axialStereoSegmentPairs = []
+        ## Method used to fit the individual segments
+        self.fit_method = fit_method
+        if not fit_method:
+            self.fit_method = self.default_fit_method
+
+        super(MCAxialStereoPairCreatorModule, self).__init__()
 
     def initialize(self):
         self.mcAxialStereoSegmentPairFilter = \
             Belle2.CDCLocalTracking.MCAxialStereoSegmentPairFilter()
         self.mcAxialStereoSegmentPairFilter.initialize()
 
+        CDCAxialStereoSegmentPair.registerStoreArray()
+
     def event(self):
-        """Generates valid axial stereo segment pairs from the CDCRecoSegment2Ds on the DataStore filtering by MCAxialStereoSegmentPairFilter and return them as a list."""
+        """Generates valid axial stereo segment pairs from the CDCRecoSegment2Ds 
+        on the DataStore filtering by MCAxialStereoSegmentPairFilter and output the result to the DataStore."""
 
-        self.axialStereoSegmentPairs = []
-        axialStereoSegmentPairs = self.axialStereoSegmentPairs
-
-        segments = Belle2.PyStoreArray('CDCRecoSegment2Ds')
-        mcAxialStereoSegmentPairFilter = self.mcAxialStereoSegmentPairFilter
-        create_mc_true_only = self.create_mc_true_only
-
-        axialStereoSegmentPair = \
-            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair()
-        segmentsByISuperLayer = [[] for i in range(9)]
-
-        for segment in segments:
-            iSuperLayer = segment.getISuperLayer()
-            segmentsByISuperLayer[iSuperLayer].append(segment)
+        segmentsByISuperLayer = self.getSegmentsByISuperLayer()
 
         for (iSuperLayer, segmentsForISuperLayer) in \
             enumerate(segmentsByISuperLayer):
@@ -107,46 +119,59 @@ class MCAxialStereoPairCreator:
             iSuperLayerIn = iSuperLayer - 1
             if iSuperLayerIn >= 0:
                 segmentsForISuperLayerIn = segmentsByISuperLayer[iSuperLayerIn]
-                for (segment, segmentIn) in \
-                    itertools.product(segmentsForISuperLayer,
-                                      segmentsForISuperLayerIn):
-
-                    axialStereoSegmentPair.setSegments(segment, segmentIn)
-                    axialStereoSegmentPair.clearTrajectory3D()
-                    mcWeight = \
-                        mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair)
-
-                    if mcWeight == mcWeight or not create_mc_true_only:
-                        axialStereoSegmentPair.getAutomatonCell().setCellWeight(mcWeight)
-                        axialStereoSegmentPairs.append(axialStereoSegmentPair)
-                        axialStereoSegmentPair = \
-                            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair()
+                self.storePairs(segmentsForISuperLayer,
+                                segmentsForISuperLayerIn)
 
             iSuperLayerOut = iSuperLayer + 1
             if iSuperLayerOut < len(segmentsByISuperLayer):
                 segmentsForISuperLayerOut = \
                     segmentsByISuperLayer[iSuperLayerOut]
-                for (segment, segmentOut) in \
-                    itertools.product(segmentsForISuperLayer,
-                                      segmentsForISuperLayerOut):
+                self.storePairs(segmentsForISuperLayer,
+                                segmentsForISuperLayerOut)
 
-                    axialStereoSegmentPair.setSegments(segment, segmentOut)
-                    axialStereoSegmentPair.clearTrajectory3D()
-                    mcWeight = \
-                        mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair)
+        self.fitStoredPairs()
 
-                    if mcWeight == mcWeight or not create_mc_true_only:
-                        axialStereoSegmentPair.getAutomatonCell().setCellWeight(mcWeight)
-                        axialStereoSegmentPairs.append(axialStereoSegmentPair)
-                        axialStereoSegmentPair = \
-                            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair()
+    def getSegmentsByISuperLayer(self):
+        """Returns a list of lists of segments where the index of the first list is the superlayer id of the segments contained at that position"""
 
-        ## Properly fit the result
+        segments = Belle2.PyStoreArray('CDCRecoSegment2Ds')
+
+        segmentsByISuperLayer = [[] for i in range(9)]
+
+        for segment in segments:
+            iSuperLayer = segment.getISuperLayer()
+            segmentsByISuperLayer[iSuperLayer].append(segment)
+
+        return segmentsByISuperLayer
+
+    def storePairs(self, startSegments, endSegments):
+        """Generate pairs of segments from the startSegments to the endSegments and copy them to the StoreArray."""
+
+        mcAxialStereoSegmentPairFilter = self.mcAxialStereoSegmentPairFilter
+        create_mc_true_only = self.create_mc_true_only
+        axialStereoSegmentPair = CDCAxialStereoSegmentPair()
+
+        for (startSegment, endSegment) in itertools.product(startSegments,
+                endSegments):
+            if startSegment == endSegment:
+                continue
+            axialStereoSegmentPair.setSegments(startSegment, endSegment)
+            axialStereoSegmentPair.clearTrajectory3D()
+
+            mcWeight = \
+                mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair)
+
+            if mcWeight == mcWeight or not create_mc_true_only:
+                axialStereoSegmentPair.getAutomatonCell().setCellWeight(mcWeight)
+                axialStereoSegmentPair.copyToStoreArray()
+
+    def fitStoredPairs(self):
+        """Fits all pairs in the StoreArray with designated fit method."""
+
         fit_method = self.fit_method
-        for axialStereoSegmentPair in axialStereoSegmentPairs:
+        for axialStereoSegmentPair in \
+            CDCAxialStereoSegmentPair.getStoreArray():
             fit_method(axialStereoSegmentPair)
-
-        return axialStereoSegmentPairs
 
     def terminate(self):
         self.mcAxialStereoSegmentPairFilter.terminate()

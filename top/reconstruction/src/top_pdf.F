@@ -553,14 +553,18 @@ c--   calculate PDF parameters
 
       INTEGER N_BGR, I
       INTEGER ICH, NUMCH
-      REAL S
+      REAL S, T
       INTEGER M_OLD /-1/
       SAVE M_OLD
-
+      
       IF(NUM_MOD.GT.1) THEN
          N_BGR=0
          DO I=1,N_DATA
-            IF(DATA_MOD(I).NE.M) N_BGR=N_BGR+1
+            IF(DATA_MOD(I).NE.M) THEN
+               T=DATA_TIME(I)
+               IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
+               N_BGR=N_BGR+1
+            ENDIF
          ENDDO
          STFB=FLOAT(N_BGR)/FLOAT(NUM_MOD-1)
          STFB=MAX(NUM_BGR,STFB)

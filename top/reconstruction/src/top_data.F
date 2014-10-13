@@ -24,12 +24,13 @@
       END
 
 
-      SUBROUTINE DATA_PUT(MDN,ICH,TDC,KK)
+      SUBROUTINE DATA_PUT(MDN,ICH,TDC,T0,KK)
 
       IMPLICIT NONE
       INTEGER MDN               ! module ID number
       INTEGER ICH               ! channel ID number
       INTEGER TDC               ! TDC time (digitized)
+      REAL T0                   ! offset to be added [ns]
       INTEGER KK                ! return status: index or 0 (failure)
 #include "TOP_DATA.fi"
 #include "TOP_TDC.fi"
@@ -46,7 +47,7 @@
       DATA_MOD(K)=MDN
       DATA_ICH(K)=ICH
       DATA_TDC(K)=TDC
-      DATA_TIME(K)= (TDC+0.5)*TDC_DT+TDC_T0
+      DATA_TIME(K)= (TDC+0.5)*TDC_DT-TDC_T0+T0
       N_DATA=K
       KK=K
 

@@ -18,7 +18,7 @@ extern "C" {
   void set_beta_rq_(float*);
   void set_tmax_(float*);
   void set_pdf_opt_(int*);
-  float get_logl_(float*, float*);
+  float get_logl_(float*, float*, float*);
   int data_getnum_();
 
 }
@@ -94,8 +94,9 @@ namespace Belle2 {
        * @param QbarID bar ID
        * @param chID channel ID
        * @param TDC digitized time
+       * @param t0 offset in [ns] to be added
        */
-      int addData(int QbarID, int chID, int TDC);
+      int addData(int QbarID, int chID, int TDC, double t0 = 0.0);
 
       /**
        * Return size of data list
@@ -168,14 +169,16 @@ namespace Belle2 {
 
       /**
        * Return log likelihood for the last mass hypothesis using time-shifted PDF
-       * @param timeShift time shift of PDF to the left
+       * @param timeShift time shift of PDF
        * @param timeWindow size of time window within which the photons are accepted
+       * @param sigma additional time smearing sigma
        * @return log likelihood
        */
-      double getLogL(double timeShift, double timeWindow) {
+      double getLogL(double timeShift, double timeWindow, double sigma = 0.0) {
         float t0 = (float) timeShift;
         float twin = (float) timeWindow;
-        return get_logl_(&t0, &twin);
+        float sigt = (float) sigma;
+        return get_logl_(&t0, &twin, &sigt);
       }
 
       /**

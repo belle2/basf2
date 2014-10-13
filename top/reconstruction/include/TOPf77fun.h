@@ -76,7 +76,7 @@ extern "C" {
   // fortran functions defined in top_data.F
   void data_clear_();
   void data_restore_();
-  void data_put_(int*, int*, int*, int*);
+  void data_put_(int*, int*, int*, float*, int*);
   int data_getnum_();
   void data_get_(int*, int*, int*, int*);
 

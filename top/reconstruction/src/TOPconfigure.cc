@@ -82,7 +82,7 @@ namespace Belle2 {
         setQE(Wavelength, QE, size, m_topgp->getColEffi() * m_topgp->getELefficiency());
       }
 
-      setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth());
+      setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth(), m_topgp->getTDCoffset());
 
       int n = m_topgp->getNbars();           // number of bars in phi
       double Dphi = 2 * M_PI / n;

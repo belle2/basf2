@@ -280,15 +280,49 @@ namespace Belle2 {
        */
       double getPMToffsetY() const {return m_pmtOffsetY / m_unit;}
 
-      /** Get number of TDC bits
+      /**
+       * Return number of TDC bits
        * @return number of TDC bits
        */
       int getTDCbits() const {return m_NTDC; }
 
-      /** Get width of TDC bit
-       * @return width of TDC bit in ns
+      /**
+       * Return width of TDC bin
+       * @return width of TDC bin [ns]
        */
       double getTDCbitwidth() const {return m_TDCwidth; }
+
+      /**
+       * Return TDC offset (see getTime(int TDC) for the definition)
+       * @return offset [ns]
+       */
+      double getTDCoffset() const {return m_TDCoffset; }
+
+      /**
+       * Return TDC overflow value
+       * @return overflow value
+       */
+      int TDCoverflow() const {return 1 << m_NTDC;}
+
+      /**
+       * Convert TDC count to time
+       * @param TDC TDC count
+       * @return time [ns]
+       */
+      double getTime(int TDC) const {return (TDC + 0.5) * m_TDCwidth - m_TDCoffset;}
+
+      /**
+       * Convert time to TDC count.
+       * For times being outside TDC range, TDC overflow value is returned.
+       * @param time [ns]
+       * @return TDC TDC count
+       */
+      int getTDCcount(double time) const {
+        time += m_TDCoffset;
+        if (time < 0) return TDCoverflow();
+        if (time > TDCoverflow() * m_TDCwidth) return TDCoverflow();
+        return int(time / m_TDCwidth);
+      }
 
       /** Get electronic jitter
        * @return rms of electronic jitter in ns
@@ -511,6 +545,7 @@ namespace Belle2 {
 
       int m_NTDC;                 /**< number of TDC bits */
       double m_TDCwidth;          /**< width of a bit in [ns] */
+      double m_TDCoffset;         /**< offset to be subtracted [ns] */
 
       //! electronics jitter
       double m_ELjitter;          /**< rms of electronic jitter */

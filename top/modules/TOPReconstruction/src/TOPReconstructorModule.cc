@@ -24,6 +24,7 @@
 #include <top/dataobjects/TOPLikelihood.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPRecBunch.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -74,14 +75,18 @@ namespace Belle2 {
     // Add parameters
     addParam("minBkgPerBar", m_minBkgPerBar,
              "Minimal number of background photons per bar", 0.0);
-    addParam("scaleN0", m_scaleN0, "Scale factor for N0", 1.0);
-    addParam("sigmaRphi", m_sigmaRphi, "track smearing sigma in Rphi [cm]", 0.0);
-    addParam("sigmaZ", m_sigmaZ, "track smearing sigma in Z [cm]", 0.0);
-    addParam("sigmaTheta", m_sigmaTheta, "track smearing sigma in Theta [radians]",
-             0.0);
-    addParam("sigmaPhi", m_sigmaPhi, "track smearing sigma in Phi [radians]", 0.0);
+    addParam("scaleN0", m_scaleN0,
+             "Scale factor for N0", 1.0);
+    addParam("sigmaRphi", m_sigmaRphi,
+             "track smearing sigma in Rphi [cm]", 0.0);
+    addParam("sigmaZ", m_sigmaZ,
+             "track smearing sigma in Z [cm]", 0.0);
+    addParam("sigmaTheta", m_sigmaTheta,
+             "track smearing sigma in Theta [radians]", 0.0);
+    addParam("sigmaPhi", m_sigmaPhi,
+             "track smearing sigma in Phi [radians]", 0.0);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use default one)", 0.0);
+             "time limit for photons [ns] (0 = use full TDC range)", 51.2);
 
     for (int i = 0; i < c_Nhyp; i++) {m_Masses[i] = 0;}
 
@@ -111,6 +116,9 @@ namespace Belle2 {
 
     StoreArray<TOPBarHit> barHits;
     barHits.isOptional();
+
+    StoreObjPtr<TOPRecBunch> recBunch;
+    recBunch.isOptional(); // to be changed to required in future
 
     // output
 
@@ -169,9 +177,15 @@ namespace Belle2 {
 
     if (m_maxTime > 0) reco.setTmax(m_maxTime);
 
-    // clear reconstruction object
+    // get reconstructed bunch time (if available)
 
-    reco.clearData();
+    double bunchTime = 0;
+    StoreObjPtr<TOPRecBunch> recBunch;
+    if (recBunch.isValid()) {
+      bunchTime = recBunch->getTime();
+      if (recBunch->isSimulated() and !recBunch->isReconstructed())
+        B2WARNING("TOPReconstructor: bunch time is simulated but not reconstructed");
+    }
 
     // add photons
 
@@ -179,7 +193,7 @@ namespace Belle2 {
     for (int i = 0; i < topDigits.getEntries(); ++i) {
       const TOPDigit* data = topDigits[i];
       if (data->getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        reco.addData(data->getBarID(), data->getChannelID(), data->getTDC());
+        reco.addData(data->getBarID(), data->getChannelID(), data->getTDC(), bunchTime);
     }
 
     // reconstruct track-by-track and store the results

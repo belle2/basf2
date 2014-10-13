@@ -86,6 +86,9 @@ namespace Belle2 {
     double m_electronicJitter;     /**< r.m.s of electronic jitter */
     double m_electronicEfficiency; /**< electronic efficiency */
     double m_darkNoise;            /**< uniform dark noise (hits per bar) */
+    double m_trigT0Sigma;          /**< trigger T0 resolution */
+
+    double m_bunchTimeSep; /**< time between two bunches */
 
     TOP::TOPGeometryPar* m_topgp;  /**< geometry parameters */
 

@@ -10,5 +10,6 @@
 #pragma link C++ class Belle2::TOPDigit+;
 #pragma link C++ class Belle2::TOPBarHit+;
 #pragma link C++ class Belle2::TOPLikelihood+;
+#pragma link C++ class Belle2::TOPRecBunch+;
 
 #endif

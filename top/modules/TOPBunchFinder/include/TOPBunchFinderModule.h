@@ -20,7 +20,8 @@ namespace Belle2 {
   class DedxLikelihood;
 
   /**
-   * Bunch finder
+   * Bunch finder: searches for the bunch crossing where the interaction happened
+   * using track-based TOP likelihood
    */
   class TOPBunchFinderModule : public Module {
 
@@ -68,16 +69,17 @@ namespace Belle2 {
   private:
 
     int m_bunchHalfRange; /**< half range of relative bunch numbers */
-    double m_maxTime;   /**< time limit for photons */
+    double m_maxTime;     /**< time limit for photons [ns] */
+    double m_sigmaSmear;  /**< additional smearing of PDF in [ns] */
+    double m_minSignal;   /**< minimal number of signal photons */
+    double m_minSBRatio;  /**< minimal signal-to-background ratio */
+    double m_maxDERatio;  /**< maximal ratio of detected over expected photons */
+    bool m_useMCTruth;    /**< use MC truth for mass instead of dEdx most probable */
 
     double m_bunchTimeSep; /**< time between two bunches */
 
-    std::vector<int> m_xxx; /**< for development - to be removed later */
-    std::vector<int> m_yyy[10]; /**< for development - to be removed later */
-
-
     /**
-     * Return mass of the most probable charged stable particle using dEdx likelihoods
+     * Return mass of the most probable charged stable particle according to dEdx
      * @return mass
      */
     double getMostProbableMass(const DedxLikelihood* dedx) const;

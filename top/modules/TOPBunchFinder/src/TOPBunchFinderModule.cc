@@ -24,6 +24,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 #include <reconstruction/dataobjects/DedxLikelihood.h>
+#include <top/dataobjects/TOPRecBunch.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -63,8 +64,17 @@ namespace Belle2 {
     addParam("bunchHalfRange", m_bunchHalfRange,
              "Half range of bunch numbers to be searched for", 5);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use default one)", 0.0);
-
+             "time limit for photons [ns] (0 = use full TDC range)", 51.2);
+    addParam("sigmaSmear", m_sigmaSmear,
+             "sigma in [ns] for additional smearing of PDF", 0.2);
+    addParam("minSignal", m_minSignal,
+             "minimal number of signal photons to accept track", 10.0);
+    addParam("minSBRatio", m_minSBRatio,
+             "minimal signal-to-background ratio to accept track", 0.0);
+    addParam("maxDERatio", m_maxDERatio,
+             "maximal ratio of detected-to-expected photons to accept track", 2.5);
+    addParam("useMCTruth", m_useMCTruth,
+             "use MC truth for mass instead of that determined from dEdx", false);
   }
 
   TOPBunchFinderModule::~TOPBunchFinderModule()
@@ -93,9 +103,10 @@ namespace Belle2 {
     StoreArray<TOPBarHit> barHits;
     barHits.isOptional();
 
-
     // output
 
+    StoreObjPtr<TOPRecBunch> recBunch;
+    recBunch.registerInDataStore();
 
     // Configure TOP detector
 
@@ -109,11 +120,6 @@ namespace Belle2 {
 
     if (m_maxTime <= 0) m_maxTime = config.getTDCTimeRange();
 
-    int n = 2 * m_bunchHalfRange + 1;
-    for (int i = 0; i < n; i++) {
-      m_xxx.push_back(0);
-      for (int k = 0; k < 10; k++) m_yyy[k].push_back(0);
-    }
   }
 
   void TOPBunchFinderModule::beginRun()
@@ -123,17 +129,28 @@ namespace Belle2 {
   void TOPBunchFinderModule::event()
   {
 
+    // define output for reconstructed bunch values
+
+    StoreObjPtr<TOPRecBunch> recBunch;
+    if (!recBunch.isValid()) recBunch.create();
+
+    // create reconstruction object and set various options
+
     int Nhyp = 1;
     double mass = Const::pion.getMass();
     TOPreco reco(Nhyp, &mass);
     reco.setPDFoption(TOPreco::c_Rough);
     reco.setTmax(m_maxTime + m_bunchTimeSep * m_bunchHalfRange);
 
+    // add photon hits to reconstruction object
+
     StoreArray<TOPDigit> topDigits;
     for (const auto & digit : topDigits) {
       if (digit.getHitQuality() == TOPDigit::c_Good)
         reco.addData(digit.getBarID(), digit.getChannelID(), digit.getTDC());
     }
+
+    // create working variables
 
     int n = 2 * m_bunchHalfRange + 1;
     double t0[n];
@@ -143,45 +160,66 @@ namespace Belle2 {
       logL[i] = 0;
     }
     int numTrk = 0;
+    int usedTrk = 0;
+
+    // loop over reconstructed tracks and make sum of log likelihoods for diff. bunches
 
     StoreArray<Track> tracks;
     for (const auto & track : tracks) {
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
 
-      auto dedx = track.getRelated<DedxLikelihood>();
-      if (dedx) {
-        mass = getMostProbableMass(dedx);
+      // determine most probable particle mass
+      if (m_useMCTruth) {
+        if (!trk.getMCParticle()) continue;
+        if (!trk.getBarHit()) continue;
+        mass = trk.getMCParticle()->getMass();
       } else {
-        mass = Const::pion.getMass();
-        B2WARNING("TOPBunchFinder: no relation to DedxLikelihood - "
-                  "pion mass used instead");
+        auto dedx = track.getRelated<DedxLikelihood>();
+        if (dedx) {
+          mass = getMostProbableMass(dedx);
+        } else {
+          mass = Const::pion.getMass();
+          B2WARNING("TOPBunchFinder: no relation to DedxLikelihood - "
+                    "pion mass used instead");
+        }
       }
 
+      // reconstruct (e.g. set PDF internally)
       reco.setMass(mass);
       reco.reconstruct(trk);
-      if (reco.getFlag() != 1) continue;
+      if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
       numTrk++;
 
-      //      cout<<trk.getP()<<"("<<trk.getHypID()<<") "<<mass<<" ";
+      // do further track selection
+      double expPhot = reco.getExpectedPhotons();
+      double expBG = reco.getExpectedBG();
+      double expSignal = expPhot - expBG;
+      double numPhot = reco.getNumOfPhotons();
+      if (expSignal < m_minSignal) continue;
+      if (expSignal < m_minSBRatio * expBG) continue;
+      if (numPhot > m_maxDERatio * expPhot) continue;
+      usedTrk++;
+
+      // make sum of log likelihoods for different bunches
       for (int i = 0; i < n; i++) {
-        logL[i] += reco.getLogL(t0[i], m_maxTime);
+        logL[i] += reco.getLogL(t0[i], m_maxTime, m_sigmaSmear);
       }
     }
-    //    cout<<endl;
+
+    // find maximum
 
     int i0 = m_bunchHalfRange;
     for (int i = 0; i < n; i++) {
       if (logL[i] > logL[i0]) i0 = i;
     }
 
-    m_xxx[i0]++;
-    int k = numTrk < 10 ? numTrk : 9;
-    m_yyy[k][i0]++;
+    // store the results
 
-    //    cout << numTrk <<" "<<i0<<" "<<t0[i0]<<endl;
-    //    for (int i = 0; i < n; i++) cout << logL[i] - logL[i0]<<" ";
-    //    cout<<endl;
+    int bunchNo = i0 - m_bunchHalfRange;
+    double bunchTime = t0[i0];
+    recBunch->setReconstructed(bunchNo, bunchTime, numTrk, usedTrk);
+    for (int i = 0; i < n; i++) recBunch->addLogL(logL[i] - logL[i0]);
 
   }
 
@@ -192,22 +230,6 @@ namespace Belle2 {
 
   void TOPBunchFinderModule::terminate()
   {
-    cout << "found bunches: " << endl;
-    for (unsigned i = 0; i < m_xxx.size(); i++) cout << m_xxx[i] << " ";
-    cout << endl;
-    cout << endl;
-    for (int k = 0; k < 10; k++) {
-      int n = 0;
-      cout << k << "  ";
-      for (unsigned i = 0; i < m_yyy[k].size(); i++) {
-        cout << m_yyy[k][i] << " ";
-        n += m_yyy[k][i];
-      }
-      cout << " " << n << " ";
-      if (n > 0) cout << float(m_yyy[k][5]) / float(n);
-      cout << endl;
-    }
-
   }
 
 
@@ -217,7 +239,7 @@ namespace Belle2 {
 
     std::vector<double> logL;
     std::vector<double> mass;
-    //    for(auto type: Const::chargedStableSet) {}
+    //    for(auto type: Const::chargedStableSet) { --- not implemented yet
     for (auto type = Const::chargedStableSet.begin();
          type != Const::chargedStableSet.end(); ++type) {
       logL.push_back(dedx->getSVDLogLikelihood(type) + dedx->getCDCLogLikelihood(type));

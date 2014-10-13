@@ -272,11 +272,12 @@
       END
 
 
-      REAL FUNCTION GET_LOGL(T0,TWIN)
+      REAL FUNCTION GET_LOGL(T0,TWIN,SIGT)
 
       IMPLICIT NONE
       REAL T0                   ! time shift
       REAL TWIN                 ! time window
+      REAL SIGT                 ! additional time smearing
 #include "TOP_DATA.fi"
 #include "TOP_RTRA.fi"
 #include "TOP_TRACK.fi"
@@ -284,7 +285,7 @@
 #include "TOP_PIK.fi"
       INTEGER I, ICH, M, NUMCH, NFOT
       REAL P, T, F, SFOT, PLKH, PS, PB
-      REAL TOP_SIGNAL, TOP_BGR, POIS_LOG
+      REAL TOP_SIGNAL1, TOP_BGR, POIS_LOG
 
       GET_LOGL=0.
       IF(N_RTRA.NE.1) RETURN
@@ -307,7 +308,7 @@
             T=DATA_TIME(I)
             IF(T.LT.0.OR.T.GT.TWIN) CYCLE
             NFOT=NFOT+1
-            F=P*TOP_SIGNAL(T+T0,ICH)/PS+(1-P)*TOP_BGR(T+T0,ICH)/PB
+            F=P*TOP_SIGNAL1(T+T0,ICH,SIGT)/PS+(1-P)*TOP_BGR(T+T0,ICH)/PB
             PLKH=PLKH+LOG(F)
          ENDIF
       ENDDO
@@ -361,6 +362,34 @@
             SIG=SQRT(SIG)
             F=PIK_NPH(K,ICH)*TTS_FRAC(I)/SQPI/SIG*EXP(-X/2)
             TOP_SIGNAL=TOP_SIGNAL+F
+         ENDDO
+      ENDDO
+
+      END
+     
+
+      REAL FUNCTION TOP_SIGNAL1(T,ICH,SIGT)
+
+      IMPLICIT NONE
+      REAL T
+      INTEGER ICH
+      REAL SIGT
+#include "TOP_PIK.fi"
+#include "TOP_PMT.fi"
+      INTEGER K, I
+      REAL X, F, SIG
+      REAL SQPI
+      PARAMETER (SQPI=2.50662827463)
+
+      TOP_SIGNAL1=0.
+      DO K=1,NUM_PIK(ICH)
+         DO I=1,TTS_NG
+            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2+SIGT**2
+            X=(T-PIK_POZ(K,ICH)-TTS_T0(I))**2/SIG
+            IF(X.GT.10) CYCLE
+            SIG=SQRT(SIG)
+            F=PIK_NPH(K,ICH)*TTS_FRAC(I)/SQPI/SIG*EXP(-X/2)
+            TOP_SIGNAL1=TOP_SIGNAL1+F
          ENDDO
       ENDDO
 

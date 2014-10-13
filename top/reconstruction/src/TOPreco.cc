@@ -56,12 +56,13 @@ namespace Belle2 {
       rtra_clear_();
     }
 
-    int TOPreco::addData(int QbarID, int chID, int TDC)
+    int TOPreco::addData(int QbarID, int chID, int TDC, double t0)
     {
       int status;
       QbarID--; // 0-based ID used in fortran
       chID--;   // 0-based ID used in fortran
-      data_put_(&QbarID, &chID, &TDC, &status);
+      float T0 = (float) t0;
+      data_put_(&QbarID, &chID, &TDC, &T0, &status);
       return status;
     }
 

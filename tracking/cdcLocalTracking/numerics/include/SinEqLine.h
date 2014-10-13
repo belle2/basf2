@@ -41,6 +41,13 @@ namespace Belle2 {
     class SinEqLine : public SwitchableRootificationBase {
 
     public:
+      /// Default constructor initializing slope and intercept to zero.
+      SinEqLine() :
+        m_slope(0.0),
+        m_intercept(0.0)
+      {;}
+
+
       /// Constructor taking the line that shall be superimposed with the sin curve.
       SinEqLine(const Line2D& line2D) :
         m_slope(line2D.slope()),

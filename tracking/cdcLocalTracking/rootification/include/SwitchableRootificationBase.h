@@ -13,10 +13,14 @@
 
 #include "RootificationBase.h"
 
+#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/pybasf2/PyStoreArray.h>
 
 #include <tracking/cdcLocalTracking/config/CDCLocalTrackingConfig.h>
+
+#include <TObject.h>
+#include <TClass.h>
 
 namespace Belle2 {
 
@@ -41,17 +45,17 @@ namespace Belle2 {
     /// Typedef the normal TObject as the base class of the track finder in case the ROOT inheritance is switched on.
     typedef RootificationBase SwitchableRootificationBase;
 
-#define CDCLOCALTRACKING_SwitchableClassDef(ClassName,ClassVersion) \
-  ClassDef(ClassName,ClassVersion);         \
+#define CDCLOCALTRACKING_SwitchableClassDef(CLASSNAME, CLASSVERSION)  \
+  ClassDef(CLASSNAME, CLASSVERSION);          \
 public:               \
   /** Register a *transient* store array on the DataStore.*/    \
-  static void registerStoreArray()                \
-  { StoreArray< ClassName >::registerTransient(); }     \
+  static void registerStoreArray()          \
+  { StoreArray< CLASSNAME >::registerTransient(); }     \
   \
 private:                \
   /** Get the default name of the StoreArray for this class.*/    \
   static std::string getStoreArrayName()        \
-  { return DataStore::arrayName< ClassName >(""); }     \
+  { return DataStore::defaultArrayName< CLASSNAME >(); }    \
   \
 public:               \
   /** Looks up the StoreArray and returns it as a PyStoreArray. */  \
@@ -60,13 +64,32 @@ public:               \
   \
   /** Copies the object to the StoreArray. */       \
   /** Returns a reference to the newly created object*/     \
-  ClassName * copyToStoreArray() const {        \
-    StoreArray< ClassName > storeArray;         \
+  CLASSNAME * copyToStoreArray() const {        \
+    StoreArray< CLASSNAME > storeArray;         \
     return storeArray.appendNew(*this);         \
+  }                 \
+  \
+  /** Append new default constructed object to the StoreArray. */ \
+  static CLASSNAME * appendNewToStoreArray() {        \
+    StoreArray< CLASSNAME > storeArray;         \
+    return storeArray.appendNew();          \
+  }                 \
+  \
+public:               \
+  /** Register a *transient* RelationArray from this class */   \
+  /** to the this class on the DataStore */       \
+  static void registerInnerRelation()         \
+  { registerRelationTo(getStoreArrayName()); }        \
+  \
+  /** Register a *transient* RelationArray from this class to the class refered to by its plural array name on the DataStore */ \
+  static void registerRelationTo(const std::string& toArrayName){ \
+    StoreArray< CLASSNAME > from;         \
+    StoreAccessorBase to(toArrayName, DataStore::c_Event, TObject::Class(), true); \
+    DataStore::Instance().registerRelation(from, to, DataStore::c_Event, DataStore::c_DontWriteOut); \
   }                 \
 private:                \
    
-#define CDCLOCALTRACKING_SwitchableClassImp(ClassName) ClassImp(ClassName);
+#define CDCLOCALTRACKING_SwitchableClassImp(CLASSNAME) ClassImp(CLASSNAME);
 
 #else
     // Do not use the ROOT inheritance in all Tracking objects
@@ -77,8 +100,8 @@ private:                \
     /// Typedef the empty class as the base class of the track finder in case the ROOT inheritance is switched off.
     typedef  SwitchableRootificationBaseificationBase SwitchableRootificationBase;
 
-#define CDCLOCALTRACKING_SwitchableClassDef(ClassName,ClassVersion)
-#define CDCLOCALTRACKING_SwitchableClassImp(ClassName)
+#define CDCLOCALTRACKING_SwitchableClassDef(CLASSNAME,CLASSVERSION)
+#define CDCLOCALTRACKING_SwitchableClassImp(CLASSNAME)
 
 #endif
 

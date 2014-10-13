@@ -25,7 +25,7 @@ stdLooseFSParticles()
 stdLightMesons()
 
 # ----> NtupleMaker module
-ntupleFile('../my_GenericB.ntup.root')
+ntupleFile('../GenericB.ntup.root')
 ##########
 # Save the tracks to ntuple
 recotools = [

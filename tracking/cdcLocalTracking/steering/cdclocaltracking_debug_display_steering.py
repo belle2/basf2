@@ -5,12 +5,7 @@ import sys
 import os
 from optparse import OptionParser
 
-# Add the path of the svg display module to the search path of python
-belle2_local_dir = os.environ['BELLE2_LOCAL_DIR']
-cdcdisplay_module_path = os.path.join(belle2_local_dir, 'tracking',
-                                      'cdcLocalTracking', 'python_code')
-sys.path.append(cdcdisplay_module_path)
-import cdcdisplay
+import cdclocaltracking.cdcdisplay as cdcdisplay
 
 # Setup the options parser
 usage = \

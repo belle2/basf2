@@ -13,9 +13,9 @@ from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import std
 from ROOT import genfit
 
-print dir(genfit)
-print dir(genfit.TrackCand)
-print dir(Belle2)
+# print dir(genfit)
+# print dir(genfit.TrackCand)
+# print dir(Belle2)
 # from ROOT import GFTrackCand
 
 import primitives

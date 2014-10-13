@@ -7,7 +7,7 @@ import functools
 
 class ChDirContext(object):
 
-    """Helper object that changes the current working temporarily. 
+    """Helper object that temporarily changes the current working. 
     Creates the folder if it is not present.
     Implements the context manager and function decorator interface.
     

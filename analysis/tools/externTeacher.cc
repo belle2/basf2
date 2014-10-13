@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   ("methodType", po::value<std::string>()->required(), "type of method")
   ("methodConfig", po::value<std::string>()->required(), "config of method")
   ("variables", po::value<std::vector<std::string>>()->multitoken(), "variables")
-  ("target", po::value<std::string>()->required(), "target")
+  ("target", po::value<std::string>(), "target")
   ("prefix", po::value<std::string>(), "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information")
   ("workingDirectory", po::value<std::string>(), "Working directory in which the config file and the weight file directory is created")
   ("factoryOption", po::value<std::string>(), "Option passed to TMVA::Factory")
@@ -75,12 +75,9 @@ int main(int argc, char* argv[])
     methodConfig = std::string("CreateMVAPdfs:") + methodConfig;
   }
 
-  std::string target = "";
+  std::string target = "isSignal";
   if (vm.count("target") == 1) {
     target = vm["target"].as<std::string>();
-  } else {
-    std::cerr << "Please input one target" << std::endl;
-    return 1;
   }
 
   std::string prefix = "TMVA";

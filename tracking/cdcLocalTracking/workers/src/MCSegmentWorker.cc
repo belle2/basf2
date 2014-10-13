@@ -17,13 +17,13 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-std::vector< CDCRecoSegment2D >& MCSegmentWorker::generate()
+std::vector< CDCRecoSegment2D >& MCSegmentWorker::generate(bool allowBackward)
 {
-  generate(m_segments2D);
+  generate(m_segments2D, allowBackward);
   return m_segments2D;
 }
 
-void MCSegmentWorker::generate(std::vector< CDCRecoSegment2D >& outputSegments)
+void MCSegmentWorker::generate(std::vector< CDCRecoSegment2D >& outputSegments, bool allowBackward)
 {
 
   m_segments2D.clear();
@@ -47,6 +47,14 @@ void MCSegmentWorker::generate(std::vector< CDCRecoSegment2D >& outputSegments)
         CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit);
         recoSegment2D.push_back(recoHit2D);
       }
+
+      if (allowBackward) {
+        m_segments2D.reserve(m_segments2D.size() + 1);
+        m_segments2D.push_back(m_segments2D.back().reversed());
+        // ^ Save because we reserved the memory beforehand.
+      }
+
+
     }
 
   }

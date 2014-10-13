@@ -691,6 +691,7 @@ namespace Belle2 {
         TMatrixDSym RerrMatrix(3);
         int nvert = 0;
 
+        // one track fit is not kinematic
         if (nTrk == 1) {
           analysis::RaveVertexFitter rsg;
           for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {

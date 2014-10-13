@@ -13,6 +13,8 @@
 
 #include "../include/CDCAxialStereoFusion.h"
 
+#include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -23,6 +25,8 @@ FloatType dCurvOverDSZByISuperLayer[NSUPERLAYERS] = {0.0, 0.0027, 0.0, -0.0017, 
 FloatType dPhi0OverDZ0ByISuperLayer[NSUPERLAYERS] = {0.0, -0.0023, 0.0, 0.0012, 0.0, -0.00097, 0.0, 0.00080};
 
 namespace {
+
+  const bool useResidualParameters = true;
 
   template<class RecoHit, class RecoHitSegment>
   TMatrixD calcAmbiguityImpl(const RecoHitSegment& segment,
@@ -116,18 +120,8 @@ namespace {
     const UncertainPerigeeCircle& startCircle = startTrajectory2D.getLocalCircle();
     const UncertainPerigeeCircle& endCircle = endTrajectory2D.getLocalCircle();
 
-    TVectorD startParameters = startCircle.parameters();
-    TVectorD endParameters = endCircle.parameters();
-
-    TMatrixDSym startCovMatrix = startCircle.perigeeCovariance();
-    TMatrixDSym endCovMatrix = endCircle.perigeeCovariance();
-
-
-
     TMatrixD startH = calcAmbiguityImpl<StartRecoHit>(startSegment, startTrajectory2D);
     TMatrixD endH = calcAmbiguityImpl<EndRecoHit>(endSegment, endTrajectory2D);
-
-
 
     TMatrixD startHTransposed = startH;
     startHTransposed.T();
@@ -135,6 +129,8 @@ namespace {
     TMatrixD endHTransposed = endH;
     endHTransposed.T();
 
+    TMatrixDSym startCovMatrix = startCircle.perigeeCovariance();
+    TMatrixDSym endCovMatrix = endCircle.perigeeCovariance();
 
 
     TMatrixDSym startInvCovMatrix = startCovMatrix;
@@ -142,8 +138,6 @@ namespace {
 
     TMatrixDSym endInvCovMatrix = endCovMatrix;
     endInvCovMatrix.Invert();
-
-
 
     TMatrixDSym startInvHelixCovMatrix = startInvCovMatrix;
     startInvHelixCovMatrix.SimilarityT(startH);
@@ -155,33 +149,45 @@ namespace {
     helixCovMatrix.Invert();
 
 
+    TVectorD startParameters = startCircle.parameters();
+    TVectorD endParameters = endCircle.parameters();
+
+    TVectorD averageParameters = startParameters;
+    averageParameters += endParameters;
+    averageParameters *= 1.0 / 2.0;
+
+    if (useResidualParameters) {
+      startParameters -= averageParameters;
+      endParameters -= averageParameters;
+    }
+
     TVectorD weightedSum =
       startHTransposed * (startInvCovMatrix * startParameters) +
       endHTransposed * (endInvCovMatrix * endParameters);
 
     TVectorD helixParameters = helixCovMatrix * weightedSum;
 
-    UncertainHelix resultHelix(helixParameters, HelixCovariance(helixCovMatrix));
-
-
 
     TVectorD startPosteriorParameters = startH * helixParameters;
     TVectorD endPosteriorParameters = endH * helixParameters;
 
-
-
     TVectorD startResidual = startParameters - startPosteriorParameters;
     TVectorD endResidual = endParameters - endPosteriorParameters;
-
-
 
     Double_t startChi2 = startInvCovMatrix.Similarity(startResidual);
     Double_t endChi2 = endInvCovMatrix.Similarity(endResidual);
 
-
-
     Double_t chi2 =  startChi2 + endChi2;
 
+    if (useResidualParameters) {
+      helixParameters(iCurv) += averageParameters(iCurv);
+      helixParameters(iPhi0) += averageParameters(iPhi0);
+      helixParameters(iI) += averageParameters(iI);
+      //B2INFO("Tan lambda correction: " << helixParameters(iSZ));
+      //B2INFO("Z0 correction: " << helixParameters(iZ0));
+    }
+
+    UncertainHelix resultHelix(helixParameters, HelixCovariance(helixCovMatrix));
     resultHelix.setChi2(chi2);
     resultHelix.setNDF(1);
 
@@ -275,9 +281,23 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
 
   CDCRecoSegment3D stereoSegment3D = CDCRecoSegment3D::reconstruct(stereoSegment, axialTrajectory2D);
 
-  CDCSZFitter szFitter = CDCSZFitter::getFitter();
-  CDCTrajectorySZ trajectorySZ = szFitter.fit(stereoSegment3D);
 
+  CDCTrajectorySZ trajectorySZ;
+
+  const bool mcTruthReference = false;
+  if (mcTruthReference) {
+    const CDCMCSegmentLookUp& theMCSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+    CDCTrajectory3D axialMCTrajectory3D = theMCSegmentLookUp.getTrajectory3D(&axialSegment);
+    Vector3D localOrigin3D =  axialMCTrajectory3D.getLocalOrigin();
+    localOrigin3D.setXY(axialTrajectory2D.getLocalOrigin());
+    axialMCTrajectory3D.setLocalOrigin(localOrigin3D);
+    trajectorySZ = axialMCTrajectory3D.getTrajectorySZ();
+
+  } else {
+    CDCSZFitter szFitter = CDCSZFitter::getFitter();
+    trajectorySZ = szFitter.fit(stereoSegment3D);
+
+  }
 
   CDCRiemannFitter riemannFitter;
   // riemannFitter.useOnlyOrientation();
@@ -289,17 +309,22 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
     // Hence the two dimensional fit, which is used for the fusion afterwards can react to residuals and render the covariances of the stereo segment broader.
     // This effect might be marginal though, which is why we make this step optional.
     for (CDCRecoHit3D & recoHit3D : stereoSegment3D) {
-      const FloatType& s = recoHit3D.getPerpS();
-      const FloatType z = trajectorySZ.mapSToZ(s);
-
       const CDCWire& wire = recoHit3D.getWire();
-      Vector2D wirePos2DAtZ = wire.getWirePos2DAtZ(z);
 
-      Vector3D recoPos3D(axialTrajectory2D.getClosest(wirePos2DAtZ), z);
-      const FloatType perpSCorrected = axialTrajectory2D.calcPerpS(recoPos3D.xy());
+      const FloatType& oldZ = recoHit3D.getRecoZ();
 
-      recoHit3D.setRecoPos3D(recoPos3D);
-      recoHit3D.setPerpS(perpSCorrected);
+      const FloatType& s = recoHit3D.getPerpS();
+      const FloatType newZ = trajectorySZ.mapSToZ(s);
+
+      Vector3D recoPos3DCorrection = wire.getWireVector();
+      recoPos3DCorrection *= (newZ - oldZ) / wire.getWireVector().z();
+
+      Vector3D correctedRecoPos3D = recoHit3D.getRecoPos3D() + recoPos3DCorrection;
+
+      const FloatType correctedPerpS = axialTrajectory2D.calcPerpS(correctedRecoPos3D.xy());
+
+      recoHit3D.setRecoPos3D(correctedRecoPos3D);
+      recoHit3D.setPerpS(correctedPerpS);
     }
   }
 

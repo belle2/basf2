@@ -609,18 +609,24 @@ def makeDiagPlotPerParticle(nTuple, plotName, mvaConfig):
 
     nbins = 100
     probabilityVar = 'getExtraInfoSignalProbability'  # ROOT.Belle2.Variable.makeROOTCompatible('getExtraInfo(SignalProbability)')
-    bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
-    signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
 
     if nTuple is not None:
         nTupleFile = ROOT.TFile(nTuple)
         variables = nTupleFile.Get('variables')
+        bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
+        signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
 
         if variables.GetEntries() == 0:
             raise RuntimeError('variables is empty')
         variables.Project('background' + probabilityVar, probabilityVar, '!' + mvaConfig.target)
         variables.Project('signal' + probabilityVar, probabilityVar, mvaConfig.target)
-    makeDiagPlot(signalHist, bgHist, plotName)
+        # Create filled plot, its important to do this in the same scope as nTupleFile!
+        makeDiagPlot(signalHist, bgHist, plotName)
+    else:
+        # Create empty plot
+        bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
+        signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
+        makeDiagPlot(signalHist, bgHist, plotName)
 
 
 def makeDiagPlotPerChannel(tmvaFilename, plotName, methodName):

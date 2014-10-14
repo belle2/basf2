@@ -17,6 +17,7 @@
 #include <TChain.h>
 #include <TCanvas.h>
 #include <TColor.h>
+#include <TDirectory.h>
 #include <TFile.h>
 #include <TGraph.h>
 #include <TGraphAsymmErrors.h>
@@ -32,7 +33,7 @@
 #include <TStyle.h>
 #include <TTree.h>
 
-//#include "Belle2Labels.h"
+//#include <Belle2Labels.h>
 
 void plot( TH1F** histo, TCanvas* canvas ) {
     THStack* stack = new THStack;
@@ -52,10 +53,6 @@ void plot( TH1F** histo, TCanvas* canvas ) {
 }
 
 void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forward,2=barrel,3=backward,4=endcap
-    if(runOffline) {
-        gROOT->LoadMacro("//Belle2Labels.C");
-    }
-
     TFile* output = new TFile("test2_Validation_PID_output.root", "recreate");
     output->Close();
 
@@ -68,7 +65,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
     enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, ntypes=5};
     const int pid[] = {211,321,11,13,2212};
     const float pdgmasses[] = {0.13957,0.49367,0.000511,0.105658,0.93827};
-    const char *names[] = { "pi", "K", "e", "#mu", "p"};
+    const char *names[] = { "pi", "K", "e", "mu", "p"};
     Color_t colors[]= {kRed, kBlue, kGreen, kOrange, kMagenta};
 
     const int nthbins=20;
@@ -84,22 +81,23 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
     const float pidhigh=1.01;
 
     TH1F* h_trk_P[ntypes];
-    TH1F* h_trk_Ppass[ntypes];
+    TH1F* h_trk_P_pass[ntypes];
     TH1F* h_trk_CosTh[ntypes];
     TH1F* h_trk_CosTh_pass[ntypes];
     TH1F* h_trk_PID[ntypes];
     TH3F* h_ROC[ntypes];
 
-    TList* list = new TList;
-
+    TList* list_web = new TList;
+    
     for(int Hypo=0; Hypo<ntypes; Hypo++) { //Hypo counter
+        TList* list = new TList;
         TLegend* legHist = new TLegend(0.5,0.7,0.7,0.9);
         legHist->SetFillColor(0);
 
         for(int Hypo2=0; Hypo2<ntypes; Hypo2++) { //Hypo counter
             h_trk_P[Hypo2]          = new TH1F(Form("%s_%s_P",names[Hypo],names[Hypo2]),         Form(";p(%s) GeV;N",names[Hypo]),
                                                npbins,plow,phigh);
-            h_trk_Ppass[Hypo2]      = new TH1F(Form("%s_%s_P_pass",names[Hypo],names[Hypo2]),    Form(";Pass PID, p(%s) GeV;N",names[Hypo]),
+            h_trk_P_pass[Hypo2]      = new TH1F(Form("%s_%s_P_pass",names[Hypo],names[Hypo2]),    Form(";Pass PID, p(%s) GeV;N",names[Hypo]),
                                                npbins,plow,phigh);
             h_trk_CosTh[Hypo2]      = new TH1F(Form("%s_%s_CosTh",names[Hypo],names[Hypo2]),     Form(";cos#theta(%s);N",names[Hypo]),
                                                nthbins,thlow,thhigh);
@@ -108,7 +106,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
             h_trk_PID[Hypo2]        = new TH1F(Form("%s_%s_pass",names[Hypo],names[Hypo2]),       Form(";PID(%s) GeV;N",names[Hypo]),
                                                npidbins,pidlow,pidhigh);
             h_trk_P[Hypo2]->SetLineColor( colors[Hypo2] );
-            h_trk_Ppass[Hypo2]->SetLineColor( colors[Hypo2] );
+            h_trk_P_pass[Hypo2]->SetLineColor( colors[Hypo2] );
             h_trk_CosTh[Hypo2]->SetLineColor( colors[Hypo2] );
             h_trk_CosTh_pass[Hypo2]->SetLineColor( colors[Hypo2] );
             h_trk_PID[Hypo2]->SetLineColor( colors[Hypo2] );
@@ -175,7 +173,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
                 h_trk_CosTh[Hypo2]->Fill(lv_trk.CosTheta());
                 h_trk_PID[Hypo2]  ->Fill(PID);
                 if(passPID) {
-                    h_trk_Ppass[Hypo2]     ->Fill(lv_trk.Rho());
+                    h_trk_P_pass[Hypo2]     ->Fill(lv_trk.Rho());
                     h_trk_CosTh_pass[Hypo2]->Fill(lv_trk.CosTheta());
                 }
             }
@@ -253,7 +251,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
         legHist->Draw();
         c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: cos#theta noPID, %s hypothesis",names[Hypo]));
 
-        plot( h_trk_Ppass, c_pidvalidation );
+        plot( h_trk_P_pass, c_pidvalidation );
         //if(runOffline)Belle2Labels(0.5,0.9,"Belle II Validation");
         legHist->Draw();
         c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: P PID, %s hypothesis",names[Hypo]));
@@ -288,20 +286,28 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
 
         //TGraph for efficiencies;
         TGraphAsymmErrors *Eff_P[ntypes];
+        TH1F *h_Eff_P[ntypes];
         TMultiGraph* multigraph_P = new TMultiGraph;
         multigraph_P->SetName(Form("Efficiency_P_%s",names[Hypo]));
         for( int Hypo2=0; Hypo2<ntypes; Hypo2++ ) {
+            h_Eff_P[Hypo2] = (TH1F*)h_trk_P[Hypo2]->Clone( Form("h_Eff_P_%s_%s",names[Hypo],names[Hypo2]) );
+            h_Eff_P[Hypo2]->GetYaxis()->SetTitle("Efficiency");
+            h_Eff_P[Hypo2]->Divide(h_trk_P_pass[Hypo2], h_trk_P[Hypo2],1,1);
+            
             Eff_P[Hypo2] = new TGraphAsymmErrors;
-            Eff_P[Hypo2]->Divide(h_trk_Ppass[Hypo2], h_trk_P[Hypo2],"cl=0.683 b(1,1) mode");
+            Eff_P[Hypo2]->Divide(h_trk_P_pass[Hypo2], h_trk_P[Hypo2],"cl=0.683 b(1,1) mode");
             Eff_P[Hypo2]->SetMarkerColor(colors[Hypo2]);
             Eff_P[Hypo2]->SetLineColor(colors[Hypo2]);
             Eff_P[Hypo2]->SetName( Form("Efficiency_P_%s_%s",names[Hypo],names[Hypo2]) );
-            Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched %s tracks in bins of lab momentum. A Generic BBbar sample is used.",names[Hypo],names[Hypo])));
-            Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
+            
             multigraph_P->Add(Eff_P[Hypo2]);
             Eff_P[Hypo2]->GetXaxis()->SetTitle(h_trk_CosTh[0]->GetXaxis()->GetTitle());
             Eff_P[Hypo2]->GetYaxis()->SetTitle("Efficiency");
+            
+            h_Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Description", Form("PID(%s)>0.5 efficiency of truth-matched %s tracks in bins of lab momentum. A Generic BBbar sample is used.",names[Hypo],names[Hypo2])));
+            h_Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
             list->Add(Eff_P[Hypo2]);
+            list_web->Add(h_Eff_P[Hypo2]);
         }
         multigraph_P->Draw("ap");
         multigraph_P->GetXaxis()->SetTitle(h_trk_P[0]->GetXaxis()->GetTitle());
@@ -324,20 +330,29 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
         }
 
         TGraphAsymmErrors *Eff_CosTh[ntypes];
+        TH1F *h_Eff_CosTh[ntypes];
         TMultiGraph* multigraph_CosTh = new TMultiGraph;
         multigraph_CosTh->SetName(Form("Efficiency_CosTh_%s",names[Hypo]));
         for( int Hypo2=0; Hypo2<ntypes; Hypo2++ ) {
+            h_Eff_CosTh[Hypo2] = (TH1F*)h_trk_CosTh[Hypo2]->Clone( Form("h_Eff_CosTh_%s_%s",names[Hypo],names[Hypo2]) );
+            h_Eff_CosTh[Hypo2]->GetYaxis()->SetTitle("Efficiency");
+            h_Eff_CosTh[Hypo2]->Divide(h_trk_CosTh_pass[Hypo2], h_trk_CosTh[Hypo2],1,1);
+            
             Eff_CosTh[Hypo2] = new TGraphAsymmErrors;
             Eff_CosTh[Hypo2]->Divide(h_trk_CosTh_pass[Hypo2], h_trk_CosTh[Hypo2],"cl=0.683 b(1,1) mode");
             Eff_CosTh[Hypo2]->SetMarkerColor(colors[Hypo2]);
             Eff_CosTh[Hypo2]->SetLineColor(colors[Hypo2]);
             Eff_CosTh[Hypo2]->SetName( Form("Efficiency_CosTh_%s_%s",names[Hypo],names[Hypo2]) );
-            Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Description", Form("PID-%s>0.5 efficiency of truth-matched %s tracks in bins of lab momentum. A Generic BBbar sample is used.",names[Hypo],names[Hypo])));
-            Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
+            
             multigraph_CosTh->Add(Eff_CosTh[Hypo2]);
             Eff_CosTh[Hypo2]->GetXaxis()->SetTitle(h_trk_CosTh[0]->GetXaxis()->GetTitle());
             Eff_CosTh[Hypo2]->GetYaxis()->SetTitle("Efficiency");
+            
+            h_Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Description", Form("PID(%s)>0.5 efficiency of truth-matched %s tracks in bins of lab momentum. A Generic BBbar sample is used.",names[Hypo],names[Hypo])));
+            h_Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
+            
             list->Add(Eff_CosTh[Hypo2]);
+            list_web->Add(h_Eff_CosTh[Hypo2]);
         }
         multigraph_CosTh->Draw("ap");
         multigraph_CosTh->GetXaxis()->SetTitle(h_trk_CosTh[0]->GetXaxis()->GetTitle());
@@ -358,11 +373,17 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
             c_pidvalidation->Print("test2_Validation_PID_plots.pdf",Form("Title: Efficiency, %s hypothesis",names[Hypo]));
         }
         TFile* outFile = new TFile("test2_Validation_PID_output.root", "update");
+        TDirectory* dir = outFile->mkdir(Form("%s",names[Hypo]));
+        dir->cd();
         list->Write();
         multigraph_P->Write();
         multigraph_CosTh->Write();
         outFile->Close();
     }
+    TFile* outFile_web = new TFile("test2_Validation_PID_output.root", "update");
+    list_web->Write();
+    outFile_web->Close();
+    
     c_pidvalidation->Clear();
     c_pidvalidation->Print("test2_Validation_PID_plots.pdf","");
     c_pidvalidation->Print("test2_Validation_PID_plots.pdf]");

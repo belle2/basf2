@@ -27,9 +27,11 @@
 #include <TFile.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TList.h>
 #include <TLorentzVector.h>
 #include <TMinuit.h>
 #include <TNtuple.h>
+#include <TObject.h>
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TSystem.h>
@@ -61,6 +63,7 @@ void test2_Validation_B2Dpi() {
     TFile* output = TFile::Open("test2_Validation_Breco_output.root", "update");
     TDirectory* dir = output->mkdir("B2Dpi");
     dir->cd();
+    TList* list_web =  new TList;
 
     TH1F* h_mbc = new TH1F("mbc","B2Dpi, m_{bc};m_{bc} [GeV];Events/0.002 GeV",25,5.24,5.29);
     h_mbc->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed m_{bc} of B -> D^0(K pi) pi signal MC."));
@@ -79,8 +82,8 @@ void test2_Validation_B2Dpi() {
     h_deltaetruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent mean, width and background, that events are between -0.1 and 0.1 GeV."));
 
     TH1F* h_md0 = new TH1F("md0","B2Dpi, m_{D^{0}} truth matched;m_{D^{0}} GeV;Events/0.002 GeV",30,1.84,1.9);
-    h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed D^0 invariant mass in B -> D^0(K pi) pi signal MC."));
-    h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "Consistent mean, width. Note the mean and width are tabulated here."));
+    h_md0->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed D^0 invariant mass in B -> D^0(K pi) pi signal MC."));
+    h_md0->GetListOfFunctions()->Add(new TNamed("Check", "Consistent mean, width. Note the mean and width are tabulated here."));
 
     enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, bplus=5, d0=6};
     const int pid[] = {211,321,11,13,2212,521,421};
@@ -225,6 +228,17 @@ void test2_Validation_B2Dpi() {
     tbreco->SetAlias("Check", "Ensure nreco is stable,  at 400 (40 percent efficiency). The D -> K pi fit should have a Mean of 1864 MeV and Width of 7 MeV.");
 
     output->Write();
+    output->cd();
+    list_web->Add(h_mbc);
+    list_web->Add(h_mbctruthmatch);
+    list_web->Add(h_deltae);
+    list_web->Add(h_deltaetruthmatch);
+    list_web->Add(h_md0);
+    
+    TIter next( list_web );
+    TObject* obj;
+    while ( ( obj = ( TObject* )next() ) ) {  ((TH1*)obj)->SetName( Form("B2Dpi_%s",obj->GetName()) ); }
+    list_web->Write();
     output->Close();
 }
 
@@ -232,6 +246,7 @@ void test2_Validation_B2JpsiKS() {
     TFile* output = TFile::Open("test2_Validation_Breco_output.root", "update");
     TDirectory* dir = output->mkdir("B2JpsiKS");
     dir->cd();
+    TList* list_web =  new TList;
 
     TChain* recoTree = new TChain("Bd_JpsiKS_tuple");
     recoTree->AddFile("../Bd_JpsiKS,mumu.ntup.root");
@@ -244,11 +259,15 @@ void test2_Validation_B2JpsiKS() {
     h_mbctruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
 
     TH1F* h_deltae = new TH1F("deltae","B2JpsiKS, #Delta E;#Delta E [GeV];Events/0.02 GeV",20,-0.2,0.2);
+    h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed Delta E of B -> J/psi(mu mu) K_S(pi pi)  signal MC."));
+    h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0, slightly larger tail on left."));
     TH1F* h_deltaetruthmatch = new TH1F("deltaetruthmatch","B2JpsiKS, #Delta E truth matched;#Delta E [GeV] (truth matched);Events/0.02 GeV",20,-0.2,0.2);
     h_deltaetruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed Delta E of B -> J/psi(mu mu) K_S(pi pi)  signal MC, truth matched."));
     h_deltaetruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0, slightly larger tail on left."));
 
     TH1F* h_mjpsi  = new TH1F("mjpsi","B2JpsiKS, m_{J/#psi};m_{J/#psi} [GeV];Events/0.005 GeV",30,3.,3.15);
+    h_mjpsi->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed J/psi mass in B -> J/psi(mu mu) K_S(pi pi)  signal MC."));
+    h_mjpsi->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 3.09 GeV."));
     TH1F* h_mjpsitruthmatch  = new TH1F("mjpsitruthmatch","B2JpsiKS, m_{J/#psi} truth matched ;m_{J/#psi} [GeV] (truth matched);Events/0.005 GeV",30,3.,3.15);
     h_mjpsitruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed J/psi mass in B -> J/psi(mu mu) K_S(pi pi)  signal MC, truth matched."));
     h_mjpsitruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 3.09 GeV."));
@@ -435,6 +454,19 @@ void test2_Validation_B2JpsiKS() {
     tbreco->SetAlias("Check", "Ensure nreco is stable,  at 400 (40 percent efficiency). The J/psi -> mu mu fit should have a Mean of 3095 MeV and Width of 5 MeV.");
 
     output->Write();
+    output->cd();
+    list_web->Add(h_mbc);
+    list_web->Add(h_mbctruthmatch);
+    list_web->Add(h_deltae);
+    list_web->Add(h_deltaetruthmatch);
+    list_web->Add(h_mjpsi);
+    list_web->Add(h_mjpsitruthmatch);
+    
+    TIter next( list_web );
+    TObject* obj;
+    while ( ( obj = ( TObject* )next() ) ) {  ((TH1*)obj)->SetName( Form("B2JpsiKS_%s",obj->GetName()) ); }
+    list_web->Add(framex);//TODO: remove this 
+    list_web->Write();
     output->Close();
 }
 
@@ -442,6 +474,7 @@ void test2_Validation_B2Kstgamma() {
     TFile* output = TFile::Open("test2_Validation_Breco_output.root", "update");
     TDirectory* dir = output->mkdir("B2Kstgamma");
     dir->cd();
+    TList* list_web =  new TList;
 
     /*  Take the BtoDpi prepared by the NtupleMaker */
     TChain* recoTree = new TChain("Bd_Kstgamma_tuple");
@@ -458,16 +491,22 @@ void test2_Validation_B2Kstgamma() {
     h_mbctruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
 
     TH1F* h_deltae           = new TH1F("deltae","B2Kstgamma, #Delta E;#Delta E [GeV];Events/0.02 GeV"   ,20,-0.2,0.2);
+    h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed Delta E of B -> K^{*0}(K pi) gamma signal MC."));
+    h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0, longer tail on right."));
     TH1F* h_deltaetruthmatch = new TH1F("deltaetruthamatch","B2Kstgamma, #Delta E truth matched;#Delta E [GeV] (truth matched);Events/0.02 GeV",20,-0.2,0.2);
     h_deltaetruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed Delta E of B -> K^{*0}(K pi) gamma signal MC, truth matched."));
     h_deltaetruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0, longer tail on right."));
 
     TH1F* h_egamma           = new TH1F("egamma","B2Kstgamma, E_{#gamma};E_{#gamma} [GeV];Events/0.2 GeV",13,1.2,3.8);
+    h_egamma->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed E(gamma) of B -> K^{*0}(K pi) gamma signal MC."));
+    h_egamma->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 2.7 GeV."));
     TH1F* h_egammatruthmatch = new TH1F("egammatruthmatch","B2Kstgamma, E_{#gamma} truth matched;E_{#gamma} [GeV] (truth matched);Events/0.1 GeV",25,1.2,3.7);
     h_egammatruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed E(gamma) of B -> K^{*0}(K pi) gamma signal MC, truth matched."));
     h_egammatruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 2.7 GeV."));
 
     TH1F* h_mkst             = new TH1F("mkst","B2Kstgamma, m_{K^{*0}};m_{K^{*0}} [GeV];Events/0.02 GeV" ,20,0.7,1.1);
+    h_mkst->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed K^{*0} mass in B -> K^{*0}(K pi) gamma signal MC."));
+    h_mkst->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0.89 GeV."));
     TH1F* h_mksttruthmatch   = new TH1F("mksttruthmatch","B2Kstgamma, m_{K^{*0}} truth matched;m_{K^{*0}} [GeV] (truth matched);Events/0.02 GeV",20,0.7,1.1);
     h_mksttruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed K^{*0} mass in B -> K^{*0}(K pi) gamma signal MC, truth matched."));
     h_mksttruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0.89 GeV."));
@@ -600,6 +639,18 @@ void test2_Validation_B2Kstgamma() {
     tbreco->SetAlias("Check", "Ensure nreco is stable,  at 400 (40 percent efficiency).");
 
     output->Write();
+    output->cd();
+    list_web->Add(h_mbc);
+    list_web->Add(h_mbctruthmatch);
+    list_web->Add(h_deltae);
+    list_web->Add(h_deltaetruthmatch);
+    list_web->Add(h_mkst);
+    list_web->Add(h_mksttruthmatch);
+    
+    TIter next( list_web );
+    TObject* obj;
+    while ( ( obj = ( TObject* )next() ) ) {  ((TH1*)obj)->SetName( Form("B2Kstgamma_%s",obj->GetName()) ); }
+    list_web->Write();
     output->Close();
 }
 
@@ -607,34 +658,35 @@ void test2_Validation_B2rho0gamma() {
     TFile* output = TFile::Open("test2_Validation_Breco_output.root", "update");
     TDirectory* dir = output->mkdir("B2rho0gamma");
     dir->cd();
+    TList* list_web =  new TList;
 
     /*  Take the BtoDpi prepared by the NtupleMaker */
     TChain* recoTree = new TChain("Bd_rho0gamma_tuple");
     recoTree->AddFile("../Bd_rho0gamma.ntup.root");
 
-    //Define these for offline validation
-
     //Put these plots in the web validation
     TH1F* h_mbc              = new TH1F("mbc","B2rho0gamma, m_{bc};m_{bc} [GeV];Events/0.002 GeV"         ,25,5.24,5.29);
-    h_mbc->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed m_{bc} of B -> K^{*0}(K pi) gamma signal MC, not truth matched - shown for reference."));
+    h_mbc->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed m_{bc} of B -> rho(pi pi) gamma signal MC."));
     h_mbc->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
     TH1F* h_mbctruthmatch    = new TH1F("mbctruthmatch","B2rho0gamma, m_{bc} truth matched;m_{bc} [GeV] (truth matched);Events/0.002 GeV"       ,25,5.24,5.29);
-    h_mbctruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed m_{bc} of B -> K^{*0}(K pi) gamma signal MC, truth matched."));
+    h_mbctruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed m_{bc} of B -> rho(pi pi) gamma signal MC, truth matched."));
     h_mbctruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
 
     TH1F* h_deltae           = new TH1F("deltae","B2rho0gamma, #Delta E;#Delta E [GeV];Events/0.02 GeV"   ,20,-0.2,0.2);
+    h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed Delta E of B -> rho(pi pi) gamma signal M matched."));
+    h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0, longer tail on right."));
     TH1F* h_deltaetruthmatch = new TH1F("deltaetruthamatch","B2rho0gamma, #Delta E truth matched;#Delta E [GeV] (truth matched);Events/0.02 GeV",20,-0.2,0.2);
-    h_deltaetruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed Delta E of B -> K^{*0}(K pi) gamma signal MC, truth matched."));
+    h_deltaetruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed Delta E of B -> rho(pi pi) gamma signal MC, truth matched."));
     h_deltaetruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0, longer tail on right."));
 
     TH1F* h_egamma           = new TH1F("egamma","B2rho0gamma, E_{#gamma};E_{#gamma} [GeV];Events/0.2 GeV",13,1.2,3.8);
     TH1F* h_egammatruthmatch = new TH1F("egammatruthmatch","B2rho0gamma, E_{#gamma} truth matched;E_{#gamma} [GeV] (truth matched);Events/0.1 GeV",25,1.2,3.7);
-    h_egammatruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed E(gamma) of B -> K^{*0}(K pi) gamma signal MC, truth matched."));
+    h_egammatruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed E(gamma) of B -> rho(pi pi) gamma signal MC, truth matched."));
     h_egammatruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 2.7 GeV."));
 
     TH1F* h_mrho             = new TH1F("mrho","B2rho0gamma, m_{K^{*0}};m_{K^{*0}} [GeV];Events/0.02 GeV" ,20,0.7,1.1);
     TH1F* h_mrhotruthmatch   = new TH1F("mrhotruthmatch","B2rho0gamma, m_{K^{*0}} truth matched;m_{K^{*0}} [GeV] (truth matched);Events/0.02 GeV",20,0.7,1.1);
-    h_mrhotruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed K^{*0} mass in B -> K^{*0}(K pi) gamma signal MC, truth matched."));
+    h_mrhotruthmatch->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed K^{*0} mass in B -> rho(pi pi) gamma signal MC, truth matched."));
     h_mrhotruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0.89 GeV."));
 
     enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, bplus=5, d0=6, photon=7, bzero=8, kstar=9, rho0=10};
@@ -759,6 +811,16 @@ void test2_Validation_B2rho0gamma() {
     tbreco->SetAlias("Check", "Ensure nreco is stable, at 400 (40 percent efficiency).");
 
     output->Write();
+    output->cd();
+    list_web->Add(h_mbc);
+    list_web->Add(h_mbctruthmatch);
+    list_web->Add(h_deltae);
+    list_web->Add(h_deltaetruthmatch);
+    
+    TIter next( list_web );
+    TObject* obj;
+    while ( ( obj = ( TObject* )next() ) ) {  ((TH1*)obj)->SetName( Form("B2rho0gamma_%s",obj->GetName()) ); }
+    list_web->Write();
     output->Close();
 }
 

@@ -14,6 +14,7 @@
 
 #include <TChain.h>
 #include <TCanvas.h>
+#include <TDirectory.h>
 #include <TError.h>
 #include <TFile.h>
 #include <TGraph.h>
@@ -37,7 +38,7 @@ const int pid[] = {211, 22};
 enum ecl_regions {All=0, FW=1, Barrel=2, BW=3};
 const char* regions[]= { "All", "FW", "Barrel", "BW" };
 
-void efficiency_and_plots( TH1* truth, TH1* reco, TGraphAsymmErrors* efficiency, TCanvas* canvas, string sOutput, string sTitle ) {
+void efficiency_and_plots( TH1* truth, TH1* reco, TGraphAsymmErrors* efficiency, TH1F* h_efficiency, TCanvas* canvas, string sOutput, string sTitle ) {
     TLegend* leg = new TLegend(0.70,0.75,0.90,0.90);
     leg->SetFillColor(0);
     leg->AddEntry(truth,"Truth","l");
@@ -63,6 +64,17 @@ void efficiency_and_plots( TH1* truth, TH1* reco, TGraphAsymmErrors* efficiency,
     //canvas->Print( Form("%s",sOutput.c_str()), Form("sTitle:%s truth and reco", sTitle.c_str()) );
     canvas->Print( Form("%s",sOutput.c_str()), Form("%s truth and reco", sTitle.c_str()) );
 
+    // This is only for the website, it doesn't accept TGraphs
+    //canvas->Clear();
+    h_efficiency->SetMarkerColor(kBlue);
+    h_efficiency->SetMarkerStyle(21);
+    h_efficiency->Divide( reco, truth, 1, 1 );
+    string sTrack("Track");
+    if (sTitle.find(sTrack) != std::string::npos)   h_efficiency->GetYaxis()->SetTitle("Track efficiency");
+    else                                            h_efficiency->GetYaxis()->SetTitle("Photon efficiency");
+    //h_efficiency->Draw("");
+    //canvas->Print( Form("%s",sOutput.c_str()), Form("%s eff", sTitle.c_str()) );
+    
     canvas->Clear();
     efficiency->Divide(reco ,truth ,"cl=0.683 b(1,1) mode");
     efficiency->SetFillColor(kBlue);
@@ -89,7 +101,6 @@ void efficiency_and_plots( TH1* truth, TH1* reco, TGraphAsymmErrors* efficiency,
     efficiency->GetXaxis()->SetRangeUser( truth->GetBinLowEdge(1), truth->GetBinLowEdge( truth->GetNbinsX()+1 ) );
     efficiency->GetYaxis()->SetRangeUser( min,max );
     efficiency->GetXaxis()->SetTitle( truth->GetXaxis()->GetTitle() );
-    string sTrack("Track");
     if (sTitle.find(sTrack) != std::string::npos)   efficiency->GetYaxis()->SetTitle("Track efficiency");
     else                                            efficiency->GetYaxis()->SetTitle("Photon efficiency");
 
@@ -326,7 +337,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
     //Set the Binning, clones for truth and reco
     //Lab momentum
     TList* list_hist_tracks = new TList;
-    TH1F* h_pi_TruthP = new TH1F("pi_TruthP" ,";p_{T}(#pi) GeV;N" ,nptbins,ptlow,pthigh);
+    TH1F* h_pi_TruthP = new TH1F("pi_TruthP" ,"All p_{T};p_{T}(#pi) GeV;N" ,nptbins,ptlow,pthigh);
     TH1F* h_pi_P = (TH1F*)h_pi_TruthP->Clone( "pi_P" );
     list_hist_tracks->Add(h_pi_TruthP);
     list_hist_tracks->Add(h_pi_P);
@@ -364,27 +375,27 @@ void test2_Validation_Efficiency(bool runOffline=false) {
     TH1F* h_gamma_Phi_LowE[4];
     TH1F* h_gamma_Phi_HighE[4];
     for( int i=0; i<4; i++ ) {
-        h_gamma_TruthP[i] = new TH1F(Form("gamma_TruthP_%s",regions[i]) ,";E(#gamma) GeV;N" ,npbins,plow,phigh);
+        h_gamma_TruthP[i] = new TH1F(Form("gamma_TruthP_%s",regions[i]) ,Form("%s;E(#gamma) GeV;N",regions[i]) ,npbins,plow,phigh);
         h_gamma_P[i] = (TH1F*)h_gamma_TruthP[i]->Clone(Form("gamma_P_%s",regions[i]));
         list_hist_photons->Add(h_gamma_TruthP[i]);
         list_hist_photons->Add(h_gamma_P[i]);
 
-        h_gamma_TruthTheta_LowE[i] = new TH1F(Form("gamma_TruthTheta_LowE_%s",regions[i]) ,"E<500 MeV;#theta(#gamma) ;N" ,nthgbins,thglow,thghigh);
+        h_gamma_TruthTheta_LowE[i] = new TH1F(Form("gamma_TruthTheta_LowE_%s",regions[i]) ,Form("%s, E<500 MeV;#theta(#gamma) ;N",regions[i]) ,nthgbins,thglow,thghigh);
         h_gamma_Theta_LowE[i] = (TH1F*)h_gamma_TruthTheta_LowE[i]->Clone(Form("gamma_Theta_LowE_%s",regions[i]));
         list_hist_photons->Add(h_gamma_TruthTheta_LowE[i]);
         list_hist_photons->Add(h_gamma_Theta_LowE[i]);
 
-        h_gamma_TruthTheta_HighE[i] = new TH1F(Form("gamma_TruthTheta_HighE_%s",regions[i]),"E>=500 MeV;#theta(#gamma) ;N" ,nthgbins,thglow,thghigh);
+        h_gamma_TruthTheta_HighE[i] = new TH1F(Form("gamma_TruthTheta_HighE_%s",regions[i]),Form("%s, E>=500 MeV;#theta(#gamma) ;N",regions[i]) ,nthgbins,thglow,thghigh);
         h_gamma_Theta_HighE[i] = (TH1F*)h_gamma_TruthTheta_HighE[i]->Clone(Form("gamma_Theta_HighE_%s",regions[i]));
         list_hist_photons->Add(h_gamma_TruthTheta_HighE[i]);
         list_hist_photons->Add(h_gamma_Theta_HighE[i]);
 
-        h_gamma_TruthPhi_LowE[i] = new TH1F(Form("gamma_TruthPhi_LowE_%s",regions[i]) ,"E<500 MeV;#phi(#gamma) ;N" ,nthbins,phlow,phhigh);
+        h_gamma_TruthPhi_LowE[i] = new TH1F(Form("gamma_TruthPhi_LowE_%s",regions[i]) ,Form("%s, E<500 MeV;#phi(#gamma) ;N",regions[i]) ,nthbins,phlow,phhigh);
         h_gamma_Phi_LowE[i] = (TH1F*)h_gamma_TruthPhi_LowE[i]->Clone(Form("gamma_Phi_LowE_%s",regions[i]));
         list_hist_photons->Add(h_gamma_TruthPhi_LowE[i]);
         list_hist_photons->Add(h_gamma_Phi_LowE[i]);
 
-        h_gamma_TruthPhi_HighE[i] = new TH1F(Form("gamma_TruthPhi_HighE_%s",regions[i]) ,"E>=500 MeV;#phi(#gamma) ;N" ,nthbins,phlow,phhigh);
+        h_gamma_TruthPhi_HighE[i] = new TH1F(Form("gamma_TruthPhi_HighE_%s",regions[i]) ,Form("%s, E>=500 MeV;#phi(#gamma) ;N",regions[i]) ,nthbins,phlow,phhigh);
         h_gamma_Phi_HighE[i] = (TH1F*)h_gamma_TruthPhi_HighE[i]->Clone(Form("gamma_Phi_HighE_%s",regions[i]));
         list_hist_photons->Add(h_gamma_TruthPhi_HighE[i]);
         list_hist_photons->Add(h_gamma_Phi_HighE[i]);
@@ -392,100 +403,137 @@ void test2_Validation_Efficiency(bool runOffline=false) {
 
     TString filename ("../GenericB.ntup.root");
 
-    // Read trees and fill histograms
-    test2_Validation_Efficiency_Track_Truth(filename, list_hist_tracks);
-    test2_Validation_Efficiency_Track_Reco(filename, list_hist_tracks);
-    test2_Validation_Efficiency_Photon_Truth(filename, list_hist_photons);
-    test2_Validation_Efficiency_Photon_Reco(filename, list_hist_photons);
-
     TCanvas* maincanvas = new TCanvas ("maincanvas","maincanvas");
     maincanvas->Print("test2_Validation_Efficiency_plots.pdf[");
-
+    
+    TList* list_web = new TList;
+    
     ///////////////////// Tracks
+    //Fill histograms
+    test2_Validation_Efficiency_Track_Truth(filename, list_hist_tracks);
+    test2_Validation_Efficiency_Track_Reco(filename, list_hist_tracks);
+    
     TList* list_eff_tracks = new TList;
     TGraphAsymmErrors* Eff_Track = new TGraphAsymmErrors();
-    efficiency_and_plots( h_pi_TruthP, h_pi_P, Eff_Track, maincanvas,
+    TH1F* h_Eff_Track = (TH1F*)h_pi_TruthP->Clone( "h_Eff_Track" );
+    efficiency_and_plots( h_pi_TruthP, h_pi_P, Eff_Track, h_Eff_Track, maincanvas,
                           string("test2_Validation_Efficiency_plots.pdf"), string( "Track p_{T}" ) );
-    Eff_Track->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. A Generic BBbar sample is used."));
-    Eff_Track->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency. Steep rise in efficiency up to 90 percent at 0.5 GeV. p_{T}<0.5 GeV more sensitive to tracking algorithm changes."));
+    h_Eff_Track->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. A Generic BBbar sample is used."));
+    h_Eff_Track->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency. Steep rise in efficiency up to 90 percent at 0.5 GeV. p_{T}<0.5 GeV more sensitive to tracking algorithm changes."));
     list_eff_tracks->Add( Eff_Track );
+    list_web->Add( h_Eff_Track );
 
     TGraphAsymmErrors* Eff_TrackTheta_LowPt = new TGraphAsymmErrors();
-    efficiency_and_plots( h_pi_TruthTheta_LowPt, h_pi_Theta_LowPt, Eff_TrackTheta_LowPt, maincanvas,
+    TH1F* h_Eff_TrackTheta_LowPt = (TH1F*)h_pi_Theta_LowPt->Clone( "h_Eff_TrackTheta_LowPt" );
+    efficiency_and_plots( h_pi_TruthTheta_LowPt, h_pi_Theta_LowPt, Eff_TrackTheta_LowPt, h_Eff_TrackTheta_LowPt, maincanvas,
                           string("test2_Validation_Efficiency_plots.pdf"), string("Track #theta_{lab}, p_{T}<250 MeV") );
-    Eff_TrackTheta_LowPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of theta_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}<250 MeV"));
-    Eff_TrackTheta_LowPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume."));
+    h_Eff_TrackTheta_LowPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of theta_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}<250 MeV"));
+    h_Eff_TrackTheta_LowPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume."));
     list_eff_tracks->Add( Eff_TrackTheta_LowPt );
+    list_web->Add( h_Eff_TrackTheta_LowPt );
 
     TGraphAsymmErrors* Eff_TrackTheta_HighPt = new TGraphAsymmErrors();
-    efficiency_and_plots( h_pi_TruthTheta_HighPt, h_pi_Theta_HighPt, Eff_TrackTheta_HighPt, maincanvas,
+    TH1F* h_Eff_TrackTheta_HighPt = (TH1F*)h_pi_Theta_HighPt->Clone( "h_Eff_TrackTheta_HighPt" );
+    efficiency_and_plots( h_pi_TruthTheta_HighPt, h_pi_Theta_HighPt, Eff_TrackTheta_HighPt, h_Eff_TrackTheta_HighPt, maincanvas,
                           string("test2_Validation_Efficiency_plots.pdf"), string("Track #theta_{lab}, p_{T}>=250 MeV") );
-    Eff_TrackTheta_HighPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of theta_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}>=250 MeV"));
-    Eff_TrackTheta_HighPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume."));
+    h_Eff_TrackTheta_HighPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of theta_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}>=250 MeV"));
+    h_Eff_TrackTheta_HighPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume."));
     list_eff_tracks->Add( Eff_TrackTheta_HighPt );
+    list_web->Add( h_Eff_TrackTheta_HighPt );
 
     TGraphAsymmErrors* Eff_TrackPhi_LowPt = new TGraphAsymmErrors();
-    efficiency_and_plots( h_pi_TruthPhi_LowPt, h_pi_Phi_LowPt, Eff_TrackPhi_LowPt, maincanvas,
+    TH1F* h_Eff_TrackPhi_LowPt = (TH1F*)h_pi_Phi_LowPt->Clone( "h_Eff_TrackPhi_LowPt" );
+    efficiency_and_plots( h_pi_TruthPhi_LowPt, h_pi_Phi_LowPt, Eff_TrackPhi_LowPt, h_Eff_TrackPhi_LowPt, maincanvas,
                           string("test2_Validation_Efficiency_plots.pdf"), string("Track #phi_{lab}, p_{T}<250 MeV") );
-    Eff_TrackPhi_LowPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of phi_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}<250 MeV"));
-    Eff_TrackPhi_LowPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Periodic dip at #pi/2 modulo."));
+    h_Eff_TrackPhi_LowPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of phi_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}<250 MeV"));
+    h_Eff_TrackPhi_LowPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Periodic dip at #pi/2 modulo."));
     list_eff_tracks->Add( Eff_TrackPhi_LowPt );
+    list_web->Add( h_Eff_TrackPhi_LowPt );
 
     TGraphAsymmErrors* Eff_TrackPhi_HighPt = new TGraphAsymmErrors();
-    efficiency_and_plots( h_pi_TruthPhi_HighPt, h_pi_Phi_HighPt, Eff_TrackPhi_HighPt, maincanvas,
+    TH1F* h_Eff_TrackPhi_HighPt = (TH1F*)h_pi_Phi_HighPt->Clone( "Eff_TrackPhi_HighPt" );
+    efficiency_and_plots( h_pi_TruthPhi_HighPt, h_pi_Phi_HighPt, Eff_TrackPhi_HighPt, h_Eff_TrackPhi_HighPt, maincanvas,
                           string("test2_Validation_Efficiency_plots.pdf"), string("Track #phi_{lab}, p_{T}>=250 MeV") );
-    Eff_TrackPhi_HighPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of phi_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}>=250 MeV"));
-    Eff_TrackPhi_HighPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Periodic dip at #pi/2 modulo."));
+    h_Eff_TrackPhi_HighPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of phi_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}>=250 MeV"));
+    h_Eff_TrackPhi_HighPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Periodic dip at #pi/2 modulo."));
     list_eff_tracks->Add( Eff_TrackPhi_HighPt );
+    list_web->Add( h_Eff_TrackPhi_HighPt );
 
     ///////////////////// Photons
-    //TFile* outputP = new TFile("EfficiencyValidationPhotons.root", "recreate");
+    // Fill histograms
+    test2_Validation_Efficiency_Photon_Truth(filename, list_hist_photons);
+    test2_Validation_Efficiency_Photon_Reco(filename, list_hist_photons);
+    
+    
     TList* list_eff_photons = new TList;
     TGraphAsymmErrors* Eff_Photon[4];
     TGraphAsymmErrors* Eff_PhotonTheta_LowE[4];
     TGraphAsymmErrors* Eff_PhotonTheta_HighE[4];
     TGraphAsymmErrors* Eff_PhotonPhLowE[4];
     TGraphAsymmErrors* Eff_PhotonPhHighE[4];
+    
+    TH1F* h_Eff_Photon[4];
+    TH1F* h_Eff_PhotonTheta_LowE[4];
+    TH1F* h_Eff_PhotonTheta_HighE[4];
+    TH1F* h_Eff_PhotonPhLowE[4];
+    TH1F* h_Eff_PhotonPhHighE[4];
     for( int i=0; i<4; i++ ) {
         Eff_Photon[i] = new TGraphAsymmErrors();
-        efficiency_and_plots( h_gamma_TruthP[i], h_gamma_P[i], Eff_Photon[i], maincanvas,
+        h_Eff_Photon[i] = (TH1F*)h_gamma_P[i]->Clone( Form( "h_Eff_Photon_%s", regions[i] ) );
+        efficiency_and_plots( h_gamma_TruthP[i], h_gamma_P[i], Eff_Photon[i], h_Eff_Photon[i], maincanvas,
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon E", regions[i])) );
-        Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction efficiency of truth-matched photons in bins of energy. Input: Generic BBbar."));
-        Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency, particularly at low E. Steep rise to 80 percent at 1 GeV."));
+        h_Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of energy. Input: Generic BBbar. ECL: %s", regions[i])));
+        h_Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency, particularly at low E. Steep rise to 80 percent at 1 GeV."));
         list_eff_photons->Add( Eff_Photon[i] );
+        list_web->Add( h_Eff_Photon[i] );
 
         Eff_PhotonTheta_LowE[i] = new TGraphAsymmErrors();
-        efficiency_and_plots( h_gamma_TruthTheta_LowE[i], h_gamma_Theta_LowE[i], Eff_PhotonTheta_LowE[i], maincanvas,
+        h_Eff_PhotonTheta_LowE[i] = (TH1F*)h_gamma_Theta_LowE[i]->Clone( Form( "h_Eff_PhotonTheta_LowE_%s", regions[i] ) );
+        efficiency_and_plots( h_gamma_TruthTheta_LowE[i], h_gamma_Theta_LowE[i], Eff_PhotonTheta_LowE[i], h_Eff_PhotonTheta_LowE[i], maincanvas,
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon #theta_{lab}, E<500 MeV", regions[i])) );
-        Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction efficiency of truth-matched photons in bins of theta_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E<500 MeV."));
-        Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Dips at 0.6 and 2.3."));
+        h_Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of theta_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E<500 MeV. ECL: %s", regions[i])));
+        h_Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Dips at 0.6 and 2.3."));
         list_eff_photons->Add( Eff_PhotonTheta_LowE[i] );
+        list_web->Add( h_Eff_PhotonTheta_LowE[i] );
 
         Eff_PhotonTheta_HighE[i] = new TGraphAsymmErrors();
-        efficiency_and_plots( h_gamma_TruthTheta_HighE[i], h_gamma_Theta_HighE[i], Eff_PhotonTheta_HighE[i], maincanvas,
+        h_Eff_PhotonTheta_HighE[i] = (TH1F*)h_gamma_Theta_HighE[i]->Clone( Form( "h_Eff_PhotonTheta_HighE_%s", regions[i] ) );
+        efficiency_and_plots( h_gamma_TruthTheta_HighE[i], h_gamma_Theta_HighE[i], Eff_PhotonTheta_HighE[i], h_Eff_PhotonTheta_HighE[i], maincanvas,
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon #theta_{lab}, E>=500 MeV", regions[i])) );
-        Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction efficiency of truth-matched photons in bins of theta_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E>=500 MeV."));
-        Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Dips at 0.6 and 2.3."));
+        h_Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of theta_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E>=500 MeV. ECL: %s", regions[i])));
+        h_Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Dips at 0.6 and 2.3."));
         list_eff_photons->Add( Eff_PhotonTheta_HighE[i] );
+        list_web->Add( h_Eff_PhotonTheta_HighE[i] );
 
         Eff_PhotonPhLowE[i] = new TGraphAsymmErrors();
-        efficiency_and_plots( h_gamma_TruthPhi_LowE[i], h_gamma_Phi_LowE[i], Eff_PhotonPhLowE[i], maincanvas,
+        h_Eff_PhotonPhLowE[i] = (TH1F*)h_gamma_Phi_LowE[i]->Clone( Form( "h_Eff_PhotonPhLowE_%s", regions[i] ) );
+        efficiency_and_plots( h_gamma_TruthPhi_LowE[i], h_gamma_Phi_LowE[i], Eff_PhotonPhLowE[i], h_Eff_PhotonPhLowE[i], maincanvas,
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon #phi_{lab}, E<500 MeV", regions[i])) );
-        Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction efficiency of truth-matched photons in bins of phi_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E<500 MeV."));
-        Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Flat across the spectrum."));
+        h_Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of phi_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E<500 MeV. ECL: %s", regions[i])));
+        h_Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Flat across the spectrum."));
         list_eff_photons->Add( Eff_PhotonPhLowE[i] );
+        list_web->Add( h_Eff_PhotonPhLowE[i] );
 
         Eff_PhotonPhHighE[i] = new TGraphAsymmErrors();
-        efficiency_and_plots( h_gamma_TruthPhi_HighE[i], h_gamma_Phi_HighE[i], Eff_PhotonPhHighE[i], maincanvas,
+        h_Eff_PhotonPhHighE[i] = (TH1F*)h_gamma_Phi_HighE[i]->Clone( Form( "h_Eff_PhotonPhHighE_%s", regions[i] ) );
+        efficiency_and_plots( h_gamma_TruthPhi_HighE[i], h_gamma_Phi_HighE[i], Eff_PhotonPhHighE[i], h_Eff_PhotonPhHighE[i], maincanvas,
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon #phi_{lab}, E>=500 MeV", regions[i]) ) );
-        Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction efficiency of truth-matched photons in bins of phi_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E>=500 MeV."));
-        Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Flat across the spectrum."));
+        h_Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of phi_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E>=500 MeV. ECL: %s", regions[i])));
+        h_Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Flat across the spectrum."));
         list_eff_photons->Add( Eff_PhotonPhHighE[i] );
+        list_web->Add( h_Eff_PhotonPhHighE[i] );
     }
 
     TFile* output = new TFile("test2_Validation_Efficiency_output.root", "recreate");
+    TDirectory* dir_tracks = output->mkdir("Tracks");
+    dir_tracks->cd();
     list_eff_tracks->Write();
+    TDirectory* dir_photons = output->mkdir("Photons");
+    dir_photons->cd();
     list_eff_photons->Write();
+    
+    output->cd();
+    list_web->Write();
     output->Close();
 
     maincanvas->Print("test2_Validation_Efficiency_plots.pdf]");

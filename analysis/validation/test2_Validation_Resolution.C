@@ -61,7 +61,7 @@ const char *names[] = { "pi", "k", "e", "mu", "p", "gamma"};
 enum ecl_regions {All=0, FW=1, Barrel=2, BW=3, ECL=4};
 const char* regions[]= { "All", "FW", "Barrel", "BW" };
 
-double x[NBINSP], yrms[NBINSP], xe[NBINSP], yerms[NBINSP];
+double xvalues[NBINSP], yrms[NBINSP], xe[NBINSP], yerms[NBINSP];
 double ymean[NBINSP], yemean[NBINSP];
 
 TCanvas *canvasResolution = new TCanvas ("canvasResolution","canvasResolution",1000,800);
@@ -78,6 +78,7 @@ void pi_plots(bool runOffline) {
     recoTree->AddFile(infile);
 
     TList* list = new TList;
+    TList* list_web = new TList;
     //Lab momentum
     TH1F* h_PPi     = new TH1F("PPi", ";p_{T}(#pi) GeV;N", NBINSP, MINP, MAXP);
     list->Add(h_PPi);
@@ -172,12 +173,12 @@ void pi_plots(bool runOffline) {
 
     for(int i=0; i<NBINSP; i++) {
         h_PResPi[i]->Scale(1/h_PResPi[i]->Integral());
-        x[i] = (float)i*reswidth+reswidth/2.;
-        yrms[i] = h_PResPi[i]->GetRMS()/x[i];
-        ymean[i] = h_PResPi[i]->GetMean()/x[i];
+        xvalues[i] = (float)i*reswidth+reswidth/2.;
+        yrms[i] = h_PResPi[i]->GetRMS()/xvalues[i];
+        ymean[i] = h_PResPi[i]->GetMean()/xvalues[i];
         xe[i] = reswidth/2.;
-        yerms[i] = h_PResPi[i]->GetRMSError()/x[i];
-        yemean[i] = h_PResPi[i]->GetMeanError()/x[i];
+        yerms[i] = h_PResPi[i]->GetRMSError()/xvalues[i];
+        yemean[i] = h_PResPi[i]->GetMeanError()/xvalues[i];
         h_PResPi[i]->Draw();
         //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
         //Belle2Labels(0.1, 0.96, Form( "%.1f < p_{T}(#pi)(GeV) < %.1f", i*0.1, (i+1)*0.1 ) );
@@ -194,70 +195,80 @@ void pi_plots(bool runOffline) {
     canvasResolution->cd()->SetGridy(1);
     canvasResolution->cd()->SetGridx(1);
 
-    TGraphErrors *graphResolution = new TGraphErrors(NBINSP, x, yrms, xe, yerms);
-    graphResolution->SetName("graphResolution");
-    graphResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction PT resolution of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
-    graphResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
-    list->Add(graphResolution);
-    graphResolution->SetFillColor(kBlue);
-    graphResolution->SetMarkerColor(kBlue);
-    graphResolution->Draw("2a");
-    graphResolution->SetMinimum(0.00);
-    graphResolution->SetMaximum(0.03);
-    graphResolution->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
-    graphResolution->GetYaxis()->SetTitle("#sigma(p_{T})/p_{T}");
-    graphResolution->GetXaxis()->SetTitle("p_{T} (#pi) GeV");
+    h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction, reconstructed vs truth transverse momentum of truth-matched pion tracks with a pi hypothesis. A Generic BBbar sample is used."));
+    h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+    list_web->Add(h_Resolution_2D);
+    
+    TH1F *h_Resolution = new TH1F("h_Resolution", ";p_{T} (#pi) GeV;#sigma(p_{T})/p_{T}", NBINSP, MINP, MAXP);
+    h_Resolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction PT resolution of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
+    h_Resolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+    h_Resolution->SetFillColor(kBlue);  h_Resolution->SetMarkerColor(kBlue);
+    h_Resolution->SetMinimum(0.00);     h_Resolution->SetMaximum(0.03);
+    for( int bin=0; bin<NBINSP; bin++ ){
+        h_Resolution->SetBinContent( bin+1, yrms[bin] );
+        h_Resolution->SetBinError( bin+1, yerms[bin] );
+    }
+    list->Add(h_Resolution);
+    list_web->Add(h_Resolution);
+    h_Resolution->Draw("e2");
+    h_Resolution->SetOption("e2");
     //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Resolution in bins of pT");
     canvasResolution->Clear();
-
-    TGraphErrors *graphBias = new TGraphErrors(NBINSP,x,ymean,xe,yemean);
-    graphBias->SetName("graphBias");
-    graphBias->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction pT bias of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
-    graphBias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low pT tracks < 100 MeV exhibit larger relative bias."));
-    list->Add(graphBias);
-    graphBias->SetFillColor(kBlue);
-    graphBias->SetMarkerColor(kBlue);
-    graphBias->Draw("2a");
-    graphBias->SetMinimum(-0.002);
-    graphBias->SetMaximum(0.002);
-    graphBias->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
-    graphBias->GetYaxis()->SetTitle("Mean Bias (Rec-True)/Mean");
-    graphBias->GetXaxis()->SetTitle("p_{T} (#pi) GeV");
+    
+    TH1F *h_Bias = new TH1F("h_Bias", ";p_{T} (#pi) GeV;Mean Bias (Rec-True)/Mean", NBINSP, MINP, MAXP);
+    h_Bias->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction pT bias of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
+    h_Bias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low pT tracks < 100 MeV exhibit larger relative bias."));
+    h_Bias->SetFillColor(kBlue);    h_Bias->SetMarkerColor(kBlue);
+    h_Bias->SetMinimum(-0.002);     h_Bias->SetMaximum(0.002);
+    for( int bin=0; bin<NBINSP; bin++ ){
+        h_Bias->SetBinContent( bin+1, ymean[bin] );
+        h_Bias->SetBinError( bin+1, yemean[bin] );
+    }
+    h_Bias->Draw("2a");
+    list->Add(h_Bias);
+    list_web->Add(h_Bias);
+    h_Bias->Draw("e2");
+    h_Bias->SetOption("e2");
     //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
-    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Resolution in bins of pT");
+    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Bias in bins of pT");
     canvasResolution->Clear();
+    
 
     for(int i=0; i<NBINSP; i++) {
         h_dzResPi[i]->Scale(1/h_dzResPi[i]->Integral());
-        x[i] = (float)i*reswidth+reswidth/2.;
+        xvalues[i] = (float)i*reswidth+reswidth/2.;
         yrms[i] = h_dzResPi[i]->GetRMS();
         xe[i] = reswidth/2.;
         yerms[i] = h_dzResPi[i]->GetRMSError();
     }
-
+    
     //z0 Bias in bins of pT
-    TGraphErrors *graphZResolution = new TGraphErrors(NBINSP, x, yrms, xe, yerms);
-    graphZResolution->SetName("graphZResolution");
-    graphZResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction dz of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
-    graphZResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
-    list->Add(graphZResolution);
-    graphZResolution->SetFillColor(kBlue);
-    graphZResolution->SetMarkerColor(kBlue);
-    graphZResolution->Draw("2a");
-    graphZResolution->SetMinimum(0.00);
-    graphZResolution->SetMaximum(250);
-    graphZResolution->GetXaxis()->SetRangeUser( h_PPi->GetBinLowEdge(1), h_PPi->GetBinLowEdge( h_PPi->GetNbinsX()+1 ) );
-    graphZResolution->GetYaxis()->SetTitle("#sigma(z)");
-    graphZResolution->GetXaxis()->SetTitle("p_{T}(#pi) GeV");
+    TH1F *h_ZResolution = new TH1F("h_ZResolution", ";p_{T}(#pi) GeV;#sigma(z)", NBINSP, MINP, MAXP);
+    h_ZResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction dz of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
+    h_ZResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+    list->Add(h_ZResolution);
+    h_ZResolution->SetFillColor(kBlue); h_ZResolution->SetMarkerColor(kBlue);
+    h_ZResolution->SetMinimum(0.00);    h_ZResolution->SetMaximum(250);
+    for( int bin=0; bin<NBINSP; bin++ ){
+        h_ZResolution->SetBinContent( bin+1, yrms[bin] );
+        h_ZResolution->SetBinError( bin+1, yerms[bin] );
+    }
+    list->Add(h_ZResolution);
+    list_web->Add(h_ZResolution);
+    h_ZResolution->Draw("e2");
+    h_ZResolution->SetOption("e2");
     //if(runOffline)Belle2Labels(0.4,0.9,"Simulation (Preliminary)");
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"z Resolution in bins of pT");
     canvasResolution->Clear();
-
+    
     TFile* output = new TFile(Form("test2_Validation_Resolution_output.root"), "update");
     TDirectory* dir = output->mkdir("Tracks");
     dir->cd();
     list->Write();
+    
+    output->cd();
+    list_web->Write();
     output->Close();
 }
 
@@ -272,6 +283,7 @@ void photon_plots(bool runOffline) {
     TH2F* h_Resolution_2D[ECL];
     //Energy
     TList* list = new TList;
+    TList* list_web = new TList;
     for( int i=0; i<ECL; i++ ) {
         h_PGamm[i]= new TH1F(Form("PGamm_%s",regions[i]), ";E(#gamma) GeV;N", NBINSP, MINP, MAXP);
         list->Add( h_PGamm[i] );
@@ -285,7 +297,10 @@ void photon_plots(bool runOffline) {
             list->Add( h_EResGamm[i][j] );
         }
         h_Resolution_2D[i] = new TH2F(Form("Resolution_2D_%s",regions[i]), ";E(#gamma) Rec GeV;E(#gamma) Truth GeV", NBINSP, MINP, MAXP, NBINSP, MINP, MAXP);
+        h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Photon reconstruction, reconstructed vs truth energy of truth-matched photons. A Generic BBbar sample is used. ECL %s",names[i]) ) );
+        h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0."));
         list->Add( h_Resolution_2D[i] );
+        list_web->Add( h_Resolution_2D[i] );
     }
 
     Float_t gamma_P;
@@ -367,6 +382,7 @@ void photon_plots(bool runOffline) {
         //if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
         canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"), Form("Photon energy resolution %d", j));
     }
+    
     for( int i=0; i<ECL; i++ ) {
         canvasResolution->cd(i+1);
         h_Resolution_2D[i]->Draw("box");
@@ -381,46 +397,51 @@ void photon_plots(bool runOffline) {
     for( int i=0; i<ECL; i++ ) {
         for(int j=0; j<NBINSP; j++) {
             h_EResGamm[i][j]->Scale(1/h_EResGamm[i][j]->Integral());
-            x[j] = (float)j*reswidth+reswidth/2.;
-            yrms[j]  = h_EResGamm[i][j]->GetRMS()/x[j];
-            ymean[j] = h_EResGamm[i][j]->GetMean()/x[j];
+            xvalues[j] = (float)j*reswidth+reswidth/2.;
+            yrms[j]  = h_EResGamm[i][j]->GetRMS()/xvalues[j];
+            ymean[j] = h_EResGamm[i][j]->GetMean()/xvalues[j];
 
             xe[j] = reswidth/2.;
-            yerms[j]  = h_EResGamm[i][j]->GetRMSError()/x[j];
-            yemean[j] = h_EResGamm[i][j]->GetMeanError()/x[j];
+            yerms[j]  = h_EResGamm[i][j]->GetRMSError()/xvalues[j];
+            yemean[j] = h_EResGamm[i][j]->GetMeanError()/xvalues[j];
+            // If too small statistics, some ymean become nan
+            if(yrms[j]!=yrms[j])    yrms[j] = 0.;
+            if(ymean[j]!=ymean[j])  ymean[j] = 0.;
         }
-
-        TGraphErrors *graphResolution = new TGraphErrors(NBINSP, x, yrms, xe, yerms);
-        graphResolution->SetName(Form("graphResolution_%s",regions[i]));
-        graphResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction resolution of truth-matched photons in bins of true energy. Sigma is determined from getRMS. A Generic BBbar sample is used."));
-        graphResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Broad at low energy, flattens to <0.2 after E>0.2 GeV"));
-        list->Add(graphResolution);
-        graphResolution->SetFillColor(kBlue);
-        graphResolution->SetMarkerColor(kBlue);
-
-        TH1 *frame = canvasResolution->DrawFrame(h_PGamm[i]->GetBinLowEdge(1),0.0,
-                     h_PGamm[i]->GetBinLowEdge(h_PGamm[i]->GetNbinsX()+1),0.4);
-        frame->GetYaxis()->SetTitle("#sigma(E)/E");
-        frame->GetXaxis()->SetTitle("E (#gamma) GeV");
-        graphResolution->Draw("2");
+        
+        TH1F *h_Resolution = new TH1F(Form("h_Resolution_%s",regions[i]), ";E (#gamma) GeV;#sigma(E)/E", NBINSP, MINP, MAXP);
+        h_Resolution->GetListOfFunctions()->Add(new TNamed("Description", Form( "Single photon reconstruction resolution of truth-matched photons in bins of true energy. Sigma is determined from getRMS. A Generic BBbar sample is used. ECL %s", names[i]) ) );
+        h_Resolution->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0"));
+        h_Resolution->SetFillColor(kBlue);  h_Resolution->SetMarkerColor(kBlue);
+        h_Resolution->SetMinimum(0.);       h_Resolution->SetMaximum(0.4);
+        for( int bin=0; bin<NBINSP; bin++ ){
+            h_Resolution->SetBinContent( bin+1, yrms[bin] );
+            h_Resolution->SetBinError( bin+1, yerms[bin] );
+        }
+        list->Add(h_Resolution);
+        list_web->Add(h_Resolution);
+        h_Resolution->Draw("e2");
+        h_Resolution->SetOption("e2");
         //if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
-        canvasResolution->Update();
         canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector resolution for photons");
-
-        TGraphErrors *graphBias = new TGraphErrors(NBINSP, x, ymean, xe, yemean);
-        graphBias->SetName(Form("graphBias_%s",regions[i]));
-        graphBias->GetListOfFunctions()->Add(new TNamed("Description", "Single photon reconstruction Energy bias of truth-matched photons in bins of true energy. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
-        graphBias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low E tracks < 200 MeV exhibit larger relative bias up to 10%."));
-        list->Add(graphBias);
-        graphBias->SetFillColor(kBlue);
-
-        frame = canvasResolution->DrawFrame(h_PGamm[i]->GetBinLowEdge(1),-0.5,
-                                            h_PGamm[i]->GetBinLowEdge(h_PGamm[i]->GetNbinsX()+1),0.1);
-        frame->GetYaxis()->SetTitle("Mean Bias (Rec-Truth)/Mean");
-        frame->GetXaxis()->SetTitle("E (#gamma) GeV");
-        graphBias->Draw("2");
+        
+        
+        TH1F *h_Bias = new TH1F(Form("h_Bias_%s",regions[i]),";E (#gamma) GeV;Mean Bias (Rec-Truth)/Mean",NBINSP,MINP,MAXP);
+        h_Bias->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction Energy bias of truth-matched photons in bins of true energy. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used. ECL %s", names[i])));
+        h_Bias->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0"));
+        list->Add(h_Bias);
+        h_Bias->SetFillColor(kBlue);  h_Bias->SetMarkerColor(kBlue);
+        h_Bias->SetMinimum(-0.5);     h_Bias->SetMaximum(0.1);
+        for( int bin=0; bin<NBINSP; bin++ ){
+            h_Bias->SetBinContent( bin+1, ymean[bin] );
+            h_Bias->SetBinError( bin+1, yemean[bin] );
+        }
+        h_Bias->Print();
+        list->Add(h_Bias);
+        list_web->Add(h_Bias);
+        h_Bias->Draw("e2");
+        h_Bias->SetOption("e2");
         //if(runOffline)Belle2Labels(0.4, 0.9, "Simulation (Preliminary)");
-        canvasResolution->Update();
         canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf"),"Detector resolution for photons");
     }
 
@@ -429,7 +450,9 @@ void photon_plots(bool runOffline) {
     TDirectory* dir = output->mkdir("Photons");
     dir->cd();
     list->Write();
-
+    
+    output->cd();
+    list_web->Write();
     output->Close();
 }
 
@@ -444,4 +467,5 @@ void test2_Validation_Resolution(bool runOffline=false) {
     photon_plots(runOffline);
     canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf]"));
 }
+
 

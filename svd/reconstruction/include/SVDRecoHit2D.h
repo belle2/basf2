@@ -154,7 +154,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(SVDRecoHit2D, 5)
+    ClassDef(SVDRecoHit2D, 6)
   };
 
 } // namespace Belle2

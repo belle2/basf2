@@ -581,7 +581,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
 
     subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/nordbert.pdf')), shell=True)
     for i in range(0, 2):
-        ret = subprocess.call(['pdflatex', '-halt-on-error', placeholders['texFile']])
+        ret = subprocess.call(['pdflatex', '-halt-on-error', '-interaction=nonstopmode', placeholders['texFile']])
         if ret == 0:
             B2INFO("Created FEI summary PDF.")
         else:

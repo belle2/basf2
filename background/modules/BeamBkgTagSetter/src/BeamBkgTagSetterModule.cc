@@ -57,7 +57,8 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Sets beam background tag variable in SimHits; "
+    setDescription("Sets beam background tag variable in SimHits and "
+                   "adds BackgroundMetaData branch in persistent tree; "
                    "returns true if at least one of the SimHit store arrays "
                    "has entries. Return value can be used to discard empty "
                    "events at output.");
@@ -68,7 +69,7 @@ namespace Belle2 {
     addParam("backgroundType", m_backgroundType,
              "one of: " + m_bgTypes.getBGTypes());
     addParam("realTime", m_realTime,
-             "real time in nano seconds that corresponds to background samle");
+             "equivalent time of superKEKB running in [ns] to obtain this sample");
 
   }
 

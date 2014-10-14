@@ -59,9 +59,15 @@ print 'BELLE2_LOCAL_DIR:    ', os.environ.get('BELLE2_LOCAL_DIR', '')
 print 'BELLE2_SUBDIR:       ', os.environ.get('BELLE2_SUBDIR', '')
 print 'Machine architecture:', os.environ.get('BELLE2_ARCH', '')
 print 'Kernel version:      ', os.uname()[2]
-print 'Operating system:    ', os.uname()[3]
+# print 'Operating system:    ', os.uname()[3]
 python_version = sys.version_info[:3]
 print 'Python version:      ', '.'.join(str(ver) for ver in python_version)
+try:
+    from ROOT import gROOT
+    rootver = gROOT.GetVersion()
+except:
+    rootver = 'PyROOT broken, cannot get version!'
+print 'ROOT version:        ', rootver
 print ''
 print 'basf2 module directories:', ':'.join(fw.list_module_search_paths())
 print '-------------------------------------------------'

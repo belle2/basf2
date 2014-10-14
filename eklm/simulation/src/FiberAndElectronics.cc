@@ -133,7 +133,7 @@ void EKLM::FiberAndElectronics::processEntry()
       m_FPGAParams.startTime = i * m_digPar->ADCSamplingTime;
       break;
     }
-  std::cout << "-------------------------------- " << m_FPGAParams.startTime << std::endl;
+  //  std::cout << "-------------------------------- " << m_FPGAParams.startTime << std::endl;
   //  m_FPGAParams.startTime = m_FPGAParams.startTime * m_digPar->ADCSamplingTime;
   m_FPGAParams.peakTime = m_FPGAParams.peakTime * m_digPar->ADCSamplingTime;
   m_FPGAParams.attenuationFreq = m_FPGAParams.attenuationFreq /

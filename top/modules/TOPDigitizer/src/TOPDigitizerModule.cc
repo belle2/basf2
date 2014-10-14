@@ -128,10 +128,9 @@ namespace Belle2 {
 
     // simulate trigger T0 accuracy in finding the right bunch crossing
     double trigT0 = 0;
-    int relBunchNo = 0;
     if (m_trigT0Sigma > 0) {
       trigT0 = gRandom->Gaus(0., m_trigT0Sigma);
-      relBunchNo = round(trigT0 / m_bunchTimeSep);
+      int relBunchNo = round(trigT0 / m_bunchTimeSep);
       trigT0 = relBunchNo * m_bunchTimeSep;
       recBunch->setSimulated(relBunchNo, trigT0);
     }

@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input>EvtGenSimRec.root, EvtGenSimRec_B2Kpi.root</input>
+  <output>TOPNtuple.root</output>
+  <contact>staric</contact>
+  <description>Makes a flat ntuple with TOP PID, track info and MC truth </description>
+</header>
+"""
+
 from basf2 import *
 
 # ---------------------------------------------------------------

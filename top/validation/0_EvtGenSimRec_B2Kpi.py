@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <output>EvtGenSimRec_B2Kpi.root</output>
+  <contact>staric</contact>
+  <description>Generates signal MC of B0 -> K-pi+, 200 events</description>
+</header>
+"""
+
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction

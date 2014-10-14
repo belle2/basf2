@@ -1,3 +1,12 @@
+/*
+<header>
+  <input>TOPNtuple.root</input>
+  <output>kaonID.root, numberOfPhotons.root, trackResolutions.root</output>
+  <contact>staric</contact>
+  <description>Makes validation histograms</description>
+</header>
+*/
+
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1F.h>

@@ -27,6 +27,7 @@ from modularAnalysis import inputMdst
 from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
+from modularAnalysis import applyTMVAMethod
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
@@ -72,17 +73,10 @@ massKFit('pi0', 0.0, '')
 # perform MC matching
 matchMCTruth('pi0')
 
-# at the moment the python wrapper function for the TMVATeacher module
-# does not exist, therefore we have to register the module by ourselves
-# and set all module parameters
-expert = register_module('TMVAExpert')
-expert.param('prefix', 'PI0-B2A501-TMVA')
-# the expertise is located in the current directory
-expert.param('workingDirectory', './')
-expert.param('method', 'BDTG')
-expert.param('listNames', ['pi0'])
-expert.param('signalProbabilityName', 'BDT')
-analysis_main.add_module(expert)
+# Apply previously trained TMVA method. The training files are identified by the prefix.
+# The expert calculates for each candidate in the pi0 particle list the classifier response
+# and stores the value in the extra info field of the particle under the key BDT.
+applyTMVAMethod('pi0', method='BDTG', signalProbabilityName='BDT', prefix='PI0-B2A501-TMVA')
 
 toolsPI0 = ['MCTruth', '^pi0 -> gamma gamma']
 toolsPI0 += ['Kinematics', '^pi0 -> ^gamma ^gamma']

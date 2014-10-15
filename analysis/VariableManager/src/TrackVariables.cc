@@ -49,10 +49,10 @@ namespace Belle2 {
 
       if (det == Const::EDetector::CDC) {
         return trackFit->getHitPatternCDC().getNHits();
-      } else if (det == Const::EDetector::CDC) {
+      } else if (det == Const::EDetector::SVD) {
         // TODO: implement when available
         return 0.0;
-      } else if (det == Const::EDetector::CDC) {
+      } else if (det == Const::EDetector::PXD) {
         // TODO: implement when available
         return 0.0;
       } else

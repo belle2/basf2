@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input>DSTtoMDST.mdst.root</input>
+  <output>MDSTtoUDST.udst.root</output>
+  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+</header>
+"""
+
 import sys
 
 rootFileName = '../MDSTtoUDST'

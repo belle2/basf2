@@ -2,6 +2,14 @@
 # -*- coding: utf-8 -*-
 
 ## This is a dummy script, ready to test UDST reading when ParticleLists are persistified
+
+"""
+<header>
+  <input>MDSTtoUDST.udst.root</input>
+  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+</header>
+"""
+
 import sys
 
 rootFileName = '../UDSTtoNTUP'

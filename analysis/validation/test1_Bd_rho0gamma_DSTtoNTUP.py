@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input>Bd_rho0gamma_GENSIMRECtoDST.dst.root</input>
+  <output>Bd_rho0gamma.ntup.root</output>
+  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+</header>
+"""
+
 import sys
 import os
 from basf2 import *

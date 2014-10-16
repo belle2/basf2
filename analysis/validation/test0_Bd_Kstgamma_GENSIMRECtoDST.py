@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input>Bd_Kstgamma.dec</input>
+  <output>Bd_Kstgamma_GENSIMRECtoDST.dst.root</output>
+  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+</header>
+"""
+
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -11,7 +19,7 @@ main = create_path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('evtNumList', [500])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)

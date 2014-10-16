@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input>Bu_D0pi,Kpi_GENSIMRECtoDST.dst.root</input>
+  <output>Bu_Dpi,Kpi.ntup.root</output>
+  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+</header>
+"""
+
 import sys
 import os
 from basf2 import *

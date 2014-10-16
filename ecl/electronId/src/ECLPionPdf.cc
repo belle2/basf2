@@ -33,6 +33,7 @@ void  ECLPionPdf::init(const char* parametersFileName)
 
 double ECLPionPdf::pdf(double eop, double p) const
 {
+  if (p > 100.) p = 100.; // very large p can not fit into int().
   int i = int(p / 0.250);
   if (i == 0) i = 1;
   if (i > 7) i = 7;

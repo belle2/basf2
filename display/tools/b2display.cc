@@ -24,8 +24,7 @@ int main(int argc, char* argv[])
               "  See output of 'basf2 -m Display' for available options.\n";
     return 1;
   }
-  using namespace Belle2::FileSystem;
-  std::string fullPath = findFile("/display/examples/display.py");
+  std::string fullPath = Belle2::FileSystem::findFile("/display/examples/display.py");
   std::string s = "basf2 " + fullPath + " -i \"" + std::string(argv[1]) + "\"";
   return system(s.c_str());
 }

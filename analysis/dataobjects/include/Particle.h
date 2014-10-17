@@ -28,6 +28,7 @@ namespace Belle2 {
   class ECLCluster;
   class KLMCluster;
   class Track;
+  class TrackFitResult;
   class MCParticle;
 
   /**
@@ -38,7 +39,7 @@ namespace Belle2 {
    *    - photons reconstructed as ECLCluster (without associated Track)
    *    - long lived neutral kaons reconstructed in KLM (as KLMCluster without associated Track)
    *  - composite particles:
-   *    - pre-reconstructed Kshort, Lambda, ...
+   *    - pre-reconstructed V0 particles: Kshort, Lambda baryon, converted photon, ...
    *    - reconstructed in decays (via combinations)
    *
    * Private members are limited to those which completely define the
@@ -145,6 +146,17 @@ namespace Belle2 {
      * @param chargedStable Type of charged particle
      */
     Particle(const Track* track,
+             const Const::ChargedStable& chargedStable);
+
+    /**
+     * Constructor from a reconstructed Track given as TrackFitResult.
+     * To be used to create Particle objects from V0 daughters.
+     * @param trackArrayIndex track StoreArray index
+     * @param trackFit pointer to TrackFitResult object
+     * @param chargedStable Type of charged particle
+     */
+    Particle(const int trackArrayIndex,
+             const TrackFitResult* trackFit,
              const Const::ChargedStable& chargedStable);
 
     /**
@@ -604,6 +616,11 @@ namespace Belle2 {
     TClonesArray* m_arrayPointer; //! transient pointer to particle StoreArray
 
     // private methods
+    /**
+     * Sets the momentum, position and error matrix for this particle (created from charged Track)
+     */
+    void setMomentumPositionErrorMatrix(const TrackFitResult* trackFit);
+
     /**
      * Resets 7x7 error matrix
      * All elements are set to 0.0

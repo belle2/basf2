@@ -112,80 +112,36 @@ Particle::Particle(const Track* track,
     B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
   m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
 
-  // set momentum
-  m_px = trackFit->getMomentum().Px();
-  m_py = trackFit->getMomentum().Py();
-  m_pz = trackFit->getMomentum().Pz();
+  // set momentum, position and error matrix
+  setMomentumPositionErrorMatrix(trackFit);
+}
 
-  // set position at which the momentum is given (= POCA)
-  setVertex(trackFit->getPosition());
+Particle::Particle(const int trackArrayIndex,
+                   const TrackFitResult* trackFit,
+                   const Const::ChargedStable& chargedStable) :
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
+{
+  if (!trackFit) return;
 
-  // set Chi^2 probability
-  m_pValue = trackFit->getPValue();
+  m_flavorType = c_Flavored; //tracks are charged
+  m_particleType = c_Track;
 
-  // set error matrix
-  TMatrixF cov6(trackFit->getCovariance6());
-  unsigned order[] = {c_X, c_Y, c_Z, c_Px, c_Py, c_Pz};
+  m_mdstIndex = trackArrayIndex;
 
-  TMatrixFSym errMatrix(c_DimMatrix);
-  for (int i = 0; i < 6; i++) {
-    for (int j = i; j < 6; j++) {
-      // although it seems to make no sense to fill all elements of the
-      // symetric matrix, it has to be (do not touch this code)
-      errMatrix(order[j], order[i]) = errMatrix(order[i], order[j]) = cov6(i, j);
-    }
-  }
+  int absPDGCode = chargedStable.getPDGCode();
+  int signFlip = 1;
+  if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
+  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
 
-  /*
-     E = sqrt(px^2 + py^2 + pz^2 + m^2) thus:
-     cov(x,E)  = cov(px,x) *dE/dpx + cov(py,x) *dE/dpy + cov(pz,x) *dE/dpz
-     cov(y,E)  = cov(px,y) *dE/dpx + cov(py,y) *dE/dpy + cov(pz,y) *dE/dpz
-     cov(z,E)  = cov(px,z) *dE/dpx + cov(py,z) *dE/dpy + cov(pz,z) *dE/dpz
-     cov(px,E) = cov(px,px)*dE/dpx + cov(px,py)*dE/dpy + cov(px,pz)*dE/dpz
-     cov(py,E) = cov(py,px)*dE/dpx + cov(py,py)*dE/dpy + cov(py,pz)*dE/dpz
-     cov(pz,E) = cov(pz,px)*dE/dpx + cov(pz,py)*dE/dpy + cov(pz,pz)*dE/dpz
-     cov(E,E)  = cov(px,px)*(dE/dpx)^2 + cov(py,py)*(dE/dpy)^2 + cov(pz,pz)*(dE/dpz)^2
-               + 2*cov(px,py)*dE/dpx*dE/dpy
-               + 2*cov(py,pz)*dE/dpy*dE/dpz
-               + 2*cov(pz,px)*dE/dpz*dE/dpx
-     dE/dpx = px/E etc.
-  */
+  // set mass
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL)
+    B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
+  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
 
-  float E = getEnergy();
-  float dEdp[] = {m_px / E, m_py / E, m_pz / E};
-  unsigned compMom[] = {c_Px, c_Py, c_Pz};
-  unsigned compPos[] = {c_X,  c_Y,  c_Z};
-
-  // covariances (p,E)
-  for (int i = 0; i < 3; i++) {
-    float Cov = 0;
-    for (int k = 0; k < 3; k++) {
-      Cov += errMatrix(compMom[i], compMom[k]) * dEdp[k];
-    }
-    errMatrix(compMom[i], c_E) = Cov;
-  }
-
-  // covariances (x,E)
-  for (int i = 0; i < 3; i++) {
-    float Cov = 0;
-    for (int k = 0; k < 3; k++) {
-      Cov += errMatrix(compPos[i], compMom[k]) * dEdp[k];
-    }
-    errMatrix(c_E, compPos[i]) = Cov;
-  }
-
-  // variance (E,E)
-  float Cov = 0;
-  for (int i = 0; i < 3; i++) {
-    Cov += errMatrix(compMom[i], compMom[i]) * dEdp[i] * dEdp[i];
-  }
-  for (int i = 0; i < 3; i++) {
-    int k = (i + 1) % 3;
-    Cov += 2 * errMatrix(compMom[i], compMom[k]) * dEdp[i] * dEdp[k];
-  }
-  errMatrix(c_E, c_E) = Cov;
-
-  storeErrorMatrix(errMatrix);
+  // set momentum, position and error matrix
+  setMomentumPositionErrorMatrix(trackFit);
 }
 
 Particle::Particle(const ECLCluster* eclCluster) :
@@ -498,13 +454,91 @@ const MCParticle* Particle::getMCParticle() const
 
 //--- private methods --------------------------------------------
 
-void  Particle::resetErrorMatrix()
+void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
+{
+  // set momenum
+  m_px = trackFit->getMomentum().Px();
+  m_py = trackFit->getMomentum().Py();
+  m_pz = trackFit->getMomentum().Pz();
+
+  // set position at which the momentum is given (= POCA)
+  setVertex(trackFit->getPosition());
+
+  // set Chi^2 probability
+  m_pValue = trackFit->getPValue();
+
+  // set error matrix
+  TMatrixF cov6(trackFit->getCovariance6());
+  unsigned order[] = {c_X, c_Y, c_Z, c_Px, c_Py, c_Pz};
+
+  TMatrixFSym errMatrix(c_DimMatrix);
+  for (int i = 0; i < 6; i++) {
+    for (int j = i; j < 6; j++) {
+      // although it seems to make no sense to fill all elements of the
+      // symetric matrix, it has to be (do not touch this code)
+      errMatrix(order[j], order[i]) = errMatrix(order[i], order[j]) = cov6(i, j);
+    }
+  }
+
+  /*
+     E = sqrt(px^2 + py^2 + pz^2 + m^2) thus:
+     cov(x,E)  = cov(px,x) *dE/dpx + cov(py,x) *dE/dpy + cov(pz,x) *dE/dpz
+     cov(y,E)  = cov(px,y) *dE/dpx + cov(py,y) *dE/dpy + cov(pz,y) *dE/dpz
+     cov(z,E)  = cov(px,z) *dE/dpx + cov(py,z) *dE/dpy + cov(pz,z) *dE/dpz
+     cov(px,E) = cov(px,px)*dE/dpx + cov(px,py)*dE/dpy + cov(px,pz)*dE/dpz
+     cov(py,E) = cov(py,px)*dE/dpx + cov(py,py)*dE/dpy + cov(py,pz)*dE/dpz
+     cov(pz,E) = cov(pz,px)*dE/dpx + cov(pz,py)*dE/dpy + cov(pz,pz)*dE/dpz
+     cov(E,E)  = cov(px,px)*(dE/dpx)^2 + cov(py,py)*(dE/dpy)^2 + cov(pz,pz)*(dE/dpz)^2
+               + 2*cov(px,py)*dE/dpx*dE/dpy
+               + 2*cov(py,pz)*dE/dpy*dE/dpz
+               + 2*cov(pz,px)*dE/dpz*dE/dpx
+     dE/dpx = px/E etc.
+  */
+
+  float E = getEnergy();
+  float dEdp[] = {m_px / E, m_py / E, m_pz / E};
+  unsigned compMom[] = {c_Px, c_Py, c_Pz};
+  unsigned compPos[] = {c_X,  c_Y,  c_Z};
+
+  // covariances (p,E)
+  for (int i = 0; i < 3; i++) {
+    float Cov = 0;
+    for (int k = 0; k < 3; k++) {
+      Cov += errMatrix(compMom[i], compMom[k]) * dEdp[k];
+    }
+    errMatrix(compMom[i], c_E) = Cov;
+  }
+
+  // covariances (x,E)
+  for (int i = 0; i < 3; i++) {
+    float Cov = 0;
+    for (int k = 0; k < 3; k++) {
+      Cov += errMatrix(compPos[i], compMom[k]) * dEdp[k];
+    }
+    errMatrix(c_E, compPos[i]) = Cov;
+  }
+
+  // variance (E,E)
+  float Cov = 0;
+  for (int i = 0; i < 3; i++) {
+    Cov += errMatrix(compMom[i], compMom[i]) * dEdp[i] * dEdp[i];
+  }
+  for (int i = 0; i < 3; i++) {
+    int k = (i + 1) % 3;
+    Cov += 2 * errMatrix(compMom[i], compMom[k]) * dEdp[i] * dEdp[k];
+  }
+  errMatrix(c_E, c_E) = Cov;
+
+  storeErrorMatrix(errMatrix);
+}
+
+void Particle::resetErrorMatrix()
 {
   for (int i = 0; i < c_SizeMatrix; i++)
     m_errMatrix[i] = 0.0;
 }
 
-void  Particle::storeErrorMatrix(const TMatrixFSym& m)
+void Particle::storeErrorMatrix(const TMatrixFSym& m)
 {
   int element = 0;
   for (int irow = 0; irow < c_DimMatrix; irow++) {

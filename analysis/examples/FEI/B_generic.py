@@ -311,7 +311,7 @@ pre_BPlus = Particle.PreCutConfiguration(
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     efficiency=0.95,
     purity=0.0001,
-    userCut='Mbc > 5.2 and -0.15 < deltaE < 0.1'
+    userCut='Mbc > 5.2 and -0.5 < deltaE < 0.5'
 )
 
 p = Particle('B+', mva_BPlus, pre_BPlus)
@@ -379,7 +379,7 @@ pre_B0 = Particle.PreCutConfiguration(
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     efficiency=0.95,
     purity=0.0001,
-    userCut='Mbc > 5.2 and -0.15 < deltaE < 0.1'
+    userCut='Mbc > 5.2 and -0.5 < deltaE < 0.5'
 )
 
 p = Particle('B0', mva_B0, pre_B0)
@@ -434,12 +434,12 @@ p.addChannel(['anti-D*0', 'pi-', 'mu+'])
 particles.append(p)
 
 analysis_path = create_path()
-selectParticle('mu+', 'muid > 0.6 and nTracks <= 12', persistent=True, path=analysis_path)
-reconstructDecay('tau+ ->  mu+', '', persistent=True, path=analysis_path)
-matchMCTruth('tau+', path=analysis_path)
-reconstructDecay('B+:sig -> tau+', '', persistent=True, path=analysis_path)
-matchMCTruth('B+:sig', path=analysis_path)
-buildRestOfEvent('B+:sig', path=analysis_path)
+#selectParticle('mu+', 'muid > 0.6 and nTracks <= 12', persistent=True, path=analysis_path)
+#reconstructDecay('tau+ ->  mu+', '', persistent=True, path=analysis_path)
+#matchMCTruth('tau+', path=analysis_path)
+#reconstructDecay('B+:sig -> tau+', '', persistent=True, path=analysis_path)
+#matchMCTruth('B+:sig', path=analysis_path)
+#buildRestOfEvent('B+:sig', path=analysis_path)
 analysis_path.add_module(register_module('RootOutput'))
 
 main = FullEventInterpretation(None, analysis_path, particles)

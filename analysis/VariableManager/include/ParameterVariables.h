@@ -55,5 +55,10 @@ namespace Belle2 {
      */
     double particleDaughterAngle(const Particle* particle, const std::vector<double>& daughters);
 
+    /**
+     * return i-th Cleo Cone
+     */
+    double CleoCones(const Particle* particle, const std::vector<double>& cone);
+
   }
 }

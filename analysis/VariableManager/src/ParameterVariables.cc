@@ -12,6 +12,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ContinuumSuppression.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -139,7 +140,6 @@ namespace Belle2 {
       return (massDiff - massDiffNominal) / massDiffErr;
     }
 
-
     // Decay Kinematics -------------------------------------------------------
     double particleDecayAngle(const Particle* particle, const std::vector<double>& daughters)
     {
@@ -182,6 +182,20 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
+    // Continuum Suppression --------------------------------------------------
+    double CleoCones(const Particle* particle, const std::vector<double>& cone)
+    {
+      if (!particle)
+        return -999;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return -999;
+
+      const auto& cleoCones = qq->getCleoCones();
+      return cleoCones.at(cone[0] - 1);
+    }
+
     VARIABLE_GROUP("ParameterFunctions");
     REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdg)", NumberOfMCParticlesInEvent , "Returns number of MC Particles (including anti particles) with the given pdg in the event.");
     REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass , "Returns invariant mass of the given daughter particles.");
@@ -191,5 +205,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter");
     REGISTER_VARIABLE("massDifferenceError(i)", massDifferenceError, "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter");
     REGISTER_VARIABLE("massDifferenceSignificance(i)", massDifferenceSignificance, "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]");
+
+    REGISTER_VARIABLE("CleoCone(i)", CleoCones, "Cleo cones (i-th cone)");
   }
 }

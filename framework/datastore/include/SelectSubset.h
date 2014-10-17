@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Eugenio Paoloni ( INFN & University of Pisa )            *
+ * Contributors: Eugenio Paoloni ( INFN & University of Pisa ), C. Pulvermacher
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,6 @@
 
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
@@ -25,6 +24,41 @@
 
 
 namespace Belle2 {
+  /** Type-independent implementation details. */
+  class SelectSubsetBase {
+  public:
+    /** Get list of arrays we inherit relations from. */
+    std::vector<std::string> getInheritFromArrays() const { return m_inheritFromArrays; }
+    /** Get list of arrays we inherit relations to. */
+    std::vector<std::string> getInheritToArrays() const { return m_inheritToArrays; }
+    /** Do we inherit relations from original set to itself? */
+    bool getInheritToSelf() const { return m_inheritToSelf; }
+
+    /** Get accessor for original set. */
+    virtual const StoreAccessorBase* getSet() = 0;
+    /** Get accessor for reduced set. */
+    virtual StoreAccessorBase* getSubSet() = 0;
+
+  protected:
+    SelectSubsetBase(): m_inheritToSelf(false), m_reduceExistingSet(false) { }
+    virtual ~SelectSubsetBase() { }
+
+    /** Swap set and subset (+relations), and keep only the reduced set.
+     *
+     * Subset and associated relations will be empty afterwards.
+     */
+    void swapSetsAndDestroyOriginal();
+
+    /** array names we inherit relations from. */
+    std::vector<std::string> m_inheritFromArrays;
+    /** array names we inherit relations to. */
+    std::vector<std::string> m_inheritToArrays;
+    /** If true, relations from set objects to set objects are copied. (if both objects are selected!). */
+    bool m_inheritToSelf;
+    /** If true, non-selected candidates are removed from m_set, m_subset only exists temporarily. */
+    bool m_reduceExistingSet;
+  };
+
   /** Class to create a subset of a given StoreArray together with the relations with other StoreArrays.
    *
    * The class SelectSubset selects a subset of objects contained in a given StoreArray
@@ -153,12 +187,11 @@ namespace Belle2 {
    * be one missing partner in the relation.
    */
   template < typename StoredClass >
-  class SelectSubset {
+  class SelectSubset : public SelectSubsetBase {
     static_assert(std::is_base_of<RelationsObject, StoredClass>::value, "SelectSubset<T> only works with classes T inheriting from RelationsObject.");
   public:
     /** Constructor */
-    SelectSubset():
-      m_set(nullptr), m_subset(nullptr), m_inheritToSelf(false), m_reduceExistingSet(false)
+    SelectSubset(): SelectSubsetBase(), m_set(nullptr), m_subset(nullptr)
     {};
 
     /** Destructor */
@@ -273,12 +306,10 @@ namespace Belle2 {
      */
     void select(std::function<bool (const StoredClass*)> f);
 
-    /** Get list of arrays we inherit relations from. */
-    std::vector<std::string> getInheritFromArrays() const { return m_inheritFromArrays; }
-    /** Get list of arrays we inherit relations to. */
-    std::vector<std::string> getInheritToArrays() const { return m_inheritToArrays; }
-    /** Do we inherit relations from original set to itself? */
-    bool getInheritToSelf() const { return m_inheritToSelf; }
+    /** Get accessor for original set. */
+    const StoreAccessorBase* getSet() override { return m_set; }
+    /** Get accessor for reduced set. */
+    StoreAccessorBase* getSubSet() override { return m_subset; }
 
   private:
     /** Empty method to stop the recursion of the variadic template.
@@ -292,19 +323,6 @@ namespace Belle2 {
     const StoreArray<StoredClass>* m_set;
     /** The array we create. */
     StoreArray<StoredClass>* m_subset;
-
-    /** array names we inherit relations from. */
-    std::vector<std::string> m_inheritFromArrays;
-    /** array names we inherit relations to. */
-    std::vector<std::string> m_inheritToArrays;
-    /** If true, relations from set objects to set objects are copied. (if both objects are selected!). */
-    bool m_inheritToSelf;
-    /** If true, non-selected candidates are removed from m_set, m_subset only exists temporarily. */
-    bool m_reduceExistingSet;
-
-    /** how to handle re-registration of subset and relations to/from it? */
-    const bool m_reportErrorIfExisting = true;
-
   };
 
 
@@ -354,25 +372,7 @@ namespace Belle2 {
     }
 
     if (m_reduceExistingSet) {
-      //replace set with subset
-      DataStore::Instance().swap(*m_set, *m_subset);
-      m_subset->clear();
-
-      //swap relations
-      for (std::string fromArray : m_inheritFromArrays) {
-        RelationArray a(DataStore::relationName(fromArray, m_set->getName()));
-        RelationArray b(DataStore::relationName(fromArray, m_subset->getName()));
-        DataStore::Instance().swap(a, b);
-        a.setModified(true);
-        b.clear();
-      }
-      for (std::string toArray : m_inheritToArrays) {
-        RelationArray a(DataStore::relationName(m_set->getName(), toArray));
-        RelationArray b(DataStore::relationName(m_subset->getName(), toArray));
-        DataStore::Instance().swap(a, b);
-        a.setModified(true);
-        b.clear();
-      }
+      swapSetsAndDestroyOriginal();
     }
 
   }

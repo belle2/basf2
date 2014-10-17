@@ -273,7 +273,7 @@ namespace Belle2 {
     void setModified(bool modified) { assertCreated(); (*m_relations)->setModified(modified); }
 
     /** Clear all elements from the relation. */
-    void clear() {
+    void clear() override {
       setModified(true);
       (*m_relations)->elements().Delete();
     }

@@ -195,7 +195,7 @@ namespace Belle2 {
      *
      * TODO: currently produces dangling relations if any were created
      */
-    void clear() {
+    void clear() override {
       if (isValid())
         (*m_storeArray)->Delete();
     }

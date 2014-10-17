@@ -110,6 +110,11 @@ namespace Belle2 {
      **/
     bool assign(TObject* object, bool replace = false);
 
+    /** Clear contents of this object. */
+    virtual void clear() {
+      create(true);
+    }
+
 
     /** Return name under which the object is saved in the DataStore. */
     const std::string& getName() const { return m_name; }
@@ -145,7 +150,6 @@ namespace Belle2 {
      * e.g. "object EventMetaData (durability: event)"
      */
     std::string readableName() const;
-
 
 
 

@@ -18,14 +18,12 @@ void SelectSubsetBase::swapSetsAndDestroyOriginal()
     RelationArray a(DataStore::relationName(fromArray, set->getName()));
     RelationArray b(DataStore::relationName(fromArray, subset->getName()));
     DataStore::Instance().swap(a, b);
-    a.setModified(true);
     b.clear();
   }
   for (std::string toArray : m_inheritToArrays) {
     RelationArray a(DataStore::relationName(set->getName(), toArray));
     RelationArray b(DataStore::relationName(subset->getName(), toArray));
     DataStore::Instance().swap(a, b);
-    a.setModified(true);
     b.clear();
   }
 }

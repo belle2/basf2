@@ -102,6 +102,7 @@ namespace Belle2 {
     bool m_modified; //!transient
 
     friend class RelationArray;
+    friend class DataStore;
 
     ClassDef(RelationContainer, 1); /**< Class to store relations between StoreArrays in the DataStore. */
   };

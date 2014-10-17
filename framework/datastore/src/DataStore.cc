@@ -267,19 +267,25 @@ void DataStore::swap(const StoreAccessorBase& a, const StoreAccessorBase& b)
     B2FATAL("cannot swap " << a.readableName() << " with " << b.readableName() << " (incompatible types)!");
   }
 
-  if (a.getClass() == RelationContainer::Class()) {
+  std::swap(entryA->object, entryB->object);
+  std::swap(entryA->ptr, entryB->ptr);
+
+  if (a.isArray()) {
+    updateRelationsObjectCache(*entryA);
+    updateRelationsObjectCache(*entryB);
+  } else if (a.getClass() == RelationContainer::Class()) {
     RelationContainer* relA = static_cast<RelationContainer*>(entryA->object);
     RelationContainer* relB = static_cast<RelationContainer*>(entryB->object);
-    //only swap elements, not from/to accessor references
-    std::swap(relA->elements(), relB->elements());
-  } else {
-    std::swap(entryA->object, entryB->object);
-    std::swap(entryA->ptr, entryB->ptr);
+    //make sure from/to info is back to normal
+    //(no swapping the elements doesn't work that well (hideously slow)
+    std::swap(relA->m_toName, relB->m_toName);
+    std::swap(relA->m_toDurability, relB->m_toDurability);
+    std::swap(relA->m_fromName, relB->m_fromName);
+    std::swap(relA->m_fromDurability, relB->m_fromDurability);
 
-    if (a.isArray()) {
-      updateRelationsObjectCache(*entryA);
-      updateRelationsObjectCache(*entryB);
-    }
+    //indices need a rebuild
+    relA->setModified(true);
+    relB->setModified(true);
   }
 }
 

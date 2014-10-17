@@ -22,7 +22,6 @@
 #include <type_traits>
 
 
-
 namespace Belle2 {
   /** Type-independent implementation details. */
   class SelectSubsetBase {

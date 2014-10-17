@@ -18,21 +18,34 @@ from reconstruction import add_reconstruction
 # ------------------------------------------------------------------------------
 # An example of a simple event display, made by using a python module.
 # It displays timing distributions of modules produced by a generic BBbar event.
-# Red histograms are marking the modules that are hited by reconstructed tracks.
+# Red histograms are marking the modules with at least one track impact.
 # ------------------------------------------------------------------------------
 
 class TOPDisplay(Module):
 
+    '''
+    Simple event display for TOP. 
+    It displays single event timing distributions of modules using TOPDigits.
+    Distributions of modules with the track impact are shown in red color.
+    '''
+
+    ## 1D histograms
     hist = [TH1F('h' + str(i), 'bar#' + str(i), 128, 0.0, 4096.0) for i in
             range(16)]
+    ## canvas
     c1 = TCanvas('c1', 'TOP event display', 1000, 800)
 
     def initialize(self):
+        ''' Initialize the Module: open the canvas. '''
 
         self.c1.Divide(4, 4)
         self.c1.Show()
 
     def event(self):
+        ''' 
+        Event processor: reset and fill the histograms, display them, 
+        wait for user respond.
+        '''
 
         for i in range(16):
             self.hist[i].Reset()
@@ -62,6 +75,7 @@ class TOPDisplay(Module):
 
         self.c1.Update()
 
+        # wait for user respond
         try:
             q = 0
             Q = 0

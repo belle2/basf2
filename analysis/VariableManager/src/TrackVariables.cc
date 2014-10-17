@@ -55,8 +55,9 @@ namespace Belle2 {
       } else if (det == Const::EDetector::PXD) {
         // TODO: implement when available
         return 0.0;
-      } else
+      } else {
         return 0.0;
+      }
     }
 
     double trackNCDCHits(const Particle* part)

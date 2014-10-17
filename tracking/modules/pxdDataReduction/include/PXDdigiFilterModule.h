@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/utilities/SelectSubset.h>
+#include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDDigit.h>
 
 namespace Belle2 {

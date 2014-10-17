@@ -1,4 +1,4 @@
-#include <framework/utilities/SelectSubset.h>
+#include <framework/datastore/SelectSubset.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/RelationArray.h>

@@ -154,7 +154,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     placeholders['combinedParticleEPTable'] = ""
     for particlePlaceholder in combinedParticlePlaceholders:
         placeholders['combinedParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
-        placeholders['combinedParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) ' & '
+        placeholders['combinedParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
@@ -596,12 +596,14 @@ def efficiencyError(k, n):
 
 
 def makeOvertrainingPlot(tmvaFilename, plotName):
-    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
+    #subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
+    subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
 def makeROCPlot(tmvaFilename, plotName):
-    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
+    #subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
+    subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 

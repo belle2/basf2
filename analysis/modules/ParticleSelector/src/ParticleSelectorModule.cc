@@ -108,6 +108,11 @@ namespace Belle2 {
     bool existingList = plist.isValid();
 
     if (!existingList) { // new particle list: fill selected
+      // TODO: this is a dirty hack to prevent addition of duplicated Particles to ParticleList
+      // keep track of mdst indices of Particles added to the list; another Particle
+      // with the same mdst index will not be added
+      std::vector<int> mdstIndices;
+
       plist.create();
       plist->initialize(m_pdgCode, m_listName);
 
@@ -124,7 +129,14 @@ namespace Belle2 {
         const Particle* part = Particles[i];
         if (abs(part->getPDGCode()) != abs(m_pdgCode)) continue;
         if (m_cut.check(part)) {
-          plist->addParticle(part);
+
+          // TODO: part of the dirty hack
+          if (std::find(mdstIndices.begin(), mdstIndices.end(), part->getMdstArrayIndex()) == mdstIndices.end()
+              || part->getParticleType() == Particle::EParticleType::c_Undefined
+              || part->getParticleType() == Particle::EParticleType::c_Composite) {
+            plist->addParticle(part);
+            mdstIndices.push_back(part->getMdstArrayIndex());
+          }
         }
       }
     } else { // existing particle list: apply selections and remove unselected

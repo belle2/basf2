@@ -402,7 +402,7 @@ class Script:
                 if creator is None:
                     validation.log.error('Unmatched dependency for {0}:'
                                          '{1} has no creator!'
-                                         .format(self.path, dependency))
+                                         .format(self.path, root_file))
                     self.status = 'skipped'
 
                 # If creator(s) could be found, add those scripts to the

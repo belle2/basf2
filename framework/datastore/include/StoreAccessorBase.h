@@ -161,23 +161,6 @@ namespace Belle2 {
       return registerInDataStore(errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
     }
 
-    /** Register the object/array in the DataStore and include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerAsPersistent("myName") in initialize(), this object will continue refer to 'myName' in event().
-     *  @param errorIfExisting  Flag whether an error will be reported if the object/array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsPersistent(const std::string& name, bool errorIfExisting = false) __attribute__((deprecated("Please use registerInDataStore() instead"))) {
-      return registerInDataStore(name, errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
-    }
-
-    /** conversion from char * to bool is apparently better than to string. let's do it ourselves then. */
-    bool registerAsPersistent(const char* name, bool errorIfExisting = false) __attribute__((deprecated("Please use registerInDataStore() instead"))) {
-
-      return registerInDataStore(std::string(name), errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
-    }
-
     /** Register the object/array in the data store, but do not include it in the output by default.
      *  This must be called in the initialization phase.
      *
@@ -186,22 +169,6 @@ namespace Belle2 {
      */
     bool registerAsTransient(bool errorIfExisting = false) __attribute__((deprecated("Please use registerInDataStore(DataStore::c_DontWriteOut) instead"))) {
       return registerInDataStore((errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0) | DataStore::c_DontWriteOut);
-    }
-
-    /** Register the object/array in the data store, but do not include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerAsPersistent("myName") in initialize(), this object will continue refer to 'myName' in event().
-     *  @param errorIfExisting  Flag whether an error will be reported if the object/array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsTransient(const std::string& name, bool errorIfExisting = false) __attribute__((deprecated("Please use registerInDataStore(name, DataStore::c_DontWriteOut) instead"))) {
-      return registerInDataStore(name, (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0) | DataStore::c_DontWriteOut);
-    }
-
-    /** conversion from char * to bool is apparently better than to string. let's do it ourselves then. */
-    bool registerAsTransient(const char* name, bool errorIfExisting = false) __attribute__((deprecated("Please use registerInDataStore(name, DataStore::c_DontWriteOut) instead"))) {
-      return registerInDataStore(std::string(name), (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0) | DataStore::c_DontWriteOut);
     }
 
 

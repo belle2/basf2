@@ -20,6 +20,7 @@
 #include <framework/logging/Logger.h>
 
 // dataobjects
+#include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -145,6 +146,7 @@ namespace Belle2 {
     StoreArray<Track> Tracks;
     StoreArray<ECLCluster> ECLClusters;
     StoreArray<KLMCluster> KLMClusters;
+    StoreArray<V0> V0s;
     StoreArray<Particle> particles;
 
     const Const::ChargedStable charged[] = {Const::electron,
@@ -209,7 +211,46 @@ namespace Belle2 {
       }
     }
 
+    // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
+    for (int i = 0; i < V0s.getEntries(); i++) {
+      // TODO: make it const once V0 dataobject is corrected (const qualifier properly applied)
+      V0* v0 = V0s[i];
 
+      std::pair<Track*, Track*> v0Tracks = v0->getTrackPtrs();
+      std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResultPtrs();
+
+      // load Kshort -> pi- pi+
+      Particle piP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, Const::pion);
+      Particle piM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, Const::pion);
+
+      const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
+      const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
+
+      const MCParticle* mcParticleP = (v0Tracks.first)->getRelated<MCParticle>();
+      const MCParticle* mcParticleM = (v0Tracks.second)->getRelated<MCParticle>();
+
+      // add V0 daughters to the Particle StoreArray
+      Particle* newPiP = particles.appendNew(piP);
+      if (pidP)
+        newPiP->addRelationTo(pidP);
+      if (mcParticleP)
+        newPiP->addRelationTo(mcParticleP);
+
+      Particle* newPiM = particles.appendNew(piM);
+      if (pidM)
+        newPiM->addRelationTo(pidM);
+      if (mcParticleM)
+        newPiM->addRelationTo(mcParticleM);
+
+      TLorentzVector v0Momentum = newPiP->get4Vector() + newPiM->get4Vector();
+
+      // TODO: avoid hard-coded values
+      Particle v0P(v0Momentum, 310);
+      v0P.appendDaughter(newPiP);
+      v0P.appendDaughter(newPiM);
+
+      particles.appendNew(v0P);
+    }
 
     //B2INFO("ParticleLoader::loadFromReconstruction size=" << particles.getEntries());
   }

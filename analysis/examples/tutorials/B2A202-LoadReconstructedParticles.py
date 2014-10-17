@@ -25,6 +25,9 @@ from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from modularAnalysis import analysis_main
 
+from stdV0s import stdKshorts
+from stdFSParticles import stdPi0
+
 # check if the required input file exists (from B2A101 example)
 import os.path
 import sys
@@ -39,6 +42,7 @@ inputMdst('B2A101-Y4SEventGeneration-gsim-BKGx0.root')
 printDataStore()
 
 # load all final state Particles
+# and K0short candidates from V0 msdt table
 loadReconstructedParticles()
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
@@ -59,6 +63,15 @@ fillParticleList('pi+:good', 'piid > 0.1')
 fillParticleList('K+:good', 'Kid > 0.1')
 fillParticleList('p+:good', 'prid > 0.1')
 
+# another possibility is to use default functions
+# for example stdKshorts() from stdV0s.py that:
+# - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
+# or for example stdPi0() from stdFSParticles.py:
+# - that makes two-photon combinations and creates three pi0 lists with different signal efficiencies/purities
+# - the lists are 'pi0:all', 'pi0:loose', 'pi0:good'
+stdKshorts()
+stdPi0()
+
 # print contents of the DataStore after loading Particles
 printDataStore()
 
@@ -75,6 +88,8 @@ printList('K-:all', False)
 printList('K-:good', False)
 printList('anti-p-:all', False)
 printList('anti-p-:good', False)
+printList('K_S0:all', False)
+printList('pi0:good', False)
 
 # define Ntuple tools for charged Particles
 toolsTrackPI = ['EventMetaData', 'pi+']
@@ -119,12 +134,32 @@ toolsGamma += ['MCTruth', '^gamma']
 toolsGamma += ['Cluster', '^gamma']
 toolsGamma += ['CustomFloats[goodGamma]', '^gamma']
 
+toolsK0 = ['EventMetaData', '^K_S0']
+toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']
+toolsK0 += ['InvMass', '^K_S0']
+toolsK0 += ['Vertex', '^K_S0']
+toolsK0 += ['MCVertex', '^K_S0']
+toolsK0 += ['PID', 'K_S0 -> ^pi+ ^pi-']
+toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
+toolsK0 += ['TrackHits', 'K_S0 -> ^pi+ ^pi-']
+toolsK0 += ['MCTruth', '^K_S0 -> ^pi+ ^pi-']
+toolsK0 += ['CustomFloats[dr:dz:isSignal:chiProb]', '^K_S0']
+
+toolsPI0 = ['MCTruth', '^pi0 -> gamma gamma']
+toolsPI0 += ['Kinematics', '^pi0 -> ^gamma ^gamma']
+toolsPI0 += ['MassBeforeFit', '^pi0']
+toolsPI0 += ['EventMetaData', '^pi0']
+toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
+toolsPI0 += ['CustomFloats[getExtraInfo(BDT):decayAngle(0)]', '^pi0']
+
 ntupleFile('B2A202-LoadReconstructedParticles.root')
 ntupleTree('pion', 'pi+:all', toolsTrackPI)
 ntupleTree('kaon', 'K+:all', toolsTrackK)
 ntupleTree('elec', 'e+:all', toolsTrackE)
 ntupleTree('muon', 'mu+:all', toolsTrackMu)
 ntupleTree('phot', 'gamma:all', toolsGamma)
+ntupleTree('pi0', 'pi0:good', toolsPI0)
+ntupleTree('kshort', 'K_S0:all', toolsK0)
 
 # Process the events
 process(analysis_main)

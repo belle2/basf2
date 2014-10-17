@@ -102,7 +102,10 @@ namespace Belle2 {
 
     // bunch separation in time
 
-    m_bunchTimeSep = 2.0; // TODO: get it from DB
+    GearDir superKEKB("/Detector/SuperKEKB/");
+    double circumference = superKEKB.getLength("circumference");
+    int numofBunches = superKEKB.getInt("numofBunches");
+    m_bunchTimeSep = circumference / Const::speedOfLight / numofBunches;
 
   }
 

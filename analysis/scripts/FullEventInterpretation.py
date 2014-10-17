@@ -136,6 +136,8 @@ class Particle(object):
             if samePreCutConfig:
                 output += '    All channels use the same PreCut configuration\n'
                 output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
+                output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=self.preCutConfig)
+                output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=self.preCutConfig)
 
             if self.postCutConfig is None:
                 output += '    PostCutConfiguration: None\n'
@@ -148,7 +150,9 @@ class Particle(object):
                     if self.postCutConfig is None:
                         output += '    PreCutConfiguration: None\n'
                     else:
-                        output += '    PreCutConfiguration: variable={p.variable}, efficiency={p.efficiency}, purity={p.purity}, userCut={p.userCut}\n'.format(p=channel.preCutConfig)
+                        output += '    PreCutConfiguration: variable={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=channel.preCutConfig)
+                        output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=channel.preCutConfig)
+                        output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=channel.preCutConfig)
                 if not sameMVAConfig:
                     output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(m=channel.mvaConfig)
                 output += '        Individual Variables: ' + ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'

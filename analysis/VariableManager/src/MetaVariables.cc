@@ -14,6 +14,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <framework/logging/Logger.h>
@@ -214,11 +215,6 @@ namespace Belle2 {
       }
     }
 
-
-
-
-
-
     Manager::FunctionPtr InputQrOf(const std::vector<std::string>& arguments)
     {
       //used by simple_flavor_tagger
@@ -305,8 +301,6 @@ namespace Belle2 {
         return nullptr;
       }
     }
-
-
 
     Manager::FunctionPtr IsRightClass(const std::vector<std::string>& arguments)
     {
@@ -548,6 +542,40 @@ namespace Belle2 {
       return func;
     }
 
+    // Continuum Suppression related -----------------------------------------------
+    Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto variableName = arguments[0];
+        // auto useFinalState = arguments[1];
+        int index = -1;
+
+        // Next make FS0 (aka k0) default.
+        // If user specifies FS1 in arguments[1], overwrite k0 with k1 in loop.
+        std::vector<std::string> names = {"k0mm2",   "k0et",
+                                          "k0hso00", "k0hso01", "k0hso02", "k0hso03", "k0hso04",
+                                          "k0hso10", "k0hso12", "k0hso14",
+                                          "k0hso20", "k0hso22", "k0hso24",
+                                          "k0hoo0",  "k0hoo1",  "k0hoo2",  "k0hoo3",  "k0hoo4"
+                                         };
+
+        for (unsigned i = 0; i < names.size(); ++i) {
+          if (variableName == names[i])
+            index = i;
+        }
+
+        auto func = [index](const Particle * particle) -> double {
+          const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+          std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+          return ksfwFS0.at(index);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (1 required) for meta function KSFWVariables");
+        return nullptr;
+      }
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion, "Returns 1 if given variable is inside a given region. Otherwise 0.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
@@ -557,6 +585,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("abs(variable)", abs, "Returns absolute value of the given variable.");
     REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing, "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
+    REGISTER_VARIABLE("KSFWVariables(variable)", KSFWVariables, "Returns et, mm2, or one of the 16 KSFW moments.");
 
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
     REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightClass, extraInfoFromB)", InputQrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");

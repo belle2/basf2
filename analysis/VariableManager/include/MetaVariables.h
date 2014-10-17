@@ -104,5 +104,10 @@ namespace Belle2 {
      */
     Manager::FunctionPtr SemiLeptonicVariables(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns the value of et, mm2, or one of the 16 KSFW moments, as requested by the user.
+     */
+    Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments);
+
   }
 }

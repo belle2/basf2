@@ -244,6 +244,12 @@ namespace Belle2 {
      */
     bool createObject(TObject* object, bool replace, const StoreAccessorBase& accessor);
 
+    /** Swap two StoreAccessors (of same type).
+     *
+     * Meta-data like c_DontWriteOut flags or info about associated arrays for RelationContainers is kept.
+     */
+    void swap(const StoreAccessorBase& a, const StoreAccessorBase& b);
+
     /** Get a reference to the object/array map.
      *
      * This is intended to be used for input/output or other framework-internal modules.
@@ -518,6 +524,12 @@ namespace Belle2 {
      *  @param arrayClass The class of the array(s).
      */
     void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass, EDurability durability = c_Event) const;
+
+    /** For an array containing RelationsObjects, update index and entry cache for entire contents.
+     *
+     * You must ensure the array actually contains objects inheriting from RelationObject!
+     */
+    void updateRelationsObjectCache(StoreEntry& entry);
 
     /** Maps (name, durability) key to StoreEntry objects. */
     StoreEntryMap m_storeEntryMap[c_NDurabilityTypes];

@@ -22,6 +22,7 @@
 #include <TClass.h>
 
 #include <unordered_map>
+#include <algorithm>
 #include <cstdlib>
 
 using namespace std;
@@ -253,6 +254,45 @@ bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorB
   return true;
 }
 
+void DataStore::swap(const StoreAccessorBase& a, const StoreAccessorBase& b)
+{
+  StoreEntry* entryA = getEntry(a);
+  StoreEntry* entryB = getEntry(b);
+  if (!entryA)
+    B2FATAL("No " << a.readableName() << " exists in the DataStore!");
+  if (!entryB)
+    B2FATAL("No " << b.readableName() << " exists in the DataStore!");
+
+  if (a.isArray() != b.isArray() or a.getClass() != b.getClass()) {
+    B2FATAL("cannot swap " << a.readableName() << " with " << b.readableName() << " (incompatible types)!");
+  }
+
+  if (a.getClass() == RelationContainer::Class()) {
+    RelationContainer* relA = static_cast<RelationContainer*>(entryA->object);
+    RelationContainer* relB = static_cast<RelationContainer*>(entryB->object);
+    //only swap elements, not from/to accessor references
+    std::swap(relA->elements(), relB->elements());
+  } else {
+    std::swap(entryA->object, entryB->object);
+    std::swap(entryA->ptr, entryB->ptr);
+
+    if (a.isArray()) {
+      updateRelationsObjectCache(*entryA);
+      updateRelationsObjectCache(*entryB);
+    }
+  }
+}
+
+void DataStore::updateRelationsObjectCache(StoreEntry& entry)
+{
+  const TClonesArray* array = static_cast<TClonesArray*>(entry.ptr);
+  const int nEntries = array->GetEntriesFast();
+  for (int i = 0; i < nEntries; i++) {
+    RelationsObject* relobj = static_cast<RelationsObject*>(array->At(i));
+    relobj->m_cacheArrayIndex = i;
+    relobj->m_cacheDataStoreEntry = &entry;
+  }
+}
 
 bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& entry, int& index)
 {
@@ -263,6 +303,7 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
     B2INFO("findStoreEntry: cached index invalid, probably harmless but odd : " << entry->name << " idx " << index);
     index = array->IndexOf(object);
     if (index >= 0) return true;
+    B2INFO("findStoreEntry: cached entry was also wrong");
   }
   entry = nullptr;
   index = -1;
@@ -284,14 +325,10 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
         } else {
           if (arrayClass->InheritsFrom(RelationsObject::Class())) {
             //update cache for entire array
-            int nEntries = array->GetEntriesFast();
-            for (int i = 0; i < nEntries; i++) {
-              RelationsObject* relobj = static_cast<RelationsObject*>((*array)[i]);
-              relobj->m_cacheArrayIndex = i;
-              relobj->m_cacheDataStoreEntry = &mapEntry.second;
-              if (relobj == object)
-                index = i;
-            }
+            updateRelationsObjectCache(mapEntry.second);
+
+            //if found, m_cacheArrayIndex is now correct, otherwise still -1
+            index = static_cast<const RelationsObject*>(object)->m_cacheArrayIndex;
           } else {
             //not a RelationsObject, so no caching
             index = array->IndexOf(object);

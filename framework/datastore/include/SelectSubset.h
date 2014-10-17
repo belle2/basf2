@@ -8,12 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef SELECT_SUBSET_HH
-#define SELECT_SUBSET_HH
+#pragma once
 
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
@@ -21,6 +20,7 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <type_traits>
 
 
 
@@ -154,10 +154,11 @@ namespace Belle2 {
    */
   template < typename StoredClass >
   class SelectSubset {
+    static_assert(std::is_base_of<RelationsObject, StoredClass>::value, "SelectSubset<T> only works with classes T inheriting from RelationsObject.");
   public:
     /** Constructor */
     SelectSubset():
-      m_set(nullptr), m_subset(nullptr), m_inheritToSelf(false)
+      m_set(nullptr), m_subset(nullptr), m_inheritToSelf(false), m_reduceExistingSet(false)
     {};
 
     /** Destructor */
@@ -166,15 +167,26 @@ namespace Belle2 {
       delete m_subset;
     }
 
+    /** Remove all non-selected objects from set. All relations registered so far are retained.
+     * TODO: consider moving this into StoreArray itself
+     *
+     *  @param set         The StoreArray<StoredClass> from which to retain only selected elements
+     */
+    void registerSubset(const StoreArray< StoredClass >& set) {
+      m_reduceExistingSet = true;
+      registerSubset(set, set.getName() + "_tmpSubset", DataStore::c_DontWriteOut);
+
+      inheritAllRelations();
+    }
+
     /** Register the StoreArray<StoredClass> that will contain the subset of selected elements
      *  @param set         The StoreArray<StoredClass> from which the elements will be selected
      *  @param subsetName  The name of the StoreArray<StoredClass> that will contain the selected elements
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      */
-    bool registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName, DataStore::EStoreFlags storeFlags = DataStore::c_ErrorIfAlreadyRegistered) {
+    void registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName, DataStore::EStoreFlags storeFlags = DataStore::c_ErrorIfAlreadyRegistered) {
       if (m_set or m_subset) {
         B2FATAL("SelectSubset::registerSubset() can only be called once!");
-        return false;
       }
 
       m_set = new StoreArray<StoredClass>(set);
@@ -183,9 +195,6 @@ namespace Belle2 {
       m_subset->registerInDataStore(storeFlags);
 
       set.registerRelationTo(*m_subset, m_subset->getDurability(), storeFlags);
-
-      return true;
-
     }
 
     /** Inherit relations pointing from Other to objects selected into this subset.
@@ -236,7 +245,7 @@ namespace Belle2 {
       }
     }
 
-    /** Automatically inherit all relations to or from the original set.
+    /** Automatically inherit all relations to or from the original set (if registered when calling this function).
      *
      * Equivalent to calling inheritRelationsFrom()/To() for all related arrays.
      *
@@ -290,6 +299,8 @@ namespace Belle2 {
     std::vector<std::string> m_inheritToArrays;
     /** If true, relations from set objects to set objects are copied. (if both objects are selected!). */
     bool m_inheritToSelf;
+    /** If true, non-selected candidates are removed from m_set, m_subset only exists temporarily. */
+    bool m_reduceExistingSet;
 
     /** how to handle re-registration of subset and relations to/from it? */
     const bool m_reportErrorIfExisting = true;
@@ -304,7 +315,8 @@ namespace Belle2 {
     for (const StoredClass & setObject : *m_set) {
       if (f(&setObject)) {
         const StoredClass* subsetObject = m_subset->appendNew(setObject);
-        setObject.addRelationTo(subsetObject);
+        if (!m_reduceExistingSet)
+          setObject.addRelationTo(subsetObject);
         for (std::string fromArray : m_inheritFromArrays) {
           const RelationVector<RelationsObject>& relations = setObject.template getRelationsFrom<RelationsObject>(fromArray);
           for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
@@ -341,8 +353,27 @@ namespace Belle2 {
       }
     }
 
+    if (m_reduceExistingSet) {
+      //replace set with subset
+      DataStore::Instance().swap(*m_set, *m_subset);
+      m_subset->clear();
+
+      //swap relations
+      for (std::string fromArray : m_inheritFromArrays) {
+        RelationArray a(DataStore::relationName(fromArray, m_set->getName()));
+        RelationArray b(DataStore::relationName(fromArray, m_subset->getName()));
+        DataStore::Instance().swap(a, b);
+        a.setModified(true);
+        b.clear();
+      }
+      for (std::string toArray : m_inheritToArrays) {
+        RelationArray a(DataStore::relationName(m_set->getName(), toArray));
+        RelationArray b(DataStore::relationName(m_subset->getName(), toArray));
+        DataStore::Instance().swap(a, b);
+        a.setModified(true);
+        b.clear();
+      }
+    }
+
   }
 }
-
-#endif
-

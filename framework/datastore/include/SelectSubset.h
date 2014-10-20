@@ -34,7 +34,7 @@ namespace Belle2 {
     bool getInheritToSelf() const { return m_inheritToSelf; }
 
     /** Get accessor for original set. */
-    virtual const StoreAccessorBase* getSet() = 0;
+    virtual StoreAccessorBase* getSet() = 0;
     /** Get accessor for reduced set. */
     virtual StoreAccessorBase* getSubSet() = 0;
 
@@ -306,7 +306,7 @@ namespace Belle2 {
     void select(std::function<bool (const StoredClass*)> f);
 
     /** Get accessor for original set. */
-    const StoreAccessorBase* getSet() override { return m_set; }
+    StoreAccessorBase* getSet() override { return m_set; }
     /** Get accessor for reduced set. */
     StoreAccessorBase* getSubSet() override { return m_subset; }
 
@@ -319,7 +319,7 @@ namespace Belle2 {
     void inheritRelationsTo() { }
 
     /** The array we use as input. */
-    const StoreArray<StoredClass>* m_set;
+    StoreArray<StoredClass>* m_set;
     /** The array we create. */
     StoreArray<StoredClass>* m_subset;
   };

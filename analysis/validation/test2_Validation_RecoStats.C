@@ -23,30 +23,29 @@
 #include <TTree.h>
 
 void test2_Validation_RecoStats() {
-    gErrorIgnoreLevel = kError;
+    //gErrorIgnoreLevel = kError;
 
     TChain * recoTree = new TChain("eventtuple");
     recoTree->AddFile("../GenericB.ntup.root");
 
     struct VarInfo {
-        string VarName;
+        const char* VarName;
         int VarRangeLow;
         int VarRangeHigh;
     };
 
     VarInfo RecoStats[] = {
-        {"nECLClusters",          150,  300},
-        {"nNeutralECLClusters",   150,  300},
-        {"nChargedECLClusters",   0,    40},
-        {"nGoodNeutralECLClusters", 0,  40},
-        {"neutralECLEnergy",      10,   30},
-        {"chargedECLEnergy",      0,    10},
-        {"goodNeutralECLEnergy",  0,    15},
-        {"nTracks",               0,    50},
-        {"nParticles",            0,    500},
-        {"nMCParticles",          0,    500}
+        {"nECLClusters",          0,  100},
+        {"nNeutralECLClusters",   0,  100},
+        {"nChargedECLClusters",   0,  40},
+        {"nGoodNeutralECLClusters",0, 40},
+        {"neutralECLEnergy",      0,  10},
+        {"chargedECLEnergy",      0,  10},
+        {"goodNeutralECLEnergy",  0,  10},
+        {"nTracks",               0,  50},
+        {"nParticles",            0,  500},
+        {"nMCParticles",          0,  500}
     };
-    // The following ranges are guessed
     VarInfo DetectorStatsRec[] = {
         {"nARICHAeroHits",      0,  20},
         {"nARICHLikelihoods",   0,  20},
@@ -67,7 +66,6 @@ void test2_Validation_RecoStats() {
         {"nTOPLikelihoods",     0,  20},
         {"nTrackFitResults",    0,  30}
     };
-    // The following ranges are guessed
     VarInfo DetectorStatsSim[] = {
         {"nARICHDigits",    0,  200},
         {"nARICHSimHits",   0,  250},
@@ -86,9 +84,9 @@ void test2_Validation_RecoStats() {
         {"nTOPSimHits",     0,  800},
         {"nTOPSimPhotons",  0,  800}
     };
-    const int NVarsRecoStats = sizeof(RecoStats)/sizeof(RecoStats[0]);
-    const int NVarsDetectorStatsRec = sizeof(DetectorStatsRec)/sizeof(DetectorStatsRec[0]);
-    const int NVarsDetectorStatsSim = sizeof(DetectorStatsSim)/sizeof(DetectorStatsSim[0]);
+    static const int NVarsRecoStats = 10;//sizeof(RecoStats)/sizeof(RecoStats[0]);
+    static const int NVarsDetectorStatsRec = 18;//sizeof(DetectorStatsRec)/sizeof(DetectorStatsRec[0]);
+    static const int NVarsDetectorStatsSim = 16;//sizeof(DetectorStatsSim)/sizeof(DetectorStatsSim[0]);
 
     TH1F *h_RecoStats[NVarsRecoStats];
     TH1F *h_DetectorStatsRec[NVarsDetectorStatsRec];
@@ -97,6 +95,7 @@ void test2_Validation_RecoStats() {
     Float_t RecoStatsMeans[NVarsRecoStats];
     Float_t DetectorStatsRecMeans[NVarsDetectorStatsRec];
     Float_t DetectorStatsSimMeans[NVarsDetectorStatsSim];
+    
     Float_t RecoStatsRMS[NVarsRecoStats];
     Float_t DetectorStatsRecRMS[NVarsDetectorStatsRec];
     Float_t DetectorStatsSimRMS[NVarsDetectorStatsSim];
@@ -110,27 +109,28 @@ void test2_Validation_RecoStats() {
         int nbins = RecoStats[i].VarRangeHigh - RecoStats[i].VarRangeLow;
         if(nbins>50)    nbins/=(int)( (RecoStats[i].VarRangeHigh - RecoStats[i].VarRangeLow) / 50);
 
-        h_RecoStats[i]= new TH1F(Form("h%s",RecoStats[i].VarName.c_str()),Form(";%s;Events",RecoStats[i].VarName.c_str()),
+        h_RecoStats[i]= new TH1F(Form("h%s",RecoStats[i].VarName),Form(";%s;Events",RecoStats[i].VarName),
                                  nbins,RecoStats[i].VarRangeLow-0.5,RecoStats[i].VarRangeHigh-0.5);
-        recoTree->Draw(Form("%s>>h%s",RecoStats[i].VarName.c_str(),RecoStats[i].VarName.c_str()),"","");
+        recoTree->Draw(Form("%s>>h%s",RecoStats[i].VarName,RecoStats[i].VarName),"","");
         h_RecoStats[i]->SetLineColor(kBlue);
         h_RecoStats[i]->Draw("hist");
         tc->Print("test2_Validation_RecoStats_plots.pdf");
-        printf( "%s\t\t%.2f\t\t%.2f\n", RecoStats[i].VarName.c_str(), h_RecoStats[i]->GetMean(), h_RecoStats[i]->GetRMS() );
+        printf( "%s\t\t%.2f\t\t%.2f\n", RecoStats[i].VarName, h_RecoStats[i]->GetMean(), h_RecoStats[i]->GetRMS() );
         RecoStatsMeans[i]=h_RecoStats[i]->GetMean();
         RecoStatsRMS[i]=h_RecoStats[i]->GetRMS();
     }
+    
     for(int i=0; i<NVarsDetectorStatsRec; i++) {
         tc->cd(i+1);
         int nbins = DetectorStatsRec[i].VarRangeHigh - DetectorStatsRec[i].VarRangeLow;
         if(nbins>50)    nbins/=(int)( (DetectorStatsRec[i].VarRangeHigh - DetectorStatsRec[i].VarRangeLow) / 50);
 
-        h_DetectorStatsRec[i]= new TH1F(Form("h%s",DetectorStatsRec[i].VarName.c_str()),Form(";%s;Events",DetectorStatsRec[i].                            VarName.c_str()),nbins,DetectorStatsRec[i].VarRangeLow-0.5,DetectorStatsRec[i].VarRangeHigh-0.5);
-        recoTree->Draw(Form("%s>>h%s",DetectorStatsRec[i].VarName.c_str(),DetectorStatsRec[i].VarName.c_str()),"","");
+        h_DetectorStatsRec[i]= new TH1F(Form("h%s",DetectorStatsRec[i].VarName),Form(";%s;Events",DetectorStatsRec[i].                            VarName),nbins,DetectorStatsRec[i].VarRangeLow-0.5,DetectorStatsRec[i].VarRangeHigh-0.5);
+        recoTree->Draw(Form("%s>>h%s",DetectorStatsRec[i].VarName,DetectorStatsRec[i].VarName),"","");
         h_DetectorStatsRec[i]->SetLineColor(kBlue);
         h_DetectorStatsRec[i]->Draw("hist");
         tc->Print("test2_Validation_RecoStats_plots.pdf");
-        printf( "%s\t\t%.2f\t\t%.2f\n", DetectorStatsRec[i].VarName.c_str(), h_DetectorStatsRec[i]->GetMean(), h_DetectorStatsRec[i]->GetRMS() );
+        printf( "%s\t\t%.2f\t\t%.2f\n", DetectorStatsRec[i].VarName, h_DetectorStatsRec[i]->GetMean(), h_DetectorStatsRec[i]->GetRMS() );
         DetectorStatsRecMeans[i]=h_DetectorStatsRec[i]->GetMean();
         DetectorStatsRecRMS[i]=h_DetectorStatsRec[i]->GetRMS();
     }
@@ -139,13 +139,13 @@ void test2_Validation_RecoStats() {
         int nbins = DetectorStatsSim[i].VarRangeHigh - DetectorStatsSim[i].VarRangeLow;
         if(nbins>50)    nbins/=(int)( (DetectorStatsSim[i].VarRangeHigh - DetectorStatsSim[i].VarRangeLow) / 50);
 
-        h_DetectorStatsSim[i]= new TH1F(Form("h%s",DetectorStatsSim[i].VarName.c_str()),Form(";%s;Events",DetectorStatsSim[i].
-                                        VarName.c_str()),nbins,DetectorStatsSim[i].VarRangeLow-0.5,DetectorStatsSim[i].VarRangeHigh-0.5);
-        recoTree->Draw(Form("%s>>h%s",DetectorStatsSim[i].VarName.c_str(),DetectorStatsSim[i].VarName.c_str()),"","");
+        h_DetectorStatsSim[i]= new TH1F(Form("h%s",DetectorStatsSim[i].VarName),Form(";%s;Events",DetectorStatsSim[i].
+                                        VarName),nbins,DetectorStatsSim[i].VarRangeLow-0.5,DetectorStatsSim[i].VarRangeHigh-0.5);
+        recoTree->Draw(Form("%s>>h%s",DetectorStatsSim[i].VarName,DetectorStatsSim[i].VarName),"","");
         h_DetectorStatsSim[i]->SetLineColor(kBlue);
         h_DetectorStatsSim[i]->Draw("hist");
         tc->Print("test2_Validation_RecoStats_plots.pdf");
-        printf( "%s\t\t%.2f\t\t%.2f\n", DetectorStatsSim[i].VarName.c_str(), h_DetectorStatsSim[i]->GetMean(), h_DetectorStatsSim[i]->GetRMS() );
+        printf( "%s\t\t%.2f\t\t%.2f\n", DetectorStatsSim[i].VarName, h_DetectorStatsSim[i]->GetMean(), h_DetectorStatsSim[i]->GetRMS() );
         DetectorStatsSimMeans[i]=h_DetectorStatsSim[i]->GetMean();
         DetectorStatsSimRMS[i]=h_DetectorStatsSim[i]->GetRMS();
     }
@@ -153,12 +153,21 @@ void test2_Validation_RecoStats() {
     tc->Print("test2_Validation_RecoStats_plots.pdf]");
 
     string RecoStatsList;
-    for(int i=0; i<NVarsRecoStats; i++)         RecoStatsList = RecoStatsList + Form("%s:",RecoStats[i].VarName.c_str());
+    for(int i=0; i<NVarsRecoStats; i++) {
+        if( i<NVarsRecoStats-1) RecoStatsList = RecoStatsList + Form("%s:",RecoStats[i].VarName);
+        else RecoStatsList = RecoStatsList + Form("%s",RecoStats[i].VarName);
+    }
     string DetectorStatsRecList;
-    for(int i=0; i<NVarsDetectorStatsRec; i++)  DetectorStatsRecList = DetectorStatsRecList + Form("%s:",DetectorStatsRec[i].VarName.c_str());
+    for(int i=0; i<NVarsDetectorStatsRec; i++){
+        if( i<NVarsDetectorStatsRec-1) DetectorStatsRecList = DetectorStatsRecList + Form("%s:",DetectorStatsRec[i].VarName);
+        else DetectorStatsRecList = DetectorStatsRecList + Form("%s",DetectorStatsRec[i].VarName);
+    }
     string DetectorStatsSimList;
-    for(int i=0; i<NVarsDetectorStatsSim; i++)  DetectorStatsSimList = DetectorStatsSimList + Form("%s:",DetectorStatsSim[i].VarName.c_str());
-
+    for(int i=0; i<NVarsDetectorStatsSim; i++){
+        if( i<NVarsDetectorStatsSim-1) DetectorStatsSimList = DetectorStatsSimList + Form("%s:",DetectorStatsSim[i].VarName);
+        else DetectorStatsSimList = DetectorStatsSimList + Form("%s",DetectorStatsSim[i].VarName);
+    }
+    
     TFile * output = TFile::Open("test2_Validation_RecoStats_output.root", "recreate");
     TNtuple* trecostats = new TNtuple("Reco Stats: N(objects)/Event", "tree", Form("%s",string(RecoStatsList).c_str()));
     trecostats->SetAlias("Description", "Average MDST reconstruction object multiplicities per event. Useful to trace back problems to specific input.");
@@ -181,3 +190,4 @@ void test2_Validation_RecoStats() {
     tsimstats->Write();
     output->Close();
 }
+

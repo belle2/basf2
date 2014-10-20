@@ -271,8 +271,11 @@ void DataStore::swap(const StoreAccessorBase& a, const StoreAccessorBase& b)
   std::swap(entryA->ptr, entryB->ptr);
 
   if (a.isArray()) {
-    updateRelationsObjectCache(*entryA);
-    updateRelationsObjectCache(*entryB);
+    if (entryA->ptr)
+      updateRelationsObjectCache(*entryA);
+
+    if (entryB->ptr)
+      updateRelationsObjectCache(*entryB);
   } else if (a.getClass() == RelationContainer::Class()) {
     RelationContainer* relA = static_cast<RelationContainer*>(entryA->object);
     RelationContainer* relB = static_cast<RelationContainer*>(entryB->object);

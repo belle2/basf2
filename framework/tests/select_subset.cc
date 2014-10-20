@@ -1096,4 +1096,60 @@ namespace {
     }
   }
 
+  TEST_F(SelectSubsetTest, TestEmptyArray)
+  {
+    //array 'main' with relations: a -> main -> b
+    //then remove half of main.
+
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray< RelationsObject > arrayMain("main");
+    StoreArray< RelationsObject > arrayA("a");
+    StoreArray< RelationsObject > arrayB("b");
+    arrayMain.registerInDataStore();
+    arrayA.registerInDataStore();
+    arrayB.registerInDataStore();
+    arrayA.registerRelationTo(arrayMain);
+    arrayMain.registerRelationTo(arrayB);
+
+    //create subset and relations
+    SelectSubset< RelationsObject > selectorMain;
+    selectorMain.registerSubset(arrayMain);
+
+    DataStore::Instance().setInitializeActive(false);
+
+    //test with empty inputs
+    EXPECT_EQ(0, arrayMain.getEntries());
+    selectorMain.select(hasOddIndex);
+    EXPECT_EQ(0, arrayMain.getEntries());
+
+    //fill some data
+    for (int i = 0; i < 10; i++) {
+      auto* mainObj = arrayMain.appendNew();
+      for (int j = 0; j < 2; j++) {
+        auto* aObj = arrayA.appendNew();
+        aObj->addRelationTo(mainObj);
+      }
+      for (int j = 0; j < 10; j++) {
+        auto* bObj = arrayB.appendNew();
+        mainObj->addRelationTo(bObj);
+      }
+    }
+
+    //verify original contents
+    EXPECT_EQ(10, arrayMain.getEntries());
+    EXPECT_EQ(20, arrayA.getEntries());
+    EXPECT_EQ(100, arrayB.getEntries());
+
+    //delete all contents
+    auto never = [](const RelationsObject*) -> bool { return false; };
+    selectorMain.select(never);
+
+
+    //verify subset
+    EXPECT_EQ(0, arrayMain.getEntries());
+    for (const RelationsObject & r : arrayA) {
+      EXPECT_EQ(0u, r.getRelationsTo<RelationsObject>("main").size());
+    }
+  }
+
 }  // namespace

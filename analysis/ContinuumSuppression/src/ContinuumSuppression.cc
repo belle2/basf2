@@ -20,10 +20,10 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/Thrust.h>
-#include <analysis/utility/KsfwMoments.h>
-#include <analysis/utility/FoxWolfram.h>
-#include <analysis/utility/CleoCones.h>
+#include <analysis/ContinuumSuppression/Thrust.h>
+#include <analysis/ContinuumSuppression/KsfwMoments.h>
+#include <analysis/ContinuumSuppression/FoxWolfram.h>
+#include <analysis/ContinuumSuppression/CleoCones.h>
 #include <utility>
 #include <vector>
 #include <iostream>

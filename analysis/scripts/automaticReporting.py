@@ -377,19 +377,19 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
 
         placeholders['preCutAllPlot'] = removeJPsiSlash('{name}_preCut_{hash}_all.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutAllPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutAllPlot'], 'all', preCut)
+            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutAllPlot'], 'all', preCut, preCutConfig)
 
         placeholders['preCutSignalPlot'] = removeJPsiSlash('{name}_preCut_{hash}_signal.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutSignalPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutSignalPlot'], 'signal', preCut)
+            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutSignalPlot'], 'signal', preCut, preCutConfig)
 
         placeholders['preCutBackgroundPlot'] = removeJPsiSlash('{name}_preCut_{hash}_background.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutBackgroundPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutBackgroundPlot'], 'bckgrd', preCut)
+            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutBackgroundPlot'], 'bckgrd', preCut, preCutConfig)
 
         placeholders['preCutRatioPlot'] = removeJPsiSlash('{name}_preCut_{hash}_ratio.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutRatioPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutRatioPlot'], 'ratio', preCut)
+            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutRatioPlot'], 'ratio', preCut, preCutConfig)
 
         placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['preCutTemplateFile'] = 'analysis/scripts/FEI/templates/PreCutTemplate.tex'
@@ -410,9 +410,11 @@ def getKey(rootFile, regexp):
     return keys[0]
 
 
-def makePreCutPlot(rootFilename, plotName, prefix, preCut):
+def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
+    ROOT.gStyle.SetOptStat(0)
+    ROOT.gStyle.SetHistMinimumZero(True)
     rootfile = ROOT.TFile(rootFilename)
-    canvas = ROOT.TCanvas(plotName + '_canvas', plotName, 600, 400)
+    canvas = ROOT.TCanvas(plotName + '_canvas', plotName, 1200, 800)
     canvas.cd()
     hist = getKey(rootfile, '^{name}.*$'.format(name=prefix)).ReadObj()
     if preCut is not None:
@@ -423,9 +425,22 @@ def makePreCutPlot(rootFilename, plotName, prefix, preCut):
         lm = hist.GetXaxis().GetXmin()
         um = hist.GetXaxis().GetXmax()
         hist.GetXaxis().SetRangeUser(lr if lr > lm else lm, ur if ur < um else um)
+        unit = ' [GeV] ' if preCutConfig.variable in ['M', 'Q'] else ''
+        if prefix in ['signal', 'all', 'bkgrd']:
+            unit += ';N'
+        else:
+            unit += ';S/B'
+        hist.SetTitle(prefix + ';' + preCutConfig.variable + unit)
+        hist.SetLabelSize(0.05, "X")
+        hist.SetLabelSize(0.05, "Y")
+        hist.SetTitleSize(0.05, "X")
+        hist.SetTitleSize(0.05, "Y")
+        hist.SetFillColor(ROOT.kBlue)
         hist.Draw()
         ll = ROOT.TLine(lc if lc > lm else lm, 0, lc if lc > lm else lm, hist.GetMaximum())
         ul = ROOT.TLine(uc if uc < um else um, 0, uc if uc < um else um, hist.GetMaximum())
+        ll.SetLineWidth(2)
+        ul.SetLineWidth(2)
         ll.Draw()
         ul.Draw()
     else:
@@ -596,14 +611,14 @@ def efficiencyError(k, n):
 
 
 def makeOvertrainingPlot(tmvaFilename, plotName):
-    #subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
-    subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
+    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
+    #subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
 def makeROCPlot(tmvaFilename, plotName):
-    #subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
-    subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
+    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
+    #subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
@@ -677,16 +692,21 @@ def makeDiagPlot(signalHist, bgHist, plotName):
     purityPerBin = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
 
     plotTitle = 'Diagonal plot'
-    canvas = ROOT.TCanvas(plotTitle + plotName, plotTitle, 600, 400)
+    canvas = ROOT.TCanvas(plotTitle + plotName, plotTitle, 1200, 800)
     canvas.cd()
 
     purityPerBin.SetTitle(';classifier output;'
                           + 'purity per bin')
     purityPerBin.GetXaxis().SetRangeUser(0.0, 1.0)
     purityPerBin.GetYaxis().SetRangeUser(0.0, 1.0)
+    purityPerBin.GetXaxis().SetTitleSize(0.05)
+    purityPerBin.GetXaxis().SetLabelSize(0.05)
+    purityPerBin.GetYaxis().SetTitleSize(0.05)
+    purityPerBin.GetYaxis().SetLabelSize(0.05)
     purityPerBin.Draw('APZ')
     diagonal = ROOT.TLine(0.0, 0.0, 1.0, 1.0)
     diagonal.SetLineColor(ROOT.kAzure)
+    diagonal.SetLineWidth(2)
     diagonal.Draw()
     canvas.SaveAs(plotName)
 

@@ -78,6 +78,25 @@ variables['Muon'] = [
     'muid_ARICH',
     ]
 variables['IntermediateMuon'] = variables['Muon']
+variables['KinLepton'] = [
+    'p_CMS',
+    'pt_CMS',
+    'p',
+    'pt',
+    'muid',
+    'muid_dEdx',
+    'muid_TOP',
+    'SemiLeptonicVariables(recoilMass)',
+    'SemiLeptonicVariables(p_missing_CMS)',
+    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(EW90)',
+    'muid_ARICH',
+    'eid',
+    'eid_dEdx',
+    'eid_TOP',
+    'eid_ARICH',
+    'eid_ECL',
+    ]
 variables['Kaon'] = [
     'p_CMS',
     'pt_CMS',
@@ -145,6 +164,7 @@ trackLevelParticles = [
     ('e+', 'IntermediateElectron'),
     ('mu+', 'Muon'),
     ('mu+', 'IntermediateMuon'),
+    ('mu+', 'KinLepton'),
     ('K+', 'Kaon'),
     ('pi+', 'SlowPion'),
     ('pi+', 'FastPion'),
@@ -160,21 +180,26 @@ for (symbol, category) in trackLevelParticles:
 
     # Select particles in ROE for different categories of flavour tagging.
     if symbol != 'Lambda0':
-        selectParticle(particleList, 'isInRestOfEvent > 0.5', path=roe_path)
-
+        selectParticle(particleList,
+                       'isInRestOfEvent > 0.5 and chiProb > 0.001',
+                       path=roe_path)
     # Check if there is K short in this event
     if symbol == 'K+':
         applyCuts('K+:ROE', '0.1<Kid', path=roe_path)  # Precut done to prevent from overtraining, might be redundant
-        selectParticle('pi+:inKaonRoe', 'isInRestOfEvent > 0.5', path=roe_path)
+        selectParticle('pi+:inKaonRoe',
+                       'isInRestOfEvent > 0.5 and chiProb > 0.001',
+                       path=roe_path)
         reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
                          '0.40<=M<=0.60', 1, path=roe_path)
         fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=roe_path)
         # modify confidence level?!
 
     if symbol == 'Lambda0':
-        selectParticle('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5',
+        selectParticle('pi+:inLambdaRoe',
+                       'isInRestOfEvent > 0.5 and chiProb > 0.001',
                        path=roe_path)
-        selectParticle('p+:inLambdaRoe', 'isInRestOfEvent > 0.5',
+        selectParticle('p+:inLambdaRoe',
+                       'isInRestOfEvent > 0.5 and chiProb > 0.001',
                        path=roe_path)
         reconstructDecay('Lambda0:ROE -> pi-:inLambdaRoe p+:inLambdaRoe',
                          '1.00<=M<=1.23', 1, path=roe_path)
@@ -184,6 +209,8 @@ for (symbol, category) in trackLevelParticles:
         matchMCTruth('Lambda0:ROE', path=roe_path)
         fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=roe_path)
         # printList('Lambda0:ROE', full=True, path=roe_path)
+
+    # How to sextract info about the number of selected Dummy particles, i.e. about the selected Tracks here. (We need this for each category)
 
     if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL):
         print isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL)
@@ -214,10 +241,25 @@ for (symbol, category) in trackLevelParticles:
 eventLevelReady = trackLevelReady
 
 # Eventlevel -> calculation only on targettrack
-eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
-                       ('pi+', 'SlowPion'), ('Lambda0', 'Lambda')]
+# eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
+                       # ('pi+', 'SlowPion'), ('Lambda0', 'Lambda')]
 
-eventLevelParticles = trackLevelParticles
+variables['KaonPion'] = ['HighestProbInCat(K+:ROE, IsFromB(Kaon))',
+                         'HighestProbInCat(pi+:ROE, IsFromB(SlowPion))',
+                         'cosKaonPion', 'KaonPionHaveOpositeCharges', 'Kid']
+
+eventLevelParticles = [
+    ('e+', 'Electron'),
+    ('e+', 'IntermediateElectron'),
+    ('mu+', 'Muon'),
+    ('mu+', 'IntermediateMuon'),
+    ('mu+', 'KinLepton'),
+    ('K+', 'Kaon'),
+    ('pi+', 'SlowPion'),
+    ('pi+', 'FastPion'),
+    ('K+', 'KaonPion'),
+    ('Lambda0', 'Lambda'),
+    ]
 
 if eventLevelReady:
     for (symbol, category) in eventLevelParticles:
@@ -227,9 +269,18 @@ if eventLevelReady:
         targetVariable = 'IsRightClass(' + category + ')'
         print 'This is the targetVariable: ' + targetVariable
 
-        selectParticle(particleList, 'hasHighestProbInCat(' + particleList
-                       + ',' + 'IsFromB(' + category + ')) > 0.5',
-                       path=roe_path)
+        # if category == 'KinLepton':
+      # selectParticle(particleList,
+                       # 'isInElectronOrMuonCat < 0.5',
+                       # path=roe_path)
+        if category == 'KaonPion':
+            selectParticle(particleList, 'hasHighestProbInCat(' + particleList
+                           + ',' + 'IsFromB(Kaon)) > 0.5', path=roe_path)
+        else:
+            selectParticle(particleList, 'hasHighestProbInCat(' + particleList
+                           + ',' + 'IsFromB(' + category + ')) > 0.5',
+                           path=roe_path)
+
         if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_EL):
             print 'PROCESSING: trainTMVAMethod on event level'
             trainTMVAMethod(
@@ -279,9 +330,11 @@ if combinerLevelReady:
         'QrOf(mu+:ROE, IsRightClass(Muon), IsFromB(Muon))',
         'QrOf(mu+:ROE, IsRightClass(IntermediateMuon), IsFromB(IntermediateMuon))'
             ,
+        'QrOf(mu+:ROE, IsRightClass(KinLepton), IsFromB(KinLepton))',
         'QrOf(K+:ROE, IsRightClass(Kaon), IsFromB(Kaon))',
         'QrOf(pi+:ROE, IsRightClass(SlowPion), IsFromB(SlowPion))',
         'QrOf(pi+:ROE, IsRightClass(FastPion), IsFromB(FastPion))',
+        'QrOf(K+:ROE, IsRightClass(KaonPion), IsFromB(Kaon))',
         'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))',
         ]
 
@@ -326,14 +379,19 @@ if combinerLevelReady:
         def event(self):
             roe = Belle2.PyStoreObj('RestOfEvent')
             info = Belle2.PyStoreObj('EventExtraInfo')
-            instance = Belle2.PyStoreObj('EventExtraInfo')
             someParticle = Belle2.Particle(None)
             qr_Combined = 2 * (info.obj().getExtraInfo('qr_Combined') - 0.5)
             qr_MC = 2 * (mc_variables.variables.evaluate('qr_Combined',
                          someParticle) - 0.5)
+            ROE_NTracks = roe.obj().getNTracks()
+            ROE_NECLClusters = roe.obj().getNECLClusters()
+            ROE_NKLMClusters = roe.obj().getNKLMClusters()
             particle = roe.obj().getRelated('Particles')
             particle.addExtraInfo('qr_Combined', qr_Combined)
             particle.addExtraInfo('qr_MC', qr_MC)
+            particle.addExtraInfo('ROE_NTracks', ROE_NTracks)
+            particle.addExtraInfo('ROE_NECLClusters', ROE_NECLClusters)
+            particle.addExtraInfo('ROE_NKLMClusters', ROE_NKLMClusters)
             info.obj().removeExtraInfo()
 
 
@@ -346,8 +404,10 @@ main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 if combinerLevelReady:
     variablesToNTuple('B0', ['getExtraInfo(qr_Combined)', 'getExtraInfo(qr_MC)'
-                      ], 'TaggingInformation', workingDirectory
-                      + '/B0_B0bar_final.root', path=main)
+                      , 'getExtraInfo(ROE_NTracks)',
+                      'getExtraInfo(ROE_NECLClusters)',
+                      'getExtraInfo(ROE_NKLMClusters)'], 'TaggingInformation',
+                      workingDirectory + '/B0_B0bar_final.root', path=main)
 
 main.add_module(register_module('ProgressBar'))
 process(main)

@@ -15,16 +15,7 @@ from ROOT import Belle2
 import os
 
 main = create_path()
-# ***************************************
-roinput = register_module('RootInput')
-inputFiles = []
-for i in xrange(20):
-    inputFiles.append('/remote/pcbelle06/ligioi/dstFiles/B2JpsiKs_mu_e0001r'
-                      + '%04d' % (i + 1) + '_s00_BGx0.mdst.root')
-roinput.param('inputFileNames', inputFiles)
-main.add_module(roinput)
-# ***************************************
-# main.add_module(register_module('RootInput'))
+main.add_module(register_module('RootInput'))
 main.add_module(register_module('Gearbox'))
 loadReconstructedParticles(path=main)
 

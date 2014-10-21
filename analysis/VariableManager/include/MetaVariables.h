@@ -95,6 +95,13 @@ namespace Belle2 {
     Manager::FunctionPtr hasHighestProbInCat(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns Returns the value of the highest target probability in particlelistName (argument[0]).
+     * The probability is accessed via extraInfoName (argument[1]).
+     * This is a Flavor Tagging specific variable!
+     */
+    Manager::FunctionPtr HighestProbInCat(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns a requested kinematical variable via argument[0] of the group of the semileptonic flavor tagging variables. The Possibilities are:
      * recoilMass: recoiling mass of the Btag system against the target particle in CMS
      * p_missing_CMS: CMS momentum magnitude missing in Btag using as target hypothesis the given particle

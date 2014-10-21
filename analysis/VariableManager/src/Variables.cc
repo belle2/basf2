@@ -749,6 +749,99 @@ namespace Belle2 {
       return result;
     }
 
+    double isInElectronOrMuonCat(const Particle* particle)
+    {
+
+      StoreObjPtr<ParticleList> MuonList("mu+:ROE");
+      StoreObjPtr<ParticleList> ElectronList("e+:ROE");
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+      double maximum_prob_el = 0;
+      double maximum_prob_mu = 0;
+
+      const Track* track_target_mu = nullptr;
+      const Track* track_target_el = nullptr;
+
+      for (unsigned int i = 0; i < MuonList->getListSize(); ++i) {
+        Particle* p_mu = MuonList->getParticle(i);
+        double prob_mu = p_mu->getExtraInfo("IsFromB(Muon)");
+        if (prob_mu > maximum_prob_mu) {
+          maximum_prob_mu = prob_mu;
+          track_target_mu = p_mu -> getTrack();
+        }
+      }
+      for (unsigned int i = 0; i < ElectronList->getListSize(); ++i) {
+        Particle* p_el = ElectronList->getParticle(i);
+//             const Particle* p_el = p ->getRelated<PartList>();
+        double prob_el = p_el->getExtraInfo("IsFromB(Electron)");
+        if (prob_el > maximum_prob_el) {
+          maximum_prob_el = prob_el;
+          track_target_el = p_el -> getTrack();
+        }
+      }
+      if (particle->getTrack() == track_target_mu || particle->getTrack() == track_target_el) {
+        return 1.0;
+      } else return 0.0;
+    }
+
+    double cosKaonPion(const Particle* particle)
+    {
+
+//       StoreObjPtr<ParticleList> KaonList("K+:ROE");
+      StoreObjPtr<ParticleList> SlowPionList("pi+:ROE");
+//       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+//       double maximum_prob_K = 0;
+      double maximum_prob_pi = 0;
+
+      PCmsLabTransform T;
+      TLorentzVector momTarget_K = T.rotateLabToCms() * particle -> get4Vector();
+      TLorentzVector momTarget_pi;
+
+//       for (unsigned int i = 0; i < KaonList->getListSize(); ++i) {
+//         Particle* p_K = KaonList->getParticle(i);
+//         double prob_K = p_K->getExtraInfo("IsFromB(Kaon)");
+//         if (prob_K > maximum_prob_K) {
+//           maximum_prob_K = prob_K;
+//           momTarget_K = T.rotateLabToCms() * p_K -> get4Vector();
+//         }
+//       }
+      for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
+        Particle* p_pi = SlowPionList->getParticle(i);
+        double prob_pi = p_pi->getExtraInfo("IsFromB(SlowPion)");
+        if (prob_pi > maximum_prob_pi) {
+          maximum_prob_pi = prob_pi;
+          momTarget_pi = T.rotateLabToCms() * p_pi -> get4Vector();
+        }
+      }
+      return TMath::Cos(momTarget_K.Angle(momTarget_pi.Vect()));
+    }
+
+    double KaonPionHaveOpositeCharges(const Particle* particle)
+    {
+
+//       StoreObjPtr<ParticleList> KaonList("K+:ROE");
+      StoreObjPtr<ParticleList> SlowPionList("pi+:ROE");
+//       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+//       double maximum_prob_K = 0;
+      double maximum_prob_pi = 0;
+
+      float chargeTarget_K = particle -> getCharge();
+      float chargeTarget_pi = 0;
+
+      for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
+        Particle* p_pi = SlowPionList->getParticle(i);
+        double prob_pi = p_pi->getExtraInfo("IsFromB(SlowPion)");
+        if (prob_pi > maximum_prob_pi) {
+          maximum_prob_pi = prob_pi;
+          chargeTarget_pi =  p_pi -> getCharge();
+        }
+      }
+      if (chargeTarget_K * chargeTarget_pi == -1) {
+        return 1;
+      } else return 0;
+    }
 
     // RestOfEvent related --------------------------------------------------
 
@@ -1243,6 +1336,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,  "Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.");
     REGISTER_VARIABLE("BtagClassFlavor",  particleClassifiedFlavor,    "Flavour of Btag from trained Method");
     REGISTER_VARIABLE("BtagMCFlavor",  particleMCFlavor,    "Flavour of Btag from MC");
+    REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,  "Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 else.");
+    REGISTER_VARIABLE("cosKaonPion"  , cosKaonPion , "cosine of angle between kaon and slow pion momenta, i.e. between the momenta of the particles selected as target kaon and slow pion");
+    REGISTER_VARIABLE("KaonPionHaveOpositeCharges", KaonPionHaveOpositeCharges, "Returns 1 if the particles selected as target kaon and slow pion have oposite charges, 0 else")
 
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");

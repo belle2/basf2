@@ -341,6 +341,21 @@ namespace Belle2 {
     double recoilMomentum(const Particle* particle);
 
     /**
+     * returns 1.0 if the particle has been selected as target in the muon or electron flavor tagging category, 0.0 else.
+     */
+    double isInElectronOrMuonCat(const Particle* particle);
+
+    /**
+     * returns cosine of angle between kaon and slow pion momenta, i.e. between the momenta of the particles selected as target kaon and slow pion.
+     */
+    double cosKaonPion(const Particle* particle);
+
+    /**
+     * returns 1 if the particles selected as target kaon and slow pion in the respective flavour tagging categories have oposite charges, 0 else.
+     */
+    double KaonPionHaveOpositeCharges(const Particle* particle);
+
+    /**
      * return energy recoiling against given Particle
      */
     double recoilEnergy(const Particle* particle);

@@ -323,33 +323,62 @@ namespace Belle2 {
             maximum_PDG = 0;
             maximum_PDG_Mother = 0;
           }
+          float SlowPion_q = 0;
+          int SlowPion_PDG = 0;
+          int SlowPion_PDG_Mother = 0;
+          if (particleName == "KaonPion") {
+            StoreObjPtr<ParticleList> SlowPionList("pi+:ROE");
+            double maximum_prob_pi = 0;
+            Particle* TargetSlowPion = nullptr;
+            for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
+              Particle* p_pi = SlowPionList->getParticle(i);
+              double prob_pi = p_pi->getExtraInfo("IsFromB(SlowPion)");
+              if (prob_pi > maximum_prob_pi) {
+                maximum_prob_pi = prob_pi;
+                TargetSlowPion = p_pi;
+              }
+              const MCParticle* MCSlowPion = TargetSlowPion ->getRelated<MCParticle>();
+              SlowPion_q = TargetSlowPion -> getCharge();
+              if (MCSlowPion->getMother() != nullptr && MCSlowPion->getMother()->getMother() != nullptr) {
+                SlowPion_PDG = TMath::Abs(MCSlowPion->getPDG());
+                SlowPion_PDG_Mother = TMath::Abs(MCSlowPion->getMother()->getPDG());
+              }
+            }
+          }
           if (particleName == "Electron"
-          && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511) {
+              && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511) {
             return 1.0;
           } else if (particleName == "IntermediateElectron"
-          && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511) {
+                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511) {
             return 1.0;
           } else if (particleName == "Muon"
-          && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511) {
+                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511) {
             return 1.0;
           } else if (particleName == "IntermediateMuon"
-          && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511) {
+                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511) {
+            return 1.0;
+          }  else if (particleName == "KinLepton"
+                      && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && (maximum_PDG == 11 || maximum_PDG == 13) && maximum_PDG_Mother == 511) {
             return 1.0;
           } else if (particleName == "Kaon"
-          && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-          && maximum_PDG == 321 && maximum_PDG_Mother > 400 && maximum_PDG_Mother < 500 && maximum_PDG_Mother_Mother == 511) {
+                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+                     && maximum_PDG == 321 && maximum_PDG_Mother > 400 && maximum_PDG_Mother < 500 && maximum_PDG_Mother_Mother == 511) {
             return 1.0;
           } else if (particleName == "SlowPion"
-          && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-          && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511) {
+                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+                     && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511) {
+            return 1.0;
+          } else if (particleName == "KaonPion"
+                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+                     && maximum_PDG == 321 && SlowPion_PDG == 211 && maximum_PDG_Mother == SlowPion_PDG_Mother) {
             return 1.0;
           } else if (particleName == "FastPion"
-          && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-          && maximum_PDG == 211 && maximum_PDG_Mother == 511) {
+                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+                     && maximum_PDG == 211 && maximum_PDG_Mother == 511) {
             return 1.0;
           } else if (particleName == "Lambda"
-          && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-          && maximum_PDG == 3122) {
+                     && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+                     && maximum_PDG == 3122) {
             return 1.0;
           } else {
             return 0.0;
@@ -393,6 +422,13 @@ namespace Belle2 {
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 13
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+            return 1.0;
+            //KinLepton
+          } else if (particleName == "KinLepton"
+          && mcParticle->getMother() != nullptr
+          && mcParticle->getMother()->getMother() != nullptr
+          && (TMath::Abs(mcParticle->getPDG()) == 13 || TMath::Abs(mcParticle->getPDG()) == 11)
           && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
             return 1.0;
             //kaon
@@ -458,6 +494,30 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr HighestProbInCat(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        auto particleListName = arguments[0];
+        auto extraInfoName = arguments[1];
+        auto func = [particleListName, extraInfoName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          double maximum_prob = 0;
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+            Particle* p = ListOfParticles->getParticle(i);
+            double prob = p->getExtraInfo(extraInfoName);
+            if (prob > maximum_prob) {
+              maximum_prob = prob;
+            }
+          }
+          return maximum_prob;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (2 required) for meta function hasHighestProbInCat");
+        return nullptr;
+      }
+    }
+
     Manager::FunctionPtr SemiLeptonicVariables(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -511,6 +571,27 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments (1 required) for meta function recoilMassBtag");
+        return nullptr;
+      }
+    }
+
+    Manager::FunctionPtr CheckingVariables(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        auto ListName = arguments[0];
+        auto requestedVariable = arguments[1];
+        auto func = [requestedVariable, ListName](const Particle*) -> double {
+          if (requestedVariable == "getListSize") {
+            StoreObjPtr<ParticleList> ListOfParticles(ListName);
+            return ListOfParticles->getListSize();
+          } else {
+            B2FATAL("Wrong requested Variable. Available is getListSize for particle lists");
+            return 0;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (2 required) for meta function CheckingVariables");
         return nullptr;
       }
     }
@@ -594,5 +675,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("IsFromB(particleName)", IsFromB, "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
     REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, "Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName. The probability is accessed via extraInfoName.");
     REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables, "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90) assuming a semileptonic decay with the given particle as target.");
+    REGISTER_VARIABLE("CheckingVariables(ListName, requestedVariable)", CheckingVariables, "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");
+    REGISTER_VARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat, "Returns the highest probability value for the given category")
+
   }
 }

@@ -323,7 +323,7 @@ namespace Belle2 {
             maximum_PDG = 0;
             maximum_PDG_Mother = 0;
           }
-          float SlowPion_q = 0;
+//           float SlowPion_q = 0;
           int SlowPion_PDG = 0;
           int SlowPion_PDG_Mother = 0;
           if (particleName == "KaonPion") {
@@ -338,7 +338,7 @@ namespace Belle2 {
                 TargetSlowPion = p_pi;
               }
               const MCParticle* MCSlowPion = TargetSlowPion ->getRelated<MCParticle>();
-              SlowPion_q = TargetSlowPion -> getCharge();
+//               SlowPion_q = TargetSlowPion -> getCharge();
               if (MCSlowPion->getMother() != nullptr && MCSlowPion->getMother()->getMother() != nullptr) {
                 SlowPion_PDG = TMath::Abs(MCSlowPion->getPDG());
                 SlowPion_PDG_Mother = TMath::Abs(MCSlowPion->getMother()->getPDG());

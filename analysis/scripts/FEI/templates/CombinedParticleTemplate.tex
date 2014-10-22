@@ -4,8 +4,9 @@ In the reconstruction of ${particleName} ${NUsedChannels} channels out of ${NCha
 \begin{itemize}
     ${channelListAsItems}
 \end{itemize}
-This amounts to ${particleNSignal} signal events and ${particleNBackground} background events in total.
-After specific pre-cuts for every channel, a post cut on the signal probability of the particle was applied in the range ${postCutRange}.
+This amounts to ${particleNSignal} signal events and ${particleNBackground} background events in total before cuts.
+Channel-specific pre-cuts and a particle-specific post cut on the signal probability of the particle were applied.
+After all cuts ${particleNSignalAfterPostCut} signal events and ${particleNBackgroundAfterPostCut} background events remained.
 
 \begin{center}
 \includegraphics[width=0.7\textwidth]{${particleDiagPlot}}

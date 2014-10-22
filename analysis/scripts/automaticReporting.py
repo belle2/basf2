@@ -145,8 +145,8 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     for particlePlaceholder in finalStateParticlePlaceholders:
         placeholders['finalStateParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
         placeholders['finalStateParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
         placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
@@ -155,10 +155,10 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     for particlePlaceholder in combinedParticlePlaceholders:
         placeholders['combinedParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
         placeholders['combinedParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNBackgroundAfterUserCut']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
@@ -425,7 +425,7 @@ def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
         lm = hist.GetXaxis().GetXmin()
         um = hist.GetXaxis().GetXmax()
         hist.GetXaxis().SetRangeUser(lr if lr > lm else lm, ur if ur < um else um)
-        unit = ' [GeV] ' if preCutConfig.variable in ['M', 'Q'] else ''
+        unit = ' (GeV) ' if preCutConfig.variable in ['M', 'Q'] else ''
         if prefix in ['signal', 'all', 'bkgrd']:
             unit += ';N'
         else:
@@ -611,14 +611,14 @@ def efficiencyError(k, n):
 
 
 def makeOvertrainingPlot(tmvaFilename, plotName):
-    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
-    #subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
+    #subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
+    subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
 def makeROCPlot(tmvaFilename, plotName):
-    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
-    #subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
+    #subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
+    subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 

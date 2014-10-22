@@ -35,6 +35,14 @@ namespace Belle2 {
     //! @param simHit pointer to the BKLMSimHit
     BKLMDigit(const BKLMSimHit* simHit);
 
+    //!Constructor with initial values for a real data hit
+    //! @param moduleID gives sector, layer and strip
+    //! @param ctime gives lower 16 bits of B2TT CTIME
+    //! @param tdc the tdc value
+    //! @@param charge the charge (number of photons for the scintillator strips)
+    BKLMDigit(int moduleID, short ctime, short tdc, short charge);
+
+
     //! Copy constructor
     BKLMDigit(const BKLMDigit&);
 
@@ -131,6 +139,9 @@ namespace Belle2 {
 
   private:
 
+    //!lowest 16 bits of the B2TT CTIME signal
+    short m_CTime;
+
     //! detector-module identifier
     //! @sa BKLMStatus.h
     int m_ModuleID;
@@ -157,7 +168,8 @@ namespace Belle2 {
     int m_FitStatus;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMDigit, 3)
+    //! version 4 adds ctime etc
+    ClassDef(BKLMDigit, 4)
 
   };
 

@@ -47,6 +47,16 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_ModuleID |= ((strip - 1) << BKLM_MAXSTRIP_BIT);
 }
 
+BKLMDigit::BKLMDigit(int moduleID, short ctime, short tdc, short charge)
+{
+  //this assumes that the strip is already zero based...
+  m_ModuleID = moduleID;
+  m_CTime = ctime;
+  m_Time = tdc;
+  m_NPixel = charge;
+
+}
+
 // Constructor with initial values for a scint hit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   RelationsObject(),

@@ -710,8 +710,9 @@ void GBLfitModule::event()
 
           candFitted = true;
           //Create output tracks
-          if (gfs->getPVal() > m_gblPvalueCut)
-            gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
+          //TODO: This caused incosistent relations! Inspect!
+          //if (gfs->getPVal() > m_gblPvalueCut)
+          gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
           tracks.appendNew(); //Track is created empty, parameters are set later on
 
           //Create relation

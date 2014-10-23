@@ -20,6 +20,7 @@ ClassImp(BKLMDigit)
 // empty constructor for ROOT - do not use this
 BKLMDigit::BKLMDigit() :
   RelationsObject(),
+  m_CTime(0),
   m_ModuleID(0),
   m_SimTime(0.0),
   m_Time(0.0),
@@ -31,9 +32,10 @@ BKLMDigit::BKLMDigit() :
 {
 }
 
-// Constructor with initial values for an RPC hit
+// Constructor with initial values for an RPC simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   RelationsObject(),
+  m_CTime(0),
   m_SimTime(simHit->getTime()),
   m_Time(m_SimTime + simHit->getPropagationTime()),
   m_SimEDep(simHit->getEDep()),
@@ -57,9 +59,10 @@ BKLMDigit::BKLMDigit(int moduleID, short ctime, short tdc, short charge)
 
 }
 
-// Constructor with initial values for a scint hit
+// Constructor with initial values for a scint simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   RelationsObject(),
+  m_CTime(0),
   m_ModuleID(simHit->getModuleID()),
   m_SimTime(simHit->getTime()),
   m_Time(m_SimTime + simHit->getPropagationTime()),
@@ -74,6 +77,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
 // Copy constructor
 BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
   RelationsObject(digit),
+  m_CTime(digit.m_CTime),
   m_ModuleID(digit.m_ModuleID),
   m_SimTime(digit.m_SimTime),
   m_Time(digit.m_Time),

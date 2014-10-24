@@ -21,6 +21,8 @@
 #include <TSystem.h>
 #include <TFile.h>
 
+#include <wordexp.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace RootIOUtilities;
@@ -41,8 +43,8 @@ RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_
 
   //Parameter definition
   vector<string> emptyvector;
-  addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", string(""));
-  addParam("inputFileNames", m_inputFileNames, "List of input files. You may use wildcards to specify multiple files, e.g. 'somePrefix_*.root'. Can be overridden using the -i argument to basf2.", emptyvector);
+  addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames or wildcards instead. Can be overridden using the -i argument to basf2.", string(""));
+  addParam("inputFileNames", m_inputFileNames, "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.", emptyvector);
 
   addParam("eventNumber", m_counterNumber, "Skip this number of events before starting.", 0);
 
@@ -78,23 +80,37 @@ void RootInputModule::initialize()
     B2FATAL("Cannot use both 'inputFileName' and 'inputFileNames' parameters!");
     return;
   }
+
+  //expand any expansions in inputFiles
+  wordexp_t expansions;
+  wordexp("", &expansions, 0);
+  for (const string & pattern : inputFiles) {
+    if (wordexp(pattern.c_str(), &expansions, WRDE_APPEND | WRDE_NOCMD | WRDE_UNDEF) != 0) {
+      B2ERROR("Failed to expand pattern '" << pattern << "'!");
+    }
+  }
+  m_inputFileNames.resize(expansions.we_wordc);
+  for (unsigned int i = 0; i < expansions.we_wordc; i++) {
+    m_inputFileNames[i] = expansions.we_wordv[i];
+  }
+  wordfree(&expansions);
+
   //we'll only use m_inputFileNames from now on
-  m_inputFileNames = inputFiles;
   m_inputFileName = "";
 
+  if (m_inputFileNames.empty()) {
+    B2FATAL("No valid files specified!");
+  }
 
   //Open TFile
   TDirectory* dir = gDirectory;
-  for (unsigned int iFile = 0; iFile < m_inputFileNames.size(); iFile++) {
-    //If file name uses wildcarding, we can't check the files here
-    if (!TString(m_inputFileNames[iFile].c_str()).Contains("*")) {
-      TFile* f = TFile::Open(m_inputFileNames[iFile].c_str(), "READ");
-      if (!f || !f->IsOpen()) {
-        B2FATAL("Couldn't open input file " + m_inputFileNames[iFile]);
-        return;
-      }
-      delete f;
+  for (const string & fileName : m_inputFileNames) {
+    TFile* f = TFile::Open(fileName.c_str(), "READ");
+    if (!f || !f->IsOpen()) {
+      B2FATAL("Couldn't open input file " + fileName);
+      return;
     }
+    delete f;
   }
   dir->cd();
 
@@ -109,10 +125,10 @@ void RootInputModule::initialize()
   //Get TTree
   m_persistent = new TChain(c_treeNames[DataStore::c_Persistent].c_str());
   m_tree = new TChain(c_treeNames[DataStore::c_Event].c_str());
-  for (unsigned int iFile = 0; iFile < m_inputFileNames.size(); iFile++) {
-    m_persistent->Add(m_inputFileNames[iFile].c_str());
-    m_tree->Add(m_inputFileNames[iFile].c_str());
-    B2INFO("Added file " + m_inputFileNames[iFile]);
+  for (const string & fileName : m_inputFileNames) {
+    m_persistent->AddFile(fileName.c_str());
+    m_tree->AddFile(fileName.c_str());
+    B2INFO("Added file " + fileName);
   }
   B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Persistent] + "' with " + m_persistent->GetEntries() << " entries.");
   B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Event] + "' with " + m_tree->GetEntries() << " entries.");

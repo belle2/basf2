@@ -19,6 +19,8 @@
 
 #include <string>
 
+class TClonesArray;
+
 namespace Belle2 {
 
   /** Defines interface for accessing relations of objects in StoreArray.
@@ -292,6 +294,13 @@ namespace Belle2 {
     TObject* getRelated(const std::string& name) const { return getRelated<TObject>(name); }
     /** @} */
 #endif
+  protected:
+
+    /** Returns the pointer to the store array holding this object (protected since these arrays are easy to misuse). */
+    TClonesArray* getArrayPointer() const {
+      DataStore::Instance().findStoreEntry(this, m_cacheDataStoreEntry, m_cacheArrayIndex);
+      return m_cacheDataStoreEntry->getPtrAsArray();
+    }
 
   private:
 

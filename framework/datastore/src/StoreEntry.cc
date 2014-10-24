@@ -28,3 +28,10 @@ void StoreEntry::recreate()
 
   ptr = object;
 }
+
+TClonesArray* StoreEntry::getPtrAsArray() const
+{
+  if (!isArray)
+    return nullptr;
+  return static_cast<TClonesArray*>(ptr);
+}

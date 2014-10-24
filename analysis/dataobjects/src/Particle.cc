@@ -31,16 +31,14 @@ using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   resetErrorMatrix();
 }
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   m_pdgCode = pdgCode;
   setFlavorType();
@@ -54,8 +52,7 @@ Particle::Particle(const TLorentzVector& momentum,
                    const EParticleType type,
                    const unsigned mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -68,11 +65,9 @@ Particle::Particle(const TLorentzVector& momentum,
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
-                   const std::vector<int>& daughterIndices,
-                   TClonesArray* arrayPointer) :
+                   const std::vector<int>& daughterIndices) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(arrayPointer)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -89,8 +84,7 @@ Particle::Particle(const TLorentzVector& momentum,
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   if (!track) return;
   const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
@@ -120,8 +114,7 @@ Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   if (!trackFit) return;
 
@@ -146,8 +139,7 @@ Particle::Particle(const int trackArrayIndex,
 
 Particle::Particle(const ECLCluster* eclCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   if (!eclCluster) return;
 
@@ -173,8 +165,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
 
 Particle::Particle(const KLMCluster* klmCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   if (!klmCluster) return;
 
@@ -198,8 +189,7 @@ Particle::Particle(const KLMCluster* klmCluster) :
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
 {
   if (!mcParticle) return;
 
@@ -328,22 +318,16 @@ float Particle::getCharge(void) const
 
 const Particle* Particle::getDaughter(unsigned i) const
 {
-  if (!m_arrayPointer) fixArrayPointer();
-  if (!m_arrayPointer) return NULL; // fixing failed
-
   if (i >= getNDaughters()) return NULL;
-  return static_cast<Particle*>(m_arrayPointer->At(m_daughterIndices[i]));
+  return static_cast<Particle*>(getArrayPointer()->At(m_daughterIndices[i]));
 }
 
 const std::vector<Belle2::Particle*> Particle::getDaughters() const
 {
+  const TClonesArray* array = getArrayPointer();
   std::vector<Particle*> daughters(getNDaughters());
-
-  if (!m_arrayPointer) fixArrayPointer();
-  if (!m_arrayPointer) return daughters; // fixing failed
-
   for (unsigned i = 0; i < getNDaughters(); i++)
-    daughters[i] = static_cast<Particle*>(m_arrayPointer->At(m_daughterIndices[i]));
+    daughters[i] = static_cast<Particle*>(array->At(m_daughterIndices[i]));
 
   return daughters;
 }
@@ -546,25 +530,6 @@ void Particle::storeErrorMatrix(const TMatrixFSym& m)
       m_errMatrix[element] = m(irow, icol);
       element++;
     }
-  }
-}
-
-void Particle::fixArrayPointer() const
-{
-
-  TClonesArray* arrayPointer(0);
-
-  std::string arrayName = getArrayName();
-  if (arrayName.empty())
-    B2ERROR("Particle::fixArrayPointer particle does not belong to a StoreArray");
-
-  StoreArray<Particle> Particles(arrayName);
-  arrayPointer = Particles.getPtr();
-
-  //Set the StoreArray pointer for all elements
-  for (int i = 0; i < arrayPointer->GetEntriesFast(); i++) {
-    Particle& p = *(static_cast<Particle*>(arrayPointer->At(i)));
-    p.m_arrayPointer = arrayPointer;
   }
 }
 

@@ -132,13 +132,12 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices vector of daughter indices
-     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
-             const std::vector<int>& daughterIndices,
-             TClonesArray* arrayPointer = 0);
+             const std::vector<int>& daughterIndices);
+
 
     /**
      * Constructor from a reconstructed track (mdst object Track);
@@ -554,7 +553,7 @@ namespace Belle2 {
 
     /** Return the id of the associated ParticleExtraInfoMap or -1 if no map is set. */
     int getExtraInfoMap() const {
-      return m_extraInfo.size() > 0 ? m_extraInfo[0] : -1;
+      return !m_extraInfo.empty() ? m_extraInfo[0] : -1;
     }
 
     /** Return the size of the extra info array */
@@ -575,10 +574,7 @@ namespace Belle2 {
     void addExtraInfo(const std::string& name, float value);
 
     /** Returns the pointer to the store array which holds the daughter particles */
-    TClonesArray* getArrayPointer() const {
-      if (!m_arrayPointer) fixArrayPointer();
-      return m_arrayPointer;
-    }
+    TClonesArray* getArrayPointer() const { return RelationsObject::getArrayPointer(); }
 
   private:
 
@@ -604,16 +600,6 @@ namespace Belle2 {
      * entry 0 is reserved specifies which map to use.
      */
     std::vector<float> m_extraInfo;
-
-    // transient data members
-    /**
-     * Internal pointer to DataStore Array containing the particle belonging to
-     * this collection.
-     *
-     * This is a transient member and will not be written to file. The pointer
-     * is set when it is the first time needed.
-     */
-    TClonesArray* m_arrayPointer; //! transient pointer to particle StoreArray
 
     // private methods
     /**

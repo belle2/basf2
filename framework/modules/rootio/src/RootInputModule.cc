@@ -55,7 +55,7 @@ RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_
   vector<string> excludePersistent({"ProcessStatistics"});
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", excludePersistent);
 
-  addParam("parentLevel", m_parentLevel, "Number of generations of parent files to be read.", 0);
+  addParam("parentLevel", m_parentLevel, "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent.", 0);
 }
 
 
@@ -148,6 +148,9 @@ void RootInputModule::initialize()
     StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
     FileCatalog::Instance().getParentMetaData(m_parentLevel, 0, *fileMetaData, m_parentMetaData);
     createParentStoreEntries();
+  } else if (m_parentLevel < 0) {
+    B2ERROR("parentLevel must be >= 0!");
+    return;
   }
 }
 
@@ -322,7 +325,7 @@ bool RootInputModule::createParentStoreEntries()
         }
 
         // get the event tree and connect its branches
-        TTree* tree = (TTree*) file->Get(c_treeNames[DataStore::c_Event].c_str());
+        TTree* tree = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Event].c_str()));
         if (!tree) {
           B2ERROR("No tree " << c_treeNames[DataStore::c_Event] << " found in " << metaData.getLfn());
           continue;
@@ -349,7 +352,7 @@ bool RootInputModule::createParentStoreEntries()
       }
     }
     if (!parentFound) {
-      B2ERROR("Failed to connect parents");
+      B2ERROR("Failed to connect parent file at level " << level);
       return false;
     }
   }

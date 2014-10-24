@@ -67,7 +67,7 @@ void BKLMEffnRadioModule::set_plot_style()
 
 }
 
-BKLMEffnRadioModule::BKLMEffnRadioModule() : Module(), minNumPointsOnTrack(7), maxEffDistance(10), m_GeoPar(NULL)
+BKLMEffnRadioModule::BKLMEffnRadioModule() : Module(), m_minNumPointsOnTrack(7), m_maxEffDistance(10), m_GeoPar(NULL)
 {
   setDescription("Get efficiency and generate radio plots for bklm");
   addParam("filename", m_filename, "Output root filename", string("eff_output.root"));
@@ -82,7 +82,7 @@ BKLMEffnRadioModule::~BKLMEffnRadioModule()
 
 void BKLMEffnRadioModule::initialize()
 {
-  eventCounter = 0;
+  m_eventCounter = 0;
   set_plot_style();
   StoreArray<BKLMHit2d>::required();
   StoreArray<BKLMHit1d>::required();
@@ -244,9 +244,9 @@ void BKLMEffnRadioModule::beginRun()
 
 void BKLMEffnRadioModule::event()
 {
-  eventCounter++;
-  if (!(eventCounter % 1000))
-    cout << "looking at event nr " << eventCounter << endl;
+  m_eventCounter++;
+  if (!(m_eventCounter % 1000))
+    cout << "looking at event nr " << m_eventCounter << endl;
 
   StoreArray<BKLMHit1d> hits1D;
   //  cout <<" we have " << hits1D.getEntries() << " 1D hits " << endl;
@@ -586,7 +586,7 @@ void BKLMEffnRadioModule::getEffs()
             //            cout <<"subtract " << effX-r1 <<"?  effX: " << effX <<",r1: " << r1 <<" (this radius minus layer1 should bring you back)" <<endl;
             //      cout <<"angle is: " << (lHitPos2-lHitPos1).Angle(lHitPos1-candLocPos);
             //        cout <<" or " <<  (lHitPos2-lHitPos1).Angle(lHitPos2-candLocPos);
-            if (distanceExtrapol < maxEffDistance)
+            if (distanceExtrapol < m_maxEffDistance)
               found = true;
 
           }
@@ -719,7 +719,7 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
 
 
   }
-  if ((int)points.size() >= minNumPointsOnTrack - 2) {
+  if ((int)points.size() >= m_minNumPointsOnTrack - 2) {
     //add seed points
 
     TVector3 candGlPos = hits2D[firstHit]->getGlobalPosition();

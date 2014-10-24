@@ -62,9 +62,9 @@ namespace Belle2 {
     };
 
     //to make this a valid track..
-    int minNumPointsOnTrack;
-    int maxEffDistance;
-    long int eventCounter;
+    int m_minNumPointsOnTrack;
+    int m_maxEffDistance;
+    long int m_eventCounter;
     //iterate over 2D hits get possible track candidates, check if they are valid
     // and if the given plane is efficient
     void getEffs();

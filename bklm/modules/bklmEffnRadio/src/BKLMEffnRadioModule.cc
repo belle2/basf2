@@ -67,12 +67,10 @@ void BKLMEffnRadioModule::set_plot_style()
 
 }
 
-BKLMEffnRadioModule::BKLMEffnRadioModule() : Module(), m_minNumPointsOnTrack(7), m_maxEffDistance(10), m_GeoPar(NULL)
+BKLMEffnRadioModule::BKLMEffnRadioModule() : Module(), m_minNumPointsOnTrack(7), m_maxEffDistance(10), m_eventCounter(0), m_cModule(nullptr), m_cModuleEff(nullptr), m_cModuleEff2D(nullptr), m_hTrackPhi(nullptr), m_hTrackTheta(nullptr), m_hHitsPerLayer(nullptr), m_hClusterSize(nullptr), m_hTracksPerEvent(nullptr), m_hHitsPerEvent1D(nullptr), m_hHitsPerEvent2D(nullptr), m_hHitsPerEventPerLayer1D(nullptr), m_eff2DFound(nullptr), m_eff2DExpected(nullptr), m_strips(nullptr), m_stripsEff(nullptr), m_file(nullptr), m_stripHits(nullptr), m_stripHitsEff(nullptr), m_stripNonHitsEff(nullptr), m_GeoPar(NULL)
 {
   setDescription("Get efficiency and generate radio plots for bklm");
   addParam("filename", m_filename, "Output root filename", string("eff_output.root"));
-  addParam("moduleID", moduleID, "Which module to plot", int(-1));
-
 }
 
 BKLMEffnRadioModule::~BKLMEffnRadioModule()
@@ -90,112 +88,113 @@ void BKLMEffnRadioModule::initialize()
   m_file = new TFile(m_filename.c_str(), "recreate");
 
   //one canvas per module
-  cModule = new TCanvas** [8];
-  cModuleEff = new TCanvas** [8];
-  cModuleEff2D = new TCanvas** [8];
+  m_cModule = new TCanvas** [8];
+  m_cModuleEff = new TCanvas** [8];
+  m_cModuleEff2D = new TCanvas** [8];
 
-  eff2DFound = new TH2D** *[8];
-  eff2DExpected = new TH2D** *[8];
+  m_eff2DFound = new TH2D** *[8];
+  m_eff2DExpected = new TH2D** *[8];
 
-  strips = new TBox**** *[8];
-  stripsEff = new TBox**** *[8];
+  m_strips = new TBox**** *[8];
+  m_stripsEff = new TBox**** *[8];
 
-  stripHits = new int**** [8];
-  stripHitsEff = new int**** [8];
-  stripNonHitsEff = new int**** [8];
+  m_stripHits = new int**** [8];
+  m_stripHitsEff = new int**** [8];
+  m_stripNonHitsEff = new int**** [8];
 
-  if (!strips || !stripsEff)
+  if (!m_strips || !m_stripsEff)
   {cout << "no strips!" << endl; B2ERROR("no strip");}
   float stripPix = 1000 / 48;
   float stripPixScinti = 1000 / 54;
 
   //all modules
-  char buffer[100];
-  for (int i = 0; i < 8; i++) {
-    strips[i] = new TBox**** [15];
-    stripsEff[i] = new TBox**** [15];
-    if (!strips[i] || !stripsEff[i])
-    {cout << "no strips!  i" << endl; B2ERROR("no strip");}
-    stripHits[i] = new int** *[15];
-    stripHitsEff[i] = new int** *[15];
-    stripNonHitsEff[i] = new int** *[15];
-    cModule[i] = new TCanvas*[16];
-    cModuleEff[i] = new TCanvas*[16];
-    cModuleEff2D[i] = new TCanvas*[16];
-    eff2DFound[i] = new TH2D** [16];
-    eff2DExpected[i] = new TH2D** [16];
 
+  for (int i = 0; i < 8; i++) {
+    m_strips[i] = new TBox**** [15];
+    m_stripsEff[i] = new TBox**** [15];
+    if (!m_strips[i] || !m_stripsEff[i])
+    {cout << "no strips!  i" << endl; B2ERROR("no strip");}
+    m_stripHits[i] = new int** *[15];
+    m_stripHitsEff[i] = new int** *[15];
+    m_stripNonHitsEff[i] = new int** *[15];
+    m_cModule[i] = new TCanvas*[16];
+    m_cModuleEff[i] = new TCanvas*[16];
+    m_cModuleEff2D[i] = new TCanvas*[16];
+    m_eff2DFound[i] = new TH2D** [16];
+    m_eff2DExpected[i] = new TH2D** [16];
+    char buffer[100];
 
     for (int iLay = 0; iLay < 15; iLay++) {
+
       sprintf(buffer, "Sector%d_layer%d", i + 1, iLay + 1);
-      cModule[i][iLay] = new TCanvas(buffer, buffer, 0, 0, 1000, 800);
+      m_cModule[i][iLay] = new TCanvas(buffer, buffer, 0, 0, 1000, 800);
       sprintf(buffer, "EffSector%d_layer%d", i + 1, iLay + 1);
-      cModuleEff[i][iLay] = new TCanvas(buffer, buffer, 0, 0, 1000, 800);
+      m_cModuleEff[i][iLay] = new TCanvas(buffer, buffer, 0, 0, 1000, 800);
       sprintf(buffer, "Eff2DSector%d_layer%d", i + 1, iLay + 1);
-      cModuleEff2D[i][iLay] = new TCanvas(buffer, buffer, 0, 0, 1000, 800);
+      m_cModuleEff2D[i][iLay] = new TCanvas(buffer, buffer, 0, 0, 1000, 800);
 
-      strips[i][iLay] = new TBox** *[2];
-      stripsEff[i][iLay] = new TBox** *[2];
-      eff2DFound[i][iLay] = new TH2D*[2];
-      eff2DExpected[i][iLay] = new TH2D*[2];
+      m_strips[i][iLay] = new TBox** *[2];
+      m_stripsEff[i][iLay] = new TBox** *[2];
+      m_eff2DFound[i][iLay] = new TH2D*[2];
+      m_eff2DExpected[i][iLay] = new TH2D*[2];
 
-      if (!strips[i][iLay] || !stripsEff[i][iLay])
+      if (!m_strips[i][iLay] || !m_stripsEff[i][iLay])
       {cout << "no strips! ilay" << endl; B2ERROR("no strip");}
-      stripHits[i][iLay] = new int** [2];
-      stripHitsEff[i][iLay] = new int** [2];
-      stripNonHitsEff[i][iLay] = new int** [2];
+      m_stripHits[i][iLay] = new int** [2];
+      m_stripHitsEff[i][iLay] = new int** [2];
+      m_stripNonHitsEff[i][iLay] = new int** [2];
       //left right, phi and z strips
-      cModule[i][iLay]->Divide(2, 2);
-      cModuleEff[i][iLay]->Divide(2, 2);
+      m_cModule[i][iLay]->Divide(2, 2);
+      m_cModuleEff[i][iLay]->Divide(2, 2);
       //each module canvas gets one pad for phi/theta strips, forward backward
       //forward/backward
 
 
       //don't divide the 2D effs in z/phi because we look at D effs. We still want to divide in fwd/backwd
-      cModuleEff2D[i][iLay]->Divide(2);
+      m_cModuleEff2D[i][iLay]->Divide(2);
 
       for (int j = 0; j < 2; j++) {
 
         sprintf(buffer, "EffFound_Sector%d_layer%d_fwd%d", i + 1, iLay + 1, j);
-        eff2DFound[i][iLay][j] = new TH2D(buffer, buffer, 50, -200.0, 200.0, 50, 0.0, 300.0);
+        m_eff2DFound[i][iLay][j] = new TH2D(buffer, buffer, 50, -200.0, 200.0, 50, 0.0, 300.0);
         sprintf(buffer, "EffExpected_Sector%d_layer%d_fwd%d", i + 1, iLay + 1, j);
-        eff2DExpected[i][iLay][j] = new TH2D(buffer, buffer, 50, -200.0, 200, 50, 0.0, 300.0);
+        m_eff2DExpected[i][iLay][j] = new TH2D(buffer, buffer, 50, -200.0, 200, 50, 0.0, 300.0);
 
-        strips[i][iLay][j] = new TBox** [2];
-        stripsEff[i][iLay][j] = new TBox** [2];
-        if (!strips[i][iLay][j] || !strips[i][iLay][j])
+        m_strips[i][iLay][j] = new TBox** [2];
+        m_stripsEff[i][iLay][j] = new TBox** [2];
+        if (!m_strips[i][iLay][j] || !m_stripsEff[i][iLay][j])
         {cout << "no strips! j" << endl; B2ERROR("no strip");}
-        stripHits[i][iLay][j] = new int*[2];
-        stripHitsEff[i][iLay][j] = new int*[2];
-        stripNonHitsEff[i][iLay][j] = new int*[2];
+        m_stripHits[i][iLay][j] = new int*[2];
+        m_stripHitsEff[i][iLay][j] = new int*[2];
+        m_stripNonHitsEff[i][iLay][j] = new int*[2];
         //theta/phi, use the size of the RPC modules as the range
         //z for each module is about 220cm (440 fwd+bkwd), y is 167-275 cm...
         //but this doesn't matter, since we'll be using 2D histos anyways
-        //        cModuleEff2D[i][iLay]->cd(j+1)->Range(0,0,300,300);
+        //        m_cModuleEff2D[i][iLay]->cd(j+1)->Range(0,0,300,300);
         for (int k = 0; k < 2; k++) {
-          (cModule[i][iLay]->cd(j * 2 + k + 1))->Range(0, 0, 1000, 1000);
-          (cModuleEff[i][iLay]->cd(j * 2 + k + 1))->Range(0, 0, 1000, 1000);
-          strips[i][iLay][j][k] = new TBox*[54];
-          stripsEff[i][iLay][j][k] = new TBox*[54];
-          if (!strips[i][iLay][j][k] || !strips[i][iLay][j][k])
+          (m_cModule[i][iLay]->cd(j * 2 + k + 1))->Range(0, 0, 1000, 1000);
+          (m_cModuleEff[i][iLay]->cd(j * 2 + k + 1))->Range(0, 0, 1000, 1000);
+          m_strips[i][iLay][j][k] = new TBox*[54];
+          m_stripsEff[i][iLay][j][k] = new TBox*[54];
+          if (!m_strips[i][iLay][j][k] || !m_stripsEff[i][iLay][j][k])
           {cout << "no strips! c" << endl; B2ERROR("no strip");}
-          stripHits[i][iLay][j][k] = new int[54];
-          stripHitsEff[i][iLay][j][k] = new int[54];
-          stripNonHitsEff[i][iLay][j][k] = new int[54];
+          m_stripHits[i][iLay][j][k] = new int[54];
+          m_stripHitsEff[i][iLay][j][k] = new int[54];
+          m_stripNonHitsEff[i][iLay][j][k] = new int[54];
           for (int l = 0; l < 54; l++) {
             if (iLay >= 2) {
-              strips[i][iLay][j][k][l] = new TBox(l * stripPix + 4, 100, (l + 1)*stripPix - 4, 900);
-              stripsEff[i][iLay][j][k][l] = new TBox(l * stripPix + 4, 100, (l + 1)*stripPix - 4, 900);
+              m_strips[i][iLay][j][k][l] = new TBox(l * stripPix + 4, 100, (l + 1)*stripPix - 4, 900);
+              m_stripsEff[i][iLay][j][k][l] = new TBox(l * stripPix + 4, 100, (l + 1)*stripPix - 4, 900);
             }
             //scintillator layer
             else {
-              strips[i][iLay][j][k][l] = new TBox(l * stripPixScinti + 4, 100, (l + 1)*stripPixScinti - 4, 900);
-              stripsEff[i][iLay][j][k][l] = new TBox(l * stripPixScinti + 4, 100, (l + 1)*stripPixScinti - 4, 900);
+              m_strips[i][iLay][j][k][l] = new TBox(l * stripPixScinti + 4, 100, (l + 1)*stripPixScinti - 4, 900);
+              m_stripsEff[i][iLay][j][k][l] = new TBox(l * stripPixScinti + 4, 100, (l + 1)*stripPixScinti - 4, 900);
 
             }
-            stripHits[i][iLay][j][k][l] = 0;
-            stripHitsEff[i][iLay][j][k][l] = 0;
-            stripNonHitsEff[i][iLay][j][k][l] = 0;
+            m_stripHits[i][iLay][j][k][l] = 0;
+            m_stripHitsEff[i][iLay][j][k][l] = 0;
+            m_stripNonHitsEff[i][iLay][j][k][l] = 0;
           }
 
         }
@@ -204,35 +203,35 @@ void BKLMEffnRadioModule::initialize()
   }
 
   //initialize other histograms...
-  hHitsPerLayer = new TH1D("HitsPerLayer", "HitsPerLayer", 15, 0, 15);
-  hHitsPerLayer->SetFillColor(kYellow);
-  hHitsPerLayer->GetXaxis()->SetTitle("Hits Per Layer");
-  hClusterSize = new TH1D("ClusterSize", "ClusterSize", 10, 0, 10);
-  hClusterSize->SetFillColor(kYellow);
-  hClusterSize->GetXaxis()->SetTitle("Cluster Size");
+  m_hHitsPerLayer = new TH1D("HitsPerLayer", "HitsPerLayer", 15, 0, 15);
+  m_hHitsPerLayer->SetFillColor(kYellow);
+  m_hHitsPerLayer->GetXaxis()->SetTitle("Hits Per Layer");
+  m_hClusterSize = new TH1D("ClusterSize", "ClusterSize", 10, 0, 10);
+  m_hClusterSize->SetFillColor(kYellow);
+  m_hClusterSize->GetXaxis()->SetTitle("Cluster Size");
 
-  hTrackPhi = new TH1D("TrackPhi", "TrackPhi", 100, 0, 2 * TMath::Pi());
-  hTrackPhi->GetXaxis()->SetTitle("Track #phi");
-  hTrackPhi->SetFillColor(kYellow);
+  m_hTrackPhi = new TH1D("TrackPhi", "TrackPhi", 100, 0, 2 * TMath::Pi());
+  m_hTrackPhi->GetXaxis()->SetTitle("Track #phi");
+  m_hTrackPhi->SetFillColor(kYellow);
 
-  hTrackTheta = new TH1D("TrackTheta", "TrackTheta", 100, 0, TMath::Pi());
-  hTrackTheta->GetXaxis()->SetTitle("Track #theta");
-  hTrackTheta->SetFillColor(kYellow);
+  m_hTrackTheta = new TH1D("TrackTheta", "TrackTheta", 100, 0, TMath::Pi());
+  m_hTrackTheta->GetXaxis()->SetTitle("Track #theta");
+  m_hTrackTheta->SetFillColor(kYellow);
 
 
-  hTracksPerEvent = new TH1D("TracksPerEvent", "TracksPerEvent", 10, 0, 10);
-  hTracksPerEvent->SetFillColor(kYellow);
-  hTracksPerEvent->GetXaxis()->SetTitle("Tracks Per Event");
+  m_hTracksPerEvent = new TH1D("TracksPerEvent", "TracksPerEvent", 10, 0, 10);
+  m_hTracksPerEvent->SetFillColor(kYellow);
+  m_hTracksPerEvent->GetXaxis()->SetTitle("Tracks Per Event");
 
-  hHitsPerEvent1D = new TH1D("hitsPerEvent1D", "hitsPerEvent1D", 50, 0, 50);
-  hHitsPerEvent1D->SetFillColor(kYellow);
-  hHitsPerEvent1D->GetXaxis()->SetTitle("1D hits per event");
-  hHitsPerEvent2D = new TH1D("hitsPerEvent2D", "hitsPerEvent2D", 50, 0, 50);
-  hHitsPerEvent2D->SetFillColor(kYellow);
-  hHitsPerEvent2D->GetXaxis()->SetTitle("2D hits per event");
-  hHitsPerEventPerLayer1D = new TH2D("hitsPerLayer1D", "hitsPerLayer1D", 50, 0, 50, 15, 0, 15);
-  hHitsPerEventPerLayer1D->GetXaxis()->SetTitle("#1D hits");
-  hHitsPerEventPerLayer1D->GetYaxis()->SetTitle("layer");
+  m_hHitsPerEvent1D = new TH1D("hitsPerEvent1D", "hitsPerEvent1D", 50, 0, 50);
+  m_hHitsPerEvent1D->SetFillColor(kYellow);
+  m_hHitsPerEvent1D->GetXaxis()->SetTitle("1D hits per event");
+  m_hHitsPerEvent2D = new TH1D("hitsPerEvent2D", "hitsPerEvent2D", 50, 0, 50);
+  m_hHitsPerEvent2D->SetFillColor(kYellow);
+  m_hHitsPerEvent2D->GetXaxis()->SetTitle("2D hits per event");
+  m_hHitsPerEventPerLayer1D = new TH2D("hitsPerLayer1D", "hitsPerLayer1D", 50, 0, 50, 15, 0, 15);
+  m_hHitsPerEventPerLayer1D->GetXaxis()->SetTitle("#1D hits");
+  m_hHitsPerEventPerLayer1D->GetYaxis()->SetTitle("layer");
 
 
 }
@@ -251,18 +250,18 @@ void BKLMEffnRadioModule::event()
   StoreArray<BKLMHit1d> hits1D;
   //  cout <<" we have " << hits1D.getEntries() << " 1D hits " << endl;
 
-  hHitsPerEvent1D->Fill(hits1D.getEntries());
+  m_hHitsPerEvent1D->Fill(hits1D.getEntries());
   int hitsPerLayer[16];
   memset(hitsPerLayer, 0, 16 * sizeof(int));
   for (int h = 0; h < hits1D.getEntries(); h++) {
     int sector = hits1D[h]->getSector() - 1;
-    if (sector < 0 || sector >= 8) {
+    if ((sector < 0) || (sector >= 8)) {
       cout << "sector:" << sector << endl;
       B2ERROR("wrong sector number ");
     }
     int layer = hits1D[h]->getLayer() - 1;
     //      cout <<"layer is : "<< layer <<endl;
-    if (layer < 0 || layer >= 15) {
+    if ((layer < 0) || (layer >= 15)) {
       cout << "layer: " << layer << endl;
       B2ERROR("wrong layer number");
     }
@@ -273,8 +272,8 @@ void BKLMEffnRadioModule::event()
     int channelMin = hits1D[h]->getStripMin() - 1;
     int channelMax = hits1D[h]->getStripMax() - 1;
 
-    hClusterSize->Fill(channelMax - channelMin + 1);
-    hHitsPerLayer->Fill(layer);
+    m_hClusterSize->Fill(channelMax - channelMin + 1);
+    m_hHitsPerLayer->Fill(layer);
 
 
     //scintillator layers have 54 channels, not 48 like the rpcs
@@ -291,12 +290,12 @@ void BKLMEffnRadioModule::event()
       isPhi = 1;
     }
     for (int c = channelMin; c <= channelMax; c++) {
-      stripHits[sector][layer][fwd][isPhi][c]++;
+      m_stripHits[sector][layer][fwd][isPhi][c]++;
     }
 
   }
   for (int i = 0; i < 16; i++) {
-    hHitsPerEventPerLayer1D->Fill(hitsPerLayer[i], i);
+    m_hHitsPerEventPerLayer1D->Fill(hitsPerLayer[i], i);
   }
 
   getEffs();
@@ -317,8 +316,8 @@ void BKLMEffnRadioModule::terminate()
       for (int j = 0; j < 2; j++) {
         for (int k = 0; k < 2; k++) {
           for (int l = 0; l < 54; l++) {
-            if (stripHits[i][iLay][j][k][l] > maxStripHits) {
-              maxStripHits = stripHits[i][iLay][j][k][l];
+            if (m_stripHits[i][iLay][j][k][l] > maxStripHits) {
+              maxStripHits = m_stripHits[i][iLay][j][k][l];
             }
           }
         }
@@ -348,21 +347,21 @@ void BKLMEffnRadioModule::terminate()
     for (int iLay = 0; iLay < 15; iLay++) {
       for (int j = 0; j < 2; j++) {
 
-        cModuleEff2D[i][iLay]->cd(j + 1);
+        m_cModuleEff2D[i][iLay]->cd(j + 1);
 
-        for (int nx = 0; nx < eff2DFound[i][iLay][j]->GetNbinsX(); nx++) {
-          for (int ny = 0; ny < eff2DFound[i][iLay][j]->GetNbinsY(); ny++) {
-            if (eff2DExpected[i][iLay][j]->GetBinContent(nx, ny) > 0) {
-              float denom = eff2DExpected[i][iLay][j]->GetBinContent(nx, ny);
-              eff2DFound[i][iLay][j]->SetBinContent(nx, ny, eff2DFound[i][iLay][j]->GetBinContent(nx, ny) / denom);
+        for (int nx = 0; nx < m_eff2DFound[i][iLay][j]->GetNbinsX(); nx++) {
+          for (int ny = 0; ny < m_eff2DFound[i][iLay][j]->GetNbinsY(); ny++) {
+            if (m_eff2DExpected[i][iLay][j]->GetBinContent(nx, ny) > 0) {
+              float denom = m_eff2DExpected[i][iLay][j]->GetBinContent(nx, ny);
+              m_eff2DFound[i][iLay][j]->SetBinContent(nx, ny, m_eff2DFound[i][iLay][j]->GetBinContent(nx, ny) / denom);
             }
           }
         }
-        eff2DFound[i][iLay][j]->Draw("colz");
+        m_eff2DFound[i][iLay][j]->Draw("colz");
 
 
         for (int k = 0; k < 2; k++) {
-          cModule[i][iLay]->cd(j * 2 + k + 1);
+          m_cModule[i][iLay]->cd(j * 2 + k + 1);
           char buffer[100];
           char fwd[10];
           char phi[10];
@@ -382,13 +381,13 @@ void BKLMEffnRadioModule::terminate()
             if (iLay >= 2 && l >= 48)
               continue;
             //colors 51-99 seem to be fine...
-            float colorIndex = stripHits[i][iLay][j][k][l] / (float)maxStripHits;
+            float colorIndex = m_stripHits[i][iLay][j][k][l] / (float)maxStripHits;
 
             colorIndex = colorIndex * 48 + 51;
 
-            strips[i][iLay][j][k][l]->SetFillColor(ceil(colorIndex));
+            m_strips[i][iLay][j][k][l]->SetFillColor(ceil(colorIndex));
             //      strips[i][iLay][j][k][l]->SetFillColor(50+l+50*k);
-            strips[i][iLay][j][k][l]->Draw();
+            m_strips[i][iLay][j][k][l]->Draw();
           }
           //draw over strips
           TLatex l(10, 10, buffer);
@@ -399,16 +398,16 @@ void BKLMEffnRadioModule::terminate()
 
 
 
-      cModuleEff2D[i][iLay]->Draw();
-      cModuleEff2D[i][iLay]->Write();
+      m_cModuleEff2D[i][iLay]->Draw();
+      m_cModuleEff2D[i][iLay]->Write();
 
       if (i == 0 && iLay == 0) {
-        cModuleEff2D[i][iLay]->SaveAs("effs.pdf(");
+        m_cModuleEff2D[i][iLay]->SaveAs("effs.pdf(");
       } else {
         if (i == 7 && iLay == 14) {
-          cModuleEff2D[i][iLay]->SaveAs("effs.pdf)");
+          m_cModuleEff2D[i][iLay]->SaveAs("effs.pdf)");
         } else {
-          cModuleEff2D[i][iLay]->SaveAs("effs.pdf");
+          m_cModuleEff2D[i][iLay]->SaveAs("effs.pdf");
         }
       }
 
@@ -416,31 +415,31 @@ void BKLMEffnRadioModule::terminate()
 
 
 
-      cModule[i][iLay]->Draw();
-      cModule[i][iLay]->Write();
+      m_cModule[i][iLay]->Draw();
+      m_cModule[i][iLay]->Write();
 
       if (i == 0 && iLay == 0) {
         cLegend.SaveAs("radio.pdf(");
-        cModule[i][iLay]->SaveAs("radio.pdf");
+        m_cModule[i][iLay]->SaveAs("radio.pdf");
 
       } else {
         if (i == 7 && iLay == 14) {
-          cModule[i][iLay]->SaveAs("radio.pdf)");
+          m_cModule[i][iLay]->SaveAs("radio.pdf)");
         } else {
-          cModule[i][iLay]->SaveAs("radio.pdf");
+          m_cModule[i][iLay]->SaveAs("radio.pdf");
         }
       }
     }
   }
 
-  hHitsPerLayer->Write();
-  hClusterSize->Write();
-  hTracksPerEvent->Write();
-  hHitsPerEvent1D->Write();
-  hHitsPerEvent2D->Write();
-  hHitsPerEventPerLayer1D->Write();
-  hTrackPhi->Write();
-  hTrackTheta->Write();
+  m_hHitsPerLayer->Write();
+  m_hClusterSize->Write();
+  m_hTracksPerEvent->Write();
+  m_hHitsPerEvent1D->Write();
+  m_hHitsPerEvent2D->Write();
+  m_hHitsPerEventPerLayer1D->Write();
+  m_hTrackPhi->Write();
+  m_hTrackTheta->Write();
 
 
   m_file->Write();
@@ -459,7 +458,7 @@ void BKLMEffnRadioModule::getEffs()
   StoreArray<BKLMHit2d> hits2D;
   m_GeoPar = GeometryPar::instance();
 
-  hHitsPerEvent2D->Fill(hits2D.getEntries());
+  m_hHitsPerEvent2D->Fill(hits2D.getEntries());
 
   //we should
   // -get the track candidate
@@ -471,7 +470,7 @@ void BKLMEffnRadioModule::getEffs()
   for (int effLayer = 1; effLayer <= 16; effLayer++) {
     int numTracks = 0;
     //for each efficiency layer, memorize the points used, so we don't find the same track twice
-    pointIndices.clear();
+    m_pointIndices.clear();
     float effX = 0;
 
     if (effLayer < 16) {
@@ -483,7 +482,7 @@ void BKLMEffnRadioModule::getEffs()
       int layer1 = hits2D[h]->getLayer();
       if (effLayer == layer1)
         continue;
-      if (pointIndices.find(h) != pointIndices.end()) {
+      if (m_pointIndices.find(h) != m_pointIndices.end()) {
 
         continue;
       }
@@ -503,7 +502,7 @@ void BKLMEffnRadioModule::getEffs()
 
 
         //check if these hits have already been used for tracks
-        if (pointIndices.find(h2) != pointIndices.end()) {
+        if (m_pointIndices.find(h2) != m_pointIndices.end()) {
           continue;
         }
 
@@ -569,7 +568,7 @@ void BKLMEffnRadioModule::getEffs()
           //check if we find a point in effLayer which is also in this sector and close to the track
           bool found = false;
           for (int e = 0; e < hits2D.getEntries(); e++) {
-            if (hits2D[e]->getLayer() != effLayer || hits2D[e]->getSector() != sector1 || hits2D[e]->isForward() != fwd1)
+            if ((hits2D[e]->getLayer() != effLayer) || (hits2D[e]->getSector() != sector1) || (hits2D[e]->isForward() != fwd1))
               continue;
             //looking at hit in this layer..., see how far away we are from the projected hit...
             TVector3 candGlPos = hits2D[e]->getGlobalPosition();
@@ -591,15 +590,15 @@ void BKLMEffnRadioModule::getEffs()
 
           }
           if (found)
-            eff2DFound[sector1 - 1][effLayer - 1][fwd1]->Fill(expHitExtrapol.Y(), expHitExtrapol.Z());
-          eff2DExpected[sector1 - 1][effLayer - 1][fwd1]->Fill(expHitExtrapol.Y(), expHitExtrapol.Z());
+            m_eff2DFound[sector1 - 1][effLayer - 1][fwd1]->Fill(expHitExtrapol.Y(), expHitExtrapol.Z());
+          m_eff2DExpected[sector1 - 1][effLayer - 1][fwd1]->Fill(expHitExtrapol.Y(), expHitExtrapol.Z());
 
 
 
           //now that we checked the efficieny for this track, lets delete the points for the track
           //however, we memorize the ids used for that track, so we don't use the same points for a different track
           //for the same eff plane
-        } catch (string s) {
+        } catch (string& s) {
           //we land here if the eff.layer is outside the range of existing layeres
           //let's compute theta, phi of the track in the global reference frame
           //grab two points in the local system, transform to global and take the difference vector
@@ -615,11 +614,11 @@ void BKLMEffnRadioModule::getEffs()
           float phi = vDiff.phi();
           if (phi < 0)
             phi += (2 * TMath::Pi());
-          hTrackTheta->Fill(theta);
-          hTrackPhi->Fill(phi);
+          m_hTrackTheta->Fill(theta);
+          m_hTrackPhi->Fill(phi);
         }
         if (effLayer == 16) {
-          // UNUSED for(auto pi : pointIndices)
+          // UNUSED for(auto pi : m_pointIndices)
           {
             //          cout <<"using index : " <<pi<<endl;
           }
@@ -635,7 +634,7 @@ void BKLMEffnRadioModule::getEffs()
 
     }
     if (effLayer == 16) {
-      hTracksPerEvent->Fill(numTracks);
+      m_hTracksPerEvent->Fill(numTracks);
     }
   }
 
@@ -674,14 +673,14 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
     if (layer == effLayer)
       continue;
     //differnt layer, same sector
-    if (layer == layer1 || layer == layer2)
+    if ((layer == layer1) || (layer == layer2))
       continue;
     //same sector necessary? probably not, the test is pretty simple...
-    if (sector != sector1 || sector != sector2 || fwd1 != hits2D[h]->isForward() || fwd2 != fwd1)
+    if ((sector != sector1) || (sector != sector2) || (fwd1 != hits2D[h]->isForward()) || (fwd2 != fwd1))
       continue;
     //don't use points that are already part of other tracks... So don't allow sharing
     //tried only to disallow the same seeds but that doesn't seem to be enough...
-    if (pointIndices.find(h) != pointIndices.end())
+    if (m_pointIndices.find(h) != m_pointIndices.end())
       continue;
 
     TVector3 gl1 = hits2D[firstHit]->getGlobalPosition();
@@ -740,10 +739,10 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
     p2->z = candLocPos_cl2.z();
     points.push_back(p2);
 
-    pointIndices.insert(firstHit);
-    pointIndices.insert(secondHit);
+    m_pointIndices.insert(firstHit);
+    m_pointIndices.insert(secondHit);
     for (auto pi : locIndices) {
-      pointIndices.insert(pi);
+      m_pointIndices.insert(pi);
     }
     return true;
 

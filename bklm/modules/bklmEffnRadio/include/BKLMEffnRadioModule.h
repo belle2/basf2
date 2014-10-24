@@ -74,50 +74,41 @@ namespace Belle2 {
     bool validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& hits2D, vector<SimplePoint*>& points, const Belle2::bklm::Module* refMod, int effLayer);
 
     void set_plot_style();
-    TCanvas*** cModule;
-    TCanvas*** cModuleEff;
-    TCanvas*** cModuleEff2D;
+    TCanvas*** m_cModule;
+    TCanvas*** m_cModuleEff;
+    TCanvas*** m_cModuleEff2D;
 
-    TH1D* hTrackPhi;
-    TH1D* hTrackTheta;
+    TH1D* m_hTrackPhi;
+    TH1D* m_hTrackTheta;
 
-    TH1D* hHitsPerLayer;
-    TH1D* hClusterSize;
+    TH1D* m_hHitsPerLayer;
+    TH1D* m_hClusterSize;
 
-    TH1D* hTracksPerEvent;
-    TH1D* hHitsPerEvent1D;
-    TH1D* hHitsPerEvent2D;
-    TH2D* hHitsPerEventPerLayer1D;
+    TH1D* m_hTracksPerEvent;
+    TH1D* m_hHitsPerEvent1D;
+    TH1D* m_hHitsPerEvent2D;
+    TH2D* m_hHitsPerEventPerLayer1D;
 
 
 
-    TH2D**** eff2DFound;
-    TH2D**** eff2DExpected;
+    TH2D**** m_eff2DFound;
+    TH2D**** m_eff2DExpected;
 
-    TBox****** strips;
-    TBox****** stripsEff;
+    TBox****** m_strips;
+    TBox****** m_stripsEff;
 
     TFile* m_file;
     string m_filename;
-    int moduleID;
 
-    TBox* leftRPC;
-    TBox* rightRPC;
-
-    int nEvents;
     //number of hits for each strip. Don't think that moving average is necessary here...
-    int***** stripHits;
-    int***** stripHitsEff;
-    int***** stripNonHitsEff;
+    int***** m_stripHits;
+    int***** m_stripHitsEff;
+    int***** m_stripNonHitsEff;
 
   private:
     bklm::GeometryPar* m_GeoPar;
     //to keep track which 2D hits where already used for tracks...
-    set<int> pointIndices;
-
-
-
-
+    set<int> m_pointIndices;
   };
 }
 

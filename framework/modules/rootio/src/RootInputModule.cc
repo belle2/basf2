@@ -114,8 +114,8 @@ void RootInputModule::initialize()
     m_tree->Add(m_inputFileNames[iFile].c_str());
     B2INFO("Added file " + m_inputFileNames[iFile]);
   }
-  B2INFO("Opened tree '" + c_treeNames[DataStore::c_Persistent] + "' with " + m_persistent->GetEntries() << " entries.");
-  B2INFO("Opened tree '" + c_treeNames[DataStore::c_Event] + "' with " + m_tree->GetEntries() << " entries.");
+  B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Persistent] + "' with " + m_persistent->GetEntries() << " entries.");
+  B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Event] + "' with " + m_tree->GetEntries() << " entries.");
 
   connectBranches(m_persistent, DataStore::c_Persistent, &m_persistentStoreEntries);
   readPersistentEntry(0);
@@ -126,7 +126,6 @@ void RootInputModule::initialize()
   } else {
     InputController::setCanControlInput(true);
     InputController::setChain(m_tree);
-    InputController::setNumEntries(m_tree->GetEntries());
   }
 
   if (m_parentLevel > 0) {
@@ -178,9 +177,19 @@ void RootInputModule::readTree()
 {
   if (!m_tree)
     return;
+
+  const string prevFile = m_tree->GetCurrentFile()->GetName();
+
   // Check if there are still new entries available.
-  if (m_counterNumber >= m_tree->GetEntriesFast())
+  int localEntryNumber = m_tree->LoadTree(m_counterNumber);
+
+  if (localEntryNumber == -2) {
+    return; //end of file
+  } else if (localEntryNumber < 0) {
+    B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. (TChain::LoadTree() returned error " << localEntryNumber << ")");
     return;
+  }
+
   B2DEBUG(200, "Reading file entry " << m_counterNumber);
 
   //Make sure transient members of objects are reinitialised
@@ -193,8 +202,7 @@ void RootInputModule::readTree()
     }
   }
 
-  const string prevFile = m_tree->GetCurrentFile()->GetName();
-  int bytesRead = m_tree->GetEntry(m_counterNumber);
+  int bytesRead = m_tree->GetTree()->GetEntry(localEntryNumber);
   if (bytesRead <= 0) {
     B2FATAL("Could not read 'tree' entry " << m_counterNumber << " in file " << m_tree->GetCurrentFile()->GetName());
   }

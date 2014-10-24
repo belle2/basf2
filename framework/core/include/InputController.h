@@ -57,17 +57,14 @@ namespace Belle2 {
     /** Return event number set via setNextEntry(). */
     static long getNextEvent() { return s_nextEvent; }
 
-
     /** returns the entry number currently loaded. */
     static long getCurrentEntry() { return s_currentEntry; }
+
     /** Returns total number of entries in the event tree.
      *
      * If no file is opened, zero is returned.
      */
-    static long numEntries() { return s_numEntries; }
-
-    /** set total number of entries in the opened file. */
-    static void setNumEntries(long n) { s_numEntries = n; }
+    static long numEntries();
 
     /** Return name of current file in loaded chain (or empty string if none loaded). */
     static std::string getCurrentFileName();
@@ -112,9 +109,6 @@ namespace Belle2 {
 
     /** current entry in file. */
     static long s_currentEntry;
-
-    /** total number of entries in event tree, or zero if none exists. */
-    static long s_numEntries;
 
     /** Opened TChain (event durability). */
     static const TChain* s_chain;

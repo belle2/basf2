@@ -116,12 +116,12 @@ namespace Belle2 {
 
   void ParticleListManipulatorModule::event()
   {
-    StoreArray<Particle> particles;
+    const StoreArray<Particle> particles;
     StoreObjPtr<ParticleList> plist(m_outputListName);
     bool existingList = plist.isValid();
 
     if (!existingList) {
-      // new particle list: create it, and copy all particles from input lists that pass selection criteria to this one
+      // new particle list: create it
       plist.create();
       plist->initialize(m_pdgCode, m_outputListName);
 
@@ -133,13 +133,13 @@ namespace Belle2 {
         antiPlist->bindAntiParticleList(*(plist));
       }
     }
-
+    // copy all particles from input lists that pass selection criteria into plist
     for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      StoreObjPtr<ParticleList> inPList(m_inputListNames[i]);
+      const StoreObjPtr<ParticleList> inPList(m_inputListNames[i]);
 
       std::vector<int> fsParticles     = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,               false);
-      std::vector<int> scParticles     = inPList->getList(ParticleList::EParticleType::c_SelfConjugatedParticle, false);
-      std::vector<int> fsAntiParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,               true);
+      const std::vector<int>& scParticles     = inPList->getList(ParticleList::EParticleType::c_SelfConjugatedParticle, false);
+      const std::vector<int>& fsAntiParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,               true);
 
       fsParticles.insert(fsParticles.end(), scParticles.begin(), scParticles.end());
       fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());

@@ -6,16 +6,12 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <geometry/GeometryManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <genfit/Track.h>
 #include <genfit/GFRaveVertex.h>
-#include <genfit/FieldManager.h>
-#include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
 
 #include <TApplication.h>
 #include <TGeoManager.h>

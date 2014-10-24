@@ -27,34 +27,47 @@ using namespace std;
 
 namespace Belle2 {
 
-  //could define a BKLM namespace, but other BKLM modules don't do it either...
-
+  //!Unpacker for the KLM
   class BKLMUnpackerModule : public Module {
   public:
-
+    //! Constructor
     BKLMUnpackerModule();
+    //! Destructor
     virtual ~BKLMUnpackerModule();
-
+    //! Initialize at start of job
     virtual void initialize();
+    //! Do any needed actions at the start of a simulation run
     virtual void beginRun();
+    //! Digitize one event and write hits, digis, and relations into DataStore
     virtual void event();
-
+    //! Do any needed actions at the end of a simulation run
     virtual void endRun();
+    //! Terminate at the end of job
     virtual void terminate();
 
-    struct BKLMLData {
-      unsigned int whatever : 32;
-    };
-
   private:
-    //to be used to map electronics address to module id
-    int electCooToInt(int copper, int finesse, int lane);
-    void intToElectCoo(int id, int& copper, int& finesse, int& lane);
-    map<int, int> electIdToModuleId;
 
+    //! fill m_electIdToModuleId from xml file
     void loadMap();
-    std::string m_mapFileName;
+
+    //!get the module id from the electroncis coordinates
+    //! @param copperId id of the copper board
+    //! @param finesseNum The Finesse slot on the copper boards
+    //! @param lane the lane number, giving for the rpcs the slot number in the crate
+    //! @param channel the channel
+    //! @param axis z or phi
     int getModuleId(int copperId, int finesseNum, int lane, int channel, int axis);
+
+    //! To be used to map electronics address to module id
+    //! @param copperId id of the copper board
+    //! @param finesseNum The Finesse slot on the copper boards
+    //! @param lane the lane number, giving for the rpcs the slot number in the crate
+    //! @param axis the axis bit in the datapacket
+    int electCooToInt(int copper, int finesse, int lane, int axis);
+
+    //    void intToElectCoo(int id, int& copper, int& finesse, int& lane);
+    //! to map hardware coordinates to logical coordinates
+    map<int, int> m_electIdToModuleId;
 
 
   };

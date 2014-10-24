@@ -20,6 +20,7 @@
 #include <boost/crc.hpp>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
+#include <bklm/dataobjects/BKLMStatus.h>
 
 #include <sstream>
 #include <iomanip>
@@ -38,15 +39,7 @@ REG_MODULE(BKLMUnpacker)
 BKLMUnpackerModule::BKLMUnpackerModule() : Module()
 {
   setDescription("Produce BKLMDigits from RawBKLM");
-
   //setPropertyFlags(c_ParallelProcessingCertified); //not sure ibf true yet...
-
-  //not needed since we use Belle2.xml
-  //  addParam("mapFile",m_mapFileName,"path of the electronics map",string(""));
-
-  //  Gearbox::getInstance().open();
-
-
 }
 
 
@@ -54,8 +47,6 @@ BKLMUnpackerModule::~BKLMUnpackerModule()
 {
 
 }
-
-
 
 void BKLMUnpackerModule::initialize()
 {
@@ -77,19 +68,21 @@ void BKLMUnpackerModule::loadMap()
       cout << "slotid : " << slotId << endl;
       for (GearDir & lane : slot.getNodes("Lane")) {
         int laneId = lane.getInt("@id");
-        int sector = lane.getInt("Sector");
-        int isForward = lane.getInt("IsForward");
-        int layer = lane.getInt("Layer");
+        for (GearDir & axis : lane.getNodes("Axis")) {
+          int axisId = axis.getInt("@id");
+          int sector = axis.getInt("Sector");
+          int isForward = axis.getInt("IsForward");
+          int layer = axis.getInt("Layer");
+          int plane = axis.getInt("Plane");
 
-        int elecId = electCooToInt(copperId, slotId, laneId);
-
-
-        int moduleId = 0;
-        moduleId = (isForward ? BKLM_END_MASK : 0)
-                   | ((sector - 1) << BKLM_SECTOR_BIT)
-                   | ((layer - 1) << BKLM_LAYER_BIT);
-        electIdToModuleId[elecId] = moduleId;
-
+          int elecId = electCooToInt(copperId, slotId, laneId, axisId);
+          int moduleId = 0;
+          moduleId = (isForward ? BKLM_END_MASK : 0)
+                     | ((sector - 1) << BKLM_SECTOR_BIT)
+                     | ((layer - 1) << BKLM_LAYER_BIT)
+                     | ((plane) << BKLM_PLANE_BIT);
+          m_electIdToModuleId[elecId] = moduleId;
+        }
       }
     }
   }
@@ -144,8 +137,9 @@ void BKLMUnpackerModule::event()
           //charge (lowest 12bits)
 
         }
-        char buffer[200];
+
         if (rawKLM[i]->GetDetectorNwords(j, finesse_num) != 2) {
+          char buffer[200];
           sprintf(buffer, "not the correct number of words: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
           B2ERROR(buffer);
           continue;
@@ -164,23 +158,23 @@ void BKLMUnpackerModule::event()
         unsigned short charge = bword4 & 0xFFF;
 
         //j should give the copper board
-        int moduleId = electIdToModuleId[electCooToInt(j, finesse_num, lane)];
+        int moduleId = m_electIdToModuleId[electCooToInt(j, finesse_num, lane, axis)];
         //still have to add the channel and axis
         int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-
+        //plane should already be set
         //moduleId counts are zero based
+
+        //only channel and inrpc flag is not set yet
+
         if (layer > 1)
           moduleId |= BKLM_INRPC_MASK;
-        //set plane_mask
         moduleId |= ((channel - 1) << BKLM_STRIP_BIT) | ((channel - 1) << BKLM_MAXSTRIP_BIT);
-        if (axis)
-          moduleId |= BKLM_PLANE_MASK;
+
 
         //(j,finesse_num,lane,channel,axis);
         BKLMDigit digit(moduleId, ctime, tdc, charge);
         //  Digit.setModuleID();
         bklmDigits.appendNew(digit);
-
 
       } //finesse boards
 
@@ -191,12 +185,12 @@ void BKLMUnpackerModule::event()
 }
 
 
-int BKLMUnpackerModule::electCooToInt(int copper, int finesse, int lane)
+int BKLMUnpackerModule::electCooToInt(int copper, int finesse, int lane, int axis)
 {
   //  there are at most 16 copper -->4 bit
   // 4 finesse --> 2 bit
   // < 16 lanes -->4 bit
-
+  // axis --> 1 bit
   int ret = 0;
   copper = copper & 0xF;
   ret |= copper;
@@ -204,23 +198,26 @@ int BKLMUnpackerModule::electCooToInt(int copper, int finesse, int lane)
   ret |= (finesse << 4);
   lane = lane & 0xF;
   ret |= (lane << 6);
+  axis = axis | 0x1;
+  ret |= (axis << 10);
+
   return ret;
 
 }
-
-void BKLMUnpackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane)
-{
-  copper = 0;
-  finesse = 0;
-  lane = 0;
-  copper = (id & 0xF);
-  finesse = (id >> 4) & 3;
-  lane = 0;
-  lane = (id >> 6) & 0xF;
-
-}
-
-
+///
+///void BKLMUnpackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane)
+///{
+///  copper = 0;
+///  finesse = 0;
+///  lane = 0;
+///  copper = (id & 0xF);
+///  finesse = (id >> 4) & 3;
+///  lane = 0;
+///  lane = (id >> 6) & 0xF;
+///
+///}
+///
+///
 void BKLMUnpackerModule::endRun()
 {
 

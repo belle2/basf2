@@ -58,7 +58,7 @@ using namespace RooFit ;
 void test2_Validation_B2Dpi() {
     /*  Take the BtoDpi prepared by the NtupleMaker */
     TChain* recoTree = new TChain("Bu_Dpi_tuple");
-    recoTree->AddFile("../Bu_Dpi,Kpi.ntup.root");
+    recoTree->AddFile("../Bu_Dpi_Kpi.ntup.root");
 
     TFile* output = TFile::Open("test2_Validation_Breco_output.root", "update");
     TDirectory* dir = output->mkdir("B2Dpi");
@@ -249,7 +249,7 @@ void test2_Validation_B2JpsiKS() {
     TList* list_web =  new TList;
 
     TChain* recoTree = new TChain("Bd_JpsiKS_tuple");
-    recoTree->AddFile("../Bd_JpsiKS,mumu.ntup.root");
+    recoTree->AddFile("../Bd_JpsiKS_mumu.ntup.root");
 
     TH1F* h_mbc    = new TH1F("mbc","B2JpsiKS, m_{bc} ;m_{bc} [GeV];Events/0.002 GeV" ,25,5.24,5.29);
     h_mbc->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed m_{bc} of B -> J/psi(mu mu) K_S(pi pi) signal MC, not truth matched - shown for reference."));

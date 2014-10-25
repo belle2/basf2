@@ -67,7 +67,7 @@ void BKLMEffnRadioModule::set_plot_style()
 
 }
 
-BKLMEffnRadioModule::BKLMEffnRadioModule() : Module(), m_minNumPointsOnTrack(7), m_maxEffDistance(10), m_eventCounter(0), m_cModule(nullptr), m_cModuleEff(nullptr), m_cModuleEff2D(nullptr), m_hTrackPhi(nullptr), m_hTrackTheta(nullptr), m_hHitsPerLayer(nullptr), m_hClusterSize(nullptr), m_hTracksPerEvent(nullptr), m_hHitsPerEvent1D(nullptr), m_hHitsPerEvent2D(nullptr), m_hHitsPerEventPerLayer1D(nullptr), m_eff2DFound(nullptr), m_eff2DExpected(nullptr), m_strips(nullptr), m_stripsEff(nullptr), m_file(nullptr), m_stripHits(nullptr), m_stripHitsEff(nullptr), m_stripNonHitsEff(nullptr), m_GeoPar(NULL)
+BKLMEffnRadioModule::BKLMEffnRadioModule() : Module(), m_minNumPointsOnTrack(7), m_maxEffDistance(10), m_eventCounter(0), m_cModule(nullptr), m_cModuleEff(nullptr), m_cModuleEff2D(nullptr), m_hTrackPhi(nullptr), m_hTrackTheta(nullptr), m_hHitsPerLayer(nullptr), m_hClusterSize(nullptr), m_hTracksPerEvent(nullptr), m_hHitsPerEvent1D(nullptr), m_hHitsPerEvent2D(nullptr), m_hHitsPerEventPerLayer1D(nullptr), m_hOccupancy1D(nullptr), m_eff2DFound(nullptr), m_eff2DExpected(nullptr), m_strips(nullptr), m_stripsEff(nullptr), m_file(nullptr), m_stripHits(nullptr), m_stripHitsEff(nullptr), m_stripNonHitsEff(nullptr), m_GeoPar(NULL)
 {
   setDescription("Get efficiency and generate radio plots for bklm");
   addParam("filename", m_filename, "Output root filename", string("eff_output.root"));
@@ -102,6 +102,9 @@ void BKLMEffnRadioModule::initialize()
   m_stripHitsEff = new int**** [8];
   m_stripNonHitsEff = new int**** [8];
 
+  m_hOccupancy1D = new TH1D**** [8];
+
+
   if (!m_strips || !m_stripsEff)
   {cout << "no strips!" << endl; B2ERROR("no strip");}
   float stripPix = 1000 / 48;
@@ -122,6 +125,7 @@ void BKLMEffnRadioModule::initialize()
     m_cModuleEff2D[i] = new TCanvas*[16];
     m_eff2DFound[i] = new TH2D** [16];
     m_eff2DExpected[i] = new TH2D** [16];
+    m_hOccupancy1D[i] = new TH1D** *[16];
     char buffer[100];
 
     for (int iLay = 0; iLay < 15; iLay++) {
@@ -132,7 +136,7 @@ void BKLMEffnRadioModule::initialize()
       m_cModuleEff[i][iLay] = new TCanvas(buffer, buffer, 0, 0, 1000, 800);
       sprintf(buffer, "Eff2DSector%d_layer%d", i + 1, iLay + 1);
       m_cModuleEff2D[i][iLay] = new TCanvas(buffer, buffer, 0, 0, 1000, 800);
-
+      m_hOccupancy1D[i][iLay] = new TH1D** [2];
       m_strips[i][iLay] = new TBox** *[2];
       m_stripsEff[i][iLay] = new TBox** *[2];
       m_eff2DFound[i][iLay] = new TH2D*[2];
@@ -167,6 +171,7 @@ void BKLMEffnRadioModule::initialize()
         m_stripHits[i][iLay][j] = new int*[2];
         m_stripHitsEff[i][iLay][j] = new int*[2];
         m_stripNonHitsEff[i][iLay][j] = new int*[2];
+        m_hOccupancy1D[i][iLay][j] = new TH1D*[2];
         //theta/phi, use the size of the RPC modules as the range
         //z for each module is about 220cm (440 fwd+bkwd), y is 167-275 cm...
         //but this doesn't matter, since we'll be using 2D histos anyways
@@ -181,6 +186,25 @@ void BKLMEffnRadioModule::initialize()
           m_stripHits[i][iLay][j][k] = new int[54];
           m_stripHitsEff[i][iLay][j][k] = new int[54];
           m_stripNonHitsEff[i][iLay][j][k] = new int[54];
+          char fwd[10];
+          char phi[10];
+          if (j == 1)
+            sprintf(fwd, "Forward");
+          else
+            sprintf(fwd, "Backward");
+          if (k == 1)
+            sprintf(phi, "Phi");
+          else
+            sprintf(phi, "Z");
+
+          sprintf(buffer, "Module%d_Layer%d_%s_%s", i + 1, iLay + 1, fwd, phi);
+          //48 channels
+          if (iLay >= 2)
+            m_hOccupancy1D[i][iLay][j][k] = new TH1D(buffer, buffer, 48, 0, 48);
+          else//54 channels
+            m_hOccupancy1D[i][iLay][j][k] = new TH1D(buffer, buffer, 54, 0, 54);
+          m_hOccupancy1D[i][iLay][j][k]->GetXaxis()->SetTitle("Channel #");
+          m_hOccupancy1D[i][iLay][j][k]->SetFillColor(kYellow);
           for (int l = 0; l < 54; l++) {
             if (iLay >= 2) {
               m_strips[i][iLay][j][k][l] = new TBox(l * stripPix + 4, 100, (l + 1)*stripPix - 4, 900);
@@ -291,6 +315,7 @@ void BKLMEffnRadioModule::event()
     }
     for (int c = channelMin; c <= channelMax; c++) {
       m_stripHits[sector][layer][fwd][isPhi][c]++;
+      m_hOccupancy1D[sector][layer][fwd][isPhi]->Fill(c);
     }
 
   }
@@ -362,6 +387,7 @@ void BKLMEffnRadioModule::terminate()
 
         for (int k = 0; k < 2; k++) {
           m_cModule[i][iLay]->cd(j * 2 + k + 1);
+          m_hOccupancy1D[i][iLay][j][k]->Write();
           char buffer[100];
           char fwd[10];
           char phi[10];
@@ -388,6 +414,7 @@ void BKLMEffnRadioModule::terminate()
             m_strips[i][iLay][j][k][l]->SetFillColor(ceil(colorIndex));
             //      strips[i][iLay][j][k][l]->SetFillColor(50+l+50*k);
             m_strips[i][iLay][j][k][l]->Draw();
+
           }
           //draw over strips
           TLatex l(10, 10, buffer);

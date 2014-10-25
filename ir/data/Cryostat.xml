@@ -1436,6 +1436,25 @@
 		<Desc>Tungsten shield in front of QCS2</Desc>
 	</Straight>
 
+        <Straight name="C5wal4">
+		<N desc="Number of planes">2</N>
+
+		<Z0 unit="cm">223</Z0>
+		<Z1 unit="cm">255</Z1>
+
+		<R0 unit="cm">30</R0>
+		<R1 unit="cm">30</R1>
+		<r0 unit="cm">27</r0>
+		<r1 unit="cm">27</r1>
+
+		<Intersect>C1wal1</Intersect>
+
+		<MotherVolume>C2spc2</MotherVolume>
+
+		<Material>W</Material>
+		<Desc>Tungsten shield in front of QCS2</Desc>
+	</Straight>
+
         <Straight name="C6spc1">
 		<N desc="Number of planes">5</N>
 

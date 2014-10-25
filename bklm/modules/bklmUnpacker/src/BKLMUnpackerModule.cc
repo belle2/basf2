@@ -74,9 +74,12 @@ void BKLMUnpackerModule::loadMap()
           int isForward = axis.getInt("IsForward");
           int layer = axis.getInt("Layer");
           int plane = axis.getInt("Plane");
-
           int elecId = electCooToInt(copperId, slotId, laneId, axisId);
           int moduleId = 0;
+
+          cout << "reading xml file...";
+          cout << " copperId: " << copperId << " slotId: " << slotId << " laneId: " << laneId << " axisId: " << axisId;
+          cout << " sector: " << sector << " isforward: " << isForward << " layer: " << layer << " plane: " << plane << endl;
           moduleId = (isForward ? BKLM_END_MASK : 0)
                      | ((sector - 1) << BKLM_SECTOR_BIT)
                      | ((layer - 1) << BKLM_LAYER_BIT)

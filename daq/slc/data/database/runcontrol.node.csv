@@ -5,7 +5,7 @@ RUNCONTROL, debug:dummycpu, true, HLT/hlt/1/default,0,1, false
 RUNCONTROL, debug:dummycpu, true, ECL/runcontrol/1/debug:dummycpu,0,1, false
 RUNCONTROL, debug:dumhslb:020:rand4k, true, STORAGE/storage/1/default,0,1, false
 RUNCONTROL, debug:dumhslb:020:rand4k, true, HLT/hlt/1/default,0,1, false
-RUNCONTROL, debug:dumhslb:020:rand4k, true, ECL/runcontrol/1/dumhslb:020:rand4k,0,1, false
+RUNCONTROL, debug:dumhslb:020:rand4k, true, ECL/runcontrol/1/debug:dumhslb:020:rand4k,0,1, false
 RUNCONTROL, debug:yamadahslb:10kHz, true, STORAGE/storage/1/default,0,1, false
 RUNCONTROL, debug:yamadahslb:10kHz, true, HLT/hlt/1/default,0,1, false
 RUNCONTROL, debug:yamadahslb:10kHz, true, ECL/runcontrol/1/debug:yamadahslb:10kHz,0,1, false

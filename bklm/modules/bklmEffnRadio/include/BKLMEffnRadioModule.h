@@ -44,11 +44,11 @@ namespace Belle2 {
     virtual  ~BKLMEffnRadioModule();
     //! Initialize at start of job
     virtual void initialize();
-    //! Do any needed actions at the start of a simulation run
+    //! begin run actions
     virtual void beginRun();
-    //! Digitize one event and write hits, digis, and relations into DataStore
+    //! Process one event (fill histograms etc)
     virtual void event();
-    //! Do any needed actions at the end of a simulation run
+    //! end run cleanunp
     virtual void endRun();
     //! Terminate at the end of job
     virtual void terminate();
@@ -56,16 +56,23 @@ namespace Belle2 {
   protected:
     //! struct to save the track parameters
     struct TrackParams {
+      //! slope of the track along z
       float bz;
+//! slope of the track along y
       float by;
+      //! z offset
       float mz;
+      //! y offset
       float my;
     };
 
     //! simple point class for the tracking
     struct SimplePoint {
+      //! x coordinate
       float x;
+      //! y coordinate
       float y;
+      //! z coordinate
       float z;
     };
 

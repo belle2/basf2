@@ -36,11 +36,11 @@ namespace Belle2 {
     virtual ~BKLMUnpackerModule();
     //! Initialize at start of job
     virtual void initialize();
-    //! Do any needed actions at the start of a simulation run
+    //! begin run stuff
     virtual void beginRun();
-    //! Digitize one event and write hits, digis, and relations into DataStore
+    //! Unpack one event and create digits
     virtual void event();
-    //! Do any needed actions at the end of a simulation run
+    //! end run stuff
     virtual void endRun();
     //! Terminate at the end of job
     virtual void terminate();

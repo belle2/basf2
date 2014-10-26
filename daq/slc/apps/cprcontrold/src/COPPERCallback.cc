@@ -30,6 +30,7 @@ COPPERCallback::COPPERCallback(const NSMNode& node,
     m_fee[i] = fee[i];
   }
   system("killall basf2");
+  m_force_boothslb = true;
 }
 
 COPPERCallback::~COPPERCallback() throw()
@@ -235,7 +236,8 @@ bool COPPERCallback::recover() throw()
     m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
   }
   if (m_hslb_firm != m_config.getSetup().getHSLBFirmware()) {
-    m_hslb_firm != m_config.getSetup().getHSLBFirmware();
+    m_force_boothslb = true;
+    m_hslb_firm = m_config.getSetup().getHSLBFirmware();
   }
   for (int i = 0; i < 4; i++) {
     if (m_config.useHSLB(i) && (m_force_boothslb || m_hslb[i].isError())) {

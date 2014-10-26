@@ -3,6 +3,7 @@
 #include <daq/slc/base/StringUtil.h>
 
 #include <daq/slc/system/File.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <mgt/libhslb.h>
 #include <mgt/hsreg.h>
@@ -67,14 +68,18 @@ bool HSLBController::boot(const std::string& runtype,
 {
   if (m_hslb.fd <= 0) return true;
   if (firmware.size() > 0 && File::exist(firmware)) {
-    system(StringUtil::form("booths -%c %s", (char)('a' + m_hslb.fin),
-                            firmware.c_str()).c_str());
+    std::string cmd = StringUtil::form("booths -%c %s", (char)('a' + m_hslb.fin),
+                                       firmware.c_str());
+    LogFile::debug(cmd);
+    system(cmd.c_str());
     if (runtype.find("dumhslb") != std::string::npos) {
       StringList str_v = StringUtil::split(runtype, ':');
       const std::string datfile = StringUtil::form("/home/usr/b2daq/run/dumhslb/%s.dat",
                                                    str_v[str_v.size() - 1].c_str());
-      system(StringUtil::form("write-dumhslb -%c %s", (char)('a' + m_hslb.fin),
-                              datfile.c_str()).c_str());
+      cmd = StringUtil::form("write-dumhslb -%c %s", (char)('a' + m_hslb.fin),
+                             datfile.c_str());
+      LogFile::debug(cmd);
+      system(cmd.c_str());
     }
     //return bootfpga(m_hslb.fd, (char*)firmware.c_str(),
     //                false, false, 6) == 0;

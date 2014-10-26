@@ -51,32 +51,32 @@
   CPR6006,debug:dummycpu,  cpr6006, ECL:V01:dummycpu,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
   CPR6007,debug:dummycpu,  cpr6007, ECL:V01:dummycpu,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
   CPR6008,debug:dummycpu,  cpr6008, ECL:V01:dummycpu,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
-  CPR5001,debug:dumhslb:020:rank4k,  cpr5001, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5002,debug:dumhslb:020:rank4k,  cpr5002, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5003,debug:dumhslb:020:rank4k,  cpr5003, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5004,debug:dumhslb:020:rank4k,  cpr5004, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5005,debug:dumhslb:020:rank4k,  cpr5005, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5006,debug:dumhslb:020:rank4k,  cpr5006, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5007,debug:dumhslb:020:rank4k,  cpr5007, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5008,debug:dumhslb:020:rank4k,  cpr5008, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5009,debug:dumhslb:020:rank4k,  cpr5009, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5010,debug:dumhslb:020:rank4k,  cpr5010, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5011,debug:dumhslb:020:rank4k,  cpr5011, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5012,debug:dumhslb:020:rank4k,  cpr5012, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5013,debug:dumhslb:020:rank4k,  cpr5013, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5014,debug:dumhslb:020:rank4k,  cpr5014, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR5015,debug:dumhslb:020:rank4k,  cpr5015, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR5016,debug:dumhslb:020:rank4k,  cpr5016, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR5017,debug:dumhslb:020:rank4k,  cpr5017, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR5018,debug:dumhslb:020:rank4k,  cpr5018, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6001,debug:dumhslb:020:rank4k,  cpr6001, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6002,debug:dumhslb:020:rank4k,  cpr6002, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6003,debug:dumhslb:020:rank4k,  cpr6003, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6004,debug:dumhslb:020:rank4k,  cpr6004, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6005,debug:dumhslb:020:rank4k,  cpr6005, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6006,debug:dumhslb:020:rank4k,  cpr6006, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6007,debug:dumhslb:020:rank4k,  cpr6007, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6008,debug:dumhslb:020:rank4k,  cpr6008, ECL:V01:dumhslb:020:rank4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5001,debug:dumhslb:020:rand4k,  cpr5001, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5002,debug:dumhslb:020:rand4k,  cpr5002, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5003,debug:dumhslb:020:rand4k,  cpr5003, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5004,debug:dumhslb:020:rand4k,  cpr5004, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5005,debug:dumhslb:020:rand4k,  cpr5005, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5006,debug:dumhslb:020:rand4k,  cpr5006, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5007,debug:dumhslb:020:rand4k,  cpr5007, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5008,debug:dumhslb:020:rand4k,  cpr5008, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5009,debug:dumhslb:020:rand4k,  cpr5009, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5010,debug:dumhslb:020:rand4k,  cpr5010, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5011,debug:dumhslb:020:rand4k,  cpr5011, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5012,debug:dumhslb:020:rand4k,  cpr5012, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5013,debug:dumhslb:020:rand4k,  cpr5013, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5014,debug:dumhslb:020:rand4k,  cpr5014, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5015,debug:dumhslb:020:rand4k,  cpr5015, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5016,debug:dumhslb:020:rand4k,  cpr5016, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5017,debug:dumhslb:020:rand4k,  cpr5017, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5018,debug:dumhslb:020:rand4k,  cpr5018, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6001,debug:dumhslb:020:rand4k,  cpr6001, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6002,debug:dumhslb:020:rand4k,  cpr6002, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6003,debug:dumhslb:020:rand4k,  cpr6003, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6004,debug:dumhslb:020:rand4k,  cpr6004, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6005,debug:dumhslb:020:rand4k,  cpr6005, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6006,debug:dumhslb:020:rand4k,  cpr6006, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6007,debug:dumhslb:020:rand4k,  cpr6007, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6008,debug:dumhslb:020:rand4k,  cpr6008, ECL:V01:dumhslb:020:rand4k,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
   CPR5001,debug:yamadahslb:10kHz,  cpr5001,ECL:V01:yamadahslb:10kHz,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
   CPR5002,debug:yamadahslb:10kHz,  cpr5002,ECL:V01:yamadahslb:10kHz,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
   CPR5003,debug:yamadahslb:10kHz,  cpr5003,ECL:V01:yamadahslb:10kHz,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000

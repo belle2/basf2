@@ -85,6 +85,7 @@ void BKLMUnpackerModule::loadMap()
                      | ((layer - 1) << BKLM_LAYER_BIT)
                      | ((plane) << BKLM_PLANE_BIT);
           m_electIdToModuleId[elecId] = moduleId;
+          cout << " electId: " << elecId << " modId: " << moduleId << endl;
         }
       }
     }
@@ -101,6 +102,7 @@ void BKLMUnpackerModule::beginRun()
 
 void BKLMUnpackerModule::event()
 {
+  cout << "unpacker..." << endl;
   StoreArray<RawKLM> rawKLM;
   StoreArray<BKLMDigit> bklmDigits;
 
@@ -111,7 +113,7 @@ void BKLMUnpackerModule::event()
       B2ERROR("rawKLM has more than one entry");
       continue;
     }
-    //      cout <<"num events in buffer: " << rawKLM[i]->GetNumEvents() <<" number of nodes (copper boards) " << rawKLM[i]->GetNumNodes() <<endl;
+    cout << "num events in buffer: " << rawKLM[i]->GetNumEvents() << " number of nodes (copper boards) " << rawKLM[i]->GetNumNodes() << endl;
     //getNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents. Number of nodes is num copper boards
     for (int j = 0; j < rawKLM[i]->GetNumEntries(); j++) {
       //since the buffer has multiple events this gets each event/node... but how to disentangle events? Maybe only one event there?
@@ -127,7 +129,7 @@ void BKLMUnpackerModule::event()
         //      cout <<"data in finesse num: " << finesse_num<< "(we have " << rawKLM[i]->GetDetectorNwords(j,finesse_num) << " words " <<endl;
         //we should get two words of 32 bits...
         for (int k = 0; k < rawKLM[i]->GetDetectorNwords(j, finesse_num); k++) {
-          //  printf("%.8x\n",buf_slot[k]);
+          printf("%.8x\n", buf_slot[k]);
 
           //in Brandon's documenation a word is 16 bit, however the basf2 word seems to be 32 bit
           //first word
@@ -147,10 +149,13 @@ void BKLMUnpackerModule::event()
           B2ERROR(buffer);
           continue;
         }
+        cout << "unpacking first word: " << buf_slot[0] << ", second: " << buf_slot[1] << endl;
         unsigned short bword1 = buf_slot[0] & 0xFFFF;
         unsigned short bword2 = (buf_slot[0] >> 16) & 0xFFFF;
         unsigned short bword3 = buf_slot[1] & 0xFFFF;
         unsigned short bword4 = (buf_slot[1] >> 16) & 0xFFFF;
+
+        cout << "unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
 
         unsigned short channel = bword1 & 0x7F;
         unsigned short axis = (bword1 >> 7) & 1;
@@ -159,9 +164,19 @@ void BKLMUnpackerModule::event()
         unsigned short ctime = bword2 & 0xFFFF; //full bword
         unsigned short tdc = bword3 & 0x7FF;
         unsigned short charge = bword4 & 0xFFF;
+        cout << "copper: " << j << " finesse: " << finesse_num << ", ";
+        cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl;
 
-        //j should give the copper board
-        int moduleId = m_electIdToModuleId[electCooToInt(j, finesse_num, lane, axis)];
+        //j should give the copper board. We add 1 because the xml file is one based
+        int electId = electCooToInt(j + 1, finesse_num + 1, lane, axis);
+        if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
+          char buffer[200];
+          sprintf(buffer, "could not find copperid %d, finesse %d, lane %d, axis %d in mapping\n", j + 1, finesse_num + 1, lane, axis);
+          B2INFO(buffer);
+          continue;
+        }
+        int moduleId = m_electIdToModuleId[electId];
+        cout << " electid: " << electId << " module: " << moduleId << endl;
         //still have to add the channel and axis
         int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
         //plane should already be set
@@ -173,11 +188,12 @@ void BKLMUnpackerModule::event()
           moduleId |= BKLM_INRPC_MASK;
         moduleId |= ((channel - 1) << BKLM_STRIP_BIT) | ((channel - 1) << BKLM_MAXSTRIP_BIT);
 
-
         //(j,finesse_num,lane,channel,axis);
         BKLMDigit digit(moduleId, ctime, tdc, charge);
         //  Digit.setModuleID();
         bklmDigits.appendNew(digit);
+
+        cout << "from digit:sector " << digit.getSector() << " layer: " << digit.getLayer() << " strip: " << digit.getStrip() << ", " << " isphi? " << digit.isPhiReadout() << " fwd? " << digit.isForward() << endl;
 
       } //finesse boards
 
@@ -194,14 +210,14 @@ int BKLMUnpackerModule::electCooToInt(int copper, int finesse, int lane, int axi
   // 4 finesse --> 2 bit
   // < 16 lanes -->4 bit
   // axis --> 1 bit
-  int ret = 0;
+  unsigned int ret = 0;
   copper = copper & 0xF;
   ret |= copper;
   finesse = finesse & 3;
   ret |= (finesse << 4);
   lane = lane & 0xF;
   ret |= (lane << 6);
-  axis = axis | 0x1;
+  axis = axis & 0x1;
   ret |= (axis << 10);
 
   return ret;

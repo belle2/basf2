@@ -1,5 +1,7 @@
 #include "daq/slc/apps/cprcontrold/HSLBController.h"
 
+#include <daq/slc/base/StringUtil.h>
+
 #include <daq/slc/system/File.h>
 
 #include <mgt/libhslb.h>
@@ -60,12 +62,22 @@ bool HSLBController::monitor() throw()
   return true;
 }
 
-bool HSLBController::boot(const std::string firmware) throw()
+bool HSLBController::boot(const std::string& runtype,
+                          const std::string& firmware) throw()
 {
   if (m_hslb.fd <= 0) return true;
   if (firmware.size() > 0 && File::exist(firmware)) {
-    return bootfpga(m_hslb.fd, (char*)firmware.c_str(),
-                    false, false, 6) == 0;
+    system(StringUtil::form("booths -%c %s", (char)('a' + m_hslb.fin),
+                            firmware.c_str()).c_str());
+    if (runtype.find("dumhslb") != std::string::npos) {
+      StringList str_v = StringUtil::split(runtype, ':');
+      const std::string datfile = StringUtil::form("/home/usr/b2daq/run/dumhslb/%s.dat",
+                                                   str_v[str_v.size() - 1].c_str());
+      system(StringUtil::form("write-dumhslb -%c %s", (char)('a' + m_hslb.fin),
+                              datfile.c_str()).c_str());
+    }
+    //return bootfpga(m_hslb.fd, (char*)firmware.c_str(),
+    //                false, false, 6) == 0;
   }
   return true;
 }

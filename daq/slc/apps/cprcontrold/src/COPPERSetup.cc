@@ -32,6 +32,7 @@ COPPERSetup::COPPERSetup(int crate, int slot,
 
 void COPPERSetup::read(const DBObject& obj)
 {
+  m_runtype = obj.getName();
   m_crate = obj.getInt("crate");
   m_slot = obj.getInt("slot");
   m_hostname = obj.getText("hostname");

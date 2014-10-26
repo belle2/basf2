@@ -1,6 +1,8 @@
  nodename,  config, ismaster, runlength,    node, nsmdata
 RUNCONTROL, debug:storage,true,480, debug:storage, debug:storage
-RUNCONTROL, debug:dummycpu,true,480,debug:dummycpu, debug:storage
+RUNCONTROL, debug:dummycpu,true,480,debug:dummycpu, default
+RUNCONTROL, debug:dumhslb:020:rank4k,true,480, debug:dumhslb:020:rank4k, default
+RUNCONTROL, debug:yamadahslb10kHz,true,480, debug:yamadahslb10kHz, default
 RUNCONTROL, test:daq:none,true,480, test:daq:none, default
 RUNCONTROL, test:daq:aux,true,480, test:daq:aux, default
 RUNCONTROL, test:daq:i,true,480, test:daq:i, default
@@ -61,3 +63,4 @@ RUNCONTROL, test:daq:random:limited:10kHz,true,480, test:daq:random:limited:10kH
 RUNCONTROL, test:daq:random:limited:100kHz,true,480, test:daq:random:limited:100kHz, default
 RUNCONTROL, test:daq:once,true,480, test:daq:once, default
 RUNCONTROL, test:daq:stop,true,480, test:daq:stop, default
+RUNCONTROL, physics,true,480,physics, default

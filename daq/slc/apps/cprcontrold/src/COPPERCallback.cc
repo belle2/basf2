@@ -188,6 +188,7 @@ void COPPERCallback::timeout() throw()
 bool COPPERCallback::load() throw()
 {
   m_config.read(getConfig().getObject());
+  m_force_boothslb = false;
   return recover();
 }
 
@@ -233,15 +234,20 @@ bool COPPERCallback::recover() throw()
   if (m_ttrx.isError()) {
     m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
   }
+  if (m_hslb_firm != m_config.getSetup().getHSLBFirmware()) {
+    m_hslb_firm != m_config.getSetup().getHSLBFirmware();
+  }
   for (int i = 0; i < 4; i++) {
-    if (m_config.useHSLB(i) && m_hslb[i].isError()) {
-      //m_hslb[i].boot(m_config.getSetup().getHSLBFirmware());
+    if (m_config.useHSLB(i) && (m_force_boothslb || m_hslb[i].isError())) {
+      m_hslb[i].boot(m_config.getSetup().getRunType(),
+                     m_config.getSetup().getHSLBFirmware());
       m_hslb[i].load();
       if (m_fee[i] != NULL) {
         m_fee[i]->load(m_hslb[i], m_config.getFEE(i));
       }
     }
   }
+  m_force_boothslb = true;
   if (!bootBasf2()) {
     getNode().setState(RCState::NOTREADY_S);
     return false;

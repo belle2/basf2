@@ -47,9 +47,8 @@ namespace Belle2 {
     int readfee32(int adr, int* valp) throw();
     int writefee32(int adr, int val) throw();
     int writestream(char* filename) throw();
-
-  protected:
-    bool boot(const std::string firmware) throw();
+    bool boot(const std::string& runtype,
+              const std::string& firmware) throw();
 
   private:
     hslb_info m_hslb;

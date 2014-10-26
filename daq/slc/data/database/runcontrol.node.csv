@@ -1,8 +1,14 @@
    nodename,  config, used,                           runtype, type, dbmode, sequential
 RUNCONTROL, debug:storage, true, STORAGE/storage/1/default,0,1, false
-RUNCONTROL,debug:dummycpu, true, STORAGE/storage/1/default,0,1, false
-RUNCONTROL,debug:dummycpu, true, HLT/hlt/1/default,0,1, false
-RUNCONTROL,debug:dummycpu, true, ECL/runcontrol/1/debug:dummycpu,0,1, false
+RUNCONTROL, debug:dummycpu, true, STORAGE/storage/1/default,0,1, false
+RUNCONTROL, debug:dummycpu, true, HLT/hlt/1/default,0,1, false
+RUNCONTROL, debug:dummycpu, true, ECL/runcontrol/1/debug:dummycpu,0,1, false
+RUNCONTROL, debug:dumhslb:020:rank4k, true, STORAGE/storage/1/default,0,1, false
+RUNCONTROL, debug:dumhslb:020:rank4k, true, HLT/hlt/1/default,0,1, false
+RUNCONTROL, debug:dumhslb:020:rank4k, true, ECL/runcontrol/1/dumhslb:020:rank4k,0,1, false
+RUNCONTROL, debug:yamadahslb:10kHz, true, STORAGE/storage/1/default,0,1, false
+RUNCONTROL, debug:yamadahslb:10kHz, true, HLT/hlt/1/default,0,1, false
+RUNCONTROL, debug:yamadahslb:10kHz, true, ECL/runcontrol/1/debug:yamadahslb:10kHz,0,1, false
 RUNCONTROL, test:daq:none, true, STORAGE/storage/1/default,0,1, false
 RUNCONTROL, test:daq:none, true, HLT/hlt/1/default,0,1, false
 RUNCONTROL, test:daq:none, true, ECL/runcontrol/1/default,0,1, false
@@ -242,3 +248,6 @@ RUNCONTROL, test:daq:stop, true, STORAGE/storage/1/default,0,1, false
 RUNCONTROL, test:daq:stop, true, HLT/hlt/1/default,0,1, false
 RUNCONTROL, test:daq:stop, true, ECL/runcontrol/1/default,0,1, false
 RUNCONTROL, test:daq:stop, true, TTD/ttd/1/stop,0,1, false
+RUNCONTROL, physics, true, STORAGE/storage/1/default,0,1, false
+RUNCONTROL, physics, true, HLT/hlt/1/default,0,1, false
+RUNCONTROL, physics, true, ECL/runcontrol/1/default,0,1, false

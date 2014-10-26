@@ -28,6 +28,7 @@ namespace Belle2 {
   public:
     int getCrate() const { return m_crate; }
     int getSlot() const { return m_slot; }
+    const std::string& getRunType() const { return m_runtype; }
     const std::string& getHostname() const { return m_hostname; }
     const std::string& getCopperId() const { return m_copperid; }
     const std::string& getSerialId() const { return m_serialid; }
@@ -41,6 +42,7 @@ namespace Belle2 {
   private:
     int m_crate;
     int m_slot;
+    std::string m_runtype;
     std::string m_hostname;
     std::string m_copperid;
     std::string m_serialid;

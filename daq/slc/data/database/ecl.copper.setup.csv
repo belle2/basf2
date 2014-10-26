@@ -1,27 +1,105 @@
  nodename,  config, crate, slot, hostname, serialid, copperid,     prpmc,     ttrx, ttrx_firmware,        hslb_a,        hslb_b, hslb_c, hslb_d,   hslb_firmware
-   CPR5001, ECL:V01,1,1,  cpr5001,  E11C046,  cpr5001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5002, ECL:V01,1,2,  cpr5002,  E11C046,  cpr5002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5003, ECL:V01,1,3,  cpr5003,  E11C046,  cpr5003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5004, ECL:V01,1,4,  cpr5004,  E11C046,  cpr5004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5005, ECL:V01,1,5,  cpr5005,  E11C046,  cpr5005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5006, ECL:V01,1,6,  cpr5006,  E11C046,  cpr5006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5007, ECL:V01,1,7,  cpr5007,  E11C046,  cpr5007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5008, ECL:V01,1,8,  cpr5008,  E11C046,  cpr5008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5009, ECL:V01,1,9,  cpr5009,  E11C046,  cpr5009, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5010, ECL:V01,1,10,  cpr5010,  E11C046,  cpr5010, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5011, ECL:V01,1,11,  cpr5011,  E11C046,  cpr5011, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5012, ECL:V01,1,12,  cpr5012,  E11C046,  cpr5012, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5013, ECL:V01,1,13,  cpr5013,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5014, ECL:V01,2,1,  cpr5014,  E11C046,  cpr5014, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5015, ECL:V01,3,2,  cpr5015,  E11C046,  cpr5015, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5016, ECL:V01,4,3,  cpr5016,  E11C046,  cpr5016, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5017, ECL:V01,5,4,  cpr5017,  E11C046,  cpr5017, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR5018, ECL:V01,6,5,  cpr5018,  E11C046,  cpr5018, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR6001, ECL:V01,7,6,  cpr6001,  E11C046,  cpr6001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR6002, ECL:V01,8,7,  cpr6002,  E11C046,  cpr6002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR6003, ECL:V01,9,8,  cpr6003,  E11C046,  cpr6003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR6004, ECL:V01,10,9,  cpr6004,  E11C046,  cpr6004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR6005, ECL:V01,11,10,  cpr6005,  E11C046,  cpr6005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR6006, ECL:V01,12,11,  cpr6006,  E11C046,  cpr6006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR6007, ECL:V01,13,12,  cpr6007,  E11C046,  cpr6007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
-   CPR6008, ECL:V01,14,13,  cpr6008,  E11C046,  cpr6008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5001, ECL:V01:rck022,1,1,  cpr5001,  E11C046,  cpr5001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5002, ECL:V01:rck022,1,2,  cpr5002,  E11C046,  cpr5002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5003, ECL:V01:rck022,1,3,  cpr5003,  E11C046,  cpr5003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5004, ECL:V01:rck022,1,4,  cpr5004,  E11C046,  cpr5004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5005, ECL:V01:rck022,1,5,  cpr5005,  E11C046,  cpr5005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5006, ECL:V01:rck022,1,6,  cpr5006,  E11C046,  cpr5006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5007, ECL:V01:rck022,1,7,  cpr5007,  E11C046,  cpr5007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5008, ECL:V01:rck022,1,8,  cpr5008,  E11C046,  cpr5008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5009, ECL:V01:rck022,1,9,  cpr5009,  E11C046,  cpr5009, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5010, ECL:V01:rck022,1,10,  cpr5010,  E11C046,  cpr5010, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5011, ECL:V01:rck022,1,11,  cpr5011,  E11C046,  cpr5011, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5012, ECL:V01:rck022,1,12,  cpr5012,  E11C046,  cpr5012, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5013, ECL:V01:rck022,1,13,  cpr5013,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5014, ECL:V01:rck022,2,1,  cpr5014,  E11C046,  cpr5014, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5015, ECL:V01:rck022,3,2,  cpr5015,  E11C046,  cpr5015, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5016, ECL:V01:rck022,4,3,  cpr5016,  E11C046,  cpr5016, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5017, ECL:V01:rck022,5,4,  cpr5017,  E11C046,  cpr5017, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5018, ECL:V01:rck022,6,5,  cpr5018,  E11C046,  cpr5018, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR6001, ECL:V01:rck022,7,6,  cpr6001,  E11C046,  cpr6001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR6002, ECL:V01:rck022,8,7,  cpr6002,  E11C046,  cpr6002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR6003, ECL:V01:rck022,9,8,  cpr6003,  E11C046,  cpr6003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR6004, ECL:V01:rck022,10,9,  cpr6004,  E11C046,  cpr6004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR6005, ECL:V01:rck022,11,10,  cpr6005,  E11C046,  cpr6005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR6006, ECL:V01:rck022,12,11,  cpr6006,  E11C046,  cpr6006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR6007, ECL:V01:rck022,13,12,  cpr6007,  E11C046,  cpr6007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR6008, ECL:V01:rck022,14,13,  cpr6008,  E11C046,  cpr6008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      ,/home/usr/b2daq/run/hslb/hslb_rck022.bit
+   CPR5001, ECL:V01:dumhslb:020:rand4k,1,1,  cpr5001,  E11C046,  cpr5001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5002, ECL:V01:dumhslb:020:rand4k,1,2,  cpr5002,  E11C046,  cpr5002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5003, ECL:V01:dumhslb:020:rand4k,1,3,  cpr5003,  E11C046,  cpr5003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5004, ECL:V01:dumhslb:020:rand4k,1,4,  cpr5004,  E11C046,  cpr5004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5005, ECL:V01:dumhslb:020:rand4k,1,5,  cpr5005,  E11C046,  cpr5005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5006, ECL:V01:dumhslb:020:rand4k,1,6,  cpr5006,  E11C046,  cpr5006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5007, ECL:V01:dumhslb:020:rand4k,1,7,  cpr5007,  E11C046,  cpr5007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5008, ECL:V01:dumhslb:020:rand4k,1,8,  cpr5008,  E11C046,  cpr5008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5009, ECL:V01:dumhslb:020:rand4k,1,9,  cpr5009,  E11C046,  cpr5009, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5010, ECL:V01:dumhslb:020:rand4k,1,10,  cpr5010,  E11C046,  cpr5010, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5011, ECL:V01:dumhslb:020:rand4k,1,11,  cpr5011,  E11C046,  cpr5011, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5012, ECL:V01:dumhslb:020:rand4k,1,12,  cpr5012,  E11C046,  cpr5012, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5013, ECL:V01:dumhslb:020:rand4k,1,13,  cpr5013,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5014, ECL:V01:dumhslb:020:rand4k,2,1,  cpr5014,  E11C046,  cpr5014, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5015, ECL:V01:dumhslb:020:rand4k,3,2,  cpr5015,  E11C046,  cpr5015, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5016, ECL:V01:dumhslb:020:rand4k,4,3,  cpr5016,  E11C046,  cpr5016, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5017, ECL:V01:dumhslb:020:rand4k,5,4,  cpr5017,  E11C046,  cpr5017, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5018, ECL:V01:dumhslb:020:rand4k,6,5,  cpr5018,  E11C046,  cpr5018, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR6001, ECL:V01:dumhslb:020:rand4k,7,6,  cpr6001,  E11C046,  cpr6001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR6002, ECL:V01:dumhslb:020:rand4k,8,7,  cpr6002,  E11C046,  cpr6002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR6003, ECL:V01:dumhslb:020:rand4k,9,8,  cpr6003,  E11C046,  cpr6003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR6004, ECL:V01:dumhslb:020:rand4k,10,9,  cpr6004,  E11C046,  cpr6004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR6005, ECL:V01:dumhslb:020:rand4k,11,10,  cpr6005,  E11C046,  cpr6005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR6006, ECL:V01:dumhslb:020:rand4k,12,11,  cpr6006,  E11C046,  cpr6006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR6007, ECL:V01:dumhslb:020:rand4k,13,12,  cpr6007,  E11C046,  cpr6007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR6008, ECL:V01:dumhslb:020:rand4k,14,13,  cpr6008,  E11C046,  cpr6008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR5001, ECL:V01:yamadahslb:10kHz,1,1,  cpr5001,  E11C046,  cpr5001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5002, ECL:V01:yamadahslb:10kHz,1,2,  cpr5002,  E11C046,  cpr5002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5003, ECL:V01:yamadahslb:10kHz,1,3,  cpr5003,  E11C046,  cpr5003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5004, ECL:V01:yamadahslb:10kHz,1,4,  cpr5004,  E11C046,  cpr5004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5005, ECL:V01:yamadahslb:10kHz,1,5,  cpr5005,  E11C046,  cpr5005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5006, ECL:V01:yamadahslb:10kHz,1,6,  cpr5006,  E11C046,  cpr5006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5007, ECL:V01:yamadahslb:10kHz,1,7,  cpr5007,  E11C046,  cpr5007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5008, ECL:V01:yamadahslb:10kHz,1,8,  cpr5008,  E11C046,  cpr5008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5009, ECL:V01:yamadahslb:10kHz,1,9,  cpr5009,  E11C046,  cpr5009, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5010, ECL:V01:yamadahslb:10kHz,1,10,  cpr5010,  E11C046,  cpr5010, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5011, ECL:V01:yamadahslb:10kHz,1,11,  cpr5011,  E11C046,  cpr5011, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5012, ECL:V01:yamadahslb:10kHz,1,12,  cpr5012,  E11C046,  cpr5012, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5013, ECL:V01:yamadahslb:10kHz,1,13,  cpr5013,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5014, ECL:V01:yamadahslb:10kHz,2,1,  cpr5014,  E11C046,  cpr5014, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5015, ECL:V01:yamadahslb:10kHz,3,2,  cpr5015,  E11C046,  cpr5015, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5016, ECL:V01:yamadahslb:10kHz,4,3,  cpr5016,  E11C046,  cpr5016, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5017, ECL:V01:yamadahslb:10kHz,5,4,  cpr5017,  E11C046,  cpr5017, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5018, ECL:V01:yamadahslb:10kHz,6,5,  cpr5018,  E11C046,  cpr5018, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR6001, ECL:V01:yamadahslb:10kHz,7,6,  cpr6001,  E11C046,  cpr6001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR6002, ECL:V01:yamadahslb:10kHz,8,7,  cpr6002,  E11C046,  cpr6002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR6003, ECL:V01:yamadahslb:10kHz,9,8,  cpr6003,  E11C046,  cpr6003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR6004, ECL:V01:yamadahslb:10kHz,10,9,  cpr6004,  E11C046,  cpr6004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR6005, ECL:V01:yamadahslb:10kHz,11,10,  cpr6005,  E11C046,  cpr6005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR6006, ECL:V01:yamadahslb:10kHz,12,11,  cpr6006,  E11C046,  cpr6006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR6007, ECL:V01:yamadahslb:10kHz,13,12,  cpr6007,  E11C046,  cpr6007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR6008, ECL:V01:yamadahslb:10kHz,14,13,  cpr6008,  E11C046,  cpr6008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR5001, ECL:V01:dummycpu,1,1,  cpr5001,  E11C046,  cpr5001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5002, ECL:V01:dummycpu,1,2,  cpr5002,  E11C046,  cpr5002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5003, ECL:V01:dummycpu,1,3,  cpr5003,  E11C046,  cpr5003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5004, ECL:V01:dummycpu,1,4,  cpr5004,  E11C046,  cpr5004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5005, ECL:V01:dummycpu,1,5,  cpr5005,  E11C046,  cpr5005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5006, ECL:V01:dummycpu,1,6,  cpr5006,  E11C046,  cpr5006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5007, ECL:V01:dummycpu,1,7,  cpr5007,  E11C046,  cpr5007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5008, ECL:V01:dummycpu,1,8,  cpr5008,  E11C046,  cpr5008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5009, ECL:V01:dummycpu,1,9,  cpr5009,  E11C046,  cpr5009, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5010, ECL:V01:dummycpu,1,10,  cpr5010,  E11C046,  cpr5010, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5011, ECL:V01:dummycpu,1,11,  cpr5011,  E11C046,  cpr5011, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5012, ECL:V01:dummycpu,1,12,  cpr5012,  E11C046,  cpr5012, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5013, ECL:V01:dummycpu,1,13,  cpr5013,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5014, ECL:V01:dummycpu,2,1,  cpr5014,  E11C046,  cpr5014, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5015, ECL:V01:dummycpu,3,2,  cpr5015,  E11C046,  cpr5015, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5016, ECL:V01:dummycpu,4,3,  cpr5016,  E11C046,  cpr5016, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5017, ECL:V01:dummycpu,5,4,  cpr5017,  E11C046,  cpr5017, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR5018, ECL:V01:dummycpu,6,5,  cpr5018,  E11C046,  cpr5018, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR6001, ECL:V01:dummycpu,7,6,  cpr6001,  E11C046,  cpr6001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR6002, ECL:V01:dummycpu,8,7,  cpr6002,  E11C046,  cpr6002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR6003, ECL:V01:dummycpu,9,8,  cpr6003,  E11C046,  cpr6003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR6004, ECL:V01:dummycpu,10,9,  cpr6004,  E11C046,  cpr6004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR6005, ECL:V01:dummycpu,11,10,  cpr6005,  E11C046,  cpr6005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR6006, ECL:V01:dummycpu,12,11,  cpr6006,  E11C046,  cpr6006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR6007, ECL:V01:dummycpu,13,12,  cpr6007,  E11C046,  cpr6007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 
+   CPR6008, ECL:V01:dummycpu,14,13,  cpr6008,  E11C046,  cpr6008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , 

@@ -1,5 +1,9 @@
    nodename,  config, used,                           runtype, type, dbmode, sequential
    ECL, default, true,ECL01/runcontrol/1/default,0,1,      false
    ECL, default, true,ECL02/runcontrol/1/default,0,1,      false
-   ECL,debug:dummycpu, true,ECL01/runcontrol/1/debug:dummycpu,0,1,      false
-   ECL,debug:dummycpu, true,ECL02/runcontrol/1/debug:dummycpu,0,1,      false
+   ECL, debug:dummycpu, true,ECL01/runcontrol/1/debug:dummycpu,0,1,      false
+   ECL, debug:dummycpu, true,ECL02/runcontrol/1/debug:dummycpu,0,1,      false
+   ECL, debug:dumhslb:020:rank4k, true,ECL01/runcontrol/1/debug:dumhslb:020:rank4k,0,1,      false
+   ECL, debug:dumhslb:020:rank4k, true,ECL02/runcontrol/1/debug:dumhslb:020:rank4k,0,1,      false
+   ECL, debug:yamadahslb:10kHz, true,ECL01/runcontrol/1/debug:yamadahslb:10kHz,0,1,      false
+   ECL, debug:yamadahslb:10kHz, true,ECL02/runcontrol/1/debug:yamadahslb:10kHz,0,1,      false

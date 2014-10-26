@@ -46,6 +46,8 @@ namespace Belle2 {
     COPPERConfig m_config;
     NSMData m_data;
     bool m_dummymode;
+    bool m_force_boothslb;
+    std::string m_hslb_firm;
 
   };
 

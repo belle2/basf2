@@ -49,7 +49,13 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_ModuleID |= ((strip - 1) << BKLM_MAXSTRIP_BIT);
 }
 
-BKLMDigit::BKLMDigit(int moduleID, short ctime, short tdc, short charge)
+BKLMDigit::BKLMDigit(int moduleID, short ctime, short tdc, short charge) :
+  RelationsObject(),
+  m_SimTime(0.0),
+  m_SimEDep(0.0),
+  m_EDep(0.0),
+  m_SimNPixel(0),
+  m_FitStatus(0)
 {
   //this assumes that the strip is already zero based...
   m_ModuleID = moduleID;

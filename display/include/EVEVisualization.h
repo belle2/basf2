@@ -18,7 +18,6 @@
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <vxd/geometry/GeoCache.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/dataobjects/ROIid.h>
 
 #include <tracking/trackFindingVXD/displayInterfaceTF/TrackCandidateTFInfo.h>

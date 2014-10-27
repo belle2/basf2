@@ -26,6 +26,7 @@
 #include <framework/utilities/FileSystem.h>
 #include <vxd/geometry/GeoCache.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <genfit/AbsMeasurement.h>

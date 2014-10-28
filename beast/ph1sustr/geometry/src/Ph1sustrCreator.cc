@@ -64,6 +64,7 @@ namespace Belle2 {
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
+      /*
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
       vector<double> bar = content.getArray("bar");
@@ -108,6 +109,17 @@ namespace Belle2 {
 
         detID++;
       }
+      */
+      G4double dx_rail = 5.*CLHEP::cm;
+      G4double dy_rail = 5.*CLHEP::cm;
+      G4double dz_rail = 2.*CLHEP::m;
+      G4VSolid* s_rail = new G4Box("s_rail1", dx_rail, dy_rail, dz_rail);
+      G4double dx_sub = 0.5 * CLHEP::cm;
+      G4double dx_rail_sub = dx_rail - dx_sub;
+      G4double dy_rail_sub = dy_rail - dx_sub;
+      G4VSolid* s_rail_sub = new G4Box("s_rail_sub", dx_rail_sub, dy_rail_sub, dz_rail);
+      s_rail = new G4SubtractionSolid("s_rail", s_rail, s_rail_sub, 0, G4ThreeVector(0, 0, dx_sub));
+
     }
   } // ph1sustr namespace
 } // Belle2 namespace

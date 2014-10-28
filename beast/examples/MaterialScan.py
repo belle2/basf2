@@ -19,13 +19,13 @@ eventinfosetter.param({'runList': [1], 'evtNumList': [1]})
 # geometry.param('Components', ['PH1BPIPE'])
 geometry.param('Components', [
     'BGO',
-    'BeamPipe',
-    'HeavyMetalShield',
-    'VXDService',
-    'PXD',
-    'SVD',
-    'CDC',
+    'MICROTPC',
+    'HE3TUBE',
+    'CAVE',
+    'PINDIODE',
+    'PH1BPIPE',
     ])
+
 geometry.set_log_level(LogLevel.INFO)
 
 # Create the MaterialScan module
@@ -71,6 +71,8 @@ materialscan.param({  # Filename for output File
                       # First axis
                       # Second axis
                       # Split output by Material names insted of by Region
+                      #    'planar.minU': -45.0,
+                      #    'planar.maxU': 57.5,
     'Filename': 'MaterialScan.root',
     'spherical': True,
     'spherical.origin': [0, 0, 0],
@@ -85,11 +87,11 @@ materialscan.param({  # Filename for output File
     'planar': True,
     'planar.plane': 'custom',
     'planar.nU': 2000,
-    'planar.minU': -45.0,
-    'planar.maxU': 57.5,
+    'planar.minU': -500.0,
+    'planar.maxU': 500.0,
     'planar.nV': 2000,
-    'planar.minV': -16,
-    'planar.maxV': 16,
+    'planar.minV': -300,
+    'planar.maxV': 300,
     'planar.maxDepth': 32,
     'planar.custom': [
         0,

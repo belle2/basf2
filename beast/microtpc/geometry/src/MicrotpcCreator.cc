@@ -179,6 +179,8 @@ namespace Belle2 {
           x_Ring[i] = 0;
           y_Ring[i] = 0;
           z_Ring[i] = -dz_iGasTPC + 3.*CLHEP::cm + 1.*i * CLHEP::cm + 2.*dz_Ring * i * CLHEP::mm;
+          //z_Ring[i] = -dz_iGasTPC + 3.*CLHEP::cm + 1.* i * CLHEP::cm + 2.*dz_Ring * i ;
+          cout << "z ring # " << i << " pos. " << z_Ring[i] / CLHEP::cm << endl;
           sprintf(Name, "p_Ring_%d", i);
           new G4PVPlacement(0, G4ThreeVector(x_Ring[i], y_Ring[i], z_Ring[i]), l_Ring, Name, l_iGasTPC, false, 1);
         }
@@ -261,7 +263,7 @@ namespace Belle2 {
         G4double dx_GasTPC = 2.5 * CLHEP::cm;
         G4double dy_GasTPC = 2.5 * CLHEP::cm;
         G4double dz_GasTPC = (z_Ring[23] - dz_Ring - z_GEM[1] - dz_GEM) / 2.; //13.5 * CLHEP::cm;
-        cout << " dz_GasTPC " << dz_GasTPC / CLHEP::cm << endl;
+        //cout << " dz_GasTPC " << dz_GasTPC / CLHEP::cm << endl;
         G4Box* s_GasTPC = new G4Box("s_GasTPC", dx_GasTPC, dy_GasTPC, dz_GasTPC);
         G4LogicalVolume* l_GasTPC = new G4LogicalVolume(s_GasTPC, geometry::Materials::get(matGas), "l_GasTPC", 0, m_sensitive);
 

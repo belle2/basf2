@@ -144,33 +144,6 @@ namespace Belle2 {
 
   }
 
-  const TOPSimHit* TOPBackgroundModule::getTOPSimHit(const TOPDigit* digit)
-  {
-
-
-    StoreArray<TOPDigit>  topDigits;
-    StoreArray<TOPSimHit>  topSimhits;
-    StoreArray<MCParticle> mcParticles;
-
-    RelationArray testrelSimHitToDigit(topSimhits, topDigits);
-
-    if (!testrelSimHitToDigit) {
-      return 0;
-    }
-
-    RelationIndex< TOPSimHit, TOPDigit > relSimHitToDigit(topSimhits, topDigits);
-
-    if (!relSimHitToDigit) {
-      return 0;
-    }
-
-    if (relSimHitToDigit.getFirstElementTo(digit)) {
-      return relSimHitToDigit.getFirstElementTo(digit)->from;
-    }
-
-    return 0;
-  }
-
   void TOPBackgroundModule::event()
   {
     StoreArray<TOPSimHit>  topSimhits;
@@ -184,14 +157,14 @@ namespace Belle2 {
       int barID = aDigit->getBarID();
       peflux->AddBinContent(barID * 2, 1. / m_TimeOfSimulation / 32.0);
 
-      const TOPSimHit* simHit = getTOPSimHit(aDigit);
+      const TOPSimHit* simHit = DataStore::getRelated<TOPSimHit>(aDigit);
 
       genergy->Fill(simHit->getEnergy());
 
-      RelationIndex<MCParticle, TOPSimHit> relMCParticleToTOPSimHit(mcParticles, topSimhits);
+      const MCParticle* particle = DataStore::getRelated<MCParticle>(simHit);
 
-      if (relMCParticleToTOPSimHit.getFirstElementTo(simHit)) {
-        const MCParticle* currParticle = relMCParticleToTOPSimHit.getFirstElementTo(simHit)->from;
+      if (particle) {
+        const MCParticle* currParticle = particle;
 
         const MCParticle* mother = currParticle->getMother();
 

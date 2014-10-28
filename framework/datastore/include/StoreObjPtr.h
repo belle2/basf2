@@ -55,7 +55,7 @@ namespace Belle2 {
    *  \code
       //store a single cdchit
       StoreObjPtr<CDCHit> cdchit;
-      cdchit.create();
+      cdchit.create(); // or construct() if you want to specify constructor arguments
       cdchit->setCharge(5.0);
       \endcode
    *  To put an existing object in the data store, use the assign method:

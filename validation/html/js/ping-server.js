@@ -3,7 +3,7 @@ $(document).ready(function() {
     // Send and AJAX Request to check if there is a webserver running
     $.ajax({
         cache: false,
-        url: "/ajax/pingserver",
+        url: "/validation/ajax/pingserver",
         type: "GET",
         contentType: "application/json",
 	

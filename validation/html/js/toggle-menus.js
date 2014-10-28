@@ -16,6 +16,9 @@ $(document).ready(function() {
     $('.filters').click(function() {
             $('#filters').slideToggle("fast");
     });
+    $('.options').click(function() {
+            $('#options').slideToggle("fast");
+    });
 });
 
 
@@ -24,6 +27,12 @@ $(document).ready(function(){
 	$('input[type="checkbox"][name="packages"]').click(function(){
             $("#"+$(this).attr("value")).toggle();
 	});
+    });
+});
+
+$(document).ready(function(){
+    $('input[type="checkbox"][name="options"]').click(function(){
+        $(".wrap_boxes").toggle();
     });
 });
 

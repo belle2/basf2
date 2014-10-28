@@ -12,6 +12,21 @@ function loadcontent() {
 		    $(this).prop('checked', false);
 		}
 	    });
+	    
+	    /* If the content is reloaded, make sure that the description boxes are displayed or not,
+	       in accordance with the checkbox  */
+	    if( $('.displaydescriptions').is(':checked') ){
+		$('.wrap_boxes').each(function(){
+			$(this).show();
+	        });
+	    }
+	    else {
+            	$('.wrap_boxes').each(function(){
+			$(this).hide();
+	      	});
+	    }
+
 	});		 
     });
+    $("#outer").hide()
 }

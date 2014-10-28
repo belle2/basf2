@@ -1,5 +1,5 @@
 function resizeWindows() {
-    if($(window).width() >= 1700){
+    if($(window).width() >= 1680){
 	$("#content").css("width", "1462");
 	$("#wrap").css("width", "1680");
     }

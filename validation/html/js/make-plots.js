@@ -17,7 +17,7 @@ $(document).ready(function() {
 	    // Now make an AJAX-Request with these values
 	    $.ajax({ 
 		cache: false,
-		url: "/ajax/makeplots",
+		url: "/validation/ajax/makeplots",
 		type: "POST",
 		contentType: "application/json",
 		dataType: "json",
@@ -27,7 +27,7 @@ $(document).ready(function() {
 	    }).done(function(json) {
 
 		// Load the 'content.html' which has been modified by the AJAX request
-		$("#content").load("content.html", function() {
+		loadcontent().done( function() {
 		    
 		    // After we have loaded the content.html into the website, we open the file with
 		    // JavaScript and read it linewise
@@ -71,7 +71,7 @@ $(document).ready(function() {
 	    }).error(function(json) {
 		$("#content").html('There was a problem!');
 
-		// Always hide the layer
+	    // Always hide the layer
 	    }).always(function() {		
 		$("#outer").hide()
 	    });

@@ -158,26 +158,30 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         """
 
         # Used to check if a web server is running
-        if self.path.startswith('/ajax/pingserver'):
+        if '/ajax/pingserver' in self.path:
             return (200, json.dumps({}), 'application/json')
 
         # Used to get a list of all log files
-        if self.path.startswith('/ajax/listlogs'):
+        if '/ajax/listlogs' in self.path:
+            # Get a list of all folders in results and sort by mod. date
+            folders = ['./results/' + __ for __ in os.listdir('./results')
+                       if os.path.isdir('./results/' + __)]
+            newest = sorted(folders, key=os.path.getctime)[-1]
+
             loglist = {}
-            for dir in os.listdir('./results/current'):
-                if os.path.isdir('./results/current/' + dir):
-                    for file in os.listdir('./results/current/' + dir):
+            for dir in os.listdir(newest):
+                if os.path.isdir(newest + '/' + dir):
+                    for file in os.listdir(newest + '/' + dir):
                         if file.endswith('.log'):
-                            print './results/current/' + dir
                             if dir in loglist.keys():
                                 loglist[dir].append(file)
                             else:
                                 loglist[dir] = [file]
-            print loglist
-            return (200, json.dumps(loglist), 'application/json')
+            print json.dumps([newest, loglist])
+            return (200, json.dumps([newest, loglist]), 'application/json')
 
         # Used to generate new plots
-        if self.path.startswith('/ajax/makeplots'):
+        if '/ajax/makeplots' in self.path:
             log.debug('Creating plots for revisions ' + ', '.join(data))
             create_plots(revisions=data)
             return (200, json.dumps({}), 'application/json')
@@ -217,7 +221,7 @@ if __name__ == '__main__':
                     datefmt='%H:%M:%S')
 
     # Define the server address
-    ip = 'localhost'
+    ip = '129.13.133.6'
     port = 8000
 
     # Start the server!

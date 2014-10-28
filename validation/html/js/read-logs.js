@@ -2,14 +2,14 @@ $(document).ready(function() {
     
     // Set the on-click event to close the windows for log list and the log reader
     $('.close').click(function(){
-	$(this).parent().parent().hide();
+        $(this).parent().parent().hide();
     });  
 
     // Send an AJAX request to retrieve the list of log files
     $('.readlogs').click(function(){
 	$.ajax({ 
 	    cache: false,
-	    url: "/ajax/listlogs",
+	    url: "/validation/ajax/listlogs",
 	    type: "GET",
 	    contentType: "application/json",
 	    dataType: "json"
@@ -24,11 +24,12 @@ $(document).ready(function() {
 	    $('#loglist').draggable({handle:'#loglist_handle'});	    
 	    
 	    // Read the data that were retrieved from the AJAX request into an array
+
 	    var data = []
-	    for (var pkg in json){
-		data.push(pkg);
+	    for (var pkg in json[1]){
+	        data.push(pkg);
 	    }
-	    
+		    
 	    // Empty the log list, so we can append the log files in a loop
 	    $('#loglist_content').html('');
 
@@ -39,8 +40,8 @@ $(document).ready(function() {
 		$('#loglist_content').append('<strong>'+data[pkg]+'</strong><br>');
 		
 		// Loop over all files in the package and append them to the list of files
-		for (var log in json[data[pkg]].sort()){
-		    $('#loglist_content').append('<span class="loglink" name="/results/current/'+data[pkg]+'/'+json[data[pkg]][log]+'">'+json[data[pkg]][log]+'</span><br>');
+		for (var log in json[1][data[pkg]].sort()){
+		    $('#loglist_content').append('<span class="loglink" name="'+json[0]+'/'+data[pkg]+'/'+json[1][data[pkg]][log]+'">'+json[1][data[pkg]][log]+'</span><br>');
 		}
 		$('#loglist_content').append('<br>');
 		

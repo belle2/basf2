@@ -18,7 +18,8 @@ namespace Belle2 {
    * This is mainly intended for objects of c_Persistent durability in the data store,
    * where those inheriting from this class will be merged when using parallel processing.
    *
-   * For storing TH1F, TNtuple and similar things, see RootMergeable<T>.
+   * For storing TH1F, TNtuple and similar things, see RootMergeable<T>. For
+   * STL maps, see MapMergeable<T>.
    *
    * The special handling for these objects is performed in DataStoreStreamer.
    */

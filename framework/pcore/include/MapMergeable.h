@@ -10,36 +10,35 @@
  **************************************************************************/
 
 #include <framework/pcore/Mergeable.h>
-#include <framework/logging/Logger.h>
 
 #include <map>
 
 namespace Belle2 {
-  /** Wrap a standard map to make them mergeable.
+  /** Wrap an STL map to make it mergeable.
+   *
+   * Should work out-of-the-box with std::map and 'similar' containers.
    *
    * To use it to save data in your module:
    * \code
      setPropertyFlags(c_Parallelprocessing | c_terminateInAllProcesses);
      \endcode
      create MapMergeable<X> in initalize (or in your constructor) of durability DataStore::c_Persistent,
-     register it by calling registerInDataStore() and construct() the actual histogram.
+     register it by calling registerInDataStore() and construct() the actual container.
    *
-   * This should work out of the box for std::map. Additional template instantiations need
-   * an entry in framework/pcore/include/linkdef.h, please contact the framework librarian if your use
-   * case requires other classes.
+   * Each template instance needs its own entry in framework/pcore/include/linkdef.h,
+   * please contact the framework librarian if your use case requires other classes than those in there.
    *
    * \sa Mergeable
    */
-  template <class T>
-  class MapMergeable : public Mergeable {
+  template <class T> class MapMergeable : public Mergeable {
   public:
-    MapMergeable() : m_wrapped(nullptr) {  }
+    MapMergeable() : m_wrapped() {  }
 
-    virtual ~MapMergeable() { delete m_wrapped; }
+    virtual ~MapMergeable() { }
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 #else
     /** Constructor, forwards all arguments to T constructor. */
-    template<class ...Args> MapMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...)) { }
+    template<class ...Args> MapMergeable(Args&& ... params) : m_wrapped(std::forward<Args>(params)...) { }
 #endif
 
     /** Get the wrapped standard object. */
@@ -57,8 +56,8 @@ namespace Belle2 {
      */
     virtual void merge(const Mergeable* other) {
       auto* otherMergeable = static_cast<const MapMergeable*>(other);
-      for (const auto & element : otherMergeable) {
-        auto it = m_wrapped.find(element);
+      for (const auto & element : otherMergeable->get()) {
+        auto it = m_wrapped.find(element.first);
         if (it != m_wrapped.end()) {
           it->second += element.second;
         } else {
@@ -77,9 +76,9 @@ namespace Belle2 {
     }
 
   private:
-    /** Wrapped root object. */
+    /** Wrapped object. */
     T m_wrapped;
 
-    ClassDef(MapMergeable, 1); /**< Wrap a standard object to make them mergeable. */
+    ClassDef(MapMergeable, 1); /**< Wrap an STL map to make it mergeable. */
   };
 }

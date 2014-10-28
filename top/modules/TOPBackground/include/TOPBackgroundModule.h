@@ -103,11 +103,6 @@ namespace Belle2 {
     void printModuleParams() const;
 
     /**
-     * Convert TOPDigit to TOPSimHit
-     */
-    const TOPSimHit* getTOPSimHit(const TOPDigit* digit);
-
-    /**
      *Print histogram 1D, helper function.
      */
     void myprint(TH1F* histo, const char* path, const char* xtit, const char* ytit, double tresh);

@@ -45,6 +45,10 @@ namespace Belle2 {
     protected:
       /**  SensitiveDetector CSI */
       SensitiveDetector* m_sensitive;
+
+      G4LogicalVolume* logical_ecl;/**< the ecl Logical Volume */
+      G4VPhysicalVolume* physical_ecl;/**< the ecl Physical Volume*/
+
     };
 
   }

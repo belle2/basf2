@@ -16,6 +16,59 @@
     <bar unit="mm">1 2 3 4 5 6 7 8 
     </bar>
 
+
+    <!-- From the ECL.xml file... not sure which are actually used -->
+     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>
+     <CsI>CsI</CsI>
+     <Si>Si</Si>
+     <Al>Al</Al>
+     <AlTeflon>AlTeflon</AlTeflon>
+     <AlTeflon_thin>AlTeflon_thin</AlTeflon_thin>
+     <AlTeflon_thinpenta>AlTeflon_thinpenta</AlTeflon_thinpenta>
+     
+     <k_fin_thickness unit="cm">0.05</k_fin_thickness>
+     <k_wrap_thickness unit="cm">0.025</k_wrap_thickness>
+     <k_barrel_Nblock>72</k_barrel_Nblock>
+     <k_endcap_Nblock>16</k_endcap_Nblock>
+     <k_Crystall_HalfLength unit="cm">15.0000000</k_Crystall_HalfLength>
+     
+     <k_Zero unit="cm">0.00000001</k_Zero>
+     <k_ForwZnear unit="cm">196.0</k_ForwZnear>
+     <k_ForwZfar  unit="cm">227.0</k_ForwZfar>
+     <k_ForwRout_ang  unit="deg">31.62</k_ForwRout_ang>
+     <k_ForwRin_ang   unit="deg">12.398</k_ForwRin_ang>
+     <k_backZnear unit="cm">102.02</k_backZnear>
+     <k_backwZfar unit="cm">131.42</k_backwZfar>
+     <k_backRout_ang  unit="deg">31.62</k_backRout_ang>
+     <k_backRin_ang   unit="deg">12.398</k_backRin_ang>
+     <k_diodewidth   unit="cm">2.0</k_diodewidth>
+     <k_diodelength   unit="cm">2.0</k_diodelength>
+     <k_diodeheight   unit="cm">0.1</k_diodeheight>
+     
+
+     <!--
+
+    <Active>
+      <Material>CSI-Material</Material>
+      <cDx1 unit="cm">5.5</cDx1>
+      <cDx2 unit="cm">5.5</cDx2>       
+      <cDy1 unit="cm">5.5</cDy1>
+      <cDx3 unit="cm">5.5</cDx3>
+      <cDy2 unit="cm">5.5</cDy2>
+      <cDx4 unit="cm">5.5</cDx4>
+      <cDz unit="cm">30.0</cDz>
+      <cDtheta unit="deg">0.0</cDtheta>
+      <cDphi unit="deg">0.0</cDphi>
+      <k_phi_init unit="deg">0.0</k_phi_init>
+      <k_z_TILTED unit="deg">27.7</k_z_TILTED>
+      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
+      <k_zC unit="cm">-117.465</k_zC>
+      <k_phiC unit="deg">0.0</k_phiC>
+    </Active>
+
+    -->
+
+    <!-- Original(not planar) version
     <Active>
       <Material>CSI-Material</Material>
       <cDx1 unit="mm">52.42</cDx1>
@@ -33,7 +86,97 @@
       <k_zC unit="cm">-117.465</k_zC>
       <k_phiC unit="deg">0.0</k_phiC>
     </Active>
+    -->
 
+
+    <!-- Interesting Crystals:
+	 FWD:0 12 24 36
+	 BWD: 8688 8672 8704 8720
+	 Cell #0: CryIndex=0
+	 Cell #12: CryIndex=0
+	 Cell #24: CryIndex=0
+	 Cell #36: CryIndex=0
+	 Cell #8688: CryIndex=128
+	 Cell #8672: CryIndex=128
+	 Cell #8704: CryIndex=128
+	 Cell #8720: CryIndex=128 
+      -->
+
+    <EndCapCrystals>
+       <EndCapCrystal id="1">
+         <K_h1 unit="cm">2.646800</K_h1>
+         <K_h2 unit="cm">3.066002</K_h2>
+         <K_bl1 unit="cm">3.139250</K_bl1>
+         <K_bl2 unit="cm">3.637884</K_bl2>
+         <K_tl1 unit="cm">2.802500</K_tl1>
+         <K_tl2 unit="cm">3.247800</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-269.992514</K_Rphi1>
+         <K_Rtheta unit="deg">13.949294</K_Rtheta>
+         <K_Rphi2 unit="deg">3.742587</K_Rphi2>
+         <K_Pr unit="cm">217.249230</K_Pr>
+         <K_Ptheta unit="deg">13.180600</K_Ptheta>
+         <K_Pphi unit="deg">3.764568</K_Pphi>
+       </EndCapCrystal>
+
+       <!-- Fictitious '2' crystal: replace with pure CsI dims-->
+       <EndCapCrystal id="2">
+         <K_h1 unit="cm">2.646800</K_h1>
+         <K_h2 unit="cm">3.066002</K_h2>
+         <K_bl1 unit="cm">3.139250</K_bl1>
+         <K_bl2 unit="cm">3.637884</K_bl2>
+         <K_tl1 unit="cm">2.802500</K_tl1>
+         <K_tl2 unit="cm">3.247800</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-269.992514</K_Rphi1>
+         <K_Rtheta unit="deg">13.949294</K_Rtheta>
+         <K_Rphi2 unit="deg">3.742587</K_Rphi2>
+         <K_Pr unit="cm">217.249230</K_Pr>
+         <K_Ptheta unit="deg">13.180600</K_Ptheta>
+         <K_Pphi unit="deg">-6.764568</K_Pphi>
+       </EndCapCrystal>
+
+
+       <EndCapCrystal id="101"> <!-- crystal id="129" in the actual ECL package -->
+         <K_h1 unit="cm">2.588124</K_h1>
+         <K_h2 unit="cm">3.337336</K_h2>
+         <K_bl1 unit="cm">2.581700</K_bl1>
+         <K_bl2 unit="cm">3.332957</K_bl2>
+         <K_tl1 unit="cm">2.359900</K_tl1>
+         <K_tl2 unit="cm">3.046950</K_tl2>
+         <K_alpha1 unit="deg">-0.000008</K_alpha1>
+         <K_alpha2 unit="deg">-0.000000</K_alpha2>
+         <K_Rphi1 unit="deg">-90.045755</K_Rphi1>
+         <K_Rtheta unit="deg">150.833371</K_Rtheta>
+         <K_Rphi2 unit="deg">2.782287</K_Rphi2>
+         <K_Pr unit="cm">130.544191</K_Pr>
+         <K_Ptheta unit="deg">153.363902</K_Ptheta>
+         <K_Pphi unit="deg">2.863975</K_Pphi>
+       </EndCapCrystal>
+
+
+       <!-- Fictitious '102' crystal: replace with pure CsI dims-->
+       <EndCapCrystal id="102">
+         <K_h1 unit="cm">2.588124</K_h1>
+         <K_h2 unit="cm">3.337336</K_h2>
+         <K_bl1 unit="cm">2.581700</K_bl1>
+         <K_bl2 unit="cm">3.332957</K_bl2>
+         <K_tl1 unit="cm">2.359900</K_tl1>
+         <K_tl2 unit="cm">3.046950</K_tl2>
+         <K_alpha1 unit="deg">-0.000008</K_alpha1>
+         <K_alpha2 unit="deg">-0.000000</K_alpha2>
+         <K_Rphi1 unit="deg">-90.045755</K_Rphi1>
+         <K_Rtheta unit="deg">150.833371</K_Rtheta>
+         <K_Rphi2 unit="deg">2.782287</K_Rphi2>
+         <K_Pr unit="cm">130.544191</K_Pr>
+         <K_Ptheta unit="deg">153.363902</K_Ptheta>
+         <K_Pphi unit="deg">-4.863975</K_Pphi>
+       </EndCapCrystal>
+
+
+    </EndCapCrystals>
 
   </Content>
 </DetectorComponent>

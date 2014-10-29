@@ -221,7 +221,7 @@ if __name__ == '__main__':
                     datefmt='%H:%M:%S')
 
     # Define the server address
-    ip = '129.13.133.6'
+    ip = 'localhost'
     port = 8000
 
     # Start the server!

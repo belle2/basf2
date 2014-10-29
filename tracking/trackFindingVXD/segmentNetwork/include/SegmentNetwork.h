@@ -25,8 +25,6 @@
 // #include <unordered_set> // TODO test that one
 // #endif
 
-#include <tracking/cdcLocalTracking/algorithms/SortableVector.h> // TODO test that one
-
 #include <framework/logging/Logger.h>
 
 
@@ -40,7 +38,9 @@
  *
  * Unordered_set and/or SortableVector should be used if this class shall not only held static information.
  * (SortableVector has to be copied first and needs some adaption since currently it is not possible to use custom sorting functions).
+ * Update Oct 29th, 2014: since we are using pointers and new, the only relevant containers left are vector and set/map,
  *
+ * TODO: find a way to freeze the network-structure after building it (to prevent breaking of pointers), if necessary
  * */
 namespace Belle2 {
 
@@ -72,21 +72,17 @@ namespace Belle2 {
 
 
     /** .first is the name of the related StoreArray of associated Elements, .second is the vector of the local version of that stuff */
-    template<typename T> using StoreVector = std::pair<std::string, std::vector<T>>;
+    template<typename T> using StoreVector = std::pair<std::string, std::vector<T*>>;
 
 
 #ifndef __CINT__
     /** .first is the name of the related StoreArray of associated Elements, .second is the vector of the local version of that stuff */
-    template<typename T> using StoreSet = std::pair<std::string, std::unordered_set<T>>;
+    template<typename T> using StoreSet = std::pair<std::string, std::unordered_set<T*>>;
 #endif
 
 
-    /** .first is the name of the related StoreArray of associated Elements, .second is the vector of the local version of that stuff */
-    template<typename T> using StoreSortVector = std::pair<std::string, CDCLocalTracking::SortableVector<T>>;
 
-
-
-    /** ********************************* constructors ********************************* **/
+    /** ********************************* constructors/destructor ********************************* **/
 
 
 
@@ -104,6 +100,16 @@ namespace Belle2 {
     SegmentNetwork() {}
 
 
+    /** destructor does the cleanup */
+    ~SegmentNetwork() {
+      for (auto * aSector : m_activatedSectors.second) { delete aSector; }
+
+      for (auto * aNode : m_nodes.second) { delete aNode; }
+
+      for (auto * aSegment : m_segments.second) { delete aSegment; }
+    }
+
+
 
     /** ********************************* getter ********************************* **/
 
@@ -114,13 +120,14 @@ namespace Belle2 {
 
 
     /** adding single activeSector to the network */
-    void addSector(unsigned int  activeSectorIndex, FullSecID::BaseType secID) { m_activatedSectors.second.push_back(activeSectorIndex, secID); }
+    void addSector(unsigned int activeSectorIndex, FullSecID::BaseType secID) { m_activatedSectors.second.push_back(new ActiveSector(activeSectorIndex, secID)); }
 
 
     /** adding single trackNode to the network */
-    void addTrackNode(unsigned int spIndex, unsigned int activatedSector, FullSecID::BaseType aFullSecID) {
-      m_nodes.second.push_back(spIndex, activatedSector, aFullSecID);
-      m_activatedSectors.second.at(spIndex).addTrackNode(m_nodes.second.size());
+    void addTrackNode(SpacePoint* spIndex, ActiveSector* activatedSector, FullSecID::BaseType aFullSecID) {
+      TrackNode* newNode = new TrackNode(spIndex, activatedSector, aFullSecID);
+      m_nodes.second.push_back(newNode);
+      activatedSector->addTrackNode(newNode);
     }
 
 
@@ -131,10 +138,11 @@ namespace Belle2 {
      * the outer- and innerSector-Entries carry the indices for the associated sectors, respectively
      * It therefore should only be filled, if nodes already exist
      */
-    void addSegment(unsigned int outerNode, unsigned int innerNode, unsigned int outerSector, unsigned int innerSector) {
-      m_segments.second.push_back(outerNode, innerNode, outerSector, innerSector);
-      m_nodes.second.at(outerNode).addInnerSegment(m_segments.second.size());
-      m_nodes.second.at(innerNode).addOuterSegment(m_segments.second.size());
+    void addSegment(TrackNode* outerNode, TrackNode* innerNode, ActiveSector* outerSector, ActiveSector* innerSector) {
+      Segment* newSeg = new Segment(outerNode, innerNode, outerSector, innerSector);
+      m_segments.second.push_back(newSeg);
+      outerNode->addInnerSegment(newSeg);
+      innerNode->addOuterSegment(newSeg);
     }
 
 
@@ -165,9 +173,14 @@ namespace Belle2 {
         return;
       }
 
-      m_activatedSectors.second[mainIndex].addActiveFriend(friendIndex);
+      m_activatedSectors.second[mainIndex]->addActiveFriend(m_activatedSectors.second[friendIndex]);
     }
 
+
+    /** connecting sectors directly */
+    void connectSectors(ActiveSector* mainSector, ActiveSector* friendSector) {
+      mainSector->addActiveFriend(friendSector);
+    }
 
     /** accepts a sectorID and searches the activated sectors for given ID.
      *
@@ -177,7 +190,7 @@ namespace Belle2 {
     unsigned int findActiveSector(FullSecID::BaseType iD) {
 
       for (unsigned int index = 0; index < m_activatedSectors.second.size(); index++) {
-        if (m_activatedSectors.second[index].getFullSecID() == iD) {
+        if (m_activatedSectors.second[index]->getFullSecID() == iD) {
           return index;
         }
       }
@@ -192,7 +205,11 @@ namespace Belle2 {
      * This also affects other elements of the network!
      * Segments, TrackNodes can be deactivated during the process if removed ActiveSector affects them.
      * */
-    void removeActiveSector() { /* TODO */ }
+    void deactivateSector(FullSecID::BaseType iD) {
+      ActiveSector* dyingSector = m_activatedSectors(findActiveSector(iD));
+      dyingSector->deactivateSector();
+      /* TODO */
+    }
 
 
     /** safely remove a tracknode from the network.
@@ -200,7 +217,7 @@ namespace Belle2 {
      * This also affects other elements of the network.
      * Segments, ActiveSectors can be deactivated during the process if removed TrackNode affects them.
      * */
-    void removeTrackNode() { /* TODO */ }
+    void deactivateTrackNode() { /* TODO */ }
 
 
     /** safely remove a tracknode from the network.
@@ -208,12 +225,13 @@ namespace Belle2 {
      * This also affects other elements of the network.
      * Segments, ActiveSectors can be deactivated during the process if removed Segment affects them.
      * */
-    void removeSegment() { /* TODO */ }
+    void deactivateSegment() { /* TODO */ }
 
 
     /** sorts Segments by their geometrical position in the network.
      *
      * this position is encoded in the FullSecID
+    * -> this does _not_ sort the segments but only a bunch of pointers to them!
      */
     void sortSegments() { /* TODO */ }
 
@@ -221,6 +239,7 @@ namespace Belle2 {
     /** sorts ActiveSectors by their geometrical position in the network.
      *
      * this position is encoded in the FullSecID
+    * -> this does _not_ sort the activeSectors but only a bunch of pointers to them!
      * */
     void sortActiveSectors() { /* TODO */ }
 

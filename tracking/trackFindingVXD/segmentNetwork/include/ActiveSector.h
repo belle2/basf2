@@ -12,9 +12,14 @@
 
 #include <tracking/dataobjects/FullSecID.h>
 
+// C++-std:
+#include <limits>       // std::numeric_limits
 #include <vector>
 
 namespace Belle2 {
+
+  /** predeclaration, real class can be found in tracking/trackFindingVXD/segmentNetwork/TrackNode.h */
+  class TrackNode;
 
 
   /** The ActiveSector Class.
@@ -34,8 +39,8 @@ namespace Belle2 {
 
     /** Default constructor for root compatibility */
     ActiveSector():
-      m_index(std::numeric_limits<unsigned int>::max()),
-      m_FullSecID(std::numeric_limits<unsigned int>::max()) {}
+      m_FullSecID(std::numeric_limits<unsigned int>::max()),
+      m_index(std::numeric_limits<unsigned int>::max()) {}
 
 
     /** Constructor.
@@ -43,8 +48,8 @@ namespace Belle2 {
      *      //      * @param FullSecID basetype of Full sector ID of activated sector associated with this one.
      *      //      */
     ActiveSector(unsigned int  activeSectorIndex, FullSecID::BaseType secID):
-      m_index(activeSectorIndex),
-      m_FullSecID(secID) {}
+      m_FullSecID(secID),
+      m_index(activeSectorIndex) {}
 
 
 
@@ -76,19 +81,19 @@ namespace Belle2 {
 
 
     /** returns all indices of attached TrackNodes */
-    const std::vector<unsigned int>& getTrackNodes() const { return m_nodes; }
+    inline const std::vector<TrackNode*>& getTrackNodes() const { return m_nodes; }
 
 
     /** returns all indices of attached ActiveSectors (e.g. "inner friends") */
-    const std::vector<unsigned int>& getActiveFriends() const { return m_activatedFriends; }
+    inline const std::vector<ActiveSector*>& getActiveFriends() const { return m_activatedFriends; }
 
 
-    /** returns index number of associated ActiveSector */
-    unsigned int getActiveSectorIndex() const { return m_index; }
+    /** returns index number of associated ActiveSector in StoreArray TODO replace by pointer! */
+    inline unsigned int getActiveSectorIndex() const { return m_index; }
 
 
     /** returns VxdID of sensor carrying current sector */
-    FullSecID::BaseType getFullSecID() const { return m_FullSecID; }
+    inline FullSecID::BaseType getFullSecID() const { return m_FullSecID; }
 
 
 
@@ -97,12 +102,15 @@ namespace Belle2 {
 
 
     /** adds new Segment to vector of inner Cells attached to current hit */
-    void addTrackNode(unsigned int newNode) { m_nodes.push_back(newNode); }
+    inline void addTrackNode(TrackNode* newNode) { m_nodes.push_back(newNode); }
 
 
     /** adds index number of ActiveSector which is a Friend of this one*/
-    void addActiveFriend(unsigned int newSector) { m_activatedFriends.push_back(newSector); }
+    inline void addActiveFriend(ActiveSector* newSector) { m_activatedFriends.push_back(newSector); }
 
+
+    /** deactivate this sector all connected Nodes */
+    void deactivateSector() { /* TODO */ }
 
   protected:
 
@@ -115,16 +123,16 @@ namespace Belle2 {
     FullSecID::BaseType m_FullSecID;
 
 
-    /** index number of associated static sector */
+    /** index number of associated static sector TODO replace by Pointer to real sector after design of SectorMap */
     unsigned int m_index;
 
 
     /** stores indices of all associated TrackNodes */
-    std::vector<unsigned int> m_nodes;
+    std::vector<TrackNode*> m_nodes;
 
 
     /** stores all active Friend sectors */
-    std::vector< unsigned int> m_activatedFriends;
+    std::vector<ActiveSector*> m_activatedFriends;
   };
 
 } //Belle2 namespace

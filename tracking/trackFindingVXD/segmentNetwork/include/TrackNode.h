@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
+#include <tracking/trackFindingVXD/segmentNetwork/Segment.h>
+
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/dataobjects/FullSecID.h>
@@ -42,21 +45,21 @@ namespace Belle2 {
 
     /** Default constructor for root compatibility */
     TrackNode():
-      m_spacePointIndex(std::numeric_limits<unsigned int>::max()),
-      m_activatedSectorIndex(std::numeric_limits<unsigned int>::max()),
+      m_spacePoint(NULL),
+      m_activatedSector(NULL),
       m_FullSecID(std::numeric_limits<FullSecID::BaseType>::max()),
       m_attachedTrackCandidates(0),
       m_collector_id(-1) {}
 
 
     /** Constructor.
-    *      //      * @param hitPos index number of spacePoint associated with this trackNode.
+    *      //      * @param spIndex index number of spacePoint associated with this trackNode.
     *      //      * @param activatedSector index number of Activated Sector containing trackNode.
-    *      //      * @param FullSecID basetype of Full sector ID of activated sector containing this trackNode.
+    *      //      * @param aFullSecID basetype of Full sector ID of activated sector containing this trackNode.
      *      //      */
-    TrackNode(unsigned int  spIndex, unsigned int activatedSector, FullSecID::BaseType aFullSecID):
-      m_spacePointIndex(spIndex),
-      m_activatedSectorIndex(activatedSector),
+    TrackNode(SpacePoint* spIndex, ActiveSector* activatedSector, FullSecID::BaseType aFullSecID):
+      m_spacePoint(spIndex),
+      m_activatedSector(activatedSector),
       m_FullSecID(aFullSecID),
       m_attachedTrackCandidates(0),
       m_collector_id(-1) {}
@@ -70,7 +73,7 @@ namespace Belle2 {
     /** overloaded '=='-operator for sorting algorithms */
     bool operator==(const TrackNode& b) const {
       B2WARNING("somebody is using the '=='-operator of TrackNode, this should not be used at the moment!");
-      return (getSpacePointIndex() == b.getSpacePointIndex());
+      return (getSpacePoint() == b.getSpacePoint());
     }
 
 
@@ -94,35 +97,48 @@ namespace Belle2 {
 
 
     /** returns all inner Cells attached to hit */
-    const std::vector<unsigned int>& getAttachedInnerCell() const { return m_attachedInnerSegments; }
+    inline const std::vector<Segment*>& getAttachedInnerSegments() const { return m_attachedInnerSegments; }
 
 
     /** returns all outer Cells attached to hit */
-    const std::vector<unsigned int>& getAttachedOuterCell() const { return m_attachedOuterSegments; }
+    inline const std::vector<Segment*>& getAttachedOuterSegments() const { return m_attachedOuterSegments; }
 
 
     /** returns number of segments connected to this hit (hits without attached segments are ignored during TF process) */
-    unsigned int getNumberOfSegments() const { return int(m_attachedInnerSegments.size() + m_attachedOuterSegments.size()); }
+    inline unsigned int getNumberOfSegments() const { return int(m_attachedInnerSegments.size() + m_attachedOuterSegments.size()); }
+
+
+    /** returns number of segments alive connected to this hit (hits without attached segments are ignored during TF process) */
+    unsigned int getNumberOfSegmentsAlive() const {
+      unsigned int foundAlive = 0;
+      for (auto * seg : m_attachedInnerSegments) {
+        foundAlive += seg->getState() ? 1 : 0;
+      }
+      for (auto * seg : m_attachedOuterSegments) {
+        foundAlive += seg->getState() ? 1 : 0;
+      }
+      return foundAlive;
+    }
 
 
     /** returns number of TCs using this hit */
-    unsigned int getNumberOfTrackCandidates() const { return m_attachedTrackCandidates; }
+    inline unsigned int getNumberOfTrackCandidates() const { return m_attachedTrackCandidates; }
 
 
     /** returns VxdID of sensor carrying current sector */
-    FullSecID::BaseType getFullSecID() const { return m_FullSecID; }
+    inline FullSecID::BaseType getFullSecID() const { return m_FullSecID; }
 
 
-    /** returns index nubmer of associated spacePoint */
-    unsigned int getSpacePointIndex() const {return m_spacePointIndex; }
+    /** returns pointer to associated spacePoint */
+    inline SpacePoint* getSpacePoint() const {return m_spacePoint; }
 
 
-    /** returns index number of associated ActiveSector */
-    unsigned int getActiveSectorIndex() const { return m_activatedSectorIndex; }
+    /** returns pointer to associated ActiveSector */
+    inline ActiveSector* getActiveSector() const { return m_activatedSector; }
 
 
     /** returns the clusterID in the collectorTFinfo-class */
-    int getCollectorID() { return m_collector_id; }
+    inline int getCollectorID() { return m_collector_id; }
 
 
 
@@ -131,19 +147,19 @@ namespace Belle2 {
 
 
     /** adds new Segment to vector of inner Cells attached to current hit */
-    void addInnerSegment(int newCell) { m_attachedInnerSegments.push_back(newCell); }
+    inline void addInnerSegment(Segment* newCell) { m_attachedInnerSegments.push_back(newCell); }
 
 
     /** adds new Segment to vector of outer Cells attached to current hit */
-    void addOuterSegment(int newCell) { m_attachedOuterSegments.push_back(newCell); }
+    inline void addOuterSegment(Segment* newCell) { m_attachedOuterSegments.push_back(newCell); }
 
 
     /** counting them is enough to check their occupancy */
-    void addTrackCandidate() { m_attachedTrackCandidates++; }
+    inline void addTrackCandidate() { m_attachedTrackCandidates++; }
 
 
     /** decrease number of TCs using this hit */
-    void removeTrackCandidate() {
+    inline void removeTrackCandidate() {
       if (m_attachedTrackCandidates == 0) {
         B2ERROR("TrackNode::removeTrackCandidate: can not have less than 0 track candidates! Value stays at 0...")
       } else {
@@ -153,7 +169,7 @@ namespace Belle2 {
 
 
     /** sets the clusterID for the collectorTFinfo-class */
-    void setCollectorID(int value) { m_collector_id = value; }
+    inline void setCollectorID(int value) { m_collector_id = value; }
 
 
   protected:
@@ -164,11 +180,11 @@ namespace Belle2 {
 
 
     /** stores the index of associated SpacePoint */
-    unsigned int m_spacePointIndex;
+    SpacePoint* m_spacePoint;
 
 
     /** index of sector containing current trackNode */
-    unsigned int m_activatedSectorIndex;
+    ActiveSector* m_activatedSector;
 
 
     /** FullSecID of sector containing hit - WARNING redundant information, is this really needed? */
@@ -176,11 +192,11 @@ namespace Belle2 {
 
 
     /** contains indices to segments using this hit as outer end  */
-    std::vector<unsigned int> m_attachedInnerSegments;
+    std::vector<Segment*> m_attachedInnerSegments;
 
 
     /** contains indices to segments using this hit as inner end  */
-    std::vector<unsigned int> m_attachedOuterSegments;
+    std::vector<Segment*> m_attachedOuterSegments;
 
 
     /** number of trackCandidates using this hit */

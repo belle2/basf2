@@ -17,8 +17,8 @@
 # basf2 program BEFORE eb0(event builder 0) on a readout PC
 #
 #    print 'Usage : RecvStream0.py <COPPER hostname> <Use NSM(Network Shared Memory)? yes=1/no=0> <port # of eb0> <NSM nodename>
-/usr/bin/xterm -fn 7x14 -geometry 102x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr001 0 32001 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 102x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr007 0 32007 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 102x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr001 0 34001 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 102x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr007 0 34007 hogehoge1000; sleep 3000000;" &
 
 #
 # basf2 program AFTER eb0(event builder 0) on a readout PC

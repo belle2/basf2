@@ -394,9 +394,15 @@ namespace Belle2 {
                                     upside + UpperGap + PannelThickness));
       polygon.push_back(G4TwoVector(ZForward,
                                     -Qthickness / 2.0 - LowerGap - PannelThickness));
+      /*
       polygon.push_back(G4TwoVector(Z1,
                                     -Qthickness / 2.0 - LowerGap - PannelThickness));
       polygon.push_back(G4TwoVector(Z1 - WLength + Wflat,
+                                    downside - LowerGap - PlateThickness));
+      */
+      polygon.push_back(G4TwoVector(Z1 + PlateThickness,
+                                    -Qthickness / 2.0 - LowerGap - PannelThickness));
+      polygon.push_back(G4TwoVector(Z1 + PlateThickness,
                                     downside - LowerGap - PlateThickness));
       polygon.push_back(G4TwoVector(ZBackward,
                                     downside - LowerGap - PlateThickness));
@@ -412,9 +418,15 @@ namespace Belle2 {
                                      upside + UpperGap));
       polygon2.push_back(G4TwoVector(ZForward - PlateThickness,
                                      -Qthickness / 2.0 - LowerGap));
+      /*
       polygon2.push_back(G4TwoVector(Z1,
                                      -Qthickness / 2.0 - LowerGap));
       polygon2.push_back(G4TwoVector(Z1 - WLength + Wflat,
+                                     downside - LowerGap));
+      */
+      polygon2.push_back(G4TwoVector(Z1,
+                                     -Qthickness / 2.0 - LowerGap));
+      polygon2.push_back(G4TwoVector(Z1,
                                      downside - LowerGap));
       polygon2.push_back(G4TwoVector(ZBackward + PlateThickness,
                                      downside - LowerGap));

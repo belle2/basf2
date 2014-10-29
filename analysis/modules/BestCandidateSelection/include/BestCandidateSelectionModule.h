@@ -23,8 +23,7 @@
 namespace Belle2 {
   class Particle;
 
-  /** Selects Particles with the highest values of 'variable' in the input list and removes all other particles from the list. The remaining list is sorted from best to worst candidate.
-  */
+  /** Selects Particles with the highest values of 'variable' in the input list and removes all other particles from the list. Particles will receive an extra-info field '${variable}_rank' containing their rank as an integer starting at 1 (best). The ranking also takes antiparticles into account, so there will only be one B+- candidate with rank=1. Candidates with same value of 'variable' will have different ranks, with undefined order. The remaining list is sorted from best to worst candidate (each charge, e.g. B+/B-, separately).  */
   class BestCandidateSelectionModule : public Module {
   public:
 

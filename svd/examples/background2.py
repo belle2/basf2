@@ -5,20 +5,17 @@ import os
 from basf2 import *
 
 set_log_level(LogLevel.INFO)
-# Change this to point to actual locations on your system.
-input_dir = '/data/belle2/BG/Jun2014/bg_full/'
-output_dir = '/data/belle2/BG/Jun2014/bg_full/output/'
+
+input_dir = '/data/belle2/BG/Jun2014/bg_full_1.2T/'
 
 components = []
-components.append(('Coulomb_HER', 100))
-components.append(('Coulomb_LER', 100))
-components.append(('RBB_HER', 100))
-components.append(('RBB_LER', 100))
-components.append(('Touschek_HER', 100))
-components.append(('Touschek_LER', 100))
-components.append(('twoPhoton', 200))
+components.append(('RBB_HER', '1p2T', 100))
+components.append(('RBB_LER', '1p2T', 100))
+components.append(('RBB_HER', '1p5T', 100))
+components.append(('RBB_LER', '1p5T', 100))
 
-files = [input_dir + s + '_' + str(t) + 'us.root' for (s, t) in components]
+files = [input_dir + s + '_' + t + '_' + str(u) + 'us.root' for (s, t, u) in
+         components]
 
 svd_branches = ['MCParticles', 'MCParticlesToSVDSimHits',
                 'MCParticlesToSVDTrueHits', 'SVDSimHits', 'SVDTrueHits']
@@ -29,8 +26,7 @@ input.param('inputFileNames', files)
 
 # Histogram manager immediately after master module
 histo = register_module('HistoManager')
-# File to save histograms
-histo.param('histoFileName', output_dir + 'SVDBackgroundHisto.root')
+histo.param('histoFileName', 'SVDBackgroundHisto2.root')  # File to save histograms
 
 # Report progress of processing
 progress = register_module('Progress')
@@ -50,16 +46,12 @@ svdDigi.param('ElectronicEffects', False)
 
 # SVD beam background
 svdBkg = register_module('SVDBackground')
-svdBkg.param('componentNames', [s for (s, t) in components])
-svdBkg.param('componentTimes', [t for (s, t) in components])
-svdBkg.param('outputDirectory', output_dir)
-
-svdBkg.set_log_level(LogLevel.DEBUG)
-svdBkg.set_debug_level(10)
+svdBkg.param('componentNames', [s + '_' + t for (s, t, u) in components])
+svdBkg.param('componentTimes', [u for (s, t, u) in components])
 
 # output - do we want output?
 output = register_module('RootOutput')
-output.param('outputFileName', output_dir + 'SVDBackgroundOutput.root')
+output.param('outputFileName', 'SVDBackgroundOutput2.root')
 
 # Create paths
 main = create_path()
@@ -73,7 +65,7 @@ main.add_module(geometry)
 main.add_module(svdDigi)
 # main.add_module(svdClust)
 main.add_module(svdBkg)
-# main.add_module(output)
+main.add_module(output)
 
 # Process events
 process(main)

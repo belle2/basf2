@@ -158,11 +158,12 @@ def loadMCParticles(path=analysis_main):
 
 def loadReconstructedParticles(path=analysis_main):
     """
-    Loads mDST data objects (Tracks/ECLClusters/KLMClusters) as Particles.
+    Loads mDST data objects (Tracks/ECLClusters/V0s/KLMClusters) as Particles.
     In particular:
      - each Track is loaded as e/mu/pi/K/p Particles
      - each neutral ECLCluster is loaded as gamma Particle
      - each neutral KLMCluster is loaded as Klong Particle
+     - each neutral V0 is loaded as Kshort Particle
 
     In all the cases no selection criteria are applied.
     """

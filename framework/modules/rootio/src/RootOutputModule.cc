@@ -23,7 +23,6 @@
 #include <TClonesArray.h>
 #include <TBaseClass.h>
 #include <TTreeIndex.h>
-#include <TProcessID.h>
 
 #include <time.h>
 
@@ -225,13 +224,17 @@ void RootOutputModule::terminate()
   if (m_tree[DataStore::c_Event]) {
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
-    if (tree->GetBranch("EventMetaData")) {
+    unsigned long numEntries = tree->GetEntries();
+    if (numEntries > 10000000) {
+      //10M events correspond to about 240MB for the TTreeIndex object. from ~45M on this causes crashes, broken files :(
+      B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
+    } else if (tree->GetBranch("EventMetaData")) {
       tree->SetBranchAddress("EventMetaData", 0);
       tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
     }
 
     //fill the file level metadata
-    fileMetaDataPtr->setEvents(tree->GetEntries());
+    fileMetaDataPtr->setEvents(numEntries);
     fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
     fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
   }

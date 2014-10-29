@@ -30,6 +30,12 @@ namespace Belle2 {
   */
   class FullSecID {
   public:
+
+
+    /** defines the base type used for FullSecID */
+    typedef unsigned int BaseType;
+
+
     // starting with operator overloading...
     /** overloaded '<'-operator for sorting algorithms */
     bool operator<(const FullSecID& secID)  const { return m_fullSecID < secID.m_fullSecID; }

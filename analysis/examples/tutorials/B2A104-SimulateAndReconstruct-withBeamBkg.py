@@ -35,7 +35,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
 
-bkgdir = '/sw/belle2/bkg.new/'
+bkgdir = '/sw/belle2/bkg/'
 bkgFiles = [
     bkgdir + 'Coulomb_HER_100us.root',
     bkgdir + 'Coulomb_LER_100us.root',

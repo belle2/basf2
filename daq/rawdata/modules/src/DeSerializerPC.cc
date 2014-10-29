@@ -14,6 +14,9 @@
 //#define MAXEVTSIZE 400000000
 #define CHECKEVT 5000
 
+
+
+#define USE_DESERIALIZER_PREPC
 //#define DEBUG
 //#define NO_DATA_CHECK
 //#define DUMHSLB
@@ -29,6 +32,12 @@ REG_MODULE(DeSerializerPC)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
+
+#ifndef REDUCED_RAWCOPPER
+#ifdef USE_DESERIALIZER_PREPC
+compile error
+#endif
+#endif
 
 DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
 {
@@ -609,10 +618,10 @@ void DeSerializerPCModule::event()
     int delete_flag_from = 0, delete_flag_to = 0;
     RawDataBlock temp_rawdatablk;
     setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
-
     //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
     checkData(&temp_rawdatablk, &eve_copper_0);
 
+#ifndef USE_DESERIALIZER_PREPC
     PreRawCOPPERFormat_latest pre_rawcopper_latest;
     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
@@ -626,15 +635,16 @@ void DeSerializerPCModule::event()
 
     int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
                                &delete_flag_to);
-
     m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from);
-
-
-
 
 #else
     delete_flag_to = delete_flag_from;
 #endif
+
+#else
+    delete_flag_to = delete_flag_from;
+#endif
+
 
     RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
     raw_datablk->SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),

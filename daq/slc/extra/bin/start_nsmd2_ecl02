@@ -5,16 +5,24 @@ source ../tools/setup_belle2
 setuprel
 cd -
 
+./boot_nsmd2_ssh ecl02 local
+sleep 2
+
 echo "booting nsmd2"
 for i in $(seq 5014 5018)
 do
 ./boot_nsmd2_ssh cpr${i} local
+sleep 1
 done
 
 for i in $(seq 6001 6008)
 do
 ./boot_nsmd2_ssh cpr${i} local
+sleep 1
 done
 
-./boot_nsmd2_ssh ecl02 local
 ./boot_nsmd2_ssh ecl02 global
+
+sleep 2
+echo "booting ecl02 nsm2socket in ecl02"
+./boot_daemon nsm2socket 9090

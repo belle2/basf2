@@ -5,7 +5,7 @@ source ../tools/setup_belle2
 setuprel
 cd -
 
-echo "killing nsmd2"
+echo "killing basf2 cprcontrold"
 for i in $(seq 5014 5018)
 do
 ssh cpr${i} "killall basf2 cprcontrold > /dev/null"
@@ -14,4 +14,4 @@ for i in $(seq 6001 6008)
 do
 ssh cpr${i} "killall basf2 cprcontrold> /dev/null"
 done
-killall rocontrold runcontrold nsm2socket > /dev/null
+killall rocontrold runcontrold > /dev/null

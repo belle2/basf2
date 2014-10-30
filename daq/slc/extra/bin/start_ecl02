@@ -5,15 +5,16 @@ for i in $(seq 5014 5018)
 do
 echo "booting cprcontrold in cpr${i}"
 ssh cpr${i} "${dir}/boot_daemon cprcontrold cpr${i}"
+sleep 1
 done
 for i in $(seq 6001 6008)
 do
 echo "booting cprcontrold in cpr${i}"
 ssh cpr${i} "${dir}/boot_daemon cprcontrold cpr${i}"
+sleep 1
 done
 echo "booting rocontrold in ecl02"
 ssh ecl02 "${dir}/boot_daemon rocontrold ropc_ecl02"
+sleep 2
 echo "booting ecl02 runcontrold in ecl02"
 ssh ecl02 "${dir}/boot_daemon runcontrold ecl02"
-echo "booting ecl02 nsm2socket in ecl02"
-ssh ecl02 "${dir}/boot_daemon nsm2socket 9090"

@@ -69,6 +69,7 @@ void RunControlCallback::init() throw()
       node.setUsed(obj_v[i].getBool("used"));
       for (StringList::iterator it = m_excluded_v.begin();
            it != m_excluded_v.end(); it++) {
+        LogFile::debug("'%s' '%s'", it->c_str(), node.getName().c_str());
         if (node.getName() == *it) {
           node.setExcluded(true);
         }

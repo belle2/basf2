@@ -283,7 +283,6 @@ namespace Belle2 {
       logical_cdc = new G4LogicalVolume(solid_cdc, medAir, "logicalCDC", 0, 0, 0);
       physical_cdc = new G4PVPlacement(0, G4ThreeVector(0., 0., globalOffsetZ * CLHEP::cm), logical_cdc, "physicalCDC", &topVolume, false, 0);
 
-
       //-----------------------
       // Construct outer wall
       //----------------------
@@ -966,24 +965,34 @@ namespace Belle2 {
         string coverName = coverContent.getString("Name");
         double coverInnerR1 = coverContent.getLength("InnerR1");
         double coverInnerR2 = coverContent.getLength("InnerR2");
+        double coverOuterR1 = coverContent.getLength("OuterR1");
+        //        double coverOuterR2 = coverContent.getLength("OuterR2");
         double coverThick = coverContent.getLength("Thickness");
         double coverAngle = coverContent.getAngle("Angle");
         double coverPosZ = coverContent.getLength("PosZ");
 
 
         if (coverName == "BackwardCover") {
-          //          double rmin2 = coverInnerR1;
-          //          double rmax2 = rmin2 + coverThick / std::cos(coverAngle);
-          double rmin1 = coverInnerR2;
-          double rmax1 = rmin1 + coverThick / std::cos(coverAngle);
-          //          double coverLength = (rmin1 - rmin2) / std::tan(coverAngle);
 
-          if (coverID == 2) {
-            G4Tubs* coverTubeShape = new G4Tubs((format("solidBackwardCover%1%") % coverID).str().c_str(), 28.8 * CLHEP::cm, rmax1 * CLHEP::cm, coverThick * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
+          if (coverID == 0) { // Outer cover (backward).
+            const double rmin1 = coverInnerR1;
+            const double rmax1 = coverOuterR1;
+            G4Tubs* coverTubeShape = new G4Tubs((format("solidBackwardCover%1%") % coverID).str().c_str(), rmin1 * CLHEP::cm, rmax1 * CLHEP::cm, coverThick * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
             G4LogicalVolume* coverTube = new G4LogicalVolume(coverTubeShape, medAluminum, (format("logicalBackwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
             coverTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
 
             new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, coverPosZ * CLHEP::cm - coverThick * CLHEP::cm / 2.0), coverTube, (format("physicalBackwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
+
+          } else if (coverID == 2) { // Middle cover (backward).
+
+            const double rmin1 = coverInnerR1;
+            const double rmax1 = coverOuterR1;
+            G4Tubs* coverTubeShape = new G4Tubs((format("solidBackwardCover%1%") % coverID).str().c_str(), rmin1 * CLHEP::cm, rmax1 * CLHEP::cm, coverThick * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
+            G4LogicalVolume* coverTube = new G4LogicalVolume(coverTubeShape, medAluminum, (format("logicalBackwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
+            coverTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
+
+            new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, coverPosZ * CLHEP::cm - coverThick * CLHEP::cm / 2.0), coverTube, (format("physicalBackwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
+
           }
         } else {
 
@@ -1014,7 +1023,8 @@ namespace Belle2 {
 
 
 
-      const bool nshieldflag = (simplifiedGeometry) ? false : true;
+      //      const bool nshieldflag = (simplifiedGeometry) ? false : true;
+      const bool nshieldflag = true;
       if (nshieldflag) {
         //
         // B4C for shilding material of neutron
@@ -1043,58 +1053,80 @@ namespace Belle2 {
 
 
         /*
-              double AA = 10.01 * g / mole ; // Atomic mass for 10B  90%
-              double ZZ = 5.0;
-              G4Element* elB = new G4Element("Boron", "B", ZZ, AA);
+        double AA = 10.01 * g / mole ; // Atomic mass for 10B  90%
+        double ZZ = 5.0;
+        G4Element* elB = new G4Element("Boron", "B", ZZ, AA);
 
-              AA = 12.011 * g / mole; // Atomic mass for C
-              ZZ = 6.0;
-              G4Element* elC = new G4Element("Carbon", "C", ZZ, AA);
+        AA = 12.011 * g / mole; // Atomic mass for C
+        ZZ = 6.0;
+        G4Element* elC = new G4Element("Carbon", "C", ZZ, AA);
 
-              const G4double denB4C = 1.25 * g / cm3; // density of B4C with silicon
-              // Notice: B4C density itself is 2.51 g/cm3
-              // B4C : Silicon  = 1 : 1 -> density = 2.51x0.5
+        const G4double denB4C = 1.25 * g / cm3; // density of B4C with silicon
+        // Notice: B4C density itself is 2.51 g/cm3
+        // B4C : Silicon  = 1 : 1 -> density = 2.51x0.5
 
-              G4Material* B4C = new G4Material("B4C", denB4C, 2);
-              B4C->AddElement(elB, 4);
-              B4C->AddElement(elC, 1);
+        G4Material* B4C = new G4Material("B4C", denB4C, 2);
+        B4C->AddElement(elB, 4);
+        B4C->AddElement(elC, 1);
         G4Material* shieldMat = B4C;
         */
 
-        G4Tubs* bgShieldTubeShape_0 = new G4Tubs("solid_B4C_0", (20.25 + 8.5) * CLHEP::cm, (20.25 + 8.5 + 30.0) * CLHEP::cm, 3.0 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
+        G4Tubs* bgShieldTubeShape_0 = new G4Tubs("solid_B4C_0", 45.5 * CLHEP::cm, 60.0 * CLHEP::cm, 6.0 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
         G4LogicalVolume* bgShieldTube_0 = new G4LogicalVolume(bgShieldTubeShape_0, shieldMat, "logical_B4C_0", 0, 0, 0);
         bgShieldTube_0->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (-98.5 + 1.5)*CLHEP::cm), bgShieldTube_0, "physical_B4C_0", logical_cdc, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -95.0 * CLHEP::cm), bgShieldTube_0, "physical_B4C_0", logical_cdc, false, 0);
 
-        G4Tubs* bgShieldTubeShape_1 = new G4Tubs("solid_B4C_1", (20.25 + 8.5) * CLHEP::cm, (20.25 + 8.5 + 15.0) * CLHEP::cm, 7.0 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
+        G4Tubs* bgShieldTubeShape_1 = new G4Tubs("solid_B4C_1", 29.2 * CLHEP::cm, 45.0 * CLHEP::cm, 4.0 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
         G4LogicalVolume* bgShieldTube_1 = new G4LogicalVolume(bgShieldTubeShape_1, shieldMat, "logical_B4C_1", 0, 0, 0);
         bgShieldTube_1->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (-98.5 + 3.0 + 3.5)*CLHEP::cm), bgShieldTube_1, "physical_B4C_1", logical_cdc, false, 0);
-        //increase length of physical_B4C_1 from 5->7, to protect iner EB layers.
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -90.0 * CLHEP::cm), bgShieldTube_1, "physical_B4C_1", logical_cdc, false, 0);
 
-        G4Tubs* bgShieldTubeShape_2 = new G4Tubs("solid_B4C_2", (20.25 + 8.5) * CLHEP::cm, (20.25 + 8.5 + 3.0) * CLHEP::cm, 8.5 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
+        G4Tubs* bgShieldTubeShape_2 = new G4Tubs("solid_B4C_2", 29.2 * CLHEP::cm, 30.2 * CLHEP::cm, 20.0 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
         G4LogicalVolume* bgShieldTube_2 = new G4LogicalVolume(bgShieldTubeShape_2, shieldMat, "logical_B4C_2", 0, 0, 0);
         bgShieldTube_2->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -84.25 * CLHEP::cm), bgShieldTube_2, "physical_B4C_2", logical_cdc, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (-90.0 + 2.0 + 10.0)*CLHEP::cm), bgShieldTube_2, "physical_B4C_2", logical_cdc, false, 0);
 
-        G4Tubs* bgShieldTubeShape_3 = new G4Tubs("solid_B4C_3", (20.25 + 5.75) * CLHEP::cm, (20.25 + 5.75 + 3.0) * CLHEP::cm, 11.5 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
-        G4LogicalVolume* bgShieldTube_3 = new G4LogicalVolume(bgShieldTubeShape_3, shieldMat, "logical_B4C_3", 0, 0, 0);
-        bgShieldTube_3->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -61.250 * CLHEP::cm), bgShieldTube_3, "physical_B4C_3", logical_cdc, false, 0);
+        const double rmin1 = 27.1;
+        const double dr1 = 2.0;
+        const double z1 = -60.0;
+        const double rmin2 = 20.5;
+        const double dr2 = 2.0;
+        const double z2 = -42.5;
+        const double slope = (rmin2 - rmin1) / (z2 - z1);
+        const double z3 = -52.0;
+        const double dr3 = 2.0;
+        const double rmin3 = slope * (z3 - z1) + rmin1;
+        const double width = fabs(z3 - z1);
+        const double zc = 0.5 * (z1 + z3);
+        G4Cons* bgShieldConeShape_3 = new G4Cons("solid_B4C_3", rmin1 * CLHEP::cm, (rmin1 + dr1) * CLHEP::cm, rmin3 * CLHEP::cm, (rmin3 + dr3) * CLHEP::cm,  width * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
+        G4LogicalVolume* bgShieldCone_3 = new G4LogicalVolume(bgShieldConeShape_3, shieldMat, "logical_B4C_3", 0, 0, 0);
+        bgShieldCone_3->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, zc * CLHEP::cm), bgShieldCone_3, "physicalbgShield_B4C_3", logical_cdc, false, 0);
 
-
-        G4Cons* bgShieldConeShape_4 = new G4Cons("solid_B4C_4", (20.25 + 8.5) * CLHEP::cm, (20.25 + 8.5 + 3.0) * CLHEP::cm, (20.25 + 5.75)* CLHEP::cm, (20.25 + 5.75 + 3) * CLHEP::cm,  13.0 * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
-        G4LogicalVolume* bgShieldCone_4 = new G4LogicalVolume(bgShieldConeShape_4, shieldMat, "logical_B4c_4", 0, 0, 0);
+        const double z4 = -45.0;
+        const double rmin4 = slope * (z4 - z2) + rmin2;
+        const double dr4 = dr1;
+        const double width4 = fabs(z4 - z2);
+        const double zc4 = 0.5 * (z2 + z4);
+        G4Cons* bgShieldConeShape_4 = new G4Cons("solid_B4C_4", rmin4 * CLHEP::cm, (rmin4 + dr4) * CLHEP::cm, rmin2 * CLHEP::cm, (rmin2 + dr2) * CLHEP::cm,  width4 * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
+        G4LogicalVolume* bgShieldCone_4 = new G4LogicalVolume(bgShieldConeShape_4, shieldMat, "logical_B4C_4", 0, 0, 0);
         bgShieldCone_4->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -73.5 * CLHEP::cm), bgShieldCone_4, "physicalbgShield_B4C_4", logical_cdc, false, 0);
-        // Thanh edited physicalbgshield_B4C_4.
+        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, zc4 * CLHEP::cm), bgShieldCone_4, "physicalbgShield_B4C_4", logical_cdc, false, 0);
 
-        G4Cons* bgShieldConeShape_5 = new G4Cons("solid_B4C_5", (20.25 + 5.25) * CLHEP::cm, (20.25 + 5.25 + 3.0) * CLHEP::cm, (20.25 - 8.0 + 4.5)* CLHEP::cm, (20.25 - 8.0 + 4.5 + 3.0) * CLHEP::cm,  15.0 * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
-        G4LogicalVolume* bgShieldCone_5 = new G4LogicalVolume(bgShieldConeShape_5, shieldMat, "logical_B4C_5", 0, 0, 0);
-        bgShieldCone_5->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
-        // Commented by M. U. June 3rd, 2013
-        //        G4VPhysicalVolume* physbgShieldCone_5;
-        // new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -48.0 * cm), bgShieldCone_5, "physicalbgShield_B4C_5", logical_cdc, false, 0);
+
+        /*
+          const double z5 = z2 + 4.0;
+          const double rmin5 = rmin2;
+          const double dr5 = 0.01;
+          const double width5 = fabs(z5-z2);
+          const double zc5 = 0.5*(z2+z5);
+          G4Cons* bgShieldConeShape_5 = new G4Cons("solid_B4C_5", rmin2 * CLHEP::cm, (rmin2+dr4) * CLHEP::cm, rmin5 * CLHEP::cm, (rmin5 + dr5 ) * CLHEP::cm,  width5 * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
+          G4LogicalVolume* bgShieldCone_5 = new G4LogicalVolume(bgShieldConeShape_5, shieldMat, "logical_B4C_5", 0, 0, 0);
+          bgShieldCone_5->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, zc5 * CLHEP::cm), bgShieldCone_5, "physicalbgShield_B4C_5", logical_cdc, false, 0);
+
+        */
+
 
       }
 

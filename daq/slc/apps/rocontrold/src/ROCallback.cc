@@ -12,11 +12,12 @@
 #include <daq/slc/base/ConfigFile.h>
 
 #include <cstring>
+#include <sstream>
 
 using namespace Belle2;
 
-ROCallback::ROCallback(const NSMNode& node)
-  : RCCallback(node), m_con(this)
+ROCallback::ROCallback(const NSMNode& node, const std::string& conf)
+  : RCCallback(node), m_file(conf)
 {
   system("killall basf2");
 }
@@ -27,37 +28,77 @@ ROCallback::~ROCallback() throw()
 
 void ROCallback::init() throw()
 {
-  m_con.init("ropcbasf2_" + getNode().getName(), 1);
   m_data = NSMData(getNode().getName() + "_STATUS",
                    "ronode_status",
                    ronode_status_revision);
   m_data.allocate(getCommunicator());
+  const size_t nproc = m_file.getInt("ropc_in.nproc");
+  m_con = std::vector<ProcessController>();
+  for (size_t i = 0; i < 1 + nproc; i++) {
+    m_con.push_back(ProcessController(this));
+  }
+  m_con[0].init("ropcbasf2_out", 1);
+  for (size_t i = 1; i < m_con.size(); i++) {
+    m_con[i].init(StringUtil::form("ropcbasf2_in_%d", i - 1), i);
+  }
 }
 
 void ROCallback::term() throw()
 {
-  m_con.abort();
-  m_con.getInfo().unlink();
+  for (size_t i = 0; i < m_con.size(); i++) {
+    m_con[i].abort();
+    m_con[i].getInfo().unlink();
+  }
 }
 
 bool ROCallback::load() throw()
 {
-  if (m_con.isAlive()) return true;
+  if (m_con[0].isAlive()) return true;
   const DBObject& obj(getConfig().getObject());
-  m_con.setExecutable("basf2");
-  m_con.clearArguments();
-  m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                                     obj.getText("ropc_script").c_str()));
-  m_con.addArgument("1");
-  m_con.addArgument(StringUtil::form("%d", obj.getInt("port_from")));
-  m_con.addArgument("ropcbasf2_" + getNode().getName());
-  if (m_con.load(10)) {
-    LogFile::debug("load succeded");
-    m_flow.open(&(m_con.getInfo()));
-    return true;
-  } else {
-    LogFile::error("load timeout");
+  std::stringstream ss;
+  ss << "#!/bin/sh" << std::endl
+     << "#Thu Oct 17 14:17:13 CEST 2013" << std::endl
+     << "cd /home/usr/b2daq/eb" << std::endl
+     << "killall eb0 > /dev/null 2>&1" << std::endl
+     << "sleep 1" << std::endl
+     << "./eb0";
+  for (size_t i = 1; i < m_con.size(); i++) {
+    const DBObject& cobj(obj.getObject("copper_from", i - 1));
+    if (cobj.getBool("used")) {
+      ss << " " << cobj.getText("hostname") << ":" << cobj.getInt("port");
+    }
   }
+  ss << std::endl
+     << "EOT" << std::endl;
+  std::ofstream fout(m_file.get("ropc_in.eb0.script"));
+  fout << ss.str();
+  fout.close();
+
+  const std::string script1 = obj.getText("ropc_script1");
+  for (size_t i = 1; i < m_con.size(); i++) {
+    const DBObject& cobj(obj.getObject("copper_from", i - 1));
+    if (cobj.getBool("used")) {
+      m_con[i].clearArguments();
+      m_con[i].setExecutable("basf2");
+      m_con[i].addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+                                            script1.c_str()));
+      m_con[i].addArgument(cobj.getText("hostname"));
+      m_con[i].addArgument("1");
+      m_con[i].addArgument(StringUtil::form("%d", cobj.getInt("port")));
+      m_con[i].addArgument(StringUtil::form("ropcbasf2_in_%d", i - 1));
+      m_con[i].addArgument(StringUtil::form("%d", i + 1));
+      m_con[i].load(0);
+      LogFile::debug("Booted %d-th basf2", i - 3);
+    }
+  }
+  m_con[0].setExecutable("basf2");
+  m_con[0].clearArguments();
+  m_con[0].addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+                                        obj.getText("ropc_script0").c_str()));
+  m_con[0].addArgument("1");
+  m_con[0].addArgument(StringUtil::form("%d", obj.getInt("port_from")));
+  m_con[0].addArgument("ropcbasf2_" + getNode().getName());
+  m_con[0].load(0);
   return false;
 }
 
@@ -65,7 +106,10 @@ bool ROCallback::start() throw()
 {
   ronode_status* status = (ronode_status*)m_data.get();
   status->stime = Time().getSecond();
-  return m_con.start();
+  for (size_t i = 0; i < m_con.size(); i++) {
+    m_con[0].start();
+  }
+  return true;
 }
 
 bool ROCallback::stop() throw()
@@ -96,7 +140,9 @@ bool ROCallback::recover() throw()
 
 bool ROCallback::abort() throw()
 {
-  m_con.abort();
+  for (size_t i = 0; i < m_con.size(); i++) {
+    m_con[0].abort();
+  }
   getNode().setState(RCState::NOTREADY_S);
   return true;
 }
@@ -118,7 +164,7 @@ void ROCallback::timeout() throw()
       nsm->loadavg = -1;
     }
   }
-  int eflag = m_con.getInfo().getErrorFlag();
+  int eflag = m_con[0].getInfo().getErrorFlag();
   if (eflag > 0) {
     if (eflag == RunInfoBuffer::PROCESS_DOWN) {
       if (getNode().getState() == RCState::RUNNING_S) {
@@ -131,7 +177,7 @@ void ROCallback::timeout() throw()
         } else {
           com.replyError(RunInfoBuffer::PROCESS_DOWN,
                          "Process recover failed " +
-                         m_con.getExecutable());
+                         m_con[0].getExecutable());
         }
       }
     }

@@ -3,6 +3,7 @@
 
 #include "daq/slc/readout/ProcessController.h"
 
+#include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/nsm/NSMData.h>
 
 #include "daq/slc/runcontrol/RCCallback.h"
@@ -13,7 +14,7 @@ namespace Belle2 {
   class ROCallback : public RCCallback {
 
   public:
-    ROCallback(const NSMNode& node);
+    ROCallback(const NSMNode& node, const std::string& conf);
     virtual ~ROCallback() throw();
 
   public:
@@ -29,9 +30,10 @@ namespace Belle2 {
     virtual void timeout() throw();
 
   private:
-    ProcessController m_con;
+    std::vector<ProcessController> m_con;
     FlowMonitor m_flow;
     NSMData m_data;
+    ConfigFile m_file;
 
   };
 

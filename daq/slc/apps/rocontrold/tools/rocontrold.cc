@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     return 1;
   }
   NSMNode node(name);
-  ROCallback* callback = new ROCallback(node);
+  ROCallback* callback = new ROCallback(node, argv[1]);
   callback->setFilePath("database/ropc");
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();

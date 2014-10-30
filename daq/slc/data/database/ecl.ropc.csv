@@ -1,3 +1,3 @@
- nodename,      config, host_from, port_from, host_to, port_to, ropc_nodeid, ropc_script
-   ROPC501, ECL:default,    ecl01,      5101,  ecl01,   36000,           3,daq/rawdata/examples/RecvStream1.py
-   ROPC502, ECL:default,    ecl02,      5101,  ecl02,   36000,           3,daq/rawdata/examples/RecvStream1.py
+ nodename,      config, host_from, port_from, host_to, port_to, copper_from, ropc_nodeid, ropc_script0, ropc_script1
+   ROPC501, ECL:default,    ecl01,5101,  ecl01,36000, ECL01:default,3,daq/rawdata/examples/RecvStream0.py,daq/rawdata/examples/RecvStream1.py
+   ROPC502, ECL:default,    ecl02,5101,  ecl02,36000, ECL02:default,3,daq/rawdata/examples/RecvStream0.py,daq/rawdata/examples/RecvStream1.py

@@ -146,8 +146,11 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
         return true;
       } else {
         std::string runtype;
+        int configid = 0;
         if (msg.getLength() > 0) {
           runtype = msg.getData();
+        } else if (msg.getNParams() > 1 && msg.getParam(1) > 0) {
+          configid = msg.getParam(1);
         } else {
           setReply("No runtype were given");
           LogFile::error("No runtype were given");
@@ -158,7 +161,11 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
             m_db->connect();
           std::string nodename = getNode().getName();
           ConfigObjectTable table(m_db);
-          m_config.setObject(table.get(runtype, nodename));
+          if (runtype.size() > 0) {
+            m_config.setObject(table.get(runtype, nodename));
+          } else {
+            m_config.setObject(table.get(configid));
+          }
           LogFile::info("Loaded from DB %s:%s", nodename.c_str(), runtype.c_str());
           if (m_db_close)
             m_db->close();

@@ -6,7 +6,7 @@ hostname : ropc02.kek.jp
 port : 9090
 nsmhost : 172.22.32.11
 nsmport : 8122
-nsmnode : RC_GUI
+nsmnode : RC_GUI2
 nsmtarget : RUNCONTROL
 data00.dataname : RUNCONTROL_STATUS
 data00.format : rc_status

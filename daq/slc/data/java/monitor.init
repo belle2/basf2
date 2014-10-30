@@ -6,7 +6,7 @@ hostname : ropc02.kek.jp
 port : 9090
 nsmhost : 172.22.32.11
 nsmport : 8122
-nsmnode : MON
+nsmnode : MON2
 nsmtarget : ECL02
 data00.dataname : STORAGE_STATUS
 data00.format : storage_status

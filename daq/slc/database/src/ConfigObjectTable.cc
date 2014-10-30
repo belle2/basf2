@@ -34,7 +34,8 @@ throw()
     }
     TableInfo tinfo = TableInfoTable(m_db).get(tablename, revision);
     if (tablename.size() == 0 || revision <= 0) {
-      LogFile::warning("No table for (%s:%s) found in config DB",
+      LogFile::warning("No table for (%s:%d, %s:%s) found in config DB",
+                       tablename.c_str(), revision,
                        nodename.c_str(), configname.c_str());
       return obj_v;
     }

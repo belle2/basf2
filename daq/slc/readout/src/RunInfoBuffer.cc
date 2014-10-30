@@ -112,6 +112,21 @@ bool RunInfoBuffer::waitRunning(int timeout)
   return true;
 }
 
+bool RunInfoBuffer::waitReady(int timeout)
+{
+  if (m_info == NULL) return false;
+  lock();
+  if (getState() != RunInfoBuffer::READY &&
+      getState() != RunInfoBuffer::RUNNING) {
+    if (!wait(timeout)) {
+      unlock();
+      return false;
+    }
+  }
+  unlock();
+  return true;
+}
+
 bool RunInfoBuffer::reportRunning()
 {
   if (m_info == NULL) return false;

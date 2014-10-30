@@ -89,6 +89,7 @@ namespace Belle2 {
     void addOutputNBytes(unsigned long long nbyte) { m_info->io[1].nbyte += nbyte; }
 
     bool waitRunning(int timeout);
+    bool waitReady(int timeout);
     bool reportRunning();
     bool reportError(EFlag eflag);
     bool reportReady();

@@ -44,7 +44,7 @@ bool ProcessController::load(int timeout)
   PThread(new ProcessListener(this));
   close(iopipe[1]);
   if (timeout > 0) {
-    if (!m_info.waitRunning(timeout)) {
+    if (!m_info.waitReady(timeout)) {
       m_callback->setReply("Failed to boot " + m_name);
       return false;
     }

@@ -202,6 +202,11 @@ namespace Belle2 {
     double cosTPTO(const Particle* part);
 
     /**
+     * returns the PDG code of the correspondig B0/B0bar when found in RoE, 0 otherwise
+     */
+    double McFlavorOfTagSide(const Particle* part);
+
+    /**
      * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
      */
     double isSignal(const Particle* particle);
@@ -247,10 +252,15 @@ namespace Belle2 {
     double isRestOfEventOfB0bar(const Particle*);
 
     /**
+     * -1 (1) if current RestOfEvent is related to a B0bar (B0) and -2 if empty - used for cuts
+     */
+    double isRestOfEventEmpty(const Particle* part);
+
+    /**
      * -1 (1) if current RestOfEvent is related to a B0bar (B0)
      */
-    double isRestOfEventB0Flavor(const Particle*);
 
+    double isRestOfEventB0Flavor(const Particle*);
     /**
      * 0 (1) if current RestOfEvent is related to a B0bar (B0)
      */

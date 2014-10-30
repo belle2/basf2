@@ -501,6 +501,64 @@ namespace Belle2 {
       return 0.0;
     }
 
+    double isRestOfEventEmpty(const Particle* part)
+    {
+      const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
+      float q_MC = 0; //Flavor of B
+      if (roe-> getNTracks() != 0) {
+        for (auto & track : roe->getTracks()) {
+          const MCParticle* mcParticle = track->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) {
+              q_MC++;
+              break;
+            }
+            if (mcParticle->getPDG() == -511) {
+              q_MC--;
+              break;
+            }
+            mcParticle = mcParticle->getMother();
+          }
+        }
+      } else if (roe-> getNECLClusters() != 0) {
+        for (auto & cluster : roe-> getECLClusters()) {
+          const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) {
+              q_MC++;
+              break;
+            }
+            if (mcParticle->getPDG() == -511) {
+              q_MC--;
+              break;
+            }
+            mcParticle = mcParticle->getMother();
+          }
+        }
+      } else if (roe-> getNKLMClusters() != 0) {
+        for (auto & klmcluster : roe-> getKLMClusters()) {
+          const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) {
+              q_MC++;
+              break;
+            }
+            if (mcParticle->getPDG() == -511) {
+              q_MC--;
+              break;
+            }
+            mcParticle = mcParticle->getMother();
+          }
+        }
+      }
+      if (q_MC > 0) {
+        return 1;
+      } else if (q_MC < 0) {
+        return -1;
+      } else return -2;
+    }
+
+
     double isRestOfEventB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -555,8 +613,9 @@ namespace Belle2 {
         return 1;
       } else if (q_MC < 0) {
         return -1;
-      } else return -2;//gRandom->Uniform(0, 1);
+      } else return -2;
     }
+
 
     double isRestOfEventB0Flavor_Norm(const Particle*)
     {
@@ -730,6 +789,20 @@ namespace Belle2 {
       }
       return sum;
 
+    }
+
+    double McFlavorOfTagSide(const Particle* part)
+    {
+      const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
+      for (auto & track : roe->getTracks()) {
+        const MCParticle* mcParticle = track->getRelated<MCParticle>();
+        while (mcParticle != nullptr) {
+          if (mcParticle->getPDG() == 511) return 511;
+          else if (mcParticle->getPDG() == -511) return -511;
+          mcParticle = mcParticle->getMother();
+        }
+      }
+      return 0;
     }
 
     double cosTPTO(const Particle* part)
@@ -1322,6 +1395,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar.");
     REGISTER_VARIABLE("isRestOfEventOfB0", isRestOfEventOfB0,  "[Eventbased] Check if current RestOfEvent is related to a B0.");
     REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,  "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar.");
+    REGISTER_VARIABLE("isRestOfEventEmpty", isRestOfEventEmpty,  "-1 (1), -2 if current RestOfEvent is related to a B0bar (B0). But is used for checking if RoE empty.");
     REGISTER_VARIABLE("isRestOfEventB0Flavor", isRestOfEventB0Flavor,  "-1 (1) if current RestOfEvent is related to a B0bar (B0).");
     REGISTER_VARIABLE("qr_Combined", isRestOfEventB0Flavor_Norm,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
     REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
@@ -1334,6 +1408,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("MomentumOfSecondDaughter_CMS", MomentumOfSecondDaughter_CMS,  "Returns the Momentum of second daughter if existing in CMS, else 0.");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,  "Returns the q*(highest PID_Likelihood for Kaons), else 0.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,  "Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.");
+    REGISTER_VARIABLE("McFlavorOfTagSide",  McFlavorOfTagSide, "Flavour of tag side from MC extracted from the RoE");
     REGISTER_VARIABLE("BtagClassFlavor",  particleClassifiedFlavor,    "Flavour of Btag from trained Method");
     REGISTER_VARIABLE("BtagMCFlavor",  particleMCFlavor,    "Flavour of Btag from MC");
     REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,  "Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 else.");

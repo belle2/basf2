@@ -6,9 +6,12 @@ setuprel
 cd -
 
 echo "booting nsmd2"
+./boot_nsmd2_ssh ecl01 local
+sleep 2
 for i in $(seq 5001 5013)
 do
 ./boot_nsmd2_ssh cpr${i} local
+sleep 1
 done
-./boot_nsmd2_ssh ecl01 local
+
 ./boot_nsmd2_ssh ecl01 global

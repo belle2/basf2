@@ -65,7 +65,8 @@ bool ROCallback::load() throw()
   for (size_t i = 1; i < m_con.size(); i++) {
     const DBObject& cobj(obj.getObject("copper_from", i - 1));
     if (cobj.getBool("used")) {
-      ss << " " << cobj.getText("hostname") << ":" << cobj.getInt("port");
+      //ss << " " << cobj.getText("hostname") << ":" << cobj.getInt("port");
+      ss << " " << "127.0.0.1" << ":" << cobj.getInt("port");
     }
   }
   ss << std::endl
@@ -74,19 +75,19 @@ bool ROCallback::load() throw()
   fout << ss.str();
   fout.close();
 
-  const std::string script1 = obj.getText("ropc_script1");
+  const std::string script0 = obj.getText("ropc_script0");
   for (size_t i = 1; i < m_con.size(); i++) {
     const DBObject& cobj(obj.getObject("copper_from", i - 1));
     if (cobj.getBool("used")) {
       m_con[i].clearArguments();
       m_con[i].setExecutable("basf2");
       m_con[i].addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                                            script1.c_str()));
+                                            script0.c_str()));
       m_con[i].addArgument(cobj.getText("hostname"));
       m_con[i].addArgument("1");
       m_con[i].addArgument(StringUtil::form("%d", cobj.getInt("port")));
       m_con[i].addArgument(StringUtil::form("ropcbasf2_in_%d", i - 1));
-      m_con[i].addArgument(StringUtil::form("%d", i + 1));
+      //m_con[i].addArgument(StringUtil::form("%d", i + 1));
       m_con[i].load(0);
       LogFile::debug("Booted %d-th basf2", i - 3);
     }
@@ -94,12 +95,12 @@ bool ROCallback::load() throw()
   m_con[0].setExecutable("basf2");
   m_con[0].clearArguments();
   m_con[0].addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                                        obj.getText("ropc_script0").c_str()));
+                                        obj.getText("ropc_script1").c_str()));
   m_con[0].addArgument("1");
   m_con[0].addArgument(StringUtil::form("%d", obj.getInt("port_from")));
   m_con[0].addArgument("ropcbasf2_" + getNode().getName());
   m_con[0].load(0);
-  return false;
+  return true;
 }
 
 bool ROCallback::start() throw()

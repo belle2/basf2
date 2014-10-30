@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   const std::string node = argv[4];
   NSMData data(node + "_STATUS", "ronode_status",
                ronode_status_revision);
-  data.open(comm);
+  data.open(comm, true);
 
   while (true) {
     sleep(2);

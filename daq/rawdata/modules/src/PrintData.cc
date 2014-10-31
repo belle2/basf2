@@ -255,15 +255,6 @@ void PrintDataModule::printPXDEvent(RawPXD* raw_pxd)
 void PrintDataModule::event()
 {
 
-  StoreArray<RawECL> raw_eclarray;
-  for (int i = 0; i < raw_eclarray.getEntries(); i++) {
-    for (int j = 0; j < raw_eclarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawECL) : Block # %d ", i);
-      printCOPPEREvent(raw_eclarray[ i ], j);
-    }
-  }
-
-  printf("Data %d\n", raw_eclarray.getEntries());
   B2INFO("aPrintData: event() started.");
   //
   // FTSW + COPPER can be combined in the array
@@ -363,11 +354,40 @@ void PrintDataModule::event()
     printf("\n===== DataBlock(RawPXD) : Block # %d ", i);
     printPXDEvent(raw_pxdarray[ i ]);
   }
+
+
+
   StoreArray<RawBPID> raw_bpidarray;
+  for (int i = 0; i < raw_bpidarray.getEntries(); i++) {
+    for (int j = 0; j < raw_bpidarray[ i ]->GetNumEntries(); j++) {
+      printf("\n===== DataBlock(RawBPID) : Block # %d ", i);
+      printCOPPEREvent(raw_bpidarray[ i ], j);
+    }
+  }
+
   StoreArray<RawEPID> raw_epidarray;
+  for (int i = 0; i < raw_epidarray.getEntries(); i++) {
+    for (int j = 0; j < raw_epidarray[ i ]->GetNumEntries(); j++) {
+      printf("\n===== DataBlock(RawEPID) : Block # %d ", i);
+      printCOPPEREvent(raw_epidarray[ i ], j);
+    }
+  }
+
   StoreArray<RawKLM> raw_klmarray;
+  for (int i = 0; i < raw_klmarray.getEntries(); i++) {
+    for (int j = 0; j < raw_klmarray[ i ]->GetNumEntries(); j++) {
+      printf("\n===== DataBlock(RawKLM) : Block # %d ", i);
+      printCOPPEREvent(raw_klmarray[ i ], j);
+    }
+  }
 
-
+  StoreArray<RawECL> raw_eclarray;
+  for (int i = 0; i < raw_eclarray.getEntries(); i++) {
+    for (int j = 0; j < raw_eclarray[ i ]->GetNumEntries(); j++) {
+      printf("\n===== DataBlock(RawECL) : Block # %d ", i);
+      printCOPPEREvent(raw_eclarray[ i ], j);
+    }
+  }
 
 
 

@@ -59,10 +59,11 @@ void PXDReadRawONSENModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
 
   // Initialize Array of RawCOPPER
-  StoreArray<RawPXD>::registerPersistent();
+  StoreArray<RawPXD> storeRawPIDs;
+  storeRawPIDs.registerInDataStore();
 
   B2DEBUG(0, "PXDReadRawONSENModule: initialized.");
 }

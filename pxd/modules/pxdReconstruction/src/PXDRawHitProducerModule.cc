@@ -45,7 +45,7 @@ void PXDRawHitProducerModule::initialize()
 {
   //Register collections
   StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
-  storeRawHits.registerAsPersistent();
+  storeRawHits.registerInDataStore();
 
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   storeDigits.required();

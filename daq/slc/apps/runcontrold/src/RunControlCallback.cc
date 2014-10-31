@@ -246,6 +246,7 @@ bool RunControlCallback::load() throw()
   for (size_t i = 0; i < m_node_v.size(); i++) {
     NSMNode& node(m_node_v[i]);
     msg.setNodeName(node);
+    msg.setData(0, NULL);
     bool finded;
     ConfigObjectList::iterator it = findConfig(node.getName(), finded);
     if (!finded) continue;
@@ -646,6 +647,8 @@ void RunControlCallback::update() throw()
     getNode().setState(RCState::STOPPING_TS);
   } else if (running_all) {
     getNode().setState(RCState::RUNNING_S);
+  } else {
+    getNode().setState(RCState::NOTREADY_S);
   }
   if (getNode().getState() != state_org) {
     replyOK();

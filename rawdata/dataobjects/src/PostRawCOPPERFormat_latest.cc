@@ -158,6 +158,7 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   //
   // Check incrementation of event #
   //
+  *cur_evenum_rawcprhdr = GetEveNo(n);
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
   if (
 #ifdef WO_FIRST_EVENUM_CHECK

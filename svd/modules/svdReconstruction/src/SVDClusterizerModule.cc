@@ -118,7 +118,7 @@ void SVDClusterizerModule::initialize()
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  storeClusters.registerAsPersistent();
+  storeClusters.registerInDataStore();
   storeDigits.required();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
@@ -129,12 +129,12 @@ void SVDClusterizerModule::initialize()
   RelationArray relDigitTrueHits(storeDigits, storeTrueHits);
   RelationArray relDigitMCParticles(storeDigits, storeMCParticles);
 
-  relClusterDigits.registerAsPersistent();
+  relClusterDigits.registerInDataStore();
   //Relations to simulation objects only if the ancestor relations exist
   if (relDigitTrueHits.isOptional())
-    relClusterTrueHits.registerAsPersistent();
+    relClusterTrueHits.registerInDataStore();
   if (relDigitMCParticles.isOptional())
-    relClusterMCParticles.registerAsPersistent();
+    relClusterMCParticles.registerInDataStore();
 
   //Store names to speed up creation later
   m_storeClustersName = storeClusters.getName();

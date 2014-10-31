@@ -907,6 +907,8 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   copy_nwords = tmp_trailer.GetTrlNwords();
   copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
+
+
   // length check
   if (pos_nwords_to != nwords_buf_to) {
     printf("Buffer overflow. Exiting... %d %d\n", pos_nwords_to, nwords_buf_to);
@@ -924,8 +926,12 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE) = pos_nwords_finesse[ 3 ];
 
 
+  // Recalculate XOR checksum in a RawCOPPER trailer
+  *(buf_to + pos_nwords_to - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM) =
+    CalcXORChecksum(buf_to, pos_nwords_to - tmp_trailer.GetTrlNwords());
+
   //
-  // CRC16 check
+  // data block # check
   //
   m_reduced_rawcpr.SetBuffer(buf_to, nwords_buf_to, 0, GetNumEvents(), GetNumNodes());
   if (m_reduced_rawcpr.GetNumEvents() * m_reduced_rawcpr.GetNumNodes() <= 0) {
@@ -935,6 +941,9 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
     exit(1);
   }
 
+  //
+  // check no-data buffer
+  //
   for (int i = 0; i < m_reduced_rawcpr.GetNumEvents() * m_reduced_rawcpr.GetNumNodes(); i++) {
     int nonzero_finesse_buf = 0;
     for (int j = 0; j < 4; j++) {

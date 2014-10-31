@@ -255,18 +255,27 @@ void PrintDataModule::printPXDEvent(RawPXD* raw_pxd)
 void PrintDataModule::event()
 {
 
+  StoreArray<RawECL> raw_eclarray;
+  for (int i = 0; i < raw_eclarray.getEntries(); i++) {
+    for (int j = 0; j < raw_eclarray[ i ]->GetNumEntries(); j++) {
+      printf("\n===== DataBlock(RawECL) : Block # %d ", i);
+      printCOPPEREvent(raw_eclarray[ i ], j);
+    }
+  }
 
+  printf("Data %d\n", raw_eclarray.getEntries());
   B2INFO("aPrintData: event() started.");
   //
   // FTSW + COPPER can be combined in the array
   //
   StoreArray<RawDataBlock> raw_datablkarray;
 
-
   for (int i = 0; i < raw_datablkarray.getEntries(); i++) {
+
     for (int j = 0; j < raw_datablkarray[ i ]->GetNumEntries(); j++) {
       int* temp_buf = raw_datablkarray[ i ]->GetBuffer(j);
       int nwords = raw_datablkarray[ i ]->GetBlockNwords(j);
+      printf("nwords %d\n", nwords);
       int delete_flag = 0;
       int num_nodes = 1;
       int num_events = 1;
@@ -281,7 +290,8 @@ void PrintDataModule::event()
       } else {
 
         // COPPER data block
-        printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d ", i);
+        printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d tot %d ", i,
+               raw_datablkarray[ i ]->TotalBufNwords());
         RawCOPPER temp_raw_copper;
         temp_raw_copper.SetBuffer(temp_buf, nwords, delete_flag, num_nodes, num_events);
         printCOPPEREvent(&temp_raw_copper, 0);
@@ -356,7 +366,10 @@ void PrintDataModule::event()
   StoreArray<RawBPID> raw_bpidarray;
   StoreArray<RawEPID> raw_epidarray;
   StoreArray<RawKLM> raw_klmarray;
-  StoreArray<RawECL> raw_eclarray;
+
+
+
+
 
   //  printf("loop %d\n", n_basf2evt);
   n_basf2evt++;

@@ -28,18 +28,17 @@ ROCallback::~ROCallback() throw()
 
 void ROCallback::init() throw()
 {
-  m_data = NSMData(getNode().getName() + "_STATUS",
-                   "ronode_status",
+  m_data = NSMData(getNode().getName() + "_STATUS", "ronode_status",
                    ronode_status_revision);
   m_data.allocate(getCommunicator());
-  const size_t nproc = m_file.getInt("ropc_in.nproc");
+  const size_t nproc = m_file.getInt("ropc.nrecv0");
   m_con = std::vector<ProcessController>();
   for (size_t i = 0; i < 1 + nproc; i++) {
     m_con.push_back(ProcessController(this));
   }
-  m_con[0].init("ropcbasf2_out", 1);
+  m_con[0].init("recvStream1", 1);
   for (size_t i = 1; i < m_con.size(); i++) {
-    m_con[i].init(StringUtil::form("ropcbasf2_in_%d", i - 1), i);
+    m_con[i].init(StringUtil::form("recvStream0_%d", i - 1), i);
   }
 }
 
@@ -54,6 +53,7 @@ void ROCallback::term() throw()
 bool ROCallback::load() throw()
 {
   if (m_con[0].isAlive()) return true;
+  const char* path_b2lib = getenv("BELLE2_LOCAL_DIR");
   const DBObject& obj(getConfig().getObject());
   std::stringstream ss;
   ss << "#!/bin/sh" << std::endl
@@ -62,44 +62,54 @@ bool ROCallback::load() throw()
      << "killall eb0 > /dev/null 2>&1" << std::endl
      << "sleep 1" << std::endl
      << "./eb0";
+  const bool use_recv0 = m_file.getBool("ropc.nrecv0") > 0;
   for (size_t i = 1; i < m_con.size(); i++) {
     const DBObject& cobj(obj.getObject("copper_from", i - 1));
     if (cobj.getBool("used")) {
-      //ss << " " << cobj.getText("hostname") << ":" << cobj.getInt("port");
-      ss << " " << "127.0.0.1" << ":" << cobj.getInt("port");
+      if (use_nrecv0) {
+        ss << " " << "127.0.0.1" << ":" << cobj.getInt("port");
+      } else {
+        ss << " " << cobj.getText("hostname") << ":" << m_file.getInt("ropc.copper.port");
+      }
     }
   }
-  ss << std::endl
-     << "EOT" << std::endl;
-  std::ofstream fout(m_file.get("ropc_in.eb0.script"));
+  ss << std::endl << "EOT" << std::endl;
+  std::ofstream fout(m_file.get("ropc.eb0.script"));
   fout << ss.str();
   fout.close();
-
-  const std::string script0 = obj.getText("ropc_script0");
-  for (size_t i = 1; i < m_con.size(); i++) {
-    const DBObject& cobj(obj.getObject("copper_from", i - 1));
-    if (cobj.getBool("used")) {
-      m_con[i].clearArguments();
-      m_con[i].setExecutable("basf2");
-      m_con[i].addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                                            script0.c_str()));
-      m_con[i].addArgument(cobj.getText("hostname"));
-      m_con[i].addArgument("1");
-      m_con[i].addArgument(StringUtil::form("%d", cobj.getInt("port")));
-      m_con[i].addArgument(StringUtil::form("ropcbasf2_in_%d", i - 1));
-      //m_con[i].addArgument(StringUtil::form("%d", i + 1));
-      m_con[i].load(0);
-      LogFile::debug("Booted %d-th basf2", i - 3);
+  if (use_nrecv0) {
+    const std::string script0 = obj.getText("ropc_script0");
+    for (size_t i = 1; i < m_con.size(); i++) {
+      const DBObject& cobj(obj.getObject("copper_from", i - 1));
+      if (cobj.getBool("used")) {
+        m_con[i].clearArguments();
+        m_con[i].setExecutable("basf2");
+        m_con[i].addArgument(StringUtil::form("%s/%s", path_b2lib, script0.c_str()));
+        m_con[i].addArgument(cobj.getText("hostname"));
+        m_con[i].addArgument("1");
+        m_con[i].addArgument(StringUtil::form("%d", cobj.getInt("port")));
+        m_con[i].addArgument(StringUtil::form("recvStream0_%d", i - 1));
+        if (!m_con[i].load(10)) {
+          LogFile::error("Failed to boot %d-th recvStream0", i - 3);
+          return false;
+        }
+        LogFile::debug("Booted %d-th recvStream0", i - 3);
+      }
     }
   }
+  const std::string script1 = obj.getText("ropc_script1");
   m_con[0].setExecutable("basf2");
   m_con[0].clearArguments();
-  m_con[0].addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                                        obj.getText("ropc_script1").c_str()));
+  m_con[0].addArgument(StringUtil::form("%s/%s", path_b2lib, script1.c_str()));
   m_con[0].addArgument("1");
   m_con[0].addArgument(StringUtil::form("%d", obj.getInt("port_from")));
-  m_con[0].addArgument("ropcbasf2_" + getNode().getName());
+  m_con[0].addArgument("recvStream1_out");
   m_con[0].load(0);
+  if (!m_con[0].load(10)) {
+    LogFile::error("Failed to boot recvStream1");
+    return false;
+  }
+  LogFile::debug("Booted recvStream1");
   return true;
 }
 
@@ -107,7 +117,12 @@ bool ROCallback::start() throw()
 {
   ronode_status* status = (ronode_status*)m_data.get();
   status->stime = Time().getSecond();
-  for (size_t i = 0; i < m_con.size(); i++) {
+  const bool use_recv0 = m_file.getBool("ropc.nrecv0") > 0;
+  if (use_recv0) {
+    for (size_t i = 0; i < m_con.size(); i++) {
+      m_con[i].start();
+    }
+  } else {
     m_con[0].start();
   }
   return true;
@@ -142,7 +157,7 @@ bool ROCallback::recover() throw()
 bool ROCallback::abort() throw()
 {
   for (size_t i = 0; i < m_con.size(); i++) {
-    m_con[0].abort();
+    m_con[i].abort();
   }
   getNode().setState(RCState::NOTREADY_S);
   return true;

@@ -82,6 +82,7 @@ bool ProcessController::abort()
   if (getExecutable() == "basf2") {
     usleep(10000);
     m_fork.kill(SIGQUIT);
+    m_fork.kill(SIGKILL);
   }
   return true;
 }

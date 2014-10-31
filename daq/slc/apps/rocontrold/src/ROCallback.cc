@@ -66,7 +66,7 @@ bool ROCallback::load() throw()
   for (size_t i = 1; i < m_con.size(); i++) {
     const DBObject& cobj(obj.getObject("copper_from", i - 1));
     if (cobj.getBool("used")) {
-      if (use_nrecv0) {
+      if (use_recv0) {
         ss << " " << "127.0.0.1" << ":" << cobj.getInt("port");
       } else {
         ss << " " << cobj.getText("hostname") << ":" << m_file.getInt("ropc.copper.port");
@@ -77,7 +77,7 @@ bool ROCallback::load() throw()
   std::ofstream fout(m_file.get("ropc.eb0.script"));
   fout << ss.str();
   fout.close();
-  if (use_nrecv0) {
+  if (use_recv0) {
     const std::string script0 = obj.getText("ropc_script0");
     for (size_t i = 1; i < m_con.size(); i++) {
       const DBObject& cobj(obj.getObject("copper_from", i - 1));

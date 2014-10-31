@@ -91,59 +91,59 @@ void COPPERCallback::timeout() throw()
     if (getNode().getState() == RCState::RUNNING_S &&
         m_copper.isFifoFull()) {
       std::string msg = "COPPER FIFO full";
-      LogFile::warning(msg);
-      com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+      //LogFile::warning(msg);
+      //com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
     }
     if (getNode().getState() == RCState::RUNNING_S &&
         m_copper.isFifoEmpty()) {
       std::string msg = "COPPER FIFO empty";
-      LogFile::warning(msg);
-      com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+      //LogFile::warning(msg);
+      //com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
     }
     if (m_copper.isLengthFifoFull()) {
       std::string msg = "COPPER length FIFO full";
-      LogFile::warning(msg);
-      com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+      //LogFile::warning(msg);
+      //com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
     }
     for (int i = 0; i < 4; i++) {
       if (m_config.useHSLB(i)) {
         if (m_hslb[i].isBelle2LinkDown()) {
           std::string msg = StringUtil::form("HSLB %c Belle2 link down", (char)(i + 'a'));
-          LogFile::error(msg);
-          com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
+          //LogFile::error(msg);
+          //com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
         }
         if (getNode().getState() == RCState::RUNNING_S &&
             m_hslb[i].isCOPPERFifoFull()) {
           std::string msg = StringUtil::form("HSLB %c COPPER fifo full", (char)(i + 'a'));
-          LogFile::warning(msg);
-          com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+          //LogFile::warning(msg);
+          //com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
         }
         if (m_hslb[i].isCOPPERLengthFifoFull()) {
           std::string msg = StringUtil::form("HSLB %c COPPER length fifo full", (char)(i + 'a'));
-          LogFile::warning(msg);
-          com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+          //LogFile::warning(msg);
+          //com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
         }
         if (m_hslb[i].isFifoFull()) {
           std::string msg = StringUtil::form("HSLB %c fifo full", (char)(i + 'a'));
-          LogFile::warning(msg);
-          com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+          //LogFile::warning(msg);
+          //com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
         }
         if (m_hslb[i].isCRCError()) {
           std::string msg = StringUtil::form("HSLB %c CRC error", (char)(i + 'a'));
-          LogFile::warning(msg);
-          com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+          //LogFile::warning(msg);
+          //com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
         }
       }
     }
     if (m_ttrx.isBelle2LinkError()) {
       std::string msg = "TTRX Belle2 link error";
-      LogFile::error(msg);
-      com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
+      //LogFile::error(msg);
+      //com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
     }
     if (m_ttrx.isLinkUpError()) {
       std::string msg = "TTRX Link up error";
-      LogFile::error(msg);
-      com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
+      //LogFile::error(msg);
+      //com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
     }
   }
   if (m_data.isAvailable()) {

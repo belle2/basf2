@@ -8,14 +8,12 @@ ssh cpr${i} "${dir}/boot_daemon cprcontrold cpr${i}"
 sleep 1
 done
 
+#cd $dir
 echo "booting rocontrold in ecl01"
-ssh ecl01 "${dir}/boot_daemon rocontrold ropc_ecl01"
+./boot_daemon rocontrold ropc_ecl01
 sleep 2
 echo "booting ecl01 runcontrold in ecl01"
-ssh ecl01 "${dir}/boot_daemon runcontrold ecl01"
+./boot_daemon runcontrold ecl01
 sleep 2
 echo "booting ecl runcontrold in ecl01"
-ssh ecl01 "${dir}/boot_daemon runcontrold ecl"
-sleep 2
-echo "booting ecl nsm2socket in ecl01"
-ssh ecl01 "${dir}/boot_daemon nsm2socket 9090"
+./boot_daemon runcontrold ecl

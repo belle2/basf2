@@ -15,3 +15,6 @@ sleep 1
 done
 
 ./boot_nsmd2_ssh ecl01 global
+
+echo "booting ecl nsm2socket in ecl01"
+./boot_daemon nsm2socket 9090

@@ -8,6 +8,6 @@ cd -
 echo "killing nsmd2"
 for i in $(seq 5001 5013)
 do
-ssh cpr${i} "killall nsmd2"
+ssh cpr${i} "killall nsmd2 > /dev/null"
 done
 killall nsmd2

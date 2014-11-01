@@ -216,6 +216,7 @@ void SVDBackgroundModule::event()
   }
 
   // Neutron flux
+  // FIMXE: Do we still need TrueHits for this?
   B2DEBUG(100, "Neutron flux")
   currentSensorID.setID(0);
   for (const SVDTrueHit & hit : storeTrueHits) {
@@ -243,12 +244,15 @@ void SVDBackgroundModule::event()
       continue;
     }
     // FIXME: Is there a difference between positrons and electrons wrt. NIEL?
+    // We fill neutronFluxBars with summary NIEL deposit for all kinds of particles by layer and component.
+    // Fluency plots are by component and are deposition histograms for a particular type of particle and compoonent.
     int pdg = abs(simhit->getPDGcode());
     double nielWeight = 0;
     if (pdg == 2112) {
       double m0 = 0.940;
       double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       nielWeight = m_nielNeutrons->getNielFactor(kineticEnergy / Unit::MeV);
+      bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_neutronFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                     stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_neutronFluxNIEL[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -258,6 +262,7 @@ void SVDBackgroundModule::event()
       double m0 = 0.938;
       double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       nielWeight = m_nielProtons->getNielFactor(kineticEnergy / Unit::MeV);
+      bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_protonFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                    stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_protonFluxNIEL[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -267,6 +272,7 @@ void SVDBackgroundModule::event()
       double m0 = 0.135;
       double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       nielWeight = m_nielPions->getNielFactor(kineticEnergy / Unit::MeV);
+      bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_pionFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                  stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_pionFluxNIEL[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -276,6 +282,7 @@ void SVDBackgroundModule::event()
       double m0 = 0.511e-3;
       double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       nielWeight = m_nielElectrons->getNielFactor(kineticEnergy / Unit::MeV);
+      bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_electronFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                      stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_electronFluxNIEL[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -321,16 +328,21 @@ void SVDBackgroundModule::event()
     VxdID sensorID = idAndSet.first;
     sensorID.setSegmentNumber(0);
     double sensorArea = getSensorArea(sensorID);
+    currentLayerNumber = sensorID.getLayerNumber();
     int nFired = idAndSet.second.size();
     double fired = nFired / (currentComponentTime / Unit::s) / sensorArea;
     int nStrips = isUStrip ? getInfo(sensorID).getUCells() : getInfo(sensorID).getVCells();
     double occupancy = w_event * nFired / nStrips / numberOfEvents;
     if (isUStrip) {
       bData.m_sensorData[sensorID].m_firedU += fired;
+      bData.m_uFiredBars->Fill(currentLayerNumber, fired);
       bData.m_sensorData[sensorID].m_occupancyU += occupancy;
+      bData.m_uOccupancyBars->Fill(currentLayerNumber, occupancy);
     } else {
       bData.m_sensorData[sensorID].m_firedV += fired;
+      bData.m_vFiredBars->Fill(currentLayerNumber, fired);
       bData.m_sensorData[sensorID].m_occupancyV += occupancy;
+      bData.m_vOccupancyBars->Fill(currentLayerNumber, occupancy);
     }
   }
 }

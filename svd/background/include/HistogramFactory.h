@@ -102,7 +102,9 @@ namespace Belle2 {
         {"Touschek HER", 46},
         {"RBB LER", 29},      // greenish
         {"RBB HER", 30},
-        {"2-photon", 40}      // blue
+        {"2-photon", 40},      // blue
+        {"SR_LER", 25},      // grayish
+        {"SR_HER", 28}
       };
       const char* c_layerlabels[4] = {"3", "4", "5", "6"};
       const float c_barwidth = 0.4;

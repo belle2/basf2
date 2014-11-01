@@ -58,8 +58,10 @@ void PXDRawHitSorterModule::initialize()
 {
   //Register collections
   StoreArray<PXDRawHit>::required(m_storeRawHitsName);
-  StoreArray<PXDDigit>::registerPersistent(m_storeDigitsName);
-  StoreArray<PXDFrame>::registerPersistent(m_storeFramesName);
+  StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
+  storeDigits.registerInDataStore();
+  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+  storeFrames.registerInDataStore();
 
   m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(m_ignoredPixelsListName));
 }

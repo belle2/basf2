@@ -55,6 +55,7 @@ Environment::Environment() :
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");
   const char* envarLocalDir = getenv("BELLE2_LOCAL_DIR");
+  const char* envarAnalysisDir = getenv("BELLE2_ANALYSIS_DIR");
   if (!envarReleaseDir and !envarLocalDir) {
     B2FATAL("The basf2 environment is not set up. Please execute the 'setuprel' script first.");
   }
@@ -70,6 +71,11 @@ Environment::Environment() :
   }
 
   // add module directories for current build options
+  if (envarAnalysisDir) {
+    const string analysisModules = (fs::path(envarAnalysisDir) / "modules" / envarSubDir).string();
+    ModuleManager::Instance().addModuleSearchPath(analysisModules);
+  }
+
   if (envarLocalDir) {
     const string localModules = (fs::path(envarLocalDir) / "modules" / envarSubDir).string();
     ModuleManager::Instance().addModuleSearchPath(localModules);

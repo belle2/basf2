@@ -37,14 +37,6 @@ receiver.param('NodeName', argvs[3])  # node name for NSM
 use_shm_flag = int(argvs[1])
 receiver.param('UseShmFlag', use_shm_flag)
 
-# Histo Module
-# histo = register_module('HistoManager')
-# main.add_module (histo)
-histo = register_module('DqmHistoManager')
-histo.param('HostName', 'ropc01')
-histo.param('Port', 9991)
-histo.param('DumpInterval', 1000)
-histo.param('HistoFileName', 'ropc_histofile.root')
 
 # Monitor module
 monitor = register_module('MonitorDataCOPPER')
@@ -66,7 +58,6 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(receiver)
-# main.add_module(histo)
 # main.add_module(monitor)
 # main.add_module(dump)
 main.add_module(sender)

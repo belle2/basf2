@@ -42,15 +42,6 @@ reader.param('MaxEventNum', -1)
 
 # reader.param('DumpFileName', 'COPPERdump.dat' )
 
-# Histo Module
-# histo = register_module('HistoManager')
-# main.add_module (histo)
-histo = register_module('DqmHistoManager')
-histo.param('HostName', 'ropc04')
-histo.param('Port', 9991)
-histo.param('DumpInterval', 10)
-
-histo.param('HistoFileName', 'histo_file_'.join([argvs[1], '.root']))
 
 # Monitor module
 monitor = register_module('MonitorDataCOPPER')
@@ -71,7 +62,6 @@ main = create_path()
 # Add modules to main path
 main.add_module(reader)
 # if use_shm_flag != 0:
-#    main.add_module(histo)
 #    main.add_module(monitor)
 # main.add_module(dump)
 main.add_module(sender)

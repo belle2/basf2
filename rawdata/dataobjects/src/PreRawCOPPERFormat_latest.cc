@@ -1182,6 +1182,7 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     chksum ^= packed_buf[ i ];
   }
   packed_buf[ poswords_to + tmp_trailer.POS_CHKSUM ] = chksum;
+
   packed_buf[ poswords_to + tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
   poswords_to += tmp_trailer.GetTrlNwords();
 

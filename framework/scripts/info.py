@@ -64,6 +64,7 @@ python_version = sys.version_info[:3]
 print 'Python version:      ', '.'.join(str(ver) for ver in python_version)
 try:
     from ROOT import gROOT
+    gROOT.SetBatch()
     rootver = gROOT.GetVersion()
 except:
     rootver = 'PyROOT broken, cannot get version!'

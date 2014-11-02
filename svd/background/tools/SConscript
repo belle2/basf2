@@ -1,0 +1,3 @@
+Import('env')
+env['TOOLS_LIBS']['make_bg_plots'] = ['svd','vxd','$ROOT_LIBS'];
+Return('env')

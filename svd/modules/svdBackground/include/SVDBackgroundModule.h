@@ -8,6 +8,7 @@
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/background/HistogramFactory.h>
+#include <string>
 #include <vector>
 #include <memory>
 #include <TTree.h>

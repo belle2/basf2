@@ -38,7 +38,7 @@ namespace Belle2 {
      *  <dt>abs(varName)</dt>
      *   <dd>Return absolute value of variable varName.</dd>
      *  <dt>daughter(N, varName)</dt>
-     *   <dd>(replace N with 0..6) Calculate variable varName for Nth daughter</dd>
+     *   <dd>Calculate variable varName for Nth daughter</dd>
      *  <dt>daughterProductOf(varName)</dt>
      *   <dd>Calculate variable varName for each daughter, and return product of values</dd>
      *  <dt>daughterSumOf(varName)</dt>
@@ -83,7 +83,7 @@ namespace Belle2 {
         \endcode
      *
      *
-     *  \note All functions should be listed on
+     *  \note You should probably also update this page if you add a useful function
      *        https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions
      */
     class Manager {
@@ -98,6 +98,7 @@ namespace Belle2 {
       typedef std::function<FunctionPtr(const std::vector<std::string>&)> MetaFunctionPtr;
 #endif
 
+      /** A variable returning a floating-point value for a given Particle. */
       struct Var {
         std::string name; /**< Unique identifier of the function, used as key. */
 #ifndef __CINT__
@@ -108,10 +109,12 @@ namespace Belle2 {
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
         Var() {} /**< default constructor for ROOT */
 #else
+        /** ctor */
         Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
 #endif
       };
 
+      /** A variable taking additional floating-point arguments to influence the behaviour. */
       struct ParameterVar {
         std::string name; /**< Unique identifier of the function, used as key. */
 #ifndef __CINT__
@@ -122,10 +125,12 @@ namespace Belle2 {
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
         ParameterVar() {} /**< default constructor for ROOT */
 #else
+        /** ctor */
         ParameterVar(std::string n, ParameterFunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
 #endif
       };
 
+      /** A variable taking string arguments returning a variable. */
       struct MetaVar {
         std::string name; /**< Unique identifier of the function, used as key. */
 #ifndef __CINT__
@@ -136,6 +141,7 @@ namespace Belle2 {
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
         MetaVar() {} /**< default constructor for ROOT */
 #else
+        /** ctor */
         MetaVar(std::string n, MetaFunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
 #endif
       };
@@ -210,9 +216,11 @@ namespace Belle2 {
       Proxy(const std::string& name, Manager::FunctionPtr f, const std::string& description) {
         Manager::Instance().registerVariable(name, f, description);
       }
+      /** constructor. */
       Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description) {
         Manager::Instance().registerVariable(name, f, description);
       }
+      /** constructor. */
       Proxy(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description) {
         Manager::Instance().registerVariable(name, f, description);
       }

@@ -9,4 +9,4 @@ echo "########################################################"
 echo "########################################################"
 echo "########################################################"
 echo "########################################################"
-basf2 ${BELLE2_LOCAL_DIR}/daq/rawdata/examples/RecvSendCOPPERDummy.py $1 $2 0 --no-stat 
+basf2 ${BELLE2_LOCAL_DIR}/daq/rawdata/examples/RecvSendCOPPERDummy.py $1 $2 $3 $4 $5 --no-stat 

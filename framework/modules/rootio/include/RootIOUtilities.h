@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+class TTree;
+
 namespace Belle2 {
   /** Some constants and helpers common to the RootInput and RootOutput modules. */
   namespace RootIOUtilities {
@@ -23,6 +25,11 @@ namespace Belle2 {
      */
     bool makeBranchNamesUnique(std::vector<std::string>& stringlist);
 
+    /** return entry number with given (event, run, experiment) from tree. Returns -1 on error. */
+    long getEntryNumberWithEvtRunExp(TTree* tree, long event, long run, long experiment);
+
+    /** Build TTreeIndex on tree (assumes EventMetaData branch exists there). */
+    void buildIndex(TTree* tree);
 
     /** Names of trees. */
     extern const std::string c_treeNames[];

@@ -22,7 +22,6 @@
 #endif
 #include <TClonesArray.h>
 #include <TBaseClass.h>
-#include <TTreeIndex.h>
 
 #include <time.h>
 
@@ -230,7 +229,7 @@ void RootOutputModule::terminate()
       B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
     } else if (tree->GetBranch("EventMetaData")) {
       tree->SetBranchAddress("EventMetaData", 0);
-      tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
+      RootIOUtilities::buildIndex(tree);
     }
 
     //fill the file level metadata

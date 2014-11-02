@@ -165,12 +165,8 @@ void RootInputModule::event()
     B2INFO("RootInput: will read entry " << nextEntry << " next.");
     m_counterNumber = nextEntry;
   } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0 && InputController::getNextEvent() >= 0) {
-    const int major = 1000000 * InputController::getNextExperiment() + InputController::getNextRun();
-    const int minor = InputController::getNextEvent();
-    const long entry = m_tree->GetTree()->GetEntryNumberWithIndex(major, minor);
-    if (entry == -1) {
-      B2ERROR("Couldn't find entry with index " << major << ", " << minor);
-    } else {
+    const long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(m_tree->GetTree(), InputController::getNextEvent(), InputController::getNextRun(), InputController::getNextExperiment());
+    if (entry >= 0) {
       const long chainentry = m_tree->GetChainEntryNumber(entry);
       B2INFO("RootInput: will read entry " << chainentry << " (entry " << entry << " in current file) next.");
       m_counterNumber = chainentry;
@@ -367,8 +363,6 @@ bool RootInputModule::readParentTrees()
   unsigned int experiment = eventMetaData->getExperiment();
   unsigned int run = eventMetaData->getRun();
   unsigned int event = eventMetaData->getEvent();
-  int major = 1000000 * experiment + run;
-  int minor = event;
   long entry = -1;
 
   FileCatalog::ParentMetaData* parentMetaData = &m_parentMetaData;
@@ -384,7 +378,7 @@ bool RootInputModule::readParentTrees()
       }
       FileMetaData& metaData = (*parentMetaData)[iParent].metaData;
       tree = m_parentTrees[metaData.getId()];
-      entry = tree->GetEntryNumberWithIndex(major, minor);
+      entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
       if (entry != -1) {
         parentMetaData = &((*parentMetaData)[iParent].parents);
       } else {
@@ -423,7 +417,7 @@ bool RootInputModule::readParentTrees()
           }
 
           // if the tree does contain the current event, connect its branches and exit parents loop
-          entry = tree->GetEntryNumberWithIndex(major, minor);
+          entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
           if (entry != -1) {
             for (auto entry : m_parentStoreEntries[level]) {
               tree->SetBranchAddress(entry->name.c_str(), &(entry->object));

@@ -150,7 +150,8 @@ void COPPERCallback::timeout() throw()
     ronode_status* nsm = (ronode_status*)m_data.get();
     if (m_flow.isAvailable()) {
       ronode_status& status(m_flow.monitor());
-      status.eflag |= (eflag & 0xFF);
+      //status.eflag |= (eflag & 0xFF);
+      status.eflag |= eflag;
       uint32 stime = nsm->stime;
       memcpy(nsm, &status, sizeof(ronode_status));
       nsm->stime = stime;

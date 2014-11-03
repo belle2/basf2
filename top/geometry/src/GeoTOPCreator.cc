@@ -343,7 +343,7 @@ namespace Belle2 {
       G4double Z1 = m_topgp->getZ1();
       G4double WLength = m_topgp->getWLength();
       G4double Wextdown = m_topgp->getWextdown();
-      G4double Wflat = m_topgp->getWflat();
+      //      G4double Wflat = m_topgp->getWflat();
       G4double PannelThickness = m_topgp->getPannelThickness();
       G4double PlateThickness = m_topgp->getPlateThickness();
       G4double LowerGap = m_topgp->getLowerGap();

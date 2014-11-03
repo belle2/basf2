@@ -29,18 +29,18 @@ namespace Belle2 {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
       StoreArray<BgoSimHit>  simHits;
-      RelationArray relMBgomHit(mcParticles, simHits);
+      RelationArray relMCSimHit(mcParticles, simHits);
 
       //Register all collections we want to modify and require those we want to use
       mcParticles.registerInDataStore();
       simHits.registerInDataStore();
-      relMBgomHit.registerInDataStore();
+      relMCSimHit.registerInDataStore();
 
       //Register the Relation so that the TrackIDs get replaced by the actual
       //MCParticle indices after simulating the events. This is needed as
       //secondary particles might not be stored so everything relating to those
       //particles will be attributed to the last saved mother particle
-      registerMCParticleRelation(relMBgomHit);
+      registerMCParticleRelation(relMCSimHit);
     }
 
     bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
@@ -75,7 +75,7 @@ namespace Belle2 {
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;
       StoreArray<BgoSimHit> simHits;
-      RelationArray relMBgomHit(mcParticles, simHits);
+      RelationArray relMCSimHit(mcParticles, simHits);
 
       StoreArray<BgoSimHit> BgoHits;
       if (!BgoHits.isValid()) BgoHits.create();
@@ -93,7 +93,7 @@ namespace Belle2 {
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since
       //the MCParticle index is not yet defined we use the trackID from Geant4
-      relMBgomHit.add(trackID, hit->getArrayIndex(), 1.0);
+      relMCSimHit.add(trackID, hit->getArrayIndex(), 1.0);
 
       return true;
     }

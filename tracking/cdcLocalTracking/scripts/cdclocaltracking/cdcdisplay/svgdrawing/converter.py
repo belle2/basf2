@@ -524,6 +524,11 @@ class CDCDataobjectsConverter:
         fromPoint1 = (comStart.x(), comStart.y())
         toPoint1 = (comEnd.x(), comEnd.y())
 
+        # startSegmentElement = self.toSVG(startSegment, **kwd)
+        # endSegmentElement = self.toSVG(endSegment, **kwd)
+        # childElements.append(startSegmentElement)
+        # childElements.append(endSegmentElement)
+
         arrowElement1 = self.svgElementFactory.createLine(fromPoint1,
                 toPoint1, **arrowStyleDict)
         childElements.append(arrowElement1)

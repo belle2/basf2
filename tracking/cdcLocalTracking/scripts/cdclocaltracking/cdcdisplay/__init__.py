@@ -33,7 +33,14 @@ class CDCSVGDisplayModule(Module):
     def __init__(self, output_folder, interactive=True):
         """
         Constructor method
-        @param output_folder folder to which the svg images shall be saved
+
+        Parameters
+        ----------
+        output_folder : str
+            Target folder for the output
+        interactive : bool, optional
+            Switch to display each event to the user and ask to continue after each event
+            Defaults to True
         """
 
         super(CDCSVGDisplayModule, self).__init__()
@@ -256,10 +263,6 @@ class CDCSVGDisplayModule(Module):
         """
 
         print '##################### DISPLAY EVENT ###########################'
-        # eventMetaData = Belle2.PyStoreObj('EventMetaData')
-        #   if (eventMetaData.obj().getEvent()):
-        #       print 'Skip event', eventMetaData.obj().getEvent()
-        #      return
 
         plotter = svgdrawing.CDCSVGPlotter(animate=self.animate)
 
@@ -473,49 +476,9 @@ class CDCSVGDisplayModule(Module):
 
                 plotter.append(good_axial_axial_segment_pairs, **styleDict)
 
-        # Mimic axial to stereo pair selection
         if self.draw_mcaxialstereopairs:
-            print 'Draw axial to axial segment pairs'
-            segment_storearray = Belle2.PyStoreArray('CDCRecoSegment2Ds')
-            if segment_storearray:
-                print '#Segment', segment_storearray.getEntries()
-                axial_segments = [segment for segment in segment_storearray
-                                  if segment.getStereoType() == 0]
-
-                stereo_segments = [segment for segment in segment_storearray
-                                   if segment.getStereoType() != 0]
-
-                # Misuse this a bit but still does what we want
-                mc_axial_axial_segment_filter = \
-                    Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
-
-                axial_stereo_segment_pairs = \
-                    (Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(startSegment,
-                        endSegment) for startSegment in axial_segments
-                    for endSegment in stereo_segments)
-
-                stereo_axial_segment_pairs = \
-                    (Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(startSegment,
-                        endSegment) for startSegment in stereo_segments
-                    for endSegment in axial_segments)
-
-                def is_good_pair(pair):
-                    weight = \
-                        mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(pair)
-                    return weight == weight  # not nan
-
-                good_axial_stereo_segment_pairs = [pair for pair in
-                        axial_stereo_segment_pairs if is_good_pair(pair)]
-
-                good_stereo_axial_segment_pairs = [pair for pair in
-                        stereo_axial_segment_pairs if is_good_pair(pair)]
-
-                print '#Pairs', len(good_axial_stereo_segment_pairs) \
-                    + len(good_stereo_axial_segment_pairs)
-                styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
-
-                plotter.append(good_axial_stereo_segment_pairs, **styleDict)
-                plotter.append(good_stereo_axial_segment_pairs, **styleDict)
+            styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
+            self.draw_storearray('CDCAxialStereoSegmentPairs', styleDict)
 
         if self.draw_mcsegmenttriples:
             print 'Draw axial to axial segment pairs'

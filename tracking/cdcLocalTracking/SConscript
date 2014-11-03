@@ -30,13 +30,22 @@ def define_aliases(
         env.Alias(parent_dir, target)
         if extension:
             env.Alias(parent_dir + '.' + extension, target)
-        parent_dir = os.path.split(parent_dir)[0]
+
+        next_parent_dir = os.path.split(parent_dir)[0]
+        if next_parent_dir == parent_dir: 
+            break
+        parent_dir = next_parent_dir
+
     if extension:
         env.Alias(extension, target)
 
 
 
 ### Main
+# This SConsript file looks for all python files in /scripts directories in the local tracking subpackage and 
+# adds them to the importable python modules in the compiled release.
+# This prevents a bit of a clutter in the tracking/scripts directory with code only related to local tracking.
+
 script_file_nodes = get_python_files_recursive("scripts")
 dir_node = Dir(".")
 dir_name = dir_node.path

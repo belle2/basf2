@@ -97,9 +97,7 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
   if (!CheckCOPPERMagic(n)) {
     char err_buf[500];
     PrintData(m_buffer, m_nwords);
-    sprintf(err_buf, "COPPER's magic word is invalid. Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    perror(err_buf);
-    exit(1);
+    sprintf(err_buf, "[ERROR] COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf;
     throw (err_str);
   }

@@ -255,25 +255,49 @@ void CDCMCTrackStore::fillNPassedSuperLayers()
   for (const std::pair<ITrackType, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
 
-    ILayerType lastISuperLayer = INVALID_ISUPERLAYER;
+    const CDCHitVector* ptrLastMCSegment = nullptr;
     Index nPassedSuperLayers = 0;
 
     for (const CDCHitVector & mcSegment : mcSegments) {
 
-      for (const CDCHit * ptrHit : mcSegment) {
-
-        if (ptrHit->getISuperLayer() != lastISuperLayer) {
-          ++nPassedSuperLayers;
-          lastISuperLayer = ptrHit->getISuperLayer();
-        }
-        m_nPassedSuperLayers[ptrHit] = nPassedSuperLayers;
-
+      if (ptrLastMCSegment and changedSuperLayer(*ptrLastMCSegment, mcSegment)) {
+        ++nPassedSuperLayers;
       }
+
+      for (const CDCHit * ptrHit : mcSegment) {
+        m_nPassedSuperLayers[ptrHit] = nPassedSuperLayers;
+      }
+
+      ptrLastMCSegment = &mcSegment;
+
     }
   }
 
 }
 
+bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDCHitVector& nextMCSegment) const
+{
+  const CDCHit* ptrHit = mcSegment.front();
+  const CDCHit* ptrNextHit = nextMCSegment.front();
+
+  if (not ptrHit or not ptrNextHit) {
+    B2ERROR("Nullptr retrieved from MC segment.");
+  }
+
+  const CDCHit& hit = *ptrHit;
+  const CDCHit& nextHit = *ptrNextHit;
+
+  if (hit.getISuperLayer() != nextHit.getISuperLayer()) {
+    return true;
+  } else if (hit.getISuperLayer() == 0) {
+    // TODO introduce a smart check here
+
+    return false;
+  } else {
+    return false;
+  }
+
+}
 
 
 Index CDCMCTrackStore::getInTrackId(const CDCHit* ptrHit) const

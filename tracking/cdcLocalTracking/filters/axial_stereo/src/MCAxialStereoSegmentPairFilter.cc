@@ -85,7 +85,7 @@ CellWeight MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CD
     Index endNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(ptrEndSegment);
     if (endNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;
 
-    //if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 1) return NOT_A_CELL;
+    if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 1) return NOT_A_CELL;
 
     //do fits
     CDCTrajectory3D mcTrajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);

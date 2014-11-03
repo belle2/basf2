@@ -80,6 +80,14 @@ namespace Belle2 {
       /// Fill the look up table of the number of traversed super layers until each hit
       void fillNPassedSuperLayers();
 
+      /// Helper function to decide whether the number of passed superlayers changed from one segment to the next
+      /** The number of passed superlayers is easily detectable in a switch of the superlayer number form one segment to the next.
+       *  An exception to this rule happens were particles are curling back exiting the super layer 0 and reentering the CDC super layer 0.
+       *  There is no change of super layer number in this case since consecutive segments (only looking at the CDC) have the super layer number 0.
+       *  Since this case would screw the evaluation of segment pair or triple selection we have to treat it seperatly.
+       */
+      bool changedSuperLayer(const CDCHitVector& mcSegment, const CDCHitVector& nextMCSegment) const;
+
     public:
       /// Getter for the index of the hit within its track.
       Index getInTrackId(const CDCHit* hit) const;

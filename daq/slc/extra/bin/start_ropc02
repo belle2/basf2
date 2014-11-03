@@ -4,5 +4,3 @@ dir="~/belle2/release/daq/slc/extra/bin"
 
 echo "booting runcontrold in ropc02"
 ssh ropc02 "${dir}/boot_daemon runcontrold runcontrol"
-echo "booting nsm2socket in ropc02"
-ssh ropc02 "${dir}/boot_daemon nsm2socket 9090"

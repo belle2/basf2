@@ -7,3 +7,5 @@ cd -
 
 echo "booting nsmd2"
 ./boot_nsmd2_ssh ropc02 global
+echo "booting nsm2socket in ropc02"
+./boot_daemon nsm2socket 9090

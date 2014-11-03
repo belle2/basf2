@@ -1,4 +1,6 @@
 #!/bin/bash
 
+echo "killing nsm2socket"
+killall nsm2socket
 echo "killing nsmd2"
 killall nsmd2 > /dev/null

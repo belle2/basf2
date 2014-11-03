@@ -42,8 +42,6 @@ drop table if exists tableinfo;
 drop table if exists nodeinfo_names;
 drop table if exists nodeinfo;
 drop table if exists groupinfo;
-drop table if exists runnumberinfo;
-drop table if exists fileinfo;
 
 create or replace function create_if_not_exists (table_name text, create_stmt text)
 returns void as $$
@@ -70,18 +68,6 @@ create table nodeinfo (
   id serial primary key, name text not null, 
   groupid int not null references groupinfo(id), 
   unique (name, groupid)
-);
-
-create table runnumberinfo (
-  record_time timestamp with time zone not null default current_timestamp,
-  id serial primary key not null,
-  expno int not null, 
-  runno int not null, 
-  subno int not null,
-  isstart boolean not null
-  constraint examination check (expno > 0 and 
-  runno > 0 and subno < 256 and subno >= 0),
-  unique (expno, runno, subno, isstart)
 );
 
 create table tableinfo (
@@ -443,16 +429,4 @@ returns runnumberinfo as $$
   select $1, $2, $3, $4
   returning *;
 $$ language sql;
-
-create table fileinfo (
-  path text not null, 
-  expno int not null,
-  runno int not null,
-  fileid int not null,
-  diskid int not null,
-  time_create timestamp with time zone,
-  time_close timestamp with time zone,
-  time_copy timestamp with time zone,
-  time_delete timestamp with time zone
-);
 

@@ -77,7 +77,7 @@ void RunControlCallback::init() throw()
       m_node_v.push_back(node);
     }
   }
-  getNode().setState(Enum::UNKNOWN);
+  getNode().setState(RCState::NOTREADY_S);
   timeout();
   if (m_port > 0) {
     PThread(new ConfigProvider(this, "0.0.0.0", m_port));
@@ -376,6 +376,19 @@ bool RunControlCallback::stop() throw()
 bool RunControlCallback::abort() throw()
 {
   postRun();
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    NSMNode& node(m_node_v[i]);
+    bool finded;
+    ConfigObjectList::iterator it = findConfig(node.getName(), finded);
+    if (!finded) continue;
+    node.setUsed(it->getBool("used"));
+    if (node.isUsed() && !node.isExcluded()) {
+      const DBObject& cobj(it->getObject("runtype"));
+      if (cobj.getTable() == "ttd") {
+        getCommunicator()->sendRequest(NSMMessage(node, RCCommand::STOP));
+      }
+    }
+  }
   return distribute_r(getMessage());
 }
 

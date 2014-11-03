@@ -1,5 +1,5 @@
  nodename,  config, ismaster, runlength,    node, nsmdata
  ECL, default,false,480, default, default
  ECL, debug:dummycpu,false,480, debug:dummycpu, default
- ECL, debug:dumhslb:020:rank4k,false,480, debug:dumhslb:020:rank4k, default
+ ECL, debug:dumhslb:020:rand4k,false,480, debug:dumhslb:020:rand4k, default
  ECL, debug:yamadahslb:10kHz,false,480, debug:yamadahslb:10kHz, default

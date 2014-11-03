@@ -2,4 +2,4 @@
  RUNCONTROL, debug:storage,  STORAGE,  STORAGE_STATUS, storage_status,        5
  RUNCONTROL, default,  STORAGE,  STORAGE_STATUS, storage_status,        5
  RUNCONTROL, default,      HLT,      HLT_STATUS,     rfunitinfo,        3
- RUNCONTROL, default, ECL, ECL_STATUS,      rorc_status,        1
+ RUNCONTROL, default, ECL, ECL_STATUS,      rc_status,        4

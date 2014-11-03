@@ -8,6 +8,7 @@ createParamTable copper.fee ${DIR}/
 createParamTable copper.fee.register ${DIR}/
 createParamTable copper.fee.parameter ${DIR}/
 createParamTable ropc ${DIR}/
+createParamTable ropc.copper_from ${DIR}/
 createParamTable hlt ${DIR}/
 createParamTable storage ${DIR}/
 createParamTable ttd ${DIR}/
@@ -20,6 +21,7 @@ addParamConfig ECL copper.fee.register ${DIR}/ecl.copper.fee.register.csv
 addParamConfig ECL copper.fee ${DIR}/ecl.copper.fee.csv
 addParamConfig ECL copper.setup ${DIR}/ecl.copper.setup.csv
 addParamConfig ECL copper ${DIR}/ecl.copper.csv
+addParamConfig ECL ropc.copper_from ${DIR}/ecl.ropc.copper_from.csv
 addParamConfig ECL ropc ${DIR}/ecl.ropc.csv
 addParamConfig DAQ hlt ${DIR}/hlt.csv
 addParamConfig DAQ storage ${DIR}/storage.csv

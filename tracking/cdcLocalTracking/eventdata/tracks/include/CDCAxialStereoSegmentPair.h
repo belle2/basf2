@@ -160,12 +160,18 @@ namespace Belle2 {
       FloatType computeEndIsAfterStart() const
       { return computeEndIsAfterStartFitless(); }
 
+      /** Indicator if the start segment and the end segment have roughly the same travel direction.*/
+      FloatType computeIsCoaligned() const
+      { return computeIsCoalignedFitless(); }
+
       /** Indicator if the start segment lies before the end segment, build without using the trajectories, which may not have been fitted yet. */
       FloatType computeStartIsBeforeEndFitless() const;
 
       /** Indicator if the start segment lies before the end segment, build without using the trajectories, which may not have been fitted yet. */
       FloatType computeEndIsAfterStartFitless() const;
 
+      /** Indicator if the start segment and the end segment have roughly the same travel direction without using the common fit*/
+      FloatType computeIsCoalignedFitless() const;
 
       /// Checks if the last entity in the vector lies greater or lower travel distance than the last entity.
       /** Returns:

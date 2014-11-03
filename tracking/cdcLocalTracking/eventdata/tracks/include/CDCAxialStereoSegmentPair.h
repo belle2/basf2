@@ -148,6 +148,24 @@ namespace Belle2 {
         if (not checkSegmentsStereoTypes()) B2WARNING("CDCAxialStereoSegmentPair: segments set with same stereo type");
       }
 
+      /** Determines the angle between the last reconstructed position of the start segment and
+       *  the first reconstructed position of the end segment.*/
+      FloatType computeDeltaPhiAtSuperLayerBound() const;
+
+      /** Indicator if the start segment lies before the end segment */
+      FloatType computeStartIsBeforeEnd() const
+      { return computeStartIsBeforeEndFitless(); }
+
+      /** Indicator if the start segment lies before the end segment */
+      FloatType computeEndIsAfterStart() const
+      { return computeEndIsAfterStartFitless(); }
+
+      /** Indicator if the start segment lies before the end segment, build without using the trajectories, which may not have been fitted yet. */
+      FloatType computeStartIsBeforeEndFitless() const;
+
+      /** Indicator if the start segment lies before the end segment, build without using the trajectories, which may not have been fitted yet. */
+      FloatType computeEndIsAfterStartFitless() const;
+
 
       /// Checks if the last entity in the vector lies greater or lower travel distance than the last entity.
       /** Returns:

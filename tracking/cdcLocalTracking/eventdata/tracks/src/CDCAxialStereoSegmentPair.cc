@@ -52,3 +52,112 @@ CDCAxialStereoSegmentPair::CDCAxialStereoSegmentPair(const CDCAxialRecoSegment2D
 CDCAxialStereoSegmentPair::~CDCAxialStereoSegmentPair()
 {
 }
+
+
+
+FloatType CDCAxialStereoSegmentPair::computeDeltaPhiAtSuperLayerBound() const
+{
+  const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
+  const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
+
+  if (not ptrStartSegment) {
+    return NAN;
+  }
+
+  if (not ptrEndSegment) {
+    return NAN;
+  }
+
+  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+
+  if (startSegment.empty() or endSegment.empty()) {
+    return NAN;
+  }
+
+  const CDCRecoHit2D& lastRecoHit_startSegment = startSegment.back();
+  const CDCRecoHit2D& firstRecoHit_endSegment = endSegment.front();
+
+  const Vector2D lastPos2D_startSegment =  lastRecoHit_startSegment.getRecoPos2D();
+  const Vector2D firstPos2D_endSegment =  firstRecoHit_endSegment.getRecoPos2D();
+
+  return lastPos2D_startSegment.angleWith(firstPos2D_endSegment);
+}
+
+
+
+
+
+FloatType CDCAxialStereoSegmentPair::computeStartIsBeforeEndFitless() const
+{
+  const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
+  const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
+
+  if (not ptrStartSegment) {
+    return NAN;
+  }
+
+  if (not ptrEndSegment) {
+    return NAN;
+  }
+
+  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+
+  if (startSegment.empty() or endSegment.empty()) {
+    return NAN;
+  }
+
+  const CDCRecoHit2D& firstRecoHit_startSegment = startSegment.front();
+  const CDCRecoHit2D& lastRecoHit_startSegment = startSegment.back();
+
+  const CDCRecoHit2D& firstRecoHit_endSegment = endSegment.front();
+
+  const Vector2D firstPos2D_startSegment =  firstRecoHit_startSegment.getRecoPos2D();
+  const Vector2D lastPos2D_startSegment =  lastRecoHit_startSegment.getRecoPos2D();
+  const Vector2D firstPos2D_endSegment =  firstRecoHit_endSegment.getRecoPos2D();
+
+  Vector2D firstToLast_startSegment = lastPos2D_startSegment - firstPos2D_startSegment;
+  Vector2D firstToFirst = firstPos2D_endSegment - firstPos2D_startSegment;
+
+  return firstToLast_startSegment.angleWith(firstToFirst);
+
+}
+
+
+
+FloatType CDCAxialStereoSegmentPair::computeEndIsAfterStartFitless() const
+{
+  const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
+  const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
+
+  if (not ptrStartSegment) {
+    return NAN;
+  }
+
+  if (not ptrEndSegment) {
+    return NAN;
+  }
+
+  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+
+  if (startSegment.empty() or endSegment.empty()) {
+    return NAN;
+  }
+
+  const CDCRecoHit2D& lastRecoHit_startSegment = startSegment.back();
+
+  const CDCRecoHit2D& firstRecoHit_endSegment = endSegment.front();
+  const CDCRecoHit2D& lastRecoHit_endSegment = endSegment.back();
+
+  const Vector2D lastPos2D_startSegment =  lastRecoHit_startSegment.getRecoPos2D();
+  const Vector2D firstPos2D_endSegment =  firstRecoHit_endSegment.getRecoPos2D();
+  const Vector2D lastPos2D_endSegment =  lastRecoHit_endSegment.getRecoPos2D();
+
+  Vector2D firstToLast_endSegment = lastPos2D_endSegment - firstPos2D_endSegment;
+  Vector2D lastToLast = lastPos2D_endSegment - lastPos2D_startSegment;
+
+  return firstToLast_endSegment.angleWith(lastToLast);
+
+}

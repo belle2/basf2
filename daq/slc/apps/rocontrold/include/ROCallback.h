@@ -34,6 +34,8 @@ namespace Belle2 {
     FlowMonitor m_flow;
     NSMData m_data;
     ConfigFile m_file;
+    int m_eflag;
+    int m_reserved_i[2];
 
   };
 

@@ -63,9 +63,15 @@ bool ROCallback::load() throw()
      << "sleep 1" << std::endl
      << "./eb0";
   const bool use_recv0 = m_file.getBool("ropc.nrecv0") > 0;
+  m_eflag = m_reserved_i[0] = m_reserved_i[1] = 0;
+  m_reserved_i[0] |= (use_recv0) & 0x01 << 0;
+  m_reserved_i[0] |= 0x01 << 1;
+  m_reserved_i[0] |= 0x01 << 2;
+  m_reserved_i[0] |= 0x01 << 3;
   for (size_t i = 1; i < m_con.size(); i++) {
     const DBObject& cobj(obj.getObject("copper_from", i - 1));
     if (cobj.getBool("used")) {
+      m_reserved_i[0] |= 0x01 << (3 + i);
       if (use_recv0) {
         ss << " " << "127.0.0.1" << ":" << cobj.getInt("port");
       } else {
@@ -179,6 +185,9 @@ void ROCallback::timeout() throw()
     } else {
       nsm->loadavg = -1;
     }
+    nsm->eflag = m_eflag;
+    nsm->reserved_i[0] = m_reserved_i[0];
+    nsm->reserved_i[1] = m_reserved_i[1];
   }
   int eflag = m_con[0].getInfo().getErrorFlag();
   if (eflag > 0) {

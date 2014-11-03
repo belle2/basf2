@@ -145,8 +145,8 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   FloatType closestOrthogonal =  n12().cross(point) / gradientAtPoint.norm();
 
   // component of closest approach parallel to coordinateSystem - two solutions expected
-  FloatType nOrthogonal = n12().fastOrthogonalComp(coordinateSystem);
-  FloatType nParallel = n12().fastParallelComp(coordinateSystem);
+  FloatType nOrthogonal = n12().unnormalizedOrthogonalComp(coordinateSystem);
+  FloatType nParallel = n12().unnormalizedParallelComp(coordinateSystem);
 
   FloatType closestParallel = 0.0;
   if (isLine()) {
@@ -160,7 +160,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
     const pair<FloatType, FloatType> closestParallel12 = solveQuadraticABC(a, b, c);
 
     //take the solution with smaller distance to point
-    const FloatType pointParallel = point.fastParallelComp(coordinateSystem);
+    const FloatType pointParallel = point.unnormalizedParallelComp(coordinateSystem);
 
     const FloatType criterion1 = closestParallel12.first * (closestParallel12.first - 2 * pointParallel);
     const FloatType criterion2 = closestParallel12.second * (closestParallel12.second - 2 * pointParallel);
@@ -258,7 +258,7 @@ Vector2D GeneralizedCircle::samePolarR(const Vector2D& point) const
   const FloatType samePolarRParallel = -(n0() + n3() * R * R) / n12().norm();
 
   //orthogonal component
-  const FloatType pointOrthogonal = point.fastOrthogonalComp(nUnit);
+  const FloatType pointOrthogonal = point.unnormalizedOrthogonalComp(nUnit);
 
   //orthoganal component of the solution takes to sign of the orthogonal component of the point
   const FloatType samePolarROrthogonal = sign(pointOrthogonal) * sqrt(R * R - samePolarRParallel * samePolarRParallel);
@@ -406,8 +406,8 @@ std::pair<Vector2D, Vector2D> GeneralizedCircle::intersections(const Generalized
 
   // Use symmetric solution and use all input parameters
   Vector2D mn12 = n12 + m12;
-  FloatType mn12Parallel = unitC.fastParallelComp(mn12);
-  FloatType mn12Orthogonal = unitC.fastOrthogonalComp(mn12);
+  FloatType mn12Parallel = unitC.unnormalizedParallelComp(mn12);
+  FloatType mn12Orthogonal = unitC.unnormalizedOrthogonalComp(mn12);
 
   FloatType a = m3 + n3;
   FloatType b = mn12Orthogonal;

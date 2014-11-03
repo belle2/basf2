@@ -270,7 +270,7 @@ namespace Belle2 {
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
-      inline FloatType fastParallelComp(const Vector2D& relativTo) const
+      inline FloatType unnormalizedParallelComp(const Vector2D& relativTo) const
       { return relativTo.dot(*this); }
 
       /// Calculates the component orthogonal to the given vector
@@ -281,12 +281,12 @@ namespace Belle2 {
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
-      inline FloatType fastOrthogonalComp(const Vector2D& relativTo) const
+      inline FloatType unnormalizedOrthogonalComp(const Vector2D& relativTo) const
       { return relativTo.cross(*this); }
 
       /// Indicates if the given vector is more left or more right if you looked in the direction of this vector.
       inline RightLeftInfo isRightOrLeftOf(const Vector2D& rhs) const
-      { return -CDCLocalTracking::sign(fastOrthogonalComp(rhs)); }
+      { return -CDCLocalTracking::sign(unnormalizedOrthogonalComp(rhs)); }
 
       /// Indicates if the given vector is more left if you looked in the direction of this vector.
       inline bool isLeftOf(const Vector2D& rhs) const
@@ -299,7 +299,7 @@ namespace Belle2 {
 
       /// Indicates if the given vector is more counterclockwise or more clockwise if you looked in the direction of this vector.
       inline CCWInfo isCCWOrCWOf(const Vector2D& rhs) const
-      { return CDCLocalTracking::sign(fastOrthogonalComp(rhs)); }
+      { return CDCLocalTracking::sign(unnormalizedOrthogonalComp(rhs)); }
 
       /// Indicates if the given vector is more counterclockwise if you looked in the direction of this vector.
       inline bool isCCWOf(const Vector2D& rhs) const
@@ -312,7 +312,7 @@ namespace Belle2 {
 
       /// Indicates if the given vector is more coaligned or reverse if you looked in the direction of this vector.
       inline ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& rhs) const
-      { return CDCLocalTracking::sign(fastParallelComp(rhs)); }
+      { return CDCLocalTracking::sign(unnormalizedParallelComp(rhs)); }
 
       /// Indicates if the given vector is more coaligned if you looked in the direction of this vector.
       inline bool isForwardOf(const Vector2D& rhs) const

@@ -154,8 +154,8 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian
   //Vector2D delta = perigee() - by;
   Vector2D delta = by - perigee();
 
-  FloatType deltaParallel = coordinateVector.fastParallelComp(delta);
-  FloatType deltaOrthogonal = coordinateVector.fastOrthogonalComp(delta);
+  FloatType deltaParallel = coordinateVector.unnormalizedParallelComp(delta);
+  FloatType deltaOrthogonal = coordinateVector.unnormalizedOrthogonalComp(delta);
 
   FloatType halfA = fastDistance(by);
   FloatType A = 2 * halfA;

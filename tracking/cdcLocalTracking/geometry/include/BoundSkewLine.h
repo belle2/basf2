@@ -173,8 +173,8 @@ namespace Belle2 {
         Vector3D unitLineVector = tangential3D();
         unitLineVector.normalize();
 
-        FloatType parallelCompPoint = point.fastParallelComp(unitLineVector);
-        FloatType parallelCompRef = refPos3D().fastParallelComp(unitLineVector);
+        FloatType parallelCompPoint = point.unnormalizedParallelComp(unitLineVector);
+        FloatType parallelCompRef = refPos3D().unnormalizedParallelComp(unitLineVector);
 
         //same memory , only different name
         Vector3D& parallelVec = unitLineVector.scale(parallelCompPoint - parallelCompRef);
@@ -187,7 +187,7 @@ namespace Belle2 {
         Vector3D unitLineVector = tangential3D();
         unitLineVector.normalize();
 
-        FloatType parallelCompRef = refPos3D().fastParallelComp(unitLineVector);
+        FloatType parallelCompRef = refPos3D().unnormalizedParallelComp(unitLineVector);
 
         //same memory , only different name
         Vector3D& parallelVecOfRef = unitLineVector.scale(parallelCompRef);

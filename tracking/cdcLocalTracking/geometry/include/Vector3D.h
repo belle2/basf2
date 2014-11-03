@@ -269,7 +269,7 @@ namespace Belle2 {
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
-      inline FloatType fastParallelComp(const Vector3D& relativTo) const
+      inline FloatType unnormalizedParallelComp(const Vector3D& relativTo) const
       { return relativTo.dot(*this); }
 
       /// Calculates the component orthogonal to the given vector
@@ -283,7 +283,7 @@ namespace Belle2 {
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
-      inline FloatType fastOrthogonalComp(const Vector3D& relativTo) const
+      inline FloatType unnormalizedOrthogonalComp(const Vector3D& relativTo) const
       { return relativTo.cross(*this).norm(); }
 
 

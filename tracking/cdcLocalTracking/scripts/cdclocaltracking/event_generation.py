@@ -172,6 +172,7 @@ def create_path_from_parsed_arguments(arguments):
 
     root_input_file_path = getattr(arguments, 'root_input_file', None)
     if root_input_file_path:
+        root_input_file_path = os.path.abspath(root_input_file_path)
         return create_load_events_path(root_input_file_path)
     else:
         generator_name = arguments.generator
@@ -239,19 +240,35 @@ muon_pdg_code = 13
 tau_pdg_code = 15
 
 ## Default parameters of the generator modules hashed by their respective module name
-default_generator_params_by_generator_module_name = {'ParticleGun': {
-    'pdgCodes': [muon_pdg_code, -muon_pdg_code],
-    'nTracks': 10,
-    'varyNTracks': False,
-    'momentumGeneration': 'uniform',
-    'momentumParams': [0.6, 1.4],
-    'thetaGeneration': 'uniform',
-    'thetaParams': [17., 150.],
-    }, 'EvtGenInput': {}}
+default_generator_params_by_generator_name = {
+    'simple_gun': {
+        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
+        'nTracks': 10,
+        'varyNTracks': False,
+        'momentumGeneration': 'uniform',
+        'momentumParams': [0.6, 1.4],
+        'thetaGeneration': 'uniform',
+        'thetaParams': [17., 150.],
+        },
+    'gun': {
+        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
+        'nTracks': 10,
+        'varyNTracks': False,
+        'momentumGeneration': 'uniform',
+        'thetaGeneration': 'uniform',
+        'thetaParams': [17., 150.],
+        },
+    'ParticleGun': {},
+    'EvtGenInput': {},
+    }
 
 ## Generator module names hashed by shorthand menomics. Includes None as a special value for background only simulation
-generator_module_names_by_short_name = {'gun': 'ParticleGun',
-        'generic': 'EvtGenInput', 'bkg': None}  # Background only generator
+generator_module_names_by_short_name = {  # Background only generator
+    'gun': 'ParticleGun',
+    'simple_gun': 'ParticleGun',
+    'generic': 'EvtGenInput',
+    'bkg': None,
+    }
 
 ## Names of module names and short names of the generators usable in this script.
 valid_generator_names = list(generator_module_names_by_short_name.keys()) \
@@ -383,10 +400,8 @@ def update_default_generator_params(generator_name, additional_params):
         Parameters updated with the additional parameters from the defaults. Usable with module.param()
     """
 
-    generator_module_name = get_generator_module_name(generator_name)
     default_params = \
-        default_generator_params_by_generator_module_name.get(generator_module_name,
-            {})
+        default_generator_params_by_generator_name.get(generator_name, {})
     params = dict(default_params)
     params.update(additional_params)
     return params
@@ -459,9 +474,11 @@ def add_generator(path, generator_name='gun', generator_params={}):
     if generator_module_name is not None:
         generator_module = basf2.register_module(generator_module_name)
 
-        generator_params = \
-            update_default_generator_params(generator_module_name,
+        generator_params = update_default_generator_params(generator_name,
                 generator_params)
+        print generator_params
+        raw_input()
+
         generator_module.param(generator_params)
 
         path.add_module(generator_module)

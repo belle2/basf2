@@ -55,6 +55,7 @@ bool ROCallback::load() throw()
   if (m_con[0].isAlive()) return true;
   const char* path_b2lib = getenv("BELLE2_LOCAL_DIR");
   const DBObject& obj(getConfig().getObject());
+  LogFile::debug("ROCallback::load %s %d", obj.getName().c_str(), obj.getId());
   std::stringstream ss;
   ss << "#!/bin/sh" << std::endl
      << "#Thu Oct 17 14:17:13 CEST 2013" << std::endl
@@ -62,7 +63,7 @@ bool ROCallback::load() throw()
      << "killall eb0 > /dev/null 2>&1" << std::endl
      << "sleep 1" << std::endl
      << "./eb0";
-  const bool use_recv0 = m_file.getBool("ropc.nrecv0") > 0;
+  const bool use_recv0 = m_file.getInt("ropc.nrecv0") > 0;
   m_eflag = m_reserved_i[0] = m_reserved_i[1] = 0;
   m_reserved_i[0] |= (use_recv0) & 0x01 << 0;
   m_reserved_i[0] |= 0x01 << 1;
@@ -70,6 +71,7 @@ bool ROCallback::load() throw()
   m_reserved_i[0] |= 0x01 << 3;
   for (size_t i = 1; i < m_con.size(); i++) {
     const DBObject& cobj(obj.getObject("copper_from", i - 1));
+    LogFile::debug("ROCallback::load %d %s", i, (cobj.getBool("used") ? "true" : "false"));
     if (cobj.getBool("used")) {
       m_reserved_i[0] |= 0x01 << (3 + i);
       if (use_recv0) {

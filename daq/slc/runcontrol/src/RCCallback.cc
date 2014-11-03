@@ -147,10 +147,10 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
       } else {
         std::string runtype;
         int configid = 0;
-        if (msg.getLength() > 0) {
-          runtype = msg.getData();
-        } else if (msg.getNParams() > 1 && msg.getParam(1) > 0) {
+        if (msg.getNParams() > 1 && msg.getParam(1) > 0) {
           configid = msg.getParam(1);
+        } else if (msg.getLength() > 0) {
+          runtype = msg.getData();
         } else {
           setReply("No runtype were given");
           LogFile::error("No runtype were given");

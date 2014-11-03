@@ -8,11 +8,11 @@ cd -
 echo "killing basf2 cprcontrold"
 for i in $(seq 5014 5018)
 do
-ssh cpr${i} "killall basf2 cprcontrold > /dev/null"
+ssh cpr${i} "killall -9 basf2 cprcontrold > /dev/null"
 #ssh cpr${i} "killall -9 basf2 > /dev/null"
 done
 for i in $(seq 6001 6008)
 do
-ssh cpr${i} "killall basf2 cprcontrold> /dev/null"
+ssh cpr${i} "killall -9 basf2 cprcontrold> /dev/null"
 done
-killall rocontrold runcontrold > /dev/null
+killall -9 basf2 rocontrold runcontrold > /dev/null

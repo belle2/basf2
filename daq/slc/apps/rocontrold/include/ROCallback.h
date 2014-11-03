@@ -31,7 +31,7 @@ namespace Belle2 {
 
   private:
     std::vector<ProcessController> m_con;
-    FlowMonitor m_flow;
+    std::vector<FlowMonitor> m_flow;
     NSMData m_data;
     ConfigFile m_file;
     int m_eflag;

@@ -14,6 +14,8 @@
 #include <cstring>
 #include <sstream>
 
+#include <unistd.h>
+
 using namespace Belle2;
 
 ROCallback::ROCallback(const NSMNode& node, const std::string& conf)
@@ -35,10 +37,13 @@ void ROCallback::init() throw()
   m_con = std::vector<ProcessController>();
   for (size_t i = 0; i < 1 + nproc; i++) {
     m_con.push_back(ProcessController(this));
+    m_flow.push_back(FlowMonitor());
   }
+  m_flow[0].open(&m_con[0].getInfo());
   m_con[0].init("recvStream1", 1);
   for (size_t i = 1; i < m_con.size(); i++) {
     m_con[i].init(StringUtil::form("recvStream0_%d", i - 1), i);
+    m_flow[i].open(&m_con[i].getInfo());
   }
 }
 
@@ -102,6 +107,7 @@ bool ROCallback::load() throw()
           return false;
         }
         LogFile::debug("Booted %d-th recvStream0", i - 3);
+        usleep(10000);
       }
     }
   }
@@ -112,7 +118,6 @@ bool ROCallback::load() throw()
   m_con[0].addArgument("1");
   m_con[0].addArgument(StringUtil::form("%d", obj.getInt("port_from")));
   m_con[0].addArgument("recvStream1_out");
-  m_con[0].load(0);
   if (!m_con[0].load(10)) {
     LogFile::error("Failed to boot recvStream1");
     return false;
@@ -175,8 +180,8 @@ void ROCallback::timeout() throw()
 {
   if (m_data.isAvailable()) {
     ronode_status* nsm = (ronode_status*)m_data.get();
-    if (m_flow.isAvailable()) {
-      ronode_status& status(m_flow.monitor());
+    if (m_flow[0].isAvailable()) {
+      ronode_status& status(m_flow[0].monitor());
       uint32 stime = nsm->stime;
       memcpy(nsm, &status, sizeof(ronode_status));
       nsm->stime = stime;
@@ -187,9 +192,18 @@ void ROCallback::timeout() throw()
     } else {
       nsm->loadavg = -1;
     }
-    nsm->eflag = m_eflag;
     nsm->reserved_i[0] = m_reserved_i[0];
     nsm->reserved_i[1] = m_reserved_i[1];
+    m_eflag = 0;
+    for (size_t i = 1; i < m_con.size(); i++) {
+      if (((m_reserved_i[0] >> (3 + i)) & 0x01) == 1) {
+        ronode_status& status(m_flow[i].monitor());
+        if (status.connection_in == 0) {
+          m_eflag |= 0x01 << (3 + i);
+        }
+      }
+    }
+    nsm->eflag = m_eflag;
   }
   int eflag = m_con[0].getInfo().getErrorFlag();
   if (eflag > 0) {

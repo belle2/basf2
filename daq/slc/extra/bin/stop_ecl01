@@ -11,5 +11,5 @@ do
 ssh cpr${i} "killall basf2 cprcontrold > /dev/null"
 #ssh cpr${i} "killall basf2 > /dev/null"
 done
-killall basf2 rocontrold runcontrold > /dev/null
+killall -9 basf2 rocontrold runcontrold > /dev/null
 #killall basf2 > /dev/null

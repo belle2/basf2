@@ -101,14 +101,14 @@ namespace {
 
 
     if (not startSegment.getTrajectory2D().isFitted()) {
-      B2WARNING("Start segment not fitted.");
+      if (startSegment.size() > 3) B2WARNING("Start segment not fitted.");
       CDCTrajectory3D result;
       result.setChi2(NAN);
       return result;
     }
 
     if (not endSegment.getTrajectory2D().isFitted()) {
-      B2WARNING("End segment not fitted.");
+      if (endSegment.size() > 3) B2WARNING("End segment not fitted.");
       CDCTrajectory3D result;
       result.setChi2(NAN);
       return result;

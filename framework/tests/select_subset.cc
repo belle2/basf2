@@ -645,11 +645,6 @@ namespace {
     CollectionOfSets m_TestBench;
 
     virtual void SetUp() {
-
-
-      m_TestBench.initializeDatastore();
-      m_TestBench.populateDatastore();
-
     }
 
     /** clear datastore */
@@ -881,6 +876,9 @@ namespace {
 
   TEST_F(SelectSubsetTest, ExtensiveTest)
   {
+    m_TestBench.initializeDatastore();
+    m_TestBench.populateDatastore();
+
     SelectSubset< StoredElement > selector;
     StoreArray< StoredElement > set(m_TestBench.getSetName());
 

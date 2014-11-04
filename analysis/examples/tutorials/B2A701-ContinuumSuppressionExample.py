@@ -10,7 +10,7 @@
 #  KSFW moments, thrust related quantities,
 #  R2, and CLEO Cones.
 #
-# 3 TMVA methods are used: Likelihood, BDT, and NBayes
+# 4 TMVA methods are used: Likelihood, BDT, FastBDT, and NBayes
 #
 # Note: This example uses a privately produced skim of
 # the continuum MC sample created with no beam background in

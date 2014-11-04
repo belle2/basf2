@@ -86,98 +86,101 @@ void BKLMRawPackerModule::event()
   // Prepare buffer to fill dummy data
   //
 
-  //hopefully we can fill as many as fill as many as we want, lets do one per layer to make tracks
+  //one call per copper, so here we only pack data for one sector
+  RawKLM* raw_klm = rawklmarray.appendNew();
+  //one hit per layer in both directions, this is what we would expect per finesse...
+  int numHits = 13 * 2;
+  int hitCounter = -1;
+  int* buf1, *buf2, *buf3, *buf4;
+  int nwords_1st = 2 * numHits, nwords_2nd = 2 * numHits, nwords_3rd = 2 * numHits, nwords_4th = 2 * numHits;
+  buf1 = new int[ nwords_1st];
+  buf2 = new int[ nwords_2nd];
+  buf3 = new int[ nwords_3rd];
+  buf4 = new int[ nwords_4th];
   for (int iLay = 1; iLay < 14; iLay++)    {
     for (int iAx = 0; iAx < 2; iAx++) {
-      for (int ifwd = 0; ifwd < 2; ifwd++) {
-        RawKLM* raw_klm = rawklmarray.appendNew();
+      hitCounter++;
+      //basf2 words are 32 bits, whereas in the dataformat documentation for the KLM assumes 16bits
 
-        int* buf1, *buf2, *buf3, *buf4;
-        int nwords_1st = 2, nwords_2nd = 2, nwords_3rd = 2, nwords_4th = 2;
-        //basf2 words are 32 bits, whereas in the dataformat documentation for the KLM assumes 16bits
-
-        unsigned short bword1 = 0;
-        unsigned short bword2 = 0;
-        unsigned short bword3 = 0;
-        unsigned short bword4 = 0;
-
-        buf1 = new int[ nwords_1st];
-        buf1[0] = 0;
-        buf1[1] = 0;
-        int iChannelNr = 10;
-        if (ifwd == 1)
-          iChannelNr = 20;
-        //tdc, charge, ctime
-        formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-        cout << "buf1: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
-        buf1[0] |= bword1;
-        buf1[0] |= ((bword2 << 16));
-        buf1[1] |= bword3;
-        buf1[1] |= ((bword4 << 16));
-
-        cout << "word1: " << buf1[0] << " word2: " << buf1[1] << endl;
-        buf2 = new int[ nwords_2nd];
-        buf2[0] = 0;
-        buf2[1] = 0;
-
-        iChannelNr = 25;
-        if (ifwd == 1)
-          iChannelNr = 30;
-        formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-        buf2[0] |= bword1;
-        buf2[0] |= ((bword2 << 16) & 0xFFFF0000);
-        buf2[1] |= bword3;
-        buf2[1] |= ((bword4 << 16) & 0xFFFF0000);
-        cout << "buf2: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
-        cout << "word1: " << buf2[0] << " word2: " << buf2[1] << endl;
-        buf3 = new int[ nwords_3rd];
-        buf3[0] = 0;
-        buf3[1] = 0;
-
-        formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-        iChannelNr = 35;
-        if (ifwd == 1)
-          iChannelNr = 40;
-        formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-        cout << "buf3: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
-        cout << "word1: " << buf3[0] << " word2: " << buf3[1] << endl;
-        buf3[0] |= bword1;
-        buf3[0] |= ((bword2 << 16) & 0xFFFF0000);
-        buf3[1] |= bword3;
-        buf3[1] |= ((bword4 << 16) & 0xFFFF0000);
+      unsigned short bword1 = 0;
+      unsigned short bword2 = 0;
+      unsigned short bword3 = 0;
+      unsigned short bword4 = 0;
 
 
-        buf4 = new int[ nwords_4th];
-        buf4[0] = 0;
-        buf4[1] = 0;
+      buf1[0 + hitCounter * 2] = 0;
+      buf1[1 + hitCounter * 2] = 0;
+      int iChannelNr = 10;
 
-        iChannelNr = 17;
-        if (ifwd == 1)
-          iChannelNr = 18;
-        formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-        cout << "buf4: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
-        cout << "word1: " << buf4[0] << " word2: " << buf4[1] << endl;
-        buf4[0] |= bword1;
-        buf4[0] |= ((bword2 << 16) & 0xFFFF0000);
-        buf4[1] |= bword3;
-        buf4[1] |= ((bword4 << 16) & 0xFFFF0000);
+      //tdc, charge, ctime
+      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
+      cout << "buf1: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
+      buf1[0 + hitCounter * 2] |= bword1;
+      buf1[0 + hitCounter * 2] |= ((bword2 << 16));
+      buf1[1 + hitCounter * 2] |= bword3;
+      buf1[1 + hitCounter * 2] |= ((bword4 << 16));
+
+      cout << "word1: " << buf1[0 + hitCounter * 2] << " word2: " << buf1[1 + hitCounter * 2] << endl;
+      buf2[0 + hitCounter * 2] = 0;
+      buf2[1 + hitCounter * 2] = 0;
+
+      iChannelNr = 25;
+
+      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
+      buf2[0 + hitCounter * 2] |= bword1;
+      buf2[0 + hitCounter * 2] |= ((bword2 << 16) & 0xFFFF0000);
+      buf2[1 + hitCounter * 2] |= bword3;
+      buf2[1 + hitCounter * 2] |= ((bword4 << 16) & 0xFFFF0000);
+      cout << "buf2: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
+      cout << "word1: " << buf2[0 + hitCounter * 2] << " word2: " << buf2[1 + hitCounter * 2] << endl;
+
+      buf3[0 + hitCounter * 2] = 0;
+      buf3[1 + hitCounter * 2] = 0;
+
+      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
+      iChannelNr = 35;
+
+      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
+      cout << "buf3: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
+      cout << "word1: " << buf3[0 + hitCounter * 2] << " word2: " << buf3[1 + hitCounter * 2] << endl;
+      buf3[0 + hitCounter * 2] |= bword1;
+      buf3[0 + hitCounter * 2] |= ((bword2 << 16) & 0xFFFF0000);
+      buf3[1 + hitCounter * 2] |= bword3;
+      buf3[1 + hitCounter * 2] |= ((bword4 << 16) & 0xFFFF0000);
+
+
+
+      buf4[0 + hitCounter * 2] = 0;
+      buf4[1 + hitCounter * 2] = 0;
+
+      iChannelNr = 17;
+
+      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
+      cout << "buf4: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
+      cout << "word1: " << buf4[0 + hitCounter * 2] << " word2: " << buf4[1 + hitCounter * 2] << endl;
+      buf4[0 + hitCounter * 2] |= bword1;
+      buf4[0 + hitCounter * 2] |= ((bword2 << 16) & 0xFFFF0000);
+      buf4[1 + hitCounter * 2] |= bword3;
+      buf4[1 + hitCounter * 2] |= ((bword4 << 16) & 0xFFFF0000);
 
 
 
 
-        raw_klm->PackDetectorBuf(buf1, nwords_1st,
-                                 buf2, nwords_2nd,
-                                 buf3, nwords_3rd,
-                                 buf4, nwords_4th,
-                                 rawcprpacker_info);
 
-        delete [] buf1;
-        delete [] buf2;
-        delete [] buf3;
-        delete [] buf4;
-      }
+
     }
   }
+  raw_klm->PackDetectorBuf(buf1, nwords_1st,
+                           buf2, nwords_2nd,
+                           buf3, nwords_3rd,
+                           buf4, nwords_4th,
+                           rawcprpacker_info);
+
+  delete [] buf1;
+  delete [] buf2;
+  delete [] buf3;
+  delete [] buf4;
+
   //
   // Update EventMetaData : Not affect on the output
   //

@@ -94,7 +94,7 @@ namespace Belle2 {
     std::vector<StoreObjPtr<ParticleList>> m_tmpLists; /**< temporary particle lists (contain subsets of contents of input lists, filled from MC truth). */
     StoreObjPtr<RootMergeable<TH1D>> m_withoutCut; /**< histogram containing signal and background amount without previous cut */
     StoreObjPtr<RootMergeable<TH1D>> m_histogramSignal; /**< signal histogram for combined particle. */
-    StoreObjPtr<RootMergeable<TH1D>> m_histogramAll; /**< signal histogram for combined particle. */
+    StoreObjPtr<RootMergeable<TH1D>> m_histogramAll; /**< signal+background histogram for combined particle. */
 
     ParticleGenerator* m_generator_signal; /**< Combines particles for signal (not everything is signal, so we run MCMatching for the limited number of candidates produced). */
     ParticleGenerator* m_generator_all; /**< Combines particles for signal+background. */

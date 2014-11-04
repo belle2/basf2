@@ -96,6 +96,11 @@ void Framework::process(PathPtr startPath, long maxEvent)
     B2FATAL("You can only call process() once per steering file!")
     return;
   }
+  int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
+  if (numLogError != 0) {
+    B2FATAL(numLogError << " ERROR(S) occurred! The processing of events will not be started.");
+    return;
+  }
 
   try {
     already_executed = true;

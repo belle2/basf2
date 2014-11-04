@@ -39,7 +39,7 @@ ROOT.gROOT.SetBatch(True)
 # please note: two different input files are needed
 # specify file name, if necessary
 
-workingDirectory = Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/RUN13')
+workingDirectory = Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/RUN15')
 B2INFO("Working directory is: " + workingDirectory)
 
 #
@@ -77,14 +77,14 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
     # calibration plot for B0. If we get a linaer line our MC is fine, than the assumption r ~ 1- 2w is reasonable
     # expectation is, that for B0 calibration plot:  qr=0  half B0 and half B0bar, qr = 1 only B0 and qr = -1
     # no B0. Inverse for B0bar calibration plot
-    histo_calib_B0 = ROOT.TH1F('Calibration_B0', 'CalibrationPlot for true B0 (binning 100)', 100, -1.0, 1.0)
+    histo_calib_B0 = ROOT.TH1F('Calibration_B0', 'CalibrationPlot for true B0', 100, -1.0, 1.0)
     # calibration plot for B0bar calibration plot
-    histo_calib_B0bar = ROOT.TH1F('Calibration_B0Bar', 'CalibrationPlot for true B0Bar (binning 100)', 100, -1.0, 1.0)
+    histo_calib_B0bar = ROOT.TH1F('Calibration_B0Bar', 'CalibrationPlot for true B0Bar', 100, -1.0, 1.0)
     # belle plot with true B0 and B0bars
     hallo12 = ROOT.TH1F('BellePlot_NoCut', 'BellePlot_NoCut (binning 100)', 100, -1.0, 1.0)
 
     ###############################
-    diag = ROOT.TF1('diag', 'pol1')
+    diag = ROOT.TF1('diag', 'pol1', -1, 1)
     ###############################
 
     # histograms for the efficiency calculation in wrong way
@@ -223,7 +223,7 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
     histo_belleplotB0bar.SetLineColor(ROOT.kRed)
     #SetLabelSize etc SetTitle
 
-    histo_belleplotB0.SetTitle('Final output; (qr)-output ; Events')
+    histo_belleplotB0.SetTitle('Final Flavor Tagger Output; (qr)-output ; Events')
     histo_belleplotB0.SetMinimum(0)
     histo_belleplotB0.SetMaximum(10000)
     histo_belleplotB0.Draw('hist')
@@ -236,7 +236,21 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
 
     Canvas1.Update()
     #IPython.embed()
-    Canvas1.SaveAs(workingDirectory + '/''Belleplot_both.pdf')
+    Canvas1.SaveAs(workingDirectory + '/' + 'PIC_Belleplot_both.pdf')
+
+    ######produce the nice calibration plot
+    Canvas2 = ROOT.TCanvas('Bla2', 'Calibration plot for true B0', 1200, 800)
+    Canvas2.cd()  # activate
+    histo_calib_B0.SetFillColorAlpha(ROOT.kBlue, 0.2)
+    histo_calib_B0.SetFillStyle(1001)
+    histo_calib_B0.GetYaxis().SetTitleOffset(1.2)
+    histo_calib_B0.SetLineColor(ROOT.kBlue)
+
+    histo_calib_B0.SetTitle('Calibration For True B0; (qr)-output ; Calibration ')
+    histo_calib_B0.Draw('hist')
+    diag.Draw('SAME')
+    Canvas2.Update()
+    Canvas2.SaveAs(workingDirectory + '/' + 'PIC_Calibration_B0.pdf')
 
 # **********************************************
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY
@@ -260,9 +274,9 @@ trackLevelParticles = [
 ]
 
 # needs the B0Tagger.root-file from combiner teacher
-if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger.root'):
-    rootfile2 = ROOT.TFile(workingDirectory + '/B0Tagger.root', 'UPDATE')
-    tree2 = rootfile2.Get('B0Tagger_tree')
+if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger_ROECUT.root'):
+    rootfile2 = ROOT.TFile(workingDirectory + '/B0Tagger_ROECUT.root', 'UPDATE')
+    tree2 = rootfile2.Get('B0Tagger_ROECUT_tree')
     rootfile2.cd()
 
     print '****************** MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CATEGORIES *************************'
@@ -272,9 +286,9 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger.root'):
 
     for (category, categoryInput) in trackLevelParticles:
         # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
-        hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' + category + ' (binning 50)', 50, 0.0, 1.0)
+        hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' + category + ' (binning 50)', 50, -1.0, 1.0)
         # histogram of input variable (only background) - not yet a probability! It's a classifier plot!
-        hist_background = ROOT.TH1F('Background_' + category, 'Input Background (B0bar)' + category + ' (binning 50)', 50, 0.0, 1.0)
+        hist_background = ROOT.TH1F('Background_' + category, 'Input Background (B0bar)' + category + ' (binning 50)', 50, -1.0, 1.0)
 
         # per definiton that input is not comparable to the network output, this has to be transformed.
         # probability output from 0 to 1 (corresponds to net output probability) -> calculation below
@@ -333,7 +347,7 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger.root'):
         l.Draw()
 
         Canvas.Update()
-        Canvas.SaveAs(workingDirectory + '/' + category + '_Input_Combiner.pdf')
+        Canvas.SaveAs(workingDirectory + '/' + 'PIC_' + category + '_Input_Combiner.pdf')
 
         ###### TEST OF CALIBRATION ######
 

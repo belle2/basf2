@@ -20,7 +20,7 @@ from array import array
 import os
 
 # Directory to save the weights and the .config files
-workingDirectory = Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/RUN13')
+workingDirectory = Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/RUN16')
 
 
 class RemoveEmptyROEModule(Module):
@@ -43,15 +43,7 @@ class RemoveEmptyROEModule(Module):
             self.return_value(1)
 
 main = create_path()
-# ***************************************
-roinput = register_module('RootInput')
-inputFiles = []
-for i in xrange(20):
-    inputFiles.append('/remote/pcbelle06/ligioi/dstFiles/B2JpsiKs_mu_e0001r'
-                      + '%04d' % (i + 1) + '_s00_BGx0.mdst.root')
-roinput.param('inputFileNames', inputFiles)
-main.add_module(roinput)
-# ***************************************
+
 # main.add_module(register_module('RootInput'))
 main.add_module(register_module('Gearbox'))
 loadReconstructedParticles(path=main)
@@ -176,7 +168,7 @@ variables['Lambda'] = [
 # For Neurobayes Method see below!
 
 # Please choose method:
-methods = [('FastBDT', 'Plugin', 'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
+#methods = [('FastBDT', 'Plugin', 'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
 # methods = [('FastBDT', 'Plugin', '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
 # methods = [("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10")]
 # methods = [("BDTGradient", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2")]
@@ -208,7 +200,7 @@ for (symbol, category) in trackLevelParticles:
     targetVariable = 'IsFromB(' + category + ')'
 
 # Neurobayes method
-# methods = [('NeuroBayes', 'Plugin', 'H:V:CreateMVAPdfs:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' + '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables[category]]) + '=34'), ]
+    methods = [('NeuroBayes', 'Plugin', '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' + '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables[category]]) + '=34'), ]
 
     # Select particles in ROE for different categories of flavour tagging.
     if symbol != 'Lambda0':
@@ -274,7 +266,7 @@ if eventLevelReady:
         # Using MetaVariable
         targetVariable = 'IsRightClass(' + category + ')'
         # VariablesToNtuple to investigate the list before best candidate selection
-        variablesToNTuple(particleList, ["charge", "getExtraInfo(IsFromB(" + category + "))", "qr_Combined"], filename="without_best_candidate_selection_" + category + ".root", path=roe_path)
+        # variablesToNTuple(particleList, ["charge", "getExtraInfo(IsFromB(" + category + "))", "qr_Combined"], filename= workingDirectory + "without_best_candidate_selection_" + category + ".root", path=roe_path)
         # Selecting particle with highest r
         applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' + 'IsFromB(' + category + ')) > 0.5', path=roe_path)
 
@@ -331,19 +323,19 @@ if combinerLevelReady:
         'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))',
     ]
 
-    method_Combiner = [('FastBDT', 'Plugin',
-                       'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
+#    method_Combiner = [('FastBDT', 'Plugin',
+#                       'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
 
 # Neurobayes method
-# method_Combiner = [('NeuroBayes', 'Plugin', 'H:V:CreateMVAPdfs:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' + '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables]) + '=34')]
+    method_Combiner = [('NeuroBayes', 'Plugin', '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' + '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables]) + '=34')]
 
-    if not isTMVAMethodAvailable(workingDirectory + '/' + 'B0Tagger'):
+    if not isTMVAMethodAvailable(workingDirectory + '/' + 'B0Tagger_ROECUT'):
         B2INFO('Train TMVAMethod on combiner level')
         trainTMVAMethod(
             [],
             variables=variables,
             target='qr_Combined',
-            prefix='B0Tagger',
+            prefix='B0Tagger_ROECUT',
             methods=method_Combiner,
             workingDirectory=workingDirectory,
             path=roe_path,
@@ -354,7 +346,7 @@ if combinerLevelReady:
         applyTMVAMethod(
             [],
             signalProbabilityName='qr_Combined',
-            prefix='B0Tagger',
+            prefix='B0Tagger_ROECUT',
             # can be removed?
             signalClass=1,
             method=method_Combiner[0][0],

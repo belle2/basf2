@@ -205,8 +205,9 @@ namespace Belle2 {
               maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
             }
           }
-          float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */
-          return 0.5 * (maximum_q * r + 1);
+          //float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */
+          //return 0.5 * (maximum_q * r + 1);
+          return maximum_q * prob;
         };
         return func;
       } else {

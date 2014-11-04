@@ -122,7 +122,7 @@ void BKLMUnpackerModule::event()
 
       //is this the same as get1stDetectorBuffer??
       ///   int* data=rawKLM[i]->Get1stFINESSEBuffer(j);
-
+      int copperId = rawKLM[i]->GetCOPPERNodeId(j);
       rawKLM[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         int* buf_slot = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
@@ -143,58 +143,61 @@ void BKLMUnpackerModule::event()
 
         }
 
-        if (rawKLM[i]->GetDetectorNwords(j, finesse_num) != 2) {
+        int numHits = rawKLM[i]->GetDetectorNwords(j, finesse_num) / hitLength;
+        if (rawKLM[i]->GetDetectorNwords(j, finesse_num) % hitLength != 0) {
           char buffer[200];
           sprintf(buffer, "not the correct number of words: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
           B2ERROR(buffer);
           continue;
         }
-        cout << "unpacking first word: " << buf_slot[0] << ", second: " << buf_slot[1] << endl;
-        unsigned short bword1 = buf_slot[0] & 0xFFFF;
-        unsigned short bword2 = (buf_slot[0] >> 16) & 0xFFFF;
-        unsigned short bword3 = buf_slot[1] & 0xFFFF;
-        unsigned short bword4 = (buf_slot[1] >> 16) & 0xFFFF;
+        cout << "this finesse has " << numHits << " hits " << endl;
+        for (int iHit = 0; iHit < numHits; iHit++) {
+          cout << "unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit * hitLength + 1] << endl;
+          unsigned short bword1 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
+          unsigned short bword2 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
+          unsigned short bword3 = buf_slot[iHit * hitLength + 1] & 0xFFFF;
+          unsigned short bword4 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
 
-        cout << "unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
+          cout << "unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
 
-        unsigned short channel = bword1 & 0x7F;
-        unsigned short axis = (bword1 >> 7) & 1;
-        //lane is the slot in the crate
-        unsigned short lane = (bword1 >> 8) & 0x1F;
-        unsigned short ctime = bword2 & 0xFFFF; //full bword
-        unsigned short tdc = bword3 & 0x7FF;
-        unsigned short charge = bword4 & 0xFFF;
-        cout << "copper: " << j << " finesse: " << finesse_num << ", ";
-        cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl;
+          unsigned short channel = bword1 & 0x7F;
+          unsigned short axis = (bword1 >> 7) & 1;
+          //lane is the slot in the crate
+          unsigned short lane = (bword1 >> 8) & 0x1F;
+          unsigned short ctime = bword2 & 0xFFFF; //full bword
+          unsigned short tdc = bword3 & 0x7FF;
+          unsigned short charge = bword4 & 0xFFF;
+          cout << "copper: " << copperId << " finesse: " << finesse_num << ", ";
+          cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl;
 
-        //j should give the copper board. We add 1 because the xml file is one based
-        int electId = electCooToInt(j + 1, finesse_num + 1, lane, axis);
-        if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
-          char buffer[200];
-          sprintf(buffer, "could not find copperid %d, finesse %d, lane %d, axis %d in mapping\n", j + 1, finesse_num + 1, lane, axis);
-          B2INFO(buffer);
-          continue;
+
+          int electId = electCooToInt(copperId, finesse_num + 1, lane, axis);
+          if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
+            char buffer[200];
+            sprintf(buffer, "could not find copperid %d, finesse %d, lane %d, axis %d in mapping\n", copperId, finesse_num + 1, lane, axis);
+            B2INFO(buffer);
+            continue;
+          }
+          int moduleId = m_electIdToModuleId[electId];
+          cout << " electid: " << electId << " module: " << moduleId << endl;
+          //still have to add the channel and axis
+          int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+          //plane should already be set
+          //moduleId counts are zero based
+
+          //only channel and inrpc flag is not set yet
+
+          if (layer > 1)
+            moduleId |= BKLM_INRPC_MASK;
+          moduleId |= ((channel - 1) << BKLM_STRIP_BIT) | ((channel - 1) << BKLM_MAXSTRIP_BIT);
+
+          //(copperId,finesse_num,lane,channel,axis);
+          BKLMDigit digit(moduleId, ctime, tdc, charge);
+          //  Digit.setModuleID();
+          bklmDigits.appendNew(digit);
+
+          cout << "from digit:sector " << digit.getSector() << " layer: " << digit.getLayer() << " strip: " << digit.getStrip() << ", " << " isphi? " << digit.isPhiReadout() << " fwd? " << digit.isForward() << endl;
         }
-        int moduleId = m_electIdToModuleId[electId];
-        cout << " electid: " << electId << " module: " << moduleId << endl;
-        //still have to add the channel and axis
-        int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-        //plane should already be set
-        //moduleId counts are zero based
-
-        //only channel and inrpc flag is not set yet
-
-        if (layer > 1)
-          moduleId |= BKLM_INRPC_MASK;
-        moduleId |= ((channel - 1) << BKLM_STRIP_BIT) | ((channel - 1) << BKLM_MAXSTRIP_BIT);
-
-        //(j,finesse_num,lane,channel,axis);
-        BKLMDigit digit(moduleId, ctime, tdc, charge);
-        //  Digit.setModuleID();
-        bklmDigits.appendNew(digit);
-
-        cout << "from digit:sector " << digit.getSector() << " layer: " << digit.getLayer() << " strip: " << digit.getStrip() << ", " << " isphi? " << digit.isPhiReadout() << " fwd? " << digit.isForward() << endl;
-
       } //finesse boards
 
     } //copper boards

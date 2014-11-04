@@ -69,7 +69,8 @@ namespace Belle2 {
     //! to map hardware coordinates to logical coordinates
     map<int, int> m_electIdToModuleId;
 
-
+    //! length of one hit in 4 byte words. This is needed find the hits in the detector buffer
+    const int hitLength = 2;
   };
 
 

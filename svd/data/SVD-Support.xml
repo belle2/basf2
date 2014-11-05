@@ -202,13 +202,13 @@
 			<box>
 				<length unit="mm">268.000</length>
 				<z unit="mm"> -39.660</z>
-				<r unit="mm"> -4.910</r>
+				<r unit="mm"> -5.210</r>
 				<theta unit="deg">  0.000</theta>
 			</box>
 			<box>
 				<length unit="mm">140.738</length>
 				<z unit="mm"> 162.256</z>
-				<r unit="mm">-19.351</r>
+				<r unit="mm">-19.651</r>
 				<theta unit="deg">-11.900</theta>
 			</box>
 		</Layer>
@@ -250,7 +250,7 @@
 			<!-- number of pipes for this layer/halfshell -->
 			<nPipes>5</nPipes>
 			<!-- phi angle of the center of the first pipe -->
-			<startPhi unit="deg">-71.118</startPhi>
+			<startPhi unit="deg">-81.118</startPhi>
 			<!-- phi angle between two pipes -->
 			<deltaPhi unit="deg"> 36.000</deltaPhi>
 			<!-- distance between IP and center of the pipes -->
@@ -262,7 +262,7 @@
 		</Layer>
 		<Layer id="5">
 			<nPipes>6</nPipes>
-			<startPhi unit="deg">-74.602</startPhi>
+			<startPhi unit="deg">-66.602</startPhi>
 			<deltaPhi unit="deg"> 30.000</deltaPhi>
 			<radius   unit="mm"> 112.000</radius>
 			<zstart   unit="mm">-202.000</zstart>
@@ -270,7 +270,7 @@
 		</Layer>
 		<Layer id="6">
 			<nPipes>8</nPipes>
-			<startPhi unit="deg">-81.211</startPhi>
+			<startPhi unit="deg">-77.211</startPhi>
 			<deltaPhi unit="deg"> 22.500</deltaPhi>
 			<radius   unit="mm"> 142.500</radius>
 			<zstart   unit="mm">-255.000</zstart>

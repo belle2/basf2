@@ -186,6 +186,7 @@ namespace Belle2 {
         auto extraInfoFromB = arguments[2];
         auto func = [particleListName, extraInfoRightClass, extraInfoFromB](const Particle*) -> double {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          PCmsLabTransform T;
           Particle* target = nullptr; //Particle selected as target
           float maximum_p_track = 0; //Probability of being the target track from the track level
           float prob = 0; //The probability of beeing right classified flavour from the event level
@@ -193,7 +194,10 @@ namespace Belle2 {
           if (ListOfParticles->getListSize() > 0) {
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* particle = ListOfParticles->getParticle(i);
-              float x = particle->getExtraInfo(extraInfoFromB);
+              double x = 0;
+              if (extraInfoFromB == "IsFromB(MaximumP*)") {
+                x = (T.rotateLabToCms() * particle->get4Vector()).P();
+              } else x = particle->getExtraInfo(extraInfoFromB);
               if (x > maximum_p_track) {
                 maximum_p_track = x;
                 target = particle;
@@ -207,6 +211,7 @@ namespace Belle2 {
           }
           //float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */
           //return 0.5 * (maximum_q * r + 1);
+//           if (extraInfoFromB == ("IsFromB(IntermediateElectron)" || "IsFromB(IntermediateMuon)" || "IsFromB(SlowPion)" || "IsFromB(FSC)" || "IsFromB(Lambda)")) return -1 * maximum_q * prob;
           return maximum_q * prob;
         };
         return func;

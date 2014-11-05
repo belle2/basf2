@@ -14,6 +14,32 @@ import variables as mc_variables
 from ROOT import Belle2
 import os
 
+
+class RemoveEmptyROEModule(Module):
+
+    """
+    Returns 1 if current ROE is empty, 0 otherwise.
+    For the later plotting we have to set a dummy combiner output on the B0_sig.
+    Combiner-network output is set to 0.5, respectively 1 for qr-value (meaning no flavour information).
+    """
+
+    def event(self):
+        self.return_value(0)
+        roe = Belle2.PyStoreObj('RestOfEvent')
+        B0 = roe.obj().getRelated('Particles')
+        if mc_variables.variables.evaluate('isRestOfEventEmpty', B0) == -2:
+            B2INFO('FOUND NO B0 IN ROE! NOT USED FOR TRAINING! COMBINER OUTPUT IS MANUALLY SET'
+                   )
+            B0.addExtraInfo('B0_prob', 0.5)
+            B0.addExtraInfo('B0bar_prob', 0.5)
+            B0.addExtraInfo('qr_Combined', 0.0)
+            B0.addExtraInfo('qr_MC', -999)
+            B0.addExtraInfo('ROE_NTracks', 0)
+            B0.addExtraInfo('ROE_NECLClusters', 0)
+            B0.addExtraInfo('ROE_NKLMClusters', 0)
+            self.return_value(1)
+
+
 main = create_path()
 main.add_module(register_module('RootInput'))
 main.add_module(register_module('Gearbox'))
@@ -35,6 +61,13 @@ applyCuts('B0', 'isSignal > 0.5', path=main)
 buildRestOfEvent('B0', path=main)
 buildContinuumSuppression('B0', path=main)
 roe_path = create_path()
+emptypath = create_path()
+
+ROEEmptyTrigger = RemoveEmptyROEModule()
+
+# If trigger returns 1 jump into empty path skipping further modules in roe_path
+roe_path.add_module(ROEEmptyTrigger)
+ROEEmptyTrigger.if_true(emptypath)
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
@@ -97,7 +130,6 @@ variables['Kaon'] = [
     'Kid_dEdx',
     'Kid_TOP',
     'Kid_ARICH',
-    'charge',
     'NumberOfKShortinRemainingROEKaon',
     'ptTracksRoe',
     'distance',
@@ -114,7 +146,6 @@ variables['SlowPion'] = [
     'piid_ARICH',
     'pi_vs_edEdxid',
     'cosTPTO',
-    'charge',
     'Kid',
     'eid',
     ]
@@ -136,8 +167,9 @@ variables['Lambda'] = [
 
 # Please choose method:
 methods = [('FastBDT', 'Plugin',
-           '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+           'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
            )]
+# methods = [('NeuroBayes', 'Plugin', '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' + '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables[category]]) + '=34'), ]
 # methods = [("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10")]
 # methods = [("BDTGradient", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2")]
 # methods = [("PDEFoamBoost", "PDEFoam", "!H:!V:CreateMVAPdfs:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T")]
@@ -146,8 +178,11 @@ methods = [('FastBDT', 'Plugin',
 workingDirectory = os.environ['BELLE2_LOCAL_DIR'] \
     + '/analysis/data/FlavorTagging/TrainedMethods'
 
-print 'FLAVOR TAGGING'
-print 'Working directory is: ' + workingDirectory
+B2INFO('*** FLAVOR TAGGING ***')
+B2INFO(' ')
+B2INFO('    Working directory is: ' + workingDirectory)
+B2INFO(' ')
+B2INFO('TRACK LEVEL')
 
 trackLevelReady = True
 trackLevelParticles = [
@@ -204,8 +239,6 @@ for (symbol, category) in trackLevelParticles:
     # How to sextract info about the number of selected Dummy particles, i.e. about the selected Tracks here. (We need this for each category)
 
     if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL):
-        print isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL)
-        print workingDirectory + '/' + methodPrefix_TL
         print 'PROCESSING: trainTMVAMethod on track level'
         trainTMVAMethod(
             particleList,
@@ -231,13 +264,28 @@ for (symbol, category) in trackLevelParticles:
 
 eventLevelReady = trackLevelReady
 
-# Eventlevel -> calculation only on targettrack
-# eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
-                       # ('pi+', 'SlowPion'), ('Lambda0', 'Lambda')]
-
 variables['KaonPion'] = ['HighestProbInCat(K+:ROE, IsFromB(Kaon))',
                          'HighestProbInCat(pi+:ROE, IsFromB(SlowPion))',
                          'cosKaonPion', 'KaonPionHaveOpositeCharges', 'Kid']
+
+variables['MaximumP*'] = [
+    'p_CMS',
+    'pt_CMS',
+    'p',
+    'pt',
+    'cosTPTO',
+    'ImpactXY',
+    ]
+
+variables['FSC'] = [
+    'p_CMS',
+    'cosTPTO',
+    'Kid',
+    'FSCVariables(p_CMS_Fast)',
+    'FSCVariables(cosSlowFast)',
+    'FSCVariables(cosTPTO_Fast)',
+    'FSCVariables(SlowFastHaveOpositeCharges)',
+    ]
 
 eventLevelParticles = [
     ('e+', 'Electron'),
@@ -248,15 +296,17 @@ eventLevelParticles = [
     ('K+', 'Kaon'),
     ('pi+', 'SlowPion'),
     ('pi+', 'FastPion'),
+    ('pi+', 'MaximumP*'),
+    ('pi+', 'FSC'),
     ('K+', 'KaonPion'),
     ('Lambda0', 'Lambda'),
     ]
 
 if eventLevelReady:
+    B2INFO('EVENT LEVEL')
     for (symbol, category) in eventLevelParticles:
         particleList = symbol + ':ROE'
         methodPrefix_EL = 'TMVA_' + category + '_EL'
-        # Using MetaVariable
         targetVariable = 'IsRightClass(' + category + ')'
         print 'This is the targetVariable: ' + targetVariable
 
@@ -267,6 +317,9 @@ if eventLevelReady:
         if category == 'KaonPion':
             selectParticle(particleList, 'hasHighestProbInCat(' + particleList
                            + ',' + 'IsFromB(Kaon)) > 0.5', path=roe_path)
+        elif category == 'FSC':
+            selectParticle(particleList, 'hasHighestProbInCat(' + particleList
+                           + ',' + 'IsFromB(SlowPion)) > 0.5', path=roe_path)
         else:
             selectParticle(particleList, 'hasHighestProbInCat(' + particleList
                            + ',' + 'IsFromB(' + category + ')) > 0.5',
@@ -314,6 +367,7 @@ class RemoveExtraInfoModule(Module):
 combinerLevelReady = eventLevelReady
 
 if combinerLevelReady:
+    B2INFO('COMBINER LEVEL')
     variables = [
         'QrOf(e+:ROE, IsRightClass(Electron), IsFromB(Electron))',
         'QrOf(e+:ROE, IsRightClass(IntermediateElectron), IsFromB(IntermediateElectron))'
@@ -325,38 +379,46 @@ if combinerLevelReady:
         'QrOf(K+:ROE, IsRightClass(Kaon), IsFromB(Kaon))',
         'QrOf(pi+:ROE, IsRightClass(SlowPion), IsFromB(SlowPion))',
         'QrOf(pi+:ROE, IsRightClass(FastPion), IsFromB(FastPion))',
+        'QrOf(pi+:ROE, IsRightClass(MaximumP*), IsFromB(MaximumP*))',
+        'QrOf(pi+:ROE, IsRightClass(FSC), IsFromB(SlowPion))',
         'QrOf(K+:ROE, IsRightClass(KaonPion), IsFromB(Kaon))',
         'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))',
         ]
 
     method_Combiner = [('FastBDT', 'Plugin',
-                       '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+                       'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
                        )]
 
-    if not isTMVAMethodAvailable(workingDirectory + '/' + 'B0Tagger'):
-        print 'PROCESSING: trainTMVAMethod on combiner level'
+# Neurobayes method
+    # method_Combiner = [('NeuroBayes', 'Plugin', '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' + '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables]) + '=34')]
+
+    if not isTMVAMethodAvailable(workingDirectory + '/' + 'B0Tagger_ROECUT'):
+        B2INFO('Train TMVAMethod on combiner level')
         trainTMVAMethod(
             [],
             variables=variables,
             target='qr_Combined',
-            prefix='B0Tagger',
+            prefix='B0Tagger_ROECUT',
             methods=method_Combiner,
             workingDirectory=workingDirectory,
             path=roe_path,
             )
         combinerLevelReady = False
     else:
-        print 'PROCESSING: applyTMVAMethod on combiner level'
+        B2INFO('Apply TMVAMethod on combiner level')
         applyTMVAMethod(
             [],
             signalProbabilityName='qr_Combined',
-            prefix='B0Tagger',
+            prefix='B0Tagger_ROECUT',
             signalClass=1,
             method=method_Combiner[0][0],
             signalFraction=signalFraction,
             workingDirectory=workingDirectory,
             path=roe_path,
             )
+
+if not combinerLevelReady:
+    roe_path.add_module(RemoveExtraInfoModule())  # Only remove extra information
 
 if combinerLevelReady:
 
@@ -371,34 +433,43 @@ if combinerLevelReady:
             roe = Belle2.PyStoreObj('RestOfEvent')
             info = Belle2.PyStoreObj('EventExtraInfo')
             someParticle = Belle2.Particle(None)
+            B0_prob = info.obj().getExtraInfo('qr_Combined')
+            B0bar_prob = 1 - info.obj().getExtraInfo('qr_Combined')
             qr_Combined = 2 * (info.obj().getExtraInfo('qr_Combined') - 0.5)
             qr_MC = 2 * (mc_variables.variables.evaluate('qr_Combined',
                          someParticle) - 0.5)
             ROE_NTracks = roe.obj().getNTracks()
             ROE_NECLClusters = roe.obj().getNECLClusters()
             ROE_NKLMClusters = roe.obj().getNKLMClusters()
-            particle = roe.obj().getRelated('Particles')
-            particle.addExtraInfo('qr_Combined', qr_Combined)
-            particle.addExtraInfo('qr_MC', qr_MC)
-            particle.addExtraInfo('ROE_NTracks', ROE_NTracks)
-            particle.addExtraInfo('ROE_NECLClusters', ROE_NECLClusters)
-            particle.addExtraInfo('ROE_NKLMClusters', ROE_NKLMClusters)
+            B0 = roe.obj().getRelated('Particles')
+            B0.addExtraInfo('B0_prob', B0_prob)
+            B0.addExtraInfo('B0bar_prob', B0bar_prob)
+            B0.addExtraInfo('qr_Combined', qr_Combined)
+            B0.addExtraInfo('qr_MC', qr_MC)
+            B0.addExtraInfo('ROE_NTracks', ROE_NTracks)
+            B0.addExtraInfo('ROE_NECLClusters', ROE_NECLClusters)
+            B0.addExtraInfo('ROE_NKLMClusters', ROE_NKLMClusters)
             info.obj().removeExtraInfo()
 
 
     roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())  # Move and remove extraInfo
     roe_path.add_module(RemoveExtraInfoModule())
-else:
-    roe_path.add_module(RemoveExtraInfoModule())  # Only remove extra info
 
 main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 if combinerLevelReady:
-    variablesToNTuple('B0', ['getExtraInfo(qr_Combined)', 'getExtraInfo(qr_MC)'
-                      , 'getExtraInfo(ROE_NTracks)',
-                      'getExtraInfo(ROE_NECLClusters)',
-                      'getExtraInfo(ROE_NKLMClusters)'], 'TaggingInformation',
-                      workingDirectory + '/B0_B0bar_final.root', path=main)
+    variablesToNTuple('B0', [
+        'getExtraInfo(qr_Combined)',
+        'getExtraInfo(qr_MC)',
+        'getExtraInfo(B0_prob)',
+        'getExtraInfo(B0bar_prob)',
+        'McFlavorOfTagSide',
+        'mcPDG',
+        'getExtraInfo(ROE_NTracks)',
+        'getExtraInfo(ROE_NECLClusters)',
+        'getExtraInfo(ROE_NKLMClusters)',
+        ], 'TaggingInformation', workingDirectory + '/B0_B0bar_final.root',
+            path=main)
 
 main.add_module(register_module('ProgressBar'))
 process(main)

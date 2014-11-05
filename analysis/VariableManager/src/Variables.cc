@@ -37,6 +37,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <TLorentzVector.h>
 #include <TRandom.h>
@@ -890,6 +891,27 @@ namespace Belle2 {
       return TMath::Cos(momTarget_K.Angle(momTarget_pi.Vect()));
     }
 
+    double ImpactXY(const Particle* particle)
+    {
+
+      double x = particle->getX() - 0;
+      double y = particle->getY() - 0;
+
+      double px = particle->getPx();
+      double py = particle->getPy();
+      double pt = sqrt(px * px + py * py);
+
+//       const TVector3 m_BeamSpotCenter = TVector3(0., 0., 0.);
+//       TVector3 Bfield= BFieldMap::Instance().getBField(m_BeamSpotCenter); # TODO check why this produces a linking bug
+
+      double a = -0.2998 * 1.5 * particle->getCharge(); //Curvature of the track,
+
+      double T = TMath::Sqrt(pt * pt - 2 * a * (x * py - y * px) + a * a * (x * x + y * y));
+
+      return TMath::Abs((-2 * (x * py - y * px) + a * (x * x + y * y)) / (T + pt));
+
+    }
+
     double KaonPionHaveOpositeCharges(const Particle* particle)
     {
 
@@ -1413,6 +1435,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("BtagMCFlavor",  particleMCFlavor,    "Flavour of Btag from MC");
     REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,  "Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 else.");
     REGISTER_VARIABLE("cosKaonPion"  , cosKaonPion , "cosine of angle between kaon and slow pion momenta, i.e. between the momenta of the particles selected as target kaon and slow pion");
+    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
     REGISTER_VARIABLE("KaonPionHaveOpositeCharges", KaonPionHaveOpositeCharges, "Returns 1 if the particles selected as target kaon and slow pion have oposite charges, 0 else")
 
     VARIABLE_GROUP("Rest Of Event");

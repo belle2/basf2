@@ -112,6 +112,17 @@ namespace Belle2 {
     Manager::FunctionPtr SemiLeptonicVariables(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns a requested kinematical variable via argument[0] of the group of the flavor tagging variables corresponding to the FastSlowCorrelated categories.
+     * The Possibilities are:
+     * p_CMS_Fast: The CMS momentum of the fast track.
+     * cosSlowFast: The cosine of the angle between the slow and the fast track.
+     * cosTPTO_Fast: The cosine of the angle between the fast track and the thrust axis.
+     * SlowFastHaveOpositeCharges: Returns 1 if the fast and slow target particles are oppositely charged, 0 else.
+     * This are Flavor Tagging specific variables!
+     */
+    Manager::FunctionPtr FSCVariables(const std::vector<std::string>& arguments);
+
+    /**
      * Returns the value of et, mm2, or one of the 16 KSFW moments, as requested by the user.
      */
     Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments);

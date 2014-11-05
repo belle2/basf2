@@ -361,6 +361,11 @@ namespace Belle2 {
     double cosKaonPion(const Particle* particle);
 
     /**
+     * returns the impact parameter D of the given particle in the xy plane
+     */
+    double ImpactXY(const Particle* particle);
+
+    /**
      * returns 1 if the particles selected as target kaon and slow pion in the respective flavour tagging categories have oposite charges, 0 else.
      */
     double KaonPionHaveOpositeCharges(const Particle* particle);

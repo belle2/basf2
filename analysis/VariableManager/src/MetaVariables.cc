@@ -319,7 +319,7 @@ namespace Belle2 {
             maximum_PDG = TMath::Abs(MCp->getPDG());
             maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
             //for Kaons and SlowPions we need the mother of the mother for the particle
-            if (particleName == "Kaon" || particleName == "SlowPion" || particleName == "Lambda" || particleName == "IntermediateElectron" || particleName == "IntermediateMuon" || particleName == "FastPion") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
+            if (particleName == "Kaon" || particleName == "SlowPion" || particleName == "Lambda" || particleName == "IntermediateElectron" || particleName == "IntermediateMuon" || particleName == "FastPion" || particleName == "FSC") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
           } else {
             maximum_PDG = 0;
             maximum_PDG_Mother = 0;
@@ -343,6 +343,27 @@ namespace Belle2 {
               if (MCSlowPion->getMother() != nullptr && MCSlowPion->getMother()->getMother() != nullptr) {
                 SlowPion_PDG = TMath::Abs(MCSlowPion->getPDG());
                 SlowPion_PDG_Mother = TMath::Abs(MCSlowPion->getMother()->getPDG());
+              }
+            }
+          }
+//           float FastParticle_q = 0;
+          int FastParticle_PDG_Mother = 0;
+          if (particleName == "FSC") {
+            StoreObjPtr<ParticleList> FastParticleList("pi+:ROE");
+            PCmsLabTransform T;
+            double maximum_prob_fast = 0;
+            Particle* TargetFastParticle = nullptr;
+            for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
+              Particle* p_fast = FastParticleList->getParticle(i);
+              double prob_fast = (T.rotateLabToCms() * p_fast -> get4Vector()).P();
+              if (prob_fast > maximum_prob_fast) {
+                maximum_prob_fast = prob_fast;
+                TargetFastParticle = p_fast;
+              }
+              const MCParticle* MCFastParticle = TargetFastParticle ->getRelated<MCParticle>();
+//               FastParticle_q = TargetFastParticle -> getCharge();
+              if (MCFastParticle->getMother() != nullptr && MCFastParticle->getMother()->getMother() != nullptr) {
+                FastParticle_PDG_Mother = TMath::Abs(MCFastParticle->getMother()->getPDG());
               }
             }
           }
@@ -376,6 +397,13 @@ namespace Belle2 {
           } else if (particleName == "FastPion"
                      && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
                      && maximum_PDG == 211 && maximum_PDG_Mother == 511) {
+            return 1.0;
+          } else if (particleName == "MaximumP*"
+                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)) {
+            return 1.0;
+          } else if (particleName == "FSC"
+                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+                     && maximum_PDG == 211 && FastParticle_PDG_Mother == 511) {
             return 1.0;
           } else if (particleName == "Lambda"
                      && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
@@ -477,16 +505,22 @@ namespace Belle2 {
         auto extraInfoName = arguments[1];
         auto func = [particleListName, extraInfoName](const Particle * particle) -> double {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          PCmsLabTransform T;
           double maximum_prob = 0;
           for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
             Particle* p = ListOfParticles->getParticle(i);
-            double prob = p->getExtraInfo(extraInfoName);
+            double prob = 0;
+            if (extraInfoName == "IsFromB(MaximumP*)") {
+              prob = (T.rotateLabToCms() * p->get4Vector()).P();
+            } else prob = p->getExtraInfo(extraInfoName);
             if (prob > maximum_prob) {
               maximum_prob = prob;
             }
           }
-          if (particle -> getExtraInfo(extraInfoName) == maximum_prob) return 1.0;
-          else return 0.0;
+          if ((extraInfoName == "IsFromB(MaximumP*)" && (T.rotateLabToCms() * particle -> get4Vector()).P() == maximum_prob) ||
+              (extraInfoName != "IsFromB(MaximumP*)" && particle -> getExtraInfo(extraInfoName) == maximum_prob)) {
+            return 1.0;
+          } else return 0.0;
         };
         return func;
       } else {
@@ -571,7 +605,46 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function recoilMassBtag");
+        B2FATAL("Wrong number of arguments (1 required) for meta function SemiLeptonicVariables");
+        return nullptr;
+      }
+    }
+
+    Manager::FunctionPtr FSCVariables(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto requestedVariable = arguments[0];
+        auto func = [requestedVariable](const Particle * particle) -> double {
+          StoreObjPtr<ParticleList> FastParticleList("pi+:ROE");
+          PCmsLabTransform T;
+          double maximum_prob_fast = 0;
+          Particle* TargetFastParticle = nullptr;
+          for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
+            Particle* p_fast = FastParticleList->getParticle(i);
+            double prob_fast = (T.rotateLabToCms() * p_fast -> get4Vector()).P();
+            if (prob_fast > maximum_prob_fast) {
+              maximum_prob_fast = prob_fast;
+              TargetFastParticle = p_fast;
+            }
+          }
+          TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
+          TLorentzVector momFastParticle = T.rotateLabToCms() * TargetFastParticle -> get4Vector();  //Momentum of Slow Pion in CMS-System
+
+          if (requestedVariable == "p_CMS_Fast") return momFastParticle.P();
+          else if (requestedVariable == "cosSlowFast") return TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
+          else if (requestedVariable == "cosTPTO_Fast") return Variable::Manager::Instance().getVariable("cosTPTO")->function(TargetFastParticle);
+          else if (requestedVariable == "SlowFastHaveOpositeCharges") {
+            if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
+              return 1;
+            } else return 0;
+          } else {
+            B2FATAL("Wrong variable requested. The possibilities are p_CMS_Fast, cosSlowFast or cosTPTO_Fast");
+            return 0;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (1 required) for meta function FSCVariables");
         return nullptr;
       }
     }
@@ -676,6 +749,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("IsFromB(particleName)", IsFromB, "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
     REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, "Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName. The probability is accessed via extraInfoName.");
     REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables, "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90) assuming a semileptonic decay with the given particle as target.");
+    REGISTER_VARIABLE("FSCVariables(requestedVariable)", FSCVariables, "FlavorTagging:[Eventbased] Kinematical variables for FastSlowCorrelated category (p_CMS_Fast, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTO_Fast).");
     REGISTER_VARIABLE("CheckingVariables(ListName, requestedVariable)", CheckingVariables, "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");
     REGISTER_VARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat, "Returns the highest probability value for the given category")
 

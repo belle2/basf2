@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- define our own special Materials -->
+<Materials>
+  <Material name="PINDIODE-Material">
+    <density unit="g/cm3">2.5</density>
+    <!-- (optional) State can be one of Gas, Liquid, Solid, Undefined, case insensitive  -->
+    <state>Solid</state>
+    <!-- (optional) Temperature in K, if omitted, the standard value is used (273.15) -->
+    <temperature>273.15</temperature>
+    <!-- (optional) Pressure in atm, if omitted, 1.0 is used -->
+    <pressure>1.0</pressure>
+    <!-- Components of the Material, can be any combination of Elements and Materials
+         All chemical elements are predefined as Element and Material.
+         If you combine only materials you don't have to specify the density above since it can be calculated
+         automatically -->
+    <Components>
+      <Element fraction="0.75">Si</Element>
+      <Element fraction="0.20">Ga</Element>
+      <Material fraction="0.05">Al</Material>
+    </Components>
+  </Material>
+
+  <Material name="Al6061">
+    <density unit="g/cm3">2.7</density>
+    <Components>
+       <Element fraction="0.004">Si</Element>
+       <Element fraction="0.007">Fe</Element>
+       <Element fraction="0.004">Cu</Element>
+       <Element fraction="0.015">Mn</Element>
+       <Element fraction="0.008">Mg</Element>
+       <Element fraction="0.0035">Cr</Element>
+       <Element fraction="0.0025">Zn</Element>
+       <Element fraction="0.0015">Ti</Element>
+       <Element fraction="0.0005">Pb</Element>
+       <Element fraction="0.0015">Zr</Element>
+       <Element fraction="0.9525">Al</Element>
+    </Components>
+  </Material>
+
+
+</Materials>
+  

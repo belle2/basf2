@@ -1,0 +1,870 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="BEAMABORT">
+  <Creator library="beast">BEAMABORTCreator</Creator>
+  <Content>
+    <!-- normally, parameters should be defined with a unit attribute. This
+         enables automatic conversion to the default framework unit --> 
+    <stepSize unit="um">200</stepSize>
+    <!--if we don't supply a unit there can be no conversion but is still valid -->
+    <divisions>32</divisions>
+    <!-- valid values for false are: "", "0", "off", "false" (case
+         insensitive), everything else will be interpreted as true -->
+    <foo>true</foo>
+    <!-- we can also have arrays as parameters which makes it easy to get a
+         number of values as vector<double>.  The numbers can be divided by
+         whitespace, comma or semi-colon -->
+    <bar unit="mm">1 2 3 4 5 6 7 8 9 10 11 12
+    </bar>
+    <!-- 1-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">0.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 2-2-->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">0.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 3-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">0.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 4-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">0.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 5-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">2.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 6-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">2.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 7-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">2.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 8-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">2.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 9-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-2.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 10-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-2.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 11-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">-2.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 12-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">-2.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 13-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">4.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 14-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">4.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 15-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">4.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 16-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">4.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 17-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-4.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 18-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-4.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 19-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">-4.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 20-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">-4.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 21-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">6.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 22-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">6.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 23-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">6.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 24-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">6.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 25-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-6.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 26-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-6.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 27-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">-6.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 28-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">-6.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 29-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-8.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 30-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-8.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 31-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">-8.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 32-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">-8.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 33-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">8.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 34-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">8.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 34-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">8.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 35-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">8.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 36-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-10.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 37-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-10.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 38-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">-10.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 39-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">-10.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 40-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">10.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 41-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">10.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 42-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">10.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 43-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">10.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 44-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-12.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 45-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-12.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 46-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">-12.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 47-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">-12.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 48-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">12.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 49-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-4.8</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">12.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 50-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">4.8</y_beamabort>
+      <z_beamabort unit="cm">12.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 51-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-4.8</y_beamabort>
+      <z_beamabort unit="cm">12.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 52-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">30</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">120.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 53-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-30</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">120.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 54-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">30</y_beamabort>
+      <z_beamabort unit="cm">120.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 55-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-30</y_beamabort>
+      <z_beamabort unit="cm">120.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 56-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">30</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-120.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 57-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-30</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-120.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 58-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">30</y_beamabort>
+      <z_beamabort unit="cm">-120.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 59-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-30</y_beamabort>
+      <z_beamabort unit="cm">-120.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 60-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">30</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">200.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 61-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-30</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">200.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 62-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">30</y_beamabort>
+      <z_beamabort unit="cm">200.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 63-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-30</y_beamabort>
+      <z_beamabort unit="cm">200.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 64-1 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">30</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-200.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 65-2 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-30</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-200.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   <!-- 66-3 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">30</y_beamabort>
+      <z_beamabort unit="cm">-200.0</z_beamabort>
+      <AngleX unit="deg">-90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   <!-- 67-4 -->
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-30</y_beamabort>
+      <z_beamabort unit="cm">-200.0</z_beamabort>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+
+<!--
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">6.2</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">5.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-6.2</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">5.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">6.2</y_beamabort>
+      <z_beamabort unit="cm">5.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-6.2</y_beamabort>
+      <z_beamabort unit="cm">5.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">6.2</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-5.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">-6.2</x_beamabort>
+      <y_beamabort unit="cm">0.0</y_beamabort>
+      <z_beamabort unit="cm">-5.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">6.2</y_beamabort>
+      <z_beamabort unit="cm">-5.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="cm">0.0</x_beamabort>
+      <y_beamabort unit="cm">-6.2</y_beamabort>
+      <z_beamabort unit="cm">-5.0</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+ -->
+<!--
+    <Active>
+      <Material>BEAMABORT-Material</Material>
+      <x_beamabort unit="mm">2.65</x_beamabort>
+      <y_beamabort unit="mm">2.65</y_beamabort>
+      <z_beamabort unit="mm">0.25</z_beamabort>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">-11.5</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+   <Active>
+     <Material>BEAMABORT-Material</Material>
+     <x_beamabort unit="cm">0.0</x_beamabort>
+     <y_beamabort unit="cm">7.5</y_beamabort>
+     <z_beamabort unit="cm">36.8637</z_beamabort>
+     <AngleX unit="deg">11.5</AngleX>
+     <AngleY unit="deg">0</AngleY>
+     <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   
+   <Active>
+     <Material>BEAMABORT-Material</Material>
+     <x_beamabort unit="cm">-7.5</x_beamabort>
+     <y_beamabort unit="cm">0.0</y_beamabort>
+     <z_beamabort unit="cm">36.8637</z_beamabort>
+     <AngleX unit="deg">0.0</AngleX>
+     <AngleY unit="deg">11.5</AngleY>
+     <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   
+   <Active>
+     <Material>BEAMABORT-Material</Material>
+     <x_beamabort unit="cm">0.0</x_beamabort>
+     <y_beamabort unit="cm">-7.5</y_beamabort>
+     <z_beamabort unit="cm">36.8637</z_beamabort>
+     <AngleX unit="deg">-11.5</AngleX>
+     <AngleY unit="deg">0.0</AngleY>
+     <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+
+   <Active>
+     <Material>BEAMABORT-Material</Material>
+     <x_beamabort unit="cm">7.5</x_beamabort>
+     <y_beamabort unit="cm">0.0</y_beamabort>
+     <z_beamabort unit="cm">-20.6061</z_beamabort>
+     <AngleX unit="deg">0.0</AngleX>
+     <AngleY unit="deg">-160.0</AngleY>
+     <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+   <Active>
+     <Material>BEAMABORT-Material</Material>
+     <x_beamabort unit="cm">0.0</x_beamabort>
+     <y_beamabort unit="cm">7.5</y_beamabort>
+     <z_beamabort unit="cm">-20.6061</z_beamabort>
+     <AngleX unit="deg">160.0</AngleX>
+     <AngleY unit="deg">0.0</AngleY>
+     <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+   
+   
+   <Active>
+     <Material>BEAMABORT-Material</Material>
+     <x_beamabort unit="cm">-7.5</x_beamabort>
+     <y_beamabort unit="cm">0.0</y_beamabort>
+     <z_beamabort unit="cm">-20.6061</z_beamabort>
+     <AngleX unit="deg">0.0</AngleX>
+     <AngleY unit="deg">160.0</AngleY>
+     <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+   
+   <Active>
+     <Material>BEAMABORT-Material</Material>
+     <x_beamabort unit="cm">0.0</x_beamabort>
+     <y_beamabort unit="cm">-7.5</y_beamabort>
+     <z_beamabort unit="cm">-20.6061</z_beamabort>
+     <AngleX unit="deg">-160.0</AngleX>
+     <AngleY unit="deg">0.0</AngleY>
+     <AngleZ unit="deg">0.0</AngleZ>
+   </Active>
+
+-->
+
+  </Content>
+</DetectorComponent>

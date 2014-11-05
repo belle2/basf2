@@ -1,0 +1,6 @@
+Import('env')
+
+#These are the libraries the awesome package has to be linked against
+env['LIBS'] = ['$ROOT_LIBS','simulation_dataobjects','framework']
+
+Return('env')

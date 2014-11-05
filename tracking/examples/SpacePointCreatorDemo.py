@@ -10,7 +10,6 @@ from time import time
 numEvents = 25
 initialValue = 42
 
-
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
 
@@ -37,22 +36,34 @@ geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
-spCreatorSingle = register_module('SpacePointCreator')
-spCreatorSingle.logging.log_level = LogLevel.DEBUG
+spCreatorSingle = register_module('SpacePointCreatorSVD')
+spCreatorSingle.logging.log_level = LogLevel.INFO
 spCreatorSingle.logging.debug_level = 1
 spCreatorSingle.param('OnlySingleClusterSpacePoints', True)
 spCreatorSingle.param('NameOfInstance', 'singlesOnly')
+spCreatorSingle.param('SpacePoints', 'singlesOnly')
 
-spCreatorCombi = register_module('SpacePointCreator')
+spCreatorCombi = register_module('SpacePointCreatorSVD')
 spCreatorCombi.logging.log_level = LogLevel.DEBUG
 spCreatorCombi.logging.debug_level = 1
 spCreatorCombi.param('OnlySingleClusterSpacePoints', False)
 spCreatorCombi.param('NameOfInstance', 'couplesAllowed')
+spCreatorCombi.param('SpacePoints', 'couplesAllowed')
+
+spCreatorPXD = register_module('SpacePointCreatorPXD')
+spCreatorPXD.logging.log_level = LogLevel.INFO
+spCreatorPXD.logging.debug_level = 1
+spCreatorPXD.param('NameOfInstance', 'pxdOnly')
+spCreatorPXD.param('SpacePoints', 'pxdOnly')
 
 spCreatorTest = register_module('SpacePointCreatorTest')
 spCreatorTest.logging.log_level = LogLevel.DEBUG
 spCreatorTest.logging.debug_level = 20
 spCreatorTest.param('NameOfInstance', 'SPTester')
+# spCreatorTest.param('SpacePoints', 'couplesAllowed')
+# spCreatorTest.param('AllSpacePointContainers', [ 'pxdOnly'] )
+spCreatorTest.param('AllSpacePointContainers', ['singlesOnly', 'couplesAllowed'
+                    , 'pxdOnly'])
 
 # Create paths
 main = create_path()
@@ -67,9 +78,9 @@ main.add_module(pxdClusterizer)
 main.add_module(svdDigitizer)
 main.add_module(svdClusterizer)
 main.add_module(spCreatorSingle)
-#main.add_module(spCreatorCombi)
+main.add_module(spCreatorCombi)
+main.add_module(spCreatorPXD)
 main.add_module(spCreatorTest)
-
 
 # Process events
 process(main)

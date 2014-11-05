@@ -97,32 +97,45 @@ particlegun.param('independentVertices', True)
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
-spCreatorSingle = register_module('TBSpacePointCreator')
-spCreatorSingle.logging.log_level = LogLevel.DEBUG
+spCreatorSingle = register_module('SpacePointCreatorSVD')
+spCreatorSingle.logging.log_level = LogLevel.INFO
 spCreatorSingle.logging.debug_level = 1
 spCreatorSingle.param('OnlySingleClusterSpacePoints', True)
 spCreatorSingle.param('NameOfInstance', 'singlesOnly')
-spCreatorSingle.param('PXDClusters', 'myPersonalPXDClusters')
+spCreatorSingle.param('SpacePoints', 'singlesOnly')
 spCreatorSingle.param('SVDClusters', 'myPersonalSVDClusters')
-spCreatorSingle.param('TelClusters', 'myPersonalTelClusters')
 
-spCreatorCombi = register_module('TBSpacePointCreator')
+spCreatorCombi = register_module('SpacePointCreatorSVD')
 spCreatorCombi.logging.log_level = LogLevel.DEBUG
 spCreatorCombi.logging.debug_level = 1
 spCreatorCombi.param('OnlySingleClusterSpacePoints', False)
 spCreatorCombi.param('NameOfInstance', 'couplesAllowed')
-spCreatorCombi.param('PXDClusters', 'myPersonalPXDClusters')
+spCreatorCombi.param('SpacePoints', 'couplesAllowed')
 spCreatorCombi.param('SVDClusters', 'myPersonalSVDClusters')
-spCreatorCombi.param('TelClusters', 'myPersonalTelClusters')
 
-spCreatorTest = register_module('TBSpacePointCreatorTest')
+spCreatorPXD = register_module('SpacePointCreatorPXD')
+spCreatorPXD.logging.log_level = LogLevel.INFO
+spCreatorPXD.logging.debug_level = 1
+spCreatorPXD.param('NameOfInstance', 'pxdOnly')
+spCreatorPXD.param('SpacePoints', 'pxdOnly')
+spCreatorPXD.param('PXDClusters', 'myPersonalPXDClusters')
+
+spCreatorTEL = register_module('SpacePointCreatorTEL')
+spCreatorTEL.logging.log_level = LogLevel.INFO
+spCreatorTEL.logging.debug_level = 1
+spCreatorTEL.param('NameOfInstance', 'telOnly')
+spCreatorTEL.param('SpacePoints', 'telOnly')
+spCreatorTEL.param('TelClusters', 'myPersonalTelClusters')
+
+spCreatorTest = register_module('SpacePointCreatorTELTest')
 spCreatorTest.logging.log_level = LogLevel.DEBUG
-spCreatorTest.logging.debug_level = 20
+spCreatorTest.logging.debug_level = 50
 spCreatorTest.param('NameOfInstance', 'SPTester')
-spCreatorTest.param('PXDClusters', 'myPersonalPXDClusters')
 spCreatorTest.param('SVDClusters', 'myPersonalSVDClusters')
+spCreatorTest.param('PXDClusters', 'myPersonalPXDClusters')
 spCreatorTest.param('TelClusters', 'myPersonalTelClusters')
-spCreatorTest.param('SpacePoints', 'TBSpacePoints')
+spCreatorTest.param('AllSpacePointContainers', ['singlesOnly', 'couplesAllowed'
+                    , 'pxdOnly', 'telOnly'])
 
 # Create paths
 main = create_path()
@@ -140,6 +153,8 @@ main.add_module(spCreatorSingle)
 main.add_module(pxdDigitizer)
 main.add_module(pxdClusterizer)
 main.add_module(spCreatorCombi)
+main.add_module(spCreatorTEL)
+main.add_module(spCreatorPXD)
 main.add_module(spCreatorTest)
 
 # Process events

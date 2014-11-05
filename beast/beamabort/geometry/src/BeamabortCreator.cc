@@ -75,36 +75,15 @@ namespace Belle2 {
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-        //create beamabort container volume
-        G4double dx_box = 2. / 2.*CLHEP::cm;
-        G4double dy_box = 1. / 2.*CLHEP::cm;
-        G4double dz_box = 1. / 2.*CLHEP::cm;
-        G4VSolid* s_Box = new G4Box("s_box", dx_box, dy_box, dz_box);
-
-        G4double dx_hole = (20. - 2.*2.05) / 2.*CLHEP::mm;
-        G4double dy_hole = (10. - 2.*2.05) / 2.*CLHEP::mm;
-        G4double dz_hole = 5.1 / 2.*CLHEP::mm;
-        G4VSolid* s_Hole = new G4Box("s_Hole", dx_hole, dy_hole, dz_hole);
-        s_Box = new G4SubtractionSolid("s_Box", s_Box, s_Hole, 0, G4ThreeVector(0, 0, dz_box - dz_hole));
-
-        G4LogicalVolume* l_Box = new G4LogicalVolume(s_Box, geometry::Materials::get("Al6061"), "l_Box");
-
         //create beamabort volumes
-        G4double dx_diode = 2.65 / 2.*CLHEP::mm;
-        G4double dy_diode = 2.65 / 2.*CLHEP::mm;
-        G4double dz_diode = 0.25 / 2.*CLHEP::mm;
-        G4Box* s_BEAMABORT1 = new G4Box("s_BEAMABORT1", dx_diode, dy_diode, dz_diode);
-        G4Box* s_BEAMABORT2 = new G4Box("s_BEAMABORT2", dx_diode, dy_diode, dz_diode);
-        G4double dz_layer = 0.01 / 2.*CLHEP::mm;
-        G4Box* s_layer = new G4Box("s_layer", dx_diode, dy_diode, dz_layer);
-
-        G4LogicalVolume* l_BEAMABORT1 = new G4LogicalVolume(s_BEAMABORT1, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_BEAMABORT1", 0, m_sensitive);
-        G4LogicalVolume* l_BEAMABORT2 = new G4LogicalVolume(s_BEAMABORT2, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_BEAMABORT2", 0, m_sensitive);
-        G4LogicalVolume* l_layer = new G4LogicalVolume(s_layer,  geometry::Materials::get("G4_Au"), "l_layer");
+        G4double dx_ba = 4.5 / 2.*CLHEP::mm;
+        G4double dy_ba = 4.5 / 2.*CLHEP::mm;
+        G4double dz_ba = 0.5 / 2.*CLHEP::mm;
+        G4Box* s_BEAMABORT = new G4Box("s_BEAMABORT", dx_ba, dy_ba, dz_ba);
+        G4LogicalVolume* l_BEAMABORT = new G4LogicalVolume(s_BEAMABORT, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_BEAMABORT", 0, m_sensitive);
 
         //Lets limit the Geant4 stepsize inside the volume
-        l_BEAMABORT1->SetUserLimits(new G4UserLimits(stepSize));
-        l_BEAMABORT2->SetUserLimits(new G4UserLimits(stepSize));
+        l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));
 
         //position beamabort assembly
         G4ThreeVector BEAMABORTpos = G4ThreeVector(
@@ -112,25 +91,13 @@ namespace Belle2 {
                                        activeParams.getLength("y_beamabort") * CLHEP::cm,
                                        activeParams.getLength("z_beamabort") * CLHEP::cm
                                      );
-        //beamabort 1 position
-        G4ThreeVector BEAMABORTpos1 = G4ThreeVector(2.*  dx_diode, 0, 0);
-        //beamabort gold layer 1 position
-        G4ThreeVector Layerpos = G4ThreeVector(2. * dx_diode, 0, dz_diode + dz_layer);
-        //beamabort 2 position
-        G4ThreeVector BEAMABORTpos2 = G4ThreeVector(-2. * dx_diode, 0, 0);
-
 
         G4RotationMatrix* rot_beamabort = new G4RotationMatrix();
         rot_beamabort->rotateX(activeParams.getLength("AngleX"));
         rot_beamabort->rotateY(activeParams.getLength("AngleY"));
         rot_beamabort->rotateZ(activeParams.getLength("AngleZ"));
-        //geometry::setColor(*l_BEAMABORT, "#006699");
 
-
-        new G4PVPlacement(rot_beamabort, BEAMABORTpos, l_Box, "p_Box", &topVolume, false, 1);
-        new G4PVPlacement(rot_beamabort, BEAMABORTpos + Layerpos, l_layer, "p_layer", &topVolume, false, 1);
-        new G4PVPlacement(rot_beamabort, BEAMABORTpos + BEAMABORTpos1, l_BEAMABORT1, "p_BEAMABORT1", &topVolume, false, detID);
-        new G4PVPlacement(rot_beamabort, BEAMABORTpos + BEAMABORTpos2, l_BEAMABORT2, "p_BEAMABORT2", &topVolume, false, detID++);
+        new G4PVPlacement(rot_beamabort, BEAMABORTpos + BEAMABORTpos, l_BEAMABORT, "p_BEAMABORT", &topVolume, false, detID);
 
         detID++;
       }

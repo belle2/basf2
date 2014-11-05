@@ -10,17 +10,28 @@ from time import time
 numEvents = 200
 initialValue = 1
 
-usePXD = True
+usePXD = False
 
 tuneValue = 0.06
-secSetup = ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
-            'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
-            'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD']
+# secSetup = ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
+            # 'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
+            # 'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD']
+secSetup = \
+    ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD'
+     , 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD'
+     , 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
 
 if usePXD:
-    secSetup = ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
-                'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
-                'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD']
+    secSetup = \
+        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
+         ,
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
+         ,
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+         ]
+    # secSetup = ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
+                # 'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
+                # 'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD']
     tuneValue = 0.22
 
 print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
@@ -40,8 +51,10 @@ gearbox = register_module('Gearbox')
 
 pxdDigitizer = register_module('PXDDigitizer')
 svdDigitizer = register_module('SVDDigitizer')
+
 pxdClusterizer = register_module('PXDClusterizer')
 svdClusterizer = register_module('SVDClusterizer')
+
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.WARNING
 
@@ -96,6 +109,8 @@ analyzer.logging.log_level = LogLevel.INFO
 analyzer.logging.debug_level = 11
 param_analyzer = {'printExtentialAnalysisData': False, 'caTCname': 'caTracks'}
 analyzer.param(param_analyzer)
+
+log_to_file('demoOutput.txt', append=False)
 
 # Create paths
 main = create_path()

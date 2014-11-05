@@ -13,16 +13,30 @@ initialValue = 1
 usePXD = True
 
 tuneValue = 0.06
-secSetup = ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
-            'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
-            'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD']
+#### old geometry for SVD:
+# secSetup = ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
+            # 'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
+            # 'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD']
+#### new 2.2 geometry for SVD:
+secSetup = \
+    ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD'
+     , 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD'
+     , 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
 
 if usePXD:
-    secSetup = ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
-                'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
-                'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD']
+  #### new 2.2 geometry for SVD:
+    secSetup = \
+        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
+         ,
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
+         ,
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+         ]
+  #### old geometry for SVD:
+  # secSetup = ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
+                # 'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
+                # 'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD']
     tuneValue = 0.22
-
 print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
         theSeed=initialValue)
 

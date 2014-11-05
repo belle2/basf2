@@ -11,6 +11,7 @@ from ROOT import Belle2
 
 
 class PruneGenfitTracks(Module):
+
     """
     Removes hits from all genfit::Track objects.
     This needs to be done after the dE/dx PID.
@@ -23,6 +24,7 @@ class PruneGenfitTracks(Module):
         """
         Constructor to enable parallel processing for this module.
         """
+
         # need to call super() _if_ we reimplement the constructor
         super(PruneGenfitTracks, self).__init__()
 
@@ -32,7 +34,8 @@ class PruneGenfitTracks(Module):
         """
         reimplement Module::event()
         """
-        tracks = Belle2.PyStoreArray("GF2Tracks")
+
+        tracks = Belle2.PyStoreArray('GF2Tracks')
         for t in tracks:
             t.prune(self.m_flags)
 
@@ -147,15 +150,23 @@ def add_reconstruction(path, components=None):
             vxd_trackfinder = register_module('VXDTF')
             vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
             if components is not None and 'PXD' not in components:
-                vxd_trackfinder.param('sectorSetup', ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
-                                                      'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
-                                                      'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD'])
-                vxd_trackfinder.param('tuneCutoffs', 0.22)
-            else:
-                vxd_trackfinder.param('sectorSetup', ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
-                                                      'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
-                                                      'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD'])
+                vxd_trackfinder.param('sectorSetup',
+                                      ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD'
+                                      ,
+                                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD'
+                                      ,
+                                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD'
+                                      ])
                 vxd_trackfinder.param('tuneCutoffs', 0.06)
+            else:
+                vxd_trackfinder.param('sectorSetup',
+                                      ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
+                                      ,
+                                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
+                                      ,
+                                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+                                      ])
+                vxd_trackfinder.param('tuneCutoffs', 0.22)
             path.add_module(vxd_trackfinder)
 
         # track merging
@@ -194,7 +205,7 @@ def add_mc_reconstruction(path, components=None):
 
     # tracking
     if components is None or 'PXD' in components or 'SVD' in components \
-            or 'CDC' in components:
+        or 'CDC' in components:
 
         # Material effects for all track extrapolations
         material_effects = register_module('SetupGenfitExtrapolation')
@@ -238,26 +249,35 @@ def add_mc_reconstruction(path, components=None):
     add_posttracking_reconstruction(path, components)
 
 
-def add_mdst_output(path, mc=True, filename='mdst.root', additionalBranches=[]):
+def add_mdst_output(
+    path,
+    mc=True,
+    filename='mdst.root',
+    additionalBranches=[],
+    ):
     """
     This function adds the mdst output modules to a path.
     """
 
     output = register_module('RootOutput')
     output.param('outputFileName', filename)
-    branches = ['Tracks',
-                'V0s',
-                'TrackFitResults',
-                'PIDLikelihoods',
-                'TracksToPIDLikelihoods',
-                'ECLClusters',
-                'ECLClustersToTracks',
-                'KLMClusters',
-                'KLMClustersToTracks',
-                'TRGSummary']
+    branches = [
+        'Tracks',
+        'V0s',
+        'TrackFitResults',
+        'PIDLikelihoods',
+        'TracksToPIDLikelihoods',
+        'ECLClusters',
+        'ECLClustersToTracks',
+        'KLMClusters',
+        'KLMClustersToTracks',
+        'TRGSummary',
+        ]
     if mc:
         branches += ['MCParticles', 'TracksToMCParticles',
                      'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
     branches += additionalBranches
     output.param('branchNames', branches)
     path.add_module(output)
+
+

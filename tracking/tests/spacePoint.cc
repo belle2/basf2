@@ -14,6 +14,16 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/SensorPlane.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+
+#include <genfit/Track.h>
+#include <genfit/AbsTrackRep.h>
+#include <genfit/RKTrackRep.h>
+
 #include <gtest/gtest.h>
 
 
@@ -55,8 +65,7 @@ namespace Belle2 {
     // create new PXDCluster and fill it with Info getting a Hit which is not at the origin (here, first layer)
 
     PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-    SpacePoint testPoint = SpacePoint(&aCluster, 3, 0, &sensorInfoBase); // the 3, 0 are without further relevance here, just to get the constructor going
-//     SpacePoint testPoint = SpacePoint(aCluster, 3);
+    SpacePoint testPoint = SpacePoint(&aCluster, &sensorInfoBase);
 
     EXPECT_DOUBLE_EQ(aVxdID, testPoint.getVxdID());
 
@@ -104,24 +113,34 @@ namespace Belle2 {
     SVDCluster clusterU2 = SVDCluster(aVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
     SVDCluster clusterU3 = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
 
+
     // normal u+v = 2D Cluster (order of input irrelevant):
-    SpacePoint testPoint2D = SpacePoint({ {&clusterU1, 1}, {&clusterV1, 2} }, 0, &sensorInfoBase); // the 0 is without further relevance here, just to get the constructor going
+    std::vector<const SVDCluster*> good2D = { &clusterU1, &clusterV1 };
+    SpacePoint testPoint2D = SpacePoint(good2D, &sensorInfoBase);
 
     // normal u-only = 1D Cluster, sensorInfoBase is normally not needed, since constructor can create it on its own, but here the geometry is not set up, therefore we have to pass the infoBase:
-    SpacePoint testPoint1D = SpacePoint({ {&clusterU3, 1} }, 0, &anotherSensorInfoBase); // the 0 is without further relevance here, just to get the constructor going
+    std::vector<const SVDCluster*> good1D = { &clusterU3 };
+    SpacePoint testPoint1D = SpacePoint(good1D, &anotherSensorInfoBase);
+
 
     // should throw, since no clusters given:
-    EXPECT_THROW(SpacePoint({}, 0, &sensorInfoBase), std::runtime_error);
+    std::vector<const SVDCluster*> badNoClusters;
+    EXPECT_THROW(SpacePoint(badNoClusters, &sensorInfoBase), std::runtime_error);
 
+    B2WARNING("bin da 4")
     // should throw, since too many clusters (of same sensor) given:
-    EXPECT_THROW(SpacePoint({ {&clusterU1, 1}, {&clusterV1, 2}, {&clusterU2, 3} }, 0, &sensorInfoBase), std::runtime_error);
+    std::vector<const SVDCluster*> bad3Clusters = { &clusterU1, &clusterV1, &clusterU2 };
+    EXPECT_THROW(SpacePoint(bad3Clusters, &sensorInfoBase), std::runtime_error);
 
+    B2WARNING("bin da 5")
     // should throw, since two clusters of same type (but on same sensor) given:
-    EXPECT_THROW(SpacePoint({ {&clusterU1, 1}, {&clusterU2, 2} }, 0, &sensorInfoBase), std::runtime_error);
+    std::vector<const SVDCluster*> badSameType = { &clusterU1, &clusterU2 };
+    EXPECT_THROW(SpacePoint(badSameType, &sensorInfoBase), std::runtime_error);
 
+    B2WARNING("bin da 6")
     // should throw, since two clusters of different sensors given:
-    EXPECT_THROW(SpacePoint({ {&clusterV1, 1}, {&clusterU3, 2} }, 0, &sensorInfoBase), std::runtime_error);
-
+    std::vector<const SVDCluster*> badDifferentSensors = { &clusterV1, &clusterU3 };
+    EXPECT_THROW(SpacePoint(badDifferentSensors, &sensorInfoBase), std::runtime_error);
 
 
     // check results for full 2D cluster-combi:
@@ -135,6 +154,8 @@ namespace Belle2 {
                                         );
     TVector3 globalErrorFor2D;
     for (int i = 0; i < 3; i++) { globalErrorFor2D[i] = sqrt(abs(globalizedVariancesFor2D[i])); }
+
+    B2WARNING("bin da 5")
 
     // vxdID:
     EXPECT_DOUBLE_EQ(aVxdID, testPoint2D.getVxdID());
@@ -151,6 +172,8 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(0.6, testPoint2D.getNormalizedLocalV());
 
 
+    B2WARNING("bin da 6")
+
     // check results for single-cluster-only-case:
     TVector3 aPositionFor1D = anotherSensorInfoBase.pointToGlobal(TVector3(clusterU3.getPosition(), 0, 0));
     TVector3 globalizedVariancesFor1D = anotherSensorInfoBase.vectorToGlobal(
@@ -162,6 +185,8 @@ namespace Belle2 {
                                         );
     TVector3 globalErrorFor1D;
     for (int i = 0; i < 3; i++) { globalErrorFor1D[i] = sqrt(abs(globalizedVariancesFor1D[i])); }
+
+    B2WARNING("bin da 7")
 
     // vxdID:
     EXPECT_DOUBLE_EQ(anotherVxdID, testPoint1D.getVxdID());
@@ -202,6 +227,148 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(0.5, testPoint.getNormalizedLocalV());*/
 
   }
+
+
+
+  /** test conversion to genfit-compatible output and relations WARNING NOT WORKING ATTENTION! reason: Mockup for testing relations of StoreArrays could not be created (not solved yet)*/
+//   TEST_F(SpacePointTest, testGenfitCompatibility)
+//   {
+//  B2INFO("testGenfitCompatibility: prepare StoreArray-stuff - clusters")
+//  // prepare StoreArray-stuff:
+//
+//  //Clusters
+//  StoreArray<PXDCluster> pxdCL("pxdStuff", DataStore::c_Persistent);
+//
+//
+//  StoreArray<SVDCluster> svdCL("svdStuff", DataStore::c_Persistent);
+//
+//
+//
+//  B2INFO("testGenfitCompatibility: prepare StoreArray-stuff - SpacePoints including relations")
+//  // SpacePoints including relations
+//  StoreArray<SpacePoint> sps("spacePoints", DataStore::c_Persistent);
+//
+//
+//
+// //   pxdCL.registerRelationTo(sps, DataStore::c_Persistent);
+// //   svdCL.registerRelationTo(sps, DataStore::c_Persistent);
+//
+//
+//  B2INFO("testGenfitCompatibility: unique StoreArrayPtr to carry the names of the Cluster-storeArrays")
+//  // unique StoreArrayPtr to carry the names of the Cluster-storeArrays:
+//  StoreObjPtr<SpacePointMetaInfo> spMI("", DataStore::c_Persistent);
+//
+//
+//
+//
+//  DataStore::Instance().setInitializeActive(true);
+//  pxdCL.registerInDataStore(pxdCL.getName(), DataStore::c_Persistent);
+//  svdCL.registerInDataStore(svdCL.getName(), DataStore::c_Persistent);
+//  sps.registerInDataStore(sps.getName(), DataStore::c_Persistent);
+//  sps.registerRelationTo(pxdCL, DataStore::c_Persistent);
+//  sps.registerRelationTo(svdCL, DataStore::c_Persistent);
+//  spMI.registerInDataStore("", DataStore::c_Persistent);
+//  DataStore::Instance().setInitializeActive(false);
+//
+//  EXPECT_TRUE(pxdCL.isValid());
+//  EXPECT_TRUE(svdCL.isValid());
+//  EXPECT_TRUE(sps.isValid());
+//
+//  spMI.create();
+//  EXPECT_TRUE(spMI.isValid());
+//
+//
+//  unsigned int indexOfpxdCL = spMI->addName(pxdCL.getName());
+//  unsigned int indexOfsvdCL = spMI->addName(svdCL.getName());
+//
+//  B2INFO("testGenfitCompatibility: creating 1 PXD and 3 SVD Cluster ")
+//  // creating 1 PXD and 3 SVD Cluster
+//  VxdID aVxdIDL1 = VxdID(1, 1, 1);
+//  VxdID aVxdIDL3 = VxdID(3, 3, 3);
+//  VxdID aVxdIDL4 = VxdID(4, 4, 4);
+//  VXD::SensorInfoBase sensorInfoBase1 = createSensorInfo(aVxdIDL1, 2.3, 4.2);
+//  VXD::SensorInfoBase sensorInfoBase3 = createSensorInfo(aVxdIDL3, 5., 23.42);
+//  VXD::SensorInfoBase sensorInfoBase4 = createSensorInfo(aVxdIDL3, 23.42, 42.23);
+//
+//
+//  B2INFO("testGenfitCompatibility: create new PXDCluster, fill it in storeArray, link it with newly created spacePoint")
+//  // create new PXDCluster, fill it in storeArray, link it with newly created spacePoint
+//  PXDCluster aCluster = PXDCluster(aVxdIDL1, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
+//  unsigned int indexOfPxdCluster = pxdCL.getEntries(); // getting the index before adding, singe its minus one
+//  B2INFO("indexOfPxdCluster: " << indexOfPxdCluster)
+//  pxdCL.appendNew(aCluster);
+//
+//  SpacePoint testPoint = SpacePoint(&aCluster, indexOfPxdCluster, indexOfpxdCL, &sensorInfoBase1);
+//  SpacePoint* newSP = sps.appendNew(testPoint);
+//  newSP->addRelationTo(pxdCL[indexOfPxdCluster]);
+//
+//
+//  B2INFO("testGenfitCompatibility: create SVDClusters, two of them are on the same sensor")
+//  // create SVDClusters, two of them are on the same sensor
+//  SVDCluster clusterU1 = SVDCluster(aVxdIDL3, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+//  unsigned int indexOfSvdClusterU1 = svdCL.getEntries();
+//  B2INFO("indexOfSvdClusterU1: " << indexOfSvdClusterU1)
+//  svdCL.appendNew(clusterU1);
+//
+//  SVDCluster clusterV1 = SVDCluster(aVxdIDL3, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+//  unsigned int indexOfSvdClusterV1 = svdCL.getEntries();
+//  B2INFO("indexOfSvdClusterV1: " << indexOfSvdClusterV1)
+//  svdCL.appendNew(clusterV1);
+//
+//  SpacePoint testPoint2D = SpacePoint({ {&clusterU1, indexOfSvdClusterU1}, {&clusterV1, indexOfSvdClusterV1} }, indexOfsvdCL, &sensorInfoBase3);
+//  newSP = sps.appendNew(testPoint2D);
+//  newSP->addRelationTo(svdCL[indexOfSvdClusterU1]);
+//  newSP->addRelationTo(svdCL[indexOfSvdClusterV1]);
+//
+//
+//  B2INFO("testGenfitCompatibility: create SVDCluster, which is alone on its sensor")
+//  // create SVDCluster, which is alone on its sensor
+//  SVDCluster clusterU2 = SVDCluster(aVxdIDL4, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+//  unsigned int indexOfSvdClusterU2 = svdCL.getEntries();
+//  B2INFO("indexOfSvdClusterU2: " << indexOfSvdClusterU2)
+//  svdCL.appendNew(clusterU2);
+//  SpacePoint testPoint1D = SpacePoint({ {&clusterU2, indexOfSvdClusterU2} }, indexOfsvdCL, &sensorInfoBase4);
+//  newSP = sps.appendNew(testPoint1D);
+//  newSP->addRelationTo(svdCL[indexOfSvdClusterU2]);
+//
+//
+//
+//  /** Situation so far:
+//   * now the mockup is fully prepared.
+//   * it contains 2 storeArrays, carrying PXD- and SVDClusters and SpacePoints based on them.
+//   * The spacePoints are related to them and have a metaInfo-StoreObjPtr telling them, where to retrieve the clusters again.
+//   * This is now used to get genfit-compatible output and fill it in a genfit::Track
+//   */
+//
+//  B2INFO("testGenfitCompatibility: preparing genfit track filled with arbitrary input")
+//  // preparing genfit track filled with arbitrary input
+//  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(211);
+// //   TVector3 posSeed =
+// //   TVector3 posSeed =
+//  genfit::Track track(trackRep, newSP->getPosition(), TVector3(23., 42., 5.));
+//
+//  B2INFO("testGenfitCompatibility: feed the track with spacePoints ported to genfit compatible stuff")
+//  // feed the track with spacePoints ported to genfit compatible stuff:
+//  // is rather complicated since the assignment operator is protected:
+//  std::vector<genfit::AbsMeasurement*> hitOutput;
+//  for (auto& aSP : sps) {
+//    std::vector<genfit::PlanarMeasurement> tempMeasurements = aSP.getGenfitCompatible();
+//    for (genfit::PlanarMeasurement& measurement : tempMeasurements) {
+//    hitOutput.emplace_back(measurement.clone());
+//    }
+// //     hitOutput.insert(hitOutput.end(), temp.begin(), temp.end());
+//  }
+//
+//  for (unsigned i = 0; i < hitOutput.size(); i++) {
+//    track.insertMeasurement(hitOutput[i]);
+//  }
+//
+//  EXPECT_EQ(track.getNumPoints(), unsigned(pxdCL.getEntries() + svdCL.getEntries()));
+//
+//  // garbage collection:
+//  delete trackRep;
+//  for (auto& hit : hitOutput) { delete hit; }
+//   }
 
 
 

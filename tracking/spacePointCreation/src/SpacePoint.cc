@@ -19,17 +19,13 @@ using namespace Belle2;
 
 ClassImp(SpacePoint)
 
-SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
-                       unsigned int indexNumber,
-                       unsigned short nameIndex,
-                       const VXD::SensorInfoBase* aSensorInfo) :
+SpacePoint::SpacePoint(const Belle2::PXDCluster* pxdCluster,
+                       const Belle2::VXD::SensorInfoBase* aSensorInfo) :
   m_vxdID(pxdCluster->getSensorID()),
-  m_nameIndex(nameIndex),
   m_qualityIndicator(0.5),
   m_isAssigned(false)
 {
   if (pxdCluster == NULL) { throw InvalidNumberOfClusters(); }
-  m_indexNumbers.push_back(indexNumber);
 
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -54,10 +50,8 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
 
 
 
-SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clusters,
-                       unsigned short nameIndex,
-                       const VXD::SensorInfoBase* aSensorInfo) :
-  m_nameIndex(nameIndex),
+SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
+                       const Belle2::VXD::SensorInfoBase* aSensorInfo) :
   m_qualityIndicator(0.5),
   m_isAssigned(false)
 {
@@ -73,11 +67,10 @@ SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clu
   } else {
     vector<VxdID::baseType> vxdIDs;
     vector<bool> isUType;
-    for (vector<SVDClusterInformation>::const_iterator iter = clusters.begin(); iter < clusters.end(); ++iter) {
-      if (iter->first == NULL) throw InvalidNumberOfClusters();
-      vxdIDs.push_back(iter->first->getSensorID());
-      isUType.push_back(iter->first->isUCluster());
-      m_indexNumbers.push_back(iter->second);
+    for (const SVDCluster * aCluster : clusters) {
+      if (aCluster == NULL) throw InvalidNumberOfClusters();
+      vxdIDs.push_back(aCluster->getSensorID());
+      isUType.push_back(aCluster->isUCluster());
     }
 
     auto newEndVxdID = std::unique(vxdIDs.begin(), vxdIDs.end());
@@ -89,7 +82,7 @@ SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clu
     if (vxdIDs.size() != 1 or isUType.size() != nClusters) throw IncompatibleClusters();
   }
 
-  m_vxdID = clusters[0].first->getSensorID();
+  m_vxdID = clusters[0]->getSensorID();
 
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -98,13 +91,13 @@ SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clu
   }
 
   // retrieve position and sigma-values
-  for (vector<SVDClusterInformation>::const_iterator iter = clusters.begin(); iter < clusters.end(); ++iter) {
-    if (iter->first->isUCluster() == true) {
-      uCoord = iter->first->getPosition();
-      uSigma = iter->first->getPositionSigma();
+  for (const SVDCluster * aCluster : clusters) {
+    if (aCluster->isUCluster() == true) {
+      uCoord = aCluster->getPosition();
+      uSigma = aCluster->getPositionSigma();
     } else {
-      vCoord = iter->first->getPosition();
-      vSigma = iter->first->getPositionSigma();
+      vCoord = aCluster->getPosition();
+      vSigma = aCluster->getPositionSigma();
     }
   }
 
@@ -134,34 +127,35 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
   // XYRecoHit will be stored as their base-class, which is detector-independent.
   vector< genfit::PlanarMeasurement > collectedMeasurements;
 
-  // used for retrieving the name of the storeArrays:
-  const StoreObjPtr<SpacePointMetaInfo> metaInfo("", DataStore::c_Persistent);
 
   // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:
   if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
 
-    auto relatedClusters = this->getRelationsTo<SVDCluster>(metaInfo->getName(m_nameIndex));
+    auto relatedClusters = this->getRelationsTo<SVDCluster>("ALL");
     for (unsigned i = 0; i < relatedClusters.size(); i++) {
       collectedMeasurements.push_back(SVDRecoHit(relatedClusters[i]));
     }
 
   } else if (getType() == VXD::SensorInfoBase::SensorType::PXD) {
 
-    collectedMeasurements.push_back(
-      PXDRecoHit(this->getRelatedTo<PXDCluster>(metaInfo->getName(m_nameIndex)))
-    );
+    // since we do not know the name of the attached PXDCluster, getRelatedTo does not work, however, getRelationsTo seems to be less sensible and therefore can be used, but in this case, one has to loop over the entries (which should be only one in this case)
+    auto relatedClusters = this->getRelationsTo<PXDCluster>("ALL");
+    for (unsigned i = 0; i < relatedClusters.size(); i++) {
+      collectedMeasurements.push_back(PXDRecoHit(relatedClusters[i]));
+    }
 
   } else {
     throw InvalidDetectorType();
   }
 
+  B2DEBUG(50, "SpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements")
 
   return move(collectedMeasurements);
 }
 
 
 
-std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(const std::pair<double, double>& hitLocal, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -188,7 +182,7 @@ std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(const 
 
 
 
-std::pair<double, double> SpacePoint::convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+std::pair<double, double> SpacePoint::convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -210,7 +204,7 @@ std::pair<double, double> SpacePoint::convertNormalizedToLocalCoordinates(const 
 
 
 
-TVector3 SpacePoint::getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+TVector3 SpacePoint::getGlobalCoordinates(const std::pair<double, double>& hitLocal, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.

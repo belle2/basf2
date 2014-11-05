@@ -23,22 +23,17 @@
 
 namespace Belle2 {
   /**
-   * Tester module for the validity of the SpacePointCreatorModule.
+   * Imports Clusters of the SVD detector and converts them to spacePoints.
    *
-   * Info Jakob (Aug 24, 2014)
-   * TODO: at the moment, the genfit-output can only verified visually
-   * (by checking, whether the detector types match the number of dimensions stored in the trackPoint)!
-   * when full reco chain is working, this testerModule should be extended!
-   * -> verification that input cluster(s) is/are converted to genfit-stuff shall be resilient!
    */
-  class SpacePointCreatorTestModule : public Module {
+  class SpacePointCreatorSVDModule : public Module {
 
   public:
 
 
 
     /** Constructor */
-    SpacePointCreatorTestModule();
+    SpacePointCreatorSVDModule();
 
 
 
@@ -54,7 +49,7 @@ namespace Belle2 {
 
 
     /** final output with mini-feedback */
-    virtual void terminate() {}
+    virtual void terminate();
 
 
     /** initialize variables in constructor to avoid nondeterministic behavior */
@@ -65,20 +60,25 @@ namespace Belle2 {
 
 
     // Data members
-    std::string m_pxdClustersName; /**< PXDCluster collection name */
-
-    StoreArray<PXDCluster> m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
-
     std::string m_svdClustersName; /**< SVDCluster collection name */
 
     StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
 
-    std::vector< StoreArray<SpacePoint> > m_allSpacePointStoreArrays; /**< a vector full of StoreArray carrying spacePoints. */
+    std::string m_spacePointsName; /**< SpacePoints collection name */
 
-    std::vector< std::string > m_containerSpacePointsName; /**< intermediate storage for the names of the loaded storeArrays. */
+    StoreArray<SpacePoint> m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
+
 
     // modification parameters
     std::string m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+
+    bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
+
+
+    //counters for testing
+    unsigned int m_TESTERSVDClusterCtr; /**< counts total number of SVDCluster occured */
+
+    unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occured */
 
   };
 } // end namespace Belle2

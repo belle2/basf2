@@ -10,7 +10,7 @@
 #pragma once
 
 // tracking
-#include <tracking/spacePointCreation/SpacePointMetaInfo.h>
+// #include <tracking/spacePointCreation/SpacePointMetaInfo.h>
 
 // framework
 #include <framework/datastore/RelationsObject.h>
@@ -41,8 +41,6 @@ namespace Belle2 {
    */
   class SpacePoint: public RelationsObject {
   public:
-    /** .first is a pointer to the SVDCluster, .second is the index number of its corresponding StoreArray */
-    typedef std::pair< const SVDCluster*, unsigned int> SVDClusterInformation;
 
     /** exception for the case that the user filled an invalid number of Clusters into the Constructor */
     BELLE2_DEFINE_EXCEPTION(InvalidNumberOfClusters, "SpacePoint::Constructor: invalid numbers of Clusters given!");
@@ -67,15 +65,11 @@ namespace Belle2 {
     * For the case of TelHits, there will be a SpacePoint-Inheriting Class adding a TelCluster-feature
      *
      * first parameter is pointer to cluster (passing a null-pointer will throw an exception)
-     * second is the index number of the cluster in its storeArray.
-     * third is the index number of the name of the storeArray stored in metaInfo.
-    * fourth parameter, a sensorInfo can be passed for testing purposes.
+     * second, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the constructor gets its own pointer to it.
      */
-    SpacePoint(const PXDCluster* pxdCluster,
-               unsigned int indexNumber,
-               unsigned short nameIndex,
-               const VXD::SensorInfoBase* aSensorInfo = NULL);
+    SpacePoint(const Belle2::PXDCluster* pxdCluster,
+               const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -83,19 +77,16 @@ namespace Belle2 {
     *
     * 1-2 clusters can be added this way
      *
-     * first parameter is a container carrying pairs,
-    *   where .first is the pointer to the svdCluster,
+     * first parameter is a container carrying pointers to the svdClusters,
     *   and .second provides its indexNumber for the StoreArray.
      * It should _not_ be filled with NULL-Pointers (passing a null-pointer will throw an exception).
      * 1 - 2 Clusters are allowed that way, if there are passed more than that or less, an exception will be thrown.
-    * second is the index number of the name of the storeArray stored in metaInfo
-    * third parameter, a sensorInfo can be passed for testing purposes.
+    * second, a sensorInfo can be passed for testing purposes.
      * If no sensorInfo is passed, the constructor gets its own pointer to it.
      *
      */
-    SpacePoint(const std::vector<Belle2::SpacePoint::SVDClusterInformation>& clusters,
-               unsigned short nameIndex,
-               const VXD::SensorInfoBase* aSensorInfo = NULL);
+    SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
+               const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -135,20 +126,7 @@ namespace Belle2 {
     *
     * The return type is equivalent of the type given by SensorInfoBase
     */
-    VXD::SensorInfoBase::SensorType getType() const { return m_sensorType; }
-
-
-
-    /** returns container containing the indices of the clusters in their storeArrays. */
-    const std::vector<unsigned int>& getClusterIndices() const { return m_indexNumbers; }
-
-
-
-    /** returns the name of the storeArray containing the cluster this spacePoint is related to. */
-    const std::string getClusterStoreName() const {
-      const StoreObjPtr<SpacePointMetaInfo> metaInfo("", DataStore::c_Persistent);
-      return metaInfo->getName(m_nameIndex);
-    }
+    Belle2::VXD::SensorInfoBase::SensorType getType() const { return m_sensorType; }
 
 
 
@@ -161,6 +139,20 @@ namespace Belle2 {
     * and therefore of different detector types.
     */
     virtual std::vector<genfit::PlanarMeasurement> getGenfitCompatible() const ;
+
+
+
+    /** returns the current state of assignment - returns true if it is assigned and therefore blocked for reuse. */
+    bool getAssignmentState() const {return m_isAssigned; }
+
+
+
+    /** returns the current estimation for the quality of that spacePoint.
+     *
+     * returns value between 0-1, 1 means "good", 0 means "bad".
+     * */
+    unsigned int getQualityEstimation() const {return m_qualityIndicator; }
+
 
 
 // static converter functions:
@@ -195,7 +187,7 @@ namespace Belle2 {
     * third parameter, a sensorInfo can be passed for testing purposes.
     *  If no sensorInfo is passed, the member gets its own pointer to it.
     */
-    static std::pair<double, double> convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<double, double> convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -208,19 +200,6 @@ namespace Belle2 {
       if (value < lower) { value = lower; }
       if (value > higher) { value = higher; }
     }
-
-
-
-    /** returns the current state of assignment - returns true if it is assigned and therefore blocked for reuse. */
-    bool getAssignmentState() const {return m_isAssigned; }
-
-
-
-    /** returns the current estimation for the quality of that spacePoint.
-     *
-     * returns value between 0-1, 1 means "good", 0 means "bad".
-     * */
-    unsigned int getQualityEstimation() const {return m_qualityIndicator; }
 
 
 
@@ -293,24 +272,12 @@ namespace Belle2 {
 
 
 
-    /** carries the index numbers of the linked clusters.
-     *
-     * These index numbers are for the storeArray of svdClusters, if the detector type is Const::SVD, If it is Const::PXD, its for the pxdCluster container, and for Const::Test it is for a telCluster-container carrying all the telescope hits */
-    std::vector<unsigned int> m_indexNumbers;
-
-
-
     /** stores the SensorType using the scheme of sensorInfoBase.
      *
      * Currently there are the following types possible:
      * PXD, SVD, TEL, VXD
      */
     VXD::SensorInfoBase::SensorType m_sensorType;
-
-
-
-    /** is the index number of the name of the storeArray stored in m_metaInfo. */
-    unsigned short m_nameIndex;
 
 
 
@@ -328,6 +295,6 @@ namespace Belle2 {
 
 
 
-    ClassDef(SpacePoint, 6) // last member added: m_qualityIndicator & m_isAssigned, last removed: m_metaInfo
+    ClassDef(SpacePoint, 7) // last member added: m_qualityIndicator & m_isAssigned, last removed: m_nameIndex, m_indexNumbers
   };
 }

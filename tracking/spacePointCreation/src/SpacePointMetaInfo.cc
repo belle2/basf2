@@ -7,7 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+/*
 #include <tracking/spacePointCreation/SpacePointMetaInfo.h>
 
 ClassImp(Belle2::SpacePointMetaInfo)
+*/

@@ -20,14 +20,10 @@ using namespace Belle2;
 ClassImp(TBSpacePoint)
 
 TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
-                           unsigned int indexNumber,
-                           unsigned short nameIndex,
                            const VXD::SensorInfoBase* aSensorInfo)
 {
-  SpacePoint::m_nameIndex = nameIndex;
   SpacePoint::m_vxdID = telCluster->getSensorID();
   if (telCluster == NULL) { throw SpacePoint::InvalidNumberOfClusters(); }
-  SpacePoint::m_indexNumbers.push_back(indexNumber);
   SpacePoint::m_qualityIndicator = 0.5;
   SpacePoint::m_isAssigned = false;
 
@@ -59,33 +55,35 @@ vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible() const
   // XYRecoHit will be stored as their base-class, which is detector-independent.
   vector< genfit::PlanarMeasurement > collectedMeasurements;
 
-  // used for retrieving the name of the storeArrays:
-  const StoreObjPtr<SpacePointMetaInfo> metaInfo("", DataStore::c_Persistent);
-
   // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:
-  if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
+  if (getType() == VXD::SensorInfoBase::SensorType::TEL) {
 
-    auto relatedClusters = this->getRelationsTo<SVDCluster>(metaInfo->getName(SpacePoint::m_nameIndex));
+    // since we do not know the name of the attached PXDCluster, getRelatedTo does not work, however, getRelationsTo seems to be less sensible and therefore can be used, but in this case, one has to loop over the entries (which should be only one in this case)
+    auto relatedClusters = this->getRelationsTo<TelCluster>("ALL");
+    for (unsigned i = 0; i < relatedClusters.size(); i++) {
+      collectedMeasurements.push_back(TelRecoHit(relatedClusters[i]));
+    }
+
+  } else if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
+
+    auto relatedClusters = this->getRelationsTo<SVDCluster>("ALL");
     for (unsigned i = 0; i < relatedClusters.size(); i++) {
       collectedMeasurements.push_back(SVDRecoHit(relatedClusters[i]));
     }
 
   } else if (getType() == VXD::SensorInfoBase::SensorType::PXD) {
 
-    collectedMeasurements.push_back(
-      PXDRecoHit(this->getRelatedTo<PXDCluster>(metaInfo->getName(SpacePoint::m_nameIndex)))
-    );
-
-  } else if (getType() == VXD::SensorInfoBase::SensorType::TEL) {
-
-    collectedMeasurements.push_back(
-      TelRecoHit(this->getRelatedTo<TelCluster>(metaInfo->getName(SpacePoint::m_nameIndex)))
-    );
+    // same issue as TelClusters
+    auto relatedClusters = this->getRelationsTo<PXDCluster>("ALL");
+    for (unsigned i = 0; i < relatedClusters.size(); i++) {
+      collectedMeasurements.push_back(PXDRecoHit(relatedClusters[i]));
+    }
 
   } else {
     throw SpacePoint::InvalidDetectorType();
   }
 
+  B2DEBUG(50, "TBSpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements")
 
   return move(collectedMeasurements);
 }

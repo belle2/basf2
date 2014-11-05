@@ -34,9 +34,9 @@ namespace Belle2 {
   public:
 
     /** member function to automatically add the cluster to its corresponding entry */
-    inline void addCluster(SpacePoint::SVDClusterInformation& entry) {
-      vxdID = entry.first->getSensorID();
-      if (entry.first->isUCluster() == true) { clustersU.push_back(entry); return; }
+    inline void addCluster(const SVDCluster* entry) {
+      vxdID = entry->getSensorID();
+      if (entry->isUCluster() == true) { clustersU.push_back(entry); return; }
       clustersV.push_back(entry);
     }
 
@@ -45,15 +45,15 @@ namespace Belle2 {
 
     /**< stores all SVDclusters of U type.
      *
-     * Each entry stores a pointer to its SVDCluster (.first) and its index number in the StoreArray.
+     * Each entry stores a pointer to its SVDCluster.
      */
-    std::vector<SpacePoint::SVDClusterInformation> clustersU;
+    std::vector<const SVDCluster*> clustersU;
 
     /**< stores all SVDclusters of V type.
      *
-     * Each entry stores a pointer to its SVDCluster (.first) and its index number in the StoreArray.
+     * Each entry stores a pointer to its SVDCluster.
      */
-    std::vector<SpacePoint::SVDClusterInformation> clustersV;
+    std::vector<const SVDCluster*> clustersV;
 
   };
 
@@ -64,16 +64,15 @@ namespace Belle2 {
    *
    * first parameter is a storeArray containing Clusters (e.g. PXD or Tel).
    * second parameter is a storeArra containing a version of spacePoints (will be filled in the function).
-   * third parameter tels the spacePoint where to get the name of the storeArray containing the related clusters
    */
-  template <class clusterTempl, class spacePointTempl> inline void storeSingleCluster(
-    const StoreArray<clusterTempl>& clusters,
-    StoreArray<spacePointTempl>& spacePoints,
-    unsigned short clustersIndex)
+  template <class ClusterType, class SpacePointType> inline void storeSingleCluster(
+    const StoreArray<ClusterType>& clusters,
+    StoreArray<SpacePointType>& spacePoints)
   {
     for (unsigned int i = 0; i < uint(clusters.getEntries()); ++i) {
-      spacePointTempl* newSP = spacePoints.appendNew((clusters[i]), i, clustersIndex);
-      newSP->addRelationTo(clusters[i]);
+      const ClusterType* currentCluster = clusters[i];
+      SpacePointType* newSP = spacePoints.appendNew((currentCluster));
+      newSP->addRelationTo(currentCluster);
     }
   }
 
@@ -83,18 +82,15 @@ namespace Belle2 {
    *
    * first parameter is a storeArray containing SVDClusters.
    * second parameter is a storeArra containing SpacePoints (will be filled in the function).
-   * third parameter tels the spacePoint where to get the name of the storeArray containing the related clusters
-   *
    */
-  template <class spTemplate> void provideSVDClusterSingles(const StoreArray<SVDCluster>& svdClusters,
-                                                            StoreArray<spTemplate>& spacePoints,
-                                                            unsigned short svdClustersIndex)
+  template <class SpacePointType> void provideSVDClusterSingles(const StoreArray<SVDCluster>& svdClusters,
+      StoreArray<SpacePointType>& spacePoints)
   {
     for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
-      SpacePoint::SVDClusterInformation currentCluster = {svdClusters[i], i};
-      std::vector<SpacePoint::SVDClusterInformation> currentClusterCombi = { currentCluster };
-      spTemplate* newSP = spacePoints.appendNew(currentClusterCombi, svdClustersIndex);
-      newSP->addRelationTo(svdClusters[i]);
+      const SVDCluster* currentCluster = svdClusters[i];
+      std::vector<const SVDCluster*> currentClusterCombi = { currentCluster };
+      SpacePointType* newSP = spacePoints.appendNew(currentClusterCombi);
+      newSP->addRelationTo(currentCluster);
     }
   }
 
@@ -107,11 +103,11 @@ namespace Belle2 {
    *
    * for each u cluster, a v cluster is combined to a possible combination.
    */
-  inline void findPossibleCombinations(const ClustersOnSensor& aSensor,
-                                       std::vector<std::vector<SpacePoint::SVDClusterInformation> >& foundCombinations)
+  inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations)
   {
-    for (const SpacePoint::SVDClusterInformation & uCluster : aSensor.clustersU) {
-      for (const SpacePoint::SVDClusterInformation & vCluster : aSensor.clustersV) {
+    for (const SVDCluster * uCluster : aSensor.clustersU) {
+      for (const SVDCluster * vCluster : aSensor.clustersV) {
         foundCombinations.push_back({uCluster, vCluster});
       }
     }
@@ -125,19 +121,18 @@ namespace Belle2 {
    * second parameter is a storeArra containing SpacePoints (will be filled in the function).
    * third parameter tels the spacePoint where to get the name of the storeArray containing the related clusters
    */
-  template <class spTemplate> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
-      StoreArray<spTemplate>& spacePoints,
-      unsigned short svdClustersIndex)
+  template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
+      StoreArray<SpacePointType>& spacePoints)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor> activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
-    std::vector<std::vector<SpacePoint::SVDClusterInformation> > foundCombinations; // collects all combinations of Clusters which were possible (condition: 1u+1v-Cluster on the same sensor)
+    std::vector<std::vector<const SVDCluster*> > foundCombinations; // collects all combinations of Clusters which were possible (condition: 1u+1v-Cluster on the same sensor)
 
 
     // sort Clusters by sensor. After the loop, each entry of activatedSensors contains all U and V-type clusters on that sensor
     for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
-      SpacePoint::SVDClusterInformation currentCluster = {svdClusters[i], i};
+      SVDCluster* currentCluster = svdClusters[i];
 
-      activatedSensors[svdClusters[i]->getSensorID().getID()].addCluster(currentCluster);
+      activatedSensors[currentCluster->getSensorID().getID()].addCluster(currentCluster);
     }
 
 
@@ -147,9 +142,9 @@ namespace Belle2 {
 
 
     for (auto & clusterCombi : foundCombinations) {
-      spTemplate* newSP = spacePoints.appendNew(clusterCombi, svdClustersIndex);
-      for (auto & cluster : clusterCombi) {
-        newSP->addRelationTo(cluster.first);
+      SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
+      for (auto * cluster : clusterCombi) {
+        newSP->addRelationTo(cluster);
       }
     }
   }

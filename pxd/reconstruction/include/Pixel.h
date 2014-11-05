@@ -46,6 +46,10 @@ namespace Belle2 {
         m_u(rawhit->getColumn()), m_v(rawhit->getRow()),
         m_charge(rawhit->getCharge()) {}
 
+      /** Construct using an index, coordinates and charge. */
+      Pixel(unsigned int index, unsigned short u, unsigned short v, float charge):
+        m_index(index), m_u(u), m_v(v), m_charge(charge) {}
+
       /** Comparison operator, sorting by row,column in ascending order */
       bool operator<(const Pixel& b) const { return m_v < b.m_v || (m_v == b.m_v && m_u < b.m_u); }
       /** Comparison operator, sorting by row,column in ascending order */
@@ -65,6 +69,8 @@ namespace Belle2 {
       float getCharge() const { return m_charge; }
       /** Return the Index of the digit */
       unsigned int getIndex() const { return m_index; }
+      /** Adjust the charge of a pixel */
+      void setCharge(float newCharge) { m_charge = newCharge; }
 
     private:
       /** Index of the corresponding PXDDigit in the StoreArray */

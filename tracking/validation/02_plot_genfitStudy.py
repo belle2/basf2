@@ -9,8 +9,15 @@
 #  j.rauch@tum.de                                                #
 #                                                                #
 ##################################################################
-
 ##################################################################
+
+"""
+<header>
+<contact>Johannes Rauch, j.rauch@tum.de</contact>
+<description> To be filled by the contact person</description>
+</header>
+"""
+
 coarse = 1
 
 ##################################################################
@@ -95,8 +102,8 @@ iterRange = 15  # number of bins for the number of iterations histogram
 MADtoSigma = 1.4826  # sigma = 1.4826*MAD (for gaussian distributions)
 outlierCut = 4.  # distance from median in terms of MAD std when to count as outlier
 
-# compute mean, RMS, median, MAD, number of outliers --------------------------------------------------------------------------------------------
 
+# compute mean, RMS, median, MAD, number of outliers --------------------------------------------------------------------------------------------
 
 def getMedian(histo):
     nbins = histo.GetNbinsX()

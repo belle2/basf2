@@ -13,6 +13,13 @@
 #                                                               #
 #################################################################
 
+"""
+<header>
+<contact>Michael Ziegler, michael.ziegler2@kit.edu</contact>
+<description> To be filled by the contact person</description>
+</header>
+"""
+
 from simulation import add_simulation
 from basf2 import *
 import glob

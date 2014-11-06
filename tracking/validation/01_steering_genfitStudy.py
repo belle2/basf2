@@ -16,6 +16,15 @@
 ##############################################################################
 
 # select if partial or full test
+
+"""
+<header>
+<output>GF2Tracks.root</output>
+<contact>Johannes Rauch, j.rauch@tum.de</contact>
+<description> To be filled by the contact person</description>
+</header>
+"""
+
 full = False
 
 # select which subdetectors to test

@@ -31,14 +31,16 @@ using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
 {
   resetErrorMatrix();
 }
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
 {
   m_pdgCode = pdgCode;
   setFlavorType();
@@ -52,7 +54,8 @@ Particle::Particle(const TLorentzVector& momentum,
                    const EParticleType type,
                    const unsigned mdstIndex) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -65,9 +68,13 @@ Particle::Particle(const TLorentzVector& momentum,
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
-                   const std::vector<int>& daughterIndices) :
+                   const std::vector<int>& daughterIndices,
+                   TClonesArray* arrayPointer) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1),
+  m_daughterIndices(daughterIndices),
+  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
@@ -76,7 +83,9 @@ Particle::Particle(const TLorentzVector& momentum,
 
   if (!daughterIndices.empty()) {
     m_particleType    = c_Composite;
-    m_daughterIndices = daughterIndices;
+    if (getArrayPointer() == nullptr) {
+      B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
+    }
   }
 }
 
@@ -84,7 +93,8 @@ Particle::Particle(const TLorentzVector& momentum,
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
 {
   if (!track) return;
   const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
@@ -114,7 +124,8 @@ Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
 {
   if (!trackFit) return;
 
@@ -139,7 +150,8 @@ Particle::Particle(const int trackArrayIndex,
 
 Particle::Particle(const ECLCluster* eclCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
 {
   if (!eclCluster) return;
 
@@ -165,7 +177,8 @@ Particle::Particle(const ECLCluster* eclCluster) :
 
 Particle::Particle(const KLMCluster* klmCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
 {
   if (!klmCluster) return;
 
@@ -189,7 +202,8 @@ Particle::Particle(const KLMCluster* klmCluster) :
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
 {
   if (!mcParticle) return;
 
@@ -324,8 +338,9 @@ const Particle* Particle::getDaughter(unsigned i) const
 
 const std::vector<Belle2::Particle*> Particle::getDaughters() const
 {
-  const TClonesArray* array = getArrayPointer();
   std::vector<Particle*> daughters(getNDaughters());
+
+  const TClonesArray* array = getArrayPointer();
   for (unsigned i = 0; i < getNDaughters(); i++)
     daughters[i] = static_cast<Particle*>(array->At(m_daughterIndices[i]));
 

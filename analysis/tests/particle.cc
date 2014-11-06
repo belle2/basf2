@@ -3,6 +3,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
 
@@ -58,30 +59,40 @@ namespace {
       EXPECT_EQ(Particle::c_MCParticle, p.getParticleType());
       EXPECT_EQ(123u, p.getMdstArrayIndex());
     }
-    {
-      TLorentzVector momentum;
-      const int nDaughters = 6;
-      StoreArray<Particle> particles;
-      std::vector<int> daughterIndices;
-      for (int i = 0; i < nDaughters; i++) {
-        Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
-        momentum += d.get4Vector();
-        Particle* newDaughters = particles.appendNew(d);
-        daughterIndices.push_back(newDaughters->getArrayIndex());
-      }
+  }
 
-      const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
-      EXPECT_EQ(411, p.getPDGCode());
-      EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
-      EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
-      EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
-      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-      EXPECT_EQ(Particle::c_Composite, p.getParticleType());
-      EXPECT_EQ(0u, p.getMdstArrayIndex());
-      EXPECT_EQ((unsigned int)nDaughters, p.getNDaughters());
-      EXPECT_EQ((unsigned int)nDaughters, p.getDaughters().size());
-      EXPECT_EQ((unsigned int)nDaughters, p.getFinalStateDaughters().size());
+  TEST_F(ParticleTest, Daughers)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
     }
+
+    const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
+    EXPECT_EQ(411, p.getPDGCode());
+    EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
+    EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
+    EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
+    EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+    EXPECT_EQ(Particle::c_Composite, p.getParticleType());
+    EXPECT_EQ(0u, p.getMdstArrayIndex());
+    EXPECT_EQ((unsigned int)nDaughters, p.getNDaughters());
+    EXPECT_EQ((unsigned int)nDaughters, p.getDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, p.getFinalStateDaughters().size());
+
+    const Particle pLocal(momentum, 411, Particle::c_Unflavored, daughterIndices, particles.getPtr());
+    EXPECT_DOUBLE_EQ(p.getMass(), pLocal.getMass());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getNDaughters());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getFinalStateDaughters().size());
+
+    EXPECT_B2FATAL(Particle p2 = Particle(momentum, 411, Particle::c_Unflavored, daughterIndices));
   }
 
   /** test some basics for extra information. */

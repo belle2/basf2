@@ -132,12 +132,13 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices vector of daughter indices
+     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
-             const std::vector<int>& daughterIndices);
-
+             const std::vector<int>& daughterIndices,
+             TClonesArray* arrayPointer = 0);
 
     /**
      * Constructor from a reconstructed track (mdst object Track);
@@ -538,7 +539,7 @@ namespace Belle2 {
     void print() const;
 
     /**
-     * Remove extra info
+     * Remove all stored extra info fields
      */
     void removeExtraInfo();
 
@@ -574,7 +575,11 @@ namespace Belle2 {
     void addExtraInfo(const std::string& name, float value);
 
     /** Returns the pointer to the store array which holds the daughter particles */
-    TClonesArray* getArrayPointer() const { return RelationsObject::getArrayPointer(); }
+    TClonesArray* getArrayPointer() const {
+      if (!m_arrayPointer)
+        m_arrayPointer = RelationsObject::getArrayPointer();
+      return m_arrayPointer;
+    }
 
   private:
 
@@ -601,6 +606,15 @@ namespace Belle2 {
      */
     std::vector<float> m_extraInfo;
 
+    // transient data members
+    /**
+     * Internal pointer to DataStore array containing the daughters of this particle.
+     *
+     * This is a transient member and will not be written to file. The pointer
+     * is set when it is the first time needed.
+     */
+    mutable TClonesArray* m_arrayPointer; //! transient pointer to particle StoreArray
+
     // private methods
     /**
      * Sets the momentum, position and error matrix for this particle (created from charged Track)
@@ -618,14 +632,6 @@ namespace Belle2 {
      * @param errMatrix 7x7 error matrix
      */
     void storeErrorMatrix(const TMatrixFSym& errMatrix);
-
-    /**
-     * Search the DataStore for the corresponding Particle array.
-     *
-     * This function is called automatically if the pointer
-     * is not set when needed
-     */
-    void fixArrayPointer() const;
 
     /**
      * Fill final state particle daughters into a vector

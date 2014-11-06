@@ -51,7 +51,7 @@ namespace Belle2 {
                  momEntry, momMidPoint, momExit, energyDep, globalTime)
     {}
 
-    ClassDef(PXDTrueHit, 5)
+    ClassDef(PXDTrueHit, 6)
   };
 
 } // end namespace Belle2

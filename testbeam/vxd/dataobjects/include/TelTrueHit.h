@@ -52,7 +52,7 @@ namespace Belle2 {
                  momEntry, momMidPoint, momExit, energyDep, globalTime)
     {}
 
-    ClassDef(TelTrueHit, 5)
+    ClassDef(TelTrueHit, 6)
   };
 
 } // end namespace Belle2

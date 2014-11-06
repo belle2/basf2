@@ -96,6 +96,11 @@ namespace Belle2 {
     /** Return momentum at the endpoint of the track.*/
     TVector3 getExitMomentum() const { return TVector3(m_momentumExit[0], m_momentumExit[1], m_momentumExit[2]); }
 
+    /** Shift the TrueHit in time (for backgorund mixing)
+     * @param delta The value of the time shift.
+     */
+    virtual void shiftInTime(float delta) { m_globalTime += delta; }
+
   protected:
     /** ID of the sensor */
     int m_sensorID;
@@ -116,7 +121,7 @@ namespace Belle2 {
     /** time when the midpoint of the track was reached */
     float m_globalTime;
 
-    ClassDef(VXDTrueHit, 5)
+    ClassDef(VXDTrueHit, 6)
   };
 
 } // end namespace Belle2

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import b2daq.hvcontrol.ui.*?>
+<?import javafx.collections.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.cell.*?>
+<?import b2daq.dqm.graphics.*?>
+<?import b2daq.dqm.ui.*?>
+<?import b2daq.dqm.core.*?>
+<?import b2daq.graphics.*?>
+<?import b2daq.runcontrol.ui.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root minHeight="240.0" minWidth="600.0" type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+    <children>
+        <CanvasPanel maxHeight="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+            <canvas>
+                <HistogramCanvas fx:id="c_size" fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="false" title=" " yLabelAlignment="bottom">
+                    <pad>
+                        <Pad height="0.70" x="0.16" y="0.3" />
+                    </pad>
+                    <histograms>
+                        <FXCollections fx:factory="observableArrayList">
+                            <TimedGraph1D fx:id="gr_size_in" fixYmax="true" fixYmin="true" lineColor="blue" name="gr_size_in" nbinsx="2000" title="Output;Time;" xmax="3600" xmin="0" ymax="5" ymin="0" />
+                            <TimedGraph1D fx:id="gr_size_out" lineColor="red" name="gr_size_out" nbinsx="1000" title="Input;Time;Event size [Byte/event]" xmax="3600" xmin="0" />
+                        </FXCollections>
+                    </histograms>
+                    <shapes>
+                        <FXCollections fx:factory="observableArrayList">
+                            <GRect fillColor="white" height="0.2" lineColor="black" lineWidth="0.6" width="0.5" x="0.25" y="0.05" />
+                            <GLine lineColor="blue" lineWidth="2" x1="0.27" x2="0.33" y1="0.15" y2="0.15" />
+                            <GLine lineColor="red" lineWidth="2" x1="0.52" x2="0.58" y1="0.15" y2="0.15" />
+                            <GText alignment="midle left" fontSize="0.6" text="Input" x="0.35" y="0.19" />
+                            <GText alignment="midle left" fontSize="0.6" text="Output" x="0.60" y="0.19" />
+                            <GText alignment="midle center" angle="270" fontSize="0.7" text="Count rate" x="0.04" y="0.6" />
+                            <GText alignment="midle center" angle="270" fontSize="0.7" text="[kHz]" x="0.07" y="0.6" />
+                        </FXCollections>
+                    </shapes>
+                </HistogramCanvas>
+            </canvas>
+            <children>
+                <Label fx:id="label_nodename" text="CPR">
+                    <padding>
+                        <Insets left="16.0" top="16.0" />
+                    </padding>
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Label>
+            </children>
+        </CanvasPanel>
+        <CanvasPanel maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+            <canvas>
+                <HistogramCanvas fx:id="c_rate" fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="false" title=" " yLabelAlignment="top">
+                    <pad>
+                        <Pad height="0.70" x="0.16" y="0." />
+                    </pad>
+                    <histograms>
+                        <FXCollections fx:factory="observableArrayList">
+                            <TimedGraph1D fx:id="gr_rate_in" fixYmax="true" fixYmin="true" lineColor="blue" name="gr_rate_in" nbinsx="2000" title="Input;Time;" xmax="3600" xmin="0" ymax="23" ymin="0" />
+                            <TimedGraph1D fx:id="gr_rate_out" lineColor="red" name="gr_rate_in" nbinsx="1000" title="Output;Time;" xmax="3600" xmin="0" />
+                        </FXCollections>
+                    </histograms>
+                    <shapes>
+                        <FXCollections fx:factory="observableArrayList">
+                            <GText alignment="midle center" angle="270" fontSize="0.7" text="Flow rate" x="0.04" y="0.4" />
+                            <GText alignment="midle center" angle="270" fontSize="0.7" text="[kB/s]" x="0.07" y="0.4" />
+                        </FXCollections>
+                    </shapes>
+                </HistogramCanvas>
+            </canvas>
+        </CanvasPanel>
+    </children>
+</fx:root>

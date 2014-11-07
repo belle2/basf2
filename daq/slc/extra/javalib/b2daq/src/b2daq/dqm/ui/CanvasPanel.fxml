@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import b2daq.hvcontrol.ui.*?>
+<?import javafx.collections.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.cell.*?>
+<?import b2daq.dqm.graphics.*?>
+<?import b2daq.dqm.ui.*?>
+<?import b2daq.dqm.core.*?>
+<?import b2daq.graphics.*?>
+<?import b2daq.runcontrol.ui.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="javafx.scene.layout.AnchorPane" xmlns:fx="http://javafx.com/fxml">
+    <children>
+    </children>
+</fx:root>

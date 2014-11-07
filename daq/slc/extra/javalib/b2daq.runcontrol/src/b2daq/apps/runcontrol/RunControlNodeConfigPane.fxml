@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="labelNodeName" minWidth="100.0" text="NodeName">
+         <HBox.margin>
+            <Insets right="25.0" />
+         </HBox.margin>
+      </Label>
+      <CheckBox fx:id="checkUsed" mnemonicParsing="false" text="Used">
+         <HBox.margin>
+            <Insets right="15.0" />
+         </HBox.margin>
+      </CheckBox>
+      <CheckBox fx:id="checkSequential" mnemonicParsing="false" text="Sequential">
+         <HBox.margin>
+            <Insets right="20.0" />
+         </HBox.margin></CheckBox>
+      <ComboBox fx:id="comboConfig" minWidth="200.0">
+         <HBox.margin>
+            <Insets right="10.0" />
+         </HBox.margin>
+      </ComboBox>
+      <Button fx:id="buttonNew" mnemonicParsing="false" text="New">
+         <HBox.margin>
+            <Insets left="5.0" />
+         </HBox.margin></Button>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</fx:root>

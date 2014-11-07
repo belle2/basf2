@@ -100,7 +100,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
                             Stage stage = new Stage();
                             RORCDataFlowTableController flowmonitor = RORCDataFlowTableController.create(nodename);
                             Scene scene = new Scene(flowmonitor.getPane());
-                            scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
+                            scene.getStylesheets().add(DataFlowMonitorPane.class.getResource("DataFlowMonitor.css").toExternalForm());
                             scene.getStylesheets().add(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.css").toExternalForm());
                             stage.setScene(scene);
                             flowmonitors.put(nodename, flowmonitor);
@@ -117,7 +117,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
                             Stage stage = new Stage();
                             StorageDataFlowTableController flowmonitor = StorageDataFlowTableController.create(nodename);
                             Scene scene = new Scene(flowmonitor.getPane());
-                            scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
+                            scene.getStylesheets().add(DataFlowMonitorPane.class.getResource("DataFlowMonitor.css").toExternalForm());
                             scene.getStylesheets().add(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.css").toExternalForm());
                             stage.setScene(scene);
                             flowmonitors.put(nodename, flowmonitor);
@@ -134,7 +134,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
                             Stage stage = new Stage();
                             HLTDataFlowTableController flowmonitor = HLTDataFlowTableController.create(nodename);
                             Scene scene = new Scene(flowmonitor.getPane());
-                            scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
+                            scene.getStylesheets().add(DataFlowMonitorPane.class.getResource("DataFlowMonitor.css").toExternalForm());
                             scene.getStylesheets().add(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.css").toExternalForm());
                             stage.setScene(scene);
                             flowmonitors.put(nodename, flowmonitor);

@@ -12,10 +12,11 @@ public class RCState extends NSMState {
     final static public RCState LOADING_TS = new RCState(6, "LOADING");
     final static public RCState STARTING_TS = new RCState(7, "STARTING");
     final static public RCState STOPPING_TS = new RCState(8, "STOPPING");
-    final static public RCState ERROR_ES = new RCState(9, "ERROR");
-    final static public RCState FATAL_ES = new RCState(10, "FATAL");
-    final static public RCState RECOVERING_RS = new RCState(11, "RECOVERING");
-    final static public RCState ABORTING_RS = new RCState(12, "ABORTING");
+    final static public RCState BOOTING_TS = new RCState(9, "BOOTING");
+    final static public RCState ERROR_ES = new RCState(10, "ERROR");
+    final static public RCState FATAL_ES = new RCState(11, "FATAL");
+    final static public RCState RECOVERING_RS = new RCState(12, "RECOVERING");
+    final static public RCState ABORTING_RS = new RCState(13, "ABORTING");
 
     public static RCState get(int id) {
         RCState state = new RCState();
@@ -67,6 +68,8 @@ public class RCState extends NSMState {
             copy(STARTING_TS);
         } else if (label.matches(STOPPING_TS._label)) {
             copy(STOPPING_TS);
+        } else if (label.matches(BOOTING_TS._label)) {
+            copy(BOOTING_TS);
         } else if (label.matches(ERROR_ES._label)) {
             copy(ERROR_ES);
         } else if (label.matches(FATAL_ES._label)) {
@@ -108,6 +111,8 @@ public class RCState extends NSMState {
             copy(STARTING_TS);
         } else if (id == STOPPING_TS._id) {
             copy(STOPPING_TS);
+        } else if (id == BOOTING_TS._id) {
+            copy(BOOTING_TS);
         } else if (id == ERROR_ES._id) {
             copy(ERROR_ES);
         } else if (id == FATAL_ES._id) {

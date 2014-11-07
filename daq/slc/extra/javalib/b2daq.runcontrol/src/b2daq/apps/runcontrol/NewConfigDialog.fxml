@@ -6,16 +6,15 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root type="javafx.scene.layout.VBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="292.0" prefWidth="315.0" spacing="16.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" >
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="121.0" prefWidth="315.0" spacing="16.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label fx:id="label" text="Select Run config " />
-        <TextField fx:id="input" editable="false" promptText="run config name">
+        <Label fx:id="label" text="Creating new config for" />
+        <TextField fx:id="input" promptText="run config name">
             <font>
                 <Font size="13.0" />
             </font>
         </TextField>
-        <TreeView fx:id="tree_runtype" prefHeight="216.0" prefWidth="193.0" />
-        <HBox alignment="CENTER_RIGHT" prefHeight="6.0" prefWidth="193.0" spacing="15.0" VBox.vgrow="ALWAYS">
+        <HBox alignment="CENTER_RIGHT" prefWidth="193.0" spacing="15.0" VBox.vgrow="ALWAYS">
             <children>
                 <Button fx:id="cancelButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="72.0" text="Cancel" />
                 <Button fx:id="okButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="72.0" text="OK" />

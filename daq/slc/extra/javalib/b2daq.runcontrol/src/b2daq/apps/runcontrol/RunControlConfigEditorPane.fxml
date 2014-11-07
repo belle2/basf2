@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="600.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+         <tabs>
+            <Tab closable="false" text="Node">
+               <content>
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="450.0" pannable="true" prefViewportHeight="2.0">
+                     <content>
+                        <VBox fx:id="vboxNodes" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" VBox.vgrow="ALWAYS" />
+                     </content>
+                  </ScrollPane>
+               </content>
+            </Tab>
+            <Tab closable="false" text="Status">
+               <content>
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="450.0" pannable="true" prefViewportHeight="36.0">
+                     <content>
+                        <VBox fx:id="vboxStatus" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                     </content>
+                  </ScrollPane>
+               </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+   </children>
+</fx:root>

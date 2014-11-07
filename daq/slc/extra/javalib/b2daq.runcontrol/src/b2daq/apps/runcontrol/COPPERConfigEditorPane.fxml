@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label text="Software">
+         <VBox.margin>
+            <Insets bottom="5.0" left="10.0" top="5.0" />
+         </VBox.margin>
+      </Label>
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" VBox.vgrow="ALWAYS">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="Hostname:" />
+                  <TextField fx:id="fieldHostName" minWidth="103.0" prefHeight="25.0" prefWidth="103.0" />
+                  <Label text="Copper ID:" />
+                  <TextField fx:id="fieldCopperid" minWidth="101.0" prefHeight="25.0" prefWidth="101.0" />
+                  <Label prefHeight="15.0" prefWidth="72.0" text="eb0 host:" />
+                  <TextField fx:id="fieldEB0Host" minWidth="99.0" prefHeight="25.0" prefWidth="99.0" />
+                  <Label text="eb0 port:" />
+                  <TextField fx:id="fieldEB0Port" minWidth="110.0" prefHeight="25.0" prefWidth="110.0" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+               <children>
+                  <Label text="Enabled slots:" />
+                  <CheckBox fx:id="checkHSLB_a" mnemonicParsing="false" text="HSLB:a" />
+                  <CheckBox fx:id="checkHSLB_b" mnemonicParsing="false" text="HSLB:b" />
+                  <CheckBox fx:id="checkHSLB_c" mnemonicParsing="false" text="HSLB:c" />
+                  <CheckBox fx:id="checkHSLB_d" mnemonicParsing="false" text="HSLB:d" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" />
+               </padding>
+               <children>
+                  <Label text="Basf2 script: ">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin></Label>
+                  <TextField fx:id="fieldScript" maxWidth="1.7976931348623157E308" prefWidth="205.0" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <Label text="Firmware">
+         <VBox.margin>
+            <Insets bottom="5.0" left="10.0" top="10.0" />
+         </VBox.margin>
+      </Label>
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" VBox.vgrow="ALWAYS">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="HSLB Firmware: " />
+                  <TextField fx:id="fieldHSLBFirm" minWidth="221.0" prefHeight="25.0" prefWidth="221.0">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin></TextField>
+                  <Label text="TTRX firmware: " />
+                  <TextField fx:id="fieldTTRXFirm" minWidth="222.0" prefHeight="25.0" prefWidth="222.0" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+      <Label text="Hardware">
+         <VBox.margin>
+            <Insets bottom="5.0" left="10.0" top="10.0" />
+         </VBox.margin></Label>
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" VBox.vgrow="ALWAYS">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="Location:" />
+                  <Label text="Crate:" />
+                  <TextField fx:id="fieldCrate" prefWidth="45.0">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Label text="Slot:" />
+                  <TextField fx:id="fieldSlot" prefWidth="45.0">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Label text="COPPER ID:" />
+                  <TextField fx:id="fieldCopperI_hard" prefHeight="25.0" prefWidth="105.0" />
+                  <Label text="Serial ID:" />
+                  <TextField fx:id="fieldSerialid" prefHeight="25.0" prefWidth="101.0" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="PrPMC: " />
+                  <TextField fx:id="fieldPrPMC" />
+                  <Label text="TTRX: ">
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
+                  </Label>
+                  <TextField fx:id="fieldTTRX" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" />
+               </padding>
+            </HBox>
+            <VBox>
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label maxWidth="60.0" minWidth="60.0" prefWidth="60.0" text="FINNESE:" />
+                        <Label text="Slot-a : " />
+                        <TextField fx:id="fieldFINNESE_a" prefWidth="200.0" />
+                        <Label text="Slot-b : ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="fieldFINNESE_b" prefWidth="200.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label maxWidth="60.0" minWidth="60.0" prefWidth="60.0" />
+                        <Label text="Slot-c : " />
+                        <TextField fx:id="fieldFINNESE_c" prefWidth="200.0" />
+                        <Label text="Slot-d : ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="fieldFINNESE_d" prefWidth="200.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets top="5.0" />
+               </padding>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</fx:root>

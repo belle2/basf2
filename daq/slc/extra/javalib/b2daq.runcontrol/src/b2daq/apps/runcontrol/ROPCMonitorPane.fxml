@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import b2daq.hvcontrol.ui.*?>
+<?import javafx.collections.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.cell.*?>
+<?import b2daq.dqm.graphics.*?>
+<?import b2daq.dqm.ui.*?>
+<?import b2daq.dqm.core.*?>
+<?import b2daq.graphics.*?>
+<?import b2daq.runcontrol.ui.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="180.0">
+            <children>
+                <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" minHeight="35.0" minWidth="200.0">
+                            <children>
+                                <Label text="NODE">
+                                    <HBox.margin>
+                                        <Insets right="10.0" />
+                                    </HBox.margin>
+                                </Label>
+                                <RCStateLabel fx:id="rclabel" HBox.hgrow="ALWAYS" />
+                            </children>
+                        </HBox>
+                        <GridPane hgap="5.0" prefHeight="35.0" prefWidth="0.0">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="0.0" percentWidth="15.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="0.0" percentWidth="15.0" />
+                                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" percentWidth="38.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="0.0" percentWidth="15.0" />
+                                <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="0.0" percentWidth="22.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <Label text="eb0" />
+                                <Label alignment="CENTER" text="eb1tx" textAlignment="CENTER" GridPane.columnIndex="4" />
+                                <CanvasPanel minHeight="10.0" minWidth="20.0" prefHeight="30.0" prefWidth="20.0" GridPane.columnIndex="1">
+                                    <canvas>
+                                        <HistogramCanvas fx:id="canvasArrawFrom" fillColor="transparent" lineColor="transparent" name="c_node0_cur_gr" stat="false" title="">
+                                            <shapes>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <GArrow headLength="0.3" headWidth="0.1" length="0.6" lineColor="red" lineWidth="2" width="0.4" x="0.05" y="0.3" />
+                                                    <GLine lineColor="red" lineWidth="2" x1="0.1" x2="0.9" y1="0.1" y2="0.9" />
+                                                    <GLine lineColor="red" lineWidth="2" x1="0.9" x2="0.1" y1="0.1" y2="0.9" />
+                                                </FXCollections>
+                                            </shapes>
+                                        </HistogramCanvas>
+                                    </canvas>
+                                </CanvasPanel>
+                                <Label fx:id="labelNodeName" alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="45.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="45.0" text="node" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                                    <font>
+                                        <Font name="System Bold" size="13.0" />
+                                    </font>
+                                </Label>
+                                <CanvasPanel minHeight="10.0" minWidth="10.0" prefHeight="30.0" prefWidth="47.0" GridPane.columnIndex="3">
+                                    <canvas>
+                                        <HistogramCanvas fx:id="canvasArrawTo" fillColor="transparent" lineColor="transparent" name="c_node0_cur_gr" stat="false" title="">
+                                            <shapes>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <GArrow headLength="0.3" headWidth="0.1" length="0.6" lineColor="red" lineWidth="2" width="0.4" x="0.05" y="0.3" />
+                                                    <GLine lineColor="red" lineWidth="2" x1="0.1" x2="0.9" y1="0.1" y2="0.9" />
+                                                    <GLine lineColor="red" lineWidth="2" x1="0.9" x2="0.1" y1="0.1" y2="0.9" />
+                                                </FXCollections>
+                                            </shapes>
+                                        </HistogramCanvas>
+                                    </canvas>
+                                </CanvasPanel>
+                            </children>
+                        </GridPane>
+                        <HBox alignment="CENTER_LEFT" minHeight="30.0">
+                            <children>
+                                <Label text="Update at:">
+                                    <HBox.margin>
+                                        <Insets right="10.0" />
+                                    </HBox.margin>
+                                </Label>
+                                <Label fx:id="labelUpdateTime" text="--:--:-- ----/--/--" />
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <Label minWidth="70.0" text="Evt rate: " />
+                                <TextField fx:id="fieldEvtRate" editable="false" prefWidth="55.0" />
+                                <Label fx:id="labelEvtRateunit" text="[kHz]">
+                                    <HBox.margin>
+                                        <Insets left="5.0" />
+                                    </HBox.margin>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <Label minWidth="70.0" text="Flow rate: " />
+                                <TextField fx:id="fieldFlowRate" editable="false" prefWidth="55.0" />
+                                <Label fx:id="labelFlowRateUnit" text="[MB/s]">
+                                    <HBox.margin>
+                                        <Insets left="5.0" />
+                                    </HBox.margin>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                    <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" top="10.0" />
+                    </HBox.margin>
+                </VBox>
+                <GridPane hgap="5.0" vgap="5.0" HBox.hgrow="ALWAYS">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" minWidth="10.0" prefWidth="84.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="66.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <Label text="recvStream0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <GridPane.margin>
+                                <Insets right="5.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <Label text="eb0" GridPane.rowIndex="2">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <GridPane.margin>
+                                <Insets right="5.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <Label text="recvStream1" GridPane.rowIndex="3">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <GridPane.margin>
+                                <Insets right="5.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <Label text="eb1tx" GridPane.rowIndex="4">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <GridPane.margin>
+                                <Insets right="5.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasRecvStream0" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasEB0" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasRecvStream1" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasEB1TX" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                    </children>
+                    <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" top="10.0" />
+                    </HBox.margin>
+                </GridPane>
+                <GridPane hgap="5.0" vgap="5.0">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" prefWidth="68.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="66.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="68.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="66.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="68.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="66.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <Label fx:id="labelNode02" text="CPR1002" GridPane.rowIndex="1">
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="labelNode01" text="CPR1001">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode02" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode01" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode07" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="5">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode11" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode12" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode03" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="3">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode06" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode08" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="5" GridPane.rowIndex="2">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode13" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode04" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode09" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="5" GridPane.rowIndex="3">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode14" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode05" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode10" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" GridPane.columnIndex="5" GridPane.rowIndex="4">
+                            <canvas>
+                                <HistogramCanvas fx:id="canvasNode15" fillColor="limegreen" lineColor="lightgreen" lineWidth="2">
+                                    <shapes>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <GText alignment="middle center" angle="0" fontColor="white" fontSize="6" text="OK" x="0.5" y="0.5" />
+                                        </FXCollections>
+                                    </shapes>
+                                </HistogramCanvas>
+                            </canvas>
+                        </CanvasPanel>
+                        <Label fx:id="labelNode03" text="CPR1001" GridPane.rowIndex="2">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode04" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.rowIndex="3">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode05" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.rowIndex="4">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode06" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="2">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode07" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode08" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode09" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode10" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode11" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="4">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode12" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode13" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="4" GridPane.rowIndex="2">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode14" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="4" GridPane.rowIndex="3">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                        <Label fx:id="labelNode15" prefHeight="5.0" prefWidth="60.0" text="CPR1001" GridPane.columnIndex="4" GridPane.rowIndex="4">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets right="5.0" />
+                            </padding>
+                        </Label>
+                    </children>
+                    <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </HBox.margin>
+                </GridPane>
+            </children>
+        </HBox>
+        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+            <children>
+                <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <canvas>
+                        <HistogramCanvas fx:id="canvasEvtRate" fillColor="lightgray" name="c_node0_voltage_time" stat="false" title=" " yLabelAlignment="bottom">
+                            <pad>
+                                <Pad height="0.70" x="0.16" y="0.3" />
+                            </pad>
+                            <histograms>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <TimedGraph1D fx:id="graphEvtRateIn" fixYmax="true" fixYmin="true" lineColor="blue" name="gr_size_in" nbinsx="2000" title="Output;Time;" xmax="3600" xmin="0" ymax="5" ymin="0" />
+                                    <TimedGraph1D fx:id="graphEvtRateOut" lineColor="red" name="gr_size_out" nbinsx="1000" title="Input;Time;Event size [Byte/event]" xmax="3600" xmin="0" />
+                                </FXCollections>
+                            </histograms>
+                            <shapes>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <GRect fillColor="white" height="0.2" lineColor="black" lineWidth="0.6" width="0.5" x="0.25" y="0.05" />
+                                    <GLine lineColor="blue" lineWidth="2" x1="0.27" x2="0.33" y1="0.15" y2="0.15" />
+                                    <GLine lineColor="red" lineWidth="2" x1="0.52" x2="0.58" y1="0.15" y2="0.15" />
+                                    <GText alignment="midle left" fontSize="0.6" text="Input" x="0.35" y="0.19" />
+                                    <GText alignment="midle left" fontSize="0.6" text="Output" x="0.60" y="0.19" />
+                                    <GText alignment="middle center" angle="270" fontSize="0.7" text="Count rate" x="0.04" y="0.6" />
+                                    <GText alignment="middle center" angle="270" fontSize="0.7" text="[kHz]" x="0.07" y="0.6" />
+                                </FXCollections>
+                            </shapes>
+                        </HistogramCanvas>
+                    </canvas>
+                </CanvasPanel>
+                <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                    <canvas>
+                        <HistogramCanvas fx:id="canvasFlowRate" fillColor="lightgray" name="c_node0_voltage_time" stat="false" title=" " yLabelAlignment="top">
+                            <pad>
+                                <Pad height="0.70" x="0.16" y="0." />
+                            </pad>
+                            <histograms>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <TimedGraph1D fx:id="graphFlowRateIn" fixYmax="true" fixYmin="true" lineColor="blue" name="gr_rate_in" nbinsx="2000" title="Input;Time;" xmax="3600" xmin="0" ymax="30" ymin="0" />
+                                    <TimedGraph1D fx:id="graphFlowRateOut" lineColor="red" name="gr_rate_in" nbinsx="1000" title="Output;Time;" xmax="3600" xmin="0" ymax="30" ymin="0" />
+                                </FXCollections>
+                            </histograms>
+                            <shapes>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <GText alignment="middle center" angle="270" fontSize="0.7" text="Flow rate" x="0.04" y="0.4" />
+                                    <GText alignment="middle center" angle="270" fontSize="0.7" text="[MB/s]" x="0.07" y="0.4" />
+                                </FXCollections>
+                            </shapes>
+                        </HistogramCanvas>
+                    </canvas>
+                </CanvasPanel>
+            </children>
+        </VBox>
+    </children>
+</fx:root>

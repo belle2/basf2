@@ -12,22 +12,21 @@ import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMMessage;
 import b2daq.runcontrol.core.RCCommand;
 import b2daq.runcontrol.core.RCState;
-import java.net.URL;
-import java.util.ResourceBundle;
+import java.io.IOException;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.TitledPane;
 
 /**
  * FXML Controller class
  *
  * @author tkonno
  */
-public class RunCommandButtonPaneController implements Initializable {
+public class RunCommandButtonPane extends TitledPane {
 
     @FXML
     private Button button_load;
@@ -38,17 +37,20 @@ public class RunCommandButtonPaneController implements Initializable {
     @FXML
     private Button button_pause;
 
-    private RunControlMainPaneController m_rcmain;
+    private RunControlMainPane m_rcmain;
 
     private final SimpleBooleanProperty stack_wait = new SimpleBooleanProperty(false);
 
-    /**
-     * Initializes the controller class.
-     */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public RunCommandButtonPane() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("RunCommandButtonPane.fxml"));
+        fxmlLoader.setRoot(this);
+        fxmlLoader.setController(this);
+        try {
+            fxmlLoader.load();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
         stack_wait.addListener(new ChangeListener<Boolean>() {
-
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (oldValue == true && newValue == false) {
@@ -56,16 +58,26 @@ public class RunCommandButtonPaneController implements Initializable {
                 }
             }
         });
+        button_load.setOnAction((event) -> {
+            String reqname = ((Button) event.getSource()).getText();
+            perform(reqname);
+        });
+        button_start.setOnAction((event) -> {
+            String reqname = ((Button) event.getSource()).getText();
+            perform(reqname);
+        });
+        button_abort.setOnAction((event) -> {
+            String reqname = ((Button) event.getSource()).getText();
+            perform(reqname);
+        });
+        button_pause.setOnAction((event) -> {
+            String reqname = ((Button) event.getSource()).getText();
+            perform(reqname);
+        });
     }
 
     public void clearStack() {
         stack_wait.set(false);
-    }
-
-    @FXML
-    private void handleButtonAction(ActionEvent event) {
-        String reqname = ((Button) event.getSource()).getText();
-        perform(reqname);
     }
 
     private void perform(String reqname) {
@@ -74,7 +86,7 @@ public class RunCommandButtonPaneController implements Initializable {
         if (cmd.equals(RCCommand.UNKNOWN)) {
             return;
         }
-        String nodename =  NSMListenerService.getNSMConfig().getNsmTarget();
+        String nodename = NSMListenerService.getNSMConfig().getNsmTarget();
         NSMMessage msg = new NSMMessage(nodename, cmd);
         if (cmd.equals(RCCommand.LOAD)) {
             if (m_rcmain.getNameList() == null) {
@@ -85,9 +97,9 @@ public class RunCommandButtonPaneController implements Initializable {
                 return;
             }
             String runtype = RunConfigDialog.showDialog(
-                            m_rcmain.getLabelStartTime().getScene(),
-                            "Loading run configuration", "select runtype",
-                            "default", m_rcmain.getNameList());
+                    m_rcmain.getLabelStartTime().getScene(),
+                    "Loading run configuration", "select runtype",
+                    "default", m_rcmain.getNameList());
             if (runtype == null) {
                 m_rcmain.getLogView().add(new LogMessage("LOCAL", LogLevel.DEBUG,
                         "LOAD canceled"));
@@ -126,7 +138,7 @@ public class RunCommandButtonPaneController implements Initializable {
         }
     }
 
-    public void set(RunControlMainPaneController rcmain) {
+    public void set(RunControlMainPane rcmain) {
         m_rcmain = rcmain;
     }
 
@@ -170,6 +182,15 @@ public class RunCommandButtonPaneController implements Initializable {
                 button_load.setDefaultButton(true);
             }
             button_load.setDisable(!registered);
+        } else if (state.equals(RCState.ABORTING_RS)) {
+            button_start.setText("START");
+            button_start.setDisable(true);
+            button_load.setText("LOAD");
+            if (ready) {
+                button_load.setDefaultButton(true);
+            }
+            button_load.setDisable(false);
+            button_abort.setDisable(false);
         }
     }
 

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
+         <children>
+            <ComboBox fx:id="comboConfigName" prefWidth="250.0" />
+            <Button fx:id="buttonCreateNew" mnemonicParsing="false" text="Create new" />
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </HBox>
+      <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+         <children>
+            <Label text="Config ID : " />
+            <Label fx:id="labelConfigId" alignment="CENTER_RIGHT" minWidth="60.0" text="0" textAlignment="RIGHT">
+               <HBox.margin>
+                  <Insets right="20.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="DB table  : ">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="labelDBTable" minWidth="60.0" text="none" textAlignment="RIGHT">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+         </padding>
+      </HBox>
+      <VBox fx:id="boxConfig" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </VBox.margin>
+      </VBox>
+   </children>
+</fx:root>

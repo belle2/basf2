@@ -177,7 +177,7 @@ public final class NSMMessage implements Serializable {
         }
         int length = reader.readInt();
         if (length > 0) {
-            _data = new byte[length];
+            _data = new byte[length+100000];
             for (int i = 0; i < length; i++) {
                 _data[i] = reader.readByte();
             }

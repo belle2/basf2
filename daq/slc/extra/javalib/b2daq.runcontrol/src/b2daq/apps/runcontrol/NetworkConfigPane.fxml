@@ -16,15 +16,15 @@
 <?import b2daq.ui.*?>
 <?import javafx.scene.control.cell.*?>
 
-<HBox prefHeight="523.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.ui.NetworkConfigPaneController">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.ui.NetworkConfigPaneController">
     <children>
-        <VBox prefHeight="528.0" prefWidth="393.0" HBox.hgrow="ALWAYS">
+        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
             <children>
-                <TitledPane maxHeight="1.7976931348623157E308" prefHeight="127.0" prefWidth="392.0" text="Socket connection" VBox.vgrow="ALWAYS">
+                <TitledPane maxHeight="1.7976931348623157E308" prefHeight="120.0" text="Socket connection" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox layoutY="-4.0" maxHeight="1.7976931348623157E308" prefHeight="218.0" prefWidth="390.0">
+                        <VBox layoutY="-4.0" maxHeight="1.7976931348623157E308" prefHeight="220.0">
                             <children>
-                                <GridPane layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="120.0" prefWidth="370.0">
+                                <GridPane layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="179.0" minWidth="10.0" prefWidth="115.0" />
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="264.0" minWidth="10.0" prefWidth="254.0" />
@@ -61,9 +61,9 @@
                         </VBox>
                     </content>
                 </TitledPane>
-                <TitledPane animated="false" maxHeight="1.7976931348623157E308" prefHeight="287.0" prefWidth="392.0" text="Database access" VBox.vgrow="ALWAYS">
+                <TitledPane animated="false" maxHeight="1.7976931348623157E308" text="Database access" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox prefHeight="247.0" prefWidth="390.0">
+                        <VBox prefHeight="240.0">
                             <children>
                                 <GridPane focusTraversable="true" hgap="10.0" layoutX="33.0" layoutY="14.0" maxHeight="1.7976931348623157E308" prefHeight="103.0" prefWidth="291.0" vgap="10.0">
                                     <columnConstraints>
@@ -133,14 +133,14 @@
             <children>
                 <TitledPane maxHeight="1.7976931348623157E308" text="NSM2" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox layoutY="-4.0">
+                        <VBox layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                             <children>
-                                <GridPane layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="194.0" prefWidth="413.0">
+                                <GridPane layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                     <children>
                                         <Label text="Node name" GridPane.rowIndex="3" />
                                         <Label text="Connection" />
                                         <Label text="Host name" GridPane.rowIndex="1" />
-                                        <AnchorPane prefHeight="39.0" prefWidth="100.0" GridPane.columnIndex="1">
+                                        <AnchorPane GridPane.columnIndex="1">
                                             <children>
                                                 <Rectangle fx:id="rect_nsm" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="9.0" stroke="BLACK" strokeType="INSIDE" width="102.0" />
                                                 <Text fx:id="text_nsm" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="102.7294921875">
@@ -202,7 +202,7 @@
                                         <Insets bottom="10.0" top="10.0" />
                                     </VBox.margin>
                                 </HBox>
-                                <TableView fx:id="table_nsm" editable="true" prefHeight="239.0" prefWidth="360.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                                <TableView fx:id="table_nsm" editable="true" maxHeight="1.7976931348623157E308" prefHeight="240.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="col_nsm_dataname" prefWidth="173.0" text="Data name">
                                             <cellValueFactory>

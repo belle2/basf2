@@ -9,26 +9,26 @@ import b2daq.database.ConfigObject;
 import b2daq.nsm.NSMData;
 import b2daq.runcontrol.core.RCState;
 import b2daq.ui.InputDialog;
-import java.net.URL;
-import java.util.ResourceBundle;
+import java.io.IOException;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 
 /**
  * FXML Controller class
  *
  * @author tkonno
  */
-public class RunSettingPaneController implements Initializable {
+public class RunSettingPane extends TitledPane {
 
     @FXML
     private TextField field_operator1;
@@ -45,11 +45,16 @@ public class RunSettingPaneController implements Initializable {
     private final RCState state = new RCState();
     private boolean edited = false;
 
-    /**
-     * Initializes the controller class.
-     */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public RunSettingPane() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("RunSettingPane.fxml"));
+        fxmlLoader.setRoot(this);
+        fxmlLoader.setController(this);
+        try {
+            fxmlLoader.load();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+
     }
 
     @FXML
@@ -113,7 +118,7 @@ public class RunSettingPaneController implements Initializable {
                 && area_comments.getText().length() > 0;
     }
 
-    public void bind(RunControlMainPaneController rcmain) {
+    public void bind(RunControlMainPane rcmain) {
         final ObjectBinding binding = new ObjectBinding() {
             {
                 super.bind(rcmain.getTextRCState().textProperty());
@@ -163,6 +168,12 @@ public class RunSettingPaneController implements Initializable {
         };
         field_operator1.setOnKeyTyped(handler);
         area_comments.setOnKeyTyped(handler);
+        button_expno.setOnAction(new EventHandler() {
+            @Override
+            public void handle(Event event) {
+                handleIncrementButton();
+            }
+        });
     }
 
     public boolean isEdited() {

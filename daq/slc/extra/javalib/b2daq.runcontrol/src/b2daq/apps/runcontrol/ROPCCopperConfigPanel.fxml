@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root alignment="CENTER_LEFT" prefHeight="41.0" prefWidth="600.0" spacing="10.0" type="javafx.scene.layout.HBox" VBox.vgrow="ALWAYS" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <CheckBox fx:id="checkUsed" mnemonicParsing="false" text="Use " />
+        <Label text="Hostname:" />
+        <TextField fx:id="fieldHostName" minWidth="97.0" prefHeight="25.0" prefWidth="97.0" />
+        <Label text="Port:">
+            <HBox.margin>
+                <Insets left="10.0" />
+            </HBox.margin>
+        </Label>
+        <TextField fx:id="fieldPort" minWidth="110.0" prefHeight="25.0" prefWidth="110.0" />
+    </children>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+    <VBox.margin>
+        <Insets left="10.0" />
+    </VBox.margin>
+</fx:root>

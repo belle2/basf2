@@ -12,15 +12,9 @@ import b2daq.nsm.ui.NSM2SocketInitDialog;
 import b2daq.nsm.ui.NSMListenerGUIHandler;
 import b2daq.ui.NetworkConfigPaneController;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.JavaFXBuilderFactory;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
@@ -34,7 +28,7 @@ import javafx.stage.WindowEvent;
  */
 public class RunControlGUI extends Application {
 
-    private FXMLLoader loader;
+    private RunControlMainPane mainPane;
     static private String[] arguments;
 
     @Override
@@ -46,7 +40,6 @@ public class RunControlGUI extends Application {
             fc.getExtensionFilters().add(new ExtensionFilter("init file", "*.init"));
 
             File f = fc.showOpenDialog(stage);
-            System.out.println(f.getPath());
             NSM2SocketInitDialog socket = NSM2SocketInitDialog.connect(f.getPath(),
                     null, 9090, null, 8122, "RC_GUI", "ARICH_RC",
                     new String[]{"ARICH_RC_STATUS:rc_status:1"},
@@ -55,38 +48,28 @@ public class RunControlGUI extends Application {
             if (socket == null) {
                 return;
             }
-            URL location = getClass().getResource("RunControlMainPane.fxml");
-            loader = new FXMLLoader();
-            loader.setLocation(location);
-            loader.setBuilderFactory(new JavaFXBuilderFactory());
-            Parent root = (Parent) loader.load(location.openStream());
-            RunControlMainPaneController controller
-                    = ((RunControlMainPaneController) loader.getController());
-            NetworkConfigPaneController netconf = controller.getNetworkConfig();
+            mainPane = new RunControlMainPane();
+            NetworkConfigPaneController netconf = mainPane.getNetworkConfig();
             netconf.setConfig(socket.getConfig());
             for (NSMDataProperty data : socket.getNSMConfig().getNSMDataProperties()) {
                 netconf.add(data);
             }
-            NSMListenerGUIHandler.get().add(controller);
-            NSMListenerGUIHandler.get().add(netconf);
-            NSMListenerService.add(NSMListenerGUIHandler.get());
-            NSMListenerService.restart();
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(mainPane);
             scene.getStylesheets().add(LogMessage.getCSSPath());
             scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
             stage.setTitle("Belle II Run Control GUI");
             stage.getIcons().add(new Image(RunControlGUI.class.getResource("runcontrol.png").toExternalForm()));
             stage.setScene(scene);
-            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent t) {
-                    t.consume();
-                    stop();
-                }
+            stage.setOnCloseRequest((WindowEvent t) -> {
+                t.consume();
+                stop();
             });
+            NSMListenerGUIHandler.get().add(mainPane);
+            NSMListenerGUIHandler.get().add(netconf);
+            NSMListenerService.add(NSMListenerGUIHandler.get());
+            NSMListenerService.restart();
             stage.show();
-        } catch (IOException ex) {
-            ex.printStackTrace();;
+        } catch (Exception ex) {
             Logger.getLogger(RunControlGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -14,7 +14,6 @@ import b2daq.runcontrol.core.RCCommand;
 import b2daq.runcontrol.core.RCState;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
@@ -30,9 +29,7 @@ import javafx.scene.text.Text;
  */
 public class RunStateLabelController {
 
-    @FXML
     private final Rectangle rect;
-    @FXML
     private final Text text;
 
     private final ContextMenu menu = new ContextMenu();

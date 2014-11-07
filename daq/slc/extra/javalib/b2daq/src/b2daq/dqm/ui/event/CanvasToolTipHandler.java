@@ -3,19 +3,17 @@ package b2daq.dqm.ui.event;
 import b2daq.dqm.core.Histo;
 import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.dqm.graphics.GAxis;
-import b2daq.dqm.graphics.GHisto;
-import b2daq.dqm.graphics.GMonObject;
 import b2daq.dqm.ui.CanvasPanel;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 
 public class CanvasToolTipHandler {
 
-    private Tooltip _tip = new Tooltip();
     private double _x = -1;
     private double _y = -1;
 
     public void show(MouseEvent arg0) {
+        Tooltip _tip = new Tooltip();
         CanvasPanel panel = (CanvasPanel) arg0.getSource();
         double x = arg0.getX() / (double) panel.getWidth();
         double y = arg0.getY() / (double) panel.getHeight();

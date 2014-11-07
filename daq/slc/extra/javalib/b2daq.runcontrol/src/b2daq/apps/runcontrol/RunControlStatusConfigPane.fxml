@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style=" -fx-border-color:lightgray; -fx-border-width: 1; -fx-border-style: solid;" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="labelName" prefWidth="100.0" text="NODE">
+         <HBox.margin>
+            <Insets right="10.0" />
+         </HBox.margin>
+      </Label>
+      <Label text="Name:">
+         <HBox.margin>
+            <Insets right="10.0" />
+         </HBox.margin></Label>
+      <TextField fx:id="fieldName" prefWidth="145.0">
+         <HBox.margin>
+            <Insets right="20.0" />
+         </HBox.margin>
+      </TextField>
+      <Label text="Format:">
+         <HBox.margin>
+            <Insets right="10.0" />
+         </HBox.margin>
+      </Label>
+      <TextField fx:id="fieldFormat" prefWidth="120.0">
+         <HBox.margin>
+            <Insets right="20.0" />
+         </HBox.margin>
+      </TextField>
+      <Label text="Revision:">
+         <HBox.margin>
+            <Insets right="10.0" />
+         </HBox.margin>
+      </Label>
+      <TextField fx:id="fieldRevision" prefWidth="60.0" />
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</fx:root>

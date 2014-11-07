@@ -24,6 +24,7 @@ public class NSMListenerService extends Thread {
     private static boolean g_connection = false;
     private static final HashMap<String, NSMData> g_data_m = new HashMap<>();
     private static final HashMap<String, ConfigObject> g_obj_m = new HashMap<>();
+    private static final HashMap<String, ArrayList<String>> g_confname_m = new HashMap<>();
     private static boolean g_closecalled = false;
     private static NSMConfig g_cofig;
 
@@ -54,6 +55,14 @@ public class NSMListenerService extends Thread {
     public static ConfigObject getDB(String name) {
         if (g_obj_m.containsKey(name)) {
             return g_obj_m.get(name);
+        } else {
+            return null;
+        }
+    }
+
+    public static ArrayList<String> getList(String name) {
+        if (g_confname_m.containsKey(name)) {
+            return g_confname_m.get(name);
         } else {
             return null;
         }
@@ -174,13 +183,22 @@ public class NSMListenerService extends Thread {
             NSMCommand command = new NSMCommand();
             command.copy(msg.getReqName());
             if (command.equals(NSMCommand.DBSET)) {
-                System.out.println(msg.getNodeName());
+                //System.out.println(msg.getNodeName());
                 ConfigObject obj = getDB(msg.getNodeName());
                 if (obj == null) {
                     obj = new ConfigObject();
                     g_obj_m.put(msg.getNodeName(), obj);
                 }
                 msg.getData(obj);
+            } else if (command.equals(NSMCommand.LISTSET)) {
+                if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
+                    String [] namelist = msg.getData().split("\n");
+                    ArrayList<String> name_v = new ArrayList<>();
+                    for (String name : namelist) {
+                        name_v.add(name);
+                    }
+                    g_confname_m.put(msg.getNodeName(), name_v);
+                }
             } else if (command.equals(NSMCommand.NSMSET)) {
                 NSMData data = getData(msg.getNodeName());
                 if (data == null) {

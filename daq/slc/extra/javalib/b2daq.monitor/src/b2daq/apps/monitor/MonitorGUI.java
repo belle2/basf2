@@ -37,7 +37,7 @@ public class MonitorGUI extends Application {
     static private String[] arguments;
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws Exception {
         try {
             FileChooser fc = new FileChooser();
             fc.setTitle("select file");
@@ -71,7 +71,7 @@ public class MonitorGUI extends Application {
             NSMListenerService.restart();
             Scene scene = new Scene(root);
             scene.getStylesheets().add(LogMessage.getCSSPath());
-            scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
+            scene.getStylesheets().add(DataFlowMonitorPane.class.getResource("DataFlowMonitor.css").toExternalForm());
             scene.getStylesheets().add(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.css").toExternalForm());
             stage.setTitle("Belle II Monitor GUI");
             stage.getIcons().add(new Image(MonitorGUI.class.getResource("mon.png").toExternalForm()));
@@ -81,8 +81,37 @@ public class MonitorGUI extends Application {
                 stop();
             });
             stage.show();
+            /*
+             URL location = getClass().getResource("DataFlowTable.fxml");
+             loader = new FXMLLoader();
+             loader.setLocation(location);
+             loader.setBuilderFactory(new JavaFXBuilderFactory());
+             Parent root = (Parent) loader.load(location.openStream());
+             DataFlowTableController controller
+             = ((DataFlowTableController) loader.getController());
+             Scene scene = new Scene(root);
+             stage.setTitle("Belle II Monitor GUI");
+             stage.getIcons().add(new Image(MonitorGUI.class.getResource("mon.png").toExternalForm()));
+             stage.setScene(scene);
+             stage.setOnCloseRequest((WindowEvent t) -> {
+             t.consume();
+             stop();
+             });
+             if (controller != null && controller.getTable() != null) {
+             controller.getTable().add(new DataFlowMonitorPane(), 0, 0);
+             controller.getTable().add(new DataFlowMonitorPane(), 1, 0);
+             controller.getTable().add(new DataFlowMonitorPane(), 0, 1);
+             controller.getTable().add(new DataFlowMonitorPane(), 1, 1);
+             controller.getTable().add(new DataFlowMonitorPane(), 0, 2);
+             controller.getTable().add(new DataFlowMonitorPane(), 1, 2);
+             controller.getTable().add(new DataFlowMonitorPane(), 0, 3);
+             controller.getTable().add(new DataFlowMonitorPane(), 1, 3);
+             controller.getTable().setMinHeight(240 * 4);
+             }
+             stage.show();
+             */
         } catch (IOException ex) {
-            ex.printStackTrace();;
+            ex.printStackTrace();
             Logger.getLogger(MonitorGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

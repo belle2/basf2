@@ -19,20 +19,20 @@ import b2daq.nsm.NSMObserver;
 import b2daq.runcontrol.core.RCCommand;
 import b2daq.runcontrol.core.RCState;
 import b2daq.ui.NetworkConfigPaneController;
-import java.net.URL;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -41,22 +41,24 @@ import javafx.scene.text.Text;
  *
  * @author tkonno
  */
-public class RunControlMainPaneController implements Initializable, NSMObserver {
+public class RunControlMainPane extends TabPane implements NSMObserver {
 
     @FXML
     private LogViewPaneController logviewController;
     @FXML
-    private RunSettingPaneController runSettingsController;
+    private RunSettingPane runSettingsPane;
     @FXML
-    private RunCommandButtonPaneController commandButtonController;
+    private RunCommandButtonPane commandButtonPane;
     @FXML
     private RunStateLabelController rcStateController;
     @FXML
     private NetworkConfigPaneController networkconfigController;
     @FXML
-    private CopperEditorController copperEditorController;
-    
-    private final HashMap<String, DataFlowMonitorController> flowmonitors = new HashMap<>();
+    private ConfigMainPane configPane;
+    @FXML
+    private VBox vboxMainSide;
+
+    private final HashMap<String, NSMObserver> flowmonitors = new HashMap<>();
     @FXML
     private TabPane tabpane_mon;
     @FXML
@@ -158,8 +160,8 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     @FXML
     private Text text_node14;
 
-    @FXML
-    private GridPane summary_grid;
+    //@FXML
+    //private GridPane summary_grid;
     @FXML
     private Label label_runnum;
     @FXML
@@ -174,15 +176,22 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private Rectangle[] rect_v = null;
     private Text[] text_v = null;
     private String[] namelist = null;
-    
+
     private final HashMap<String, RunStateLabelController> label_m
             = new HashMap<>();
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public RunControlMainPane() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("RunControlMainPane.fxml"));
+        fxmlLoader.setRoot(this);
+        fxmlLoader.setController(this);
+        try {
+            fxmlLoader.load();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
         label_v = new Label[]{label_node0, label_node1, label_node2,
             label_node3, label_node4, label_node5,
-            label_node6, label_node7, label_node8, 
+            label_node6, label_node7, label_node8,
             label_node9, label_node10, label_node11,
             label_node12, label_node13, label_node14
         };
@@ -193,8 +202,8 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
             rect_node12, rect_node13, rect_node14
         };
         text_v = new Text[]{text_node0, text_node1, text_node2,
-            text_node3, text_node4, text_node5, 
-            text_node6, text_node7, text_node8, 
+            text_node3, text_node4, text_node5,
+            text_node6, text_node7, text_node8,
             text_node9, text_node10, text_node11,
             text_node12, text_node13, text_node14
         };
@@ -215,18 +224,18 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         NSMConfig config = NSMListenerService.getNSMConfig();
         label_rcnode.setText(config.getNsmTarget());
         rcStateController.setFont(Color.BLACK);
-        commandButtonController.set(this);
-        runSettingsController.bind(this);
+        commandButtonPane.set(this);
+        runSettingsPane.bind(this);
         ChangeListener listener = (ChangeListener) (ObservableValue observable, Object oldValue, Object newValue) -> {
             final RCState state = new RCState();
             state.copy(text_rc.getText());
-            commandButtonController.update(state,
-                    runSettingsController.readyProperty().get(),
-                    runSettingsController.getFieldOperator1().getText().length() > 0);
+            commandButtonPane.update(state,
+                    runSettingsPane.readyProperty().get(),
+                    runSettingsPane.getFieldOperator1().getText().length() > 0);
         };
         text_rc.textProperty().addListener(listener);
-        runSettingsController.getFieldOperator1().textProperty().addListener(listener);
-        runSettingsController.readyProperty().addListener(listener);
+        runSettingsPane.getFieldOperator1().textProperty().addListener(listener);
+        runSettingsPane.readyProperty().addListener(listener);
         networkconfigController.setState(true, true);
         NSMListenerService.request(new NSMMessage(NSMListenerService.getNSMConfig().getNsmTarget(), RCCommand.STATECHECK));
     }
@@ -250,18 +259,19 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
             log(new LogMessage(from, LogLevel.Get(msg.getParam(0)),
                     new Date(date), ss.toString()));
         } else if (command.equals(NSMCommand.LISTSET)) {
-            if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
+            if (msg.getNodeName().matches(NSMListenerService.getNSMConfig().getNsmTarget()) &&
+                    msg.getNParams() > 0 && msg.getParam(0) > 0) {
                 namelist = msg.getData().split("\n");
-                //System.out.println(msg.getData());
-                commandButtonController.clearStack();
+                commandButtonPane.clearStack();
             }
+            configPane.handleOnReceived(msg);
         } else if (command.equals(NSMCommand.DBSET)) {
+            configPane.handleOnReceived(msg);
             ConfigObject cobj = NSMListenerService.getDB(msg.getNodeName());
             if (cobj != null) {
-                copperEditorController.handleOnReceived(msg);
                 networkconfigController.add(cobj);
-                if (cobj.getNode().matches(NSMListenerService.getNSMConfig().getNsmTarget()) && 
-                        cobj.getTable().matches("runcontrol")) {
+                if (cobj.getNode().matches(NSMListenerService.getNSMConfig().getNsmTarget())
+                        && cobj.getTable().matches("runcontrol")) {
                     label_runtype.setText(cobj.getName());
                     if (cobj.hasObject("node")) {
                         int count = 0;
@@ -295,13 +305,23 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                 }
             }
             if (data.getFormat().matches("ronode_status") && tab == null) {
-                DataFlowMonitorController flowmonitor = DataFlowMonitorController.create(nodename);
-                tab = new Tab();
-                tab.setText(flowmonitor.getNodeName());
-                tab.setContent(flowmonitor.getPane());
-                tab.setClosable(false);
-                tabpane_mon.getTabs().add(tab);
-                flowmonitors.put(nodename, flowmonitor);
+                if (nodename.contains("CPR")) {
+                    COPPERMonitorPane flowmonitor = new COPPERMonitorPane(nodename);
+                    tab = new Tab();
+                    tab.setText(flowmonitor.getNodeName());
+                    tab.setContent(flowmonitor);
+                    tab.setClosable(false);
+                    tabpane_mon.getTabs().add(tab);
+                    flowmonitors.put(nodename, flowmonitor);
+                } else {
+                    ROPCMonitorPane flowmonitor = new ROPCMonitorPane(nodename);
+                    tab = new Tab();
+                    tab.setText(flowmonitor.getNodeName());
+                    tab.setContent(flowmonitor);
+                    tab.setClosable(false);
+                    tabpane_mon.getTabs().add(tab);
+                    flowmonitors.put(nodename, flowmonitor);
+                }
             }
             dataname = getNSMDataProperties().get(0).getDataname();
             if (dataname.matches(msg.getNodeName())) {
@@ -325,13 +345,13 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                     NSMListenerService.requestDBGet(config.getNsmTarget(),
                             data.getInt("configid", 0));
                 } else {
-                    runSettingsController.update(cobj, data);
+                    runSettingsPane.update(cobj, data);
                     rcStateController.update(data.getInt("state"), true);
                     if (cobj.hasObject("node")) {
                         int n = 0;
                         for (ConfigObject obj : cobj.getObjects("node")) {
-                            NSMData cdata = (NSMData)data.getObject("node", n);
-                            statelabel_v[n].update(cdata.getInt("state"), 
+                            NSMData cdata = (NSMData) data.getObject("node", n);
+                            statelabel_v[n].update(cdata.getInt("state"),
                                     cdata.getInt("excluded") == 0 && obj.getBool("used"));
                             n++;
                         }
@@ -345,14 +365,14 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
             if (!state.isTransition()) {
                 String dataname = getNSMDataProperties().get(0).getDataname();
                 /*
-                logviewController.add(new LogMessage(msg.getNodeName(),
-                        LogLevel.INFO, "State shift " + msg.getNodeName() + ">> "
-                        + state.getLabel()));
-                        */
+                 logviewController.add(new LogMessage(msg.getNodeName(),
+                 LogLevel.INFO, "State shift " + msg.getNodeName() + ">> "
+                 + state.getLabel()));
+                 */
                 NSMListenerService.requestNSMGet(dataname, "", 0);
             }
             if (state.equals(RCState.RUNNING_S)) {
-                runSettingsController.clear();
+                runSettingsPane.clear();
             }
         } else if (command.equals(RCCommand.STATE)) {
             RCState state = new RCState();
@@ -382,8 +402,8 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         return logviewController;
     }
 
-    public RunSettingPaneController getRunSetting() {
-        return runSettingsController;
+    public RunSettingPane getRunSetting() {
+        return runSettingsPane;
     }
 
     public NetworkConfigPaneController getNetworkConfig() {
@@ -417,4 +437,5 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     public ObservableList<NSMDataProperty> getNSMDataProperties() {
         return networkconfigController.getNSMDataProperties();
     }
+
 }

@@ -36,7 +36,7 @@ REG_MODULE(ECLElectronId)
 ECLElectronIdModule::ECLElectronIdModule() : Module()
 {
   setDescription("First version of E/p based Electron ID. Likelihood values for each particle hypothesis are stored in an ECLPidLikelihood object.");
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   //add module parameters here [see one of the following tutorials]
 }
 

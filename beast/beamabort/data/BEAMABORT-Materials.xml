@@ -20,20 +20,10 @@
     </Components>
   </Material>
 
-  <Material name="Al6061">
-    <density unit="g/cm3">2.7</density>
+  <Material name="Diamond">
+    <density unit="g/cm3">3.53</density>
     <Components>
-       <Element fraction="0.004">Si</Element>
-       <Element fraction="0.007">Fe</Element>
-       <Element fraction="0.004">Cu</Element>
-       <Element fraction="0.015">Mn</Element>
-       <Element fraction="0.008">Mg</Element>
-       <Element fraction="0.0035">Cr</Element>
-       <Element fraction="0.0025">Zn</Element>
-       <Element fraction="0.0015">Ti</Element>
-       <Element fraction="0.0005">Pb</Element>
-       <Element fraction="0.0015">Zr</Element>
-       <Element fraction="0.9525">Al</Element>
+       <Element fraction="1.0">C</Element>
     </Components>
   </Material>
 

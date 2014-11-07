@@ -80,7 +80,7 @@ namespace Belle2 {
         G4double dy_ba = 4.5 / 2.*CLHEP::mm;
         G4double dz_ba = 0.5 / 2.*CLHEP::mm;
         G4Box* s_BEAMABORT = new G4Box("s_BEAMABORT", dx_ba, dy_ba, dz_ba);
-        G4LogicalVolume* l_BEAMABORT = new G4LogicalVolume(s_BEAMABORT, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_BEAMABORT", 0, m_sensitive);
+        G4LogicalVolume* l_BEAMABORT = new G4LogicalVolume(s_BEAMABORT, geometry::Materials::get("Diamond"), "l_BEAMABORT", 0, m_sensitive);
 
         //Lets limit the Geant4 stepsize inside the volume
         l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));

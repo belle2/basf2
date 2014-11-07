@@ -264,7 +264,26 @@ namespace Belle2 {
 
     /** works with VXDSegmentCells: checks state of inner neighbours and removes incompatible and virtual ones   */
     void delFalseFriends(PassData* currentPass,
-                         TVector3 primaryVertex); // -> TODO: PassData
+                         TVector3 primaryVertex) {
+      /** REDESIGNCOMMENT DELFALSEFRIENDS 1:
+       * * short:
+       *
+       ** long (+personal comments):
+       *
+       ** dependency of module parameters (global):
+       *
+       ** dependency of global in-module variables:
+       *
+       ** dependency of global stuff just because of B2XX-output or debugging only:
+       *
+       ** in-module-function-calls:
+       */
+      for (VXDSector * aSector : currentPass->sectorVector) {
+        for (VXDSegmentCell * segment : aSector->getInnerSegmentCells()) {
+          segment->kickFalseFriends(primaryVertex);
+        }
+      }
+    }
 
 
     /** Recursive CoreFunction of the Track Candidate Collector, stores every possible way starting at a Seed (VXDSegmentCell) */
@@ -870,8 +889,8 @@ namespace Belle2 {
     int m_calcSeedType; /**< is set by m_PARAMcalcSeedType and defines which seed type shall be calculated */
     std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
-    std::string m_PARAMpxdClustersName;         /** name of storeArray containing pxd clusters */
-    std::string m_PARAMsvdClustersName;         /** name of storeArray containing svd clusters */
+    std::string m_PARAMpxdClustersName;         /**< name of storeArray containing pxd clusters */
+    std::string m_PARAMsvdClustersName;         /**< name of storeArray containing svd clusters */
 
     StoreArray<PXDCluster> m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
     StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */

@@ -730,9 +730,9 @@ namespace Belle2 {
     int m_calcSeedType; /**< is set by m_PARAMcalcSeedType and defines which seed type shall be calculated */
     std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
-    std::string m_PARAMpxdClustersName;         /** name of storeArray containing pxd clusters */
-    std::string m_PARAMtelClustersName;         /** name of storeArray containing tel clusters */
-    std::string m_PARAMsvdClustersName;         /** name of storeArray containing svd clusters */
+    std::string m_PARAMpxdClustersName;         /**< name of storeArray containing pxd clusters */
+    std::string m_PARAMtelClustersName;         /**< name of storeArray containing tel clusters */
+    std::string m_PARAMsvdClustersName;         /**< name of storeArray containing svd clusters */
     std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
     int m_PARAMactivateBaselineTF; /**< there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only */
 

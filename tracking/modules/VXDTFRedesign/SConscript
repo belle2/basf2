@@ -9,7 +9,7 @@ env['LIBS'] = [
     'vxd', 'vxd_dataobjects',
     'genfit2',
     'tracking', 'tracking_dataobjects',
-    'testbean_vxd_dataobjects'
+    'testbeam_vxd_dataobjects'
     ]
 Return('env')
 # ', 'tracking_sharedClasses'

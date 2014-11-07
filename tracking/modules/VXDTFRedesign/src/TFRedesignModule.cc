@@ -1079,32 +1079,6 @@ void TFRedesignModule::terminate()
 
 
 
-/** ***** delFalseFriends ***** **/
-///checks state of inner neighbours and removes incompatible and virtual ones
-void TFRedesignModule::delFalseFriends(PassData* currentPass, TVector3 primaryVertex)
-{
-  /** REDESIGNCOMMENT DELFALSEFRIENDS 1:
-   * * short:
-   *
-   ** long (+personal comments):
-   *
-   ** dependency of module parameters (global):
-   *
-   ** dependency of global in-module variables:
-   *
-   ** dependency of global stuff just because of B2XX-output or debugging only:
-   *
-   ** in-module-function-calls:
-   */
-  for (VXDSector * aSector : currentPass->sectorVector) {
-    for (VXDSegmentCell * segment : aSector->getInnerSegmentCells()) {
-      segment->kickFalseFriends(primaryVertex);
-    }
-  }
-}
-
-
-
 /** ***** findTCs ***** **/
 ///Recursive CoreFunction of the Track Candidate Collector, stores every possible way starting at a Seed (VXDSegmentCell)
 void TFRedesignModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, short int maxLayer)
@@ -5128,15 +5102,20 @@ bool TFRedesignModule::initializeEvent()
    * EventInfoPackage is currently storing the info needed for the TFAnalyzerModule to determine the efficiency of the TF
    *
    ** dependency of module parameters (global):
-   * m_PARAMdisplayCollector
+   * m_PARAMdisplayCollector, m_usePXDHits, m_useSVDHits,
+   *
    *
    ** dependency of global in-module variables:
-   * m_eventCounter, m_collector
+   * m_eventCounter, m_collector, m_usePXDHits,
+   * m_evInfoPack, m_TESTERnoHitsAtEvent, m_totalPXDClusters,
+   * m_totalSVDClusters, m_badSectorRangeCtr
    *
    ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_PARAMdisplayCollector, m_collector
+   * m_PARAMdisplayCollector, m_collector, m_TESTERnoHitsAtEvent,
+   * m_totalPXDClusters, m_totalSVDClusters, m_badSectorRangeCtr
    *
    ** in-module-function-calls:
+   * stopTFevent();
    */
 
 
@@ -5201,18 +5180,11 @@ void TFRedesignModule::addVirtualInteractionPoint()
    * this is the inner part of the virtual segment, which connects a hit on the innermost layer to the IP
    *
    ** dependency of module parameters (global):
-   * m_PARAMtelClustersName, m_PARAMpxdClustersName, m_PARAMsvdClustersName,
-   * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines,
    *
    ** dependency of global in-module variables:
-   * m_useTELHits, m_usePXDHits, m_useSVDHits,
-   * m_TESTERnoHitsAtEvent, m_TESTERtimeConsumption, m_TESTERlogEvents,
-   * m_passSetupVector,
-   *
+   * m_passSetupVector, m_evInfoPack
    *
    ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_TESTERtimeConsumption, m_TESTERexpandedTestingRoutines, m_TESTERnoHitsAtEvent,
-   * m_TESTERlogEvents,
    *
    ** in-module-function-calls:
    */
@@ -5268,6 +5240,7 @@ void TFRedesignModule::createClusterInfo()
    *
    ** dependency of global in-module variables:
    * m_passSetupVector, m_collector, m_TESTERtimeConsumption,
+   * m_evInfoPack, m_clustersOfEvent
    *
    ** dependency of global stuff just because of B2XX-output or debugging only:
    * m_PARAMdisplayCollector, m_collector, m_TESTERtimeConsumption,
@@ -5332,33 +5305,24 @@ void TFRedesignModule::assignPXDHitsToSectors()
   /// Section 3d
   /** REDESIGNCOMMENT EVENT 5:
   * * short:
-  * Section 3d - assign sectors for PXD Clusters, then find 2-SVDCluster-Combis and assign sectors to them.
+  * Section 3d - assign sectors for PXD Clusters
   * Creates VXDTFHits
   *
   ** long (+personal comments):
   *
   ** dependency of module parameters (global):
-  * m_PARAMdisplayCollector, m_PARAMnameOfInstance, m_PARAMkillEventForHighOccupancyThreshold,
-  *
+  * m_PARAMdisplayCollector,
   *
   ** dependency of global in-module variables:
   * m_passSetupVector, m_TESTERbadSensors, m_collector,
-  * m_useSVDHits, m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
-  * m_TESTERdistortedHitCtr, m_badSectorRangeCounter, m_totalSVDClusterCombis,
-  * m_totalPXDClusters, m_totalTELClusters, m_totalSVDClusters,
-  * m_TESTERtimeConsumption
+  * m_evInfoPack
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
   * m_eventCounter, m_TESTERbadSensors, m_PARAMdisplayCollector,
-  * m_collector, m_PARAMnameOfInstance, m_TESTERbrokenEventsCtr,
-  * m_TESTERlogEvents, m_TESTERdistortedHitCtr, m_badSectorRangeCounter,
-  * m_totalPXDClusters, m_totalTELClusters, m_totalSVDClusters,
-  * m_totalSVDClusterCombis, m_TESTERtimeConsumption
+  * m_collector,
   *
   ** in-module-function-calls:
   * searchSector4Hit(aVxdID, transformedHitLocal, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV)
-  * findSensors4Clusters(activatedSensors, m_clustersOfEvent)
-  * find2DSVDHits(activatedSensors, clusterHitList)
   */
 
   B2DEBUG(3, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << m_evInfoPack.nPXDClusters << ", SVDCLuster: " << m_evInfoPack.nSVDClusters << ", m_clustersOfEvent: " << m_clustersOfEvent.size());
@@ -5472,6 +5436,33 @@ void TFRedesignModule::assignPXDHitsToSectors()
 
 void TFRedesignModule::assignSVDHitsToSectors()
 {
+  /// Section 3d part 2
+  /** REDESIGNCOMMENT EVENT 5b:
+   * * short:
+   * Section 3d part 2 - find 2-SVDCluster-Combis and assign sectors to them.
+   * Creates VXDTFHits
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector, m_PARAMnameOfInstance, m_PARAMkillEventForHighOccupancyThreshold,
+   *
+   ** dependency of global in-module variables:
+   * m_passSetupVector, m_TESTERbadSensors, m_collector,
+   * m_TESTERdistortedHitCtr, m_badSectorRangeCounter, m_totalSVDClusterCombis,
+   * m_evInfoPack
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_eventCounter, m_TESTERbadSensors, m_PARAMdisplayCollector,
+   * m_collector, m_PARAMnameOfInstance, m_TESTERdistortedHitCtr,
+   * m_badSectorRangeCounter, m_totalSVDClusterCombis,
+   *
+   ** in-module-function-calls:
+   * searchSector4Hit(aVxdID, transformedHitLocal, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV)
+   * findSensors4Clusters(activatedSensors, m_clustersOfEvent)
+   * find2DSVDHits(activatedSensors, clusterHitList)
+   * stopBrokenEvent()
+   */
   m_evInfoPack.newTic();
 
   TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
@@ -5664,6 +5655,24 @@ void TFRedesignModule::assignSVDHitsToSectors()
 
 void TFRedesignModule::preparePass(PassData* currentPass, int passNumber)
 {
+  /** REDESIGNCOMMENT EVENT 5c:
+   * * short:
+   * prepares the pass dependent stuff
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector,
+   *
+   ** dependency of global in-module variables:
+   * m_evInfoPack
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector
+   *
+   ** in-module-function-calls:
+   */
+
   m_evInfoPack.newTic();
 
   // Set current Pass Number for Collector
@@ -5700,22 +5709,19 @@ bool TFRedesignModule::doTheSegFinder(PassData* currentPass, int passNumber)
    * several TFs will use that section with totally the same interface, therefore generalized approach important (function/class)
    *
    ** dependency of module parameters (global):
-   * m_PARAMdisplayCollector, m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
-   *
+   * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
    *
    ** dependency of global in-module variables:
-   * m_passSetupVector, m_aktpassNumber, m_TESTERtotalsegmentsSFCtr,
-   * m_TESTERdiscardedSegmentsSFCtr, m_eventCounter, m_TESTERtimeConsumption,
-   * m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+   * m_TESTERtotalsegmentsSFCtr, m_TESTERdiscardedSegmentsSFCtr, m_eventCounter,
+   * m_evInfoPack
    *
    ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_aktpassNumber, m_PARAMdisplayCollector, m_TESTERtotalsegmentsSFCtr,
-   * m_TESTERdiscardedSegmentsSFCtr, m_eventCounter, m_TESTERtimeConsumption,
-   * m_PARAMnameOfInstance, m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+   * m_TESTERtotalsegmentsSFCtr, m_TESTERdiscardedSegmentsSFCtr, m_eventCounter,
+   * m_PARAMnameOfInstance,
    *
    ** in-module-function-calls:
    * segFinder(currentPass)
-   * cleanEvent(currentPass)
+   * stopBrokenEvent()
    */
   m_evInfoPack.newTic();
   bool killEvent = false;
@@ -5772,18 +5778,16 @@ bool TFRedesignModule::doTheNeighbourFinder(PassData* currentPass, int passNumbe
   * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance
   *
   ** dependency of global in-module variables:
-  * m_passSetupVector, m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr,
-  * m_TESTERtimeConsumption, m_eventCounter, m_TESTERbrokenEventsCtr,
-  * m_TESTERlogEvents
+  * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr, m_eventCounter,
+  * m_evInfoPack
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr, m_TESTERtimeConsumption,
-  * m_PARAMnameOfInstance, m_eventCounter, m_TESTERbrokenEventsCtr,
-  * m_TESTERlogEvents
+  * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr, m_PARAMnameOfInstance,
+  * m_eventCounter,
   *
   ** in-module-function-calls:
   * neighbourFinder(currentPass)
-  * cleanEvent(currentPass)
+  * stopBrokenEvent()
   */
   m_evInfoPack.newTic();
   bool killEvent = false;
@@ -5818,19 +5822,17 @@ bool TFRedesignModule::doTheCellularAutomaton(PassData* currentPass, int passNum
   ** long (+personal comments):
   *
   ** dependency of module parameters (global):
-  * m_PARAMnameOfInstance, m_PARAMdisplayCollector
+  * m_PARAMnameOfInstance,
   *
   ** dependency of global in-module variables:
-  * m_eventCounter, m_TESTERbrokenEventsCtr, m_passSetupVector,
-  * m_TESTERtimeConsumption, m_aktpassNumber
+  * m_eventCounter, m_evInfoPack
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_PARAMnameOfInstance, m_eventCounter, m_TESTERbrokenEventsCtr,
-  * m_TESTERtimeConsumption, m_PARAMdisplayCollector, m_aktpassNumber
+  * m_PARAMnameOfInstance, m_eventCounter,
   *
   ** in-module-function-calls:
   * cellularAutomaton(currentPass)
-  * cleanEvent(currentPass)
+  * stopBrokenEvent()
   */
   m_evInfoPack.newTic();
   bool killEvent = false;
@@ -5860,17 +5862,15 @@ bool TFRedesignModule::doTheTrackCandidateCollector(PassData* currentPass, int p
   * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
   *
   ** dependency of global in-module variables:
-  * m_TESTERtimeConsumption, m_eventCounter, m_TESTERbrokenEventsCtr,
-  * m_passSetupVector, m_TESTERlogEvents,
+  * m_eventCounter, m_evInfoPack
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_TESTERtimeConsumption, m_PARAMnameOfInstance, m_eventCounter,
-  * m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+  * m_PARAMnameOfInstance, m_eventCounter,
   *
   ** in-module-function-calls:
   * delFalseFriends(currentPass, currentPass->origin)
   * tcCollector(currentPass)
-  * cleanEvent(currentPass)
+  * stopBrokenEvent()
   */
   m_evInfoPack.newTic();
   bool killEvent = false;
@@ -5904,10 +5904,10 @@ void TFRedesignModule::doTheTcFilter(PassData* currentPass, int passNumber)
   ** dependency of module parameters (global):
   *
   ** dependency of global in-module variables:
-  * m_TESTERtimeConsumption
+  * m_evInfoPack
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_TESTERtimeConsumption
+  * m_evInfoPack
   *
   ** in-module-function-calls:
   * tcFilter(currentPass, passNumber)
@@ -5941,10 +5941,10 @@ unsigned int TFRedesignModule::doTheOverlapCheck(PassData* currentPass)
   *
   ** dependency of global in-module variables:
   * m_tcVectorOverlapped, m_calcQiType, m_tcVector,
-  * m_collector, m_TESTERtimeConsumption, m_eventCounter
+  * m_collector, m_evInfoPack, m_eventCounter
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_PARAMdisplayCollector, m_collector, m_TESTERtimeConsumption,
+  * m_PARAMdisplayCollector, m_collector, m_evInfoPack,
   * m_eventCounter
   *
   ** in-module-function-calls:
@@ -6010,19 +6010,18 @@ bool TFRedesignModule::doTheQICalculation(unsigned int totalOverlaps)
   * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
   *
   ** dependency of global in-module variables:
-  * m_calcQiType, m_TESTERbrokenEventsCtr, m_eventCounter,
-  * m_passSetupVector, m_TESTERtimeConsumption, m_TESTERlogEvents,
-  * m_TESTERkalmanSkipped, m_tcVector,
+  * m_calcQiType, m_evInfoPack, m_eventCounter,
+  * m_passSetupVector, m_TESTERkalmanSkipped, m_tcVector,
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_TESTERbrokenEventsCtr, m_PARAMnameOfInstance, m_eventCounter,
-  * m_TESTERtimeConsumption, m_TESTERlogEvents, m_TESTERkalmanSkipped,
+  * m_PARAMnameOfInstance, m_eventCounter, m_evInfoPack
+  * m_TESTERkalmanSkipped,
   *
   ** in-module-function-calls:
-  * cleanEvent(currentPass)
   * calcQIbyKalman(m_tcVector)
   * calcQIbyLength(m_tcVector, m_passSetupVector)
   * calcQIbyStraightLine(m_tcVector)
+  * stopBrokenEvent()
   */
   m_evInfoPack.newTic();
   bool killEvent = false;
@@ -6071,10 +6070,10 @@ unsigned int TFRedesignModule::doTheOverlapCleaning(unsigned int totalOverlaps)
   *
   ** dependency of global in-module variables:
   * m_tcVectorOverlapped, m_TESTERcleanOverlappingSetStartedCtr,
-  * m_TESTERtimeConsumption,
+  * m_evInfoPack,
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_TESTERcleanOverlappingSetStartedCtr, m_TESTERtimeConsumption,
+  * m_TESTERcleanOverlappingSetStartedCtr, m_evInfoPack,
   *
   ** in-module-function-calls:
   * cleanOverlappingSet(m_tcVectorOverlapped)
@@ -6113,11 +6112,11 @@ unsigned int TFRedesignModule::redoTheOverlapCheck(unsigned int totalOverlaps)
   ** dependency of module parameters (global):
   *
   ** dependency of global in-module variables:
-  * m_tcVectorOverlapped, m_tcVector, m_TESTERtimeConsumption,
-  *
+  * m_tcVectorOverlapped, m_tcVector, m_evInfoPack,
+  * m_clustersOfEvent
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_TESTERtimeConsumption,
+  * m_evInfoPack,
   *
   ** in-module-function-calls:
   */
@@ -6168,10 +6167,10 @@ void TFRedesignModule::doTheFilterOverlappingTCs(PassData* currentPass, int pass
   *
   ** dependency of global in-module variables:
   * m_filterOverlappingTCs, m_tcVectorOverlapped, m_tcVector,
-  * m_eventCounter, m_TESTERtimeConsumption, m_passSetupVector,
+  * m_eventCounter, m_evInfoPack, m_passSetupVector,
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_eventCounter, m_TESTERtimeConsumption,
+  * m_eventCounter, m_evInfoPack,
   *
   ** in-module-function-calls:
   * hopfield(m_tcVectorOverlapped, m_PARAMomega)
@@ -6238,7 +6237,7 @@ void TFRedesignModule::doTheGFTrackCandGeneration()
   ** long (+personal comments):
   *
   ** dependency of module parameters (global):
-  * m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
+  * m_TESTERexpandedTestingRoutines, m_evInfoPack, m_PARAMdisplayCollector,
   * m_PARAMnameOfInstance,
   *
   ** dependency of global in-module variables:
@@ -6247,7 +6246,7 @@ void TFRedesignModule::doTheGFTrackCandGeneration()
   * m_TESTERcountTotalTCsFinal
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
-  * m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
+  * m_TESTERexpandedTestingRoutines, m_evInfoPack, m_PARAMdisplayCollector,
   * m_collector, m_TESTERcountTotalUsedHitsFinal, m_TESTERcountTotalUsedIndicesFinal,
   * m_TESTERcountTotalTCsFinal,
   *
@@ -6374,13 +6373,12 @@ void TFRedesignModule::finalEventCleanup()
   * m_PARAMdisplayCollector, m_PARAMwriteToRoot,
   *
   ** dependency of global in-module variables:
-  * m_collector, m_passSetupVector, m_rootTimeConsumption,
-  * m_treeEventWisePtr, m_TESTERtimeConsumption, m_TESTERlogEvents
+  * m_collector, m_passSetupVector, m_evInfoPack,
+  * m_treeEventWisePtr, m_TESTERlogEvents
   *
   ** dependency of global stuff just because of B2XX-output or debugging only:
   * m_PARAMdisplayCollector, m_collector, m_PARAMwriteToRoot,
-  * m_rootTimeConsumption, m_treeEventWisePtr, m_TESTERtimeConsumption,
-  * m_TESTERlogEvents
+  * m_evInfoPack, m_treeEventWisePtr, m_TESTERlogEvents
   *
   ** in-module-function-calls:
   * cleanEvent(currentPass)

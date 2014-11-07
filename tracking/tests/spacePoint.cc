@@ -37,6 +37,7 @@ namespace Belle2 {
   class SpacePointTest : public ::testing::Test {
 
   public:
+    /** this is a small helper function to create a sensorInfo to be used */
     VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, double width = 1., double length = 1., double width2 = -1.) {
       // (SensorType type, VxdID id, double width, double length, double thickness, int uCells, int vCells, double width2=-1, double splitLength=-1, int vCells2=0)
       VXD::SensorInfoBase sensorInfoBase(VXD::SensorInfoBase::PXD, aVxdID, width, length, 0.3, 2, 4, width2);

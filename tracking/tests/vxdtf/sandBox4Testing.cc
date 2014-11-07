@@ -1,6 +1,5 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <../../externals/v00-05-02/include/boost/concept_check.hpp>
 #include <gtest/gtest.h>
 #include <vector>
 

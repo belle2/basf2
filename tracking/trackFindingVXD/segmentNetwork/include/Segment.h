@@ -166,7 +166,7 @@ namespace Belle2 {
     inline void addInnerNeighbour(Segment* aSegment) { m_innerNeighbours.push_back(aSegment); }
 
 
-    /**< adds an outer neighbour-segment */
+    /** adds an outer neighbour-segment */
     inline void addOuterNeighbour(Segment* aSegment) { m_outerNeighbours.push_back(aSegment); }
 
 

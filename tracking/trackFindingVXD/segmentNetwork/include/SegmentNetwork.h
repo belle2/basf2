@@ -63,6 +63,7 @@ namespace Belle2 {
 
 
 
+    /** this is an exception indicating that the sectorMap and its related segment network do not contain the given sectorID */
     BELLE2_DEFINE_EXCEPTION(SectorNotFound, "the given sectorID/index number does not match any existing sector in this network!");
 
 

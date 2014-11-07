@@ -114,9 +114,9 @@ namespace Belle2 {
     TVector3 origin; /**< stores the chosen origin (position of assumed primary vertex) */
     std::string chosenDetectorType; /**< same as detectorType, but fully written ('SVD','PXD' or 'TEL' allowed), needed during xml and for logging messages */
     bool m_isFilterByDistance2OriginActivated; /**< if true, the sectors are not sorted by layerID but by distance to origin values */
-    bool useSVDHits; /** if true, this pass uses SVD hits */
-    bool usePXDHits; /** if true, this pass uses PXD hits */
-    bool useTELHits; /** if true, this pass uses TEL hits */
+    bool useSVDHits; /**< if true, this pass uses SVD hits */
+    bool usePXDHits; /**< if true, this pass uses PXD hits */
+    bool useTELHits; /**< if true, this pass uses TEL hits */
     double reserveHitsThreshold; /**< value between 0 (0%) and 1 (100%), defines how many tcs are allowed to reserve their clusters which forbids other TCs to use them too */
     unsigned short int highestAllowedLayer; /**< needed for e.g. hitfinding. This value excludes Layernumbers higher than set value. (interesting for low momentum tracks)  */
     int numTotalLayers;  /**< needed e.g. for neuronal network. This value allows calculation of maximum track length (noncurling), carries implicit information about detectorType, while 'highestAllowedLayer' does not know whether its a SVD or VXD setup */
@@ -127,6 +127,7 @@ namespace Belle2 {
 
 
     /** soon to come (maybe even layer-specific): **/
+
     std::vector<double> secConfigU;  /**< defines subdivition of sensors U */
     std::vector<double> secConfigV; /**< defines subdivition of sensors V */
 
@@ -144,6 +145,7 @@ namespace Belle2 {
 
 
     /** for segFinder in high occupancy mode, compares 2+1 hits (using origin as third hit) */
+
     PassDataTypedef::Filter anglesHighOccupancy3D; /**< exactly the same as 'angles3D' but for high occupancy cases */
     PassDataTypedef::Filter anglesHighOccupancyXY; /**< exactly the same as 'anglesXY' but for high occupancy cases */
     PassDataTypedef::Filter anglesHighOccupancyRZ; /**< exactly the same as 'anglesRZ' but for high occupancy cases */
@@ -155,6 +157,7 @@ namespace Belle2 {
 
 
     /** for nbFinder, compares 3 hits **/
+
     PassDataTypedef::Filter angles3D; /**< carries information about the filter 'angles3D', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter anglesXY; /**< carries information about the filter 'anglesXY', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter anglesRZ; /**< carries information about the filter 'anglesRZ', type pair<bool isActivated, double tuningParameter> */
@@ -171,12 +174,14 @@ namespace Belle2 {
 
 
     /** for nbFinder in high occupancy mode, compares 3+1 hits (using origin as fourth hit) */
+
     PassDataTypedef::Filter deltaPtHighOccupancy; /**< exactly the same as 'deltaPt' but for high occupancy cases */
     PassDataTypedef::Filter deltaDistanceHighOccupancy2IP; /**< exactly the same as 'deltaDistance2IP' but for high occupancy cases */
     int activatedHighOccupancyNbFinderTests; /**< counts number of tests activated for nbFinder */
 
 
     /** for TCC filter, compares 4 hits **/
+
     PassDataTypedef::Filter zigzagXY; /**< carries information about the filter 'zigZagXY', type pair<bool isActivated, double tuningParameter> , here the tuningparameter is currently ignored, possible future use is reserved for defining uncertainties because of measurement errors */
     PassDataTypedef::Filter zigzagXYWithSigma; /**< checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the X-Y-plane, returns true, if they are ziggzagging. This functions uses the sigma of the positionInfos to consider also approximately straight tracks as not zigg-zagging, type pair<bool isActivated, double tuningParameter> , here the tuningparameter is currently ignored, possible future use is reserved for defining uncertainties because of measurement errors */
     PassDataTypedef::Filter zigzagRZ; /**< carries information about the filter 'zigZagRZ', type pair<bool isActivated, double tuningParameter> , here the tuningparameter is currently ignored, possible future use is reserved for defining uncertainties because of measurement errors */
@@ -194,8 +199,8 @@ namespace Belle2 {
     TrackletFilters trackletFilterBox; /**< contains all the four-or-more hit filters needed by the post-ca-Filter */
 
 
-
     /** filled and resetted each event **/
+
     OperationVectorOfActivatedSectors sectorVector; /**< carries pointers to sectors which are used in current event */
     ActiveSegmentsOfEvent activeCellList; /**< list of active cells, dead ones get kicked (therefore it's a list) */
     TotalSegmentsOfEvent totalCellVector;   /**< This vector contains throughout the whole event all segments found. It is needed since

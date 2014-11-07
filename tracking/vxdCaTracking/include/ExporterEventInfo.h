@@ -47,6 +47,7 @@ namespace Belle2 {
     std::vector<ExporterHitInfo>* getHits();
 
 
+    /** returns number of current event */
     int getEventNumber() { return m_eventNumber; }
 
 

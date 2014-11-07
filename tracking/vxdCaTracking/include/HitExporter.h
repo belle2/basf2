@@ -35,8 +35,13 @@ namespace Belle2 {
 
   public:
 
+    /** stores all the relevant info for an event */
     typedef std::map<int, ExporterEventInfo*> EventMap;
+
+    /** a key-value-pair for the EventMap */
     typedef std::pair<int, ExporterEventInfo*> EventMapEntry;
+
+    /** stores some basic info about the TC hit */
     typedef std::pair<double, std::string> TcHitEntry;
 
     /** Empty constructor. */

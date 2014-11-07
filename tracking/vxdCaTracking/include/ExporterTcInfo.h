@@ -71,7 +71,7 @@ namespace Belle2 {
   protected:
     int m_pdgCode; /**< pdgCode of tc in the tc-file TODO: implement a check which proves that suggested and real fileIndex are the same! */
     int m_motherID; /**< index of the mother particle in the simulation */
-    std::vector< std::pair<double, std::string> > m_hits; /** contains already formatted hit information. The .first value of the pair is the radius of the hit, so the vector can be sorted using it */
+    std::vector< std::pair<double, std::string> > m_hits; /**< contains already formatted hit information. The .first value of the pair is the radius of the hit, so the vector can be sorted using it */
     std::vector<int> m_hitIDs; /**< stores the hitIDs of the hits attached to this TC, can be treated independently of hits themselves. It's only important to know, which tc had which hits */
     std::string m_tcInfo; /**< contains Info about the tc itself. It is already formatted but lacks of the last information needed, the index of the first McPoint */
   };

@@ -310,7 +310,13 @@ namespace Belle2 {
     /** Get accessor for reduced set. */
     StoreAccessorBase* getSubSet() override { return m_subset; }
 
-  private:
+  protected:
+    /** Selects the elements, fill the subset and copies all the relations in which the set is involved. */
+    std::map<int, int> copySetWithRelations(std::function<bool (const StoredClass*)> f);
+
+    /** Copy any set -> set relations between selected objects. */
+    void copyRelationsToSelf();
+
     /** Empty method to stop the recursion of the variadic template.
     */
     void inheritRelationsFrom() { }
@@ -324,55 +330,80 @@ namespace Belle2 {
     StoreArray<StoredClass>* m_subset;
   };
 
+  template < class StoredClass>
+  std::map<int, int>
+  SelectSubset< StoredClass >::copySetWithRelations(std::function<bool (const StoredClass*)> f)
+  {
+    std::map<int, int> oldToNew;
+    for (const StoredClass & setObject : *m_set) {
+      if (!f(&setObject))
+        continue;
+
+      oldToNew[setObject.getArrayIndex()] = m_subset->getEntries();
+      const StoredClass* subsetObject = m_subset->appendNew(setObject);
+      if (!m_reduceExistingSet)
+        setObject.addRelationTo(subsetObject);
+    }
+
+
+    //TODO this is the slow bit, can probably be improved by directly dealing with indices
+    for (const auto & oldToNewPair : oldToNew) {
+      const StoredClass* setObject = (*m_set)[oldToNewPair.first];
+      const StoredClass* subsetObject = (*m_subset)[oldToNewPair.second];
+
+      for (std::string fromArray : m_inheritFromArrays) {
+        const RelationVector<RelationsObject>& relations = setObject->template getRelationsFrom<RelationsObject>(fromArray);
+        for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
+          relations.object(iRel)->addRelationTo(subsetObject, relations.weight(iRel));
+        }
+      }
+      for (std::string toArray : m_inheritToArrays) {
+        const RelationVector<RelationsObject>& relations = setObject->template getRelationsTo<RelationsObject>(toArray);
+        for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
+          subsetObject->addRelationTo(relations.object(iRel), relations.weight(iRel));
+        }
+      }
+    }
+
+    return oldToNew;
+  }
+
+
+  template < class StoredClass>
+  void
+  SelectSubset< StoredClass >::copyRelationsToSelf()
+  {
+    for (const StoredClass & subsetObject1 : *m_subset) {
+      //TODO: change relation direction to set -> subset?
+      const StoredClass* setObject1 = subsetObject1.template getRelatedFrom<StoredClass>(m_set->getName());
+
+      //get all objects in original set related to setObject1
+      const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_set->getName());
+      for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
+        const StoredClass* setObject2 = relations.object(iRel);
+        const double weight = relations.weight(iRel);
+
+        //if setObject2 was selected into subset, inherit relation
+        const StoredClass* subsetObject2 = setObject2->template getRelatedTo<StoredClass>(m_subset->getName());
+        if (subsetObject2) {
+          subsetObject1.addRelationTo(subsetObject2, weight);
+        }
+      }
+    }
+  }
 
   template < class StoredClass>
   void
   SelectSubset< StoredClass >::select(std::function<bool (const StoredClass*)> f)
   {
-    for (const StoredClass & setObject : *m_set) {
-      if (f(&setObject)) {
-        const StoredClass* subsetObject = m_subset->appendNew(setObject);
-        if (!m_reduceExistingSet)
-          setObject.addRelationTo(subsetObject);
-        for (std::string fromArray : m_inheritFromArrays) {
-          const RelationVector<RelationsObject>& relations = setObject.template getRelationsFrom<RelationsObject>(fromArray);
-          for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
-            relations.object(iRel)->addRelationTo(subsetObject, relations.weight(iRel));
-          }
-        }
-        for (std::string toArray : m_inheritToArrays) {
-          const RelationVector<RelationsObject>& relations = setObject.template getRelationsTo<RelationsObject>(toArray);
-          for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
-            subsetObject->addRelationTo(relations.object(iRel), relations.weight(iRel));
-          }
-        }
-
-      }
-    }
+    copySetWithRelations(f);
 
     if (m_inheritToSelf) {
-      for (const StoredClass & subsetObject1 : *m_subset) {
-        //TODO: change relation direction to set -> subset?
-        const StoredClass* setObject1 = subsetObject1.template getRelatedFrom<StoredClass>(m_set->getName());
-
-        //get all objects in original set related to setObject1
-        const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_set->getName());
-        for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
-          const StoredClass* setObject2 = relations.object(iRel);
-          const double weight = relations.weight(iRel);
-
-          //if setObject2 was selected into subset, inherit relation
-          const StoredClass* subsetObject2 = setObject2->template getRelatedTo<StoredClass>(m_subset->getName());
-          if (subsetObject2) {
-            subsetObject1.addRelationTo(subsetObject2, weight);
-          }
-        }
-      }
+      copyRelationsToSelf();
     }
 
     if (m_reduceExistingSet) {
       swapSetsAndDestroyOriginal();
     }
-
   }
 }

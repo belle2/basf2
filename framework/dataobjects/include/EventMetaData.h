@@ -15,7 +15,7 @@
 namespace Belle2 {
   /** Store event number, run number, and experiment number.
    *
-   *  Master modules (which control event flow) have to create an object of this type!
+   *  Modules controlling the event-flow (e.g. EventInfoSetter, RootInput) have to create an object of this type!
    *
    *  @sa EventInfoSetterModule, EventInfoPrinterModule
    *  @author <a href="mailto:martin.heck@kit.edu?subject=EventMetaData">Martin Heck</a>
@@ -168,7 +168,7 @@ namespace Belle2 {
      *  @param eventMetaData The event meta data to compare with.
      *  @return True if event, run, or experiment numbers are different
      */
-    bool operator!= (const EventMetaData& eventMetaData) const;
+    bool operator!= (const EventMetaData& eventMetaData) const { return !(*this == eventMetaData); }
 
   private:
 

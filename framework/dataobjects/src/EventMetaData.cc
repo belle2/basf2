@@ -44,8 +44,3 @@ bool EventMetaData::operator== (const EventMetaData& eventMetaData) const
           (m_run == eventMetaData.getRun()) &&
           (m_experiment == eventMetaData.getExperiment()));
 }
-
-bool EventMetaData::operator!= (const EventMetaData& eventMetaData) const
-{
-  return !(*this == eventMetaData);
-}

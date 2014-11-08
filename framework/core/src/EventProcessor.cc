@@ -124,7 +124,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
   //Don't start processing in case of no master module
   if (!m_master) {
-    B2ERROR("There is no module that provides event and run numbers. You must either add the EventInfoSetter module to your path, or, if using an input module, read EventMetaData objects from file.");
+    B2ERROR("There is no module that provides event and run numbers (EventMetaData). You must add either the EventInfoSetter or an input module (e.g. RootInput) to the beginning of your path.");
   }
 
   //Check if errors appeared. If yes, don't start the event processing.
@@ -193,7 +193,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
     //Check whether this is the master module
     if (!m_master && DataStore::Instance().getEntry(m_eventMetaDataPtr) != NULL) {
-      B2DEBUG(100, "Found master module " << module->getName());
+      B2DEBUG(100, "Found module providing EventMetaData: " << module->getName());
       m_master = module;
     }
 
@@ -242,12 +242,12 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
     if ((m_eventMetaDataPtr && (m_eventMetaDataPtr->isEndOfData())) ||
         ((module == m_master) && !m_eventMetaDataPtr)) {
       if (module != m_master) {
-        B2WARNING("Event processing stopped by non-master module " << module->getName());
+        B2WARNING("Event processing stopped by module '" << module->getName() << "', which is not in control of event processing (does not provide EventMetaData)");
       }
       return true;
     }
 
-    //Handle event meta data changes of the master module
+    //Handle EventMetaData changes by master module
     if (module == m_master) {
 
       //Check for a change of the run
@@ -269,7 +269,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
     } else {
       //Check for a second master module
       if (m_eventMetaDataPtr && (*m_eventMetaDataPtr != m_previousEventMetaData)) {
-        B2FATAL("Two master modules were discovered: " << m_master->getName() << " and " << module->getName());
+        B2FATAL("Two modules setting EventMetaData were discovered: " << m_master->getName() << " and " << module->getName());
       }
     }
 

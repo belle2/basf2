@@ -9,12 +9,14 @@
  **************************************************************************/
 
 #include <boost/python/class.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include <iostream>
+#include <fstream>
 
 
 using namespace std;
@@ -66,7 +68,6 @@ void FileMetaData::exposePythonAPI()
   .def("get_user", &FileMetaData::getUser)
   .def("get_logfile", &FileMetaData::getLogFile)
   .def("get_random_seed", &FileMetaData::getRandomSeed)
-  .def("get_random", &FileMetaData::getRandom)
   .def("get_steering", &FileMetaData::getSteering)
   .def("set_ids", &FileMetaData::setIds);
 }

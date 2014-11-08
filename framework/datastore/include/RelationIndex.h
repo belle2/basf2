@@ -227,13 +227,13 @@ namespace Belle2 {
     }
 
     /** Get the AccessorParams of the underlying relation. */
-    const AccessorParams getAccessorParams()     const { return m_index->getAccessorParams(); }
+    const AccessorParams& getAccessorParams()     const { return m_index->getAccessorParams(); }
 
     /** Get the AccessorParams of the StoreArray the relation points from. */
-    const AccessorParams getFromAccessorParams() const { return m_index->getFromAccessorParams(); }
+    const AccessorParams& getFromAccessorParams() const { return m_index->getFromAccessorParams(); }
 
     /** Get the AccessorParams of the StoreArray the relation points to. */
-    const AccessorParams getToAccessorParams()   const { return m_index->getToAccessorParams(); }
+    const AccessorParams& getToAccessorParams()   const { return m_index->getToAccessorParams(); }
 
     /** Get the size of the index. */
     size_t size() const { return m_index->index().size(); }

@@ -13,8 +13,9 @@
 #include <TObject.h>
 #include <TRandom3.h>
 #include <time.h>
-#include <fstream>
 
+#include <iosfwd>
+#include <vector>
 
 namespace Belle2 {
 
@@ -112,7 +113,7 @@ namespace Belle2 {
 
     /** Initital random number generator object getter.
      */
-    const TRandom3 getRandom() const {return m_random;}
+    const TRandom3& getRandom() const {return m_random;}
 
     /** Steering file content getter.
      */

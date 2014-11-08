@@ -27,6 +27,13 @@
 //  28 Jun 2013    ver. 0.21  Bug fix
 //
 
+/*
+<header>
+<input>CDCOutputGen.root</input>
+<output>CDCValidation.root</output>
+<contact>Hiroki Kanda, kanda@m.tains.tohoku.ac.jp</contact>
+</header>
+*/
 
 #include "string.h"
 

@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+<output>CDCOutputGen.root</output>
+<contact>Hiroki Kanda, kanda@m.tains.tohoku.ac.jp</contact>
+</header>
+"""
 from basf2 import *
 from simulation import add_simulation
 import glob

@@ -51,12 +51,12 @@ stdHighEPhoton()
 stdLoosePi()
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV
-reconDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.0')
+reconstructDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.0')
 
 # reconstruct B0 -> rho0 gamma decay
 # keep only candidates with Mbc > 5.2 GeV
 # and -2 < Delta E < 2 GeV
-reconDecay('B0 -> rho0 gamma:highE', '5.2 < Mbc < 5.29 and abs(deltaE) < 2.0')
+reconstructDecay('B0 -> rho0 gamma:highE', '5.2 < Mbc < 5.29 and abs(deltaE) < 2.0')
 
 # Skim 1
 # The new algorithm
@@ -66,7 +66,7 @@ skimfilter.set_name('SkimFilter_MyB2RhoGammaskim')
 skimfilter.param('particleLists', ['B0'])
 analysis_main.add_module(skimfilter)
 # Suggest that you print a summary of the particle lists
-summaryOfLists(['B0', 'rho0', 'gamma:highE', 'pi+:std'])
+summaryOfLists(['B0', 'rho0', 'gamma:highE', 'pi+:loose'])
 # Create a new path for the skim output
 myRhoGammaskim_path = create_path()
 # The filter provides a boolean, which is true if any of the argument particle lists are not empty

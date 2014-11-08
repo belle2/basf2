@@ -36,8 +36,6 @@ namespace Belle2 {
     float m_fTagVez;
     /** Tag vertex P value. */
     float m_TagVPvalue;
-    /** Delta T : TBrec - TBtag. */
-    float m_fDeltaT;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

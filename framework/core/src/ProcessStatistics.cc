@@ -59,18 +59,24 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   }
   std::string numTabsModule = (boost::format("%d") % (moduleNameLength + 1)).str();
   std::string numWidth = (boost::format("%d") % (moduleNameLength + 1 + lengthOfRest)).str();
-  out << boost::format("%|" + numWidth + "T=|\n");
   boost::format outputheader("%s %|" + numTabsModule + "t|| %10s | %10s | %10s | %17s\n");
   boost::format output("%s %|" + numTabsModule + "t|| %10.0f | %10.0f | %10.2f | %7.2f +-%7.2f\n");
+
+  out << boost::format("%|" + numWidth + "T=|\n");
   out << outputheader % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
   out << boost::format("%|" + numWidth + "T=|\n");
 
   std::vector<ModuleStatistics> modulesSortedByIndex(*modules);
   sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
+
+  float maxcalls = 0;
   for (const ModuleStatistics & stats : modulesSortedByIndex) {
+    const float calls = stats.getCalls(mode);
+    if (calls > maxcalls)
+      maxcalls = calls;
     out << output
         % stats.getName()
-        % stats.getCalls(mode)
+        % calls
         % (stats.getMemorySum(mode) / 1024)
         % (stats.getTimeSum(mode) / Unit::s)
         % (stats.getTimeMean(mode) / Unit::ms)
@@ -80,7 +86,7 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   out << boost::format("%|" + numWidth + "T=|\n");
   out << output
       % "Total"
-      % global.getCalls(mode)
+      % maxcalls
       % (global.getMemorySum(mode) / 1024)
       % (global.getTimeSum(mode) / Unit::s)
       % (global.getTimeMean(mode) / Unit::ms)

@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_UTILITIES_CALCMEANCOV_H
-#define FRAMEWORK_UTILITIES_CALCMEANCOV_H
 
 #include <cmath>
 
@@ -260,4 +258,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // FRAMEWORK_UTILITIES_CALCMEANCOV_H

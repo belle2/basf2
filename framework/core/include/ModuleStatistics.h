@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_CORE_MODULESTATISTICS_H
-#define FRAMEWORK_CORE_MODULESTATISTICS_H
 
 #include <framework/utilities/CalcMeanCov.h>
 #include <string>
@@ -121,4 +119,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // FRAMEWORK_CORE_MODULESTATISTICS_H

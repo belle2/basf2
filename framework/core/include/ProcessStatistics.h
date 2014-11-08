@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_CORE_PROCESSSTATISTICS_H
-#define FRAMEWORK_CORE_PROCESSSTATISTICS_H
 
 #include <framework/core/ModuleStatistics.h>
 #include <framework/utilities/Utils.h>
@@ -217,4 +215,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // FRAMEWORK_CORE_PROCESSSTATISTICS_H

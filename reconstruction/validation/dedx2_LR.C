@@ -1,7 +1,8 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>cpulvermacher</contact>
+  <contact>christian.pulvermacher@kit.edu</contact>
+  <description>check PID performance of each particle vs. all others</description>
 </header>
 */
 

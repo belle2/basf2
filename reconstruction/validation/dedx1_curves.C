@@ -1,7 +1,8 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>cpulvermacher</contact>
+  <contact>christian.pulvermacher@kit.edu</contact>
+  <description>Plot dE/dx over momentum</description>
 </header>
 */
 

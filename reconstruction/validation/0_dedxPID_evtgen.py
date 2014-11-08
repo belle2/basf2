@@ -4,7 +4,8 @@
 """
 <header>
   <output>EvtGenSimRec_dedx.root</output>
-  <contact>cpulvermacher</contact>
+  <description>Generates dE/dx debug data (DedxTracks) for testing</description>
+  <contact>christian.pulvermacher@kit.edu</contact>
 </header>
 """
 

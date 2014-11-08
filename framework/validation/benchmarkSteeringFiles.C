@@ -1,3 +1,9 @@
+/*
+<header>
+<output></output>
+<contact>Christian Pulvermacher, christian.pulvermacher@kit.edu</contact>
+</header>
+*/
 #include <TTimeStamp.h>
 #include <TString.h>
 #include <TFile.h>

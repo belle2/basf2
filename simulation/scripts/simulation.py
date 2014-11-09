@@ -58,17 +58,6 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
             geometry.param('components', components)
         path.add_module(geometry)
 
-    # detector simulation
-    if not _has_module(path, 'FullSim'):
-        g4sim = register_module('FullSim')
-        path.add_module(g4sim)
-
-    check_simulation(path)
-
-    # no checks are performed for BeamBkgMixer and the Digitizers as they are
-    # not necessary for running simulation jobs and it should be possible to
-    # have them in the path more than once
-
     # background mixing
     if bkgfiles:
         bkgmixer = register_module('BeamBkgMixer')
@@ -79,6 +68,17 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
             if components:
                 bkgmixer.param('components', components)
         path.add_module(bkgmixer)
+
+    # detector simulation
+    if not _has_module(path, 'FullSim'):
+        g4sim = register_module('FullSim')
+        path.add_module(g4sim)
+
+    check_simulation(path)
+
+    # no checks are performed for BeamBkgMixer and the Digitizers as they are
+    # not necessary for running simulation jobs and it should be possible to
+    # have them in the path more than once
 
     # PXD digitization
     if components is None or 'PXD' in components:

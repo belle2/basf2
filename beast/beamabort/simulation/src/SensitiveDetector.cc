@@ -63,6 +63,11 @@ namespace Belle2 {
       registerMCParticleRelation(relMCSimHit);
     }
 
+    SensitiveDetector::~SensitiveDetector()
+    {
+
+    }
+
     bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
     {
       const G4StepPoint& preStep  = *step->GetPreStepPoint();

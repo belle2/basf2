@@ -6,7 +6,7 @@ import glob
 
 # ----------------------------------------------------------------------------------
 # This example is maybe useful for tuning ECL digitizer on pure BG.
-# If needed, ParticleGun and FullSim can be added in btw. Geometry and BeamBkgMixer
+# If needed, ParticleGun and FullSim can be added as marked below
 # ----------------------------------------------------------------------------------
 
 set_log_level(LogLevel.INFO)
@@ -46,7 +46,7 @@ main.add_module(gearbox)
 geometry = register_module('Geometry')
 main.add_module(geometry)
 
-# if needed, ParticleGun and FullSim must be added here
+# if needed, ParticleGun can be added here
 
 # Mix beam background with wide time window for ECL
 bkgmixer = register_module('BeamBkgMixer')
@@ -55,6 +55,8 @@ bkgmixer.param('components', ['ECL'])  # mix BG only for ECL
 bkgmixer.param('minTime', -4000)  # set time window start time [ns]
 bkgmixer.param('maxTime', 16000)  # set time window stop time [ns]
 main.add_module(bkgmixer)
+
+# with ParticleGun in the path, FullSim must be added here
 
 # ECL digitization
 ecl_digitizer = register_module('ECLDigitizer')

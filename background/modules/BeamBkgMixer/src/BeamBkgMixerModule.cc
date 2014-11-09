@@ -64,8 +64,6 @@ namespace Belle2 {
                    " simulation output directly (collision files) and not ROF files. "
                    "Each background event is shifted in time randomly within "
                    "a time window specified with minTime and maxTime.");
-    // set property flags
-    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("backgroundFiles", m_backgroundFiles,

@@ -63,8 +63,6 @@ namespace Belle2 {
                    "has entries. Return value can be used to discard empty "
                    "events at output.");
 
-    setPropertyFlags(c_ParallelProcessingCertified);
-
     // Add parameters
     addParam("backgroundType", m_backgroundType,
              "one of: " + m_bgTypes.getBGTypes());

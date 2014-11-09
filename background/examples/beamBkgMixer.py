@@ -10,6 +10,8 @@ import glob
 # For simplicity no particle generator and/or geant simulation is included,
 # digitization and event reconstruction is also not done. The output root file
 # will contain SimHits from BG.
+#
+# Note: in multiprocessing mode put BG mixer in the path first then FullSim
 # ----------------------------------------------------------------------------------
 
 set_log_level(LogLevel.INFO)
@@ -49,7 +51,7 @@ main.add_module(gearbox)
 geometry = register_module('Geometry')
 main.add_module(geometry)
 
-# particle generator and FullSim module go here
+# particle generator can be put here
 
 # Mix beam background
 bkgmixer = register_module('BeamBkgMixer')
@@ -62,7 +64,7 @@ bkgmixer.param('scaleFactors', [('Coulomb_LER', 1.05), ('Coulomb_HER', 1.08),
                # scale rates of some backgrounds
 main.add_module(bkgmixer)
 
-# digitizers, clusterizers and reconstruction modules go here
+# FullSim, digitizers, clusterizers and reconstruction modules can be put here
 
 # Output
 output = register_module('RootOutput')

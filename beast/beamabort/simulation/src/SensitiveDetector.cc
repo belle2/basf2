@@ -26,6 +26,26 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("BeamabortSensitiveDetector", Const::invalidDetector)
     {
+      m_simhitNumber = 0;
+      m_hitNum = 0;
+      m_EvnetNumber = 0;
+      m_oldEvnetNumber = 0;
+      m_trackID = 0;
+      m_startTime = 0;
+      m_endTime = 0;
+      m_WightedTime = 0;
+      m_startEnergy = 0;
+      m_energyDeposit = 0;
+      m_trackLength = 0;
+      iECLCell = 0;
+      TimeIndex = 0;
+      local_pos = 0;
+      T_ave = 0;
+      firstcall = 0;
+      m_phiID = 0;
+      m_thetaID = 0;
+      m_cellID = 0;
+
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
       StoreArray<BeamabortSimHit>  simHits;

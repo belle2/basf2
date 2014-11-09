@@ -14,7 +14,7 @@
   <xi:include href="../../geometry/BasicMaterials.xml"/> 
 
   <!-- include the beast Materials and detector component -->
-  <xi:include href="SRSENSOR-Material.xml"/>
+  <xi:include href="SRSENSOR-Materials.xml"/>
   <xi:include href="SDD.xml"/>
   <xi:include href="FEI4.xml"/> 
 </Detector>

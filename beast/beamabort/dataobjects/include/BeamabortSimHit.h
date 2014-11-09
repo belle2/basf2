@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter, Igal Jaegle                               *
- *               Alexandre Beaulieu                                       *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 

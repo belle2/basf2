@@ -51,7 +51,6 @@ namespace Belle2 {
   {
     // set module description
     setDescription("Writes ntuple of TOPLikelihoods with tracking info into a root file");
-    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("outputFileName", m_outputFileName, "Output file name",

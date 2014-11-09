@@ -431,6 +431,14 @@ namespace Belle2 {
       polygon2.push_back(G4TwoVector(ZBackward + PlateThickness,
                                      downside - LowerGap));
 
+      /*
+      cout<<"Inner QBB"<<endl;
+      for(const auto& point: polygon2){
+      cout<<point.x()<<" "<<point.y()<<endl;
+      }
+      cout<<endl;
+      */
+
       G4ExtrudedSolid* airShape = new  G4ExtrudedSolid("air", polygon2, side + SideGap, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
 
       /*! Read support and fill materials */

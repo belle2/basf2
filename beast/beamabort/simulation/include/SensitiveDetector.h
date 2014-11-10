@@ -44,8 +44,8 @@ namespace Belle2 {
     private:
 
       /** members of  SensitiveDetector  */
-      G4double m_thresholdEnergyDeposit;/** Energy Deposit  threshold  */
-      G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
+      //G4double m_thresholdEnergyDeposit;/** Energy Deposit  threshold  */
+      //G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
       int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore ECLSimHit. */
       int m_hitNum;                     /** The current number of created hits in an event. Used to fill the DataStore ECLHit.*/
       int m_EvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array. */
@@ -62,7 +62,7 @@ namespace Belle2 {
       double m_energyDeposit;     /** energy deposited in volume */
       double m_trackLength;       /** length of the track in the volume */
 
-      int ECLHitIndex[8736][80]; /** Hit index of StoreArray */
+      //int ECLHitIndex[8736][80]; /** Hit index of StoreArray */
       int iECLCell;              /** Hit Energy of StoreArray */
       int TimeIndex;             /** Hit Time of StoreArray */
       TVector3 PosCell;          /** center of crystal position */

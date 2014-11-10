@@ -24,6 +24,9 @@ geometry.param('Components', [
     'CAVE',
     'PINDIODE',
     'PH1BPIPE',
+    'CSI',
+    'BEAMABORT',
+    'PH1SUSTR',
     ])
 
 geometry.set_log_level(LogLevel.INFO)

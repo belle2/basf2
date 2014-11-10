@@ -85,6 +85,7 @@ FullSimModule::FullSimModule() : Module(), m_visManager(nullptr), m_useNativeGea
   addParam("SecondariesEnergyCut", m_energyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
   addParam("magneticField", m_magneticField, "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge", string("default"));
   addParam("magneticCacheDistance", m_magneticCacheDistance, "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching", 0.0);
+  addParam("deltaChordInMagneticField", m_deltaChordInMagneticField, "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
 
   vector<string> defaultCommands;
   addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.", defaultCommands);
@@ -137,6 +138,7 @@ void FullSimModule::initialize()
     G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
     fieldManager->SetDetectorField(magneticField);
     if (m_magneticField != "default") {
+
       //We only use Magnetic field so let's try the specialized steppers
       G4Mag_UsualEqRhs* pMagFldEquation = new G4Mag_UsualEqRhs(magneticField);
       G4MagIntegratorStepper* stepper(0);
@@ -149,14 +151,21 @@ void FullSimModule::initialize()
       } else {
         B2FATAL("Unknown magnetic field option: " << m_magneticField);
       }
-      //Set a minimum stepsize: The chordfinder should not attempt to limit
-      //the stepsize to something less than 10µm (which is the default
-      //value of Geant4
-      G4ChordFinder* chordfinder = new G4ChordFinder(magneticField, 1e-2 * mm, stepper);
-      fieldManager->SetChordFinder(chordfinder);
+
+      //Set a minimum stepsize (stepMinimum): The chordfinder should not attempt to limit
+      //the stepsize to something less than 10µm (which is the default value of Geant4).
+      G4ChordFinder* chordFinder = new G4ChordFinder(magneticField, 1e-2 * mm, stepper);
+      fieldManager->SetChordFinder(chordFinder);
     } else {
       fieldManager->CreateChordFinder(magneticField);
     }
+
+    //Change DeltaCord (the max. miss-distance between the trajectory curve and its linear chord(s) approximation, if asked.
+    G4ChordFinder* chordFinder = fieldManager->GetChordFinder();
+    B2INFO("Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
+    chordFinder->SetDeltaChord(m_deltaChordInMagneticField * mm);
+    B2INFO("DeltaChord after reset = " << chordFinder->GetDeltaChord());
+
     //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)
   }
 

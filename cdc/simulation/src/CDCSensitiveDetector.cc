@@ -62,19 +62,21 @@ namespace Belle2 {
 
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
     gd.append("/SensitiveDetector");
-    m_thresholdEnergyDeposit =  Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "eV");
-    m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV
+    //    m_thresholdEnergyDeposit =  Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "eV");
+    m_thresholdEnergyDeposit = gd.getWithUnit("EnergyDepositionThreshold");
+    m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
+    B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
-    //    B2INFO("Threshold energy " << m_thresholdEnergyDeposit);
 
     //Now sag must be always off since sag is taken into account in Digitizer, not in FullSim.
     //    m_wireSag = gd.getBool("WireSag");
     m_wireSag = false;
-    B2INFO("Sense wire sag in CDCSensitiveDetector on(=1)/off(=0): " << m_wireSag);
+    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
 
-    m_minTrackLength = gd.getDouble("MinTrackLength");
-    B2INFO("MinTrackLength in CDCSensitiveDetector:" << m_minTrackLength);
-
+    //    m_minTrackLength = gd.getDouble("MinTrackLength");
+    m_minTrackLength = gd.getWithUnit("MinTrackLength");
+    m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
+    B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
   }
 
   void CDCSensitiveDetector::Initialize(G4HCofThisEvent*)

@@ -6,6 +6,19 @@
 namespace Belle2 {
 
   class ECLFEEController : public FEEController {
+    class Reg {
+    public:
+      Reg() {}
+      Reg(int adr, int val, const char* name) {
+        this->adr = adr;
+        this->val = val;
+        this->name = name;
+      }
+    public:
+      int adr;
+      int val;
+      std::string name;
+    };
 
   public:
     ECLFEEController();

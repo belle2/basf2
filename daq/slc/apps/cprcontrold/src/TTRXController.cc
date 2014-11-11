@@ -35,6 +35,7 @@ bool TTRXController::boot(const std::string& file) throw()
       return false;
     }
     readregs_4r19(m_ttrx, &m_info);
+    write_ttrx(m_ttrx, 0x130, 0x3);
     return true;
   }
   return false;

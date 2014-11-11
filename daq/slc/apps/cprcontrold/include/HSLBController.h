@@ -33,6 +33,7 @@ namespace Belle2 {
       return m_hslb;
     }
     int fd() const throw() { return m_hslb.fd; }
+    int get_finid() const throw() { return m_hslb.fin; }
     operator int() const throw() { return m_hslb.fd; }
     int readfn(int adr) throw();
     int writefn(int adr, int val) throw();

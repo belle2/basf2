@@ -90,7 +90,7 @@ bool HSLBController::boot(const std::string& runtype,
       LogFile::debug(cmd);
       std::string ret = perform(cmd);
       LogFile::debug(ret);
-      if (ret.find("FEE") != std::string::npos) break;
+      if (ret.find("no response") == std::string::npos) break;
       cmd = StringUtil::form("reghs -%c 82 1000", (char)('a' + m_hslb.fin));
       LogFile::debug(cmd);
       system(cmd.c_str());

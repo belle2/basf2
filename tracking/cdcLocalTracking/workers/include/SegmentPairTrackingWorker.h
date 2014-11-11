@@ -73,6 +73,15 @@ namespace Belle2 {
       inline void apply(const std::vector< CDCRecoSegment2D >& segments,
                         StoreArray < genfit::TrackCand >& storedGFTrackCands) {
 
+        // Regenerate the do not use flag for the cellular automaton
+        for (const CDCRecoSegment2D & segment : segments) {
+          for (const CDCRecoHit2D & recoHit2D : segment) {
+            const CDCWireHit& wireHit = recoHit2D.getWireHit();
+            wireHit.getAutomatonCell().unsetDoNotUseFlag();
+          }
+        }
+
+
         //create the segment pairs
         B2DEBUG(100, "Combining CDCReco2DSegments to CDCAxialStereoSegmentPairs");
         m_axialStereoSegmentPairs.clear();
@@ -111,6 +120,13 @@ namespace Belle2 {
         copyToDataStoreForDebug();
 
 
+
+        // Check that tracks are disjoint
+        if (not areTracksDisjoint(m_tracks)) {
+          B2WARNING("Tracks are not disjoint.");
+        }
+
+
       }
 
 
@@ -118,6 +134,37 @@ namespace Belle2 {
 
 
     private:
+      /// Checks if any two of the given tracks have common hist
+      bool areTracksDisjoint(const std::vector<CDCTrack>& tracks) {
+        bool result = true;
+        // Prepare
+        for (const CDCTrack & track : tracks) {
+          for (const CDCRecoHit3D & recoHit3D : track) {
+            const CDCWireHit& wireHit = recoHit3D.getWireHit();
+            wireHit.getAutomatonCell().setCellState(-1.0);
+          }
+        }
+
+        int iTrack = -1;
+        for (const CDCTrack & track : tracks) {
+          iTrack++;
+
+          for (const CDCRecoHit3D & recoHit3D : track) {
+            const CDCWireHit& wireHit = recoHit3D.getWireHit();
+            const AutomatonCell& automatonCell = wireHit.getAutomatonCell();
+            CellState cellState = automatonCell.getCellState();
+            if (cellState == -1.0) {
+              automatonCell.setCellState(iTrack);
+            } else {
+              result = false;
+            }
+          }
+        }
+
+        return result;
+
+      }
+
       /// Helper function to copy intermediate objects to the data store for analysis from python.
       void copyToDataStoreForDebug() const {
 

@@ -103,20 +103,17 @@ namespace Belle2 {
       void clearTrajectories() const
       { clearTrajectorySZ(); CDCAxialAxialSegmentPair::clearTrajectory2D(); }
 
-      /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
-      void setDoNotUse() const {
+      /// Sets the do not use flag of the segment triple's automaton cell. Also forward the do not use flag to the contained segments and the contained wire hits.
+      void setAndForwardDoNotUseFlag() const {
         getAutomatonCell().setDoNotUseFlag();
-        forwardDoNotUse();
-      }
-
-      /// Sets the do not use flag of the three contained segments
-      void forwardDoNotUse() const {
-        CDCAxialAxialSegmentPair::forwardDoNotUse();
-        getMiddle()->getAutomatonCell().setDoNotUseFlag();
+        CDCAxialAxialSegmentPair::setAndForwardDoNotUseFlag();
+        getMiddle()->setAndForwardDoNotUseFlag();
       }
 
       /// If one of the contained segments is marked as do not use this segment triple is set be not usable as well - returns an indicator, if this cell is not usable anymore.
       void receiveDoNotUse() const {
+        CDCAxialAxialSegmentPair::receiveDoNotUseFlag();
+        getMiddle()->receiveDoNotUseFlag();
 
         if (getStart()->getAutomatonCell().hasDoNotUseFlag() or
             getMiddle()->getAutomatonCell().hasDoNotUseFlag() or

@@ -65,6 +65,14 @@ namespace Belle2 {
       inline void apply(const std::vector< CDCRecoSegment2D >& recoSegments,
                         StoreArray < genfit::TrackCand >& storedGFTrackCands) {
 
+        // Regenerate the do not use flag for the cellular automaton
+        for (const CDCRecoSegment2D & segment : recoSegments) {
+          for (const CDCRecoHit2D & recoHit2D : segment) {
+            const CDCWireHit& wireHit = recoHit2D.getWireHit();
+            wireHit.getAutomatonCell().unsetDoNotUseFlag();
+          }
+        }
+
         //create the segment triples
         B2DEBUG(100, "Combining CDCReco2DSegments to CDCSegmentTriples");
         m_segmentTriples.clear();

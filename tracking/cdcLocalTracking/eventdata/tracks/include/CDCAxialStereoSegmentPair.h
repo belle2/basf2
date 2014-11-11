@@ -208,19 +208,17 @@ namespace Belle2 {
       { getTrajectory3D().clear(); }
 
       /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
-      void setDoNotUse() const {
+      void setAndForwardDoNotUseFlag() const {
         getAutomatonCell().setDoNotUseFlag();
-        forwardDoNotUse();
-      }
-
-      /// Sets the do not use flag of the three contained segments
-      void forwardDoNotUse() const {
-        getStartSegment()->getAutomatonCell().setDoNotUseFlag();
-        getEndSegment()->getAutomatonCell().setDoNotUseFlag();
+        getStartSegment()->setAndForwardDoNotUseFlag();
+        getEndSegment()->setAndForwardDoNotUseFlag();
       }
 
       /// If one of the contained segments is marked as do not use this segment triple is set be not usable as well
-      void receiveDoNotUse() const {
+      void receiveDoNotUseFlag() const {
+        getStartSegment()->receiveDoNotUseFlag();
+        getEndSegment()->receiveDoNotUseFlag();
+
         if (getStartSegment()->getAutomatonCell().hasDoNotUseFlag() or
             getEndSegment()->getAutomatonCell().hasDoNotUseFlag()) {
           getAutomatonCell().setDoNotUseFlag();

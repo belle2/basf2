@@ -113,6 +113,31 @@ namespace Belle2 {
       /// Constant getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
+      /// Set the do not use flag of the automaton cell of this segment and forward the do not use flag to all contained wire hits.
+      void setAndForwardDoNotUseFlag() const {
+        getAutomatonCell().setDoNotUseFlag();
+        for (const CDCRecoHit2D & recoHit2D : *this) {
+          const CDCWireHit& wireHit = recoHit2D.getWireHit();
+
+          wireHit.getAutomatonCell().setDoNotUseFlag();
+
+        }
+      }
+
+      /// Check all contained wire hits if one has the do not use flag. Set the do not use flag of this segment in case at least one of the contained wire hits is flagged as do not use.
+      void receiveDoNotUseFlag() const {
+        for (const CDCRecoHit2D & recoHit2D : *this) {
+          const CDCWireHit& wireHit = recoHit2D.getWireHit();
+
+          if (wireHit.getAutomatonCell().hasDoNotUseFlag()) {
+            getAutomatonCell().setDoNotUseFlag();
+            return;
+          }
+
+        }
+
+      }
+
       /// Getter for the two dimensional trajectory fitted to the segment
       CDCTrajectory2D& getTrajectory2D() const
       { return m_trajectory2D; }

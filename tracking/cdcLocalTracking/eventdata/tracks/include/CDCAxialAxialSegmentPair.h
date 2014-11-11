@@ -58,8 +58,6 @@ namespace Belle2 {
       friend bool operator<(const CDCAxialRecoSegment2D* axialSegment, CDCAxialAxialSegmentPair const& segmentTriple)
       { return axialSegment < segmentTriple.getStart(); }
 
-
-
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
@@ -111,23 +109,20 @@ namespace Belle2 {
       void clearTrajectory2D() const
       { getTrajectory2D().clear(); }
 
-      /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
-      void setDoNotUse() const {
+      /// Sets the do not use flag of the segment pair's automaton cell. Also forward the don not use flag to the contained segments and the contained wire hits.
+      void setAndForwardDoNotUseFlag() const {
         getAutomatonCell().setDoNotUseFlag();
-        forwardDoNotUse();
-      }
-
-      /// Sets the do not use flag of the three contained segments
-      void forwardDoNotUse() const {
-        getStart()->getAutomatonCell().setDoNotUseFlag();
-        getEnd()->getAutomatonCell().setDoNotUseFlag();
+        getStart()->setAndForwardDoNotUseFlag();
+        getEnd()->setAndForwardDoNotUseFlag();
       }
 
       /// If one of the contained segments is marked as do not use this segment triple is set be not usable as well
-      void receiveDoNotUse() const {
+      void receiveDoNotUseFlag() const {
+        getStart()->receiveDoNotUseFlag();
+        getEnd()->receiveDoNotUseFlag();
+
         if (getStart()->getAutomatonCell().hasDoNotUseFlag() or
             getEnd()->getAutomatonCell().hasDoNotUseFlag()) {
-
           getAutomatonCell().setDoNotUseFlag();
         }
 

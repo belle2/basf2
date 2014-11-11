@@ -158,20 +158,15 @@ namespace Belle2 {
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;
 
       /// Sets the do not use flag of the facet's automaton cell and of the three contained wire hits
-      void setDoNotUse() const {
+      void setAndForwardDoNotUseFlag() const {
         getAutomatonCell().setDoNotUseFlag();
-        forwardDoNotUse();
-      }
-
-      /// Sets the do not use flag of the three contained wire hits
-      void forwardDoNotUse() const {
         getStartWireHit().getAutomatonCell().setDoNotUseFlag();
         getMiddleWireHit().getAutomatonCell().setDoNotUseFlag();
         getEndWireHit().getAutomatonCell().setDoNotUseFlag();
       }
 
       /// If one of the contained wire hits is marked as do not use this facet is set be not usable as well
-      void receiveDoNotUse() const {
+      void receiveDoNotUseFlag() const {
 
         if (getStartWireHit().getAutomatonCell().hasDoNotUseFlag() or
             getMiddleWireHit().getAutomatonCell().hasDoNotUseFlag() or

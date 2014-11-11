@@ -76,12 +76,12 @@ namespace Belle2 {
 
             //Block the used items
             for (const Item * item : newPath) {
-              item->setDoNotUse();
+              item->setAndForwardDoNotUseFlag();
             }
 
             //Block the items that have already used components
             for (const Item & item : itemRange) {
-              item.receiveDoNotUse();
+              item.receiveDoNotUseFlag();
             }
 
             paths.push_back(std::move(newPath));

@@ -82,9 +82,10 @@ class ChDirContext(object):
 
 
 def vector_iterator(v):
-    """Returns an iterator over and std::vector like structure that supports .size() and.at(i)
+    """Returns an iterator over an std::vector like structure that supports .size() and.at(i)
 
-    Use like:
+    Example
+    -------
     for item in vector_iterator(container):
         print item
 
@@ -94,11 +95,27 @@ def vector_iterator(v):
 
 
 def is_iterable_collection(obj):
+    """Test if the object is an iterable collection..
+
+    Targets the duck typing of container types.
+    Stings are not considered iterable by this definition.
+    
+    Parameters
+    ----------
+    obj : any type
+        Object to be checked.
+    """
+
     return isinstance(obj, collections.Iterable)
 
 
 def is_primary(mcParticle):
-    """Indicates if the given MCParticle is primary."""
+    """Indicates if the given MCParticle is primary.
+    
+    Parameters
+    ----------
+    mcParticle : Belle2.MCParticle
+        MCParticle to be checked"""
 
     return mcParticle.hasStatus(1)
 

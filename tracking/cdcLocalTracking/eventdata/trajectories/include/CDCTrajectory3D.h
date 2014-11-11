@@ -20,6 +20,8 @@
 #include <tracking/cdcLocalTracking/geometry/Vector3D.h>
 //#include <tracking/cdcLocalTracking/geometry/BoundSkewLine.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+
 #include <tracking/cdcLocalTracking/geometry/UncertainHelix.h>
 
 #include <tracking/cdcLocalTracking/topology/ISuperLayerType.h>
@@ -61,6 +63,9 @@ namespace Belle2 {
                       const Vector3D& startMomentum,
                       const FloatType& charge);
 
+      /// Construct a trajectory from the MCParticles vertex and momentum.
+      CDCTrajectory3D(const MCParticle& mcParticle);
+
       /// Construct a three dimensional trajectory from a two dimensional circular trajectory and sz linear trajectory
       CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
                       const CDCTrajectorySZ& trajectorySZ);
@@ -100,7 +105,6 @@ namespace Belle2 {
       /// Getter for the signed impact parameter of the trajectory
       FloatType getGlobalImpact() const
       { return  getGlobalCircle().impact(); }
-
 
 
     public:

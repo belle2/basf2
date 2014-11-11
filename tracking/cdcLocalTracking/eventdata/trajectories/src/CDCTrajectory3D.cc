@@ -39,6 +39,19 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
 
 
 
+CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle) :
+  CDCTrajectory3D(mcParticle.getProductionVertex(),
+                  mcParticle.getMomentum(),
+                  mcParticle.getCharge())
+{
+
+
+
+
+}
+
+
+
 CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
                                  const CDCTrajectorySZ& trajectorySZ) :
   m_localOrigin(trajectory2D.getLocalOrigin()),
@@ -59,6 +72,7 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
                                 mom3D.cotTheta(),
                                 0.0);
 }
+
 
 
 void CDCTrajectory3D::fillInto(genfit::TrackCand& trackCand) const

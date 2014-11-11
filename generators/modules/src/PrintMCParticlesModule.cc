@@ -9,13 +9,8 @@
  **************************************************************************/
 
 #include <generators/modules/PrintMCParticlesModule.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include <TDatabasePDG.h>
 
@@ -34,10 +29,10 @@ REG_MODULE(PrintMCParticles)
 PrintMCParticlesModule::PrintMCParticlesModule() : Module()
 {
   //Set module properties
-  setDescription("Print an MCParticle Collection");
+  setDescription("Print an MCParticle List");
 
   //Parameter definition
-  addParam("collectionName", m_particleList, "Collection to print", string(""));
+  addParam("storeName", m_particleList, "Name of the StoreArray to print", string(""));
   addParam("onlyPrimaries", m_onlyPrimaries, "Show only primary particles", true);
   addParam("maxLevel", m_maxLevel, "Show only up to specified depth level, -1 means no limit", -1);
 }
@@ -45,12 +40,13 @@ PrintMCParticlesModule::PrintMCParticlesModule() : Module()
 
 void PrintMCParticlesModule::event()
 {
+  m_mcparticles.required(m_particleList);
   StoreArray<MCParticle> MCParticles(m_particleList);
   m_seen.clear();
   m_seen.resize(MCParticles.getEntries() + 1, false);
-  B2INFO("Content from MCParticle Collection '" + m_particleList + "':");
+  B2INFO("Content from MCParticle list '" + m_mcparticles.getName() + "':");
 
-  //Loop over the primary particles (no mother particle exists)
+  //Loop over the top level particles (no mother particle exists)
   for (int i = 0; i < MCParticles.getEntries(); i++) {
     MCParticle& mc = *MCParticles[i];
     if (mc.getMother() != NULL) continue;
@@ -67,7 +63,7 @@ void PrintMCParticlesModule::printTree(const MCParticle& mc, int level)
   if (m_maxLevel >= 0 && level > m_maxLevel) return;
   ++level;
   string indent = "";
-  for (int i = 0; i < 2 * level; i++) indent += " ";
+  for (int i = 0; i < level; i++) indent += "  ";
   TDatabasePDG* pdb = TDatabasePDG::Instance();
   TParticlePDG* pdef = pdb->GetParticle(mc.getPDG());
   string name = pdef ? (string(" (") + pdef->GetTitle() + ")") : "";
@@ -89,7 +85,7 @@ void PrintMCParticlesModule::printTree(const MCParticle& mc, int level)
         );
 
   const vector<MCParticle*> daughters = mc.getDaughters();
-  BOOST_FOREACH(MCParticle * daughter, daughters) {
+  for (MCParticle * daughter : daughters) {
     printTree(*daughter, level);
   }
   m_seen[mc.getIndex()] = true;

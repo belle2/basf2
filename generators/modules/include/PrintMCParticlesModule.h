@@ -12,6 +12,8 @@
 #define PRINTMCPARTICLESMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
 #include <vector>
@@ -53,6 +55,7 @@ namespace Belle2 {
     std::vector<bool> m_seen;   /**< Tag the particles which were already visited using their index. */
     bool m_onlyPrimaries;       /**< Print only primary particles. */
     int m_maxLevel;             /**< Show only up to specified depth level. */
+    StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
   };
 
 } // end namespace Belle2

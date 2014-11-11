@@ -16,6 +16,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <TVector3.h>
 #include <vector>
+#include <algorithm>
 
 namespace Belle2 {
   /** Class VXDSimHit - Geant4 simulated hit for the VXD.
@@ -38,8 +39,8 @@ namespace Belle2 {
      */
     VXDSimHit(VxdID sensorID, int pdg, float globalTime, const float* posIn, const float* posOut):
       SimHitBase(), m_pdg(pdg), m_globalTime(globalTime), m_sensorID(sensorID) {
-      std::copy(posIn, posIn + 3, m_posIn);
-      std::copy(posOut, posOut + 3, m_posOut);
+      std::copy_n(posIn, 3, m_posIn);
+      std::copy_n(posOut, 3, m_posOut);
     }
 
     /** Set energy deposition profile

@@ -15,6 +15,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
+#include <algorithm>
 
 namespace Belle2 {
   /**
@@ -55,12 +56,12 @@ namespace Belle2 {
       VxdID sensorID, float* posEntry, float* posMidPoint, float* posExit,
       float* momEntry, float* momMidPoint, float* momExit, float energyDep, float globalTime):
       RelationsObject(), m_sensorID(sensorID), m_energyDep(energyDep), m_globalTime(globalTime) {
-      std::copy(posEntry, posEntry + 3, m_positionEntry);
-      std::copy(posMidPoint, posMidPoint + 3, m_positionMidPoint);
-      std::copy(posExit, posExit + 3, m_positionExit);
-      std::copy(momEntry, momEntry + 3, m_momentumEntry);
-      std::copy(momMidPoint, momMidPoint + 3, m_momentumMidPoint);
-      std::copy(momExit, momExit + 3, m_momentumExit);
+      std::copy_n(posEntry, 3, m_positionEntry);
+      std::copy_n(posMidPoint, 3, m_positionMidPoint);
+      std::copy_n(posExit, 3, m_positionExit);
+      std::copy_n(momEntry, 3, m_momentumEntry);
+      std::copy_n(momMidPoint, 3, m_momentumMidPoint);
+      std::copy_n(momExit, 3, m_momentumExit);
     }
 
     /** Return the Sensor ID. */

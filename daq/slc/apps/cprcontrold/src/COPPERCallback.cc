@@ -271,7 +271,8 @@ bool COPPERCallback::abort() throw()
 
 bool COPPERCallback::bootBasf2() throw()
 {
-  if (m_con.isAlive()) return true;
+  //if (m_con.isAlive()) return true;
+  system("killall -9 basf2");
   int flag = 0;
   for (size_t i = 0; i < 4; i++) {
     if (m_config.useHSLB(i)) flag += 1 << i;

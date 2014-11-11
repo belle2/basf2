@@ -51,6 +51,52 @@ def main():
     print basf2.statistics
 
 
+# Default settings and shorthand names for generator with specific settings #
+#############################################################################
+
+## PDG code of an electorn
+electron_pdg_code = 11
+
+## PDG code of a muon
+muon_pdg_code = 13
+
+## PDG code of a tau
+tau_pdg_code = 15
+
+## Default parameters of the generator modules hashed by their respective module name
+default_generator_params_by_generator_name = {
+    'simple_gun': {
+        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
+        'nTracks': 10,
+        'varyNTracks': False,
+        'momentumGeneration': 'uniform',
+        'momentumParams': [0.6, 1.4],
+        'thetaGeneration': 'uniform',
+        'thetaParams': [17., 150.],
+        },
+    'gun': {
+        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
+        'nTracks': 10,
+        'varyNTracks': False,
+        'momentumGeneration': 'uniform',
+        'thetaGeneration': 'uniform',
+        'thetaParams': [17., 150.],
+        },
+    'cosmics': {},
+    'ParticleGun': {},
+    'EvtGenInput': {},
+    }
+
+## Generator module names hashed by shorthand menomics. Includes None as a special value for background only simulation
+generator_module_names_by_short_name = {  # Background only generator
+    'gun': 'ParticleGun',
+    'simple_gun': 'ParticleGun',
+    'generic': 'EvtGenInput',
+    'cosmics': 'Cosmics',
+    'bkg': None,
+    }
+
+
 #### Helper functions to setup a command line tool executing basf2 that includes simulation of events or loading of presimulated events.
 
 def create_argument_parser(allow_file_input=True, **kwds):
@@ -229,46 +275,6 @@ def create_simulate_events_path(
 
 
 #### Methodes and logic to compose a BASF2 module execution path to generate and simulate events or load them from an input file.
-
-## PDG code of an electorn
-electron_pdg_code = 11
-
-## PDG code of a muon
-muon_pdg_code = 13
-
-## PDG code of a tau
-tau_pdg_code = 15
-
-## Default parameters of the generator modules hashed by their respective module name
-default_generator_params_by_generator_name = {
-    'simple_gun': {
-        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
-        'nTracks': 10,
-        'varyNTracks': False,
-        'momentumGeneration': 'uniform',
-        'momentumParams': [0.6, 1.4],
-        'thetaGeneration': 'uniform',
-        'thetaParams': [17., 150.],
-        },
-    'gun': {
-        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
-        'nTracks': 10,
-        'varyNTracks': False,
-        'momentumGeneration': 'uniform',
-        'thetaGeneration': 'uniform',
-        'thetaParams': [17., 150.],
-        },
-    'ParticleGun': {},
-    'EvtGenInput': {},
-    }
-
-## Generator module names hashed by shorthand menomics. Includes None as a special value for background only simulation
-generator_module_names_by_short_name = {  # Background only generator
-    'gun': 'ParticleGun',
-    'simple_gun': 'ParticleGun',
-    'generic': 'EvtGenInput',
-    'bkg': None,
-    }
 
 ## Names of module names and short names of the generators usable in this script.
 valid_generator_names = list(generator_module_names_by_short_name.keys()) \
@@ -476,8 +482,7 @@ def add_generator(path, generator_name='gun', generator_params={}):
 
         generator_params = update_default_generator_params(generator_name,
                 generator_params)
-        print generator_params
-        raw_input()
+        print 'Setting up generator with parameters', generator_params
 
         generator_module.param(generator_params)
 

@@ -79,24 +79,31 @@ bool HSLBController::monitor() throw()
 bool HSLBController::boot(const std::string& runtype,
                           const std::string& firmware) throw()
 {
-  if (m_hslb.fd <= 0) return true;
+  //if (m_hslb.fd <= 0) return true;
   if (firmware.size() > 0 && File::exist(firmware)) {
     std::string cmd = StringUtil::form("booths -%c %s", (char)('a' + m_hslb.fin),
                                        firmware.c_str());
     LogFile::debug(cmd);
     system(cmd.c_str());
+    std::string FEE("FEE");
+    int ntry = 0;
     while (true) {
       cmd = StringUtil::form("reghs -%c checkfee", (char)('a' + m_hslb.fin));
       LogFile::debug(cmd);
       std::string ret = perform(cmd);
       LogFile::debug(ret);
-      if (ret.find("no response") == std::string::npos) break;
+      if (ret.compare(0, FEE.size(), FEE) == 0) break;
       cmd = StringUtil::form("reghs -%c 82 1000", (char)('a' + m_hslb.fin));
       LogFile::debug(cmd);
       system(cmd.c_str());
-      cmd = StringUtil::form("reghs -%c 82 1000", (char)('a' + m_hslb.fin));
+      cmd = StringUtil::form("reghs -%c 82 10", (char)('a' + m_hslb.fin));
       LogFile::debug(cmd);
       system(cmd.c_str());
+      ntry++;
+      if (ntry > 5) {
+        LogFile::error("Can not establich b2link at HSLB %c", (char)('a' + m_hslb.fin));
+        return false;
+      }
       usleep(10);
     }
     if (runtype.find("dumhslb") != std::string::npos) {

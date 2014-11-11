@@ -222,28 +222,31 @@ bool COPPERCallback::recover() throw()
 {
   if (!m_ttrx.isOpened()) {
     m_ttrx.open();
-    m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
   }
+  m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
   for (int i = 0; i < 4; i++) {
     if (m_config.useHSLB(i)) {
       m_hslb[i].open(i);
-      m_hslb[i].load();
-      if (m_fee[i] != NULL) {
-        m_fee[i]->load(m_hslb[i], m_config.getFEE(i));
-      }
+      //if (!m_hslb[i].load()) {
+      //  return false;
+      //}
+      //if (m_fee[i] != NULL) {
+      //  m_fee[i]->load(m_hslb[i], m_config.getFEE(i));
+      //}
     }
   }
-  if (m_ttrx.isError()) {
-    m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
-  }
+  //if (m_ttrx.isError()) {
+  //  m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
+  //}
   if (m_hslb_firm != m_config.getSetup().getHSLBFirmware()) {
     m_force_boothslb = true;
     m_hslb_firm = m_config.getSetup().getHSLBFirmware();
   }
   for (int i = 0; i < 4; i++) {
-    if (m_config.useHSLB(i) && (m_force_boothslb || m_hslb[i].isError())) {
-      m_hslb[i].boot(m_config.getSetup().getRunType(),
-                     m_config.getSetup().getHSLBFirmware());
+    if (m_config.useHSLB(i)) { // && (m_force_boothslb || m_hslb[i].isError())) {
+      if (!m_hslb[i].boot(m_config.getSetup().getRunType(),
+                          m_config.getSetup().getHSLBFirmware()))
+        return false;
       m_hslb[i].load();
       if (m_fee[i] != NULL) {
         m_fee[i]->load(m_hslb[i], m_config.getFEE(i));

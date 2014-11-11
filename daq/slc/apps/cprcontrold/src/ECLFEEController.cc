@@ -9,6 +9,7 @@
 
 #include <unistd.h>
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
 
 using namespace Belle2;

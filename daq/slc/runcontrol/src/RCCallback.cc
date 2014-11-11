@@ -133,6 +133,9 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
         writer.writeInt(msg.getParam(3));
         TCPSocketReader reader(socket);
         m_config.getObject().readObject(reader);
+        LogFile::info("Loaded from DB %s:%s",
+                      m_config.getObject().getNode().c_str(),
+                      m_config.getObject().getName().c_str());
       } catch (const IOException& e) {
         LogFile::error(e.what());
         socket.close();
@@ -179,6 +182,7 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
   } else if (msg.getParam(0) == NSMCommand::DBSET.getId()) {
     if (msg.getLength() > 0) {
       msg.getData(m_config.getObject());
+      LogFile::info("Loaded from DB %s:%s", m_config.getObject().getNode().c_str(), m_config.getObject().getName().c_str());
     } else {
       setReply("No DB objects were given");
       LogFile::error("No DB objects were given");

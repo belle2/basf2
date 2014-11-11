@@ -39,8 +39,8 @@ void ROCallback::init() throw()
     m_con.push_back(ProcessController(this));
     m_flow.push_back(FlowMonitor());
   }
-  m_flow[0].open(&m_con[0].getInfo());
   m_con[0].init("recvStream1", 1);
+  m_flow[0].open(&m_con[0].getInfo());
   for (size_t i = 1; i < m_con.size(); i++) {
     m_con[i].init(StringUtil::form("recvStream0_%d", i - 1), i);
     m_flow[i].open(&m_con[i].getInfo());
@@ -117,11 +117,14 @@ bool ROCallback::load() throw()
   m_con[0].addArgument(StringUtil::form("%s/%s", path_b2lib, script1.c_str()));
   m_con[0].addArgument("1");
   m_con[0].addArgument(StringUtil::form("%d", obj.getInt("port_from")));
-  m_con[0].addArgument("recvStream1_out");
+  m_con[0].addArgument("recvStream1");
+  m_con[0].load(0);
+  /*
   if (!m_con[0].load(10)) {
     LogFile::error("Failed to boot recvStream1");
     return false;
   }
+  */
   LogFile::debug("Booted recvStream1");
   return true;
 }

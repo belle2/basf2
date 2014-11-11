@@ -210,11 +210,11 @@ namespace Belle2 {
             segmentTriple.clearTrajectories();
 
             if (segmentTriple.getTrajectory2D().isFitted()) {
-              B2ERROR("CDCAxialAxialSegmentPair still fitted after clearing.")
+              B2ERROR("Two dimensional trajectory of CDCAxialAxialSegmentPair still fitted after clearing.")
               continue;
             }
             if (segmentTriple.getTrajectorySZ().isFitted()) {
-              B2ERROR("CDCAxialAxialSegmentPair still fitted after clearing.")
+              B2ERROR("SZ trajectory of CDCAxialAxialSegmentPair still fitted after clearing.")
               continue;
             }
 
@@ -239,7 +239,7 @@ namespace Belle2 {
                   continue;
                 }
 
-                // Ask the filter to asses this triple
+                // Ask the filter to assess this triple
                 CellWeight cellWeight = m_segmentTripleFilter.isGoodSegmentTriple(segmentTriple);
 
                 if (not isNotACell(cellWeight)) {

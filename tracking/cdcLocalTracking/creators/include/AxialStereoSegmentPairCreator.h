@@ -144,7 +144,7 @@ namespace Belle2 {
             axialStereoSegmentPair.clearTrajectory3D();
 
             if (axialStereoSegmentPair.getTrajectory3D().isFitted()) {
-              B2ERROR("CDCAxialAxialSegmentPair still fitted after clearing.")
+              B2ERROR("CDCAxialStereoSegmentPair still fitted after clearing.")
               continue;
             }
 

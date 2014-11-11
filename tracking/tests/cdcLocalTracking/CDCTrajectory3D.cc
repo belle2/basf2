@@ -42,3 +42,40 @@ TEST_F(CDCLocalTrackingTest, CDCTrajectory3D_constructorPosMomCharge)
 
   EXPECT_NEAR(newChargeSign, chargeSign, 10e-7);
 }
+
+
+
+TEST_F(CDCLocalTrackingTest, CDCTrajectory3D_clear)
+{
+  Vector3D newMom3D(1.0, 2.0, 1.0);
+  Vector3D newPos3D(1.0, 2.0, 1.0);
+  SignType newChargeSign = PLUS;
+
+  CDCTrajectory3D trajectory3D(newPos3D, newMom3D, newChargeSign);
+  UncertainHelix uncertainHelix = trajectory3D.getLocalHelix();
+  Helix helix = uncertainHelix;
+
+  PerigeeCircle perigeeCircle = helix.circleXY();
+  GeneralizedCircle generalizedCircle = perigeeCircle;
+
+  Line2D lineSZ = helix.lineSZ();
+
+  trajectory3D.clear();
+  EXPECT_TRUE(trajectory3D.isNull());
+  EXPECT_FALSE(trajectory3D.isFitted());
+
+  uncertainHelix.setNull();
+  EXPECT_TRUE(uncertainHelix.isNull());
+
+  helix.setNull();
+  EXPECT_TRUE(helix.isNull());
+
+  perigeeCircle.setNull();
+  EXPECT_TRUE(perigeeCircle.isNull());
+
+  generalizedCircle.setNull();
+  EXPECT_TRUE(generalizedCircle.isNull());
+
+  lineSZ.setNull();
+  EXPECT_TRUE(lineSZ.isNull());
+}

@@ -124,7 +124,11 @@ namespace Belle2 {
 
 
       /// Updates the parameters to obey the normalization condition
-      void normalize() { scaleN(1.0 / normalization()); }
+      void normalize() {
+        if (not isNull()) {
+          scaleN(1.0 / normalization());
+        }
+      }
 
       /// Flips orientation the line in place
       void reverse() { scaleN(-1.0); }

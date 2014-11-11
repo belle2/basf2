@@ -9,7 +9,7 @@ set_log_level(LogLevel.WARNING)
 
 # set event info for generated events
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10000])  # we want to process 100 events
+eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
 
 # load parameters (i.e. beam energies)
 gearbox = register_module('Gearbox')
@@ -56,8 +56,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(aafh)
-main.add_module(register_module("Progress"))
-#main.add_module(mcparticleprinter)
+main.add_module(mcparticleprinter)
 
 # process the events
 process(main)

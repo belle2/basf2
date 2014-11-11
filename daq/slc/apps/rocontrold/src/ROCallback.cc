@@ -87,7 +87,7 @@ bool ROCallback::load() throw()
     }
   }
   ss << std::endl << "EOT" << std::endl;
-  std::ofstream fout(m_file.get("ropc.eb0.script"));
+  std::ofstream fout(m_file.get("ropc.eb0.script").c_str());
   fout << ss.str();
   fout.close();
   if (use_recv0) {

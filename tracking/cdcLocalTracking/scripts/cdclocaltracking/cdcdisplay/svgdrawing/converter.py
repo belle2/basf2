@@ -433,7 +433,7 @@ class CDCDataobjectsConverter:
         defaultStyleDict['stroke'] = 'black'
         self.styleFillUpdate(defaultStyleDict)
 
-        position = recohit.getPos3D()
+        position = recohit.getRecoPos3D()
         point = (position.x(), position.y())
 
         supportPointRadius = 0.2

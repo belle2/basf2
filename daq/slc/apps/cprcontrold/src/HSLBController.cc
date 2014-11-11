@@ -10,8 +10,21 @@
 
 #include <unistd.h>
 #include <cstdlib>
+#include <cstdio>
+#include <string.h>
 
 using namespace Belle2;
+
+std::string perform(const std::string& cmd)
+{
+  FILE* file = popen(cmd.c_str(), "r");
+  static char str[1024];
+  memset(str, '\0', 1024);
+  fread(str, 1, 1024 - 1, file);
+  pclose(file);
+  std::string s = str;
+  return s;//.substr(0, s.find_last_of("\n"));
+}
 
 const char* HSLBController::getFEEType(int type)
 {
@@ -72,6 +85,20 @@ bool HSLBController::boot(const std::string& runtype,
                                        firmware.c_str());
     LogFile::debug(cmd);
     system(cmd.c_str());
+    while (true) {
+      cmd = StringUtil::form("reghs %c checkfee", (char)('a' + m_hslb.fin));
+      LogFile::debug(cmd);
+      std::string ret = perform(cmd);
+      LogFile::debug(ret);
+      if (ret.find("FEE") != std::string::npos) break;
+      cmd = StringUtil::form("reghs %c 82 1000", (char)('a' + m_hslb.fin));
+      LogFile::debug(cmd);
+      system(cmd.c_str());
+      cmd = StringUtil::form("reghs %c 82 1000", (char)('a' + m_hslb.fin));
+      LogFile::debug(cmd);
+      system(cmd.c_str());
+      usleep(10);
+    }
     if (runtype.find("dumhslb") != std::string::npos) {
       StringList str_v = StringUtil::split(runtype, ':');
       const std::string datfile = StringUtil::form("/home/usr/b2daq/run/dumhslb/%s.dat",

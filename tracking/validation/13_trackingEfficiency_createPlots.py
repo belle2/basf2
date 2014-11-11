@@ -19,7 +19,7 @@
     <output>TrackingValidation.root</output>
     <contact>michael.ziegler2@kit.edu</contact>
     <description>Create momentum resolution, impact parameter resolution and efficiency plots.</description>
-</header
+</header>
 """
 
 from __future__ import division

@@ -63,6 +63,7 @@ void HepevtInputModule::initialize()
     m_inputFileName = m_inputFileNames[m_iFile];
   }
   try {
+    B2INFO("Opening first file: " << m_inputFileName);
     m_hepevt.open(m_inputFileName);
     m_hepevt.skipEvents(m_skipEventNumber);
   } catch (runtime_error& e) {
@@ -130,7 +131,7 @@ void HepevtInputModule::event()
     if (m_iFile < m_inputFileNames.size()) {
       try {
         m_inputFileName = m_inputFileNames[m_iFile];
-        B2DEBUG(100, "Opening next file: " << m_inputFileName);
+        B2INFO("Opening next file: " << m_inputFileName);
         m_hepevt.open(m_inputFileName);
       } catch (runtime_error& e) {
         B2FATAL(e.what());

@@ -69,7 +69,7 @@ def CountMCParticles(path, names):
     return {'mcCounts': counter, '__cache__': True}
 
 
-def FSPDistribution(path, identifier, inputList, mvaConfig):
+def FSPDistribution(path, hash, identifier, inputList, mvaConfigTarget):
     """
     Returns signal and background distribution of FSP
     Counts the number of MC Particles for every pdg code in all events
@@ -79,13 +79,12 @@ def FSPDistribution(path, identifier, inputList, mvaConfig):
         @param mvaConfig configuration for the multivariate analysis
     """
     B2INFO("Calculate signal and background candiates of FSP {i}".format(i=inputList))
-    hash = actorFramework.create_hash([identifier, inputList, mvaConfig.target])
     filename = removeJPsiSlash('{i}_{h}.root'.format(i=inputList, h=hash))
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
         output.param('particleList', inputList)
-        output.param('variables', [mvaConfig.target])
+        output.param('variables', [mvaConfigTarget])
         output.param('fileName', filename)
         output.param('treeName', 'distribution')
         path.add_module(output)
@@ -238,7 +237,7 @@ def FitVertex(path, hash, channelName, particleList, daughterVertices, geometry)
     return {'VertexFit_{c}'.format(c=channelName): hash, '__cache__': True}
 
 
-def CreatePreCutHistogram(path, particleName, channelName, mvaConfig, preCutConfig, daughterParticleLists, additionalDependencies):
+def CreatePreCutHistogram(path, hash, particleName, channelName, mvaConfigTarget, preCutConfig, daughterParticleLists, additionalDependencies):
     """
     Creates ROOT file with chosen pre cut variable histogram of this channel (signal/background)
     for a given particle, before any intermediate cuts are applied.
@@ -255,7 +254,6 @@ def CreatePreCutHistogram(path, particleName, channelName, mvaConfig, preCutConf
         B2INFO("Create pre cut histogram for channel {c}. But channel is ignored.".format(c=channelName))
         return {'PreCutHistogram_{c}'.format(c=channelName): None, '__cache__': True}
 
-    hash = actorFramework.create_hash([particleName, channelName, preCutConfig.userCut, preCutConfig.variable, preCutConfig.binning, daughterParticleLists, mvaConfig.target, additionalDependencies])
     filename = removeJPsiSlash('CutHistograms_{c}:{h}.root'.format(c=channelName, h=hash))
 
     if os.path.isfile(filename):
@@ -268,7 +266,7 @@ def CreatePreCutHistogram(path, particleName, channelName, mvaConfig, preCutConf
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
         pmake.param('cut', preCutConfig.userCut)
-        pmake.param('target', mvaConfig.target)
+        pmake.param('target', mvaConfigTarget)
         pmake.param('variable', preCutConfig.variable)
         if isinstance(preCutConfig.binning, tuple):
             pmake.param('histParams', preCutConfig.binning)

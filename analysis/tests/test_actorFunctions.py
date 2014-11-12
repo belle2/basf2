@@ -53,10 +53,11 @@ class TestFSPDistribution(unittest.TestCase):
     def setUp(self):
         """ Unittest function """
         self.path = MockPath()
+        self.standardHash = '909c951ba071fbd12a835b6ae140398d380c9185'
 
     def test_standard(self):
         """ Unittest function """
-        result = FSPDistribution(self.path, 'e+', 'e+:listname', mvaConfig)
+        result = FSPDistribution(self.path, self.standardHash, 'e+', 'e+:listname', mvaConfig.target)
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -244,7 +245,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
     def test_standard(self):
         """ Unittest function """
         os.remove(self.standardFilename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, self.standardHash, 'D+', 'UniqueChannelName', mvaConfig.target, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -256,142 +257,21 @@ class TestCreatePreCutHistogram(unittest.TestCase):
 
     def test_nothing_to_do(self):
         """ Unittest function """
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, self.standardHash, 'D+', 'UniqueChannelName', mvaConfig.target, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': (self.standardFilename, 'D+:' + self.standardHash), '__cache__': True})
         self.assertEqual(len(self.path.modules()), 0)
 
     def test_missing_daughter(self):
         """ Unittest function """
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, [None, 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, self.standardHash, 'D+', 'UniqueChannelName', mvaConfig.target, preCutConfig, [None, 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': None, '__cache__': True})
         self.assertEqual(len(self.path.modules()), 0)
 
     def test_missing_additionalDependencies(self):
         """ Unittest function """
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', None])
+        result = CreatePreCutHistogram(self.path, self.standardHash, 'D+', 'UniqueChannelName', mvaConfig.target, preCutConfig, ['pi+:1', 'K+:1'], ['bar', None])
         self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': None, '__cache__': True})
         self.assertEqual(len(self.path.modules()), 0)
-
-    def test_hash_depends_on_particle_name(self):
-        """ Unittest function """
-        result = CreatePreCutHistogram(self.path, 'B+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_depends_on_channel_name(self):
-        """ Unittest function """
-        result = CreatePreCutHistogram(self.path, 'D+', 'other', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] != 'CutHistograms_other:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_depends_on_pre_cut_variable(self):
-        """ Unittest function """
-        myPreCutConfig = Particle.PreCutConfiguration(
-            variable='Q',
-            binning=(500, 2, 4),
-            efficiency=0.7,
-            purity=0.01,
-            userCut='M > 0.2'
-        )
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_depends_on_pre_cut_binning(self):
-        """ Unittest function """
-        myPreCutConfig = Particle.PreCutConfiguration(
-            variable='M',
-            binning=(400, 2, 4),
-            efficiency=0.7,
-            purity=0.01,
-            userCut='M > 0.2'
-        )
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_depends_on_pre_cut_userCut(self):
-        """ Unittest function """
-        myPreCutConfig = Particle.PreCutConfiguration(
-            variable='M',
-            binning=(500, 2, 4),
-            efficiency=0.7,
-            purity=0.01,
-            userCut='M > 0.5'
-        )
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_doesnt_depends_on_pre_cut_in_general(self):
-        """ Unittest function """
-        myPreCutConfig = Particle.PreCutConfiguration(
-            variable='M',
-            binning=(500, 2, 4),
-            efficiency=0.6,
-            purity=0.1,
-            userCut='M > 0.2'
-        )
-        os.remove(self.standardFilename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] == 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_on_mva_target(self):
-        """ Unittest function """
-        myMVAConfig = Particle.MVAConfiguration(
-            name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-            variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
-            target='isSignalAcceptMissingNeutrino'
-        )
-        os.remove(self.standardFilename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', myMVAConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_doesnt_depends_on_mva_in_general(self):
-        """ Unittest function """
-        myMVAConfig = Particle.MVAConfiguration(
-            name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-            variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb', 'pz'],
-            target='isSignal'
-        )
-        os.remove(self.standardFilename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', myMVAConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] == 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_depends_on_daughters(self):
-        """ Unittest function """
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K-:1'], ['bar', 'foo'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
-
-    def test_hash_depends_on_additional_dependencies(self):
-        """ Unittest function """
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'bla'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules()), 1)
-        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
 
 
 class TestPreCutDetermination(unittest.TestCase):

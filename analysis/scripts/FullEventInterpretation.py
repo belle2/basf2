@@ -191,10 +191,12 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
         if particle.isFSP:
             play.addProperty('MVAConfig_{i}'.format(i=particle.identifier), particle.mvaConfig)
+            play.addProperty('MVAConfigTarget_{i}'.format(i=particle.identifier), particle.mvaConfig.target)
             play.addProperty('VertexFit_{i}'.format(i=particle.identifier), 'TrackFitIsAlreadyDoneForFSPs')
         for channel in particle.channels:
             play.addProperty('Name_{c}'.format(c=channel.name), channel.name)
             play.addProperty('MVAConfig_{c}'.format(c=channel.name), channel.mvaConfig)
+            play.addProperty('MVAConfigTarget_{c}'.format(c=channel.name), channel.mvaConfig.target)
             play.addProperty('PreCutConfig_{c}'.format(c=channel.name), channel.preCutConfig)
 
     # Add top-level actors
@@ -247,7 +249,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
             play.addActor(FSPDistribution,
                           identifier='Identifier_{i}'.format(i=particle.identifier),
                           inputList='RawParticleList_{i}'.format(i=particle.identifier),
-                          mvaConfig='MVAConfig_{i}'.format(i=particle.identifier))
+                          mvaConfigTarget='MVAConfigTarget_{i}'.format(i=particle.identifier))
             play.addActor(PostCutDetermination,
                           identifier='Identifier_{i}'.format(i=particle.identifier),
                           postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
@@ -270,7 +272,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
                 play.addActor(CreatePreCutHistogram,
                               particleName='Name_{i}'.format(i=particle.identifier),
                               channelName='Name_{c}'.format(c=channel.name),
-                              mvaConfig='MVAConfig_{c}'.format(c=channel.name),
+                              mvaConfigTarget='MVAConfigTarget_{c}'.format(c=channel.name),
                               preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
                               daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
                               additionalDependencies=additionalDependencies)

@@ -141,14 +141,15 @@ class Actor(object):
         return result
 
 
-def call_actor(results, result_cache, path_cache, actor):
+def call_actor(results, result_cache, path_cache, actor, preload):
     global_lock.acquire()
     results = copy.copy(results)
     results['path'] = actor.path = basf2.create_path()
     results['hash'] = create_hash([results[r] for r in actor.requires])
     if results['hash'] in result_cache and results['hash'] in path_cache:
         actor.provides = result_cache[results['hash']]
-        actor.path = basf2.deserialize_path(path_cache[results['hash']])
+        if not preload:
+            actor.path = basf2.deserialize_path(path_cache[results['hash']])
     else:
         actor.provides = actor(results)
         if '__cache__' in actor.provides and actor.provides['__cache__']:
@@ -186,7 +187,7 @@ class Play(object):
             return {}
         self.seq.append(Actor(RequireManually, a=key))
 
-    def run(self, path, verbose=False, cacheFile=None, nProcesses=1):
+    def run(self, path, verbose=False, cacheFile=None, preload=False, nProcesses=1):
         """
         Resolve dependencies of the Actors, by extracting step by step the actors for which
         all their requirements are provided.
@@ -195,6 +196,7 @@ class Play(object):
         @param path basf2 path
         @param verbose output additional information
         @param cacheFile file containing a pickled dictionary with hash and result-dict
+        @param preload stuff from cache file
         @param nProcesses use n parallel processes for the execution of the actors
         """
         # We loop over all actors and check which actors are ready to run.
@@ -228,12 +230,12 @@ class Play(object):
                 break
             if nProcesses > 1:
                 def _execute_actor_parallel(actor):
-                    call_actor(results, result_cache, path_cache, actor)
+                    call_actor(results, result_cache, path_cache, actor, preload)
                     return actor
                 ready = p.map(_execute_actor_parallel, ready)
             else:
                 for actor in ready:
-                    call_actor(results, result_cache, path_cache, actor)
+                    call_actor(results, result_cache, path_cache, actor, preload)
             if verbose:
                 print "Updating result dictionary"
             for actor in ready:

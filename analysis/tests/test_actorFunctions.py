@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from actorFunctions import *
-from FullEventInterpretation import Particle, Preloader
+from FullEventInterpretation import Particle
 
 from basf2 import *
 import unittest
@@ -74,8 +74,7 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_standard(self):
         """ Unittest function """
-        result = SelectParticleList(self.path, 'hash', Preloader(None), 'dummy', 'e+', 'generic', False)
-        print result
+        result = SelectParticleList(self.path, 'hash', 'dummy', 'e+', 'generic', False)
         self.assertTrue('RawParticleList_e+:generic' in result)
         self.assertEqual(result['RawParticleList_e+:generic'], 'e+:hash')
         self.assertDictEqual(result, {'RawParticleList_e+:generic': 'e+:hash', '__cache__': True})
@@ -88,8 +87,7 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_roe(self):
         """ Unittest function """
-        result = SelectParticleList(self.path, 'hash', Preloader(None), 'dummy', 'e+', 'generic', True)
-        print result
+        result = SelectParticleList(self.path, 'hash', 'dummy', 'e+', 'generic', True)
         self.assertTrue('RawParticleList_e+:generic' in result)
         self.assertEqual(result['RawParticleList_e+:generic'], 'e+:hash')
         self.assertDictEqual(result, {'RawParticleList_e+:generic': 'e+:hash', '__cache__': True})
@@ -109,7 +107,7 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
 
     def test_standard(self):
         """ Unittest function """
-        result = MakeAndMatchParticleList(self.path, 'hash', Preloader(None), 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
+        result = MakeAndMatchParticleList(self.path, 'hash', 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
         self.assertTrue('RawParticleList_D+ChannelUnique' in result)
         self.assertEqual(result['RawParticleList_D+ChannelUnique'], 'D+:hash')
         self.assertDictEqual(result, {'RawParticleList_D+ChannelUnique': 'D+:hash', '__cache__': True})
@@ -125,7 +123,7 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
 
     def test_missing_precut(self):
         """ Unittest function """
-        result = MakeAndMatchParticleList(self.path, 'hash', Preloader(None), 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], None)
+        result = MakeAndMatchParticleList(self.path, 'hash', 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], None)
         self.assertDictEqual(result, {'RawParticleList_D+ChannelUnique': None, '__cache__': True})
         self.assertEqual(len(self.path.modules()), 0)
 
@@ -138,7 +136,7 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_standard(self):
         """ Unittest function """
-        result = CopyParticleLists(self.path, 'hash', Preloader(None), 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3'], {'cutstring': '0.1 < M'})
+        result = CopyParticleLists(self.path, 'hash', 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3'], {'cutstring': '0.1 < M'})
         self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:hash',
                                       'ParticleList_D-:generic': 'D-:hash',
                                       '__cache__': True})
@@ -151,7 +149,7 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_some_missing_daughter_lists(self):
         """ Unittest function """
-        result = CopyParticleLists(self.path, 'hash', Preloader(None), 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3', None], {'cutstring': '0.1 < M'})
+        result = CopyParticleLists(self.path, 'hash', 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3', None], {'cutstring': '0.1 < M'})
         self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:hash',
                                       'ParticleList_D-:generic': 'D-:hash',
                                       '__cache__': True})
@@ -162,7 +160,7 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_all_missing_daughter_lists(self):
         """ Unittest function """
-        result = CopyParticleLists(self.path, 'hash', Preloader(None), 'D+', 'generic', [None, None, None], [{'cutstring': '0.1 < M'}] * 3)
+        result = CopyParticleLists(self.path, 'hash', 'D+', 'generic', [None, None, None], [{'cutstring': '0.1 < M'}] * 3)
         self.assertDictEqual(result, {'ParticleList_D+:generic': None,
                                       'ParticleList_D-:generic': None,
                                       '__cache__': True})
@@ -170,7 +168,7 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_all_missing_post_cuts(self):
         """ Unittest function """
-        result = CopyParticleLists(self.path, 'hash', Preloader(None), 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3'], None)
+        result = CopyParticleLists(self.path, 'hash', 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3'], None)
         self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:hash',
                                       'ParticleList_D-:generic': 'D-:hash',
                                       '__cache__': True})
@@ -206,7 +204,7 @@ class TestFitVertex(unittest.TestCase):
 
     def test_standard(self):
         """ Unittest function """
-        result = FitVertex(self.path, 'hash', Preloader(None), 'UniqueChannelName', 'D+:1', ['v1', 'v2'], 'dummy')
+        result = FitVertex(self.path, 'hash', 'UniqueChannelName', 'D+:1', ['v1', 'v2'], 'dummy')
         self.assertDictEqual(result, {'VertexFit_UniqueChannelName': 'hash', '__cache__': True})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -215,7 +213,7 @@ class TestFitVertex(unittest.TestCase):
 
     def test_missing_particle_list(self):
         """ Unittest function """
-        result = FitVertex(self.path, 'hash', Preloader(None), 'UniqueChannelName', None, ['v1', 'v2'], 'dummy')
+        result = FitVertex(self.path, 'hash', 'UniqueChannelName', None, ['v1', 'v2'], 'dummy')
         self.assertDictEqual(result, {'VertexFit_UniqueChannelName': None, '__cache__': True})
         self.assertEqual(len(self.path.modules()), 0)
 
@@ -439,7 +437,7 @@ class TestSignalProbability(unittest.TestCase):
 
     def test_standard_expert(self):
         """ Unittest function """
-        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'hash', 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_Identifier': self.standardFilename + '.config', '__cache__': True})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -453,7 +451,7 @@ class TestSignalProbability(unittest.TestCase):
 
     def test_standard_expert_sampling(self):
         """ Unittest function """
-        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, {'nSignal': 2e8, 'nBackground': 4e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'hash', 'Identifier', 'D+:1', mvaConfig, {'nSignal': 2e8, 'nBackground': 4e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_Identifier': self.standardFilename + '.config', '__cache__': True})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -469,7 +467,7 @@ class TestSignalProbability(unittest.TestCase):
         """ Unittest function """
         os.remove(self.standardFilename + '.root')
         os.remove(self.standardFilename + '.config')
-        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'hash', 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -485,7 +483,7 @@ class TestSignalProbability(unittest.TestCase):
         """ Unittest function """
         os.remove(self.standardFilename + '.root')
         os.remove(self.standardFilename + '.config')
-        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, {'nSignal': 2e8, 'nBackground': 4e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'hash', 'Identifier', 'D+:1', mvaConfig, {'nSignal': 2e8, 'nBackground': 4e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -499,7 +497,7 @@ class TestSignalProbability(unittest.TestCase):
 
     def test_missing_additional_dependencies(self):
         """ Unittest function """
-        result = SignalProbability(self.path, 'hash', Preloader(None), 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', None])
+        result = SignalProbability(self.path, 'hash', 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', None])
         self.assertDictEqual(result, {'SignalProbability_Identifier': None,
                                       '__cache__': True})
         self.assertEqual(len(self.path.modules()), 0)

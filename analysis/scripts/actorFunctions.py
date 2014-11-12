@@ -99,11 +99,10 @@ def FSPDistribution(path, identifier, inputList, mvaConfig):
     return {'Distribution_{i}'.format(i=identifier): result, '__cache__': True}
 
 
-def LoadParticles(path, preloader):
+def LoadParticles(path):
     """
     Loads Particles
     @param path the basf2 path
-    @param preloader checks if provided resource is already available in input root file
     @return Resource named ParticleLoader
     """
     B2INFO("Adding ParticleLoader")
@@ -115,12 +114,11 @@ def LoadParticles(path, preloader):
     return {'particleLoader': 'dummy', '__cache__': True}
 
 
-def SelectParticleList(path, hash, preloader, particleLoader, particleName, particleLabel, runs_in_ROE):
+def SelectParticleList(path, hash, particleLoader, particleName, particleLabel, runs_in_ROE):
     """
     Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
         @param hash of all input parameters
-        @param preloader checks if provided resource is already available in input root file
         @param particleLoader
         @param particleName valid pdg particle name
         @param particleLabel user defined label
@@ -129,23 +127,16 @@ def SelectParticleList(path, hash, preloader, particleLoader, particleName, part
     """
     B2INFO("Enter: Select Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     outputList = particleName + ':' + hash
-
-    if preloader.treeContainsObject(outputList):
-        B2INFO("Preload Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
-        return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, '__needed__': False}
-
     modularAnalysis.selectParticle(outputList, 'isInRestOfEvent > 0.5' if runs_in_ROE else '', persistent=True, path=path)
-
     B2INFO("Select Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
     return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, '__cache__': True}
 
 
-def MakeAndMatchParticleList(path, hash, preloader, particleName, particleLabel, channelName, daughterParticleLists, preCut):
+def MakeAndMatchParticleList(path, hash, particleName, particleLabel, channelName, daughterParticleLists, preCut):
     """
     Creates a ParticleList by combining other particleLists via the ParticleCombiner module and match MC truth for this new list.
         @param path the basf2 path
         @param hash of all input parameters
-        @param preloader checks if provided resource is already available in input root file
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param channelName unique name describing the channel
@@ -155,10 +146,6 @@ def MakeAndMatchParticleList(path, hash, preloader, particleName, particleLabel,
     """
     B2INFO("Enter: Make and Match Particle List {p} with label {l} for channel {c}".format(p=particleName, l=particleLabel, c=channelName))
     outputList = particleName + ':' + hash
-
-    if preloader.treeContainsObject(outputList):
-        B2INFO("Preload Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
-        return {'RawParticleList_{c}'.format(c=channelName): outputList, '__needed__': False}
 
     # If preCut is None this channel is ignored
     if preCut is None:
@@ -172,12 +159,11 @@ def MakeAndMatchParticleList(path, hash, preloader, particleName, particleLabel,
     return {'RawParticleList_{c}'.format(c=channelName): outputList, '__cache__': True}
 
 
-def CopyParticleLists(path, hash, preloader, particleName, particleLabel, inputLists, postCut):
+def CopyParticleLists(path, hash, particleName, particleLabel, inputLists, postCut):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param path the basf2 path
         @param hash of all input parameters
-        @param preloader checks if provided resource is already available in input root file
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param inputLists list of ParticleLists name defning which ParticleLists are copied to the new list
@@ -186,12 +172,6 @@ def CopyParticleLists(path, hash, preloader, particleName, particleLabel, inputL
     """
     B2INFO("Enter: Gather Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     outputList = particleName + ':' + hash
-
-    if preloader.treeContainsObject(outputList):
-        B2INFO("Preload Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
-        return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
-                'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + hash,
-                '__needed__': False}
 
     inputLists = [l for l in inputLists if l is not None]
     if inputLists == []:
@@ -225,12 +205,11 @@ def LoadGeometry(path):
     return {'geometry': 'dummy', '__cache__': True}
 
 
-def FitVertex(path, hash, preloader, channelName, particleList, daughterVertices, geometry):
+def FitVertex(path, hash, channelName, particleList, daughterVertices, geometry):
     """
     Fit secondary vertex of all particles in this ParticleList
         @param path the basf2 path
         @param hash of all input parameters
-        @param preloader checks if provided resource is already available in input root file
         @param channelName unique name describing the channel
         @param particleList ParticleList name
         @param daughterVertices to ensure all daughter particles have valid error matrices
@@ -241,10 +220,6 @@ def FitVertex(path, hash, preloader, channelName, particleList, daughterVertices
     if particleList is None:
         B2INFO("Didn't fitted vertex for channel {c}, because channel is ignored.".format(c=channelName))
         return {'VertexFit_{c}'.format(c=channelName): None, '__cache__': True}
-
-    if preloader.particleListHasVertexFit(particleList):
-        B2INFO("Preloaded fitted vertex for channel {c}.".format(c=channelName))
-        return {'VertexFit_{c}'.format(c=channelName): hash, '__needed__': False}
 
     if re.findall(r"[\w']+", channelName).count('pi0') > 1:
         B2INFO("Ignore vertex fit for this channel because multiple pi0 are not supported yet {c}.".format(c=channelName))
@@ -353,12 +328,11 @@ def PostCutDetermination(identifier, postCutConfig, signalProbabilities):
         return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}, '__cache__': True}
 
 
-def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig, distribution, additionalDependencies):
+def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribution, additionalDependencies):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
         @param hash of all input parameters
-        @param preloader checks if provided resource is already available in input root file
         @param identifier unique identifier describing the channel or the particle
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
@@ -386,8 +360,6 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
         Nbins = 'NbinsMVAPdf=100:'
     if distribution['nSignal'] > 1e6:
         Nbins = 'NbinsMVAPdf=200:'
-
-    print inverseSamplingRates
 
     if not os.path.isfile(rootFilename):
         teacher = register_module('TMVATeacher')
@@ -422,10 +394,6 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
         actorFramework.global_lock.acquire()
 
     if os.path.isfile(configFilename):
-        if preloader.particleListHasSignalProbability(particleList):
-            B2INFO("Preloaded SignalProbability for {i}".format(i=identifier))
-            return{'SignalProbability_{i}'.format(i=identifier): configFilename, '__needed__': False}
-
         expert = register_module('TMVAExpert')
         expert.set_name('TMVAExpert_' + particleList)
         expert.param('prefix', removeJPsiSlash(particleList + '_' + hash))

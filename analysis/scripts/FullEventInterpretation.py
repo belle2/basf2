@@ -159,93 +159,6 @@ class Particle(object):
         return output
 
 
-class Preloader(object):
-    """
-    Class checks the input file for already existing ParticleLists
-    so these lists don't have to be created again
-    """
-    def __init__(self, filename=None):
-        """
-        Open input file. Get tree and persistent object
-        """
-        if filename is not None and os.path.isfile(filename):
-            ROOT.gSystem.Load('libdataobjects')
-            self.rootfile = ROOT.TFile(filename)
-            self.tree = self.rootfile.Get('tree')
-            self.persistent = self.rootfile.Get('persistent')
-            self.particles = ROOT.TClonesArray("Belle2::Particle")
-
-    def __str__(self):
-        """
-        We don't want to change the hashes in the actors if the preloader
-        changes, therefore it's important to return here a constant string!
-        """
-        return "Preloader"
-
-    def treeContainsObject(self, name):
-        """
-        Returns true if the tree object contains a branch with the given name
-        """
-        return hasattr(self, 'tree') and any(branch.GetName() == name for branch in self.tree.GetListOfBranches())
-
-    def persistentContainsObject(self, name):
-        """
-        Returns true if the persistent object contains a branch with the given name
-        """
-        return hasattr(self, 'persistent') and any(branch.GetName() == name for branch in self.persistent.GetListOfBranches())
-
-    def getFirstParticleInList(self, particleListName):
-        """
-        Returns the particle object of the first valid particle in the given particle list
-        """
-        particleList = Belle2.ParticleList()
-        self.tree.SetBranchAddress(particleListName, particleList)
-        self.tree.SetBranchAddress("Particles", self.particles)
-        i = 0
-        N = self.tree.GetEntries()
-        while i < N:
-            self.tree.GetEntry(i)
-            for k in [Belle2.ParticleList.c_FlavorSpecificParticle, Belle2.ParticleList.c_SelfConjugatedParticle]:
-                for j in [True, False]:
-                    vec = particleList.getList(k, j)
-                    if len(vec) > 0:
-                        self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
-                        part = self.particles[vec[0]]
-                        self.tree.ResetBranchAddress(self.tree.GetBranch("Particles"))
-                        return part
-            i += 1
-        self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
-        self.tree.ResetBranchAddress(self.tree.GetBranch("Particles"))
-        return None
-
-    def particleListHasSignalProbability(self, particleListName):
-        """
-        Returns true if the given particle list contains an extra info named SignalProbability
-        """
-        if self.treeContainsObject(particleListName):
-            p = self.getFirstParticleInList(particleListName)
-            print p
-            if p is None:
-                return False
-            mapId = p.getExtraInfoMap()
-            if mapId == -1:
-                return False
-            index = self.tree.ParticleExtraInfoMap.getIndex(mapId, 'SignalProbability')
-            return index > 0 and index < p.getExtraInfoSize()
-        else:
-            return False
-
-    def particleListHasVertexFit(self, particleListName):
-        """
-        Returns true if the given particle list contains particles on which a vertex fit was performed
-        """
-        if self.treeContainsObject(particleListName):
-            p = self.getFirstParticleInList(particleListName)
-            return p is not None and (p.getPValue() >= 0 or p.getPValue() < -2)
-        else:
-            return False
-
-
 def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
     """
     The Full Event Interpretation algorithm.
@@ -261,16 +174,12 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
     parser.add_argument('-summary', '--make-summmary', dest='makeSummary', action='store_true', help='Create Summary pdf')
     parser.add_argument('-nosignal', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
     parser.add_argument('-nproc', '--nProcesses', dest='nProcesses', type=int, default=1, help='Use n processes to execute actors parallel')
-    parser.add_argument('-preload', '--preload', dest='preload', type=str, default=None, help='Used input files for preloading')
+    parser.add_argument('-preload', '--preload', dest='preload', action='store_true', help='Preload stuf from cache file')
     parser.add_argument('-cache', '--cache', dest='cacheFile', type=str, default=None, help='Cache File')
     args = parser.parse_args()
 
     # Add the basf2 module path
     play = actorFramework.Play()
-
-    # Add preload resource of available
-    preloader = Preloader(args.preload)
-    play.addProperty('preloader', preloader)
 
     # Than add the properties of the particles to the play
     for particle in particles:
@@ -466,7 +375,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
         play.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
 
     fei_path = create_path()
-    finished_training = play.run(fei_path, args.verbose, args.cacheFile, args.nProcesses)
+    finished_training = play.run(fei_path, args.verbose, args.cacheFile, args.preload, args.nProcesses)
     print fei_path
     is_first_run = not preloader.treeContainsObject('Particles')
 

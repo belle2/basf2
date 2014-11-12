@@ -197,7 +197,7 @@ class TestPlay(unittest.TestCase):
         self.s.addActor(t, path='path', a='a', b=['b1', 'b2'])
 
         path = create_path()
-        self.s.run(path, False, 2)
+        self.s.run(path, False, nProcesses=2)
 
         # Expect no module in main path
         self.assertEqual(len(path.modules()), 0)

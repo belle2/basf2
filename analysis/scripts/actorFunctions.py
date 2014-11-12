@@ -65,9 +65,8 @@ def CountMCParticles(path, names):
         counter[getpdg(branch)] = hallo.Integral()
         del hallo
     counter['NEvents'] = countNtuple.GetEntries()
-    print counter
     B2INFO("Loaded number of MCParticles for every pdg code seperatly")
-    return {'mcCounts': counter}
+    return {'mcCounts': counter, '__cache__': True}
 
 
 def FSPDistribution(path, identifier, inputList, mvaConfig):
@@ -96,9 +95,8 @@ def FSPDistribution(path, identifier, inputList, mvaConfig):
     rootfile = ROOT.TFile(filename)
     distribution = rootfile.Get('distribution')
     result = {'nSignal': distribution.GetEntries(mvaConfig.target + ' == 1'), 'nBackground': distribution.GetEntries(mvaConfig.target + ' == 0')}
-    print result
     B2INFO("Calculated signal and background candiates of FSP {i}".format(i=inputList))
-    return {'Distribution_{i}'.format(i=identifier): result}
+    return {'Distribution_{i}'.format(i=identifier): result, '__cache__': True}
 
 
 def LoadParticles(path, preloader):
@@ -114,7 +112,7 @@ def LoadParticles(path, preloader):
         return {'particleLoader': 'dummy', '__needed__': False}
     path.add_module(register_module('ParticleLoader'))
     B2INFO("Added Particles Array")
-    return {'particleLoader': 'dummy'}
+    return {'particleLoader': 'dummy', '__cache__': True}
 
 
 def SelectParticleList(path, hash, preloader, particleLoader, particleName, particleLabel, runs_in_ROE):
@@ -139,7 +137,7 @@ def SelectParticleList(path, hash, preloader, particleLoader, particleName, part
     modularAnalysis.selectParticle(outputList, 'isInRestOfEvent > 0.5' if runs_in_ROE else '', persistent=True, path=path)
 
     B2INFO("Select Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
-    return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList}
+    return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, '__cache__': True}
 
 
 def MakeAndMatchParticleList(path, hash, preloader, particleName, particleLabel, channelName, daughterParticleLists, preCut):
@@ -165,13 +163,13 @@ def MakeAndMatchParticleList(path, hash, preloader, particleName, particleLabel,
     # If preCut is None this channel is ignored
     if preCut is None:
         B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
-        return {'RawParticleList_{c}'.format(c=channelName): None}
+        return {'RawParticleList_{c}'.format(c=channelName): None, '__cache__': True}
 
     decayString = outputList + ' ==> ' + ' '.join(daughterParticleLists)
     modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], 0, persistent=True, path=path)
     modularAnalysis.matchMCTruth(outputList, path=path)
     B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
-    return {'RawParticleList_{c}'.format(c=channelName): outputList}
+    return {'RawParticleList_{c}'.format(c=channelName): outputList, '__cache__': True}
 
 
 def CopyParticleLists(path, hash, preloader, particleName, particleLabel, inputLists, postCut):
@@ -199,14 +197,16 @@ def CopyParticleLists(path, hash, preloader, particleName, particleLabel, inputL
     if inputLists == []:
         B2INFO("Gather Particle List {p} with label {l} in list {o}. But there are no particles to gather :-(.".format(p=particleName, l=particleLabel, o=outputList))
         return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): None,
-                'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None}
+                'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None,
+                '__cache__': True}
 
     modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'] if postCut is not None else '', persistent=True, path=path)
     #modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
     return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
-            'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + hash}
+            'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + hash,
+            '__cache__': True}
 
 
 def LoadGeometry(path):
@@ -222,7 +222,7 @@ def LoadGeometry(path):
     geometry.param('components', ['MagneticField'])
     path.add_module(geometry)
     B2INFO("Added Geometry and Gearbox to Path")
-    return {'geometry': 'dummy'}
+    return {'geometry': 'dummy', '__cache__': True}
 
 
 def FitVertex(path, hash, preloader, channelName, particleList, daughterVertices, geometry):
@@ -240,7 +240,7 @@ def FitVertex(path, hash, preloader, channelName, particleList, daughterVertices
     B2INFO("Enter: Fitted vertex for channel {c}.".format(c=channelName))
     if particleList is None:
         B2INFO("Didn't fitted vertex for channel {c}, because channel is ignored.".format(c=channelName))
-        return {'VertexFit_{c}'.format(c=channelName): None}
+        return {'VertexFit_{c}'.format(c=channelName): None, '__cache__': True}
 
     if preloader.particleListHasVertexFit(particleList):
         B2INFO("Preloaded fitted vertex for channel {c}.".format(c=channelName))
@@ -248,7 +248,7 @@ def FitVertex(path, hash, preloader, channelName, particleList, daughterVertices
 
     if re.findall(r"[\w']+", channelName).count('pi0') > 1:
         B2INFO("Ignore vertex fit for this channel because multiple pi0 are not supported yet {c}.".format(c=channelName))
-        return {'VertexFit_{c}'.format(c=channelName): hash}
+        return {'VertexFit_{c}'.format(c=channelName): hash, '__cache__': True}
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + particleList)
@@ -260,7 +260,7 @@ def FitVertex(path, hash, preloader, channelName, particleList, daughterVertices
     path.add_module(pvfit)
 
     B2INFO("Fitted vertex for channel {c}.".format(c=channelName))
-    return {'VertexFit_{c}'.format(c=channelName): hash}
+    return {'VertexFit_{c}'.format(c=channelName): hash, '__cache__': True}
 
 
 def CreatePreCutHistogram(path, particleName, channelName, mvaConfig, preCutConfig, daughterParticleLists, additionalDependencies):
@@ -278,14 +278,14 @@ def CreatePreCutHistogram(path, particleName, channelName, mvaConfig, preCutConf
     B2INFO("Enter: Create pre cut histogram for channel {c}.".format(c=channelName))
     if any([daughterParticleList is None for daughterParticleList in daughterParticleLists]) or any([x is None for x in additionalDependencies]):
         B2INFO("Create pre cut histogram for channel {c}. But channel is ignored.".format(c=channelName))
-        return {'PreCutHistogram_{c}'.format(c=channelName): None}
+        return {'PreCutHistogram_{c}'.format(c=channelName): None, '__cache__': True}
 
     hash = actorFramework.create_hash([particleName, channelName, preCutConfig.userCut, preCutConfig.variable, preCutConfig.binning, daughterParticleLists, mvaConfig.target, additionalDependencies])
     filename = removeJPsiSlash('CutHistograms_{c}:{h}.root'.format(c=channelName, h=hash))
 
     if os.path.isfile(filename):
         B2INFO("Create pre cut histogram for channel {c}. But file already exists, so nothing to do here.".format(c=channelName))
-        return {'PreCutHistogram_{c}'.format(c=channelName): (filename, particleName + ':' + hash)}
+        return {'PreCutHistogram_{c}'.format(c=channelName): (filename, particleName + ':' + hash), '__cache__': True}
     else:
         outputList = particleName + ':' + hash + ' ==> ' + ' '.join(daughterParticleLists)
         pmake = register_module('PreCutHistMaker')
@@ -332,6 +332,7 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
             cut['cutstring'] += ' and ' + preCutConfig.userCut
         results['PreCut_{c}'.format(c=channelName)] = None if cut['isIgnored'] else cut
         B2INFO("Calculated pre cut for channel {c}".format(c=channelName))
+    results['__cache__'] = True
     return results
 
 
@@ -346,10 +347,10 @@ def PostCutDetermination(identifier, postCutConfig, signalProbabilities):
     B2INFO("Enter: Calculation of post cuts")
     if postCutConfig is None:
         B2INFO("Calculate post cut for {i} but nothing todo becaus PostCutConfig is None".format(i=identifier))
-        return {'PostCut_{i}'.format(i=identifier): None, '__needed__': False}
+        return {'PostCut_{i}'.format(i=identifier): None, '__needed__': False, '__cache__': True}
     else:
         B2INFO("Calculate post cut for {i}".format(i=identifier))
-        return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
+        return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}, '__cache__': True}
 
 
 def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig, distribution, additionalDependencies):
@@ -368,7 +369,7 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
     B2INFO("Enter: Calculate SignalProbability for {i}.".format(i=identifier))
     if particleList is None or (additionalDependencies is not None and any([d is None for d in additionalDependencies])):
         B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored".format(i=identifier))
-        return{'SignalProbability_{i}'.format(i=identifier): None}
+        return{'SignalProbability_{i}'.format(i=identifier): None, '__cache__': True}
 
     rootFilename = removeJPsiSlash('{particleList}_{hash}.root'.format(particleList=particleList, hash=hash))
     configFilename = removeJPsiSlash('{particleList}_{hash}.config'.format(particleList=particleList, hash=hash))
@@ -437,7 +438,7 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
         expert.param('listNames', [particleList])
         path.add_module(expert)
         B2INFO("Calculating SignalProbability for {i}".format(i=identifier))
-        return{'SignalProbability_{i}'.format(i=identifier): configFilename}
+        return{'SignalProbability_{i}'.format(i=identifier): configFilename, '__cache__': True}
 
     B2ERROR("Training of {i} failed!".format(i=identifier))
     return {'__needed__': False}
@@ -456,7 +457,7 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
     B2INFO("Enter: Write variables to ntuple for particle {i}".format(i=particleIdentifier))
     if particleList is None or signalProbability is None:
         B2INFO("Write variables to ntuple for particle {p}. But list is ignored.".format(p=particleIdentifier))
-        return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): None}
+        return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): None, '__cache__': True}
 
     filename = removeJPsiSlash('var_{i}_{h}.root'.format(i=particleIdentifier, h=hash))
 
@@ -472,7 +473,7 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
         return {}
 
     B2INFO("Write variables to ntuple for particle {i}. But file already exists, so nothing to do here.".format(i=particleIdentifier))
-    return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): filename}
+    return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): filename, '__cache__': True}
 
 
 def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCutConfig, preCut, preCutHistogram, mvaConfig, signalProbability, postCutConfig, postCut):
@@ -619,7 +620,7 @@ def SaveModuleStatistics(path, hash, finalParticleSignalProbabilities):
         return {}
 
     B2INFO("Provided SaveModuleStatistics")
-    return {'ModuleStatisticsFile': filename}
+    return {'ModuleStatisticsFile': filename, '__cache__': True}
 
 
 def WriteCPUTimeSummary(channelNames, inputLists, channelPlaceholders, mcCounts, moduleStatisticsFile):

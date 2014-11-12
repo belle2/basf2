@@ -22,6 +22,7 @@ import copy
 import inspect
 import threading
 import sys
+import cPickle
 
 global_lock = threading.RLock()
 
@@ -140,6 +141,22 @@ class Actor(object):
         return result
 
 
+def call_actor(results, result_cache, path_cache, actor):
+    global_lock.acquire()
+    results = copy.copy(results)
+    results['path'] = actor.path = basf2.create_path()
+    results['hash'] = create_hash([results[r] for r in actor.requires])
+    if results['hash'] in result_cache and results['hash'] in path_cache:
+        actor.provides = result_cache[results['hash']]
+        actor.path = basf2.deserialize_path(path_cache[results['hash']])
+    else:
+        actor.provides = actor(results)
+        if '__cache__' in actor.provides and actor.provides['__cache__']:
+            result_cache[results['hash']] = actor.provides
+            path_cache[results['hash']] = basf2.serialize_path(actor.path)
+    global_lock.release()
+
+
 class Play(object):
     """
     The Play contains all the actors (Property, Collection and Actor).
@@ -169,7 +186,7 @@ class Play(object):
             return {}
         self.seq.append(Actor(RequireManually, a=key))
 
-    def run(self, path, verbose=False, nProcesses=1):
+    def run(self, path, verbose=False, cacheFile=None, nProcesses=1):
         """
         Resolve dependencies of the Actors, by extracting step by step the actors for which
         all their requirements are provided.
@@ -177,6 +194,7 @@ class Play(object):
         These results are then used to provide the required arguments of the following actors.
         @param path basf2 path
         @param verbose output additional information
+        @param cacheFile file containing a pickled dictionary with hash and result-dict
         @param nProcesses use n parallel processes for the execution of the actors
         """
         # We loop over all actors and check which actors are ready to run.
@@ -187,6 +205,10 @@ class Play(object):
         # If there are no ready actors, the resolution of the dependencies is finished (and maybe incomplete).
         if verbose:
             print "Start execution of Sequence"
+        if cacheFile is not None:
+            result_cache, path_cache = cPickle.load(open(cacheFile, 'r'))
+        else:
+            result_cache, path_cache = {}, {}
         if nProcesses > 1:
             p = multiprocessing.pool.ThreadPool(processes=nProcesses)
         actors = [actor for actor in self.seq]
@@ -206,28 +228,20 @@ class Play(object):
                 break
             if nProcesses > 1:
                 def _execute_actor_parallel(actor):
-                    global_lock.acquire()
-                    c = copy.copy(results)
-                    c['path'] = actor.path = basf2.create_path()
-                    c['hash'] = ''
-                    c['hash'] = create_hash([c[r] for r in actor.requires])
-                    actor.provides = actor(c)
-                    global_lock.release()
+                    call_actor(results, result_cache, path_cache, actor)
                     return actor
                 ready = p.map(_execute_actor_parallel, ready)
             else:
                 for actor in ready:
-                    global_lock.acquire()
-                    results['path'] = actor.path = basf2.create_path()
-                    results['hash'] = ''
-                    results['hash'] = create_hash([results[r] for r in actor.requires])
-                    actor.provides = actor(results)
-                    global_lock.release()
+                    call_actor(results, result_cache, path_cache, actor)
             if verbose:
                 print "Updating result dictionary"
             for actor in ready:
                 results.update(actor.provides)
             chain.append(ready)
+
+        if cacheFile is not None:
+            cPickle.dump((result_cache, path_cache), open(cacheFile, 'w'))
 
         # Now the chain contains all actors with grantable requirements.
         # The chain is a list of list of actors, all actors in one element of the list depend on the actors in the previous elements.

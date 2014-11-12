@@ -262,6 +262,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
     parser.add_argument('-nosignal', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
     parser.add_argument('-nproc', '--nProcesses', dest='nProcesses', type=int, default=1, help='Use n processes to execute actors parallel')
     parser.add_argument('-preload', '--preload', dest='preload', type=str, default=None, help='Used input files for preloading')
+    parser.add_argument('-cache', '--cache', dest='cacheFile', type=str, default=None, help='Cache File')
     args = parser.parse_args()
 
     # Add the basf2 module path
@@ -465,7 +466,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
         play.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
 
     fei_path = create_path()
-    finished_training = play.run(fei_path, args.verbose, args.nProcesses)
+    finished_training = play.run(fei_path, args.verbose, args.cacheFile, args.nProcesses)
     print fei_path
     is_first_run = not preloader.treeContainsObject('Particles')
 

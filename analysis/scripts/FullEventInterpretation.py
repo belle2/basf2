@@ -377,9 +377,9 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
         play.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
 
     fei_path = create_path()
+
+    is_first_run = args.cacheFile is None or not os.path.isfile(args.cacheFile)
     finished_training = play.run(fei_path, args.verbose, args.cacheFile, args.preload, args.nProcesses)
-    print fei_path
-    is_first_run = not preloader.treeContainsObject('Particles')
 
     path = create_path()
     if user_selection_path is None:

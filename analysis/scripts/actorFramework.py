@@ -23,6 +23,8 @@ import inspect
 import threading
 import sys
 import cPickle
+import os
+import shutil
 
 global_lock = threading.RLock()
 
@@ -146,15 +148,16 @@ def call_actor(results, result_cache, path_cache, actor, preload):
     results = copy.copy(results)
     results['path'] = actor.path = basf2.create_path()
     results['hash'] = create_hash([results[r] for r in actor.requires])
-    if results['hash'] in result_cache and results['hash'] in path_cache:
-        actor.provides = result_cache[results['hash']]
+    key = actor.name + '_' + results['hash']
+    if key in result_cache and key in path_cache:
+        actor.provides = result_cache[key]
         if not preload:
-            actor.path = basf2.deserialize_path(path_cache[results['hash']])
+            actor.path = basf2.deserialize_path(path_cache[key])
     else:
         actor.provides = actor(results)
         if '__cache__' in actor.provides and actor.provides['__cache__']:
-            result_cache[results['hash']] = actor.provides
-            path_cache[results['hash']] = basf2.serialize_path(actor.path)
+            result_cache[key] = actor.provides
+            path_cache[key] = basf2.serialize_path(actor.path)
     global_lock.release()
 
 
@@ -207,7 +210,7 @@ class Play(object):
         # If there are no ready actors, the resolution of the dependencies is finished (and maybe incomplete).
         if verbose:
             print "Start execution of Sequence"
-        if cacheFile is not None:
+        if cacheFile is not None and os.path.isfile(cacheFile):
             result_cache, path_cache = cPickle.load(open(cacheFile, 'r'))
         else:
             result_cache, path_cache = {}, {}
@@ -243,6 +246,8 @@ class Play(object):
             chain.append(ready)
 
         if cacheFile is not None:
+            if os.path.isfile(cacheFile):
+                shutil.copyfile(cacheFile, cacheFile + '.bkp')
             cPickle.dump((result_cache, path_cache), open(cacheFile, 'w'))
 
         # Now the chain contains all actors with grantable requirements.

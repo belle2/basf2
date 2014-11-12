@@ -93,7 +93,7 @@ def FSPDistribution(path, hash, identifier, inputList, mvaConfigTarget):
 
     rootfile = ROOT.TFile(filename)
     distribution = rootfile.Get('distribution')
-    result = {'nSignal': distribution.GetEntries(mvaConfig.target + ' == 1'), 'nBackground': distribution.GetEntries(mvaConfig.target + ' == 0')}
+    result = {'nSignal': distribution.GetEntries(mvaConfigTarget + ' == 1'), 'nBackground': distribution.GetEntries(mvaConfigTarget + ' == 0')}
     B2INFO("Calculated signal and background candiates of FSP {i}".format(i=inputList))
     return {'Distribution_{i}'.format(i=identifier): result, '__cache__': True}
 
@@ -201,7 +201,7 @@ def LoadGeometry(path):
     geometry.param('components', ['MagneticField'])
     path.add_module(geometry)
     B2INFO("Added Geometry and Gearbox to Path")
-    return {'geometry': 'dummy', '__cache__': True}
+    return {'geometry': 'dummy'}
 
 
 def FitVertex(path, hash, channelName, particleList, daughterVertices, geometry):

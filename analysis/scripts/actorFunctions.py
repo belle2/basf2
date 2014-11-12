@@ -180,6 +180,7 @@ def CopyParticleLists(path, hash, particleName, particleLabel, inputLists, postC
                 '__cache__': True}
 
     modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'] if postCut is not None else '', persistent=True, path=path)
+    modularAnalysis.cutAndCopyLists(particleName + ':' + particleLabel, outputList, '', persistent=True, path=path)
     #modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))

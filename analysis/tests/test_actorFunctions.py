@@ -141,11 +141,18 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:hash',
                                       'ParticleList_D-:generic': 'D-:hash',
                                       '__cache__': True})
-        self.assertEqual(len(self.path.modules()), 1)
+        self.assertEqual(len(self.path.modules()), 2)
+
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['outputListName'], 'D+:hash')
         self.assertListEqual(parameters['inputListNames'], ['D+:1', 'D+:2', 'D+:3'])
         self.assertEqual(parameters['cut'], '0.1 < M')
+        self.assertEqual(parameters['persistent'], True)
+
+        parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
+        self.assertEqual(parameters['outputListName'], 'D+:generic')
+        self.assertListEqual(parameters['inputListNames'], ['D+:hash'])
+        self.assertEqual(parameters['cut'], '')
         self.assertEqual(parameters['persistent'], True)
 
     def test_some_missing_daughter_lists(self):
@@ -154,10 +161,16 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:hash',
                                       'ParticleList_D-:generic': 'D-:hash',
                                       '__cache__': True})
-        self.assertEqual(len(self.path.modules()), 1)
+        self.assertEqual(len(self.path.modules()), 2)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['outputListName'], 'D+:hash')
         self.assertListEqual(parameters['inputListNames'], ['D+:1', 'D+:2', 'D+:3'])
+
+        parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
+        self.assertEqual(parameters['outputListName'], 'D+:generic')
+        self.assertListEqual(parameters['inputListNames'], ['D+:hash'])
+        self.assertEqual(parameters['cut'], '')
+        self.assertEqual(parameters['persistent'], True)
 
     def test_all_missing_daughter_lists(self):
         """ Unittest function """
@@ -173,10 +186,16 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:hash',
                                       'ParticleList_D-:generic': 'D-:hash',
                                       '__cache__': True})
-        self.assertEqual(len(self.path.modules()), 1)
+        self.assertEqual(len(self.path.modules()), 2)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['outputListName'], 'D+:hash')
         self.assertListEqual(parameters['inputListNames'], ['D+:1', 'D+:2', 'D+:3'])
+        self.assertEqual(parameters['cut'], '')
+        self.assertEqual(parameters['persistent'], True)
+
+        parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
+        self.assertEqual(parameters['outputListName'], 'D+:generic')
+        self.assertListEqual(parameters['inputListNames'], ['D+:hash'])
         self.assertEqual(parameters['cut'], '')
         self.assertEqual(parameters['persistent'], True)
 
@@ -190,7 +209,7 @@ class TestLoadGeometry(unittest.TestCase):
     def test_standard(self):
         """ Unittest function """
         result = LoadGeometry(self.path)
-        self.assertDictEqual(result, {'geometry': 'dummy', '__cache__': True})
+        self.assertDictEqual(result, {'geometry': 'dummy'})
         self.assertEqual(len(self.path.modules()), 2)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}

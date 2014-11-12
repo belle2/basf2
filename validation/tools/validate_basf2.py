@@ -477,13 +477,16 @@ class Script:
             # The keywords that should be parsed into a list
             list_tags = ['input', 'output', 'contact']
 
+            # If the tag is empty branch.text is None. Replacing None with an empty string in this case.
+            branch_text = branch.text or ""
+
             # Format the values of each branch
             if branch.tag.strip() in list_tags:
-                branch_value = [__.strip() for __ in branch.text.split(',')]
+                branch_value = [__.strip() for __ in branch_text.split(',')]
                 if branch_value == ['']:
                     branch_value = []
             else:
-                branch_value = re.sub(' +', ' ', branch.text.replace('\n', ''))
+                branch_value = re.sub(' +', ' ', branch_text.replace('\n', ''))
                 branch_value = branch_value.strip()
 
             # Append the branch and its values to the header-dict. This

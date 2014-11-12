@@ -62,9 +62,9 @@ def CountMCParticles(path, names):
     for branch in [str(k.GetName()) for k in countNtuple.GetListOfBranches()]:
         hallo = ROOT.TH1D('hallo', 'hallo', 1, 0, countNtuple.GetMaximum(branch) + 1)
         countNtuple.Project('hallo', branch, branch)
-        counter[getpdg(branch)] = hallo.Integral()
+        counter[getpdg(branch)] = int(hallo.Integral())
         del hallo
-    counter['NEvents'] = countNtuple.GetEntries()
+    counter['NEvents'] = int(countNtuple.GetEntries())
     B2INFO("Loaded number of MCParticles for every pdg code seperatly")
     return {'mcCounts': counter, '__cache__': True}
 
@@ -93,7 +93,7 @@ def FSPDistribution(path, hash, identifier, inputList, mvaConfigTarget):
 
     rootfile = ROOT.TFile(filename)
     distribution = rootfile.Get('distribution')
-    result = {'nSignal': distribution.GetEntries(mvaConfigTarget + ' == 1'), 'nBackground': distribution.GetEntries(mvaConfigTarget + ' == 0')}
+    result = {'nSignal': int(distribution.GetEntries(mvaConfigTarget + ' == 1')), 'nBackground': int(distribution.GetEntries(mvaConfigTarget + ' == 0'))}
     B2INFO("Calculated signal and background candiates of FSP {i}".format(i=inputList))
     return {'Distribution_{i}'.format(i=identifier): result, '__cache__': True}
 
@@ -105,9 +105,6 @@ def LoadParticles(path):
     @return Resource named ParticleLoader
     """
     B2INFO("Adding ParticleLoader")
-    if preloader.treeContainsObject('Particles'):
-        B2INFO("Preload Particles Array")
-        return {'particleLoader': 'dummy', '__needed__': False}
     path.add_module(register_module('ParticleLoader'))
     B2INFO("Added Particles Array")
     return {'particleLoader': 'dummy', '__cache__': True}

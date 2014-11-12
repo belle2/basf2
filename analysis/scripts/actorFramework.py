@@ -25,6 +25,8 @@ import sys
 import cPickle
 import os
 import shutil
+import decimal
+import collections
 
 global_lock = threading.RLock()
 
@@ -34,7 +36,19 @@ def create_hash(arguments):
     Creates a unique hash which depends on the given arguments
         @param arguments the hash depends on
     """
-    return hashlib.sha1(str([str(v) for v in arguments if v is not None])).hexdigest()
+    def makeNonAmbiguous(x):
+        if isinstance(x, float):
+            return decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN)
+        elif isinstance(x, dict):
+            items = [(makeNonAmbiguous(k), makeNonAmbiguous(v)) for k, v in sorted(x.items(), key=lambda t: t[0])]
+            return collections.OrderedDict(items)
+        elif isinstance(x, list):
+            return list(makeNonAmbiguous(v) for v in x)
+        elif isinstance(x, tuple):
+            return tuple(makeNonAmbiguous(v) for v in x)
+        else:
+            return x
+    return hashlib.sha1(str([str(makeNonAmbiguous(v)) for v in arguments if v is not None])).hexdigest()
 
 
 class Property(object):

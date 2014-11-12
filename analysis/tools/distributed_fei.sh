@@ -4,7 +4,7 @@ collectionDirectory="FEI"
 jobDirectory="jobs"
 persistentDirectory="persistent"
 nJobs="1000"
-steeringFile="B+.py"
+steeringFile="B_generic.py"
 
 set -a
 source /opt/ogs/ekpcluster/common/settings.sh
@@ -55,7 +55,8 @@ function create_play {
 
 function run_basf2 {
   cd "$collectionDirectory"
-  basf2 ../$steeringFile --dump-path basf2_path.pickle -- -ve -nproc 1 -preload ../"$persistentDirectory"/1/basf2_input.root #-summary 
+  basf2 ../$steeringFile --dump-path basf2_path.pickle -- -ve -nproc 2 -preload -cache mycachefile.pkl
+  #basf2 ../$steeringFile --dump-path basf2_path.pickle -- -ve -preload -cache mycachefile.pkl
   cd -
 }
 
@@ -78,7 +79,7 @@ function submit_jobs {
   for i in $(seq "$nJobs")
   do
     cd "$jobDirectory"/"$i"
-    qsub -cwd -q short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
+    qsub -cwd -q express,short -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
     cd -
   done
 }

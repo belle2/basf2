@@ -565,6 +565,7 @@ namespace {
       d.finalize();
       MCParticle* muon = d.getMCParticle(13);
       muon->setStatus(muon->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
+      ASSERT_FALSE(muon->hasStatus(MCParticle::c_PrimaryParticle));
       d.reconstruct({421, {321, -211, {111, {22, 22}}}});
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
@@ -686,17 +687,8 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      //TODO: doesn't have a flag yet, but shouldn't be 0 (same as for WrongCombination? does this warrant an own flag?)
       EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
     }
-    {
-      Decay d(521, {{ -421, {321, { -211, {22, -211}}}}, 211, 211, -211});
-      Decay* pi = &(d[0][1][1]);
-      d.reconstruct({521, {{ -421, {321, -211}}, 211, 211, { -211, {}, Decay::c_ReconstructFrom, pi}}});
-      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle), c_MissMassiveParticle) << d.getString();
-    }
-
   }
 
   TEST_F(MCMatchingTest, FlavouredD0Decay)

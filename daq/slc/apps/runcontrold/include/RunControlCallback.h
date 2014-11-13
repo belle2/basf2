@@ -69,7 +69,7 @@ namespace Belle2 {
     void update() throw();
     bool distribute(NSMMessage& msg) throw();
     bool distribute_r(NSMMessage& msg) throw();
-    bool loadNode(unsigned int index) throw();
+    bool loadNode(int index) throw();
     void postRun() throw();
     ConfigObjectList::iterator findConfig(const std::string& nodename, bool& finded) throw();
     NSMNodeIterator findNode(const std::string& nodename) throw();

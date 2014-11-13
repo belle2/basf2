@@ -176,6 +176,25 @@ bool RunControlCallback::error() throw()
     logging(DAQLogMessage(nodename, LogFile::ERROR,
                           StringUtil::form("ERROR message : %s",
                                            msg.getData())));
+    if (getNode().getState() == RCState::LOADING_TS) {
+      getNode().setState(RCState::NOTREADY_S);
+      replyOK();
+      setReply(StringUtil::form("LOAD failed error on %s : %s",
+                                nodename.c_str(), msg.getData()));
+      NSMCommunicator* com = getCommunicator();
+      com->replyError(getNode().getError(), getReply());
+      if (m_callback && m_callback->getCommunicator()) {
+        NSMCommunicator* com_g = m_callback->getCommunicator();
+        com_g->replyError(getNode().getError(), getReply());
+      }
+    }
+    /*
+    NSMNodeIterator it = findNode(nodename);
+    if (it != m_node_v.end()) {
+      NSMNode& node(*it);
+      node.getState();
+    }
+    */
   }
   return true;
 }
@@ -255,18 +274,14 @@ bool RunControlCallback::load() throw()
   update();
   m_loadindex = 0;
   loadNode(m_loadindex);
-  //for (size_t i = 0; i < m_node_v.size(); i++) {
-  //  if (loadNode(i)) return true;
-  //}
-  //m_loadindex = -1;
   return true;
 }
 
-bool RunControlCallback::loadNode(unsigned int index) throw()
+bool RunControlCallback::loadNode(int index) throw()
 {
   m_loadindex = index + 1;
   NSMCommunicator& com(*getCommunicator());
-  if (index >= m_node_v.size()) {
+  if (index >= (int)m_node_v.size()) {
     m_loadindex = -1;
     return false;
   }

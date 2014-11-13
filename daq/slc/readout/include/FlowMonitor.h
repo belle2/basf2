@@ -17,6 +17,8 @@ namespace Belle2 {
       m_ioinfo.push_back(IOInfo());
       m_ioinfo.push_back(IOInfo());
       m_info = NULL;
+      m_status.connection_in = 0;
+      m_status.connection_out = 0;
     }
     ~FlowMonitor() {}
 

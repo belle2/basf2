@@ -49,7 +49,7 @@ namespace Belle2 {
         const std::string name = boxtype.getString("@name");
         G4VSolid* shape_box = new G4Box(name, box.height, box.width, box.length);
         box.volume = new G4LogicalVolume(shape_box, Materials::get(box.material), name);
-        B2INFO("Created " << name << " DockBox with a mass of " << (box.volume->GetMass(true) / kg) << "kg");
+        B2INFO("Created " << name << " DockBox with a mass of " << (box.volume->GetMass(true) / CLHEP::kg) << "kg");
         boxes[name] = box;
       }
 

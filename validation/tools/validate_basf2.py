@@ -79,16 +79,20 @@ class Validation:
         self.list_of_packages = []
 
         ## The list of packages to be included in the validation. If we are
-        # running a complete validation, this will be None.
+        #  running a complete validation, this will be None.
         self.packages = None
 
         ## Additional arguments for basf2, if we received any from the command
-        # line arguments
+        #  line arguments
         self.basf2_options = ''
 
         ## A variable which holds the mode, i.e. 'local' for local
-        # multi-processing and 'cluster' for cluster usage
+        #  multi-processing and 'cluster' for cluster usage
         self.mode = None
+
+        ## Defines whether the validation is run in quiet mode, i.e. without
+        #  the dynamic progress bar
+        self.quiet = False
 
     def build_dependencies(self):
         """!
@@ -239,9 +243,10 @@ class Validation:
         else:
             control = local_control
 
-        # This variable is needed for the progress bar function
-        progress_bar_lines = 0
-        print
+        if not self.quiet:
+            # This variable is needed for the progress bar function
+            progress_bar_lines = 0
+            print
 
         # The list of scripts that have to be processed
         remaining_scripts = [script for script in self.list_of_scripts if script.status == 'waiting']
@@ -304,7 +309,9 @@ class Validation:
             # Wait for one second before starting again
             time.sleep(1)
 
-            progress_bar_lines = draw_progress_bar(progress_bar_lines)
+            # If we are not running in quiet mode, draw the progress bar
+            if not self.quiet:
+                progress_bar_lines = draw_progress_bar(progress_bar_lines)
 
         print
 
@@ -517,7 +524,7 @@ def find_creator(outputfile, package):
 
     # Get a list of all Script objects for scripts in the given package as well
     # as from the validation-folder
-    candidates = [script for script in validation.list_of_scripts if script.package in [package, 'valiation']]
+    candidates = [script for script in validation.list_of_scripts if script.package in [package, 'validation']]
 
     # Reserve some space for the results we will return
     results = []
@@ -603,13 +610,15 @@ def parse_cmd_line_arguments():
                                                    "multiple packages. "
                                                    "Validation will be run "
                                                    "only on these packages! "
-                                                   "E.g. -pkgte analysis arich",
+                                                   "E.g. -pkg analysis arich",
                         type=str, nargs='*')
     parser.add_argument("-m", "--mode", help="The mode which will be used for "
                                              "running the validation. Two "
                                              "possible values: 'local' or "
                                              "'cluster'. Default is 'local'",
                         type=str, nargs='?', default='local')
+    parser.add_argument("-q", "--quiet", help="Suppress the progress bar",
+                        action='store_true')
 
     # Return the parsed arguments!
     return parser.parse_args()
@@ -757,6 +766,10 @@ try:
         validation.log.note('Validation will use local multi-processing.')
     elif validation.mode == 'cluster':
         validation.log.note('Validation will use the cluster.')
+
+    # Check if we are running in quiet mode (no progress bar)
+    if cmd_arguments.quiet:
+        validation.quiet = True
 
     # Now collect the steering files which will be used in this validation.
     # This will fill validation.list_of_sf_paths with values.

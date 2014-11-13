@@ -147,9 +147,7 @@ bool RunControlCallback::ok() throw()
       }
       if (state == RCState::READY_S &&
           getNode().getState() == RCState::LOADING_TS) {
-        LogFile::debug("debug2");
         if (m_loadindex >= 0 && m_loadindex < (int)m_node_v.size()) {
-          LogFile::debug("debug : loadindex=%d", (int)m_loadindex);
           loadNode(m_loadindex);
         } else {
           m_loadindex = -1;

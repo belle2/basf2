@@ -15,6 +15,8 @@
 /* Belle2 headers. */
 #include <eklm/geometry/G4TriangularPrism.h>
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 using namespace Belle2;
 
 G4TriangularPrism::G4TriangularPrism(const G4String& name,
@@ -56,9 +58,9 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
     goto err_mem2;
   }
   if (r1 >= r2)
-    t = G4RotateZ3D((phi1 + alpha) * rad - 90.0 * deg);
+    t = G4RotateZ3D((phi1 + alpha) * CLHEP::rad - 90.0 * CLHEP::deg);
   else
-    t = G4RotateZ3D((phi2 - alpha) * rad + 90.0 * deg);
+    t = G4RotateZ3D((phi2 - alpha) * CLHEP::rad + 90.0 * CLHEP::deg);
   try {
     m_is = new G4IntersectionSolid(name, m_tube, m_box, t);
   } catch (std::bad_alloc& ba) {

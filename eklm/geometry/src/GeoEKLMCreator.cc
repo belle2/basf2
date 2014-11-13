@@ -36,6 +36,8 @@
 #include <geometry/Materials.h>
 #include <geometry/utilities.h>
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 using namespace Belle2;
 
 static const char MemErr[] = "Memory allocation error.";
@@ -191,12 +193,12 @@ void EKLM::GeoEKLMCreator::createMaterials()
  */
 static void readPositionData(struct EKLM::ElementPosition* epos, GearDir* gd)
 {
-  epos->innerR = gd->getLength("InnerR") * cm;
-  epos->outerR = gd->getLength("OuterR") * cm;
-  epos->length = gd->getLength("Length") * cm;
-  epos->X = gd->getLength("PositionX") * cm;
-  epos->Y = gd->getLength("PositionY") * cm;
-  epos->Z = gd->getLength("PositionZ") * cm;
+  epos->innerR = gd->getLength("InnerR") * CLHEP::cm;
+  epos->outerR = gd->getLength("OuterR") * CLHEP::cm;
+  epos->length = gd->getLength("Length") * CLHEP::cm;
+  epos->X = gd->getLength("PositionX") * CLHEP::cm;
+  epos->Y = gd->getLength("PositionY") * CLHEP::cm;
+  epos->Z = gd->getLength("PositionZ") * CLHEP::cm;
 }
 
 /**
@@ -207,26 +209,26 @@ static void readPositionData(struct EKLM::ElementPosition* epos, GearDir* gd)
 static void readSectorSupportData(struct EKLM::SectorSupportSize* sss,
                                   GearDir* gd)
 {
-  sss->Thickness = gd->getLength("Thickness") * cm;
-  sss->DeltaLY = gd->getLength("DeltaLY") * cm;
-  sss->CornerX = gd->getLength("CornerX") * cm;
-  sss->TopCornerHeight = gd->getLength("TopCornerHeight") * cm;
-  sss->Corner1LX = gd->getLength("Corner1LX") * cm;
-  sss->Corner1Width = gd->getLength("Corner1Width") * cm;
-  sss->Corner1Thickness = gd->getLength("Corner1Thickness") * cm;
-  sss->Corner1Z = gd->getLength("Corner1Z") * cm;
-  sss->Corner2LX = gd->getLength("Corner2LX") * cm;
-  sss->Corner2LY = gd->getLength("Corner2LY") * cm;
-  sss->Corner2Thickness = gd->getLength("Corner2Thickness") * cm;
-  sss->Corner2Z = gd->getLength("Corner2Z") * cm;
-  sss->Corner3LX = gd->getLength("Corner3LX") * cm;
-  sss->Corner3LY = gd->getLength("Corner3LY") * cm;
-  sss->Corner3Thickness = gd->getLength("Corner3Thickness") * cm;
-  sss->Corner3Z = gd->getLength("Corner3Z") * cm;
-  sss->Corner4LX = gd->getLength("Corner4LX") * cm;
-  sss->Corner4LY = gd->getLength("Corner4LY") * cm;
-  sss->Corner4Thickness = gd->getLength("Corner4Thickness") * cm;
-  sss->Corner4Z = gd->getLength("Corner4Z") * cm;
+  sss->Thickness = gd->getLength("Thickness") * CLHEP::cm;
+  sss->DeltaLY = gd->getLength("DeltaLY") * CLHEP::cm;
+  sss->CornerX = gd->getLength("CornerX") * CLHEP::cm;
+  sss->TopCornerHeight = gd->getLength("TopCornerHeight") * CLHEP::cm;
+  sss->Corner1LX = gd->getLength("Corner1LX") * CLHEP::cm;
+  sss->Corner1Width = gd->getLength("Corner1Width") * CLHEP::cm;
+  sss->Corner1Thickness = gd->getLength("Corner1Thickness") * CLHEP::cm;
+  sss->Corner1Z = gd->getLength("Corner1Z") * CLHEP::cm;
+  sss->Corner2LX = gd->getLength("Corner2LX") * CLHEP::cm;
+  sss->Corner2LY = gd->getLength("Corner2LY") * CLHEP::cm;
+  sss->Corner2Thickness = gd->getLength("Corner2Thickness") * CLHEP::cm;
+  sss->Corner2Z = gd->getLength("Corner2Z") * CLHEP::cm;
+  sss->Corner3LX = gd->getLength("Corner3LX") * CLHEP::cm;
+  sss->Corner3LY = gd->getLength("Corner3LY") * CLHEP::cm;
+  sss->Corner3Thickness = gd->getLength("Corner3Thickness") * CLHEP::cm;
+  sss->Corner3Z = gd->getLength("Corner3Z") * CLHEP::cm;
+  sss->Corner4LX = gd->getLength("Corner4LX") * CLHEP::cm;
+  sss->Corner4LY = gd->getLength("Corner4LY") * CLHEP::cm;
+  sss->Corner4Thickness = gd->getLength("Corner4Thickness") * CLHEP::cm;
+  sss->Corner4Z = gd->getLength("Corner4Z") * CLHEP::cm;
 }
 
 void EKLM::GeoEKLMCreator::readXMLData()
@@ -247,7 +249,7 @@ void EKLM::GeoEKLMCreator::readXMLData()
   GearDir Layer(EndCap);
   Layer.append("/Layer");
   readPositionData(&LayerPosition, &Layer);
-  Layer_shiftZ = Layer.getLength("ShiftZ") * cm;
+  Layer_shiftZ = Layer.getLength("ShiftZ") * CLHEP::cm;
   GearDir Sector(Layer);
   Sector.append("/Sector");
   readPositionData(&SectorPosition, &Sector);
@@ -255,14 +257,14 @@ void EKLM::GeoEKLMCreator::readXMLData()
   nBoard = Sector.getInt("nBoard");
   GearDir Boards(Sector);
   Boards.append("/Boards");
-  BoardSize.length = Boards.getLength("Length") * cm;
-  BoardSize.width = Boards.getLength("Width") * cm;
-  BoardSize.height = Boards.getLength("Height") * cm;
-  BoardSize.base_width = Boards.getLength("BaseWidth") * cm;
-  BoardSize.base_height = Boards.getLength("BaseHeight") * cm;
-  BoardSize.strip_length = Boards.getLength("StripLength") * cm;
-  BoardSize.strip_width = Boards.getLength("StripWidth") * cm;
-  BoardSize.strip_height = Boards.getLength("StripHeight") * cm;
+  BoardSize.length = Boards.getLength("Length") * CLHEP::cm;
+  BoardSize.width = Boards.getLength("Width") * CLHEP::cm;
+  BoardSize.height = Boards.getLength("Height") * CLHEP::cm;
+  BoardSize.base_width = Boards.getLength("BaseWidth") * CLHEP::cm;
+  BoardSize.base_height = Boards.getLength("BaseHeight") * CLHEP::cm;
+  BoardSize.strip_length = Boards.getLength("StripLength") * CLHEP::cm;
+  BoardSize.strip_width = Boards.getLength("StripWidth") * CLHEP::cm;
+  BoardSize.strip_height = Boards.getLength("StripHeight") * CLHEP::cm;
   nStripBoard = Boards.getInt("nStripBoard");
   for (j = 0; j < nPlane; j++) {
     BoardPosition[j] = (struct EKLM::BoardPosition*)
@@ -273,8 +275,8 @@ void EKLM::GeoEKLMCreator::readXMLData()
       GearDir BoardContent(Boards);
       BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
       BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
-      BoardPosition[j][i].phi = BoardContent.getLength("Phi") * rad;
-      BoardPosition[j][i].r = BoardContent.getLength("Radius") * cm;
+      BoardPosition[j][i].phi = BoardContent.getLength("Phi") * CLHEP::rad;
+      BoardPosition[j][i].r = BoardContent.getLength("Radius") * CLHEP::cm;
     }
   }
   StripBoardPosition = (struct EKLM::StripBoardPosition*)
@@ -286,7 +288,7 @@ void EKLM::GeoEKLMCreator::readXMLData()
     GearDir StripBoardContent(Boards);
     StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
                               (i + 1)).str());
-    StripBoardPosition[i].x = StripBoardContent.getLength("PositionX") * cm;
+    StripBoardPosition[i].x = StripBoardContent.getLength("PositionX") * CLHEP::cm;
   }
   GearDir SectorSupport(Sector);
   SectorSupport.append("/SectorSupport");
@@ -296,19 +298,19 @@ void EKLM::GeoEKLMCreator::readXMLData()
   Plane.append("/Plane");
   readPositionData(&PlanePosition, &Plane);
   nSection = Plane.getInt("nSection");
-  PlasticSheetWidth = Plane.getLength("PlasticSheetWidth") * cm;
-  PlasticSheetDeltaL = Plane.getLength("PlasticSheetDeltaL") * cm;
+  PlasticSheetWidth = Plane.getLength("PlasticSheetWidth") * CLHEP::cm;
+  PlasticSheetDeltaL = Plane.getLength("PlasticSheetDeltaL") * CLHEP::cm;
   GearDir Strips(Plane);
   Strips.append("/Strips");
   nStrip = Strips.getNumberNodes("Strip");
-  StripSize.width  = Strips.getLength("Width") * cm;
-  StripSize.thickness = Strips.getLength("Thickness") * cm;
-  StripSize.groove_depth = Strips.getLength("GrooveDepth") * cm;
-  StripSize.groove_width = Strips.getLength("GrooveWidth") * cm;
+  StripSize.width  = Strips.getLength("Width") * CLHEP::cm;
+  StripSize.thickness = Strips.getLength("Thickness") * CLHEP::cm;
+  StripSize.groove_depth = Strips.getLength("GrooveDepth") * CLHEP::cm;
+  StripSize.groove_width = Strips.getLength("GrooveWidth") * CLHEP::cm;
   StripSize.no_scintillation_thickness = Strips.
                                          getLength("NoScintillationThickness")
-                                         * cm;
-  StripSize.rss_size = Strips.getLength("RSSSize") * cm;
+                                         * CLHEP::cm;
+  StripSize.rss_size = Strips.getLength("RSSSize") * CLHEP::cm;
   StripPosition = (struct EKLM::ElementPosition*)
                   malloc(nStrip * sizeof(struct EKLM::ElementPosition));
   if (StripPosition == NULL)
@@ -316,17 +318,17 @@ void EKLM::GeoEKLMCreator::readXMLData()
   for (i = 0; i < nStrip; i++) {
     GearDir StripContent(Strips);
     StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
-    StripPosition[i].length = StripContent.getLength("Length") * cm;
-    StripPosition[i].X = StripContent.getLength("PositionX") * cm;
-    StripPosition[i].Y = StripContent.getLength("PositionY") * cm;
-    StripPosition[i].Z = StripContent.getLength("PositionZ") * cm;
+    StripPosition[i].length = StripContent.getLength("Length") * CLHEP::cm;
+    StripPosition[i].X = StripContent.getLength("PositionX") * CLHEP::cm;
+    StripPosition[i].Y = StripContent.getLength("PositionY") * CLHEP::cm;
+    StripPosition[i].Z = StripContent.getLength("PositionZ") * CLHEP::cm;
   }
   GearDir Sections(Plane);
   Sections.append("/Sections");
-  SectionSupportTopWidth = Sections.getLength("TopWidth") * cm;
-  SectionSupportTopThickness = Sections.getLength("TopThickness") * cm;
-  SectionSupportMiddleWidth = Sections.getLength("MiddleWidth") * cm;
-  SectionSupportMiddleThickness = Sections.getLength("MiddleThickness") * cm;
+  SectionSupportTopWidth = Sections.getLength("TopWidth") * CLHEP::cm;
+  SectionSupportTopThickness = Sections.getLength("TopThickness") * CLHEP::cm;
+  SectionSupportMiddleWidth = Sections.getLength("MiddleWidth") * CLHEP::cm;
+  SectionSupportMiddleThickness = Sections.getLength("MiddleThickness") * CLHEP::cm;
   for (j = 0; j < nPlane; j++) {
     SectionSupportPosition[j] =
       (struct EKLM::SectionSupportPosition*)
@@ -342,18 +344,18 @@ void EKLM::GeoEKLMCreator::readXMLData()
                                       "/SectionSupport[%1%]") %
                                     (i +  1)).str());
       SectionSupportPosition[j][i].length = SectionSupportContent.
-                                            getLength("Length") * cm;
+                                            getLength("Length") * CLHEP::cm;
       SectionSupportPosition[j][i].x = SectionSupportContent.
-                                       getLength("PositionX") * cm;
+                                       getLength("PositionX") * CLHEP::cm;
       SectionSupportPosition[j][i].y = SectionSupportContent.
-                                       getLength("PositionY") * cm;
+                                       getLength("PositionY") * CLHEP::cm;
       SectionSupportPosition[j][i].z = SectionSupportContent.
-                                       getLength("PositionZ") * cm;
+                                       getLength("PositionZ") * CLHEP::cm;
       SectionSupportPosition[j][i].deltal_right = SectionSupportContent.
                                                   getLength("DeltaLRight") *
-                                                  cm;
+                                                  CLHEP::cm;
       SectionSupportPosition[j][i].deltal_left = SectionSupportContent.
-                                                 getLength("DeltaLLeft") * cm;
+                                                 getLength("DeltaLLeft") * CLHEP::cm;
     }
   }
   haveGeoDat = true;
@@ -450,7 +452,7 @@ double EKLM::GeoEKLMCreator::getSectorSupportCornerAngle()
     x2 = SectorSupportSize.CornerX + SectorSupportPosition.X;
     y2 = sqrt(SectorSupportPosition.outerR * SectorSupportPosition.outerR -
               x2 * x2);
-    SectorSupportSize.CornerAngle = atan2(y2 - y1, x2 - x1) * rad;
+    SectorSupportSize.CornerAngle = atan2(y2 - y1, x2 - x1) * CLHEP::rad;
   }
   return SectorSupportSize.CornerAngle;
 }
@@ -470,7 +472,7 @@ void EKLM::GeoEKLMCreator::createEndcapSolid()
   }
   try {
     tb = new G4Tubs("Endcap_Tube",  ESTRPar.rminsub, ESTRPar.rmaxsub,
-                    ESTRPar.zsub, 0.0, 360.0 * deg);
+                    ESTRPar.zsub, 0.0, 360.0 * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -496,7 +498,7 @@ void EKLM::GeoEKLMCreator::createSectorCoverSolid()
     solidCoverTube = new G4Tubs("Cover_Tube",
                                 SectorSupportPosition.innerR,
                                 SectorSupportPosition.outerR, 0.5 * lz, 0.0,
-                                90.0 * deg);
+                                90.0 * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -569,7 +571,7 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxY(G4Transform3D& t)
             SectorSupportPosition.X * SectorSupportPosition.X);
   y2 = SectorSupportPosition.outerR - SectorSupportSize.DeltaLY;
   t = G4Translate3D(SectorSupportPosition.X + 0.5 * SectorSupportSize.Thickness,
-                    0.5 * (y1 + y2), 0.) * G4RotateZ3D(90. * deg);
+                    0.5 * (y1 + y2), 0.) * G4RotateZ3D(90. * CLHEP::deg);
   try {
     res = new G4Box("SectorSupport_BoxY",
                     0.5 * (y2 - y1),
@@ -628,7 +630,7 @@ G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportInnerTube()
                      SectorSupportPosition.innerR +
                      SectorSupportSize.Thickness,
                      0.5 * SectorSupportPosition.length,
-                     std::min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
+                     std::min(ang1, ang2) * CLHEP::rad, fabs(ang1 - ang2) * CLHEP::rad);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -659,7 +661,7 @@ G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportOuterTube()
                      SectorSupportSize.Thickness,
                      SectorSupportPosition.outerR,
                      0.5 * SectorSupportPosition.length,
-                     std::min(ang1, ang2) * rad, fabs(ang1 - ang2) * rad);
+                     std::min(ang1, ang2) * CLHEP::rad, fabs(ang1 - ang2) * CLHEP::rad);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -683,7 +685,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1Solid()
                                   SectorSupportPosition.outerR -
                                   SectorSupportSize.Thickness,
                                   0.5 * SectorSupportSize.Corner1Thickness,
-                                  0., 90. * deg);
+                                  0., 90. * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -742,9 +744,9 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2Solid()
   try {
     solidCorner2Prism = new G4TriangularPrism("SectorSupport_Corner2_Prism",
                                               SectorSupportSize.Corner2LY,
-                                              90. * deg,
+                                              90. * CLHEP::deg,
                                               SectorSupportSize.Corner2LX,
-                                              180. * deg,
+                                              180. * CLHEP::deg,
                                               0.5 * SectorSupportSize.
                                               Corner2Thickness);
   } catch (std::bad_alloc& ba) {
@@ -776,7 +778,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3Solid()
     solidCorner3Prism = new G4TriangularPrism("SectorSupport_Corner3_Prism",
                                               SectorSupportSize.Corner3LX, 0.,
                                               SectorSupportSize.Corner3LY,
-                                              90. * deg,
+                                              90. * CLHEP::deg,
                                               0.5 * SectorSupportSize.
                                               Corner3Thickness);
   } catch (std::bad_alloc& ba) {
@@ -808,7 +810,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner4Solid()
     solidCorner4Prism = new G4TriangularPrism("SectorSupport_Corner4_Prism",
                                               SectorSupportSize.Corner4LX, 0.,
                                               SectorSupportSize.Corner4LY,
-                                              90. * deg,
+                                              90. * CLHEP::deg,
                                               0.5 * SectorSupportSize.
                                               Corner4Thickness);
   } catch (std::bad_alloc& ba) {
@@ -847,7 +849,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportSolid()
     solidLimitationTube = new G4Tubs("SectorSupport_LimitationTube",
                                      0., SectorSupportPosition.outerR,
                                      0.5 * SectorSupportPosition.length,
-                                     0., 90.*deg);
+                                     0., 90.*CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -913,7 +915,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   snprintf(name, 128, "Plane_%d_Tube", n + 1);
   try {
     tb = new G4Tubs(name, PlanePosition.innerR, PlanePosition.outerR,
-                    0.5 * PlanePosition.length, 0.0, 90.0 * deg);
+                    0.5 * PlanePosition.length, 0.0, 90.0 * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -929,9 +931,9 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   }
   snprintf(name, 128, "Plane_%d_Triangular_Prism_1", n + 1);
   try {
-    pr1 = new G4TriangularPrism(name, SectorSupportSize.Corner2LY, 90. * deg,
+    pr1 = new G4TriangularPrism(name, SectorSupportSize.Corner2LY, 90. * CLHEP::deg,
                                 SectorSupportSize.Corner2LX,
-                                180. * deg, PlanePosition.length);
+                                180. * CLHEP::deg, PlanePosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -939,7 +941,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   try {
     pr2 = new G4TriangularPrism(name, SectorSupportSize.Corner3LX, 0.,
                                 SectorSupportSize.Corner3LY,
-                                90. * deg, PlanePosition.length);
+                                90. * CLHEP::deg, PlanePosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -947,7 +949,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   try {
     pr3 = new G4TriangularPrism(name, SectorSupportSize.Corner4LX, 0.,
                                 SectorSupportSize.Corner4LY,
-                                90. * deg, PlanePosition.length);
+                                90. * CLHEP::deg, PlanePosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -961,7 +963,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   t1 = HepGeom::Translate3D(0.5 * (PlanePosition.outerR + box_x),
                             0.5 * (PlanePosition.outerR + box_x), 0.);
   if (n == 1)
-    t1 = HepGeom::Rotate3D(180. * deg,
+    t1 = HepGeom::Rotate3D(180. * CLHEP::deg,
                            HepGeom::Vector3D<double>(1., 1., 0.)) * t1;
   ang = getSectorSupportCornerAngle();
   x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X);
@@ -986,7 +988,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   x = sqrt(r * r - y * y);
   t3 = HepGeom::Translate3D(x, y, 0.);
   if (n == 1)
-    t3 = HepGeom::Rotate3D(180. * deg,
+    t3 = HepGeom::Rotate3D(180. * CLHEP::deg,
                            HepGeom::Vector3D<double>(1., 1., 0.)) * t3;
   r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
   y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
@@ -995,7 +997,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
   t4 = HepGeom::Translate3D(x, y, 0.);
   if (n == 1)
-    t4 = HepGeom::Rotate3D(180. * deg,
+    t4 = HepGeom::Rotate3D(180. * CLHEP::deg,
                            HepGeom::Vector3D<double>(1., 1., 0.)) * t4;
   x = SectorSupportPosition.X + SectorSupportSize.Thickness +
       SectorSupportSize.Corner4LX;
@@ -1003,7 +1005,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   x = SectorSupportPosition.X + SectorSupportSize.Thickness;
   t5 = HepGeom::Translate3D(x, y, 0.);
   if (n == 1)
-    t5 = HepGeom::Rotate3D(180. * deg,
+    t5 = HepGeom::Rotate3D(180. * CLHEP::deg,
                            HepGeom::Vector3D<double>(1., 1., 0.)) * t5;
   /* Boolean solids. */
   snprintf(name, 128, "Plane_%d_Intersection", n + 1);
@@ -1128,7 +1130,7 @@ void EKLM::GeoEKLMCreator::createSolids()
   try {
     solids.layer = new G4Tubs("Layer", LayerPosition.innerR,
                               LayerPosition.outerR, LayerPosition.length / 2.0,
-                              0. * deg, 360. * deg);
+                              0. * CLHEP::deg, 360. * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1137,7 +1139,7 @@ void EKLM::GeoEKLMCreator::createSolids()
     solids.sector = new G4Tubs("Sector", SectorPosition.innerR,
                                SectorPosition.outerR,
                                0.5 * SectorPosition.length,
-                               0.0, 90.0 * deg);
+                               0.0, 90.0 * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1340,7 +1342,7 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
           G4RotateZ3D(BoardPosition[i][j].phi) *
           G4Translate3D(BoardPosition[i][j].r -
                         0.5 * BoardSize.height, 0., 0.) *
-          G4RotateZ3D(90.0 * deg));
+          G4RotateZ3D(90.0 * CLHEP::deg));
       } catch (std::bad_alloc& ba) {
         B2FATAL(MemErr);
       }
@@ -1518,7 +1520,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
     for (j = 0; j < nBoard; j++) {
       t = *BoardTransform[i][j];
       if (n == 1)
-        t = G4Rotate3D(180. * deg, G4ThreeVector(1., 1., 0.)) * t;
+        t = G4Rotate3D(180. * CLHEP::deg, G4ThreeVector(1., 1., 0.)) * t;
       if (i == 0) {
         if (j == 0)
           prev_solid = plane;
@@ -1918,7 +1920,7 @@ void EKLM::GeoEKLMCreator::printVolumeMass(G4LogicalVolume* lv)
 {
   if (m_mode == EKLM_DETECTOR_PRINTMASSES)
     printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),
-           lv->GetMass() / g);
+           lv->GetMass() / CLHEP::g);
 }
 
 void EKLM::GeoEKLMCreator::create(const GearDir& content,

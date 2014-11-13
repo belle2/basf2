@@ -19,6 +19,8 @@
 #include <eklm/geometry/GeoESTRCreator.h>
 #include <framework/gearbox/GearDir.h>
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 using namespace Belle2;
 
 int EKLM::readESTRData(struct EKLM::ESTRGeometryParams* par)

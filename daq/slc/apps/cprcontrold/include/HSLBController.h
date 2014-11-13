@@ -50,9 +50,13 @@ namespace Belle2 {
     int writestream(char* filename) throw();
     bool boot(const std::string& runtype,
               const std::string& firmware) throw();
+    const std::string getErrMessage() {
+      return m_errmsg;
+    }
 
   private:
     hslb_info m_hslb;
+    std::string m_errmsg;
 
   };
 

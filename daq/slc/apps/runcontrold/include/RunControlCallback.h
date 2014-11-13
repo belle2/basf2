@@ -91,7 +91,7 @@ namespace Belle2 {
     LogFile::Priority m_priority_local;
     LogFile::Priority m_priority_global;
     StringList m_excluded_v;
-    unsigned int m_loadindex;
+    int m_loadindex;
 
   private:
     class ConfigProvider {

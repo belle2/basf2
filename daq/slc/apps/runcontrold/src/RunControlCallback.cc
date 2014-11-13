@@ -39,7 +39,7 @@ RunControlCallback::RunControlCallback(const NSMNode& node,
   m_callback = NULL;
   setAutoReply(false);
   setDBClose(false);
-  m_loadindex = 0;
+  m_loadindex = -1;
 }
 
 void RunControlCallback::init() throw()
@@ -147,10 +147,12 @@ bool RunControlCallback::ok() throw()
       }
       if (state == RCState::READY_S &&
           getNode().getState() == RCState::LOADING_TS) {
-        if (m_loadindex < m_node_v.size()) {
+        LogFile::debug("debug2");
+        if (m_loadindex >= 0 && m_loadindex < (int)m_node_v.size()) {
+          LogFile::debug("debug : loadindex=%d", (int)m_loadindex);
           loadNode(m_loadindex);
         } else {
-          m_loadindex = 0;
+          m_loadindex = -1;
         }
       }
       if (state.isStable() && synchronize(node)) {
@@ -253,9 +255,11 @@ bool RunControlCallback::load() throw()
   getNode().setState(RCState::LOADING_TS);
   replyOK();
   update();
+  m_loadindex = 0;
   for (size_t i = 0; i < m_node_v.size(); i++) {
     if (loadNode(i)) return true;
   }
+  m_loadindex = -1;
   return true;
 }
 
@@ -263,13 +267,13 @@ bool RunControlCallback::loadNode(unsigned int index) throw()
 {
   m_loadindex = index + 1;
   NSMCommunicator& com(*getCommunicator());
-  NSMMessage& msg(getMessage());
   if (index >= m_node_v.size()) {
     return false;
   }
   NSMNode& node(m_node_v[index]);
-  msg.setNodeName(node);
-  msg.setData(0, NULL);
+  NSMMessage msg(NSMMessage(node, RCCommand::LOAD));
+  //msg.setNodeName(node);
+  //msg.setData(0, NULL);
   bool finded;
   ConfigObjectList::iterator it = findConfig(node.getName(), finded);
   if (!finded) return false;

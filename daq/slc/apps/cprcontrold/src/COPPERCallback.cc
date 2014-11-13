@@ -246,7 +246,9 @@ bool COPPERCallback::recover() throw()
     if (m_config.useHSLB(i)) { // && (m_force_boothslb || m_hslb[i].isError())) {
       if (!m_hslb[i].boot(m_config.getSetup().getRunType(),
                           m_config.getSetup().getHSLBFirmware()))
-        return false;
+        setReply(m_hslb[i].getErrMessage());
+      getNode().setState(RCState::NOTREADY_S);
+      return false;
       m_hslb[i].load();
       if (m_fee[i] != NULL) {
         m_fee[i]->load(m_hslb[i], m_config.getFEE(i));

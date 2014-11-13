@@ -101,7 +101,7 @@ bool HSLBController::boot(const std::string& runtype,
       system(cmd.c_str());
       ntry++;
       if (ntry > 50) {
-        m_errmsg = StringUtil::form("Can not establich b2link at HSLB %c", (char)('a' + m_hslb.fin));
+        m_errmsg = StringUtil::form("Can not establish b2link at HSLB %c", (char)('a' + m_hslb.fin));
         LogFile::error(m_errmsg);
         return false;
       }

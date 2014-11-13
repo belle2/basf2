@@ -256,10 +256,11 @@ bool RunControlCallback::load() throw()
   replyOK();
   update();
   m_loadindex = 0;
-  for (size_t i = 0; i < m_node_v.size(); i++) {
-    if (loadNode(i)) return true;
-  }
-  m_loadindex = -1;
+  loadNode(m_loadindex);
+  //for (size_t i = 0; i < m_node_v.size(); i++) {
+  //  if (loadNode(i)) return true;
+  //}
+  //m_loadindex = -1;
   return true;
 }
 
@@ -268,15 +269,14 @@ bool RunControlCallback::loadNode(unsigned int index) throw()
   m_loadindex = index + 1;
   NSMCommunicator& com(*getCommunicator());
   if (index >= m_node_v.size()) {
+    m_loadindex = -1;
     return false;
   }
   NSMNode& node(m_node_v[index]);
   NSMMessage msg(NSMMessage(node, RCCommand::LOAD));
-  //msg.setNodeName(node);
-  //msg.setData(0, NULL);
   bool finded;
   ConfigObjectList::iterator it = findConfig(node.getName(), finded);
-  if (!finded) return false;
+  if (!finded) return loadNode(m_loadindex);
   node.setUsed(it->getBool("used"));
   if (node.isUsed() && !node.isExcluded() &&
       msg.getNodeName() == node.getName()) {
@@ -309,11 +309,11 @@ bool RunControlCallback::loadNode(unsigned int index) throw()
                           StringUtil::form("Send %s to %s",
                                            msg.getRequestName(),
                                            node.getName().c_str())));
-    com.sendRequest(msg);
     node.setState(RCState::LOADING_TS);
-    return it->getBool("sequential");
+    com.sendRequest(msg);
+    if (it->getBool("sequential")) return true;
   }
-  return false;
+  return loadNode(m_loadindex);
 }
 
 bool RunControlCallback::distribute(NSMMessage& msg) throw()

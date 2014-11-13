@@ -16,6 +16,8 @@
 #pragma link C++ class Belle2::SVDHoughTrack;
 #pragma link C++ class Belle2::SVDHoughCluster;
 
+#pragma link C++ class pair <bool, double>+;
+#pragma link C++ class pair <bool, int>+;
 #pragma link C++ class pair <unsigned int, pair < double, double > >+;
 #pragma link C++ class vector < pair <unsigned int, pair < double, double > > >+;
 #pragma link C++ class pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > >+;

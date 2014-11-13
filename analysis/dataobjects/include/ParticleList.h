@@ -310,6 +310,7 @@ namespace Belle2 {
 
     ClassDef(ParticleList, 3); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
 
+    friend class ParticleSubset;
   };
 
 } // end namespace Belle2

@@ -647,6 +647,8 @@ namespace Belle2 {
     void setFlavorType();
 
     ClassDef(Particle, 7); /**< Class to store reconstructed particles. */
+
+    friend class ParticleSubset;
   };
 
 } // end namespace Belle2

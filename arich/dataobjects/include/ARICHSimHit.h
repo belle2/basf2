@@ -64,7 +64,7 @@ namespace Belle2 {
     TVector2 getLocalPosition() const { TVector2 vec(m_x, m_y); return vec; }
 
     //! Get global time of hit
-    double getGlobalTime() const { return m_globalTime; }
+    float getGlobalTime() const { return m_globalTime; }
 
     //! Get detected photon energy
     double getEnergy() const { return m_energy; }

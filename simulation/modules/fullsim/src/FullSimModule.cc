@@ -154,7 +154,7 @@ void FullSimModule::initialize()
 
       //Set a minimum stepsize (stepMinimum): The chordfinder should not attempt to limit
       //the stepsize to something less than 10µm (which is the default value of Geant4).
-      G4ChordFinder* chordFinder = new G4ChordFinder(magneticField, 1e-2 * mm, stepper);
+      G4ChordFinder* chordFinder = new G4ChordFinder(magneticField, 1e-2 * CLHEP::mm, stepper);
       fieldManager->SetChordFinder(chordFinder);
     } else {
       fieldManager->CreateChordFinder(magneticField);
@@ -163,7 +163,7 @@ void FullSimModule::initialize()
     //Change DeltaCord (the max. miss-distance between the trajectory curve and its linear chord(s) approximation, if asked.
     G4ChordFinder* chordFinder = fieldManager->GetChordFinder();
     B2INFO("Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
-    chordFinder->SetDeltaChord(m_deltaChordInMagneticField * mm);
+    chordFinder->SetDeltaChord(m_deltaChordInMagneticField * CLHEP::mm);
     B2INFO("DeltaChord after reset = " << chordFinder->GetDeltaChord());
 
     //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)

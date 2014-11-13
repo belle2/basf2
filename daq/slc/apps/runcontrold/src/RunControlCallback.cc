@@ -251,6 +251,7 @@ void RunControlCallback::postRun() throw()
 bool RunControlCallback::load() throw()
 {
   getNode().setState(RCState::LOADING_TS);
+  replyOK();
   update();
   for (size_t i = 0; i < m_node_v.size(); i++) {
     if (loadNode(i)) return true;
@@ -668,12 +669,12 @@ void RunControlCallback::update() throw()
   } else if (recovering_any ||
              (!ready_all && state_org == RCState::RECOVERING_RS)) {
     getNode().setState(RCState::RECOVERING_RS);
+  } else if (state_org == RCState::LOADING_TS) {
+
   } else if (notready_any) {
     getNode().setState(RCState::NOTREADY_S);
   } else if (ready_all) {
     getNode().setState(RCState::READY_S);
-  } else if (state_org == RCState::LOADING_TS) {
-
   } else if (paused_any) {
     getNode().setState(RCState::PAUSED_S);
   } else if (starting_any ||

@@ -28,6 +28,12 @@ TLorentzVector PCmsLabTransform::labToCms(const TLorentzVector& vector)
   return T.rotateLabToCms() * vector;
 }
 
+TLorentzVector PCmsLabTransform::cmsToLab(const TLorentzVector& vector)
+{
+  static PCmsLabTransform T;
+  return T.rotateCmsToLab() * vector;
+}
+
 PCmsLabTransform::PCmsLabTransform()
 {
   if (m_initialized) return;

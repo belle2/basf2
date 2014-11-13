@@ -69,7 +69,19 @@ namespace Belle2 {
       return m_cmsEnergy;
     }
 
-    static TLorentzVector labToCms(const TLorentzVector&);
+    /**
+     * Transforms Lorentz vector into CM System
+     * @param vec Lorentz vector in Laboratory System
+     * @return Lorentz vector in CM System
+     */
+    static TLorentzVector labToCms(const TLorentzVector& vec);
+
+    /**
+     * Transforms Lorentz vector into Laboratory System
+     * @param vec Lorentz vector in CM System
+     * @return Lorentz vector in Laboratory System
+     */
+    static TLorentzVector cmsToLab(const TLorentzVector& vec);
 
   private:
     static bool m_initialized;          /**< true when class initialized */

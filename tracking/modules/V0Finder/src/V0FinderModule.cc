@@ -1,6 +1,5 @@
 #include <tracking/modules/V0Finder/V0FinderModule.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
@@ -64,8 +63,12 @@ void V0FinderModule::initialize()
   StoreArray<Track>::required(m_TrackColName);
   StoreArray<genfit::Track>::required(m_GFTrackColName);
   StoreArray<TrackFitResult>::required(m_TFRColName);
-  StoreArray<V0>::registerPersistent(m_V0ColName);
-  RelationArray::registerPersistent<V0, MCParticle> (m_V0ColName, "");
+  StoreArray < MCParticle > mcParticles;
+  mcParticles.isOptional();
+
+  StoreArray<V0> V0s(m_V0ColName);
+  V0s.registerInDataStore();
+  V0s.registerRelationTo(mcParticles);
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
@@ -272,9 +275,6 @@ void V0FinderModule::event()
 
   if (nMCpart == 0)
     return;
-
-  RelationArray gfTrToMCpart(GFTracks, mcParticles);
-  RelationArray TracksToMCpart(Tracks, mcParticles);
 
   for (size_t i = 0; i < nMCpart; ++i) {
     const MCParticle* MCpart = mcParticles[i];

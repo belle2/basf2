@@ -11,24 +11,16 @@
 #include <tracking/modules/mcTrackCandCombiner/MCTrackCandCombinerModule.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <genfit/TrackCand.h>
-#include <genfit/WireTrackCandHit.h>
 
-#include <boost/foreach.hpp>
 #include <boost/math/special_functions/sign.hpp>
 
 #include <utility>
@@ -74,19 +66,18 @@ MCTrackCandCombinerModule::~MCTrackCandCombinerModule()
 
 void MCTrackCandCombinerModule::initialize()
 {
-  StoreArray<MCParticle>::required();
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired();
+
   // at least one of the two store arrays has to be present
   if (StoreArray<genfit::TrackCand>::optional(m_vxdTrackCandColName) == false) {
     StoreArray<genfit::TrackCand>::required(m_cdcTrackCandColName);
   }
 
   //output store arrays have to be registered in initialize()
-  StoreArray<genfit::TrackCand>::registerPersistent(m_combinedTrackCandColName);
-
-  RelationArray::registerPersistent<genfit::TrackCand, MCParticle>(m_combinedTrackCandColName, "");
-
-
-
+  StoreArray<genfit::TrackCand> outCands(m_combinedTrackCandColName);
+  outCands.registerInDataStore();
+  outCands.registerRelationTo(mcParticles);
 }
 
 void MCTrackCandCombinerModule::beginRun()

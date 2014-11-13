@@ -132,23 +132,29 @@ void GenFitterModule::initialize()
   m_failedGFTrackCandFitCounter = 0;
   m_successfulGFTrackCandFitCounter = 0;
 
-  StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand> trackCandidates(m_gfTrackCandsColName);
+  StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
+  trackCandidates.isRequired();
+  mcParticles.isOptional();
 
-  StoreArray<Track>::registerPersistent();
-  StoreArray<TrackFitResult>::registerPersistent();
-  StoreArray < genfit::Track >::registerPersistent(m_gfTracksColName);
-  StoreArray < genfit::TrackCand >::registerPersistent();
+  StoreArray<Track> tracks;
+  StoreArray<genfit::Track> gftracks(m_gfTracksColName);
+  StoreArray<TrackFitResult> trackfitresults;
+
+  gftracks.registerInDataStore();
+  tracks.registerInDataStore();
+  trackfitresults.registerInDataStore();
 
   if (!m_tracksColName.empty() and m_tracksColName != "Tracks") {
     B2ERROR("Setting a collection name with TracksColName is not implemented.");
     //TODO: implementation might also need different name for TrackFitResults?
   }
 
-  RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
-  RelationArray::registerPersistent<Track, MCParticle> ();
-  RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
-  RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
-  RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
+  gftracks.registerRelationTo(mcParticles);
+  tracks.registerRelationTo(mcParticles);
+  gftracks.registerRelationTo(trackfitresults);
+  trackCandidates.registerRelationTo(trackfitresults);
+  trackCandidates.registerRelationTo(gftracks);
 
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
@@ -261,7 +267,7 @@ void GenFitterModule::event()
   RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
   RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
 
-  RelationArray gfTrackCandidatesToTrackFitResults(trackCandidates, trackFitResults, "");//"GFTrackCandsToTrackFitResults");
+  RelationArray gfTrackCandidatesToTrackFitResults(trackCandidates, trackFitResults);
 
   //Create a relation between the gftracks and their most probable 'mother' MC particle
   RelationArray gfTracksToMCPart(gfTracks, mcParticles);

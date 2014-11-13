@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/PXDDataReductionModule.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/TGeoMaterialInterface.h>
 #include <genfit/TrackCand.h>
@@ -69,15 +69,18 @@ PXDDataReductionModule::~PXDDataReductionModule()
 
 void PXDDataReductionModule::initialize()
 {
+  StoreArray<genfit::TrackCand> trackCandList(m_gfTrackCandsColName);
+  trackCandList.isRequired();
 
-  StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
-  StoreArray<ROIid>::registerPersistent(m_ROIListName);
-  StoreArray<PXDIntercept>::registerPersistent(m_PXDInterceptListName);
+  StoreArray<ROIid> ROIList(m_ROIListName);
+  ROIList.registerInDataStore();
+  StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
+  PXDInterceptList.registerInDataStore();
   StoreArray<genfit::TrackCand>::registerPersistent(m_badTracksListName);
   StoreArray<genfit::Track>::registerPersistent(m_gfTracksListName);
 
-  RelationArray::registerPersistent<genfit::TrackCand, PXDIntercept>(m_gfTrackCandsColName, m_PXDInterceptListName);
-  RelationArray::registerPersistent<PXDIntercept, ROIid>(m_PXDInterceptListName, m_ROIListName);
+  trackCandList.registerRelationTo(PXDInterceptList);
+  PXDInterceptList.registerRelationTo(ROIList);
 
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {

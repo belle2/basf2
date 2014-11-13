@@ -25,7 +25,6 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <framework/dataobjects/SimpleVec.h>
 #include <genfit/TrackCand.h>
 #include <genfit/WireTrackCandHit.h>
 
@@ -96,12 +95,14 @@ TrackFinderMCTruthModule::~TrackFinderMCTruthModule()
 
 void TrackFinderMCTruthModule::initialize()
 {
-  StoreArray<MCParticle>::required();
+  StoreArray<MCParticle> mcparticles;
+  mcparticles.isRequired();
 
   //output store arrays have to be registered in initialize()
-  StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
+  StoreArray<genfit::TrackCand> trackCandidates(m_gfTrackCandsColName);
+  trackCandidates.registerInDataStore();
 
-  RelationArray::registerPersistent<genfit::TrackCand, MCParticle>(m_gfTrackCandsColName, "");
+  trackCandidates.registerRelationTo(mcparticles);
 
   // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
   m_particleProperties = 0;

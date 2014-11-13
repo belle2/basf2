@@ -39,6 +39,7 @@ RunControlCallback::RunControlCallback(const NSMNode& node,
   m_callback = NULL;
   setAutoReply(false);
   setDBClose(false);
+  m_loadindex = 0;
 }
 
 void RunControlCallback::init() throw()
@@ -144,6 +145,14 @@ bool RunControlCallback::ok() throw()
           }
         }
       }
+      if (state == RCState::READY_S &&
+          getNode().getState() == RCState::LOADING_TS) {
+        if (m_loadindex < m_node_v.size()) {
+          loadNode(m_loadindex);
+        } else {
+          m_loadindex = 0;
+        }
+      }
       if (state.isStable() && synchronize(node)) {
         RCState state_org(getNode().getState());
         if (state != state_org) {
@@ -241,52 +250,65 @@ void RunControlCallback::postRun() throw()
 
 bool RunControlCallback::load() throw()
 {
-  NSMCommunicator& com(*getCommunicator());
-  NSMMessage& msg(getMessage());
+  getNode().setState(RCState::LOADING_TS);
+  update();
   for (size_t i = 0; i < m_node_v.size(); i++) {
-    NSMNode& node(m_node_v[i]);
-    msg.setNodeName(node);
-    msg.setData(0, NULL);
-    bool finded;
-    ConfigObjectList::iterator it = findConfig(node.getName(), finded);
-    if (!finded) continue;
-    node.setUsed(it->getBool("used"));
-    if (node.isUsed() && !node.isExcluded() &&
-        msg.getNodeName() == node.getName()) {
-      const DBObject& cobj(it->getObject("runtype"));
-      if (cobj.getTable() == "ttd") {
-        int pars[4];
-        pars[0] = cobj.getShort("trigger_type");
-        pars[1] = cobj.getShort("dummy_rate");
-        pars[2] = cobj.getShort("trigger_limit");
-        pars[3] = 0;
-        LogFile::debug("Send TRIGFT to %s (pars = {%d, %d, %d})",
-                       node.getName().c_str(),
-                       pars[0], pars[1], pars[2]);
-        com.sendRequest(NSMMessage(node, RCCommand::TRIGFT, 4, pars));
-      }
-      if (m_port > 0) {
-        msg.setNParams(4);
-        msg.setParam(0, NSMCommand::DBGET.getId());
-        msg.setParam(1, cobj.getId());
-        msg.setParam(2, m_port);
-        msg.setParam(3, i);
-      } else {
-        msg.setNParams(2);
-        msg.setParam(0, NSMCommand::DBGET.getId());
-        msg.setParam(1, cobj.getId());
-      }
-      LogFile::debug("Send %s to %s", msg.getRequestName(),
-                     node.getName().c_str());
-      logging(DAQLogMessage(getNode().getName(), LogFile::DEBUG,
-                            StringUtil::form("Send %s to %s",
-                                             msg.getRequestName(),
-                                             node.getName().c_str())));
-      com.sendRequest(msg);
-      node.setState(RCState::LOADING_TS);
-    }
+    if (loadNode(i)) return true;
   }
   return true;
+}
+
+bool RunControlCallback::loadNode(unsigned int index) throw()
+{
+  m_loadindex = index + 1;
+  NSMCommunicator& com(*getCommunicator());
+  NSMMessage& msg(getMessage());
+  if (index >= m_node_v.size()) {
+    return false;
+  }
+  NSMNode& node(m_node_v[index]);
+  msg.setNodeName(node);
+  msg.setData(0, NULL);
+  bool finded;
+  ConfigObjectList::iterator it = findConfig(node.getName(), finded);
+  if (!finded) return false;
+  node.setUsed(it->getBool("used"));
+  if (node.isUsed() && !node.isExcluded() &&
+      msg.getNodeName() == node.getName()) {
+    const DBObject& cobj(it->getObject("runtype"));
+    if (cobj.getTable() == "ttd") {
+      int pars[4];
+      pars[0] = cobj.getShort("trigger_type");
+      pars[1] = cobj.getShort("dummy_rate");
+      pars[2] = cobj.getShort("trigger_limit");
+      pars[3] = 0;
+      LogFile::debug("Send TRIGFT to %s (pars = {%d, %d, %d})",
+                     node.getName().c_str(),
+                     pars[0], pars[1], pars[2]);
+      com.sendRequest(NSMMessage(node, RCCommand::TRIGFT, 4, pars));
+    }
+    if (m_port > 0) {
+      msg.setNParams(4);
+      msg.setParam(0, NSMCommand::DBGET.getId());
+      msg.setParam(1, cobj.getId());
+      msg.setParam(2, m_port);
+      msg.setParam(3, index);
+    } else {
+      msg.setNParams(2);
+      msg.setParam(0, NSMCommand::DBGET.getId());
+      msg.setParam(1, cobj.getId());
+    }
+    LogFile::debug("Send %s to %s", msg.getRequestName(),
+                   node.getName().c_str());
+    logging(DAQLogMessage(getNode().getName(), LogFile::DEBUG,
+                          StringUtil::form("Send %s to %s",
+                                           msg.getRequestName(),
+                                           node.getName().c_str())));
+    com.sendRequest(msg);
+    node.setState(RCState::LOADING_TS);
+    return it->getBool("sequential");
+  }
+  return false;
 }
 
 bool RunControlCallback::distribute(NSMMessage& msg) throw()
@@ -493,12 +515,12 @@ bool RunControlCallback::exclude() throw()
         DAQLogMessage log(getNode().getName(), LogFile::INFO,
                           "Excluded " + node.getName());
         LoggerObjectTable(getDB()).add(log, true);
-        //getDB()->close();
       } catch (const DBHandlerException& e) {
         getDB()->close();
         LogFile::error("DB errir : %s", e.what());
       }
     }
+    update();
     return true;
   } catch (const NSMHandlerException& e) {
 
@@ -521,12 +543,12 @@ bool RunControlCallback::include() throw()
         DAQLogMessage log(getNode().getName(), LogFile::INFO,
                           "Included " + node.getName());
         LoggerObjectTable(getDB()).add(log, true);
-        //getDB()->close();
       } catch (const DBHandlerException& e) {
         getDB()->close();
         LogFile::error("DB errir : %s", e.what());
       }
     }
+    update();
     return true;
   } catch (const NSMHandlerException& e) {
 
@@ -650,6 +672,8 @@ void RunControlCallback::update() throw()
     getNode().setState(RCState::NOTREADY_S);
   } else if (ready_all) {
     getNode().setState(RCState::READY_S);
+  } else if (state_org == RCState::LOADING_TS) {
+
   } else if (paused_any) {
     getNode().setState(RCState::PAUSED_S);
   } else if (starting_any ||

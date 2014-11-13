@@ -69,6 +69,7 @@ namespace Belle2 {
     void update() throw();
     bool distribute(NSMMessage& msg) throw();
     bool distribute_r(NSMMessage& msg) throw();
+    bool loadNode(unsigned int index) throw();
     void postRun() throw();
     ConfigObjectList::iterator findConfig(const std::string& nodename, bool& finded) throw();
     NSMNodeIterator findNode(const std::string& nodename) throw();
@@ -90,6 +91,7 @@ namespace Belle2 {
     LogFile::Priority m_priority_local;
     LogFile::Priority m_priority_global;
     StringList m_excluded_v;
+    unsigned int m_loadindex;
 
   private:
     class ConfigProvider {

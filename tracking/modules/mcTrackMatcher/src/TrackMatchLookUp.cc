@@ -190,7 +190,7 @@ float TrackMatchLookUp::getRelatedPurity(const genfit::TrackCand& prTrackCand)
 {
   float purity = NAN;
   getRelatedMCTrackCand(prTrackCand, purity);
-  return purity;
+  return std::fabs(purity);
 }
 
 
@@ -199,7 +199,7 @@ float TrackMatchLookUp::getRelatedEfficiency(const genfit::TrackCand& mcTrackCan
 {
   float efficiency = NAN;
   getRelatedPRTrackCand(mcTrackCand, efficiency);
-  return efficiency;
+  return std::fabs(efficiency);
 }
 
 

@@ -2,6 +2,8 @@
 
 #include <framework/logging/LogSystem.h>
 
+#include <string>
+
 namespace Belle2 {
   /** Some utilities to help with writing unit tests.
    *
@@ -11,6 +13,26 @@ namespace Belle2 {
      \endcode
    */
   namespace TestHelpers {
+    /** changes working directory into a newly created directory, and removes it (and contents) on destruction.
+     *
+     * Example:
+     *
+      \code
+      TEST(MyTest, TestThatCreatesFiles)
+      {
+        TestHelpers::TempDirCreator tempdir;
+        //create files here ... (automatically cleaned up at end of scope)
+      }
+      \endcode
+     */
+    class TempDirCreator {
+    public:
+      TempDirCreator(); /**< ctor. */
+      ~TempDirCreator(); /**< dtor. */
+    private:
+      std::string m_oldpwd; /**< previous working directory. */
+      std::string m_tmpdir; /**< path of temporary director. */
+    };
   }
 
   /** \def EXPECT_LOGMESSAGE(x, loglevel)

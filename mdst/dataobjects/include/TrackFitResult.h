@@ -18,7 +18,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TVector3.h>
-#include <TMatrixF.h>
+#include <TMatrixD.h>
 #include <TMatrixDSym.h>
 
 #include <cstdlib>
@@ -27,6 +27,16 @@
 namespace Belle2 {
 
   /** Values of the result of a track fit with a given particle hypothesis.
+   *  The values are stored as perigee parameters with a corresponding covariance matrix.
+   *  The used perigee parameters are:
+   *  1) d0 which is the signed distance to there perigee. The sign positive (negative) if the angle between
+   *    the transverse momentum and d0 is +pi/2 (-pi/2)
+   *  2) phi which is the angle between the transverse momentum and the x axis and in [-pi, pi]
+   *  3) the signed curvature of the track where the sign is given by the charge of the particle
+   *  4) z0 which is the distance of the perigee from the origin in the r-z plane
+   *  5) cotTheta which is the inverse slope of the track in the r-z plane
+   *
+   *  The class is able to return the track fit result as either perigee parameters or cartesian parameters (x,y,z,px,py,pz)
    */
   class TrackFitResult : public RelationsObject {
   public:
@@ -90,7 +100,7 @@ namespace Belle2 {
      *  As well currently no TMatrixSym is used (which might change, but doesn't matter much due to the misconstruction of TMatrixSym).
      *  @TODO Study if double precision matrix is needed and if TMatrixSym helps somewhere.
      */
-    TMatrixF getCovariance6(const float bField = 1.5) const;
+    TMatrixDSym getCovariance6(const float bField = 1.5) const;
 
     /** Getter for ParticleCode of the mass hypothesis of the track fit. */
     Const::ParticleType getParticleType() const {
@@ -159,7 +169,7 @@ namespace Belle2 {
      *
      *  @return
      */
-    TMatrixF getCovariance5() const;
+    TMatrixDSym getCovariance5() const;
 
     /** Getter for the hit pattern in the CDC; @sa HitPatternCDC */
     HitPatternCDC getHitPatternCDC()const {
@@ -264,7 +274,7 @@ namespace Belle2 {
      * @param bField: correction factor if different from original bField
      * @return
      */
-    TMatrixF transformCov5ToCov6(const TMatrixF& cov5, const float bField) const;
+    TMatrixDSym transformCov5ToCov6(const TMatrixDSym& cov5, const float bField) const;
 
     /** Cartesian to Perigee conversion.
      *

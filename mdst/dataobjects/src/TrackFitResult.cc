@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <TMath.h>
-#include <TMatrixD.h>
 
 using namespace Belle2;
 
@@ -56,20 +55,20 @@ float TrackFitResult::getTransverseMomentum(const float bField) const
   return std::fabs(1 / getAlpha(bField) / m_tau.at(2));
 }
 
-TMatrixF TrackFitResult::getCovariance5() const
+TMatrixDSym TrackFitResult::getCovariance5() const
 {
-  TMatrixF cov5(5, 5);
+  TMatrixDSym cov5(5);
   unsigned int counter = 0;
   for (unsigned int i = 0; i < 5; ++i) {
     for (unsigned int j = i; j < 5; ++j) {
-      cov5(i, j) = cov5(j, i) = m_cov5[counter];
+      cov5(i, j) = m_cov5[counter];
       ++counter;
     }
   }
   return cov5;
 }
 
-TMatrixF TrackFitResult::transformCov5ToCov6(const TMatrixF& cov5, const float bField) const
+TMatrixDSym TrackFitResult::transformCov5ToCov6(const TMatrixDSym& cov5, const float bField) const
 {
   const double d0 = getD0();
   const double phi = getPhi();
@@ -77,7 +76,7 @@ TMatrixF TrackFitResult::transformCov5ToCov6(const TMatrixF& cov5, const float b
   const double cotTheta = getCotTheta();
   const double alpha = getAlpha(bField);
 
-  TMatrixF B(6, 5); // Matrix is invoked with zeros
+  TMatrixD B(6, 5); // Matrix is invoked with zeros
   const double alphaOmega = std::fabs(alpha * omega);
   const double alphaOmega2 = std::fabs(alpha * std::pow(omega, 2));
 
@@ -92,18 +91,29 @@ TMatrixF TrackFitResult::transformCov5ToCov6(const TMatrixF& cov5, const float b
   B(4, 2) = -std::sin(phi) / alphaOmega2;
   B(5, 2) = -cotTheta / alphaOmega2;
   B(5, 4) = 1.0 / alphaOmega;
-  TMatrixF cov6(6, 6);
-  TMatrixF BT(5, 6);
+
+  // FIXME why does this make the test fail?
+//  TMatrixDSym cov6(cov5);
+//  cov6.Similarity(B);
+//  return cov6;
+  // and this ugly code not, which should do in principal the same?
+  TMatrixD cov6(6, 6);
+  TMatrixD BT(5, 6);
   BT.Transpose(B);
   cov6 = B * cov5 * BT;
-  return cov6;
+  TMatrixDSym cov6workaroud(6);
+  for (unsigned int i = 0; i < 6; ++i) {
+    for (unsigned int j = 0; j < 6; ++j) {
+      cov6workaroud(i, j) = cov6(i, j);
+    }
+  }
+  return cov6workaroud;
 }
 
 
-TMatrixF TrackFitResult::getCovariance6(const float bField) const
+TMatrixDSym TrackFitResult::getCovariance6(const float bField) const
 {
-  TMatrixF cov5(getCovariance5());
-  return transformCov5ToCov6(cov5, bField);
+  return transformCov5ToCov6(getCovariance5(), bField);
 }
 
 

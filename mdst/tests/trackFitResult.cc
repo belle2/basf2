@@ -3,7 +3,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <TMatrixF.h>
+#include <TMatrixD.h>
 #include <TMatrixDSym.h>
 #include <TVector3.h>
 #include <TRandom3.h>
@@ -90,7 +90,7 @@ namespace Belle2 {
         element = generator.Gaus(1e-4);
       }
       Belle2::TrackFitResult myResult(tau, cov, pType, pValue, 0, 0);
-      TMatrix covariance(myResult.getCovariance6());
+      TMatrixDSym covariance(myResult.getCovariance6());
       TMatrixDSym cov6(6);
       for (unsigned int row = 0; row < 6; ++row) {
         for (unsigned int col = 0; col < 6; ++col) {
@@ -100,8 +100,8 @@ namespace Belle2 {
       Belle2::TrackFitResult myResult2(myResult.getPosition(), myResult.getMomentum(), cov6,
                                        myResult.getChargeSign(), pType, pValue, bField, 0, 0);
 
-      TMatrixF myResultCov5 = myResult.getCovariance5();
-      TMatrixF myResult2Cov5 = myResult2.getCovariance5();
+      TMatrixDSym myResultCov5 = myResult.getCovariance5();
+      TMatrixDSym myResult2Cov5 = myResult2.getCovariance5();
 
       EXPECT_NEAR(myResultCov5(0, 0), myResult2Cov5(0, 0), absError);
       EXPECT_NEAR(myResultCov5(0, 1), myResult2Cov5(0, 1), absError);

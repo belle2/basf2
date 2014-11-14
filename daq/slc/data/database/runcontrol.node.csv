@@ -251,3 +251,4 @@ RUNCONTROL, test:daq:stop, true, TTD/ttd/1/stop,0,1, false
 RUNCONTROL, physics, true, STORAGE/storage/1/default,0,1, false
 RUNCONTROL, physics, true, HLT/hlt/1/default,0,1, false
 RUNCONTROL, physics, true, ECL/runcontrol/1/default,0,1, false
+RUNCONTROL, physics, true, TTD/ttd/1/aux,0,1, false

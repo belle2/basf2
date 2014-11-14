@@ -17,11 +17,11 @@
     ROPC502, ECL02:default,true,  cpr5016,34003
     ROPC502, ECL02:default,true,  cpr5017,34004
     ROPC502, ECL02:default,true,  cpr5018,34005
-    ROPC502, ECL02:default,true,  cpr6001,34006
-    ROPC502, ECL02:default,true,  cpr6002,34007
-    ROPC502, ECL02:default,true,  cpr6003,34008
-    ROPC502, ECL02:default,true,  cpr6004,34009
-    ROPC502, ECL02:default,true,  cpr6005,34010
-    ROPC502, ECL02:default,true,  cpr6006,34011
-    ROPC502, ECL02:default,true,  cpr6007,34012
-    ROPC502, ECL02:default,true,  cpr6008,34013
+    ROPC502, ECL02:default,false,  cpr6001,34006
+    ROPC502, ECL02:default,false,  cpr6002,34007
+    ROPC502, ECL02:default,false,  cpr6003,34008
+    ROPC502, ECL02:default,false,  cpr6004,34009
+    ROPC502, ECL02:default,false,  cpr6005,34010
+    ROPC502, ECL02:default,false,  cpr6006,34011
+    ROPC502, ECL02:default,false,  cpr6007,34012
+    ROPC502, ECL02:default,false,  cpr6008,34013

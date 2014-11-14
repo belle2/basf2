@@ -273,6 +273,7 @@ bool COPPERCallback::bootBasf2() throw()
   }
   ConfigFile conf("copper");
   m_con.clearArguments();
+  m_con.setExecutable("basf2");
   m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
                                      m_config.getBasf2Script().c_str()));
   //m_con.addArgument(conf.get("readout.script"));

@@ -37,12 +37,16 @@ namespace Belle2 {
     HitPatternCDC() {}
 
     /** Initialize the pattern with some long int.*/
-    HitPatternCDC(const unsigned long& initValue) : m_pattern(initValue)
+    HitPatternCDC(ULong64_t initValue) : m_pattern(initValue)
     {}
 
     /** Getter for underlying integer type. */
-    unsigned long getInteger() const {
-      return m_pattern.to_ulong();
+    ULong64_t getInteger() const {
+      if (sizeof(unsigned long) >= 8) {
+        return m_pattern.to_ulong();
+      } else {
+        return m_pattern.to_ullong();
+      }
     }
 
     /** Getter for underlying bit set. */

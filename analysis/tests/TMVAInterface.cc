@@ -88,7 +88,6 @@ namespace {
 
   TEST(TMVAInterfaceTest, ExpertErrorHandling)
   {
-
     EXPECT_B2FATAL(Expert expert("TMVA", FileSystem::findFile("/analysis/tests/"), "THIS_IS_NOT_A_VALID_METHOD", 1));
     EXPECT_B2FATAL(Expert expert("TMVA", FileSystem::findFile("/analysis/tests/"), "MockPlugin", 123));
     EXPECT_B2FATAL(Expert expert("NON_EXISTING_PREFIX", FileSystem::findFile("/analysis/tests/"), "MockPlugin", 1));
@@ -126,7 +125,6 @@ namespace {
     std::vector<float> test_event = inspector.GetTestEvent();
     EXPECT_FLOAT_EQ(0.5, test_event[0]); // eid
     EXPECT_FLOAT_EQ(1.0, test_event[1]); // p
-
   }
 
   TEST(TMVAInterfaceTest, ExpertOnBackgroundRunAnalysisCorrectly)
@@ -161,11 +159,12 @@ namespace {
     std::vector<float> test_event = inspector.GetTestEvent();
     EXPECT_FLOAT_EQ(0.5, test_event[0]); // eid
     EXPECT_FLOAT_EQ(1.0, test_event[1]); // p
-
   }
 
   TEST(TMVAInterfaceTest, TeacherTrainsCorrectly)
   {
+    TestHelpers::TempDirCreator tempdir;
+
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
 
     std::vector<std::string> variables = {"p", "getExtraInfo(someInput)"};
@@ -209,11 +208,11 @@ namespace {
     }
 
     EXPECT_EQ(given_samples, received_samples);
-
   }
 
   TEST(TMVAInterfaceTest, TeacherDropsConstantVariable)
   {
+    TestHelpers::TempDirCreator tempdir;
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
 
     std::vector<std::string> variables = {"p", "False", "getExtraInfo(someInput)"};
@@ -257,6 +256,5 @@ namespace {
     }
 
     EXPECT_EQ(given_samples, received_samples);
-
   }
 }

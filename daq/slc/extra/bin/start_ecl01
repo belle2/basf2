@@ -5,7 +5,7 @@ for i in $(seq 5001 5013)
 do
 echo "booting cprcontrold in cpr${i}"
 ssh cpr${i} "${dir}/boot_daemon cprcontrold cpr${i}"
-sleep 1
+usleep 100000
 done
 
 #cd $dir

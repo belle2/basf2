@@ -29,10 +29,8 @@ daughters = ['K-', 'pi+', 'pi0']
 reconstructDecay('D0 -> K- pi+ pi0', '1.7 < M < 1.9', 0, path=main)
 
 
-#main.add_module(register_module('PrintCollections'))
-
 output = register_module('RootOutput')
-output.param('outputFileName', '1.root')
+output.param('outputFileName', 'discardparticles_full.root')
 main.add_module(output)
 
 summaryOfLists(['D0'], path=main)
@@ -44,18 +42,34 @@ main.add_module(discardparticles)
 matchMCTruth('D0', path=main)
 matchMCTruth('pi0', path=main)
 
+# ensures that things in D0 list are ok
 ntupler = register_module('VariablesToNtuple')
-ntupler.param('fileName', 'test_D0ntuple.root')
+ntupler.param('fileName', 'discardparticles_D0ntuple.root')
+ntupler.param('variables', ['M', 'daughter(0, M)', 'daughter(2, M)', 'mcPDG'])
+ntupler.param('particleList', 'D0')
+main.add_module(ntupler)
+
+# pi0 list should also have been fixed
+ntupler = register_module('VariablesToNtuple')
+ntupler.param('fileName', 'discardparticles_pi0ntuple.root')
 ntupler.param('variables', ['M', 'daughter(0, M)', 'mcPDG'])
 ntupler.param('particleList', 'D0')
 main.add_module(ntupler)
 
-#main.add_module(register_module('PrintCollections'))
-
 output = register_module('RootOutput')
-output.param('outputFileName', '2.root')
+output.param('outputFileName', 'discardparticles_reduced.root')
 main.add_module(output)
 
 process(main)
 
 print statistics
+
+statfull = os.stat('discardparticles_full.root')
+statreduced = os.stat('discardparticles_reduced.root')
+if statfull.st_size <= statreduced.st_size:
+    B2FATAL("Reduced file is not smaller than original")
+
+os.remove('discardparticles_D0ntuple.root')
+os.remove('discardparticles_pi0ntuple.root')
+os.remove('discardparticles_full.root')
+os.remove('discardparticles_reduced.root')

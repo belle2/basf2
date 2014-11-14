@@ -11,7 +11,7 @@
 
 VALIDATION_OUTPUT_FILE = 'cosmicsTrackingValidation.root'
 CONTACT = 'oliver.frost@desy.de'
-N_EVENTS = 100000
+N_EVENTS = 10000
 
 import basf2
 basf2.set_random_seed(1337)
@@ -20,9 +20,9 @@ import os
 import sys
 import logging
 
-import matplotlib.pyplot as plt
+import numpy as np
 
-from cdclocaltracking import event_generation, cdcdisplay
+from cdclocaltracking import event_generation
 
 import ROOT
 from ROOT import Belle2
@@ -33,9 +33,9 @@ class ValidationPlot(object):
     def __init__(
         self,
         name,
-        n_bins=None,
         lower_bound=None,
         upper_bound=None,
+        n_bins=None,
         description='',
         check='',
         contact='',
@@ -70,9 +70,10 @@ class ValidationPlot(object):
         weights=None,
         ):
 
-        # Handle data content of the histgram
         name = self.name
 
+        # Handle data content of the histgram
+        ## Figure out the the binning if not externally set already
         if self.is_binary(xs):
             # if xs is a binary variable setup the histogram to
             # have only two bins with the right boundaries.
@@ -80,17 +81,16 @@ class ValidationPlot(object):
                 self.lower_bound = 0
 
             if self.upper_bound is None:
-                self.upper_bound = 1.0000000000000002
+                self.upper_bound = np.nextafter(1.0, np.inf)
 
             if self.n_bins is None:
                 self.n_bins = 2
         else:
-
             if self.lower_bound is None:
-                self.lower_bound = min(xs)
+                self.lower_bound = np.min(xs)
 
             if self.upper_bound is None:
-                self.upper_bound = max(xs)
+                self.upper_bound = np.max(xs)
 
             if self.n_bins is None:
                 n_data = len(x)
@@ -101,6 +101,7 @@ class ValidationPlot(object):
         upper_bound = self.upper_bound
         n_bins = self.n_bins
 
+        ## Setup the histogram and fill it with values
         if ys is not None:
             histogram = ROOT.TProfile(name, '', self.n_bins, lower_bound,
                                       upper_bound)
@@ -130,7 +131,7 @@ class ValidationPlot(object):
                 for (x, weight) in zip(xs, weights):
                     Fill(float(x), float(weight))
 
-        # Now handle to style of the histogram
+        # Now attach the additional information
         root_description = ROOT.TNamed('Descrition', self.description)
         root_check = ROOT.TNamed('Check', self.check)
         root_contact = ROOT.TNamed('Contact', self.contact)
@@ -144,11 +145,12 @@ class ValidationPlot(object):
         xlabel = self.xlabel
         histogram.SetXTitle(xlabel)
 
-        ylabel = self.ylabel
-        if ylabel is None:
+        if self.ylabel is None:
             if ys is None:
                 # Default ylabel for a histogram plot
-                ylabel = 'Count'
+                self.ylabel = 'Count'
+
+        ylabel = self.ylabel
         histogram.SetYTitle(ylabel)
 
         self.histogram = histogram
@@ -219,7 +221,7 @@ class ValidationPlot(object):
             if found_obj:
                 found_obj.SetTitle(check)
 
-    def draw(self):
+    def show(self):
         self.histogram.Draw()
 
     def write(self):
@@ -309,12 +311,16 @@ class CosmicsTrackingValidationModule(basf2.Module):
 
         self.mc_transverse_momenta = []
         self.mc_matches = []
+        self.mc_impacts = []
+        self.mc_cos_thetas = []
+        self.mc_hit_efficiencies = []
 
     def event(self):
         """Event method"""
 
         trackMatchLookUp = self.trackMatchLookUp
 
+        # Analyse from the pattern recognition side
         trackCands = Belle2.PyStoreArray('TrackCands')
         if trackCands:
             # print 'Number of pattern recognition tracks', \
@@ -323,8 +329,10 @@ class CosmicsTrackingValidationModule(basf2.Module):
             for (iTrackCand, trackCand) in enumerate(trackCands):
                 is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
                 is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
+
                 seen_in_vxd = False
                 if is_matched or is_clone:
+                    # Only matched and clone tracks have a related MCParticle
                     mcParticle = \
                         trackMatchLookUp.getRelatedMCParticle(trackCand)
                     if mcParticle:
@@ -343,6 +351,7 @@ class CosmicsTrackingValidationModule(basf2.Module):
                 self.pr_matches.append(is_matched)
                 self.pr_seen_in_vxds.append(seen_in_vxd)
 
+        # Analyse from the Monte carlo reference side
         mcTrackCands = Belle2.PyStoreArray('MCTrackCands')
         if trackCands:
             # print 'Number of Monte Carlo tracks', mcTrackCands.getEntries()
@@ -350,41 +359,56 @@ class CosmicsTrackingValidationModule(basf2.Module):
             for mcTrackCand in mcTrackCands:
                 is_matched = trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand)
 
+                hit_efficiency = \
+                    trackMatchLookUp.getRelatedEfficiency(mcTrackCand)
+                if np.isnan(hit_efficiency):
+                    hit_efficiency = 0
+
                 mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
                 momentum = mcParticle.getMomentum()
                 transverse_momentum = momentum.Perp()
+                cos_theta = momentum.CosTheta()
+                impact = 0
 
                 self.mc_matches.append(is_matched)
+                self.mc_hit_efficiencies.append(hit_efficiency)
                 self.mc_transverse_momenta.append(transverse_momentum)
+                self.mc_impacts.append(impact)
+                self.mc_cos_thetas.append(cos_theta)
 
     def terminate(self):
-        track_finding_efficiency = 1.0 * sum(self.mc_matches) \
-            / len(self.mc_matches)
-
-        fake_rate = 1.0 - 1.0 * sum(self.pr_clones_and_matches) \
-            / sum(self.pr_clones_and_matches)
-
-        clone_rate = 1.0 - 1.0 * sum(self.pr_matches) \
-            / sum(self.pr_clones_and_matches)
+        # Overall figures of merit #
+        ############################
+        track_finding_efficiency = np.mean(self.mc_matches)
+        fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
+        clone_rate = 1.0 - np.average(self.pr_matches,
+                                      weights=self.pr_clones_and_matches)
+        hit_efficiency = np.mean(self.mc_hit_efficiencies)
 
         cosmics_figures_of_merit = \
-            ValidationFiguresOfMerit('Cosmics_track_finding_efficiency')
+            ValidationFiguresOfMerit('Cosmics_figures_of_merit')
         cosmics_figures_of_merit['finding_efficiency'] = \
             track_finding_efficiency
         cosmics_figures_of_merit['fake_rate'] = fake_rate
         cosmics_figures_of_merit['clone_rate'] = clone_rate
+        cosmics_figures_of_merit['hit_efficiency'] = hit_efficiency
+
         cosmics_figures_of_merit.description = \
             """
 finding_efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks <br/>
-fake_rate - ratio of  pattern recognition tracks that are not related to a particle (background, ghost) to all pattern recognition tracks <br/>
+fake_rate - ratio of pattern recognition tracks that are not related to a particle (background, ghost) to all pattern recognition tracks <br/>
 clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches) <br/>
 """
-        cosmics_figures_of_merit.check = \
-            'The efficiency should be well above 0.9. The fake rate should be well below 0.1'
+        cosmics_figures_of_merit.check = ''
         cosmics_figures_of_merit.contact = CONTACT
 
         print cosmics_figures_of_merit
 
+        # Validation plots #
+        ####################
+        validation_plots = []
+
+        # A try out efficiency plot
         efficiency_profile = \
             ValidationPlot('Cosmics_track_finding_efficiency_by_momentum',
                            n_bins=50)
@@ -395,8 +419,11 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         efficiency_profile.description = 'Not a serious plot yet.'
         efficiency_profile.check = ''
         efficiency_profile.contact = CONTACT
-        efficiency_profile.draw()
 
+        validation_plots.append(efficiency_profile)
+        efficiency_profile.show()
+
+        # A tryout impact parameter plot, yet using the seen in vxd as an impact parameter.
         clone_rate_by_impact = \
             ValidationPlot('Cosmics_clone_rate_by_seen_in_vxd')
         clone_rate_by_impact.fill(self.pr_seen_in_vxds, [not x for x in
@@ -410,12 +437,93 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         clone_rate_by_impact.check = ''
         clone_rate_by_impact.contact = CONTACT
 
-        clone_rate_by_impact.draw()
+        validation_plots.append(clone_rate_by_impact)
+        clone_rate_by_impact.show()
 
+        # Finding efficiency by impact parameter
+        finding_efficiency_by_impact = \
+            ValidationPlot('Cosmics_finding_efficiency_by_impact')
+        finding_efficiency_by_impact.n_bins = 50
+        finding_efficiency_by_impact.fill(self.mc_impacts, self.mc_matches)
+
+        finding_efficiency_by_impact.xlabel = 'Impact (cm)'
+        finding_efficiency_by_impact.ylabel = 'Finding efficiency'
+
+        finding_efficiency_by_impact.description = 'Not a serious plot yet.'
+        finding_efficiency_by_impact.check = ''
+        finding_efficiency_by_impact.contact = CONTACT
+
+        validation_plots.append(finding_efficiency_by_impact)
+
+        # Finding efficiency by cos theta
+        finding_efficiency_by_cos_theta = \
+            ValidationPlot('Cosmics_finding_efficiency_by_cos_theta')
+        finding_efficiency_by_cos_theta.n_bins = 50
+        finding_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
+                self.mc_matches)
+
+        finding_efficiency_by_cos_theta.xlabel = '#cos #theta'
+        finding_efficiency_by_cos_theta.ylabel = 'Finding efficiency'
+
+        finding_efficiency_by_cos_theta.description = 'Not a serious plot yet.'
+        finding_efficiency_by_cos_theta.check = ''
+        finding_efficiency_by_cos_theta.contact = CONTACT
+
+        validation_plots.append(finding_efficiency_by_cos_theta)
+
+        # Histogram of the hit efficiency
+        hit_efficiency_histogram = ValidationPlot('Cosmics_hit_efficiency')
+        hit_efficiency_histogram.n_bins = 50
+        hit_efficiency_histogram.fill(self.mc_hit_efficiencies)
+
+        hit_efficiency_histogram.xlabel = 'Hit efficiency'
+        hit_efficiency_histogram.description = 'Not a serious plot yet.'
+        hit_efficiency_histogram.check = ''
+        hit_efficiency_histogram.contact = CONTACT
+
+        validation_plots.append(hit_efficiency_histogram)
+
+        # Hit efficiency by impact parameter
+        hit_efficiency_by_impact = \
+            ValidationPlot('Cosmics_hit_efficiency_by_impact')
+        hit_efficiency_by_impact.n_bins = 50
+        hit_efficiency_by_impact.fill(self.mc_impacts,
+                                      self.mc_hit_efficiencies)
+
+        hit_efficiency_by_impact.xlabel = 'Impact (cm)'
+        hit_efficiency_by_impact.ylabel = 'Hit efficiency'
+
+        hit_efficiency_by_impact.description = 'Not a serious plot yet.'
+        hit_efficiency_by_impact.check = ''
+        hit_efficiency_by_impact.contact = CONTACT
+
+        validation_plots.append(hit_efficiency_by_impact)
+
+        # Hit efficiency by cos_theta parameter
+        hit_efficiency_by_cos_theta = \
+            ValidationPlot('Cosmics_hit_efficiency_by_cos_theta')
+        hit_efficiency_by_cos_theta.n_bins = 50
+        hit_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
+                self.mc_hit_efficiencies)
+
+        hit_efficiency_by_cos_theta.xlabel = '#cos #theta (cm)'
+        hit_efficiency_by_cos_theta.ylabel = 'Hit efficiency'
+
+        hit_efficiency_by_cos_theta.description = 'Not a serious plot yet.'
+        hit_efficiency_by_cos_theta.check = ''
+        hit_efficiency_by_cos_theta.contact = CONTACT
+
+        validation_plots.append(hit_efficiency_by_cos_theta)
+
+        # Save everything to a ROOT file
         output_file = ROOT.TFile(VALIDATION_OUTPUT_FILE, 'recreate')
+
         cosmics_figures_of_merit.write()
+
         efficiency_profile.write()
-        # clone_rate_by_impact.write()
+        for validation_plot in validation_plots:
+            validation_plot.write()
+
         output_file.Close()
 
 

@@ -62,7 +62,7 @@ global_env = Environment(ENV = os.environ,
                          EXTBINDIR = os.path.join('$EXTDIR', 'bin', extsubdir),
                          LINK='g++',
                          SHLINK='g++',
-                         CCFLAGS = ['-Wall', '-I$EXTINCDIR', '-I' + sysconfig.get_python_inc(), '-std=c++11'],
+                         CCFLAGS = ['-Wall', '-isystem$EXTINCDIR', '-isystem' + sysconfig.get_python_inc(), '-std=c++11'],
                          CPPDEFINES = {'_PACKAGE_': '\\"$PACKAGE\\"'},
                          CPPPATH = ['include'],
                          LIBPATH = ['$LIBDIR', sysconfig.get_config_var('LIBDIR'), '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
@@ -150,7 +150,7 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
         Exit(1)
 
 # remove C++11 flag for cint
-global_env['CINTFLAGS'] = global_env['CCFLAGS'][:]
+global_env['CINTFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']]
 global_env['CINTFLAGS'].remove('-std=c++11')
 
 # process the analysis directory

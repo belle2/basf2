@@ -41,7 +41,7 @@
 #pragma link C++ class Belle2::ROIid+;
 #pragma link C++ class Belle2::ROIpayload+;
 #pragma link C++ class Belle2::PXDIntercept+;
-#pragma link C++ class Belle2::RelationsInterface<genfit::Track>+;
+#pragma link C++ class Belle2::RelationsInterface<genfit::Track>+; //implicit
 #pragma link C++ class set < unsigned short >+;
 #pragma link C++ class Belle2::RecoTrack+;
 
@@ -54,8 +54,8 @@
 // #pragma link C++ class Belle2::TrackCandidateTFInfo+;
 // #pragma link C++ class Belle2::ClusterTFInfo+;
 // #pragma link C++ class Belle2::RootSectorMap+;
-#pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+;
-#pragma link C++ namespace Belle2::VXDTFSecMapTypedef+;
+#pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+; //implicit
+#pragma link C++ namespace Belle2::VXDTFSecMapTypedef+; //implicit
 
 // #pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+;
 // #pragma link C++ namespace Belle2::VXDTFSecMapTypedef+;

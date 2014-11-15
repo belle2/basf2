@@ -446,6 +446,11 @@ namespace {
     {
       //correct (we miss the 'K0' resonance, but that's fine)
       Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {130}}});
+      d.finalize();
+      //K0L and daughters are secondary
+      MCParticle* k0l = d.getMCParticle(130);
+      k0l->setStatus(k0l->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
+
       d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, {130, {}, Decay::c_ReconstructFrom, d.getDecay(130)}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
@@ -453,9 +458,49 @@ namespace {
     {
       //K0L not reconstructed
       Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {130}}});
+      d.finalize();
+      //K0L and daughters are secondary
+      MCParticle* k0l = d.getMCParticle(130);
+      k0l->setStatus(k0l->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
+
       d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, 0}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(c_MissKlong | c_MissMassiveParticle | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+  }
+  TEST_F(MCMatchingTest, KShort)
+  {
+    {
+      //correct (we miss the 'K0' resonance, but that's fine)
+      Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {{310, {211, -211}}}}});
+      d.finalize();
+      //K0S and daughters are secondary
+      MCParticle* k0s = d.getMCParticle(310);
+      k0s->setStatus(k0s->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
+      MCParticle* pi1 = d.getMCParticle(211);
+      pi1->setStatus(pi1->getStatus() & (~MCParticle::c_PrimaryParticle));
+      MCParticle* pi2 = d.getMCParticle(-211);
+      pi2->setStatus(pi1->getStatus() & (~MCParticle::c_PrimaryParticle));
+
+      d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, {310, {{211, {}, Decay::c_ReconstructFrom, d.getDecay(211)}, { -211, {}, Decay::c_ReconstructFrom, d.getDecay(-211)}}}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //K0S not reconstructed
+      Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {{310, {211, -211}}}}});
+      d.finalize();
+      //K0S and daughters are secondary
+      MCParticle* k0s = d.getMCParticle(310);
+      k0s->setStatus(k0s->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
+      MCParticle* pi1 = d.getMCParticle(211);
+      pi1->setStatus(pi1->getStatus() & (~MCParticle::c_PrimaryParticle));
+      MCParticle* pi2 = d.getMCParticle(-211);
+      pi2->setStatus(pi1->getStatus() & (~MCParticle::c_PrimaryParticle));
+
+      d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, 0}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissMassiveParticle | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** more missing particles. */

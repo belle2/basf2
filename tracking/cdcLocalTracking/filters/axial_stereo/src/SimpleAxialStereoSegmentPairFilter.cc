@@ -111,15 +111,12 @@ CellWeight SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(cons
   FloatType startFit_dist2DToFront_endSegment = startFit.getDist2DToFront(endSegment);
   FloatType endFit_dist2DToBack_startSegment = endFit.getDist2DToBack(startSegment);
 
-  if (startFit_dist2DToFront_endSegment < 10 and  endFit_dist2DToBack_startSegment < 10)
+  if (startFit_dist2DToFront_endSegment < 10 and  endFit_dist2DToBack_startSegment < 10) {
+    getFittedTrajectory3D(axialStereoSegmentPair);
     return startSegment.size() + endSegment.size();
-  else {
+  } else {
     return NOT_A_CELL;
   }
-
-  // const CDCTrajectory3D& combinedFit = getFittedTrajectory3D(axialStereoSegmentPair);
-  // combinedFit.getChi2();
-  // return startSegment.size() + endSegment.size();
 
 }
 
@@ -147,11 +144,11 @@ const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
-  //do fits if still necessary.
+  //Do fits if still necessary.
   getFittedTrajectory2D(startSegment);
   getFittedTrajectory2D(endSegment);
 
-  CDCAxialStereoFusion::fuseTrajectories(axialStereoSegmentPair);
+  CDCAxialStereoFusion::reconstructFuseTrajectories(axialStereoSegmentPair);
   return axialStereoSegmentPair.getTrajectory3D();
 
 }

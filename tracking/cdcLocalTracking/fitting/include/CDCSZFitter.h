@@ -84,20 +84,35 @@ namespace Belle2 {
         FloatType dispNorm = disp2D.norm();
 
         FloatType zeta = 1.0;
-        zeta = wireVector.xy().dot(disp2D) / wireVector.z() / dispNorm;
-        // zeta = wireVector.xy().norm() / wireVector.z();
+        if (dispNorm == 0.0) {
+          zeta = wireVector.xy().norm() / wireVector.z();
+        } else {
+          zeta = wireVector.xy().dot(disp2D) / wireVector.z() / dispNorm;
+        }
 
         FloatType weight = 1.0;
         weight = zeta * zeta / SIMPLE_DRIFT_LENGTH_VARIANCE;
-        // B2INFO("weight " << weight);
-        // B2INFO("zeta " << zeta);
 
-        appendSZ(observationsSZ, recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z(), weight);
+        size_t appended_hit = appendSZ(observationsSZ, recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z(), weight);
+        // if (not appended_hit){
+        //   B2WARNING("CDCRecoHit3D was not appended as SZ observation.");
+        //   B2WARNING("S: " << recoHit3D.getPerpS());
+        //   B2WARNING("Z: " << recoHit3D.getRecoPos3D().z());
+        //   B2WARNING("Reconstructed position: " << recoHit3D.getRecoPos2D());
+        //   B2WARNING("Reconstructed displacement: " << recoHit3D.getRecoDisp2D());
+        //   B2WARNING("Reconstructed displacement norm: " << dispNorm);
+        //   B2WARNING("Reconstructed displacement norm eq 0: " << (dispNorm == 0.0));
+        //   B2WARNING("Stereo type: " << recoHit3D.getStereoType());
+        //   B2WARNING("Wire vector: " << wireVector);
+        //   B2WARNING("Zeta: " << zeta);
+        //   B2WARNING("Variance: " << 1.0 / weight);
+        //   B2WARNING("Weight: " << weight << std::endl);
+        // }
       }
 
       /// Appends the s and z value of the given hit to the observation matrix
-      void appendSZ(CDCObservations2D& observationsSZ, const FloatType& s, const FloatType& z, const FloatType& weight = 1.0) const
-      { observationsSZ.append(s, z, 0.0, weight); }
+      size_t appendSZ(CDCObservations2D& observationsSZ, const FloatType& s, const FloatType& z, const FloatType& weight = 1.0) const
+      { return observationsSZ.append(s, z, 0.0, weight); }
 
 
 

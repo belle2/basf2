@@ -93,11 +93,16 @@ namespace Belle2 {
           observations2D.append(hits, false);
         }
 
-        FitMethod::update(trajectory2D, observations2D);
+        if (observations2D.size() < 5) {
+          trajectory2D.clear();
+          return;
+        } else {
+          FitMethod::update(trajectory2D, observations2D);
+          ForwardBackwardInfo isCoaligned = observations2D.isCoaligned(trajectory2D);
+          if (isCoaligned == BACKWARD) trajectory2D.reverse();
+          //else if (isCoaligned != FORWARD) B2WARNING("Fit cannot be oriented correctly");
+        }
 
-        ForwardBackwardInfo isCoaligned = observations2D.isCoaligned(trajectory2D);
-        if (isCoaligned == BACKWARD) trajectory2D.reverse();
-        //else if (isCoaligned != FORWARD) B2WARNING("Fit cannot be oriented correctly");
       }
 
       /// Update the trajectory with a fit to the observations.

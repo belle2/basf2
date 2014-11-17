@@ -72,129 +72,208 @@ namespace Belle2 {
 
 
 
-      /// Appends the observed position - drift radius is assumed to be zero if not given
-      void append(const FloatType& x,
-                  const FloatType& y,
-                  const FloatType& signedRadius = 0.0,
-                  const FloatType& weight = 1.0) {
+      /// Appends the observed position.
+      /** \note Observations are skipped, if one of the given variables is NAN.
+      @param x            X coordinate of the center of the observed circle.
+      @param y            Y coordinate of the center of the observed circle.
+      @param signedRadius The radius of the observed circle signed with right left passage hypotheses. Defaults to 0.
+      @param weight       The relative weight of the observation. In order to generate a unit less chi^2 measure the weight should be chosen as the inverse variance of the drift length. Defaults to 1.
+      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
+      */
+      size_t append(const FloatType& x,
+                    const FloatType& y,
+                    const FloatType& signedRadius = 0.0,
+                    const FloatType& weight = 1.0) {
 
-        if (std::isnan(x)) return;
-        if (std::isnan(y)) return;
+        if (std::isnan(x)) return 0;
+        if (std::isnan(y)) return 0;
 
         if (std::isnan(signedRadius)) {
           B2WARNING("Signed radius is nan. Skipping observation");
-          return;
+          return 0;
         }
 
         if (std::isnan(weight)) {
           B2WARNING("Weight is nan. Skipping observation");
-          return;
+          return 0;
         }
 
         m_observations.push_back(x);
         m_observations.push_back(y);
         m_observations.push_back(signedRadius);
         m_observations.push_back(weight);
+        return 1;
       }
 
-      /// Appends the observed position - drift radius is assumed to be zero if not given
-      void append(const Belle2::CDCLocalTracking::Vector2D& pos2D, const FloatType& signedRadius = 0.0, const FloatType& weight = 1.0)
-      { append(pos2D.x(), pos2D.y(), signedRadius, weight); }
+      /// Appends the observed position.
+      /** \note Observations are skipped, if one of the given variables is NAN.
+      @param pos2D        X, Y coordinate of the center of the observed circle.
+      @param signedRadius The radius of the observed circle signed with right left passage hypotheses. Defaults to 0.
+      @param weight       The relative weight of the observation. In order to generate a unit less chi^2 measure the weight should be chosen as the inverse variance of the drift length. Defaults to 1.
+      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
+      */
+      size_t append(const Belle2::CDCLocalTracking::Vector2D& pos2D, const FloatType& signedRadius = 0.0, const FloatType& weight = 1.0)
+      { return append(pos2D.x(), pos2D.y(), signedRadius, weight); }
 
-      /// Appends the observed position - drift radius is take a positiv number
-      void append(const Belle2::CDCLocalTracking::CDCWireHit& wireHit)
-      { append(wireHit.getRefPos2D(), wireHit.getRefDriftLength(), 1.0 / wireHit.getRefDriftLengthVariance()); }
-
-      /// Appends the observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit)
-      { append(rlWireHit.getRefPos2D(), rlWireHit.getSignedRefDriftLength(), 1.0 / rlWireHit.getRefDriftLengthVariance()); }
-
-      /// Appends the two observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRLWireHitPair& rlWireHitPair) {
-        append(rlWireHitPair.getFromRLWireHit());
-        append(rlWireHitPair.getToRLWireHit());
+      /// Appends the hit circle at wire reference position without a right left passage hypotheses.
+      /** \note Observations are skipped, if one of the contained variables is NAN.
+      \note The left right passage information is always set to RIGHT, since on specific assumption can be made from the wire hit alone.
+      @param wireHit      Hit information to be appended as observation. XY position, drift length and inverse variance are taken at the wire reference position.
+      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
+      */
+      size_t append(const Belle2::CDCLocalTracking::CDCWireHit& wireHit) {
+        const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
+        const FloatType driftLength = wireHit.getRefDriftLength();
+        const FloatType weight = 1.0 / wireHit.getRefDriftLengthVariance();
+        size_t appended_hit = append(wireRefPos2D, driftLength, weight);
+        // if (not appended_hit){
+        //   B2WARNING("CDCRLWireHit was not appended");
+        //   B2WARNING("Reference position: " << wireRefPos2D);
+        //   B2WARNING("Drift length:" << driftLength);
+        //   B2WARNING("Variance: " << wireHit.getRefDriftLengthVariance());
+        //   B2WARNING("Weight: " << weight << std::endl);
+        // }
+        return appended_hit;
       }
 
-      /// Appends the three observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRLWireHitTriple& rlWireHitTriple) {
-        append(rlWireHitTriple.getStartRLWireHit());
-        append(rlWireHitTriple.getMiddleRLWireHit());
-        append(rlWireHitTriple.getEndRLWireHit());
+      /// Appends the hit circle at wire reference position without a right left passage hypotheses.
+      /** \note Observations are skipped, if one of the contained variables is NAN.
+      \note The left right passage information is always set to the right left passage hypotheses of the give hit.
+      @param wireHit      Hit information to be appended as observation. XY position, signed drift length and inverse variance are taken at the wire reference position.
+      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
+      */
+      size_t append(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit) {
+        const Vector2D& wireRefPos2D = rlWireHit.getRefPos2D();
+        const FloatType signedDriftLength = rlWireHit.getSignedRefDriftLength();
+        const FloatType weight = 1.0 / rlWireHit.getRefDriftLengthVariance();
+        size_t appended_hit = append(wireRefPos2D, signedDriftLength, weight);
+        // if (not appended_hit){
+        //   B2WARNING("CDCRLWireHit was not appended");
+        //   B2WARNING("Reference position: " << wireRefPos2D);
+        //   B2WARNING("Drift length:" << signedDriftLength);
+        //   B2WARNING("Variance: " << rlWireHit.getRefDriftLengthVariance());
+        //   B2WARNING("Weight: " << weight << std::endl);
+        // }
+        return appended_hit;
       }
 
-      /// Appends the observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRecoHit2D& recoHit2D, bool usePosition = false) {
-        if (usePosition) {
+      /// Appends the two observed position
+      size_t append(const Belle2::CDCLocalTracking::CDCRLWireHitPair& rlWireHitPair)
+      { return append(rlWireHitPair.getFromRLWireHit()) + append(rlWireHitPair.getToRLWireHit()); }
+
+      /// Appends the three observed position
+      size_t append(const Belle2::CDCLocalTracking::CDCRLWireHitTriple& rlWireHitTriple) {
+        return append(rlWireHitTriple.getStartRLWireHit())
+               + append(rlWireHitTriple.getMiddleRLWireHit())
+               + append(rlWireHitTriple.getEndRLWireHit());
+      }
+
+      /// Appends the observed position
+      size_t append(const Belle2::CDCLocalTracking::CDCRecoHit2D& recoHit2D, bool useRecoPos = false) {
+        if (useRecoPos) {
           const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
-          append(recoPos2D, driftLength, weight);
+          size_t appended_hit =  append(recoPos2D, driftLength, weight);
+          // if (not appended_hit) {
+          //   B2WARNING("CDCRecoHit2D was not appended");
+          //   B2WARNING("Reconstructed position: " << recoPos2D);
+          //   B2WARNING("Drift length:" << driftLength);
+          //   B2WARNING("Variance: " << recoHit2D.getRefDriftLengthVariance());
+          //   B2WARNING("Weight: " << weight << std::endl);
+          // }
+          return appended_hit;
         } else {
-          append(recoHit2D.getRLWireHit());
+          return append(recoHit2D.getRLWireHit());
         }
       }
 
-      /// Appends the observed position - drift radius is signed number according to the orientation
-      void append(const Belle2::CDCLocalTracking::CDCRecoHit3D& recoHit3D, bool usePosition = false) {
+      /// Appends the observed position
+      size_t append(const Belle2::CDCLocalTracking::CDCRecoHit3D& recoHit3D, bool usePosition = false) {
         if (usePosition) {
           const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
           const FloatType driftLength = 0.0;
-          const FloatType weight = 1.0 / recoHit3D.getWireHit().getRefDriftLengthVariance();
-          append(recoPos2D, driftLength, weight);
+          const FloatType weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
+          size_t appended_hit = append(recoPos2D, driftLength, weight);
+          // if (not appended_hit){
+          //   B2WARNING("CDCRecoHit3D was not appended");
+          //   B2WARNING("Reconstructed position: " << recoPos2D);
+          //   B2WARNING("Drift length:" << driftLength);
+          //   B2WARNING("Variance: " << recoHit3D.getRecoDriftLengthVariance());
+          //   B2WARNING("Weight: " << weight << std::endl);
+          // }
+          return appended_hit;
         } else {
-          const Vector2D& recoPos2D = recoHit3D.getRecoWirePos2D();
+          const Vector2D& recoWirePos2D = recoHit3D.getRecoWirePos2D();
           const FloatType driftLength = recoHit3D.getSignedRecoDriftLength();
           const FloatType weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-          append(recoPos2D, driftLength, weight);
+          size_t appended_hit = append(recoWirePos2D, driftLength, weight);
+          // if (not appended_hit){
+          //   B2WARNING("CDCRecoHit3D was not appended");
+          //   B2WARNING("Reconstructed wire position: " << recoWirePos2D);
+          //   B2WARNING("Drift length:" << driftLength);
+          //   B2WARNING("Variance: " << recoHit3D.getRecoDriftLengthVariance());
+          //   B2WARNING("Weight: " << weight << std::endl);
+          // }
+          return appended_hit;
         }
       }
 
 
       /// Appends all reconstructed hits from the two dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information
-      void append(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false) {
+      size_t append(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false) {
+        size_t result = 0;
         for (const CDCRecoHit2D & recoHit2D :  recoSegment2D) {
-          append(recoHit2D, usePosition);
+          result += append(recoHit2D, usePosition);
         }
+        return result;
       }
 
       /// Appends all reconstructed hits from the three dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information next to the reconstructed position
-      void append(const CDCRecoSegment3D& recoSegment3D, bool usePosition = false) {
+      size_t append(const CDCRecoSegment3D& recoSegment3D, bool usePosition = false) {
+        size_t result = 0;
         for (const CDCRecoHit3D & recoHit3D :  recoSegment3D) {
-          append(recoHit3D, usePosition);
+          result += append(recoHit3D, usePosition);
         }
+        return result;
       }
 
 
       /// Appends all reconstructed hits from the two axial segments, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information.
-      void append(const CDCAxialAxialSegmentPair& axialAxialSegmentPair,
-                  bool usePosition = false) {
+      size_t append(const CDCAxialAxialSegmentPair& axialAxialSegmentPair,
+                    bool usePosition = false) {
+        size_t result = 0;
         const CDCRecoSegment2D* ptrStartSegment2D = axialAxialSegmentPair.getStart();
         if (ptrStartSegment2D) {
           const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
-          append(startSegment2D, usePosition);
+          result += append(startSegment2D, usePosition);
         }
 
         const CDCRecoSegment2D* ptrEndSegment2D = axialAxialSegmentPair.getEnd();
         if (ptrEndSegment2D) {
           const CDCRecoSegment2D& endSegment2D = *ptrEndSegment2D;
-          append(endSegment2D, usePosition);
+          result += append(endSegment2D, usePosition);
         }
+        return result;
       }
 
       /// Appends all the reference wire positions. Always use position since there is no other mode. For cross check to legendre finder.
-      void append(const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires,
-                  bool usePosition  __attribute__((__unused__)) = false) {
+      size_t append(const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires,
+                    bool usePosition  __attribute__((__unused__)) = false) {
+        size_t result = 0;
         for (const CDCWire * ptrWire : wires) {
           if (not ptrWire) continue;
           const CDCWire& wire = *ptrWire;
           const Vector2D& wirePos = wire.getRefPos2D();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0;
-          append(wirePos, driftLength, weight);
+          result += append(wirePos, driftLength, weight);
         }
+        return result;
       }
 
-      void append(const CDCWireHitSegment& wireHits, bool usePosition  = false) {
+      size_t append(const CDCWireHitSegment& wireHits, bool usePosition  = false) {
+        size_t result = 0;
         for (const CDCWireHit * ptrWireHit : wireHits) {
           if (not ptrWireHit) continue;
           const CDCWireHit& wireHit = *ptrWireHit;
@@ -206,24 +285,27 @@ namespace Belle2 {
           // Limited at the bottom by the nominal uncertainty of the drift time (as introduced in CDC::SimpleTDCCountTranslator)
           const FloatType pseudoVariance = (usePosition ? 0.0 : wireHit.getRefDriftLength() * wireHit.getRefDriftLength()) + SIMPLE_DRIFT_LENGTH_VARIANCE;
           const FloatType weight = 1 / pseudoVariance;
-          append(wirePos, driftLength, weight);
+          result += append(wirePos, driftLength, weight);
         }
+        return result;
       }
 
 
 
 #ifndef __CINT__
       /// Appends all wire positions of the hits in the legendre track hits. Always use position since there is no other mode as long as there are no right left passage information available.
-      void append(const std::vector<TrackFinderCDCLegendre::TrackHit*>& legendreTrackHits,
-                  bool usePosition  __attribute__((unused)) = false) {
+      size_t append(const std::vector<TrackFinderCDCLegendre::TrackHit*>& legendreTrackHits,
+                    bool usePosition  __attribute__((unused)) = false) {
+        size_t result = 0;
         for (const TrackFinderCDCLegendre::TrackHit * ptrLegendreTrackHit : legendreTrackHits) {
           if (not ptrLegendreTrackHit) continue;
           const TrackFinderCDCLegendre::TrackHit& legendreTrackHit = *ptrLegendreTrackHit;
           const TVector3&& wirePos = legendreTrackHit.getWirePosition();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0;
-          append(wirePos.X(), wirePos.Y(), driftLength, weight);
+          result += append(wirePos.X(), wirePos.Y(), driftLength, weight);
         }
+        return result;
       }
 #endif
       /// Get the postion of the first observation.

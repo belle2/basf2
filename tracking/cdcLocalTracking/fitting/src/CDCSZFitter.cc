@@ -197,6 +197,12 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
                          CDCObservations2D& observations2D) const
 {
+  trajectorySZ.clear();
+  if (observations2D.size() < 3) {
+    B2WARNING("Skipping sz fit.");
+    return;
+  }
+
   // Matrix of weighted sums
   Matrix< FloatType, 3, 3 > sumMatrixWSZ = observations2D.getWXYSumMatrix();
   UncertainSZLine uncertainSZLine = fitZ(sumMatrixWSZ);

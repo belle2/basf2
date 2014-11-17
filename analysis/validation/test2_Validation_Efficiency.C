@@ -1,3 +1,10 @@
+/*
+<header>   
+<input>GenericB.ntup.root</input>
+<output>test2_Validation_Efficiency_output.root</output>
+<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+</header>
+*/
 ////////////////////////////////////////////////////////////
 // Validation_Efficiency.cc
 // Check the Reconstruction efficiency for single particles

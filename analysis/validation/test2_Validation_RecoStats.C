@@ -1,3 +1,10 @@
+/*
+<header>
+<input>GenericB.ntup.root</input>
+<output>test2_Validation_RecoStats_output.root</output>
+<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+</header>
+*/
 ////////////////////////////////////////////////////////////
 // Validation_RecoStats.cc
 // Check the detector sim and reco stats

@@ -1,3 +1,10 @@
+/*
+<header>
+<input>GenericB_GENSIMRECtoDST.dst.root,DSTtoMDST.mdst.root,MDSTtoUDST.udst.root</input>
+<output>FileEventSizes.root</output>
+<contact>Luis Pesantex, pesantez@uni-bonn.de</contact>
+</header>
+*/
 void test5_FileSizes() {
 
 // open the file with simulated and reconstructed EvtGen particles

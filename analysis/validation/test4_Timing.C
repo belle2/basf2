@@ -1,3 +1,9 @@
+/*
+<header>
+<output>Timing.root</output>
+<contact>Luis Pesantex, pesantez@uni-bonn.de</contact>
+</header>
+*/
 #include <TTimeStamp.h>
 #include <TString.h>
 #include <TFile.h>

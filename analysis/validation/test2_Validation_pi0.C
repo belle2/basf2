@@ -1,3 +1,10 @@
+/*
+<header>
+<input>GenericB.ntup.root</input>
+<output>test2_Validation_pi0_output.root</output>
+<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+</header>
+*/
 ////////////////////////////////////////////////////////////
 // Validation_pi0.cc
 // Check the calibration of the ECL in the MC by

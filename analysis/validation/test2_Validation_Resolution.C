@@ -1,3 +1,10 @@
+/*
+<header>
+<input>GenericB.ntup.root</input>
+<output>test2_Validation_Resolution_output.root</output>
+<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+</header>
+*/
 ////////////////////////////////////////////////////////////
 // Validation_Resolution.cc
 // Check the Reconstruction resolution

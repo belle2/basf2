@@ -1,3 +1,9 @@
+/*
+<header>    <input>Bu_Dpi_Kpi.ntup.root,Bd_JpsiKS_mumu.ntup.root,Bd_Kstgamma.ntup.root,Bd_rho0gamma.ntup.root</input>
+<output>test2_Validation_Breco_output.root</output>
+<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+</header>
+*/
 ////////////////////////////////////////////////////////////
 // Validation_Breco.cc
 // Reconstruction some benchmark B decay modes

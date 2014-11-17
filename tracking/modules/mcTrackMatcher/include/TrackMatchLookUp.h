@@ -10,8 +10,8 @@
 #ifndef TRACKMATCHLOOKUP_H
 #define TRACKMATCHLOOKUP_H
 
-
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <genfit/TrackCand.h>
 
@@ -135,6 +135,11 @@ namespace Belle2 {
   public:
     /// Looks for a registered relation of the given track candidate to a Monte Carlo particle. Works for both pattern recognition and Monte Carlo track candidates. Returns nullptr if not found, If clones have a related MCParticle depends on the settings of the MCTrackMatcher module what filled the relations. (Default is that clones are related to the MCParticles.)
     const MCParticle* getRelatedMCParticle(const genfit::TrackCand& trackCand);
+
+    /// Looks up the TrackFitResult of a pattern recognition track. Return nullptr if there is no related track fit result.
+    /** The relations are setup to be from track candidate to the track fit result, which is why we only check this direction
+     */
+    const TrackFitResult* getRelatedTrackFitResult(const genfit::TrackCand& prTrackCand);
 
     /// Looks for a related Monte Carlo track for the given pattern recognition track candidate and return it if found. Return nullptr if not found.
     const genfit::TrackCand* getRelatedMCTrackCand(const genfit::TrackCand& prTrackCand);

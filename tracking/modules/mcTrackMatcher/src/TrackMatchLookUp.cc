@@ -170,12 +170,25 @@ TrackMatchLookUp::getRelatedMCParticle(const genfit::TrackCand& prTrackCand)
   return getRelatedFromObj<MCParticle>(&prTrackCand, dummy_weight, mcParticleStoreArrayName);
 }
 
+
+
 const genfit::TrackCand*
-TrackMatchLookUp::getRelatedMCTrackCand(const genfit::TrackCand& prTrackCand)
+TrackMatchLookUp::getRelatedMCTrackCand(const genfit::TrackCand& trackCand)
 {
   double dummy_weight = NAN;
-  return getRelatedFromObj<genfit::TrackCand>(&prTrackCand, dummy_weight, getMCTracksStoreArrayName());
+  return getRelatedFromObj<genfit::TrackCand>(&trackCand, dummy_weight, getMCTracksStoreArrayName());
 }
+
+
+
+const TrackFitResult*
+TrackMatchLookUp::getRelatedTrackFitResult(const genfit::TrackCand& prTrackCand)
+{
+  double dummy_weight = NAN;
+  return getRelatedFromObj<TrackFitResult>(&prTrackCand, dummy_weight, "");
+}
+
+
 
 const genfit::TrackCand*
 TrackMatchLookUp::getRelatedPRTrackCand(const genfit::TrackCand& mcTrackCand)

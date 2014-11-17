@@ -19,25 +19,39 @@ HitPatternVXD::HitPatternVXD(): m_pattern(0)
 
 }
 
-std::bitset<32> pxdLayerZerModeA(static_cast<std::string>("00000000000000000000000000000011"));
-std::bitset<32> pxdLayerOneModeA(static_cast<std::string>("00000000000000000000000000001100"));
-std::bitset<32> pxdLayerTwoModeB(static_cast<std::string>("00000000000000000000000000110000"));
-std::bitset<32> pxdLayerThrModeB(static_cast<std::string>("00000000000000000000000011000000"));
-std::bitset<32> vxdLayerZer(static_cast<std::string>("00000000000000000000001100000000"));
-std::bitset<32> vxdLayerOne(static_cast<std::string>("00000000000000000000110000000000"));
-std::bitset<32> vxdLayerTwo(static_cast<std::string>("00000000000000000011000000000000"));
-std::bitset<32> vxdLayerThr(static_cast<std::string>("00000000000000001100000000000000"));
+std::bitset<32> pxdLayerZer(static_cast<std::string>("00000000000000000000000000001111"));
+std::bitset<32> pxdLayerOne(static_cast<std::string>("00000000000000000000000011110000"));
 
+const std::bitset<32> HitPatternVXD::s_PXDLayerMasks[2] = {
+  pxdLayerZer, pxdLayerOne
+};
 
+std::bitset<32> pxdNormMode(static_cast<std::string>("00000000000000000000000000110011"));
+std::bitset<32> pxdGateMode(static_cast<std::string>("00000000000000000000000011001100"));
 
-const std::bitset<32> HitPatternVXD::s_LayerMasks[8] = {pxdLayerZerModeA, pxdLayerOneModeA, pxdLayerTwoModeB, pxdLayerThrModeB,
-                                                        vxdLayerZer, vxdLayerOne, vxdLayerTwo, vxdLayerThr
-                                                       };
+const std::bitset<32> HitPatternVXD::s_PXDModeMasks[2] = {
+  pxdNormMode, pxdGateMode
+};
 
-std::bitset<32> infoLayerVXD(static_cast<std::string>("11111111111111110000000000000000"));
+std::bitset<32> svdLayerZer(static_cast<std::string>("00000000000000000000111100000000"));
+std::bitset<32> svdLayerOne(static_cast<std::string>("00000000000000001111000000000000"));
+std::bitset<32> svdLayerTwo(static_cast<std::string>("00000000000011110000000000000000"));
+std::bitset<32> svdLayerThr(static_cast<std::string>("00000000111100000000000000000000"));
+
+const std::bitset<32> HitPatternVXD::s_SVDLayerMasks[4] = {
+  svdLayerZer, svdLayerOne, svdLayerTwo, svdLayerThr
+};
+
+std::bitset<32> SVDuLayer(static_cast<std::string>("00000000001100110011001100000000"));
+std::bitset<32> SVDvLayer(static_cast<std::string>("00000000110011001100110000000000"));
+
+const std::bitset<32> HitPatternVXD::s_SVDuvMasks[2] = {
+  SVDuLayer, SVDvLayer
+};
+
+std::bitset<32> infoLayerVXD(static_cast<std::string>("11111111000000000000000000000000"));
 
 const std::bitset<32> HitPatternVXD::s_infoLayerMask = infoLayerVXD;
 
-const std::vector<unsigned short> HitPatternVXD::s_layerBitOne = {0, 2, 4, 6, 8, 10, 12, 14};
-const std::vector<unsigned short> HitPatternVXD::s_layerBitTwo = {1, 3, 5, 7, 9, 11, 13, 15};
+
 

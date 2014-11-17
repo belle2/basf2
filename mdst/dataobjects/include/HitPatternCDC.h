@@ -16,6 +16,8 @@
 #include <bitset>
 #include <algorithm>
 #include <vector>
+#include <map>
+#include <utility>
 
 namespace Belle2 {
   /** Hit pattern of CDC hits within a track and efficient getters.
@@ -143,7 +145,8 @@ namespace Belle2 {
       B2ASSERT("Super layer outof range.", sLayer <= 8);
       unsigned short max = 0;
       unsigned short counter = 0;
-      for (unsigned short i = s_indexMin[sLayer]; i <= s_indexMax[sLayer]; ++i) {
+      std::pair<unsigned short, unsigned short> indices = s_superLayerIndices.at(sLayer);
+      for (unsigned short i = indices.first; i <= indices.second; ++i) {
         counter += m_pattern[i];
         if (m_pattern[i] == 0) {
           if (counter > max) {
@@ -182,8 +185,8 @@ namespace Belle2 {
     static const std::bitset<64> s_sLayerMasks[9]; /**<  Masks to zero out all bits from other layers.*/
     static const std::bitset<64> s_infoLayerMask;  /**<  Mask to zero out all bits from other layers. */
 
-    static const std::vector<unsigned short> s_indexMin; /**< Holds the min indices for super layer access. */
-    static const std::vector<unsigned short> s_indexMax; /**< Holds the max indices for super layer access. */
+    /** Holds the indices for super layer access. */
+    static const std::map<unsigned short, std::pair<unsigned short, unsigned short>> s_superLayerIndices;
 
     //-----------------------------------------------------------------------------------
     /** Make it a ROOT object.

@@ -36,7 +36,14 @@ std::bitset<64> infoLayerCDC(static_cast<std::string>("1111111100000000000000000
 
 const std::bitset<64> HitPatternCDC::s_infoLayerMask = infoLayerCDC;
 
-
-const std::vector<unsigned short> HitPatternCDC::s_indexMin = {0, 8, 14, 20, 26, 32, 38, 44, 50};
-const std::vector<unsigned short> HitPatternCDC::s_indexMax = {7, 13, 19, 25, 31, 37, 43, 49, 55};
-
+const std::map<unsigned short, std::pair<unsigned short, unsigned short>> HitPatternCDC::s_superLayerIndices = {
+  {0, std::make_pair(0, 7)},
+  {1, std::make_pair(8, 13)},
+  {2, std::make_pair(14, 19)},
+  {3, std::make_pair(20, 25)},
+  {4, std::make_pair(26, 31)},
+  {5, std::make_pair(32, 37)},
+  {6, std::make_pair(38, 43)},
+  {7, std::make_pair(44, 49)},
+  {8, std::make_pair(50, 55)}
+};

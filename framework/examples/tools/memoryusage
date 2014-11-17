@@ -96,6 +96,11 @@ parser.add_argument("-t", "--types", default="vrps",
                     "v=virtual size, r=resident size, p=proportional size, "
                     "s=swap or any combination of these "
                     "(default: %(default)s)")
+parser.add_argument("--system", default=False, action="store_true",
+                    dest="system",
+                    help="If given, also record /proc/meminfo to check "
+                    "consistency. This only works well if no other programs "
+                    "are allocating memory while profile is recorded")
 
 options, args = parser.parse_known_args()
 # remove the -- if present
@@ -293,9 +298,6 @@ def get_system_memory():
     memory = 0
     with open("/proc/meminfo") as meminfo:
         for line in meminfo:
-            if line.startswith("MemAvailable:"):
-                # only available on fairly recent kernels
-                return int(line.split()[1])
             if line.startswith("MemTotal:"):
                 memory += int(line.split()[1])
             if line.startswith("MemFree:") or line.startswith("Buffers:") \
@@ -328,6 +330,10 @@ if do_record:
     process_memory = {}
     process_names = {}
     total_memory = []
+    system_memory = None
+    if options.system:
+        system_offset = get_system_memory()
+        system_memory = []
     # run the program
     try:
         child = subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -371,9 +377,14 @@ if do_record:
 
         #and remember the total as well
         total_memory.append([runtime] + list(total))
+        if options.system:
+            system_memory.append([runtime,
+                                  get_system_memory() - system_offset])
 
     #convert lists to numpy arrays
     total_memory = np.array(total_memory)
+    if options.system:
+        system_memory = np.array(system_memory)
     for pid in process_memory:
         process_memory[pid] = np.array(process_memory[pid])
 
@@ -390,6 +401,8 @@ if write_file:
             "process_names": np.array(process_names.items()),
             "memory_types": np.array(memory_types),
         }
+        if options.system:
+            keys["system_memory"] = system_memory
         for pid, data in process_memory.items():
             keys[str(pid)] = data
 
@@ -402,6 +415,7 @@ if read_file:
     process_names = {}
     process_memory = {}
     memory_types = None
+    system_memory = None
     with open(options.profile, "r") as datafile:
         contents = np.load(datafile)
         # loop over all elements in the file and assign to the correct
@@ -414,6 +428,8 @@ if read_file:
                     process_names[int(pid)] = name
             elif key == "memory_types":
                 memory_types = data
+            elif key == "system_memory":
+                system_memory = data
             else:
                 process_memory[int(key)] = data
 
@@ -461,8 +477,13 @@ if do_plotting:
         label = "%s (%d)" % (process_names[pid], pid)
         plot_memory(val, label, get_color(i, len(process_memory)))
 
-    # let's add title and labels
+    # finalize all plots
     for i, (a, title) in enumerate(zip(axes, memory_types)):
+        # plot system memory usage if recorded
+        if system_memory is not None and (title[0] != "swap"):
+            a.plot(system_memory[:, 0], system_memory[:, 1] / 1000,
+                   label="system", c="k", alpha=0.5)
+        # and add title and labels
         a.set_xlabel("time / s")
         a.set_ylabel("memory / MB")
         a.set_title(title[0])

@@ -384,8 +384,8 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
         /// Fill pixel to pixelmap
         {
           unsigned int row, col;
-          row = it->getVCellID();
-          col = it->getUCellID();
+          row = it->getUCellID(); // it->getVCellID(); funny, did somebody changed U and V???
+          col = it->getVCellID(); // it->getUCellID();
           if (row < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
             B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
           } else {

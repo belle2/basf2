@@ -244,7 +244,6 @@ def create_load_events_path(root_input_file_path):
 
     path = basf2.create_path()
     add_load_events(path, root_input_file_path)
-    progress_module = basf2.register_module('Progress')
     return path
 
 

@@ -150,7 +150,6 @@ namespace Belle2 {
       TVector3 point(x, y, 0);
 
       // generate direction
-      double cosTheta = 1.0;
       TVector3 direction;
       if (m_angularDistribution == string("uniform")) {
         direction = getDirectionUniform();

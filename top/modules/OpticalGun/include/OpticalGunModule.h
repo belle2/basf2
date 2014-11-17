@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
+ *               Stefano Lacaprara                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -78,6 +79,7 @@ namespace Belle2 {
     double m_z;          /**< source position in z */
     double m_diameter;   /**< source diameter */
     double m_alpha;      /**< source emission angle [deg] */
+    double m_na;         /**< source numerical aperture */
     double m_wavelength; /**< source wavelenght [nm] */
     double m_phi;        /**< first rotation angle (around z) [deg] */
     double m_theta;      /**< second rotation angle (around x) [deg] */
@@ -110,6 +112,23 @@ namespace Belle2 {
      */
     bool isInsideSlit(const TVector3& point, const TVector3& direction) const;
 
+    /**
+     * Return photon direction according to a 2D gaussian distribution based on
+     * numerical aperture NA
+     */
+    TVector3 getDirectionGaussian() const;
+
+    /**
+     * Return photon direction according to a uniform distribution with opening
+     * angle alpha
+     */
+    TVector3 getDirectionUniform() const;
+
+    /**
+     * Return photon direction according to a lambertian distribution with
+     * opening angle alpha
+     */
+    TVector3 getDirectionLambertian() const;
   };
 
 } // Belle2 namespace

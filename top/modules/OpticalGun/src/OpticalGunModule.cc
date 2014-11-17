@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
+ *               Stefano Lacaprara                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -58,6 +59,7 @@ namespace Belle2 {
     addParam("z", m_z, "position in z [cm]", 0.0);
     addParam("diameter", m_diameter, "source diameter [cm]", 0.0);
     addParam("alpha", m_alpha, "source maximal emission angle [deg]", 0.0);
+    addParam("na", m_na, "source numerical aperture", 0.50);
     addParam("wavelength", m_wavelength, "wavelength of photons [nm]", 405.0);
     addParam("phi", m_phi, "first rotation angle (around z) [deg]", 0.0);
     addParam("theta", m_theta, "second rotation angle (around x) [deg]", 0.0);
@@ -77,7 +79,7 @@ namespace Belle2 {
     addParam("slitZ", m_slitZ, "slit distance to source [cm], if > 0.01, otherwise none",
              0.0);
     addParam("angularDistribution", m_angularDistribution,
-             "source angular distribution: uniform, Lambertian", string("uniform"));
+             "source angular distribution: uniform, Lambertian, Gaussian (uses na)", string("Gaussian"));
   }
 
   OpticalGunModule::~OpticalGunModule()
@@ -149,19 +151,16 @@ namespace Belle2 {
 
       // generate direction
       double cosTheta = 1.0;
+      TVector3 direction;
       if (m_angularDistribution == string("uniform")) {
-        cosTheta = (1.0 - m_cosAlpha) * gRandom->Rndm() + m_cosAlpha;
+        direction = getDirectionUniform();
       } else if (m_angularDistribution == string("Lambertian")) {
-        cosTheta = sqrt((1.0 - m_cosAlpha * m_cosAlpha) * gRandom->Rndm() +
-                        m_cosAlpha * m_cosAlpha);
-      } else { // default: uniform
-        cosTheta = (1.0 - m_cosAlpha) * gRandom->Rndm() + m_cosAlpha;
-        B2WARNING("Angular distribution '" << m_angularDistribution <<
-                  "' not available, uniform generated instead");
+        direction = getDirectionLambertian();
+      } else if (m_angularDistribution == string("Gaussian")) {
+        direction = getDirectionGaussian();
+      } else {
+        B2FATAL("Wrong source angular distribution. Available ones are: uniform, Lambertian, Gaussian(default)");
       }
-      double sinTheta = sqrt(1.0 - cosTheta * cosTheta);
-      double phi = 2.0 * M_PI * gRandom->Rndm();
-      TVector3 direction(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
       TVector3 momentum = m_energy * direction;
 
       // check if photon flies through the slit
@@ -231,6 +230,34 @@ namespace Belle2 {
     }
 
     return true;
+  }
+
+  TVector3 OpticalGunModule::getDirectionGaussian() const
+  {
+    // NA is defined as the aperture where the amplitude is 5% of that of the
+    // peak, which translates into 2.45 sigma for a gaussian distribution
+    double x = gRandom->Gaus(0., asin(m_na) / 2.45);
+    double y = gRandom->Gaus(0., asin(m_na) / 2.45);
+    double z = sqrt(1. - x * x - y * y);
+    z = (m_theta > 0) ? z : -z;
+    return TVector3(x, y, z);
+  }
+
+  TVector3 OpticalGunModule::getDirectionUniform() const
+  {
+    double cosTheta = (1.0 - m_cosAlpha) * gRandom->Rndm() + m_cosAlpha;
+    double sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+    double phi = 2.0 * M_PI * gRandom->Rndm();
+    return TVector3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+  }
+
+  TVector3 OpticalGunModule::getDirectionLambertian() const
+  {
+    double cosTheta = sqrt((1.0 - m_cosAlpha * m_cosAlpha) * gRandom->Rndm() +
+                           m_cosAlpha * m_cosAlpha);
+    double sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+    double phi = 2.0 * M_PI * gRandom->Rndm();
+    return TVector3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
   }
 
 

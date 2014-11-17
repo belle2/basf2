@@ -46,6 +46,7 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 
+using namespace boost::spirit::endian;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -98,18 +99,18 @@ typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32_type;
 ///*********************************************************************************
 
 struct dhhc_frame_header_word0 {
-  const unsigned short data;
+  const ubig16_t data;
   /// fixed length
-  inline unsigned int getData(void) const {
+  inline ubig16_t getData(void) const {
     return data;
   };
-  inline unsigned int getFrameType(void) const {
-    return (data >> 11) & 0xF;
+  inline unsigned short getFrameType(void) const {
+    return (data & 0x7800) >> 11;
   };
-  inline unsigned int getErrorFlag(void) const {
-    return (data >> 15) & 0x1;
+  inline unsigned short getErrorFlag(void) const {
+    return (data & 0x8000) >> 15;
   };
-  inline unsigned int getMisc(void) const {
+  inline unsigned short getMisc(void) const {
     return data & 0x3FF;
   };
   void print(void) const {
@@ -137,13 +138,13 @@ struct dhhc_frame_header_word0 {
 
 struct dhhc_start_frame {
   const dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned short trigger_nr_hi;
-  const unsigned short time_tag_lo_and_type;
-  const unsigned short time_tag_mid;
-  const unsigned short time_tag_hi;
-  const unsigned short run_subrun;
-  const unsigned short exp_run;
+  const ubig16_t trigger_nr_lo;
+  const ubig16_t trigger_nr_hi;
+  const ubig16_t time_tag_lo_and_type;
+  const ubig16_t time_tag_mid;
+  const ubig16_t time_tag_hi;
+  const ubig16_t run_subrun;
+  const ubig16_t exp_run;
   const unsigned int crc32;
   /// fixed length, only for reading
 
@@ -171,20 +172,20 @@ struct dhhc_start_frame {
            << " TTMID $" << hex << time_tag_mid << " TTHI $" << hex << time_tag_hi << " Exp/Run/Subrun $" << hex << exp_run << " $" << run_subrun
            << " CRC $" << hex << crc32);
   };
-  inline unsigned int get_active_dhh_mask(void) const {return word0.getMisc() & 0x1F;};
-  inline unsigned int get_dhhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
-  inline unsigned int get_subrun(void) const {return run_subrun & 0xFF;};
-  inline unsigned int get_run(void) const {return ((run_subrun >> 8) & 0xFF) | ((exp_run << 8) & 0x3F00);};
-  inline unsigned int get_experiment(void) const {return (exp_run >> 6) & 0x3FF;};
+  inline unsigned short get_active_dhh_mask(void) const {return word0.getMisc() & 0x1F;};
+  inline unsigned short get_dhhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
+  inline unsigned short get_subrun(void) const {return run_subrun & 0x00FF;};
+  inline unsigned short get_run(void) const {return (((run_subrun & 0xFF00) >> 8)  | ((exp_run & 0x003F) << 8));};
+  inline unsigned short get_experiment(void) const {return (exp_run & 0xFFC0) >> 6 ;};
 };
 
 struct dhhc_dhh_start_frame {
   const dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned short trigger_nr_hi;
-  const unsigned short dhh_time_tag_lo;
-  const unsigned short dhh_time_tag_hi;
-  const unsigned short sfnr_offset;
+  const ubig16_t trigger_nr_lo;
+  const ubig16_t trigger_nr_hi;
+  const ubig16_t dhh_time_tag_lo;
+  const ubig16_t dhh_time_tag_hi;
+  const ubig16_t sfnr_offset;
   const unsigned int crc32;
   /// fixed length
 
@@ -192,10 +193,10 @@ struct dhhc_dhh_start_frame {
     return trigger_nr_lo;
   };
   inline unsigned short getStartFrameNr(void) const {// last DHP frame before trigger
-    return (sfnr_offset >> 10) & 0x3F;
+    return (sfnr_offset & 0xFC00) >> 10;
   };
   inline unsigned short getTriggerOffsetRow(void) const {// and trigger row offset
-    return sfnr_offset & 0x3FF;
+    return sfnr_offset & 0x03FF;
   };
   inline unsigned int getFixedSize(void) const {
     return 16;// 8 words
@@ -215,8 +216,8 @@ struct dhhc_dhh_start_frame {
 
 struct dhhc_commode_frame {
   const dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned short data[96];
+  const ubig16_t trigger_nr_lo;
+  const ubig16_t data[96];
   const unsigned int crc32;
   /// fixed length
 
@@ -231,7 +232,7 @@ struct dhhc_commode_frame {
 
 struct dhhc_direct_readout_frame {
   const dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
+  const ubig16_t trigger_nr_lo;
   /// an unbelievable amount of words may follow
   /// and finally a 32 bit checksum
 
@@ -257,13 +258,13 @@ struct dhhc_direct_readout_frame_zsd : public dhhc_direct_readout_frame {
 
 struct dhhc_onsen_trigger_frame {
   const dhhc_frame_header_word0 word0;
-  const unsigned short trignr0;
-  const unsigned int magic1;/// redundant
-  const unsigned int trignr1;
-  const unsigned int trigtag1;
-  const unsigned int magic2;/// redundant
-  const unsigned int trignr2;/// redundant, DATCON check
-  const unsigned int trigtag2;/// redundant, DATCON check
+  const ubig16_t trignr0;
+  const ubig32_t magic1;/// redundant
+  const ubig32_t trignr1;
+  const ubig32_t trigtag1;
+  const ubig32_t magic2;/// redundant
+  const ubig32_t trignr2;/// redundant, DATCON check
+  const ubig32_t trigtag2;/// redundant, DATCON check
   const unsigned int crc32;
 
   inline unsigned int getFixedSize(void) const {
@@ -284,15 +285,15 @@ struct dhhc_onsen_trigger_frame {
   };
   unsigned int check_error(bool ignore_datcon_flag = false) const {
     unsigned int m_errorMask = 0;
-    if ((magic1 & 0xFFFF) != 0xCAFE) {
+    if ((magic1 & 0xFFFF0000) != 0xCAFE0000) {
       B2ERROR("ONSEN Trigger Magic 1 error $" << hex << magic1);
       m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
     }
-    if ((magic2 & 0xFFFF) != 0xCAFE) {
+    if ((magic2 & 0xFFFF0000) != 0xCAFE0000) {
       B2ERROR("ONSEN Trigger Magic 2 error $" << hex << magic2);
       m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
     }
-    if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
+    if (magic2 == 0xCAFE0000 && trignr2 == 0x00000000) {
       if (!ignore_datcon_flag) B2WARNING("ONSEN Trigger Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
       m_errorMask |= ONSEN_ERR_FLAG_NO_DATCON;
     } else {
@@ -307,44 +308,16 @@ struct dhhc_onsen_trigger_frame {
 
 struct dhhc_onsen_roi_frame {
   const dhhc_frame_header_word0 word0;/// mainly empty
-  const unsigned short trignr0;// not used
-  ///const unsigned int magic1;// REMOVED this info is not in the onsen trigger frame.
-  ///const unsigned int trignr1;// REMOVED  this info is not in the onsen trigger frame.
-  ///const unsigned int trigtag1;// REMOVED this info is not in the onsen trigger frame.
-  ///const unsigned int magic2;// REMOVED this info is not in the onsen trigger frame.
-  ///const unsigned int trignr2;// REMOVED this info is not in the onsen trigger frame.
-  ///const unsigned int trigtag2;// REMOVED this info is not in the onsen trigger frame.
+  const ubig16_t trignr0;// not used
   /// plus n* ROIs (64 bit)
   /// plus checksum 32bit
 
   inline unsigned short get_trig_nr0(void) const {
     return trignr0;
   };
-//   inline unsigned int get_trig_nr1(void) const {
-//     return trignr1;
-//   };
-//   inline unsigned int get_trig_nr2(void) const {
-//     return trignr2;
-//   };
   unsigned int check_error(void) const {
     unsigned int m_errorMask = 0;
-//     if ((magic1 & 0xFFFF) != 0xCAFE) {
-//       B2ERROR("DHHC HLT/ROI Magic 1 error $" << hex << magic1);
-//       m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
-//     }
-//     if ((magic2 & 0xFFFF) != 0xCAFE) {
-//       B2ERROR("DHHC HLT/ROI Magic 2 error $" << hex << magic2);
-//       m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
-//     }
-//     if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
-//       if (!ignore_datcon_flag) B2WARNING("DHHC HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
-//       m_errorMask |= ONSEN_ERR_FLAG_NO_DATCON;
-//     } else {
-//       if (trignr1 != trignr2) {
-//         B2ERROR("DHHC HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
-//         m_errorMask |= ONSEN_ERR_FLAG_MERGER_TRIGNR;
-//       }
-//     }
+    // there is nothing to check here...
     return m_errorMask;
   };
   void print(void) const {
@@ -353,53 +326,9 @@ struct dhhc_onsen_roi_frame {
   };
 
   unsigned int check_inner_crc(unsigned int length) const {
-    /// Parts of the data are now in the ONSEN Triogger frame, therefore the inner CRC cannot be checked that easily!
-//     if (length < 8) {
-//       B2ERROR("DHHC ONSEN HLT/ROI Frame too small!!!");
-//       return ONSEN_ERR_FLAG_MERGER_CRC;
-//     }
-//     unsigned char* d;
-//     dhh_crc_32_type bocrc;
-//     char crcbuffer[65536 * 2]; /// 128kB
-//     d = (unsigned char*) &magic1;/// without the DHHC header as its only an inner checksum!!!
-//
-//     if (length > 65536 * 2) {
-//       B2WARNING("DHHC ONSEN HLT/ROI Frame CRC FAIL because of too large packet (>128kB)!");
-//     } else {
-//       for (unsigned int k = 0; k < length - 4; k += 2) { // -4
-//         crcbuffer[k] = d[k + 1];
-//         crcbuffer[k + 1] = d[k];
-//       }
-//       bocrc.process_bytes(crcbuffer, length - 8); /// -4
-//     }
-//     unsigned int c;
-//     c = bocrc.checksum();
-//
-//     boost::spirit::endian::ubig32_t crc32;
-//     crc32 = *(boost::spirit::endian::ubig32_t*)(crcbuffer + length - 8);  /// -4
-//
-//     if (c == crc32) {
-// //       if (verbose)
-// //         B2INFO("DHHC ONSEN HLT/ROI Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-// //                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
-//       return 0;// O.K.
-//     } else {
-// //       crc_error++;
-// //       if (verbose) {
-//       B2ERROR("DHHC ONSEN HLT/ROI Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-//               << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
-//       /// others would be interessting but possible subjects to access outside of buffer
-//       /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
-//       //if (length <= 64) {
-//       //  for (unsigned int i = 0; i < length / 4; i++) {
-//       //    B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
-//       //  }
-//       //}
-// //       };
-// //       error_flag = true;
-//       return ONSEN_ERR_FLAG_MERGER_CRC;
-//     }
-    return 0;// never reached
+    /// Parts of the data are now in the ONSEN Trigger frame, therefore the inner CRC cannot be checked that easily!
+    // TODO can be re-implemented if needed
+    return 0;
   };
   void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) const {
     // not clear what will remain here, as part of data (headers) will go to trigger frame.
@@ -409,8 +338,7 @@ struct dhhc_onsen_roi_frame {
     }
     unsigned int l;
     l = (length - 4 - 4) / 8;
-    // for(unsigned int i=0; i<l*2; i++) data[5+i]=((data[5+i]>>16)&0xFFFF)| ((data[5+i]&0xFFFF)<<16);// dont do it here ... CRC will fail
-//     sa.appendNew(l, magic1, trignr1, magic2, trignr2, &data[5]);
+    // Endian swapping is done in Contructor of RawRoi object
     sa.appendNew(l, &data[1]);
   }
 
@@ -418,7 +346,7 @@ struct dhhc_onsen_roi_frame {
 
 struct dhhc_ghost_frame {
   const dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
+  const ubig16_t trigger_nr_lo;
   const unsigned int crc32;
   /// fixed length
 
@@ -435,7 +363,7 @@ struct dhhc_ghost_frame {
 
 struct dhhc_end_frame {
   const dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
+  const ubig16_t trigger_nr_lo;
   const unsigned int wordsinevent;
   const unsigned int errorinfo;
   const unsigned int crc32;
@@ -465,7 +393,7 @@ struct dhhc_end_frame {
 
 struct dhhc_dhh_end_frame {
   const dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
+  const ubig16_t trigger_nr_lo;
   const unsigned int wordsinevent;
   const unsigned int errorinfo;
   const unsigned int crc32;
@@ -534,28 +462,21 @@ public:
     length = 0;
   };
   unsigned int getEventNrLo(void) {
-    return ((unsigned short*)data)[1];
+    return ((ubig16_t*)data)[1];
   };
   unsigned int check_crc(void) {
-    unsigned char* d;
     dhh_crc_32_type bocrc;
-    char crcbuffer[65536 * 16]; /// 1MB
-    d = (unsigned char*)data;
 
     if (length > 65536 * 16) {
       B2WARNING("DHHC Data Frame CRC not calculated because of too large packet (>1MB)!");
     } else {
-      for (int k = 0; k < length - 4; k += 2) {
-        crcbuffer[k] = d[k + 1];// annoying... revert endian swap :-b
-        crcbuffer[k + 1] = d[k];
-      }
-      bocrc.process_bytes(crcbuffer, length - 4);
+      bocrc.process_bytes(data, length - 4);
     }
     unsigned int c;
     c = bocrc.checksum();
 
-    boost::spirit::endian::ubig32_t crc32;
-    crc32 = *(boost::spirit::endian::ubig32_t*)(d + length - 4);
+    ubig32_t crc32;
+    crc32 = *(ubig32_t*)(((unsigned char*)data) + length - 4);
 
     if (c == crc32) {
 //       if (verbose)
@@ -565,8 +486,8 @@ public:
     } else {
 //       crc_error++;
 //       if (verbose) {
-      B2ERROR("DHHC Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-              << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
+      B2ERROR("DHHC Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(((unsigned char*)data) + length - 8) << " "
+              << * (unsigned int*)(((unsigned char*)data) + length - 6) << " " << * (unsigned int*)(((unsigned char*)data) + length - 4) << " len $" << length);
       /// others would be interessting but possible subjects to access outside of buffer
       /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
       //if (length <= 32) {
@@ -755,16 +676,6 @@ void PXDUnpackerModule::event()
   }
 }
 
-void PXDUnpackerModule::endian_swap_frame(unsigned short* dataptr, int len)
-{
-  boost::spirit::endian::ubig16_t* p = (boost::spirit::endian::ubig16_t*)dataptr;
-
-  /// swap endianess of all shorts in frame BUT not the CRC (2 shorts)
-  for (int i = 0; i < len / 2 - 2; i++) {
-    dataptr[i] = p[i];// Endian Swap! (it doesnt matter if you swap from little to big or vice versa)
-  }
-}
-
 void PXDUnpackerModule::unpack_event(RawPXD& px)
 {
   int Frames_in_event;
@@ -792,7 +703,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
     return;
   }
 
-  if (m_headerEndianSwap) Frames_in_event = ((boost::spirit::endian::ubig32_t*)data)[1]; else Frames_in_event = ((boost::spirit::endian::ulittle32_t*)data)[1];
+  if (m_headerEndianSwap) Frames_in_event = ((ubig32_t*)data)[1]; else Frames_in_event = ((ulittle32_t*)data)[1];
   if (Frames_in_event < 0 || Frames_in_event > 256) {
     B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
     m_errorMask |= ONSEN_ERR_FLAG_FRAME_NR;
@@ -819,7 +730,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   int ll = 0; // Offset in dataptr in bytes
   for (int j = 0; j < Frames_in_event; j++) {
     int lo;/// len of frame in bytes
-    if (m_headerEndianSwap) lo = ((boost::spirit::endian::ubig32_t*)tableptr)[j]; else lo = ((boost::spirit::endian::ulittle32_t*)tableptr)[j];
+    if (m_headerEndianSwap) lo = ((ubig32_t*)tableptr)[j]; else lo = ((ulittle32_t*)tableptr)[j];
     if (lo <= 0) {
       B2ERROR("size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
       m_errorMask |= ONSEN_ERR_FLAG_FRAME_SIZE;
@@ -835,7 +746,6 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
       B2INFO("unpack DHH(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
-      endian_swap_frame((unsigned short*)(ll + (char*)dataptr), lo);
       unpack_dhhc_frame(ll + (char*)dataptr, lo, j, Frames_in_event);
       ll += lo; /// no rounding needed
     }
@@ -846,8 +756,15 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhh_ID, unsigned dhh_DHPport, VxdID vxd_id)
 {
 //   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  unsigned short* dhp_pix = (unsigned short*)data;
+  ubig16_t* dhp_pix = (ubig16_t*)data;
   // ADC/ADC and ADC/PEDESTAL can only be distinguised by length of frame
+
+  //! *************************************************************
+  //! Important Remark:
+  //! Up to now the format for Raw frames as well as size etc
+  //! is not well defined. It will most likely change!
+  //! E.g. not the whole mem is dumped, but only a part of it.
+  //! *************************************************************
 
   if (frame_len != 0x10008 && frame_len != 0x20008) {
     B2ERROR("Frame size unsupported for RAW pedestal frame! $" << hex << frame_len << " bytes");
@@ -858,10 +775,10 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   unsigned int dhp_dhh_id       = 0;
   unsigned int dhp_dhp_id       = 0;
 
-  dhp_header_type  = (dhp_pix[2] >> 13) & 0x07;
+  dhp_header_type  = (dhp_pix[2] & 0xE000) >> 13;
 //   dhp_reserved     = (dhp_pix[2] >> 8) & 0x1F;
-  dhp_dhh_id       = (dhp_pix[2] >> 2) & 0x3F;
-  dhp_dhp_id       =  dhp_pix[2] & 0x03;
+  dhp_dhh_id       = (dhp_pix[2] & 0x00FC) >> 2;
+  dhp_dhp_id       =  dhp_pix[2] & 0x0003;
 
   if (dhh_ID != dhp_dhh_id) {
     B2ERROR("DHH ID in DHH and DHP header differ $" << hex << dhh_ID << " != $" << dhp_dhh_id);
@@ -877,6 +794,7 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
     return;
   }
 
+  /// Endian Swapping is done in Contructors of Raw Objects!
   if (frame_len == 0x10008) { // 64k
     B2INFO("Pedestal Data - (ADC:ADC)");
     m_storeRawAdc.appendNew(vxd_id, data, false);
@@ -892,7 +810,7 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
 void PXDUnpackerModule::unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  unsigned short* dhp_fce = (unsigned short*)data;
+  ubig16_t* dhp_fce = (ubig16_t*)data;
 
   /// Actually, the format is not fixed yet, thus any depacking is guessing right now :-/
   /// It seems, there is nod DHP Frame header here
@@ -924,7 +842,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
   bool printflag = false;
-  unsigned short* dhp_pix = (unsigned short*)data;
+  ubig16_t* dhp_pix = (ubig16_t*)data;
 
   unsigned int dhp_readout_frame_lo = 0;
   unsigned int dhp_header_type  = 0;
@@ -949,10 +867,10 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
   if (printflag)
     B2INFO("DHP Header   | " << hex << dhp_pix[2] << " ( " << hex << dhp_pix[2] << " ) ");
-  dhp_header_type  = (dhp_pix[2] >> 13) & 0x07;
-  dhp_reserved     = (dhp_pix[2] >> 8) & 0x1F;
-  dhp_dhh_id       = (dhp_pix[2] >> 2) & 0x3F;
-  dhp_dhp_id       =  dhp_pix[2] & 0x03;
+  dhp_header_type  = (dhp_pix[2] & 0xE000) >> 13;
+  dhp_reserved     = (dhp_pix[2] & 0x1F00) >> 8;
+  dhp_dhh_id       = (dhp_pix[2] & 0x00FC) >> 2;
+  dhp_dhp_id       =  dhp_pix[2] & 0x0003;
 
   if (printflag) {
     B2INFO("DHP type     | " << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
@@ -987,9 +905,9 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     if (printflag)
       B2INFO("-- " << hex << dhp_pix[i] << " --   " << dec << i);
     {
-      if (((dhp_pix[i] >> 15) & 0x1) == 0) {
+      if (((dhp_pix[i] & 0x8000) >> 15) == 0) {
         rowflag = true;
-        dhp_row = (dhp_pix[i] >> 5) & 0xFFE;
+        dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
         if (printflag)
           B2INFO("SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
@@ -1000,8 +918,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 //           dhp_pixel_error++;
           return;
         } else {
-          dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] >> 14) & 0x001);
-          dhp_col = ((dhp_pix[i] >> 8) & 0x3F);
+          dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
+          dhp_col = ((dhp_pix[i]  & 0x3F00) >> 8);
           ///  remapping flag
           if (dhh_reformat == 0) dhp_col ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ...
           dhp_col += dhp_offset;

@@ -11,7 +11,6 @@
 #ifndef PXDRAWROIS_H
 #define PXDRAWROIS_H
 
-
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
@@ -34,11 +33,7 @@ namespace Belle2 {
      * @param nrroi Nr of Rois to follow in data ptr.
      * @param data pointer to ROIs .
      */
-    PXDRawROIs(unsigned int nrroi, unsigned int* data):
-      m_2timesNrROIs(2 * nrroi), m_rois(0) {
-      m_rois = new int[m_2timesNrROIs];
-      for (unsigned int i = 0; i < m_2timesNrROIs; i++) m_rois[i] = ((data[i] >> 16) & 0xFFFF) | ((data[i] & 0xFFFF) << 16); // word swap
-    };
+    PXDRawROIs(unsigned int nrroi, unsigned int* data);
 
     /** Get the nr of ROIs.
      * @param j Index of ROI

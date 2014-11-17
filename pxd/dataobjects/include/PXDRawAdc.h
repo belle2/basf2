@@ -8,9 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+//! *************************************************************
+//! Important Remark:
+//! Up to now the format for Raw frames as well as size etc
+//! is not well defined. It will most likely change!
+//! E.g. not the whole mem is dumped, but only a part of it.
+//! *************************************************************
+
 #ifndef PXDRAWADC_H
 #define PXDRAWADC_H
-
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
@@ -32,22 +38,7 @@ namespace Belle2 {
      * @param sensorID Sensor compact ID.
      * @param data raw data pointer
      */
-    PXDRawAdc(VxdID sensorID, void* data, bool pedestal_flag):
-      m_sensorID(sensorID) , m_adcs() {
-      unsigned char* d = (unsigned char*)data;
-      m_dhp_header = ((unsigned short*)data)[2];
-      d += 8; // Skip DHH and DHP header, data is 64kb large (+ 8 bytes)
-      if (pedestal_flag) {
-        for (unsigned int i = 0; i < sizeof(m_adcs); i++) {
-          m_adcs[i] = d[2 * i + 1]; // Check if endianess is correctly done... TODO , seems so
-        }
-      } else {
-        // memcpy(m_adcs,d,sizeof(m_adcs));// check if we need to swap endianess TODO , we do :-(
-        for (unsigned int i = 0; i < sizeof(m_adcs); i++) {
-          m_adcs[i] = d[i ^ 0x1]; // swap endianess --- again ---
-        }
-      }
-    };
+    PXDRawAdc(VxdID sensorID, void* data, bool pedestal_flag);
 
     /** Get the sensor ID.
      * @return ID of the sensor.

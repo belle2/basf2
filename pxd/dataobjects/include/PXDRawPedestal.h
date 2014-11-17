@@ -8,9 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+//! *************************************************************
+//! Important Remark:
+//! Up to now the format for Raw frames as well as size etc
+//! is not well defined. It will most likely change!
+//! E.g. not the whole mem is dumped, but only a part of it.
+//! *************************************************************
+
 #ifndef PXDRAWPEDESTAL_H
 #define PXDRAWPEDESTAL_H
-
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
@@ -32,15 +38,7 @@ namespace Belle2 {
      * @param sensorID Sensor compact ID.
      * @param data raw data pointer
      */
-    PXDRawPedestal(VxdID sensorID, void* data):
-      m_sensorID(sensorID), m_pedestals() {
-      unsigned char* d = (unsigned char*)data;
-      m_dhp_header = ((unsigned short*)data)[2];
-      d += 8; // Skip DHH and DHP header, data is 128kb large (+ 8 bytes)
-      for (unsigned int i = 0; i < sizeof(m_pedestals); i++) {
-        m_pedestals[i] = d[2 * i + 0]; // Check if endianess is correctly done... TODO
-      }
-    };
+    PXDRawPedestal(VxdID sensorID, void* data);
 
     /** Get the sensor ID.
      * @return ID of the sensor.

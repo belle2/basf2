@@ -21,11 +21,11 @@ namespace Belle2 {
     public:
       /** Constructor */
       SensitiveDetector();
-      /** Destructor*/
+      /** Destructor */
       ~SensitiveDetector();
 
 
-      //! Save ECLSimHit into datastore
+      //** Save ECLSimHit into datastore */
       int saveSimHit(
         const G4int cellId,
         const G4int trackID,

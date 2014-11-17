@@ -20,7 +20,6 @@
     </Components>
   </Material>
 
-
   <Material name="BGO"> <!-- Bi4Ge3O12 -->
     <density unit="g/cm3">7.130</density>
     <Components>

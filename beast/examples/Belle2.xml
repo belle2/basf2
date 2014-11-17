@@ -28,7 +28,7 @@
   <xi:include href="../beast/pindiode/PINDIODE-Materials.xml"/>
   <xi:include href="../beast/cave/CAVE-Materials.xml"/>
   <xi:include href="../beast/ph1bpipe/PH1BPIPE-Materials.xml"/>
-  <xi:include href="../beast/ph1bpipe/CSI-Materials.xml"/>
+  <xi:include href="../beast/csi/CSI-Materials.xml"/>
 
 
 

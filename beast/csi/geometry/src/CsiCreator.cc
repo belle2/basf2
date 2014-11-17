@@ -54,56 +54,22 @@ namespace Belle2 {
     /** Creator creates the CSI geometry */
     geometry::CreatorFactory<CsiCreator> CsiFactory("CSICreator");
 
-
-    const double k_CLR(0.01   * CLHEP::cm);                 // clearance around outside
-    const double k_backConFarZ(-145.5 * CLHEP::cm);        // Z of back container back
-    const double k_backConNearZ(-102.0 * CLHEP::cm);       // Z of back container front
-    const double k_forwConFarZ(239.8 * CLHEP::cm);         // Z of forw container back
-    const double k_forwConNearZ(196.0 * CLHEP::cm);        // Z of forw container front
-    const double k_backConNearInnerR(45.0705 * CLHEP::cm); // inner R of back cont (near Z)
-    const double k_backConFarInnerR(67.9125 * CLHEP::cm);  // inner R of back cont (far  Z)
-    const double k_forwConNearInnerR(40.93  * CLHEP::cm);  // inner R of forw cont (near Z)
-    const double k_forwConFarInnerR(51.1387 * CLHEP::cm);  // inner R of forw cont (far  Z)
-
-    const double k_endConInnerThick(2.0   * CLHEP::cm);    // thickness of inner cone
-    const double k_endConSiWallThick(0.16 * CLHEP::cm);    // thickness of outer side wall
-    const double k_endConOuterThick(2.0  * CLHEP::cm);     // thickness of outer tube
-    const double k_backConNearOuterR(119.015 * CLHEP::cm); // outer R of cont at near Z
-    const double k_backConFarOuterR(149.6 * CLHEP::cm);    // outer R of cont at far Z
-    const double k_backConHflat(20.267 * CLHEP::cm);       // Zlength of "flat" outer radius
-    const double k_forwConNearOuterR(120.04 * CLHEP::cm);  // outer R of cont at near Z
-    const double k_forwConFarOuterR(141.5  * CLHEP::cm);   // outer R of cont at far Z
-    const double k_forwConHflat(10.72 * CLHEP::cm);        // Zlength of "flat" outer radius
-    const double k_endConNearThick(0.3   * CLHEP::cm);     // thickness of front of con
-    const double k_endConFarThick(0.1   * CLHEP::cm);      // thickness of back of con
-    const double k_endConFinThick(0.05  * CLHEP::cm);      // ec's phi fin thickness
-
-
     const double k_barConBackRThick(10.5 * CLHEP::cm);     // thickness of sup ring in back
     const double k_barConBackZOut(-122.50 * CLHEP::cm);    // Z of container back at outer R
     const double k_barConEndRngThick(0.2 * CLHEP::cm);     // endring thickess, both ends
 
     const double k_barConForwZOut(229.0 * CLHEP::cm);      // Z of container forw at outer R
     const double k_barConForwRThick(9.0 * CLHEP::cm);      // thickness of sup ring in forw
-    const double k_barConInnerR(125.01 * CLHEP::cm);       // inner R of barrel container
-    const double k_barCryBackZOut(k_barConBackZOut + k_barConEndRngThick) ;
-    const double k_barSupBackFarZ(k_barConBackZOut - k_barConBackRThick) ;
     const double k_barSupForwFarZ(k_barConForwZOut + k_barConForwRThick) ;
     const double k_c1z3(k_barSupForwFarZ + 31.*CLHEP::cm);
     const double k_c2z1(k_c1z3 - 444.0 * CLHEP::cm);
-    const double k_c2z2(k_c2z1 + 1.0 * CLHEP::cm);
-
     const double k_c1r1(167.0 * CLHEP::cm);
     const double k_l1r4(k_c1r1 - 0.2 * CLHEP::cm);
-    const double k_l2r3(k_l1r4);
-
 
     // add foil thickness //
-    const double foilthickness = 0.0100 * CLHEP::cm; // crystal wrapping foil 100 um
-    const double thinfoilthickness = foilthickness * 0.8; // thin crystal wrapping foil 80 um
-    const double avoidov = 1 + 1E-6; // foil inside is a little bit lager than crystal to avoid overlap
+    const double foilthickness = 0.0100 * CLHEP::cm; /**< Crystal wrapping foil 100 um */
+    const double avoidov = 1 + 1E-6; /**< foil inside is a little bit lager than crystal to avoid overlap */
     ///////////////////////
-
 
 
     CsiCreator::CsiCreator(): m_sensitive(0)
@@ -121,57 +87,36 @@ namespace Belle2 {
 
       if (type) {}
 
+
       //
       // Load materials
       // Note to AB: someday change this
       // to use materials from the .xml file
-      //
       ///////////////////////////////////////
-      G4Material* medAir = geometry::Materials::get("ColdAir");
       G4Material* medCsI = geometry::Materials::get("CsI");
-      G4Material* medSi = geometry::Materials::get("Si");
       G4Material* medAlTeflon = geometry::Materials::get("AlTeflon");
-      G4Material* medAlTeflon_thin = geometry::Materials::get("AlTeflon_thin");
-
-
-      // Diodes. Obsolete, but maybe relevent in the future..
-      ///////////////////////////////////////////////////////
-      double DiodeWidth = content.getLength("k_diodewidth") * CLHEP::cm;
-      double DiodeLength = content.getLength("k_diodelength") * CLHEP::cm;
-      double DiodeHeight = content.getLength("k_diodeheight") * CLHEP::cm;
-      G4Box* SensorDiode = new G4Box("diode", DiodeWidth / 2, DiodeLength / 2, DiodeHeight / 2);
-
-
-      double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
 
 
       //
       // Define CsI Envelope
-      // To o: get rid of that, and make an envelope per box,
-      // fill it with all possible  combinaitions of crystals, and
-      ////////////////////////
-
+      // To do: get rid of that, and make an
+      // envelope per crystal box, fill it
+      // with all possible  combinaitions of
+      // crystals, and then copy it to all
+      // positions.
+      ////////////////////////////////////////
       double eclWorld_I[6] = {452, 452, 1250, 1250, 395, 395};//unit:mm
       double eclWorld_O[6] = {1640, 1640, 1640, 1640, 1640, 1640};//unit:mm
       double eclWorld_Z[6] = { -1450, -1010, -1010, 1960, 1960, 2400};//unit:mm
       G4Polycone* eclWorld = new G4Polycone("eclWorld", 0, 2 * PI, 6, eclWorld_Z, eclWorld_I, eclWorld_O);
       logical_ecl = new G4LogicalVolume(eclWorld, geometry::Materials::get("G4_Galactic"), "logical_ecl");
       physical_ecl = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_ecl, "physicalECL", &topVolume, false, 0);
-
-      /*
-      // Instantiation of a set of visualization attributes with white 100% transparent colour.
-      G4VisAttributes * csiWorldVisAtt = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0, 0.0));
-      // Set the forced wireframe style
-      csiWorldVisAtt->SetForceWireframe(true);
-      */
-      // Assignment of the visualization attributes to the logical volume
       logical_ecl->SetVisAttributes(G4VisAttributes::GetInvisible());
 
 
       // Create sub-assebmlies
       // NOTE: the order is important for getting the right names for
       // the physical volumes. Crystals first!!
-
       G4AssemblyVolume* assemblyFwCrystals = new G4AssemblyVolume();
       G4AssemblyVolume* assemblyFwFoils = new G4AssemblyVolume();
       ///////////////////////////////////////////////////////////
@@ -179,27 +124,15 @@ namespace Belle2 {
 
 
       //
-      //  FORWARD END-CAP CRYSTALS
-      //  (does backward too now...)
+      //  "END-CAP:-LIKE  CRYSTALS
       ///////////////////////////////
+      double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
 
-      int iRing = 0;
-      int nRing = 0;
-      int iPhi = 0;
-
-      //      for (int iCry = 1 ; iCry <= 72 ; ++iCry) {
       for (int iCry = 1 ; iCry <= 4 ; ++iCry) {
 
 
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
-
-        /*
-              //for quick tests!
-              if (iCry > 2) {
-          iCry = iCry - 2 + 100;
-              }
-        */
 
         h1 = counter.getLength("K_h1") * CLHEP::cm;
         h2 = counter.getLength("K_h2") * CLHEP::cm;
@@ -247,7 +180,7 @@ namespace Belle2 {
                                             halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
         G4LogicalVolume* FwCrysral = new G4LogicalVolume(FwCrysralShape, medCsI, (format("logicalEclFwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
 
-        G4VisAttributes* FwCrystalVisAtt = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0, 1.0));
+        G4VisAttributes* FwCrystalVisAtt = new G4VisAttributes(G4Colour(18.0 / 256, 230.0 / 256, 3.0 / 256, 1.0));
         FwCrysral->SetVisAttributes(FwCrystalVisAtt);
         FwCrysral->SetSensitiveDetector(m_sensitive);
 
@@ -266,8 +199,10 @@ namespace Belle2 {
         G4SubtractionSolid* FwFoilShape = new G4SubtractionSolid((format("FwFoil_%1%") % iCry).str().c_str(), FwFoilout, FwFoilin);
 
         G4LogicalVolume* FwFoil = new G4LogicalVolume(FwFoilShape, medAlTeflon, (format("logicalFwFoil_%1%") % iCry).str().c_str(), 0, 0, 0);
-        G4VisAttributes* FwFoilVisAtt = new G4VisAttributes(G4Colour(0.4, 0.4, 0.8, 0.5));
-        FwFoil->SetVisAttributes(FwFoilVisAtt);
+
+
+        //Hide the foils for now...
+        FwFoil->SetVisAttributes(G4VisAttributes::GetInvisible());
 
         assemblyFwFoils->AddPlacedVolume(FwFoil, Tr);
         //////////////////////////////////////////////////////////////////////////////////
@@ -279,29 +214,23 @@ namespace Belle2 {
         G4Transform3D BrR = G4RotateZ3D(360.*iSector / nSector * CLHEP::deg);
         assemblyFwCrystals->MakeImprint(logical_ecl, BrR);
         assemblyFwFoils->MakeImprint(logical_ecl, BrR);  // foil
-      }//nSector sectior
+      }//nSector sector
 
       // Diags
-      B2INFO("Volumes names for the CsI crystals");
-      B2INFO("  Forward: ");
+      B2INFO("Volume names for the CsI crystals");
       unsigned int i = 0;
-      G4VPhysicalVolume* MyVolume;
 
       // Show cell IDs and volume names
-      int cid;
       for (std::vector<G4VPhysicalVolume*>::iterator it = assemblyFwCrystals->GetVolumesIterator();
            i !=  assemblyFwCrystals->TotalImprintedVolumes();
            ++it, ++i) {
 
-        MyVolume = *it;
+        G4VPhysicalVolume* MyVolume = *it;
         B2INFO("   Crystal Name " << MyVolume->GetName());
         CsiGeometryPar* eclp = CsiGeometryPar::Instance();
-        cid = eclp->CsiVolNameToCellID(MyVolume->GetName());
+        int cid = eclp->CsiVolNameToCellID(MyVolume->GetName());
         B2INFO("   Crystal Number " << cid);
-      }
-
-
-    }//create
-
+      } // for all physical volumes in the assembly
+    }// create
   } // csi namespace
 } // Belle2 namespace

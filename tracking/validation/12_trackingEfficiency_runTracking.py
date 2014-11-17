@@ -18,7 +18,7 @@
     trackingEfficiency_pt_1.00GeV.root,trackingEfficiency_pt_1.50GeV.root,
     trackingEfficiency_pt_2.00GeV.root,trackingEfficiency_pt_3.00GeV.root,
     trackingEfficiency_pt_4.00GeV.root</input>
-    <output>trackingEfficiency_FinalData.root</header>
+    <output>trackingEfficiency_FinalData.root</output>
     <contact>michael.ziegler2@kit.edu</contact>
     <description>Run standard tracking on input files and write out information of the reconstructed tracks.</description>
 </header>

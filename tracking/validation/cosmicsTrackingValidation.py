@@ -13,6 +13,12 @@ VALIDATION_OUTPUT_FILE = 'cosmicsTrackingValidation.root'
 CONTACT = 'oliver.frost@desy.de'
 N_EVENTS = 10000
 
+## Indication if tracks should be fitted. Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
+GENFIT_TRACKS = False
+
+## Geometry name to be used in the Genfit extrapolation.
+GENFIT_GEOMETRY = 'Geant4'
+
 import basf2
 basf2.set_random_seed(1337)
 
@@ -49,24 +55,24 @@ def main():
     main_path.add_module(cosmicsModule)
 
     # Simulation
-    components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD'
-                  , 'CDC']
+    components = ['MagneticFieldConstant4LimitedRCDC', 'CDC']
     simulation.add_simulation(main_path, components=components)
 
     # Setup track finder
     trackFinderModule = basf2.register_module('CDCLocalTracking')
     main_path.add_module(trackFinderModule)
 
-    # Prepare Genfit extrapolation
-    setupGenfitExtrapolationModule = \
-        basf2.register_module('SetupGenfitExtrapolation')
-    setupGenfitExtrapolationModule.param({'whichGeometry': 'TGeo'})
-    main_path.add_module(setupGenfitExtrapolationModule)
+    if GENFIT_TRACKS:
+        # Prepare Genfit extrapolation
+        setupGenfitExtrapolationModule = \
+            basf2.register_module('SetupGenfitExtrapolation')
+        setupGenfitExtrapolationModule.param({'whichGeometry': GENFIT_GEOMETRY})
+        main_path.add_module(setupGenfitExtrapolationModule)
 
-    # Fit tracks
-    genFitterModule = basf2.register_module('GenFitter')
-    genFitterModule.param({'PDGCodes': [13]})
-    main_path.add_module(genFitterModule)
+        # Fit tracks
+        genFitterModule = basf2.register_module('GenFitter')
+        genFitterModule.param({'PDGCodes': [13]})
+        main_path.add_module(genFitterModule)
 
     # Reference Monte Carlo tracks
     trackFinderMCTruthModule = basf2.register_module('TrackFinderMCTruth')
@@ -121,6 +127,7 @@ class CosmicsTrackingValidationModule(basf2.Module):
         self.mc_matches = collections.deque()
         self.mc_d0s = collections.deque()
         self.mc_cos_thetas = collections.deque()
+        self.mc_pt = collections.deque()
         self.mc_hit_efficiencies = collections.deque()
 
     def event(self):
@@ -343,36 +350,38 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         validation_plots.append(hit_efficiency_by_cos_theta)
 
         # Omega / curvature residuals
-        omega_residuals_histogram = ValidationPlot('Cosmics_omega_residuals')
-        omega_residuals_histogram.n_bins = 50
+        if GENFIT_TRACKS:
+            omega_residuals_histogram = \
+                ValidationPlot('Cosmics_omega_residuals')
+            omega_residuals_histogram.n_bins = 50
 
-        pr_fitted_omegas = np.array(self.pr_fitted_omegas)
-        pr_failed_fits = np.isnan(pr_fitted_omegas)
-        pr_true_omegas = np.array(self.pr_true_omegas)
-        pr_no_true_omega = np.isnan(pr_true_omegas)
+            pr_fitted_omegas = np.array(self.pr_fitted_omegas)
+            pr_failed_fits = np.isnan(pr_fitted_omegas)
+            pr_true_omegas = np.array(self.pr_true_omegas)
+            pr_no_true_omega = np.isnan(pr_true_omegas)
 
-        print 'Number of failed fits', np.sum(pr_failed_fits)
-        import matplotlib.pyplot as plt
-        plt.figure()
-        plt.hist(pr_fitted_omegas[~pr_failed_fits])
-        plt.show()
+            print 'Number of failed fits', np.sum(pr_failed_fits)
+            import matplotlib.pyplot as plt
+            plt.figure()
+            plt.hist(pr_fitted_omegas[~pr_failed_fits])
+            plt.show()
 
-        print 'Number of no true omegas', np.sum(pr_no_true_omega)
-        plt.figure()
-        plt.hist(pr_true_omegas[~pr_no_true_omega])
-        plt.show()
+            print 'Number of no true omegas', np.sum(pr_no_true_omega)
+            plt.figure()
+            plt.hist(pr_true_omegas[~pr_no_true_omega])
+            plt.show()
 
-        pr_omega_residuals = pr_fitted_omegas - pr_true_omegas
-        omega_residuals_histogram.fill(pr_omega_residuals[~pr_failed_fits
-                                       & ~pr_no_true_omega])
+            pr_omega_residuals = pr_fitted_omegas - pr_true_omegas
+            omega_residuals_histogram.fill(pr_omega_residuals[~pr_failed_fits
+                    & ~pr_no_true_omega])
 
-        omega_residuals_histogram.xlabel = 'Omega residuals (1/cm)'
+            omega_residuals_histogram.xlabel = 'Omega residuals (1/cm)'
 
-        omega_residuals_histogram.description = 'Not a serious plot yet.'
-        omega_residuals_histogram.check = ''
-        omega_residuals_histogram.contact = CONTACT
+            omega_residuals_histogram.description = 'Not a serious plot yet.'
+            omega_residuals_histogram.check = ''
+            omega_residuals_histogram.contact = CONTACT
 
-        validation_plots.append(omega_residuals_histogram)
+            validation_plots.append(omega_residuals_histogram)
 
         # Save everything to a ROOT file
         output_file = ROOT.TFile(VALIDATION_OUTPUT_FILE, 'recreate')

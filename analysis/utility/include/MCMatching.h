@@ -6,6 +6,7 @@
 
 
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class Particle;
@@ -32,6 +33,12 @@ namespace Belle2 {
       c_AddedWrongParticle  = 256, /**< A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
       c_InternalError       = 512, /**< There was an error in MC matching. Not a valid match. Might indicate fake/background track or cluster. */
     };
+
+    /** Return string with all human-readable flags, e.g. explainFlags(402) returns "c_MissingResonance | c_MissGamma | c_MisID | c_AddedWrongParticle".
+     */
+    std::string explainFlags(unsigned int flags);
+
+#ifndef __CINT__
 
     /**
      * This is the main function of MC matching algorithm. When executed the algorithm
@@ -136,5 +143,6 @@ namespace Belle2 {
      * @returns ORed combination of MCMatchStatus flags for missing particles.
      */
     int getMissingParticleFlags(const std::vector<const Particle*>& reconstructedFSPs, const std::vector<const MCParticle*>& generatedFSPs);
+#endif
   }
 }

@@ -14,6 +14,39 @@
 using namespace Belle2;
 using namespace std;
 
+std::string MCMatching::explainFlags(unsigned int flags)
+{
+  if (flags == c_Correct)
+    return "c_Correct";
+
+  std::string s;
+  unsigned int f = 1;
+  while (flags != 0) {
+    if (flags & f) {
+      switch (f) {
+        case c_MissFSR             : s += "c_MissFSR"; break;
+        case c_MissingResonance    : s += "c_MissingResonance"; break;
+        case c_DecayInFlight       : s += "c_DecayInFlight"; break;
+        case c_MissNeutrino        : s += "c_MissNeutrino"; break;
+        case c_MissGamma           : s += "c_MissGamma"; break;
+        case c_MissMassiveParticle : s += "c_MissMassiveParticle"; break;
+        case c_MissKlong           : s += "c_MissKlong"; break;
+        case c_MisID               : s += "c_MisID"; break;
+        case c_AddedWrongParticle  : s += "c_AddedWrongParticle"; break;
+        case c_InternalError       : s += "c_InternalError"; break;
+        default:
+          s += to_string(f);
+          B2ERROR("MCMatching::explainFlags() doesn't know about flag " << f << ", please update it.")
+      }
+      flags -= f; //remove flag
+      if (flags != 0)
+        s += " | ";
+    }
+    f *= 2;
+  }
+  return s;
+}
+
 void MCMatching::fillGenMothers(const MCParticle* mcP, vector<int>& genMCPMothers)
 {
   while (mcP) {

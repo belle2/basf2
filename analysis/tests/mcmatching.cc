@@ -588,7 +588,7 @@ namespace {
   TEST_F(MCMatchingTest, WrongPhotonForPi0)
   {
     {
-      Decay d(521, {211, Decay(421, {321, -211, Decay(111, {22, 22})})});
+      Decay d(521, {211, Decay(421, {321, -211, Decay(111, {22, 22})}), 22});
       d.finalize();
       d.reconstruct({521, {211, {421, {321, -211, {111, {{22}, {22, {}, Decay::c_RelateWith, d.getMCParticle(211)}}}}}}});
       //result: pi0 gets MC match 521. Gets misID & c_AddedWrongParticle because of 'wrong' photon, plus c_MissMassiveParticle since the B's daughters are missing, plus c_MissGamma because one photon was not reconstructed, plus c_MissingResonance because non-FSPs were missed (MC matched particle (521) has lots of daughters)
@@ -596,13 +596,17 @@ namespace {
       Decay* pi0decay = d.getDecay(111);
       ASSERT_TRUE(setMCTruth(pi0)) << pi0decay->getString();
       EXPECT_EQ(521, pi0->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma | c_MissingResonance, getMCTruthStatus(pi0)) << pi0decay->getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma | c_MissingResonance | c_MissFSR, getMCTruthStatus(pi0)) << pi0decay->getString();
 
       //flags migrate upstream
       Particle* p = d.getParticle(421);
       Decay* d0decay = d.getDecay(421);
       ASSERT_TRUE(setMCTruth(p)) << d0decay->getString();
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance, getMCTruthStatus(p)) << d0decay->getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance | c_MissFSR, getMCTruthStatus(p)) << d0decay->getString();
+
+      //even with addedWrongParticle (inherited from daughter), missFSR should be detected.
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance | c_MissFSR, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
 
@@ -675,7 +679,8 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+      //inherits c_AddedWrongParticle from D0, gets c_MissingResonance since D+ is missing
+      EXPECT_EQ(c_AddedWrongParticle | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** Correctly reconstructed decay, except we switched some tracks around. */
@@ -694,7 +699,8 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+      //gets c_MissingResonance since none of the Particles got the D0 MCParticle as MC match
+      EXPECT_EQ(c_AddedWrongParticle | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
 
     /** B0 -> phi [K+ K-] phi [K+ K-] with Ks from both sides switched*/
@@ -714,7 +720,8 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+      //gets c_MissingResonance since none of the Particles got the phi MCParticle as MC match
+      EXPECT_EQ(c_AddedWrongParticle | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** Reconstruct both Bs, but switch pi0 to other B */
@@ -736,7 +743,8 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+      //gets c_MissingResonance since none of the Particles got the B0/anti-B0 MCParticle as MC match
+      EXPECT_EQ(c_AddedWrongParticle | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
 

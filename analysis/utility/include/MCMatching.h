@@ -19,6 +19,9 @@ namespace Belle2 {
    * Different MCMatchStatus flags can be queried using getMCTruthStatus(), or the associated 'mcStatus' variable (available via VariablesToNtuple, the MCTruth ntuple tool, etc.). For checking if a Particle is correctly reconstructed, the 'isSignal' variable can be used.
    */
   namespace MCMatching {
+    /** Name of extra-info field stored in Particle (MCTruthStatus). */
+    extern const std::string c_extraInfoMCStatus;
+
     /** Flags that describe different reconstruction errors. */
     enum MCMatchStatus {
       c_Correct             = 0,  /**< This Particle and all its daughters are perfectly reconstructed. */
@@ -38,8 +41,6 @@ namespace Belle2 {
      */
     std::string explainFlags(unsigned int flags);
 
-#ifndef __CINT__
-
     /**
      * This is the main function of MC matching algorithm. When executed the algorithm
      * searches for first common generated mother (MCParticle) of this particle's daughters.
@@ -51,15 +52,14 @@ namespace Belle2 {
      *
      * @return returns true if relation is set and false otherwise
      */
-    bool setMCTruth(const Particle* particle);
+    bool setMCTruth(const Belle2::Particle* particle);
 
     /**
      * Returns the status (quality indicator) of the match. The status is given as a bit pattern,
      * where the individual bits indicate the the type of mismatch. The values are defined in the
      * MCMatchStatus enum and described in detail there.
      *
-     * Status equal to c_Correct == 0 indicates the perfect MC match (evrything OK).
-     * c_InternalError is used to indicate an internal error.
+     * Status equal to c_Correct == 0 indicates a perfect MC match (everything OK).
      *
      * The mctruth value is also stored inside the MCTruthStatus extrainfo (so it is calculated only once per candidate).
      *
@@ -68,14 +68,14 @@ namespace Belle2 {
      *
      * @return status (bit pattern) of the mc match
      */
-    int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle = nullptr);
+    int getMCTruthStatus(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
 
     /** Sets mctruth flag in MCTruthStatus extrainfo (also returns it).
      *
      * Users should use getMCTruthStatus(), which only calculates this information when necessary.
      *
      * */
-    int setMCTruthStatus(Particle* particle, const MCParticle* mcParticle);
+    int setMCTruthStatus(Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
 
     /**
      * Fills vector with array (1-based) indices of all generator ancestors of given MCParticle.
@@ -83,7 +83,7 @@ namespace Belle2 {
      * @param pointer to the MCParticle
      * @param reference to the vector of integers to hold the results
      */
-    void fillGenMothers(const MCParticle* mcP, std::vector<int>& genMCPMothers);
+    void fillGenMothers(const Belle2::MCParticle* mcP, std::vector<int>& genMCPMothers);
 
     /**
      * Finds a mother of mcP that is in firstMothers, from [lastMother,  end]
@@ -98,32 +98,12 @@ namespace Belle2 {
      *
      * @return index of the first common mother in firstMothers (!), or -1 if not found.
      */
-    int findCommonMother(const MCParticle* mcP, const std::vector<int>& firstMothers, int lastMother);
+    int findCommonMother(const Belle2::MCParticle* mcP, const std::vector<int>& firstMothers, int lastMother);
 
     /**
-     * Appends final state particle (FSP) to the vector of Particles.
-     *
-     * @param pointer to the particle
-     * @param vector of FSPs that are used to reconstruct specified particle
-     * @return number of non-FSPs encountered
+     * Returns true if given PDG code indicates a FSP.
      */
-    int appendFSP(const Particle* p,     std::vector<const Particle*>&   children);
-
-    /**
-     * Appends final state particle (FSP) to the vector of MCParticles.
-     *
-     * @param gen pointer to the MCParticle
-     * @param children vector of FSPs that can be found in the generated decay chain of specified MCParticle
-     * @return number of non-FSPs encountered
-     */
-    int appendFSP(const MCParticle* gen, std::vector<const MCParticle*>& children);
-
-    /**
-     * Returns true if given MCParticle is FSP or not.
-     *
-     * @return true if MCParticle is FSP and false otherwise
-     */
-    bool isFSP(const MCParticle* p);
+    bool isFSP(int pdg);
 
     /**
      * Returns true if given MCParticle is a final state radiation (FSR) photon.
@@ -131,18 +111,14 @@ namespace Belle2 {
      *
      * Note: this is a bit rough, needs some changes to EvtGen to determine this reliably.
      */
-    bool isFSR(const MCParticle* p);
+    bool isFSR(const Belle2::MCParticle* p);
 
     /**
-     * Finds final state particles given in vector of generated particles that
-     * are not given in vector of reconstructed final state particles,
-     * returns flags describing what kind of FSPs are missing.
+     * Determines which daughters of 'mcParticle' are not reconstructed by any daughter of
+     * 'particle'.
      *
-     * @param reconstructedFSPs vector of reconstructed final state particles
-     * @param generatedFSPs vector of generated final state particles
      * @returns ORed combination of MCMatchStatus flags for missing particles.
      */
-    int getMissingParticleFlags(const std::vector<const Particle*>& reconstructedFSPs, const std::vector<const MCParticle*>& generatedFSPs);
-#endif
+    int getMissingParticleFlags(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
   }
 }

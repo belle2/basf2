@@ -14,6 +14,8 @@
 using namespace Belle2;
 using namespace std;
 
+const std::string MCMatching::c_extraInfoMCStatus = "MCTruthStatus";
+
 std::string MCMatching::explainFlags(unsigned int flags)
 {
   if (flags == c_Correct)
@@ -76,7 +78,7 @@ bool MCMatching::setMCTruth(const Particle* particle)
 {
   //if MCTruthStatus is set, we already handled this particle
   //TODO check wether this actually speeds things up or not
-  if (particle->hasExtraInfo("MCTruthStatus"))
+  if (particle->hasExtraInfo(c_extraInfoMCStatus))
     return true;
 
   const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
@@ -158,7 +160,7 @@ bool MCMatching::setMCTruth(const Particle* particle)
 int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticle)
 {
   auto setStatus = [](Particle * particle, int s) -> int {
-    particle->addExtraInfo("MCTruthStatus", s);
+    particle->addExtraInfo(c_extraInfoMCStatus, s);
     return s;
   };
 
@@ -206,7 +208,6 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   }
   status |= (daughterStatus & daughterStatusAcceptMask);
 
-
   //int genMotherPDG = mcParticle->getPDG();
   // TODO: fix this (aim for no hard coded values)
   // TODO: is this neccessary ?
@@ -214,37 +215,15 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   //if (genMotherPDG == 10022 || genMotherPDG == 300553 || genMotherPDG == 9000553)
   //  return -1;
 
-  // Ks doesn't have daughters in gen_hepevt table
-  // TODO: is there any better way
-  //if (genMotherPDG == 310)
-  //return 1;
-
-  // fill vectors of reconstructed and generated final state particles
-  vector<const Particle*>   recFSPs;
-  vector<const MCParticle*> genFSPs;
-
-  int reconstructedNonFSPs = appendFSP(particle,   recFSPs);
-  int mcNonFSPs = appendFSP(mcParticle, genFSPs);
-  if (mcNonFSPs > reconstructedNonFSPs)
-    status |= c_MissingResonance;
-
-  // TODO: do something
-  if (genFSPs.empty())
-    return setStatus(particle, status | MCMatchStatus::c_InternalError);
-
-  //This might happen with  e.g two ECLClusters from a charged track
-  if (recFSPs.size() > genFSPs.size())
-    return setStatus(particle, status | MCMatchStatus::c_InternalError);
-
-  status |= getMissingParticleFlags(recFSPs, genFSPs);
+  status |= getMissingParticleFlags(particle, mcParticle);
 
   return setStatus(particle, status);
 }
 
 int MCMatching::getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
 {
-  if (particle->hasExtraInfo("MCTruthStatus")) {
-    return particle->getExtraInfo("MCTruthStatus");
+  if (particle->hasExtraInfo(c_extraInfoMCStatus)) {
+    return particle->getExtraInfo(c_extraInfoMCStatus);
   } else {
     if (!mcParticle)
       mcParticle = particle->getRelatedTo<MCParticle>();
@@ -253,43 +232,9 @@ int MCMatching::getMCTruthStatus(const Particle* particle, const MCParticle* mcP
 }
 
 
-int MCMatching::appendFSP(const Particle* p, vector<const Particle*>& children)
+bool MCMatching::isFSP(int pdg)
 {
-  int nonFSPs = 0;
-  for (unsigned i = 0; i < p->getNDaughters(); ++i) {
-    const Particle* daug = p->getDaughter(i);
-
-    // TODO: fix this (aim for no hard coded values)
-    // don't add K_S^0 daughters since they are also in isFSPs()
-    if (daug->getNDaughters() && daug->getPDGCode() != 310) {
-      nonFSPs += 1 + appendFSP(daug, children);
-    } else {
-      children.push_back(daug);
-    }
-  }
-  return nonFSPs;
-}
-
-int MCMatching::appendFSP(const MCParticle* gen, vector<const MCParticle*>& children)
-{
-  int nonFSPs = 0;
-  const vector<MCParticle*>& genDaughters = gen->getDaughters();
-  for (unsigned i = 0; i < genDaughters.size(); ++i) {
-    const MCParticle* daug = genDaughters[i];
-
-    int nDaughs = daug->getNDaughters();
-    if (nDaughs && !isFSP(daug)) {
-      nonFSPs += 1 + appendFSP(daug, children);
-    } else {
-      children.push_back(daug);
-    }
-  }
-  return nonFSPs;
-}
-
-bool MCMatching::isFSP(const MCParticle* p)
-{
-  switch (abs(p->getPDG())) {
+  switch (abs(pdg)) {
     case 211:
     case 321:
     case 11:
@@ -299,8 +244,8 @@ bool MCMatching::isFSP(const MCParticle* p)
     case 16:
     case 22:
     case 2212:
-    case 310:
-    case 130:
+    case 310: // K0S
+    case 130: // K0L
     case 2112:
       return true;
     default:
@@ -324,32 +269,72 @@ bool MCMatching::isFSR(const MCParticle* p)
   }
 }
 
-int MCMatching::getMissingParticleFlags(const std::vector<const Particle*>& reconstructedFSPs, const std::vector<const MCParticle*>& generatedFSPs)
+//utility functions used by getMissingParticleFlags()
+namespace {
+  using namespace MCMatching;
+
+  /** Recursively gather all matched MCParticles in daughters of p (taking special care of decay-in-flight things). */
+  void appendParticles(const Particle* p, unordered_set<const MCParticle*>& mcMatchedParticles)
+  {
+    for (unsigned i = 0; i < p->getNDaughters(); ++i) {
+      const Particle* daug = p->getDaughter(i);
+
+      //add matched MCParticle for 'daug'
+      const MCParticle* mcParticle = daug->getRelatedTo<MCParticle>();
+      if (mcParticle) {
+        mcMatchedParticles.insert(mcParticle);
+        if (daug->getNDaughters() == 0 and (unsigned int)daug->getExtraInfo(c_extraInfoMCStatus) & c_DecayInFlight) {
+          //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
+          //so we'll also add all mother MCParticles until the first primary mother
+          do {
+            mcParticle = mcParticle->getMother();
+            if (mcParticle)
+              mcMatchedParticles.insert(mcParticle);
+          } while (mcParticle and !mcParticle->hasStatus(MCParticle::c_PrimaryParticle));
+        }
+      }
+      appendParticles(daug, mcMatchedParticles);
+    }
+  }
+
+  /** Recursively gather all daughters of 'gen' we want to reconstruct. */
+  void appendParticles(const MCParticle* gen, vector<const MCParticle*>& children)
+  {
+    if (MCMatching::isFSP(gen->getPDG()))
+      return; //stop at the bottom of the MC decay tree (ignore secondaries)
+
+    const vector<MCParticle*>& genDaughters = gen->getDaughters();
+    for (unsigned i = 0; i < genDaughters.size(); ++i) {
+      const MCParticle* daug = genDaughters[i];
+      children.push_back(daug);
+      appendParticles(daug, children);
+    }
+  }
+}
+
+
+int MCMatching::getMissingParticleFlags(const Particle* particle, const MCParticle* mcParticle)
 {
   int flags = 0;
 
-  //a) same number for reconstructed and generated FSPs: nothing missing (provided the common mother is the same)
-  //b) more FSPs reconstructed than generated: most likely something like K_S, which counts as FSP. TODO: I don't think this should happen when K_S = 310 gets special handling in appendFSP(Particle*, ...)
-  if (reconstructedFSPs.size() >= generatedFSPs.size())
-    return flags;
+  unordered_set<const MCParticle*> mcMatchedParticles;
+  appendParticles(particle, mcMatchedParticles);
+  vector<const MCParticle*> genParts;
+  appendParticles(mcParticle, genParts);
 
-  //matched MCParticles of reconstructed FSPs
-  std::unordered_set<const MCParticle*> mcMatchedFSPs;
-  for (const Particle * rec : reconstructedFSPs) {
-    const MCParticle* mcParticle = rec->getRelatedTo<MCParticle>();
-    if (mcParticle)
-      mcMatchedFSPs.insert(mcParticle);
-  }
-
-  for (const MCParticle * genFSP : generatedFSPs) {
-    const bool missing = (mcMatchedFSPs.find(genFSP) == mcMatchedFSPs.end());
+  for (const MCParticle * genPart : genParts) {
+    const bool missing = (mcMatchedParticles.find(genPart) == mcMatchedParticles.end());
     if (missing) {
-      //we want to set a flag, so what kind of particle is genFSP?
-      const int generatedPDG = genFSP->getPDG();
+
+      //we want to set a flag, so what kind of particle is genPart?
+      const int generatedPDG = genPart->getPDG();
       const int absGeneratedPDG = abs(generatedPDG);
-      if (generatedPDG == 22) { //missing photon
+
+      if (!isFSP(generatedPDG)) {
+        flags |= c_MissingResonance;
+      } else if (generatedPDG == 22) { //missing photon
         if (!(flags & c_MissFSR) or !(flags & c_MissGamma)) {
-          if (isFSR(genFSP))
+          if (isFSR(genPart))
             flags |= c_MissFSR;
           else
             flags |= c_MissGamma;

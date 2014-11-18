@@ -146,7 +146,6 @@ namespace {
         finalize(); //overwrites m_mcparticle with the new particle
       } else if (decay.m_behavior == c_RelateWith) {
         m_mcparticle = decay.m_optMcPart;
-        ASSERT_TRUE(m_mcparticle != nullptr);
       } else if (decay.m_behavior == c_ReconstructFrom) {
         ASSERT_TRUE(decay.m_optDecay != nullptr);
         Decay* mcDecay = decay.m_optDecay;
@@ -238,8 +237,11 @@ namespace {
       if (m_particle)
         mcMatch = m_particle->getRelated<MCParticle>();
       if (mcMatch) {
-        s << ", " << mcMatch->getPDG();
-        s << ", " << MCMatching::explainFlags(m_particle->getExtraInfo("MCTruthStatus"));
+        s << ", " << mcMatch->getPDG() << ", ";
+        if (m_particle->hasExtraInfo(c_extraInfoMCStatus))
+          s << explainFlags(m_particle->getExtraInfo(c_extraInfoMCStatus));
+        else
+          s << "-not set-";
       } else {
         s << ", ?";
         s << ", ?";
@@ -870,6 +872,17 @@ namespace {
     ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
     EXPECT_EQ(c_MissMassiveParticle, getMCTruthStatus(d.m_particle)) << d.getString();
   }
+  TEST_F(MCMatchingTest, BeamBackground)
+  {
+    Decay d(421, {321, -211, {111, {22, 22}}});
+    d.finalize();
+    MCParticle* noParticle = nullptr;
+    d.reconstruct({421, {321, { -211, {}, Decay::c_RelateWith, noParticle}, {111, {22, 22}}}});
 
+    //no common mother
+    ASSERT_FALSE(setMCTruth(d.m_particle)) << d.getString();
+    EXPECT_EQ(c_InternalError, getMCTruthStatus(d.m_particle)) << d.getString();
+    EXPECT_EQ(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+  }
 }  // namespace
 #endif

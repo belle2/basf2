@@ -20,14 +20,18 @@ namespace Belle2 {
   public:
     bool boot(int shm_num, int mem_addr) throw(IOException);
     bool init(int shm_num, int mem_addr) throw(IOException);
+    int read(int sh_num, int mem_addr) throw(IOException);
+    int write(int sh_num, int mem_addr, int reg_wdata) throw(IOException);
 
   public:
     int getId() const throw() { return m_id; }
     const std::string& getHost() const throw() { return m_host; }
+    int* getData() throw() { return m_reg_data; }
 
   private:
     int m_id;
     std::string m_host;
+    int m_reg_data[12];
 
   };
 

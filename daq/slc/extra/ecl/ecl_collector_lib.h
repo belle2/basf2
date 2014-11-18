@@ -18,7 +18,9 @@ int sh_get_mem_data(int sh_num, int* mem_data);
 
 int sh_boot(const char* ip_addr, int sh_num, unsigned int mem_addr);
 int sh_init_ecldsp(const char* ip_addr, int sh_num, unsigned int mem_addr);
-int sh_reg_io(const char* ip_addr, const char* opt, int sh_num, int reg_num, int reg_wdata);
+int sh_reg_io(const char* ip_addr, const char* opt,
+              int sh_num, int mem_addr, int reg_wdata,
+              int* sh_reg_data, char* msg);
 
 #ifdef __cplusplus
 }

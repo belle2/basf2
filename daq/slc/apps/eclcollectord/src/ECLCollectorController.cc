@@ -22,7 +22,8 @@ throw(IOException)
   }
   for (size_t i = 0; i < m_shaper_v.size(); i++) {
     ECLShaperController& sh(m_shaper_v[i]);
-    system(StringUtil::form("sh_boot %s %s", sh.getHost().c_str(), "A7000000").c_str());
+    sh.boot(0, 0xA7000000);
+    //system(StringUtil::form("sh_boot %s %s", sh.getHost().c_str(), "A7000000").c_str());
   }
   return true;
 }
@@ -60,29 +61,34 @@ throw(IOException)
   reg_v.push_back(ShaperReg(0x800, 0x1, ""));
   for (size_t i = 0; i < m_shaper_v.size(); i++) {
     ECLShaperController& sh(m_shaper_v[i]);
-    std::string cmd = StringUtil::form("sh_init_ecldsp %s %s", sh.getHost().c_str(),
-                                       (mode == 2) ? "AA000000" : "A8000000");
-    LogFile::debug(cmd);
-    system(cmd.c_str());
+    sh.init(0, ((mode == 2) ? 0xAA000000 : 0xA8000000));
+    //std::string cmd = StringUtil::form("sh_init_ecldsp %s %s", sh.getHost().c_str(),
+    //                                   (mode == 2) ? "AA000000" : "A8000000");
+    //LogFile::debug(cmd);
+    //system(cmd.c_str());
     usleep(100000);
     for (size_t i2 = 0; i2 < reg_v.size(); i2++) {
       ShaperReg& reg(reg_v[i2]);
-      cmd = StringUtil::form("sh_reg_io %s wq %x %x", sh.getHost().c_str(),
-                             reg.adr, reg.val);
-      system(cmd.c_str());
-      LogFile::debug(cmd);
+      sh.write(0, reg.adr, reg.val);
+      //cmd = StringUtil::form("sh_reg_io %s wq %x %x", sh.getHost().c_str(),
+      //                       reg.adr, reg.val);
+      //system(cmd.c_str());
+      //LogFile::debug(cmd);
     }
-    cmd = StringUtil::form("col_reg_io %s w C000 1", sh.getHost().c_str());
-    system(cmd.c_str());
-    LogFile::debug(cmd);
+    sh.write(0, 0xC000, 0x1);
+    //cmd = StringUtil::form("col_reg_io %s w C000 1", sh.getHost().c_str());
+    //system(cmd.c_str());
+    //LogFile::debug(cmd);
     usleep(100000);
     for (size_t i2 = 0; i2 < 16; i2++) {
-      cmd = StringUtil::form("sh_reg_io %s wq 30 3f", sh.getHost().c_str());
-      system(cmd.c_str());
-      LogFile::debug(cmd);
-      cmd = StringUtil::form("sh_reg_io %s wq 31 %x", sh.getHost().c_str(), 0x10 + i2);
-      system(cmd.c_str());
-      LogFile::debug(cmd);
+      sh.write(0, 0x30, 0x3f);
+      sh.write(0, 0x31, 0x10 + i2);
+      //cmd = StringUtil::form("sh_reg_io %s wq 30 3f", sh.getHost().c_str());
+      //system(cmd.c_str());
+      //LogFile::debug(cmd);
+      //cmd = StringUtil::form("sh_reg_io %s wq 31 %x", sh.getHost().c_str(), 0x10 + i2);
+      //system(cmd.c_str());
+      //LogFile::debug(cmd);
       usleep(100000);
     }
   }

@@ -208,13 +208,6 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   }
   status |= (daughterStatus & daughterStatusAcceptMask);
 
-  //int genMotherPDG = mcParticle->getPDG();
-  // TODO: fix this (aim for no hard coded values)
-  // TODO: is this neccessary ?
-  // -> might speed up things by removing combinatorics  (we don't need missingX flags there)
-  //if (genMotherPDG == 10022 || genMotherPDG == 300553 || genMotherPDG == 9000553)
-  //  return -1;
-
   status |= getMissingParticleFlags(particle, mcParticle);
 
   return setStatus(particle, status);
@@ -230,7 +223,6 @@ int MCMatching::getMCTruthStatus(const Particle* particle, const MCParticle* mcP
     return setMCTruthStatus(const_cast<Particle*>(particle), mcParticle);
   }
 }
-
 
 bool MCMatching::isFSP(int pdg)
 {

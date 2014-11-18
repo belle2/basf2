@@ -207,7 +207,7 @@ namespace {
       }
     }
 
-    string getString() { return "Particles(MCParticles,MCMatch): " + getStringInternal(); }
+    string getString() const { return "Particles(MCParticles,MCMatch,Flags):\n" + getStringInternal(); }
 
     int m_pdg; /**< PDG code of this MCParticle. */
     vector<Decay> m_daughterDecays; /**< decay products. */
@@ -217,15 +217,19 @@ namespace {
 
   private:
     /** implementation of getString(), without descriptive prefix. */
-    string getStringInternal() const {
+    string getStringInternal(int depth = 0) const {
       stringstream s;
+      string spaces;
+      for (int i = 0; i < depth; i++)
+        spaces += "    ";
+      s << spaces;
 
       if (m_particle)
         s << m_particle->getPDGCode();
       else
         s << "?";
 
-      s << "(";
+      s << " (";
       if (m_mcparticle)
         s << m_mcparticle->getPDG();
       else
@@ -233,19 +237,22 @@ namespace {
       const MCParticle* mcMatch = nullptr;
       if (m_particle)
         mcMatch = m_particle->getRelated<MCParticle>();
-      if (mcMatch)
-        s << "," << mcMatch->getPDG();
-      else
-        s << ",?";
+      if (mcMatch) {
+        s << ", " << mcMatch->getPDG();
+        s << ", " << MCMatching::explainFlags(m_particle->getExtraInfo("MCTruthStatus"));
+      } else {
+        s << ", ?";
+        s << ", ?";
+      }
       s << ") ";
 
       if (!m_daughterDecays.empty()) {
-        s << "[";
+        s << " [";
         for (const Decay & d : m_daughterDecays) {
-          s << d.getStringInternal();
+          s << "\n" << d.getStringInternal(depth + 1);
         }
 
-        s << "]";
+        s << "\n" << spaces << "]";
       }
 
       return s.str();

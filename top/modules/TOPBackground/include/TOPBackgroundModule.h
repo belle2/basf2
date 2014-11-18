@@ -125,7 +125,7 @@ namespace Belle2 {
     TH1F* genergy2;    /**< energy of gamma that hits the bar */
 
     TH1F* zdistg;      /**< z distribution of the photoelectron flux */
-
+    TH1F* originpt;    /**< pt of electrons*/
 
     TH2F* nflux_bar;   /**< neutron flux on bar */
     TH2F* gflux_bar;   /**< gamma flux on bar */

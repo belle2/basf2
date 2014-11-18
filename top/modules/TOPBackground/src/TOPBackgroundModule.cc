@@ -53,6 +53,7 @@ namespace Belle2 {
     genergy(0),
     genergy2(0),
     zdistg(0),
+    originpt(0),
     nflux_bar(0),
     gflux_bar(0),
     cflux_bar(0),
@@ -105,6 +106,7 @@ namespace Belle2 {
     genergy2 = new TH1F("Energy distribution of gammas", "Energy distribution of gammas", 150, 0, 30);
 
     zdistg = new TH1F("Photoelectron flux z", "Photoelectron flux Z projection", 80, -400, 400);
+    originpt = new TH1F("P_t of origin electron", "P_t of origin electron", 300, 0.06, 0.14);
 
     nflux_bar = new TH2F("Neutron flux on bar", "Neutron flux on bar", 32, -114.8, 211.5, 16, -0, 360);
     gflux_bar = new TH2F("Gamma flux on bar", "Gamma flux on bar MHz/cm^{2}", 32, -114.8, 211.5, 16, -0, 360);
@@ -159,7 +161,7 @@ namespace Belle2 {
 
       const TOPSimHit* simHit = DataStore::getRelated<TOPSimHit>(aDigit);
 
-      genergy->Fill(simHit->getEnergy());
+      //  genergy->Fill(simHit->getEnergy());
 
       const MCParticle* particle = DataStore::getRelated<MCParticle>(simHit);
 
@@ -175,7 +177,13 @@ namespace Belle2 {
 
             zdist->Fill(mother->getVertex().Z());
             zdistg->Fill(mother->getVertex().Z(), 1. / m_TimeOfSimulation / 32.0 / 16.0);
-
+            TVector3 momentum = mother->getMomentum();
+            if (m_BkgType.at(m_BkgType.size() - 3) == 'L') momentum.RotateY(0.0415);
+            else if (m_BkgType.at(m_BkgType.size() - 3) == 'H') momentum.RotateY(-0.0415);
+            double px = momentum.X();
+            double py = momentum.Y();
+            double pt = sqrt(px * px + py * py);
+            originpt->Fill(pt);
           }
           mother = pommother;
           mm++;
@@ -352,6 +360,7 @@ namespace Belle2 {
     gorigin->Write();
     norigin->Write();
     zdistg->Write();
+    originpt->Write();
     m_rootFile->Close();
 
     // Announce

@@ -13,14 +13,10 @@ VALIDATION_OUTPUT_FILE = 'cosmicsTrackingValidation.root'
 CONTACT = 'oliver.frost@desy.de'
 N_EVENTS = 10000
 
-## Indication if tracks should be fitted. Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
-GENFIT_TRACKS = False
-
-## Geometry name to be used in the Genfit extrapolation.
-GENFIT_GEOMETRY = 'Geant4'
-
 import basf2
 basf2.set_random_seed(1337)
+
+import argparse
 
 import os
 import sys
@@ -38,6 +34,23 @@ from ROOT import Belle2
 def main():
     """Function to be executed during the validation run"""
 
+    argument_parser = argparse.ArgumentParser()
+
+    # Indication if tracks should be fitted.
+    # Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
+    argument_parser.add_argument('-f', '--fit', action='store_true',
+                                 help='Perform fitting of the generated tracks with Genfit.'
+                                 )
+
+    # Geometry name to be used in the Genfit extrapolation.
+    argument_parser.add_argument('-g', '--geometry', choices=['TGeo', 'Geant4'
+                                 ], default='Geant4',
+                                 help='Geometry to be used with Genfit.')
+
+    arguments = argument_parser.parse_args()
+
+    # Compose basf2 module path #
+    #############################
     main_path = basf2.create_path()
 
     # Master module
@@ -62,11 +75,11 @@ def main():
     trackFinderModule = basf2.register_module('CDCLocalTracking')
     main_path.add_module(trackFinderModule)
 
-    if GENFIT_TRACKS:
+    if arguments.fit:
         # Prepare Genfit extrapolation
         setupGenfitExtrapolationModule = \
             basf2.register_module('SetupGenfitExtrapolation')
-        setupGenfitExtrapolationModule.param({'whichGeometry': GENFIT_GEOMETRY})
+        setupGenfitExtrapolationModule.param({'whichGeometry': arguments.geometry})
         main_path.add_module(setupGenfitExtrapolationModule)
 
         # Fit tracks
@@ -98,10 +111,15 @@ def main():
         })
 
     main_path.add_module(mcTrackMatcherModule)
-    main_path.add_module(CosmicsTrackingValidationModule())
 
+    # Validation module generating plots
+    trackingValidationModule = TrackingValidationModule('Cosmics',
+            fit=arguments.fit)
+    main_path.add_module(trackingValidationModule)
+
+    # Run basf2 module path #
+    #########################
     print 'Start processing'
-
     basf2.process(main_path)
     print basf2.statistics
 
@@ -109,9 +127,18 @@ def main():
 # Analysis module #
 ###################
 
-class CosmicsTrackingValidationModule(basf2.Module):
+class TrackingValidationModule(basf2.Module):
 
     """Module to collect matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding."""
+
+    def __init__(self, name, fit=False):
+        super(TrackingValidationModule, self).__init__()
+        self.name = name
+        self.fit = fit
+
+    @property
+    def output_file_name(self):
+        return self.name + 'TrackingValidation.root'
 
     def initialize(self):
         self.trackMatchLookUp = Belle2.TrackMatchLookUp('MCTrackCands')
@@ -217,7 +244,7 @@ class CosmicsTrackingValidationModule(basf2.Module):
         hit_efficiency = np.mean(self.mc_hit_efficiencies)
 
         cosmics_figures_of_merit = \
-            ValidationFiguresOfMerit('Cosmics_figures_of_merit')
+            ValidationFiguresOfMerit('%s_figures_of_merit' % self.name)
         cosmics_figures_of_merit['finding_efficiency'] = \
             track_finding_efficiency
         cosmics_figures_of_merit['fake_rate'] = fake_rate
@@ -241,8 +268,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         # A try out efficiency plot
         efficiency_profile = \
-            ValidationPlot('Cosmics_track_finding_efficiency_by_momentum',
-                           n_bins=50)
+            ValidationPlot('%s_track_finding_efficiency_by_momentum'
+                           % self.name, n_bins=50)
 
         efficiency_profile.fill(self.mc_transverse_momenta, self.mc_matches)
 
@@ -251,12 +278,11 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         efficiency_profile.description = 'Not a serious plot yet.'
         efficiency_profile.check = ''
         efficiency_profile.contact = CONTACT
-
         # validation_plots.append(efficiency_profile)
-        efficiency_profile.show()
 
         # A tryout d0 parameter plot, yet using the seen in vxd as an d0 parameter.
-        clone_rate_by_d0 = ValidationPlot('Cosmics_clone_rate_by_seen_in_vxd')
+        clone_rate_by_d0 = ValidationPlot('%s_clone_rate_by_seen_in_vxd'
+                % self.name)
 
         pr_matches = np.array(self.pr_matches)
         clone_rate_by_d0.fill(self.pr_seen_in_vxds, ~pr_matches,
@@ -268,13 +294,11 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         clone_rate_by_d0.description = 'Not a serious plot yet.'
         clone_rate_by_d0.check = ''
         clone_rate_by_d0.contact = CONTACT
-
         # validation_plots.append(clone_rate_by_d0)
-        clone_rate_by_d0.show()
 
         # Finding efficiency by d0 parameter
-        finding_efficiency_by_d0 = \
-            ValidationPlot('Cosmics_finding_efficiency_by_d0')
+        finding_efficiency_by_d0 = ValidationPlot('%s_finding_efficiency_by_d0'
+                 % self.name)
         finding_efficiency_by_d0.n_bins = 50
 
         finding_efficiency_by_d0.fill(self.mc_d0s, self.mc_matches)
@@ -290,7 +314,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         # Finding efficiency by cos theta
         finding_efficiency_by_cos_theta = \
-            ValidationPlot('Cosmics_finding_efficiency_by_cos_theta')
+            ValidationPlot('%s_finding_efficiency_by_cos_theta' % self.name)
         finding_efficiency_by_cos_theta.n_bins = 50
 
         finding_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
@@ -306,7 +330,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         validation_plots.append(finding_efficiency_by_cos_theta)
 
         # Histogram of the hit efficiency
-        hit_efficiency_histogram = ValidationPlot('Cosmics_hit_efficiency')
+        hit_efficiency_histogram = ValidationPlot('%s_hit_efficiency'
+                % self.name)
         hit_efficiency_histogram.n_bins = 50
         hit_efficiency_histogram.fill(self.mc_hit_efficiencies)
 
@@ -318,7 +343,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         validation_plots.append(hit_efficiency_histogram)
 
         # Hit efficiency by d0 parameter
-        hit_efficiency_by_d0 = ValidationPlot('Cosmics_hit_efficiency_by_d0')
+        hit_efficiency_by_d0 = ValidationPlot('%s_hit_efficiency_by_d0'
+                % self.name)
         hit_efficiency_by_d0.n_bins = 50
 
         hit_efficiency_by_d0.fill(self.mc_d0s, self.mc_hit_efficiencies)
@@ -334,13 +360,13 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         # Hit efficiency by cos_theta parameter
         hit_efficiency_by_cos_theta = \
-            ValidationPlot('Cosmics_hit_efficiency_by_cos_theta')
+            ValidationPlot('%s_hit_efficiency_by_cos_theta' % self.name)
         hit_efficiency_by_cos_theta.n_bins = 50
 
         hit_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
                 self.mc_hit_efficiencies)
 
-        hit_efficiency_by_cos_theta.xlabel = '#cos #theta (cm)'
+        hit_efficiency_by_cos_theta.xlabel = '#Cos #theta'
         hit_efficiency_by_cos_theta.ylabel = 'Hit efficiency'
 
         hit_efficiency_by_cos_theta.description = 'Not a serious plot yet.'
@@ -350,9 +376,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         validation_plots.append(hit_efficiency_by_cos_theta)
 
         # Omega / curvature residuals
-        if GENFIT_TRACKS:
-            omega_residuals_histogram = \
-                ValidationPlot('Cosmics_omega_residuals')
+        if self.fit:
+            omega_residuals_histogram = ValidationPlot('%s_omega_residuals'
+                    % self.name)
             omega_residuals_histogram.n_bins = 50
 
             pr_fitted_omegas = np.array(self.pr_fitted_omegas)
@@ -360,16 +386,16 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             pr_true_omegas = np.array(self.pr_true_omegas)
             pr_no_true_omega = np.isnan(pr_true_omegas)
 
-            print 'Number of failed fits', np.sum(pr_failed_fits)
-            import matplotlib.pyplot as plt
-            plt.figure()
-            plt.hist(pr_fitted_omegas[~pr_failed_fits])
-            plt.show()
+            # print 'Number of failed fits', np.sum(pr_failed_fits)
+            # import matplotlib.pyplot as plt
+            # plt.figure()
+            # plt.hist(pr_fitted_omegas[~pr_failed_fits])
+            # plt.show()
 
-            print 'Number of no true omegas', np.sum(pr_no_true_omega)
-            plt.figure()
-            plt.hist(pr_true_omegas[~pr_no_true_omega])
-            plt.show()
+            # print 'Number of no true omegas', np.sum(pr_no_true_omega)
+            # plt.figure()
+            # plt.hist(pr_true_omegas[~pr_no_true_omega])
+            # plt.show()
 
             pr_omega_residuals = pr_fitted_omegas - pr_true_omegas
             omega_residuals_histogram.fill(pr_omega_residuals[~pr_failed_fits
@@ -384,11 +410,10 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             validation_plots.append(omega_residuals_histogram)
 
         # Save everything to a ROOT file
-        output_file = ROOT.TFile(VALIDATION_OUTPUT_FILE, 'recreate')
+        output_file = ROOT.TFile(self.output_file_name, 'recreate')
 
         cosmics_figures_of_merit.write()
 
-        efficiency_profile.write()
         for validation_plot in validation_plots:
             validation_plot.write()
 

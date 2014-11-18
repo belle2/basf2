@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Zbynek Drasal, Christian Oswald,           *
- *               Martin Ritter                                            *
+ *               Martin Ritter, Hyacinth Stypula                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -122,11 +122,9 @@ namespace Belle2 {
           double vertBarWidth  = endring.getLength("verticalBar") / Unit::mm / 2.0;
 
           double angle = asin(gapWidth / innerRadius);
-          G4VSolid* endringSolid = new G4Tubs("OuterEndring", innerRadius, outerRadius,
-                                              length, -M_PI / 2 + angle, M_PI - 2 * angle);
+          G4VSolid* endringSolid = new G4Tubs("OuterEndring", innerRadius, outerRadius, length, -M_PI / 2 + angle, M_PI - 2 * angle);
           angle = asin(gapWidth / baseRadius);
-          G4VSolid* endringBase  = new G4Tubs("InnerEndring", baseRadius, baseRadius + baseThickness,
-                                              length, -M_PI / 2 + angle, M_PI - 2 * angle);
+          G4VSolid* endringBase  = new G4Tubs("InnerEndring", baseRadius, baseRadius + baseThickness, length, -M_PI / 2 + angle, M_PI - 2 * angle);
           endringSolid = new G4UnionSolid("Endring", endringSolid, endringBase);
 
           //Now we need the bars which connect the two rings
@@ -134,12 +132,9 @@ namespace Belle2 {
           double x = vertBarWidth + gapWidth;
           G4Box* verticalBar = new G4Box("VerticalBar", vertBarWidth, height, length);
           G4Box* horizontalBar = new G4Box("HorizontalBar", height, horiBarWidth, length);
-          endringSolid = new G4UnionSolid("Endring", endringSolid, verticalBar,
-                                          G4Translate3D(x,  baseRadius + height, 0));
-          endringSolid = new G4UnionSolid("Endring", endringSolid, verticalBar,
-                                          G4Translate3D(x, -(baseRadius + height), 0));
-          endringSolid = new G4UnionSolid("Endring", endringSolid, horizontalBar,
-                                          G4Translate3D((baseRadius + height), 0, 0));
+          endringSolid = new G4UnionSolid("Endring", endringSolid, verticalBar, G4Translate3D(x,  baseRadius + height, 0));
+          endringSolid = new G4UnionSolid("Endring", endringSolid, verticalBar, G4Translate3D(x, -(baseRadius + height), 0));
+          endringSolid = new G4UnionSolid("Endring", endringSolid, horizontalBar, G4Translate3D((baseRadius + height), 0, 0));
 
           //Finally create the volume and add it to the assembly at the correct z position
           G4LogicalVolume* endringVolume = new G4LogicalVolume(
@@ -149,7 +144,7 @@ namespace Belle2 {
         }
       }
 
-      //Now let's add the cooling pipes to the Support
+      // Now let's add the cooling pipes to the Support
       GearDir pipes(support, (boost::format("CoolingPipes/Layer[@id='%1%']") % layer).str());
       if (pipes) {
         string material    = support.getString("CoolingPipes/Material");
@@ -163,8 +158,8 @@ namespace Belle2 {
         double zend        = pipes.getLength("zend") / Unit::mm;
         double zlength     = (zend - zstart) / 2.0;
 
-        //There are two parts: the straight pipes and the bendings. So we only need to different volumes
-        //which we place multiple times
+        // There are two parts: the straight pipes and the bendings. So we only need two different volumes
+        // which we place multiple times
         G4Tubs* pipeSolid = new G4Tubs("CoolingPipe", innerRadius, outerRadius, zlength, 0, 2 * M_PI);
         G4LogicalVolume* pipeVolume = new G4LogicalVolume(
           pipeSolid, geometry::Materials::get(material),
@@ -176,24 +171,45 @@ namespace Belle2 {
           bendSolid, geometry::Materials::get(material),
           (boost::format("%1%.Layer%2%.CoolingBend") % m_prefix % layer).str());
 
+        // Last pipe may be closer, thus we need additional bending
+        if (pipes.exists("deltaL")) {
+          double deltaL = pipes.getLength("deltaL") / Unit::mm;
+          G4Torus* bendSolidLast = new G4Torus("CoolingBendLast", innerRadius, outerRadius, sin(deltaPhi / 2.0) * radius - deltaL / 2.0, -M_PI / 2, M_PI);
+          G4LogicalVolume* bendVolumeLast = new G4LogicalVolume(bendSolidLast, geometry::Materials::get(material), (boost::format("%1%.Layer%2%.CoolingBendLast") % m_prefix % layer).str());
+          --nPipes;
+
+          // Place the last straight pipe
+          G4Transform3D placement_pipe = G4RotateZ3D(startPhi + (nPipes - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius, sin(deltaPhi / 2.0) * radius - deltaL, zstart + zlength);
+          supportAssembly.add(pipeVolume, placement_pipe);
+
+          // Place forward or backward bend
+          double zpos = nPipes % 2 > 0 ? zend : zstart;
+          // Calculate transformation
+          G4Transform3D placement = G4RotateZ3D(startPhi + (nPipes - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius, -deltaL / 2.0, zpos) * G4RotateY3D(M_PI / 2);
+          // If we are at the forward side we rotate the bend by 180 degree
+          if (nPipes % 2 > 0) {
+            placement = placement * G4RotateZ3D(M_PI);
+          }
+          // And place the bend
+          supportAssembly.add(bendVolumeLast, placement);
+        }
+
         for (int i = 0; i < nPipes; ++i) {
-          //Place the straight pipes
+          // Place the straight pipes
           G4Transform3D placement_pipe = G4RotateZ3D(startPhi + i * deltaPhi) * G4Translate3D(radius, 0, zstart + zlength);
           supportAssembly.add(pipeVolume, placement_pipe);
 
-          //This was the easy part, now lets add the connection between the pipes. We only need n-1 bendings
+          // This was the easy part, now lets add the connection between the pipes. We only need n-1 bendings
           if (i > 0) {
-            //Place forward or backward bend
+            // Place forward or backward bend
             double zpos = i % 2 > 0 ? zend : zstart;
-            //Calculate transformation
-            G4Transform3D placement = G4RotateZ3D(startPhi + (i - 0.5) * deltaPhi) *
-                                      G4Translate3D(cos(deltaPhi / 2.0) * radius, 0, zpos) *
-                                      G4RotateY3D(M_PI / 2);
-            //If we are at the forward side we rotate the bend by 180 degree
+            // Calculate transformation
+            G4Transform3D placement = G4RotateZ3D(startPhi + (i - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius, 0, zpos) * G4RotateY3D(M_PI / 2);
+            // If we are at the forward side we rotate the bend by 180 degree
             if (i % 2 > 0) {
               placement = placement * G4RotateZ3D(M_PI);
             }
-            //And place the bend
+            // And place the bend
             supportAssembly.add(bendVolume, placement);
           }
         }

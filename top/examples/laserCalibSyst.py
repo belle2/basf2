@@ -3,37 +3,48 @@
 
 from basf2 import *
 
-# ----------------------------------------------------------------
-# example of using OpticalGun to simulate laser calibration system
-# ----------------------------------------------------------------
+gb2_setuprel = 'build-2014-10-22'
+
+# ---------------------------------------------------------------
+# example of using OpticalGun to simulate laser light sources
+# two sources at the left and right side of prism, outside quartz
+# ---------------------------------------------------------------
 
 # Create path
 main = create_path()
 
 
-# define a single laser source (a fiber)
+# Optical sources
 
-def fiber(x, barID=1, path=main):
-    lightSource = register_module('OpticalGun')
-    lightSource.param('barID', barID)  # if nonzero, local (bar) frame, otherwise Belle II
-    lightSource.param('startTime', 0)
-    lightSource.param('pulseWidth', 10.0e-3)
-    lightSource.param('numPhotons', 10)
-    lightSource.param('diameter', 10.0e-3)
-    lightSource.param('alpha', 60.0)
-    lightSource.param('wavelength', 405.0)
-    lightSource.param('x', x)
-    lightSource.param('y', -2.7)
-    lightSource.param('z', -131)
-    lightSource.param('phi', 0.0)
-    lightSource.param('theta', 163.0)
-    lightSource.param('psi', 0.0)
-    path.add_module(lightSource)
+def fiber(
+    x,
+    angle,
+    barID=1,
+    path=main,
+    ):
+
+    source1 = register_module('OpticalGun')
+    source1.param('alpha', 60.0)
+    source1.param('na', 0.50)
+    source1.param('startTime', 0)
+    source1.param('pulseWidth', 10.0e-3)
+    source1.param('numPhotons', 10)
+    source1.param('diameter', 10.0e-3)
+    source1.param('barID', barID)  # if nonzero, local (bar) frame, otherwise Belle II
+    source1.param('x', x)
+    source1.param('y', -3.26)
+    source1.param('z', -131.33)
+    source1.param('theta', 180 + angle)
+    source1.param('phi', 0.0)
+    source1.param('psi', 0.0)
+    source1.param('angularDistribution', 'Gaussian')
+    # source1.param('angularDistribution', 'Lambertian')
+    path.add_module(source1)
 
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
@@ -45,11 +56,23 @@ geometry = register_module('Geometry')
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
-# Optical calibration system
-for barID in range(16):
-    for i in range(9):
-        x = (i - 4) * 5.0
-        fiber(x, barID + 1)
+# Optical sources
+# for (pos,angle) in [(0.9,17), (5.7,15), (11.3,15), (16.9,15), (22.5,15), (28.1,15), (33.7,15), (39.3,15), (44.1,17)]:
+for barId in range(16):
+    for pos in [
+        0.9,
+        5.7,
+        11.3,
+        16.9,
+        22.5,
+        28.1,
+        33.7,
+        39.3,
+        44.1,
+        ]:
+        angle = 17
+        x = -45. / 2. + pos
+        fiber(x, angle, barId + 1, main)
 
 # Simulation
 simulation = register_module('FullSim')

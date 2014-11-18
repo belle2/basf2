@@ -12,17 +12,14 @@
 #include <analysis/modules/ParticleSelector/ParticleSelectorModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
-#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -45,15 +42,13 @@ namespace Belle2 {
 
   ParticleSelectorModule::ParticleSelectorModule() : Module()
   {
-    // set module description (e.g. insert text)
-    setDescription("Selects from StoreArray<Particles> according to given decay and selection criteria and fills them into a ParticleList.");
+    setDescription("Selects reconstructed Particles from StoreArray<Particles> according to given decay and selection criteria and fills them into a ParticleList.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    // Add parameters
     addParam("decayString", m_decayString, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
 
     Variable::Cut::Parameter emptyCut;
-    addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
+    addParam("cut", m_cutParameter, "Selection criteria to be applied, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions", emptyCut);
 
     addParam("persistent", m_persistent,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);

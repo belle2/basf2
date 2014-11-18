@@ -1,7 +1,9 @@
 #ifndef Belle2_ECLCollectorController_h
 #define Belle2_ECLCollectorController_h
 
-#include <daq/slc/system/TCPSocket.h>
+#include "daq/slc/apps/eclcollectord/ECLShaperController.h"
+
+#include <daq/slc/base/IOException.h>
 
 #include <string>
 #include <vector>
@@ -10,11 +12,6 @@ namespace Belle2 {
 
   class ECLCollectorController {
   public:
-    class Shaper {
-    public:
-      int id;
-      std::string host;
-    };
     class ShaperReg {
     public:
       ShaperReg() {}
@@ -30,29 +27,18 @@ namespace Belle2 {
     };
 
   public:
-    ECLCollectorController(const std::string& hostname,
-                           unsigned int port = 6001)
-      : m_hostname(hostname), m_socket(hostname, port) {}
+    ECLCollectorController() {}
     ~ECLCollectorController() {}
 
   public:
-    bool boot(const std::string& config);
-    bool initialize(int mode);
-    bool connect();
-    void close();
-    bool sendRequest(const char* param,
-                     unsigned int param_size,
-                     char* reply, int reply_max);
+    bool boot(const std::string& config) throw(IOException);
+    bool init(int mode) throw(IOException);
 
   public:
-    bool bootShapers(int sh_num, int adrr = 0xA7000000);
-    bool initDSP(int sh_num, int adrr = 0xA8000000);
-    bool status(int status_type = 0);
+    //bool status(int status_type = 0);
 
   private:
-    std::string m_hostname;
-    TCPSocket m_socket;
-    std::vector<Shaper> m_shaper_v;
+    std::vector<ECLShaperController> m_shaper_v;
 
   };
 

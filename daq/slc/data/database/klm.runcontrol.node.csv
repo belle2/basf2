@@ -1,0 +1,5 @@
+   nodename,  config, used,                           runtype, type, dbmode, sequential
+   KLM, default, true,KLM01/runcontrol/1/default,0,1,      false
+   KLM, debug:dummycpu, true,KLM01/runcontrol/1/debug:dummycpu,0,1,      false
+   KLM, debug:dumhslb:020:rand4k, true,KLM01/runcontrol/1/debug:dumhslb:020:rand4k,0,1,      false
+   KLM, debug:yamadahslb:10kHz, true,KLM01/runcontrol/1/debug:yamadahslb:10kHz,0,1,      false

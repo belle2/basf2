@@ -1,0 +1,8 @@
+   nodename,  config, hostnode,        dataname,         format, file_revision
+   KLM01, default,  ROPC701,  ROPC701_STATUS,  ronode_status,4
+   KLM01, default,  CPR7001,  CPR7001_STATUS,  ronode_status,4
+   KLM01, default,  CPR7002,  CPR7002_STATUS,  ronode_status,4
+   KLM01, default,  CPR7003,  CPR7003_STATUS,  ronode_status,4
+   KLM01, default,  CPR7004,  CPR7004_STATUS,  ronode_status,4
+   KLM01, default,  CPR7005,  CPR7005_STATUS,  ronode_status,4
+   KLM01, default,  CPR7006,  CPR7006_STATUS,  ronode_status,4

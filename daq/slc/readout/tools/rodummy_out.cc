@@ -31,7 +31,7 @@ int main(int argc, char** argv)
   usleep(500000);
   info.reportRunning();
 
-  unsigned long long nbyte = 0;
+  //unsigned long long nbyte = 0;
   unsigned int count = 0;
   int expno = 1;
   int runno = 1;

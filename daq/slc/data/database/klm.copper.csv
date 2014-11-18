@@ -1,0 +1,25 @@
+ nodename,   config, copperid,   setup, hslb_a, hslb_b, hslb_c, hslb_d, dmalimit,     fee,                                                            basf2script, eb0_host, eb0_port
+  CPR7001, KLM:V01:rck035,  cpr7001, KLM:V01:rck035,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33001
+  CPR7002, KLM:V01:rck035,  cpr7002, KLM:V01:rck035,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33002
+  CPR7003, KLM:V01:rck035,  cpr7003, KLM:V01:rck035,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33003
+  CPR7004, KLM:V01:rck035,  cpr7004, KLM:V01:rck035,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33004
+  CPR7005, KLM:V01:rck035,  cpr7005, KLM:V01:rck035,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33005
+  CPR7006, KLM:V01:rck035,  cpr7006, KLM:V01:rck035,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33006
+  CPR7001,debug:dummycpu,  cpr7001, KLM:V01:dummycpu,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    klm01,33001
+  CPR7002,debug:dummycpu,  cpr7002, KLM:V01:dummycpu,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    klm01,33002
+  CPR7003,debug:dummycpu,  cpr7003, KLM:V01:dummycpu,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    klm01,33003
+  CPR7004,debug:dummycpu,  cpr7004, KLM:V01:dummycpu,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    klm01,33004
+  CPR7005,debug:dummycpu,  cpr7005, KLM:V01:dummycpu,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    klm01,33005
+  CPR7006,debug:dummycpu,  cpr7006, KLM:V01:dummycpu,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    klm01,33006
+  CPR7001,debug:dumhslb:020:rand4k,  cpr7001, KLM:V01:dumhslb:020:rand4k,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33001
+  CPR7002,debug:dumhslb:020:rand4k,  cpr7002, KLM:V01:dumhslb:020:rand4k,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33002
+  CPR7003,debug:dumhslb:020:rand4k,  cpr7003, KLM:V01:dumhslb:020:rand4k,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33003
+  CPR7004,debug:dumhslb:020:rand4k,  cpr7004, KLM:V01:dumhslb:020:rand4k,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33004
+  CPR7005,debug:dumhslb:020:rand4k,  cpr7005, KLM:V01:dumhslb:020:rand4k,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33005
+  CPR7006,debug:dumhslb:020:rand4k,  cpr7006, KLM:V01:dumhslb:020:rand4k,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33006
+  CPR7001,debug:yamadahslb:10kHz,  cpr7001,KLM:V01:yamadahslb:10kHz,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33001
+  CPR7002,debug:yamadahslb:10kHz,  cpr7002,KLM:V01:yamadahslb:10kHz,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33002
+  CPR7003,debug:yamadahslb:10kHz,  cpr7003,KLM:V01:yamadahslb:10kHz,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33003
+  CPR7004,debug:yamadahslb:10kHz,  cpr7004,KLM:V01:yamadahslb:10kHz,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33004
+  CPR7005,debug:yamadahslb:10kHz,  cpr7005,KLM:V01:yamadahslb:10kHz,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33005
+  CPR7006,debug:yamadahslb:10kHz,  cpr7006,KLM:V01:yamadahslb:10kHz,   true,  true,  true,  true,100, KLM:V01,daq/rawdata/examples/RecvSendCOPPER.py,    klm01,33006

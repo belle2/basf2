@@ -347,7 +347,8 @@ public class COPPERMonitorPane extends VBox implements NSMObserver {
                     canvasCprFIFO.setFillColor(Color.RED);
                     canvasCprFIFO.setLineColor(Color.PINK);
                     ((GText) canvasCprFIFO.getShapes().get(0)).setText("FULL");
-                } if (((eflag >> 6) & 0x1) > 0) {
+                }
+                if (((eflag >> 6) & 0x1) > 0) {
                     canvasCprFIFO.setFillColor(Color.ORANGE);
                     canvasCprFIFO.setLineColor(Color.GOLD);
                     ((GText) canvasCprFIFO.getShapes().get(0)).setText("EMPTY");
@@ -359,11 +360,13 @@ public class COPPERMonitorPane extends VBox implements NSMObserver {
                 canvasCprFIFO.update();
                 setStatus(eflag, 7, canvasLenFIFO);
                 for (int i = 0; i < 4; i++) {
-                    setStatus(eflag, 8 + i, canvasHSLBB2Link[i]);
-                    setStatus(eflag, 12 + i, canvasHSLBCprFIFO[i]);
-                    setStatus(eflag, 16 + i, canvasHSLBLenFIFO[i]);
-                    setStatus(eflag, 20 + i, canvasHSLBFIFO[i]);
-                    setStatus(eflag, 24 + i, canvasHSLBCRC[i]);
+                    boolean used = cobj.getBool(String.format("hslb_%c", 'a'+i));
+                    int eeflag = (!used) ? -1 : eflag;
+                    setStatus(eeflag, 8 + i, canvasHSLBB2Link[i]);
+                    setStatus(eeflag, 12 + i, canvasHSLBCprFIFO[i]);
+                    setStatus(eeflag, 16 + i, canvasHSLBLenFIFO[i]);
+                    setStatus(eeflag, 20 + i, canvasHSLBFIFO[i]);
+                    setStatus(eeflag, 24 + i, canvasHSLBCRC[i]);
                 }
                 setStatus(eflag, 28, canvasTTRXB2Link);
                 setStatus(eflag, 29, canvasTTRXLinkUp);
@@ -374,7 +377,11 @@ public class COPPERMonitorPane extends VBox implements NSMObserver {
     }
 
     private void setStatus(int eflag, int bit, HistogramCanvas canvas) {
-        if (((eflag >> bit) & 0x1) > 0) {
+        if (eflag == -1) {
+            canvas.setFillColor(Color.TRANSPARENT);
+            canvas.setLineColor(Color.LIGHTGRAY);
+            ((GText) canvas.getShapes().get(0)).setText("");
+        } else if (((eflag >> bit) & 0x1) > 0) {
             canvas.setFillColor(Color.RED);
             canvas.setLineColor(Color.PINK);
             ((GText) canvas.getShapes().get(0)).setText("ERROR");

@@ -1,5 +1,5 @@
    nodename,  config, used,                           runtype, type, dbmode, sequential
-   ECL01, default, true,    ROPC501/ropc/1/ECL:default,0,1,       true
+   ECL01, default, true,    ROPC501/ropc/1/ECL:default,0,1,       false
    ECL01, default, true,      CPR5001/copper/1/ECL:V01:rck022,0,1,      false
    ECL01, default, true,      CPR5002/copper/1/ECL:V01:rck022,0,1,      false
    ECL01, default, true,      CPR5003/copper/1/ECL:V01:rck022,0,1,      false
@@ -13,7 +13,7 @@
    ECL01, default, true,      CPR5011/copper/1/ECL:V01:rck022,0,1,      false
    ECL01, default, true,      CPR5012/copper/1/ECL:V01:rck022,0,1,      false
    ECL01, default, true,      CPR5013/copper/1/ECL:V01:rck022,0,1,      false
-   ECL02, default, true,    ROPC502/ropc/1/ECL:default,0,1,       true
+   ECL02, default, true,    ROPC502/ropc/1/ECL:default,0,1,       false
    ECL02, default, true,      CPR5014/copper/1/ECL:V01:rck022,0,1,      false
    ECL02, default, true,      CPR5015/copper/1/ECL:V01:rck022,0,1,      false
    ECL02, default, true,      CPR5016/copper/1/ECL:V01:rck022,0,1,      false
@@ -27,7 +27,7 @@
    ECL02, default, true,      CPR6006/copper/1/ECL:V01:rck022,0,1,      false
    ECL02, default, true,      CPR6007/copper/1/ECL:V01:rck022,0,1,      false
    ECL02, default, true,      CPR6008/copper/1/ECL:V01:rck022,0,1,      false
-   ECL01, debug:dummycpu, true,    ROPC501/ropc/1/ECL:default,0,1,       true
+   ECL01, debug:dummycpu, true,    ROPC501/ropc/1/ECL:default,0,1,       false
    ECL01, debug:dummycpu, true,      CPR5001/copper/1/debug:dummycpu,0,1,      false
    ECL01, debug:dummycpu, true,      CPR5002/copper/1/debug:dummycpu,0,1,      false
    ECL01, debug:dummycpu, true,      CPR5003/copper/1/debug:dummycpu,0,1,      false
@@ -41,7 +41,7 @@
    ECL01, debug:dummycpu, true,      CPR5011/copper/1/debug:dummycpu,0,1,      false
    ECL01, debug:dummycpu, true,      CPR5012/copper/1/debug:dummycpu,0,1,      false
    ECL01, debug:dummycpu, true,      CPR5013/copper/1/debug:dummycpu,0,1,      false
-   ECL02, debug:dummycpu, true,    ROPC502/ropc/1/ECL:default,0,1,       true
+   ECL02, debug:dummycpu, true,    ROPC502/ropc/1/ECL:default,0,1,       false
    ECL02, debug:dummycpu, true,      CPR5014/copper/1/debug:dummycpu,0,1,      false
    ECL02, debug:dummycpu, true,      CPR5015/copper/1/debug:dummycpu,0,1,      false
    ECL02, debug:dummycpu, true,      CPR5016/copper/1/debug:dummycpu,0,1,      false
@@ -55,7 +55,7 @@
    ECL02, debug:dummycpu, true,      CPR6006/copper/1/debug:dummycpu,0,1,      false
    ECL02, debug:dummycpu, true,      CPR6007/copper/1/debug:dummycpu,0,1,      false
    ECL02, debug:dummycpu, true,      CPR6008/copper/1/debug:dummycpu,0,1,      false
-   ECL01, debug:dumhslb:020:rand4k, true,    ROPC501/ropc/1/ECL:default,0,1,       true
+   ECL01, debug:dumhslb:020:rand4k, true,    ROPC501/ropc/1/ECL:default,0,1,       false
    ECL01, debug:dumhslb:020:rand4k, true,      CPR5001/copper/1/debug:dumhslb:020:rand4k,0,1,      false
    ECL01, debug:dumhslb:020:rand4k, true,      CPR5002/copper/1/debug:dumhslb:020:rand4k,0,1,      false
    ECL01, debug:dumhslb:020:rand4k, true,      CPR5003/copper/1/debug:dumhslb:020:rand4k,0,1,      false
@@ -69,7 +69,7 @@
    ECL01, debug:dumhslb:020:rand4k, true,      CPR5011/copper/1/debug:dumhslb:020:rand4k,0,1,      false
    ECL01, debug:dumhslb:020:rand4k, true,      CPR5012/copper/1/debug:dumhslb:020:rand4k,0,1,      false
    ECL01, debug:dumhslb:020:rand4k, true,      CPR5013/copper/1/debug:dumhslb:020:rand4k,0,1,      false
-   ECL02, debug:dumhslb:020:rand4k, true,    ROPC502/ropc/1/ECL:default,0,1,       true
+   ECL02, debug:dumhslb:020:rand4k, true,    ROPC502/ropc/1/ECL:default,0,1,       false
    ECL02, debug:dumhslb:020:rand4k, true,      CPR5014/copper/1/debug:dumhslb:020:rand4k,0,1,      false
    ECL02, debug:dumhslb:020:rand4k, true,      CPR5015/copper/1/debug:dumhslb:020:rand4k,0,1,      false
    ECL02, debug:dumhslb:020:rand4k, true,      CPR5016/copper/1/debug:dumhslb:020:rand4k,0,1,      false
@@ -83,7 +83,7 @@
    ECL02, debug:dumhslb:020:rand4k, true,      CPR6006/copper/1/debug:dumhslb:020:rand4k,0,1,      false
    ECL02, debug:dumhslb:020:rand4k, true,      CPR6007/copper/1/debug:dumhslb:020:rand4k,0,1,      false
    ECL02, debug:dumhslb:020:rand4k, true,      CPR6008/copper/1/debug:dumhslb:020:rand4k,0,1,      false
-   ECL01, debug:yamadahslb:10kHz, true,    ROPC501/ropc/1/ECL:default,0,1,       true
+   ECL01, debug:yamadahslb:10kHz, true,    ROPC501/ropc/1/ECL:default,0,1,       false
    ECL01, debug:yamadahslb:10kHz, true,      CPR5001/copper/1/debug:yamadahslb:10kHz,0,1,      false
    ECL01, debug:yamadahslb:10kHz, true,      CPR5002/copper/1/debug:yamadahslb:10kHz,0,1,      false
    ECL01, debug:yamadahslb:10kHz, true,      CPR5003/copper/1/debug:yamadahslb:10kHz,0,1,      false
@@ -97,7 +97,7 @@
    ECL01, debug:yamadahslb:10kHz, true,      CPR5011/copper/1/debug:yamadahslb:10kHz,0,1,      false
    ECL01, debug:yamadahslb:10kHz, true,      CPR5012/copper/1/debug:yamadahslb:10kHz,0,1,      false
    ECL01, debug:yamadahslb:10kHz, true,      CPR5013/copper/1/debug:yamadahslb:10kHz,0,1,      false
-   ECL02, debug:yamadahslb:10kHz, true,    ROPC502/ropc/1/ECL:default,0,1,       true
+   ECL02, debug:yamadahslb:10kHz, true,    ROPC502/ropc/1/ECL:default,0,1,       false
    ECL02, debug:yamadahslb:10kHz, true,      CPR5014/copper/1/debug:yamadahslb:10kHz,0,1,      false
    ECL02, debug:yamadahslb:10kHz, true,      CPR5015/copper/1/debug:yamadahslb:10kHz,0,1,      false
    ECL02, debug:yamadahslb:10kHz, true,      CPR5016/copper/1/debug:yamadahslb:10kHz,0,1,      false

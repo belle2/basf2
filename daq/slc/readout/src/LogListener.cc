@@ -33,7 +33,7 @@ void LogListener::run()
   std::stringstream ss;
   std::string s;
   LogFile::Priority priority = LogFile::UNKNOWN;
-  NSMCommunicator* comm = m_con->getCallback()->getCommunicator();
+  //NSMCommunicator* comm = m_con->getCallback()->getCommunicator();
   NSMNode& node(m_con->getCallback()->getNode());
   try {
     int count = 0;

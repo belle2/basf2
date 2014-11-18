@@ -76,7 +76,8 @@ final class ConfigEditorPane extends VBox {
             String confname = (String)comboConfigName.getSelectionModel().getSelectedItem()+"_1";
             String newconf = NewConfigDialog.showDialog(null, "New configuration", nodename, confname);
             ConfigObject obj = manager.update(nodename, newconf);
-            obj.print();
+            NSMListenerService.requestDBSet(obj);
+            //obj.print();
             System.out.println(newconf);
         });
     }

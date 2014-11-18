@@ -8,6 +8,10 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  if (argc < 4) {
+    printf("usage: %s port hostname port", argv[0]);
+    return 1;
+  }
   UDPSocket socket;
   socket.bind(atoi(argv[2]), argv[1]);
   char buf[2048];

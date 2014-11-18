@@ -62,7 +62,7 @@ bool HSLBController::load(/*int triggermode*/) throw()
 {
   if (m_hslb.fd < 0) return false;
   linkfee(m_hslb.fd);
-  return (!isError()) && checkfee(&m_hslb);
+  return (!isError()) && checkfee();
 }
 
 bool HSLBController::monitor() throw()
@@ -79,15 +79,40 @@ bool HSLBController::monitor() throw()
 bool HSLBController::boot(const std::string& runtype,
                           const std::string& firmware) throw()
 {
-  //if (m_hslb.fd <= 0) return true;
+  if (m_hslb.fd <= 0) return true;
   if (firmware.size() > 0 && File::exist(firmware)) {
+    if (!bootfpga(firmware)) {
+      m_errmsg = StringUtil::form("Failed to boot HSLB %c (firmware=%s)",
+                                  (char)('a' + m_hslb.fin),
+                                  firmware.c_str());
+      LogFile::error(m_errmsg);
+      return false;
+    }
+    /*
     std::string cmd = StringUtil::form("booths -%c %s", (char)('a' + m_hslb.fin),
                                        firmware.c_str());
     LogFile::debug(cmd);
     system(cmd.c_str());
-    std::string FEE("FEE");
+    */
+    //std::string FEE("FEE");
     int ntry = 0;
     while (true) {
+      if (checkfee()) {
+        break;
+      }
+      if (writefn(0x82, 0x1000) < 0) {
+        m_errmsg = StringUtil::form("Failed to write to HSLB %c",
+                                    (char)('a' + m_hslb.fin));
+        LogFile::error(m_errmsg);
+        return false;
+      }
+      if (writefn(0x82, 0x10) < 0) {
+        m_errmsg = StringUtil::form("Failed to write to HSLB %c",
+                                    (char)('a' + m_hslb.fin));
+        LogFile::error(m_errmsg);
+        return false;
+      }
+      /*
       cmd = StringUtil::form("reghs -%c checkfee", (char)('a' + m_hslb.fin));
       LogFile::debug(cmd);
       std::string ret = perform(cmd);
@@ -99,9 +124,11 @@ bool HSLBController::boot(const std::string& runtype,
       cmd = StringUtil::form("reghs -%c 82 10", (char)('a' + m_hslb.fin));
       LogFile::debug(cmd);
       system(cmd.c_str());
+      */
       ntry++;
       if (ntry > 50) {
-        m_errmsg = StringUtil::form("Can not establish b2link at HSLB %c", (char)('a' + m_hslb.fin));
+        m_errmsg = StringUtil::form("Can not establish b2link at HSLB %c",
+                                    (char)('a' + m_hslb.fin));
         LogFile::error(m_errmsg);
         return false;
       }
@@ -111,13 +138,11 @@ bool HSLBController::boot(const std::string& runtype,
       StringList str_v = StringUtil::split(runtype, ':');
       const std::string datfile = StringUtil::form("/home/usr/b2daq/run/dumhslb/%s.dat",
                                                    str_v[str_v.size() - 1].c_str());
-      cmd = StringUtil::form("write-dumhslb -%c %s", (char)('a' + m_hslb.fin),
-                             datfile.c_str());
+      std::string cmd = StringUtil::form("write-dumhslb -%c %s", (char)('a' + m_hslb.fin),
+                                         datfile.c_str());
       LogFile::debug(cmd);
       system(cmd.c_str());
     }
-    //return bootfpga(m_hslb.fd, (char*)firmware.c_str(),
-    //                false, false, 6) == 0;
   }
   return true;
 }
@@ -225,3 +250,12 @@ int HSLBController::writestream(char* filename) throw()
   return ::writestream(m_hslb.fd, filename);
 }
 
+bool HSLBController::checkfee() throw()
+{
+  return ::checkfee(&m_hslb) > 0;
+}
+
+bool HSLBController::bootfpga(const std::string& firmware) throw()
+{
+  return ::bootfpga(m_hslb.fd, firmware.c_str(), 0, 0, M012_SELECTMAP) == 0;
+}

@@ -16,8 +16,7 @@ namespace Belle2 {
   class ECLCollectorCallback : public RCCallback {
 
   public:
-    ECLCollectorCallback(const NSMNode& node,
-                         const std::string& hostname);
+    ECLCollectorCallback(const NSMNode& node);
     virtual ~ECLCollectorCallback() throw();
 
   public:

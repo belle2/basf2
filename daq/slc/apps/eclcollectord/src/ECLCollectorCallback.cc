@@ -6,12 +6,10 @@
 
 using namespace Belle2;
 
-ECLCollectorCallback::ECLCollectorCallback(const NSMNode& node,
-                                           const std::string& hostname)
-  : RCCallback(node, 5), m_collector(hostname)
+ECLCollectorCallback::ECLCollectorCallback(const NSMNode& node)
+  : RCCallback(node, 5), m_collector()
 {
   //m_data = NSMData("STATUS_" + node.getName(), format, revision);
-
 }
 
 ECLCollectorCallback::~ECLCollectorCallback() throw()
@@ -25,7 +23,6 @@ void ECLCollectorCallback::init() throw()
 
 void ECLCollectorCallback::term() throw()
 {
-  //m_collector.close();
 }
 
 void ECLCollectorCallback::timeout() throw()
@@ -35,7 +32,7 @@ void ECLCollectorCallback::timeout() throw()
 bool ECLCollectorCallback::load() throw()
 {
   m_collector.boot("");
-  m_collector.initialize(2);
+  m_collector.init(2);
   return true;
 }
 

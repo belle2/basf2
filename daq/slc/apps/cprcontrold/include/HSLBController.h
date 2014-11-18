@@ -29,9 +29,7 @@ namespace Belle2 {
     bool isCRCError() throw();
 
   public:
-    const hslb_info& getInfo() const throw() {
-      return m_hslb;
-    }
+    const hslb_info& getInfo() const throw() { return m_hslb; }
     int fd() const throw() { return m_hslb.fd; }
     int get_finid() const throw() { return m_hslb.fin; }
     operator int() const throw() { return m_hslb.fd; }
@@ -48,6 +46,10 @@ namespace Belle2 {
     int readfee32(int adr, int* valp) throw();
     int writefee32(int adr, int val) throw();
     int writestream(char* filename) throw();
+    bool checkfee() throw();
+    bool bootfpga(const std::string& firmware) throw();
+
+  public:
     bool boot(const std::string& runtype,
               const std::string& firmware) throw();
     const std::string getErrMessage() {

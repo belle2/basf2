@@ -1,0 +1,25 @@
+ nodename,  config, crate, slot, hostname, serialid, copperid,     prpmc,     ttrx, ttrx_firmware,        hslb_a,        hslb_b, hslb_c, hslb_d,   hslb_firmware
+   CPR7001, ECL:V01:rck035,1,1,  cpr7001,E11C022,  cpr7001,33,1303T152,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-278,V3-3-279,V3-3-277,V3-3-280,/home/usr/b2daq/run/hslb/hslb035_rck.bit
+   CPR7002, ECL:V01:rck035,1,2,  cpr7002,E11C023,  cpr7002,34,1303T151,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-269,V3-3-270,V3-3-274,V3-3-275,/home/usr/b2daq/run/hslb/hslb035_rck.bit
+   CPR7003, ECL:V01:rck035,1,3,  cpr7003,E11C024,  cpr7003,35,1303T150,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-265,V3-3-266,V3-3-268,V3-3-264,/home/usr/b2daq/run/hslb/hslb035_rck.bit
+   CPR7004, ECL:V01:rck035,1,4,  cpr7004,E11C025,  cpr7004,36,1303T149,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-260,V3-3-261,V3-3-262,V3-3-263,/home/usr/b2daq/run/hslb/hslb035_rck.bit
+   CPR7005, ECL:V01:rck035,1,5,  cpr7005,E133008,  cpr7005,37,1003T046,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-211,V3-3-212,V3-3-213,V3-3-214,/home/usr/b2daq/run/hslb/hslb035_rck.bit
+   CPR7006, ECL:V01:rck035,1,6,  cpr7006,E133008,  cpr7006,38,1003T047,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-217,V3-3-218,V3-3-219,V3-3-220,/home/usr/b2daq/run/hslb/hslb035_rck.bit
+   CPR7001, ECL:V01:dumhslb:020:rand4k,1,1,  cpr7001,E11C022,  cpr7001,33,1303T152,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-278,V3-3-279,V3-3-277,V3-3-280, /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR7002, ECL:V01:dumhslb:020:rand4k,1,2,  cpr7002,E11C023,  cpr7002,34,1303T151,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-269,V3-3-270,V3-3-274,V3-3-275, /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR7003, ECL:V01:dumhslb:020:rand4k,1,3,  cpr7003,E11C024,  cpr7003,35,1303T150,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-265,V3-3-266,V3-3-268,V3-3-264, /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR7004, ECL:V01:dumhslb:020:rand4k,1,4,  cpr7004,E11C025,  cpr7004,36,1303T149,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-260,V3-3-261,V3-3-262,V3-3-263, /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR7005, ECL:V01:dumhslb:020:rand4k,1,5,  cpr7005,E133008,  cpr7005,37,1003T046,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-211,V3-3-212,V3-3-213,V3-3-214, /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR7006, ECL:V01:dumhslb:020:rand4k,1,6,  cpr7006,E133008,  cpr7006,38,1003T047,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-217,V3-3-218,V3-3-219,V3-3-220, /home/usr/b2daq/run/hslb/dumhslb020.bit
+   CPR7001, ECL:V01:yamadahslb:10kHz,1,1,  cpr7001,E11C022,  cpr7001,33,1303T152,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-278,V3-3-279,V3-3-277,V3-3-280, /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR7002, ECL:V01:yamadahslb:10kHz,1,2,  cpr7002,E11C023,  cpr7002,34,1303T151,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-269,V3-3-270,V3-3-274,V3-3-275, /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR7003, ECL:V01:yamadahslb:10kHz,1,3,  cpr7003,E11C024,  cpr7003,35,1303T150,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-265,V3-3-266,V3-3-268,V3-3-264, /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR7004, ECL:V01:yamadahslb:10kHz,1,4,  cpr7004,E11C025,  cpr7004,36,1303T149,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-260,V3-3-261,V3-3-262,V3-3-263, /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR7005, ECL:V01:yamadahslb:10kHz,1,5,  cpr7005,E133008,  cpr7005,37,1003T046,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-211,V3-3-212,V3-3-213,V3-3-214, /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR7006, ECL:V01:yamadahslb:10kHz,1,6,  cpr7006,E133008,  cpr7006,38,1003T047,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-217,V3-3-218,V3-3-219,V3-3-220, /home/usr/yamadas/bit/HSLB_10kHz1kBincreEve.bit
+   CPR7001, ECL:V01:dummycpu,1,1,  cpr7001,E11C022,  cpr7001,33,1303T152,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-278,V3-3-279,V3-3-277,V3-3-280, 
+   CPR7002, ECL:V01:dummycpu,1,2,  cpr7002,E11C023,  cpr7002,34,1303T151,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-269,V3-3-270,V3-3-274,V3-3-275, 
+   CPR7003, ECL:V01:dummycpu,1,3,  cpr7003,E11C024,  cpr7003,35,1303T150,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-265,V3-3-266,V3-3-268,V3-3-264, 
+   CPR7004, ECL:V01:dummycpu,1,4,  cpr7004,E11C025,  cpr7004,36,1303T149,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-260,V3-3-261,V3-3-262,V3-3-263, 
+   CPR7005, ECL:V01:dummycpu,1,5,  cpr7005,E133008,  cpr7005,37,1003T046,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-211,V3-3-212,V3-3-213,V3-3-214, 
+   CPR7006, ECL:V01:dummycpu,1,6,  cpr7006,E133008,  cpr7006,38,1003T047,   /home/usr/b2daq/run/ttrx/tt5r022.bit,V3-3-217,V3-3-218,V3-3-219,V3-3-220, 

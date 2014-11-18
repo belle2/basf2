@@ -99,5 +99,37 @@
 */
 #define HSREGL_RXDATA  0x84  /* stal(16#84#) <= cntcrcerr & rxdata; */
 
+/* 0 parameter */
+#define HSDO_NOP      0x100
+#define HSDO_LINK     0x101
+#define HSDO_CHECKFEE 0x102
+#define HSDO_TRGOFF   0x104
+#define HSDO_TRGON    0x105
+
+/* 0 parameter (obsolete, unused) */
+#define HSDO_TTTRG    0x106
+#define HSDO_DUMTRG   0x107
+
+/* 0 parameter (CDC special) */
+#define HSDO_SUPMODE  0x108
+#define HSDO_RAWMODE  0x109
+
+/* 1 parameter */
+#define HSDO_STREAM   0x200
+
+/* 1 parameter (CDC special) */
+#define HSDO_PDSTLALL 0x201
+#define HSDO_ADCTH    0x202
+#define HSDO_TDCTH    0x203
+#define HSDO_DELAY    0x204
+#define HSDO_WINDOW   0x205
+
+/* 2 parameters */
+#define HSDO_FEE8     0x300
+#define HSDO_FEE32    0x301
+
+/* 2 parameters (CDC special) */
+#define HSDO_PDSTL    0x302
+
 #endif /* __HSREG_H__ */
 

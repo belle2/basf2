@@ -12,8 +12,11 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/RunCommandButtonPane.java</file>
-            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/ROPCMonitorPane.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/RunControlConfigEditorPane.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/ROPCCopperConfigPanel.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/COPPERMonitorPane.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/RunControlMainPane.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/ConfigMainPane.java</file>
         </group>
     </open-files>
 </project-private>

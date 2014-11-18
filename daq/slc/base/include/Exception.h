@@ -11,13 +11,16 @@ namespace Belle2 {
   public:
     Exception() throw();
     Exception(const std::string&) throw();
+    Exception(const std::string&, int err) throw();
     virtual ~Exception() throw();
 
   public:
     virtual const char* what() const throw();
+    int err() const throw() { return m_err; }
 
   protected:
     std::string m_comment;
+    int m_err;
 
   };
 

@@ -11,6 +11,9 @@ extern "C" {
 }
 #endif
 
+#define M012_SERIAL      7
+#define M012_SELECTMAP   6
+
 int openfn(int fd, int readonly);
 int readfn(int fd, int adr);
 int writefn(int fd, int adr, int val);
@@ -25,7 +28,7 @@ int writefee32(int fd, int adr, int val);
 int writestream(int fd, char* filename);
 void writefpga(int fndev, int m012, int ch, int n);
 void dumpfpga(int conf, char* str);
-int bootfpga(int fndev, char* file,
+int bootfpga(int fndev, const char* file,
              int verbose, int forced, int m012);
 int checkfee(hslb_info* hslb);
 int writefee(int fd, int addr, int val);

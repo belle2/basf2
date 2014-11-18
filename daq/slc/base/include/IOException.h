@@ -10,6 +10,7 @@ namespace Belle2 {
   public:
     IOException() throw() {}
     IOException(const std::string& comment, ...) throw();
+    IOException(int err, const std::string& comment, ...) throw();
     ~IOException() throw() {}
 
   };

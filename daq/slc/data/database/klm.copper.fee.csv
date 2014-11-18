@@ -1,0 +1,13 @@
+ nodename,  config, slot, board,       firmware, register,         parameter
+   CPR7001,KLM:FEE:V01,0,KLM:FEE:V01, b2l_klm.bit,KLM:FEE:V01, KLM:default:a
+   CPR7001,KLM:FEE:V02,0,KLM:FEE:V02, b2l_klm.bit,KLM:FEE:V02, KLM:default:b
+   CPR7002,KLM:FEE:V03,0,KLM:FEE:V03, b2l_klm.bit,KLM:FEE:V03, KLM:default:a
+   CPR7002,KLM:FEE:V04,0,KLM:FEE:V04, b2l_klm.bit,KLM:FEE:V04, KLM:default:b
+   CPR7003,KLM:FEE:V05,0,KLM:FEE:V05, b2l_klm.bit,KLM:FEE:V05, KLM:default:a
+   CPR7003,KLM:FEE:V06,0,KLM:FEE:V06, b2l_klm.bit,KLM:FEE:V06, KLM:default:b
+   CPR7004,KLM:FEE:V07,0,KLM:FEE:V07, b2l_klm.bit,KLM:FEE:V07, KLM:default:a
+   CPR7004,KLM:FEE:V08,0,KLM:FEE:V08, b2l_klm.bit,KLM:FEE:V08, KLM:default:b
+   CPR7005,KLM:FEE:V09,0,KLM:FEE:V09, b2l_klm.bit,KLM:FEE:V09, KLM:default:a
+   CPR7005,KLM:FEE:V10,0,KLM:FEE:V10, b2l_klm.bit,KLM:FEE:V10, KLM:default:b
+   CPR7006,KLM:FEE:V11,0,KLM:FEE:V11, b2l_klm.bit,KLM:FEE:V11, KLM:default:a
+   CPR7006,KLM:FEE:V12,0,KLM:FEE:V12, b2l_klm.bit,KLM:FEE:V12, KLM:default:b

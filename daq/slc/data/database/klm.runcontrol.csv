@@ -1,0 +1,5 @@
+ nodename,  config, ismaster, runlength,    node, nsmdata
+ KLM, default,false,480, default, default
+ KLM, debug:dummycpu,false,480, debug:dummycpu, default
+ KLM, debug:dumhslb:020:rand4k,false,480, debug:dumhslb:020:rand4k, default
+ KLM, debug:yamadahslb:10kHz,false,480, debug:yamadahslb:10kHz, default

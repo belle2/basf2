@@ -13,9 +13,9 @@ namespace Belle2 {
     virtual ~FEEController() throw() {}
 
   public:
-    virtual bool boot(HSLBController& hslb, FEEConfig& conf) throw() = 0;
-    virtual bool load(HSLBController& hslb, FEEConfig& conf) throw() = 0;
-    virtual bool monitor(HSLBController& hslb, FEEConfig& conf) throw() = 0;
+    virtual bool boot(HSLBController& hslb, FEEConfig& conf) throw(IOException) = 0;
+    virtual bool load(HSLBController& hslb, FEEConfig& conf) throw(IOException) = 0;
+    virtual bool monitor(HSLBController& hslb, FEEConfig& conf) throw(IOException) = 0;
 
   };
 

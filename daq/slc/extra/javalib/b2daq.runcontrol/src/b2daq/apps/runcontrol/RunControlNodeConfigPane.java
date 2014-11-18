@@ -5,6 +5,7 @@
  */
 package b2daq.apps.runcontrol;
 
+import b2daq.nsm.NSMListenerService;
 import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -70,7 +71,13 @@ class RunControlNodeConfigPane extends HBox {
         labelNodeName.setText(name);
         checkUsed.setSelected(used);
         checkSequential.setSelected(sequential);
-        comboConfig.getItems().add(configname);
-        comboConfig.getSelectionModel().selectFirst();
+        if (NSMListenerService.getList(name) != null) {
+            for (String cname : NSMListenerService.getList(name)) {
+                comboConfig.getItems().add(cname);
+            }
+            comboConfig.getSelectionModel().select(configname);
+        } else {
+            NSMListenerService.requestList(name);
+        }
     }
 }

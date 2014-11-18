@@ -25,6 +25,14 @@ static char DEVICE[256];
 #define M012_SERIAL      7
 #define M012_SELECTMAP   6
 
+static const char *feetype[] = {
+  "UNDEF", "SVD", "CDC", "BPID", "EPID", "ECL", "KLM", "TRG",
+  "UNKNOWN-8", "UNKNOWN-9", "UNKNOWN-10", "UNKNOWN-11",
+  "UNKNOWN-12", "UNKNOWN-13", "DEMO", "TEST" };
+
+static const char *demotype[] = {
+  "UNDEF", "HSLB-B2L", "SP605-B2L", "ML605-B2L", "AC701-B2L" };
+
 /* ---------------------------------------------------------------------- *\
    openfn
 \* ---------------------------------------------------------------------- */
@@ -255,7 +263,7 @@ dumpfpga(int conf, char *str)
 }
 
 int
-bootfpga(int fd, char *file, int verbose, int forced, int m012)
+bootfpga(int fd, const char *file, int verbose, int forced, int m012)
 {
   int i, ch, conf;
   int count = 1, length = 0;
@@ -433,10 +441,10 @@ int writefee8a(int fd, int addr, int nvals,
 
 int checkfee(struct hslb_info* hslb)
 {
-  int fd;
   int ret;
-  fd = hslb->fd;
- 
+  int fd = hslb->fd;
+  int fin = hslb->fin;
+  
   writefn(fd, HSREG_CSR, 0x05); /* reset address fifo */
   writefn(fd, HSREG_CSR, 0x06); /* reset status register */
   if ((ret = readfn(fd, HSREG_STAT))) {
@@ -447,31 +455,31 @@ int checkfee(struct hslb_info* hslb)
   writefn(fd, HSREG_FEESERIAL, 0x02); /* dummy value write */
   writefn(fd, HSREG_FEEFWTYPE, 0x02); /* dummy value write */
   writefn(fd, HSREG_FEEFWVER,  0x02); /* dummy value write */
-  writefn(fd, HSREG_HWVER,  0x02); /* dummy value write */
-  writefn(fd, HSREG_FWVER,  0x02); /* dummy value write */
-  writefn(fd, HSREG_CPLDVER,  0x02); /* dummy value write */
   writefn(fd, HSREG_CSR, 0x07);
   
   if (hswait(fd) < 0) {
     return 0;
   }
   
-  hslb->feehw = readfn(hslb->fd, HSREG_FEEHWTYPE);
-  hslb->feeserial = readfn(hslb->fd, HSREG_FEESERIAL);
-  hslb->feetype = readfn(hslb->fd, HSREG_FEEFWTYPE);
-  hslb->feever  = readfn(hslb->fd, HSREG_FEEFWVER);
-  hslb->hslbhw  = readfn(hslb->fd, HSREG_HWVER) & 0xf;
-  hslb->hslbfw  = readfn(hslb->fd, HSREG_FWVER) & 0xf;
-  hslb->cpldver  = readfn(hslb->fd, HSREG_FWVER) & 0xf;
-  
+  hslb->feehw = readfn(fd, HSREG_FEEHWTYPE);
+  hslb->feeserial = readfn(fd, HSREG_FEESERIAL);
+  hslb->feetype = readfn(fd, HSREG_FEEFWTYPE);
+  hslb->feever = readfn(fd, HSREG_FEEFWVER);
   hslb->feeserial |= (hslb->feehw & 0xf) << 8;
-  hslb->feever  |= (hslb->feetype & 0xf) << 8;
+  hslb->feetype |= (hslb->feetype & 0xf) << 8;
   hslb->feehw = (hslb->feehw >> 4) & 0xf;
   hslb->feetype = (hslb->feetype >> 4) & 0xf;
-
   hslb->hslbid = readfn32(hslb->fd, HSREGL_ID);
   hslb->hslbver = readfn32(hslb->fd, HSREGL_VER);
-
-  return 1;
+  if (hslb->feehw == 14 && hslb->feetype > 0 && hslb->feetype <= 4) {
+    printf("FEE type %s serial %d version %d at HSLB-%c\n",
+	   demotype[hslb->feehw], hslb->feeserial, hslb->feever, (char)('a'+fin));
+    return 1;
+  } else {
+    printf("FEE type %s serial %d firmware %d version %d at HSLB-%c\n",
+	   feetype[hslb->feehw], hslb->feeserial, hslb->feetype, hslb->feever, (char)('a'+fin));
+    return 1;
+  }
+  return 0;
 }
 

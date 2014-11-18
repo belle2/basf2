@@ -16,12 +16,11 @@ int main(int argc, char** argv)
   const std::string hostname = config.get("nsm.local.host");
   const int port = config.getInt("nsm.local.port");
   const std::string name = config.get("nsm.nodename");
-  const std::string colhostname = config.get("ecl.collector.host");
   if (!Daemon::start(("eclcollectord." + name).c_str(), argc - 1, argv + 1)) {
     return 1;
   }
   NSMNode node(name);
-  ECLCollectorCallback* callback = new ECLCollectorCallback(node, colhostname);
+  ECLCollectorCallback* callback = new ECLCollectorCallback(node);
 
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();

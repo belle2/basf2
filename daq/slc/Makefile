@@ -1,4 +1,4 @@
-.PHONY : all clean base system database nsm readout dqm runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold 
+.PHONY : all clean base system database nsm readout dqm runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold apps/eclcollectord
 
 SRCDIR=./src
 INCDIR=./include/daq/slc/
@@ -6,7 +6,7 @@ LIBDIR=./lib
 BINDIR=./bin
 TMPDIR=./tmp
 
-APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold
+APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold apps/eclcollectord
 
 SUBPACKAGES = base system database nsm readout runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc $(APPS)
 
@@ -32,6 +32,8 @@ copyinc:
 	@ make -C extra/mgt BELLE2_EXTERNALS_DIR=$(PWD)
 	@ mkdir -p include/ttrx
 	@ make -C extra/ttrx BELLE2_EXTERNALS_DIR=$(PWD)
+	@ mkdir -p include/ecl
+	@ make -C extra/ecl BELLE2_EXTERNALS_DIR=$(PWD)
 
 $(SUBPACKAGES): %:
 	@ make -f Makefile.src TARGET=$@

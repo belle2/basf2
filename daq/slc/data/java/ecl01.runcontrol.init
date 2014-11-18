@@ -6,7 +6,7 @@ hostname : localhost
 port : 9090
 nsmhost : 192.168.10.1
 nsmport : 9122
-nsmnode : RC_GUIG
+nsmnode : RC_GUIG2
 nsmtarget : ECL01
 data00.dataname : ECL01_STATUS
 data00.format : rorc_status

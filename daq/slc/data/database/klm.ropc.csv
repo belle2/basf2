@@ -1,0 +1,2 @@
+ nodename,      config, host_from, port_from, host_to, port_to, copper_from, ropc_nodeid, ropc_script0, ropc_script1
+   ROPC701, KLM:default,    klm01,5101,  klm01,36000, KLM01:default,3,daq/rawdata/examples/RecvStream0.py,daq/rawdata/examples/RecvStream1.py

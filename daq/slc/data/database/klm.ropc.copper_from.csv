@@ -1,0 +1,7 @@
+ nodename,        config,used,   hostname, port
+    ROPC701, KLM01:default,true,  cpr7001,34001
+    ROPC701, KLM01:default,true,  cpr7002,34002
+    ROPC701, KLM01:default,true,  cpr7003,34003
+    ROPC701, KLM01:default,true,  cpr7004,34004
+    ROPC701, KLM01:default,true,  cpr7005,34005
+    ROPC701, KLM01:default,true,  cpr7006,34006

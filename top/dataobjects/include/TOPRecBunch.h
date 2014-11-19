@@ -80,7 +80,7 @@ namespace Belle2 {
      * Return reconstructed bunch time (time to be added to correct time of digits)
      * @return time relative to interaction time
      */
-    int getTime() const {return m_recTime;}
+    float getTime() const {return m_recTime;}
 
     /**
      * Return number of tracks in acceptance of TOP
@@ -116,7 +116,7 @@ namespace Belle2 {
      * Return simulated bunch time (= time used as event start time)
      * @return time relative to interaction time
      */
-    int getMCTime() const {return m_simTime;}
+    float getMCTime() const {return m_simTime;}
 
     /**
      * Check if simulated return values are valid

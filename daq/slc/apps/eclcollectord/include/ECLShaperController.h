@@ -1,40 +1,34 @@
 #ifndef Belle2_ECLShaperController_h
 #define Belle2_ECLShaperController_h
 
+#include "daq/slc/apps/eclcollectord/ECLShaper.h"
+#include "daq/slc/apps/eclcollectord/ECLShaperConfig.h"
+
 #include <daq/slc/base/IOException.h>
+
+#include <string>
+#include <vector>
 
 namespace Belle2 {
 
   class ECLShaperController {
 
   public:
-    static const int ECL_TCP_STATUS_PORT = 6001;
+    ECLShaperController() {}
+    ~ECLShaperController() {}
 
   public:
-    ECLShaperController() :
-      m_id(0) {}
-    ECLShaperController(int id, const std::string& host):
-      m_id(id), m_host(host) {}
-    ~ECLShaperController() throw() {}
+    bool boot(ECLShaperConfig& config) throw(IOException);
+    bool init(ECLShaperConfig& config, int mode) throw(IOException);
 
   public:
-    bool boot(int shm_num, int mem_addr) throw(IOException);
-    bool init(int shm_num, int mem_addr) throw(IOException);
-    int read(int sh_num, int mem_addr) throw(IOException);
-    int write(int sh_num, int mem_addr, int reg_wdata) throw(IOException);
-
-  public:
-    int getId() const throw() { return m_id; }
-    const std::string& getHost() const throw() { return m_host; }
-    int* getData() throw() { return m_reg_data; }
+    //bool status(int status_type = 0);
 
   private:
-    int m_id;
-    std::string m_host;
-    int m_reg_data[12];
+    std::vector<ECLShaper> m_shaper_v;
 
   };
 
-};
+}
 
 #endif

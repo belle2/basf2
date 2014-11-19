@@ -1,61 +1,53 @@
-#include "daq/slc/apps/eclcollectord/ECLCollectorController.h"
+#include "daq/slc/apps/eclcollectord/ECLShaperController.h"
 
-extern "C" {
-#include <ecl/ecl_collector_lib.h>
-}
+#include <daq/slc/base/StringUtil.h>
+#include <daq/slc/system/LogFile.h>
 
-#include <errno.h>
+#include <cstdlib>
+#include <unistd.h>
 #include <cstring>
 
 using namespace Belle2;
 
-bool ECLShaperController::boot(int sh_num, int mem_addr) throw(IOException)
+bool ECLShaperController::boot(ECLShaperConfig& config)
+throw(IOException)
 {
-  int err;
-  if ((err = sh_boot(m_host.c_str(), sh_num, mem_addr)) > 0) {
-    std::string msg;
-    if (err == 1) msg = "Connection error";
-    else if (err == 2) msg = "Failed to recieve reply";
-    else if (err == 3) msg = "Boot failed";
-    throw (IOException(err, "Failed to boot Shaper : %s", msg.c_str()));
+  m_shaper_v = std::vector<ECLShaper>();
+  for (ECLShaperConfig::iterator it = config.begin();
+       it != config.end(); it++) {
+    int sh_num = it->first;
+    std::string hostname = StringUtil::form("192.168.1.%d", sh_num);
+    m_shaper_v.push_back(ECLShaper(sh_num, hostname));
+  }
+  for (size_t i = 0; i < m_shaper_v.size(); i++) {
+    ECLShaper& sh(m_shaper_v[i]);
+    sh.boot(0, 0xA7000000);
   }
   return true;
 }
 
-bool ECLShaperController::init(int sh_num, int mem_addr) throw(IOException)
+bool ECLShaperController::init(ECLShaperConfig& config, int mode)
+throw(IOException)
 {
-  int err;
-  if ((err = sh_init_ecldsp(m_host.c_str(), sh_num, mem_addr)) > 0) {
-    std::string msg;
-    if (err == 1) msg = "Connection error";
-    else if (err == 2) msg = "Failed to recieve reply";
-    else if (err == 3) msg = "Init failed";
-    throw (IOException(err, "Failed to boot Shaper : %s", msg.c_str()));
-  }
-  return true;
-}
-
-int ECLShaperController::read(int sh_num, int mem_addr) throw(IOException)
-{
-  int err;
-  char msg[255];
-  memset(m_reg_data, 0, 12 * sizeof(int));
-  memset(msg, 0, 255);
-  if ((err = sh_reg_io(m_host.c_str(), "r", sh_num, mem_addr,
-                       0, m_reg_data, msg)) > 0) {
-    throw (IOException(err, "Failed to read from Shaper : %s", msg));
-  }
-  return true;
-}
-
-int ECLShaperController::write(int sh_num, int mem_addr, int reg_wdata) throw(IOException)
-{
-  int err;
-  char msg[255];
-  memset(msg, 0, 255);
-  if ((err = sh_reg_io(m_host.c_str(), "w", sh_num, mem_addr,
-                       reg_wdata, m_reg_data, msg)) > 0) {
-    throw (IOException(err, "Failed to write to Shaper : %s", msg));
+  for (size_t i = 0; i < m_shaper_v.size(); i++) {
+    ECLShaper& sh(m_shaper_v[i]);
+    sh.init(0, ((mode == 2) ? 0xAA000000 : 0xA8000000));
+    usleep(100000);
+    int sh_num = m_shaper_v[i].getId();
+    ECLShaperRegisterList& regs(config[sh_num]);
+    for (ECLShaperRegisterList::iterator it = regs.begin();
+         it != regs.end(); it++) {
+      ECLShaperRegister& reg(it->second);
+      sh.write(0, reg.adr, reg.val);
+    }
+    sh.write(0,  0x800, 0x1);
+    sh.write(0, 0xC000, 0x1);
+    usleep(100000);
+    for (size_t i2 = 0; i2 < 16; i2++) {
+      sh.write(0, 0x30, 0x3f);
+      sh.write(0, 0x31, 0x10 + i2);
+      usleep(100000);
+    }
   }
   return true;
 }

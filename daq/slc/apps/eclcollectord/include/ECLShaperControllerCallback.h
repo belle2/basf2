@@ -1,7 +1,8 @@
-#ifndef _Belle2_ECLCollectorCallback_hh
-#define _Belle2_ECLCollectorCallback_hh
+#ifndef _Belle2_ECLShaperControllerCallback_hh
+#define _Belle2_ECLShaperControllerCallback_hh
 
-#include "daq/slc/apps/eclcollectord/ECLCollectorController.h"
+#include "daq/slc/apps/eclcollectord/ECLShaperController.h"
+#include "daq/slc/apps/eclcollectord/ECLShaperConfig.h"
 
 #include "daq/slc/readout/ProcessController.h"
 
@@ -13,11 +14,11 @@
 
 namespace Belle2 {
 
-  class ECLCollectorCallback : public RCCallback {
+  class ECLShaperControllerCallback : public RCCallback {
 
   public:
-    ECLCollectorCallback(const NSMNode& node);
-    virtual ~ECLCollectorCallback() throw();
+    ECLShaperControllerCallback(const NSMNode& node);
+    virtual ~ECLShaperControllerCallback() throw();
 
   public:
     virtual void init() throw();
@@ -32,8 +33,10 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    ECLCollectorController m_collector;
+    ECLShaperController m_con;
+    ECLShaperConfig m_config;
     NSMData m_data;
+    bool m_forced;
 
   };
 

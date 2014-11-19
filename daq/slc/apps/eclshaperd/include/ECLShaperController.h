@@ -1,8 +1,8 @@
 #ifndef Belle2_ECLShaperController_h
 #define Belle2_ECLShaperController_h
 
-#include "daq/slc/apps/eclcollectord/ECLShaper.h"
-#include "daq/slc/apps/eclcollectord/ECLShaperConfig.h"
+#include "daq/slc/apps/eclshaperd/ECLShaper.h"
+#include "daq/slc/apps/eclshaperd/ECLShaperConfig.h"
 
 #include <daq/slc/base/IOException.h>
 

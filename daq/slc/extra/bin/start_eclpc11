@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo "booting eclcollectord in ecl01"
-./boot_daemon eclcollectord eclpc11
+echo "booting eclshaperd in eclpc11"
+./boot_daemon eclshaperd eclpc11

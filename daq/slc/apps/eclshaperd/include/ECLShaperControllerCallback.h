@@ -1,8 +1,8 @@
 #ifndef _Belle2_ECLShaperControllerCallback_h
 #define _Belle2_ECLShaperControllerCallback_h
 
-#include "daq/slc/apps/eclcollectord/ECLShaperController.h"
-#include "daq/slc/apps/eclcollectord/ECLShaperConfig.h"
+#include "daq/slc/apps/eclshaperd/ECLShaperController.h"
+#include "daq/slc/apps/eclshaperd/ECLShaperConfig.h"
 
 #include "daq/slc/readout/ProcessController.h"
 

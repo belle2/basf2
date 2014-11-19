@@ -1,4 +1,4 @@
-#include "daq/slc/apps/eclcollectord/ECLShaperControllerCallback.h"
+#include "daq/slc/apps/eclshaperd/ECLShaperControllerCallback.h"
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 

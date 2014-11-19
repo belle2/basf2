@@ -11,10 +11,13 @@
 ##################################################################
 ##################################################################
 
+# Fixing the input file such that the script 01_steering_genfitStudy.py termiates first.
+
 """
 <header>
-<contact>Johannes Rauch, j.rauch@tum.de</contact>
-<description> To be filled by the contact person</description>
+  <input>GF2Tracks.root</input>
+  <contact>Johannes Rauch, j.rauch@tum.de</contact>
+  <description> To be filled by the contact person</description>
 </header>
 """
 

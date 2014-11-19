@@ -14,40 +14,40 @@
 namespace Belle2 {
 
   char
-  TBranchLeafType(const char* var) { return 'C'; };
+  TBranchLeafType(const char*) { return 'C'; };
 
   char
-  TBranchLeafType(const Char_t& var) { return 'B'; };
+  TBranchLeafType(const Char_t&) { return 'B'; };
 
   char
-  TBranchLeafType(const unsigned char& var) { return 'b'; };
+  TBranchLeafType(const unsigned char&) { return 'b'; };
 
   char
-  TBranchLeafType(const short& var) { return 'S'; };
+  TBranchLeafType(const short&) { return 'S'; };
 
   char
-  TBranchLeafType(const unsigned short& var) { return 's'; };
+  TBranchLeafType(const unsigned short&) { return 's'; };
 
   char
-  TBranchLeafType(const Int_t& var) { return 'I'; };
+  TBranchLeafType(const Int_t&) { return 'I'; };
 
   char
-  TBranchLeafType(const UInt_t& var) { return 'i'; };
+  TBranchLeafType(const UInt_t&) { return 'i'; };
 
   char
-  TBranchLeafType(const Float_t& var) { return 'F'; };
+  TBranchLeafType(const Float_t&) { return 'F'; };
 
   char
-  TBranchLeafType(const Double_t& var) { return 'D'; };
+  TBranchLeafType(const Double_t&) { return 'D'; };
 
   char
-  TBranchLeafType(const long int& var) { return 'L'; };
+  TBranchLeafType(const long int&) { return 'L'; };
 
   char
-  TBranchLeafType(const unsigned long int& var) { return 'l'; };
+  TBranchLeafType(const unsigned long int&) { return 'l'; };
 
   char
-  TBranchLeafType(const bool& var) { return 'O'; };
+  TBranchLeafType(const bool&) { return 'O'; };
 
 
 }

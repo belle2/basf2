@@ -71,6 +71,14 @@ namespace Belle2 {
      */
     virtual void shiftInTime(float /*delta*/) {}
 
+    /**
+     * Get time of the hit.
+     * Re-implement for your subdetector's SimHit class.
+     * @return global time
+     */
+    virtual float getGlobalTime() const { return 0; }
+
+
   private:
 
     unsigned short m_backgroundTag; /**< Background tag */

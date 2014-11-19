@@ -85,6 +85,10 @@ namespace Belle2 {
     //! @return time-of-propagation (ns) from hit to sensor
     float getPropagationTime() const { return m_PropagationTime; }
 
+    //! Get the hit time (implementation of base class function
+    //! @return the hit time (ns) since start of the event
+    float getGlobalTime() const { return m_Time; }
+
     //! Get the hit time
     //! @return the hit time (ns) since start of the event
     double getTime() const { return (double)m_Time; }
@@ -117,7 +121,7 @@ namespace Belle2 {
     float m_PropagationTime;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMSimHit, 4);
+    ClassDef(BKLMSimHit, 5);
 
   };
 

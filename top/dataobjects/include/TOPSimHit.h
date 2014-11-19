@@ -17,7 +17,8 @@
 
 namespace Belle2 {
 
-  /*! Class to store simulated hits of Cherenkov photons on PMT's
+  /**
+   * Class to store simulated hits of Cherenkov photons on PMT's
    * input for digitization module (TOPDigitizer).
    * relation to MCParticle
    * filled in top/simulation/src/SensitivePMT.cc
@@ -26,7 +27,8 @@ namespace Belle2 {
   class TOPSimHit : public SimHitBase {
   public:
 
-    /*! Default constructor
+    /**
+     * Default constructor
      */
     TOPSimHit():
       SimHitBase(),
@@ -38,7 +40,8 @@ namespace Belle2 {
       m_energy(0.0) {
     }
 
-    /*!  Full constructor.
+    /**
+     * Full constructor.
      * @param barID       bar ID
      * @param pmtID       PMT ID
      * @param xLocal      detection position x in local PMT frame
@@ -62,42 +65,56 @@ namespace Belle2 {
       m_energy = (float) energy_eV;
     }
 
-    /*! Get bar ID
+    /**
+     * Get bar ID
      * @return bar ID
      */
     int getBarID() const { return m_barID; }
 
-    /*! Get PMT ID
+    /**
+     * Get PMT ID
      * @return PMT ID
      */
     int getPmtID() const { return m_pmtID; }
 
-    /*! Get local position of hit (in PMT frame)
+    /**
+     * Get local position of hit (in PMT frame)
      * @return local position
      */
-    TVector2 getPosition() const { TVector2 vec(m_x, m_y); return vec; }
+    TVector2 getPosition() const { return TVector2(m_x, m_y); }
 
-    /*! Get local x position of hit (in PMT frame)
+    /**
+     * Get local x position of hit (in PMT frame)
      * @return local x position
      */
     double getX() const { return m_x; }
 
-    /*! Get local y position of hit (in PMT frame)
+    /**
+     * Get local y position of hit (in PMT frame)
      * @return local y position
      */
     double getY() const { return m_y; }
 
-    /*! Get detection time
+    /**
+     * Get detection time
      * @return detection time
      */
     double getTime() const { return m_globalTime; }
 
-    /*! Get photon energy
+    /**
+     * Get detection time (implementation of base class function)
+     * @return detection time
+     */
+    float getGlobalTime() const { return m_globalTime; }
+
+    /**
+     * Get photon energy
      * @return photon energy in [eV]
      */
     double getEnergy() const { return m_energy; }
 
-    /** Shift the SimHit in time (needed for beam background mixing)
+    /**
+     * Shift SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
     void shiftInTime(float delta) { m_globalTime += delta; }

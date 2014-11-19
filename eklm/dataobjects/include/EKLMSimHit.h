@@ -99,6 +99,23 @@ namespace Belle2 {
      */
     void setStrip(int Strip);
 
+
+
+
+
+    /**
+     * Get hit time (implementation of base class function)
+     * @return hit time
+     */
+    float getGlobalTime() const { return getTime(); }
+
+    /**
+     * Shift SimHit in time (implementation of base class function)
+     * @param delta time shift.
+     */
+    void shiftInTime(float delta) { setTime(getTime() + delta); }
+
+
   private:
 
     /** Track ID. */

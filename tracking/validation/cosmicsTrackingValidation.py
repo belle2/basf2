@@ -39,13 +39,16 @@ def main():
     # Indication if tracks should be fitted.
     # Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
     argument_parser.add_argument('-f', '--fit', action='store_true',
-                                 help='Perform fitting of the generated tracks with Genfit.'
+                                 help='Perform fitting of the generated tracks with Genfit. Default is not to perform a fit but use the seed values generated in track finding.'
                                  )
 
     # Geometry name to be used in the Genfit extrapolation.
     argument_parser.add_argument('-g', '--geometry', choices=['TGeo', 'Geant4'
                                  ], default='Geant4',
                                  help='Geometry to be used with Genfit.')
+
+    argument_parser.add_argument('-p', '--pulls', action='store_true',
+                                 help='Plot pulls of the curvature.')
 
     arguments = argument_parser.parse_args()
 
@@ -114,7 +117,7 @@ def main():
 
     # Validation module generating plots
     trackingValidationModule = TrackingValidationModule('Cosmics',
-            fit=arguments.fit)
+            fit=arguments.fit, pulls=arguments.pulls)
     main_path.add_module(trackingValidationModule)
 
     # Run basf2 module path #
@@ -131,10 +134,17 @@ class TrackingValidationModule(basf2.Module):
 
     """Module to collect matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding."""
 
-    def __init__(self, name, fit=False):
+    def __init__(
+        self,
+        name,
+        fit=False,
+        pulls=False,
+        ):
+
         super(TrackingValidationModule, self).__init__()
         self.name = name
         self.fit = fit
+        self.pulls = pulls
 
     @property
     def output_file_name(self):
@@ -172,8 +182,12 @@ class TrackingValidationModule(basf2.Module):
                 is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
                 is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
 
-                prTrackFitResult = \
-                    trackMatchLookUp.getRelatedTrackFitResult(trackCand)
+                if self.fit:
+                    prTrackFitResult = \
+                        trackMatchLookUp.getRelatedTrackFitResult(trackCand)
+                else:
+                    prTrackFitResult = getSeedTrackFitResult(trackCand)
+
                 fitted_omega = float('nan')
                 if prTrackFitResult != None:
                     fitted_omega = prTrackFitResult.getOmega()
@@ -320,7 +334,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         finding_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
                 self.mc_matches)
 
-        finding_efficiency_by_cos_theta.xlabel = '#cos #theta'
+        finding_efficiency_by_cos_theta.xlabel = 'cos #theta'
         finding_efficiency_by_cos_theta.ylabel = 'Finding efficiency'
 
         finding_efficiency_by_cos_theta.description = 'Not a serious plot yet.'
@@ -366,7 +380,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         hit_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
                 self.mc_hit_efficiencies)
 
-        hit_efficiency_by_cos_theta.xlabel = '#Cos #theta'
+        hit_efficiency_by_cos_theta.xlabel = 'cos #theta'
         hit_efficiency_by_cos_theta.ylabel = 'Hit efficiency'
 
         hit_efficiency_by_cos_theta.description = 'Not a serious plot yet.'
@@ -376,15 +390,12 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         validation_plots.append(hit_efficiency_by_cos_theta)
 
         # Omega / curvature residuals
-        if self.fit:
-            omega_residuals_histogram = ValidationPlot('%s_omega_residuals'
-                    % self.name)
-            omega_residuals_histogram.n_bins = 50
-
+        if self.pulls:
             pr_fitted_omegas = np.array(self.pr_fitted_omegas)
             pr_failed_fits = np.isnan(pr_fitted_omegas)
             pr_true_omegas = np.array(self.pr_true_omegas)
             pr_no_true_omega = np.isnan(pr_true_omegas)
+            pr_omega_residuals = pr_fitted_omegas - pr_true_omegas
 
             # print 'Number of failed fits', np.sum(pr_failed_fits)
             # import matplotlib.pyplot as plt
@@ -397,7 +408,40 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             # plt.hist(pr_true_omegas[~pr_no_true_omega])
             # plt.show()
 
-            pr_omega_residuals = pr_fitted_omegas - pr_true_omegas
+            # Truths
+            true_omegas_histogram = ValidationPlot('%s_true_omegas'
+                    % self.name)
+            true_omegas_histogram.n_bins = 50
+            true_omegas_histogram.fill(pr_true_omegas[~pr_no_true_omega])
+
+            true_omegas_histogram.xlabel = 'True omega (1/cm)'
+
+            true_omegas_histogram.description = \
+                'True omega value of the track. Not a serious plot yet.'
+            true_omegas_histogram.check = ''
+            true_omegas_histogram.contact = CONTACT
+
+            validation_plots.append(true_omegas_histogram)
+
+            # Fitted
+            fitted_omegas_histogram = ValidationPlot('%s_fitted_omegas'
+                    % self.name)
+            fitted_omegas_histogram.n_bins = 50
+            fitted_omegas_histogram.fill(pr_fitted_omegas[~pr_failed_fits])
+
+            fitted_omegas_histogram.xlabel = 'Fitted omega (1/cm)'
+
+            fitted_omegas_histogram.description = \
+                'Fitted omega value, for now it is the seed value of the TrackCand, which has not enough sensitivity as is shown below. Not a serious plot yet.'
+            fitted_omegas_histogram.check = ''
+            fitted_omegas_histogram.contact = CONTACT
+
+            validation_plots.append(fitted_omegas_histogram)
+
+            # Residuals
+            omega_residuals_histogram = ValidationPlot('%s_omega_residuals'
+                    % self.name)
+            omega_residuals_histogram.n_bins = 50
             omega_residuals_histogram.fill(pr_omega_residuals[~pr_failed_fits
                     & ~pr_no_true_omega])
 
@@ -408,6 +452,24 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             omega_residuals_histogram.contact = CONTACT
 
             validation_plots.append(omega_residuals_histogram)
+
+            # Diagonal plot
+            fitted_omegas_by_true_omegas = \
+                ValidationPlot('%s_fitted_omegas_by_true_omegas' % self.name)
+            fitted_omegas_by_true_omegas.n_bins = 50
+            fitted_omegas_by_true_omegas.fill(pr_true_omegas[~pr_failed_fits
+                    & ~pr_no_true_omega], pr_fitted_omegas[~pr_failed_fits
+                    & ~pr_no_true_omega])
+
+            fitted_omegas_by_true_omegas.xlabel = 'True omega (1/cm)'
+            fitted_omegas_by_true_omegas.ylabel = 'Fitted omega (1/cm)'
+
+            fitted_omegas_by_true_omegas.description = \
+                'Displays the seed values of the TrackCand. Sensitivity for Not a serious plot yet.'
+            fitted_omegas_by_true_omegas.check = 'Should be a diagonal plot'
+            fitted_omegas_by_true_omegas.contact = CONTACT
+
+            validation_plots.append(fitted_omegas_by_true_omegas)
 
         # Save everything to a ROOT file
         output_file = ROOT.TFile(self.output_file_name, 'recreate')
@@ -427,6 +489,32 @@ def getTrackFitResultFromMCParticle(mcParticle):
     cartesian_covariance.UnitMatrix()
     charge_sign = (-1 if mcParticle.getCharge() < 0 else 1)
     particle_type = Belle2.Const.ParticleType(mcParticle.getPDG())
+    p_value = float('nan')
+    b_field = 1.5
+    cdc_hit_pattern = 0
+    svd_hit_pattern = 0
+
+    track_fit_result = Belle2.TrackFitResult(
+        position,
+        momentum,
+        cartesian_covariance,
+        charge_sign,
+        particle_type,
+        p_value,
+        b_field,
+        cdc_hit_pattern,
+        svd_hit_pattern,
+        )
+
+    return track_fit_result
+
+
+def getSeedTrackFitResult(trackCand):
+    position = trackCand.getPosSeed()
+    momentum = trackCand.getMomSeed()
+    cartesian_covariance = trackCand.getCovSeed()
+    charge_sign = (-1 if trackCand.getChargeSeed() < 0 else 1)
+    particle_type = Belle2.Const.ParticleType(trackCand.getPdgCode())
     p_value = float('nan')
     b_field = 1.5
     cdc_hit_pattern = 0
@@ -553,7 +641,7 @@ class ValidationPlot(object):
                     Fill(float(x), float(weight))
 
         # Now attach the additional information
-        root_description = ROOT.TNamed('Descrition', self.description)
+        root_description = ROOT.TNamed('Description', self.description)
         root_check = ROOT.TNamed('Check', self.check)
         root_contact = ROOT.TNamed('Contact', self.contact)
 
@@ -617,6 +705,8 @@ class ValidationPlot(object):
             found_obj = self.histogram.FindObject('Contact')
             if found_obj:
                 found_obj.SetTitle(contact)
+            else:
+                raise KeyError("Could not find 'Contact' in histogram")
 
     @property
     def description(self):
@@ -629,6 +719,8 @@ class ValidationPlot(object):
             found_obj = self.histogram.FindObject('Description')
             if found_obj:
                 found_obj.SetTitle(description)
+            else:
+                raise KeyError("Could not find 'Description' in histogram")
 
     @property
     def check(self):
@@ -641,6 +733,8 @@ class ValidationPlot(object):
             found_obj = self.histogram.FindObject('Check')
             if found_obj:
                 found_obj.SetTitle(check)
+            else:
+                raise KeyError("Could not find 'Check' in histogram")
 
     def show(self):
         self.histogram.Draw()

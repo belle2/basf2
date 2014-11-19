@@ -55,7 +55,7 @@ RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_
   vector<string> excludePersistent({"ProcessStatistics"});
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", excludePersistent);
 
-  addParam("parentLevel", m_parentLevel, "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent.", 0);
+  addParam("parentLevel", m_parentLevel, "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/ParentFiles for details.", 0);
 }
 
 
@@ -335,7 +335,7 @@ bool RootInputModule::createParentStoreEntries()
         m_parentTrees.insert(std::make_pair(metaData.getId(), tree));
 
         // get the persistent tree and read its branches
-        TTree* persistent = (TTree*) file->Get(c_treeNames[DataStore::c_Persistent].c_str());
+        TTree* persistent = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Persistent].c_str()));
         if (!persistent) {
           B2ERROR("No tree " << c_treeNames[DataStore::c_Persistent] << " found in " << metaData.getLfn());
         } else {
@@ -408,7 +408,7 @@ bool RootInputModule::readParentTrees()
               B2ERROR("Couldn't open parent file " << metaData.getLfn());
               continue;
             }
-            tree = (TTree*) file->Get(c_treeNames[DataStore::c_Event].c_str());
+            tree = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Event].c_str()));
             if (!tree) {
               B2ERROR("No tree " << c_treeNames[DataStore::c_Event] << " found in " << metaData.getLfn());
               continue;

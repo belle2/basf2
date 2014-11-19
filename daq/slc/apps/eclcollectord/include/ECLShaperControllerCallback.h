@@ -1,5 +1,5 @@
-#ifndef _Belle2_ECLShaperControllerCallback_hh
-#define _Belle2_ECLShaperControllerCallback_hh
+#ifndef _Belle2_ECLShaperControllerCallback_h
+#define _Belle2_ECLShaperControllerCallback_h
 
 #include "daq/slc/apps/eclcollectord/ECLShaperController.h"
 #include "daq/slc/apps/eclcollectord/ECLShaperConfig.h"

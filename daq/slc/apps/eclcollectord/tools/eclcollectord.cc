@@ -1,4 +1,4 @@
-#include "daq/slc/apps/eclcollectord/ECLCollectorCallback.h"
+#include "daq/slc/apps/eclcollectord/ECLShaperControllerCallback.h"
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     return 1;
   }
   NSMNode node(name);
-  ECLCollectorCallback* callback = new ECLCollectorCallback(node);
+  ECLShaperControllerCallback* callback = new ECLShaperControllerCallback(node);
 
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();

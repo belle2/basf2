@@ -1,12 +1,12 @@
 #!/bin/bash
 
-if [ -e $HOME/belle2/latest ]; then
-cd $HOME/belle2/latest
-else 
-cd $HOME/belle2/release
-fi
-source ../tools/setup_belle2
-setuprel
+#if [ -e $HOME/belle2/latest ]; then
+#cd $HOME/belle2/latest
+#else 
+#cd $HOME/belle2/release
+#fi
+#source ../tools/setup_belle2
+#setuprel
 nsm2log=$1/nsm2
 mkdir -p $nsm2log
 nsm2host=$2

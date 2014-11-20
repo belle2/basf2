@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #pragma once
-
+#include "tracking/trackFindingVXD/FilterTools/VoidObserver.h"
 #include <TBranch.h>
 #include <TTree.h>
 #include <string>
@@ -131,6 +131,17 @@ namespace Belle2 {
       return Filter< Variable, Range, BypassableFilter, Observer>(m_range, bypassVariable);
     }
 
+    template< class otherObserver >
+    Filter< Variable, Range, otherObserver>
+    observe(const otherObserver&) {
+      return Filter< Variable , Range, otherObserver>(m_range);
+    }
+
+    template< class otherObserver >
+    Filter(const Filter< Variable, Range, otherObserver>& filter):
+      m_range(filter.getRange()) {};
+
+
   protected:
     Range  m_range;
 
@@ -251,11 +262,11 @@ namespace Belle2 {
 
   };
 
-  template<class Observer, typename ... types >
-  Filter< OperatorNot, Filter< types...>, Observer >
+  template<typename ... types >
+  Filter< OperatorNot, Filter< types...>, VoidObserver >
   operator !(const Filter< types...>& filter)
   {
-    return Filter< OperatorNot, Filter< types...>, Observer >(filter);
+    return Filter< OperatorNot, Filter< types...>, VoidObserver >(filter);
   }
 
 
@@ -305,16 +316,16 @@ namespace Belle2 {
 
   };
 
-  template < class Observer,
-           typename ... types1,
+  template <
+  typename ... types1,
            typename ... types2
            >
-  Filter< OperatorAnd, Filter< types1...>, Filter< types2...> , Observer >
+  Filter< OperatorAnd, Filter< types1...>, Filter< types2...> , VoidObserver >
   operator &&(const Filter< types1...>& filter1 , const Filter< types2...>& filter2)
   {
     return Filter < OperatorAnd,
            Filter< types1...>,
-           Filter< types2...>, Observer > (filter1, filter2);
+           Filter< types2...>, VoidObserver > (filter1, filter2);
   }
 
 
@@ -363,16 +374,16 @@ namespace Belle2 {
 
   };
 
-  template < class Observer,
-           typename ... types1,
+  template <
+  typename ... types1,
            typename ... types2
            >
-  Filter< OperatorOr, Filter< types1...>, Filter< types2...> , Observer >
+  Filter< OperatorOr, Filter< types1...>, Filter< types2...> , VoidObserver >
   operator ||(const Filter< types1...>& filter1 , const Filter< types2...>& filter2)
   {
     return Filter < OperatorOr,
            Filter< types1...>,
-           Filter< types2...>, Observer > (filter1, filter2);
+           Filter< types2...>, VoidObserver > (filter1, filter2);
   }
 
 

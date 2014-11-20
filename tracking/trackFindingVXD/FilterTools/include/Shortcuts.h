@@ -32,7 +32,7 @@ namespace Belle2 {
   std::enable_if < std::is_base_of< SelectionVariable< typename Var::argumentType, typename Var::variableType >, Var >::value&&
   std::is_arithmetic< Arithmetic >::value,
       Filter< Var, UpperBoundedSet<Arithmetic>, VoidObserver> >::type
-      operator < (const Var& variable, Arithmetic  upperBound)
+      operator < (const Var& , Arithmetic  upperBound)
   {
     return Filter< Var, UpperBoundedSet<Arithmetic>, VoidObserver >(UpperBoundedSet<Arithmetic> (upperBound));
   }
@@ -43,7 +43,7 @@ namespace Belle2 {
   typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, LowerBoundedSet<Arithmetic>, VoidObserver> >::type
-  operator > (const Var& variable, Arithmetic  lowerBound)
+  operator > (const Var& , Arithmetic  lowerBound)
   {
     return Filter< Var, LowerBoundedSet<Arithmetic>, VoidObserver >(LowerBoundedSet<Arithmetic> (lowerBound));
   }
@@ -54,7 +54,7 @@ namespace Belle2 {
   typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, UpperBoundedSet<Arithmetic>, VoidObserver> >::type
-  operator > (Arithmetic  upperBound, const Var& variable)
+  operator > (Arithmetic  upperBound, const Var&)
   {
     return Filter< Var, UpperBoundedSet<Arithmetic>, VoidObserver >(UpperBoundedSet<Arithmetic> (upperBound));
   }
@@ -66,7 +66,7 @@ namespace Belle2 {
   typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, LowerBoundedSet<Arithmetic>, VoidObserver> >::type
-  operator < (Arithmetic  lowerBound, const Var& variable)
+  operator < (Arithmetic  lowerBound, const Var&)
   {
     return Filter< Var, LowerBoundedSet<Arithmetic>, VoidObserver >(LowerBoundedSet<Arithmetic> (lowerBound));
   }
@@ -82,7 +82,7 @@ namespace Belle2 {
   operator < (Filter< Var, LowerBoundedSet< ArithmeticLower > , Observer>  filter ,  ArithmeticUpper  upperBound)
   {
     return Filter< Var, Range<ArithmeticLower, ArithmeticUpper>, Observer >
-           (Range< ArithmeticLower, ArithmeticUpper> (filter.getRange().getMin() , upperBound));
+           (Range< ArithmeticLower, ArithmeticUpper> (filter.getRange().getInf() , upperBound));
   }
 
 
@@ -96,7 +96,7 @@ namespace Belle2 {
   operator > (Filter< Var, UpperBoundedSet< ArithmeticUpper > , Observer>  filter ,  ArithmeticLower  lowerBound)
   {
     return Filter< Var, Range<ArithmeticLower, ArithmeticUpper>, Observer >
-           (Range< ArithmeticLower, ArithmeticUpper> (lowerBound , filter.getRange().getMax()));
+           (Range< ArithmeticLower, ArithmeticUpper> (lowerBound , filter.getRange().getSup()));
   }
 
 

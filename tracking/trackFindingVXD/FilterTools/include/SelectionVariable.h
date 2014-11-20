@@ -98,7 +98,7 @@ namespace Belle2 {
      * you like to write an external name manager?
      */
 
-    const std::string name(void) {
+    const std::string name(void) const {
       char* realname(NULL);
       int status(0);
       realname = abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);

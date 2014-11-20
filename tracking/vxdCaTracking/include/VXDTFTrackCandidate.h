@@ -164,12 +164,11 @@ namespace Belle2 {
 
 
     bool checkOverlappingState() { /**< returns flag whether TC is sharing hits with other TCs or not, after manual check, whether its rivals are still alive */
-      int rivalsAlive = 0;
+      m_overlapping = false;
       for (VXDTFTrackCandidate * rival : m_bookingRivals) {
-        if (rival->getCondition() == false) continue;
-        rivalsAlive++;
+        if (rival->getCondition() != false) { m_overlapping = true; return true; }
       }
-      if (rivalsAlive != 0) { m_overlapping = true; return true; } else { m_overlapping = false; return false; }
+      return false;
     }
 
 

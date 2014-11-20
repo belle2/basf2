@@ -87,7 +87,7 @@ namespace Belle2 {
     const std::list<Belle2::VXDSegmentCell*>* getAllInnerNeighbours() const { return &m_allInnerNeighbours; } /**< returns list of all inner neighbours (does not change during event) */
 
 
-    std::list<Belle2::VXDSegmentCell*>* getOuterNeighbours() { return &m_outerNeighbours; } /**< returns list of outer Neighbours */
+//     std::list<Belle2::VXDSegmentCell*>* getOuterNeighbours() { return &m_outerNeighbours; } /**< returns list of outer Neighbours */
 
 
     /** incompatible neighbours get kicked when new information about the situation recommends that step */

@@ -13,6 +13,7 @@
 #include "vxdtf/secMapVector.cc"
 #include "vxdtf/hittfinfo.cc"
 #include "vxdtf/filterID.cc"
+#include "vxdtf/filters.cc"
 #include "vxdtf/collectortfinfo.cc"
 #include "vxdtf/twohitfilters.cc"
 #include "vxdtf/trackcandidatetfinfo.cc"

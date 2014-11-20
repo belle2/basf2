@@ -298,7 +298,7 @@ namespace Belle2 {
                 const typename Filter< Variable, Range, Observer>::argumentType& arg2) const {
       typename Variable::variableType value = Variable::value(arg1, arg2);
       Observer::notify(arg1, arg2 , Variable(), value);
-      return m_enable && Filter< Variable, Range, Observer >::m_range.contains(value);
+      return (! m_enable) || Filter< Variable, Range, Observer >::m_range.contains(value);
     }
 
   private:

@@ -117,6 +117,7 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
 
   addParam("minTrackletLength", m_PARAMminTrackletLength, "defines the number of hits needed to be stored as a tracklet", int(3));
 
+  addParam("filterCharges", m_filterCharges, "this value can be set to: 1: allow only particles with positive charges, 0: allow all particles, -1: allow only particles with negative charges - standard is 0", short(0));
   //2 hit filters:
   addParam("logDistanceXY", m_PARAMlogDistanceXY, "set 'true' if you want to log distances (XY) between trackHits", bool(true));
   addParam("logDistanceZ", m_PARAMlogDistanceZ, "set 'true' if you want to log distances (Z) between trackHits", bool(true));
@@ -227,6 +228,12 @@ void FilterCalculatorModule::initialize()
       B2FATAL("FilterCalculator::initialize: rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: " << output)
     }
   }
+
+  if (m_filterCharges != -1 and m_filterCharges != 0 and m_filterCharges != 1) {
+    B2ERROR("FilterCalculatorModule::initialize: parameter filterCharges is set to " << m_filterCharges << ", which is invalid, setting to standard (0)!")
+    m_filterCharges = 0;
+  }
+
 
   m_threeHitFilterBox.resetMagneticField(m_PARAMmagneticFieldStrength);
   m_fourHitFilterBox.resetMagneticField(m_PARAMmagneticFieldStrength);
@@ -415,12 +422,18 @@ void FilterCalculatorModule::event()
     aMcParticlePtr->fixParticleList();
     int pdg = aMcParticlePtr->getPDG();
 
-
-    /** getting full chain of track hits for each track */
-    if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle) == false) { continue; } // check whether current particle (and all its hits) belong to a primary particle
-
     TVector3 mcVertexPos = aMcParticlePtr->getVertex();
     TVector3 mcMomentum = aMcParticlePtr->getMomentum(); /// used for filtering depending on momentum of particle
+
+
+    /** getting full chain of track hits for each track */
+
+    /** now some conditions filtering that particle: */
+    // capture particles with wrong charge:
+    if (m_filterCharges != 0) { if (signbit(m_filterCharges) != signbit(aMcParticlePtr->getCharge())) { continue; } }
+
+    if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle) == false) { continue; } // check whether current particle (and all its hits) belong to a primary particle
+
     if (mcVertexPos.Perp() > m_PARAMmaxXYvertexDistance) {
       B2DEBUG(10, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart << " discarded because of bad rho-value (" << mcVertexPos.Perp() << " is bigger than threshold: " << m_PARAMmaxXYvertexDistance << ") of the particle-vertex")
       continue;
@@ -1486,128 +1499,128 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
   int aLayerID = aVxdID.getLayerNumber();
 
 
-  if (m_PARAMuseOldSecCalc == true) {
-    double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0, centerU = 0, centerV = 0;
-    TVector3 centerOfSector;
+//   if (m_PARAMuseOldSecCalc == true) {
+//     double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0, centerU = 0, centerV = 0;
+//     TVector3 centerOfSector;
+//
+//     int aUniID = aVxdID.getID();
+//     int aLayerID = aVxdID.getLayerNumber();
+//     B2DEBUG(20, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ") @layer: " << aLayerID);
+//     unsigned int aSecID = 0;
+//     string aSectorName;
+//
+//     // searching for sector:
+//     for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
+//       B2DEBUG(150, "uCuts(j)*uSize: " << m_PARAMsectorConfigU.at(j)*uSizeAtHit << " uCuts(j+1)*uSize: " << m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit);
+//
+//       if (uCoord >= (m_PARAMsectorConfigU.at(j)*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit * 2)) {
+//
+//         for (int k = 0; k != int(m_PARAMsectorConfigV.size() - 1); ++k) {
+//           B2DEBUG(150, " vCuts(k)*vSize: " << m_PARAMsectorConfigV.at(k)*vSize1 << " vCuts(k+1)*vSize: " << m_PARAMsectorConfigV.at(k + 1)*vSize1);
+//
+//           if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
+//             aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
+//
+//             sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
+//             sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
+//             uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
+//             uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
+//             sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
+//             sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
+//             sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
+//             sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
+// //           centerV = sectorEdgeV1 + 0.5 * fabs(sectorEdgeV1 - sectorEdgeV2); /// WARNING Berechnung falsch!
+//             //           centerU = aSensorInfo.getUSize(centerV); // uSizeAtCenterV
+//             //           centerU = centerU*(m_PARAMsectorConfigU.at(j) * 2 - 1 + (m_PARAMsectorConfigU.at(j) + 0.5*fabs(m_PARAMsectorConfigU.at(j) - m_PARAMsectorConfigU.at(j+1))));
+//             // calculating the intersection of two lines connecting the edges of the trapezoid. Therefore the first step is to calculate the slope parameter mu (deltaV & tempVal are used to make the code more readable):
+//             double deltaV = sectorEdgeV2 - sectorEdgeV1;
+//             double tempVal = deltaV / (sectorEdgeU2OfV2 - sectorEdgeU1OfV1);
+//             double deltaU2112 = sectorEdgeU2OfV1 - sectorEdgeU1OfV2;
+//             double mu = (deltaV - sectorEdgeU1OfV2 * tempVal + sectorEdgeU1OfV1 * tempVal) / (deltaV + deltaU2112 * tempVal); // TODO implement isInf or isNan-check....
+//             centerU = sectorEdgeU1OfV2 + mu * deltaU2112;
+//             centerV = sectorEdgeV2 - mu * deltaV;
+//             centerOfSector.SetXYZ(centerU, centerV, 0);
+//             centerOfSector = aSensorInfo.pointToGlobal(centerOfSector);
+//             dist2Origin = (centerOfSector - m_origin).Mag();
+//             // [DEBUG] Sector edges: O(-6.144,-2.88), U(6.144,-2.88), V(-6.144,2.88), UV(6.144,2.88), centerU/V: inf/-inf  { module: FilterCalculator @tracking/modules/VXDTFHelperTools/src/FilterCalculatorModule.cc:1332 }
+//
+//             aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
+//             B2DEBUG(20, "I have found a SecID: " << aSectorName << " with centerU/V: " << centerU << "/" << centerV << " and tempvalues of deltaV/tempVal/deltaU2112/mu: " << deltaV << "/" << tempVal << "/" << deltaU2112 << "/" << mu);
+//             B2DEBUG(50, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << "), centerU/V: " << centerU << "/" << centerV)
+//
+//             if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
+// //               Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, dist2Origin, aSectorName);
+//               Sector newSector(aSectorName, {sectorEdgeU1OfV1, sectorEdgeV1}, {sectorEdgeU2OfV1, sectorEdgeV1}, {sectorEdgeU1OfV2, sectorEdgeV2}, {sectorEdgeU2OfV2, sectorEdgeV2}, dist2Origin);
+//               thisSecMap->insert({aSectorName, newSector});
+//             } else {
+//               thisSecMap->find(aSectorName)->second.increaseCounter();
+//             }
+//           }
+//         }
+//       }
+//     } //sector-searching loop
+//   }
 
-    int aUniID = aVxdID.getID();
-    int aLayerID = aVxdID.getLayerNumber();
-    B2DEBUG(20, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ") @layer: " << aLayerID);
-    unsigned int aSecID = 0;
-    string aSectorName;
-
-    // searching for sector:
-    for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
-      B2DEBUG(150, "uCuts(j)*uSize: " << m_PARAMsectorConfigU.at(j)*uSizeAtHit << " uCuts(j+1)*uSize: " << m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit);
-
-      if (uCoord >= (m_PARAMsectorConfigU.at(j)*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit * 2)) {
-
-        for (int k = 0; k != int(m_PARAMsectorConfigV.size() - 1); ++k) {
-          B2DEBUG(150, " vCuts(k)*vSize: " << m_PARAMsectorConfigV.at(k)*vSize1 << " vCuts(k+1)*vSize: " << m_PARAMsectorConfigV.at(k + 1)*vSize1);
-
-          if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
-            aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
-
-            sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
-            sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
-            uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
-            uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
-            sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
-            sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
-            sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
-            sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
-//           centerV = sectorEdgeV1 + 0.5 * fabs(sectorEdgeV1 - sectorEdgeV2); /// WARNING Berechnung falsch!
-            //           centerU = aSensorInfo.getUSize(centerV); // uSizeAtCenterV
-            //           centerU = centerU*(m_PARAMsectorConfigU.at(j) * 2 - 1 + (m_PARAMsectorConfigU.at(j) + 0.5*fabs(m_PARAMsectorConfigU.at(j) - m_PARAMsectorConfigU.at(j+1))));
-            // calculating the intersection of two lines connecting the edges of the trapezoid. Therefore the first step is to calculate the slope parameter mu (deltaV & tempVal are used to make the code more readable):
-            double deltaV = sectorEdgeV2 - sectorEdgeV1;
-            double tempVal = deltaV / (sectorEdgeU2OfV2 - sectorEdgeU1OfV1);
-            double deltaU2112 = sectorEdgeU2OfV1 - sectorEdgeU1OfV2;
-            double mu = (deltaV - sectorEdgeU1OfV2 * tempVal + sectorEdgeU1OfV1 * tempVal) / (deltaV + deltaU2112 * tempVal); // TODO implement isInf or isNan-check....
-            centerU = sectorEdgeU1OfV2 + mu * deltaU2112;
-            centerV = sectorEdgeV2 - mu * deltaV;
-            centerOfSector.SetXYZ(centerU, centerV, 0);
-            centerOfSector = aSensorInfo.pointToGlobal(centerOfSector);
-            dist2Origin = (centerOfSector - m_origin).Mag();
-            // [DEBUG] Sector edges: O(-6.144,-2.88), U(6.144,-2.88), V(-6.144,2.88), UV(6.144,2.88), centerU/V: inf/-inf  { module: FilterCalculator @tracking/modules/VXDTFHelperTools/src/FilterCalculatorModule.cc:1332 }
-
-            aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
-            B2DEBUG(20, "I have found a SecID: " << aSectorName << " with centerU/V: " << centerU << "/" << centerV << " and tempvalues of deltaV/tempVal/deltaU2112/mu: " << deltaV << "/" << tempVal << "/" << deltaU2112 << "/" << mu);
-            B2DEBUG(50, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << "), centerU/V: " << centerU << "/" << centerV)
-
-            if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-//               Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, dist2Origin, aSectorName);
-              Sector newSector(aSectorName, {sectorEdgeU1OfV1, sectorEdgeV1}, {sectorEdgeU2OfV1, sectorEdgeV1}, {sectorEdgeU1OfV2, sectorEdgeV2}, {sectorEdgeU2OfV2, sectorEdgeV2}, dist2Origin);
-              thisSecMap->insert({aSectorName, newSector});
-            } else {
-              thisSecMap->find(aSectorName)->second.increaseCounter();
-            }
-          }
-        }
-      }
-    } //sector-searching loop
-  }
-
-  else { // new way to calc sectorID
-    std::pair<double, double> aCoorNormalized,
+//   else { // new way to calc sectorID
+  std::pair<double, double> aCoorNormalized,
 //            aCoorLocal = {uCoord, vCoord},
-        aCoorLocal = {hitLocal[0], hitLocal[1]},
-        aCornerCoordinate;
+      aCoorLocal = {hitLocal[0], hitLocal[1]},
+      aCornerCoordinate;
 
-    // Normalization of the Coordinates
-    aCoorNormalized = SpacePoint::convertLocalToNormalizedCoordinates(aCoorLocal, aVxdID, &aSensorInfo);
+  // Normalization of the Coordinates
+  aCoorNormalized = SpacePoint::convertLocalToNormalizedCoordinates(aCoorLocal, aVxdID, &aSensorInfo);
 
-    B2DEBUG(10, "local hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << "), in normalized:(" << aCoorNormalized.first << "," << aCoorNormalized.second << "), @layer: " << aLayerID << ", with sensorSizeU/V: " << aSensorInfo.getUSize() << "/" << aSensorInfo.getVSize());
+  B2DEBUG(10, "local hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << "), in normalized:(" << aCoorNormalized.first << "," << aCoorNormalized.second << "), @layer: " << aLayerID << ", with sensorSizeU/V: " << aSensorInfo.getUSize() << "/" << aSensorInfo.getVSize());
 
-    // Calculate the SectorID (SectorTool-Object)
-    aSecID = SectorTools::calcSecID(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aCoorNormalized);
+  // Calculate the SectorID (SectorTool-Object)
+  aSecID = SectorTools::calcSecID(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aCoorNormalized);
 
 
-    if (aSecID == std::numeric_limits<unsigned short>::max()) { return success; } // equals to false
+  if (aSecID == std::numeric_limits<unsigned short>::max()) { return success; } // equals to false
 
-    // 1. Corner Calculate
-    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner1);
-    pair<double, double> localCorner00 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+  // 1. Corner Calculate
+  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner1);
+  pair<double, double> localCorner00 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
-    // 2. Corner Calculate
-    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner2);
-    pair<double, double> localCorner01 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+  // 2. Corner Calculate
+  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner2);
+  pair<double, double> localCorner01 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
-    // 3. Corner Calculate
-    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner3);
-    pair<double, double> localCorner10 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+  // 3. Corner Calculate
+  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner3);
+  pair<double, double> localCorner10 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
-    // 4. Corner Calculate
-    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner4);
-    pair<double, double> localCorner11 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+  // 4. Corner Calculate
+  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner4);
+  pair<double, double> localCorner11 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
-    // Center
-    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCenter);
+  // Center
+  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCenter);
 
-    B2DEBUG(20, "OOO SIZE: " << aSensorInfo.getUSize() << ", " << aSensorInfo.getVSize());
-    B2DEBUG(20, "OOO Center normalized: " << aCornerCoordinate.first << ", " << aCornerCoordinate.second);
-    B2DEBUG(20, "OOO Center real: " << localCorner11.first << ", " << localCorner11.second);
+  B2DEBUG(20, "OOO SIZE: " << aSensorInfo.getUSize() << ", " << aSensorInfo.getVSize());
+  B2DEBUG(20, "OOO Center normalized: " << aCornerCoordinate.first << ", " << aCornerCoordinate.second);
+  B2DEBUG(20, "OOO Center real: " << localCorner11.first << ", " << localCorner11.second);
 
-    pair<double, double> aCenterOfSector = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+  pair<double, double> aCenterOfSector = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 //     TVector3 centerOfSector = TVector3((aRelCoor.first - 0.5) * aSensorInfo.getUSize(), (aRelCoor.second - 0.5) * aSensorInfo.getVSize(), 0);
 
-    dist2Origin = (aSensorInfo.pointToGlobal(TVector3(aCenterOfSector.first, aCenterOfSector.second, 0.)) - m_origin).Mag();
+  dist2Origin = (aSensorInfo.pointToGlobal(TVector3(aCenterOfSector.first, aCenterOfSector.second, 0.)) - m_origin).Mag();
 
-    aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
+  aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
 
-    B2DEBUG(20, "OOO I have found a SecID: " << aSectorName << " with centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second << " for hit " << uCoord << "/" << vCoord);
-    B2DEBUG(100, "OOO Sector " << aSectorName << " - edges: O(" << localCorner00.first << "," << localCorner00.second << "), U(" << localCorner01.first << "," << localCorner01.second << "), V(" << localCorner10.first << "," << localCorner10.second << "), UV(" << localCorner11.first << "," << localCorner11.second << "), centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second)
+  B2DEBUG(20, "OOO I have found a SecID: " << aSectorName << " with centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second << " for hit " << uCoord << "/" << vCoord);
+  B2DEBUG(100, "OOO Sector " << aSectorName << " - edges: O(" << localCorner00.first << "," << localCorner00.second << "), U(" << localCorner01.first << "," << localCorner01.second << "), V(" << localCorner10.first << "," << localCorner10.second << "), UV(" << localCorner11.first << "," << localCorner11.second << "), centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second)
 
 
-    if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-      Sector newSector(aSectorName, localCorner00, localCorner10, localCorner01, localCorner11, dist2Origin);
+  if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
+    Sector newSector(aSectorName, localCorner00, localCorner10, localCorner01, localCorner11, dist2Origin);
 //       (std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV, double distance)
 
-      thisSecMap->insert({aSectorName, newSector});
-    } else {
-      thisSecMap->find(aSectorName)->second.increaseCounter();
-    }
+    thisSecMap->insert({aSectorName, newSector});
+  } else {
+    thisSecMap->find(aSectorName)->second.increaseCounter();
   }
+//   }
 
 
   if (aLayerID <= m_PARAMhighestAllowedLayer) {

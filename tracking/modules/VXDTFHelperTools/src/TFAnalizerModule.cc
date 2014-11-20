@@ -168,6 +168,16 @@ void TFAnalizerModule::initialize()
     m_treePtr->Branch("CleanCAThetaResiduals", &m_rootCleanCAThetaResiduals);
     m_treePtr->Branch("CompleteCAThetaResiduals", &m_rootCompleteCAThetaResiduals);
 
+    m_treePtr->Branch("TotalMCPhiValues", &m_rootTotalMCPhiValues);
+    m_treePtr->Branch("TotalCAPhiValues", &m_rootTotalCAPhiValues);
+    m_treePtr->Branch("CleanCAPhiValues", &m_rootCleanCAPhiValues);
+    m_treePtr->Branch("CompleteCAPhiValues", &m_rootCompleteCAPhiValues);
+    m_treePtr->Branch("TotalPhiValues", &m_rootTotalPhiValues);
+
+    m_treePtr->Branch("TotalCAThetaResiduals", &m_rootTotalCAThetaResiduals);
+    m_treePtr->Branch("CleanCAThetaResiduals", &m_rootCleanCAThetaResiduals);
+    m_treePtr->Branch("CompleteCAThetaResiduals", &m_rootCompleteCAThetaResiduals);
+
     m_treePtr->Branch("TotalCAMomResidualsAngles", &m_rootTotalCAMomResidualsAngles);
     m_treePtr->Branch("CleanCAMomResidualsAngles", &m_rootCleanCAMomResidualsAngles);
     m_treePtr->Branch("CompleteCAMomResidualsAngles", &m_rootCompleteCAMomResidualsAngles);
@@ -413,6 +423,16 @@ void TFAnalizerModule::event()
     m_rootCleanCAThetaResiduals = rootVariables.cleanCAThetaResiduals;
     m_rootCompleteCAThetaResiduals = rootVariables.completeCAThetaResiduals;
 
+    m_rootTotalMCPhiValues = rootVariables.totalMCPhiValues;
+    m_rootTotalCAPhiValues = rootVariables.totalCAPhiValues;
+    m_rootCleanCAPhiValues = rootVariables.cleanCAPhiValues;
+    m_rootCompleteCAPhiValues = rootVariables.completeCAPhiValues;
+    m_rootTotalPhiValues = rootVariables.totalPhiValues;
+
+    m_rootTotalCAPhiResiduals = rootVariables.totalCAPhiResiduals;
+    m_rootCleanCAPhiResiduals = rootVariables.cleanCAPhiResiduals;
+    m_rootCompleteCAPhiResiduals = rootVariables.completeCAPhiResiduals;
+
     m_rootTotalCAMomResidualsAngles = rootVariables.totalCAMomResidualAngles;
     m_rootCleanCAMomResidualsAngles = rootVariables.cleanCAMomResidualAngles;
     m_rootCompleteCAMomResidualsAngles = rootVariables.completeCAMomResidualAngles;
@@ -584,9 +604,16 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
   double pz = mcDirection[2] - caDirection[2];
   if (pz > 7 or pz < -7) { B2DEBUG(10, "printInfo::event " << m_eventCounter << ": pzResidual got bad value (in GeV/c): " << pz << " ,ca: " << caDirection[2] << ", mc: " << mcDirection[2])} /// DEBUG
 
-  double thetaMC = mcDirection.Angle(zDir) * 180.*TMath::InvPi();
-  double thetaCA = caDirection.Angle(zDir) * 180.*TMath::InvPi();
+  double thetaMC = mcDirection.Theta() * 180.*TMath::InvPi();
+  double thetaCA = caDirection.Theta() * 180.*TMath::InvPi();
   double angle = caDirection.Angle(mcDirection) * 180.*TMath::InvPi(); // angle between the initial momentum vectors in grad
+
+  double phiMC = mcDirection.Phi() * 180.*TMath::InvPi(); // -pi < phi < pi   ->   0 < phi < 360°
+  if (phiMC < 0) { phiMC += 360.; }
+
+  double phiCA = caDirection.Phi() * 180.*TMath::InvPi(); // -pi < phi < pi   ->   0 < phi < 360°
+  if (phiCA < 0) { phiCA += 360.; }
+
   caDirection.SetZ(0.);
   mcDirection.SetZ(0.);
   double transverseAngle = caDirection.Angle(mcDirection) * 180.*TMath::InvPi();
@@ -600,13 +627,16 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
   } else if (recoveryState == 2) {
     tcType = "PerfectMCTC";
     if (m_PARAMwriteToRoot == true) {
-      rootVariables.completeCAMomValues.push_back(mcTC.pValue); /// why are there values of the mcTC stored? we want to know the real data, not the guesses of the reconstructed data. Guesses of the reconstructed data will be stored in resiudals
+      /// why are there values of the mcTC stored? we want to know the real data, not the guesses of the reconstructed data. Guesses of the reconstructed data will be stored in resiudals
+      rootVariables.completeCAMomValues.push_back(mcTC.pValue);
       rootVariables.completeCApTValues.push_back(mcTC.pTValue);
       rootVariables.completeCAThetaValues.push_back(thetaMC);
+      rootVariables.completeCAPhiValues.push_back(phiMC);
 
       rootVariables.completeCAMomResiduals.push_back(mcTC.pValue - caTC.pValue);
       rootVariables.completeCApTResiduals.push_back(mcTC.pTValue - caTC.pTValue);
       rootVariables.completeCAThetaResiduals.push_back(thetaMC - thetaCA);
+      rootVariables.completeCAPhiResiduals.push_back(phiMC - phiCA);
       rootVariables.completeCAMomResidualAngles.push_back(angle);
       rootVariables.completeCApTResidualAngles.push_back(transverseAngle);
 
@@ -620,13 +650,16 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
   } else if (recoveryState == 3) {
     tcType = "CleanMCTC";
     if (m_PARAMwriteToRoot == true) {
+      /// why are there values of the mcTC stored? we want to know the real data, not the guesses of the reconstructed data. Guesses of the reconstructed data will be stored in resiudals
       rootVariables.cleanCAMomValues.push_back(mcTC.pValue);
       rootVariables.cleanCApTValues.push_back(mcTC.pTValue);
       rootVariables.cleanCAThetaValues.push_back(thetaMC);
+      rootVariables.cleanCAPhiValues.push_back(phiMC);
 
       rootVariables.cleanCAMomResiduals.push_back(mcTC.pValue - caTC.pValue);
       rootVariables.cleanCApTResiduals.push_back(mcTC.pTValue - caTC.pTValue);
       rootVariables.cleanCAThetaResiduals.push_back(thetaMC - thetaCA);
+      rootVariables.cleanCAPhiResiduals.push_back(phiMC - phiCA);
       rootVariables.cleanCAMomResidualAngles.push_back(angle);
       rootVariables.cleanCApTResidualAngles.push_back(transverseAngle);
 
@@ -645,14 +678,17 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
     if (std::find(m_forRootCountFoundIDs.begin(), m_forRootCountFoundIDs.end(), caTC.finalAssignedID) == m_forRootCountFoundIDs.end() and             caTC.finalAssignedID != -1) {
       m_forRootCountFoundIDs.push_back(caTC.finalAssignedID);
 
+      /// why are there values of the mcTC stored? we want to know the real data, not the guesses of the reconstructed data. Guesses of the reconstructed data will be stored in resiudals
       rootVariables.totalCAMomValues.push_back(mcTC.pValue);
       rootVariables.totalCApTValues.push_back(mcTC.pTValue);
       rootVariables.totalCAThetaValues.push_back(thetaMC);
+      rootVariables.totalCAPhiValues.push_back(phiMC);
       rootVariables.cAreconstructedTrackLength.push_back(caTC.coordinates.size());
 
       rootVariables.totalCAMomResiduals.push_back(mcTC.pValue - caTC.pValue);
       rootVariables.totalCApTResiduals.push_back(mcTC.pTValue - caTC.pTValue);
       rootVariables.totalCAThetaResiduals.push_back(thetaMC - thetaCA);
+      rootVariables.totalCAPhiResiduals.push_back(phiMC - phiCA);
       rootVariables.totalCAMomResidualAngles.push_back(angle);
       rootVariables.totalCApTResidualAngles.push_back(transverseAngle);
 
@@ -706,15 +742,18 @@ void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC, RootVariables
   string info = "FOUNDINFO";
   if (type == false) { info = "LOSTINFO"; }
 
-  TVector3 zDir(0., 0., 1.); // vector parallel to z-axis
+//   TVector3 zDir(0., 0., 1.); // vector parallel to z-axis
   TVector3 mcDirection = mcTC.direction;
-  double theta = mcDirection.Angle(zDir) * 180.*TMath::InvPi();
+  double theta = mcDirection.Theta() * 180.*TMath::InvPi(); //0 < theta < pi   ->   0 < theta < 180°
+  double phi = mcDirection.Phi() * 180.*TMath::InvPi(); // -pi < phi < pi   ->   0 < phi < 360°
+  if (phi < 0) { phi += 360; }
 
   // store mcValues in any case...
   if (m_PARAMwriteToRoot == true) {
     rootVariables.totalMCMomValues.push_back(mcTC.pValue);
     rootVariables.totalMCpTValues.push_back(mcTC.pTValue);
     rootVariables.totalMCThetaValues.push_back(theta);
+    rootVariables.totalMCPhiValues.push_back(phi);
     rootVariables.mCreconstructedTrackLength.push_back(mcTC.coordinates.size());
   }
 
@@ -722,6 +761,7 @@ void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC, RootVariables
     B2INFO(info << ": At event " << m_eventCounter <<
            ": MC with ID " << mcTC.indexNumber << " having §" << mcTC.coordinates.size() <<
            "§ hits with theta of §" << setprecision(4) <<  theta <<
+           "§ and phi of §" << setprecision(4) <<  phi <<
            "§° got pT of §" << setprecision(4) << mcTC.pTValue <<
            "§ GeV/c and vertex distance to origin: §" << setprecision(4) << mcTC.vertex.Mag() <<
            "§cm, transverseDistance: §" << setprecision(4) << mcTC.vertex.Perp() <<
@@ -738,12 +778,12 @@ void TFAnalizerModule::printCA(bool type, VXDTrackCandidate& caTC)
   string info = "FOUNDCATCINFO";
   if (type == false) { info = "LOSTCATCINFO"; }
 
-  TVector3 zDir(0., 0., 1.); // vector parallel to z-axis
+//   TVector3 zDir(0., 0., 1.); // vector parallel to z-axis
 
   B2INFO(info << ": At event " << m_eventCounter <<
          ": CA with assigned ID " << caTC.finalAssignedID <<
          " having §" << caTC.coordinates.size() <<
-         "§ hits with theta of §" << setprecision(4) << caTC.direction.Angle(zDir) * 180.*TMath::InvPi() <<
+         "§ hits with theta of §" << setprecision(4) << caTC.direction.Theta() * 180.*TMath::InvPi() <<
          "§° got pT of §" << setprecision(4) << caTC.pTValue <<
          "§ GeV/c, QI of §" << setprecision(4) << caTC.qualityIndex <<
          "§ and pdg of: " << caTC.pdgCode) // '§' will be used to filter

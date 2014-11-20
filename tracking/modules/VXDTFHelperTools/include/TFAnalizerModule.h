@@ -123,6 +123,16 @@ namespace Belle2 {
         std::vector<double> cleanCAThetaResiduals; /**< used to store all theta residuals (true - estimated) of clean tracks reconstructed by the CATF */
         std::vector<double> completeCAThetaResiduals; /**< used to store all theta residuals (true - estimated) of full tracks reconstructed by the CATF */
 
+        std::vector<double> totalMCPhiValues; /**< used to store all Phi values of tracks reconstructed by the MCTF */
+        std::vector<double> totalCAPhiValues; /**< used to store all Phi values of tracks reconstructed by the CATF */
+        std::vector<double> cleanCAPhiValues; /**< used to store all Phi values of clean tracks reconstructed by the CATF */
+        std::vector<double> completeCAPhiValues; /**< used to store all Phi values of full tracks reconstructed by the CATF */
+        std::vector<double> totalPhiValues; /**< used to store all Phi values of tracks existing no matter they produced hits or not */
+
+        std::vector<double> totalCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of tracks reconstructed by the CATF */
+        std::vector<double> cleanCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of clean tracks reconstructed by the CATF */
+        std::vector<double> completeCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of full tracks reconstructed by the CATF */
+
         std::vector<double> totalCAMomResidualAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of tracks reconstructed by the CATF */
         std::vector<double> cleanCAMomResidualAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of clean tracks reconstructed by the CATF */
         std::vector<double> completeCAMomResidualAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of full tracks reconstructed by the CATF */
@@ -324,6 +334,16 @@ namespace Belle2 {
       std::vector<double> m_rootTotalCAThetaResiduals; /**< used to store all theta residuals (true - estimated) of tracks reconstructed by the CATF */
       std::vector<double> m_rootCleanCAThetaResiduals; /**< used to store all theta residuals (true - estimated) of clean tracks reconstructed by the CATF */
       std::vector<double> m_rootCompleteCAThetaResiduals; /**< used to store all theta residuals (true - estimated) of full tracks reconstructed by the CATF */
+
+      std::vector<double> m_rootTotalMCPhiValues; /**< used to store all Phi values of tracks reconstructed by the MCTF */
+      std::vector<double> m_rootTotalCAPhiValues; /**< used to store all Phi values of tracks reconstructed by the CATF */
+      std::vector<double> m_rootCleanCAPhiValues; /**< used to store all Phi values of clean tracks reconstructed by the CATF */
+      std::vector<double> m_rootCompleteCAPhiValues; /**< used to store all Phi values of full tracks reconstructed by the CATF */
+      std::vector<double> m_rootTotalPhiValues; /**< used to store all Phi values of tracks existing no matter they produced hits or not */
+
+      std::vector<double> m_rootTotalCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of tracks reconstructed by the CATF */
+      std::vector<double> m_rootCleanCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of clean tracks reconstructed by the CATF */
+      std::vector<double> m_rootCompleteCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of full tracks reconstructed by the CATF */
 
       std::vector<double> m_rootTotalCAMomResidualsAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of tracks reconstructed by the CATF */
       std::vector<double> m_rootCleanCAMomResidualsAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of clean tracks reconstructed by the CATF */

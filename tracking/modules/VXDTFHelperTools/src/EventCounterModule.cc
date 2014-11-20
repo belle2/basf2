@@ -69,6 +69,7 @@ void EventCounterModule::beginRun()
 
   unsigned int knownLayers = 0, knownLadders = 0, knownSensors = 0, nUnknownLayers = 0, nUnknownLadders = 0, nUnknownSensors = 0, pos = 0; // pos is position in corresponding array in the countedStuff instance
 
+
   // import information of number of strips/pixels for each sensor in the VXD (unrecognized detector types are ignored (like Tel)):
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
   set< VxdID > layers = aGeometry.getLayers();
@@ -97,7 +98,9 @@ void EventCounterModule::beginRun()
         if (isPXD == false and isSVD == false) { nUnknownSensors++; continue; } else { knownSensors++; }
 
         // nPixels@Sensor uPixels x vPixels. nStrips@Sensor uStrips + vStrips:
-        if (isPXD == true) { m_countedPixelsAndStrips.m_pxdPixelCounter.at(pos) += (aSensorInfo.getUCells() * aSensorInfo.getVCells()); }
+        if (isPXD == true) {
+          m_countedPixelsAndStrips.m_pxdPixelCounter.at(pos) += (aSensorInfo.getUCells() * aSensorInfo.getVCells());
+        }
         if (isSVD == true) {
           m_countedPixelsAndStrips.m_svdStripCounter4U.at(pos) += aSensorInfo.getUCells();
           m_countedPixelsAndStrips.m_svdStripCounter4V.at(pos) += aSensorInfo.getVCells();

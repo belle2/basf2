@@ -455,6 +455,7 @@ namespace Belle2 {
 
     int m_PARAMhighestAllowedLayer; /**< defines the highest layer number allowed for filtering (this way, low momentum tracks can be checked neglecting the highest layer) */
 
+    short m_filterCharges; /**< this value can be set to: 1: allow only particles with positive charges, 0: allow all particles, -1: allow only particles with negative charges - standard is 0 */
     double m_PARAMuniSigma; /**< standard value is 1/sqrt(12). Change this value for sharper or more diffuse hits (coupled with 'smearHits */
     bool m_PARAMsmearHits; /**< set true if you want to smear hits */
     bool m_PARAMnoCurler; /**< set true if you want to exclude curling parts of tracks */

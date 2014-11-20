@@ -45,7 +45,7 @@ namespace Belle2 {
 
 
 
-    /** small struct to count some event-specific stuff */
+    /** a template class to count some event-specific stuff */
     template <class StoreType> class CountStuff {
     public:
       /** standard constructor setting all members to 0 */
@@ -304,7 +304,7 @@ namespace Belle2 {
       }/**< summing up all entries of given container */
 
 
-/// compiles but can't be used:
+/// WARNING compiles but can't be used:
       template < typename EntryType, template <typename...> class ContainerType >
       EntryType sumUpVT(ContainerType<EntryType>& aContainer) {
         EntryType sumTotal = 0;
@@ -313,7 +313,7 @@ namespace Belle2 {
       } /**< summing up all entries of given container */
 
 
-/// compiles but can't be used:
+      /// WARNING compiles but can't be used:
       template < typename EntryType, typename...OtherArguments, template <typename, typename...> class ContainerType >
       EntryType sumUpVT2(ContainerType<EntryType, OtherArguments...>& aContainer) {
         EntryType sumTotal = 0;

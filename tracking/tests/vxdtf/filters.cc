@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost <oliver.frost@desy.de>                      *
+ * Contributors: Eugenio Paoloni (eugenio.paoloni@pi.infn.it              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

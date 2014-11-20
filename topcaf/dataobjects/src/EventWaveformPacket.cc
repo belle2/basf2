@@ -1,4 +1,4 @@
-#include <topcaf/dataobjects/inc/EventWaveformPacket.h>
+#include <topcaf/dataobjects/EventWaveformPacket.h>
 
 using namespace Belle2;
 
@@ -46,7 +46,7 @@ void EventWaveformPacket::SetSamples(std::vector< double > samples)
   m_nsamples = samples.size();
 }
 
-EventWaveformPacket::EventWaveformPacket(const EventWaveformPacket& in_wp)
+EventWaveformPacket::EventWaveformPacket(const EventWaveformPacket& in_wp) : Packet()
 {
 
   //From packet

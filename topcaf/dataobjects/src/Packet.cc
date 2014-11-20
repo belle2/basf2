@@ -1,4 +1,4 @@
-#include <topcaf/dataobjects/inc/Packet.h>
+#include <topcaf/dataobjects/Packet.h>
 
 using namespace Belle2;
 

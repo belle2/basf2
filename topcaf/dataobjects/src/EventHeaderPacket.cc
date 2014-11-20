@@ -1,4 +1,4 @@
-#include <topcaf/dataobjects/inc/EventHeaderPacket.h>
+#include <topcaf/dataobjects/EventHeaderPacket.h>
 
 using namespace Belle2;
 
@@ -15,4 +15,5 @@ EventHeaderPacket::EventHeaderPacket(const unsigned int* temp_buffer,
   m_flag = m_packet_payload[5];
   m_nwaves = m_packet_payload[6];
   m_aux = m_packet_payload[7];
+  m_ftsw = -999999.;
 }

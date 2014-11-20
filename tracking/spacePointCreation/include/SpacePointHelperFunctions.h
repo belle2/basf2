@@ -43,13 +43,13 @@ namespace Belle2 {
     /** Id of sensor, TODO can be removed if struct is used in a map */
     VxdID vxdID;
 
-    /**< stores all SVDclusters of U type.
+    /** stores all SVDclusters of U type.
      *
      * Each entry stores a pointer to its SVDCluster.
      */
     std::vector<const SVDCluster*> clustersU;
 
-    /**< stores all SVDclusters of V type.
+    /** stores all SVDclusters of V type.
      *
      * Each entry stores a pointer to its SVDCluster.
      */

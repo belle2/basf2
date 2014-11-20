@@ -212,7 +212,7 @@ namespace Belle2 {
     const static int SectorMask;
 
     /** contains full info of current SecID. Check class definition for detailed description */
-    unsigned int m_fullSecID;
+    BaseType m_fullSecID;
 
   }; //end class SecID
 } //end namespace Belle2

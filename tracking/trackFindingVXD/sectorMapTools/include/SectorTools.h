@@ -168,13 +168,13 @@ namespace Belle2 {
       double vPosInSector = (vConfig.at(vIndex + 1) - vConfig.at(vIndex)) * coords.second;
       throwBoundary(vPosInSector);
 
-      return std::make_pair(uConfig.at(uIndex) + uPosInSector, vConfig.at(vIndex) + vPosInSector);
+      return { uConfig.at(uIndex) + uPosInSector, vConfig.at(vIndex) + vPosInSector };
     }
 
   protected:
     /** returns true if value is between 0-1, false if not */
     static void throwBoundary(double value) {
-      if (value > 1. or value < 0.) {
+      if (value < 0. or value > 1.) {
         throw Out_of_bounds();
       }
     }

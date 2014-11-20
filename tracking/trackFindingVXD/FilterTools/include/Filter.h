@@ -22,6 +22,7 @@ namespace Belle2 {
 
   /** this is just a classname to be levered in the template parameter pack  */
   class BypassableFilter;
+  class ActivableFilter;
 
   /** Basic building block of the Filter tools
    *
@@ -131,6 +132,12 @@ namespace Belle2 {
       return Filter< Variable, Range, BypassableFilter, Observer>(m_range, bypassVariable);
     }
 
+    Filter< Variable, Range, ActivableFilter, Observer>
+    __attribute__((deprecated("Please use the bypass( const bool &) method instead")))
+    enable(const bool& enableVariable) {
+      return Filter< Variable, Range, ActivableFilter, Observer>(m_range, enableVariable);
+    }
+
     template< class otherObserver >
     Filter< Variable, Range, otherObserver>
     observe(const otherObserver&) {
@@ -221,6 +228,82 @@ namespace Belle2 {
   private:
 
     const bool& m_bypass;
+  };
+
+
+  /** Basic building block of the Filter tools
+   *
+   * An external bool variable Enable/Disable the Filter E.g.:
+  \code
+
+
+  #include "tracking/trackFindingVXD/FilterTools/SelectionVariable.h"
+  #include "tracking/trackFindingVXD/FilterTools/UpperBoundedSet.h"
+  #include "tracking/trackFindingVXD/FilterTools/Filter.h"
+
+  struct spacePoint{ float x; float y;float z; };
+
+  SquaredDistance2D: public SelectionVariable< TSpacePoint > {
+    value( const TSpacePoint & p1, const TSpacePoint &p2 ){
+      return pow(p1.x - p2.x, 2 ) + pow(p1.y - p2.y, 2 );
+    }
+  };
+  bool enable(false);
+  Filter< Distance3D, UpperBoundedSet, ActivableFilter, VoidObserver >
+               filter( UpperBoundedSet( 1.1 ), enable);
+
+  enable = false;
+  spacePoint a( {0,0,0} ), b( {10,0,0} );
+  cout << filter.accept(a,b) << endl;
+  enable = true;
+  cout << filter.accept(a,b) << endl;
+
+  \endcode
+
+     * will produce:
+     * true
+     * false
+     *
+     * The Variable class will provide the static method value x( arg1, arg2)
+     * The Range object will provide the method contains to decide if x(arg1, arg2) is good
+     * The Observer will be notified of the actions via its static method notify
+     */
+
+  template <
+  class Variable,
+        class Range,
+        class Observer
+        >
+  class Filter < Variable, Range, ActivableFilter, Observer  >:
+    public Filter< Variable, Range, Observer> {
+  public:
+
+    /** Constructor.
+     *
+     * To construct the Filter we need a concrete Range and a reference to a bool value.
+     * The variable and the observer are passed through the template type pack.
+     *
+     * @param range: a class that provides a method \code
+     bool contains( Variable::returnType x) \endcode
+     * @param bypass is a bool value controlling the behaviour of accept: if bypass is set to
+     * true the method accept will return always true, if bypass is set to false the accept
+     * method will return the actual result of the test.
+     */
+    Filter(const Range& range , const bool& enable):
+      Filter< Variable, Range, Observer >(range),
+      m_enable(enable) { };
+
+    /** All the real computations are occuring here */
+    bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
+                const typename Filter< Variable, Range, Observer>::argumentType& arg2) const {
+      typename Variable::variableType value = Variable::value(arg1, arg2);
+      Observer::notify(arg1, arg2 , Variable(), value);
+      return m_enable && Filter< Variable, Range, Observer >::m_range.contains(value);
+    }
+
+  private:
+
+    const bool& m_enable;
   };
 
 

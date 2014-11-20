@@ -51,6 +51,15 @@ namespace VXDTFfilterTest {
     }
   };
 
+  class BooleanVariable : public SelectionVariable< spacePoint , bool > {
+  public:
+    static float value(const spacePoint& p1, const spacePoint& p2) {
+      return
+        get<0>(p1) - get<0>(p2) == 0.;
+    }
+  };
+
+
   template < class T>
   class counter {
   public:
@@ -264,6 +273,24 @@ namespace VXDTFfilterTest {
     EXPECT_TRUE(filter.accept(x1, x1));
     EXPECT_EQ(2 , counter< SquaredDistance2Dxy >::N);
     EXPECT_EQ(1 , counter< SquaredDistance3D >::N);
+
+  }
+
+  TEST_F(FilterTest, BooleanVariableShortcuts)
+  {
+    auto filter1(BooleanVariable() == true);
+    auto filter2(false == BooleanVariable());
+    spacePoint x1(0.0f , 0.0f, 0.0f);
+    spacePoint x2(1.0f , 0.0f, 0.0f);
+
+    EXPECT_TRUE(filter1.accept(x1, x1));
+    EXPECT_FALSE(filter1.accept(x1, x2));
+
+
+    EXPECT_FALSE(filter2.accept(x1, x1));
+    EXPECT_TRUE(filter2.accept(x1, x2));
+
+
 
   }
 }

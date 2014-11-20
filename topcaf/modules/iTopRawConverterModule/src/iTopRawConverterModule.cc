@@ -1,4 +1,5 @@
-#include <topcaf/modules/iTopRawConverterModule/inc/iTopRawConverterModule.h>
+#include <topcaf/modules/iTopRawConverterModule/iTopRawConverterModule.h>
+
 #include <iostream>
 
 using namespace Belle2;
@@ -10,6 +11,7 @@ iTopRawConverterModule::iTopRawConverterModule() : Module()
 {
   setDescription("This module is used to upack the raw data from the testbeam and crt data");
   addParam("InputFileName", m_input_filename, "Raw input filename");
+  addParam("InputDirectory", m_input_directory, "Raw input file directory");
 
   m_WfPacket = NULL;
   m_EvtPacket = NULL;
@@ -30,12 +32,24 @@ iTopRawConverterModule::~iTopRawConverterModule()
 /////////////////////
 void iTopRawConverterModule::initialize()
 {
-  LoadRawFile(m_input_filename.c_str());
+  std::string m_input_fileandpath = m_input_directory + m_input_filename;
+
+  LoadRawFile(m_input_fileandpath.c_str());
 
   //output
-  m_evtheader_ptr.registerInDataStore();
-  m_evtwave_ptr.registerInDataStore();
 
+  m_evtheader_ptr.registerInDataStore();
+  m_evtwaves_ptr.registerInDataStore();
+  m_filedata_ptr.registerInDataStore();
+
+
+
+}
+
+void iTopRawConverterModule::beginRun()
+{
+  m_filedata_ptr.create();
+  m_filedata_ptr->set(m_input_directory, m_input_filename);
 }
 
 void iTopRawConverterModule::event()
@@ -43,13 +57,36 @@ void iTopRawConverterModule::event()
 
   //output
   m_evtheader_ptr.create();
-  m_evtwave_ptr.create();
+  //  m_evtheader_ptr.clear();
+  //  m_evtwaves_ptr.create();
+  m_evtwaves_ptr.clear();
 
-  int packet_type = FindNextPacket();
-  if (packet_type == 2) {
-    std::cout << "Founds Waveform Packet Type: " << packet_type << std::endl;
-    m_evtwave_ptr.assign(GetWaveformPacket(), true);
-    std::cout << " GetChannelID(): " <<   m_evtwave_ptr-> GetChannelID() << std::endl;
+  int packet_type = 0;
+  while (packet_type > -1) {
+    packet_type = FindNextPacket();
+
+    if (packet_type == -1) {
+      B2ERROR("Corrupt packet found.");
+      break;
+    } else if (packet_type == -11) {
+      B2WARNING("End of file.");
+      break;
+    } else if (packet_type == 1) {
+      EventHeaderPacket* headerpkt = GetEvtHeaderPacket();
+      if (m_evtheader_ptr->GetPacketType() == -1)
+        m_evtheader_ptr.assign(headerpkt, true);
+      else if (headerpkt->GetEventNumber() != m_evtheader_ptr->GetEventNumber()) {
+        // Found next event.  Rewind and break.
+        Rewind();
+        //  B2INFO(" itop event " << m_evtheader_ptr->GetEventNumber() << " converted with " << m_evtwaves_ptr.getEntries() << " waveform packets.");
+        break;
+      }
+    } else if (packet_type == 2) {
+      //    B2INFO("Found Waveform Packet Type: " << packet_type);
+      //      m_evtwaves_ptr.appendNew(GetWaveformPacket());
+      m_evtwaves_ptr.appendNew(EventWaveformPacket(*m_WfPacket));
+      //    B2INFO(" GetChannelID(): " <<   m_evtwave_ptr-> GetChannelID());
+    }
   }
 
 }
@@ -59,7 +96,7 @@ int iTopRawConverterModule::LoadRawFile(const char* argc)
 {
   m_input_file.open(argc, std::ios::binary);
   if (!m_input_file) {
-    std::cout << "Couldn't open input file: " << argc << std::endl;
+    B2ERROR("Couldn't open input file: " << argc);
     return -9;
   }  else {
     return 0;
@@ -116,7 +153,7 @@ int iTopRawConverterModule::FindNextPacket()
     //Grab the rest of the packet
     int ndata = (packet_length - 1) * sizeof(packet_word_t);
     if (ndata > 1280) {
-      std::cout << "Large payload: " << ndata << " ... skipping!" << std::endl;
+      B2WARNING("Large payload: " << ndata << " ... skipping!");
       return -1;
     }
 

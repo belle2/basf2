@@ -1,12 +1,17 @@
 #ifndef iTopRawConverter_H
 #define iTopRawConverter_H
 
+#include <framework/core/Module.h>
+
 #include <fstream>
 #include <iostream>
-#include <framework/core/Module.h>
-#include <topcaf/dataobjects/inc/EventHeaderPacket.h>
-#include <topcaf/dataobjects/inc/EventWaveformPacket.h>
+
+#include <topcaf/dataobjects/EventHeaderPacket.h>
+#include <topcaf/dataobjects/EventWaveformPacket.h>
+#include <topcaf/dataobjects/topFileMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+
 
 namespace Belle2 {
 
@@ -23,6 +28,7 @@ namespace Belle2 {
 
 //Module function (only to be used when running as a module!!!)
     void initialize();
+    void beginRun();
     void event();
 
 //Original function
@@ -34,13 +40,17 @@ namespace Belle2 {
 
   private:
     std::string m_input_filename;
+    std::string m_input_directory;
+    std::string m_input_fileandpath;
     std::ifstream m_input_file;
+    std::string m_tmp;
     unsigned int m_temp_buffer[1280];
     int m_current_pos, m_prev_pos;
     EventHeaderPacket* m_EvtPacket;
     EventWaveformPacket* m_WfPacket;
-    StoreObjPtr<EventHeaderPacket> m_evtheader_ptr;
-    StoreObjPtr<EventWaveformPacket> m_evtwave_ptr;
+    StoreObjPtr<EventHeaderPacket>   m_evtheader_ptr;
+    StoreArray<EventWaveformPacket>  m_evtwaves_ptr;
+    StoreObjPtr<topFileMetaData>     m_filedata_ptr;
   };
 }
 #endif

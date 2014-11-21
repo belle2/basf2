@@ -1,6 +1,8 @@
 #include <topcaf/modules/WaveTimingModule/WaveTimingModule.h>
 #include <topcaf/dataobjects/EventWaveformPacket.h>
+#include <topcaf/dataobjects/EventHeaderPacket.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include "TH1D.h"
 #include "TSpline.h"
 #include <cmath>
@@ -37,8 +39,16 @@ void WaveTimingModule::event()
   StoreArray<EventWaveformPacket> evtwaves_ptr;
   evtwaves_ptr.isRequired();
 
+  StoreObjPtr<EventHeaderPacket> evtheader_ptr;
+  evtheader_ptr.isRequired();
+
   //Output TOPDIgit
   m_topdigits_ptr.clear();
+
+  double ftsw = 0;
+  if (evtheader_ptr) {
+    ftsw = evtheader_ptr->GetFTSW();
+  }
 
   if (evtwaves_ptr) {
 
@@ -50,10 +60,12 @@ void WaveTimingModule::event()
       std::vector< double > v_samples = evtwaves_ptr[w]->GetSamples();
       int refwin = evtwaves_ptr[w]->GetRefWindow();
       int win = evtwaves_ptr[w]->GetASICWindow();
-      //int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
       float window_dt = (1. / 0.0212) / 2.0;
       float sample_dt = window_dt / 64.0;
-      //float coarse_t = float(coarse_int) * window_dt;
+
+      //coarse time setup
+      int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
+      float coarse_t = float(coarse_int) * window_dt;
 
       //Find rough peak location
       m_tmp_h->Reset();
@@ -104,7 +116,7 @@ void WaveTimingModule::event()
       //Create TOPDigit
       int barID = 0;
       int channelID = channel_id;
-      int TDC = at40_t * sample_dt;
+      int TDC = ftsw - coarse_t + at40_t * sample_dt;
       TOPDigit* this_topdigit = m_topdigits_ptr.appendNew(barID, channelID, TDC);
       this_topdigit->setADC(max_adc);
 

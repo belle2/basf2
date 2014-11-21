@@ -13,7 +13,8 @@ output = register_module('RootOutput')
 # register topcaf modules
 itopeventconverter = register_module('iTopRawConverter')
 evtconvDict = {'InputDirectory': '/srv/itop_data/jun2013leps/20130609/data/',
-               'InputFileName': 'topcrt-pedfront-e000002r000571-f000.dat'}
+               'InputFileName': 'topcrt-pulser-e000002r000616-f000.dat'}
+# topcrt-pedfront-e000002r000571-f000.dat'}
 itopeventconverter.param(evtconvDict)
 
 pedmodule = register_module('Pedestal')

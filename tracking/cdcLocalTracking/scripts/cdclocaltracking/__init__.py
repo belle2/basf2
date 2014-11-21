@@ -95,21 +95,11 @@ class MCSegmenterModule(Module):
 
     """Simple module to generate segment to the DataStore."""
 
-    @staticmethod
-    def default_fit_method(segment):
-        CDCRiemannFitter = Belle2.CDCLocalTracking.CDCRiemannFitter
-        return CDCRiemannFitter.getFitter().fit(segment)
-
-    def __init__(self, allow_backward=False, fit_method=None):
+    def __init__(self, allow_backward=False):
         """Initalizes the module and sets up the method, with which the segments ought to be fitted."""
 
         ## Indicates if also segments that are reverse to the actual track should be generated.
         self.allow_backward = allow_backward
-
-        ## Method used to fit the individual segments
-        self.fit_method = fit_method
-        if not fit_method:
-            self.fit_method = self.default_fit_method
 
         super(MCSegmenterModule, self).__init__()
 
@@ -129,6 +119,37 @@ class MCSegmenterModule(Module):
         self.theMCHitLookUp.fill()
         self.theWireHitTopology.fill()
         self.mcSegmentWorker.generate(self.allow_backward)
+
+    def terminate(self):
+        """Terminates the segment worker"""
+
+        self.mcSegmentWorker.terminate()
+
+
+class SegmentFitterModule(Module):
+
+    @staticmethod
+    def default_fit_method(segment):
+        """Default method to fit the generated segments."""
+
+        CDCRiemannFitter = Belle2.CDCLocalTracking.CDCRiemannFitter
+        return CDCRiemannFitter.getFitter().fit(segment)
+
+    def __init__(self, fit_method=None):
+        """
+        fit_method : function
+            A function called on each stored segment pair as its only argument to update its fit inplace.
+            See default_fit_method for an example. Defaults to None meaning the default_fit_method is used
+        """
+
+        ## Method used to fit the individual segment pairs
+        self.fit_method = fit_method
+        if not fit_method:
+            self.fit_method = self.default_fit_method
+
+        super(SegmentFitterModule, self).__init__()
+
+    def event(self):
         self.fitStoredSegments()
 
     def fitStoredSegments(self):
@@ -140,11 +161,6 @@ class MCSegmenterModule(Module):
             fit = fit_method(segment)
             if fit is not None:
                 segment.setTrajectory2D(fit)
-
-    def terminate(self):
-        """Terminates the segment worker"""
-
-        self.mcSegmentWorker.terminate()
 
 
 class MCAxialStereoPairCreatorModule(Module):
@@ -226,6 +242,8 @@ class MCAxialStereoPairCreatorModule(Module):
         """Generates valid axial stereo segment pairs from the CDCRecoSegment2Ds 
         on the DataStore filtering by MCAxialStereoSegmentPairFilter and output the result to the DataStore."""
 
+        Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair.clearStoreArray()
+
         segmentsByISuperLayer = self.getSegmentsByISuperLayer()
 
         for (iSuperLayer, segmentsForISuperLayer) in \
@@ -246,10 +264,16 @@ class MCAxialStereoPairCreatorModule(Module):
 
         self.addRelationsToSegments()
 
+        storeArray = \
+            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair.getStoreArray()
+        getLogger().info('Generated number of pairs: %s',
+                         storeArray.getEntries())
+
     def getSegmentsByISuperLayer(self):
         """Returns a list of lists of segments where the index of the first list is the superlayer id of the segments contained at that position"""
 
         segments = Belle2.PyStoreArray('CDCRecoSegment2Ds')
+        getLogger().info('Number of segments: %s', segments.getEntries())
 
         segmentsByISuperLayer = [[] for i in range(9)]
 
@@ -314,7 +338,7 @@ class MCAxialStereoPairCreatorModule(Module):
                     self.num_rejected_signal)
 
 
-class MCAxialStereoPairFitterModule(Module):
+class AxialStereoPairFitterModule(Module):
 
     @staticmethod
     def default_fit_method(axialStereoSegmentPair):
@@ -336,7 +360,7 @@ class MCAxialStereoPairFitterModule(Module):
         if not fit_method:
             self.fit_method = self.default_fit_method
 
-        super(MCAxialStereoPairFitterModule, self).__init__()
+        super(AxialStereoPairFitterModule, self).__init__()
 
     def event(self):
         self.fitStoredPairs()

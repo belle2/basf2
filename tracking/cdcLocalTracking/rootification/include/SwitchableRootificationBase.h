@@ -46,40 +46,47 @@ namespace Belle2 {
     typedef RootificationBase SwitchableRootificationBase;
 
 #define CDCLOCALTRACKING_SwitchableClassDef(CLASSNAME, CLASSVERSION)  \
-  ClassDef(CLASSNAME, CLASSVERSION);          \
-public:               \
-  /** Register a *transient* store array on the DataStore.*/    \
-  static void registerStoreArray()          \
-  { StoreArray< CLASSNAME >::registerTransient(); }     \
+  ClassDef(CLASSNAME, CLASSVERSION);              \
+public:                   \
+  /** Register a *transient* store array on the DataStore.*/        \
+  static void registerStoreArray()              \
+  { StoreArray< CLASSNAME >::registerTransient(); }         \
   \
-private:                \
-  /** Get the default name of the StoreArray for this class.*/    \
-  static std::string getStoreArrayName()        \
-  { return DataStore::defaultArrayName< CLASSNAME >(); }    \
+  /** Clear the StoreArray to an empty version. */          \
+  static void clearStoreArray(){              \
+    StoreArray< CLASSNAME > storeArray;             \
+    const bool replace = true;                \
+    storeArray.create(replace);               \
+  }                     \
   \
-public:               \
-  /** Looks up the StoreArray and returns it as a PyStoreArray. */  \
-  static PyStoreArray getStoreArray()         \
-  { return PyStoreArray(getStoreArrayName()); }       \
+private:                    \
+  /** Get the default name of the StoreArray for this class.*/        \
+  static std::string getStoreArrayName()            \
+  { return DataStore::defaultArrayName< CLASSNAME >(); }        \
   \
-  /** Copies the object to the StoreArray. */       \
-  /** Returns a reference to the newly created object*/     \
-  CLASSNAME * copyToStoreArray() const {        \
-    StoreArray< CLASSNAME > storeArray;         \
-    return storeArray.appendNew(*this);         \
-  }                 \
+public:                   \
+  /** Looks up the StoreArray and returns it as a PyStoreArray. */    \
+  static PyStoreArray getStoreArray()             \
+  { return PyStoreArray(getStoreArrayName()); }           \
   \
-  /** Append new default constructed object to the StoreArray. */ \
-  static CLASSNAME * appendNewToStoreArray() {        \
-    StoreArray< CLASSNAME > storeArray;         \
-    return storeArray.appendNew();          \
-  }                 \
+  /** Copies the object to the StoreArray. */           \
+  /** Returns a reference to the newly created object*/         \
+  CLASSNAME * copyToStoreArray() const {            \
+    StoreArray< CLASSNAME > storeArray;             \
+    return storeArray.appendNew(*this);             \
+  }                     \
   \
-public:               \
-  /** Register a *transient* RelationArray from this class */   \
-  /** to the this class on the DataStore */       \
-  static void registerInnerRelation()         \
-  { registerRelationTo(getStoreArrayName()); }        \
+  /** Append new default constructed object to the StoreArray. */     \
+  static CLASSNAME * appendNewToStoreArray() {            \
+    StoreArray< CLASSNAME > storeArray;             \
+    return storeArray.appendNew();              \
+  }                     \
+  \
+public:                   \
+  /** Register a *transient* RelationArray from this class */       \
+  /** to the this class on the DataStore */           \
+  static void registerInnerRelation()             \
+  { registerRelationTo(getStoreArrayName()); }            \
   \
   /** Register a *transient* RelationArray from this class to the class refered to by its plural array name on the DataStore */ \
   static void registerRelationTo(const std::string& toArrayName){ \

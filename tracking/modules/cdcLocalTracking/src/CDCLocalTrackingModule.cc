@@ -49,6 +49,8 @@ CDCLocalTrackingModule::CDCLocalTrackingModule() : Module()
 
   addParam("GFTrackCandColName",  m_param_gfTrackCandColName, "Name of the output collection of genfit::TrackCands ", string(""));
 
+  addParam("runSecondStage",  m_param_runSecondStage, "Switch to deactive the second stage of the tracking algorithm.", true);
+
 }
 
 CDCLocalTrackingModule::~CDCLocalTrackingModule()
@@ -57,12 +59,17 @@ CDCLocalTrackingModule::~CDCLocalTrackingModule()
 
 void CDCLocalTrackingModule::initialize()
 {
-  //output collection
-  StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandColName);
+  if (m_param_runSecondStage) {
+    //output collection
+    StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandColName);
+  }
 
   m_segmentWorker.initialize();
-  //m_segmentTripleTrackingWorker.initialize();
-  m_segmentPairTrackingWorker.initialize();
+
+  if (m_param_runSecondStage) {
+    //m_segmentTripleTrackingWorker.initialize();
+    m_segmentPairTrackingWorker.initialize();
+  }
 
   //StoreArray with digitized CDCHits
   StoreArray <CDCHit>::required();
@@ -130,14 +137,14 @@ void CDCLocalTrackingModule::event()
   m_segmentWorker.generate(m_recoSegments);
   B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
 
-
-  // Stage two
-  // Build the gfTracks
-  StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandColName);
-  storedGFTrackCands.create();
-  //m_segmentTripleTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
-  m_segmentPairTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
-
+  if (m_param_runSecondStage) {
+    // Stage two
+    // Build the gfTracks
+    StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandColName);
+    storedGFTrackCands.create();
+    //m_segmentTripleTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
+    m_segmentPairTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
+  }
 
 
   //End callgrind recording
@@ -156,8 +163,11 @@ void CDCLocalTrackingModule::endRun()
 void CDCLocalTrackingModule::terminate()
 {
   m_segmentWorker.terminate();
-  //m_segmentTripleTrackingWorker.terminate();
-  m_segmentPairTrackingWorker.terminate();
+
+  if (m_param_runSecondStage) {
+    //m_segmentTripleTrackingWorker.terminate();
+    m_segmentPairTrackingWorker.terminate();
+  }
 
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS;

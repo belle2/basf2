@@ -22,8 +22,12 @@ using namespace std;
 using namespace Belle2;
 
 namespace VXDTFfilterTest {
+
+  /** just a small proto-container storing coordinates */
   typedef tuple<float, float, float> spacePoint;
 
+
+  /** a small filter illustrating the behavior of a distance3D-filter */
   class SquaredDistance3D : public SelectionVariable< spacePoint , float > {
   public:
     static float value(const spacePoint& p1, const spacePoint& p2) {
@@ -34,6 +38,8 @@ namespace VXDTFfilterTest {
     }
   };
 
+
+  /** a small filter illustrating the behavior of a distance2D-filter in XY */
   class SquaredDistance2Dxy : public SelectionVariable< spacePoint , float > {
   public:
     static float value(const spacePoint& p1, const spacePoint& p2) {
@@ -43,6 +49,8 @@ namespace VXDTFfilterTest {
     }
   };
 
+
+  /** a small filter illustrating the behavior of a distance1D-filter in X */
   class SquaredDistance1Dx : public SelectionVariable< spacePoint , float > {
   public:
     static float value(const spacePoint& p1, const spacePoint& p2) {
@@ -51,6 +59,8 @@ namespace VXDTFfilterTest {
     }
   };
 
+
+  /** a small filter illustrating the behavior of a filter which is compatible with boolean comparisons */
   class BooleanVariable : public SelectionVariable< spacePoint , bool > {
   public:
     static float value(const spacePoint& p1, const spacePoint& p2) {
@@ -68,16 +78,20 @@ namespace VXDTFfilterTest {
     ~counter() {};
   };
 
+
   template<>
   int counter< SquaredDistance3D   >::N(0);
 
+
   template<>
   int counter< SquaredDistance2Dxy >::N(0);
+
 
   template<>
   int counter< SquaredDistance1Dx  >::N(0);
 
 
+  /** this observer does simply count the number of times, the attached Filter was used */
   class Observer : public VoidObserver {
   public:
     template<class Var>
@@ -98,6 +112,7 @@ namespace VXDTFfilterTest {
   };
 
 
+  /** shows the functionality of the Range */
   TEST_F(FilterTest, Range)
   {
 
@@ -111,6 +126,8 @@ namespace VXDTFfilterTest {
     EXPECT_EQ(1. , range.getSup());
   }
 
+
+  /** shows the functionality of the UpperBoundedSet */
   TEST_F(FilterTest, UpperBoundedSet)
   {
 
@@ -122,6 +139,7 @@ namespace VXDTFfilterTest {
   }
 
 
+  /** shows the functionality of the LowerBoundedSet */
   TEST_F(FilterTest, LowerBoundedSet)
   {
 
@@ -132,6 +150,8 @@ namespace VXDTFfilterTest {
     EXPECT_EQ(0. , lowerBoundedSet.getInf());
   }
 
+
+  /** shows the functionality of the auto naming capability of the Filter */
   TEST_F(FilterTest, SelectionVariableName)
   {
 
@@ -139,6 +159,8 @@ namespace VXDTFfilterTest {
 
   }
 
+
+  /** shows how to use a filter in a simple case */
   TEST_F(FilterTest, BasicFilter)
   {
     // Very verbose declaration, see below for convenient shortcuts
@@ -153,6 +175,8 @@ namespace VXDTFfilterTest {
 
   }
 
+
+  /** shows how to attach an observer to a filter of interest */
   TEST_F(FilterTest, ObservedFilter)
   {
     // Very verbose declaration, see below for convenient shortcuts
@@ -170,6 +194,7 @@ namespace VXDTFfilterTest {
   }
 
 
+  /** shows how to bypass a filter which itself was not initially planned to be bypassed */
   TEST_F(FilterTest, BypassableFilter)
   {
     bool bypassControl(false);
@@ -189,6 +214,8 @@ namespace VXDTFfilterTest {
 
   }
 
+
+  /** shows how to write compact code using the new filter design */
   TEST_F(FilterTest, Shortcuts)
   {
 
@@ -219,6 +246,8 @@ namespace VXDTFfilterTest {
 
   }
 
+
+  /** tests compatibility of filters with boolean operations for easy coupling of filters */
   TEST_F(FilterTest, BooleanOperations)
   {
 
@@ -252,6 +281,8 @@ namespace VXDTFfilterTest {
 
   }
 
+
+  /** evaluating compatibility of filters with lazy evaluation */
   TEST_F(FilterTest, ShortCircuitsEvaluation)
   {
     auto filter(
@@ -276,6 +307,8 @@ namespace VXDTFfilterTest {
 
   }
 
+
+  /** explains how to use boolean checks with filters */
   TEST_F(FilterTest, BooleanVariableShortcuts)
   {
     auto filter1(BooleanVariable() == true);

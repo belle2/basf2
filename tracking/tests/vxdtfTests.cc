@@ -27,4 +27,10 @@
 #include "vxdtf/celltfinfo.cc"
 #include "vxdtf/vXDTFRawSecMap.cc"
 
+/// for the redesign:
+#include "vxdtfRedesign/twoHitFilters.cc"
+#include "vxdtfRedesign/oldVSNewSegFinderFilters.cc"
+
+
+/// for testing:
 #include "vxdtf/sandBox4Testing.cc"

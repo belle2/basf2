@@ -40,7 +40,7 @@ tools = [
     'Kinematics',
     '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
     'MCTruth',
-    'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
+    '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
     'DeltaEMbc',
     '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
     'MCHierarchy',

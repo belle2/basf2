@@ -1,5 +1,6 @@
 /*
-<header>    <input>Bu_Dpi_Kpi.ntup.root,Bd_JpsiKS_mumu.ntup.root,Bd_Kstgamma.ntup.root,Bd_rho0gamma.ntup.root</input>
+<header>
+<input>Bu_Dpi_Kpi.ntup.root,Bd_JpsiKS_mumu.ntup.root,Bd_Kstgamma.ntup.root,Bd_rho0gamma.ntup.root</input>
 <output>test2_Validation_Breco_output.root</output>
 <contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
 </header>
@@ -103,16 +104,7 @@ void test2_Validation_B2Dpi() {
     float B_mbc;
     float B_deltae;
 
-    int B_pi_mcPDG;
-    int B_D0_K_mcPDG;
-    int B_D0_pi_mcPDG;
-
-    int B_pi_MC_MOTHER_ID;
-    int B_D0_K_MC_MOTHER_ID;
-    int B_D0_pi_MC_MOTHER_ID;
-
-    int B_D0_K_MC_GD_MOTHER_ID;
-    int B_D0_pi_MC_GD_MOTHER_ID;
+    int B_mcStatus;
 
     int nCands;
     int iCand;
@@ -126,16 +118,7 @@ void test2_Validation_B2Dpi() {
     recoTree->SetBranchAddress("B_mbc",      &B_mbc);
     recoTree->SetBranchAddress("B_deltae",   &B_deltae);
 
-    recoTree->SetBranchAddress("B_pi_mcPDG",    &B_pi_mcPDG);
-    recoTree->SetBranchAddress("B_D0_K_mcPDG",  &B_D0_K_mcPDG);
-    recoTree->SetBranchAddress("B_D0_pi_mcPDG", &B_D0_pi_mcPDG);
-
-    recoTree->SetBranchAddress("B_pi_MC_MOTHER_ID",    &B_pi_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B_D0_K_MC_MOTHER_ID",  &B_D0_K_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B_D0_pi_MC_MOTHER_ID", &B_D0_pi_MC_MOTHER_ID);
-
-    recoTree->SetBranchAddress("B_D0_K_MC_GD_MOTHER_ID",  &B_D0_K_MC_GD_MOTHER_ID);
-    recoTree->SetBranchAddress("B_D0_pi_MC_GD_MOTHER_ID", &B_D0_pi_MC_GD_MOTHER_ID);
+    recoTree->SetBranchAddress("B_mcStatus", &B_mcStatus);
 
     recoTree->SetBranchAddress("nCands", &nCands);
     recoTree->SetBranchAddress("iCand", &iCand);
@@ -152,15 +135,7 @@ void test2_Validation_B2Dpi() {
         h_deltae->Fill(B_deltae);
 
         //Simple Truth Match of the Tracks and their mothers
-        if(abs(B_pi_mcPDG)!=pid[pion])      continue;
-        if(abs(B_D0_K_mcPDG)!=pid[kaon])    continue;
-        if(abs(B_D0_pi_mcPDG)!=pid[pion])   continue;
-
-        if(abs(B_pi_MC_MOTHER_ID)!=pid[bplus])      continue;
-        if(abs(B_D0_pi_MC_MOTHER_ID)!=pid[d0])      continue;
-        if(abs(B_D0_pi_MC_GD_MOTHER_ID)!=pid[bplus])continue;
-        if(abs(B_D0_K_MC_MOTHER_ID)!=pid[d0])       continue;
-        if(abs(B_D0_K_MC_GD_MOTHER_ID)!=pid[bplus]) continue;
+        if( B_mcStatus>=4 ) continue;
 
         h_mbctruthmatch->Fill(B_mbc);
         h_deltaetruthmatch->Fill(B_deltae);
@@ -236,11 +211,10 @@ void test2_Validation_B2Dpi() {
     output->Write();
     output->cd();
     list_web->Add(h_mbc);
-    list_web->Add(h_mbctruthmatch);
     list_web->Add(h_deltae);
-    list_web->Add(h_deltaetruthmatch);
     list_web->Add(h_md0);
-    
+    list_web->Add(tbreco);
+
     TIter next( list_web );
     TObject* obj;
     while ( ( obj = ( TObject* )next() ) ) {  ((TH1*)obj)->SetName( Form("B2Dpi_%s",obj->GetName()) ); }
@@ -295,18 +269,7 @@ void test2_Validation_B2JpsiKS() {
     Float_t B0_mbc;
     Float_t B0_deltae;
 
-    Int_t B0_Jpsi_mu0_mcPDG;
-    Int_t B0_Jpsi_mu1_mcPDG;
-    Int_t B0_K_S0_pi0_mcPDG;
-    Int_t B0_K_S0_pi1_mcPDG;
-
-    Int_t B0_Jpsi_mu0_MC_MOTHER_ID;
-    Int_t B0_Jpsi_mu1_MC_MOTHER_ID;
-
-    Int_t B0_K_S0_pi0_MC_MOTHER_ID;
-    Int_t B0_K_S0_pi1_MC_MOTHER_ID;
-    Int_t B0_K_S0_pi0_MC_GD_MOTHER_ID;
-    Int_t B0_K_S0_pi1_MC_GD_MOTHER_ID;
+    Float_t B0_mcStatus;
 
     Int_t nCands;
     Int_t iCand;
@@ -320,19 +283,8 @@ void test2_Validation_B2JpsiKS() {
     recoTree->SetBranchAddress("B0_mbc",     &B0_mbc);
     recoTree->SetBranchAddress("B0_deltae",  &B0_deltae);
 
-    recoTree->SetBranchAddress("B0_Jpsi_mu0_mcPDG", &B0_Jpsi_mu0_mcPDG);
-    recoTree->SetBranchAddress("B0_Jpsi_mu1_mcPDG", &B0_Jpsi_mu1_mcPDG);
-    recoTree->SetBranchAddress("B0_K_S0_pi0_mcPDG", &B0_K_S0_pi0_mcPDG);
-    recoTree->SetBranchAddress("B0_K_S0_pi1_mcPDG", &B0_K_S0_pi1_mcPDG);
-
-    recoTree->SetBranchAddress("B0_Jpsi_mu0_MC_MOTHER_ID", &B0_Jpsi_mu0_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_Jpsi_mu1_MC_MOTHER_ID", &B0_Jpsi_mu1_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_K_S0_pi0_MC_MOTHER_ID", &B0_K_S0_pi0_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_K_S0_pi1_MC_MOTHER_ID", &B0_K_S0_pi1_MC_MOTHER_ID);
-
-    recoTree->SetBranchAddress("B0_K_S0_pi0_MC_GD_MOTHER_ID", &B0_K_S0_pi0_MC_GD_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_K_S0_pi1_MC_GD_MOTHER_ID", &B0_K_S0_pi1_MC_GD_MOTHER_ID);
-
+    recoTree->SetBranchAddress("B0_mcStatus", &B0_mcStatus);
+    
     recoTree->SetBranchAddress("nCands", &nCands);
     recoTree->SetBranchAddress("iCand", &iCand);
 
@@ -355,18 +307,8 @@ void test2_Validation_B2JpsiKS() {
         h_mks   ->Fill(lv_B0_KS0.M());
 
         //Simple Truth Match of the Tracks and their mothers
-        if(abs(B0_Jpsi_mu0_mcPDG)!=pid[muon])continue;
-        if(abs(B0_Jpsi_mu1_mcPDG)!=pid[muon])continue;
-        if(abs(B0_K_S0_pi0_mcPDG)!=pid[pion])continue;
-        if(abs(B0_K_S0_pi1_mcPDG)!=pid[pion])continue;
-
-        if(abs(B0_Jpsi_mu0_MC_MOTHER_ID)    !=pid[jpsi])    continue;
-        if(abs(B0_Jpsi_mu1_MC_MOTHER_ID)    !=pid[jpsi])    continue;
-        if(abs(B0_K_S0_pi1_MC_MOTHER_ID)    !=pid[ks])      continue;
-        if(abs(B0_K_S0_pi1_MC_GD_MOTHER_ID) !=pid[bzero])   continue;
-        if(abs(B0_K_S0_pi0_MC_MOTHER_ID)    !=pid[ks])      continue;
-        if(abs(B0_K_S0_pi0_MC_GD_MOTHER_ID) !=pid[bzero])   continue;
-
+        if(B0_mcStatus>=4) continue;
+        
         h_mbctruthmatch     ->Fill(B0_mbc);
         h_deltaetruthmatch  ->Fill(B0_deltae);
         h_mjpsitruthmatch   ->Fill(lv_B0_Jpsi.M());
@@ -462,16 +404,13 @@ void test2_Validation_B2JpsiKS() {
     output->Write();
     output->cd();
     list_web->Add(h_mbc);
-    list_web->Add(h_mbctruthmatch);
     list_web->Add(h_deltae);
-    list_web->Add(h_deltaetruthmatch);
     list_web->Add(h_mjpsi);
-    list_web->Add(h_mjpsitruthmatch);
-    
+    list_web->Add(tbreco);
+
     TIter next( list_web );
     TObject* obj;
     while ( ( obj = ( TObject* )next() ) ) {  ((TH1*)obj)->SetName( Form("B2JpsiKS_%s",obj->GetName()) ); }
-    list_web->Add(framex);//TODO: remove this 
     list_web->Write();
     output->Close();
 }
@@ -485,8 +424,6 @@ void test2_Validation_B2Kstgamma() {
     /*  Take the BtoDpi prepared by the NtupleMaker */
     TChain* recoTree = new TChain("Bd_Kstgamma_tuple");
     recoTree->AddFile("../Bd_Kstgamma.ntup.root");
-
-    //Define these for offline validation
 
     //Put these plots in the web validation
     TH1F* h_mbc              = new TH1F("mbc","B2Kstgamma, m_{bc};m_{bc} [GeV];Events/0.002 GeV"         ,25,5.24,5.29);
@@ -531,17 +468,8 @@ void test2_Validation_B2Kstgamma() {
 
     float B0_KST0_K_PIDk;
 
-    int B0_gamma_mcPDG;
-    int B0_KST0_K_mcPDG;
-    int B0_KST0_pi_mcPDG;
-
-    int B0_gamma_MC_MOTHER_ID;
-    int B0_KST0_K_MC_MOTHER_ID;
-    int B0_KST0_pi_MC_MOTHER_ID;
-
-    int B0_KST0_K_MC_GD_MOTHER_ID;
-    int B0_KST0_pi_MC_GD_MOTHER_ID;
-
+    int B0_mcStatus;
+    
     int nCands;
     int iCand;
 
@@ -556,16 +484,7 @@ void test2_Validation_B2Kstgamma() {
 
     recoTree->SetBranchAddress("B0_KST0_K_PIDk",   &B0_KST0_K_PIDk);
 
-    recoTree->SetBranchAddress("B0_gamma_mcPDG",   &B0_gamma_mcPDG);
-    recoTree->SetBranchAddress("B0_KST0_K_mcPDG",  &B0_KST0_K_mcPDG);
-    recoTree->SetBranchAddress("B0_KST0_pi_mcPDG", &B0_KST0_pi_mcPDG);
-
-    recoTree->SetBranchAddress("B0_gamma_MC_MOTHER_ID",   &B0_gamma_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_KST0_K_MC_MOTHER_ID",  &B0_KST0_K_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_KST0_pi_MC_MOTHER_ID", &B0_KST0_pi_MC_MOTHER_ID);
-
-    recoTree->SetBranchAddress("B0_KST0_K_MC_GD_MOTHER_ID",  &B0_KST0_K_MC_GD_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_KST0_pi_MC_GD_MOTHER_ID", &B0_KST0_pi_MC_GD_MOTHER_ID);
+    recoTree->SetBranchAddress("B0_mcStatus",   &B0_mcStatus);
 
     recoTree->SetBranchAddress("nCands", &nCands);
     recoTree->SetBranchAddress("iCand", &iCand);
@@ -591,15 +510,7 @@ void test2_Validation_B2Kstgamma() {
         h_mkst->Fill(lv_B0_KST0.M());
 
         //Simple Truth Match of the Tracks and their mothers
-        if(abs(B0_gamma_mcPDG)!=pid[photon])continue;
-        if(abs(B0_KST0_K_mcPDG)!=pid[kaon])continue;
-        if(abs(B0_KST0_pi_mcPDG)!=pid[pion])continue;
-
-        if(abs(B0_gamma_MC_MOTHER_ID)!=pid[bzero])continue;
-        if(abs(B0_KST0_pi_MC_MOTHER_ID)!=pid[kstar])continue;
-        if(abs(B0_KST0_pi_MC_GD_MOTHER_ID)!=pid[bzero])continue;
-        if(abs(B0_KST0_K_MC_MOTHER_ID)!=pid[kstar])continue;
-        if(abs(B0_KST0_K_MC_GD_MOTHER_ID)!=pid[bzero])continue;
+        if(B0_mcStatus>=4)continue;
 
         h_mbctruthmatch->Fill(B0_mbc);
         h_deltaetruthmatch->Fill(B0_deltae);
@@ -639,7 +550,7 @@ void test2_Validation_B2Kstgamma() {
 
     printf("Average Efficiency per particle = %4.3f +/- %4.3f\n",efftrack, erreff);
 
-    TNtuple* tbreco = new TNtuple("Bd_K*gamma reco", "tree", "nreco:nrecotruthmatch:efftrack:erreff" );
+    TNtuple* tbreco = new TNtuple("Bd_Kstgamma reco", "tree", "nreco:nrecotruthmatch:efftrack:erreff" );
     tbreco->Fill(nreco,nrecotruthmatch,efftrack,erreff);
     tbreco->SetAlias("Description", "Reconstruction of B -> K^{*0}(K pi) gamma events in a signal MC sample of 1000 events, where the other side decays generically. PIDK>0.5 is required for the K. nreco is the total number of reconstructed, truth matched signal. This tests the modular analysis tools.");
     tbreco->SetAlias("Check", "Ensure nreco is stable,  at 400 (40 percent efficiency).");
@@ -647,12 +558,10 @@ void test2_Validation_B2Kstgamma() {
     output->Write();
     output->cd();
     list_web->Add(h_mbc);
-    list_web->Add(h_mbctruthmatch);
     list_web->Add(h_deltae);
-    list_web->Add(h_deltaetruthmatch);
     list_web->Add(h_mkst);
-    list_web->Add(h_mksttruthmatch);
-    
+    list_web->Add(tbreco);
+
     TIter next( list_web );
     TObject* obj;
     while ( ( obj = ( TObject* )next() ) ) {  ((TH1*)obj)->SetName( Form("B2Kstgamma_%s",obj->GetName()) ); }
@@ -707,17 +616,8 @@ void test2_Validation_B2rho0gamma() {
     float B0_mbc;
     float B0_deltae;
 
-    int B0_gamma_mcPDG;
-    int B0_rho0_pi0_mcPDG;
-    int B0_rho0_pi1_mcPDG;
-
-    int B0_gamma_MC_MOTHER_ID;
-    int B0_rho0_pi0_MC_MOTHER_ID;
-    int B0_rho0_pi1_MC_MOTHER_ID;
-
-    int B0_rho0_pi0_MC_GD_MOTHER_ID;
-    int B0_rho0_pi1_MC_GD_MOTHER_ID;
-
+    int B0_mcStatus;
+    
     int nCands;
     int iCand;
 
@@ -730,17 +630,8 @@ void test2_Validation_B2rho0gamma() {
     recoTree->SetBranchAddress("B0_mbc",        &B0_mbc);
     recoTree->SetBranchAddress("B0_deltae",     &B0_deltae);
 
-    recoTree->SetBranchAddress("B0_gamma_mcPDG",   &B0_gamma_mcPDG);
-    recoTree->SetBranchAddress("B0_rho0_pi0_mcPDG", &B0_rho0_pi0_mcPDG);
-    recoTree->SetBranchAddress("B0_rho0_pi1_mcPDG", &B0_rho0_pi1_mcPDG);
-
-    recoTree->SetBranchAddress("B0_gamma_MC_MOTHER_ID",   &B0_gamma_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_rho0_pi0_MC_MOTHER_ID", &B0_rho0_pi0_MC_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_rho0_pi1_MC_MOTHER_ID", &B0_rho0_pi1_MC_MOTHER_ID);
-
-    recoTree->SetBranchAddress("B0_rho0_pi0_MC_GD_MOTHER_ID", &B0_rho0_pi0_MC_GD_MOTHER_ID);
-    recoTree->SetBranchAddress("B0_rho0_pi1_MC_GD_MOTHER_ID", &B0_rho0_pi1_MC_GD_MOTHER_ID);
-
+    recoTree->SetBranchAddress("B0_mcStatus",   &B0_mcStatus);
+    
     recoTree->SetBranchAddress("nCands", &nCands);
     recoTree->SetBranchAddress("iCand", &iCand);
 
@@ -763,15 +654,7 @@ void test2_Validation_B2rho0gamma() {
         h_mrho->Fill(lv_B0_rho0.M());
 
         //Simple Truth Match of the Tracks and their mothers
-        if(abs(B0_gamma_mcPDG)!=pid[photon])continue;
-        if(abs(B0_rho0_pi0_mcPDG)!=pid[pion])continue;
-        if(abs(B0_rho0_pi1_mcPDG)!=pid[pion])continue;
-
-        if(abs(B0_gamma_MC_MOTHER_ID)!=pid[bzero])continue;
-        if(abs(B0_rho0_pi0_MC_MOTHER_ID)!=pid[rho0])continue;
-        if(abs(B0_rho0_pi0_MC_GD_MOTHER_ID)!=pid[bzero])continue;
-        if(abs(B0_rho0_pi1_MC_MOTHER_ID)!=pid[rho0])continue;
-        if(abs(B0_rho0_pi1_MC_GD_MOTHER_ID)!=pid[bzero])continue;
+        if(B0_mcStatus>=4)continue;
 
         h_mbctruthmatch->Fill(B0_mbc);
         h_deltaetruthmatch->Fill(B0_deltae);
@@ -819,14 +702,14 @@ void test2_Validation_B2rho0gamma() {
     output->Write();
     output->cd();
     list_web->Add(h_mbc);
-    list_web->Add(h_mbctruthmatch);
     list_web->Add(h_deltae);
-    list_web->Add(h_deltaetruthmatch);
-    
+    list_web->Add(tbreco);
+
     TIter next( list_web );
     TObject* obj;
     while ( ( obj = ( TObject* )next() ) ) {  ((TH1*)obj)->SetName( Form("B2rho0gamma_%s",obj->GetName()) ); }
     list_web->Write();
+    
     output->Close();
 }
 

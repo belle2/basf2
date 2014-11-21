@@ -1,10 +1,11 @@
 /*
-<header>   
+<header>
 <input>GenericB.ntup.root</input>
 <output>test2_Validation_PID_output.root</output>
 <contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
 </header>
 */
+
 ////////////////////////////////////////////////////////////
 // Validation_pass.cc
 // Check the PID efficiency
@@ -95,7 +96,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
     TH3F* h_ROC[ntypes];
 
     TList* list_web = new TList;
-    
+
     for(int Hypo=0; Hypo<ntypes; Hypo++) { //Hypo counter
         TList* list = new TList;
         TLegend* legHist = new TLegend(0.5,0.7,0.7,0.9);
@@ -300,21 +301,21 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
             h_Eff_P[Hypo2] = (TH1F*)h_trk_P[Hypo2]->Clone( Form("h_Eff_P_%s_%s",names[Hypo],names[Hypo2]) );
             h_Eff_P[Hypo2]->GetYaxis()->SetTitle("Efficiency");
             h_Eff_P[Hypo2]->Divide(h_trk_P_pass[Hypo2], h_trk_P[Hypo2],1,1);
-            
+
             Eff_P[Hypo2] = new TGraphAsymmErrors;
             Eff_P[Hypo2]->Divide(h_trk_P_pass[Hypo2], h_trk_P[Hypo2],"cl=0.683 b(1,1) mode");
             Eff_P[Hypo2]->SetMarkerColor(colors[Hypo2]);
             Eff_P[Hypo2]->SetLineColor(colors[Hypo2]);
             Eff_P[Hypo2]->SetName( Form("Efficiency_P_%s_%s",names[Hypo],names[Hypo2]) );
-            
+
             multigraph_P->Add(Eff_P[Hypo2]);
             Eff_P[Hypo2]->GetXaxis()->SetTitle(h_trk_CosTh[0]->GetXaxis()->GetTitle());
             Eff_P[Hypo2]->GetYaxis()->SetTitle("Efficiency");
-            
+
             h_Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Description", Form("PID(%s)>0.5 efficiency of truth-matched %s tracks in bins of lab momentum. A Generic BBbar sample is used.",names[Hypo],names[Hypo2])));
             h_Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
             list->Add(Eff_P[Hypo2]);
-            list_web->Add(h_Eff_P[Hypo2]);
+            if( Hypo2==Hypo ) list_web->Add(h_Eff_P[Hypo2]);
         }
         multigraph_P->Draw("ap");
         multigraph_P->GetXaxis()->SetTitle(h_trk_P[0]->GetXaxis()->GetTitle());
@@ -344,22 +345,22 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
             h_Eff_CosTh[Hypo2] = (TH1F*)h_trk_CosTh[Hypo2]->Clone( Form("h_Eff_CosTh_%s_%s",names[Hypo],names[Hypo2]) );
             h_Eff_CosTh[Hypo2]->GetYaxis()->SetTitle("Efficiency");
             h_Eff_CosTh[Hypo2]->Divide(h_trk_CosTh_pass[Hypo2], h_trk_CosTh[Hypo2],1,1);
-            
+
             Eff_CosTh[Hypo2] = new TGraphAsymmErrors;
             Eff_CosTh[Hypo2]->Divide(h_trk_CosTh_pass[Hypo2], h_trk_CosTh[Hypo2],"cl=0.683 b(1,1) mode");
             Eff_CosTh[Hypo2]->SetMarkerColor(colors[Hypo2]);
             Eff_CosTh[Hypo2]->SetLineColor(colors[Hypo2]);
             Eff_CosTh[Hypo2]->SetName( Form("Efficiency_CosTh_%s_%s",names[Hypo],names[Hypo2]) );
-            
+
             multigraph_CosTh->Add(Eff_CosTh[Hypo2]);
             Eff_CosTh[Hypo2]->GetXaxis()->SetTitle(h_trk_CosTh[0]->GetXaxis()->GetTitle());
             Eff_CosTh[Hypo2]->GetYaxis()->SetTitle("Efficiency");
-            
+
             h_Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Description", Form("PID(%s)>0.5 efficiency of truth-matched %s tracks in bins of lab momentum. A Generic BBbar sample is used.",names[Hypo],names[Hypo])));
             h_Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
-            
+
             list->Add(Eff_CosTh[Hypo2]);
-            list_web->Add(h_Eff_CosTh[Hypo2]);
+            if( Hypo2==Hypo ) list_web->Add(h_Eff_CosTh[Hypo2]);
         }
         multigraph_CosTh->Draw("ap");
         multigraph_CosTh->GetXaxis()->SetTitle(h_trk_CosTh[0]->GetXaxis()->GetTitle());
@@ -390,7 +391,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
     TFile* outFile_web = new TFile("test2_Validation_PID_output.root", "update");
     list_web->Write();
     outFile_web->Close();
-    
+
     c_pidvalidation->Clear();
     c_pidvalidation->Print("test2_Validation_PID_plots.pdf","");
     c_pidvalidation->Print("test2_Validation_PID_plots.pdf]");

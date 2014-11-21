@@ -40,7 +40,7 @@ tools = [
     'DeltaEMbc',
     '^B- -> [anti-D0 -> K+ pi-] pi-',
     'MCTruth',
-    'B- -> [anti-D0 -> ^K+ ^pi-] ^pi-',
+    '^B- -> [^anti-D0 -> ^K+ ^pi-] ^pi-',
     'PID',
     'B- -> [anti-D0 -> ^K+ ^pi-] ^pi-',
     'Track',

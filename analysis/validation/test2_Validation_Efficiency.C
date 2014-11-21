@@ -1,5 +1,5 @@
 /*
-<header>   
+<header>
 <input>GenericB.ntup.root</input>
 <output>test2_Validation_Efficiency_output.root</output>
 <contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
@@ -81,7 +81,7 @@ void efficiency_and_plots( TH1* truth, TH1* reco, TGraphAsymmErrors* efficiency,
     else                                            h_efficiency->GetYaxis()->SetTitle("Photon efficiency");
     //h_efficiency->Draw("");
     //canvas->Print( Form("%s",sOutput.c_str()), Form("%s eff", sTitle.c_str()) );
-    
+
     canvas->Clear();
     efficiency->Divide(reco ,truth ,"cl=0.683 b(1,1) mode");
     efficiency->SetFillColor(kBlue);
@@ -181,12 +181,10 @@ void test2_Validation_Efficiency_Track_Reco(TString filename, TList* list) {
     tree->AddFile(filename);
 
     float pi_TruthP4[4];
-    int pi_mcPDG;
     int pi_mcStatus;
     int iCand;
     int nCands;
     int evt_no;
-    tree->SetBranchAddress("pi_mcPDG",    &pi_mcPDG);
     tree->SetBranchAddress("pi_mcStatus", &pi_mcStatus);
     tree->SetBranchAddress("pi_TruthP4",  &pi_TruthP4);
     tree->SetBranchAddress("iCand",       &iCand);
@@ -207,7 +205,6 @@ void test2_Validation_Efficiency_Track_Reco(TString filename, TList* list) {
         all_evt_tracks.push_back(lv_pi);
 
         if( pi_mcStatus>0 ) continue;
-        if( abs(pi_mcPDG)!=pid[pion] ) continue;
 
         ( (TH1*)list->FindObject( Form( "pi_P" ) ) )->Fill(lv_pi.Pt());
         if(lv_pi.Pt()<0.25) {
@@ -273,12 +270,12 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename, TList* list) {
     float gamma_clusterTiming;
     float gamma_TruthP4[4];
     float gamma_TruthP;
-    int gamma_mcPDG;
+    int gamma_mcStatus;
     int iCand;
     tree->SetBranchAddress("gamma_clusterTiming",  &gamma_clusterTiming);
     tree->SetBranchAddress("gamma_TruthP4", &gamma_TruthP4);
     tree->SetBranchAddress("gamma_TruthP",  &gamma_TruthP);
-    tree->SetBranchAddress("gamma_mcPDG",   &gamma_mcPDG);
+    tree->SetBranchAddress("gamma_mcStatus",   &gamma_mcStatus);
     tree->SetBranchAddress("iCand",         &iCand);
 
     // Run a check on cluster duplicates
@@ -289,13 +286,14 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename, TList* list) {
         TLorentzVector lv_gamma(gamma_TruthP4);
         if(iCand==0) all_evt_clusters.clear();
 
-        if( abs(gamma_mcPDG)!=pid[photon] ) continue;
+        if( gamma_mcStatus>0 ) continue;
+        //if( abs(gamma_mcPDG)!=pid[photon] ) continue;
         if(lv_gamma.E()<0.02) continue;
         if(lv_gamma.Theta()>2.71 || lv_gamma.Theta()<0.21) continue;
         if((lv_gamma.Theta()<0.58 && lv_gamma.Theta()>=0.21) ) region=1; //forward
         if((lv_gamma.Theta()<2.23 && lv_gamma.Theta()>=0.58) ) region=2; //barrel
         if((lv_gamma.Theta()<2.71 && lv_gamma.Theta()>=2.23) ) region=3; //backward
-        // Timing window
+        // TODO: Implement timing selection criteria
         // if( gamma_clusterTiming<0.75e3 || gamma_clusterTiming>2.5e3 ) continue;
 
         // For cluster duplicates
@@ -412,14 +410,14 @@ void test2_Validation_Efficiency(bool runOffline=false) {
 
     TCanvas* maincanvas = new TCanvas ("maincanvas","maincanvas");
     maincanvas->Print("test2_Validation_Efficiency_plots.pdf[");
-    
+
     TList* list_web = new TList;
-    
+
     ///////////////////// Tracks
     //Fill histograms
     test2_Validation_Efficiency_Track_Truth(filename, list_hist_tracks);
     test2_Validation_Efficiency_Track_Reco(filename, list_hist_tracks);
-    
+
     TList* list_eff_tracks = new TList;
     TGraphAsymmErrors* Eff_Track = new TGraphAsymmErrors();
     TH1F* h_Eff_Track = (TH1F*)h_pi_TruthP->Clone( "h_Eff_Track" );
@@ -470,15 +468,15 @@ void test2_Validation_Efficiency(bool runOffline=false) {
     // Fill histograms
     test2_Validation_Efficiency_Photon_Truth(filename, list_hist_photons);
     test2_Validation_Efficiency_Photon_Reco(filename, list_hist_photons);
-    
-    
+
+
     TList* list_eff_photons = new TList;
     TGraphAsymmErrors* Eff_Photon[4];
     TGraphAsymmErrors* Eff_PhotonTheta_LowE[4];
     TGraphAsymmErrors* Eff_PhotonTheta_HighE[4];
     TGraphAsymmErrors* Eff_PhotonPhLowE[4];
     TGraphAsymmErrors* Eff_PhotonPhHighE[4];
-    
+
     TH1F* h_Eff_Photon[4];
     TH1F* h_Eff_PhotonTheta_LowE[4];
     TH1F* h_Eff_PhotonTheta_HighE[4];
@@ -492,7 +490,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
         h_Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of energy. Input: Generic BBbar. ECL: %s", regions[i])));
         h_Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency, particularly at low E. Steep rise to 80 percent at 1 GeV."));
         list_eff_photons->Add( Eff_Photon[i] );
-        list_web->Add( h_Eff_Photon[i] );
+        if(i==0) list_web->Add( h_Eff_Photon[i] );
 
         Eff_PhotonTheta_LowE[i] = new TGraphAsymmErrors();
         h_Eff_PhotonTheta_LowE[i] = (TH1F*)h_gamma_Theta_LowE[i]->Clone( Form( "h_Eff_PhotonTheta_LowE_%s", regions[i] ) );
@@ -501,7 +499,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
         h_Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of theta_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E<500 MeV. ECL: %s", regions[i])));
         h_Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Dips at 0.6 and 2.3."));
         list_eff_photons->Add( Eff_PhotonTheta_LowE[i] );
-        list_web->Add( h_Eff_PhotonTheta_LowE[i] );
+        if(i==0) list_web->Add( h_Eff_PhotonTheta_LowE[i] );
 
         Eff_PhotonTheta_HighE[i] = new TGraphAsymmErrors();
         h_Eff_PhotonTheta_HighE[i] = (TH1F*)h_gamma_Theta_HighE[i]->Clone( Form( "h_Eff_PhotonTheta_HighE_%s", regions[i] ) );
@@ -510,7 +508,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
         h_Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of theta_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E>=500 MeV. ECL: %s", regions[i])));
         h_Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Dips at 0.6 and 2.3."));
         list_eff_photons->Add( Eff_PhotonTheta_HighE[i] );
-        list_web->Add( h_Eff_PhotonTheta_HighE[i] );
+        if(i==0) list_web->Add( h_Eff_PhotonTheta_HighE[i] );
 
         Eff_PhotonPhLowE[i] = new TGraphAsymmErrors();
         h_Eff_PhotonPhLowE[i] = (TH1F*)h_gamma_Phi_LowE[i]->Clone( Form( "h_Eff_PhotonPhLowE_%s", regions[i] ) );
@@ -519,7 +517,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
         h_Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of phi_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E<500 MeV. ECL: %s", regions[i])));
         h_Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Flat across the spectrum."));
         list_eff_photons->Add( Eff_PhotonPhLowE[i] );
-        list_web->Add( h_Eff_PhotonPhLowE[i] );
+        if(i==0) list_web->Add( h_Eff_PhotonPhLowE[i] );
 
         Eff_PhotonPhHighE[i] = new TGraphAsymmErrors();
         h_Eff_PhotonPhHighE[i] = (TH1F*)h_gamma_Phi_HighE[i]->Clone( Form( "h_Eff_PhotonPhHighE_%s", regions[i] ) );
@@ -528,7 +526,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
         h_Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of phi_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E>=500 MeV. ECL: %s", regions[i])));
         h_Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Flat across the spectrum."));
         list_eff_photons->Add( Eff_PhotonPhHighE[i] );
-        list_web->Add( h_Eff_PhotonPhHighE[i] );
+        if(i==0) list_web->Add( h_Eff_PhotonPhHighE[i] );
     }
 
     TFile* output = new TFile("test2_Validation_Efficiency_output.root", "recreate");
@@ -538,7 +536,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
     TDirectory* dir_photons = output->mkdir("Photons");
     dir_photons->cd();
     list_eff_photons->Write();
-    
+
     output->cd();
     list_web->Write();
     output->Close();

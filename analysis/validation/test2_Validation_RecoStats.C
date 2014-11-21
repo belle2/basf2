@@ -30,8 +30,6 @@
 #include <TTree.h>
 
 void test2_Validation_RecoStats() {
-    //gErrorIgnoreLevel = kError;
-
     TChain * recoTree = new TChain("eventtuple");
     recoTree->AddFile("../GenericB.ntup.root");
 
@@ -176,17 +174,17 @@ void test2_Validation_RecoStats() {
     }
     
     TFile * output = TFile::Open("test2_Validation_RecoStats_output.root", "recreate");
-    TNtuple* trecostats = new TNtuple("Reco Stats: N(objects)/Event", "tree", Form("%s",string(RecoStatsList).c_str()));
+    TNtuple* trecostats = new TNtuple("RecoStats", "Reco Stats: N(objects)/Event", Form("%s",string(RecoStatsList).c_str()));
     trecostats->SetAlias("Description", "Average MDST reconstruction object multiplicities per event. Useful to trace back problems to specific input.");
     trecostats->SetAlias("Check", "Look for any MDST classes that are empty, or changed substantially.");
     trecostats->Fill(RecoStatsMeans);
 
-    TNtuple* trecstats = new TNtuple("Detector Reco Stats: N(objects)/Event", "tree", Form("%s",string(DetectorStatsRecList).c_str()));
-    trecstats->SetAlias("Description", "Average MDST reculation object multiplicities per event. Useful to trace back problems to specific input.");
+    TNtuple* trecstats = new TNtuple("DetectorStats", "Detector Stats: N(objects)/Event", Form("%s",string(DetectorStatsRecList).c_str()));
+    trecstats->SetAlias("Description", "Average MDST reconstruction object multiplicities per event. Useful to trace back problems to specific input.");
     trecstats->SetAlias("Check", "Look for any MDST classes that are empty, or changed substantially. Note that MCParticles may change substantially in the case that secondary particles are preserved by subdetector reculation.");
     trecstats->Fill(DetectorStatsRecMeans);
 
-    TNtuple* tsimstats = new TNtuple("Detector Sim Stats: N(objects)/Event", "tree", Form("%s",string(DetectorStatsSimList).c_str()));
+    TNtuple* tsimstats = new TNtuple("SimStats", "Detector Sim Stats: N(objects)/Event", Form("%s",string(DetectorStatsSimList).c_str()));
     tsimstats->SetAlias("Description", "Average MDST simulation object multiplicities per event. Useful to trace back problems to specific input.");
     tsimstats->SetAlias("Check", "Look for any MDST classes that are empty, or changed substantially. Note that MCParticles may change substantially in the case that secondary particles are preserved by subdetector simulation.");
     tsimstats->Fill(DetectorStatsSimMeans);

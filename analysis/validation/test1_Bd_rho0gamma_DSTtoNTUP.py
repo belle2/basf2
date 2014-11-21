@@ -39,7 +39,7 @@ tools = [
     'Kinematics',
     '^B0 -> [^rho0 -> ^pi+ ^pi-] ^gamma',
     'MCTruth',
-    'B0 -> [rho0 -> ^pi+ ^pi-] ^gamma',
+    '^B0 -> [^rho0 -> ^pi+ ^pi-] ^gamma',
     'DeltaEMbc',
     '^B0 -> [rho0 -> pi+ pi-] gamma',
     'MCHierarchy',

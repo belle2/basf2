@@ -46,14 +46,14 @@ void WaveTimingModule::event()
     for (int w = 0; w < evtwaves_ptr.getEntries(); w++) {
 
       unsigned int channel_id = evtwaves_ptr[w]->GetChannelID();
-      double win_time_shift = evtwaves_ptr[w]->GetTime();
+      //double win_time_shift = evtwaves_ptr[w]->GetTime();
       std::vector< double > v_samples = evtwaves_ptr[w]->GetSamples();
       int refwin = evtwaves_ptr[w]->GetRefWindow();
       int win = evtwaves_ptr[w]->GetASICWindow();
-      int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
+      //int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
       float window_dt = (1. / 0.0212) / 2.0;
       float sample_dt = window_dt / 64.0;
-      float coarse_t = float(coarse_int) * window_dt;
+      //float coarse_t = float(coarse_int) * window_dt;
 
       //Find rough peak location
       m_tmp_h->Reset();
@@ -72,18 +72,18 @@ void WaveTimingModule::event()
       double steps = 10000.0;
       double step_size = (max - min) / steps;
       double max_adc = 0;
-      double max_t = 0;
+      //double max_t = 0;
       for (int i = 0; i < steps; i++) {
         double this_t = min + i * step_size;
         double val = s5->Eval(this_t);
         if (val > max_adc) {
           max_adc = val;
-          max_t = this_t;
+          //max_t = this_t;
         }
       }
       //Find 40%
       double damp_best = 9999;
-      double at40_adc = 0;
+      //double at40_adc = 0;
       double at40_t = 0;
       double min40 = 0;
       double max40 = max_bin;
@@ -99,7 +99,7 @@ void WaveTimingModule::event()
         }
       }
       delete s5;
-      max_t = at40_t;
+      //max_t = at40_t;
 
       //Create TOPDigit
       int barID = 0;

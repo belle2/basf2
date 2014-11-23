@@ -18,20 +18,16 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <vxd/geometry/GeoCache.h>
-#include <geometry/GeometryManager.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <genfit/TrackCand.h>
 #include <genfit/Track.h>
 #include <genfit/AbsTrackRep.h>
 #include <genfit/Exception.h>
-#include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
 #include <genfit/StateOnPlane.h>
 
 #include <TFile.h>
-#include <TGeoManager.h>
 #include <TH2F.h>
 #include <TMath.h>
 
@@ -63,8 +59,8 @@ DedxPIDModule::DedxPIDModule() : Module(),
 
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits, "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
-  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded if UseIndividualHits is false", double(0.0));
-  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded if UseIndividualHits is false", double(0.8));
+  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded if useIndividualHits is false", double(0.0));
+  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded if useIndividualHits is false", double(0.8));
 
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
@@ -74,7 +70,7 @@ DedxPIDModule::DedxPIDModule() : Module(),
   addParam("trackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
   addParam("enableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
 
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r8682_200k_events_upper_80perc_trunc.root"));
+  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r14119_400k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -190,7 +186,7 @@ void DedxPIDModule::initialize()
   VXD::GeoCache::getInstance();
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2FATAL("Need to have  SetupGenfitExtrapolationModule in path before this one.");
+    B2FATAL("Need to have SetupGenfitExtrapolationModule in path before this one.");
   }
 }
 
@@ -588,7 +584,6 @@ double DedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHelpe
   const TVector3& sensor_normal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
   const double angle = sensor_normal.Angle(local_momentum); //includes theta and phi components
 
-  //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
 }
 
@@ -608,15 +603,17 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
   std::vector<float> silicon_dedx; //used for averages
   silicon_dedx.reserve(num_hits);
 
+  VxdID prevSensor;
   for (int i = 0; i < num_hits; i++) {
     const HitClass* hit = hits[hit_indices.at(i)];
     if (!hit) {
       B2ERROR(hits.getName() << " index out of bounds!");
       continue;
     }
+    const VxdID& currentSensor = hit->getSensorID();
     int layer = -1;
     if (m_enableDebugOutput) {
-      layer = -hit->getSensorID().getLayerNumber();
+      layer = -currentSensor.getLayerNumber();
       assert(layer >= -6 && layer < 0);
     }
 
@@ -625,20 +622,21 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
     const double total_distance = getTraversedLength(hit, &helix);
     const float charge = hit->getCharge();
     const float dedx = charge / total_distance;
-    if (dedx > 0) {
-      //store data, if there's energy loss in last layer
+    if (dedx <= 0) {
+      B2WARNING("dE/dx is " << dedx << " in layer " << layer);
+    } else if (i == 0 or prevSensor != currentSensor) { //only save once per sensor (u and v hits share charge!)
+      prevSensor = currentSensor;
+      //store data
       silicon_dedx.push_back(dedx);
       track->m_dedx_avg[current_detector] += dedx;
       track->addDedx(layer, total_distance, dedx);
       if (!m_pdfFile.empty() and m_useIndividualHits) {
         saveLogLikelihood(track->m_svdLogl, track->m_p, dedx, m_pdfs[current_detector]);
       }
-    } else {
-      B2WARNING("dE/dx is zero in layer " << layer);
     }
 
     if (m_enableDebugOutput) {
-      track->addHit(TVector3(0, 0, 0), layer, hit->getSensorID(), 0, charge, false);
+      track->addHit(TVector3(0, 0, 0), layer, currentSensor, 0, charge, false);
     }
   }
 

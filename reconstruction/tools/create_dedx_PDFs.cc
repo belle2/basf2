@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
   }
 
   //create momentum binning (larger bins for high momentum)
-  const int num_p_bins = 65;
+  const int num_p_bins = 69;
   double pbins[num_p_bins + 1];
   for (int bin = 0; bin <= num_p_bins; bin++) {
     if (bin <= 25)

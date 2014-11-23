@@ -28,7 +28,7 @@ pdgs = [11, 13, 211, 321, 2212]
 pdgs += [-p for p in pdgs]
 
 generator = register_module('ParticleGun')
-generator.param('momentumParams', [0.05, 4.0])
+generator.param('momentumParams', [0.05, 4.5])
 generator.param('nTracks', 8.0)
 generator.param('pdgCodes', pdgs)
 main.add_module(generator)
@@ -49,6 +49,7 @@ add_reconstruction(main, components)
 for m in main.modules():
     if m.name() == 'DedxPID':
         m.param('enableDebugOutput', True)
+        # m.param('usePXD', True)
 
 
 output = register_module('RootOutput')

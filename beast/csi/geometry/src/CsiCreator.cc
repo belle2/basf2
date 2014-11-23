@@ -74,7 +74,7 @@ namespace Belle2 {
     void CsiCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
 
-      if (type) {}
+      //if (type) {}
 
 
       //

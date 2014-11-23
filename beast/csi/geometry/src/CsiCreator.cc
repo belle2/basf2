@@ -71,7 +71,7 @@ namespace Belle2 {
       if (m_sensitive) delete m_sensitive;
     }
 
-    void CsiCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void CsiCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
 
       //if (type) {}

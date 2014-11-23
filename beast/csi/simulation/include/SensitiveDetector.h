@@ -25,7 +25,17 @@ namespace Belle2 {
       ~SensitiveDetector();
 
 
-      //** Save ECLSimHit into datastore */
+      /** Save ECLSimHits of the event  into datastore
+       * @param cellID the channel identifier
+       * @param trackID the track identifier
+       * @param pid the pdg code of the particle
+       * @param tof the time of flight of the particle
+       * @param edep the energy deposited in the crystal by the particle
+       * @param mom the momentum of the particle
+       * @param WightedPos the weighted position.
+       *
+       * @return int the number of hits saved in this event
+       */
       int saveSimHit(
         const G4int cellId,
         const G4int trackID,
@@ -47,8 +57,8 @@ namespace Belle2 {
     private:
 
       /** members of  SensitiveDetector  */
-      G4double m_thresholdEnergyDeposit;/** Energy Deposit  threshold  */
-      G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
+      //      G4double m_thresholdEnergyDeposit;/** Energy Deposit  threshold  */
+      //G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
       int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore ECLSimHit. */
       int m_hitNum;                     /** The current number of created hits in an event. Used to fill the DataStore ECLHit.*/
       int m_EvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array. */
@@ -65,7 +75,7 @@ namespace Belle2 {
       double m_energyDeposit;     /** energy deposited in volume */
       double m_trackLength;       /** length of the track in the volume */
 
-      int ECLHitIndex[8736][80]; /** Hit index of StoreArray */
+      //int ECLHitIndex[8736][80]; /** Hit index of StoreArray */
       int iECLCell;              /** Hit Energy of StoreArray */
       int TimeIndex;             /** Hit Time of StoreArray */
       TVector3 PosCell;          /** center of crystal position */

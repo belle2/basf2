@@ -45,6 +45,7 @@
 using namespace std;
 using namespace boost;
 
+
 namespace Belle2 {
 
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the CSI detector */
@@ -53,18 +54,6 @@ namespace Belle2 {
     // Register the creator
     /** Creator creates the CSI geometry */
     geometry::CreatorFactory<CsiCreator> CsiFactory("CSICreator");
-
-    const double k_barConBackRThick(10.5 * CLHEP::cm);     // thickness of sup ring in back
-    const double k_barConBackZOut(-122.50 * CLHEP::cm);    // Z of container back at outer R
-    const double k_barConEndRngThick(0.2 * CLHEP::cm);     // endring thickess, both ends
-
-    const double k_barConForwZOut(229.0 * CLHEP::cm);      // Z of container forw at outer R
-    const double k_barConForwRThick(9.0 * CLHEP::cm);      // thickness of sup ring in forw
-    const double k_barSupForwFarZ(k_barConForwZOut + k_barConForwRThick) ;
-    const double k_c1z3(k_barSupForwFarZ + 31.*CLHEP::cm);
-    const double k_c2z1(k_c1z3 - 444.0 * CLHEP::cm);
-    const double k_c1r1(167.0 * CLHEP::cm);
-    const double k_l1r4(k_c1r1 - 0.2 * CLHEP::cm);
 
     // add foil thickness //
     const double foilthickness = 0.0100 * CLHEP::cm; /**< Crystal wrapping foil 100 um */
@@ -89,6 +78,24 @@ namespace Belle2 {
 
 
       //
+      // Instanciate CsI Envelope
+      // To do: get rid of that, and make an envelope per crystal box, fill it with
+      // all possible  combinaitions of  crystals, and then copy it to all positions.
+      ///////////////////////////////////////////////////////////////////////////////
+
+      double eclWorld_I[6] = {452, 452, 1250, 1250, 395, 395};//unit:mm
+      double eclWorld_O[6] = {1640, 1640, 1640, 1640, 1640, 1640};//unit:mm
+      double eclWorld_Z[6] = { -1450, -1010, -1010, 1960, 1960, 2400};//unit:mm
+      G4Polycone* eclWorld = new G4Polycone("eclWorld", 0, 2 * PI, 6, eclWorld_Z, eclWorld_I, eclWorld_O);
+
+      /** The CsI Logical Volume */
+      G4LogicalVolume* logical_ecl = new G4LogicalVolume(eclWorld, geometry::Materials::get("G4_Galactic"), "logical_ecl");
+      logical_ecl->SetVisAttributes(G4VisAttributes::GetInvisible());
+
+
+      new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_ecl, "physicalECL", &topVolume, false, 0);
+
+      //
       // Load materials
       // Note to AB: someday change this
       // to use materials from the .xml file
@@ -96,22 +103,6 @@ namespace Belle2 {
       G4Material* medCsI = geometry::Materials::get("CsI");
       G4Material* medAlTeflon = geometry::Materials::get("AlTeflon");
 
-
-      //
-      // Define CsI Envelope
-      // To do: get rid of that, and make an
-      // envelope per crystal box, fill it
-      // with all possible  combinaitions of
-      // crystals, and then copy it to all
-      // positions.
-      ////////////////////////////////////////
-      double eclWorld_I[6] = {452, 452, 1250, 1250, 395, 395};//unit:mm
-      double eclWorld_O[6] = {1640, 1640, 1640, 1640, 1640, 1640};//unit:mm
-      double eclWorld_Z[6] = { -1450, -1010, -1010, 1960, 1960, 2400};//unit:mm
-      G4Polycone* eclWorld = new G4Polycone("eclWorld", 0, 2 * PI, 6, eclWorld_Z, eclWorld_I, eclWorld_O);
-      logical_ecl = new G4LogicalVolume(eclWorld, geometry::Materials::get("G4_Galactic"), "logical_ecl");
-      physical_ecl = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_ecl, "physicalECL", &topVolume, false, 0);
-      logical_ecl->SetVisAttributes(G4VisAttributes::GetInvisible());
 
 
       // Create sub-assebmlies
@@ -126,7 +117,7 @@ namespace Belle2 {
       //
       //  "END-CAP:-LIKE  CRYSTALS
       ///////////////////////////////
-      double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
+      //double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
 
       for (int iCry = 1 ; iCry <= 4 ; ++iCry) {
 
@@ -134,21 +125,22 @@ namespace Belle2 {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
-        h1 = counter.getLength("K_h1") * CLHEP::cm;
-        h2 = counter.getLength("K_h2") * CLHEP::cm;
-        bl1 = counter.getLength("K_bl1") * CLHEP::cm;
-        bl2 = counter.getLength("K_bl2") * CLHEP::cm;
-        tl1 = counter.getLength("K_tl1") * CLHEP::cm;
-        tl2 = counter.getLength("K_tl2") * CLHEP::cm;
-        alpha1 = counter.getAngle("K_alpha1");
-        alpha2 = counter.getAngle("K_alpha2");
-        Rphi1 = counter.getAngle("K_Rphi1") ;
-        Rtheta = counter.getAngle("K_Rtheta") ;
-        Rphi2 = counter.getAngle("K_Rphi2")  ;
-        Pr = counter.getLength("K_Pr") * CLHEP::cm;
-        Ptheta = counter.getAngle("K_Ptheta") ;
-        Pphi = counter.getAngle("K_Pphi") ;
-        halflength = 15.0 * CLHEP::cm;
+        double h1 = counter.getLength("K_h1") * CLHEP::cm;
+        double h2 = counter.getLength("K_h2") * CLHEP::cm;
+        double bl1 = counter.getLength("K_bl1") * CLHEP::cm;
+        double bl2 = counter.getLength("K_bl2") * CLHEP::cm;
+        double tl1 = counter.getLength("K_tl1") * CLHEP::cm;
+        double tl2 = counter.getLength("K_tl2") * CLHEP::cm;
+        double alpha1 = counter.getAngle("K_alpha1");
+        double alpha2 = counter.getAngle("K_alpha2");
+        double Rphi1 = counter.getAngle("K_Rphi1") ;
+        double Rtheta = counter.getAngle("K_Rtheta") ;
+        double Rphi2 = counter.getAngle("K_Rphi2")  ;
+        double Pr = counter.getLength("K_Pr") * CLHEP::cm;
+        double Ptheta = counter.getAngle("K_Ptheta") ;
+        double Pphi = counter.getAngle("K_Pphi") ;
+        double halflength = 15.0 * CLHEP::cm;
+
 
         double fwfoilthickness = foilthickness;
 

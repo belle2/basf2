@@ -42,11 +42,9 @@ namespace Belle2 {
       CsiCreator();
       virtual ~CsiCreator();
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+
     protected:
       SensitiveDetector* m_sensitive;  /**<  SensitiveDetector CSI */
-
-      G4LogicalVolume* logical_ecl;    /**< The CsI Logical Volume */
-      G4VPhysicalVolume* physical_ecl; /**< The CsI Physical Volume*/
     };
 
   }

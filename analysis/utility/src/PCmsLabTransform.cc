@@ -12,6 +12,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/GearDir.h>
 #include <iostream>
 
 using namespace Belle2;
@@ -38,10 +39,12 @@ PCmsLabTransform::PCmsLabTransform()
 {
   if (m_initialized) return;
 
-  double Eher = 7.0 * Unit::GeV;
-  double Eler = 4.0 * Unit::GeV;
-  double cross_angle = 83 * Unit::mrad;
-  double angle = 41.5 * Unit::mrad;
+  GearDir LER("/Detector/SuperKEKB/LER/");
+  GearDir HER("/Detector/SuperKEKB/HER/");
+  double Eher = HER.getEnergy("energy");
+  double Eler = LER.getEnergy("energy");
+  double cross_angle = HER.getAngle("angle") - LER.getAngle("angle");
+  double angle = HER.getAngle("angle");
   update(Eher, Eler, cross_angle, angle);
   m_initialized = true;
 }

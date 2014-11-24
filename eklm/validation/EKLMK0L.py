@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+<output>EKLMK0LOutput.root</output>
+<contact>Timofey Uglov, uglov@itep.ru</contact>
+</header>
+"""
+
 import os
 import random
 from basf2 import *

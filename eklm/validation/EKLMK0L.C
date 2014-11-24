@@ -1,3 +1,13 @@
+
+/*
+<header>
+<input>EKLMK0LOutput.root</input>
+<output>EKLMK0L.root</output>
+<contact>Timofey Uglov, uglov@itep.ru</contact>
+</header>
+*/
+
+
 void EKLMK0L()
 {
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  

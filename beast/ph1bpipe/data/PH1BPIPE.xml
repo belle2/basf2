@@ -32,6 +32,8 @@
     <xpipe_innerRadius unit="cm">4.0</xpipe_innerRadius>
     <xpipe_outerRadius unit="cm">4.5</xpipe_outerRadius>
     <xpipe_hz unit="cm">200.0</xpipe_hz>
+    <xpipePOS_hz unit="cm">182.0</xpipePOS_hz>
+    <xpipeMIN_hz unit="cm">146.0</xpipeMIN_hz>
     
   </Content>
 </DetectorComponent>

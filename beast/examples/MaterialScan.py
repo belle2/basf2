@@ -18,6 +18,7 @@ eventinfosetter.param({'runList': [1], 'evtNumList': [1]})
 # geometry.param('Components', ['BGO', 'MICROTPC'])
 # geometry.param('Components', ['PH1BPIPE'])
 geometry.param('Components', [
+    'FarBeamLine',
     'BGO',
     'MICROTPC',
     'HE3TUBE',
@@ -25,7 +26,6 @@ geometry.param('Components', [
     'PINDIODE',
     'PH1BPIPE',
     'CSI',
-    'BEAMABORT',
     'PH1SUSTR',
     ])
 

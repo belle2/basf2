@@ -216,6 +216,25 @@ namespace Belle2 {
                                        content.getLength("xpipe_outerRadius")*CLHEP::cm,
                                        content.getLength("xpipe_hz")*CLHEP::cm,
                                        startAngle, spanningAngle);
+      G4VSolid* s_XshapePOS = new G4Tubs("s_XshapePOScl",
+                                         content.getLength("xpipe_innerRadius")*CLHEP::cm,
+                                         content.getLength("xpipe_outerRadius")*CLHEP::cm,
+                                         content.getLength("xpipePOS_hz")*CLHEP::cm,
+                                         startAngle, spanningAngle);
+      G4VSolid* s_XshapeMIN = new G4Tubs("s_XshapeMINcl",
+                                         content.getLength("xpipe_innerRadius")*CLHEP::cm,
+                                         content.getLength("xpipe_outerRadius")*CLHEP::cm,
+                                         content.getLength("xpipeMIN_hz")*CLHEP::cm,
+                                         startAngle, spanningAngle);
+
+      G4double POStubpos =  content.getLength("xpipe_hz") / 2.*CLHEP::cm + content.getLength("xpipePOS_hz") / 2.*CLHEP::cm;
+      G4double MINtubpos = -content.getLength("xpipe_hz") / 2.*CLHEP::cm - content.getLength("xpipeMIN_hz") / 2.*CLHEP::cm;
+      s_Xshape1 = new G4UnionSolid("s_Xshape1+s_XshapePOS", s_Xshape1, s_XshapePOS, G4Translate3D(0., 0., POStubpos));
+      s_Xshape1 = new G4UnionSolid("s_Xshape1+s_XshapeMIN", s_Xshape1, s_XshapeMIN, G4Translate3D(0., 0., MINtubpos));
+
+      s_Xshape2 = new G4UnionSolid("s_Xshape2+s_XshapePOS", s_Xshape2, s_XshapePOS, G4Translate3D(0., 0., POStubpos));
+      s_Xshape2 = new G4UnionSolid("s_Xshape2+s_XshapeMIN", s_Xshape2, s_XshapeMIN, G4Translate3D(0., 0., MINtubpos));
+
       //make the union
       G4Transform3D transform_X = G4Translate3D(0., 0., 0.);
       transform_X = transform_X * G4RotateY3D(0.083 * CLHEP::rad);

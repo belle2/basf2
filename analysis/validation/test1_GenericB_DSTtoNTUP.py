@@ -4,7 +4,7 @@
 """
 <header>
   <input>GenericB_GENSIMRECtoDST.dst.root</input>
-  <output>my_GenericB.ntup.root</output>
+  <output>GenericB.ntup.root</output>
   <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>
 """

@@ -142,13 +142,13 @@ namespace Belle2 {
 
       // NIEL file names - placed in svd/data, so needn't be module parameters.
       /** NIEL-correction file for neutrons */
-      const std::string c_niel_neutronFile = "svd/data/neutrons.csv";
+      const std::string c_niel_neutronFile = "/svd/data/neutrons.csv";
       /** NIEL-correction file for protons */
-      const std::string c_niel_protonFile = "svd/data/protons.csv";
+      const std::string c_niel_protonFile = "/svd/data/protons.csv";
       /** NIEL-correction file for pions */
-      const std::string c_niel_pionFile = "svd/data/pions.csv";
+      const std::string c_niel_pionFile = "/svd/data/pions.csv";
       /** NIEL-correction file for electrons */
-      const std::string c_niel_electronFile = "svd/data/electrons.csv";
+      const std::string c_niel_electronFile = "/svd/data/electrons.csv";
       // No NIEL for photons.
 
       /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.

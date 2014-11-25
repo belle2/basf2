@@ -1,6 +1,7 @@
 #include <svd/background/niel_fun.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 #include <fstream>
 
 // IMPORTANT!!!!! OUTSIDE THE RANGE OF THE DATA, THE VALUE IS SET TO THE CLOSEST KNOWN VALUE
@@ -33,8 +34,13 @@ using namespace Belle2;
 
 TNiel::TNiel(const string FileName)
 {
+  string fullName = FileSystem::findFile(FileName);
+  if (fullName == "") {
+    B2FATAL("TNIEL: Can't locate " << FileName);
+    return;
+  }
   ifstream inputfile;
-  inputfile.open(FileName.c_str(), ifstream::in);
+  inputfile.open(fullName.c_str(), ifstream::in);
   if (!inputfile.good()) {
     B2FATAL("TNIEL: Error opening input file " << FileName);
     return;

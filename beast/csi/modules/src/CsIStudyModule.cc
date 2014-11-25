@@ -43,6 +43,7 @@ CsIStudyModule::CsIStudyModule() : Module()
   addParam("histoFileName", m_inputFileName, "Output file containing histograms",
            string("CsIPlots.root"));
 
+  initialize();
 }
 
 CsIStudyModule::~CsIStudyModule()

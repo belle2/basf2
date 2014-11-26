@@ -36,11 +36,12 @@ def removeJPsiSlash(filename):
     return filename.replace('/', '')
 
 
-def CountMCParticles(path, names):
+def CountMCParticles(path, names, gearbox):
     """
     Counts the number of MC Particles for every pdg code in all events
         @param path the basf2 path
         @param names of all particles
+        @param gearbox ensures gearbox is loaded first
     """
     B2INFO("Load number of MCParticles for every pdg code seperatly")
     filename = 'mcParticlesCount.root'
@@ -69,7 +70,7 @@ def CountMCParticles(path, names):
     return {'mcCounts': counter, '__cache__': True}
 
 
-def FSPDistribution(path, hash, identifier, inputList, mvaConfigTarget):
+def FSPDistribution(path, hash, identifier, inputList, mvaConfigTarget, gearbox):
     """
     Returns signal and background distribution of FSP
     Counts the number of MC Particles for every pdg code in all events
@@ -77,6 +78,7 @@ def FSPDistribution(path, hash, identifier, inputList, mvaConfigTarget):
         @param identifier unique identifier of the particle
         @param inputList particle list name
         @param mvaConfig configuration for the multivariate analysis
+        @param gearbox ensures gearbox is loaded first
     """
     B2INFO("Calculate signal and background candiates of FSP {i}".format(i=inputList))
     filename = removeJPsiSlash('{i}_{h}.root'.format(i=inputList, h=hash))
@@ -186,19 +188,30 @@ def CopyParticleLists(path, hash, particleName, particleLabel, inputLists, postC
             '__cache__': True}
 
 
-def LoadGeometry(path):
+def LoadGearbox(path):
+    """
+    Loads Gearbox module
+    @param path the basf2 path
+    @return Resource named gearbox
+    """
+    B2INFO("Adding Gearbox to Path")
+    gearbox = register_module('Gearbox')
+    path.add_module(gearbox)
+    return {'gearbox': 'dummy'}
+
+
+def LoadGeometry(path, gearbox):
     """
     Loads Geometry module
     @param path the basf2 path
-    @return Resource named Geometry
+    @param gearbox ensures gearbox is loaded first
+    @return Resource named geometry
     """
-    B2INFO("Adding Geometry and Gearbox to Path")
-    gearbox = register_module('Gearbox')
-    path.add_module(gearbox)
+    B2INFO("Adding Geometry to Path")
     geometry = register_module('Geometry')
     geometry.param('components', ['MagneticField'])
     path.add_module(geometry)
-    B2INFO("Added Geometry and Gearbox to Path")
+    B2INFO("Added Geometry to Path")
     return {'geometry': 'dummy'}
 
 
@@ -210,7 +223,7 @@ def FitVertex(path, hash, channelName, particleList, daughterVertices, geometry)
         @param channelName unique name describing the channel
         @param particleList ParticleList name
         @param daughterVertices to ensure all daughter particles have valid error matrices
-        @param additional requirement to ensure that geometry module is loaded
+        @param geometry additional requirement to ensure that geometry module is loaded
         @return Resource named VertexFit_{channelName}
     """
     B2INFO("Enter: Fitted vertex for channel {c}.".format(c=channelName))
@@ -408,7 +421,7 @@ def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribut
     return {'__needed__': False}
 
 
-def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbability):
+def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbability, gearbox):
     """
     Saves the calculated signal probability for this particle list
         @param path the basf2 path
@@ -416,6 +429,7 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
         @param particleIdentifier valid pdg particle name + optional user label seperated by :
         @param particleList the particleList
         @param signalProbability signalProbability as additional dependency
+        @param gearbox ensures gearbox is loaded first
         @return Resource named VariablesToNTuple_{particleIdentifier} providing root filename
     """
     B2INFO("Enter: Write variables to ntuple for particle {i}".format(i=particleIdentifier))

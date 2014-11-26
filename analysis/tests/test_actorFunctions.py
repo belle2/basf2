@@ -39,7 +39,7 @@ class TestCountMCParticles(unittest.TestCase):
 
     def test_standard(self):
         """ Unittest function """
-        result = CountMCParticles(self.path, ['e+', 'gamma', 'D+'])
+        result = CountMCParticles(self.path, ['e+', 'gamma', 'D+'], {'gearbox': 'dummy'})
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -57,7 +57,7 @@ class TestFSPDistribution(unittest.TestCase):
 
     def test_standard(self):
         """ Unittest function """
-        result = FSPDistribution(self.path, self.standardHash, 'e+', 'e+:listname', mvaConfig.target)
+        result = FSPDistribution(self.path, self.standardHash, 'e+', 'e+:listname', mvaConfig.target, {'gearbox': 'dummy'})
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -208,11 +208,10 @@ class TestLoadGeometry(unittest.TestCase):
 
     def test_standard(self):
         """ Unittest function """
-        result = LoadGeometry(self.path)
+        result = LoadGeometry(self.path, {'gearbox': 'dummy'})
         self.assertDictEqual(result, {'geometry': 'dummy'})
-        self.assertEqual(len(self.path.modules()), 2)
+        self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
         self.assertListEqual(parameters['components'], ['MagneticField'])
 
 

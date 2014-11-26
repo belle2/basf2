@@ -201,6 +201,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
     # Add top-level actors
     play.addActor(CountMCParticles, names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
+    play.addActor(LoadGearbox)
     play.addActor(LoadGeometry)
 
     if user_selection_path is None:

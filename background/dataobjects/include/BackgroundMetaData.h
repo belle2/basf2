@@ -23,12 +23,19 @@ namespace Belle2 {
   class BackgroundMetaData: public TObject {
 
   public:
+    /**
+     * Enum for BG file types
+     */
+    enum EFileType { c_Usual = 0,  /**< usual BG file */
+                     c_ECL   = 1,  /**< additional for ECL */
+                     c_PXD   = 2   /**< additional for PXD */
+                   };
 
     /**
      * Constructor
      */
     BackgroundMetaData() : m_backgroundTag(SimHitBase::bg_other),
-      m_realTime(0.0)
+      m_realTime(0.0), m_fileType(c_Usual)
     {}
 
     /**
@@ -50,6 +57,12 @@ namespace Belle2 {
     void setRealTime(float time) {m_realTime = time;}
 
     /**
+     * Sets file type
+     * @param type file type
+     */
+    void setFileType(EFileType type) {m_fileType = type;}
+
+    /**
      * Returns the type of background
      * @return background type
      */
@@ -67,17 +80,23 @@ namespace Belle2 {
      */
     float getRealTime() const {return m_realTime;}
 
+    /**
+     * Returns file type
+     * @return file type
+     */
+    EFileType getFileType() const {return m_fileType;}
 
   private:
 
     std::string m_backgroundType; /**< beam background type */
     SimHitBase::BG_TAG m_backgroundTag; /**< background tag value */
     float m_realTime; /**< real time that corresponds to beam background sample */
+    EFileType m_fileType; /**< file type */
 
     /**
-     * Class definition required for the creation of the ROOT dictionary.
+     * Class definition required for creation of ROOT dictionary.
      */
-    ClassDef(BackgroundMetaData, 1);
+    ClassDef(BackgroundMetaData, 2);
   };
 }
 

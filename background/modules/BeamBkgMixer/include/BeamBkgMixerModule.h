@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <simulation/dataobjects/SimHitBase.h>
 #include <simulation/background/BeamBGTypes.h>
+#include <background/dataobjects/BackgroundMetaData.h>
 #include <string>
 
 #include "TFile.h"
@@ -70,11 +71,6 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
 
     /**
@@ -102,36 +98,41 @@ namespace Belle2 {
      * structure to hold samples of a particular background type
      */
     struct BkgFiles {
-      unsigned tag;        /**< background tag */
-      std::string type;    /**< background type */
-      double realTime;     /**< real time of BG samlpe */
-      double scaleFactor;  /**< scale factor for the rate */
-      std::vector<std::string> fileNames;  /**< file names */
-      TChain* tree;        /**< tree pointer */
-      unsigned numFiles;   /**< number of files connected to TChain */
-      unsigned numEvents;  /**< number of events (tree entries) in the sample */
-      unsigned eventCount; /**< current event (tree entry) */
-      double rate;         /**< background rate of the sample */
-      BkgHits simHits;     /**< input event buffer */
+      SimHitBase::BG_TAG tag;  /**< background tag */
+      std::string type;        /**< background type */
+      double realTime;         /**< real time of BG samlpe */
+      double scaleFactor;      /**< scale factor for the rate */
+      std::vector<std::string> fileNames;     /**< file names */
+      BackgroundMetaData::EFileType fileType; /**< file type */
+      TChain* tree;            /**< tree pointer */
+      unsigned numFiles;       /**< number of files connected to TChain */
+      unsigned numEvents;      /**< number of events (tree entries) in the sample */
+      unsigned eventCount;     /**< current event (tree entry) */
+      double rate;             /**< background rate of the sample */
+      BkgHits simHits;         /**< input event buffer */
 
       /**
        * default constructor
        */
-      BkgFiles(): tag(0), realTime(0.0), scaleFactor(1.0),
+      BkgFiles(): tag(SimHitBase::bg_none), realTime(0.0), scaleFactor(1.0),
+        fileType(BackgroundMetaData::c_Usual),
         tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0)
       {}
       /**
-       * constructor with tag, type, file name and real time
+       * constructor with tag, type, file name, and real time
        * @param bkgTag background tag
        * @param bkgType background type
        * @param fileName file name
        * @param realTime real time that corresponds to background sample
+       * @param fileTyp file type
        */
-      BkgFiles(unsigned bkgTag,
+      BkgFiles(SimHitBase::BG_TAG bkgTag,
                const std::string& bkgType,
                const std::string& fileName,
-               double time):
+               double time,
+               BackgroundMetaData::EFileType fileTyp = BackgroundMetaData::c_Usual):
         tag(bkgTag), type(bkgType), realTime(time), scaleFactor(1.0),
+        fileType(fileTyp),
         tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0) {
         fileNames.push_back(fileName);
       }
@@ -143,11 +144,15 @@ namespace Belle2 {
      * @param simHits a reference to DataStore SimHits
      * @param cloneArray a pointer to background SimHits read from a file
      * @param timeShift time shift to be applied to background SimHits
+     * @param minTime time window left edge
+     * @param maxTime time window right edge
      */
     template<class SIMHIT>
     void addSimHits(StoreArray<SIMHIT>& simHits,
                     TClonesArray* cloneArray,
-                    double timeShift) {
+                    double timeShift,
+                    double minTime,
+                    double maxTime) {
       if (!cloneArray) return;
       if (!simHits.isValid()) return;
 
@@ -159,9 +164,18 @@ namespace Belle2 {
         simHit->shiftInTime(timeShift);
         if (simHit->getBackgroundTag() == 0) // should be properly set at bkg simulation
           simHit->setBackgroundTag(SimHitBase::bg_other);
+        if (m_wrapAround) {
+          double time = simHit->getGlobalTime();
+          if (time > maxTime) {
+            double windowSize = maxTime - minTime;
+            double shift = int((time - minTime) / windowSize) * windowSize;
+            simHit->shiftInTime(-shift);
+          }
+        }
       }
 
     }
+
 
     /**
      * Returns true if a component is found in components or the list is empty.
@@ -179,11 +193,13 @@ namespace Belle2 {
      * @param bkgType background type
      * @param fileName file name
      * @param realTime real time that corresponds to background sample
+     * @param fileTyp file type
      */
-    void appendSample(unsigned bkgTag,
+    void appendSample(SimHitBase::BG_TAG bkgTag,
                       const std::string& bkgType,
                       const std::string& fileName,
-                      double realTime);
+                      double realTime,
+                      BackgroundMetaData::EFileType fileTyp);
 
 
     std::vector<std::string> m_backgroundFiles; /**< names of beam background files */
@@ -191,6 +207,9 @@ namespace Belle2 {
     double m_minTime;  /**< minimal time shift of background event */
     double m_maxTime;  /**< maximal time shift of background event */
     std::vector<std::string> m_components; /**< detector components */
+    bool m_wrapAround; /**< if true wrap around events in the tail after maxTime */
+    double m_minTimeECL;  /**< minimal time shift of background event for ECL */
+    double m_maxTimeECL;  /**< maximal time shift of background event for ECL */
 
     std::vector<BkgFiles> m_backgrounds;  /**< container for background samples */
 

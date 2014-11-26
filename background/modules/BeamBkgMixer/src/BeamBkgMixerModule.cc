@@ -80,6 +80,12 @@ namespace Belle2 {
     addParam("components", m_components,
              "Detector components to be included, empty list means all components",
              m_components);
+    addParam("wrapAround", m_wrapAround,
+             "if true wrap around events passing time window upper edge", true);
+    addParam("minTimeECL", m_minTimeECL,
+             "Time window lower edge for ECL in nano seconds", -16000.0);
+    addParam("maxTimeECL", m_maxTimeECL,
+             "Time window upper edge for ECL in nano seconds", 8500.0);
 
   }
 
@@ -151,20 +157,25 @@ namespace Belle2 {
         B2ERROR(file << ": tree 'persistent' has no entries");
         continue;
       }
+
       TObject* bkgMetaData = 0; // Note: allocation left to root
-      persistent.SetBranchAddress("BackgroundMetaData", &bkgMetaData);
-      if (bkgMetaData == 0) {
+      TBranch* branchBMD = persistent.GetBranch("BackgroundMetaData");
+      if (!branchBMD) {
         B2ERROR(file << ": branch 'BackgroundMetaData' not found");
         continue;
       }
-      std::vector<unsigned> tags;
+      branchBMD->SetAddress(&bkgMetaData);
+
+      std::vector<SimHitBase::BG_TAG> tags;
       std::vector<std::string> types;
+      std::vector<BackgroundMetaData::EFileType> fileTypes;
       double realTime = 0;
       for (unsigned k = 0; k < persistent.GetEntries(); k++) {
         persistent.GetEntry(k);
         BackgroundMetaData* bgMD = static_cast<BackgroundMetaData*>(bkgMetaData);
         tags.push_back(bgMD->getBackgroundTag());
         types.push_back(bgMD->getBackgroundType());
+        fileTypes.push_back(bgMD->getFileType());
         realTime += bgMD->getRealTime();
       }
       if (realTime <= 0) {
@@ -177,8 +188,14 @@ namespace Belle2 {
           continue;
         }
       }
+      for (unsigned i = 1; i < fileTypes.size(); ++i) {
+        if (fileTypes[i] != fileTypes[0]) {
+          B2ERROR(file << ": files with mixed file types not supported");
+          continue;
+        }
+      }
 
-      appendSample(tags[0], types[0], file, realTime);
+      appendSample(tags[0], types[0], file, realTime, fileTypes[0]);
 
     }
 
@@ -209,14 +226,22 @@ namespace Belle2 {
       bkg.numEvents = bkg.tree->GetEntries();
       bkg.rate =  bkg.numEvents / bkg.realTime * bkg.scaleFactor;
 
-      if (m_PXD) bkg.tree->SetBranchAddress("PXDSimHits", &bkg.simHits.PXD);
-      if (m_SVD) bkg.tree->SetBranchAddress("SVDSimHits", &bkg.simHits.SVD);
-      if (m_CDC) bkg.tree->SetBranchAddress("CDCSimHits", &bkg.simHits.CDC);
-      if (m_TOP) bkg.tree->SetBranchAddress("TOPSimHits", &bkg.simHits.TOP);
-      if (m_ARICH) bkg.tree->SetBranchAddress("ARICHSimHits", &bkg.simHits.ARICH);
-      if (m_ECL) bkg.tree->SetBranchAddress("ECLHits", &bkg.simHits.ECL);
-      if (m_BKLM) bkg.tree->SetBranchAddress("BKLMSimHits", &bkg.simHits.BKLM);
-      if (m_EKLM) bkg.tree->SetBranchAddress("EKLMSimHits", &bkg.simHits.EKLM);
+      if (m_PXD and bkg.tree->GetBranch("PXDSimHits"))
+        bkg.tree->SetBranchAddress("PXDSimHits", &bkg.simHits.PXD);
+      if (m_SVD and bkg.tree->GetBranch("SVDSimHits"))
+        bkg.tree->SetBranchAddress("SVDSimHits", &bkg.simHits.SVD);
+      if (m_CDC and bkg.tree->GetBranch("CDCSimHits"))
+        bkg.tree->SetBranchAddress("CDCSimHits", &bkg.simHits.CDC);
+      if (m_TOP and bkg.tree->GetBranch("TOPSimHits"))
+        bkg.tree->SetBranchAddress("TOPSimHits", &bkg.simHits.TOP);
+      if (m_ARICH and bkg.tree->GetBranch("ARICHSimHits"))
+        bkg.tree->SetBranchAddress("ARICHSimHits", &bkg.simHits.ARICH);
+      if (m_ECL and bkg.tree->GetBranch("ECLHits"))
+        bkg.tree->SetBranchAddress("ECLHits", &bkg.simHits.ECL);
+      if (m_BKLM and bkg.tree->GetBranch("BKLMSimHits"))
+        bkg.tree->SetBranchAddress("BKLMSimHits", &bkg.simHits.BKLM);
+      if (m_EKLM and bkg.tree->GetBranch("EKLMSimHits"))
+        bkg.tree->SetBranchAddress("EKLMSimHits", &bkg.simHits.EKLM);
 
       // print INFO
       std::string unit(" ns");
@@ -271,6 +296,9 @@ namespace Belle2 {
     if (m_EKLM && !eklmSimHits.isValid()) eklmSimHits.create();
 
     for (auto & bkg : m_backgrounds) {
+
+      if (bkg.fileType != BackgroundMetaData::c_Usual) continue;
+
       double mean = bkg.rate * (m_maxTime - m_minTime);
       int nev = gRandom->Poisson(mean);
 
@@ -278,14 +306,14 @@ namespace Belle2 {
         double timeShift = gRandom->Rndm() * (m_maxTime - m_minTime) + m_minTime;
         bkg.tree->GetEntry(bkg.eventCount);
 
-        addSimHits(pxdSimHits, bkg.simHits.PXD, timeShift);
-        addSimHits(svdSimHits, bkg.simHits.SVD, timeShift);
-        addSimHits(cdcSimHits, bkg.simHits.CDC, timeShift);
-        addSimHits(topSimHits, bkg.simHits.TOP, timeShift);
-        addSimHits(arichSimHits, bkg.simHits.ARICH, timeShift);
-        addSimHits(eclHits, bkg.simHits.ECL, timeShift);
-        addSimHits(bklmSimHits, bkg.simHits.BKLM, timeShift);
-        addSimHits(eklmSimHits, bkg.simHits.EKLM, timeShift);
+        addSimHits(pxdSimHits, bkg.simHits.PXD, timeShift, m_minTime, m_maxTime);
+        addSimHits(svdSimHits, bkg.simHits.SVD, timeShift, m_minTime, m_maxTime);
+        addSimHits(cdcSimHits, bkg.simHits.CDC, timeShift, m_minTime, m_maxTime);
+        addSimHits(topSimHits, bkg.simHits.TOP, timeShift, m_minTime, m_maxTime);
+        addSimHits(arichSimHits, bkg.simHits.ARICH, timeShift, m_minTime, m_maxTime);
+        addSimHits(eclHits, bkg.simHits.ECL, timeShift, m_minTime, m_maxTime);
+        addSimHits(bklmSimHits, bkg.simHits.BKLM, timeShift, m_minTime, m_maxTime);
+        addSimHits(eklmSimHits, bkg.simHits.EKLM, timeShift, m_minTime, m_maxTime);
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {
@@ -293,6 +321,37 @@ namespace Belle2 {
           B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
         }
       }
+    }
+
+
+    for (auto & bkg : m_backgrounds) {
+
+      if (bkg.fileType != BackgroundMetaData::c_ECL) continue;
+
+      double mean = bkg.rate * (m_maxTimeECL - m_minTimeECL);
+      int nev = gRandom->Poisson(mean);
+
+      for (int iev = 0; iev < nev; iev++) {
+        double timeShift = gRandom->Rndm() * (m_maxTimeECL - m_minTimeECL) + m_minTimeECL;
+        if (timeShift > m_minTime and timeShift < m_maxTime) continue;
+        bkg.tree->GetEntry(bkg.eventCount);
+
+        double minTime = m_minTimeECL;
+        double maxTime = m_maxTimeECL;
+        if (timeShift <= m_minTime) {
+          maxTime = m_minTime;
+        } else {
+          minTime = m_maxTime;
+        }
+        addSimHits(eclHits, bkg.simHits.ECL, timeShift, minTime, maxTime);
+
+        bkg.eventCount++;
+        if (bkg.eventCount >= bkg.numEvents) {
+          bkg.eventCount = 0;
+          B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
+        }
+      }
+
     }
 
   }
@@ -309,10 +368,6 @@ namespace Belle2 {
       delete bkg.tree;
     }
 
-  }
-
-  void BeamBkgMixerModule::printModuleParams() const
-  {
   }
 
 
@@ -332,19 +387,23 @@ namespace Belle2 {
   }
 
 
-  void BeamBkgMixerModule::appendSample(unsigned tag,
+  void BeamBkgMixerModule::appendSample(SimHitBase::BG_TAG  tag,
                                         const std::string& type,
                                         const std::string& fileName,
-                                        double realTime)
+                                        double realTime,
+                                        BackgroundMetaData::EFileType fileType)
   {
     for (auto & bkg : m_backgrounds) {
-      if (tag == bkg.tag) {
+      if (tag == bkg.tag and fileType == bkg.fileType) {
         bkg.fileNames.push_back(fileName);
         bkg.realTime += realTime;
         return;
       }
     }
-    m_backgrounds.push_back(BkgFiles(tag, type, fileName, realTime));
+    std::string ftype = type;
+    if (fileType == BackgroundMetaData::c_ECL) ftype += "(ECL)";
+    if (fileType == BackgroundMetaData::c_PXD) ftype += "(PXD)";
+    m_backgrounds.push_back(BkgFiles(tag, ftype, fileName, realTime, fileType));
   }
 
 

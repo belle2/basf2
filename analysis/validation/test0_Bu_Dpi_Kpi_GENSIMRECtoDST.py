@@ -3,7 +3,6 @@
 
 """
 <header>
-  <input>Bu_D0pi,Kpi.dec</input>
   <output>Bu_D0pi_Kpi_GENSIMRECtoDST.dst.root</output>
   <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>

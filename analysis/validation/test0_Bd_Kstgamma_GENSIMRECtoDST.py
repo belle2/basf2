@@ -3,7 +3,6 @@
 
 """
 <header>
-  <input>Bd_Kstgamma.dec</input>
   <output>Bd_Kstgamma_GENSIMRECtoDST.dst.root</output>
   <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>

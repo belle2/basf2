@@ -3,7 +3,6 @@
 
 """
 <header>
-  <input>Bd_rho0gamma,pipi.dec</input>
   <output>Bd_rho0gamma_GENSIMRECtoDST.dst.root</output>
   <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>

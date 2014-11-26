@@ -3,7 +3,6 @@
 
 """
 <header>
-  <input>Bd_JpsiKS,mumu.dec</input>
   <output>Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root</output>
   <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>

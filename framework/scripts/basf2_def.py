@@ -143,9 +143,11 @@ def process(path, max_event=0):
         if os.path.isfile(pickle_path) and path is None:
             path = deserialize_path(pickle.load(open(pickle_path, 'r')))
         # Otherwise we dump the given path into the pickle file and exit
-        else:
+        elif not path is None:
             pickle.dump(serialize_path(path), open(pickle_path, 'w'))
             return
+        else:
+            B2FATAL("Couldn't open path-file '" + pickle_path + "' and no steering file provided.")
 
     if max_event != 0:
         fw.process(path, max_event)

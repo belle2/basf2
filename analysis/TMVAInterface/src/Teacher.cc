@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <analysis/TMVAInterface/Teacher.h>
+#include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 
@@ -19,6 +20,7 @@
 #include <TString.h>
 #include <TSystem.h>
 
+#include <boost/property_tree/xml_parser.hpp>
 #include <boost/version.hpp>
 
 #include <sstream>

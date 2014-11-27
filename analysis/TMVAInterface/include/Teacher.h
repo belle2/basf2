@@ -16,14 +16,10 @@
 #include <framework/pcore/RootMergeable.h>
 
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 
 #include <vector>
 #include <string>
 
-/**
- * Forward declaration
- */
 class TFile;
 class TTree;
 

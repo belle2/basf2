@@ -9,7 +9,15 @@
 
 
 #include <analysis/TMVAInterface/Expert.h>
+#include <analysis/TMVAInterface/Method.h>
+#include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
+
+#include <TMVA/Tools.h>
+
+#include <TSystem.h>
+
+#include <boost/property_tree/xml_parser.hpp>
 
 namespace Belle2 {
 
@@ -166,4 +174,3 @@ namespace Belle2 {
     }
   }
 }
-

@@ -9,24 +9,19 @@
 
 #pragma once
 
-#include <analysis/TMVAInterface/Method.h>
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 
 #include <TMVA/Reader.h>
-#include <TMVA/Tools.h>
-#include <TSystem.h>
 
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 
-#include <fstream>
 #include <vector>
 #include <string>
 #include <map>
 #include <memory>
 
 namespace Belle2 {
+  class Particle;
 
   namespace TMVAInterface {
 
@@ -84,4 +79,3 @@ namespace Belle2 {
     };
   }
 }
-

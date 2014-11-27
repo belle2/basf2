@@ -55,6 +55,15 @@ namespace Belle2 {
       return 2 * getNPXDHits() + getNSVDHits();
     }
 
+    /**
+     * Return the total number of activated layers in the VXD depending on
+     * the mode of the PXD.
+     * @param pxdmode 0/1 is normal/gated
+     */
+    unsigned short getNVXDLayers(const unsigned short pxdmode = 0) const {
+      return getNPXDLayers(pxdmode) + getNSVDLayers();
+    }
+
     // ----------------------------------------------------------------
     // ---------------- SVD LAYER FUNCTIONS ---------------------------
     // ----------------------------------------------------------------
@@ -115,6 +124,18 @@ namespace Belle2 {
       return svdHits;
     }
 
+
+    /// Returns the total number of activated layers of the SVD.
+    unsigned short getNSVDLayers() const {
+      unsigned short nSVD = 0;
+      // there are 4 SVD layers ...
+      for (unsigned short layer = 0; layer < 4; ++layer) {
+        std::pair<const unsigned short, const unsigned short> hits(getSVDLayer(layer));
+        if ((hits.first + hits.second) > 0) ++nSVD;
+      }
+      return nSVD;
+    }
+
     // ----------------------------------------------------------------
     // ---------------- PXD LAYER FUNCTIONS ---------------------------
     // ----------------------------------------------------------------
@@ -168,6 +189,18 @@ namespace Belle2 {
         }
       }
       return pxdHits;
+    }
+
+    /** Returns the total number of activated layers of the PXD.
+     * @param mode: normal mode is 0, gated mode is 1.
+     */
+    unsigned short getNPXDLayers(const unsigned short mode = 0) const {
+      unsigned short nPXD = 0;
+      // there are 2 PXD layers ...
+      for (unsigned short layer = 0; layer < 2; ++layer) {
+        if (getPXDLayer(layer, mode) > 0) ++nPXD;
+      }
+      return nPXD;
     }
 
 

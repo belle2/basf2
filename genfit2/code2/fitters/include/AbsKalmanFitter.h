@@ -54,7 +54,8 @@ class AbsKalmanFitter : public AbsFitter {
 
   AbsKalmanFitter(unsigned int maxIterations = 4, double deltaPval = 1e-3, double blowUpFactor = 1e3)
     : AbsFitter(), minIterations_(2), maxIterations_(maxIterations), deltaPval_(deltaPval), relChi2Change_(0.2),
-      blowUpFactor_(blowUpFactor), multipleMeasurementHandling_(unweightedClosestToPredictionWire),
+      blowUpFactor_(blowUpFactor), resetOffDiagonals_(true), blowUpMaxVal_(1.E6),
+      multipleMeasurementHandling_(unweightedClosestToPredictionWire),
       maxFailedHits_(-1) {
     if (minIterations_ > maxIterations_)
       minIterations_ = maxIterations_;
@@ -69,7 +70,16 @@ class AbsKalmanFitter : public AbsFitter {
   double getNdf(const Track* tr, const AbsTrackRep* rep, int direction = -1) const;
   double getRedChiSqu(const Track* tr, const AbsTrackRep* rep, int direction = -1) const;
   double getPVal(const Track* tr, const AbsTrackRep* rep, int direction = -1) const;
+
+  unsigned int getMinIterations() const {return minIterations_;}
+  unsigned int getMaxIterations() const {return maxIterations_;}
+  double getDeltaPval() const {return deltaPval_;}
+  double getRelChi2Change() const {return relChi2Change_;}
+  double getBlowUpFactor() const {return blowUpFactor_;}
+  bool getResetOffDiagonals() const {return resetOffDiagonals_;}
+  double getBlowUpMaxVal() const {return blowUpMaxVal_;}
   eMultipleMeasurementHandling getMultipleMeasurementHandling() const {return multipleMeasurementHandling_;}
+  int getMaxFailedHits() const {return maxFailedHits_;}
 
   //! Set the minimum number of iterations
   virtual void setMinIterations(unsigned int n) {minIterations_ = std::max((unsigned int)1,n); if (maxIterations_ < minIterations_) maxIterations_ = minIterations_;}
@@ -94,6 +104,19 @@ class AbsKalmanFitter : public AbsFitter {
    * chi^2 tells us, that the fit might not yet be converged.
    */
   void setRelChi2Change(double relChi2Change) {relChi2Change_ = relChi2Change;}
+
+  void setBlowUpFactor(double blowUpFactor) {blowUpFactor_ = blowUpFactor;}
+  void setResetOffDiagonals(bool resetOffDiagonals) {resetOffDiagonals_ = resetOffDiagonals;}
+  //! Limit the cov entries to this maximum value when blowing up the cov. Set to negative value to disable. Default is 1.E6.
+  /**
+   * This is especially useful for fits where the measurements do not constrain one direction,
+   * e.g. parallel wire measurements. The fit will not be constrained along the wire direction.
+   * This also means that the covariance along the wire direction will not get smaller during the fit.
+   * However, it will be blown up before the next iteration, leading to an exponential growth of
+   * the covariance element(s) corresponding to the wire direction. This can then lead to numerical problems.
+   * To prevent this, the maximum value of the covariance elements after blowing up can be limited.
+   */
+  void setBlowUpMaxVal(double blowUpMaxVal) {blowUpMaxVal_= blowUpMaxVal;}
 
   //! How should multiple measurements be handled?
   void setMultipleMeasurementHandling(eMultipleMeasurementHandling mmh) {multipleMeasurementHandling_ = mmh;}
@@ -133,8 +156,13 @@ class AbsKalmanFitter : public AbsFitter {
    * chi^2 tells us, that the fit might not yet be converged.
    */
   double relChi2Change_;
+
   //! Blow up the covariance of the forward (backward) fit by this factor before seeding the backward (forward) fit.
   double blowUpFactor_;
+  //! Reset the off-diagonals to 0 when blowing up the cov
+  bool resetOffDiagonals_;
+  //! Limit the cov entries to this maxuimum value when blowing up the cov.
+  double blowUpMaxVal_;
 
   //! How to handle if there are multiple MeasurementsOnPlane
   eMultipleMeasurementHandling multipleMeasurementHandling_;
@@ -145,7 +173,7 @@ class AbsKalmanFitter : public AbsFitter {
 
  public:
 
-  ClassDef(AbsKalmanFitter, 1)
+  ClassDef(AbsKalmanFitter, 2)
 
 };
 

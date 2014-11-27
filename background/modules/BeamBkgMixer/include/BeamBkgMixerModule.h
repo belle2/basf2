@@ -210,6 +210,8 @@ namespace Belle2 {
     bool m_wrapAround; /**< if true wrap around events in the tail after maxTime */
     double m_minTimeECL;  /**< minimal time shift of background event for ECL */
     double m_maxTimeECL;  /**< maximal time shift of background event for ECL */
+    double m_minTimePXD;  /**< minimal time shift of background event for PXD */
+    double m_maxTimePXD;  /**< maximal time shift of background event for PXD */
 
     std::vector<BkgFiles> m_backgrounds;  /**< container for background samples */
 

@@ -53,7 +53,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   BeamBkgTagSetterModule::BeamBkgTagSetterModule() : Module(),
-    m_backgroundTag(SimHitBase::bg_none)
+    m_backgroundTag(SimHitBase::bg_none), m_fileType(BackgroundMetaData::c_Usual)
 
   {
     // set module description (e.g. insert text)
@@ -71,6 +71,9 @@ namespace Belle2 {
              "one of: " + m_bgTypes.getBGTypes());
     addParam("realTime", m_realTime,
              "equivalent time of superKEKB running in [ns] to obtain this sample");
+    addParam("specialFor", m_specialFor,
+             "tag ordinary file (default) or additional file ('ECL' or 'PXD')",
+             string(""));
 
   }
 
@@ -89,6 +92,12 @@ namespace Belle2 {
       m_backgroundTag = SimHitBase::bg_other;
     }
 
+    if (m_specialFor != "") {
+      if (m_specialFor == "ECL") {m_fileType = BackgroundMetaData::c_ECL;}
+      else if (m_specialFor == "PXD") {m_fileType = BackgroundMetaData::c_PXD;}
+      else {B2ERROR("specialFor " << m_specialFor << "not supported");}
+    }
+
     StoreObjPtr<BackgroundMetaData> bkgMetaData("", DataStore::c_Persistent);
     bkgMetaData.registerInDataStore();
     if (!bkgMetaData.isValid())
@@ -96,6 +105,7 @@ namespace Belle2 {
     bkgMetaData->setBackgroundType(m_backgroundType);
     bkgMetaData->setBackgroundTag(m_backgroundTag);
     bkgMetaData->setRealTime(m_realTime);
+    bkgMetaData->setFileType(m_fileType);
 
     StoreArray<PXDSimHit>::optional();
     StoreArray<SVDSimHit>::optional();
@@ -134,6 +144,9 @@ namespace Belle2 {
     n += setBackgroundTag(bklmSimHits);
     n += setBackgroundTag(eklmSimHits);
 
+    if (m_fileType == BackgroundMetaData::c_ECL) n = eclHits.getEntries();
+    if (m_fileType == BackgroundMetaData::c_PXD) n = pxdSimHits.getEntries();
+
     setReturnValue(n > 0);
 
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -150,10 +163,6 @@ namespace Belle2 {
   }
 
   void BeamBkgTagSetterModule::terminate()
-  {
-  }
-
-  void BeamBkgTagSetterModule::printModuleParams() const
   {
   }
 

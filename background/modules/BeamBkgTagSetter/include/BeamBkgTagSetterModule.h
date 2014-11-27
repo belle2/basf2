@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <simulation/dataobjects/SimHitBase.h>
 #include <simulation/background/BeamBGTypes.h>
+#include <background/dataobjects/BackgroundMetaData.h>
 #include <string>
 
 namespace Belle2 {
@@ -66,18 +67,15 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
 
     std::string m_backgroundType; /**< BG type */
     double m_realTime; /**< real time that corresponds to beam background sample */
+    std::string m_specialFor; /**< ordinary or special file for ECL, PXD */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */
     SimHitBase::BG_TAG m_backgroundTag; /**< background tag to set (from BG type) */
+    BackgroundMetaData::EFileType m_fileType; /**< file type to set */
 
     /**
      * functions that set background tag in SimHits

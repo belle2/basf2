@@ -86,6 +86,10 @@ namespace Belle2 {
              "Time window lower edge for ECL in nano seconds", -16000.0);
     addParam("maxTimeECL", m_maxTimeECL,
              "Time window upper edge for ECL in nano seconds", 8500.0);
+    addParam("minTimePXD", m_minTimePXD,
+             "Time window lower edge for PXD in nano seconds", -10000.0);
+    addParam("maxTimePXD", m_maxTimePXD,
+             "Time window upper edge for PXD in nano seconds", 10000.0);
 
   }
 
@@ -344,6 +348,37 @@ namespace Belle2 {
           minTime = m_maxTime;
         }
         addSimHits(eclHits, bkg.simHits.ECL, timeShift, minTime, maxTime);
+
+        bkg.eventCount++;
+        if (bkg.eventCount >= bkg.numEvents) {
+          bkg.eventCount = 0;
+          B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
+        }
+      }
+
+    }
+
+
+    for (auto & bkg : m_backgrounds) {
+
+      if (bkg.fileType != BackgroundMetaData::c_PXD) continue;
+
+      double mean = bkg.rate * (m_maxTimePXD - m_minTimePXD);
+      int nev = gRandom->Poisson(mean);
+
+      for (int iev = 0; iev < nev; iev++) {
+        double timeShift = gRandom->Rndm() * (m_maxTimePXD - m_minTimePXD) + m_minTimePXD;
+        if (timeShift > m_minTime and timeShift < m_maxTime) continue;
+        bkg.tree->GetEntry(bkg.eventCount);
+
+        double minTime = m_minTimePXD;
+        double maxTime = m_maxTimePXD;
+        if (timeShift <= m_minTime) {
+          maxTime = m_minTime;
+        } else {
+          minTime = m_maxTime;
+        }
+        addSimHits(pxdSimHits, bkg.simHits.PXD, timeShift, minTime, maxTime);
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {

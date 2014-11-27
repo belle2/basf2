@@ -148,10 +148,13 @@ namespace Belle2 {
     /** thread pointer
      */
     pthread_t m_pt[c_maxThreads];
+    /** thread index. */
     int m_id[c_maxThreads];
+    /** current thread? */
     int m_threadin;
     //int m_threadout;
-    int m_decstat[c_maxThreads];
+    /** thread decoder status. */
+    int m_decoderStatus[c_maxThreads];
     //MsgHandler* m_pmsghandler[c_maxThreads];
     //    char* m_evtbuf[c_maxThreads];
     //std::queue<char*> m_evtbuf[c_maxThreads];

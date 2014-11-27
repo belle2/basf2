@@ -474,7 +474,7 @@ int DataStoreStreamer::getDecoderStatus()
 void DataStoreStreamer::setDecoderStatus(int val)
 {
   //  printf ( "Decode thread %d = %d\n", m_threadin, m_done_decode[m_threadin] );
-  m_decstat[m_threadin] = val;
+  m_decoderStatus[m_threadin] = val;
 }
 
 

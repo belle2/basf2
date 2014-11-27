@@ -54,6 +54,7 @@ namespace Belle2 {
 
     //! Blocked file handler
     SeqFile* m_file;
+    /** file-reading thread. */
     pthread_t m_thr_input;
 
     //! Total nr. of events in the file

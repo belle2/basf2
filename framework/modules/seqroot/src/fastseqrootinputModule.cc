@@ -50,7 +50,7 @@ REG_MODULE(FastSeqRootInput)
 FastSeqRootInputModule::FastSeqRootInputModule() : Module()
 {
   //Set module properties
-  setDescription("SeqROOT input module (with parallel deserialization)");
+  setDescription("SeqROOT input module (with parallel deserialization). EXPERIMENTAL.");
   setPropertyFlags(c_Input);
 
   m_file = 0;

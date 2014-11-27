@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   ("id,i", prog::value<int>(), "unique identifier")
   ("lfn,l", prog::value<string>(), "logical file name")
   ("all,a", "print all information")
-  ("steering,s", "print sterring file")
+  ("steering,s", "print steering file contents")
   ;
 
   prog::positional_options_description posOptDesc;

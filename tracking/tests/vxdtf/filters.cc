@@ -106,7 +106,7 @@ namespace VXDTFfilterTest {
 
 
 
-  /** Test class for the RecoTrack object. */
+  /** Test class for Filter object. */
   class FilterTest : public ::testing::Test {
   protected:
   };
@@ -126,6 +126,20 @@ namespace VXDTFfilterTest {
     EXPECT_EQ(1. , range.getSup());
   }
 
+  /** shows the functionality of the Range */
+  TEST_F(FilterTest, ClosedRange)
+  {
+
+    ClosedRange<double, double> range(0. , 1.);
+    EXPECT_TRUE(range.contains(0.5));
+    EXPECT_FALSE(range.contains(-1.));
+    EXPECT_TRUE(range.contains(0.));
+    EXPECT_TRUE(range.contains(1.));
+    EXPECT_FALSE(range.contains(2.));
+    EXPECT_EQ(0. , range.getInf());
+    EXPECT_EQ(1. , range.getSup());
+  }
+
 
   /** shows the functionality of the UpperBoundedSet */
   TEST_F(FilterTest, UpperBoundedSet)
@@ -138,6 +152,17 @@ namespace VXDTFfilterTest {
     EXPECT_EQ(0. , upperBoundedSet.getSup());
   }
 
+  /** shows the functionality of the ClosedUpperBoundedSet */
+  TEST_F(FilterTest, ClosedUpperBoundedSet)
+  {
+
+    ClosedUpperBoundedSet<double> upperBoundedSet(0.);
+    EXPECT_TRUE(upperBoundedSet.contains(-1.));
+    EXPECT_TRUE(upperBoundedSet.contains(0.));
+    EXPECT_FALSE(upperBoundedSet.contains(1.));
+    EXPECT_EQ(0. , upperBoundedSet.getSup());
+  }
+
 
   /** shows the functionality of the LowerBoundedSet */
   TEST_F(FilterTest, LowerBoundedSet)
@@ -146,6 +171,17 @@ namespace VXDTFfilterTest {
     LowerBoundedSet<double> lowerBoundedSet(0.);
     EXPECT_TRUE(lowerBoundedSet.contains(1.));
     EXPECT_FALSE(lowerBoundedSet.contains(0.));
+    EXPECT_FALSE(lowerBoundedSet.contains(-1.));
+    EXPECT_EQ(0. , lowerBoundedSet.getInf());
+  }
+
+  /** shows the functionality of the ClosedLowerBoundedSet */
+  TEST_F(FilterTest, ClosedLowerBoundedSet)
+  {
+
+    ClosedLowerBoundedSet<double> lowerBoundedSet(0.);
+    EXPECT_TRUE(lowerBoundedSet.contains(1.));
+    EXPECT_TRUE(lowerBoundedSet.contains(0.));
     EXPECT_FALSE(lowerBoundedSet.contains(-1.));
     EXPECT_EQ(0. , lowerBoundedSet.getInf());
   }
@@ -222,27 +258,60 @@ namespace VXDTFfilterTest {
     spacePoint x1(0.0f , 0.0f, 0.0f);
     spacePoint x2(0.5f , 0.0f, 0.0f);
     spacePoint x3(2.0f , 0.0f, 0.0f);
+    spacePoint x4(1.0f , 0.0f, 0.0f);
 
     auto filterSup = (SquaredDistance3D() < 1.) ;
     EXPECT_TRUE(filterSup.accept(x1, x2));
+    EXPECT_FALSE(filterSup.accept(x1, x4));
     EXPECT_FALSE(filterSup.accept(x1, x3));
+
+    auto filterMax = (SquaredDistance3D() <= 1.) ;
+    EXPECT_TRUE(filterMax.accept(x1, x2));
+    EXPECT_TRUE(filterMax.accept(x1, x4));
+    EXPECT_FALSE(filterMax.accept(x1, x3));
+
 
     auto filterSup2 = (1 > SquaredDistance3D()) ;
     EXPECT_TRUE(filterSup2.accept(x1, x2));
     EXPECT_FALSE(filterSup2.accept(x1, x3));
+    EXPECT_FALSE(filterSup2.accept(x1, x4));
+
+    auto filterMax2 = (1 >= SquaredDistance3D()) ;
+    EXPECT_TRUE(filterMax2.accept(x1, x2));
+    EXPECT_FALSE(filterMax2.accept(x1, x3));
+    EXPECT_TRUE(filterMax2.accept(x1, x4));
 
     auto filterInf = (SquaredDistance3D() > 1.) ;
     EXPECT_TRUE(filterInf.accept(x1, x3));
     EXPECT_FALSE(filterInf.accept(x1, x2));
+    EXPECT_FALSE(filterInf.accept(x1, x4));
+
+    auto filterMin = (SquaredDistance3D() >= 1.) ;
+    EXPECT_TRUE(filterMin.accept(x1, x3));
+    EXPECT_FALSE(filterMin.accept(x1, x2));
+    EXPECT_TRUE(filterMin.accept(x1, x4));
 
     auto filterInf2 = (1 < SquaredDistance3D()) ;
     EXPECT_TRUE(filterInf2.accept(x1, x3));
     EXPECT_FALSE(filterInf2.accept(x1, x2));
+    EXPECT_FALSE(filterInf2.accept(x1, x4));
 
-    auto filterRange = (0.1 < SquaredDistance3D() < 1);
+    auto filterMin2 = (1 <= SquaredDistance3D()) ;
+    EXPECT_TRUE(filterMin2.accept(x1, x3));
+    EXPECT_FALSE(filterMin2.accept(x1, x2));
+    EXPECT_TRUE(filterMin2.accept(x1, x4));
+
+    auto filterRange = (0. < SquaredDistance3D() < 1);
     EXPECT_FALSE(filterRange.accept(x1, x1));
     EXPECT_TRUE(filterRange.accept(x1, x2));
     EXPECT_FALSE(filterRange.accept(x1, x3));
+    EXPECT_FALSE(filterRange.accept(x1, x4));
+
+    auto filterClosedRange = (0. <= SquaredDistance3D() <= 1);
+    EXPECT_TRUE(filterClosedRange.accept(x1, x1));
+    EXPECT_TRUE(filterClosedRange.accept(x1, x2));
+    EXPECT_FALSE(filterClosedRange.accept(x1, x3));
+    EXPECT_TRUE(filterClosedRange.accept(x1, x4));
 
   }
 
@@ -282,7 +351,7 @@ namespace VXDTFfilterTest {
   }
 
 
-  /** evaluating compatibility of filters with lazy evaluation */
+  /** check for shortcircuit evaluation */
   TEST_F(FilterTest, ShortCircuitsEvaluation)
   {
     auto filter(
@@ -298,11 +367,16 @@ namespace VXDTFfilterTest {
     counter< SquaredDistance2Dxy >::N = 0;
 
     EXPECT_FALSE(filter.accept(x1, x3));
+    // since the pair x1, x3 does not satisfy the SquaredDistance2Dxy
+    // requirement, we do expect SquaredDistance2Dxy evaluated once:
     EXPECT_EQ(1 , counter< SquaredDistance2Dxy >::N);
+    // and SquaredDistance3D not evaluated at all
     EXPECT_EQ(0 , counter< SquaredDistance3D >::N);
 
     EXPECT_TRUE(filter.accept(x1, x1));
+    // in this case Distance2Dxy is satisfied
     EXPECT_EQ(2 , counter< SquaredDistance2Dxy >::N);
+    // and Distance3D is evaluated
     EXPECT_EQ(1 , counter< SquaredDistance3D >::N);
 
   }

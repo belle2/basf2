@@ -20,7 +20,7 @@ namespace Belle2 {
   template< typename ... types >
   class Filter { /* Empty: just specialized templates are interesting */  };
 
-  /** this is just a classname to be levered in the template parameter pack  */
+  /** these are just classnames to be leveraged in the template parameters pack  */
   class BypassableFilter;
   class ActivableFilter;
 

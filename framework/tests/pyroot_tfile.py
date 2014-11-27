@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# This test catches a regression in PyRoot (in root 5.34/19+ ?)
+# This test catches a regression in PyRoot (in root 5.34/19+?, fixed in 5.34/23)
 from basf2 import *
 import ROOT
 from ROOT import Belle2

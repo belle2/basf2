@@ -82,4 +82,22 @@ namespace Belle2 {
 
   }
 
+  /// Test if getFirst/LastLayer returns the proper value.
+  TEST_F(HitPatternCDCTest, getFirstLastLayer)
+  {
+    HitPatternCDC myHitPatternCDC(0);
+    myHitPatternCDC.setNHits(123); //arbitrary number to check if this layer is masked out correctly
+
+    unsigned short firstLayer = 5;
+    unsigned short lastLayer = 46;
+    myHitPatternCDC.setLayer(firstLayer);
+    myHitPatternCDC.setLayer(lastLayer);
+    EXPECT_EQ(firstLayer, myHitPatternCDC.getFirstLayer());
+    EXPECT_EQ(lastLayer, myHitPatternCDC.getLastLayer());
+
+    myHitPatternCDC.resetPattern();
+    EXPECT_EQ(-1, myHitPatternCDC.getFirstLayer());
+    EXPECT_EQ(-1, myHitPatternCDC.getLastLayer());
+  }
+
 } // namespace Belle2

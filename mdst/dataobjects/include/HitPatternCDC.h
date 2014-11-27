@@ -106,6 +106,28 @@ namespace Belle2 {
       return m_pattern[layer];
     }
 
+
+    /** Returns the index of the first layer with a hit.
+     * If there is no hit in the whole pattern, -1 is returned.
+     */
+    short getFirstLayer() const {
+      for (unsigned int i = 0; i < m_pattern.size(); ++i) {
+        if ((m_pattern & ~s_infoLayerMask).test(i)) return i;
+      }
+      return -1;
+    }
+
+    /** Returns the index of the last layer with a hit.
+     * If there is no hit in the whole pattern, -1 is returned.
+     */
+    short getLastLayer() const {
+      // m_pattern.size()-8 because the first 8 bits are not pattern
+      for (unsigned int i = m_pattern.size() - 8; i > 0; --i) {
+        // -1 because of the index couting...
+        if ((m_pattern & ~s_infoLayerMask).test(i - 1)) return i - 1;
+      }
+      return -1;
+    }
     // ----------------------------------------------------------------
     // ---------------- SUPER LAYER FUNCTIONS -------------------------
     // ----------------------------------------------------------------

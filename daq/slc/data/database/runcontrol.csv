@@ -1,5 +1,4 @@
  nodename,  config, ismaster, runlength,    node, nsmdata
-RUNCONTROL, debug:storage,true,480, debug:storage, debug:storage
 RUNCONTROL, debug:dummycpu,true,480,debug:dummycpu, default
 RUNCONTROL, debug:dumhslb:020:rand4k,true,480, debug:dumhslb:020:rand4k, default
 RUNCONTROL, debug:yamadahslb:10kHz,true,480, debug:yamadahslb:10kHz, default

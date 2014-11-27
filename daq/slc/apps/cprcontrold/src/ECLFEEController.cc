@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
 
 #define HSLB_FIRMWARE_VERSION  (0xA)
 #define HSLB_HARDWARE_VERSION  (0xA)
@@ -39,6 +40,20 @@ bool ECLFEEController::load(HSLBController& hslb,
   if ((ret = hslb.readfn(HSREG_FWVER)) != HSLB_HARDWARE_VERSION) {
     throw (IOException(2, "HLSB Hardware version %.4x is not suitable for this applicaton", ret));
   }
+  std::ifstream fin("/home/usr/b2daq/belle2/release/daq/slc/data/database/eclcollector.txt");
+  std::string name;
+  unsigned int adr, val;
+  while (fin >> name, adr, val) {
+    LogFile::debug("write val=%x to adr=%x (%s)", val, adr, name.c_str());
+    hslb.writefee(adr, val);
+    /*
+    std::string cmd = StringUtil::form("rio_reg_io w %c %x %x",
+                                       (hslb.get_finid() + 'a'), adr, val);
+    system(cmd.c_str());
+    LogFile::debug(cmd);
+    */
+  }
+  /*
   FEEConfig::ParameterList& pars(conf.getParameters());
   for (FEEConfig::ParameterList::iterator it = pars.begin();
        it != pars.end(); it++) {
@@ -48,13 +63,12 @@ bool ECLFEEController::load(HSLBController& hslb,
     int val = par.getValue();
     hslb.writefee(adr, val);
     LogFile::debug("write address %d (val=%d)", adr, val);
-    /*
     std::string cmd = StringUtil::form("rio_reg_io w %c %x %x",
                                        (hslb.get_finid() + 'a'), adr, val);
     system(cmd.c_str());
     LogFile::debug(cmd);
-    */
   }
+  */
   hslb.writefee(0x30, 0x0d);
   LogFile::debug("write address %d (val=%d)", 0x30, 0x0d);
   hslb.writefee(0x30, 0x09);

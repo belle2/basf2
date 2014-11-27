@@ -64,10 +64,10 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
-    /** Accessor to the min of the set */
+    /** Accessor to the inf of the set */
     InfType getInf(void) const { return m_inf; } ;
 
-    /** Accessor to the max of the set */
+    /** Accessor to the sup of the set */
     SupType getSup(void) const { return m_sup; } ;
 
   };

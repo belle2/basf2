@@ -40,7 +40,7 @@ namespace Belle2 {
     template< class VariableType >
     inline bool contains(const VariableType& x) const { return  m_inf < x ;};
 
-    /** Creates and sets the addresses of the leaves to store the min value.
+    /** Creates and sets the addresses of the leaves to store the inf value.
      *
      * @param t  the pointer to the TTree that will contain the TBranch of this range.
      * @param branchName the name of the TBranch that will host this range.

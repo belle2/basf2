@@ -27,7 +27,7 @@ namespace Belle2 {
   class UpperBoundedSet {
     SupType m_sup;
   public:
-    UpperBoundedSet(SupType max):  m_sup(max) {};
+    UpperBoundedSet(SupType sup):  m_sup(sup) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
      *
@@ -38,7 +38,7 @@ namespace Belle2 {
     template< class VariableType >
     inline bool contains(const VariableType& x) const { return x < m_sup;};
 
-    /** Creates and sets the addresses of the leaves to store the min and max values.
+    /** Creates and sets the addresses of the leaves to store sup value.
      *
      * @param t  the pointer to the TTree that will contain the TBranch of this range.
      * @param branchName the name of the TBranch that will host this range.

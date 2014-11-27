@@ -17,7 +17,7 @@ AddOption('--extra-ccflags', dest = 'extraccflags', action = 'store', help = 'Ad
 
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
-    __import__(multiprocessing)
+    import multiprocessing
     SetOption('num_jobs', multiprocessing.cpu_count())
 except:
     pass

@@ -1,4 +1,4 @@
-import os, re, platform
+import os
 from distutils import sysconfig
 import config
 
@@ -153,6 +153,9 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
 global_env['CINTFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']]
 global_env['CINTFLAGS'].remove('-std=c++11')
 
+special_targets = ['tests', 'test_all', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
+explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rstrip('/') not in special_targets and not '/' in p.rstrip('/') and os.path.isdir(p)]
+
 # process the analysis directory
 if analysis:
     global_env['PACKAGE'] = os.path.basename(os.environ['BELLE2_ANALYSIS_DIR'])
@@ -166,6 +169,8 @@ else:
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:
             continue
+        if explicit_package_targets and entry not in explicit_package_targets:
+            continue
 
         # we are in a package directory
         global_env['PACKAGE'] = entry
@@ -177,6 +182,9 @@ else:
     if repository and not GetOption('local'):
         for entry in os.listdir(repository):
             if entry.find('.') > -1 or os.path.isfile(os.path.join(repository, entry)) or entry in exclude_dirs + local_packages:
+                continue
+
+            if explicit_package_targets and entry not in explicit_package_targets:
                 continue
 
             # we are in a package directory
@@ -214,11 +222,14 @@ if len(global_env['TEST_FILES']) > 0:
 # search the include folder and delete all files which would not be
 # built/installed by scons
 
-global_env.RemoveNonTargets(global_env["INCDIR"])
-global_env.RemoveNonTargets(global_env["MODDIR"])
-global_env.RemoveNonTargets(global_env["LIBDIR"])
-global_env.RemoveNonTargets(global_env["BINDIR"])
-global_env.RemoveNonTargets(global_env["DATADIR"])
+if explicit_package_targets:
+  print "Performing a quick build for given packages. Note that any removed targets (e.g. modules, include files) will remain until you run a full build without any explicit target packages."
+else:
+  global_env.RemoveNonTargets(global_env["INCDIR"])
+  global_env.RemoveNonTargets(global_env["MODDIR"])
+  global_env.RemoveNonTargets(global_env["LIBDIR"])
+  global_env.RemoveNonTargets(global_env["BINDIR"])
+  global_env.RemoveNonTargets(global_env["DATADIR"])
 
 
 from SCons.Script.Main import OptionsParser

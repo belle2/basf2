@@ -43,13 +43,16 @@ void MixBkgModule::initialize()
   B2INFO("------------------------------------------------------------")
 
   // Create an empty MCParticles collection if there is none.
-  StoreArray<MCParticle>::registerPersistent("MCParticles");
+  StoreArray<MCParticle> storeMCParticles("MCParticles");
+  storeMCParticles.registerInDataStore();
   m_mixBackground.setAnalysisMode(m_analysisMode);
   if (m_analysisMode) {
     B2INFO(">> Analysis mode: ON");
     // Register analysis-mode specific background collections
-    StoreArray<BackgroundInfo>::registerPersistent("BackgroundInfos");
-    StoreArray<MCParticle>::registerPersistent("BackgroundMCParticles");
+    StoreArray<BackgroundInfo> storeBackgroundInfos("BackgroundInfos");
+    storeBackgroundInfos.registerInDataStore();
+    StoreArray<MCParticle> storeBackgroundParticles("BackgroundMCParticles");
+    storeBackgroundParticles.registerInDataStore();
 
   } else {
     B2INFO(">> Analysis mode: OFF")

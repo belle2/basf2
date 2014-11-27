@@ -118,11 +118,14 @@ SVDDigitizerModule::SVDDigitizerModule() :
 void SVDDigitizerModule::initialize()
 {
   //Register all required collections
-  StoreArray<SVDDigit>::registerPersistent(m_storeDigitsName);
-  RelationArray::registerPersistent<SVDDigit, MCParticle>(m_storeDigitsName,
-                                                          m_storeMCParticlesName);
-  RelationArray::registerPersistent<SVDDigit, SVDTrueHit>(m_storeDigitsName,
-                                                          m_storeMCParticlesName);
+  StoreArray<SVDDigit>storeDigits(m_storeDigitsName);
+  storeDigits.registerInDataStore();
+
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  storeDigits.registerRelationTo(storeMCParticles);
+
+  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  storeDigits.registerRelationTo(storeTrueHits);
 
   //Set names in case default was used. We need the names to initialize the RelationIndices.
   m_relMCParticleSimHitName = DataStore::relationName(
@@ -137,7 +140,6 @@ void SVDDigitizerModule::initialize()
   m_relDigitTrueHitName = DataStore::relationName(
                             DataStore::arrayName<SVDDigit>(m_storeDigitsName),
                             DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
-  ;
 
   //Convert parameters to correct units
   m_segmentLength *= Unit::mm;
@@ -262,38 +264,18 @@ void SVDDigitizerModule::event()
   StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
 
-  // FIXME: Provisional fix to ensure proper output when there are no SimHits:
-  // Create empty arrays, then empty relations will be created, too.
-  if (!storeSimHits.isValid())
-    storeSimHits.create();
-  if (!storeTrueHits.isValid())
-    storeTrueHits.create();
-  // For the same reason, initialize the RelationArrays.
-  RelationArray mcParticlesToSimHits(storeMCParticles, storeSimHits,
-                                     m_relMCParticleSimHitName);
-  RelationArray mcParticlesToTrueHits(storeMCParticles, storeTrueHits); // not used here
-  RelationArray trueHitsToSimHits(storeTrueHits, storeSimHits,
-                                  m_relTrueHitSimHitName);
+  RelationArray mcParticlesToSimHits(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
+  RelationArray trueHitsToSimHits(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
 
-  RelationIndex<MCParticle, SVDSimHit> relMCParticleSimHit(storeMCParticles,
-                                                           storeSimHits, m_relMCParticleSimHitName);
-  RelationIndex<SVDTrueHit, SVDSimHit> relTrueHitSimHit(storeTrueHits,
-                                                        storeSimHits, m_relTrueHitSimHitName);
+  RelationIndex<MCParticle, SVDSimHit> relMCParticleSimHit(storeMCParticles, storeSimHits, m_relMCParticleSimHitName);
+  RelationIndex<SVDTrueHit, SVDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
 
-  // Clear old SVDDigits
   StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
-  if (!storeDigits.isValid())
-    storeDigits.create();
-  else
-    storeDigits.getPtr()->Clear();
 
-  RelationArray relDigitMCParticle(storeDigits, storeMCParticles,
-                                   m_relDigitMCParticleName);
-  relDigitMCParticle.clear();
+  RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
 
-  RelationArray relDigitTrueHit(storeDigits, storeTrueHits,
-                                m_relDigitTrueHitName);
-  relDigitTrueHit.clear();
+  RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+
 
   unsigned int nSimHits = storeSimHits.getEntries();
   if (nSimHits == 0)

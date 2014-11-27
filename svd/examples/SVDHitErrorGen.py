@@ -27,7 +27,7 @@ output = register_module('RootOutput')
 analyze = SVDHitErrorsTTree()
 
 # Specify number of events to generate
-eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
 # Set parameters for particlegun
 particlegun.param({  # Generate 5 tracks (on average)
@@ -44,7 +44,7 @@ particlegun.param({  # Generate 5 tracks (on average)
                      # and no deviation in z
                      # all tracks sharing the same vertex per event
     'nTracks': 1,
-    'varyNTracks': False,
+    'varyNTracks': True,
     'pdgCodes': [211, -211, 11, -11],
     'momentumGeneration': 'normal',
     'momentumParams': [2, 0.2],

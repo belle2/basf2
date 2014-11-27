@@ -68,8 +68,10 @@ void SVDUnpackerModule::initialize()
 {
 
   StoreArray<RawSVD>::required(m_rawSVDListName);
-  StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
-  StoreArray<SVDTransparentDigit>::registerPersistent(m_svdTransparentDigitListName);
+  StoreArray<SVDDigit> storeDigits(m_svdDigitListName);
+  storeDigits.registerInDataStore();
+  StoreArray<SVDTransparentDigit> storeTransparentDigits(m_svdTransparentDigitListName);
+  storeTransparentDigits.registerInDataStore();
 
   loadMap();
 }

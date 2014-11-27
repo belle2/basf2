@@ -53,8 +53,9 @@ SVDDigitFilterModule::~SVDDigitFilterModule()
 
 void SVDDigitFilterModule::initialize()
 {
-  StoreArray<SVDDigit>::required(m_inputDigits);
-  StoreArray<SVDDigit>::registerPersistent(m_outputDigits);
+  StoreArray<SVDDigit> required(m_inputDigits);
+  StoreArray<SVDDigit> storeOutputDigits(m_outputDigits);
+  storeOutputDigits.registerInDataStore();
 }
 
 void SVDDigitFilterModule::beginRun()

@@ -11,7 +11,7 @@
 #pragma once
 
 #include <TVector3.h>
-#include "SharedFunctions.h"
+#include "tracking/vxdCaTracking/SharedFunctions.h"
 
 // #include "ClusterInfo.h"
 #include <vxd/dataobjects/VxdID.h>

@@ -12,9 +12,9 @@
 
 #include <framework/gearbox/Const.h>
 
-#include "VXDTFHit.h"
-#include "VXDSegmentCell.h"
-#include "SharedFunctions.h"
+#include "tracking/vxdCaTracking/VXDTFHit.h"
+#include "tracking/vxdCaTracking/VXDSegmentCell.h"
+#include "tracking/vxdCaTracking/SharedFunctions.h"
 
 #include <list>
 #include <string>

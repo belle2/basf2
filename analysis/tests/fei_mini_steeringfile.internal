@@ -89,7 +89,4 @@ print main
 
 process(main)
 
-#B2WARNING('event() statistics:')
 print statistics
-#B2WARNING('endRun() statistics:')
-#print statistics(statistics.END_RUN)

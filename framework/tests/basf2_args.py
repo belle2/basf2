@@ -1,26 +1,21 @@
 import os
-import sys
 
-ret = os.system('basf2 --info')
-if ret != 0:
-    sys.exit(1)
+assert 0 == os.system('basf2 --info')
 
-ret = os.system('basf2 --version')
-if ret != 0:
-    sys.exit(1)
+assert 0 == os.system('basf2 --version')
 
-ret = os.system('basf2 --help')
-if ret != 0:
-    sys.exit(1)
+assert 0 == os.system('basf2 --help')
 
-ret = os.system('basf2 -m')
-if ret != 0:
-    sys.exit(1)
+assert 0 == os.system('basf2 -m')
 
-ret = os.system('basf2 -m RootOutput')
-if ret != 0:
-    sys.exit(1)
+assert 0 == os.system('basf2 -m RootOutput')
 
-ret = os.system('basf2 -m NonExistingModule')
-if ret == 0:  # exact return code of system() not defined, just unsuccesful
-    sys.exit(1)
+# some failing things
+# exact return code of system() not defined, just unsuccesful
+assert 0 != os.system('basf2 -m NonExistingModule')
+
+assert 0 != os.system('basf2 --thisdoesntexist')
+
+assert 0 != os.system('basf2 /this/path/doesnot/exist.py')
+
+assert 0 != os.system('basf2 --execute-path /this/path/doesnot/exist')

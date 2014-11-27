@@ -113,4 +113,34 @@ namespace Belle2 {
 
   }
 
+  TEST_F(HitPatternVXDTest, getFirstLastLayer)
+  {
+    HitPatternVXD myHitPattern(0);
+    // random choices
+    const unsigned short firstLayerPXD = 0;
+    const unsigned short lastLayerPXD = 1;
+    const unsigned short firstLayerSVD = 1;
+    const unsigned short lastLayerSVD = 3;
+
+    const unsigned short normalMode = 0;
+    const unsigned short gatedMode = 1;
+    // set SVD
+    myHitPattern.setSVDLayer(0, 0, 0);
+    myHitPattern.setSVDLayer(1, 3, 0);
+    myHitPattern.setSVDLayer(2, 0, 1);
+    myHitPattern.setSVDLayer(3, 1, 1);
+    // set PXD normal
+    myHitPattern.setPXDLayer(0, 1, normalMode);
+    myHitPattern.setPXDLayer(1, 2, normalMode);
+    // set PXD gated
+    myHitPattern.setPXDLayer(0, 1, gatedMode);
+    myHitPattern.setPXDLayer(1, 2, gatedMode);
+
+    EXPECT_EQ(firstLayerSVD, myHitPattern.getFirstSVDLayer());
+    EXPECT_EQ(lastLayerSVD, myHitPattern.getLastSVDLayer());
+    EXPECT_EQ(firstLayerPXD, myHitPattern.getFirstPXDLayer(normalMode));
+    EXPECT_EQ(lastLayerPXD, myHitPattern.getLastPXDLayer(normalMode));
+    EXPECT_EQ(firstLayerPXD, myHitPattern.getFirstPXDLayer(gatedMode));
+    EXPECT_EQ(lastLayerPXD, myHitPattern.getLastPXDLayer(gatedMode));
+  }
 }

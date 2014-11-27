@@ -136,6 +136,32 @@ namespace Belle2 {
       return nSVD;
     }
 
+    /**
+     * Get the first activated svd layer index.
+     * If there is no hit in the SVD pattern, -1 is returned.
+     */
+    short getFirstSVDLayer() const {
+      // there are 4 SVD layers ...
+      for (unsigned short layer = 0; layer < 4; ++layer) {
+        std::pair<const unsigned short, const unsigned short> hits(getSVDLayer(layer));
+        if ((hits.first + hits.second) > 0) return layer;
+      }
+      return -1;
+    }
+
+    /**
+     * Get the last activated svd layer index.
+     * If there is no hit in the SVD pattern, -1 is returned.
+     */
+    short getLastSVDLayer() const {
+      // there are 4 SVD layers ...
+      for (short layer = 3; layer >= 0; --layer) {
+        std::pair<const unsigned short, const unsigned short> hits(getSVDLayer(layer));
+        if ((hits.first + hits.second) > 0) return layer;
+      }
+      return -1;
+    }
+
     // ----------------------------------------------------------------
     // ---------------- PXD LAYER FUNCTIONS ---------------------------
     // ----------------------------------------------------------------
@@ -203,6 +229,27 @@ namespace Belle2 {
       return nPXD;
     }
 
+    /** Returns the first activated layer of the PXD depending on the mode.
+     * If there is no hit in the PXD pattern, -1 is returned.
+     * @param mode: normal mode is 0, gated mode is 1.
+     */
+    short getFirstPXDLayer(const unsigned short mode = 0) const {
+      for (unsigned short layer = 0; layer < 2; ++layer) {
+        if (getPXDLayer(layer, mode) > 0) return layer;
+      }
+      return -1;
+    }
+
+    /** Returns the last activated layer of the PXD depending on the mode.
+     * If there is no hit in the PXD pattern, -1 is returned.
+     * @param mode: normal mode is 0, gated mode is 1.
+     */
+    short getLastPXDLayer(const unsigned short mode = 0) const {
+      for (short layer = 1; layer >= 0; --layer) {
+        if (getPXDLayer(layer, mode) > 0) return layer;
+      }
+      return -1;
+    }
 
   private:
     /** Storing of actual hit pattern.

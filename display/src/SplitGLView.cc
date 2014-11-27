@@ -46,6 +46,8 @@ SplitGLView::SplitGLView() :
 
     TEveViewer* viewer = new TEveViewer(TString::Format("%s viewer", projectionName[iFrame]));
     m_glViewer[iFrame] = viewer->SpawnGLEmbeddedViewer();
+    m_glViewer[iFrame]->SetFader(1.0);
+    m_glViewer[iFrame]->AutoFade(0.0, 0.3);
     slot->ReplaceWindow(viewer);
     slot = 0; //invalid after ReplaceWindow()
     viewer->SetShowTitleBar(kFALSE); //might want to show these?
@@ -93,6 +95,8 @@ SplitGLView::SplitGLView() :
   m_cameraMenu->AddSeparator();
   m_cameraMenu->AddEntry("Orthographic: Allow rotating", kGLOrthoRotate);
   m_cameraMenu->AddEntry("Orthographic: Right click to dolly", kGLOrthoDolly);
+  m_cameraMenu->AddSeparator();
+  m_cameraMenu->AddEntry("Perspective: Enable stereographic 3D (requires hardware or stereowrap)", kGLStereo);
 
   TGPopupMenu* sceneMenu = new TGPopupMenu(gClient->GetDefaultRoot());
   sceneMenu->AddEntry("&Update Current", kSceneUpdate);
@@ -181,6 +185,10 @@ void SplitGLView::handleMenu(Int_t id)
       break;
     case kGLOrthoDolly:
       toggleOrthoDolly();
+      break;
+
+    case kGLStereo:
+      toggleStereo();
       break;
 
     case kSceneUpdate:
@@ -293,6 +301,11 @@ void SplitGLView::setActiveViewer(TGLEmbeddedViewer* v)
       m_cameraMenu->CheckEntry(kGLOrthoRotate);
     else
       m_cameraMenu->UnCheckEntry(kGLOrthoRotate);
+
+    if (getActiveGLViewer()->GetStereo())
+      m_cameraMenu->CheckEntry(kGLStereo);
+    else
+      m_cameraMenu->UnCheckEntry(kGLStereo);
   }
 }
 
@@ -313,8 +326,6 @@ void SplitGLView::onMouseOver(TGLPhysicalShape* shape)
 
 void SplitGLView::toggleOrthoRotate()
 {
-  // Toggle state of the 'Ortho allow rotate' menu entry.
-
   if (m_cameraMenu->IsEntryChecked(kGLOrthoRotate))
     m_cameraMenu->UnCheckEntry(kGLOrthoRotate);
   else
@@ -329,8 +340,6 @@ void SplitGLView::toggleOrthoRotate()
 
 void SplitGLView::toggleOrthoDolly()
 {
-  // Toggle state of the 'Ortho allow dolly' menu entry.
-
   if (m_cameraMenu->IsEntryChecked(kGLOrthoDolly))
     m_cameraMenu->UnCheckEntry(kGLOrthoDolly);
   else
@@ -341,6 +350,18 @@ void SplitGLView::toggleOrthoDolly()
     getActiveGLViewer()->GetOrthoXOZCamera()->SetDollyToZoom(state);
     getActiveGLViewer()->GetOrthoZOYCamera()->SetDollyToZoom(state);
   }
+}
+
+void SplitGLView::toggleStereo()
+{
+  if (!getActiveGLViewer())
+    return;
+
+  getActiveGLViewer()->SetStereo(!getActiveGLViewer()->GetStereo());
+  if (getActiveGLViewer()->GetStereo())
+    m_cameraMenu->CheckEntry(kGLStereo);
+  else
+    m_cameraMenu->UnCheckEntry(kGLStereo);
 }
 
 void SplitGLView::itemClicked(TGListTreeItem* item, Int_t, Int_t, Int_t)

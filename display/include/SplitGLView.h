@@ -45,6 +45,8 @@ namespace Belle2 {
     void           toggleOrthoRotate();
     /** Toggle state of the 'Ortho allow dolly' menu entry. */
     void           toggleOrthoDolly();
+    /** Toggle stereo viewing for perspective viewer. */
+    void toggleStereo();
 
     /** return R-Phi projection manager. */
     TEveProjectionManager* getRPhiMgr() const { return m_rphiManager; }
@@ -56,7 +58,7 @@ namespace Belle2 {
     /** Which menu command was selected? */
     enum EMyCommands {
       kGLPerspYOZ, kGLPerspXOZ, kGLPerspXOY, kGLXOY,
-      kGLXOZ, kGLZOY, kGLOrthoRotate, kGLOrthoDolly,
+      kGLXOZ, kGLZOY, kGLOrthoRotate, kGLOrthoDolly, kGLStereo,
       kSceneUpdate, kSceneUpdateAll, kSaveGeometryExtract
     };
 

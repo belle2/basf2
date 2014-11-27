@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jacek Stypula                                            *
+ * Contributors: Hyacinth Stypula                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -75,7 +75,7 @@ namespace Belle2 {
         G4Material* material = Materials::get(materialName);
         if (!material) B2FATAL("Material '" << materialName << "', required by " << name << " IR Shield could not be found");
 
-        G4LogicalVolume* volume = new G4LogicalVolume(geoShield, material, name);
+        G4LogicalVolume* volume = new G4LogicalVolume(geoShield, material, name + " IR Shield");
         setColor(*volume, "#cc0000");
         //setVisibility(*volume, false);
         new G4PVPlacement(0, G4ThreeVector(0, 0, 0), volume, name + " IR Shield", &topVolume, false, 0);

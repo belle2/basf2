@@ -71,6 +71,11 @@ namespace Belle2 {
      */
     double getTimeAve() const {return (double) m_TimeAve;}
 
+    /*! Get average time (implementation of base class function)
+     *  @return average time
+     *  by Marko Staric */
+    float getGlobalTime() const {return m_TimeAve;}
+
     /** Shift the Hit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */

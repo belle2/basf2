@@ -162,7 +162,7 @@ class Particle(object):
 def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
     """
     The Full Event Interpretation algorithm.
-    Alle the Actors defined above are added to the playuence and are executed in an order which fulfills all requirements.
+    All the Actors defined above are added to the play and are executed in an order which fulfills all requirements.
     This function returns if no more Actors can be called without violating some requirements.
         @param user_selection_path basf2 module path to execute before any tag-side reconstruction. Should load data, select signal side and create a 'RestOfEvents' list
         @param user_analysis_path basf2 module path to execute after training is finished
@@ -171,11 +171,11 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-verbose', '--verbose', dest='verbose', action='store_true', help='Output additional information')
-    parser.add_argument('-summary', '--make-summmary', dest='makeSummary', action='store_true', help='Create Summary pdf')
+    parser.add_argument('-summary', '--make-summmary', dest='makeSummary', action='store_true', help='Create summary PDF file')
     parser.add_argument('-nosignal', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
     parser.add_argument('-nproc', '--nProcesses', dest='nProcesses', type=int, default=1, help='Use n processes to execute actors parallel')
-    parser.add_argument('-preload', '--preload', dest='preload', action='store_true', help='Preload stuf from cache file')
-    parser.add_argument('-cache', '--cache', dest='cacheFile', type=str, default=None, help='Cache File')
+    parser.add_argument('-preload', '--preload', dest='preload', action='store_true', help='In conjuction with --cache, the basf2 modules used by cached actors are not executed, corresponding data are read from the input file.')
+    parser.add_argument('-cache', '--cache', dest='cacheFile', type=str, default=None, help='Cache actor results in the given file. If an actor is found in the file, it is not executed a second time.')
     args = parser.parse_args()
 
     # Add the basf2 module path

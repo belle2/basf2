@@ -25,6 +25,7 @@ from modularAnalysis import generateY4S
 from modularAnalysis import loadGearbox
 from reconstruction import add_mdst_output
 from modularAnalysis import analysis_main
+from ROOT import Belle2
 
 # generation of 100 events according to the specified DECAY table
 # Y(4S) -> Btag- Bsig+
@@ -32,7 +33,7 @@ from modularAnalysis import analysis_main
 # Bsig+ -> mu+ nu_mu
 #
 # generateY4S function is defined in analysis/scripts/modularAnalysis.py
-generateY4S(100, 'B2A101-Y4SEventGeneration.dec')
+generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/B2A101-Y4SEventGeneration.dec'))
 
 # If the simulation and reconstruction is not performed in the sam job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.
@@ -49,4 +50,3 @@ process(analysis_main)
 
 # print out the summary
 print statistics
-

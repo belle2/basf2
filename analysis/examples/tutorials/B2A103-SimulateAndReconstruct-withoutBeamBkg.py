@@ -46,7 +46,7 @@ add_mdst_output(analysis_main, True,
                 'B2A101-Y4SEventGeneration-gsim-BKGx0.root')
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = register_module('ProgressBar')
 analysis_main.add_module(progress)
 
 # Process the events

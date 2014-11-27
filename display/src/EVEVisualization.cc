@@ -1174,7 +1174,7 @@ void EVEVisualization::makeTracks()
 
   m_eclData->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclData->Empty()) {
-    m_eclData->SetAxisFromBins();
+    m_eclData->SetAxisFromBins(0.0, 0.0); //epsilon_x/y = 0 so we don't merge neighboring bins. This avoids some rendering issues with projections of small clusters.
     m_calo3d->SetData(m_eclData);
   }
   gEve->AddElement(m_calo3d);

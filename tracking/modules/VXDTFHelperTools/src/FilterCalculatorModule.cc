@@ -240,26 +240,7 @@ void FilterCalculatorModule::initialize()
 
   m_sectorMap.clear();
   B2INFO("~~~~~~~~~~~FilterCalculator - initialize ~~~~~~~~~~")
-  std::stringstream supportedDetectorTypes;
-  for (string aDetector : m_PARAMdetectorType) {
-    supportedDetectorTypes << aDetector << " ";
-  }
-  B2INFO("chosen detectorTypes: " << supportedDetectorTypes.str() << ", highestAllowedLayer: " << m_PARAMhighestAllowedLayer << ", smearHits: " << m_PARAMsmearHits << ", noCurler: " << m_PARAMnoCurler << ", uniSigma: " << m_PARAMuniSigma)
-  B2INFO("origin is set to: (x,y,z) (" << m_PARAMsetOrigin.at(0) << "," << m_PARAMsetOrigin.at(1) << "," << m_PARAMsetOrigin.at(2) << "), testBeam-mode is " << m_PARAMtestBeam << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
 
-  StoreArray<MCParticle>::required();
-  StoreArray<PXDTrueHit>::required();
-  StoreArray<SVDTrueHit>::required();
-}
-
-
-
-/// /// /// /// /// /// /// /// BEGIN RUN /// /// /// /// /// /// /// ///
-void FilterCalculatorModule::beginRun()
-{
-  B2INFO("~~~~~~~~~~~FilterCalculator - beginRun ~~~~~~~~~~")
-
-  InitializeVariables();
 
   m_numOfLayers = 0;
   stringstream detectorNames; // same as above but a little bit more readable for B2XY-output...
@@ -284,8 +265,24 @@ void FilterCalculatorModule::beginRun()
 
   m_trackletLengthCounter.assign(m_numOfLayers * 2 + 1, 0);
 
-  B2INFO("chosen detectorTypes: " << detectorNames.str() << ", version 2: " << Belle2::printMyStdVector(m_PARAMdetectorType) << ", uniSigma: " << m_PARAMuniSigma)
+  B2INFO("chosen detectorTypes: " << detectorNames.str() << ", highestAllowedLayer: " << m_PARAMhighestAllowedLayer << ", smearHits: " << m_PARAMsmearHits << ", noCurler: " << m_PARAMnoCurler << ", uniSigma: " << m_PARAMuniSigma)
+  B2INFO("origin is set to: (x,y,z) (" << m_PARAMsetOrigin.at(0) << "," << m_PARAMsetOrigin.at(1) << "," << m_PARAMsetOrigin.at(2) << "), testBeam-mode is " << m_PARAMtestBeam << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
 
+
+  StoreArray<MCParticle>::required();
+  if (m_useTEL) { StoreArray<TelTrueHit>::required(); }
+  if (m_usePXD) { StoreArray<PXDTrueHit>::required(); }
+  if (m_useSVD) { StoreArray<SVDTrueHit>::required(); }
+}
+
+
+
+/// /// /// /// /// /// /// /// BEGIN RUN /// /// /// /// /// /// /// ///
+void FilterCalculatorModule::beginRun()
+{
+  B2INFO("~~~~~~~~~~~FilterCalculator - beginRun ~~~~~~~~~~")
+
+//   InitializeVariables();
 
 
   int numCuts = m_PARAMpTcuts.size();
@@ -378,13 +375,16 @@ void FilterCalculatorModule::event()
   if (numOfMcParticles == 0) {
     B2WARNING("event " << m_eventCounter << ": there is no MCParticle!")
     return;
-  } else if (numOfPxdTrueHits == 0 && m_usePXD == true) {
+  }
+  if (numOfPxdTrueHits == 0 && m_usePXD == true) {
     B2WARNING("event " << m_eventCounter << ": there are no PXDTrueHits")
     return;
-  } else if (numOfSvdTrueHits == 0 && m_useSVD == true) {
+  }
+  if (numOfSvdTrueHits == 0 && m_useSVD == true) {
     B2WARNING("event " << m_eventCounter << ": there are no SVDTrueHits")
     return;
-  } else if (numOfTelTrueHits == 0 && m_useTEL == true) {
+  }
+  if (numOfTelTrueHits == 0 && m_useTEL == true) {
     B2WARNING("event " << m_eventCounter << ": there are no TelTrueHits")
     return;
   }
@@ -398,7 +398,7 @@ void FilterCalculatorModule::event()
     m_PARAMtracksPerEvent = numOfMcParticles;
   }
 
-  B2DEBUG(5, "FilterCalculatorModule, event " << m_eventCounter << ": size of arrays, SvdTrueHit: " << numOfSvdTrueHits << ", mcPart: " << numOfMcParticles << ", PxDTrueHits: " << numOfPxdTrueHits /*<< endl*/);
+  B2DEBUG(5, "FilterCalculatorModule, event " << m_eventCounter << ": size of arrays, SvdTrueHit: " << numOfSvdTrueHits << ", mcPart: " << numOfMcParticles << ", PxDTrueHits: " << numOfPxdTrueHits << ", TelTrueHits: " << numOfTelTrueHits /*<< endl*/);
 
 
   TVector3 oldpGlobal;
@@ -434,11 +434,11 @@ void FilterCalculatorModule::event()
 
     if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle) == false) { continue; } // check whether current particle (and all its hits) belong to a primary particle
 
-    if (mcVertexPos.Perp() > m_PARAMmaxXYvertexDistance) {
+    if (abs(mcVertexPos.Perp() - m_origin.Perp()) > m_PARAMmaxXYvertexDistance) {
       B2DEBUG(10, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart << " discarded because of bad rho-value (" << mcVertexPos.Perp() << " is bigger than threshold: " << m_PARAMmaxXYvertexDistance << ") of the particle-vertex")
       continue;
     }
-    if (abs(mcVertexPos[2]) > m_PARAMmaxZvertexDistance) {
+    if (abs(mcVertexPos.Z() - m_origin.Z()) > m_PARAMmaxZvertexDistance) {
       B2DEBUG(10, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart << " discarded because of bad z-value (" << abs(mcVertexPos[2]) << " is bigger than threshold: " << m_PARAMmaxZvertexDistance << ") of the particle-vertex")
       continue;
     }
@@ -460,7 +460,7 @@ void FilterCalculatorModule::event()
     }
 
 
-    B2DEBUG(20, "FilterCalculatorModule - event " << m_eventCounter << ": chosenSecMap is " << chosenSecMap << " with lower pt threshold of " << m_PARAMpTcuts.at(chosenSecMap) << " with particle id/pdg: " << iPart << "/" << pdg << " having pT: " << mcMomValue)
+    B2DEBUG(20, "FilterCalculatorModule - event " << m_eventCounter << ": chosenSecMap is " << chosenSecMap << " with lower pt threshold of " << m_PARAMpTcuts.at(chosenSecMap) << " with particle id/pdg: " << iPart << "/" << pdg << " having pT: " << mcMomValue << "GeV/c")
     MapOfSectors* thisSecMap = m_sectorMaps.at(chosenSecMap);
 
     VXDTrack newTrack(iPart); // will now filled with PXD and SVD-Hits from same particle

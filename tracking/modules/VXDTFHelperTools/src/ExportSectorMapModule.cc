@@ -141,23 +141,6 @@ void ExportSectorMapModule::initialize()
 
 
 
-void ExportSectorMapModule::beginRun()
-{
-}
-
-
-
-void ExportSectorMapModule::event()
-{
-}
-
-
-
-void ExportSectorMapModule::endRun()
-{
-}
-
-
 
 void ExportSectorMapModule::terminate()
 {

@@ -65,19 +65,6 @@ namespace Belle2 {
     virtual void initialize();
 
     /**
-     * Prints a header for each new run.
-     */
-    virtual void beginRun();
-
-    /** Prints the full information about the event, run and experiment number. */
-    virtual void event();
-
-    /**
-     * Prints a footer for each run which ended.
-     */
-    virtual void endRun();
-
-    /**
      * Termination action.
      */
     virtual void terminate();

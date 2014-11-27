@@ -9,6 +9,7 @@
 
 #include <framework/core/InputController.h>
 
+#include <framework/dataobjects/FileMetaData.h>
 #include <background/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDSimHit.h>
@@ -105,7 +106,8 @@ void SVDBackgroundModule::defineHisto()
 void SVDBackgroundModule::initialize()
 {
   //Register collections
-  StoreObjPtr<BackgroundMetaData> storeBgMetaData(m_storeBgMetaDataName);
+  StoreObjPtr<FileMetaData> storeFileMetaData(m_storeFileMetaDataName, DataStore::c_Persistent);
+  StoreObjPtr<BackgroundMetaData> storeBgMetaData(m_storeBgMetaDataName, DataStore::c_Persistent);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
@@ -117,6 +119,7 @@ void SVDBackgroundModule::initialize()
   RelationArray relTrueHitsSimHits(storeTrueHits, storeSimHits);
 
   //Store names to speed up creation later
+  m_storeFileMetaDataName = storeFileMetaData.getName();
   m_storeBgMetaDataName = storeBgMetaData.getName();
   m_storeMCParticlesName = storeMCParticles.getName();
   m_storeSimHitsName = storeSimHits.getName();
@@ -144,28 +147,9 @@ void SVDBackgroundModule::beginRun()
 
 void SVDBackgroundModule::event()
 {
-  // Get current component name
-  string currentFileName = InputController::getCurrentFileName();
-  size_t beginNameMark = currentFileName.find_last_of('/') + 1;
-  size_t endNameMark = currentFileName.find_last_of('_');
-  string componentName = currentFileName.substr(beginNameMark, endNameMark - beginNameMark);
-  if (componentName != m_currentComponentName) {
-    B2INFO("Current component: " << componentName);
-    m_currentComponentName = componentName;
-  }
-
-  // Get number of events to process
-  int numberOfEvents = InputController::numEntries();
-
   //Register collections
-  // FIXME: BackgroundMetaData contain data on individual merged files. Therefore,
-  // they don't contain summary real times. To calculate that, one would have to
-  // somehow detect boundaries between merged files.
-  // Should somehow fix this to take things out of BackgroundMetaData rather than
-  // from module parameters, since the former is less prone to ugly errors.
-  // One solution would be to only do time normalizations at end of processing.
-  // This is impractical with histograms.
-  const StoreObjPtr<BackgroundMetaData> storeBgMetaData(m_storeBgMetaDataName);
+  const StoreObjPtr<FileMetaData> storeFileMetaData(m_storeFileMetaDataName, DataStore::c_Persistent);
+  const StoreObjPtr<BackgroundMetaData> storeBgMetaData(m_storeBgMetaDataName, DataStore::c_Persistent);
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   const StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
   const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
@@ -176,10 +160,19 @@ void SVDBackgroundModule::event()
   RelationArray relTrueHitsSimHits(storeTrueHits, storeSimHits, m_relTrueHitsSimHitsName);
   RelationArray relTrueHitsMCParticles(storeMCParticles, storeTrueHits, m_relParticlesTrueHitsName);
 
+  const string& componentName = storeBgMetaData->getBackgroundType();
+  if (componentName != m_currentComponentName) {
+    B2INFO("Current component: " << componentName);
+    m_currentComponentName = componentName;
+  }
+
+  // Get number of events to process
+  unsigned long numberOfEvents = storeFileMetaData->getEvents();
+  double currentComponentTime = storeBgMetaData->getRealTime() * Unit::us;
+
   // Exposition and dose
   B2DEBUG(100, "Expo and dose");
   BackgroundData& bData = m_data[m_currentComponentName];
-  double currentComponentTime = bData.m_componentTime;
   VxdID currentSensorID(0);
   double currentSensorThickness(0);
   double currentSensorMass(0);
@@ -210,7 +203,7 @@ void SVDBackgroundModule::event()
     bData.m_sensorData[currentSensorID].m_expo += hitEnergy / currentSensorArea / (currentComponentTime / Unit::s);
     // Bar charts
     // Normalize by layer mass for bar charts
-    bData.m_doseBars->Fill(currentLayerArea,
+    bData.m_doseBars->Fill(currentLayerNumber,
                            (hitEnergy / Unit::J) / (currentLayerMass / 1000) * (c_smy / currentComponentTime));
     // TODO: We need more spatial information here. Envelope plots.
   }

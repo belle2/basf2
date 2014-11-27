@@ -178,7 +178,7 @@ namespace Belle2 {
 
       // Output directory
       std::string m_outputDirectoryName; /**< Path to directory where output data will be stored */
-
+      std::string m_storeFileMetaDataName; /**< Name of the persistent FileMetaData object */
       std::string m_storeBgMetaDataName; /**< Name of the persistent BackgroundMetaDta object */
       // StoreArrays
       std::string m_storeMCParticlesName; /**< MCParticles StoreArray name */

@@ -61,10 +61,10 @@ def CountMCParticles(path, names, gearbox):
 
     counter = {}
     for branch in [str(k.GetName()) for k in countNtuple.GetListOfBranches()]:
-        hallo = ROOT.TH1D('hallo', 'hallo', 1, 0, countNtuple.GetMaximum(branch) + 1)
-        countNtuple.Project('hallo', branch, branch)
-        counter[getpdg(branch)] = int(hallo.Integral())
-        del hallo
+        allMCParticles = ROOT.TH1D('allMCParticles', 'allMCParticles', 1, 0, countNtuple.GetMaximum(branch) + 1)
+        countNtuple.Project('allMCParticles', branch, branch)
+        counter[getpdg(branch)] = int(allMCParticles.Integral())
+        del allMCParticles
     counter['NEvents'] = int(countNtuple.GetEntries())
     B2INFO("Loaded number of MCParticles for every pdg code seperatly")
     return {'mcCounts': counter, '__cache__': True}

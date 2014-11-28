@@ -459,15 +459,15 @@ main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 if combinerLevelReady:
     variablesToNTuple('B0', [
-        'getExtraInfo(qr_Combined)',
-        'getExtraInfo(qr_MC)',
-        'getExtraInfo(B0_prob)',
-        'getExtraInfo(B0bar_prob)',
+        'extraInfo(qr_Combined)',
+        'extraInfo(qr_MC)',
+        'extraInfo(B0_prob)',
+        'extraInfo(B0bar_prob)',
         'McFlavorOfTagSide',
         'mcPDG',
-        'getExtraInfo(ROE_NTracks)',
-        'getExtraInfo(ROE_NECLClusters)',
-        'getExtraInfo(ROE_NKLMClusters)',
+        'extraInfo(ROE_NTracks)',
+        'extraInfo(ROE_NECLClusters)',
+        'extraInfo(ROE_NKLMClusters)',
         ], 'TaggingInformation', workingDirectory + '/B0_B0bar_final.root',
             path=main)
 

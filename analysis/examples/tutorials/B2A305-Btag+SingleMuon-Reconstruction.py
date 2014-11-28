@@ -101,7 +101,7 @@ toolsBTAG = ['MCTruth', '^B- -> ^D0 pi-']
 toolsBTAG += ['Kinematics', 'B- -> ^D0 pi-']
 toolsBTAG += ['DeltaEMbc', '^B-']
 toolsBTAG += ['InvMass', 'B- -> ^D0 pi-']
-toolsBTAG += ['CustomFloats[getExtraInfo(decayModeID)]', '^B- -> ^D0 pi-']
+toolsBTAG += ['CustomFloats[extraInfo(decayModeID)]', '^B- -> ^D0 pi-']
 
 tools4S = ['MCTruth', '^Upsilon(4S) -> ^B- ^mu+']
 tools4S += ['DeltaEMbc', 'Upsilon(4S) -> ^B- mu+']
@@ -110,7 +110,7 @@ tools4S += ['RecoilKinematics', '^Upsilon(4S)']
 tools4S += ['ExtraEnergy', '^Upsilon(4S)']
 tools4S += ['Kinematics', '^Upsilon(4S) -> [B- -> ^D0 pi-] mu+']
 tools4S += ['InvMass', 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+']
-tools4S += ['CustomFloats[getExtraInfo(decayModeID)]', 'Upsilon(4S) -> [^B- -> ^D0 pi-] mu+']
+tools4S += ['CustomFloats[extraInfo(decayModeID)]', 'Upsilon(4S) -> [^B- -> ^D0 pi-] mu+']
 
 ntupleFile('B2A305-Btag+SingleMuon-Reconstruction.root')
 ntupleTree('btag', 'B-:tag', toolsBTAG)

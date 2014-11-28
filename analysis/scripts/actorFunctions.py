@@ -334,7 +334,7 @@ def PostCutDetermination(identifier, postCutConfig, signalProbabilities):
         return {'PostCut_{i}'.format(i=identifier): None, '__needed__': False, '__cache__': True}
     else:
         B2INFO("Calculate post cut for {i}".format(i=identifier))
-        return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}, '__cache__': True}
+        return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < extraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}, '__cache__': True}
 
 
 def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribution, additionalDependencies):
@@ -443,7 +443,7 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
         output = register_module('VariablesToNtuple')
         output.set_name('VariablesToNtuple_' + particleList)
         output.param('particleList', particleList)
-        output.param('variables', ['getExtraInfo(SignalProbability)', 'isSignal', 'isSignalAcceptMissingNeutrino', 'Mbc', 'mcStatus', 'cosThetaBetweenParticleAndTrueB'])
+        output.param('variables', ['extraInfo(SignalProbability)', 'isSignal', 'isSignalAcceptMissingNeutrino', 'Mbc', 'mcStatus', 'cosThetaBetweenParticleAndTrueB'])
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)

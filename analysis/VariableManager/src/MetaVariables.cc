@@ -35,7 +35,7 @@
 namespace Belle2 {
   namespace Variable {
 
-    Manager::FunctionPtr getExtraInfo(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         auto extraInfoName = arguments[0];
@@ -48,7 +48,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function getExtraInfo")
+        B2WARNING("Wrong number of arguments for meta function extraInfo")
         return nullptr;
       }
     }
@@ -741,7 +741,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf, "Returns product of a variable over all daughters.");
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf, "Returns sum of a variable over all daughters.");
-    REGISTER_VARIABLE("getExtraInfo(name)", getExtraInfo, "Returns extra info stored under the given name.");
+    REGISTER_VARIABLE("extraInfo(name)", extraInfo, "Returns extra info stored under the given name.");
+    REGISTER_VARIABLE("getExtraInfo(name)", extraInfo, "Deprecated, use extraInfo(name) instead.");
     REGISTER_VARIABLE("abs(variable)", abs, "Returns absolute value of the given variable.");
     REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing, "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");

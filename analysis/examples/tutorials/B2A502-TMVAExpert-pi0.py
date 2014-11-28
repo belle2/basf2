@@ -84,7 +84,7 @@ toolsPI0 += ['MassBeforeFit', '^pi0']
 toolsPI0 += ['MCKinematics', '^pi0 -> gamma gamma']
 toolsPI0 += ['EventMetaData', '^pi0']
 toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
-toolsPI0 += ['CustomFloats[getExtraInfo(BDT)]', '^pi0']
+toolsPI0 += ['CustomFloats[extraInfo(BDT)]', '^pi0']
 
 # write flat ntuples
 

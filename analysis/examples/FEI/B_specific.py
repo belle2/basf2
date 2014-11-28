@@ -97,13 +97,13 @@ particles.append(p)
 ######################## D0 #########################
 mva_D0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
     target='isSignal'
 )
 
 mva_D0_withoutVertex = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables,
     target='isSignal'
 )
 
@@ -138,13 +138,13 @@ particles.append(p)
 
 mva_DPlus = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
     target='isSignal'
 )
 
 mva_DPlus_withoutVertex = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables,
     target='isSignal'
 )
 
@@ -176,13 +176,13 @@ particles.append(p)
 
 mva_DStarPlus = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
     target='isSignal'
 )
 
 mva_DStarPlus_withoutVertex = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables,
     target='isSignal'
 )
 
@@ -203,7 +203,7 @@ particles.append(p)
 ######################## D*0 #########################
 mva_DStar0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables,
     target='isSignal'
 )
 
@@ -224,7 +224,7 @@ particles.append(p)
 
 mva_DS = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
     target='isSignal'
 )
 
@@ -255,7 +255,7 @@ particles.append(p)
 
 mva_DStarS = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables,
     target='isSignal'
 )
 
@@ -276,7 +276,7 @@ particles.append(p)
 
 mva_J = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
     target='isSignal'
 )
 
@@ -296,18 +296,18 @@ particles.append(p)
 ################### B+ ##############################
 mva_BPlus = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + B_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + B_variables,
     target='isSignal'
 )
 
 mva_BPlus_low_stat = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=5:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + B_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + B_variables,
     target='isSignal'
 )
 
 pre_BPlus = Particle.PreCutConfiguration(
-    variable='daughterProductOf(getExtraInfo(SignalProbability))',
+    variable='daughterProductOf(extraInfo(SignalProbability))',
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     efficiency=0.95,
     purity=0.0001,
@@ -344,12 +344,12 @@ particles.append(p)
 
 mva_BPlusSemileptonic = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + B_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + B_variables,
     target='isSignalAcceptMissingNeutrino'
 )
 
 pre_BPlusSemileptonic = Particle.PreCutConfiguration(
-    variable='daughterProductOf(getExtraInfo(SignalProbability))',
+    variable='daughterProductOf(extraInfo(SignalProbability))',
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     efficiency=0.95,
     purity=0.0001,
@@ -370,12 +370,12 @@ particles.append(p)
 ##################################  B0 #################################
 mva_B0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + B_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + B_variables,
     target='isSignal'
 )
 
 pre_B0 = Particle.PreCutConfiguration(
-    variable='daughterProductOf(getExtraInfo(SignalProbability))',
+    variable='daughterProductOf(extraInfo(SignalProbability))',
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     efficiency=0.95,
     purity=0.0001,
@@ -410,12 +410,12 @@ particles.append(p)
 
 mva_B0Semileptonic = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + B_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + B_variables,
     target='isSignalAcceptMissingNeutrino'
 )
 
 pre_B0Semileptonic = Particle.PreCutConfiguration(
-    variable='daughterProductOf(getExtraInfo(SignalProbability))',
+    variable='daughterProductOf(extraInfo(SignalProbability))',
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     efficiency=0.95,
     purity=0.0001,

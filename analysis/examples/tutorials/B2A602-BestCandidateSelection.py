@@ -69,7 +69,7 @@ matchMCTruth('D0')
 toolsDST = ['EventMetaData', '^D0']
 toolsDST += ['CMSKinematics', '^D0']
 # save ranks and associated variables
-toolsDST += ['CustomFloats[dM:chiProb:getExtraInfo(abs(dM)_rank):getExtraInfo(chiProb_rank)]', '^D0']
+toolsDST += ['CustomFloats[dM:chiProb:extraInfo(abs(dM)_rank):extraInfo(chiProb_rank)]', '^D0']
 toolsDST += ['Vertex', '^D0']
 toolsDST += ['MCVertex', '^D0']
 toolsDST += ['MCTruth', '^D0 -> ^K- ^pi+']

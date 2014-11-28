@@ -23,7 +23,7 @@ for method in methods:
     main.add_module(expert)
 
 output = register_module('VariablesToNtuple')
-output.param('variables', ['getExtraInfo({method}_Probability)'.format(method=method) for method in methods] + ['isContinuumEvent'])
+output.param('variables', ['extraInfo({method}_Probability)'.format(method=method) for method in methods] + ['isContinuumEvent'])
 output.param('fileName', 'expert_per_event.root')
 output.param('treeName', 'variables')
 main.add_module(output)

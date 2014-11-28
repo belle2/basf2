@@ -125,32 +125,29 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
     # filling the histograms
 
     # filling with abs(qr) in one of 6 bins with its weight
-    tree.Project('Average_r', 'abs(getExtraInfoqr_Combined)',
-                 'abs(getExtraInfoqr_Combined)')
+    tree.Project('Average_r', 'abs(extraInfoqr_Combined)',
+                 'abs(extraInfoqr_Combined)')
     # filling with abs(qr) in one of 6 bins
-    tree.Project('entries_per_bin', 'abs(getExtraInfoqr_Combined)')
+    tree.Project('entries_per_bin', 'abs(extraInfoqr_Combined)')
 
     # not necessary
-    tree.Draw('getExtraInfoB0_prob>>Comb_Net_Output_B0', 'McFlavorOfTagSide>0')
-    tree.Draw('getExtraInfoB0_prob>>Comb_Net_Output_B0bar',
-              'McFlavorOfTagSide<0')
+    tree.Draw('extraInfoB0_prob>>Comb_Net_Output_B0', 'McFlavorOfTagSide>0')
+    tree.Draw('extraInfoB0_prob>>Comb_Net_Output_B0bar', 'McFlavorOfTagSide<0')
 
-    tree.Draw('getExtraInfoqr_Combined>>BellePlot_B0', 'McFlavorOfTagSide>0 ')
-    tree.Draw('getExtraInfoqr_Combined>>BellePlot_B0Bar', 'McFlavorOfTagSide<0'
-              )
-    tree.Draw('getExtraInfoqr_Combined>>BellePlot_NoCut')
+    tree.Draw('extraInfoqr_Combined>>BellePlot_B0', 'McFlavorOfTagSide>0 ')
+    tree.Draw('extraInfoqr_Combined>>BellePlot_B0Bar', 'McFlavorOfTagSide<0')
+    tree.Draw('extraInfoqr_Combined>>BellePlot_NoCut')
 
-    tree.Draw('getExtraInfoqr_Combined>>Calibration_B0', 'McFlavorOfTagSide>0')
-    tree.Draw('getExtraInfoqr_Combined>>Calibration_B0Bar',
-              'McFlavorOfTagSide<0')
+    tree.Draw('extraInfoqr_Combined>>Calibration_B0', 'McFlavorOfTagSide>0')
+    tree.Draw('extraInfoqr_Combined>>Calibration_B0Bar', 'McFlavorOfTagSide<0')
 
     # filling histograms wrong efficiency calculation
-    tree.Draw('getExtraInfoqr_Combined>>BellePlot_B0_m0',
-              'McFlavorOfTagSide>0 && getExtraInfoqr_Combined>0')
-    tree.Draw('getExtraInfoqr_Combined>>BellePlot_B0_m1',
-              'McFlavorOfTagSide>0 && getExtraInfoqr_Combined<0')
-    tree.Draw('getExtraInfoqr_Combined>>BellePlot_B0_m2',
-              'McFlavorOfTagSide<0 && getExtraInfoqr_Combined>0')
+    tree.Draw('extraInfoqr_Combined>>BellePlot_B0_m0',
+              'McFlavorOfTagSide>0 && extraInfoqr_Combined>0')
+    tree.Draw('extraInfoqr_Combined>>BellePlot_B0_m1',
+              'McFlavorOfTagSide>0 && extraInfoqr_Combined<0')
+    tree.Draw('extraInfoqr_Combined>>BellePlot_B0_m2',
+              'McFlavorOfTagSide<0 && extraInfoqr_Combined>0')
 
     # producing the average r histogram
     histo_avr_r.Divide(histo_entries_per_bin)

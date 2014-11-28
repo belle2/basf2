@@ -266,7 +266,7 @@ if eventLevelReady:
         # Using MetaVariable
         targetVariable = 'IsRightClass(' + category + ')'
         # VariablesToNtuple to investigate the list before best candidate selection
-        # variablesToNTuple(particleList, ["charge", "getExtraInfo(IsFromB(" + category + "))", "qr_Combined"], filename= workingDirectory + "without_best_candidate_selection_" + category + ".root", path=roe_path)
+        # variablesToNTuple(particleList, ["charge", "extraInfo(IsFromB(" + category + "))", "qr_Combined"], filename= workingDirectory + "without_best_candidate_selection_" + category + ".root", path=roe_path)
         # Selecting particle with highest r
         applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' + 'IsFromB(' + category + ')) > 0.5', path=roe_path)
 
@@ -390,8 +390,8 @@ if combinerLevelReady:
 main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 if combinerLevelReady:
-    variablesToNTuple('B0', ['getExtraInfo(qr_Combined)', 'getExtraInfo(qr_MC)', 'getExtraInfo(B0_prob)',
-                             'getExtraInfo(B0bar_prob)', 'McFlavorOfTagSide', 'mcPDG'], 'TaggingInformation',
+    variablesToNTuple('B0', ['extraInfo(qr_Combined)', 'extraInfo(qr_MC)', 'extraInfo(B0_prob)',
+                             'extraInfo(B0bar_prob)', 'McFlavorOfTagSide', 'mcPDG'], 'TaggingInformation',
                       workingDirectory + '/B0_B0bar_final.root', path=main)
 
 

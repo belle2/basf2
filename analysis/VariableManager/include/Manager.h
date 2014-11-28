@@ -43,11 +43,11 @@ namespace Belle2 {
      *   <dd>Calculate variable varName for each daughter, and return product of values</dd>
      *  <dt>daughterSumOf(varName)</dt>
      *   <dd>Calculate variable varName for each daughter, and return sum of values</dd>
-     *  <dt>getExtraInfo(extraInfoName)</dt>
+     *  <dt>extraInfo(extraInfoName)</dt>
      *   <dd>Return value of extra info 'extraInfoName' from Particle (see Particle::getExtraInfo()).</dd>
      *  </dl>
      *  So, if you wanted to get the momentum of the first daughter, you can use "daughter(1, p)" anywhere where variable
-     *  names are accepted. Nesting is also possible, e.g. "daughter(1, abs(getExtraInfo(SignalProbability)))" can be used.
+     *  names are accepted. Nesting is also possible, e.g. "daughter(1, abs(extraInfo(SignalProbability)))" can be used.
      *
      *  <h2>Adding variables</h2>
      *  Variables will automatically register themselves when

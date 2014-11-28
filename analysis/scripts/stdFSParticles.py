@@ -47,21 +47,21 @@ def stdPi0(path=analysis_main):
     expert.param('signalProbabilityName', 'BDT')
     path.add_module(expert)
 
-    cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < getExtraInfo(BDT) < 1.0',
+    cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < extraInfo(BDT) < 1.0',
                    True, path)
-    cutAndCopyList('pi0:good', 'pi0:all', '0.5 < getExtraInfo(BDT) < 1.0',
+    cutAndCopyList('pi0:good', 'pi0:all', '0.5 < extraInfo(BDT) < 1.0',
                    True, path)
 
 
 def loosePi0(path=analysis_main):
     stdPi0(path)
-    cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < getExtraInfo(BDT) < 1.0',
+    cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < extraInfo(BDT) < 1.0',
                    True, path)
 
 
 def goodPi0(path=analysis_main):
     stdPi0(path)
-    cutAndCopyList('pi0:good', 'pi0:all', '0.5 < getExtraInfo(BDT) < 1.0',
+    cutAndCopyList('pi0:good', 'pi0:all', '0.5 < extraInfo(BDT) < 1.0',
                    True, path)
 
 
@@ -79,5 +79,3 @@ def goodPhoton(path=analysis_main):
 def stdHighEPhoton(path=analysis_main):
     stdPhoton(path)
     cutAndCopyList('gamma:highE', 'gamma:all', '1.5 < E < 100', True, path)
-
-

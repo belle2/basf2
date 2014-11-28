@@ -27,7 +27,7 @@ for method in methods:
 
 output = register_module('VariablesToNtuple')
 output.param('particleList', 'e-')
-output.param('variables', ['getExtraInfo({method}_Probability)'.format(method=method) for method in methods])
+output.param('variables', ['extraInfo({method}_Probability)'.format(method=method) for method in methods])
 output.param('fileName', 'expert_per_candidate.root')
 output.param('treeName', 'variables')
 main.add_module(output)

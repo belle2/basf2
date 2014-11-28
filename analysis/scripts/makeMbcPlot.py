@@ -29,10 +29,10 @@ def makeMbcPlot(fileName, outputFileName):
     for cut in [0.0001, 0.001, 0.01, 0.1, 0.5]:
         testTree.SetLineColor(int(color))
         testTree.SetLineStyle(ROOT.kSolid)
-        testTree.Draw('Mbc', 'getExtraInfoSignalProbability > ' + str(cut), 'same')
+        testTree.Draw('Mbc', 'extraInfoSignalProbability > ' + str(cut), 'same')
 
         testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('Mbc', 'getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
+        testTree.Draw('Mbc', 'extraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
         color -= 1
 
     l = canvas.GetListOfPrimitives()

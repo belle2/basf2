@@ -23,7 +23,7 @@ namespace Belle2 {
      * Returns function which returns extra info of a given particle
      * First argument in the argument vector must be the name of the extra info
      */
-    Manager::FunctionPtr getExtraInfo(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the product of a variable over all daughters of the given particle

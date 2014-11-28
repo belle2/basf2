@@ -82,7 +82,7 @@ particles.append(p)
 
 mva_J = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
     target='isSignal', targetCluster=1
 )
 
@@ -103,7 +103,7 @@ particles.append(p)
 
 mva_B0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'deltaE'] + vertex_variables,
+    variables=['daughterProductOf(extraInfo(SignalProbability))', 'deltaE'] + vertex_variables,
     target='isSignal', targetCluster=1
 )
 

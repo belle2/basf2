@@ -42,10 +42,10 @@ namespace {
     const Manager::Var* daughter1P = Manager::Instance().getVariable("daughter(1, p)");
     EXPECT_TRUE(daughter1P != nullptr);
 
-    const Manager::Var* extraInfo = Manager::Instance().getVariable("getExtraInfo(signalProbability)");
+    const Manager::Var* extraInfo = Manager::Instance().getVariable("extraInfo(signalProbability)");
     EXPECT_TRUE(extraInfo != nullptr);
 
-    const Manager::Var* nested = Manager::Instance().getVariable("daughterSumOf(daughter(1, getExtraInfo(signalProbability)))");
+    const Manager::Var* nested = Manager::Instance().getVariable("daughterSumOf(daughter(1, extraInfo(signalProbability)))");
     EXPECT_TRUE(nested != nullptr);
 
     const Manager::Var* funcDoesNotExists = Manager::Instance().getVariable("funcDoesNotExist(p)");

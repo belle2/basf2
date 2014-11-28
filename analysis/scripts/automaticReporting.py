@@ -585,6 +585,7 @@ def addHyphenations(someString):
         '=': r'=\allowbreak ',
         ':': r':\allowbreak ',
         '(': r'(\allowbreak ',
+        'extraInfo': r'ex\-tra\-In\-fo',
         'getExtraInfo': r'get\-Ex\-tra\-In\-fo',
         'SignalProbability': r'Sig\-nal\-Prob\-a\-bil\-i\-ty',
         'cosAngleBetweenMomentumAndVertexVector': r'cosAngle\-Between\-Momentum\-And\-Vertex\-Vector'}
@@ -625,7 +626,7 @@ def makeROCPlot(tmvaFilename, plotName):
 def makeDiagPlotPerParticle(nTuple, plotName, mvaConfig):
 
     nbins = 100
-    probabilityVar = 'getExtraInfoSignalProbability'  # ROOT.Belle2.Variable.makeROOTCompatible('getExtraInfo(SignalProbability)')
+    probabilityVar = 'extraInfoSignalProbability'  # ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(SignalProbability)')
 
     if nTuple is not None:
         nTupleFile = ROOT.TFile(nTuple)
@@ -737,11 +738,11 @@ def makeCosBDLPlot(fileName, outputFileName):
     for cut in [0.01, 0.1, 0.5]:
         testTree.SetLineColor(int(color))
         testTree.SetLineStyle(ROOT.kSolid)
-        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && getExtraInfoSignalProbability > ' + str(cut), '' if first_plot else 'same')
+        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' + str(cut), '' if first_plot else 'same')
         first_plot = False
 
         testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignalAcceptMissingNeutrino', 'same')
+        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' + str(cut) + ' && !isSignalAcceptMissingNeutrino', 'same')
         color -= 1
 
     l = canvas.GetListOfPrimitives()
@@ -783,11 +784,11 @@ def makeMbcPlot(fileName, outputFileName):
     for cut in [0.01, 0.1, 0.5]:
         testTree.SetLineColor(int(color))
         testTree.SetLineStyle(ROOT.kSolid)
-        testTree.Draw('Mbc', 'Mbc > 5.23 && getExtraInfoSignalProbability > ' + str(cut), '' if first_plot else 'same')
+        testTree.Draw('Mbc', 'Mbc > 5.23 && extraInfoSignalProbability > ' + str(cut), '' if first_plot else 'same')
         first_plot = False
 
         testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('Mbc', 'Mbc > 5.23 && getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
+        testTree.Draw('Mbc', 'Mbc > 5.23 && extraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
         color -= 1
 
     l = canvas.GetListOfPrimitives()

@@ -10,6 +10,10 @@
 #pragma once
 
 #include <framework/datastore/StoreEntry.h>
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+#include <framework/datastore/RelationVector.h>
+#include <framework/datastore/RelationEntry.h>
+#endif
 
 #include <vector>
 #include <string>
@@ -283,7 +287,7 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
      *  @return               Vector of relation entry objects.
      */
-    std::vector<RelationEntry> getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName);
+    std::vector<Belle2::RelationEntry> getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName);
 
     /** Get the first relation between an object and another object in a store array.
      *
@@ -297,7 +301,7 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
      *  @return               The entry of the first related object.
      */
-    RelationEntry getRelationWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName);
+    Belle2::RelationEntry getRelationWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName);
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
@@ -428,6 +432,27 @@ namespace Belle2 {
       return static_cast<T*>(DataStore::Instance().getRelationWith(c_BothSides, object, storeEntry, index, T::Class(), name).object);
     }
 
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+
+    /**
+     * @{
+     * Define versions without template arguments, only available from python modules.
+     */
+    static RelationVector<TObject> getRelationsToObj(const TObject* toObject, const std::string& name) {
+      return getRelationsToObj<TObject>(toObject, name);
+    }
+    static RelationVector<TObject> getRelationsFromObj(const TObject* fromObject, const std::string& name) {
+      return getRelationsFromObj<TObject>(fromObject, name);
+    }
+    static RelationVector<TObject> getRelationsWithObj(const TObject* object, const std::string& name) {
+      return getRelationsWithObj<TObject>(object, name);
+    }
+    static TObject* getRelatedToObj(const TObject* toObject, const std::string& name) { return getRelatedToObj<TObject>(toObject, name); }
+    static TObject* getRelatedFromObj(const TObject* fromObject, const std::string& name) { return getRelatedFromObj<TObject>(fromObject, name); }
+    static TObject* getRelated(const TObject* object, const std::string& name) { return getRelated<TObject>(object, name); }
+    /** @} */
+#endif
+
     /** Find an object in an array in the data store.
      *
      *  entry/index are used to return the found array and index,
@@ -496,7 +521,7 @@ namespace Belle2 {
     void setModule(const std::string& name) { m_currentModule = name; }
 
     /** return information on inputs/outputs of each module, as obtained by requireInput()/optionalInput()/registerEntry(); */
-    const std::map<std::string, ModuleInfo>& getModuleInfoMap() const { return m_moduleInfo; }
+    const std::map<std::string, Belle2::DataStore::ModuleInfo>& getModuleInfoMap() const { return m_moduleInfo; }
 
 
   private:
@@ -544,6 +569,6 @@ namespace Belle2 {
     std::string m_currentModule;
 
     /** Stores information on inputs/outputs of each module, as obtained by requireInput()/optionalInput()/registerEntry(); */
-    std::map<std::string, ModuleInfo> m_moduleInfo;
+    std::map<std::string, Belle2::DataStore::ModuleInfo> m_moduleInfo;
   };
 } // namespace Belle2

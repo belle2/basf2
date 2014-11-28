@@ -26,14 +26,13 @@ inputMdst(inputMdstFileName)
 loadReconstructedParticles()
 
 # fetch the standard photon (input for standard pi0 reconstruction)
-# the reconstructed photon Particles are collected in the StdPhoton ParticleList
+# the reconstructed photon Particles are collected in the gamma:all ParticleList
 stdPhoton()
 
 # make  standard pi0 reconstruction
-# the reconstructed pi0 Particles are collected in the StdPi0 ParticleList
+# the reconstructed pi0 Particles are collected in the pi0:all, pi0:loose, and pi0:good ParticleList
 stdPi0()
 
-matchMCTruth('StdPi0')
 
 toolsPI0 = ['MCTruth', '^pi0']
 toolsPI0 += ['Kinematics', '^pi0']
@@ -45,7 +44,7 @@ toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
 
 # write flat ntuples
 ntupleFile('StandardPi0_example_output.root')
-ntupleTree('pi0Tree', 'StdPi0', toolsPI0)
+ntupleTree('pi0Tree', 'pi0:all', toolsPI0)
 
 # ----> start processing of modules
 process(analysis_main)

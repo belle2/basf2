@@ -117,81 +117,142 @@ def add_posttracking_reconstruction(path, components=None):
         path.add_module(mdstPID)
 
 
+def add_tracking_reconstruction(path, components=None):
+    """
+    This function adds the standard reconstruction modules for tracking
+    to a path.
+    """
+
+    if components and not ('SVD' in components or 'CDC' in components):
+        return
+
+    use_vxd = components is None or 'SVD' in components
+    use_cdc = components is None or 'CDC' in components
+
+    # Material effects for all track extrapolations
+    material_effects = register_module('SetupGenfitExtrapolation')
+    material_effects.param('whichGeometry', 'TGeo')
+    path.add_module(material_effects)
+
+    # CDC track finder: trasan
+    if use_cdc:
+        cdc_trackcands = ''
+        if use_vxd:
+            cdc_trackcands = 'CDCGFTrackCands'
+        trackcands = cdc_trackcands
+        cdc_trackfinder = register_module('Trasan')
+        cdc_trackfinder.param('GFTrackCandidatesColName', cdc_trackcands)
+        path.add_module(cdc_trackfinder)
+
+    # VXD track finder
+    if use_vxd:
+        vxd_trackcands = ''
+        if use_cdc:
+            vxd_trackcands = 'VXDGFTrackCands'
+        vxd_trackfinder = register_module('VXDTF')
+        vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
+        if components is not None and 'PXD' not in components:
+            vxd_trackfinder.param('sectorSetup',
+                                  ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD'
+                                  ,
+                                  'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD'
+                                  ,
+                                  'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD'
+                                  ])
+            vxd_trackfinder.param('tuneCutoffs', 0.06)
+        else:
+            vxd_trackfinder.param('sectorSetup',
+                                  ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
+                                  ,
+                                  'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
+                                  ,
+                                  'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+                                  ])
+            vxd_trackfinder.param('tuneCutoffs', 0.22)
+        path.add_module(vxd_trackfinder)
+
+    # track merging
+    if use_vxd and use_cdc:
+        track_merger = register_module('MCTrackCandCombiner')
+        track_merger.param('CDCTrackCandidatesColName', cdc_trackcands)
+        track_merger.param('VXDTrackCandidatesColName', vxd_trackcands)
+        path.add_module(track_merger)
+
+    # track fitting
+    trackfitter = register_module('GenFitter')
+    path.add_module(trackfitter)
+
+    # V0 finding
+    v0finder = register_module('V0Finder')
+    path.add_module(v0finder)
+
+    # dE/dx PID
+    dEdxPID = register_module('DedxPID')
+    dEdxPID.param('useSVD', use_vxd)
+    dEdxPID.param('useCDC', use_cdc)
+    path.add_module(dEdxPID)
+
+    # prune genfit tracks
+    path.add_module(PruneGenfitTracks())
+
+
+def add_mc_tracking_reconstruction(path, components=None):
+    """
+    This function adds the standard reconstruction modules for MC tracking
+    to a path.
+    """
+
+    # tracking
+    if components and not ('PXD' in components or 'SVD' in components or 'CDC'
+                           in components):
+        return
+
+    # Material effects for all track extrapolations
+    material_effects = register_module('SetupGenfitExtrapolation')
+    material_effects.param('whichGeometry', 'TGeo')
+    path.add_module(material_effects)
+
+    # find MCTracks in CDC, SVD, and PXD
+    mc_trackfinder = register_module('TrackFinderMCTruth')
+    # Default setting in the module may be either way, therefore
+    # accomodate both cases explicitly.
+    if components is None or 'PXD' in components:
+        mc_trackfinder.param('UsePXDHits', 1)
+    else:
+        mc_trackfinder.param('UsePXDHits', 0)
+    if components is None or 'SVD' in components:
+        mc_trackfinder.param('UseSVDHits', 1)
+    else:
+        mc_trackfinder.param('UseSVDHits', 0)
+    if components is None or 'CDC' in components:
+        mc_trackfinder.param('UseCDCHits', 1)
+    else:
+        mc_trackfinder.param('UseCDCHits', 0)
+    path.add_module(mc_trackfinder)
+
+    # track fitting
+    trackfitter = register_module('GenFitter')
+    path.add_module(trackfitter)
+
+    # dE/dx PID
+    dEdxPID = register_module('DedxPID')
+    if components is not None and 'SVD' not in components:
+        dEdxPID.param('useSVD', False)
+    if components is not None and 'CDC' not in components:
+        dEdxPID.param('useCDC', False)
+    path.add_module(dEdxPID)
+
+    # prune genfit tracks
+    path.add_module(PruneGenfitTracks())
+
+
 def add_reconstruction(path, components=None):
     """
     This function adds the standard reconstruction modules to a path.
     """
 
     # tracking
-    if components is None or 'SVD' in components or 'CDC' in components:
-        use_vxd = components is None or 'SVD' in components
-        use_cdc = components is None or 'CDC' in components
-
-        # Material effects for all track extrapolations
-        material_effects = register_module('SetupGenfitExtrapolation')
-        material_effects.param('whichGeometry', 'TGeo')
-        path.add_module(material_effects)
-
-        # CDC track finder: trasan
-        if use_cdc:
-            cdc_trackcands = ''
-            if use_vxd:
-                cdc_trackcands = 'CDCGFTrackCands'
-            trackcands = cdc_trackcands
-            cdc_trackfinder = register_module('Trasan')
-            cdc_trackfinder.param('GFTrackCandidatesColName', cdc_trackcands)
-            path.add_module(cdc_trackfinder)
-
-        # VXD track finder
-        if use_vxd:
-            vxd_trackcands = ''
-            if use_cdc:
-                vxd_trackcands = 'VXDGFTrackCands'
-            vxd_trackfinder = register_module('VXDTF')
-            vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
-            if components is not None and 'PXD' not in components:
-                vxd_trackfinder.param('sectorSetup',
-                                      ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD'
-                                      ,
-                                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD'
-                                      ,
-                                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD'
-                                      ])
-                vxd_trackfinder.param('tuneCutoffs', 0.06)
-            else:
-                vxd_trackfinder.param('sectorSetup',
-                                      ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
-                                      ,
-                                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
-                                      ,
-                                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
-                                      ])
-                vxd_trackfinder.param('tuneCutoffs', 0.22)
-            path.add_module(vxd_trackfinder)
-
-        # track merging
-        if use_vxd and use_cdc:
-            track_merger = register_module('MCTrackCandCombiner')
-            track_merger.param('CDCTrackCandidatesColName', cdc_trackcands)
-            track_merger.param('VXDTrackCandidatesColName', vxd_trackcands)
-            path.add_module(track_merger)
-
-        # track fitting
-        trackfitter = register_module('GenFitter')
-        path.add_module(trackfitter)
-
-        # V0 finding
-        v0finder = register_module('V0Finder')
-        path.add_module(v0finder)
-
-        # dE/dx PID
-        dEdxPID = register_module('DedxPID')
-        dEdxPID.param('useSVD', use_vxd)
-        dEdxPID.param('useCDC', use_cdc)
-        path.add_module(dEdxPID)
-
-        # prune genfit tracks
-        path.add_module(PruneGenfitTracks())
+    add_tracking_reconstruction(path, components)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)
@@ -204,46 +265,7 @@ def add_mc_reconstruction(path, components=None):
     """
 
     # tracking
-    if components is None or 'PXD' in components or 'SVD' in components \
-        or 'CDC' in components:
-
-        # Material effects for all track extrapolations
-        material_effects = register_module('SetupGenfitExtrapolation')
-        material_effects.param('whichGeometry', 'TGeo')
-        path.add_module(material_effects)
-
-        # find MCTracks in CDC, SVD, and PXD
-        mc_trackfinder = register_module('TrackFinderMCTruth')
-        # Default setting in the module may be either way, therefore
-        # accomodate both cases explicitly.
-        if components is None or 'PXD' in components:
-            mc_trackfinder.param('UsePXDHits', 1)
-        else:
-            mc_trackfinder.param('UsePXDHits', 0)
-        if components is None or 'SVD' in components:
-            mc_trackfinder.param('UseSVDHits', 1)
-        else:
-            mc_trackfinder.param('UseSVDHits', 0)
-        if components is None or 'CDC' in components:
-            mc_trackfinder.param('UseCDCHits', 1)
-        else:
-            mc_trackfinder.param('UseCDCHits', 0)
-        path.add_module(mc_trackfinder)
-
-        # track fitting
-        trackfitter = register_module('GenFitter')
-        path.add_module(trackfitter)
-
-        # dE/dx PID
-        dEdxPID = register_module('DedxPID')
-        if components is not None and 'SVD' not in components:
-            dEdxPID.param('useSVD', False)
-        if components is not None and 'CDC' not in components:
-            dEdxPID.param('useCDC', False)
-        path.add_module(dEdxPID)
-
-        # prune genfit tracks
-        path.add_module(PruneGenfitTracks())
+    add_mc_tracking_reconstruction(path, components)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)

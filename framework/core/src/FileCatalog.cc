@@ -154,7 +154,7 @@ bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
   // use absolute path and next negative integer number as ID for the meta data
   fileName = fs::absolute(fileName, fs::initial_path<fs::path>()).c_str();
   int id = fileMap.begin()->first - 1;
-  if (metaData.getId() <= 0) {
+  if (metaData.getId() == 0) {
     metaData.setIds(id, "", fileName);
   } else {
     metaData.setIds(metaData.getId(), metaData.getGuid(), fileName);

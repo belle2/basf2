@@ -1,0 +1,17 @@
+[INFO] Steering file: framework/tests/filemetadata.py
+>>> basf2 Python environment set
+>>> Framework object created: fw
+[INFO] Write TTree tree
+[INFO] Write TTree persistent
+FileMetaData
+  ID     : 0
+  LFN    : 
+  #event : 10
+  range  : 0/0/0 - 0/0/9
+  parents:
+FileMetaData
+  ID     : 12345
+  LFN    : /logical/file/name
+  #event : 10
+  range  : 0/0/0 - 0/0/9
+  parents:

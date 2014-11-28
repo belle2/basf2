@@ -18,15 +18,14 @@
 
 namespace Belle2 {
 
-  /** This is the specialization for SpacePoints with returning floats, where value calculates the squared distance between two hits in 2D on the X-Y-plane */
-  class Distance2DXYSquared : public SelectionVariable< SpacePoint , float > {
+  /** This is the specialization for SpacePoints with returning floats, where value calculates the squared distance between two hits in 1D on the Z-axis */
+  class Distance1DZSquared : public SelectionVariable< SpacePoint , float > {
   public:
 
-    /** calculates the squared distance between the hits (2D on the X-Y-plane), returning unit: cm^2 for speed optimization */
+    /** calculates the squared distance between the hits in Z (in 1D), returning unit: cm^2 */
     static float value(const SpacePoint& outerHit, const SpacePoint& innerHit) {
       return
-        std::pow(outerHit.X() - innerHit.X() , 2) +
-        std::pow(outerHit.Y() - innerHit.Y() , 2);
+        std::pow(outerHit.Z() - innerHit.Z(), 2);
     }
   };
 

@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 #include <vector>
 
+#include <math.h> // sqrt, atan, isinf, ...
+
 using namespace std;
 
 namespace Belle2 {
@@ -11,20 +13,23 @@ namespace Belle2 {
 
 
 
+  /** should behave differently for different verbosity-levels given - class*/
   template <int Verbosity> class VerbosityClass {
   public:
-    VerbosityClass() : state(Verbosity) {}
+    VerbosityClass() /*: state(Verbosity)*/ {}
 
 
+    /** should behave differently for different verbosity-levels given - function */
     void SomeCleverMethod() {
-      int bla = 5;
+      double bla = 5;
 
       VerbosityClass<Verbosity>::GiveVerboseOutput(bla);
     }
 
-    static inline void GiveVerboseOutput(double result) { /* do nothing here */ }
+    /** do nothing relevant here just needing a dummy functhion */
+    static inline void GiveVerboseOutput(double& result) { /*state = */result++; }
   protected:
-    int state;
+//     double state; /** dummy value */
   };
 
 
@@ -95,6 +100,21 @@ namespace Belle2 {
     } else {
       B2WARNING("yay, it worked!")
     }
+  }
+
+
+  /** shall show when to get nan and when to get inf (and that inf != nan) */
+  TEST_F(SandBox4TestingTest, TestIsNanAndIsInfBehavior)
+  {
+    EXPECT_TRUE(std::isinf(1. / 0.));
+    EXPECT_FALSE(std::isnan(1. / 0.));
+    EXPECT_TRUE(std::isnan(std::sqrt(-1)));
+    EXPECT_FALSE(std::isinf(std::sqrt(-1)));
+    EXPECT_TRUE(std::isnan(0. / 0.));
+    EXPECT_FALSE(std::isinf(0. / 0.));
+
+//  EXPECT_FALSE(std::isnan(std::pow(0.,0.))); // this should be nan, but actually it is implementation dependent, therefore here we get for 0^0 = 1, which is mathematically not correct
+    EXPECT_FALSE(std::isinf(std::pow(0., 0.)));
   }
 
 

@@ -15,6 +15,9 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance3DSquared.h"
 #include "tracking/trackFindingVXD/TwoHitFilters/Distance2DXYSquared.h"
+#include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZ.h"
+#include "tracking/trackFindingVXD/TwoHitFilters/SlopeRZ.h"
+#include "tracking/trackFindingVXD/TwoHitFilters/Distance3DNormed.h"
 
 #include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
 
@@ -117,6 +120,8 @@ namespace VXDTFtwoHitFilterTest {
 
     EXPECT_EQ("Belle2::Distance3DSquared" , Distance3DSquared().name());
     EXPECT_EQ("Belle2::Distance2DXYSquared" , Distance2DXYSquared().name());
+    EXPECT_EQ("Belle2::Distance1DZ" , Distance1DZ().name());
+    EXPECT_EQ("Belle2::SlopeRZ" , SlopeRZ().name());
 
   }
 
@@ -151,6 +156,83 @@ namespace VXDTFtwoHitFilterTest {
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_FALSE(filter.accept(x1, x3));
     EXPECT_TRUE(filter.accept(x2, x4));
+
+  }
+
+
+  /** shows how to use the filter Distance1DZ in a simple case */
+  TEST_F(TwoHitFilterTest, BasicFilterTestDistance1DZ)
+  {
+    // Very verbose declaration, see below for convenient shortcuts
+    Filter< Distance1DZ, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
+
+    SpacePoint x1 = provideSpacePointDummy(0. , 0., 0.);
+    SpacePoint x2 = provideSpacePointDummy(0. , 0., .5);
+    SpacePoint x3 = provideSpacePointDummy(.25 , .25, 0.);
+    SpacePoint x4 = provideSpacePointDummy(0. , 0., 1.);
+
+    EXPECT_TRUE(filter.accept(x2, x1));
+    EXPECT_FALSE(filter.accept(x1, x2)); // the input order is relevant
+    EXPECT_FALSE(filter.accept(x1, x3));
+    EXPECT_FALSE(filter.accept(x1, x4));
+
+  }
+
+
+  /** shows how to use the filter SlopeRZ and its expected behavior for some tricky cases */
+  TEST_F(TwoHitFilterTest, BasicFilterTestSlopeRZ)
+  {
+    // Very verbose declaration, see below for convenient shortcuts
+    Filter< SlopeRZ, Range<float, float>, VoidObserver > filter(Range<float, float>(atan(2.), atan(3.)));
+
+    SpacePoint innerSP = provideSpacePointDummy(1 , 2, 3);
+    SpacePoint outerSP1 = provideSpacePointDummy(1 , 4, 4);
+    SpacePoint outerSP2 = provideSpacePointDummy(1 , 4, 3.95);
+    SpacePoint outerSP3 = provideSpacePointDummy(1 , 4, 4.05);
+    SpacePoint outerSP4 = provideSpacePointDummy(1 , 3, 3.45);
+    SpacePoint outerSP5 = provideSpacePointDummy(1 , 3, 3.55);
+    SpacePoint outerSP6 = provideSpacePointDummy(1 , 4, 3);
+    SpacePoint outerSP7 = provideSpacePointDummy(1 , 0, 4);
+
+    EXPECT_FALSE(filter.accept(outerSP1, innerSP));
+    EXPECT_TRUE(filter.accept(outerSP2, innerSP));
+    EXPECT_FALSE(filter.accept(innerSP, outerSP2)); // reverse order not same result (because of z)
+    EXPECT_FALSE(filter.accept(outerSP3, innerSP));
+    EXPECT_TRUE(filter.accept(outerSP4, innerSP));
+    EXPECT_FALSE(filter.accept(outerSP5, innerSP));
+    EXPECT_EQ(filter.accept(outerSP1, innerSP), filter.accept(outerSP7, innerSP)); // (direction of r-vector not relevant, only its length)
+
+
+    EXPECT_FLOAT_EQ(0., SlopeRZ().value(innerSP, innerSP));
+    EXPECT_FLOAT_EQ(atan(2.), SlopeRZ().value(outerSP1, innerSP));
+    EXPECT_FLOAT_EQ(atan(2. / 0.95), SlopeRZ().value(outerSP2, innerSP));
+    EXPECT_FLOAT_EQ(- SlopeRZ().value(outerSP2, innerSP), SlopeRZ().value(innerSP, outerSP2)); // reverse order changes sign
+    EXPECT_FLOAT_EQ(atan(2. / 1.05), SlopeRZ().value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(atan(1. / 0.45), SlopeRZ().value(outerSP4, innerSP));
+    EXPECT_FLOAT_EQ(atan(1. / 0.55), SlopeRZ().value(outerSP5, innerSP));
+    EXPECT_FLOAT_EQ(M_PI * 0.5, SlopeRZ().value(outerSP6, innerSP)); // no problem with division by 0 in Z
+    EXPECT_FLOAT_EQ(atan(2. / 1.05), SlopeRZ().value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(SlopeRZ().value(outerSP1, innerSP), SlopeRZ().value(outerSP7, innerSP)); // (direction of r-vector not relevant, only its length)
+
+  }
+
+
+  /** shows how to use the filter Distance3DNormed in a simple case */
+  TEST_F(TwoHitFilterTest, BasicFilterTestDistance3DNormed)
+  {
+    // Very verbose declaration, the old normed distance 3D has only an upper cut, no lower one:
+    Filter< Distance3DNormed, UpperBoundedSet<float>, VoidObserver > filter(UpperBoundedSet<float>(1.));
+
+    // prepare spacePoints for new stuff
+    SpacePoint innerSP = provideSpacePointDummy(1 , 2, 3);
+    SpacePoint outerSP1 = provideSpacePointDummy(2 , 3, 4);
+    SpacePoint outerSP2 = provideSpacePointDummy(1 , 2, 4);
+    SpacePoint outerSP3 = provideSpacePointDummy(2 , 3, 3);
+
+    EXPECT_FLOAT_EQ(2. / 3., Distance3DNormed().value(outerSP1, innerSP));
+    EXPECT_FLOAT_EQ(0., Distance3DNormed().value(outerSP2, innerSP));
+    EXPECT_FLOAT_EQ(1., Distance3DNormed().value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(0., Distance3DNormed().value(innerSP, innerSP));
 
   }
 

@@ -18,15 +18,28 @@
 
 namespace Belle2 {
 
-  /** This is the specialization for SpacePoints with returning floats, where value calculates the squared distance between two hits in 2D on the X-Y-plane */
-  class Distance2DXYSquared : public SelectionVariable< SpacePoint , float > {
+  /** This is the specialization for SpacePoints with returning floats, where value calculates the normed distance between two hits in 3D */
+  class Distance3DNormed : public SelectionVariable< SpacePoint , float > {
   public:
 
-    /** calculates the squared distance between the hits (2D on the X-Y-plane), returning unit: cm^2 for speed optimization */
+    /** calculates the normed distance between the hits (3D), returning unit: none.
+    *
+    * Value is defined between 0-1, which is 1, if there is no distance in r^2 and is 1 if there is no distance in z
+    *
+    * ATTENTION: returns 0 if inf or nan is provoked (this is the behavior of the old code)
+    */
     static float value(const SpacePoint& outerHit, const SpacePoint& innerHit) {
+
+      float result =
+        (std::pow(outerHit.X() - innerHit.X() , 2)
+         + std::pow(outerHit.Y() - innerHit.Y() , 2))
+        /
+        (std::pow(outerHit.X() - innerHit.X() , 2)
+         + std::pow(outerHit.Y() - innerHit.Y() , 2)
+         + std::pow(outerHit.Z() - innerHit.Z() , 2));
+
       return
-        std::pow(outerHit.X() - innerHit.X() , 2) +
-        std::pow(outerHit.Y() - innerHit.Y() , 2);
+        (std::isnan(result) || std::isinf(result)) ? 0 : result;
     }
   };
 

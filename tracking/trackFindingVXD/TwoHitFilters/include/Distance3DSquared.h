@@ -23,11 +23,11 @@ namespace Belle2 {
   public:
 
     /** calculates the squared distance between the hits (3D), returning unit: cm^2 for speed optimization */
-    static float value(const SpacePoint& hitA, const SpacePoint& hitB) {
+    static float value(const SpacePoint& outerHit, const SpacePoint& innerHit) {
       return
-        std::pow(hitA.getPosition().X() - hitB.getPosition().X() , 2) +
-        std::pow(hitA.getPosition().Y() - hitB.getPosition().Y() , 2) +
-        std::pow(hitA.getPosition().Z() - hitB.getPosition().Z() , 2) ;
+        std::pow(outerHit.X() - innerHit.X() , 2) +
+        std::pow(outerHit.Y() - innerHit.Y() , 2) +
+        std::pow(outerHit.Z() - innerHit.Z() , 2) ;
     }
   };
 

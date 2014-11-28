@@ -14,19 +14,29 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
+#include <boost/math/special_functions/fpclassify.hpp> // isnan and isinf
+
 #include <math.h>
 
 namespace Belle2 {
 
-  /** This is the specialization for SpacePoints with returning floats, where value calculates the squared distance between two hits in 2D on the X-Y-plane */
-  class Distance2DXYSquared : public SelectionVariable< SpacePoint , float > {
+  /** This is the specialization for SpacePoints with returning floats, where value calculates the  slope in R-Z for a given pair of hits.
+   *
+   * WARNING: this filter returns 0 if no valid value could be found!
+   * */
+  class SlopeRZ : public SelectionVariable< SpacePoint , float > {
   public:
 
-    /** calculates the squared distance between the hits (2D on the X-Y-plane), returning unit: cm^2 for speed optimization */
+    /** calculates the distance between the hits in z (1D), returning unit: cm */
     static float value(const SpacePoint& outerHit, const SpacePoint& innerHit) {
+      float result = atan(
+                       std::sqrt(
+                         std::pow((outerHit.X() - innerHit.X()), 2)
+                         + std::pow((outerHit.Y() - innerHit.Y()), 2)
+                       ) / (outerHit.Z() - innerHit.Z())
+                     );
       return
-        std::pow(outerHit.X() - innerHit.X() , 2) +
-        std::pow(outerHit.Y() - innerHit.Y() , 2);
+        (std::isnan(result) || std::isinf(result)) ? 0 : result;
     }
   };
 

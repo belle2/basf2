@@ -175,53 +175,53 @@ SpacePointTrackCand::~SpacePointTrackCand()
 }
 
 // converting a SPTrackCand to a GFTrackCand
-const genfit::TrackCand SpacePointTrackCand::getGenFitTrackCand() const
-{
-  genfit::TrackCand returnTrackCand;
-  B2WARNING("WARNING SpacePointTrackCand::getGenFitTrackCand() is deprecated and will probably not be supported any longer."); // getting tested at the moment
-
-  const TVectorD stateSeed = this->getStateSeed();
-  const int pdgCode = this->getPdgCode();
-  const TMatrixDSym covSeed = this->getCovSeed();
-
-  returnTrackCand.set6DSeed(stateSeed, pdgCode);
-  returnTrackCand.setCovSeed(covSeed);
-
-  // fill track candidate with hits
-  for (const SpacePoint * aHit : this->getHits()) {
-    auto detType = aHit->getType();
-    // PXD SpacePoints
-    if (detType == VXD::SensorInfoBase::PXD) {
-      RelationVector<PXDCluster> pxdClusters = aHit->getRelationsTo<PXDCluster>("ALL");
-      B2DEBUG(70, "Found " << pxdClusters.size() << " relations to PXDcluster for this SpacePoint");
-      if (pxdClusters.size() == 0) {
-        B2WARNING("Could not find a relation to a PXDCluster for SpacePoint " << aHit->getArrayIndex() << " from StoreArray " << aHit->getArrayName() << ". The Hit belonging to this SpacePoint will not be in the genfit::TrackCand.");
-        continue;
-      }
-      for (const PXDCluster & aCluster : pxdClusters) {
-        int hitID = aCluster.getArrayIndex();
-        returnTrackCand.addHit(Const::PXD, hitID);
-        B2DEBUG(60, "Added PXDCluster " << hitID << " from StoreArray " << aCluster.getArrayName() << " to genfit::TrackCand.");
-      }
-    }
-    // SVD SpacePoints
-    else if (detType == VXD::SensorInfoBase::SVD) {
-      RelationVector<SVDCluster> svdClusters = aHit->getRelationsTo<SVDCluster>("ALL");
-      if (svdClusters.size() == 0) {
-        B2WARNING("Could not find a relation to a SVDCluster for SpacePoint " << aHit->getArrayIndex() << " from StoreArray " << aHit->getArrayName() << ". The Hit belonging to this SpacePoint will not be in the genfit::TrackCand.");
-        continue;
-      }
-      for (const SVDCluster & aCluster : svdClusters) {
-        int hitID = aCluster.getArrayIndex();
-        returnTrackCand.addHit(Const::SVD, hitID);
-        B2DEBUG(60, "Added SVDCluster " << hitID << " from StoreArray " << aCluster.getArrayName() << " to genfit::TrackCand.");
-      }
-    } else {
-      throw Unsupported_Det_Type();
-    }
-  }
-  return returnTrackCand;
-}
+// const genfit::TrackCand SpacePointTrackCand::getGenFitTrackCand() const
+// {
+//   genfit::TrackCand returnTrackCand;
+//   B2WARNING("WARNING SpacePointTrackCand::getGenFitTrackCand() is deprecated and will probably not be supported any longer."); // getting tested at the moment
+//
+//   const TVectorD stateSeed = this->getStateSeed();
+//   const int pdgCode = this->getPdgCode();
+//   const TMatrixDSym covSeed = this->getCovSeed();
+//
+//   returnTrackCand.set6DSeed(stateSeed, pdgCode);
+//   returnTrackCand.setCovSeed(covSeed);
+//
+//   // fill track candidate with hits
+//   for (const SpacePoint * aHit : this->getHits()) {
+//     auto detType = aHit->getType();
+//     // PXD SpacePoints
+//     if (detType == VXD::SensorInfoBase::PXD) {
+//       RelationVector<PXDCluster> pxdClusters = aHit->getRelationsTo<PXDCluster>("ALL");
+//       B2DEBUG(70, "Found " << pxdClusters.size() << " relations to PXDcluster for this SpacePoint");
+//       if (pxdClusters.size() == 0) {
+//         B2WARNING("Could not find a relation to a PXDCluster for SpacePoint " << aHit->getArrayIndex() << " from StoreArray " << aHit->getArrayName() << ". The Hit belonging to this SpacePoint will not be in the genfit::TrackCand.");
+//         continue;
+//       }
+//       for (const PXDCluster & aCluster : pxdClusters) {
+//         int hitID = aCluster.getArrayIndex();
+//         returnTrackCand.addHit(Const::PXD, hitID);
+//         B2DEBUG(60, "Added PXDCluster " << hitID << " from StoreArray " << aCluster.getArrayName() << " to genfit::TrackCand.");
+//       }
+//     }
+//     // SVD SpacePoints
+//     else if (detType == VXD::SensorInfoBase::SVD) {
+//       RelationVector<SVDCluster> svdClusters = aHit->getRelationsTo<SVDCluster>("ALL");
+//       if (svdClusters.size() == 0) {
+//         B2WARNING("Could not find a relation to a SVDCluster for SpacePoint " << aHit->getArrayIndex() << " from StoreArray " << aHit->getArrayName() << ". The Hit belonging to this SpacePoint will not be in the genfit::TrackCand.");
+//         continue;
+//       }
+//       for (const SVDCluster & aCluster : svdClusters) {
+//         int hitID = aCluster.getArrayIndex();
+//         returnTrackCand.addHit(Const::SVD, hitID);
+//         B2DEBUG(60, "Added SVDCluster " << hitID << " from StoreArray " << aCluster.getArrayName() << " to genfit::TrackCand.");
+//       }
+//     } else {
+//       throw UnsupportedDetType();
+//     }
+//   }
+//   return returnTrackCand;
+// }
 
 // more or less copy pasted from genfit::TrackCand
 void SpacePointTrackCand::setPdgCode(int pdgCode)

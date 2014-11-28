@@ -91,6 +91,11 @@ namespace Belle2 {
     const TVectorD& getStateSeed() const { return m_state6D; }
 
     /**
+     * get the MC Track ID
+     */
+    int getMcTrackID() const { return m_MCTrackID; }
+
+    /**
      * set a hypothesis for the particle by setting a pdgcode (will also set the appropriate charge)
      */
     void setPdgCode(int pdgCode);
@@ -115,7 +120,7 @@ namespace Belle2 {
     /**
      * "backwards conversion" from spacepoints track candidate to genfit track candidate
      */
-    const genfit::TrackCand getGenFitTrackCand() const;
+//     const genfit::TrackCand getGenFitTrackCand() const;
 
     // =========================================================================
     /*
@@ -125,7 +130,7 @@ namespace Belle2 {
 
     // EXCEPTIONS
     //     BELLE2_DEFINE_EXCEPTION(No_SpacePointRelation_Found, "No Relation with a SpacePoint has been found"); // unused at the moment
-    BELLE2_DEFINE_EXCEPTION(Unsupported_Det_Type, "The Detector Type is not supported by this class. Supported are: PXD, SVD and Tel");
+    BELLE2_DEFINE_EXCEPTION(UnsupportedDetType, "The Detector Type is not supported by this class. Supported are: PXD, SVD and Tel");
 
     /**
      * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!), returns false if one of the TrackCands does not contain any SpacePoints

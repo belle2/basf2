@@ -417,6 +417,17 @@ def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
     canvas = ROOT.TCanvas(plotName + '_canvas', plotName, 1200, 800)
     canvas.cd()
     hist = getKey(rootfile, '^{name}.*$'.format(name=prefix)).ReadObj()
+    unit = ' (GeV) ' if preCutConfig.variable in ['M', 'Q'] else ''
+    if prefix in ['signal', 'all', 'bkgrd']:
+        unit += ';N'
+    else:
+        unit += ';S/B'
+    hist.SetTitle(prefix + ';' + preCutConfig.variable + unit)
+    hist.SetLabelSize(0.05, "X")
+    hist.SetLabelSize(0.05, "Y")
+    hist.SetTitleSize(0.05, "X")
+    hist.SetTitleSize(0.05, "Y")
+    hist.SetFillColor(ROOT.kBlue - 2)
     if preCut is not None:
         lc, uc = preCut['range']
         d = uc - lc
@@ -425,17 +436,6 @@ def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
         lm = hist.GetXaxis().GetXmin()
         um = hist.GetXaxis().GetXmax()
         hist.GetXaxis().SetRangeUser(lr if lr > lm else lm, ur if ur < um else um)
-        unit = ' (GeV) ' if preCutConfig.variable in ['M', 'Q'] else ''
-        if prefix in ['signal', 'all', 'bkgrd']:
-            unit += ';N'
-        else:
-            unit += ';S/B'
-        hist.SetTitle(prefix + ';' + preCutConfig.variable + unit)
-        hist.SetLabelSize(0.05, "X")
-        hist.SetLabelSize(0.05, "Y")
-        hist.SetTitleSize(0.05, "X")
-        hist.SetTitleSize(0.05, "Y")
-        hist.SetFillColor(ROOT.kBlue)
         hist.Draw()
         ll = ROOT.TLine(lc if lc > lm else lm, 0, lc if lc > lm else lm, hist.GetMaximum())
         ul = ROOT.TLine(uc if uc < um else um, 0, uc if uc < um else um, hist.GetMaximum())

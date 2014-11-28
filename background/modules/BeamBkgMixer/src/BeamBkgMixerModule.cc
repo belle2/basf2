@@ -83,7 +83,7 @@ namespace Belle2 {
     addParam("wrapAround", m_wrapAround,
              "if true wrap around events passing time window upper edge", true);
     addParam("minTimeECL", m_minTimeECL,
-             "Time window lower edge for ECL in nano seconds", -16000.0);
+             "Time window lower edge for ECL in nano seconds", -17600.0);
     addParam("maxTimeECL", m_maxTimeECL,
              "Time window upper edge for ECL in nano seconds", 8500.0);
     addParam("minTimePXD", m_minTimePXD,
@@ -298,6 +298,7 @@ namespace Belle2 {
     if (m_ECL && !eclHits.isValid()) eclHits.create();
     if (m_BKLM && !bklmSimHits.isValid()) bklmSimHits.create();
     if (m_EKLM && !eklmSimHits.isValid()) eklmSimHits.create();
+
 
     for (auto & bkg : m_backgrounds) {
 

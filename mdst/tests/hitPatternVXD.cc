@@ -85,6 +85,7 @@ namespace Belle2 {
 
   }
 
+  /** Test the getNLayer functions */
   TEST_F(HitPatternVXDTest, getNLayers)
   {
     HitPatternVXD myHitPattern(0);
@@ -113,6 +114,7 @@ namespace Belle2 {
 
   }
 
+  /** Test the getters for First/Last Layer. */
   TEST_F(HitPatternVXDTest, getFirstLastLayer)
   {
     HitPatternVXD myHitPattern(0);

@@ -68,7 +68,7 @@ namespace Belle2 {
       \endcode
    *  Note that the datastore takes ownership of the object!
    *
-   *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
+   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
    *  @sa If you want to store more than a single object of one type, use the StoreArray class.
    *  @sa Data can also be created/accessed from Python modules using PyStoreObj
    */

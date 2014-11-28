@@ -79,7 +79,7 @@ namespace Belle2 {
    *  @sa See StoreObjPtr for a way store single objects
    *  @sa Data can also be accessed from Python modules using PyStoreArray
    *
-   *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreArray">The basf2 developers</a>
+   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreArray">The basf2 developers</a>
    */
   template <class T>
   class StoreArray : public StoreAccessorBase {

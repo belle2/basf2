@@ -39,7 +39,7 @@ namespace Belle2 {
    *  - Durability: defines duration that objects are valid, see DataStore::EDurability.
    *
    *  @sa EDurability StoreObjPtr StoreArray RelationsObject
-   *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=DataStore">The basf2 developers</a>
+   *  @author <a href="mailto:software@belle2.kek.jp?subject=DataStore">The basf2 developers</a>
    */
   class DataStore {
   public:

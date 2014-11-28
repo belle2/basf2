@@ -22,7 +22,7 @@ namespace Belle2 {
 
   /** Base class for StoreObjPtr and StoreArray for easier common treatment.
    *
-   *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=StoreAccessorBase">The basf2 developers</a>
+   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreAccessorBase">The basf2 developers</a>
    */
   class StoreAccessorBase {
   public:

@@ -97,6 +97,36 @@ namespace Belle2 {
 
 // getter:
 
+    /** return the x-value of the global position of the SpacePoint */
+    double X() const { return m_position.X(); }
+
+
+
+    /** return the x-value of the global position of the SpacePoint */
+    double x() const { return m_position.X(); }
+
+
+
+    /** return the y-value of the global position of the SpacePoint */
+    double Y() const { return m_position.Y(); }
+
+
+
+    /** return the y-value of the global position of the SpacePoint */
+    double y() const { return m_position.Y(); }
+
+
+
+    /** return the z-value of the global position of the SpacePoint */
+    double Z() const { return m_position.Z(); }
+
+
+
+    /** return the z-value of the global position of the SpacePoint */
+    double z() const { return m_position.Z(); }
+
+
+
     /** return the position vector in global coordinates */
     const TVector3& getPosition() const { return m_position; }
 

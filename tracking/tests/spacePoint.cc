@@ -126,19 +126,17 @@ namespace Belle2 {
 
     // should throw, since no clusters given:
     std::vector<const SVDCluster*> badNoClusters;
-    EXPECT_THROW(SpacePoint(badNoClusters, &sensorInfoBase), std::runtime_error);
+//  SpacePoint blaBla = SpacePoint(badNoClusters, &sensorInfoBase);
+    EXPECT_THROW(SpacePoint(badNoClusters, &sensorInfoBase), std::out_of_range);
 
-    B2WARNING("bin da 4")
     // should throw, since too many clusters (of same sensor) given:
     std::vector<const SVDCluster*> bad3Clusters = { &clusterU1, &clusterV1, &clusterU2 };
     EXPECT_THROW(SpacePoint(bad3Clusters, &sensorInfoBase), std::runtime_error);
 
-    B2WARNING("bin da 5")
     // should throw, since two clusters of same type (but on same sensor) given:
     std::vector<const SVDCluster*> badSameType = { &clusterU1, &clusterU2 };
     EXPECT_THROW(SpacePoint(badSameType, &sensorInfoBase), std::runtime_error);
 
-    B2WARNING("bin da 6")
     // should throw, since two clusters of different sensors given:
     std::vector<const SVDCluster*> badDifferentSensors = { &clusterV1, &clusterU3 };
     EXPECT_THROW(SpacePoint(badDifferentSensors, &sensorInfoBase), std::runtime_error);
@@ -156,8 +154,6 @@ namespace Belle2 {
     TVector3 globalErrorFor2D;
     for (int i = 0; i < 3; i++) { globalErrorFor2D[i] = sqrt(abs(globalizedVariancesFor2D[i])); }
 
-    B2WARNING("bin da 5")
-
     // vxdID:
     EXPECT_DOUBLE_EQ(aVxdID, testPoint2D.getVxdID());
     // global position:
@@ -173,8 +169,6 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(0.6, testPoint2D.getNormalizedLocalV());
 
 
-    B2WARNING("bin da 6")
-
     // check results for single-cluster-only-case:
     TVector3 aPositionFor1D = anotherSensorInfoBase.pointToGlobal(TVector3(clusterU3.getPosition(), 0, 0));
     TVector3 globalizedVariancesFor1D = anotherSensorInfoBase.vectorToGlobal(
@@ -187,7 +181,6 @@ namespace Belle2 {
     TVector3 globalErrorFor1D;
     for (int i = 0; i < 3; i++) { globalErrorFor1D[i] = sqrt(abs(globalizedVariancesFor1D[i])); }
 
-    B2WARNING("bin da 7")
 
     // vxdID:
     EXPECT_DOUBLE_EQ(anotherVxdID, testPoint1D.getVxdID());

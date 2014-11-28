@@ -52,6 +52,7 @@ SpacePoint::SpacePoint(const Belle2::PXDCluster* pxdCluster,
 
 SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
                        const Belle2::VXD::SensorInfoBase* aSensorInfo) :
+  m_vxdID(clusters.at(0)->getSensorID()),
   m_qualityIndicator(0.5),
   m_isAssigned(false)
 {
@@ -81,8 +82,6 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
 
     if (vxdIDs.size() != 1 or isUType.size() != nClusters) throw IncompatibleClusters();
   }
-
-  m_vxdID = clusters[0]->getSensorID();
 
   //We need some handle to translate IDs to local and global
   // coordinates.

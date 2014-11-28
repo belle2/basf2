@@ -10,5 +10,6 @@
 #pragma link C++ class Belle2::SpacePoint+;
 // #pragma link C++ class Belle2::SpacePointMetaInfo+;
 #pragma link C++ class pair <float, float >+;
+#pragma link C++ class Belle2::SpacePointTrackCand+;
 
 #endif

@@ -39,6 +39,50 @@ namespace Belle2 {
     }
   protected:
   };
+
+  /**
+   * Test the Constructor, that takes a vector of SpacePoint* as argument
+   */
+  TEST_F(SpacePointTrackCandTest, testConstructorFromVector)
+  {
+    // set up some SpacePoints and group them to a vector
+    VxdID aVxdID = VxdID(1, 1, 1);
+    VXD::SensorInfoBase aSensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
+    PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
+    const SpacePoint aPXDSpacePoint = SpacePoint(&aCluster, &aSensorInfoBase);
+
+    VxdID anotherVxdID = VxdID(3, 3, 3);
+    VXD::SensorInfoBase anotherSensorInfoBase = createSensorInfo(anotherVxdID, 2.3, 4.2);
+    SVDCluster aUCluster = SVDCluster(anotherVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aVCluster = SVDCluster(anotherVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    std::vector<const SVDCluster*> a2HitCluster = { &aUCluster, &aVCluster };
+    const SpacePoint aSVDSpacePoint = SpacePoint(a2HitCluster, &anotherSensorInfoBase);
+
+    SVDCluster anotherUCluster = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    std::vector<const SVDCluster*> a1HitCluster = { &anotherUCluster };
+    const SpacePoint anotherSVDSpacePoint = SpacePoint(a1HitCluster, &anotherSensorInfoBase);
+
+    const std::vector<const Belle2::SpacePoint*> aSpacePointVec = { &aPXDSpacePoint, &aSVDSpacePoint, &anotherSVDSpacePoint };
+
+
+    // construct SpacePointTrackCand with (more or less arbitrary) values for pdg code, charge and MC-TrackID
+    SpacePointTrackCand aSpacePointTC = SpacePointTrackCand(aSpacePointVec, 11, -1, 23);
+
+    // do some checks
+    // check if all SpacePoints are actually in the TrackCand
+    EXPECT_EQ(aSpacePointTC.getNHits(), aSpacePointVec.size());
+    // check pdg, charge, etc...
+    EXPECT_EQ(aSpacePointTC.getPdgCode(), 11);
+    EXPECT_DOUBLE_EQ(aSpacePointTC.getChargeSeed(), -1);
+    EXPECT_EQ(aSpacePointTC.getMcTrackID(), 23);
+
+    // get SpacePoints and compare them with the original vector
+    const std::vector<const SpacePoint*> returnSPVector = aSpacePointTC.getHits();
+    for (unsigned int i = 0; i < aSpacePointTC.getNHits(); i++) {
+      EXPECT_TRUE(returnSPVector[i] == aSpacePointVec[i]);
+    }
+  }
+
   /**
    * Test operator == of SpacePointTrackCand
    */

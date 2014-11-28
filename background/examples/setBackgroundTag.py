@@ -23,7 +23,7 @@ from basf2 import *
 set_log_level(LogLevel.WARNING)
 
 # background (collision) file
-indir = '~/nakayama/bgMC/release_201406_9thMCgen/output/'  # at KEKCC
+indir = '~/nakayama/bgMC/release_201406_9thMCgen/output/'  # at KEKCC (but maybe empty now)
 outdir = 'beamBkg/'  # output directory
 
 bkgType = 'Touschek_LER'

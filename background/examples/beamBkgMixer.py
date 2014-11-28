@@ -5,7 +5,7 @@ from basf2 import *
 import glob
 
 # ----------------------------------------------------------------------------------
-# This example shows all possibilities of steering BG mixing with BeamBkgMixer.
+# This example shows some of the possibilities to steer BG mixing with BeamBkgMixer.
 #
 # For simplicity no particle generator and/or geant simulation is included,
 # digitization and event reconstruction is also not done. The output root file
@@ -16,24 +16,26 @@ import glob
 
 set_log_level(LogLevel.INFO)
 
-# background (collision) files
+# define background (collision) files
+#    glob.glob is the prefered way to get the list of files:
+#    (the directory must include only BG files!)
+
+bg = glob.glob('/sw/belle2/bkg/*.root')  # if you run at KEKCC
+
+# alternative: you can specify files explicitely
 #   wildcards can be used if there are several files of the same BG type
 #   example: 'Coulomb_HER_*.root' if there are several files for Coulomb_HER
-
-dir = '/sw/belle2/bkg/'  # change the directory name if you don't run on KEKCC
-bg = [
-    dir + 'Coulomb_HER_100us.root',
-    dir + 'Coulomb_LER_100us.root',
-    dir + 'RBB_HER_100us.root',
-    dir + 'RBB_LER_100us.root',
-    dir + 'Touschek_HER_100us.root',
-    dir + 'Touschek_LER_100us.root',
-    ]
-  # change the file names if differ, remove some or add some more files
-
-# alternatively glob.glob can be used to get the list of files:
-# (the directory must include only BG files!)
-# bg = glob.glob(dir + '/*.root')
+#
+# dir = '/sw/belle2/bkg/'  # change the directory name if you don't run on KEKCC
+# bg = [
+#    dir + 'Coulomb_HER_100us.root',
+#    dir + 'Coulomb_LER_100us.root',
+#    dir + 'RBB_HER_100us.root',
+#    dir + 'RBB_LER_100us.root',
+#    dir + 'Touschek_HER_100us.root',
+#    dir + 'Touschek_LER_100us.root',
+#    ]
+# change the file names if differ, remove some or add some more files
 
 # Create path
 main = create_path()

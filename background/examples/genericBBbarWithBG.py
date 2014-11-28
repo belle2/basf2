@@ -18,23 +18,7 @@ import glob
 set_log_level(LogLevel.ERROR)
 
 # background (collision) files
-#   wildcards can be used if there are several files of the same BG type
-#   example: 'Coulomb_HER_*.root' if there are several files for Coulomb_HER
-
-dir = '/sw/belle2/bkg/'  # change the directory name if you don't run on KEKCC
-bg = [
-    dir + 'Coulomb_HER_100us.root',
-    dir + 'Coulomb_LER_100us.root',
-    dir + 'RBB_HER_100us.root',
-    dir + 'RBB_LER_100us.root',
-    dir + 'Touschek_HER_100us.root',
-    dir + 'Touschek_LER_100us.root',
-    ]
-  # change the file names if differ
-
-# alternatively glob.glob can be used to get the list of files:
-# (the directory must include only BG files!)
-# bg = glob.glob(dir + '/*.root')
+bg = glob.glob('/sw/belle2/bkg/*.root')  # if you run at KEKCC
 
 # Create path
 main = create_path()
@@ -46,7 +30,6 @@ main.add_module(eventinfosetter)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # Simulation

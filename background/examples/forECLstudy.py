@@ -52,8 +52,8 @@ main.add_module(geometry)
 bkgmixer = register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)  # specify BG files
 bkgmixer.param('components', ['ECL'])  # mix BG only for ECL
-bkgmixer.param('minTime', -4000)  # set time window start time [ns]
-bkgmixer.param('maxTime', 16000)  # set time window stop time [ns]
+bkgmixer.param('minTime', -16000)  # set time window start time [ns]
+bkgmixer.param('maxTime', 8500)  # set time window stop time [ns]
 main.add_module(bkgmixer)
 
 # with ParticleGun in the path, FullSim must be added here

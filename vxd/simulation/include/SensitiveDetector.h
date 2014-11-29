@@ -125,11 +125,11 @@ namespace Belle2 {
       //Note that we have many SensitiveDetector classes, so this will be attempted many times,
       //therefore we have to suppress errors.
       //m_mcparticles.required();
-      m_simhits.registerAsPersistent(false);
-      m_truehits.registerAsPersistent(false);
-      m_relMCSimHits.registerAsPersistent(false);
-      m_relMCTrueHits.registerAsPersistent(false);
-      m_relTrueSimHits.registerAsPersistent(false);
+      m_simhits.registerInDataStore();
+      m_truehits.registerInDataStore();
+      m_relMCSimHits.registerInDataStore();
+      m_relMCTrueHits.registerInDataStore();
+      m_relTrueSimHits.registerInDataStore();
       registerMCParticleRelation(m_relMCSimHits, RelationArray::c_negativeWeight);
       registerMCParticleRelation(m_relMCTrueHits, RelationArray::c_negativeWeight);
     }

@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['background_dataobjects']
+
+Return('env')

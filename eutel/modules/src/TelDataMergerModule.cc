@@ -213,11 +213,11 @@ void TelDataMergerModule::initialize()
 
   // Register output data collections
   StoreArray<TelDigit> storeTelDigits(m_storeDigitsName);
-  storeTelDigits.registerAsPersistent();
+  storeTelDigits.registerInDataStore();
   m_storeDigitsName = storeTelDigits.getName();
 
   StoreObjPtr<TelEventInfo> storeTelEventInfo;
-  storeTelEventInfo.registerAsPersistent();
+  storeTelEventInfo.registerInDataStore();
 
   if (m_nEventsProcess < 0) m_nEventsProcess = std::numeric_limits<long>::max();
 

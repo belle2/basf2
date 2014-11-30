@@ -94,15 +94,15 @@ void TelDataReaderModule::initialize()
   m_inputFileName = "";
 
   // register event meta data collection as persistent
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
 
   // Register output data collections
   StoreArray<TelDigit> storeTelDigits("TelDigits");
-  storeTelDigits.registerAsPersistent();
+  storeTelDigits.registerInDataStore();
   StoreObjPtr<TelEventInfo> storeTelEventInfo("TelEventInfo");
-  storeTelEventInfo.registerAsPersistent();
+  storeTelEventInfo.registerInDataStore();
   StoreArray<PXDDigit> storePXDDigits("ePXDDigits");
-  storePXDDigits.registerAsPersistent();
+  storePXDDigits.registerInDataStore();
 
 
   B2DEBUG(75, "TelDataReaderModule initialised!");

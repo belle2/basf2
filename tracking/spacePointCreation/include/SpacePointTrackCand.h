@@ -23,7 +23,7 @@
 
 // stl
 #include <vector>
-#include <utility> // for pair
+// #include <utility> // for pair
 
 // ROOT
 #include <TVectorD.h>
@@ -52,11 +52,6 @@ namespace Belle2 {
      */
     SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*> spacePoints, int pdgCode = 0, double charge = 0, int mcTrackID = -1);
 
-    /**
-     * for constructing a SpacePointTrackCand directly from a genfit track candidate. WARNING: This will probably be deprecated soon, and might not survive developement!
-     */
-//     SpacePointTrackCand(const genfit::TrackCand& genfitTC);
-
     // destructor
     virtual ~SpacePointTrackCand();
 
@@ -83,11 +78,10 @@ namespace Belle2 {
      */
     double getChargeSeed() const { return m_q; }
 
-    // tmadlener: next to are copied from genfit TrackCand
-    /** @brief get the covariance matrix seed (6D).  */
+    /** get the covariance matrix seed (6D).  */
     const TMatrixDSym& getCovSeed() const { return m_cov6D; }
 
-    //! Returns the 6D seed state; should be in global coordinates.
+    /** get state seed as 6D vector */
     const TVectorD& getStateSeed() const { return m_state6D; }
 
     /**
@@ -116,15 +110,10 @@ namespace Belle2 {
      */
     void addSpacePoint(const SpacePoint* newSP) { m_trackSpacePoints.push_back(newSP); }
 
-    // ========================================================================
-    /**
-     * "backwards conversion" from spacepoints track candidate to genfit track candidate
-     */
-//     const genfit::TrackCand getGenFitTrackCand() const;
 
     // =========================================================================
     /*
-     * print the Track Candidate in its "full beauty"
+     * print the Track Candidate in its "full beauty". NOTE: prints someparts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */
     void print(int debuglevel = 100, const Option_t* = "") const;
 
@@ -133,10 +122,9 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(UnsupportedDetType, "The Detector Type is not supported by this class. Supported are: PXD, SVD and Tel");
 
     /**
-     * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!), returns false if one of the TrackCands does not contain any SpacePoints
+     * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!), NOTE: returns false if both TrackCands do not contain any SpacePoints
      */
     bool operator == (const SpacePointTrackCand& rhs);
-//     friend bool operator== (SpacePointTrackCand& lhs, SpacePointTrackCand& rhs); // should declare them as const -> get compiler error
 
   protected:
     /**
@@ -173,15 +161,6 @@ namespace Belle2 {
      * charge of the particle in units of elementary charge
      */
     double m_q;
-
-
-    /**
-     * type alias for internal purposes. WARNING: cannot be used for StoreArray
-     *
-     */
-#ifndef __CINT__
-    template<typename HitType> using HitInfo = std::pair<unsigned int, const HitType*>;
-#endif
 
     ClassDef(SpacePointTrackCand, 1) // last member added: -
   };

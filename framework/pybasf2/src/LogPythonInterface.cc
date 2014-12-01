@@ -132,6 +132,7 @@ void LogPythonInterface::exposePythonAPI()
   enum_<LogConfig::ELogLevel>("LogLevel")
   .value(LogConfig::logLevelToString(LogConfig::c_Debug), LogConfig::c_Debug)
   .value(LogConfig::logLevelToString(LogConfig::c_Info), LogConfig::c_Info)
+  .value(LogConfig::logLevelToString(LogConfig::c_Result), LogConfig::c_Result)
   .value(LogConfig::logLevelToString(LogConfig::c_Warning), LogConfig::c_Warning)
   .value(LogConfig::logLevelToString(LogConfig::c_Error), LogConfig::c_Error)
   .value(LogConfig::logLevelToString(LogConfig::c_Fatal), LogConfig::c_Fatal)
@@ -182,6 +183,7 @@ void LogPythonInterface::exposePythonAPI()
 
   def("B2DEBUG", &LogPythonInterface::logDebug);
   def("B2INFO", &LogPythonInterface::logInfo);
+  def("B2RESULT", &LogPythonInterface::logResult);
   def("B2WARNING", &LogPythonInterface::logWarning);
   def("B2ERROR", &LogPythonInterface::logError);
   def("B2FATAL", &LogPythonInterface::logFatal);
@@ -220,6 +222,13 @@ void LogPythonInterface::logInfo(const std::string& msg)
 {
 #ifndef LOG_NO_B2INFO
   PYTHON_LOG_IFENABLED(LogConfig::c_Info, 0, msg);
+#endif
+}
+
+void LogPythonInterface::logResult(const std::string& msg)
+{
+#ifndef LOG_NO_B2RESULT
+  PYTHON_LOG_IFENABLED(LogConfig::c_Result, 0, msg);
 #endif
 }
 

@@ -34,7 +34,7 @@ logging.set_package('pxd', pxd_logging)
 # debug level 10, print level, message, and file name for info messages
 logging.package('svd').debug_level = 10
 logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE
-    | LogInfo.FILE)
+                                | LogInfo.FILE)
 
 # show default loginfo for all levels
 for (name, value) in LogLevel.names.items():
@@ -52,8 +52,9 @@ logging.add_console(True)
 # print some log messages
 B2DEBUG(100, 'Debug Message')
 B2INFO('Info Message')
+B2RESULT('Result Message')
 B2WARNING('Warning Message')
-#B2ERROR('Error Message')
+# B2ERROR('Error Message')
 
 # Repeated messages (provided they originate from the same line) can be
 # filtered. Note that this is not the default, you can enable this using

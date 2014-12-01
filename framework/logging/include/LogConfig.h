@@ -24,6 +24,7 @@ namespace Belle2 {
     /** Definition of the supported log levels. In ascending order ! */
     enum ELogLevel { c_Debug,   /**< Debug: for code development.  */
                      c_Info,    /**< Info: for informational messages, e.g. about opened files, processed events, etc. */
+                     c_Result,  /**< Result: for informational summary messages, e.g. about number of selected events */
                      c_Warning, /**< Warning: for potential problems that the user should pay attention to. */
                      c_Error,   /**< Error: for things that went wrong and have to be fixed. */
                      c_Fatal,   /**< Fatal: for situations were the program execution can not be continued. */

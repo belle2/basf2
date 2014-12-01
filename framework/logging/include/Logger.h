@@ -77,6 +77,17 @@ namespace Belle2 {
 #endif
 
   /**
+   * \def B2RESULT(streamText)
+   * Send an info message.
+   */
+#ifdef LOG_NO_B2RESULT
+#define B2RESULT(streamText)
+#else
+#define B2RESULT(streamText) \
+  B2LOGMESSAGE_IFENABLED(LogConfig::c_Result, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
+#endif
+
+  /**
    * \def B2WARNING(streamText)
    * Send a warning message.
    */

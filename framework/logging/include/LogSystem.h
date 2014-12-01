@@ -28,6 +28,7 @@ namespace Belle2 {
    * For log messages the following preprocessor macros should be used:
    *    B2DEBUG   for code development
    *    B2INFO    for informational messages, e.g. about opened files, processed events, etc.
+   *    B2RESULT  for informational summary messages, e.g. about number of selected events
    *    B2WARNING for potential problems that the user should pay attention to
    *    B2ERROR   for things that went wrong and have to be fixed
    *    B2FATAL   for situations were the program execution can not be continued

@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
     config.add_options()
     ("steering", prog::value<string>(), "the python steering file")
     ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
-    ("log_level,l", prog::value<string>(), "set global log level (one of DEBUG, INFO, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("log_level,l", prog::value<string>(), "set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
     ("events,n", prog::value<int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("input,i", prog::value<vector<string> >(), "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
         }
       }
       if (level < 0) {
-        B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, WARNING, or ERROR.");
+        B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
         return 1;
       }
 

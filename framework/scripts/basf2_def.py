@@ -296,7 +296,7 @@ def set_log_level(level):
     Sets the global log level which specifies up to which level the
     logging messages will be shown
 
-    level: LogLevel.DEBUG/INFO/WARNING/ERROR/FATAL
+    level: LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
     """
 
     logging.log_level = level

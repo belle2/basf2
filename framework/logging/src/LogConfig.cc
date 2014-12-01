@@ -39,6 +39,6 @@ void LogConfig::setLogLevel(ELogLevel logLevel)
 
 const char* LogConfig::logLevelToString(LogConfig::ELogLevel logLevelType)
 {
-  static const char* logLevelString[] = {"DEBUG", "INFO", "WARNING", "ERROR", "FATAL", "default"};
+  static const char* logLevelString[] = {"DEBUG", "INFO", "RESULT", "WARNING", "ERROR", "FATAL", "default"};
   return logLevelString[logLevelType];
 }

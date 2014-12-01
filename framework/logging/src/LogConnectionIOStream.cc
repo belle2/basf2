@@ -41,6 +41,7 @@ bool LogConnectionIOStream::sendMessage(const LogMessage& message)
       static const char* color_str[] = {
         "\x1b[32m",        // Debug  : green
         "",                // Info   : terminal default
+        "\x1b[34m",        // Result : blue
         "\x1b[33m",        // Warning: yellow
         "\x1b[31m",        // Error  : red
         "\x1b[07m\x1b[31m" // Fatal  : red reversed

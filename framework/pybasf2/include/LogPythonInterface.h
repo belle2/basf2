@@ -160,6 +160,13 @@ namespace Belle2 {
     static void logInfo(const std::string& msg);
 
     /**
+     * Produce result message
+     *
+     * @param msg The result message text
+     */
+    static void logResult(const std::string& msg);
+
+    /**
      * Produce warning message
      *
      * @param msg The warning message

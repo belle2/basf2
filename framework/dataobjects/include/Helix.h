@@ -25,7 +25,7 @@ namespace Belle2 {
   /** This class represents an ideal helix in perigee parameterization.
    *  The used perigee parameters are:
    *  1) d0 which is the signed distance to the perigee. The sign positive (negative) if the angle between
-   *    the transverse momentum and d0 is +pi/2 (-pi/2)
+   *    the transverse momentum and perigee position is +pi/2 (-pi/2)
    *  2) phi which is the angle between the transverse momentum and the x axis and in [-pi, pi]
    *  3) the signed curvature of the track where the sign is given by the charge of the particle
    *  4) z0 which is the distance of the perigee from the origin in the r-z plane
@@ -37,8 +37,6 @@ namespace Belle2 {
   public:
     /** Constructor initializing all perigee parameters to zero. */
     Helix();
-
-
 
     /** Constructor initializing class with fit result.
      *
@@ -117,6 +115,36 @@ namespace Belle2 {
     }
 
     /// @}
+
+
+    //---------------------------------------------------------------------------------------------------------------------------
+    /// @name Simple extrapolations of the ideal helix
+    /// @{
+    //---------------------------------------------------------------------------------------------------------------------------
+
+
+    /** Calculates the position on the helix that lies at the given transverse travel distance.
+
+     *  @param arcS          Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
+     */
+    TVector3 getPositionAtS(const float& arcS) const;
+
+    /** Reverses the direction of travel of the helix in place. */
+    void reverse();
+
+    /** Sinus cardinalis function, which is the real part of (exp(ix) - 1) / x being sin(x) / x
+     *
+     *  @note The current implementation just uses the boost version of this function.
+     */
+    static double sinc(const double& x);
+
+    /** Cosinus cardinalis function, which is the imaginary part of (exp(ix) - 1) / x being (cos(x) - 1)  /x
+     *
+     *  @note The implementation is inspired by the sinc_pi of boost.
+     */
+    static double cosc(const double& x);
+    /// @}
+
 
 
 

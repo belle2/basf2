@@ -10,6 +10,9 @@
 #include <framework/dataobjects/Helix.h>
 #include <TMath.h>
 
+#include <boost/math/special_functions/sinc.hpp>
+#include <boost/math/tools/precision.hpp>
+
 using namespace Belle2;
 
 ClassImp(Helix);
@@ -59,6 +62,69 @@ float Helix::getTransverseMomentum(const float bField) const
   return std::fabs(1 / getAlpha(bField) / m_tau.at(2));
 }
 
+void Helix::reverse()
+{
+  // All except z0 have to be taken to their opposites
+  m_tau.at(0) = -m_tau.at(0); //d0
+  m_tau.at(1) = m_tau.at(1) < 0 ? m_tau.at(1) + M_PI : m_tau.at(1) - M_PI; //phi
+  m_tau.at(2) = -m_tau.at(2); //omega
+  m_tau.at(4) = -m_tau.at(4); //coTheta
+}
+
+TVector3 Helix::getPositionAtS(const float& arcS) const
+{
+  // Using the sinus and cosinus cardinalis for an expression which is safe at the limit omega -> 0
+  const float x =  arcS * cosc((double)arcS * getOmega()) + getD0();
+  const float y =  arcS * sinc((double)arcS * getOmega());
+  const float z = fma((double)getCotTheta(), arcS, getZ0());
+  TVector3 result(x, y, z);
+  const float rotatePhi = getPhi() - M_PI / 2.0;
+  result.RotateZ(rotatePhi);
+  return result;
+}
+
+
+double Helix::sinc(const double& x)
+{
+  return boost::math::sinc_pi(x);
+}
+
+double Helix::cosc(const double& x)
+{
+  // Though fundamentally appealing, since it is the complex adjoint of the sinus cardinalis
+  // there is no standard implementation of this function, which is why we draw inspiration
+  // from the boost sinc_pi function and modify it.
+
+  BOOST_MATH_STD_USING;
+
+  double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
+
+  if (abs(x) >= taylor_n_bound) {
+    return (1 - cos(x)) / x;
+
+  } else {
+    // approximation by taylor series in x at 0 up to order 1
+    double result = x / 2.0;
+
+    double const taylor_3_bound = boost::math::tools::epsilon<double>();
+    if (abs(x) >= taylor_3_bound) {
+      // approximation by taylor series in x at 0 up to order 3
+      double const x2 = x * x;
+      double const x3 = x2 * x;
+      result -= x3 / 24.0;
+
+      double const taylor_5_bound = boost::math::tools::root_epsilon<double>();
+      if (abs(x) >= taylor_5_bound) {
+        // approximation by taylor series in x at 0 up to order 5
+        double const x5 = x2 * x3;
+        result += x5 / 720;
+
+      }
+    }
+    return result;
+  }
+}
+
 void Helix::cartesianToPerigee(const TVector3& position,
                                const TVector3& momentum,
                                const short int charge,
@@ -103,7 +169,7 @@ void Helix::cartesianToPerigee(const TVector3& position,
   // Helix center in the (x, y) plane:
   const double helX = x + charge * py * alpha;
   const double helY = y - charge * px * alpha;
-  const double rhoHel = hypot(helX, helY);
+  //const double rhoHel = hypot(helX, helY);
 
   const double d0 = charge * hypot(helX, helY) - 1 / omega;
   const double phi = atan2(helY, helX) + charge * M_PI / 2;

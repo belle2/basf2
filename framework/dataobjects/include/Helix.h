@@ -132,6 +132,10 @@ namespace Belle2 {
     /** Reverses the direction of travel of the helix in place. */
     void reverse();
 
+    /** Calculates the transverse travel distance at the point the helix first reaches the given polar radius.
+     */
+    float getSAtPolarR(const float& polarR) const;
+
     /** Sinus cardinalis function, which is the real part of (exp(ix) - 1) / x being sin(x) / x
      *
      *  @note The current implementation just uses the boost version of this function.
@@ -143,6 +147,17 @@ namespace Belle2 {
      *  @note The implementation is inspired by the sinc_pi of boost.
      */
     static double cosc(const double& x);
+
+    /// Helper function the calculate the factor between the length of a secant line and the transverse travel distance
+    /**
+     *  Function expressing the relation between arc length and direct length
+     *  only using the omega as additional information.
+     *  Handles to line case smoothly.
+     *
+     */
+
+
+    double calcSFromSecantLength(const double& secantLength) const;
     /// @}
 
 

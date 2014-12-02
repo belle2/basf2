@@ -10,6 +10,8 @@
 #include <framework/dataobjects/Helix.h>
 #include <TMath.h>
 
+#include <framework/logging/Logger.h>
+
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
 
@@ -74,8 +76,8 @@ void Helix::reverse()
 TVector3 Helix::getPositionAtS(const float& arcS) const
 {
   // Using the sinus and cosinus cardinalis for an expression which is safe at the limit omega -> 0
-  const float x =  arcS * cosc((double)arcS * getOmega()) + getD0();
-  const float y =  arcS * sinc((double)arcS * getOmega());
+  const float x = arcS * cosc((double)arcS * getOmega()) + getD0();
+  const float y = arcS * sinc((double)arcS * getOmega());
   const float z = fma((double)getCotTheta(), arcS, getZ0());
   TVector3 result(x, y, z);
   const float rotatePhi = getPhi() - M_PI / 2.0;
@@ -83,6 +85,13 @@ TVector3 Helix::getPositionAtS(const float& arcS) const
   return result;
 }
 
+float Helix::getSAtPolarR(const float& polarR) const
+{
+  double d0 = getD0();
+  double omega = getOmega();
+  double secantLength = sqrt(((double)polarR * polarR  - d0 * d0) / (1 + d0 * omega));
+  return calcSFromSecantLength(secantLength);
+}
 
 double Helix::sinc(const double& x)
 {
@@ -123,6 +132,49 @@ double Helix::cosc(const double& x)
     }
     return result;
   }
+}
+
+double Helix::calcSFromSecantLength(const double& secantLength) const
+{
+  double x = secantLength * getOmega() / 2.0;
+
+  // Need asin(x) / x also for low values
+  // Use approximation inspired by BOOST's sinc
+  BOOST_MATH_STD_USING;
+
+  double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
+
+  if (abs(x) >= taylor_n_bound) {
+    if (fabs(x) == 1) {
+      return secantLength * M_PI / 2.0;
+
+    } else {
+      return 2.0 * asin(x) / getOmega();
+
+    }
+
+  } else {
+    // Approximation of asin(x) / x
+    // Inspired by BOOST's sinc
+
+    // approximation by taylor series in x at 0 up to order 0
+    double secantLengthFactor = 1.0;
+
+    double const taylor_0_bound = boost::math::tools::epsilon<double>();
+    if (abs(x) >= taylor_0_bound) {
+      double x2 = x * x;
+      // approximation by taylor series in x at 0 up to order 2
+      secantLengthFactor += x2 / 6.0;
+
+      double const taylor_2_bound = boost::math::tools::root_epsilon<double>();
+      if (abs(x) >= taylor_2_bound) {
+        // approximation by taylor series in x at 0 up to order 4
+        secantLengthFactor += x2 * x2 * (3.0 / 40.0);
+      }
+    }
+    return  secantLengthFactor * secantLength;
+  }
+
 }
 
 void Helix::cartesianToPerigee(const TVector3& position,

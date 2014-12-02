@@ -95,18 +95,20 @@ namespace Belle2 {
     float z0 = 0;
     float cotTheta = 2;
 
+    TVector3 expectedPerigee(0, -d0, z0);
+    int expectedCharge = omega > 0 ? 1 : -1;
+
     Helix helix(d0, phi0, omega, z0, cotTheta);
 
     // Check setup
     TVector3 perigee(helix.getPosition());
-    EXPECT_NEAR(0, perigee.X(), absError);
-    EXPECT_NEAR(-d0,  perigee.Y(), absError);
-    EXPECT_NEAR(z0, perigee.Z(), absError);
+    EXPECT_NEAR(expectedPerigee.X(), perigee.X(), absError);
+    EXPECT_NEAR(expectedPerigee.Y(), perigee.Y(), absError);
+    EXPECT_NEAR(expectedPerigee.Z(), perigee.Z(), absError);
 
     TVector3 momentumAtPerigee(helix.getMomentum());
     EXPECT_NEAR(phi0,  momentumAtPerigee.Phi(), absError);
-    EXPECT_EQ(1,  helix.getChargeSign());
-
+    EXPECT_EQ(expectedCharge,  helix.getChargeSign());
 
     // Advance a quater of a full circle.
     {
@@ -141,24 +143,25 @@ namespace Belle2 {
     float z0 = 0;
     float cotTheta = 2;
 
+    TVector3 expectedPerigee(d0, 0, z0);
+    int expectedCharge = omega > 0 ? 1 : -1;
+
     Helix helix(d0, phi0, omega, z0, cotTheta);
 
     // Check setup
     TVector3 perigee(helix.getPosition());
-    EXPECT_NEAR(d0, perigee.X(), absError);
-    EXPECT_NEAR(0,  perigee.Y(), absError);
-    EXPECT_NEAR(z0, perigee.Z(), absError);
+    EXPECT_NEAR(expectedPerigee.X(), perigee.X(), absError);
+    EXPECT_NEAR(expectedPerigee.Y(), perigee.Y(), absError);
+    EXPECT_NEAR(expectedPerigee.Z(), perigee.Z(), absError);
 
     TVector3 momentumAtPerigee(helix.getMomentum());
     EXPECT_NEAR(phi0,  momentumAtPerigee.Phi(), absError);
-    EXPECT_EQ(-1,  helix.getChargeSign());
-
+    EXPECT_EQ(expectedCharge,  helix.getChargeSign());
 
     // Advance a quater of a full circle.
     {
       float s =  M_PI / 2;
       TVector3 extrapolatedPosition = helix.getPositionAtS(s);
-
       EXPECT_NEAR(-0.75, extrapolatedPosition.X(), absError);
       EXPECT_NEAR(1, extrapolatedPosition.Y(), absError);
       EXPECT_NEAR(M_PI, extrapolatedPosition.Z(), absError);
@@ -178,5 +181,65 @@ namespace Belle2 {
 
   }
 
+  TEST_F(HelixTest, getSAtPolarR)
+  {
+    /// Test a variaty of helices
+    std::vector<float> omegas { -1, 0, 1};
+    std::vector<float> d0s {0.5, 0.2, 0, 0.2, 0.5};
+
+    // Make a sample from the full angle range
+    std::vector<float> phi0s;
+    for (int iAngle = -4; iAngle <= 5; ++iAngle) {
+      float angle = 2 * M_PI * iAngle / 10.0;
+      phi0s.push_back(angle);
+    }
+
+    // Make a sample from the full angle range
+    // Avoid the far end of the helix for now.
+    std::vector<float> chis;
+    for (int iAngle = -4; iAngle < 5; ++iAngle) {
+      float angle = 2 * M_PI * iAngle / 10.0;
+      chis.push_back(angle);
+    }
+
+
+    // z coordinates do not matter for this test.
+    float z0 = 0;
+    float cotTheta = 2;
+
+    for (const float d0 : d0s) {
+      for (const float phi0 : phi0s) {
+        for (const float omega : omegas) {
+
+          Helix helix(d0, phi0, omega, z0, cotTheta);
+          TVector3 perigee = helix.getPosition();
+
+          for (const float chi : chis) {
+            // In the cases where omega is 0 (straight line case) chi become undefined.
+            // Use chi sample as transverse travel distance instead.
+            float expectedS = omega != 0 ? chi / omega : chi;
+
+            TVector3 pointOnHelix = helix.getPositionAtS(expectedS);
+
+            //TVector3 secant = pointOnHelix - perigee;
+            //B2INFO("Secant length " << secant.Perp());
+
+            float polarR = pointOnHelix.Perp();
+
+            float s = helix.getSAtPolarR(polarR);
+
+            // Only the absolute value is returned.
+            EXPECT_NEAR(fabs(expectedS), s, absError) <<
+                                                      "Fails for " <<
+                                                      " d0 = " << d0 <<
+                                                      " phi = " << phi0 <<
+                                                      " omega = " << omega;
+
+          }
+        }
+      }
+    }
+
+  }
 
 }  // namespace

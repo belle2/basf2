@@ -25,16 +25,6 @@
 #include <daq/dataflow/EvtSocket.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
-#ifndef REDUCED_RAWCOPPER
-#include <rawdata/dataobjects/RawCDC.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <rawdata/dataobjects/RawECL.h>
-#include <rawdata/dataobjects/RawEPID.h>
-#include <rawdata/dataobjects/RawBPID.h>
-#include <rawdata/dataobjects/RawKLM.h>
-#else
-#include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
-#endif
 
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawTLU.h>
@@ -104,22 +94,10 @@ namespace Belle2 {
 
     StoreArray<RawCOPPER> rawcprarray;
 
-#ifndef REDUCED_RAWCOPPER
-    //    StoreArray<RawDataBlock> raw_dblkarray;
-
-    StoreArray<RawCDC> raw_cdcarray;
-    StoreArray<RawSVD> raw_svdarray;
-    StoreArray<RawBPID> raw_bpidarray;
-    StoreArray<RawECL> raw_eclarray;
-    StoreArray<RawEPID> raw_epidarray;
-    StoreArray<RawKLM> raw_klmarray;
-#else
 
     //    StoreArray<ReducedRawCOPPER> rawcprarray;
     ///
     PreRawCOPPERFormat_latest m_pre_rawcpr;
-
-#endif
 
     int event_diff;
 

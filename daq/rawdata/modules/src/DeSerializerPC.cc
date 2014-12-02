@@ -17,6 +17,7 @@
 
 
 #define USE_DESERIALIZER_PREPC
+
 //#define DEBUG
 //#define NO_DATA_CHECK
 //#define DUMHSLB
@@ -35,7 +36,7 @@ REG_MODULE(DeSerializerPC)
 
 #ifndef REDUCED_RAWCOPPER
 #ifdef USE_DESERIALIZER_PREPC
-compile error
+//compile error
 #endif
 #endif
 
@@ -85,14 +86,6 @@ void DeSerializerPCModule::initialize()
   rawcprarray.registerPersistent();
   raw_ftswarray.registerPersistent();
 
-#ifndef REDUCED_RAWCOPPER
-  raw_cdcarray.registerPersistent();
-  raw_svdarray.registerPersistent();
-  raw_bpidarray.registerPersistent();
-  raw_epidarray.registerPersistent();
-  raw_eclarray.registerPersistent();
-  raw_klmarray.registerPersistent();
-#endif
 
   // Initialize Array of RawCOPPER
 
@@ -490,17 +483,9 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
-#ifndef REDUCED_RAWCOPPER
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_EXP_RUN_NO ] = exp_run_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTUTIME ] = utime_ftsw;
-#else
-
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
-
-#endif
 #endif
 
 
@@ -538,9 +523,10 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
 #ifndef NO_DATA_CHECK
     // event #, ctime, utime over nodes
     for (int l = 1; l < num_nodes_in_sendblock; l++) {
-      if (eve_array[ 0 ] != eve_array[ l ] ||
-          utime_array[ 0 ] != utime_array[ l ] ||
-          ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
+      if (eve_array[ 0 ] != eve_array[ l ]) {
+//       if (eve_array[ 0 ] != eve_array[ l ] ||
+//           utime_array[ 0 ] != utime_array[ l ] ||
+//           ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
         char err_buf[500];
         for (int m = 0; m < num_nodes_in_sendblock; m++) {
           printf("[DEBUG] node %d eve # %d utime %x ctime %x\n",
@@ -598,14 +584,6 @@ void DeSerializerPCModule::event()
   rawcprarray.create();
   raw_ftswarray.create();
 
-#ifndef REDUCED_RAWCOPPER
-  raw_cdcarray.create();
-  raw_svdarray.create();
-  raw_bpidarray.create();
-  raw_epidarray.create();
-  raw_eclarray.create();
-  raw_klmarray.create();
-#endif
 
   //
   // Main loop
@@ -625,14 +603,10 @@ void DeSerializerPCModule::event()
     PreRawCOPPERFormat_latest pre_rawcopper_latest;
     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-//     pre_rawcopper_latest.CheckCRC16( 0, 0 );
-
-
 #ifdef REDUCED_RAWCOPPER
     //
     // Copy reduced buffer
     //
-
     int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
                                &delete_flag_to);
     m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from);
@@ -651,7 +625,8 @@ void DeSerializerPCModule::event()
                            delete_flag_to, temp_rawdatablk.GetNumEvents(),
                            temp_rawdatablk.GetNumNodes());
 
-    // CRC16 check
+#ifndef USE_DESERIALIZER_PREPC
+#ifdef REDUCED_RAWCOPPER
     PostRawCOPPERFormat_latest post_rawcopper_latest;
     post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                                     0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
@@ -662,9 +637,8 @@ void DeSerializerPCModule::event()
         post_rawcopper_latest.CheckCRC16(block_num, i_finesse_num);
       }
     }
-
-
-
+#endif
+#endif
   }
 
 

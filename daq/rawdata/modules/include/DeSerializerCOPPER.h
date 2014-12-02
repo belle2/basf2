@@ -29,14 +29,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
-
-#ifndef REDUCED_RAWCOPPER
-#include <rawdata/dataobjects/RawCOPPER.h>
-#else
-//#include <rawdata/dataobjects/PreRawCOPPER.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
-#endif
+
 
 
 namespace Belle2 {
@@ -60,10 +55,10 @@ namespace Belle2 {
     //! Module functions to be called from event process
     virtual void event();
 
-#ifndef REDUCED_RAWCOPPER
-    //! Fill RawHeader
-    virtual void fillNewRawCOPPERHeader(RawCOPPER* raw_copper);
-#endif
+    /* #ifndef REDUCED_RAWCOPPER */
+    /*     //! Fill RawHeader */
+    /*     virtual void fillNewRawCOPPERHeader(RawCOPPER* raw_copper); */
+    /* #endif */
 
 
 
@@ -76,26 +71,11 @@ namespace Belle2 {
 #endif
 
   protected:
-
-#ifdef REDUCED_RAWCOPPER
     //! Handle to data from HSLBs
     const PreRawCOPPERFormat_latest m_pre_rawcpr;
-#endif
-
 
   private:
 
-#ifndef REDUCED_RAWCOPPER
-    //! data
-    StoreObjPtr<RawCOPPER> m_rawcopper;
-
-    StoreArray<RawCOPPER> rawcprarray;
-#else
-    //! data
-    /*     StoreObjPtr<PreRawCOPPER> m_rawcopper; */
-
-    /*     StoreArray<PreRawCOPPER> rawcprarray; */
-#endif
 
     StoreArray<RawDataBlock> raw_dblkarray;
 

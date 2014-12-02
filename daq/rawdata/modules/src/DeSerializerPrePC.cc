@@ -76,15 +76,6 @@ void DeSerializerPrePCModule::initialize()
   rawcprarray.registerPersistent();
   raw_ftswarray.registerPersistent();
 
-#ifndef REDUCED_RAWCOPPER
-  raw_cdcarray.registerPersistent();
-  raw_svdarray.registerPersistent();
-  raw_bpidarray.registerPersistent();
-  raw_epidarray.registerPersistent();
-  raw_eclarray.registerPersistent();
-  raw_klmarray.registerPersistent();
-#endif
-
   // Initialize Array of RawCOPPER
 
   if (m_dump_fname.size() > 0) {
@@ -481,17 +472,9 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
-#ifndef REDUCED_RAWCOPPER
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_EXP_RUN_NO ] = exp_run_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTUTIME ] = utime_ftsw;
-#else
-
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
-
-#endif
 #endif
 
 
@@ -589,65 +572,52 @@ void DeSerializerPrePCModule::event()
   rawcprarray.create();
   raw_ftswarray.create();
 
-#ifndef REDUCED_RAWCOPPER
-  raw_cdcarray.create();
-  raw_svdarray.create();
-  raw_bpidarray.create();
-  raw_epidarray.create();
-  raw_eclarray.create();
-  raw_klmarray.create();
-#endif
 
   //
   // Main loop
   //
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
+
+    //
+    // Receive data from COPPER
+    //
     eve_copper_0 = 0;
-    //
-    // Set buffer to the RawData class stored in DataStore
-    //
     int delete_flag_from = 0, delete_flag_to = 0;
     RawDataBlock temp_rawdatablk;
-
     setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
     //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
     checkData(&temp_rawdatablk, &eve_copper_0);
-//     PreRawCOPPERFormat_latest pre_rawcopper_latest;
-//     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-//                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-////     pre_rawcopper_latest.CheckCRC16( 0, 0 );
-
+    //     PreRawCOPPERFormat_latest pre_rawcopper_latest;
+    //     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+    //                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+    ////     pre_rawcopper_latest.CheckCRC16( 0, 0 );
 
 #ifdef REDUCED_RAWCOPPER
     //
     // Copy reduced buffer
     //
-
-
     int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
                                &delete_flag_to);
-
     m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from);
-
-
-
-
 #else
     delete_flag_to = delete_flag_from;
 #endif
 
-
+    //
+    // Set buffer to the RawData class stored in DataStore
+    //
     RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
     raw_datablk->SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                            delete_flag_to, temp_rawdatablk.GetNumEvents(),
                            temp_rawdatablk.GetNumNodes());
 
-    // CRC16 check
+    //
+    // CRC16 check after data reduction
+    //
+#ifdef REDUCED_RAWCOPPER
     PostRawCOPPERFormat_latest post_rawcopper_latest;
     post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                                     0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-
-
 
     for (int i_finesse_num = 0; i_finesse_num < 4; i_finesse_num ++) {
       int block_num = 0;
@@ -656,7 +626,7 @@ void DeSerializerPrePCModule::event()
       }
     }
 
-
+#endif
 
   }
 

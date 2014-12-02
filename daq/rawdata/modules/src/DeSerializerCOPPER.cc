@@ -8,13 +8,8 @@
 
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>
 #include <rawdata/CRCCalculator.h>
-
-#ifndef REDUCED_RAWCOPPER
-#include <rawdata/dataobjects/RawHeader.h>
-#include <rawdata/dataobjects/RawTrailer.h>
-#else
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
-#endif
+
 
 
 #define CHECKEVT 10000
@@ -185,120 +180,6 @@ void DeSerializerCOPPERModule::initializeCOPPER()
 
 }
 
-#ifndef REDUCED_RAWCOPPER
-void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
-{
-
-  const int cprblock = 0; // On COPPER, 1 COPPER block will be stored in a RawCOPPER.
-
-  // initialize header(header nwords, magic word) and trailer(magic word)
-  RawHeader rawhdr;
-  rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(cprblock));
-  rawhdr.Initialize(); // Fill 2nd( hdr size) and 20th header word( magic word )
-
-  // 1, Set total words info
-  int nwords = raw_copper->GetBlockNwords(cprblock);
-  rawhdr.SetNwords(nwords);
-
-
-
-  // 2, Set run and exp #
-  rawhdr.SetExpRunNumber(raw_copper->GetExpRunBuf(cprblock));       // Fill 3rd header word
-
-  // 3, Make 32bit event number from B2link FEE header
-  unsigned int cur_ftsw_eve32 =  raw_copper->GetB2LFEE32bitEventNumber(cprblock);
-
-
-#ifdef DUMMY_EVENT_NUM
-  cur_ftsw_eve32 = m_prev_ftsweve32 + 1;
-#endif
-  rawhdr.SetEveNo(cur_ftsw_eve32);       // Temporarily use COPPER counter   //raw_copper->GetCOPPERCounter()
-
-  // Set FTSW word
-  rawhdr.SetFTSW2Words(raw_copper->GetTTCtimeTRGType(cprblock), raw_copper->GetTTUtime(cprblock));
-
-#ifdef debug
-  printf("[DEBUG] 1: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-  printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
-#endif
-
-  // Obtain info from SlowController via AddParam or COPPER data
-  rawhdr.SetSubsysId(m_nodeid);   // Fill 7th header word
-  rawhdr.SetDataType(m_data_type);   // Fill 8th header word
-  rawhdr.SetTruncMask(m_trunc_mask);   // Fill 8th header word
-
-  // Offset
-  rawhdr.SetOffset1stFINESSE(raw_copper->GetOffset1stFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));          // Fill 9th header word
-  rawhdr.SetOffset2ndFINESSE(raw_copper->GetOffset2ndFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 10th header word
-  rawhdr.SetOffset3rdFINESSE(raw_copper->GetOffset3rdFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 11th header word
-  rawhdr.SetOffset4thFINESSE(raw_copper->GetOffset4thFINESSE(cprblock) - raw_copper->GetBufferPos(cprblock));         // Fill 12th header word
-
-  // Set magic word
-  rawhdr.SetMagicWordEntireHeader();
-
-  // Add node-info
-  rawhdr.AddNodeInfo(m_nodeid);   // Fill 13th header word
-
-#ifdef debug
-  printf("[DEBUG] 2: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-  printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
-#endif
-
-  //
-  // Fill info in Trailer
-  //
-  RawTrailer rawtrl;
-  rawtrl.SetBuffer(raw_copper->GetRawTrlBufPtr(cprblock));
-  rawtrl.Initialize(); // Fill 2nd word : magic word
-  rawtrl.SetChksum(calcXORChecksum(raw_copper->GetBuffer(cprblock),
-                                   raw_copper->GetBlockNwords(cprblock) - rawtrl.GetTrlNwords()));
-
-  //magic word check
-#ifndef NO_DATA_CHECK
-// 3, magic word check
-  if (!(raw_copper->CheckCOPPERMagic(cprblock))) {
-    char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
-            raw_copper->GetMagicDriverHeader(cprblock),
-            raw_copper->GetMagicFPGAHeader(cprblock),
-            raw_copper->GetMagicFPGATrailer(cprblock),
-            raw_copper->GetMagicDriverTrailer(cprblock));
-    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    sleep(12345678);
-    exit(-1);
-  }
-
-  // 3, event # increment check
-#ifdef WO_FIRST_EVENUM_CHECK
-  if ((m_prev_ftsweve32 + 1 != cur_ftsw_eve32) && (m_prev_ftsweve32 != 0xFFFFFFFF)) {
-#else
-  if (m_prev_ftsweve32 + 1 != cur_ftsw_eve32) {
-#endif // WO_FIRST_EVENUM_CHECK
-
-    char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
-    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
-    printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-    printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
-    exit(-1);
-
-  }
-#endif // NO_DATA_CHECK
-
-  m_prev_ftsweve32 = cur_ftsw_eve32;
-  // Check magic words are set at proper positions
-
-#ifdef debug
-  printf("[DEBUG] 3: i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
-  printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
-#endif
-
-  return;
-}
-
-#endif // REDUCED_RAWCOPPER
-
 
 int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word)
 {
@@ -313,12 +194,9 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   //
   // Read data from HSLB
   //
-#ifndef REDUCED_RAWCOPPER
-  int recvd_byte = RawHeader::RAWHEADER_NWORDS * sizeof(int);
-#else
-  //  int recvd_byte = ReducedRawHeader::RAWHEADER_NWORDS * sizeof(int);
+
   int recvd_byte = (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int);
-#endif
+
 
   while (1) {
     int read_size = 0;
@@ -327,14 +205,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 
-        if (
-#ifndef REDUCED_RAWCOPPER
-          recvd_byte > RawHeader::RAWHEADER_NWORDS * sizeof(int)
-#else
-          //          recvd_byte > ReducedRawHeader::RAWHEADER_NWORDS * sizeof(int)
-          recvd_byte > (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int)
-#endif
-        ) {
+        if (recvd_byte > (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int)) {
           char err_buf[500];
           sprintf("EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...", strerror(errno));
           print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -359,7 +230,6 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
         }
 #endif
         continue;
-
       } else {
         char err_buf[500];
         sprintf("Failed to read data from COPPER(%s). Exiting...", strerror(errno));
@@ -368,126 +238,50 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
       }
     } else {
       recvd_byte += read_size;
-
-#ifndef REDUCED_RAWCOPPER
-      if (recvd_byte - RawHeader::RAWHEADER_NWORDS * sizeof(int) > (int)(sizeof(int) * (RawCOPPER::POS_DATA_LENGTH + 1)))break;
-#else
-      //      if (recvd_byte - ReducedRawHeader::RAWHEADER_NWORDS * sizeof(int) > (int)(sizeof(int) * (PreRawCOPPER::POS_DATA_LENGTH + 1)))break;
       if (recvd_byte - (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int) > (int)(sizeof(int) * (m_pre_rawcpr.POS_DATA_LENGTH + 1)))break;
-#endif
-
     }
   }
 
   //
   // Calcurate data size
   //
-#ifndef REDUCED_RAWCOPPER
-  *m_size_word = m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH + RawHeader::RAWHEADER_NWORDS ]
-                 + RawCOPPER::SIZE_COPPER_DRIVER_HEADER + RawCOPPER::SIZE_COPPER_DRIVER_TRAILER
-                 + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
-#else
-//   *m_size_word = m_bufary[ entry ][ PreRawCOPPER::POS_DATA_LENGTH + ReducedRawHeader::RAWHEADER_NWORDS ]
-//                  + PreRawCOPPER::SIZE_COPPER_DRIVER_HEADER + PreRawCOPPER::SIZE_COPPER_DRIVER_TRAILER
-//                  + ReducedRawHeader::RAWHEADER_NWORDS + ReducedRawTrailer::RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
   *m_size_word = m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH + (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) ]
                  + m_pre_rawcpr.SIZE_COPPER_DRIVER_HEADER + m_pre_rawcpr.SIZE_COPPER_DRIVER_TRAILER
                  + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS + m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
-#endif
 
   //
   // Allocate buffer if needed
   //
-  if (
-#ifndef REDUCED_RAWCOPPER
-    (int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte
-#else
-    //    (int)((*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte
-    (int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte
-#endif
-  ) {
+  if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte) {
     // Check buffer size
     if (*m_size_word >  BUF_SIZE_WORD) {
       *delete_flag = 1;
       temp_buf = new int[ *m_size_word ];
-
-
       memcpy(temp_buf, m_bufary[ entry ], recvd_byte);
-#ifndef REDUCED_RAWCOPPER
-      recvd_byte += readFD(m_cpr_fd, (char*)temp_buf + recvd_byte,
-                           (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
-#else
-//       recvd_byte += readFD(m_cpr_fd, (char*)temp_buf + recvd_byte,
-//                            (*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
       recvd_byte += readFD(m_cpr_fd, (char*)temp_buf + recvd_byte,
                            (*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
-#endif
     } else {
-#ifndef REDUCED_RAWCOPPER
-      recvd_byte += readFD(m_cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
-                           (*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
-#else
-//       recvd_byte += readFD(m_cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
-//                            (*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+
       recvd_byte += readFD(m_cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
                            (*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
-#endif
     }
 
-    if (
-#ifndef REDUCED_RAWCOPPER
-      (int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte
-#else
-      //      (int)((*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte
-      (int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte
-#endif
-    ) {
+    if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
       char    err_buf[500];
 
-#ifndef REDUCED_RAWCOPPER
-      sprintf(err_buf, "CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
-              recvd_byte,
-              *m_size_word * sizeof(int) - RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
-              m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ]);
-#else
-//       sprintf(err_buf, "CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
-//               recvd_byte,
-//               *m_size_word * sizeof(int) - ReducedRawTrailer::RAWTRAILER_NWORDS * sizeof(int),
-//               m_bufary[ entry ][ PreRawCOPPER::POS_DATA_LENGTH ]);
       sprintf(err_buf, "CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
               recvd_byte,
               *m_size_word * sizeof(int) - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ]);
-#endif
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
-  } else if (
-#ifndef REDUCED_RAWCOPPER
-    (int)((*m_size_word - RawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte
-#else
-    //    (int)((*m_size_word - ReducedRawTrailer::RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte
-    (int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte
-#endif
-  ) {
+  } else if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
-#ifndef REDUCED_RAWCOPPER
-    sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
-            recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
-            m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
-    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-#else
-//     sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
-//             recvd_byte, *m_size_word * sizeof(int) , ReducedRawTrailer::RAWTRAILER_NWORDS * sizeof(int),
-//             m_bufary[ entry ][ PreRawCOPPER::POS_DATA_LENGTH ],  PreRawCOPPER::POS_DATA_LENGTH);
-//     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
     sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
             recvd_byte, *m_size_word * sizeof(int) , m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
             m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ],  m_pre_rawcpr.POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-#endif
-
     exit(-1);
   }
 #else
@@ -726,11 +520,7 @@ void DeSerializerCOPPERModule::event()
     temp_rawdblk->SetBuffer(temp_buf, m_size_word, delete_flag, num_events, num_nodes);
     // Fill Header and Trailer
 
-#ifndef REDUCED_RAWCOPPER
-    RawCOPPER temp_rawcopper;
-#else
     PreRawCOPPERFormat_latest temp_rawcopper;
-#endif
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
 
     // Fill header and trailer

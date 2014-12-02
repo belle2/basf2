@@ -19,11 +19,8 @@
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 
-#ifdef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawHeader_latest.h>
-#else
-#include <rawdata/dataobjects/RawHeader.h>
-#endif
+
 
 
 namespace Belle2 {

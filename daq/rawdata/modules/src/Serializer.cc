@@ -192,19 +192,10 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 
     //copy event # from a tonp COPPER block
     if (!(rawdblk->CheckFTSWID(i)) && !(rawdblk->CheckTLUID(i))) {
-#ifndef REDUCED_RAWCOPPER
-      RawHeader rawhdr;
-      rawhdr.SetBuffer(rawdblk->GetBuffer(i));
-      hdr->SetEventNumber(rawhdr.GetEveNo());
-      hdr->SetNodeID(rawhdr.GetSubsysId());
-      hdr->SetExpRunWord(rawhdr.GetExpRunNumberWord());
-#else
       tmp_header.SetBuffer(rawdblk->GetBuffer(i));
       hdr->SetEventNumber(tmp_header.GetEveNo());
       hdr->SetNodeID(tmp_header.GetSubsysId());
       hdr->SetExpRunWord(tmp_header.GetExpRunNumberWord());
-#endif
-
       break;
     }
 

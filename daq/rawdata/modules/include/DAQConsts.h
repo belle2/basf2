@@ -10,6 +10,7 @@
 #define DAQCONSTS_H
 
 #define REDUCED_RAWCOPPER
+
 //#define NONSTOP
 //#define NONSTOP_DEBUG
 

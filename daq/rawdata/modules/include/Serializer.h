@@ -30,11 +30,7 @@
 #include <daq/dataobjects/SendTrailer.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
-#ifndef REDUCED_RAWCOPPER
-#include <rawdata/dataobjects/RawHeader.h>
-#else
 #include <rawdata/dataobjects/RawHeader_latest.h>
-#endif
 //#include <rawdata/dataobjects/RawCOPPER.h>
 
 
@@ -206,10 +202,8 @@ namespace Belle2 {
 
 #endif
 
-#ifdef REDUCED_RAWCOPPER
     //! which format is used
     RawHeader_latest tmp_header;
-#endif
 
   };
 

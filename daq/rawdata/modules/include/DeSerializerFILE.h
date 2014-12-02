@@ -50,11 +50,6 @@ namespace Belle2 {
     //! read data from file
     virtual int* readfromFILE(FILE* fp_in, const int size_word, const int start_word, const int stop_word);
 
-#ifndef REDUCED_RAWCOPPER
-    //! read data from file
-    virtual int* modify131213SVDdata(int* buf_in, int* buf_in_nwords, int* delete_flag, unsigned int evenum);
-#endif
-
 
   protected :
 
@@ -95,9 +90,8 @@ namespace Belle2 {
     std::string m_fname_in;
 
     //! a class to handle data from a file
-#ifdef REDUCED_RAWCOPPER
     PostRawCOPPERFormat_latest m_tmp_header;
-#endif
+
 
   };
 

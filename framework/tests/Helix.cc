@@ -112,8 +112,8 @@ namespace Belle2 {
 
     // Advance a quater of a full circle.
     {
-      float s =  M_PI / 2;
-      TVector3 extrapolatedPosition = helix.getPositionAtS(s);
+      float arcLength =  M_PI / 2;
+      TVector3 extrapolatedPosition = helix.getPositionAtArcLength(arcLength);
 
       EXPECT_NEAR(1, extrapolatedPosition.X(), absError);
       EXPECT_NEAR(-1.5, extrapolatedPosition.Y(), absError);
@@ -125,7 +125,7 @@ namespace Belle2 {
     // Advance a quater of a circle now in the opposite direction
     {
       float s =  M_PI / 2;
-      TVector3 extrapolatedPosition = helix.getPositionAtS(s);
+      TVector3 extrapolatedPosition = helix.getPositionAtArcLength(s);
       EXPECT_NEAR(-1, extrapolatedPosition.X(), absError);
       EXPECT_NEAR(-1.5, extrapolatedPosition.Y(), absError);
       EXPECT_NEAR(-M_PI, extrapolatedPosition.Z(), absError);
@@ -160,8 +160,8 @@ namespace Belle2 {
 
     // Advance a quater of a full circle.
     {
-      float s =  M_PI / 2;
-      TVector3 extrapolatedPosition = helix.getPositionAtS(s);
+      float arcLength =  M_PI / 2;
+      TVector3 extrapolatedPosition = helix.getPositionAtArcLength(arcLength);
       EXPECT_NEAR(-0.75, extrapolatedPosition.X(), absError);
       EXPECT_NEAR(1, extrapolatedPosition.Y(), absError);
       EXPECT_NEAR(M_PI, extrapolatedPosition.Z(), absError);
@@ -172,8 +172,8 @@ namespace Belle2 {
 
     // Advance a quater of a circle now in the opposite direction
     {
-      float s =  M_PI / 2;
-      TVector3 extrapolatedPosition = helix.getPositionAtS(s);
+      float arcLength =  M_PI / 2;
+      TVector3 extrapolatedPosition = helix.getPositionAtArcLength(arcLength);
       EXPECT_NEAR(-0.75, extrapolatedPosition.X(), absError);
       EXPECT_NEAR(-1, extrapolatedPosition.Y(), absError);
       EXPECT_NEAR(-M_PI, extrapolatedPosition.Z(), absError);
@@ -217,23 +217,26 @@ namespace Belle2 {
           for (const float chi : chis) {
             // In the cases where omega is 0 (straight line case) chi become undefined.
             // Use chi sample as transverse travel distance instead.
-            float expectedS = omega != 0 ? chi / omega : chi;
+            float expectedArcLength = omega != 0 ? chi / omega : chi;
 
-            TVector3 pointOnHelix = helix.getPositionAtS(expectedS);
+            TVector3 pointOnHelix = helix.getPositionAtArcLength(expectedArcLength);
 
             //TVector3 secant = pointOnHelix - perigee;
             //B2INFO("Secant length " << secant.Perp());
 
             float polarR = pointOnHelix.Perp();
-
-            float s = helix.getSAtPolarR(polarR);
+            float arcLength = helix.getArcLengthAtPolarR(polarR);
 
             // Only the absolute value is returned.
-            EXPECT_NEAR(fabs(expectedS), s, absError) <<
-                                                      "Fails for " <<
-                                                      " d0 = " << d0 <<
-                                                      " phi = " << phi0 <<
-                                                      " omega = " << omega;
+            EXPECT_NEAR(fabs(expectedArcLength), arcLength, absError) <<
+                                                                      "Fails for " <<
+                                                                      " d0 = " << d0 <<
+                                                                      " phi = " << phi0 <<
+                                                                      " omega = " << omega;
+
+            // Extrapolation to perigee
+            // TVector3 momentumAtPointOnHelix = helix.getMomentumAtArcLength(expectedArcLength);
+            // Helix backExtrapolationHelix(pointOnHelix, momentumAtPointOnHelix, 1.5);
 
           }
         }

@@ -31,7 +31,9 @@ namespace Belle2 {
    *  4) z0 which is the distance of the perigee from the origin in the r-z plane
    *  5) cotTheta which is the inverse slope of the track in the r-z plane
    *
-   *
+   *  Each point on the helix can adressed by the arc length which has to be traversed to get to it from the perigee.
+   *  More precisely the arc length means the transverse part of the particles travel distance,
+   *  hence the arc length of the cirlce in the xy projection.
    */
   class Helix : public RelationsObject {
   public:
@@ -62,8 +64,8 @@ namespace Belle2 {
      *  @param phi           The angle between the transverse momentum and the x axis and in [-pi, pi]
      *  @param omega         The signed curvature of the track where the sign is given by the charge of the particle
      *  @param z0            The z coordinate of the perigee.
-     *  @param cotTheta      The inverse slope of the track in the r-z plane,
-                             where r significes the transverse travel distance as seen in the xy projection.
+     *  @param cotTheta      The inverse slope of the track in the s-z plane,
+                             where s significes the arc length as seen in the xy projection.
      */
     Helix(const float& d0,
           const float& phi,
@@ -125,16 +127,16 @@ namespace Belle2 {
 
     /** Calculates the position on the helix that lies at the given transverse travel distance.
 
-     *  @param arcS          Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
+     *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
      */
-    TVector3 getPositionAtS(const float& arcS) const;
+    TVector3 getPositionAtArcLength(const float& arcLength) const;
 
     /** Reverses the direction of travel of the helix in place. */
     void reverse();
 
     /** Calculates the transverse travel distance at the point the helix first reaches the given polar radius.
      */
-    float getSAtPolarR(const float& polarR) const;
+    float getArcLengthAtPolarR(const float& polarR) const;
 
     /** Sinus cardinalis function, which is the real part of (exp(ix) - 1) / x being sin(x) / x
      *
@@ -148,16 +150,12 @@ namespace Belle2 {
      */
     static double cosc(const double& x);
 
-    /// Helper function the calculate the factor between the length of a secant line and the transverse travel distance
-    /**
-     *  Function expressing the relation between arc length and direct length
-     *  only using the omega as additional information.
-     *  Handles to line case smoothly.
+    /** Helper function to calculate the circle arc length from the length of a secant.
      *
+     *  Translates the direct length between two point on the circle in the xy projection to the arc length on the circle
+     *  Behaves smoothly in the limit of vanishing curvature.
      */
-
-
-    double calcSFromSecantLength(const double& secantLength) const;
+    double calcArcLengthFromSecantLength(const double& secantLength) const;
     /// @}
 
 
@@ -297,7 +295,7 @@ namespace Belle2 {
 
     /** Cartesian to Perigee conversion.
      *
-     *  Everything happens internally, m_tau and m_cov5 will be set and cartesian values dropped
+     *  Everything happens internally, m_tau will be set and cartesian values dropped
      */
     void cartesianToPerigee(const TVector3& position,
                             const TVector3& momentum,

@@ -73,24 +73,41 @@ void Helix::reverse()
   m_tau.at(4) = -m_tau.at(4); //coTheta
 }
 
-TVector3 Helix::getPositionAtS(const float& arcS) const
+TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
 {
-  // Using the sinus and cosinus cardinalis for an expression which is safe at the limit omega -> 0
-  const float x = arcS * cosc((double)arcS * getOmega()) + getD0();
-  const float y = arcS * sinc((double)arcS * getOmega());
-  const float z = fma((double)getCotTheta(), arcS, getZ0());
-  TVector3 result(x, y, z);
-  const float rotatePhi = getPhi() - M_PI / 2.0;
-  result.RotateZ(rotatePhi);
-  return result;
+  /*
+  x =  d0 * sin(phi) + charge / omega * (sin(phi + chi) - sin(phi));
+  y = -d0 * cos(phi) + charge / omega * (-cos(phi + chi) + cos(phi));
+  z = z0 + charge / omega * cotTheta * chi;
+
+  where chi = arcLength * omega
+  */
+
+  // First calculating the position assuming the circle center to lies on the y axes (assuming phi0 = 0)
+  // Rotate to the right phi position afterwards
+  // Using the sinus cardinalis yields expressions that are smooth in the limit of omega -> 0
+  const float x = arcLength * sinc((double)arcLength * getOmega());
+  const float y = -arcLength * cosc((double)arcLength * getOmega()) - getD0();
+
+  // z = s * tan lambda  + z0
+  const float z = fma((double)arcLength, getCotTheta(),  getZ0());
+
+  // Unrotated position
+  TVector3 position(x, y, z);
+
+  // Rotate to the right phi position
+  const float rotatePhi = getPhi();
+  position.RotateZ(rotatePhi);
+
+  return position;
 }
 
-float Helix::getSAtPolarR(const float& polarR) const
+float Helix::getArcLengthAtPolarR(const float& polarR) const
 {
   double d0 = getD0();
   double omega = getOmega();
   double secantLength = sqrt(((double)polarR * polarR  - d0 * d0) / (1 + d0 * omega));
-  return calcSFromSecantLength(secantLength);
+  return calcArcLengthFromSecantLength(secantLength);
 }
 
 double Helix::sinc(const double& x)
@@ -134,7 +151,7 @@ double Helix::cosc(const double& x)
   }
 }
 
-double Helix::calcSFromSecantLength(const double& secantLength) const
+double Helix::calcArcLengthFromSecantLength(const double& secantLength) const
 {
   double x = secantLength * getOmega() / 2.0;
 

@@ -60,11 +60,11 @@ void ExtPhysicsConstructor::ConstructParticle()
 
   if (g4eParticle == NULL) {
     // Bohr Magneton for positron and positive muon
-    G4double muBpositron = 0.5 * eplus * hbar_Planck / (0.51099906 * MeV / c_squared);
-    G4double muBmuon = 0.5 * eplus * hbar_Planck / (0.1056584 * GeV / c_squared);
-    G4double muNucleon = eplus * hbar_Planck / 2. / (proton_mass_c2 / c_squared);
+    G4double muBpositron = 0.5 * CLHEP::eplus * CLHEP::hbar_Planck / (0.51099906 * CLHEP::MeV / CLHEP::c_squared);
+    G4double muBmuon = 0.5 * CLHEP::eplus * CLHEP::hbar_Planck / (0.1056584 * CLHEP::GeV / CLHEP::c_squared);
+    G4double muNucleon = CLHEP::eplus * CLHEP::hbar_Planck / 2. / (CLHEP::proton_mass_c2 / CLHEP::c_squared);
     g4eParticle = new G4ParticleDefinition(
-      "g4e_gamma",         0.0 * MeV,       0.0 * MeV,          0.0,
+      "g4e_gamma",         0.0 * CLHEP::MeV,       0.0 * CLHEP::MeV,          0.0,
       2,              -1,            -1,
       0,               0,             0,
       "gamma",               0,             0,   1000000022,
@@ -72,7 +72,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,        "photon",    1000000022
     );
     new G4ParticleDefinition(
-      "g4e_e-",  0.51099906 * MeV,       0.0 * MeV,    -1.*eplus,
+      "g4e_e-",  0.51099906 * CLHEP::MeV,       0.0 * CLHEP::MeV,    -1.*CLHEP::eplus,
       1,               0,             0,
       0,               0,             0,
       "lepton",               1,             0,   1000000011,
@@ -80,7 +80,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,             "e",   -1000000011, -muBpositron * 1.0011596521859
     );
     new G4ParticleDefinition(
-      "g4e_e+",  0.51099906 * MeV,       0.0 * MeV,    +1.*eplus,
+      "g4e_e+",  0.51099906 * CLHEP::MeV,       0.0 * CLHEP::MeV,    +1.*CLHEP::eplus,
       1,               0,             0,
       0,               0,             0,
       "lepton",              -1,             0,  -1000000011,
@@ -88,7 +88,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,             "e",    1000000011, muBpositron * 1.0011596521859
     );
     new G4ParticleDefinition(
-      "g4e_mu+",   0.1056584 * GeV, 2.99591e-16 * MeV,  +1.*eplus,
+      "g4e_mu+",   0.1056584 * CLHEP::GeV, 2.99591e-16 * CLHEP::MeV,  +1.*CLHEP::eplus,
       1,               0,             0,
       0,               0,             0,
       "lepton",              -1,             0,  -1000000013,
@@ -96,7 +96,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,            "mu",    1000000013, muBmuon * 1.0011659208
     );
     new G4ParticleDefinition(
-      "g4e_mu-",   0.1056584 * GeV, 2.99591e-16 * MeV,  -1.*eplus,
+      "g4e_mu-",   0.1056584 * CLHEP::GeV, 2.99591e-16 * CLHEP::MeV,  -1.*CLHEP::eplus,
       1,               0,             0,
       0,               0,             0,
       "lepton",               1,             0,   1000000013,
@@ -104,7 +104,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,            "mu",   -1000000013, -muBmuon * 1.0011659208
     );
     new G4ParticleDefinition(
-      "g4e_pi+",    0.1395700 * GeV,  2.5284e-14 * MeV, +1.*eplus,
+      "g4e_pi+",    0.1395700 * CLHEP::GeV,  2.5284e-14 * CLHEP::MeV, +1.*CLHEP::eplus,
       0,              -1,             0,
       2,              +2,            -1,
       "meson",               0,             0,   1000000211,
@@ -112,7 +112,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,            "pi",   -1000000211
     );
     new G4ParticleDefinition(
-      "g4e_pi-",    0.1395700 * GeV, 2.5284e-14 * MeV,  -1.*eplus,
+      "g4e_pi-",    0.1395700 * CLHEP::GeV, 2.5284e-14 * CLHEP::MeV,  -1.*CLHEP::eplus,
       0,              -1,             0,
       2,              -2,            -1,
       "meson",               0,             0,  -1000000211,
@@ -120,7 +120,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,            "pi",    1000000211
     );
     new G4ParticleDefinition(
-      "g4e_kaon+",    0.493677 * GeV,  5.315e-14 * MeV,   +1.*eplus,
+      "g4e_kaon+",    0.493677 * CLHEP::GeV,  5.315e-14 * CLHEP::MeV,   +1.*CLHEP::eplus,
       0,              -1,             0,
       1,              +1,             0,
       "meson",               0,             0,   1000000321,
@@ -128,7 +128,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,          "kaon",   -1000000321
     );
     new G4ParticleDefinition(
-      "g4e_kaon-",    0.493677 * GeV,   5.315e-14 * MeV,  -1.*eplus,
+      "g4e_kaon-",    0.493677 * CLHEP::GeV,   5.315e-14 * CLHEP::MeV,  -1.*CLHEP::eplus,
       0,              -1,             0,
       1,              -1,             0,
       "meson",               0,             0,  -1000000321,
@@ -136,7 +136,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,          "kaon",    1000000321
     );
     new G4Ions(
-      "g4e_proton",   0.9382723 * GeV,       0.0 * MeV,       eplus,
+      "g4e_proton",   0.9382723 * CLHEP::GeV,       0.0 * CLHEP::MeV,       CLHEP::eplus,
       1,              +1,             0,
       1,              +1,             0,
       "baryon",               0,            +1,   1000002212,
@@ -144,7 +144,7 @@ void ExtPhysicsConstructor::ConstructParticle()
       false,       "nucleon",   -1000002212, muNucleon * 2.792847351
     );
     new G4Ions(
-      "g4e_anti_proton",   0.9382723 * GeV,       0.0 * MeV,   -1.0 * eplus,
+      "g4e_anti_proton",   0.9382723 * CLHEP::GeV,       0.0 * CLHEP::MeV,   -1.0 * CLHEP::eplus,
       1,              +1,             0,
       1,              -1,             0,
       "baryon",               0,            -1,  -1000002212,

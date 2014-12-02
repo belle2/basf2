@@ -47,6 +47,8 @@ void TCConvertersTestModule::initialize()
   StoreArray<SVDCluster>::required(m_SVDClusterName);
 
   for (string aName : m_SpacePointArrayNames) { StoreArray<SpacePoint>::required(aName); }
+
+  initializeCounters();
 }
 
 // ----------------------------------- EVENT -----------------------------------------

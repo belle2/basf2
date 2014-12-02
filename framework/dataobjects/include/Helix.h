@@ -24,12 +24,12 @@ namespace Belle2 {
 
   /** This class represents an ideal helix in perigee parameterization.
    *  The used perigee parameters are:
-   *  1) omega - the signed curvature of the track where the sign is given by the charge of the particle
-   *  2) phi - the polar angle between the transverse momentum and the x axis which is in [-pi, pi]
-   *  3) d0 - the signed distance to the perigee. The sign positive (negative) if the angle between
+   *  1) d0 - the signed distance to the perigee. The sign positive (negative) if the angle between
    *          the transverse momentum and perigee position is +pi/2 (-pi/2)
-   *  4) tanLambda - the slope of the track in the sz plane (dz/ds)
-   *  5) z0 - the distance of the perigee from the origin
+   *  2) phi - the polar angle between the transverse momentum and the x axis which is in [-pi, pi]
+   *  3) omega - the signed curvature of the track where the sign is given by the charge of the particle
+   *  4) z0 - the distance of the perigee from the origin
+   *  5) tanLambda - the slope of the track in the sz plane (dz/ds)
    *
    *  Each point on the helix can adressed by the arc length s, which has to be traversed to get to it from the perigee.
    *  More precisely the arc length means the transverse part of the particles travel distance,
@@ -60,18 +60,18 @@ namespace Belle2 {
 
     /** Constructor initializing class with perigee parameters.
      *
-     *  @param omega         The signed curvature of the track where the sign is given by the charge of the particle
-     *  @param phi0          The angle between the transverse momentum and the x axis and in [-pi, pi]
      *  @param d0            The signed distance from origin to the perigee.
      *                       The sign is positive (negative) if the angle between the transverse momentum and d0 is +pi/2 (-pi/2)
-     *  @param tanLambda     the slope of the track in the sz plane (dz/ds)
+     *  @param phi0          The angle between the transverse momentum and the x axis and in [-pi, pi]
+     *  @param omega         The signed curvature of the track where the sign is given by the charge of the particle
      *  @param z0            The z coordinate of the perigee.
+     *  @param tanLambda     the slope of the track in the sz plane (dz/ds)
      */
-    Helix(const float& omega,
+    Helix(const float& d0,
           const float& phi0,
-          const float& d0,
-          const float& tanLambda,
-          const float& z0);
+          const float& omega,
+          const float& z0,
+          const float& tanLambda);
 
     /** Output operator for debugging and the generation of unittest error messages.*/
     friend std::ostream& operator<<(std::ostream& output, const Helix& helix);
@@ -196,26 +196,24 @@ namespace Belle2 {
     /// @{
     //---------------------------------------------------------------------------------------------------------------------------
   public:
-    /** Getter for omega. This is the curvature of the track. It's sign is defined by the charge of the particle. */
-    float getOmega() const { return m_omega; }
+    /** Getter for d0, which is the signed distance to the perigee in the r-phi plane. */
+    float getD0() const { return m_d0; }
 
-    /** Getter for phi0. This is the angle of the transverse momentum in the r-phi plane.
+    /** Getter for phi0, which is the polar angle of the transverse momentum in the r-phi plane at the perigee.
      *
      *  getMomentum().Phi() == getPhi0() holds.
      */
     float getPhi0() const { return m_phi0; }
 
-    /** Getter for d0. This is the signed distance to the perigee in the r-phi plane. */
-    float getD0() const { return m_d0; }
+    /** Getter for omega, which is a signed curvature measure of the track. The sign is equivalent to the charge of the particle. */
+    float getOmega() const { return m_omega; }
 
-    /** Getter for tanLambda. This is the slope of the track in the r-z plane. */
-    float getTanLambda() const { return m_tanLambda; }
-
-    /** Getter for z0. This is the z coordinate of the perigee. */
+    /** Getter for z0, which is the z coordinate of the perigee. */
     float getZ0() const { return m_z0; }
+
+    /** Getter for tanLambda, which is the z over arc length slope of the track. */
+    float getTanLambda() const { return m_tanLambda; }
     /// @}
-
-
 
     ///--------------------------------------------------------------------------------------------------------------------------
   private:
@@ -247,7 +245,6 @@ namespace Belle2 {
      * @param momentum in cartesian coordinates
      * @param charge of the particle
      * @param bField at the perigee point
-     * @return q/omega
      */
     double calcOmegaFromCartesian(const TVector3& momentum, const short int charge, const float bField) const;
 
@@ -314,20 +311,21 @@ namespace Belle2 {
                             const float bField);
 
 
-    /** Memory for the curvature of the signed curvature*/
-    float m_omega;
-
-    /** Memory for the polar angle between the transverse momentum and the x axis which is in [-pi, pi]. */
-    float m_phi0;
 
     /** Memory for the signed distance to the perigee. The sign positive (negative).*/
     float m_d0;
 
-    /** Memory for the slope of the track in the sz plane (dz/ds)*/
-    float m_tanLambda;
+    /** Memory for the polar angle between the transverse momentum and the x axis which is in [-pi, pi]. */
+    float m_phi0;
+
+    /** Memory for the curvature of the signed curvature*/
+    float m_omega;
 
     /** Memory for the z coordinate of the perigee. */
     float m_z0;
+
+    /** Memory for the slope of the track in the sz plane (dz/ds)*/
+    float m_tanLambda;
 
     /** Streamer version 1. */
     ClassDef(Helix, 1);

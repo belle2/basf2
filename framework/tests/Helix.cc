@@ -160,7 +160,7 @@ namespace Belle2 {
       for (const float phi0 : phi0s) {
         for (const float omega : omegas) {
 
-          Helix helix(omega, phi0, d0, tanLambda, z0);
+          Helix helix(d0, phi0, omega, z0, tanLambda);
 
           TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
 
@@ -206,7 +206,7 @@ namespace Belle2 {
         for (const float omega : omegas) {
           if (omega != 0) {
 
-            Helix helix(omega, phi0, d0, tanLambda, z0);
+            Helix helix(d0, phi0, omega, z0, tanLambda);
             TVector3 momentumAtPerigee = helix.getMomentum();
             for (const float chi : chis) {
 
@@ -237,7 +237,7 @@ namespace Belle2 {
       for (const float phi0 : phi0s) {
         for (const float omega : omegas) {
 
-          Helix helix(omega, phi0, d0, tanLambda, z0);
+          Helix helix(d0, phi0, omega, z0, tanLambda);
           TVector3 perigee = helix.getPosition();
 
           TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
@@ -289,14 +289,14 @@ namespace Belle2 {
   {
 
     float z0 = 0;
-    float tanLambda = 0;
+    float tanLambda = -2;
 
     for (const float d0 : d0s) {
       for (const float phi0 : phi0s) {
         for (const float omega : omegas) {
 
           if (omega != 0) {
-            Helix expectedHelix(omega, phi0, d0, tanLambda, z0);
+            Helix expectedHelix(d0, phi0, omega, z0, tanLambda);
             TVector3 perigee = expectedHelix.getPosition();
             TVector3 momentum = expectedHelix.getMomentum(nominalBz);
             int chargeSign = expectedHelix.getChargeSign();

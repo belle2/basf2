@@ -33,16 +33,16 @@ Helix::Helix(const TVector3& position,
 
 
 
-Helix::Helix(const float& omega,
+Helix::Helix(const float& d0,
              const float& phi0,
-             const float& d0,
-             const float& tanLambda,
-             const float& z0)
-  : m_omega(omega),
+             const float& omega,
+             const float& z0,
+             const float& tanLambda)
+  : m_d0(d0),
     m_phi0(phi0),
-    m_d0(d0),
-    m_tanLambda(tanLambda),
-    m_z0(z0)
+    m_omega(omega),
+    m_z0(z0),
+    m_tanLambda(tanLambda)
 {
 }
 
@@ -328,10 +328,10 @@ namespace Belle2 {
   {
     return output
            << "Helix("
-           << "omega=" << helix.getOmega() << ", "
-           << "phi0=" << helix.getPhi0() << ", "
            << "d0=" << helix.getD0() << ", "
-           << "tanLambda=" << helix.getTanLambda() << ", "
-           << "z0=" << helix.getZ0() << ")";
+           << "phi0=" << helix.getPhi0() << ", "
+           << "omega=" << helix.getOmega() << ", "
+           << "z0=" << helix.getZ0() << ", "
+           << "tanLambda=" << helix.getTanLambda() << ")";
   }
 }

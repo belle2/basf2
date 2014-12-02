@@ -27,7 +27,8 @@
 #pragma link C++ class Belle2::HitPatternVXD+;
 #pragma link C++ class Belle2::TrackFitResult+;
 #pragma link C++ class Belle2::V0+;
-
+#pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+;
+#pragma link C++ class pair<short, short>+;
 
 #pragma link C++ class Belle2::TRGSummary+;
 

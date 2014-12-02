@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Heck, Markus Prim                                 *
@@ -50,13 +50,13 @@ namespace Belle2 {
      *  @param position      Position of the track at the perigee.
      *  @param momentum      Momentum of the track at the perigee.
      *  @param charge        Charge of the particle.
-     *  @param bField        Magnetic field to be used for the calculation of the curvature;
+     *  @param bZ            Magnetic field to be used for the calculation of the curvature;
                              It is assumed, that the B-field is parallel to the z-Axis.
      */
     Helix(const TVector3& position,
           const TVector3& momentum,
           const short int charge,
-          const float bField);
+          const float bZ);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -90,26 +90,23 @@ namespace Belle2 {
      *  As we calculate recalculate the momentum from a geometric helix, we need an estimate
      *  of the magnetic field along the z-axis to give back the momentum.
      *  @TODO This has a default value so that the basf2 compiles; default should be removed.
-     *  @param bField  Magnetic field at the perigee.
+     *  @param bZ  Magnetic field at the perigee.
      */
-    TVector3 getMomentum(const float bField = 1.5) const;
+    TVector3 getMomentum(const float bZ = 1.5) const;
 
     /** Getter for the absolute value of the transverse momentum at the perigee.
      *
-     * @param bField Magnetic field at the perigee
+     * @param bZ Magnetic field at the perigee
      */
-    float getTransverseMomentum(const float bField = 1.5) const;
+    float getTransverseMomentum(const float bZ = 1.5) const;
 
     /** Getter for kappa, which is charge / transverse momentum or equivalently omega * alpha */
-    float getKappa(const float bField = 1.5) const;
+    float getKappa(const float bZ = 1.5) const;
 
     /** Calculates the alpha value for a given magnetic field in Tesla */
-    double getAlpha(const float bField) const;
+    static double getAlpha(const float bZ);
 
-    /** Return track charge (1 or -1).
-     *
-     *  @TODO For very small values, we might be unsure and return zero.
-     */
+    /** Return track charge sign (1 or -1).*/
     short getChargeSign() const {
       return getOmega() >= 0 ? 1 : -1;
     }
@@ -124,8 +121,7 @@ namespace Belle2 {
 
     /** Calculates the transverse travel distance at the point the helix first reaches the given polar radius.
      *
-     *
-     *  Gives the circle arc length in the forward direction that is traversed until a certain polar radius is reached
+     *  Gives the circle arc length in the forward direction that is traversed until a certain polar radius is reached.
      *  Returns NAN, if the polar radius can not be reached, either because it is to far outside or inside of the perigee.
      *
      *  Forward the result to getPositionAtArcLength() or getMomentumAtArcLength() in order to extrapolate to the concentrical detector boundaries.
@@ -138,7 +134,6 @@ namespace Belle2 {
      */
     float getArcLengthAtPolarR(const float& polarR) const;
 
-
     /** Calculates the position on the helix at the given arc length
      *
      *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
@@ -150,7 +145,6 @@ namespace Belle2 {
      *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
      */
     TVector3 getUnitTangentialAtArcLength(const float& arcLength) const;
-
 
     /** Calculates the momentum vector at the given arc length.
      *
@@ -247,9 +241,9 @@ namespace Belle2 {
      * Calculates the signed curvature of the track.
      * @param momentum in cartesian coordinates
      * @param charge of the particle
-     * @param bField at the perigee point
+     * @param bZ at the perigee point
      */
-    double calcOmegaFromCartesian(const TVector3& momentum, const short int charge, const float bField) const;
+    double calcOmegaFromCartesian(const TVector3& momentum, const short int charge, const float bZ) const;
 
     /**
      * Calculates the z component of the perigee vector.
@@ -285,33 +279,33 @@ namespace Belle2 {
 
     /**
      * Calculates the x momentum of the particle at the perigee point from the internal stored parameters.
-     * @param bField: correction factor if different from original bField
+     * @param bZ: correction factor if different from original bZ
      * @return
      */
-    double calcPxFromPerigee(const float bField) const;
+    double calcPxFromPerigee(const float bZ) const;
 
     /**
      * Calculates the y momentum of the particle at the perigee point from the internal stored parameters.
-     * @param bField: correction factor if different from original bField
+     * @param bZ: correction factor if different from original bZ
      * @return
      */
-    double calcPyFromPerigee(const float bField) const;
+    double calcPyFromPerigee(const float bZ) const;
 
     /**
      * Calculates the z momentum of the particle at the perigee point from the internal stored parameters.
-     * @param bField: correction factor if different from original bField
+     * @param bZ: correction factor if different from original bZ
      * @return
      */
-    double calcPzFromPerigee(const float bField) const;
+    double calcPzFromPerigee(const float bZ) const;
 
     /** Cartesian to Perigee conversion.
      *
-     *  Everything happens internally, m_tau will be set and cartesian values dropped
+     *  Everything happens internally, perigee parameters will be set and cartesian values dropped
      */
     void cartesianToPerigee(const TVector3& position,
                             const TVector3& momentum,
                             const short int charge,
-                            const float bField);
+                            const float bZ);
 
 
 

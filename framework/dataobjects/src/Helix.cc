@@ -26,9 +26,9 @@ Helix::Helix()
 Helix::Helix(const TVector3& position,
              const TVector3& momentum,
              const short int charge,
-             const float bField)
+             const float bZ)
 {
-  cartesianToPerigee(position, momentum, charge, bField);
+  cartesianToPerigee(position, momentum, charge, bZ);
 }
 
 Helix::Helix(const float& d0,
@@ -49,24 +49,24 @@ TVector3 Helix::getPosition() const
   return TVector3(calcXFromPerigee(), calcYFromPerigee(), calcZFromPerigee());
 }
 
-TVector3 Helix::getMomentum(const float bField) const
+TVector3 Helix::getMomentum(const float bZ) const
 {
-  return TVector3(calcPxFromPerigee(bField), calcPyFromPerigee(bField), calcPzFromPerigee(bField));
+  return TVector3(calcPxFromPerigee(bZ), calcPyFromPerigee(bZ), calcPzFromPerigee(bZ));
 }
 
-float Helix::getTransverseMomentum(const float bField) const
+float Helix::getTransverseMomentum(const float bZ) const
 {
-  return std::fabs(1 / getAlpha(bField) / getOmega());
+  return std::fabs(1 / getAlpha(bZ) / getOmega());
 }
 
-float Helix::getKappa(const float bField) const
+float Helix::getKappa(const float bZ) const
 {
-  return getOmega() * getAlpha(bField);
+  return getOmega() * getAlpha(bZ);
 }
 
-double Helix::getAlpha(const float bField) const
+double Helix::getAlpha(const float bZ)
 {
-  return 1.0 / (bField * TMath::C()) * 1E11;
+  return 1.0 / (bZ * TMath::C()) * 1E11;
 }
 
 void Helix::reverse()
@@ -225,9 +225,9 @@ double Helix::calcASinXDividedByX(const double& x)
 void Helix::cartesianToPerigee(const TVector3& position,
                                const TVector3& momentum,
                                const short int charge,
-                               const float bField)
+                               const float bZ)
 {
-  const double alpha = getAlpha(bField);
+  const double alpha = getAlpha(bZ);
 
   // We allow for the case that position, momentum are not given
   // exactly in the perigee.  Therefore we have to solve the
@@ -307,19 +307,19 @@ double Helix::calcZFromPerigee() const
   return getZ0();
 }
 
-double Helix::calcPxFromPerigee(const float bField) const
+double Helix::calcPxFromPerigee(const float bZ) const
 {
-  return std::cos((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bField)));
+  return std::cos((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bZ)));
 }
 
-double Helix::calcPyFromPerigee(const float bField) const
+double Helix::calcPyFromPerigee(const float bZ) const
 {
-  return std::sin((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bField)));
+  return std::sin((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bZ)));
 }
 
-double Helix::calcPzFromPerigee(const float bField) const
+double Helix::calcPzFromPerigee(const float bZ) const
 {
-  return getTanLambda() / (std::fabs(getOmega() * getAlpha(bField)));
+  return getTanLambda() / (std::fabs(getOmega() * getAlpha(bZ)));
 }
 
 namespace Belle2 {

@@ -98,8 +98,8 @@ void ExtModule::initialize()
 {
 
   // Convert from GeV to GEANT4 energy units (MeV); avoid negative values
-  m_MinPt = max(0.0, m_MinPt) * GeV;
-  m_MinKE = max(0.0, m_MinKE) * GeV;
+  m_MinPt = max(0.0, m_MinPt) * CLHEP::GeV;
+  m_MinKE = max(0.0, m_MinKE) * CLHEP::GeV;
 
   // Define the list of volumes that will have their entry and/or
   // exit points stored during the extrapolation.
@@ -156,7 +156,7 @@ void ExtModule::initialize()
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
   // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
   // *NOTE* If module muid runs after this, its G4UImanager commands will override these.
-  G4double maxStep = ((m_MaxStep == 0.0) ? 10.0 : std::min(10.0, m_MaxStep)) * cm;
+  G4double maxStep = ((m_MaxStep == 0.0) ? 10.0 : std::min(10.0, m_MaxStep)) * CLHEP::cm;
   char stepSize[80];
   std::sprintf(stepSize, "/geant4e/limits/stepLength %8.2f mm", maxStep);
   G4UImanager::GetUIpointer()->ApplyCommand(stepSize);
@@ -164,9 +164,9 @@ void ExtModule::initialize()
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
 
   GearDir strContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-  double offsetZ = strContent.getLength("OffsetZ") * cm;
-  double rMaxCoil = strContent.getLength("Cryostat/Rmin") * cm;
-  double halfLength = strContent.getLength("Cryostat/HalfLength") * cm;
+  double offsetZ = strContent.getLength("OffsetZ") * CLHEP::cm;
+  double rMaxCoil = strContent.getLength("Cryostat/Rmin") * CLHEP::cm;
+  double halfLength = strContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
   m_Target = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
   m_MinRadiusSq = (rMaxCoil * 0.25) * (rMaxCoil * 0.25); // roughly 40 cm
@@ -478,15 +478,15 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     int charge = gfTrackRep->getCharge(firstState);
     TVector3 firstDirection(firstMomentum.Unit());
 
-    double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * kilogauss / tesla;
-    double radius = (firstMomentum.Perp() * GeV / eV) / (c_light / (m / s) * charge * Bz) * (m / cm);
-    double centerPhi = firstMomentum.Phi() - halfpi;
+    double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * CLHEP::kilogauss / CLHEP::tesla;
+    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) * (CLHEP::m / CLHEP::cm);
+    double centerPhi = firstMomentum.Phi() - CLHEP::halfpi;
     double centerX = firstPosition.X() + radius * cos(centerPhi);
     double centerY = firstPosition.Y() + radius * sin(centerPhi);
-    double pocaPhi = atan2(charge * centerY, charge * centerX) + pi;
-    double dPhi = pocaPhi - centerPhi - pi;
-    if (dPhi > pi) { dPhi -= twopi; }
-    if (dPhi < -pi) { dPhi  += twopi; }
+    double pocaPhi = atan2(charge * centerY, charge * centerX) + CLHEP::pi;
+    double dPhi = pocaPhi - centerPhi - CLHEP::pi;
+    if (dPhi >  CLHEP::pi) { dPhi -= CLHEP::twopi; }
+    if (dPhi < -CLHEP::pi) { dPhi += CLHEP::twopi; }
     TVector3 ipPosition(centerX + radius * cos(pocaPhi),
                         centerY + radius * sin(pocaPhi),
                         firstPosition.Z() - dPhi * radius * firstDirection.Z() / firstDirection.Perp());
@@ -512,24 +512,24 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
       pathLength = fabs((lastPosition.Z() - ipPosition.Z()) / avgW);
     } else {
       dPhi = lastDirection.Phi() - ipDirection.Phi();
-      if (dPhi < -pi) { dPhi += twopi; }
-      if (dPhi >  pi) { dPhi -= twopi; }
+      if (dPhi < -CLHEP::pi) { dPhi += CLHEP::twopi; }
+      if (dPhi >  CLHEP::pi) { dPhi -= CLHEP::twopi; }
       double dx = lastPosition.X() - ipPosition.X();
       double dy = lastPosition.Y() - ipPosition.Y();
       pathLength = sqrt(dx * dx + dy * dy) / (ipDirection.Perp() + lastDirection.Perp())
                    * (dPhi / sin(0.5 * dPhi));
     }
-    double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / GeV;
+    double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / CLHEP::GeV;
     // time of flight from I.P. (ns) at the last point on the Genfit track
-    m_TOF = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * c_light / (cm / ns)));
+    m_TOF = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * CLHEP::c_light / (CLHEP::cm / CLHEP::ns)));
 
     covG4e = fromPhasespaceToG4e(lastMomentum, lastCov); // in Geant4e units (GeV/c, cm)
-    position.setX(lastPosition.X()*cm); // in Geant4 units (mm)
-    position.setY(lastPosition.Y()*cm);
-    position.setZ(lastPosition.Z()*cm);
-    momentum.setX(lastMomentum.X()*GeV);  // in Geant4 units (MeV/c)
-    momentum.setY(lastMomentum.Y()*GeV);
-    momentum.setZ(lastMomentum.Z()*GeV);
+    position.setX(lastPosition.X() * CLHEP::cm); // in Geant4 units (mm)
+    position.setY(lastPosition.Y() * CLHEP::cm);
+    position.setZ(lastPosition.Z() * CLHEP::cm);
+    momentum.setX(lastMomentum.X() * CLHEP::GeV);  // in Geant4 units (MeV/c)
+    momentum.setY(lastMomentum.Y() * CLHEP::GeV);
+    momentum.setZ(lastMomentum.Z() * CLHEP::GeV);
   }
 
   catch (genfit::Exception& e) {
@@ -556,7 +556,7 @@ TMatrixDSym ExtModule::fromG4eToPhasespace(const G4ErrorFreeTrajState* state)
   // zT = -x * sin(lambda) * cos(phi) - y * sin(lambda) * sin(phi) + z * cos(lambda)
 
   G4ErrorFreeTrajParam param = state->GetParameters();
-  double p = 1.0 / (param.GetInvP() * GeV);     // in GeV/c
+  double p = 1.0 / (param.GetInvP() * CLHEP::GeV);     // in GeV/c
   double p2 = p * p;
   double lambda = param.GetLambda();            // in radians
   double phi = param.GetPhi();          // in radians
@@ -671,8 +671,12 @@ void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status
     stepPoint = state->GetG4Track()->GetStep()->GetPostStepPoint();
   }
 
-  TVector3 pos(stepPoint->GetPosition().x() / cm, stepPoint->GetPosition().y() / cm, stepPoint->GetPosition().z() / cm);
-  TVector3 mom(stepPoint->GetMomentum().x() / GeV, stepPoint->GetMomentum().y() / GeV, stepPoint->GetMomentum().z() / GeV);
+  TVector3 pos(stepPoint->GetPosition().x() / CLHEP::cm,
+               stepPoint->GetPosition().y() / CLHEP::cm,
+               stepPoint->GetPosition().z() / CLHEP::cm);
+  TVector3 mom(stepPoint->GetMomentum().x() / CLHEP::GeV,
+               stepPoint->GetMomentum().y() / CLHEP::GeV,
+               stepPoint->GetMomentum().z() / CLHEP::GeV);
   Const::EDetector detID(Const::EDetector::invalidDetector);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);

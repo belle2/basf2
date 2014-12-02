@@ -178,14 +178,24 @@ namespace Belle2 {
      *  Behaves smoothly in the limit of vanishing curvature.
      */
     double calcArcLengthFromSecantLength(const double& secantLength) const;
+
+
+    /** Helper function to calculate the factor between the secant length and the circle arc length as seen in xy projection of the helix
+     */
+    double calcSecantLengthToArcLengthFactor(const double& secantLength) const;
+
+  private:
+    /** Implementation of the function asin(x) / x which handles small x values smoothly. */
+    static double calcASinXDividedByX(const double& x);
     /// @}
+
 
 
     //---------------------------------------------------------------------------------------------------------------------------
     /// @name Getters for perigee helix parameters
     /// @{
     //---------------------------------------------------------------------------------------------------------------------------
-
+  public:
     /** Getter for omega. This is the curvature of the track. It's sign is defined by the charge of the particle. */
     float getOmega() const { return m_omega; }
 

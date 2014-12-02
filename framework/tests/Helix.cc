@@ -111,12 +111,8 @@ namespace Belle2 {
       Helix helix(position, momentum, charge, bField);
 
       // Test all vector elements
-      EXPECT_NEAR(position.X(), helix.getPosition().X(), absError);
-      EXPECT_NEAR(position.Y(), helix.getPosition().Y(), absError);
-      EXPECT_NEAR(position.Z(), helix.getPosition().Z(), absError);
-      EXPECT_NEAR(momentum.Px(), helix.getMomentum(bField).Px(), absError);
-      EXPECT_NEAR(momentum.Py(), helix.getMomentum(bField).Py(), absError);
-      EXPECT_NEAR(momentum.Pz(), helix.getMomentum(bField).Pz(), absError);
+      EXPECT_ALL_NEAR(position, helix.getPosition(), absError);
+      EXPECT_ALL_NEAR(momentum, helix.getMomentum(bField), absError);
 
       // Test getter for transverse momentum
       EXPECT_NEAR(momentum.Perp(), helix.getTransverseMomentum(bField), absError);
@@ -155,108 +151,8 @@ namespace Belle2 {
   }
 
 
-  TEST_F(HelixTest, SimpleExtrapolation)
-  {
-    // Setup a clockwise helix starting at (0, -0.5, 0) which does not surround the origin
-
-    float d0 = 0.5;
-    float phi0 = 0;
-    float omega = 1.0;
-    float z0 = 0;
-    float tanLambda = 2;
-
-    TVector3 expectedPerigee(0, -d0, z0);
-    int expectedCharge = omega > 0 ? 1 : -1;
-
-    Helix helix(omega, phi0, d0, tanLambda, z0);
-
-    // Check setup
-    TVector3 perigee(helix.getPosition());
-    EXPECT_NEAR(expectedPerigee.X(), perigee.X(), absError);
-    EXPECT_NEAR(expectedPerigee.Y(), perigee.Y(), absError);
-    EXPECT_NEAR(expectedPerigee.Z(), perigee.Z(), absError);
-
-    TVector3 momentumAtPerigee(helix.getMomentum());
-    EXPECT_NEAR(phi0,  momentumAtPerigee.Phi(), absError);
-    EXPECT_EQ(expectedCharge,  helix.getChargeSign());
-
-    // Advance a quater of a full circle.
-    {
-      float arcLength =  M_PI / 2;
-      TVector3 extrapolatedPosition = helix.getPositionAtArcLength(arcLength);
-
-      EXPECT_NEAR(1, extrapolatedPosition.X(), absError);
-      EXPECT_NEAR(-1.5, extrapolatedPosition.Y(), absError);
-      EXPECT_NEAR(M_PI, extrapolatedPosition.Z(), absError);
-    }
-    // Reverse the helix in place
-    helix.reverse();
-
-    // Advance a quater of a circle now in the opposite direction
-    {
-      float s =  M_PI / 2;
-      TVector3 extrapolatedPosition = helix.getPositionAtArcLength(s);
-      EXPECT_NEAR(-1, extrapolatedPosition.X(), absError);
-      EXPECT_NEAR(-1.5, extrapolatedPosition.Y(), absError);
-      EXPECT_NEAR(-M_PI, extrapolatedPosition.Z(), absError);
-    }
-
-  }
-
-
-
-  TEST_F(HelixTest, SimpleExtrapolation2)
-  {
-    // Setup a clockwise helix starting at (0.25, 0 , 0) which *does* surround the origin
-
-    float d0 = 0.25;
-    float phi0 = M_PI / 2;
-    float omega = -1.0;
-    float z0 = 0;
-    float tanLambda = 2;
-
-    TVector3 expectedPerigee(d0, 0, z0);
-    int expectedCharge = omega > 0 ? 1 : -1;
-
-    Helix helix(omega, phi0, d0, tanLambda, z0);
-
-    // Check setup
-    TVector3 perigee(helix.getPosition());
-    EXPECT_NEAR(expectedPerigee.X(), perigee.X(), absError);
-    EXPECT_NEAR(expectedPerigee.Y(), perigee.Y(), absError);
-    EXPECT_NEAR(expectedPerigee.Z(), perigee.Z(), absError);
-
-    TVector3 momentumAtPerigee(helix.getMomentum());
-    EXPECT_NEAR(phi0,  momentumAtPerigee.Phi(), absError);
-    EXPECT_EQ(expectedCharge,  helix.getChargeSign());
-
-    // Advance a quater of a full circle.
-    {
-      float arcLength =  M_PI / 2;
-      TVector3 extrapolatedPosition = helix.getPositionAtArcLength(arcLength);
-      EXPECT_NEAR(-0.75, extrapolatedPosition.X(), absError);
-      EXPECT_NEAR(1, extrapolatedPosition.Y(), absError);
-      EXPECT_NEAR(M_PI, extrapolatedPosition.Z(), absError);
-    }
-
-    // Reverse the helix in place
-    helix.reverse();
-
-    // Advance a quater of a circle now in the opposite direction
-    {
-      float arcLength =  M_PI / 2;
-      TVector3 extrapolatedPosition = helix.getPositionAtArcLength(arcLength);
-      EXPECT_NEAR(-0.75, extrapolatedPosition.X(), absError);
-      EXPECT_NEAR(-1, extrapolatedPosition.Y(), absError);
-      EXPECT_NEAR(-M_PI, extrapolatedPosition.Z(), absError);
-    }
-
-  }
-
   TEST_F(HelixTest, Tangential)
   {
-
-    // z coordinates do not matter for this test.
     float z0 = 0;
     float tanLambda = 2;
 
@@ -302,9 +198,8 @@ namespace Belle2 {
 
   TEST_F(HelixTest, MomentumExtrapolation)
   {
-    // z coordinates do not matter for this test.
     float z0 = 0;
-    float tanLambda = 2;
+    float tanLambda = -2;
 
     for (const float d0 : d0s) {
       for (const float phi0 : phi0s) {
@@ -346,7 +241,6 @@ namespace Belle2 {
           TVector3 perigee = helix.getPosition();
 
           TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
-          int chargeSign = helix.getChargeSign();
 
           std::ostringstream message;
           message << "Failed for " << helix;
@@ -363,15 +257,11 @@ namespace Belle2 {
             float expectedArcLength = omega != 0 ? chi / omega : chi;
             TVector3 pointOnHelix = helix.getPositionAtArcLength(expectedArcLength);
 
-            //TVector3 secant = pointOnHelix - perigee;
-            //B2INFO("Secant length " << secant.Perp());
-
             float polarR = pointOnHelix.Perp();
             float arcLength = helix.getArcLengthAtPolarR(polarR);
 
             // Only the absolute value is returned.
             EXPECT_NEAR(fabs(expectedArcLength), arcLength, absError);
-
 
             // Also check it the extrapolation lies in the forward direction.
             TVector3 secantVector = pointOnHelix - perigee;

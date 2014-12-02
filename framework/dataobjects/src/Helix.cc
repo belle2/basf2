@@ -85,9 +85,9 @@ float Helix::getArcLengthAtPolarR(const float& polarR) const
 TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
 {
   /*
-    /   \     /                      \     /                             \
-    | x |     | cos phi0   -sin phi0 |     |      sin(chi)  / omega      |
-    |   |  =  |                      |  *  |                             |
+    /   \     /                      \     /                              \
+    | x |     | cos phi0   -sin phi0 |     |       sin(chi)  / omega      |
+    |   |  =  |                      |  *  |                              |
     | y |     | sin phi0    cos phi0 |     | -(1 - cos(chi)) / omega - d0 |
     \   /     \                      /     \                             /
 
@@ -100,6 +100,7 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
     // Old definitionb identical?
     x =  d0 * sin(phi0) + charge / omega * (sin(phi0 + chi) - sin(phi0));
     y = -d0 * cos(phi0) + charge / omega * (-cos(phi0 + chi) + cos(phi0));
+    // Actually no - have to talk back to Markus about this.
   */
 
   // First calculating the position assuming the circle center to lies on the y axes (assuming phi0 = 0)
@@ -160,63 +161,62 @@ TVector3 Helix::getMomentumAtArcLength(const float& arcLength, const float& bz) 
   const double py = sin(arcLength * omega + phi0) * pr;
   const double pz = tanLambda * pr;
 
-
-  // const double px = std::cos((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bz)));
-  // const double py = std::sin((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bz)));
-  // const double pz = getTanLambda() / (std::fabs(getOmega() * getAlpha(bz)));
-
-  // const double px = calcPxFromPerigee(bz);
-  // const double py = calcPyFromPerigee(bz);
-  // const double pz = calcPzFromPerigee(bz);
-
   TVector3 momentum(px, py, pz);
-  //momentum.RotateZ(arcLength * omega);
-
   return momentum;
 }
 
 double Helix::calcArcLengthFromSecantLength(const double& secantLength) const
 {
-  double x = secantLength * getOmega() / 2.0;
+  return secantLength * calcSecantLengthToArcLengthFactor(secantLength);
+}
 
-  // Need asin(x) / x also for low values
-  // Use approximation inspired by BOOST's sinc
+
+double Helix::calcSecantLengthToArcLengthFactor(const double& secantLength) const
+{
+  double chiHalf = secantLength * getOmega() / 2.0;
+  return calcASinXDividedByX(chiHalf);
+}
+
+
+double Helix::calcASinXDividedByX(const double& x)
+{
+  // Approximation of asin(x) / x
+  // Inspired by BOOST's sinc
+
   BOOST_MATH_STD_USING;
 
   double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
 
   if (abs(x) >= taylor_n_bound) {
     if (fabs(x) == 1) {
-      return secantLength * M_PI / 2.0;
+      return  M_PI / 2.0;
 
     } else {
-      return 2.0 * asin(x) / getOmega();
+      return asin(x) / x;
 
     }
 
   } else {
-    // Approximation of asin(x) / x
-    // Inspired by BOOST's sinc
-
     // approximation by taylor series in x at 0 up to order 0
-    double secantLengthFactor = 1.0;
+    double result = 1.0;
 
     double const taylor_0_bound = boost::math::tools::epsilon<double>();
     if (abs(x) >= taylor_0_bound) {
       double x2 = x * x;
       // approximation by taylor series in x at 0 up to order 2
-      secantLengthFactor += x2 / 6.0;
+      result += x2 / 6.0;
 
       double const taylor_2_bound = boost::math::tools::root_epsilon<double>();
       if (abs(x) >= taylor_2_bound) {
         // approximation by taylor series in x at 0 up to order 4
-        secantLengthFactor += x2 * x2 * (3.0 / 40.0);
+        result += x2 * x2 * (3.0 / 40.0);
       }
     }
-    return  secantLengthFactor * secantLength;
+    return result;
   }
 
 }
+
 
 void Helix::cartesianToPerigee(const TVector3& position,
                                const TVector3& momentum,

@@ -88,7 +88,7 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
     /   \     /                      \     /                             \
     | x |     | cos phi0   -sin phi0 |     |      sin(chi)  / omega      |
     |   |  =  |                      |  *  |                             |
-    | y |     | sin phi0    cos phi0 |     | (1 - cos(chi)) / omega - d0 |
+    | y |     | sin phi0    cos phi0 |     | -(1 - cos(chi)) / omega - d0 |
     \   /     \                      /     \                             /
 
     and
@@ -107,11 +107,15 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
   // Using the sinus cardinalis yields expressions that are smooth in the limit of omega -> 0
 
   // Do calculations in double
-  const double omega = getOmega();
-  const double x = arcLength * sinc(arcLength * omega);
-  const double y = -arcLength * cosc(arcLength * omega) - getD0();
+  const double chi = arcLength * getOmega();
+  const double chiHalf = chi / 2.0;
 
-  // z = s * tan lambda  + z0
+  using boost::math::sinc_pi;
+
+  const double x = arcLength * sinc_pi(chi);
+  const double y = -arcLength * sinc_pi(chiHalf) * sin(chiHalf) - getD0();
+
+  // const double z = s * tan lambda + z0
   const double z = fma((double)arcLength, getTanLambda(),  getZ0());
 
   // Unrotated position
@@ -169,48 +173,6 @@ TVector3 Helix::getMomentumAtArcLength(const float& arcLength, const float& bz) 
   //momentum.RotateZ(arcLength * omega);
 
   return momentum;
-}
-
-
-double Helix::sinc(const double& x)
-{
-  return boost::math::sinc_pi(x);
-}
-
-double Helix::cosc(const double& x)
-{
-  // Though fundamentally appealing, since it is the complex adjoint of the sinus cardinalis
-  // there is no standard implementation of this function, which is why we draw inspiration
-  // from the boost sinc_pi function and modify it.
-
-  BOOST_MATH_STD_USING;
-
-  double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
-
-  if (abs(x) >= taylor_n_bound) {
-    return (1 - cos(x)) / x;
-
-  } else {
-    // approximation by taylor series in x at 0 up to order 1
-    double result = x / 2.0;
-
-    double const taylor_3_bound = boost::math::tools::epsilon<double>();
-    if (abs(x) >= taylor_3_bound) {
-      // approximation by taylor series in x at 0 up to order 3
-      double const x2 = x * x;
-      double const x3 = x2 * x;
-      result -= x3 / 24.0;
-
-      double const taylor_5_bound = boost::math::tools::root_epsilon<double>();
-      if (abs(x) >= taylor_5_bound) {
-        // approximation by taylor series in x at 0 up to order 5
-        double const x5 = x2 * x3;
-        result += x5 / 720;
-
-      }
-    }
-    return result;
-  }
 }
 
 double Helix::calcArcLengthFromSecantLength(const double& secantLength) const

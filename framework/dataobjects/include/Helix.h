@@ -172,18 +172,6 @@ namespace Belle2 {
       return phi < 0 ? phi + M_PI : phi - M_PI;
     }
 
-    /** Sinus cardinalis function, which is the real part of (exp(ix) - 1) / x being sin(x) / x
-     *
-     *  @note The current implementation just uses the boost version of this function.
-     */
-    static double sinc(const double& x);
-
-    /** Cosinus cardinalis function, which is the imaginary part of (exp(ix) - 1) / x being (cos(x) - 1)  /x
-     *
-     *  @note The implementation is inspired by the sinc_pi of boost.
-     */
-    static double cosc(const double& x);
-
     /** Helper function to calculate the circle arc length from the length of a secant.
      *
      *  Translates the direct length between two point on the circle in the xy projection to the arc length on the circle
@@ -191,8 +179,6 @@ namespace Belle2 {
      */
     double calcArcLengthFromSecantLength(const double& secantLength) const;
     /// @}
-
-
 
 
     //---------------------------------------------------------------------------------------------------------------------------

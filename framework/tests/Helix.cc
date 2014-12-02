@@ -93,12 +93,12 @@ namespace Belle2 {
     float phi0 = 0;
     float omega = 1.0;
     float z0 = 0;
-    float cotTheta = 2;
+    float tanLambda = 2;
 
     TVector3 expectedPerigee(0, -d0, z0);
     int expectedCharge = omega > 0 ? 1 : -1;
 
-    Helix helix(d0, phi0, omega, z0, cotTheta);
+    Helix helix(d0, phi0, omega, z0, tanLambda);
 
     // Check setup
     TVector3 perigee(helix.getPosition());
@@ -141,12 +141,12 @@ namespace Belle2 {
     float phi0 = M_PI / 2;
     float omega = -1.0;
     float z0 = 0;
-    float cotTheta = 2;
+    float tanLambda = 2;
 
     TVector3 expectedPerigee(d0, 0, z0);
     int expectedCharge = omega > 0 ? 1 : -1;
 
-    Helix helix(d0, phi0, omega, z0, cotTheta);
+    Helix helix(d0, phi0, omega, z0, tanLambda);
 
     // Check setup
     TVector3 perigee(helix.getPosition());
@@ -181,7 +181,7 @@ namespace Belle2 {
 
   }
 
-  TEST_F(HelixTest, getSAtPolarR)
+  TEST_F(HelixTest, Extrapolation)
   {
     /// Test a variaty of helices
     std::vector<float> omegas { -1, 0, 1};
@@ -205,13 +205,13 @@ namespace Belle2 {
 
     // z coordinates do not matter for this test.
     float z0 = 0;
-    float cotTheta = 2;
+    float tanLambda = 2;
 
     for (const float d0 : d0s) {
       for (const float phi0 : phi0s) {
         for (const float omega : omegas) {
 
-          Helix helix(d0, phi0, omega, z0, cotTheta);
+          Helix helix(d0, phi0, omega, z0, tanLambda);
           TVector3 perigee = helix.getPosition();
 
           for (const float chi : chis) {
@@ -228,11 +228,11 @@ namespace Belle2 {
             float arcLength = helix.getArcLengthAtPolarR(polarR);
 
             // Only the absolute value is returned.
-            EXPECT_NEAR(fabs(expectedArcLength), arcLength, absError) <<
-                                                                      "Fails for " <<
-                                                                      " d0 = " << d0 <<
-                                                                      " phi = " << phi0 <<
-                                                                      " omega = " << omega;
+            EXPECT_NEAR(fabs(expectedArcLength), arcLength, absError)
+                << "Fails for "
+                << " omega = " << omega
+                << " phi0 = " << phi0
+                << " d0 = " << d0;
 
             // Extrapolation to perigee
             // TVector3 momentumAtPointOnHelix = helix.getMomentumAtArcLength(expectedArcLength);

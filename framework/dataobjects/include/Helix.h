@@ -29,7 +29,7 @@ namespace Belle2 {
    *  2) phi which is the angle between the transverse momentum and the x axis and in [-pi, pi]
    *  3) the signed curvature of the track where the sign is given by the charge of the particle
    *  4) z0 which is the distance of the perigee from the origin in the r-z plane
-   *  5) cotTheta which is the inverse slope of the track in the r-z plane
+   *  5) tanLambda which is the inverse slope of the track in the r-z plane
    *
    *  Each point on the helix can adressed by the arc length which has to be traversed to get to it from the perigee.
    *  More precisely the arc length means the transverse part of the particles travel distance,
@@ -64,21 +64,21 @@ namespace Belle2 {
      *  @param phi           The angle between the transverse momentum and the x axis and in [-pi, pi]
      *  @param omega         The signed curvature of the track where the sign is given by the charge of the particle
      *  @param z0            The z coordinate of the perigee.
-     *  @param cotTheta      The inverse slope of the track in the s-z plane,
+     *  @param tanLambda      The inverse slope of the track in the s-z plane,
                              where s significes the arc length as seen in the xy projection.
      */
     Helix(const float& d0,
           const float& phi,
           const float& omega,
           const float& z0,
-          const float& cotTheta);
+          const float& tanLambda);
 
 
 
     /** Constructor initializing class with perigee parameters.
-     *  @param tau           A vector of length 5 containing the perigee coordinates in the order d0, phi, omega, z0, cotTheta.
+     *  @param tau           A vector of length 5 containing the perigee coordinates in the order d0, phi, omega, z0, tanLambda.
      *
-     *  @sa Helix(const float& d0, const float& phi, const float& omega, const float& z0, const float& cotTheta)
+     *  @sa Helix(const float& d0, const float& phi, const float& omega, const float& z0, const float& tanLambda)
      *  for a describtion of the individual parameters.
      */
     Helix(const std::vector<float>& tau);
@@ -190,11 +190,11 @@ namespace Belle2 {
      */
     float getZ0() const { return m_tau.at(3); }
 
-    /** Getter for cotTheta. This is the slope of the track in the r-z plane.
+    /** Getter for tanLambda. This is the slope of the track in the r-z plane.
      *
      *  @return
      */
-    float getCotTheta() const { return m_tau.at(4); }
+    float getTanLambda() const { return m_tau.at(4); }
 
     /** Getter for all perigee parameters
      *
@@ -250,9 +250,9 @@ namespace Belle2 {
     /**
      * Calculates the inverse slope of the track in the r-z plane.
      * @param momentum in cartesian coordinates
-     * @return cotTheta = pz/pt
+     * @return tanLambda = pz/pt
      */
-    double calcCotThetaFromCartesian(const TVector3& momentum) const;
+    double calcTanLambdaFromCartesian(const TVector3& momentum) const;
 
     /**
      * Calculates the x coordinates of the perigee point with the internal stored parameters.
@@ -302,7 +302,7 @@ namespace Belle2 {
                             const short int charge,
                             const float bField);
 
-    /** perigee helix parameters; tau = d0, phi, omega, z0, cotTheta. */
+    /** perigee helix parameters; tau = d0, phi, omega, z0, tanLambda. */
     std::vector<float> m_tau;
 
     /** Streamer version 1. */

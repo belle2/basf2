@@ -36,8 +36,8 @@ Helix::Helix(const float& d0,
              const float& phi,
              const float& omega,
              const float& z0,
-             const float& cotTheta):
-  m_tau {d0, phi, omega, z0, cotTheta} {
+             const float& tanLambda):
+  m_tau {d0, phi, omega, z0, tanLambda} {
 }
 
 
@@ -78,7 +78,7 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
   /*
   x =  d0 * sin(phi) + charge / omega * (sin(phi + chi) - sin(phi));
   y = -d0 * cos(phi) + charge / omega * (-cos(phi + chi) + cos(phi));
-  z = z0 + charge / omega * cotTheta * chi;
+  z = z0 + charge / omega * tanLambda * chi;
 
   where chi = arcLength * omega
   */
@@ -90,7 +90,7 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
   const float y = -arcLength * cosc((double)arcLength * getOmega()) - getD0();
 
   // z = s * tan lambda  + z0
-  const float z = fma((double)arcLength, getCotTheta(),  getZ0());
+  const float z = fma((double)arcLength, getTanLambda(),  getZ0());
 
   // Unrotated position
   TVector3 position(x, y, z);
@@ -206,15 +206,15 @@ void Helix::cartesianToPerigee(const TVector3& position,
   // equations.  Any point on the helix, using the perigee parameters
   // as in "Fast vertex fitting with a local parametrization of tracks
   // - Billoir, Pierre et al. Nucl.Instrum.Meth. A311 (1992) 139-150"
-  // named here d0, phi, omega, z0, cotTheta together with an angle
+  // named here d0, phi, omega, z0, tanLambda together with an angle
   // chi, can be written:
 #if 0
   px = cos(phi + chi) / alpha / omega;
   py = sin(phi + chi) / alpha / omega;
-  pz = charge * cotTheta / alpha / omega;
+  pz = charge * tanLambda / alpha / omega;
   x =  d0 * sin(phi) + charge / omega * (sin(phi + chi) - sin(phi));
   y = -d0 * cos(phi) + charge / omega * (-cos(phi + chi) + cos(phi));
-  z = z0 + charge / omega * cotTheta * chi;
+  z = z0 + charge / omega * tanLambda * chi;
 #endif
   const double x = position.X();
   const double y = position.Y();
@@ -226,11 +226,11 @@ void Helix::cartesianToPerigee(const TVector3& position,
 
   // We find the perigee parameters by inverting this system of
   // equations and solving for the six variables d0, phi, omega, z0,
-  // cotTheta, chi.
+  // tanLambda, chi.
 
   const double ptinv = 1 / hypot(px, py);
   const double omega = charge * ptinv / alpha;
-  const double cotTheta = ptinv * pz;
+  const double tanLambda = ptinv * pz;
 
   const double cosphichi = charge * ptinv * px;  // cos(phi + chi)
   const double sinphichi = charge * ptinv * py;  // sin(phi + chi)
@@ -244,14 +244,14 @@ void Helix::cartesianToPerigee(const TVector3& position,
   const double phi = atan2(helY, helX) + charge * M_PI / 2;
   const double sinchi = sinphichi * cos(phi) - cosphichi * sin(phi);
   const double chi = asin(sinchi);
-  const double z0 = z + charge / omega * cotTheta * chi;
+  const double z0 = z + charge / omega * tanLambda * chi;
 
   m_tau.reserve(5);
   m_tau.push_back(d0);
   m_tau.push_back(phi);
   m_tau.push_back(omega);
   m_tau.push_back(z0);
-  m_tau.push_back(cotTheta);
+  m_tau.push_back(tanLambda);
 
 }
 
@@ -287,5 +287,5 @@ double Helix::calcPyFromPerigee(const float bField) const
 
 double Helix::calcPzFromPerigee(const float bField) const
 {
-  return getCotTheta() / (std::fabs(getOmega() * getAlpha(bField)));
+  return getTanLambda() / (std::fabs(getOmega() * getAlpha(bField)));
 }

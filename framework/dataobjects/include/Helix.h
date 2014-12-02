@@ -73,14 +73,8 @@ namespace Belle2 {
           const float& tanLambda,
           const float& z0);
 
-    /** Constructor initializing class with perigee parameters.
-     *  @param tau           A vector of length 5 containing the perigee coordinates in the order d0, phi0, omega, z0, tanLambda.
-     *
-     *  @sa Helix(const float& d0, const float& phi0, const float& omega, const float& z0, const float& tanLambda)
-     *  for a describtion of the individual parameters.
-     */
-    //Helix(const std::vector<float>& tau);
-
+    /** Output operator for debugging and the generation of unittest error messages.*/
+    friend std::ostream& operator<<(std::ostream& output, const Helix& helix);
 
 
     //---------------------------------------------------------------------------------------------------------------------------
@@ -113,7 +107,6 @@ namespace Belle2 {
     short getChargeSign() const {
       return getOmega() >= 0 ? 1 : -1;
     }
-
     /// @}
 
 
@@ -123,11 +116,43 @@ namespace Belle2 {
     //---------------------------------------------------------------------------------------------------------------------------
 
 
-    /** Calculates the position on the helix that lies at the given transverse travel distance.
+    /** Calculates the transverse travel distance at the point the helix first reaches the given polar radius.
+     *
+     *
+     *  Gives the circle arc length in the forward direction that is traversed until a certain polar radius is reached
+     *  Returns NAN, if the polar radius can not be reached, either because it is to far outside or inside of the perigee.
+     *
+     *  Forward the result to getPositionAtArcLength() or getMomentumAtArcLength() in order to extrapolate to the concentrical detector boundaries.
+     *
+     *  The result always has a positive sign. Hence it refers to the forward direction. Adding a minus sign yields the point at the same polar radius
+     *  but in he backward direction.
+     *
+     *  @param polarR  The polar radius in question
+     *  @return        The circle arc length traversed to reach the polar radius. NAN if it can not be reached.
+     */
+    float getArcLengthAtPolarR(const float& polarR) const;
+
+
+    /** Calculates the position on the helix at the given arc length
      *
      *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
      */
     TVector3 getPositionAtArcLength(const float& arcLength) const;
+
+    /** Calculates the unit tangential vector to the helix curve at the given circle arc length
+     *
+     *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
+     */
+    TVector3 getUnitTangentialAtArcLength(const float& arcLength) const;
+
+
+    /** Calculates the momentum vector at the given arc length.
+     *
+     *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
+     *  @param bz              Magnetic field strength in the z direction.
+     */
+    TVector3 getMomentumAtArcLength(const float& arcLength, const float& bz) const;
+
 
     /** Reverses the direction of travel of the helix in place.
      *
@@ -146,10 +171,6 @@ namespace Belle2 {
     static float reversePhi(const float& phi) {
       return phi < 0 ? phi + M_PI : phi - M_PI;
     }
-
-    /** Calculates the transverse travel distance at the point the helix first reaches the given polar radius.
-     */
-    float getArcLengthAtPolarR(const float& polarR) const;
 
     /** Sinus cardinalis function, which is the real part of (exp(ix) - 1) / x being sin(x) / x
      *

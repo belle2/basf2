@@ -74,18 +74,27 @@ void Helix::reverse()
   m_tanLambda = -m_tanLambda;
 }
 
+float Helix::getArcLengthAtPolarR(const float& polarR) const
+{
+  double d0 = getD0();
+  double omega = getOmega();
+  double secantLength = sqrt(((double)polarR * polarR  - d0 * d0) / (1 + d0 * omega));
+  return calcArcLengthFromSecantLength(secantLength);
+}
+
 TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
 {
   /*
-    /   \     /                      \     /                        \
-    | x |     | cos phi0   -sin phi0 |     |  sin(chi) / omega      |
-    |   |  =  |                      |  *  |                        |
-    | y |     | sin phi0    cos phi0 |     | -cos(chi) / omega - d0 |
-    \   /     \                      /     \                        /
+    /   \     /                      \     /                             \
+    | x |     | cos phi0   -sin phi0 |     |      sin(chi)  / omega      |
+    |   |  =  |                      |  *  |                             |
+    | y |     | sin phi0    cos phi0 |     | (1 - cos(chi)) / omega - d0 |
+    \   /     \                      /     \                             /
 
     and
 
     z = z0 + charge / omega * tanLambda * chi;
+
     where chi = arcLength * omega
 
     // Old definitionb identical?
@@ -114,13 +123,54 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
   return position;
 }
 
-float Helix::getArcLengthAtPolarR(const float& polarR) const
+
+TVector3 Helix::getUnitTangentialAtArcLength(const float& arcLength) const
 {
-  double d0 = getD0();
-  double omega = getOmega();
-  double secantLength = sqrt(((double)polarR * polarR  - d0 * d0) / (1 + d0 * omega));
-  return calcArcLengthFromSecantLength(secantLength);
+
+  const double omega = getOmega();
+  const double phi0 = getPhi0();
+  const double tanLambda = getTanLambda();
+
+  const double norm = hypot(1, tanLambda);
+  const double invNorm = 1 / norm;
+
+  const double tx = cos(arcLength * omega + phi0) * invNorm;
+  const double ty = sin(arcLength * omega + phi0) * invNorm;
+  const double tz = tanLambda * invNorm;
+
+  return TVector3(tx, ty, tz);
 }
+
+
+
+TVector3 Helix::getMomentumAtArcLength(const float& arcLength, const float& bz) const
+{
+  const double omega = getOmega();
+  const double phi0 = getPhi0();
+  const double tanLambda = getTanLambda();
+
+  // For the straight line case we return a unit length vector
+  const double pr = omega == 0 or bz == 0 ? 1 / hypot(1, tanLambda) : getTransverseMomentum(bz);
+
+  const double px = cos(arcLength * omega + phi0) * pr;
+  const double py = sin(arcLength * omega + phi0) * pr;
+  const double pz = tanLambda * pr;
+
+
+  // const double px = std::cos((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bz)));
+  // const double py = std::sin((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bz)));
+  // const double pz = getTanLambda() / (std::fabs(getOmega() * getAlpha(bz)));
+
+  // const double px = calcPxFromPerigee(bz);
+  // const double py = calcPyFromPerigee(bz);
+  // const double pz = calcPzFromPerigee(bz);
+
+  TVector3 momentum(px, py, pz);
+  //momentum.RotateZ(arcLength * omega);
+
+  return momentum;
+}
+
 
 double Helix::sinc(const double& x)
 {
@@ -253,10 +303,20 @@ void Helix::cartesianToPerigee(const TVector3& position,
   //const double rhoHel = hypot(helX, helY);
 
   const double d0 = charge * hypot(helX, helY) - 1 / omega;
-  const double phi0 = atan2(helY, helX) + charge * M_PI / 2;
+
+  double phi0 = atan2(helY, helX) + charge * M_PI / 2;
+  // Bring phi0 to the interval [-pi, pi]
+  phi0 = remainder(phi0, 2 * M_PI);
+
   const double sinchi = sinphi0chi * cos(phi0) - cosphi0chi * sin(phi0);
   const double chi = asin(sinchi);
   const double z0 = z + charge / omega * tanLambda * chi;
+
+  // Bring phi0 to the interval [-pi, pi]
+  phi0 = fmod(phi0, 2 * M_PI);
+  if ((phi0 < -M_PI) or (phi0 > M_PI)) {
+    phi0 = reversePhi(phi0);
+  }
 
   m_omega = omega;
   m_phi0 = phi0;
@@ -299,4 +359,17 @@ double Helix::calcPyFromPerigee(const float bField) const
 double Helix::calcPzFromPerigee(const float bField) const
 {
   return getTanLambda() / (std::fabs(getOmega() * getAlpha(bField)));
+}
+
+namespace Belle2 {
+  std::ostream& operator<<(std::ostream& output, const Helix& helix)
+  {
+    return output
+           << "Helix("
+           << "omega=" << helix.getOmega() << ", "
+           << "phi0=" << helix.getPhi0() << ", "
+           << "d0=" << helix.getD0() << ", "
+           << "tanLambda=" << helix.getTanLambda() << ", "
+           << "z0=" << helix.getZ0() << ")";
+  }
 }

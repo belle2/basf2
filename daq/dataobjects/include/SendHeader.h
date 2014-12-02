@@ -14,12 +14,7 @@
 #include <TObject.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 
-#ifdef REDUCED_RAWCOPPER
 #include "rawdata/dataobjects/RawHeader_latest.h"
-#else
-#include "rawdata/dataobjects/RawHeader.h"
-#endif
-
 
 
 namespace Belle2 {
@@ -69,9 +64,7 @@ namespace Belle2 {
     int GetExpNum(); //!
     int GetRunNumSubRunNum(); //!
 
-#ifdef REDUCED_RAWCOPPER
     RawHeader_latest tmp_header; //!
-#endif
 
     /* Data Format : Node info */
     enum {

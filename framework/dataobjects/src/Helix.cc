@@ -31,8 +31,6 @@ Helix::Helix(const TVector3& position,
   cartesianToPerigee(position, momentum, charge, bField);
 }
 
-
-
 Helix::Helix(const float& d0,
              const float& phi0,
              const float& omega,
@@ -46,10 +44,6 @@ Helix::Helix(const float& d0,
 {
 }
 
-
-
-// This class should be able to give back Helix information either in Perigee Parametrisation
-// or as starting position + momentum.
 TVector3 Helix::getPosition() const
 {
   return TVector3(calcXFromPerigee(), calcYFromPerigee(), calcZFromPerigee());
@@ -63,6 +57,16 @@ TVector3 Helix::getMomentum(const float bField) const
 float Helix::getTransverseMomentum(const float bField) const
 {
   return std::fabs(1 / getAlpha(bField) / getOmega());
+}
+
+float Helix::getKappa(const float bField) const
+{
+  return getOmega() * getAlpha(bField);
+}
+
+double Helix::getAlpha(const float bField) const
+{
+  return 1.0 / (bField * TMath::C()) * 1E11;
 }
 
 void Helix::reverse()
@@ -89,7 +93,7 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
     | x |     | cos phi0   -sin phi0 |     |       sin(chi)  / omega      |
     |   |  =  |                      |  *  |                              |
     | y |     | sin phi0    cos phi0 |     | -(1 - cos(chi)) / omega - d0 |
-    \   /     \                      /     \                             /
+    \   /     \                      /     \                              /
 
     and
 
@@ -97,7 +101,7 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
 
     where chi = arcLength * omega
 
-    // Old definitionb identical?
+    // Old definition identical?
     x =  d0 * sin(phi0) + charge / omega * (sin(phi0 + chi) - sin(phi0));
     y = -d0 * cos(phi0) + charge / omega * (-cos(phi0 + chi) + cos(phi0));
     // Actually no - have to talk back to Markus about this.
@@ -286,11 +290,6 @@ void Helix::cartesianToPerigee(const TVector3& position,
   m_tanLambda = tanLambda;
   m_z0 = z0;
 
-}
-
-double Helix::getAlpha(const float bField) const
-{
-  return 1.0 / (bField * TMath::C()) * 1E11;
 }
 
 double Helix::calcXFromPerigee() const

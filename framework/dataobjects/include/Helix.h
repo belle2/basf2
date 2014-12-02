@@ -100,6 +100,12 @@ namespace Belle2 {
      */
     float getTransverseMomentum(const float bField = 1.5) const;
 
+    /** Getter for kappa, which is charge / transverse momentum or equivalently omega * alpha */
+    float getKappa(const float bField = 1.5) const;
+
+    /** Calculates the alpha value for a given magnetic field in Tesla */
+    double getAlpha(const float bField) const;
+
     /** Return track charge (1 or -1).
      *
      *  @TODO For very small values, we might be unsure and return zero.
@@ -217,9 +223,6 @@ namespace Belle2 {
 
     ///--------------------------------------------------------------------------------------------------------------------------
   private:
-    /** Calculates the alpha value for a given magnetic field in Tesla */
-    double getAlpha(const float bField) const;
-
     //---------------------------------------------------------------------------------------------------------------------------
     //--- Functions for internal conversions between cartesian and perigee helix parameters
     //--- This can be placed in a seperate header which handles all the conversion stuff

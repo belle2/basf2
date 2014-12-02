@@ -63,7 +63,7 @@ namespace Belle2 {
     double absError = 1e-6;
     double nominalBz = 1.5;
 
-    std::vector<float> omegas {0, 1};
+    std::vector<float> omegas { -1, 0, 1};
     std::vector<float> phi0s;
     std::vector<float> d0s { -0.5, -0.2, 0, 0.2, 0.5};
     std::vector<float> chis;
@@ -116,6 +116,9 @@ namespace Belle2 {
 
       // Test getter for transverse momentum
       EXPECT_NEAR(momentum.Perp(), helix.getTransverseMomentum(bField), absError);
+
+      // Test getter of kappa
+      EXPECT_NEAR(charge / momentum.Perp(), helix.getKappa(bField), absError);
 
       // Test other variables
       EXPECT_EQ(charge, helix.getChargeSign());

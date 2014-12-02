@@ -97,7 +97,7 @@ namespace Belle2 {
       // instead of trying to find entry and exit points and then saving only the midpoint.
       // Do same for scintillators.
 
-      double       eDep     = step->GetTotalEnergyDeposit() / MeV;  // GEANT4: in MeV
+      double       eDep     = step->GetTotalEnergyDeposit() / CLHEP::MeV;  // GEANT4: in MeV
       G4StepPoint* preStep  = step->GetPreStepPoint();
       G4StepPoint* postStep = step->GetPostStepPoint();
       G4Track*     track    = step->GetTrack();
@@ -124,7 +124,7 @@ namespace Belle2 {
         const CLHEP::Hep3Vector mom = 0.5 * (preStep->GetMomentum() + postStep->GetMomentum());  // GEANT4: in MeV/c
         const TVector3 momentum(mom.x(), mom.y(), mom.z());
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
-        const CLHEP::Hep3Vector gHitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / cm; // in cm
+        const CLHEP::Hep3Vector gHitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
         const Module* m = m_GeoPar->findModule(isForward, sector, layer);
         const CLHEP::Hep3Vector lHitPos = m->globalToLocal(gHitPos);
         const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(lHitPos);

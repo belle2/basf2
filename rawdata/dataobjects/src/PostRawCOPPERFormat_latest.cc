@@ -284,9 +284,12 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   // Compare CRC16 with B2LCRC16
   //
   buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_CRC16) + SIZE_B2LHSLB_TRAILER) ;
-  //  printf("PostRawCOPPER : Eve %.8x block %d finesse %d B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), n, finesse_num,  *buf, temp_crc16 );
 
+  if (GetEveNo(n) % 10000 == 0) {
+    printf("#### PostRawCOPPER : Eve %.8x block %d finesse %d B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), n, finesse_num,  *buf, temp_crc16);
+  }
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
+    //  if ( false ) {
     PrintData(m_buffer, m_nwords);
     printf("POST CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
     printf("\n");

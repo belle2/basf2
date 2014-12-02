@@ -98,7 +98,7 @@ namespace Belle2 {
     TVector3 expectedPerigee(0, -d0, z0);
     int expectedCharge = omega > 0 ? 1 : -1;
 
-    Helix helix(d0, phi0, omega, z0, tanLambda);
+    Helix helix(omega, phi0, d0, tanLambda, z0);
 
     // Check setup
     TVector3 perigee(helix.getPosition());
@@ -146,7 +146,7 @@ namespace Belle2 {
     TVector3 expectedPerigee(d0, 0, z0);
     int expectedCharge = omega > 0 ? 1 : -1;
 
-    Helix helix(d0, phi0, omega, z0, tanLambda);
+    Helix helix(omega, phi0, d0, tanLambda, z0);
 
     // Check setup
     TVector3 perigee(helix.getPosition());
@@ -211,14 +211,13 @@ namespace Belle2 {
       for (const float phi0 : phi0s) {
         for (const float omega : omegas) {
 
-          Helix helix(d0, phi0, omega, z0, tanLambda);
+          Helix helix(omega, phi0, d0, tanLambda, z0);
           TVector3 perigee = helix.getPosition();
 
           for (const float chi : chis) {
             // In the cases where omega is 0 (straight line case) chi become undefined.
             // Use chi sample as transverse travel distance instead.
             float expectedArcLength = omega != 0 ? chi / omega : chi;
-
             TVector3 pointOnHelix = helix.getPositionAtArcLength(expectedArcLength);
 
             //TVector3 secant = pointOnHelix - perigee;

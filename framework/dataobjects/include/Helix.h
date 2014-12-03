@@ -240,8 +240,11 @@ namespace Belle2 {
     /** Getter for z0, which is the z coordinate of the perigee. */
     float getZ0() const { return m_z0; }
 
-    /** Getter for tanLambda, which is the z over arc length slope of the track. */
+    /** Getter for tan lambda, which is the z over arc length slope of the track. */
     float getTanLambda() const { return m_tanLambda; }
+
+    /** Getter for cot theta, which is the z over arc length slope of the track. Synomym to tan lambda. */
+    float getCotTheta() const { return m_tanLambda; }
     /// @}
 
     ///--------------------------------------------------------------------------------------------------------------------------

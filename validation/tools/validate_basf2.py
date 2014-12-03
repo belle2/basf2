@@ -114,6 +114,11 @@ class Validation:
                     'validation':
                 script_object.dependencies += default_depend
 
+        # Make sure dependent scripts of skipped scripts are skipped, too.
+        for script_object in self.list_of_scripts:
+            if script_object.status == 'skipped':
+                self.skip_script(script_object)
+
     def build_headers(self):
         """!
         This method loops over all Script objects in self.list_of_scripts and
@@ -122,6 +127,23 @@ class Validation:
         """
         for script_object in self.list_of_scripts:
             script_object.get_header()
+
+    def skip_script(self, script_object):
+        """!
+        This method sets the status of the given script and all dependent ones
+        to 'skipped'.
+        @return: None
+        """
+        # Print a warning if the status of the script is changed and then
+        # set it to 'skipped'.
+        if script_object.status not in ['skipped', 'failed']:
+            self.log.warning('Skipping ' + script_object.path)
+            script_object.status = 'skipped'
+
+        # Also skip all dependent scripts.
+        for dependent_script in self.list_of_scripts:
+            if script_object in dependent_script.dependencies:
+                self.skip_script(dependent_script)
 
     def create_log(self):
         """!
@@ -271,20 +293,20 @@ class Validation:
 
                         # Check for the return code and set variables correspondingly
                         script_object.status = 'done'
+                        script_object.returncode = result[1]
                         if result[1] != 0:
                             script_object.status = 'failed'
                             self.log.warning('exit_status was {0} for {1}'
                                              .format(result[1],
                                                      script_object.path))
-                        script_object.returncode = result[1]
+                            # Skip all dependent scripts
+                            self.skip_script(script_object)
 
-                        # Remove this script from the dependencies of dependent script objects and skip dependent scripts if this one failed
-                        for dependent_script in remaining_scripts:
-                            if script_object in dependent_script.dependencies:
-                                dependent_script.dependencies.remove(script_object)
-                                if result[1] != 0:
-                                    self.log.warning('Skipping ' + dependent_script.path)
-                                    dependent_script.status = 'skipped'
+                        else:
+                            # Remove this script from the dependencies of dependent script objects
+                            for dependent_script in remaining_scripts:
+                                if script_object in dependent_script.dependencies:
+                                    dependent_script.dependencies.remove(script_object)
 
                 # Otherwise (the script is waiting) and if it is ready to be executed
                 elif not script_object.dependencies:

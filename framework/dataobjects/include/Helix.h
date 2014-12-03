@@ -154,6 +154,14 @@ namespace Belle2 {
     TVector3 getMomentumAtArcLength(const float& arcLength, const float& bz) const;
 
 
+    /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace. */
+    void passiveMoveBy(const TVector3& by);
+
+
+    /** Calculates the signed distance of the helix to the point the xy projection. */
+    float getDr(const TVector3& position) const;
+
+
     /** Reverses the direction of travel of the helix in place.
      *
      *  The same points are located on the helix stay the same after the transformation,
@@ -204,6 +212,12 @@ namespace Belle2 {
      *  getMomentum().Phi() == getPhi0() holds.
      */
     float getPhi0() const { return m_phi0; }
+
+    /** Getter for the cosine of the polar angle of travel direction at the perigee. */
+    float getCosPhi0() const { return std::cos(double(getPhi0())); }
+
+    /** Getter for the cosine of the polar angle of travel direction at the perigee. */
+    float getSinPhi0() const { return std::sin(double(getPhi0())); }
 
     /** Getter for omega, which is a signed curvature measure of the track. The sign is equivalent to the charge of the particle. */
     float getOmega() const { return m_omega; }

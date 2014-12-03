@@ -32,6 +32,16 @@ std::ostream& operator<<(std::ostream& output, const TVector3& tVector3)
          << tVector3.Z() << ")";
 }
 
+/** Adds message to all EXCEPTS and ASSERT in the current and any called or nested scopes
+ *
+ *  The macro sets up for the following EXCEPTS and ASSERTS, hence it must be placed before the tests.
+ *
+ *  The message can be composed in a B2INFO style manner with addtional << between
+ *  individual strings and values to be concatenated.
+ *
+ *  @example TEST_CONTEXT("for my value set to "  << myValue);
+ */
+#define TEST_CONTEXT(message) SCOPED_TRACE([&](){std::ostringstream messageStream; messageStream << message; return messageStream.str();}());
 
 namespace {
   /** Predicate checking that all three components of TVector are close by a maximal error of absError*/
@@ -50,6 +60,15 @@ namespace {
     return fabs(remainder(expected - actual, 2 * M_PI)) < absError;
   }
 
+  Belle2::Helix helixFromCenter(const TVector3& center, const float& radius, const float& tanLambda)
+  {
+    double omega = 1 / radius;
+    double phi0 = center.Phi() + copysign(M_PI / 2.0, radius);
+    double d0 = copysign(center.Perp(), radius) - radius;
+    double z0 = center.Z();
+
+    return Belle2::Helix(d0, phi0, omega, z0, tanLambda);
+  }
 }
 
 
@@ -64,8 +83,10 @@ namespace Belle2 {
     double nominalBz = 1.5;
 
     std::vector<float> omegas { -1, 0, 1};
+    //std::vector<float> omegas {1};
     std::vector<float> phi0s;
     std::vector<float> d0s { -0.5, -0.2, 0, 0.2, 0.5};
+    //std::vector<float> d0s {0.5};
     std::vector<float> chis;
 
     virtual void SetUp() {
@@ -102,7 +123,8 @@ namespace Belle2 {
       // Generate a random put orthogonal pair of vectors in the r-phi plane
       TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
       TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+      d.Set(d.X(), -d.X() * pt.Px() / pt.Py());
+
       // Add a random z component
       TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
       TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
@@ -154,6 +176,63 @@ namespace Belle2 {
   }
 
 
+  TEST_F(HelixTest, Explicit)
+  {
+    /** Setup a helix
+     *  for counterclockwise travel
+     *  starting at -1.0, 0.0, 0.0
+     *  heading in the negative y direction initially
+     */
+
+    TVector3 center(0.0, -2.0, 0.0);
+    float radius = -1;
+    // Keep it flat
+    float tanLambda = 0;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+    EXPECT_NEAR(-1, helix.getD0(), absError);
+    EXPECT_ANGLE_NEAR(-M_PI, helix.getPhi0(), absError);
+    EXPECT_NEAR(-1, helix.getOmega(), absError);
+
+    double omega = helix.getOmega();
+
+
+    // Positions on the helix
+    {
+      // Start point
+      float arcLength = 0;
+      TVector3 position = helix.getPositionAtArcLength(arcLength);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+
+      EXPECT_ALL_NEAR(TVector3(0.0, -1.0, 0.0), position, absError);
+      EXPECT_ANGLE_NEAR(-M_PI, tangential.Phi(), absError);
+    }
+
+    {
+      float arcLength = M_PI / 2;
+      TVector3 position = helix.getPositionAtArcLength(arcLength);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      EXPECT_ALL_NEAR(TVector3(-1.0, -2.0, 0.0), position, absError);
+      EXPECT_ANGLE_NEAR(-M_PI / 2, tangential.Phi(), absError);
+    }
+
+    {
+      float arcLength = M_PI;
+      TVector3 position = helix.getPositionAtArcLength(arcLength);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      EXPECT_ALL_NEAR(TVector3(0.0, -3.0, 0.0), position, absError);
+      EXPECT_ANGLE_NEAR(0, tangential.Phi(), absError);
+    }
+
+    {
+      float arcLength = 3 * M_PI / 2 ;
+      TVector3 position = helix.getPositionAtArcLength(arcLength);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      EXPECT_ALL_NEAR(TVector3(1.0, -2.0, 0.0), position, absError);
+      EXPECT_ANGLE_NEAR(M_PI / 2, tangential.Phi(), absError);
+    }
+  }
+
   TEST_F(HelixTest, Tangential)
   {
     float z0 = 0;
@@ -164,6 +243,7 @@ namespace Belle2 {
         for (const float omega : omegas) {
 
           Helix helix(d0, phi0, omega, z0, tanLambda);
+          TEST_CONTEXT("Failed for " << helix);
 
           TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
 
@@ -182,7 +262,7 @@ namespace Belle2 {
               EXPECT_ALL_NEAR(tangentialAtPerigee, tangential, absError);
 
             } else {
-              float arcLength  =  chi / omega;
+              float arcLength = -chi / omega;
               TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
 
               float actualChi = tangential.DeltaPhi(tangentialAtPerigee);
@@ -213,7 +293,7 @@ namespace Belle2 {
             TVector3 momentumAtPerigee = helix.getMomentum();
             for (const float chi : chis) {
 
-              float arcLength = chi / omega;
+              float arcLength = -chi / omega;
               TVector3 extrapolatedMomentum = helix.getMomentumAtArcLength(arcLength, nominalBz);
 
               float actualChi = extrapolatedMomentum.DeltaPhi(momentumAtPerigee);
@@ -244,20 +324,16 @@ namespace Belle2 {
           TVector3 perigee = helix.getPosition();
 
           TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
+          TEST_CONTEXT("Failed for " << helix);
 
-          std::ostringstream message;
-          message << "Failed for " << helix;
-          SCOPED_TRACE(message.str());
+          //continue;
 
           for (const float chi : chis) {
-
-            std::ostringstream message;
-            message << "Failed for chi=" << chi;
-            SCOPED_TRACE(message.str());
+            TEST_CONTEXT("Failed for chi = " << chi);
 
             // In the cases where omega is 0 (straight line case) chi become undefined.
             // Use chi sample as transverse travel distance instead.
-            float expectedArcLength = omega != 0 ? chi / omega : chi;
+            float expectedArcLength = omega != 0 ? -chi / omega : chi;
             TVector3 pointOnHelix = helix.getPositionAtArcLength(expectedArcLength);
 
             float polarR = pointOnHelix.Perp();
@@ -290,7 +366,6 @@ namespace Belle2 {
 
   TEST_F(HelixTest, PerigeeExtrapolateRoundTrip)
   {
-
     float z0 = 0;
     float tanLambda = -2;
 
@@ -298,24 +373,136 @@ namespace Belle2 {
       for (const float phi0 : phi0s) {
         for (const float omega : omegas) {
 
+          // Extrapolations involving the momentum only makes sense with finit momenta
           if (omega != 0) {
             Helix expectedHelix(d0, phi0, omega, z0, tanLambda);
-            TVector3 perigee = expectedHelix.getPosition();
-            TVector3 momentum = expectedHelix.getMomentum(nominalBz);
-            int chargeSign = expectedHelix.getChargeSign();
 
-            Helix helix(perigee, momentum, chargeSign, nominalBz);
+            for (const float chi : chis) {
+              float arcLength = -chi / omega;
+              TVector3 position = expectedHelix.getPositionAtArcLength(arcLength);
+              TVector3 momentum = expectedHelix.getMomentumAtArcLength(arcLength, nominalBz);
+              int chargeSign = expectedHelix.getChargeSign();
 
-            EXPECT_NEAR(expectedHelix.getOmega(), helix.getOmega(), absError);
-            EXPECT_ANGLE_NEAR(expectedHelix.getPhi0(), helix.getPhi0(), absError);
-            EXPECT_NEAR(expectedHelix.getD0(), helix.getD0(), absError);
-            EXPECT_NEAR(expectedHelix.getTanLambda(), helix.getTanLambda(), absError);
-            EXPECT_NEAR(expectedHelix.getZ0(), helix.getZ0(), absError);
+              EXPECT_NEAR(tanLambda, 1 / tan(momentum.Theta()), absError);
+              EXPECT_ANGLE_NEAR(phi0 + chi, momentum.Phi(), absError);
+              EXPECT_NEAR(z0 + tanLambda * arcLength, position.Z(), absError);
+
+              //B2INFO("chi out " << chi);
+              Helix helix(position, momentum, chargeSign, nominalBz);
+
+              EXPECT_NEAR(expectedHelix.getOmega(), helix.getOmega(), absError);
+              EXPECT_ANGLE_NEAR(expectedHelix.getPhi0(), helix.getPhi0(), absError);
+              EXPECT_NEAR(expectedHelix.getD0(), helix.getD0(), absError);
+              EXPECT_NEAR(expectedHelix.getTanLambda(), helix.getTanLambda(), absError);
+              EXPECT_NEAR(expectedHelix.getZ0(), helix.getZ0(), absError);
+            }
           }
 
         }
       }
     }
+  }
+
+
+
+
+
+  TEST_F(HelixTest, CalcDr)
+  {
+    float z0 = 2;
+    float tanLambda = 3;
+
+    TVector3 center(0.0, -2.0, 0.0);
+    float radius = -1;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+    EXPECT_NEAR(-1, helix.getD0(), absError);
+    EXPECT_ANGLE_NEAR(-M_PI, helix.getPhi0(), absError);
+    EXPECT_NEAR(-1, helix.getOmega(), absError);
+    {
+      TVector3 position(0.0, 0.0, 0.0);
+      float newD0 = helix.getDr(position);
+      EXPECT_NEAR(-1, newD0, absError);
+    }
+
+    {
+      TVector3 position(2.0, -2.0, 0.0);
+      float newD0 = helix.getDr(position);
+      EXPECT_NEAR(-1, newD0, absError);
+    }
+    {
+      TVector3 position(-2.0, -2.0, 0.0);
+      float newD0 = helix.getDr(position);
+      EXPECT_NEAR(-1, newD0, absError);
+    }
+
+    {
+      TVector3 position(1.0, -1.0, 0.0);
+      float newD0 = helix.getDr(position);
+      EXPECT_NEAR(-(sqrt(2) - 1) , newD0, absError);
+    }
+
+
+
+  }
+
+  TEST_F(HelixTest, CalcDrExtended)
+  {
+    float z0 = 2;
+    float tanLambda = 3;
+
+    float d0 = -1;
+    float phi0 = -M_PI;
+    float omega = -1;
+
+    float newD0 = -1;
+
+    std::vector<float> chis { -M_PI / 2.0, 0, M_PI / 2.0 , M_PI};
+
+    //for (const float phi0 : phi0s)
+    {
+
+      //for (const float omega : omegas)
+      {
+        //  for (const float d0 : d0s)
+        {
+          Helix helix(d0, phi0, omega, z0, tanLambda);
+          TEST_CONTEXT("Failed for " << helix);
+
+          EXPECT_NEAR(d0, helix.getDr(TVector3(0.0, 0.0, 0.0)), absError);
+
+          for (const float chi : chis) {
+            for (const float newD0 : d0s) {
+              // In the line case use the chi value directly as the arc length
+
+              float arcLength = omega == 0 ? chi : -chi / omega;
+              TVector3 positionOnHelix = helix.getPositionAtArcLength(arcLength);
+
+              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength(arcLength);
+
+              TVector3 perpendicularToHelix = tangentialToHelix;
+              perpendicularToHelix.RotateZ(M_PI / 2.0);
+              // Normalize the xy part
+              perpendicularToHelix *= 1 / perpendicularToHelix.Perp();
+
+              TVector3 displacementFromHelix = perpendicularToHelix * newD0;
+              TVector3 testPosition = positionOnHelix + displacementFromHelix;
+
+              TEST_CONTEXT("Failed for chi " << chi);
+              TEST_CONTEXT("Failed for position on helix " << positionOnHelix);
+              TEST_CONTEXT("Failed for tangential to helix " << tangentialToHelix);
+              TEST_CONTEXT("Failed for perpendicular to helix " << perpendicularToHelix);
+              TEST_CONTEXT("Failed for test position " << testPosition);
+
+              float testDr = helix.getDr(testPosition);
+              EXPECT_NEAR(newD0, testDr, absError);
+            }
+          }
+
+        }
+      }
+    }
+
   }
 
 }  // namespace

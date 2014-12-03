@@ -5,6 +5,8 @@
 #include <TRandom3.h>
 #include <TMath.h>
 
+#include <boost/math/special_functions/sign.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -21,6 +23,14 @@ using namespace std;
 
 /// Assertation macro for angle values that should not care for a multiple of 2 * PI difference between the values
 #define ASSERT_ANGLE_NEAR(expected, actual, delta) EXPECT_PRED3(angleNear, expected, actual, delta)
+
+/// Assertation macro that two values carry the same sign.
+#define EXPECT_SAME_SIGN(expected, actual) ASSERT_PRED2(sameSign, expected, actual)
+
+/// Assertation macro that two values carry the same sign.
+#define ASSERT_SAME_SIGN(expected, actual) ASSERT_PRED2(sameSign, expected, actual)
+
+
 
 /// Sting output operator for a TVector3 for gtest print support.
 std::ostream& operator<<(std::ostream& output, const TVector3& tVector3)
@@ -80,6 +90,17 @@ namespace {
   {
     return fabs(remainder(expected - actual, 2 * M_PI)) < absError;
   }
+
+  /** Predicate checking that two values have the same sign. Returns nan if any of the values is nan. */
+  bool sameSign(const float& expected, const float& actual)
+  {
+    if (isnan(expected) or isnan(actual)) return false;
+    using boost::math::sign;
+    int expectedSign = sign(expected);
+    int actualSign = sign(actual);
+    return expectedSign == actualSign;
+  }
+
 
   Belle2::Helix helixFromCenter(const TVector3& center, const float& radius, const float& tanLambda)
   {
@@ -162,6 +183,25 @@ namespace Belle2 {
 
       // Test getter of kappa
       EXPECT_NEAR(charge / momentum.Perp(), helix.getKappa(bField), absError);
+
+      // Test getter of d0
+      // Check absolute value of d0
+      EXPECT_NEAR(position.Perp(), fabs(helix.getD0()), absError);
+
+      // Check sign of d0
+      EXPECT_SAME_SIGN(position.Cross(momentum).Z(), helix.getD0());
+
+      // Test getter of phi0
+      EXPECT_NEAR(momentum.Phi(), helix.getPhi0(), absError);
+
+      // Test getter of d0
+      EXPECT_NEAR(position.Z(), helix.getZ0(), absError);
+
+      // Test getter of tan lambda
+      EXPECT_NEAR(1 / tan(momentum.Theta()), helix.getTanLambda(), absError);
+
+      // Test getter of cot theta
+      EXPECT_NEAR(1 / tan(momentum.Theta()), helix.getCotTheta(), absError);
 
       // Test other variables
       EXPECT_EQ(charge, helix.getChargeSign());

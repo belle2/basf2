@@ -37,6 +37,10 @@
 #include <G4RegionStore.hh>
 #include "G4Tubs.hh"
 
+//Visualization Attributes
+#include <G4VisAttributes.hh>
+
+
 using namespace std;
 using namespace boost;
 
@@ -98,6 +102,9 @@ namespace Belle2 {
         string matTube = activeParams.getString("MaterialTube");
         G4LogicalVolume* l_He3TUBE = new G4LogicalVolume(s_He3TUBE, geometry::Materials::get(matTube), "l_He3TUBE");
 
+        G4VisAttributes* l_He3TubeVisAtt = new G4VisAttributes(G4Colour(0, 1.0, 1.0, 1.0));
+        l_He3TUBE->SetVisAttributes(l_He3TubeVisAtt);
+
         //position he3tube volume
         G4ThreeVector He3TUBEpos = G4ThreeVector(
                                      activeParams.getLength("x_he3tube") * CLHEP::cm,
@@ -122,6 +129,8 @@ namespace Belle2 {
                                          startAngle, spanningAngle);
 
         G4LogicalVolume* l_He3endcap = new G4LogicalVolume(s_He3endcap, geometry::Materials::get(matTube), "l_He3endcap");
+
+        l_He3endcap->SetVisAttributes(l_He3TubeVisAtt);
 
         //position endcaps
         G4ThreeVector He3endcapposTop = G4ThreeVector(
@@ -149,6 +158,7 @@ namespace Belle2 {
 
         //string matGas = activeParams.getString("MaterialGas");
         G4LogicalVolume* l_iHe3Gas = new G4LogicalVolume(s_iHe3Gas, gHe3, "l_iHe3Gas");
+        l_iHe3Gas->SetVisAttributes(l_He3TubeVisAtt);
 
         new G4PVPlacement(rot_he3tube, He3TUBEpos, l_iHe3Gas, "p_iHe3Gas", &topVolume, false, 1);
 
@@ -160,7 +170,7 @@ namespace Belle2 {
                                       startAngle, spanningAngle);
 
         G4LogicalVolume* l_He3Gas = new G4LogicalVolume(s_He3Gas, gHe3, "l_He3Gas", 0, m_sensitive);
-
+        l_He3Gas->SetVisAttributes(l_He3TubeVisAtt);
         //Lets limit the Geant4 stepsize inside the volume
         l_He3Gas->SetUserLimits(new G4UserLimits(stepSize));
 

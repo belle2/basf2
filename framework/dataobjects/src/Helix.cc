@@ -135,45 +135,42 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
   return position;
 }
 
-
-TVector3 Helix::getUnitTangentialAtArcLength(const float& arcLength) const
+TVector3 Helix::getTangentialAtArcLength(const float& arcLength) const
 {
   const double omega = getOmega();
   const double phi0 = getPhi0();
   const double tanLambda = getTanLambda();
 
-  const double norm = hypot(1, tanLambda);
-  const double invNorm = 1 / norm;
+  const double chi = - omega * arcLength;
 
-  const double chi = -arcLength * omega;
-
-  const double tx = cos(chi + phi0) * invNorm;
-  const double ty = sin(chi + phi0) * invNorm;
-  const double tz = tanLambda * invNorm;
+  const double tx = cos(chi + phi0);
+  const double ty = sin(chi + phi0);
+  const double tz = tanLambda;
 
   TVector3 tangential(tx, ty, tz);
   return tangential;
 }
 
+
+TVector3 Helix::getUnitTangentialAtArcLength(const float& arcLength) const
+{
+  TVector3 unitTangential = getTangentialAtArcLength(arcLength);
+  const double norm = hypot(1, getTanLambda());
+  const double invNorm = 1 / norm;
+  unitTangential *= invNorm;
+  return unitTangential;
+}
+
 TVector3 Helix::getMomentumAtArcLength(const float& arcLength, const float& bz) const
 {
-  const double omega = getOmega();
-  const double phi0 = getPhi0();
-  const double tanLambda = getTanLambda();
-
+  TVector3 momentum = getTangentialAtArcLength(arcLength);
   const double pr = getTransverseMomentum(bz);
+  momentum *= pr;
 
-  const double chi = -omega * arcLength;
-
-  const double px = cos(chi + phi0) * pr;
-  const double py = sin(chi + phi0) * pr;
-  const double pz = tanLambda * pr;
-
-  TVector3 momentum(px, py, pz);
   return momentum;
 }
 
-void Helix::passiveMoveBy(const TVector3& by)
+float Helix::passiveMoveBy(const TVector3& by)
 {
   // First calculate the distance of the new origin to the helix in the xy projection
   double new_d0 = getDr(by);
@@ -185,12 +182,15 @@ void Helix::passiveMoveBy(const TVector3& by)
   TVector3 delta = perigee - by;
   double polarRSquare = delta.Perp2();
 
-  double absSecantLength = sqrt((polarRSquare  - new_d0 * new_d0) / (1 + new_d0 * omega));
+  // When polarR and d0 are approximatly the same and the resulting difference of the squares turns out
+  // to be -10^-18 in double precision, which makes the sqrt return nan.
+  // Do calculation in float precision here to negating these rounding errors of order -10^-18.
+  double absSecantLength = sqrt(((float)polarRSquare - (float)new_d0 * (float)new_d0) / (1 + new_d0 * omega));
   double absArcLength = calcArcLengthFromSecantLength(absSecantLength);
 
-  double isForward = omega * (perigee.X() * by.Y() - perigee.Y() * by.X());
+  double isForward = getCosPhi0() * by.X() + getSinPhi0() * by.Y();
 
-  // Translate the length of the secant to an arc length, fixing the sign as well
+  // Fixing the sign looking if the new origin lies in the forward direction in the xy projection.
   double arcLength = std::copysign(absArcLength, isForward);
 
   // Third the new phi0 and z0 can be calculated from the arc length
@@ -202,6 +202,8 @@ void Helix::passiveMoveBy(const TVector3& by)
   m_d0 = new_d0;
   m_phi0 = new_phi0;
   m_z0 = new_z0;
+
+  return arcLength;
 }
 
 
@@ -209,7 +211,6 @@ float Helix::getDr(const TVector3& position) const
 {
   // The curvature in the bend plain (xy) is the opposite of the charge.
   double omega = getOmega();
-  double curvature = -omega;
 
   TVector3 perigee = getPosition();
 
@@ -218,7 +219,7 @@ float Helix::getDr(const TVector3& position) const
 
   TVector3 delta = perigee - position;
 
-  double deltaParallel   =    delta.X() * cosPhi0   + delta.Y() * sinPhi0;
+  // double deltaParallel   =    delta.X() * cosPhi0   + delta.Y() * sinPhi0;
   double deltaOrthogonal =  - delta.Y() * cosPhi0   + delta.X() * sinPhi0;
 
   double deltaPolarRSquare =  delta.X() * delta.X() + delta.Y() * delta.Y();
@@ -232,14 +233,15 @@ float Helix::getDr(const TVector3& position) const
 
 double Helix::calcArcLengthFromSecantLength(const double& secantLength) const
 {
+
   return secantLength * calcSecantLengthToArcLengthFactor(secantLength);
 }
 
 
 double Helix::calcSecantLengthToArcLengthFactor(const double& secantLength) const
 {
-  double chiHalf = secantLength * getOmega() / 2.0;
-  return calcASinXDividedByX(chiHalf);
+  double x = secantLength * getOmega() / 2.0;
+  return calcASinXDividedByX(x);
 }
 
 double Helix::calcASinXDividedByX(const double& x)

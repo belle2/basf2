@@ -140,6 +140,18 @@ namespace Belle2 {
      */
     TVector3 getPositionAtArcLength(const float& arcLength) const;
 
+    /** Calculates the tangential vector to the helix curve at the given circle arc length.
+     *
+     *  The tangential vector is the derivative of the position with respect to the circle arc length
+     *  It is normalised such that the polar radius of the result is 1
+     *
+     *  getTangentialAtArcLength(arcLength).Perp() == 1 holds.
+     *
+     *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
+     *  @return                Tangential vector normalised to unit transverse component / polar radius.
+     */
+    TVector3 getTangentialAtArcLength(const float& arcLength) const;
+
     /** Calculates the unit tangential vector to the helix curve at the given circle arc length
      *
      *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
@@ -153,9 +165,12 @@ namespace Belle2 {
      */
     TVector3 getMomentumAtArcLength(const float& arcLength, const float& bz) const;
 
-
-    /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace. */
-    void passiveMoveBy(const TVector3& by);
+    /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace.
+     *
+     *  @param by              Vector by which the origin of the coordinate system should be moved.
+     *  @return                The float value is the arc length which as the be traversed from the old perigee to the new.
+     */
+    float passiveMoveBy(const TVector3& by);
 
 
     /** Calculates the signed distance of the helix to the point the xy projection. */
@@ -214,10 +229,10 @@ namespace Belle2 {
     float getPhi0() const { return m_phi0; }
 
     /** Getter for the cosine of the polar angle of travel direction at the perigee. */
-    float getCosPhi0() const { return std::cos(double(getPhi0())); }
+    double getCosPhi0() const { return std::cos(double(getPhi0())); }
 
     /** Getter for the cosine of the polar angle of travel direction at the perigee. */
-    float getSinPhi0() const { return std::sin(double(getPhi0())); }
+    double getSinPhi0() const { return std::sin(double(getPhi0())); }
 
     /** Getter for omega, which is a signed curvature measure of the track. The sign is equivalent to the charge of the particle. */
     float getOmega() const { return m_omega; }

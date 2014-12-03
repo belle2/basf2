@@ -11,10 +11,10 @@ using namespace std;
 
 // Additional tests
 /// Expectation macro for combound structures like vectors to be close to each other
-#define EXPECT_ALL_NEAR(expected, actual, delta) EXPECT_PRED3(near, expected, actual, delta)
+#define EXPECT_ALL_NEAR(expected, actual, delta) EXPECT_PRED3(allNearTemplate<decltype(expected)>, expected, actual, delta)
 
 /// Assertation macro for combound structures like vectors to be close to each other
-#define ASSERT_ALL_NEAR(expected, actual, delta) ASSERT_PRED3(near, expected, actual, delta)
+#define ASSERT_ALL_NEAR(expected, actual, delta) ASSERT_PRED3(allNearTemplate<decltype(expected)>, expected, actual, delta)
 
 /// Expectation macro for angle values that should not care for a multiple of 2 * PI difference between the values
 #define EXPECT_ANGLE_NEAR(expected, actual, delta) EXPECT_PRED3(angleNear, expected, actual, delta)
@@ -44,14 +44,35 @@ std::ostream& operator<<(std::ostream& output, const TVector3& tVector3)
 #define TEST_CONTEXT(message) SCOPED_TRACE([&](){std::ostringstream messageStream; messageStream << message; return messageStream.str();}());
 
 namespace {
-  /** Predicate checking that all three components of TVector are close by a maximal error of absError*/
-  bool near(const TVector3& expected, const TVector3& actual, const float& absError)
+  /** Predicate checking that all three components of TVector are close by a maximal error of absError. */
+  bool allNear(const TVector3& expected, const TVector3& actual, const float& absError)
   {
 
     bool xNear = fabs(expected.X() - actual.X()) < absError;
     bool yNear = fabs(expected.Y() - actual.Y()) < absError;
     bool zNear = fabs(expected.Z() - actual.Z()) < absError;
     return xNear and yNear and zNear;
+  }
+
+  /** Predicate checking that all five components of the Helix are close by a maximal error of absError. */
+  bool allNear(const Belle2::Helix& expected, const Belle2::Helix& actual, const float& absError)
+  {
+    bool d0Near = fabs(expected.getD0() - actual.getD0()) < absError;
+    bool phi0Near = fabs(remainder(expected.getPhi0() - actual.getPhi0(), 2 * M_PI)) < absError; // Identical modulo 2 * PI
+    bool omegaNear = fabs(expected.getOmega() - actual.getOmega()) < absError;
+    bool z0Near = fabs(expected.getZ0() - actual.getZ0()) < absError;
+    bool tanLambdaNear = fabs(expected.getTanLambda() - actual.getTanLambda()) < absError;
+
+    return d0Near and phi0Near and omegaNear and z0Near and tanLambdaNear;
+  }
+
+  /** Templated version of predicate checking if two combound object containing some floating point are near each other by maximum deviation.
+   *  Concrete implementations can be given as simple overloads of the allNear function.
+   */
+  template<class T>
+  bool allNearTemplate(const T& expected, const T& actual, const float& absError)
+  {
+    return allNear(expected, actual, absError);
   }
 
   /** Predicate checking that two angular values are close to each other modulus a 2 * PI difference. */
@@ -69,6 +90,24 @@ namespace {
 
     return Belle2::Helix(d0, phi0, omega, z0, tanLambda);
   }
+
+
+  /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
+  vector<float> linspace(const float& start, const float& end, const int n)
+  {
+    std::vector<float> result(n);
+    result[0] = start;
+    result[n - 1] = end;
+
+    for (int i = 1; i < n - 1; ++i) {
+      float start_weight = (float)(n - 1 - i) / (n - 1);
+      float end_weight = 1 - start_weight;
+      result[i] = start * start_weight + end * end_weight;
+    }
+
+    return result;
+  }
+
 }
 
 
@@ -84,28 +123,10 @@ namespace Belle2 {
 
     std::vector<float> omegas { -1, 0, 1};
     //std::vector<float> omegas {1};
-    std::vector<float> phi0s;
+    std::vector<float> phi0s = linspace(-M_PI, M_PI, 11);
     std::vector<float> d0s { -0.5, -0.2, 0, 0.2, 0.5};
     //std::vector<float> d0s {0.5};
-    std::vector<float> chis;
-
-    virtual void SetUp() {
-      // Make a sample from the full angle range
-      phi0s.clear();
-      for (int iAngle = -4; iAngle <= 5; ++iAngle) {
-        float angle = 2 * M_PI * iAngle / 10.0;
-        phi0s.push_back(angle);
-      }
-
-      // Make a sample from the full angle range
-      // Avoid the far end of the helix for now.
-      chis.clear();
-      for (int iAngle = -4; iAngle < 5; ++iAngle) {
-        float angle = 2 * M_PI * iAngle / 10.0;
-        chis.push_back(angle);
-      }
-
-    }
+    std::vector<float> chis = linspace(-5 * M_PI / 6, 5 * M_PI / 6, 11);
 
   };
 
@@ -193,9 +214,6 @@ namespace Belle2 {
     EXPECT_NEAR(-1, helix.getD0(), absError);
     EXPECT_ANGLE_NEAR(-M_PI, helix.getPhi0(), absError);
     EXPECT_NEAR(-1, helix.getOmega(), absError);
-
-    double omega = helix.getOmega();
-
 
     // Positions on the helix
     {
@@ -407,9 +425,8 @@ namespace Belle2 {
 
 
 
-  TEST_F(HelixTest, CalcDr)
+  TEST_F(HelixTest, CalcDrExplicit)
   {
-    float z0 = 2;
     float tanLambda = 3;
 
     TVector3 center(0.0, -2.0, 0.0);
@@ -441,31 +458,16 @@ namespace Belle2 {
       float newD0 = helix.getDr(position);
       EXPECT_NEAR(-(sqrt(2) - 1) , newD0, absError);
     }
-
-
-
   }
 
-  TEST_F(HelixTest, CalcDrExtended)
+  TEST_F(HelixTest, CalcDr)
   {
     float z0 = 2;
     float tanLambda = 3;
 
-    float d0 = -1;
-    float phi0 = -M_PI;
-    float omega = -1;
-
-    float newD0 = -1;
-
-    std::vector<float> chis { -M_PI / 2.0, 0, M_PI / 2.0 , M_PI};
-
-    //for (const float phi0 : phi0s)
-    {
-
-      //for (const float omega : omegas)
-      {
-        //  for (const float d0 : d0s)
-        {
+    for (const float phi0 : phi0s) {
+      for (const float omega : omegas) {
+        for (const float d0 : d0s) {
           Helix helix(d0, phi0, omega, z0, tanLambda);
           TEST_CONTEXT("Failed for " << helix);
 
@@ -498,11 +500,101 @@ namespace Belle2 {
               EXPECT_NEAR(newD0, testDr, absError);
             }
           }
-
         }
       }
     }
-
   }
+
+
+  TEST_F(HelixTest, passiveMoveExplicit)
+  {
+    TVector3 center(0.0, 1.0, 0.0);
+    float radius = -1;
+    float tanLambda = 3;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+
+    ASSERT_NEAR(0, helix.getD0(), absError);
+    ASSERT_ANGLE_NEAR(0, helix.getPhi0(), absError);
+    ASSERT_NEAR(-1, helix.getOmega(), absError);
+
+    // Save the untransformed Helix
+    Helix expectedHelix(helix);
+
+    // Vector by which the coordinate system should move.
+    // (To the top of the circle)
+    TVector3 by(1.0, 1.0, 0.0);
+
+    float arcLength = helix.passiveMoveBy(by);
+
+    // The left of the circle lies in the counterclockwise direction
+    // The forward direction is counterclockwise, so we expect to move forward.
+    ASSERT_NEAR(M_PI / 2, arcLength, absError);
+
+    ASSERT_NEAR(0, helix.getD0(), absError);
+    ASSERT_ANGLE_NEAR(M_PI / 2, helix.getPhi0(), absError);
+    ASSERT_NEAR(-1, helix.getOmega(), absError);
+
+    ASSERT_NEAR(3 * M_PI / 2, helix.getZ0(), absError);
+    ASSERT_NEAR(3, helix.getTanLambda(), absError);
+
+    // Now transform back to the original point
+    float arcLengthBackward = helix.passiveMoveBy(-by);
+
+    ASSERT_NEAR(arcLength, -arcLengthBackward, absError);
+    ASSERT_ALL_NEAR(expectedHelix, helix, absError);
+  }
+
+
+  TEST_F(HelixTest, passiveMove)
+  {
+    float z0 = 2;
+    float tanLambda = 3;
+
+    for (const float phi0 : phi0s) {
+      for (const float omega : omegas) {
+        for (const float d0 : d0s) {
+          for (const float chi : chis) {
+            for (const float newD0 : d0s) {
+              Helix helix(d0, phi0, omega, z0, tanLambda);
+              TEST_CONTEXT("Failed for " << helix);
+
+              // In the line case use the chi value directly as the arc length
+
+              float expectedArcLength = omega == 0 ? chi : -chi / omega;
+              TVector3 positionOnHelix = helix.getPositionAtArcLength(expectedArcLength);
+              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength(expectedArcLength);
+
+              TVector3 perpendicularToHelix = tangentialToHelix;
+              perpendicularToHelix.RotateZ(M_PI / 2.0);
+              // Normalize the xy part
+              perpendicularToHelix *= 1 / perpendicularToHelix.Perp();
+
+              TVector3 displacementFromHelix = -perpendicularToHelix * newD0;
+              TVector3 testPosition = positionOnHelix + displacementFromHelix;
+
+              TVector3 expectedPerigee = -displacementFromHelix;
+
+              TEST_CONTEXT("Failed for chi " << chi);
+              TEST_CONTEXT("Failed for position on helix " << positionOnHelix);
+              TEST_CONTEXT("Failed for tangential to helix " << tangentialToHelix);
+              TEST_CONTEXT("Failed for perpendicular to helix " << perpendicularToHelix);
+              TEST_CONTEXT("Failed for test position " << testPosition);
+
+              float arcLength = helix.passiveMoveBy(testPosition);
+
+              ASSERT_NEAR(expectedArcLength, arcLength, absError);
+
+              ASSERT_ALL_NEAR(expectedPerigee, helix.getPosition(), absError);
+
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+
 
 }  // namespace

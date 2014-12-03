@@ -20,9 +20,10 @@ set_random_seed(123452)
 class BGHistogrammer(Module):
 
     '''
-    Make validation histograms for BG mixer
+    Make validation histograms for BG mixer.
     '''
 
+    ## list of SimHits to be histogramed
     simHits = [
         'PXDSimHits',
         'SVDSimHits',
@@ -33,27 +34,27 @@ class BGHistogrammer(Module):
         'BKLMSimHits',
         'EKLMSimHits',
         ]
-
+    ## length of simHits list
     n = len(simHits)
+    ## list of histograms
     hist = [TH1F('h' + str(i), simHits[i], 400, -20, 20) for i in range(n)]
-    for i in range(n):
-        hist[i].GetXaxis().SetTitle('time [#mus]')
-        hist[i].GetYaxis().SetTitle('entries/bin')
-        descr = TNamed('Description', 'Time distribution of ' + simHits[i]
-                       + ' for mixed background')
-        hist[i].GetListOfFunctions().Add(descr)
-        check = TNamed('Check',
-                       'Distribution must be flat in the time window. Bin statistics is not Poissonian.'
-                       )
-        hist[i].GetListOfFunctions().Add(check)
 
     def initialize(self):
-        ''' Initialize the Module'''
+        ''' Initialize the Module: set histogram axis titles, description and check'''
+
+        for i in range(self.n):
+            self.hist[i].GetXaxis().SetTitle('time [#mus]')
+            self.hist[i].GetYaxis().SetTitle('entries/bin')
+            descr = TNamed('Description', 'Time distribution of '
+                           + self.simHits[i] + ' for mixed background')
+            self.hist[i].GetListOfFunctions().Add(descr)
+            check = TNamed('Check',
+                           'Distribution must be flat in the time window. '
+                           + 'Bin statistics is not Poissonian.')
+            self.hist[i].GetListOfFunctions().Add(check)
 
     def event(self):
-        ''' 
-        Event processor: fill histograms 
-        '''
+        ''' Event processor: fill histograms '''
 
         for i in range(self.n):
             hits = Belle2.PyStoreArray(self.simHits[i])
@@ -82,6 +83,7 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
+# Geometry
 geometry = register_module('Geometry')
 main.add_module(geometry)
 
@@ -108,6 +110,7 @@ process(main)
 # Print call statistics
 print statistics
 
+# Print warning again
 if bg is None:
     print 'Warning: variable BELLE2_BACKGROUND_DIR is not set -> BG mixer not in path!'
     print

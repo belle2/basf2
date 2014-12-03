@@ -38,8 +38,8 @@ TCConvertersTestModule::TCConvertersTestModule() :
 void TCConvertersTestModule::initialize()
 {
   B2INFO("TCConvertersTest ---------------------------- initialize ------------------ ");
+
   // check if all StoreArrays are present
-  B2DEBUG(1, m_SPTCName);
   StoreArray<SpacePointTrackCand>::required(m_SPTCName);
   for (string aName : m_genfitTCNames) { StoreArray<genfit::TrackCand>::required(aName); }
 
@@ -82,23 +82,40 @@ void TCConvertersTestModule::event()
   for (int iTC = 0; iTC < nSpacePointTCs; ++iTC) {
     const SpacePointTrackCand* trackCand = SpacePointTCs[iTC];
 
+    B2DEBUG(20, "Now comparing genfit::TrackCands related from SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName());
+
     // there SHOULD only exist one relation to each StoreArray of genfit::TrackCands for each SpacePointTrackCand (each converter module registers one, but since genfit::TrackCand is no RelationObject it is only possible to register RelationTo)
     const genfit::TrackCand* genfitTC = trackCand->getRelatedTo<genfit::TrackCand>(m_genfitTCNames[0]);
     const genfit::TrackCand* convertedTC = trackCand->getRelatedTo<genfit::TrackCand>(m_genfitTCNames[1]);
+
+    // check if both trackCands are present (this should never happen, if the relations work correctly!)
+    if (genfitTC == NULL) {
+      B2DEBUG(50, "Found no original genfit::TrackCand related from SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName());
+      m_failedNoRelationOrig += 1;
+      continue;
+    }
+    if (convertedTC == NULL) {
+      B2DEBUG(50, "Found no converted genfit::TrackCand related from SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName());
+      m_failedNoRelationConv += 1;
+      continue;
+    }
 
     // for debugging purposes, to reproduce why the comparison failed, if it did so. Have to comment in here if you want this output, as genfit::TrackCand::Print() prints to stdout and is thus not affected by setting another LogLevel in the steering script
 //     genfitTC->Print();
 //     convertedTC->Print();
 
-    if (*genfitTC == *convertedTC) { continue; }
-    else {
-      B2DEBUG(11, "The two genfit::TrackCands related to the SpacePointTrackCand do not match");
+    // compare the two genfit::TrackCands
+    if (*genfitTC == *convertedTC) {
+      B2DEBUG(20, "The two genfit::TrackCands are equal!")
+      continue;
+    } else {
+      B2WARNING("The two genfit::TrackCands related to the SpacePointTrackCand " << trackCand->getArrayIndex() << " do not match");
       if (genfitTC->getNHits() > convertedTC->getNHits()) {
-        B2WARNING("The originial TrackCand has more TrackCandHits");
+        B2DEBUG(80, "The originial TrackCand has more TrackCandHits");
         m_failedTooLittle += 1;
         continue;
       } else if (genfitTC->getNHits() < convertedTC->getNHits()) {
-        B2WARNING("The original TrackCand has less TrackCandHits");
+        B2DEBUG(80, "The original TrackCand has less TrackCandHits");
         m_failedTooMany += 1;
         continue;
       } else {
@@ -118,7 +135,7 @@ void TCConvertersTestModule::event()
         // build a stringstream for output
         stringstream falseHitsStr;
         for (int iD : failedIDs) { falseHitsStr << iD << " "; }
-        B2DEBUG(80, "The comparison of hits failed for HitIDs: " << falseHitsStr);
+        B2DEBUG(80, "The comparison of hits failed for HitIDs: " << falseHitsStr.str());
 
         // find the reason why the comparison of the TrackCand failed and categorize them accordingly
         bool wrongOrder = false;
@@ -132,13 +149,13 @@ void TCConvertersTestModule::event()
         }
 
         if (wrongOrder && !falseHits) {
-          B2WARNING("TrackCandidates contain the same TrackCandHits but in different order");
+          B2DEBUG(80, "TrackCandidates contain the same TrackCandHits but in different order");
           m_failedWrongOrder += 1;
         } else if (falseHits) {
-          B2WARNING("The TrackCands contain different TrackCandHits");
+          B2DEBUG(80, "The TrackCands contain different TrackCandHits");
           m_failedNotSameHits += 1;
         } else {
-          B2WARNING("TrackCands are not equal due to unknown reason");
+          B2DEBUG(80, "TrackCands are not equal due to an unknown reason");
           m_failedOther += 1;
         }
       }
@@ -153,7 +170,7 @@ void TCConvertersTestModule::terminate()
   nFailedConversions += m_failedNoSPTC; nFailedConversions += m_failedOther; nFailedConversions += m_failedTooLittle; nFailedConversions += m_failedTooMany; nFailedConversions += m_failedNotSameHits;
   nFailedConversions += m_failedWrongOrder;
 
-  B2INFO("TCConverterTest::terminate: There were " << m_genfitTCCtr << " 'original' genfit::TrackCands from which " << m_SpacePointTCCtr << " SpacePointTrackCands were created. " << m_convertedTCCtr << " were created by conversion form a SpacePointTrackCand. In " << nFailedConversions << " cases one of the two conversions went wrong");
+  B2INFO("TCConverterTest::terminate: There were " << m_genfitTCCtr << " 'original' genfit::TrackCands from which " << m_SpacePointTCCtr << " SpacePointTrackCands were created. " << m_convertedTCCtr << " were created by conversion from a SpacePointTrackCand. In " << nFailedConversions << " cases one of the two conversions went wrong");
   B2INFO("The reasons for the failure of the conversions are : \n" <<
          "No SpacePointTrackCand was created: " << m_failedNoSPTC << "\n" <<
          "No genfit::TrackCand was created: " << m_failedNoGFTC << "\n" <<
@@ -161,7 +178,9 @@ void TCConvertersTestModule::terminate()
          "The converted TrackCand has too little TrackCandHits: " << m_failedTooLittle << "\n" <<
          "The TrackCandidates contained the Hits in different orders: " << m_failedWrongOrder << "\n" <<
          "The TrackCandidates contained different Hits: " << m_failedNotSameHits << "\n" <<
-         "The conversion failed due to another reason than stated above: " << m_failedOther);
+         "The conversion failed due to another reason than stated above: " << m_failedOther << "\n" <<
+         "No related original genfit::TrackCand was found: " << m_failedNoRelationOrig << "\n" <<
+         "No related converted genfit::TrackCand was found: " << m_failedNoRelationConv);
 
 }
 
@@ -177,4 +196,6 @@ void TCConvertersTestModule::initializeCounters()
   m_failedOther = 0;
   m_failedNotSameHits = 0;
   m_failedWrongOrder = 0;
+  m_failedNoRelationOrig = 0;
+  m_failedNoRelationConv = 0;
 }

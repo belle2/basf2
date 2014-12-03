@@ -216,6 +216,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getPXDSpacePoint(const PXDCl
   if (spacePoint == NULL) {
     throw FoundNoSpacePoint();
   }
+  B2DEBUG(80, "Found SpacePoint " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName());
   markHitAsUsed(flaggedHitIDs, iHit);
   return spacePoint;
 }
@@ -260,6 +261,8 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       bool bothValid = true; // change to false if the second Cluster can be found, but is already used
 
       for (const SVDCluster & aCluster : relatedClusters) {
+        B2DEBUG(100, "Now checking Cluster " << aCluster.getArrayIndex() << ". VXDID is: " << aCluster.getSensorID());
+
         // if the original Cluster and this Cluster are the same, this Cluster does not need to be checked, because it led here the first way
         // WARNING: only comparing the indices of the Clusters here, not if they are from the same StoreArray!!!
         if (aCluster.getArrayIndex() == svdCluster->getArrayIndex()) {
@@ -268,7 +271,6 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
           continue;
         }
 
-        B2DEBUG(100, "Now checking Cluster " << aCluster.getArrayIndex() << ". VXDID is: " << aCluster.getSensorID());
         flaggedPair<int> validID(false, Const::SVD, aCluster.getArrayIndex()); // flaggedPair for finding valid IDs: hit is in genfit::TrackCand and has not yet been used by another SpacePoint
         flaggedPair<int> existingID(true, Const::SVD, aCluster.getArrayIndex()); // flaggedPair for finding existing but used fHitIDs
 
@@ -322,6 +324,13 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
 
       int pos1 = clusterPositions[2 * iSP].second;
       int pos2 = clusterPositions[2 * iSP + 1].second;
+
+//       int distance = (pos1 - pos2)*(pos1 - pos2);
+//       if (distance != 1) {
+//  B2ERROR("The squared distance between the two Clusters of the only valid SpacePoint is " << distance << " This leads to wrong ordered TrackCandHits. This TrackCand will not be converted!");
+//  throw UnsuitableGFTrackCand();
+//       }
+
       markHitAsUsed(flaggedHitIDs, pos1);
       markHitAsUsed(flaggedHitIDs, pos2);
 
@@ -332,20 +341,27 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       std::vector<fourTuple<int> > positionInfos; // 1) index of SpacePoint in RelationVector, 2) squared position difference, 3) & 4) are positions
 
       for (unsigned int iSP = 0 ; iSP < spacePoints.size(); ++iSP) {
-        if (!existAndValidSP[iSP].first) continue; // if not valid continue with next SpacePoint from RelationVector
+        if (!existAndValidSP[iSP].second) continue; // if not valid continue with next SpacePoint from RelationVector
         int posDiff = clusterPositions[iSP * 2].second - clusterPositions[2 * iSP + 1].second; // sign does not matter here, as only squared values are compared later
 
-        B2DEBUG(200, "Difference of positions of Clusters in genfit::TrackCand is " << posDiff << " for SpacePoint " << iSP << " containing this and another compatible Cluster");
+        B2DEBUG(200, "Difference of positions of Clusters in genfit::TrackCand is " << posDiff << " for SpacePoint " << spacePoints[iSP]->getArrayIndex() << " (RelationVector index " << iSP << ") containing this and another compatible Cluster");
         fourTuple<int> aTuple(iSP, posDiff * posDiff, clusterPositions[2 * iSP].second, clusterPositions[2 * iSP + 1].second);
         positionInfos.push_back(aTuple);
       }
 
       // sort to find the smallest difference
+      // COULDDO: only add if the position difference is one (i.e. the Hits appear in consecutive order in the genfit::TrackCand)
       std::sort(positionInfos.begin(), positionInfos.end(), [](const fourTuple<int> lTuple, const fourTuple<int> rTuple) { return lTuple.get<1>() < rTuple.get<1>(); });
       int iSP = positionInfos[0].get<0>(); // SpacePoint with smallest difference of positions is on first position in positinInfo
+
+      int distance = positionInfos[0].get<1>();
+      if (distance != 1) {
+        B2ERROR("The shortest squared distance between two Clusters is " << distance << ". This leads to wrong ordered TrackCandHits. This TrackCand will not be converted!")
+        throw UnsuitableGFTrackCand();
+      }
       const SpacePoint* spacePoint = spacePoints[iSP];
 
-      B2DEBUG(80, "SpacePoint " << spacePoint->getArrayIndex() << " from StoreArray " << spacePoint->getArrayName() << " is the valid SpacePoint with the smallest difference of Cluster positions from all valid SpacePoints related to SVDCluster " << svdCluster->getArrayIndex() << " from " << svdCluster->getArrayName());
+      B2DEBUG(80, "SpacePoint " << spacePoint->getArrayIndex() << " from StoreArray " << spacePoint->getArrayName() << " is the valid SpacePoint with two Clusters in consecutive order from all valid SpacePoints related to SVDCluster " << svdCluster->getArrayIndex() << " from " << svdCluster->getArrayName());
 
       markHitAsUsed(flaggedHitIDs, positionInfos[0].get<2>());
       markHitAsUsed(flaggedHitIDs, positionInfos[0].get<3>());
@@ -359,7 +375,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
     }
   }
   // CAUTION: momentary solution to stop compiler from complaining about -Wreturn-type
-  B2FATAL("Reached GFTC2SPTCConverterModule::getSVDSpacePoint without a return statement or a throw");
+  B2FATAL("Reached end of GFTC2SPTCConverterModule::getSVDSpacePoint() without a return statement or a throw");
   return new SpacePoint;
 }
 
@@ -372,6 +388,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSingleClusterSVDSpacePoin
   if (spacePoint == NULL) {
     throw FoundNoSpacePoint();
   }
+  B2DEBUG(80, "Found SpacePoint " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName());
   markHitAsUsed(flaggedHitIDs, iHit);
   return spacePoint;
 }
@@ -386,5 +403,5 @@ void GFTC2SPTCConverterModule::markHitAsUsed(std::vector<flaggedPair<int> >& fla
 {
   flaggedHitIDs[hitToMark].get<0>() = true;
   flaggedPair<int> fPair = flaggedHitIDs[hitToMark];
-  B2DEBUG(150, "Marked Hit " << hitToMark << " as used. (detID,hitID) of this hit is  (" << fPair.get<1>() << "," << fPair.get<2>() << ")");
+  B2DEBUG(150, "Marked Hit " << hitToMark << " as used. (detID,hitID) of this hit is (" << fPair.get<1>() << "," << fPair.get<2>() << ")");
 }

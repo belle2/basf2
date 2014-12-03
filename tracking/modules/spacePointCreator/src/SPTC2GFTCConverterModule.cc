@@ -111,7 +111,7 @@ void SPTC2GFTCConverterModule::event()
       // add genfit::TrackCand to StoreArray
       m_genfitTCCtr += 1;
 //       genfitTC.Print(); // debug purposes
-      B2DEBUG(15, "genfit::TrackCand contains " << genfitTC.getNHits());
+      B2DEBUG(15, "genfit::TrackCand contains " << genfitTC.getNHits() << "TrackCandHits.");
       genfit::TrackCand* newTC = genfitTCs.appendNew(genfitTC);
       trackCand->addRelationTo(newTC);
     } catch (SpacePointTrackCand::UnsupportedDetType& anException) {

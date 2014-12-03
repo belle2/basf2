@@ -63,6 +63,10 @@ namespace Belle2 {
 
     int m_failedWrongOrder; /**< Counter for failed conversions due to wrong ordering of TrackCandHits */
 
+    int m_failedNoRelationOrig; /**< Counter for failed Relation to original genfit::TrackCand */
+
+    int m_failedNoRelationConv; /**< Counter for failed Relation to converted genfit::TrackCand */
+
     void initializeCounters(); /**< initialize all counter variables to zero, to avoid indeterministic behaviour */
   };
 }

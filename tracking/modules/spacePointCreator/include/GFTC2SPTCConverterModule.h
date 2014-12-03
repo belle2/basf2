@@ -83,9 +83,9 @@ namespace Belle2 {
 
     unsigned int m_genfitTCCtr; /**< Counter for genfit::TrackCands which were presented to the module */
 
-#ifndef __CINT__
+// #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
     template<typename HitType> using HitInfo = std::pair<unsigned int, const HitType*>;
-#endif
+// #endif
 
     template<typename T> using fourTuple = boost::tuple<T, T, T, T>; /**< typdef, for some less writing effort in the code */
 

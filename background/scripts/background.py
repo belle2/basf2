@@ -42,6 +42,8 @@ def add_output(
         madeFor = 'PXD'
         branches = ['PXDSimHits']
     else:
+        madeFor = ''
+        branches = []
         B2ERROR('add_output - invalid value of argument sampleType: %s'
                 % sampleType)
 

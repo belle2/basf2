@@ -173,7 +173,7 @@ namespace Belle2 {
     float passiveMoveBy(const TVector3& by);
 
 
-    /** Calculates the signed distance of the helix to the point the xy projection. */
+    /** Calculates the signed distance of the helix to the point in the xy projection. */
     float getDr(const TVector3& position) const;
 
 

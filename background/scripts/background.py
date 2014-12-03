@@ -20,10 +20,10 @@ def add_output(
     @param fileName optional file name, can be overridden by basf2 -o 
     '''
 
-    if sampleType is 'study':
+    if sampleType == 'study':
         madeFor = ''
         branches = []
-    elif sampleType is 'usual':
+    elif sampleType == 'usual':
         madeFor = ''
         branches = [
             'PXDSimHits',
@@ -35,10 +35,10 @@ def add_output(
             'BKLMSimHits',
             'EKLMSimHits',
             ]
-    elif sampleType is 'ECL':
+    elif sampleType == 'ECL':
         madeFor = 'ECL'
         branches = ['ECLHits']
-    elif sampleType is 'PXD':
+    elif sampleType == 'PXD':
         madeFor = 'PXD'
         branches = ['PXDSimHits']
     else:
@@ -55,7 +55,7 @@ def add_output(
     path.add_module(tagSetter)
 
     # Write out only non-empty events when producing samples for BG mixer
-    if sampleType is not 'study':
+    if sampleType != 'study':
         emptyPath = create_path()
         tagSetter.if_false(emptyPath)
 

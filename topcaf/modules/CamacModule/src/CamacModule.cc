@@ -24,7 +24,7 @@ CamacModule::CamacModule() : Module(), m_c3377nhit(0)
 
   addParam("InputFilename", m_in_filename, "The input .cmc file to be parsed.");
   addParam("CrateID", m_crateID, "The crate containing the FTSW TDC.");
-  addParam("FTSW_TDC_Timing", m_ftswTDCtiming, "The timing of the FTSW TDC counts in nanoseconds.", 0.45056);
+  addParam("FTSW_TDC_Timing", m_ftswTDCtiming, "The timing of the FTSW TDC counts in nanoseconds.", 0.045056);
   addParam("FTSWslot", m_ftswSlot, "The slot number of the TDC containing the FTSW signal.");
   addParam("FTSWword", m_ftswWord, "The word number of the FTSW time.");
 

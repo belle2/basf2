@@ -16,7 +16,11 @@ const int channel_samples = 4096;
 WaveTimingModule::WaveTimingModule() : Module()
 {
   setDescription("This module calculates the timing of itop raw waveform event data");
+  addParam("Time2TDC", m_time2tdc, "Conversion factor to match iTOPDigit time scale [time unit/ns]", 40.0);
+
+
 }
+
 
 WaveTimingModule::~WaveTimingModule() {}
 
@@ -114,11 +118,13 @@ void WaveTimingModule::event()
       //max_t = at40_t;
 
       //Create TOPDigit
-      int barID = 0;
-      int channelID = channel_id;
-      int TDC = ftsw - coarse_t + at40_t * sample_dt;
+      int barID = -9;
+      int channelID = -9;
+      int TDC = (int)((ftsw - coarse_t + at40_t * sample_dt) * m_time2tdc);
+      // B2INFO(" TDC(): " <<   TDC << "=(" << ftsw << "-" << coarse_t << "+" << at40_t << "*" <<  sample_dt << ")*" << m_time2tdc );
       TOPDigit* this_topdigit = m_topdigits_ptr.appendNew(barID, channelID, TDC);
       this_topdigit->setADC(max_adc);
+      this_topdigit->setHardwareChannelID(channel_id);
 
     }//End loop
   }

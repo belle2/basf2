@@ -24,6 +24,8 @@ namespace Belle2 {
     TH1D* m_tmp_h;
     StoreArray<TOPDigit>  m_topdigits_ptr;
 
+    //
+    double m_time2tdc;
   };
 
 }

@@ -31,15 +31,17 @@ camacconverter.param(camacDict)
 
 pedmodule = register_module('Pedestal')
 pedestalDict = {
-    'InputFileName': 'test.root',
+    'InputFileName': '/srv/itop_data/conditions/top/pedestal/1.0.0.1/top_pedestal_1.0.0.1_topcrt-e000002_r000571_pedestal_1.0.0.1.root',
     'Mode': 1,
     'WriteFile': 0,
-    'Conditions': 1,
+    'Conditions': 0,
     }
 pedmodule.param(pedestalDict)
 
 mergemodule = register_module('WaveMerging')
 timemodule = register_module('WaveTiming')
+timeDict = {'Time2TDC': 40.0}
+timemodule.param(timeDict)
 
 main = create_path()
 main.add_module(eventinfosetter)

@@ -106,6 +106,12 @@ bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs)
   return true;
 }
 
+// set sorting parameters
+void SpacePointTrackCand::setSortingParameters(const std::vector<double>& sortParams)
+{
+  for (auto aValue : sortParams) { m_sortingParameters.push_back(aValue); }
+}
+
 // genfit::TrackCand prints to stdout, as does the Print method from ROOT TVectorD (which is invoked here).
 // I build a stringstrem, which I then hand over B2DEBUG
 // there is a somewhat nasty hack to intercept the output to the stdout by redirecting the stdout to a buffer, which can then be put into a stringstream. This is however platform-dependent and not very C++ like and therefore not done here

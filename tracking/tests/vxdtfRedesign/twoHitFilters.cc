@@ -27,6 +27,8 @@
 #include <iostream>
 #include <math.h>
 
+#include <functional>
+
 using namespace std;
 
 using namespace Belle2;
@@ -89,8 +91,10 @@ namespace VXDTFtwoHitFilterTest {
   int counter< Distance2DXYSquared >::N(0);
 
 
+
+
   /** this observer does simply count the number of times, the attached Filter was used */
-  class Observer : public VoidObserver {
+  class CountingObserver : public VoidObserver {
   public:
     template<class Var>
     static void notify(const typename Var::argumentType& ,
@@ -101,6 +105,157 @@ namespace VXDTFtwoHitFilterTest {
     }
 
   };
+
+
+
+
+
+  /** this observer does simply print the name of the SelectionVariable and the result of its value-function as an Error */
+  class ErrorObserver : public VoidObserver {
+  public:
+    template<class Var>
+    static void notify(const typename Var::argumentType& outerHit,
+                       const typename Var::argumentType& innerHit,
+                       const Var& filterType,
+                       typename Var::variableType filterResult) {
+      B2ERROR(" Filter " << filterType.name() << " got result of " << filterResult)
+    }
+
+  };
+
+
+
+
+
+  /** this observer does simply print the name of the SelectionVariable and the result of its value-function as a Warning */
+  class WarningObserver : public VoidObserver {
+  public:
+    template<class Var>
+    static void notify(const typename Var::argumentType& outerHit,
+                       const typename Var::argumentType& innerHit,
+                       const Var& filterType,
+                       typename Var::variableType filterResult) {
+      B2WARNING(" Filter " << filterType.name() << " got result of " << filterResult)
+    }
+
+  };
+
+
+
+
+  /** this observer does simply collect other observers which are to be executed during ::notify */
+  template<class FilterType> class VectorOfObservers : public VoidObserver {
+  public:
+
+    /** a typedef to make the stuff more readable */
+    typedef std::function< void (const typename FilterType::argumentType&, const typename FilterType::argumentType&, const FilterType&, typename FilterType::variableType)> observerFunction;
+
+    /** a typedef to make the c-style pointer more readable (can not be done with classic typedef) */
+    using CStyleFunctionPointer = void(*)(const typename FilterType::argumentType&, const typename FilterType::argumentType&, const FilterType&, typename FilterType::variableType) ;
+
+    /** iterate over all stored Observers and execute their notify-function */
+    static void notify(const typename FilterType::argumentType& outerHit,
+                       const typename FilterType::argumentType& innerHit,
+                       const FilterType& filterType,
+                       typename FilterType::variableType filterResult) {
+      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" << innerHit.getPosition().Mag() << " got result of " << filterResult << " and Observer-Vector sm_collectedObservers got " << VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected")
+      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" << innerHit.getPosition().Mag() << " got result of " << filterResult << " and Observer-Vector sm_collectedObserversCSTYLE got " << VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected")
+
+      /// the idea of the following three lines have to work in the end (I basically want to loop over all attached observers and execute their notify function):
+      //    for(auto& anObserver : CollectedObservers<FilterType>::collectedObservers) {
+      //    anObserver(outerHit, innerHit, filterResult);
+      //    }
+      /// or
+    }
+
+
+    /** collects observers to be executed during notify (can not be used so far, but is long-term goal) */
+    template <typename ObserverType>
+    static void addObserver(observerFunction newObserver) {
+      VectorOfObservers<FilterType>::sm_collectedObservers.push_back(std::bind(&newObserver, std::placeholders::_1, std::placeholders::_2, FilterType(), std::placeholders::_3));
+    }
+
+
+    /** collects observers with std::function to be executed during notify (variant A)*/
+    static std::vector< observerFunction > sm_collectedObservers;
+    /** collects observers with c-style function pointers to be executed during notify (variant B)*/
+    static std::vector< CStyleFunctionPointer > sm_collectedObserversCSTYLE;
+  };
+
+  /** initialize static member of variant A*/
+  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::observerFunction > VectorOfObservers<FilterType>::sm_collectedObservers  = {};
+  /** initialize static member of variant B*/
+  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::CStyleFunctionPointer > VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE  = {};
+
+
+
+  /** presents the functionality of the SpacePoint-creating function written above */
+  TEST_F(TwoHitFilterTest, TestObserverFlexibility)
+  {
+    // Very verbose declaration, see below for convenient shortcuts
+    Filter< Distance3DSquared, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0., 1.));
+
+    Filter< Distance3DSquared, Range<double, double>, VectorOfObservers<Distance3DSquared> > filter(unobservedFilter);
+    SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
+    SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
+    SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
+    counter< Distance3DSquared >::N = 0;
+
+    /// variant A (doesn't work, because of static function(?)):
+//  auto storeFuncVariantA = std::bind( ((VectorOfObservers<Distance3DSquared>::observerFunction) &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3);
+    //  VectorOfObservers<Distance3DSquared>::sm_collectedObservers.push_back(storeFuncVariantA);
+
+    /// variant B:
+    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared>::CStyleFunctionPointer) &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3);
+
+    /// doesn't work, different type, additionally static_cast doesn't work too (reinterpret_casat too dangerous, didn't try):
+//  VectorOfObservers<Distance3DSquared>::sm_collectedObserversCSTYLE.push_back(storeFuncVariantB);
+
+    /// long-term goal, something comparable to this:
+    // VectorOfObservers<Distance3DSquared>::addObserver(CountingObserver);
+    // VectorOfObservers<Distance3DSquared>::addObserver(WarningObserver);
+
+    filter.accept(x1, x2);
+    filter.accept(x1, x3);
+    EXPECT_EQ(0 , counter< Distance3DSquared >::N);
+  }
+
+
+
+  /** ignore what is written in this test, is simply used as a temporary storage for currently not used code-snippets */
+  TEST_F(TwoHitFilterTest, ignoreMe)
+  {
+    //garbage:
+    //  VectorOfObservers<Distance3DSquared>::addObserver(CountingObserver::notify);
+    //  auto storeFunc = std::bind((void(*)(const SpacePoint&, const SpacePoint&, const Belle2::Distance3DSquared&, float))&CountingObserver::notify, std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3);
+//  auto storeFunc1 = std::bind(void(*)(const typename Distance3DSquared::argumentType&, const typename Distance3DSquared::argumentType&, const Distance3DSquared&, typename Distance3DSquared::variableType) /*&CountingObserver::notify*/), std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3);
+
+//  ObserverVector<Distance3DSquared>::sm_collectedObservers.push_back(storeFunc);
+    //  ObserverVector<Distance3DSquared>::sm_collectedObservers.push_back(std::bind((void(*)(const SpacePoint&, const SpacePoint&, const Belle2::Distance3DSquared&, float))&CountingObserver::notify, std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3));
+    // std::vector< typename ObserverVector<FilterType>::observerFunction >();
+    //     ObserverVector<VectorOfObservers>::sm_collectedObservers = std::vector< typename VectorOfObservers<Distance3DSquared>::observerFunction >();
+//  ErrorObserver anErrorBla();
+    //  WarningObserver aWarningBla();
+    //  ObserverVector<Distance3DSquared>::addObserver(aWarningBla/*, filterBla*/);
+    //  ObserverVector<Distance3DSquared>::addObserver(aBla/*, filterBla*/);
+    // // // // // //   Distance3DSquared filterBla();
+
+    /** a tiny CollectedObservers class for CollectedObservers stuff */
+//   template<class FilterType> class CollectedObservers {
+//   public:
+//  typedef std::function< void (const typename FilterType::argumentType&, const typename FilterType::argumentType&, const FilterType&, typename FilterType::variableType)> observerFunction;
+//
+//  /** collects observers to be executed during notify */
+//  static std::vector< observerFunction > collectedObservers;
+//  CollectedObservers() {};
+//  ~CollectedObservers() {};
+//   };
+
+    //  static void addObserver( CountingObserver& newObserver) {
+//    //  static void addObserver(observerFunction newObserver) {
+//    ObserverVector<FilterType>::sm_collectedObservers.push_back(std::bind(&newObserver::notify, std::placeholders::_1, std::placeholders::_2, FilterType(), std::placeholders::_3));
+//  }
+  }
 
 
   /** presents the functionality of the SpacePoint-creating function written above */
@@ -243,7 +398,7 @@ namespace VXDTFtwoHitFilterTest {
     // Very verbose declaration, see below for convenient shortcuts
     Filter< Distance3DSquared, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0., 1.));
 
-    Filter< Distance3DSquared, Range<double, double>, Observer > filter(unobservedFilter);
+    Filter< Distance3DSquared, Range<double, double>, CountingObserver > filter(unobservedFilter);
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
@@ -260,7 +415,7 @@ namespace VXDTFtwoHitFilterTest {
   {
     bool bypassControl(false);
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared, Range<double, double>, Observer > nonBypassableFilter(Range<double, double>(0., 1.));
+    Filter< Distance3DSquared, Range<double, double>, CountingObserver > nonBypassableFilter(Range<double, double>(0., 1.));
     auto filter = nonBypassableFilter.bypass(bypassControl);
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
@@ -345,8 +500,8 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, ShortCircuitsEvaluation)
   {
     auto filter(
-      (Distance2DXYSquared() < 1).observe(Observer()) &&
-      (Distance3DSquared()   < 1).observe(Observer())
+      (Distance2DXYSquared() < 1).observe(CountingObserver()) &&
+      (Distance3DSquared()   < 1).observe(CountingObserver())
     );
 
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);

@@ -108,6 +108,11 @@ class Cluster:
         # Path where log file is supposed to be created
         log_file = output_dir + '/' + job.name + '.log'
 
+        # Remove any left over done files
+        donefile_path = "{0}/script_{1}.done".format(self.path, job.name)
+        if os.path.isfile(donefile_path):
+            os.remove(donefile_path)
+
         # Now we need to distinguish between .py and .C files:
         extension = os.path.splitext(job.path)[1]
         if extension == '.C':

@@ -106,7 +106,7 @@ void BKLMUnpackerModule::event()
   StoreArray<RawKLM> rawKLM;
   StoreArray<BKLMDigit> bklmDigits;
 
-
+  cout << "we have " << rawKLM.getEntries() << " entries " << endl;
   for (int i = 0; i < rawKLM.getEntries(); i++) {
 
     if (rawKLM[i]->GetNumEvents() != 1) {
@@ -144,19 +144,25 @@ void BKLMUnpackerModule::event()
         }
 
         int numHits = rawKLM[i]->GetDetectorNwords(j, finesse_num) / hitLength;
-        if (rawKLM[i]->GetDetectorNwords(j, finesse_num) % hitLength != 0) {
+        //addendum: There is always an additional word (count) in the end
+        int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
+        //either no data (finesse not connected) or with the count word
+        if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           char buffer[200];
           sprintf(buffer, "not the correct number of words: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
           B2ERROR(buffer);
           continue;
         }
         cout << "this finesse has " << numHits << " hits " << endl;
+        if (numDetNwords > 0)
+          cout << "counter is: " << (buf_slot[numDetNwords - 1] & 0xFFFF) << endl;
         for (int iHit = 0; iHit < numHits; iHit++) {
           cout << "unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit * hitLength + 1] << endl;
-          unsigned short bword1 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
-          unsigned short bword2 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
-          unsigned short bword3 = buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          unsigned short bword4 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
+          //--->first word is the leftmost, not rightmost
+          unsigned short bword2 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
+          unsigned short bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
+          unsigned short bword4 = buf_slot[iHit * hitLength + 1] & 0xFFFF;
+          unsigned short bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
 
           cout << "unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
 

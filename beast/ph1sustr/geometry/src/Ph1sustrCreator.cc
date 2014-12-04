@@ -309,7 +309,6 @@ namespace Belle2 {
                     );
       new G4PVPlacement(rotX, PH1SUSTRpos, l_20V2100bgov, "p_20V2100bgov", &topVolume, false, 0);
 
-
       G4VSolid* s_20V2100bgoh = new G4UnionSolid("s_20V2100bgoh", s_20V2100bgohpos, s_20V2100bgohneg, 0, G4ThreeVector(0, -2.*dy_20V2000, 0));
       G4LogicalVolume* l_20V2100bgoh = new G4LogicalVolume(s_20V2100bgoh,  geometry::Materials::get("MetalCopper") , "l_20V2100bgoh", 0, 0);
 

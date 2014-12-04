@@ -70,10 +70,10 @@ namespace Belle2 {
       G4double abundance, density;
       G4int ncomponents;
 
-      G4Isotope* iHe3 = new G4Isotope("iHe3", z = 2, n = 3, a = 3.0160293 * g / mole);
+      G4Isotope* iHe3 = new G4Isotope("iHe3", z = 2, n = 3, a = 3.0160293 * CLHEP::g / CLHEP::mole);
       G4Element* eHe3 = new G4Element("eHe3", symbol = "eHe3", ncomponents = 1);
       eHe3->AddIsotope(iHe3, abundance = 100.);
-      G4Material* gHe3 = new G4Material("gHe3", density = 0.00066 * g / cm3, ncomponents = 1);
+      G4Material* gHe3 = new G4Material("gHe3", density = 0.00066 * CLHEP::g / CLHEP::cm3, ncomponents = 1);
       gHe3->AddElement(eHe3, 1);
 
       //lets get the stepsize parameter with a default value of 5 µm

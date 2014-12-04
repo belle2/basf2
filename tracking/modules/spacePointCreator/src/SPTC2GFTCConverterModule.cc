@@ -71,8 +71,14 @@ void SPTC2GFTCConverterModule::event()
       genfit::TrackCand genfitTC;
       B2DEBUG(20, "SpacePointTrackCand " << iTC << " contains " << trackCand->getNHits() << " SpacePoints")
 
+      std::vector<const SpacePoint*> tcSpacePoints = trackCand->getHits();
+      std::vector<double> sortingParams = trackCand->getSortingParameters();
+
       // loop over all SpacePoints and look at their relations
-      for (const SpacePoint * aSP : trackCand->getHits()) {
+      for (unsigned int iTCSP = 0; iTCSP < tcSpacePoints.size(); ++iTCSP) {
+        const SpacePoint* aSP = tcSpacePoints[iTCSP];
+        double sortingParam = sortingParams[iTCSP];
+
         auto detType = aSP->getType();
 
         if (detType == VXD::SensorInfoBase::PXD) {
@@ -83,7 +89,7 @@ void SPTC2GFTCConverterModule::event()
             throw (ClusterNotFound());
           }
           int hitID = pxdCluster->getArrayIndex();
-          genfitTC.addHit(Const::PXD, hitID);
+          genfitTC.addHit(Const::PXD, hitID, -1, sortingParam); // setting PlaneID to -1
           B2DEBUG(60, "Added PXDCluster " << hitID << " from StoreArray " << pxdCluster->getArrayName() << " to genfit::TrackCand");
         } else if (detType == VXD::SensorInfoBase::SVD) {
           // More than one SVD Cluster can be related from a SpacePoint (maximum two), hence get all related Clusters and add them
@@ -96,7 +102,7 @@ void SPTC2GFTCConverterModule::event()
           B2DEBUG(70, "Found " << svdClusters.size() << " SVD Clusters related to SpacePoint");
           for (const SVDCluster & aCluster : svdClusters) {
             int hitID = aCluster.getArrayIndex();
-            genfitTC.addHit(Const::SVD, hitID);
+            genfitTC.addHit(Const::SVD, hitID, -1, sortingParam); // setting PlaneID to -1
             B2DEBUG(60, "Added SVDCluster " << hitID << " from StoreArray " << aCluster.getArrayName()  << " to genfit::TrackCand");
           }
         } else {

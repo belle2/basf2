@@ -15,6 +15,9 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 
+#include <boost/tuple/tuple.hpp>
+#include <boost/tuple/tuple_comparison.hpp>
+
 using namespace Belle2;
 using namespace std;
 
@@ -48,6 +51,7 @@ void TCConvertersTestModule::initialize()
 
   for (string aName : m_SpacePointArrayNames) { StoreArray<SpacePoint>::required(aName); }
 
+  // TODO: check why this does not work properly (not all variables are initialized to 0 here!)
   initializeCounters();
 }
 
@@ -91,18 +95,18 @@ void TCConvertersTestModule::event()
     // check if both trackCands are present (this should never happen, if the relations work correctly!)
     if (genfitTC == NULL) {
       B2DEBUG(50, "Found no original genfit::TrackCand related from SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName());
-      m_failedNoRelationOrig += 1;
+      ++m_failedNoRelationOrig;
       continue;
     }
     if (convertedTC == NULL) {
       B2DEBUG(50, "Found no converted genfit::TrackCand related from SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName());
-      m_failedNoRelationConv += 1;
+      ++m_failedNoRelationConv;
       continue;
     }
 
     // for debugging purposes, to reproduce why the comparison failed, if it did so. Have to comment in here if you want this output, as genfit::TrackCand::Print() prints to stdout and is thus not affected by setting another LogLevel in the steering script
-//     genfitTC->Print();
-//     convertedTC->Print();
+    genfitTC->Print();
+    convertedTC->Print();
 
     // compare the two genfit::TrackCands
     if (*genfitTC == *convertedTC) {
@@ -112,23 +116,28 @@ void TCConvertersTestModule::event()
       B2WARNING("The two genfit::TrackCands related to the SpacePointTrackCand " << trackCand->getArrayIndex() << " do not match");
       if (genfitTC->getNHits() > convertedTC->getNHits()) {
         B2DEBUG(80, "The originial TrackCand has more TrackCandHits");
-        m_failedTooLittle += 1;
+        ++m_failedTooLittle;;
         continue;
       } else if (genfitTC->getNHits() < convertedTC->getNHits()) {
         B2DEBUG(80, "The original TrackCand has less TrackCandHits");
-        m_failedTooMany += 1;
+        ++m_failedTooMany;
         continue;
       } else {
-        std::vector< std::pair<int, int> > genfitIDs;
-        std::vector< std::pair<int, int> > convertedIDs;
+        ++m_failedHitLevel;
+
+        // COULDDO: typedef this
+        std::vector< boost::tuple<int, int, double> > genfitIDs;
+        std::vector< boost::tuple<int, int, double> > convertedIDs;
         vector<int> failedIDs;
 
         // get the detID and the hitID and store them together for later comparison
         for (unsigned int iHit = 0; iHit < genfitTC->getNHits(); ++iHit) {
           auto genfitHit = genfitTC->getHit(iHit);
           auto convertedHit = convertedTC->getHit(iHit);
-          genfitIDs.push_back({genfitHit->getDetId(), genfitHit->getHitId()});
-          convertedIDs.push_back({convertedHit->getDetId(), convertedHit->getHitId()});
+          boost::tuple<int, int, double> genfitTuple(genfitHit->getDetId(), genfitHit->getHitId(), genfitHit->getSortingParameter());
+          boost::tuple<int, int, double> convertedTuple(convertedHit->getDetId(), convertedHit->getHitId(), convertedHit->getSortingParameter());
+          genfitIDs.push_back(genfitTuple);
+          convertedIDs.push_back(convertedTuple);
           if (*genfitHit != *convertedHit) { failedIDs.push_back(iHit); }
         }
 
@@ -138,25 +147,42 @@ void TCConvertersTestModule::event()
         B2DEBUG(80, "The comparison of hits failed for HitIDs: " << falseHitsStr.str());
 
         // find the reason why the comparison of the TrackCand failed and categorize them accordingly
-        bool wrongOrder = false;
+        bool wrongSortParam = false;
         bool falseHits = false;
-        for (auto aPair : genfitIDs) {
-          if (std::find(convertedIDs.begin(), convertedIDs.end(), aPair) != convertedIDs.end()) {
+        bool wrongOrder = false;
+
+        for (auto aTuple : genfitIDs) {
+          B2DEBUG(250, "Checking aTuple: " << aTuple.get<0>() << "," << aTuple.get<1>() << "," << aTuple.get<2>())
+          // first check if the whole tuple can be found in the converted TrackCand, if so: the TrackCandHits are in wrong order, if not -> make further checks
+          if (std::find(convertedIDs.begin(), convertedIDs.end(), aTuple) != convertedIDs.end()) {
+            B2DEBUG(250, "Found with complete Tuple");
             wrongOrder = true;
-          } else {
-            falseHits = true;
+          }
+          // if this is not the case, look if the combination of (detID, hitID) can be found (omitting the sorting parameter), then only the sorting Parameters are wrong, if this is not the case, there are wrong hits
+          else {
+            std::pair<int, int> detHitID = {aTuple.get<0>(), aTuple.get<1>()};
+            if (std::find_if(convertedIDs.begin(), convertedIDs.end(), [&detHitID](const boost::tuple<int, int, double>& mTuple) { return mTuple.get<0>() == detHitID.first && mTuple.get<1>() == detHitID.second; }) != convertedIDs.end()) {
+              B2DEBUG(250, "Found with only detId, hitID");
+              wrongSortParam = true;
+            } else {
+              B2DEBUG(250, "Not found at all");
+              falseHits = true;
+            }
           }
         }
 
         if (wrongOrder && !falseHits) {
           B2DEBUG(80, "TrackCandidates contain the same TrackCandHits but in different order");
-          m_failedWrongOrder += 1;
+          ++m_failedWrongOrder;
+        }
+        if (wrongSortParam && !falseHits) {
+          B2DEBUG(80, "The Sorting Parameters do not match");
+          ++m_failedWrongSortingParam;
         } else if (falseHits) {
-          B2DEBUG(80, "The TrackCands contain different TrackCandHits");
-          m_failedNotSameHits += 1;
+          B2DEBUG(80, "The TrackCands contain different Hits");
         } else {
           B2DEBUG(80, "TrackCands are not equal due to an unknown reason");
-          m_failedOther += 1;
+          ++m_failedOther;
         }
       }
     }
@@ -167,35 +193,39 @@ void TCConvertersTestModule::event()
 void TCConvertersTestModule::terminate()
 {
   int nFailedConversions = m_failedNoGFTC;
-  nFailedConversions += m_failedNoSPTC; nFailedConversions += m_failedOther; nFailedConversions += m_failedTooLittle; nFailedConversions += m_failedTooMany; nFailedConversions += m_failedNotSameHits;
-  nFailedConversions += m_failedWrongOrder;
+  nFailedConversions += m_failedNoSPTC; nFailedConversions += m_failedTooLittle; nFailedConversions += m_failedTooMany; nFailedConversions += m_failedHitLevel;
+  nFailedConversions += m_failedNoRelationOrig; nFailedConversions += m_failedNoRelationOrig;
 
   B2INFO("TCConverterTest::terminate: There were " << m_genfitTCCtr << " 'original' genfit::TrackCands from which " << m_SpacePointTCCtr << " SpacePointTrackCands were created. " << m_convertedTCCtr << " were created by conversion from a SpacePointTrackCand. In " << nFailedConversions << " cases one of the two conversions went wrong");
   B2INFO("The reasons for the failure of the conversions are : \n" <<
          "No SpacePointTrackCand was created: " << m_failedNoSPTC << "\n" <<
          "No genfit::TrackCand was created: " << m_failedNoGFTC << "\n" <<
+         "No related original genfit::TrackCand was found: " << m_failedNoRelationOrig << "\n" <<
+         "No related converted genfit::TrackCand was found: " << m_failedNoRelationConv << "\n" <<
          "The converted TrackCand has too many TrackCandHits: " << m_failedTooMany << "\n" <<
          "The converted TrackCand has too little TrackCandHits: " << m_failedTooLittle << "\n" <<
+         "The conversion failed on hit Level: " << m_failedHitLevel << ". The reasons the for the failure of the comparison on hit level are (multiple reasons possible):\n" <<
          "The TrackCandidates contained the Hits in different orders: " << m_failedWrongOrder << "\n" <<
+         "The Sorting Parameters did not match: " << m_failedWrongSortingParam << "\n" <<
          "The TrackCandidates contained different Hits: " << m_failedNotSameHits << "\n" <<
-         "The conversion failed due to another reason than stated above: " << m_failedOther << "\n" <<
-         "No related original genfit::TrackCand was found: " << m_failedNoRelationOrig << "\n" <<
-         "No related converted genfit::TrackCand was found: " << m_failedNoRelationConv);
-
+         "The conversion failed due to another reason than stated above: " << m_failedOther);
 }
 
 void TCConvertersTestModule::initializeCounters()
 {
+  B2INFO("TCConvertersTestModule initializing Counter variables");
   m_genfitTCCtr = 0;
   m_SpacePointTCCtr = 0;
   m_convertedTCCtr = 0;
   m_failedNoGFTC = 0;
   m_failedNoSPTC = 0;
+  m_failedHitLevel = 0;
   m_failedTooLittle = 0;
   m_failedTooMany = 0;
   m_failedOther = 0;
   m_failedNotSameHits = 0;
   m_failedWrongOrder = 0;
+  m_failedWrongSortingParam = 0;
   m_failedNoRelationOrig = 0;
   m_failedNoRelationConv = 0;
 }

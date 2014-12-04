@@ -41,8 +41,8 @@ namespace Belle2 {
    * 2.a) If no SpacePoints (double Cluster) can be found, add this Cluster via a single Cluster SpacePoint (should always be present, if not an exception is thrown, and the genfit::TrackCand is not converted). Mark this Cluster (TrackCandHit) as used and go to next Cluster (TrackCandHit)
    * 3) For every SpacePoint (double Cluster) related to the original Cluster, get all Clusters related from this SpacePoint
    * 4) For every SpacePoint (from 3) check if its Cluster combination is valid (i.e. both Clusters are contained in the genfit::TrackCand and neither of these Clusters has been used by another SpacePoint) and also check if its Cluster combination is not valid, but existing (i.e. both Clusters are contained in the genfit::TrackCand but one has already been used by another SpacePoint)
-   * 5) If ONLY ONE SpacePoint has a valid Cluster Combination -> take this SpacePoint, mark the Clusters (TrackCandHits) as used, proceed with next TrackCandHit
-   * 6) If more than SpacePoint has a valid Cluster Combination -> take the SpacePoint with the smallest position difference in the genfit::TrackCand ('normally' there is a Cluster Combination, that is in consecutive order in the genfit::TrackCand) and mark its Clusters as used, proceed with next TrackCandHit
+   * 5) If ONLY ONE SpacePoint has a valid Cluster Combination, check if its Clusters appear in consecutive order in the genfit::TrackCand, if they do -> take this SpacePoint, mark the Clusters (TrackCandHits) as used, proceed with next TrackCandHit. If they do not appear in consecutive order -> throw an exception (this SpacePointTrackCand cannot be converted back to a genfit::TrackCand properly)
+   * 6) If more than SpacePoint has a valid Cluster Combination -> check if there is a SpacePoint with consecutive Clusters in the genfit::TrackCand ('normally' there is a Cluster Combination, that is in consecutive order in the genfit::TrackCand) and mark its Clusters as used, proceed with next TrackCandHit, if all valid SpacePoints have Cluster Combinations that do not appear in consecutive order -> throw
    * 7) If no valid SpacePoint can be found, but SpacePoints with existing (but used) Cluster Combinations can be found, an exception is thrown and the genfit::TrackCand will not be converted, since the conversion would get ambiguous then (this happens in roughly 1 % of all cases)
    * 8) If no valid SpacePoint can be found and no SpacePoint with existing (but used) Cluster Combinations, this Cluster will be added via a single Cluster SpacePoint (and then be marked as used)
    *
@@ -84,7 +84,7 @@ namespace Belle2 {
     unsigned int m_genfitTCCtr; /**< Counter for genfit::TrackCands which were presented to the module */
 
 // #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
-    template<typename HitType> using HitInfo = std::pair<unsigned int, const HitType*>;
+    template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */
 // #endif
 
     template<typename T> using fourTuple = boost::tuple<T, T, T, T>; /**< typdef, for some less writing effort in the code */

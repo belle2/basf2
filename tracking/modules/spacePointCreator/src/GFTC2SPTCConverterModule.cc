@@ -161,6 +161,7 @@ const Belle2::SpacePointTrackCand GFTC2SPTCConverterModule::createSpacePointTC(c
     int detID = aTCHit->getDetId();
     int hitID = aTCHit->getHitId();
     int planeID = aTCHit->getPlaneId(); // not used at the moment (except for debug output)
+    double sortingParam = aTCHit->getSortingParameter();
     B2DEBUG(60, "TrackCandHit " << iTCHit << " has detID: " << detID << ", hitID: " << hitID << ", planeID: " << planeID);
 
     // check if this hit has already been used, if not process
@@ -171,12 +172,12 @@ const Belle2::SpacePointTrackCand GFTC2SPTCConverterModule::createSpacePointTC(c
       if (detID == Const::PXD) {
         const PXDCluster* aCluster = pxdClusters[hitID];
         const SpacePoint* aSpacePoint = getPXDSpacePoint(aCluster, fHitIDs, iTCHit);
-        tcSpacePoints.push_back({iTCHit, aSpacePoint});
+        tcSpacePoints.push_back({sortingParam, aSpacePoint});
         B2DEBUG(60, "Added SpacePoint " << aSpacePoint->getArrayIndex() << " from Array " << aSpacePoint->getArrayName() << " to tcSpacePoints");
       } else if (detID == Const::SVD) {
         const SVDCluster* aCluster = svdClusters[hitID];
         const SpacePoint* aSpacePoint = getSVDSpacePoint(aCluster, fHitIDs, iTCHit);
-        tcSpacePoints.push_back({iTCHit, aSpacePoint});
+        tcSpacePoints.push_back({sortingParam, aSpacePoint});
         B2DEBUG(60, "Added SpacePoint " << aSpacePoint->getArrayIndex() << " from Array " << aSpacePoint->getArrayName() << " to tcSpacePoints");
       } else {
         throw SpacePointTrackCand::UnsupportedDetType();
@@ -194,16 +195,19 @@ const Belle2::SpacePointTrackCand GFTC2SPTCConverterModule::createSpacePointTC(c
     }
   }
 
-  // create a vector of SpacePoint*
+  // create a vector of SpacePoint* and one with sorting Parameters to add to the SpacePointTrackCand
   std::vector<const SpacePoint*> spacePoints;
+  std::vector<double> sortingParams;
   for (const HitInfo<SpacePoint> aSP : tcSpacePoints) {
     spacePoints.push_back(aSP.second);
+    sortingParams.push_back(aSP.first);
   }
 
   SpacePointTrackCand spacePointTC = SpacePointTrackCand(spacePoints, genfitTC->getPdgCode(), genfitTC->getChargeSeed(), genfitTC->getMcTrackId());
 
   spacePointTC.set6DSeed(genfitTC->getStateSeed());
   spacePointTC.setCovSeed(genfitTC->getCovSeed());
+  spacePointTC.setSortingParameters(sortingParams);
 
   return spacePointTC;
 }
@@ -311,6 +315,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       B2ERROR("All of the SpacePoints that are related to Cluster " << svdCluster->getArrayIndex() << " have Cluster Combinations where one of the Clusters is already used by another SpacePoint! This genfit::TrackCand cannot be converted properly to a SpacePointTrackCand");
       throw UnsuitableGFTrackCand();
     }
+    // COULDDO: merge the cases for one and for more than one valid SpacePoints (should be easily doable), since code is mostly copy paste
     // if no valid SpacePoint and no existing but used SpacePoint can be found, add this Cluster as SingleCluster SpacePoint
     else if (nValidSP < 1 && nExistingButUsedSP < 1) {
       B2DEBUG(100, "Found no valid SpacePoint and no SpacePoint with existing but used Clusters/Hits. Adding a SingleClusterSpacePoint related to SVDCluser " << svdCluster->getArrayIndex() <<  " from " << svdCluster->getArrayName());
@@ -325,11 +330,11 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       int pos1 = clusterPositions[2 * iSP].second;
       int pos2 = clusterPositions[2 * iSP + 1].second;
 
-//       int distance = (pos1 - pos2)*(pos1 - pos2);
-//       if (distance != 1) {
-//  B2ERROR("The squared distance between the two Clusters of the only valid SpacePoint is " << distance << " This leads to wrong ordered TrackCandHits. This TrackCand will not be converted!");
-//  throw UnsuitableGFTrackCand();
-//       }
+      int distance = (pos1 - pos2) * (pos1 - pos2);
+      if (distance != 1) {
+        B2ERROR("The squared distance between the two Clusters of the only valid SpacePoint is " << distance << " This leads to wrong ordered TrackCandHits. This TrackCand will not be converted!");
+        throw UnsuitableGFTrackCand();
+      }
 
       markHitAsUsed(flaggedHitIDs, pos1);
       markHitAsUsed(flaggedHitIDs, pos2);
@@ -350,7 +355,6 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       }
 
       // sort to find the smallest difference
-      // COULDDO: only add if the position difference is one (i.e. the Hits appear in consecutive order in the genfit::TrackCand)
       std::sort(positionInfos.begin(), positionInfos.end(), [](const fourTuple<int> lTuple, const fourTuple<int> rTuple) { return lTuple.get<1>() < rTuple.get<1>(); });
       int iSP = positionInfos[0].get<0>(); // SpacePoint with smallest difference of positions is on first position in positinInfo
 

@@ -30,7 +30,11 @@
 #include <G4LossTableBuilder.hh>
 #include <G4MollerBhabhaModel.hh>
 #include <G4BetheBlochModel.hh>
+#if G4VERSION_NUMBER < 1001
+#include <G4eBremsstrahlungModel.hh>
+#else
 #include <G4eBremsstrahlungRelModel.hh>
+#endif
 #include <G4MuPairProductionModel.hh>
 #include <G4MuBremsstrahlungModel.hh>
 #include <G4ProductionCuts.hh>
@@ -407,7 +411,11 @@ void EnergyLossForExtrapolator::ComputeElectronDEDX(const G4ParticleDefinition* 
 {
   G4DataVector v;
   G4MollerBhabhaModel* ioni = new G4MollerBhabhaModel();
+#if G4VERSION_NUMBER < 1001
+  G4eBremsstrahlungModel* brem = new G4eBremsstrahlungModel();
+#else
   G4eBremsstrahlungRelModel* brem = new G4eBremsstrahlungRelModel();
+#endif
   ioni->Initialise(part, v);
   brem->Initialise(part, v);
 

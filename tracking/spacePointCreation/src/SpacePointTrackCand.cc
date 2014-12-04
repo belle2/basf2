@@ -54,6 +54,7 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
 
   for (const SpacePoint * spacePoint : spacePoints) {
     m_trackSpacePoints.push_back(spacePoint);
+    m_trackSpacePointIndices.push_back(spacePoint->getArrayIndex());
   }
 }
 
@@ -139,7 +140,7 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
 
     const SpacePoint* spacePoint = m_trackSpacePoints[i];
     // COULDDO: implement a print method for SpacePoints
-    output << "SpacePoint " << i << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() << "\n";
+    output << "SpacePoint " << i << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() << ". Sorting Parameter: " << m_sortingParameters[i] << "\n";
   }
   B2DEBUG(debuglevel, output.str());
 }

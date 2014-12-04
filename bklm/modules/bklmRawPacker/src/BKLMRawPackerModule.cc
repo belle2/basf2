@@ -113,12 +113,14 @@ void BKLMRawPackerModule::event()
       int iChannelNr = 10;
 
       //tdc, charge, ctime
+      //we need to switch bword1/bword2 and bword3/bword4 since the hi/loword ordering
+      //from the concentrator board has teh hiword on the rightmost side
       formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
       cout << "buf1: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
-      buf1[0 + hitCounter * 2] |= bword1;
-      buf1[0 + hitCounter * 2] |= ((bword2 << 16));
-      buf1[1 + hitCounter * 2] |= bword3;
-      buf1[1 + hitCounter * 2] |= ((bword4 << 16));
+      buf1[0 + hitCounter * 2] |= bword2;
+      buf1[0 + hitCounter * 2] |= ((bword1 << 16));
+      buf1[1 + hitCounter * 2] |= bword4;
+      buf1[1 + hitCounter * 2] |= ((bword3 << 16));
 
       cout << "word1: " << buf1[0 + hitCounter * 2] << " word2: " << buf1[1 + hitCounter * 2] << endl;
       buf2[0 + hitCounter * 2] = 0;
@@ -127,10 +129,10 @@ void BKLMRawPackerModule::event()
       iChannelNr = 25;
 
       formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-      buf2[0 + hitCounter * 2] |= bword1;
-      buf2[0 + hitCounter * 2] |= ((bword2 << 16) & 0xFFFF0000);
-      buf2[1 + hitCounter * 2] |= bword3;
-      buf2[1 + hitCounter * 2] |= ((bword4 << 16) & 0xFFFF0000);
+      buf2[0 + hitCounter * 2] |= bword2;
+      buf2[0 + hitCounter * 2] |= ((bword1 << 16) & 0xFFFF0000);
+      buf2[1 + hitCounter * 2] |= bword4;
+      buf2[1 + hitCounter * 2] |= ((bword3 << 16) & 0xFFFF0000);
       cout << "buf2: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
       cout << "word1: " << buf2[0 + hitCounter * 2] << " word2: " << buf2[1 + hitCounter * 2] << endl;
 
@@ -143,10 +145,10 @@ void BKLMRawPackerModule::event()
       formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
       cout << "buf3: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
       cout << "word1: " << buf3[0 + hitCounter * 2] << " word2: " << buf3[1 + hitCounter * 2] << endl;
-      buf3[0 + hitCounter * 2] |= bword1;
-      buf3[0 + hitCounter * 2] |= ((bword2 << 16) & 0xFFFF0000);
-      buf3[1 + hitCounter * 2] |= bword3;
-      buf3[1 + hitCounter * 2] |= ((bword4 << 16) & 0xFFFF0000);
+      buf3[0 + hitCounter * 2] |= bword2;
+      buf3[0 + hitCounter * 2] |= ((bword1 << 16) & 0xFFFF0000);
+      buf3[1 + hitCounter * 2] |= bword4;
+      buf3[1 + hitCounter * 2] |= ((bword3 << 16) & 0xFFFF0000);
 
 
 
@@ -158,10 +160,10 @@ void BKLMRawPackerModule::event()
       formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
       cout << "buf4: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl;
       cout << "word1: " << buf4[0 + hitCounter * 2] << " word2: " << buf4[1 + hitCounter * 2] << endl;
-      buf4[0 + hitCounter * 2] |= bword1;
-      buf4[0 + hitCounter * 2] |= ((bword2 << 16) & 0xFFFF0000);
-      buf4[1 + hitCounter * 2] |= bword3;
-      buf4[1 + hitCounter * 2] |= ((bword4 << 16) & 0xFFFF0000);
+      buf4[0 + hitCounter * 2] |= bword2;
+      buf4[0 + hitCounter * 2] |= ((bword1 << 16) & 0xFFFF0000);
+      buf4[1 + hitCounter * 2] |= bword4;
+      buf4[1 + hitCounter * 2] |= ((bword3 << 16) & 0xFFFF0000);
 
 
 

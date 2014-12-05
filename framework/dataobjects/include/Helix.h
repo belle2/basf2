@@ -36,6 +36,10 @@ namespace Belle2 {
    *  Each point on the helix can adressed by the arc length s, which has to be traversed to get to it from the perigee.
    *  More precisely the arc length means the transverse part of the particles travel distance,
    *  hence the arc length of the circle in the xy projection.
+   *
+   *  If you need different kind of methods / interfaces to the Helix please do not hesitate to contract oliver.frost@desy.de
+   *  Contributions are always welcome.
+   *
    */
   class Helix : public RelationsObject {
   public:

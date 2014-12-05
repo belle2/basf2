@@ -571,6 +571,15 @@ namespace {
       EXPECT_EQ(c_MissFSR, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
+      //pi0 -> 2 gamma, with both clusters coming from same photon
+      Decay d(111, {22, 22});
+      Decay& gamma = d[0];
+      d.reconstruct({111, {22, {22, {}, Decay::c_ReconstructFrom, &gamma}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      //MCMatch of pi0 is first gamma
+      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
       //pi0 -> 4 gamma
       Decay d(111, {22, 22, 22, 22});
       d.reconstruct({111, {22, 22, 22, 22}});
@@ -581,6 +590,15 @@ namespace {
       //pi0 -> 4 gamma as 2 gamma
       Decay d(111, {22, 22, 22, 22});
       d.reconstruct({111, {22, 22, 0, 0}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      //TODO: this should get c_MissGamma, but distinction between these cases is hard
+      EXPECT_EQ(c_MissFSR, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //pi0 -> 4 gamma, with two clusters coming from same photon
+      Decay d(111, {22, 22, 22, 22});
+      Decay& gamma = d[0];
+      d.reconstruct({111, {22, 22, 22, {22, {}, Decay::c_ReconstructFrom, &gamma}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       //TODO: this should get c_MissGamma, but distinction between these cases is hard
       EXPECT_EQ(c_MissFSR, getMCTruthStatus(d.m_particle)) << d.getString();
@@ -644,7 +662,6 @@ namespace {
       d.finalize();
       MCParticle* muon = d.getMCParticle(13);
       muon->setStatus(muon->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
-      ASSERT_TRUE(muon != nullptr);
       d.reconstruct({ -211, {}, Decay::c_RelateWith, muon});
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
@@ -656,7 +673,6 @@ namespace {
       d.finalize();
       MCParticle* muon = d.getMCParticle(13);
       muon->setStatus(muon->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
-      ASSERT_TRUE(muon != nullptr);
       d.reconstruct({421, {321, { -211, {}, Decay::c_RelateWith, muon}, {111, {22, 22}}}});
 
 
@@ -883,6 +899,22 @@ namespace {
     ASSERT_FALSE(setMCTruth(d.m_particle)) << d.getString();
     EXPECT_EQ(c_InternalError, getMCTruthStatus(d.m_particle)) << d.getString();
     EXPECT_EQ(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
+  }
+
+  TEST_F(MCMatchingTest, DuplicateTrack)
+  {
+    {
+      Decay d(421, {321, -211, {111, {22, 22}}});
+      d.finalize();
+      MCParticle* kaon = d.getMCParticle(321);
+      ASSERT_TRUE(kaon != nullptr);
+      //tracks for the same MCParticle used twice:
+      d.reconstruct({421, {321, { -211, {}, Decay::c_RelateWith, kaon}, {111, {22, 22}}}});
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_MissMassiveParticle | c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
   }
 }  // namespace
 #endif

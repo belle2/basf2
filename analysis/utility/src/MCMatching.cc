@@ -253,6 +253,8 @@ bool MCMatching::isFSR(const MCParticle* p)
     return false; //?
   }
 
+  //TODO: this is a rough approximation, needs EvtGen changes for correct determination
+  //once fixed, have a look at the TODOs in mcmatching tests, some should have different flags
   int ndaug = mother->getNDaughters();
   if (ndaug > 2) { // M -> A B (...) gamma is probably FSR
     return true;

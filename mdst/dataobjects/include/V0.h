@@ -50,7 +50,7 @@ namespace Belle2 {
     /** Get pair of TrackFitResults, that are part of the V0 particle.*/
     std::pair<TrackFitResult*, TrackFitResult*> getTrackFitResultPtrs() {
       StoreArray<TrackFitResult> trackFitResults;
-      return std::make_pair(trackFitResults[m_trackIndexPositive], trackFitResults[m_trackIndexNegative]);
+      return std::make_pair(trackFitResults[m_trackFitResultIndexPositive], trackFitResults[m_trackFitResultIndexNegative]);
     }
 
     /** Get indices of the TrackFitResults, that are part of the V0 particle. */

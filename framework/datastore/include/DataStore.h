@@ -109,6 +109,16 @@ namespace Belle2 {
     typedef StoreEntryMap::iterator StoreEntryIter;              /**< Iterator for a StoreEntry map. */
     typedef StoreEntryMap::const_iterator StoreEntryConstIter;   /**< const_iterator for a StoreEntry map. */
 
+    /** Global flag to to decide if we can do normal cleanup.
+     *
+     * If the normal basf2 execution is bypassed, e.g. in tests or separate binaries,
+     * we cannot guarantee that exit handlers are called in the correct order. Since
+     * this may lead to double deletion of objects through ROOT and misleading error
+     * stack traces, we will skip cleanup in these exceptional cases.
+     */
+    static bool s_DoCleanup;
+
+
     //--------------------------------- Instance ---------------------------------------------------------------
     /** Instance of singleton Store.
      *

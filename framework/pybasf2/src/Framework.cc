@@ -34,6 +34,7 @@ using namespace Belle2;
 
 Framework::Framework()
 {
+  DataStore::s_DoCleanup = true;
   LogSystem::Instance().enableErrorSummary(true);
   m_pathManager = new PathManager();
 
@@ -51,6 +52,7 @@ Framework::~Framework()
   //these shared pointers have special cleanup hooks that can cause crashes if run
   //after Py_Finalize(). The framework object is cleaned up before, so this is a good place.
   ModuleManager::Instance().reset();
+  DataStore::s_DoCleanup = false;
 }
 
 

@@ -29,9 +29,7 @@ namespace Belle2 {
    * This class combines all subsystems of the framework.
    */
   class Framework {
-
   public:
-
     /**
      * Constructor.
      */

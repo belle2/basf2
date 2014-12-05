@@ -40,6 +40,8 @@ namespace {
   }
 }
 
+bool DataStore::s_DoCleanup = false;
+
 DataStore& DataStore::Instance()
 {
   static DataStore instance;
@@ -53,8 +55,10 @@ DataStore::DataStore() : m_initializeActive(true)
 
 DataStore::~DataStore()
 {
-  //release all memory in data store
-  reset();
+  if (s_DoCleanup) {
+    //release all memory in data store
+    reset();
+  }
 }
 
 void DataStore::reset()

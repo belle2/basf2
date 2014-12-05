@@ -132,503 +132,505 @@ namespace {
 }
 
 
-/** Set up a few arrays and objects in the datastore */
-class HelixTest : public ::testing::Test {
+namespace {
 
-protected:
-  // Common level precision for all tests.
-  double absError = 1e-6;
-  double nominalBz = 1.5;
+  /** Set up a few arrays and objects in the datastore */
+  class HelixTest : public ::testing::Test {
 
-  std::vector<float> omegas { -1, 0, 1};
-  //std::vector<float> omegas {1};
-  std::vector<float> phi0s = linspace(-M_PI, M_PI, 11);
-  std::vector<float> d0s { -0.5, -0.2, 0, 0.2, 0.5};
-  //std::vector<float> d0s {0.5};
-  std::vector<float> chis = linspace(-5 * M_PI / 6, 5 * M_PI / 6, 11);
+  protected:
+    // Common level precision for all tests.
+    double absError = 1e-6;
+    double nominalBz = 1.5;
 
-};
+    std::vector<float> omegas { -1, 0, 1};
+    //std::vector<float> omegas {1};
+    std::vector<float> phi0s = linspace(-M_PI, M_PI, 11);
+    std::vector<float> d0s { -0.5, -0.2, 0, 0.2, 0.5};
+    //std::vector<float> d0s {0.5};
+    std::vector<float> chis = linspace(-5 * M_PI / 6, 5 * M_PI / 6, 11);
 
-/** Test simple Setters and Getters. */
-TEST_F(HelixTest, Getters)
-{
-  TRandom3 generator;
-  unsigned int nCases = 1;
-  double bField = nominalBz;
+  };
 
-  for (unsigned int i = 0; i < nCases; ++i) {
+  /** Test simple Setters and Getters. */
+  TEST_F(HelixTest, Getters)
+  {
+    TRandom3 generator;
+    unsigned int nCases = 1;
+    double bField = nominalBz;
 
-    short int charge = generator.Uniform(-1, 1) > 0 ? 1 : -1;
+    for (unsigned int i = 0; i < nCases; ++i) {
 
-    // Generate a random put orthogonal pair of vectors in the r-phi plane
-    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.Set(d.X(), -d.X() * pt.Px() / pt.Py());
+      short int charge = generator.Uniform(-1, 1) > 0 ? 1 : -1;
 
-    // Add a random z component
-    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+      // Generate a random put orthogonal pair of vectors in the r-phi plane
+      TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      d.Set(d.X(), -d.X() * pt.Px() / pt.Py());
 
-    // Set up class for testing
+      // Add a random z component
+      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+
+      // Set up class for testing
+      Helix helix(position, momentum, charge, bField);
+
+      // Test all vector elements
+      EXPECT_ALL_NEAR(position, helix.getPosition(), absError);
+      EXPECT_ALL_NEAR(momentum, helix.getMomentum(bField), absError);
+
+      // Test getter for transverse momentum
+      EXPECT_NEAR(momentum.Perp(), helix.getTransverseMomentum(bField), absError);
+
+      // Test getter of kappa
+      EXPECT_NEAR(charge / momentum.Perp(), helix.getKappa(bField), absError);
+
+      // Test getter of d0
+      // Check absolute value of d0
+      EXPECT_NEAR(position.Perp(), fabs(helix.getD0()), absError);
+
+      // Check sign of d0
+      EXPECT_SAME_SIGN(position.Cross(momentum).Z(), helix.getD0());
+
+      // Test getter of phi0
+      EXPECT_NEAR(momentum.Phi(), helix.getPhi0(), absError);
+
+      // Test getter of d0
+      EXPECT_NEAR(position.Z(), helix.getZ0(), absError);
+
+      // Test getter of tan lambda
+      EXPECT_NEAR(1 / tan(momentum.Theta()), helix.getTanLambda(), absError);
+
+      // Test getter of cot theta
+      EXPECT_NEAR(1 / tan(momentum.Theta()), helix.getCotTheta(), absError);
+
+      // Test other variables
+      EXPECT_EQ(charge, helix.getChargeSign());
+
+    }
+  } // Testcases for getters
+
+
+  TEST_F(HelixTest, SignOfD0)
+  {
+    // This tests the assumption that the sign of d0 is given by the sign of position x momentum as a two dimensional cross product.
+
+    const TVector3 position(1, 0, 0);
+    const TVector3 momentum(0, 1, 0);
+    const TVector3 oppositeMomentum(0, -1, 0);
+    const float charge = 1;
+    const float bField = nominalBz;
+
     Helix helix(position, momentum, charge, bField);
+    EXPECT_NEAR(1, helix.getD0(), absError);
 
-    // Test all vector elements
-    EXPECT_ALL_NEAR(position, helix.getPosition(), absError);
-    EXPECT_ALL_NEAR(momentum, helix.getMomentum(bField), absError);
+    // D0 does not change with the charge
+    Helix helix2(position, momentum, -charge, bField);
+    EXPECT_NEAR(1, helix2.getD0(), absError);
 
-    // Test getter for transverse momentum
-    EXPECT_NEAR(momentum.Perp(), helix.getTransverseMomentum(bField), absError);
+    // But with reversal of momentum
+    Helix oppositeMomentumHelix(position, oppositeMomentum, charge, bField);
+    EXPECT_NEAR(-1, oppositeMomentumHelix.getD0(), absError);
 
-    // Test getter of kappa
-    EXPECT_NEAR(charge / momentum.Perp(), helix.getKappa(bField), absError);
-
-    // Test getter of d0
-    // Check absolute value of d0
-    EXPECT_NEAR(position.Perp(), fabs(helix.getD0()), absError);
-
-    // Check sign of d0
-    EXPECT_SAME_SIGN(position.Cross(momentum).Z(), helix.getD0());
-
-    // Test getter of phi0
-    EXPECT_NEAR(momentum.Phi(), helix.getPhi0(), absError);
-
-    // Test getter of d0
-    EXPECT_NEAR(position.Z(), helix.getZ0(), absError);
-
-    // Test getter of tan lambda
-    EXPECT_NEAR(1 / tan(momentum.Theta()), helix.getTanLambda(), absError);
-
-    // Test getter of cot theta
-    EXPECT_NEAR(1 / tan(momentum.Theta()), helix.getCotTheta(), absError);
-
-    // Test other variables
-    EXPECT_EQ(charge, helix.getChargeSign());
+    Helix oppositeMomentumHelix2(position, oppositeMomentum, -charge, bField);
+    EXPECT_NEAR(-1, oppositeMomentumHelix2.getD0(), absError);
 
   }
-} // Testcases for getters
 
 
-TEST_F(HelixTest, SignOfD0)
-{
-  // This tests the assumption that the sign of d0 is given by the sign of position x momentum as a two dimensional cross product.
-
-  const TVector3 position(1, 0, 0);
-  const TVector3 momentum(0, 1, 0);
-  const TVector3 oppositeMomentum(0, -1, 0);
-  const float charge = 1;
-  const float bField = nominalBz;
-
-  Helix helix(position, momentum, charge, bField);
-  EXPECT_NEAR(1, helix.getD0(), absError);
-
-  // D0 does not change with the charge
-  Helix helix2(position, momentum, -charge, bField);
-  EXPECT_NEAR(1, helix2.getD0(), absError);
-
-  // But with reversal of momentum
-  Helix oppositeMomentumHelix(position, oppositeMomentum, charge, bField);
-  EXPECT_NEAR(-1, oppositeMomentumHelix.getD0(), absError);
-
-  Helix oppositeMomentumHelix2(position, oppositeMomentum, -charge, bField);
-  EXPECT_NEAR(-1, oppositeMomentumHelix2.getD0(), absError);
-
-}
-
-
-TEST_F(HelixTest, Explicit)
-{
-  /** Setup a helix
-   *  for counterclockwise travel
-   *  starting at -1.0, 0.0, 0.0
-   *  heading in the negative y direction initially
-   */
-
-  TVector3 center(0.0, -2.0, 0.0);
-  float radius = -1;
-  // Keep it flat
-  float tanLambda = 0;
-
-  Helix helix = helixFromCenter(center, radius, tanLambda);
-  EXPECT_NEAR(-1, helix.getD0(), absError);
-  EXPECT_ANGLE_NEAR(-M_PI, helix.getPhi0(), absError);
-  EXPECT_NEAR(-1, helix.getOmega(), absError);
-
-  // Positions on the helix
+  TEST_F(HelixTest, Explicit)
   {
-    // Start point
-    float arcLength = 0;
-    TVector3 position = helix.getPositionAtArcLength(arcLength);
-    TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+    /** Setup a helix
+     *  for counterclockwise travel
+     *  starting at -1.0, 0.0, 0.0
+     *  heading in the negative y direction initially
+     */
 
-    EXPECT_ALL_NEAR(TVector3(0.0, -1.0, 0.0), position, absError);
-    EXPECT_ANGLE_NEAR(-M_PI, tangential.Phi(), absError);
-  }
+    TVector3 center(0.0, -2.0, 0.0);
+    float radius = -1;
+    // Keep it flat
+    float tanLambda = 0;
 
-  {
-    float arcLength = M_PI / 2;
-    TVector3 position = helix.getPositionAtArcLength(arcLength);
-    TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
-    EXPECT_ALL_NEAR(TVector3(-1.0, -2.0, 0.0), position, absError);
-    EXPECT_ANGLE_NEAR(-M_PI / 2, tangential.Phi(), absError);
-  }
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+    EXPECT_NEAR(-1, helix.getD0(), absError);
+    EXPECT_ANGLE_NEAR(-M_PI, helix.getPhi0(), absError);
+    EXPECT_NEAR(-1, helix.getOmega(), absError);
 
-  {
-    float arcLength = M_PI;
-    TVector3 position = helix.getPositionAtArcLength(arcLength);
-    TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
-    EXPECT_ALL_NEAR(TVector3(0.0, -3.0, 0.0), position, absError);
-    EXPECT_ANGLE_NEAR(0, tangential.Phi(), absError);
-  }
+    // Positions on the helix
+    {
+      // Start point
+      float arcLength = 0;
+      TVector3 position = helix.getPositionAtArcLength(arcLength);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
 
-  {
-    float arcLength = 3 * M_PI / 2 ;
-    TVector3 position = helix.getPositionAtArcLength(arcLength);
-    TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
-    EXPECT_ALL_NEAR(TVector3(1.0, -2.0, 0.0), position, absError);
-    EXPECT_ANGLE_NEAR(M_PI / 2, tangential.Phi(), absError);
-  }
-}
+      EXPECT_ALL_NEAR(TVector3(0.0, -1.0, 0.0), position, absError);
+      EXPECT_ANGLE_NEAR(-M_PI, tangential.Phi(), absError);
+    }
 
-TEST_F(HelixTest, Tangential)
-{
-  float z0 = 0;
-  float tanLambda = 2;
+    {
+      float arcLength = M_PI / 2;
+      TVector3 position = helix.getPositionAtArcLength(arcLength);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      EXPECT_ALL_NEAR(TVector3(-1.0, -2.0, 0.0), position, absError);
+      EXPECT_ANGLE_NEAR(-M_PI / 2, tangential.Phi(), absError);
+    }
 
-  for (const float d0 : d0s) {
-    for (const float phi0 : phi0s) {
-      for (const float omega : omegas) {
+    {
+      float arcLength = M_PI;
+      TVector3 position = helix.getPositionAtArcLength(arcLength);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      EXPECT_ALL_NEAR(TVector3(0.0, -3.0, 0.0), position, absError);
+      EXPECT_ANGLE_NEAR(0, tangential.Phi(), absError);
+    }
 
-        Helix helix(d0, phi0, omega, z0, tanLambda);
-        TEST_CONTEXT("Failed for " << helix);
-
-        TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
-
-        EXPECT_ANGLE_NEAR(phi0, tangentialAtPerigee.Phi(), absError);
-        EXPECT_FLOAT_EQ(1.0, tangentialAtPerigee.Mag());
-        EXPECT_FLOAT_EQ(tanLambda, 1 / tan(tangentialAtPerigee.Theta()));
-
-        for (const float chi : chis) {
-
-          if (omega == 0) {
-            // Use chi as the arc length in the straight line case
-            float arcLength = chi;
-
-            // Tangential vector shall not change along the line
-            TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
-            EXPECT_ALL_NEAR(tangentialAtPerigee, tangential, absError);
-
-          } else {
-            float arcLength = -chi / omega;
-            TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
-
-            float actualChi = tangential.DeltaPhi(tangentialAtPerigee);
-            EXPECT_ANGLE_NEAR(chi, actualChi, absError);
-            EXPECT_FLOAT_EQ(tangentialAtPerigee.Theta(), tangential.Theta());
-            EXPECT_FLOAT_EQ(1, tangential.Mag());
-
-          }
-
-        }
-      }
+    {
+      float arcLength = 3 * M_PI / 2 ;
+      TVector3 position = helix.getPositionAtArcLength(arcLength);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      EXPECT_ALL_NEAR(TVector3(1.0, -2.0, 0.0), position, absError);
+      EXPECT_ANGLE_NEAR(M_PI / 2, tangential.Phi(), absError);
     }
   }
-}
 
+  TEST_F(HelixTest, Tangential)
+  {
+    float z0 = 0;
+    float tanLambda = 2;
 
-TEST_F(HelixTest, MomentumExtrapolation)
-{
-  float z0 = 0;
-  float tanLambda = -2;
-
-  for (const float d0 : d0s) {
-    for (const float phi0 : phi0s) {
-      for (const float omega : omegas) {
-        if (omega != 0) {
+    for (const float d0 : d0s) {
+      for (const float phi0 : phi0s) {
+        for (const float omega : omegas) {
 
           Helix helix(d0, phi0, omega, z0, tanLambda);
-          TVector3 momentumAtPerigee = helix.getMomentum();
-          for (const float chi : chis) {
+          TEST_CONTEXT("Failed for " << helix);
 
-            float arcLength = -chi / omega;
-            TVector3 extrapolatedMomentum = helix.getMomentumAtArcLength(arcLength, nominalBz);
+          TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
 
-            float actualChi = extrapolatedMomentum.DeltaPhi(momentumAtPerigee);
-            EXPECT_ANGLE_NEAR(chi, actualChi, absError);
-            EXPECT_FLOAT_EQ(momentumAtPerigee.Theta(), extrapolatedMomentum.Theta());
-            EXPECT_FLOAT_EQ(momentumAtPerigee.Mag(), extrapolatedMomentum.Mag());
-          }
-        }
-      }
-    }
-  }
-}
-
-
-
-TEST_F(HelixTest, Extrapolation)
-{
-
-  // z coordinates do not matter for this test.
-  float z0 = 0;
-  float tanLambda = 2;
-
-  for (const float d0 : d0s) {
-    for (const float phi0 : phi0s) {
-      for (const float omega : omegas) {
-
-        Helix helix(d0, phi0, omega, z0, tanLambda);
-        TVector3 perigee = helix.getPosition();
-
-        TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
-        TEST_CONTEXT("Failed for " << helix);
-
-        //continue;
-
-        for (const float chi : chis) {
-          TEST_CONTEXT("Failed for chi = " << chi);
-
-          // In the cases where omega is 0 (straight line case) chi become undefined.
-          // Use chi sample as transverse travel distance instead.
-          float expectedArcLength = omega != 0 ? -chi / omega : chi;
-          TVector3 pointOnHelix = helix.getPositionAtArcLength(expectedArcLength);
-
-          float polarR = pointOnHelix.Perp();
-          float arcLength = helix.getArcLengthAtPolarR(polarR);
-
-          // Only the absolute value is returned.
-          EXPECT_NEAR(fabs(expectedArcLength), arcLength, absError);
-
-          // Also check it the extrapolation lies in the forward direction.
-          TVector3 secantVector = pointOnHelix - perigee;
-
-          if (expectedArcLength == 0) {
-            EXPECT_NEAR(0, secantVector.Mag(), absError);
-          } else {
-            TVector2 secantVectorXY = secantVector.XYvector();
-
-            TVector2 tangentialXY = tangentialAtPerigee.XYvector();
-            float coalignment = secantVectorXY * tangentialXY ;
-
-            bool extrapolationIsForward = coalignment > 0;
-            bool expectedIsForward = expectedArcLength > 0;
-            EXPECT_EQ(expectedIsForward, extrapolationIsForward);
-          }
-        }
-      }
-    }
-  }
-} // end TEST_F
-
-
-TEST_F(HelixTest, PerigeeExtrapolateRoundTrip)
-{
-  float z0 = 0;
-  float tanLambda = -2;
-
-  for (const float d0 : d0s) {
-    for (const float phi0 : phi0s) {
-      for (const float omega : omegas) {
-
-        // Extrapolations involving the momentum only makes sense with finit momenta
-        if (omega != 0) {
-          Helix expectedHelix(d0, phi0, omega, z0, tanLambda);
+          EXPECT_ANGLE_NEAR(phi0, tangentialAtPerigee.Phi(), absError);
+          EXPECT_FLOAT_EQ(1.0, tangentialAtPerigee.Mag());
+          EXPECT_FLOAT_EQ(tanLambda, 1 / tan(tangentialAtPerigee.Theta()));
 
           for (const float chi : chis) {
-            float arcLength = -chi / omega;
-            TVector3 position = expectedHelix.getPositionAtArcLength(arcLength);
-            TVector3 momentum = expectedHelix.getMomentumAtArcLength(arcLength, nominalBz);
-            int chargeSign = expectedHelix.getChargeSign();
 
-            EXPECT_NEAR(tanLambda, 1 / tan(momentum.Theta()), absError);
-            EXPECT_ANGLE_NEAR(phi0 + chi, momentum.Phi(), absError);
-            EXPECT_NEAR(z0 + tanLambda * arcLength, position.Z(), absError);
+            if (omega == 0) {
+              // Use chi as the arc length in the straight line case
+              float arcLength = chi;
 
-            //B2INFO("chi out " << chi);
-            Helix helix(position, momentum, chargeSign, nominalBz);
+              // Tangential vector shall not change along the line
+              TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+              EXPECT_ALL_NEAR(tangentialAtPerigee, tangential, absError);
 
-            EXPECT_NEAR(expectedHelix.getOmega(), helix.getOmega(), absError);
-            EXPECT_ANGLE_NEAR(expectedHelix.getPhi0(), helix.getPhi0(), absError);
-            EXPECT_NEAR(expectedHelix.getD0(), helix.getD0(), absError);
-            EXPECT_NEAR(expectedHelix.getTanLambda(), helix.getTanLambda(), absError);
-            EXPECT_NEAR(expectedHelix.getZ0(), helix.getZ0(), absError);
-          }
-        }
+            } else {
+              float arcLength = -chi / omega;
+              TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
 
-      }
-    }
-  }
-}
+              float actualChi = tangential.DeltaPhi(tangentialAtPerigee);
+              EXPECT_ANGLE_NEAR(chi, actualChi, absError);
+              EXPECT_FLOAT_EQ(tangentialAtPerigee.Theta(), tangential.Theta());
+              EXPECT_FLOAT_EQ(1, tangential.Mag());
 
+            }
 
-
-
-
-TEST_F(HelixTest, CalculateDrExplicit)
-{
-  float tanLambda = 3;
-
-  TVector3 center(0.0, -2.0, 0.0);
-  float radius = -1;
-
-  Helix helix = helixFromCenter(center, radius, tanLambda);
-  EXPECT_NEAR(-1, helix.getD0(), absError);
-  EXPECT_ANGLE_NEAR(-M_PI, helix.getPhi0(), absError);
-  EXPECT_NEAR(-1, helix.getOmega(), absError);
-  {
-    TVector3 position(0.0, 0.0, 0.0);
-    float newD0 = helix.getDr(position);
-    EXPECT_NEAR(-1, newD0, absError);
-  }
-
-  {
-    TVector3 position(2.0, -2.0, 0.0);
-    float newD0 = helix.getDr(position);
-    EXPECT_NEAR(-1, newD0, absError);
-  }
-  {
-    TVector3 position(-2.0, -2.0, 0.0);
-    float newD0 = helix.getDr(position);
-    EXPECT_NEAR(-1, newD0, absError);
-  }
-
-  {
-    TVector3 position(1.0, -1.0, 0.0);
-    float newD0 = helix.getDr(position);
-    EXPECT_NEAR(-(sqrt(2) - 1) , newD0, absError);
-  }
-}
-
-TEST_F(HelixTest, CalculateDr)
-{
-  float z0 = 2;
-  float tanLambda = 3;
-
-  for (const float phi0 : phi0s) {
-    for (const float omega : omegas) {
-      for (const float d0 : d0s) {
-        Helix helix(d0, phi0, omega, z0, tanLambda);
-        TEST_CONTEXT("Failed for " << helix);
-
-        EXPECT_NEAR(d0, helix.getDr(TVector3(0.0, 0.0, 0.0)), absError);
-
-        for (const float chi : chis) {
-          for (const float newD0 : d0s) {
-            // In the line case use the chi value directly as the arc length
-
-            float arcLength = omega == 0 ? chi : -chi / omega;
-            TVector3 positionOnHelix = helix.getPositionAtArcLength(arcLength);
-
-            TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength(arcLength);
-
-            TVector3 perpendicularToHelix = tangentialToHelix;
-            perpendicularToHelix.RotateZ(M_PI / 2.0);
-            // Normalize the xy part
-            perpendicularToHelix *= 1 / perpendicularToHelix.Perp();
-
-            TVector3 displacementFromHelix = perpendicularToHelix * newD0;
-            TVector3 testPosition = positionOnHelix + displacementFromHelix;
-
-            TEST_CONTEXT("Failed for chi " << chi);
-            TEST_CONTEXT("Failed for position on helix " << positionOnHelix);
-            TEST_CONTEXT("Failed for tangential to helix " << tangentialToHelix);
-            TEST_CONTEXT("Failed for perpendicular to helix " << perpendicularToHelix);
-            TEST_CONTEXT("Failed for test position " << testPosition);
-
-            float testDr = helix.getDr(testPosition);
-            EXPECT_NEAR(newD0, testDr, absError);
           }
         }
       }
     }
   }
-}
 
 
-TEST_F(HelixTest, PassiveMoveExplicit)
-{
-  TVector3 center(0.0, 1.0, 0.0);
-  float radius = -1;
-  float tanLambda = 3;
+  TEST_F(HelixTest, MomentumExtrapolation)
+  {
+    float z0 = 0;
+    float tanLambda = -2;
 
-  Helix helix = helixFromCenter(center, radius, tanLambda);
+    for (const float d0 : d0s) {
+      for (const float phi0 : phi0s) {
+        for (const float omega : omegas) {
+          if (omega != 0) {
 
-  ASSERT_NEAR(0, helix.getD0(), absError);
-  ASSERT_ANGLE_NEAR(0, helix.getPhi0(), absError);
-  ASSERT_NEAR(-1, helix.getOmega(), absError);
-
-  // Save the untransformed Helix
-  Helix expectedHelix(helix);
-
-  // Vector by which the coordinate system should move.
-  // (To the top of the circle)
-  TVector3 by(1.0, 1.0, 0.0);
-
-  float arcLength = helix.passiveMoveBy(by);
-
-  // The left of the circle lies in the counterclockwise direction
-  // The forward direction is counterclockwise, so we expect to move forward.
-  ASSERT_NEAR(M_PI / 2, arcLength, absError);
-
-  ASSERT_NEAR(0, helix.getD0(), absError);
-  ASSERT_ANGLE_NEAR(M_PI / 2, helix.getPhi0(), absError);
-  ASSERT_NEAR(-1, helix.getOmega(), absError);
-
-  ASSERT_NEAR(3 * M_PI / 2, helix.getZ0(), absError);
-  ASSERT_NEAR(3, helix.getTanLambda(), absError);
-
-  // Now transform back to the original point
-  float arcLengthBackward = helix.passiveMoveBy(-by);
-
-  ASSERT_NEAR(arcLength, -arcLengthBackward, absError);
-  ASSERT_ALL_NEAR(expectedHelix, helix, absError);
-}
-
-
-TEST_F(HelixTest, PassiveMove)
-{
-  float z0 = 2;
-  float tanLambda = 3;
-
-  for (const float phi0 : phi0s) {
-    for (const float omega : omegas) {
-      for (const float d0 : d0s) {
-        for (const float chi : chis) {
-          for (const float newD0 : d0s) {
             Helix helix(d0, phi0, omega, z0, tanLambda);
-            TEST_CONTEXT("Failed for " << helix);
+            TVector3 momentumAtPerigee = helix.getMomentum();
+            for (const float chi : chis) {
 
-            // In the line case use the chi value directly as the arc length
+              float arcLength = -chi / omega;
+              TVector3 extrapolatedMomentum = helix.getMomentumAtArcLength(arcLength, nominalBz);
 
-            float expectedArcLength = omega == 0 ? chi : -chi / omega;
-            TVector3 positionOnHelix = helix.getPositionAtArcLength(expectedArcLength);
-            TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength(expectedArcLength);
+              float actualChi = extrapolatedMomentum.DeltaPhi(momentumAtPerigee);
+              EXPECT_ANGLE_NEAR(chi, actualChi, absError);
+              EXPECT_FLOAT_EQ(momentumAtPerigee.Theta(), extrapolatedMomentum.Theta());
+              EXPECT_FLOAT_EQ(momentumAtPerigee.Mag(), extrapolatedMomentum.Mag());
+            }
+          }
+        }
+      }
+    }
+  }
 
-            TVector3 perpendicularToHelix = tangentialToHelix;
-            perpendicularToHelix.RotateZ(M_PI / 2.0);
-            // Normalize the xy part
-            perpendicularToHelix *= 1 / perpendicularToHelix.Perp();
 
-            TVector3 displacementFromHelix = -perpendicularToHelix * newD0;
-            TVector3 testPosition = positionOnHelix + displacementFromHelix;
 
-            TVector3 expectedPerigee = -displacementFromHelix;
+  TEST_F(HelixTest, Extrapolation)
+  {
 
-            TEST_CONTEXT("Failed for chi " << chi);
-            TEST_CONTEXT("Failed for position on helix " << positionOnHelix);
-            TEST_CONTEXT("Failed for tangential to helix " << tangentialToHelix);
-            TEST_CONTEXT("Failed for perpendicular to helix " << perpendicularToHelix);
-            TEST_CONTEXT("Failed for test position " << testPosition);
+    // z coordinates do not matter for this test.
+    float z0 = 0;
+    float tanLambda = 2;
 
-            float arcLength = helix.passiveMoveBy(testPosition);
+    for (const float d0 : d0s) {
+      for (const float phi0 : phi0s) {
+        for (const float omega : omegas) {
 
-            ASSERT_NEAR(expectedArcLength, arcLength, absError);
+          Helix helix(d0, phi0, omega, z0, tanLambda);
+          TVector3 perigee = helix.getPosition();
 
-            ASSERT_ALL_NEAR(expectedPerigee, helix.getPosition(), absError);
+          TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
+          TEST_CONTEXT("Failed for " << helix);
 
+          //continue;
+
+          for (const float chi : chis) {
+            TEST_CONTEXT("Failed for chi = " << chi);
+
+            // In the cases where omega is 0 (straight line case) chi become undefined.
+            // Use chi sample as transverse travel distance instead.
+            float expectedArcLength = omega != 0 ? -chi / omega : chi;
+            TVector3 pointOnHelix = helix.getPositionAtArcLength(expectedArcLength);
+
+            float polarR = pointOnHelix.Perp();
+            float arcLength = helix.getArcLengthAtPolarR(polarR);
+
+            // Only the absolute value is returned.
+            EXPECT_NEAR(fabs(expectedArcLength), arcLength, absError);
+
+            // Also check it the extrapolation lies in the forward direction.
+            TVector3 secantVector = pointOnHelix - perigee;
+
+            if (expectedArcLength == 0) {
+              EXPECT_NEAR(0, secantVector.Mag(), absError);
+            } else {
+              TVector2 secantVectorXY = secantVector.XYvector();
+
+              TVector2 tangentialXY = tangentialAtPerigee.XYvector();
+              float coalignment = secantVectorXY * tangentialXY ;
+
+              bool extrapolationIsForward = coalignment > 0;
+              bool expectedIsForward = expectedArcLength > 0;
+              EXPECT_EQ(expectedIsForward, extrapolationIsForward);
+            }
+          }
+        }
+      }
+    }
+  } // end TEST_F
+
+
+  TEST_F(HelixTest, PerigeeExtrapolateRoundTrip)
+  {
+    float z0 = 0;
+    float tanLambda = -2;
+
+    for (const float d0 : d0s) {
+      for (const float phi0 : phi0s) {
+        for (const float omega : omegas) {
+
+          // Extrapolations involving the momentum only makes sense with finit momenta
+          if (omega != 0) {
+            Helix expectedHelix(d0, phi0, omega, z0, tanLambda);
+
+            for (const float chi : chis) {
+              float arcLength = -chi / omega;
+              TVector3 position = expectedHelix.getPositionAtArcLength(arcLength);
+              TVector3 momentum = expectedHelix.getMomentumAtArcLength(arcLength, nominalBz);
+              int chargeSign = expectedHelix.getChargeSign();
+
+              EXPECT_NEAR(tanLambda, 1 / tan(momentum.Theta()), absError);
+              EXPECT_ANGLE_NEAR(phi0 + chi, momentum.Phi(), absError);
+              EXPECT_NEAR(z0 + tanLambda * arcLength, position.Z(), absError);
+
+              //B2INFO("chi out " << chi);
+              Helix helix(position, momentum, chargeSign, nominalBz);
+
+              EXPECT_NEAR(expectedHelix.getOmega(), helix.getOmega(), absError);
+              EXPECT_ANGLE_NEAR(expectedHelix.getPhi0(), helix.getPhi0(), absError);
+              EXPECT_NEAR(expectedHelix.getD0(), helix.getD0(), absError);
+              EXPECT_NEAR(expectedHelix.getTanLambda(), helix.getTanLambda(), absError);
+              EXPECT_NEAR(expectedHelix.getZ0(), helix.getZ0(), absError);
+            }
+          }
+
+        }
+      }
+    }
+  }
+
+
+
+
+
+  TEST_F(HelixTest, CalculateDrExplicit)
+  {
+    float tanLambda = 3;
+
+    TVector3 center(0.0, -2.0, 0.0);
+    float radius = -1;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+    EXPECT_NEAR(-1, helix.getD0(), absError);
+    EXPECT_ANGLE_NEAR(-M_PI, helix.getPhi0(), absError);
+    EXPECT_NEAR(-1, helix.getOmega(), absError);
+    {
+      TVector3 position(0.0, 0.0, 0.0);
+      float newD0 = helix.getDr(position);
+      EXPECT_NEAR(-1, newD0, absError);
+    }
+
+    {
+      TVector3 position(2.0, -2.0, 0.0);
+      float newD0 = helix.getDr(position);
+      EXPECT_NEAR(-1, newD0, absError);
+    }
+    {
+      TVector3 position(-2.0, -2.0, 0.0);
+      float newD0 = helix.getDr(position);
+      EXPECT_NEAR(-1, newD0, absError);
+    }
+
+    {
+      TVector3 position(1.0, -1.0, 0.0);
+      float newD0 = helix.getDr(position);
+      EXPECT_NEAR(-(sqrt(2) - 1) , newD0, absError);
+    }
+  }
+
+  TEST_F(HelixTest, CalculateDr)
+  {
+    float z0 = 2;
+    float tanLambda = 3;
+
+    for (const float phi0 : phi0s) {
+      for (const float omega : omegas) {
+        for (const float d0 : d0s) {
+          Helix helix(d0, phi0, omega, z0, tanLambda);
+          TEST_CONTEXT("Failed for " << helix);
+
+          EXPECT_NEAR(d0, helix.getDr(TVector3(0.0, 0.0, 0.0)), absError);
+
+          for (const float chi : chis) {
+            for (const float newD0 : d0s) {
+              // In the line case use the chi value directly as the arc length
+
+              float arcLength = omega == 0 ? chi : -chi / omega;
+              TVector3 positionOnHelix = helix.getPositionAtArcLength(arcLength);
+
+              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength(arcLength);
+
+              TVector3 perpendicularToHelix = tangentialToHelix;
+              perpendicularToHelix.RotateZ(M_PI / 2.0);
+              // Normalize the xy part
+              perpendicularToHelix *= 1 / perpendicularToHelix.Perp();
+
+              TVector3 displacementFromHelix = perpendicularToHelix * newD0;
+              TVector3 testPosition = positionOnHelix + displacementFromHelix;
+
+              TEST_CONTEXT("Failed for chi " << chi);
+              TEST_CONTEXT("Failed for position on helix " << positionOnHelix);
+              TEST_CONTEXT("Failed for tangential to helix " << tangentialToHelix);
+              TEST_CONTEXT("Failed for perpendicular to helix " << perpendicularToHelix);
+              TEST_CONTEXT("Failed for test position " << testPosition);
+
+              float testDr = helix.getDr(testPosition);
+              EXPECT_NEAR(newD0, testDr, absError);
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+  TEST_F(HelixTest, PassiveMoveExplicit)
+  {
+    TVector3 center(0.0, 1.0, 0.0);
+    float radius = -1;
+    float tanLambda = 3;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+
+    ASSERT_NEAR(0, helix.getD0(), absError);
+    ASSERT_ANGLE_NEAR(0, helix.getPhi0(), absError);
+    ASSERT_NEAR(-1, helix.getOmega(), absError);
+
+    // Save the untransformed Helix
+    Helix expectedHelix(helix);
+
+    // Vector by which the coordinate system should move.
+    // (To the top of the circle)
+    TVector3 by(1.0, 1.0, 0.0);
+
+    float arcLength = helix.passiveMoveBy(by);
+
+    // The left of the circle lies in the counterclockwise direction
+    // The forward direction is counterclockwise, so we expect to move forward.
+    ASSERT_NEAR(M_PI / 2, arcLength, absError);
+
+    ASSERT_NEAR(0, helix.getD0(), absError);
+    ASSERT_ANGLE_NEAR(M_PI / 2, helix.getPhi0(), absError);
+    ASSERT_NEAR(-1, helix.getOmega(), absError);
+
+    ASSERT_NEAR(3 * M_PI / 2, helix.getZ0(), absError);
+    ASSERT_NEAR(3, helix.getTanLambda(), absError);
+
+    // Now transform back to the original point
+    float arcLengthBackward = helix.passiveMoveBy(-by);
+
+    ASSERT_NEAR(arcLength, -arcLengthBackward, absError);
+    ASSERT_ALL_NEAR(expectedHelix, helix, absError);
+  }
+
+
+  TEST_F(HelixTest, PassiveMove)
+  {
+    float z0 = 2;
+    float tanLambda = 3;
+
+    for (const float phi0 : phi0s) {
+      for (const float omega : omegas) {
+        for (const float d0 : d0s) {
+          for (const float chi : chis) {
+            for (const float newD0 : d0s) {
+              Helix helix(d0, phi0, omega, z0, tanLambda);
+              TEST_CONTEXT("Failed for " << helix);
+
+              // In the line case use the chi value directly as the arc length
+
+              float expectedArcLength = omega == 0 ? chi : -chi / omega;
+              TVector3 positionOnHelix = helix.getPositionAtArcLength(expectedArcLength);
+              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength(expectedArcLength);
+
+              TVector3 perpendicularToHelix = tangentialToHelix;
+              perpendicularToHelix.RotateZ(M_PI / 2.0);
+              // Normalize the xy part
+              perpendicularToHelix *= 1 / perpendicularToHelix.Perp();
+
+              TVector3 displacementFromHelix = -perpendicularToHelix * newD0;
+              TVector3 testPosition = positionOnHelix + displacementFromHelix;
+
+              TVector3 expectedPerigee = -displacementFromHelix;
+
+              TEST_CONTEXT("Failed for chi " << chi);
+              TEST_CONTEXT("Failed for position on helix " << positionOnHelix);
+              TEST_CONTEXT("Failed for tangential to helix " << tangentialToHelix);
+              TEST_CONTEXT("Failed for perpendicular to helix " << perpendicularToHelix);
+              TEST_CONTEXT("Failed for test position " << testPosition);
+
+              float arcLength = helix.passiveMoveBy(testPosition);
+
+              ASSERT_NEAR(expectedArcLength, arcLength, absError);
+
+              ASSERT_ALL_NEAR(expectedPerigee, helix.getPosition(), absError);
+
+            }
           }
         }
       }
     }
   }
 }
-

@@ -13,7 +13,6 @@
 #include <libxml/parser.h>
 #include <libxml/xinclude.h>
 #include <libxml/xmlIO.h>
-#include <memory>
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
@@ -79,8 +78,8 @@ namespace Belle2 {
 
   Gearbox& Gearbox::getInstance()
   {
-    static auto_ptr<Gearbox> instance(new Gearbox());
-    return *instance;
+    static Gearbox instance;
+    return instance;
   }
 
   gearbox::InputContext* Gearbox::openXmlUri(const string& uri) const

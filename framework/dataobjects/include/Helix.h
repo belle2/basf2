@@ -123,15 +123,28 @@ namespace Belle2 {
      *  Gives the circle arc length in the forward direction that is traversed until a certain polar radius (polar means the polar coordinates in the xy projection) is reached.
      *  Returns NAN, if the polar radius can not be reached, either because it is to far outside or inside of the perigee.
      *
-     *  Forward the result to getPositionAtArcLength() or getMomentumAtArcLength() in order to extrapolate to the concentrical detector boundaries.
+     *  Forward the result to getPositionAtArcLength() or getMomentumAtArcLength() in order to extrapolate to the cylinder detector boundaries.
      *
-     *  The result always has a positive sign. Hence it refers to the forward direction. Adding a minus sign yields the point at the same polar radius
-     *  but in he backward direction.
+     *  The result always has a positive sign. Hence it refers to the forward direction.
+     *  Adding a minus sign yields the point at the same polar radius but in the backward direction.
      *
      *  @param polarR  The polar radius in question (polar means the polar coordinates in the xy projection).
      *  @return        The circle arc length traversed to reach the polar radius. NAN if it can not be reached.
      */
     float getArcLengthAtPolarR(const float& polarR) const;
+
+    /** Calculates the circle arc length at which the circle in the xy projection is closest to the point
+     *
+     *  This calculates the arc length to the closest approach in xy projection.
+     *  Hence, it only optimizes the distance in x and y.
+     *  This is sufficent to extrapolate to an axial wire.
+     *  For stereo wires this is not optimal, since the distance in the z direction also plays a role.
+     *
+     *  @param x        X coordinate of the point to which to extrapolate
+     *  @param y        Y coordinate of the point to which to extrapolate
+     *  @return         The circle arc length from the perigee at which the closest approach is reached
+     */
+    float getArcLengthAtXY(const float& x, const float& y) const;
 
     /** Calculates the position on the helix at the given arc length
      *
@@ -171,11 +184,6 @@ namespace Belle2 {
      */
     float passiveMoveBy(const TVector3& by);
 
-
-    /** Calculates the signed distance of the helix to the point in the xy projection. */
-    float getDr(const TVector3& position) const;
-
-
     /** Reverses the direction of travel of the helix in place.
      *
      *  The same points are located on the helix stay the same after the transformation,
@@ -201,15 +209,35 @@ namespace Belle2 {
      */
     double calcArcLengthFromSecantLength(const double& secantLength) const;
 
-
     /** Helper function to calculate the factor between the secant length and the circle arc length as seen in xy projection of the helix
      */
     double calcSecantLengthToArcLengthFactor(const double& secantLength) const;
+    /// @}
 
   private:
     /** Implementation of the function asin(x) / x which handles small x values smoothly. */
     static double calcASinXDividedByX(const double& x);
-    /// @}
+
+    /** Helper method to calculate the signed circle arc length and the signed distance to the circle of a point in the xy projection.
+     *
+     *  This function is an implementation detail that prevents some code duplication.
+     *
+     *  @param x                   X coordinate of the point to which to extrapolate
+     *  @param y                   Y coordinate of the point to which to extrapolate
+     *  @param arcLength[out]      The circle arc length from the perigee at which the closest approach is reached
+     *  @param dr[out]             Signed distance of the point to circle in the xy projection.
+     */
+    void calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLength, double& dr) const;
+
+    /** Helper method to calculate the circle arc length of a point at polar radius in the *from the perigee* and has the distance dr from the circle in the xy projection
+     *
+     *  This function is an implementation detail that prevents some code duplication.
+     *
+     *  @param deltaPolarR         Direct absolute distance of the point to the perigee in the xy projection
+     *  @param dr                  Signed distance of the point to circle in the xy projection.
+     *  @return                    The absolute arc length from the perigee to the point.*
+     */
+    double calcArcLengthAtDeltaPolarRAndDr(const double& deltaPolarRSquared, const double& dr) const;
 
 
 

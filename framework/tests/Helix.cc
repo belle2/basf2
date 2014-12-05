@@ -464,7 +464,7 @@ namespace {
 
 
 
-
+  /*
   TEST_F(HelixTest, CalculateDrExplicit)
   {
     float tanLambda = 3;
@@ -544,7 +544,7 @@ namespace {
       }
     }
   }
-
+  */
 
   TEST_F(HelixTest, PassiveMoveExplicit)
   {
@@ -562,12 +562,12 @@ namespace {
     Helix expectedHelix(helix);
 
     // Vector by which the coordinate system should move.
-    // (To the top of the circle)
+    // (To the right of the circle)
     TVector3 by(1.0, 1.0, 0.0);
 
     float arcLength = helix.passiveMoveBy(by);
 
-    // The left of the circle lies in the counterclockwise direction
+    // The right of the circle lies in the counterclockwise direction
     // The forward direction is counterclockwise, so we expect to move forward.
     ASSERT_NEAR(M_PI / 2, arcLength, absError);
 
@@ -589,7 +589,7 @@ namespace {
   TEST_F(HelixTest, PassiveMove)
   {
     float z0 = 2;
-    float tanLambda = 3;
+    float tanLambda = 2;
 
     for (const float phi0 : phi0s) {
       for (const float omega : omegas) {

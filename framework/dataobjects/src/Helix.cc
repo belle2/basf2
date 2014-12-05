@@ -80,24 +80,37 @@ void Helix::reverse()
 
 float Helix::getArcLengthAtPolarR(const float& polarR) const
 {
-  double d0 = getD0();
-  double omega = getOmega();
-  double secantLength = sqrt(((double)polarR * polarR  - d0 * d0) / (1 + d0 * omega));
-  return calcArcLengthFromSecantLength(secantLength);
+  // Slight trick here
+  // Since the sought point is on the helix we treat it as the perigee
+  // and the origin as the point to extrapolate to.
+  // We know the distance of the origin to the circle, which is just d0
+  // The direct distance from the origin to the imaginary perigee is just the given polarR.
+  const float dr = getD0();
+  const float deltaPolarR = polarR;
+  const double absArcLength = calcArcLengthAtDeltaPolarRAndDr(deltaPolarR, dr);
+  return absArcLength;
+}
+
+float Helix::getArcLengthAtXY(const float& x, const float& y) const
+{
+  double dr = 0;
+  double arcLength = 0;
+  calcArcLengthAndDrAtXY(x, y, arcLength, dr);
+  return arcLength;
 }
 
 TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
 {
   /*
     /   \     /                      \     /                             \
-    | x |     | cos phi0   -sin phi0 |     |      sin(chi)  / omega      |
+    | x |     | cos phi0   -sin phi0 |     |    - sin(chi)  / omega      |
     |   |  =  |                      |  *  |                             |
     | y |     | sin phi0    cos phi0 |     | (1 - cos(chi)) / omega - d0 |
     \   /     \                      /     \                             /
 
     and
 
-    z = tanLambda * chi / omega + z0;
+    z = tanLambda * arclength + z0;
 
     where chi = -arcLength * omega
 
@@ -173,28 +186,12 @@ TVector3 Helix::getMomentumAtArcLength(const float& arcLength, const float& bz) 
 float Helix::passiveMoveBy(const TVector3& by)
 {
   // First calculate the distance of the new origin to the helix in the xy projection
-  double new_d0 = getDr(by);
-
-  // Second calculate the arc length from the old perigee to the new.
-  double omega = getOmega();
-  TVector3 perigee = getPosition();
-
-  TVector3 delta = perigee - by;
-  double polarRSquare = delta.Perp2();
-
-  // When polarR and d0 are approximatly the same and the resulting difference of the squares turns out
-  // to be -10^-18 in double precision, which makes the sqrt return nan.
-  // Do calculation in float precision here to negating these rounding errors of order -10^-18.
-  double absSecantLength = sqrt(((float)polarRSquare - (float)new_d0 * (float)new_d0) / (1 + new_d0 * omega));
-  double absArcLength = calcArcLengthFromSecantLength(absSecantLength);
-
-  double isForward = getCosPhi0() * by.X() + getSinPhi0() * by.Y();
-
-  // Fixing the sign looking if the new origin lies in the forward direction in the xy projection.
-  double arcLength = std::copysign(absArcLength, isForward);
+  double new_d0 = 0;
+  double arcLength = 0;
+  calcArcLengthAndDrAtXY(by.X(), by.Y(), arcLength, new_d0);
 
   // Third the new phi0 and z0 can be calculated from the arc length
-  double chi = -arcLength * omega;
+  double chi = -arcLength * getOmega();
   double new_phi0 = m_phi0 + chi;
   double new_z0 = m_z0 - by.Z() + getTanLambda() * arcLength;
 
@@ -206,34 +203,8 @@ float Helix::passiveMoveBy(const TVector3& by)
   return arcLength;
 }
 
-
-float Helix::getDr(const TVector3& position) const
-{
-  // The curvature in the bend plain (xy) is the opposite of the charge.
-  double omega = getOmega();
-
-  TVector3 perigee = getPosition();
-
-  double cosPhi0 = getCosPhi0();
-  double sinPhi0 = getSinPhi0();
-
-  TVector3 delta = perigee - position;
-
-  // double deltaParallel   =    delta.X() * cosPhi0   + delta.Y() * sinPhi0;
-  double deltaOrthogonal =  - delta.Y() * cosPhi0   + delta.X() * sinPhi0;
-
-  double deltaPolarRSquare =  delta.X() * delta.X() + delta.Y() * delta.Y();
-
-  double A = 2 * deltaOrthogonal + omega * deltaPolarRSquare;
-  double U = sqrt(1 + omega * A);
-
-  return A / (1 + U);
-
-}
-
 double Helix::calcArcLengthFromSecantLength(const double& secantLength) const
 {
-
   return secantLength * calcSecantLengthToArcLengthFactor(secantLength);
 }
 
@@ -283,6 +254,51 @@ double Helix::calcASinXDividedByX(const double& x)
 
 }
 
+void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLength, double& dr) const
+{
+  // Prepare common variables
+  const double omega = getOmega();
+  const double cosPhi0 = getCosPhi0();
+  const double sinPhi0 = getSinPhi0();
+
+  const double perigeeX = calcXFromPerigee();
+  const double perigeeY = calcYFromPerigee();
+
+  const double deltaX = x - perigeeX;
+  const double deltaY = y - perigeeY;
+
+  const double deltaParallel = deltaX * cosPhi0 + deltaY * sinPhi0;
+  const double deltaOrthogonal = deltaY * cosPhi0 - deltaX * sinPhi0;
+  const double deltaPolarR = hypot(deltaX, deltaY);
+  const double deltaPolarRSquared = deltaPolarR * deltaPolarR;
+
+  // Calculate dr
+  const double A = 2 * deltaOrthogonal + omega * deltaPolarRSquared;
+  const double U = sqrt(1 + omega * A);
+  dr = A / (1 + U);
+
+  // Calculate the absolute value of the arc length
+  const double absArcLength = calcArcLengthAtDeltaPolarRAndDr(deltaPolarR, dr);
+
+  // Fixing the sign looking if the new origin lies in the forward direction in the xy projection.
+  arcLength = std::copysign(absArcLength, deltaParallel);
+}
+
+double Helix::calcArcLengthAtDeltaPolarRAndDr(const double& deltaPolarR, const double& dr) const
+{
+  const double omega = getOmega();
+
+  // When polarR and d0 are approximatly the same and the resulting difference of the squares turns out
+  // to be -10^-18 in double precision, which makes the sqrt return nan.
+  // Do calculation in single precision here to negating these rounding errors of order -10^-18.
+  float deltaPolarRSquared = deltaPolarR * deltaPolarR;
+  float drSquared = dr * dr;
+  double secantLength = sqrt((deltaPolarRSquared - drSquared) / (1 + dr * omega));
+  // Note : The above line results from simplifications for the normal n_0, n_1, n_2, n_3 representation
+  // It might have an geometrical interpretation. If you have one please insert it here.
+
+  return calcArcLengthFromSecantLength(secantLength);
+}
 
 void Helix::cartesianToPerigee(const TVector3& position,
                                const TVector3& momentum,
@@ -337,10 +353,6 @@ void Helix::cartesianToPerigee(const TVector3& position,
   const double cosPhi0 = cos(phi0);
   const double sinPhi0 = sin(phi0);
 
-  // Originally was
-  // const double cosphi0chi = charge * ptinv * px;  // cos(phi0 + chi)
-  // const double sinphi0chi = charge * ptinv * py;  // sin(phi0 + chi)
-
   const double cosphi0chi = ptinv * px;  // cos(phi0 + chi)
   const double sinphi0chi = ptinv * py;  // sin(phi0 + chi)
 
@@ -349,13 +361,8 @@ void Helix::cartesianToPerigee(const TVector3& position,
 
   const double chi = atan2(sinchi, coschi);
 
-  //B2INFO("chi out " << chi);
-
   const double arcLength = -chi / omega;
   const double z0 = z - arcLength * tanLambda;
-
-  // Original
-  // const double z0 = z + charge / omega * tanLambda * chi;
 
   m_omega = omega;
   m_phi0 = phi0;
@@ -364,65 +371,6 @@ void Helix::cartesianToPerigee(const TVector3& position,
   m_z0 = z0;
 
 }
-
-// void Helix::cartesianToPerigee(const TVector3& position,
-//                                const TVector3& tangential,
-//                                const float& omega)
-// {
-
-// #if 0
-//   px = cos(phi0 + chi) / alpha / omega;
-//   py = sin(phi0 + chi) / alpha / omega;
-//   pz = charge * tanLambda / alpha / omega;
-//   x =  d0 * sin(phi0) + charge / omega * (sin(phi0 + chi) - sin(phi0));
-//   y = -d0 * cos(phi0) + charge / omega * (-cos(phi0 + chi) + cos(phi0));
-//   z = z0 + charge / omega * tanLambda * chi;
-// #endif
-
-
-//   const double x = position.X();
-//   const double y = position.Y();
-//   const double z = position.Z();
-
-//   const double px = momentum.X();
-//   const double py = momentum.Y();
-//   const double pz = momentum.Z();
-
-//   // We find the perigee parameters by inverting this system of
-//   // equations and solving for the six variables d0, phi0, omega, z0,
-//   // tanLambda, chi.
-
-//   const double ptinv = 1 / hypot(px, py);
-//   //const double omega = charge * ptinv / alpha;
-//   const double tanLambda = tangential.Z() / tangential.Perp();
-
-//   const double cosphi0chi = tangential.X() / tangential.Perp(); // cos(phi0 + chi)
-//   const double sinphi0chi = tangential.Y() / tangential.Perp(); // sin(phi0 + chi)
-
-//   // Helix center in the (x, y) plane time omega:
-//   const double helX = omega * x + charge * sinphi0chi;
-//   const double helY = omega * y - charge * cosPhi0chi;
-//   //const double rhoHel = hypot(helX, helY);
-
-//   const double d0 = charge / (hypot(helX, helY) + 1);
-
-//   double phi0 = atan2(helY, helX) + charge * M_PI / 2;
-//   // Bring phi0 to the interval [-pi, pi]
-//   phi0 = remainder(phi0, 2 * M_PI);
-
-//   const double sinchi = sinphi0chi * cos(phi0) - cosphi0chi * sin(phi0);
-//   const double chi = asin(sinchi);
-//   const double z0 = z + charge / omega * tanLambda * chi;
-
-//   m_omega = omega;
-//   m_phi0 = phi0;
-//   m_d0 = d0;
-//   m_tanLambda = tanLambda;
-//   m_z0 = z0;
-
-
-
-// }
 
 double Helix::calcXFromPerigee() const
 {

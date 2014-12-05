@@ -41,8 +41,9 @@ namespace Belle2 {
      *  @returns A RelationIndexContainer
      */
     template<class FROM, class TO> const std::shared_ptr<RelationIndexContainer<FROM, TO>> get(const RelationArray& relation) {
-      //do some type checking...
-      relation.isValid();
+      const static bool doTypeCheck = (FROM::Class() != TObject::Class() or TO::Class() != TObject::Class());
+      if (doTypeCheck)
+        relation.isValid();
 
       const std::string& name = relation.getName();
       DataStore::EDurability durability = relation.getDurability();

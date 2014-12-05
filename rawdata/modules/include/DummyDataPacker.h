@@ -23,6 +23,12 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
+#include <rawdata/dataobjects/RawSVD.h>
+#include <rawdata/dataobjects/RawCDC.h>
+#include <rawdata/dataobjects/RawBPID.h>
+#include <rawdata/dataobjects/RawEPID.h>
+#include <rawdata/dataobjects/RawECL.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 
 namespace Belle2 {
@@ -55,7 +61,7 @@ namespace Belle2 {
     int max_nevt;
 
     //! Node ID
-    int m_nodeid;
+    //    int m_nodeid;
 
     //! Number of events
     int n_basf2evt;
@@ -70,7 +76,25 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     //! RawCOPPER array
-    StoreArray<RawCOPPER> rawcprarray;
+    StoreArray<RawCOPPER> raw_cprarray;
+
+    //! RawSVD array
+    StoreArray<RawSVD> raw_svdarray;
+
+    //! RawCDC array
+    StoreArray<RawCDC> raw_cdcarray;
+
+    //! RawBPID array
+    StoreArray<RawBPID> raw_bpidarray;
+
+    //! RawEPID array
+    StoreArray<RawEPID> raw_epidarray;
+
+    //! RawECL array
+    StoreArray<RawECL> raw_eclarray;
+
+    //! RawKLM array
+    StoreArray<RawKLM> raw_klmarray;
 
 
   };

@@ -1,6 +1,6 @@
 //+
 // File : DummyDataPacker.cc
-// Description : Module to store dummy data in RawCOPPER object
+// Description : Module to store dummy data in RawSVD(and others) object
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 14 - Jul - 2014
@@ -29,7 +29,7 @@ DummyDataPackerModule::DummyDataPackerModule() : Module()
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
 
   ///  maximum # of events to produce( -1 : inifinite)
-  addParam("NodeID", m_nodeid, "Node ID", 0);
+  //  addParam("NodeID", m_nodeid, "Node ID", 0);
 
   B2INFO("DummyDataPacker: Constructor done.");
 
@@ -57,8 +57,13 @@ void DummyDataPackerModule::initialize()
   /// Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
 
-  rawcprarray.registerPersistent();
-
+  raw_cprarray.registerPersistent();
+  raw_svdarray.registerPersistent();
+  raw_cdcarray.registerPersistent();
+  raw_bpidarray.registerPersistent();
+  raw_epidarray.registerPersistent();
+  raw_eclarray.registerPersistent();
+  raw_klmarray.registerPersistent();
   B2INFO("DummyDataPacker: initialize() done.");
 }
 
@@ -67,71 +72,97 @@ void DummyDataPackerModule::initialize()
 
 void DummyDataPackerModule::event()
 {
+  //
+  //  To Make RawCOPPER array
+  //
 
-  //    Make RawCOPPER array
-  rawcprarray.create();
-
+//  raw_cprarray.create();
 
   //
-  // Fill event info (These values will be stored in RawHeader )
+  // To make RawDetector array use the following objects
   //
+
+  raw_svdarray.create();
+//   raw_cdcarray.create();
+//   raw_bpidarray.create();
+//   raw_epidarray.create();
+//   raw_klmarray.create();
+//   raw_eclarray.create();
+
+
   RawCOPPERPackerInfo rawcprpacker_info;
-  rawcprpacker_info.exp_num = 1;
-  rawcprpacker_info.run_subrun_num = 2; // run number : 14bits, subrun # : 8bits
-  rawcprpacker_info.eve_num = n_basf2evt;
-  rawcprpacker_info.node_id = m_nodeid;
-  rawcprpacker_info.tt_ctime = 0x7123456;
-  rawcprpacker_info.tt_utime = 0xF1234567;
-  rawcprpacker_info.b2l_ctime = 0x7654321;
+
+  int num_coppers = 48; // In SVD case
+  for (int i ; i < num_coppers; i++) {
+
+    //
+    // Example of event info (These values will be stored in RawHeader )
+    //
+    rawcprpacker_info.exp_num = 1;
+    rawcprpacker_info.run_subrun_num = 2; // run number : 14bits, subrun # : 8bits
+    rawcprpacker_info.eve_num = n_basf2evt;
+    //    rawcprpacker_info.node_id = m_nodeid;
+    rawcprpacker_info.node_id = SVD_ID + 1000 + (i + 1);   //cpr1001...cpr1048
+    rawcprpacker_info.tt_ctime = 0x7123456;
+    rawcprpacker_info.tt_utime = 0xF1234567;
+    rawcprpacker_info.b2l_ctime = 0x7654321;
+
+    //
+    // Prepare buffer to fill dummy data
+    //
+//    RawCOPPER* raw_copper = raw_cprarray.appendNew();
+    RawSVD* raw_svd = raw_svdarray.appendNew();
+//     RawCDC* raw_cdc = raw_cdcarray.appendNew();
+//     RawBPID* raw_bpid = raw_bpidarray.appendNew();
+//     RawEPID* raw_epid = raw_epidarray.appendNew();
+//     RawECL* raw_ecl = raw_eclarray.appendNew();
+//     RawKLM* raw_klm = raw_klmarray.appendNew();
+
+
+    int* buf_hslb1, *buf_hslb2, *buf_hslb3, *buf_hslb4;
+    int nwords_1st_hslb = 0, nwords_2nd_hslb = 0, nwords_3rd_hslb = 0, nwords_4th_hslb = 0;
+
+    nwords_1st_hslb = n_basf2evt % 10 + 1;
+    buf_hslb1 = new int[ nwords_1st_hslb];
+    for (int i = 0; i < nwords_1st_hslb; i++) {
+      buf_hslb1[ i ] = i;
+    }
+
+    nwords_2nd_hslb = (n_basf2evt + 1) % 10 + 1;
+    buf_hslb2 = new int[ nwords_2nd_hslb];
+    for (int i = 0; i < nwords_2nd_hslb; i++) {
+      buf_hslb2[ i ] = i + 1;
+    }
+
+    nwords_3rd_hslb = 3 * (n_basf2evt + 2) % 10 + 1;
+    buf_hslb3 = new int[ nwords_3rd_hslb];
+    for (int i = 0; i < nwords_3rd_hslb; i++) {
+      buf_hslb3[ i ] = i + 2;
+    }
+
+    nwords_4th_hslb = 4 * (n_basf2evt + 3)  % 10 + 1;
+    buf_hslb4 = new int[ nwords_4th_hslb];
+    for (int i = 0; i < nwords_4th_hslb; i++) {
+      buf_hslb4[ i ] = i + 3;
+    }
+
+    raw_svd->PackDetectorBuf(buf_hslb1, nwords_1st_hslb,
+                             buf_hslb2, nwords_2nd_hslb,
+                             buf_hslb3, nwords_3rd_hslb,
+                             buf_hslb4, nwords_4th_hslb,
+                             rawcprpacker_info);
+
+
+    delete [] buf_hslb1;
+    delete [] buf_hslb2;
+    delete [] buf_hslb3;
+    delete [] buf_hslb4;
+
+  }
 
 
   //
-  // Prepare buffer to fill dummy data
-  //
-  RawCOPPER* raw_copper = rawcprarray.appendNew();
-
-  int* buf1, *buf2, *buf3, *buf4;
-  int nwords_1st = 0, nwords_2nd = 0, nwords_3rd = 0, nwords_4th = 0;
-
-  nwords_1st = n_basf2evt % 10;
-  buf1 = new int[ nwords_1st];
-  for (int i = 0; i < nwords_1st; i++) {
-    buf1[ i ] = i;
-  }
-
-  nwords_2nd = (n_basf2evt + 1) % 10;
-  buf2 = new int[ nwords_2nd];
-  for (int i = 0; i < nwords_2nd; i++) {
-    buf2[ i ] = i + 1;
-  }
-
-  nwords_3rd = 3 * (n_basf2evt + 2) % 10;
-  buf3 = new int[ nwords_3rd];
-  for (int i = 0; i < nwords_3rd; i++) {
-    buf3[ i ] = i + 2;
-  }
-
-  nwords_4th = 4 * (n_basf2evt + 3)  % 10;
-  buf4 = new int[ nwords_4th];
-  for (int i = 0; i < nwords_4th; i++) {
-    buf4[ i ] = i + 3;
-  }
-
-  raw_copper->PackDetectorBuf(buf1, nwords_1st,
-                              buf2, nwords_2nd,
-                              buf3, nwords_3rd,
-                              buf4, nwords_4th,
-                              rawcprpacker_info);
-
-
-
-  delete [] buf1;
-  delete [] buf2;
-  delete [] buf3;
-  delete [] buf4;
-
-  //
-  // Update EventMetaData : Not affect on the output
+  // Update EventMetaData :
   //
   m_eventMetaDataPtr.create();
   m_eventMetaDataPtr->setExperiment(rawcprpacker_info.exp_num);

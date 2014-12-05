@@ -288,43 +288,6 @@ namespace Belle2 {
     //--- Functions for internal conversions between cartesian and perigee helix parameters
     //--- This can be placed in a seperate header which handles all the conversion stuff
     //---------------------------------------------------------------------------------------------------------------------------
-    /**
-     * Calculates the signed distance between the origin and the perigee in the r-phi plane. The sign is positive (negative) if
-     * the angle between the perigee vector (d0) and the transverse momentum is +(-) pi/2.
-     * @param position in cartesian coordinates
-     * @param momentum in cartesian coordinates
-     * @return signed absolute value of d0
-     */
-    double calcD0FromCartesian(const TVector3& position, const TVector3& momentum) const;
-
-    /**
-     * Calculates the angle of the transverse momentum in the r-phi plane.
-     * @param momentum in cartesian coordinates
-     * @return phi in [-pi, [pi]
-     */
-    double calcPhiFromCartesian(const TVector3& momentum) const;
-
-    /**
-     * Calculates the signed curvature of the track.
-     * @param momentum in cartesian coordinates
-     * @param charge of the particle
-     * @param bZ at the perigee point
-     */
-    double calcOmegaFromCartesian(const TVector3& momentum, const short int charge, const float bZ) const;
-
-    /**
-     * Calculates the z component of the perigee vector.
-     * @param position in cartesian coordinates
-     * @return z0
-     */
-    double calcZ0FromCartesian(const TVector3& position) const;
-
-    /**
-     * Calculates the inverse slope of the track in the r-z plane.
-     * @param momentum in cartesian coordinates
-     * @return tanLambda = pz/pt
-     */
-    double calcTanLambdaFromCartesian(const TVector3& momentum) const;
 
     /**
      * Calculates the x coordinates of the perigee point with the internal stored parameters.

@@ -120,7 +120,8 @@ namespace Belle2 {
       analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
-    for (unsigned i = 0; i < plist->getListSize(); i++) {
+    unsigned int n = plist->getListSize();
+    for (unsigned i = 0; i < n; i++) {
       Particle* particle = plist->getParticle(i);
       bool ok = doVertexFit(particle);
       if (!ok and !m_dontDiscardOnError) toRemove.push_back(particle->getArrayIndex());

@@ -89,7 +89,8 @@ namespace Belle2 {
    * To loop over all particles (as well as their anti-particles) do the following
    *
      \code
-     for (unsigned i = 0; i < pList->getListSize(); i++) {
+     const unsigned int n = m_plist->getListSize();
+     for (unsigned i = 0; i < n; i++) {
       const Particle* particle = pList->getParticle(i);
 
       // do something with the particle
@@ -100,7 +101,8 @@ namespace Belle2 {
    * If you would like to loop over the particles stored in particular ParticleList and not the anti-particles as well,
    * do the following (set the boolean parameter in the relevant functions to false)
      \code
-     for (unsigned i = 0; i < pList->getListSize(false); i++) {
+     const unsigned int n = m_plist->getListSize(false);
+     for (unsigned i = 0; i < n; i++) {
       const Particle* particle = pList->getParticle(i, false);
 
       // do something with the particle
@@ -114,8 +116,9 @@ namespace Belle2 {
    * particles as well as to list for anti-particles):
    *
      \code
-     std::vector<unsigned int> toRemove;
-      for (unsigned i = 0; i < pList->getListSize(); i++) {
+      std::vector<unsigned int> toRemove;
+      const unsigned int n = m_plist->getListSize();
+      for (unsigned i = 0; i < n; i++) {
         const Particle* part = pList->getParticle(i);
         if (...particle should be removed...) toRemove.push_back(part->getArrayIndex());
       }
@@ -239,7 +242,7 @@ namespace Belle2 {
      * @param forAntiParticle - whether the Particle or SelfConjugatedParticle should be returned for this (false) or anti-particle list (true)
      * @return const reference to vector of indices
      */
-    std::vector<int> getList(EParticleType K, bool forAntiParticle = false) const;
+    const std::vector<int>& getList(EParticleType K, bool forAntiParticle = false) const;
 
     /**
      * Returns the name the anti-particle ParticleList.
@@ -274,8 +277,7 @@ namespace Belle2 {
      * @return number of particles or self-conjugated particles in the list or anti-particle list
      */
     unsigned getNParticlesOfType(EParticleType K, bool forAntiParticle = false) const {
-      const std::vector<int> list = getList(K, forAntiParticle);
-      return list.size();
+      return getList(K, forAntiParticle).size();
     }
 
     /**

@@ -208,7 +208,7 @@ unsigned ParticleList::getListSize(bool includingAntiList) const
   return size;
 }
 
-std::vector<int> ParticleList::getList(EParticleType K, bool forAntiParticle) const
+const std::vector<int>& ParticleList::getList(EParticleType K, bool forAntiParticle) const
 {
   if (!forAntiParticle) {
     if (K == c_FlavorSpecificParticle)
@@ -216,8 +216,7 @@ std::vector<int> ParticleList::getList(EParticleType K, bool forAntiParticle) co
     else
       return m_scList;
   } else {
-    std::vector<int> emptyList;
-
+    const static std::vector<int> emptyList;
     if (m_antiListName.empty())
       return emptyList;
 

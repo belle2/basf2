@@ -39,7 +39,7 @@ namespace Belle2 {
     setDescription("Performs MC matching (sets relation Particle->MCParticle) for all particles (and its (grand)^N-daughter particles) in the ParticleList. The relation can be used in conjuction with MCMatching::MCMatchStatus flags, e.g. using the isSignal or mcPDG & mcStatus variables.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("listName", m_listName, "Name of the input ParticleList.", string(""));
+    addParam("listName", m_listName, "Name of the input ParticleList.");
   }
 
 
@@ -67,8 +67,8 @@ namespace Belle2 {
       B2ERROR("ParticleList " << m_listName << " not found");
       return;
     }
-
-    for (unsigned i = 0; i < m_plist->getListSize(); i++) {
+    const unsigned int n = m_plist->getListSize();
+    for (unsigned i = 0; i < n; i++) {
       const Particle* part = m_plist->getParticle(i);
 
       MCMatching::setMCTruth(part);

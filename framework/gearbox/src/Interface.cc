@@ -17,7 +17,6 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -134,7 +133,7 @@ namespace Belle2 {
       tokenizer tokens(value.first, sep);
       vector<double> result;
       double numValue(0);
-      BOOST_FOREACH(const string & tok, tokens) {
+      for (const string & tok : tokens) {
         try {
           numValue = boost::lexical_cast<double>(tok);
         } catch (boost::bad_lexical_cast&) {

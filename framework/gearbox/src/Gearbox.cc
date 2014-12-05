@@ -6,7 +6,7 @@
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include "framework/gearbox/GBResult.h"
+#include <framework/gearbox/GBResult.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Stream.h>
 
@@ -16,7 +16,6 @@
 #include <memory>
 #include <cstring>
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 #include <boost/regex.hpp>
 #include <list>
 
@@ -87,7 +86,7 @@ namespace Belle2 {
   gearbox::InputContext* Gearbox::openXmlUri(const string& uri) const
   {
     //Check input handlers one by one
-    BOOST_FOREACH(gearbox::InputHandler * handler, m_handlers) {
+    for (gearbox::InputHandler * handler : m_handlers) {
       //try to create context for uri, return if success
       gearbox::InputContext* context = handler->open(uri);
       if (context) return context;
@@ -99,7 +98,7 @@ namespace Belle2 {
   void Gearbox::setBackends(const vector<string>& backends)
   {
     clearBackends();
-    BOOST_FOREACH(const string & backend, backends) {
+    for (const string & backend : backends) {
       B2DEBUG(300, "Adding InputHandler for '" << backend << "'");
       //Find correct InputHandler, assuming file backend by default if there is no colon in the
       //uri
@@ -126,7 +125,7 @@ namespace Belle2 {
 
   void Gearbox::clearBackends()
   {
-    BOOST_FOREACH(gearbox::InputHandler * handler, m_handlers) delete handler;
+    for (gearbox::InputHandler * handler : m_handlers) delete handler;
     m_handlers.clear();
   }
 
@@ -164,8 +163,7 @@ namespace Belle2 {
     m_xpathContext = 0;
     m_xmlDocument = 0;
 
-    typedef std::pair<std::string, TObject*> EntryType;
-    BOOST_FOREACH(EntryType entry, m_ownedObjects) {
+    for (auto & entry : m_ownedObjects) {
       delete entry.second;
     }
     m_ownedObjects.clear();

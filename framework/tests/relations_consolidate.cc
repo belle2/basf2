@@ -2,9 +2,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/RelationsObject.h>
+
 #include <gtest/gtest.h>
-#include <boost/foreach.hpp>
-#include <iostream>
+
 using namespace std;
 using namespace Belle2;
 

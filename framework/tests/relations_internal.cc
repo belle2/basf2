@@ -6,8 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 using namespace Belle2;
 
@@ -174,7 +172,6 @@ namespace {
     //Copy could be expensive and this should be a corner-case anyway
     EXPECT_EQ(relIndex.size(), 4u);
 
-    typedef const RelationIndex<EventMetaData, ProfileInfo>::Element el_t;
     //check elements of last relation (both from objects point to to_obj)
     const EventMetaData* first_from_obj = (evtData)[0];
     const EventMetaData* from_obj = (evtData)[1];
@@ -198,8 +195,7 @@ namespace {
     {
       int size(0);
       double allweights(0);
-      //for backwards compatibility: BOOST_FOREACH should work
-      BOOST_FOREACH(el_t & e, relIndex.getElementsFrom((evtData)[0])) {
+      for (auto & e : relIndex.getElementsFrom((evtData)[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -209,7 +205,7 @@ namespace {
     {
       int size(0);
       double allweights(0);
-      for (el_t & e : relIndex.getElementsTo((profileData)[0])) {
+      for (auto & e : relIndex.getElementsTo((profileData)[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -219,7 +215,7 @@ namespace {
     {
       int size(0);
       double allweights(0);
-      for (const el_t & e : relIndex.getElementsTo((profileData)[4])) {
+      for (const auto & e : relIndex.getElementsTo((profileData)[4])) {
         ++size;
         allweights += e.weight;
       }

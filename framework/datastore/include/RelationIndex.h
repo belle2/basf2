@@ -68,10 +68,6 @@ namespace Belle2 {
    *  getFirstElementFrom() or during the for loop can be found in
    *  RelationIndexContainer<FROM, TO>::Element.
    *
-   *  Note that the BOOST_FOREACH macro must always be used with a typedef similar
-   *  to relElement_t (because of the comma between the template arguments).
-   *
-   *
    *  \sa See RelationArray for examples on how to create new relations
    *      between objects.
    */

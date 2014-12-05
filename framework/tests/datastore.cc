@@ -5,7 +5,6 @@
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
-#include <boost/foreach.hpp>
 
 #include <algorithm>
 
@@ -329,25 +328,7 @@ namespace {
       EXPECT_EQ((int)evtDataDifferentName[9]->getEvent(), 29);
     }
 
-
-    //const_iterator
     int i = 0;
-    BOOST_FOREACH(const EventMetaData & emd, evtData) {
-      EXPECT_TRUE(&emd == evtData[i]);
-      i++;
-    }
-    EXPECT_EQ(i, evtData.getEntries());
-
-
-    //iterator
-    i = 0;
-    BOOST_FOREACH(EventMetaData & emd, evtDataNonConst) {
-      EXPECT_TRUE(&emd == evtData[i]);
-      i++;
-    }
-    EXPECT_EQ(i, evtData.getEntries());
-
-    i = 0;
     for (StoreArray<EventMetaData>::iterator it = evtDataNonConst.begin(); it != evtDataNonConst.end(); ++it) {
       EXPECT_TRUE(&(*it) == evtData[i]);
       EXPECT_EQ((int)it->getEvent(), 10 + i);

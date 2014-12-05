@@ -24,12 +24,14 @@ namespace Belle2 {
 
   /** This class represents an ideal helix in perigee parameterization.
    *  The used perigee parameters are:
-   *  1) d0 - the signed distance to the perigee. The sign positive (negative) if the angle between
-   *          the transverse momentum and perigee position is +pi/2 (-pi/2)
-   *  2) phi - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
-   *  3) omega - the signed curvature of the track where the sign is given by the charge of the particle
-   *  4) z0 - the distance of the perigee from the origin
-   *  5) tanLambda - the slope of the track in the sz plane (dz/ds)
+   *
+   *  1. **d0** - the signed distance from the origin to the perigee. The sign is positive (negative),
+                  if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
+            d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
+   *  2. **phi** - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
+   *  3. **omega** - the signed curvature of the track where the sign is given by the charge of the particle
+   *  4. **z0** - the distance of the perigee from the origin
+   *  5. **tanLambda** - the slope of the track in the sz plane (dz/ds)
    *
    *  Each point on the helix can adressed by the arc length s, which has to be traversed to get to it from the perigee.
    *  More precisely the arc length means the transverse part of the particles travel distance,
@@ -60,8 +62,9 @@ namespace Belle2 {
 
     /** Constructor initializing class with perigee parameters.
      *
-     *  @param d0            The signed distance from origin to the perigee.
-     *                       The sign is positive (negative) if the angle between the transverse momentum and d0 is +pi/2 (-pi/2)
+     *  @param d0            The signed distance from the origin to the perigee. The sign is positive (negative),
+                             if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
+                       d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
      *  @param phi0          The angle between the transverse momentum and the x axis and in [-pi, pi]
      *  @param omega         The signed curvature of the track where the sign is given by the charge of the particle
      *  @param z0            The z coordinate of the perigee.
@@ -248,7 +251,9 @@ namespace Belle2 {
   public:
     /** Getter for d0, which is the signed distance to the perigee in the r-phi plane.
      *
-     *  The sign of d0 is the same as of the z component of getPosition().Cross(getMomentum()).
+     *  The signed distance from the origin to the perigee. The sign is positive (negative),
+     *  if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
+     *  d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
      */
     float getD0() const { return m_d0; }
 

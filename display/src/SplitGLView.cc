@@ -46,8 +46,6 @@ SplitGLView::SplitGLView() :
 
     TEveViewer* viewer = new TEveViewer(TString::Format("%s viewer", projectionName[iFrame]));
     m_glViewer[iFrame] = viewer->SpawnGLEmbeddedViewer();
-    m_glViewer[iFrame]->SetFader(1.0);
-    m_glViewer[iFrame]->AutoFade(0.0, 0.3);
     slot->ReplaceWindow(viewer);
     slot = 0; //invalid after ReplaceWindow()
     viewer->SetShowTitleBar(kFALSE); //might want to show these?

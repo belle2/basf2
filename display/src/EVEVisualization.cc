@@ -117,7 +117,7 @@ EVEVisualization::EVEVisualization():
   m_tracklist = new TEveTrackList(m_trackpropagator);
   m_tracklist->IncDenyDestroy();
   m_tracklist->SetName("MCParticles");
-  m_tracklist->SelectByP(MIN_P_CUT, 15.0); //don't show too many particles by default...
+  m_tracklist->SelectByP(MIN_P_CUT, FLT_MAX); //don't show too many particles by default...
 
   m_gftrackpropagator = new TEveTrackPropagator();
   m_gftrackpropagator->IncDenyDestroy();
@@ -1156,7 +1156,7 @@ void EVEVisualization::makeTracks()
   }
   gEve->AddElement(m_tracklist);
   m_tracklist->MakeTracks();
-  m_tracklist->SelectByP(MIN_P_CUT, 15.0); //don't show too many particles by default...
+  m_tracklist->SelectByP(MIN_P_CUT, FLT_MAX); //don't show too many particles by default...
 
   for (size_t i = 0; i < m_options.length(); i++) {
     if (m_options.at(i) == 'M') {

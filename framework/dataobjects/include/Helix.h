@@ -26,7 +26,7 @@ namespace Belle2 {
    *  The used perigee parameters are:
    *  1) d0 - the signed distance to the perigee. The sign positive (negative) if the angle between
    *          the transverse momentum and perigee position is +pi/2 (-pi/2)
-   *  2) phi - the polar angle between the transverse momentum and the x axis which is in [-pi, pi]
+   *  2) phi - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
    *  3) omega - the signed curvature of the track where the sign is given by the charge of the particle
    *  4) z0 - the distance of the perigee from the origin
    *  5) tanLambda - the slope of the track in the sz plane (dz/ds)
@@ -118,10 +118,9 @@ namespace Belle2 {
     /// @{
     //---------------------------------------------------------------------------------------------------------------------------
 
-
-    /** Calculates the transverse travel distance at the point the helix first reaches the given polar radius.
+    /** Calculates the transverse travel distance at the point the helix first reaches the given polar radius (polar means the polar coordinates in the xy projection).
      *
-     *  Gives the circle arc length in the forward direction that is traversed until a certain polar radius is reached.
+     *  Gives the circle arc length in the forward direction that is traversed until a certain polar radius (polar means the polar coordinates in the xy projection) is reached.
      *  Returns NAN, if the polar radius can not be reached, either because it is to far outside or inside of the perigee.
      *
      *  Forward the result to getPositionAtArcLength() or getMomentumAtArcLength() in order to extrapolate to the concentrical detector boundaries.
@@ -129,7 +128,7 @@ namespace Belle2 {
      *  The result always has a positive sign. Hence it refers to the forward direction. Adding a minus sign yields the point at the same polar radius
      *  but in he backward direction.
      *
-     *  @param polarR  The polar radius in question
+     *  @param polarR  The polar radius in question (polar means the polar coordinates in the xy projection).
      *  @return        The circle arc length traversed to reach the polar radius. NAN if it can not be reached.
      */
     float getArcLengthAtPolarR(const float& polarR) const;
@@ -143,7 +142,7 @@ namespace Belle2 {
     /** Calculates the tangential vector to the helix curve at the given circle arc length.
      *
      *  The tangential vector is the derivative of the position with respect to the circle arc length
-     *  It is normalised such that the polar radius of the result is 1
+     *  It is normalised such that the polar radius (polar means the polar coordinates in the xy projection) of the result is 1
      *
      *  getTangentialAtArcLength(arcLength).Perp() == 1 holds.
      *
@@ -186,10 +185,10 @@ namespace Belle2 {
      */
     void reverse();
 
-    /** Reverses a polar angle to the opposite direction
+    /** Reverses an azimuthal angle to the opposite direction
      *
-     *  @param phi             A polar angle in [-pi, pi]
-     *  @return                The polar angle for the opposite direction in [-pi, pi]
+     *  @param phi             A angle in [-pi, pi]
+     *  @return                The angle for the opposite direction in [-pi, pi]
      */
     static float reversePhi(const float& phi) {
       return phi < 0 ? phi + M_PI : phi - M_PI;
@@ -219,19 +218,22 @@ namespace Belle2 {
     /// @{
     //---------------------------------------------------------------------------------------------------------------------------
   public:
-    /** Getter for d0, which is the signed distance to the perigee in the r-phi plane. */
+    /** Getter for d0, which is the signed distance to the perigee in the r-phi plane.
+     *
+     *  The sign of d0 is the same as of the z component of getPosition().Cross(getMomentum()).
+     */
     float getD0() const { return m_d0; }
 
-    /** Getter for phi0, which is the polar angle of the transverse momentum in the r-phi plane at the perigee.
+    /** Getter for phi0, which is the azimuth angle of the transverse momentum at the perigee.
      *
      *  getMomentum().Phi() == getPhi0() holds.
      */
     float getPhi0() const { return m_phi0; }
 
-    /** Getter for the cosine of the polar angle of travel direction at the perigee. */
+    /** Getter for the cosine of the azimuth angle of travel direction at the perigee. */
     double getCosPhi0() const { return std::cos(double(getPhi0())); }
 
-    /** Getter for the cosine of the polar angle of travel direction at the perigee. */
+    /** Getter for the cosine of the azimuth angle of travel direction at the perigee. */
     double getSinPhi0() const { return std::sin(double(getPhi0())); }
 
     /** Getter for omega, which is a signed curvature measure of the track. The sign is equivalent to the charge of the particle. */
@@ -341,10 +343,10 @@ namespace Belle2 {
 
 
 
-    /** Memory for the signed distance to the perigee. The sign positive (negative).*/
+    /** Memory for the signed distance to the perigee. The sign is the same as of the z component of getPosition().Cross(getMomentum()).*/
     float m_d0;
 
-    /** Memory for the polar angle between the transverse momentum and the x axis which is in [-pi, pi]. */
+    /** Memory for the azimuth angle between the transverse momentum and the x axis, which is in [-pi, pi]. */
     float m_phi0;
 
     /** Memory for the curvature of the signed curvature*/

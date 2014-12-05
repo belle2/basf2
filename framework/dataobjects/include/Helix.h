@@ -67,12 +67,12 @@ namespace Belle2 {
     /** Constructor initializing class with perigee parameters.
      *
      *  @param d0            The signed distance from the origin to the perigee. The sign is positive (negative),
-                             if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
-                       d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
+     *                       if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
+     *                       d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
      *  @param phi0          The angle between the transverse momentum and the x axis and in [-pi, pi]
      *  @param omega         The signed curvature of the track where the sign is given by the charge of the particle
      *  @param z0            The z coordinate of the perigee.
-     *  @param tanLambda     the slope of the track in the sz plane (dz/ds)
+     *  @param tanLambda     The slope of the track in the sz plane (dz/ds)
      */
     Helix(const float& d0,
           const float& phi0,
@@ -88,22 +88,44 @@ namespace Belle2 {
     /// @name Getters for cartesian parameters of the perigee
     /// @{
     //---------------------------------------------------------------------------------------------------------------------------
+    /** Calculates the x coordinate of the perigee point.*/
+    double getPerigeeX() const;
+
+    /** Calculates the y coordinate of the perigee point.*/
+    double getPerigeeY() const;
+
+    /** Calculates the z coordinate of the perigee point.*/
+    double getPerigeeZ() const;
 
     /** Getter for the perigee position. */
-    TVector3 getPosition() const;
+    TVector3 getPerigee() const;
+
+    /** Calculates the x momentum of the particle at the perigee point.
+     *  @param bZ            Z component of the magnetic field in Tesla
+     */
+    double getMomentumX(const float bZ) const;
+
+    /** Calculates the y momentum of the particle at the perigee point.
+     *  @param bZ            Z component of the magnetic field in Tesla
+     */
+    double getMomentumY(const float bZ) const;
+
+    /** Calculates the z momentum of the particle at the perigee point.
+     *  @param bZ            Z component of the magnetic field in Tesla
+     */
+    double getMomentumZ(const float bZ) const;
 
     /** Getter for vector of momentum at the perigee position
      *
      *  As we calculate recalculate the momentum from a geometric helix, we need an estimate
      *  of the magnetic field along the z-axis to give back the momentum.
-     *  @TODO This has a default value so that the basf2 compiles; default should be removed.
-     *  @param bZ  Magnetic field at the perigee.
+     *  @param bZ            Magnetic field at the perigee.
      */
     TVector3 getMomentum(const float bZ = 1.5) const;
 
     /** Getter for the absolute value of the transverse momentum at the perigee.
      *
-     * @param bZ Magnetic field at the perigee
+     *  @param bZ            Magnetic field at the perigee
      */
     float getTransverseMomentum(const float bZ = 1.5) const;
 
@@ -293,55 +315,12 @@ namespace Belle2 {
     //--- This can be placed in a seperate header which handles all the conversion stuff
     //---------------------------------------------------------------------------------------------------------------------------
 
-    /**
-     * Calculates the x coordinates of the perigee point with the internal stored parameters.
-     * @return
-     */
-    double calcXFromPerigee() const;
-
-    /**
-     * Calculates the y coordinates of the perigee point with the internal stored parameters.
-     * @return
-     */
-    double calcYFromPerigee() const;
-
-    /**
-     * Calculates the z coordinates of the perigee point with the internal stored parameters.
-     * @return
-     */
-    double calcZFromPerigee() const;
-
-    /**
-     * Calculates the x momentum of the particle at the perigee point from the internal stored parameters.
-     * @param bZ: correction factor if different from original bZ
-     * @return
-     */
-    double calcPxFromPerigee(const float bZ) const;
-
-    /**
-     * Calculates the y momentum of the particle at the perigee point from the internal stored parameters.
-     * @param bZ: correction factor if different from original bZ
-     * @return
-     */
-    double calcPyFromPerigee(const float bZ) const;
-
-    /**
-     * Calculates the z momentum of the particle at the perigee point from the internal stored parameters.
-     * @param bZ: correction factor if different from original bZ
-     * @return
-     */
-    double calcPzFromPerigee(const float bZ) const;
-
     /** Cartesian to Perigee conversion.
-     *
-     *  Everything happens internally, perigee parameters will be set and cartesian values dropped
      */
-    void cartesianToPerigee(const TVector3& position,
-                            const TVector3& momentum,
-                            const short int charge,
-                            const float bZ);
-
-
+    void setCartesian(const TVector3& position,
+                      const TVector3& momentum,
+                      const short int charge,
+                      const float bZ);
 
     /** Memory for the signed distance to the perigee. The sign is the same as of the z component of getPosition().Cross(getMomentum()).*/
     float m_d0;

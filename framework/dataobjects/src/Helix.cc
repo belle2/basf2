@@ -28,7 +28,7 @@ Helix::Helix(const TVector3& position,
              const short int charge,
              const float bZ)
 {
-  cartesianToPerigee(position, momentum, charge, bZ);
+  setCartesian(position, momentum, charge, bZ);
 }
 
 Helix::Helix(const float& d0,
@@ -44,19 +44,49 @@ Helix::Helix(const float& d0,
 {
 }
 
-TVector3 Helix::getPosition() const
+double Helix::getPerigeeX() const
 {
-  return TVector3(calcXFromPerigee(), calcYFromPerigee(), calcZFromPerigee());
+  return getD0() * getSinPhi0();
 }
 
-TVector3 Helix::getMomentum(const float bZ) const
+double Helix::getPerigeeY() const
 {
-  return TVector3(calcPxFromPerigee(bZ), calcPyFromPerigee(bZ), calcPzFromPerigee(bZ));
+  return -getD0() * getCosPhi0();
+}
+
+double Helix::getPerigeeZ() const
+{
+  return getZ0();
+}
+
+TVector3 Helix::getPerigee() const
+{
+  return TVector3(getPerigeeX(), getPerigeeY(), getPerigeeZ());
+}
+
+double Helix::getMomentumX(const float bZ) const
+{
+  return getCosPhi0() * getTransverseMomentum(bZ);
+}
+
+double Helix::getMomentumY(const float bZ) const
+{
+  return getSinPhi0() * getTransverseMomentum(bZ);
+}
+
+double Helix::getMomentumZ(const float bZ) const
+{
+  return getTanLambda() * getTransverseMomentum(bZ);
+}
+
+TVector3 Helix:: getMomentum(const float bZ) const
+{
+  return TVector3(getMomentumX(bZ), getMomentumY(bZ), getMomentumZ(bZ));
 }
 
 float Helix::getTransverseMomentum(const float bZ) const
 {
-  return std::fabs(1 / getAlpha(bZ) / getOmega());
+  return 1 / std::fabs(getAlpha(bZ) * getOmega());
 }
 
 float Helix::getKappa(const float bZ) const
@@ -193,7 +223,7 @@ float Helix::passiveMoveBy(const TVector3& by)
   // Third the new phi0 and z0 can be calculated from the arc length
   double chi = -arcLength * getOmega();
   double new_phi0 = m_phi0 + chi;
-  double new_z0 = m_z0 - by.Z() + getTanLambda() * arcLength;
+  double new_z0 = getZ0() - by.Z() + getTanLambda() * arcLength;
 
   /// Update the parameters inplace. Omega and tan lambda are unchanged
   m_d0 = new_d0;
@@ -261,8 +291,8 @@ void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLe
   const double cosPhi0 = getCosPhi0();
   const double sinPhi0 = getSinPhi0();
 
-  const double perigeeX = calcXFromPerigee();
-  const double perigeeY = calcYFromPerigee();
+  const double perigeeX = getPerigeeX();
+  const double perigeeY = getPerigeeY();
 
   const double deltaX = x - perigeeX;
   const double deltaY = y - perigeeY;
@@ -300,10 +330,10 @@ double Helix::calcArcLengthAtDeltaPolarRAndDr(const double& deltaPolarR, const d
   return calcArcLengthFromSecantLength(secantLength);
 }
 
-void Helix::cartesianToPerigee(const TVector3& position,
-                               const TVector3& momentum,
-                               const short int charge,
-                               const float bZ)
+void Helix::setCartesian(const TVector3& position,
+                         const TVector3& momentum,
+                         const short int charge,
+                         const float bZ)
 {
   const double alpha = getAlpha(bZ);
 
@@ -370,36 +400,6 @@ void Helix::cartesianToPerigee(const TVector3& position,
   m_tanLambda = tanLambda;
   m_z0 = z0;
 
-}
-
-double Helix::calcXFromPerigee() const
-{
-  return getD0() * std::sin((double)getPhi0());
-}
-
-double Helix::calcYFromPerigee() const
-{
-  return -getD0() * std::cos((double)getPhi0());
-}
-
-double Helix::calcZFromPerigee() const
-{
-  return getZ0();
-}
-
-double Helix::calcPxFromPerigee(const float bZ) const
-{
-  return std::cos((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bZ)));
-}
-
-double Helix::calcPyFromPerigee(const float bZ) const
-{
-  return std::sin((double)getPhi0()) / (std::fabs(getOmega() * getAlpha(bZ)));
-}
-
-double Helix::calcPzFromPerigee(const float bZ) const
-{
-  return getTanLambda() / (std::fabs(getOmega() * getAlpha(bZ)));
 }
 
 namespace Belle2 {

@@ -175,7 +175,7 @@ namespace {
       Helix helix(position, momentum, charge, bField);
 
       // Test all vector elements
-      EXPECT_ALL_NEAR(position, helix.getPosition(), absError);
+      EXPECT_ALL_NEAR(position, helix.getPerigee(), absError);
       EXPECT_ALL_NEAR(momentum, helix.getMomentum(bField), absError);
 
       // Test getter for transverse momentum
@@ -379,7 +379,7 @@ namespace {
         for (const float omega : omegas) {
 
           Helix helix(d0, phi0, omega, z0, tanLambda);
-          TVector3 perigee = helix.getPosition();
+          TVector3 perigee = helix.getPerigee();
 
           TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
           TEST_CONTEXT("Failed for " << helix);
@@ -625,7 +625,7 @@ namespace {
 
               ASSERT_NEAR(expectedArcLength, arcLength, absError);
 
-              ASSERT_ALL_NEAR(expectedPerigee, helix.getPosition(), absError);
+              ASSERT_ALL_NEAR(expectedPerigee, helix.getPerigee(), absError);
 
             }
           }

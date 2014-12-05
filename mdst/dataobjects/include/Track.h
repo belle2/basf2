@@ -56,9 +56,9 @@ namespace Belle2 {
         B2DEBUG(100, "Attempt to access an unset TrackFitResult");
         //ULTRA PRELIMINARY
         short int index = -1; // MS: better to set to invalid value and test again after
-        for (int ii = 0; ii < 5; ii++) {
+        for (unsigned int ii = 0; ii < Const::chargedStableSet.size(); ii++) {
           if (m_trackFitIndices[ii] >= 0) {
-            index = m_trackFitIndices[ii]; // MS: bug fixed
+            index = m_trackFitIndices[ii];
           }
         }
         if (index < 0) return 0; // MS: just in case and to be sure not to get garbage

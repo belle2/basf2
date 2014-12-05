@@ -93,7 +93,7 @@ void DummyDataPackerModule::event()
   RawCOPPERPackerInfo rawcprpacker_info;
 
   int num_coppers = 48; // In SVD case
-  for (int i ; i < num_coppers; i++) {
+  for (int i = 0 ; i < num_coppers; i++) {
 
     //
     // Example of event info (These values will be stored in RawHeader )

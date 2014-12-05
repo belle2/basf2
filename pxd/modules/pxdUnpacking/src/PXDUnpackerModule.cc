@@ -160,7 +160,7 @@ struct dhhc_start_frame {
     if (time_tag_hi != 0) return false;
     if (run_subrun != 0) return false;
     if (exp_run != 0) return false;
-    if (crc32 != 0x12345678) return false; // Recalculate!!! TODO
+    if (crc32 != 0x4d212948) return false; // Recalculate!!! TODO
     return true;
   };
   inline unsigned int getFixedSize(void) const {

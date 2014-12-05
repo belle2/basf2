@@ -8,11 +8,13 @@
 //-
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawONSEN.h>
-#include <arpa/inet.h>
+#include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;
 using namespace Belle2;
 using namespace PXD;
+
+using namespace boost::spirit::endian;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -25,6 +27,8 @@ REG_MODULE(PXDReadRawONSEN)
 
 PXDReadRawONSENModule::PXDReadRawONSENModule() : Module()
 {
+  fh = 0;
+  m_msghandler = 0;
   //Set module properties
   setDescription("Read a Raw PXD-Data Dump from ONSEN (or a simulator) and stores it as RawPXD in Data Store");
   //setPropertyFlags(c_Input | c_ParallelProcessingCertified);
@@ -88,18 +92,16 @@ int PXDReadRawONSENModule::readOneEvent()
 
 #define MAX_PXD_FRAMES  256
   const int headerlen = 8;
-  int* pxdheader = (int*) data;
-  int* pxdheadertable = (int*) &data[headerlen];
+  ubig32_t* pxdheader = (ubig32_t*) data;
+  ubig32_t* pxdheadertable = (ubig32_t*) &data[headerlen];
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(data, headerlen);
   if (br <= 0) return br;
-  if (pxdheader[0] != (int) htonl(0xCAFEBABE)) {
-    printf("pxdheader wrong : Magic %X , Frames %X \n", pxdheader[0], ntohl(pxdheader[1]));
+  if (pxdheader[0] != (int)0xCAFEBABE) {
+    printf("pxdheader wrong : Magic %X , Frames %X \n", (unsigned int) pxdheader[0], (unsigned int) pxdheader[1]);
     exit(0);
   }
-//  pxdheader[0] = ntohl(pxdheader[0]); /// as this is fixed .... might not be needed if taken care of in unpacker
-//  framenr = pxdheader[1] = ntohl(pxdheader[1]);
-  framenr = ntohl(pxdheader[1]);
+  framenr = pxdheader[1];
   if (framenr > MAX_PXD_FRAMES) {
     printf("MAX_PXD_FRAMES too small : %d(%d) \n", framenr, MAX_PXD_FRAMES);
     exit(0);
@@ -108,9 +110,7 @@ int PXDReadRawONSENModule::readOneEvent()
   br = read_data((char*)&data[headerlen], tablelen);
   if (br <= 0) return br;
   for (int i = 0; i < framenr; i++) {
-//    pxdheadertable[i] = ntohl(pxdheadertable[i]);
-//    datalen += (pxdheadertable[i] + 3) & 0xFFFFFFFC;
-    datalen += (ntohl(pxdheadertable[i]) + 3) & 0xFFFFFFFC;
+    datalen += (pxdheadertable[i] + 3) & 0xFFFFFFFC;
   }
 
   if (datalen + headerlen + tablelen > len) {

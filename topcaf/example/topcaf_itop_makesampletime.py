@@ -11,24 +11,37 @@ output = register_module('RootOutput')
 
 # register topcaf modules
 
-if len(sys.argv) != 6:
-    print 'Usage: basf2 topcaf_itop_makesampletime.py -n <number of events> --arg <Input Data Filename> <Input Camac Filename> <Path to Files> <Initial run for interval of validity> <Final run for interval of validity>'
-    print '               NULL for IOV if not known/desired'
+if len(sys.argv) == 3:
+    IOVinitial = 'NULL'
+    IOVfinal = 'NULL'
+elif len(sys.argv) == 4:
+    IOVinitial = str(sys.argv[4])
+    IOVfinal = 'NULL'
+elif len(sys.argv) == 5:
+    IOVinitial = str(sys.argv[4])
+    IOVfinal = str(sys.argv[5])
+else:
+    print 'Usage: basf2 topcaf_itop_makesampletime.py -n <number of events> --arg <Path to Files> <Input Data Rootname> <Initial run for interval of validity> <Final run for interval of validity>'
+    print '               IOV inputs are optional, can also be set to NULL'
     sys.exit()
 
 itopeventconverter = register_module('iTopRawConverter')
-itopeventconverter.param('InputFileName', str(sys.argv[1]))
-itopeventconverter.param('InputDirectory', str(sys.argv[3]))
+itopeventconverter.param('InputFileName', str(sys.argv[2]) + '.dat')
+itopeventconverter.param('InputDirectory', str(sys.argv[1]))
 
 camacconverter = register_module('Camac')
-camacDict = {  # leps june 2013 itop test beam
-               # leps june 2013 itop test beam
-               # leps june 2013 itop test beam
-    'InputFilename': str(sys.argv[3]) + str(sys.argv[2]),
-    'CrateID': 13369927,
-    'FTSWslot': 7,
-    'FTSWword': 3,
+camacDict = {  #             'CrateID'            : 13369927,  # leps june 2013 itop test beam
+               #             'FTSWslot'           : 7,  # leps june 2013 itop test beam
+               #             'FTSWword'           : 3 } # leps june 2013 itop test beam
+               # 2014 itop crt
+               # 2014 itop crt
+               # 2014 itop crt
+    'InputFilename': str(sys.argv[1]) + str(sys.argv[2]) + '.cmc',
+    'CrateID': 0x00cc0200,
+    'FTSWslot': 6,
+    'FTSWword': 5,
     }
+
 camacconverter.param(camacDict)
 
 pedmodule = register_module('Pedestal')
@@ -42,13 +55,14 @@ timeDict = {'Time2TDC': 40.0}
 timemodule.param(timeDict)
 
 sampletimemodule = register_module('SampleTimeCalibration')
+
 sampletimeDict = {
     'OutputFileName': 'test.root',
     'Mode': 0,
     'WriteFile': 1,
     'Conditions': 0,
-    'IOV_initialRun': str(sys.argv[4]),
-    'IOV_finalRun': str(sys.argv[5]),
+    'IOV_initialRun': IOVinitial,
+    'IOV_finalRun': IOVfinal,
     }
 sampletimemodule.param(sampletimeDict)
 

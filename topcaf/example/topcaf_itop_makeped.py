@@ -11,23 +11,28 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 # register topcaf modules
 
-if len(sys.argv) != 5:
-    print 'Usage: basf2 topcaf_itop_makeped.py -n <number of events> --arg <Input Pedestal Filename> <Path to Pedestal File> <Initial run for interval of validity> <Final run for interval of validity>'
-    print '         NULL for IOV if not known/desired'
+if len(sys.argv) == 3:
+    InitialRun = 'NULL'
+    FinalRun = 'NULL'
+elif len(sys.argv) == 4:
+    FinalRun = 'NULL'
+else:
+    print 'Usage: basf2 topcaf_itop_makeped.py -n <number of events> --arg <Path to Files> <Input Pedestal Filename> <Initial run for interval of validity> <Final run for interval of validity>'
+    print '         NULL for IOV if not known/desired (IOV optional)'
     sys.exit()
 
 itopeventconverter = register_module('iTopRawConverter')
-itopeventconverter.param('InputFileName', str(sys.argv[1]))
-itopeventconverter.param('InputDirectory', str(sys.argv[2]))
+itopeventconverter.param('InputFileName', str(sys.argv[2]))
+itopeventconverter.param('InputDirectory', str(sys.argv[1]))
 
 pedmodule = register_module('Pedestal')
 pedestalDict = {
-    'OutputFileName': 'test.root',
+    'OutputFileName': sys.argv[2] + '_pedestals.root',
     'Mode': 0,
     'WriteFile': 1,
-    'Conditions': 1,
-    'IOV_initialRun': str(sys.argv[3]),
-    'IOV_finalRun': str(sys.argv[4]),
+    'Conditions': 0,
+    'IOV_initialRun': InitialRun,
+    'IOV_finalRun': FinalRun,
     }
 pedmodule.param(pedestalDict)
 

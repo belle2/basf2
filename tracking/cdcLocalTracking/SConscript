@@ -2,8 +2,8 @@ Import('env')
 
 import os
 
-
-### Function definitions
+# Function definitions #
+########################
 def get_python_files_recursive(topdir_path):
     python_file_nodes = []
     
@@ -41,7 +41,9 @@ def define_aliases(
 
 
 
-### Main
+# Enable python package support #
+#################################
+
 # This SConsript file looks for all python files in /scripts directories in the local tracking subpackage and 
 # adds them to the importable python modules in the compiled release.
 # This prevents a bit of a clutter in the tracking/scripts directory with code only related to local tracking.
@@ -52,7 +54,7 @@ dir_name = dir_node.path
 
 script_targets = []
 for script_file_node in script_file_nodes:
-    script_file_path =  str(script_file_node)
+    script_file_path = str(script_file_node)
     script_dir = os.path.dirname(script_file_path)
 
     destination_reldir = os.path.relpath(script_dir, "scripts")
@@ -66,5 +68,20 @@ define_aliases(env, script_targets, dir_name, "scripts")
 
 # Abolish script files
 env['SCRIPT_FILES'] = []
+
+
+# Setup a variable for libraries common to all tests in this folder
+env['CDCLOCALTRACKING_TEST_LIBS'] = [
+    'tracking', 'tracking_dataobjects', 
+    'cdc', 'cdc_dataobjects',
+    'simulation_dataobjects',
+    'mdst_dataobjects',
+    'genfit2',
+    'framework',
+    'framework_pybasf2',
+    'geometry',
+    '$ROOT_LIBS',
+    '$PYTHON_LIBS',
+    ]
 
 Return('env')

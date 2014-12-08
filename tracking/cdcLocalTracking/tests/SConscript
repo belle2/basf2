@@ -1,0 +1,46 @@
+Import('env')
+
+# Use the common libraries of the track finder for the test compilation
+env['LIBS'] = env['CDCLOCALTRACKING_TEST_LIBS']
+
+# Include all tests in subdirectories into the test executable here at the top level
+# The only way this is possible is by replacing the linking call (test_env.Program()) from process_dir()
+# with a modified version, that adds the additional sources from 
+
+# First divide the test_files gathered into files from this directory and files from the subdirectories, 
+# since only the tests in the subdirectories have been compiled yet.
+
+test_files = env["TEST_FILES"]
+
+test_shared_objects = []
+test_source_files = []
+
+for test_file in test_files:
+    # Skip source files that are not yet compiled
+    if isinstance(test_file, str) and test_file.endswith(".cc"):
+        test_source_files.append(test_file)
+    else:
+        # Filter for compiled shared objects.
+        try:
+            path = test_file.get_path()
+        except AttributeError:
+            print "test_file", test_file, "is a", type(test_file), ". Expected str or SCons.Node.FS.Entry."
+            print "Exclude it from the test executable."
+        else:
+            if path.endswith(".os"):
+                test_shared_objects.append(test_file)
+
+original_programm_builder = env['BUILDERS']['Program']
+env['BUILDERS']['OriginalProgram'] = original_programm_builder
+
+def inject_tests_from_subdirectories(env, target, sources):
+    # Sources are only the test_source_files
+    # Append the test_shared_objects from the subdirectories to the sources.
+    for test_shared_object in test_shared_objects:
+        if test_shared_object not in sources:
+            sources.append(test_shared_object)
+    env.OriginalProgram(target, sources)
+
+env.AddMethod(inject_tests_from_subdirectories, "Program")
+
+Return('env')

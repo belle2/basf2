@@ -394,8 +394,8 @@ namespace {
             float expectedArcLength = omega != 0 ? -chi / omega : chi;
             TVector3 pointOnHelix = helix.getPositionAtArcLength(expectedArcLength);
 
-            float polarR = pointOnHelix.Perp();
-            float arcLength = helix.getArcLengthAtPolarR(polarR);
+            float cylindricalR = pointOnHelix.Perp();
+            float arcLength = helix.getArcLengthAtCylindricalR(cylindricalR);
 
             // Only the absolute value is returned.
             EXPECT_NEAR(fabs(expectedArcLength), arcLength, absError);

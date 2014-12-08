@@ -30,7 +30,7 @@ namespace Belle2 {
             d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
    *  2. **phi** - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
    *  3. **omega** - the signed curvature of the track where the sign is given by the charge of the particle
-   *  4. **z0** - the distance of the perigee from the origin
+   *  4. **z0** - z coordinate of the perigee
    *  5. **tanLambda** - the slope of the track in the sz plane (dz/ds)
    *
    *  Each point on the helix can adressed by the arc length s, which has to be traversed to get to it from the perigee.
@@ -147,20 +147,20 @@ namespace Belle2 {
     /// @{
     //---------------------------------------------------------------------------------------------------------------------------
 
-    /** Calculates the transverse travel distance at the point the helix first reaches the given polar radius (polar means the polar coordinates in the xy projection).
+    /** Calculates the transverse travel distance at the point the helix first reaches the given cylindrical radius.
      *
-     *  Gives the circle arc length in the forward direction that is traversed until a certain polar radius (polar means the polar coordinates in the xy projection) is reached.
-     *  Returns NAN, if the polar radius can not be reached, either because it is to far outside or inside of the perigee.
+     *  Gives the circle arc length in the forward direction that is traversed until a certain cylindrical radius is reached.
+     *  Returns NAN, if the cylindrical radius can not be reached, either because it is to far outside or inside of the perigee.
      *
      *  Forward the result to getPositionAtArcLength() or getMomentumAtArcLength() in order to extrapolate to the cylinder detector boundaries.
      *
      *  The result always has a positive sign. Hence it refers to the forward direction.
-     *  Adding a minus sign yields the point at the same polar radius but in the backward direction.
+     *  Adding a minus sign yields the point at the same cylindrical radius but in the backward direction.
      *
-     *  @param polarR  The polar radius in question (polar means the polar coordinates in the xy projection).
-     *  @return        The circle arc length traversed to reach the polar radius. NAN if it can not be reached.
+     *  @param cylindricalR  The cylinder radius to extrapolate to.
+     *  @return              The circle arc length traversed to reach the cylindrical radius. NAN if it can not be reached.
      */
-    float getArcLengthAtPolarR(const float& polarR) const;
+    float getArcLengthAtCylindricalR(const float& cylindricalR) const;
 
     /** Calculates the circle arc length at which the circle in the xy projection is closest to the point
      *
@@ -184,12 +184,12 @@ namespace Belle2 {
     /** Calculates the tangential vector to the helix curve at the given circle arc length.
      *
      *  The tangential vector is the derivative of the position with respect to the circle arc length
-     *  It is normalised such that the polar radius (polar means the polar coordinates in the xy projection) of the result is 1
+     *  It is normalised such that the cylindrical radius of the result is 1
      *
      *  getTangentialAtArcLength(arcLength).Perp() == 1 holds.
      *
      *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
-     *  @return                Tangential vector normalised to unit transverse component / polar radius.
+     *  @return                Tangential vector normalised to unit transverse component / cylindrical radius.
      */
     TVector3 getTangentialAtArcLength(const float& arcLength) const;
 
@@ -258,16 +258,15 @@ namespace Belle2 {
      */
     void calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLength, double& dr) const;
 
-    /** Helper method to calculate the circle arc length of a point at polar radius in the *from the perigee* and has the distance dr from the circle in the xy projection
+    /** Helper method to calculate the circle arc length *from the perigee* to a point at cylindrical radius, which also has the distance dr from the circle in the xy projection
      *
      *  This function is an implementation detail that prevents some code duplication.
      *
-     *  @param deltaPolarR         Direct absolute distance of the point to the perigee in the xy projection
-     *  @param dr                  Signed distance of the point to circle in the xy projection.
-     *  @return                    The absolute arc length from the perigee to the point.*
+     *  @param deltaCylindricalR             The absolute distance of the point in question to the perigee in the xy projection
+     *  @param dr                            Signed distance of the point to circle in the xy projection.
+     *  @return                              The absolute arc length from the perigee to the point.
      */
-    double calcArcLengthAtDeltaPolarRAndDr(const double& deltaPolarRSquared, const double& dr) const;
-
+    double calcArcLengthAtDeltaCylindricalRAndDr(const double& deltaCylindricalR, const double& dr) const;
 
 
     //---------------------------------------------------------------------------------------------------------------------------

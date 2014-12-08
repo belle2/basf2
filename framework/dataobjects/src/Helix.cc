@@ -108,16 +108,16 @@ void Helix::reverse()
   m_tanLambda = -m_tanLambda;
 }
 
-float Helix::getArcLengthAtPolarR(const float& polarR) const
+float Helix::getArcLengthAtCylindricalR(const float& cylindricalR) const
 {
   // Slight trick here
   // Since the sought point is on the helix we treat it as the perigee
   // and the origin as the point to extrapolate to.
   // We know the distance of the origin to the circle, which is just d0
-  // The direct distance from the origin to the imaginary perigee is just the given polarR.
+  // The direct distance from the origin to the imaginary perigee is just the given cylindricalR.
   const float dr = getD0();
-  const float deltaPolarR = polarR;
-  const double absArcLength = calcArcLengthAtDeltaPolarRAndDr(deltaPolarR, dr);
+  const float deltaCylindricalR = cylindricalR;
+  const double absArcLength = calcArcLengthAtDeltaCylindricalRAndDr(deltaCylindricalR, dr);
   return absArcLength;
 }
 
@@ -299,31 +299,31 @@ void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLe
 
   const double deltaParallel = deltaX * cosPhi0 + deltaY * sinPhi0;
   const double deltaOrthogonal = deltaY * cosPhi0 - deltaX * sinPhi0;
-  const double deltaPolarR = hypot(deltaX, deltaY);
-  const double deltaPolarRSquared = deltaPolarR * deltaPolarR;
+  const double deltaCylindricalR = hypot(deltaX, deltaY);
+  const double deltaCylindricalRSquared = deltaCylindricalR * deltaCylindricalR;
 
   // Calculate dr
-  const double A = 2 * deltaOrthogonal + omega * deltaPolarRSquared;
+  const double A = 2 * deltaOrthogonal + omega * deltaCylindricalRSquared;
   const double U = sqrt(1 + omega * A);
   dr = A / (1 + U);
 
   // Calculate the absolute value of the arc length
-  const double absArcLength = calcArcLengthAtDeltaPolarRAndDr(deltaPolarR, dr);
+  const double absArcLength = calcArcLengthAtDeltaCylindricalRAndDr(deltaCylindricalR, dr);
 
   // Fixing the sign looking if the new origin lies in the forward direction in the xy projection.
   arcLength = std::copysign(absArcLength, deltaParallel);
 }
 
-double Helix::calcArcLengthAtDeltaPolarRAndDr(const double& deltaPolarR, const double& dr) const
+double Helix::calcArcLengthAtDeltaCylindricalRAndDr(const double& deltaCylindricalR, const double& dr) const
 {
   const double omega = getOmega();
 
-  // When polarR and d0 are approximatly the same and the resulting difference of the squares turns out
+  // When cylindricalR and d0 are approximatly the same and the resulting difference of the squares turns out
   // to be -10^-18 in double precision, which makes the sqrt return nan.
   // Do calculation in single precision here to negating these rounding errors of order -10^-18.
-  float deltaPolarRSquared = deltaPolarR * deltaPolarR;
+  float deltaCylindricalRSquared = deltaCylindricalR * deltaCylindricalR;
   float drSquared = dr * dr;
-  double secantLength = sqrt((deltaPolarRSquared - drSquared) / (1 + dr * omega));
+  double secantLength = sqrt((deltaCylindricalRSquared - drSquared) / (1 + dr * omega));
   // Note : The above line results from simplifications for the normal n_0, n_1, n_2, n_3 representation
   // It might have an geometrical interpretation. If you have one please insert it here.
 

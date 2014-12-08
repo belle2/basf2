@@ -98,6 +98,7 @@ namespace Belle2 {
 
       /// Makes a copy of the segment with the reversed hits in the opposite order.
       CDCRecoSegment2D reversed() const {
+
         CDCRecoSegment2D reverseSegment;
         reverseSegment.reserve(size());
         for (const CDCRecoHit2D & recohit : reverseRange()) {
@@ -106,6 +107,15 @@ namespace Belle2 {
         return reverseSegment;
       }
 
+      /// Reverses the order of hits and their right left passage hypotheses inplace
+      void reverse() {
+        // Reverse the left right passage hypotheses
+        for (CDCRecoHit2D & recoHit2D : *this) {
+          recoHit2D.reverse();
+        }
+        // Reverse the arrangement of hits.
+        std::reverse(begin(), end());
+      }
 
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell() { return m_automatonCell; }

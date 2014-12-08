@@ -120,11 +120,18 @@ void WaveTimingModule::event()
       //Create TOPDigit
       int barID = -9;
       int channelID = -9;
-      int TDC = (int)((ftsw - coarse_t + at40_t * sample_dt) * m_time2tdc);
+      double time = (ftsw - coarse_t + at40_t * sample_dt);
+      int TDC = (int)(time * m_time2tdc);
       // B2INFO(" TDC(): " <<   TDC << "=(" << ftsw << "-" << coarse_t << "+" << at40_t << "*" <<  sample_dt << ")*" << m_time2tdc );
+      //Create TOPDIGIT
       TOPDigit* this_topdigit = m_topdigits_ptr.appendNew(barID, channelID, TDC);
       this_topdigit->setADC(max_adc);
       this_topdigit->setHardwareChannelID(channel_id);
+
+      //Update EventWaveForm for Sample-to-Sample correction
+      evtwaves_ptr[w]->SetTime(at40_t * sample_dt);
+      evtwaves_ptr[w]->SetTimeBin(m_tmp_h->GetXaxis()->FindBin(at40_t));
+      evtwaves_ptr[w]->SetAmplitude(max_adc);
 
     }//End loop
   }

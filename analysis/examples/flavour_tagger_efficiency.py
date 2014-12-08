@@ -40,7 +40,7 @@ ROOT.gROOT.SetBatch(True)
 # specify file name, if necessary
 
 workingDirectory = \
-    Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/TrainedMethods/')
+    Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/TrainedMethods')
 B2INFO('Working directory is: ' + workingDirectory)
 
 #
@@ -125,29 +125,29 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
     # filling the histograms
 
     # filling with abs(qr) in one of 6 bins with its weight
-    tree.Project('Average_r', 'abs(extraInfoqr_Combined)',
-                 'abs(extraInfoqr_Combined)')
+    tree.Project('Average_r', 'abs(extraInfoqrCombined)',
+                 'abs(extraInfoqrCombined)')
     # filling with abs(qr) in one of 6 bins
-    tree.Project('entries_per_bin', 'abs(extraInfoqr_Combined)')
+    tree.Project('entries_per_bin', 'abs(extraInfoqrCombined)')
 
     # not necessary
     tree.Draw('extraInfoB0_prob>>Comb_Net_Output_B0', 'McFlavorOfTagSide>0')
     tree.Draw('extraInfoB0_prob>>Comb_Net_Output_B0bar', 'McFlavorOfTagSide<0')
 
-    tree.Draw('extraInfoqr_Combined>>BellePlot_B0', 'McFlavorOfTagSide>0 ')
-    tree.Draw('extraInfoqr_Combined>>BellePlot_B0Bar', 'McFlavorOfTagSide<0')
-    tree.Draw('extraInfoqr_Combined>>BellePlot_NoCut')
+    tree.Draw('extraInfoqrCombined>>BellePlot_B0', 'McFlavorOfTagSide>0 ')
+    tree.Draw('extraInfoqrCombined>>BellePlot_B0Bar', 'McFlavorOfTagSide<0')
+    tree.Draw('extraInfoqrCombined>>BellePlot_NoCut')
 
-    tree.Draw('extraInfoqr_Combined>>Calibration_B0', 'McFlavorOfTagSide>0')
-    tree.Draw('extraInfoqr_Combined>>Calibration_B0Bar', 'McFlavorOfTagSide<0')
+    tree.Draw('extraInfoqrCombined>>Calibration_B0', 'McFlavorOfTagSide>0')
+    tree.Draw('extraInfoqrCombined>>Calibration_B0Bar', 'McFlavorOfTagSide<0')
 
     # filling histograms wrong efficiency calculation
-    tree.Draw('extraInfoqr_Combined>>BellePlot_B0_m0',
-              'McFlavorOfTagSide>0 && extraInfoqr_Combined>0')
-    tree.Draw('extraInfoqr_Combined>>BellePlot_B0_m1',
-              'McFlavorOfTagSide>0 && extraInfoqr_Combined<0')
-    tree.Draw('extraInfoqr_Combined>>BellePlot_B0_m2',
-              'McFlavorOfTagSide<0 && extraInfoqr_Combined>0')
+    tree.Draw('extraInfoqrCombined>>BellePlot_B0_m0',
+              'McFlavorOfTagSide>0 && extraInfoqrCombined>0')
+    tree.Draw('extraInfoqrCombined>>BellePlot_B0_m1',
+              'McFlavorOfTagSide>0 && extraInfoqrCombined<0')
+    tree.Draw('extraInfoqrCombined>>BellePlot_B0_m2',
+              'McFlavorOfTagSide<0 && extraInfoqrCombined>0')
 
     # producing the average r histogram
     histo_avr_r.Divide(histo_entries_per_bin)
@@ -374,14 +374,14 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger_ROECUT.root'):
         hist_calib_B0 = ROOT.TH1F('Calib_B0_' + category,
                                   'Calibration Plot for true B0' + category
                                   + ' (binning 50)', 50, 0.0, 1.0)
-        tree2.Draw(categoryInput + '>>Calib_B0_' + category, 'qr_Combined>0.5')
+        tree2.Draw(categoryInput + '>>Calib_B0_' + category, 'qrCombined>0.5')
         hist_calib_B0.Divide(hist_all)
 
         # fill signal
-        tree2.Draw(categoryInput + '>>Signal_' + category, 'qr_Combined>0.5')
+        tree2.Draw(categoryInput + '>>Signal_' + category, 'qrCombined>0.5')
         # fill background
-        tree2.Draw(categoryInput + '>>Background_' + category,
-                   'qr_Combined<0.5')
+        tree2.Draw(categoryInput + '>>Background_' + category, 'qrCombined<0.5'
+                   )
 
         ##### produce the input plots from combiner level #####
 

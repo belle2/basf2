@@ -361,6 +361,7 @@ namespace Belle2 {
           G4Material* mat_vacuum = Materials::get("Vacuum");
           string logi_vacuum_name = "logi_" + nameVac + "_name";
           G4LogicalVolume* logi_vacuum = new G4LogicalVolume(vacuum.geo, mat_vacuum, logi_vacuum_name);
+          if (flag_limitStep) logi_vacuum->SetUserLimits(new G4UserLimits(stepMax));
           setColor(*logi_vacuum, "#000000");
           setVisibility(*logi_vacuum, false);
 

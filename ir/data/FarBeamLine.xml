@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="FarBeamLine" xmlns:xi="http://www.w3.org/2001/XInclude">
+<DetectorComponent name="FarBeamLine" isDefault="false" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="ir">FarBeamLineCreator</Creator>
   <Content>
 

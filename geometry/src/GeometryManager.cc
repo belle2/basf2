@@ -104,6 +104,8 @@ namespace Belle2 {
       G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", 0, 0, 0);
       setVisibility(*top_log, false);
       m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);
+      B2INFO("Created top volume with x= +-" << width * Unit::mm << " cm, y= +-"
+             << height * Unit::mm << " cm, z= +-" << length * Unit::mm << " cm");
       //Make a copy of the names for all selected or excluded components to
       //check if all of those names are actually known components
       std::set<std::string> componentNames = m_components;

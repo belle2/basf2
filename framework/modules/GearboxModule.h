@@ -73,6 +73,12 @@ namespace Belle2 {
     std::vector<std::string> m_backends;   /**< The backend specifier. */
     std::string m_fileName;  /**< The toplevel filename for the parameters */
 
+    /** common prefix for all value overrides */
+    std::string m_overridePrefix;
+    /** overrides to override the value and unit of a parameter */
+    std::vector<std::tuple<std::string, std::string, std::string>> m_unitOverrides;
+    /** overrides to override the value and unit of many parameters */
+    std::vector<std::tuple<std::string, std::string, std::string>> m_multipleOverrides;
   };
 }
 

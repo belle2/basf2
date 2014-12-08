@@ -35,10 +35,26 @@ GearboxModule::GearboxModule() : Module()
   m_backends.push_back("file:");
 
   //Parameter definition
-  addParam("backends",  m_backends, "The backends to use when looking for xml data. A backend can also contain a search path after ':'. (If none is given, '/data' will be used.)",
-           m_backends);
+  addParam("backends",  m_backends, "The backends to use when looking for xml "
+           "data. A backend can also contain a search path after ':'. (If none "
+           "is given, '/data' will be used.)", m_backends);
   addParam("fileName", m_fileName, "The filename of the main xml file",
            string("geometry/Belle2.xml"));
+  addParam("override", m_unitOverrides, "Override single values from the XML "
+           "file. This should be a list of tuples containing an xpath "
+           "expression, a value and a unit (which can be empty). The xpath "
+           "expression must resolve to exactly one node in the XML tree which "
+           "does not contain any children except text. The supplied value and "
+           "unit will be set for this node. See "
+           "framework/examples/gearbox_override.py", m_unitOverrides);
+  addParam("overrideMultiple", m_multipleOverrides, "Same as override but the "
+           "xpath expression may evaluate to more than one node in which case "
+           "all occurances are set to the supplied value and unit",
+           m_multipleOverrides);
+  addParam("overridePrefix", m_overridePrefix, "Common prefix which is "
+           "prepended to all overrides. Beware that '//' has a special meaning "
+           "meaning in xpath so be careful with leading and trailing slashes "
+           "in the overrides and the prefix respectively", std::string("/Detector"));
 }
 
 void GearboxModule::initialize()
@@ -47,6 +63,22 @@ void GearboxModule::initialize()
   StoreObjPtr<EventMetaData>::required();
 
   Gearbox& gearbox = Gearbox::getInstance();
+  for (auto & unit : m_unitOverrides) {
+    Gearbox::PathOverride poverride;
+    poverride.path = m_overridePrefix + std::get<0>(unit);
+    poverride.value = std::get<1>(unit);
+    poverride.unit = std::get<2>(unit);
+    gearbox.addOverride(poverride);
+  }
+  for (auto & multiple : m_multipleOverrides) {
+    Gearbox::PathOverride poverride;
+    poverride.path = m_overridePrefix + std::get<0>(multiple);
+    poverride.value = std::get<1>(multiple);
+    poverride.unit = std::get<2>(multiple);
+    poverride.multiple = true;
+    gearbox.addOverride(poverride);
+  }
+
   gearbox.setBackends(m_backends);
   gearbox.open(m_fileName);
 }

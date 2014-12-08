@@ -59,6 +59,19 @@ namespace Belle2 {
       std::string unit;
     };
 
+    /** Struct to override a path in the XML file with a custom value */
+    struct PathOverride {
+      /** XPath expression of the path to override */
+      std::string path {""};
+      /** New value */
+      std::string value {""};
+      /** new Unit */
+      std::string unit {""};
+      /** if true, override all nodes when more than one node matches the XPath
+       * expression, bail otherwise */
+      bool multiple {false};
+    };
+
     /** Free structures on destruction */
     ~Gearbox() { close(); clearBackends(); }
 
@@ -75,6 +88,16 @@ namespace Belle2 {
 
     /** Clear list of backends */
     void clearBackends();
+
+    /** Add an override for a given XPath expression */
+    void addOverride(const PathOverride& poverride) {
+      m_overrides.push_back(poverride);
+    }
+
+    /** Clear all existing overrides */
+    void clearOverrides() {
+      m_overrides.clear();
+    }
 
     /**
      * Open connection to backend and parse tree
@@ -238,6 +261,8 @@ namespace Belle2 {
     /** Function to be called when libxml requests a new input uri to be opened */
     gearbox::InputContext* openXmlUri(const std::string& uri) const;
 
+    /** Change the value of a given path expression */
+    void overridePathValue(const PathOverride& poverride);
     /** Return the (cached) value of a given path */
     PathValue getPathValue(const std::string& path) const;
 
@@ -259,6 +284,9 @@ namespace Belle2 {
      * The existing Backends
      */
     std::vector<gearbox::Backend> backends;
+
+    /** the existing overrides */
+    std::vector<PathOverride> m_overrides;
 
     /**
      * Information regarding the active mounts

@@ -64,7 +64,7 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
   FloatType backY = observations2D.getY(nObservations - 1);
   Vector2D backPos(backX, backY);
 
-  FloatType totalPerps = perigeeCircle.lengthOnCurve(frontPos, backPos);
+  FloatType totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
   if (totalPerps < 0) {
     //B2INFO("Reversed");
     perigeeCircle.reverse();

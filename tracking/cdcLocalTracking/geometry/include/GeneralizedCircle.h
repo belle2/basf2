@@ -424,7 +424,7 @@ namespace Belle2 {
        * before we take the opening angle as seen from the circle center.
        * The angle will zero if the generalized circle was line.
        */
-      inline FloatType openingAngle(const Vector2D& from, const Vector2D& to) const
+      inline FloatType openingAngleBetween(const Vector2D& from, const Vector2D& to) const
       { return gradient(from).angleWith(gradient(to)); } //not optimal in number of computations
 
 
@@ -437,7 +437,7 @@ namespace Belle2 {
        * before we take the length on the curve.
        * For the line case the length is the distance component parallel to the line.
        */
-      FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const;
+      FloatType arcLengthBetween(const Vector2D& from, const Vector2D& to) const;
 
       /// Calculates the arc length between the perigee and the given point.
       FloatType arcLengthTo(const Vector2D& point) const;
@@ -457,7 +457,7 @@ namespace Belle2 {
 
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
-      Vector2D atPerpS(const FloatType& perpS) const;
+      Vector2D atArcLength(const FloatType& arcLength) const;
 
 
     public:

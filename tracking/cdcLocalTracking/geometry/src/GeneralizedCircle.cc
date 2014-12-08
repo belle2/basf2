@@ -181,8 +181,8 @@ Vector2D GeneralizedCircle::perigee() const
 Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const
 {
 
-  FloatType lengthOnCurve1 = lengthOnCurve(start, end1);
-  FloatType lengthOnCurve2 = lengthOnCurve(start, end2);
+  FloatType lengthOnCurve1 = arcLengthBetween(start, end1);
+  FloatType lengthOnCurve2 = arcLengthBetween(start, end2);
 
   if (lengthOnCurve1 >= 0.0) {
 
@@ -278,7 +278,7 @@ Vector2D GeneralizedCircle::samePolarRForwardOf(const Vector2D& startPoint, cons
 
 
 
-FloatType GeneralizedCircle::lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+FloatType GeneralizedCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to) const
 {
   ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
   if (lengthSign == INVALID_INFO) return NAN;
@@ -420,9 +420,9 @@ std::pair<Vector2D, Vector2D> GeneralizedCircle::intersections(const Generalized
 }
 
 
-Vector2D GeneralizedCircle::atPerpS(const FloatType& perpS) const
+Vector2D GeneralizedCircle::atArcLength(const FloatType& arcLength) const
 {
-  FloatType atX =  perpS * cosc(perpS * curvature()) + impact();
-  FloatType atY =  -perpS * sinc_pi(perpS * curvature());
+  FloatType atX =  arcLength * cosc(arcLength * curvature()) + impact();
+  FloatType atY =  -arcLength * sinc_pi(arcLength * curvature());
   return Vector2D::compose(-n12().unit(), atX, atY);
 }

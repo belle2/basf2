@@ -75,7 +75,7 @@ namespace Belle2 {
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
       FloatType calcPerpS(const Vector2D& point) const
-      { return getLocalCircle().lengthOnCurve(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
+      { return getLocalCircle().arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
 
 
       /// Calculate the travel distance between the two given positions
@@ -85,7 +85,7 @@ namespace Belle2 {
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
       FloatType calcPerpSBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
-      { return getLocalCircle().lengthOnCurve(fromPoint - getLocalOrigin(), toPoint - getLocalOrigin()); }
+      { return getLocalCircle().arcLengthBetween(fromPoint - getLocalOrigin(), toPoint - getLocalOrigin()); }
 
       /// Gives the three dimensional point which is on the skew line and has the given proper (signed) distance to the circle in the xy projection
       /** This method makes the reconstruction of the z coordinate possible by using the skewness \n

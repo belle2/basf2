@@ -72,8 +72,12 @@ namespace Belle2 {
       void appendSZ(CDCObservations2D& observationsSZ, const CDCRecoHit3DVector& recoHits3D) const
       { for (const CDCRecoHit3D & recoHit3D : recoHits3D) appendSZ(observationsSZ, recoHit3D); }
 
-      /// Appends the s and z value of the given hit to the observation matrix
-      void appendSZ(CDCObservations2D& observationsSZ, const Belle2::CDCLocalTracking::CDCRecoHit3D& recoHit3D) const {
+      /** Appends the s and z value of the given hit to the observation matrix
+       *
+       *  In case the hit do contains a NaN value it will not be appended to the observations
+       *
+       *  @return   The number of hits appended which is 0 or 1 here.*/
+      size_t appendSZ(CDCObservations2D& observationsSZ, const Belle2::CDCLocalTracking::CDCRecoHit3D& recoHit3D) const {
         // Translate the drift length uncertainty to a uncertainty in z
         // by the taking the projected wire vector part parallel to the displacement
         // as a proportionality factor to the z direction.
@@ -108,6 +112,7 @@ namespace Belle2 {
         //   B2WARNING("Variance: " << 1.0 / weight);
         //   B2WARNING("Weight: " << weight << std::endl);
         // }
+        return appended_hit;
       }
 
       /// Appends the s and z value of the given hit to the observation matrix

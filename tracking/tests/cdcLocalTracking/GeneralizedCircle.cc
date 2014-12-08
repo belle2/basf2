@@ -75,7 +75,7 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_arcLengthFactor)
 
 
 
-TEST_F(CDCLocalTrackingTest, GeneralizedCircle_lengthOnCurve)
+TEST_F(CDCLocalTrackingTest, GeneralizedCircle_arcLengthBetween)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
   Vector2D origin(0.0, 0.0);
@@ -86,27 +86,27 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_lengthOnCurve)
   FloatType smallAngle = PI / 100;
   Vector2D close(1.0 - cos(smallAngle), sin(smallAngle));
 
-  EXPECT_NEAR(-PI / 2.0, circle.lengthOnCurve(origin, up), 10e-7);
-  EXPECT_NEAR(PI / 2.0, circle.lengthOnCurve(origin, down), 10e-7);
+  EXPECT_NEAR(-PI / 2.0, circle.arcLengthBetween(origin, up), 10e-7);
+  EXPECT_NEAR(PI / 2.0, circle.arcLengthBetween(origin, down), 10e-7);
 
-  EXPECT_NEAR(PI / 2.0, circle.lengthOnCurve(up, origin), 10e-7);
-  EXPECT_NEAR(-PI / 2.0, circle.lengthOnCurve(down, origin), 10e-7);
+  EXPECT_NEAR(PI / 2.0, circle.arcLengthBetween(up, origin), 10e-7);
+  EXPECT_NEAR(-PI / 2.0, circle.arcLengthBetween(down, origin), 10e-7);
 
   // Sign of the length at the far end is unstable, which is why fabs is taken here
-  EXPECT_NEAR(PI, fabs(circle.lengthOnCurve(origin, far)), 10e-7);
+  EXPECT_NEAR(PI, fabs(circle.arcLengthBetween(origin, far)), 10e-7);
 
-  EXPECT_NEAR(-smallAngle, circle.lengthOnCurve(origin, close), 10e-7);
+  EXPECT_NEAR(-smallAngle, circle.arcLengthBetween(origin, close), 10e-7);
 
 
   GeneralizedCircle line(0.0, -1.0, 0.0, 0.0);
-  EXPECT_NEAR(-2, line.lengthOnCurve(origin, up), 10e-7);
-  EXPECT_NEAR(2, line.lengthOnCurve(origin, down), 10e-7);
-  EXPECT_NEAR(0, line.lengthOnCurve(origin, far), 10e-7);
+  EXPECT_NEAR(-2, line.arcLengthBetween(origin, up), 10e-7);
+  EXPECT_NEAR(2, line.arcLengthBetween(origin, down), 10e-7);
+  EXPECT_NEAR(0, line.arcLengthBetween(origin, far), 10e-7);
 
   GeneralizedCircle reverseLine(0.0, 1.0, 0.0, -0.0);
-  EXPECT_NEAR(2, reverseLine.lengthOnCurve(origin, up), 10e-7);
-  EXPECT_NEAR(-2, reverseLine.lengthOnCurve(origin, down), 10e-7);
-  EXPECT_NEAR(0, reverseLine.lengthOnCurve(origin, far), 10e-7);
+  EXPECT_NEAR(2, reverseLine.arcLengthBetween(origin, up), 10e-7);
+  EXPECT_NEAR(-2, reverseLine.arcLengthBetween(origin, down), 10e-7);
+  EXPECT_NEAR(0, reverseLine.arcLengthBetween(origin, far), 10e-7);
 
 }
 
@@ -161,7 +161,7 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_atPerps)
 
   FloatType nearPerpS = -smallAngle * radius; //Minus because of default counterclockwise orientation
 
-  Vector2D atNear = circle.atPerpS(nearPerpS);
+  Vector2D atNear = circle.atArcLength(nearPerpS);
 
   EXPECT_NEAR(near.x(), atNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), atNear.y(), 10e-7);
@@ -170,7 +170,7 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_atPerps)
   Vector2D down(2.0, -1.0);
   FloatType downPerpS = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
 
-  Vector2D atDown = circle.atPerpS(downPerpS);
+  Vector2D atDown = circle.atArcLength(downPerpS);
 
   EXPECT_NEAR(down.x(), atDown.x(), 10e-7);
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
@@ -205,7 +205,7 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_atPerps)
   B2INFO("tangential to 3,0 " << circle.tangential(Vector2D(3, 0)));
 
   B2INFO("opening angle from 0.5,2.5 to  3,0 " << circle.openingAngle(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
-  B2INFO("arc length from 0.5,2.5 to  3,0 " << circle.lengthOnCurve(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
+  B2INFO("arc length from 0.5,2.5 to  3,0 " << circle.arcLengthBetween(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
 
 
   circle.reverse();
@@ -230,7 +230,7 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_atPerps)
   B2INFO("tangential to 3,0 " << circle.tangential(Vector2D(3, 0)));
 
   B2INFO("opening angle from 0.5,2,5 to  3,0 " << circle.openingAngle(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
-  B2INFO("arc length from 0.5,2.5 to  3,0 " << circle.lengthOnCurve(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
+  B2INFO("arc length from 0.5,2.5 to  3,0 " << circle.arcLengthBetween(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
 
 
   circle.setN(1, 1, -1, 0);
@@ -256,7 +256,7 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_atPerps)
   B2INFO("tangential to 3,0 " << circle.tangential(Vector2D(3, 0)));
 
   B2INFO("opening angle from 0,0 to  3,0 " << circle.openingAngle(Vector2D(0, 0) , Vector2D(3, 0)));
-  B2INFO("arc length from 0,0 to  3,0 " << circle.lengthOnCurve(Vector2D(0, 0) , Vector2D(3, 0)));
+  B2INFO("arc length from 0,0 to  3,0 " << circle.arcLengthBetween(Vector2D(0, 0) , Vector2D(3, 0)));
 
   B2INFO("Reversed line");
   circle.reverse();
@@ -280,5 +280,5 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_atPerps)
   B2INFO("tangential to 3,0 " << circle.tangential(Vector2D(3, 0)));
 
   B2INFO("opening angle from 0,0 to  3,0 " << circle.openingAngle(Vector2D(0, 0) , Vector2D(3, 0)));
-  B2INFO("arc length from 0,0 to  3,0 " << circle.lengthOnCurve(Vector2D(0, 0) , Vector2D(3, 0)));
+  B2INFO("arc length from 0,0 to  3,0 " << circle.arcLengthBetween(Vector2D(0, 0) , Vector2D(3, 0)));
 */

@@ -32,7 +32,7 @@ FloatType Helix::closestAtPerpS(const Vector3D& point) const
   // TODO: Introduce special case for curvatureXY == 0
 
 
-  FloatType byPerpS = circleXY().lengthOnCurve(perigeeXY(), point.xy());
+  FloatType byPerpS = circleXY().arcLengthBetween(perigeeXY(), point.xy());
 
   // Handle z coordinate
   FloatType transformedZ0 = byPerpS * szSlope() + z0();

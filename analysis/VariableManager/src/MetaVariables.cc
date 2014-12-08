@@ -189,7 +189,7 @@ namespace Belle2 {
           PCmsLabTransform T;
           Particle* target = nullptr; //Particle selected as target
           float maximum_p_track = 0; //Probability of being the target track from the track level
-          float prob = 0; //The probability of beeing right classified flavour from the event level
+          float prob = 0; //The probability of beeing right classified flavor from the event level
           float maximum_q = 0; //Flavour of the track selected as target
           if (ListOfParticles->getListSize() > 0) {
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
@@ -203,15 +203,15 @@ namespace Belle2 {
                 target = particle;
               }
             }
-            prob = target -> getExtraInfo(extraInfoRightClass); //Gets the probability of beeing right classified flavour from the event level
-            maximum_q = target -> getCharge(); //Gets the flavour of the track selected as target
+            prob = target -> getExtraInfo(extraInfoRightClass); //Gets the probability of beeing right classified flavor from the event level
+            maximum_q = target -> getCharge(); //Gets the flavor of the track selected as target
             if (extraInfoFromB == "IsFromB(Lambda)") {
               maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
             }
           }
           //float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */
           //return 0.5 * (maximum_q * r + 1);
-//           if (extraInfoFromB == ("IsFromB(IntermediateElectron)" || "IsFromB(IntermediateMuon)" || "IsFromB(SlowPion)" || "IsFromB(FSC)" || "IsFromB(Lambda)")) return -1 * maximum_q * prob;
+//            if (extraInfoFromB == ("IsFromB(IntermediateElectron)" || "IsFromB(IntermediateMuon)" || "IsFromB(SlowPion)" || "IsFromB(FSC)" || "IsFromB(Lambda)")) return -1 * maximum_q * prob;
           return maximum_q * prob;
         };
         return func;
@@ -373,13 +373,15 @@ namespace Belle2 {
             }
           }
           if (particleName == "Electron"
-              && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511) {
+              && ((maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511)
+                  || (maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511))) {
             return 1.0;
           } else if (particleName == "IntermediateElectron"
                      && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511) {
             return 1.0;
           } else if (particleName == "Muon"
-                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511) {
+                     && ((maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511)
+                         || (maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511))) {
             return 1.0;
           } else if (particleName == "IntermediateMuon"
                      && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511) {
@@ -434,9 +436,13 @@ namespace Belle2 {
           if (mcParticle == nullptr) return 0.0;
           //direct electron
           else if (particleName == "Electron"
-          && mcParticle->getMother() != nullptr
+          && ((mcParticle->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 11
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511)
+          || (mcParticle->getMother() != nullptr
+          && mcParticle->getMother()->getMother() != nullptr
+          && TMath::Abs(mcParticle->getPDG()) == 11
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511))) {
             return 1.0;
             //intermediate electron
           } else if (particleName == "IntermediateElectron"
@@ -447,9 +453,14 @@ namespace Belle2 {
             return 1.0;
             //direct muon
           } else if (particleName == "Muon"
-          && mcParticle->getMother() != nullptr
+          && ((mcParticle->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 13
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511)
+          || (mcParticle->getMother() != nullptr
+          && mcParticle->getMother()->getMother() != nullptr
+          && TMath::Abs(mcParticle->getPDG()) == 13
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511))
+                    ) {
             return 1.0;
             //intermediate muon
           } else if (particleName == "IntermediateMuon"
@@ -751,7 +762,7 @@ namespace Belle2 {
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
     REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightClass, extraInfoFromB)", InputQrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
     REGISTER_VARIABLE("QrOf(particleListName, extraInfoRightClass, extraInfoFromB)", QrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
-    REGISTER_VARIABLE("IsRightClass(particleName)", IsRightClass, "FlavorTagging: returns 1 if the class track by particleName category has the same flavour as the MC target track 0 else also if there is no target track");
+    REGISTER_VARIABLE("IsRightClass(particleName)", IsRightClass, "FlavorTagging: returns 1 if the class track by particleName category has the same flavor as the MC target track 0 else also if there is no target track");
     REGISTER_VARIABLE("IsFromB(particleName)", IsFromB, "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
     REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, "Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName. The probability is accessed via extraInfoName.");
     REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables, "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90) assuming a semileptonic decay with the given particle as target.");

@@ -1422,7 +1422,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,  "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar.");
     REGISTER_VARIABLE("isRestOfEventEmpty", isRestOfEventEmpty,  "-1 (1), -2 if current RestOfEvent is related to a B0bar (B0). But is used for checking if RoE empty.");
     REGISTER_VARIABLE("isRestOfEventB0Flavor", isRestOfEventB0Flavor,  "-1 (1) if current RestOfEvent is related to a B0bar (B0).");
-    REGISTER_VARIABLE("qr_Combined", isRestOfEventB0Flavor_Norm,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
+    REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor_Norm,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
     REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
     REGISTER_VARIABLE("NumberOfKShortinRemainingROEKaon", NumberOfKShortinRemainingROEKaon,  "Returns the number of K_S0 in the remainging Kaon ROE.");

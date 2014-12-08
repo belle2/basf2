@@ -32,7 +32,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Worker for building reconstructed segments form wirehits using reconstructed facets
-    template<class FacetFilter, class FacetNeighborChooser>
+    template<class FacetFilter, class FacetNeighborChooser, bool generateSymmetric = true>
     class FacetSegmentWorker {
 
     public:
@@ -156,14 +156,28 @@ namespace Belle2 {
 
             // reduce the CDCRecoFacetPtrSegment directly to the selected vector
             B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            //Make enough space for the segments condensed from the facet paths and their reversed versions.
-            m_segments2D.reserve(m_segments2D.size() + 2 * m_facetPaths.size());
-            for (const std::vector<const CDCRecoFacet* >& facetPath : m_facetPaths) {
-              m_segments2D.push_back(CDCRecoSegment2D::condense(facetPath));
-              m_segments2D.push_back(m_segments2D.back().reversed());
-              // ^ Save because we reserved the memory beforehand.
+            if (generateSymmetric) {
+              //Make enough space for the segments condensed from the facet paths and their reversed versions.
+              m_segments2D.reserve(m_segments2D.size() + 2 * m_facetPaths.size());
+              for (const std::vector<const CDCRecoFacet* >& facetPath : m_facetPaths) {
+                m_segments2D.push_back(CDCRecoSegment2D::condense(facetPath));
+                m_segments2D.push_back(m_segments2D.back().reversed());
+                // ^ Save because we reserved the memory beforehand.
+              }
+            } else {
+              // Only keep on hypotheses namely the on that is moving to the outside of the detector
+              m_segments2D.reserve(m_segments2D.size() + m_facetPaths.size());
+              for (const std::vector<const CDCRecoFacet* >& facetPath : m_facetPaths) {
+                m_segments2D.push_back(CDCRecoSegment2D::condense(facetPath));
+                // Check if the segment needs to be reversed
+                CDCRecoSegment2D& lastSegment = m_segments2D.back();
+                const CDCRecoHit2D& firstHit = lastSegment.front();
+                const CDCRecoHit2D& lastHit = lastSegment.back();
+                if (lastHit.getRecoPos2D().polarR() > firstHit.getRecoPos2D().polarR()) {
+                  lastSegment.reverse();
+                }
+              }
             }
-
             //TODO: combine matching segments here
 
             //size_t nSegmentsAfter = m_segments2D.size();

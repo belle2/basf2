@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Susanne Koblitz                                          *
+ * Contributors: Susanne Koblitz, Martin Ritter                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,14 +18,6 @@
 
 #include <string>
 #include <queue>
-#include <utility>
-
-#include <stdexcept>
-#include <boost/lexical_cast.hpp>
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
-#include <boost/format.hpp>
 
 #include <EvtGenExternal/EvtExternalGenList.hh>
 #include <EvtGenBase/EvtAbsRadCorr.hh>
@@ -54,7 +46,6 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
   extraModels.insert(extraModels.end(), modelList.begin(), modelList.end());
 
   // Method to add User EvtGen models here
-
   if (!m_Generator) {
     int mixingType = EvtCPUtil::Coherent;
     m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, radCorrEngine, &extraModels, mixingType);
@@ -74,26 +65,8 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
 
 int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, int inclusiveType, const std::string& inclusiveParticle)
 {
-  //  B2INFO("Starting event simulation.");
-
-  //pParentParticle.SetXYZM(0.0, 0.0, 0.0, EvtPDL::getMass(m_ParentParticle));
-
-  // Boost to CMS frame
-  pParentParticle = m_labboost.Inverse() * pParentParticle;
-
-  if (m_ParentParticle.getId() != 93) {
-
-    // Boost to CMS frame
-    //pParentParticle = m_labboost.Inverse() * pParentParticle;
-    m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
-
-    //B2INFO(pParentParticle.E() << "tt" << pParentParticle.X() << "tt" << pParentParticle.Y() << "tt" << pParentParticle.Z());
-
-  } else {
-    EvtId Ups = EvtPDL::getId("Upsilon(4S)");
-    //m_pinit.set(EvtPDL::getMass(Ups), 0.0, 0.0, 0.0);
-    m_pinit.set(EvtPDL::getMass(Ups), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
-  }
+  //Init evtgen
+  m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 
   EvtId Inclusive_Particle_ID = EvtPDL::getId(inclusiveParticle);
   EvtId Inclusive_Anti_Particle_ID = EvtPDL::chargeConj(Inclusive_Particle_ID);
@@ -102,7 +75,6 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
   do {
     m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
     m_parent->setVectorSpinDensity();
-    //B2INFO("Set starting particle");
     m_Generator->generateDecay(m_parent);
 
     if (inclusiveType != 0) {
@@ -134,7 +106,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
   int iPart = addParticles2Graph(m_parent, graph);
   graph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
-  //  B2INFO("doing the graph thing");
+  //  B2INFO("convert EvtGen particles to MCParticle list using MCParticleGraph");
 
   m_parent->deleteTree();
 

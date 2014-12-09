@@ -19,29 +19,25 @@
 #include <evtgen/EvtGenBase/EvtCPUtil.hh>
 #include <evtgen/EvtGenBase/EvtParticle.hh>
 #include <evtgen/EvtGenBase/EvtParticleFactory.hh>
-#include <evtgen/EvtGenBase/EvtPatches.hh>
 #include <evtgen/EvtGenBase/EvtPDL.hh>
 #include <evtgen/EvtGenBase/EvtRandom.hh>
-#include <evtgen/EvtGenBase/EvtReport.hh>
-#include <evtgen/EvtGenBase/EvtStdHep.hh>
-#include <evtgen/EvtGenBase/EvtStdlibRandomEngine.hh>
 #include <evtgen/EvtGenBase/EvtVector4R.hh>
-
 #include <generators/evtgen/EvtGenFwRandEngine.h>
 
 #include <string>
 #include <fstream>
 
-#include <TLorentzRotation.h>
-
 namespace Belle2 {
 
-  //! Module for using EvtGen generator
+  /** Class to interface EvtGen.
+   * This class is responsible to handle all interaction with evtgen and its
+   * classes when generating events. It sets up the models, calls evtgen to
+   * generate the events and converts the evtgen particles to a list of
+   * MCParticles
+   */
   class EvtGenInterface {
 
   public:
-
-    //Define exceptions
     /**
      * Constructor.
      */
@@ -54,17 +50,23 @@ namespace Belle2 {
       if (m_Generator) delete m_Generator;
     }
 
-    int setup(const std::string& decayFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName = std::string("")); /**< Member setup for user decay  */
-    int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, int inclusiveType, const std::string& inclusiveParticle); /**< MC simulation function */
-    TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
+    /** Setup evtgen with the given decay and pdl files  */
+    int setup(const std::string& decayFileName, const std::string& pdlFileName,
+              const std::string& parentParticle,
+              const std::string& userFileName = std::string(""));
+    /** Generate a single event */
+    int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
+                      int inclusiveType, const std::string& inclusiveParticle);
 
   private:
-    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph); /**< Function to add particle decays */
-    void updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle); /**< Function to update particle decays */
+    /** Convert EvtParticle structure to flat MCParticle list */
+    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph);
+    /** Copy parameters from EvtParticle to MCParticle */
+    void updateGraphParticle(EvtParticle* eParticle,
+                             MCParticleGraph::GraphParticle* gParticle);
 
   protected:
     EvtParticle* m_parent;      /**<Variable needed for parent particle.  */
-    EvtStdHep   m_evtstdhep;    /**<Variable needed for STDHEP format.    */
     EvtGenFwRandEngine m_eng;   /**<Variable needed for random generator. */
     EvtGen* m_Generator;        /**<Variable needed for EvtGen generator. */
     EvtVector4R m_pinit;        /**<Variable needed for initial momentum. */

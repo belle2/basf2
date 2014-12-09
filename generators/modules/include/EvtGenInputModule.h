@@ -46,9 +46,19 @@ namespace Belle2 {
     virtual void beginRun();
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual  void event();
 
   protected:
+
+    /** Create a "beam particle" from LER and HER direction, energy and energy
+     * spread and make sure it's inside the given mass window. Also boost it to
+     * CMS if needed
+     * @param minMass minimum mass for the beam particle to be accepted
+     * @param maxMass maximum mass for the beam particle to be accepted
+     * @return lorenz vector of the compound beam particle
+     */
+    TLorentzVector createBeamParticle(double minMass = 0,
+                                      double maxMass = std::numeric_limits<double>::infinity());
 
     MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
     EvtGenInterface m_Ievtgen;  /**< An instance of the EvtGen Interface. */
@@ -63,9 +73,12 @@ namespace Belle2 {
     double m_ELER;              /**< Energy for LER [GeV]. */
     double m_HER_Espread;       /**< Energy spread for HER [GeV]. */
     double m_LER_Espread;       /**< Energy spread for LER [GeV]. */
-    double m_crossing_angle;    /**< Beam pipe crossing angle [rad]. */
-    double m_angle;             /**< Rotation with respect to e- beampie [rad]. */
-
+    double m_crossing_angle;    /**< Crossing angle between beams */
+    double m_angle;             /**< Angle between LER and z-axis */
+    double m_angleHerToB;       /**< Angle between HER and z-axis */
+    double m_angleLerToB;       /**< Angle between LER and z-axis */
+    int m_maxTries; /**< Maximum number of tries for generating the parent particle */
+    EvtId m_parentId; /**< EvtGen Id of the parent particle we want to generate */
   };
 
 } // end namespace Belle2

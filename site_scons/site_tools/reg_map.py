@@ -6,7 +6,8 @@ import re
 from SCons.Builder import Builder
 
 # regular expression to find module names in source files
-reg_re = re.compile(r'(REG_[A-Z0-9_]+\([\S ]+\))', re.M)
+# corresponding code to get module name in ModuleManager::fillModuleNameLibMap()
+reg_re = re.compile(r'(REG_[A-Z0-9_]+\s*\([\S ]+\))', re.M)
 
 
 def build_map(target, source, env):

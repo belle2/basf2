@@ -9,14 +9,13 @@
 </header>
 """
 
-import os
 from basf2 import *
 from simulation import *
 from reconstruction import *
+from ROOT import Belle2
 
 set_random_seed(56423)
 
-print os.getcwd()
 
 main = create_path()
 
@@ -24,8 +23,13 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 main.add_module(eventinfosetter)
 
-pdgs = [11, 13, 211, 321, 2212]
+particles = Belle2.Const.chargedStableSet
+pdgs = []
+for i in range(particles.size()):
+    pdgs.append(particles.at(i).getPDGCode())
+
 pdgs += [-p for p in pdgs]
+print pdgs
 
 generator = register_module('ParticleGun')
 generator.param('momentumParams', [0.05, 4.5])
@@ -57,6 +61,8 @@ output.param('outputFileName', 'EvtGenSimRec_dedx.root')
 # let's keep this small
 output.param('branchNames', ['DedxLikelihoods', 'DedxTracks', 'EventMetaData'])
 main.add_module(output)
+
+main.add_module(register_module('ProgressBar'))
 
 process(main)
 print statistics

@@ -25,13 +25,13 @@ namespace Belle2 {
   /** This class represents an ideal helix in perigee parameterization.
    *  The used perigee parameters are:
    *
-   *  1. **d0** - the signed distance from the origin to the perigee. The sign is positive (negative),
-                  if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
-            d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
-   *  2. **phi** - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
-   *  3. **omega** - the signed curvature of the track where the sign is given by the charge of the particle
-   *  4. **z0** - z coordinate of the perigee
-   *  5. **tanLambda** - the slope of the track in the sz plane (dz/ds)
+   *  1. **@f$ d_0 @f$** - the signed distance from the origin to the perigee. The sign is positive (negative),
+                           if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
+                           @f$d_0@F$ has the same sign as `getPerigee().Cross(getMomentum()).Z()`.
+   *  2. **@f$ \phi_0 @f$** - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
+   *  3. **@f$ \omega @f$** - the signed curvature of the track where the sign is given by the charge of the particle
+   *  4. **@f$ z_0 @f$** - z coordinate of the perigee
+   *  5. **@f$ \tan \lambda @f$** - the slope of the track in the sz plane (dz/ds)
    *
    *  Each point on the helix can adressed by the arc length s, which has to be traversed to get to it from the perigee.
    *  More precisely the arc length means the transverse part of the particles travel distance,
@@ -47,17 +47,15 @@ namespace Belle2 {
     /** Constructor initializing all perigee parameters to zero. */
     Helix();
 
-    /** Constructor initializing class with fit result.
+    /** Constructor initializing class with a fit result.
      *
-     *  This is the only way to set the values of the Helix.
-     *  We don't have any setters, as we assume, that once we create the MDST object, we don't want
-     *  to change the values of the tracks any more.
-     *  Scaling can be applied during readout, by setting the value for the magnetic field.
+     *  The give n position and momentum are extrapolated to the perigee given a homogeneous magnetic field in the z direction
+     *
      *  @param position      Position of the track at the perigee.
      *  @param momentum      Momentum of the track at the perigee.
      *  @param charge        Charge of the particle.
-     *  @param bZ            Magnetic field to be used for the calculation of the curvature;
-                             It is assumed, that the B-field is parallel to the z-Axis.
+     *  @param bZ            Magnetic field to be used for the calculation of the curvature.
+                             It is assumed, that the B-field is homogeneous parallel to the z axis.
      */
     Helix(const TVector3& position,
           const TVector3& momentum,
@@ -88,6 +86,7 @@ namespace Belle2 {
     /// @name Getters for cartesian parameters of the perigee
     /// @{
     //---------------------------------------------------------------------------------------------------------------------------
+  public:
     /** Calculates the x coordinate of the perigee point.*/
     double getPerigeeX() const;
 
@@ -146,7 +145,7 @@ namespace Belle2 {
     /// @name Simple extrapolations of the ideal helix
     /// @{
     //---------------------------------------------------------------------------------------------------------------------------
-
+  public:
     /** Calculates the transverse travel distance at the point the helix first reaches the given cylindrical radius.
      *
      *  Gives the circle arc length in the forward direction that is traversed until a certain cylindrical radius is reached.
@@ -278,7 +277,7 @@ namespace Belle2 {
      *
      *  The signed distance from the origin to the perigee. The sign is positive (negative),
      *  if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
-     *  d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
+     *  d0 has the same sign as `getPerigee().Cross(getMomentum()).Z()`.
      */
     float getD0() const { return m_d0; }
 
@@ -321,7 +320,7 @@ namespace Belle2 {
                       const short int charge,
                       const float bZ);
 
-    /** Memory for the signed distance to the perigee. The sign is the same as of the z component of getPosition().Cross(getMomentum()).*/
+    /** Memory for the signed distance to the perigee. The sign is the same as of the z component of getPerigee().Cross(getMomentum()).*/
     float m_d0;
 
     /** Memory for the azimuth angle between the transverse momentum and the x axis, which is in [-pi, pi]. */
@@ -333,7 +332,7 @@ namespace Belle2 {
     /** Memory for the z coordinate of the perigee. */
     float m_z0;
 
-    /** Memory for the slope of the track in the sz plane (dz/ds)*/
+    /** Memory for the slope of the track in the z coordinate over the arclength (dz/ds)*/
     float m_tanLambda;
 
     /** Streamer version 1. */

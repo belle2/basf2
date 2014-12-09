@@ -6,11 +6,6 @@
 #
 # make a link to the SAD files before running it:
 #    ln -s /home/belle/nakayama/fs2/BGdata/10th_fullsim/ input
-# and make two changes in Belle2.xml:
-#    1. uncomment inclusion of FarBeamLine.xml
-#    2. change length of a Global volume from 8 to 40 m
-#
-# To generate samples for BG studies use patch provided by Nakayama-san
 # -------------------------------------------------------------------------
 
 from basf2 import *
@@ -64,40 +59,63 @@ readouttime = 0
 nevent = 1000000
 realTime = 1.0e3  # ns
 
+seed = str(1234567 + int(num))
 nummod = str(int(num) % 100)
 
 if name == 'RBB_LER':
     readmode = 0
     inputfilename = 'input/EvtbyEvt/' + name + '_EvtbyEvt_' + nummod + '.root'
+    seed = seed + '1'
 elif name == 'RBB_HER':
     readmode = 0
     inputfilename = 'input/EvtbyEvt/' + name + '_EvtbyEvt_' + nummod + '.root'
+    seed = seed + '2'
 elif name == 'Touschek_LER':
     readmode = 0  # 1us
     inputfilename = 'input/EvtbyEvt/' + name + '_EvtbyEvt_' + nummod + '.root'
+    seed = seed + '3'
 elif name == 'Touschek_HER':
     readmode = 0  # 1us
     inputfilename = 'input/EvtbyEvt/' + name + '_EvtbyEvt_' + nummod + '.root'
+    seed = seed + '4'
 elif name == 'Coulomb_LER':
     readmode = 0  # 1us
     inputfilename = 'input/EvtbyEvt/' + name + '_EvtbyEvt_' + nummod + '.root'
+    seed = seed + '5'
 elif name == 'Coulomb_HER':
     readmode = 0
     inputfilename = 'input/EvtbyEvt/' + name + '_EvtbyEvt_' + nummod + '.root'
+    seed = seed + '6'
 elif name == 'RBB_LER_far':
     readmode = 0
     nevent = 11459  # 0.1us
+    seed = seed + '7'
 elif name == 'RBB_HER_far':
     readmode = 0
     nevent = 3498  # 0.1us
+    seed = seed + '8'
 elif name == 'Touschek_LER_far':
     readmode = 1
     readouttime = 100  # 0.1us
+    seed = seed + '9'
 elif name == 'Touschek_HER_far':
     readmode = 1
     readouttime = 100  # 0.1us
+    seed = seed + '10'
 else:
     print 'Unknown name! (' + name + ')'
+    sys.exit()
+
+if sampleType == 'study':
+    seed = seed + '1'
+elif sampleType == 'usual':
+    seed = seed + '2'
+elif sampleType == 'ECL':
+    seed = seed + '3'
+elif sampleType == 'PXD':
+    seed = seed + '4'
+else:
+    print 'Unknown sample type! (' + sampleType + ')'
     sys.exit()
 
 print 'accring: ', accring, '(0:LER, 1:HER)'
@@ -110,10 +128,12 @@ print 'readouttime:', readouttime
 print 'bgType: ', bgType
 print 'sampleType: ', sampleType
 print 'realTime: ', realTime, 'ns'
+print 'seed: ', seed
 
 # --- put modules into path ---------------------------------------------------
 
 set_log_level(LogLevel.WARNING)
+set_random_seed(int(seed))
 
 main = create_path()
 
@@ -122,6 +142,22 @@ eventinfosetter.param({'evtNumList': [nevent], 'runList': [1], 'expList': [1]})
 main.add_module(eventinfosetter)
 
 gearbox = register_module('Gearbox')
+if sampleType == 'study':
+    gearbox.param('override', [
+        ('/Global/length', '40.0', 'm'),
+        ("/DetectorComponent[@name='PXD']//ActiveChips", 'true', ''),
+        ("/DetectorComponent[@name='PXD']//SeeNeutrons", 'true', ''),
+        ("/DetectorComponent[@name='SVD']//ActiveChips", 'true', ''),
+        ("/DetectorComponent[@name='SVD']//SeeNeutrons", 'true', ''),
+        ("/DetectorComponent[@name='TOP']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='ARICH']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='BKLM']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='BKLM']//DoBackgroundStudy", 'true', ''),
+        ("/DetectorComponent[@name='EKLM']//Mode", '1', ''),
+        ])
+else:
+    gearbox.param('override', [('/Global/length', '40.0', 'm')])  # needed for FarBeamLine
 main.add_module(gearbox)
 
 sadinput = register_module('SADInput')
@@ -133,6 +169,7 @@ sadinput.param('Range', range)
 main.add_module(sadinput)
 
 geometry = register_module('Geometry')
+geometry.param('additionalComponents', ['FarBeamLine'])
 main.add_module(geometry)
 
 fullsim = register_module('FullSim')

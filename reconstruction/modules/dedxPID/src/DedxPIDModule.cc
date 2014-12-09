@@ -70,7 +70,7 @@ DedxPIDModule::DedxPIDModule() : Module(),
   addParam("trackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
   addParam("enableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
 
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r14119_400k_events.root"));
+  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r14253_400k_events_including_deuterons.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;

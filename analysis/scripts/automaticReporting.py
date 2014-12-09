@@ -418,11 +418,14 @@ def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
     canvas.cd()
     hist = getKey(rootfile, '^{name}.*$'.format(name=prefix)).ReadObj()
     unit = ' (GeV) ' if preCutConfig.variable in ['M', 'Q'] else ''
-    if prefix in ['signal', 'all', 'bkgrd']:
-        unit += ';N'
-    else:
+    if prefix == 'ratio':
         unit += ';S/B'
-    hist.SetTitle(prefix + ';' + preCutConfig.variable + unit)
+    else:
+        unit += ';N'
+    title = prefix.capitalize()
+    if prefix == 'bckgrd':
+        title = 'Background'
+    hist.SetTitle(title + ';' + preCutConfig.variable + unit)
     hist.SetLabelSize(0.05, "X")
     hist.SetLabelSize(0.05, "Y")
     hist.SetTitleSize(0.05, "X")

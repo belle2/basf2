@@ -16,7 +16,7 @@ tempdir = tempfile.mkdtemp()
 print tempdir
 os.chdir(tempdir)
 
-cmd = "basf2 " + steeringFile + " -i " + inputFile
+cmd = "basf2 " + steeringFile + " -i " + inputFile + " -- -summary"
 
 #fsp variablestontuple
 assert 0 == os.system(cmd)

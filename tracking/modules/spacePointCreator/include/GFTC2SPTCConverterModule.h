@@ -18,6 +18,7 @@
 #include <string>
 #include <utility>
 
+#include <TVector3.h>
 
 namespace Belle2 {
   /**
@@ -43,7 +44,7 @@ namespace Belle2 {
    * 4) For every SpacePoint (from 3) check if its Cluster combination is valid (i.e. both Clusters are contained in the genfit::TrackCand and neither of these Clusters has been used by another SpacePoint) and also check if its Cluster combination is not valid, but existing (i.e. both Clusters are contained in the genfit::TrackCand but one has already been used by another SpacePoint)
    * 5) If ONLY ONE SpacePoint has a valid Cluster Combination, check if its Clusters appear in consecutive order in the genfit::TrackCand, if they do -> take this SpacePoint, mark the Clusters (TrackCandHits) as used, proceed with next TrackCandHit. If they do not appear in consecutive order -> throw an exception (this SpacePointTrackCand cannot be converted back to a genfit::TrackCand properly)
    * 6) If more than SpacePoint has a valid Cluster Combination -> check if there is a SpacePoint with consecutive Clusters in the genfit::TrackCand ('normally' there is a Cluster Combination, that is in consecutive order in the genfit::TrackCand) and mark its Clusters as used, proceed with next TrackCandHit, if all valid SpacePoints have Cluster Combinations that do not appear in consecutive order -> throw
-   * 7) If no valid SpacePoint can be found, but SpacePoints with existing (but used) Cluster Combinations can be found, an exception is thrown and the genfit::TrackCand will not be converted, since the conversion would get ambiguous then (this happens in roughly 1 % of all cases)
+   * 7) If no valid SpacePoint can be found, but SpacePoints with existing (but used) Cluster Combinations can be found, an exception is thrown and the genfit::TrackCand will not be converted, since the conversion would get ambiguous then (this happens in roughly 1 - 2 % of all cases)
    * 8) If no valid SpacePoint can be found and no SpacePoint with existing (but used) Cluster Combinations, this Cluster will be added via a single Cluster SpacePoint (and then be marked as used)
    *
    * If no SpacePoint can be found for any Cluster in the genfit::TrackCand, an exception is thrown, and the conversion is skipped.
@@ -62,6 +63,9 @@ namespace Belle2 {
 
     BELLE2_DEFINE_EXCEPTION(UnsuitableGFTrackCand, "The genfit::TrackCand cannot be unambiguously converted to a SpacePointTrackCand.");
 
+    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no related TrueHit for one (or more) Clusters of the Track Candidate. Cannot check if this is a curling track!");
+
+    BELLE2_DEFINE_EXCEPTION(FoundNoCluster, "No related Cluster to a SpacePoint was found.");
   protected:
 
     std::string m_PXDClusterName; /**< PXDCluster collection name */
@@ -77,6 +81,14 @@ namespace Belle2 {
     std::string m_genfitTCName; /**< Name of collection of genfit::TrackCand StoreArray */
 
     std::string m_SPTCName; /**< Name of collection under which SpacePointTrackCands will be stored in the StoreArray */
+
+    bool m_PARAMsplitCurlers; /**< Split curling tracks into tracklets.*/
+
+    std::vector<double> m_PARAMsetOrigin; /**< Reset origin, usefull for e.g. testbeam */
+
+    TVector3 m_origin; /**< Assumed interaction point. Set by user (or to default (0,0,0) if no other user input). WARNING: this does not have to be the actual interaction point! */
+
+    int m_NTracklets; /**< maximum number of tracklets to be saved, if curling tracks are split up into tracklets*/
 
     // some counters for testing
     unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were actually created by module*/
@@ -103,9 +115,23 @@ namespace Belle2 {
 
     const Belle2::SpacePoint* getSingleClusterSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the single cluster SVD SpacePoint */
 
+    const std::vector<int> checkTrackCandForCurling(const Belle2::SpacePointTrackCand&); /**< Check if the track candidate is curling. Returns the indices of SpacePoint where the Track Candidate changes direction (i.e. changes its direction of flight from outwards to inwards or vice versa) */
+
+    const std::vector<Belle2::SpacePointTrackCand> splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices); /**< Split a culring track candidate into (up to NTracklets) tracklets */
+
+    /**
+     Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
+     */
+    template<class TrueHit>
+    std::pair<const TVector3, const TVector3> getGlobalPositionAndMomentum(TrueHit* aTrueHit);
+
+    bool getDirectionOfFlight(const std::pair<const TVector3, const TVector3>& hitPosAndMom, const TVector3 origin); /**< determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
+
     BELLE2_DEFINE_EXCEPTION(UnusedHits, "Not all hits of the genfit::TrackCand have been marked as used. This indicates that not all hits have been used to create a SpacePointTrackCand.");
 
     BELLE2_DEFINE_EXCEPTION(FoundNoSpacePoint, "Found no relation between Cluster and SpacePoint. This hit would not be in SpacePointTrackCand, therefore skipping TrackCand from conversion!");
+
+    BELLE2_DEFINE_EXCEPTION(TrueHitsNotMatching, "The TrueHits related to the two SVDClusters of a SpacePoint are not the same!")
   };
 
 }

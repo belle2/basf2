@@ -53,6 +53,12 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
   addParam("SingleClusterSVDSP", m_SingleClusterSVDSPName, "Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string(""));
   addParam("NoSingleClusterSVDSP", m_NoSingleClusterSVDSPName, "Non Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string(""));
   addParam("PXDClusterSP", m_PXDClusterSPName, "PXD Cluster SpacePoints collection name.", string(""));
+
+  std::vector<double> defaultOrigin = {0., 0., 0.};
+  addParam("setOrigin", m_PARAMsetOrigin, "Reset origin to given Point. Used for decision if track is curling or not. (e.g. testbeam: origin is not at (0,0,0))", defaultOrigin);
+
+  addParam("splitCurlers", m_PARAMsplitCurlers, "Split curling tracks into tracklets, where each tracklet is then non-curling", false);
+  addParam("NTracklets", m_NTracklets, "Maximum number of tracklets to be saved if a curling track is split up into tracklets. Set to 1 if only the first part of a curling track is needed.", 1);
 }
 
 // ------------------------------ INITIALIZE ---------------------------------------
@@ -78,6 +84,20 @@ void GFTC2SPTCConverterModule::initialize()
 
   // register Relation to genfit::TrackCand
   spTrackCand.registerRelationTo(gfTrackCand);
+
+  // check other input parameters
+  if (m_PARAMsetOrigin.size() != 3) {
+    B2WARNING("SPTC2GFTCConverter::initialize: origin is set wrong. Please provide 3 values (x,y,z). Rejecting user defined value. Resetting origin to (0,0,0)");
+    m_PARAMsetOrigin.clear();
+    m_PARAMsetOrigin.assign(3, 0);
+  }
+  m_origin.SetXYZ(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
+  B2DEBUG(150, "Set origin to: (" << m_origin.X() << "," << m_origin.Y() << "," << m_origin.Z() << ")");
+
+  if (m_NTracklets < 1) {
+    B2WARNING("Maximum number of tracklets is set to a value lower than one. Please provide a value larger than one. Resetting to 1 now");
+    m_NTracklets = 1;
+  }
 }
 
 // ------------------------------------- EVENT -------------------------------------------------------
@@ -112,10 +132,33 @@ void GFTC2SPTCConverterModule::event()
     B2DEBUG(10, "Now processing genfit::TrackCand " << iTC << ".");
     try {
       const SpacePointTrackCand spacePointTC = createSpacePointTC(trackCand);
-      SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC);
-      m_SpacePointTCCtr += 1;
-      newSPTC->addRelationTo(trackCand);
-      B2DEBUG(10, "Added new SpacePointTrackCand to StoreArray " << spacePointTrackCands.getName());
+      // if the trackCand should not be split, do not even check if it is a curling track, simply add it to the store Array
+      if (!m_PARAMsplitCurlers) {
+        SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC);
+        m_SpacePointTCCtr += 1;
+        newSPTC->addRelationTo(trackCand);
+        B2DEBUG(10, "Added new SpacePointTrackCand to StoreArray " << spacePointTrackCands.getName());
+      } else {
+        const std::vector<int> changingIndices = checkTrackCandForCurling(spacePointTC); // ckeck the TrackCand for curling behaviour and get the indices (if it does)
+        // COULDDO: define method for adding a SpacePointTrackCand to the store array
+        if (changingIndices.size() == 0) { // if no indices come back, the track is not curling
+          SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC);
+          m_SpacePointTCCtr += 1;
+          newSPTC->addRelationTo(trackCand);
+          B2DEBUG(10, "Added new SpacePointTrackCand to StoreArray " << spacePointTrackCands.getName());
+        } else {
+          // get a vector of SpacePointTrackCands and store each of them separately in the StoreArray. relate each of them to the genfitTC
+          // COULDDO: store curling tracks in a separate StoreArray, where only curling tracks are (for easier handling in backconversion for example)
+          // COULDDO: introduce additional counter that counts curling tracks
+          const std::vector<Belle2::SpacePointTrackCand> tracklets = splitCurlingTrackCand(spacePointTC, m_NTracklets, changingIndices);
+          for (auto SPTrackCand : tracklets) {
+            SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(SPTrackCand);
+            m_SpacePointTCCtr += 1;
+            newSPTC->addRelationTo(trackCand);
+            B2DEBUG(10, "Added new SpacePointTrackCand to StoreArray " << spacePointTrackCands.getName());
+          }
+        }
+      }
     } catch (SpacePointTrackCand::UnsupportedDetType& anEx) {
       B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
     } catch (FoundNoSpacePoint& anEx) {
@@ -125,6 +168,12 @@ void GFTC2SPTCConverterModule::event()
     } catch (UnsuitableGFTrackCand& anEx) {
       B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
     } catch (UnusedHits& anEx) {
+      B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
+    } catch (FoundNoTrueHit& anEx) {
+      B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
+    } catch (FoundNoCluster& anEx) {
+      B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
+    } catch (TrueHitsNotMatching& anEx) {
       B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
     }
   }
@@ -395,6 +444,156 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSingleClusterSVDSpacePoin
   B2DEBUG(80, "Found SpacePoint " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName());
   markHitAsUsed(flaggedHitIDs, iHit);
   return spacePoint;
+}
+
+// ---------------------------------- check track cand for curling behaviour ----------------------------------------------------------------
+const std::vector<int> GFTC2SPTCConverterModule::checkTrackCandForCurling(const Belle2::SpacePointTrackCand& SPTrackCand)
+{
+  const std::vector<const Belle2::SpacePoint*> tcSpacePoints = SPTrackCand.getHits();
+  unsigned int nHits = SPTrackCand.getNHits();
+
+  std::vector<int> returnVector; // fill this vector with indices, if no indices can be found, leave it empty
+
+  std::pair<bool, bool> directions; // only store the last two directions to decide if it has changed or not. .first is always last hit, .second is present hit.
+  directions.first = true; // assume that the track points outwards from the interaction point
+
+  for (unsigned int iHit = 0; iHit < nHits; ++iHit) {
+    const SpacePoint* spacePoint = tcSpacePoints[iHit];
+    auto detType = spacePoint->getType();
+
+    // get global position and momentum for every spacePoint in the SpacePointTrackCand
+    std::pair<TVector3, TVector3> hitGlobalPosMom;
+
+    if (detType == VXD::SensorInfoBase::PXD) {
+      // first get PXDCluster, from that get TrueHit
+      PXDCluster* pxdCluster = spacePoint->getRelatedTo<PXDCluster>(m_PXDClusterName);
+      PXDTrueHit* pxdTrueHit = pxdCluster->getRelatedTo<PXDTrueHit>("ALL"); // COULDDO: search only certain PXDTrueHit arrays -> new parameter for module
+
+      if (pxdTrueHit == NULL) {
+        B2WARNING("Found no PXDTrueHit for PXDCluster " << pxdCluster->getArrayIndex() << " from Array " << pxdCluster->getArrayName() << ". This PXDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
+        throw FoundNoTrueHit();
+      }
+
+      hitGlobalPosMom = getGlobalPositionAndMomentum(pxdTrueHit);
+
+    } else if (detType == VXD::SensorInfoBase::SVD) {
+      // get all related SVDClusters and do some sanity checks, before getting the SVDTrueHits and then using them to get global position and momentum
+      RelationVector<SVDCluster> svdClusters = spacePoint->getRelationsTo<SVDCluster>(m_SVDClusterName);
+      if (svdClusters.size() > 2) { throw SpacePoint::InvalidNumberOfClusters(); } // should never throw, since this check should already be done in SpacePoint creation!
+      if (svdClusters.size() == 0) {
+        B2WARNING("Found no related clusters for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". With no Cluster no information if a track is curling or not can be obtained");
+        throw FoundNoCluster(); // this should also never happen, as the vice versa way is used above to get to the SpacePoints in the first place!!
+      } else {
+        // collect the TrueHits (maximum 2), if there is more than one compare them, to see if both Clusters point to the same TrueHit
+        std::vector<SVDTrueHit*> svdTrueHits;
+        for (const SVDCluster & aCluster : svdClusters) {
+          SVDTrueHit* svdTrueHit = aCluster.getRelatedTo<SVDTrueHit>("ALL"); // COULDDO: search only certain SVDTrueHit arrays -> new parameter for module
+          if (svdTrueHit == NULL) {
+            B2WARNING("Found no SVDTrueHit for SVDCluster " << aCluster.getArrayIndex() << " from Array " << aCluster.getArrayName() << ". This SVDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
+            throw FoundNoTrueHit();
+          }
+          svdTrueHits.push_back(svdTrueHit);
+        }
+        // if there were 2 clusters, check if they are both related to the same SVDTrueHit, if not throw. Else get position and momentum for this SpacePoint
+        if (svdTrueHits.size() > 1) {
+          if (svdTrueHits[0] != svdTrueHits[1]) {
+            B2WARNING("TrueHits of SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " are not matching: TrueHit 1 has Index " << svdTrueHits[0]->getArrayIndex() << ", TrueHit 2 has Index " << svdTrueHits[1]->getArrayIndex());
+            throw TrueHitsNotMatching();
+          }
+        }
+        hitGlobalPosMom = getGlobalPositionAndMomentum(svdTrueHits[0]);
+      }
+    } else { // this should never be reached, because it should be caught in the creation of the SpacePointTrackCand which is passed to this function!
+      throw SpacePointTrackCand::UnsupportedDetType();
+    }
+
+    // get the direction of flight for the present SpacePoint
+    directions.second = getDirectionOfFlight(hitGlobalPosMom, m_origin);
+
+    // check if the directions have changed since the last hit, if so, add the number of the SpacePoint (inside the SpacePointTrackCand) to the returnVector
+    if (directions.first != directions.second) {
+      B2DEBUG(75, "The direction of flight has changed for SpacePoint " << iHit << " in SpacePointTrackCand. The StoreArray index of this SpacePoint is " << spacePoint->getArrayIndex() << " in " << spacePoint->getArrayName());
+      returnVector.push_back(iHit);
+    }
+    // assign old value to .first, for next comparison
+    directions.first = directions.second;
+  }
+  return returnVector;
+}
+
+// get the global position of a TrueHit
+template<class TrueHit>
+std::pair<const TVector3, const TVector3> GFTC2SPTCConverterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
+{
+  // get sensor stuff (needed for pointToGlobal)
+  VxdID aVxdId = aTrueHit->getSensorID();
+
+  B2DEBUG(100, "Getting global position and momentum vectors for TrueHit " << aTrueHit->getArrayIndex() << " from Array " << aTrueHit->getArrayName() << ". This hit has VxdID " << aVxdId);
+
+  const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(aVxdId);
+
+  // get position
+  TVector3 hitGlobal = sensorInfoBase.pointToGlobal(TVector3(aTrueHit->getU(), aTrueHit->getV(), 0)); // should work like this, since local coordinates are only 2D
+  B2DEBUG(100, "Global position of hit is (" << hitGlobal.X() << "," << hitGlobal.Y() << "," << hitGlobal.Z() << ")");
+
+  // get momentum
+  TVector3 pGlobal = sensorInfoBase.pointToGlobal(aTrueHit->getMomentum());
+  B2DEBUG(100, "Global momentum of hit is (" << pGlobal.X() << "," << pGlobal.Y() << "," << pGlobal.Z() << ")");
+
+  return std::make_pair(hitGlobal, pGlobal);
+}
+
+// get the direction of flight. false is inwards, true is outwards !!
+bool GFTC2SPTCConverterModule::getDirectionOfFlight(const std::pair<const TVector3, const TVector3>& hitPosAndMom, const TVector3 origin)
+{
+  TVector3 originToHit = hitPosAndMom.first - origin;
+  TVector3 momentumAtHit = hitPosAndMom.second + originToHit;
+
+  B2DEBUG(250, "Position of hit relative to origin is (" << originToHit.X() << "," << originToHit.Y() << "," << originToHit.Z() << "). Momentum relative to hit (relative to origin) (" << momentumAtHit.X() << "," << momentumAtHit.Y() << "," << momentumAtHit.Z() << ")");
+
+  // cylindrical coordinates (?) -> use TVector3.Perp() to get the radial component of a given vector
+  // for spherical coordinates -> use TVector3.Mag() for the same purposes
+  double hitRadComp = originToHit.Perp(); // radial component of hit coordinates
+  double hitMomRadComp = momentumAtHit.Perp(); // radial component of the tip of the momentum vector, when its origin would be the hit position (as it is only the direction of the momentum that matters here, units are completely ignored)
+
+  if (hitMomRadComp < hitRadComp) {
+    B2DEBUG(100, "Direction of flight is inwards for this hit");
+    return false;
+  } else {
+    B2DEBUG(100, "Direction of flight is outwards for this hit");
+    return true;
+  }
+}
+
+// ------------------------------------- split curling track candidates into tracklets -------------------------------------------------------
+const std::vector<Belle2::SpacePointTrackCand> GFTC2SPTCConverterModule::splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices)
+{
+  std::vector<SpacePointTrackCand> spacePointTCs;
+
+  // first 'first Index' is 0
+  int firstIndex = 0;
+  // return NTracklets at most
+  for (unsigned iTr = 0; iTr < uint(NTracklets) && iTr < splitIndices.size(); ++iTr) {
+    int lastIndex = splitIndices[iTr];
+
+    B2DEBUG(75, "Creating Tracklet " << iTr << " of " << splitIndices.size() << " possible Tracklets for this SpacePointTrackCand. The indices for this Tracklet are (first,last): (" << firstIndex << "," << lastIndex << ")");
+
+    const std::vector<const SpacePoint*> trackletSpacePoints = SPTrackCand.getHitsInRange(firstIndex, lastIndex);
+    const std::vector<double> trackletSortingParams = SPTrackCand.getSortingParametersInRange(firstIndex, lastIndex);
+
+    // next first Index is lastIndex from this turn + 1
+    firstIndex = lastIndex + 1;
+
+    SpacePointTrackCand newSPTrackCand = SpacePointTrackCand(trackletSpacePoints, SPTrackCand.getPdgCode(), SPTrackCand.getChargeSeed(), SPTrackCand.getMcTrackID());
+    newSPTrackCand.setSortingParameters(trackletSortingParams);
+
+    // TODO: set state seed and cov seed for all but the first tracklets (first is just the seed of the original TrackCand)
+
+    spacePointTCs.push_back(newSPTrackCand);
+  }
+
+  return spacePointTCs;
 }
 
 void GFTC2SPTCConverterModule::initializeCounters()

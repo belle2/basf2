@@ -38,7 +38,7 @@
   <xi:include href="../structure/STR.xml"/>
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
-  <!--xi:include href="../ir/FarBeamLine.xml"/-->
+  <xi:include href="../ir/FarBeamLine.xml"/>
   <xi:include href="../vxd/HeavyMetalShield.xml"/>
   <xi:include href="../vxd/Service.xml"/>
   <xi:include href="../pxd/PXD.xml"/>

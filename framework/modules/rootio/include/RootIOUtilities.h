@@ -15,6 +15,7 @@
 #include <vector>
 
 class TTree;
+class TClass;
 
 namespace Belle2 {
   /** Some constants and helpers common to the RootInput and RootOutput modules. */
@@ -30,6 +31,23 @@ namespace Belle2 {
 
     /** Build TTreeIndex on tree (assumes EventMetaData branch exists there). */
     void buildIndex(TTree* tree);
+
+    /** Returns true if and only if 'cl' or one of its bases has I/O streamers.
+     *
+     *  TObject is not considered to have any.
+     */
+    bool hasStreamer(TClass* cl);
+
+    /** Returns true if and only if 'cl' has a user-defined streamer
+     *
+     * In that case, TClonesArrays of this type should be written with BypassStreamer(false) and
+     * split-level -1 (no splitting).
+     */
+    bool hasCustomStreamer(TClass* cl);
+
+    /** Load dictionaries for classes found in input files. */
+    void loadDictionaries();
+
 
     /** Names of trees. */
     extern const std::string c_treeNames[];

@@ -87,12 +87,6 @@ namespace Belle2 {
      */
     void fillTree(DataStore::EDurability durability);
 
-    /** Returns true if and only if 'cl' or one of its bases has I/O streamers.
-     *
-     *  TObject is not considered to have any.
-     */
-    static bool hasStreamers(TClass* cl);
-
     //first the steerable variables:
 
     /** Name for output file.

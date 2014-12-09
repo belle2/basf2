@@ -2,7 +2,15 @@
 
 #include <framework/logging/Logger.h>
 
+#include <RVersion.h>
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
+#include <TCint.h>
+#endif
 #include <TTree.h>
+#include <TList.h>
+#include <TClass.h>
+#include <TBaseClass.h>
+#include <TSystem.h>
 
 #include <algorithm>
 
@@ -42,4 +50,46 @@ long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long 
 void RootIOUtilities::buildIndex(TTree* tree)
 {
   tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
+}
+
+bool RootIOUtilities::hasStreamer(TClass* cl)
+{
+  if (cl == TObject::Class())
+    return false;
+
+  if (cl->GetClassVersion() <= 0) {
+    // version number == 0 means no streamers for this class, check base classes
+    TList* baseClasses = cl->GetListOfBases();
+    TIter it(baseClasses);
+    while (TBaseClass* base = static_cast<TBaseClass*>(it())) {
+      if (hasStreamer(base->GetClassPointer()))
+        return true;
+    }
+    //nothing found
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
+bool RootIOUtilities::hasCustomStreamer(TClass* cl)
+{
+  //does this class have a custom streamer? (magic from from TTree.cxx)
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,0,0)
+  return cl->TestBit(TClass::kHasCustomStreamerMember);
+#else
+  return gCint->ClassInfo_RootFlag(cl->GetClassInfo()) & 1;
+#endif
+}
+
+void RootIOUtilities::loadDictionaries()
+{
+  gSystem->Load("libdataobjects");
+  gSystem->Load("libTreePlayer");
+  gSystem->Load("libgenfit2");    // Because genfit2 classes need custom streamers.
+  gSystem->Load("libvxd");
+  gSystem->Load("libsvd");
+  gSystem->Load("libpxd");
+  gSystem->Load("libcdc");
 }

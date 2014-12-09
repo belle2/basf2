@@ -17,11 +17,7 @@
 #include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
 
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-#include <TCint.h>
-#endif
 #include <TClonesArray.h>
-#include <TBaseClass.h>
 
 #include <time.h>
 
@@ -127,17 +123,11 @@ void RootOutputModule::initialize()
         entryClass = static_cast<TClonesArray*>(iter->second.object)->GetClass();
       }
 
-      if (!hasStreamers(entryClass))
+      if (!hasStreamer(entryClass))
         B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");
 
       int splitLevel = m_splitLevel;
-      //does this class have a custom streamer? (magic from from TTree.cxx)
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,0,0)
-      bool hasCustomStreamer = entryClass->TestBit(TClass::kHasCustomStreamerMember);
-#else
-      bool hasCustomStreamer = gCint->ClassInfo_RootFlag(entryClass->GetClassInfo()) & 1;
-#endif
-      if (hasCustomStreamer) {
+      if (hasCustomStreamer(entryClass)) {
         B2DEBUG(100, entryClass->GetName() << " has custom streamer, setting split level -1 for this branch.");
 
         splitLevel = -1;
@@ -153,26 +143,6 @@ void RootOutputModule::initialize()
     }
   }
   dir->cd();
-}
-
-bool RootOutputModule::hasStreamers(TClass* cl)
-{
-  if (cl == TObject::Class())
-    return false;
-
-  if (cl->GetClassVersion() <= 0) {
-    // version number == 0 means no streamers for this class, check base classes
-    TList* baseClasses = cl->GetListOfBases();
-    TIter it(baseClasses);
-    while (TBaseClass* base = static_cast<TBaseClass*>(it())) {
-      if (hasStreamers(base->GetClassPointer()))
-        return true;
-    }
-    //nothing found
-    return false;
-  } else {
-    return true;
-  }
 }
 
 

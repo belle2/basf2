@@ -18,7 +18,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <TClonesArray.h>
-#include <TSystem.h>
 #include <TFile.h>
 
 #include <wordexp.h>
@@ -63,13 +62,7 @@ RootInputModule::~RootInputModule() { }
 
 void RootInputModule::initialize()
 {
-  gSystem->Load("libdataobjects");
-  gSystem->Load("libTreePlayer");
-  gSystem->Load("libgenfit2");    // Because genfit2 classes need custom streamers.
-  gSystem->Load("libvxd");
-  gSystem->Load("libsvd");
-  gSystem->Load("libpxd");
-  gSystem->Load("libcdc");
+  loadDictionaries();
 
   const vector<string>& inputFiles = getInputFiles();
   if (inputFiles.empty()) {

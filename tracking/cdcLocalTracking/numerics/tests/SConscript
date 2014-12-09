@@ -1,5 +1,11 @@
 Import('env')
 
-env['LIBS'] = env['CDCLOCALTRACKING_TEST_LIBS']
+env['LIBS'] = [
+    'tracking',
+    'framework',
+    'framework_pybasf2',
+    '$ROOT_LIBS',
+    '$PYTHON_LIBS',
+    ]
 
 Return('env')

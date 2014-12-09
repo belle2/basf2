@@ -69,19 +69,7 @@ define_aliases(env, script_targets, dir_name, "scripts")
 # Abolish script files
 env['SCRIPT_FILES'] = []
 
-
-# Setup a variable for libraries common to all tests in this folder
-env['CDCLOCALTRACKING_TEST_LIBS'] = [
-    'tracking', 'tracking_dataobjects', 
-    'cdc', 'cdc_dataobjects',
-    'simulation_dataobjects',
-    'mdst_dataobjects',
-    'genfit2',
-    'framework',
-    'framework_pybasf2',
-    'geometry',
-    '$ROOT_LIBS',
-    '$PYTHON_LIBS',
-    ]
+# Additional libraries
+env['LIBS'] = ['framework_pybasf2']
 
 Return('env')

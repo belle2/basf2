@@ -1,7 +1,19 @@
 Import('env')
 
 # Use the common libraries of the track finder for the test compilation
-env['LIBS'] = env['CDCLOCALTRACKING_TEST_LIBS']
+env['LIBS'] = [
+    'tracking',
+    'cdc', 
+    'cdc_dataobjects',
+    'simulation_dataobjects',
+    'mdst_dataobjects',
+    'genfit2',
+    'framework',
+    'framework_pybasf2',
+    'geometry',
+    '$ROOT_LIBS',
+    '$PYTHON_LIBS',
+    ]
 
 # Include all tests in subdirectories into the test executable here at the top level
 # The only way this is possible is by replacing the linking call (test_env.Program()) from process_dir()

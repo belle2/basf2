@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
         switch (Dedx::Detector(detector)) {
           case Dedx::c_PXD:
             flayer_selection = TString::Format("%s < 0 && %s >= -2", flayer_var, flayer_var);
-            dedx_cutoff = 2.5e7; //for digitized PXDHits
+            dedx_cutoff = 10e3;
             break;
           case Dedx::c_SVD:
             flayer_selection = TString::Format("%s < -2", flayer_var);

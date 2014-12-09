@@ -53,7 +53,6 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <streambuf>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/valgrind.h>

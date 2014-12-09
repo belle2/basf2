@@ -1,8 +1,8 @@
 Import('env')
 
-env['TOOLS_LIBS']['basf2'] = ['$XML_LIBS', 'framework_pybasf2', 'framework',
+env['TOOLS_LIBS']['basf2'] = ['framework_pybasf2', 'framework',
                               'boost_filesystem', 'boost_program_options', 'boost_python', 'boost_system',
-                              '$PYTHON_LIBS', '$ROOT_LIBS']
+                              '$PYTHON_LIBS']
 
 env['TOOLS_LIBS']['showmetadata'] = ['$XML_LIBS', 'framework', 'boost_program_options', '$ROOT_LIBS']
 

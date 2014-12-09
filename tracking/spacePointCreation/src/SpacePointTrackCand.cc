@@ -70,6 +70,26 @@ SpacePointTrackCand::~SpacePointTrackCand()
 //   m_trackSpacePoints.clear();
 }
 
+// get SpacePoints in range
+const std::vector<const Belle2::SpacePoint*> SpacePointTrackCand::getHitsInRange(int firstInd, int lastInd) const
+{
+  std::vector<const SpacePoint*> spacePoints;
+  for (int iSP = firstInd; iSP <= lastInd; ++iSP) {
+    spacePoints.push_back(m_trackSpacePoints[iSP]);
+  }
+  return spacePoints;
+}
+
+// get Sorting Parameters in range
+const std::vector<double> SpacePointTrackCand::getSortingParametersInRange(int firstIndex, int lastIndex) const
+{
+  std::vector<double> sortingParams;
+  for (int iSP = firstIndex; iSP <= lastIndex; ++iSP) {
+    sortingParams.push_back(m_sortingParameters[iSP]);
+  }
+  return sortingParams;
+}
+
 // more or less copy pasted from genfit::TrackCand
 void SpacePointTrackCand::setPdgCode(int pdgCode)
 {

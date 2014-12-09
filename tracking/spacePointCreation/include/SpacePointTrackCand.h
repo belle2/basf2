@@ -60,6 +60,12 @@ namespace Belle2 {
     const std::vector<const Belle2::SpacePoint*>& getHits() const { return m_trackSpacePoints; }
 
     /**
+     * get hits (SpacePoints) in range (indices of SpacePoint inside SpacePointTrackCand) [firstInd,lastInd] (the SpacePoint on firstInd and on lastInd wil be returned as well!).
+     * For all hits range is from 0 to getNHits - 1
+     */
+    const std::vector<const Belle2::SpacePoint*> getHitsInRange(int firstInd, int lastInd) const;
+
+    /**
      * get the number of hits (space points) in the track candidate
      */
     unsigned int getNHits() const { return m_trackSpacePoints.size(); }
@@ -84,6 +90,11 @@ namespace Belle2 {
      * get the sorting parameters
      */
     const std::vector<double>& getSortingParameters() const { return m_sortingParameters; }
+
+    /**
+     * get the sorting parameters in range (indices of SpacePoints inside SpacePointTrackCand) including firstIndex and lastIndex
+     */
+    const std::vector<double> getSortingParametersInRange(int firstIndex, int lastIndex) const;
 
     /**
      * set the sorting parameters

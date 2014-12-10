@@ -13,25 +13,72 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2 3 4 5 6 7 8
+    <bar unit="mm">1 
     </bar>
 
     <Active>
       <Material>PH1SUSTR-Material</Material>
-      <x_ph1sustr unit="cm">7.5</x_ph1sustr>
-      <y_ph1sustr unit="cm">0.0</y_ph1sustr>
-      <z_ph1sustr unit="cm">36.8637</z_ph1sustr>
+      <x_tpcbeamR unit="cm">60.0</x_tpcbeamR>
+      <y_tpcbeamR unit="cm">0.0</y_tpcbeamR>
+      <z_tpcbeamR unit="cm">12.0</z_tpcbeamR>
+   
+      <x_tpcbeamL unit="cm">-60.0</x_tpcbeamL>
+      <y_tpcbeamL unit="cm">0.0</y_tpcbeamL>
+      <z_tpcbeamL unit="cm">12.0</z_tpcbeamL>
+    
+      <x_tpcbeamT unit="cm">0.0</x_tpcbeamT>
+      <y_tpcbeamT unit="cm">45.0</y_tpcbeamT>
+      <z_tpcbeamT unit="cm">12.0</z_tpcbeamT>
+    
+      <x_tpcbeamB unit="cm">0.0</x_tpcbeamB>
+      <y_tpcbeamB unit="cm">-45.0</y_tpcbeamB>
+      <z_tpcbeamB unit="cm">12.0</z_tpcbeamB>
+    </Active>
+
+<!--
+    <Active>
+      <Material>PH1SUSTR-Material</Material>
+      <x_tpcbeam unit="cm">78.0</x_tpcbeam>
+      <y_tpcbeam unit="cm">13.6</y_tpcbeam>
+      <z_tpcbeam unit="cm">50.0</z_tpcbeam>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-11.5</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-      <cDz unit="mm">124.0</cDz>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDx4 unit="mm">34.692</cDx4>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2> 
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>      
    </Active>
+
+    <Active>
+      <Material>PH1SUSTR-Material</Material>
+      <x_tpcbeam unit="cm">-78.0</x_tpcbeam>
+      <y_tpcbeam unit="cm">13.6</y_tpcbeam>
+      <z_tpcbeam unit="cm">50.0</z_tpcbeam>
+      <AngleX unit="deg">90.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>      
+   </Active>
+-->
+
+
+<!--
+    <Active>
+      <Material>PH1SUSTR-Material</Material>
+      <x_tpcbeam unit="mm">780.0</x_tpcbeam>
+      <y_tpcbeam unit="mm">136.0</y_tpcbeam>
+      <z_tpcbeam unit="mm">-100.0</z_tpcbeam>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>      
+   </Active>
+
+    <Active>
+      <Material>PH1SUSTR-Material</Material>
+      <x_tpcbeam unit="mm">780.0</x_tpcbeam>
+      <y_tpcbeam unit="mm">136.0</y_tpcbeam>
+      <z_tpcbeam unit="mm">300.0</z_tpcbeam>
+      <AngleX unit="deg">180.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>      
+   </Active>
+
 
    <Active>
      <Material>PH1SUSTR-Material</Material>
@@ -152,6 +199,6 @@
      <cDx3 unit="mm">22.938</cDx3>
      <cDx4 unit="mm">25.356</cDx4> 
    </Active>
-    
+-->    
   </Content>
 </DetectorComponent>

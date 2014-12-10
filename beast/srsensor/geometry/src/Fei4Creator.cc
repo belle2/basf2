@@ -95,9 +95,9 @@ namespace Belle2 {
                                 );
 
         G4RotationMatrix* rot_fei4 = new G4RotationMatrix();
-        rot_fei4->rotateX(activeParams.getLength("AngleX"));
-        rot_fei4->rotateY(activeParams.getLength("AngleY"));
-        rot_fei4->rotateZ(activeParams.getLength("AngleZ"));
+        rot_fei4->rotateX(activeParams.getAngle("AngleX"));
+        rot_fei4->rotateY(activeParams.getAngle("AngleY"));
+        rot_fei4->rotateZ(activeParams.getAngle("AngleZ"));
         //geometry::setColor(*l_FEI4, "#006699");
 
         new G4PVPlacement(rot_fei4, FEI4pos, l_FEI4, "p_FEI4", &topVolume, false, fei4Nb);

@@ -11,8 +11,7 @@
 #ifndef CSISTUDYMODULE_H
 #define CSISTUDYMODULE_H
 
-#include <framework/core/Module.h>
-
+#include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
 
@@ -21,19 +20,18 @@
 
 
 //ROOT
-#include <TFile.h>
 #include <TH1F.h>
 
 namespace Belle2 {
 
   /**
-   * Analyze simulations of CsI readings in BEAST
+   * Analyze simulations of CsI readings in BEAST. Requires HistoManager
    *
-   * Calculate the dose seen by each crystal. Todo: implement showers and digitization to differentiate between two types of channels
+   * Calculates the dose seen by each crystal. Todo: implement showers and digitization to differentiate between two types of channels.
+   * Requires HistoManager to be added to path RIGHT AFTER the input module. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/HistogramManagement
    *
    */
-
-  class CsIStudyModule : public Module {
+  class CsIStudyModule : public HistoModule {
 
   public:
 
@@ -62,22 +60,25 @@ namespace Belle2 {
     virtual void terminate();
 
 
+    //! function to define histograms
+    /*
+       Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
+       to be placed in this function.
+    */
+    virtual void defineHisto();
+
   private:
 
     StoreArray<CsiSimHit> m_hits; /**< Array of the simulated hits in the crystals */
-    TFile* m_outputFile; /**< Output ROOT file */
 
     // Parameters
     double m_paramTemplate;  /**< Template of an input parameter. Noop for now. */
-    std::string m_inputFileName; /**< path/name of the output file */
-
-
 
     // Histograms
     TH1F* h_EdistCrystal;   /**< Energy deposited in each crystal per hit */
     TH1F* h_EdistTotal;     /**< Energy deposited in all crystals per hit */
     TH1F* h_CrystalRadDose; /**< Yearly radiation dose deposited in each crystal */
-
+    TH1F* h_NhitCrystal;    /**< Number of hits in each crystals (to validate light yield..) */
 
     // Constants
     const double GeVtoJ = 1.6e-10; /**< Conversion between GeV to Joule */

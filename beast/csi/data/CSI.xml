@@ -2,23 +2,10 @@
 <DetectorComponent name="CSI">
   <Creator library="beast">CSICreator</Creator>
   <Content>
-    <!-- normally, parameters should be defined with a unit attribute. This
-         enables automatic conversion to the default framework unit --> 
-    <stepSize unit="um">200</stepSize>
-    <!--if we don't supply a unit there can be no conversion but is still valid -->
-    <divisions>32</divisions>
-    <!-- valid values for false are: "", "0", "off", "false" (case
-         insensitive), everything else will be interpreted as true -->
-    <foo>true</foo>
-    <!-- we can also have arrays as parameters which makes it easy to get a
-         number of values as vector<double>.  The numbers can be divided by
-         whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2 3 4 5 6 7 8 
-    </bar>
-
 
     <!-- From the ECL.xml file... not sure which are actually used -->
-     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>
+    <!-- To delete?
+     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>  
      <CsI>CsI</CsI>
      <Si>Si</Si>
      <Al>Al</Al>
@@ -44,50 +31,12 @@
      <k_diodewidth   unit="cm">2.0</k_diodewidth>
      <k_diodelength   unit="cm">2.0</k_diodelength>
      <k_diodeheight   unit="cm">0.1</k_diodeheight>
-     
+     -->
 
-     <!--
-
-    <Active>
-      <Material>CSI-Material</Material>
-      <cDx1 unit="cm">5.5</cDx1>
-      <cDx2 unit="cm">5.5</cDx2>       
-      <cDy1 unit="cm">5.5</cDy1>
-      <cDx3 unit="cm">5.5</cDx3>
-      <cDy2 unit="cm">5.5</cDy2>
-      <cDx4 unit="cm">5.5</cDx4>
-      <cDz unit="cm">30.0</cDz>
-      <cDtheta unit="deg">0.0</cDtheta>
-      <cDphi unit="deg">0.0</cDphi>
-      <k_phi_init unit="deg">0.0</k_phi_init>
-      <k_z_TILTED unit="deg">27.7</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-117.465</k_zC>
-      <k_phiC unit="deg">0.0</k_phiC>
-    </Active>
-
-    -->
-
-    <!-- Original(not planar) version
-    <Active>
-      <Material>CSI-Material</Material>
-      <cDx1 unit="mm">52.42</cDx1>
-      <cDx2 unit="mm">67.45</cDx2>       
-      <cDy1 unit="mm">47.45</cDy1>
-      <cDx3 unit="mm">61.69</cDx3>
-      <cDy2 unit="mm">52.32</cDy2>
-      <cDx4 unit="mm">67.33</cDx4>
-      <cDz unit="mm">300.26</cDz>
-      <cDtheta unit="deg">0.0</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">27.7</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-117.465</k_zC>
-      <k_phiC unit="deg">0.0</k_phiC>
-    </Active>
-    -->
-
+    <Wrapping description="Wrapping around each crystals">
+      <Thickness unit="cm">0.01</Thickness>
+      <Material>AlTeflon</Material>
+    </Wrapping>
 
     <!-- Interesting Crystals:
 	 FWD:0 12 24 36
@@ -104,6 +53,7 @@
 
     <EndCapCrystals>
        <EndCapCrystal id="1">
+	 <Material>CsI-Tl</Material>
          <K_h1 unit="cm">2.646800</K_h1>
          <K_h2 unit="cm">3.066002</K_h2>
          <K_bl1 unit="cm">3.139250</K_bl1>
@@ -122,6 +72,7 @@
 
        <!-- Fictitious '2' crystal: replace with pure CsI dims-->
        <EndCapCrystal id="2">
+	 <Material>CsI</Material>
          <K_h1 unit="cm">2.646800</K_h1>
          <K_h2 unit="cm">3.066002</K_h2>
          <K_bl1 unit="cm">3.139250</K_bl1>
@@ -140,6 +91,7 @@
 
 
        <EndCapCrystal id="101"> <!-- crystal id="129" in the actual ECL package -->
+	 <Material>CsI-Tl</Material>
          <K_h1 unit="cm">2.588124</K_h1>
          <K_h2 unit="cm">3.337336</K_h2>
          <K_bl1 unit="cm">2.581700</K_bl1>
@@ -159,6 +111,7 @@
 
        <!-- Fictitious '102' crystal: replace with pure CsI dims-->
        <EndCapCrystal id="102">
+	 <Material>CsI</Material>
          <K_h1 unit="cm">2.588124</K_h1>
          <K_h2 unit="cm">3.337336</K_h2>
          <K_bl1 unit="cm">2.581700</K_bl1>
@@ -174,9 +127,111 @@
          <K_Ptheta unit="deg">153.363902</K_Ptheta>
          <K_Pphi unit="deg">-4.863975</K_Pphi>
        </EndCapCrystal>
-
-
     </EndCapCrystals>
+
+
+    <Enclosures>
+
+      <Material>5052-Alloy</Material>
+      <Width unit="cm">24.5</Width>
+      <Length unit="cm">47.5</Length>
+      <Depth unit="cm">10</Depth>
+      <Thickness unit="cm">0.127</Thickness>
+      <Fold unit="cm">1.397</Fold>
+
+      <LidThickness unit="cm">0.127</LidThickness>
+      <LidMaterial>5052-Alloy</LidMaterial>
+
+      <Slot id="1">
+	<PosX unit="cm"> 5.685 </PosX>
+	<PosY unit="cm"> 0.0 </PosY>
+	<PosZ unit="cm"> 0.0 </PosZ>
+      </Slot>
+
+      <Slot id="2">
+	<PosX unit="cm">-5.685 </PosX>
+	<PosY unit="cm"> 0.0 </PosY>
+	<PosZ unit="cm"> 0.0 </PosZ>
+      </Slot>
+      
+      <Enclosure id="1">
+        <PosZ unit="cm">211.53</PosZ>
+        <PosR unit="cm">49.53</PosR>
+        <PosT unit="deg">0.00</PosT>
+
+        <AngPhi1 unit="deg">-270</AngPhi1>
+        <AngTheta unit="deg">13.94</AngTheta>
+        <AngPhi2 unit="deg">0</AngPhi2>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+      </Enclosure>
+
+      <Enclosure id="2">
+        <PosZ unit="cm">211.53</PosZ>
+        <PosR unit="cm">49.53</PosR>
+        <PosT unit="deg">90.00</PosT>
+
+        <AngPhi1 unit="deg">-270</AngPhi1>
+        <AngTheta unit="deg">13.94</AngTheta>
+        <AngPhi2 unit="deg">90</AngPhi2>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+      </Enclosure>
+
+      <Enclosure id="3">
+        <PosZ unit="cm">211.53</PosZ>
+        <PosR unit="cm">49.53</PosR>
+        <PosT unit="deg">180.00</PosT>
+
+        <AngPhi1 unit="deg">-270</AngPhi1>
+        <AngTheta unit="deg">13.94</AngTheta>
+        <AngPhi2 unit="deg">180</AngPhi2>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+      </Enclosure>
+
+      <Enclosure id="4">
+        <PosZ unit="cm">-116.6897</PosZ>
+        <PosR unit="cm">58.5258</PosR>
+        <PosT unit="deg">0.00</PosT>
+
+        <AngPhi1 unit="deg">-90</AngPhi1>
+        <AngTheta unit="deg">150.85</AngTheta>
+        <AngPhi2 unit="deg">0</AngPhi2>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+      </Enclosure>
+
+      <Enclosure id="5">
+        <PosZ unit="cm">-116.6897</PosZ>
+        <PosR unit="cm">58.5258</PosR>
+        <PosT unit="deg">180.00</PosT>
+
+        <AngPhi1 unit="deg">-90</AngPhi1>
+        <AngTheta unit="deg">150.85</AngTheta>
+        <AngPhi2 unit="deg">180</AngPhi2>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+      </Enclosure>
+
+      <Enclosure id="6">
+        <PosZ unit="cm">-116.6897</PosZ>
+        <PosR unit="cm">58.5258</PosR>
+        <PosT unit="deg">90</PosT>
+
+        <AngPhi1 unit="deg">-90</AngPhi1>
+        <AngTheta unit="deg">150.85</AngTheta>
+        <AngPhi2 unit="deg">90</AngPhi2>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+      </Enclosure>
+    </Enclosures>
 
   </Content>
 </DetectorComponent>

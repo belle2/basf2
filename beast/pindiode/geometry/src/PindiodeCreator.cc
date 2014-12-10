@@ -121,9 +121,9 @@ namespace Belle2 {
 
 
         G4RotationMatrix* rot_pindiode = new G4RotationMatrix();
-        rot_pindiode->rotateX(activeParams.getLength("AngleX"));
-        rot_pindiode->rotateY(activeParams.getLength("AngleY"));
-        rot_pindiode->rotateZ(activeParams.getLength("AngleZ"));
+        rot_pindiode->rotateX(activeParams.getAngle("AngleX"));
+        rot_pindiode->rotateY(activeParams.getAngle("AngleY"));
+        rot_pindiode->rotateZ(activeParams.getAngle("AngleZ"));
         //geometry::setColor(*l_PINDIODE, "#006699");
 
 

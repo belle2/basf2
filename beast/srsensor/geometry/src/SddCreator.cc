@@ -98,9 +98,9 @@ namespace Belle2 {
                                );
 
         G4RotationMatrix* rot_sdd = new G4RotationMatrix();
-        rot_sdd->rotateX(activeParams.getLength("AngleX"));
-        rot_sdd->rotateY(activeParams.getLength("AngleY"));
-        rot_sdd->rotateZ(activeParams.getLength("AngleZ"));
+        rot_sdd->rotateX(activeParams.getAngle("AngleX"));
+        rot_sdd->rotateY(activeParams.getAngle("AngleY"));
+        rot_sdd->rotateZ(activeParams.getAngle("AngleZ"));
         //geometry::setColor(*l_SDD, "#006699");
 
         new G4PVPlacement(rot_sdd, SDDpos, l_SDD, "p_SDD", &topVolume, false, sddNb);

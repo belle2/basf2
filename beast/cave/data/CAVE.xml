@@ -18,55 +18,55 @@
 
     <Active>
       <Material>CAVE-Material</Material>
-      <x_cave unit="mm">-115.0</x_cave>
-      <y_cave unit="mm">-1250.0</y_cave>
+      <x_cave unit="mm">1890.0</x_cave>
+      <y_cave unit="mm">130.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
-      <px unit="cm">150.0</px>
-      <py unit="cm">25.0</py>
-      <pz unit="cm">300.0</pz>
+      <px unit="cm">37.5</px>
+      <py unit="cm">89.0</py>
+      <pz unit="cm">432.6</pz>
    </Active>
 
     <Active>
       <Material>CAVE-Material</Material>
-      <x_cave unit="mm">-115.0</x_cave>
-      <y_cave unit="mm">1300.0</y_cave>
+      <x_cave unit="mm">-1140.0</x_cave>
+      <y_cave unit="mm">130.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
-      <px unit="cm">150.0</px>
-      <py unit="cm">25.0</py>
-      <pz unit="cm">300.0</pz>
+      <px unit="cm">37.5</px>
+      <py unit="cm">89.0</py>
+      <pz unit="cm">432.6</pz>
    </Active>
 
 
     <Active>
       <Material>CAVE-Material</Material>
-      <x_cave unit="mm">1085.0</x_cave>
-      <y_cave unit="mm">25.0</y_cave>
+      <x_cave unit="mm">375.0</x_cave>
+      <y_cave unit="mm">1395.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
-      <px unit="cm">25.0</px>
-      <py unit="cm">100.0</py>
-      <pz unit="cm">300.0</pz>
+      <px unit="cm">189.0</px>
+      <py unit="cm">37.5</py>
+      <pz unit="cm">432.6</pz>
    </Active>
 
  <Active>
       <Material>CAVE-Material</Material>
-      <x_cave unit="mm">-1315.0</x_cave>
-      <y_cave unit="mm">25.0</y_cave>
+      <x_cave unit="mm">375.0</x_cave>
+      <y_cave unit="mm">-1135.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
-      <px unit="cm">25.0</px>
-      <py unit="cm">100.0</py>
-      <pz unit="cm">300.0</pz>
+      <px unit="cm">189.0</px>
+      <py unit="cm">37.5</py>
+      <pz unit="cm">432.6</pz>
    </Active>
     
   </Content>

@@ -13,6 +13,8 @@
 
 #include <geometry/CreatorBase.h>
 #include "G4VUserDetectorConstruction.hh"
+#include <G4AssemblyVolume.hh>
+#include <G4Transform3D.hh>
 #include "globals.hh"
 #include "TString.h"
 #include "Riostream.h"
@@ -30,6 +32,7 @@ class G4VSolid;
 class G4UnionSolid;
 class G4SubtractionSolid;
 
+
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the CSI detector */
   namespace csi {
@@ -45,8 +48,13 @@ namespace Belle2 {
 
     protected:
       SensitiveDetector* m_sensitive;  /**<  SensitiveDetector CSI */
-    };
 
+      /** Builds the crystals enclosures **/
+      void BuildEnclosure(const GearDir& content, G4AssemblyVolume* assembly, string side, int iEnclosure);
+
+      /** Builds the crystals and their wrapping (foil) **/
+      void PutCrystal(const GearDir& content,  G4AssemblyVolume* assembly, G4Transform3D position,  int iEnclosure, int iCry);
+    };
   }
 }
 

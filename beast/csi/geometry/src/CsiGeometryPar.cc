@@ -13,9 +13,10 @@
 #include <framework/gearbox/Unit.h>
 #include <cmath>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <beast/csi/geometry/CsiGeometryPar.h>
 #include <cmath>
-#include <boost/format.hpp>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -83,44 +84,21 @@ void CsiGeometryPar::read()
 
 int CsiGeometryPar::CsiVolNameToCellID(const G4String VolumeName)
 {
-  char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100], temp8[100];
   int cellID = 0;
-  sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']", temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8);
 
-  int GSector = atoi(temp4) - 1;
-  int iCry = atoi(temp8);
+  vector< string > partName;
+  split(partName, VolumeName, is_any_of("_"));
 
-  // This is the output of the geometry creator:
-  /*
-  [INFO] Volumes names for the CsI crystals
-  [INFO]   Forward:
-  [INFO]    Crystal Name av_1_impr_1_logicalEclFwCrystal_1_pv_0
-  [INFO]    Crystal Name av_1_impr_1_logicalEclFwCrystal_2_pv_1
-  [INFO]    Crystal Name av_1_impr_2_logicalEclFwCrystal_1_pv_0
-  [INFO]    Crystal Name av_1_impr_2_logicalEclFwCrystal_2_pv_1
-  [INFO]    Crystal Name av_1_impr_3_logicalEclFwCrystal_1_pv_0
-  [INFO]    Crystal Name av_1_impr_3_logicalEclFwCrystal_2_pv_1
-  [INFO]    Crystal Name av_1_impr_4_logicalEclFwCrystal_1_pv_0
-  [INFO]    Crystal Name av_1_impr_4_logicalEclFwCrystal_2_pv_1
-  [INFO]   Backward:
-  [INFO]    Crystal Name av_4_impr_1_logicalEclBwCrystal_129_pv_0
-  [INFO]    Crystal Name av_4_impr_2_logicalEclBwCrystal_129_pv_0
-  [INFO]    Crystal Name av_4_impr_3_logicalEclBwCrystal_129_pv_0
-  [INFO]    Crystal Name av_4_impr_4_logicalEclBwCrystal_129_pv_0
-
-  */
-
-
-  if (VolumeName.c_str() == 0 || GSector > 4) {
-    B2WARNING("BEAST CsI CsiGeometryPar VolNameToCell; Sector  " << GSector << ". Out of range.");
-    return -1;
-
-  } else if (iCry > 200) {
-    B2WARNING("BEAST CsI CsiGeometryPar VolNameToCell; Crystal " << iCry << ". Out of range.");
-    return -1;
-
-  } else {
-    cellID = GSector * 4 + iCry;
+  int iEnclosure = -1;
+  int iCrystal   = -1;
+  for (std::vector<string>::iterator it = partName.begin() ; it != partName.end(); ++it) {
+    if (equals(*it, "Enclosure")) iEnclosure = boost::lexical_cast<int>(*(it + 1)) - 1;
+    else if (equals(*it, "Crystal")) iCrystal = boost::lexical_cast<int>(*(it + 1)) - 1;
   }
+
+  cellID = 2 * iEnclosure + iCrystal;
+
+  if (cellID < 0) B2WARNING("CsiGeometryPar: volume " << VolumeName << " is not a crystal");
+
   return cellID;
 }

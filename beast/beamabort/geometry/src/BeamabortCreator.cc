@@ -92,9 +92,9 @@ namespace Belle2 {
                                      );
 
         G4RotationMatrix* rot_beamabort = new G4RotationMatrix();
-        rot_beamabort->rotateX(activeParams.getLength("AngleX"));
-        rot_beamabort->rotateY(activeParams.getLength("AngleY"));
-        rot_beamabort->rotateZ(activeParams.getLength("AngleZ"));
+        rot_beamabort->rotateX(activeParams.getAngle("AngleX"));
+        rot_beamabort->rotateY(activeParams.getAngle("AngleY"));
+        rot_beamabort->rotateZ(activeParams.getAngle("AngleZ"));
 
         new G4PVPlacement(rot_beamabort, BEAMABORTpos + BEAMABORTpos, l_BEAMABORT, "p_BEAMABORT", &topVolume, false, detID);
 

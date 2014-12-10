@@ -113,9 +113,9 @@ namespace Belle2 {
                                    );
 
         G4RotationMatrix* rot_he3tube = new G4RotationMatrix();
-        rot_he3tube->rotateX(activeParams.getLength("AngleX"));
-        rot_he3tube->rotateY(activeParams.getLength("AngleY"));
-        rot_he3tube->rotateZ(activeParams.getLength("AngleZ"));
+        rot_he3tube->rotateX(activeParams.getAngle("AngleX"));
+        rot_he3tube->rotateY(activeParams.getAngle("AngleY"));
+        rot_he3tube->rotateZ(activeParams.getAngle("AngleZ"));
         //geometry::setColor(*l_HE3TUBE, "#006699");
 
         new G4PVPlacement(rot_he3tube, He3TUBEpos, l_He3TUBE, "p_He3TUBE", &topVolume, false, 1);

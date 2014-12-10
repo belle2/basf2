@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- define our own special Materials -->
 <Materials>
-  <Material name="CSI-Material">
+  <Material name="Example-Material">
     <density unit="g/cm3">2.5</density>
     <!-- (optional) State can be one of Gas, Liquid, Solid, Undefined, case insensitive  -->
     <state>Solid</state>
@@ -21,163 +21,43 @@
   </Material>
 
 
-  <Material name="CSI"> 
-    <density unit="g/cm3">4.509</density>
+  <!-- JIS SUS 304 Stainless Steel -->
+  <Material name="SUS304">
+    <density unit="g/cm3">8.04</density>
     <Components>
-      <Element fraction="0.4885">Cs</Element>
-      <Element fraction="0.5115">I</Element>
-    </Components>
-  </Material>
-
-  <Material name="StainlessSteel304">
-    <density unit="g/cm3">0.03</density>
-    <Components>
-       <Element fraction="0.76">Fe</Element>
-       <Element fraction="0.13">Cr</Element>
-       <Element fraction="0.11">Ni</Element>
-    </Components>
-  </Material>
-
-  <Material name="G10">
-    <density unit="g/cm3">1.7</density>
-    <Components>
-       <Element fraction="0.2802">Si</Element>
-       <Element fraction="0.3874">O</Element>
-       <Element fraction="0.304">C</Element>
-       <Element fraction="0.0284">H</Element>
-    </Components>
-  </Material>
-
-  <Material name="MetalCopper">
-    <density unit="g/cm3">8.967</density>
-    <Components>
-       <Element fraction="1.0">Cu</Element>
-    </Components>
-  </Material>
-
-  <Material name="ststeel">
-    <density unit="g/cm3">7.7</density>
-    <Components>
-       <Element fraction="0.04">C</Element>
-       <Element fraction="0.88">Fe</Element>
-       <Element fraction="0.08">Co</Element>
-    </Components>
-  </Material>
-
-  <Material name="AusteniticStainlessSteel">
-    <density unit="g/cm3">8.02</density>
-    <Components>
-       <Element fraction="0.68">Fe</Element>
-       <Element fraction="0.19">Cr</Element>
-       <Element fraction="0.10">Ni</Element>
-       <Element fraction="0.02">Mn</Element>
-       <Element fraction="0.01">Si</Element>
-    </Components>
-  </Material>
-
-  <Material name="MaterialVessel">
-    <density unit="g/cm3">7.7</density>
-    <Components>
-       <Element fraction="0.0003">C</Element>
-       <Element fraction="0.02">Mn</Element>
-       <Element fraction="0.00045">P</Element>
-       <Element fraction="0.0003">S</Element>
+       <Element fraction="0.0008">C</Element>
        <Element fraction="0.0075">Si</Element>
-       <Element fraction="0.19">Cr</Element>
-       <Element fraction="0.10">Ni</Element>
-       <Element fraction="0.001">N</Element>
-       <Element fraction="0.68045">Fe</Element>
-    </Components>
-  </Material>
-  
-  <Material name="ststeel304L">
-    <density unit="g/cm3">7.7</density>
-    <Components>
-       <Element fraction="0.0003">C</Element>
-       <Element fraction="0.02">Mn</Element>
-       <Element fraction="0.00045">P</Element>
-       <Element fraction="0.0003">S</Element>
-       <Element fraction="0.0075">Si</Element>
-       <Element fraction="0.19">Cr</Element>
-       <Element fraction="0.10">Ni</Element>
-       <Element fraction="0.001">N</Element>
-       <Element fraction="0.68045">Fe</Element>
+       <Element fraction="0.0100">Mn</Element>
+       <Element fraction="0.1900">Cr</Element>
+       <Element fraction="0.1000">Ni</Element>
+       <Element fraction="0.0095">N</Element>
+       <Element fraction="0.6822">Fe</Element>
     </Components>
   </Material>
 
-  <Material name="meatCuScreen">
-    <density unit="g/cm3">8.95</density>
-    <Components>
-       <Element fraction="0.9">Cu</Element>
-       <Element fraction="0.1">Zn</Element>
-    </Components>
-  </Material>
-
-  <Material name="Kovar">
-    <density unit="g/cm3">8.36</density>
-    <Components>
-       <Element fraction="0.536">Fe</Element>
-       <Element fraction="0.29">Ni</Element>
-       <Element fraction="0.17">Co</Element>
-       <Element fraction="0.003">Mn</Element>
-       <Element fraction="0.001">Si</Element>
-    </Components>
-  </Material>
-
-  <Material name="Quartz">
-    <density unit="g/cm3">2.64</density>
-    <Components>
-       <Element fraction="0.536">Si</Element>
-       <Element fraction="0.29">Ni</Element>
-       <Element fraction="0.17">Co</Element>
-       <Element fraction="0.003">Mn</Element>
-       <Element fraction="0.001">Si</Element>
-    </Components>
-  </Material>
-
-
-  <Material name="Helium">
-     <density unit="g/cm3">1.786e-4</density>
-     <state>Gas</state>
+  <Material name="5052-Alloy">
+     <density unit="g/cm3">2.68</density>
      <Components>
-        <Element fraction="1.0">He</Element>
-     </Components>
-  </Material>
-
-  
-  <Material name="MaterialGas">
-     <density unit="g/cm3">6.6908e-4</density>
-     <state>Gas</state>
-     <Components>
-        <Element fraction="0.1751">He</Element>
-        <Element fraction="0.2251">C</Element>
-        <Element fraction="0.5998">O</Element>
-     </Components>
-  </Material>
-
-   <Material name="MaterialEnCap">
-     <density unit="g/cm3">2.70</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
-   </Material>
-
-
-  <Material name="Aluminum">
-     <density unit="g/cm3">2.70</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
-   </Material>
-
-   <Material name="Tungsten">
-     <density unit="g/cm3">19.3</density>
-     <Components>
-        <Element fraction="1.0">W</Element>
+        <Element fraction="0.9620">Al</Element>
+        <Element fraction="0.0025">Cr</Element>
+        <Element fraction="0.0010">Cu</Element>
+        <Element fraction="0.0040">Fe</Element>
+        <Element fraction="0.0260">Mg</Element>
+        <Element fraction="0.0010">Mn</Element>
+        <Element fraction="0.0025">Si</Element>
+        <Element fraction="0.0010">Zn</Element>
      </Components>
    </Material>
 
   <Material name="CsI">
+    <density unit="g/cm3">4.510</density>
+    <Components>
+       <Element fraction="0.4885">I</Element>
+       <Element fraction="0.5115">Cs</Element>
+    </Components>
+  </Material>
+
+  <Material name="CsI-Mistake">
     <density unit="g/cm3">4.510</density>
     <Components>
        <Element fraction="0.4885">Cs</Element>
@@ -185,18 +65,15 @@
     </Components>
   </Material>
 
-  <Material name="Si">
-     <density unit="g/cm3">2.3290</density>
-     <Components>
-        <Element fraction="1.0">Si</Element>
-     </Components>
-  </Material>
 
-  <Material name="Al">
-     <density unit="g/cm3">2.700</density>
-     <Components>
-        <Element fraction="1.0">Al</Element>
-     </Components>
+  <Material name="CsI-Tl">
+    <density unit="g/cm3">4.510</density>
+    <Components>
+       <Element fraction="0.511307">Cs</Element>
+       <Element fraction="0.488221">I</Element>
+       <!-- doped with 0.3mol% of Thallium-->
+       <Element fraction="0.000472">Tl</Element>
+    </Components>
   </Material>
 
   <Material name="AlTeflon">
@@ -208,23 +85,59 @@
     </Components>
   </Material>
 
-  <Material name="AlTeflon_thin">
-    <density unit="g/cm3">2.820</density>
-    <Components>
-       <Element fraction="0.1330">Al</Element>
-       <Element fraction="0.2081">C</Element>
-       <Element fraction="0.6589">F</Element>
-    </Components>
-  </Material>
 
-  <Material name="AlTeflon_thinpenta">
-    <density unit="g/cm3">11.28</density>
-    <Components>
-       <Element fraction="0.1330">Al</Element>
-       <Element fraction="0.2081">C</Element>
-       <Element fraction="0.6589">F</Element>
-    </Components>
-  </Material>
+<!--
+      <Property name="RINDEX" unit="eV"> 
+	<value energy="1.5">1.045</value> 
+	<value energy="2.2">1.045</value> 
+	<value energy="2.9">1.045</value> 
+	<value energy="3.6">1.045</value> 
+	<value energy="4.3">1.045</value> 
+	<value energy="5.0">1.045</value> 
+      </Property> 
+      <Property name="ABSLENGTH" unit="eV"> 
+	<value energy="1.911">39.3</value> 
+	<value energy="2.2">39.3</value> 
+	<value energy="2.9">39.3</value> 
+	<value energy="3.6">39.3</value> 
+	<value energy="4.3">39.3</value> 
+	<value energy="5.0">39.3</value> 
+      </Property> 
+      <Property name="RAYLEIGH" unit="eV"> 
+	<value energy="1.5">729.696</value>
+	<value energy="2.2">157.694</value>
+	<value energy="2.9">52.2294</value>
+	<value energy="3.6">21.9936</value>
+	<value energy="4.3">10.8052</value>
+	<value energy="5.0">5.91053</value>
+      </Property> 
+-->
+      <!--
+	 const G4int nEntries = 5;
+	 //energy values; currently this value corresponds to the maximum emission energy of CsI (550 nm)
+	 G4double photonEnergies[nEntries] = {2.761*eV,2.485*eV,2.258*eV,2.071*eV,1.911*eV}; 
 
+	 
+	 
+
+
+// optical properties of Cesium Iodide
+  G4double refractiveIndexCesiumIodide[nEntries] = {1.824,1.807,1.795,1.786,1.779};
+  G4double absorptionLengthCesiumIodide[nEntries] = {39.3*cm,39.3*cm,39.3*cm,39.3*cm,39.3*cm};
+  G4double Scnt_SLOW[nEntries] = { 0.29,0.75,1.0,0.72,0.39};
+
+	 //  mptCesiumIodide->AddProperty("FASTCOMPONENT", photonEnergies, Scnt_FAST, nEntries);
+      mptCesiumIodide->AddProperty("SLOWCOMPONENT", photonEnergies, Scnt_SLOW, nEntries);
+
+      mptCesiumIodide->AddProperty("RINDEX",photonEnergies,refractiveIndexCesiumIodide,nEntries);
+      mptCesiumIodide->AddProperty("ABSLENGTH",photonEnergies,absorptionLengthCesiumIodide,nEntries);
+      mptCesiumIodide->AddConstProperty("SCINTILLATIONYIELD", 54000./MeV);
+      mptCesiumIodide->AddConstProperty("YIELDRATIO", 0.0);
+      // mptCesiumIodide->AddConstProperty("FASTTIMECONSTANT", 1.*ns);
+      mptCesiumIodide->AddConstProperty("SLOWTIMECONSTANT", 1000.*ns);
+      mptCesiumIodide->AddConstProperty("RESOLUTIONSCALE", 1.0);
+      // set these to Cesium Iodide
+      CsI_Tl->SetMaterialPropertiesTable(mptCesiumIodide);
+-->
 </Materials>
   

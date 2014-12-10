@@ -36,6 +36,10 @@
 #include <G4RegionStore.hh>
 #include "G4Tubs.hh"
 
+//Visualization
+#include "G4Colour.hh"
+#include <G4VisAttributes.hh>
+
 using namespace std;
 using namespace boost;
 
@@ -98,8 +102,8 @@ namespace Belle2 {
         G4LogicalVolume* l_iGasTPC = new G4LogicalVolume(s_iGasTPC, geometry::Materials::get(matGas), "l_iGasTPC");
 
         G4RotationMatrix* rotXx = new G4RotationMatrix();
-        G4double AngleX = activeParams.getLength("AngleX");
-        G4double AngleZ = activeParams.getLength("AngleZ");
+        G4double AngleX = activeParams.getAngle("AngleX");
+        G4double AngleZ = activeParams.getAngle("AngleZ");
         rotXx->rotateX(AngleX);
         rotXx->rotateZ(AngleZ);
         G4ThreeVector TPCpos = G4ThreeVector(
@@ -126,6 +130,11 @@ namespace Belle2 {
 
         new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[0], y_VesselEndCap[0], z_VesselEndCap[0]) + TPCpos, l_VesselEndCap, "p_VesselEndCapTop", &topVolume, false, 1);
         new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[1], y_VesselEndCap[1], z_VesselEndCap[1]) + TPCpos, l_VesselEndCap, "p_VesselEndCapBottom", &topVolume, false, 1);
+
+        G4VisAttributes* orange = new G4VisAttributes(G4Colour(1, 2, 0));
+        orange->SetForceAuxEdgeVisible(true);
+        l_VesselEndCap->SetVisAttributes(orange);
+        l_Vessel->SetVisAttributes(orange);
 
         //create rods
         G4double iR_Rod = 0.*CLHEP::mm;

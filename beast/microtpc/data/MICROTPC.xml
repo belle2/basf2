@@ -13,7 +13,7 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2 
+    <bar unit="mm">1 2 3 4
     </bar>
     <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
     <!--
@@ -56,10 +56,25 @@
       <dy_Vessel unit="cm">10.16</dy_Vessel>
       <dz_Vessel unit="cm">30.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleZ unit="deg">0.0</AngleZ>
-      <TPCpos_x unit="cm">40.0</TPCpos_x>
-      <TPCpos_y unit="cm">0.0</TPCpos_y>
-      <TPCpos_z unit="cm">40.0</TPCpos_z>
+      <AngleZ unit="deg">90.0</AngleZ>
+      <TPCpos_x unit="cm">54.92</TPCpos_x>
+      <TPCpos_y unit="cm">8.35</TPCpos_y>
+      <TPCpos_z unit="cm">12.0</TPCpos_z>
+    </Active>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">12.7</dx_Vessel>
+      <dy_Vessel unit="cm">10.16</dy_Vessel>
+      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">90.0</AngleZ>
+      <TPCpos_x unit="cm">-54.92</TPCpos_x>
+      <TPCpos_y unit="cm">8.35</TPCpos_y>
+      <TPCpos_z unit="cm">12.0</TPCpos_z>
     </Active>
 
     <Active>
@@ -72,10 +87,26 @@
       <dz_Vessel unit="cm">30.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">0.0</AngleZ>
-      <TPCpos_x unit="cm">-40.0</TPCpos_x>
-      <TPCpos_y unit="cm">0.0</TPCpos_y>
-      <TPCpos_z unit="cm">40.0</TPCpos_z>
+      <TPCpos_x unit="cm">8.35</TPCpos_x>
+      <TPCpos_y unit="cm">39.92</TPCpos_y>
+      <TPCpos_z unit="cm">12.0</TPCpos_z>
     </Active>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">12.7</dx_Vessel>
+      <dy_Vessel unit="cm">10.16</dy_Vessel>
+      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">0.0</AngleZ>
+      <TPCpos_x unit="cm">8.35</TPCpos_x>
+      <TPCpos_y unit="cm">-39.92</TPCpos_y>
+      <TPCpos_z unit="cm">12.0</TPCpos_z>
+    </Active>
+
     <!--
     <Active>
       <MaterialVessel>MICROTPC-Material</MaterialVessel>

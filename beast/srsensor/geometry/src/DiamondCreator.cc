@@ -95,9 +95,9 @@ namespace Belle2 {
                                    );
 
         G4RotationMatrix* rot_diamond = new G4RotationMatrix();
-        rot_diamond->rotateX(activeParams.getLength("AngleX"));
-        rot_diamond->rotateY(activeParams.getLength("AngleY"));
-        rot_diamond->rotateZ(activeParams.getLength("AngleZ"));
+        rot_diamond->rotateX(activeParams.getAngle("AngleX"));
+        rot_diamond->rotateY(activeParams.getAngle("AngleY"));
+        rot_diamond->rotateZ(activeParams.getAngle("AngleZ"));
         //geometry::setColor(*l_DIAMOND, "#006699");
 
         new G4PVPlacement(rot_diamond, DIAMONDpos, l_DIAMOND, "p_DIAMOND", &topVolume, false, diamondNb);

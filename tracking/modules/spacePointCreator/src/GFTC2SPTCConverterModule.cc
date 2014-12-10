@@ -449,7 +449,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSingleClusterSVDSpacePoin
 // ---------------------------------- check track cand for curling behaviour ----------------------------------------------------------------
 const std::vector<int> GFTC2SPTCConverterModule::checkTrackCandForCurling(const Belle2::SpacePointTrackCand& SPTrackCand)
 {
-  const std::vector<const Belle2::SpacePoint*> tcSpacePoints = SPTrackCand.getHits();
+  const std::vector<const Belle2::SpacePoint*>& tcSpacePoints = SPTrackCand.getHits();
   unsigned int nHits = SPTrackCand.getNHits();
 
   std::vector<int> returnVector; // fill this vector with indices, if no indices can be found, leave it empty

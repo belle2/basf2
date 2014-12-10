@@ -61,11 +61,12 @@ namespace Belle2 {
 
     virtual void terminate(); /**< terminate: print some summary information on the processed events */
 
-    BELLE2_DEFINE_EXCEPTION(UnsuitableGFTrackCand, "The genfit::TrackCand cannot be unambiguously converted to a SpacePointTrackCand.");
+    BELLE2_DEFINE_EXCEPTION(UnsuitableGFTrackCand, "The genfit::TrackCand cannot be unambiguously converted to a SpacePointTrackCand."); /**< Exception thrown, when a genfit::TrackCand occurs, that cannot be converted to a SpacePointTrackCand unambiguously (see Module documentation for more information) */
 
-    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no related TrueHit for one (or more) Clusters of the Track Candidate. Cannot check if this is a curling track!");
+    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no related TrueHit for one (or more) Clusters of the Track Candidate. Cannot check if this is a curling track!"); /**< Exception thrown, when no relation to a TrueHit can be found for a Cluster. Information from the TrueHit is needed for deciding if a track is curling or not */
 
-    BELLE2_DEFINE_EXCEPTION(FoundNoCluster, "No related Cluster to a SpacePoint was found.");
+    BELLE2_DEFINE_EXCEPTION(FoundNoCluster, "No related Cluster to a SpacePoint was found."); /**< Exception thrown, when no relation to a Cluster can be found for a SpacePoint. This should never happen, since only SpacePoints related from a Cluster get into the SpacePointTrackCand in the first place. */
+
   protected:
 
     std::string m_PXDClusterName; /**< PXDCluster collection name */
@@ -120,18 +121,24 @@ namespace Belle2 {
     const std::vector<Belle2::SpacePointTrackCand> splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices); /**< Split a culring track candidate into (up to NTracklets) tracklets */
 
     /**
-     Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
+     * Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
      */
     template<class TrueHit>
     std::pair<const TVector3, const TVector3> getGlobalPositionAndMomentum(TrueHit* aTrueHit);
 
     bool getDirectionOfFlight(const std::pair<const TVector3, const TVector3>& hitPosAndMom, const TVector3 origin); /**< determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
 
+    /**
+     * Exception thrown, when not all hits of a genfit::TrackCand have been used for conversion.
+     */
     BELLE2_DEFINE_EXCEPTION(UnusedHits, "Not all hits of the genfit::TrackCand have been marked as used. This indicates that not all hits have been used to create a SpacePointTrackCand.");
 
+    /**
+     * Exception thrown, when no SpacePoint that is related to a Cluster in the genfit::TrackCand can be found
+     */
     BELLE2_DEFINE_EXCEPTION(FoundNoSpacePoint, "Found no relation between Cluster and SpacePoint. This hit would not be in SpacePointTrackCand, therefore skipping TrackCand from conversion!");
 
-    BELLE2_DEFINE_EXCEPTION(TrueHitsNotMatching, "The TrueHits related to the two SVDClusters of a SpacePoint are not the same!")
+    BELLE2_DEFINE_EXCEPTION(TrueHitsNotMatching, "The TrueHits related to the two SVDClusters of a SpacePoint are not the same!") /**< Exception thrown during checking if Track is curling, when a SpacePoint is related to two different TrueHits (via its Clusters) */
   };
 
 }

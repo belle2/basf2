@@ -21,6 +21,9 @@ using namespace std;
 
 namespace Belle2 {
 
+  /**
+   * Test class for the SpacePointTrackCand class
+   */
   class SpacePointTrackCandTest : public ::testing::Test {
   public:
     /** this is a small helper function to create a sensorInfo to be used */

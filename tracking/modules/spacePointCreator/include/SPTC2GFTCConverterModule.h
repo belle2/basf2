@@ -46,6 +46,6 @@ namespace Belle2 {
 
     void initializeCounters(); /**< reset counters to 0 to avoid indeterministic behaviour */
 
-    BELLE2_DEFINE_EXCEPTION(ClusterNotFound, "No related Cluster to a SpacePoint was found.");
+    BELLE2_DEFINE_EXCEPTION(ClusterNotFound, "No related Cluster to a SpacePoint was found."); /**< Exception thrown, when no related Cluster can be found for a SpacePoint */
   };
 }

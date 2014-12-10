@@ -49,7 +49,7 @@ namespace Belle2 {
     /**
      * constructor from a vector<SpacePoint*> and some additional information: pdg code and charge estimate as well as the MCTrackID of the track candidate
      */
-    SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*> spacePoints, int pdgCode = 0, double charge = 0, int mcTrackID = -1);
+    SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0, int mcTrackID = -1);
 
     // destructor
     virtual ~SpacePointTrackCand();
@@ -136,9 +136,10 @@ namespace Belle2 {
      */
     void print(int debuglevel = 100, const Option_t* = "") const;
 
-    // EXCEPTIONS
-    //     BELLE2_DEFINE_EXCEPTION(No_SpacePointRelation_Found, "No Relation with a SpacePoint has been found"); // unused at the moment
-    BELLE2_DEFINE_EXCEPTION(UnsupportedDetType, "The Detector Type is not supported by this class. Supported are: PXD, SVD and Tel");
+    /**
+     * Exception thrown, when an Unsupported Detector Type occurs. Momentarily supported: PXD & SVD
+     */
+    BELLE2_DEFINE_EXCEPTION(UnsupportedDetType, "The Detector Type is not supported by this class. Supported are: PXD and SVD");
 
     /**
      * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!), NOTE: returns false if both TrackCands do not contain any SpacePoints

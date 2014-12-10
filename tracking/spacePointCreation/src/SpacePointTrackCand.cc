@@ -44,7 +44,7 @@ SpacePointTrackCand::SpacePointTrackCand() :
 
 }
 
-SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*> spacePoints, int pdgCode, double charge, int mcTrackID) :
+SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode, double charge, int mcTrackID) :
   m_state6D(6),
   m_cov6D(6)
 {

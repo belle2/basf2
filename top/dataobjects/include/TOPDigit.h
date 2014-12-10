@@ -70,7 +70,7 @@ namespace Belle2 {
     /** Set hardware channel ID (0-based)
      * @param chID hardware channel ID
      */
-    void setHardwareChannelID(int chID) {m_hardChannelID = chID;}
+    void setHardwareChannelID(unsigned int chID) {m_hardChannelID = chID;}
 
     /** Set hit quality
      * @param quality hit quality
@@ -110,7 +110,7 @@ namespace Belle2 {
     /** Get hardware channel ID
      * @return hardware channel ID
      */
-    int getHardwareChannelID() const { return m_hardChannelID; }
+    unsigned int getHardwareChannelID() const { return m_hardChannelID; }
 
   private:
     int m_barID;               /**< bar ID (1-based) */

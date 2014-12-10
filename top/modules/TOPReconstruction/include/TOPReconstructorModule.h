@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
+#include <framework/gearbox/Const.h>
 #include <string>
 
 namespace Belle2 {
@@ -97,8 +98,7 @@ namespace Belle2 {
 
     // Masses of particle hypotheses
 
-    enum {c_Nhyp = 5};        /**< number of hypotheses */
-    double m_Masses[c_Nhyp];  /**< particle masses */
+    double m_masses[Const::ChargedStable::c_SetSize];  /**< particle masses */
 
   };
 

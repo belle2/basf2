@@ -88,7 +88,7 @@ namespace Belle2 {
     addParam("maxTime", m_maxTime,
              "time limit for photons [ns] (0 = use full TDC range)", 51.2);
 
-    for (int i = 0; i < c_Nhyp; i++) {m_Masses[i] = 0;}
+    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_masses[i] = 0;}
 
   }
 
@@ -136,11 +136,9 @@ namespace Belle2 {
 
     // Initialize masses
 
-    m_Masses[0] = Const::electron.getMass();
-    m_Masses[1] = Const::muon.getMass();
-    m_Masses[2] = Const::pion.getMass();
-    m_Masses[3] = Const::kaon.getMass();
-    m_Masses[4] = Const::proton.getMass();
+    for (const auto & part : Const::chargedStableSet) {
+      m_masses[part.getIndex()] = part.getMass();
+    }
 
     // set track smearing flag
 
@@ -171,7 +169,7 @@ namespace Belle2 {
 
     // create reconstruction object
 
-    TOPreco reco(c_Nhyp, m_Masses, m_minBkgPerBar, m_scaleN0);
+    TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
 
     // set time limit for photons lower than that given by TDC range (optional)
 
@@ -217,17 +215,19 @@ namespace Belle2 {
       if (m_debugLevel > 1) {
         trk.dump();
         reco.dumpTrackHit(Local);
-        reco.dumpLogL(c_Nhyp);
+        reco.dumpLogL(Const::ChargedStable::c_SetSize);
       }
 
       // get results
-      double logl[c_Nhyp], expPhot[c_Nhyp];
-      int nphot;
-      reco.getLogL(c_Nhyp, logl, expPhot, nphot);
+      double logl[Const::ChargedStable::c_SetSize];
+      double estPhot[Const::ChargedStable::c_SetSize];
+      int nphot = 0;
+      reco.getLogL(Const::ChargedStable::c_SetSize, logl, estPhot, nphot);
+      double estBkg = reco.getExpectedBG();
 
       // store results
-      TOPLikelihood* topL = topLikelihoods.appendNew(reco.getFlag(),
-                                                     logl, nphot, expPhot);
+      TOPLikelihood* topL = topLikelihoods.appendNew(reco.getFlag(), nphot,
+                                                     logl, estPhot, estBkg);
       // make relations:
       track->addRelationTo(topL);
       topL->addRelationTo(trk.getExtHit());

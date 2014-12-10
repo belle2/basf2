@@ -48,7 +48,7 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
   addParam("PXDClusters", m_PXDClusterName, "PXDCluster collection name. WARNING: it is only checked if these exist, they are not actually used at the moment!", string(""));
   addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", string(""));
   addParam("genfitTCName", m_genfitTCName, "Name of container of genfit::TrackCands", string(""));
-  addParam("SpacePointTCName", m_SPTCName, "Name of the container under which SpacePoints will be stored in the DataStore", string(""));
+  addParam("SpacePointTCName", m_SPTCName, "Name of the container under which SpacePointTrackCands will be stored in the DataStore (NOTE: These SpaceTrackCands are not checked for curling behaviour, but are simply converted and stored!)", string(""));
 
   addParam("SingleClusterSVDSP", m_SingleClusterSVDSPName, "Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string(""));
   addParam("NoSingleClusterSVDSP", m_NoSingleClusterSVDSPName, "Non Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string(""));
@@ -57,8 +57,13 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
   std::vector<double> defaultOrigin = {0., 0., 0.};
   addParam("setOrigin", m_PARAMsetOrigin, "Reset origin to given Point. Used for decision if track is curling or not. (e.g. testbeam: origin is not at (0,0,0))", defaultOrigin);
 
-  addParam("splitCurlers", m_PARAMsplitCurlers, "Split curling tracks into tracklets, where each tracklet is then non-curling", false);
-  addParam("NTracklets", m_NTracklets, "Maximum number of tracklets to be saved if a curling track is split up into tracklets. Set to 1 if only the first part of a curling track is needed.", 1);
+  addParam("splitCurlers", m_PARAMsplitCurlers, "Split curling tracks into tracklets, where each Track Stub is then non-curling", false);
+  addParam("NTracklets", m_NTracklets, "Maximum number of Track Stub to be saved if a curling track is split up into Track Stubs. Set to 0 if all parts shall be stored. Set to 1 if only the first part of a curling track is needed.", 0);
+
+  std::vector<std::string> emptyDefaultStringVec = { std::string("") };
+  addParam("CurlingTrackStubsNames", m_PARAMCurlingTCNames, "Names of containers under which SpacePointTrackCand stubs will be stored in the StoreArray. Pass a maximum of 4 strings! The according StoreArrays will be filled with: 1) only the first (outgoing) part of a curling TrackCandidate, 2) all ingoing parts of a curling TrackCandidate, 3) all but the first outgoing parts of a curling TrackCandidate, 4) (if provided) all track candidate stubs of a curling TrackCandidate (e.g. needed for testing)", emptyDefaultStringVec);
+
+
 }
 
 // ------------------------------ INITIALIZE ---------------------------------------
@@ -94,9 +99,38 @@ void GFTC2SPTCConverterModule::initialize()
   m_origin.SetXYZ(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
   B2DEBUG(150, "Set origin to: (" << m_origin.X() << "," << m_origin.Y() << "," << m_origin.Z() << ")");
 
-  if (m_NTracklets < 1) {
-    B2WARNING("Maximum number of tracklets is set to a value lower than one. Please provide a value larger than one. Resetting to 1 now");
-    m_NTracklets = 1;
+  if (m_NTracklets < 0) {
+    B2WARNING("Maximum number of tracklets is set to a negative value. Please provide a positive number or zero. Resetting to 0 now (all parts of a curling Track will be stored.)");
+    m_NTracklets = 0;
+  }
+  // set NTracklets to max integer value if user wants all TrackStubs
+  if (m_NTracklets == 0) {
+    m_NTracklets = numeric_limits< int >::max(); // WARNING: kind of hardcoded here.
+  }
+
+  // only check if there are enough names and register additional stuff in the DataStore if it's neccessary!
+  if (m_PARAMsplitCurlers) {
+    m_saveCompleteCurler = false;
+    // check how many names are provided for the StoreArrays of curling tracks, if less than three -> FATAL! if more than 4, issue a warning.
+    if (m_PARAMCurlingTCNames.size() < 3) {
+      B2FATAL("Need at least 3 (non-empty) names for StoreArrays of Curling TrackCandidates. You provided only " << m_PARAMCurlingTCNames.size());
+    }
+    // if there are more than 4 names, user wants to save complete (but split-up) TrackCand in a separate StoreArray
+    if (m_PARAMCurlingTCNames.size() >= 4) { m_saveCompleteCurler = true; }
+    if (m_PARAMCurlingTCNames.size() > 4) {
+      m_PARAMCurlingTCNames.resize(4);
+      stringstream output;
+      for (string name : m_PARAMCurlingTCNames) { output << name << ", "; }
+      B2WARNING("Provided " << m_PARAMCurlingTCNames.size() << " names for StoreArrays of curling TrackCands. Please provide only 4! Omitting all but the first 4 for now! Used Names are: " << output.str());
+    }
+
+    // Register StoreArrays and Relations to full SpacePointTrackCand and to genfit::TrackCand
+    for (string aName : m_PARAMCurlingTCNames) {
+      StoreArray<SpacePointTrackCand> curlingSPTCArray(aName);
+      curlingSPTCArray.registerPersistent(aName);
+      curlingSPTCArray.registerRelationTo(spTrackCand);
+      curlingSPTCArray.registerRelationTo(gfTrackCand);
+    }
   }
 }
 
@@ -108,7 +142,7 @@ void GFTC2SPTCConverterModule::event()
   B2DEBUG(10, "GFTC2SPTCConverter::event(). Processing event " << eventCounter << " --------");
 
   StoreArray<genfit::TrackCand> mcTrackCands(m_genfitTCName);
-  StoreArray<SpacePointTrackCand> spacePointTrackCands(m_SPTCName);
+  StoreArray<SpacePointTrackCand> spacePointTrackCands(m_SPTCName); // StoreArray for complete (i.e. unchecked for curling behaviour and unsplit) SpacePointTrackCands
 
   std::vector<HitInfo<SpacePoint> > tcSpacePoints; // collection of all SpacePoints, that will be used to create the SpacePointTrackCandidate
 
@@ -129,9 +163,16 @@ void GFTC2SPTCConverterModule::event()
       fHitIDs.push_back(aPair);
     }
 
-    B2DEBUG(10, "Now processing genfit::TrackCand " << iTC << ".");
+    B2DEBUG(10, "===========================================================================================================\nNow processing genfit::TrackCand " << iTC << ".");
     try {
+      // convert the genfit::TrackCand and store it in the DataStore. Curling behaviour will be checked later!
       const SpacePointTrackCand spacePointTC = createSpacePointTC(trackCand);
+      SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC);
+      m_SpacePointTCCtr += 1;
+      newSPTC->addRelationTo(trackCand);
+      B2DEBUG(10, "Added new SpacePointTrackCand to StoreArray " << spacePointTrackCands.getName());
+
+      // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
       // if the trackCand should not be split, do not even check if it is a curling track, simply add it to the store Array
       if (!m_PARAMsplitCurlers) {
         SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC);
@@ -142,6 +183,7 @@ void GFTC2SPTCConverterModule::event()
         const std::vector<int> changingIndices = checkTrackCandForCurling(spacePointTC); // ckeck the TrackCand for curling behaviour and get the indices (if it does)
         // COULDDO: define method for adding a SpacePointTrackCand to the store array
         if (changingIndices.size() == 0) { // if no indices come back, the track is not curling
+          B2DEBUG(20, "TrackCand " << iTC << " shows no curling behaviour");
           SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC);
           m_SpacePointTCCtr += 1;
           newSPTC->addRelationTo(trackCand);
@@ -150,10 +192,15 @@ void GFTC2SPTCConverterModule::event()
           // get a vector of SpacePointTrackCands and store each of them separately in the StoreArray. relate each of them to the genfitTC
           // COULDDO: store curling tracks in a separate StoreArray, where only curling tracks are (for easier handling in backconversion for example)
           // COULDDO: introduce additional counter that counts curling tracks
+          stringstream splitIndices;
+          for (unsigned int i = 0; i < changingIndices.size(); i++) { splitIndices << changingIndices[i] << " "; } // put indices into a stringStream for debug output
+          B2DEBUG(20, "TrackCand " << iTC << " shows curling behaviour  and can be split into " << changingIndices.size() + 1 << " Track Stubs. The Indices for splitting are: " << splitIndices.str());
           const std::vector<Belle2::SpacePointTrackCand> tracklets = splitCurlingTrackCand(spacePointTC, m_NTracklets, changingIndices);
+          m_curlingTracksCtr++;
           for (auto SPTrackCand : tracklets) {
             SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(SPTrackCand);
             m_SpacePointTCCtr += 1;
+
             newSPTC->addRelationTo(trackCand);
             B2DEBUG(10, "Added new SpacePointTrackCand to StoreArray " << spacePointTrackCands.getName());
           }
@@ -182,7 +229,7 @@ void GFTC2SPTCConverterModule::event()
 // -------------------------------- TERMINATE --------------------------------------------------------
 void GFTC2SPTCConverterModule::terminate()
 {
-  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands.");
+  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. From " << m_curlingTracksCtr << " curling track candidates " << m_TrackletCtr << " Track Stubs have been created by splitting up the curling track candidate");
 }
 
 // ---------------------------------------- Create SpacePoint TrackCand
@@ -196,7 +243,7 @@ const Belle2::SpacePointTrackCand GFTC2SPTCConverterModule::createSpacePointTC(c
   int nHits = genfitTC->getNHits();
   B2DEBUG(15, "genfit::TrackCand contains " << nHits << " hits");
 
-  // for easier handling fill a taggedPair (typedef) to distinguish whether a hit has alread been used or if is stil open for procession
+  // for easier handling fill a taggedPair (typedef) to distinguish whether a hit has alread been used or if is still open for procession
   std::vector<flaggedPair<int> > fHitIDs;
   for (int i = 0; i < nHits; ++i) {
     auto aHit = genfitTC->getHit(i);
@@ -474,6 +521,7 @@ const std::vector<int> GFTC2SPTCConverterModule::checkTrackCandForCurling(const 
         throw FoundNoTrueHit();
       }
 
+      B2DEBUG(100, "Now getting global position and momentum for PXDCluster " << pxdCluster->getArrayIndex() << " from Array " << pxdCluster->getArrayName());
       hitGlobalPosMom = getGlobalPositionAndMomentum(pxdTrueHit);
 
     } else if (detType == VXD::SensorInfoBase::SVD) {
@@ -492,15 +540,19 @@ const std::vector<int> GFTC2SPTCConverterModule::checkTrackCandForCurling(const 
             B2WARNING("Found no SVDTrueHit for SVDCluster " << aCluster.getArrayIndex() << " from Array " << aCluster.getArrayName() << ". This SVDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
             throw FoundNoTrueHit();
           }
+          B2DEBUG(100, "Found TrueHit for SVDCluster " << aCluster.getArrayIndex() << " from Array " << aCluster.getArrayName())
           svdTrueHits.push_back(svdTrueHit);
         }
         // if there were 2 clusters, check if they are both related to the same SVDTrueHit, if not throw. Else get position and momentum for this SpacePoint
         if (svdTrueHits.size() > 1) {
+          B2DEBUG(150, "Now checking if TrueHits of Clusters belonging to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " are equal.")
           if (svdTrueHits[0] != svdTrueHits[1]) {
             B2WARNING("TrueHits of SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " are not matching: TrueHit 1 has Index " << svdTrueHits[0]->getArrayIndex() << ", TrueHit 2 has Index " << svdTrueHits[1]->getArrayIndex());
             throw TrueHitsNotMatching();
           }
         }
+
+        B2DEBUG(100, "Now getting global position and momentum for SVDCluster " << svdClusters[0]->getArrayIndex() << " from Array " << svdClusters[0]->getArrayName());
         hitGlobalPosMom = getGlobalPositionAndMomentum(svdTrueHits[0]);
       }
     } else { // this should never be reached, because it should be caught in the creation of the SpacePointTrackCand which is passed to this function!
@@ -534,11 +586,12 @@ std::pair<const TVector3, const TVector3> GFTC2SPTCConverterModule::getGlobalPos
   const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(aVxdId);
 
   // get position
-  TVector3 hitGlobal = sensorInfoBase.pointToGlobal(TVector3(aTrueHit->getU(), aTrueHit->getV(), 0)); // should work like this, since local coordinates are only 2D
-  B2DEBUG(100, "Global position of hit is (" << hitGlobal.X() << "," << hitGlobal.Y() << "," << hitGlobal.Z() << ")");
+  TVector3 hitLocal = TVector3(aTrueHit->getU(), aTrueHit->getV(), 0);
+  TVector3 hitGlobal = sensorInfoBase.pointToGlobal(hitLocal); // should work like this, since local coordinates are only 2D
+  B2DEBUG(100, "Local position of hit is (" << hitLocal.X() << "," << hitLocal.Y() << "," << hitLocal.Z() << "), Global position of hit is (" << hitGlobal.X() << "," << hitGlobal.Y() << "," << hitGlobal.Z() << ")");
 
   // get momentum
-  TVector3 pGlobal = sensorInfoBase.pointToGlobal(aTrueHit->getMomentum());
+  TVector3 pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum());
   B2DEBUG(100, "Global momentum of hit is (" << pGlobal.X() << "," << pGlobal.Y() << "," << pGlobal.Z() << ")");
 
   return std::make_pair(hitGlobal, pGlobal);
@@ -550,7 +603,7 @@ bool GFTC2SPTCConverterModule::getDirectionOfFlight(const std::pair<const TVecto
   TVector3 originToHit = hitPosAndMom.first - origin;
   TVector3 momentumAtHit = hitPosAndMom.second + originToHit;
 
-  B2DEBUG(250, "Position of hit relative to origin is (" << originToHit.X() << "," << originToHit.Y() << "," << originToHit.Z() << "). Momentum relative to hit (relative to origin) (" << momentumAtHit.X() << "," << momentumAtHit.Y() << "," << momentumAtHit.Z() << ")");
+  B2DEBUG(100, "Position of hit relative to origin is (" << originToHit.X() << "," << originToHit.Y() << "," << originToHit.Z() << "). Momentum relative to hit (relative to origin) (" << momentumAtHit.X() << "," << momentumAtHit.Y() << "," << momentumAtHit.Z() << ")");
 
   // cylindrical coordinates (?) -> use TVector3.Perp() to get the radial component of a given vector
   // for spherical coordinates -> use TVector3.Mag() for the same purposes
@@ -571,26 +624,37 @@ const std::vector<Belle2::SpacePointTrackCand> GFTC2SPTCConverterModule::splitCu
 {
   std::vector<SpacePointTrackCand> spacePointTCs;
 
-  // first 'first Index' is 0
-  int firstIndex = 0;
-  // return NTracklets at most
-  for (unsigned iTr = 0; iTr < uint(NTracklets) && iTr < splitIndices.size(); ++iTr) {
-    int lastIndex = splitIndices[iTr];
+  std::vector<std::pair<int, int> > rangeIndices; // store pairs of Indices indicating the first and the last index of a TrackStub inside a SpacePointTrackCand
 
-    B2DEBUG(75, "Creating Tracklet " << iTr << " of " << splitIndices.size() << " possible Tracklets for this SpacePointTrackCand. The indices for this Tracklet are (first,last): (" << firstIndex << "," << lastIndex << ")");
+  int firstIndex = 0; // first 'first index' is 0
+  for (int index : splitIndices) {
+    rangeIndices.push_back({firstIndex, index});
+    firstIndex = index + 1; // next first index is last index + 1
+  }
+  rangeIndices.push_back({firstIndex, SPTrackCand.getNHits() - 1}); // the last TrackStub contains all hits from the last splitIndex to the end of the SpacePointTrackCand
 
-    const std::vector<const SpacePoint*> trackletSpacePoints = SPTrackCand.getHitsInRange(firstIndex, lastIndex);
-    const std::vector<double> trackletSortingParams = SPTrackCand.getSortingParametersInRange(firstIndex, lastIndex);
 
-    // next first Index is lastIndex from this turn + 1
-    firstIndex = lastIndex + 1;
+  // return NTracklets (user defined) at most
+  for (unsigned iTr = 0; iTr < uint(NTracklets) && iTr < rangeIndices.size(); ++iTr) {
+    int lastInd = rangeIndices[iTr].second;
+    int firstInd = rangeIndices[iTr].first;
+
+    B2DEBUG(75, "Creating Track Stub " << iTr << " of " << splitIndices.size() << " possible Track Stub for this SpacePointTrackCand. The indices for this Tracklet are (first,last): (" << firstInd << "," << lastInd << "). This SpacePointTrackCand contains " << SPTrackCand.getNHits() << " SpacePoints.");
+
+    const std::vector<const SpacePoint*> trackletSpacePoints = SPTrackCand.getHitsInRange(firstInd, lastInd);
+    const std::vector<double> trackletSortingParams = SPTrackCand.getSortingParametersInRange(firstInd, lastInd);
 
     SpacePointTrackCand newSPTrackCand = SpacePointTrackCand(trackletSpacePoints, SPTrackCand.getPdgCode(), SPTrackCand.getChargeSeed(), SPTrackCand.getMcTrackID());
     newSPTrackCand.setSortingParameters(trackletSortingParams);
 
     // TODO: set state seed and cov seed for all but the first tracklets (first is just the seed of the original TrackCand)
+    // CAUTION: for now setting the state seed for every track stub to the same as for the first part!!!
+    newSPTrackCand.set6DSeed(SPTrackCand.getStateSeed());
+    newSPTrackCand.setCovSeed(SPTrackCand.getCovSeed());
 
     spacePointTCs.push_back(newSPTrackCand);
+    m_TrackletCtr++;
+    B2DEBUG(500, "This was Track Stub " << m_TrackletCtr << ".")
   }
 
   return spacePointTCs;
@@ -600,6 +664,8 @@ void GFTC2SPTCConverterModule::initializeCounters()
 {
   m_SpacePointTCCtr = 0;
   m_genfitTCCtr = 0;
+  m_curlingTracksCtr = 0;
+  m_TrackletCtr = 0;
 }
 
 void GFTC2SPTCConverterModule::markHitAsUsed(std::vector<flaggedPair<int> >& flaggedHitIDs, int hitToMark)

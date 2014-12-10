@@ -104,9 +104,11 @@ void TCConvertersTestModule::event()
       continue;
     }
 
-    // for debugging purposes, to reproduce why the comparison failed, if it did so. Have to comment in here if you want this output, as genfit::TrackCand::Print() prints to stdout and is thus not affected by setting another LogLevel in the steering script
-    genfitTC->Print();
-    convertedTC->Print();
+    // only print in debug mode
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 20, PACKAGENAME()) == true) {
+      genfitTC->Print();
+      convertedTC->Print();
+    }
 
     // compare the two genfit::TrackCands
     if (*genfitTC == *convertedTC) {

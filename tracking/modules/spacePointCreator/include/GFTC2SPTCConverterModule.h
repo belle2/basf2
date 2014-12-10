@@ -48,6 +48,16 @@ namespace Belle2 {
    * 8) If no valid SpacePoint can be found and no SpacePoint with existing (but used) Cluster Combinations, this Cluster will be added via a single Cluster SpacePoint (and then be marked as used)
    *
    * If no SpacePoint can be found for any Cluster in the genfit::TrackCand, an exception is thrown, and the conversion is skipped.
+   *
+   * Some statements on how the module works on checking if a SpacePointTrackCand is curling:
+   * 1) convert genfit::TrackCand to SpacePointTrackCand
+   * 2) for every SpacePoint in SpacePointTrackCand get Cluster(s) and from them get the according TrueHit(s). If there is more than one TrueHit for a SpacePoint (e.g. SVD) check if they are the same, if not throw
+   * 3) From TrueHit get position and momentum of hit (in global coordinates) and decide with this information if the particles direction of flight is inwards our outwards (i.e. towards or away from set origin)
+   * 4) If Direction changes from one SpacePoint to another -> split SpacePointTrackCand
+   *
+   * NOTE: If the SpacePointTrackCand is checked for curling behaviour (set 'splitCurlers' to true), it is possible (at the moment) that the conversion is aborted, because of some further checks on the SpacePoints (and especially their relation to TrueHits). This abortion leads to another 1-2 % of failed conversions, although these SpacePointTrackCands could pass (there are some cases, where they would not) the current tests.
+   *
+   * TODO: clean-up and bring in line with coding conventions!
    */
   class GFTC2SPTCConverterModule : public Module {
 
@@ -83,18 +93,26 @@ namespace Belle2 {
 
     std::string m_SPTCName; /**< Name of collection under which SpacePointTrackCands will be stored in the StoreArray */
 
+    std::vector<std::string> m_PARAMCurlingTCNames; /**< Names of containers under which Track Stubs of curling track candidates get stored in the StoreArray (regard the order: 1. first (outgoing) part of a curling Track, 2. all ingoing parts of a curling Track, 3. all but the first outgoing part of a curling track, 4. all parts of a curling track (for testing)). */
+
     bool m_PARAMsplitCurlers; /**< Split curling tracks into tracklets.*/
 
-    std::vector<double> m_PARAMsetOrigin; /**< Reset origin, usefull for e.g. testbeam */
-
-    TVector3 m_origin; /**< Assumed interaction point. Set by user (or to default (0,0,0) if no other user input). WARNING: this does not have to be the actual interaction point! */
+    std::vector<double> m_PARAMsetOrigin; /**< Reset origin, usefull for e.g. testbeam et by user (or to default (0,0,0) if no other user input). WARNING: this does not have to be the actual interaction point!*/
 
     int m_NTracklets; /**< maximum number of tracklets to be saved, if curling tracks are split up into tracklets*/
 
+    TVector3 m_origin; /**< Assumed interaction point. Defining this a separate parameter, in case it is reset during run-time to not change the user set value */
+
+    bool m_saveCompleteCurler; /**< Indicator whether all parts of a curling TrackCandidate shall be stored in an extra store array, or if only parts of it get stored together */
+
     // some counters for testing
-    unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were actually created by module*/
+    unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were converted (if a curling track is split up, this counter will still be only increased by 1!) */
 
     unsigned int m_genfitTCCtr; /**< Counter for genfit::TrackCands which were presented to the module */
+
+    unsigned int m_curlingTracksCtr; /**< Counter for tracks that show curling behaviour */
+
+    unsigned int m_TrackletCtr; /**< Counter for all tracklets that were created by splitting up a curling track */
 
 // #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
     template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */

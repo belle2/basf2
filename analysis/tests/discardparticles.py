@@ -64,9 +64,11 @@ process(main)
 
 print statistics
 
-statfull = os.stat('discardparticles_full.root')
-statreduced = os.stat('discardparticles_reduced.root')
-if statfull.st_size <= statreduced.st_size:
+statfull = os.stat('discardparticles_full.root').st_size
+statreduced = os.stat('discardparticles_reduced.root').st_size
+B2RESULT("original size (kB): " + str(statfull / 1024))
+B2RESULT("reduced size (kB):  " + str(statreduced / 1024))
+if statfull <= statreduced:
     B2FATAL("Reduced file is not smaller than original")
 
 os.remove('discardparticles_D0ntuple.root')

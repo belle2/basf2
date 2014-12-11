@@ -258,41 +258,49 @@ bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorB
   return true;
 }
 
-void DataStore::swap(const StoreAccessorBase& a, const StoreAccessorBase& b)
+void DataStore::replaceData(const StoreAccessorBase& from, const StoreAccessorBase& to)
 {
-  StoreEntry* entryA = getEntry(a);
-  StoreEntry* entryB = getEntry(b);
-  if (!entryA)
-    B2FATAL("No " << a.readableName() << " exists in the DataStore!");
-  if (!entryB)
-    B2FATAL("No " << b.readableName() << " exists in the DataStore!");
+  StoreEntry* fromEntry = getEntry(from);
+  StoreEntry* toEntry = getEntry(to);
+  if (!fromEntry)
+    B2FATAL("No " << from.readableName() << " exists in the DataStore!");
+  if (!toEntry)
+    B2FATAL("No " << to.readableName() << " exists in the DataStore!");
 
-  if (a.isArray() != b.isArray() or a.getClass() != b.getClass()) {
-    B2FATAL("cannot swap " << a.readableName() << " with " << b.readableName() << " (incompatible types)!");
+  if (from.isArray() != to.isArray() or from.getClass() != to.getClass()) {
+    B2FATAL("cannot replace " << to.readableName() << " with " << from.readableName() << " (incompatible types)!");
   }
 
-  std::swap(entryA->object, entryB->object);
-  std::swap(entryA->ptr, entryB->ptr);
+  if (!fromEntry->ptr) {
+    //since we don't need to move any data, just invalidate toEntry instead.
+    toEntry->ptr = nullptr;
+  } else if (from.isArray()) {
+    if (!toEntry->ptr)
+      toEntry->ptr = toEntry->object;
+    toEntry->getPtrAsArray()->Delete();
 
-  if (a.isArray()) {
-    if (entryA->ptr)
-      updateRelationsObjectCache(*entryA);
+    toEntry->getPtrAsArray()->AbsorbObjects(fromEntry->getPtrAsArray());
+    updateRelationsObjectCache(*toEntry);
+  } else if (from.getClass() == RelationContainer::Class()) {
+    if (!toEntry->ptr)
+      toEntry->ptr = toEntry->object;
+    RelationContainer* fromRel = static_cast<RelationContainer*>(fromEntry->ptr);
+    RelationContainer* toRel = static_cast<RelationContainer*>(toEntry->ptr);
 
-    if (entryB->ptr)
-      updateRelationsObjectCache(*entryB);
-  } else if (a.getClass() == RelationContainer::Class()) {
-    RelationContainer* relA = static_cast<RelationContainer*>(entryA->object);
-    RelationContainer* relB = static_cast<RelationContainer*>(entryB->object);
-    //make sure from/to info is back to normal
-    //(no swapping the elements doesn't work that well (hideously slow)
-    std::swap(relA->m_toName, relB->m_toName);
-    std::swap(relA->m_toDurability, relB->m_toDurability);
-    std::swap(relA->m_fromName, relB->m_fromName);
-    std::swap(relA->m_fromDurability, relB->m_fromDurability);
+    toRel->elements().Delete();
+
+    toRel->elements().AbsorbObjects(&fromRel->elements());
 
     //indices need a rebuild
-    relA->setModified(true);
-    relB->setModified(true);
+    fromRel->setModified(true);
+    toRel->setModified(true);
+  } else {
+    delete toEntry->object;
+
+    toEntry->object = fromEntry->ptr->Clone();
+    toEntry->ptr = toEntry->object;
+
+    fromEntry->ptr = nullptr;
   }
 }
 

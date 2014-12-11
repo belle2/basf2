@@ -459,4 +459,60 @@ namespace {
     std::vector<std::string> exparrayList = {"EventMetaDatas", "EventMetaDatas_2"};
     EXPECT_EQ(exparrayList, arrayList);
   }
+
+  TEST_F(DataStoreTest, ReplaceData)
+  {
+    StoreObjPtr<EventMetaData> evtPtr;
+    StoreObjPtr<EventMetaData> evtPtrB("abc123");
+    StoreArray<EventMetaData> evtData;
+    StoreArray<EventMetaData> evtDataB("otherArray");
+    DataStore::Instance().setInitializeActive(true);
+    evtPtrB.registerInDataStore(DataStore::c_DontWriteOut);
+    evtDataB.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    {
+      //objects
+      EXPECT_EQ(42, evtPtr->getEvent());
+      EXPECT_FALSE(evtPtrB.isValid());
+      EXPECT_EQ(false, evtPtr.notWrittenOut());
+      EXPECT_EQ(true, evtPtrB.notWrittenOut());
+
+      DataStore::Instance().replaceData(evtPtr, evtPtrB);
+      EXPECT_EQ(42, evtPtrB->getEvent());
+      EXPECT_FALSE(evtPtr.isValid());
+
+      //metadata unchanged
+      EXPECT_EQ(false, evtPtr.notWrittenOut());
+      EXPECT_EQ(true, evtPtrB.notWrittenOut());
+
+      //move null object into existing one
+      DataStore::Instance().replaceData(evtPtr, evtPtrB);
+      EXPECT_FALSE(evtPtr.isValid());
+      EXPECT_FALSE(evtPtrB.isValid());
+
+      //null object to null object
+      DataStore::Instance().replaceData(evtPtr, evtPtrB);
+      EXPECT_FALSE(evtPtr.isValid());
+      EXPECT_FALSE(evtPtrB.isValid());
+    }
+
+    {
+      //arrays
+      EXPECT_EQ(10, evtData.getEntries());
+      EXPECT_EQ(0, evtDataB.getEntries());
+
+      DataStore::Instance().replaceData(evtData, evtDataB);
+      EXPECT_EQ(0, evtData.getEntries());
+      EXPECT_EQ(10, evtDataB.getEntries());
+
+      DataStore::Instance().replaceData(evtData, evtDataB);
+      EXPECT_EQ(0, evtData.getEntries());
+      EXPECT_EQ(0, evtDataB.getEntries());
+
+      DataStore::Instance().replaceData(evtData, evtDataB);
+      EXPECT_EQ(0, evtData.getEntries());
+      EXPECT_EQ(0, evtDataB.getEntries());
+    }
+  }
 }  // namespace

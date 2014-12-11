@@ -11,6 +11,7 @@
 
 #include <framework/datastore/StoreEntry.h>
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+//CINT doesn't like forward declarations
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/RelationEntry.h>
 #endif
@@ -258,11 +259,11 @@ namespace Belle2 {
      */
     bool createObject(TObject* object, bool replace, const StoreAccessorBase& accessor);
 
-    /** Swap two StoreAccessors (of same type).
+    /** For two StoreAccessors of same type, move all data in 'from' into 'to', discarding previous contents of 'to' and leaving 'from' empty.
      *
-     * Meta-data like c_DontWriteOut flags or info about associated arrays for RelationContainers is kept.
+     * Meta-data like c_DontWriteOut flags or info about associated arrays for RelationContainers is not replaced.
      */
-    void swap(const StoreAccessorBase& a, const StoreAccessorBase& b);
+    void replaceData(const StoreAccessorBase& from, const StoreAccessorBase& to);
 
     /** Get a reference to the object/array map.
      *

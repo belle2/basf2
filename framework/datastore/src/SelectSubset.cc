@@ -10,20 +10,17 @@ void SelectSubsetBase::swapSetsAndDestroyOriginal()
   StoreAccessorBase* subset = getSubSet();
 
   //replace set with subset
-  set->clear();
-  DataStore::Instance().swap(*set, *subset);
+  DataStore::Instance().replaceData(*subset, *set);
 
   //swap relations
   for (std::string fromArray : m_inheritFromArrays) {
-    RelationArray a(DataStore::relationName(fromArray, set->getName()));
-    RelationArray b(DataStore::relationName(fromArray, subset->getName()));
-    a.clear();
-    DataStore::Instance().swap(a, b);
+    RelationArray setRel(DataStore::relationName(fromArray, set->getName()));
+    RelationArray subsetRel(DataStore::relationName(fromArray, subset->getName()));
+    DataStore::Instance().replaceData(subsetRel, setRel);
   }
   for (std::string toArray : m_inheritToArrays) {
-    RelationArray a(DataStore::relationName(set->getName(), toArray));
-    RelationArray b(DataStore::relationName(subset->getName(), toArray));
-    a.clear();
-    DataStore::Instance().swap(a, b);
+    RelationArray setRel(DataStore::relationName(set->getName(), toArray));
+    RelationArray subsetRel(DataStore::relationName(subset->getName(), toArray));
+    DataStore::Instance().replaceData(subsetRel, setRel);
   }
 }

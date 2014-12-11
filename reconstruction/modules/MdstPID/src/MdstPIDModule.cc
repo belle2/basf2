@@ -122,11 +122,9 @@ namespace Belle2 {
   {
     if (logl->getFlag() != 1) return;
 
-    m_pid->setLogLikelihood(Const::TOP, Const::electron, (float) logl->getLogL_e());
-    m_pid->setLogLikelihood(Const::TOP, Const::muon, (float) logl->getLogL_mu());
-    m_pid->setLogLikelihood(Const::TOP, Const::pion, (float) logl->getLogL_pi());
-    m_pid->setLogLikelihood(Const::TOP, Const::kaon, (float) logl->getLogL_K());
-    m_pid->setLogLikelihood(Const::TOP, Const::proton, (float) logl->getLogL_p());
+    for (const auto & chargedStable : Const::chargedStableSet) {
+      m_pid->setLogLikelihood(Const::TOP, chargedStable, logl->getLogL(chargedStable));
+    }
 
   }
 
@@ -146,17 +144,22 @@ namespace Belle2 {
 
   void MdstPIDModule::setLikelihoods(const DedxLikelihood* logl)
   {
-    for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k) {
-      m_pid->setLogLikelihood(Const::SVD, k, logl->getSVDLogLikelihood(k));
-      m_pid->setLogLikelihood(Const::CDC, k, logl->getCDCLogLikelihood(k));
+
+    for (const auto & chargedStable : Const::chargedStableSet) {
+      m_pid->setLogLikelihood(Const::SVD, chargedStable, logl->getSVDLogLikelihood(chargedStable));
+      m_pid->setLogLikelihood(Const::CDC, chargedStable, logl->getCDCLogLikelihood(chargedStable));
     }
+
   }
 
 
   void MdstPIDModule::setLikelihoods(const ECLPidLikelihood* logl)
   {
-    for (Const::ParticleType k = Const::chargedStableSet.begin(); k != Const::chargedStableSet.end(); ++k)
-      m_pid->setLogLikelihood(Const::ECL, k, logl->getLogLikelihood(k));
+
+    for (const auto & chargedStable : Const::chargedStableSet) {
+      m_pid->setLogLikelihood(Const::ECL, chargedStable, logl->getLogLikelihood(chargedStable));
+    }
+
   }
 
 

@@ -146,11 +146,15 @@ namespace Belle {
 
       //...Calculate radius...
       const float swr = cdc2.senseWireR(i);
-      float fwr = cdc2.fieldWireR(i);
-      if (i == nLayers - 2)
-        fwrLast = fwr;
-      else if (i == nLayers - 1)
+      float fwr = 0.0;
+      if (i < nLayers - 1) {
+        // number of field wire layers is nLayers - 1
+        fwr = cdc2.fieldWireR(i);
+        if (i == nLayers - 2)
+          fwrLast = fwr;
+      } else {
         fwr = swr + (swr - fwrLast);
+      }
       const float innerRadius = swr - (fwr - swr);
       const float outerRadius = swr + (fwr - swr);
 

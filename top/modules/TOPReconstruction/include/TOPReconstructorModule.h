@@ -99,6 +99,7 @@ namespace Belle2 {
     // Masses of particle hypotheses
 
     double m_masses[Const::ChargedStable::c_SetSize];  /**< particle masses */
+    int m_pdgCodes[Const::ChargedStable::c_SetSize];   /**< particle codes */
 
   };
 

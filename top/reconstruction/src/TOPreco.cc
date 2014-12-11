@@ -86,7 +86,8 @@ namespace Belle2 {
 
     void TOPreco::reconstruct(TOPtrack& trk)
     {
-      m_hypID = trk.getHypID();
+      //      m_hypID = trk.getHypID();
+      m_hypID = abs(trk.getPDGcode());
       reconstruct(trk.getX(), trk.getY(), trk.getZ(), trk.getTrackLength(),
                   trk.getPx(), trk.getPy(), trk.getPz(), trk.getCharge(), m_hypID);
     }
@@ -165,11 +166,11 @@ namespace Belle2 {
       using namespace std;
       cout << "TOPreco::dumpLogL: Flag=" << getFlag();
       cout << "  Detected Photons=" << Nphot << endl;
-      cout << " i HypID   LogL   ExpPhot" << endl;
+      cout << " i         HypID   LogL   ExpPhot" << endl;
       cout << showpoint << fixed << right;
       for (int i = 0; i < Size; i++) {
         cout << setw(2) << i;
-        cout << setw(4) << hypid[i];
+        cout << setw(12) << hypid[i];
         cout << setw(10) << setprecision(2) << logl[i];
         cout << setw(8) << setprecision(2) << sfot[i];
         if (i == i_max) cout << " <";

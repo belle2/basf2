@@ -89,6 +89,7 @@ namespace Belle2 {
              "time limit for photons [ns] (0 = use full TDC range)", 51.2);
 
     for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_masses[i] = 0;}
+    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_pdgCodes[i] = 0;}
 
   }
 
@@ -138,6 +139,7 @@ namespace Belle2 {
 
     for (const auto & part : Const::chargedStableSet) {
       m_masses[part.getIndex()] = part.getMass();
+      m_pdgCodes[part.getIndex()] = abs(part.getPDGCode());
     }
 
     // set track smearing flag
@@ -170,6 +172,7 @@ namespace Belle2 {
     // create reconstruction object
 
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
+    reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
 
     // set time limit for photons lower than that given by TDC range (optional)
 

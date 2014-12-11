@@ -35,8 +35,8 @@ REG_MODULE(ECLElectronId)
 
 ECLElectronIdModule::ECLElectronIdModule() : Module()
 {
-  setDescription("First version of E/p based Electron ID. Likelihood values for each particle hypothesis are stored in an ECLPidLikelihood object.");
-  setPropertyFlags(c_ParallelProcessingCertified);
+  setDescription("E/p based Electron ID. Likelihood values for each particle hypothesis are stored in an ECLPidLikelihood object.");
+  for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) m_pdf[i] = 0;
   //add module parameters here [see one of the following tutorials]
 }
 
@@ -89,9 +89,12 @@ void ECLElectronIdModule::event()
       if (fitRes == 0) fitRes = track -> getTrackFitResult(Const::pion);
 
       if (fitRes != 0) {
+        ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
+        if (currentpdf == 0) currentpdf = m_pdf[ Const::pion.getIndex() ]; // use pion pdf when specialized pdf is not assigned.
         double p = fitRes  -> getMomentum() . Mag();
         double eop = energy / p;
-        likelihoods[hypo.getIndex()] = log(m_pdf[hypo.getIndex()]->pdf(eop, p));
+        likelihoods[hypo.getIndex()] = log(currentpdf->pdf(eop, p));
+
       } else likelihoods[hypo.getIndex()] = -700;
 
     } // end loop on hypo

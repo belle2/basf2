@@ -163,6 +163,11 @@ namespace Belle2 {
       /** Return area of the sensor with the given sensor ID */
       inline double getSensorArea(VxdID sensorID) const;
 
+      /** Convert local sensor coordinates to global */
+      const TVector3& pointToGlobal(VxdID sensorID, const TVector3& local);
+      /** Convert local vector coordinates to global */
+      const TVector3& vectorToGlobal(VxdID sensorID, const TVector3& local);
+
       /** Get number of sensors in a layer */
       inline int getNumSensors(int layerNum);
       /** Get layer area */
@@ -191,6 +196,9 @@ namespace Belle2 {
       std::string m_storeClustersName; /**< SVDClusters StoreArray name */
       std::string m_relClusterDigitName; /**< SVDClustersToSVDDigits RelationArray name */
       std::string m_relTrueHitsSimHitsName;  /**< SVDTrueHitsToSVDSimHits RelationArray name */
+
+      std::string m_storeEnergyDepositsName; /**< SVDEnergyDepositEvents StoreArray name */
+      std::string m_storeNeutronFluxesName; /**< SVDNeutronFluxEvents StoreArray name */
 
       std::vector<std::string> m_componentNames; /**< List of component names.*/
       std::vector<unsigned long> m_componentTimes; /**< List of equivalent times for individual components */

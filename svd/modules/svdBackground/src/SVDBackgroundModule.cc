@@ -16,6 +16,8 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDEnergyDepositionEvent.h>
+#include <svd/dataobjects/SVDNeutronFluxEvent.h>
 #include <svd/background/HistogramFactory.h>
 
 #include <fstream>
@@ -60,6 +62,23 @@ SVDBackgroundModule::SVDBackgroundModule() :
   addParam("outputDirectory", m_outputDirectoryName, "Name of output directory", m_outputDirectoryName);
 }
 
+const TVector3& SVDBackgroundModule::pointToGlobal(VxdID sensorID, const TVector3& local)
+{
+  static TVector3 result(0, 0, 0);
+
+  const SVD::SensorInfo& info = getInfo(sensorID);
+  result = info.pointToGlobal(local);
+  return result;
+}
+
+const TVector3& SVDBackgroundModule::vectorToGlobal(VxdID sensorID, const TVector3& local)
+{
+  static TVector3 result(0, 0, 0);
+
+  const SVD::SensorInfo& info = getInfo(sensorID);
+  result = info.vectorToGlobal(local);
+  return result;
+}
 
 SVDBackgroundModule::~SVDBackgroundModule()
 {
@@ -118,6 +137,12 @@ void SVDBackgroundModule::initialize()
   RelationArray relMCParticlesTrueHits(storeMCParticles, storeTrueHits);
   RelationArray relTrueHitsSimHits(storeTrueHits, storeSimHits);
 
+  // Add two new StoreArrays
+  StoreArray<SVDEnergyDepositionEvent> storeEnergyDeposits(m_storeEnergyDepositsName);
+  storeEnergyDeposits.registerInDataStore();
+  StoreArray<SVDNeutronFluxEvent> storeNeutronFluxes(m_storeNeutronFluxesName);
+  storeNeutronFluxes.registerInDataStore();
+
   //Store names to speed up creation later
   m_storeFileMetaDataName = storeFileMetaData.getName();
   m_storeBgMetaDataName = storeBgMetaData.getName();
@@ -129,6 +154,8 @@ void SVDBackgroundModule::initialize()
   m_relDigitsTrueHitsName = relDigitsTrueHits.getName();
   m_relParticlesTrueHitsName = relMCParticlesTrueHits.getName();
   m_relTrueHitsSimHitsName = relTrueHitsSimHits.getName();
+  m_storeEnergyDepositsName = storeEnergyDeposits.getName();
+  m_storeNeutronFluxesName = storeNeutronFluxes.getName();
 
   // Initialize m_data:
   for (unsigned int iComp = 0; iComp < m_componentNames.size(); ++iComp) {
@@ -155,6 +182,11 @@ void SVDBackgroundModule::event()
   const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   const StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
 
+  // Add two new StoreArrays
+  StoreArray<SVDEnergyDepositionEvent> storeEnergyDeposits(m_storeEnergyDepositsName);
+  StoreArray<SVDNeutronFluxEvent> storeNeutronFluxes(m_storeNeutronFluxesName);
+
+  // Relations
   RelationArray relDigitsMCParticles(storeDigits, storeMCParticles, m_relDigitsMCParticlesName);
   RelationArray relDigitsTrueHits(storeDigits, storeTrueHits, m_relDigitsTrueHitsName);
   RelationArray relTrueHitsSimHits(storeTrueHits, storeSimHits, m_relTrueHitsSimHitsName);
@@ -205,11 +237,21 @@ void SVDBackgroundModule::event()
     // Normalize by layer mass for bar charts
     bData.m_doseBars->Fill(currentLayerNumber,
                            (hitEnergy / Unit::J) / (currentLayerMass / 1000) * (c_smy / currentComponentTime));
-    // TODO: We need more spatial information here. Envelope plots.
+    // Store things in an SVDEnergyDepositEvent object
+    TVector3 localPos = 0.5 * (hit.getPosIn() + hit.getPosOut());
+    const TVector3 globalPos = pointToGlobal(currentSensorID, localPos);
+    float globalPosXYZ[3];
+    globalPos.GetXYZ(globalPosXYZ);
+    storeEnergyDeposits.appendNew(
+      sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+      hit.getBackgroundTag(), hit.getPDGcode(), hit.getGlobalTime(),
+      localPos.X(), localPos.Y(), globalPosXYZ, hitEnergy,
+      (hitEnergy / Unit::J) / (currentSensorMass / 1000) / (currentComponentTime / Unit::s),
+      (hitEnergy / Unit::J) / currentSensorArea / (currentComponentTime / Unit::s)
+    );
   }
 
   // Neutron flux
-  // FIMXE: Do we still need TrueHits for this?
   B2DEBUG(100, "Neutron flux")
   currentSensorID.setID(0);
   for (const SVDTrueHit & hit : storeTrueHits) {
@@ -240,10 +282,11 @@ void SVDBackgroundModule::event()
     // We fill neutronFluxBars with summary NIEL deposit for all kinds of particles by layer and component.
     // Fluency plots are by component and are deposition histograms for a particular type of particle and compoonent.
     int pdg = abs(simhit->getPDGcode());
-    double nielWeight = 0;
+    double kineticEnergy(0.0);
+    double nielWeight(0.0);
     if (pdg == 2112) {
       double m0 = 0.940;
-      double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
+      kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       nielWeight = m_nielNeutrons->getNielFactor(kineticEnergy / Unit::MeV);
       bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_neutronFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -253,7 +296,7 @@ void SVDBackgroundModule::event()
     }
     if (pdg == 2212) {
       double m0 = 0.938;
-      double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
+      kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       nielWeight = m_nielProtons->getNielFactor(kineticEnergy / Unit::MeV);
       bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_protonFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -263,7 +306,7 @@ void SVDBackgroundModule::event()
     }
     if (pdg == 111 || pdg == 211) {
       double m0 = 0.135;
-      double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
+      kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       nielWeight = m_nielPions->getNielFactor(kineticEnergy / Unit::MeV);
       bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_pionFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -273,7 +316,7 @@ void SVDBackgroundModule::event()
     }
     if (pdg == 11) {
       double m0 = 0.511e-3;
-      double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
+      kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       nielWeight = m_nielElectrons->getNielFactor(kineticEnergy / Unit::MeV);
       bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_electronFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -283,7 +326,7 @@ void SVDBackgroundModule::event()
     }
     if (pdg == 22) {
       double m0 = 0.0;
-      double kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
+      kineticEnergy = sqrt(hit.getMomentum().Mag2() + m0 * m0) - m0;
       bData.m_photonFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                    stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
     }
@@ -291,6 +334,24 @@ void SVDBackgroundModule::event()
     // Only set weight for supported particles
 
     bData.m_sensorData[currentSensorID].m_neutronFlux += nielWeight * stepLength / currentSensorThickness / currentSensorArea / currentComponentTime * c_smy;
+
+    // Store data in a SVDNeutronFluxEvent object
+    TVector3 localPos(hit.getU(), hit.getV(), hit.getW());
+    const TVector3 globalPos = pointToGlobal(currentSensorID, localPos);
+    float globalPosXYZ[3];
+    globalPos.GetXYZ(globalPosXYZ);
+    TVector3 localMom = hit.getMomentum();
+    const TVector3 globalMom = vectorToGlobal(currentSensorID, localMom);
+    float globalMomXYZ[3];
+    globalMom.GetXYZ(globalMomXYZ);
+    storeNeutronFluxes.appendNew(
+      sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+      simhit->getBackgroundTag(), simhit->getPDGcode(), simhit->getGlobalTime(),
+      hit.getU(), hit.getV(), globalPosXYZ, globalMomXYZ, kineticEnergy,
+      stepLength, nielWeight,
+      stepLength / currentSensorThickness / currentSensorArea / (currentComponentTime / Unit::s),
+      nielWeight * stepLength / currentSensorThickness / currentSensorArea / (currentComponentTime / Unit::s)
+    );
   }
 
   // Fired strips and raw occupancy

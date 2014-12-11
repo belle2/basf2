@@ -6,8 +6,8 @@ from basf2 import *
 
 set_log_level(LogLevel.INFO)
 # Change this to point to actual locations on your system.
-input_dir = '/data/belle2/BG/Jun2014/bg_full/'
-output_dir = '/data/belle2/BG/Jun2014/bg_full/output/'
+input_dir = '/data/belle2/BG/Jun2014/bg_SVD/'
+output_dir = '/data/belle2/BG/Jun2014/bg_SVD/output/'
 
 components = []
 components.append(('Coulomb_HER', 100))
@@ -60,6 +60,7 @@ svdBkg.set_debug_level(10)
 # output - do we want output?
 output = register_module('RootOutput')
 output.param('outputFileName', output_dir + 'SVDBackgroundOutput.root')
+output.param('branchNames', ['SVDEnergyDepositionEvents', 'SVDNeutronFluxEvents'])
 
 # Create paths
 main = create_path()
@@ -73,7 +74,7 @@ main.add_module(geometry)
 main.add_module(svdDigi)
 # main.add_module(svdClust)
 main.add_module(svdBkg)
-# main.add_module(output)
+main.add_module(output)
 
 # Process events
 process(main)

@@ -10,5 +10,7 @@
 #pragma link C++ class Belle2::SVDTransparentDigit+;
 #pragma link C++ class Belle2::SVDSimHit+;
 #pragma link C++ class Belle2::SVDTrueHit+;
+#pragma link C++ class Belle2::SVDEnergyDepositionEvent+;
+#pragma link C++ class Belle2::SVDNeutronFluxEvent+;
 
 #endif

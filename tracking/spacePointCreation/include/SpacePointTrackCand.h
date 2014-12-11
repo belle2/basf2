@@ -146,6 +146,16 @@ namespace Belle2 {
      */
     bool operator == (const SpacePointTrackCand& rhs);
 
+    /**
+     * set the direction of flight (true is outgoing, false is ingoing)
+     */
+    void setFlightDirection(bool direction) { m_flightDirection = direction; }
+
+    /**
+     * check if particle is outgoing (simply returns member m_flightDirection)!
+     */
+    bool isOutgoing() const { return m_flightDirection; }
+
   protected:
     /**
      * pointers to SpacePoints in the datastore
@@ -187,6 +197,11 @@ namespace Belle2 {
      */
     double m_q;
 
-    ClassDef(SpacePointTrackCand, 2) // last member added: m_sortingParameters
+    /**
+     * direction of flight. true is outgoing, false is ingoing
+     */
+    bool m_flightDirection;
+
+    ClassDef(SpacePointTrackCand, 3) // last members added: m_flightDirection(3), m_sortingParameters (2)
   };
 }

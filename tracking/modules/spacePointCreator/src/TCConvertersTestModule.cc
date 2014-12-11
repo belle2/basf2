@@ -51,7 +51,6 @@ void TCConvertersTestModule::initialize()
 
   for (string aName : m_SpacePointArrayNames) { StoreArray<SpacePoint>::required(aName); }
 
-  // TODO: check why this does not work properly (not all variables are initialized to 0 here!)
   initializeCounters();
 }
 

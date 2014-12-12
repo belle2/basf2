@@ -242,13 +242,13 @@ void SVDBackgroundModule::event()
     const TVector3 globalPos = pointToGlobal(currentSensorID, localPos);
     float globalPosXYZ[3];
     globalPos.GetXYZ(globalPosXYZ);
-    SVDEnergyDepositionEvent* writeEvent = storeEnergyDeposits.appendNew(
-                                             sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                             hit.getBackgroundTag(), hit.getPDGcode(), hit.getGlobalTime(),
-                                             localPos.X(), localPos.Y(), globalPosXYZ, hitEnergy,
-                                             (hitEnergy / Unit::J) / (currentSensorMass / 1000) / (currentComponentTime / Unit::s),
-                                             (hitEnergy / Unit::J) / currentSensorArea / (currentComponentTime / Unit::s)
-                                           );
+    storeEnergyDeposits.appendNew(
+      sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+      hit.getBackgroundTag(), hit.getPDGcode(), hit.getGlobalTime(),
+      localPos.X(), localPos.Y(), globalPosXYZ, hitEnergy,
+      (hitEnergy / Unit::J) / (currentSensorMass / 1000) / (currentComponentTime / Unit::s),
+      (hitEnergy / Unit::J) / currentSensorArea / (currentComponentTime / Unit::s)
+    );
   }
 
   // Neutron flux

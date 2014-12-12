@@ -475,16 +475,16 @@ namespace {
       //objects
       EXPECT_EQ(42, evtPtr->getEvent());
       EXPECT_FALSE(evtPtrB.isValid());
-      EXPECT_EQ(false, evtPtr.notWrittenOut());
-      EXPECT_EQ(true, evtPtrB.notWrittenOut());
+      EXPECT_FALSE(evtPtr.notWrittenOut());
+      EXPECT_TRUE(evtPtrB.notWrittenOut());
 
       DataStore::Instance().replaceData(evtPtr, evtPtrB);
       EXPECT_EQ(42, evtPtrB->getEvent());
       EXPECT_FALSE(evtPtr.isValid());
 
       //metadata unchanged
-      EXPECT_EQ(false, evtPtr.notWrittenOut());
-      EXPECT_EQ(true, evtPtrB.notWrittenOut());
+      EXPECT_FALSE(evtPtr.notWrittenOut());
+      EXPECT_TRUE(evtPtrB.notWrittenOut());
 
       //move null object into existing one
       DataStore::Instance().replaceData(evtPtr, evtPtrB);

@@ -12,6 +12,8 @@
 #include <framework/logging/Logger.h>
 
 #include <cmath>
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -154,6 +156,58 @@ void PIDLikelihood::probability(double probabilities[],
 
 }
 
+
+void PIDLikelihood::printArray() const
+{
+
+  string detectorName[Const::PIDDetectors::c_size] =
+  {"SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"};
+  string hline("-------");
+  for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
+    hline += "-----------";
+  string Hline("=======");
+  for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
+    Hline += "===========";
+
+  cout << Hline << endl;
+
+  cout << "PDGcode";
+  for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
+    cout << setw(10) << Const::chargedStableSet.at(i).getPDGCode() << " ";
+  cout << endl;
+
+  cout << Hline << endl;
+
+  float sum_logl[Const::ChargedStable::c_SetSize];
+  for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) sum_logl[i] = 0;
+
+  for (unsigned k = 0; k < Const::PIDDetectors::c_size; k++) {
+    cout << setw(7) << detectorName[k];
+    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+      cout << setw(10) << setprecision(4) << m_logl[k][i] << " ";
+      sum_logl[i] += m_logl[k][i];
+    }
+    cout << endl;
+  }
+
+  cout << hline << endl;
+
+  cout << setw(7) << "sum";
+  for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
+    cout << setw(10) << setprecision(4) << sum_logl[i] << " ";
+  cout << endl;
+
+  if (isAvailable(Const::SVD) or isAvailable(Const::CDC) or isAvailable(Const::TOP) or
+      isAvailable(Const::ARICH) or isAvailable(Const::ECL) or isAvailable(Const::KLM)) {
+    unsigned k = 0;
+    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
+      if (sum_logl[i] > sum_logl[k]) k = i;
+    unsigned pos = 11 * (k + 1) + 3;
+    Hline.replace(pos, 1, "^");
+  }
+  cout << Hline << endl;
+
+}
 
 ClassImp(PIDLikelihood)
 

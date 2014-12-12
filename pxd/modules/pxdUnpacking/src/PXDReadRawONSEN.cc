@@ -97,7 +97,7 @@ int PXDReadRawONSENModule::readOneEvent()
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(data, headerlen);
   if (br <= 0) return br;
-  if (pxdheader[0] != (int)0xCAFEBABE) {
+  if (pxdheader[0] != 0xCAFEBABEu) {
     printf("pxdheader wrong : Magic %X , Frames %X \n", (unsigned int) pxdheader[0], (unsigned int) pxdheader[1]);
     exit(0);
   }

@@ -28,7 +28,6 @@ ARICHTrack::ARICHTrack(const ARICHAeroHit& aeroHit)
   m_PDGEncoding = aeroHit.getPDG();
   m_trackID = 0;
   m_extHitID = -1;
-  m_identity = Lund2Type(m_PDGEncoding);
   m_aeroIndex = aeroHit.getArrayIndex();
   m_flag = 1;
   for (int i = 0; i < c_noOfHypotheses; i++) {
@@ -50,7 +49,6 @@ ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int pdgCode, int trackI
   m_PDGEncoding(pdgCode),
   m_trackID(trackID),
   m_extHitID(extHit->getArrayIndex()),
-  m_identity(Lund2Type(m_PDGEncoding)),
   m_aeroIndex(aeroHitIndex),
   m_flag(1)
 {
@@ -59,26 +57,6 @@ ARICHTrack::ARICHTrack(const ExtHit* extHit, int charge, int pdgCode, int trackI
     m_expectedPhotons[i] = 0;
     m_detectedPhotons[i] = 0;
     m_acc[i] = 0;
-  }
-}
-
-int ARICHTrack::Lund2Type(int ipart)
-{
-  //Description: Converts GEANT code to e mu pi K p index.
-  // return =0  electron
-  //        =1  muon
-  //        =2  pion
-  //        =3  kaon
-  //        =4  proton
-  //        =-1   ?
-  ipart = abs(ipart);
-  switch (ipart) {
-    case  11  :  return 0;
-    case  13  :  return 1;
-    case  211 :  return 2;
-    case  321 :  return 3;
-    case  2212:  return 4;
-    default:     return -1;
   }
 }
 

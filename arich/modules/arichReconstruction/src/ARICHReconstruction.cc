@@ -49,8 +49,10 @@ namespace Belle2 {
     B2INFO("ARICHReconstruction::ARICHReconstruction()");
     if (m_storeHist) {
       m_hitstuple = new TNtuple("hits", "Btest Cherenkov angle", "n:id:agel:mir:thc:fic:x:y:tx:ty:p");
-      m_tracktuple = new TNtuple("tracks", "Btest tracks", "id:p:nexp:acc:ndet:le:lmu:lpi:lk:lp");
+      m_tracktuple = new TNtuple("tracks", "Btest tracks", "id:p:nexp:acc:ndet:lkh_1:lkh_2:lkh_3:lkh_4:lkh_5");
     }
+
+    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {p_mass[i] = 0;}
   }
 
 
@@ -276,8 +278,6 @@ namespace Belle2 {
 
   int ARICHReconstruction::likelihood2(std::vector<ARICHTrack>& arichTracks)
   {
-    //const double p_mass[5] = { 0.000511, 0.10566, 0.13957, 0.49368, 0.93827};// mass of particles in GeV
-    const double p_mass[5] = {Const::electron.getMass(), Const::muon.getMass(), Const::pion.getMass(), Const::kaon.getMass(), Const::proton.getMass()};
 
     const unsigned int nTracks = arichTracks.size();
     StoreArray<ARICHDigit> arichDigits;
@@ -307,6 +307,10 @@ namespace Belle2 {
     double  thetaCh[c_noOfHypotheses][c_noOfAerogels]; // expected Ch. angle
 
     if (first) {
+      const Const::ParticleSet set = Const::chargedStableSet;
+      for (const Const::ChargedStable & pdgIter : set) {
+        p_mass[pdgIter.getIndex()] =  pdgIter.getMass();
+      }
 
       padSize = m_arichGeoParameters->getDetectorPadSize();
       padArea = padSize / Unit::m * padSize / Unit::m;
@@ -339,12 +343,12 @@ namespace Belle2 {
 
       ARICHTrack* track =  &arichTracks[i];
       // Reconstructed photons within expected cone
-      int nDetPhotons[5] = {0, 0, 0, 0, 0};
+      int nDetPhotons[c_noOfHypotheses];
 
       // loop over all particle hypotheses
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
         logL[iHyp] = 0;
-
+        nDetPhotons[iHyp] = 0;
         // loop over aerogel layers
         for (unsigned int iAerogel = 0; iAerogel < nAerogelLayers; iAerogel++) {
           // track length in the radiator
@@ -468,7 +472,7 @@ namespace Belle2 {
 
             if (th_cer > 0.5 /*|| th_cer < 0.05*/) continue;
 
-            if (ncount < m_storeHist) m_hitstuple->Fill(ncount, track->getIdentity(), iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), epoint.x(), epoint.y(), track->getReconstructedMomentum());
+            if (ncount < m_storeHist) m_hitstuple->Fill(ncount, track->getPDGEncoding(), iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), epoint.x(), epoint.y(), track->getReconstructedMomentum());
             if (m_beamtest) continue;
             if (fi_cer < 0) fi_cer += 2 * M_PI;
             double fii = fi_cer;
@@ -563,9 +567,10 @@ namespace Belle2 {
       //**************************************
 
       if (ncount < m_storeHist) {
-        int id = track->getIdentity();
-        if (id < 0) id = 0;
-        m_tracktuple->Fill(id, track->getReconstructedMomentum(), nSig[id][nAerogelLayers], acceptance[id][0], nDetPhotons[id], logL[0], logL[1], logL[2], logL[3], logL[4]);
+        static const Const::ParticleSet set =  Const::chargedStableSet;
+        Const::ParticleType part = set.find(abs(track->getPDGEncoding()));
+        int id = part.getIndex();
+        m_tracktuple->Fill(track->getPDGEncoding(), track->getReconstructedMomentum(), nSig[id][nAerogelLayers], acceptance[id][0], nDetPhotons[id], logL[0], logL[1], logL[2], logL[3], logL[4]);
       }
 
     } // for (unsigned  int i=0; i< nTracks; i++){

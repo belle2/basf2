@@ -156,9 +156,9 @@ namespace Belle2 {
       int nTracks = arichTracks.size();
       for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
         ARICHTrack* track = &arichTracks[iTrack];
-        double likelihoods[5];
-        double expectedPhotons[5];
-        int detectedPhotons[5];
+        double likelihoods[Const::ChargedStable::c_SetSize];
+        double expectedPhotons[Const::ChargedStable::c_SetSize];
+        int detectedPhotons[Const::ChargedStable::c_SetSize];
         track->getLikelihood(likelihoods);
         track->getExpectedPhotons(expectedPhotons);
         track->getDetectedPhotons(detectedPhotons);
@@ -208,9 +208,9 @@ namespace Belle2 {
 
       for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
         ARICHTrack* track = &arichTracks[iTrack];
-        double expectedPhotons[5];
-        double likelihoods[5];
-        int detectedPhotons[5];
+        double expectedPhotons[Const::ChargedStable::c_SetSize];
+        double likelihoods[Const::ChargedStable::c_SetSize];
+        int detectedPhotons[Const::ChargedStable::c_SetSize];
         track->getExpectedPhotons(expectedPhotons);
         track->getLikelihood(likelihoods);
         track->getDetectedPhotons(detectedPhotons);

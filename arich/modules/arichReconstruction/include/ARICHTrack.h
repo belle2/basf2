@@ -46,7 +46,6 @@ namespace Belle2 {
       m_PDGEncoding(-1),
       m_trackID(-1),
       m_extHitID(-1),
-      m_identity(-1),
       m_aeroIndex(-1),
       m_flag(1) {
       /*! does nothing */
@@ -83,7 +82,6 @@ namespace Belle2 {
       m_PDGEncoding(type),
       m_trackID(trackID),
       m_extHitID(-1),
-      m_identity(-1),
       m_aeroIndex(-1),
       m_flag(1) {
       for (int i = 0; i < c_noOfHypotheses; i++) {
@@ -139,52 +137,49 @@ namespace Belle2 {
     //! returns track id from ext
     int getHitID() const {return m_extHitID;};
 
-    //! return particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else)
-    int getIdentity() const {return m_identity;};
-
     //! returns aerogel hit (MC simulation) index
     int getAeroIndex() const {return m_aeroIndex;};
 
-    //! returns value of likelihood function for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //! returns value of likelihood function for "i" particle hypothesis (in the order of Const::ChargedStableSet )
     double getLikelihood(int i) const {return m_lkh[i]; };
 
     //! calculates likelihoods for 5 hypotheses
-    void getLikelihood(double like[]) {like[0] = m_lkh[0]; like[1] = m_lkh[1]; like[2] = m_lkh[2]; like[3] = m_lkh[3]; like[4] = m_lkh[4];};
+    void getLikelihood(double like[]) {for (int i = 0; i < c_noOfHypotheses; i++) like[i] = m_lkh[i];};
 
-    //! returns expected number of detected photons for "i" particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //! returns expected number of detected photons for "i" particle hypothesis (in the order of Const::ChargedStableSet )
     double getExpectedPhotons(int i) const {return m_expectedPhotons[i]; };
 
     //! returns expected number of detected photons for all particle hypotheses
-    void getExpectedPhotons(double nphot[]) {nphot[0] = m_expectedPhotons[0]; nphot[1] = m_expectedPhotons[1]; nphot[2] = m_expectedPhotons[2]; nphot[3] = m_expectedPhotons[3]; nphot[4] = m_expectedPhotons[4]; };
+    void getExpectedPhotons(double nphot[]) {for (int i = 0; i < c_noOfHypotheses; i++) nphot[i] = m_expectedPhotons[i]; };
 
-    //! returns no. of detected photons in +/- 3 sigma band around the expected cherenkov angle for "i"-th particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //! returns no. of detected photons in +/- 3 sigma band around the expected cherenkov angle for "i"-th particle hypothesis (in the order of Const::ChargedStableSet )
     int getDetectedPhotons(int i) const {return m_detectedPhotons[i];};
 
     //! returns expected number of detected photons for all particle hypotheses
-    void getDetectedPhotons(int nphot[]) {nphot[0] = m_detectedPhotons[0]; nphot[1] = m_detectedPhotons[1]; nphot[2] = m_detectedPhotons[2]; nphot[3] = m_detectedPhotons[3]; nphot[4] = m_detectedPhotons[4]; };
+    void getDetectedPhotons(int nphot[]) {for (int i = 0; i < c_noOfHypotheses; i++) nphot[i] = m_detectedPhotons[i];};
 
-    //! returns geometrical acceptance of emitted Cherenkov photons by particle "i" (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //! returns geometrical acceptance of emitted Cherenkov photons by particle "i" (in the order of Const::ChargedStableSet )
     double getGeometricalAcceptance(int i) const {return m_acc[i]; };
 
     //! returns the likelihood flag. 0 if outside ARICH geometrical acceptance.
     int getFlag() const {return  m_flag; };
 
-    //! sets value of likelihood function for particle hypothesis "i" to "val" (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //! sets value of likelihood function for particle hypothesis "i" to "val" (in the order of Const::ChargedStableSet )
     void setLikelihood(int i, double val) {m_lkh[i] = val; };
 
-    //!  sets value of likelihood function for all particle hypotheses. "imax" is number of particle hypotheses, "val" is array of hypotheses values (val[0] electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //!  sets value of likelihood function for all particle hypotheses. "imax" is number of particle hypotheses, "val" is array of hypotheses values (in the order of Const::ChargedStableSet )
     void setLikelihood(double* val) {for (int i = 0; i < c_noOfHypotheses; i++) m_lkh[i] = val[i];};
 
-    //! sets theoretically expected number of photons for i-th particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //! sets theoretically expected number of photons for i-th particle hypothesis (in the order of Const::ChargedStableSet)
     void setExpectedPhotons(int i, double val) {m_expectedPhotons[i] = val; };
 
-    //! sets detected number of photons for i-th particle hypothesis
+    //! sets detected number of photons for i-th particle hypothesis (in the order of Const::ChargedStableSet)
     /* Photons are detected if they are found to be in the theoretically expected Cherenkov cone
      * within +/- 42mrad (~3sigma, for now fixed).
      */
     void setDetectedPhotons(int i, double val) {m_detectedPhotons[i] = val;};
 
-    //! sets the geometrical acceptance of Cherenkov ring for i-th particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
+    //! sets the geometrical acceptance of Cherenkov ring for i-th particle hypothesis (in the order of Const::ChargedStableSet)
     void setGeometricalAcceptance(int i, double val) {m_acc[i] = val;};
 
     //! sets the likelihood flag. Set to 0 if outside ARICH geometrical acceptance.
@@ -237,7 +232,7 @@ namespace Belle2 {
 
   private:
 
-    static const int c_noOfHypotheses = 5; /**< Number of hypothesis to loop over. */
+    static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize; /**< Number of hypothesis to loop over. */
 
     // track parameter from geant4 simulation
     TVector3 m_originalPosition;          /**< Original position on aerogel plane. */
@@ -253,7 +248,6 @@ namespace Belle2 {
     int    m_PDGEncoding;                 /**< particle PDG id number */
     int    m_trackID;                     /**< track identification number in genfit::Track */
     int    m_extHitID;                    /**< track identification number in ext */
-    int    m_identity;                    /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
     int    m_aeroIndex;                   /**< Relation index needed to create relation from ARICHAeroHit(MC simulation) to ARICHLikelihood. */
     int    m_flag;                        /**< Flag for calculated likelihood usefulness. */
 

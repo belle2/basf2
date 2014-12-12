@@ -65,9 +65,9 @@ namespace Belle2 {
 
   private:
 
-    static const int c_noOfHypotheses = 5; /**< Number of hypotheses to loop over */
+    static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize; /**< Number of hypotheses to loop over */
     static const int c_noOfAerogels = 5; /**< Maximal number of aerogel layers to loop over */
-
+    double p_mass[Const::ChargedStable::c_SetSize];  /**< particle masses */
     ARICHGeometryPar* m_arichGeoParameters; /**< holding the parameters of detector */
     TNtuple* m_hitstuple;  /**< beamtest/debug output hit-track pairs */
     TNtuple* m_tracktuple; /**< beamtest/debug output tracks */

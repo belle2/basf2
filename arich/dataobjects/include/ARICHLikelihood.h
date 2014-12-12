@@ -12,6 +12,7 @@
 #define ARICHLIKELIHOOD_H
 
 #include <framework/datastore/RelationsObject.h>
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 
@@ -28,88 +29,31 @@ namespace Belle2 {
 
     /*! default constructor */
 
-    ARICHLikelihood(): m_flag(0), m_logL_e(0), m_logL_mu(0), m_logL_pi(0), m_logL_K(0),
-      m_logL_p(0), m_NphotD_e(0), m_NphotD_mu(0), m_NphotD_pi(0), m_NphotD_K(0), m_NphotD_p(0), m_Nphot_e(0), m_Nphot_mu(0), m_Nphot_pi(0),
-      m_Nphot_K(0), m_Nphot_p(0) {
+    ARICHLikelihood(): m_flag(0) {
+      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_logL[i] = 0;
+      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_expPhot[i] = 0;
+      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_detPhot[i] = 0;
     }
 
     /*! full constructor
      * @param flag:     reconstruction flag
-     * @param logL_e:   electron log likelihood
-     * @param logL_mu:  muon log likelihood
-     * @param logL_pi:  pion log likelihood
-     * @param logL_K:   kaon log likelihood
-     * @param logL_p:   proton log likelihood
-     * @param NphotD_e: detected photons in electron expected ring
-     * @param NphotD_e: detected photons in muon expected ring
-     * @param NphotD_e: detected photons in pion expected ring
-     * @param NphotD_e: detected photons in kaon expected ring
-     * @param NphotD_e: detected photons in proton expected ring
-     * @param Nphot_e:  expected photons for electron
-     * @param Nphot_mu: expected photons for muon
-     * @param Nphot_pi: expected photons for pion
-     * @param Nphot_K:  expected photons for kaon
-     * @param Nphot_p:  expected photons for proton
+     * @param logL log likelihoods in the order of Const::ChargedStableSet
+     * @param expPhot expected number of photons in the order of Const::ChargedStableSet
+     * @param detPhot detected number of photons in the order of Const::ChargedStableSet
      */
 
     ARICHLikelihood(int flag,
-                    double logL_e,
-                    double logL_mu,
-                    double logL_pi,
-                    double logL_K,
-                    double logL_p,
-                    int NphotD_e,
-                    int NphotD_mu,
-                    int NphotD_pi,
-                    int NphotD_K,
-                    int NphotD_p,
-                    double Nphot_e,
-                    double Nphot_mu,
-                    double Nphot_pi,
-                    double Nphot_K,
-                    double Nphot_p) {
+                    const double* logL,
+                    const int* detPhot,
+                    const double* expPhot
+                   ) {
       m_flag = flag;
-      m_logL_e  = (float) logL_e;
-      m_logL_mu = (float) logL_mu;
-      m_logL_pi = (float) logL_pi;
-      m_logL_K  = (float) logL_K;
-      m_logL_p  = (float) logL_p;
-      m_NphotD_e = NphotD_e;
-      m_NphotD_mu = NphotD_mu;
-      m_NphotD_pi = NphotD_pi;
-      m_NphotD_K = NphotD_K;
-      m_NphotD_p = NphotD_p;
-      m_Nphot_e  = (float) Nphot_e;
-      m_Nphot_mu = (float) Nphot_mu;
-      m_Nphot_pi = (float) Nphot_pi;
-      m_Nphot_K  = (float) Nphot_K;
-      m_Nphot_p  = (float) Nphot_p;
-    }
-
-    /*! full constructor
-     * @param flag:         reconstruction flag
-     * @param logL:         log likelihoods in order e, mu, pi, K, p
-     * @param NphotD:       detected photons in e,mu,pi,K,p ring
-     * @param Nphot_expect: number of expected photons in order e, mu, pi, K, p
-     */
-
-    ARICHLikelihood(int flag, double logL[5], int NphotD[5], double Nphot_expect[5]) {
-      m_flag = flag;
-      m_logL_e  = (float) logL[0];
-      m_logL_mu = (float) logL[1];
-      m_logL_pi = (float) logL[2];
-      m_logL_K  = (float) logL[3];
-      m_logL_p  = (float) logL[4];
-      m_NphotD_e = NphotD[0];
-      m_NphotD_mu = NphotD[1];
-      m_NphotD_pi = NphotD[2];
-      m_NphotD_K = NphotD[3];
-      m_NphotD_p = NphotD[4];
-      m_Nphot_e  = (float) Nphot_expect[0];
-      m_Nphot_mu = (float) Nphot_expect[1];
-      m_Nphot_pi = (float) Nphot_expect[2];
-      m_Nphot_K  = (float) Nphot_expect[3];
-      m_Nphot_p  = (float) Nphot_expect[4];
+      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
+        m_logL[i] = logL[i];
+      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
+        m_expPhot[i] = expPhot[i];
+      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
+        m_detPhot[i] = detPhot[i];
     }
 
     /*! Get reconstruction flag
@@ -117,100 +61,116 @@ namespace Belle2 {
      */
     int getFlag() const {return m_flag;}
 
+    /*!
+     * Return log likelihood for a given particle
+     * @param part charged stable particle
+     * @return log likelihood
+     */
+    float getLogL(const Const::ChargedStable& part) const {
+      return m_logL[part.getIndex()];
+    }
+
+    /*!
+     * Return number of detected photons for a given particle
+     * @param part charged stable particle
+     * @return detected photon number
+     */
+    float getDetPhot(const Const::ChargedStable& part) const {
+      return m_detPhot[part.getIndex()];
+    }
+
+    /*!
+     * Return number of expected photons for a given particle
+     * @param part charged stable particle
+     * @return detected photon number
+     */
+    float getExpPhot(const Const::ChargedStable& part) const {
+      return m_expPhot[part.getIndex()];
+    }
+
+
     /*! Get electron log likelihood
      * @return electron log likelihood
      */
-    double getLogL_e() const {return m_logL_e;}
+    double getLogL_e() const {return m_logL[Const::electron.getIndex()];}
 
     /*! Get muon log likelihood
      * @return muon log likelihood
      */
-    double getLogL_mu() const {return m_logL_mu;}
+    double getLogL_mu() const {return m_logL[Const::muon.getIndex()];}
 
     /*! Get pion log likelihood
      * @return pion log likelihood
      */
-    double getLogL_pi() const {return m_logL_pi;}
+    double getLogL_pi() const {return m_logL[Const::pion.getIndex()];}
 
     /*! Get kaon log likelihood
      * @return kaon log likelihood
      */
-    double getLogL_K() const {return m_logL_K;}
+    double getLogL_K() const {return m_logL[Const::kaon.getIndex()];}
 
     /*! Get proton log likelihood
      * @return proton log likelihood
      */
-    double getLogL_p() const {return m_logL_p;}
+    double getLogL_p() const {return m_logL[Const::proton.getIndex()];}
 
     /*! Get number of detected photons in electron expected ring
      * @return number of detected photons  in electron expected ring
      */
-    int getNphotD_e() const {return m_NphotD_e;}
+    int getNphotD_e() const {return m_detPhot[Const::electron.getIndex()];}
 
     /*! Get number of detected photons in muon expected ring
      * @return number of detected photons in muon expected ring
      */
-    int getNphotD_mu() const {return m_NphotD_mu;}
+    int getNphotD_mu() const {return m_detPhot[Const::muon.getIndex()];}
 
     /*! Get number of detected photons in pion expected ring
      * @return number of detected photons in pion expected ring
      */
-    int getNphotD_pi() const {return m_NphotD_pi;}
+    int getNphotD_pi() const {return m_detPhot[Const::pion.getIndex()];}
 
     /*! Get number of detected photons in kaon expected ring
      * @return number of detected photons in kaon expected ring
      */
-    int getNphotD_K() const {return m_NphotD_K;}
+    int getNphotD_K() const {return m_detPhot[Const::kaon.getIndex()];}
 
     /*! Get number of detected photons in proton expected ring
      * @return number of detected photons in proton expected ring
      */
-    int getNphotD_p() const {return m_NphotD_p;}
+    int getNphotD_p() const {return m_detPhot[Const::proton.getIndex()];}
 
     /*! Get number of expected photons for electron
      * @return number of expected photons for electron
      */
-    double getNphot_e() const {return m_Nphot_e;}
+    double getNphot_e() const {return m_expPhot[Const::electron.getIndex()];}
 
     /*! Get number of expected photons for muon
      * @return number of expected photons for muon
      */
-    double getNphot_mu() const {return m_Nphot_mu;}
+    double getNphot_mu() const {return m_expPhot[Const::muon.getIndex()];}
 
     /*! Get number of expected photons for pion
      * @return number of expected photons for pion
      */
-    double getNphot_pi() const {return m_Nphot_pi;}
+    double getNphot_pi() const {return m_expPhot[Const::pion.getIndex()];}
 
     /*! Get number of expected photons for kaon
      * @return number of expected photons for kaon
      */
-    double getNphot_K() const {return m_Nphot_K;}
+    double getNphot_K() const {return m_expPhot[Const::kaon.getIndex()];}
 
     /*! Get number of expected photons for proton
      * @return number of expected photons for proton
      */
-    double getNphot_p() const {return m_Nphot_p;}
+    double getNphot_p() const {return m_expPhot[Const::proton.getIndex()];}
 
   private:
     int m_flag;          /**< reconstruction flag */
-    float m_logL_e;     /**< log likelihood for electron hypothesis */
-    float m_logL_mu;    /**< log likelihood for muon hypothesis */
-    float m_logL_pi;    /**< log likelihood for pion hypothesis */
-    float m_logL_K;     /**< log likelihood for kaon hypothesis */
-    float m_logL_p;     /**< log likelihood for proton hypothesis */
-    int m_NphotD_e;     /**< number of detected photons in electron expected ring */
-    int m_NphotD_mu;    /**< number of detected photons in muon expected ring */
-    int m_NphotD_pi;    /**< number of detected photons in pion expected ring */
-    int m_NphotD_K;     /**< number of detected photons in kaon expected ring */
-    int m_NphotD_p;     /**< number of detected photons in proton expected ring */
-    float m_Nphot_e;    /**< number of expected photons for electron hypothesis */
-    float m_Nphot_mu;   /**< number of expected photons for muon hypothesis */
-    float m_Nphot_pi;   /**< number of expected photons for pion hypothesis */
-    float m_Nphot_K;    /**< number of expected photons for kaon hypothesis */
-    float m_Nphot_p;    /**< number of expected photons for proton hypothesis */
+    float m_logL[Const::ChargedStable::c_SetSize]; /**< log likelihoods */
+    float m_expPhot[Const::ChargedStable::c_SetSize]; /**< expected number of photons */
+    int m_detPhot[Const::ChargedStable::c_SetSize]; /**< detected number of photons */
 
-    ClassDef(ARICHLikelihood, 1); /**< the class title */
+    ClassDef(ARICHLikelihood, 2); /**< the class title */
 
   };
 

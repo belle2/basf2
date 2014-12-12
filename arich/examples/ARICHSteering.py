@@ -17,7 +17,7 @@
 from basf2 import *
 
 # suppress messages and warnings during processing DEBUG, INFO, WARNING, ERROR
-set_log_level(LogLevel.WARNING)
+set_log_level(LogLevel.ERROR)
 
 # to run the framework the used modules need to be registered
 
@@ -62,7 +62,7 @@ output.param('outputFileName', 'ParticleGunOutput.root')
 # Setting the random seed for particle generation:
 set_random_seed(1028307)
 # Setting the list of particle codes (PDG codes) for the generated particles
-particlegun.param('pdgCodes', [-211, 211])
+particlegun.param('pdgCodes', [-211, 211, 11, 321])
 # Setting the number of tracks to be generated per event:
 particlegun.param('nTracks', 1)
 # if you set nTracks to 0, then for each PDG code in pdgCodes list a track
@@ -117,7 +117,7 @@ simulation.param('PhotonFraction', 0.3)
 
 # =============================================================================
 # ARICH Reconstruction parameters
-arichRECO.logging.log_level = LogLevel.DEBUG
+# arichRECO.logging.log_level = LogLevel.DEBUG
 arichRECO.param('inputTrackType', 0)
 # =============================================================================
 

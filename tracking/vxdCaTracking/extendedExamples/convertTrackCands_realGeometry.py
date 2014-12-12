@@ -8,9 +8,13 @@ from sys import argv
 
 numEvents = 1
 
-# setting debuglevels for more than one module at once
-MyLogLevel = LogLevel.DEBUG
+# setting debuglevels for more than one module at once (currently set for the converter modules)
+MyLogLevel = LogLevel.INFO
 MyDebugLevel = 500
+
+# set for the curling splitter module
+MyOtherLogLevel = LogLevel.DEBUG
+MyOtherDebugLevel = 500
 
 initialValue = 0  # 0 for random events
 
@@ -105,11 +109,6 @@ param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
     'NoSingleClusterSVDSP': 'nosingleSP',
     'SingleClusterSVDSP': 'singleSP',
     'PXDClusterSP': 'pxdOnly',
-    'splitCurlers': True,
-    'NTracklets': 100,
-    'setOrigin': [0., 0., 0.],
-    'CurlingTrackStubsNames': ['firstOutParts', 'AllInParts', 'RestOutParts',
-                               'SplittedCurls'],
     }
 trackCandConverter.param(param_trackCandConverter)
 
@@ -129,6 +128,21 @@ param_tcConverterTest = {'SpacePointTCName': 'SPTracks',
                          'genfitTCNames': ['mcTracks', 'myMCTracks'],
                          'SpacePointArrayNames': 'pxdOnly'}
 tcConverterTest.param(param_tcConverterTest)
+
+curlingSplitter = register_module('CurlingTrackCandSplitter')
+curlingSplitter.logging.log_level = MyOtherLogLevel
+curlingSplitter.logging.debug_level = MyOtherDebugLevel
+param_curlingSplitter = {
+    'SpacePointTCName': 'SPTracks',
+    'curlingFirstOutName': 'firstOutParts',
+    'curlingAllInName': 'allInParts',
+    'curlingRestOutName': 'restOutParts',
+    'completeCurlerName': 'completeCurler',
+    'splitCurlers': False,
+    'nTrackStubs': int(0),
+    'setOrigin': [0., 0., 0.],
+    }
+curlingSplitter.param(param_curlingSplitter)
 
 # Path
 main = create_path()
@@ -150,6 +164,8 @@ main.add_module(mcTrackFinder)
 main.add_module(trackCandConverter)
 main.add_module(btrackCandConverter)
 main.add_module(tcConverterTest)
+
+main.add_module(curlingSplitter)
 
 process(main)
 

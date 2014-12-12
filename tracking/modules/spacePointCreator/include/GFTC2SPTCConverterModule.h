@@ -10,7 +10,7 @@
 # pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
+// #include <framework/datastore/StoreArray.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
@@ -49,13 +49,7 @@ namespace Belle2 {
    *
    * If no SpacePoint can be found for any Cluster in the genfit::TrackCand, an exception is thrown, and the conversion is skipped.
    *
-   * Some statements on how the module works on checking if a SpacePointTrackCand is curling:
-   * 1) convert genfit::TrackCand to SpacePointTrackCand
-   * 2) for every SpacePoint in SpacePointTrackCand get Cluster(s) and from them get the according TrueHit(s). If there is more than one TrueHit for a SpacePoint (e.g. SVD) check if they are the same, if not throw
-   * 3) From TrueHit get position and momentum of hit (in global coordinates) and decide with this information if the particles direction of flight is inwards our outwards (i.e. towards or away from set origin)
-   * 4) If Direction changes from one SpacePoint to another -> split SpacePointTrackCand
-   *
-   * NOTE: If the SpacePointTrackCand is checked for curling behaviour (set 'splitCurlers' to true), it is possible (at the moment) that the conversion is aborted, because of some further checks on the SpacePoints (and especially their relation to TrueHits). This abortion leads to another 1-2 % of failed conversions, although these SpacePointTrackCands could pass (there are some cases, where they would not) the current tests.
+   * NOTE: Checking TrueHits for SVD Clusters leads to another 1-2 % of discarded TrackCandidates. TODO: this doesnot work at the moment TODO: Investigate if throwing these out is necessary at all or if this is something that can be neglected
    *
    * TODO: clean-up and bring in line with coding conventions!
    */
@@ -70,12 +64,6 @@ namespace Belle2 {
     virtual void event(); /**< event: convert genfit::TrackCands to SpacePointTrackCands */
 
     virtual void terminate(); /**< terminate: print some summary information on the processed events */
-
-    BELLE2_DEFINE_EXCEPTION(UnsuitableGFTrackCand, "The genfit::TrackCand cannot be unambiguously converted to a SpacePointTrackCand."); /**< Exception thrown, when a genfit::TrackCand occurs, that cannot be converted to a SpacePointTrackCand unambiguously (see Module documentation for more information) */
-
-    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no related TrueHit for one (or more) Clusters of the Track Candidate. Cannot check if this is a curling track!"); /**< Exception thrown, when no relation to a TrueHit can be found for a Cluster. Information from the TrueHit is needed for deciding if a track is curling or not */
-
-    BELLE2_DEFINE_EXCEPTION(FoundNoCluster, "No related Cluster to a SpacePoint was found."); /**< Exception thrown, when no relation to a Cluster can be found for a SpacePoint. This should never happen, since only SpacePoints related from a Cluster get into the SpacePointTrackCand in the first place. */
 
   protected:
 
@@ -93,26 +81,16 @@ namespace Belle2 {
 
     std::string m_SPTCName; /**< Name of collection under which SpacePointTrackCands will be stored in the StoreArray */
 
-    std::vector<std::string> m_PARAMCurlingTCNames; /**< Names of containers under which Track Stubs of curling track candidates get stored in the StoreArray (regard the order: 1. first (outgoing) part of a curling Track, 2. all ingoing parts of a curling Track, 3. all but the first outgoing part of a curling track, 4. all parts of a curling track (for testing)). */
-
-    bool m_PARAMsplitCurlers; /**< Split curling tracks into tracklets.*/
-
-    std::vector<double> m_PARAMsetOrigin; /**< Reset origin, usefull for e.g. testbeam et by user (or to default (0,0,0) if no other user input). WARNING: this does not have to be the actual interaction point!*/
-
-    int m_NTracklets; /**< maximum number of tracklets to be saved, if curling tracks are split up into tracklets*/
-
-    TVector3 m_origin; /**< Assumed interaction point. Defining this a separate parameter, in case it is reset during run-time to not change the user set value */
-
-    bool m_saveCompleteCurler; /**< Indicator whether all parts of a curling TrackCandidate shall be stored in an extra store array, or if only parts of it get stored together */
+    bool m_PARAMcheckTrueHits; /**< Parameter Indicating if the TrueHits related from the Clusters forming a SpacePoint should be checked for equality */
 
     // some counters for testing
     unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were converted (if a curling track is split up, this counter will still be only increased by 1!) */
 
     unsigned int m_genfitTCCtr; /**< Counter for genfit::TrackCands which were presented to the module */
 
-    unsigned int m_curlingTracksCtr; /**< Counter for tracks that show curling behaviour */
+    unsigned int m_abortedTrueHitCtr; /**< Counting discarded conversions due to check for TrueHits not good */
 
-    unsigned int m_TrackletCtr; /**< Counter for all tracklets that were created by splitting up a curling track */
+    unsigned int m_abortedUnsuitableTCCtr; /**< Counter for aborted conversions due to unsuitable genfit::TrackCand */
 
 // #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
     template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */
@@ -134,17 +112,11 @@ namespace Belle2 {
 
     const Belle2::SpacePoint* getSingleClusterSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the single cluster SVD SpacePoint */
 
-    const std::vector<int> checkTrackCandForCurling(const Belle2::SpacePointTrackCand&); /**< Check if the track candidate is curling. Returns the indices of SpacePoint where the Track Candidate changes direction (i.e. changes its direction of flight from outwards to inwards or vice versa) */
-
-    const std::vector<Belle2::SpacePointTrackCand> splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices); /**< Split a culring track candidate into (up to NTracklets) tracklets */
-
     /**
-     * Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
+     * Check if all passed Clusters point to the same TrueHit. If only one TrueHit is passed, it will only be checked if the TrueHit exists. WARNING: returns true all the times at the moment, but should not be called at all anyways.
      */
-    template<class TrueHit>
-    std::pair<const TVector3, const TVector3> getGlobalPositionAndMomentum(TrueHit* aTrueHit);
-
-    bool getDirectionOfFlight(const std::pair<const TVector3, const TVector3>& hitPosAndMom, const TVector3 origin); /**< determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
+    template<class ClusterType>
+    bool trueHitsAreGood(std::vector<ClusterType> clusters);
 
     /**
      * Exception thrown, when not all hits of a genfit::TrackCand have been used for conversion.
@@ -156,7 +128,20 @@ namespace Belle2 {
      */
     BELLE2_DEFINE_EXCEPTION(FoundNoSpacePoint, "Found no relation between Cluster and SpacePoint. This hit would not be in SpacePointTrackCand, therefore skipping TrackCand from conversion!");
 
-    BELLE2_DEFINE_EXCEPTION(TrueHitsNotMatching, "The TrueHits related to the two SVDClusters of a SpacePoint are not the same!") /**< Exception thrown during checking if Track is curling, when a SpacePoint is related to two different TrueHits (via its Clusters) */
+    /**
+     * Exception thrown, when a genfit::TrackCand occurs, that cannot be converted to a SpacePointTrackCand unambiguously (see Module documentation for more information)
+     */
+    BELLE2_DEFINE_EXCEPTION(UnsuitableGFTrackCand, "The genfit::TrackCand cannot be unambiguously converted to a SpacePointTrackCand.");
+
+    /**
+     * Exception thrown, when no relation to a TrueHit can be found for a Cluster. Information from the TrueHit is needed for deciding if a track is curling or not
+     */
+    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no related TrueHit for one (or more) Clusters of the Track Candidate. Cannot check if this is a curling track!");
+
+    /**
+     * Exception thrown, when the TrueHits of different Clusters of one SpacePoint do not match
+     */
+    BELLE2_DEFINE_EXCEPTION(TrueHitsDoNotMatch, "The TrueHits of two Clusters of a SpacePoint do not match");
   };
 
 }

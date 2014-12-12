@@ -131,7 +131,7 @@ namespace Belle2 {
      */
     void addSpacePoint(const SpacePoint* newSP, double sortParam) { m_trackSpacePoints.push_back(newSP); m_sortingParameters.push_back(sortParam); }
 
-    /*
+    /**
      * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */
     void print(int debuglevel = 100, const Option_t* = "") const;

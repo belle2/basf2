@@ -30,8 +30,9 @@ namespace Belle2 {
     /** default constructor for ROOT */
     SVDEnergyDepositionEvent(): m_layer(0), m_ladder(0), m_sensor(0),
       m_backgroundTag(0), m_pdg(0), m_time(0.0), m_u(0.0), m_v(0.0),
-      m_energyDep(0.0), m_dose(0.0), m_expo(0.0)
-    {}
+      m_energyDep(0.0), m_dose(0.0), m_expo(0.0) {
+      std::fill_n(m_globalPos, 3, 0.0);
+    }
 
     /** Standard constructor
      * @param layer Layer number

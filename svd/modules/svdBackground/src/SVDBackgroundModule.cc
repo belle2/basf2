@@ -238,17 +238,17 @@ void SVDBackgroundModule::event()
     bData.m_doseBars->Fill(currentLayerNumber,
                            (hitEnergy / Unit::J) / (currentLayerMass / 1000) * (c_smy / currentComponentTime));
     // Store things in an SVDEnergyDepositEvent object
-    TVector3 localPos = 0.5 * (hit.getPosIn() + hit.getPosOut());
+    TVector3 localPos = 0.5 * TVector3(hit.getPosIn() + hit.getPosOut());
     const TVector3 globalPos = pointToGlobal(currentSensorID, localPos);
     float globalPosXYZ[3];
     globalPos.GetXYZ(globalPosXYZ);
-    storeEnergyDeposits.appendNew(
-      sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-      hit.getBackgroundTag(), hit.getPDGcode(), hit.getGlobalTime(),
-      localPos.X(), localPos.Y(), globalPosXYZ, hitEnergy,
-      (hitEnergy / Unit::J) / (currentSensorMass / 1000) / (currentComponentTime / Unit::s),
-      (hitEnergy / Unit::J) / currentSensorArea / (currentComponentTime / Unit::s)
-    );
+    SVDEnergyDepositionEvent* writeEvent = storeEnergyDeposits.appendNew(
+                                             sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                             hit.getBackgroundTag(), hit.getPDGcode(), hit.getGlobalTime(),
+                                             localPos.X(), localPos.Y(), globalPosXYZ, hitEnergy,
+                                             (hitEnergy / Unit::J) / (currentSensorMass / 1000) / (currentComponentTime / Unit::s),
+                                             (hitEnergy / Unit::J) / currentSensorArea / (currentComponentTime / Unit::s)
+                                           );
   }
 
   // Neutron flux

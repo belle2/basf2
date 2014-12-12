@@ -31,8 +31,10 @@ namespace Belle2 {
     SVDNeutronFluxEvent(): m_layer(0), m_ladder(0), m_sensor(0),
       m_backgroundTag(0), m_pdg(0), m_time(0.0), m_u(0.0), m_v(0.0),
       m_kineticEnergy(0.0), m_stepLength(0.0), m_nielFactor(0.0), m_rawFlux(0.0),
-      m_nielFlux(0.0)
-    {}
+      m_nielFlux(0.0) {
+      std::fill_n(m_globalPos, 3, 0.0);
+      std::fill_n(m_globalMom, 3, 0.0);
+    }
 
     /** Standard constructor
      * @param layer Layer number

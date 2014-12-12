@@ -133,11 +133,9 @@ namespace Belle2 {
   {
     if (logl->getFlag() != 1) return;
 
-    m_pid->setLogLikelihood(Const::ARICH, Const::electron, (float) logl->getLogL_e());
-    m_pid->setLogLikelihood(Const::ARICH, Const::muon, (float) logl->getLogL_mu());
-    m_pid->setLogLikelihood(Const::ARICH, Const::pion, (float) logl->getLogL_pi());
-    m_pid->setLogLikelihood(Const::ARICH, Const::kaon, (float) logl->getLogL_K());
-    m_pid->setLogLikelihood(Const::ARICH, Const::proton, (float) logl->getLogL_p());
+    for (const auto & chargedStable : Const::chargedStableSet) {
+      m_pid->setLogLikelihood(Const::ARICH, chargedStable, logl->getLogL(chargedStable));
+    }
 
   }
 

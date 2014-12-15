@@ -26,7 +26,7 @@ namespace Belle2 {
   public:
     /** Default constructor.
      */
-    ROIpayload(int length = 0);
+    ROIpayload(int rois = 0);
 
     /**
      * destructor.
@@ -45,6 +45,10 @@ namespace Belle2 {
     void setPayloadLength();
     void setHeader();
     void setTriggerNumber(unsigned long int triggerNumber);
+
+    //! set run/ subrun/exp number
+    void setRunSubrunExpNumber(int run , int subrun , int exp);
+
     //    void addROIraw(ROIrawID roiraw);
     void addROIraw(unsigned long int roiraw);
     void setCRC();

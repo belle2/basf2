@@ -144,7 +144,7 @@ void ROIPayloadAssemblerModule::event()
   // The payload is created with a buffer long enough to contains all
   // the ROIs but the actual payload will contains max 32 ROIs per pxd
   // sensor per event as required by the Onsens specifications
-  ROIpayload* payload = new ROIpayload(4 + 2 * ROIListSize);
+  ROIpayload* payload = new ROIpayload(ROIListSize);// let the ROIpayload compute the size itself
 
   StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
 
@@ -154,6 +154,9 @@ void ROIPayloadAssemblerModule::event()
 
   //  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   payload->setTriggerNumber(eventMetaDataPtr->getEvent());
+
+  // Set run subrun exp number
+  payload->setRunSubrunExpNumber(eventMetaDataPtr->getRun(), eventMetaDataPtr->getSubrun(), eventMetaDataPtr->getExperiment());
 
   int tmpDHHID = -1;
   int countROIs = 0;

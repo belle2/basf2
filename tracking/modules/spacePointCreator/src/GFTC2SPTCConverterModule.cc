@@ -143,7 +143,7 @@ void GFTC2SPTCConverterModule::event()
 // -------------------------------- TERMINATE --------------------------------------------------------
 void GFTC2SPTCConverterModule::terminate()
 {
-  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands.");
+  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " no conversion was made due to an unsuitable genfit::TrackCand and in " << m_abortedTrueHitCtr << " the TrueHits of an SVD SpacePoint did not match.");
 }
 
 // ---------------------------------------- Create SpacePoint TrackCand
@@ -234,7 +234,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getPXDSpacePoint(const PXDCl
 
   // check TrueHits if necessary
   if (m_PARAMcheckTrueHits) {
-    std::vector<PXDCluster> pxdClusterVec = { *pxdCluster };
+    std::vector<const PXDCluster*> pxdClusterVec = { pxdCluster };
     if (!trueHitsAreGood(pxdClusterVec)) {
       throw FoundNoTrueHit();
     }
@@ -362,7 +362,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
         RelationVector<SVDCluster> clusters = spacePoint->getRelationsTo<SVDCluster>("ALL");
         // this SHOULD work like this, since this SHOULD be a SpacePoint related to two Clusters
         // COULDDO: some error-catching here
-        std::vector<SVDCluster> ClusterVec = { clusters[0], clusters[1] };
+        std::vector<const SVDCluster*> ClusterVec = { clusters[0], clusters[1] };
         if (!trueHitsAreGood(ClusterVec)) {
           throw TrueHitsDoNotMatch();
         }
@@ -406,7 +406,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
         RelationVector<SVDCluster> clusters = spacePoint->getRelationsTo<SVDCluster>("ALL");
         // this SHOULD work like this, since this SHOULD be a SpacePoint related to two Clusters
         // COULDDO: some error-catching here
-        std::vector<SVDCluster> ClusterVec = { clusters[0], clusters[1] };
+        std::vector<const SVDCluster*> ClusterVec = { clusters[0], clusters[1] };
         if (!trueHitsAreGood(ClusterVec)) {
           throw TrueHitsDoNotMatch();
         }
@@ -441,7 +441,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSingleClusterSVDSpacePoin
 
   // check TrueHits if necessary
   if (m_PARAMcheckTrueHits) {
-    std::vector<SVDCluster> svdClusterVec = { *svdCluster };
+    std::vector<const SVDCluster*> svdClusterVec = { svdCluster };
     if (!trueHitsAreGood(svdClusterVec)) {
       throw FoundNoTrueHit();
     }
@@ -451,22 +451,20 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSingleClusterSVDSpacePoin
   return spacePoint;
 }
 
-// --------------------------------------- check TrueHits for equality -------------------------------------------
-template<class ClusterType>
-bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<ClusterType> clusters)
-{
-  VxdID vxdId = clusters.at(0).getSensorID(); // for suppressing compiler warning
-  B2DEBUG(1000, vxdId)
-  return true;
+// --------------------------------------- check TrueHits for equality or existence -------------------------------------------
+// NOTE: this does not compile at the moment, I have no idea why!!
+// template<class ClusterType>
+// bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const ClusterType*> clusters)
+// {
 //   // since all clusters have to be of the same type and I only want the type, looking at the first cluster should be enough
-//   VxdID vxdId = clusters.at(0).getSensorID();
+//   VxdID vxdId = clusters.at(0)->getSensorID();
 //   // if only one Cluster has been passed, simply check if it exists
 //   if (clusters.size() == 1) {
 //     if(VXD::GeoCache::getInstance().getSensorInfo(vxdId).getType() == VXD::SensorInfoBase::PXD) {
-//       PXDTrueHit* trueHit = clusters[0].getRelatedTo<PXDTrueHit>("ALL");
+//       const PXDTrueHit* trueHit = clusters.at(0).getRelatedTo<PXDTrueHit>("ALL"); // does not compile
 //       if(trueHit != NULL) return true;
 //     } else if (VXD::GeoCache::getInstance().getSensorInfo(vxdId).getType() == VXD::SensorInfoBase::SVD) {
-//       SVDTrueHit* trueHit = clusters[0].getRelatedTo<SVDTrueHit>("ALL");
+//       SVDTrueHit* trueHit = clusters.at(0)->getRelatedTo<SVDTrueHit>("ALL"); // does not compile
 //       if(trueHit != NULL) return true;
 //     } // COULDDO: throw UnsupportedDetType here, but as it is called from functions only where this is already checked it should get thrown there. If it does not get thrown there, this function returns false and another exception is thrown, so no harm done only debugging is a little bit more complicated
 //   } else if (clusters.size() > 1 ) {
@@ -474,14 +472,49 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<ClusterType> clusters
 //     if(VXD::GeoCache::getInstance().getSensorInfo(vxdId).getType() == VXD::SensorInfoBase::SVD) {
 //       // collect all TrueHits related to the clusters (can be more than one per Cluster and look if one TrueHit appears more than once!)
 //       std::vector<SVDTrueHit> trueHits;
-//       for(ClusterType cluster : clusters) {
-//  RelationVector<SVDTrueHit> relTrueHits = cluster.getRelationsTo<SVDTrueHit>("ALL");
-//  for(SVDTrueHit trueHit : relTrueHits) { trueHits.push_back(trueHit); }
+//       for(const ClusterType* cluster : clusters) {
+//       RelationVector<SVDTrueHit> relTrueHits = cluster->getRelationsTo<SVDTrueHit>("ALL"); // does not compile
+//       for(SVDTrueHit trueHit : relTrueHits) { trueHits.push_back(trueHit); }
 //       }
 //       // still TODO, does not compile at the moment
 //     }
 //   }
-//
+// }
+
+bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const PXDCluster*> clusters)
+{
+  if (clusters.size() > 0) {
+    const PXDTrueHit* trueHit = clusters[0]->getRelatedTo<PXDTrueHit>("ALL");
+    if (trueHit != NULL) return true;
+  }
+  return false;
+}
+
+bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> clusters)
+{
+  if (clusters.size() > 0) {
+    // if only one cluster is passed simply check if there exists a related TrueHit
+    if (clusters.size() == 1) {
+      const SVDTrueHit* trueHit = clusters[0]->getRelatedTo<SVDTrueHit>("ALL");
+      if (trueHit != NULL) return true;
+    } else {
+      std::vector<const SVDTrueHit*> allTrueHits;
+      // get all TrueHits from all Clusters
+      for (const SVDCluster * aCluster : clusters) {
+        RelationVector<SVDTrueHit> relTrueHits = aCluster->getRelationsTo<SVDTrueHit>("ALL");
+        for (unsigned int i = 0; i < relTrueHits.size(); i++) {
+          allTrueHits.push_back(relTrueHits[i]);
+        }
+      }
+      // sort & unique the TrueHits to see if more than one is present, if more than one is present, assume there is something 'fishy' and return false
+      std::sort(allTrueHits.begin(), allTrueHits.end());
+      auto newEnd = std::unique(allTrueHits.begin(), allTrueHits.end());
+
+      allTrueHits.resize(std::distance(allTrueHits.begin(), newEnd));
+      if (allTrueHits.size() == 1) return true;
+    }
+  }
+  return false;
 }
 
 void GFTC2SPTCConverterModule::initializeCounters()

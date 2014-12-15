@@ -134,7 +134,7 @@ namespace Belle2 {
     /**
      * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */
-    void print(int debuglevel = 100, const Option_t* = "") const;
+    void print(int debuglevel = 150, const Option_t* = "") const;
 
     /**
      * Exception thrown, when an Unsupported Detector Type occurs. Momentarily supported: PXD & SVD
@@ -155,6 +155,12 @@ namespace Belle2 {
      * check if particle is outgoing (simply returns member m_flightDirection)!
      */
     bool isOutgoing() const { return m_flightDirection; }
+
+    /** set TrackStub index */
+    void setTrackStubIndex(int trackStubInd) { m_iTrackStub = trackStubInd; }
+
+    /** get TrackStub Index */
+    int getTrackStubIndex() const { return m_iTrackStub; }
 
   protected:
     /**
@@ -202,6 +208,11 @@ namespace Belle2 {
      */
     bool m_flightDirection;
 
-    ClassDef(SpacePointTrackCand, 3) // last members added: m_flightDirection(3), m_sortingParameters (2)
+    /**
+     * Index of TrackStub in a curling Track Candidate. If the TrackCandidate is not curling this value is set to 0. If it is not yet checked if the TrackCand is curling it is set to -1. If it is a curling TrackCand the counter starts at 1, indicating that this is the first outgoing part of the TrackCand. COULDDO: implement such a feature via something like a linked list (would be much nicer, but for the moment this little workaround works)
+     */
+    int m_iTrackStub;
+
+    ClassDef(SpacePointTrackCand, 4) // last members added: m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2)
   };
 }

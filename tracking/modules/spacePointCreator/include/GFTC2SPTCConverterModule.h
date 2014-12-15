@@ -115,8 +115,11 @@ namespace Belle2 {
     /**
      * Check if all passed Clusters point to the same TrueHit. If only one TrueHit is passed, it will only be checked if the TrueHit exists. WARNING: returns true all the times at the moment, but should not be called at all anyways.
      */
-    template<class ClusterType>
-    bool trueHitsAreGood(std::vector<ClusterType> clusters);
+//     template<class ClusterType>
+//     bool trueHitsAreGood(std::vector<const ClusterType*> clusters);
+
+    bool trueHitsAreGood(std::vector<const SVDCluster*> clusters); /**< check if TrueHit is present (if only one Cluster is passed), or if all passed Cluster point to the same TrueHit */
+    bool trueHitsAreGood(std::vector<const PXDCluster*> clusters); /**< check if TrueHit is present */
 
     /**
      * Exception thrown, when not all hits of a genfit::TrackCand have been used for conversion.

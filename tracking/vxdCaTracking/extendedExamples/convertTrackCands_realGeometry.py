@@ -6,14 +6,14 @@ import os
 from basf2 import *
 from sys import argv
 
-numEvents = 1
+numEvents = 100
 
 # setting debuglevels for more than one module at once (currently set for the converter modules)
 MyLogLevel = LogLevel.INFO
 MyDebugLevel = 500
 
 # set for the curling splitter module
-MyOtherLogLevel = LogLevel.DEBUG
+MyOtherLogLevel = LogLevel.INFO
 MyOtherDebugLevel = 500
 
 initialValue = 0  # 0 for random events
@@ -104,11 +104,13 @@ trackCandConverter.logging.debug_level = MyDebugLevel
 param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
                               #    'SVDClusters': 'mySVDClusters',
                               # use everything there is
+                              # does not work at the moment anyway
     'genfitTCName': 'mcTracks',
     'SpacePointTCName': 'SPTracks',
     'NoSingleClusterSVDSP': 'nosingleSP',
     'SingleClusterSVDSP': 'singleSP',
     'PXDClusterSP': 'pxdOnly',
+    'checkTrueHits': False,
     }
 trackCandConverter.param(param_trackCandConverter)
 
@@ -132,15 +134,17 @@ tcConverterTest.param(param_tcConverterTest)
 curlingSplitter = register_module('CurlingTrackCandSplitter')
 curlingSplitter.logging.log_level = MyOtherLogLevel
 curlingSplitter.logging.debug_level = MyOtherDebugLevel
-param_curlingSplitter = {
+param_curlingSplitter = {  # set to true if you want to analyze the position of SpacePoints and the TrueHits they are related to
     'SpacePointTCName': 'SPTracks',
     'curlingFirstOutName': 'firstOutParts',
     'curlingAllInName': 'allInParts',
     'curlingRestOutName': 'restOutParts',
     'completeCurlerName': 'completeCurler',
-    'splitCurlers': False,
+    'splitCurlers': True,
     'nTrackStubs': int(0),
     'setOrigin': [0., 0., 0.],
+    'positionAnalysis': False,
+    'rootFileName': ['SPtoTrueHitAnalysis', 'RECREATE'],
     }
 curlingSplitter.param(param_curlingSplitter)
 

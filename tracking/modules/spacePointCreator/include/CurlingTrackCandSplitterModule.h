@@ -13,6 +13,8 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <TVector3.h>
+#include <TFile.h>
+#include <TTree.h>
 
 namespace Belle2 {
   /**
@@ -38,6 +40,28 @@ namespace Belle2 {
     virtual void event(); /**< event: check SpacePointTrackCand for curling behaviour, split if needed (and wanted by user) */
 
     virtual void terminate(); /**< terminate: print some summary on the modules work */
+
+    /** Internal DataStore for ROOT output variables */
+    struct RootVariables {
+      std::vector<double> SpacePointXGlobal; /**< global x-positions of SpacePoints */
+      std::vector<double> SpacePointYGlobal; /**< global y-positions of SpacePoints */
+      std::vector<double> SpacePointZGlobal; /**< global z-positions of SpacePoints */
+
+      std::vector<double> SpacePointULocal; /**< local u-positions of SpacePoints */
+      std::vector<double> SpacePointVLocal; /**< local v-positions of SpacePoints */
+//       std::vector<double> SpacePointZLocal; /**< local z-positions of SpacePoints */
+
+      std::vector<double> TrueHitXGlobal; /**< global x-positions of TrueHits */
+      std::vector<double> TrueHitYGlobal; /**< global y-positions of TrueHits */
+      std::vector<double> TrueHitZGlobal; /**< global z-positions of TrueHits */
+
+      std::vector<double> TrueHitULocal; /**< local u-positions of TrueHits */
+      std::vector<double> TrueHitVLocal; /**< local v-positions of TrueHits */
+//       std::vector<double> TrueHitZLocal; /**< local z-positions of TrueHits */
+
+      std::vector<double> PosResiduesLocal; /**< position differences in local coordinates */
+      std::vector<double> PosResiduesGlobal; /**< position differences in global coordinates */
+    };
 
   protected:
 
@@ -72,9 +96,9 @@ namespace Belle2 {
     void initializeCounters(); /**< initialize all counters to 0 for avoiding undeterministic behaviour. */
 
     /**
-     *Check if the track candidate is curling. Returns the indices of SpacePoint where the Track Candidate changes direction (i.e. changes its direction of flight from outwards to inwards or vice versa)
+     *Check if the track candidate is curling. Returns the indices of SpacePoint where the Track Candidate changes direction (i.e. changes its direction of flight from outwards to inwards or vice versa). If the first entry of this vector is 0, this means, that the direction of flight for the first hit of this particle was towards the (assumed) interaction point!!
      */
-    const std::vector<int> checkTrackCandForCurling(const Belle2::SpacePointTrackCand&);
+    const std::vector<int> checkTrackCandForCurling(const Belle2::SpacePointTrackCand&, RootVariables& rootVariables);
 
     /**
      * Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
@@ -88,8 +112,7 @@ namespace Belle2 {
     const std::vector<Belle2::SpacePointTrackCand>
     splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices);
 
-    /**
-     * determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
+    /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
     bool getDirectionOfFlight(const std::pair<const TVector3, const TVector3>& hitPosAndMom, const TVector3 origin);
 
     /**
@@ -106,5 +129,36 @@ namespace Belle2 {
      * Exception thrown, when no relation to a Cluster can be found for a SpacePoint. This should never happen, since only SpacePoints related from a Cluster get into the SpacePointTrackCand in the first place.
      */
     BELLE2_DEFINE_EXCEPTION(FoundNoCluster, "No related Cluster to a SpacePoint was found.");
+
+    bool m_PARAMpositionAnalysis; /**< Set to true if output to ROOT file is desired with the positions and position differences of SpacePoints and TrueHits */
+    std::vector<std::string> m_PARAMrootFileName; /**< two entries accepted. First is filename, second is 'RECREATE' or 'UPDATE' (write mode) */
+    TFile* m_rootFilePtr; /**< Pointer to ROOT file */
+    TTree* m_treePtr; /**< Pointer to ROOT tree */
+
+    std::vector<double> m_rootSpacePointXGlobals; /**< Global X-Positions of SpacePoints */
+    std::vector<double> m_rootSpacePointYGlobals; /**< Global Y-Positions of SpacePoints */
+    std::vector<double> m_rootSpacePointZGlobals; /**< Global Z-Positions of SpacePoints */
+
+    std::vector<double> m_rootSpacePointULocals; /**< Local U-Positions of SpacePoints */
+    std::vector<double> m_rootSpacePointVLocals; /**< Local V-Positions of SpacePoints */
+//     std::vector<double> m_rootSpacePointZLocals; /**< Local Z-Positions of SpacePoints */
+
+    std::vector<double> m_rootTrueHitXGlobals; /**< Global U-Positions of TrueHits */
+    std::vector<double> m_rootTrueHitYGlobals; /**< Global V-Positions of TrueHits */
+    std::vector<double> m_rootTrueHitZGlobals; /**< Global Z-Positions of TrueHits */
+
+    std::vector<double> m_rootTrueHitULocals; /**< Local X-Positions of TrueHits */
+    std::vector<double> m_rootTrueHitVLocals; /**< Local Y-Positions of TrueHits */
+//     std::vector<double> m_rootTrueHitZLocals; /**< Local Z-Positions of TrueHits */
+
+    std::vector<double> m_rootLocalPosResiduals; /**< Local Position Residuals between TrueHits and SpacePoints */
+    std::vector<double> m_rootGlobalPosResiduals; /**< Global Position Residuals between TrueHits and SpacePoints */
+
+    std::pair<double, double> getUV(const Belle2::SpacePoint* spacePoint); /**< get U&V for a SpacePoint (via its relation to Clusters) (SpacePoint can only return normalized U&V coordinates) */
+
+    template <class TrueHit>
+    void getValuesForRoot(const Belle2::SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables); /**< Get The Values that are later written to a ROOT file */
+
+    void writeToRoot(RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
   };
 }

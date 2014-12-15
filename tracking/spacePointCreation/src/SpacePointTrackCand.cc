@@ -39,14 +39,16 @@ SpacePointTrackCand::SpacePointTrackCand() :
   m_MCTrackID(-1),
   m_state6D(6),
   m_cov6D(6),
-  m_q(0)
+  m_q(0),
+  m_iTrackStub(-1)
 {
 
 }
 
 SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode, double charge, int mcTrackID) :
   m_state6D(6),
-  m_cov6D(6)
+  m_cov6D(6),
+  m_iTrackStub(-1)
 {
   m_pdg = pdgCode;
   m_q = charge;
@@ -149,8 +151,8 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   output.str(std::string(""));
   output.clear();
 
-  // this is printed to stdout (using ROOT::Print() )
-  m_state6D.Print(option);
+  // Only print this if the debuglevel is high enough
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, debuglevel, PACKAGENAME())) { m_state6D.Print(option); }
 
   output << "estimates of Track Candidate: \n";
   output << "q = " << m_q << "\n";

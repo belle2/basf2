@@ -153,7 +153,6 @@ if sampleType == 'study':
         ("/DetectorComponent[@name='ARICH']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='BKLM']//BeamBackgroundStudy", '1', ''),
-        ("/DetectorComponent[@name='BKLM']//DoBackgroundStudy", 'true', ''),
         ("/DetectorComponent[@name='EKLM']//Mode", '1', ''),
         ])
 else:

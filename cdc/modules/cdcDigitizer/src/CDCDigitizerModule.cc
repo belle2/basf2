@@ -172,8 +172,7 @@ void CDCDigitizerModule::event()
     // Hit geom. info
     m_wireID = m_aCDCSimHit->getWireID();
     B2DEBUG(250, "Encoded wire number of current CDCSimHit: " << m_wireID);
-    //todo need to update the following line when moving to new flag
-    m_posFlag    = m_aCDCSimHit->getPosFlag();
+    m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
     m_posWire    = m_aCDCSimHit->getPosWire();
     m_posTrack   = m_aCDCSimHit->getPosTrack();
     m_momentum   = m_aCDCSimHit->getMomentum();
@@ -228,8 +227,7 @@ void CDCDigitizerModule::event()
       //      double deltaTime = (posTrack - m_posTrack).Mag() / speed;
       m_flightTime += deltaTime;
       m_globalTime += deltaTime;
-      //todo need to update the following line when moving to the new flag
-      m_posFlag = m_cdcp->getOldLeftRight(m_posWire, m_posTrack, m_momentum);
+      m_posFlag = m_cdcp->getNewLeftRightRaw(m_posWire, m_posTrack, m_momentum);
     }
 
     // Hit phys. info

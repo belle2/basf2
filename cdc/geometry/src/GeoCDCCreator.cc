@@ -753,8 +753,8 @@ namespace Belle2 {
         }
 
 
-        std::cout << iSLayer << " " << zfor_sensitive_middle << " " <<
-                  zback_sensitive_middle << std::endl;
+        //        std::cout << iSLayer << " " << zfor_sensitive_middle << " " <<
+        //                  zback_sensitive_middle << std::endl;
 
         // Middle sensitive tube
         // cppcheck-suppress zerodiv

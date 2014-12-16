@@ -13,7 +13,6 @@
 
 #include <cdc/dataobjects/WireID.h>
 
-#include <TVector3.h>
 #include <TMath.h>
 
 namespace Belle2 {
@@ -41,7 +40,8 @@ namespace Belle2 {
        *                                 for the calculation of the drift length/actual drift time.
        *  @param ambiguityDiscriminator  Information to resolve left/right ambiguity.
        *  @param z                       z-position for determining the in-wire-propagation time.
-       *  @param theta                   Angle under which the particle moves through the drift-cell in r-phi.
+       *  @param alpha                   Track incident angle in r-phi plane.
+       *  @param theta                   Track incident angle in s-z plane (=polar angle).
        *
        *  @return  Best estimation of closest distance between the track and the wire.
        */
@@ -49,27 +49,24 @@ namespace Belle2 {
                                    const WireID& wireID        = WireID(),
                                    float timeOfFlightEstimator = 0.,
                                    bool ambiguityDiscrimiator  = false,
-                                   float z = 0, float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
-
-      /** Function for realistic xt and sigma */
-      virtual float getDriftLength(unsigned short tdcCount = 0,
-                                   const TVector3& posWire = TVector3(),
-                                   const TVector3& posTrack = TVector3(),
-                                   const TVector3& momentum = TVector3(),
-                                   const WireID& wireID = WireID(),
-                                   float timeOfFlightEstimator = 0.) = 0;
+                                   float z = 0,
+                                   float alpha = 0,
+                                   float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *
        *  @param driftLength             Output of the getDriftLength function.
        *  @param ambiguityDiscriminator  Information to resolve left/right ambiguity.
        *  @param z                       z-position for determining the in-wire-propagation time.
-       *  @param theta                   Angle under which the particle moves through the drift-cell in r-phi.
+       *  @param alpha                   Track incident angle in r-phi plane.
+       *  @param theta                   Track incident angle in s-z plane (=polar angle).
        */
       virtual float getDriftLengthResolution(float driftLength          = 0.,
                                              const WireID& wireID       = WireID(),
                                              bool ambiguityDiscrimiator = false,
-                                             float z = 0, float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
+                                             float z = 0,
+                                             float alpha = 0,
+                                             float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
     };
   }
 }

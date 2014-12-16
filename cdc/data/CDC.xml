@@ -18,8 +18,8 @@
     <!-- Switch for printing for debug -->
     <Debug desc="true: print out; false: not print out.">false</Debug>
 
-    <!-- Switch for loadding x-t etc. (from disk) to be used in simulation -->
-    <XTetc desc="true: load x-t etc. params. from disk; false: not load.">false</XTetc>
+    <!-- Switch for loadding x-t etc. (from disk) to be used in digitization -->
+    <XTetc desc="true: load x-t etc. params. from disk; false: not load.">true</XTetc>
     <xtFileName desc="file which contains x-t relation">xt_v2.dat</xtFileName>
     <sigmaFileName desc="file which contains space resol.">sigma_v0.dat</sigmaFileName>
     <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>

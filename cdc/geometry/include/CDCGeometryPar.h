@@ -549,7 +549,7 @@ namespace Belle2 {
        * @param momentum   Track 3-momentum.
        */
 
-      signed short getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
+      unsigned short getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
 
       /**
        * Returns track incident angle in rphi plane (alpha in rad.).

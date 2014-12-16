@@ -33,42 +33,37 @@ namespace Belle2 {
         m_eventTime = eventTime;
       }
 
-      /** Returns drift length corresponding to input TDC-counts. */
-      float getDriftLength(unsigned short tdcCount,
-                           const WireID& wireID        = WireID(),
-                           float timeOfFlightEstimator = 0,
-                           bool = false,
-                           float z = 0, float = static_cast<float>(TMath::Pi() / 2.));
-
       /**
-        * Get Drift length.
-        * @parm tdcCount TDC value in nsec.
-        * @parm posOnWire Wire position of closest approach.
-        * @parm posOnTrack position at closest approach.
-        * @parm posOnTrack momentum at closest approach.
-        * @parm wireID encoded sense wire ID.
-        * @parm timeOfFlightEstimator Time of Flight in nsec.
+        * Get Drift length (cm).
+        * @parm tdcCount              TDC count (ns).
+        * @parm wireID                Encoded sense wire ID.
+        * @parm timeOfFlightEstimator Time of Flight (ns).
+        * @parm leftRight             left/right flag.
+        * @parm z                     z-positin on the wire (cm).
         *
         */
 
       float getDriftLength(unsigned short tdcCount,
-                           const TVector3& posOnWire,
-                           const TVector3& posOnTrack,
-                           const TVector3& momentum,
                            const WireID& wireID        = WireID(),
-                           float timeOfFlightEstimator = 0);
+                           float timeOfFlightEstimator = 0,
+                           bool leftRight = false,
+                           float z = 0,
+                           float = 0,
+                           float = 0);
 
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *
        *  Currently in the simple digitization just a Gaussian smearing is used.
        *
-       *  @return Uncertainty on the drift length, currently 0.001.
+       *  @return Uncertainty on the drift length, currently 1.69e-4.
        */
       float getDriftLengthResolution(float,
-                                     const WireID&,
-                                     bool,
-                                     float, float);
+                                     const WireID& = WireID(),
+                                     bool = false,
+                                     float = 0,
+                                     float = 0,
+                                     float = 0);
 
     private:
       /**

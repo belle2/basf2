@@ -218,14 +218,18 @@ namespace Belle2 {
 
     //! The method to get new left/right info. for digitization
     int getLeftRightPassageRaw() const {
-      int minusOneOrOne = (int((m_leftRight & 0x2) >> 1) == 0) ? -1 : 1;
-      return minusOneOrOne;
+      //      int minusOneOrOne = (int((m_leftRight & 0x2) >> 1) == 0) ? -1 : 1;
+      //      return minusOneOrOne;
+      int zeroOrOne = (int((m_leftRight & 0x2) >> 1) == 0) ? 0 : 1;
+      return zeroOrOne;
     }
 
     //! The method to get new left/right info. for tracking
     int getLeftRightPassage() const {
-      int minusOneOrOne = (int((m_leftRight & 0x4) >> 2) == 0) ? -1 : 1;
-      return minusOneOrOne;
+      //      int minusOneOrOne = (int((m_leftRight & 0x4) >> 2) == 0) ? -1 : 1;
+      //      return minusOneOrOne;
+      int zeroOrOne = (int((m_leftRight & 0x4) >> 2) == 0) ? 0 : 1;
+      return zeroOrOne;
     }
 
 

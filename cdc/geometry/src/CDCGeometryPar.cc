@@ -241,11 +241,11 @@ void CDCGeometryPar::read()
   m_nominalPropSpeed = 27.25;  //in cm/nsec (Belle's result, provided by iwasaki san)
 
   m_nominalSpaceResol = gbxParams.getLength("SenseWire/SpaceResol");
-  m_maxSpaceResol = 5. * m_nominalSpaceResol;
+  m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
 
   //Set misalignment params. (from input data)
   m_Misalignment = gbxParams.getBool("Misalignment");
-  B2INFO("CDCGeometryPar: Load misalignment params.(=1)/not load(=0):" <<
+  B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
          m_Misalignment);
   if (m_Misalignment) {
     readWirePositionParams(gbxParams, c_Misaligned);
@@ -253,14 +253,15 @@ void CDCGeometryPar::read()
 
   //Set alignment params. (from input data)
   m_Alignment = gbxParams.getBool("Alignment");
-  B2INFO("CDCGeometryPar: Load alignment params.(=1)/not load(=0):" <<
+  B2INFO("CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
          m_Alignment);
   if (m_Alignment) {
     readWirePositionParams(gbxParams, c_Aligned);
   }
 
-  //Set xt etc. params. for simulation
+  //Set xt etc. params. for digitization
   m_XTetc = gbxParams.getBool("XTetc");
+  B2INFO("CDCGeometryPar: Load x-t etc. params. for digitization (=1); not load (=0):" << m_XTetc);
   if (m_XTetc) {
     //Read xt params.
     readXT(gbxParams);
@@ -274,8 +275,7 @@ void CDCGeometryPar::read()
 
   //Replace xt etc. with those for reconstriction
   m_XTetc4Recon = gbxParams.getBool("XTetc4Recon");
-  B2INFO("CDCGeometryPar: x-t etc. for reconstruction on(=1)/off(=0):" << m_XTetc4Recon);
-
+  B2INFO("CDCGeometryPar: Load x-t etc. params. for reconstruction (=1); not load and use the same ones for digitization (=0):" << m_XTetc4Recon);
   if (m_XTetc4Recon) {
     readXT(gbxParams, 1);
     readSigma(gbxParams, 1);
@@ -995,16 +995,19 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
   int ialpha = getAlphaBin(alpha);
   int itheta = getThetaBin(theta);
 
-  const double boundary = m_XT[iCLayer][lr][ialpha][itheta][6];
+  //convert incoming- to outgoing-lr
+  unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
+
+  const double boundary = m_XT[iCLayer][lrp][ialpha][itheta][6];
 
   if (time < boundary) {
-    dDdt =    m_XT[iCLayer][lr][ialpha][itheta][1] + time
-              * (2.*m_XT[iCLayer][lr][ialpha][itheta][2] + time
-                 * (3.*m_XT[iCLayer][lr][ialpha][itheta][3] + time
-                    * (4.*m_XT[iCLayer][lr][ialpha][itheta][4] + time
-                       * (5.*m_XT[iCLayer][lr][ialpha][itheta][5]))));
+    dDdt =    m_XT[iCLayer][lrp][ialpha][itheta][1] + time
+              * (2.*m_XT[iCLayer][lrp][ialpha][itheta][2] + time
+                 * (3.*m_XT[iCLayer][lrp][ialpha][itheta][3] + time
+                    * (4.*m_XT[iCLayer][lrp][ialpha][itheta][4] + time
+                       * (5.*m_XT[iCLayer][lrp][ialpha][itheta][5]))));
   } else {
-    dDdt = m_XT[iCLayer][lr][ialpha][itheta][7];
+    dDdt = m_XT[iCLayer][lrp][ialpha][itheta][7];
   }
 
   //replaced with return fabs, since dDdt < 0 rarely; why happens ???
@@ -1021,27 +1024,27 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 
   int ialpha = getAlphaBin(alpha);
   int itheta = getThetaBin(theta);
-
   //  std::cout <<"iCLayer= " << iCLayer << std::endl;
   //  std::cout <<"lr= " << lr << std::endl;
   //  std::cout <<"alpha,ialpha= " << alpha <<" "<< ialpha << std::endl;
-  const double boundary = m_XT[iCLayer][lr][ialpha][itheta][6];
+
+  //convert incoming- to outgoing-lr
+  unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
+
+  const double boundary = m_XT[iCLayer][lrp][ialpha][itheta][6];
   //  std::cout <<"boundary= " << boundary << std::endl;
 
   if (time < boundary) {
-    dist = m_XT[iCLayer][lr][ialpha][itheta][0] + time
-           * (m_XT[iCLayer][lr][ialpha][itheta][1] + time
-              * (m_XT[iCLayer][lr][ialpha][itheta][2] + time
-                 * (m_XT[iCLayer][lr][ialpha][itheta][3] + time
-                    * (m_XT[iCLayer][lr][ialpha][itheta][4] + time
-                       * (m_XT[iCLayer][lr][ialpha][itheta][5])))));
+    dist = m_XT[iCLayer][lrp][ialpha][itheta][0] + time
+           * (m_XT[iCLayer][lrp][ialpha][itheta][1] + time
+              * (m_XT[iCLayer][lrp][ialpha][itheta][2] + time
+                 * (m_XT[iCLayer][lrp][ialpha][itheta][3] + time
+                    * (m_XT[iCLayer][lrp][ialpha][itheta][4] + time
+                       * (m_XT[iCLayer][lrp][ialpha][itheta][5])))));
   } else {
-    dist = m_XT[iCLayer][lr][ialpha][itheta][7] * (time - boundary) + m_XT[iCLayer][lr][ialpha][itheta][8];
+    dist = m_XT[iCLayer][lrp][ialpha][itheta][7] * (time - boundary) + m_XT[iCLayer][lrp][ialpha][itheta][8];
   }
 
-  //  if (lr == 1) dist *= -1.;
-  //  std::cout <<"dist= " << dist << std::endl;
-  //tentative  return std::max(0., dist);
   return fabs(dist);
 
 }
@@ -1056,9 +1059,12 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   int ialpha = getAlphaBin(alpha);
   int itheta = getThetaBin(theta);
 
+  //convert incoming- to outgoing-lr
+  unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
+
   double maxTime = 5000.; //in ns
-  if (m_XT[iCLayer][lr][ialpha][itheta][7] == 0.) {
-    maxTime = m_XT[iCLayer][lr][ialpha][itheta][6];
+  if (m_XT[iCLayer][lrp][ialpha][itheta][7] == 0.) {
+    maxTime = m_XT[iCLayer][lrp][ialpha][itheta][6];
   }
 
   double t0 = 0.;
@@ -1119,7 +1125,7 @@ double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLaye
 
 unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const
 {
-  unsigned short lr = 1;
+  unsigned short lr = 0;
   double wCrossT = (posOnWire.Cross(posOnTrack)).z();
 
   if (wCrossT < 0.) {
@@ -1142,20 +1148,19 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
           lr = 1;
         }
       } else {
-        lr = 1;
+        lr = 0;
       }
     } else {
-      lr = 1;
+      lr = 0;
     }
   }
   return lr;
 }
 
-signed short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const
+unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const
 {
-  double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).z();
-  short int lr = 1;
-  if (distanceCrossP < 0.) lr = -1;
+  const double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).z();
+  unsigned short int lr = (distanceCrossP > 0.) ? 1 : 0;
   return lr;
 }
 
@@ -1166,12 +1171,10 @@ double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momen
   const double px = momentum.x();
   const double py = momentum.y();
 
-  double sinalpha = (wx * py - wy * px) / sqrt((wx * wx + wy * wy) * (px * px + py * py));
+  const double cross = wx * py - wy * px;
+  const double dot   = wx * px + wy * py;
 
-  const double dot = wx * px + wy * py;
-  if (dot < 0.) sinalpha *= -1.;
-
-  return asin(sinalpha);
+  return atan2(cross, dot);
 }
 
 double CDCGeometryPar::getTheta(const TVector3& momentum) const
@@ -1181,8 +1184,15 @@ double CDCGeometryPar::getTheta(const TVector3& momentum) const
 
 int CDCGeometryPar::getAlphaBin(const double alpha) const
 {
+  //convert incoming- to outgoing-alpha
+  double alphap = alpha;
+  if (alpha >  0.5 * M_PI) {
+    alphap -= M_PI;
+  } else if (alpha < -0.5 * M_PI) {
+    alphap += M_PI;
+  }
   //tentative
-  int ialpha = (alpha >= 0.) ? (alpha * 180. / M_PI + 5.) / 10. : (alpha * 180. / M_PI - 5.) / 10.;
+  int ialpha = (alphap >= 0.) ? (alphap * 180. / M_PI + 5.) / 10. : (alphap * 180. / M_PI - 5.) / 10.;
   ialpha += 9;
   ialpha = std::max(0, ialpha);
   ialpha = std::min(18, ialpha);

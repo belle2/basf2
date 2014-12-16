@@ -613,7 +613,7 @@ namespace Belle2 {
      * This is a transient member and will not be written to file. The pointer
      * is set when it is the first time needed.
      */
-    mutable TClonesArray* m_arrayPointer; //! transient pointer to particle StoreArray
+    mutable TClonesArray* m_arrayPointer; //!
 
     // private methods
     /**

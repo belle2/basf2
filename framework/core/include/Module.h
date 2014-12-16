@@ -227,8 +227,6 @@ namespace Belle2 {
 
     /**
      * Sets the condition path of the module
-     *
-     * @param path
      */
     void setConditionPath(const boost::shared_ptr<Path>& path) { m_conditionPath = path; };
 

@@ -24,11 +24,11 @@ namespace Belle2 {
 
   namespace gearbox {
     /** Exception to be thrown in case of an empty result */
-    BELLE2_DEFINE_EXCEPTION(PathEmptyError, "Path '%1%' does not exist or is empty");
+    BELLE2_DEFINE_EXCEPTION(PathEmptyError, "Path '%1%' does not exist or is empty")
     /** Exception to be thrown in case of an conversion error */
-    BELLE2_DEFINE_EXCEPTION(ConversionError, "Path '%1%': Could not convert '%2%' to numerical value");
+    BELLE2_DEFINE_EXCEPTION(ConversionError, "Path '%1%': Could not convert '%2%' to numerical value")
     /** getTObject() couldn't deserialize data. */
-    BELLE2_DEFINE_EXCEPTION(TObjectConversionError, "Path '%1%': Could not convert to TObject! Malformed data?");
+    BELLE2_DEFINE_EXCEPTION(TObjectConversionError, "Path '%1%': Could not convert to TObject! Malformed data?")
 
     /** common interface for Gearbox and GearDir. */
     class Interface {

@@ -124,7 +124,7 @@ namespace Belle2 {
     /**
      * Writes content of a std::vector to a python list.
      *
-     * @param value The vector whose items should be stored to a python list.
+     * @param vector The vector whose items should be stored to a python list.
      * @return object python list where the vector is stored.
      */
     template<typename Value>
@@ -140,7 +140,7 @@ namespace Belle2 {
     /**
      * Writes content of a std::map to a python dict.
      *
-     * @param value The map whose items should be stored to a python dict.
+     * @param map The map whose items should be stored to a python dict.
      * @return dict The python dict where the the content of the map is stored.
      */
     template<typename Key, typename Value>
@@ -183,7 +183,7 @@ namespace Belle2 {
     /**
      * Writes content of a std::tuple to a python tuple.
      *
-     * @param value The tuple whose items should be stored to a python tuple.
+     * @param tuple The tuple whose items should be stored to a python tuple.
      * @return tuple The python tuple where the the content of the map is stored.
      */
     template<typename... Types>

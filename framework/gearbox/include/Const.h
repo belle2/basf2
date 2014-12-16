@@ -151,7 +151,7 @@ namespace Belle2 {
       /**
        * Exception that is thrown if there is the attempt to add an invalid detector ID to a restricted set.
        */
-      BELLE2_DEFINE_EXCEPTION(InvalidDetectorTypeError, "The given detector is not a valid element of the set!");
+      BELLE2_DEFINE_EXCEPTION(InvalidDetectorTypeError, "The given detector is not a valid element of the set!")
 
       /**
        * Default constructor.

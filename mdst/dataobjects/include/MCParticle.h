@@ -13,6 +13,8 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
+#include <framework/logging/Logger.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <TObject.h>
 #include <TClonesArray.h>
@@ -23,8 +25,6 @@
 #include <climits>
 #include <vector>
 
-#include <framework/logging/Logger.h>
-#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /**
@@ -35,11 +35,11 @@ namespace Belle2 {
 
     //Define exceptions
     /** Exception is thrown if the requested index for the last child is out of range. */
-    BELLE2_DEFINE_EXCEPTION(LastChildIndexOutOfRangError, "Last child index out of range !");
+    BELLE2_DEFINE_EXCEPTION(LastChildIndexOutOfRangError, "Last child index out of range!")
     /** Exception is thrown if no pointer to the particle list was set. */
-    BELLE2_DEFINE_EXCEPTION(NoParticleListSetError, "No Particle list set, cannot determine related particles !");
+    BELLE2_DEFINE_EXCEPTION(NoParticleListSetError, "No Particle list set, cannot determine related particles!")
     /** Exception is thrown if the pdg value of the MCParticle is not known to the internal database (TDatabasePDG). */
-    BELLE2_DEFINE_EXCEPTION(ParticlePDGNotKnownError, "The pdg value (%1%) of the MCParticle is not known !");
+    BELLE2_DEFINE_EXCEPTION(ParticlePDGNotKnownError, "The pdg value (%1%) of the MCParticle is not known!")
 
 
     /** The status information for the MCParticle. */

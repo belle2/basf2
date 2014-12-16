@@ -520,7 +520,7 @@ def fitVertex(
     """
 
     if 'Geometry' in [m.name() for m in path.modules()]:
-        print '[INFO] fitVertex: Geometry already in path'
+        B2INFO('fitVertex: Geometry already in path')
     else:
         geometry = register_module('Geometry')
         geometry.param('components', ['MagneticField'])
@@ -887,7 +887,7 @@ def TagV(
     """
 
     if 'Geometry' in [m.name() for m in path.modules()]:
-        print '[INFO] TAgV: Geometry already in path'
+        B2INFO('TagV: Geometry already in path')
     else:
         geometry = register_module('Geometry')
         geometry.param('components', ['MagneticField'])

@@ -16,7 +16,7 @@ class TestModule(Module):
         prints some PIDlikelihood data
         """
         partList = [Belle2.Const.electron, Belle2.Const.muon, Belle2.Const.pion, Belle2.Const.kaon, Belle2.Const.proton]
-        detList = [Belle2.Const.DetectorSet(Belle2.Const.SVD), Belle2.Const.DetectorSet(Belle2.Const.CDC), Belle2.Const.DetectorSet(Belle2.Const.TOP), Belle2.Const.DetectorSet(Belle2.Const.ARICH)]
+        detList = [Belle2.Const.PIDDetectorSet(d) for d in (Belle2.Const.SVD, Belle2.Const.CDC, Belle2.Const.TOP, Belle2.Const.ARICH)]
 
         ll = Belle2.PyStoreArray('PIDLikelihoods')
         for l in ll:

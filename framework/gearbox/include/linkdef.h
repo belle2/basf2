@@ -8,6 +8,8 @@
 #pragma link C++ class Belle2::Const-;
 #pragma link C++ class Belle2::Const::DetectorSet+;
 #pragma link C++ class Belle2::Const::ChargedStable+;
+#pragma link C++ class Belle2::Const::PIDDetectors+;
+#pragma link C++ class Belle2::Const::RestrictedDetectorSet<Belle2::Const::PIDDetectors>+;
 
 //not meant to be streamed
 #pragma link C++ class Belle2::Const::ParticleType-;

@@ -349,13 +349,13 @@ int main(int argc, char* argv[])
       //Init Python interpreter
       Py_InitializeEx(0);
 
-      //Pass python filename and additional arguments to python
-      const char* pyargs[arguments.size() + 1];
-      pyargs[0] = pythonFile.c_str();
+      std::vector<const char*> pyArgv(arguments.size() + 1);
+      pyArgv[0] = pythonFile.c_str();
       for (size_t i = 0; i < arguments.size(); i++) {
-        pyargs[i + 1] = arguments[i].c_str();
+        pyArgv[i + 1] = arguments[i].c_str();
       }
-      PySys_SetArgv(arguments.size() + 1, const_cast<char**>(pyargs));
+      //Pass python filename and additional arguments to python
+      PySys_SetArgv(pyArgv.size(), const_cast<char**>(pyArgv.data()));
 
       //Execute Python file
       executePythonFile(pythonFile);

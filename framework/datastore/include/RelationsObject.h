@@ -299,6 +299,8 @@ namespace Belle2 {
     /** Returns the pointer to the store array holding this object (protected since these arrays are easy to misuse). */
     TClonesArray* getArrayPointer() const {
       DataStore::Instance().findStoreEntry(this, m_cacheDataStoreEntry, m_cacheArrayIndex);
+      if (!m_cacheDataStoreEntry)
+        return nullptr;
       return m_cacheDataStoreEntry->getPtrAsArray();
     }
 

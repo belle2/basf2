@@ -185,12 +185,11 @@ namespace Belle2 {
     void setCounters(double& time, double& memory,
                      double startTime = 0, double startMemory = 0);
 
-    /** Statistics object for global time and memory consumption */
-    ModuleStatistics m_global;
-    /** module statistics */
-    std::vector<Belle2::ModuleStatistics> m_stats;
+    ModuleStatistics m_global; /**< Statistics object for global time and memory consumption */
+    std::vector<Belle2::ModuleStatistics> m_stats; /**< module statistics */
 
-    std::map<const Module*, int> m_modulesToStatsIndex; //!< transient, maps Module* to m_stats index
+    /** transient, maps Module* to m_stats index. */
+    std::map<const Module*, int> m_modulesToStatsIndex; //!
 
     //the following are used for the (process-local) time-keeping
 

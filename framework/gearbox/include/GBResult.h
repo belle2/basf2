@@ -1,11 +1,13 @@
-
 #ifndef GBRESULT_H_
 #define GBRESULT_H_
 
+#include <framework/gearbox/types.h>
+
+#include <boost/variant/get.hpp>
 #include <boost/shared_ptr.hpp>
+
 #include <map>
 
-#include "framework/gearbox/types.h"
 
 namespace boost {
   namespace property_tree {

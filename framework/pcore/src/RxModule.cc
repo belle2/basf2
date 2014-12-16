@@ -15,15 +15,6 @@
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-REG_MODULE(Rx)
-
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
 RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
 {
   //Set module properties
@@ -33,8 +24,7 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
   m_rbuf = rbuf;
   m_compressionLevel = 0;
   if (rbuf) {
-    std::ostringstream buf; buf << "Rx" << rbuf->shmid();
-    setModuleName(buf.str());
+    setModuleName("Rx" + std::to_string(rbuf->shmid()));
     B2INFO("Rx: Constructor with RingBuffer done.");
   }
 }

@@ -12,19 +12,15 @@
 
 #include <framework/logging/Logger.h>
 
+#include <TFileMerger.h>
+#include <TFile.h>
+#include <Riostream.h>
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
 #include <dirent.h>
 #include <errno.h>
-
-#include "TFileMerger.h"
-#include "TChain.h"
-#include "TFile.h"
-#include "TH1.h"
-#include "TTree.h"
-#include "TKey.h"
-#include "Riostream.h"
 
 using namespace std;
 using namespace Belle2;

@@ -10,6 +10,9 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/logging/Logger.h>
 
+#include <TObject.h>
+#include <TMessage.h>
+
 #include <stdlib.h>
 
 

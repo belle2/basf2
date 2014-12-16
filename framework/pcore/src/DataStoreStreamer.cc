@@ -10,12 +10,16 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/Mergeable.h>
 
+#include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <TClonesArray.h>
 #include <TClass.h>
+
+#include <unistd.h>
+#include <stdio.h>                      // for NULL, printf
 
 #include <algorithm>
 #include <queue>

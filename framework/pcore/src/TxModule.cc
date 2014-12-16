@@ -16,15 +16,6 @@
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-REG_MODULE(Tx)
-
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
 TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_blockingInsert(true)
 {
   //Set module properties
@@ -36,8 +27,7 @@ TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_blocking
   m_compressionLevel = 0;
 
   if (rbuf) {
-    std::ostringstream buf; buf << "Tx" << rbuf->shmid();
-    setModuleName(buf.str());
+    setModuleName("Tx" + std::to_string(rbuf->shmid()));
     B2INFO("Tx: Constructor with RingBuffer done.");
   }
 }

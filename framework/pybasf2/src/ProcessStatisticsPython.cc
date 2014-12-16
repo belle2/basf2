@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <boost/python.hpp>
-#include <boost/format.hpp>
 
 #include <framework/pybasf2/ProcessStatisticsPython.h>
 #include <framework/core/Module.h>

@@ -8,13 +8,10 @@
 // Date : 5 - Sep - 2012
 
 #include <framework/pcore/EvtMessage.h>
-#include <framework/datastore/DataStore.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <Rtypes.h> //for BIT()
+
 #include <pthread.h>
-#include <unistd.h>
-#include <sys/types.h>
 
 #include <vector>
 #include <string>

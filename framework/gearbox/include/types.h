@@ -1,12 +1,13 @@
 #ifndef GEARBOX_TYPES_H_
 #define GEARBOX_TYPES_H_
 
+#include <boost/variant/variant.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 #include <string>
 #include <map>
 #include <list>
-
-#include <boost/variant.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include <utility>
 
 
 namespace Belle2 {

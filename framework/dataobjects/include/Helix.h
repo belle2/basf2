@@ -9,13 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/RelationsObject.h>
-#include <framework/logging/Logger.h>
 
 #include <TVector3.h>
-#include <TMatrixD.h>
-#include <TMatrixDSym.h>
 
 #include <cstdlib>
 #include <vector>

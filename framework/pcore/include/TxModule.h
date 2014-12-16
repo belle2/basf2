@@ -26,7 +26,7 @@ namespace Belle2 {
      *
      * @param rbuf Use the given RingBuffer for data
      */
-    TxModule(RingBuffer* rbuf = 0);
+    TxModule(RingBuffer* rbuf);
     virtual ~TxModule();
 
     //! Module functions to be called from main process

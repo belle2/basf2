@@ -206,7 +206,7 @@ int RingBuffer::insq(const int* buf, int size)
 {
   //  printf ( "insq: requesting : %d, nbuf = %d\n", size, m_bufinfo->nbuf );
   if (size <= 0) {
-    printf("RingBuffer::insq : buffer size = %d, not queued.\n", size);
+    B2ERROR("RingBuffer::insq() failed: invalid buffer size = " << size);
     return -1;
   }
   SemaphoreLocker locker(m_semid);

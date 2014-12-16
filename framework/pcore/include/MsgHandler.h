@@ -13,7 +13,10 @@
 #include <framework/pcore/EvtMessage.h>
 
 #include <vector>
-#include "TObject.h"
+#include <string>
+
+class TObject;
+class TMessage;
 
 namespace Belle2 {
   /** A class to encode/decode an EvtMessage */

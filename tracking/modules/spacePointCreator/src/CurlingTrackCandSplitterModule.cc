@@ -149,6 +149,11 @@ void CurlingTrackCandSplitterModule::initialize()
 
     m_treePtr->Branch("LocalPosResiduals", &m_rootLocalPosResiduals);
     m_treePtr->Branch("GlobalPosResiduals", &m_rootGlobalPosResiduals);
+
+    m_treePtr->Branch("MisMatchPosResiduals", &m_rootMisMatchPosDistance);
+    m_treePtr->Branch("MisMatchMomDiffX", &m_rootMisMatchMomX);
+    m_treePtr->Branch("MisMatchMomDiffY", &m_rootMisMatchMomY);
+    m_treePtr->Branch("MisMatchMomDiffZ", &m_rootMisMatchMomZ);
   } else {
     m_rootFilePtr = NULL;
     m_treePtr = NULL;
@@ -193,26 +198,31 @@ void CurlingTrackCandSplitterModule::event()
           B2DEBUG(15, "This SpacePointTrackCand could be split into " << splittingIndices.size() + 1 << " but will not, because splitCurlers is set to false");
           continue; // should jump to enclosing for-loop!!! (process the next SpacePointTrackCand)
         }
-
+        m_curlingTCCtr++;
         // get the TrackCand Stubs
         std::vector<SpacePointTrackCand> trackStubs = splitCurlingTrackCand(*spacePointTC, m_PARAMnTrackStubs, splittingIndices);
 
+        // add the stubs to the appropriate StoreArray
         for (SpacePointTrackCand trackStub : trackStubs) {
           m_createdTrackStubsCtr++;
           if (m_saveCompleteCurler) {
             SpacePointTrackCand* newSPTC = completeCurlingTCs.appendNew(trackStub);
             newSPTC->addRelationTo(spacePointTC);
+            B2DEBUG(25, "Added SpacePointTrackCand " << newSPTC->getArrayIndex() << " to StoreArray " << newSPTC->getArrayName());
           }
           if (!trackStub.isOutgoing()) {
             SpacePointTrackCand* newSPTC = ingoingAllTCs.appendNew(trackStub);
             newSPTC->addRelationTo(spacePointTC);
+            B2DEBUG(25, "Added SpacePointTrackCand " << newSPTC->getArrayIndex() << " to StoreArray " << newSPTC->getArrayName());
           } else { // if not ingoing differentiate between first part and all of the rest
             if (trackStub.getTrackStubIndex() > 1) {
               SpacePointTrackCand* newSPTC = outgoingRestTCs.appendNew(trackStub);
               newSPTC->addRelationTo(spacePointTC);
+              B2DEBUG(25, "Added SpacePointTrackCand " << newSPTC->getArrayIndex() << " to StoreArray " << newSPTC->getArrayName());
             } else {
               SpacePointTrackCand* newSPTC = outgoingFirstTCs.appendNew(trackStub);
               newSPTC->addRelationTo(spacePointTC);
+              B2DEBUG(25, "Added SpacePointTrackCand " << newSPTC->getArrayIndex() << " to StoreArray " << newSPTC->getArrayName());
             }
           }
         }
@@ -241,7 +251,7 @@ void CurlingTrackCandSplitterModule::event()
 // =================================================== TERMINATE ========================================================
 void CurlingTrackCandSplitterModule::terminate()
 {
-  B2INFO("CurlingTrackCandSplitter::terminate(): checked " << m_spacePointTCCtr << " SpacePointTrackCands for curling behaviour. " << m_curlingTCCtr << " of them were curling and " << m_createdTrackStubsCtr << " were created. In " << m_noDecisionPossibleCtr << " no decision could be made.");
+  B2INFO("CurlingTrackCandSplitter::terminate(): checked " << m_spacePointTCCtr << " SpacePointTrackCands for curling behaviour. " << m_curlingTCCtr << " of them were curling and " << m_createdTrackStubsCtr << " TrackStubs were created. In " << m_noDecisionPossibleCtr << " no decision could be made.");
 
   // do ROOT file stuff
   if (m_treePtr != NULL) {
@@ -313,7 +323,30 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
           if (svdTrueHits[0] != svdTrueHits[1]) {
             B2WARNING("TrueHits of SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " are not matching: TrueHit 1 has Index " << svdTrueHits[0]->getArrayIndex() << ", TrueHit 2 has Index " << svdTrueHits[1]->getArrayIndex());
 
+            // Only do these calculations if output to root is is enabled
+            if (m_PARAMpositionAnalysis) {
+              std::vector<TVector3> globalPositions;
+              std::vector<TVector3> globalMomenta;
+              // collect all values
+              for (unsigned int i = 0; i < svdTrueHits.size(); ++i) {
+                auto posMom = getGlobalPositionAndMomentum(svdTrueHits[i]);
+                globalPositions.push_back(posMom.first);
+                globalMomenta.push_back(posMom.second);
+              }
+              // do the calculations (starting from one because of comparison of two elements in each run through loop)
+              for (unsigned int i = 1; i < globalPositions.size(); ++i) {
+                rootVariables.MisMatchPosResiduals.push_back((globalPositions[i] - globalPositions[i - 1]).Mag());
+
+                TVector3 momDiff = globalMomenta[i] - globalMomenta[i - 1];
+                rootVariables.MisMatchMomX.push_back(momDiff.X());
+                rootVariables.MisMatchMomY.push_back(momDiff.Y());
+                rootVariables.MisMatchMomZ.push_back(momDiff.Z());
+              }
+            }
+
+
             // Only do these calculations if the debug Level is set to 150 or higher
+            // DEPRECATED!!!
             if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 150, PACKAGENAME())) {   // comparison with true is uneccessary?
               B2DEBUG(150, "There are " << svdTrueHits.size() << " TrueHits related to SpacePoint " << spacePoint->getArrayIndex())
 
@@ -423,8 +456,11 @@ CurlingTrackCandSplitterModule::splitCurlingTrackCand(const Belle2::SpacePointTr
   // WARNING: This is only true as long as this behaviour is not changed in checkTrackCandForCurling(...), as there the assumption is made that the direction of flight of the first hit is outgoing, and only if it is not 0 is the first entry of the returnVector of the latter.
   bool outgoing = splitIndices[0] != 0;
 
-  // return NTracklets (user defined) at most
-  for (unsigned iTr = 0; iTr < uint(NTracklets) && iTr < rangeIndices.size(); ++iTr) {
+  // return NTracklets (user defined) at most, or if NTracklets is 0, return all
+  // if NTracklets is 0 set it to the appropriate size for the following for-loop
+  if (NTracklets < 1) { NTracklets = rangeIndices.size(); }
+  for (unsigned iTr = 0; iTr < rangeIndices.size() && iTr < uint(NTracklets); ++iTr) {
+
     int lastInd = rangeIndices[iTr].second;
     int firstInd = rangeIndices[iTr].first;
 
@@ -518,6 +554,12 @@ void CurlingTrackCandSplitterModule::writeToRoot(RootVariables& rootVariables)
   m_rootTrueHitXGlobals = rootVariables.TrueHitXGlobal;
   m_rootTrueHitYGlobals = rootVariables.TrueHitYGlobal;
   m_rootTrueHitZGlobals = rootVariables.TrueHitZGlobal;
+
+  m_rootMisMatchPosDistance = rootVariables.MisMatchPosResiduals;
+
+  m_rootMisMatchMomX = rootVariables.MisMatchMomX;
+  m_rootMisMatchMomY = rootVariables.MisMatchMomY;
+  m_rootMisMatchMomZ = rootVariables.MisMatchMomZ;
 
   m_treePtr->Fill();
 }

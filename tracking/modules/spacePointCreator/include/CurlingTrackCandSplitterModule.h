@@ -61,6 +61,11 @@ namespace Belle2 {
 
       std::vector<double> PosResiduesLocal; /**< position differences in local coordinates */
       std::vector<double> PosResiduesGlobal; /**< position differences in global coordinates */
+
+      std::vector<double> MisMatchPosResiduals; /**< Distance between TrueHits that do not match but are related from one SpacePoint */
+      std::vector<double> MisMatchMomX; /**< Difference of Momentum in X-Direction for TrueHits that do not match but are related from one SpacePoint */
+      std::vector<double> MisMatchMomY; /**< Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint */
+      std::vector<double> MisMatchMomZ; /**< Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint */
     };
 
   protected:
@@ -153,6 +158,11 @@ namespace Belle2 {
 
     std::vector<double> m_rootLocalPosResiduals; /**< Local Position Residuals between TrueHits and SpacePoints */
     std::vector<double> m_rootGlobalPosResiduals; /**< Global Position Residuals between TrueHits and SpacePoints */
+
+    std::vector<double> m_rootMisMatchPosDistance; /**< Distance of TrueHits that do not match but are related from one SpacePoint */
+    std::vector<double> m_rootMisMatchMomX; /**< Difference of Momentum in X-Direction for TrueHits that do not match but are related from one SpacePoint */
+    std::vector<double> m_rootMisMatchMomY; /**< Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint */
+    std::vector<double> m_rootMisMatchMomZ; /**< Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint */
 
     std::pair<double, double> getUV(const Belle2::SpacePoint* spacePoint); /**< get U&V for a SpacePoint (via its relation to Clusters) (SpacePoint can only return normalized U&V coordinates) */
 

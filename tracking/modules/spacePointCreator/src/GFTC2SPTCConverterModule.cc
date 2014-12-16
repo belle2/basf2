@@ -75,9 +75,6 @@ void GFTC2SPTCConverterModule::initialize()
 
   // register Relation to genfit::TrackCand
   spTrackCand.registerRelationTo(gfTrackCand);
-
-  // TODO: change this line, once the TrueHit checking works
-  m_PARAMcheckTrueHits = false;
 }
 
 // ------------------------------------- EVENT -------------------------------------------------------
@@ -484,8 +481,14 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSingleClusterSVDSpacePoin
 bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const PXDCluster*> clusters)
 {
   if (clusters.size() > 0) {
+    if (clusters.size() > 1) { // this should not happen. only defining this with a vector of PXDClusters due to possible templating
+      B2WARNING("Got more than one PXDCluster in trueHitsAreGood. Will only check the first!")
+    }
     const PXDTrueHit* trueHit = clusters[0]->getRelatedTo<PXDTrueHit>("ALL");
-    if (trueHit != NULL) return true;
+    if (trueHit != NULL) {
+      B2DEBUG(200, "Found TrueHit " << trueHit->getArrayIndex() << " in Array " << trueHit->getArrayName() << " related to PXDCluster " << clusters[0]->getArrayIndex());
+      return true;
+    }
   }
   return false;
 }
@@ -496,7 +499,10 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
     // if only one cluster is passed simply check if there exists a related TrueHit
     if (clusters.size() == 1) {
       const SVDTrueHit* trueHit = clusters[0]->getRelatedTo<SVDTrueHit>("ALL");
-      if (trueHit != NULL) return true;
+      if (trueHit != NULL) {
+        B2DEBUG(200, "Found TrueHit " << trueHit->getArrayIndex() << " in Array " << trueHit->getArrayName() << " related to the only passed SVDCluster " << clusters[0]->getArrayIndex());
+        return true;
+      }
     } else {
       std::vector<const SVDTrueHit*> allTrueHits;
       // get all TrueHits from all Clusters
@@ -506,11 +512,13 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
           allTrueHits.push_back(relTrueHits[i]);
         }
       }
+      B2DEBUG(200, "Got " << clusters.size() << " SVDCluster for TrueHitChecking and found " << allTrueHits.size() << " related TrueHits");
       // sort & unique the TrueHits to see if more than one is present, if more than one is present, assume there is something 'fishy' and return false
       std::sort(allTrueHits.begin(), allTrueHits.end());
       auto newEnd = std::unique(allTrueHits.begin(), allTrueHits.end());
 
       allTrueHits.resize(std::distance(allTrueHits.begin(), newEnd));
+      B2DEBUG(200, "Size of allTrueHits after sort & unique: " << allTrueHits.size());
       if (allTrueHits.size() == 1) return true;
     }
   }

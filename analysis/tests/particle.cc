@@ -61,7 +61,7 @@ namespace {
     }
   }
 
-  TEST_F(ParticleTest, Daughers)
+  TEST_F(ParticleTest, Daughters)
   {
     TLorentzVector momentum;
     const int nDaughters = 6;
@@ -92,6 +92,8 @@ namespace {
     EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughters().size());
     EXPECT_EQ((unsigned int)nDaughters, pLocal.getFinalStateDaughters().size());
 
+    Particle outsideArray;
+    EXPECT_TRUE(outsideArray.getArrayPointer() == nullptr);
     EXPECT_B2FATAL(Particle p2 = Particle(momentum, 411, Particle::c_Unflavored, daughterIndices));
   }
 

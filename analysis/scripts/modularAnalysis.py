@@ -176,7 +176,7 @@ def loadReconstructedParticles(path=analysis_main):
 def copyList(
     outputListName,
     inputListName,
-    persistent=False,
+    writeOut=False,
     path=analysis_main,
     ):
     """
@@ -184,7 +184,7 @@ def copyList(
 
     @param ouputListName copied ParticleList
     @param inputListName original ParticleList to be copied
-    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path 
     """
 
@@ -192,14 +192,14 @@ def copyList(
     pmanipulate.set_name('PListCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
     pmanipulate.param('inputListNames', [inputListName])
-    pmanipulate.param('persistent', persistent)
+    pmanipulate.param('writeOut', writeOut)
     path.add_module(pmanipulate)
 
 
 def copyLists(
     outputListName,
     inputListNames,
-    persistent=False,
+    writeOut=False,
     path=analysis_main,
     ):
     """
@@ -207,7 +207,7 @@ def copyLists(
     
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
-    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -215,7 +215,7 @@ def copyLists(
     pmanipulate.set_name('PListCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
     pmanipulate.param('inputListNames', inputListNames)
-    pmanipulate.param('persistent', persistent)
+    pmanipulate.param('writeOut', writeOut)
     path.add_module(pmanipulate)
 
 
@@ -223,7 +223,7 @@ def cutAndCopyLists(
     outputListName,
     inputListNames,
     cut,
-    persistent=False,
+    writeOut=False,
     path=analysis_main,
     ):
     """
@@ -233,7 +233,7 @@ def cutAndCopyLists(
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
     @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -242,7 +242,7 @@ def cutAndCopyLists(
     pmanipulate.param('outputListName', outputListName)
     pmanipulate.param('inputListNames', inputListNames)
     pmanipulate.param('cut', cut)
-    pmanipulate.param('persistent', persistent)
+    pmanipulate.param('writeOut', writeOut)
     path.add_module(pmanipulate)
 
 
@@ -250,7 +250,7 @@ def cutAndCopyList(
     outputListName,
     inputListName,
     cut,
-    persistent=False,
+    writeOut=False,
     path=analysis_main,
     ):
     """
@@ -260,7 +260,7 @@ def cutAndCopyList(
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
     @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -269,14 +269,14 @@ def cutAndCopyList(
     pmanipulate.param('outputListName', outputListName)
     pmanipulate.param('inputListNames', [inputListName])
     pmanipulate.param('cut', cut)
-    pmanipulate.param('persistent', persistent)
+    pmanipulate.param('writeOut', writeOut)
     path.add_module(pmanipulate)
 
 
 def fillParticleList(
     decayString,
     cut,
-    persistent=False,
+    writeOut=False,
     path=analysis_main,
     ):
     """
@@ -285,7 +285,7 @@ def fillParticleList(
     
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut      Particles need to pass these selection criteria to be added to the ParticleList
-    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path 
     """
 
@@ -293,14 +293,14 @@ def fillParticleList(
     pselect.set_name('ParticleSelector_' + decayString)
     pselect.param('decayString', decayString)
     pselect.param('cut', cut)
-    pselect.param('persistent', persistent)
+    pselect.param('writeOut', writeOut)
     path.add_module(pselect)
 
 
 def selectParticle(
     decayString,
     cut='',
-    persistent=False,
+    writeOut=False,
     path=analysis_main,
     ):
     """
@@ -308,7 +308,7 @@ def selectParticle(
     
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut      Particles need to pass these selection criteria to be added to the ParticleList
-    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -316,7 +316,7 @@ def selectParticle(
     pselect.set_name('ParticleSelector_' + decayString)
     pselect.param('decayString', decayString)
     pselect.param('cut', cut)
-    pselect.param('persistent', persistent)
+    pselect.param('writeOut', writeOut)
     path.add_module(pselect)
 
 
@@ -341,7 +341,7 @@ def reconstructDecay(
     decayString,
     cut,
     dmID=0,
-    persistent=False,
+    writeOut=False,
     path=analysis_main,
     ):
     """
@@ -356,7 +356,7 @@ def reconstructDecay(
     @param cut         created (mother) Particles are added to the mother ParticleList if they 
                        pass give cuts (in VariableManager style) and rejected otherwise
     @oaram dmID        user specified decay mode identifier
-    @param persistent  toggle newly created particle list btw. transient/persistent
+    @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path     
     """
 
@@ -365,7 +365,7 @@ def reconstructDecay(
     pmake.param('decayString', decayString)
     pmake.param('cut', cut)
     pmake.param('decayMode', dmID)
-    pmake.param('persistent', persistent)
+    pmake.param('writeOut', writeOut)
     path.add_module(pmake)
 
 
@@ -807,7 +807,7 @@ def variablesToNTuple(
 def findMCDecay(
     list_name,
     decay,
-    persistent=False,
+    writeOut=False,
     path=analysis_main,
     ):
     """
@@ -818,7 +818,7 @@ def findMCDecay(
     decayfinder.set_name('MCDecayFinder_' + list_name)
     decayfinder.param('listName', list_name)
     decayfinder.param('decayString', decay)
-    decayfinder.param('persistent', persistent)
+    decayfinder.param('writeOut', writeOut)
     path.add_module(decayfinder)
 
 

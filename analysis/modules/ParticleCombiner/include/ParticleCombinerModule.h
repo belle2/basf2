@@ -94,7 +94,7 @@ namespace Belle2 {
     Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */
     Variable::Cut m_cut; /**< cut object which performs the cuts */
 
-    bool m_persistent;  /**< toggle output particle list btw. transient/persistent */
+    bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 
   };
 

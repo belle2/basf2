@@ -29,7 +29,7 @@ MCDecayFinderModule::MCDecayFinderModule() : Module()
   //Parameter definition
   addParam("decayString", m_strDecay, "DecayDescriptor string.");
   addParam("listName", m_listName, "Name of the output particle list");
-  addParam("persistent", m_persistent, "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+  addParam("writeOut", m_writeOut, "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 }
 
 void MCDecayFinderModule::initialize()
@@ -47,7 +47,7 @@ void MCDecayFinderModule::initialize()
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   StoreArray<MCParticle> mcparticles;
 
-  DataStore::EStoreFlags flags = m_persistent ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+  DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
   particleList.registerInDataStore(flags);
   particles.registerInDataStore(flags);
   extraInfoMap.registerInDataStore();

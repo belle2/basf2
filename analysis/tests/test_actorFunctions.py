@@ -73,7 +73,7 @@ class TestSelectParticleList(unittest.TestCase):
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['decayString'], 'e+:hash')
         self.assertEqual(parameters['cut'], '')
-        self.assertEqual(parameters['persistent'], True)
+        self.assertEqual(parameters['writeOut'], True)
 
     def test_roe(self):
         result = SelectParticleList(self.path, 'hash', 'dummy', 'e+', 'generic', True)
@@ -85,7 +85,7 @@ class TestSelectParticleList(unittest.TestCase):
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['decayString'], 'e+:hash')
         self.assertEqual(parameters['cut'], 'isInRestOfEvent > 0.5')
-        self.assertEqual(parameters['persistent'], True)
+        self.assertEqual(parameters['writeOut'], True)
 
 
 class TestMakeAndMatchParticleList(unittest.TestCase):
@@ -102,7 +102,7 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['decayString'], 'D+:hash ==> pi+ K-')
         self.assertEqual(parameters['cut'], '0 < M < 10')
-        self.assertEqual(parameters['persistent'], True)
+        self.assertEqual(parameters['writeOut'], True)
 
         parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
         self.assertEqual(parameters['listName'], 'D+:hash')
@@ -128,13 +128,13 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertEqual(parameters['outputListName'], 'D+:hash')
         self.assertListEqual(parameters['inputListNames'], ['D+:1', 'D+:2', 'D+:3'])
         self.assertEqual(parameters['cut'], '0.1 < M')
-        self.assertEqual(parameters['persistent'], True)
+        self.assertEqual(parameters['writeOut'], True)
 
         parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
         self.assertEqual(parameters['outputListName'], 'D+:generic')
         self.assertListEqual(parameters['inputListNames'], ['D+:hash'])
         self.assertEqual(parameters['cut'], '')
-        self.assertEqual(parameters['persistent'], True)
+        self.assertEqual(parameters['writeOut'], True)
 
     def test_some_missing_daughter_lists(self):
         result = CopyParticleLists(self.path, 'hash', 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3', None], {'cutstring': '0.1 < M'})
@@ -150,7 +150,7 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertEqual(parameters['outputListName'], 'D+:generic')
         self.assertListEqual(parameters['inputListNames'], ['D+:hash'])
         self.assertEqual(parameters['cut'], '')
-        self.assertEqual(parameters['persistent'], True)
+        self.assertEqual(parameters['writeOut'], True)
 
     def test_all_missing_daughter_lists(self):
         result = CopyParticleLists(self.path, 'hash', 'D+', 'generic', [None, None, None], [{'cutstring': '0.1 < M'}] * 3)
@@ -169,13 +169,13 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertEqual(parameters['outputListName'], 'D+:hash')
         self.assertListEqual(parameters['inputListNames'], ['D+:1', 'D+:2', 'D+:3'])
         self.assertEqual(parameters['cut'], '')
-        self.assertEqual(parameters['persistent'], True)
+        self.assertEqual(parameters['writeOut'], True)
 
         parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
         self.assertEqual(parameters['outputListName'], 'D+:generic')
         self.assertListEqual(parameters['inputListNames'], ['D+:hash'])
         self.assertEqual(parameters['cut'], '')
-        self.assertEqual(parameters['persistent'], True)
+        self.assertEqual(parameters['writeOut'], True)
 
 
 class TestLoadGeometry(unittest.TestCase):

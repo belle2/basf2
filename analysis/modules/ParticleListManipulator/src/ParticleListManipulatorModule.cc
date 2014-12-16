@@ -57,7 +57,7 @@ namespace Belle2 {
     Variable::Cut::Parameter emptyCut;
     addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
 
-    addParam("persistent", m_persistent,
+    addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
     // initializing the rest of private memebers
@@ -95,7 +95,7 @@ namespace Belle2 {
     }
 
     StoreObjPtr<ParticleList> particleList(m_outputListName);
-    DataStore::EStoreFlags flags = m_persistent ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+    DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
     particleList.registerInDataStore(flags);
     if (!m_isSelfConjugatedParticle) {
       StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);

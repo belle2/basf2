@@ -125,7 +125,7 @@ def SelectParticleList(path, hash, particleLoader, particleName, particleLabel, 
     """
     B2INFO("Enter: Select Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     outputList = particleName + ':' + hash
-    modularAnalysis.selectParticle(outputList, 'isInRestOfEvent > 0.5' if runs_in_ROE else '', persistent=True, path=path)
+    modularAnalysis.selectParticle(outputList, 'isInRestOfEvent > 0.5' if runs_in_ROE else '', writeOut=True, path=path)
     B2INFO("Select Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
     return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, '__cache__': True}
 
@@ -151,7 +151,7 @@ def MakeAndMatchParticleList(path, hash, particleName, particleLabel, channelNam
         return {'RawParticleList_{c}'.format(c=channelName): None, '__cache__': True}
 
     decayString = outputList + ' ==> ' + ' '.join(daughterParticleLists)
-    modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], 0, persistent=True, path=path)
+    modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], 0, writeOut=True, path=path)
     modularAnalysis.matchMCTruth(outputList, path=path)
     B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
     return {'RawParticleList_{c}'.format(c=channelName): outputList, '__cache__': True}
@@ -178,8 +178,8 @@ def CopyParticleLists(path, hash, particleName, particleLabel, inputLists, postC
                 'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None,
                 '__cache__': True}
 
-    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'] if postCut is not None else '', persistent=True, path=path)
-    modularAnalysis.cutAndCopyLists(particleName + ':' + particleLabel, outputList, '', persistent=True, path=path)
+    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'] if postCut is not None else '', writeOut=True, path=path)
+    modularAnalysis.cutAndCopyLists(particleName + ':' + particleLabel, outputList, '', writeOut=True, path=path)
     #modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))

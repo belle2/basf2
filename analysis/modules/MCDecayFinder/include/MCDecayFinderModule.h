@@ -25,7 +25,7 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     std::string m_strDecay; /**< Decay string to build the decay descriptor. */
     std::string m_listName; /**< Name of output particle list. */
-    bool m_persistent;  /**< toggle output particle list btw. transient/persistent */
+    bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
     std::string m_particleStore; /**< name of Particle store array */
 
   public:

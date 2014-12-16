@@ -15,9 +15,6 @@
 //std
 #include <string>
 
-//Genfit
-#include <genfit/Track.h>
-#include <genfit/GFRaveVertexFactory.h>
 //tracking
 //#include <tracking/dataobjects/Track.h>
 //basf2
@@ -27,12 +24,10 @@
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 
-//rave
-#include <rave/VacuumPropagator.h>
-#include <rave/MagneticField.h>
-#include <rave/ConstantMagneticField.h>
-#include <rave/VertexFactory.h>
-#include <rave/KinematicTreeFactory.h>
+namespace rave {
+  class KinematicTreeFactory;
+  class VertexFactory;
+}
 
 namespace Belle2 {
 

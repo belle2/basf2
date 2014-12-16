@@ -11,12 +11,11 @@
 #ifndef PARTICLELIST_H
 #define PARTICLELIST_H
 
+#include <analysis/dataobjects/Particle.h>
+
 #include <TObject.h>
 #include <vector>
 
-#include <analysis/dataobjects/Particle.h>
-
-#include <iostream>
 
 namespace Belle2 {
 

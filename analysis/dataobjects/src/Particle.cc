@@ -22,6 +22,7 @@
 
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>
+#include <TMatrixFSym.h>
 
 #include <iostream>
 #include <iomanip>

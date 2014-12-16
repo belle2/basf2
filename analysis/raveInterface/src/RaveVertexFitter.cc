@@ -16,6 +16,8 @@
 #include <genfit/GFRaveVertexFactory.h>
 #include <genfit/RKTrackRep.h>
 
+#include <rave/VertexFactory.h>
+
 //root
 #include <Math/ProbFunc.h>
 //stl

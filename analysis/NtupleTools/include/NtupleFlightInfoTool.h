@@ -14,6 +14,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TTree.h>
+#include <TMatrixFSym.h>
 #include <string>
 #include <utility>
 

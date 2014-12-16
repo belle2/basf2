@@ -11,6 +11,7 @@
 #include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/RootMergeable.h>
 
 #include <TMVA/Factory.h>
 #include <TMVA/Tools.h>
@@ -21,6 +22,7 @@
 #include <TSystem.h>
 
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <boost/version.hpp>
 
 #include <sstream>

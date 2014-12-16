@@ -13,9 +13,8 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/pcore/RootMergeable.h>
 
-#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
 
 #include <vector>
 #include <string>
@@ -27,6 +26,7 @@ class TTree;
 namespace Belle2 {
 
   class Particle;
+  template <class T> class RootMergeable;
 
   namespace TMVAInterface {
 

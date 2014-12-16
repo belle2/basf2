@@ -11,14 +11,13 @@
 
 #include <analysis/VariableManager/Manager.h>
 
-#include <TMVA/Reader.h>
-
-#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
 
 #include <vector>
 #include <string>
 #include <map>
 #include <memory>
+namespace TMVA { class Reader; }
 
 namespace Belle2 {
   class Particle;

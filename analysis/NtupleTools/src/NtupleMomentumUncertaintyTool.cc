@@ -10,6 +10,7 @@
 
 #include <analysis/NtupleTools/NtupleMomentumUncertaintyTool.h>
 #include <TBranch.h>
+#include <TMatrixFSym.h>
 
 using namespace Belle2;
 using namespace std;

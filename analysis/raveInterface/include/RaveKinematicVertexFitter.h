@@ -21,10 +21,8 @@
 
 //root
 #include <TMatrixFSym.h>
-//Genfit
-#include <genfit/Track.h>
-#include <genfit/GFRaveVertex.h>
 //rave
+#include <rave/Vertex.h>
 #include <rave/Track.h>
 #include <rave/KinematicTree.h>
 

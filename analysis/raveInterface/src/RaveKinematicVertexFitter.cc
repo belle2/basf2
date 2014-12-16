@@ -22,6 +22,7 @@
 #include <rave/KinematicTreeFactory.h>
 #include <rave/KinematicConstraint.h>
 #include <rave/KinematicConstraintBuilder.h>
+#include <rave/VertexFactory.h>
 
 
 //#include <analysis/dataobjects/Particle.h>

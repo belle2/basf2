@@ -16,7 +16,7 @@
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
-#include <TMatrixFSym.h>
+#include <TMatrixFSymfwd.h>
 
 #include <vector>
 

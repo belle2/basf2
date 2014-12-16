@@ -13,6 +13,7 @@
 #include <cmath>
 #include <TBranch.h>
 #include <TLorentzVector.h>
+#include <TMatrixFSym.h>
 #include <TVector3.h>
 
 using namespace Belle2;

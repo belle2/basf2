@@ -88,7 +88,9 @@ namespace Belle2 {
       EXPECT_FALSE(B2Vector3<bool>(testB2Vector3D).Z());
     }
 
-    /** Test getter and setter of the B2Vector3
+
+
+    /** Test access and manipulating coordinates of the B2Vector3
     */
     TEST_F(B2Vector3Test, testGetterSetter)
     {
@@ -124,6 +126,41 @@ namespace Belle2 {
       EXPECT_B2FATAL(testXYZ(-1));
 
       EXPECT_B2FATAL(testXYZ[-1]);
+    }
+
+
+
+    /** Test operators of the B2Vector3
+    */
+    TEST_F(B2Vector3Test, testOperators)
+    {
+      //test assignment and comparison and convertibility to TVector3:
+      TVector3 tVecA(1. / 3., 23., 42.);
+      B2Vector3D vecA(tVecA.X(), tVecA.Y(), tVecA.Z());
+      B2Vector3D vecB(vecA);
+      B2Vector3D vecC = vecA;
+      B2Vector3D vecD(tVecA);
+      TVector3 tVecB(vecA);
+
+      EXPECT_EQ(vecA, vecB);
+      EXPECT_EQ(vecA, vecC);
+      EXPECT_EQ(vecA, vecD);
+      EXPECT_EQ(vecA, tVecA);
+      EXPECT_EQ(vecD, tVecA);
+      EXPECT_EQ(tVecA, vecA);
+      EXPECT_EQ(tVecA, vecD);
+      EXPECT_EQ(tVecA, tVecB);
+
+      vecD.SetZ(3.14);
+      EXPECT_NE(vecA, vecD);
+
+      vecD.SetXYZ(vecA); // reset
+
+// //     EXPECT_DOUBLE_EQ( 2.* vecA, vecA + vecA);
+// //     EXPECT_DOUBLE_EQ( vecA * 2., vecA + vecA);
+// //     EXPECT_DOUBLE_EQ( tVecA + tVecA, vecA + vecA);
+      EXPECT_DOUBLE_EQ(tVecA * tVecA, vecA * vecA);
+
     }
   }  // namespace B2Vector3Tests
 

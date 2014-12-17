@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import math
 import itertools
 import collections
 import array
@@ -13,6 +14,90 @@ import logging
 
 def get_logger():
     return logging.getLogger(__name__)
+
+
+def iqr(array_like):
+    """Computes the interquantile range, hence the distance from the 25% to 75% quantile."""
+
+    return np.percentile(array_like, 75) - np.percentile(array_like, 25)
+
+
+normal_iqr_to_std_factor = 2.0 * math.sqrt(2.0) * math.erf(0.5)
+
+
+def trimmed_std(array_like):
+    """A trimmed estimate for the standard deviation of a normal distribution 
+    contaminated by outliers using the interquanitle range times the appropriate factor.
+    """
+
+    return normal_iqr_to_std_factor * iqr(array_like)
+
+
+def truncated_mean(array_like, r=0.23):
+    """Calculates the truncated mean, where 2r is the fraction of data to be taken into account. 
+
+    The truncated mean is a robust estimator for the central value of a symmetric distribution.
+    The (1-r) upper and the (1-r) lower values are left out and only the central remaining 2r fraction enters 
+    the normal calculation of the mean. The default value of r is the text book value, which produces an approximatelly
+    82%-efficient estimate of the mean for normal, central value of the cauchy and the double-exponential 
+    distribution.
+    """
+
+    truncation = 1 - 2 * r
+
+    if truncation >= 1 or truncation <= 0:
+        raise ValueError('Value of r must be between 0 and 0.5')
+
+    array = np.array(array_like)
+
+    lower_percentile = 100 * truncation / 2.0
+    upper_percentile = 100 * (1.0 - truncation / 2.0)
+
+    (lower_bound, upper_bound) = np.percentile(array, (lower_percentile,
+            upper_percentile))
+
+    weights = (array >= lower_bound) & (array <= upper_bound)
+
+    truncated_array = array[weights]
+
+    return np.mean(truncated_array)
+
+
+units_by_quantity_name = {
+    'pt': 'GeV',
+    'p_{t}': 'GeV',
+    'd0': 'cm',
+    'd_{0}': 'cm',
+    'phi0': None,
+    '#phi_{0}': None,
+    'omega': '1/cm',
+    '#omega': '1/cm',
+    'z0': 'cm',
+    'z_{0}': 'cm',
+    'tan_lambda': None,
+    'tan #lambda': None,
+    }
+
+
+def compose_axis_label(quantity_name, unit=None):
+    if unit is None:
+        unit = units_by_quantity_name.get(quantity_name, None)
+
+    if unit is None:
+        axis_label = quantity_name
+    else:
+        axis_label = '%s (%s)' % (quantity_name, unit)
+
+    return axis_label
+
+
+def root_save_name(name):
+    """Strips all meta characters that might be unsafe to use as a ROOT name"""
+
+    deletechars = r"/$\#{}"
+    name = name.replace(' ', '_').replace('-', '_').translate(None,
+            deletechars)
+    return name
 
 
 class ValidationPlot(object):
@@ -40,7 +125,8 @@ class ValidationPlot(object):
     @staticmethod
     def is_binary(xs):
         is_boolean = all(isinstance(x, bool) for x in xs)
-        is_one_or_zero = all(x == 0 or x == 1 for x in xs)
+        is_one_or_zero = all(x == 0 or x == 1 or not np.isfinite(x) for x in
+                             xs)
         return is_boolean or is_one_or_zero
 
     @classmethod
@@ -50,7 +136,7 @@ class ValidationPlot(object):
         bins=None,
         lower_bound=None,
         upper_bound=None,
-        trim=False,
+        outlier_z_score=None,
         ):
 
         # Coerce values to a numpy array. Do not copy if already a numpy array.
@@ -75,17 +161,36 @@ class ValidationPlot(object):
             if bins is None:
                 n_bins = 2
             else:
-
                 n_bins = int(bins) or 1
         else:
+
             finite_indices = np.isfinite(xs)
+
+            if outlier_z_score is not None and (lower_bound is None
+                    or upper_bound is None):
+                # Prepare for the estimation of outliers
+                x_mean = truncated_mean(xs)
+                x_std = trimmed_std(xs)
+
             if lower_bound is None:
                 lower_bound = np.min(xs[finite_indices])
 
+                # Clip the lower bound by outliers that exceed the given z score
+                if outlier_z_score is not None:
+                    outlier_lower_bound = x_mean - outlier_z_score * x_std
+                    if outlier_lower_bound > lower_bound:
+                        lower_bound = outlier_lower_bound
+
             if upper_bound is None:
                 upper_bound = np.max(xs[finite_indices])
-                ## Correct the upper bound such that all values are strictly smaller than the upper bound
+                # Correct the upper bound such that all values are strictly smaller than the upper bound
                 upper_bound = np.nextafter(upper_bound, np.inf)
+
+                # Clip the upper bound by outliers that exceed the given z score
+                if outlier_z_score is not None:
+                    outlier_upper_bound = x_mean + outlier_z_score * x_std
+                    if outlier_upper_bound < upper_bound:
+                        upper_bound = outlier_upper_bound
 
             if bins is None:
                 # Assume number of bins according to the rice rule
@@ -97,11 +202,16 @@ class ValidationPlot(object):
                 n_bins = int(bins) or 1
 
         n_bin_edges = n_bins + 1
-        bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
+        if lower_bound != upper_bound:
+            bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
 
-        # Reinforce the upper and lower bound to be exact
-        bin_edges[0] = lower_bound
-        bin_edges[-1] = upper_bound
+            # Reinforce the upper and lower bound to be exact
+            bin_edges[0] = lower_bound
+            bin_edges[-1] = upper_bound
+        else:
+
+            # Fall back if the array contains only one value
+            bin_edges = [lower_bound, upper_bound + 1]
 
         # Construct a float array forwardable to root.
         bin_edges = array.array('f', bin_edges)
@@ -128,7 +238,7 @@ class ValidationPlot(object):
         bins=None,
         lower_bound=None,
         upper_bound=None,
-        trim=False,
+        outlier_z_score=None,
         ):
 
         name = self.name
@@ -139,7 +249,8 @@ class ValidationPlot(object):
             weights = np.array(weights, copy=False)
 
         bin_edges = self.determine_bin_edges(xs, bins=bins,
-                lower_bound=lower_bound, upper_bound=upper_bound, trim=trim)
+                lower_bound=lower_bound, upper_bound=upper_bound,
+                outlier_z_score=outlier_z_score)
 
         n_bins = len(bin_edges) - 1
         histogram = ROOT.TH1F(name, '', n_bins, bin_edges)
@@ -162,6 +273,7 @@ class ValidationPlot(object):
             self.ylabel = 'Count'
 
         self.attach_attributes()
+        return self
 
     def profile(
         self,
@@ -171,7 +283,7 @@ class ValidationPlot(object):
         bins=None,
         lower_bound=None,
         upper_bound=None,
-        trim=False,
+        outlier_z_score=None,
         ):
 
         name = self.name
@@ -183,7 +295,8 @@ class ValidationPlot(object):
             weights = np.array(weights, copy=False)
 
         bin_edges = self.determine_bin_edges(xs, bins=bins,
-                lower_bound=lower_bound, upper_bound=upper_bound, trim=trim)
+                lower_bound=lower_bound, upper_bound=upper_bound,
+                outlier_z_score=outlier_z_score)
 
         # Use determine bins to find the lower and upper bound with correct handling of nan and inf
         (y_lower_bound, y_upper_bound) = self.determine_bin_edges(ys, bins=1)
@@ -217,17 +330,20 @@ class ValidationPlot(object):
             self.ylabel = 'Probability'
 
         self.attach_attributes()
+        return self
 
     def scatter(
         self,
         xs,
         ys,
-        weights,
+        weights=None,
         bins=(None, None),
         lower_bound=(None, None),
-        upper_bounds=(None, None),
-        trim=(False, False),
+        upper_bound=(None, None),
+        outlier_z_score=(None, None),
         ):
+
+        name = self.name
 
         try:
             if len(bins) == 2:
@@ -251,19 +367,19 @@ class ValidationPlot(object):
             y_upper_bound = upper_bound
 
         try:
-            if len(trim) == 2:
-                (x_trim, y_trim) = trim
+            if len(outlier_z_score) == 2:
+                (x_outlier_z_score, y_outlier_z_score) = outlier_z_score
         except TypeError:
-            x_trim = trim
-            y_trim = trim
+            x_outlier_z_score = outlier_z_score
+            y_outlier_z_score = outlier_z_score
 
         x_bin_edges = self.determine_bin_edges(xs, bins=x_bins,
                 lower_bound=x_lower_bound, upper_bound=x_upper_bound,
-                trim=x_trim)
+                outlier_z_score=x_outlier_z_score)
 
         y_bin_edges = self.determine_bin_edges(ys, bins=y_bins,
                 lower_bound=y_lower_bound, upper_bound=y_upper_bound,
-                trim=y_trim)
+                outlier_z_score=y_outlier_z_score)
 
         n_x_bins = len(x_bin_edges) - 1
         n_y_bins = len(y_bin_edges) - 1
@@ -295,6 +411,8 @@ class ValidationPlot(object):
 
         # Add description, check, contact and titles to the histogram
         self.attach_attributes()
+
+        return self
 
     def add_nan_inf_stats(self, name, values):
         n_nans = np.isnan(values).sum()
@@ -335,7 +453,7 @@ class ValidationPlot(object):
         return self._title
 
     @title.setter
-    def _(self, title):
+    def title(self, title):
         self._title = title
         if self.histogram is not None:
             self.histogram.SetTitle(title)
@@ -574,7 +692,7 @@ class ValidationPlot(object):
         self.fit('[0]', 'M')
 
     def fit_diag(self):
-        self.fit('x', 'M')
+        self.fit('[0]*x', 'M')
 
 
 def test():

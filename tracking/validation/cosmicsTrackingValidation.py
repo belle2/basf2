@@ -9,7 +9,7 @@
 </header>
 """
 
-VALIDATION_OUTPUT_FILE = 'cosmicsTrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'CosmicsTrackingValidation.root'
 CONTACT = 'oliver.frost@desy.de'
 N_EVENTS = 10000
 
@@ -24,9 +24,12 @@ import logging
 import collections
 
 import numpy as np
+import math
 
 import simulation
-from cdclocaltracking.validation.plot import ValidationPlot
+from cdclocaltracking.validation.plot import ValidationPlot, root_save_name, \
+    compose_axis_label
+from cdclocaltracking.validation.pull import PullAnalysis
 
 import ROOT
 from ROOT import Belle2
@@ -50,6 +53,10 @@ def main():
 
     argument_parser.add_argument('-p', '--pulls', action='store_true',
                                  help='Plot pulls of the curvature.')
+
+    argument_parser.add_argument('-s', '--show', action='store_true',
+                                 help='Show generated plots in a TBrowser immediatly.'
+                                 )
 
     arguments = argument_parser.parse_args()
 
@@ -127,6 +134,17 @@ def main():
     basf2.process(main_path)
     print basf2.statistics
 
+    # Show plots #
+    ##############
+    if arguments.show:
+        output_file_name = trackingValidationModule.output_file_name
+        tFile = ROOT.TFile(output_file_name)
+        tBrowser = ROOT.TBrowser()
+        tBrowser.BrowseObject(tFile)
+        tBrowser.Show()
+        raw_input('Press enter to close.')
+        tFile.Close()
+
 
 # Analysis module #
 ###################
@@ -157,99 +175,115 @@ class TrackingValidationModule(basf2.Module):
         # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
         self.pr_clones_and_matches = collections.deque()
         self.pr_matches = collections.deque()
-        self.pr_seen_in_vxds = collections.deque()
-        self.pr_fitted_omegas = collections.deque()
-        self.pr_true_omegas = collections.deque()
 
-        self.mc_transverse_momenta = collections.deque()
+        self.pr_omega_truths = collections.deque()
+        self.pr_omega_estimates = collections.deque()
+        self.pr_omega_variances = collections.deque()
+
+        self.pr_tan_lambda_truths = collections.deque()
+        self.pr_tan_lambda_estimates = collections.deque()
+        self.pr_tan_lambda_variances = collections.deque()
+
         self.mc_matches = collections.deque()
         self.mc_d0s = collections.deque()
-        self.mc_cos_thetas = collections.deque()
-        self.mc_pt = collections.deque()
+        self.mc_tan_lambdas = collections.deque()
+        self.mc_pts = collections.deque()
         self.mc_hit_efficiencies = collections.deque()
+        self.mc_multiplicities = collections.deque()
 
     def event(self):
         """Event method"""
 
-        trackMatchLookUp = self.trackMatchLookUp
+        self.examine_pr_tracks()
+        self.examine_mc_tracks()
+
+    def examine_pr_tracks(self):
+        """Looks at the individual pattern recognition tracks and store information about them"""
 
         # Analyse from the pattern recognition side
+        trackMatchLookUp = self.trackMatchLookUp
+
         trackCands = Belle2.PyStoreArray('TrackCands')
-        if trackCands:
-            # print 'Number of pattern recognition tracks', \
-            #    trackCands.getEntries()
+        if not trackCands:
+            return
 
-            for trackCand in trackCands:
-                is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
-                is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
+        for trackCand in trackCands:
+            is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
+            is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
 
-                if self.fit:
-                    prTrackFitResult = \
-                        trackMatchLookUp.getRelatedTrackFitResult(trackCand)
-                else:
-                    prTrackFitResult = getSeedTrackFitResult(trackCand)
+            if self.fit:
+                prTrackFitResult = \
+                    trackMatchLookUp.getRelatedTrackFitResult(trackCand)
+            else:
+                prTrackFitResult = getSeedTrackFitResult(trackCand)
 
-                fitted_omega = float('nan')
-                if prTrackFitResult != None:
-                    fitted_omega = prTrackFitResult.getOmega()
+            omega_estimate = float('nan')
+            omega_variance = float('nan')
+            tan_lambda_estimate = float('nan')
+            tan_lambda_variance = float('nan')
 
-                seen_in_vxd = False
-                true_omega = float('nan')
-                if is_matched or is_clone:
-                    # Only matched and clone tracks have a related MCParticle
-                    mcParticle = \
-                        trackMatchLookUp.getRelatedMCParticle(trackCand)
-                    mcTrackFitResult = \
-                        getTrackFitResultFromMCParticle(mcParticle)
-                    true_omega = mcTrackFitResult.getOmega()
+            if prTrackFitResult != None:
+                omega_estimate = prTrackFitResult.getOmega()
+                omega_variance = prTrackFitResult.getCov()[9]
 
-                    if mcParticle:
-                        seenInDetector = mcParticle.getSeenInDetector()
+                tan_lambda_estimate = prTrackFitResult.getCotTheta()
+                tan_lambda_variance = prTrackFitResult.getCov()[14]
 
-                        pxd_detector_set = \
-                            Belle2.Const.DetectorSet(Belle2.Const.PXD)
-                        svd_detector_set = \
-                            Belle2.Const.DetectorSet(Belle2.Const.SVD)
+            omega_truth = float('nan')
+            tan_lambda_truth = float('nan')
+            if is_matched or is_clone:
+                # Only matched and clone tracks have a related MCParticle
+                mcParticle = trackMatchLookUp.getRelatedMCParticle(trackCand)
+                mcHelix = getHelixFromMCParticle(mcParticle)
+                omega_truth = mcHelix.getOmega()
+                tan_lambda_truth = tan_lambda_truth
 
-                        seen_in_pxd = seenInDetector.contains(pxd_detector_set)
-                        seen_in_svd = seenInDetector.contains(svd_detector_set)
-                        seen_in_vxd = seen_in_pxd | seen_in_vxd
+            self.pr_clones_and_matches.append(is_matched or is_clone)
+            self.pr_matches.append(is_matched)
 
-                self.pr_clones_and_matches.append(is_matched or is_clone)
-                self.pr_matches.append(is_matched)
-                self.pr_seen_in_vxds.append(seen_in_vxd)
+            self.pr_omega_estimates.append(omega_estimate)
+            self.pr_omega_variances.append(omega_variance)
+            self.pr_omega_truths.append(omega_truth)
 
-                self.pr_fitted_omegas.append(fitted_omega)
-                self.pr_true_omegas.append(true_omega)
+            self.pr_tan_lambda_estimates.append(tan_lambda_estimate)
+            self.pr_tan_lambda_variances.append(tan_lambda_variance)
+            self.pr_tan_lambda_truths.append(tan_lambda_truth)
 
-        # Analyse from the Monte carlo reference side
+    def examine_mc_tracks(self):
+        """Looks at the individual Monte Carlo tracks and store information about them"""
+
+        trackMatchLookUp = self.trackMatchLookUp
+
+        # Analyse from the Monte Carlo reference side
         mcTrackCands = Belle2.PyStoreArray('MCTrackCands')
-        if trackCands:
-            # print 'Number of Monte Carlo tracks', mcTrackCands.getEntries()
+        if not mcTrackCands:
+            return
 
-            for mcTrackCand in mcTrackCands:
-                is_matched = trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand)
+        multiplicity = mcTrackCands.getEntries()
 
-                hit_efficiency = \
-                    trackMatchLookUp.getRelatedEfficiency(mcTrackCand)
-                if np.isnan(hit_efficiency):
-                    hit_efficiency = 0
+        for mcTrackCand in mcTrackCands:
+            is_matched = trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand)
 
-                mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
-                mcTrackFitResult = getTrackFitResultFromMCParticle(mcParticle)
+            hit_efficiency = trackMatchLookUp.getRelatedEfficiency(mcTrackCand)
 
-                momentum = mcParticle.getMomentum()
-                transverse_momentum = momentum.Perp()
-                cos_theta = momentum.CosTheta()
-                d0 = mcTrackFitResult.getD0()
+            mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
+            mcHelix = getHelixFromMCParticle(mcParticle)
 
-                self.mc_matches.append(is_matched)
-                self.mc_hit_efficiencies.append(hit_efficiency)
-                self.mc_transverse_momenta.append(transverse_momentum)
-                self.mc_d0s.append(d0)
-                self.mc_cos_thetas.append(cos_theta)
+            momentum = mcParticle.getMomentum()
+            pt = momentum.Perp()
+            tan_lambda = 1 / math.tan(momentum.Theta())
+            d0 = mcHelix.getD0()
+
+            self.mc_matches.append(is_matched)
+            self.mc_hit_efficiencies.append(hit_efficiency)
+            self.mc_pts.append(pt)
+            self.mc_d0s.append(d0)
+            self.mc_tan_lambdas.append(tan_lambda)
+            self.mc_multiplicities.append(multiplicity)
 
     def terminate(self):
+        name = self.name
+
         # Overall figures of merit #
         ############################
         track_finding_efficiency = np.mean(self.mc_matches)
@@ -258,250 +292,157 @@ class TrackingValidationModule(basf2.Module):
                                       weights=self.pr_clones_and_matches)
         hit_efficiency = np.mean(self.mc_hit_efficiencies)
 
-        cosmics_figures_of_merit = \
-            ValidationFiguresOfMerit('%s_figures_of_merit' % self.name)
-        cosmics_figures_of_merit['finding_efficiency'] = \
-            track_finding_efficiency
-        cosmics_figures_of_merit['fake_rate'] = fake_rate
-        cosmics_figures_of_merit['clone_rate'] = clone_rate
-        cosmics_figures_of_merit['hit_efficiency'] = hit_efficiency
+        figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
+                % name)
+        figures_of_merit['finding_efficiency'] = track_finding_efficiency
+        figures_of_merit['fake_rate'] = fake_rate
+        figures_of_merit['clone_rate'] = clone_rate
+        figures_of_merit['hit_efficiency'] = hit_efficiency
 
-        cosmics_figures_of_merit.description = \
+        figures_of_merit.description = \
             """
 finding_efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks <br/>
 fake_rate - ratio of pattern recognition tracks that are not related to a particle (background, ghost) to all pattern recognition tracks <br/>
 clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches) <br/>
 """
-        cosmics_figures_of_merit.check = ''
-        cosmics_figures_of_merit.contact = CONTACT
-
-        print cosmics_figures_of_merit
+        figures_of_merit.check = ''
+        figures_of_merit.contact = CONTACT
+        print figures_of_merit
 
         # Validation plots #
         ####################
         validation_plots = []
 
-        # Track finding efficiency over the true transverse momentum profile
-        finding_efficiency_by_pt = ValidationPlot('%s_finding_efficiency_by_pt'
-                 % self.name)
+        # Finding efficiency #
+        ######################
+        plots = self.profiles_by_mc_parameters(self.mc_matches,
+                'finding efficiency', make_hist=False)
+        validation_plots.extend(plots)
 
-        finding_efficiency_by_pt.profile(self.mc_transverse_momenta,
-                self.mc_matches, bins=50)
+        # Hit efficiency #
+        ##################
+        plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
+                'hit efficiency')
+        validation_plots.extend(plots)
 
-        finding_efficiency_by_pt.xlabel = 'Momentum (GeV)'
-        finding_efficiency_by_pt.ylabel = 'Efficiency'
-        finding_efficiency_by_pt.description = 'Not a serious plot yet.'
-        finding_efficiency_by_pt.check = ''
-        finding_efficiency_by_pt.contact = CONTACT
-
-        validation_plots.append(finding_efficiency_by_pt)
-
-        # A tryout d0 parameter plot, yet using the seen in vxd as an d0 parameter.
-        clone_rate_by_d0 = ValidationPlot('%s_clone_rate_by_seen_in_vxd'
-                % self.name)
-
-        pr_matches = np.array(self.pr_matches)
-        clone_rate_by_d0.fill(self.pr_seen_in_vxds, ~pr_matches,
-                              weights=self.pr_clones_and_matches)
-
-        clone_rate_by_d0.xlabel = 'Seen in vxd (bool)'
-        clone_rate_by_d0.ylabel = 'Clone rate'
-
-        clone_rate_by_d0.description = 'Not a serious plot yet.'
-        clone_rate_by_d0.check = ''
-        clone_rate_by_d0.contact = CONTACT
-        # validation_plots.append(clone_rate_by_d0)
-
-        # Finding efficiency by d0 parameter
-        finding_efficiency_by_d0 = ValidationPlot('%s_finding_efficiency_by_d0'
-                 % self.name)
-        finding_efficiency_by_d0.fill(self.mc_d0s, self.mc_matches, bins=50)
-
-        finding_efficiency_by_d0.xlabel = 'D0 (cm)'
-        finding_efficiency_by_d0.ylabel = 'Finding efficiency'
-
-        finding_efficiency_by_d0.description = 'Not a serious plot yet.'
-        finding_efficiency_by_d0.check = ''
-        finding_efficiency_by_d0.contact = CONTACT
-
-        validation_plots.append(finding_efficiency_by_d0)
-
-        # Finding efficiency by cos theta
-        finding_efficiency_by_cos_theta = \
-            ValidationPlot('%s_finding_efficiency_by_cos_theta' % self.name)
-
-        finding_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
-                self.mc_matches, bins=50)
-
-        finding_efficiency_by_cos_theta.xlabel = 'cos #theta'
-        finding_efficiency_by_cos_theta.ylabel = 'Finding efficiency'
-
-        finding_efficiency_by_cos_theta.description = 'Not a serious plot yet.'
-        finding_efficiency_by_cos_theta.check = ''
-        finding_efficiency_by_cos_theta.contact = CONTACT
-
-        validation_plots.append(finding_efficiency_by_cos_theta)
-
-        # Histogram of the hit efficiency
-        hit_efficiency_histogram = ValidationPlot('%s_hit_efficiency'
-                % self.name)
-        hit_efficiency_histogram.fill(self.mc_hit_efficiencies, bins=50)
-
-        hit_efficiency_histogram.xlabel = 'Hit efficiency'
-        hit_efficiency_histogram.description = 'Not a serious plot yet.'
-        hit_efficiency_histogram.check = ''
-        hit_efficiency_histogram.contact = CONTACT
-
-        validation_plots.append(hit_efficiency_histogram)
-
-        # Hit efficiency by d0 parameter
-        hit_efficiency_by_d0 = ValidationPlot('%s_hit_efficiency_by_d0'
-                % self.name)
-
-        hit_efficiency_by_d0.fill(self.mc_d0s, self.mc_hit_efficiencies,
-                                  bins=50)
-
-        hit_efficiency_by_d0.xlabel = 'D0 (cm)'
-        hit_efficiency_by_d0.ylabel = 'Hit efficiency'
-
-        hit_efficiency_by_d0.description = 'Not a serious plot yet.'
-        hit_efficiency_by_d0.check = ''
-        hit_efficiency_by_d0.contact = CONTACT
-
-        validation_plots.append(hit_efficiency_by_d0)
-
-        # Hit efficiency by cos_theta parameter
-        hit_efficiency_by_cos_theta = \
-            ValidationPlot('%s_hit_efficiency_by_cos_theta' % self.name)
-
-        hit_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
-                self.mc_hit_efficiencies, bins=50)
-
-        hit_efficiency_by_cos_theta.xlabel = 'cos #theta'
-        hit_efficiency_by_cos_theta.ylabel = 'Hit efficiency'
-
-        hit_efficiency_by_cos_theta.description = 'Not a serious plot yet.'
-        hit_efficiency_by_cos_theta.check = ''
-        hit_efficiency_by_cos_theta.contact = CONTACT
-
-        validation_plots.append(hit_efficiency_by_cos_theta)
-
-        # Omega / curvature residuals
+        # Fit quality #
+        ###############
         if self.pulls:
-            pr_fitted_omegas = np.array(self.pr_fitted_omegas)
-            pr_failed_fits = np.isnan(pr_fitted_omegas)
-            pr_true_omegas = np.array(self.pr_true_omegas)
-            pr_no_true_omega = np.isnan(pr_true_omegas)
-            pr_omega_residuals = pr_fitted_omegas - pr_true_omegas
+            plot_name_prefix = name
+            if not self.fit:
+                plot_name_prefix += '_seed'
 
-            # print 'Number of failed fits', np.sum(pr_failed_fits)
-            # import matplotlib.pyplot as plt
-            # plt.figure()
-            # plt.hist(pr_fitted_omegas[~pr_failed_fits])
-            # plt.show()
+            # Omega / curvature pull
+            pr_omega_truths = np.array(self.pr_omega_truths)
+            pr_omega_estimates = np.array(self.pr_omega_estimates)
+            pr_omega_variances = np.array(self.pr_omega_variances)
 
-            # print 'Number of no true omegas', np.sum(pr_no_true_omega)
-            # plt.figure()
-            # plt.hist(pr_true_omegas[~pr_no_true_omega])
-            # plt.show()
+            curvature_pull_analysis = PullAnalysis('#omega', unit='1/cm',
+                    plot_name_prefix=plot_name_prefix + '_omega')
+            curvature_pull_analysis.analyse(pr_omega_truths,
+                    pr_omega_estimates, pr_omega_variances)
+            curvature_pull_analysis.contact = CONTACT
+            validation_plots.append(curvature_pull_analysis)
 
-            # Truths
-            true_omegas_histogram = ValidationPlot('%s_true_omegas'
-                    % self.name)
-            true_omegas_histogram.fill(pr_true_omegas[~pr_no_true_omega],
-                                       bins=50)
+            # Tan lambda pull
+            pr_tan_lambda_truths = np.array(self.pr_tan_lambda_truths)
+            pr_tan_lambda_estimates = np.array(self.pr_tan_lambda_estimates)
+            pr_tan_lambda_variances = np.array(self.pr_tan_lambda_variances)
 
-            true_omegas_histogram.xlabel = 'True omega (1/cm)'
+            curvature_pull_analysis = PullAnalysis('tan #lambda',
+                    plot_name_prefix=plot_name_prefix + '_tan_lambda')
+            curvature_pull_analysis.analyse(pr_tan_lambda_truths,
+                    pr_tan_lambda_estimates, pr_tan_lambda_variances)
+            curvature_pull_analysis.contact = CONTACT
+            validation_plots.append(curvature_pull_analysis)
 
-            true_omegas_histogram.description = \
-                'True omega value of the track. Not a serious plot yet.'
-            true_omegas_histogram.check = ''
-            true_omegas_histogram.contact = CONTACT
+            # TODO
+            # pulls for the vertex residuals
+            # push pull analysis to seperate TDirectory and only forward highlights to the top level
+            # Profile variances versus parameters
 
-            validation_plots.append(true_omegas_histogram)
-
-            # Fitted
-            fitted_omegas_histogram = ValidationPlot('%s_fitted_omegas'
-                    % self.name)
-            fitted_omegas_histogram.fill(pr_fitted_omegas[~pr_failed_fits],
-                    bins=50)
-
-            fitted_omegas_histogram.xlabel = 'Fitted omega (1/cm)'
-
-            fitted_omegas_histogram.description = \
-                'Fitted omega value, for now it is the seed value of the TrackCand, which has not enough sensitivity as is shown below. Not a serious plot yet.'
-            fitted_omegas_histogram.check = ''
-            fitted_omegas_histogram.contact = CONTACT
-
-            validation_plots.append(fitted_omegas_histogram)
-
-            # Residuals
-            omega_residuals_histogram = ValidationPlot('%s_omega_residuals'
-                    % self.name)
-            omega_residuals_histogram.fill(pr_omega_residuals[~pr_failed_fits
-                    & ~pr_no_true_omega], bins=50)
-
-            omega_residuals_histogram.xlabel = 'Omega residuals (1/cm)'
-
-            omega_residuals_histogram.description = 'Not a serious plot yet.'
-            omega_residuals_histogram.check = ''
-            omega_residuals_histogram.contact = CONTACT
-
-            validation_plots.append(omega_residuals_histogram)
-
-            # Diagonal plot
-            fitted_omegas_by_true_omegas = \
-                ValidationPlot('%s_fitted_omegas_by_true_omegas' % self.name)
-            fitted_omegas_by_true_omegas.fill(pr_true_omegas[~pr_failed_fits
-                    & ~pr_no_true_omega], pr_fitted_omegas[~pr_failed_fits
-                    & ~pr_no_true_omega], bins=50)
-
-            fitted_omegas_by_true_omegas.xlabel = 'True omega (1/cm)'
-            fitted_omegas_by_true_omegas.ylabel = 'Fitted omega (1/cm)'
-
-            fitted_omegas_by_true_omegas.description = \
-                'Displays the seed values of the TrackCand. Sensitivity for Not a serious plot yet.'
-            fitted_omegas_by_true_omegas.check = 'Should be a diagonal plot'
-            fitted_omegas_by_true_omegas.contact = CONTACT
-
-            validation_plots.append(fitted_omegas_by_true_omegas)
+        # Saving #
+        ##########
 
         # Save everything to a ROOT file
         output_file = ROOT.TFile(self.output_file_name, 'recreate')
 
-        cosmics_figures_of_merit.write()
+        # Show all parameters and the fit result in the plots
+        # if viewed in the browser or the validation
+        opt_fit = 0112
+        ROOT.gStyle.SetOptFit(opt_fit)
+
+        figures_of_merit.write()
 
         for validation_plot in validation_plots:
             validation_plot.write()
 
         output_file.Close()
 
+    def profiles_by_mc_parameters(
+        self,
+        xs,
+        quantity_name,
+        unit=None,
+        parameter_names=['d_0', 'p_t', 'tan_lambda', 'multiplicity'],
+        make_hist=True,
+        ):
 
-def getTrackFitResultFromMCParticle(mcParticle):
+        validation_plots = []
+        plot_name_prefix = self.name + '_' + root_save_name(quantity_name)
+
+        if make_hist:
+            # Histogram of the quantity
+            histogram = ValidationPlot(plot_name_prefix)
+            histogram.hist(xs)
+
+            histogram.xlabel = quantity_name
+            histogram.description = 'Not a serious plot yet.'
+            histogram.check = ''
+            histogram.contact = CONTACT
+
+            validation_plots.append(histogram)
+
+        # Profile versus the various parameters
+        profile_parameters = {
+            'd_{0}': self.mc_d0s,
+            'p_{t}': self.mc_pts,
+            'tan #lambda': self.mc_tan_lambdas,
+            'multiplicity': self.mc_multiplicities,
+            }
+
+        for (parameter_name, parameter_values) in profile_parameters.items():
+            if parameter_name in parameter_names \
+                or root_save_name(parameter_name) in parameter_names:
+
+                profile_plot_name = plot_name_prefix + '_by_' \
+                    + root_save_name(parameter_name)
+                profile_plot = ValidationPlot(profile_plot_name)
+                profile_plot.profile(parameter_values, xs)
+
+                profile_plot.xlabel = compose_axis_label(parameter_name)
+                profile_plot.ylabel = compose_axis_label(quantity_name, unit)
+                profile_plot.title = quantity_name + ' by ' + parameter_name \
+                    + ' profile'
+
+                profile_plot.description = \
+                    'Dependence of %s of the track over the true %s' \
+                    % (quantity_name, parameter_name)
+                profile_plot.check = 'Variations should be low'
+                profile_plot.contact = CONTACT
+                validation_plots.append(profile_plot)
+
+        return validation_plots
+
+
+def getHelixFromMCParticle(mcParticle):
     position = mcParticle.getVertex()
     momentum = mcParticle.getMomentum()
-    cartesian_covariance = ROOT.TMatrixDSym(6)
-    cartesian_covariance.UnitMatrix()
     charge_sign = (-1 if mcParticle.getCharge() < 0 else 1)
-    particle_type = Belle2.Const.ParticleType(mcParticle.getPDG())
-    p_value = float('nan')
     b_field = 1.5
-    cdc_hit_pattern = 0
-    svd_hit_pattern = 0
 
-    track_fit_result = Belle2.TrackFitResult(
-        position,
-        momentum,
-        cartesian_covariance,
-        charge_sign,
-        particle_type,
-        p_value,
-        b_field,
-        cdc_hit_pattern,
-        svd_hit_pattern,
-        )
-
-    return track_fit_result
+    seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
+    return seed_helix
 
 
 def getSeedTrackFitResult(trackCand):
@@ -529,8 +470,6 @@ def getSeedTrackFitResult(trackCand):
 
     return track_fit_result
 
-
-# Standardized generation of validation histograms making the actual validation code more readable
 
 class ValidationFiguresOfMerit(dict):
 

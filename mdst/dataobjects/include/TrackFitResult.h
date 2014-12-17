@@ -71,7 +71,7 @@ namespace Belle2 {
      *  @param particleType  Particle Type used for the mass hypothesis of the fit.
      *  @param pValue        p-value of the fit.
      */
-    TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
+    TrackFitResult(const float tau[5], const float cov5[15],
                    const Const::ParticleType& particleType, const float pValue,
                    const unsigned long hitPatternCDCInitializer, const unsigned short hitPatternVXDInitializer);
 
@@ -127,43 +127,43 @@ namespace Belle2 {
      *
      *  @return
      */
-    float getD0() const { return m_tau.at(0); }
+    float getD0() const { return m_tau[0]; }
 
     /** Getter for phi. This is the angle of the transverse momentum in the r-phi plane.
      *
      *  @return
      */
-    float getPhi() const { return m_tau.at(1); }
+    float getPhi() const { return m_tau[1]; }
 
     /** Getter for omega. This is the curvature of the track. It's sign is defined by the charge of the particle.
      *
      *  @return
      */
-    float getOmega() const { return m_tau.at(2); }
+    float getOmega() const { return m_tau[2]; }
 
     /** Getter for z0. This is the z coordinate of the POCA.
      *
      *  @return
      */
-    float getZ0() const { return m_tau.at(3); }
+    float getZ0() const { return m_tau[3]; }
 
     /** Getter for cotTheta. This is the slope of the track in the r-z plane.
      *
      *  @return
      */
-    float getCotTheta() const { return m_tau.at(4); }
+    float getCotTheta() const { return m_tau[4]; }
 
     /** Getter for all perigee parameters
      *
-     *  @return vector with 5 elements
+     *  @return array with 5 elements
      */
-    std::vector<float> getTau() const { return m_tau; }
+    const float* getTau() const { return m_tau; }
 
     /** Getter for all covariance matrix elements of perigee parameters
      *
-     *  @return vector with 15 elements
+     *  @return array with 15 elements
      */
-    std::vector<float> getCov() const { return m_cov5; }
+    const float* getCov() const { return m_cov5; }
 
     /** Getter for covariance matrix of perigee parameters in matrix form.
      *
@@ -291,13 +291,13 @@ namespace Belle2 {
     const float m_pValue;
 
     /** perigee helix parameters; tau = d0, phi, omega, z0, cotTheta. */
-    std::vector<float> m_tau;
+    float m_tau[5];
 
-    /** covariance matrix elements.
+    /** covariance matrix elements. Only 15 elements are needed because we will only store the upper half of the matrix.
      *
      *  (0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...
      */
-    std::vector<float> m_cov5;
+    float m_cov5[15];
 
     /** Member for initializing the information about hits in the CDC.
      *

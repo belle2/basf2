@@ -1,44 +1,63 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-######################################################## This steering file
-# shows all options for the generation of radiative Bhabha scattering.
+#######################################################
+# This steering file is an example on how to use
+# EclDataAnalysis module.
 #
-# 10000 radiative Bhabha events are generated using the BHWide Fortran
-# generator and some plots are shown at the end.
+# 1000 500 MeV-electrons are generated with ParticleGun
+# and reconstructed. ECL-related infos are dumped on
+# a TTree saved in an output file named
+# EclDataAnalysis_electrons_500mev.root .
 #
-# Example steering file - 2011 Belle II Collaboration
+# Example steering file - 2014 Belle II Collaboration
 ########################################################
 
-import sys
-import math
+import os
 from basf2 import *
+from simulation import add_simulation
+from reconstruction import add_reconstruction
 
-## Create main path
+# Create paths
 main = create_path()
 
-## input
-roiname = sys.argv[1]
-roinput = register_module('RootInput')
-roinput.param('inputFileName', roiname)
-main.add_module(roinput)
+# Event setting and info
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+main.add_module(eventinfosetter)
 
-## Set the global log level
-logging.log_level = LogLevel.WARNING
+# random number for generation
+import random
+intseed = random.randint(1, 10000000)
 
-##
-rooname = sys.argv[2]
+# single particle generator settings
+pGun = register_module('ParticleGun')
+param_pGun = {
+    'pdgCodes': [11],
+    'nTracks': 0,
+    'momentumGeneration': 'fixed',
+    'momentumParams': [0.5],
+    'thetaGeneration': 'uniform',
+    'thetaParams': [40., 120.],
+    'phiGeneration': 'uniform',
+    'phiParams': [0, 360],
+    'vertexGeneration': 'uniform',
+    'xVertexParams': [0.0, 0.0],
+    'yVertexParams': [0.0, 0.0],
+    'zVertexParams': [0.0, 0.0],
+    }
+
+pGun.param(param_pGun)
+main.add_module(pGun)
+
+add_simulation(main)
+add_reconstruction(main)
+
+# eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', rooname)
-ecldataanalysis.param('doTracking', 0)
+ecldataanalysis.param('rootFileName', 'EclDataAnalysis_electrons_500mev.root')
+ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
-## Register the Progress module and the Python histogram module
-# progress = register_module('Progress')
-# main.add_module(paramloader)
 
-##
 process(main)
-
-##
 print statistics
-

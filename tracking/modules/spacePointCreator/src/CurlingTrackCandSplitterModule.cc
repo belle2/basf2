@@ -24,6 +24,10 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
+#include <boost/format.hpp>
+
+#include <algorithm> // sort & unique
+
 using namespace std;
 using namespace Belle2;
 
@@ -131,29 +135,48 @@ void CurlingTrackCandSplitterModule::initialize()
     m_rootFilePtr = new TFile(m_PARAMrootFileName[0].c_str(), m_PARAMrootFileName[1].c_str());
     m_treePtr = new TTree("m_treePtr", "aTree");
 
-    m_treePtr->Branch("SpacePointXGlobal", &m_rootSpacePointXGlobals);
-    m_treePtr->Branch("SpacePointYGlobal", &m_rootSpacePointYGlobals);
-    m_treePtr->Branch("SpacePointZGlobal", &m_rootSpacePointZGlobals);
+    // link everything to the according variables
+    for (int layer = 0; layer < c_nPlanes; ++layer) {
+      string layerString = (boost::format("%1%") % layer).str();
 
-    m_treePtr->Branch("SpacePointULocal", &m_rootSpacePointULocals);
-    m_treePtr->Branch("SpacePointVLocal", &m_rootSpacePointVLocals);
-//     m_treePtr->Branch("SpacePointZLocal", &m_rootSpacePointZLocals);
+      string name = "SpacePointXGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootSpacePointXGlobals.at(layer));
+      name = "SpacePointYGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootSpacePointYGlobals.at(layer));
+      name = "SpacePointZGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootSpacePointZGlobals.at(layer));
 
-    m_treePtr->Branch("TrueHitXGlobal", &m_rootTrueHitXGlobals);
-    m_treePtr->Branch("TrueHitYGlobal", &m_rootTrueHitYGlobals);
-    m_treePtr->Branch("TrueHitZGlobal", &m_rootTrueHitZGlobals);
+      name = "SpacePointULocal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootSpacePointULocals.at(layer));
+      name = "SpacePointVlocal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootSpacePointVLocals.at(layer));
 
-    m_treePtr->Branch("TrueHitULocal", &m_rootTrueHitULocals);
-    m_treePtr->Branch("TrueHitVLocal", &m_rootTrueHitVLocals);
-//     m_treePtr->Branch("TrueHitZLocal", &m_rootTrueHitZLocals);
+      name = "TrueHitXGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootTrueHitXGlobals.at(layer));
+      name = "TrueHitYGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootTrueHitYGlobals.at(layer));
+      name = "TrueHitZGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootTrueHitZGlobals.at(layer));
 
-    m_treePtr->Branch("LocalPosResiduals", &m_rootLocalPosResiduals);
-    m_treePtr->Branch("GlobalPosResiduals", &m_rootGlobalPosResiduals);
+      name = "TrueHitULocal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootTrueHitULocals.at(layer));
+      name = "TrueHitXVLocal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootTrueHitVLocals.at(layer));
 
-    m_treePtr->Branch("MisMatchPosResiduals", &m_rootMisMatchPosDistance);
-    m_treePtr->Branch("MisMatchMomDiffX", &m_rootMisMatchMomX);
-    m_treePtr->Branch("MisMatchMomDiffY", &m_rootMisMatchMomY);
-    m_treePtr->Branch("MisMatchMomDiffZ", &m_rootMisMatchMomZ);
+      name = "LocalPositionResiduals_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootLocalPosResiduals.at(layer));
+      name = "GlobalPositionResiduals_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootGlobalPosResiduals.at(layer));
+
+      name = "MisMatchPosDistance_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchPosDistance.at(layer));
+      name = "MisMatchMomX_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchMomX.at(layer));
+      name = "MisMatchMomY_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchMomY.at(layer));
+      name = "MisMatchMomZ_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchMomZ.at(layer));
+    }
   } else {
     m_rootFilePtr = NULL;
     m_treePtr = NULL;
@@ -251,7 +274,7 @@ void CurlingTrackCandSplitterModule::event()
 // =================================================== TERMINATE ========================================================
 void CurlingTrackCandSplitterModule::terminate()
 {
-  B2INFO("CurlingTrackCandSplitter::terminate(): checked " << m_spacePointTCCtr << " SpacePointTrackCands for curling behaviour. " << m_curlingTCCtr << " of them were curling and " << m_createdTrackStubsCtr << " TrackStubs were created. In " << m_noDecisionPossibleCtr << " no decision could be made.");
+  B2INFO("CurlingTrackCandSplitter::terminate(): checked " << m_spacePointTCCtr << " SpacePointTrackCands for curling behaviour. " << m_curlingTCCtr << " of them were curling and " << m_createdTrackStubsCtr << " TrackStubs were created. In " << m_noDecisionPossibleCtr << " cases no decision could be made.");
 
   // do ROOT file stuff
   if (m_treePtr != NULL) {
@@ -304,24 +327,40 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
         B2WARNING("Found no related clusters for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". With no Cluster no information if a track is curling or not can be obtained");
         throw FoundNoCluster(); // this should also never happen, as the vice versa way is used above to get to the SpacePoints in the first place!!
       } else {
-        // collect the TrueHits (maximum 2), if there is more than one compare them, to see if both Clusters point to the same TrueHit
+        // collect the TrueHits, if there is more than one compare them, to see if both Clusters point to the same TrueHit
         // WARNING there can be more! more than one TrueHit can be 'hidden' in one Cluster!!!
+        // TODO: look at this again, this seems not to work properly at the moment!!!
         std::vector<SVDTrueHit*> svdTrueHits;
         for (const SVDCluster & aCluster : svdClusters) {
           // CAUTION: there can be more than one TrueHit for a given Cluster!!!
-          SVDTrueHit* svdTrueHit = aCluster.getRelatedTo<SVDTrueHit>("ALL"); // COULDDO: search only certain SVDTrueHit arrays -> new parameter for module
-          if (svdTrueHit == NULL) {
+          RelationVector<SVDTrueHit> relTrueHits = aCluster.getRelationsTo<SVDTrueHit>("ALL"); // COULDDO: search only certain SVDTrueHit arrays -> new parameter for module
+          if (relTrueHits.size() == 0) {
             B2WARNING("Found no SVDTrueHit for SVDCluster " << aCluster.getArrayIndex() << " from Array " << aCluster.getArrayName() << ". This SVDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
             throw FoundNoTrueHit();
           }
-          B2DEBUG(100, "Found TrueHit for SVDCluster " << aCluster.getArrayIndex() << " from Array " << aCluster.getArrayName())
-          svdTrueHits.push_back(svdTrueHit);
+
+          B2DEBUG(100, "Found " << relTrueHits.size() << " TrueHits for SVDCluster " << aCluster.getArrayIndex() << " from Array " << aCluster.getArrayName())
+          for (unsigned int i = 0; i < relTrueHits.size(); ++i) { svdTrueHits.push_back(relTrueHits[i]); }
         }
-        // if there were 2 clusters, check if they are both related to the same SVDTrueHit, if not throw. Else get position and momentum for this SpacePoint
+
+        // if there is only one cluster related to the SpacePoint simply check if one (or more TrueHits are present). Additionally checking the size for svdTrueHits again is not necessary here, because if there was only one Cluster and no TrueHits were found this part is never reached!
+        if (svdClusters.size() == 1) {
+          B2DEBUG(150, "Found only one Cluster related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". To this Cluster " << svdTrueHits.size() << " related TrueHits were found.")
+        }
+        // if there are 2 Clusters, there have to be at least 2 TrueHits (else above part would have thrown)
         if (svdTrueHits.size() > 1) {
-          B2DEBUG(150, "Now checking if TrueHits of Clusters belonging to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " are equal.")
-          if (svdTrueHits[0] != svdTrueHits[1]) {
-            B2WARNING("TrueHits of SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " are not matching: TrueHit 1 has Index " << svdTrueHits[0]->getArrayIndex() << ", TrueHit 2 has Index " << svdTrueHits[1]->getArrayIndex());
+          B2DEBUG(150, "Found " << svdTrueHits.size() << " related to Clusters related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". Now checking if they are compatible")
+
+          //
+          std::sort(svdTrueHits.begin(), svdTrueHits.end());
+          unsigned int oldSize = svdTrueHits.size();
+          auto newEnd = std::unique(svdTrueHits.begin(), svdTrueHits.end());
+          svdTrueHits.resize(std::distance(svdTrueHits.begin(), newEnd));
+
+          if (svdTrueHits.size() == oldSize) {
+            stringstream trueHitInds;
+            for (const SVDTrueHit * trueHit : svdTrueHits) { trueHitInds << trueHit->getArrayIndex() << ", "; }
+            B2WARNING("There is no overlapping TrueHit for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". The Indices of the TrueHits are: " << trueHitInds.str());
 
             // Only do these calculations if output to root is is enabled
             if (m_PARAMpositionAnalysis) {
@@ -333,35 +372,16 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
                 globalPositions.push_back(posMom.first);
                 globalMomenta.push_back(posMom.second);
               }
+              int layer = svdTrueHits[0]->getSensorID().getLayerNumber() - 1; // layer numbering starts at 1, indexing of array at 0
               // do the calculations (starting from one because of comparison of two elements in each run through loop)
               for (unsigned int i = 1; i < globalPositions.size(); ++i) {
-                rootVariables.MisMatchPosResiduals.push_back((globalPositions[i] - globalPositions[i - 1]).Mag());
+                rootVariables.MisMatchPosResiduals.at(layer).push_back((globalPositions[i] - globalPositions[i - 1]).Mag());
 
                 TVector3 momDiff = globalMomenta[i] - globalMomenta[i - 1];
-                rootVariables.MisMatchMomX.push_back(momDiff.X());
-                rootVariables.MisMatchMomY.push_back(momDiff.Y());
-                rootVariables.MisMatchMomZ.push_back(momDiff.Z());
+                rootVariables.MisMatchMomX.at(layer).push_back(momDiff.X());
+                rootVariables.MisMatchMomY.at(layer).push_back(momDiff.Y());
+                rootVariables.MisMatchMomZ.at(layer).push_back(momDiff.Z());
               }
-            }
-
-
-            // Only do these calculations if the debug Level is set to 150 or higher
-            // DEPRECATED!!!
-            if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 150, PACKAGENAME())) {   // comparison with true is uneccessary?
-              B2DEBUG(150, "There are " << svdTrueHits.size() << " TrueHits related to SpacePoint " << spacePoint->getArrayIndex())
-
-              // get position and momentum for every TrueHit and print it, to compare them later
-              stringstream positions;
-              stringstream momenta;
-              for (unsigned int i = 0; i < svdTrueHits.size(); ++i) {
-                auto posMom = getGlobalPositionAndMomentum(svdTrueHits[i]);
-                positions << posMom.first.X() << " " << posMom.first.Y() << " " << posMom.first.Z() << " ";
-                momenta << posMom.second.X() << " " << posMom.second.Y() << " " << posMom.second.Z() << " ";
-              }
-
-              // now print out with easy to grep pattern
-              B2DEBUG(150, "MISMATCHING_TRUEHITS_POSITIONS: " << positions.str());
-              B2DEBUG(150, "MISMATCHING_TRUEHITS_MOMENTA:" << momenta.str());
             }
             throw TrueHitsNotMatching();
           }
@@ -426,7 +446,7 @@ bool CurlingTrackCandSplitterModule::getDirectionOfFlight(const std::pair<const 
   // cylindrical coordinates (?) -> use TVector3.Perp() to get the radial component of a given vector
   // for spherical coordinates -> use TVector3.Mag() for the same purposes
   double hitRadComp = originToHit.Perp(); // radial component of hit coordinates
-  double hitMomRadComp = momentumAtHit.Perp(); // radial component of the tip of the momentum vector, when its origin would be the hit position (as it is only the direction of the momentum that matters here, units are completely ignored)
+  double hitMomRadComp = momentumAtHit.Perp(); // radial component of the tip of the momentum vector, when its origin would be the hit position (as it is only the direction of the momentum that matters here, units are completely ignored -> COULDDO: use the unit() method from TVector3
 
   if (hitMomRadComp < hitRadComp) {
     B2DEBUG(100, "Direction of flight is inwards for this hit");
@@ -502,37 +522,47 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
   std::pair<double, double> spacePointUV = getUV(spacePoint);
   const TVector3 spacePointLocal = TVector3(spacePointUV.first, spacePointUV.second, 0);
 
-  rootVariables.SpacePointXGlobal.push_back(spacePoint->X());
-  rootVariables.SpacePointYGlobal.push_back(spacePoint->Y());
-  rootVariables.SpacePointZGlobal.push_back(spacePoint->Z());
+  // get VxdIDs of spacePoint and trueHit (and their according layer numbers for storing the information in the appropriate arrays)
+  VxdID spacePointVxdId = spacePoint->getVxdID();
+  VxdID trueHitVxdId = trueHit->getSensorID();
 
-  rootVariables.SpacePointULocal.push_back(spacePointUV.first);
-  rootVariables.SpacePointVLocal.push_back(spacePointUV.second);
+  // Layer numbering starts at 1 not at 0 so deduce layer by one to access array
+  int spLayer = spacePointVxdId.getLayerNumber() - 1;
+  int thLayer = trueHitVxdId.getLayerNumber() - 1;
+
+  rootVariables.SpacePointXGlobal.at(spLayer).push_back(spacePoint->X());
+  rootVariables.SpacePointYGlobal.at(spLayer).push_back(spacePoint->Y());
+  rootVariables.SpacePointZGlobal.at(spLayer).push_back(spacePoint->Z());
+
+  rootVariables.SpacePointULocal.at(spLayer).push_back(spacePointUV.first);
+  rootVariables.SpacePointVLocal.at(spLayer).push_back(spacePointUV.second);
 
   B2DEBUG(200, "Global (x,y,z)/Local (U,V) positions of SpacePoint: (" << spacePointGlobal.X() << "," << spacePointGlobal.Y() << "," << spacePointGlobal.Z() << ")/(" << spacePointLocal.X() << "," << spacePointLocal.Y() << ")");
 
   // get positions from TrueHit
-  VxdID trueHitVxdId = trueHit->getSensorID();
+
   const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(trueHitVxdId);
 
   const TVector3 trueHitLocal = TVector3(trueHit->getU(), trueHit->getV(), 0);
   const TVector3 trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal);
 
-  rootVariables.TrueHitXGlobal.push_back(trueHitGlobal.X());
-  rootVariables.TrueHitYGlobal.push_back(trueHitGlobal.Y());
-  rootVariables.TrueHitZGlobal.push_back(trueHitGlobal.Z());
+  rootVariables.TrueHitXGlobal.at(thLayer).push_back(spacePoint->X());
+  rootVariables.TrueHitYGlobal.at(thLayer).push_back(spacePoint->Y());
+  rootVariables.TrueHitZGlobal.at(thLayer).push_back(spacePoint->Z());
 
-  rootVariables.TrueHitULocal.push_back(trueHit->getU());
-  rootVariables.TrueHitVLocal.push_back(trueHit->getV());
+  rootVariables.TrueHitULocal.at(thLayer).push_back(trueHit->getU());
+  rootVariables.TrueHitVLocal.at(thLayer).push_back(trueHit->getV());
 
   B2DEBUG(200, "Global (x,y,z)/Local (U,V) positions of SpacePoint: (" << trueHitGlobal.X() << "," << trueHitGlobal.Y() << "," << trueHitGlobal.Z() << ")/(" << trueHitLocal.X() << "," << trueHitLocal.Y() << ")");
 
   B2DEBUG(200, "This leads to position differences global/local: " << (spacePointGlobal - trueHitGlobal).Mag() << "/" << (spacePointLocal - trueHitLocal).Mag());
 
-  // calculate position differences
-  rootVariables.PosResiduesGlobal.push_back((spacePointGlobal - trueHitGlobal).Mag());
-  rootVariables.PosResiduesLocal.push_back((spacePointLocal - trueHitLocal).Mag());
+  // calculate position differences (& check if both are on the same layer, but should be)
+  if (spLayer == thLayer) {
+    rootVariables.PosResiduesGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).Mag());
+    rootVariables.PosResiduesLocal.at(spLayer).push_back((spacePointLocal - trueHitLocal).Mag());
+  }
 }
 
 // =================================== WRITE TO ROOT ===============================================================================

@@ -27,15 +27,15 @@ CDCLOCALTRACKING_SwitchableClassImp(PerigeeCircle)
 
 
 
-FloatType Helix::closestAtPerpS(const Vector3D& point) const
+FloatType Helix::arcLengthAtClosest(const Vector3D& point) const
 {
   // TODO: Introduce special case for curvatureXY == 0
 
 
-  FloatType byPerpS = circleXY().arcLengthBetween(perigeeXY(), point.xy());
+  FloatType byArcLength = circleXY().arcLengthBetween(perigeeXY(), point.xy());
 
   // Handle z coordinate
-  FloatType transformedZ0 = byPerpS * szSlope() + z0();
+  FloatType transformedZ0 = byArcLength * szSlope() + z0();
   FloatType deltaZ = point.z() - transformedZ0;
   // FloatType iPeriod = floor(deltaZ / zPeriod());
 
@@ -49,7 +49,7 @@ FloatType Helix::closestAtPerpS(const Vector3D& point) const
   FloatType denominator = 1 + curvatureXY() * d0;
   //B2INFO("denominator = " << denominator);
   if (denominator == 0) {
-    return deltaZ / szSlope() + byPerpS;
+    return deltaZ / szSlope() + byArcLength;
   }
 
   FloatType slope = - szSlope() * szSlope() / denominator;
@@ -82,7 +82,7 @@ FloatType Helix::closestAtPerpS(const Vector3D& point) const
   for (int iSol = 0; iSol < 4; ++iSol) {
     distances[iSol] = -2.0 * (1.0 + d0 * curvatureXY()) * cos(solutions[iSol]) + szSlope() * szSlope() * solutions[iSol] * solutions[iSol] + 2 * szSlope() * curvatureXY() * deltaZ * solutions[iSol];
     // B2INFO("Solution : " << iSol);
-    // B2INFO("perpS * curvature = " << solutions[iSol]);
+    // B2INFO("arcLength * curvature = " << solutions[iSol]);
     // B2INFO("distance = " << distances[iSol]);
 
     if (not std::isnan(distances[iSol]) and not(smallestDistance < distances[iSol])) {
@@ -94,16 +94,16 @@ FloatType Helix::closestAtPerpS(const Vector3D& point) const
   }
 
   // B2INFO("Smallest solution : " << iSmallestSol);
-  // B2INFO("perpS * curvature = " << solutions[iSmallestSol]);
+  // B2INFO("arcLength * curvature = " << solutions[iSmallestSol]);
   // B2INFO("distance = " << distances[iSmallestSol]);
 
-  FloatType curvatureXYTimesPerpS = solutions[iSmallestSol] ;
+  FloatType curvatureXYTimesArcLength = solutions[iSmallestSol] ;
 
-  FloatType perpS = curvatureXYTimesPerpS / curvatureXY();
+  FloatType arcLength = curvatureXYTimesArcLength / curvatureXY();
 
   // Correct for the periods off set before
-  perpS += byPerpS;
-  return perpS;
+  arcLength += byArcLength;
+  return arcLength;
 
 }
 

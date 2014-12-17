@@ -246,7 +246,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_passiveMoveBy)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_atPerps)
+TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_atArcLength)
 {
   FloatType radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -256,18 +256,18 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_atPerps)
   FloatType smallAngle = PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
-  FloatType nearPerpS = -smallAngle * radius; //Minus because of default counterclockwise orientation
+  FloatType nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
 
-  Vector2D atNear = circle.atPerpS(nearPerpS);
+  Vector2D atNear = circle.atArcLength(nearArcLength);
 
   EXPECT_NEAR(near.x(), atNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), atNear.y(), 10e-7);
 
 
   Vector2D down(2.0, -1.0);
-  FloatType downPerpS = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  FloatType downArcLength = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
 
-  Vector2D atDown = circle.atPerpS(downPerpS);
+  Vector2D atDown = circle.atArcLength(downArcLength);
 
   EXPECT_NEAR(down.x(), atDown.x(), 10e-7);
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);

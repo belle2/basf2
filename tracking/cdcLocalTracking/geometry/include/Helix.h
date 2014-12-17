@@ -96,12 +96,12 @@ namespace Belle2 {
 
     public:
       /// Calculates the perpendicular travel distance at which the helix has the closest approach to the given point.
-      FloatType closestAtPerpS(const Vector3D& point) const;
+      FloatType arcLengthAtClosest(const Vector3D& point) const;
 
       /// Calculates the point of closest approach on the helix to the given point.
       Vector3D closest(const Vector3D& point) const {
-        FloatType perpS = closestAtPerpS(point);
-        return atPerpS(perpS);
+        FloatType arcLength = arcLengthAtClosest(point);
+        return atArcLength(arcLength);
       }
 
       //FloatType distance(const Vector3D& point) const;
@@ -130,8 +130,8 @@ namespace Belle2 {
       }
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
-      Vector3D atPerpS(const FloatType& perpS) const
-      { return Vector3D(circleXY().atPerpS(perpS), lineSZ().map(perpS)); }
+      Vector3D atArcLength(const FloatType& arcLength) const
+      { return Vector3D(circleXY().atArcLength(arcLength), lineSZ().map(arcLength)); }
 
       /// Calculates the point, which lies at the given z coordinate
       Vector3D atZ(const FloatType& z) const
@@ -139,7 +139,7 @@ namespace Belle2 {
 
       /// Calculates the point, which lies at the given z coordinate
       Vector2D xyAtZ(const FloatType& z) const
-      { return Vector2D(circleXY().atPerpS(lineSZ().inverseMap(z))); }
+      { return Vector2D(circleXY().atArcLength(lineSZ().inverseMap(z))); }
 
 
       /// Gives the minimal polar r the circle reaches (unsigned)

@@ -127,10 +127,15 @@ PerigeeCircle PerigeeCircle::fromPerigeeParameters(const FloatType& curvature,
 
 
 
-Vector2D PerigeeCircle::atPerpS(const FloatType& perpS) const
+Vector2D PerigeeCircle::atArcLength(const FloatType& arcLength) const
 {
-  FloatType atX =  perpS * cosc(perpS * curvature()) + impact();
-  FloatType atY =  -perpS * sinc_pi(perpS * curvature());
+  FloatType chi = arcLength * curvature();
+  FloatType chiHalf = chi / 2.0;
+
+  using boost::math::sinc_pi;
+
+  FloatType atX =  arcLength *  sinc_pi(chiHalf) * sin(chiHalf) + impact();
+  FloatType atY =  -arcLength * sinc_pi(chi);
   return Vector2D::compose(-n12().unit(), atX, atY);
 }
 

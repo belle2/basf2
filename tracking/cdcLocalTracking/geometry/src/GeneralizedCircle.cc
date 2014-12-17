@@ -422,7 +422,12 @@ std::pair<Vector2D, Vector2D> GeneralizedCircle::intersections(const Generalized
 
 Vector2D GeneralizedCircle::atArcLength(const FloatType& arcLength) const
 {
-  FloatType atX =  arcLength * cosc(arcLength * curvature()) + impact();
-  FloatType atY =  -arcLength * sinc_pi(arcLength * curvature());
+  FloatType chi = arcLength * curvature();
+  FloatType chiHalf = chi / 2.0;
+
+  using boost::math::sinc_pi;
+
+  FloatType atX =  arcLength *  sinc_pi(chiHalf) * sin(chiHalf) + impact();
+  FloatType atY =  -arcLength * sinc_pi(chi);
   return Vector2D::compose(-n12().unit(), atX, atY);
 }

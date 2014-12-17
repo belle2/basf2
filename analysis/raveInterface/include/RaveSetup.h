@@ -15,9 +15,6 @@
 //std
 #include <string>
 
-//tracking
-//#include <tracking/dataobjects/Track.h>
-//basf2
 #include <framework/logging/Logger.h>
 
 //root
@@ -64,6 +61,7 @@ namespace Belle2 {
       static void Print();
 
     protected:
+      /** Same as getInstance(), but no check if the instance is initialised. */
       static RaveSetup* getRawInstance();
       /** default constructor */
       RaveSetup();
@@ -81,10 +79,6 @@ namespace Belle2 {
       rave::KinematicTreeFactory* m_raveKinematicTreeFactory;
 
       bool m_initialized; /**< Has initialize() been called? unusable otherwise. */
-
-
-
-
     };
 
   }

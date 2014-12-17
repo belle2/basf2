@@ -18,19 +18,45 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
+TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_Getters)
+{
+  float absError = 10e-6;
+
+  float n0 = 0.0;
+  float n1 = 1.0;
+  float n2 = 0.0;
+  float n3 = 1.0;
+
+  GeneralizedCircle circle(n0, n1, n2, n3);
+
+  EXPECT_NEAR(n0, circle.n0(), absError);
+  EXPECT_NEAR(n1, circle.n1(), absError);
+  EXPECT_NEAR(n2, circle.n2(), absError);
+  EXPECT_NEAR(n3, circle.n3(), absError);
+
+  EXPECT_NEAR(2.0 * n3, circle.curvature(), absError);
+  EXPECT_NEAR(1.0 / (2.0 * n3), circle.radius(), absError);
+
+  EXPECT_NEAR(PI / 2.0, circle.tangentialPhi(), absError);
+
+  EXPECT_NEAR(0, circle.impact(), absError);
+
+}
+
+
 
 TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_orientation)
 {
-  GeneralizedCircle circle(0.0, 0.0, 0.0, 1.0);
+  GeneralizedCircle circle(1.0, 0.0, 0.0, 1.0);
   EXPECT_EQ(CCW, circle.orientation());
 
   GeneralizedCircle reversedCircle(1.0, 0.0, 0.0, -1.0);
   EXPECT_EQ(CW, reversedCircle.orientation());
 
-  GeneralizedCircle line(0.0, 0.0, 0.0, 0.0);
+  GeneralizedCircle line(1.0, 0.0, 0.0, 0.0);
   EXPECT_EQ(CCW, line.orientation());
 
-  GeneralizedCircle reversedLine(0.0, 0.0, 0.0, -0.0);
+  GeneralizedCircle reversedLine(1.0, 0.0, 0.0, -0.0);
   EXPECT_EQ(CW, reversedLine.orientation());
 }
 
@@ -148,7 +174,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_intersections)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_atPerps)
+TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_atArcLength)
 {
   FloatType radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -158,18 +184,18 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_atPerps)
   FloatType smallAngle = PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
-  FloatType nearPerpS = -smallAngle * radius; //Minus because of default counterclockwise orientation
+  FloatType nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
 
-  Vector2D atNear = circle.atArcLength(nearPerpS);
+  Vector2D atNear = circle.atArcLength(nearArcLength);
 
   EXPECT_NEAR(near.x(), atNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), atNear.y(), 10e-7);
 
 
   Vector2D down(2.0, -1.0);
-  FloatType downPerpS = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  FloatType downArcLength = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
 
-  Vector2D atDown = circle.atArcLength(downPerpS);
+  Vector2D atDown = circle.atArcLength(downArcLength);
 
   EXPECT_NEAR(down.x(), atDown.x(), 10e-7);
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
@@ -177,107 +203,61 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_atPerps)
 }
 
 
+TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_isLine)
+{
+  FloatType radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
+
+  EXPECT_FALSE(circle.isLine());
+
+  float curvature = 0;
+  float phi0 = PI / 2;
+  float impact = -1;
+  GeneralizedCircle line = GeneralizedCircle::fromPerigeeParameters(curvature, phi0, impact);
+
+  EXPECT_TRUE(line.isLine());
+}
 
 
+TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_isCircle)
+{
+  FloatType radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
-/**
+  EXPECT_TRUE(circle.isCircle());
 
-  B2INFO("##### Test generalized circle");
-  GeneralizedCircle circle(Vector2D(0.5, 0.0), 1.5);
-  B2INFO(circle);
+  float curvature = 0;
+  float phi0 = PI / 2;
+  float impact = -1;
+  GeneralizedCircle line = GeneralizedCircle::fromPerigeeParameters(curvature, phi0, impact);
 
-  B2INFO("Is line " << circle.isLine());
-  B2INFO("Is circle " << circle.isCircle());
-
-  B2INFO("n0 " << circle.n0());
-  B2INFO("n1 " << circle.n1());
-  B2INFO("n2 " << circle.n2());
-  B2INFO("n3 " << circle.n3());
-
-  B2INFO("distance to 3,0 " << circle.distance(Vector2D(3, 0)));
-  B2INFO("fast distance to 3,0 " << circle.fastDistance(Vector2D(3, 0)));
-  B2INFO("absolute distance to 3,0 " << circle.absoluteDistance(Vector2D(3, 0)));
-
-  B2INFO("closest approach to 0,0 " << circle.closestToOrigin());
-  B2INFO("closest approach to 3,0 " << circle.closest(Vector2D(3, 0)));
-  B2INFO("same r approach to 3,0 " << circle.samePolarR(Vector2D(3, 0)));
-  B2INFO("tangential to 3,0 " << circle.tangential(Vector2D(3, 0)));
-
-  B2INFO("opening angle from 0.5,2.5 to  3,0 " << circle.openingAngle(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
-  B2INFO("arc length from 0.5,2.5 to  3,0 " << circle.arcLengthBetween(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
+  EXPECT_FALSE(line.isCircle());
+}
 
 
+TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_distance)
+{
+  float absError = 10e-6;
+
+  float radius = 1.5;
+  Vector2D center = Vector2D(0.5, 0.0);
+
+  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
+
+  Vector2D testPoint(3, 0);
+
+  EXPECT_NEAR(1,  circle.distance(testPoint), absError);
+  EXPECT_NEAR(1,  circle.absDistance(testPoint), absError);
+  // Approximated distance is already quite far of since the circle radius is of the order of the distance
+  EXPECT_NEAR(1.33333,  circle.fastDistance(testPoint), absError);
+
+  // Now clockwise orientation. All points outside the circle have negative distance
   circle.reverse();
-  B2INFO("Reversed");
-  B2INFO(circle);
 
-  B2INFO("Is line " << circle.isLine());
-  B2INFO("Is circle " << circle.isCircle());
+  EXPECT_NEAR(-1,  circle.distance(testPoint), absError);
+  EXPECT_NEAR(1,  circle.absDistance(testPoint), absError);
+  EXPECT_NEAR(-1.33333,  circle.fastDistance(testPoint), absError);
 
-  B2INFO("n0 " << circle.n0());
-  B2INFO("n1 " << circle.n1());
-  B2INFO("n2 " << circle.n2());
-  B2INFO("n3 " << circle.n3());
-
-  B2INFO("distance to 3,0 " << circle.distance(Vector2D(3, 0)));
-  B2INFO("fast distance to 3,0 " << circle.fastDistance(Vector2D(3, 0)));
-  B2INFO("absolute distance to 3,0 " << circle.absoluteDistance(Vector2D(3, 0)));
-
-  B2INFO("closest approach to 0,0 " << circle.closestToOrigin());
-  B2INFO("closest approach to 3,0 " << circle.closest(Vector2D(3, 0)));
-  B2INFO("same r approach to 3,0 " << circle.samePolarR(Vector2D(3, 0)));
-  B2INFO("tangential to 3,0 " << circle.tangential(Vector2D(3, 0)));
-
-  B2INFO("opening angle from 0.5,2,5 to  3,0 " << circle.openingAngle(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
-  B2INFO("arc length from 0.5,2.5 to  3,0 " << circle.arcLengthBetween(Vector2D(0.5, 2.5) , Vector2D(3, 0)));
-
-
-  circle.setN(1, 1, -1, 0);
-  circle.normalize();
-  B2INFO("Line");
-  B2INFO(circle);
-
-  B2INFO("Is line " << circle.isLine());
-  B2INFO("Is circle " << circle.isCircle());
-
-  B2INFO("n0 " << circle.n0());
-  B2INFO("n1 " << circle.n1());
-  B2INFO("n2 " << circle.n2());
-  B2INFO("n3 " << circle.n3());
-
-  B2INFO("distance to 3,0 " << circle.distance(Vector2D(3, 0)));
-  B2INFO("fast distance to 3,0 " << circle.fastDistance(Vector2D(3, 0)));
-  B2INFO("absolute distance to 3,0 " << circle.absoluteDistance(Vector2D(3, 0)));
-
-  B2INFO("closest approach to 0,0 " << circle.closestToOrigin());
-  B2INFO("closest approach to 3,0 " << circle.closest(Vector2D(3, 0)));
-  B2INFO("same r approach to 3,0 " << circle.samePolarR(Vector2D(3, 0)));
-  B2INFO("tangential to 3,0 " << circle.tangential(Vector2D(3, 0)));
-
-  B2INFO("opening angle from 0,0 to  3,0 " << circle.openingAngle(Vector2D(0, 0) , Vector2D(3, 0)));
-  B2INFO("arc length from 0,0 to  3,0 " << circle.arcLengthBetween(Vector2D(0, 0) , Vector2D(3, 0)));
-
-  B2INFO("Reversed line");
-  circle.reverse();
-  B2INFO(circle);
-
-  B2INFO("Is line " << circle.isLine());
-  B2INFO("Is circle " << circle.isCircle());
-
-  B2INFO("n0 " << circle.n0());
-  B2INFO("n1 " << circle.n1());
-  B2INFO("n2 " << circle.n2());
-  B2INFO("n3 " << circle.n3());
-
-  B2INFO("distance to 3,0 " << circle.distance(Vector2D(3, 0)));
-  B2INFO("fast distance to 3,0 " << circle.fastDistance(Vector2D(3, 0)));
-  B2INFO("absolute distance to 3,0 " << circle.absoluteDistance(Vector2D(3, 0)));
-
-  B2INFO("closest approach to 0,0 " << circle.closestToOrigin());
-  B2INFO("closest approach to 3,0 " << circle.closest(Vector2D(3, 0)));
-  B2INFO("same r approach to 3,0 " << circle.samePolarR(Vector2D(3, 0)));
-  B2INFO("tangential to 3,0 " << circle.tangential(Vector2D(3, 0)));
-
-  B2INFO("opening angle from 0,0 to  3,0 " << circle.openingAngle(Vector2D(0, 0) , Vector2D(3, 0)));
-  B2INFO("arc length from 0,0 to  3,0 " << circle.arcLengthBetween(Vector2D(0, 0) , Vector2D(3, 0)));
-*/
+}

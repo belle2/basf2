@@ -236,7 +236,7 @@ class TrackingValidationModule(basf2.Module):
                 mcParticle = trackMatchLookUp.getRelatedMCParticle(trackCand)
                 mcHelix = getHelixFromMCParticle(mcParticle)
                 omega_truth = mcHelix.getOmega()
-                tan_lambda_truth = tan_lambda_truth
+                tan_lambda_truth = mcHelix.getTanLambda()
 
             self.pr_clones_and_matches.append(is_matched or is_clone)
             self.pr_matches.append(is_matched)
@@ -312,6 +312,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Validation plots #
         ####################
         validation_plots = []
+        pull_analyses = []
 
         # Finding efficiency #
         ######################
@@ -342,7 +343,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             curvature_pull_analysis.analyse(pr_omega_truths,
                     pr_omega_estimates, pr_omega_variances)
             curvature_pull_analysis.contact = CONTACT
-            validation_plots.append(curvature_pull_analysis)
+            pull_analyses.append(curvature_pull_analysis)
 
             # Tan lambda pull
             pr_tan_lambda_truths = np.array(self.pr_tan_lambda_truths)
@@ -354,7 +355,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             curvature_pull_analysis.analyse(pr_tan_lambda_truths,
                     pr_tan_lambda_estimates, pr_tan_lambda_variances)
             curvature_pull_analysis.contact = CONTACT
-            validation_plots.append(curvature_pull_analysis)
+            pull_analyses.append(curvature_pull_analysis)
 
             # TODO
             # pulls for the vertex residuals
@@ -365,7 +366,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         ##########
 
         # Save everything to a ROOT file
-        output_file = ROOT.TFile(self.output_file_name, 'recreate')
+        output_tfile = ROOT.TFile(self.output_file_name, 'recreate')
 
         # Show all parameters and the fit result in the plots
         # if viewed in the browser or the validation
@@ -377,7 +378,14 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         for validation_plot in validation_plots:
             validation_plot.write()
 
-        output_file.Close()
+        expert_tdirectory = output_tfile.mkdir('expert', 'Expert')
+        expert_tdirectory.cd()
+        ROOT.gStyle.SetOptFit(opt_fit)
+
+        for pull_analysis in pull_analyses:
+            pull_analysis.write()
+
+        output_tfile.Close()
 
     def profiles_by_mc_parameters(
         self,

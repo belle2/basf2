@@ -9,7 +9,6 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleFlavorTaggingTool.h>
-#include <analysis/modules/ParticleSelector/ParticleSelectorModule.h>
 #include <cmath>
 #include <TBranch.h>
 #include <TLorentzVector.h>

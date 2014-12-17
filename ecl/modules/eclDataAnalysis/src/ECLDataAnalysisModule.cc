@@ -84,7 +84,6 @@ void ECLDataAnalysisModule::initialize()
   //  StoreArray<ECLDsp>::required();
 
   if (m_writeToRoot == true) {
-    m_rootFileName += ".root";
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
   } else
     m_rootFilePtr = NULL;
@@ -215,6 +214,7 @@ void ECLDataAnalysisModule::initialize()
   m_trkMultip = 0;
   m_trkIdx = new std::vector<int>();
   m_trkPdg = new std::vector<int>();
+  m_trkCharge = new std::vector<int>();
   m_trkPx = new std::vector<double>();
   m_trkPy = new std::vector<double>();
   m_trkPz = new std::vector<double>();
@@ -262,9 +262,9 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclHitTimeAve",       "std::vector<double>", &m_eclHitTimeAve);
 
   m_tree->Branch("eclShowerMultip",     &m_eclShowerMultip,      "eclShowerMultip/I");
-  m_tree->Branch("eclShowerToGamma",      "std::vector<int>",       &m_eclShowerToGamma);
   m_tree->Branch("eclShowerIdx",     "std::vector<int>",       &m_eclShowerIdx);
   m_tree->Branch("eclShowerToMc",      "std::vector<int>",       &m_eclShowerToMc);
+  m_tree->Branch("eclShowerToGamma",      "std::vector<int>",       &m_eclShowerToGamma);
   m_tree->Branch("eclShowerEnergy",     "std::vector<double>",    &m_eclShowerEnergy);
   m_tree->Branch("eclShowerTheta",      "std::vector<double>",    &m_eclShowerTheta);
   m_tree->Branch("eclShowerPhi",        "std::vector<double>",    &m_eclShowerPhi);
@@ -284,7 +284,7 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclClusterThetaError",   "std::vector<double>",    &m_eclClusterThetaError);
   m_tree->Branch("eclClusterPhi",        "std::vector<double>",    &m_eclClusterPhi);
   m_tree->Branch("eclClusterPhiError",     "std::vector<double>",    &m_eclClusterPhiError);
-  m_tree->Branch("eclClusterr",          "std::vector<double>",    &m_eclClusterR);
+  m_tree->Branch("eclClusterR",          "std::vector<double>",    &m_eclClusterR);
   m_tree->Branch("eclClusterEnergyDepSum",   "std::vector<double>",    &m_eclClusterEnergyDepSum);
   m_tree->Branch("eclClusterTiming",     "std::vector<double>",    &m_eclClusterTiming);
   m_tree->Branch("eclClusterTimingError",  "std::vector<double>",    &m_eclClusterTimingError);
@@ -305,7 +305,6 @@ void ECLDataAnalysisModule::initialize()
 
   m_tree->Branch("eclGammaMultip",     &m_eclGammaMultip,      "eclGammaMultip/I");
   m_tree->Branch("eclGammaIdx",     "std::vector<int>",       &m_eclGammaIdx);
-
   m_tree->Branch("eclGammaEnergy",     "std::vector<double>",    &m_eclGammaEnergy);
   m_tree->Branch("eclGammaTheta",      "std::vector<double>",    &m_eclGammaTheta);
   m_tree->Branch("eclGammaPhi",        "std::vector<double>",    &m_eclGammaPhi);
@@ -348,8 +347,9 @@ void ECLDataAnalysisModule::initialize()
 
   if (m_doTracking == true) {
     m_tree->Branch("trkMultip",     &m_trkMultip,          "trkMulti/I");
-    m_tree->Branch("trk_Idx",     "std::vector<int>",       &m_trkIdx);
+    m_tree->Branch("trkIdx",     "std::vector<int>",       &m_trkIdx);
     m_tree->Branch("trkPdg",        "std::vector<int>",    &m_trkPdg);
+    m_tree->Branch("trkCharge",        "std::vector<int>",    &m_trkCharge);
     m_tree->Branch("trkPx",         "std::vector<double>", &m_trkPx);
     m_tree->Branch("trkPy",         "std::vector<double>", &m_trkPy);
     m_tree->Branch("trkPz",         "std::vector<double>", &m_trkPz);
@@ -415,7 +415,7 @@ void ECLDataAnalysisModule::event()
   m_mcSecondaryPhysProc->clear();
 
   m_trkIdx->clear();
-  m_trkPdg->clear();   m_trkPx->clear();  m_trkPy->clear();  m_trkPz->clear();
+  m_trkPdg->clear();  m_trkCharge->clear();   m_trkPx->clear();  m_trkPy->clear();  m_trkPz->clear();
   m_trkX->clear();  m_trkY->clear();  m_trkZ->clear();
 
   StoreObjPtr<EventMetaData> eventmetadata;
@@ -519,14 +519,6 @@ void ECLDataAnalysisModule::event()
     m_eclGammaTheta->push_back(aECLgammas->getPositon().Theta());
     m_eclGammaPhi->push_back(aECLgammas->getPositon().Phi());
     m_eclGammaR->push_back(aECLgammas->getPositon().Mag());
-    /*
-    if (aECLgammas->getRelated<ECLShower>() != (nullptr)) {
-    const ECLShower* gamma_shower = aECLgammas->getRelated<ECLShower>();
-    m_eclShowerToGamma->push_back(gamma_shower->getArrayIndex());
-    }
-    else
-    m_eclShowerToGamma->push_back(-1);
-    */
   }
 
   m_eclPi0Multip = pi0s.getEntries();
@@ -620,7 +612,6 @@ void ECLDataAnalysisModule::event()
       m_eclShowerToGamma->push_back(gamma_shower->getArrayIndex());
     } else
       m_eclShowerToGamma->push_back(-1);
-
   }
 
   m_mcMultip = mcParticles.getEntries();
@@ -662,6 +653,7 @@ void ECLDataAnalysisModule::event()
 
       m_trkIdx->push_back(itrks);
       m_trkPdg->push_back(atrk->getParticleType().getPDGCode());
+      m_trkCharge->push_back(atrk->getChargeSign());
 
       m_trkPx->push_back(atrk->getMomentum().X());
       m_trkPy->push_back(atrk->getMomentum().Y());

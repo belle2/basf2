@@ -195,6 +195,7 @@ namespace Belle2 {
 
     int m_trkMultip;
     std::vector<int>* m_trkPdg;
+    std::vector<int>* m_trkCharge;
     std::vector<int>* m_trkIdx;
     std::vector<double>* m_trkPx;
     std::vector<double>* m_trkPy;

@@ -351,12 +351,12 @@ namespace Belle2 {
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (mcp) {
         s << " -> MC: " << mcp->getPDG() << ", mcStatus: " << MCMatching::getMCTruthStatus(p, mcp);
+        s << ", mc-index " << mcp->getIndex();
+        s << ", mc-pdg " << mcp->getPDG();
       } else {
         s << " (no MC match)";
       }
       s << ", mdst-source " << p->getMdstSource();
-      s << ", mc-index " << mcp->getIndex();
-      s << ", mc-pdg " << mcp->getPDG();
       B2INFO(s.str())
       for (const auto * daughter : p->getDaughters()) {
         printParticleInternal(daughter, depth + 1);

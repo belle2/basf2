@@ -131,9 +131,10 @@ namespace Belle2 {
       auto var = manager.getVariable(varName);
       if (var == nullptr) {
         B2ERROR("ParticlePrinter: Variable::Manager doesn't have variable" << varName)
+      } else {
+        double value = var->function(particle);
+        B2INFO("     o) " << varName << " = " << value);
       }
-      double value = var->function(particle);
-      B2INFO("     o) " << varName << " = " << value);
     }
   }
 

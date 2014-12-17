@@ -26,6 +26,7 @@ import collections
 import numpy as np
 
 import simulation
+from cdclocaltracking.validation.plot import ValidationPlot
 
 import ROOT
 from ROOT import Belle2
@@ -280,19 +281,20 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         ####################
         validation_plots = []
 
-        # A try out efficiency plot
-        efficiency_profile = \
-            ValidationPlot('%s_track_finding_efficiency_by_momentum'
-                           % self.name, n_bins=50)
+        # Track finding efficiency over the true transverse momentum profile
+        finding_efficiency_by_pt = ValidationPlot('%s_finding_efficiency_by_pt'
+                 % self.name)
 
-        efficiency_profile.fill(self.mc_transverse_momenta, self.mc_matches)
+        finding_efficiency_by_pt.profile(self.mc_transverse_momenta,
+                self.mc_matches, bins=50)
 
-        efficiency_profile.xlabel = 'Momentum (GeV)'
-        efficiency_profile.ylabel = 'Efficiency'
-        efficiency_profile.description = 'Not a serious plot yet.'
-        efficiency_profile.check = ''
-        efficiency_profile.contact = CONTACT
-        # validation_plots.append(efficiency_profile)
+        finding_efficiency_by_pt.xlabel = 'Momentum (GeV)'
+        finding_efficiency_by_pt.ylabel = 'Efficiency'
+        finding_efficiency_by_pt.description = 'Not a serious plot yet.'
+        finding_efficiency_by_pt.check = ''
+        finding_efficiency_by_pt.contact = CONTACT
+
+        validation_plots.append(finding_efficiency_by_pt)
 
         # A tryout d0 parameter plot, yet using the seen in vxd as an d0 parameter.
         clone_rate_by_d0 = ValidationPlot('%s_clone_rate_by_seen_in_vxd'
@@ -313,9 +315,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Finding efficiency by d0 parameter
         finding_efficiency_by_d0 = ValidationPlot('%s_finding_efficiency_by_d0'
                  % self.name)
-        finding_efficiency_by_d0.n_bins = 50
-
-        finding_efficiency_by_d0.fill(self.mc_d0s, self.mc_matches)
+        finding_efficiency_by_d0.fill(self.mc_d0s, self.mc_matches, bins=50)
 
         finding_efficiency_by_d0.xlabel = 'D0 (cm)'
         finding_efficiency_by_d0.ylabel = 'Finding efficiency'
@@ -329,10 +329,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Finding efficiency by cos theta
         finding_efficiency_by_cos_theta = \
             ValidationPlot('%s_finding_efficiency_by_cos_theta' % self.name)
-        finding_efficiency_by_cos_theta.n_bins = 50
 
         finding_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
-                self.mc_matches)
+                self.mc_matches, bins=50)
 
         finding_efficiency_by_cos_theta.xlabel = 'cos #theta'
         finding_efficiency_by_cos_theta.ylabel = 'Finding efficiency'
@@ -346,8 +345,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Histogram of the hit efficiency
         hit_efficiency_histogram = ValidationPlot('%s_hit_efficiency'
                 % self.name)
-        hit_efficiency_histogram.n_bins = 50
-        hit_efficiency_histogram.fill(self.mc_hit_efficiencies)
+        hit_efficiency_histogram.fill(self.mc_hit_efficiencies, bins=50)
 
         hit_efficiency_histogram.xlabel = 'Hit efficiency'
         hit_efficiency_histogram.description = 'Not a serious plot yet.'
@@ -359,9 +357,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Hit efficiency by d0 parameter
         hit_efficiency_by_d0 = ValidationPlot('%s_hit_efficiency_by_d0'
                 % self.name)
-        hit_efficiency_by_d0.n_bins = 50
 
-        hit_efficiency_by_d0.fill(self.mc_d0s, self.mc_hit_efficiencies)
+        hit_efficiency_by_d0.fill(self.mc_d0s, self.mc_hit_efficiencies,
+                                  bins=50)
 
         hit_efficiency_by_d0.xlabel = 'D0 (cm)'
         hit_efficiency_by_d0.ylabel = 'Hit efficiency'
@@ -375,10 +373,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Hit efficiency by cos_theta parameter
         hit_efficiency_by_cos_theta = \
             ValidationPlot('%s_hit_efficiency_by_cos_theta' % self.name)
-        hit_efficiency_by_cos_theta.n_bins = 50
 
         hit_efficiency_by_cos_theta.fill(self.mc_cos_thetas,
-                self.mc_hit_efficiencies)
+                self.mc_hit_efficiencies, bins=50)
 
         hit_efficiency_by_cos_theta.xlabel = 'cos #theta'
         hit_efficiency_by_cos_theta.ylabel = 'Hit efficiency'
@@ -411,8 +408,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             # Truths
             true_omegas_histogram = ValidationPlot('%s_true_omegas'
                     % self.name)
-            true_omegas_histogram.n_bins = 50
-            true_omegas_histogram.fill(pr_true_omegas[~pr_no_true_omega])
+            true_omegas_histogram.fill(pr_true_omegas[~pr_no_true_omega],
+                                       bins=50)
 
             true_omegas_histogram.xlabel = 'True omega (1/cm)'
 
@@ -426,8 +423,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             # Fitted
             fitted_omegas_histogram = ValidationPlot('%s_fitted_omegas'
                     % self.name)
-            fitted_omegas_histogram.n_bins = 50
-            fitted_omegas_histogram.fill(pr_fitted_omegas[~pr_failed_fits])
+            fitted_omegas_histogram.fill(pr_fitted_omegas[~pr_failed_fits],
+                    bins=50)
 
             fitted_omegas_histogram.xlabel = 'Fitted omega (1/cm)'
 
@@ -441,9 +438,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             # Residuals
             omega_residuals_histogram = ValidationPlot('%s_omega_residuals'
                     % self.name)
-            omega_residuals_histogram.n_bins = 50
             omega_residuals_histogram.fill(pr_omega_residuals[~pr_failed_fits
-                    & ~pr_no_true_omega])
+                    & ~pr_no_true_omega], bins=50)
 
             omega_residuals_histogram.xlabel = 'Omega residuals (1/cm)'
 
@@ -456,10 +452,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             # Diagonal plot
             fitted_omegas_by_true_omegas = \
                 ValidationPlot('%s_fitted_omegas_by_true_omegas' % self.name)
-            fitted_omegas_by_true_omegas.n_bins = 50
             fitted_omegas_by_true_omegas.fill(pr_true_omegas[~pr_failed_fits
                     & ~pr_no_true_omega], pr_fitted_omegas[~pr_failed_fits
-                    & ~pr_no_true_omega])
+                    & ~pr_no_true_omega], bins=50)
 
             fitted_omegas_by_true_omegas.xlabel = 'True omega (1/cm)'
             fitted_omegas_by_true_omegas.ylabel = 'Fitted omega (1/cm)'
@@ -536,212 +531,6 @@ def getSeedTrackFitResult(trackCand):
 
 
 # Standardized generation of validation histograms making the actual validation code more readable
-
-class ValidationPlot(object):
-
-    def __init__(
-        self,
-        name,
-        lower_bound=None,
-        upper_bound=None,
-        n_bins=None,
-        description='',
-        check='',
-        contact='',
-        ):
-
-        self.name = name
-
-        self.upper_bound = upper_bound
-        self.lower_bound = lower_bound
-        self.n_bins = n_bins
-
-        self._description = description
-        self._check = check
-        self._contact = contact
-
-        self._xlabel = ''
-        self._ylabel = ''
-        self._title = ''
-
-        self.histogram = None
-
-    @staticmethod
-    def is_binary(xs):
-        is_boolean = all(isinstance(x, bool) for x in xs)
-        is_one_or_zero = all(x == 0 or x == 1 for x in xs)
-        return is_boolean or is_one_or_zero
-
-    def fill(
-        self,
-        xs,
-        ys=None,
-        weights=None,
-        ):
-
-        name = self.name
-
-        # Handle data content of the histgram
-        ## Figure out the the binning if not externally set already
-        if self.is_binary(xs):
-            # if xs is a binary variable setup the histogram to
-            # have only two bins with the right boundaries.
-            if self.lower_bound is None:
-                self.lower_bound = 0
-
-            if self.upper_bound is None:
-                self.upper_bound = np.nextafter(1.0, np.inf)
-
-            if self.n_bins is None:
-                self.n_bins = 2
-        else:
-            if self.lower_bound is None:
-                self.lower_bound = np.min(xs)
-
-            if self.upper_bound is None:
-                self.upper_bound = np.max(xs)
-
-            if self.n_bins is None:
-                n_data = len(x)
-                rice_n_bins = ceil(2.0 * pow(n_data, 1.0 / 3.0))
-                self.n_bins = rice_n_bins
-
-        lower_bound = self.lower_bound
-        upper_bound = self.upper_bound
-        n_bins = self.n_bins
-
-        ## Setup the histogram and fill it with values
-        if ys is not None:
-            histogram = ROOT.TProfile(name, '', self.n_bins, lower_bound,
-                                      upper_bound)
-            Fill = histogram.Fill
-            if weights is None:
-                for (x, y) in zip(xs, ys):
-                    Fill(float(x), float(y))
-            else:
-                for (x, y, weight) in zip(xs, ys, weights):
-                    Fill(float(x), float(y), float(weight))
-
-            max_y = max(ys)
-            min_y = min(ys)
-            y_range = max_y - min_y
-
-            histogram.SetMaximum(max_y + 0.1 * y_range)
-            histogram.SetMinimum(min_y)
-        else:
-
-            histogram = ROOT.TH1F(name, '', self.n_bins, lower_bound,
-                                  upper_bound)
-            Fill = histogram.Fill
-            if weights is None:
-                for x in xs:
-                    Fill(float(x))
-            else:
-                for (x, weight) in zip(xs, weights):
-                    Fill(float(x), float(weight))
-
-        # Now attach the additional information
-        root_description = ROOT.TNamed('Description', self.description)
-        root_check = ROOT.TNamed('Check', self.check)
-        root_contact = ROOT.TNamed('Contact', self.contact)
-
-        for root_attribute in (root_description, root_check, root_contact):
-            histogram.GetListOfFunctions().Add(root_attribute)
-
-        title = (self.title if self.title else self.name)
-        histogram.SetTitle(title)
-
-        xlabel = self.xlabel
-        histogram.SetXTitle(xlabel)
-
-        if self.ylabel is None:
-            if ys is None:
-                # Default ylabel for a histogram plot
-                self.ylabel = 'Count'
-
-        ylabel = self.ylabel
-        histogram.SetYTitle(ylabel)
-
-        self.histogram = histogram
-
-    @property
-    def title(self):
-        return self._title
-
-    @title.setter
-    def _(self, title):
-        self._title = title
-        if self.histogram is not None:
-            self.histogram.SetTitle(title)
-
-    @property
-    def xlabel(self):
-        return self._xlabel
-
-    @xlabel.setter
-    def xlabel(self, xlabel):
-        self._xlabel = xlabel
-        if self.histogram is not None:
-            self.histogram.SetXTitle(xlabel)
-
-    @property
-    def ylabel(self):
-        return self._ylabel
-
-    @ylabel.setter
-    def ylabel(self, ylabel):
-        self._ylabel = ylabel
-        if self.histogram is not None:
-            self.histogram.SetYTitle(ylabel)
-
-    @property
-    def contact(self):
-        return self._contact
-
-    @contact.setter
-    def contact(self, contact):
-        self._contact = contact
-        if self.histogram is not None:
-            found_obj = self.histogram.FindObject('Contact')
-            if found_obj:
-                found_obj.SetTitle(contact)
-            else:
-                raise KeyError("Could not find 'Contact' in histogram")
-
-    @property
-    def description(self):
-        return self._description
-
-    @description.setter
-    def description(self, description):
-        self._description = description
-        if self.histogram is not None:
-            found_obj = self.histogram.FindObject('Description')
-            if found_obj:
-                found_obj.SetTitle(description)
-            else:
-                raise KeyError("Could not find 'Description' in histogram")
-
-    @property
-    def check(self):
-        return self._check
-
-    @check.setter
-    def check(self, check):
-        self._check = check
-        if self.histogram is not None:
-            found_obj = self.histogram.FindObject('Check')
-            if found_obj:
-                found_obj.SetTitle(check)
-            else:
-                raise KeyError("Could not find 'Check' in histogram")
-
-    def show(self):
-        self.histogram.Draw()
-
-    def write(self):
-        self.histogram.Write()
-
 
 class ValidationFiguresOfMerit(dict):
 

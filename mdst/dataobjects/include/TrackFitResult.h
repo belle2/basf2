@@ -311,8 +311,8 @@ namespace Belle2 {
      */
     const unsigned short m_hitPatternVXDInitializer;
 
-    /** Streamer version 3. */
-    ClassDef(TrackFitResult, 3);
+    /** Streamer version. */
+    ClassDef(TrackFitResult, 4);
   };
 }
 

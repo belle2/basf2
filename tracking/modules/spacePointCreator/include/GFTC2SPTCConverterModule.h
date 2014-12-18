@@ -83,6 +83,8 @@ namespace Belle2 {
 
     bool m_PARAMcheckTrueHits; /**< Parameter Indicating if the TrueHits related from the Clusters forming a SpacePoint should be checked for equality */
 
+    bool m_PARAMuseSingleClusterSP; /**< Parameter Indicating if SingleCluster SVD SpacePoints should be used if no double Cluster SVD SpacePoint can be found */
+
     // some counters for testing
     unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were converted (if a curling track is split up, this counter will still be only increased by 1!) */
 
@@ -91,6 +93,8 @@ namespace Belle2 {
     unsigned int m_abortedTrueHitCtr; /**< Counting discarded conversions due to check for TrueHits not good */
 
     unsigned int m_abortedUnsuitableTCCtr; /**< Counter for aborted conversions due to unsuitable genfit::TrackCand */
+
+    unsigned int m_abortedNoSPCtr; /**< Counter for aborted conversions because no SpacePoint has been found */
 
 // #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
     template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */

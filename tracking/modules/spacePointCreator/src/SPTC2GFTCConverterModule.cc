@@ -29,6 +29,8 @@ SPTC2GFTCConverterModule::SPTC2GFTCConverterModule() :
   addParam("genfitTCName", m_genfitTCName, "Name of the container of the (output) genfit::TrackCands", string(""));
   addParam("PXDClusters", m_PXDClustersName, "Name of the container of the PXD Clusters", string(""));
   addParam("SVDClusters", m_SVDClustersName, "Name of the container of the SVD Clusters", string(""));
+
+  initializeCounters(); // NOTE: they get initialized in initialize again!!
 }
 
 void SPTC2GFTCConverterModule::initialize()

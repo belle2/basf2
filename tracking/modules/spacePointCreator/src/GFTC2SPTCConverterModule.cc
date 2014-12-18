@@ -50,6 +50,10 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
   addParam("PXDClusterSP", m_PXDClusterSPName, "PXD Cluster SpacePoints collection name.", string(""));
 
   addParam("checkTrueHits", m_PARAMcheckTrueHits, "Set to true if you want TrueHits of Clusters forming a SpacePoint (e.g. SVD) to be checked for equality", false);
+
+  addParam("useSingleClusterSP", m_PARAMuseSingleClusterSP, "Set to true if you want to use singleCluster SVD SpacePoints if no doubleCluster SVD SpacePoint can be found", true);
+
+  initializeCounters(); // NOTE: they get initialized in initialize again!!
 }
 
 // ------------------------------ INITIALIZE ---------------------------------------
@@ -62,7 +66,7 @@ void GFTC2SPTCConverterModule::initialize()
   // check if all required StoreArrays are here
   StoreArray<PXDCluster>::required(m_PXDClusterName);
   StoreArray<SVDCluster>::required(m_SVDClusterName);
-  StoreArray<SpacePoint>::required(m_SingleClusterSVDSPName);
+  if (m_PARAMuseSingleClusterSP) { StoreArray<SpacePoint>::required(m_SingleClusterSVDSPName); }
   StoreArray<SpacePoint>::required(m_NoSingleClusterSVDSPName);
   StoreArray<SpacePoint>::required(m_PXDClusterSPName);
 
@@ -122,6 +126,7 @@ void GFTC2SPTCConverterModule::event()
       B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
     } catch (FoundNoSpacePoint& anEx) {
       B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
+      m_abortedNoSPCtr++;
     } catch (SpacePoint::InvalidNumberOfClusters& anEx) {
       B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
     } catch (UnsuitableGFTrackCand& anEx) {
@@ -140,7 +145,7 @@ void GFTC2SPTCConverterModule::event()
 // -------------------------------- TERMINATE --------------------------------------------------------
 void GFTC2SPTCConverterModule::terminate()
 {
-  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand and in " << m_abortedTrueHitCtr << " the TrueHits of an SVD SpacePoint did not match (overlap).");
+  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found  and in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap).");
 }
 
 // ---------------------------------------- Create SpacePoint TrackCand
@@ -276,7 +281,6 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       // COULDDO: at the moment searching in all SVDCluster StoreArrays, maybe precise this with a new Module Parameter
       RelationVector<SVDCluster> relatedClusters = aSP->getRelationsTo<SVDCluster>("ALL");
       if (relatedClusters.size() > 2) { throw SpacePoint::InvalidNumberOfClusters(); }
-
       bool foundBoth = true; // change to false if the second Cluster cannot be found in the genfit::TrackCand
       bool bothValid = true; // change to false if the second Cluster can be found, but is already used
 
@@ -318,7 +322,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       // assign determined values to existAndValidSP
       existAndValidSP.push_back({foundBoth, bothValid});
 
-      B2DEBUG(100, "Cluster Cobination of SpacePoint " << aSP->getArrayIndex() << " is contained in genfit::TrackCand: " << foundBoth << ". SpacePoint is valid: " << bothValid);
+      B2DEBUG(100, "Cluster Combination of SpacePoint " << aSP->getArrayIndex() << " is contained in genfit::TrackCand: " << foundBoth << ". SpacePoint is valid: " << bothValid);
     }
 
     // get the number of existing but used and the number of valid SpacePoints
@@ -429,6 +433,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
 // COULDDO: Template this (almost the same as get PXD SpacePoint) (drawback: need a string argument then, to specify the StoreArray in which desired SpacePoints are located!)
 const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSingleClusterSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit)
 {
+  if (!m_PARAMuseSingleClusterSP) throw FoundNoSpacePoint(); // COULDDO: check this before calling this function, is probably faster!!
   B2DEBUG(70, "Trying to find a related SpacePoint for Cluster " << svdCluster->getArrayIndex() << " from Array " << svdCluster->getArrayName());
   const SpacePoint* spacePoint = svdCluster->getRelatedFrom<SpacePoint>(m_SingleClusterSVDSPName);
   if (spacePoint == NULL) {
@@ -455,9 +460,11 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const PXDCluster*> cl
     if (clusters.size() > 1) { // this should not happen. only defining this with a vector of PXDClusters due to possible templating
       B2WARNING("Got more than one PXDCluster in trueHitsAreGood. Will only check the first!")
     }
-    const PXDTrueHit* trueHit = clusters[0]->getRelatedTo<PXDTrueHit>("ALL");
-    if (trueHit != NULL) {
-      B2DEBUG(200, "Found TrueHit " << trueHit->getArrayIndex() << " in Array " << trueHit->getArrayName() << " related to PXDCluster " << clusters[0]->getArrayIndex());
+    RelationVector<PXDTrueHit> relTrueHits = clusters[0]->getRelationsTo<PXDTrueHit>("ALL"); // COULDDO: search only certain arrays
+    if (relTrueHits.size() > 0) {
+      stringstream inds;
+      for (const PXDTrueHit & trueHit : relTrueHits) { inds << trueHit.getArrayIndex() << ", "; }
+      B2DEBUG(200, "Found " << relTrueHits.size() << " TrueHits related to the only passed PXDCluster " << clusters[0]->getArrayIndex() << ". The indices of these TrueHits are: " << inds.str());
       return true;
     }
   }
@@ -469,9 +476,11 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
   if (clusters.size() > 0) {
     // if only one cluster is passed simply check if there exists a related TrueHit
     if (clusters.size() == 1) {
-      const SVDTrueHit* trueHit = clusters[0]->getRelatedTo<SVDTrueHit>("ALL");
-      if (trueHit != NULL) {
-        B2DEBUG(200, "Found TrueHit " << trueHit->getArrayIndex() << " in Array " << trueHit->getArrayName() << " related to the only passed SVDCluster " << clusters[0]->getArrayIndex());
+      RelationVector<SVDTrueHit> relTrueHits = clusters[0]->getRelationsTo<SVDTrueHit>("ALL"); // COULDDO: search only certain arrays
+      if (relTrueHits.size() > 0) {
+        stringstream inds;
+        for (const SVDTrueHit & trueHit : relTrueHits) { inds << trueHit.getArrayIndex() << ", "; }
+        B2DEBUG(200, "Found " << relTrueHits.size() << " TrueHits related to the only passed SVDCluster " << clusters[0]->getArrayIndex() << ". The indices of these TrueHits are: " << inds.str());
         return true;
       }
     } else {
@@ -491,7 +500,7 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
 
       stringstream inds;
       for (int index : trueHitsInds) { inds << index << ", "; }
-      B2DEBUG(200, "Unique indices of TrueHits " << inds.str());
+      B2DEBUG(200, "indices of TrueHits " << inds.str());
 
       std::sort(allTrueHits.begin(), allTrueHits.end());
       std::sort(trueHitsInds.begin(), trueHitsInds.end());
@@ -504,9 +513,14 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
       trueHitsInds.resize(std::distance(trueHitsInds.begin(), newIndEnd));
       B2DEBUG(200, "Size of allTrueHits before/after sort & unique: " << oldPtSize << "/" << allTrueHits.size());
       B2DEBUG(200, "Size of trueHitsInds before/after sort & unique: " << oldIndSize << "/" << trueHitsInds.size());
-      stringstream output;
-      for (int index : trueHitsInds) { output << index << ", "; }
-      B2DEBUG(200, "Unique indices of TrueHits " << output.str());
+
+      // reset stringstream for other output.
+      inds.clear();
+      inds.str(std::string());
+      for (int index : trueHitsInds) { inds << index << ", "; }
+      inds << " direct via getArrayIndex(): ";
+      for (const SVDTrueHit * trueHit : allTrueHits) { inds << trueHit->getArrayIndex() << ", "; }
+      B2DEBUG(200, "Unique indices of TrueHits " << inds.str());
 
       // It is possible that there is more than one TrueHit left but still the Clusters are related to the same TrueHit(s).
       // COULDDO:

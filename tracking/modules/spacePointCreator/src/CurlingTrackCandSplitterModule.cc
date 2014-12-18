@@ -59,6 +59,8 @@ CurlingTrackCandSplitterModule::CurlingTrackCandSplitterModule()
   defaultRootFName.push_back("RECREATE");
 
   addParam("rootFileName", m_PARAMrootFileName, "Filename and write-mode ('RECREATE' or 'UPDATE'). If given more than 2 strings this module will cause termination", defaultRootFName);
+
+  initializeCounters(); // NOTE: they get initialized in initialize again!!
 }
 
 // ================================================= INITIALIZE =========================================================
@@ -137,7 +139,7 @@ void CurlingTrackCandSplitterModule::initialize()
 
     // link everything to the according variables
     for (int layer = 0; layer < c_nPlanes; ++layer) {
-      string layerString = (boost::format("%1%") % layer).str();
+      string layerString = (boost::format("%1%") % (layer + 1)).str(); // layer numbering starts at 1 this way (plus cppcheck complains about division by zero otherwise)
 
       string name = "SpacePointXGlobal_" + layerString;
       m_treePtr->Branch(name.c_str(), &m_rootSpacePointXGlobals.at(layer));
@@ -163,6 +165,19 @@ void CurlingTrackCandSplitterModule::initialize()
       name = "TrueHitXVLocal_" + layerString;
       m_treePtr->Branch(name.c_str(), &m_rootTrueHitVLocals.at(layer));
 
+      name = "PosResidualsXGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootPosResidueXGlobal.at(layer));
+      name = "PosResidualsYGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootPosResidueYGlobal.at(layer));
+      name = "PosResidualsZGlobal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootPosResidueZGlobal.at(layer));
+
+      name = "PosResidualsULocal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootPosResidueULocal.at(layer));
+      name = "PosResidualsVLocal_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootPosResidueVLocal.at(layer));
+
+
       name = "LocalPositionResiduals_" + layerString;
       m_treePtr->Branch(name.c_str(), &m_rootLocalPosResiduals.at(layer));
       name = "GlobalPositionResiduals_" + layerString;
@@ -170,6 +185,18 @@ void CurlingTrackCandSplitterModule::initialize()
 
       name = "MisMatchPosDistance_" + layerString;
       m_treePtr->Branch(name.c_str(), &m_rootMisMatchPosDistance.at(layer));
+      name = "MisMatchPosX_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchPosX.at(layer));
+      name = "MisMatchPosY_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchPosY.at(layer));
+      name = "MisMatchPosZ_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchPosZ.at(layer));
+
+      name = "MisMatchPosU_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchPosU.at(layer));
+      name = "MisMatchPosV_" + layerString;
+      m_treePtr->Branch(name.c_str(), &m_rootMisMatchPosV.at(layer));
+
       name = "MisMatchMomX_" + layerString;
       m_treePtr->Branch(name.c_str(), &m_rootMisMatchMomX.at(layer));
       name = "MisMatchMomY_" + layerString;
@@ -330,7 +357,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
         // collect the TrueHits, if there is more than one compare them, to see if both Clusters point to the same TrueHit
         // WARNING there can be more! more than one TrueHit can be 'hidden' in one Cluster!!!
         // TODO: look at this again, this seems not to work properly at the moment!!!
-        std::vector<SVDTrueHit*> svdTrueHits;
+        std::vector<const SVDTrueHit*> svdTrueHits;
         for (const SVDCluster & aCluster : svdClusters) {
           // CAUTION: there can be more than one TrueHit for a given Cluster!!!
           RelationVector<SVDTrueHit> relTrueHits = aCluster.getRelationsTo<SVDTrueHit>("ALL"); // COULDDO: search only certain SVDTrueHit arrays -> new parameter for module
@@ -344,8 +371,12 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
         }
 
         // if there is only one cluster related to the SpacePoint simply check if one (or more TrueHits are present). Additionally checking the size for svdTrueHits again is not necessary here, because if there was only one Cluster and no TrueHits were found this part is never reached!
+        // WARNING: It is not guaranteed that this actually leads to a valid relation between SpacePoint and TrueHit!!
         if (svdClusters.size() == 1) {
-          B2DEBUG(150, "Found only one Cluster related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". To this Cluster " << svdTrueHits.size() << " related TrueHits were found.")
+          stringstream inds;
+          for (const SVDTrueHit * trueHit : svdTrueHits) { inds << trueHit->getArrayIndex() << ", "; }
+          B2DEBUG(150, "Found only one Cluster related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". To this Cluster " << svdTrueHits.size() << " related TrueHits were found. Indices: " << inds.str());
+          continue; // start over with next SpacePoint
         }
         // if there are 2 Clusters, there have to be at least 2 TrueHits (else above part would have thrown)
         if (svdTrueHits.size() > 1) {
@@ -357,6 +388,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
           auto newEnd = std::unique(svdTrueHits.begin(), svdTrueHits.end());
           svdTrueHits.resize(std::distance(svdTrueHits.begin(), newEnd));
 
+          // WARNING if there are one (or more) matching TrueHits only the first TrueHit is used for comparison!!!
           if (svdTrueHits.size() == oldSize) {
             stringstream trueHitInds;
             for (const SVDTrueHit * trueHit : svdTrueHits) { trueHitInds << trueHit->getArrayIndex() << ", "; }
@@ -376,6 +408,13 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
               // do the calculations (starting from one because of comparison of two elements in each run through loop)
               for (unsigned int i = 1; i < globalPositions.size(); ++i) {
                 rootVariables.MisMatchPosResiduals.at(layer).push_back((globalPositions[i] - globalPositions[i - 1]).Mag());
+
+                rootVariables.MisMatchPosX.at(layer).push_back((globalPositions[i] - globalPositions[i - 1]).X());
+                rootVariables.MisMatchPosY.at(layer).push_back((globalPositions[i] - globalPositions[i - 1]).Y());
+                rootVariables.MisMatchPosZ.at(layer).push_back((globalPositions[i] - globalPositions[i - 1]).Z());
+
+                rootVariables.MisMatchPosU.at(layer).push_back((svdTrueHits[i]->getU() - svdTrueHits[i - 1]->getU()));
+                rootVariables.MisMatchPosV.at(layer).push_back((svdTrueHits[i]->getV() - svdTrueHits[i - 1]->getV()));
 
                 TVector3 momDiff = globalMomenta[i] - globalMomenta[i - 1];
                 rootVariables.MisMatchMomX.at(layer).push_back(momDiff.X());
@@ -554,7 +593,7 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
   rootVariables.TrueHitULocal.at(thLayer).push_back(trueHit->getU());
   rootVariables.TrueHitVLocal.at(thLayer).push_back(trueHit->getV());
 
-  B2DEBUG(200, "Global (x,y,z)/Local (U,V) positions of SpacePoint: (" << trueHitGlobal.X() << "," << trueHitGlobal.Y() << "," << trueHitGlobal.Z() << ")/(" << trueHitLocal.X() << "," << trueHitLocal.Y() << ")");
+  B2DEBUG(200, "Global (x,y,z)/Local (U,V) positions of TrueHit: (" << trueHitGlobal.X() << "," << trueHitGlobal.Y() << "," << trueHitGlobal.Z() << ")/(" << trueHitLocal.X() << "," << trueHitLocal.Y() << ")");
 
   B2DEBUG(200, "This leads to position differences global/local: " << (spacePointGlobal - trueHitGlobal).Mag() << "/" << (spacePointLocal - trueHitLocal).Mag());
 
@@ -562,6 +601,14 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
   if (spLayer == thLayer) {
     rootVariables.PosResiduesGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).Mag());
     rootVariables.PosResiduesLocal.at(spLayer).push_back((spacePointLocal - trueHitLocal).Mag());
+
+    rootVariables.PosResidueXGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).X());
+    rootVariables.PosResidueYGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).Y());
+    rootVariables.PosResidueZGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).Z());
+
+    rootVariables.PosResidueULocal.at(spLayer).push_back((spacePointUV.first - trueHit->getU()));
+    rootVariables.PosResidueVLocal.at(spLayer).push_back((spacePointUV.second - trueHit->getV()));
+
   }
 }
 
@@ -585,7 +632,19 @@ void CurlingTrackCandSplitterModule::writeToRoot(RootVariables& rootVariables)
   m_rootTrueHitYGlobals = rootVariables.TrueHitYGlobal;
   m_rootTrueHitZGlobals = rootVariables.TrueHitZGlobal;
 
+  m_rootPosResidueXGlobal = rootVariables.PosResidueXGlobal;
+  m_rootPosResidueYGlobal = rootVariables.PosResidueYGlobal;
+  m_rootPosResidueZGlobal = rootVariables.PosResidueZGlobal;
+  m_rootPosResidueULocal = rootVariables.PosResidueULocal;
+  m_rootPosResidueVLocal = rootVariables.PosResidueVLocal;
+
   m_rootMisMatchPosDistance = rootVariables.MisMatchPosResiduals;
+  m_rootMisMatchPosX = rootVariables.MisMatchPosX;
+  m_rootMisMatchPosY = rootVariables.MisMatchPosY;
+  m_rootMisMatchPosZ = rootVariables.MisMatchPosZ;
+
+  m_rootMisMatchPosU = rootVariables.MisMatchPosU;
+  m_rootMisMatchPosV = rootVariables.MisMatchPosV;
 
   m_rootMisMatchMomX = rootVariables.MisMatchMomX;
   m_rootMisMatchMomY = rootVariables.MisMatchMomY;

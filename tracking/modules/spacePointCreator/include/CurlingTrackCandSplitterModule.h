@@ -12,6 +12,8 @@
 #include <framework/core/Module.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
+#include <array>
+
 #include <TVector3.h>
 #include <TFile.h>
 #include <TTree.h>
@@ -63,6 +65,13 @@ namespace Belle2 {
       std::array<std::vector<double>, c_nPlanes> TrueHitYGlobal; /**< global y-positions of TrueHits (layerwise) */
       std::array<std::vector<double>, c_nPlanes> TrueHitZGlobal; /**< global z-positions of TrueHits (layerwise) */
 
+      std::array<std::vector<double>, c_nPlanes> PosResidueXGlobal; /**< X-position (global) difference between TrueHit and SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> PosResidueYGlobal; /**< Y-position (global) difference between TrueHit and SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> PosResidueZGlobal; /**< Z-position (global) difference between TrueHit and SpacePoint (layerwise) */
+
+      std::array<std::vector<double>, c_nPlanes> PosResidueULocal; /**< U-position (local) differnece between TrueHit and SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> PosResidueVLocal; /**< V-position (local) difference between TrueHit and SpacePoint (layerwise) */
+
       std::array<std::vector<double>, c_nPlanes> TrueHitULocal; /**< local u-positions of TrueHits (layerwise) */
       std::array<std::vector<double>, c_nPlanes> TrueHitVLocal; /**< local v-positions of TrueHits (layerwise) */
 //       std::array<std::vector<double>, c_nPlanes> TrueHitZLocal; /**< local z-positions of TrueHits (layerwise) */
@@ -71,6 +80,13 @@ namespace Belle2 {
       std::array<std::vector<double>, c_nPlanes> PosResiduesGlobal; /**< position differences in global coordinates (layerwise) */
 
       std::array<std::vector<double>, c_nPlanes> MisMatchPosResiduals; /**< Distance between TrueHits that do not match but are related from one SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosX; /**< Difference of X-positions (global) for mismatched TrueHits (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosY; /**< Difference of Y-positions (global) for mismatched TrueHits (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosZ; /**< Difference of Z-positions (global) for mismatched TrueHits (layerwise) */
+
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosU; /**< Difference of U-positions (local) for mismatched TrueHits (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosV; /**< Difference of V-positions (local) for mismatched TrueHits (layerwise) */
+
       std::array<std::vector<double>, c_nPlanes> MisMatchMomX; /**< Difference of Momentum in X-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
       std::array<std::vector<double>, c_nPlanes> MisMatchMomY; /**< Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
       std::array<std::vector<double>, c_nPlanes> MisMatchMomZ; /**< Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
@@ -164,10 +180,24 @@ namespace Belle2 {
     std::array<std::vector<double>, c_nPlanes> m_rootTrueHitVLocals; /**< Local Y-Positions of TrueHits (layerwise) */
 //     std::vector<double> m_rootTrueHitZLocals; /**< Local Z-Positions of TrueHits (layerwise) */
 
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueXGlobal; /**< X-position (global) difference between TrueHit and SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueYGlobal; /**< Y-position (global) difference between TrueHit and SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueZGlobal; /**< Z-position (global) difference between TrueHit and SpacePoint (layerwise) */
+
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueULocal; /**< U-position (local) differnece between TrueHit and SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueVLocal; /**< V-position (local) difference between TrueHit and SpacePoint (layerwise) */
+
     std::array<std::vector<double>, c_nPlanes> m_rootLocalPosResiduals; /**< Local Position Residuals between TrueHits and SpacePoints (layerwise) */
     std::array<std::vector<double>, c_nPlanes> m_rootGlobalPosResiduals; /**< Global Position Residuals between TrueHits and SpacePoints (layerwise) */
 
     std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosDistance; /**< Distance of TrueHits that do not match but are related from one SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosX; /**< Difference of X-positions (global) for mismatched TrueHits (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosY; /**< Difference of Y-positions (global) for mismatched TrueHits (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosZ; /**< Difference of Z-positions (global) for mismatched TrueHits (layerwise) */
+
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosU; /**< Difference of U-positions (local) for mismatched TrueHits (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosV; /**< Difference of V-positions (local) for mismatched TrueHits (layerwise) */
+
     std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomX; /**< Difference of Momentum in X-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
     std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomY; /**< Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
     std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomZ; /**< Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */

@@ -35,6 +35,8 @@ TCConvertersTestModule::TCConvertersTestModule() :
   std::vector<std::string> emptyDefaultStringVec = { std::string("") };
   addParam("genfitTCNames", m_genfitTCNames, "Names of containers of genfit::TrackCands. WARNING: For this module provide two names! First is the name of the container with the genfit::TrackCands which were used to create SpacePointTrackCands (e.g. from MCTrackFinderTruth), second are the genfit::TrackCands obtaineed by the 'back conversion' from the SpacePointTrackCands!", emptyDefaultStringVec);
   addParam("SpacePointArrayNames", m_SpacePointArrayNames, "SpacePoints collection name(s) WARNING: it is only checked if these exist. At the moment all StoreArray<SpacePoint> are searched for SpacePoints!", emptyDefaultStringVec);
+
+  initializeCounters(); // NOTE: they get initialized in initialize again!!
 }
 
 // --------------------------------- INITIALIZE -------------------------------------

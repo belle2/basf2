@@ -12,7 +12,7 @@ numEvents = 100
 MyLogLevel = LogLevel.INFO
 MyDebugLevel = 500
 
-# set for the curling splitter module
+# set for the curling splitter module and GFTC2SPTC
 MyOtherLogLevel = LogLevel.INFO
 MyOtherDebugLevel = 500
 
@@ -34,6 +34,9 @@ eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
 
 eventinfoprinter = register_module('EventInfoPrinter')
+
+progress = register_module('Progress')
+progress.param('maxN', 2)
 
 gearbox = register_module('Gearbox')
 
@@ -99,18 +102,20 @@ mcTrackFinder.param(param_mctrackfinder)
 
 # TCConverter, genfit -> SPTC
 trackCandConverter = register_module('GFTC2SPTCConverter')
-trackCandConverter.logging.log_level = MyLogLevel
-trackCandConverter.logging.debug_level = MyDebugLevel
+trackCandConverter.logging.log_level = MyOtherLogLevel
+trackCandConverter.logging.debug_level = MyOtherDebugLevel
 param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
                               #    'SVDClusters': 'mySVDClusters',
                               # use everything there is
                               # does not work at the moment anyway
+                              # set to false if exception should be thrown when no doubleCluster SpacePoint can be found for SVD Clusters
     'genfitTCName': 'mcTracks',
     'SpacePointTCName': 'SPTracks',
     'NoSingleClusterSVDSP': 'nosingleSP',
     'SingleClusterSVDSP': 'singleSP',
     'PXDClusterSP': 'pxdOnly',
     'checkTrueHits': False,
+    'useSingleClusterSP': False,
     }
 trackCandConverter.param(param_trackCandConverter)
 
@@ -143,7 +148,7 @@ param_curlingSplitter = {  # set to true if you want to analyze the position of 
     'splitCurlers': True,
     'nTrackStubs': int(0),
     'setOrigin': [0., 0., 0.],
-    'positionAnalysis': False,
+    'positionAnalysis': True,
     'rootFileName': ['SPtoTrueHitAnalysis', 'RECREATE'],
     }
 curlingSplitter.param(param_curlingSplitter)
@@ -152,6 +157,7 @@ curlingSplitter.param(param_curlingSplitter)
 main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
+main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(evtgeninput)
@@ -166,10 +172,9 @@ main.add_module(spCreatorSVDsingle)
 main.add_module(mcTrackFinder)
 
 main.add_module(trackCandConverter)
+main.add_module(curlingSplitter)  # for easier debug reading
 main.add_module(btrackCandConverter)
 main.add_module(tcConverterTest)
-
-main.add_module(curlingSplitter)
 
 process(main)
 

@@ -19,8 +19,6 @@
 
 #include <string>
 #include <vector>
-#include <TFile.h>
-#include <TH2F.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -66,6 +64,12 @@ namespace Belle2 {
     int m_eventID;
     /** counter for tracks in this event */
     int m_trackID;
+    /** pdg code for mc particle */
+    int m_pdg;
+    /** pdg code for mother of mc particle */
+    int m_mother_pdg;
+    /** mc momentum of particle */
+    int m_p_true;
 
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *

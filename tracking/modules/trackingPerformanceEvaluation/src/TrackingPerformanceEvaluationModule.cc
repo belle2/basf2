@@ -126,9 +126,9 @@ void TrackingPerformanceEvaluationModule::initialize()
                                            2000, -10, 10, "y (cm)",
                                            m_histoList);
 
-  m_h2_d0errphi0err_zt = createHistogram2D("h2d0errphierrZT", "#sigma_{d0}/#sigma_{#phi} projected on z and r_{t}=#sqrt{x^{2}+y^{2}}",
-                                           2000, -10, 10, "z (cm)",
-                                           2000, 0, 10, "r_{t} (cm)",
+  m_h2_d0errphi0err_rz = createHistogram2D("h2d0errphierrRZ", "#sigma_{d0}/#sigma_{#phi} projected on z and r_{t}=#sqrt{x^{2}+y^{2}}",
+                                           2000, -30, 40, "z (cm)",
+                                           2000, 0, 15, "r_{t} (cm)",
                                            m_histoList);
 
   m_h2_z0errcotThetaerr_xy = (TH2F*)duplicateHistogram("h2z0errcotThetaerrXY", "#sigma_{z0}/#sigma_{cot#theta} projected on x,y",
@@ -138,9 +138,14 @@ void TrackingPerformanceEvaluationModule::initialize()
   //hits used in the fit
   m_h1_nHitDetID = createHistogram1D("h1nHitDetID", "detector ID per hit", 4, -0.5, 3.5, "0=PXD, 1=SVD2D, 2=SVD,3=CDC", m_histoList);
   m_h1_nVXDhitsUsed = createHistogram1D("h1nVXDHitsUsed", "number of VXD hits per Layer", 6, 0.5, 6.5, "VXD Layer", m_histoList);
-  m_h2_VXDhitsUsed_xy = createHistogram2D("h2hitsUsedXY", "hits used in the fit to the tracks",
+  m_h2_VXDhitsUsed_xy = createHistogram2D("h2hitsUsedXY", "hits used in the fit to the tracks, transverse plane",
                                           2000, -15, 15, "x (cm)",
                                           2000, -15, 15, "y (cm)",
+                                          m_histoList);
+
+  m_h2_VXDhitsUsed_rz = createHistogram2D("h2hitsUsedRZ", "hits used in the fit to the tracks, r_{t} z",
+                                          2000, -30, 40, "z (cm)",
+                                          2000, 0, 15, "r_{t} (cm)",
                                           m_histoList);
 
   m_h1_pValue = createHistogram1D("h1pValue", "pValue of the fit", 100, 0, 1, "pValue", m_histoList);
@@ -151,6 +156,10 @@ void TrackingPerformanceEvaluationModule::initialize()
                                      100, 0, 0.1, "#sigma_{d0} (cm)",
                                      m_histoList);
 
+  m_h2_d0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wPXD", "#sigma_{d0} VS p_{t}, with PXD hits", m_h2_d0errVSpt, m_histoList);
+
+  m_h2_d0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2d0errVSpt_woPXD", "#sigma_{d0} VS p_{t}, no PXD hits", m_h2_d0errVSpt, m_histoList);
+
   m_h2_d0errMSVSpt = createHistogram2D("h2d0errMSVSpt", "#sigma_{d0} * #betapsin^{3/2}#theta VS p_{t}",
                                        50, 0, 2.5, "p_{t} (GeV/c)",
                                        500, 0, 1, "cm",
@@ -159,22 +168,17 @@ void TrackingPerformanceEvaluationModule::initialize()
 
   //histograms to produce efficiency plots
   Double_t bins_pt[9 + 1] = {0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2, 3.5}; //GeV/c
-  Double_t bins_phi[10 + 1];
-  Double_t bins_theta[10 + 1];
-  Double_t width_theta = TMath::Pi() / 10;
-  Double_t width_phi = 2 * TMath::Pi() / 10;
-  for (int bin = 0; bin < 10 + 1; bin++) {
-    bins_theta[bin] = 0 + bin * width_theta;
+  Double_t bins_theta[10 + 1] = {0, 0.25, 0.5, 0.75, 0.75 + 0.32, 0.75 + 2 * 0.32, 0.75 + 3 * 0.32, 0.75 + 4 * 0.32, 0.75 + 5 * 0.32, 2.65, TMath::Pi()};
+  Double_t bins_phi[14 + 1];
+  Double_t width_phi = 2 * TMath::Pi() / 14;
+  for (int bin = 0; bin < 14 + 1; bin++)
     bins_phi[bin] = - TMath::Pi() + bin * width_phi;
-  }
+
 
   m_h3_MCParticle = createHistogram3D("h3MCParticle", "entry per MCParticle",
                                       9, bins_pt, "p_{t} (GeV/c)",
                                       10, bins_theta, "#theta",
-                                      10, bins_phi, "#phi" /*,
-              m_histoList*/);
-
-
+                                      14, bins_phi, "#phi" /*, m_histoList*/);
 
   m_h3_TracksPerMCParticle = (TH3F*)duplicateHistogram("h3TracksPerMCParticle",
                                                        "entry per Track connected to a MCParticle",
@@ -675,7 +679,7 @@ TH1* TrackingPerformanceEvaluationModule::duplicateHistogram(const char* newname
   TH2F* h2 =  dynamic_cast<TH2F*>(h);
   TH3F* h3 =  dynamic_cast<TH3F*>(h);
 
-  TH1* newh;
+  TH1* newh = 0;
 
   if (h1)
     newh = new TH1F(*h1);
@@ -706,8 +710,8 @@ TH1F* TrackingPerformanceEvaluationModule::createHistogramsRatio(const char* nam
   TH3F* h3den =  dynamic_cast<TH3F*>(hDen);
   TH3F* h3num =  dynamic_cast<TH3F*>(hNum);
 
-  TH1* hden;
-  TH1* hnum;
+  TH1* hden = 0;
+  TH1* hnum = 0;
 
   if (h1den) {
     hden = new TH1F(*h1den);
@@ -871,7 +875,7 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
                              d0_err / phi_err * py / pt);
   m_h2_z0errcotThetaerr_xy->Fill(z0_err / cotTheta_err * px / pt,
                                  z0_err / cotTheta_err * py / pt);
-  m_h2_d0errphi0err_zt->Fill(d0_err / phi_err * pz / pt,
+  m_h2_d0errphi0err_rz->Fill(d0_err / phi_err * pz / pt,
                              d0_err / phi_err);
 
   m_h2_d0errVSpt->Fill(pt, d0_err);
@@ -888,6 +892,16 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   int nHits = track.getNumPointsWithMeasurement();
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
+  bool hasPXDhit = false;
+  double d0_err = -999;
+  double pt = -999;
+  const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
+
+  if (fitResult != NULL) { // valid TrackFitResult found
+    d0_err = sqrt((fitResult->getCovariance5())[0][0]);
+    pt = fitResult->getMomentum().Pt();
+  }
+
   for (int i = 0; i < nHits; i++) {
     genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
     genfit::AbsMeasurement* absMeas = tp->getRawMeasurement();
@@ -899,7 +913,10 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
     SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
     SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
 
+
     if (pxdHit) {
+      hasPXDhit = true;
+
       detId = 0;
       double uCoor = pxdHit->getU();
       double vCoor = pxdHit->getV();
@@ -911,6 +928,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
       globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
 
     } else if (svdHit2D) {
+
       detId = 1;
       double uCoor = svdHit2D->getU();
       double vCoor = svdHit2D->getV();
@@ -922,9 +940,10 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
       globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
 
     } else if (svdHit) {
+
       detId = 2;
-      double uCoor = -999;
-      double vCoor = -999;
+      double uCoor = 0;
+      double vCoor = 0;
       if (svdHit->isU())
         uCoor = svdHit->getPosition();
       else
@@ -938,9 +957,19 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
     } else
       detId = 3;
 
+
     m_h1_nHitDetID ->Fill(detId);
 
     m_h2_VXDhitsUsed_xy->Fill(globalHit.X(), globalHit.Y());
+
+    m_h2_VXDhitsUsed_rz->Fill(globalHit.Z(), globalHit.Perp());
+  }
+
+  if (fitResult != NULL) {
+    if (hasPXDhit)
+      m_h2_d0errVSpt_wpxd->Fill(pt, d0_err);
+    else
+      m_h2_d0errVSpt_wopxd->Fill(pt, d0_err);
   }
 
 }

@@ -150,15 +150,18 @@ namespace Belle2 {
 
 
     TH2F* m_h2_d0errphi0err_xy;
-    TH2F* m_h2_d0errphi0err_zt;
+    TH2F* m_h2_d0errphi0err_rz;
     TH2F* m_h2_z0errcotThetaerr_xy;
 
     TH2F* m_h2_VXDhitsUsed_xy;
+    TH2F* m_h2_VXDhitsUsed_rz;
     TH1F* m_h1_nVXDhitsUsed;
     TH1F* m_h1_nHitDetID;
 
     TH1F* m_h1_pValue;
 
+    TH2F* m_h2_d0errVSpt_wpxd;
+    TH2F* m_h2_d0errVSpt_wopxd;
     TH2F* m_h2_d0errVSpt;
     TH2F* m_h2_d0errMSVSpt;
 

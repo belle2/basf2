@@ -27,6 +27,7 @@ namespace Belle2 {
    */
   class DedxCell : public RelationsObject {
     friend class DedxCellPIDModule;
+    friend class DedxCellPIDDebugModule;
     friend class DedxScanModule;
     friend class DedxCorrectionModule;
   public:
@@ -36,6 +37,7 @@ namespace Belle2 {
       RelationsObject(),
       m_size(0), m_eventID(0), m_trackID(0),
       m_p(0), m_cosTheta(0),
+      m_pdg(0), m_mother_pdg(0), m_p_true(0),
       m_dedx_avg(0), m_dedx_avg_truncated(0), m_dedx_avg_truncated_err(0) {
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
@@ -56,13 +58,6 @@ namespace Belle2 {
       m_enta.push_back(enta);
       m_cellHeight.push_back(cellHeight);
       m_cellHalfWidth.push_back(cellHalfWidth);
-      m_dedx_avg = m_dedx_avg_truncated = m_dedx_avg_truncated_err = 0.0;
-
-      //for all particles
-      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
-        m_cdcLogL[i] = 0.0;
-        m_svdLogL[i] = 0.0;
-      }
     }
 
     /** Return the event ID */
@@ -139,6 +134,10 @@ namespace Belle2 {
     // track level information
     double m_p; /**< momentum at point of closest approach to origin */
     double m_cosTheta; /**< cos(theta) for the track */
+
+    double m_pdg; /**< MC PID */
+    double m_mother_pdg; /**< MC PID of mother particle */
+    double m_p_true; /**< MC true momentum */
 
     double m_dedx_avg;               /**< dE/dx averaged */
     double m_dedx_avg_truncated;     /**< dE/dx averaged, truncated mean */

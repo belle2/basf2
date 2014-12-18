@@ -36,6 +36,9 @@ map<string, int> component_colors = {
 const char* c_layerlabels[4] = {"3", "4", "5", "6"};
 const float c_barwidth = 0.4;
 
+void makeDoseBars(TFile* f);
+void makeNeutronFluxBars(TFile* f);
+
 int main(int argc, char** argv)
 {
   if (argc != 2) {
@@ -55,51 +58,92 @@ int main(int argc, char** argv)
   } else {
     cout << "Opened " << argv[1] << ". Processing..." << endl;
   }
-
-  // Now the plots one by one. Not sure what we are going to outpuut. Canvases?
-  // Template name for bar plots: hBar_{variable}_{bg type}
-  TString s_barTemplate("hBar_%s_%s");
-  // Quantities to plot
-  set<string> barplot_quantities = {"Dose"};
-  for (auto quantity : barplot_quantities) {
-    cout << "Making stacked bar plot for " << quantity.c_str() << endl;
-    // Make canvas
-    TCanvas* c_barPlot = (TCanvas*)gROOT->GetListOfCanvases()->FindObject("c_barPlot");
-    if (c_barPlot) delete c_barPlot;
-    TString s_barPlotCanvasName(Form("c_%sBars", quantity.c_str()));
-    TString s_barPlotCanvasDescription(Form("%s by layer and background type", quantity.c_str()));
-    c_barPlot = new TCanvas(s_barPlotCanvasName.Data(), s_barPlotCanvasDescription.Data());
-    // Make stacked bar chart
-    THStack hBarStack("hBarStack", s_barPlotCanvasDescription.Data());
-    TLegend* hBarLegend = new TLegend(0.6, 0.6, 0.85, 0.85);
-    for (auto bg : component_names) {
-      TString histoName(Form(s_barTemplate.Data(), quantity.c_str(), bg.c_str()));
-      cout << histoName.Data() << endl;
-      TH1F* histoBg = (TH1F*)f->Get(histoName.Data());
-      if (!histoBg) {
-        cout << "WARNING histogram not found: " << histoName.Data() << endl;
-        continue;
-      }
-      histoBg->SetFillColor(component_colors[bg]);
-      histoBg->SetBarWidth(c_barwidth);
-      hBarStack.Add(histoBg);
-      hBarLegend->AddEntry(histoBg, bg.c_str(), "F");
-    }
-    c_barPlot->cd();
-    hBarStack.Draw("B");
-    hBarLegend->Draw();
-    c_barPlot->Modified(); c_barPlot->Update();
-    TString imageName(hBarStack.GetName());
-    imageName.Append(".png");
-    c_barPlot->SaveAs(imageName.Data());
-    char cStop;
-    cout << "Any char to continue" << endl;
-    cin >> cStop;
-  }
-  // 2. Neutron flux bars
-  // 3. Fired strips bars
-  // 4. Occupancy bars
-  // 5. Fluence plots
-
+  makeDoseBars(f);
+  makeNeutronFluxBars(f);
+  char cStop;
+  cout << "Any char to continue" << endl;
+  cin >> cStop;
   return 0;
 }
+
+void makeDoseBars(TFile* f)
+{
+  string quantity("Dose");
+  string ylabel("Dose [Gy/smy]");
+  cout << "Making stacked bar plot for " << quantity.c_str() << endl;
+  // Make canvas
+  TString s_barPlotCanvasName(Form("c_%sBars", quantity.c_str()));
+  TString s_barPlotCanvasDescription(Form("%s by layer and background type", quantity.c_str()));
+  TCanvas* c_barPlot = (TCanvas*)gROOT->GetListOfCanvases()->FindObject(s_barPlotCanvasName.Data());
+  if (c_barPlot) delete c_barPlot;
+  c_barPlot = new TCanvas(s_barPlotCanvasName.Data(), s_barPlotCanvasDescription.Data());
+  // Make stacked bar chart
+  THStack hBarStack("hBarStack", s_barPlotCanvasDescription.Data());
+  TLegend* hBarLegend = new TLegend(0.6, 0.6, 0.85, 0.85);
+  hBarLegend->SetHeader(quantity.c_str());
+  hBarLegend->SetBorderSize(0);
+  for (auto bg : component_names) {
+    TString histoName(Form("hBar_%s_%s", quantity.c_str(), bg.c_str()));
+    cout << histoName.Data() << endl;
+    TH1F* histoBg = (TH1F*)f->Get(histoName.Data());
+    if (!histoBg) {
+      cout << "WARNING histogram not found: " << histoName.Data() << endl;
+      continue;
+    }
+    histoBg->SetFillColor(component_colors[bg]);
+    histoBg->SetBarWidth(c_barwidth);
+    hBarStack.Add(histoBg);
+    hBarLegend->AddEntry(histoBg, bg.c_str(), "F");
+  }
+  c_barPlot->cd();
+  hBarStack.Draw("B");
+  hBarStack.GetXaxis()->SetTitle("SVD layer");
+  hBarStack.GetYaxis()->SetTitle(ylabel.c_str());
+  hBarLegend->Draw();
+  c_barPlot->Modified(); c_barPlot->Update();
+  TString imageName(hBarStack.GetName());
+  imageName.Append(".png");
+  c_barPlot->SaveAs(imageName.Data());
+}
+
+void makeNeutronFluxBars(TFile* f)
+{
+  string quantity("Neutron_flux");
+  string ylabel("Neutron flux [1/cm^2/smy]");
+  cout << "Making stacked bar plot for " << quantity.c_str() << endl;
+  // Make canvas
+  TString s_barPlotCanvasName(Form("c_%sBars", quantity.c_str()));
+  TString s_barPlotCanvasDescription(Form("%s by layer and background type", "Neutron flux"));
+  TCanvas* c_barPlot = (TCanvas*)gROOT->GetListOfCanvases()->FindObject(s_barPlotCanvasName.Data());
+  if (c_barPlot) delete c_barPlot;
+  c_barPlot = new TCanvas(s_barPlotCanvasName.Data(), s_barPlotCanvasDescription.Data());
+  // Make stacked bar chart
+  THStack hBarStack("hBarStack", s_barPlotCanvasDescription.Data());
+  TLegend* hBarLegend = new TLegend(0.6, 0.6, 0.85, 0.85);
+  hBarLegend->SetHeader(quantity.c_str());
+  hBarLegend->SetBorderSize(0);
+  for (auto bg : component_names) {
+    TString histoName(Form("hBar_%s_%s", quantity.c_str(), bg.c_str()));
+    cout << histoName.Data() << endl;
+    TH1F* histoBg = (TH1F*)f->Get(histoName.Data());
+    if (!histoBg) {
+      cout << "WARNING histogram not found: " << histoName.Data() << endl;
+      continue;
+    }
+    histoBg->SetFillColor(component_colors[bg]);
+    histoBg->SetBarWidth(c_barwidth);
+    hBarStack.Add(histoBg);
+    hBarLegend->AddEntry(histoBg, bg.c_str(), "F");
+  }
+  c_barPlot->cd();
+  hBarStack.Draw("B");
+  hBarStack.GetXaxis()->SetTitle("SVD layer");
+  hBarStack.GetYaxis()->SetTitle(ylabel.c_str());
+  hBarLegend->Draw();
+  c_barPlot->Modified(); c_barPlot->Update();
+  TString imageName(hBarStack.GetName());
+  imageName.Append(".png");
+  c_barPlot->SaveAs(imageName.Data());
+}
+
+

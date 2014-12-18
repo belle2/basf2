@@ -37,7 +37,10 @@
 #include <genfit/TGeoMaterialInterface.h>
 #include <genfit/StateOnPlane.h>
 
+#include <TFile.h>
 #include <TGeoManager.h>
+#include <TH2F.h>
+#include <TMath.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -66,7 +69,7 @@ DedxCellPIDModule::DedxCellPIDModule() : Module(), m_pdfs()
 
   addParam("enableDebugOutput", m_enableDebugOutput, "Option to write out debugging information to DedxCells (DataStore objects).", false);
 
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r8682_200k_events_upper_80perc_trunc.root"));
+  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r14253_400k.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -185,6 +188,7 @@ void DedxCellPIDModule::event()
   StoreArray<Track> tracks;
   StoreArray<CDCHit> cdcHits;
   StoreArray<MCParticle> mcparticles;
+  const int num_mcparticles = mcparticles.getEntries();
 
   // outputs
   StoreArray<DedxCell> dedxArray;
@@ -215,11 +219,30 @@ void DedxCellPIDModule::event()
       continue;
     }
     TVector3 trackMom = fitResult->getMomentum();
-    TVector3 trackPos = fitResult->getPosition();
     dedxCell->m_p = trackMom.Mag();
     dedxCell->m_cosTheta = trackMom.CosTheta();
 
-    // calculate dE/dx values using associated genfit::Track
+    if (m_enableDebugOutput && num_mcparticles != 0) {
+      // find MCParticle corresponding to this track
+      const MCParticle* mcpart = track->getRelatedTo<MCParticle>();
+
+      if (mcpart) {
+        //add some MC truths to DedxTrack object
+        dedxCell->m_pdg = mcpart->getPDG();
+        const MCParticle* mother = mcpart->getMother();
+        dedxCell->m_mother_pdg = mother ? mother->getPDG() : 0;
+
+        // find slow pions (i.e. D* daughter pions)
+        //          dedxTrack->m_slow_pion = (TMath::Abs(dedxTrack->m_pdg) == 211 and TMath::Abs(dedxTrack->m_mother_pdg) == 413);
+
+        const TVector3 true_momentum = mcpart->getMomentum();
+        dedxCell->m_p_true = true_momentum.Mag();
+      } else {
+        B2WARNING("No MCParticle found for current track!");
+      }
+    }
+
+    // dE/dx values will be calculated using associated genfit::Track
     const genfit::Track* gftrack = fitResult->getRelatedFrom<genfit::Track>();
     if (!gftrack) {
       B2WARNING("No related track for this fit...");

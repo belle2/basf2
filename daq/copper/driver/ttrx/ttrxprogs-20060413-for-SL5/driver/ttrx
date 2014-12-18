@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# ttrx	Script to load/unload ttrx devices
+#
+# Author: M. Nakao
+#
+# chkconfig: 2345 98 98
+# description: TT-RX drivers
+
+. /etc/init.d/functions
+
+# See how we were called.
+case "$1" in
+  start)
+	action $"Loading TT-RX device driver: " \
+           insmod /lib/modules/`uname -r`/misc/ttrx.ko
+	action $"Loading TT-RX FIFO driver: " \
+           insmod /lib/modules/`uname -r`/misc/ttrx_fifo.ko
+	rm -f /dev/ttrx? /dev/ttrx_fifo?
+	major=`cat /proc/devices | awk "\\$2==\"ttrx\" {print \\$1}"`
+	mknod /dev/ttrx0 c $major 0
+	mknod /dev/ttrx1 c $major 1
+	chmod 666 /dev/ttrx0
+	chmod 666 /dev/ttrx1
+	major_fifo=`cat /proc/devices | awk "\\$2==\"ttrx_fifo\" {print \\$1}"`
+	mknod /dev/ttrx_fifo0 c $major_fifo 0
+	mknod /dev/ttrx_fifo1 c $major_fifo 1
+	chmod 666 /dev/ttrx0
+	chmod 666 /dev/ttrx1
+	;;
+  stop)
+	action $"Unloading TT-RX device drivers: " \
+           rmmod ttrx ttrx_fifo
+	;;
+  status)
+	# nothing
+	:
+	;;
+  restart|reload)
+	# nothing
+	:
+	;;
+  *)
+	# do not advertise unreasonable commands that there is no reason
+	# to use with this device
+	echo $"Usage: $0 {start|stop|status|restart|reload}"
+	exit 1
+esac
+
+exit 0

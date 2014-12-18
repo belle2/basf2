@@ -141,7 +141,7 @@ namespace Belle2 {
                      Const::PIDDetectorSet detSet) const;
 
 
-    ClassDef(PIDLikelihood, 2); /**< class definition */
+    ClassDef(PIDLikelihood, 3); /**< class definition */
 
   };
 

@@ -19,6 +19,7 @@ namespace {
     Const::ChargedStable(Const::ParticleType(2212));
     Const::ChargedStable(Const::ParticleType(11));
     Const::ChargedStable(Const::ParticleType(13));
+    Const::ChargedStable(Const::ParticleType(1000010020));
     EXPECT_THROW(Const::ChargedStable(Const::ParticleType(22)), std::runtime_error);
     EXPECT_THROW(Const::ChargedStable(Const::ParticleType(-211)), std::runtime_error);
 
@@ -26,20 +27,21 @@ namespace {
     EXPECT_FALSE(emptyset.contains(Const::Klong));
 
     //check indices of some defined particles
-    EXPECT_EQ(0, Const::pion.getIndex());
-    EXPECT_EQ(1, Const::kaon.getIndex());
-    EXPECT_EQ(2, Const::proton.getIndex());
-    EXPECT_EQ(3, Const::electron.getIndex());
-    EXPECT_EQ(4, Const::muon.getIndex());
+    EXPECT_EQ(0, Const::electron.getIndex());
+    EXPECT_EQ(1, Const::muon.getIndex());
+    EXPECT_EQ(2, Const::pion.getIndex());
+    EXPECT_EQ(3, Const::kaon.getIndex());
+    EXPECT_EQ(4, Const::proton.getIndex());
+    EXPECT_EQ(5, Const::deuteron.getIndex());
 
     //and after a copy
     Const::ChargedStable c = Const::muon;
-    EXPECT_EQ(4, c.getIndex());
+    EXPECT_EQ(1, c.getIndex());
     Const::ParticleType p = Const::muon;
-    EXPECT_EQ(4, p.getIndex());
+    EXPECT_EQ(1, p.getIndex());
 
     //and after construction from PDG code
-    EXPECT_EQ(4, Const::ChargedStable(13).getIndex());
+    EXPECT_EQ(1, Const::ChargedStable(13).getIndex());
 
     //not in any set
     EXPECT_EQ(-1, Const::invalidParticle.getIndex());
@@ -68,40 +70,44 @@ namespace {
 
       switch (index) {
         case 0:
-          EXPECT_EQ(211, pdg);
-          break;
-        case 1:
-          EXPECT_EQ(321, pdg);
-          break;
-        case 2:
-          EXPECT_EQ(2212, pdg);
-          break;
-        case 3:
           EXPECT_EQ(11, pdg);
           break;
-        case 4:
+        case 1:
           EXPECT_EQ(13, pdg);
           break;
+        case 2:
+          EXPECT_EQ(211, pdg);
+          break;
+        case 3:
+          EXPECT_EQ(321, pdg);
+          break;
+        case 4:
+          EXPECT_EQ(2212, pdg);
+          break;
+        case 5:
+          EXPECT_EQ(1000010020, pdg);
+          break;
         default:
-          EXPECT_TRUE(false) << "Index >4 encountered?";
+          EXPECT_TRUE(false) << "Index >5 encountered?";
       }
       size++;
     }
-    EXPECT_EQ(5, size);
+    int setSize = Const::ChargedStable::c_SetSize;
+    EXPECT_EQ(setSize, size);
 
     size = 0;
     for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
       size++;
     }
-    EXPECT_EQ(5, size);
+    EXPECT_EQ(6, size);
 
-    Const::ChargedStable c = Const::proton;
+    Const::ChargedStable c = Const::kaon;
     EXPECT_TRUE(Const::chargedStableSet.contains(c));
-    EXPECT_EQ(2, c.getIndex());
+    EXPECT_EQ(3, c.getIndex());
     ++c;
     ++c;
-    EXPECT_EQ(4, c.getIndex());
-    EXPECT_EQ(13, c.getPDGCode());
+    EXPECT_EQ(5, c.getIndex());
+    EXPECT_EQ(1000010020, c.getPDGCode());
   }
 
   /** Check combination of ParticleSets. */
@@ -113,7 +119,7 @@ namespace {
     for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
       size++;
     }
-    EXPECT_EQ(5, size);
+    EXPECT_EQ(6, size);
 
     const Const::ParticleSet kaonSet = Const::kaon + Const::Klong + Const::Kshort;
     size = 0;
@@ -127,7 +133,7 @@ namespace {
     for (Const::ParticleType pdgIter = mergedSet.begin(); pdgIter != mergedSet.end(); ++pdgIter) {
       size++;
     }
-    EXPECT_EQ(size, 7); //kaon should be removed
+    EXPECT_EQ(size, 8); //kaon should be removed
   }
 
   /** Check TDatabasePDG lookups. */

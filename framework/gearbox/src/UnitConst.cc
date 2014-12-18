@@ -443,13 +443,14 @@ double Const::ParticleType::getMass() const
   return getParticlePDG()->Mass();
 }
 
-const Const::ParticleSet Const::chargedStableSet = Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(11) + Const::ParticleType(13);
+const Const::ParticleSet Const::chargedStableSet = Const::ParticleType(11) + Const::ParticleType(13) + Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020);
 
 const Const::ChargedStable Const::electron = Const::chargedStableSet.find(11);
 const Const::ChargedStable Const::muon = Const::chargedStableSet.find(13);
 const Const::ChargedStable Const::pion = Const::chargedStableSet.find(211);
 const Const::ChargedStable Const::kaon = Const::chargedStableSet.find(321);
 const Const::ChargedStable Const::proton = Const::chargedStableSet.find(2212);
+const Const::ChargedStable Const::deuteron = Const::chargedStableSet.find(1000010020);
 
 const Const::ParticleType Const::photon = Const::ParticleType(22);
 const Const::ParticleType Const::pi0 = Const::ParticleType(111);
@@ -463,6 +464,7 @@ const double Const::muonMass = Const::muon.getMass();
 const double Const::pionMass = Const::pion.getMass();
 const double Const::kaonMass = Const::kaon.getMass();
 const double Const::protonMass = Const::proton.getMass();
+const double Const::deuteronMass = Const::deuteron.getMass();
 const double Const::pi0Mass = Const::pi0.getMass();
 const double Const::neutronMass = Const::neutron.getMass();
 const double Const::K0Mass = Const::Kshort.getMass();

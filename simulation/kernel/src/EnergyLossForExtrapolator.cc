@@ -30,6 +30,7 @@
 #include <G4LossTableBuilder.hh>
 #include <G4MollerBhabhaModel.hh>
 #include <G4BetheBlochModel.hh>
+#include <G4Version.hh>
 #if G4VERSION_NUMBER < 1001
 #include <G4eBremsstrahlungModel.hh>
 #else

@@ -35,4 +35,26 @@
 
 #pragma link C++ class Belle2::HLTTag;
 
+// Allow reading PIDLikelihood version <=2 (less particle types, different order)
+//
+// schema evolution rule as described in "Support For Significant Evolutions of the User Data Model In ROOT Files"
+// Ph Canal et al 2010 J. Phys.: Conf. Ser. 219
+//
+// Note: target must be empty, otherwise the rule isn't applied in this case. Probably some bug there?
+//       One can still access the fresh object via 'newObj', though.
+#pragma read sourceClass="Belle2::PIDLikelihood" version="[-2]" \
+  source="float m_logl[6][5]" \
+  targetClass="Belle2::PIDLikelihood" target="" \
+  code="{ \
+    const static int oldToNewIndex[] = {2, 3, 4, 0, 1}; \
+    for (int iDet = 0; iDet < 6; iDet++) { \
+      for (int iPDG = 0; iPDG < 5; iPDG++) { \
+        int newIndex = oldToNewIndex[iPDG]; \
+        newObj->m_logl[iDet][newIndex] = onfile.m_logl[iDet][iPDG]; \
+      } \
+      /* use proton likelihood for deuterons. */ \
+      newObj->m_logl[iDet][5] = onfile.m_logl[iDet][2]; \
+    }\
+  }"
+
 #endif

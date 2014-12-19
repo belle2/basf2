@@ -162,7 +162,7 @@ void CurlingTrackCandSplitterModule::initialize()
 
       name = "TrueHitULocal_" + layerString;
       m_treePtr->Branch(name.c_str(), &m_rootTrueHitULocals.at(layer));
-      name = "TrueHitXVLocal_" + layerString;
+      name = "TrueHitVLocal_" + layerString;
       m_treePtr->Branch(name.c_str(), &m_rootTrueHitVLocals.at(layer));
 
       name = "PosResidualsXGlobal_" + layerString;
@@ -609,6 +609,8 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
     rootVariables.PosResidueULocal.at(spLayer).push_back((spacePointUV.first - trueHit->getU()));
     rootVariables.PosResidueVLocal.at(spLayer).push_back((spacePointUV.second - trueHit->getV()));
 
+  } else {
+    B2WARNING("SpacePoint " << spacePoint->getArrayIndex() << " (Array " << spacePoint->getArrayName() << ") and TrueHit " << trueHit->getArrayIndex() << " (Array " << trueHit->getArrayName() << ") are not on the same Layer in getValuesForRoot()");
   }
 }
 

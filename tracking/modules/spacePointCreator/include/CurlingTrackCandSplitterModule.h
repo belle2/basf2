@@ -26,9 +26,13 @@ namespace Belle2 {
    *
    * Some statements on how the module works on checking if a SpacePointTrackCand is curling:
    * 1) convert genfit::TrackCand to SpacePointTrackCand
-   * 2) for every SpacePoint in SpacePointTrackCand get Cluster(s) and from them get the according TrueHit(s). If there is more than one TrueHit for a SpacePoint (e.g. SVD) check if they are the same, if not throw
+   * 2) for every SpacePoint in SpacePointTrackCand get Cluster(s) and from them get the according TrueHit(s).
+   * 4) Check if the TrueHits are compatible (explanation below)
    * 3) From TrueHit get position and momentum of hit (in global coordinates) and decide with this information if the particles direction of flight is inwards our outwards (i.e. towards or away from set origin)
    * 4) If Direction changes from one SpacePoint to another -> split SpacePointTrackCand
+   *
+   * Explanation of compatible TrueHits:
+   * For all Clusters related from a SpacePoint all related TrueHits are collected. If there is one (or more) shared TrueHit this is considered to be compatible (regardless of other non-matching TrueHits)
    *
    */
   class CurlingTrackCandSplitterModule : public Module {

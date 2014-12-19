@@ -106,9 +106,8 @@ trackCandConverter.logging.log_level = MyOtherLogLevel
 trackCandConverter.logging.debug_level = MyOtherDebugLevel
 param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
                               #    'SVDClusters': 'mySVDClusters',
-                              # use everything there is
-                              # does not work at the moment anyway
-                              # set to false if exception should be thrown when no doubleCluster SpacePoint can be found for SVD Clusters
+                              # set checkTrueHits to true if TrueHits should be checked (CAUTION: no analysis on MisMatch TrueHits in CurlingTrackCandSplitter possible if set to true)
+                              # set useSingleClusterSP to false if exception should be thrown when no doubleCluster SpacePoint can be found for SVD Clusters
     'genfitTCName': 'mcTracks',
     'SpacePointTCName': 'SPTracks',
     'NoSingleClusterSVDSP': 'nosingleSP',
@@ -139,7 +138,8 @@ tcConverterTest.param(param_tcConverterTest)
 curlingSplitter = register_module('CurlingTrackCandSplitter')
 curlingSplitter.logging.log_level = MyOtherLogLevel
 curlingSplitter.logging.debug_level = MyOtherDebugLevel
-param_curlingSplitter = {  # set to true if you want to analyze the position of SpacePoints and the TrueHits they are related to
+param_curlingSplitter = {  # set positionAnalysis to true if you want to analyze the position of SpacePoints and the TrueHits they are related to
+                           # set splitCurlers to false if you do not want to split curling TrackCandidates but simply analyze them for curling behaviour
     'SpacePointTCName': 'SPTracks',
     'curlingFirstOutName': 'firstOutParts',
     'curlingAllInName': 'allInParts',
@@ -149,7 +149,7 @@ param_curlingSplitter = {  # set to true if you want to analyze the position of 
     'nTrackStubs': int(0),
     'setOrigin': [0., 0., 0.],
     'positionAnalysis': True,
-    'rootFileName': ['SPtoTrueHitAnalysis', 'RECREATE'],
+    'rootFileName': ['SPtoTrueHitAnalysis_nosingle', 'RECREATE'],
     }
 curlingSplitter.param(param_curlingSplitter)
 

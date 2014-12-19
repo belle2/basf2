@@ -145,7 +145,7 @@ void GFTC2SPTCConverterModule::event()
 // -------------------------------- TERMINATE --------------------------------------------------------
 void GFTC2SPTCConverterModule::terminate()
 {
-  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found  and in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap).");
+  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found  and in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap). (TrueHits have been checked: " << m_PARAMcheckTrueHits << ")");
 }
 
 // ---------------------------------------- Create SpacePoint TrackCand
@@ -433,7 +433,10 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
 // COULDDO: Template this (almost the same as get PXD SpacePoint) (drawback: need a string argument then, to specify the StoreArray in which desired SpacePoints are located!)
 const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSingleClusterSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit)
 {
-  if (!m_PARAMuseSingleClusterSP) throw FoundNoSpacePoint(); // COULDDO: check this before calling this function, is probably faster!!
+  if (!m_PARAMuseSingleClusterSP) {
+    B2WARNING("Found no double Cluster SVD SpacePoint for Cluster " << svdCluster->getArrayIndex() << " but 'useSingleClusterSP' is set to false!")
+    throw FoundNoSpacePoint(); // COULDDO: check this before calling this function, is probably faster!!
+  }
   B2DEBUG(70, "Trying to find a related SpacePoint for Cluster " << svdCluster->getArrayIndex() << " from Array " << svdCluster->getArrayName());
   const SpacePoint* spacePoint = svdCluster->getRelatedFrom<SpacePoint>(m_SingleClusterSVDSPName);
   if (spacePoint == NULL) {
@@ -538,6 +541,7 @@ void GFTC2SPTCConverterModule::initializeCounters()
   m_genfitTCCtr = 0;
   m_abortedTrueHitCtr = 0;
   m_abortedUnsuitableTCCtr = 0;
+  m_abortedNoSPCtr = 0;
 }
 
 void GFTC2SPTCConverterModule::markHitAsUsed(std::vector<flaggedPair<int> >& flaggedHitIDs, int hitToMark)

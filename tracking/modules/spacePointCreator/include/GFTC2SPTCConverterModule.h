@@ -45,11 +45,13 @@ namespace Belle2 {
    * 5) If ONLY ONE SpacePoint has a valid Cluster Combination, check if its Clusters appear in consecutive order in the genfit::TrackCand, if they do -> take this SpacePoint, mark the Clusters (TrackCandHits) as used, proceed with next TrackCandHit. If they do not appear in consecutive order -> throw an exception (this SpacePointTrackCand cannot be converted back to a genfit::TrackCand properly)
    * 6) If more than SpacePoint has a valid Cluster Combination -> check if there is a SpacePoint with consecutive Clusters in the genfit::TrackCand ('normally' there is a Cluster Combination, that is in consecutive order in the genfit::TrackCand) and mark its Clusters as used, proceed with next TrackCandHit, if all valid SpacePoints have Cluster Combinations that do not appear in consecutive order -> throw
    * 7) If no valid SpacePoint can be found, but SpacePoints with existing (but used) Cluster Combinations can be found, an exception is thrown and the genfit::TrackCand will not be converted, since the conversion would get ambiguous then (this happens in roughly 1 - 2 % of all cases)
-   * 8) If no valid SpacePoint can be found and no SpacePoint with existing (but used) Cluster Combinations, this Cluster will be added via a single Cluster SpacePoint (and then be marked as used)
+   * 8) If no valid SpacePoint can be found and no SpacePoint with existing (but used) Cluster Combinations, this Cluster will be added via a single Cluster SpacePoint (and then be marked as used) if this feature is activated by parameter 'useSingleClusterSP'
    *
    * If no SpacePoint can be found for any Cluster in the genfit::TrackCand, an exception is thrown, and the conversion is skipped.
    *
-   * NOTE: Checking TrueHits for SVD Clusters leads to another 1-2 % of discarded TrackCandidates. TODO: this doesnot work at the moment TODO: Investigate if throwing these out is necessary at all or if this is something that can be neglected
+   * Some Statements on how TrueHits are checked (if activated)
+   * 1) for PXD SpacePoints or single Cluster SVD SpacePoints it is only checked if a relation to one (or more) TrueHits exists
+   * 2) for double Cluster SVD SpacePoints, all TrueHits related to both SVDClusters are collected. The collection is then searched for TrueHits appearing twice. If one (or more) TrueHits appear twice the SpacePoint is accepted, else it is not and the TrackCand will be skipped from conversion
    *
    * TODO: clean-up and bring in line with coding conventions!
    */

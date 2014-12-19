@@ -147,7 +147,7 @@ namespace Belle2 {
     bool operator == (const SpacePointTrackCand& rhs);
 
     /**
-     * set the direction of flight (true is outgoing, false is ingoing)
+     * set the direction of flight (true is outgoing, false is ingoing). Initialized to true by default!
      */
     void setFlightDirection(bool direction) { m_flightDirection = direction; }
 

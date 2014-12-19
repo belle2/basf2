@@ -302,7 +302,7 @@ namespace Belle2 {
     double  acceptance[c_noOfHypotheses][c_noOfAerogels];
     double  logL[c_noOfHypotheses];
     double  nBgr[c_noOfHypotheses];
-    double  nSig[c_noOfAerogels][c_noOfHypotheses]; // expected no. of photons
+    double  nSig[c_noOfHypotheses][c_noOfAerogels]; // expected no. of photons
     double  esigi[c_noOfHypotheses]; // expected number of signal photons in each pixel
     double  thetaCh[c_noOfHypotheses][c_noOfAerogels]; // expected Ch. angle
 

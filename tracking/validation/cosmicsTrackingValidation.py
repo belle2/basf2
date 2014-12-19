@@ -12,6 +12,7 @@
 VALIDATION_OUTPUT_FILE = 'CosmicsTrackingValidation.root'
 CONTACT = 'oliver.frost@desy.de'
 N_EVENTS = 10000
+ACTIVE = True
 
 import basf2
 basf2.set_random_seed(1337)
@@ -82,5 +83,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if ACTIVE:
+        main()
 

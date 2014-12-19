@@ -129,9 +129,8 @@ class ValidationPlot(object):
                              xs)
         return is_boolean or is_one_or_zero
 
-    @classmethod
     def determine_bin_edges(
-        cls,
+        self,
         xs,
         bins=None,
         lower_bound=None,
@@ -142,6 +141,8 @@ class ValidationPlot(object):
         # Coerce values to a numpy array. Do not copy if already a numpy array.
         xs = np.array(xs, copy=False)
 
+        get_logger().debug('Plot name %s', self.name)
+
         if isinstance(bins, collections.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
@@ -149,7 +150,7 @@ class ValidationPlot(object):
             bin_edges = array.array('f', bin_edges)
             return bin_edges
 
-        if cls.is_binary(xs):
+        if self.is_binary(xs):
             # if xs is a binary variable setup the histogram to
             # have only two bins with the right boundaries.
             if lower_bound is None:
@@ -162,35 +163,75 @@ class ValidationPlot(object):
                 n_bins = 2
             else:
                 n_bins = int(bins) or 1
+        elif isinstance(xs[0], np.integer):
+
+            get_logger().debug('Integer binning values encountered')
+            if lower_bound is None:
+                lower_bound = np.min(xs) - 0.5
+
+            if upper_bound is None:
+                upper_bound = np.max(xs) + 0.5
+
+            if bins is None:
+                n_bins = int(np.floor(upper_bound) - np.ceil(lower_bound)) + 1
+            else:
+                n_bins = int(bins)
+                # Do not allow negative bin numbers
+                if not n_bins > 0:
+                    message = 'bins=%s which is not a number greater than 0.' \
+                        % bins
+                    raise ValueError(message)
+
+            get_logger().debug('Lower bound %s', lower_bound)
+            get_logger().debug('Upper bound %s', upper_bound)
+            get_logger().debug('N bins %s', n_bins)
         else:
 
-            finite_indices = np.isfinite(xs)
-
+            finite_xs = xs[np.isfinite(xs)]
             if outlier_z_score is not None and (lower_bound is None
                     or upper_bound is None):
                 # Prepare for the estimation of outliers
-                x_mean = truncated_mean(xs)
-                x_std = trimmed_std(xs)
+                x_mean = truncated_mean(finite_xs)
+                x_std = trimmed_std(finite_xs)
 
             if lower_bound is None:
-                lower_bound = np.min(xs[finite_indices])
-
+                lower_bound = np.min(finite_xs)
                 # Clip the lower bound by outliers that exceed the given z score
                 if outlier_z_score is not None:
-                    outlier_lower_bound = x_mean - outlier_z_score * x_std
-                    if outlier_lower_bound > lower_bound:
-                        lower_bound = outlier_lower_bound
+                    # The lower bound at which outliers exceed the given z score
+                    lower_outlier_bound = x_mean - outlier_z_score * x_std
+                    # Clip the lower bound such that it concides with an actual value,
+                    # which prevents empty bins from being produced
+                    indices_above_lower_outlier_bound = finite_xs \
+                        > lower_outlier_bound
+                    lower_bound = \
+                        np.min(finite_xs[indices_above_lower_outlier_bound])
+
+                    get_logger().debug('Lower bound %s', lower_bound)
+                    get_logger().debug('Lower outlier bound %s',
+                                       lower_outlier_bound)
 
             if upper_bound is None:
-                upper_bound = np.max(xs[finite_indices])
-                # Correct the upper bound such that all values are strictly smaller than the upper bound
-                upper_bound = np.nextafter(upper_bound, np.inf)
+                if outlier_z_score is None:
+                    upper_bound = np.max(finite_xs)
+                else:
+                    # The upper bound at which outliers exceed the given z score
+                    upper_outlier_bound = x_mean + outlier_z_score * x_std
+                    # Clip the upper bound such that it concides with an actual value,
+                    # which prevents empty bins from being produced
+                    indices_above_upper_outlier_bound = finite_xs \
+                        < upper_outlier_bound
+                    upper_bound = \
+                        np.nanmax(finite_xs[indices_above_upper_outlier_bound])
 
-                # Clip the upper bound by outliers that exceed the given z score
-                if outlier_z_score is not None:
-                    outlier_upper_bound = x_mean + outlier_z_score * x_std
-                    if outlier_upper_bound < upper_bound:
-                        upper_bound = outlier_upper_bound
+                    get_logger().debug('Upper bound %s', upper_bound)
+                    get_logger().debug('Upper outlier bound %s',
+                                       upper_outlier_bound)
+
+                # Correct the upper bound such that all values are strictly smaller than the upper bound
+                # Make one step in single precision in the positive direction
+                next_upper_bound = np.nextafter(np.single(upper_bound), np.inf)
+                upper_bound = next_upper_bound
 
             if bins is None:
                 # Assume number of bins according to the rice rule.
@@ -214,6 +255,7 @@ class ValidationPlot(object):
             # Reinforce the upper and lower bound to be exact
             bin_edges[0] = lower_bound
             bin_edges[-1] = upper_bound
+            get_logger().debug('Bins %s', bin_edges)
         else:
 
             # Fall back if the array contains only one value
@@ -221,6 +263,7 @@ class ValidationPlot(object):
 
         # Construct a float array forwardable to root.
         bin_edges = array.array('f', bin_edges)
+        get_logger().debug('Bins %s', bin_edges)
         return bin_edges
 
     def fill(

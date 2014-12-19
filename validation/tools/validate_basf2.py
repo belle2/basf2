@@ -308,6 +308,12 @@ class Validation:
                                 if script_object in dependent_script.dependencies:
                                     dependent_script.dependencies.remove(script_object)
 
+                        # Some printout in quiet mode
+                        if self.quiet:
+                            waiting = [script for script in remaining_scripts if script.status == 'waiting']
+                            running = [script for script in remaining_scripts if script.status == 'running']
+                            print 'Finished [%d,%d]: %s -> %s' % (len(waiting), len(running), script_object.path, script_object.status)
+
                 # Otherwise (the script is waiting) and if it is ready to be executed
                 elif not script_object.dependencies:
 
@@ -324,6 +330,12 @@ class Validation:
                         self.log.debug('Starting ' + script_object.path)
                         script_object.control.execute(script_object, self.basf2_options)
                         script_object.status = 'running'
+
+                        # Some printout in quiet mode
+                        if self.quiet:
+                            waiting = [script for script in remaining_scripts if script.status == 'waiting']
+                            running = [script for script in remaining_scripts if script.status == 'running']
+                            print 'Started [%d,%d]: %s' % (len(waiting), len(running), script_object.path)
 
             # Update the list of scripts that have to be processed
             remaining_scripts = [script for script in remaining_scripts if script.status in ['waiting', 'running']]

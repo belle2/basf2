@@ -18,6 +18,8 @@
 #include <TFile.h>
 #include <TTree.h>
 
+#include <array>
+
 namespace Belle2 {
   /**
    * Module for checking SpacePointTrackCandidates for curling behaviour and splitting them into Track Candidate Stubs (each of them being a SpacePointTrackCand again) which do not show curling behaviour.

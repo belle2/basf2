@@ -4,16 +4,14 @@
 Import('env')
 
 env['LIBS'] = [
-    #'pxd',
+    'pxd',
+    'svd',
     'pxd_dataobjects',
     'svd_dataobjects',
     'tracking', 'tracking_dataobjects', 
     'vxd', 'vxd_dataobjects', 
-    'cdc', 'cdc_dataobjects',
-    'simulation_dataobjects',
+    'cdc_dataobjects',
     'framework',
-    'framework_pybasf2',
-    'geometry',
     'Geom',
 #   'genfit2',
     '$ROOT_LIBS',

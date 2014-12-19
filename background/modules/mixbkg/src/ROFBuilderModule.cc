@@ -40,7 +40,19 @@ REG_MODULE(ROFBuilder)
 
 const string ROFBuilderModule::s_auxMCParticlesName = "ROFBuilderMCParticleEvent";
 
-ROFBuilderModule::ROFBuilderModule() : Module()
+ROFBuilderModule::ROFBuilderModule() : Module(), m_backgroundTag(0),
+  m_rofGraphUniqueID(0),
+  m_outputRootFile(0),
+  m_rofTree(0),
+  m_contentTree(0),
+  m_readoutFrame(0),
+  m_mcParticles(0),
+  m_mcPartRels(0),
+  m_event(0),
+  m_currReadoutFrameIdx(0),
+  m_numberSimHits(0),
+  m_timer(0),
+  m_eventTime(0)
 {
   //Set module properties
   setDescription("Generates a ROOT file containing the readout frames for a single subdetector and a specific background component and generator.");

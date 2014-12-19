@@ -11,6 +11,7 @@
     <xi:include href="TOP-Support.xml"/>
     <xi:include href="TOP-Mirror.xml"/>
     <xi:include href="TOP-SupportAlignment.xml"/>
+    <xi:include href="FrontEndMapping.xml"/>
     
     <BeamBackgroundStudy desc="select 1 to record neutron and gamma hits">0</BeamBackgroundStudy>
 

@@ -130,6 +130,7 @@ namespace Belle2 {
     m_topgp->setBasfUnits();
 
     // simulate trigger T0 accuracy in finding the right bunch crossing
+
     double trigT0 = 0;
     if (m_trigT0Sigma > 0) {
       trigT0 = gRandom->Gaus(0., m_trigT0Sigma);
@@ -180,19 +181,27 @@ namespace Belle2 {
     }
 
     // add randomly distributed electronic noise
-    if (m_darkNoise <= 0) return;
 
-    int Nbars = m_topgp->getNbars();
-    int Nchannels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
-                    m_topgp->getNpadx() * m_topgp->getNpady();
+    if (m_darkNoise > 0) {
+      int Nbars = m_topgp->getNbars();
+      int Nchannels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
+                      m_topgp->getNpadx() * m_topgp->getNpady();
 
-    for (int barID = 1; barID < Nbars + 1; barID++) {
-      int NoiseHits = gRandom->Poisson(m_darkNoise);
-      for (int i = 0; i < NoiseHits; i++) {
-        int channelID = int(gRandom->Rndm() * Nchannels) + 1;
-        int TDC = int(gRandom->Rndm() * overflow);
-        topDigits.appendNew(barID, channelID, TDC);
+      for (int barID = 1; barID < Nbars + 1; barID++) {
+        int NoiseHits = gRandom->Poisson(m_darkNoise);
+        for (int i = 0; i < NoiseHits; i++) {
+          int channelID = int(gRandom->Rndm() * Nchannels) + 1;
+          int TDC = int(gRandom->Rndm() * overflow);
+          topDigits.appendNew(barID, channelID, TDC);
+        }
       }
+    }
+
+    // set hardware channel ID
+
+    for (auto & digit : topDigits) {
+      unsigned chan = m_topgp->getHardwareChannelID(digit.getChannelID());
+      digit.setHardwareChannelID(chan);
     }
 
   }

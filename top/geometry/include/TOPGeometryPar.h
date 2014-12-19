@@ -25,6 +25,7 @@
 #include <G4RotationMatrix.hh>
 
 #include <top/geometry/TOPQbar.h>
+#include <top/geometry/FrontEndMapper.h>
 
 
 #define MAXPTS_TTS 10
@@ -281,6 +282,12 @@ namespace Belle2 {
       double getPMToffsetY() const {return m_pmtOffsetY / m_unit;}
 
       /**
+       * Get channel mapper
+       * @return channel mapper object
+       */
+      const FrontEndMapper& getFrontEndMapper() const {return m_mapper;}
+
+      /**
        * Return number of TDC bits
        * @return number of TDC bits
        */
@@ -452,6 +459,83 @@ namespace Belle2 {
        */
       int getChannelID(double x, double y, int pmtID) const;
 
+
+      /**
+       * Calculate channel ID from bar column and ASIC row, column and channel
+       * @param electronicsModule column within a TOP module
+       * @param asicRow ASIC row number
+       * @param asicColumn ASIC column number
+       * @param asicChannel ASIC channel number
+       * @return software channel ID
+       */
+      int getChannelID(int electronicsModule, int asicRow,
+                       int asicColumn, int asicChannel) const {
+        return 4 - (asicChannel % 8) / 2 + (asicChannel % 2) * 64 + asicColumn * 4
+               + electronicsModule * 16 + asicRow * 128;
+      }
+
+      /**
+       * Converts hardware to software channel ID
+       * @param channel hardware channel ID
+       * @return software channel ID
+       */
+      unsigned getChannelID(int channel) const {
+        unsigned asicChannel = channel % 8; channel /= 8;
+        unsigned asicRow = channel % 4; channel /= 4;
+        unsigned asicCol = channel % 4; channel /= 4;
+        unsigned column = channel;
+        return getChannelID(column, asicRow, asicCol, asicChannel);
+      }
+
+      /**
+       * Returns a column of electronic module within TOP module
+       * @param pixel software channel ID
+       * @return electronic module number
+       */
+      int getElectronicsModuleNumber(int pixel) const {
+        return ((pixel - 1) % 64) / 16;
+      }
+
+      /**
+       * Returns ASIC row
+       * @param pixel software channel ID
+       * @return ASIC row
+       */
+      int getAsicRow(int pixel) const {
+        return (pixel - 1) / 128;
+      }
+
+      /**
+       * Returns ASIC column
+       * @param pixel software channel ID
+       * @return ASIC column
+       */
+      int getAsicColumn(int pixel) const {
+        return ((pixel - 1) % 16) / 4;
+      }
+
+      /**
+       * Returns ASIC channel
+       * @param pixel software channel ID
+       * @return ASIC channel
+       */
+      int getAsicChannel(int pixel) const {
+        return 2 * ((3 - (pixel - 1) % 4)) + ((pixel - 1) % 128) / 64;
+      }
+
+      /**
+       * Converts software to hardware channel ID
+       * @param pixel software channel ID
+       * @return hardware channel ID
+       */
+      unsigned getHardwareChannelID(int pixel) const {
+        unsigned asicChannel = getAsicChannel(pixel);
+        unsigned asicRow = getAsicRow(pixel);
+        unsigned asicCol = getAsicColumn(pixel);
+        unsigned column = getElectronicsModuleNumber(pixel);
+        return asicChannel + asicRow * 8 + asicCol * 32 + column * 128;
+      }
+
       /**
        * Convert new numbering scheme to the old one
        * @param channelID channel ID in the new numbering scheme
@@ -540,6 +624,10 @@ namespace Belle2 {
       double m_dGlue;             /**< PMT wedge glue thickness */
       double m_pmtOffsetX;        /**< PMT array offset in x */
       double m_pmtOffsetY;        /**< PMT array offset in y */
+
+      //! mapping
+
+      FrontEndMapper m_mapper; /**< front end electronics mapper */
 
       //! TDC parameters
 

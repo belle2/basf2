@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FrontEndMapping descr="Mapping of SCROD's to TOP modules">
+<!-- Because no hardware yet to exist, SCRODid's and COPPERid's are arbitrary chosen -->
+
+  <TOPModule barID="1">
+    <ElectronicsModule col="0">
+      <SCRODid>101</SCRODid>
+      <COPPERid>1001</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>102</SCRODid>
+      <COPPERid>1001</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>103</SCRODid>
+      <COPPERid>1001</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>104</SCRODid>
+      <COPPERid>1001</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="2">
+    <ElectronicsModule col="0">
+      <SCRODid>201</SCRODid>
+      <COPPERid>1002</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>202</SCRODid>
+      <COPPERid>1002</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>203</SCRODid>
+      <COPPERid>1002</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>204</SCRODid>
+      <COPPERid>1002</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="3">
+    <ElectronicsModule col="0">
+      <SCRODid>301</SCRODid>
+      <COPPERid>1003</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>302</SCRODid>
+      <COPPERid>1003</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>303</SCRODid>
+      <COPPERid>1003</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>304</SCRODid>
+      <COPPERid>1003</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="4">
+    <ElectronicsModule col="0">
+      <SCRODid>401</SCRODid>
+      <COPPERid>1004</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>402</SCRODid>
+      <COPPERid>1004</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>403</SCRODid>
+      <COPPERid>1004</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>404</SCRODid>
+      <COPPERid>1004</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="5">
+    <ElectronicsModule col="0">
+      <SCRODid>501</SCRODid>
+      <COPPERid>1005</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>502</SCRODid>
+      <COPPERid>1005</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>503</SCRODid>
+      <COPPERid>1005</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>504</SCRODid>
+      <COPPERid>1005</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="6">
+    <ElectronicsModule col="0">
+      <SCRODid>601</SCRODid>
+      <COPPERid>1006</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>602</SCRODid>
+      <COPPERid>1006</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>603</SCRODid>
+      <COPPERid>1006</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>604</SCRODid>
+      <COPPERid>1006</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="7">
+    <ElectronicsModule col="0">
+      <SCRODid>701</SCRODid>
+      <COPPERid>1007</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>702</SCRODid>
+      <COPPERid>1007</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>703</SCRODid>
+      <COPPERid>1007</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>704</SCRODid>
+      <COPPERid>1007</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="8">
+    <ElectronicsModule col="0">
+      <SCRODid>801</SCRODid>
+      <COPPERid>1008</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>802</SCRODid>
+      <COPPERid>1008</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>803</SCRODid>
+      <COPPERid>1008</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>804</SCRODid>
+      <COPPERid>1008</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="9">
+    <ElectronicsModule col="0">
+      <SCRODid>901</SCRODid>
+      <COPPERid>1009</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>902</SCRODid>
+      <COPPERid>1009</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>903</SCRODid>
+      <COPPERid>1009</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>904</SCRODid>
+      <COPPERid>1009</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="10">
+    <ElectronicsModule col="0">
+      <SCRODid>1001</SCRODid>
+      <COPPERid>1010</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>1002</SCRODid>
+      <COPPERid>1010</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>1003</SCRODid>
+      <COPPERid>1010</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>1004</SCRODid>
+      <COPPERid>1010</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="11">
+    <ElectronicsModule col="0">
+      <SCRODid>1101</SCRODid>
+      <COPPERid>1011</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>1102</SCRODid>
+      <COPPERid>1011</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>1103</SCRODid>
+      <COPPERid>1011</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>1104</SCRODid>
+      <COPPERid>1011</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="12">
+    <ElectronicsModule col="0">
+      <SCRODid>1201</SCRODid>
+      <COPPERid>1012</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>1202</SCRODid>
+      <COPPERid>1012</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>1203</SCRODid>
+      <COPPERid>1012</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>1204</SCRODid>
+      <COPPERid>1012</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="13">
+    <ElectronicsModule col="0">
+      <SCRODid>1301</SCRODid>
+      <COPPERid>1013</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>1302</SCRODid>
+      <COPPERid>1013</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>1303</SCRODid>
+      <COPPERid>1013</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>1304</SCRODid>
+      <COPPERid>1013</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="14">
+    <ElectronicsModule col="0">
+      <SCRODid>1401</SCRODid>
+      <COPPERid>1014</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>1402</SCRODid>
+      <COPPERid>1014</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>1403</SCRODid>
+      <COPPERid>1014</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>1404</SCRODid>
+      <COPPERid>1014</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="15">
+    <ElectronicsModule col="0">
+      <SCRODid>1501</SCRODid>
+      <COPPERid>1015</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>1502</SCRODid>
+      <COPPERid>1015</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>1503</SCRODid>
+      <COPPERid>1015</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>1504</SCRODid>
+      <COPPERid>1015</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+  <TOPModule barID="16">
+    <ElectronicsModule col="0">
+      <SCRODid>1601</SCRODid>
+      <COPPERid>1016</COPPERid>
+      <FinesseSlot>A</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="1">
+      <SCRODid>1602</SCRODid>
+      <COPPERid>1016</COPPERid>
+      <FinesseSlot>B</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="2">
+      <SCRODid>1603</SCRODid>
+      <COPPERid>1016</COPPERid>
+      <FinesseSlot>C</FinesseSlot>
+    </ElectronicsModule>
+    <ElectronicsModule col="3">
+      <SCRODid>1604</SCRODid>
+      <COPPERid>1016</COPPERid>
+      <FinesseSlot>D</FinesseSlot>
+    </ElectronicsModule>
+  </TOPModule>
+
+</FrontEndMapping>
+

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from cdclocaltracking.validation.plot import ValidationPlot, \
-    compose_axis_label, root_save_name
+from tracking.validation.plot import ValidationPlot, compose_axis_label, \
+    root_save_name
 
 import math
 import collections

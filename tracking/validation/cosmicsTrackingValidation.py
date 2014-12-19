@@ -29,9 +29,9 @@ import numpy as np
 import math
 
 import simulation
-from cdclocaltracking.validation.plot import ValidationPlot, root_save_name, \
+from tracking.validation.plot import ValidationPlot, root_save_name, \
     compose_axis_label
-from cdclocaltracking.validation.pull import PullAnalysis
+from tracking.validation.pull import PullAnalysis
 
 import ROOT
 from ROOT import Belle2

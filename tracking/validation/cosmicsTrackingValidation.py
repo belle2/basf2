@@ -4,7 +4,7 @@
 """
 <header>
   <contact>oliver.frost@desy.de</contact>
-  <output>cosmicsTrackingValidation.root</output>
+  <output>CosmicsTrackingValidation.root</output>
   <description>This module validates that track finding is capable of reconstructing tracks in cosmics run.</description>
 </header>
 """

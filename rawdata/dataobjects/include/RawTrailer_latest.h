@@ -69,10 +69,11 @@ namespace Belle2 {
 
   private:
     //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer_latest )
-    int* m_buffer;
+    int* m_buffer; //! do not record
 
     /// To derive from TObject
-    ClassDef(RawTrailer_latest, 1);
+    // ver.2 Do not record m_buffer pointer. (Dec.19, 2014)
+    ClassDef(RawTrailer_latest, 2);
   };
 
 

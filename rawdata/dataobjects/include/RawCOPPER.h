@@ -300,10 +300,10 @@ namespace Belle2 {
     };
 
     //! class to access
-    RawCOPPERFormat* m_access; //!
+    RawCOPPERFormat* m_access; //! do not record
 
     /// Version of the format
-    int m_version;
+    int m_version; //! do not record
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)

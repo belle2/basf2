@@ -193,13 +193,19 @@ class ValidationPlot(object):
                         upper_bound = outlier_upper_bound
 
             if bins is None:
-                # Assume number of bins according to the rice rule
-                n_data = finite_indices.sum()
+                # Assume number of bins according to the rice rule.
+                # The number of data points should not include outliers.
+                n_data = np.sum((lower_bound <= xs) & (xs <= upper_bound))
                 rice_n_bins = int(np.ceil(2.0 * pow(n_data, 1.0 / 3.0)))
                 n_bins = rice_n_bins
             else:
 
-                n_bins = int(bins) or 1
+                n_bins = int(bins)
+                # Do not allow negative bin numbers
+                if not n_bins > 0:
+                    message = 'bins=%s which is not a number greater than 0.' \
+                        % bins
+                    raise ValueError(message)
 
         n_bin_edges = n_bins + 1
         if lower_bound != upper_bound:

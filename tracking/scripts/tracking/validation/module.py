@@ -298,7 +298,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 profile_plot_name = plot_name_prefix + '_by_' \
                     + root_save_name(parameter_name)
                 profile_plot = ValidationPlot(profile_plot_name)
-                profile_plot.profile(parameter_values, xs)
+                profile_plot.profile(parameter_values, xs, outlier_z_score=5.0)
 
                 profile_plot.xlabel = compose_axis_label(parameter_name)
                 profile_plot.ylabel = compose_axis_label(quantity_name, unit)

@@ -73,7 +73,7 @@ namespace Belle2 {
 
     /// To derive from TObject
     // ver.2 Do not record m_buffer pointer. (Dec.19, 2014)
-    ClassDef(RawTrailer_latest, 2);
+    ClassDef(RawTrailer_latest, 1);
   };
 
 

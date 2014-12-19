@@ -300,7 +300,7 @@ namespace Belle2 {
     };
 
     //! class to access
-    RawCOPPERFormat* m_access;
+    RawCOPPERFormat* m_access; //!
 
     /// Version of the format
     int m_version;
@@ -309,7 +309,7 @@ namespace Belle2 {
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
     ///ver.3 Change FEE format as presented at B2GM in Nov.2013 ( May 1, 2014)
     ///ver.4 Do not record m_access pointer ( Dec 19, 2014)
-    ClassDef(RawCOPPER, 4);
+    ClassDef(RawCOPPER, 3);
 
   };
 

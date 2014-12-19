@@ -178,6 +178,7 @@ namespace Belle2 {
     m_pid->setLogLikelihood(Const::KLM, Const::pion, muid->getLogL_pi());
     m_pid->setLogLikelihood(Const::KLM, Const::kaon, muid->getLogL_K());
     m_pid->setLogLikelihood(Const::KLM, Const::proton, muid->getLogL_p());
+    m_pid->setLogLikelihood(Const::KLM, Const::deuteron, muid->getLogL_p());
 
   }
 

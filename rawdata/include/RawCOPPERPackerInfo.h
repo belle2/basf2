@@ -5,7 +5,8 @@ namespace Belle2 {
   /**
    * struct to contain header information used by RawCOPPERFormat::Packer()
    */
-  struct RawCOPPERPackerInfo {
+  class RawCOPPERPackerInfo {
+  public :
 
     /// Experiment number (10bit)
     unsigned int exp_num; /// Experiment number (10bit)
@@ -27,6 +28,22 @@ namespace Belle2 {
     unsigned int truncation_mask; /// Not defined yet
 
     unsigned int type_of_data; /// Not defined yet
+
+
+
+    RawCOPPERPackerInfo() {
+      exp_num = 0;
+      run_subrun_num = 0;
+      eve_num = 0;
+      node_id = 0x00000000; // See RawCOPPERFormat.h
+      tt_ctime = 0;
+      tt_utime = 0;
+      b2l_ctime = 0;
+      hslb_crc16_error_bit = 0x0;
+      truncation_mask = 0;
+      type_of_data = 0;
+    }
+
   };
 }
 #endif

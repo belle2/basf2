@@ -88,7 +88,7 @@ namespace Belle2 {
     int mapSize = mapper.getMapSize();
     if (mapSize == 0) return;
 
-    std::vector<const TOPDigit*> sortedDigits[mapSize];
+    vector<const TOPDigit*>* sortedDigits = new vector<const TOPDigit*>[mapSize];
 
     for (const auto & digit : digits) {
       int barID = digit.getBarID();
@@ -102,13 +102,14 @@ namespace Belle2 {
       sortedDigits[feemap->index].push_back(&digit);
     }
 
-    unsigned maxSize = 0;
+    unsigned sortedDigitsMaxsize = 0;
     for (int i = 0; i < mapSize; i++) {
       unsigned size = sortedDigits[i].size();
-      if (size > maxSize) maxSize = size;
+      if (size > sortedDigitsMaxsize) sortedDigitsMaxsize = size;
     }
 
-    int buffer[4][maxSize];
+    int bufferDim = 1 + sortedDigitsMaxsize; // 1 header word + 1 data word per digit
+    int buffer[4][bufferDim];
 
     for (const auto & copperID : mapper.getCopperIDs()) {
       int bufferSize[4] = {0, 0, 0, 0};
@@ -118,16 +119,16 @@ namespace Belle2 {
         const auto* feemap = mapper.getMapFromCopper(copperID, finesse);
         if (!feemap) continue;
         unsigned scrodID = feemap->scrodID;
-        unsigned recID = 1;
-        unsigned ver = 0;
-        buf[i] = scrodID + (ver << 16) + (recID << 24);
-        i++;
+        unsigned dataFormat = 1; // production data -> TODO: use enum
+        unsigned version = 0;
+        buf[i] = scrodID + (version << 16) + (dataFormat << 24);
+        i++; // one header word
         for (const auto & digit : sortedDigits[feemap->index]) {
           unsigned tdc = digit->getTDC() & 0xFFFF;
           unsigned chan = digit->getHardwareChannelID() % 128;
           unsigned flags = (unsigned) digit->getHitQuality();
           buf[i] = tdc + (chan << 16) + (flags << 24);
-          i++;
+          i++; // one data word per digit
         }
       }
       RawCOPPERPackerInfo info;
@@ -151,6 +152,8 @@ namespace Belle2 {
                            info);
 
     }
+
+    delete [] sortedDigits;
 
   }
 

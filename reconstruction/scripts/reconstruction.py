@@ -2,11 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-
-# avoid race conditions beetween pyroot and GUI thread
-from ROOT import PyConfig
-PyConfig.StartGuiThread = False
-
 from ROOT import Belle2
 
 

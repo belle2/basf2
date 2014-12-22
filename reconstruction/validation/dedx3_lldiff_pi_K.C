@@ -40,18 +40,17 @@ void plot(const TString &input_filename)
   TFile *output_file = new TFile("dedx_LLdiff_pi_K.root", "RECREATE");
   output_file->cd();
 
-  const int show_particles = 2;
-  const int num_particles = 5;
-  const int pdg_codes[] = { 211, 321, 2212, 11, 13};
-  const char* pdg_names[] = { "pions", "kaons", "protons", "electrons", "muons" };
+  const int num_particles = 6;
+  const int pdg_codes[] = { 11, 13, 211, 321, 2212, 1000010020 };
+  const char* pdg_names[] = { "electrons", "muons", "pions", "kaons", "protons", "deuterons" };
   for (int det = 0; det < 2; det++) {
     TString selection;
     if (det == 0) //SVD
-      selection = TString::Format("(DedxTracks.m_svdLogl[][0] - DedxTracks.m_svdLogl[][1]):m_p_true");
+      selection = TString::Format("(DedxTracks.m_svdLogl[][2] - DedxTracks.m_svdLogl[][3]):m_p_true");
     else //CDC
-      selection = TString::Format("(DedxTracks.m_cdcLogl[][0] - DedxTracks.m_cdcLogl[][1]):m_p_true");
+      selection = TString::Format("(DedxTracks.m_cdcLogl[][2] - DedxTracks.m_cdcLogl[][3]):m_p_true");
 
-    for (int part = 0; part < show_particles; part++) {
+    for (int part = 2; part < 4; part++) {
       //now create histograms with log-likelihood difference
       tree->Project(TString::Format("%d_%d_LLdiff", det, pdg_codes[part]), selection,
           TString::Format("abs(DedxTracks.m_pdg) == %d", pdg_codes[part]));

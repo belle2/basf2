@@ -40,10 +40,10 @@ void plot(const TString &input_filename)
   TFile *output_file = new TFile("dedx_LRplots.root", "RECREATE");
   output_file->cd();
 
-  const int show_particles = 5;
-  const int num_particles = 5;
-  const int pdg_codes[] = { 211, 321, 2212, 11, 13};
-  const char* pdg_names[] = { "pions", "kaons", "protons", "electrons", "muons" };
+  const int show_particles = 6;
+  const int num_particles = 6;
+  const int pdg_codes[] = { 11, 13, 211, 321, 2212, 1000010020 };
+  const char* pdg_names[] = { "electrons", "muons", "pions", "kaons", "protons", "deuterons" };
   TString logl_strings[num_particles];
   for(int part = 0; part < show_particles; part++) {
     //for this particle, take its likelihood...

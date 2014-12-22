@@ -479,7 +479,7 @@ namespace Belle2 {
        * @param channel hardware channel ID
        * @return software channel ID
        */
-      unsigned getChannelID(int channel) const {
+      int getChannelID(unsigned int channel) const {
         unsigned asicChannel = channel % 8; channel /= 8;
         unsigned asicRow = channel % 4; channel /= 4;
         unsigned asicCol = channel % 4; channel /= 4;

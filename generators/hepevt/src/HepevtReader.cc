@@ -193,6 +193,18 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(
       particle.setMass(fields[4]);
       particle.setEnergy(fields[3]);
       break;
+      //modified Pit
+    case 9:
+      particle.setStatus(MCParticle::c_PrimaryParticle);
+      particle.setPDG(static_cast<int>(fields[8]));
+      particle.setFirstDaughter(0);
+      particle.setLastDaughter(0);
+      particle.setProductionVertex(TVector3(&fields[0])*Unit::mm);
+      particle.setMomentum(TVector3(&fields[3]));
+      particle.setMass(fields[6]);
+      particle.setEnergy(fields[7]);
+      break;
+      //end modified Pit
     case 15:
       particle.setStatus(MCParticle::c_PrimaryParticle);
       particle.setPDG(static_cast<int>(fields[1]));

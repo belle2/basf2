@@ -5,6 +5,20 @@ import os
 import signal
 from pybasf2 import *
 
+# workaround for possible hang with PyROOT on SL5
+# see https://belle2.cc.kek.jp/redmine/issues/1236
+# note: platform.libc_ver() is _really_ broken, so i'm checking the version via ldd (ships with libc)
+import subprocess
+ldd_ver = subprocess.check_output(['ldd', '--version'])
+sl5_libc_string = "ldd (GNU libc) 2.5"
+if sl5_libc_string in ldd_ver:
+    try:
+        from ROOT import PyConfig
+        PyConfig.StartGuiThread = False
+    except:
+        print "PyRoot not set up, this will cause problems."
+
+
 # -----------------------------------------------
 #             Set basf2 information
 # -----------------------------------------------

@@ -7,7 +7,10 @@ from basf2 import create_path, register_module, process, logging, \
 logging.log_level = LogLevel.WARNING
 
 # Load the required libraries
-from ROOT import TH1D, TH2D, TCanvas, Belle2
+from ROOT import TH1D, TH2D, TCanvas, Belle2, PyConfig
+
+# reenable GUI thread for our canvas
+PyConfig.StartGuiThread = True
 
 # Create some histograms to be filled
 h_nTracks = TH1D('nTracks', 'Number of Tracks per Event', 100, 0, 50)
@@ -27,10 +30,6 @@ h_zyvertex = TH2D('zyvertex', 'vertex in zy;z/#mum;y/#mum',
 
 class ShowMCParticles(Module):
     """Simple module to collect some information about MCParticles"""
-    def __init__(self):
-        """Initialize the module"""
-        super(ShowMCParticles, self).__init__()
-
     def event(self):
         """Fill the histograms with the values of the MCParticle collection"""
         mcParticles = Belle2.PyStoreArray('MCParticles')

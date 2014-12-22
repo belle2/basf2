@@ -14,14 +14,15 @@ import sys
 import math
 from basf2 import *
 
+# reenable GUI thread for our canvas
+from ROOT import PyConfig
+PyConfig.StartGuiThread = True
+
 ## Set the global log level
 logging.log_level = LogLevel.WARNING
 
 ## Load the required libraries
 import ROOT
-ROOT.gSystem.Load('libframework')
-ROOT.gSystem.Load('libgenerators_koralw')
-ROOT.gSystem.Load('libgenerators')
 from ROOT import Belle2
 
 ## Create some histograms to be filled
@@ -48,11 +49,6 @@ h_vertex = ROOT.TH2D(
 class ShowMCParticles(Module):
 
     """Simple module to collect some information about MCParticles"""
-
-    def __init__(self):
-        """Initialize the module"""
-
-        super(ShowMCParticles, self).__init__()
 
     def event(self):
         """Fill the histograms with the values of the MCParticle collection"""

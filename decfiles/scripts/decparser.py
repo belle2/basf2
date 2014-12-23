@@ -9,7 +9,6 @@ import sys
 import settings
 import os
 import time
-import grabnos
 from colours import *
 import descriptcheck
 
@@ -143,8 +142,6 @@ for line in file:
             cuts = tmp
             order += ['cuts']
             test_cuts = ['None', 'DaughtersInBelleII']
-            if settings.use_url:
-                test_cuts = grabnos.grabcuts()
             if cuts not in test_cuts:
                 warning('Unknown cuts <' + cuts + '> on line '
                         + str(linecount) + '. Please check.')
@@ -669,13 +666,6 @@ if not flag == neutrals:
 else:
     done()
 newevtype += str(flag)
-
-if settings.use_url:
-    query('Checking online for further information.')
-    zippednos = grabnos.grabnos()
-    obsnos = grabnos.grabobs()
-#    particleprops = grabnos.grabIdToName()
-    done()
 
 query('Checking the extra and user for duplicity and funky stuff.')
 

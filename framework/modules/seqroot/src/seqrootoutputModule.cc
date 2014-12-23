@@ -29,7 +29,7 @@ REG_MODULE(SeqRootOutput)
 SeqRootOutputModule::SeqRootOutputModule() : Module()
 {
   //Set module properties
-  setDescription("Module for sequential ROOT I/O. As an alternative to the TTree format, this format stores data as a sequential stream of objects plus a small meta-data header, which doesn't impose the overhead of the TTree and may result in higher read rates from hard disks. It is also the storage format used by DAQ and HLT. SeqRoot files however tend be a factor 2-3 larger than their .root equivalents.");
+  setDescription("Module for sequential ROOT I/O. As an alternative to the TTree format, this format stores data as a sequential stream of objects plus a small meta-data header, which doesn't impose the overhead of the TTree and may result in higher read rates from very fast hard disks. It is also the storage format used by DAQ and HLT. SeqRoot files however tend be a factor 2-3 larger than their .root equivalents, and on normal disks performance is comparable to using RootOutput without compression.");
   m_file = 0;
   m_msghandler = 0;
   m_streamer = 0;
@@ -37,7 +37,7 @@ SeqRootOutputModule::SeqRootOutputModule() : Module()
   vector<string> emptyvector;
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "SeqRoot file name.", string("SeqRootOutput.sroot"));
-  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug ( https://sft.its.cern.ch/jira/browse/ROOT-4550 ), enabling this currently causes memory leaks and is disabled.", 0);
+  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug ( https://sft.its.cern.ch/jira/browse/ROOT-4550 ), this option currently causes memory leaks and is disabled.", 0);
   addParam("saveObjs", m_saveObjs, "List of objects/arrays to be saved", emptyvector);
 
   B2DEBUG(1, "SeqRootOutput: Constructor done.");
@@ -63,7 +63,6 @@ void SeqRootOutputModule::initialize()
   m_streamer->registerStreamObjs(m_saveObjs);
 
   B2INFO("SeqRootOutput: initialized.");
-
 }
 
 

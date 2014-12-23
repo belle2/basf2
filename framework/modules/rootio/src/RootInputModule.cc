@@ -37,7 +37,7 @@ REG_MODULE(RootInput)
 RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_persistent(0)
 {
   //Set module properties
-  setDescription("Reads objects/arrays from one or more .root files and makes them available through the DataStore. Files do not necessarily have to be local, http:// and root:// (for files in xrootd) URLs are supported as well.");
+  setDescription("Reads objects/arrays from one or more .root files saved by the RootOutput module and makes them available through the DataStore. Files do not necessarily have to be local, http:// and root:// (for files in xrootd) URLs are supported as well.");
   setPropertyFlags(c_Input);
 
   //Parameter definition
@@ -47,12 +47,12 @@ RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_
 
   addParam("eventNumber", m_counterNumber, "Skip this number of events before starting.", 0);
 
-  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be read into event map. Empty means all branches. (EventMetaData is always read)", emptyvector);
-  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be read into persistent map. Empty means all branches. (FileMetaData is always read)", emptyvector);
+  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of event durability branches to be read. Empty means all branches. (EventMetaData is always read)", emptyvector);
+  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of persistent durability branches to be read. Empty means all branches. (FileMetaData is always read)", emptyvector);
 
-  addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be read into event map. Takes precedence over branchNames.", emptyvector);
+  addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of event durability branches NOT to be read. Takes precedence over branchNames.", emptyvector);
   vector<string> excludePersistent({"ProcessStatistics"});
-  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", excludePersistent);
+  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of persistent durability branches NOT to be read. Takes precedence over branchNamesPersistent.", excludePersistent);
 
   addParam("parentLevel", m_parentLevel, "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/ParentFiles for details.", 0);
 }

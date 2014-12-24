@@ -15,6 +15,9 @@ namespace Belle2 {
   public:
     File() throw() {}
     File(int fd) throw() : FileDescriptor(fd) {}
+    File(const std::string& path,
+         const std::string& mode = "r") throw(IOException)
+    { open(path, mode); }
     virtual ~File() throw() {}
 
   public:

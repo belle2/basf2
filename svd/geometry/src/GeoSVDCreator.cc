@@ -34,6 +34,7 @@
 #include <G4Torus.hh>
 #include <G4Polycone.hh>
 #include <G4UnionSolid.hh>
+#include <G4SubtractionSolid.hh>
 
 using namespace std;
 using namespace boost;
@@ -220,20 +221,25 @@ namespace Belle2 {
     VXD::GeoVXDAssembly GeoSVDCreator::createLadderSupport(int layer, GearDir support)
     {
       VXD::GeoVXDAssembly supportAssembly;
-      //Check if there are any support ribs defined for this layer. If not return empty assembly
+      // Check if there are any support ribs defined for this layer. If not return empty assembly
       GearDir params(support, (boost::format("SupportRibs/Layer[@id='%1%']") % layer).str());
       if (!params) return supportAssembly;
 
-      //Get the common values for all layers
+      // Get the common values for all layers
       double spacing    = support.getLength("SupportRibs/spacing") / Unit::mm / 2.0;
       double height     = support.getLength("SupportRibs/height") / Unit::mm / 2.0;
       double innerWidth = support.getLength("SupportRibs/inner/width") / Unit::mm / 2.0;
       double outerWidth = support.getLength("SupportRibs/outer/width") / Unit::mm / 2.0;
+      double tabLength  = support.getLength("SupportRibs/inner/tabLength") / Unit::mm / 2.0;
       G4VSolid* inner(0);
       G4VSolid* outer(0);
       G4Transform3D placement;
 
-      //No lets create the ribs by adding all boxes to form one union solid
+      // Get values for the layer if available
+      if (params.exists("spacing")) spacing = params.getLength("spacing") / Unit::mm / 2.0;
+      if (params.exists("height")) height = params.getLength("height") / Unit::mm / 2.0;
+
+      // Now lets create the ribs by adding all boxes to form one union solid
       BOOST_FOREACH(const GearDir & box, params.getNodes("box")) {
         double theta = box.getAngle("theta");
         double zpos = box.getLength("z") / Unit::mm;
@@ -251,8 +257,24 @@ namespace Belle2 {
           outer = new G4UnionSolid("outerBox", outer, outerBox, relative);
         }
       }
-      //If there has been at least one Box, create the volumes and add them to the assembly
+      // Now lets add the tabs
+      BOOST_FOREACH(const GearDir & tab, params.getNodes("tab")) {
+        double theta = tab.getAngle("theta");
+        double zpos = tab.getLength("z") / Unit::mm;
+        double rpos = tab.getLength("r") / Unit::mm;
+        G4Box* innerBox = new G4Box("innerBox", height, innerWidth, tabLength);
+        if (!inner) {
+          inner = innerBox;
+          placement = G4Translate3D(rpos, 0, zpos) * G4RotateY3D(theta);
+        } else {
+          G4Transform3D relative = placement.inverse() * G4Translate3D(rpos, 0, zpos) * G4RotateY3D(theta);
+          inner = new G4UnionSolid("innerBox", inner, innerBox, relative);
+        }
+      }
+
+      // If there has been at least one Box, create the volumes and add them to the assembly
       if (inner) {
+        outer = new G4SubtractionSolid("outerBox", outer, inner);
         G4LogicalVolume* outerVolume = new G4LogicalVolume(
           outer, geometry::Materials::get(support.getString("SupportRibs/outer/Material")),
           (boost::format("%1%.Layer%2%.SupportRib") % m_prefix % layer).str());
@@ -261,12 +283,13 @@ namespace Belle2 {
           (boost::format("%1%.Layer%2%.SupportRib.Airex") % m_prefix % layer).str());
         geometry::setColor(*outerVolume, support.getString("SupportRibs/outer/Color"));
         geometry::setColor(*innerVolume, support.getString("SupportRibs/inner/Color"));
-        new G4PVPlacement(G4Transform3D(), innerVolume, "inner", outerVolume, false, 1);
+        supportAssembly.add(innerVolume, G4TranslateY3D(-spacing)*placement);
+        supportAssembly.add(innerVolume, G4TranslateY3D(spacing)*placement);
         supportAssembly.add(outerVolume, G4TranslateY3D(-spacing)*placement);
         supportAssembly.add(outerVolume, G4TranslateY3D(spacing)*placement);
       }
 
-      //Done, return the finished assembly
+      // Done, return the finished assembly
       return supportAssembly;
     }
 

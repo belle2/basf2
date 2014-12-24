@@ -255,7 +255,7 @@ class Validation:
         """
 
         # Use the local execution for all plotting scripts
-        local_control = localcontrol.Local()
+        local_control = localcontrol.Local(max_number_of_processes=self.parallel)
 
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
@@ -651,6 +651,10 @@ def parse_cmd_line_arguments():
                                              "possible values: 'local' or "
                                              "'cluster'. Default is 'local'",
                         type=str, nargs='?', default='local')
+    parser.add_argument("-p", "--parallel", help="The maximum number of parallel processes "
+                                                 "to run the validation. Only used for "
+                                                 "local execution. Default is number of CPU cores.",
+                        type=int, nargs='?', default=None)
     parser.add_argument("-q", "--quiet", help="Suppress the progress bar",
                         action='store_true')
 
@@ -800,6 +804,9 @@ try:
         validation.log.note('Validation will use local multi-processing.')
     elif validation.mode == 'cluster':
         validation.log.note('Validation will use the cluster.')
+
+    # Set if we have a limit on the maximum number of local processes
+    validation.parallel = cmd_arguments.parallel
 
     # Check if we are running in quiet mode (no progress bar)
     if cmd_arguments.quiet:

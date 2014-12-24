@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import multiprocessing
 
 
 class Local:
@@ -12,7 +13,7 @@ class Local:
     - execute(job): Takes a job and executes it by spawning a new process for it
     """
 
-    def __init__(self):
+    def __init__(self, max_number_of_processes=None):
         """!
         The default constructor.
         - Initializes a list which holds a connection between Script-Objects
@@ -30,8 +31,14 @@ class Local:
         # .execute and .is_finished
         self.logger = logging.getLogger('validate_basf2')
 
-        ## Parameter for maximal number of parallel processes
-        self.max_number_of_processes = 10
+        ## Parameter for maximal number of parallel processes, use system CPU count if not specified
+        # use the default of 10 if the cpu_count call is not supported on current platform
+        try:
+            self.max_number_of_processes = multiprocessing.cpu_count() if max_number_of_processes is None else max_number_of_processes
+        except NotImplementedError:
+            self.max_number_of_processes = 10
+
+        self.logger.note("Executing validation with " + str(self.max_number_of_processes) + " parallel processes")
 
         ## Counter for number of running parallel processes
         self.current_number_of_processes = 0

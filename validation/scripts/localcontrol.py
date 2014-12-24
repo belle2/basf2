@@ -28,7 +28,7 @@ class Local:
         # Set up the logging functionality for the 'local execution'-Class,
         # so we can log to validate_basf2.py's log what is going on in
         # .execute and .is_finished
-        self.logger = logging.getLogger('validate_basf2.localcontrol')
+        self.logger = logging.getLogger('validate_basf2')
 
         ## Parameter for maximal number of parallel processes
         self.max_number_of_processes = 10

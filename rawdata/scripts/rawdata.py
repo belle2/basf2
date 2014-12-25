@@ -114,7 +114,7 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     """
 
     output = register_module('RootOutput')
-    output.param('outputFTOPileName', filename)
+    output.param('outputFileName', filename)
     branches = ['RawPXDs']
     branches += ['RawBPIDs']
     branches += additionalBranches

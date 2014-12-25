@@ -58,18 +58,6 @@ NSMMessage::NSMMessage(const NSMNode& node,
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
-                       int par, const Serializable& obj) throw()
-{
-  init();
-  m_nodename = node.getName();
-  m_reqname = cmd.getLabel();
-  m_nsm_msg.npar = 1;
-  m_nsm_msg.pars[0] = par;
-  setData(obj);
-}
-
-NSMMessage::NSMMessage(const NSMNode& node,
-                       const NSMCommand& cmd,
                        int par, const std::string& obj) throw()
 {
   init();
@@ -77,16 +65,6 @@ NSMMessage::NSMMessage(const NSMNode& node,
   m_reqname = cmd.getLabel();
   m_nsm_msg.npar = 1;
   m_nsm_msg.pars[0] = par;
-  setData(obj);
-}
-
-NSMMessage::NSMMessage(const NSMNode& node,
-                       const NSMCommand& cmd,
-                       const Serializable& obj) throw()
-{
-  init();
-  m_nodename = node.getName();
-  m_reqname = cmd.getLabel();
   setData(obj);
 }
 
@@ -230,16 +208,6 @@ unsigned int NSMMessage::getLength() const throw()
   return m_nsm_msg.len;
 }
 
-/*
-void NSMMessage::m_nsm_msg.len =unsigned int len) throw()
-{
-  if (m_nsm_msg.len != len) {
-    m_nsm_
-  }
-
-}
-*/
-
 const char* NSMMessage::getData() const throw()
 {
   if (m_nsm_msg.len > 0) return (const char*)m_data.ptr();
@@ -269,24 +237,6 @@ void NSMMessage::setNParams(unsigned short npar) throw()
 void NSMMessage::setParam(int i, unsigned int v) throw()
 {
   m_nsm_msg.pars[i] = v;
-}
-
-void NSMMessage::getData(Serializable& obj) const throw(IOException)
-{
-  BufferedReader reader(getLength(), (unsigned char*)m_data.ptr());
-  reader.readObject(obj);
-}
-
-void NSMMessage::setData(const Serializable& obj) throw(IOException)
-{
-  StreamSizeCounter counter;
-  counter.writeObject(obj);
-  m_data = Buffer(counter.count());
-  m_nsm_msg.len = counter.count();
-  if (counter.count() > 0) {
-    BufferedWriter writer(counter.count(), (unsigned char*)m_data.ptr());
-    writer.writeObject(obj);
-  }
 }
 
 void NSMMessage::setData(int len, const char* data)  throw()

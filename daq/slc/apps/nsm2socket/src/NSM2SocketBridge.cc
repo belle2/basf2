@@ -48,6 +48,23 @@ bool NSM2SocketBridge::sendMessage(const NSMMessage& msg) throw()
   return false;
 }
 
+bool NSM2SocketBridge::sendMessage(const NSMMessage& msg,
+                                   const Serializable& obj) throw()
+{
+  m_mutex.lock();
+  try {
+    m_writer.writeObject(msg);
+    m_writer.writeObject(obj);
+    m_mutex.unlock();
+    return true;
+  } catch (const IOException& e) {
+    LogFile::warning("Connection failed for writing");
+    m_socket.close();
+  }
+  m_mutex.unlock();
+  return false;
+}
+
 bool NSM2SocketBridge::sendLog(const DAQLogMessage& log) throw()
 {
   NSMMessage msg(m_callback->getNode());
@@ -109,8 +126,7 @@ void NSM2SocketBridge::run() throw()
         ConfigObject obj = ConfigObjectTable(m_db).get(configname, nodename);
         msg_out.setNodeName(nodename);
         msg_out.setRequestName(NSMCommand::DBSET);
-        msg_out.setData(obj);
-        sendMessage(msg_out);
+        sendMessage(msg_out, obj);
         ConfigObjectTable(m_db).get(configname, nodename);
       } catch (const DBHandlerException& e) {
         LogFile::error(e.what());
@@ -121,8 +137,7 @@ void NSM2SocketBridge::run() throw()
       ConfigObject obj;
       try {
         if (msg.getLength() > 0) {
-          msg.getData(obj);
-          obj.print();
+          m_reader.readObject(obj);
           m_db->connect();
           ConfigObjectTable(m_db).addAll(obj, true);
         }
@@ -161,8 +176,7 @@ void NSM2SocketBridge::run() throw()
         if (data.isAvailable()) {
           msg_out.setNodeName(data.getName());
           msg_out.setRequestName(NSMCommand::NSMSET);
-          msg_out.setData(data);
-          sendMessage(msg_out);
+          sendMessage(msg_out, data);
         }
       } catch (const NSMHandlerException& e) {
         LogFile::error(e.what());

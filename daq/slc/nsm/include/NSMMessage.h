@@ -37,13 +37,7 @@ namespace Belle2 {
                int npar, int* pars) throw();
     NSMMessage(const NSMNode& node,
                const NSMCommand& cmd,
-               int par, const Serializable& obj) throw();
-    NSMMessage(const NSMNode& node,
-               const NSMCommand& cmd,
                int par, const std::string& obj) throw();
-    NSMMessage(const NSMNode& node,
-               const NSMCommand& cmd,
-               const Serializable& obj) throw();
     NSMMessage(const NSMNode& node,
                const NSMCommand& cmd,
                const std::string& obj) throw();
@@ -72,7 +66,6 @@ namespace Belle2 {
 #endif
     unsigned int getLength() const throw();
     const char* getData() const throw();
-    void getData(Serializable& obj) const throw(IOException);
     void setRequestName(const std::string& name) throw();
     void setRequestName(const NSMCommand& cmd) throw();
     void setRequestName() throw();
@@ -86,7 +79,6 @@ namespace Belle2 {
     void setParam(int i, unsigned int v) throw();
     void setData(int len, const char* data)  throw();
     void setData(const std::string& text)  throw();
-    void setData(const Serializable& obj) throw(IOException);
 
   public:
     virtual void readObject(Reader&) throw(IOException);

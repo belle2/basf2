@@ -67,7 +67,6 @@ bool NSM2SocketCallback::sendRequest(NSMMessage& msg) throw()
       isonline = m_node_m[nodename];
     }
     if (!isonline) {
-      //m_bridge->sendError(ERRORNo::NSMONLINE, nodename, "No PID");
       m_bridge->sendLog(DAQLogMessage(getNode().getName(), LogFile::ERROR,
                                       StringUtil::form("Node %s was aready down.",
                                                        nodename.c_str())));
@@ -76,9 +75,6 @@ bool NSM2SocketCallback::sendRequest(NSMMessage& msg) throw()
     }
   } catch (const NSMHandlerException& e) {
     LogFile::error(e.what());
-    //m_bridge->sendError(ERRORNo::NSMSENDREQ, nodename,
-    //      std::string("Failed to send ") +
-    //      msg.getRequestName());
     m_bridge->sendLog(DAQLogMessage(getNode().getName(),
                                     LogFile::ERROR, e.what()));
 
@@ -99,7 +95,6 @@ void NSM2SocketCallback::timeout() throw()
     bool isonline2 = getCommunicator()->isConnected(nodename);
     m_node_m[nodename] = isonline2;
     if (isonline && !isonline2) {
-      //m_bridge->sendError(ERRORNo::NSMONLINE, nodename, "Lost PID");
       LogFile::error("Node %s got down.", nodename.c_str());
       m_bridge->sendLog(DAQLogMessage(getNode().getName(), LogFile::ERROR,
                                       StringUtil::form("Node %s got down.",
@@ -126,10 +121,8 @@ void NSM2SocketCallback::timeout() throw()
       if (n % 5 == 0 || opennew) {
         msg.setNodeName(data.getName());
         msg.setRequestName(NSMCommand::NSMSET);
-        //data.print();
         data.update();
-        msg.setData(data);
-        m_bridge->sendMessage(msg);
+        m_bridge->sendMessage(msg, data);
       }
     } catch (const NSMHandlerException& e) {
       std::string log = StringUtil::form("Failed to open NSM data (%s:%s:%d) ",
@@ -138,8 +131,6 @@ void NSM2SocketCallback::timeout() throw()
                                          data.getRevision());
       LogFile::error(e.what());
       LogFile::error(log);
-      //m_bridge->sendError(ERRORNo::NSMSENDREQ, getNode().getName(),
-      //        "Failed to open data "+ data.getName());
       m_bridge->sendLog(DAQLogMessage(getNode().getName(),
                                       LogFile::ERROR, log));
     }

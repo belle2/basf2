@@ -31,6 +31,8 @@ namespace Belle2 {
   public:
     void run() throw();
     bool sendMessage(const NSMMessage& msg) throw();
+    bool sendMessage(const NSMMessage& msg,
+                     const Serializable& obj) throw();
     bool recieveMessage(NSMMessage& msg) throw();
     bool sendLog(const DAQLogMessage& log) throw();
     bool sendError(const ERRORNo& eno,

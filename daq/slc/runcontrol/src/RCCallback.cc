@@ -179,15 +179,6 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
         }
       }
     }
-  } else if (msg.getParam(0) == NSMCommand::DBSET.getId()) {
-    if (msg.getLength() > 0) {
-      msg.getData(m_config.getObject());
-      LogFile::info("Loaded from DB %s:%s", m_config.getObject().getNode().c_str(), m_config.getObject().getName().c_str());
-    } else {
-      setReply("No DB objects were given");
-      LogFile::error("No DB objects were given");
-      return false;
-    }
   } else {
     LogFile::warning("No DB objects was loaded");
   }

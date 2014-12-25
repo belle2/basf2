@@ -1,11 +1,14 @@
 package b2daq.nsm;
 
+import b2daq.core.Serializable;
 import java.io.IOException;
 import java.net.Socket;
 
 import b2daq.database.ConfigObject;
 import b2daq.io.SocketDataReader;
 import b2daq.io.SocketDataWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NSMSocket {
 
@@ -83,8 +86,16 @@ public class NSMSocket {
 
     public boolean requestDBSet(ConfigObject obj) {
         NSMMessage msg = new NSMMessage(NSMCommand.DBSET);
-        msg.setData(obj);
-        return request(msg);
+        if (request(msg)) {
+            try {
+                m_writer.writeObject(obj);
+                return true;
+            } catch (IOException ex) {
+                Logger.getLogger(NSMSocket.class.getName()).log(Level.SEVERE, null, ex);
+                close();
+            }
+        }
+        return false;
     }
 
     public NSMMessage waitMessage() {
@@ -114,5 +125,16 @@ public class NSMSocket {
         } else {
             return false;
         }
+    }
+
+    boolean readObject(Serializable obj) {
+        try {
+            m_reader.readObject(obj);
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(NSMSocket.class.getName()).log(Level.SEVERE, null, ex);
+            close();
+        }
+        return false;
     }
 }

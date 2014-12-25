@@ -183,13 +183,12 @@ public class NSMListenerService extends Thread {
             NSMCommand command = new NSMCommand();
             command.copy(msg.getReqName());
             if (command.equals(NSMCommand.DBSET)) {
-                //System.out.println(msg.getNodeName());
                 ConfigObject obj = getDB(msg.getNodeName());
                 if (obj == null) {
                     obj = new ConfigObject();
                     g_obj_m.put(msg.getNodeName(), obj);
                 }
-                msg.getData(obj);
+                g_socket.readObject(obj);
             } else if (command.equals(NSMCommand.LISTSET)) {
                 if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
                     String [] namelist = msg.getData().split("\n");
@@ -205,8 +204,7 @@ public class NSMListenerService extends Thread {
                     data = new NSMData();
                     g_data_m.put(msg.getNodeName(), data);
                 }
-                msg.getData(data);
-                //data.print();
+                g_socket.readObject(data);
             }
         }
         return msg;

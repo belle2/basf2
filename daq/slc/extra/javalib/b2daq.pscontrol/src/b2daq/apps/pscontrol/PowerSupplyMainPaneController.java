@@ -56,7 +56,7 @@ public class PowerSupplyMainPaneController implements Initializable, NSMObserver
     @FXML
     private RadioButton radio_manual;
     
-    private final ConfigObject cobj = new ConfigObject();
+    private ConfigObject cobj = new ConfigObject();
 
     private boolean sent_listrequest = false;
     private String[] namelist = null;
@@ -124,7 +124,7 @@ public class PowerSupplyMainPaneController implements Initializable, NSMObserver
                 commandButtonController.clearStack();
             }
         } else if (command.equals(NSMCommand.DBSET)) {
-            msg.getData(cobj);
+            cobj = NSMListenerService.getDB(msg.getNodeName());
             if (cobj.getId() > 0 && sent_listrequest) {
                 sent_listrequest = false;
                 networkconfigController.add(cobj);

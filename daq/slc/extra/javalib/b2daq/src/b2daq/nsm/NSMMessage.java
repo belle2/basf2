@@ -1,25 +1,18 @@
 package b2daq.nsm;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import b2daq.core.Reader;
 import b2daq.core.Serializable;
-import b2daq.core.SizeCounter;
 import b2daq.core.Writer;
-import b2daq.io.DataReader;
-import b2daq.io.DataWriter;
 import b2daq.runcontrol.core.RCCommand;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class NSMMessage implements Serializable {
 
     private String _reqname = "";
     private String _nodename = "";
     private int[] _pars = new int[0];
-    private byte[] _data = null;
+    private String _data = "";
 
     public NSMMessage() {
 
@@ -111,16 +104,7 @@ public final class NSMMessage implements Serializable {
     }
 
     public String getData() {
-        return new String(_data).replace("\0", "");
-    }
-
-    public void getData(Serializable obj) {
-        Reader reader = new DataReader(new ByteArrayInputStream(_data));
-        try {
-            reader.readObject(obj);
-        } catch (IOException ex) {
-            Logger.getLogger(NSMMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        return _data.replace("\0", "");
     }
 
     public void setNParams(int npar) {
@@ -138,32 +122,7 @@ public final class NSMMessage implements Serializable {
     }
 
     public void setData(String data) {
-        _data = null;
-        if (data == null) {
-            return;
-        }
-        _data = new byte[data.length()+1];
-        byte[] d = data.getBytes();
-        for (int i = 0; i < data.length(); i++) {
-            _data[i] = d[i];
-        }
-        _data[data.length()] = '\0';
-    }
-
-    public void setData(Serializable data) {
-        _data = null;
-        if (data == null) {
-            return;
-        }
-        SizeCounter counter = new SizeCounter();
-        try {
-            counter.writeObject(data);
-            ByteArrayOutputStream ostream = new ByteArrayOutputStream(counter.count());
-            Writer writer = new DataWriter(ostream);
-            writer.writeObject(data);
-            _data = ostream.toByteArray();
-        } catch (IOException e) {
-        }
+        _data = data;
     }
 
     @Override
@@ -177,12 +136,13 @@ public final class NSMMessage implements Serializable {
         }
         int length = reader.readInt();
         if (length > 0) {
-            _data = new byte[length+100000];
+            StringBuilder buf = new StringBuilder();
             for (int i = 0; i < length; i++) {
-                _data[i] = reader.readByte();
+                buf.append(reader.readChar());
             }
+            _data = buf.toString().replace("\0", "");
         } else {
-            _data = null;
+            _data = "";
         }
     }
 
@@ -195,10 +155,11 @@ public final class NSMMessage implements Serializable {
             writer.writeInt(_pars[i]);
         }
         if (_data != null) {
-            writer.writeInt(_data.length);
-            for (int i = 0; i < _data.length; i++) {
-                writer.writeByte(_data[i]);
+            writer.writeInt(_data.length()+1);
+            for (char c : _data.toCharArray()) {
+                writer.writeChar(c);
             }
+            writer.writeChar('\0');
         } else {
             writer.writeInt(0);
         }

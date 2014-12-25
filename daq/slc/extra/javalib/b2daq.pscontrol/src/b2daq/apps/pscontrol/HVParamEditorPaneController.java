@@ -241,9 +241,7 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
             ConfigObject cobj = NSMListenerService.getDB(msg.getNodeName());
             if (cobj != null) {
                 if (!cobj_m.containsKey(cobj.getName())) {
-                    ConfigObject obj = new ConfigObject();
-                    msg.getData(obj);
-                    cobj_m.put(obj.getName(), obj);
+                    cobj_m.put(cobj.getName(), cobj);
                 }
                 update(cobj);
             }

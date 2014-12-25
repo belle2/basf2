@@ -67,6 +67,7 @@ int main(int argc, char** argv)
     }
     outptr++;
     if (outptr >= nout) outptr = 0;
+    delete msg;
   }
 
   // EOF

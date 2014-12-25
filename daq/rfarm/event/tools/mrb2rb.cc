@@ -62,6 +62,7 @@ int main(int argc, char** argv)
     }
     inptr++;
     if (inptr >= nin) inptr = 0;
+    delete msg;
   }
 }
 

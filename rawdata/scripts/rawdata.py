@@ -82,7 +82,7 @@ def add_packers(path, components=None):
         path.add_module(pxdpacker)
 
     # BPID
-    if components == None or 'BPID' in components:
+    if components == None or 'TOP' in components:
         bpidpacker = register_module('TOPPacker')
         path.add_module(bpidpacker)
 
@@ -103,7 +103,7 @@ def add_unpackers(path, components=None):
         path.add_module(pxdhitsorter)
 
     # BPID
-    if components == None or 'BPID' in components:
+    if components == None or 'TOP' in components:
         bpidunpacker = register_module('TOPUnpacker')
         path.add_module(bpidunpacker)
 
@@ -114,7 +114,7 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     """
 
     output = register_module('RootOutput')
-    output.param('outputFileName', filename)
+    output.param('outputFTOPileName', filename)
     branches = ['RawPXDs']
     branches += ['RawBPIDs']
     branches += additionalBranches

@@ -379,17 +379,17 @@ main(int argc, char** argv)
       } else {
         b2nsm_sendreq(av[1], "STOP", 0, 0);
       }
-    } else if (strcasecmp(av[0], "config") == 0) {
+    } else if (strcasecmp(av[0], "load") == 0) {
       if (ac < 2) {
-        printf("usage: config <node>\n");
+        printf("usage: load <node>\n");
       } else {
-        b2nsm_sendreq(av[1], "CONFIG", 0, 0);
+        b2nsm_sendreq(av[1], "LOAD", 0, 0);
       }
-    } else if (strcasecmp(av[0], "forget") == 0) {
+    } else if (strcasecmp(av[0], "abort") == 0) {
       if (ac < 2) {
-        printf("usage: forget <node>\n");
+        printf("usage: abort <node>\n");
       } else {
-        b2nsm_sendreq(av[1], "FORGET", 0, 0);
+        b2nsm_sendreq(av[1], "ABORT", 0, 0);
       }
     } else if (strcasecmp(av[0], "data") == 0) {
       if (ac < 3) {

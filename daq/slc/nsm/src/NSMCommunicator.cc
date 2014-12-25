@@ -101,12 +101,15 @@ void NSMCommunicator::sendRequest(const std::string& node, const std::string& cm
 throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
+  m_mutex.lock();
   b2nsm_context(m_nsmc);
   if (b2nsm_sendany(node.c_str(), cmd.c_str(),
                     npar, (int*) pars, len, data, NULL) < 0) {
     m_id = -1;
+    m_mutex.unlock();
     throw (NSMHandlerException("Failed to send request: %s", b2nsm_strerror()));
   }
+  m_mutex.unlock();
 #else
 #warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif

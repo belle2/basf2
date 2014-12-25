@@ -5,6 +5,8 @@
 #include "daq/slc/nsm/NSMMessage.h"
 #include "daq/slc/nsm/NSMNode.h"
 
+#include <daq/slc/system/Mutex.h>
+
 #include <daq/slc/database/DAQLogMessage.h>
 
 #include <daq/slc/base/Serializable.h>
@@ -90,6 +92,7 @@ namespace Belle2 {
     int m_port;
     NSMNodeList m_masters;
     NSMNode m_node;
+    Mutex m_mutex;
 
   };
 

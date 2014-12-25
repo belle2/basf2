@@ -41,7 +41,7 @@ bool NSM2SocketBridge::sendMessage(const NSMMessage& msg) throw()
     m_mutex.unlock();
     return true;
   } catch (const IOException& e) {
-    LogFile::warning("Connection failed for writing");
+    LogFile::warning("Connection failed for writing : %s", e.what());
     m_socket.close();
   }
   m_mutex.unlock();

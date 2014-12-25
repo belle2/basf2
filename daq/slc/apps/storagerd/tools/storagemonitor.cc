@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     printf(" data in record buffer : %4.1f [kB]\n", (float)(info->node[1].nqueue_in * 4 / 1024.));
     printf("\n");
     printf(" %13s | in |      count | freq [kHz] | rate [MB/s] | evtsize [kB]", "node");
-    printf(" out |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n");
+    printf(" | out |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n");
     for (int i = 0; i < 7; i++) {
       storage_status::node_status& node(info->node[i]);
       if (i == 2) continue;
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
       } else {
         printf("\x1b[49m\x1b[32m");
       }
-      printf("| %s |    | %10s | %11s | %12s \x1b[49m\x1b[39m",
+      printf("|    | %s | %10s | %11s | %12s \x1b[49m\x1b[39m",
              StringUtil::form("%10u", node.nevent_in).c_str(),
              StringUtil::form("%02.2f", node.evtrate_in).c_str(),
              StringUtil::form("%04.2f", node.flowrate_in).c_str(),
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
       } else {
         printf("\x1b[49m\x1b[32m");
       }
-      printf("| %s |    | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
+      printf("|     | %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
              StringUtil::form("%10u", node.nevent_out).c_str(),
              StringUtil::form("%02.2f", node.evtrate_out).c_str(),
              StringUtil::form("%04.2f", node.flowrate_out).c_str(),

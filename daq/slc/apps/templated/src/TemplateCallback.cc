@@ -4,14 +4,16 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <unistd.h>
+
 using namespace Belle2;
 
-TemplateCallback::TemplateCallback(const NSMNode& node,
+TemplateCallback::TemplateCallback(const NSMNode& node/*,
                                    const std::string& format,
-                                   int revision)
+                                   int revision*/)
   : RCCallback(node, 5)
 {
-  m_data = NSMData("STATUS_" + node.getName(), format, revision);
+  //m_data = NSMData("STATUS_" + node.getName(), format, revision);
 }
 
 TemplateCallback::~TemplateCallback() throw()
@@ -20,7 +22,7 @@ TemplateCallback::~TemplateCallback() throw()
 
 void TemplateCallback::init() throw()
 {
-  m_data.allocate(getCommunicator());
+  //m_data.allocate(getCommunicator());
 }
 
 void TemplateCallback::term() throw()
@@ -33,6 +35,7 @@ void TemplateCallback::timeout() throw()
 
 bool TemplateCallback::load() throw()
 {
+  sleep(5);
   getConfig().getObject().print();
   return true;
 }
@@ -78,6 +81,7 @@ bool TemplateCallback::recover() throw()
 
 bool TemplateCallback::abort() throw()
 {
+  sleep(5);
   getNode().setState(RCState::NOTREADY_S);
   return true;
 }

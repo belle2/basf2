@@ -1,5 +1,5 @@
-#ifndef _Belle2_TemplateCallback_hh
-#define _Belle2_TemplateCallback_hh
+#ifndef _Belle2_MasterCallback_hh
+#define _Belle2_MasterCallback_hh
 
 #include "daq/slc/readout/ProcessController.h"
 
@@ -11,18 +11,17 @@
 
 namespace Belle2 {
 
-  class TemplateCallback : public RCCallback {
+  class MasterCallback : public RCCallback {
 
   public:
-    TemplateCallback(const NSMNode& node/*,
-                     const std::string& format,
-                     int revision*/);
-    virtual ~TemplateCallback() throw();
+    MasterCallback(const NSMNode& node);
+    virtual ~MasterCallback() throw();
 
   public:
     virtual void init() throw();
     virtual void term() throw();
     virtual void timeout() throw();
+    virtual bool ok() throw();
     virtual bool load() throw();
     virtual bool start() throw();
     virtual bool stop() throw();
@@ -34,6 +33,7 @@ namespace Belle2 {
 
   private:
     NSMData m_data;
+    int m_count;
 
   };
 

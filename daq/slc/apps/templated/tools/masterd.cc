@@ -1,4 +1,4 @@
-#include "daq/slc/apps/templated/TemplateCallback.h"
+#include "daq/slc/apps/templated/MasterCallback.h"
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
   const std::string hostname = config.get("nsm.global.host");
   const int port = config.getInt("nsm.global.port");
   NSMNode node(name);
-  TemplateCallback* callback = new TemplateCallback(node/*, format, revision*/);
+  MasterCallback* callback = new MasterCallback(node/*, format, revision*/);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();
 

@@ -171,7 +171,7 @@ namespace Belle2 {
         convert.as_int = ntohl(*reinterpret_cast<const int32_t*>(ptr));
         return convert.as_float;
       } else if (type == FLOAT8OID) {
-        static_assert(sizeof(uint64_t) == sizeof(double), "float is not 32 bit.");
+        static_assert(sizeof(uint64_t) == sizeof(double), "double is not 64 bit.");
         union {
           uint64_t as_int;
           double as_float;

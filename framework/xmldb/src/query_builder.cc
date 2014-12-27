@@ -40,8 +40,9 @@ namespace Belle2 {
       verifyParameterId(_param);
       param_formats_[_param - 1] = 1 /* binary */;
       param_lengths_[_param - 1] = 8;
+      static_assert(sizeof(uint64_t) == sizeof(double), "double is not 64 bit.");
       union {
-        int64_t as_int;
+        uint64_t as_int;
         double as_float;
       } convert;
       convert.as_float = _value;

@@ -1,6 +1,7 @@
 #include "framework/xmldb/query.h"
+#include "framework/xmldb/htobe.h"
 
-#include <endian.h>
+#include <netinet/in.h>
 #include <stdint.h>
 
 #include <cassert>
@@ -162,10 +163,10 @@ namespace Belle2 {
 
       ::Oid type = ::PQftype(result_, _col);
       if (type == FLOAT4OID) {
-        const int32_t as_int = be32toh(*reinterpret_cast<const int32_t*>(ptr));
+        const int32_t as_int = ntohl(*reinterpret_cast<const int32_t*>(ptr));
         return *reinterpret_cast<const float*>(&as_int);
       } else if (type == FLOAT8OID) {
-        const int64_t as_int = be64toh(*reinterpret_cast<const int64_t*>(ptr));
+        const int64_t as_int = ntohll(*reinterpret_cast<const int64_t*>(ptr));
         return *reinterpret_cast<const double*>(&as_int);
       } else {
         throw std::logic_error("Type conversion not (yet) supported.");
@@ -183,16 +184,18 @@ namespace Belle2 {
       ::Oid type = ::PQftype(result_, _col);
       if (type == INT2OID) {
         const int16_t* val = reinterpret_cast<const int16_t*>(ptr);
-        return be16toh(*val);
+        return ntohs(*val);
       } else if (type == INT4OID) {
         const int32_t* val = reinterpret_cast<const int32_t*>(ptr);
-        return be32toh(*val);
+        return ntohl(*val);
       } else if (type == INT8OID) {
         const int64_t* val = reinterpret_cast<const int64_t*>(ptr);
-        return be64toh(*val);
+        return ntohll(*val);
       } else {
         throw std::logic_error("Type conversion not (yet) supported.");
       } // else
+      // just mutes a compiler warning
+      return 0;
     } // Query::getValueAsInt
 
     std::string Query::getValueAsString(int _row, int _col, bool* _is_null)
@@ -234,7 +237,7 @@ namespace Belle2 {
       ::Oid type = ::PQftype(result_, _col);
       if ((type == TIMESTAMPOID) || (type == TIMESTAMPTZOID)) {
         // usec since 1.1.2000
-        const int64_t usec2000 = be64toh(*reinterpret_cast<const int64_t*>(ptr));
+        const int64_t usec2000 = ntohll(*reinterpret_cast<const int64_t*>(ptr));
 
         /* # select EXTRACT(EPOCH FROM TIMESTAMPTZ('2000-01-01 00:00+00'));
            date_part

@@ -1,7 +1,8 @@
 #include "framework/xmldb/query_builder.h"
+#include "framework/xmldb/htobe.h"
 #include "framework/xmldb/query.h"
 
-#include <endian.h>
+#include <netinet/in.h>
 #include <string.h>
 
 #include <libpq-fe.h>
@@ -40,7 +41,7 @@ namespace Belle2 {
       param_formats_[_param - 1] = 1 /* binary */;
       param_lengths_[_param - 1] = 8;
       int64_t as_int = *reinterpret_cast<int64_t*>(&_value);
-      parameters_[_param - 1].int_value = htobe64(as_int);
+      parameters_[_param - 1].int_value = htonll(as_int);
       param_types_[_param - 1] = FLOAT8OID;
       param_values_[_param - 1] = reinterpret_cast<char*>(
                                     &parameters_[_param - 1].int_value);
@@ -54,7 +55,7 @@ namespace Belle2 {
       verifyParameterId(_param);
       param_formats_[_param - 1] = 1 /* binary */;
       param_lengths_[_param - 1] = 8 /* bytes */;
-      parameters_[_param - 1].int_value = htobe64(_value);
+      parameters_[_param - 1].int_value = htonll(_value);
       param_types_[_param - 1] = INT8OID;
       param_values_[_param - 1] = reinterpret_cast<char*>(
                                     &parameters_[_param - 1].int_value);
@@ -97,7 +98,7 @@ namespace Belle2 {
       param_lengths_[_param - 1] = 8 /* bytes */;
       int64_t secs2000 = _value.tv_sec - 946684800;
       int64_t usecs2000 = secs2000 * 1000000 + _value.tv_usec;
-      parameters_[_param - 1].int_value = htobe64(usecs2000);
+      parameters_[_param - 1].int_value = htonll(usecs2000);
       param_types_[_param - 1] = TIMESTAMPTZOID;
       param_values_[_param - 1] = reinterpret_cast<char*>(
                                     &parameters_[_param - 1].int_value);

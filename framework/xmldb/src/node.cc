@@ -2,6 +2,35 @@
 #include "framework/xmldb/node.h"
 #include "framework/xmldb/tree.h"
 
+#if LIBXML_VERSION < 20703
+namespace {
+
+  ::xmlNodePtr
+  xmlFirstElementChild(::xmlNodePtr _parent)
+  {
+    if (!_parent)
+      return (NULL);
+    ::xmlNodePtr cur = NULL;
+    switch (_parent->type) {
+      case XML_ELEMENT_NODE:
+      case XML_ENTITY_NODE:
+      case XML_DOCUMENT_NODE:
+      case XML_HTML_DOCUMENT_NODE:
+        cur = _parent->children;
+        break;
+      default:
+        return (NULL);
+    }
+    while (cur != NULL) {
+      if (cur->type == XML_ELEMENT_NODE)
+        return (cur);
+      cur = cur->next;
+    }
+    return (NULL);
+  }
+}
+#endif
+
 namespace Belle2 {
   namespace xmldb {
 
@@ -37,7 +66,7 @@ namespace Belle2 {
 
     bool Node::isLeaf() const
     {
-      return !::xmlFirstElementChild(xmlnode_);
+      return !xmlFirstElementChild(xmlnode_);
     } // Node::isLeaf
 
     void Node::invalidateData()

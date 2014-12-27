@@ -163,11 +163,21 @@ namespace Belle2 {
 
       ::Oid type = ::PQftype(result_, _col);
       if (type == FLOAT4OID) {
-        const int32_t as_int = ntohl(*reinterpret_cast<const int32_t*>(ptr));
-        return *reinterpret_cast<const float*>(&as_int);
+        static_assert(sizeof(uint32_t) == sizeof(float), "float is not 32 bit.");
+        union {
+          uint32_t as_int;
+          float as_float;
+        } convert;
+        convert.as_int = ntohl(*reinterpret_cast<const int32_t*>(ptr));
+        return convert.as_float;
       } else if (type == FLOAT8OID) {
-        const int64_t as_int = ntohll(*reinterpret_cast<const int64_t*>(ptr));
-        return *reinterpret_cast<const double*>(&as_int);
+        static_assert(sizeof(uint64_t) == sizeof(double), "float is not 32 bit.");
+        union {
+          uint64_t as_int;
+          double as_float;
+        } convert;
+        convert.as_int = ntohll(*reinterpret_cast<const int64_t*>(ptr));
+        return convert.as_float;
       } else {
         throw std::logic_error("Type conversion not (yet) supported.");
       } // else

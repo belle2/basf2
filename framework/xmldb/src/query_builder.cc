@@ -40,8 +40,12 @@ namespace Belle2 {
       verifyParameterId(_param);
       param_formats_[_param - 1] = 1 /* binary */;
       param_lengths_[_param - 1] = 8;
-      int64_t as_int = *reinterpret_cast<int64_t*>(&_value);
-      parameters_[_param - 1].int_value = htonll(as_int);
+      union {
+        int64_t as_int;
+        double as_float;
+      } convert;
+      convert.as_float = _value;
+      parameters_[_param - 1].int_value = htonll(convert.as_int);
       param_types_[_param - 1] = FLOAT8OID;
       param_values_[_param - 1] = reinterpret_cast<char*>(
                                     &parameters_[_param - 1].int_value);

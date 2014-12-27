@@ -79,6 +79,8 @@ namespace Belle2 {
     std::vector<std::tuple<std::string, std::string, std::string>> m_unitOverrides;
     /** overrides to override the value and unit of many parameters */
     std::vector<std::tuple<std::string, std::string, std::string>> m_multipleOverrides;
+
+    bool m_useXMLDatabase; /**< Enable the XML database. */
   };
 }
 

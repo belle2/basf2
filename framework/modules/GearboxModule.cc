@@ -55,6 +55,8 @@ GearboxModule::GearboxModule() : Module()
            "prepended to all overrides. Beware that '//' has a special meaning "
            "meaning in xpath so be careful with leading and trailing slashes "
            "in the overrides and the prefix respectively", std::string("/Detector"));
+  addParam("useXMLDatabase", m_useXMLDatabase, "Enable the XML database.",
+           false);
 }
 
 void GearboxModule::initialize()
@@ -80,7 +82,7 @@ void GearboxModule::initialize()
   }
 
   gearbox.setBackends(m_backends);
-  gearbox.open(m_fileName);
+  gearbox.open(m_fileName, m_useXMLDatabase);
 }
 
 void GearboxModule::beginRun()
@@ -91,5 +93,5 @@ void GearboxModule::beginRun()
 
   Gearbox& gearbox = Gearbox::getInstance();
   gearbox.close();
-  gearbox.open(m_fileName);
+  gearbox.open(m_fileName, m_useXMLDatabase);
 }

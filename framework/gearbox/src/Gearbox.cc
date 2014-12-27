@@ -24,6 +24,10 @@
 
 #include <TObject.h>
 
+#include <framework/xmldb/connection.h>
+#include <framework/xmldb/reader_db.h>
+#include <framework/xmldb/tree.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -128,22 +132,41 @@ namespace Belle2 {
     m_handlers.clear();
   }
 
-  void Gearbox::open(const std::string& name, size_t cacheSize)
+  void Gearbox::open(const std::string& name, bool database, size_t cacheSize)
   {
+    m_database = database;
     //Check if we have an open connection and close first if so
     if (m_xmlDocument) close();
     //Check if we have at least one backend
     if (m_handlers.empty())
       B2FATAL("No backends defined, please use Gearbox::setBackends() first to specify how to access XML files.");
     //Open document
-    m_xmlDocument = xmlParseFile(name.c_str());
 
+    if (!m_database) {
+      m_xmlDocument = xmlParseFile(name.c_str());
 #if LIBXML_VERSION >= 20700
-    //libxml >= 2.7.0 introduced some limits on node size etc. which breaks reading VXDTF files
-    xmlXIncludeProcessFlags(m_xmlDocument, XML_PARSE_HUGE);
+      //libxml >= 2.7.0 introduced some limits on node size etc. which breaks reading VXDTF files
+      xmlXIncludeProcessFlags(m_xmlDocument, XML_PARSE_HUGE);
 #else
-    xmlXIncludeProcess(m_xmlDocument);
+      xmlXIncludeProcess(m_xmlDocument);
 #endif
+    } else {
+      using namespace Belle2::xmldb;
+      Reader_DB* reader = new Reader_DB();
+
+      // use the file name part of the passed string as the file name in
+      // the database.
+      // note: the XML database support passing the branch name by appending
+      // ;branch to the filename. Maybe the not-database code above should be
+      // patched to strip off that suffix.
+      const size_t last_slash = name.rfind("/");
+      const std::string basename = last_slash == std::string::npos ? name
+                                   : name.substr(last_slash + 1);
+      m_configTree = reader->read(basename);
+      m_xmlDocument = m_configTree->doc_;
+      delete reader;
+    }
+
     if (!m_xmlDocument) B2FATAL("Could not connect gearbox to " << name);
     m_xpathContext = xmlXPathNewContext(m_xmlDocument);
     if (!m_xpathContext) B2FATAL("Could not create XPath context");
@@ -288,6 +311,10 @@ namespace Belle2 {
 
   const TObject* Gearbox::getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError)
   {
+    if (m_database) {
+      B2DEBUG(800, "Getting TObject " << path << " from database.");
+      m_configTree->loadCdata(path);
+    }
     //do we already have an object for this path?
     std::map<std::string, TObject*>::const_iterator it = m_ownedObjects.find(path);
     if (it != m_ownedObjects.end())

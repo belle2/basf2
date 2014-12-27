@@ -34,6 +34,10 @@ namespace boost {
 }
 
 namespace Belle2 {
+  namespace xmldb {
+    class Tree;
+  }
+
   namespace gearbox {
     void* openXmlUri(const char*);
     class GBResult;
@@ -102,9 +106,10 @@ namespace Belle2 {
     /**
      * Open connection to backend and parse tree
      * @param name Name of the tree to parse
-     * @param cachSize maximum cache size in entries
+     * @param database Load from the XML database
+     * @param cacheSize maximum cache size in entries
      */
-    void open(const std::string& name = "Belle2.xml", size_t cachSize = DefaultCacheSize);
+    void open(const std::string& name = "Belle2.xml", bool database = false, size_t cacheSize = DefaultCacheSize);
 
     /** Free internal structures of previously parsed tree and clear cache */
     void close();
@@ -265,6 +270,11 @@ namespace Belle2 {
     void overridePathValue(const PathOverride& poverride);
     /** Return the (cached) value of a given path */
     PathValue getPathValue(const std::string& path) const;
+
+    /** The handle for the tree in the XML database, when it is in use. */
+    Belle2::xmldb::Tree* m_configTree;
+    /** Flag indicating whether the last load operation used the database */
+    bool m_database;
 
     /** Pointer to the libxml Document structure */
     xmlDocPtr m_xmlDocument;

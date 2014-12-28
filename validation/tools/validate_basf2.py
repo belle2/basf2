@@ -332,7 +332,10 @@ class Validation:
 
                         # Start execution and set attributes for the script
                         self.log.debug('Starting ' + script_object.path)
-                        script_object.status = 'running'
+                        if script_object.status == 'failed':
+                            self.log.warning('Starting of {0} failed'.format(script_object.path))
+                        else:
+                            script_object.status = 'running'
                         script_object.control.execute(script_object, self.basf2_options, self.dry)
 
                         # Some printout in quiet mode

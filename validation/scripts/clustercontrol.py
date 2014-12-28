@@ -151,13 +151,16 @@ class Cluster:
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
 
-        # Submit it to the cluster and throw away the cluster output (which is
-        # usually only "Your job [Job ID] has been submitted"). The steering
+        # Submit it to the cluster. The steering
         # file output will be written to 'log_file' (see above).
         # If we are performing a dry run, don't send anything to the cluster and just
         # create the *.done file right away and delete the *.sh file.
         if not dry:
-            subprocess.Popen(params, stdout=self.clusterlog, stderr=self.clusterlog)
+            process = subprocess.Popen(params, stdout=self.clusterlog, stderr=self.clusterlog)
+
+            # Check whether the submission succeeded
+            if process.wait() != 0:
+                job.status = 'failed'
         else:
             os.system('echo 0 > {0}/script_{1}.done'.format(self.path, job.name))
             os.system('rm {0}'.format(tmp_name))

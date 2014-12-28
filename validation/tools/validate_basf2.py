@@ -94,6 +94,10 @@ class Validation:
         #  the dynamic progress bar
         self.quiet = False
 
+        ## Defines if a dry run is performed, i.e. a run where the steering
+        #  files are not actually started (for debugging purposes)
+        self.dry = False
+
     def build_dependencies(self):
         """!
         This method loops over all Script objects in self.list_of_scripts and
@@ -199,7 +203,7 @@ class Validation:
 
         # Format the handler. We want the datetime, the module that produced
         # the message, the LEVEL of the message and the message itself
-        file_format = logging.Formatter('%(asctime)s - %(name)s - '
+        file_format = logging.Formatter('%(asctime)s - %(module)s - '
                                         '%(levelname)s - %(message)s',
                                         datefmt='%Y-%m-%d %H:%M:%S')
         file_handler.setFormatter(file_format)
@@ -328,8 +332,8 @@ class Validation:
 
                         # Start execution and set attributes for the script
                         self.log.debug('Starting ' + script_object.path)
-                        script_object.control.execute(script_object, self.basf2_options)
                         script_object.status = 'running'
+                        script_object.control.execute(script_object, self.basf2_options, self.dry)
 
                         # Some printout in quiet mode
                         if self.quiet:
@@ -636,26 +640,22 @@ def parse_cmd_line_arguments():
 
     # Define the accepted command line flags and read them in
     parser.add_argument("-o", "--options", help="A string which will be given"
-                                                "to basf2 as arguments. "
-                                                "Example: '-n 100'. "
-                                                "Quotes are necessary!",
-                        type=str, nargs='*')
+                        "to basf2 as arguments. Example: '-n 100'. "
+                        "Quotes are necessary!", type=str, nargs='*')
     parser.add_argument("-pkg", "--packages", help="The name(s) of one or "
-                                                   "multiple packages. "
-                                                   "Validation will be run "
-                                                   "only on these packages! "
-                                                   "E.g. -pkg analysis arich",
+                        "multiple packages. Validation will be run "
+                        "only on these packages! E.g. -pkg analysis arich",
                         type=str, nargs='*')
     parser.add_argument("-m", "--mode", help="The mode which will be used for "
-                                             "running the validation. Two "
-                                             "possible values: 'local' or "
-                                             "'cluster'. Default is 'local'",
-                        type=str, nargs='?', default='local')
+                        "running the validation. Two possible values: 'local' or "
+                        "'cluster'. Default is 'local'", type=str, nargs='?', default='local')
     parser.add_argument("-p", "--parallel", help="The maximum number of parallel processes "
-                                                 "to run the validation. Only used for "
-                                                 "local execution. Default is number of CPU cores.",
-                        type=int, nargs='?', default=None)
+                        "to run the validation. Only used for local execution. Default is "
+                        "number of CPU cores.", type=int, nargs='?', default=None)
     parser.add_argument("-q", "--quiet", help="Suppress the progress bar",
+                        action='store_true')
+    parser.add_argument("-d", "--dry", help="Perform a dry run, i.e. run the validation module "
+                        "without actually executing the steering files (for debugging purposes).",
                         action='store_true')
 
     # Return the parsed arguments!
@@ -812,6 +812,10 @@ try:
     if cmd_arguments.quiet:
         validation.quiet = True
 
+    # Check if we are performing a dry run (don't actually start scripts)
+    if cmd_arguments.dry:
+        validation.dry = True
+
     # Now collect the steering files which will be used in this validation.
     # This will fill validation.list_of_sf_paths with values.
     validation.log.note('Collecting steering files...')
@@ -831,11 +835,14 @@ try:
 
     # Log that the validation has finished and that we are creating plots
     validation.log.note('Validation finished...')
-    validation.log.note('Start creating plots...')
-    validation.create_plots()
+    if not validation.dry:
+        validation.log.note('Start creating plots...')
+        validation.create_plots()
+        validation.log.note('Plots have been created...')
+    else:
+        validation.log.note('Skipping plot creation (dry run)...')
 
     # Log that everything is finished
-    validation.log.note('Plots have been created...')
     validation.log.note('Validation finished! Total runtime: {0}s'
                         .format(int(timeit.default_timer() - start)))
 

@@ -52,7 +52,7 @@ class Local:
 
         return (self.max_number_of_processes > 0) and (self.current_number_of_processes < self.max_number_of_processes)
 
-    def execute(self, job, options=''):
+    def execute(self, job, options='', dry=False):
         """!
         Takes a Script object and a string with options and runs it locally,
         either with ROOT or with basf2, depending on the file type.
@@ -96,6 +96,9 @@ class Local:
 
         # Spawn that new process which executes the command we just defined.
         # Output of it will be written to the file defined above ('log').
+        # If we are performing a dry run, just start an empty process.
+        if dry:
+            params = ['echo', '"Performing a dry run!"']
         process = subprocess.Popen(params, stdout=log, stderr=log)
 
         # Save the connection between the job and the given process-ID

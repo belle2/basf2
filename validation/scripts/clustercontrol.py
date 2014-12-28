@@ -24,8 +24,8 @@ class Cluster:
 
         ## The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
-        # self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
-        self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
+        self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
+        # self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
 
         ## The path, where the help files are being created
         # Maybe there should be a special subfolder for them?
@@ -35,7 +35,7 @@ class Cluster:
         # Set up the logging functionality for the 'cluster execution'-Class,
         # so we can log to validate_basf2.py's log what is going on in
         # .execute and .is_finished
-        self.logger = logging.getLogger('validate_basf2.clustercontrol')
+        self.logger = logging.getLogger('validate_basf2')
 
         # We need to set up the same environment on the cluster like on the
         # local machine. The information can be extracted from $BELLE2_TOOLS,
@@ -86,7 +86,7 @@ class Cluster:
 
         return True
 
-    def execute(self, job, options=''):
+    def execute(self, job, options='', dry=False):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
@@ -154,7 +154,13 @@ class Cluster:
         # Submit it to the cluster and throw away the cluster output (which is
         # usually only "Your job [Job ID] has been submitted"). The steering
         # file output will be written to 'log_file' (see above).
-        subprocess.Popen(params, stdout=self.clusterlog, stderr=self.clusterlog)
+        # If we are performing a dry run, don't send anything to the cluster and just
+        # create the *.done file right away and delete the *.sh file.
+        if not dry:
+            subprocess.Popen(params, stdout=self.clusterlog, stderr=self.clusterlog)
+        else:
+            os.system('echo 0 > {0}/script_{1}.done'.format(self.path, job.name))
+            os.system('rm {0}'.format(tmp_name))
 
     def is_job_finished(self, job):
         """!

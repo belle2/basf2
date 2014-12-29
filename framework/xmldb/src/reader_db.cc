@@ -307,7 +307,7 @@ namespace Belle2 {
       // undoing the conversions as a chain. after each block, data must hold
       // the output of the conversions done so far.
       if (conversion == 0) {
-        assert(data.size() == _size);
+        assert(data.size() == (std::vector<uint8_t>::size_type)_size);
       }
       if (conversion & CONVERSION_BZIP2) {
         std::vector<uint8_t> decompressed(_size);

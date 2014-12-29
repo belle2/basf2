@@ -216,7 +216,6 @@ namespace Belle2 {
                                    reinterpret_cast<const ::xmlChar*>(name.c_str()),
                                    reinterpret_cast<const ::xmlChar*>(""));
           if (!node) { /* TODO */; }
-          work_tree_->getNodeData(parent)->num_children_++;
           Leaf* l = nullptr;
 
           if (!float_value_null) {
@@ -255,7 +254,6 @@ namespace Belle2 {
                                                reinterpret_cast<const ::xmlChar*>("urn:X-belle2:database-control"),
                                                reinterpret_cast<const ::xmlChar*>("dbctrl"));
           } else {
-            work_tree_->getNodeData(parent)->num_children_++;
             node = ::xmlNewChild(parent, NULL /* ns */,
                                  reinterpret_cast<const ::xmlChar*>(name.c_str()),
                                  NULL /* content */);

@@ -35,7 +35,7 @@ namespace Belle2 {
   namespace xmldb {
 
     Node::Node(::xmlNodePtr _xmlnode, const Tree* _owner)
-      : xmlnode_(_xmlnode), id_(-1), link_invalid(true), num_children_(0),
+      : xmlnode_(_xmlnode), id_(-1), link_invalid(true),
         owner_(_owner), predecessor_(-1), last_changed_commit_(-1)
     {
     } // Node constructor

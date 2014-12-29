@@ -30,10 +30,6 @@ namespace Belle2 {
        */
       bool isDirty() const MUST_USE_RESULT;
 
-      inline int64_t numChildren() const MUST_USE_RESULT {
-        return num_children_;
-      } // Children
-
       /** @return True, iff the node has a predecessor in the database. */
       inline bool hasPredecessor() const MUST_USE_RESULT {
         return predecessor_ != -1;
@@ -102,9 +98,6 @@ namespace Belle2 {
        *  it lies in the path from a changed node to the root node.
        */
       bool link_invalid;
-
-      //! Incremented by the Reader
-      int64_t num_children_;
 
       /** The tree to which this node belongs. */
       const Tree* owner_;

@@ -7,11 +7,13 @@
 namespace Belle2 {
   namespace xmldb {
 
+    /** A node in the XML tree that contains actual data. */
     class Leaf : public Node {
     public:
-      // None: not a leaf
+      /** The type of the data stored in a leaf. */
       enum class DataType {
-        None, Int, String, Double, Cdata
+        None, //< Not a leaf.
+        Int, String, Double, Cdata
       };
 
       explicit Leaf(::xmlNodePtr _xmlnode, const Tree* _owner);
@@ -20,6 +22,9 @@ namespace Belle2 {
 
       virtual std::string textRepresentation() = 0;
 
+      /** Updates the text representation stored in the XML node when the raw
+       *  data changes.
+       */
       virtual bool updateXMLNode();
     };  // class Leaf
 

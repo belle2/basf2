@@ -14,22 +14,30 @@ namespace Belle2 {
 
     class Node;
 
+    /** A pointer to a datum read from the database, for it to be used like
+     *  a POD type. */
     template<typename T> class Value {
     public:
-
+      /** Initialize the value with data read from the database.
+       *  @param _t The tree loaded from the database.
+       *  @param _xpath The XPath pointing to the requested datum.
+       */
       Value(const Tree* _t, const std::string& _xpath)
         : node_(_t->getNodeData(_t->findNode(_xpath))) {
       }
 
+      /** Assign a new value. */
       T operator=(const T& _newValue) throw (std::logic_error) {
         throw std::logic_error("Generic = is not implemented.");
       }
 
+      /** Get the current value. */
       T operator()() throw (std::logic_error) {
         throw std::logic_error("Generic () is not implemented.");
       }
 
     private:
+      /** Pointer the the Node containing the value within the XML tree. */
       Node* const node_;
     }; // class Value
 

@@ -9,7 +9,7 @@
 namespace Belle2 {
   namespace xmldb {
 
-//! Connection to a PostgreSQL database.
+    /** Connection to a PostgreSQL database. */
     class Connection {
     public:
       /** Initialize the connection to the database.
@@ -24,17 +24,23 @@ namespace Belle2 {
       bool integer_datetime() const MUST_USE_RESULT { return integer_datetime_; }
 
       /** Check the state of the database connection.
-       * \return true, iff the connection is alive.
+       * @return true, iff the connection is alive.
        */
       bool ok() const MUST_USE_RESULT;
 
     private:
       friend class Query;
 
+      /** Get the handle to the database connection.
+       *  @return The handle.
+       */
       ::PGconn* conn() const MUST_USE_RESULT { return conn_; }
+      /** Print information about the active database connection. */
       void dumpConnectionParameters() const;
 
+      /** The PostgreSQL handle to the database connection. */
       ::PGconn* conn_;
+      /** The server setting of the integer_datatime option. */
       bool integer_datetime_;
     };  // class Connection
 

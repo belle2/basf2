@@ -14,20 +14,24 @@ namespace Belle2 {
 
     class Node;
 
+    /** Represents an XML file including its metadata. */
     class Tree {
     public:
 
+      /** Metadata of a file stored in the database. */
       struct File {
         int32_t id;
         std::string name;
       };
 
+      /** Metadata of a branch stored in the database. */
       struct Branch {
         int64_t id;
         std::string name;
         File file;
       };
 
+      /** Metadata of a commit to the database. */
       struct Commit {
         std::string comment;
         timeval creation_date;
@@ -36,6 +40,7 @@ namespace Belle2 {
         Branch branch;
       };
 
+      /** A List of commits. */
       typedef std::vector<Commit> commit_list_t;
 
       /** Constructs an empty tree. */
@@ -56,6 +61,9 @@ namespace Belle2 {
       /** Retrieve meta information for a libxml node. */
       Node* getNodeData(::xmlNodePtr _node) const;
 
+      /** Get the root node of the libxml2 tree.
+       *  @return A pointer to the root node.
+       */
       ::xmlNodePtr rootNode() const MUST_USE_RESULT;
 
       /*! Retrieve a CDATA block from the database.

@@ -16,17 +16,23 @@ namespace Belle2 {
 
   namespace xmldb {
 
+    /** Operations on the "directory" of the XML database. */
     class DB {
     public:
-      // maps from name to id.
-      // this is redundant by now, as File=name + id, but this might change
-      // in the future.
+      /** Maps from name to id.
+       * This is redundant as of now, as File=name + id, but this might change
+       * in the future.
+       */
       typedef std::map<std::string, Tree::File> FileList;
+      /** List of commits to a file.
+       *  key: a branch name, value: a commit to that branch.
+       */
       typedef std::multimap<std::string, Tree::Commit> CommitsToFile;
 
       /** List files known to the database.
 
           @param _like String to match. In SQL syntax, i.e. "%like so%".
+          @return The list of matches.
       */
       static FileList listFiles(Belle2::xmldb::Connection* _db,
                                 const std::string& _like = "%")
@@ -38,6 +44,7 @@ namespace Belle2 {
           @param _like String to match. In SQL syntax, i.e. "%like so%".
           @param _from Lower end of creation time range.
           @param _to Upper end of creation time range.
+          @return The list of matches.
       */
       static CommitsToFile find(Belle2::xmldb::Connection* _db, int32_t _file,
                                 const std::string& _like = "%", long _from = 0,

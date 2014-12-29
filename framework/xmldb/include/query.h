@@ -57,17 +57,25 @@ namespace Belle2 {
       int numRows() const throw(std::logic_error) MUST_USE_RESULT;
 
     private:
+      /** Check if the query was executed correctly. */
       bool checkResult(const std::string& _query);
 
+      /** Get the binary representation of a returned datum. */
       const char* getValue(int _row, int _col, bool* _is_null)
       throw(std::logic_error) MUST_USE_RESULT;
 
-      Connection* const conn_;
-      bool data_returned_;
-      bool executed_;
+      Connection* const conn_; /**< The connection used for this query. */
+      bool data_returned_; /**< True, iff data has been returned by the query. */
+      bool executed_; /**< True, iff the query has already been executed. */
+      /** The number of columns in the query result.
+       *  Only valid if data_returned_ is true.
+       */
       int numColumns_;
+      /** The number of rows in the query result.
+       *  Only valid if data_returned_ is true.
+       */
       int numRows_;
-      ::PGresult* result_;
+      ::PGresult* result_; /**< Handle for the result. */
     };  // class Query
 
   }  // namespace xmldb

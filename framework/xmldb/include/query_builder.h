@@ -51,33 +51,45 @@ namespace Belle2 {
       bool setParameterXML(int _param, const std::string& _value)
       throw(std::logic_error);
 
-      /*! Initialize the object with the query string.
+      /** Initialize the object with the query string.
 
           Values to be passed to the database must be replaced with $1, $2, ... .
           It is assumed that the parameter numbers are consecutive, starting at 1.
 
-          \param _stmt The query string.
-          \param _num_params The number of parameters in the query.
-          \return true, iff the call completed successfully.
+          @param _stmt The query string.
+          @param _num_params The number of parameters in the query.
+          @return true, iff the call completed successfully.
       */
       bool setStatement(const std::string& _stmt, int _num_params);
 
     private:
       friend class Query;
 
+      /** Check that a query id passed in to a function is in the allowed
+       *  range.
+       *  Throws std::out_of_range for negative or too big ids.
+       */
       void verifyParameterId(int _param) throw(std::out_of_range);
 
-      // prepare a union to easily support more data types later.
+      /** Prepare a union to easily support more data types later. */
       typedef union {
         int64_t int_value;
       } Parameter;
 
+      /** Collects the paramFormats[] parameter for the PQexecParams call. */
       std::vector<int> param_formats_;
+      /** Collects the paramLengths[] parameter for the PQexecParams call. */
       std::vector<int> param_lengths_;
+      /** Collects the paramTypes[] parameter for the PQexecParams call. */
       std::vector< ::Oid > param_types_;
+      /** Collects the paramValues[] parameter for the PQexecParams call. */
       std::vector<const char*> param_values_;
+      /** Collects the actual parameter values. Pointed to by param_values_
+       *  where needed.
+       */
       std::vector<Parameter> parameters_;
 
+      /** The query string. */
       std::string query_;
     }; // class QueryBuilder
 

@@ -1,5 +1,4 @@
 #include "framework/xmldb/query.h"
-#include "framework/xmldb/htobe.h"
 
 #include <netinet/in.h>
 #include <stdint.h>
@@ -11,7 +10,9 @@
 #include <libpq-fe.h>
 #include "catalog/pg_type.h"
 
+#include <framework/logging/Logger.h>
 #include "framework/xmldb/connection.h"
+#include "framework/xmldb/htobe.h"
 #include "framework/xmldb/query_builder.h"
 
 namespace Belle2 {
@@ -47,10 +48,10 @@ namespace Belle2 {
         return true;
       }
       // bad return code. report the error
-      std::cerr << "Query: " << _query << std::endl;
-      std::cerr << "Query status: " << execstatus << " (" <<
-                ::PQresStatus(execstatus) << ") " << std::endl
-                << "Error: " << ::PQresultErrorMessage(result_) << std::endl << std::flush;
+      B2ERROR("Query: " << _query << " => "
+              "Query status: " << execstatus << " (" <<
+              ::PQresStatus(execstatus) << "), "
+              "Error: " << ::PQresultErrorMessage(result_));
       return false;
     } // Query::checkResult
 

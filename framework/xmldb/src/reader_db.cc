@@ -20,7 +20,11 @@
 namespace Belle2 {
   namespace xmldb {
 
-    Reader_DB::Reader_DB() : work_tree_(nullptr)
+    Reader_DB::Reader_DB() : attrib_name_index_(-1), attrib_value_index_(-1),
+      cdata_id_index_(-1), cdata_size_index_(-1), commitid_index_(-1),
+      float_value_index_(-1), id_index_(-1), int_value_index_(-1),
+      linktype_index_(-1), name_index_(-1), parent_index_(-1),
+      text_value_index_(-1), work_tree_(nullptr)
     {
     } // Reader_DB constructor
 

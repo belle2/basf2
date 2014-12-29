@@ -19,7 +19,8 @@ namespace Belle2 {
   namespace xmldb {
 
     Query::Query(Connection* _conn)
-      : conn_(_conn), data_returned_(false), executed_(false), result_(nullptr)
+      : conn_(_conn), data_returned_(false), executed_(false),
+        numColumns_(0), numRows_(0), result_(nullptr)
     {
       assert(_conn);
     } // Query constructor

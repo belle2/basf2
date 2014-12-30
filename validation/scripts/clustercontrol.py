@@ -24,8 +24,8 @@ class Cluster:
 
         ## The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
-        self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
-        # self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
+        # self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
+        self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
 
         ## The path, where the help files are being created
         # Maybe there should be a special subfolder for them?

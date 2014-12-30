@@ -14,7 +14,7 @@ using namespace Belle2;
 
 ClassImp(TrackFitResult);
 
-TrackFitResult::TrackFitResult() : m_pdg(0), m_pValue(0), m_hitPatternCDCInitializer(0), m_hitPatternVXDInitializer(0)
+TrackFitResult::TrackFitResult() : m_pdg(0), m_pValue(0), m_tau(), m_cov5(), m_hitPatternCDCInitializer(0), m_hitPatternVXDInitializer(0)
 {
 }
 

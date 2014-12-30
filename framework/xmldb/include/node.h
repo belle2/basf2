@@ -17,6 +17,7 @@ namespace Belle2 {
 
     class Tree;
 
+    /** Annotations for a libxml2 node. */
     class Node {
     public:
       explicit Node(::xmlNodePtr _xmlnode, const Tree* _owner);
@@ -43,9 +44,9 @@ namespace Belle2 {
       /** @return True, iff the node is a leaf, i.e. contains data. */
       bool isLeaf() const MUST_USE_RESULT;
 
-      /* @return The name of the node. */
+      /** @return The name of the node. */
       std::string name() const MUST_USE_RESULT;
-      /* @return The full path of the node (including the name), separated
+      /** @return The full path of the node (including the name), separated
        * with ".".
        */
       std::string path() const MUST_USE_RESULT;
@@ -104,7 +105,7 @@ namespace Belle2 {
       /** The id of the predecessor in the database, or -1. */
       int64_t predecessor_;
 
-      /* The íd of the last commit that changed the value of this node. */
+      /** The íd of the last commit that changed the value of this node. */
       int64_t last_changed_commit_;
     };  // class Node
 

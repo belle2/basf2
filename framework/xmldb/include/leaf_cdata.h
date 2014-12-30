@@ -46,9 +46,9 @@ namespace Belle2 {
     protected:
       static const int32_t cdata_id_invalid = -1;
 
-      int32_t cdata_id_;
-      bool is_loaded_;
-      int64_t size_;
+      int32_t cdata_id_; /**< Id of the cdata in the database. */
+      bool is_loaded_; /**< Has the data been loaded from the database. */
+      int64_t size_; /**< Raw size of the data block. */
     };  // class LeafCdata
 
   }  // namespace xmldb

@@ -45,6 +45,7 @@ namespace Belle2 {
 
       /** Constructs an empty tree. */
       Tree();
+      /** Destructor. */
       ~Tree();
 
       /*! Find a node by an XPath query.
@@ -75,8 +76,11 @@ namespace Belle2 {
        */
       bool loadCdata(const std::string& _xpath);
 
+      /** Information about the commit that has been loaded. */
       Commit id_;
+      /** Pointer to the associated libxml2 document. */
       ::xmlDocPtr doc_;
+      /** Libxml2 handle for the config namespace definition. */
       ::xmlNsPtr configNs_;
 
       typedef std::map< ::xmlNodePtr, Node* > node_data_map_t;
@@ -84,9 +88,15 @@ namespace Belle2 {
        * for the node. */
       node_data_map_t node_data_map;
 
+      /** Is the node a leaf containing data? */
       static bool isLeaf(::xmlNodePtr n) MUST_USE_RESULT;
+      /** Is this an inner node of the document?
+       *  I.e. not a leaf, comment or text node.
+       */
       static bool isTreeChild(::xmlNodePtr n) MUST_USE_RESULT;
-      // ignore XML comments, and pure text nodes
+      /** Does this node contribute to the content of the document?
+       *  Ignores XML comments and pure text nodes.
+       */
       static bool isTrueChild(::xmlNodePtr n) MUST_USE_RESULT;
     }; // class Tree
 

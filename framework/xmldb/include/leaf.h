@@ -18,8 +18,10 @@ namespace Belle2 {
 
       explicit Leaf(::xmlNodePtr _xmlnode, const Tree* _owner);
 
+      /** Get the data type stored in the node. */
       virtual DataType type() const = 0;
 
+      /** @return A textual representation of the data. */
       virtual std::string textRepresentation() = 0;
 
       /** Updates the text representation stored in the XML node when the raw

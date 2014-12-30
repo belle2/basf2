@@ -37,6 +37,11 @@ namespace Belle2 {
       */
       bool setParameterString(int _param, const std::string& _value)
       throw(std::logic_error);
+      //! Bind a parameter as a timestamp value.
+      /*! It is recommended to use the TIMESTAMPTZ SQL type.
+       * @param _param The id of the parameter.
+       * @param _value Timestamp (seconds since 1.1.1970).
+      */
       bool setParameterTimestamp(int _param, long _value)
       throw(std::logic_error);
       //! Bind a parameter as a timestamp value.

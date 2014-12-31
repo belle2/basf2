@@ -26,7 +26,7 @@
       <dy_Vessel unit="cm">10.16</dy_Vessel>
       <dz_Vessel unit="cm">30.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <AngleZ unit="deg">90.0</AngleZ>
       <TPCpos_x unit="cm">POS_X1</TPCpos_x>
       <TPCpos_y unit="cm">POS_Y1</TPCpos_y>
       <TPCpos_z unit="cm">POS_Z1</TPCpos_z>
@@ -41,7 +41,7 @@
       <dy_Vessel unit="cm">10.16</dy_Vessel>
       <dz_Vessel unit="cm">30.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <AngleZ unit="deg">90.0</AngleZ>
       <TPCpos_x unit="cm">POS_X2</TPCpos_x>
       <TPCpos_y unit="cm">POS_Y2</TPCpos_y>
       <TPCpos_z unit="cm">POS_Z2</TPCpos_z>

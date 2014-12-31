@@ -66,7 +66,7 @@ namespace Belle2 {
     void Ph1sustrCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
-      double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
+      //double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
 
       //no get the array. Notice that the default framework unit is cm, so the
@@ -167,6 +167,14 @@ namespace Belle2 {
         */
       }
 
+      //TPC vertical: 4x @ 1614/ea
+      //TPC horizontal + BGO base: 8x @ 1583/ea
+      //TPC railroad: 8x @ 2200/ea
+      //BGO vertical: 4x @ 928/ea
+      //BGO horizontal: 4x @ 318/ea
+      //G4double dz_20V2100bgov = 843.72 / 2.*CLHEP::mm;
+      //G4double dz_20V2100bgoh = 280.00 / 2.*CLHEP::mm;
+
       //Beam supporting the TPC-Tube-plate
       //define tpc beam and plate dimensions
       double betpcbeam = 190.8 / 2. * CLHEP::mm;
@@ -184,7 +192,7 @@ namespace Belle2 {
       G4VSolid* s_plate = new G4Box("s_plate", dx_plate, dy_plate, dz_plate);
 
       //place plate volume
-      G4LogicalVolume* l_plate = new G4LogicalVolume(s_plate,  geometry::Materials::get("MetalCopper") , "l_plate", 0, 0);
+      G4LogicalVolume* l_plate = new G4LogicalVolume(s_plate,  geometry::Materials::get("Aluminum") , "l_plate", 0, 0);
       G4VisAttributes* white = new G4VisAttributes(G4Colour(1, 1, 1));
       white->SetForceAuxEdgeVisible(true);
       l_plate->SetVisAttributes(white);
@@ -196,7 +204,7 @@ namespace Belle2 {
       G4VSolid* s_tpcbeam = new G4UnionSolid("s_tpcbeam", s_tpcbeampos, s_tpcbeamneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
 
       //create tpc beam volumes
-      G4LogicalVolume* l_tpcbeam = new G4LogicalVolume(s_tpcbeam,  geometry::Materials::get("MetalCopper") , "l_tpcbeam", 0, 0);
+      G4LogicalVolume* l_tpcbeam = new G4LogicalVolume(s_tpcbeam,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeam", 0, 0);
 
       //place plate volume
       G4ThreeVector PH1SUSTRpos = G4ThreeVector(
@@ -303,13 +311,14 @@ namespace Belle2 {
       new G4PVPlacement(rotXx, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
       //vertical beams
-      G4double dz_tpcbeamv = 1537.37 / 2.*CLHEP::mm;
+      //G4double dz_tpcbeamv = 1537.37 / 2.*CLHEP::mm;
+      G4double dz_tpcbeamv = 1583. / 2.*CLHEP::mm;
       G4VSolid* s_tpcbeamv_a = new G4Box("s_tpcbeamv_a", dx_tpcbeam, dy_tpcbeam, dz_tpcbeamv);
       G4VSolid* s_tpcbeamv_b = new G4Box("s_tpcbeamv_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_tpcbeamv);
       G4VSolid* s_tpcbeamvpos = new G4SubtractionSolid("s_tpcbeamvpos", s_tpcbeamv_a, s_tpcbeamv_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
       G4VSolid* s_tpcbeamvneg = new G4SubtractionSolid("s_tpcbeamvneg", s_tpcbeamv_a, s_tpcbeamv_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
       G4VSolid* s_tpcbeamv = new G4UnionSolid("s_tpcbeamv", s_tpcbeamvpos, s_tpcbeamvneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-      G4LogicalVolume* l_tpcbeamv = new G4LogicalVolume(s_tpcbeamv,  geometry::Materials::get("MetalCopper") , "l_tpcbeamv", 0, 0);
+      G4LogicalVolume* l_tpcbeamv = new G4LogicalVolume(s_tpcbeamv,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamv", 0, 0);
 
       //place 1st vertical TPC beam
       G4RotationMatrix* rotX = new G4RotationMatrix();
@@ -343,13 +352,14 @@ namespace Belle2 {
       new G4PVPlacement(rotX, PH1SUSTRpos, l_tpcbeamv, "p_tpcbeamv", &topVolume, false, 0);
 
       //horizontal beams
-      G4double dz_tpcbeamh = 1792. / 2.*CLHEP::mm;
+      //G4double dz_tpcbeamh = 1792. / 2.*CLHEP::mm;
+      G4double dz_tpcbeamh = 1614. / 2.*CLHEP::mm;
       G4VSolid* s_tpcbeamh_a = new G4Box("s_tpcbeamh_a", dx_tpcbeam, dy_tpcbeam, dz_tpcbeamh);
       G4VSolid* s_tpcbeamh_b = new G4Box("s_tpcbeamh_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_tpcbeamh);
       G4VSolid* s_tpcbeamhpos = new G4SubtractionSolid("s_tpcbeamhpos", s_tpcbeamh_a, s_tpcbeamh_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
       G4VSolid* s_tpcbeamhneg = new G4SubtractionSolid("s_tpcbeanhneg", s_tpcbeamh_a, s_tpcbeamh_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
       G4VSolid* s_tpcbeamh = new G4UnionSolid("s_tpcbeamh", s_tpcbeamhpos, s_tpcbeamhneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-      G4LogicalVolume* l_tpcbeamh = new G4LogicalVolume(s_tpcbeamh,  geometry::Materials::get("MetalCopper") , "l_tpcbeamh", 0, 0);
+      G4LogicalVolume* l_tpcbeamh = new G4LogicalVolume(s_tpcbeamh,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamh", 0, 0);
 
       //place 1st horizontal TPC beam
       G4RotationMatrix* rotY = new G4RotationMatrix();
@@ -457,7 +467,7 @@ namespace Belle2 {
       G4VSolid* s_20V2300_a = new G4Box("s_20V2300_a", dx_20V2300, dy_20V2300, dz_20V2300);
       G4VSolid* s_20V2300 = new G4UnionSolid("s_20V2300", s_20V2000, s_20V2300_a, 0, G4ThreeVector(0, -dy_20V2000 - dw_20V2000, 0));
 
-      G4LogicalVolume* l_20V2300 = new G4LogicalVolume(s_20V2300,  geometry::Materials::get("MetalCopper") , "l_20V2300", 0, m_sensitive);
+      G4LogicalVolume* l_20V2300 = new G4LogicalVolume(s_20V2300,  geometry::Materials::get("FG_Epoxy") , "l_20V2300", 0, m_sensitive);
 
       //Lets limit the Geant4 stepsize inside the volume
       l_20V2300->SetUserLimits(new G4UserLimits(stepSize));
@@ -523,7 +533,7 @@ namespace Belle2 {
 
 
       G4VSolid* s_20V2100v = new G4UnionSolid("s_20V2100v", s_20V2100vpos, s_20V2100vneg, 0, G4ThreeVector(0, -2.*dy_20V2000, 0));
-      G4LogicalVolume* l_20V2100v = new G4LogicalVolume(s_20V2100v,  geometry::Materials::get("MetalCopper") , "l_20V2100v", 0, 0);
+      G4LogicalVolume* l_20V2100v = new G4LogicalVolume(s_20V2100v,  geometry::Materials::get("FG_Epoxy") , "l_20V2100v", 0, 0);
 
       G4RotationMatrix* rotX = new G4RotationMatrix();
       rotX->rotateX(90.*CLHEP::deg);
@@ -559,7 +569,7 @@ namespace Belle2 {
 
 
       G4VSolid* s_20V2100h = new G4UnionSolid("s_20V2100h", s_20V2100hpos, s_20V2100hneg, 0, G4ThreeVector(0, -2.*dy_20V2000, 0));
-      G4LogicalVolume* l_20V2100h = new G4LogicalVolume(s_20V2100h,  geometry::Materials::get("MetalCopper") , "l_20V2100h", 0, 0);
+      G4LogicalVolume* l_20V2100h = new G4LogicalVolume(s_20V2100h,  geometry::Materials::get("FG_Epoxy") , "l_20V2100h", 0, 0);
 
       G4RotationMatrix* rotY = new G4RotationMatrix();
       rotY->rotateY(90.*CLHEP::deg);
@@ -594,7 +604,7 @@ namespace Belle2 {
       new G4PVPlacement(rotY, PH1SUSTRpos, l_20V2100h, "p_20V2100h", &topVolume, false, 0);
 
       G4VSolid* s_20V2100bgov = new G4UnionSolid("s_20V2100bgov", s_20V2100bgovpos, s_20V2100bgovneg, 0, G4ThreeVector(0, -2.*dy_20V2000, 0));
-      G4LogicalVolume* l_20V2100bgov = new G4LogicalVolume(s_20V2100bgov,  geometry::Materials::get("MetalCopper") , "l_20V2100bgov", 0, 0);
+      G4LogicalVolume* l_20V2100bgov = new G4LogicalVolume(s_20V2100bgov,  geometry::Materials::get("FG_Epoxy") , "l_20V2100bgov", 0, 0);
 
       PH1SUSTRpos = G4ThreeVector(
                       -181.3 * CLHEP::mm,
@@ -625,7 +635,7 @@ namespace Belle2 {
       new G4PVPlacement(rotX, PH1SUSTRpos, l_20V2100bgov, "p_20V2100bgov", &topVolume, false, 0);
 
       G4VSolid* s_20V2100bgoh = new G4UnionSolid("s_20V2100bgoh", s_20V2100bgohpos, s_20V2100bgohneg, 0, G4ThreeVector(0, -2.*dy_20V2000, 0));
-      G4LogicalVolume* l_20V2100bgoh = new G4LogicalVolume(s_20V2100bgoh,  geometry::Materials::get("MetalCopper") , "l_20V2100bgoh", 0, 0);
+      G4LogicalVolume* l_20V2100bgoh = new G4LogicalVolume(s_20V2100bgoh,  geometry::Materials::get("FG_Epoxy") , "l_20V2100bgoh", 0, 0);
 
       PH1SUSTRpos = G4ThreeVector(
                       0 * CLHEP::mm,

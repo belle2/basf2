@@ -1,101 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="HE3TUBE">
-  <Creator library="beast">HE3TUBECreator</Creator>
-  <Content>
-    <!-- normally, parameters should be defined with a unit attribute. This
-         enables automatic conversion to the default framework unit --> 
-    <stepSize unit="um">200</stepSize>
-    <!--if we don't supply a unit there can be no conversion but is still valid -->
-    <divisions>32</divisions>
-    <!-- valid values for false are: "", "0", "off", "false" (case
-         insensitive), everything else will be interpreted as true -->
-    <foo>true</foo>
-    <!-- we can also have arrays as parameters which makes it easy to get a
-         number of values as vector<double>.  The numbers can be divided by
-         whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2
-    </bar>
-
-<!--Backward end-->
-
-<!--left-->
-   <Active>
-     <Material>HE3TUBE-Material</Material>
-     <MaterialTube>StainlessSteel304</MaterialTube>
-     <MaterialGas>HE3TUBE-Material</MaterialGas>
-     <x_he3tube unit="cm">-57.62</x_he3tube>
-     <y_he3tube unit="cm">-4.38</y_he3tube>
-     <z_he3tube unit="cm">12.0</z_he3tube>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-     <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-     <tube_outerRadius unit="cm">2.38</tube_outerRadius>
-     <tube_hz unit="cm">10.19</tube_hz>
-     <endcap_hz unit="cm">0.47</endcap_hz>
-     <gas_outerRadius unit="cm">2.38</gas_outerRadius>
-     <gas_hz unit="cm">7.62</gas_hz>
-   </Active>
-
-<!--right-->
-   <Active>
-     <Material>HE3TUBE-Material</Material>
-     <MaterialTube>StainlessSteel304</MaterialTube>
-     <MaterialGas>HE3TUBE-Material</MaterialGas>
-     <x_he3tube unit="cm">57.62</x_he3tube>
-     <y_he3tube unit="cm">-4.38</y_he3tube>
-     <z_he3tube unit="cm">12.0</z_he3tube>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-     <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-     <tube_outerRadius unit="cm">2.38</tube_outerRadius>
-     <tube_hz unit="cm">10.19</tube_hz>
-     <endcap_hz unit="cm">0.47</endcap_hz>
-     <gas_outerRadius unit="cm">2.38</gas_outerRadius>
-     <gas_hz unit="cm">7.62</gas_hz>
-   </Active>
-
-<!--Forward end-->
-
-<!--left-->
-   <Active>
-     <Material>HE3TUBE-Material</Material>
-     <MaterialTube>StainlessSteel304</MaterialTube>
-     <MaterialGas>HE3TUBE-Material</MaterialGas>
-     <x_he3tube unit="cm">-4.38</x_he3tube>
-     <y_he3tube unit="cm">42.62</y_he3tube>
-     <z_he3tube unit="cm">12.0</z_he3tube>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-     <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-     <tube_outerRadius unit="cm">2.38</tube_outerRadius>
-     <tube_hz unit="cm">10.19</tube_hz>
-     <endcap_hz unit="cm">0.47</endcap_hz>
-     <gas_outerRadius unit="cm">2.38</gas_outerRadius>
-     <gas_hz unit="cm">7.62</gas_hz>
-   </Active>
-
-<!--top-->
-   <Active>
-     <Material>HE3TUBE-Material</Material>
-     <MaterialTube>StainlessSteel304</MaterialTube>
-     <MaterialGas>HE3TUBE-Material</MaterialGas>
-     <x_he3tube unit="cm">-4.38</x_he3tube>
-     <y_he3tube unit="cm">-42.62</y_he3tube>
-     <z_he3tube unit="cm">12</z_he3tube>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-     <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-     <tube_outerRadius unit="cm">2.38</tube_outerRadius>
-     <tube_hz unit="cm">10.19</tube_hz>
-     <endcap_hz unit="cm">0.47</endcap_hz>
-     <gas_outerRadius unit="cm">2.38</gas_outerRadius>
-     <gas_hz unit="cm">7.62</gas_hz>
-   </Active>
-
-
-  </Content>
+<Creator library="beast">HE3TUBECreator</Creator>
+<Content>
+<!-- normally, parameters should be defined with a unit attribute. This
+enables automatic conversion to the default framework unit --> 
+<stepSize unit="um">200</stepSize>
+<!--if we don't supply a unit there can be no conversion but is still valid -->
+<divisions>32</divisions>
+<!-- valid values for false are: "", "0", "off", "false" (case
+insensitive), everything else will be interpreted as true -->
+<foo>true</foo>
+<!-- we can also have arrays as parameters which makes it easy to get a
+number of values as vector<double>.  The numbers can be divided by
+whitespace, comma or semi-colon -->
+<bar unit="mm">1 2 3 4
+</bar>
+<Active>
+<Material>HE3TUBE-Material</Material>
+<MaterialTube>StainlessSteel304</MaterialTube>
+<MaterialGas>HE3TUBE-Material</MaterialGas>
+<x_he3tube unit="cm">57.62000</x_he3tube>
+<y_he3tube unit="cm">-4.38000</y_he3tube>
+<z_he3tube unit="cm">40.00000</z_he3tube>
+<AngleX unit="deg">0.0</AngleX>
+<AngleY unit="deg">0.0</AngleY>
+<AngleZ unit="deg">0.0</AngleZ>
+<tube_innerRadius unit="cm">2.069</tube_innerRadius>
+<tube_outerRadius unit="cm">2.38</tube_outerRadius>
+<tube_hz unit="cm">10.19</tube_hz>
+<endcap_hz unit="cm">0.47</endcap_hz>
+<gas_outerRadius unit="cm">2.38</gas_outerRadius>
+<gas_hz unit="cm">7.62</gas_hz>
+</Active>
+<Active>
+<Material>HE3TUBE-Material</Material>
+<MaterialTube>StainlessSteel304</MaterialTube>
+<MaterialGas>HE3TUBE-Material</MaterialGas>
+<x_he3tube unit="cm">-57.62000</x_he3tube>
+<y_he3tube unit="cm">-4.38000</y_he3tube>
+<z_he3tube unit="cm">40.00000</z_he3tube>
+<AngleX unit="deg">0.0</AngleX>
+<AngleY unit="deg">0.0</AngleY>
+<AngleZ unit="deg">0.0</AngleZ>
+<tube_innerRadius unit="cm">2.069</tube_innerRadius>
+<tube_outerRadius unit="cm">2.38</tube_outerRadius>
+<tube_hz unit="cm">10.19</tube_hz>
+<endcap_hz unit="cm">0.47</endcap_hz>
+<gas_outerRadius unit="cm">2.38</gas_outerRadius>
+<gas_hz unit="cm">7.62</gas_hz>
+</Active>
+<Active>
+<Material>HE3TUBE-Material</Material>
+<MaterialTube>StainlessSteel304</MaterialTube>
+<MaterialGas>HE3TUBE-Material</MaterialGas>
+<x_he3tube unit="cm">-4.38000</x_he3tube>
+<y_he3tube unit="cm">42.62000</y_he3tube>
+<z_he3tube unit="cm">40.00000</z_he3tube>
+<AngleX unit="deg">0.0</AngleX>
+<AngleY unit="deg">0.0</AngleY>
+<AngleZ unit="deg">0.0</AngleZ>
+<tube_innerRadius unit="cm">2.069</tube_innerRadius>
+<tube_outerRadius unit="cm">2.38</tube_outerRadius>
+<tube_hz unit="cm">10.19</tube_hz>
+<endcap_hz unit="cm">0.47</endcap_hz>
+<gas_outerRadius unit="cm">2.38</gas_outerRadius>
+<gas_hz unit="cm">7.62</gas_hz>
+</Active>
+<Active>
+<Material>HE3TUBE-Material</Material>
+<MaterialTube>StainlessSteel304</MaterialTube>
+<MaterialGas>HE3TUBE-Material</MaterialGas>
+<x_he3tube unit="cm">-4.38000</x_he3tube>
+<y_he3tube unit="cm">-42.62000</y_he3tube>
+<z_he3tube unit="cm">40.00000</z_he3tube>
+<AngleX unit="deg">0.0</AngleX>
+<AngleY unit="deg">0.0</AngleY>
+<AngleZ unit="deg">0.0</AngleZ>
+<tube_innerRadius unit="cm">2.069</tube_innerRadius>
+<tube_outerRadius unit="cm">2.38</tube_outerRadius>
+<tube_hz unit="cm">10.19</tube_hz>
+<endcap_hz unit="cm">0.47</endcap_hz>
+<gas_outerRadius unit="cm">2.38</gas_outerRadius>
+<gas_hz unit="cm">7.62</gas_hz>
+</Active>
+</Content>
 </DetectorComponent>
+

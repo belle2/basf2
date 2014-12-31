@@ -17,8 +17,8 @@
     </bar_diamond>
 
     <Active>
-      <Material>SRSENSOR-Material</Material>
-      <MaterialDIAMOND>SRSENSOR-Material</MaterialDIAMOND>
+      <Material>SRSENSOR-Materials</Material>
+      <MaterialDIAMOND>SRSENSOR-Materials</MaterialDIAMOND>
       <x_diamond unit="cm">0.0</x_diamond>
       <y_diamond unit="cm">0.0</y_diamond>
       <z_diamond unit="cm">100.0</z_diamond>

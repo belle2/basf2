@@ -17,8 +17,8 @@
     </bar_sdd>
 
     <Active>
-      <Material>SRSENSOR-Material</Material>
-      <MaterialSDD>SRSENSOR-Material</MaterialSDD>
+      <Material>SRSENSOR-Materials</Material>
+      <MaterialSDD>SRSENSOR-Materials</MaterialSDD>
       <x_sdd unit="cm">0.0</x_sdd>
       <y_sdd unit="cm">0.0</y_sdd>
       <z_sdd unit="cm">0.0</z_sdd>

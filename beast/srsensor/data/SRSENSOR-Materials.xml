@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- define our own special Materials -->
 <Materials>
-  <Material name="SRSENSOR-Material">
+  <Material name="SRSENSOR-Materials">
     <density unit="g/cm3">2.5</density>
     <!-- (optional) State can be one of Gas, Liquid, Solid, Undefined, case insensitive  -->
     <state>Solid</state>

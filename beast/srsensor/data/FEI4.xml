@@ -17,8 +17,8 @@
     </bar_fei4>
 
     <Active>
-      <Material>SRSENSOR-Material</Material>
-      <MaterialFEI4>SRSENSOR-Material</MaterialFEI4>
+      <Material>SRSENSOR-Materials</Material>
+      <MaterialFEI4>SRSENSOR-Materials</MaterialFEI4>
       <x_fei4 unit="cm">0.0</x_fei4>
       <y_fei4 unit="cm">0.0</y_fei4>
       <z_fei4 unit="cm">-50.0</z_fei4>

@@ -70,9 +70,15 @@ void ECLGammaReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLGamma>::registerPersistent();
-  RelationArray::registerPersistent<ECLGamma, ECLShower>("", "");
+  //KM StoreArray<ECLGamma>::registerPersistent();
+  //KM RelationArray::registerPersistent<ECLGamma, ECLShower>("", "");
 
+  //Input Array ... moved from event func.
+  StoreArray<ECLShower> eclRecShowerArray;
+  StoreArray<ECLHitAssignment> eclHitAssignmentArray;
+  StoreArray<ECLGamma> gammaArray;
+  gammaArray.registerInDataStore();
+  gammaArray.registerRelationTo(eclRecShowerArray);
 
 }
 
@@ -83,11 +89,9 @@ void ECLGammaReconstructorModule::beginRun()
 
 void ECLGammaReconstructorModule::event()
 {
-  //Input Array
   StoreArray<ECLShower> eclRecShowerArray;
   StoreArray<ECLHitAssignment> eclHitAssignmentArray;
   StoreArray<ECLGamma> gammaArray;
-
   RelationArray eclGammaToShower(gammaArray, eclRecShowerArray);
 
   if (!eclRecShowerArray) {

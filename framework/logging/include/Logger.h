@@ -77,7 +77,7 @@
 
 /**
  * \def B2RESULT(streamText)
- * Send an info message.
+ * Send result message (meant for or informational summary messages, e.g. about number of selected events).
  */
 #ifdef LOG_NO_B2RESULT
 #define B2RESULT(streamText)

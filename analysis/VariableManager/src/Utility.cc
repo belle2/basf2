@@ -84,7 +84,7 @@ void Belle2::Variable::Cut::init(Parameter str)
           Variable::Manager& manager = Variable::Manager::Instance();
           var = manager.getVariable(str);
           if (var == nullptr) {
-            throw std::runtime_error("Cut string has an invalid format: Variable not found " + str);
+            throw std::runtime_error("Cut string has an invalid format: Variable not found: " + str);
           }
         }
       }
@@ -238,7 +238,7 @@ bool Belle2::Variable::Cut::check(const Particle* p)
     case NE:
       return not almostEqualFloat(left->get(p), right->get(p));
   }
-  throw std::runtime_error("Cut string has an invalid format: Invalid Operation");
+  throw std::runtime_error("Cut string has an invalid format: Invalid operation");
   return false;
 }
 

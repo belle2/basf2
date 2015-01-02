@@ -9,8 +9,6 @@ namespace Belle2 {
   class Particle;
 
   namespace Variable {
-
-
     /** Global list of available variables.
      *
      *  Each variable has an associated unique string key through
@@ -89,7 +87,12 @@ namespace Belle2 {
     class Manager {
 
     public:
-#ifndef __CINT__
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+      //hide C++11 things from root.
+      typedef void* FunctionPtr;
+      typedef void* ParameterFunctionPtr;
+      typedef void* MetaFunctionPtr;
+#else
       /** functions stored take a const Particle* and return double. */
       typedef std::function<double(const Particle*)> FunctionPtr;
       /** parameter functions stored take a const Particle*, const std::vector<double>& and return double. */
@@ -101,49 +104,31 @@ namespace Belle2 {
       /** A variable returning a floating-point value for a given Particle. */
       struct Var {
         std::string name; /**< Unique identifier of the function, used as key. */
-#ifndef __CINT__
-        FunctionPtr function; /**< Pointer to function. */
-#endif
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-        Var() {} /**< default constructor for ROOT */
-#else
+        FunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
-#endif
+        Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : name(n), description(d), group(g), function(f) { }
       };
 
       /** A variable taking additional floating-point arguments to influence the behaviour. */
       struct ParameterVar {
         std::string name; /**< Unique identifier of the function, used as key. */
-#ifndef __CINT__
-        ParameterFunctionPtr function; /**< Pointer to function. */
-#endif
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-        ParameterVar() {} /**< default constructor for ROOT */
-#else
+        ParameterFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        ParameterVar(std::string n, ParameterFunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
-#endif
+        ParameterVar(std::string n, ParameterFunctionPtr f, std::string d, std::string g = "") : name(n), description(d), group(g), function(f) { }
       };
 
       /** A variable taking string arguments returning a variable. */
       struct MetaVar {
         std::string name; /**< Unique identifier of the function, used as key. */
-#ifndef __CINT__
-        MetaFunctionPtr function; /**< Pointer to function. */
-#endif
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-        MetaVar() {} /**< default constructor for ROOT */
-#else
+        MetaFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        MetaVar(std::string n, MetaFunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
-#endif
+        MetaVar(std::string n, MetaFunctionPtr f, std::string d, std::string g = "") : name(n), description(d), group(g), function(f) { }
       };
 
       /** get singleton instance. */
@@ -155,7 +140,8 @@ namespace Belle2 {
        */
       const Var* getVariable(const std::string& name);
 
-#ifndef __CINT__
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+#else
       /** Return list of all variables (in order registered). */
       std::vector<const Var*> getVariables() const { return m_variablesInRegistrationOrder; }
 
@@ -168,16 +154,13 @@ namespace Belle2 {
       void registerVariable(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description);
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description);
-
-      /** Creates and registers a variable of the form func(varname) */
-      bool createVariable(const std::string& name);
 #endif
 
       /** evaluate variable 'varName' on given Particle.
        *
        * Mainly provided for the Python interface. For performance critical code, it is recommended to use getVariable() once and keep the Var* pointer around.
        *
-       * Aborts with B2FATAL if variable isn't found. Assumes 'p' is != NULL.
+       * Throws exception if variable isn't found. Assumes 'p' is != NULL.
        */
       double evaluate(const std::string& varName, const Particle* p);
 
@@ -193,9 +176,11 @@ namespace Belle2 {
       Manager(const Manager&);
       ~Manager();
 
+      /** Creates and registers a concrete variable (Var) from a MetaVar, ParameterVar or numeric constant. */
+      bool createVariable(const std::string& name);
+
       /** Group last set via VARIABLE_GROUP(). */
       std::string m_currentGroup;
-#ifndef __CINT__
       /** List of registered variables. */
       std::map<std::string, Var*> m_variables;
       /** List of registered variables. */
@@ -205,10 +190,10 @@ namespace Belle2 {
 
       /** List of variables in registration order. */
       std::vector<const Var*> m_variablesInRegistrationOrder;
-#endif
     };
 
-#ifndef __CINT__
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+#else
     /** Internal class that registers a variable with Manager when constructed. */
     class Proxy {
     public:

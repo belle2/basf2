@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <exception>
 
 using namespace Belle2;
 
@@ -113,7 +114,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
 
-  B2WARNING("Encountered bad variable name " << name << " i don't know what to do with it")
+  B2WARNING("Encountered bad variable name '" << name << "'. Maybe you misspelled it?")
   return false;
 }
 
@@ -232,7 +233,7 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
 {
   const Var* var = getVariable(varName);
   if (!var) {
-    B2FATAL("Variable::Manager::evaluate(): variable '" << varName << "' not found!");
+    throw std::runtime_error("Variable::Manager::evaluate(): variable '" + varName + "' not found!");
     return 0.0; //never reached, suppresses cppcheck warning
   }
 

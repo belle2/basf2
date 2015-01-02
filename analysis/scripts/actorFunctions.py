@@ -555,7 +555,8 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     for ntuple in finalParticleNTuples:
         if ntuple is not None:
             type = 'CosBDL' if 'semileptonic' in ntuple else 'Mbc'
-            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, type))
+            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, type, mcCounts))
+            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, "ROC", mcCounts))
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
 
     subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/nordbert.pdf')), shell=True)

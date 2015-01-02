@@ -203,26 +203,32 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     return placeholders
 
 
-def createMoneyPlotTexFile(ntuple, type):
+def createMoneyPlotTexFile(ntuple, type, mcCounts):
     """
     Creates a tex document with MBC or CosBDL Plot from the given ntuple
         @param ntuple the ntuple containing the needed information
     """
     placeholders = {}
-    moneyFilename = ntuple[:-5] + '_money.pdf'
+    prefix = ntuple[:-5] + '_' + type
+    plotFile = prefix + '_money.pdf'
+    placeholders['particleName'] = plotFile[4:].split(':', 1)[0]
     if type == 'Mbc':
         template_file = 'analysis/scripts/FEI/templates/MBCTemplate.tex'
-        if not os.path.isfile(moneyFilename):
-            makeMbcPlot(ntuple, moneyFilename)
+        if not os.path.isfile(plotFile):
+            makeMbcPlot(ntuple, plotFile)
     elif type == 'CosBDL':
         template_file = 'analysis/scripts/FEI/templates/CosBDLTemplate.tex'
-        if not os.path.isfile(moneyFilename):
-            makeCosBDLPlot(ntuple, moneyFilename)
+        if not os.path.isfile(plotFile):
+            makeCosBDLPlot(ntuple, plotFile)
+    elif type == 'ROC':
+        template_file = 'analysis/scripts/FEI/templates/ROCTemplate.tex'
+        if not os.path.isfile(plotFile):
+            nTrueSignal = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
+            makeROCPlotFromNtuple(ntuple, plotFile, nTrueSignal)
     else:
-        raise RuntimeError('Unkown money plot type')
-    placeholders['moneyPlot'] = moneyFilename
-    placeholders['texFile'] = ntuple[:-5] + '_money.tex'
-    placeholders['particleName'] = moneyFilename[4:].split(':', 1)[0]
+        raise RuntimeError('Unknown money plot type')
+    placeholders['moneyPlot'] = plotFile
+    placeholders['texFile'] = prefix + '_money.tex'
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], template_file, placeholders)
     return placeholders
@@ -744,7 +750,7 @@ def makeCosBDLPlot(fileName, outputFileName):
 
     plotTitle = 'CosThetaBDL plot'
     ROOT.gStyle.SetOptStat(0)
-    canvas = ROOT.TCanvas(plotTitle, plotTitle, 600, 400)
+    canvas = ROOT.TCanvas(outputFileName, plotTitle, 600, 400)
     canvas.cd()
 
     #testTree.SetLineColor(ROOT.kBlack)
@@ -790,7 +796,7 @@ def makeMbcPlot(fileName, outputFileName):
 
     plotTitle = 'Mbc plot'
     ROOT.gStyle.SetOptStat(0)
-    canvas = ROOT.TCanvas(plotTitle, plotTitle, 600, 400)
+    canvas = ROOT.TCanvas(outputFileName, plotTitle, 600, 400)
     canvas.cd()
 
     #testTree.SetLineColor(ROOT.kBlack)
@@ -818,6 +824,69 @@ def makeMbcPlot(fileName, outputFileName):
 
     legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
     legend.SetFillStyle(0)
+    canvas.SaveAs(outputFileName)
+
+
+def makeROCPlotFromNtuple(fileName, outputFileName, nTrueSignal):
+    """
+    Using the TNTuple in 'fileName', save an efficiency over purity plot in 'outputFileName'.
+
+    @param nTrueSignal number of true signal particles in the sample.
+    """
+    ntupleFile = ROOT.TFile(fileName)
+    ntupleName = 'variables'
+
+    tree = ntupleFile.Get(ntupleName)
+    if tree.GetEntries() == 0:
+        raise RuntimeError('Couldn\'t find TNtuple "' + ntupleName + '" in file ' + ntupleFile)
+
+    plotTitle = 'ROC curve'
+    canvas = ROOT.TCanvas(outputFileName, plotTitle, 600, 400)
+    canvas.cd()
+
+    nbins = 100
+    import array
+
+    bgHist = ROOT.TH1D('ROCbackground', 'background', nbins, 0.0, 1.0)
+    signalHist = ROOT.TH1D('ROCsignal', 'signal', nbins, 0.0, 1.0)
+
+    probabilityVar = 'extraInfoSignalProbability'
+    targetVar = 'isSignalAcceptMissingNeutrino'  # TODO: depends on type of final particle, is this still available in the particle config?
+    tree.Project('ROCbackground', probabilityVar, '!' + targetVar)
+    tree.Project('ROCsignal', probabilityVar, targetVar)
+
+    x = array.array('d')
+    y = array.array('d')
+    xerr = array.array('d')
+    yerr = array.array('d')
+
+    for cutBin in range(nbins + 1):
+        nSig = signalHist.Integral(cutBin, nbins + 1)
+        nBg = bgHist.Integral(cutBin, nbins + 1)
+
+        efficiency = nSig / nTrueSignal
+        efficiencyErr = efficiencyError(nSig, nTrueSignal)
+        try:
+            purity = nSig / (nSig + nBg)
+            purityErr = efficiencyError(nSig, nSig + nBg)
+        except ZeroDivisionError:
+            purity = 0
+            purityErr = 0
+
+        x.append(100 * purity)
+        y.append(100 * efficiency)
+        xerr.append(100 * purityErr)
+        yerr.append(100 * efficiencyErr)
+
+    rocgraph = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
+    rocgraph.SetLineColor(ROOT.kBlue - 2)
+    rocgraph.SetTitle(';purity (%);efficiency (%)')
+    rocgraph.GetXaxis().SetTitleSize(0.05)
+    rocgraph.GetXaxis().SetLabelSize(0.05)
+    rocgraph.GetYaxis().SetTitleSize(0.05)
+    rocgraph.GetYaxis().SetLabelSize(0.05)
+    rocgraph.Draw('ALPZ')
+
     canvas.SaveAs(outputFileName)
 
 

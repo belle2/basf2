@@ -40,10 +40,12 @@ VXDCDCTrackMergerModule::~VXDCDCTrackMergerModule()
 void VXDCDCTrackMergerModule::initialize()
 {
   StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
-  StoreArray<genfit::Track>::required(m_VXDGFTracksColName);
-  StoreArray<genfit::Track>::required(m_CDCGFTracksColName);
+  StoreArray<genfit::Track> vxdTracks(m_VXDGFTracksColName);
+  StoreArray<genfit::Track> cdcTracks(m_CDCGFTracksColName);
 
-  RelationArray::registerPersistent<genfit::Track, genfit::Track>(m_CDCGFTracksColName, m_VXDGFTracksColName);
+  vxdTracks.isRequired();
+  cdcTracks.isRequired();
+  cdcTracks.registerRelationTo(vxdTracks);
 
   m_CDC_wall_radius     = 16.25;
   m_total_pairs         = 0;

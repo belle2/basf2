@@ -45,8 +45,14 @@ class MinModule(Module):
         pids = Belle2.PyStoreArray('PIDLikelihoods')
         for pid in pids:
             track = pid.getRelatedFrom('Tracks')
-            mcpart = track.getRelatedFrom('MCParticles')
-            try:
+            if track:
+                mcpart = track.getRelatedTo('MCParticles')
+            if not track or not mcpart:
+                # some tracks don't have an mcparticle
+                B2WARNING('problems with track <-> mcparticle relations')
+                event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
+                print 'event: %d, track: %d' % (event, track.getArrayIndex())
+            else:
                 pdg = abs(mcpart.getPDG())
                 momentumVec = mcpart.getMomentum()
                 momentum = momentumVec.Mag()
@@ -56,8 +62,8 @@ class MinModule(Module):
 
                 # particle to compare with pions
                 selectedpart = Belle2.Const.kaon
-                pid_dedx = Belle2.Const.DetectorSet(Belle2.Const.CDC)
-                pid_top = Belle2.Const.DetectorSet(Belle2.Const.TOP)
+                pid_dedx = Belle2.Const.PIDDetectorSet(Belle2.Const.CDC)
+                pid_top = Belle2.Const.PIDDetectorSet(Belle2.Const.TOP)
                 logl_sel = pid.getLogL(selectedpart, pid_dedx)
                 logl_pi = pid.getLogL(Belle2.Const.pion, pid_dedx)
                 dedx_DLL = logl_pi - logl_sel
@@ -72,12 +78,6 @@ class MinModule(Module):
                 elif pdg == 211:
                     hist[1].Fill(momentum, dedx_DLL)
                     hist[3].Fill(momentum, top_DLL)
-            except:
-
-                # some tracks don't have an mcparticle
-                B2WARNING('problems with track <-> mcparticle relations')
-                event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
-                print 'event: %d, track: %d' % (event, track.getArrayIndex())
 
     def terminate(self):
         """

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Removes brokek or empty root files in the current directory
+# Removes broken or empty root files in the current directory
 # Thomas Keck 2014
 
 import ROOT

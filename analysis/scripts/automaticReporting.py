@@ -21,9 +21,9 @@ def removeJPsiSlash(filename):
 
 
 def prettifyDecayString(decayString):
+    decayString = decayString.replace(':generic', '')
     substitutes = {
         '==>': '$\\to$',
-        ':generic': '',
         'gamma': r'$\gamma$',
         'pi+': r'$\pi^+$',
         'pi-': r'$\pi^-$',
@@ -52,9 +52,10 @@ def prettifyDecayString(decayString):
         'B-': r'$B^-$',
         'B0': r'$B^0$',
         'anti-B0': r'$\bar{B^0}$'}
+    texString = decayString
     for key, value in substitutes.iteritems():
-        decayString = decayString.replace(key, value)
-    return decayString
+        texString = texString.replace(key, value)
+    return '\\texorpdfstring{%s}{%s}' % (texString, decayString)
 
 
 def getConfigurationString(particles):

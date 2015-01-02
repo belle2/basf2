@@ -12,7 +12,7 @@
 
 
 //how often do we want to execute stuff? (result of first execution ignored to warm caches)
-const int nRuns = 4; //make this >= 3
+const int nRuns = 3; //make this >= 3
 
 /** Helper function to get stdout of 'cmd'. */
 TString exec(const char* cmd) {
@@ -85,7 +85,7 @@ void benchmarkSteeringFiles()
     const double average = sum / times_ms.size();
     bench->Fill(average, sqrt(squares / times_ms.size() - average * average) / (times_ms.size() - 1));
     bench->SetAlias("Description", TString::Format("Measures average runtime of the '%s' test over %d runs", files[iFile], nRuns));
-    bench->SetAlias("Check", "Increases in runtime could indicate performance regressions in the framework.");
+    bench->SetAlias("Check", "Larger (>20\% or so) increases in runtime could indicate performance regressions in the framework. Since they might also result from high load on the server, verify the effect is persistent over multiple validation runs.");
     bench->Write();
   }
 

@@ -57,6 +57,29 @@ def prettifyDecayString(decayString):
     return decayString
 
 
+def getConfigurationString(particles):
+    """
+    Prettify config output
+    """
+    input = '\n\n'.join([str(p) for p in particles])
+    output = ''
+    count = 0
+    first_sep = 0
+    for c in input:
+        output += c
+        count += 1
+        if first_sep == 0 and c in ':':
+            first_sep = count
+        if c == '\n':
+            count = 0
+            first_sep = 0
+        if count >= 75:
+            if c in ':, ' or count == 90:
+                output += '\n' + ' ' * first_sep
+                count = first_sep
+    return output
+
+
 def formatTime(seconds):
     """
     Return string describing a duration in a natural format
@@ -117,28 +140,20 @@ def createTexFile(filename, templateFilename, placeholders):
 
 
 def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles):
+    """
+    Creates combined summary .tex file for FEIR
+
+    @param finalStateParticlePlaceholders list of placeholder dictonaries (for each FSP)
+    @param combinedParticlePlaceholders list of placeholder dictonaries (for each combined particle)
+    @param finalParticlePlaceholders list of placeholder dictonaries with Mbc, CosBDL, ...  plots
+    @param cpuTimeSummaryPlaceholders placeholder dictonary with CPU statistics
+    @param mcCounts dictionary with MCParticle counts
+    @param particles List of Particle objects
+    """
 
     placeholders = {}
 
-    # Prettify config output
-    input = '\n\n'.join([str(p) for p in particles])
-    output = ''
-    count = 0
-    first_sep = 0
-    for c in input:
-        output += c
-        count += 1
-        if first_sep == 0 and c in ':':
-            first_sep = count
-        if c == '\n':
-            count = 0
-            first_sep = 0
-        if count >= 75:
-            if c in ':, ' or count == 90:
-                output += '\n' + ' ' * first_sep
-                count = first_sep
-
-    placeholders['particleConfigurations'] = output
+    placeholders['particleConfigurations'] = getConfigurationString(particles)
 
     placeholders['finalStateParticleInputs'] = ""
     placeholders['finalStateParticleEPTable'] = ""
@@ -164,9 +179,9 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
-    placeholders['mbcInputs'] = ''
+    placeholders['finalParticleInputs'] = ''
     for particlePlaceholder in finalParticlePlaceholders:
-        placeholders['mbcInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
+        placeholders['finalParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
 
     placeholders['cpuTimeSummary'] = '\input{' + cpuTimeSummaryPlaceholders['texFile'] + '}\n'
 

@@ -191,13 +191,23 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
         if particle.isFSP:
             play.addProperty('MVAConfig_{i}'.format(i=particle.identifier), particle.mvaConfig)
-            play.addProperty('MVAConfigTarget_{i}'.format(i=particle.identifier), particle.mvaConfig.target)
             play.addProperty('VertexFit_{i}'.format(i=particle.identifier), 'TrackFitIsAlreadyDoneForFSPs')
+
+        if particle.mvaConfig is None:
+            commonTarget = None
+        else:
+            commonTarget = particle.mvaConfig.target
+
         for channel in particle.channels:
             play.addProperty('Name_{c}'.format(c=channel.name), channel.name)
             play.addProperty('MVAConfig_{c}'.format(c=channel.name), channel.mvaConfig)
             play.addProperty('MVAConfigTarget_{c}'.format(c=channel.name), channel.mvaConfig.target)
             play.addProperty('PreCutConfig_{c}'.format(c=channel.name), channel.preCutConfig)
+            if commonTarget is None:
+                commonTarget = channel.mvaConfig.target
+            if channel.mvaConfig.target != commonTarget:
+                B2FATAL('Particle %s has common target %s, while channel %s has %s. Each particle must have exactly one target!' % (particle.identifier, commonTarget, channel.name, channel.mvaConfig.target))
+        play.addProperty('MVAConfigTarget_{i}'.format(i=particle.identifier), commonTarget)
 
     # Add top-level actors
     play.addActor(CountMCParticles, names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
@@ -367,6 +377,7 @@ def FullEventInterpretation(user_selection_path, user_analysis_path, particles):
                       finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],
                       combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if not particle.isFSP],
                       finalParticleNTuples=['VariablesToNTuple_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
+                      finalParticleTargets=['MVAConfigTarget_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
                       cpuTimeSummaryPlaceholders='CPUTimeSummary',
                       mcCounts='mcCounts',
                       particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])

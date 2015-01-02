@@ -204,10 +204,13 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     return placeholders
 
 
-def createMoneyPlotTexFile(ntuple, type, mcCounts):
+def createMoneyPlotTexFile(ntuple, type, mcCounts, target):
     """
     Creates a tex document with MBC or CosBDL Plot from the given ntuple
         @param ntuple the ntuple containing the needed information
+        @param type string identifier of plot type
+        @param mcCounts number of MCParticles for each particle
+        @param target name of target (signal) variable for this plot
     """
     placeholders = {}
     prefix = ntuple[:-5] + '_' + type
@@ -216,16 +219,16 @@ def createMoneyPlotTexFile(ntuple, type, mcCounts):
     if type == 'Mbc':
         template_file = 'analysis/scripts/FEI/templates/MBCTemplate.tex'
         if not os.path.isfile(plotFile):
-            makeMbcPlot(ntuple, plotFile)
+            makeMbcPlot(ntuple, plotFile, target)
     elif type == 'CosBDL':
         template_file = 'analysis/scripts/FEI/templates/CosBDLTemplate.tex'
         if not os.path.isfile(plotFile):
-            makeCosBDLPlot(ntuple, plotFile)
+            makeCosBDLPlot(ntuple, plotFile, target)
     elif type == 'ROC':
         template_file = 'analysis/scripts/FEI/templates/ROCTemplate.tex'
         if not os.path.isfile(plotFile):
             nTrueSignal = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
-            makeROCPlotFromNtuple(ntuple, plotFile, nTrueSignal)
+            makeROCPlotFromNtuple(ntuple, plotFile, nTrueSignal, target)
     else:
         raise RuntimeError('Unknown money plot type')
     placeholders['moneyPlot'] = plotFile
@@ -737,7 +740,7 @@ def makeDiagPlot(signalHist, bgHist, plotName):
     canvas.SaveAs(plotName)
 
 
-def makeCosBDLPlot(fileName, outputFileName):
+def makeCosBDLPlot(fileName, outputFileName, targetVar):
     """
     Using the TNTuple in 'fileName', save CosThetaBDL plot in 'outputFileName'.
     Shows effect of different cuts on SignalProbability, plus signal distribution.
@@ -754,10 +757,6 @@ def makeCosBDLPlot(fileName, outputFileName):
     canvas = ROOT.TCanvas(outputFileName, plotTitle, 600, 400)
     canvas.cd()
 
-    #testTree.SetLineColor(ROOT.kBlack)
-    #testTree.Draw('Mbc', 'Mbc > 5.23', '')
-    #testTree.SetLineStyle(ROOT.kDotted)
-    #testTree.Draw('Mbc', '!isSignal', 'same')
     color = ROOT.kRed + 4
     first_plot = True
     for cut in [0.01, 0.1, 0.5]:
@@ -767,7 +766,7 @@ def makeCosBDLPlot(fileName, outputFileName):
         first_plot = False
 
         testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' + str(cut) + ' && !isSignalAcceptMissingNeutrino', 'same')
+        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' + str(cut) + ' && !' + targetVar, 'same')
         color -= 1
 
     l = canvas.GetListOfPrimitives()
@@ -783,7 +782,7 @@ def makeCosBDLPlot(fileName, outputFileName):
     canvas.SaveAs(outputFileName)
 
 
-def makeMbcPlot(fileName, outputFileName):
+def makeMbcPlot(fileName, outputFileName, targetVar):
     """
     Using the TNTuple in 'fileName', save M_bc plot in 'outputFileName'.
     Shows effect of different cuts on SignalProbability, plus signal distribution.
@@ -813,7 +812,7 @@ def makeMbcPlot(fileName, outputFileName):
         first_plot = False
 
         testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('Mbc', 'Mbc > 5.23 && extraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
+        testTree.Draw('Mbc', 'Mbc > 5.23 && extraInfoSignalProbability > ' + str(cut) + ' && !' + targetVar, 'same')
         color -= 1
 
     l = canvas.GetListOfPrimitives()
@@ -828,7 +827,7 @@ def makeMbcPlot(fileName, outputFileName):
     canvas.SaveAs(outputFileName)
 
 
-def makeROCPlotFromNtuple(fileName, outputFileName, nTrueSignal):
+def makeROCPlotFromNtuple(fileName, outputFileName, nTrueSignal, targetVar):
     """
     Using the TNTuple in 'fileName', save an efficiency over purity plot in 'outputFileName'.
 
@@ -852,7 +851,6 @@ def makeROCPlotFromNtuple(fileName, outputFileName, nTrueSignal):
     signalHist = ROOT.TH1D('ROCsignal', 'signal', nbins, 0.0, 1.0)
 
     probabilityVar = 'extraInfoSignalProbability'
-    targetVar = 'isSignalAcceptMissingNeutrino'  # TODO: depends on type of final particle, is this still available in the particle config?
     tree.Project('ROCbackground', probabilityVar, '!' + targetVar)
     tree.Project('ROCsignal', probabilityVar, targetVar)
 

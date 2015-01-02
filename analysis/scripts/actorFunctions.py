@@ -330,7 +330,7 @@ def PostCutDetermination(identifier, postCutConfig, signalProbabilities):
     """
     B2INFO("Enter: Calculation of post cuts")
     if postCutConfig is None:
-        B2INFO("Calculate post cut for {i} but nothing todo becaus PostCutConfig is None".format(i=identifier))
+        B2INFO("Calculate post cut for {i} but nothing to do because PostCutConfig is None".format(i=identifier))
         return {'PostCut_{i}'.format(i=identifier): None, '__needed__': False, '__cache__': True}
     else:
         B2INFO("Calculate post cut for {i}".format(i=identifier))
@@ -539,12 +539,13 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, '__needed__': False}
 
 
-def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticleNTuples, cpuTimeSummaryPlaceholders, mcCounts, particles):
+def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticleNTuples, finalParticleTargets, cpuTimeSummaryPlaceholders, mcCounts, particles):
     """
     Creates a pdf summarizing all networks trained.
         @param finalStateParticlePlaceholders list of all tex placeholder dictionaries of fsp
         @param combinedParticlePlaceholders list of all tex placeholder dictionaries of intermediate particles
         @param finalParticleNTuples list of ntuples of all final particles
+        @param finalParticleTargets list of target variables of all final particles (corresponding to ntuple list)
         @param mcCounts
         @param particles particle objects
         @return Resource named FEIsummary.pdf
@@ -552,11 +553,11 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
 
     B2INFO("Create analysis summary pdf file.")
     finalParticlePlaceholders = []
-    for ntuple in finalParticleNTuples:
+    for (ntuple, target) in zip(finalParticleNTuples, finalParticleTargets):
         if ntuple is not None:
             type = 'CosBDL' if 'semileptonic' in ntuple else 'Mbc'
-            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, type, mcCounts))
-            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, "ROC", mcCounts))
+            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, type, mcCounts, target))
+            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, "ROC", mcCounts, target))
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
 
     subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/nordbert.pdf')), shell=True)

@@ -3,7 +3,7 @@
 #include <framework/logging/Logger.h>
 #include <string.h>
 
-#include "config.h"
+#include "RConfigure.h"
 
 namespace Belle2 {
   namespace xmldb {

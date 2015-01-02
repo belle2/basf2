@@ -367,6 +367,8 @@ namespace Belle2 {
     /** Map TObject <-> TEveElement, shared with UI */
     VisualRepMap* m_visualRepMap;
 
+    /** don't show MCParticles with momentum below this cutoff. */
+    static constexpr double c_minPCut = 0.00;
   };
 
   template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const std::string& collectionName, const genfit::TrackCand* trackCand, const TString& label,

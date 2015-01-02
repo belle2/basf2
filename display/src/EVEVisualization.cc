@@ -84,8 +84,6 @@
 
 using namespace Belle2;
 
-const double MIN_P_CUT = 0.00;
-
 EVEVisualization::EVEVisualization():
   m_fullgeo(false),
   m_assignToPrimaries(false),
@@ -117,7 +115,7 @@ EVEVisualization::EVEVisualization():
   m_tracklist = new TEveTrackList(m_trackpropagator);
   m_tracklist->IncDenyDestroy();
   m_tracklist->SetName("MCParticles");
-  m_tracklist->SelectByP(MIN_P_CUT, FLT_MAX); //don't show too many particles by default...
+  m_tracklist->SelectByP(c_minPCut, FLT_MAX); //don't show too many particles by default...
 
   m_gftrackpropagator = new TEveTrackPropagator();
   m_gftrackpropagator->IncDenyDestroy();
@@ -321,7 +319,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   bool resort_ = true;
   int i = 0; //just for printing
 
-  unsigned int numpoints = track ? track->getNumPointsWithMeasurement() : 0;
+  const unsigned int numpoints = track ? track->getNumPointsWithMeasurement() : 0;
   bool isPruned = (track == nullptr);
 
 
@@ -334,6 +332,10 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   recTrack.fSign = fitResult->getChargeSign();
   TEveTrack* eveTrack = new TEveTrack(&recTrack, m_gftrackpropagator);
   eveTrack->SetName(label);
+
+  if (!std::isfinite(poca_momentum.Mag())) {
+    B2WARNING(label.Data() << " has infinite momentum!");
+  }
 
 
   if (track) {
@@ -708,14 +710,13 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
       }
     }
   }
-
   eveTrack->SetTitle(TString::Format("%s\n"
                                      "#points: %u %s\n"
-                                     //"pT=%.3f, pZ=%.3f\n"
+                                     "pT=%.3f, pZ=%.3f\n"
                                      "pVal: %e",
                                      label.Data(),
                                      numpoints, (isPruned ? " (pruned)" : ""),
-                                     //track_mom.Pt(), track_mom.Pz(),
+                                     poca_momentum.Pt(), poca_momentum.Pz(),
                                      fitResult->getPValue()
                                     ));
   eveTrack->SetLineColor(c_trackColor);
@@ -1156,7 +1157,7 @@ void EVEVisualization::makeTracks()
   }
   gEve->AddElement(m_tracklist);
   m_tracklist->MakeTracks();
-  m_tracklist->SelectByP(MIN_P_CUT, FLT_MAX); //don't show too many particles by default...
+  m_tracklist->SelectByP(c_minPCut, FLT_MAX); //don't show too many particles by default...
 
   for (size_t i = 0; i < m_options.length(); i++) {
     if (m_options.at(i) == 'M') {

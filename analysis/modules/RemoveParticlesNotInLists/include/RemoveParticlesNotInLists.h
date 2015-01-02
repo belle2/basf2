@@ -28,19 +28,19 @@ namespace Belle2 {
   /**
   Removes all Particles that are not in a given list of ParticleLists (or daughters of those). All relations from/to Particles, daughter indices, and other ParticleLists are fixed.
   */
-  class DiscardParticlesModule : public Module {
+  class RemoveParticlesNotInListsModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    DiscardParticlesModule();
+    RemoveParticlesNotInListsModule();
 
     /**
      * Destructor
      */
-    virtual ~DiscardParticlesModule();
+    virtual ~RemoveParticlesNotInListsModule();
 
     /**
      * Initialize the Module.
@@ -57,6 +57,8 @@ namespace Belle2 {
   private:
     std::vector<std::string>  m_particleLists; /**< keep Particles and daughters in these lists. */
     ParticleSubset m_subset; /**< reduces the Particles array. */
+    unsigned long m_nRemoved; /**< number of particles removed. */
+    unsigned long m_nTotal; /**< number of particles before removal. */
 
   };
 

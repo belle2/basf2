@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/modules/DiscardParticles/DiscardParticlesModule.h>
+#include <analysis/modules/RemoveParticlesNotInLists/RemoveParticlesNotInLists.h>
 
 #include <framework/logging/Logger.h>
 
@@ -20,22 +20,21 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(DiscardParticles)
+REG_MODULE(RemoveParticlesNotInLists)
 
-DiscardParticlesModule::DiscardParticlesModule()
+RemoveParticlesNotInListsModule::RemoveParticlesNotInListsModule(): m_nRemoved(0), m_nTotal(0)
 {
-  setDescription("Removes all Particles that are not in a given list of ParticleLists (or daughters of those). All relations from/to Particles, daughter indices, and other ParticleLists are fixed.");
+  setDescription("Removes all Particles that are not in one of the given ParticleLists (or daughters of Particles in the lists). All relations from/to Particles, daughter indices, and other ParticleLists are fixed. Note that this does not currently touch any data used to create final state particles, which might make up a large fraction of the total file size.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("particleLists", m_particleLists, "Keep the Particles and their daughters in these ParticleLists.");
-
 }
 
-DiscardParticlesModule::~DiscardParticlesModule()
+RemoveParticlesNotInListsModule::~RemoveParticlesNotInListsModule()
 {
 }
 
-void DiscardParticlesModule::initialize()
+void RemoveParticlesNotInListsModule::initialize()
 {
   StoreArray<Particle> particles;
   particles.isRequired();
@@ -55,7 +54,7 @@ void keepParticle(const Particle* p, std::unordered_set<int>* indicesToKeep)
   }
 }
 
-void DiscardParticlesModule::event()
+void RemoveParticlesNotInListsModule::event()
 {
   std::unordered_set<int> indicesToKeep;
   for (auto l : m_particleLists) {
@@ -70,14 +69,24 @@ void DiscardParticlesModule::event()
     }
   }
 
+  StoreArray<Particle> particles;
+  const int nBefore = particles.getEntries();
+
   //remove everything not in indicesToKeep
   auto selector = [indicesToKeep](const Particle * p) -> bool {
     int idx = p->getArrayIndex();
     return indicesToKeep.count(idx) == 1;
   };
   m_subset.select(selector);
+
+  const int nAfter = particles.getEntries();
+
+  m_nTotal += nBefore;
+  m_nRemoved += nBefore - nAfter;
 }
 
-void DiscardParticlesModule::terminate()
+void RemoveParticlesNotInListsModule::terminate()
 {
+  double perc = double(m_nRemoved) / m_nTotal * 100.0;
+  B2INFO(getName() << ": removed " << m_nRemoved << " Particles (" << perc << " \% of total amount).");
 }

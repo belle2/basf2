@@ -947,3 +947,16 @@ def calibratePhotonEnergy(list_name, path=analysis_main):
     path.add_module(gammacal)
 
 
+def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
+    """
+    Description: Removes all Particles that are not in a given list of ParticleLists (or daughters of those). All relations from/to Particles, daughter indices, and other ParticleLists are fixed.
+
+    @param lists_to_keep Keep the Particles and their daughters in these ParticleLists.
+    @param path      modules are added to this path
+    """
+
+    mod = register_module('RemoveParticlesNotInLists')
+    mod.param('particleLists', lists_to_keep)
+    path.add_module(mod)
+
+

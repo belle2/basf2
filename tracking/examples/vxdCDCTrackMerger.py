@@ -227,7 +227,6 @@ display = register_module('Display')
 display.param('useClusters', True)
 display.param('showTrackLevelObjects', True)
     # 'showTrackCandidates' : True)
-display.param('GFTrackCandidatesColName', 'UnMergedCand')
 display.param('options', 'DHMPS')
 # display.param(display_param)
 

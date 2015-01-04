@@ -79,10 +79,21 @@ void ECLMCMatchingModule::initialize()
   m_nEvent  = 0 ;
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  RelationArray::registerPersistent<ECLHit, MCParticle>("", "");
-  RelationArray::registerPersistent<ECLDigit, MCParticle>("", "");
-  RelationArray::registerPersistent<ECLShower, MCParticle>("", "");
-  RelationArray::registerPersistent<ECLCluster, MCParticle>("", "");
+  StoreArray<MCParticle> MCParticleArray;
+  StoreArray<ECLHit> ECLHitArray;
+  StoreArray<ECLDigit> ECLDigitArray;
+  StoreArray<ECLShower> ECLShowerArray;
+  StoreArray<ECLCluster> ECLClusterArray;
+  MCParticleArray.registerRelationTo(ECLHitArray);
+  //MCParticleArray.registerRelationTo(ECLDigitArray);
+  ECLDigitArray.registerRelationTo(MCParticleArray);
+  ECLShowerArray.registerRelationTo(MCParticleArray);
+  ECLClusterArray.registerRelationTo(MCParticleArray);
+
+  // RelationArray::registerPersistent<ECLHit,MCParticle>("", ""); obsolete
+  // RelationArray::registerPersistent<ECLDigit,MCParticle>("", ""); obsolete
+  // RelationArray::registerPersistent<ECLShower,MCParticle>("", ""); obsolete
+  // RelationArray::registerPersistent<ECLCluster,MCParticle>("", ""); obsolete
 
 }
 

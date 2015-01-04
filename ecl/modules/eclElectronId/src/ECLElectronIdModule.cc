@@ -48,8 +48,12 @@ ECLElectronIdModule::~ECLElectronIdModule()
 
 void ECLElectronIdModule::initialize()
 {
-  StoreArray<ECLPidLikelihood>::registerPersistent();
-  RelationArray::registerPersistent<Track, ECLPidLikelihood>();
+  StoreArray<Track> Tracks;
+  StoreArray<ECLPidLikelihood> ECLPidLikelihoodArray;
+  ECLPidLikelihoodArray.registerInDataStore();
+  Tracks.registerRelationTo(ECLPidLikelihoodArray);
+  // StoreArray<ECLPidLikelihood>::registerPersistent(); oboslete.
+  // RelationArray::registerPersistent<Track, ECLPidLikelihood>(); obsolete.
 
   string eParams = FileSystem::findFile("/data/ecl/electrons.dat");
   string muParams = FileSystem::findFile("/data/ecl/muons.dat");

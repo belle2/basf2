@@ -88,5 +88,5 @@ void RemoveParticlesNotInListsModule::event()
 void RemoveParticlesNotInListsModule::terminate()
 {
   double perc = double(m_nRemoved) / m_nTotal * 100.0;
-  B2INFO(getName() << ": removed " << m_nRemoved << " Particles (" << perc << " \% of total amount).");
+  B2INFO(getName() << ": removed " << m_nRemoved << " Particles (" << perc << " % of total amount).");
 }

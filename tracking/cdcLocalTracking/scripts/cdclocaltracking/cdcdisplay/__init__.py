@@ -104,6 +104,9 @@ class CDCSVGDisplayModule(Module):
         ## Switch to draw the CDCSimHits color coded by their getPDGCode() property. Default: inactive
         self.draw_simhit_pdgcode = True and False
 
+        ## Switch to draw the CDCSimHits color coded by their getBackgroundTag() property. Default: inactive
+        self.draw_simhit_bkgtag = True and False
+
         ## Switch to draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle. Default: inactive
         self.draw_connect_tof = True and False
 
@@ -349,6 +352,26 @@ class CDCSVGDisplayModule(Module):
                          'stroke': attributemaps.TOFColorMap()}
             self.draw_storearray('CDCHits', styleDict)
 
+        # Draw pdg code of simhits
+        if self.draw_simhit_pdgcode:
+
+            def color_map(iHit, hit):
+                simHit = hit.getRelated('CDCSimHits')
+                pdgCode = simHit.getPDGCode()
+                color = \
+                    attributemaps.MCPDGCodeColorMap.color_by_pdgcode.get(pdgCode,
+                        'orange')
+                return color
+
+            styleDict = {'stroke': color_map, 'stroke-width': '0.5'}
+            self.draw_storearray('CDCHits', styleDict)
+
+        # Draw background tag of related simhits
+        if self.draw_simhit_bkgtag:
+            styleDict = {'stroke-width': '0.2',
+                         'stroke': attributemaps.BackgroundTagColorMap()}
+            self.draw_storearray('CDCHits', styleDict)
+
         if self.draw_connect_tof:
             print 'Drawing simulated hits connected by tof'
             cdchits_storearray = Belle2.PyStoreArray('CDCHits')
@@ -378,19 +401,6 @@ class CDCSVGDisplayModule(Module):
 
                         styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
                         plotter.append((fromSimHit, toSimHit), **styleDict)
-
-        if self.draw_simhit_pdgcode:
-
-            def color_map(iHit, hit):
-                simHit = hit.getRelated('CDCSimHits')
-                pdgCode = simHit.getPDGCode()
-                color = \
-                    attributemaps.MCPDGCodeColorMap.color_by_pdgcode.get(pdgCode,
-                        'orange')
-                return color
-
-            styleDict = {'stroke': color_map, 'stroke-width': '0.5'}
-            self.draw_storearray('CDCHits', styleDict)
 
         # Draw the reassignment information of hits
         if self.draw_reassigned:

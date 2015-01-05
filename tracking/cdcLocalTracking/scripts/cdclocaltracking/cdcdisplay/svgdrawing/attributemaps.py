@@ -196,6 +196,88 @@ class PosFlagColorMap(CDCHitColorMap):
         return 'PosFlag variable of the related CDCSimHit: green <-> 0 (Right), red <-> 1 (Left), orange <-> determinable.'
 
 
+class BackgroundTagColorMap(CDCHitColorMap):
+
+    """
+    CDCHit to color map by their assoziated CDCSimHit::getBackgroundTag property.
+    """
+
+    SimHitBase = Belle2.SimHitBase
+
+    bkgname_by_bkgtag = {
+        SimHitBase.bg_none: 'bg_none',
+        SimHitBase.bg_Coulomb_LER: 'bg_Coulomb_LER',
+        SimHitBase.bg_Coulomb_HER: 'bg_Coulomb_HER',
+        SimHitBase.bg_RBB_LER: 'bg_RBB_LER',
+        SimHitBase.bg_RBB_HER: 'bg_RBB_HER',
+        SimHitBase.bg_Touschek_LER: 'bg_Touschek_LER',
+        SimHitBase.bg_Touschek_HER: 'bg_Touschek_HER',
+        SimHitBase.bg_twoPhoton: 'bg_twoPhoton',
+        SimHitBase.bg_RBB_gamma: 'bg_RBB_gamma',
+        SimHitBase.bg_RBB_LER_far: 'bg_RBB_LER_far',
+        SimHitBase.bg_RBB_HER_far: 'bg_RBB_HER_far',
+        SimHitBase.bg_Touschek_LER_far: 'bg_Touschek_LER_far',
+        SimHitBase.bg_Touschek_HER_far: 'bg_Touschek_HER_far',
+        SimHitBase.bg_SynchRad_LER: 'bg_SynchRad_LER',
+        SimHitBase.bg_SynchRad_HER: 'bg_SynchRad_HER',
+        SimHitBase.bg_other: 'bg_other',
+        }
+
+    color_by_bkgtag = {
+        SimHitBase.bg_none: 'orange',
+        SimHitBase.bg_Coulomb_LER: 'red',
+        SimHitBase.bg_Coulomb_HER: 'darkred',
+        SimHitBase.bg_RBB_LER: 'blue',
+        SimHitBase.bg_RBB_HER: 'darkblue',
+        SimHitBase.bg_Touschek_LER: 'green',
+        SimHitBase.bg_Touschek_HER: 'darkgreen',
+        SimHitBase.bg_twoPhoton: 'violet',
+        SimHitBase.bg_RBB_gamma: 'skyblue',
+        SimHitBase.bg_RBB_LER_far: 'turquoise',
+        SimHitBase.bg_RBB_HER_far: 'darkturquoise',
+        SimHitBase.bg_Touschek_LER_far: 'olivergreen',
+        SimHitBase.bg_Touschek_HER_far: 'darkolivegreen',
+        SimHitBase.bg_SynchRad_LER: 'goldenrod',
+        SimHitBase.bg_SynchRad_HER: 'darkgoldenrod',
+        SimHitBase.bg_other: 'orange',
+        }
+
+    def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
+        cdcSimHit = cdcHit.getRelated('CDCSimHits')
+        backgroundTag = cdcSimHit.getBackgroundTag()
+
+        color = self.color_by_bkgtag.get(backgroundTag, None)
+
+        if color is None:
+            print 'Background tag %s not associated with a color.' \
+                % backgroundTag
+            return 'orange'
+        else:
+            return color
+
+    def __str__(self):
+        """
+        Informal string summarizing the translation from CDCSimHit::getBackgroundTag variable to colors.
+        """
+
+        color_by_bkgname = {}
+
+        for backgroundTag in self.bkgname_by_bkgtag:
+            name = self.bkgname_by_bkgtag[backgroundTag]
+            color = self.color_by_bkgtag[backgroundTag]
+            color_by_bkgname[name] = color
+
+        bkgname_and_color = sorted(color_by_bkgname.items())
+
+        message = 'Background tag color coding is \n%s' % '\n'.join(name
+                + ' -> ' + color for (name, color) in bkgname_and_color)
+        return message
+
+
 class MCSegmentIdColorMap(CDCHitColorMap):
 
     """

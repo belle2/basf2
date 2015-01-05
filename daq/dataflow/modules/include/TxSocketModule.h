@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include <framework/datastore/DataStore.h>
 #include <framework/pcore/DataStoreStreamer.h>
 
 

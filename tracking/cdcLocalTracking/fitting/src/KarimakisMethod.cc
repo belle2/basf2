@@ -149,7 +149,7 @@ namespace {
       FloatType chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
       return chi2;
     } else {
-      // Ternminology Karimaki used in the paper
+      // Terminology Karimaki used in the paper
       const FloatType& rho = parameters.curvature();
       const FloatType& d = parameters.impact();
 

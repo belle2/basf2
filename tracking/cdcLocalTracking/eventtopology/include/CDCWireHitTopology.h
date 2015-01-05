@@ -28,7 +28,16 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    /// Class representating the sense wire arrangement in the whole of the central drift chamber.
+    /// Class representating the wire hit arrangement in the current event in the whole of the central drift chamber.
+    /** This class stores the hits in the CDC that have been unpacked from the raw CDCHits and geometrical information
+     *  of the wire position an initial estimate of the drift length is attached.
+     *  Also a pair of oriented wire hits (with an assoziate right left passage hypotheses) is stored in here.
+     *  In this way track finders do not need to (re)create hits multiple times but simply refer to them.
+     *
+     *  For faster lookup the hits are sorted by their corresponding wire id and their reference drift radius
+     *  (and their right left passage hypothese in case of
+     *  So they can be retieved by their respective (super) layer as a range.
+     */
     class CDCWireHitTopology : public SwitchableRootificationBase {
 
     public:
@@ -37,7 +46,6 @@ namespace Belle2 {
 
       /// A Range of const CDCLRWireHits - usable with range based for
       typedef SortableVector<Belle2::CDCLocalTracking::CDCRLWireHit>::const_range CDCRLWireHitRange;
-
 
       /// Getter of the singletone instance
       static CDCWireHitTopology& getInstance();
@@ -50,10 +58,10 @@ namespace Belle2 {
       ~CDCWireHitTopology() {;}
 
     public:
-      /// Fill the topology from the raw cdc hits
+      /// Fill the topology from the raw cdc hits.
       size_t fill(const std::string& cdcHitsStoreArrayName = "");
 
-      /// Clear content of the topology after the event is processed
+      /// Clear content of the topology after the event is processed.
       void clear();
 
       /// Getter for the oriented wire hit with the opposite orientation.
@@ -71,7 +79,7 @@ namespace Belle2 {
       /// Getter for the oriented wire hit that is based on the given CDCHit with a specific right left passafe hypotheses.
       const Belle2::CDCLocalTracking::CDCRLWireHit* getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const;
 
-      /// Getter for a coaligned subrange of wire hits
+      /// Getter for a coaligned subrange of wire hits.
       template<class Coaligned>
       CDCWireHitRange getWireHits(const Coaligned& coaligned) const { return m_wireHits.equal_range(coaligned); }
 
@@ -100,4 +108,4 @@ namespace Belle2 {
 
   } // namespace CDCLocalTracking
 } // namespace Belle2
-#endif // CDCWIRETOPOLOGY
+#endif // CDCWIREHITTOPOLOGY_H

@@ -61,7 +61,7 @@ namespace Belle2 {
       /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
       CDCWire(const ISuperLayerType& iSuperLayer,
               const ILayerType& iLayer,
-              const IWireType&   iWire);
+              const IWireType& iWire);
 
       /// Empty deconstructor
       ~CDCWire() {;}
@@ -71,17 +71,15 @@ namespace Belle2 {
        */
       /**@{*/
       /// Getter from the wireID convinience object. Does not construct a new object.
-
       static const CDCWire* getInstance(const CDCWire& wire);
+
       /// Getter from the superlayer id, the layer id and the wire id. Does not construct a new object.
       static const CDCWire* getInstance(const ISuperLayerType& iSuperLayer,
                                         const ILayerType& iLayer,
-                                        const IWireType&   iWire);
+                                        const IWireType& iWire);
 
       /// Convinience getter for the wire from a hit object.
       static const CDCWire* getInstance(const CDCHit& hit);
-
-
       /**@}*/
 
 
@@ -278,7 +276,7 @@ namespace Belle2 {
        */
       WireNeighborType isNeighborWith(const CDCWire& wire) const;
 
-      /// Gives the two wires in the next layer inward
+      /// Gives the two wires in the next layer inward.
       /** Gives the two wire in the next layer closer to the interaction point from this wire.
        *  The pair is sorted such that the more counterclockwise wire is the .first.
        *  This does not cross superlayer boundaries. Trying to get the inwards neighbors from
@@ -287,7 +285,7 @@ namespace Belle2 {
        */
       NeighborPair getNeighborsInwards() const;
 
-      /// Gives the two wires in the next layer inward
+      /// Gives the two wires in the next layer outward.
       /** Gives the two wire in the next layer further away from the interaction point from this wire.
        *  The pair is sorted such that the more counterclockwise wire is the .first.
        *  This does not cross superlayer boundaries. Trying to get the outwards neighbors from
@@ -333,6 +331,7 @@ namespace Belle2 {
        *  So the result has to be checked before referencing.
        */
       const CDCWire* getNeighborCCWOutwards() const;
+
       /// Gives the closest neighbor in the clockwise outwards direction
       /**
        *  This does not cross superlayer boundaries. Trying to get the clockwise outwards neighbor

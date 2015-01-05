@@ -130,11 +130,11 @@ namespace Belle2 {
 
       /** Append the three dimensional reconstructed hits from the given segments averaged over two possible trajectories.
        *  In case of overlapping segments in segment triple or segment pairs segment usually participate in two trajectory fits.
-       *  In principle we end up with to reconstructed positions from each of the fits which we have to average out. Also there
+       *  In principle we end up with two reconstructed positions from each of the fits which we have to average out. Also there
        *  is a mismatch of the start point of the travel distance scale since the reference points of the two trajectories differ.
-       *  Hence we shift the travel distance scale of following trajectory such that both match on the first hit of the given segment.
+       *  Hence we shift the travel distance scale of the following trajectory such that both match on the first hit of the given segment.
        *  For the other hits the average of the travel distance is assumed.
-       *  Furthermore an carryover offset of the travel distance can be introduced which might arise from earlier travel distance shifts
+       *  Furthermore an carry over offset of the travel distance can be introduced which might arise from earlier travel distance shifts
        *  on other previous parts of the whole track.
        *  Return value is the travel distance by which the following trajectories have to be shifted to match the overall track travel distance scale
        *  on the last hit of the given segment.*/

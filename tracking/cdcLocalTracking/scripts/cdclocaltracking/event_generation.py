@@ -3,6 +3,12 @@
 
 import os
 import sys
+import logging
+
+
+def get_logger():
+    return logging.getLogger(__name__)
+
 
 import argparse
 
@@ -48,7 +54,7 @@ def main():
     main_path.add_module(root_output_module)
 
     basf2.process(main_path)
-    print basf2.statistics
+    get_logger().info('\n%s', basf2.statistics)
 
 
 # Default settings and shorthand names for generator with specific settings #
@@ -173,10 +179,14 @@ def add_arguments(argument_parser, allow_file_input=True):
         help='Number of events to be generated',
         )
 
-    argument_parser.add_argument('-b', '--bkg-dir', default=[],
-                                 metavar='BACKGROUND_DIRECTORY',
-                                 help='Path to folder containing the background files to be used'
-                                 )
+    argument_parser.add_argument(
+        '-b',
+        '--bkg-dir',
+        default=[],
+        action='append',
+        metavar='BACKGROUND_DIRECTORY',
+        help='Path to folder containing the background files to be used',
+        )
 
 
 def create_path_from_command_line(**kwds):
@@ -333,7 +343,7 @@ def get_bkg_file_paths(bkg_dir_or_file_paths):
         A list of paths to individual background files.
     """
 
-    if not is_iterable_collection(bkg_dir_or_file_paths):
+    if isinstance(bkg_dir_or_file_paths, str):
         bkg_dir_or_file_path = bkg_dir_or_file_paths
         bkg_dir_or_file_paths = [bkg_dir_or_file_path]
 
@@ -347,7 +357,7 @@ def get_bkg_file_paths(bkg_dir_or_file_paths):
             bkg_dir_path = bkg_dir_or_file_path
             bkg_dir_contents = os.listdir(bkg_dir_path)
             for dir_or_file_name in bkg_dir_contents:
-                dir_or_file_path = os.join(bkg_dir_path, dir_or_file_name)
+                dir_or_file_path = os.path.join(bkg_dir_path, dir_or_file_name)
                 if is_bkg_file(dir_or_file_path):
                     bkg_file_path = dir_or_file_path
                     result.append(bkg_file_path)
@@ -481,8 +491,8 @@ def add_generator(path, generator_name='gun', generator_params={}):
 
         generator_params = update_default_generator_params(generator_name,
                 generator_params)
-        print 'Setting up generator with parameters', generator_params
-
+        get_logger().info('Setting up generator with parameters %s',
+                          generator_params)
         generator_module.param(generator_params)
 
         path.add_module(generator_module)

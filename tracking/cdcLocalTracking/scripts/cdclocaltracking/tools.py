@@ -95,7 +95,7 @@ def vector_iterator(v):
 
 
 def is_iterable_collection(obj):
-    """Test if the object is an iterable collection..
+    """Test if the object is an iterable collection.
 
     Targets the duck typing of container types.
     Stings are not considered iterable by this definition.
@@ -106,7 +106,8 @@ def is_iterable_collection(obj):
         Object to be checked.
     """
 
-    return isinstance(obj, collections.Iterable)
+    return isinstance(obj, collections.Iterable) and not isinstance(obj,
+            basestring)
 
 
 def is_primary(mcParticle):

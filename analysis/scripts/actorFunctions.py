@@ -392,7 +392,7 @@ def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribut
         command = ("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
                    " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
                    " --maxEventsPerClass {maxEvents}"
-                   " 2>&1 > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config='CreateMVAPdfs:' + Nbins + mvaConfig.config,
+                   " > '{prefix}'.log 2>&1".format(name=mvaConfig.name, type=mvaConfig.type, config='CreateMVAPdfs:' + Nbins + mvaConfig.config,
                                                    target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
                                                    foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
                                                    poption='SplitMode=random:!V', maxEvents=maxEvents,

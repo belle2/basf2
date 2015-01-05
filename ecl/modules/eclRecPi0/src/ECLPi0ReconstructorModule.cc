@@ -73,9 +73,15 @@ void ECLPi0ReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLPi0>::registerPersistent();
 
-  RelationArray::registerPersistent<ECLPi0, ECLGamma>("", "");
+  StoreArray<ECLPi0> ECLPi0Array;
+  StoreArray<ECLGamma> GammaArray;
+  StoreArray<ECLShower> ECLShowerArray;
+  ECLPi0Array.registerInDataStore();
+  ECLPi0Array.registerRelationTo(GammaArray);
+
+  // StoreArray<ECLPi0>::registerPersistent(); obsolete.
+  // RelationArray::registerPersistent<ECLPi0, ECLGamma>("", ""); obsolete.
 }
 
 void ECLPi0ReconstructorModule::beginRun()

@@ -15,6 +15,7 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
 
+#include <framework/datastore/DataStore.h>
 #include <framework/pcore/DataStoreStreamer.h>
 //#include <framework/datastore/DataStore.h>
 

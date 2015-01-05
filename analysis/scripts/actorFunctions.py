@@ -392,11 +392,11 @@ def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribut
         command = ("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
                    " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
                    " --maxEventsPerClass {maxEvents}"
-                   " > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config='CreateMVAPdfs:' + Nbins + mvaConfig.config,
-                                              target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
-                                              foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                                              poption='SplitMode=random:!V', maxEvents=maxEvents,
-                                              prefix=removeJPsiSlash(particleList + '_' + hash)))
+                   " 2>&1 > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config='CreateMVAPdfs:' + Nbins + mvaConfig.config,
+                                                   target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
+                                                   foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
+                                                   poption='SplitMode=random:!V', maxEvents=maxEvents,
+                                                   prefix=removeJPsiSlash(particleList + '_' + hash)))
         B2INFO("Use following command to invoke teacher\n" + command)
         actorFramework.global_lock.release()
         subprocess.call(command, shell=True)

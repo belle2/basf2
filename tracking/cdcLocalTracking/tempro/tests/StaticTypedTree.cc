@@ -28,10 +28,11 @@ TEST(TemproTest, tempro_StaticTypedTree)
   typedef StaticTypedTree <
   BranchOf < int, NAMED("n") > ,
            BranchOf < int, NAMED("i") > ,
-           BranchOf < float, NAMED("efficiency") >
+           BranchOf < float, NAMED("eff") >
            > TestTreeWrapper;
 
   ::testing::StaticAssertTypeEq < int, TestTreeWrapper::GetValueTypeAtTag < NAMED("i") > > ();
+  ::testing::StaticAssertTypeEq < BranchOf < int, NAMED("i") > , TestTreeWrapper::GetBranchTypeAtTag < NAMED("i") > > ();
 
   TestTreeWrapper testTreeWrapper("test_tree", "A simple tree to test on");
 
@@ -48,7 +49,7 @@ TEST(TemproTest, tempro_StaticTypedTree)
   for (int i = 0; i < n; ++i) {
     testTreeWrapper.setValue < NAMED("i") > (i);
     testTreeWrapper.setValue < NAMED("n") > (n);
-    testTreeWrapper.setValue < NAMED("efficiency") > (fullEfficiency * i / n);
+    testTreeWrapper.setValue < NAMED("eff") > (fullEfficiency * i / n);
     testTreeWrapper.fill();
   }
   testTreeWrapper.save();

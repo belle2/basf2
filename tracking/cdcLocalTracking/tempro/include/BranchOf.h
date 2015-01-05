@@ -19,6 +19,8 @@
 #include <TBranch.h>
 #include <framework/logging/Logger.h>
 
+#include <tracking/cdcLocalTracking/tempro/TaggedType.h>
+
 namespace Belle2 {
   namespace CDCLocalTracking {
 
@@ -44,13 +46,13 @@ namespace Belle2 {
     /** BranchOf aims to provide and statically typed variant to ROOT's TBranch. It is tagged for tagged lookup semantics
      *  as implemented by TaggedTuple. The tag also determines the name of the TBranch written to disk. */
     template<class Type_, class Tag_ = Type_>
-    class BranchOf {
+    class BranchOf : public TaggedType<BranchOf<Type_, Tag_>, Tag_> {
     public:
       /// Type of the values in the branch
       typedef Type_ value_type;
 
       /// Type of the values in the branch
-      typedef Type_ Type;
+      typedef BranchOf<Type_, Tag_> Type;
 
       /// Tag of the branch used for tagged lookup and the name of the branch.
       typedef Tag_ Tag;
@@ -71,7 +73,7 @@ namespace Belle2 {
       static const char* getName()
       { return GetName<Tag>::c_str(); }
 
-      /// Creates a TBranch in the given TTree and looks on to the newly created branch.
+      /// Creates a TBranch in the given TTree and locks onto the newly created branch.
       bool create(TTree& tree) {
 
         if (m_ptrTBranch) {

@@ -140,7 +140,7 @@ namespace Belle2 {
     private:
       /// Helper function to create the branches of the wrapped TTree from the template parameters.
       void createBranches()
-      { EvalVariadic { createBranch< typename BranchTuple::template GetTag<Branches> >()... };  }
+      { EvalVariadic { createBranch< GetTag<Branches> >()... };  }
 
     private:
       /// Helper function to create a single branch of the wrapped TTree for the given tag.

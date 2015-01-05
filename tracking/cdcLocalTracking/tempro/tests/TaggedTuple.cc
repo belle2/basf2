@@ -20,7 +20,20 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
-// This file contains only compile time test.
+// This file contains mainly compile time test.
+
+TEST(TemproTest, tempro_TaggedTuple_Constructor)
+{
+  typedef TaggedTuple <
+  TaggedType<float>,
+             TaggedType<int>
+             > TestTaggedTuple;
+
+  TestTaggedTuple testTaggedTuple(1.0, 2);
+
+  EXPECT_EQ(1.0, testTaggedTuple.get<float>());
+  EXPECT_EQ(2, testTaggedTuple.get<int>());
+}
 
 TEST(TemproTest, tempro_GetTag)
 {

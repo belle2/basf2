@@ -11,22 +11,19 @@
 #define TAGGEDTUPLE_H
 
 #include <tuple>
+#include <tracking/cdcLocalTracking/tempro/TaggedType.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    /// Metafunction to retrieve the Tag.
-    /** Retrieves the Tag of a type, which is a dedicated member type named Tag.*/
-    template<class TaggedType>
-    struct GetTagImpl {
-      /// Tag type unpacked from the TaggedType.
-      typedef typename TaggedType::Tag type;
-    };
+    /// Metafunction to extract the tags of a variadic sequence of TaggedTuples returning a tuple of types.
+    template<class ... TaggedTypes_>
+    using GetTags = typename std::tuple< GetTag<TaggedTypes_>... >;
 
-    /// Metafunction to retrieve the Tag from a Tagged type.
-    /** Defines a shorthand for  GetTagImpl<>::type; */
-    template<class TaggedType>
-    using GetTag = typename GetTagImpl<TaggedType>::type;
+    /// Metafunction to extract the tags of a variadic sequence of TaggedTuples returning a tuple of types.
+    template<class ... TaggedTypes_>
+    using GetTypes = typename std::tuple< GetType<TaggedTypes_>... >;
+
 
     /// Looks up at, which index the given Type can be found in a tuple. Amounts to a type inheriting from std::integral_constant
     template<class Type, class Tuple>
@@ -55,44 +52,76 @@ namespace Belle2 {
         GetIndexInTuple<Type, std::tuple<Types...> > {
     };
 
+    /// Substitute a variadic template with another.
+    template<class OldWrapped_, template <class ...> class NewWrapper_>
+    struct RewrapImpl;
+
+    /// Specilisation deducing the OldWrapper and the contained types and reapplying them to the new wrapper.
+    template <template<class ...> class OldWrapper_, template <class ...> class NewWrapper_, class ... Types_>
+    struct RewrapImpl<OldWrapper_<Types_...>, NewWrapper_ > {
+      typedef NewWrapper_<Types_...> type;
+    };
+
+    /// Substitute a variadic template with another.
+    template<class OldWrapped_, template <class ...> class NewWrapper_>
+    using Rewrap = typename RewrapImpl<OldWrapped_, NewWrapper_>::type;
+
+    template<class Type, class... Types_>
+    using First = Type;
 
     /// Tuple type supporting look up of the individual entries by a tag.
-    template<class ... TaggedTypes>
-    class TaggedTuple : public std::tuple<TaggedTypes... > {
+    template<class ... TaggedTypes_>
+    class TaggedTuple : public std::tuple<GetType<TaggedTypes_>...> {
 
     public:
-      /// Metafunction to extract the tag from a tagged type
-      template<class TaggedType>
-      using GetTag = typename GetTagImpl<TaggedType>::type;
+      /// Base class of the tagged tuple which is a tuple containing the bare types.
+      typedef  std::tuple<GetType<TaggedTypes_>...> Base;
 
-    private:
       /// The tuple type providing the storage for the values
-      typedef std::tuple< TaggedTypes... > TaggedTypesTuple;
+      typedef std::tuple< TaggedTypes_... > TaggedTypes;
 
-      /// Tuple type collecting of the tags
-      typedef std::tuple< GetTag<TaggedTypes>... > TagsTuple;
+      /// Tuple type collecting the tags
+      typedef std::tuple< GetTag<TaggedTypes_>... > Tags;
+
+      /// Tuple type collecting the types
+      typedef std::tuple< GetType<TaggedTypes_>... > Types;
 
     public:
-      /// Metafunction to get the nth type
+      /// Metafunction to get the nth TaggedType
       template<std::size_t index>
-      using GetTypeAtIndex = typename std::tuple_element< index, std::tuple< TaggedTypes... > >::type;
+      using GetTaggedTypeAtIndex = typename std::tuple_element< index, TaggedTypes>::type;
 
-      /// Metafunction to get the type for a given tag
+      /// Metafunction to get the nth Type
+      template<std::size_t index>
+      using GetTypeAtIndex = typename std::tuple_element< index, Types>::type;
+
+      /// Metafunction to get the nth Tag
+      template<std::size_t index>
+      using GetTagAtIndex = typename std::tuple_element< index, Tags>::type;
+
+      /// Metafunction to get the TaggedType for a given Tag
       template<class Tag>
-      using GetTypeAtTag = GetTypeAtIndex< GetIndex<Tag, TagsTuple>::value >;
+      using GetTaggedTypeAtTag = GetTaggedTypeAtIndex< GetIndex<Tag, Tags>::value >;
 
+      /// Metafunction to get the Type for a given Tag
+      template<class Tag>
+      using GetTypeAtTag = GetTypeAtIndex< GetIndex<Tag, Tags>::value >;
+
+      /// Default constructor with no arguments
+      TaggedTuple() : Base() {;}
+
+      /// Constructor taking references forwarded to the base tuple.
+      explicit TaggedTuple(const GetType<TaggedTypes_>& ... initialValues) : Base(initialValues...) {;}
 
       /// Constant getter function taking a tag and returning the value at this tag
       template<class Tag>
-      const GetTypeAtTag<Tag>&
-      get() const
-      { return std::get<GetIndex< Tag, TagsTuple>::value >(*this); }
+      const GetTypeAtTag<Tag>& get() const
+      { return std::get<GetIndex<Tag, Tags>::value >(*this); }
 
       /// Getter function taking a tag and returning the value at this tag
       template<class Tag>
-      GetTypeAtTag<Tag>&
-      get()
-      { return std::get<GetIndex< Tag, TagsTuple>::value >(*this); }
+      GetTypeAtTag<Tag>& get()
+      { return std::get<GetIndex<Tag, Tags>::value >(*this); }
 
     };
 

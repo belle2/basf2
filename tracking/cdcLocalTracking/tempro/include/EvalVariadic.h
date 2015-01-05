@@ -23,7 +23,6 @@ namespace Belle2 {
     template<typename... Args>
     static inline void evalVariadic(Args&& ...) {}
 
-
     /** Structure to serve as a placeholder for a variadic initializer list of statements to be evaluated.
      *  Similar to the evalVariadic functions this structure evaluates as variadic list of statements, but
      *  uses a initializer list instead of a function call.

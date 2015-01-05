@@ -204,6 +204,9 @@ class Play(object):
             return {}
         self.seq.append(Actor(RequireManually, a=key))
 
+    def showProgress(self, total, done, ready):
+        sys.stderr.write("FEI progress: %g%% (%d/%d actors)\n" % (done * 100.0 / total, done, total))
+
     def run(self, path, verbose=False, cacheFile=None, preload=False, nProcesses=1):
         """
         Resolve dependencies of the Actors, by extracting step by step the actors for which
@@ -231,6 +234,7 @@ class Play(object):
         if nProcesses > 1:
             p = multiprocessing.pool.ThreadPool(processes=nProcesses)
         actors = [actor for actor in self.seq]
+        nActors = len(actors)
         results = dict()
         results['path'] = True
         results['hash'] = ''
@@ -245,6 +249,8 @@ class Play(object):
                 print "Found {n} actors which are ready for execution".format(n=len(ready))
             if len(ready) == 0:
                 break
+            nReady = len(ready)
+            nActorsDone = nActors - len(actors) - nReady
             if nProcesses > 1:
                 def _execute_actor_parallel(actor):
                     call_actor(results, result_cache, path_cache, actor, preload)
@@ -253,6 +259,9 @@ class Play(object):
             else:
                 for actor in ready:
                     call_actor(results, result_cache, path_cache, actor, preload)
+                    nActorsDone += 1
+                    nReady -= 1
+                    self.showProgress(nActors, nActorsDone, nReady)
             if verbose:
                 print "Updating result dictionary"
             for actor in ready:

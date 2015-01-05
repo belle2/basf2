@@ -1,106 +1,58 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 import os
-from optparse import OptionParser
+import sys
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
-
-import simulation
+import basf2
+basf2.set_log_level(basf2.LogLevel.INFO)
+# basf2.set_random_seed(12345)
 
 import cdclocaltracking.cdcdisplay as cdcdisplay
+import cdclocaltracking.event_generation as event_generation
 
-# Setup the options parser
-usage = \
-    """Usage:
-basf2 %prog -- [options] input_tracked_events_filename
-%prog [options] input_tracked_events_filename
-"""
 
-parser = OptionParser(usage=usage)
+def main():
+    """
+    Sets up standard command line arguments for event generation or event reading from files and displayes the events with the svg display.
+    """
 
-(options, args) = parser.parse_args()
+    argument_parser = event_generation.create_argument_parser()
+    arguments = argument_parser.parse_args()
 
-# Check if an input file has been given that shall be used as ROOT input
-if args:
-    simulated_events_file = args[0]
-    if not os.path.exists(simulated_events_file):
-        print 'The given input file', simulated_events_file, 'does not exist.'
-        sys.exit(1)
-    use_simulation = False
-else:
-    use_simulation = True
+    main_path = event_generation.create_path_from_parsed_arguments(arguments)
 
-# set_random_seed(12345)
+    # Add the display module as the last module in the chain
+    svgdisplay = cdcdisplay.CDCSVGDisplayModule('/tmp')
+    svgdisplay.draw_wires = True
+    svgdisplay.draw_hits = False
 
-components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD',
-              'CDC']
+    svgdisplay.draw_superlayer_boundaries = True
+    svgdisplay.draw_interactionpoint = True
 
-main = create_path()
+    svgdisplay.draw_mcparticle_id = False
+    svgdisplay.draw_mcparticle_pdgcodes = False
+    svgdisplay.draw_mcparticle_primary = False
 
-if use_simulation:
-    # Evtgen info setter
-    # Specify number of events to be generated in job
-    eventinfosetter = register_module('EventInfoSetter')
-    eventinfosetter.param('evtNumList', [10])  # we want to process nOfEvents events
-    eventinfosetter.param('runList', [1])  # from run number 1
-    eventinfosetter.param('expList', [1])  # and experiment number 1
-    main.add_module(eventinfosetter)
+    svgdisplay.draw_mcsegments = False
 
-    # Show progress of processing
-    progress = register_module('Progress')
-    main.add_module(progress)
+    svgdisplay.draw_simhits = False
+    svgdisplay.draw_simhit_tof = False
+    svgdisplay.draw_simhit_posflag = False
+    svgdisplay.draw_simhit_pdgcode = False
+    svgdisplay.draw_simhit_bkgtag = True
 
-    # Evtgen generator
-    evtgen = register_module('EvtGenInput')
-    evtgen.param('boost2LAB', True)
-    main.add_module(evtgen)
+    svgdisplay.draw_connect_tof = False
 
-    # Standard simulation
-    simulation.add_simulation(main, components=components)
-else:
+    svgdisplay.draw_rlinfo = False
+    svgdisplay.draw_reassigned = False
 
-    rootInput = register_module('RootInput')
-    rootInput.param('inputFileName', simulated_events_file)
-    main.add_module(rootInput)
+    main_path.add_module(svgdisplay)
 
-    gearbox = register_module('Gearbox')
-    main.add_module(gearbox)
+    basf2.process(main_path)
+    print basf2.statistics
 
-    geometry = register_module('Geometry')
-    geometry.param('Components', components)
-    main.add_module(geometry)
 
-# Add the display module as the last module in the chain
-svgdisplay = cdcdisplay.CDCSVGDisplayModule('/tmp')
-svgdisplay.draw_wires = True
-svgdisplay.draw_hits = True
-
-svgdisplay.draw_superlayer_boundaries = True
-svgdisplay.draw_interactionpoint = True
-
-svgdisplay.draw_mcparticle_id = False
-svgdisplay.draw_mcparticle_pdgcodes = False
-svgdisplay.draw_mcparticle_primary = False
-
-svgdisplay.draw_mcsegments = False
-
-svgdisplay.draw_simhits = False
-svgdisplay.draw_simhit_tof = False
-svgdisplay.draw_simhit_posflag = False
-svgdisplay.draw_simhit_pdgcode = False
-
-svgdisplay.draw_connect_tof = False
-
-svgdisplay.draw_rlinfo = False
-svgdisplay.draw_reassigned = False
-
-main.add_module(svgdisplay)
-
-process(main)
-
-# Print call statistics
-print statistics
-
+if __name__ == '__main__':
+    main()
+    sys.exit(0)

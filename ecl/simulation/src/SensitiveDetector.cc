@@ -94,10 +94,10 @@ namespace Belle2 {
       mcParticles.registerRelationTo(eclHits);
 
       // Following lines are obsolete.
-      StoreArray<ECLSimHit>::registerPersistent();
-      StoreArray<ECLHit>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, ECLSimHit>("", "");
-      RelationArray::registerPersistent<MCParticle, ECLHit>("", "");
+      // StoreArray<ECLSimHit>::registerPersistent();
+      // StoreArray<ECLHit>::registerPersistent();
+      // RelationArray::registerPersistent<MCParticle, ECLSimHit>("", "");
+      // RelationArray::registerPersistent<MCParticle, ECLHit>("", "");
 
     }
 

@@ -82,14 +82,28 @@ void ECLReconstructorModule::initialize()
 
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLHitAssignment>::registerPersistent();
-  StoreArray<ECLShower>::registerPersistent();
 
-  StoreArray<ECLCluster>::registerPersistent();
-  RelationArray::registerPersistent<ECLCluster, ECLShower>("", "");
-  RelationArray::registerPersistent<ECLCluster, Track>("", "");
+  // Get tracks.
+  StoreArray<Track> TrackArray;
 
+  // ECL relevant objects.
+  StoreArray<ECLHitAssignment> HitAssignArray;
+  StoreArray<ECLShower> ECLShowerArray;
+  StoreArray<ECLCluster> ECLClusterArray;
+  HitAssignArray.registerInDataStore();
+  ECLShowerArray.registerInDataStore();
+  ECLClusterArray.registerInDataStore();
+  // ECL related relations.
+  ECLClusterArray.registerRelationTo(TrackArray);
+  ECLClusterArray.registerRelationTo(ECLShowerArray);
 
+  // Following lines are obsolete.
+  // StoreArray<ECLHitAssignment>::registerPersistent();
+  // StoreArray<ECLShower>::registerPersistent();
+  //
+  // StoreArray<ECLCluster>::registerPersistent();
+  // RelationArray::registerPersistent<ECLCluster, ECLShower>("", "");
+  // RelationArray::registerPersistent<ECLCluster, Track>("", "");
 
 }
 

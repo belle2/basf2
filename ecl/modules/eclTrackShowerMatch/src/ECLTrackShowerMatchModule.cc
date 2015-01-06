@@ -45,7 +45,11 @@ ECLTrackShowerMatchModule::~ECLTrackShowerMatchModule()
 
 void ECLTrackShowerMatchModule::initialize()
 {
-  RelationArray::registerPersistent<Track, ECLShower>();
+  StoreArray<Track> TrackArray;
+  StoreArray<ECLShower> ECLShowerArray;
+  TrackArray.registerRelationTo(ECLShowerArray);
+
+  // RelationArray::registerPersistent<Track, ECLShower>(); obsolete.
 }
 
 void ECLTrackShowerMatchModule::beginRun()

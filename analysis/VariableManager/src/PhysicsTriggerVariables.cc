@@ -61,6 +61,12 @@ namespace Belle2 {
     }
 
 
+    double nKLMClustersHLT(const Particle*)
+    {
+      StoreArray<KLMCluster> klmClusters;
+      return klmClusters.getEntries();
+    }
+
     double ECLEnergyHLT(const Particle*)
     {
       double result = 0.;
@@ -180,6 +186,27 @@ namespace Belle2 {
       const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
       const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
       result = V3p1.Angle(V3p2);
+      return result;
+    }
+
+    double MaxAngleTTHLT(const Particle*)
+    {
+      double result = -10.;
+      double temp = -10.;
+      StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
+      if (pionshlt->getListSize() < 2) return result;
+      for (unsigned int i = 0; i < pionshlt->getListSize() - 1; i++) {
+        Particle* par1 = pionshlt->getParticle(i);
+        for (unsigned int j = i + 1; j < pionshlt->getListSize(); j++) {
+          Particle* par2 = pionshlt->getParticle(j);
+          TLorentzVector V4p1 = par1->get4Vector();
+          TLorentzVector V4p2 = par2->get4Vector();
+          const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          temp = V3p1.Angle(V3p2);
+          if (result < temp) result = temp;
+        }
+      }
       return result;
     }
 
@@ -339,11 +366,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("VisibleEnergyHLT", VisibleEnergyHLT, "[Eventbased] total visible energy (the sum of the charged track's momenta and the ECL cluster's energies)");
     REGISTER_VARIABLE("VisiblePzHLT", VisiblePzHLT, "[Eventbased] sum of the absolute momentum in z-coordinate in the event");
     REGISTER_VARIABLE("AngleTTHLT", AngleTTHLT, "[Eventbased] the angle between two charged tracks with the largest momentum in e+e- center-of-mass frame");
+    REGISTER_VARIABLE("MaxAngleTTHLT", MaxAngleTTHLT, "[Eventbased] the maximum angle between two charged tracks in e+e- center-of-mass frame");
     REGISTER_VARIABLE("TrackP1HLT", TrackP1HLT, "[Eventbased] the largest momentum of the charged tracks in the event in the rest frame");
     REGISTER_VARIABLE("TrackP2HLT", TrackP2HLT, "[Eventbased] the second largest momentum of the charged tracks in the event in the rest frame");
     REGISTER_VARIABLE("AngleGGHLT", AngleGGHLT, "[Eventbased] the angle between the two most energetic gamma in ECL in the rest frame");
     REGISTER_VARIABLE("ECLClusterE1HLT", ECLClusterE1HLT, "[Eventbased] the most energetic gamma in the ECL in the rest frame");
-    REGISTER_VARIABLE("ECLClusterE2HLT", ECLClusterE2HLT, "[Eventbased] the second most energetic gamma in the ECL in the rest framw");
+    REGISTER_VARIABLE("ECLClusterE2HLT", ECLClusterE2HLT, "[Eventbased] the second most energetic gamma in the ECL in the rest frame");
+    REGISTER_VARIABLE("nKLMClustersHLT", nKLMClustersHLT, "[Eventbased] the number of KLM clusters");
     REGISTER_VARIABLE("ECLClusterEHLT",     ECLClusterEHLT, "Energy of the ECL clusters");
     REGISTER_VARIABLE("ECLClusterThetaHLT", ECLClusterThetaHLT, " Theta of the ECL clusters");
     REGISTER_VARIABLE("ECLClusterTimingHLT", ECLClusterTimingHLT, "Timing of the ELC clusters ");

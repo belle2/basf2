@@ -56,6 +56,11 @@ namespace Belle2 {
     double AngleTTHLT(const Particle*);
 
     /**
+     * return the maximum angle between the two tracks
+     */
+    double MaxAngleTTHLT(const Particle*);
+
+    /**
      * return the largest momentum for the charged tracks
      */
     double TrackP1HLT(const Particle*);
@@ -94,6 +99,12 @@ namespace Belle2 {
      * return the timing information of the ECL clusters
      */
     double ECLClusterTimingHLT(const Particle*);
+
+    /**
+     * return the number of KLM layters with hits
+     */
+    double nKLMClustersHLT(const Particle*);
+
   }
 
 }

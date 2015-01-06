@@ -118,9 +118,11 @@ namespace Belle2 {
     int m_summary;
     int m_ngoodTracks;
     int m_ngoodECLClusters;
+    int m_nKLMClusters;
     float m_Evis;
     float m_Pzvis;
     float m_angleTT;
+    float m_maxangleTT;
     float m_angleGG;
     float m_dr;
     float m_dz;

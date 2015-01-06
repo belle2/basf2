@@ -62,13 +62,22 @@ void ECLShowertoClusterModule::initialize()
   m_nEvent = 0;
   m_timeCPU = clock() * Unit::us;
 
-  StoreArray<ECLCluster>::registerPersistent();
+  StoreArray<ECLCluster> ECLClusterArray;
+  ECLClusterArray.registerInDataStore();
 
-  RelationArray::registerPersistent<ECLCluster, ECLShower>("", "");
-  RelationArray::registerPersistent<ECLCluster, MCParticle>("", "");
-  RelationArray::registerPersistent<ECLCluster, Track>("", "");
+  StoreArray<ECLShower> ECLShowerArray;
+  StoreArray<Track> TrackArray;
+  StoreArray<MCParticle> MCParticleArray;
+  ECLClusterArray.registerRelationTo(ECLShowerArray);
+  ECLClusterArray.registerRelationTo(TrackArray);
+  ECLClusterArray.registerRelationTo(MCParticleArray);
 
-
+  // Following lines are obsolete.
+  // StoreArray<ECLCluster>::registerPersistent();
+  //
+  // RelationArray::registerPersistent<ECLCluster, ECLShower>("", "");
+  // RelationArray::registerPersistent<ECLCluster, MCParticle>("", "");
+  // RelationArray::registerPersistent<ECLCluster, Track>("", "");
 
 }
 

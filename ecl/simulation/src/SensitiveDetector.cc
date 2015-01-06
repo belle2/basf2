@@ -86,6 +86,14 @@ namespace Belle2 {
 
       eclSimHits.registerAsPersistent();
       eclHits.registerAsPersistent();
+
+      eclSimHits.registerInDataStore();
+      eclHits.registerInDataStore();
+
+      mcParticles.registerRelationTo(eclSimHits);
+      mcParticles.registerRelationTo(eclHits);
+
+      // Following lines are obsolete.
       StoreArray<ECLSimHit>::registerPersistent();
       StoreArray<ECLHit>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, ECLSimHit>("", "");

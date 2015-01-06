@@ -39,6 +39,11 @@ namespace Belle2 {
     void setNGoodECLClusters(int ngoodECLClusters) {m_ngoodECLClusters = ngoodECLClusters;}
 
     /**
+     *set the number of KLM clusters
+     */
+    void setNKLMClusters(int nKLMClusters) {m_nKLMClusters = nKLMClusters;}
+
+    /**
      *set the visible energy
      */
     void setEvis(float Evis) {m_Evis = Evis;}
@@ -59,6 +64,11 @@ namespace Belle2 {
      *T2 is the track with the second largest momentum
      */
     void setAngleTT(float AngleTT) {m_AngleTT = AngleTT;}
+
+    /**
+     *set the maximum angle tetween two charged tracks
+     */
+    void setMaxAngleTT(float MaxAngleTT) {m_MaxAngleTT = MaxAngleTT;}
 
     /**
      *set T1's momentum
@@ -167,6 +177,11 @@ namespace Belle2 {
     int getNGoodECLClusters() const {return m_ngoodECLClusters;}
 
     /**
+     *return the number of KLM layers with hits
+     */
+    int getnKLMClusters() const {return m_nKLMClusters;}
+
+    /**
      *return the visible energy
      */
     float getEvis() const {return m_Evis;}
@@ -213,9 +228,15 @@ namespace Belle2 {
 
 
     /**
-     *return angle between two tracks in the rest frame
+     *return angle between two tracks with the largest momentum in the rest frame
      */
     float getAngleTT()const {return m_AngleTT;}
+
+
+    /**
+     *return the maximum angle between two charged tracks in the rest frame
+     */
+    float getMaxAngleTT()const {return m_MaxAngleTT;}
 
     /**
      *return the largest momentum
@@ -288,13 +309,14 @@ namespace Belle2 {
     std::vector<float> m_ECLClusterPhi; /**the azimuth angle of the cluster*/
     std::vector<float> m_ECLClusterTiming; /**the timing of the cluster*/
     float m_Esum; /**the sum of cluster energy*/
+    float m_MaxAngleTT; /*the maximum angle between the charged tracks in the rest frame*/
     float m_AngleTT; /*the angle between the first and second largest momentum tracks in the rest frame*/
     float m_AngleGG;/**the angle between the first and second energetic cluster*/
     float m_P1; /**the largest momentum of the tracks*/
     float m_P2; /**the second largest momentum of the tracks*/
     float m_E1; /**the largest energetic cluster*/
     float m_E2; /**the second largest energtic cluster*/
-
+    int  m_nKLMClusters; /**the number of KLM clusters*/
 
     ClassDef(PhysicsTriggerInformation, 1)
   };

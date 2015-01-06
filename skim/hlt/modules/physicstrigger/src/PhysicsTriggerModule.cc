@@ -249,6 +249,7 @@ void PhysicsTriggerModule::eventInformation()
   Particle* p = NULL;
   m_ngoodTracks = Variable::nTracksHLT(p);
   m_ngoodECLClusters = Variable::nECLClustersHLT(p);
+  m_nKLMClusters = Variable::nKLMClustersHLT(p);
   m_Pzvis = Variable::VisiblePzHLT(p);
   m_Esum = Variable::ECLEnergyHLT(p);
   m_Evis = Variable::VisibleEnergyHLT(p);
@@ -257,14 +258,18 @@ void PhysicsTriggerModule::eventInformation()
   m_e1 = Variable::ECLClusterE1HLT(p);
   m_e2 = Variable::ECLClusterE2HLT(p);
   m_angleTT = Variable::AngleTTHLT(p);
+  m_maxangleTT = Variable::MaxAngleTTHLT(p);
   m_angleGG = Variable::AngleGGHLT(p);
+
 //The total ECL energy
   phyTriInfo->setNGoodTrack(m_ngoodTracks);
   phyTriInfo->setNGoodECLClusters(m_ngoodECLClusters);
+  phyTriInfo->setNKLMClusters(m_nKLMClusters);
   phyTriInfo->setEvis(m_Evis);
   phyTriInfo->setPzvis(m_Pzvis);
   phyTriInfo->setEsum(m_Esum);
   phyTriInfo->setAngleTT(m_angleTT);
+  phyTriInfo->setMaxAngleTT(m_maxangleTT);
   phyTriInfo->setAngleGG(m_angleGG);
   phyTriInfo->setP1(m_p1);
   phyTriInfo->setP2(m_p2);
@@ -281,6 +286,7 @@ void PhysicsTriggerModule::initializeForEvent()
   m_summary = 0;
   m_ngoodTracks = 0;
   m_ngoodECLClusters = 0;
+  m_nKLMClusters = 0;
   m_Evis = 0.;
   m_Pzvis = 0.;
   m_p = -1.;
@@ -293,6 +299,7 @@ void PhysicsTriggerModule::initializeForEvent()
   m_Esum = 0.;
   //m_Elargest = 0.;
   m_angleTT = -10.;
+  m_maxangleTT = -10.;
   m_angleGG = -10.;
   m_p1 = -1.;
   m_p2 = -1.;

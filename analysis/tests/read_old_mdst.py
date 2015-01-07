@@ -25,6 +25,11 @@ class TestModule(Module):
                 logls = [str(l.getLogL(part, det)) for part in partList]
                 print str(l.isAvailable(det)) + "\t" + " ".join(logls)
 
+        trackfitresults = Belle2.PyStoreArray('TrackFitResults')
+        for t in trackfitresults:
+            print t.getCotTheta()
+            t.getCovariance5().Print()
+
 
 input = register_module('RootInput')
 eventinfo = register_module('EventInfoPrinter')

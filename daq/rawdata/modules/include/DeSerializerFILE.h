@@ -14,8 +14,8 @@
 #include <rawdata/dataobjects/RawCDC.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawECL.h>
-#include <rawdata/dataobjects/RawEPID.h>
-#include <rawdata/dataobjects/RawBPID.h>
+#include <rawdata/dataobjects/RawARICH.h>
+#include <rawdata/dataobjects/RawTOP.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <daq/rawdata/modules/DAQConsts.h>
@@ -65,9 +65,9 @@ namespace Belle2 {
     /*     StoreArray<RawCOPPER> rawcprarray; */
     /*     StoreArray<RawCDC> raw_cdcarray; */
     /*     StoreArray<RawSVD> raw_svdarray; */
-    /*     StoreArray<RawBPID> raw_bpidarray; */
+    /*     StoreArray<RawTOP> raw_bpidarray; */
     /*     StoreArray<RawECL> raw_eclarray; */
-    /*     StoreArray<RawEPID> raw_epidarray; */
+    /*     StoreArray<RawARICH> raw_epidarray; */
     /*     StoreArray<RawKLM> raw_klmarray; */
     /*     StoreArray<RawFTSW> raw_ftswarray; */
 

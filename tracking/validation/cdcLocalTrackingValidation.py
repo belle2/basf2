@@ -28,8 +28,6 @@ class CDCLocal(TrackingValidationRun):
 
     n_events = N_EVENTS
     finder_module = 'CDCLocalTracking'
-    tracking_coverage = {'UsePXDHits': False, 'UseSVDHits': False,
-                         'UseCDCHits': True}
     fit_geometry = None
     pulls = True
     contact = CONTACT
@@ -46,8 +44,8 @@ def main():
                                  )
 
     # Geometry name to be used in the Genfit extrapolation.
-    argument_parser.add_argument('-g', '--geometry', choices=['TGeo', 'Geant4'
-                                 ], default='Geant4',
+    argument_parser.add_argument('-g', '--geometry', choices=['TGeo', 'Geant4'],
+                                 default='Geant4',
                                  help='Geometry to be used with Genfit.')
 
     argument_parser.add_argument('-s', '--show', action='store_true',
@@ -83,4 +81,3 @@ def main():
 if __name__ == '__main__':
     if ACTIVE:
         main()
-

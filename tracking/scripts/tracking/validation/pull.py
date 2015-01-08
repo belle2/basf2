@@ -14,18 +14,23 @@ try:
 except ImportError:
     # Minimal workaround that only relies on numpy and python 2.7
     # erf as a vectorized function
-    erf = np.frompyfunc(math.erf, 1, 1)
+    # Will convert the incoming nparray to dtype 'object', if nin
+    # values are contained
+    # use numpy.asfarray(...) to convert back
+    erf_ufunc = np.frompyfunc(math.erf, 1, 1)
+
+    def erf(*args):
+        result = erf_ufunc(*args)
+        return np.asfarray(result)
 
 
 class PullAnalysis:
 
-    def __init__(
-        self,
-        quantity_name,
-        unit=None,
-        outlier_z_score=5.0,
-        plot_name_prefix='',
-        ):
+    def __init__(self,
+                 quantity_name,
+                 unit=None,
+                 outlier_z_score=5.0,
+                 plot_name_prefix=''):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
         self.quantity_name = quantity_name
@@ -34,19 +39,18 @@ class PullAnalysis:
 
         deletechars = r"/$\#"
         save_quantity_name = quantity_name.replace(' ', '_').translate(None,
-                deletechars)
+                                                                       deletechars)
         self.plot_name_prefix = plot_name_prefix \
             or root_save_name(quantity_name)
 
         self._contact = ''
         self.plots = collections.OrderedDict()
 
-    def analyse(
-        self,
-        truths,
-        estimates,
-        variances=None,
-        ):
+    def analyse(self,
+                # truths can contain NaN entries if no MC track could be matched
+                truths,
+                estimates,
+                variances=None):
         """Compares the concrete estimate to the truth and generates plots of the estimates, residuals, pulls and p-values.
         Close indicates if the figure shall be closed after they are saved."""
 
@@ -91,9 +95,9 @@ class PullAnalysis:
 
         # Estimates versus truths scatter plot
         estimates_by_truths_scatter = ValidationPlot('%s_diag_scatter'
-                % plot_name_prefix)
+                                                     % plot_name_prefix)
         estimates_by_truths_scatter.scatter(truths, estimates,
-                outlier_z_score=outlier_z_score)
+                                            outlier_z_score=outlier_z_score)
         estimates_by_truths_scatter.xlabel = 'True ' + axis_label
         estimates_by_truths_scatter.ylabel = 'Estimated ' + axis_label
         estimates_by_truths_scatter.title = 'Diagonal %s scatter plot' \
@@ -103,9 +107,9 @@ class PullAnalysis:
 
         # Estimates versus truths profile plot
         estimates_by_truths_profile = ValidationPlot('%s_diag_profile'
-                % plot_name_prefix)
+                                                     % plot_name_prefix)
         estimates_by_truths_profile.profile(truths, estimates,
-                outlier_z_score=outlier_z_score)
+                                            outlier_z_score=outlier_z_score)
         estimates_by_truths_profile.xlabel = 'True ' + axis_label
         estimates_by_truths_profile.ylabel = 'Estimated ' + axis_label
         estimates_by_truths_profile.title = 'Diagonal %s profile plot' \
@@ -184,5 +188,3 @@ class PullAnalysis:
         # Write all validation plot to the given Root directory
         for validation_plot in self.plots.values():
             validation_plot.write(tDirectory)
-
-

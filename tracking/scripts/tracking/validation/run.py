@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import basf2
+# necessary for the logging to work properly
+from basf2 import *
 import simulation
+from reconstruction import add_reconstruction
 
 from tracking.validation.module import TrackingValidationModule
 
@@ -28,11 +31,13 @@ class TrackingValidationRun(object):
 
     n_events = 10000
     generator_module = 'EvtGenInput'
+    root_input_file = None
     components = ['PXD', 'SVD', 'CDC', 'BeamPipe',
                   'MagneticFieldConstant4LimitedRCDC']
     finder_module = None  # To be specified
     tracking_coverage = {'UsePXDHits': True, 'UseSVDHits': True,
                          'UseCDCHits': True}
+    run_simulation = True
     fit_geometry = None
     pulls = True
     contact = TRACKING_MAILING_LIST
@@ -42,17 +47,28 @@ class TrackingValidationRun(object):
     __slots__ = [
         'n_events',
         'generator_module',
+        'root_input_file',
         'components',
         'finder_module',
+        'run_simulation',
         'tracking_coverage',
         'fit_geometry',
         'contract',
-        'output_file_name',
-        ]
+        'output_file_name']
 
     @property
     def name(self):
         return self.__class__.__name__
+
+    def determineTrackingCoverage(self, finder_module):
+        if finder_module == "CDCLocalTracking" or finder_module == "CDCLegendreTracking":
+            return {'UsePXDHits': False, 'UseSVDHits': False, 'UseCDCHits': True}
+        elif finder_module == "VXDTF":
+            return {'UsePXDHits': True, 'UseSVDHits': True, 'UseCDCHits': False}
+        elif finder_module == "FullReco":
+            return {'UsePXDHits': True, 'UseSVDHits': True, 'UseCDCHits': True}
+        else:
+            basf2.B2FATAL("Track finder module " + finder_module + " is not supported.")
 
     def execute(self):
         # Compose basf2 module path #
@@ -69,36 +85,58 @@ class TrackingValidationRun(object):
         progressModule = basf2.register_module('Progress')
         main_path.add_module(progressModule)
 
-        # Generator
-        generatorModule = get_basf2_module(self.generator_module)
-        main_path.add_module(generatorModule)
+        # use Generator if no root input file is specified
+        if self.root_input_file is None:
+            generatorModule = get_basf2_module(self.generator_module)
+            main_path.add_module(generatorModule)
+        else:
+            rootInputModule = get_basf2_module('RootInput')
+            rootInputModule.param({'inputFileName': self.root_input_file})
+            main_path.add_module(rootInputModule)
 
         # Simulation
+        print "self.run_simulation = " + str(self.run_simulation)
         components = self.components
-        simulation.add_simulation(main_path, components=components)
+        if self.run_simulation:
+            simulation.add_simulation(main_path, components=components)
+        else:
+            # gearbox & geometry needs to be registered any way
+            gearbox = get_basf2_module('Gearbox')
+            main_path.add_module(gearbox)
+            geometry = get_basf2_module('Geometry')
+            geometry.param('components', components)
+            main_path.add_module(geometry)
 
         # Setup track finder
-        trackFinderModule = get_basf2_module(self.finder_module)
-        main_path.add_module(trackFinderModule)
+        # determine which sub-detector hits will be used
+        self.tracking_coverage = self.determineTrackingCoverage(self.finder_module)
 
-        if self.fit_geometry:
-            # Prepare Genfit extrapolation
-            setupGenfitExtrapolationModule = \
-                basf2.register_module('SetupGenfitExtrapolation')
-            setupGenfitExtrapolationModule.param({'whichGeometry': self.fit_geometry})
-            main_path.add_module(setupGenfitExtrapolationModule)
+        if self.finder_module == "FullReco":
+            # add the full reconstruction chain
+            add_reconstruction(main_path, components)
+        else:
+            trackFinderModule = get_basf2_module(self.finder_module)
+            main_path.add_module(trackFinderModule)
 
-            # Fit tracks
-            genFitterModule = basf2.register_module('GenFitter')
-            genFitterModule.param({'PDGCodes': [13]})
-            main_path.add_module(genFitterModule)
+            # setting up fitting is only necessary when testing
+            # track finding comonenst ex-situ
+            if self.fit_geometry:
+                # Prepare Genfit extrapolation
+                setupGenfitExtrapolationModule = \
+                    basf2.register_module('SetupGenfitExtrapolation')
+                setupGenfitExtrapolationModule.param({'whichGeometry': self.fit_geometry})
+                main_path.add_module(setupGenfitExtrapolationModule)
+
+                # Fit tracks
+                genFitterModule = basf2.register_module('GenFitter')
+                genFitterModule.param({'PDGCodes': [13]})
+                main_path.add_module(genFitterModule)
 
         # Reference Monte Carlo tracks
         trackFinderMCTruthModule = basf2.register_module('TrackFinderMCTruth')
         trackFinderMCTruthModule.param({'WhichParticles': ['primary'],
                                        'EnergyCut': 0.1,
-                                       'GFTrackCandidatesColName': 'MCTrackCands'
-                                       })
+                                       'GFTrackCandidatesColName': 'MCTrackCands'})
         trackFinderMCTruthModule.param(self.tracking_coverage)
         main_path.add_module(trackFinderMCTruthModule)
 
@@ -116,8 +154,8 @@ class TrackingValidationRun(object):
         contact = self.contact
         output_file_name = self.output_file_name
         trackingValidationModule = TrackingValidationModule(self.name,
-                contact=contact, fit=fit, pulls=pulls,
-                output_file_name=output_file_name)
+                                                            contact=contact, fit=fit, pulls=pulls,
+                                                            output_file_name=output_file_name)
         main_path.add_module(trackingValidationModule)
 
         # Run basf2 module path #
@@ -125,5 +163,3 @@ class TrackingValidationRun(object):
         print 'Start processing'
         basf2.process(main_path)
         print basf2.statistics
-
-

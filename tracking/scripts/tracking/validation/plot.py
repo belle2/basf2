@@ -26,7 +26,7 @@ normal_iqr_to_std_factor = 2.0 * math.sqrt(2.0) * math.erf(0.5)
 
 
 def trimmed_std(array_like):
-    """A trimmed estimate for the standard deviation of a normal distribution 
+    """A trimmed estimate for the standard deviation of a normal distribution
     contaminated by outliers using the interquanitle range times the appropriate factor.
     """
 
@@ -34,12 +34,12 @@ def trimmed_std(array_like):
 
 
 def truncated_mean(array_like, r=0.23):
-    """Calculates the truncated mean, where 2r is the fraction of data to be taken into account. 
+    """Calculates the truncated mean, where 2r is the fraction of data to be taken into account.
 
     The truncated mean is a robust estimator for the central value of a symmetric distribution.
-    The (1-r) upper and the (1-r) lower values are left out and only the central remaining 2r fraction enters 
+    The (1-r) upper and the (1-r) lower values are left out and only the central remaining 2r fraction enters
     the normal calculation of the mean. The default value of r is the text book value, which produces an approximatelly
-    82%-efficient estimate of the mean for normal, central value of the cauchy and the double-exponential 
+    82%-efficient estimate of the mean for normal, central value of the cauchy and the double-exponential
     distribution.
     """
 
@@ -54,7 +54,7 @@ def truncated_mean(array_like, r=0.23):
     upper_percentile = 100 * (1.0 - truncation / 2.0)
 
     (lower_bound, upper_bound) = np.percentile(array, (lower_percentile,
-            upper_percentile))
+                                                       upper_percentile))
 
     weights = (array >= lower_bound) & (array <= upper_bound)
 
@@ -75,8 +75,7 @@ units_by_quantity_name = {
     'z0': 'cm',
     'z_{0}': 'cm',
     'tan_lambda': None,
-    'tan #lambda': None,
-    }
+    'tan #lambda': None}
 
 
 def compose_axis_label(quantity_name, unit=None):
@@ -96,7 +95,7 @@ def root_save_name(name):
 
     deletechars = r"/$\#{}"
     name = name.replace(' ', '_').replace('-', '_').translate(None,
-            deletechars)
+                                                              deletechars)
     return name
 
 
@@ -129,14 +128,12 @@ class ValidationPlot(object):
                              xs)
         return is_boolean or is_one_or_zero
 
-    def determine_bin_edges(
-        self,
-        xs,
-        bins=None,
-        lower_bound=None,
-        upper_bound=None,
-        outlier_z_score=None,
-        ):
+    def determine_bin_edges(self,
+                            xs,
+                            bins=None,
+                            lower_bound=None,
+                            upper_bound=None,
+                            outlier_z_score=None):
 
         # Coerce values to a numpy array. Do not copy if already a numpy array.
         xs = np.array(xs, copy=False)
@@ -189,7 +186,7 @@ class ValidationPlot(object):
 
             finite_xs = xs[np.isfinite(xs)]
             if outlier_z_score is not None and (lower_bound is None
-                    or upper_bound is None):
+                                                or upper_bound is None):
                 # Prepare for the estimation of outliers
                 x_mean = truncated_mean(finite_xs)
                 x_std = trimmed_std(finite_xs)
@@ -236,7 +233,7 @@ class ValidationPlot(object):
             if bins is None:
                 # Assume number of bins according to the rice rule.
                 # The number of data points should not include outliers.
-                n_data = np.sum((lower_bound <= xs) & (xs <= upper_bound))
+                n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
                 rice_n_bins = int(np.ceil(2.0 * pow(n_data, 1.0 / 3.0)))
                 n_bins = rice_n_bins
             else:
@@ -266,13 +263,11 @@ class ValidationPlot(object):
         get_logger().debug('Bins %s', bin_edges)
         return bin_edges
 
-    def fill(
-        self,
-        xs,
-        ys=None,
-        weights=None,
-        bins=None,
-        ):
+    def fill(self,
+             xs,
+             ys=None,
+             weights=None,
+             bins=None):
         """Legacy use hist or profile instead."""
 
         if ys is None:
@@ -280,15 +275,13 @@ class ValidationPlot(object):
         else:
             return self.profile(xs, ys, weights=weights, bins=bins)
 
-    def hist(
-        self,
-        xs,
-        weights=None,
-        bins=None,
-        lower_bound=None,
-        upper_bound=None,
-        outlier_z_score=None,
-        ):
+    def hist(self,
+             xs,
+             weights=None,
+             bins=None,
+             lower_bound=None,
+             upper_bound=None,
+             outlier_z_score=None):
 
         name = self.name
 
@@ -298,8 +291,8 @@ class ValidationPlot(object):
             weights = np.array(weights, copy=False)
 
         bin_edges = self.determine_bin_edges(xs, bins=bins,
-                lower_bound=lower_bound, upper_bound=upper_bound,
-                outlier_z_score=outlier_z_score)
+                                             lower_bound=lower_bound, upper_bound=upper_bound,
+                                             outlier_z_score=outlier_z_score)
 
         n_bins = len(bin_edges) - 1
         histogram = ROOT.TH1F(name, '', n_bins, bin_edges)
@@ -324,16 +317,14 @@ class ValidationPlot(object):
         self.attach_attributes()
         return self
 
-    def profile(
-        self,
-        xs,
-        ys,
-        weights=None,
-        bins=None,
-        lower_bound=None,
-        upper_bound=None,
-        outlier_z_score=None,
-        ):
+    def profile(self,
+                xs,
+                ys,
+                weights=None,
+                bins=None,
+                lower_bound=None,
+                upper_bound=None,
+                outlier_z_score=None):
 
         name = self.name
 
@@ -344,8 +335,8 @@ class ValidationPlot(object):
             weights = np.array(weights, copy=False)
 
         bin_edges = self.determine_bin_edges(xs, bins=bins,
-                lower_bound=lower_bound, upper_bound=upper_bound,
-                outlier_z_score=outlier_z_score)
+                                             lower_bound=lower_bound, upper_bound=upper_bound,
+                                             outlier_z_score=outlier_z_score)
 
         # Use determine bins to find the lower and upper bound with correct handling of nan and inf
         (y_lower_bound, y_upper_bound) = self.determine_bin_edges(ys, bins=1)
@@ -381,16 +372,14 @@ class ValidationPlot(object):
         self.attach_attributes()
         return self
 
-    def scatter(
-        self,
-        xs,
-        ys,
-        weights=None,
-        bins=(None, None),
-        lower_bound=(None, None),
-        upper_bound=(None, None),
-        outlier_z_score=(None, None),
-        ):
+    def scatter(self,
+                xs,
+                ys,
+                weights=None,
+                bins=(None, None),
+                lower_bound=(None, None),
+                upper_bound=(None, None),
+                outlier_z_score=(None, None)):
 
         name = self.name
 
@@ -423,23 +412,21 @@ class ValidationPlot(object):
             y_outlier_z_score = outlier_z_score
 
         x_bin_edges = self.determine_bin_edges(xs, bins=x_bins,
-                lower_bound=x_lower_bound, upper_bound=x_upper_bound,
-                outlier_z_score=x_outlier_z_score)
+                                               lower_bound=x_lower_bound, upper_bound=x_upper_bound,
+                                               outlier_z_score=x_outlier_z_score)
 
         y_bin_edges = self.determine_bin_edges(ys, bins=y_bins,
-                lower_bound=y_lower_bound, upper_bound=y_upper_bound,
-                outlier_z_score=y_outlier_z_score)
+                                               lower_bound=y_lower_bound, upper_bound=y_upper_bound,
+                                               outlier_z_score=y_outlier_z_score)
 
         n_x_bins = len(x_bin_edges) - 1
         n_y_bins = len(y_bin_edges) - 1
-        histogram = ROOT.TH2F(
-            name,
-            '',
-            n_x_bins,
-            x_bin_edges,
-            n_y_bins,
-            y_bin_edges,
-            )
+        histogram = ROOT.TH2F(name,
+                              '',
+                              n_x_bins,
+                              x_bin_edges,
+                              n_y_bins,
+                              y_bin_edges)
         self.histogram = histogram
 
         finite_indices = ~np.isnan(xs) & ~np.isnan(ys)
@@ -617,7 +604,7 @@ class ValidationPlot(object):
 
         # Compose a function that carries the addtional information
         tf1_additional_stats = ROOT.TF1(self.tf1_additional_stats_name,
-                formula_string, lower_bound, upper_bound)
+                                        formula_string, lower_bound, upper_bound)
 
         for (i, (label, value)) in enumerate(self.additional_stats.items()):
             tf1_additional_stats.SetParName(i, label)
@@ -787,4 +774,3 @@ def test():
 
 if __name__ == '__main__':
     test()
-

@@ -6,17 +6,17 @@
 // Date : 2 - Aug - 2013
 //-
 
-#include <rawdata/dataobjects/RawBPID.h>
+#include <rawdata/dataobjects/RawTOP.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawBPID);
+ClassImp(RawTOP);
 
-RawBPID::RawBPID()
+RawTOP::RawTOP()
 {
 }
 
-RawBPID::~RawBPID()
+RawTOP::~RawTOP()
 {
 }

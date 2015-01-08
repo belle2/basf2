@@ -25,7 +25,7 @@
 
 // Dataobject classes
 #include <top/dataobjects/TOPDigit.h>
-#include <rawdata/dataobjects/RawBPID.h>
+#include <rawdata/dataobjects/RawTOP.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 using namespace std;
@@ -64,7 +64,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     digits.isRequired();
 
-    StoreArray<RawBPID> rawData;
+    StoreArray<RawTOP> rawData;
     rawData.registerInDataStore();
 
     const auto& mapper = m_topgp->getFrontEndMapper();
@@ -82,7 +82,7 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> evtMetaData;
     StoreArray<TOPDigit> digits;
-    StoreArray<RawBPID> rawData;
+    StoreArray<RawTOP> rawData;
 
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
@@ -136,7 +136,7 @@ namespace Belle2 {
       info.run_subrun_num = (evtMetaData->getRun() << 8) +
                             (evtMetaData->getSubrun() & 0xFF); // run number : 14bits, subrun # : 8bits
       info.eve_num = evtMetaData->getEvent();
-      info.node_id = BPID_ID + copperID;
+      info.node_id = TOP_ID + copperID;
       info.tt_ctime = 0;
       info.tt_utime = 0;
       info.b2l_ctime = 0;

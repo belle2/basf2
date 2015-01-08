@@ -25,7 +25,7 @@
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawCDC.h>
-#include <rawdata/dataobjects/RawBPID.h>
+#include <rawdata/dataobjects/RawTOP.h>
 #include <rawdata/dataobjects/RawEPID.h>
 #include <rawdata/dataobjects/RawECL.h>
 #include <rawdata/dataobjects/RawKLM.h>
@@ -84,8 +84,8 @@ namespace Belle2 {
     //! RawCDC array
     StoreArray<RawCDC> raw_cdcarray;
 
-    //! RawBPID array
-    StoreArray<RawBPID> raw_bpidarray;
+    //! RawTOP array
+    StoreArray<RawTOP> raw_bpidarray;
 
     //! RawEPID array
     StoreArray<RawEPID> raw_epidarray;

@@ -6,8 +6,8 @@
 // Date : 2 - Aug - 2013
 //-
 
-#ifndef RAWBPID_H
-#define RAWBPID_H
+#ifndef RAWTOP_H
+#define RAWTOP_H
 
 // Includes
 #include <stdio.h>
@@ -21,20 +21,20 @@
 namespace Belle2 {
 
   /**
-   * The Raw BPID class
-   * Class for RawCOPPER class data taken by BPID
+   * The Raw TOP class
+   * Class for RawCOPPER class data taken by TOP
    * Currently, this class is almost same as RawCOPPER class.
    */
 
-  class RawBPID : public RawCOPPER {
+  class RawTOP : public RawCOPPER {
   public:
     //! Default constructor
-    RawBPID();
+    RawTOP();
     //! Destructor
-    virtual ~RawBPID();
+    virtual ~RawTOP();
 
     /// To derive from TObject
-    ClassDef(RawBPID, 1);
+    ClassDef(RawTOP, 1);
   };
 }
 

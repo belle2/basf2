@@ -113,7 +113,7 @@ void DummyDataPackerModule::event()
 //    RawCOPPER* raw_copper = raw_cprarray.appendNew();
     RawSVD* raw_svd = raw_svdarray.appendNew();
 //     RawCDC* raw_cdc = raw_cdcarray.appendNew();
-//     RawBPID* raw_bpid = raw_bpidarray.appendNew();
+//     RawTOP* raw_bpid = raw_bpidarray.appendNew();
 //     RawEPID* raw_epid = raw_epidarray.appendNew();
 //     RawECL* raw_ecl = raw_eclarray.appendNew();
 //     RawKLM* raw_klm = raw_klmarray.appendNew();

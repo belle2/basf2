@@ -25,7 +25,7 @@
 
 // Dataobject classes
 #include <top/dataobjects/TOPDigit.h>
-#include <rawdata/dataobjects/RawBPID.h>
+#include <rawdata/dataobjects/RawTOP.h>
 
 using namespace std;
 
@@ -60,7 +60,7 @@ namespace Belle2 {
   void TOPUnpackerModule::initialize()
   {
 
-    StoreArray<RawBPID> rawData;
+    StoreArray<RawTOP> rawData;
     rawData.isRequired();
 
     StoreArray<TOPDigit> digits;
@@ -79,7 +79,7 @@ namespace Belle2 {
   void TOPUnpackerModule::event()
   {
 
-    StoreArray<RawBPID> rawData;
+    StoreArray<RawTOP> rawData;
     StoreArray<TOPDigit> digits;
     digits.clear();
 

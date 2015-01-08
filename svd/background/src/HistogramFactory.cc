@@ -11,6 +11,9 @@
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 
+#include <TROOT.h>
+#include <TLegend.h>
+#include <iostream>
 #include <algorithm>
 #include <boost/format.hpp>
 
@@ -96,6 +99,7 @@ TH1F* HistogramFactory::MakeBarPlot(const string& componentName, const string& v
 {
   // Retrieve full value name from the BgValues map
   const string fullValueName(getTitle(valueName));
+  // FIXME: This must be corrected, componentName rather than fullValueName.
   string comp_id(fullValueName + "_" + componentName);
   std::replace(comp_id.begin(), comp_id.end(), ' ', '_');
   string histo_name = "hBar_" + comp_id;
@@ -109,6 +113,46 @@ TH1F* HistogramFactory::MakeBarPlot(const string& componentName, const string& v
   result->GetYaxis()->SetTitle(getAxisLabel(valueName).c_str());
   result->SetFillColor(component_colors[componentName]);
   return result;
+}
+
+TCanvas* HistogramFactory::PlotStackedBars(TFile* f, const set<string>& componentNames, const string& valueName)
+{
+  // Retrieve full value name from the BgValues map
+  string fullValueName(getTitle(valueName));
+  // Make canvas
+  string canvasName("c_" + valueName);
+  string canvasDescription(fullValueName + " by layer and background type");
+  TCanvas* c_barPlot = (TCanvas*)gROOT->GetListOfCanvases()->FindObject(canvasName.c_str());
+  if (c_barPlot) delete c_barPlot;
+  c_barPlot = new TCanvas(canvasName.c_str(), canvasDescription.c_str());
+  //THStack and legend
+  THStack* hBarStack = new THStack("hBarStack", canvasDescription.c_str());
+  TLegend* hBarLegend = new TLegend(0.6, 0.6, 0.85, 0.85);
+  hBarLegend->SetHeader("Background component");
+  hBarLegend->SetBorderSize(0);
+  for (auto componentName : componentNames) {
+    //FIXME: Correct as soon as it is corrected in the MakeBarPlot method.
+    string comp_id(fullValueName + "_" + componentName);
+    std::replace(comp_id.begin(), comp_id.end(), ' ', '_');
+    string histo_name = "hBar_" + comp_id;
+    string histo_title(componentName);  // keep original component name for legend
+    TH1F* histo = (TH1F*)f->Get(histo_name.c_str());
+    if (!histo) {
+      cout << "WARNING: Histogram " << histo_name.c_str() << " not found." << endl;
+      continue;
+    }
+    histo->SetFillColor(component_colors[componentName]);
+    histo->SetBarWidth(c_barwidth);
+    hBarStack->Add(histo);
+    hBarLegend->AddEntry(histo, componentName.c_str(), "F");
+  }
+  c_barPlot->cd();
+  hBarStack->Draw("B");
+  hBarStack->GetXaxis()->SetTitle("SVD layer");
+  hBarStack->GetYaxis()->SetTitle(getAxisLabel(valueName).c_str());
+  hBarLegend->Draw();
+  c_barPlot->Modified(); c_barPlot->Update();
+  return c_barPlot;
 }
 
 TH1F* HistogramFactory::MakeFluencePlot(const string& componentName, const string& valueName, int layer)

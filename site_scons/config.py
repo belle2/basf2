@@ -15,7 +15,7 @@ def CheckEnvVar(conf, var, text=None):
         conf.Message('Checking for %s...' % text)
     else:
         conf.Message('Checking for environment variable %s...' % var)
-    result = conf.env['ENV'].has_key(var)
+    result = var in conf.env['ENV']
     conf.Result(result)
     return result
 

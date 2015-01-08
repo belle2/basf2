@@ -133,11 +133,11 @@ def process_dir(
     env['DATAOBJECT_LIBS'] = []
 
     # clean up some environment variables that should not be inherited from the parent environment
-    if env.Dictionary().has_key('SUBLIB'):
+    if 'SUBLIB' in env.Dictionary():
         del env.Dictionary()['SUBLIB']
-    if env.Dictionary().has_key('PYTHON_MODULE'):
+    if 'PYTHON_MODULE' in env.Dictionary():
         del env.Dictionary()['PYTHON_MODULE']
-    if env.Dictionary().has_key('LIBS'):
+    if 'LIBS' in env.Dictionary():
         del env.Dictionary()['LIBS']
 
     # link dataobjects to analysis modules
@@ -290,9 +290,9 @@ def process_dir(
         parent_env['SRC_FILES'] += env['SRC_FILES']
 
     # add dataobject libs to parent environment
-    if env.Dictionary().has_key('DATAOBJECT_LIB'):
+    if 'DATAOBJECT_LIB' in env.Dictionary():
         parent_env.Append(DATAOBJECT_LIBS=env['DATAOBJECT_LIB'])
-    if env.Dictionary().has_key('DATAOBJECT_LIBS'):
+    if 'DATAOBJECT_LIBS' in env.Dictionary():
         parent_env.AppendUnique(DATAOBJECT_LIBS=env['DATAOBJECT_LIBS'])
 
     # process modules directory last so that it is known whether the main library exists
@@ -316,11 +316,11 @@ def process_dir(
         bin_filename = os.path.splitext(os.path.basename(str(bin_file)))[0]
         bin_env = env.Clone()
         bin_env['LIBS'] = []
-        if bin_env['TOOLS_LIBS'].has_key(bin_filename):
+        if bin_filename in bin_env['TOOLS_LIBS']:
             bin_env['LIBS'] = Flatten([env.subst(str(lib)).split() for lib in
                                       Flatten(bin_env['TOOLS_LIBS'
                                       ][bin_filename])])
-        if bin_env['TOOLS_LIBPATH'].has_key(bin_filename):
+        if bin_filename in bin_env['TOOLS_LIBPATH']:
             bin_env['LIBPATH'] = bin_env['TOOLS_LIBPATH'][bin_filename]
         tool = bin_env.Program(os.path.join(bin_env['BINDIR'], bin_filename),
                                os.path.join(bin_env['BUILDDIR'],

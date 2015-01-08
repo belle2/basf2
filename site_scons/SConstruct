@@ -4,7 +4,7 @@ import config
 
 
 # determine whether we have an analysis or a local release
-analysis = os.environ.has_key('BELLE2_ANALYSIS_DIR')
+analysis = 'BELLE2_ANALYSIS_DIR' in os.environ
 
 # build options
 AddOption('--color', dest = 'color', nargs = 1, default = 'off', action = 'store', help = 'Enable color output. Possible values are: off, light, dark')
@@ -27,21 +27,21 @@ if analysis:
     setup_message = '-> Execute "setupana" in your local analysis directory.'
 
 # get the sub directory name for architecture and build option dependent files
-if not os.environ.has_key('BELLE2_SUBDIR'):
+if not 'BELLE2_SUBDIR' in os.environ:
     print 'Belle II software environment is not set up.'
     print setup_message
     Exit(1)
 subdir = os.environ['BELLE2_SUBDIR']
 
 # check for the externals
-if not os.environ.has_key('BELLE2_EXTERNALS_DIR'):
+if not 'BELLE2_EXTERNALS_DIR' in os.environ:
     print 'externals are not set up.'
     print setup_message
     Exit(1)
 extsubdir = os.environ.get('BELLE2_EXTERNALS_SUBDIR', subdir)
 
 # check for root
-if not os.environ.has_key('ROOTSYS'):
+if not 'ROOTSYS' in os.environ:
     print 'root is not set up.'
     print setup_message
     Exit(1)
@@ -136,7 +136,7 @@ if analysis:
     global_env.Append(LIBPATH = [os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'lib', subdir)])
 else:
     # use central release as repository if it is set up
-    if os.environ.has_key('BELLE2_RELEASE_DIR'):
+    if 'BELLE2_RELEASE_DIR' in os.environ:
         repository = os.environ['BELLE2_RELEASE_DIR']
         global_env.Repository(repository)
 

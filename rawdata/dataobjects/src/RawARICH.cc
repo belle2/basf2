@@ -6,17 +6,17 @@
 // Date : 2 - Aug - 2013
 //-
 
-#include <rawdata/dataobjects/RawEPID.h>
+#include <rawdata/dataobjects/RawARICH.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawEPID);
+ClassImp(RawARICH);
 
-RawEPID::RawEPID()
+RawARICH::RawARICH()
 {
 }
 
-RawEPID::~RawEPID()
+RawARICH::~RawARICH()
 {
 }

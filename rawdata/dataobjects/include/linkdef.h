@@ -21,7 +21,7 @@
 #pragma link C++ class Belle2::RawSVD+;
 #pragma link C++ class Belle2::RawECL+;
 #pragma link C++ class Belle2::RawTOP+;
-#pragma link C++ class Belle2::RawEPID+;
+#pragma link C++ class Belle2::RawARICH+;
 #pragma link C++ class Belle2::RawKLM+;
 #pragma link C++ class Belle2::RawFTSW+;
 #pragma link C++ class Belle2::RawTLU+;

@@ -50,7 +50,7 @@ void Convert2RawDetModule::initialize()
   StoreArray<RawSVD>::registerPersistent();
   StoreArray<RawCDC>::registerPersistent();
   StoreArray<RawTOP>::registerPersistent();
-  StoreArray<RawEPID>::registerPersistent();
+  StoreArray<RawARICH>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
@@ -145,8 +145,8 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
       } else if ((subsys_id & DETECTOR_MASK) == TOP_ID) {
         StoreArray<RawTOP> ary;
         (ary.appendNew())->SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
-      } else if ((subsys_id & DETECTOR_MASK) == EPID_ID) {
-        StoreArray<RawEPID> ary;
+      } else if ((subsys_id & DETECTOR_MASK) == ARICH_ID) {
+        StoreArray<RawARICH> ary;
         (ary.appendNew())->SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
       } else if ((subsys_id & DETECTOR_MASK) == BECL_ID) {
         StoreArray<RawECL> ary;

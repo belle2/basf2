@@ -28,7 +28,7 @@
 #define SVD_ID  0x01000000 // tentative
 #define CDC_ID  0x02000000 // tentative
 #define TOP_ID 0x03000000 // tentative
-#define EPID_ID 0x04000000 // tentative
+#define ARICH_ID 0x04000000 // tentative
 #define BECL_ID  0x05000000 // tentative
 #define EECL_ID  0x06000000 // tentative
 #define BKLM_ID  0x07000000 // tentative

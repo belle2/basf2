@@ -6,8 +6,8 @@
 // Date : 2 - Aug - 2013
 //-
 
-#ifndef RAWEPID_H
-#define RAWEPID_H
+#ifndef RAWARICH_H
+#define RAWARICH_H
 
 // Includes
 #include <stdio.h>
@@ -20,19 +20,19 @@
 namespace Belle2 {
 
   /**
-   * The Raw EPID class
-   * Class for RawCOPPER class data taken by EPID
+   * The Raw ARICH class
+   * Class for RawCOPPER class data taken by ARICH
    * Currently, this class is almost same as RawCOPPER class.
    */
 
-  class RawEPID : public RawCOPPER {
+  class RawARICH : public RawCOPPER {
   public:
     //! Default constructor
-    RawEPID();
+    RawARICH();
     //! Destructor
-    virtual ~RawEPID();
+    virtual ~RawARICH();
     /// To derive from TObject
-    ClassDef(RawEPID, 1);
+    ClassDef(RawARICH, 1);
   };
 }
 

@@ -21,7 +21,7 @@
 #include <rawdata/dataobjects/RawCDC.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawECL.h>
-#include <rawdata/dataobjects/RawEPID.h>
+#include <rawdata/dataobjects/RawARICH.h>
 #include <rawdata/dataobjects/RawTOP.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawCOPPER.h>

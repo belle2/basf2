@@ -54,8 +54,8 @@ void RawInputModule::initialize()
   StoreArray<RawCOPPER>::registerPersistent();
   StoreArray<RawSVD>::registerPersistent();
   StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawBPID>::registerPersistent();
-  StoreArray<RawEPID>::registerPersistent();
+  StoreArray<RawTOP>::registerPersistent();
+  StoreArray<RawARICH>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
@@ -139,13 +139,13 @@ void RawInputModule::registerRawCOPPERs()
       //      printf ( "ECL identified\n" );
       StoreArray<RawECL> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == BPID_ID) {
-      //      printf ( "BPID identified\n" );
-      StoreArray<RawBPID> ary;
+    } else if (subsysid == TOP_ID) {
+      //      printf ( "TOP identified\n" );
+      StoreArray<RawTOP> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == EPID_ID) {
-      //      printf ( "EPID identified\n" );
-      StoreArray<RawEPID> ary;
+    } else if (subsysid == ARICH_ID) {
+      //      printf ( "ARICH identified\n" );
+      StoreArray<RawARICH> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else if (subsysid == BKLM_ID || subsysid == EKLM_ID) {
       //      printf ( "KLM identified\n" );

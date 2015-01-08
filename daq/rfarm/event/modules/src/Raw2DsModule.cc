@@ -61,8 +61,8 @@ void Raw2DsModule::initialize()
   StoreArray<RawCOPPER>::registerPersistent();
   StoreArray<RawSVD>::registerPersistent();
   StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawBPID>::registerPersistent();
-  StoreArray<RawEPID>::registerPersistent();
+  StoreArray<RawTOP>::registerPersistent();
+  StoreArray<RawARICH>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
@@ -169,11 +169,11 @@ void Raw2DsModule::registerRawCOPPERs()
     } else if ((subsysid & DETECTOR_MASK) == EECL_ID) {
       StoreArray<RawECL> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if ((subsysid & DETECTOR_MASK) == BPID_ID) {
-      StoreArray<RawBPID> ary;
+    } else if ((subsysid & DETECTOR_MASK) == TOP_ID) {
+      StoreArray<RawTOP> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if ((subsysid & DETECTOR_MASK) == EPID_ID) {
-      StoreArray<RawEPID> ary;
+    } else if ((subsysid & DETECTOR_MASK) == ARICH_ID) {
+      StoreArray<RawARICH> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else if ((subsysid & DETECTOR_MASK) == BKLM_ID) {
       StoreArray<RawKLM> ary;

@@ -27,8 +27,8 @@
 #include <rawdata/dataobjects/RawCDC.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawECL.h>
-#include <rawdata/dataobjects/RawEPID.h>
-#include <rawdata/dataobjects/RawBPID.h>
+#include <rawdata/dataobjects/RawARICH.h>
+#include <rawdata/dataobjects/RawTOP.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 //#include <rawdata/dataobjects/RawHeader.h>
@@ -46,8 +46,8 @@
 #define DETECTOR_MASK 0xFFFFFFFF // tentative
 #define SVD_ID 0x00000001 // tentative
 #define CDC_ID 0x00000002 // tentative
-#define BPID_ID 0x00000003 // tentative
-#define EPID_ID 0x00000004 // tentative
+#define TOP_ID 0x00000003 // tentative
+#define ARICH_ID 0x00000004 // tentative
 #define ECL_ID 0x00000005 // tentative
 #define KLM_ID 0x00000006 // tentative
 */

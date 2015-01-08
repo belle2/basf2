@@ -208,7 +208,7 @@ namespace Belle2 {
     * each hit. We still need this link since until the neighbourfinder did his work, no segmentCell does know its neighbour (the name
     * explains itself ;) ).  Therefore each hit carries the indices of its inner and outer neighbours so the neighbourfinder can easily
     * find neighbouring segments. */
-    HitsOfEvent hitVector; /**< carries total number of hits of current event. atm only used for .size() and final delete of hits at end of event, can we remove it? */
+    HitsOfEvent hitVector; /**< carries total number of hits of current event. */
     std::vector<VXDTFHit> fullHitsVector; /**< carries hits of event (no pointers), used by baselineTF */
     TCsOfEvent tcVector; /**< carries track candidates of current pass */
 

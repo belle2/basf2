@@ -75,15 +75,27 @@ namespace Belle2 {
 
     TVector3* getHitCoordinates() { return &(m_hit.hitPosition); } /**< returns global hit coordinates */
 
+    /** returns x-variable of hit-position in global coordinates. */
+    double X() const {return m_hit.hitPosition.X(); }
+
+    /** returns y-variable of hit-position in global coordinates. */
+    double Y() const {return m_hit.hitPosition.Y(); }
+
+    /** returns z-variable of hit-position in global coordinates. */
+    double Z() const {return m_hit.hitPosition.Z(); }
+
+    /** returns r-variable of hit-position in global coordinates. */
+    double Perp() const {return m_hit.hitPosition.Perp(); }
+
     PositionInfo* getPositionInfo() { return &m_hit; } /**< returns global hit coordinates and errors for x and y coordinates */
 
     const std::vector<int>& getAttachedInnerCell() const { return m_attachedInnerCells; } /**< returns all inner Cells attached to hit */
 
     const std::vector<int>& getAttachedOuterCell() const { return m_attachedOuterCells; } /**< returns all outer Cells attached to hit */
 
-    int getNumberOfSegments() { return int(m_attachedInnerCells.size() + m_attachedOuterCells.size()); } /**< returns number of segments connected to this hit (hits without attached segments are ignored during TF process) */
+    int getNumberOfSegments() const { return int(m_attachedInnerCells.size() + m_attachedOuterCells.size()); } /**< returns number of segments connected to this hit (hits without attached segments are ignored during TF process) */
 
-    int getNumberOfTrackCandidates() { return m_attachedTrackCandidates; } /**< returns number of TCs using this hit */
+    int getNumberOfTrackCandidates() const { return m_attachedTrackCandidates; } /**< returns number of TCs using this hit */
 
     int getPassIndex() const { return m_passIndex; } /**< VXDTFHits are pass-dependent. Returns the index number of the pass containing current hit */
 

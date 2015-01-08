@@ -18,7 +18,13 @@ def define_aliases(
         env.Alias(parent_dir, target)
         if extension:
             env.Alias(parent_dir + '.' + extension, target)
-        parent_dir = os.path.split(parent_dir)[0]
+
+        next_parent_dir = os.path.split(parent_dir)[0]
+        # check split actually does something here
+        if next_parent_dir == parent_dir:
+            break
+        parent_dir = next_parent_dir
+
     if extension:
         env.Alias(extension, target)
 
@@ -32,6 +38,19 @@ def get_files(path_name, release_dir):
     if release_dir:
         os.chdir(save_dir)
     return files
+
+
+def get_python_files_recursive(topdir_path):
+    python_file_nodes = []
+
+    for (dir_path, dir_names, file_names) in os.walk(topdir_path):
+        for file_name in file_names:
+            if file_name.endswith('.py'):
+                file_path = os.path.join(dir_path, file_name)
+                file_node = File(file_path)
+                python_file_nodes.append(file_node)
+
+    return python_file_nodes
 
 
 def real_path(path_name, release_dir):
@@ -81,8 +100,8 @@ def process_dir(
                   release_dir)]
 
     # get list of script files
-    script_files = get_files(os.path.join(dir_name, 'scripts', '*.py'),
-                             release_dir)
+    script_files = get_python_files_recursive(os.path.join(dir_name, 'scripts'
+            ))
 
     # get list of executable script files
     executable_files = []
@@ -145,8 +164,21 @@ def process_dir(
     define_aliases(env, includes, dir_name, 'include')
 
     # install script files in the library directory
-    scripts = env.Install(env['LIBDIR'], env['SCRIPT_FILES'])
-    define_aliases(env, scripts, dir_name, 'scripts')
+    script_targets = []
+    for script_file_node in env['SCRIPT_FILES']:
+        script_file_path = str(script_file_node)
+        script_dir = os.path.dirname(script_file_path)
+
+        destination_reldir = os.path.relpath(script_dir,
+                os.path.join(dir_name, 'scripts'))
+
+        if not destination_reldir:
+            continue
+        destination_dir = os.path.join(env['LIBDIR'], destination_reldir)
+        script_target = env.Install(destination_dir, script_file_node)
+        script_targets.append(script_target)
+
+    define_aliases(env, script_targets, dir_name, 'scripts')
 
     # install executable script files in the bin directory
     executables = env.Install(env['BINDIR'], env['EXECUTABLE_FILES'])

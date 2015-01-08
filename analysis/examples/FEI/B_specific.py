@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Thomas Keck 2014
 
-from FEI.FullEventInterpretation import *
+from FEI import *
 from basf2 import *
 from modularAnalysis import *
 
@@ -446,7 +446,7 @@ buildRestOfEvent('B+:sig', path=selection_path)
 analysis_path = create_path()
 analysis_path.add_module(register_module('RootOutput'))
 
-main = FullEventInterpretation(selection_path, analysis_path, particles)
+main = fullEventInterpretation(selection_path, analysis_path, particles)
 
 # show constructed path
 print main

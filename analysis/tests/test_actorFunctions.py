@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from FEI.actorFunctions import *
-from FEI.FullEventInterpretation import Particle
+from FEI import Particle
 
 from basf2 import *
 import unittest

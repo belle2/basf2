@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # Thomas Keck 2014
 
-from FEI.FullEventInterpretation import *
 from basf2 import *
+from FEI import *
 
 chargedTrackVars = [
     'eid',
@@ -82,7 +82,7 @@ particles.append(p)
 
 analysis_path = create_path()
 analysis_path.add_module(register_module('PrintCollections'))
-main = FullEventInterpretation(None, analysis_path, particles)
+main = fullEventInterpretation(None, analysis_path, particles)
 
 # show constructed path
 print main

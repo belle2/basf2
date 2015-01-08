@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Thomas Keck 2014
 
-from FEI.FullEventInterpretation import *
+from FEI import *
 from basf2 import *
 
 pid_variables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
@@ -121,7 +121,7 @@ particles.append(p)
 main = create_path()
 main.add_module(register_module('RootInput'))
 
-FullEventInterpretation(main, particles)
+fullEventInterpretation(main, particles)
 
 main.add_module(register_module('ProgressBar'))
 main.add_module(register_module('RootOutput'))

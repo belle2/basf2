@@ -6,13 +6,11 @@ source  ~/.bash_profile
 #
 # Read data form COPPER FIFO
 #
-#${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvSendCOPPER.sh $1 $2 $3 $4 $5 # Read from COPPER FIFO
+${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvSendCOPPER.sh $1 $2 $3 $4 $5 # Read from COPPER FIFO
 
 #
 # Use dummy data instead of data from COPPER FIFO
 #
 #${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvSendCOPPERDummy.sh $1 $2  $3 $4 $5 # Dummy data produced by COPPER CPU
 #${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvSendCOPPER.sh $1 $2  $3 $4 $5 #
-#/home/usr/yamadas/work/timeout/dummy_data_src $2 | tee ~/dummysrc_$1_woeb0_Recv0DummyRecv1.txt
-#/home/usr/yamadas/work/timeout/dummy_data_src $2 | tee ~/dummysrc_nc_$1.txt 
-/home/usr/yamadas/work/timeout/dummy_data_src $2 
+#/home/usr/yamadas/work/timeout/dummy_data_src $2 

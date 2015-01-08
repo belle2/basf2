@@ -25,11 +25,15 @@ void ParticleSubset::removeParticlesNotInLists(const std::vector<std::string>& l
     StoreObjPtr<ParticleList> list(l);
     if (!list)
       continue;
-    //TODO: getParticleCollectionName() might be different for some lists...
-    const int n = list->getListSize();
-    for (int i = 0; i < n; i++) {
-      const Particle* p = list->getParticle(i);
-      keepParticle(p, &indicesToKeep);
+
+    if (list->getParticleCollectionName() == m_set->getName()) {
+      const int n = list->getListSize();
+      for (int i = 0; i < n; i++) {
+        const Particle* p = list->getParticle(i);
+        keepParticle(p, &indicesToKeep);
+      }
+    } else {
+      B2ERROR("ParticleList " << l << " uses Particle array '" << list->getParticleCollectionName() << "', but ParticleSubset uses different array '" << m_set->getName() << "'!");
     }
   }
 
@@ -62,8 +66,10 @@ void ParticleSubset::fixParticleLists(const std::map<int, int>& oldToNewMap)
       continue;
 
     ParticleList* list = static_cast<ParticleList*>(entry.second.ptr);
-    fixVector(list->m_scList, oldToNewMap);
-    fixVector(list->m_fsList, oldToNewMap);
+    if (list->getParticleCollectionName() == m_set->getName()) {
+      fixVector(list->m_scList, oldToNewMap);
+      fixVector(list->m_fsList, oldToNewMap);
+    }
   }
 }
 

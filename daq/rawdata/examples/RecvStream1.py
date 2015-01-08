@@ -23,6 +23,7 @@ set_log_level(LogLevel.ERROR)
 receiver = register_module('DeSerializerPC')
 dump = register_module('RootOutput')
 perf = register_module('DAQPerf')
+converter = register_module('Convert2RawDet')
 output = register_module('PrintData')
 
 # Receiver
@@ -36,7 +37,6 @@ receiver.param('MaxEventNum', -1)
 receiver.param('NodeName', argvs[3])  # node name for NSM
 use_shm_flag = int(argvs[1])
 receiver.param('UseShmFlag', use_shm_flag)
-
 
 # Monitor module
 monitor = register_module('MonitorDataCOPPER')
@@ -59,6 +59,7 @@ main = create_path()
 # Add modules to main path
 main.add_module(receiver)
 # main.add_module(monitor)
+# main.add_module(converter)
 # main.add_module(dump)
 main.add_module(sender)
 # main.add_module(output)

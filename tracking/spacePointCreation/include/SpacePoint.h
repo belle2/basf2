@@ -11,6 +11,8 @@
 
 // tracking
 // #include <tracking/spacePointCreation/SpacePointMetaInfo.h>
+#include <tracking/vectorTools/B2Vector3.h>
+// #include <TVector3.h>
 
 // framework
 #include <framework/datastore/RelationsObject.h>
@@ -41,6 +43,9 @@ namespace Belle2 {
    */
   class SpacePoint: public RelationsObject {
   public:
+
+    /** setting the baseType for storing coordinate-related infos */
+    typedef float SpBaseType;
 
     /** exception for the case that the user filled an invalid number of Clusters into the Constructor */
     BELLE2_DEFINE_EXCEPTION(InvalidNumberOfClusters, "SpacePoint::Constructor: invalid numbers of Clusters given!");
@@ -98,42 +103,42 @@ namespace Belle2 {
 // getter:
 
     /** return the x-value of the global position of the SpacePoint */
-    double X() const { return m_position.X(); }
+    SpBaseType X() const { return m_position.X(); }
 
 
 
     /** return the x-value of the global position of the SpacePoint */
-    double x() const { return m_position.X(); }
+    SpBaseType x() const { return m_position.X(); }
 
 
 
     /** return the y-value of the global position of the SpacePoint */
-    double Y() const { return m_position.Y(); }
+    SpBaseType Y() const { return m_position.Y(); }
 
 
 
     /** return the y-value of the global position of the SpacePoint */
-    double y() const { return m_position.Y(); }
+    SpBaseType y() const { return m_position.Y(); }
 
 
 
     /** return the z-value of the global position of the SpacePoint */
-    double Z() const { return m_position.Z(); }
+    SpBaseType Z() const { return m_position.Z(); }
 
 
 
     /** return the z-value of the global position of the SpacePoint */
-    double z() const { return m_position.Z(); }
+    SpBaseType z() const { return m_position.Z(); }
 
 
 
     /** return the position vector in global coordinates */
-    const TVector3& getPosition() const { return m_position; }
+    const B2Vector3F& getPosition() const { return m_position; }
 
 
 
     /** return the hitErrors in sigma of the global position */
-    const TVector3& getPositionError() const { return m_positionError; }
+    const B2Vector3F& getPositionError() const { return m_positionError; }
 
 
 
@@ -143,12 +148,12 @@ namespace Belle2 {
 
 
     /** return the normalized local coordinates of the cluster in u (0 <= posU <= 1) */
-    double getNormalizedLocalU() const { return m_normalizedLocal.first/*m_normalizedLocal[0]*/; }
+    SpBaseType getNormalizedLocalU() const { return m_normalizedLocal.first/*m_normalizedLocal[0]*/; }
 
 
 
     /** return the normalized local coordinates of the cluster in v (0 <= posV <= 1) */
-    double getNormalizedLocalV() const { return m_normalizedLocal.second/*m_normalizedLocal[1]*/; }
+    SpBaseType getNormalizedLocalV() const { return m_normalizedLocal.second/*m_normalizedLocal[1]*/; }
 
 
 
@@ -189,24 +194,24 @@ namespace Belle2 {
 
     /** converts a local hit into sensor-independent relative coordinates.
      *
-     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of doubles.
+     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of SpBaseTypes.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
      */
-    static std::pair<double, double> convertLocalToNormalizedCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<SpBaseType, SpBaseType> convertLocalToNormalizedCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
     /** converts a local hit on a given sensor into global coordinates.
      *
      * so this practically does what sensorInfo::pointToGlobal is doing, the difference is, that you do not need to have the sensorInfo beforehand (it will be retrieved using the VxdID)
-     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of doubles.
+     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of SpBaseTypes.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
      */
-    static TVector3 getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static B2Vector3F getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -217,7 +222,7 @@ namespace Belle2 {
     * third parameter, a sensorInfo can be passed for testing purposes.
     *  If no sensorInfo is passed, the member gets its own pointer to it.
     */
-    static std::pair<double, double> convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<SpBaseType, SpBaseType> convertNormalizedToLocalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitNormalized, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -226,7 +231,7 @@ namespace Belle2 {
      * does take second/third argument for checking for lower/upper boundary.
      * if boundary is crossed, value gets reset to boundary value
      * */
-    static void boundaryCheck(double& value, double lower = 0, double higher = 1) {
+    static void boundaryCheck(SpBaseType& value, SpBaseType lower = 0, SpBaseType higher = 1) {
       if (value < lower) { value = lower; }
       if (value > higher) { value = higher; }
     }
@@ -254,20 +259,18 @@ namespace Belle2 {
      *
      * It takes care for the transformation of the local sigmas to global error values.
      */
-    void setPositionError(double uSigma, double vSigma, const VXD::SensorInfoBase* aSensorInfo) {
+    void setPositionError(SpBaseType uSigma, SpBaseType vSigma, const VXD::SensorInfoBase* aSensorInfo) {
       //As only variances, but not the sigmas transform linearly,
       // we need to use some acrobatics
       // (and some more (abs) since we do not really transform a vector).
-      TVector3 globalizedVariances = aSensorInfo->vectorToGlobal(
-                                       TVector3(
-                                         uSigma * uSigma,
-                                         vSigma * vSigma,
-                                         0
-                                       )
-                                     );
-      for (int i = 0; i < 3; i++) {
-        m_positionError[i] = std::sqrt(std::abs(globalizedVariances[i]));
-      }
+      m_positionError = aSensorInfo->vectorToGlobal(
+                          TVector3(
+                            uSigma * uSigma,
+                            vSigma * vSigma,
+                            0
+                          )
+                        );
+      m_positionError.Sqrt();
     }
 
 
@@ -276,7 +279,7 @@ namespace Belle2 {
      *
      *  [0]: x , [1] : y, [2] : z
      */
-    TVector3 m_position;
+    B2Vector3<SpBaseType> m_position;
 
 
 
@@ -284,7 +287,7 @@ namespace Belle2 {
      *
      *  [0]: x-uncertainty , [1] : y-uncertainty, [2] : z-uncertainty
      */
-    TVector3 m_positionError;
+    B2Vector3<SpBaseType> m_positionError;
 
 
 
@@ -292,8 +295,8 @@ namespace Belle2 {
      *
      *  First entry is u, second is v
      */
-    std::pair<double, double> m_normalizedLocal;
-//     double m_normalizedLocal[2];
+    std::pair<SpBaseType, SpBaseType> m_normalizedLocal;
+//     SpBaseType m_normalizedLocal[2];
 
 
 
@@ -316,7 +319,7 @@ namespace Belle2 {
      * The value shall be between 0-1, where 1 means "good" and 0 means "bad".
      * Standard is 0.5.
      * */
-    double m_qualityIndicator;
+    SpBaseType m_qualityIndicator;
 
 
 
@@ -325,6 +328,6 @@ namespace Belle2 {
 
 
 
-    ClassDef(SpacePoint, 7) // last member added: m_qualityIndicator & m_isAssigned, last removed: m_nameIndex, m_indexNumbers
+    ClassDef(SpacePoint, 8) // last member changed: m_position, m_positionError, m_qualityIndicator
   };
 }

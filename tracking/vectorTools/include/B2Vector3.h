@@ -12,7 +12,7 @@
 #pragma once
 
 
-#include <framework/core/FrameworkExceptions.h>
+// #include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
 
 #include <TBranch.h>
@@ -22,12 +22,13 @@
 #include <string>
 
 #include <typeinfo>
-#include <cxxabi.h>
+// #if 0 || defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+// #include <cxxabi.h>
+// # endif
 
 // #include <algorithm>    // std::move (ranges)
 #include <utility>      // std::move (objects)
 
-#include <type_traits>
 
 namespace Belle2 {
 
@@ -141,7 +142,8 @@ namespace Belle2 {
 
 
     /** type conversion in TVector3 */
-    operator TVector3() const { return std::move(TVector3(this->X(), this->Y(), this->Z())); }
+//     operator TVector3() const { return std::move(TVector3(this->X(), this->Y(), this->Z())); } // C++11-version
+    operator TVector3() const { return TVector3(this->X(), this->Y(), this->Z()); }
 
 
 
@@ -189,7 +191,8 @@ namespace Belle2 {
 
     /** unary minus */
     inline B2Vector3<DataType> operator - () const {
-      return std::move(B2Vector3<DataType>(-X(), -Y(), -Z()));
+//    return std::move(B2Vector3<DataType>(-X(), -Y(), -Z())); // C++11-version
+      return B2Vector3<DataType>(-X(), -Y(), -Z());
     }
 
 
@@ -204,19 +207,22 @@ namespace Belle2 {
 
     /**  Addition of 3-vectors. */
     B2Vector3<DataType> operator + (const B2Vector3<DataType>& b) const {
-      return std::move(B2Vector3<DataType>(X() + X(), Y() + Y(), Z() + b.Z()));
+//    return std::move(B2Vector3<DataType>(X() + X(), Y() + Y(), Z() + b.Z())); // C++11-version
+      return B2Vector3<DataType>(X() + X(), Y() + Y(), Z() + b.Z());
     }
 
 
     /**  Subtraction of 3-vectors */
     B2Vector3<DataType> operator - (const B2Vector3<DataType>& b) const {
-      return std::move(B2Vector3<DataType>(X() - b.X(), Y() - b.Y(), Z() - b.Z()));
+//    return std::move(B2Vector3<DataType>(X() - b.X(), Y() - b.Y(), Z() - b.Z())); // C++11-version
+      return B2Vector3<DataType>(X() - b.X(), Y() - b.Y(), Z() - b.Z());
     }
 
 
     /**  Scaling of 3-vectors with a real number */
     B2Vector3<DataType> operator * (DataType a) const {
-      return std::move(B2Vector3<DataType>(a * X(), a * Y(), a * Z()));
+//    return std::move(B2Vector3<DataType>(a * X(), a * Y(), a * Z())); // C++11-version
+      return B2Vector3<DataType>(a * X(), a * Y(), a * Z()); // C++11-version
     }
 
 
@@ -404,7 +410,8 @@ namespace Belle2 {
 
     /**  Cross product. */
     inline B2Vector3<DataType> Cross(const B2Vector3<DataType>& p) const {
-      return std::move(B2Vector3<DataType>(Y() * p.Z() - p.Y() * Z(), Z() * p.X() - p.Z() * X(), X() * p.Y() - p.X() * Y()));
+//    return std::move(B2Vector3<DataType>(Y() * p.Z() - p.Y() * Z(), Z() * p.X() - p.Z() * X(), X() * p.Y() - p.X() * Y())); // C++11-version
+      return B2Vector3<DataType>(Y() * p.Z() - p.Y() * Z(), Z() * p.X() - p.Z() * X(), X() * p.Y() - p.X() * Y()); // C++11-version
     }
 
 
@@ -504,6 +511,26 @@ namespace Belle2 {
 //  }
 
 
+    /** *********************************************** Additional MATHEMATICS *********************************************** */
+    /* functions defined here are not existing in TVector3 but enhance featureset of B2Vector3 */
+
+
+    /** calculates the absolute value of the coordinates element-wise */
+    inline void Abs() {
+      m_coordinates[0] = std::abs(m_coordinates[0]);
+      m_coordinates[1] = std::abs(m_coordinates[1]);
+      m_coordinates[2] = std::abs(m_coordinates[2]);
+    }
+
+
+    /** calculates the square root of the absolute values of the coordinates element-wise */
+    inline void Sqrt() {
+      Abs();
+      m_coordinates[0] = std::sqrt(m_coordinates[0]);
+      m_coordinates[1] = std::sqrt(m_coordinates[1]);
+      m_coordinates[2] = std::sqrt(m_coordinates[2]);
+    }
+
 
     /** *********************************************** MEMBER ACCESS *********************************************** */
 
@@ -578,12 +605,17 @@ namespace Belle2 {
     /** returns a TVector3 containing the same coordinates */
     inline TVector3 GetTVector3(void) const {
       return
-        std::move(
-          TVector3(
-            static_cast<Double_t>(X()),
-            static_cast<Double_t>(Y()),
-            static_cast<Double_t>(Z())
-          )
+//       std::move( // C++11-version
+//           TVector3(
+//             static_cast<Double_t>(X()),
+//             static_cast<Double_t>(Y()),
+//             static_cast<Double_t>(Z())
+//           )
+//         );
+        TVector3(
+          static_cast<Double_t>(X()),
+          static_cast<Double_t>(Y()),
+          static_cast<Double_t>(Z())
         );
     }
 
@@ -643,6 +675,20 @@ namespace Belle2 {
      */
     void persist(TTree* t, const std::string& branchName, const std::string& variableName);
 
+
+//    // Stream a B2Vector3 object
+//  template<typename BufferType>
+//  void Streamer(BufferType &b)
+//  {
+//
+//    if (b.IsReading()) {
+//    Version_t v = b.ReadVersion();
+//    b >> m_coordinates;
+//    } else {
+//    b.WriteVersion(TShape::IsA());
+//    b << m_coordinates;
+//    }
+//  }
   }; //B2Vector3 - end
 
 
@@ -678,18 +724,19 @@ namespace Belle2 {
   template < typename DataType>
   B2Vector3<DataType> operator * (DataType a, const B2Vector3<DataType>& p)
   {
-    return std::move(B2Vector3<DataType>(a * p.X(), a * p.Y(), a * p.Z()));
+    /*return std::move(B2Vector3<DataType>(a * p.X(), a * p.Y(), a * p.Z()));*/ // C++11-version
+    return B2Vector3<DataType>(a * p.X(), a * p.Y(), a * p.Z());
   }
 
 
   /** non-memberfunction Scaling of 3-vectors with a real number */
 // //   template < typename DataType>
 //   B2Vector3D operator * (double a, const B2Vector3D & p) {
-//  return std::move(B2Vector3D(a*p.X(), a*p.Y(), a*p.Z()));
+//  return std::move(B2Vector3D(a*p.X(), a*p.Y(), a*p.Z())); // C++11-version
 //   }
 //
 //   B2Vector3F operator * (float a, const B2Vector3F & p) {
-//  return std::move(B2Vector3F(a*p.X(), a*p.Y(), a*p.Z()));
+//  return std::move(B2Vector3F(a*p.X(), a*p.Y(), a*p.Z())); // C++11-version
 //   }
 //
 
@@ -715,20 +762,30 @@ namespace Belle2 {
   }
 
 
-  /** Returns the name of the B2Vector3.
+//   #if  0 || defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+//   /** Returns the name of the B2Vector3.
+//    *
+//    */
+//   template < typename DataType>
+//   const std::string B2Vector3<DataType>::name(void) const
+//   {
+//     char* realname(NULL);
+//     int status(0);
+//     realname = abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
+//     std::string name(realname);
+//     free(realname);
+//     return name ;
+//   }
+// # else
+  /** Returns a less readable (but more compatible) name of the B2Vector3.
    *
    */
   template < typename DataType>
   const std::string B2Vector3<DataType>::name(void) const
   {
-    char* realname(NULL);
-    int status(0);
-    realname = abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
-    std::string name(realname);
-    free(realname);
-    return name ;
+    return std::string("B2Vector3<") + typeid(DataType).name() + std::string(">");
   }
-
+// #endif
 
   /** Creates and sets the addresses of the leaves to store the values of this B2Vector3.
    *
@@ -758,4 +815,5 @@ namespace Belle2 {
     TBranch* branch = new TBranch(t, branchName.c_str() , & B2Vector3<DataType>::m_coordinates, leafList.c_str());
     t->GetListOfBranches()->Add(branch);
   }
-}
+
+} // end namespace Belle2

@@ -28,7 +28,7 @@ namespace Belle2 {
   class ActiveSector;
 
 
-  /** The VXD SegmentCell class
+  /** The Segment class
    * This class represents segments of track candidates needed for the Cellular automaton (CA) implemented in the VXDTF.
    */
   class Segment {

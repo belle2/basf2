@@ -875,12 +875,55 @@ namespace Belle2 {
     std::vector<std::string> m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
 
     TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
+    TTree* m_treeHitWisePtr; /**< pointer at root tree used for information stored once per hit (e.g. positions) */
     TTree* m_treeTrackWisePtr; /**< pointer at root tree used for information stored once per track (e.g. p-value-output) */
     TTree* m_treeEventWisePtr; /**< pointer at root tree used for information stored once per event */
-    long long int m_rootTimeConsumption; /**< used for storing duration of event in a root file */
     double m_rootPvalues; /**< used for storing pValues in a root file */
     double m_rootChi2; /**< used for storing chi2values in a root file */
     double m_rootCircleRadius; /**< used for storing the circle radii calculated by the circle fitter in a root file */
+    long long int m_rootTimeConsumption; /**< used for storing duration of event in a root file */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosSMX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosSMY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosSMZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosSMR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosSFX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosSFY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosSFZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosSFR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosNFX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosNFY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosNFZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosNFR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosTCCX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosTCCY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosTCCZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosTCCR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosFTCX; /**< used for storing the global x-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosFTCY; /**< used for storing the global y-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosFTCZ; /**< used for storing the global z-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
+    std::array<std::vector<double>, 6> m_rootGoodHitPosFTCR; /**< used for storing the global r-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
+
+    std::vector<double> m_rootAllGoodHitPosSMX; /**< used for storing the global x-variables of all hits accepted by the secMap, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosSMY; /**< used for storing the global y-variables of all hits accepted by the secMap, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosSMZ; /**< used for storing the global z-variables of all hits accepted by the secMap, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosSMR; /**< used for storing the global r-variables of all hits accepted by the secMap, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosSFX; /**< used for storing the global x-variables of all hits accepted by the segFinder, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosSFY; /**< used for storing the global y-variables of all hits accepted by the segFinder, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosSFZ; /**< used for storing the global z-variables of all hits accepted by the segFinder, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosSFR; /**< used for storing the global r-variables of all hits accepted by the segFinder, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosNFX; /**< used for storing the global x-variables of all hits accepted by the neighborFinder, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosNFY; /**< used for storing the global y-variables of all hits accepted by the neighborFinder, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosNFZ; /**< used for storing the global z-variables of all hits accepted by the neighborFinder, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosNFR; /**< used for storing the global r-variables of all hits accepted by the neighborFinder, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosTCCX; /**< used for storing the global x-variables of all hits accepted by the tcc, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosTCCY; /**< used for storing the global y-variables of all hits accepted by the tcc, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosTCCZ; /**< used for storing the global z-variables of all hits accepted by the tcc, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosTCCR; /**< used for storing the global r-variables of all hits accepted by the tcc, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosFTCX; /**< used for storing the global x-variables of all hits accepted as final tcs, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosFTCY; /**< used for storing the global y-variables of all hits accepted as final tcs, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosFTCZ; /**< used for storing the global z-variables of all hits accepted as final tcs, filled to root once per event */
+    std::vector<double> m_rootAllGoodHitPosFTCR; /**< used for storing the global r-variables of all hits accepted as final tcs, filled to root once per event */
+
     int m_rootNdf; /**< used for storing numbers of degrees of freedom in a root file */
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */

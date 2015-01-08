@@ -1390,7 +1390,7 @@ void TFRedesignModule::hopfield(TCsOfEvent& tcVector, double omega)
     int hctr = 0;
     for (VXDTFHit * hit : tempHits) {
       if (hit->getDetectorType() == Const::IR) {
-        B2ERROR("Even more illegal result: hit " << hctr << " is attached to interaction point! Perp/secID " << hit->getHitCoordinates()->Perp() << "/" << hit->getSectorString())
+        B2ERROR("Even more illegal result: hit " << hctr << " is attached to interaction point! Perp/secID " << hit->Perp() << "/" << hit->getSectorString())
       } else if (hit->getDetectorType() == Const::PXD) {
         B2WARNING("hit " << hctr << " is a PXD-hit with clusterIndexUV: " << hit->getClusterIndexUV())
       } else if (hit->getDetectorType() == Const::TEST) {
@@ -4268,6 +4268,92 @@ void TFRedesignModule::checkAndSetupModuleParameters()
     m_treeEventWisePtr = new TTree("m_treeEventWisePtr", "anEventWiseTree");
     m_treeEventWisePtr->Branch("duration", &m_rootTimeConsumption);
 
+    string goodHits = "goodHitsFoundAt";
+    string sf = "segFinder";
+    string sm = "secMap";
+    string nf = "nbFinder";
+    string tcc = "tcCollector";
+    string ftc = "finalTC";
+    string x = "GlobalPos_X";
+    string y = "GlobalPos_Y";
+    string z = "GlobalPos_Z";
+    string r = "GlobalPos_R";
+
+    for (unsigned index = 0; index < 6 ; ++index) {
+      string layerID = std::to_string(index + 1);
+      m_rootGoodHitPosSMX.at(index) = {};
+      m_rootGoodHitPosSMY.at(index) = {};
+      m_rootGoodHitPosSMZ.at(index) = {};
+      m_rootGoodHitPosSMR.at(index) = {};
+      m_rootGoodHitPosSFX.at(index) = {};
+      m_rootGoodHitPosSFY.at(index) = {};
+      m_rootGoodHitPosSFZ.at(index) = {};
+      m_rootGoodHitPosSFR.at(index) = {};
+      m_rootGoodHitPosNFX.at(index) = {};
+      m_rootGoodHitPosNFY.at(index) = {};
+      m_rootGoodHitPosNFZ.at(index) = {};
+      m_rootGoodHitPosNFR.at(index) = {};
+      m_rootGoodHitPosTCCX.at(index) = {};
+      m_rootGoodHitPosTCCY.at(index) = {};
+      m_rootGoodHitPosTCCZ.at(index) = {};
+      m_rootGoodHitPosTCCR.at(index) = {};
+      m_rootGoodHitPosFTCX.at(index) = {};
+      m_rootGoodHitPosFTCY.at(index) = {};
+      m_rootGoodHitPosFTCZ.at(index) = {};
+      m_rootGoodHitPosFTCR.at(index) = {};
+
+      m_treeEventWisePtr->Branch((goodHits + sm + x + layerID).c_str(), &m_rootGoodHitPosSMX[index]);
+      m_treeEventWisePtr->Branch((goodHits + sm + y + layerID).c_str(), &m_rootGoodHitPosSMY[index]);
+      m_treeEventWisePtr->Branch((goodHits + sm + z + layerID).c_str(), &m_rootGoodHitPosSMZ[index]);
+      m_treeEventWisePtr->Branch((goodHits + sm + r + layerID).c_str(), &m_rootGoodHitPosSMR[index]);
+
+      m_treeEventWisePtr->Branch((goodHits + sf + x + layerID).c_str(), &m_rootGoodHitPosSFX[index]);
+      m_treeEventWisePtr->Branch((goodHits + sf + y + layerID).c_str(), &m_rootGoodHitPosSFY[index]);
+      m_treeEventWisePtr->Branch((goodHits + sf + z + layerID).c_str(), &m_rootGoodHitPosSFZ[index]);
+      m_treeEventWisePtr->Branch((goodHits + sf + r + layerID).c_str(), &m_rootGoodHitPosSFR[index]);
+
+      m_treeEventWisePtr->Branch((goodHits + nf + x + layerID).c_str(), &m_rootGoodHitPosNFX[index]);
+      m_treeEventWisePtr->Branch((goodHits + nf + y + layerID).c_str(), &m_rootGoodHitPosNFY[index]);
+      m_treeEventWisePtr->Branch((goodHits + nf + z + layerID).c_str(), &m_rootGoodHitPosNFZ[index]);
+      m_treeEventWisePtr->Branch((goodHits + nf + r + layerID).c_str(), &m_rootGoodHitPosNFR[index]);
+
+      m_treeEventWisePtr->Branch((goodHits + tcc + x + layerID).c_str(), &m_rootGoodHitPosTCCX[index]);
+      m_treeEventWisePtr->Branch((goodHits + tcc + y + layerID).c_str(), &m_rootGoodHitPosTCCY[index]);
+      m_treeEventWisePtr->Branch((goodHits + tcc + z + layerID).c_str(), &m_rootGoodHitPosTCCZ[index]);
+      m_treeEventWisePtr->Branch((goodHits + tcc + r + layerID).c_str(), &m_rootGoodHitPosTCCR[index]);
+
+      m_treeEventWisePtr->Branch((goodHits + ftc + x + layerID).c_str(), &m_rootGoodHitPosFTCX[index]);
+      m_treeEventWisePtr->Branch((goodHits + ftc + y + layerID).c_str(), &m_rootGoodHitPosFTCY[index]);
+      m_treeEventWisePtr->Branch((goodHits + ftc + z + layerID).c_str(), &m_rootGoodHitPosFTCZ[index]);
+      m_treeEventWisePtr->Branch((goodHits + ftc + r + layerID).c_str(), &m_rootGoodHitPosFTCR[index]);
+    }
+
+    m_treeEventWisePtr->Branch((goodHits + sm + x).c_str(), &m_rootAllGoodHitPosSMX);
+    m_treeEventWisePtr->Branch((goodHits + sm + y).c_str(), &m_rootAllGoodHitPosSMY);
+    m_treeEventWisePtr->Branch((goodHits + sm + z).c_str(), &m_rootAllGoodHitPosSMZ);
+    m_treeEventWisePtr->Branch((goodHits + sm + r).c_str(), &m_rootAllGoodHitPosSMR);
+
+    m_treeEventWisePtr->Branch((goodHits + sf + x).c_str(), &m_rootAllGoodHitPosSFX);
+    m_treeEventWisePtr->Branch((goodHits + sf + y).c_str(), &m_rootAllGoodHitPosSFY);
+    m_treeEventWisePtr->Branch((goodHits + sf + z).c_str(), &m_rootAllGoodHitPosSFZ);
+    m_treeEventWisePtr->Branch((goodHits + sf + r).c_str(), &m_rootAllGoodHitPosSFR);
+
+    m_treeEventWisePtr->Branch((goodHits + nf + x).c_str(), &m_rootAllGoodHitPosNFX);
+    m_treeEventWisePtr->Branch((goodHits + nf + y).c_str(), &m_rootAllGoodHitPosNFY);
+    m_treeEventWisePtr->Branch((goodHits + nf + z).c_str(), &m_rootAllGoodHitPosNFZ);
+    m_treeEventWisePtr->Branch((goodHits + nf + r).c_str(), &m_rootAllGoodHitPosNFR);
+
+    m_treeEventWisePtr->Branch((goodHits + tcc + x).c_str(), &m_rootAllGoodHitPosTCCX);
+    m_treeEventWisePtr->Branch((goodHits + tcc + y).c_str(), &m_rootAllGoodHitPosTCCY);
+    m_treeEventWisePtr->Branch((goodHits + tcc + z).c_str(), &m_rootAllGoodHitPosTCCZ);
+    m_treeEventWisePtr->Branch((goodHits + tcc + r).c_str(), &m_rootAllGoodHitPosTCCR);
+
+    m_treeEventWisePtr->Branch((goodHits + ftc + x).c_str(), &m_rootAllGoodHitPosFTCX);
+    m_treeEventWisePtr->Branch((goodHits + ftc + y).c_str(), &m_rootAllGoodHitPosFTCY);
+    m_treeEventWisePtr->Branch((goodHits + ftc + z).c_str(), &m_rootAllGoodHitPosFTCZ);
+    m_treeEventWisePtr->Branch((goodHits + ftc + r).c_str(), &m_rootAllGoodHitPosFTCR);
+
+
     m_treeTrackWisePtr = new TTree("m_treeTrackWisePtr", "aTrackWiseTree");
     m_treeTrackWisePtr->Branch("pValues", &m_rootPvalues);
     m_treeTrackWisePtr->Branch("chi2Values", &m_rootChi2);
@@ -5149,6 +5235,59 @@ bool TFRedesignModule::initializeEvent()
   m_totalSVDClusters += m_evInfoPack.nSVDClusters;
   m_badSectorRangeCtr = 0;
 
+  if (m_PARAMwriteToRoot == true) {
+    for (auto & vector : m_rootGoodHitPosSMX) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosSMY) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosSMZ) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosSMR) { vector.clear(); }
+
+    for (auto & vector : m_rootGoodHitPosSFX) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosSFY) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosSFZ) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosSFR) { vector.clear(); }
+
+    for (auto & vector : m_rootGoodHitPosNFX) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosNFY) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosNFZ) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosNFR) { vector.clear(); }
+
+    for (auto & vector : m_rootGoodHitPosTCCX) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosTCCY) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosTCCZ) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosTCCR) { vector.clear(); }
+
+    for (auto & vector : m_rootGoodHitPosFTCX) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosFTCY) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosFTCZ) { vector.clear(); }
+    for (auto & vector : m_rootGoodHitPosFTCR) { vector.clear(); }
+
+
+    m_rootAllGoodHitPosSMX.clear();
+    m_rootAllGoodHitPosSMY.clear();
+    m_rootAllGoodHitPosSMZ.clear();
+    m_rootAllGoodHitPosSMR.clear();
+
+    m_rootAllGoodHitPosSFX.clear();
+    m_rootAllGoodHitPosSFY.clear();
+    m_rootAllGoodHitPosSFZ.clear();
+    m_rootAllGoodHitPosSFR.clear();
+
+    m_rootAllGoodHitPosNFX.clear();
+    m_rootAllGoodHitPosNFY.clear();
+    m_rootAllGoodHitPosNFZ.clear();
+    m_rootAllGoodHitPosNFR.clear();
+
+    m_rootAllGoodHitPosTCCX.clear();
+    m_rootAllGoodHitPosTCCY.clear();
+    m_rootAllGoodHitPosTCCZ.clear();
+    m_rootAllGoodHitPosTCCR.clear();
+
+    m_rootAllGoodHitPosFTCX.clear();
+    m_rootAllGoodHitPosFTCY.clear();
+    m_rootAllGoodHitPosFTCZ.clear();
+    m_rootAllGoodHitPosFTCR.clear();
+  }
+
   return false;
 }
 
@@ -5158,7 +5297,11 @@ void TFRedesignModule::stopTFevent()
 {
   m_evInfoPack.duration.totalTime += m_evInfoPack.eventTicToc();
 
-  if (m_PARAMwriteToRoot == true) { m_rootTimeConsumption = m_evInfoPack.duration.totalTime.count(); }
+  if (m_PARAMwriteToRoot == true) {
+    m_rootTimeConsumption = m_evInfoPack.duration.totalTime.count();
+
+    m_treeEventWisePtr->Fill();
+  }
 
   m_TESTERtimeConsumption += m_evInfoPack.duration;
 
@@ -5692,8 +5835,24 @@ void TFRedesignModule::preparePass(PassData* currentPass, int passNumber)
     for (const VXDSector * aSector : currentPass->sectorVector) {
       infoStream << FullSecID(aSector->getSecID()) << ": " << aSector->getHits().size() << ",  ";
     }
-    B2DEBUG(10, "Before sf: had following hits in sectors: " << endl << infoStream.str())
+    B2DEBUG(10, "Before sf: have got " << currentPass->hitVector.size() <<  " hits in sectors: " << endl << infoStream.str())
   }
+
+  if (m_PARAMwriteToRoot == true) {
+    for (const VXDTFHit * hit : currentPass->hitVector) {
+      if (hit->getVxdID().getLayerNumber() == 0) {continue; }
+      m_rootGoodHitPosSMX.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->X());
+      m_rootGoodHitPosSMY.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Y());
+      m_rootGoodHitPosSMZ.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Z());
+      m_rootGoodHitPosSMR.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Perp());
+
+      m_rootAllGoodHitPosSMX.push_back(hit->X());
+      m_rootAllGoodHitPosSMY.push_back(hit->Y());
+      m_rootAllGoodHitPosSMZ.push_back(hit->Z());
+      m_rootAllGoodHitPosSMR.push_back(hit->Perp());
+    }
+  }
+
   m_evInfoPack.duration.hitSorting += m_evInfoPack.TicToc();
 }
 
@@ -5738,6 +5897,21 @@ bool TFRedesignModule::doTheSegFinder(PassData* currentPass, int passNumber)
   m_evInfoPack.numHitCombisTotal += (activatedSegments + discardedSegments);
 
   m_evInfoPack.duration.segFinder += m_evInfoPack.TicToc();
+
+  if (m_PARAMwriteToRoot == true) {
+    for (const VXDTFHit * hit : currentPass->hitVector) {
+      if (hit->getNumberOfSegments() < 1 or hit->getVxdID().getLayerNumber() == 0) { continue; }
+      m_rootGoodHitPosSFX.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->X());
+      m_rootGoodHitPosSFY.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Y());
+      m_rootGoodHitPosSFZ.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Z());
+      m_rootGoodHitPosSFR.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Perp());
+
+      m_rootAllGoodHitPosSFX.push_back(hit->X());
+      m_rootAllGoodHitPosSFY.push_back(hit->Y());
+      m_rootAllGoodHitPosSFZ.push_back(hit->Z());
+      m_rootAllGoodHitPosSFR.push_back(hit->Perp());
+    }
+  }
 
   if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
     B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of activated segments: " << activatedSegments << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations.")
@@ -5802,6 +5976,27 @@ bool TFRedesignModule::doTheNeighbourFinder(PassData* currentPass, int passNumbe
   m_evInfoPack.nbFinderDiscarded += discardedSegments;
 
   m_evInfoPack.duration.nbFinder += m_evInfoPack.TicToc();
+
+  if (m_PARAMwriteToRoot == true) {
+    for (const VXDTFHit * hit : currentPass->hitVector) {
+      if (hit->getVxdID().getLayerNumber() == 0) {continue; }
+      int cellsAlive = 0;
+      for (int index : hit->getAttachedInnerCell()) {
+        cellsAlive += currentPass->totalCellVector.at(index)->sizeOfOuterNeighbours();
+        cellsAlive += currentPass->totalCellVector.at(index)->sizeOfInnerNeighbours();
+      }
+      if (cellsAlive < 1) { continue; }
+      m_rootGoodHitPosNFX.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->X());
+      m_rootGoodHitPosNFY.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Y());
+      m_rootGoodHitPosNFZ.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Z());
+      m_rootGoodHitPosNFR.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Perp());
+
+      m_rootAllGoodHitPosNFX.push_back(hit->X());
+      m_rootAllGoodHitPosNFY.push_back(hit->Y());
+      m_rootAllGoodHitPosNFZ.push_back(hit->Z());
+      m_rootAllGoodHitPosNFR.push_back(hit->Perp());
+    }
+  }
 
   if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
     B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": after nbFinder, total number of activated segments: " << activatedSegments << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations.")
@@ -5882,6 +6077,24 @@ bool TFRedesignModule::doTheTrackCandidateCollector(PassData* currentPass, int p
   m_evInfoPack.numTCsAfterTCC += survivingTCs;
 
   m_evInfoPack.duration.tcc += m_evInfoPack.TicToc();
+
+  if (m_PARAMwriteToRoot == true) {
+    for (VXDTFTrackCandidate * tc : currentPass->tcVector) {
+
+      for (const VXDTFHit * hit : tc->getHits()) {
+        if (hit->getVxdID().getLayerNumber() == 0) {continue; }
+        m_rootGoodHitPosTCCX.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->X());
+        m_rootGoodHitPosTCCY.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Y());
+        m_rootGoodHitPosTCCZ.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Z());
+        m_rootGoodHitPosTCCR.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Perp());
+
+        m_rootAllGoodHitPosTCCX.push_back(hit->X());
+        m_rootAllGoodHitPosTCCY.push_back(hit->Y());
+        m_rootAllGoodHitPosTCCZ.push_back(hit->Z());
+        m_rootAllGoodHitPosTCCR.push_back(hit->Perp());
+      }
+    }
+  }
 
   if (m_evInfoPack.numTCsAfterTCC > m_PARAMkillEventForHighOccupancyThreshold / 3) {
     B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of tcs after tcc: " << m_evInfoPack.numTCsAfterTCC << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << m_evInfoPack.nbFinderActivated)
@@ -6353,6 +6566,25 @@ void TFRedesignModule::doTheGFTrackCandGeneration()
     }
   }
 
+  if (m_PARAMwriteToRoot == true) {
+    for (VXDTFTrackCandidate * tc : m_tcVector) {
+      if (tc->getCondition() == false) { continue; }
+
+      for (const VXDTFHit * hit : tc->getHits()) {
+        if (hit->getVxdID().getLayerNumber() == 0) {continue; }
+        m_rootGoodHitPosFTCX.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->X());
+        m_rootGoodHitPosFTCY.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Y());
+        m_rootGoodHitPosFTCZ.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Z());
+        m_rootGoodHitPosFTCR.at(hit->getVxdID().getLayerNumber() - 1).push_back(hit->Perp());
+
+        m_rootAllGoodHitPosFTCX.push_back(hit->X());
+        m_rootAllGoodHitPosFTCY.push_back(hit->Y());
+        m_rootAllGoodHitPosFTCZ.push_back(hit->Z());
+        m_rootAllGoodHitPosFTCR.push_back(hit->Perp());
+      }
+    }
+  }
+
   m_TESTERcountTotalTCsFinal += nFinalTCs;
   m_evInfoPack.numTCsfinal += nFinalTCs;
 
@@ -6396,8 +6628,6 @@ void TFRedesignModule::finalEventCleanup()
   for (PassData * currentPass : m_passSetupVector) {
     cleanEvent(currentPass);
   }
-
-  if (m_PARAMwriteToRoot == true) { m_treeEventWisePtr->Fill(); }
 
   m_evInfoPack.duration.intermediateStuff += m_evInfoPack.TicToc();
   stopTFevent();

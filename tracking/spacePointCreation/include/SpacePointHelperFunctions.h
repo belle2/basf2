@@ -21,6 +21,8 @@
 
 #include <unordered_map>
 
+#include <type_traits>
+
 
 namespace Belle2 {
 

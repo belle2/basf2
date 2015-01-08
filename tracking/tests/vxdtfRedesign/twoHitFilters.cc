@@ -262,9 +262,9 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, SpacePointCreation)
   {
     SpacePoint testSP = provideSpacePointDummy(1.2, 2.3, 4.2);
-    EXPECT_EQ(1.2, testSP.getPosition().X()) ;
-    EXPECT_EQ(2.3, testSP.getPosition().Y()) ;
-    EXPECT_EQ(4.2, testSP.getPosition().Z()) ;
+    EXPECT_FLOAT_EQ(1.2, testSP.getPosition().X()) ;
+    EXPECT_FLOAT_EQ(2.3, testSP.getPosition().Y()) ;
+    EXPECT_FLOAT_EQ(4.2, testSP.getPosition().Z()) ;
 
   }
 

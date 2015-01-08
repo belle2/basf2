@@ -11,6 +11,33 @@ numEvents = 200
 initialValue = 1
 
 usePXD = True
+useEvtGen = False
+usePGun = True
+
+# flags for the pGun
+numTracks = 5
+# transverseMomentum:
+momentumMin = 0.5  # GeV/c
+momentumMax = 0.5  # %
+# theta: starting angle of particle direction in r-z-plane
+thetaMin = 15.0  # degrees
+thetaMax = 152.  # degrees
+# phi: starting angle of particle direction in x-y-plane (r-phi-plane)
+phiMin = 0.  # degrees
+phiMax = 360.  # degrees
+
+if len(argv) > 1:
+    numEvents = int(argv[1])
+    print '1st argument given, new value for numEvents: ' + str(numEvents)
+if len(argv) > 2:
+    thetaMin = int(argv[2])
+    print '2nd argument given, new value for thetaMin: ' + str(thetaMin)
+if len(argv) > 3:
+    thetaMax = int(argv[3])
+    print '3rd argument given, new value for thetaMax: ' + str(thetaMax)
+if len(argv) > 4:
+    numTracks = int(argv[4])
+    print '4th argument given, new value for numTracks: ' + str(numTracks)
 
 tuneValue = 0.06
 #### old geometry for SVD:
@@ -56,8 +83,27 @@ pxdDigitizer = register_module('PXDDigitizer')
 svdDigitizer = register_module('SVDDigitizer')
 pxdClusterizer = register_module('PXDClusterizer')
 svdClusterizer = register_module('SVDClusterizer')
+
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.WARNING
+
+particlegun = register_module('ParticleGun')
+param_pGun = {  # 13: muons, 211: charged pions
+                # fixed, uniform, normal, polyline, uniformPt, normalPt, inversePt, polylinePt or discrete
+    'pdgCodes': [13, -13],
+    'nTracks': numTracks,
+    'momentumGeneration': 'uniformPt',
+    'momentumParams': [momentumMin, momentumMax],
+    'thetaGeneration': 'uniform',
+    'thetaParams': [thetaMin, thetaMax],
+    'phiGeneration': 'uniform',
+    'phiParams': [phiMin, phiMax],
+    'vertexGeneration': 'uniform',
+    'xVertexParams': [-0.01, 0.01],
+    'yVertexParams': [-0.01, 0.01],
+    'zVertexParams': [-0.5, 0.5],
+    }
+particlegun.param(param_pGun)
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
@@ -69,9 +115,15 @@ g4sim.param('StoreAllSecondaries', True)
 vxdtf = register_module('TFRedesign')
 vxdtf.logging.log_level = LogLevel.DEBUG
 vxdtf.logging.debug_level = 1
-param_vxdtf = {'sectorSetup': secSetup,
-               'GFTrackCandidatesColName': 'caTracks',
-               'tuneCutoffs': tuneValue}
+param_vxdtf = {
+    'sectorSetup': secSetup,
+    'GFTrackCandidatesColName': 'caTracks',
+    'writeToRoot': True,
+    'activateSlopeRZ': False,
+    'activateDistanceXY': False,
+    'activateDistance3D': False,
+    'tuneCutoffs': tuneValue,
+    }
 # , 'calcQIType': 'kalman'
 vxdtf.param(param_vxdtf)
 
@@ -123,7 +175,14 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(evtgeninput)
+if useEvtGen:
+  ##following modules only for evtGen:
+    main.add_module(evtgeninput)
+    if usePGun:
+        main.add_module(particlegun)
+else:
+  ## following modules only for pGun:
+    main.add_module(particlegun)
 main.add_module(g4sim)
 main.add_module(pxdDigitizer)
 main.add_module(pxdClusterizer)

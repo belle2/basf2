@@ -38,8 +38,8 @@ namespace Belle2 {
 
   public:
     /** this is a small helper function to create a sensorInfo to be used */
-    VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, double width = 1., double length = 1., double width2 = -1.) {
-      // (SensorType type, VxdID id, double width, double length, double thickness, int uCells, int vCells, double width2=-1, double splitLength=-1, int vCells2=0)
+    VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, float width = 1., float length = 1., float width2 = -1.) {
+      // (SensorType type, VxdID id, float width, float length, float thickness, int uCells, int vCells, float width2=-1, double splitLength=-1, int vCells2=0)
       VXD::SensorInfoBase sensorInfoBase(VXD::SensorInfoBase::PXD, aVxdID, width, length, 0.3, 2, 4, width2);
 
       TGeoRotation r1;
@@ -103,7 +103,7 @@ namespace Belle2 {
    */
   TEST_F(SpacePointTest, testConstructorSVD)
   {
-    VxdID aVxdID = VxdID(3, 3, 3), anotherVxdID = VxdID(1, 1, 1);
+    VxdID::baseType aVxdID = VxdID(3, 3, 3), anotherVxdID = VxdID(1, 1, 1);
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
     VXD::SensorInfoBase anotherSensorInfoBase = createSensorInfo(anotherVxdID, 2.3, 4.2);
 
@@ -155,11 +155,11 @@ namespace Belle2 {
     for (int i = 0; i < 3; i++) { globalErrorFor2D[i] = sqrt(abs(globalizedVariancesFor2D[i])); }
 
     // vxdID:
-    EXPECT_DOUBLE_EQ(aVxdID, testPoint2D.getVxdID());
+    EXPECT_EQ(aVxdID, testPoint2D.getVxdID());
     // global position:
-    EXPECT_DOUBLE_EQ(aPositionFor2D.X(), testPoint2D.getPosition().X());
-    EXPECT_DOUBLE_EQ(aPositionFor2D.Y(), testPoint2D.getPosition().Y());
-    EXPECT_DOUBLE_EQ(aPositionFor2D.Z(), testPoint2D.getPosition().Z());
+    EXPECT_FLOAT_EQ(aPositionFor2D.X(), testPoint2D.getPosition().X());
+    EXPECT_FLOAT_EQ(aPositionFor2D.Y(), testPoint2D.getPosition().Y());
+    EXPECT_FLOAT_EQ(aPositionFor2D.Z(), testPoint2D.getPosition().Z());
     //global error:
     EXPECT_FLOAT_EQ(globalErrorFor2D.X(), testPoint2D.getPositionError().X());
     EXPECT_FLOAT_EQ(globalErrorFor2D.Y(), testPoint2D.getPositionError().Y());
@@ -183,11 +183,11 @@ namespace Belle2 {
 
 
     // vxdID:
-    EXPECT_DOUBLE_EQ(anotherVxdID, testPoint1D.getVxdID());
+    EXPECT_EQ(anotherVxdID, testPoint1D.getVxdID());
     // global position:
-    EXPECT_DOUBLE_EQ(aPositionFor1D.X(), testPoint1D.getPosition().X());
-    EXPECT_DOUBLE_EQ(aPositionFor1D.Y(), testPoint1D.getPosition().Y());
-    EXPECT_DOUBLE_EQ(aPositionFor1D.Z(), testPoint1D.getPosition().Z());
+    EXPECT_FLOAT_EQ(aPositionFor1D.X(), testPoint1D.getPosition().X());
+    EXPECT_FLOAT_EQ(aPositionFor1D.Y(), testPoint1D.getPosition().Y());
+    EXPECT_FLOAT_EQ(aPositionFor1D.Z(), testPoint1D.getPosition().Z());
     //global error:
     EXPECT_FLOAT_EQ(globalErrorFor1D.X(), testPoint1D.getPositionError().X());
     EXPECT_FLOAT_EQ(globalErrorFor1D.Y(), testPoint1D.getPositionError().Y());
@@ -375,46 +375,46 @@ namespace Belle2 {
     VxdID aVxdID = VxdID(1, 1, 1);
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
 
-    pair<double, double> sensorCenter = {1.15, 2.1};
+    pair<float, float> sensorCenter = {1.15, 2.1};
 
-    pair<double, double> hitLocal05 = {0, 0}; // sensorCenter is at 0, 0 in local coordinates
-    pair<double, double> resultNormalized05 = {0.5, 0.5};
+    pair<float, float> hitLocal05 = {0, 0}; // sensorCenter is at 0, 0 in local coordinates
+    pair<float, float> resultNormalized05 = {0.5, 0.5};
 
-    pair<double, double> hitLocal001 = {0.023, 0.042};
+    pair<float, float> hitLocal001 = {0.023, 0.042};
     hitLocal001.first -= sensorCenter.first;
     hitLocal001.second -= sensorCenter.second;
-    pair<double, double> resultNormalized001 = {0.01, 0.01};
+    pair<float, float> resultNormalized001 = {0.01, 0.01};
 
-    pair<double, double> hitLocal088 = {2.024, 3.696};
+    pair<float, float> hitLocal088 = {2.024, 3.696};
     hitLocal088.first -= sensorCenter.first;
     hitLocal088.second -= sensorCenter.second;
-    pair<double, double> resultNormalized088 = {0.88, 0.88};
+    pair<float, float> resultNormalized088 = {0.88, 0.88};
 
-    pair<double, double> hitLocal001088 = {0.023, 3.696};// asymmetric example verifying that values are not accidentally switched
+    pair<float, float> hitLocal001088 = {0.023, 3.696};// asymmetric example verifying that values are not accidentally switched
     hitLocal001088.first -= sensorCenter.first;
     hitLocal001088.second -= sensorCenter.second;
-    pair<double, double> resultNormalized001088 = {0.01, 0.88};
+    pair<float, float> resultNormalized001088 = {0.01, 0.88};
 
-    pair<double, double> hitLocalMinMax = { -1.16, 500}; // hit lies way beyond sensor edges (first is below lower threshold, second above higher one)
-    pair<double, double> resultNormalizedMinMax = {0., 1.};
+    pair<float, float> hitLocalMinMax = { -1.16, 500}; // hit lies way beyond sensor edges (first is below lower threshold, second above higher one)
+    pair<float, float> resultNormalizedMinMax = {0., 1.};
 
-    pair<double, double> hitNormalized05 = SpacePoint::convertLocalToNormalizedCoordinates(hitLocal05, aVxdID, &sensorInfoBase);
+    pair<float, float> hitNormalized05 = SpacePoint::convertLocalToNormalizedCoordinates(hitLocal05, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultNormalized05.first, hitNormalized05.first);
     EXPECT_FLOAT_EQ(resultNormalized05.second, hitNormalized05.second);
 
-    pair<double, double> hitNormalized001 = SpacePoint::convertLocalToNormalizedCoordinates(hitLocal001, aVxdID, &sensorInfoBase);
+    pair<float, float> hitNormalized001 = SpacePoint::convertLocalToNormalizedCoordinates(hitLocal001, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultNormalized001.first, hitNormalized001.first);
-    EXPECT_FLOAT_EQ(resultNormalized001.second, hitNormalized001.second);
+    EXPECT_NEAR(resultNormalized001.second, hitNormalized001.second, 1. / 100000.); // resolution of better than 1 nm.
 
-    pair<double, double> hitNormalized088 = SpacePoint::convertLocalToNormalizedCoordinates(hitLocal088, aVxdID, &sensorInfoBase);
+    pair<float, float> hitNormalized088 = SpacePoint::convertLocalToNormalizedCoordinates(hitLocal088, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultNormalized088.first, hitNormalized088.first);
     EXPECT_FLOAT_EQ(resultNormalized088.second, hitNormalized088.second);
 
-    pair<double, double> hitNormalized001088 = SpacePoint::convertLocalToNormalizedCoordinates(hitLocal001088, aVxdID, &sensorInfoBase);
+    pair<float, float> hitNormalized001088 = SpacePoint::convertLocalToNormalizedCoordinates(hitLocal001088, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultNormalized001088.first, hitNormalized001088.first);
     EXPECT_FLOAT_EQ(resultNormalized001088.second, hitNormalized001088.second);
 
-    pair<double, double> hitNormalizedMinMax = SpacePoint::convertLocalToNormalizedCoordinates(hitLocalMinMax, aVxdID, &sensorInfoBase);
+    pair<float, float> hitNormalizedMinMax = SpacePoint::convertLocalToNormalizedCoordinates(hitLocalMinMax, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultNormalizedMinMax.first, hitNormalizedMinMax.first);
     EXPECT_FLOAT_EQ(resultNormalizedMinMax.second, hitNormalizedMinMax.second);
   }
@@ -430,50 +430,50 @@ namespace Belle2 {
     VxdID aVxdID = VxdID(1, 1, 1);
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
 
-    pair<double, double> sensorCenter = {1.15, 2.1};
+    pair<float, float> sensorCenter = {1.15, 2.1};
 
-    pair<double, double> hitNormalized05 = {0.5, 0.5};
-    pair<double, double> resultLocal05 = {0, 0}; // sensorCenter is at 0, 0 in local coordinates
+    pair<float, float> hitNormalized05 = {0.5, 0.5};
+    pair<float, float> resultLocal05 = {0, 0}; // sensorCenter is at 0, 0 in local coordinates
 
-    pair<double, double> hitNormalized001 = {0.01, 0.01};
-    pair<double, double> resultLocal001 = {0.023, 0.042};
+    pair<float, float> hitNormalized001 = {0.01, 0.01};
+    pair<float, float> resultLocal001 = {0.023, 0.042};
     resultLocal001.first -= sensorCenter.first;
     resultLocal001.second -= sensorCenter.second;
 
-    pair<double, double> hitNormalized088 = {0.88, 0.88};
-    pair<double, double> resultLocal088 = {2.024, 3.696};
+    pair<float, float> hitNormalized088 = {0.88, 0.88};
+    pair<float, float> resultLocal088 = {2.024, 3.696};
     resultLocal088.first -= sensorCenter.first;
     resultLocal088.second -= sensorCenter.second;
 
-    pair<double, double> hitNormalized001088 = {0.01, 0.88};
-    pair<double, double> resultLocal001088 = {0.023, 3.696};// asymmetric example verifying that values are not accidentally switched
+    pair<float, float> hitNormalized001088 = {0.01, 0.88};
+    pair<float, float> resultLocal001088 = {0.023, 3.696};// asymmetric example verifying that values are not accidentally switched
     resultLocal001088.first -= sensorCenter.first;
     resultLocal001088.second -= sensorCenter.second;
 
-    pair<double, double> hitNormalizedMinMax = { -0.1, 4.2}; // hit lies way beyond sensor edges (first is below lower threshold, second above higher one)
-    pair<double, double> resultLocalMinMax = { -1.15, 2.1}; // reduced to sensor borders
+    pair<float, float> hitNormalizedMinMax = { -0.1, 4.2}; // hit lies way beyond sensor edges (first is below lower threshold, second above higher one)
+    pair<float, float> resultLocalMinMax = { -1.15, 2.1}; // reduced to sensor borders
 
-    pair<double, double> hitLocal05 = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalized05, aVxdID, &sensorInfoBase);
+    pair<float, float> hitLocal05 = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalized05, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultLocal05.first, hitLocal05.first);
     EXPECT_FLOAT_EQ(resultLocal05.second, hitLocal05.second);
 
-    pair<double, double> hitLocal001 = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalized001, aVxdID, &sensorInfoBase);
+    pair<float, float> hitLocal001 = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalized001, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultLocal001.first, hitLocal001.first);
     EXPECT_FLOAT_EQ(resultLocal001.second, hitLocal001.second);
 
-    pair<double, double> hitLocal088 = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalized088, aVxdID, &sensorInfoBase);
+    pair<float, float> hitLocal088 = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalized088, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultLocal088.first, hitLocal088.first);
     EXPECT_FLOAT_EQ(resultLocal088.second, hitLocal088.second);
 
-    pair<double, double> hitLocal001088 = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalized001088, aVxdID, &sensorInfoBase);
+    pair<float, float> hitLocal001088 = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalized001088, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultLocal001088.first, hitLocal001088.first);
     EXPECT_FLOAT_EQ(resultLocal001088.second, hitLocal001088.second);
 
-    pair<double, double> hitLocalMinMax = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalizedMinMax, aVxdID, &sensorInfoBase);
+    pair<float, float> hitLocalMinMax = SpacePoint::convertNormalizedToLocalCoordinates(hitNormalizedMinMax, aVxdID, &sensorInfoBase);
     EXPECT_FLOAT_EQ(resultLocalMinMax.first, hitLocalMinMax.first);
     EXPECT_FLOAT_EQ(resultLocalMinMax.second, hitLocalMinMax.second);
   }
-//     static pair<double, double> convertToLocalCoordinates(const pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+//     static pair<float, float> convertToLocalCoordinates(const pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -486,12 +486,12 @@ namespace Belle2 {
   }
   /** converts a local hit on a given sensor into global coordinates.
    *
-   * first parameter is the local hit stored as a pair of doubles.
+   * first parameter is the local hit stored as a pair of floats.
    * second parameter is the coded vxdID, which carries the sensorID.
    * third parameter, a sensorInfo can be passed for testing purposes.
    *  If no sensorInfo is passed, the member gets its own pointer to it.
    */
-//     static TVector3 getGlobalCoordinates(const pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+//     static TVector3 getGlobalCoordinates(const pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -509,7 +509,7 @@ namespace Belle2 {
   * third parameter, a sensorInfo can be passed for testing purposes.
   *  If no sensorInfo is passed, the member gets its own pointer to it.
   */
-//     static pair<double, double> convertToLocalCoordinatesNormalized(const pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+//     static pair<float, float> convertToLocalCoordinatesNormalized(const pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 

@@ -26,11 +26,12 @@ PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
 import ROOT
 
-import pdg
-
 import actorFramework
 from basf2 import *
 from actorFunctions import *
+
+# should come after basf2 import
+import pdg
 
 import collections
 import argparse

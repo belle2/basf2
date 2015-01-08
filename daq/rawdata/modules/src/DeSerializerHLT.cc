@@ -171,13 +171,13 @@ void DeSerializerHLTModule::event()
             rawecl = raw_eclarray.appendNew();
             rawecl->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
-          case BPID_ID :
-            RawBPID* rawbpid;
+          case TOP_ID :
+            RawTOP* rawbpid;
             rawbpid = raw_bpidarray.appendNew();
             rawbpid->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
-          case EPID_ID :
-            RawEPID* rawepid;
+          case ARICH_ID :
+            RawARICH* rawepid;
             rawepid = raw_epidarray.appendNew();
             rawepid->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;

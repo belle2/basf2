@@ -250,18 +250,18 @@ void PrintDataTemplateModule::event()
     printPXDEvent(raw_pxdarray[ i ]);
   }
 
-  StoreArray<RawBPID> raw_bpidarray;
+  StoreArray<RawTOP> raw_bpidarray;
   for (int i = 0; i < raw_bpidarray.getEntries(); i++) {
     for (int j = 0; j < raw_bpidarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawBPID) : Block # %d ", i);
+      printf("\n===== DataBlock(RawTOP) : Block # %d ", i);
       printCOPPEREvent(raw_bpidarray[ i ], j);
     }
   }
 
-  StoreArray<RawEPID> raw_epidarray;
+  StoreArray<RawARICH> raw_epidarray;
   for (int i = 0; i < raw_epidarray.getEntries(); i++) {
     for (int j = 0; j < raw_epidarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawEPID) : Block # %d ", i);
+      printf("\n===== DataBlock(RawARICH) : Block # %d ", i);
       printCOPPEREvent(raw_epidarray[ i ], j);
     }
   }

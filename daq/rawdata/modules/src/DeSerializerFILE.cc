@@ -80,8 +80,8 @@ void DeSerializerFILEModule::initialize()
   StoreArray<RawCOPPER>::registerPersistent();
   StoreArray<RawSVD>::registerPersistent();
   StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawBPID>::registerPersistent();
-  StoreArray<RawEPID>::registerPersistent();
+  StoreArray<RawTOP>::registerPersistent();
+  StoreArray<RawARICH>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
 
@@ -337,11 +337,11 @@ void DeSerializerFILEModule::event()
       //       } else if (subsysid == ECL_ID) {
       //  StoreArray<RawECL> ary;
       //  (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
-      //       } else if (subsysid == BPID_ID) {
-      //  StoreArray<RawBPID> ary;
+      //       } else if (subsysid == TOP_ID) {
+      //  StoreArray<RawTOP> ary;
       //  (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
-      //       } else if (subsysid == EPID_ID) {
-      //  StoreArray<RawEPID> ary;
+      //       } else if (subsysid == ARICH_ID) {
+      //  StoreArray<RawARICH> ary;
       //  (ary.appendNew())->SetBuffer(temp_buf, size_word, 1, 1, 1);
       //       } else if (subsysid == KLM_ID) {
       //  StoreArray<RawKLM> ary;

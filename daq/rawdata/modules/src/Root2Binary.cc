@@ -127,8 +127,8 @@ void Root2BinaryModule::event()
   StoreArray<RawCOPPER> raw_copperarray;
   StoreArray<RawSVD> raw_svdarray;
   StoreArray<RawCDC> raw_cdcarray;
-  StoreArray<RawBPID> raw_bpidarray;
-  StoreArray<RawEPID> raw_epidarray;
+  StoreArray<RawTOP> raw_bpidarray;
+  StoreArray<RawARICH> raw_epidarray;
   StoreArray<RawKLM> raw_klmarray;
   StoreArray<RawECL> raw_eclarray;
 

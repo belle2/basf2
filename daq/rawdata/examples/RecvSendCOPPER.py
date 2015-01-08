@@ -42,7 +42,6 @@ reader.param('MaxEventNum', -1)
 
 # reader.param('DumpFileName', 'COPPERdump.dat' )
 
-
 # Monitor module
 monitor = register_module('MonitorDataCOPPER')
 

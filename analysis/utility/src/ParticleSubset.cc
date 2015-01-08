@@ -1,6 +1,45 @@
 #include <analysis/utility/ParticleSubset.h>
 
+#include <analysis/dataobjects/ParticleList.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <unordered_set>
+
 using namespace Belle2;
+
+namespace {
+  void keepParticle(const Particle* p, std::unordered_set<int>* indicesToKeep)
+  {
+    indicesToKeep->insert(p->getArrayIndex());
+    unsigned int n = p->getNDaughters();
+    for (unsigned int i = 0; i < n; i++) {
+      keepParticle(p->getDaughter(i), indicesToKeep);
+    }
+  }
+}
+
+void ParticleSubset::removeParticlesNotInLists(const std::vector<std::string>& listNames)
+{
+  std::unordered_set<int> indicesToKeep;
+  for (auto l : listNames) {
+    StoreObjPtr<ParticleList> list(l);
+    if (!list)
+      continue;
+    //TODO: getParticleCollectionName() might be different for some lists...
+    const int n = list->getListSize();
+    for (int i = 0; i < n; i++) {
+      const Particle* p = list->getParticle(i);
+      keepParticle(p, &indicesToKeep);
+    }
+  }
+
+  //remove everything not in indicesToKeep
+  auto selector = [indicesToKeep](const Particle * p) -> bool {
+    int idx = p->getArrayIndex();
+    return indicesToKeep.count(idx) == 1;
+  };
+  select(selector);
+}
 
 void ParticleSubset::fixParticles(const std::map<int, int>& oldToNewMap)
 {
@@ -38,3 +77,4 @@ void ParticleSubset::fixVector(std::vector<int>& vec, const std::map<int, int>& 
       vec.push_back(it->second);
   }
 }
+

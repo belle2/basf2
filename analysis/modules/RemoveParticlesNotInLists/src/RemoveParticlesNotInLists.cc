@@ -12,10 +12,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <unordered_set>
-#include <algorithm>
-
-
 using namespace std;
 using namespace Belle2;
 
@@ -45,39 +41,12 @@ void RemoveParticlesNotInListsModule::initialize()
   }
 }
 
-void keepParticle(const Particle* p, std::unordered_set<int>* indicesToKeep)
-{
-  indicesToKeep->insert(p->getArrayIndex());
-  unsigned int n = p->getNDaughters();
-  for (unsigned int i = 0; i < n; i++) {
-    keepParticle(p->getDaughter(i), indicesToKeep);
-  }
-}
-
 void RemoveParticlesNotInListsModule::event()
 {
-  std::unordered_set<int> indicesToKeep;
-  for (auto l : m_particleLists) {
-    StoreObjPtr<ParticleList> list(l);
-    if (!list)
-      continue;
-    //TODO: getParticleCollectionName() might be different for some lists...
-    const int n = list->getListSize();
-    for (int i = 0; i < n; i++) {
-      const Particle* p = list->getParticle(i);
-      keepParticle(p, &indicesToKeep);
-    }
-  }
-
   StoreArray<Particle> particles;
   const int nBefore = particles.getEntries();
 
-  //remove everything not in indicesToKeep
-  auto selector = [indicesToKeep](const Particle * p) -> bool {
-    int idx = p->getArrayIndex();
-    return indicesToKeep.count(idx) == 1;
-  };
-  m_subset.select(selector);
+  m_subset.removeParticlesNotInLists(m_particleLists);
 
   const int nAfter = particles.getEntries();
 

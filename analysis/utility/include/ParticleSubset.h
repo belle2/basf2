@@ -2,12 +2,20 @@
 
 #include <framework/datastore/SelectSubset.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 namespace Belle2 {
-  /** Specialised SelectSubset<Particle> that also fixes daughter indices and all ParticleLists. */
+  /** Specialised SelectSubset<Particle> that also fixes daughter indices and all ParticleLists. Relations are already handled in SelectSubset.
+   *
+   * Can be used like SelectSubset via select(), or by calling removeParticlesNotInLists() instead.
+   */
   class ParticleSubset : public SelectSubset<Particle> {
   public:
+    /** Removes all Particles that are not in one of the given ParticleLists (or daughters of Particles in the lists).
+     *
+     * Removal is done immediately, there is no need to call select() afterwards.
+     */
+    void removeParticlesNotInLists(const std::vector<std::string>& listNames);
+
     /** select Particles for which f returns true, discard others */
     void select(std::function<bool (const Particle*)> f) {
       const std::map<int, int>& oldToNewMap = copySetWithRelations(f);
@@ -34,5 +42,6 @@ namespace Belle2 {
 
     /** replace entries in vec via oldToNewMap, removing those not found. */
     void fixVector(std::vector<int>& vec, const std::map<int, int>& oldToNewMap);
+
   };
 }

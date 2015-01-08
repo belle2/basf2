@@ -560,7 +560,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
             finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, "ROC", mcCounts, target))
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
 
-    subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/nordbert.pdf')), shell=True)
+    subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/FEI/templates/nordbert.pdf')), shell=True)
     for i in range(0, 2):
         ret = subprocess.call(['pdflatex', '-halt-on-error', '-interaction=nonstopmode', placeholders['texFile']])
         if ret == 0:

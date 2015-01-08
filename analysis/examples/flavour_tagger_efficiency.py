@@ -13,8 +13,6 @@ import ROOT
 import pdg
 
 import math
-import actorFramework
-import preCutDetermination
 import os
 import re
 import sys

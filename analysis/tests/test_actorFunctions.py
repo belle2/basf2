@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from actorFunctions import *
-from FullEventInterpretation import Particle
+from FEI.actorFunctions import *
+from FEI.FullEventInterpretation import Particle
 
 from basf2 import *
 import unittest

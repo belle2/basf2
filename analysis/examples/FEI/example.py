@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Thomas Keck 2014
 
-from FullEventInterpretation import *
+from FEI.FullEventInterpretation import *
 from basf2 import *
 
 pid_variables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',

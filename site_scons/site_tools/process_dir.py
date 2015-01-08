@@ -301,20 +301,27 @@ def process_dir(
     # restore original environment
     env = save_env
 
-    # check whether we have to create a new test executable
+    # build shared objects from the tests/*.cc files in this directory
     if len(local_test_files) > 0:
-        test_filename = 'test_' + lib_name
-        test_env = env.Clone()
-        test_env['LIBS'] = []
+        local_test_env = env.Clone()
+        local_test_env['LIBS'] = env.Dictionary().get('LOCAL_TEST_LIBS', [])
         sconscript_name = real_path(os.path.join(dir_name, 'tests',
                                     'SConscript'), release_dir)
         if os.path.isfile(sconscript_name):
             result = SConscript(sconscript_name, exports='env')
             if isinstance(result, Environment):
-                test_env = result
-        test_env.Append(LIBS=['gtest', 'pthread'])
-        env.AppendUnique(TEST_LIBS=test_env['LIBS'])
-        env['TEST_FILES'] = test_env.SharedObject(local_test_files)
+                local_test_env = result
+        local_test_env.AppendUnique(LIBS=['gtest', 'pthread'])
+        env['TEST_FILES'] = [test_file for test_file in env['TEST_FILES']
+                             if test_file not in local_test_files]
+        env.Prepend(TEST_FILES=local_test_env.SharedObject(local_test_files))
+        env.AppendUnique(TEST_LIBS=local_test_env['LIBS'])
+
+    # combine all tests from subdirectories to a new test executable
+    if len(env['TEST_FILES']) > 0:
+        test_filename = 'test_' + lib_name
+        test_env = env.Clone()
+        test_env['LIBS'] = env['TEST_LIBS']
         test = test_env.Program(os.path.join(test_env['BINDIR'],
                                 test_filename), env['TEST_FILES'])
         env.Alias(os.path.join(dir_name, 'tests', test_filename), test)

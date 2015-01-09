@@ -14,7 +14,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
+
 #include <string>
+#include <memory>
 
 using namespace std;
 using namespace Belle2;
@@ -77,10 +79,10 @@ void MCDecayFinderModule::event()
   int nMCParticles = mcparticles.getEntries();
   for (int i = 0; i < nMCParticles; i++) {
     for (int iCC = 0; iCC < 2; iCC++) {
-      DecayTree<MCParticle>* decay = match(mcparticles[i], m_decaydescriptor, iCC);
+      std::unique_ptr<DecayTree<MCParticle>> decay(match(mcparticles[i], m_decaydescriptor, iCC));
       if (decay->getObj()) {
         B2INFO("Match!");
-        int iIndex = write(decay);
+        int iIndex = write(decay.get());
         outputList->addParticle(particles[iIndex]);
       }
     }

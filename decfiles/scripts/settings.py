@@ -7,8 +7,8 @@ import os
 logfile = os.path.dirname(os.path.abspath(sys.argv[0])) + '/decparse.log'
 enable_colours = True
 overwrite = True
-dkfilespath = 'dec/'
-obsoletepath = 'doc/'
+dkfilespath = '../dec/'
+obsoletepath = '../doc/'
 partdictpath = os.path.dirname(os.path.abspath(sys.argv[0])) \
     + '/particle_dictionary'
 

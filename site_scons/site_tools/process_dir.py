@@ -336,7 +336,6 @@ def process_dir(
     # build shared objects from the tests/*.cc files in this directory
     if len(local_test_files) > 0:
         local_test_env = env.Clone()
-        local_test_env['LIBS'] = env.Dictionary().get('LOCAL_TEST_LIBS', [])
         sconscript_name = real_path(os.path.join(dir_name, 'tests',
                                     'SConscript'), release_dir)
         if os.path.isfile(sconscript_name):

@@ -86,11 +86,10 @@ class GenericOptionFile(object):
         self.AddInclude(eventtype.ExtraOptions())
 
     def AddEventTypeNumber(self, eventtype):
-        self.AddOptionValue('Generation.EventType',
-                            eventtype.EventTypeNumber())
+        self.AddOptionValue('GenerationEventType', eventtype.EventTypeNumber())
 
     def AddEvtGenUserDecayFile(self, eventtype):
-        self.AddOptionValue('ToolSvc.EvtGenDecay.UserDecayFile',
+        self.AddOptionValue('EvtGenUserDecayFile',
                             '"$DECFILESROOT/dec/{0}.dec"'.format(eventtype.DecayName()))
 
     def AddDecayOptions(self, eventtype):

@@ -55,7 +55,7 @@ namespace Belle2 {
     Variable::Cut::Parameter emptyCut;
     addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
 
-    addParam("decayMode", m_decayModeID, "Usper specified decay mode identifier", 0);
+    addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)", 0);
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);

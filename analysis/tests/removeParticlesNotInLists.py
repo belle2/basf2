@@ -23,11 +23,7 @@ selectParticle('pi+', 'piid > 0.05', path=main)
 
 selectParticle('gamma', '', path=main)
 reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
-
-daughters = ['K-', 'pi+', 'pi0']
-
 reconstructDecay('D0 -> K- pi+ pi0', '1.7 < M < 1.9', 0, path=main)
-
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'removeparticlesnotinlists_full.root')

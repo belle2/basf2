@@ -477,8 +477,8 @@ def writeBkkTable(evttypeid, descriptor, nickname):
     """
 
     global bkk_first, eventid_inbkk
-    TableName = 'doc/table_event.txt'.format(os.environ['DECFILESROOT'])
-
+    TableName = '../doc/table_event.txt'.format(os.environ['DECFILESROOT'])
+    logging.warning(TableName)
     if bkk_first:
         bkk_first = False
         if not os.path.exists(TableName):
@@ -505,7 +505,7 @@ def writeSQLTable(evttypeid, descriptor, nickname):
     """
 
     global sql_first, eventid_insql
-    TableName = 'doc/table_event.sql'.format(os.environ['DECFILESROOT'])
+    TableName = '../doc/table_event.sql'.format(os.environ['DECFILESROOT'])
 
     if sql_first:
         sql_first = False

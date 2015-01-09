@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#######################################################
-# This steering file is an example on how to use
-# EclDataAnalysis module.
+########################################################
+# This steering file shows how to use EclDataAnalysis
+# module to dump ECL related quantities in an ntuple
+# starting from dst root file.
 #
-# 1000 500 MeV-electrons are generated with ParticleGun
-# and reconstructed. ECL-related infos are dumped on
-# a TTree saved in an output file named
-# EclDataAnalysis_electrons_500mev.root .
+# The user should provide input and output root filnames
+# as first and second argument respectively.
 #
 # Example steering file - 2014 Belle II Collaboration
 ########################################################

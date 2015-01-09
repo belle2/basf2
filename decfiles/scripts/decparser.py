@@ -661,13 +661,13 @@ else:
         flag += 4
 
 if not flag == neutrals:
-    fail(['Neutrals flag not compliant. SHould be ' + str(flag)
+    fail(['Neutrals flag not compliant. Should be ' + str(flag)
          + '. Please check.'])
 else:
     done()
 newevtype += str(flag)
 
-query('Checking the extra and user for duplicity and funky stuff.')
+query('Checking the extra and user for duplicity .')
 
 if settings.use_url:
     if not zippednos:
@@ -767,7 +767,9 @@ if not nick[1] == '=' and not cuts == []:
     faillist += \
         ['The = sign not found in the nickname while cuts are present. Check nickname conventions and fix.'
          ]
-    failed = True
+    warning('The = sign not found in the nickname while cuts are present. Check nickname conventions and fix.'
+            )
+    # failed = True
 if 'DaughtersInBelleII' in cuts and not 'DecProdCut' in nick[2].split(','):
     faillist += \
         ['You have decay angular acceptance cut in Cuts but not in the nickname.'

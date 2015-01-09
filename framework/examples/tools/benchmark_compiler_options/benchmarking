@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "This script will build basf2 with different compiler options and run framework/examples/tools/benchmark_compiler_options/scripts/script to check the resulting performance."
 echo "Note that this will edit your SConstruct file. Please make a backup if you have local changes."

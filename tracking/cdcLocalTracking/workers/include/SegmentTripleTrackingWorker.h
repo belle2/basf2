@@ -37,7 +37,7 @@ namespace Belle2 {
 
     public:
       /** Constructor. */
-      SegmentTripleTrackingWorker(): m_cellularPathFinder(0.0) {;}
+      SegmentTripleTrackingWorker(bool copyToDataStoreForDebug = false): m_copyToDataStoreForDebug(copyToDataStoreForDebug), m_cellularPathFinder(0.0) {;}
 
       /** Destructor.*/
       ~SegmentTripleTrackingWorker() {;}
@@ -109,8 +109,10 @@ namespace Belle2 {
           track.fillInto(*ptrTrackCand);
         }
 
-        copyToDataStoreForDebug();
 
+        if (m_copyToDataStoreForDebug) {
+          copyToDataStoreForDebug();
+        }
       }
 
 
@@ -146,8 +148,10 @@ namespace Belle2 {
 
 
     private:
-      // object pools
+      /// Switch to write out the intermediate data objects out to DataStore.
+      bool m_copyToDataStoreForDebug;
 
+      // object pools
       /// Memory for the segment triples
       std::set<CDCSegmentTriple> m_segmentTriples;
 

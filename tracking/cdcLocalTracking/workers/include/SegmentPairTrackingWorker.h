@@ -37,8 +37,7 @@ namespace Belle2 {
 
     public:
       /// Constructor.
-      SegmentPairTrackingWorker(): m_cellularPathFinder(0.0) {;}
-
+      SegmentPairTrackingWorker(bool copyToDataStoreForDebug = false): m_copyToDataStoreForDebug(copyToDataStoreForDebug), m_cellularPathFinder(0.0) {;}
 
 
       /// Destructor.
@@ -117,9 +116,9 @@ namespace Belle2 {
           track.fillInto(*ptrTrackCand);
         }
 
-        copyToDataStoreForDebug();
-
-
+        if (m_copyToDataStoreForDebug) {
+          copyToDataStoreForDebug();
+        }
 
         // Check that tracks are disjoint
         if (not areTracksDisjoint(m_tracks)) {
@@ -193,6 +192,9 @@ namespace Belle2 {
 
 
     private:
+      /// Switch to write out the intermediate data objects out to DataStore.
+      bool m_copyToDataStoreForDebug;
+
       //object pools
       /// Memory for the axial stereo segment pairs.
       std::vector<CDCAxialStereoSegmentPair> m_axialStereoSegmentPairs;
@@ -227,7 +229,6 @@ namespace Belle2 {
 
       /// Instance of the orientation fixer
       TrackOrientator m_trackOrientator;
-
 
     }; // end class SegmentPairTrackingWorker
 

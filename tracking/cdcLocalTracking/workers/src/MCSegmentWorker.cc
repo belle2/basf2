@@ -54,13 +54,13 @@ void MCSegmentWorker::generate(std::vector< CDCRecoSegment2D >& outputSegments, 
         // ^ Save because we reserved the memory beforehand.
       }
 
-
     }
 
   }
 
-
-  copyToDataStoreForDebug();
+  if (m_copyToDataStoreForDebug) {
+    copyToDataStoreForDebug();
+  }
 
   outputSegments.swap(m_segments2D);
 }

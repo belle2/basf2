@@ -9,5 +9,21 @@ env['LIBS'] = [
     'tracking', #'tracking_dataobjects',
     ]
 
+import os
+
+# Forward the compilation option 
+belle2_option = os.environ["BELLE2_OPTION"]
+
+if belle2_option == "debug":
+    cpp_defines = ['CDCLOCALTRACKING_COMPILE_DEBUG',]
+
+elif belle2_option == "opt":
+    cpp_defines = ['CDCLOCALTRACKING_COMPILE_OPT',]
+
+elif belle2_option == "clang":
+    cpp_defines = ['CDCLOCALTRACKING_COMPILE_CLANG',]
+
+env.Append(CPPDEFINES=cpp_defines)
+
 Return('env')
 

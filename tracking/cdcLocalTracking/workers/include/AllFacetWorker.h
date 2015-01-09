@@ -28,7 +28,7 @@ namespace Belle2 {
 
     public:
       /** Constructor. */
-      AllFacetWorker() {;}
+      AllFacetWorker(bool copyToDataStoreForDebug = true) : m_copyToDataStoreForDebug(copyToDataStoreForDebug) {;}
 
       /** Destructor.*/
       ~AllFacetWorker() {;}
@@ -60,6 +60,9 @@ namespace Belle2 {
     private:
       /// Memory for the constructed facets.
       CDCRecoFacetCollection m_recoFacets;
+
+      /// Switch to write out the intermediate data objects out to DataStore.
+      bool m_copyToDataStoreForDebug;
 
       /// ROOT Macro to make AllFacetWorker a ROOT class.
       CDCLOCALTRACKING_SwitchableClassDef(AllFacetWorker, 1);

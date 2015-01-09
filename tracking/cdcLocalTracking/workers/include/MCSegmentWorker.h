@@ -28,7 +28,7 @@ namespace Belle2 {
 
     public:
       /** Constructor. */
-      MCSegmentWorker() {;}
+      MCSegmentWorker(bool copyToDataStoreForDebug = true) : m_copyToDataStoreForDebug(copyToDataStoreForDebug) {;}
 
       /** Destructor.*/
       ~MCSegmentWorker() {;}
@@ -62,6 +62,9 @@ namespace Belle2 {
 
       /// Memory for the segments extracted from the paths
       std::vector<Belle2::CDCLocalTracking::CDCRecoSegment2D> m_segments2D;
+
+      /// Switch to write out the intermediate data objects out to DataStore.
+      bool m_copyToDataStoreForDebug;
 
     private:
       /// ROOT Macro to make MCSegmentWorker a ROOT class.

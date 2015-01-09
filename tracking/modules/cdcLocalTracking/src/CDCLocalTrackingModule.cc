@@ -43,7 +43,7 @@ using namespace CDCLocalTracking;
 
 REG_MODULE(CDCLocalTracking);
 
-CDCLocalTrackingModule::CDCLocalTrackingModule() : Module()
+CDCLocalTrackingModule::CDCLocalTrackingModule() : Module(),  m_segmentWorker(true), m_segmentTripleTrackingWorker(true), m_segmentPairTrackingWorker(true)
 {
   setDescription("Performs patter recognition in the CDC based on local hit following");
 

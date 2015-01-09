@@ -13,7 +13,7 @@
 #include <tracking/cdcLocalTracking/creators/FacetCreator.h>
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 
-#include <tracking/cdcLocalTracking/filters/CDCFilters.h>
+#include <tracking/cdcLocalTracking/filters/facet/AllFacetFilter.h>
 #include <tracking/cdcLocalTracking/filters/wirehit_wirehit/WireHitNeighborChooser.h>
 
 #include <framework/logging/Logger.h>
@@ -21,9 +21,6 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
-
-
-
 
 
 void AllFacetWorker::generate()
@@ -97,7 +94,10 @@ void AllFacetWorker::generate()
     } // end for cluster
   } // end for superlayer
 
-  copyToDataStoreForDebug();
+
+  if (m_copyToDataStoreForDebug) {
+    copyToDataStoreForDebug();
+  }
 
 }
 

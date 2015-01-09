@@ -36,9 +36,8 @@ namespace Belle2 {
     class FacetSegmentWorker {
 
     public:
-
       /** Constructor. */
-      FacetSegmentWorker(): m_cellularPathFinder(3.0) {;}
+      FacetSegmentWorker(bool copyToDataStoreForDebug = true): m_copyToDataStoreForDebug(copyToDataStoreForDebug), m_cellularPathFinder(3.0) {;}
 
       /** Destructor.*/
       ~FacetSegmentWorker() {;}
@@ -47,9 +46,11 @@ namespace Belle2 {
       void initialize() {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
-        StoreArray < CDCRecoTangentSegment >::registerTransient();
-        StoreArray < CDCRecoSegment2D >::registerTransient();
-        StoreArray < CDCWireHitCluster >::registerTransient();
+        if (m_copyToDataStoreForDebug) {
+          StoreArray < CDCRecoTangentSegment >::registerTransient();
+          StoreArray < CDCRecoSegment2D >::registerTransient();
+          StoreArray < CDCWireHitCluster >::registerTransient();
+        }
 #endif
 
         m_clustersInSuperLayer.reserve(20);
@@ -74,11 +75,8 @@ namespace Belle2 {
 
         m_segments2D.clear();
         outputSegments.clear();
-
-#ifdef CDCLOCALTRACKING_USE_ROOT
         m_clusters.clear();
         m_recoTangentSegments.clear();
-#endif
 
         const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
         const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -120,10 +118,9 @@ namespace Belle2 {
           m_wirehitClusterizer.create(wireHitsInSuperlayer, m_wirehitNeighborhood, m_clustersInSuperLayer);
           B2DEBUG(100, "Created " << m_clustersInSuperLayer.size() << " CDCWireHit clusters in superlayer");
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
-          m_clusters.insert(m_clusters.end(), m_clustersInSuperLayer.begin(), m_clustersInSuperLayer.end());
-#endif
-
+          if (m_copyToDataStoreForDebug) {
+            m_clusters.insert(m_clusters.end(), m_clustersInSuperLayer.begin(), m_clustersInSuperLayer.end());
+          }
 
           for (CDCWireHitCluster & cluster : m_clustersInSuperLayer) {
             //size_t nSegmentsBefore = m_segments2D.size();
@@ -147,12 +144,12 @@ namespace Belle2 {
             m_facetPaths.clear();
             m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetPaths);
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
-            //save the tangents for display only
-            for (std::vector<const CDCRecoFacet*> facetPath : m_facetPaths) {
-              m_recoTangentSegments.push_back(CDCRecoTangentSegment::condense(facetPath));
+            if (m_copyToDataStoreForDebug) {
+              //save the tangents for display only
+              for (std::vector<const CDCRecoFacet*> facetPath : m_facetPaths) {
+                m_recoTangentSegments.push_back(CDCRecoTangentSegment::condense(facetPath));
+              }
             }
-#endif
 
             // reduce the CDCRecoFacetPtrSegment directly to the selected vector
             B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
@@ -189,7 +186,9 @@ namespace Belle2 {
 
         } // end for superlayer
 
-        copyToDataStoreForDebug();
+        if (m_copyToDataStoreForDebug) {
+          copyToDataStoreForDebug();
+        }
 
         outputSegments.swap(m_segments2D);
       }
@@ -229,6 +228,9 @@ namespace Belle2 {
 
 
     private:
+      /// Switch to write out the intermediate data objects out to DataStore.
+      bool m_copyToDataStoreForDebug;
+
       //object pools
       /// Neighborhood type for wire hits
       typedef WeightedNeighborhood<const CDCWireHit> CDCWireHitNeighborhood;
@@ -248,13 +250,11 @@ namespace Belle2 {
       /// Memory for the facet paths generated from the graph.
       std::vector< std::vector<const CDCRecoFacet*> > m_facetPaths;
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
       /// Memory for the tangent segments extracted from the paths
       std::vector< CDCRecoTangentSegment > m_recoTangentSegments;
 
       /// Memory for the hit clusters
       std::vector<CDCWireHitCluster> m_clusters;
-#endif
 
       /// Memory for the segments extracted from the paths
       std::vector<CDCRecoSegment2D> m_segments2D;
@@ -276,7 +276,6 @@ namespace Belle2 {
       //cellular automaton
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
-
 
     }; // end class FacetSegmentWorker
   } //end namespace CDCLocalTracking

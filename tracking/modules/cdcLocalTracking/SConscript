@@ -7,6 +7,7 @@ env['LIBS'] = [
     'cdc', 'cdc_dataobjects',
     'genfit2',
     'tracking', #'tracking_dataobjects',
+    'tracking_cdcLocalTracking',
     ]
 
 import os

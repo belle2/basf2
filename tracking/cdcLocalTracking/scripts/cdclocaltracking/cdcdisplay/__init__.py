@@ -52,13 +52,6 @@ class CDCSVGDisplayModule(Module):
         ## Folder the images shall be saved to
         self.output_folder = output_folder
 
-        if not os.path.exists(output_folder):
-            print "CDCSVGDisplay.__init__ : Output folder '", output_folder, \
-                "' does not exist."
-            answer = raw_input('Create it? (y or n)')
-            if answer == 'y':
-                os.makedirs(output_folder)
-
         ## List of drawing options
         # Animate the display by uncovering the drawn objects in order of their time of flight
         # This can be seen in most standard browsers. Note however that you should switch of
@@ -106,6 +99,9 @@ class CDCSVGDisplayModule(Module):
 
         ## Switch to draw the CDCSimHits color coded by their getBackgroundTag() property. Default: inactive
         self.draw_simhit_bkgtag = True and False
+
+        ## Switch to draw the CDCSimHits red for getBackgroundTag() != bg_none. Default: inactive
+        self.draw_simhit_isbkg = True and False
 
         ## Switch to draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle. Default: inactive
         self.draw_connect_tof = True and False
@@ -181,7 +177,43 @@ class CDCSVGDisplayModule(Module):
     @property
     def drawoptions(self):
         """
-        Property that collects the various names of the draw options to a list.
+        Property that collects the various names of the draw options to a list
+        that are not related to the CDC cellular automaton track finder.
+        @return list of strings naming the different switches that can be activated.
+        """
+
+        result = [
+            'animate',
+            'draw_mcparticle_id',
+            'draw_mcparticle_pdgcodes',
+            'draw_mcparticle_primary',
+            'draw_mcsegments',
+            'draw_simhits',
+            'draw_simhit_tof',
+            'draw_simhit_posflag',
+            'draw_simhit_pdgcode',
+            'draw_simhit_bkgtag',
+            'draw_simhit_isbkg',
+            'draw_connect_tof',
+            'draw_rlinfo',
+            'draw_reassigned',
+            'draw_gftrackcands',
+            'draw_gftrackcand_trajectories',
+            ]
+
+        for name in result:
+            if not hasattr(self, name):
+                raise NameError('%s is not a valid draw option. Fix the misspelling.'
+                                 % name)
+
+        return result
+
+    @property
+    def all_drawoptions(self):
+        """
+        Property that collects the all names of the draw options to a list.
+        Note that some draw options only make sense after running the CDC
+        cellular automaton track finder.
         @return list of strings naming the different switches that can be activated.
         """
 
@@ -233,7 +265,13 @@ class CDCSVGDisplayModule(Module):
             print 'dir(Belle2.CDCLocalTracking)', dir(Belle2.CDCLocalTracking)
             print 'dir(genfit)', dir(genfit)
 
-        pass
+        output_folder = self.output_folder
+        if not os.path.exists(output_folder):
+            print "CDCSVGDisplay.__init__ : Output folder '", output_folder, \
+                "' does not exist."
+            answer = raw_input('Create it? (y or n)')
+            if answer == 'y':
+                os.makedirs(output_folder)
 
     def beginRun(self):
         """ 
@@ -370,6 +408,18 @@ class CDCSVGDisplayModule(Module):
         if self.draw_simhit_bkgtag:
             styleDict = {'stroke-width': '0.2',
                          'stroke': attributemaps.BackgroundTagColorMap()}
+            self.draw_storearray('CDCHits', styleDict)
+
+        # Draw background tag != bg_none of related simhits
+        if self.draw_simhit_isbkg:
+
+            def color_map(iHit, hit):
+                simHit = hit.getRelated('CDCSimHits')
+                bkgTag = simHit.getBackgroundTag()
+                color = ('red' if bkgTag else 'gray')
+                return color
+
+            styleDict = {'stroke-width': '0.5', 'stroke': color_map}
             self.draw_storearray('CDCHits', styleDict)
 
         if self.draw_connect_tof:

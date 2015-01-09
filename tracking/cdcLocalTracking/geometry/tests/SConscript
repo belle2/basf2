@@ -2,6 +2,7 @@ Import('env')
 
 env['LIBS'] = [
     'tracking',
+    'tracking_cdcLocalTracking',
     'framework',
     'framework_pybasf2',
     '$ROOT_LIBS',

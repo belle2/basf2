@@ -1,6 +1,28 @@
 Import('env')
 
+import os
+
+# Mark this folder as a sub library
+env.Dictionary()['SUBLIB'] = True
+
 # Additional libraries
 env['LIBS'] = ['framework_pybasf2']
+
+# Forward the compilation option 
+belle2_option = os.environ["BELLE2_OPTION"]
+
+cpp_flags = ['-O3', '-g',]
+if belle2_option == "debug":
+    cpp_defines = ['CDCLOCALTRACKING_COMPILE_DEBUG',]
+
+elif belle2_option == "opt":
+    cpp_defines = ['CDCLOCALTRACKING_COMPILE_OPT',]
+
+elif belle2_option == "clang":
+    cpp_defines = ['CDCLOCALTRACKING_COMPILE_CLANG',]
+    cpp_flags += ['-Wno-deprecated-register', '-Wno-overloaded-virtual', '-Wno-redeclared-class-member',]
+
+env.Append(CPPDEFINES=cpp_defines)
+env.Append(CPPFLAGS=cpp_flags)
 
 Return('env')

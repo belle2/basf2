@@ -10,10 +10,6 @@
 # Date: 20150109
 #
 #
-Alias B0sig B0
-Alias anti-B0sig anti-B0
-ChargeConj B0sig anti-B0sig
-#
 Decay Upsilon(4S)
 1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
 Enddecay
@@ -21,6 +17,5 @@ Enddecay
 Decay B0sig
 1.000 rho0 gamma SVP_HELAMP 1.0 0.0 1.0 0.0;
 Enddecay
-CDecay anti-B0sig
 #
 End

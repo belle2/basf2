@@ -1,0 +1,22 @@
+# EventType: 11102400
+# Descriptor: [B0 -> pi+ pi- pi0]cc
+# NickName: Bd_pipipi0=CPV
+# Documentation: 3 Body charmless process
+# Tested: Yes
+# PhysicsWG: HAD
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20150109
+#
+#
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.0 pi+ pi- pi0  BTO3PI_CP dm alpha; 
+Enddecay
+CDecay anti-B0sig
+#
+End

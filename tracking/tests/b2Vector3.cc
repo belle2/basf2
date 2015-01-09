@@ -9,10 +9,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <gtest/gtest.h>
+#include <tracking/vectorTools/B2Vector3.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
-#include <tracking/vectorTools/B2Vector3.h>
+#include <gtest/gtest.h>
+
+#include <TRandom.h>
+
 
 
 using namespace std;
@@ -169,6 +172,174 @@ namespace Belle2 {
       EXPECT_DOUBLE_EQ(tVecA * tVecA, vecA * vecA);
 
     }
+
+
+
+    /** fill vector of double with random numbers
+    */
+    TEST_F(B2Vector3Test, speedFillVectorDouble)
+    {
+      std::vector<double> testVec;
+      unsigned int nElements = 1000000;
+      testVec.reserve(nElements);
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        testVec.push_back(gRandom->Uniform(1.));
+        testVec.push_back(gRandom->Uniform(1.));
+        testVec.push_back(gRandom->Uniform(1.));
+      }
+
+      EXPECT_EQ(nElements * 3, testVec.size());
+    }
+
+
+
+    /** fill vector of TVector3 with random numbers
+     */
+    TEST_F(B2Vector3Test, speedFillVectorTVector3)
+    {
+      std::vector<TVector3> testVec;
+      unsigned int nElements = 1000000;
+      testVec.reserve(nElements);
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        testVec.push_back(TVector3(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.)));
+      }
+
+      EXPECT_EQ(nElements, testVec.size());
+    }
+
+
+
+    /** fill vector B2Vector3D with random numbers
+     */
+    TEST_F(B2Vector3Test, speedFillVectorB2Vector3D)
+    {
+      std::vector<B2Vector3D> testVec;
+      unsigned int nElements = 1000000;
+      testVec.reserve(nElements);
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        testVec.push_back(B2Vector3D(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.)));
+      }
+
+      EXPECT_EQ(nElements, testVec.size());
+    }
+
+
+    /** fill vector B2Vector3F with random numbers
+     */
+    TEST_F(B2Vector3Test, speedFillVectorB2Vector3F)
+    {
+      std::vector<B2Vector3F> testVec;
+      unsigned int nElements = 1000000;
+      testVec.reserve(nElements);
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        testVec.push_back(B2Vector3F(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.)));
+      }
+
+      EXPECT_EQ(nElements, testVec.size());
+    }
+
+
+
+    /** multiply 2 TVector3s filled with random numbers
+     */
+    TEST_F(B2Vector3Test, speedMultiplyTVector3)
+    {
+      unsigned int nElements = 1000000;
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        TVector3 a(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        TVector3 b(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        double c = a * b;
+        EXPECT_DOUBLE_EQ(c, a.X()*b.X() + a.Y()*b.Y() + a.Z()*b.Z());
+      }
+    }
+
+
+
+    /** multiply 2 B2Vector3D filled with random numbers
+     */
+    TEST_F(B2Vector3Test, speedMultiplyB2Vector3D)
+    {
+      unsigned int nElements = 1000000;
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        B2Vector3D a = B2Vector3D(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        B2Vector3D b = B2Vector3D(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        double c = a * b;
+        EXPECT_DOUBLE_EQ(c, a.X()*b.X() + a.Y()*b.Y() + a.Z()*b.Z());
+      }
+    }
+
+
+
+    /** multiply 2 B2Vector3F filled with random numbers
+     */
+    TEST_F(B2Vector3Test, speedMultiplyB2Vector3F)
+    {
+      unsigned int nElements = 1000000;
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        B2Vector3F a = B2Vector3F(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        B2Vector3F b = B2Vector3F(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        float c = a * b;
+        EXPECT_FLOAT_EQ(c, a.X()*b.X() + a.Y()*b.Y() + a.Z()*b.Z());
+      }
+    }
+
+
+
+    /** cross product of 2 TVector3s filled with random numbers
+     */
+    TEST_F(B2Vector3Test, speedCrossProductTVector3)
+    {
+      unsigned int nElements = 1000000;
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        TVector3 a(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        TVector3 b(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        TVector3 c = a.Cross(b);
+        EXPECT_EQ(c, TVector3(a.Y() * b.Z() - b.Y() * a.Z(),
+                              a.Z() * b.X() - b.Z() * a.X(),
+                              a.X() * b.Y() - b.X() * a.Y())
+                 );
+      }
+    }
+
+
+    /** cross product of 2 B2Vector3Ds filled with random numbers
+     */
+    TEST_F(B2Vector3Test, speedCrossProductB2Vector3D)
+    {
+      unsigned int nElements = 1000000;
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        B2Vector3D a(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        B2Vector3D b(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        B2Vector3D c = a.Cross(b);
+        EXPECT_EQ(c, B2Vector3D(a.Y() * b.Z() - b.Y() * a.Z(), a.Z() * b.X() - b.Z() * a.X(), a.X() * b.Y() - b.X() * a.Y()));
+      }
+    }
+
+
+    /** cross product of 2 B2Vector3Fs filled with random numbers
+     */
+    TEST_F(B2Vector3Test, speedCrossProductB2Vector3F)
+    {
+      unsigned int nElements = 1000000;
+
+      for (unsigned i = 0; i < nElements ; i++) {
+        B2Vector3F a(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        B2Vector3F b(gRandom->Uniform(1.), gRandom->Uniform(1.), gRandom->Uniform(1.));
+        B2Vector3F c = a.Cross(b);
+        EXPECT_EQ(c, B2Vector3F(a.Y() * b.Z() - b.Y() * a.Z(), a.Z() * b.X() - b.Z() * a.X(), a.X() * b.Y() - b.X() * a.Y()));
+      }
+    }
+
+
   }  // namespace B2Vector3Tests
 
 }  // namespace Belle2

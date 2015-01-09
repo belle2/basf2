@@ -10,6 +10,8 @@
 # This is a simple python script for the
 # purpose of submitting multiple jobs. It
 # generates 100 empty events and saves them.
+# Use JS201-JobSubmissionScripts-simple.py
+# to run several times.
 ############################################
 
 from basf2 import *

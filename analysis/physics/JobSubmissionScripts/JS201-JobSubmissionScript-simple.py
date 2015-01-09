@@ -22,6 +22,7 @@ logDirectory = 'log/'
 if not os.path.exists(logDirectory):
     os.makedirs(logDirectory)
 
+# in each loop create a specific command string
 for x in range(0, 10):
     logFile = logDirectory + 'JS202-JobSubmissionScript-' + str(x) + '.log'
     command = 'bsub -q s -o ' + logFile + ' basf2 JS101-SteeringFile.py ' \

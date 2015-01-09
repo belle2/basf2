@@ -1,0 +1,16 @@
+Alias MyB+ B+
+Alias MyB- B-
+ChargeConj MyB+ MyB-
+
+Decay Upsilon(4S)
+0.5000	MyB+	B-	VSS;
+0.5000	MyB-	B+	VSS;
+Enddecay
+
+Decay MyB+
+1.0000	pi0	e+	nu_e	PHOTOS	ISGW2;
+Enddecay
+
+CDecay MyB-
+
+End

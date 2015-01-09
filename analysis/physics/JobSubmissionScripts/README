@@ -1,0 +1,15 @@
+This is an example on how to submit multiple jobs at once, if the number of jobs you wish to submit is rather large.
+The main python steering file is "JS101-SteeringFile.py", which generates 100 events with a generic decay of Upsilon(4S) and 
+then saves the output into the rootFiles/ folder. This steering file also needs a number argument for the output file name:
+
+e.g.:
+"basf2 JS101-SteeringFile.py 3"     # runs the script and produces the file rootFiles/JS101-EvtGenData_3.root
+
+However, if you wish to run this script for example 5000 times, it is unpractical to manually run it 5000 times.
+The second file with the name "JS201-JobSubmissionScript.py" uses loops to create a command string, which is then 
+printed out in the terminal and evaluated. A log directory is also created. This file also works with the "python"
+command instead of "basf2".
+
+These files also provide examples for:
+      - automatic folder and subfolder creation
+      - the use of arguments when running the python steering files with basf2.

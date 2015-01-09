@@ -1,0 +1,25 @@
+This is a package for the B-tag SKIM on the generator level for B anti-B meson pairs. 
+
+This package can be used for several reasons. You can check already studied decays, 
+check if the MC generation is OK (if Br are correct), these files can also help 
+find potential decay channels of future interest that have not yet been considered, etc.
+
+USAGE:
+
+1. GENERATION (BS10*)
+
+Change the decay mode of the B-sig, if you are interested in a different decay mode. Run these scripts for mdst data generation: 
+   - "basf2 BS101-BBChargedGen.py 1000" for generating 1000 pairs of charged BB events.
+   - "basf2 BS102-BBNeutralGen.py 1000" for generating 1000 pairs of neutral BB events.
+
+1. PRINTOUT (BS20*)
+
+Here you can verify the decay chain:
+   - "basf2 BS201-PrintOutMCParticlesCharged.py -n 10" for printing out decay trees of the first 10 events of charged BB events.
+   - "basf2 BS202-PrintOutMCParticlesNeutral.py -n 10" for printing out decay trees of the first 10 events of neutral BB events.
+
+2. SKIM (BS30*)
+
+Run these scripts for skimming the original mdst data. This produces a new mdst file, which contains only relevant events.
+    - "basf2 BS301-SkimMdstCharged.py 1" for reconstruction of ALL included decay modes of charged BB pairs (for shorter version run "basf2 BS301-SkimMdstCharged.py 0")
+    - "basf2 BS302-SkimMdstNeutral.py 1" for reconstruction of ALL included decay modes of neutral BB pairs (for shorter version run "basf2 BS302-SkimMdstNeutral.py 0")

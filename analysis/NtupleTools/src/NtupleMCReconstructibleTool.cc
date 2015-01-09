@@ -43,7 +43,7 @@ void NtupleMCReconstructibleTool::setupTree()
 void NtupleMCReconstructibleTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCReconstructibleTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMCReconstructibleTool::eval - no Particle found!\n");
     return;
   }
 
@@ -63,9 +63,9 @@ void NtupleMCReconstructibleTool::eval(const Particle* particle)
 
     const MCParticle* mcparticle = selparticles[iProduct]->getRelated<MCParticle>();
     if (selparticles[iProduct]->getParticleType() == 6/*c_Composite*/) {
-      B2INFO(boost::format("[NtupleMCReconstructibleTool]: this tool does not currently return the truth ID for composite particles : %d") % selparticles[iProduct]->getParticleType());
+      B2INFO("[NtupleMCReconstructibleTool]: this tool does not currently return the truth ID for composite particles : " << selparticles[iProduct]->getParticleType());
     } else if (!mcparticle) {
-      printf("NtupleMCReconstructibleTool::eval - WARNING no truth match found for this reco particle!\n");
+      B2WARNING("NtupleMCReconstructibleTool::eval - no truth match found for this reco particle!\n");
     } else {
       m_iReconstructible[iProduct] =  0;
       /* if it is a track make sure it went through the SVD for now */

@@ -37,6 +37,10 @@
 #include <analysis/NtupleTools/NtupleFlightInfoTool.h>
 #include <analysis/NtupleTools/NtupleMCFlightInfoTool.h>
 #include <analysis/NtupleTools/NtupleMomentumVectorDeviationTool.h>
+#include <analysis/NtupleTools/NtupleDalitzTool.h>
+#include <analysis/NtupleTools/NtupleVVAnglesTool.h>
+#include <analysis/NtupleTools/NtupleHelicityTool.h>
+#include <analysis/NtupleTools/NtupleSLTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -110,6 +114,10 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "FlightInfo") return new NtupleFlightInfoTool(tree, d);
   else if (strToolName == "MCFlightInfo") return new NtupleMCFlightInfoTool(tree, d);
   else if (strToolName == "MomentumVectorDeviation") return new NtupleMomentumVectorDeviationTool(tree, d);
+  else if (strToolName == "Dalitz") return new NtupleDalitzTool(tree, d);
+  else if (strToolName == "VVAngles") return new NtupleVVAnglesTool(tree, d);
+  else if (strToolName == "Helicity") return new NtupleHelicityTool(tree, d);
+  else if (strToolName == "SL") return new NtupleSLTool(tree, d);
 
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;

@@ -27,7 +27,7 @@ namespace Belle2 {
    *    that have an anti-particle but are reconstructed in self-conjugated decay mode, e.g. K*0 -> K0s pi0, or D0 -> K- K+, ...)
    * ParticleList can store only particles with same PDG code (whcih however can be reconstructed in different decay modes).
    *
-   * Each ParticleList can and should be binded with its anti-ParticleList at the time of creation of the lists.
+   * Each ParticleList can and should be bound with its anti-ParticleList at the time of creation of the lists.
    * This bond for example enables automatic reconstruction of charged conjugated decays in ParticleCombiner module for example.
    *
    * The unique identifier of the ParticleList is its name. According to the naming convention the ParticleList's name
@@ -35,7 +35,7 @@ namespace Belle2 {
    *
    * listName = particle_name:label,
    *
-   * where particel_name is the name of the particle as given in the evt.pdl and the label can be any string
+   * where particle_name is the name of the particle as given in the evt.pdl and the label can be any string
    * indicating the selection criteria or decay mode (or anything else) used to reconstruct the particles. Examples are:
    * o) pi+:loose - pi+ candidates passing loose PID requirements
    * o) D0:kpi    - D0 candidates reconstructed in D0->Kpi decays
@@ -57,14 +57,14 @@ namespace Belle2 {
      antipList->initialize(-321, "K-:all");
 
      \\ bind the two lists together
-     pList->bindAntiParticleList(*(antipList));
+     pList->bindAntiParticleList(*antipList);
      \endcode
    *
    * <h1>Adding Particle to ParticleList</h1>
    *
    * The following rules apply:
-   * o) ParticleList can contain only particles with same absolute value of PDG code (e.g. only charged kaons, neutral D mesons, ...)
-   * o) particles have to be stored in the same StoreArray<Particle>
+   * o) ParticleList can contain only particles with same absolute value of the PDG code (e.g. only charged kaons, neutral D mesons, ...)
+   * o) All particles have to be stored in the same StoreArray<Particle>
    *
    * Example:
    *
@@ -97,7 +97,7 @@ namespace Belle2 {
      }
      \endcode
    *
-   * If you would like to loop over the particles stored in particular ParticleList and not the anti-particles as well,
+   * If you would like to loop over the particles stored in a particular ParticleList _without_ including the anti-particles as well,
    * do the following (set the boolean parameter in the relevant functions to false)
      \code
      const unsigned int n = m_plist->getListSize(false);
@@ -158,7 +158,7 @@ namespace Belle2 {
     void initialize(int pdg, std::string name);
 
     /**
-     * Binds particle and anti-particle ParticleLists. After the lists are binded any action performed on ParticleList
+     * Binds particle and anti-particle ParticleLists. After the lists are bound any action performed on ParticleList
      * for particles will be performed by default also on ParticleList for anti-particles.
      *
      * @param antiList - anti-particle ParticleList of this ParticleList

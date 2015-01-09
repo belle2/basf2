@@ -150,21 +150,11 @@ class PythonOptionFile(GenericOptionFile):
         if substitute:
             value = value.replace('true', 'True')
             value = value.replace('false', 'False')
-            if 'GeV' in value:
-                self.Write(['from GaudiKernel import SystemOfUnits'])
-                value = value.replace('GeV', 'SystemOfUnits.GeV')
-            if 'MeV' in value:
-                self.Write(['from GaudiKernel import SystemOfUnits'])
-                value = value.replace('MeV', 'SystemOfUnits.MeV')
         self.Write(['{0} = {1}'.format(option, value)])
 
     def IncreaseOptionValue(self, option, value):
         option = self.ConfigureToolAndAlgo(option)
         self.Write(['{0} += {1}'.format(option, value)])
-
-    def AddInclude(self, filename):
-        self.Write(['from Gaudi.Configuration import *',
-                   'importOptions( "$DECFILESROOT/prod/{0}.py" )'.format(filename)])
 
 
 class EventType:

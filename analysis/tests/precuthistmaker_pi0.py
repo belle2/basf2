@@ -21,7 +21,7 @@ main.add_module(register_module('ParticleLoader'))
 
 
 #loose cut on energy
-selectParticle('gamma', 'E > 0.05', path=main)
+fillParticleList('gamma', 'E > 0.05', path=main)
 
 
 #a) save signal invariant mass using PreCutHistMaker

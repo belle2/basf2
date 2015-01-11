@@ -18,10 +18,11 @@ main.add_module(rootinput)
 main.add_module(register_module('ParticleLoader'))
 
 
-selectParticle('K-', 'Kid > 0.05', path=main)
-selectParticle('pi+', 'piid > 0.05', path=main)
+kaons = ('K-', 'Kid > 0.05')
+pions = ('pi+', 'piid > 0.05')
+photons = ('gamma', '')
+fillParticleLists([kaons, pions, photons], path=main)
 
-selectParticle('gamma', '', path=main)
 reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
 reconstructDecay('D0 -> K- pi+ pi0', '1.7 < M < 1.9', 0, path=main)
 

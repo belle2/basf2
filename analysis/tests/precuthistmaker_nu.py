@@ -24,10 +24,11 @@ main.add_module(register_module('EventInfoPrinter'))
 main.add_module(register_module('ParticleLoader'))
 
 #loose cut on energy
-selectParticle('gamma', 'E > 0.05', path=main)
+photons = ('gamma', 'E > 0.05')
+electrons = ('e+', 'eid > 0.1')
+kaons = ('K+', 'Kid > 0.1')
 
-selectParticle('e+', 'eid > 0.1', path=main)
-selectParticle('K+', 'Kid > 0.1', path=main)
+fillParticleLists([photons, electrons, kaons], path=main)
 
 reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', path=main)
 matchMCTruth('pi0', path=main)

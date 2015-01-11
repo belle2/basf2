@@ -19,7 +19,7 @@ main.add_module(register_module('ParticleLoader'))
 
 # Train TMVA Teacher using all electron candidates as input data
 # Select the candidates
-selectParticle('e-', path=main)
+fillParticleList('e-', path=main)
 
 # Define Variables
 variables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH',

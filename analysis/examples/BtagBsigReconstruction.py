@@ -22,14 +22,13 @@ add_simulation(myMain)
 # reconstruction
 add_reconstruction(myMain)
 
-# do the analysis
-loadReconstructedParticles(myMain)
-
 # create final state particle lists
-selectParticle('K-', '', True, myMain)
-selectParticle('pi+', '', True, myMain)
-selectParticle('e+', '', True, myMain)
-selectParticle('gamma', '', True, myMain)
+kaons = ('K-', '')
+pions = ('pi+', '')
+elecs = ('e+', '')
+photons = ('gamma', '')
+
+fillParticleLists([kaons, pions, elecs, photons], True, myMain)
 
 # reconstruct pi0 -> gamma gamma decay
 reconstructDecay('pi0 -> gamma gamma', '0.05 < M < 1.7', 1, True, myMain)

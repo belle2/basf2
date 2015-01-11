@@ -14,8 +14,7 @@
 
 from basf2 import *
 from modularAnalysis import inputMdst
-from modularAnalysis import loadMCParticles
-from modularAnalysis import fillParticleList
+from modularAnalysis import fillParticleListFromMC
 from modularAnalysis import printVariableValues
 from modularAnalysis import analysis_main
 
@@ -29,13 +28,10 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
 
-# load all final state MCParticles as Particles
-loadMCParticles()
-
 # create charged kaon and pion particle lists with names "K-:gen" and "pi-:gen"
 # all generated kaons(pions) will be added to the kaon(pion) list
-fillParticleList('K-:gen', '')
-fillParticleList('pi-:gen', '')
+fillParticleListFromMC('K-:gen', '')
+fillParticleListFromMC('pi-:gen', '')
 
 # print charge, energy and total momentum of generated kaons
 # and x,y,z components of momenta for generated pions

@@ -28,7 +28,6 @@
 
 from basf2 import *
 from modularAnalysis import inputMdstList
-from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import copyLists
@@ -60,9 +59,6 @@ filelistUU = \
 
 inputMdstList(filelistMIX + filelistCHG + filelistCC + filelistSS + filelistDD
               + filelistUU)
-
-# load all final state Particles
-loadReconstructedParticles()
 
 # create and fill final state ParticleLists
 # use standard lists

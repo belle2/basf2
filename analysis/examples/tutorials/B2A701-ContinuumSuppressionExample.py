@@ -22,7 +22,6 @@
 
 from basf2 import *
 from modularAnalysis import inputMdst
-from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
@@ -50,15 +49,12 @@ filelistUU = \
      ]
 inputMdstList(filelistSIG + filelistCC + filelistSS + filelistDD + filelistUU)
 
-# Do the analysis
-loadReconstructedParticles()
-
-selectParticle('K+',
-               'chiProb > 0.001 and Kid  > 0.5 and -4.0 < dz < 4.0 and -0.2 < dr < 0.2'
-               )
-selectParticle('pi-',
-               'chiProb > 0.001 and piid > 0.5 and -4.0 < dz < 4.0 and -0.2 < dr < 0.2'
-               )
+fillParticleList('K+',
+                 'chiProb > 0.001 and Kid  > 0.5 and -4.0 < dz < 4.0 and -0.2 < dr < 0.2'
+                 )
+fillParticleList('pi-',
+                 'chiProb > 0.001 and piid > 0.5 and -4.0 < dz < 4.0 and -0.2 < dr < 0.2'
+                 )
 
 reconstructDecay('K*0 -> K+ pi-', '0.75 < M < 1.25')
 reconstructDecay('phi -> K+ K-', '1.00 < M < 1.05')

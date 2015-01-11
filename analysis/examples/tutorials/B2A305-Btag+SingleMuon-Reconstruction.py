@@ -38,7 +38,6 @@
 
 from basf2 import *
 from modularAnalysis import inputMdst
-from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import copyLists
@@ -54,9 +53,6 @@ from stdFSParticles import stdPi0
 
 # load data
 inputMdst('B2A101-Y4SEventGeneration-gsim-BKGx1.root')
-
-# load all final state Particles
-loadReconstructedParticles()
 
 # create and fill final state ParticleLists
 # use standard lists

@@ -17,7 +17,6 @@
 
 from basf2 import *
 from modularAnalysis import inputMdst
-from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import printDataStore
 from modularAnalysis import printList
 from modularAnalysis import fillParticleList
@@ -41,13 +40,9 @@ inputMdst('B2A101-Y4SEventGeneration-gsim-BKGx0.root')
 # print contents of the DataStore before loading Particles
 printDataStore()
 
-# load all final state Particles
-# and K0short candidates from V0 msdt table
-loadReconstructedParticles()
-
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
-fillParticleList('gamma:all', '')
+#fillParticleList('gamma:all', '')
 fillParticleList('e-:all', '')
 fillParticleList('mu-:all', '')
 fillParticleList('pi-:all', '')

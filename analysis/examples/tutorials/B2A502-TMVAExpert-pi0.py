@@ -24,7 +24,6 @@
 
 from basf2 import *
 from modularAnalysis import inputMdst
-from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import applyTMVAMethod
@@ -56,9 +55,6 @@ filelistUU = \
 
 inputMdstList(filelistMIX + filelistCHG + filelistCC + filelistSS + filelistDD
               + filelistUU)
-
-# do the analysis
-loadReconstructedParticles()
 
 # create final state particle lists
 # use standard-good photon candidates

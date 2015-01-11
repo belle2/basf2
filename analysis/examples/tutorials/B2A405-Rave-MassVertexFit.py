@@ -27,7 +27,6 @@
 
 from basf2 import *
 from modularAnalysis import inputMdstList
-from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
@@ -45,9 +44,6 @@ filelistSIG = \
      ]
 
 inputMdstList(filelistSIG)
-
-# load all final state Particles
-loadReconstructedParticles()
 
 # use standard final state particle lists
 #

@@ -25,8 +25,7 @@
 
 from basf2 import *
 from modularAnalysis import inputMdst
-from modularAnalysis import loadMCParticles
-from modularAnalysis import fillParticleList
+from modularAnalysis import fillParticleListsFromMC
 from modularAnalysis import reconstructDecay
 from modularAnalysis import copyLists
 from modularAnalysis import matchMCTruth
@@ -44,13 +43,11 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
 
-# load all final state Particles (on generator level)
-loadMCParticles()
-
 # create and fill final state ParticleLists
-fillParticleList('K-', '')
-fillParticleList('pi-', '')
-fillParticleList('gamma', '')
+kaons = ('K-', '')
+pions = ('pi-', '')
+photons = ('gamma', '')
+fillParticleListsFromMC([kaons, pions, photons])
 
 # 1. reconstruct pi0 -> gamma gamma decay
 reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 0.15')

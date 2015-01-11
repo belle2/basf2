@@ -20,11 +20,6 @@ inputMdstFileName = sys.argv[1]
 # load the input MDST file
 inputMdst(inputMdstFileName)
 
-# load reconstructed particles
-# Track(s) as e/mu/pi/k/p
-# neutral ECLCluster(s) as photons
-loadReconstructedParticles()
-
 # fetch the standard photon (input for standard pi0 reconstruction)
 # the reconstructed photon Particles are collected in the gamma:all ParticleList
 stdPhoton()

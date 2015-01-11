@@ -18,13 +18,12 @@ from stdFSParticles import *
 from stdLooseFSParticles import *
 
 inputMdst('../Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root')
-loadReconstructedParticles()
 stdFSParticles()
 stdLooseFSParticles()
 
 # Signal side B_sig
-selectParticle('mu+', 'muid >= 0.1')
-selectParticle('pi+', 'piid >= 0.1')
+fillParticleList('mu+', 'muid >= 0.1')
+fillParticleList('pi+', 'piid >= 0.1')
 
 reconstructDecay('J/psi -> mu+ mu-', '3.0<=M<=3.2', 1)
 reconstructDecay('K_S0 -> pi+ pi-', '0.25<=M<=0.75', 1)

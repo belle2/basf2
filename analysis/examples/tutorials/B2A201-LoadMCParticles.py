@@ -17,10 +17,9 @@
 
 from basf2 import *
 from modularAnalysis import inputMdst
-from modularAnalysis import loadMCParticles
 from modularAnalysis import printDataStore
 from modularAnalysis import printList
-from modularAnalysis import fillParticleList
+from modularAnalysis import fillParticleListsFromMC
 from modularAnalysis import analysis_main
 
 # check if the required input file exists (from B2A101 example)
@@ -36,19 +35,18 @@ inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
 # print contents of the DataStore before loading MCParticles
 printDataStore()
 
-# load all final state MCParticles as Particles
-loadMCParticles()
-
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
-fillParticleList('gamma:gen', '')
-fillParticleList('e-:gen', '')
-fillParticleList('mu-:gen', '')
-fillParticleList('pi-:gen', '')
-fillParticleList('K-:gen', '')
-fillParticleList('anti-p-:gen', '')
+photons = ('gamma:gen', '')
+electrons = ('e-:gen', '')
+muons = ('mu-:gen', '')
+pions = ('pi-:gen', '')
+kaons = ('K-:gen', '')
+protons = ('anti-p-:gen', '')
 
-# print contents of the DataStore before loading MCParticles
+fillParticleListsFromMC([photons, electrons, muons, pions, kaons, protons])
+
+# print contents of the DataStore after loading MCParticles
 # the difference is that DataStore now contains StoreArray<Particle>
 # filled with Particles created from generated final state particles
 printDataStore()

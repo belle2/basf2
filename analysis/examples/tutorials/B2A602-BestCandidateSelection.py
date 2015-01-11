@@ -38,9 +38,6 @@ filelistSIG = \
 
 inputMdstList(filelistSIG)
 
-# load all final state Particles
-loadReconstructedParticles()
-
 # use standard final state particle lists
 #
 # creates "pi+:all" ParticleList (and c.c.)

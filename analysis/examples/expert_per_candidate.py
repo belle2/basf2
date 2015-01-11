@@ -13,7 +13,7 @@ main = create_path()
 
 main.add_module(register_module('RootInput'))
 main.add_module(register_module('ParticleLoader'))
-selectParticle('e-', path=main)
+fillParticleList('e-', path=main)
 
 methods = ['Fisher', 'FastBDT', 'BDTGradient', 'PDEFoamBoost']
 

@@ -20,7 +20,6 @@
 
 from basf2 import *
 from modularAnalysis import inputMdstList
-from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
@@ -46,9 +45,6 @@ inputMdstList(filelistSIG)
 # (uncomment next two lines and comment above two to run over BKG MC)
 # rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-BKGMC.root'
 # inputMdstList(filelistBKG)
-
-# load all final state Particles
-loadReconstructedParticles()
 
 # use standard final state particle lists
 #

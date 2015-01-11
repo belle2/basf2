@@ -146,31 +146,43 @@ def printPrimaryMCParticles(path=analysis_main):
     path.add_module(mcparticleprinter)
 
 
-def loadMCParticles(path=analysis_main):
+def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=analysis_main):
     """
-    Loads all Final state MCParticles (e/mu/pi/K/p/gamma and Klongs) as Particles.
+    Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
     """
 
-    ploader = register_module('ParticleLoader')
-    ploader.param('useMCParticles', True)
-    path.add_module(ploader)
+    mcparticleprinter = register_module('PrintMCParticles')
+    mcparticleprinter.param('onlyPrimaries', onlyPrimaries)
+    mcparticleprinter.param('maxLevel', maxLevel)
+    path.add_module(mcparticleprinter)
+
+
+def loadMCParticles(path=analysis_main):
+    """
+    THIS FUNCTION IS NO LONGER NEEDED. IT IS OBSOLETE AND IT DOES NOTHING.
+    """
+
+    print ''
+    print '* ************************************************* *'
+    print '* loadMCParticles function is no longer needed.     *'
+    print '* IT IS OBSOLETE AND IT DOES NOTHING.               *'
+    print '* Delete loadMCParticles() from your python script. *'
+    print '* ************************************************* *'
+    print ''
 
 
 def loadReconstructedParticles(path=analysis_main):
     """
-    Loads mDST data objects (Tracks/ECLClusters/V0s/KLMClusters) as Particles.
-    In particular:
-     - each Track is loaded as e/mu/pi/K/p Particles
-     - each neutral ECLCluster is loaded as gamma Particle
-     - each neutral KLMCluster is loaded as Klong Particle
-     - each neutral V0 is loaded as Kshort Particle
-
-    In all the cases no selection criteria are applied.
+    THIS FUNCTION IS NO LONGER NEEDED. IT IS OBSOLETE AND IT DOES NOTHING.
     """
 
-    ploader = register_module('ParticleLoader')
-    ploader.param('useMCParticles', False)
-    path.add_module(ploader)
+    print ''
+    print '* ************************************************************ *'
+    print '* loadMCParticles function is no longer needed.                *'
+    print '* IT IS OBSOLETE AND IT DOES NOTHING.                          *'
+    print '* Delete loadReconstructedParticles() from your python script. *'
+    print '* ************************************************************ *'
+    print ''
 
 
 def copyList(
@@ -273,6 +285,43 @@ def cutAndCopyList(
     path.add_module(pmanipulate)
 
 
+def fillParticleLists(decayStringsWithCuts, writeOut=False,
+                      path=analysis_main):
+    """
+    Creates Particles of the desired types from the corresponding MDST dataobjects, 
+    loads them to the StoreArray<Particle> and fills the ParticleLists.
+
+    The multiple ParticleLists with their own selection criteria are specified
+    via list tuples (decayString, cut), like for example
+    kaons = ('K+:std', 'Kid>0.1')
+    pions = ('pi+:std', 'piid>0.1')
+    fillParticleLists([kaons, pions])
+
+    The type of the particles to be loaded is specified via the decayString module parameter. 
+    The type of the MDST dataobject that is used as an input is determined from the type of 
+    the particle. The following types of the particles can be loaded:
+    
+    o) charged final state particles (input MDST type = Tracks)
+       - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
+
+    o) neutral final state particles
+       - gamma         (input MDST type = ECLCluster)
+       - K_S0, Lambda0 (input MDST type = V0)
+       - K_L0          (input MDST type = KLMCluster)
+
+    @param decayString   specifies type of Particles and determines the name of the ParticleList 
+    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + 'PLists')
+    pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('writeOut', writeOut)
+    path.add_module(pload)
+
+
 def fillParticleList(
     decayString,
     cut,
@@ -280,44 +329,106 @@ def fillParticleList(
     path=analysis_main,
     ):
     """
-    Creates and fills ParticleList with StoreArray<Particle> 
-    indices of Particles of desired type.
+    Creates Particles of the desired type from the corresponding MDST dataobjects, 
+    loads them to the StoreArray<Particle> and fills the ParticleList. 
+
+    The type of the particles to be loaded is specified via the decayString module parameter. 
+    The type of the MDST dataobject that is used as an input is determined from the type of 
+    the particle. The following types of the particles can be loaded:
     
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut      Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      wether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path 
-    """
+    o) charged final state particles (input MDST type = Tracks)
+       - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    pselect = register_module('ParticleSelector')
-    pselect.set_name('ParticleSelector_' + decayString)
-    pselect.param('decayString', decayString)
-    pselect.param('cut', cut)
-    pselect.param('writeOut', writeOut)
-    path.add_module(pselect)
+    o) neutral final state particles
+       - gamma         (input MDST type = ECLCluster)
+       - K_S0, Lambda0 (input MDST type = V0)
+       - K_L0          (input MDST type = KLMCluster)
 
-
-def selectParticle(
-    decayString,
-    cut='',
-    writeOut=False,
-    path=analysis_main,
-    ):
-    """
-    Creates and fills ParticleList with StoreArray<Particle> indices of Particles of desired type.
-    
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut      Particles need to pass these selection criteria to be added to the ParticleList
+    @param decayString   specifies type of Particles and determines the name of the ParticleList 
+    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
-    pselect = register_module('ParticleSelector')
-    pselect.set_name('ParticleSelector_' + decayString)
-    pselect.param('decayString', decayString)
-    pselect.param('cut', cut)
-    pselect.param('writeOut', writeOut)
-    path.add_module(pselect)
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('writeOut', writeOut)
+    path.add_module(pload)
+
+
+def fillParticleListFromMC(
+    decayString,
+    cut,
+    writeOut=False,
+    path=analysis_main,
+    ):
+    """
+    Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
+    loads them to the StoreArray<Particle> and fills the ParticleList.
+
+    The type of the particles to be loaded is specified via the decayString module parameter.
+    
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('writeOut', writeOut)
+    pload.param('useMCParticles', True)
+    path.add_module(pload)
+
+
+def fillParticleListsFromMC(decayStringsWithCuts, writeOut=False,
+                            path=analysis_main):
+    """
+    Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
+    loads them to the StoreArray<Particle> and fills the ParticleLists.
+
+    The types of the particles to be loaded are specified via the (decayString, cut) tuples given in a list.
+    For example:
+    kaons = ('K+:gen', '')
+    pions = ('pi+:gen', 'piid>0.1')
+    fillParticleListsFromMC([kaons, pions])
+    
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + 'PLists')
+    pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('writeOut', writeOut)
+    pload.param('useMCParticles', True)
+    path.add_module(pload)
+
+
+def selectParticle(
+    decayString,
+    cut,
+    writeOut=False,
+    path=analysis_main,
+    ):
+    """
+    THIS FUNCTION IS OBSOLETE. IT WILL BE DELETED.
+
+    USE fillParticleList INSTEAD!
+    """
+
+    print ''
+    print '* ******************************************************* *'
+    print '* selectParticle is obsolete.                             *'
+    print '* Replace it with fillParticleList in your python script. *'
+    print '* ******************************************************* *'
+    print ''
+
+    fillParticleList(decayString, cut, writeOut, path)
 
 
 def applyCuts(list_name, cut, path=analysis_main):

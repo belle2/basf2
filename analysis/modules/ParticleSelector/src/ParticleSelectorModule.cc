@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,20 +42,14 @@ namespace Belle2 {
 
   ParticleSelectorModule::ParticleSelectorModule() : Module()
   {
-    setDescription("Selects reconstructed Particles from StoreArray<Particles> according to given decay and selection criteria and fills them into a ParticleList.");
+    setDescription("Removes Particles from given ParticleList that do not pass specified selection criteria.");
+
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("decayString", m_decayString, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
+    addParam("decayString", m_decayString, "Input ParticleList name (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
 
     Variable::Cut::Parameter emptyCut;
     addParam("cut", m_cutParameter, "Selection criteria to be applied, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions", emptyCut);
-
-    addParam("writeOut", m_writeOut,
-             "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
-
-    // initializing the rest of private memebers
-    m_pdgCode = 0;
-    m_isSelfConjugatedParticle = 0;
   }
 
   void ParticleSelectorModule::initialize()
@@ -73,28 +67,15 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
 
-    m_pdgCode  = mother->getPDGCode();
     m_listName = mother->getFullName();
 
-    m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
-    m_antiListName             = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
-
-
     StoreObjPtr<ParticleList> particleList(m_listName);
-    if (!particleList.isOptional()) {
-      //if it doesn't exist:
-
-      DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-      particleList.registerInDataStore(flags);
-      if (!m_isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
-        antiParticleList.registerInDataStore(flags);
-      }
-    }
+    particleList.isRequired(m_listName);
 
     m_cut.init(m_cutParameter);
 
-    B2INFO("ParticleSelector: " << m_listName << " (" << m_antiListName << ") ");
+    B2INFO("ParticleSelector: " << m_listName);
+    B2INFO("   -> With cuts  : " << m_cutParameter);
   }
 
   void ParticleSelectorModule::event()
@@ -102,49 +83,19 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> plist(m_listName);
     bool existingList = plist.isValid();
 
-    if (!existingList) { // new particle list: fill selected
-      // TODO: this is a dirty hack to prevent addition of duplicated Particles to ParticleList
-      // keep track of mdst indices of Particles added to the list; another Particle
-      // with the same mdst index will not be added
-      std::vector<int> mdstIndices;
-
-      plist.create();
-      plist->initialize(m_pdgCode, m_listName);
-
-      if (!m_isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(m_antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * m_pdgCode, m_antiListName);
-
-        antiPlist->bindAntiParticleList(*(plist));
-      }
-
-      StoreArray<Particle> Particles;
-      for (int i = 0; i < Particles.getEntries(); i++) {
-        const Particle* part = Particles[i];
-        if (abs(part->getPDGCode()) != abs(m_pdgCode)) continue;
-        if (m_cut.check(part)) {
-
-          // TODO: part of the dirty hack
-          if (std::find(mdstIndices.begin(), mdstIndices.end(), part->getMdstArrayIndex()) == mdstIndices.end()
-              || part->getParticleType() == Particle::EParticleType::c_Undefined
-              || part->getParticleType() == Particle::EParticleType::c_Composite) {
-            plist->addParticle(part);
-            mdstIndices.push_back(part->getMdstArrayIndex());
-          }
-        }
-      }
-    } else { // existing particle list: apply selections and remove unselected
-      // loop over list only if cuts should be applied
-      std::vector<unsigned int> toRemove;
-      unsigned int n = plist->getListSize();
-      for (unsigned i = 0; i < n; i++) {
-        const Particle* part = plist->getParticle(i);
-        if (!m_cut.check(part)) toRemove.push_back(part->getArrayIndex());
-      }
-
-      plist->removeParticles(toRemove);
+    if (!existingList) {
+      B2WARNING("Input list " << m_listName << " was not created?");
+      return;
     }
+
+    // loop over list only if cuts should be applied
+    std::vector<unsigned int> toRemove;
+    unsigned int n = plist->getListSize();
+    for (unsigned i = 0; i < n; i++) {
+      const Particle* part = plist->getParticle(i);
+      if (!m_cut.check(part)) toRemove.push_back(part->getArrayIndex());
+    }
+    plist->removeParticles(toRemove);
   }
 } // end Belle2 namespace
 

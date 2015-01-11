@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,7 +19,8 @@
 namespace Belle2 {
 
   /**
-   * particle selector module
+   * Loops over all Particles in the ParticleList and removes those Particles
+   * from the ParticleList that do not pass given selection criteria.
    */
   class ParticleSelectorModule : public Module {
 
@@ -47,17 +48,9 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the particle being selected */
 
     std::string m_listName;   /**< output particle list name */
-    std::string m_antiListName;   /**< output anti-particle list name */
-
-    bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle does not exist */
-
-    int m_pdgCode;       /**< PDG code of particles to select */
 
     Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */
     Variable::Cut m_cut; /**< cut object which performs the cuts */
-
-    bool m_writeOut;  /**< toggle particle list btw. transient/writeOut */
-
   };
 
 } // Belle2 namespace

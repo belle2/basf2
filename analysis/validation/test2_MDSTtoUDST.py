@@ -41,11 +41,7 @@ geometry = register_module('Geometry')
 main.add_module(geometry)
 
 # ---------------------------------------------------------------
-# Run analysis tools to create Final State Particles (further tests to come)
-loadReconstructedParticles(main)
-
-# ---------------------------------------------------------------
-# Produce a microdst with reconstructed Particles
+# Produce a microdst
 outputUdst('../MDSTtoUDST.udst.root', main)
 
 # Go

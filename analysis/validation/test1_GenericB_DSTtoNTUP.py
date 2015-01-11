@@ -27,7 +27,6 @@ from stdLightMesons import *
 # inputMdstList(filelist)
 
 inputMdst('../GenericB_GENSIMRECtoDST.dst.root')
-loadReconstructedParticles()
 stdFSParticles()
 stdLooseFSParticles()
 stdLightMesons()

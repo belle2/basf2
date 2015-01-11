@@ -17,7 +17,6 @@ from stdFSParticles import *
 from stdLooseFSParticles import *
 
 inputMdst('../Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root')
-loadReconstructedParticles()
 stdFSParticles()
 stdLooseFSParticles()
 

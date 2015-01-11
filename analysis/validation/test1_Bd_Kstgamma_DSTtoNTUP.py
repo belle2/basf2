@@ -18,7 +18,6 @@ from stdLooseFSParticles import *
 from stdLightMesons import *
 
 inputMdst('../Bd_Kstgamma_GENSIMRECtoDST.dst.root')
-loadReconstructedParticles()
 stdFSParticles()
 stdLooseFSParticles()
 stdLightMesons()

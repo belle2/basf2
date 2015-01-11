@@ -192,13 +192,18 @@ namespace Belle2 {
     double particleFlavorType(const Particle* part);
 
     /**
-       * return charge
-       */
+     * return charge
+     */
     double particleCharge(const Particle* part);
 
     /**
-       * return cosine of angle between thrust axis of given particle and thrust axis of ROE
-       */
+     * return StoreArray index (0-based) of the MDST object from which the Particle was created
+     */
+    double particleMdstArrayIndex(const Particle* part);
+
+    /**
+     * return cosine of angle between thrust axis of given particle and thrust axis of ROE
+     */
     double cosTPTO(const Particle* part);
 
     /**
@@ -222,9 +227,14 @@ namespace Belle2 {
     double particleMCMatchPDGCode(const Particle* particle);
 
     /**
-     * return ORed combination of MCMatching::MCMatchStatus flags.
+     * return combination of MCMatching::MCMatchStatus flags.
      */
     double particleMCMatchStatus(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCPrimaryParticle(const Particle* particle);
 
     /**
      * return 1 if Particle was in RestOfEventObject, 0 otherwise

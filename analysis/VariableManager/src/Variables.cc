@@ -103,6 +103,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
+
       return vec.P();
     }
 
@@ -321,6 +322,11 @@ namespace Belle2 {
 
     // other ------------------------------------------------------------
 
+    double particleMdstArrayIndex(const Particle* part)
+    {
+      return part->getMdstArrayIndex();
+    }
+
     double particlePvalue(const Particle* part)
     {
       return part->getPValue();
@@ -374,6 +380,20 @@ namespace Belle2 {
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (mcp) {
         return mcp->getStatus();
+      } else {
+        return -1;
+      }
+    }
+
+    double particleMCPrimaryParticle(const Particle* p)
+    {
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        unsigned int bitmask = MCParticle::c_PrimaryParticle;
+        if (mcp->hasStatus(bitmask))
+          return 1;
+        else
+          return 0;
       } else {
         return -1;
       }
@@ -1450,6 +1470,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
     REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
+    REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex, "StoreArray index (0-based) of the MDST object from which the Particle was created");
 
     REGISTER_VARIABLE("pRecoil",  recoilMomentum,    "magnitude of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,   "energy recoiling against given Particle");
@@ -1461,6 +1482,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("particleMCStatus", particleMCStatus, "Returns mcStatus of related MCParticle or -1 if MCParticle relation is not set.");
+    REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle, "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("False", False, "returns always 0, used for testing and debugging.");
 
     VARIABLE_GROUP("ECL Cluster related");

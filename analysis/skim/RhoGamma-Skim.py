@@ -38,9 +38,6 @@ filelistSIG = \
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma MC
 inputMdstList(filelistBKG)
 
-# load all final state Particles
-loadReconstructedParticles()
-
 # use standard final state particle lists
 #
 # creates "gamma:highE" ParticleList

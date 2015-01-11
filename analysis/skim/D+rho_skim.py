@@ -39,9 +39,6 @@ inputMdstList(filelistSIG)
 # rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-BKGMC.root'
 # inputMdstList(filelistBKG)
 
-# load all final state Particles
-loadReconstructedParticles()
-
 # use standard final state particle lists
 #
 # creates "gamma:highE" ParticleList

@@ -123,7 +123,7 @@ namespace Belle2 {
       /** Event number */
       int    m_nEvent;
       /** ECL Gamma index */
-      int    m_GNum;
+      //int    m_GNum;
       /** ECL Pi0 index */
       int    m_Pi0Num;
       /** gamma1 information    */

@@ -55,7 +55,7 @@
 
 /**
  * \def B2DEBUG(level, streamText)
- * Send a debug message.
+ * Send a debug message, use lower values for level for more important messages.
  */
 #ifdef LOG_NO_B2DEBUG
 #define B2DEBUG(level, streamText)

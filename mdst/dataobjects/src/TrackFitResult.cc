@@ -28,19 +28,14 @@ TrackFitResult::TrackFitResult(const TVector3& position, const TVector3& momentu
   cartesianToPerigee(position, momentum, covariance, charge, bField);
 }
 
-TrackFitResult::TrackFitResult(const float tau[5], const float cov5[15],
+TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                                const Const::ParticleType& particleType, const float pValue,
                                const unsigned long hitPatternCDCInitializer, const unsigned short hitPatternVXDInitializer) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
-  m_tau(), m_cov5(),
+  m_tau(tau), m_cov5(cov5),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer), m_hitPatternVXDInitializer(hitPatternVXDInitializer)
 {
-  for (unsigned int i = 0; i < 5; ++i) {
-    m_tau[i] = tau[i];
-  }
-  for (unsigned int i = 0; i < 15; ++i) {
-    m_cov5[i] = cov5[i];
-  }
+
 }
 
 // This class should be able to give back Helix information either in Perigee Parametrisation
@@ -57,7 +52,7 @@ TVector3 TrackFitResult::getMomentum(const float bField) const
 
 float TrackFitResult::getTransverseMomentum(const float bField) const
 {
-  return std::fabs(1 / getAlpha(bField) / m_tau[2]);
+  return std::fabs(1 / getAlpha(bField) / m_tau.at(2));
 }
 
 TMatrixDSym TrackFitResult::getCovariance5() const
@@ -167,11 +162,12 @@ void TrackFitResult::cartesianToPerigee(const TVector3& position, const TVector3
   const double chi = asin(sinchi);
   const double z0 = z + charge / omega * cotTheta * chi;
 
-  m_tau[0] = d0;
-  m_tau[1] = phi;
-  m_tau[2] = omega;
-  m_tau[3] = z0;
-  m_tau[4] = cotTheta;
+  m_tau.reserve(5);
+  m_tau.push_back(d0);
+  m_tau.push_back(phi);
+  m_tau.push_back(omega);
+  m_tau.push_back(z0);
+  m_tau.push_back(cotTheta);
 
   // Derivative of the helix parameters WRT the 6D parameters.
   // We write down all the intermediate derivatives and then apply the
@@ -280,11 +276,9 @@ void TrackFitResult::cartesianToPerigee(const TVector3& position, const TVector3
   TMatrixDSym cov5(covariance);
   cov5.Similarity(A);
 
-  unsigned int counter = 0;
   for (unsigned int i = 0; i < 5; ++i) {
     for (unsigned int j = i; j < 5; ++j) {
-      m_cov5[counter] = cov5(i, j);
-      ++counter;
+      m_cov5.push_back(cov5(i, j));
     }
   }
 
@@ -297,30 +291,30 @@ double TrackFitResult::getAlpha(const float bField) const
 
 double TrackFitResult::calcXFromPerigee() const
 {
-  return m_tau[0] * std::sin((double)m_tau[1]);
+  return m_tau.at(0) * std::sin((double)m_tau.at(1));
 }
 
 double TrackFitResult::calcYFromPerigee() const
 {
-  return -m_tau[0] * std::cos((double)m_tau[1]);
+  return -m_tau.at(0) * std::cos((double)m_tau.at(1));
 }
 
 double TrackFitResult::calcZFromPerigee() const
 {
-  return m_tau[3];
+  return m_tau.at(3);
 }
 
 double TrackFitResult::calcPxFromPerigee(const float bField) const
 {
-  return std::cos((double)m_tau[1]) / (std::fabs(m_tau[2] * getAlpha(bField)));
+  return std::cos((double)m_tau.at(1)) / (std::fabs(m_tau.at(2) * getAlpha(bField)));
 }
 
 double TrackFitResult::calcPyFromPerigee(const float bField) const
 {
-  return std::sin((double)m_tau[1]) / (std::fabs(m_tau[2] * getAlpha(bField)));
+  return std::sin((double)m_tau.at(1)) / (std::fabs(m_tau.at(2) * getAlpha(bField)));
 }
 
 double TrackFitResult::calcPzFromPerigee(const float bField) const
 {
-  return m_tau[4] / (std::fabs(m_tau[2] * getAlpha(bField)));
+  return m_tau.at(4) / (std::fabs(m_tau.at(2) * getAlpha(bField)));
 }

@@ -80,14 +80,14 @@ namespace Belle2 {
       auto bField = 1.5;
       auto pType = Belle2::Const::electron;
       auto pValue = 0.45;
-      float tau[5];
+      std::vector<float> tau;
       for (int i = 0; i < 5; ++i) {
         // does not matter what is appended here, we only test the cov matrix
-        tau[i] = 1;
+        tau.push_back(1);
       }
-      float cov[15];
-      for (int i = 0; i < 15; i++) {
-        cov[i] = generator.Gaus(1e-4);
+      std::vector<float> cov(15);
+      for (auto & element : cov) {
+        element = generator.Gaus(1e-4);
       }
       Belle2::TrackFitResult myResult(tau, cov, pType, pValue, 0, 0);
       TMatrixDSym covariance(myResult.getCovariance6());

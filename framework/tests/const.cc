@@ -136,6 +136,16 @@ namespace {
     EXPECT_EQ(size, 8); //kaon should be removed
   }
 
+  TEST(ConstTest, FindInParticleSet)
+  {
+    for (const Const::ChargedStable & c : Const::chargedStableSet) {
+      int pdg = c.getPDGCode();
+      B2WARNING("pdg: " << pdg)
+      EXPECT_EQ(pdg, Const::chargedStableSet.find(pdg).getPDGCode());
+    }
+    EXPECT_TRUE(Const::chargedStableSet.find(12356467) == Const::invalidParticle);
+  }
+
   /** Check TDatabasePDG lookups. */
   TEST(ConstTest, TDatabasePDG)
   {

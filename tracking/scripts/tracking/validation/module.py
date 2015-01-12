@@ -44,6 +44,11 @@ class TrackingValidationModule(basf2.Module):
         # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
         self.pr_clones_and_matches = collections.deque()
         self.pr_matches = collections.deque()
+        self.pr_fakes = collections.deque()
+
+        self.pr_seed_tan_lambdas = collections.deque()
+        self.pr_seed_phi = collections.deque()
+        self.pr_seed_theta = collections.deque()
 
         self.pr_omega_truths = collections.deque()
         self.pr_omega_estimates = collections.deque()
@@ -91,12 +96,27 @@ class TrackingValidationModule(basf2.Module):
             tan_lambda_estimate = float('nan')
             tan_lambda_variance = float('nan')
 
+            momentum_pt = float('nan')
+            momentum = float('nan')
+
+            # store seed information, they are always available from the pattern reco
+            # even if the fit was no successful
+            # this information can we used when plotting fake tracks, for example
+            seed_position = trackCand.getPosSeed()
+            seed_momentum = trackCand.getMomSeed()
+            seed_tan_lambda = 1 / math.tan(seed_momentum.Theta())
+            seed_phi = seed_position.Phi()
+            seed_theta = seed_position.Theta()
+
             if prTrackFitResult != None:
                 omega_estimate = prTrackFitResult.getOmega()
                 omega_variance = prTrackFitResult.getCov()[9]
 
                 tan_lambda_estimate = prTrackFitResult.getCotTheta()
                 tan_lambda_variance = prTrackFitResult.getCov()[14]
+
+                momentum = prTrackFitResult.getMomentum()
+                momentum_pt = momentum.Perp()
 
             omega_truth = float('nan')
             tan_lambda_truth = float('nan')
@@ -107,8 +127,16 @@ class TrackingValidationModule(basf2.Module):
                 omega_truth = mcHelix.getOmega()
                 tan_lambda_truth = mcHelix.getTanLambda()
 
-            self.pr_clones_and_matches.append(is_matched or is_clone)
+            # store properties of the seed
+            self.pr_seed_tan_lambdas.append(seed_tan_lambda)
+            self.pr_seed_phi.append(seed_phi)
+            self.pr_seed_theta.append(seed_theta)
+
+            # store properties resulting from this trackfit
+            isMatchedOrIsClone = is_matched or is_clone
+            self.pr_clones_and_matches.append(isMatchedOrIsClone)
             self.pr_matches.append(is_matched)
+            self.pr_fakes.append(not isMatchedOrIsClone)
 
             self.pr_omega_estimates.append(omega_estimate)
             self.pr_omega_variances.append(omega_variance)
@@ -190,6 +218,15 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 'finding efficiency', make_hist=False)
         validation_plots.extend(plots)
 
+        # Fake rate (all tracks not matched or clone            #
+        # use TrackCand seeds for the fake track plotting       #
+        # as the fit (if successful) is probably not meaningful #
+        #########################################################
+        print 'fake list: ' + str(len(self.pr_fakes))
+        plots = self.profiles_by_pr_parameters(self.pr_fakes, 'fake rate',
+                make_hist=False)
+        validation_plots.extend(plots)
+
         # Hit efficiency #
         ##################
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
@@ -266,6 +303,56 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         make_hist=True,
         ):
 
+        # Profile versus the various parameters
+        profile_parameters = {
+            'd_{0}': self.mc_d0s,
+            'p_{t}': self.mc_pts,
+            'tan #lambda': self.mc_tan_lambdas,
+            'multiplicity': self.mc_multiplicities,
+            }
+
+        return self.profiles_by_parameters_base(
+            xs,
+            quantity_name,
+            parameter_names,
+            profile_parameters,
+            unit,
+            make_hist,
+            )
+
+    def profiles_by_pr_parameters(
+        self,
+        xs,
+        quantity_name,
+        unit=None,
+        parameter_names=['Seed tan #lambda', 'Seed #phi', 'Seed #theta'],
+        make_hist=True,
+        ):
+
+        # Profile versus the various parameters
+        profile_parameters = {'Seed tan #lambda': self.pr_seed_tan_lambdas,
+                              'Seed #phi': self.pr_seed_phi,
+                              'Seed #theta': self.pr_seed_theta}
+
+        return self.profiles_by_parameters_base(
+            xs,
+            quantity_name,
+            parameter_names,
+            profile_parameters,
+            unit,
+            make_hist,
+            )
+
+    def profiles_by_parameters_base(
+        self,
+        xs,
+        quantity_name,
+        parameter_names,
+        profile_parameters,
+        unit,
+        make_hist,
+        ):
+
         contact = self.contact
 
         validation_plots = []
@@ -282,14 +369,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             histogram.contact = contact
 
             validation_plots.append(histogram)
-
-        # Profile versus the various parameters
-        profile_parameters = {
-            'd_{0}': self.mc_d0s,
-            'p_{t}': self.mc_pts,
-            'tan #lambda': self.mc_tan_lambdas,
-            'multiplicity': self.mc_multiplicities,
-            }
 
         for (parameter_name, parameter_values) in profile_parameters.items():
             if parameter_name in parameter_names \

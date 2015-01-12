@@ -27,7 +27,7 @@ import ROOT
 class CDCLocal(TrackingValidationRun):
 
     n_events = N_EVENTS
-    finder_module = 'CDCLocalTracking'
+    finder_module = 'TrackFinderCDCAutomaton'
     fit_geometry = None
     pulls = True
     contact = CONTACT

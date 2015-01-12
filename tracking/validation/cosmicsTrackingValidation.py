@@ -29,7 +29,7 @@ class Cosmics(TrackingValidationRun):
     n_events = N_EVENTS
     generator_module = 'Cosmics'
     components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
-    finder_module = 'CDCLocalTracking'
+    finder_module = 'TrackFinderCDCCosmics'
     fit_geometry = None
     pulls = True
     contact = CONTACT

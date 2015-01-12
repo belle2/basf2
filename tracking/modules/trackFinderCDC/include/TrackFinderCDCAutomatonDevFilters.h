@@ -7,8 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCFILTERS_H_
-#define CDCFILTERS_H_
+#ifndef TRACKFINDERCDCAUTOMATONDEVFILTERS_H_
+#define TRACKFINDERCDCAUTOMATONDEVFILTERS_H_
+
+// Configuring definitions
+#include <tracking/modules/trackFinderCDC/TrackFinderCDCAutomatonDevConfig.h>
+
 
 #include <tracking/cdcLocalTracking/filters/facet/SimpleFacetFilter.h>
 #include <tracking/cdcLocalTracking/filters/facet_facet/SimpleFacetNeighborChooser.h>
@@ -137,4 +141,4 @@ namespace Belle2 {
   } // end namespace CDCLocalTracking
 } // end namespace Belle2
 
-#endif /* CDCFILTERS_H_ */
+#endif /* TRACKFINDERCDCAUTOMATONDEVFILTERS_H_ */

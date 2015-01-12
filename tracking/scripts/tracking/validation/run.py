@@ -24,7 +24,7 @@ def get_basf2_module(module_or_module_name):
         message_template = \
             '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
         raise ValueError(message_template % (module_or_module_name,
-                         type(module_or_module_name)))
+                                             type(module_or_module_name)))
 
 
 class TrackingValidationRun(object):
@@ -61,7 +61,7 @@ class TrackingValidationRun(object):
         return self.__class__.__name__
 
     def determineTrackingCoverage(self, finder_module):
-        if finder_module == "CDCLocalTracking" or finder_module == "CDCLegendreTracking":
+        if finder_module == "CDCLocalTracking" or finder_module == "CDCLegendreTracking" or finder_module.startswith('TrackFinderCDC'):
             return {'UsePXDHits': False, 'UseSVDHits': False, 'UseCDCHits': True}
         elif finder_module == "VXDTF":
             return {'UsePXDHits': True, 'UseSVDHits': True, 'UseCDCHits': False}
@@ -78,7 +78,7 @@ class TrackingValidationRun(object):
         # Master module
         eventInfoSetterModule = basf2.register_module('EventInfoSetter')
         eventInfoSetterModule.param({'evtNumList': [self.n_events],
-                                    'runList': [1], 'expList': [1]})
+                                     'runList': [1], 'expList': [1]})
         main_path.add_module(eventInfoSetterModule)
 
         # Progress module
@@ -135,16 +135,16 @@ class TrackingValidationRun(object):
         # Reference Monte Carlo tracks
         trackFinderMCTruthModule = basf2.register_module('TrackFinderMCTruth')
         trackFinderMCTruthModule.param({'WhichParticles': ['primary'],
-                                       'EnergyCut': 0.1,
-                                       'GFTrackCandidatesColName': 'MCTrackCands'})
+                                        'EnergyCut': 0.1,
+                                        'GFTrackCandidatesColName': 'MCTrackCands'})
         trackFinderMCTruthModule.param(self.tracking_coverage)
         main_path.add_module(trackFinderMCTruthModule)
 
         # Track matcher
         mcTrackMatcherModule = basf2.register_module('MCTrackMatcher')
         mcTrackMatcherModule.param({'MCGFTrackCandsColName': 'MCTrackCands',
-                                   'MinimalPurity': 0.66,
-                                   'RelateClonesToMCParticles': True})
+                                    'MinimalPurity': 0.66,
+                                    'RelateClonesToMCParticles': True})
         mcTrackMatcherModule.param(self.tracking_coverage)
         main_path.add_module(mcTrackMatcherModule)
 

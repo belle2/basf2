@@ -92,7 +92,7 @@ void NtupleCustomFloatsTool::setupTree()
 void NtupleCustomFloatsTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleCustomFloatsTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleCustomFloatsTool::eval - no Particle found!");
     return;
   }
 

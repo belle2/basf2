@@ -39,7 +39,7 @@ void NtupleFlavorTaggingTool::setupTree()
 void NtupleFlavorTaggingTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleFlavorTaggingTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleFlavorTaggingTool::eval - no Particle found!");
     return;
   }
 

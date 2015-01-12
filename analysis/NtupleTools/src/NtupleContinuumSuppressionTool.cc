@@ -135,7 +135,7 @@ void NtupleContinuumSuppressionTool::setupTree()
 void NtupleContinuumSuppressionTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleContinuumSuppressionTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleContinuumSuppressionTool::eval - no Particle found!");
     return;
   }
 

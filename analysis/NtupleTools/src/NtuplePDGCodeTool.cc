@@ -28,7 +28,7 @@ void NtuplePDGCodeTool::setupTree()
 void NtuplePDGCodeTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtuplePDGCodeTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtuplePDGCodeTool::eval - no Particle found!");
     return;
   }
 

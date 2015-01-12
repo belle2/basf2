@@ -30,7 +30,7 @@ void NtupleKinematicsTool::setupTree()
 void NtupleKinematicsTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleKinematicsTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleKinematicsTool::eval - no Particle found!");
     return;
   }
 

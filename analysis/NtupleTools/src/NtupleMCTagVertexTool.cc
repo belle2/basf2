@@ -35,7 +35,7 @@ void NtupleMCTagVertexTool::setupTree()
 void NtupleMCTagVertexTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCTagVertexTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMCTagVertexTool::eval - no Particle found!");
     return;
   }
 

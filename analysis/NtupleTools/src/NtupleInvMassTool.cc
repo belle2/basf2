@@ -43,7 +43,7 @@ void NtupleInvMassTool::setupTree()
 void NtupleInvMassTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleInvMassTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleInvMassTool::eval - no Particle found!");
     return;
   }
 

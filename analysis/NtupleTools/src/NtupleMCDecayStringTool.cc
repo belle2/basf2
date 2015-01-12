@@ -40,7 +40,7 @@ void NtupleMCDecayStringTool::setupTree()
 void NtupleMCDecayStringTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCDecayStringTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMCDecayStringTool::eval - no Particle found!");
     return;
   }
 

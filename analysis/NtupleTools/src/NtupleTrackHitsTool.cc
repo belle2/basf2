@@ -35,7 +35,7 @@ void NtupleTrackHitsTool::eval(const Particle* particle)
 {
 
   if (!particle) {
-    printf("NtupleTrackHitsTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleTrackHitsTool::eval - no Particle found!");
     return;
   }
 

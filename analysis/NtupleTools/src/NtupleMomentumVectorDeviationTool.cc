@@ -27,7 +27,7 @@ void NtupleMomentumVectorDeviationTool::setupTree()
 void NtupleMomentumVectorDeviationTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMomentumVectorDeviationTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMomentumVectorDeviationTool::eval - no Particle found!");
     return;
   }
 
@@ -36,7 +36,7 @@ void NtupleMomentumVectorDeviationTool::eval(const Particle* particle)
   if (selparticles.empty()) return;
 
   if (selparticles.size() != 2) {
-    printf("NtupleMomentumVectorDeviationTool::eval - ERROR, you must to select exactly 2 particles in the decay (mother and daughter)!\n");
+    B2ERROR("NtupleMomentumVectorDeviationTool::eval - you must to select exactly 2 particles in the decay (mother and daughter)!");
     return;
   }
 

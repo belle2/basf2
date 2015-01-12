@@ -28,7 +28,7 @@ void NtupleChargeTool::setupTree()
 void NtupleChargeTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleChargeTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleChargeTool::eval - no Particle found!");
     return;
   }
 

@@ -38,7 +38,7 @@ void NtuplePIDTool::setupTree()
 void NtuplePIDTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtuplePIDTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtuplePIDTool::eval - no Particle found!");
     return;
   }
 

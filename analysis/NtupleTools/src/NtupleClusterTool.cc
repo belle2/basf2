@@ -49,7 +49,7 @@ void NtupleClusterTool::setupTree()
 void NtupleClusterTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleClusterTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleClusterTool::eval - no Particle found!");
     return;
   }
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);

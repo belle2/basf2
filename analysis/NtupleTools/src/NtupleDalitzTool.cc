@@ -30,7 +30,7 @@ void NtupleDalitzTool::setupTree()
 void NtupleDalitzTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleDalitzTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleDalitzTool::eval - no Particle found!");
     return;
   }
 
@@ -39,7 +39,7 @@ void NtupleDalitzTool::eval(const Particle* particle)
   if (selparticles.empty()) return;
 
   if (selparticles.size() != 3) {
-    printf("NtupleDalitzTool::eval - ERROR, you must select exactly 3 particles in the decay (daughter1, daughter2, daughter3)!\n");
+    B2ERROR("NtupleDalitzTool::eval - you must select exactly 3 particles in the decay (daughter1, daughter2, daughter3)!");
     return;
   }
 

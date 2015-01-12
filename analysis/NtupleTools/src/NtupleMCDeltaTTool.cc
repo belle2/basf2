@@ -33,7 +33,7 @@ void NtupleMCDeltaTTool::setupTree()
 void NtupleMCDeltaTTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCDeltaTTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMCDeltaTTool::eval - no Particle found!");
     return;
   }
 

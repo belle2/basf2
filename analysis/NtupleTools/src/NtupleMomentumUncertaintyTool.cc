@@ -29,7 +29,7 @@ void NtupleMomentumUncertaintyTool::setupTree()
 void NtupleMomentumUncertaintyTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMomentumUncertaintyTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMomentumUncertaintyTool::eval - no Particle found!");
     return;
   }
 

@@ -30,7 +30,7 @@ void NtupleVVAnglesTool::setupTree()
 void NtupleVVAnglesTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleVVAnglesTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleVVAnglesTool::eval - no Particle found!");
     return;
   }
 
@@ -38,7 +38,7 @@ void NtupleVVAnglesTool::eval(const Particle* particle)
   if (selparticles.empty()) return;
 
   if (selparticles.size() != 4) {
-    printf("NtupleVVAnglesTool::eval - ERROR, you must select exactly 4 particles in the decay B-> A + B, A->1+2, B->3+4!\n");
+    B2ERROR("NtupleVVAnglesTool::eval - you must select exactly 4 particles in the decay B-> A + B, A->1+2, B->3+4!");
     return;
   }
 

@@ -34,7 +34,7 @@ void NtupleMCVertexTool::setupTree()
 void NtupleMCVertexTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCVertexTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMCVertexTool::eval - no Particle found!");
     return;
   }
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
@@ -43,7 +43,7 @@ void NtupleMCVertexTool::eval(const Particle* particle)
     const MCParticle* mcparticle = selparticles[iProduct]->getRelatedTo<MCParticle>();
 
     if (!mcparticle) {
-      printf("NtupleMCVertexTool::eval - WARNING no truth match found for this reco particle!\n");
+      B2WARNING("NtupleMCVertexTool::eval - no truth match found for this reco particle!");
     } else {
       const TVector3 mcparticle_vert = mcparticle->getDecayVertex();
       m_fTruthX[iProduct] = mcparticle_vert.X();

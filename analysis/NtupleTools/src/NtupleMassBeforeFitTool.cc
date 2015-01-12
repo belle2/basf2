@@ -32,7 +32,7 @@ void NtupleMassBeforeFitTool::setupTree()
 void NtupleMassBeforeFitTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMassBeforeFitTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMassBeforeFitTool::eval - no Particle found!");
     return;
   }
 

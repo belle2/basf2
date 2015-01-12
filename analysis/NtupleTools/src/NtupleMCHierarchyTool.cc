@@ -32,7 +32,7 @@ void NtupleMCHierarchyTool::setupTree()
 void NtupleMCHierarchyTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCHierarchyTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMCHierarchyTool::eval - no Particle found!");
     return;
   }
 

@@ -28,7 +28,7 @@ void NtupleHelicityTool::setupTree()
 void NtupleHelicityTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleHelicityTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleHelicityTool::eval - no Particle found!");
     return;
   }
 
@@ -36,7 +36,7 @@ void NtupleHelicityTool::eval(const Particle* particle)
   if (selparticles.empty()) return;
 
   if (selparticles.size() != 2) {
-    printf("NtupleHelicityTool::eval - ERROR, you must select exactly 2 particles in the decay A->1+2!\n");
+    B2ERROR("NtupleHelicityTool::eval - you must select exactly 2 particles in the decay A->1+2!");
     return;
   }
 

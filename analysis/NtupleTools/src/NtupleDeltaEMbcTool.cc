@@ -31,7 +31,7 @@ void NtupleDeltaEMbcTool::setupTree()
 void NtupleDeltaEMbcTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleDeltaEMbcTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleDeltaEMbcTool::eval - no Particle found!");
     return;
   }
 

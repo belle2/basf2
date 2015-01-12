@@ -33,7 +33,7 @@ void NtupleMCKinematicsTool::setupTree()
 void NtupleMCKinematicsTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCKinematicsTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMCKinematicsTool::eval - no Particle found!");
     return;
   }
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);

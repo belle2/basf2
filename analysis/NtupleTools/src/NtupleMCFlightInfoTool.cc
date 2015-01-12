@@ -33,7 +33,7 @@ void NtupleMCFlightInfoTool::setupTree()
 void NtupleMCFlightInfoTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCFlightInfoTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleMCFlightInfoTool::eval - no Particle found!");
     return;
   }
 
@@ -42,7 +42,7 @@ void NtupleMCFlightInfoTool::eval(const Particle* particle)
   if (selparticles.empty()) return;
 
   if (selparticles.size() != 2) {
-    printf("NtupleMCFlightInfoTool::eval - ERROR, you must to select exactly 2 particles in the decay (mother and daughter)!\n");
+    B2ERROR("NtupleMCFlightInfoTool::eval - you must to select exactly 2 particles in the decay (mother and daughter)!");
     return;
   }
 

@@ -14,6 +14,7 @@
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 #include <TTree.h>
 #include <string>
 

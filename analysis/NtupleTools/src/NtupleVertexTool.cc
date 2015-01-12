@@ -50,7 +50,7 @@ void NtupleVertexTool::setupTree()
 void NtupleVertexTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleVertexTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleVertexTool::eval - no Particle found!");
     return;
   }
 

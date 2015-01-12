@@ -33,7 +33,7 @@ void NtupleCMSKinematicsTool::setupTree()
 void NtupleCMSKinematicsTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleCMSKinematicsTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleCMSKinematicsTool::eval - no Particle found!");
     return;
   }
 

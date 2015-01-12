@@ -29,7 +29,7 @@ void NtupleSLTool::setupTree()
 void NtupleSLTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleSLTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleSLTool::eval - no Particle found!");
     return;
   }
 
@@ -37,7 +37,7 @@ void NtupleSLTool::eval(const Particle* particle)
   if (selparticles.empty()) return;
 
   if (selparticles.size() != 2) {
-    printf("NtupleSLTool::eval - ERROR, you must select exactly 2 particles in the decay A->1+2!\n");
+    B2ERROR("NtupleSLTool::eval - you must select exactly 2 particles in the decay A->1+2!");
     return;
   }
 

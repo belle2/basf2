@@ -35,7 +35,7 @@ void NtupleTrackTool::eval(const Particle* particle)
 {
 
   if (!particle) {
-    printf("NtupleTrackTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleTrackTool::eval - no Particle found!");
     return;
   }
 

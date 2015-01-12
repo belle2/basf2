@@ -43,7 +43,7 @@ void NtupleTagVertexTool::setupTree()
 void NtupleTagVertexTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleTagVertexTool::eval - ERROR, no Particle found!\n");
+    B2ERROR("NtupleTagVertexTool::eval - no Particle found!");
     return;
   }
 

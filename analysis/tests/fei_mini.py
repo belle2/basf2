@@ -9,7 +9,7 @@ import glob
 from basf2 import *
 from ROOT import Belle2
 
-inputFile = Belle2.FileSystem.findFile('analysis/tests/mdst_100events.root')
+inputFile = Belle2.FileSystem.findFile('analysis/tests/mdst_r10142.root')
 steeringFile = Belle2.FileSystem.findFile('analysis/tests/fei_mini_steeringfile.internal')
 
 tempdir = tempfile.mkdtemp()

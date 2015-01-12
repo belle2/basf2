@@ -32,16 +32,16 @@ template <typename T>
 class CDCLocalTrackingRootificationTest : public CDCLocalTrackingTestWithTopology {;};
 
 typedef ::testing::Types <
-Vector2D,
-Vector3D,
-CDCGenHit,
-CDCGenHitVector<CDCGenHit>,
-CDCGenHitVector<CDCWireHit>,
-CDCWireHitVector,
-CDCRecoHit2DVector,
-CDCRecoTangentVector,
-CDCRecoFacetVector,
-CDCRecoHit3DVector
+Vector2D
+// Vector3D,
+// CDCGenHit,
+// CDCGenHitVector<CDCGenHit>,
+// CDCGenHitVector<CDCWireHit>,
+// CDCWireHitVector,
+// CDCRecoHit2DVector,
+// CDCRecoTangentVector,
+// CDCRecoFacetVector,
+// CDCRecoHit3DVector
 > RootifiedTypes;
 
 

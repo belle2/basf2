@@ -6,7 +6,16 @@ import os
 env.Dictionary()['SUBLIB'] = True
 
 # Additional libraries
-env['LIBS'] = ['framework_pybasf2']
+env['LIBS'] = [
+    'tracking',
+    'tracking_dataobjects',
+    'cdc', 'cdc_dataobjects',
+    'mdst_dataobjects',
+    'framework',
+    'framework_pybasf2',
+    'genfit2',
+    '$ROOT_LIBS',
+    ]
 
 # Forward the compilation option 
 belle2_option = os.environ["BELLE2_OPTION"]

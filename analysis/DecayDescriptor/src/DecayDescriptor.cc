@@ -12,10 +12,10 @@
 #include <evtgen/EvtGenBase/EvtPDL.hh>
 #include <evtgen/EvtGenBase/EvtId.hh>
 
-#include <algorithm>
 #include <boost/variant/get.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
+#include <algorithm>
 #include <set>
 #include <utility>
 
@@ -270,8 +270,10 @@ vector<const Particle*> DecayDescriptor::getSelectionParticles(const Particle* p
       continue;
     }
     // check if the daughter has the correct PDG code
-    if (abs(daughter->getPDGCode()) != abs(m_daughters[iDaughter_d].getMother()->getPDGCode())) {
-      B2ERROR("The PDG code of the particle daughter does not match the PDG code of the DecayDescriptor daughter");
+    int daughterPDG = abs(daughter->getPDGCode());
+    int decayDescriptorDaughterPDG = abs(m_daughters[iDaughter_d].getMother()->getPDGCode());
+    if (daughterPDG != decayDescriptorDaughterPDG) {
+      B2ERROR("The PDG code of the particle daughter (" << daughterPDG << ") does not match the PDG code of the DecayDescriptor daughter (" << decayDescriptorDaughterPDG << ")! Check the order of the decay string is the same you expect in the reconstructed Particles.");
       break;
     }
     vector<const Particle*> seldaughters = m_daughters[iDaughter_d].getSelectionParticles(daughter);
@@ -333,7 +335,7 @@ vector<string> DecayDescriptor::getSelectionNames()
       iOccurrence++;
     }
     if (iOccurrence == 10) {
-      printf("DecayDescriptor::getSelectionNames - Something is wrong! More than 10x the same name!\n");
+      B2ERROR("DecayDescriptor::getSelectionNames - Something is wrong! More than 10x the same name!");
       break;
     }
   }

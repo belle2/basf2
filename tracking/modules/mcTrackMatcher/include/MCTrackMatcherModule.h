@@ -151,6 +151,11 @@ namespace Belle2 {
                    This number encodes how many correct hits are minimally need to compensate for a false hits.
                    The default 0.66 suggests that for each background hit can be compensated by two correct hits.*/
 
+    double m_param_minimalEfficiency;                                  /**< Minimal efficiency of a MCTrack to be considered matchable to a PRTrack.
+                    This number encodes which fraction of the true hits must at least be in the reconstructed track.
+                    The default 0.2 suggests that at least 20% of the true hits should have been picked up.*/
+
+
     /*int m_param_minimalExcessNdf;                                     < Minimum number of degrees of freedom in the PRtrack. 2D hits count as 2.
                    The number can be given to insure that a minimum of correct degress of freedom
                    is in the track for the fit as well as the rest of the correct hits is able to

@@ -95,6 +95,13 @@ MCTrackMatcherModule::MCTrackMatcherModule() : Module()
            2.0 / 3.0);
 
 
+  addParam("MinimalEfficiency",
+           m_param_minimalEfficiency,
+           "Minimal efficiency of a MCTrack to be considered matchable to a PRTrack. "
+           "This number encodes which fraction of the true hits must at least be in the reconstructed track. "
+           "The default 0.2 suggests that at least 20% of the true hits should have been picked up.",
+           0.2);
+
   // PRTracks purity minimal constrains
   /*addParam("MinimalExcessNDF",
      m_param_minimalExcessNdf,
@@ -318,26 +325,19 @@ void MCTrackMatcherModule::event()
 
   //### Build the confusion matrix ###
 
-  //Reserve enough space for the confusion matrix
-  //The last row and column are meant for hits not assigned to a prTrackCand and/or mcTrackCand (aka background)
-  Eigen::MatrixXi confusionMatrix = Eigen::MatrixXi::Zero(nPRTrackCands + 1, nMCTrackCands + 1);
+  // Reserve enough space for the confusion matrix
+  // The last row is meant for hits not assigned to a mcTrackCand (aka background hits)
+  Eigen::MatrixXi confusionMatrix = Eigen::MatrixXi::Zero(nPRTrackCands, nMCTrackCands + 1);
 
-  //Accumulated the total number of hits/ndf for each Monte-Carlo track seperatly to avoid double counting,
-  //in case patter recognition tracks share hits.
+  // Accumulated the total number of hits/ndf for each Monte-Carlo track seperatly to avoid double counting,
+  // in case patter recognition tracks share hits.
   Eigen::RowVectorXi totalNDF_by_mcTrackCandId = Eigen::RowVectorXi::Zero(nMCTrackCands + 1);
 
-  // The equivalent for the patter recognition tracks is just the rowise sum of the confusion matrix,
-  // Double counting can not occure, since Monte-Carlo tracks do not share hits.
-  // look below for  Eigen::VectorXi totalNDF_by_prTrackCandId
-
-  //Row index for the hits not assigned to any PRTrackCand
-  const int prBkgId = nPRTrackCands;
-
-  //Column index for the hits not assigned to any MCTrackCand
+  // Column index for the hits not assigned to any MCTrackCand
   const int mcBkgId = nMCTrackCands;
 
   // for each detector examine every hit to which mcTrackCand and prTrackCand it belongs
-  // if the hit is not part of any mcTrackCand or any prTrackCand or none of both, put the hit in the corresponding
+  // if the hit is not part of any mcTrackCand put the hit in the background column.
   for (const pair<const DetId, NDF>& detId_nHits_pair : nHits_by_detId) {
 
     const DetId& detId = detId_nHits_pair.first;
@@ -347,8 +347,8 @@ void MCTrackMatcherModule::event()
     for (HitId hitId = 0; hitId < nHits; ++hitId) {
       pair<DetId, HitId> detId_hitId_pair(detId, hitId);
 
-      //First search the unique mcTrackCandId for the hit
-      //If the hit is not assigned to any mcTrackCand to Id is set to the background column id iMC
+      // First search the unique mcTrackCandId for the hit.
+      // If the hit is not assigned to any mcTrackCand to Id is set iMC to the background column.
       auto it_mcTrackCandId_for_detId_hitId_pair = mcTrackCandId_by_hitId.find(detId_hitId_pair);
 
       TrackCandId mcTrackCandId = -1;
@@ -360,42 +360,22 @@ void MCTrackMatcherModule::event()
         mcTrackCandId = it_mcTrackCandId_for_detId_hitId_pair->second;
       }
 
-      //Assign the hits/ndf to the total ndf vector seperatly here to avoid double counting, if patter recognition track share hits.
+      // Assign the hits/ndf to the total ndf vector seperatly here to avoid double counting, if patter recognition track share hits.
       totalNDF_by_mcTrackCandId(mcTrackCandId) += ndfForOneHit;
 
-      //Second examine the prTrackCands if the hit is assigned to none or a couple of them
-      size_t n_prTrackCands_for_detId_hitId_pair = prTrackCandId_by_hitId.count(detId_hitId_pair);
+      // Seek all prTrackCands
+      //  use as range adapter to convert the iterator pair form equal_range to a range base iterable struct
+      auto range_prTrackCandIds_for_detId_hitId_pair = as_range(prTrackCandId_by_hitId.equal_range(detId_hitId_pair));
 
-      if (n_prTrackCands_for_detId_hitId_pair == 0) {
-        // hit is not assigned to any prTrack
-        // add the hit with ndf to the row of unassigned hits
-        B2DEBUG(200, "prBkgId : " << prBkgId << ";  mcTrackCandId : " <<  mcTrackCandId);
+      // add the degrees of freedom to every prTrackCand that has this hit
+      for (const pair<pair<DetId, HitId>, TrackCandId>& detId_hitId_pair_and_prTrackCandId :
+           range_prTrackCandIds_for_detId_hitId_pair) {
 
-        confusionMatrix(prBkgId, mcTrackCandId) += ndfForOneHit;
+        TrackCandId prTrackCandId = detId_hitId_pair_and_prTrackCandId.second;
 
-        // Annotation : maybe the last row containing hits not assigned to any PRTrack is irrelevant.
-        // Since we may assign the ndf of a hit more than once (for each PRTrack that contains it)
-        // efficiency measures of the confusion matrix are screwed and only compairing the absolute hit content is applicable.
-
-      } else { /*( n_prTrackCands_for_detId_hitId_pair != 0 )*/
-        // hit is assigned to some prTracks
-
-        //Seek all prTrackCands
-        //  use as range adapter to convert the iterator pair form equal_range to a range base iterable struct
-        auto range_prTrackCandIds_for_detId_hitId_pair = as_range(prTrackCandId_by_hitId.equal_range(detId_hitId_pair));
-
-        // add the degrees of freedom to every prTrackCand that has this hit
-        for (const pair<pair<DetId, HitId>, TrackCandId>& detId_hitId_pair_and_prTrackCandId :
-             range_prTrackCandIds_for_detId_hitId_pair) {
-
-          TrackCandId prTrackCandId = detId_hitId_pair_and_prTrackCandId.second;
-
-          B2DEBUG(200, " prTrackCandId : " <<  prTrackCandId  << ";  mcTrackCandId : " <<  mcTrackCandId);
-          confusionMatrix(prTrackCandId, mcTrackCandId) += ndfForOneHit;
-        } //end for
-
-      } //end if ( n_prTrackCands_for_detId_hitId_pair == 0 )
-
+        B2DEBUG(200, " prTrackCandId : " <<  prTrackCandId  << ";  mcTrackCandId : " <<  mcTrackCandId);
+        confusionMatrix(prTrackCandId, mcTrackCandId) += ndfForOneHit;
+      } //end for
     } //end for hitId
   } // end for decId
 
@@ -505,7 +485,7 @@ void MCTrackMatcherModule::event()
 
 
   // ### Classify the patter recognition tracks ###
-  // Meaning saving the highest purity relation to the data store
+  // Means saving the highest purity relation to the data store
   // + setup the PRTrack to MCParticle relation
   // + save the McTrackId property
   for (TrackCandId prTrackCandId = 0; prTrackCandId < nPRTrackCands; ++prTrackCandId) {
@@ -517,59 +497,68 @@ void MCTrackMatcherModule::event()
     const Purity& purity = purestMCTrackCandId.second;
 
     if (purity < m_param_minimalPurity) {
-      //GHOST
+      // GHOST
       prTrackCand->setMcTrackId(-999);
       B2DEBUG(100, "Stored PRTrack " << prTrackCandId << " as ghost (McTrackId=" << prTrackCand->getMcTrackId()  << ")");
 
     } else if (mcTrackCandId == mcBkgId) {
-      //BACKGROUND
+      // BACKGROUND
       prTrackCand->setMcTrackId(-99);
-      B2DEBUG(100, "Stored PRTrack " << prTrackCandId << " as background (McTrackId=" << prTrackCand->getMcTrackId() << ")");
+      B2DEBUG(100, "Stored PRTrack " << prTrackCandId << " as background (McTrackId=" << prTrackCand->getMcTrackId() << ") because of too low purity.");
     } else {
 
-      //after the classification for bad purity and background we examine, whether
-      //the highest purity Monte-Carlo track has in turn the highest efficiency patter recognition track
-      //equal to this track.
-      //All extra patter recognition tracks are stored with negativelly signed purity
+      // after the classification for bad purity and background we examine, whether
+      // the highest purity Monte-Carlo track has in turn the highest efficiency patter recognition track
+      // equal to this track.
+      // All extra patter recognition tracks are stored with negativelly signed purity
 
       genfit::TrackCand* mcTrackCand = mcGFTrackCands[mcTrackCandId];
 
       const pair<TrackCandId, Efficiency>& mostEfficientPRTrackCandId_for_mcTrackCandId = mostEfficientPRTrackCandId_by_mcTrackCandId[mcTrackCandId];
 
       const TrackCandId& mostEfficientPRTrackCandId = mostEfficientPRTrackCandId_for_mcTrackCandId.first;
-
-      //may be one can also impose a minimal efficiency cut on the PRTracks here,
-      //but efficiency seem rather unimportant as long as the track is pure and not a ghost
-      //const Efficiency & efficiency = mostEfficientPRTrackCandId_for_mcTrackCandId.second;
+      const Efficiency& efficiency = mostEfficientPRTrackCandId_for_mcTrackCandId.second;
 
       if (prTrackCandId != mostEfficientPRTrackCandId) {
-        //CLONE
+        if (efficiency >= m_param_minimalEfficiency) {
 
-        if (m_param_relateClonesToMCParticles) {
+          // CLONE
+          if (m_param_relateClonesToMCParticles) {
 
-          //Set the McTrackId to the related MCParticle
-          prTrackCand->setMcTrackId(mcTrackCand->getMcTrackId());
-          B2DEBUG(100, "Set McTrackId property of PRTrack to " << prTrackCand->getMcTrackId());
+            // Set the McTrackId to the related MCParticle
+            prTrackCand->setMcTrackId(mcTrackCand->getMcTrackId());
+            B2DEBUG(100, "Set McTrackId property of PRTrack to " << prTrackCand->getMcTrackId());
 
-          //Add the mc matching relation
-          MCParticle* mcParticle = DataStore::getRelatedFromObj<MCParticle>(mcTrackCand);
-          DataStore::addRelationFromTo(prTrackCand, mcParticle);
-          B2DEBUG(100, "MC Match prId " << prTrackCandId << " to mcPartId " << mcParticle->getArrayIndex());
+            // Add the mc matching relation
+            MCParticle* mcParticle = DataStore::getRelatedFromObj<MCParticle>(mcTrackCand);
+            DataStore::addRelationFromTo(prTrackCand, mcParticle);
+            B2DEBUG(100, "MC Match prId " << prTrackCandId << " to mcPartId " << mcParticle->getArrayIndex());
 
+
+          } else {
+
+            prTrackCand->setMcTrackId(-9);
+            B2DEBUG(100, "Set McTrackId property of PRTrack to " << prTrackCand->getMcTrackId());
+
+          }
+          //Setup the relation with negative purity for this case
+          DataStore::addRelationFromTo(prTrackCand, mcTrackCand, -purity);
+          B2DEBUG(100, "Purity rel: prId " << prTrackCandId << " -> mcId " << mcTrackCandId << " : " << -purity);
 
         } else {
+          // Pattern recognition track fails the minimal purity requirement
+          // We might want to introduce a different classification here, we see problems
+          // with too many ghosts and want to investigate the specific source of the mismatch
+          //
 
-          prTrackCand->setMcTrackId(-9);
-          B2DEBUG(100, "Set McTrackId property of PRTrack to " << prTrackCand->getMcTrackId());
+          // GHOST
+          prTrackCand->setMcTrackId(-999);
+          B2DEBUG(100, "Stored PRTrack " << prTrackCandId << " as ghost (McTrackId=" << prTrackCand->getMcTrackId()  << ") because of too low efficiency.");
 
         }
 
-        //Setup the relation with negative purity for this case
-        DataStore::addRelationFromTo(prTrackCand, mcTrackCand, -purity);
-        B2DEBUG(100, "Purity rel: mcId " << prTrackCandId << " -> prId " << mcTrackCandId << " : " << -purity);
-
       } else {
-        //MATCHED
+        // MATCHED
 
         //Set the McTrackId to the related MCParticle
         prTrackCand->setMcTrackId(mcTrackCand->getMcTrackId());
@@ -609,10 +598,10 @@ void MCTrackMatcherModule::event()
     const TrackCandId& prTrackCandId = mostEfficiencyPRTrackCandId.first;
     const Efficiency& efficiency = mostEfficiencyPRTrackCandId.second;
 
-    if (prTrackCandId == prBkgId or prGFTrackCands[prTrackCandId]->getMcTrackId() < 0) {
-      //MISSING
-      //No related pattern recognition track
-      //Do not create a relation.
+    if (prGFTrackCands[prTrackCandId]->getMcTrackId() < 0 or not(efficiency >= m_param_minimalEfficiency)) {
+      // MISSING
+      // No related pattern recognition track
+      // Do not create a relation.
       B2DEBUG(100, "mcId " << mcTrackCandId << " is missing. No relation created.");
 
     } else {
@@ -623,17 +612,17 @@ void MCTrackMatcherModule::event()
       const TrackCandId& purestMCTrackCandId = purestMCTrackCandId_for_prTrackCandId.first;
 
       if (mcTrackCandId != purestMCTrackCandId) {
-        //MERGED
+        // MERGED
         // this MCTrack is in a PRTrack which in turn better describes a MCTrack different form this.
 
-        //Setup the relation with negative efficiency for this case.
+        // Setup the relation with negative efficiency for this case.
         DataStore::addRelationFromTo(mcTrackCand, prTrackCand, -efficiency);
         B2DEBUG(100, "Efficiency rel: mcId " << mcTrackCandId << " -> prId " << prTrackCandId << " : " << -efficiency);
 
       } else {
-        //MATCHED
+        // MATCHED
 
-        //Setup the relation with positive efficiency for this case.
+        // Setup the relation with positive efficiency for this case.
         DataStore::addRelationFromTo(mcTrackCand, prTrackCand, efficiency);
         B2DEBUG(100, "Efficiency rel: mcId " << mcTrackCandId << " -> prId " << prTrackCandId << " : " << efficiency);
 
@@ -642,7 +631,7 @@ void MCTrackMatcherModule::event()
 
   }
 
-  B2DEBUG(100, "########## MCTrackMatcherModule ############");
+  B2DEBUG(100, "########## End MCTrackMatcherModule ############");
 
 } //end event()
 

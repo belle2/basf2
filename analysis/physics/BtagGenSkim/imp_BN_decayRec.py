@@ -76,6 +76,10 @@ def reconstructB0DMYPS0(q):  # reconstruct B0 -> D- Y+(S=0) decays
     matchMCTruth('B0:D-Y+S0')
     # taking only correctly reconstructed B0
     applyCuts('B0:D-Y+S0', 'isSignal>0.5')
+    # prevent double counting of different channels with same output particles
+    applyCuts('B0:D-Y+S0',
+              'abs(daughter(0,genMotherPDG)) < 413 or abs(daughter(0,genMotherPDG)) > 413'
+              )
 
 
 def reconstructB0DMYPS1(q):  # reconstruct B0 -> D- Y+(S=1) decays
@@ -143,6 +147,10 @@ def reconstructB0DMYPS1(q):  # reconstruct B0 -> D- Y+(S=1) decays
     matchMCTruth('B0:D-Y+S1')
     # taking only correctly reconstructed B0
     applyCuts('B0:D-Y+S1', 'isSignal>0.5')
+    # prevent double counting of different channels with same output particles
+    applyCuts('B0:D-Y+S1',
+              'abs(daughter(0,genMotherPDG)) < 413 or abs(daughter(0,genMotherPDG)) > 413'
+              )
 
 
 def reconstructB0DSTMYPS0(q):  # reconstruct B0 -> D*- Y+(S=0) decays
@@ -353,6 +361,10 @@ def reconstructB0misc(q):  # miscellaneous modes
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 113)
     reconstructDecay('B0:114 -> anti-D0:all pi+:all pi-:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 114)
+    # prevent double counting of different channels with same output particles
+    applyCuts('B0:114',
+              'abs(daughter(0,genMotherPDG)) < 413 or abs(daughter(0,genMotherPDG)) > 413'
+              )
     reconstructDecay('B0:115 -> D-:all D*0:all K+:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 115)
     reconstructDecay('B0:116 -> D*-:all D_s+:all',
@@ -367,6 +379,10 @@ def reconstructB0misc(q):  # miscellaneous modes
     # decay modes in the top ~98 % most frequent of all included
     reconstructDecay('B0:120 -> anti-D0:all pi+:all pi-:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 120)
+    # prevent double counting of different channels with same output particles
+    applyCuts('B0:120',
+              'abs(daughter(0,genMotherPDG)) < 413 or abs(daughter(0,genMotherPDG)) > 413'
+              )
     reconstructDecay('B0:121 -> D*-:all D0:all K+:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 121)
     mmin = 112

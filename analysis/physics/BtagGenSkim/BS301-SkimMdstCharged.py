@@ -18,7 +18,7 @@ from basf2 import *
 from reconstruction import *
 
 from modularAnalysis import inputMdstList
-from modularAnalysis import newFillParticleListFromMC
+from modularAnalysis import fillParticleListsFromMC
 from modularAnalysis import applyCuts
 from modularAnalysis import summaryOfLists
 from modularAnalysis import reconstructDecay
@@ -28,7 +28,6 @@ from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from modularAnalysis import copyLists
 from modularAnalysis import cutAndCopyList
-from modularAnalysis import summaryOfLists
 
 from imp_D_decayRec import *
 from imp_cc_decayRec import *
@@ -50,23 +49,23 @@ inputFiles = ['BS101-BBChargedGen.root']
 inputMdstList(inputFiles)
 
 # create lists of FSPs
-newFillParticleListFromMC('pi+:all', '')
-newFillParticleListFromMC('K+:all', '')
-newFillParticleListFromMC('gamma:all', '')
-newFillParticleListFromMC('e-:all', '')
-newFillParticleListFromMC('mu+:all', '')
+pions = ('pi+:all', '')
+kaons = ('K+:all', '')
+gammas = ('gamma:all', '')
+electrons = ('e-:all', '')
+muons = ('mu+:all', '')
+pi0 = ('pi0:all', '')
+kshort = ('K_S0:all', '')
 
-# reconstruct, check and select correct pi0
-reconstructDecay('pi0:all -> gamma:all gamma:all', '0.12 < M < 0.15', 1)
-matchMCTruth('pi0:all')
-applyCuts('pi0:all', 'isSignal > 0.5')
-
-# reconstruct, check and select correct K_S0
-reconstructDecay('K_S0:pi0 -> pi0:all pi0:all', '0.45 < M < 0.55', 1)
-reconstructDecay('K_S0:pi -> pi+:all pi-:all', '0.45 < M < 0.55', 2)
-copyLists('K_S0:all', ['K_S0:pi0', 'K_S0:pi'])
-matchMCTruth('K_S0:all')
-applyCuts('K_S0:all', 'isSignal > 0.5')
+fillParticleListsFromMC([
+    pions,
+    kaons,
+    gammas,
+    electrons,
+    muons,
+    pi0,
+    kshort,
+    ])
 
 # next lines do the same as the lines for pi0 and K_S0
 # reconstruct charm
@@ -97,11 +96,6 @@ reconstructBPmisc(q)
 # merge individual B+ lists
 # the same is already done for D mesons and ccbar, but in their own files, B mesons are here separately for ease of access
 copyLists('B+:antiD0Y+', ['B+:antiD0Y+S0', 'B+:antiD0Y+S1'])
-applyCuts('B+:antiD0Y+',
-          'abs(daughter(0,genMotherPDG)) < 423 or abs(daughter(0,genMotherPDG)) > 423'
-          )
-             # this prevents double counting of different channels with same particle output
-
 copyLists('B+:antiD*0Y+', ['B+:antiD*0Y+S0', 'B+:antiD*0Y+S1'])
 copyLists('B+:rest', ['B+:ccbarYPS1', 'B+:misc'])
 

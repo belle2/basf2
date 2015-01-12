@@ -76,6 +76,10 @@ def reconstructBPD0YPS0(q):  # reconstruct B+ -> anti-D0 Y+(S=0) decays
     matchMCTruth('B+:antiD0Y+S0')
     # taking only correctly reconstructed B+
     applyCuts('B+:antiD0Y+S0', 'isSignal>0.5')
+    # prevent double counting of different channels with same particle output
+    applyCuts('B+:antiD0Y+S0',
+              'abs(daughter(0,genMotherPDG)) < 423 or abs(daughter(0,genMotherPDG)) > 423'
+              )
 
 
 def reconstructBPD0YPS1(q):  # reconstruct B+ -> anti-D0 Y+(S=1) decays
@@ -143,6 +147,10 @@ def reconstructBPD0YPS1(q):  # reconstruct B+ -> anti-D0 Y+(S=1) decays
     matchMCTruth('B+:antiD0Y+S1')
     # taking only correctly reconstructed B+
     applyCuts('B+:antiD0Y+S1', 'isSignal>0.5')
+    # prevent double counting of different channels with same particle output
+    applyCuts('B+:antiD0Y+S1',
+              'abs(daughter(0,genMotherPDG)) < 423 or abs(daughter(0,genMotherPDG)) > 423'
+              )
 
 
 def reconstructBPDST0YPS0(q):  # reconstruct B+ -> anti-D*0 Y+(S=0) decays

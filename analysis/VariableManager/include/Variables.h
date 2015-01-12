@@ -217,6 +217,11 @@ namespace Belle2 {
     double isSignal(const Particle* particle);
 
     /**
+     * check the PDG code of a particles MC mother
+     */
+    double genMotherPDG(const Particle* particle);
+
+    /**
      * return absolute PDG code of matched MCParticle
      */
     double particleAbsMCMatchPDGCode(const Particle* particle);

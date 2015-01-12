@@ -151,7 +151,7 @@ namespace Belle2 {
     RelationArray storeRel(m_storeRel);
     m_valid = storeRel.isValid();
     if (!m_valid) {
-      B2DEBUG(100, "Relation " << m_storeRel.first << " does not exist, cannot build index");
+      B2DEBUG(200, "Relation " << m_storeRel.first << " does not exist, cannot build index");
       m_index.clear();
       m_storeFrom = AccessorParams();
       m_storeTo = AccessorParams();
@@ -161,8 +161,6 @@ namespace Belle2 {
     //Check if relation has been modified since we created the index
     //If not, keep old contents
     if (!force && !storeRel.getModified()) return;
-
-    B2DEBUG(100, "Building index for " << m_storeRel.first);
 
     //Reset modification flag
     storeRel.setModified(false);

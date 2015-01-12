@@ -64,27 +64,33 @@ class TestSelectParticleList(unittest.TestCase):
         self.path = MockPath()
 
     def test_standard(self):
-        result = SelectParticleList(self.path, 'hash', 'dummy', 'e+', 'generic', False)
+        result = SelectParticleList(self.path, 'hash', 'e+', 'generic', False)
         self.assertTrue('RawParticleList_e+:generic' in result)
         self.assertEqual(result['RawParticleList_e+:generic'], 'e+:hash')
         self.assertDictEqual(result, {'RawParticleList_e+:generic': 'e+:hash', '__cache__': True})
         self.assertEqual(len(self.path.modules()), 1)
 
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertEqual(parameters['decayString'], 'e+:hash')
-        self.assertEqual(parameters['cut'], '')
+        decay = parameters['decayStringsWithCuts'][0][0]
+        cut = parameters['decayStringsWithCuts'][0][1]
+        self.assertEqual(decay, 'e+:hash')
+        self.assertEqual(cut, '')
+        self.assertEqual(parameters['useMCParticles'], False)
         self.assertEqual(parameters['writeOut'], True)
 
     def test_roe(self):
-        result = SelectParticleList(self.path, 'hash', 'dummy', 'e+', 'generic', True)
+        result = SelectParticleList(self.path, 'hash', 'e+', 'generic', True)
         self.assertTrue('RawParticleList_e+:generic' in result)
         self.assertEqual(result['RawParticleList_e+:generic'], 'e+:hash')
         self.assertDictEqual(result, {'RawParticleList_e+:generic': 'e+:hash', '__cache__': True})
         self.assertEqual(len(self.path.modules()), 1)
 
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertEqual(parameters['decayString'], 'e+:hash')
-        self.assertEqual(parameters['cut'], 'isInRestOfEvent > 0.5')
+        decay = parameters['decayStringsWithCuts'][0][0]
+        cut = parameters['decayStringsWithCuts'][0][1]
+        self.assertEqual(decay, 'e+:hash')
+        self.assertEqual(cut, 'isInRestOfEvent > 0.5')
+        self.assertEqual(parameters['useMCParticles'], False)
         self.assertEqual(parameters['writeOut'], True)
 
 

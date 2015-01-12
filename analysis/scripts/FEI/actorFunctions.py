@@ -100,24 +100,11 @@ def FSPDistribution(path, hash, identifier, inputList, mvaConfigTarget, gearbox)
     return {'Distribution_{i}'.format(i=identifier): result, '__cache__': True}
 
 
-def LoadParticles(path):
-    """
-    Loads Particles
-    @param path the basf2 path
-    @return Resource named ParticleLoader
-    """
-    B2INFO("Adding ParticleLoader")
-    path.add_module(register_module('ParticleLoader'))
-    B2INFO("Added Particles Array")
-    return {'particleLoader': 'dummy', '__cache__': True}
-
-
-def SelectParticleList(path, hash, particleLoader, particleName, particleLabel, runs_in_ROE):
+def SelectParticleList(path, hash, particleName, particleLabel, runs_in_ROE):
     """
     Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
         @param hash of all input parameters
-        @param particleLoader
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param runs_in_ROE boolean determines if particles are selected frmo ROE
@@ -125,7 +112,8 @@ def SelectParticleList(path, hash, particleLoader, particleName, particleLabel, 
     """
     B2INFO("Enter: Select Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     outputList = particleName + ':' + hash
-    modularAnalysis.selectParticle(outputList, 'isInRestOfEvent > 0.5' if runs_in_ROE else '', writeOut=True, path=path)
+    cut = 'isInRestOfEvent > 0.5' if runs_in_ROE else ''
+    modularAnalysis.fillParticleList(outputList, cut, writeOut=True, path=path)
     B2INFO("Select Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
     return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, '__cache__': True}
 

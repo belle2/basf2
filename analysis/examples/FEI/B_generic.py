@@ -434,7 +434,7 @@ p.addChannel(['anti-D*0', 'pi-', 'mu+'])
 particles.append(p)
 
 analysis_path = create_path()
-#selectParticle('mu+', 'muid > 0.6 and nTracks <= 12', writeOut=True, path=analysis_path)
+#fillParticleList('mu+', 'muid > 0.6 and nTracks <= 12', writeOut=True, path=analysis_path)
 #reconstructDecay('tau+ ->  mu+', '', writeOut=True, path=analysis_path)
 #matchMCTruth('tau+', path=analysis_path)
 #reconstructDecay('B+:sig -> tau+', '', writeOut=True, path=analysis_path)

@@ -215,12 +215,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
     play.addActor(LoadGearbox)
     play.addActor(LoadGeometry)
 
-    if user_selection_path is None:
-        play.addActor(LoadParticles)
-        play.addProperty('runs_in_ROE', False)
-    else:
-        play.addProperty('particleLoader', str(serialize_path(user_selection_path)))
-        play.addProperty('runs_in_ROE', True)
+    play.addProperty('runs_in_ROE', user_selection_path is not None)
 
     # In the first act we reconstruct the particles
     for particle in particles:

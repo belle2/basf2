@@ -14,7 +14,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [500])
+eventinfosetter.param('evtNumList', [100])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
@@ -93,6 +93,25 @@ si_mctrackfinder_param = {  # ---        'MinimalNDF': 6,
         # 'Force2DSVDClusters': 1,
         # 'forceExisting2DClusters4SVD': 0
 si_mctrackfinder.param(si_mctrackfinder_param)
+
+vxd_trackfinder = register_module('VXDTF')
+vxd_trackfinder.param('GFTrackCandidatesColName', 'VXDTracksCand')
+# if components is not None and 'PXD' not in components:
+#    vxd_trackfinder.param('sectorSetup',
+#                          ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
+#                          'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
+#                          'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD'])
+#    vxd_trackfinder.param('tuneCutoffs', 0.06)
+# else:
+vxd_trackfinder.param('sectorSetup',
+                      ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
+                      ,
+                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
+                      ,
+                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+                      ])
+vxd_trackfinder.param('tuneCutoffs', 0.22)
+# path.add_module(vxd_trackfinder)
 
 cdc_mctrackfinder = register_module('TrackFinderMCTruth')
 cdc_mctrackfinder.logging.log_level = LogLevel.WARNING

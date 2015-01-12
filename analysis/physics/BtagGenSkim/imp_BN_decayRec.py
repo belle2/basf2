@@ -260,7 +260,7 @@ def reconstructB0DSTMYPS1(q):  # reconstruct B0 -> D*- Y+(S=1) decays
         reconstructDecay('B0:79 -> D*-:all K+:all K_S0:all K_S0:all',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 79)
         reconstructDecay('B0:80 -> D*-:all K+:all K+:all K-:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 90)
+                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 80)
         mmax = 80
 
     # merge individual B0 lists into one list

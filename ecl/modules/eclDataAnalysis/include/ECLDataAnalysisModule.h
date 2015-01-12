@@ -68,7 +68,7 @@ namespace Belle2 {
 
     /** Root tree and file for saving the output */
     TTree* m_tree;
-    TFile* m_rootFile;
+    //TFile* m_rootFile;
 
     // variables
     int m_iExperiment;

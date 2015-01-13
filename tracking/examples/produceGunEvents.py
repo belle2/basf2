@@ -2,14 +2,9 @@
 # -*- coding: utf-8 -*-
 
 ######### Imports #########
-import optparse
-
 from basf2 import *
-from ROOT import Belle2
 
 import simulation
-
-import matplotlib.pyplot as plt
 
 ########## Register modules  ##########
 eventInfoSetterModule = register_module('EventInfoSetter')

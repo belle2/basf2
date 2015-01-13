@@ -102,7 +102,6 @@ GenFitterModule::GenFitterModule() :
   addParam("ProbCut", m_probCut, "Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001", double(0.001));
   addParam("PruneFlags", m_pruneFlags, "Determine which information to keep after track fit, by default we keep everything, but please note that add_reconstruction prunes track after all other reconstruction is processed.  See genfit::Track::prune for options.", std::string(""));
   addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
-  addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
   addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final genfit::Tracks (will be created by this module)", string(""));
@@ -297,16 +296,20 @@ void GenFitterModule::event()
     bool candFitted = false;   //boolean to mark if the track candidates was fitted successfully with at least one PDG hypothesis
 
     for (int iPdg = 0; iPdg != nPdg; ++iPdg) {  // loop over all pdg hypothesises
-      //make sure the track fit starts with the correct PDG code because the sign of the PDG code will also set the charge in the TrackRep
+      // Make sure the track fit starts with the correct PDG code
+      // because the sign of the PDG code will also set the charge in
+      // the TrackRep.
       TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(m_pdgCodes[iPdg]);
       B2DEBUG(99, "GenFitter: current PDG code: " << m_pdgCodes[iPdg]);
-      int currentPdgCode = boost::math::sign(aTrackCandPointer->getChargeSeed()) * m_pdgCodes[iPdg];
-      if (currentPdgCode == 0) {
-        B2FATAL("Either the charge of the current genfit::TrackCand is 0 or you set 0 as a PDG code");
-      }
-      if (part->Charge() < 0.0) {
-        currentPdgCode *= -1; //swap sign
-      }
+      int currentPdgCode = m_pdgCodes[iPdg];
+      // Note that for leptons positive PDG codes correspond to the
+      // negatively charged particles.
+      if (signbit(part->Charge()) != signbit(aTrackCandPointer->getChargeSeed()))
+        currentPdgCode *= -1;
+      // Charges in the PDG tables are counted in multiples of 1/3e.
+      if (TDatabasePDG::Instance()->GetParticle(currentPdgCode)->Charge()
+          != aTrackCandPointer->getChargeSeed() * 3)
+        B2FATAL("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).");
       //std::cout << "fitting with pdg " << currentPdgCode << " for charge " << aTrackCandPointer->getChargeSeed() << std::endl;
       //Find the particle with the correct PDG Code;
       Const::ChargedStable chargedStable = Const::pion;
@@ -332,24 +335,13 @@ void GenFitterModule::event()
       genfit::MeasurementFactory<genfit::AbsMeasurement> factory;
 
       //create MeasurementProducers for PXD, SVD and CDC and add producers to the factory with correct detector Id
-      if (m_useClusters == false) { // use the trueHits
-        if (pxdTrueHits.getEntries()) {
-          auto PXDProducer =  new genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
-          factory.addProducer(Const::PXD, PXDProducer);
-        }
-        if (svdTrueHits.getEntries()) {
-          auto SVDProducer =  new genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
-          factory.addProducer(Const::SVD, SVDProducer);
-        }
-      } else {
-        if (nPXDClusters) {
-          auto pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
-          factory.addProducer(Const::PXD, pxdClusterProducer);
-        }
-        if (nSVDClusters) {
-          auto svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
-          factory.addProducer(Const::SVD, svdClusterProducer);
-        }
+      if (nPXDClusters) {
+        auto pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
+        factory.addProducer(Const::PXD, pxdClusterProducer);
+      }
+      if (nSVDClusters) {
+        auto svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
+        factory.addProducer(Const::SVD, svdClusterProducer);
       }
       if (cdcHits.getEntries()) {
         auto CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());

@@ -10,7 +10,7 @@
 
 #include "../include/CDCRLWireHit.h"
 
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 using namespace std;
 using namespace Belle2;

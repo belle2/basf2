@@ -10,7 +10,7 @@
 #ifndef ISUPERLAYERTYPE_H
 #define ISUPERLAYERTYPE_H
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 namespace Belle2 {
 

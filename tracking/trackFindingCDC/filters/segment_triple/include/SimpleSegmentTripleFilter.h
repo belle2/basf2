@@ -11,12 +11,12 @@
 #ifndef SIMPLESEGMENTTRIPLEFILTER_H_
 #define SIMPLESEGMENTTRIPLEFILTER_H_
 
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
-#include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
-#include <tracking/cdcLocalTracking/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
 
 #include "boost/tuple/tuple.hpp"
 #include "boost/tuple/tuple_comparison.hpp"

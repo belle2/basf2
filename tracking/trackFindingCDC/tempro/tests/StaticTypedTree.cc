@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/tempro/StaticTypedTree.h>
-#include <tracking/cdcLocalTracking/tempro/BranchOf.h>
-#include <tracking/cdcLocalTracking/tempro/Named.h>
+#include <tracking/trackFindingCDC/tempro/StaticTypedTree.h>
+#include <tracking/trackFindingCDC/tempro/BranchOf.h>
+#include <tracking/trackFindingCDC/tempro/Named.h>
 
 #include <gtest/gtest.h>
 

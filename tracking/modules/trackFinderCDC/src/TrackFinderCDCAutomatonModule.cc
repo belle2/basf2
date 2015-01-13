@@ -16,7 +16,7 @@
 #include "genfit/TrackCand.h"
 
 // Event data objects
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 using namespace std;
 using namespace Belle2;

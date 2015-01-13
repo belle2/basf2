@@ -14,11 +14,11 @@
 #include <math.h>
 #include <iostream>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/numerics/numerics.h>
-#include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/numerics.h>
+#include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

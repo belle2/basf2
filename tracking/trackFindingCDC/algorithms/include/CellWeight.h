@@ -11,7 +11,7 @@
 #define CELLWEIGHT_H
 
 #include <cmath>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 namespace Belle2 {
 

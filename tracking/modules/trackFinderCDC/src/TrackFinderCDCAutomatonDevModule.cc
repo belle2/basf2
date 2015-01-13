@@ -12,12 +12,12 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #ifdef CDCLOCALTRACKING_USE_MC_INFORMATION
 #include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-#include <tracking/cdcLocalTracking/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #endif
 
 //out type

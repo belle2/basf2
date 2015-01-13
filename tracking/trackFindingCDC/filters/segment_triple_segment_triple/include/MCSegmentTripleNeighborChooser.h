@@ -11,7 +11,7 @@
 #ifndef MCSEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define MCSEGMENTTRIPLENEIGHBORCHOOSER_H_
 
-#include <tracking/cdcLocalTracking/filters/segment_triple/MCSegmentTripleFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_triple/MCSegmentTripleFilter.h>
 
 #include "BaseSegmentTripleNeighborChooser.h"
 

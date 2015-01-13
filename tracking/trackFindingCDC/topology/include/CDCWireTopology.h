@@ -17,12 +17,12 @@
 
 #include <cdc/dataobjects/WireID.h>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWire.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireLayer.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireSuperLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

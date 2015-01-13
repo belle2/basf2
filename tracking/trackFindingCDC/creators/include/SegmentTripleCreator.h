@@ -12,10 +12,10 @@
 #define SEGMENTTRIPLECREATOR_H_
 
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

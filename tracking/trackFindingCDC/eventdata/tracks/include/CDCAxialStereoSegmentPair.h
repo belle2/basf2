@@ -10,13 +10,13 @@
 #ifndef CDCAXIALSTEREOSEGMENTPAIR_H
 #define CDCAXIALSTEREOSEGMENTPAIR_H
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCEntities.h>
-#include <tracking/cdcLocalTracking/eventdata/segments/CDCSegments.h>
-#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

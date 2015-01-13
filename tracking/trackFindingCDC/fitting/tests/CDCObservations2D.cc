@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/geometry/Vector2D.h>
-#include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <gtest/gtest.h>
 

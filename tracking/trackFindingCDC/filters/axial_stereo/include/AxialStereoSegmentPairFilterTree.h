@@ -11,11 +11,11 @@
 #ifndef AXIALSTEREOSEGMENTPAIRFILTERTREE_H
 #define AXIALSTEREOSEGMENTPAIRFILTERTREE_H
 
-#include <tracking/cdcLocalTracking/tempro/StaticTypedTree.h>
-#include <tracking/cdcLocalTracking/tempro/BranchOf.h>
-#include <tracking/cdcLocalTracking/tempro/Named.h>
+#include <tracking/trackFindingCDC/tempro/StaticTypedTree.h>
+#include <tracking/trackFindingCDC/tempro/BranchOf.h>
+#include <tracking/trackFindingCDC/tempro/Named.h>
 
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

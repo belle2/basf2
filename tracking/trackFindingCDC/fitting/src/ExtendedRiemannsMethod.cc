@@ -12,7 +12,7 @@
 
 #include <Eigen/Dense>
 
-#include <tracking/cdcLocalTracking/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
 
 using namespace std;

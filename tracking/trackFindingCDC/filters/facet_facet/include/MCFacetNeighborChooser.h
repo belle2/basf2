@@ -11,7 +11,7 @@
 #ifndef MCFACETNEIGHBORCHOOSER_H_
 #define MCFACETNEIGHBORCHOOSER_H_
 
-#include <tracking/cdcLocalTracking/filters/facet/MCFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 #include "BaseFacetNeighborChooser.h"
 
 namespace Belle2 {

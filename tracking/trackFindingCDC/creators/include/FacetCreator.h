@@ -14,9 +14,9 @@
 #include <vector>
 #include <set>
 
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
-#include <tracking/cdcLocalTracking/algorithms/SortableVector.h>
-#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/algorithms/SortableVector.h>
+#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

@@ -12,9 +12,9 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 using namespace std;
 using namespace Belle2;

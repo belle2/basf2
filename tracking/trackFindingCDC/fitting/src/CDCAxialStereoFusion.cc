@@ -13,7 +13,7 @@
 
 #include "../include/CDCAxialStereoFusion.h"
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 
 using namespace std;
 using namespace Belle2;

@@ -13,12 +13,12 @@
 
 #include <boost/range/iterator_range.hpp>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
+#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRLWireHitPair.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

@@ -14,37 +14,37 @@
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCAutomatonDevConfig.h>
 
 
-#include <tracking/cdcLocalTracking/filters/facet/SimpleFacetFilter.h>
-#include <tracking/cdcLocalTracking/filters/facet_facet/SimpleFacetNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet_facet/SimpleFacetNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/filters/facet/AllFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/AllFacetFilter.h>
 
-#include <tracking/cdcLocalTracking/filters/facet/MCFacetFilter.h>
-#include <tracking/cdcLocalTracking/filters/facet_facet/MCFacetNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet_facet/MCFacetNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/filters/facet/EvaluateFacetFilter.h>
-#include <tracking/cdcLocalTracking/filters/facet_facet/EvaluateFacetNeighborChooser.h>
-
-
-
-#include <tracking/cdcLocalTracking/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
-#include <tracking/cdcLocalTracking/filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
-#include <tracking/cdcLocalTracking/filters/axial_axial/EvaluateAxialAxialSegmentPairFilter.h>
-
-#include <tracking/cdcLocalTracking/filters/axial_stereo/SimpleAxialStereoSegmentPairFilter.h>
-#include <tracking/cdcLocalTracking/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
-#include <tracking/cdcLocalTracking/filters/axial_stereo/EvaluateAxialStereoSegmentPairFilter.h>
-
-#include <tracking/cdcLocalTracking/filters/axial_stereo_axial_stereo/MCAxialStereoSegmentPairNeighborChooser.h>
-#include <tracking/cdcLocalTracking/filters/axial_stereo_axial_stereo/SimpleAxialStereoSegmentPairNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/facet/EvaluateFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet_facet/EvaluateFacetNeighborChooser.h>
 
 
 
-#include <tracking/cdcLocalTracking/filters/segment_triple/SimpleSegmentTripleFilter.h>
-#include <tracking/cdcLocalTracking/filters/segment_triple_segment_triple/SimpleSegmentTripleNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_axial/EvaluateAxialAxialSegmentPairFilter.h>
 
-#include <tracking/cdcLocalTracking/filters/segment_triple/MCSegmentTripleFilter.h>
-#include <tracking/cdcLocalTracking/filters/segment_triple_segment_triple/MCSegmentTripleNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo/SimpleAxialStereoSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo/EvaluateAxialStereoSegmentPairFilter.h>
+
+#include <tracking/trackFindingCDC/filters/axial_stereo_axial_stereo/MCAxialStereoSegmentPairNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo_axial_stereo/SimpleAxialStereoSegmentPairNeighborChooser.h>
+
+
+
+#include <tracking/trackFindingCDC/filters/segment_triple/SimpleSegmentTripleFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_triple_segment_triple/SimpleSegmentTripleNeighborChooser.h>
+
+#include <tracking/trackFindingCDC/filters/segment_triple/MCSegmentTripleFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_triple_segment_triple/MCSegmentTripleNeighborChooser.h>
 
 
 

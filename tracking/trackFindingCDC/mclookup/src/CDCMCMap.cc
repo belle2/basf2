@@ -10,7 +10,7 @@
 
 #include "../include/CDCMCMap.h"
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>

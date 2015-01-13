@@ -14,8 +14,8 @@
 
 #include "TVectorD.h"
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include "HelixParameterIndex.h"
 

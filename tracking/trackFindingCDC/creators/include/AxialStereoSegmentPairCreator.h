@@ -13,8 +13,8 @@
 
 #include <boost/range/iterator_range.hpp>
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 
 

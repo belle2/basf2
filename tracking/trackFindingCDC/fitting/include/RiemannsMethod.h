@@ -10,9 +10,9 @@
 #ifndef RIEMANNSMETHOD_H
 #define RIEMANNSMETHOD_H
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

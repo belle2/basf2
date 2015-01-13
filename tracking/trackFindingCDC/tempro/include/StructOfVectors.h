@@ -11,8 +11,8 @@
 #define STRUCTOFVECTORS_H
 
 #include <vector>
-#include <tracking/cdcLocalTracking/tempro/TaggedType.h>
-#include <tracking/cdcLocalTracking/tempro/TaggedTuple.h>
+#include <tracking/trackFindingCDC/tempro/TaggedType.h>
+#include <tracking/trackFindingCDC/tempro/TaggedTuple.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

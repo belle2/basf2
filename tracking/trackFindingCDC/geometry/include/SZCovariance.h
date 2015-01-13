@@ -16,7 +16,7 @@
 #include "TMatrixD.h"
 
 #include <framework/logging/Logger.h>
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include "HelixParameterIndex.h"
 

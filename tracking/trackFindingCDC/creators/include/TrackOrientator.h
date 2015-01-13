@@ -13,7 +13,7 @@
 
 #include <vector>
 
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

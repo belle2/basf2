@@ -11,10 +11,10 @@
 #define ALLFACETWORKER_H
 
 
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <framework/datastore/StoreArray.h>
 

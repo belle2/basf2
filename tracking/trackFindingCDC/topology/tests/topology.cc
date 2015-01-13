@@ -8,13 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
-#include <tracking/cdcLocalTracking/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/test_fixtures/CDCLocalTrackingTestWithTopology.h>
+#include <tracking/trackFindingCDC/test_fixtures/CDCLocalTrackingTestWithTopology.h>
 
 #include <gtest/gtest.h>
 

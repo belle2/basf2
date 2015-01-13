@@ -11,8 +11,8 @@
 #ifndef SIMPLEAXIALSTEREOSEGMENTPAIRFILTER_H
 #define SIMPLEAXIALSTEREOSEGMENTPAIRFILTER_H
 
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialStereoSegmentPair.h>
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

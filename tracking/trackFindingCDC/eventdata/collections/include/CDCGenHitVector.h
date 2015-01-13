@@ -13,12 +13,12 @@
 #include <vector>
 #include <algorithm>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWire.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 
-#include <tracking/cdcLocalTracking/algorithms/SortableVector.h>
+#include <tracking/trackFindingCDC/algorithms/SortableVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

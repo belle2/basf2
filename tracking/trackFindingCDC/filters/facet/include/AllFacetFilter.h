@@ -11,8 +11,8 @@
 #ifndef ALLFACETFILTER_H_
 #define ALLFACETFILTER_H_
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

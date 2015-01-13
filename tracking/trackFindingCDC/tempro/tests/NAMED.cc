@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/tempro/Named.h>
+#include <tracking/trackFindingCDC/tempro/Named.h>
 
 #include <gtest/gtest.h>
 

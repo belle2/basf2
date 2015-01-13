@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/geometry/HelixCovariance.h>
+#include <tracking/trackFindingCDC/geometry/HelixCovariance.h>
 
 #include <gtest/gtest.h>
 

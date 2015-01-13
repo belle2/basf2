@@ -11,11 +11,11 @@
 #ifndef FACETFILTERTREE_H_
 #define FACETFILTERTREE_H_
 
-#include <tracking/cdcLocalTracking/tempro/StaticTypedTree.h>
-#include <tracking/cdcLocalTracking/tempro/BranchOf.h>
-#include <tracking/cdcLocalTracking/tempro/Named.h>
+#include <tracking/trackFindingCDC/tempro/StaticTypedTree.h>
+#include <tracking/trackFindingCDC/tempro/BranchOf.h>
+#include <tracking/trackFindingCDC/tempro/Named.h>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

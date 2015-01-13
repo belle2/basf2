@@ -13,21 +13,21 @@
 //#define LOG_NO_B2DEBUG
 
 // Workers
-#include <tracking/cdcLocalTracking/workers/FacetSegmentWorker.h>
-#include <tracking/cdcLocalTracking/workers/SegmentPairTrackingWorker.h>
-#include <tracking/cdcLocalTracking/workers/SegmentTripleTrackingWorker.h>
+#include <tracking/trackFindingCDC/workers/FacetSegmentWorker.h>
+#include <tracking/trackFindingCDC/workers/SegmentPairTrackingWorker.h>
+#include <tracking/trackFindingCDC/workers/SegmentTripleTrackingWorker.h>
 
 // Filters
-#include <tracking/cdcLocalTracking/filters/facet/SimpleFacetFilter.h>
-#include <tracking/cdcLocalTracking/filters/facet_facet/SimpleFacetNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet_facet/SimpleFacetNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
-#include <tracking/cdcLocalTracking/filters/axial_stereo/SimpleAxialStereoSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo/SimpleAxialStereoSegmentPairFilter.h>
 
-#include <tracking/cdcLocalTracking/filters/axial_stereo_axial_stereo/SimpleAxialStereoSegmentPairNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo_axial_stereo/SimpleAxialStereoSegmentPairNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/filters/segment_triple/SimpleSegmentTripleFilter.h>
-#include <tracking/cdcLocalTracking/filters/segment_triple_segment_triple/SimpleSegmentTripleNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/segment_triple/SimpleSegmentTripleFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_triple_segment_triple/SimpleSegmentTripleNeighborChooser.h>
 
 // Base track finder module
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>

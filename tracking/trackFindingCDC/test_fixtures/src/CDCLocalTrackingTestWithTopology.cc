@@ -13,7 +13,7 @@
 
 #include "../include/CDCLocalTrackingTestWithTopology.h"
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>

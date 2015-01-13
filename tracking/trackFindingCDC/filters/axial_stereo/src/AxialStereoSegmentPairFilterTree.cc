@@ -10,8 +10,8 @@
 
 #include "../include/AxialStereoSegmentPairFilterTree.h"
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
-#include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 using namespace std;
 using namespace Belle2;

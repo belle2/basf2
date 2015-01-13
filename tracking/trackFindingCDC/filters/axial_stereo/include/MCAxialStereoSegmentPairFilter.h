@@ -11,10 +11,10 @@
 #ifndef MCAXIALSTEREOSEGMENTPAIRFILTER_H
 #define MCAXIALSTEREOSEGMENTPAIRFILTER_H
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

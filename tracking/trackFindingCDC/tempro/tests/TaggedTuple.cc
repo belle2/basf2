@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/tempro/BranchOf.h>
-#include <tracking/cdcLocalTracking/tempro/TaggedTuple.h>
-#include <tracking/cdcLocalTracking/tempro/Named.h>
+#include <tracking/trackFindingCDC/tempro/BranchOf.h>
+#include <tracking/trackFindingCDC/tempro/TaggedTuple.h>
+#include <tracking/trackFindingCDC/tempro/Named.h>
 
 #include <gtest/gtest.h>
 

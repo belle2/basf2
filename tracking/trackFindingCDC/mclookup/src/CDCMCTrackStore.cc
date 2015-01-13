@@ -11,10 +11,10 @@
 #include "../include/CDCMCTrackStore.h"
 #include "../include/CDCMCManager.h"
 
-#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
-#include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
+#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

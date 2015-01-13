@@ -11,12 +11,12 @@
 #include "../include/CDCMCManager.h"
 
 #include <framework/datastore/RelationVector.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
 using namespace std;
 using namespace Belle2;

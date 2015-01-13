@@ -10,11 +10,11 @@
 #ifndef CDCRECOHIT3DVECTOR_H
 #define CDCRECOHIT3DVECTOR_H
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoHit3D.h>
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

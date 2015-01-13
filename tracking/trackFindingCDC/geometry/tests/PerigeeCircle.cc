@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/geometry/PerigeeCircle.h>
-#include <tracking/cdcLocalTracking/geometry/GeneralizedCircle.h>
-#include <tracking/cdcLocalTracking/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <gtest/gtest.h>
 

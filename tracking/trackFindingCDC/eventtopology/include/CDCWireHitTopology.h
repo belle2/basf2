@@ -12,18 +12,18 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWire.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireLayer.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireSuperLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 
-#include <tracking/cdcLocalTracking/algorithms/SortableVector.h>
+#include <tracking/trackFindingCDC/algorithms/SortableVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

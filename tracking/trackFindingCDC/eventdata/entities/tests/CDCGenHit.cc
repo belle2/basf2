@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
 
-#include <tracking/cdcLocalTracking/test_fixtures/CDCLocalTrackingTestWithTopology.h>
+#include <tracking/trackFindingCDC/test_fixtures/CDCLocalTrackingTestWithTopology.h>
 
 #include <gtest/gtest.h>
 

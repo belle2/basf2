@@ -12,8 +12,8 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
-#include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 using namespace std;
 using namespace Belle2;

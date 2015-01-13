@@ -13,7 +13,7 @@
 #include "TMatrixDSym.h"
 #include "TVectorD.h"
 
-#include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 namespace Belle2 {
   namespace CDCLocalTracking {
 

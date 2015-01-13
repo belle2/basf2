@@ -12,17 +12,17 @@
 
 #include <cmath>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 
-#include <tracking/cdcLocalTracking/geometry/Vector2D.h>
-#include <tracking/cdcLocalTracking/geometry/Vector3D.h>
-#include <tracking/cdcLocalTracking/geometry/BoundSkewLine.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
 
-#include <tracking/cdcLocalTracking/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
-#include <tracking/cdcLocalTracking/topology/ISuperLayerType.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
 
 namespace Belle2 {
 

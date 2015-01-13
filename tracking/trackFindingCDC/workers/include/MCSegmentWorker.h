@@ -15,10 +15,10 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

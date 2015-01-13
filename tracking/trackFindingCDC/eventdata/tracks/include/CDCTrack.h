@@ -10,15 +10,15 @@
 #ifndef CDCTRACK_H
 #define CDCTRACK_H
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoHit3D.h>
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoHit3DVector.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
 
-#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectories.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
 
-#include <tracking/cdcLocalTracking/eventdata/segments/CDCSegments.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 
 #include "genfit/TrackCand.h"
 

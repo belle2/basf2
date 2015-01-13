@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include "../include/CDCWireLayer.h"
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace std;

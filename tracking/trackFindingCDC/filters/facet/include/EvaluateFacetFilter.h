@@ -14,8 +14,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include "MCFacetFilter.h"
 #include "FacetFilterTree.h"

@@ -10,8 +10,8 @@
 
 #include "../include/MCSegmentWorker.h"
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCTrackStore.h>
-#include <tracking/cdcLocalTracking/mclookup/CDCSimHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
+#include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
 
 using namespace std;
 using namespace Belle2;

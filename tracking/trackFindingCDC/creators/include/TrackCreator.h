@@ -13,11 +13,11 @@
 
 #include <vector>
 
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialStereoSegmentPair.h>
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 
 namespace Belle2 {

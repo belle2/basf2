@@ -12,7 +12,7 @@
 
 #include "CDCRecoSegment2D.h"
 
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoHit3DVector.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

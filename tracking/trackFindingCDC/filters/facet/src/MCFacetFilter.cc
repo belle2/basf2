@@ -13,9 +13,9 @@
 #include <cmath>
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
 
 using namespace std;

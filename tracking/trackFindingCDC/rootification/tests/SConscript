@@ -2,7 +2,7 @@ Import('env')
 
 env['LIBS'] = [
     'tracking',
-    'tracking_cdcLocalTracking',
+    'tracking_trackFindingCDC',
     'cdc_dataobjects',
     'simulation_dataobjects',
     'mdst_dataobjects',

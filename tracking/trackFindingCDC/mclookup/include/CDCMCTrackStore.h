@@ -10,11 +10,11 @@
 #ifndef CDCMCTRACKSTORE_H
 #define CDCMCTRACKSTORE_H
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <map>

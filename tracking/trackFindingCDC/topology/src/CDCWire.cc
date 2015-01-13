@@ -11,7 +11,7 @@
 #include "../include/CDCWire.h"
 
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 
 using namespace std;

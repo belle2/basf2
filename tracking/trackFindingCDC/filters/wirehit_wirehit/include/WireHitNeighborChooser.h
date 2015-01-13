@@ -13,12 +13,12 @@
 
 #include <boost/range/iterator_range.hpp>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWire.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/Compare.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/Compare.h>
 
 #include <cmath>
 

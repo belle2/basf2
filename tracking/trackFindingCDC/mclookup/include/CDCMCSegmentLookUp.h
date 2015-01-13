@@ -10,11 +10,11 @@
 #ifndef CDCMCSEGMENTLOOKUP_H
 #define CDCMCSEGMENTLOOKUP_H
 
-#include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
-#include <tracking/cdcLocalTracking/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectories.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

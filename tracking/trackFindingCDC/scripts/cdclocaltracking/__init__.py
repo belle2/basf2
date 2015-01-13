@@ -6,7 +6,7 @@ from basf2 import *
 from ROOT import gSystem
 gSystem.Load('libcdc')  # for CDCSimHit
 gSystem.Load('libtracking')  # for CDCWireHit
-gSystem.Load('libtracking_cdcLocalTracking')
+gSystem.Load('libtracking_trackFindingCDC')
 gSystem.Load('libgenfit2')  # for GFTrackCands
 
 from ROOT import Belle2  # make Belle2 namespace available

@@ -11,7 +11,7 @@
 #define TAGGEDTUPLE_H
 
 #include <tuple>
-#include <tracking/cdcLocalTracking/tempro/TaggedType.h>
+#include <tracking/trackFindingCDC/tempro/TaggedType.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

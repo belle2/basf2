@@ -10,9 +10,9 @@
 #ifndef INFOTYPES_H
 #define INFOTYPES_H
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/SignType.h>
-#include <tracking/cdcLocalTracking/numerics/numerics.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/SignType.h>
+#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 namespace Belle2 {
 

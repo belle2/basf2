@@ -9,7 +9,7 @@
  **************************************************************************/
 #include "../include/ISuperLayerType.h"
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <limits>
 

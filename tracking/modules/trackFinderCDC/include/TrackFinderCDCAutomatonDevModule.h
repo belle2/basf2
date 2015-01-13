@@ -11,12 +11,12 @@
 #define TRACKFINDERCDCAUTOMATONDEVMODULE_H_
 
 //#define LOG_NO_B2DEBUG
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
-#include <tracking/cdcLocalTracking/workers/FacetSegmentWorker.h>
-#include <tracking/cdcLocalTracking/workers/SegmentTripleTrackingWorker.h>
+#include <tracking/trackFindingCDC/workers/FacetSegmentWorker.h>
+#include <tracking/trackFindingCDC/workers/SegmentTripleTrackingWorker.h>
 
-#include <tracking/cdcLocalTracking/workers/SegmentPairTrackingWorker.h>
+#include <tracking/trackFindingCDC/workers/SegmentPairTrackingWorker.h>
 
 // Base track finder module
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>

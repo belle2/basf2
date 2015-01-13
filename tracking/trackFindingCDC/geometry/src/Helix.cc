@@ -12,7 +12,7 @@
 #include "../include/HelixParameterIndex.h"
 
 
-#include <tracking/cdcLocalTracking/numerics/SinEqLine.h>
+#include <tracking/trackFindingCDC/numerics/SinEqLine.h>
 
 using namespace std;
 

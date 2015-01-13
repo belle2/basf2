@@ -11,11 +11,11 @@
 #ifndef CELLULARPATHFOLLOWER_H_
 #define CELLULARPATHFOLLOWER_H_
 
-#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
-#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
+#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
 
-#include <tracking/cdcLocalTracking/algorithms/CellWeight.h>
-#include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
+#include <tracking/trackFindingCDC/algorithms/CellWeight.h>
+#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
 
 #include <framework/logging/Logger.h>
 

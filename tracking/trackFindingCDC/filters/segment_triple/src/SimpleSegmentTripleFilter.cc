@@ -12,7 +12,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 using namespace std;
 using namespace Belle2;

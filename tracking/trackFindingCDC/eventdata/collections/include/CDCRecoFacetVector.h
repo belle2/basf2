@@ -10,8 +10,8 @@
 #ifndef CDCRECOFACETVECTOR_H
 #define CDCRECOFACETVECTOR_H
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

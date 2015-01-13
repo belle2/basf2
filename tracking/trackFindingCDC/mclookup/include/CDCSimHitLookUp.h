@@ -10,14 +10,14 @@
 #ifndef CDCSIMHITLOOKUP_H
 #define CDCSIMHITLOOKUP_H
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 
-#include <tracking/cdcLocalTracking/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

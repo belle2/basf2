@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/tempro/pp_pow.h>
+#include <tracking/trackFindingCDC/tempro/pp_pow.h>
 
 #include <gtest/gtest.h>
 

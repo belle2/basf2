@@ -11,7 +11,7 @@
 #include "../include/SimpleAxialStereoSegmentPairFilter.h"
 
 #include <framework/logging/Logger.h>
-#include <tracking/cdcLocalTracking/fitting/CDCAxialStereoFusion.h>
+#include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
 
 using namespace std;
 using namespace Belle2;

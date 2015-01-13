@@ -13,11 +13,11 @@
 #include <vector>
 #include <algorithm>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 //Unpacked version for ROOT dictionary generation
-#include <tracking/cdcLocalTracking/topology/CDCWireUnpackedFromNamespaces.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCEntitiesUnpackedFromNamespaces.h>
+#include <tracking/trackFindingCDC/topology/CDCWireUnpackedFromNamespaces.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCEntitiesUnpackedFromNamespaces.h>
 
 
 namespace Belle2 {

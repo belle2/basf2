@@ -10,9 +10,9 @@
 #ifndef CDCRIEMANNFITTER_H
 #define CDCRIEMANNFITTER_H
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 #include "CDCObservations2D.h"
 #include "CDCFitter2D.h"

@@ -11,8 +11,8 @@
 #include "../include/CDCSimHitLookUp.h"
 #include "../include/CDCMCManager.h"
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <vector>
 

@@ -8,14 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
-#include <tracking/cdcLocalTracking/fitting/CDCKarimakiFitter.h>
-#include <tracking/cdcLocalTracking/fitting/CDCFitter2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-#include <tracking/cdcLocalTracking/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 

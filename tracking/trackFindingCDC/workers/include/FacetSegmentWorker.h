@@ -15,17 +15,17 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
-#include <tracking/cdcLocalTracking/filters/wirehit_wirehit/WireHitNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/wirehit_wirehit/WireHitNeighborChooser.h>
 
-#include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
-#include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
+#include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
+#include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
-#include <tracking/cdcLocalTracking/creators/FacetCreator.h>
+#include <tracking/trackFindingCDC/creators/FacetCreator.h>
 
 
 namespace Belle2 {

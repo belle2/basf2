@@ -11,8 +11,8 @@
 #define CDCWIREHITCLUSTER_H
 
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

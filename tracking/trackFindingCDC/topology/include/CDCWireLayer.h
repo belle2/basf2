@@ -12,10 +12,10 @@
 
 #include <TVector3.h>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

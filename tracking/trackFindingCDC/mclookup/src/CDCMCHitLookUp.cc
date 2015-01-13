@@ -11,7 +11,7 @@
 #include "../include/CDCMCHitLookUp.h"
 #include "../include/CDCMCManager.h"
 
-#include <tracking/cdcLocalTracking/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 using namespace std;
 using namespace Belle2;

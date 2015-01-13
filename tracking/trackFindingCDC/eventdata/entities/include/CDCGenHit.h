@@ -15,11 +15,11 @@
 
 #include <cdc/dataobjects/WireID.h>
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/topology/CDCWire.h>
-#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include "CDCWireHit.h"
 

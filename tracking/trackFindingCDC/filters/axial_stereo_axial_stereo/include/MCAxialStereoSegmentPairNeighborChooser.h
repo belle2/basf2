@@ -11,7 +11,7 @@
 #ifndef MCAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H
 #define MCAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H
 
-#include <tracking/cdcLocalTracking/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
 
 #include "BaseAxialStereoSegmentPairNeighborChooser.h"
 

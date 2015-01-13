@@ -12,8 +12,8 @@
 
 #include <math.h>
 #include <utility>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/SignType.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/SignType.h>
 
 namespace Belle2 {
 

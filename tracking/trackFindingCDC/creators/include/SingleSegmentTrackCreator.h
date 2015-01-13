@@ -12,7 +12,7 @@
 #define SINGLESEGMENTTRACKCREATOR_H_
 
 #include <vector>
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include "TrackCreator.h"
 
 namespace Belle2 {

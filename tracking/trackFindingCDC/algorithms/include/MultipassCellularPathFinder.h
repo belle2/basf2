@@ -11,13 +11,13 @@
 #ifndef MULTIPASSCELLULARPATHFINDER_H
 #define MULTIPASSCELLULARPATHFINDER_H
 
-#include <tracking/cdcLocalTracking/algorithms/CellularAutomaton.h>
-#include <tracking/cdcLocalTracking/algorithms/CellularPathFollower.h>
-#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/algorithms/CellularAutomaton.h>
+#include <tracking/trackFindingCDC/algorithms/CellularPathFollower.h>
+#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <vector>
 
 namespace Belle2 {

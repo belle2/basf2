@@ -10,10 +10,10 @@
 #ifndef CDCRECOSEGMENT2D_H_
 #define CDCRECOSEGMENT2D_H_
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoHit2DVector.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit2DVector.h>
 #include "CDCWireHitSegment.h"
 #include "CDCRLWireHitSegment.h"
 

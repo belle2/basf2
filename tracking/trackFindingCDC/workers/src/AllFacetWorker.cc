@@ -10,11 +10,11 @@
 
 #include "../include/AllFacetWorker.h"
 
-#include <tracking/cdcLocalTracking/creators/FacetCreator.h>
-#include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
+#include <tracking/trackFindingCDC/creators/FacetCreator.h>
+#include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 
-#include <tracking/cdcLocalTracking/filters/facet/AllFacetFilter.h>
-#include <tracking/cdcLocalTracking/filters/wirehit_wirehit/WireHitNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/facet/AllFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/wirehit_wirehit/WireHitNeighborChooser.h>
 
 #include <framework/logging/Logger.h>
 

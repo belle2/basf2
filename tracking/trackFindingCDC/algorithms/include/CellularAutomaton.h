@@ -15,15 +15,15 @@
 #include <boost/foreach.hpp>
 #include <limits>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <framework/logging/Logger.h>
 
 
-#include <tracking/cdcLocalTracking/algorithms/CellWeight.h>
-#include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
-#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
-#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/algorithms/CellWeight.h>
+#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
+#include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
+#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 
 

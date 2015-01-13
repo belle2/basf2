@@ -8,16 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
-#include <tracking/cdcLocalTracking/geometry/Vector3D.h>
-#include <tracking/cdcLocalTracking/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 
 // Hit objects rely on the presence of wire that they are based on. Need to load the CDCGeometry from the Gearbox.
-#include <tracking/cdcLocalTracking/test_fixtures/CDCLocalTrackingTestWithTopology.h>
+#include <tracking/trackFindingCDC/test_fixtures/CDCLocalTrackingTestWithTopology.h>
 
 #include <boost/python.hpp>
 #include <gtest/gtest.h>

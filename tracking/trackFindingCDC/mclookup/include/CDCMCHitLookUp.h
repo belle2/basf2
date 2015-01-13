@@ -10,8 +10,8 @@
 #ifndef CDCMCHITLOOKUP_H
 #define CDCMCHITLOOKUP_H
 
-#include <tracking/cdcLocalTracking/typedefs/InfoTypes.h>
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

@@ -13,7 +13,7 @@
 #include <iostream>
 #include <map>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include "NeighborWeight.h"
 

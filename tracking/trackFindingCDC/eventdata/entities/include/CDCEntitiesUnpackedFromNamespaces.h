@@ -12,13 +12,13 @@
 
 
 #include "CDCEntities.h"
-/* #include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h> */
-/* #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h> */
-/* #include <tracking/cdcLocalTracking/eventdata/entities/CDCRLWireHit.h> */
-/* #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoHit2D.h> */
-/* #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoTangent.h> */
-/* #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h> */
-/* #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoHit3D.h> */
+/* #include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h> */
+/* #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h> */
+/* #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h> */
+/* #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h> */
+/* #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoTangent.h> */
+/* #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h> */
+/* #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h> */
 
 
 

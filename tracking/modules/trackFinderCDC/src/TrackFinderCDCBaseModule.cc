@@ -17,8 +17,8 @@
 
 //in type
 #include <cdc/dataobjects/CDCHit.h>
-#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 //out type
 #include "genfit/TrackCand.h"

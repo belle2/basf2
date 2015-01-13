@@ -10,11 +10,11 @@
 #ifndef CDCEVENTDATA_H
 #define CDCEVENTDATA_H
 
-#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectories.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCEntities.h>
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCCollections.h>
-#include <tracking/cdcLocalTracking/eventdata/segments/CDCSegments.h>
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCTracks.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCCollections.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTracks.h>
 
 
 

@@ -10,11 +10,11 @@
 #ifndef CDCFITTER2D_H
 #define CDCFITTER2D_H
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include "RiemannsMethod.h"
 #include "ExtendedRiemannsMethod.h"

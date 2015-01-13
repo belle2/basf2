@@ -13,7 +13,7 @@
 
 
 #include <framework/logging/Logger.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <cmath>
 #include <cassert>

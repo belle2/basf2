@@ -19,7 +19,7 @@
 #include <TBranch.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/tempro/TaggedType.h>
+#include <tracking/trackFindingCDC/tempro/TaggedType.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

@@ -10,12 +10,12 @@
 #ifndef CDCAXIALSTEREOFUSION_H
 #define CDCAXIALSTEREOFUSION_H
 
-#include <tracking/cdcLocalTracking/rootification/SwitchableRootificationBase.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectories.h>
-#include <tracking/cdcLocalTracking/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 #include "TMatrixD.h"
 #include "TVectorD.h"

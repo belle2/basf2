@@ -10,7 +10,7 @@
 #ifndef STEREOTYPES_H
 #define STEREOTYPES_H
 
-#include <tracking/cdcLocalTracking/typedefs/SignType.h>
+#include <tracking/trackFindingCDC/typedefs/SignType.h>
 
 namespace Belle2 {
 

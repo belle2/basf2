@@ -532,7 +532,7 @@ def draw_impact_parameter(data_tree):
                                     number_bins, lower_edge, upper_edge)
     hist_impact_parameter_d0.SetTitle('d0 resolution')
     hist_impact_parameter_d0.SetXTitle('pt in GeV/c')
-    hist_impact_parameter_d0.SetYTitle('#sigma_{d0}')
+    hist_impact_parameter_d0.SetYTitle('#sigma_{d0} [cm]')
     # Get a log scale on the plot.  The first way is my hackish way of
     # doing this, which is currently available on the buildbot
     # (2014-10-08).  The second is the way suggested for the future.
@@ -545,7 +545,7 @@ def draw_impact_parameter(data_tree):
                                    number_bins, lower_edge, upper_edge)
     hist_impact_parameter_z.SetTitle('z resolution')
     hist_impact_parameter_z.SetXTitle('pt in GeV/c')
-    hist_impact_parameter_z.SetYTitle('#sigma_{z}')
+    hist_impact_parameter_z.SetYTitle('#sigma_{z} [cm]')
     # Get a log scale on the plot.  The first way is my hackish way of
     # doing this, which is currently available on the buildbot
     # (2014-10-08).  The second is the way suggested for the future.

@@ -25,6 +25,7 @@
 """
 from basf2 import *
 from reconstruction import add_reconstruction
+from tracking.validation.tracking_efficiency_helpers import get_generated_pdg_code
 import glob
 import argparse
 
@@ -62,6 +63,9 @@ geometry.param('Components', components)
 path.add_module(geometry)
 
 add_reconstruction(path, components)
+for m in path.modules():
+    if m.name == 'GenFitter':
+        m.param('PDGCodes', [get_generated_pdg_code()])
 
 output_file_name = arguments.output_files
 

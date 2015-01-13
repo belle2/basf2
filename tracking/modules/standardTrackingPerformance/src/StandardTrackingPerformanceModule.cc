@@ -184,7 +184,16 @@ genfit::Track* StandardTrackingPerformanceModule::findRelatedTrack(
       continue;
     }
     if (aTrackCandPtr->getMcTrackId() == iMcParticle
-        && aTrackCandPtr->getPdgCode() == mcParticle.getPDG()) {
+        /* FIXME: it used to say 'aTrackCandPtr->getPdgCode() ==
+           mcParticle.getPDG()' as a second contion.  This broke when
+           the MCTrackCandCombiner stopped automatically setting the
+           particle hypothesis to the MC truth.  But the whole
+           sequence in this function doesn't seem to make much sense,
+           as we specified the data structures such that each
+           Belle2::Track contains several Belle2::TrackFitResults
+           corresponding to the various particle hypotheses.  How
+           these relate to genfit::Track is not yet cast in stone.  */
+        && 1) {
       B2DEBUG(99, "Found genfit::Track<->MCParticle relation.");
       resultGfTrack = &gfTrack;
     }

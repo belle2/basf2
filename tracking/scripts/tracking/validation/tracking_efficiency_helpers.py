@@ -27,6 +27,10 @@ import os
 import sys
 
 
+def get_generated_pdg_code():
+    return 13
+
+
 def get_generated_pt_value(index):
     """
     List with generated pt values is created in this function. With the
@@ -101,7 +105,7 @@ def run_simulation(path, pt_value, output_filename):
     pgun = register_module('ParticleGun')
     # choose the particles you want to simulate
     param_pgun = {
-        'pdgCodes': [13, -13],
+        'pdgCodes': [get_generated_pdg_code(), -get_generated_pdg_code()],
         'nTracks': 10,
         'varyNTracks': 0,
         'momentumGeneration': 'uniformPt',

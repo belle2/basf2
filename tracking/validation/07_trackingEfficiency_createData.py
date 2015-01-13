@@ -22,7 +22,7 @@
 """
 
 from basf2 import *
-from tracking_efficiency_helpers import run_simulation, get_generated_pt_value
+from tracking.validation.tracking_efficiency_helpers import run_simulation, get_generated_pt_value
 
 set_random_seed(123457)
 

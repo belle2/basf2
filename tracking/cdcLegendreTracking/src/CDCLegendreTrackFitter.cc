@@ -10,10 +10,10 @@
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
 
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
-#include <tracking/cdcLocalTracking/fitting/CDCKarimakiFitter.h>
-#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/cdcLocalTracking/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
@@ -23,7 +23,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace VXD;
 using namespace TrackFinderCDCLegendre;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 double TrackFitter::fitTrackCandidateFast(
   std::vector<TrackHit*>& hits,

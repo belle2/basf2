@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// The type of the wire ids enumerating wires within a given layer
     // Sign is essential.
@@ -26,7 +26,7 @@ namespace Belle2 {
     /// Legacy constant
     const IWireType INVALIDWIRE = INVALID_IWIRE;
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 #endif // WIRETYPE_H

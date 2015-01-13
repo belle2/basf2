@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     typedef Weight NeighborWeight;  ///< Type for the cell weight in the cellular automata
 
@@ -27,7 +27,7 @@ namespace Belle2 {
     inline bool isNotANeighbor(const NeighborWeight& weight)
     { return std::isnan(weight); }
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 #endif // NEIGHBORWEIGHT_H

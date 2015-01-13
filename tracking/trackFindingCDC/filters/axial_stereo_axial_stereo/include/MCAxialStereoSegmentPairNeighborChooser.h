@@ -16,7 +16,7 @@
 #include "BaseAxialStereoSegmentPairNeighborChooser.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
     class MCAxialStereoSegmentPairNeighborChooser : public BaseAxialStereoSegmentPairNeighborChooser {
@@ -49,7 +49,7 @@ namespace Belle2 {
 
     }; // end class
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif // MCAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H

@@ -23,7 +23,7 @@
 #include "CDCMCHitLookUp.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Interface class to the Monte Carlo information for segments
     /** This class provides a stable interface for the underlying implementation for look ups
@@ -199,6 +199,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(CDCMCSegmentLookUp, 1);
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCMCSEGMENTLOOKUP

@@ -15,10 +15,10 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
-    class ExtendedRiemannsMethod : public CDCLocalTracking::SwitchableRootificationBase {
+    class ExtendedRiemannsMethod : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
       ///Empty constructor
@@ -62,6 +62,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(ExtendedRiemannsMethod, 1);
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // EXTENDEDRIEMANNSMETHOD

@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representating a sense wire layer in the central drift chamber.
     /** This class represents the a CDC layer as a range of wires. \n
@@ -33,13 +33,13 @@ namespace Belle2 {
      * which you can get with the static getInstance() functions. \n
      * There is rarely a need for constructing a layer object and \n
      * it should be avoided for speed reasons. */
-    class CDCWireLayer : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCWireLayer : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
       /// The underlying container type storing range of wires referenced by this class
-      typedef std::vector<Belle2::CDCLocalTracking::CDCWire> Container;
+      typedef std::vector<Belle2::TrackFindingCDC::CDCWire> Container;
       /// The value type of the iterator range
-      typedef const Belle2::CDCLocalTracking::CDCWire value_type;
+      typedef const Belle2::TrackFindingCDC::CDCWire value_type;
 
       /// The type of the iterator for the wire range
       typedef Container::iterator iterator;
@@ -311,6 +311,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCWIRELAYER

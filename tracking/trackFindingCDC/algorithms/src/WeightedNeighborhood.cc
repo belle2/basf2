@@ -12,13 +12,13 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 //ClassImp(CDCNeighborhood)
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     //typedef WeightedNeighborhood<const int> ExampleNeighborHood;
 

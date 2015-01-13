@@ -25,7 +25,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /** This is a mock class, which defines the interface expected by the CDCGenHitVector.
 
@@ -142,7 +142,7 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(CDCGenHit, 1);
 
     }; //end class GenHit
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //CDCGENHIT_H

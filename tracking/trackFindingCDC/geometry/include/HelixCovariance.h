@@ -23,7 +23,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing the covariance matrix of a Helix in perigee parameters.
     class HelixCovariance : public SwitchableRootificationBase {
@@ -169,6 +169,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // HELIXCOVARIANCE_H

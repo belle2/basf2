@@ -94,7 +94,7 @@ class ZeroDriftLengthStrokeWidthMap(CDCHitStrokeWidthMap):
         Function call to map the CDCHit id and object to a stroke width.
         """
 
-        wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdcHit)
+        wirehit = Belle2.TrackFindingCDC.CDCWireHit(cdcHit)
         if wirehit.getRefDriftLength() == 0.0:
             return 1
         else:
@@ -129,7 +129,7 @@ class ZeroDriftLengthColorMap(CDCHitColorMap):
         Function call to map the CDCHit id and object to a color.
         """
 
-        wirehit = Belle2.CDCLocalTracking.CDCWireHit(cdcHit)
+        wirehit = Belle2.TrackFindingCDC.CDCWireHit(cdcHit)
         if wirehit.getRefDriftLength() == 0.0:
             return 'red'
         else:
@@ -147,7 +147,7 @@ class RLColorMap(CDCHitColorMap):
         Function call to map the CDCHit id and object to a color.
         """
 
-        mcHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
+        mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         rlInfo = mcHitLookUp.getRLInfo(cdcHit)
         if rlInfo == 1:
             # Right
@@ -289,7 +289,7 @@ class MCSegmentIdColorMap(CDCHitColorMap):
         Function call to map the CDCHit id and object to a color.
         """
 
-        mcHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
+        mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         inTrackSegmentId = mcHitLookUp.getInTrackSegmentId(cdcHit)
 
         if inTrackSegmentId < 0:
@@ -545,7 +545,7 @@ class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
         mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
         if mcTrackId < 0:
@@ -568,7 +568,7 @@ class SegmentFBInfoColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
         # Just to look at matched segments
         mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
@@ -597,7 +597,7 @@ class SegmentFirstInTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
         # Just to look at matched segments
         firstInTrackId = mcSegmentLookUp.getFirstInTrackId(segment)
@@ -620,7 +620,7 @@ class SegmentLastInTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
         # Just to look at matched segments
         lastInTrackId = mcSegmentLookUp.getLastInTrackId(segment)
@@ -643,7 +643,7 @@ class SegmentFirstNPassedSuperLayersColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
         # Just to look at matched segments
         firstNPassedSuperLayers = \
@@ -667,7 +667,7 @@ class SegmentLastNPassedSuperLayersColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
         # Just to look at matched segments
         lastNPassedSuperLayers = \

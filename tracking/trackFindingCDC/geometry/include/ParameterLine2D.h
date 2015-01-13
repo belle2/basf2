@@ -20,7 +20,7 @@
 #include "GeneralizedCircle.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A line with a support point and tangential vector
     /** Implements the representation \f$ x = s + \lambda \cdot t \f$ where \n
@@ -29,7 +29,7 @@ namespace Belle2 {
      *  this line defines a direction of positiv advance ( the tangential vector ) as well as \n
      *  a right and a left half plane.
      */
-    class ParameterLine2D : public CDCLocalTracking::SwitchableRootificationBase {
+    class ParameterLine2D : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -275,6 +275,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(ParameterLine2D, 1);
 
     }; //class
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // PARAMETERLINE2D

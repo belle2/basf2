@@ -17,7 +17,7 @@
 #include "AxialAxialSegmentPairFilterTree.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
     template<class RealAxialAxialSegmentPairFilter>
@@ -159,7 +159,7 @@ namespace Belle2 {
 
     }
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 

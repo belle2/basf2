@@ -26,10 +26,10 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Particle trajectory as it is seen in xy projection
-    class CDCTrajectory2D : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCTrajectory2D : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -438,6 +438,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCTRAJECTORY2D_H

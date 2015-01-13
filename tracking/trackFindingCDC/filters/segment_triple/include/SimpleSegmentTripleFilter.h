@@ -22,7 +22,7 @@
 #include "boost/tuple/tuple_comparison.hpp"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Filter for the constuction of segment triples based on simple criterions
     class SimpleSegmentTripleFilter {
@@ -69,7 +69,7 @@ namespace Belle2 {
     }; // end class SimpleSegmentTripleFilter
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //SIMPLESEGMENTTRIPLEFILTER_H_

@@ -15,10 +15,10 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class implementing the Karimaki fit for two dimensional trajectory circle
-    class KarimakisMethod : public CDCLocalTracking::SwitchableRootificationBase {
+    class KarimakisMethod : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
       ///Empty constructor
@@ -52,6 +52,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(KarimakisMethod, 1);
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // KARIMAKISMETHOD

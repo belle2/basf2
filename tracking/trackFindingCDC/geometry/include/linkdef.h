@@ -9,28 +9,28 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::Vector2D+;
-#pragma link C++ class Belle2::CDCLocalTracking::Vector3D+;
+#pragma link C++ class Belle2::TrackFindingCDC::Vector2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::Vector3D+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::Circle2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::Circle2D+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::Line2D+;
-#pragma link C++ class Belle2::CDCLocalTracking::ParameterLine2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::Line2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::ParameterLine2D+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::GeneralizedCircle+;
+#pragma link C++ class Belle2::TrackFindingCDC::GeneralizedCircle+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::PerigeeCircle+;
-#pragma link C++ class Belle2::CDCLocalTracking::PerigeeCovariance+;
-#pragma link C++ class Belle2::CDCLocalTracking::UncertainPerigeeCircle+;
+#pragma link C++ class Belle2::TrackFindingCDC::PerigeeCircle+;
+#pragma link C++ class Belle2::TrackFindingCDC::PerigeeCovariance+;
+#pragma link C++ class Belle2::TrackFindingCDC::UncertainPerigeeCircle+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::SZCovariance+;
-#pragma link C++ class Belle2::CDCLocalTracking::UncertainSZLine+;
+#pragma link C++ class Belle2::TrackFindingCDC::SZCovariance+;
+#pragma link C++ class Belle2::TrackFindingCDC::UncertainSZLine+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::Helix+;
-#pragma link C++ class Belle2::CDCLocalTracking::HelixCovariance+;
-#pragma link C++ class Belle2::CDCLocalTracking::UncertainHelix+;
+#pragma link C++ class Belle2::TrackFindingCDC::Helix+;
+#pragma link C++ class Belle2::TrackFindingCDC::HelixCovariance+;
+#pragma link C++ class Belle2::TrackFindingCDC::UncertainHelix+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::BoundSkewLine+;
+#pragma link C++ class Belle2::TrackFindingCDC::BoundSkewLine+;
 
 #endif
 

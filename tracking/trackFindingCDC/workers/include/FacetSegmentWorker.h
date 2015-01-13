@@ -29,7 +29,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Worker for building reconstructed segments form wirehits using reconstructed facets
     template<class FacetFilter, class FacetNeighborChooser, bool generateSymmetric = true>
@@ -278,7 +278,7 @@ namespace Belle2 {
       MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
 
     }; // end class FacetSegmentWorker
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //FACETSEGMENTWORKER_H_

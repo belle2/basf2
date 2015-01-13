@@ -11,7 +11,7 @@
 #include "../include/StaticString.h"
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 const char StaticString<>::chars[1] = {'\0' };
 const char StaticString<>::first = '\0';

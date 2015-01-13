@@ -15,7 +15,7 @@
 using namespace std;
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 TEST(CDCLocalTrackingTest, eventdata_trajectories_CDCBField_getBFieldZSign)

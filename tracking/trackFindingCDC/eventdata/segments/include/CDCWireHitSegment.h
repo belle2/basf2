@@ -17,10 +17,10 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A segment consisting of two dimensional reconsturcted hits
-    class CDCWireHitSegment :  public CDCGenHitVector<const Belle2::CDCLocalTracking::CDCWireHit*> {
+    class CDCWireHitSegment :  public CDCGenHitVector<const Belle2::TrackFindingCDC::CDCWireHit*> {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -38,8 +38,8 @@ namespace Belle2 {
       { return wireSuperLayer.getISuperLayer() < wireHitSegment.getISuperLayer(); }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      std::vector<const Belle2::CDCLocalTracking::CDCWire*> getWireSegment() const {
-        std::vector<const Belle2::CDCLocalTracking::CDCWire*> wireSegment;
+      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const {
+        std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
         for (const CDCWireHit * ptrWireHit : *this) {
           ptrWireHit ? wireSegment.push_back(&(ptrWireHit->getWire())) : wireSegment.push_back(nullptr);
         }
@@ -85,6 +85,6 @@ namespace Belle2 {
 
     }; //end class CDCWireHitSegment
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 #endif // CDCWIREHITSEGMENT_H_

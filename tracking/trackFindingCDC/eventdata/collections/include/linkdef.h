@@ -9,21 +9,21 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCGenHit>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCWireHit>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<const CDCWireHit *>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRLWireHit>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<const CDCRLWireHit *>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRecoHit2D>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRecoTangent>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRecoFacet>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCGenHitVector<CDCRecoHit3D>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<CDCGenHit>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<CDCWireHit>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<const CDCWireHit *>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<CDCRLWireHit>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<const CDCRLWireHit *>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<CDCRecoHit2D>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<CDCRecoTangent>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<CDCRecoFacet>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHitVector<CDCRecoHit3D>+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitVector+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRecoFacetVector+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRecoTangentVector+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRecoHit2DVector+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRecoHit3DVector+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitVector+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoFacetVector+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoTangentVector+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoHit2DVector+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoHit3DVector+;
 
 #endif
 

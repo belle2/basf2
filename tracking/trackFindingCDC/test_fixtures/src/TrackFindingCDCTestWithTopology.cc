@@ -26,7 +26,7 @@
 using namespace std;
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 void TrackFindingCDCTestWithTopology::SetUpTestCase()

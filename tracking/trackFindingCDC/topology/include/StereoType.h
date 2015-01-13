@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Type for the stereo property of the wire
     typedef SignType StereoType;
@@ -31,7 +31,7 @@ namespace Belle2 {
     /// Constant for an invalid stereo information
     const StereoType INVALID_STEREOTYPE = -127;
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 

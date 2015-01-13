@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/tempro/TaggedType.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Metafunction to extract the tags of a variadic sequence of TaggedTuples returning a tuple of types.
     template<class ... TaggedTypes_>
@@ -125,6 +125,6 @@ namespace Belle2 {
 
     };
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // TAGGEDTUPLE_H

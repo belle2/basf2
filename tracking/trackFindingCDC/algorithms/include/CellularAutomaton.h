@@ -29,7 +29,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     ///Implemetation of the cellular automaton
     /** Implements the weighted cellular automaton algorithm respecting the DO_NOT_USE flags of the cells
      *  not to be traversed. */
@@ -327,7 +327,7 @@ namespace Belle2 {
 
     }; // end class CellularAutomaton
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 
 } //end namespace Belle2
 

@@ -15,7 +15,7 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /** This class provides the declaration of the common test fixture to all
        test of the CDCLocalTracking code.
 
@@ -39,7 +39,7 @@ namespace Belle2 {
       static void TearDownTestCase();
 
     }; //end class
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //TRACKFINDINGCDCTESTWITHTOPOLOGY_H_

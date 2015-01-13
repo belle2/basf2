@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the segment triples.
     template<class AxialAxialSegmentPairFilter, class SegmentTripleFilter>
     class SegmentTripleCreator {
@@ -262,7 +262,7 @@ namespace Belle2 {
       mutable AxialAxialSegmentPairFilter m_axialAxialSegmentPairFilter; ///< Instance of the axial to axial pair filter.
       mutable SegmentTripleFilter m_segmentTripleFilter; ///< Instance of the segment triple filter.
     };
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //SEGMENTTRIPLECREATOR_H_

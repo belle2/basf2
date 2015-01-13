@@ -22,7 +22,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A segment consisting of two dimensional reconsturcted hits
     class CDCRecoSegment2D : public CDCRecoHit2DVector {
@@ -38,13 +38,13 @@ namespace Belle2 {
       static CDCRecoSegment2D condense(const CDCRecoTangentSegment& recoTangentSegment);
 
       /// Averages the recostructed positions from hits that overlap in adjacent tangents in the given tangent path
-      static CDCRecoSegment2D condense(const std::vector<const Belle2::CDCLocalTracking::CDCRecoTangent* >& recoTangentPath);
+      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoTangent* >& recoTangentPath);
 
       /// Averages the recostructed positions from hits that overlap in adjacent facets in the given facet segment.
       static CDCRecoSegment2D condense(const CDCRecoFacetSegment& recoFacetSegment);
 
       /// Averages the recostructed positions from hits that overlap in adjacent facet in the given facet path.
-      static CDCRecoSegment2D condense(const std::vector<const Belle2::CDCLocalTracking::CDCRecoFacet* >& recoFacetPath);
+      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoFacet* >& recoFacetPath);
 
 
       /// Reconstruct from wire hits with attached right left passage hypotheses by constructing tangents between adjacent hits pairs and averaging the reconstucted position.
@@ -70,8 +70,8 @@ namespace Belle2 {
       { return wireSuperLayer.getISuperLayer() < segment.getISuperLayer(); }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      std::vector<const Belle2::CDCLocalTracking::CDCWire*> getWireSegment() const {
-        std::vector<const Belle2::CDCLocalTracking::CDCWire*> wireSegment;
+      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const {
+        std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
         for (const CDCRecoHit2D & recoHit2D : *this) {
           wireSegment.push_back(&(recoHit2D.getWire()));
         }
@@ -191,6 +191,6 @@ namespace Belle2 {
 
     }; //end class CDCRecoSegment2D
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 #endif // CDCRECOSEGMENT2D_H_

@@ -21,7 +21,7 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Worker for building all facets without a filter applied. This is mainly a helper to evaluate a filter.
     class AllFacetWorker : public SwitchableRootificationBase {
@@ -68,7 +68,7 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(AllFacetWorker, 1);
 
     }; // end class AllFacetWorker
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //ALLFACETWORKER_H_

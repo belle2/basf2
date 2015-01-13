@@ -19,7 +19,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     //some additional transient types for exchange between creator objects

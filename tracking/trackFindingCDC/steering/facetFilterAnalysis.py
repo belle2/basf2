@@ -53,16 +53,16 @@ class AnalyseFacetFiltering(Module):
     def initialize(self):
         # Initialize singletones from the tracking software
         self.theMCHitLookUp = \
-            Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         self.theWireHitTopology = \
-            Belle2.CDCLocalTracking.CDCWireHitTopology.getInstance()
+            Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
 
         # Prepare a filter based on Monte Carlo information
-        self.mcFacetFilter = Belle2.CDCLocalTracking.MCFacetFilter()
+        self.mcFacetFilter = Belle2.TrackFindingCDC.MCFacetFilter()
         self.mcFacetFilter.initialize()
 
         # Create the worker that creates the facets
-        self.allFacetWorker = Belle2.CDCLocalTracking.AllFacetWorker()
+        self.allFacetWorker = Belle2.TrackFindingCDC.AllFacetWorker()
         self.allFacetWorker.initialize()
 
         # Initalize some counters to be extended

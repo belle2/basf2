@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     ///Base class  for filtering the neighborhood of facets
     /** Base implementation providing the getLowestPossibleNeighbor and isStillPossibleNeighbor method
      *  using the geometry of the facet.
@@ -85,7 +85,7 @@ namespace Belle2 {
       }
     }; // end class
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //BASEFACETNEIGHBORCHOOSER_H_

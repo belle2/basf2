@@ -53,26 +53,26 @@ class CDCDataobjectsConverter:
             # TRACKFINDINGCDC_USE_ROOT is active
             # use pyROOT interface to draw various specialised objects from the local finder.
             self.toSVGFunctions_by_type.update({
-                Belle2.CDCLocalTracking.Vector2D: self.Vector2DToSVG,
-                Belle2.CDCLocalTracking.Vector3D: self.Vector3DToSVG,
-                Belle2.CDCLocalTracking.CDCWire: self.CDCWireToSVG,
-                Belle2.CDCLocalTracking.CDCWireSuperLayer: self.CDCWireSuperLayerToSVG,
-                Belle2.CDCLocalTracking.CDCWireHit: self.CDCWireHitToSVG,
-                Belle2.CDCLocalTracking.CDCWireHitVector: self.CDCGenericHitCollectionToSVG,
-                Belle2.CDCLocalTracking.CDCRecoHit2D: self.CDCRecoHit2DToSVG,
-                Belle2.CDCLocalTracking.CDCRecoHit2DVector: self.CDCGenericHitCollectionToSVG,
-                Belle2.CDCLocalTracking.CDCRecoTangent: self.CDCRecoTangentToSVG,
-                Belle2.CDCLocalTracking.CDCRecoTangentVector: self.CDCGenericHitCollectionToSVG,
-                Belle2.CDCLocalTracking.CDCRecoFacetVector: self.CDCGenericHitCollectionToSVG,
-                Belle2.CDCLocalTracking.CDCRecoHit3D: self.CDCRecoHit3DToSVG,
-                Belle2.CDCLocalTracking.CDCRecoHit3DVector: self.CDCGenericHitCollectionToSVG,
-                Belle2.CDCLocalTracking.CDCWireHitCluster: self.CDCGenericHitCollectionToSVG,
-                Belle2.CDCLocalTracking.CDCRecoSegment2D: self.CDCGenericHitCollectionToSVG,
-                Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair: self.CDCAxialAxialSegmentPairToSVG,
-                Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair: self.CDCAxialStereoSegmentPairToSVG,
-                Belle2.CDCLocalTracking.CDCSegmentTriple: self.CDCSegmentTripleToSVG,
-                Belle2.CDCLocalTracking.CDCTrack: self.CDCGenericHitCollectionToSVG,
-                Belle2.CDCLocalTracking.CDCTrajectory2D: self.CDCTrajectory2DToSVG,
+                Belle2.TrackFindingCDC.Vector2D: self.Vector2DToSVG,
+                Belle2.TrackFindingCDC.Vector3D: self.Vector3DToSVG,
+                Belle2.TrackFindingCDC.CDCWire: self.CDCWireToSVG,
+                Belle2.TrackFindingCDC.CDCWireSuperLayer: self.CDCWireSuperLayerToSVG,
+                Belle2.TrackFindingCDC.CDCWireHit: self.CDCWireHitToSVG,
+                Belle2.TrackFindingCDC.CDCWireHitVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.TrackFindingCDC.CDCRecoHit2D: self.CDCRecoHit2DToSVG,
+                Belle2.TrackFindingCDC.CDCRecoHit2DVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.TrackFindingCDC.CDCRecoTangent: self.CDCRecoTangentToSVG,
+                Belle2.TrackFindingCDC.CDCRecoTangentVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.TrackFindingCDC.CDCRecoFacetVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.TrackFindingCDC.CDCRecoHit3D: self.CDCRecoHit3DToSVG,
+                Belle2.TrackFindingCDC.CDCRecoHit3DVector: self.CDCGenericHitCollectionToSVG,
+                Belle2.TrackFindingCDC.CDCWireHitCluster: self.CDCGenericHitCollectionToSVG,
+                Belle2.TrackFindingCDC.CDCRecoSegment2D: self.CDCGenericHitCollectionToSVG,
+                Belle2.TrackFindingCDC.CDCAxialAxialSegmentPair: self.CDCAxialAxialSegmentPairToSVG,
+                Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair: self.CDCAxialStereoSegmentPairToSVG,
+                Belle2.TrackFindingCDC.CDCSegmentTriple: self.CDCSegmentTripleToSVG,
+                Belle2.TrackFindingCDC.CDCTrack: self.CDCGenericHitCollectionToSVG,
+                Belle2.TrackFindingCDC.CDCTrajectory2D: self.CDCTrajectory2DToSVG,
                 })
 
             # Generics
@@ -252,7 +252,7 @@ class CDCDataobjectsConverter:
 
         childElements = []
 
-        mcHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
+        mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         tCenterPostion = mcHitLookUp.getRefPos2D(cdchit)
 
         center = (tCenterPostion.X(), tCenterPostion.Y())

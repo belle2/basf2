@@ -14,11 +14,11 @@
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A vector of wire hits. Template instance of CDCGenHitVector<CDCRecoFacet>
     /** See CDCGenHitVector for all methods and details */
-    class CDCRecoFacetVector : public CDCGenHitVector<Belle2::CDCLocalTracking::CDCRecoFacet> {
+    class CDCRecoFacetVector : public CDCGenHitVector<Belle2::TrackFindingCDC::CDCRecoFacet> {
 
     public:
 
@@ -34,7 +34,7 @@ namespace Belle2 {
 
     }; //class CDCRecoFacetVector
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 
 #endif // CDCRECOFACETVECTOR_H

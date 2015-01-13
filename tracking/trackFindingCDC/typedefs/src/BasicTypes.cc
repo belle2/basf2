@@ -15,9 +15,9 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
-const Weight CDCLocalTracking::HIGHEST_WEIGHT = std::numeric_limits<Weight>::infinity();
+const Weight TrackFindingCDC::HIGHEST_WEIGHT = std::numeric_limits<Weight>::infinity();
 
-const Weight CDCLocalTracking::LOWEST_WEIGHT = -std::numeric_limits<Weight>::infinity();
+const Weight TrackFindingCDC::LOWEST_WEIGHT = -std::numeric_limits<Weight>::infinity();

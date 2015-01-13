@@ -13,10 +13,10 @@
 #include "CDCFitter2D.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class implementing the Karimaki fit for two dimensional trajectory circle
-    class CDCKarimakiFitter : public CDCFitter2D<Belle2::CDCLocalTracking::KarimakisMethod> {
+    class CDCKarimakiFitter : public CDCFitter2D<Belle2::TrackFindingCDC::KarimakisMethod> {
 
     public:
       ///Static getter for a general riemann fitter
@@ -40,6 +40,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(CDCKarimakiFitter, 1);
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCKARIMAKIFITTER

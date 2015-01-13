@@ -13,9 +13,9 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 
 
-const NeighborWeight CDCLocalTracking::NOT_A_NEIGHBOR = std::numeric_limits<Weight>::quiet_NaN();;
+const NeighborWeight TrackFindingCDC::NOT_A_NEIGHBOR = std::numeric_limits<Weight>::quiet_NaN();;

@@ -53,9 +53,9 @@ class ShowNumberOfHits(Module):
     def initialize(self):
         # Initialize singletones from the tracking software
         self.theMCHitLookUp = \
-            Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         self.theWireHitTopology = \
-            Belle2.CDCLocalTracking.CDCWireHitTopology.getInstance()
+            Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
 
         self.numberOfHits = []
 

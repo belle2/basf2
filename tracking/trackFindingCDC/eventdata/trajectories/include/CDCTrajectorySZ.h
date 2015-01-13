@@ -20,7 +20,7 @@
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     /// Linear trajectory in sz space
@@ -29,7 +29,7 @@ namespace Belle2 {
      *  This class presents this trajectory projection by a line representation in sz space.
      *  The s coordinate is interpreted as the transvers travel distance, hence  \n
      *  the part of the travel distance see in the xy projection. */
-    class CDCTrajectorySZ : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCTrajectorySZ : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -177,6 +177,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(CDCTrajectorySZ, 1);
 
     }; //class
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCTRAJECTORYSZ_H

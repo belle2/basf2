@@ -23,7 +23,7 @@
 #include "genfit/TrackCand.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing a sequence of three dimensional reconstructed hits
     class CDCTrack : public CDCRecoHit3DVector {
@@ -43,11 +43,11 @@ namespace Belle2 {
 
 
       /// Getter for the first reconstructed hit in the track. Does not account for the forward backward info.
-      const Belle2::CDCLocalTracking::CDCRecoHit3D& getStartRecoHit3D() const
+      const Belle2::TrackFindingCDC::CDCRecoHit3D& getStartRecoHit3D() const
       { return front(); }
 
       /// Getter for the last reconstructed hit in the track. Does not account for the forward backward info.
-      const Belle2::CDCLocalTracking::CDCRecoHit3D& getEndRecoHit3D() const
+      const Belle2::TrackFindingCDC::CDCRecoHit3D& getEndRecoHit3D() const
       { return back(); }
 
 
@@ -151,6 +151,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCTRACK_H

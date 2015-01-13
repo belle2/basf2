@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
 
@@ -36,7 +36,7 @@ namespace Belle2 {
 
 
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 #endif // CELLWEIGHT_H

@@ -24,7 +24,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Helper class template to get a closest wire neighbor by its neighborhood relation type
     template<WireNeighborType NeighborType>
@@ -134,7 +134,7 @@ namespace Belle2 {
 
     }; // end class
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //WIREHITNEIGHBORCHOOSER_H

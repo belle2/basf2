@@ -17,7 +17,7 @@
 #include "CDCWireLayer.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     /// Class representating a sense wire superlayer in the central drift chamber.
@@ -34,15 +34,15 @@ namespace Belle2 {
      * which you can get with the static getInstance() functions. \n
      * There is rarely a need for constructing a superlayer object and \n
      * it should be avoided for speed reasons. */
-    class CDCWireSuperLayer : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCWireSuperLayer : public TrackFindingCDC::SwitchableRootificationBase {
 
 
     public:
       /// The underlying container type storing range of layers referenced by this class
-      typedef std::vector<Belle2::CDCLocalTracking::CDCWireLayer> Container;
+      typedef std::vector<Belle2::TrackFindingCDC::CDCWireLayer> Container;
 
       /// The value type of the iterator range
-      typedef Belle2::CDCLocalTracking::CDCWireLayer value_type;
+      typedef Belle2::TrackFindingCDC::CDCWireLayer value_type;
 
       /// The type of the iterator for the layer range
       typedef Container::iterator iterator;
@@ -51,7 +51,7 @@ namespace Belle2 {
       typedef Container::const_iterator const_iterator;
 
       /// A wire pointer pair as returned from getNeighborsOutward(), getNeighborsInward()
-      typedef std::pair<const Belle2::CDCLocalTracking::CDCWire*, const Belle2::CDCLocalTracking::CDCWire*> NeighborPair;
+      typedef std::pair<const Belle2::TrackFindingCDC::CDCWire*, const Belle2::TrackFindingCDC::CDCWire*> NeighborPair;
 
       /// Default constructor for ROOT compatibility.
       CDCWireSuperLayer();
@@ -312,6 +312,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCWIRESUPERLAYER

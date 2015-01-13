@@ -15,7 +15,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 std::vector< CDCRecoSegment2D >& MCSegmentWorker::generate(bool allowBackward)
 {
@@ -32,7 +32,7 @@ void MCSegmentWorker::generate(std::vector< CDCRecoSegment2D >& outputSegments, 
   const CDCMCTrackStore& mcTrackStore = CDCMCTrackStore::getInstance();
   const CDCSimHitLookUp& simHitLookUp = CDCSimHitLookUp::getInstance();
 
-  typedef Belle2::CDCLocalTracking::CDCMCTrackStore::CDCHitVector CDCHitVector;
+  typedef Belle2::TrackFindingCDC::CDCMCTrackStore::CDCHitVector CDCHitVector;
 
   const std::map<ITrackType, std::vector<CDCHitVector>>& mcSegmentsByMCParticleIdx = mcTrackStore.getMCSegmentsByMCParticleIdx();
   for (const std::pair<ITrackType, std::vector<CDCHitVector>>& mcSegmentsAndMCParticleIdx : mcSegmentsByMCParticleIdx) {

@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to stereo segment pairs based on Monte Carlo information.
     class MCAxialStereoSegmentPairFilter : public SwitchableRootificationBase {
@@ -42,7 +42,7 @@ namespace Belle2 {
       void terminate();
 
       /// Checks if a axial stereo segment pair is a good combination.
-      CellWeight isGoodAxialStereoSegmentPair(const Belle2::CDCLocalTracking::CDCAxialStereoSegmentPair& axialAxialSegmentPair,
+      CellWeight isGoodAxialStereoSegmentPair(const Belle2::TrackFindingCDC::CDCAxialStereoSegmentPair& axialAxialSegmentPair,
                                               bool allowBackward = false) const;
 
     private:
@@ -52,7 +52,7 @@ namespace Belle2 {
     }; // end class MCAxialStereoSegmentPairFilter
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif // MCAXIALSTEREOSEGMENTPAIRFILTER_H

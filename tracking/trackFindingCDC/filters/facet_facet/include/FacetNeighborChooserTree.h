@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Tree to store relevant variables to filter out wrong facets and the true information form Monte Carlo.
     typedef StaticTypedTree <
@@ -49,7 +49,7 @@ namespace Belle2 {
 
     }; // end class
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 
 

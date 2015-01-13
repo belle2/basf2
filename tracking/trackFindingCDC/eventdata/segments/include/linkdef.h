@@ -9,15 +9,15 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitCluster+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitSegment+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRLWireHitSegment+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitCluster+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitSegment+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHitSegment+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRecoTangentSegment+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoTangentSegment+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRecoSegment2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoSegment2D+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRecoSegment3D+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoSegment3D+;
 
 #endif
 

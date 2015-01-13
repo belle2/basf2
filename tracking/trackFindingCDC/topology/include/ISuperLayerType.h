@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// The type of the layer and superlayer ids
     typedef signed short ISuperLayerType;
@@ -44,7 +44,7 @@ namespace Belle2 {
     ISuperLayerType isAxialISuperLayer(const ISuperLayerType& iSuperLayer);
 
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 #endif // ISUPERLAYERTYPE_H

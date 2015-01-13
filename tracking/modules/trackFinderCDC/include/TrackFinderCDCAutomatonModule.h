@@ -62,26 +62,26 @@ namespace Belle2 {
 
   private:
     /// Worker to carry out the first stage for segment generation
-    CDCLocalTracking::FacetSegmentWorker <
-    CDCLocalTracking::SimpleFacetFilter,
-                     CDCLocalTracking::SimpleFacetNeighborChooser
-                     > m_segmentWorker;
+    TrackFindingCDC::FacetSegmentWorker <
+    TrackFindingCDC::SimpleFacetFilter,
+                    TrackFindingCDC::SimpleFacetNeighborChooser
+                    > m_segmentWorker;
 
     /// Pool to store the segments between the stages
-    std::vector< Belle2::CDCLocalTracking::CDCRecoSegment2D > m_recoSegments;
+    std::vector< Belle2::TrackFindingCDC::CDCRecoSegment2D > m_recoSegments;
 
     /// Worker to carry out the second stage generating tracks from segments.
-    CDCLocalTracking::SegmentTripleTrackingWorker <
-    CDCLocalTracking::SimpleAxialAxialSegmentPairFilter,
-                     CDCLocalTracking::SimpleSegmentTripleFilter,
-                     CDCLocalTracking::SimpleSegmentTripleNeighborChooser
-                     > m_segmentTripleTrackingWorker;
+    TrackFindingCDC::SegmentTripleTrackingWorker <
+    TrackFindingCDC::SimpleAxialAxialSegmentPairFilter,
+                    TrackFindingCDC::SimpleSegmentTripleFilter,
+                    TrackFindingCDC::SimpleSegmentTripleNeighborChooser
+                    > m_segmentTripleTrackingWorker;
 
     /// Worker to carry out the second stage generating tracks from segments utilizing pairs of segments.
-    CDCLocalTracking::SegmentPairTrackingWorker <
-    CDCLocalTracking::SimpleAxialStereoSegmentPairFilter,
-                     CDCLocalTracking::SimpleAxialStereoSegmentPairNeighborChooser
-                     > m_segmentPairTrackingWorker;
+    TrackFindingCDC::SegmentPairTrackingWorker <
+    TrackFindingCDC::SimpleAxialStereoSegmentPairFilter,
+                    TrackFindingCDC::SimpleAxialStereoSegmentPairNeighborChooser
+                    > m_segmentPairTrackingWorker;
 
   }; // end class
 } // end namespace Belle2

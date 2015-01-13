@@ -9,24 +9,24 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::AutomatonCell+;
+#pragma link C++ class Belle2::TrackFindingCDC::AutomatonCell+;
 
 //for testing
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<int>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<float>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCGenHit>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<int>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<float>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCGenHit>+;
 
 //to use
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCWire>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCWire*>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCWireHit>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCWireHit*>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRLWireHit>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCRLWireHit*>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRecoHit2D>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRecoTangent>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRecoFacet>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRecoHit3D>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCWire>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const CDCWire*>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCWireHit>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const CDCWireHit*>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRLWireHit>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const CDCRLWireHit*>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRecoHit2D>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRecoTangent>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRecoFacet>+;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRecoHit3D>+;
 
 #endif
 

@@ -21,7 +21,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A generic vector which keeps track if its elements are sorted and speeds up lookups accordingly.
     template<class T>
@@ -444,7 +444,7 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 
 #endif // SORTABLEVECTOR_H

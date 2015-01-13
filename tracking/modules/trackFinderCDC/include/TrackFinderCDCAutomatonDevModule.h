@@ -58,26 +58,26 @@ namespace Belle2 {
     bool m_param_runSecondStage;
 
     /// Worker to carry out the first stage for segment generation
-    CDCLocalTracking::FacetSegmentWorker <
-    CDCLocalTracking::FacetFilter,
-                     CDCLocalTracking::FacetNeighborChooser
-                     > m_segmentWorker;
+    TrackFindingCDC::FacetSegmentWorker <
+    TrackFindingCDC::FacetFilter,
+                    TrackFindingCDC::FacetNeighborChooser
+                    > m_segmentWorker;
 
     /// Pool to store the segments between the stages
-    std::vector< Belle2::CDCLocalTracking::CDCRecoSegment2D > m_recoSegments;
+    std::vector< Belle2::TrackFindingCDC::CDCRecoSegment2D > m_recoSegments;
 
     /// Worker to carry out the second stage generating tracks from segments.
-    CDCLocalTracking::SegmentTripleTrackingWorker <
-    CDCLocalTracking::AxialAxialSegmentPairFilter,
-                     CDCLocalTracking::SegmentTripleFilter,
-                     CDCLocalTracking::SegmentTripleNeighborChooser
-                     > m_segmentTripleTrackingWorker;
+    TrackFindingCDC::SegmentTripleTrackingWorker <
+    TrackFindingCDC::AxialAxialSegmentPairFilter,
+                    TrackFindingCDC::SegmentTripleFilter,
+                    TrackFindingCDC::SegmentTripleNeighborChooser
+                    > m_segmentTripleTrackingWorker;
 
     /// Worker to carry out the second stage generating tracks from segments utilizing pairs of segments.
-    CDCLocalTracking::SegmentPairTrackingWorker <
-    CDCLocalTracking::AxialStereoSegmentPairFilter,
-                     CDCLocalTracking::AxialStereoSegmentPairNeighborChooser
-                     > m_segmentPairTrackingWorker;
+    TrackFindingCDC::SegmentPairTrackingWorker <
+    TrackFindingCDC::AxialStereoSegmentPairFilter,
+                    TrackFindingCDC::AxialStereoSegmentPairNeighborChooser
+                    > m_segmentPairTrackingWorker;
   }; // end class
 } // end namespace Belle2
 

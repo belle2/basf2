@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A segment consisting of three dimensional reconstructed hits.
     class CDCRecoSegment3D : public CDCRecoHit3DVector {

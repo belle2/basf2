@@ -22,13 +22,13 @@
 
 #ifdef __CINT__
 //Unpack specialisation from all namespaces to spoon feeding them to ROOT
-typedef Belle2::CDCLocalTracking::RiemannsMethod RiemannsMethod;
-typedef Belle2::CDCLocalTracking::ExtendedRiemannsMethod ExtendedRiemannsMethod;
-typedef Belle2::CDCLocalTracking::KarimakisMethod KarimakisMethod;
+typedef Belle2::TrackFindingCDC::RiemannsMethod RiemannsMethod;
+typedef Belle2::TrackFindingCDC::ExtendedRiemannsMethod ExtendedRiemannsMethod;
+typedef Belle2::TrackFindingCDC::KarimakisMethod KarimakisMethod;
 #endif // __CINT__
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
     template<class FitMethod>
@@ -64,8 +64,8 @@ namespace Belle2 {
       }
 
       /// Fits to the wire positions
-      CDCTrajectory2D fit(const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires) const {
-        //B2INFO("Called const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires.");
+      CDCTrajectory2D fit(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires) const {
+        //B2INFO("Called const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires.");
         CDCTrajectory2D result;
         update(result, wires);
         return result;
@@ -132,6 +132,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCFITTER2D

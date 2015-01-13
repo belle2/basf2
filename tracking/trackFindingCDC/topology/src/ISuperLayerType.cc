@@ -15,13 +15,13 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 
 
 
-bool CDCLocalTracking::isValidISuperLayer(const ISuperLayerType& iSuperLayer)
+bool TrackFindingCDC::isValidISuperLayer(const ISuperLayerType& iSuperLayer)
 {
   return 0 <= iSuperLayer and iSuperLayer < NSUPERLAYERS;
 }
@@ -30,7 +30,7 @@ bool CDCLocalTracking::isValidISuperLayer(const ISuperLayerType& iSuperLayer)
 
 
 
-bool CDCLocalTracking::isLogicISuperLayer(const ISuperLayerType& iSuperLayer)
+bool TrackFindingCDC::isLogicISuperLayer(const ISuperLayerType& iSuperLayer)
 {
   return INNER_ISUPERLAYER <= iSuperLayer and iSuperLayer <= OUTER_ISUPERLAYER;
 }
@@ -39,7 +39,7 @@ bool CDCLocalTracking::isLogicISuperLayer(const ISuperLayerType& iSuperLayer)
 
 
 
-ISuperLayerType CDCLocalTracking::getISuperLayerAtPolarR(const FloatType& polarR)
+ISuperLayerType TrackFindingCDC::getISuperLayerAtPolarR(const FloatType& polarR)
 {
   const CDCWireTopology& cdcWireTopology = CDCWireTopology::getInstance();
   const std::vector<CDCWireSuperLayer>& wireSuperLayers = cdcWireTopology.getWireSuperLayers();
@@ -62,7 +62,7 @@ ISuperLayerType CDCLocalTracking::getISuperLayerAtPolarR(const FloatType& polarR
 
 
 
-ISuperLayerType CDCLocalTracking::isAxialISuperLayer(const ISuperLayerType& iSuperLayer)
+ISuperLayerType TrackFindingCDC::isAxialISuperLayer(const ISuperLayerType& iSuperLayer)
 {
   return isValidISuperLayer(iSuperLayer) and isEven(iSuperLayer);
 }

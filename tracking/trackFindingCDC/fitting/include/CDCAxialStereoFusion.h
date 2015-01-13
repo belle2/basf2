@@ -21,7 +21,7 @@
 #include "TVectorD.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     class CDCAxialStereoFusion : public SwitchableRootificationBase {
 
@@ -51,6 +51,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(CDCAxialStereoFusion, 1);
 
     }; // end class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCAXIALSTEREOFUSION_H

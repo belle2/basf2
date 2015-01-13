@@ -19,7 +19,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Interface class to the Monte Carlo information for individual hits
     /** This class provides a stable interface for the underlying implementation for look ups
@@ -89,6 +89,6 @@ namespace Belle2 {
       ClassDef(CDCMCHitLookUp, 1);
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCMCHITLOOKUP

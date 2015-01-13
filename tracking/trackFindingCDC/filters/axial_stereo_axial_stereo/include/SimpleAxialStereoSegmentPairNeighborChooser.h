@@ -14,7 +14,7 @@
 #include "BaseAxialStereoSegmentPairNeighborChooser.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Class filtering the neighborhood of segment triples based on simple criterions.
     class SimpleAxialStereoSegmentPairNeighborChooser : public BaseAxialStereoSegmentPairNeighborChooser {
@@ -50,7 +50,7 @@ namespace Belle2 {
 
     }; // end class
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif // SIMPLEAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H

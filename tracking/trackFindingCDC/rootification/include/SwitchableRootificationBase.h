@@ -24,7 +24,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     // BASF2 defines
     // RelationsObject
@@ -113,7 +113,7 @@ private:                \
 #endif
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 
 } //end namespace Belle2
 

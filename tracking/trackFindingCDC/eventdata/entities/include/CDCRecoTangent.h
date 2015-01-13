@@ -23,7 +23,7 @@
 #include "CDCRecoHit2D.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representating a linear track piece between two oriented wire hits \n
     /** A reconstructed tangent is an approximation of the possible trajectory between two oriented wire hits. \n
@@ -98,7 +98,7 @@ namespace Belle2 {
       /// Allow automatic taking of the address.
       /** Essentially pointers to objects is a class of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication. */
-      operator const Belle2::CDCLocalTracking::CDCRecoTangent* () const { return this; }
+      operator const Belle2::TrackFindingCDC::CDCRecoTangent* () const { return this; }
 
 
       /// Getter for the touching point of the tangent to the first drift circle
@@ -195,6 +195,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCRECOHITTANGENT_H

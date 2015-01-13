@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Type transporting a sign
     typedef signed short SignType;
@@ -46,7 +46,7 @@ namespace Belle2 {
     { return std::abs(s) <= 1; }
 
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 #endif // SIGNTYPE_H

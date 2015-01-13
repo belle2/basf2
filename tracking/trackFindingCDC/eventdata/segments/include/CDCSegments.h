@@ -16,7 +16,7 @@
 #include "CDCRecoSegment3D.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     //doing two typedef just to clearify the intention of use in other objects
     //( hence whether an axial or stereo segment shall be given as a parameter )

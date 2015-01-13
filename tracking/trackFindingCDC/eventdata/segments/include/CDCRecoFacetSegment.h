@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoFacetVector.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     // for now a typedef is enough
     // may get additional methods if necessary

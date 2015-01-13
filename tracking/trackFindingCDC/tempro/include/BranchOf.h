@@ -22,7 +22,7 @@
 #include <tracking/trackFindingCDC/tempro/TaggedType.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     /// Template deriving a name from a tag. Default is the typeid.name()
@@ -97,7 +97,7 @@ namespace Belle2 {
 
     };
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // BRANCHOF_H
 

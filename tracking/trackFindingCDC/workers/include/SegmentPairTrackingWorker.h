@@ -29,7 +29,7 @@
 #include <tracking/trackFindingCDC/creators/TrackOrientator.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Worker for building reconstructed tracks form reconstructed segments using segment triples
     template<class AxialStereoSegmentPairFilter, class AxialStereoSegmentPairNeighorChooser>
@@ -232,7 +232,7 @@ namespace Belle2 {
 
     }; // end class SegmentPairTrackingWorker
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif // SEGMENTPAIRTRACKINGWORKER_H

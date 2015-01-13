@@ -17,7 +17,7 @@
 // we have to make each object, with which we want the instantiate the templates,
 // available outside any namespace.
 
-typedef Belle2::CDCLocalTracking::CDCWire CDCWire;
+typedef Belle2::TrackFindingCDC::CDCWire CDCWire;
 
 #endif // __CINT__
 

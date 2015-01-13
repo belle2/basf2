@@ -19,7 +19,7 @@
 #include "CDCWireHit.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing an oriented hit wire including a hypotheses whether the causing track passes left or right
     class CDCRLWireHit : public SwitchableRootificationBase {
@@ -187,6 +187,6 @@ namespace Belle2 {
 
     }; //class CDCRLWireHit
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCRLWIREHIT_H

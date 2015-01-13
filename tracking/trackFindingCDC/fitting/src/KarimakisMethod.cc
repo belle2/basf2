@@ -20,7 +20,7 @@ using namespace std;
 using namespace Belle2;
 using namespace Eigen;
 
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 TRACKFINDINGCDC_SwitchableClassImp(KarimakisMethod)
 

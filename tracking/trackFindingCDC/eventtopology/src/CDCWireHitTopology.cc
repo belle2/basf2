@@ -18,7 +18,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 namespace {
@@ -160,7 +160,7 @@ std::pair<const CDCRLWireHit*, const CDCRLWireHit*> CDCWireHitTopology::getRLWir
   }
 }
 
-const Belle2::CDCLocalTracking::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCLocalTracking::CDCWireHit& wireHit, const RightLeftInfo& rlInfo) const
+const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit, const RightLeftInfo& rlInfo) const
 {
 
   std::pair<const CDCRLWireHit*, const CDCRLWireHit*> rlWireHitPair = getRLWireHitPair(wireHit);
@@ -173,7 +173,7 @@ const Belle2::CDCLocalTracking::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(c
 }
 
 
-const Belle2::CDCLocalTracking::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const
+const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const
 {
   const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
   return  ptrWireHit ? getRLWireHit(*ptrWireHit, rlInfo) : nullptr;

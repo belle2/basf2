@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// Algorithm fixing the track orientation if we can figure that the track point into the wrong direction
     /** Since the tracks are produced from the cellular automaton in no specific direction
      *  we have to fix the orientation by hand somehow. The algorithm is at no point to be called clever
@@ -42,7 +42,7 @@ namespace Belle2 {
     }; // end class TrackOrientator
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //TRACKORIENTATOR_H_

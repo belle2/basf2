@@ -7,10 +7,10 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::CDCLocalTracking::MCFacetFilter+;
+#pragma link C++ class Belle2::TrackFindingCDC::MCFacetFilter+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::AllFacetFilter+;
-#pragma link C++ class Belle2::CDCLocalTracking::SimpleFacetFilter+;
+#pragma link C++ class Belle2::TrackFindingCDC::AllFacetFilter+;
+#pragma link C++ class Belle2::TrackFindingCDC::SimpleFacetFilter+;
 
 
 #endif

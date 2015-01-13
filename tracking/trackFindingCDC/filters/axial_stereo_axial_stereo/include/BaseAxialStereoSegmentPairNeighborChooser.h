@@ -19,7 +19,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     ///Base class for filtering the neighborhood of axial stereo segment pairs
     class BaseAxialStereoSegmentPairNeighborChooser {
 
@@ -64,7 +64,7 @@ namespace Belle2 {
       }
     }; // end class
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif // BASEAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H

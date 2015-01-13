@@ -14,7 +14,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 using namespace CDC;
 
 TRACKFINDINGCDC_SwitchableClassImp(CDCWireTopology)

@@ -22,7 +22,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing a triple of reconstructed segements in adjacent superlayer
     class CDCSegmentTriple : public CDCAxialAxialSegmentPair {
@@ -133,6 +133,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCSEGMENTTRIPLE

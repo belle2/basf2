@@ -16,7 +16,7 @@
 #include "TrackCreator.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// Creator to append left over segments from the cellular automaton as tracks
     /** The cellular automaton for track building is based in segment triples which means that
      *  tracks that do not traverse three superlayers are not picked up.
@@ -48,7 +48,7 @@ namespace Belle2 {
     }; // end class SingleSegmentTrackCreator
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //SINGLESEGMENTTRACKCREATOR_H_

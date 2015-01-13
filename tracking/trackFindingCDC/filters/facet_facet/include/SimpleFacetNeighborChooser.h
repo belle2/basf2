@@ -14,7 +14,7 @@
 #include "BaseFacetNeighborChooser.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Class filtering the neighborhood of facets based on simple criterions.
     class SimpleFacetNeighborChooser : public BaseFacetNeighborChooser {
@@ -71,7 +71,7 @@ namespace Belle2 {
     }; // end class
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //SIMPLEFACETNEIGHBORCHOOSER_H_

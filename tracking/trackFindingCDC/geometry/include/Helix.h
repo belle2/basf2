@@ -26,10 +26,10 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Extension of the generalized circle also caching the perigee coordinates.
-    class Helix : public CDCLocalTracking::SwitchableRootificationBase {
+    class Helix : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -250,6 +250,6 @@ namespace Belle2 {
     }; //class
 
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // HELIX_H

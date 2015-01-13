@@ -29,7 +29,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Worker for building reconstructed tracks form reconstructed segments using segment triples
     template<class AxialAxialSegmentPairFilter, class SegmentTripleFilter, class SegmentTripleNeighborChooser>
@@ -185,7 +185,7 @@ namespace Belle2 {
       TrackOrientator m_trackOrientator;
 
     }; // end class SegmentTripleTrackingWorker
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //SEGMENTTRIPLETRACKINGWORKER_H_

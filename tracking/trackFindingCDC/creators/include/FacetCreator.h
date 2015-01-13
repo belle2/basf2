@@ -19,7 +19,7 @@
 #include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the facets.
     template<class FacetFilter>
     class FacetCreator {
@@ -143,7 +143,7 @@ namespace Belle2 {
       mutable FacetFilter m_facetFilter; ///< Instance of the filter used to judge the hit triple quality.
 
     }; //end class FacetCreator
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //FACETCREATOR_H_

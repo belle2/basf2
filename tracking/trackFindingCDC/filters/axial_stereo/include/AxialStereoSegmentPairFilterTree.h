@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// ROOT Tree structure declaration for the evaluation of axial to stereo segment pair filters.
     typedef StaticTypedTree <
@@ -119,7 +119,7 @@ namespace Belle2 {
 
     }; // end class AxialStereoSegmentPairFilterVars
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 

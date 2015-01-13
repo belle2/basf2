@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Helper indices for meaningfull access in a vector or matrix assoziated with helix parameters.
     typedef PerigeeParameterIndex HelixParameterIndex;
@@ -30,7 +30,7 @@ namespace Belle2 {
     /// Constant to address the z reference point in a vector or matrix assoziated with helix parameters
     const HelixParameterIndex iZ0 = 4;
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 

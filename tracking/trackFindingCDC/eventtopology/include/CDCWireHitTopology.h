@@ -26,7 +26,7 @@
 #include <tracking/trackFindingCDC/algorithms/SortableVector.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representating the wire hit arrangement in the current event in the whole of the central drift chamber.
     /** This class stores the hits in the CDC that have been unpacked from the raw CDCHits and geometrical information
@@ -42,10 +42,10 @@ namespace Belle2 {
 
     public:
       /// A Range of const CDCWireHits - usable with range based for
-      typedef SortableVector<Belle2::CDCLocalTracking::CDCWireHit>::const_range CDCWireHitRange;
+      typedef SortableVector<Belle2::TrackFindingCDC::CDCWireHit>::const_range CDCWireHitRange;
 
       /// A Range of const CDCLRWireHits - usable with range based for
-      typedef SortableVector<Belle2::CDCLocalTracking::CDCRLWireHit>::const_range CDCRLWireHitRange;
+      typedef SortableVector<Belle2::TrackFindingCDC::CDCRLWireHit>::const_range CDCRLWireHitRange;
 
       /// Getter of the singletone instance
       static CDCWireHitTopology& getInstance();
@@ -65,19 +65,19 @@ namespace Belle2 {
       void clear();
 
       /// Getter for the oriented wire hit with the opposite orientation.
-      const Belle2::CDCLocalTracking::CDCRLWireHit* getReverseOf(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit) const;
+      const Belle2::TrackFindingCDC::CDCRLWireHit* getReverseOf(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
 
       /// Getter for the wire hit that is based on the given CDCHit.
-      const Belle2::CDCLocalTracking::CDCWireHit* getWireHit(const Belle2::CDCHit* ptrHit) const;
+      const Belle2::TrackFindingCDC::CDCWireHit* getWireHit(const Belle2::CDCHit* ptrHit) const;
 
       /// Getter for the two oriented wire hits that are based on the given wire hit
-      std::pair<const Belle2::CDCLocalTracking::CDCRLWireHit*, const Belle2::CDCLocalTracking::CDCRLWireHit*> getRLWireHitPair(const Belle2::CDCLocalTracking::CDCWireHit& wireHit) const;
+      std::pair<const Belle2::TrackFindingCDC::CDCRLWireHit*, const Belle2::TrackFindingCDC::CDCRLWireHit*> getRLWireHitPair(const Belle2::TrackFindingCDC::CDCWireHit& wireHit) const;
 
       /// Getter for the oriented wire hit that is based on the given wire hit with a specific right left passage hypotheses.
-      const Belle2::CDCLocalTracking::CDCRLWireHit* getRLWireHit(const Belle2::CDCLocalTracking::CDCWireHit& wireHit, const RightLeftInfo& rlInfo) const;
+      const Belle2::TrackFindingCDC::CDCRLWireHit* getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit, const RightLeftInfo& rlInfo) const;
 
       /// Getter for the oriented wire hit that is based on the given CDCHit with a specific right left passafe hypotheses.
-      const Belle2::CDCLocalTracking::CDCRLWireHit* getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const;
+      const Belle2::TrackFindingCDC::CDCRLWireHit* getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const;
 
       /// Getter for a coaligned subrange of wire hits.
       template<class Coaligned>
@@ -88,11 +88,11 @@ namespace Belle2 {
       CDCRLWireHitRange getRLWireHits(const Coaligned& coaligned) const { return m_rlWireHits.equal_range(coaligned); }
 
       /// Getter for the wire hits
-      const Belle2::CDCLocalTracking::SortableVector<Belle2::CDCLocalTracking::CDCWireHit>& getWireHits() const
+      const Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCWireHit>& getWireHits() const
       { return m_wireHits; }
 
       /// Getter for the wire hits
-      const Belle2::CDCLocalTracking::SortableVector<Belle2::CDCLocalTracking::CDCRLWireHit>& getRLWireHits() const
+      const Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCRLWireHit>& getRLWireHits() const
       { return m_rlWireHits; }
 
     private:
@@ -106,6 +106,6 @@ namespace Belle2 {
     }; //class
 
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCWIREHITTOPOLOGY_H

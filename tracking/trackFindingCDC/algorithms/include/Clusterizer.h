@@ -23,7 +23,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     /// Implementation of the clustering
@@ -231,7 +231,7 @@ namespace Belle2 {
 
     }; // end class Clusterizer
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //CLUSTERIZER_H_

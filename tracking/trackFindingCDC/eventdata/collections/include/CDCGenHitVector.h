@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/algorithms/SortableVector.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A generic vector used for different hit aggregates.
     /** details */
@@ -63,7 +63,7 @@ namespace Belle2 {
       class HasWirePredicate {
       public:
         /// Constructor of the helper class taking the sought wire.
-        HasWirePredicate(const Belle2::CDCLocalTracking::CDCWire& wire) : m_wire(wire) {;}
+        HasWirePredicate(const Belle2::TrackFindingCDC::CDCWire& wire) : m_wire(wire) {;}
 
         /// Evaluates if the given item has the sought wire.
         bool operator()(const T& item) { return item->hasWire(m_wire); }
@@ -76,49 +76,49 @@ namespace Belle2 {
       class HasWireHitPredicate {
       public:
         /// Constructor of the helper class taking the sought wire hit.
-        HasWireHitPredicate(const Belle2::CDCLocalTracking::CDCWireHit& wirehit) : m_wirehit(wirehit) {;}
+        HasWireHitPredicate(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) : m_wirehit(wirehit) {;}
 
         /// Evaluates if the given item has the sought wire hit.
         bool operator()(const T& item) { return item->hasWireHit(m_wirehit); }
 
       private:
         /// Reference to the sought wire hit.
-        const Belle2::CDCLocalTracking::CDCWireHit& m_wirehit;
+        const Belle2::TrackFindingCDC::CDCWireHit& m_wirehit;
       };
 
     public:
       /// Erases all tracking entities assoziated with specific wire from the vector.
-      void eraseAll(const Belle2::CDCLocalTracking::CDCWire& wire) {
+      void eraseAll(const Belle2::TrackFindingCDC::CDCWire& wire) {
         this->erase(remove_if(this->begin(), this->end(), HasWirePredicate(wire)), this->end());
         //remove erase idiom
       }
       /// Erases all tracking entities assoziated with specific wire hit from the vector.
-      void eraseAll(const Belle2::CDCLocalTracking::CDCWireHit& wirehit) {
+      void eraseAll(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) {
         this->erase(remove_if(this->begin(), this->end(), HasWireHitPredicate(wirehit)), this->end());
         //remove erase idiom
       }
 
       /// Checks if any stored tracking entity is assoziated with a specific wire.
-      bool hasWire(const Belle2::CDCLocalTracking::CDCWire& wire) const {
+      bool hasWire(const Belle2::TrackFindingCDC::CDCWire& wire) const {
         const_iterator found = std::find_if(this->begin(), this->end(), HasWirePredicate(wire));
         return found != this->end();
       }
 
       /// Checks if any stored tracking entity is assoziated with a specific wire hit.
-      bool hasWireHit(const Belle2::CDCLocalTracking::CDCWireHit& wirehit) const {
+      bool hasWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) const {
         const_iterator found = std::find_if(this->begin(), this->end(), HasWireHitPredicate(wirehit));
         return found != this->end();
       }
 
       /// Copy all entities in this collection assoziated with a specific wire to the given collection.
-      void collectForWire(const Belle2::CDCLocalTracking::CDCWire& wire, CDCGenHitVector<T>& collect) const {
+      void collectForWire(const Belle2::TrackFindingCDC::CDCWire& wire, CDCGenHitVector<T>& collect) const {
         input_iterator inputTo = collect.input();
         for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
           if ((*itItem)->hasWire(wire)) inputTo = *itItem;
         }
       }
       /// Copy all entities in this collection assoziated with a specific wire hit to the given collection.
-      void collectForWireHit(const Belle2::CDCLocalTracking::CDCWireHit& wirehit, CDCGenHitVector<T>& collect) const {
+      void collectForWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wirehit, CDCGenHitVector<T>& collect) const {
         input_iterator inputTo = collect.input();
         for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
           if ((*itItem)->hasWireHit(wirehit)) inputTo = *itItem;
@@ -213,7 +213,7 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 
 #endif // CDCGENHITVECTOR_H

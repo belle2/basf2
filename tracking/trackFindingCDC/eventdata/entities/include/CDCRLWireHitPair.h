@@ -15,7 +15,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A pair of oriented wire hits
     class CDCRLWireHitPair : public SwitchableRootificationBase {
@@ -170,7 +170,7 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(CDCRLWireHitPair, 1);
 
     }; //end class CDCRLWireHitPair
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //CDCRLWIREHITPAIR_H

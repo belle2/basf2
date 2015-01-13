@@ -18,10 +18,10 @@
 #include "CDCFitter2D.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
-    class CDCRiemannFitter : public CDCFitter2D<Belle2::CDCLocalTracking::ExtendedRiemannsMethod> {
+    class CDCRiemannFitter : public CDCFitter2D<Belle2::TrackFindingCDC::ExtendedRiemannsMethod> {
 
     public:
       ///Static getter for a general Riemann fitter
@@ -45,6 +45,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(CDCRiemannFitter, 1);
     }; //class
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCRIEMANNFITTER

@@ -13,12 +13,12 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 
 
 
-const CellWeight CDCLocalTracking::NOT_A_CELL = std::numeric_limits<Weight>::quiet_NaN();
+const CellWeight TrackFindingCDC::NOT_A_CELL = std::numeric_limits<Weight>::quiet_NaN();
 
 

@@ -24,7 +24,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     const FloatType SIMPLE_DRIFT_LENGTH_VARIANCE  = 0.000169;
 
@@ -162,7 +162,7 @@ namespace Belle2 {
       { return m_automatonCell; }
 
       /// Cast operator to the reference of the automaton cell - making AutomatonCell a constant pseudo base class of CDCWireHit
-      operator const Belle2::CDCLocalTracking::AutomatonCell& () const
+      operator const Belle2::TrackFindingCDC::AutomatonCell& () const
       { return m_automatonCell; }
 
 
@@ -181,7 +181,7 @@ namespace Belle2 {
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
-      operator const Belle2::CDCLocalTracking::CDCWireHit* () const
+      operator const Belle2::TrackFindingCDC::CDCWireHit* () const
       { return this; }
       /**@}*/
 
@@ -262,6 +262,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCWIREHIT_H

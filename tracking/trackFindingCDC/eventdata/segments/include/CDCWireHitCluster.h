@@ -15,10 +15,10 @@
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// An aggregation of CDCWireHits.
-    class CDCWireHitCluster : public CDCGenHitVector<const Belle2::CDCLocalTracking::CDCWireHit*> {
+    class CDCWireHitCluster : public CDCGenHitVector<const Belle2::TrackFindingCDC::CDCWireHit*> {
     public:
 
       /// Default constructor for ROOT compatibility.

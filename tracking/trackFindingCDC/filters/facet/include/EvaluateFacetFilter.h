@@ -21,7 +21,7 @@
 #include "FacetFilterTree.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Filter for facets using a real facet filter and compares it to the Monte Carlo decision and writing the events to file for analysis.
     template<class RealFacetFilter>
@@ -69,7 +69,7 @@ namespace Belle2 {
       RealFacetFilter m_realFacetFilter; ///< Instance of evaluated facet filter.
 
     }; // end class EvaluateFacetFilter
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 
@@ -77,7 +77,7 @@ namespace Belle2 {
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     template<class RealFacetFilter>
     EvaluateFacetFilter<RealFacetFilter>::EvaluateFacetFilter()
@@ -153,7 +153,7 @@ namespace Belle2 {
       return "EvaluateFacetFilter.root";
     }
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //EVALUATEFACETFILTER_H_

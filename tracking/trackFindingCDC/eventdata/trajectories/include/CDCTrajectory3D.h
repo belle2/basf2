@@ -33,10 +33,10 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Particle full three dimensional trajectory.
-    class CDCTrajectory3D : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCTrajectory3D : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -250,6 +250,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCTRAJECTORY2D_H

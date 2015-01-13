@@ -19,7 +19,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing a pair of one reconstructed axial segement and one stereo segment in adjacent superlayer.
     class CDCAxialStereoSegmentPair : public SwitchableRootificationBase {
@@ -70,7 +70,7 @@ namespace Belle2 {
        *  that work for objects and poiinters alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the trailing const
        *  to constrain the cast to lvalues.*/
-      operator const Belle2::CDCLocalTracking::CDCAxialStereoSegmentPair* () const
+      operator const Belle2::TrackFindingCDC::CDCAxialStereoSegmentPair* () const
       { return this; }
 
 
@@ -249,6 +249,6 @@ namespace Belle2 {
 
     }; //end class CDCAxialStereoSegmentPair
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 #endif // CDCAXIALSTEREOSEGMENTPAIR_H

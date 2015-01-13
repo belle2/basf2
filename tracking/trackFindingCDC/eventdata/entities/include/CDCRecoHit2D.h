@@ -19,7 +19,7 @@
 #include "CDCRLWireHit.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing a two dimensional reconstructed hit in the central drift chamber
     /** A recohit represents a likely point where the particle went through. It is always assoziated with a \n
@@ -29,7 +29,7 @@ namespace Belle2 {
      *  the hit wire lies to the right or to the left of the particle trajectory causing the hit. The later readily \n
      *  indicates a flight direction from the reconstructed it, if a tangential approch of the trajectory to the \n
      *  drift circle is assumed. */
-    class CDCRecoHit2D : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCRecoHit2D : public TrackFindingCDC::SwitchableRootificationBase {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -268,6 +268,6 @@ namespace Belle2 {
 
     }; //class CDCRecoHit2D
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCRECOHIT2D_H

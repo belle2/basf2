@@ -49,7 +49,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     // First stage filter setup
 
@@ -138,7 +138,7 @@ namespace Belle2 {
 #endif
 
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 
 #endif /* TRACKFINDERCDCAUTOMATONDEVFILTERS_H_ */

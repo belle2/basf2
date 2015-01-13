@@ -17,7 +17,7 @@
 using namespace std;
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 // This file contains mainly compile time test.

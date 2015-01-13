@@ -19,7 +19,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Class to organize and present the monte carlo hit information
     class CDCMCMap {
@@ -234,6 +234,6 @@ namespace Belle2 {
       std::set<const CDCSimHit*> m_reassignedSecondarySimHits;
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCMCHITLOOKUP

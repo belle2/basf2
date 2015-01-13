@@ -12,6 +12,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 //only here to trigger a compilation of the source file

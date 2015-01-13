@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
     class MCAxialAxialSegmentPairFilter : public SwitchableRootificationBase {
@@ -42,7 +42,7 @@ namespace Belle2 {
       void terminate();
 
       /// Checks if a pair of axial segments is a good combination
-      CellWeight isGoodAxialAxialSegmentPair(const Belle2::CDCLocalTracking::CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool allowBackward = false) const;
+      CellWeight isGoodAxialAxialSegmentPair(const Belle2::TrackFindingCDC::CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool allowBackward = false) const;
 
     private:
       /// ROOT Macro to make MCAxialAxialSegmentPairFilter a ROOT class.
@@ -51,7 +51,7 @@ namespace Belle2 {
     }; // end class MCAxialAxialSegmentPairFilter
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif // MCAXIALAXIALSEGMENTPAIRFILTER_H_

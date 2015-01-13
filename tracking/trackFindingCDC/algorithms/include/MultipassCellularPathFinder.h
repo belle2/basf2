@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     /** Class to combine the run of the cellular automaton and the repeated path extraction.
@@ -105,7 +105,7 @@ namespace Belle2 {
 
     }; // end class MultipassCellularPathFinder
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 
 } //end namespace Belle2
 

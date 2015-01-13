@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
 
@@ -171,7 +171,7 @@ namespace Belle2 {
 
     };
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 
 } //end namespace Belle2
 

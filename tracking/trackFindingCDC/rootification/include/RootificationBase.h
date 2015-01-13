@@ -18,7 +18,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
     const bool ROOTIFICATIONNBASE_IS_ACTIVE = true;
@@ -45,7 +45,7 @@ namespace Belle2 {
 
     };
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 
 } //end namespace Belle2
 

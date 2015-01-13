@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// Filter for the constuction of segment triples based on monte carlo information
     class MCSegmentTripleFilter {
 
@@ -47,7 +47,7 @@ namespace Belle2 {
       /// Instance of the cell filter to reject neighborhoods of false cells.
       MCAxialAxialSegmentPairFilter m_mcAxialAxialSegmentPairFilter;
     }; // end class MCSegmentTripleFilter
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //MCSEGMENTTRIPLEFILTER_H_

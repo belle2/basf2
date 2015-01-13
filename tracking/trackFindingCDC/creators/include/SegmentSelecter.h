@@ -18,7 +18,7 @@
 //#include <vector>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// Implementation of the unique assignement analysis of hits to segments. To be removed soonish
     class SegmentSelecter {
 
@@ -41,7 +41,7 @@ namespace Belle2 {
     }; // end class SegmentSelecter
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //SEGMENTSELECTER_H_

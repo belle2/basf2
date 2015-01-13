@@ -26,7 +26,7 @@
 #include "CDCRecoHit2D.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing a three dimensional reconstructed hit.
     /** A recohit represents a likely point where the particle went through. It is always assoziated with a \n
@@ -42,7 +42,7 @@ namespace Belle2 {
      *  the two dimensional tracking as the arc length.
      */
 
-    class CDCRecoHit3D : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCRecoHit3D : public TrackFindingCDC::SwitchableRootificationBase {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -308,6 +308,6 @@ namespace Belle2 {
 
     }; //class
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCRECOHIT3D_H

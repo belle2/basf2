@@ -11,7 +11,7 @@
 #define EVALVARIADIC_H
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /** Function serves as a placeholder for a variadic list of statements to be evaluated.
      *  The variadic syntax of C++ allows for variadic calls to a function which first map each element in an expression
@@ -34,6 +34,6 @@ namespace Belle2 {
     };
 
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // EVALVARIADIC_H

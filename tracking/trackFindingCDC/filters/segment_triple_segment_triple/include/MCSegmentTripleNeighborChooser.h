@@ -16,7 +16,7 @@
 #include "BaseSegmentTripleNeighborChooser.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     ///Class filtering the neighborhood of segment triples with monte carlo information
     class MCSegmentTripleNeighborChooser: public BaseSegmentTripleNeighborChooser {
 
@@ -49,7 +49,7 @@ namespace Belle2 {
     }; // end class
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //MCSEGMENTTRIPLENEIGHBORCHOOSER_H_

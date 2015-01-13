@@ -15,24 +15,24 @@
 
 using namespace boost::math;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
-bool Belle2::CDCLocalTracking::isNAN(const double x)
+bool Belle2::TrackFindingCDC::isNAN(const double x)
 {
   return std::isnan(x);
 }
 
 
 
-bool Belle2::CDCLocalTracking::isNAN(const float x)
+bool Belle2::TrackFindingCDC::isNAN(const float x)
 {
   return std::isnan(x);
 }
 
 
 
-SignType Belle2::CDCLocalTracking::sign(double x)
+SignType Belle2::TrackFindingCDC::sign(double x)
 {
   return std::isnan(x) ? INVALID_SIGN : (std::signbit(x) ? MINUS : PLUS);
 }

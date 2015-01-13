@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///A two dimensional vector
     /** A two dimensional vector which is equiped with functions for correct handeling \n
@@ -30,7 +30,7 @@ namespace Belle2 {
      *  for monitoring purposes but may be empty for maximal performance. \n
      *  Also this vector can be used whereever a TVector2 is expected syntactically.
      */
-    class Vector2D : public CDCLocalTracking::SwitchableRootificationBase {
+    class Vector2D : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -286,7 +286,7 @@ namespace Belle2 {
 
       /// Indicates if the given vector is more left or more right if you looked in the direction of this vector.
       inline RightLeftInfo isRightOrLeftOf(const Vector2D& rhs) const
-      { return -CDCLocalTracking::sign(unnormalizedOrthogonalComp(rhs)); }
+      { return -TrackFindingCDC::sign(unnormalizedOrthogonalComp(rhs)); }
 
       /// Indicates if the given vector is more left if you looked in the direction of this vector.
       inline bool isLeftOf(const Vector2D& rhs) const
@@ -299,7 +299,7 @@ namespace Belle2 {
 
       /// Indicates if the given vector is more counterclockwise or more clockwise if you looked in the direction of this vector.
       inline CCWInfo isCCWOrCWOf(const Vector2D& rhs) const
-      { return CDCLocalTracking::sign(unnormalizedOrthogonalComp(rhs)); }
+      { return TrackFindingCDC::sign(unnormalizedOrthogonalComp(rhs)); }
 
       /// Indicates if the given vector is more counterclockwise if you looked in the direction of this vector.
       inline bool isCCWOf(const Vector2D& rhs) const
@@ -312,7 +312,7 @@ namespace Belle2 {
 
       /// Indicates if the given vector is more coaligned or reverse if you looked in the direction of this vector.
       inline ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& rhs) const
-      { return CDCLocalTracking::sign(unnormalizedParallelComp(rhs)); }
+      { return TrackFindingCDC::sign(unnormalizedParallelComp(rhs)); }
 
       /// Indicates if the given vector is more coaligned if you looked in the direction of this vector.
       inline bool isForwardOf(const Vector2D& rhs) const
@@ -387,6 +387,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // VECTOR2D_WITHROOT_H

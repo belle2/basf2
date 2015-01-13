@@ -21,7 +21,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// Class providing the reduction form segment triple sequences to reconstructed tracks
     class TrackCreator {
 
@@ -148,7 +148,7 @@ namespace Belle2 {
 
 
     }; // end class TrackCreator
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //TRACKCREATOR_H_

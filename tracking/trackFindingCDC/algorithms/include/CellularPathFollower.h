@@ -24,7 +24,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Implements to pick up of the highest value path in neighborhood
     /** Following high value paths can be done two ways. First construct a single path that has the highest
@@ -208,7 +208,7 @@ namespace Belle2 {
 
     }; // end class CellularPathFollower
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 
 } //end namespace Belle2
 

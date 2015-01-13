@@ -15,7 +15,7 @@
 #include "BaseFacetNeighborChooser.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     ///Class filtering the neighborhood of facets with monte carlo information
     class MCFacetNeighborChooser : public BaseFacetNeighborChooser {
 
@@ -60,7 +60,7 @@ namespace Belle2 {
       const MCFacetFilter m_mcFacetFilter; ///< Monte Carlo cell filter to reject neighborhoods have false cells
 
     }; // end class
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //MCFACETNEIGHBORCHOOSER_H_

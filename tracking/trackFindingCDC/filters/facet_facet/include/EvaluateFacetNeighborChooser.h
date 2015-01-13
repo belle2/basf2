@@ -20,7 +20,7 @@
 #include "FacetNeighborChooserTree.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Class filtering the neighborhood of facets based on simple criterions.
     template<class RealFacetNeighborChooser>
@@ -66,14 +66,14 @@ namespace Belle2 {
     }; // end class
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 
 // Implementations
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     template<class RealFacetNeighborChooser>
     EvaluateFacetNeighborChooser<RealFacetNeighborChooser>::EvaluateFacetNeighborChooser()
@@ -150,7 +150,7 @@ namespace Belle2 {
 
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle
 
 

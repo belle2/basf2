@@ -12,7 +12,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 AxialAxialSegmentPairFilterTree::AxialAxialSegmentPairFilterTree() : AxialAxialSegmentPairFilterTreeBase("axial_axial", "Variables to select correct axial to axial segment combinations and the mc truth.")
 {

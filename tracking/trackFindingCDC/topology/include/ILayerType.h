@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///The type of the layer ids enumerating layers within a superlayer
     typedef signed short ILayerType;
@@ -25,7 +25,7 @@ namespace Belle2 {
     ///Legacy constant
     const ILayerType INVALIDLAYER = INVALID_ILAYER;
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 

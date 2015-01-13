@@ -27,7 +27,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /** Helper class to calculate roots for the function f(x) = sin x - slope * x - intercept.
      *  Solves the equation sin x = slope * x + intercept by netwons method on the function f(x) = sin x - slope * x - intercept.
@@ -170,7 +170,7 @@ namespace Belle2 {
 
     };
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 
 #endif // SINEQLINE_H_

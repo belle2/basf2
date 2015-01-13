@@ -11,7 +11,7 @@
 #define TAGGEDTYPE_H
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Simple struct attaching a tag to a type
     template<class Type_, class Tag_ = Type_>
@@ -47,6 +47,6 @@ namespace Belle2 {
     template<class TaggedType_>
     using GetType = typename GetTypeImpl<TaggedType_>::result;
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // TAGGEDTUPLE_H

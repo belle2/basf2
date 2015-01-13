@@ -23,7 +23,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///A three dimensional vector
     /** A three dimensional vector which is equiped with the expected vector methods. \n
@@ -31,7 +31,7 @@ namespace Belle2 {
      *  for monitoring purposes but may be empty for maximal performance. \n
      *  Also this vector can be used whereever a TVector3 is expected syntactically.
      */
-    class Vector3D : public CDCLocalTracking::SwitchableRootificationBase {
+    class Vector3D : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -350,6 +350,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // VECTOR3D_H

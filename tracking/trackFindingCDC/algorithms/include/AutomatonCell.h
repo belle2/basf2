@@ -17,7 +17,7 @@
 #include "CellState.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Cell used by the cellular automata.
     /** This class represents a cell in the cellular automata algorithm the local tracking is build on.
@@ -26,7 +26,7 @@ namespace Belle2 {
      *  is not worth a full point, but a probability measure which is additiv. The points that can be gained by picking \n
      *  this cell are stored in the cell weight property. Moreover the class defines status flags to be set and/or read by\n
      *  the cellular automaton. */
-    class AutomatonCell : public CDCLocalTracking::SwitchableRootificationBase {
+    class AutomatonCell : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
       typedef unsigned CellFlags; ///< Type for the additional status flags of cells in the cellular automata
@@ -183,7 +183,7 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // AUTOMATONCELL
 

@@ -15,7 +15,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 AxialStereoSegmentPairFilterTree::AxialStereoSegmentPairFilterTree() :
   AxialStereoSegmentPairFilterTreeBase("axial_stereo", "Variables to select correct axial stereo segment combinations and the mc truth.")

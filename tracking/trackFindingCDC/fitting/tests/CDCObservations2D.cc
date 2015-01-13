@@ -16,7 +16,7 @@
 using namespace std;
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 TEST(CDCLocalTrackingTest, fitting_CDCObservations2D_centralize)

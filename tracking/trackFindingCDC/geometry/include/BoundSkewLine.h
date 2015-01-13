@@ -23,7 +23,7 @@
 #include "Vector3D.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /**
      * A three dimensional limited line represented by its closest approach to the z-axes (reference position ) and its skew parameter.
      * The representation is only suitable for lines out of the xy plane.
@@ -35,7 +35,7 @@ namespace Belle2 {
      * @brief A three dimensional limited line
      *
      */
-    class BoundSkewLine : public CDCLocalTracking::SwitchableRootificationBase {
+    class BoundSkewLine : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -237,6 +237,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // BOUNDSKEWLINE_H

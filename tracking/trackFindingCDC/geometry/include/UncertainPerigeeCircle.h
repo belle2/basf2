@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///A circle through the origin which center lies on the positive x-axis
     /** Makes a smooth generalization from a two dimensional normal line ( like Line2D ) to a circle \n
@@ -196,6 +196,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // UNCERTAINPERIGEECIRCLE

@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Helper indices for meaningfull access in a vector or matrix assoziated with perigee parameters.
     typedef Index PerigeeParameterIndex;
@@ -28,7 +28,7 @@ namespace Belle2 {
     /// Constant to address the impact parameter in a vector or matrix assoziated with perigee parameters.
     const PerigeeParameterIndex iI = 2;
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 

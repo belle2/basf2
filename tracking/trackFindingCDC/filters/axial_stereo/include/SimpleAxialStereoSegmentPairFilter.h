@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
     class SimpleAxialStereoSegmentPairFilter {
@@ -59,7 +59,7 @@ namespace Belle2 {
     }; // end class SimpleAxialStereoSegmentPairFilter
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //SIMPLEAXIALSTEREOSEGMENTPAIRFILTER_H

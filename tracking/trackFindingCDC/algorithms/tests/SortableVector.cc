@@ -23,7 +23,7 @@
 using namespace std;
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 // Tests if SortableVector can handle CDCGenHits
 TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_empty)

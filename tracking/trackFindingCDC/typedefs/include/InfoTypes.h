@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /** @name Orientation types*/
     /**@{*/

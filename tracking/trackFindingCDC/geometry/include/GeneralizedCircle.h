@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///A generalized circle
     /** Makes a smooth generalization from a two dimensional normal line ( like Line2D ) to a circle \n
@@ -39,7 +39,7 @@ namespace Belle2 {
      *  Additionally we can represent a line with same parameters by setting n3 = 0. Compare Line2D.
      */
 
-    class GeneralizedCircle : public CDCLocalTracking::SwitchableRootificationBase {
+    class GeneralizedCircle : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -297,7 +297,7 @@ namespace Belle2 {
       Vector2D chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const;
 
       /// Calculates the two points with the given polar radius on the generalised circle
-      std::pair<Belle2::CDCLocalTracking::Vector2D, Belle2::CDCLocalTracking::Vector2D> samePolarR(const FloatType& polarR) const;
+      std::pair<Belle2::TrackFindingCDC::Vector2D, Belle2::TrackFindingCDC::Vector2D> samePolarR(const FloatType& polarR) const;
 
       ///Approach with the same polar radius on the circle to the point
       /**
@@ -484,6 +484,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // GENERALIZEDCIRCLE

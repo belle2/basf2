@@ -9,9 +9,9 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::AllFacetWorker+;
+#pragma link C++ class Belle2::TrackFindingCDC::AllFacetWorker+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::MCSegmentWorker+;
+#pragma link C++ class Belle2::TrackFindingCDC::MCSegmentWorker+;
 
 #endif
 

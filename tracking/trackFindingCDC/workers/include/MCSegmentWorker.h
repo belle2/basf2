@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Worker for building reconstructed segments form wirehits using reconstructed facets
     class MCSegmentWorker : public SwitchableRootificationBase {
@@ -36,7 +36,7 @@ namespace Belle2 {
       /// Forwards the initialize method of the module to the facet creator and the neighborhood builder
       void initialize() {
 #ifdef TRACKFINDINGCDC_USE_ROOT
-        StoreArray < Belle2::CDCLocalTracking::CDCRecoSegment2D >::registerTransient();
+        StoreArray < Belle2::TrackFindingCDC::CDCRecoSegment2D >::registerTransient();
 #endif
       }
 
@@ -46,10 +46,10 @@ namespace Belle2 {
       }
 
       /// Generates the segments from the event topology.
-      std::vector<Belle2::CDCLocalTracking::CDCRecoSegment2D>& generate(bool allowBackward = false);
+      std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& generate(bool allowBackward = false);
 
       /// Generates the segments from the event topology.
-      void generate(std::vector<Belle2::CDCLocalTracking::CDCRecoSegment2D>& outputSegments,  bool allowBackward = false);
+      void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& outputSegments,  bool allowBackward = false);
 
     private:
       /// Helper function to copy intermediate objects to the data store for analysis from python.
@@ -61,7 +61,7 @@ namespace Belle2 {
     private:
 
       /// Memory for the segments extracted from the paths
-      std::vector<Belle2::CDCLocalTracking::CDCRecoSegment2D> m_segments2D;
+      std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D> m_segments2D;
 
       /// Switch to write out the intermediate data objects out to DataStore.
       bool m_copyToDataStoreForDebug;
@@ -74,7 +74,7 @@ namespace Belle2 {
 
     }; // end class MCSegmentWorker
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //MCSEGMENTWORKER_H_

@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/tempro/TaggedTuple.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Wraps the Type of a TaggedTyp by a wrapper type and constructs a TaggedType with that Wrapper<Type> and the original Tag
     template<class TaggedType_, template<class> class Wrapper_>
@@ -90,6 +90,6 @@ namespace Belle2 {
       }
 
     };
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // TAGGEDTUPLE_H

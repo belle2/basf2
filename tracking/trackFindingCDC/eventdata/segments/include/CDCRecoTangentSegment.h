@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoTangentVector.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A segment consisting of adjacent reconstructed tangents.
     class  CDCRecoTangentSegment : public CDCRecoTangentVector {
@@ -26,7 +26,7 @@ namespace Belle2 {
       ~CDCRecoTangentSegment() {;}
 
       /// Takes all distinct tangents from the facets in the path - Note! there is no particular order of the tangents in the segment.
-      static CDCRecoTangentSegment condense(const std::vector<const Belle2::CDCLocalTracking::CDCRecoFacet* >& recoFacetPath);
+      static CDCRecoTangentSegment condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoFacet* >& recoFacetPath);
 
 
     private:

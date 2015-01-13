@@ -29,13 +29,13 @@
 // available outside any namespace. Therefore we also have to include each of
 // them as well.
 
-typedef Belle2::CDCLocalTracking::CDCGenHit CDCGenHit;
-typedef Belle2::CDCLocalTracking::CDCWireHit CDCWireHit;
-typedef Belle2::CDCLocalTracking::CDCRLWireHit CDCRLWireHit;
-typedef Belle2::CDCLocalTracking::CDCRecoHit2D CDCRecoHit2D;
-typedef Belle2::CDCLocalTracking::CDCRecoTangent CDCRecoTangent;
-typedef Belle2::CDCLocalTracking::CDCRecoFacet CDCRecoFacet;
-typedef Belle2::CDCLocalTracking::CDCRecoHit3D CDCRecoHit3D;
+typedef Belle2::TrackFindingCDC::CDCGenHit CDCGenHit;
+typedef Belle2::TrackFindingCDC::CDCWireHit CDCWireHit;
+typedef Belle2::TrackFindingCDC::CDCRLWireHit CDCRLWireHit;
+typedef Belle2::TrackFindingCDC::CDCRecoHit2D CDCRecoHit2D;
+typedef Belle2::TrackFindingCDC::CDCRecoTangent CDCRecoTangent;
+typedef Belle2::TrackFindingCDC::CDCRecoFacet CDCRecoFacet;
+typedef Belle2::TrackFindingCDC::CDCRecoHit3D CDCRecoHit3D;
 
 //#endif // TRACKFINDINGCDC_ROOTIFY_CDCVECTOR
 #endif // __CINT__

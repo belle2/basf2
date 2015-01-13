@@ -20,7 +20,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Base class for filtering the neighborhood of segment triples
     /** Base implementation providing the getLowestPossibleNeighbor and isStillPossibleNeighbor method
@@ -80,7 +80,7 @@ namespace Belle2 {
     }; // end class
 
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //BASESEGMENTTRIPLENEIGHBORCHOOSER_H_

@@ -26,7 +26,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Statically typed wrapper for ROOT's TTree.
     /** Statically typed Tree variant taking the branches as template arguments.
@@ -165,7 +165,7 @@ namespace Belle2 {
 
     };
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif //  STATICTYPEDTREE_H
 

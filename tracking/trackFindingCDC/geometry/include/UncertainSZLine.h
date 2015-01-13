@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///A line in sz where s is the transverse travel distance as seen in the xy projection with uncertainties in the slope and intercept of the line.
     class UncertainSZLine : public Line2D {
@@ -161,6 +161,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // UNCERTAINSZLINE

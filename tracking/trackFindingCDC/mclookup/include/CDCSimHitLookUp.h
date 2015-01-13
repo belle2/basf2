@@ -25,7 +25,7 @@
 #include <map>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     /// Singletone class to gather local information about the hits.
@@ -110,6 +110,6 @@ namespace Belle2 {
       std::map<const CDCHit*, RightLeftInfo> m_rightLeftInfos;
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCSIMHITLOOKUP_H

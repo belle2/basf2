@@ -17,7 +17,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A two dimensional circle in its natural representation
     /** An oriented two dimensional circle in the central point, radius representation.
@@ -25,7 +25,7 @@ namespace Belle2 {
      *  The convension is that positiv radii correspond to a counterclockwise orientation of the circle,
      *  while negative radii are for the clockwise orientation.
      */
-    class Circle2D : public CDCLocalTracking::SwitchableRootificationBase {
+    class Circle2D : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -259,6 +259,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(Circle2D, 1);
 
     }; //class
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CIRCLE2D

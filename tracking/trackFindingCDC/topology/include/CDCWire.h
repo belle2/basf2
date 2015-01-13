@@ -32,7 +32,7 @@
 #include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     /// Class representing a sense wire in the central drift chamber
@@ -44,11 +44,11 @@ namespace Belle2 {
      * which you can get with the static getInstance() functions. \n
      * There is rarely a need for constructing a wire object it should be avoided for speed reasons.
      */
-    class CDCWire : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCWire : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
       /// A wire pointer pair as returned from getNeighborsOutward(), getNeighborsInward()
-      typedef std::pair<const Belle2::CDCLocalTracking::CDCWire*, const Belle2::CDCLocalTracking::CDCWire*> NeighborPair;
+      typedef std::pair<const Belle2::TrackFindingCDC::CDCWire*, const Belle2::TrackFindingCDC::CDCWire*> NeighborPair;
 
     public:
 
@@ -368,6 +368,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCWIRE_H

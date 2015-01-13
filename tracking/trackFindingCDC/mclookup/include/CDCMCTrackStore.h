@@ -21,7 +21,7 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Class to organize and present the monte carlo hit information
     class CDCMCTrackStore {
@@ -53,11 +53,11 @@ namespace Belle2 {
 
     public:
       /// Getter for the stored Monte Carlo tracks ordered by their Monte Carlo Id
-      const std::map<ITrackType, Belle2::CDCLocalTracking::CDCMCTrackStore::CDCHitVector>& getMCTracksByMCParticleIdx() const
+      const std::map<ITrackType, Belle2::TrackFindingCDC::CDCMCTrackStore::CDCHitVector>& getMCTracksByMCParticleIdx() const
       { return  m_mcTracksByMCParticleIdx;}
 
       /// Getter for the stored Monte Carlo segments ordered by their Monte Carlo Id
-      const std::map<ITrackType, std::vector<Belle2::CDCLocalTracking::CDCMCTrackStore::CDCHitVector> >& getMCSegmentsByMCParticleIdx() const
+      const std::map<ITrackType, std::vector<Belle2::TrackFindingCDC::CDCMCTrackStore::CDCHitVector> >& getMCSegmentsByMCParticleIdx() const
       { return  m_mcSegmentsByMCParticleIdx;}
 
     private:
@@ -118,6 +118,6 @@ namespace Belle2 {
       std::map<const CDCHit*, Index> m_nPassedSuperLayers;
 
     }; //class CDCMCTrackStore
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCMCTRACKSTORE

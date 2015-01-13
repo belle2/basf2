@@ -27,7 +27,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Extension of the generalized circle also caching the perigee coordinates.
     class PerigeeCircle : public GeneralizedCircle {
@@ -320,6 +320,6 @@ namespace Belle2 {
     }; //class
 
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // PERIGEECIRCLE_H

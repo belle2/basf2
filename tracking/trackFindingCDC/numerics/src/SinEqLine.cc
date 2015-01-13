@@ -11,7 +11,7 @@
 #include "../include/SinEqLine.h"
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 

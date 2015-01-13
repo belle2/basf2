@@ -17,10 +17,10 @@
 #include "CDCObservations2D.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class implementing the z coordinate over travel distance line fit.
-    class CDCSZFitter : public CDCLocalTracking::SwitchableRootificationBase {
+    class CDCSZFitter : public TrackFindingCDC::SwitchableRootificationBase {
     public:
 
       /// Default constructor for ROOT.
@@ -77,7 +77,7 @@ namespace Belle2 {
        *  In case the hit do contains a NaN value it will not be appended to the observations
        *
        *  @return   The number of hits appended which is 0 or 1 here.*/
-      size_t appendSZ(CDCObservations2D& observationsSZ, const Belle2::CDCLocalTracking::CDCRecoHit3D& recoHit3D) const {
+      size_t appendSZ(CDCObservations2D& observationsSZ, const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D) const {
         // Translate the drift length uncertainty to a uncertainty in z
         // by the taking the projected wire vector part parallel to the displacement
         // as a proportionality factor to the z direction.
@@ -134,6 +134,6 @@ namespace Belle2 {
 
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCSZFITTER_H

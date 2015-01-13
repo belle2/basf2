@@ -25,7 +25,7 @@ def getLogger():
 import tools
 
 # Lookup
-CDCMCHitLookUp = Belle2.CDCLocalTracking.CDCMCHitLookUp
+CDCMCHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp
 
 
 class IfModule(Module):
@@ -109,9 +109,9 @@ class MCSegmenterModule(Module):
 
         self.theMCHitLookUp = CDCMCHitLookUp.getInstance()
         self.theWireHitTopology = \
-            Belle2.CDCLocalTracking.CDCWireHitTopology.getInstance()
+            Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
 
-        self.mcSegmentWorker = Belle2.CDCLocalTracking.MCSegmentWorker()
+        self.mcSegmentWorker = Belle2.TrackFindingCDC.MCSegmentWorker()
         self.mcSegmentWorker.initialize()
 
     def event(self):
@@ -133,7 +133,7 @@ class SegmentFitterModule(Module):
     def default_fit_method(segment):
         """Default method to fit the generated segments."""
 
-        CDCRiemannFitter = Belle2.CDCLocalTracking.CDCRiemannFitter
+        CDCRiemannFitter = Belle2.TrackFindingCDC.CDCRiemannFitter
         return CDCRiemannFitter.getFitter().fit(segment)
 
     def __init__(self, fit_method=None):
@@ -228,22 +228,22 @@ class MCAxialStereoPairCreatorModule(Module):
 
     def initialize(self):
         self.mcAxialStereoSegmentPairFilter = \
-            Belle2.CDCLocalTracking.MCAxialStereoSegmentPairFilter()
+            Belle2.TrackFindingCDC.MCAxialStereoSegmentPairFilter()
         self.mcAxialStereoSegmentPairFilter.initialize()
 
         CDCAxialStereoSegmentPair = \
-            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair
+            Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair
         CDCAxialStereoSegmentPair.registerStoreArray()
         CDCAxialStereoSegmentPair.registerRelationTo('CDCRecoSegment2Ds')
 
-        CDCRecoSegment2D = Belle2.CDCLocalTracking.CDCRecoSegment2D
+        CDCRecoSegment2D = Belle2.TrackFindingCDC.CDCRecoSegment2D
         CDCRecoSegment2D.registerRelationTo('CDCAxialStereoSegmentPairs')
 
     def event(self):
         """Generates valid axial stereo segment pairs from the CDCRecoSegment2Ds 
         on the DataStore filtering by MCAxialStereoSegmentPairFilter and output the result to the DataStore."""
 
-        Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair.clearStoreArray()
+        Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair.clearStoreArray()
 
         segmentsByISuperLayer = self.getSegmentsByISuperLayer()
 
@@ -266,7 +266,7 @@ class MCAxialStereoPairCreatorModule(Module):
         self.addRelationsToSegments()
 
         storeArray = \
-            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair.getStoreArray()
+            Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair.getStoreArray()
         getLogger().info('Generated number of pairs: %s',
                          storeArray.getEntries())
 
@@ -294,7 +294,7 @@ class MCAxialStereoPairCreatorModule(Module):
         filter_method = self.filter_method
 
         CDCAxialStereoSegmentPair = \
-            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair
+            Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair
         axialStereoSegmentPair = CDCAxialStereoSegmentPair()
 
         for (startSegment, endSegment) in itertools.product(startSegments,
@@ -321,7 +321,7 @@ class MCAxialStereoPairCreatorModule(Module):
         """Adds relations from start segments to the pairs and from the pairs to the end segments."""
 
         CDCAxialStereoSegmentPair = \
-            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair
+            Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair
         for axialStereoSegmentPair in \
             CDCAxialStereoSegmentPair.getStoreArray():
             startSegment = axialStereoSegmentPair.getStartSegment()
@@ -345,7 +345,7 @@ class AxialStereoPairFitterModule(Module):
     def default_fit_method(axialStereoSegmentPair):
         """Default method to fit the generated segment pairs."""
 
-        CDCAxialStereoFusion = Belle2.CDCLocalTracking.CDCAxialStereoFusion
+        CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
         CDCAxialStereoFusion.reconstructFuseTrajectories(axialStereoSegmentPair,
                 True)
 
@@ -371,7 +371,7 @@ class AxialStereoPairFitterModule(Module):
 
         fit_method = self.fit_method
         CDCAxialStereoSegmentPair = \
-            Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair
+            Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair
         for axialStereoSegmentPair in \
             CDCAxialStereoSegmentPair.getStoreArray():
             fit_method(axialStereoSegmentPair)

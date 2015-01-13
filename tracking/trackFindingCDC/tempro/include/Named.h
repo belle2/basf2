@@ -30,7 +30,7 @@
 #   define NAMED_MAXLENGTH BELLE2_PP_POW(2, NAMED_MAXLENGTH_EXPONENT) //Including the terminating '\0' character
 
 /// Helper macro for the repeatition of the string unpacking in the NAMED macro
-#   define __NAMED_AT(Z,i,name) ::Belle2::CDCLocalTracking::Named::at_limited(name,i)
+#   define __NAMED_AT(Z,i,name) ::Belle2::TrackFindingCDC::Named::at_limited(name,i)
 
 //#   define NAMED(name) StaticStripBack<at(name,0), at(name,1), at(name,2), at(name,3), at(name,4), at(name,5), at(name,6)>::type
 
@@ -40,7 +40,7 @@
 #endif
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     namespace Named {
 
       /// Method to retrieve a character from a char string safely. Returns '\0' for indices out of range.
@@ -62,7 +62,7 @@ namespace Belle2 {
       }
 
     } //end namespace Named
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 
 

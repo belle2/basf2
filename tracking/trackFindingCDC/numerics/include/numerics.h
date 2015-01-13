@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// The famous number
     const FloatType PI = 3.141592653589793238462;
 
@@ -107,7 +107,7 @@ namespace Belle2 {
     }
 
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 
 #endif // NUMERICS_H

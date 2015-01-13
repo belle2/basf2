@@ -19,7 +19,7 @@
 #include "CDCRLWireHitPair.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing a triple of neighboring wire hits.
     /** Class representing a triple of neighboring wire hits.
@@ -243,6 +243,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(CDCRLWireHitTriple, 1);
 
     }; //end class CDCRLWireHitTriple
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 #endif // CDCRECOFACET_H

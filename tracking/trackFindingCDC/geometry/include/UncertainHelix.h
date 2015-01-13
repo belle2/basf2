@@ -24,7 +24,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A general helix class including a covariance matrix.
     class UncertainHelix : public Helix {
@@ -195,6 +195,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // UNCERTAINHELIX

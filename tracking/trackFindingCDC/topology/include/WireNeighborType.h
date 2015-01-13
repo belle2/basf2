@@ -12,7 +12,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
     /// Type for the neighbor relationship from in wire to an other, imagined in the clock
     typedef signed short WireNeighborType;
 
@@ -36,7 +36,7 @@ namespace Belle2 {
     const WireNeighborType CCW_OUT_NEIGHBOR = 11;
 
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 

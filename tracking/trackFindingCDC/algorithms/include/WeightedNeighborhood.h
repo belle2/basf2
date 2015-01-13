@@ -18,7 +18,7 @@
 #include "NeighborWeight.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing weighted relations between items of the same type.
     /** The WeightedNeighborhood implements a weighted graph of items of the same types \n

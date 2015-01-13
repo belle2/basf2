@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
 
     /// Filter for the constuction of good facets based on monte carlo information
@@ -48,7 +48,7 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(MCFacetFilter, 1);
 
     }; // end class MCFacetFilter
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //MCFACETFILTER_H_

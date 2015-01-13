@@ -12,7 +12,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 FacetFilterTree::FacetFilterTree() :
   FacetFilterTreeBase("facet", "Variables to select correct facets and the mc truth.")

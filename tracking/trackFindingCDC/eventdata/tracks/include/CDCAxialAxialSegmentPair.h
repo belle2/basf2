@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing a pair of reconstructed axial segements in adjacent superlayer
     class CDCAxialAxialSegmentPair : public SwitchableRootificationBase {
@@ -62,7 +62,7 @@ namespace Belle2 {
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
-      operator const Belle2::CDCLocalTracking::CDCAxialAxialSegmentPair* () const
+      operator const Belle2::TrackFindingCDC::CDCAxialAxialSegmentPair* () const
       { return this; }
 
 
@@ -161,6 +161,6 @@ namespace Belle2 {
 
     }; //end class CDCAxialAxialSegmentPair
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // end namespace Belle2
 #endif // CDCAXIALAXIALSEGMENTPAIR

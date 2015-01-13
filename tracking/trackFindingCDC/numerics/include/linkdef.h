@@ -9,7 +9,7 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::SinEqLine+;
+#pragma link C++ class Belle2::TrackFindingCDC::SinEqLine+;
 
 #endif
 

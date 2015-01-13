@@ -14,7 +14,7 @@ using namespace std;
 using namespace Eigen;
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 TRACKFINDINGCDC_SwitchableClassImp(CDCObservations2D)
 

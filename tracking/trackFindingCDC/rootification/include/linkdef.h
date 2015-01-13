@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::CDCLocalTracking::RootificationBase+;
+#pragma link C++ class Belle2::TrackFindingCDC::RootificationBase+;
 
 #endif

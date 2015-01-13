@@ -29,7 +29,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     class TrackMerger {
 
@@ -68,7 +68,7 @@ namespace Belle2 {
       std::vector< CDCTrack >& m_mergedTracks;
 
     }; // end class FacetSegmentWorker
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //FACETSEGMENTWORKER_H_

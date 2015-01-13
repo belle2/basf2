@@ -23,7 +23,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class representing a triple of neighboring wire hits
     class CDCRecoFacet : public CDCRLWireHitTriple {
@@ -70,7 +70,7 @@ namespace Belle2 {
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
-      operator const Belle2::CDCLocalTracking::CDCRecoFacet* () const
+      operator const Belle2::TrackFindingCDC::CDCRecoFacet* () const
       { return this; }
 
 
@@ -197,6 +197,6 @@ namespace Belle2 {
 
     }; //class
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCRECOFACET_H

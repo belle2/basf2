@@ -9,22 +9,22 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCObservations2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCObservations2D+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::RiemannsMethod+;
-#pragma link C++ class Belle2::CDCLocalTracking::ExtendedRiemannsMethod+;
-#pragma link C++ class Belle2::CDCLocalTracking::KarimakisMethod+;
+#pragma link C++ class Belle2::TrackFindingCDC::RiemannsMethod+;
+#pragma link C++ class Belle2::TrackFindingCDC::ExtendedRiemannsMethod+;
+#pragma link C++ class Belle2::TrackFindingCDC::KarimakisMethod+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCFitter2D<RiemannsMethod>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCFitter2D<ExtendedRiemannsMethod>+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCFitter2D<KarimakisMethod>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCFitter2D<RiemannsMethod>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCFitter2D<ExtendedRiemannsMethod>+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCFitter2D<KarimakisMethod>+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCRiemannFitter+;
-#pragma link C++ class Belle2::CDCLocalTracking::CDCKarimakiFitter+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRiemannFitter+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCKarimakiFitter+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCAxialStereoFusion+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCAxialStereoFusion+;
 
-#pragma link C++ class Belle2::CDCLocalTracking::CDCSZFitter+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCSZFitter+;
 
 #endif
 

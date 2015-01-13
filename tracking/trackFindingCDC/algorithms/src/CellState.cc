@@ -13,13 +13,13 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 
 
 
 
-const CellState CDCLocalTracking::NO_CONTINUATION = -std::numeric_limits<Weight>::infinity();
+const CellState TrackFindingCDC::NO_CONTINUATION = -std::numeric_limits<Weight>::infinity();
 
 
 

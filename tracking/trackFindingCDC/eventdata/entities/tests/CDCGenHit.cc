@@ -17,7 +17,7 @@
 using namespace std;
 
 using namespace Belle2;
-using namespace CDCLocalTracking;
+using namespace TrackFindingCDC;
 
 // Tests if CDCGenHitVector can handle CDCWireHits
 TEST_F(TrackFindingCDCTestWithTopology, eventdata_entities_CDCGenHit_totalOrdering)

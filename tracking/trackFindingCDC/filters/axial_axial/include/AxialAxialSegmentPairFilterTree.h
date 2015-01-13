@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
     typedef StaticTypedTree <
@@ -101,7 +101,7 @@ namespace Belle2 {
 
     }; // end class AxialAxialSegmentPairFilterVars
 
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 

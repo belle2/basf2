@@ -253,18 +253,6 @@ class CDCSVGDisplayModule(Module):
         objects in this namespace.
         """
 
-        # Check if the CDCLocalTracking namespace is available for object look up should always be true now
-        if not hasattr(Belle2, 'CDCLocalTracking'):
-            print 'CDCLocalTracking namespace not available from Python'
-            print 'Did you compile with -DTRACKFINDINGCDC_USE_ROOT?'
-            r = raw_input('')
-            return
-        else:
-            print 'CDCLocalTracking namespace available from Python'
-            print 'dir(Belle2)', dir(Belle2)
-            print 'dir(Belle2.CDCLocalTracking)', dir(Belle2.CDCLocalTracking)
-            print 'dir(genfit)', dir(genfit)
-
         output_folder = self.output_folder
         if not os.path.exists(output_folder):
             print "CDCSVGDisplay.__init__ : Output folder '", output_folder, \
@@ -311,7 +299,7 @@ class CDCSVGDisplayModule(Module):
         self.plotter = plotter
 
         # Construct additional information from basic Monte Carlo data, if it is available from the DataStore
-        # Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance().fill()
+        # Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
 
         ########## CDCWires ##########
         # Draw wires from cdcwire objects
@@ -319,7 +307,7 @@ class CDCSVGDisplayModule(Module):
         if self.draw_wires:
             print 'Drawing wires'
             theCDCWireTopology = \
-                Belle2.CDCLocalTracking.CDCWireTopology.getInstance()
+                Belle2.TrackFindingCDC.CDCWireTopology.getInstance()
 
             for iLayer in range(theCDCWireTopology.getNLayers()):
                 wirelayer = theCDCWireTopology.getWireLayer(iLayer)
@@ -517,9 +505,9 @@ class CDCSVGDisplayModule(Module):
                                   if segment.getStereoType() == 0]
 
                 mc_axial_axial_segment_filter = \
-                    Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
+                    Belle2.TrackFindingCDC.MCAxialAxialSegmentPairFilter()
                 axial_axial_segment_pairs = \
-                    (Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair(startSegment,
+                    (Belle2.TrackFindingCDC.CDCAxialAxialSegmentPair(startSegment,
                         endSegment) for startSegment in axial_segments
                     for endSegment in axial_segments)
 
@@ -553,12 +541,12 @@ class CDCSVGDisplayModule(Module):
 
                 # Misuse this a bit but still does what we want
                 mc_axial_axial_segment_filter = \
-                    Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
+                    Belle2.TrackFindingCDC.MCAxialAxialSegmentPairFilter()
                 mc_segment_lookup = \
-                    Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+                    Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
                 segment_triples = \
-                    (Belle2.CDCLocalTracking.CDCSegmentTriple(startSegment,
+                    (Belle2.TrackFindingCDC.CDCSegmentTriple(startSegment,
                         middleSegment, endSegment) for startSegment in
                     axial_segments for middleSegment in stereo_segments
                     for endSegment in axial_segments)
@@ -630,7 +618,7 @@ class CDCSVGDisplayModule(Module):
         if self.draw_superlayer_boundaries:
             print 'Drawing superlayer boundaries'
             theCDCWireTopology = \
-                Belle2.CDCLocalTracking.CDCWireTopology.getInstance()
+                Belle2.TrackFindingCDC.CDCWireTopology.getInstance()
 
             for iSuperLayer in range(theCDCWireTopology.getNSuperLayers()):
                 superlayer = theCDCWireTopology.getWireSuperLayer(iSuperLayer)
@@ -641,7 +629,7 @@ class CDCSVGDisplayModule(Module):
         # Draw interaction point
         if self.draw_interactionpoint:
             print 'Drawing interaction point'
-            interactionPoint = Belle2.CDCLocalTracking.Vector2D(0.0, 0.0)
+            interactionPoint = Belle2.TrackFindingCDC.Vector2D(0.0, 0.0)
 
             styleDict = {'stroke': 'black', 'stroke-width': '1', 'r': '1'}
 
@@ -693,13 +681,13 @@ class CDCSVGDisplayModule(Module):
                     charge = gftrackcand.getChargeSeed()
                     tPosition = gftrackcand.getPosSeed()
 
-                    momentum = Belle2.CDCLocalTracking.Vector2D(tMomentum.X(),
+                    momentum = Belle2.TrackFindingCDC.Vector2D(tMomentum.X(),
                             tMomentum.Y())
-                    position = Belle2.CDCLocalTracking.Vector2D(tPosition.X(),
+                    position = Belle2.TrackFindingCDC.Vector2D(tPosition.X(),
                             tPosition.Y())
 
                     trajectory = \
-                        Belle2.CDCLocalTracking.CDCTrajectory2D(position,
+                        Belle2.TrackFindingCDC.CDCTrajectory2D(position,
                             momentum, charge)
                     trajectories.append(trajectory)
 

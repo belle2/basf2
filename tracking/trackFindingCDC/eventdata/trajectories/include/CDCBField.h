@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     //const FloatType CDCTrajectory2D::c_bFieldZMagnitude = 1.5;
     //const SignType CDCTrajectory2D::c_bFieldZSign = PLUS;
@@ -87,6 +87,6 @@ namespace Belle2 {
                                   const FloatType& charge,
                                   const Vector2D& pos2D = Vector2D(0.0, 0.0));
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCBFIELD_H

@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Filter for the constuction of good facets based on simple criterions.
     class AllFacetFilter : public SwitchableRootificationBase {
@@ -45,7 +45,7 @@ namespace Belle2 {
 
 
     }; //end class AllFacetFilter
-  } //end namespace CDCLocalTracking
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif // ALLFACETFILTER_H_

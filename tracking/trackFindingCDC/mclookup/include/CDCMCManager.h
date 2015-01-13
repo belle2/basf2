@@ -20,7 +20,7 @@
 #include "CDCMCSegmentLookUp.h"
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     ///Class to organize and present the monte carlo hit information
 
@@ -85,6 +85,6 @@ namespace Belle2 {
       CDCMCSegmentLookUp m_mcSegmentLookUp;
 
     }; //class
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCMCHITLOOKUP

@@ -17,7 +17,7 @@
 
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// A two dimensional normal line
     /** This class represents a line in two dimensional space by its normal definition\n
@@ -28,7 +28,7 @@ namespace Belle2 {
      *  This naturally corresponds to a direction of positiv advance being the tangential \n
      *  to the line (-n2 ,n1) \n
      *  This line is best suited for linear least square fits. */
-    class Line2D : public CDCLocalTracking::SwitchableRootificationBase {
+    class Line2D : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
 
@@ -337,6 +337,6 @@ namespace Belle2 {
       TRACKFINDINGCDC_SwitchableClassDef(Line2D, 1);
 
     }; //class
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // LINE2D

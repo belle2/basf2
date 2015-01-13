@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /** @name Basic integer types*/
     /**@{*/
@@ -48,7 +48,7 @@ namespace Belle2 {
 
 
 
-  } // namespace CDCLocalTracking
+  } // namespace TrackFindingCDC
 
 } // namespace Belle2
 #endif // BASICTYPES

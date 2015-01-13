@@ -14,7 +14,7 @@
 #include <type_traits>
 
 namespace Belle2 {
-  namespace CDCLocalTracking {
+  namespace TrackFindingCDC {
 
     /// Class for compile time string handeling
     template<char... Chars>
@@ -158,6 +158,6 @@ namespace Belle2 {
     using StaticStripBack =  typename StaticStripBackImpl<StaticString<>, Chars... >::type;
 
 
-  } // end namespace CDCLocalTracking
+  } // end namespace TrackFindingCDC
 } // namespace Belle2
 #endif // STATICSTRING_H

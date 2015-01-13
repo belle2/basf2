@@ -442,7 +442,7 @@ namespace Belle2 {
       std::vector<FloatType> m_observations; ///< Memory for the individual observations. Arrangement of values is x,y, drift raduis, weight, x, y, .....
 
       /** ROOT Macro to make CDCObservation2D a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(CDCObservations2D, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCObservations2D, 1);
 
     }; //class
 

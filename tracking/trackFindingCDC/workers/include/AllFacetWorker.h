@@ -35,7 +35,7 @@ namespace Belle2 {
 
       /// Forwards the initialize method of the module to the facet creator and the neighborhood chooser
       void initialize() {
-#ifdef CDCLOCALTRACKING_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT
         StoreArray < CDCRecoFacet >::registerTransient();
 #endif
       }
@@ -65,7 +65,7 @@ namespace Belle2 {
       bool m_copyToDataStoreForDebug;
 
       /// ROOT Macro to make AllFacetWorker a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(AllFacetWorker, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(AllFacetWorker, 1);
 
     }; // end class AllFacetWorker
   } //end namespace CDCLocalTracking

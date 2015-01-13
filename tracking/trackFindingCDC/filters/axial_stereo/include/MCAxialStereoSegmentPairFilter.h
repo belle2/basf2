@@ -47,7 +47,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make MCAxialStereoSegmentPairFilter a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(MCAxialStereoSegmentPairFilter, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(MCAxialStereoSegmentPairFilter, 1);
 
     }; // end class MCAxialStereoSegmentPairFilter
 

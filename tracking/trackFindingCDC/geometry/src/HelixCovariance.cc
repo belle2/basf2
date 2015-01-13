@@ -15,7 +15,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(HelixCovariance)
+TRACKFINDINGCDC_SwitchableClassImp(HelixCovariance)
 
 void HelixCovariance::reverse()
 {

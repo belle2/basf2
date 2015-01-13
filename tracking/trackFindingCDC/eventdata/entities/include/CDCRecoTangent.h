@@ -191,7 +191,7 @@ namespace Belle2 {
       ParameterLine2D m_line;///< Memory for the line between the two touching points. The first touch point at(0), second at(1).
 
       /// ROOT Macro to make CDCRecoTangent a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoTangent, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoTangent, 1);
 
     }; //class
 

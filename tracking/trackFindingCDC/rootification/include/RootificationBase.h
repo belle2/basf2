@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace CDCLocalTracking {
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT
     const bool ROOTIFICATIONNBASE_IS_ACTIVE = true;
 #else
     const bool ROOTIFICATIONNBASE_IS_ACTIVE = false;

@@ -20,7 +20,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(CDCWireHit)
+TRACKFINDINGCDC_SwitchableClassImp(CDCWireHit)
 
 namespace {
   // Setup instance for the tdc count translation

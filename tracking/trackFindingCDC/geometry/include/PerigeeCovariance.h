@@ -138,7 +138,7 @@ namespace Belle2 {
       TMatrixDSym m_matrix;
 
       /// ROOT Macro to make PerigeeCovariance a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(PerigeeCovariance, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(PerigeeCovariance, 1);
 
     }; //class
 

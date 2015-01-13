@@ -21,7 +21,7 @@ using namespace CDC;
 using namespace CDCLocalTracking;
 
 
-CDCLOCALTRACKING_SwitchableClassImp(CDCWire)
+TRACKFINDINGCDC_SwitchableClassImp(CDCWire)
 
 
 CDCWire::CDCWire(const WireID& wireID) :

@@ -165,7 +165,7 @@ namespace Belle2 {
       TMatrixDSym m_matrix;
 
       /// ROOT Macro to make HelixCovariance a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(HelixCovariance, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(HelixCovariance, 1);
 
     }; //class
 

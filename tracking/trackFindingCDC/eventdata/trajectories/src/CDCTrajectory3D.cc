@@ -22,7 +22,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(CDCTrajectory3D)
+TRACKFINDINGCDC_SwitchableClassImp(CDCTrajectory3D)
 
 
 CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,

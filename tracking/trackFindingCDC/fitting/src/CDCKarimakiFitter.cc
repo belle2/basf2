@@ -21,7 +21,7 @@ using namespace Eigen;
 
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(CDCKarimakiFitter)
+TRACKFINDINGCDC_SwitchableClassImp(CDCKarimakiFitter)
 
 
 namespace {

@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(CDCRecoHit2D)
+TRACKFINDINGCDC_SwitchableClassImp(CDCRecoHit2D)
 
 CDCRecoHit2D::CDCRecoHit2D() :
   m_rlWireHit(nullptr),

@@ -232,7 +232,7 @@ namespace Belle2 {
     private:
 
       /// ROOT Macro to make BoundSkewLine a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(BoundSkewLine, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(BoundSkewLine, 1);
 
 
     }; //class

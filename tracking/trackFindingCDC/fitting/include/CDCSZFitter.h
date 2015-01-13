@@ -129,7 +129,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCSZFitter a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCSZFitter, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCSZFitter, 1);
 
 
 

@@ -141,7 +141,7 @@ namespace Belle2 {
       TMatrixDSym m_matrix;
 
       /// ROOT Macro to make SZCovariance a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(SZCovariance, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(SZCovariance, 1);
 
     }; //class
 

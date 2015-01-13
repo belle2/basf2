@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(CDCRLWireHitTriple)
+TRACKFINDINGCDC_SwitchableClassImp(CDCRLWireHitTriple)
 
 
 

@@ -26,7 +26,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT
 
 template <typename T>
 class CDCLocalTrackingRootificationTest : public CDCLocalTrackingTestWithTopology {;};

@@ -191,7 +191,7 @@ namespace Belle2 {
       size_t m_ndf;
 
       /// ROOT Macro to make UncertainHelix a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(UncertainHelix, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(UncertainHelix, 1);
 
     }; //class
 

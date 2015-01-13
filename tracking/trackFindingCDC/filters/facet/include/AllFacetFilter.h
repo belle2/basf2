@@ -41,7 +41,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make AllFacetFilter a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(AllFacetFilter, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(AllFacetFilter, 1);
 
 
     }; //end class AllFacetFilter

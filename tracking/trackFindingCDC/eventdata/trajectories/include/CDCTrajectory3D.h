@@ -246,7 +246,7 @@ namespace Belle2 {
       UncertainHelix m_localHelix;
 
       /// ROOT Macro to make CDCTrajectory3D a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCTrajectory3D, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCTrajectory3D, 1);
 
     }; //class
 

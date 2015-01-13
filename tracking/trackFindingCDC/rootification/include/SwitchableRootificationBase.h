@@ -35,17 +35,17 @@ namespace Belle2 {
     // enables access from Python as well as access through the DataStore
 
     // In the scons build system you can activate the additional compile time macro using
-    // scons --extra-ccflags='-DCDCLOCALTRACKING_USE_ROOT'.
+    // scons --extra-ccflags='-DTRACKFINDINGCDC_USE_ROOT'.
     // Forgeting to give the flag should result in the correct
     // default behaviour, which is to build without ROOT support. This avoids that one
     // accidentally checks in a version with ROOT switch on.
 
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT
     /// Typedef the normal TObject as the base class of the track finder in case the ROOT inheritance is switched on.
     typedef RootificationBase SwitchableRootificationBase;
 
-#define CDCLOCALTRACKING_SwitchableClassDef(CLASSNAME, CLASSVERSION)  \
+#define TRACKFINDINGCDC_SwitchableClassDef(CLASSNAME, CLASSVERSION)  \
   ClassDef(CLASSNAME, CLASSVERSION);              \
 public:                   \
   /** Register a *transient* store array on the DataStore.*/        \
@@ -96,7 +96,7 @@ public:                   \
   }                 \
 private:                \
    
-#define CDCLOCALTRACKING_SwitchableClassImp(CLASSNAME) ClassImp(CLASSNAME);
+#define TRACKFINDINGCDC_SwitchableClassImp(CLASSNAME) ClassImp(CLASSNAME);
 
 #else
     // Do not use the ROOT inheritance in all Tracking objects
@@ -107,8 +107,8 @@ private:                \
     /// Typedef the empty class as the base class of the track finder in case the ROOT inheritance is switched off.
     typedef  SwitchableRootificationBaseificationBase SwitchableRootificationBase;
 
-#define CDCLOCALTRACKING_SwitchableClassDef(CLASSNAME,CLASSVERSION)
-#define CDCLOCALTRACKING_SwitchableClassImp(CLASSNAME)
+#define TRACKFINDINGCDC_SwitchableClassDef(CLASSNAME,CLASSVERSION)
+#define TRACKFINDINGCDC_SwitchableClassImp(CLASSNAME)
 
 #endif
 

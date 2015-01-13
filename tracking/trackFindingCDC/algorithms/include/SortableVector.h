@@ -440,7 +440,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make SortableVector a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(SortableVector, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(SortableVector, 1);
 
     }; //class
 

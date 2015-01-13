@@ -183,7 +183,7 @@ namespace Belle2 {
       RightLeftInfo m_rlInfo; ///< Memory for the right left passage information of the oriented wire hit.
 
       /// ROOT Macro to make CDCRLWireHit a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCRLWireHit, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCRLWireHit, 1);
 
     }; //class CDCRLWireHit
 

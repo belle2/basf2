@@ -364,7 +364,7 @@ namespace Belle2 {
     private:
 
       /// ROOT Macro to make CDCWire a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCWire, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCWire, 1);
 
     }; //class
 

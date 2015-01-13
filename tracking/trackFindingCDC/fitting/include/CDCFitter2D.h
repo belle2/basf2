@@ -128,7 +128,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make CDCFitter2D a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(CDCFitter2D, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCFitter2D, 1);
 
     }; //class
 

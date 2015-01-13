@@ -192,7 +192,7 @@ namespace Belle2 {
       size_t m_ndf;
 
       /// ROOT Macro to make UncertainPerigeeCircle a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(UncertainPerigeeCircle, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(UncertainPerigeeCircle, 1);
 
     }; //class
 

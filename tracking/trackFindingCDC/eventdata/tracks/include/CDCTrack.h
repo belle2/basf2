@@ -147,7 +147,7 @@ namespace Belle2 {
       ForwardBackwardInfo m_fbInfo; ///< Memory for the forward backward indicator
 
       /// ROOT Macro to make CDCTrack a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCTrack, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCTrack, 1);
 
     }; //class
 

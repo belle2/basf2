@@ -315,7 +315,7 @@ namespace Belle2 {
       FloatType m_impact; ///< Memory for the signed impact parameter
 
       /// ROOT Macro to make PerigeeCircle a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(PerigeeCircle, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(PerigeeCircle, 1);
 
     }; //class
 

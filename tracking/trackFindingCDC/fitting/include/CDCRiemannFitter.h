@@ -42,7 +42,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make CDCRiemannFitter a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(CDCRiemannFitter, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCRiemannFitter, 1);
     }; //class
 
   } // end namespace CDCLocalTracking

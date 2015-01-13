@@ -174,7 +174,7 @@ namespace Belle2 {
       UncertainSZLine m_szLine; ///< Memory for the line representation
 
       /// ROOT Macro to make CDCTrajectorySZ a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCTrajectorySZ, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCTrajectorySZ, 1);
 
     }; //class
   } // namespace CDCLocalTracking

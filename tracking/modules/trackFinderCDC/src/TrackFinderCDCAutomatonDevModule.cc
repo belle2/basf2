@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
-#ifdef CDCLOCALTRACKING_USE_MC_INFORMATION
+#ifdef TRACKFINDINGCDC_USE_MC_INFORMATION
 #include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
@@ -62,7 +62,7 @@ void TrackFinderCDCAutomatonDevModule::initialize()
     m_segmentPairTrackingWorker.initialize();
   }
 
-#ifdef CDCLOCALTRACKING_USE_MC_INFORMATION
+#ifdef TRACKFINDINGCDC_USE_MC_INFORMATION
   StoreArray <CDCSimHit>::required();
   StoreArray <MCParticle>::required();
 #endif
@@ -77,7 +77,7 @@ void  TrackFinderCDCAutomatonDevModule::event()
 {
   B2DEBUG(100, "########## CDCLocalTracking begin ##########");
 
-#ifdef CDCLOCALTRACKING_USE_MC_INFORMATION
+#ifdef TRACKFINDINGCDC_USE_MC_INFORMATION
   CDCMCManager::getInstance().clear();
   CDCMCManager::getInstance().fill();
 #endif

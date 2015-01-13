@@ -63,7 +63,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make RiemannsMethod a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(RiemannsMethod, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(RiemannsMethod, 1);
 
     }; //class
 

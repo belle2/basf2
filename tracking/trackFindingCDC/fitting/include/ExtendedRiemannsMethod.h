@@ -59,7 +59,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make ExtendedRiemannsMethod a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(ExtendedRiemannsMethod, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(ExtendedRiemannsMethod, 1);
 
     }; //class
   } // end namespace CDCLocalTracking

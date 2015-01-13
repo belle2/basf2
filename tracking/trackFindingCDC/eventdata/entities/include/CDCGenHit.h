@@ -139,7 +139,7 @@ namespace Belle2 {
       Vector2D m_dummyPos; ///< Memory for the dummy position for distance measures
 
       /// ROOT Macro to make CDCGenHit a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCGenHit, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCGenHit, 1);
 
     }; //end class GenHit
   } //end namespace CDCLocalTracking

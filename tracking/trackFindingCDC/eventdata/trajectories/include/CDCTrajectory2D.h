@@ -434,7 +434,7 @@ namespace Belle2 {
       //Vector2D m_startPos2D;
 
       /// ROOT Macro to make CDCTrajectory2D a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCTrajectory2D, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCTrajectory2D, 1);
 
     }; //class
 

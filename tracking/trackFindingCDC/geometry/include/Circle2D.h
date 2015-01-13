@@ -256,7 +256,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make Circle2D a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(Circle2D, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(Circle2D, 1);
 
     }; //class
   } // namespace CDCLocalTracking

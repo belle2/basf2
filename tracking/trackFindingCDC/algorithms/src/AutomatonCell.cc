@@ -14,4 +14,4 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(AutomatonCell)
+TRACKFINDINGCDC_SwitchableClassImp(AutomatonCell)

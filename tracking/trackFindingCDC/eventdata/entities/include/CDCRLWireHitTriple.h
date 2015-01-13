@@ -240,7 +240,7 @@ namespace Belle2 {
       CDCRLWireHitPair m_rearRLWireHitPair; ///< Memory for the reference to the remaining two oriented wire hits
 
       /// ROOT Macro to make CDCRLWireHitTriple a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCRLWireHitTriple, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCRLWireHitTriple, 1);
 
     }; //end class CDCRLWireHitTriple
   } // end namespace CDCLocalTracking

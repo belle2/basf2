@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCLOCALTRACKINGTESTWITHTOPOLOGY_H_
-#define CDCLOCALTRACKINGTESTWITHTOPOLOGY_H_
+#ifndef TRACKFINDINGCDCTESTWITHTOPOLOGY_H_
+#define TRACKFINDINGCDCTESTWITHTOPOLOGY_H_
 
 #include <gtest/gtest.h>
 
@@ -42,4 +42,4 @@ namespace Belle2 {
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
 
-#endif //CDCLOCALTRACKINGTESTWITHTOPOLOGY_H_
+#endif //TRACKFINDINGCDCTESTWITHTOPOLOGY_H_

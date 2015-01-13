@@ -245,7 +245,7 @@ namespace Belle2 {
       Line2D m_lineSZ;
 
       /// ROOT Macro to make Helix a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(Helix, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(Helix, 1);
 
     }; //class
 

@@ -16,13 +16,13 @@ import os
 belle2_option = os.environ["BELLE2_OPTION"]
 
 if belle2_option == "debug":
-    cpp_defines = ['CDCLOCALTRACKING_COMPILE_DEBUG',]
+    cpp_defines = ['TRACKFINDINGCDC_COMPILE_DEBUG',]
 
 elif belle2_option == "opt":
-    cpp_defines = ['CDCLOCALTRACKING_COMPILE_OPT',]
+    cpp_defines = ['TRACKFINDINGCDC_COMPILE_OPT',]
 
 elif belle2_option == "clang":
-    cpp_defines = ['CDCLOCALTRACKING_COMPILE_CLANG',]
+    cpp_defines = ['TRACKFINDINGCDC_COMPILE_CLANG',]
 
 env.Append(CPPDEFINES=cpp_defines)
 

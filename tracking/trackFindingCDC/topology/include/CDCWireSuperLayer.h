@@ -308,7 +308,7 @@ namespace Belle2 {
       FloatType m_refPolarRZSlope;
 
       /** ROOT Macro to make CDCWireSuperLayer a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(CDCWireSuperLayer, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCWireSuperLayer, 1);
 
     }; //class
 

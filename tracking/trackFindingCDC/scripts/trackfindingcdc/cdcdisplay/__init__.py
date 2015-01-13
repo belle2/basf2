@@ -256,7 +256,7 @@ class CDCSVGDisplayModule(Module):
         # Check if the CDCLocalTracking namespace is available for object look up should always be true now
         if not hasattr(Belle2, 'CDCLocalTracking'):
             print 'CDCLocalTracking namespace not available from Python'
-            print 'Did you compile with -DCDCLOCALTRACKING_USE_ROOT?'
+            print 'Did you compile with -DTRACKFINDINGCDC_USE_ROOT?'
             r = raw_input('')
             return
         else:

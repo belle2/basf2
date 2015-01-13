@@ -157,7 +157,7 @@ namespace Belle2 {
       size_t m_ndf;
 
       /// ROOT Macro to make UncertainSZLine a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(UncertainSZLine, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(UncertainSZLine, 1);
 
     }; //class
 

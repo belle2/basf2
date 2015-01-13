@@ -50,7 +50,7 @@ class CDCDataobjectsConverter:
             }
 
         if hasattr(Belle2.CDCLocalTracking, 'CDCWireHit'):
-            # CDCLOCALTRACKING_USE_ROOT is active
+            # TRACKFINDINGCDC_USE_ROOT is active
             # use pyROOT interface to draw various specialised objects from the local finder.
             self.toSVGFunctions_by_type.update({
                 Belle2.CDCLocalTracking.Vector2D: self.Vector2DToSVG,

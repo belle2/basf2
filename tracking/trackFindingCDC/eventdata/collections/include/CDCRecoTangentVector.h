@@ -30,7 +30,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCRecoTangentVector a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoTangentVector, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoTangentVector, 1);
 
     }; //class CDCRecoTangentVector
 

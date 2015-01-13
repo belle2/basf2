@@ -264,7 +264,7 @@ namespace Belle2 {
       Vector2D m_recoDisp2D; ///< Memory for the displacement fo the assoziated wire reference position
 
       /// ROOT Macro to make CDCRecoHit2D a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoHit2D, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoHit2D, 1);
 
     }; //class CDCRecoHit2D
 

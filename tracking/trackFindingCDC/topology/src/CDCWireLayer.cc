@@ -18,7 +18,7 @@ using namespace CDC;
 
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(CDCWireLayer)
+TRACKFINDINGCDC_SwitchableClassImp(CDCWireLayer)
 
 CDCWireLayer::CDCWireLayer() :
 

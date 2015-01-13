@@ -43,7 +43,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make SimpleFacetFilter a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(SimpleFacetFilter, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(SimpleFacetFilter, 1);
 
     }; // end class SimpleFacetFilter
   } //end namespace CDCLocalTracking

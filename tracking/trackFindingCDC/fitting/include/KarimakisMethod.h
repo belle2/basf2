@@ -49,7 +49,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make KarimakisMethod a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(KarimakisMethod, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(KarimakisMethod, 1);
 
     }; //class
   } // end namespace CDCLocalTracking

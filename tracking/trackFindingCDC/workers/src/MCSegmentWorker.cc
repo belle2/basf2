@@ -71,7 +71,7 @@ void MCSegmentWorker::copyToDataStoreForDebug() const
 {
 
   // IO for monitoring in python
-#ifdef CDCLOCALTRACKING_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT
 
   // IO selected segments without tangents
   B2DEBUG(100, "  Creating the StoreArray for the generated segments");

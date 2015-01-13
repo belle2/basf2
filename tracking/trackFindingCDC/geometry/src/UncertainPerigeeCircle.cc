@@ -21,4 +21,4 @@ using namespace boost::math;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(UncertainPerigeeCircle)
+TRACKFINDINGCDC_SwitchableClassImp(UncertainPerigeeCircle)

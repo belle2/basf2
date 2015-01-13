@@ -179,7 +179,7 @@ namespace Belle2 {
       mutable CellState m_state; ///< Storage for the cell state set by the cellular automata
 
       /** ROOT Macro to make AutomatonCell a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(AutomatonCell, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(AutomatonCell, 1);
 
     }; //class
 

@@ -334,7 +334,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make Line2D a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(Line2D, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(Line2D, 1);
 
     }; //class
   } // namespace CDCLocalTracking

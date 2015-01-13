@@ -307,7 +307,7 @@ namespace Belle2 {
       //@}
 
       /** ROOT Macro to make CDCWireLayer a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(CDCWireLayer, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCWireLayer, 1);
 
     }; //class
 

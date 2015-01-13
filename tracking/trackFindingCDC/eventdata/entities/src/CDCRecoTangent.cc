@@ -19,7 +19,7 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
-CDCLOCALTRACKING_SwitchableClassImp(CDCRecoTangent)
+TRACKFINDINGCDC_SwitchableClassImp(CDCRecoTangent)
 
 
 

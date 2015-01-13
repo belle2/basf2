@@ -23,7 +23,7 @@
 
 
 #ifdef __CINT__
-//#ifdef CDCLOCALTRACKING_ROOTIFY_CDCVECTOR
+//#ifdef TRACKFINDINGCDC_ROOTIFY_CDCVECTOR
 // Because ROOTCINT does not like namespaces inside template parameters
 // we have to make each object, which we want the instantiate the template
 // available outside any namespace. Therefore we also have to include each of
@@ -37,7 +37,7 @@ typedef Belle2::CDCLocalTracking::CDCRecoTangent CDCRecoTangent;
 typedef Belle2::CDCLocalTracking::CDCRecoFacet CDCRecoFacet;
 typedef Belle2::CDCLocalTracking::CDCRecoHit3D CDCRecoHit3D;
 
-//#endif // CDCLOCALTRACKING_ROOTIFY_CDCVECTOR
+//#endif // TRACKFINDINGCDC_ROOTIFY_CDCVECTOR
 #endif // __CINT__
 
 #endif //CDCENTITIESUNPACKEDFROMNAMESPACES_H

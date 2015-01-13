@@ -480,7 +480,7 @@ namespace Belle2 {
       FloatType m_n0; ///< Memory for the first parameter
 
       /// ROOT Macro to make GeneralizedCircle a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(GeneralizedCircle, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(GeneralizedCircle, 1);
 
     }; //class
 

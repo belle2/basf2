@@ -48,7 +48,7 @@ namespace Belle2 {
       /// Forwards the initialize methods of the module to the segment creator and the neighborhood builder.
       void initialize() {
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT
         StoreArray < CDCAxialStereoSegmentPair >::registerTransient("CDCAxialStereoSegmentPairs");
         StoreArray < CDCTrack >::registerTransient("CDCTracks");
 #endif
@@ -167,7 +167,7 @@ namespace Belle2 {
       /// Helper function to copy intermediate objects to the data store for analysis from python.
       void copyToDataStoreForDebug() const {
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT
         // IO for monitoring in python
         // IO segment triples
         StoreArray < CDCAxialStereoSegmentPair > storedAxialStereoSegmentPairs("CDCAxialStereoSegmentPairs");

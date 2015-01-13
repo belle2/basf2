@@ -37,7 +37,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCRecoHit3DVector a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCRecoHit3DVector, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoHit3DVector, 1);
 
     }; //class CDCRecoHit3DVector
 

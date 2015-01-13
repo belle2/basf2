@@ -157,7 +157,7 @@ namespace Belle2 {
       mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
 
       /** ROOT Macro to make CDCAxialAxialSegmentPair a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(CDCAxialAxialSegmentPair, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCAxialAxialSegmentPair, 1);
 
     }; //end class CDCAxialAxialSegmentPair
 

@@ -21,4 +21,4 @@ using namespace boost::math;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(UncertainHelix)
+TRACKFINDINGCDC_SwitchableClassImp(UncertainHelix)

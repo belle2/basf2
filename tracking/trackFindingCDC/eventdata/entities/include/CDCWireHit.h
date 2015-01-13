@@ -258,7 +258,7 @@ namespace Belle2 {
       AutomatonCell m_automatonCell;
 
       /// ROOT Macro to make CDCWireHit a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCWireHit, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCWireHit, 1);
 
     }; //class
 

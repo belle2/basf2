@@ -346,7 +346,7 @@ namespace Belle2 {
     private:
 
       /// ROOT Macro to make Vector3D a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(Vector3D, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(Vector3D, 1);
 
     }; //class
 

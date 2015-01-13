@@ -7,7 +7,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#ifdef CDCLOCALTRACKING_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCTrajectory2D+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCTrajectorySZ+;

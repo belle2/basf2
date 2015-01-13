@@ -129,7 +129,7 @@ namespace Belle2 {
       mutable CDCTrajectorySZ m_trajectorySZ; ///< Memory of the linear trajectory in the sz direction assoziated with the triple.
 
       /** ROOT Macro to make CDCSegmentTriple a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(CDCSegmentTriple, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCSegmentTriple, 1);
 
     }; //class
 

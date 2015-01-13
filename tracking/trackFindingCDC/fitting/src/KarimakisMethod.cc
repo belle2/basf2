@@ -22,7 +22,7 @@ using namespace Eigen;
 
 using namespace CDCLocalTracking;
 
-CDCLOCALTRACKING_SwitchableClassImp(KarimakisMethod)
+TRACKFINDINGCDC_SwitchableClassImp(KarimakisMethod)
 
 
 KarimakisMethod::KarimakisMethod() :

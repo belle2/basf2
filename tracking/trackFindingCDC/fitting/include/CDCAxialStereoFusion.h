@@ -48,7 +48,7 @@ namespace Belle2 {
 
     public:
       /** ROOT Macro to make CDCAxialStereoFusion a ROOT class.*/
-      CDCLOCALTRACKING_SwitchableClassDef(CDCAxialStereoFusion, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCAxialStereoFusion, 1);
 
     }; // end class
   } // end namespace CDCLocalTracking

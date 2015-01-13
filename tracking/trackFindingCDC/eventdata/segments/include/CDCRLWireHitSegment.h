@@ -81,7 +81,7 @@ namespace Belle2 {
 
     private:
       /// ROOT Macro to make CDCRLWireHitSegment a ROOT class.
-      CDCLOCALTRACKING_SwitchableClassDef(CDCRLWireHitSegment, 1);
+      TRACKFINDINGCDC_SwitchableClassDef(CDCRLWireHitSegment, 1);
 
     }; //end class CDCRLWireHitSegment
 

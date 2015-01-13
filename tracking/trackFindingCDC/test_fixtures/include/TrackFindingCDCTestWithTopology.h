@@ -32,13 +32,13 @@ namespace Belle2 {
        to exclude test with this fixture. Also consider
        test_tracking --help for more details
     */
-    class CDCLocalTrackingTestWithTopology : public ::testing::Test {
+    class TrackFindingCDCTestWithTopology : public ::testing::Test {
 
     public:
       static void SetUpTestCase();
       static void TearDownTestCase();
 
-    }; //end class CDCLocalTrackingTestWithTopology
+    }; //end class
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
 

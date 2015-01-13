@@ -17,7 +17,7 @@
 #include <framework/datastore/DataStore.h>
 
 // Hit objects rely on the presence of wire that they are based on. Need to load the CDCGeometry from the Gearbox.
-#include <tracking/trackFindingCDC/test_fixtures/CDCLocalTrackingTestWithTopology.h>
+#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <boost/python.hpp>
 #include <gtest/gtest.h>
@@ -29,7 +29,7 @@ using namespace CDCLocalTracking;
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
 template <typename T>
-class CDCLocalTrackingRootificationTest : public CDCLocalTrackingTestWithTopology {;};
+class CDCLocalTrackingRootificationTest : public TrackFindingCDCTestWithTopology {;};
 
 typedef ::testing::Types <
 Vector2D

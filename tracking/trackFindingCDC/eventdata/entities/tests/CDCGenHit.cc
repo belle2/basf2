@@ -10,7 +10,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
 
-#include <tracking/trackFindingCDC/test_fixtures/CDCLocalTrackingTestWithTopology.h>
+#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <gtest/gtest.h>
 
@@ -20,7 +20,7 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 // Tests if CDCGenHitVector can handle CDCWireHits
-TEST_F(CDCLocalTrackingTestWithTopology, eventdata_entities_CDCGenHit_totalOrdering)
+TEST_F(TrackFindingCDCTestWithTopology, eventdata_entities_CDCGenHit_totalOrdering)
 {
   CDCGenHit lowestGenHit;
   CDCGenHit secondLowestGenHit(WireID(0, 0, 1), Vector2D(0.0, 0.0));

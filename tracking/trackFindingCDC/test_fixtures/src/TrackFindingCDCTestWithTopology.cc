@@ -11,7 +11,7 @@
 /* This file provides the implementation of the common test fixture to all
    test of the CDCLocalTracking code. */
 
-#include "../include/CDCLocalTrackingTestWithTopology.h"
+#include "../include/TrackFindingCDCTestWithTopology.h"
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
@@ -29,7 +29,7 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
-void CDCLocalTrackingTestWithTopology::SetUpTestCase()
+void TrackFindingCDCTestWithTopology::SetUpTestCase()
 {
 
   //Setup the gearbox
@@ -48,7 +48,7 @@ void CDCLocalTrackingTestWithTopology::SetUpTestCase()
 
 }
 
-void CDCLocalTrackingTestWithTopology::TearDownTestCase()
+void TrackFindingCDCTestWithTopology::TearDownTestCase()
 {
 
   Gearbox& gearbox = Gearbox::getInstance();

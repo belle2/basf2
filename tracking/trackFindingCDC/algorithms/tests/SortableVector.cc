@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/test_fixtures/CDCLocalTrackingTestWithTopology.h>
+#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <gtest/gtest.h>
 
@@ -26,7 +26,7 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 // Tests if SortableVector can handle CDCGenHits
-TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_empty)
+TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_empty)
 {
 
   const CDCWireTopology& wireTopology  = CDCWireTopology::getInstance();
@@ -44,7 +44,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_empty)
 
 }
 
-TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_range)
+TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_range)
 {
 
   CDCGenHit lowestGenHit;
@@ -91,7 +91,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_range)
 }
 
 
-TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_findFast)
+TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_findFast)
 {
 
   const CDCGenHit lowestGenHit;
@@ -155,7 +155,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_findFast)
 
 
 
-TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_sort)
+TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_sort)
 {
   SortableVector<CDCGenHit> collection;
   EXPECT_TRUE(collection.isSorted()) << "Empty collection is not sorted";
@@ -207,7 +207,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_sort)
 }
 
 
-TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_unique)
+TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_unique)
 {
 
   SortableVector<CDCGenHit> collection;
@@ -231,7 +231,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_unique)
 
 
 
-TEST_F(CDCLocalTrackingTestWithTopology, algorithms_SortableVector_swap)
+TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_swap)
 {
 
   SortableVector<CDCGenHit> collection;

@@ -14,7 +14,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/test_fixtures/CDCLocalTrackingTestWithTopology.h>
+#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <gtest/gtest.h>
 
@@ -23,7 +23,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CWInwards)
+TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWInwards)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -37,7 +37,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CWInwards
   }
 }
 
-TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CCWInwards)
+TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWInwards)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -51,7 +51,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CCWInward
   }
 }
 
-TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CWOutwards)
+TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWOutwards)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -65,7 +65,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CWOutward
   }
 }
 
-TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CCWOutwards)
+TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWOutwards)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -79,7 +79,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CCWOutwar
   }
 }
 
-TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CCW)
+TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCW)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -93,7 +93,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CCW)
   }
 }
 
-TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CW)
+TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CW)
 {
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
@@ -108,7 +108,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, topology_WireNeighborSymmetry_CW)
 }
 
 
-TEST_F(CDCLocalTrackingTestWithTopology, topology_WireSkew)
+TEST_F(TrackFindingCDCTestWithTopology, topology_WireSkew)
 {
   // Test if the all wires in the same superlayer have similar skew parameters.
 
@@ -143,7 +143,7 @@ TEST_F(CDCLocalTrackingTestWithTopology, topology_WireSkew)
 
 
 
-TEST_F(CDCLocalTrackingTestWithTopology, topology_RefPolarRVersusZInSuperLayers)
+TEST_F(TrackFindingCDCTestWithTopology, topology_RefPolarRVersusZInSuperLayers)
 {
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   for (const CDCWireSuperLayer & wireSuperLayer : theWireTopology.getWireSuperLayers()) {

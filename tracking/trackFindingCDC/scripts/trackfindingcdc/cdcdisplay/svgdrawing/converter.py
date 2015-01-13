@@ -49,7 +49,7 @@ class CDCDataobjectsConverter:
             genfit.TrackCand: self.GFTrackCandToSVG,
             }
 
-        if hasattr(Belle2.CDCLocalTracking, 'CDCWireHit'):
+        if Belle2.TrackFindingCDC.RootificationBase.getIsActive():
             # TRACKFINDINGCDC_USE_ROOT is active
             # use pyROOT interface to draw various specialised objects from the local finder.
             self.toSVGFunctions_by_type.update({

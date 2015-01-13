@@ -249,8 +249,7 @@ class CDCSVGDisplayModule(Module):
     def initialize(self):
         """
         Initialisation method of the module.
-        Checks if the CDCLocalTracking namespace is present, since this module relies on
-        objects in this namespace.
+        Creates the output folder if it is not present yet.
         """
 
         output_folder = self.output_folder

@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* This file provides the implementation of the common test fixture to all
-   test of the CDCLocalTracking code. */
-
 #include "../include/TrackFindingCDCTestWithTopology.h"
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>

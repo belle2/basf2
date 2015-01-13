@@ -18,6 +18,9 @@
 
 #pragma once
 
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+
+
 #include "tracking/cdcLegendreTracking/CDCLegendreQuadTreeNeighborFinder.h"
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
@@ -54,7 +57,7 @@ namespace Belle2 {
 
       QuadTree();
 
-      QuadTree(double rMin, double rMax, int thetaMin, int thetaMax, int level, QuadTree* parent);
+      QuadTree(float rMin, float rMax, int thetaMin, int thetaMax, int level, QuadTree* parent);
 
       ~QuadTree();
 
@@ -62,6 +65,9 @@ namespace Belle2 {
 
       /** Initialize structure and prepare children */
       void initialize();
+
+      /** Create vector with children of current node */
+      void initializeChildren();
 
       /** Build neighborhood for leafs */
       void buildNeighborhood(int levelNeighborhood);
@@ -73,16 +79,16 @@ namespace Belle2 {
       static void setHitsThreshold(unsigned int hitsThreshold) {s_hitsThreshold = hitsThreshold;};
 
       /** Sets threshold on pt of candidates */
-      static void setRThreshold(double rThreshold) {s_rThreshold = rThreshold;};
+      static void setRThreshold(double rThreshold) {s_rThreshold = static_cast<float>(rThreshold);};
 
       /** Sets threshold on pt of candidates */
-      static void setLastLevel(double lastLevel) {s_lastLevel = lastLevel;};
+      static void setLastLevel(double lastLevel) {s_lastLevel = static_cast<float>(lastLevel);};
 
       /** Copy information about hits into member of class (node at level 0 should be used  because other levels fills by parents) */
       void provideHitSet(const std::set<TrackHit*>& hits_set);
 
       /** Fill the tree structure */
-      void startFillingTree();
+      void startFillingTree(bool returnCandidate = false, TrackCandidate* cand = nullptr);
 
       /**
        * Fill children of node with hits (according to bin crossing criteria)
@@ -112,8 +118,9 @@ namespace Belle2 {
       /** Removing used or bad hits */
       void cleanHitsInNode() ;
 
+      //TODO: IMPORTANT! check functionality of this method and impact of uncommenting _m_level_ ! */
       /** Check whether node is leaf (lowest node in the tree) */
-      bool isLeaf() const {return s_lastLevel;};
+      bool isLeaf() const {return /*m_level ==*/ s_lastLevel;};
 
       /** Check whether node has been processed, i.e. children nodes has been filled */
       inline bool checkFilled() const {return m_filled; };
@@ -122,19 +129,19 @@ namespace Belle2 {
       void setFilled() {m_filled = true; };
 
       /** Get mean value of theta */
-      inline double getThetaMean() const {return (m_thetaMin + m_thetaMax) / 2. * m_PI / s_nbinsTheta;};
+      inline double getThetaMean() const {return static_cast<double>((m_thetaMin + m_thetaMax) / 2. * m_PI / s_nbinsTheta);};
 
       /** Get mean value of r */
-      inline double getRMean() const {return (m_rMin + m_rMax) / 2.;};
+      inline double getRMean() const {return static_cast<double>((m_rMin + m_rMax) / 2.);};
 
       /** Get number of bins in "r" direction */
       inline int getRNbins() const {return m_nbins_r;};
 
       /** Get minimal "r" value of the node */
-      inline double getRMin() const {return m_rMin;};
+      inline double getRMin() const {return static_cast<double>(m_rMin);};
 
       /** Get maximal "r" value of the node */
-      inline double getRMax() const {return m_rMax;};
+      inline double getRMax() const {return static_cast<double>(m_rMax);};
 
       /** Get number of bins in "Theta" direction */
       inline int getThetaNbins() const {return m_nbins_theta;};
@@ -176,13 +183,13 @@ namespace Belle2 {
 
       static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
 
-      double m_rMin; /**< Lower border of the node (R) */
-      double m_rMax; /**< Upper border of the node (R) */
+      float m_rMin; /**< Lower border of the node (R) */
+      float m_rMax; /**< Upper border of the node (R) */
       int m_thetaMin;  /**< Lower border of the node (Theta) */
       int m_thetaMax;  /**< Upper border of the node (Theta) */
       int m_level;  /**< Level of node in the tree */
-      double Rcell;  /**< Approximate radius of drift cell */
-      double m_deltaR;  /**< Value of R, when node splitting whould be stopped; currently not used */
+//      double Rcell;  /**< Approximate radius of drift cell */
+//      double m_deltaR;  /**< Value of R, when node splitting whould be stopped; currently not used */
 
       std::vector<TrackHit*> m_hits;  /**< Vector of hits which belongs to the node */
 
@@ -193,16 +200,16 @@ namespace Belle2 {
       QuadTree*** m_children; /**< Pointers to the children nodes */
       bool m_isMaxLevel;  /**< If node is leaf */
 
-      double* m_r;          /**< bins range on r */
+      float* m_r;          /**< bins range on r */
       int* m_thetaBin;      /**< bins range on theta */
       int m_nbins_r;        /**< number of r bins */
       int m_nbins_theta;    /**< number of theta bins */
-      static double* s_sin_theta; /**< Lookup array for calculation of sin */
-      static double* s_cos_theta; /**< Lookup array for calculation of cos */
+      static float* s_sin_theta; /**< Lookup array for calculation of sin */
+      static float* s_cos_theta; /**< Lookup array for calculation of cos */
       static bool s_sin_lookup_created; /**< Allows to use the same lookup table for sin and cos */
       static int s_nbinsTheta; /**< Number of theta bins */
       static unsigned int s_hitsThreshold;
-      static double s_rThreshold; /**< Threshold on r variable; allows to set threshold on pt of tracks */
+      static float s_rThreshold; /**< Threshold on r variable; allows to set threshold on pt of tracks */
       static int s_lastLevel;
       bool m_filled; /**< Is the node has been filled with hits */
       bool m_neighborsDefined; /**< Checks whether neighbors of current node has been defined */

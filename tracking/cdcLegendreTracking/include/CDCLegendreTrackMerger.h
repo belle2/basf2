@@ -45,6 +45,9 @@ namespace Belle2 {
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
       void doTracksMerging();
 
+      /** Try to merge given track with tracks in tracklist. */
+      void tryToMergeTrack(TrackCandidate* cand1);
+
       /** Trying to merge tracks */
       double tryToMergeAndFit(TrackCandidate* cand1, TrackCandidate* cand2, bool remove_hits = true);
 

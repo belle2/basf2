@@ -45,6 +45,9 @@ namespace Belle2 {
       /** Makes hits cleanup in candidate*/
       void clearBadHits(std::pair<std::vector<TrackHit*>, std::pair<double, double> >* track, std::pair<double, double>& ref_point);
 
+      /** Check whether track is compete; i.e. all hits on it's trajectory are present */
+      bool isTrackComplete(TrackCandidate* track);
+
     private:
 
       TrackCreator* m_cdcLegendreTrackCreator; /**< object for track candidate creating */

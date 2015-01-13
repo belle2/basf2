@@ -14,7 +14,16 @@ using namespace TrackFinderCDCLegendre;
 NiceDrawing::NiceDrawing(std::string& TrackCandColName, std::string& trackColName,
                          std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
                          bool drawCands, std::string& mcParticlesColName):
-  m_TrackCandColName(TrackCandColName), m_trackColName(trackColName), m_HitColName(HitColName), m_StoreDirectory(StoreDirectory),
+  m_TrackCandColName(TrackCandColName), m_mcTrackCandColName(std::string("")), m_trackColName(trackColName), m_HitColName(HitColName), m_StoreDirectory(StoreDirectory),
+  m_drawMCSignal(drawMCSignal), m_drawCands(drawCands), m_mcParticlesColName(mcParticlesColName)
+{
+
+}
+
+NiceDrawing::NiceDrawing(std::string& TrackCandColName, std::string& mcTrackCandColName, std::string& trackColName,
+                         std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
+                         bool drawCands, std::string& mcParticlesColName):
+  m_TrackCandColName(TrackCandColName), m_mcTrackCandColName(mcTrackCandColName), m_trackColName(trackColName), m_HitColName(HitColName), m_StoreDirectory(StoreDirectory),
   m_drawMCSignal(drawMCSignal), m_drawCands(drawCands), m_mcParticlesColName(mcParticlesColName)
 {
 
@@ -22,8 +31,6 @@ NiceDrawing::NiceDrawing(std::string& TrackCandColName, std::string& trackColNam
 
 void NiceDrawing::initialize()
 {
-//  m_zReference = 25.852;
-
   m_eventCounter = 1;
 
   m_max = 800;
@@ -38,47 +45,96 @@ void NiceDrawing::initialize()
 
   initWireString();
 
-  if (m_drawCands)
-    StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
-  else
-    StoreArray<genfit::Track>::required(m_trackColName);
-
+  StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
   StoreArray<CDCHit>::required(m_HitColName);
 
   if (m_drawMCSignal)
     StoreArray<MCParticle>::required(m_mcParticlesColName);
 
+  if (m_mcTrackCandColName != std::string("")) {
+    StoreArray<genfit::TrackCand>::required(m_mcTrackCandColName);
+    StoreArray<MCParticle>::required(m_mcParticlesColName);
+  }
+
 }
 
-void NiceDrawing::event()
+void NiceDrawing::event(bool drawAlsoDifference)
 {
-  initFig();
+  if (drawAlsoDifference) {
+    drawOneFileForEvent(DrawStatus::draw_tracks);
+    drawOneFileForEvent(DrawStatus::draw_mc_tracks);
+    drawOneFileForEvent(DrawStatus::draw_track_candidates);
+    drawOneFileForEvent(DrawStatus::draw_not_reconstructed);
+    drawOneFileForEvent(DrawStatus::draw_not_reconstructed_hits);
+  } else {
+    drawOneFileForEvent(DrawStatus::draw_tracks);
+  }
+  m_eventCounter += 1;
+}
 
+void NiceDrawing::drawOneFileForEvent(DrawStatus drawStatus)
+{
+  initFig(drawStatus);
+  drawWires();
+  if (drawStatus != DrawStatus::draw_not_reconstructed_hits) {
+    drawCDCHits();
+  }
   if (m_drawMCSignal)
     drawMCTracks();
 
-  drawWires();
-
-  drawCDCHits();
-
-//  if (m_drawCands)
-  drawTrackCands();
-//  else
-//    drawTracks();
-
-  m_eventCounter += 1;
+  if (drawStatus == DrawStatus::draw_tracks) {
+    drawTrackCands(m_TrackCandColName);
+  } else if (drawStatus == DrawStatus::draw_not_reconstructed) {
+    drawMCTracksMinusTrackCandidates();
+  } else if (drawStatus == DrawStatus::draw_track_candidates) {
+    drawTrackCandidatesMinusMCTracks();
+  } else if (drawStatus == DrawStatus::draw_mc_tracks) {
+    drawTrackCands(m_mcTrackCandColName);
+  } else if (drawStatus == DrawStatus::draw_not_reconstructed_hits) {
+    drawNotReconstructedCDCHits();
+  }
 
   finalizeFile();
 }
 
-void NiceDrawing::initFig()
+void NiceDrawing::initFig(DrawStatus drawStatus)
 {
+
+  std::string suffix("_");
+
+  if (drawStatus == DrawStatus::draw_not_reconstructed) {
+    suffix = std::string("_NotReconstructed_");
+  } else if (drawStatus == DrawStatus::draw_track_candidates) {
+    suffix = std::string("_FakeTracks_");
+  } else if (drawStatus == DrawStatus::draw_mc_tracks) {
+    suffix = std::string("_MC_");
+  } else if (drawStatus == DrawStatus::draw_not_reconstructed_hits) {
+    suffix = std::string("_NotReconstructedHits_");
+  }
+
   std::stringstream ss;
-  ss << m_StoreDirectory << std::setfill('0') << std::setw(4) << m_eventCounter << "_cdc.svg";
+
+  if (drawStatus == DrawStatus::draw_mc_tracks) {
+    StoreArray<genfit::TrackCand> mcTrackCandidates(m_mcTrackCandColName);
+
+    ss << m_StoreDirectory << std::setfill('0') << std::setw(4) << m_eventCounter << suffix << "cdc.svg";
+  } else {
+    StoreArray<genfit::TrackCand> trackCandidates(m_TrackCandColName);
+
+    ss << m_StoreDirectory << std::setfill('0') << std::setw(4) << m_eventCounter << suffix << "cdc.svg";
+  }
 
   m_fig.open(ss.str().c_str());
 
   m_fig << "<?xml version=\"1.0\" ?> \n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"" << m_max << "pt\" height=\"" << m_max << "pt\" viewBox=\"0 0 " << m_max << " " << m_max << "\" version=\"1.1\">\n";
+  m_fig << "<text x=\"0\" y=\"10\" fill=\"black\">" << suffix << "</text>\n";
+
+  if (drawStatus != DrawStatus::draw_tracks) {
+    m_fig << "<text x=\"0\" y=\"20\" fill=\"blue\">The purity is too low</text>\n";
+    m_fig << "<text x=\"0\" y=\"30\" fill=\"green\">No other track has relates hits</text>\n";
+    m_fig << "<text x=\"0\" y=\"40\" fill=\"red\">The track related to this has in turn another 'better' relation</text>\n";
+    m_fig << "<text x=\"0\" y=\"50\" fill=\"orange\">Another reason</text>\n";
+  }
 }
 
 void NiceDrawing::drawWires()
@@ -93,7 +149,10 @@ void NiceDrawing::initWireString()
   for (unsigned int iLayer = 0; iLayer < CDC::CDCGeometryPar::Instance().nWireLayers(); ++iLayer) {
     for (unsigned int iWire = 0; iWire < CDC::CDCGeometryPar::Instance().nWiresInLayer(iLayer); ++iWire) {
       TVector2 wirePos = getWirePosition(iLayer, iWire);
-      drawCircle(m_wireString, wirePos, rWire, "gray");
+      if (WireID(iLayer, iWire).getISuperLayer() % 2 == 0)
+        drawCircle(m_wireString, wirePos, rWire, "gray");
+      else
+        drawCircle(m_wireString, wirePos, rWire, "black");
     }
   }
 
@@ -137,13 +196,10 @@ TVector2 NiceDrawing::getWirePosition(int iLayer, int iWire)
   TVector3 wireBegin = CDC::CDCGeometryPar::Instance().wireForwardPosition(iLayer, iWire);
   TVector3 wireEnd = CDC::CDCGeometryPar::Instance().wireBackwardPosition(iLayer, iWire);
 
-  m_zReference = WireCenter::Instance().getCenter(iLayer);
-//  B2INFO("Z position: " << m_zReference << "; Layer: " << iLayer);
-
+  m_zReference = 0.;
   double fraction;
 
   fraction = (m_zReference - wireBegin.z()) / (wireBegin.z() - wireEnd.z());
-//  B2INFO("Fraction: " << fraction);
   double WireX = (wireBegin.x() + fraction * (wireBegin.x() - wireEnd.x()));
   double WireY = (wireBegin.y() + fraction * (wireBegin.y() - wireEnd.y()));
 
@@ -216,7 +272,8 @@ void NiceDrawing::drawCDCHits()
   m_fig << ss.str();
 }
 
-void NiceDrawing::drawCDCHit(std::stringstream& drawString, CDCHit* cdcHit, std::string hitColor)
+
+void NiceDrawing::drawCDCHit(std::stringstream& drawString, const CDCHit* cdcHit, std::string hitColor)
 {
   double driftTime = m_driftTimeTranslator.getDriftLength(
                        cdcHit->getTDCCount(), WireID(cdcHit->getID()));
@@ -233,7 +290,47 @@ void NiceDrawing::drawCDCHit(std::stringstream& drawString, CDCHit* cdcHit, std:
   drawCircle(drawString, position, driftTime, hitColor);
 }
 
-void NiceDrawing::drawTrackCand(std::stringstream& drawString, genfit::TrackCand* TrackCand, std::string trackColor)
+void NiceDrawing::drawNotReconstructedCDCHits()
+{
+  StoreArray<CDCHit> HitArray(m_HitColName);
+  StoreArray<genfit::TrackCand> mcTrackCands(m_mcTrackCandColName);
+  StoreArray<genfit::TrackCand> trackCands(m_TrackCandColName);
+
+  if (HitArray.getEntries() == 0)
+    return;
+
+
+  std::stringstream ss;
+
+
+  for (int iMCTrack = 0; iMCTrack < mcTrackCands.getEntries(); ++iMCTrack) {
+    genfit::TrackCand* mcTrackCandidate = mcTrackCands[iMCTrack];
+
+    std::string trackColor = getColor(iMCTrack);
+
+    for (int mcHitID : mcTrackCandidate->getHitIDs(Const::CDC)) {
+      CDCHit* mcTrackHit = HitArray[mcHitID];
+
+      bool foundInAPTTrackCandidate = false;
+
+      for (int iTrack = 0; iTrack < trackCands.getEntries(); ++iTrack) {
+        genfit::TrackCand* trackCandidate = trackCands[iTrack];
+        std::vector<int> hitIDs = trackCandidate->getHitIDs(Const::CDC);
+        if (std::find(hitIDs.begin(), hitIDs.end(), mcHitID) != hitIDs.end()) {
+          foundInAPTTrackCandidate = true;
+          break;
+        }
+      }
+
+      if (!foundInAPTTrackCandidate)
+        drawCDCHit(ss, mcTrackHit, trackColor);
+    }
+  }
+
+  m_fig << ss.str();
+}
+
+void NiceDrawing::drawTrackCand(std::stringstream& drawString, const genfit::TrackCand* TrackCand, std::string trackColor)
 {
   TVector2 momentum(TrackCand->getMomSeed().X(), TrackCand->getMomSeed().Y());
   TVector2 position(TrackCand->getPosSeed().X(), TrackCand->getPosSeed().Y());
@@ -254,15 +351,13 @@ void NiceDrawing::drawAnyTrack(std::stringstream& drawString, TVector2 momentum,
 
   if (radius > 56.5)
     drawArc(drawString, position, TVector2(xc, yc), radius, charge, trackColor, linewidth);
-//    drawArc(drawString, position, radius, charge, trackColor, linewidth);
   else
     drawCircle(drawString, TVector2(xc, yc), radius, trackColor, linewidth);
-//    drawCircle(drawString, position, radius, trackColor, linewidth);
 }
 
-void NiceDrawing::drawTrackCands()
+void NiceDrawing::drawTrackCands(std::string& trackCandColName)
 {
-  StoreArray<genfit::TrackCand> CandArray(m_TrackCandColName);
+  StoreArray<genfit::TrackCand> CandArray(trackCandColName);
   StoreArray<CDCHit> HitArray(m_HitColName);
 
   if (CandArray.getEntries() == 0)
@@ -271,18 +366,110 @@ void NiceDrawing::drawTrackCands()
   std::stringstream ss;
 
   for (int iTrack = 0; iTrack < CandArray.getEntries(); ++iTrack) {
-    genfit::TrackCand* TrackCandidate = CandArray[iTrack];
+    genfit::TrackCand* trackCandidate = CandArray[iTrack];
 
     std::string trackColor = getColor(iTrack);
 
-    drawTrackCand(ss, TrackCandidate, trackColor);
+    drawTrackCand(ss, trackCandidate, trackColor);
 
-    BOOST_FOREACH(int hitID, TrackCandidate->getHitIDs(Const::CDC)) {
+    BOOST_FOREACH(int hitID, trackCandidate->getHitIDs(Const::CDC)) {
       CDCHit* TrackHit = HitArray[hitID];
 
-//      B2INFO("HitID: " << hitID);
+      drawCDCHit(ss, TrackHit, trackColor);
+    }
+  }
+
+  m_fig << ss.str();
+}
+
+void NiceDrawing::drawMCTracksMinusTrackCandidates()
+{
+  StoreArray<genfit::TrackCand> mcParticleTrackCandidates(m_mcTrackCandColName);
+  StoreArray<CDCHit> HitArray(m_HitColName);
+
+  std::stringstream ss;
+
+  for (int iTrack = 0; iTrack < mcParticleTrackCandidates.getEntries(); ++iTrack) {
+    genfit::TrackCand* mcTrackCandidate = mcParticleTrackCandidates[iTrack];
+
+    std::string trackColor = getColor(iTrack);
+
+    int ptMatchingStatus = mcTrackCandidate->getMcTrackId();
+
+    if (ptMatchingStatus >= 0) {
+      // A good pt track candidate is related to this pattern track candidate
+      continue;
+    } else if (ptMatchingStatus == -99) {
+      // BACKGROUND = no (or no good) pt track related to the hits, green
+      trackColor = getColor(1);
+    } else if (ptMatchingStatus == -9) {
+      // CLONE = the pt track related to this is in turn better relates to another mc track candidate, red
+      trackColor = getColor(2);
+    } else {
+      B2INFO("Pt Matching Status " << ptMatchingStatus);
+      trackColor = getColor(3);
+    }
+
+    drawTrackCand(ss, mcTrackCandidate, trackColor);
+    BOOST_FOREACH(int hitID, mcTrackCandidate->getHitIDs(Const::CDC)) {
+      CDCHit* TrackHit = HitArray[hitID];
 
       drawCDCHit(ss, TrackHit, trackColor);
+    }
+  }
+
+  m_fig << ss.str();
+}
+
+void NiceDrawing::drawTrackCandidatesMinusMCTracks()
+{
+  // FakeTracks
+  StoreArray<genfit::TrackCand> particleTrackCandidates(m_TrackCandColName);
+  StoreArray<CDCHit> HitArray(m_HitColName);
+
+  std::stringstream ss;
+  double yPosition = 100;
+
+  for (int iTrack = 0; iTrack < particleTrackCandidates.getEntries(); ++iTrack) {
+    genfit::TrackCand* trackCandidate = particleTrackCandidates[iTrack];
+
+    int mcMatchingStatus = trackCandidate->getMcTrackId();
+
+    std::string trackColor = getColor(iTrack);
+    //std::string qualityEstimation = getQualityEstimationOfPTTrackCandidate(trackCandidate);
+
+    //drawDescribingQualityText(ss, qualityEstimation, trackColor, yPosition);
+    yPosition += 15;
+
+    if (mcMatchingStatus >= 0) {
+      // A good mc track candidate is related to this pattern track candidate
+      continue;
+    } else if (mcMatchingStatus == -999) {
+      // GHOST = purity too low, blue
+      trackColor = getColor(0);
+    } else if (mcMatchingStatus == -99) {
+      // BACKGROUND = no mc track related to the hits, green
+      trackColor = getColor(1);
+    } else if (mcMatchingStatus == -9) {
+      // CLONE = the mc track related to this is in turn better related to another pattern track candidate, red
+      trackColor = getColor(2);
+    } else {
+      B2INFO("Mc Matching Status " << mcMatchingStatus);
+      trackColor = getColor(3);
+    }
+
+    drawTrackCand(ss, trackCandidate, trackColor);
+
+    for (int hitID : trackCandidate->getHitIDs(Const::CDC)) {
+      CDCHit* trackHit = HitArray[hitID];
+
+      RelationVector<MCParticle> relationsToMCParticles = trackHit->getRelationsWith<MCParticle>(m_mcParticlesColName);
+
+      // This CDC Hits is not related to a MCParticle.
+      if (relationsToMCParticles.size() == 0)
+        drawCDCHit(ss, trackHit, "lightblue");
+      else
+        drawCDCHit(ss, trackHit, trackColor);
     }
   }
 
@@ -292,14 +479,21 @@ void NiceDrawing::drawTrackCands()
 void NiceDrawing::drawMCTracks()
 {
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
+  StoreArray<CDCHit> cdcHits(m_HitColName);
+
 
   std::stringstream ss;
 
   for (int iPart = 0; iPart < mcParticles.getEntries(); ++iPart) {
     MCParticle* part = mcParticles[iPart];
 
-    if (part->hasStatus(MCParticle::c_StableInGenerator) && fabs(part->getCharge()) > 0.001)
+    if (part->hasStatus(MCParticle::c_StableInGenerator) && fabs(part->getCharge()) > 0.001) {
       drawMCTrack(ss, part, "lightblue");
+
+      for (const CDCHit & hit :  part->getRelationsTo<CDCHit>()) {
+        drawCDCHit(ss, &hit, "lightblue");
+      }
+    }
   }
 
   m_fig << ss.str();
@@ -311,58 +505,13 @@ void NiceDrawing::drawMCTrack(std::stringstream& drawString, MCParticle* mcPart,
 
   int charge = int(mcPart->getCharge());
 
-//  double radius = sqrt(momentum.X() * momentum.X() + momentum.Y() * momentum.Y()) / (1.5 * 0.00299792458);
+  double vertex_position_y = mcPart->getVertex().Y();
+  double vertex_position_x = mcPart->getVertex().X();
 
-//  double alpha = atan2(momentum.Y(), momentum.X());
-
-  double yc = mcPart->getVertex().Y();
-  double xc = mcPart->getVertex().X();
-
-
-  TVector2 position(xc, yc);
+  TVector2 position(vertex_position_x, vertex_position_y);
 
   drawAnyTrack(drawString, momentum, charge, trackColor, position, 4);
 }
-
-/*
-void CDCNiceDrawingModule::drawTracks()
-{
-  StoreArray< genfit::Track > tracks(m_trackColName);
-  StoreArray< CDCHit > cdcHits(m_HitColName);
-
-  if (tracks.getEntries() == 0) // tracks
-    return;
-
-  std::stringstream ss;
-
-  for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
-    genfit::Track* track = tracks[iTrack];
-
-    std::string color = getColor(iTrack);
-
-    drawTrack(ss, track, color);
-
-    BOOST_FOREACH(int iHit, track->getCand().getHitIDs(Const::CDC)) {
-      CDCHit* trackHit = cdcHits[iHit];
-
-      drawCDCHit(ss, trackHit, color);
-    }
-  }
-
-  m_fig << ss.str();
-}
-
-
-void CDCNiceDrawingModule::drawTrack(std::stringstream& drawString, genfit::Track* track, std::string color)
-{
-  TVector2 momentum(track->getMom().X(), track->getMom().Y());
-  TVector2 position(track->getPos().X(), track->getPos().Y());
-
-  int charge = track->getCharge() * 1.1;
-
-  drawAnyTrack(drawString, momentum, charge, color, position, 2);
-}
-*/
 
 std::pair<TVector2, TVector2> NiceDrawing::getIntersect(TVector2 center, TVector2 position)
 {
@@ -381,4 +530,26 @@ std::pair<TVector2, TVector2> NiceDrawing::getIntersect(TVector2 center, TVector
   TVector2 intersect_2 = A + u_AB * (b * cosAlpha) - pu_AB * (b * sqrt(1 - cosAlpha * cosAlpha));
 
   return std::make_pair(intersect_1, intersect_2);
+}
+
+std::string NiceDrawing::getQualityEstimationOfPTTrackCandidate(const genfit::TrackCand* trackCand)
+{
+  std::stringstream ss;
+  TVector3 positionVector = trackCand->getPosSeed();
+  TVector3 momentumVector = trackCand->getMomSeed();
+
+  double radiusOfMostInnerCDCWire = getWirePosition(0, 0).Mod();
+
+  if (positionVector.Pt() > radiusOfMostInnerCDCWire / 2.0) {
+    ss << " away_from_center ";
+  }
+
+  ss << momentumVector.Pt() ;
+
+  return ss.str();
+}
+
+void NiceDrawing::drawDescribingQualityText(std::stringstream& drawString, std::string& qualityEstimation, std::string& trackColor, double yPosition)
+{
+  drawString << "<text x=\"0\" y=\"" << yPosition << "\" fill=\"" << trackColor << "\"> Track Quality " << qualityEstimation << "</text>\n";
 }

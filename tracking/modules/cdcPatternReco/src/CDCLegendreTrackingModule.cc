@@ -10,13 +10,14 @@
 
 #include <tracking/modules/cdcPatternReco/CDCLegendreTrackingModule.h>
 
+#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-
+#include <mdst/dataobjects/TrackFitResult.h>
 
 /*
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
@@ -36,8 +37,39 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreSimpleFilter.h>
 */
 
+#include "TH1F.h"
+#include "TCanvas.h"
+#include "TF1.h"
+#include "TGraph.h"
 
-#include "genfit/TrackCand.h"
+
+#include "cdc/dataobjects/CDCSimHit.h"
+
+#include <genfit/Track.h>
+#include <genfit/TrackCand.h>
+#include <genfit/RKTrackRep.h>
+#include <genfit/AbsKalmanFitter.h>
+#include <genfit/KalmanFitter.h>
+#include <genfit/KalmanFitterRefTrack.h>
+#include <genfit/KalmanFitStatus.h>
+#include <genfit/DAF.h>
+#include <genfit/Exception.h>
+#include <genfit/MeasurementFactory.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
+#include <TDatabasePDG.h>
+
+#include <cdc/translators/LinearGlobalADCCountTranslator.h>
+#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <cdc/translators/IdealCDCGeometryTranslator.h>
+#include <genfit/FieldManager.h>
+#include <tracking/gfbfield/GFGeant4Field.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/TGeoMaterialInterface.h>
+#include <TGeoManager.h>
+#include <TDatabasePDG.h>
+#include <geometry/GeometryManager.h>
+#include <geometry/bfieldmap/BFieldMap.h>
+
 
 #include <cstdlib>
 #include <iomanip>
@@ -64,7 +96,7 @@ using namespace TrackFinderCDCLegendre;
 REG_MODULE(CDCLegendreTracking)
 
 CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
-  Module(), m_rMin(-0.15), m_rMax(0.15)
+  Module(), m_rMin(-0.15), m_rMax(0.15), eventnr(0)
 {
   setDescription(
     "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -89,9 +121,9 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            2.);
 
   addParam("MaxLevel", m_maxLevel,
-           "Maximal level of recursive calling of FastHough algorithm", 10);
+           "Maximal level of recursive calling of FastHough algorithm", 11);
 
-  addParam("Reconstruct Curler", m_reconstructCurler,
+  addParam("ReconstructCurler", m_reconstructCurler,
            "Flag, whether curlers should be reconstructed", false);
 
   addParam("FitTracks", m_fitTracks,
@@ -112,11 +144,18 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   addParam("EnableDrawing", m_drawCandInfo,
            "Enable in-module drawing", false);
 
+  addParam("EnableBatchMode", m_batchMode,
+           "Enable batch mode for track drawer. (Done with gROOT->SetBatch())", false);
+
   addParam("MultipleCandidateSearch", m_multipleCandidateSearch,
            "Search multiple track candidates per run of FastHough algorithm", true);
 
   addParam("UseHitPrecalculatedR", m_useHitPrecalculatedR,
            "To store r values inside hit objects or recalculate it each step", true);
+
+  addParam("AssignStereoHits", m_assignStereoHits,
+           "Flag, whether stereohits should be assigned to tracks", false);
+
 
 }
 
@@ -134,7 +173,7 @@ void CDCLegendreTrackingModule::initialize()
 
   m_cdcLegendreTrackFitter = new TrackFitter(m_nbinsTheta, m_rMax, m_rMin, m_fitTracks);
 
-  m_cdcLegendreTrackDrawer = new TrackDrawer(m_drawCandInfo, m_drawCandidates);
+  m_cdcLegendreTrackDrawer = new TrackDrawer(m_drawCandInfo, m_drawCandidates, m_batchMode);
   m_cdcLegendreTrackDrawer->initialize();
 
   m_AxialHitList.reserve(2048);
@@ -148,14 +187,12 @@ void CDCLegendreTrackingModule::initialize()
 
   m_cdcLegendrePatternChecker = new PatternChecker(m_cdcLegendreTrackCreator);
 
-  m_cdcLegendreConformalPosition = new ConformalPosition();
-
-  ConformalPosition& m_cdcLegendreConformalPosition_temp __attribute__((unused)) = ConformalPosition::Instance();
+//  m_cdcLegendreConformalPosition = new ConformalPosition();
 
 //  m_cdcLegendreQuadTree = new QuadTree(-1.*m_rc, m_rc, 0, m_nbinsTheta, 0, NULL);
   m_cdcLegendreQuadTree = new QuadTree(m_rMin, m_rMax,  /*-1.*m_rc, m_rc,*/ 0, m_nbinsTheta, 0, NULL);
   m_cdcLegendreQuadTree->setLastLevel(m_maxLevel);
-  m_cdcLegendreQuadTree->buildNeighborhood(m_maxLevel);
+//  m_cdcLegendreQuadTree->buildNeighborhood(m_maxLevel);
 
   m_cdcLegendreQuadTreeCandidateCreator = new QuadTreeCandidateCreator();
   QuadTreeCandidateCreator m_cdcLegendreQuadTreeCandidateCreator_temp __attribute__((unused)) =  QuadTreeCandidateCreator::Instance();
@@ -165,10 +202,39 @@ void CDCLegendreTrackingModule::initialize()
 
   QuadTreeNeighborFinder m_cdcLegendreQuadTreeNeighborFinder_temp __attribute__((unused)) = QuadTreeNeighborFinder::Instance();
 
-  WireCenter m_cdcLegendreWireCenter __attribute__((unused))  = WireCenter::Instance();
-
   m_treeFinder = 0;
   m_steppedFinder = 0;
+
+  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
+
+
+  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
+    B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
+
+    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+      geoManager.createTGeoRepresentation();
+    }
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
+    // activate / deactivate material effects in genfit
+    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
+    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
+
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+  }
+
+  if (!genfit::FieldManager::getInstance()->isInitialized()) {
+    B2WARNING("Magnetic field not set up, doing this myself.");
+
+    //pass the magnetic field to genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::FieldManager::getInstance()->useCache();
+  }
+
 
 }
 
@@ -179,6 +245,8 @@ void CDCLegendreTrackingModule::beginRun()
 
 void CDCLegendreTrackingModule::event()
 {
+
+  eventnr++;
 
   m_cdcLegendreTrackDrawer->event();
 
@@ -214,10 +282,22 @@ void CDCLegendreTrackingModule::event()
 
   B2DEBUG(100, "Perform track finding");
 
-  //perform track finding
-//  DoSteppedTrackFinding();
   DoTreeTrackFinding();
 
+  if (m_mergeTracksEarly)processTracks();
+
+//  for (TrackCandidate * cand : m_trackList) {
+//     if (cand->getCandidateType() != TrackCandidate::tracklet) continue;
+//    m_cdcLegendreTrackMerger->extendTracklet(cand, m_AxialHitList);
+//  }
+
+
+  DoTreeTrackFindingFinal();
+
+
+  if (m_mergeTracksEarly)processTracks();
+
+  DoTreeTrackFindingFinal();
 
   if (m_mergeTracksEarly)processTracks();
 
@@ -226,12 +306,19 @@ void CDCLegendreTrackingModule::event()
 
 //  DoTreeStereoTrackletFinding();
 
-  //m_cdcLegendreTrackMerger->addStereoTracklesToTrack();
-//  MergeTracks();
-//    MergeCurler();
-//  AsignStereoHits();
+//  m_cdcLegendreTrackMerger->addStereoTracklesToTrack();
 
+//  doVXDTrackCandidatesMerging();
+//  doStereoHitsAssignment();
+//  doStereoHitsAssignmentInClasses();
+//  doStereoHitsAssignmentWithDAF();
+
+//1if(m_assignStereoHits) AsignStereoHits();
 //  checkHitPattern();
+
+  for (TrackCandidate * cand : m_trackList) {
+    B2DEBUG(100, "R value: " << cand->getR() << "; theta: " << cand->getTheta() << "; radius: " << cand->getRadius() << "; phi: " << cand->getPhi() << "; charge: " << cand->getChargeSign() << "; Xc = " << cand->getXc() << "; Yc = " << cand->getYc());
+  }
 
   //create GenFit Track candidates
   m_cdcLegendreTrackCreator->createGFTrackCandidates(m_gfTrackCandsColName);
@@ -353,7 +440,61 @@ void CDCLegendreTrackingModule::DoTreeTrackFinding()
 
   unsigned int n_hits = 999;
   double limit = 40;
+  double rThreshold = 0.07;
+  m_cdcLegendreQuadTree->provideHitSet(hits_set);
+  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
+  int nSteps = 0;
+
+//  Start loop, where tracks are searched for
+  do {
+    m_cdcLegendreQuadTree->setRThreshold(rThreshold);
+    m_cdcLegendreQuadTree->setHitsThreshold(limit);
+    m_cdcLegendreQuadTree->startFillingTree();
+
+    limit = limit * m_stepScale;
+//    rThreshold *= 2.;
+//    if (rThreshold > 0.15) rThreshold = 0.15;
+    nSteps++;
+    //perform search until found track has too few hits or threshold is too small and no tracks are found
+  } while (limit >= m_threshold
+           && hits_set.size() >= (unsigned) m_threshold);
+
+  //sort tracks by value of curvature
+  m_trackList.sort([](const TrackCandidate * a, const TrackCandidate * b) {
+    return static_cast <bool>(a->getRadius() > b->getRadius());
+  });
+
+  std::vector<TrackHit*> hits_vector; //temporary array;
+  m_cdcLegendreTrackDrawer->finalizeROOTFile(hits_vector);
+
+  B2DEBUG(100, "Number of steps in tree track finding: " << nSteps);
+  B2DEBUG(100, "Threshold on number of hits: " << limit);
+}
+
+
+void CDCLegendreTrackingModule::DoTreeTrackFindingFinal()
+{
+  B2INFO("Final tree track finding");
+  m_treeFinder++;
+  std::sort(m_AxialHitList.begin(), m_AxialHitList.end());
+
+  for (TrackCandidate * cand : m_trackList) {
+    for (TrackHit * hit : cand->getTrackHits()) {
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+  }
+
+
+  std::set<TrackHit*> hits_set;
+  std::set<TrackHit*>::iterator it = hits_set.begin();
+  for (TrackHit * trackHit : m_AxialHitList) {
+    if ((trackHit->getHitUsage() != TrackHit::used_in_track) && (trackHit->getHitUsage() != TrackHit::background)) it = hits_set.insert(it, trackHit);
+  }
+
+  unsigned int n_hits = 999;
+  double limit = 20;
   double rThreshold = 0.15;
+  m_cdcLegendreQuadTree->clearTree();
   m_cdcLegendreQuadTree->provideHitSet(hits_set);
   m_cdcLegendreQuadTree->setRThreshold(rThreshold);
   int nSteps = 0;
@@ -370,16 +511,18 @@ void CDCLegendreTrackingModule::DoTreeTrackFinding()
     nSteps++;
     //perform search until found track has too few hits or threshold is too small and no tracks are found
   } while (limit >= m_threshold
-           && (limit / m_stepScale >= m_threshold || n_hits != 999)
            && hits_set.size() >= (unsigned) m_threshold);
 
+  //sort tracks by value of curvature
+  m_trackList.sort([](const TrackCandidate * a, const TrackCandidate * b) {
+    return static_cast <bool>(a->getRadius() > b->getRadius());
+  });
 
   std::vector<TrackHit*> hits_vector; //temporary array;
   m_cdcLegendreTrackDrawer->finalizeROOTFile(hits_vector);
-  B2INFO("Number of steps in tree track finding: " << nSteps);
-  B2INFO("Threshold on number of hits: " << limit);
+  B2DEBUG(100, "Number of steps in tree track finding: " << nSteps);
+  B2DEBUG(100, "Threshold on number of hits: " << limit);
 }
-
 
 void CDCLegendreTrackingModule::DoTreeStereoTrackletFinding()
 {
@@ -462,17 +605,44 @@ void CDCLegendreTrackingModule::AsignStereoHits()
 void CDCLegendreTrackingModule::processTracks()
 {
 
-  B2INFO("Number of tracks: " << m_trackList.size());
-  B2INFO("Number of trackslets: " << m_trackletList.size());
+  //Track processing done in such way:
+  //*try to merge tracks;
+  //*split curlers and try to merge again - it allows to release tracklets produced by particles from non-IP
+  //*reassign hit
+  //*add unused hits to tracks
+
+  /*
+    for (TrackCandidate * cand : m_trackList) {
+      m_cdcLegendreTrackFitter->performRiemannFit(cand);
+    }
+   */
+
+  B2DEBUG(100, "Number of tracks: " << m_trackList.size());
+  B2DEBUG(100, "Number of trackslets: " << m_trackletList.size());
+
+  m_cdcLegendreTrackMerger->doTracksMerging();
 
   m_cdcLegendreTrackMerger->splitTracks();
 
   for (TrackCandidate * cand : m_trackList) {
-    if (cand->getCandidateType() != TrackCandidate::tracklet) continue;
+//     if (cand->getCandidateType() != TrackCandidate::tracklet) continue;
     m_cdcLegendreTrackMerger->extendTracklet(cand, m_AxialHitList);
   }
 
+
+
+  //sort tracks by value of curvature
+  m_trackList.sort([](TrackCandidate * a, TrackCandidate * b) {
+    return static_cast <bool>(a->getTrackHits().size() > b->getTrackHits().size());
+  });
+
+
   m_cdcLegendreTrackMerger->doTracksMerging();
+
+
+  for (TrackCandidate * cand : m_trackList) {
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+  }
 
 
   for (TrackCandidate * cand : m_trackList) {
@@ -496,16 +666,28 @@ void CDCLegendreTrackingModule::processTracks()
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
   }
 
-  PatternChecker cdcLegendrePatternChecker(m_cdcLegendreTrackCreator);
-  for (TrackCandidate * cand : m_trackList) {
-    cand->reestimateCharge();
-    cdcLegendrePatternChecker.checkCandidate(cand);
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-  }
+  /*
+
+
+      PatternChecker cdcLegendrePatternChecker(m_cdcLegendreTrackCreator);
+      for (TrackCandidate * cand : m_trackList) {
+        cand->reestimateCharge();
+        cdcLegendrePatternChecker.checkCandidate(cand);
+        m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+      }
+  */
+
 
   m_cdcLegendreTrackMerger->doTracksMerging();
+  /**/
+
+  for (TrackCandidate * cand : m_trackList) {
+    cand->reestimateCharge();
+  }
+
 
 }
+
 
 void CDCLegendreTrackingModule::endRun()
 {
@@ -517,7 +699,7 @@ void CDCLegendreTrackingModule::terminate()
 {
   delete m_cdcLegendreQuadTree;
   delete m_cdcLegendreQuadTreeCandidateCreator;
-  delete m_cdcLegendreConformalPosition;
+//  delete m_cdcLegendreConformalPosition;
 //  delete m_cdcLegendreTrackFitter;
   delete m_cdcLegendreTrackDrawer;
   delete m_cdcLegendrePatternChecker;

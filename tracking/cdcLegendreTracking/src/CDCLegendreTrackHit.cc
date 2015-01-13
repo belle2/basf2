@@ -20,6 +20,8 @@ TrackHit::TrackHit(CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIW
 //  m_zReference = CDCLegendreWireCenter::Instance().getCenter(hit->getILayer());
   m_zReference = 0;
 
+  m_cdcHit = hit;
+
   CDC::SimpleTDCCountTranslator sDriftTimeTranslator;
   m_driftLength = sDriftTimeTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
   //FIXME: Provide correct parameters, as soon as driftTimeTranslator supports them
@@ -49,6 +51,15 @@ TrackHit::TrackHit(CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIW
   m_hitUsage = TrackHit::not_used;
 
   checkHitDriftLength();
+
+  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+
+  //forward end of the wire
+  m_wireForwardPosition.SetXYZ(cdcg.wireForwardPosition(m_layerId, m_wireId).x(), cdcg.wireForwardPosition(m_layerId, m_wireId).y(), cdcg.wireForwardPosition(m_layerId, m_wireId).z());
+
+  //backward end of the wire
+  m_wireBackwardPosition.SetXYZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).x(), cdcg.wireBackwardPosition(m_layerId, m_wireId).y(), cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
+
 }
 
 TrackHit::TrackHit(const TrackHit& rhs)
@@ -62,6 +73,8 @@ TrackHit::TrackHit(const TrackHit& rhs)
   m_isAxial = rhs.m_isAxial;
   m_wirePositionOrig = rhs.m_wirePositionOrig;
   m_hitUsage = rhs.getHitUsage();
+
+  m_cdcHit = rhs.m_cdcHit;
 
   //set hit coordinates in normal space and conformal plane
   setWirePosition();
@@ -88,10 +101,17 @@ bool TrackHit::checkHitDriftLength()
     wireBeginNeighbor = cdcg.wireForwardPosition(m_layerId, m_wireId + 1);
   }
 
-  double delta = sqrt((wireBegin.x() - wireBeginNeighbor.x()) * (wireBegin.x() - wireBeginNeighbor.x()) +
-                      (wireBegin.y() - wireBeginNeighbor.y()) * (wireBegin.y() - wireBeginNeighbor.y()));
+//  double delta = sqrt((wireBegin.x() - wireBeginNeighbor.x()) * (wireBegin.x() - wireBeginNeighbor.x()) +
+//                      (wireBegin.y() - wireBeginNeighbor.y()) * (wireBegin.y() - wireBeginNeighbor.y()));
+  double delta = fabs(TVector3(wireBegin - wireBeginNeighbor).Pt());
 
-  if (m_driftLength > delta * 0.75) {
+  double coef = 1.;
+
+  if (m_isAxial) coef = 0.8;
+  else coef = 0.9;
+
+
+  if (m_driftLength > delta * coef) {
     m_hitUsage = TrackHit::background;
 //    B2INFO("Bad hit!");
     return false;
@@ -136,6 +156,23 @@ void TrackHit::performConformalTransformation()
   //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
   m_conformalDriftLength = 2 * m_driftLength / (x * x + y * y - m_driftLength * m_driftLength);
 
+}
+
+
+std::tuple<double, double, double> TrackHit::performConformalTransformWithRespectToPoint(double x0, double y0)
+{
+  double x = m_wirePosition.x() - x0;
+  double y = m_wirePosition.y() - y0;
+
+  //transformation of the coordinates from normal to conformal plane
+  //this is not the actual wire position but the transformed center of the drift circle
+  double conformalX = 2 * x / (x * x + y * y - m_driftLength * m_driftLength);
+  double conformalY = 2 * y / (x * x + y * y - m_driftLength * m_driftLength);
+
+  //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
+  double conformalDriftLength = 2 * m_driftLength / (x * x + y * y - m_driftLength * m_driftLength);
+
+  return std::make_tuple(conformalX, conformalY, conformalDriftLength);
 }
 
 double TrackHit::getPhi() const

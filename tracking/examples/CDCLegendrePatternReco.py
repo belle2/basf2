@@ -89,7 +89,7 @@ param_cdctracking = {  #    'Resolution StereoHits': 2.,
     'DrawCandidates': False,
     'EnableDrawing': False,
     'StepScale': 0.75,
-    'Reconstruct Curler': False,
+    'ReconstructCurler': False,
     }
 cdctracking.param(param_cdctracking)
 

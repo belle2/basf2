@@ -88,7 +88,7 @@ namespace Belle2 {
        * @param CDCLegendreTrackHits name of the CDCTrackHits array. In this way the sort funtion can get all necessary information about the hits.
        * @param charge estimated charge of the track, which is needed for hits from the same layer to be ordered correctly.
        */
-      void sortHits(std::vector<TrackHit*>& hitIndices, int charge);
+      static void sortHits(std::vector<TrackHit*>& hitIndices, int charge);
 
       /** Appends new unused hits from set of hits which might belong to current track */
       void appendNewHits(TrackCandidate* track);
@@ -98,6 +98,8 @@ namespace Belle2 {
 
       /** Remove candidate from given list */
       void removeFromList(list<TrackCandidate*>&, TrackCandidate*);
+
+      list<TrackCandidate*>& getTrackList() const {return m_trackList;};
 
     private:
       std::vector<TrackHit*>& m_AxialHitList; /**< Vector which hold axial hits */

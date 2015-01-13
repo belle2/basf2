@@ -14,8 +14,8 @@ using namespace Belle2;
 using namespace TrackFinderCDCLegendre;
 
 
-TrackDrawer::TrackDrawer(bool drawCandInfo, bool drawCandidates) :
-  m_drawCandInfo(drawCandInfo), m_drawCandidates(drawCandidates), m_rMin(-0.15), m_rMax(0.15)
+TrackDrawer::TrackDrawer(bool drawCandInfo, bool drawCandidates, bool batchMode) :
+  m_drawCandInfo(drawCandInfo), m_drawCandidates(drawCandidates), m_rMin(-0.15), m_rMax(0.15), m_batchMode(batchMode)
 {
 
 }
@@ -27,6 +27,11 @@ void TrackDrawer::initialize()
   m_StoreDirectory = std::string("tmp/visualization"); // Where to store step-by-step drawings.
 
   if (not m_drawCandInfo) return;
+
+  if (m_batchMode) {
+    gROOT->SetBatch();
+    B2WARNING("ROOT has been setted to batch mode! (gROOT->SetBatch()) ");
+  }
 
   m_zReference = 25.852;
 

@@ -13,6 +13,9 @@
 #include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackMerger.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
+
+#include <tracking/cdcLegendreTracking/CDCLegendreSimpleFilter.h>
+
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>

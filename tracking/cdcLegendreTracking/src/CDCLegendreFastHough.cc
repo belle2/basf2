@@ -261,6 +261,128 @@ void FastHough::FastHoughNormal(
 }
 
 
+
+void FastHough::FastHoughCustomReferencePoint(
+  std::pair<std::vector<TrackHit*>, std::pair<double, double> >* candidate,
+  const std::vector<TrackHit*>& hits, const std::pair<double, double>& refPoint, const int level,
+  const int theta_min, const int theta_max, const double r_min,
+  const double r_max, const unsigned limit)
+{
+
+  //calculate bin borders of 2x2 bin "histogram"
+  int thetaBin[3];
+  thetaBin[0] = theta_min;
+  thetaBin[1] = theta_min + (theta_max - theta_min) / 2;
+  thetaBin[2] = theta_max;
+
+  double r[3];
+  r[0] = r_min;
+  r[1] = r_min + 0.5 * (r_max - r_min);
+  r[2] = r_max;
+
+  //2 x 2 voting plane
+  std::vector<TrackHit*> voted_hits[2][2];
+  for (unsigned int i = 0; i < 2; ++i)
+    for (unsigned int j = 0; j < 2; ++j)
+      voted_hits[i][j].reserve(1024);
+
+  double r_temp, r_1, r_2;
+  double dist_1[3][3];
+  double dist_2[3][3];
+
+  //Voting within the four bins
+  for (TrackHit * hit : hits) {
+    for (int t_index = 0; t_index < 3; ++t_index) {
+
+      std::tuple<double, double, double> confPoint = hit->performConformalTransformWithRespectToPoint(refPoint.first, refPoint.second);
+
+//      r_temp = CDCLegendreConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
+      r_temp = std::get<0>(confPoint) * m_cos_theta[thetaBin[t_index]] +
+               std::get<1>(confPoint) * m_sin_theta[thetaBin[t_index]];
+
+      r_1 = r_temp + std::get<2>(confPoint);
+      r_2 = r_temp - std::get<2>(confPoint);
+
+      //calculate distances of lines to horizontal bin border
+      for (int r_index = 0; r_index < 3; ++r_index) {
+        dist_1[t_index][r_index] = r[r_index] - r_1;
+        dist_2[t_index][r_index] = r[r_index] - r_2;
+      }
+    }
+
+    //actual voting, based on the distances (test, if line is passing though the bin)
+    for (int t_index = 0; t_index < 2; ++t_index) {
+      for (int r_index = 0; r_index < 2; ++r_index) {
+        //curves are assumed to be straight lines, might be a reasonable assumption locally
+        if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) /*&&
+            (hit->getHitUsage() == TrackHit::not_used)*/)
+          voted_hits[t_index][r_index].push_back(hit);
+        else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1]))/* &&
+                 (hit->getHitUsage() == TrackHit::not_used)*/)
+          voted_hits[t_index][r_index].push_back(hit);
+      }
+    }
+
+  }
+
+  unsigned int max_value = 0;
+  std::pair<int, int> max_value_bin = std::make_pair(0, 0);
+
+  bool binUsed[2][2];
+  for (int ii = 0; ii < 2; ii++)
+    for (int jj = 0; jj < 2; jj++)
+      binUsed[ii][jj] = false;
+
+
+  for (int t_index = 0; t_index < 2; ++t_index) {
+    for (int r_index = 0; r_index < 2; ++r_index) {
+      if (max_value  < voted_hits[t_index][r_index].size()) {
+        max_value = voted_hits[t_index][r_index].size();
+        max_value_bin = std::make_pair(t_index, r_index);
+      }
+    }
+  }
+
+
+//Processing, which bins are further investigated
+  for (int bin_loop = 0; bin_loop < 4; bin_loop++) {
+    int t_index = 0;
+    int r_index = 0;
+    double max_value_temp = 0;
+    for (int t_index_temp = 0; t_index_temp < 2; ++t_index_temp) {
+      for (int r_index_temp = 0; r_index_temp < 2; ++r_index_temp) {
+        if ((max_value_temp  < voted_hits[t_index_temp][r_index_temp].size()) && (!binUsed[t_index_temp][r_index_temp])) {
+          max_value_temp = voted_hits[t_index_temp][r_index_temp].size();
+          t_index = t_index_temp;
+          r_index = r_index_temp;
+        }
+      }
+    }
+    binUsed[t_index][r_index] = true;
+
+
+    if (voted_hits[t_index][r_index].size() >= limit
+        && voted_hits[t_index][r_index].size() > candidate->first.size()) {
+
+      //if max level of fast Hough is reached, mark candidate and return
+      if (level >= m_maxLevel) {
+        double theta = static_cast<double>(thetaBin[t_index]
+                                           + thetaBin[t_index + 1]) / 2. * m_PI / m_nbinsTheta;
+
+        candidate->first = voted_hits[t_index][r_index];
+        candidate->second = std::make_pair(theta,
+                                           (r[r_index] + r[r_index + 1]) / 2.);
+
+      } else {
+        FastHoughCustomReferencePoint(candidate, voted_hits[t_index][r_index], refPoint, level + 1,
+                                      thetaBin[t_index], thetaBin[t_index + 1], r[r_index],
+                                      r[r_index + 1], limit);
+      }
+    }
+  }
+}
+
+
 void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level, const int theta_min, const int theta_max,
                              const double r_min, const double r_max)
 {
@@ -296,7 +418,8 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
     if (hit->getHitUsage() != TrackHit::not_used) continue;
     for (int t_index = 0; t_index < 3; ++t_index) {
 
-      r_temp = ConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
+      r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
+               hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
 
       r_1 = r_temp + hit->getConformalDriftLength();
       r_2 = r_temp - hit->getConformalDriftLength();

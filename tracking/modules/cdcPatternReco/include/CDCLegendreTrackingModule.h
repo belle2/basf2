@@ -16,7 +16,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <vector>
 
-
+#include <tracking/cdcLegendreTracking/CDCLegendreStereohitsProcesser.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
@@ -26,10 +26,8 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
 #include "tracking/cdcLegendreTracking/CDCLegendreQuadTreeNeighborFinder.h"
-#include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
 
 #include <tracking/cdcLegendreTracking/CDCLegendreSimpleFilter.h>
 
@@ -113,7 +111,7 @@ namespace Belle2 {
     TrackFinderCDCLegendre::TrackMerger* m_cdcLegendreTrackMerger; /**< Object which make track merging inside the module */
     TrackFinderCDCLegendre::TrackCreator* m_cdcLegendreTrackCreator; /**< Object for creating tracks */
     TrackFinderCDCLegendre::QuadTree* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
-    TrackFinderCDCLegendre::ConformalPosition* m_cdcLegendreConformalPosition; /**< Object which holds pre-calculated conformal transformation of each wire */
+//    TrackFinderCDCLegendre::ConformalPosition* m_cdcLegendreConformalPosition; /**< Object which holds pre-calculated conformal transformation of each wire */
     TrackFinderCDCLegendre::QuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator; /**< Object which creates track candidates using quadtree nodes */
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
@@ -132,21 +130,26 @@ namespace Belle2 {
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
     static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/
 
-    bool m_reconstructCurler; /**< Stores, curlers shall be reconstructed*/
-    bool m_fitTracks; /**< Apply fitting for candidates or not*/
-    bool m_fitTracksEarly; /**< Apply fitting for candidates on early stage or not*/
-    bool m_mergeTracksEarly; /**< Apply fitting for candidates on early stage or not*/
-    bool m_earlyMerge; /**< Apply fitting for candidates or not*/
-    bool m_drawCandidates; /**< Draw each candidate in interactive mode*/
-    bool m_drawCandInfo; /**< Set whether TrackDrawer class will bw used at all*/
-    bool m_appendHits; /**< Try to append new hits to track candidate*/
+    bool m_reconstructCurler;     /**< Stores, curlers shall be reconstructed*/
+    bool m_fitTracks;             /**< Apply fitting for candidates or not*/
+    bool m_fitTracksEarly;        /**< Apply fitting for candidates on early stage or not*/
+    bool m_mergeTracksEarly;      /**< Apply fitting for candidates on early stage or not*/
+    bool m_earlyMerge;            /**< Apply fitting for candidates or not*/
+    bool m_drawCandidates;        /**< Draw each candidate in interactive mode*/
+    bool m_drawCandInfo;          /**< Set whether TrackDrawer class will bw used at all*/
+    bool m_appendHits;            /**< Try to append new hits to track candidate*/
     bool m_multipleCandidateSearch; /**< Search multiple track candidates per run of FastHough algorithm*/
-    bool m_useHitPrecalculatedR; /**< To store r values inside hit objects or recalculate it each step */
+    bool m_useHitPrecalculatedR;  /**< To store r values inside hit objects or recalculate it each step */
+    bool m_assignStereoHits;      /**< Try to append new hits to track candidate*/
+    bool m_batchMode;             /**< Sets ROOT to batch mode (don't show canvases) */
 
     TrackFinderCDCLegendre::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
 
     int m_treeFinder;
     int m_steppedFinder;
+
+    int eventnr;
+
     /**
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
      */
@@ -156,6 +159,11 @@ namespace Belle2 {
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
      */
     void DoTreeTrackFinding();
+
+    /**
+     * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
+     */
+    void DoTreeTrackFindingFinal();
 
     /**
      * Finding of stereo tracklets which will be assigned to some track
@@ -188,6 +196,8 @@ namespace Belle2 {
      * Necessary since we cannot use smart pointers up to now.
      */
     void clear_pointer_vectors();
+
+
 
   };
 

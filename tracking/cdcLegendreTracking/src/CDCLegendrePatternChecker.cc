@@ -92,6 +92,8 @@ void PatternChecker::checkCurler(
 
 bool PatternChecker::checkCandidate(TrackCandidate* track, int minNHitsSLayer)
 {
+  return false;
+  if (track->getTrackHits().size() < 1) return false;
   HitPatternCDC trackHitPattern = track->getHitPattern();
   B2DEBUG(100, "Initial pattern: " << trackHitPattern.getBitSet());
 
@@ -271,5 +273,31 @@ void PatternChecker::checkPattern(HitPatternCDC* /*pattern*/)
 //  double minSLayer, maxSLayer;
 //  minSLayer = getMinSLayer(pattern);
 //  maxSLayer = getMaxSLayer(pattern);
+}
+
+
+bool PatternChecker::isTrackComplete(TrackCandidate* track)
+{
+  int nPositiveHits(0), nNegativeHits(0);
+  // Make two patterns: for "positive" and "negative" parts of track (curler)
+  for (TrackHit * hit : track->getTrackHits()) {
+    if (hit->getCurvatureSignWrt(track->getXc(), track->getYc()) == TrackCandidate::charge_positive) {
+      nPositiveHits++;
+    } else {
+      nNegativeHits++;
+    }
+  }
+
+  int charge;
+
+  if (nPositiveHits > nNegativeHits) {
+    charge = TrackCandidate::charge_positive;
+  } else {
+    charge = TrackCandidate::charge_negative;
+  }
+
+  //TODO
+
+
 }
 

@@ -63,6 +63,18 @@ namespace Belle2 {
                            const double r_max,
                            const unsigned limit);
 
+
+      void FastHoughCustomReferencePoint(std::pair<std::vector<TrackHit*>, std::pair<double, double> >* candidate,
+                                         const std::vector<TrackHit*>& hits,
+                                         const std::pair<double, double>& refPoint,
+                                         const int level,
+                                         const int theta_min,
+                                         const int theta_max,
+                                         const double r_min,
+                                         const double r_max,
+                                         const unsigned limit);
+
+
       /**
        * @brief Recursively called function to perform the Fast Hough algorithm, modified to deliver the candidates which passes limitation on number of hits
        * @param hits The hits, which are used for track finding

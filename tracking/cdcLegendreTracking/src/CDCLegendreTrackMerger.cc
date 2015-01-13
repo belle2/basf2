@@ -30,14 +30,25 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool
   if (cand1 == cand2)return;
 
   double new_chi2 = tryToMergeAndFit(cand1, cand2, remove_hits);
-  B2INFO("Track merging: chi2_1 = " << cand1->getChi2() << "; chi2_2 = " << cand2->getChi2() << "; new chi2 = " << new_chi2);
+  B2DEBUG(100, "Track merging: chi2_1 = " << cand1->getChi2() << "; chi2_2 = " << cand2->getChi2() << "; new chi2 = " << new_chi2);
 
   if (not remove_hits) {
     for (TrackHit * hit : cand2->getTrackHits()) {
       cand1->addHit(hit);
     }
+    for (TrackHit * hit : cand1->getTrackHits()) {
+      if (hit->getHitUsage() == TrackHit::bad) {
+        hit->setHitUsage(TrackHit::used_in_track);
+      }
+    }
+
 
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+
+    cand1->getTrackHits().erase(
+      std::unique(cand1->getTrackHits().begin(), cand1->getTrackHits().end()),
+      cand1->getTrackHits().end());
+
 
     m_trackList.remove(cand2);
     delete cand2;
@@ -51,8 +62,6 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool
       if (hit->getHitUsage() == TrackHit::used_in_track) cand1_good++;
       if (hit->getHitUsage() == TrackHit::bad) cand1_bad++;
     }
-    if (cand1_bad == 0) cand1_bad = 1;
-    cand1_ratio = cand1_good / cand1_bad;
 
     int cand2_good(0), cand2_bad(0);
     double cand2_ratio(0);
@@ -60,8 +69,14 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool
       if (hit->getHitUsage() == TrackHit::used_in_track) cand2_good++;
       if (hit->getHitUsage() == TrackHit::bad) cand2_bad++;
     }
+
+    if (cand1_bad == 0) cand1_bad = 1;
+//    cand1_ratio = cand1_good / cand1_bad;
+    cand1_ratio = cand1_good / (cand1_good + cand1_bad);
+
     if (cand2_bad == 0) cand2_bad = 1;
-    cand2_ratio = cand2_good / cand2_bad;
+//    cand2_ratio = cand2_good / cand2_bad;
+    cand2_ratio = cand2_good / (cand1_good + cand1_bad);
 
     TrackCandidate* cand_good = NULL;
     TrackCandidate* cand_bad = NULL;
@@ -83,6 +98,14 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool
       }
     }
 
+    /*
+    std::vector<TrackHit*> c_list_temp;
+    for (TrackHit * hit : cand_good->getTrackHits()) {
+      if (hit->getHitUsage() == TrackHit::bad) {
+        c_list_temp.push_back(hit);
+      }
+    }
+    */
 
     cand_bad->getTrackHits().erase(std::remove_if(cand_bad->getTrackHits().begin(), cand_bad->getTrackHits().end(),
     [&](TrackHit * hit) {
@@ -96,13 +119,22 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool
     }),
     cand_good->getTrackHits().end());
 
+
+    /*
+    m_cdcLegendreTrackCreator->createLegendreTracklet(c_list_temp);
+    for (TrackHit * hit : c_list_temp) {
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+    */
+
+
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_good);
     for (TrackHit * hit : cand_good->getTrackHits()) {
       double x0_hit = hit->getOriginalWirePosition().X();
       double y0_hit = hit->getOriginalWirePosition().Y();
-      double x0_track = cos(cand_good->getTheta()) / fabs(cand_good->getR()) + cand_good->getReferencePoint().X();
-      double y0_track = sin(cand_good->getTheta()) / fabs(cand_good->getR()) + cand_good->getReferencePoint().Y();
-      double dist = fabs(fabs(1. / fabs(cand_good->getR()) - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
+      double x0_track = cand_good->getXc();
+      double y0_track = cand_good->getYc();
+      double dist = fabs(fabs(cand_good->getRadius() - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
       if (dist > hit->getDriftLength() * .5) {
         hit->setHitUsage(TrackHit::not_used);
       }
@@ -120,7 +152,18 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool
     }
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_bad);
 
+    cand_good->getTrackHits().erase(
+      std::unique(cand_good->getTrackHits().begin(), cand_good->getTrackHits().end()),
+      cand_good->getTrackHits().end());
+
+
+    cand_bad->getTrackHits().erase(
+      std::unique(cand_bad->getTrackHits().begin(), cand_bad->getTrackHits().end()),
+      cand_bad->getTrackHits().end());
+
   }
+
+
 
 //  m_trackList.remove(cand2);
 //  delete cand2;
@@ -144,9 +187,9 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1,
     /*    cand1->addHit(hit);
         hit->setHitUsage(TrackHit::used_in_track);
     */
-    double R = fabs(1. / cand1->getR());
-    double x0_track = cos(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().X() ;
-    double y0_track = sin(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().Y();
+    double R = cand1->getRadius();
+    double x0_track = cand1->getXc() ;
+    double y0_track = cand1->getYc();
     double x0_hit = hit->getOriginalWirePosition().X();
     double y0_hit = hit->getOriginalWirePosition().Y();
     double dist = SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
@@ -169,7 +212,7 @@ void TrackMerger::doTracksMerging()
 
   int ii = 0;
 
-  B2INFO("Merger: Initial nCands = " << m_trackList.size());
+  B2DEBUG(100, "Merger: Initial nCands = " << m_trackList.size());
 
   bool merging_done(false);
   bool remove_hits(true);
@@ -183,7 +226,9 @@ void TrackMerger::doTracksMerging()
            m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
       TrackCandidate* cand1 = *it1;
 
+//      if(cand1->getCandidateType() ==  TrackCandidate::goodTrack) continue;
       if (cand1->getTrackHits().size() < 3) continue;
+      if (remove_hits && (cand1->getPt() < 0.9)) continue;
       m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
 
       double chi2_best = 999;
@@ -195,10 +240,18 @@ void TrackMerger::doTracksMerging()
         TrackCandidate* cand2 = *it2;
         ++it2;
 
-        if (cand2->getTrackHits().size() < 3) continue;
+//        if(cand2->getCandidateType() ==  TrackCandidate::goodTrack) continue;
 
+        if (cand2->getTrackHits().size() < 3) continue;
+        if (remove_hits && (cand2->getPt() < 0.9)) continue;
         m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand2);
         double chi2_temp = tryToMergeAndFit(cand1, cand2, remove_hits);
+        for (TrackHit * hit : cand1->getTrackHits()) {
+          hit->setHitUsage(TrackHit::used_in_track);
+        }
+        for (TrackHit * hit : cand2->getTrackHits()) {
+          hit->setHitUsage(TrackHit::used_in_track);
+        }
 
         if (chi2_best > chi2_temp) {
           candidateToMergeBest = cand2;
@@ -216,9 +269,17 @@ void TrackMerger::doTracksMerging()
           if (cand_temp == cand1) continue;
           if (cand_temp == candidateToMergeBest) continue;
           if (cand_temp->getTrackHits().size() < 3) continue;
+//          if(cand_temp->getCandidateType() ==  TrackCandidate::goodTrack) continue;
+
 
           m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_temp);
           double chi2_temp = tryToMergeAndFit(candidateToMergeBest, cand_temp, remove_hits);
+          for (TrackHit * hit : candidateToMergeBest->getTrackHits()) {
+            hit->setHitUsage(TrackHit::used_in_track);
+          }
+          for (TrackHit * hit : cand_temp->getTrackHits()) {
+            hit->setHitUsage(TrackHit::used_in_track);
+          }
 
           if (chi2_best_reverse > chi2_temp) {
             candidateToMergeBestReverse = cand_temp;
@@ -227,7 +288,7 @@ void TrackMerger::doTracksMerging()
         }
 
         if (chi2_best < chi2_best_reverse) {
-          mergeTracks(cand1, candidateToMergeBest, false);
+          mergeTracks(cand1, candidateToMergeBest, remove_hits /*false*/);
           m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
           it1 = m_trackList.begin();
           tracks_merged++;
@@ -254,7 +315,7 @@ void TrackMerger::doTracksMerging()
     if (tracks_merged == 0 && not remove_hits)merging_done = true;
     if (tracks_merged == 0 && remove_hits)remove_hits  = false;
 //    tracks_merged = 0;
-    B2INFO("tracks_merged = " << tracks_merged)
+    B2DEBUG(100, "tracks_merged = " << tracks_merged)
 
     m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(),
     [&](TrackCandidate * cand) {
@@ -268,7 +329,139 @@ void TrackMerger::doTracksMerging()
     return (cand->getTrackHits().size() < 6);
   }), m_trackList.end());
 
-  B2INFO("Merger: Resulting nCands = " << m_trackList.size());
+  B2DEBUG(100, "Merger: Resulting nCands = " << m_trackList.size());
+
+  for (TrackCandidate * cand : m_trackList) {
+    for (TrackHit * hit : cand->getTrackHits()) {
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+  }
+
+}
+
+
+void TrackMerger::tryToMergeTrack(TrackCandidate* cand1)
+{
+
+  int ii = 0;
+
+  B2DEBUG(100, "Merger: Initial nCands = " << m_trackList.size());
+
+  bool merging_done(false);
+  bool remove_hits(true);
+
+  do {
+
+    int tracks_merged = 0;
+
+    double chi2_best = 999;
+    TrackCandidate* candidateToMergeBest = NULL;
+
+    //loop over all candidates
+    for (std::list<TrackCandidate*>::iterator it =
+           m_trackList.begin(); it != m_trackList.end(); ++it) {
+      TrackCandidate* cand2 = *it;
+
+      if (cand1 == cand2) continue;
+
+//      if(cand1->getCandidateType() ==  TrackCandidate::goodTrack) continue;
+      if (cand2->getTrackHits().size() < 3) continue;
+      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand2);
+
+
+//        if(cand2->getCandidateType() ==  TrackCandidate::goodTrack) continue;
+
+      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand2);
+      double chi2_temp = tryToMergeAndFit(cand1, cand2, remove_hits);
+
+      for (TrackHit * hit : cand1->getTrackHits()) {
+        hit->setHitUsage(TrackHit::used_in_track);
+      }
+      for (TrackHit * hit : cand2->getTrackHits()) {
+        hit->setHitUsage(TrackHit::used_in_track);
+      }
+
+      if (chi2_best > chi2_temp) {
+        candidateToMergeBest = cand2;
+        chi2_best = chi2_temp;
+      }
+
+    }
+
+    if (chi2_best < 1.) {
+      //      B2INFO("chi2_best: " << chi2_best << "; chi2_track1: " << chi2_track1);
+      /*
+            double chi2_best_reverse = 999.;
+            TrackCandidate* candidateToMergeBestReverse = NULL;
+            for (TrackCandidate * cand_temp : m_trackList) {
+              if (cand_temp == cand1) continue;
+              if (cand_temp == candidateToMergeBest) continue;
+              if (cand_temp->getTrackHits().size() < 3) continue;
+      //          if(cand_temp->getCandidateType() ==  TrackCandidate::goodTrack) continue;
+
+
+              m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_temp);
+              double chi2_temp = tryToMergeAndFit(candidateToMergeBest, cand_temp, remove_hits);
+
+              if (chi2_best_reverse > chi2_temp) {
+                candidateToMergeBestReverse = cand_temp;
+                chi2_best_reverse = chi2_temp;
+              }
+            }
+
+            if (chi2_best < chi2_best_reverse) {
+              mergeTracks(cand1, candidateToMergeBest, remove_hits);
+              m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+              it = m_trackList.begin();
+              tracks_merged++;
+            } else {
+              mergeTracks(candidateToMergeBest, candidateToMergeBestReverse, remove_hits);
+              m_cdcLegendreTrackFitter->fitTrackCandidateFast(candidateToMergeBest);
+              it = m_trackList.begin();
+              tracks_merged++;
+            }
+
+            //      mergeTracks(cand1, candidateToMergeBest);
+            //      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+      */
+
+      mergeTracks(cand1, candidateToMergeBest, remove_hits);
+      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+      tracks_merged++;
+
+      ii++;
+      B2DEBUG(100, "ii = " << ii);
+    }
+
+    B2DEBUG(100, "Cand hits vector size = " << cand1->getTrackHits().size());
+    B2DEBUG(100, "Cand R = " << cand1->getR());
+
+
+
+    if (tracks_merged == 0 && not remove_hits)merging_done = true;
+    if (tracks_merged == 0 && remove_hits)remove_hits  = false;
+//    tracks_merged = 0;
+    B2DEBUG(100, "tracks_merged = " << tracks_merged)
+
+    m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(),
+    [&](TrackCandidate * cand) {
+      return (cand->getTrackHits().size() < 3);
+    }), m_trackList.end());
+
+  } while (not merging_done);
+
+  m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(),
+  [&](TrackCandidate * cand) {
+    return (cand->getTrackHits().size() < 4);
+  }), m_trackList.end());
+
+  B2DEBUG(100, "Merger: Resulting nCands = " << m_trackList.size());
+
+  for (TrackCandidate * cand : m_trackList) {
+    for (TrackHit * hit : cand->getTrackHits()) {
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+  }
 
 }
 
@@ -293,6 +486,9 @@ double TrackMerger::tryToMergeAndFit(TrackCandidate* cand1, TrackCandidate* cand
     c_list_temp_2.push_back(hit);
   }
 
+  c_list_temp_2.erase(
+    std::unique(c_list_temp_2.begin(), c_list_temp_2.end()),
+    c_list_temp_2.end());
 
   for (TrackHit * hit : c_list_temp_2) {
     hit->setHitUsage(TrackHit::used_in_track);
@@ -315,7 +511,7 @@ double TrackMerger::tryToMergeAndFit(TrackCandidate* cand1, TrackCandidate* cand
     double x0_track = cos(track_par.first) / fabs(track_par.second) + ref_point.first;
     double y0_track = sin(track_par.first) / fabs(track_par.second) + ref_point.second;
     double dist = fabs(fabs(1 / fabs(track_par.second) - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
-    if (dist > hit->getDriftLength() * 2.) {
+    if (dist > hit->getDriftLength() * 5.) {
       hit->setHitUsage(TrackHit::bad);
     }
   }
@@ -363,7 +559,7 @@ double TrackMerger::tryToMergeAndFit(TrackCandidate* cand1, TrackCandidate* cand
     double x0_track = cos(track_par.first) / fabs(track_par.second) + ref_point.first;
     double y0_track = sin(track_par.first) / fabs(track_par.second) + ref_point.second;
     double dist = fabs(fabs(1 / fabs(track_par.second) - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
-    if (dist > hit->getDriftLength() * .5) {
+    if (dist > hit->getSigmaDriftLength() * .3) {
       hit->setHitUsage(TrackHit::bad);
     }
   }
@@ -592,9 +788,9 @@ double TrackMerger::selectCoreMergeFit(TrackCandidate* cand1, TrackCandidate* ca
 
 double TrackMerger::checkDist(TrackHit* hit, TrackCandidate* track)
 {
-  double x0_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
-  double y0_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
-  double R = fabs(1. / track->getR());
+  double x0_track = track->getXc();
+  double y0_track = track->getYc();
+  double R = track->getRadius();
 
   double x0_hit = hit->getOriginalWirePosition().X();
   double y0_hit = hit->getOriginalWirePosition().Y();
@@ -609,8 +805,8 @@ void TrackMerger::splitTracks()
 //    if(cand->getCandidateType() == TrackCandidate::tracklet) continue;
     double theta = cand->getTheta();
     double r = cand->getR();
-    double yc = sin(theta) / r;
-    double xc = cos(theta) / r;
+    double yc = cand->getXc();
+    double xc = cand->getYc();
 
     int hits_pos = 0;
     int hits_neg = 0;
@@ -643,13 +839,23 @@ void TrackMerger::splitTracks()
       }
 
       for (TrackHit * hit : hitsForNewTrack) {
-        cand->removeHit(hit);
+//        cand->removeHit(hit);
         hit->setHitUsage(TrackHit::not_used);
       }
 
+      cand->getTrackHits().erase(std::remove_if(cand->getTrackHits().begin(), cand->getTrackHits().end(),
+      [&](TrackHit * hit) {
+        return hit->getHitUsage() == TrackHit::not_used;
+      }), cand->getTrackHits().end());
+
+
       if (hitsForNewTrack.size() > 5) {
         TrackCandidate* newTracklet = m_cdcLegendreTrackCreator->createLegendreTracklet(hitsForNewTrack);
+        newTracklet->setCandidateType(TrackCandidate::tracklet);
         newTracklet->reestimateCharge();
+        PatternChecker cdcLegendrePatternChecker(m_cdcLegendreTrackCreator);
+        cdcLegendrePatternChecker.checkCandidate(newTracklet);
+        cdcLegendrePatternChecker.checkCandidate(cand);
         m_cdcLegendreTrackFitter->fitTrackCandidateFast(newTracklet);
       } else {
         hitsForNewTrack.clear();
@@ -658,6 +864,7 @@ void TrackMerger::splitTracks()
       cand->reestimateCharge();
 
       m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+
 
 
 
@@ -680,8 +887,8 @@ void TrackMerger::checkOverlapping()
 
     double chi2_cand1 = cand1->getChi2();
 
-    double x0_track1 = cos(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().X();
-    double y0_track1 = sin(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().Y();
+    double x0_track1 = cand1->getXc();
+    double y0_track1 = cand1->getYc();
 
 
     std::list<TrackCandidate*>::iterator it2 = std::next(it1);
@@ -695,8 +902,8 @@ void TrackMerger::checkOverlapping()
       m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand2);
       double chi2_cand2 = cand2->getChi2();
 
-      double x0_track2 = cos(cand2->getTheta()) / cand2->getR() + cand2->getReferencePoint().X();
-      double y0_track2 = sin(cand2->getTheta()) / cand2->getR() + cand2->getReferencePoint().Y();
+      double x0_track2 = cand2->getXc();
+      double y0_track2 = cand2->getYc();
 
 
       if ((fabs(x0_track1 - x0_track2) / x0_track1 < overlapParametersThreshold) &&
@@ -706,7 +913,7 @@ void TrackMerger::checkOverlapping()
         isHeavyOverlapping = true;
       else {
         int n_overlapp = 0;
-        double R = fabs(1. / cand1->getR());
+        double R = cand1->getRadius();
         for (TrackHit * hit : cand2->getTrackHits()) {
           double x0_hit = hit->getOriginalWirePosition().X();
           double y0_hit = hit->getOriginalWirePosition().Y();
@@ -718,7 +925,7 @@ void TrackMerger::checkOverlapping()
           if (n_overlapp > hitsHeavyOverlapThreshold) isHeavyOverlapping = true;
         } else {
           n_overlapp = 0;
-          R = fabs(1. / cand2->getR());
+          R = cand2->getRadius();
           for (TrackHit * hit : cand1->getTrackHits()) {
             double x0_hit = hit->getOriginalWirePosition().X();
             double y0_hit = hit->getOriginalWirePosition().Y();
@@ -837,15 +1044,15 @@ bool TrackMerger::earlyCandidateMerge(std::pair < std::vector<TrackHit*>,
 
       double chi2_track = cand1->getChi2();
 
-      double x0_track = cos(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().X();
-      double y0_track = sin(cand1->getTheta()) / cand1->getR() + cand1->getReferencePoint().Y();
+      double x0_track = cand1->getXc();
+      double y0_track = cand1->getYc();
 
       //        if((fabs(x0_track-x0_cand)/x0_track < 0.1)&&(fabs(y0_track-y0_cand)/y0_track < 0.1))make_merge = true;
       //        else
 
       {
         int n_overlapp = 0;
-        double R = fabs(1. / cand1->getR());
+        double R = cand1->getRadius();
         for (TrackHit * hit : candidate.first) {
           double x0_hit = hit->getOriginalWirePosition().X();
           double y0_hit = hit->getOriginalWirePosition().Y();
@@ -933,7 +1140,7 @@ void TrackMerger::addStereoTracklesToTrack()
       y0_tracklet = y0_tracklet / stereoTracklet->getNHits();
 
 
-      double dist = SQR(fabs(fabs(1. / track->getR()) - sqrt(SQR(x0_tracklet - track->getXc()) + SQR(y0_tracklet - track->getYc()))));
+      double dist = SQR(fabs(track->getRadius() - sqrt(SQR(x0_tracklet - track->getXc()) + SQR(y0_tracklet - track->getYc()))));
 
       if (dist < 40) {
 //        mergeTracks(track, stereoTracklet);
@@ -996,10 +1203,10 @@ double TrackMerger::fitStereoTrackletsToTrack(TrackCandidate* track, TrackCandid
     double lWire = fabs(backwardWirePoint.Z() - forwardWirePoint.Z());
     double rWire = sqrt(SQR(backwardWirePoint.x() - forwardWirePoint.x()) + SQR(backwardWirePoint.y() - forwardWirePoint.y()));
 
-    double dist_1 = fabs(1. / track->getR()) - sqrt(SQR(hit->getOriginalWirePosition().X() - track->getXc()) + SQR(hit->getOriginalWirePosition().Y() - track->getYc())) - hit->getDriftLength();
-    double dist_2 = fabs(1. / track->getR()) - sqrt(SQR(hit->getOriginalWirePosition().X() - track->getXc()) + SQR(hit->getOriginalWirePosition().Y() - track->getYc())) + hit->getDriftLength();
+    double dist_1 = track->getRadius() - sqrt(SQR(hit->getOriginalWirePosition().X() - track->getXc()) + SQR(hit->getOriginalWirePosition().Y() - track->getYc())) - hit->getDriftLength();
+    double dist_2 = track->getRadius() - sqrt(SQR(hit->getOriginalWirePosition().X() - track->getXc()) + SQR(hit->getOriginalWirePosition().Y() - track->getYc())) + hit->getDriftLength();
 
-    double alpha = acos(1. - (SQR(hit->getOriginalWirePosition().X() - track->getReferencePoint().X()) + SQR(hit->getOriginalWirePosition().Y() - track->getReferencePoint().Y())) / (2.*SQR(fabs(1. / track->getR()))));
+    double alpha = acos(1. - (SQR(hit->getOriginalWirePosition().X() - track->getReferencePoint().X()) + SQR(hit->getOriginalWirePosition().Y() - track->getReferencePoint().Y())) / (2.*SQR(track->getRadius())));
 
     //analyzing sign of z position
     double phi_on_track; //azimutal angle of point on thack which is projection of current stereohit on thack
@@ -1030,13 +1237,13 @@ double TrackMerger::fitStereoTrackletsToTrack(TrackCandidate* track, TrackCandid
 
 //    B2INFO("alpha = " << alpha);
 
-    double __attribute__((unused)) omega_1 = Zpos_1 / (alpha * fabs(1. / track->getR()));
-    double __attribute__((unused)) omega_2 = Zpos_2 / (alpha * fabs(1. / track->getR()));
+    double __attribute__((unused)) omega_1 = Zpos_1 / (alpha * track->getRadius());
+    double __attribute__((unused)) omega_2 = Zpos_2 / (alpha * track->getRadius());
 
 //    double theta_track_1 = (atan(omega_1) + 3.1415/2 ) * 180. / 3.1415;
 //    double theta_track_2 = (atan(omega_2) + 3.1415/2 ) * 180. / 3.1415;
-    double theta_track_1 = (atan2(Zpos_1 , (alpha * fabs(1. / track->getR()))) + 3.1415 / 2) * 180. / 3.1415;
-    double theta_track_2 = (atan2(Zpos_2 , (alpha * fabs(1. / track->getR()))) + 3.1415 / 2) * 180. / 3.1415;
+    double theta_track_1 = (atan2(Zpos_1 , (alpha * track->getRadius())) + 3.1415 / 2) * 180. / 3.1415;
+    double theta_track_2 = (atan2(Zpos_2 , (alpha * track->getRadius())) + 3.1415 / 2) * 180. / 3.1415;
 
     B2INFO("THETA_track_1 angle = " << theta_track_1 << " THETA_track_2 angle = " << theta_track_2);
 
@@ -1055,9 +1262,9 @@ void TrackMerger::extendTracklet(TrackCandidate* tracklet, std::vector<TrackHit*
   return ;
   std::vector<TrackHit*> hits;
 
-  double x0_track = cos(tracklet->getTheta()) / tracklet->getR() + tracklet->getReferencePoint().X();
-  double y0_track = sin(tracklet->getTheta()) / tracklet->getR() + tracklet->getReferencePoint().Y();
-  double R = fabs(1. / tracklet->getR());
+  double x0_track = tracklet->getXc();
+  double y0_track = tracklet->getYc();
+  double R = tracklet->getRadius();
   double dist_min = 999;
   double x_pos, y_pos;
 
@@ -1079,12 +1286,79 @@ void TrackMerger::extendTracklet(TrackCandidate* tracklet, std::vector<TrackHit*
 //      }
   }
 
+//  x_pos = tracklet->getReferencePoint().X();
+//  y_pos = tracklet->getReferencePoint().Y();
+
   TVector3 reference;
   reference.SetZ(0);
 //    reference.SetX(tracklet->getTrackHits()[1]->getOriginalWirePosition().X());
 //    reference.SetY(tracklet->getTrackHits()[1]->getOriginalWirePosition().X());
+
+//  try this
+//  x_pos = tracklet->getReferencePoint().X();
+//  y_pos = tracklet->getReferencePoint().Y();
+
   reference.SetX(x_pos);
   reference.SetY(y_pos);
+
+
+  double dist_hit_min = 999.;
+  TVector3 pos(0, 0, 0);
+
+  for (TrackHit * hit : tracklet->getTrackHits()) {
+    if (not hit->getIsAxial()) continue;
+
+    double dist_hit = hit->getOriginalWirePosition().Pt();
+
+    if (dist_hit < dist_hit_min) {
+      dist_hit_min = dist_hit;
+      pos.SetXYZ(hit->getOriginalWirePosition().X(), hit->getOriginalWirePosition().Y(), 0);
+    }
+
+  }
+
+//  x_pos = pos.X();
+//  y_pos = pos.Y();
+
+
+  int innermostSLayer = tracklet->getInnermostSLayer(2);
+  int outermostSLayer = tracklet->getOutermostSLayer(2);
+  for (TrackHit * axialHit : m_AxialHitList) {
+    if (axialHit->getHitUsage() == TrackHit::used_in_track) continue;
+    if ((axialHit->getSuperlayerId() > outermostSLayer) || (axialHit->getSuperlayerId() < innermostSLayer)) {
+//      TrackHit* trackHit = new TrackHit(*axialHit);
+//      trackHit->setPosition(axialHit->getOriginalWirePosition() - reference);
+//      trackHit->setHitUsage(TrackHit::not_used);
+      hits.push_back(axialHit);
+    }
+  }
+
+  for (TrackHit * hit : tracklet->getTrackHits()) {
+    hits.push_back(hit);
+  }
+
+
+  std::vector<TrackHit*> c_list1;
+  std::pair<std::vector<TrackHit*>, std::pair<double, double> > cand = std::make_pair(c_list1, std::make_pair(-999, -999));
+
+  std::pair<double, double> refPoint = std::make_pair(x_pos, y_pos);
+  m_cdcLegendreFastHough->FastHoughCustomReferencePoint(&cand, hits, refPoint, 1, 0, 2048, -0.15, 0.15, 9);
+
+
+  for (TrackHit * hit : cand.first) {
+    if (hit->getHitUsage() != TrackHit::used_in_track) {
+      hit->setHitUsage(TrackHit::used_in_track);
+      tracklet->addHit(hit);
+    }
+  }
+
+
+  tracklet->getTrackHits().erase(
+    std::unique(tracklet->getTrackHits().begin(), tracklet->getTrackHits().end()),
+    tracklet->getTrackHits().end());
+
+
+  return;
 
   /*
   int innermostSLayer = tracklet->getInnermostSLayer(2);

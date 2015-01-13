@@ -29,6 +29,9 @@
 #include "TEllipse.h"
 #include "TLine.h"
 
+#include "TROOT.h"
+#include "TRint.h"
+
 #include <iomanip>
 #include <fstream>
 
@@ -47,7 +50,7 @@ namespace Belle2 {
        * @param drawCandInfo Sets whether conformal and legendre transformation should be drawn
        * @param drawCandidates Sets whether drawing while basf2 running should be done
        */
-      TrackDrawer(bool drawCandInfo, bool drawCandidates);
+      TrackDrawer(bool drawCandInfo, bool drawCandidates, bool batchMode);
 
       virtual ~TrackDrawer() {};
 
@@ -116,6 +119,7 @@ namespace Belle2 {
 
       bool m_drawCandInfo; /**< Checks whether conformal and legendre transformation should be drawn */
       bool m_drawCandidates;  /**< Checks whether drawing while basf2 running should be done */
+      bool m_batchMode;  /**< Sets ROOT to batch mode (don't show canvases) */
       int m_iTrack; /**< Track counter */
 //    FILE* pipeout_fp; /**< Chacks whether conformal and legendre transformation should be drawn */
       int m_trackCounter; /**< Track counter; used for saving track finding progress */

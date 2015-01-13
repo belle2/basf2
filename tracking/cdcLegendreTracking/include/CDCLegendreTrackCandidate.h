@@ -63,7 +63,7 @@ namespace Belle2 {
       TrackCandidate(const std::vector<QuadTree*>& nodeList);
 
       /** Destructor. */
-      ~TrackCandidate();
+      virtual ~TrackCandidate();
 
       /**Construct a Track Candidate from give theta and r value (in conformal plane)
        * @param theta theta value of track
@@ -84,27 +84,49 @@ namespace Belle2 {
         return m_hitPattern;
       }
 
-      /** Return theta value of track.*/
+      /**
+       * Return theta value of track.
+       * Important: this theta angle is value given by Legendre finding, not an azimuthal (phi) angle; mainly used in estimation of center of track trajectory
+       */
       inline double getTheta() const {
         return m_theta;
       }
 
-      /** Return r value of track.*/
+      /**
+       * Return r value of track.
+       * Important: this r value is signed curvature of track; mainly used in estimation of center of track trajectory
+       */
       inline double getR() const {
         return m_r;
       }
 
-      /** Return Xc value of track.*/
+      /** Return radius of track trajectory */
+      inline double getRadius() const {
+        return fabs(1. / m_r);
+      }
+
+      /** Return pT of the track candidate */
+      inline double getPt() const {
+        return fabs(1 / m_r) * 1.5 * 0.00299792458;
+      }
+
+      /** Return azimuthal angle of the track (phi) */
+      double getPhi() const {
+        return (m_r > 0.) ? (m_theta + m_PI * getChargeSign() / 2.) : (m_theta + m_PI * getChargeSign() / 2. + m_PI);
+      }
+
+      /** Return Xc value of track - X projection of track's trajectory center.*/
       inline double getXc() const {
         return m_xc;
       }
 
-      /** Return Yc value of track.*/
+      /** Return Yc value of track - Y projection of track's trajectory center.*/
       inline double getYc() const {
         return m_yc;
       }
 
-      /** Return charge hypotheses of track.
+      /**
+       * Return charge hypotheses of track.
        * Might also be curler or two tracks.
        */
       inline int getCharge() const {
@@ -119,7 +141,7 @@ namespace Belle2 {
 
 
       /** Return charge sign of track.
-       * Sure to be 1 or -1 (1 for curlers)
+       * Sure to be 1 or -1
        */
       int getChargeSign() const;
 
@@ -259,6 +281,7 @@ namespace Belle2 {
       int m_outermostAxialSLayer; /**< Outermost axial superlayer */
 //    int m_innermostAxialLayer; //Innermost axial layer;
 //    int m_outermostAxialLayer; //Outermost axial layer;
+      static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
 
       double m_chi2; /**< Chi2 of track fitting */
       /**

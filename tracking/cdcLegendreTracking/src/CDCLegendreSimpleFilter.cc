@@ -23,9 +23,9 @@ double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* trac
 
   double prob = 0;
 
-  double x0_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
-  double y0_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
-  double R = fabs(1. / track->getR());
+  double x0_track = track->getXc();
+  double y0_track = track->getYc();
+  double R = track->getRadius();
 
 
   double x0_hit = hit->getOriginalWirePosition().X();
@@ -34,7 +34,9 @@ double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* trac
 
 
 
-  prob = exp(-1. * dist / m_distFactor);
+  prob = exp(-1. * dist / hit->getSigmaDriftLength());
+
+  if (dist < hit->getSigmaDriftLength() * 2.) prob = 1.;
 
   return prob;
 }
@@ -86,13 +88,13 @@ void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
 
   int ii = 0;
 
-  B2INFO("NCands = " << m_trackList.size());
+  B2DEBUG(100, "NCands = " << m_trackList.size());
 
   for (TrackCandidate * cand : m_trackList) {
     ii++;
-    B2INFO("ii = " << ii);
-    B2INFO("Processing: Cand hits vector size = " << cand->getTrackHits().size());
-    B2INFO("Processing: Cand R = " << cand->getR());
+    B2DEBUG(100, "ii = " << ii);
+    B2DEBUG(100, "Processing: Cand hits vector size = " << cand->getTrackHits().size());
+    B2DEBUG(100, "Processing: Cand R = " << cand->getR());
 
     for (TrackHit * hit : cand->getTrackHits()) {
       hit->setHitUsage(TrackHit::used_in_track);
@@ -208,8 +210,9 @@ void SimpleFilter::trackCore()
 
 void SimpleFilter::appenUnusedHits(std::list<TrackCandidate*>& m_trackList, std::vector<TrackHit*>& AxialHitList)
 {
+
   for (TrackHit * hit : AxialHitList) {
-    if (hit->getHitUsage() != TrackHit::not_used) continue;
+//    if (hit->getHitUsage() != TrackHit::not_used) continue;
     double bestHitProb = 0;
     TrackCandidate* BestCandidate = NULL;
 

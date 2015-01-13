@@ -12,7 +12,6 @@
 
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
 
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -71,6 +70,9 @@ namespace Belle2 {
       /** Assigns values for conformal coordinates by transforming the wire coordinates. */
       void performConformalTransformation();
 
+      /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. */
+      std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0);
+
       /** Return the index in the store array of the original CDCHit*/
       inline int getStoreIndex() const {return m_cdcHitIndex;}
 
@@ -97,6 +99,12 @@ namespace Belle2 {
 
       /** Returns the original wire position (before the finding of the z-position.*/
       inline TVector3 getOriginalWirePosition() const {return m_wirePositionOrig ;}
+
+      /** Returns position of forward wire end */
+      inline TVector3 getForwardWirePosition() const {return  m_wireForwardPosition; }
+
+      /** Returns position of backward wire end */
+      inline TVector3 getBackwardWirePosition() const {return  m_wireBackwardPosition; }
 
       /** Returns the Hit position (X coordinate) in the conformal plane.*/
       inline double getConformalX() const {return m_conformalX;};
@@ -133,8 +141,16 @@ namespace Belle2 {
       /** Sets how hit was used */
       void setHitUsage(int hitUsage) {m_hitUsage = hitUsage;};
 
+      /** Get pointer to original CDCHit */
+      CDCHit* getOriginalCDCHit() const {return m_cdcHit;};
+
+      /** Get Z reference */
+      double getZReference() const {return m_zReference;};
+
 
     private:
+
+      CDCHit* m_cdcHit;                  /**< Pointer to original CDCHit */
 
       int m_cdcHitIndex;                 /**< ID of the original CDCHit in the store array*/
       int m_layerId;                     /**< ID of the layer of the hit (0-55)*/
@@ -152,6 +168,9 @@ namespace Belle2 {
       double m_conformalDriftLength;       /**< Drift time of the hit in the conformal plane (under the assumption that r << x,y*/
 
       TVector3 m_wirePositionOrig;           /**< Original Coordinates of the center (!) of the hit wire. */
+
+      TVector3 m_wireForwardPosition;     /**< Coordinates of forward end of the wire */
+      TVector3 m_wireBackwardPosition;    /**< Coordinates of backward end of the wire */
 
       //    static constexpr double m_zReference = 25.852;  /**< Reference z position for wire position determination*/
       double m_zReference;  /**< Reference z position for wire position determination*/

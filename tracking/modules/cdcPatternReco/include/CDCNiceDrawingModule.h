@@ -19,14 +19,11 @@
 #include "tracking/cdcLegendreTracking/CDCLegendreNiceDrawing.h"
 
 class TVector2;
-//class TrackCand;
-//class Track;
 
 namespace Belle2 {
 
   class CDCHit;
   class MCParticle;
-//  class NiceDrawing;
 
   class CDCNiceDrawingModule : public Module {
 
@@ -53,6 +50,8 @@ namespace Belle2 {
 
     std::string m_TrackCandColName;
 
+    std::string m_MCTrackCandColName;
+
     std::string m_HitColName;
 
     std::string m_mcParticlesColName;
@@ -61,7 +60,7 @@ namespace Belle2 {
 
     bool m_drawMCSignal;
 
-//    double m_zReference;
+    bool m_drawAlsoDifference;  /// Output three pictures for each event: one with the MCTracks and the Candidates, one with the Candidates with no MCTrack relates to and one with the MCTracks with no Candidate related to
 
     bool m_drawCands;
 

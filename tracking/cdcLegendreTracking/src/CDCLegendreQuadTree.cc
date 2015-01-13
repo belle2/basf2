@@ -15,12 +15,12 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFinderCDCLegendre;
 
-double* QuadTree::s_sin_theta;
-double* QuadTree::s_cos_theta;
+float* QuadTree::s_sin_theta;
+float* QuadTree::s_cos_theta;
 bool QuadTree::s_sin_lookup_created;
 int QuadTree::s_nbinsTheta;
 unsigned int QuadTree::s_hitsThreshold;
-double QuadTree::s_rThreshold;
+float QuadTree::s_rThreshold;
 int QuadTree::s_lastLevel;
 
 /*
@@ -36,7 +36,7 @@ QuadTree::QuadTree():
 }
 
 
-QuadTree::QuadTree(double rMin, double rMax, int thetaMin, int thetaMax, int level, QuadTree* parent) :
+QuadTree::QuadTree(float rMin, float rMax, int thetaMin, int thetaMax, int level, QuadTree* parent) :
   m_rMin(rMin), m_rMax(rMax), m_thetaMin(thetaMin), m_thetaMax(thetaMax), m_level(level)
 {
   m_filled = false;
@@ -50,13 +50,16 @@ QuadTree::QuadTree(double rMin, double rMax, int thetaMin, int thetaMax, int lev
     s_rThreshold = 0.15; //whole phase-space;
   }
 
-  Rcell = 2. * m_PI * 60. / 384.;
+//  Rcell = 2. * m_PI * 60. / 384.;
 
-  m_deltaR = 4. * Rcell / (4. / ((m_rMax + m_rMin) * (m_rMax + m_rMin)) - 4.*Rcell * Rcell);
+//  m_deltaR = 4. * Rcell / (4. / ((m_rMax + m_rMin) * (m_rMax + m_rMin)) - 4.*Rcell * Rcell);
 
   m_isMaxLevel = checkLimitsR();
 
-  if (not m_isMaxLevel) initialize();
+  m_children = nullptr;
+
+//  if (not m_isMaxLevel) initialize();
+  initialize();
 
 //  B2INFO("CREATED node:" << m_thetaMin<< "x" << m_thetaMax << "x" << m_rMin << "x" << m_rMax << " dr=" << m_deltaR << " level:" << m_level);
 }
@@ -65,15 +68,20 @@ QuadTree::QuadTree(double rMin, double rMax, int thetaMin, int thetaMax, int lev
 QuadTree::~QuadTree()
 {
   if (not m_isMaxLevel) {
-    for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
-      for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
-        delete m_children[t_index][r_index];
+
+    if (m_children != nullptr) {
+      for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
+        for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
+          delete m_children[t_index][r_index];
+        }
+        delete[] m_children[t_index];
       }
-      delete[] m_children[t_index];
+      delete[] m_children;
     }
+
     delete[] m_r;
     delete[] m_thetaBin;
-    delete[] m_children;
+
   }
 
   if ((m_level == 0) && (s_sin_lookup_created)) {
@@ -86,7 +94,7 @@ QuadTree::~QuadTree()
 bool QuadTree::checkLimitsR()
 {
 
-  if (m_level == 11)
+  if (m_level == 13)
     return true;
 
 //  if (fabs(m_rMax - m_rMin) < m_deltaR) {
@@ -102,9 +110,9 @@ void QuadTree::initialize()
   if (not s_sin_lookup_created) {
     //B2INFO("Create lookup table");
     s_nbinsTheta = 8192;
-    double bin_width = m_PI / s_nbinsTheta;
-    s_sin_theta = new double[s_nbinsTheta + 1];
-    s_cos_theta = new double[s_nbinsTheta + 1];
+    float bin_width = m_PI / s_nbinsTheta;
+    s_sin_theta = new float[s_nbinsTheta + 1];
+    s_cos_theta = new float[s_nbinsTheta + 1];
 
     for (int i = 0; i <= s_nbinsTheta; ++i) {
       s_sin_theta[i] = sin(i * bin_width);
@@ -117,12 +125,13 @@ void QuadTree::initialize()
   //B2DEBUG(100, "DELTA r: " << delta_r << "; r_max-r_min: " << fabs(r_max - r_min));
 
   //calculate bin borders of 2x2 bin "histogram"
+  /*
   if (not m_isMaxLevel) {
     //B2DEBUG(100, "NORMAL binning");
     m_nbins_r = 2;
     m_nbins_theta = 2;
 
-    m_r = new double[3];
+    m_r = new float[3];
     m_r[0] = m_rMin;
     m_r[1] = m_rMin + 0.5 * (m_rMax - m_rMin);
     m_r[2] = m_rMax;
@@ -135,7 +144,7 @@ void QuadTree::initialize()
     //B2DEBUG(100, "1xN binning");
     m_nbins_r = 1;
 
-    m_r = new double[2];
+    m_r = new float[2];
     m_r[0] = m_rMin;
     m_r[1] = m_rMax;
 
@@ -145,15 +154,54 @@ void QuadTree::initialize()
       m_thetaBin[t_index] = m_thetaMin + t_index;
     }
   }
+  */
+  //B2DEBUG(100, "NORMAL binning");
+  m_nbins_r = 2;
+  m_nbins_theta = 2;
+
+  m_r = new float[3];
+  m_r[0] = m_rMin;
+  m_r[1] = m_rMin + 0.5 * (m_rMax - m_rMin);
+  m_r[2] = m_rMax;
+
+  m_thetaBin = new int[3];
+  m_thetaBin[0] = m_thetaMin;
+  m_thetaBin[1] = m_thetaMin + (m_thetaMax - m_thetaMin) / 2;
+  m_thetaBin[2] = m_thetaMax;
 
   //B2DEBUG(100, "Number of bins: " << nbins_r << "x" << nbins_theta);
   //B2DEBUG(100, "CREATING voting plane");
 
+
+}
+
+void QuadTree::initializeChildren()
+{
   m_children = new QuadTree** [m_nbins_theta];
   for (int i = 0; i < m_nbins_theta; ++i) {
     m_children[i] = new QuadTree*[m_nbins_r];
     for (int j = 0; j < m_nbins_r; ++j) {
-      m_children[i][j] = new QuadTree(m_r[j], m_r[j + 1], m_thetaBin[i], m_thetaBin[i + 1], m_level + 1, this);
+      if (m_level < (s_lastLevel - 5))m_children[i][j] = new QuadTree(m_r[j], m_r[j + 1], m_thetaBin[i], m_thetaBin[i + 1], m_level + 1, this);
+      else {
+        double r1 = m_r[j] - fabs(m_r[j + 1] - m_r[j]) / 4.;
+        double r2 = m_r[j + 1] + fabs(m_r[j + 1] - m_r[j]) / 4.;
+//        double r1 = m_r[j];
+//        double r2 = m_r[j+1];
+        //            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
+        //            theta_2_overlap = thetaBin[t_index + 1]/* + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
+        //            theta_1_overlap = thetaBin[t_index] - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
+        //            theta_2_overlap = thetaBin[t_index + 1] + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
+        int theta1 = m_thetaBin[i] - abs(pow(2, s_lastLevel + 0 - m_level) / 4);
+        int theta2 = m_thetaBin[i + 1] + abs(pow(2, s_lastLevel + 0 - m_level) / 4);
+//        int theta1 = m_thetaBin[i];
+//        int theta2 = m_thetaBin[i + 1];
+
+        if (theta1 < 0)theta1 = m_thetaBin[i];
+        if (theta2 >= 8192)theta2 = m_thetaBin[i + 1];
+
+
+        m_children[i][j] = new QuadTree(r1, r2, theta1, theta2, m_level + 1, this);
+      }
     }
   }
 
@@ -170,7 +218,7 @@ void QuadTree::buildNeighborhood(int levelNeighborhood)
     } else if (m_level == s_lastLevel){
       this->findNeighbors();
     }*/
-  if (m_level < 11) {
+  if (m_level < 13) {
     for (int i = 0; i < m_nbins_theta; ++i) {
       for (int j = 0; j < m_nbins_r; ++j) {
         m_children[i][j]->buildNeighborhood(levelNeighborhood);
@@ -196,18 +244,32 @@ void QuadTree::cleanHitsInNode()
 
 void QuadTree::clearTree()
 {
+  if (!m_filled)return;
+
   clearNode();
   if (checkFilled()) {
     for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
       for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
-        m_children[t_index][r_index]->clearTree();
+        if (m_children[t_index][r_index]) m_children[t_index][r_index]->clearTree();
       }
     }
   }
   m_filled = false;
+
+  if (m_level == 0) {
+    for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
+      for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
+        delete m_children[t_index][r_index];
+      }
+      delete[] m_children[t_index];
+    }
+    delete[] m_children;
+    m_children = nullptr;
+  }
+
 }
 
-void QuadTree::startFillingTree()
+void QuadTree::startFillingTree(bool returnCandidate, TrackCandidate* cand)
 {
   if (m_hits.size() < s_hitsThreshold) return;
   if (m_rMin * m_rMax >= 0 && fabs(m_rMin) > s_rThreshold && fabs(m_rMax) > s_rThreshold) return;
@@ -216,11 +278,32 @@ void QuadTree::startFillingTree()
 //    B2INFO("Candidate: " << m_rMin << "-" << m_rMax << "x" << m_thetaMin << "-" << m_thetaMax << "; nhits=" << m_hits.size());
 
     QuadTreeCandidateCreator::Instance().createCandidateDirect(this);
+
+    /*
+    if(!returnCandidate) QuadTreeCandidateCreator::Instance().createCandidateDirect(this);
+    else {
+      if(cand == nullptr){
+        cleanHitsInNode();
+        std::vector<QuadTree*> nodeList;
+        nodeList.push_back(this);
+        cand = new TrackCandidate(nodeList);
+      } else if(cand->getTrackHits().size() < getHits().size()){
+        delete cand;
+
+        cleanHitsInNode();
+        std::vector<QuadTree*> nodeList;
+        nodeList.push_back(this);
+        cand = new TrackCandidate(nodeList);
+      }
+    }*/
+
     return;
   }
 
+  if (m_children == nullptr) initializeChildren();
+
+
   if (!checkFilled()) fillChildren();
-//  else cleanHitsInNode();
 
 
 
@@ -233,7 +316,7 @@ void QuadTree::startFillingTree()
   for (int bin_loop = 0; bin_loop < m_nbins_theta * m_nbins_r; bin_loop++) {
     int t_index = 0;
     int r_index = 0;
-    double max_value_temp = 0;
+    float max_value_temp = 0;
     for (int t_index_temp = 0; t_index_temp < m_nbins_theta; ++t_index_temp) {
       for (int r_index_temp = 0; r_index_temp < m_nbins_r; ++r_index_temp) {
         if ((max_value_temp  < m_children[t_index_temp][r_index_temp]->getNHits()) && (!binUsed[t_index_temp][r_index_temp])) {
@@ -246,6 +329,7 @@ void QuadTree::startFillingTree()
 
     binUsed[t_index][r_index] = true;
 
+    m_children[t_index][r_index]->cleanHitsInNode();
     m_children[t_index][r_index]->startFillingTree();
 
   }
@@ -254,10 +338,10 @@ void QuadTree::startFillingTree()
 void QuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>& hits*/)
 {
 
-  double r_temp, r_1, r_2;
+  float r_temp, r_1, r_2;
 
-  double dist_1[m_nbins_theta + 1][m_nbins_r + 1];
-  double dist_2[m_nbins_theta + 1][m_nbins_r + 1];
+  float dist_1[m_nbins_theta + 1][m_nbins_r + 1];
+  float dist_2[m_nbins_theta + 1][m_nbins_r + 1];
 
   //B2DEBUG(100, "VOTING");
 
@@ -279,8 +363,19 @@ void QuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>& hits*/)
                  hit->getConformalY() * s_sin_theta[m_thetaBin[t_index]];
         hit->setRValue(m_thetaBin[t_index], r_temp);
       }*/
+
+      /*
       r_temp = hit->getConformalX() * s_cos_theta[m_thetaBin[t_index]] +
                hit->getConformalY() * s_sin_theta[m_thetaBin[t_index]];
+      */
+
+      // for bin overlapping!
+      if (t_index < m_nbins_theta)
+        r_temp = hit->getConformalX() * s_cos_theta[m_children[t_index][0]->getThetaMin()] +
+                 hit->getConformalY() * s_sin_theta[m_children[t_index][0]->getThetaMin()];
+      else
+        r_temp = hit->getConformalX() * s_cos_theta[m_children[t_index - 1][0]->getThetaMax()] +
+                 hit->getConformalY() * s_sin_theta[m_children[t_index - 1][0]->getThetaMax()];
 
 
 //      r_temp = CDCLegendreConformalPosition::InstanceTrusted().getConformalR(hit->getLayerId(), hit->getWireId(), m_thetaBin[t_index]);

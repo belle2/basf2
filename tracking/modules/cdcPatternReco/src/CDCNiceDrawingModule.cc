@@ -48,16 +48,25 @@ CDCNiceDrawingModule::CDCNiceDrawingModule() : Module()
            "Controls, whether MC signal is draw", false);
 
   addParam("DrawCands", m_drawCands,
-           "Controls, whether Track Candidates or Tracks are drawn", false);
+           "Controls, whether Track Candidates or Tracks are drawn (not used at the moment!)", false);
 
   addParam("MCParticlesColName", m_mcParticlesColName,
            "MCParticles collection name", std::string("MCParticles"));
+
+  addParam("MCTrackCandColName", m_MCTrackCandColName, "MC Genfit Track candidate collection",
+           std::string("MCTrackCands"));
+
+  addParam("DrawAlsoDifference", m_drawAlsoDifference, "Draw also pictures with the differences between MC and Candidates", false);
 
 }
 
 void CDCNiceDrawingModule::initialize()
 {
-  m_cdcLegendreNiceDrawing = new NiceDrawing(m_TrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory, m_drawMCSignal, m_drawCands, m_mcParticlesColName);
+  if (m_drawAlsoDifference) {
+    m_cdcLegendreNiceDrawing = new NiceDrawing(m_TrackCandColName, m_MCTrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory, m_drawMCSignal, m_drawCands, m_mcParticlesColName);
+  } else {
+    m_cdcLegendreNiceDrawing = new NiceDrawing(m_TrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory, m_drawMCSignal, m_drawCands, m_mcParticlesColName);
+  }
 
   m_cdcLegendreNiceDrawing->initialize();
 
@@ -65,9 +74,7 @@ void CDCNiceDrawingModule::initialize()
 
 void CDCNiceDrawingModule::event()
 {
-
-  m_cdcLegendreNiceDrawing->event();
-
+  m_cdcLegendreNiceDrawing->event(m_drawAlsoDifference);
 }
 
 CDCNiceDrawingModule::~CDCNiceDrawingModule()

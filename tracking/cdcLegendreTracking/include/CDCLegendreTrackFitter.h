@@ -10,10 +10,18 @@
 
 #pragma once
 
+
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/SensorInfoBase.h>
+
 
 #include <framework/datastore/StoreArray.h>
+#include "genfit/TrackCand.h"
+#include "genfit/Track.h"
+
 
 #include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -91,6 +99,24 @@ namespace Belle2 {
       void fitTrackCandidateFast(
         TrackCandidate* track,
         bool with_drift_time = false);
+
+      void performRiemannFit(TrackCandidate* track);
+
+
+      /**
+       * @brief Perform polar angle estimation basing on stereohits added to the candidate
+       */
+      void estimatePolarAngle(TrackCandidate* track);
+
+      /**
+       * @brief Function for fitting TrackCandidate with given SVDClusters
+       */
+      bool fitTrackCandWithSVD(TrackCandidate* track, /*std::vector<SVDCluster*>& svdClusters*/ const genfit::TrackCand* vxdTrack);
+
+      /**
+       * @brief Function for fitting TrackCandidate with given genfit::Track
+       */
+      void fitTrackCandWithTrack(TrackCandidate* track, /*std::vector<SVDCluster*>& svdClusters*/  genfit::Track* vxdTrack);
 
       /** Simple fitter which perform stepped fitting in normal space, not the best choice in sense of performance */
       void fitTrackCandidateNormalSpace(

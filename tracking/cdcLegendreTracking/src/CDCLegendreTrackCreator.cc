@@ -123,9 +123,9 @@ TrackCandidate* TrackCreator::createLegendreTracklet(std::vector<TrackHit*>& hit
 
   processTrack(trackCandidate, m_trackList);
 
-  for (TrackHit * hit : trackCandidate->getTrackHits()) {
-    hit->setHitUsage(TrackHit::not_used);
-  }
+//  for (TrackHit * hit : trackCandidate->getTrackHits()) {
+//    hit->setHitUsage(TrackHit::not_used);
+//  }
 
   trackCandidate->setCandidateType(TrackCandidate::tracklet);
 
@@ -152,16 +152,16 @@ TrackCandidate* TrackCreator::createLegendreStereoTracklet(std::vector<QuadTree*
 void TrackCreator::appendNewHits(TrackCandidate* track)
 {
   if (not m_appendHits) return;
-  double x0_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
-  double y0_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
-  double R = fabs(1. / track->getR());
+  double x0_track = track->getXc();
+  double y0_track = track->getYc();
+  double R = track->getRadius();
 
   for (TrackHit * hit : m_AxialHitList) {
     if (hit->getHitUsage() != TrackHit::used_in_track || hit->getHitUsage() != TrackHit::background) {
       double x0_hit = hit->getOriginalWirePosition().X();
       double y0_hit = hit->getOriginalWirePosition().Y();
       double dist = fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength();
-      if (dist < hit->getDriftLength() * 0.75) track->addHit(hit);
+      if (dist < hit->getSigmaDriftLength() * 2.) track->addHit(hit);
     }
   }
 }
@@ -182,6 +182,8 @@ void TrackCreator::processTrack(TrackCandidate* trackCandidate, std::list<TrackC
 
     PatternChecker cdcLegendrePatternChecker(this);
     cdcLegendrePatternChecker.checkCandidate(trackCandidate);
+
+    m_cdcLegendreTrackDrawer->showPicture();
 
   }
 
@@ -234,12 +236,12 @@ void TrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColName)
     std::copy(m_stereoTrackletList.begin(), m_stereoTrackletList.end(), std::back_inserter(completeTracksList));
   */
   for (TrackCandidate * trackCand : m_trackList) {
-//    if (trackCand->getNHits() == 0) continue;
+//    if (trackCand->getTrackHits().size() == 0) continue;
     if (trackCand->getTrackHits().size() < 5) continue;
 //    B2INFO("Number of hits: " << trackCand->getNHits());
     gfTrackCandidates.appendNew();
     std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCand, ref_point_temp);
+//    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCand, ref_point_temp);
 
 
     //set the values needed as start values for the fit in the genfit::TrackCandidate from the CDCTrackCandidate information

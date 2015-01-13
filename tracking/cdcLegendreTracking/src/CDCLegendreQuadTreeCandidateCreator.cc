@@ -140,8 +140,6 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
   TrackCandidate* trackCandidate;
   if (AxialVsStereo >= 0) {
     trackCandidate = s_cdcLegendreTrackCreator->createLegendreTrackCandidate(nodeList);
-    PatternChecker cdcLegendrePatternChecker(s_cdcLegendreTrackCreator);
-    cdcLegendrePatternChecker.checkCandidate(trackCandidate);
 
     s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
 //    trackCandidate->clearBadHits();
@@ -195,7 +193,22 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
     }
   }
 
-  s_cdcLegendreTrackMerger->extendTracklet(trackCandidate, hitsToProcess/*s_axialHits*/);
+
+  if (trackCandidate->getPt() < 0.9) s_cdcLegendreTrackMerger->tryToMergeTrack(trackCandidate);
+
+
+  SimpleFilter m_cdcLegendreSimpleFilter;
+  m_cdcLegendreSimpleFilter.processTracks(s_cdcLegendreTrackCreator->getTrackList());
+  for (TrackCandidate * cand : s_cdcLegendreTrackCreator->getTrackList()) {
+    s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+  }
+  m_cdcLegendreSimpleFilter.appenUnusedHits(s_cdcLegendreTrackCreator->getTrackList(), s_axialHits);
+
+  PatternChecker cdcLegendrePatternChecker(s_cdcLegendreTrackCreator);
+  cdcLegendrePatternChecker.checkCandidate(trackCandidate);
+
+
+//  s_cdcLegendreTrackMerger->extendTracklet(trackCandidate, /*hitsToProcess*/ s_axialHits);
 
 
 

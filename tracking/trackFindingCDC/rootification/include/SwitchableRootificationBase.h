@@ -17,7 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/pybasf2/PyStoreArray.h>
 
-#include <tracking/trackFindingCDC/config/CDCLocalTrackingConfig.h>
+#include <tracking/trackFindingCDC/config/CompileConfiguration.h>
 
 #include <TObject.h>
 #include <TClass.h>

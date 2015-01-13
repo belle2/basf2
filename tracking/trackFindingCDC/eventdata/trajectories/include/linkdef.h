@@ -1,6 +1,6 @@
 #ifdef __CINT__
 
-#include <tracking/trackFindingCDC/config/CDCLocalTrackingConfig.h>
+#include <tracking/trackFindingCDC/config/CompileConfiguration.h>
 
 #pragma link off all globals;
 #pragma link off all classes;

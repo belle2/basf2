@@ -13,7 +13,7 @@
 
 
 #include <framework/datastore/RelationsObject.h>
-#include <tracking/trackFindingCDC/config/CDCLocalTrackingConfig.h>
+#include <tracking/trackFindingCDC/config/CompileConfiguration.h>
 
 
 namespace Belle2 {

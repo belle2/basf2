@@ -32,7 +32,6 @@ namespace Belle2 {
      * This class is mainly used to descripe the cdc wires with as few parameters as possible and
      * simplifies the retrival of the two dimensional track reference position, which is taken at
      * the closest approach to the beam z-axes.
-     * @ingroup cdclocaltracking
      * @brief A three dimensional limited line
      *
      */

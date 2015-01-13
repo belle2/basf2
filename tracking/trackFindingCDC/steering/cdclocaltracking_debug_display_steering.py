@@ -5,7 +5,7 @@ import sys
 import os
 from optparse import OptionParser
 
-import cdclocaltracking.cdcdisplay as cdcdisplay
+import trackfindingcdc.cdcdisplay as cdcdisplay
 
 # Setup the options parser
 usage = \
@@ -113,8 +113,8 @@ else:
     main.add_module(geometry)
 
 # Add the tracking module
-cdclocaltracking = register_module('CDCLocalTracking')
-main.add_module(cdclocaltracking)
+trackfindingcdc = register_module('CDCLocalTracking')
+main.add_module(trackfindingcdc)
 
 # Maybe view other track finders
 # trasan = register_module('Trasan')

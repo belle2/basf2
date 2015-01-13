@@ -14,8 +14,8 @@ import argparse
 
 import basf2
 import simulation
-import cdclocaltracking.tools as tools
-from cdclocaltracking.tools import is_iterable_collection
+import trackfindingcdc.tools as tools
+from trackfindingcdc.tools import is_iterable_collection
 
 
 def main():
@@ -26,15 +26,15 @@ def main():
     -------
     Execute 
 
-    >>> python -m cdclocaltracking.event_generation mc.root 
+    >>> python -m trackfindingcdc.event_generation mc.root 
     
     to generate 100 events with 10 midrange momentum muons per event (default parameters).
 
-    >>> python -m cdclocaltracking.event_generation -n 1000 -g generic mc.root 
+    >>> python -m trackfindingcdc.event_generation -n 1000 -g generic mc.root 
 
     To find out the command line arguments execute
 
-    >>> python -m cdclocaltracking.event_generation 
+    >>> python -m trackfindingcdc.event_generation 
     """
 
     argument_parser = create_argument_parser(allow_file_input=False)

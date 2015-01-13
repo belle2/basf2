@@ -8,8 +8,8 @@ import basf2
 basf2.set_log_level(basf2.LogLevel.INFO)
 # basf2.set_random_seed(12345)
 
-import cdclocaltracking.cdcdisplay as cdcdisplay
-import cdclocaltracking.event_generation as event_generation
+import trackfindingcdc.cdcdisplay as cdcdisplay
+import trackfindingcdc.event_generation as event_generation
 
 
 def main():

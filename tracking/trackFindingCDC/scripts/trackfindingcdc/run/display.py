@@ -5,7 +5,7 @@ import logging
 
 from tracking.run.event_generation import ReadOrGenerateEventsRun
 
-import cdclocaltracking.cdcdisplay as cdcdisplay
+import trackfindingcdc.cdcdisplay as cdcdisplay
 
 
 class CDCDisplayRun(ReadOrGenerateEventsRun):

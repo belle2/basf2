@@ -18,7 +18,7 @@ Its purpose is mainly to asure the programmer that his assumptions about run tim
 
 using namespace std;
 
-TEST(CDCLocalTrackingTest, cpp_float)
+TEST(TrackFindingCDCTest, cpp_float)
 {
   EXPECT_TRUE(std::signbit(-0.0));
   EXPECT_FALSE(std::signbit(0.0));
@@ -26,7 +26,7 @@ TEST(CDCLocalTrackingTest, cpp_float)
 }
 
 
-TEST(CDCLocalTrackingTest, cpp_max)
+TEST(TrackFindingCDCTest, cpp_max)
 {
   float value = 1.0;
   double maximum = std::max(NAN, value);

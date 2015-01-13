@@ -135,7 +135,7 @@ namespace {
 
 
 
-TEST(CDCLocalTrackingTest, fitting_ExtendedRiemannsMethod_GeneralCircleFit_NoDriftLength)
+TEST(TrackFindingCDCTest, fitting_ExtendedRiemannsMethod_GeneralCircleFit_NoDriftLength)
 {
   const CDCFitter2D<ExtendedRiemannsMethod> fitter;
   CDCTrajectory2D trajectory2D = testGeneralCircleFitter(fitter, false);
@@ -168,14 +168,14 @@ TEST(CDCLocalTrackingTest, fitting_ExtendedRiemannsMethod_GeneralCircleFit_NoDri
 
 
 
-TEST(CDCLocalTrackingTest, fitting_ExtendedRiemannsMethod_GeneralCircleFit_WithDriftLengths)
+TEST(TrackFindingCDCTest, fitting_ExtendedRiemannsMethod_GeneralCircleFit_WithDriftLengths)
 {
   const CDCFitter2D<ExtendedRiemannsMethod> fitter;
   testGeneralCircleFitter(fitter, true);
 }
 
 
-TEST(CDCLocalTrackingTest, fitting_RiemannsMethod_GeneralCircleFit_WithDriftLengths)
+TEST(TrackFindingCDCTest, fitting_RiemannsMethod_GeneralCircleFit_WithDriftLengths)
 {
   const CDCFitter2D<RiemannsMethod> fitter;
   testGeneralCircleFitter(fitter, true);
@@ -183,7 +183,7 @@ TEST(CDCLocalTrackingTest, fitting_RiemannsMethod_GeneralCircleFit_WithDriftLeng
 
 
 
-TEST(CDCLocalTrackingTest, fitting_CDCRiemannFitter_CircleFit_NoDriftLength)
+TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_CircleFit_NoDriftLength)
 {
   CDCRiemannFitter fitter = CDCRiemannFitter::getFitter();
   testGeneralCircleFitter(fitter, false);
@@ -191,7 +191,7 @@ TEST(CDCLocalTrackingTest, fitting_CDCRiemannFitter_CircleFit_NoDriftLength)
 
 
 
-TEST(CDCLocalTrackingTest, fitting_CDCKarimakiFitter_CircleFit_NoDriftLength)
+TEST(TrackFindingCDCTest, fitting_CDCKarimakiFitter_CircleFit_NoDriftLength)
 {
   CDCKarimakiFitter fitter = CDCKarimakiFitter::getFitter();
   fitter.useOnlyPosition();
@@ -200,14 +200,14 @@ TEST(CDCLocalTrackingTest, fitting_CDCKarimakiFitter_CircleFit_NoDriftLength)
 
 
 
-TEST(CDCLocalTrackingTest, fitting_CDCRiemannFitter_LineFit_WithDriftLength)
+TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_LineFit_WithDriftLength)
 {
   CDCRiemannFitter fitter = CDCRiemannFitter::getLineFitter();
   testLineFitter(fitter);
 }
 
 
-TEST(CDCLocalTrackingTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
+TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
 {
 
   const std::vector<TrackFinderCDCLegendre::TrackHit*> legendreTrackHits;
@@ -225,7 +225,7 @@ TEST(CDCLocalTrackingTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
 
 
 
-TEST(CDCLocalTrackingTest, fitting_SIMPLE_DRIFT_LENGTH_VARIANCE_isConsistent)
+TEST(TrackFindingCDCTest, fitting_SIMPLE_DRIFT_LENGTH_VARIANCE_isConsistent)
 {
   CDC::SimpleTDCCountTranslator simpleTDCCountTranslator;
 

@@ -18,7 +18,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(CDCLocalTrackingTest, eventdata_trajectories_CDCBField_getBFieldZSign)
+TEST(TrackFindingCDCTest, eventdata_trajectories_CDCBField_getBFieldZSign)
 {
   BFieldMap& bFieldMap = BFieldMap::Instance();
 

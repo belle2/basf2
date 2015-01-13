@@ -18,7 +18,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(CDCLocalTrackingTest, geometry_HelixCovariance_perigeeCovariance)
+TEST(TrackFindingCDCTest, geometry_HelixCovariance_perigeeCovariance)
 {
   HelixCovariance helixCovariance;
   PerigeeCovariance perigeeCovariance = helixCovariance.perigeeCovariance();
@@ -30,7 +30,7 @@ TEST(CDCLocalTrackingTest, geometry_HelixCovariance_perigeeCovariance)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_HelixCovariance_constructFromPerigeeAndSZCovariance)
+TEST(TrackFindingCDCTest, geometry_HelixCovariance_constructFromPerigeeAndSZCovariance)
 {
   PerigeeCovariance perigeeCovariance;
   SZCovariance szCovariance;

@@ -22,7 +22,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(CDCLocalTrackingTest, numerics_sign)
+TEST(TrackFindingCDCTest, numerics_sign)
 {
   EXPECT_EQ(PLUS, sign(INFINITY));
   EXPECT_EQ(PLUS, sign(2));
@@ -46,7 +46,7 @@ TEST(CDCLocalTrackingTest, numerics_sign)
 }
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_isIncreasing)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_isIncreasing)
 {
 
   Vector2D lower(0.0, 1.0);
@@ -57,7 +57,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_isIncreasing)
 }
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_getIPeriodFromIHalfPeriod)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_getIPeriodFromIHalfPeriod)
 {
   Index iHalfPeriod = -1;
   Index iPeriod = SinEqLine::getIPeriodFromIHalfPeriod(iHalfPeriod);
@@ -65,7 +65,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_getIPeriodFromIHalfPeriod)
 }
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootInInterval_simple)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_simple)
 {
 
   // Simple sin.
@@ -81,7 +81,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootInInterval_simple)
 
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootInInterval_const)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_const)
 {
 
   // Constant sin.
@@ -96,7 +96,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootInInterval_const)
 }
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootInInterval_complex)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_complex)
 {
 
   // Setup a line that is a
@@ -115,7 +115,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootInInterval_complex)
 }
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfPeriod_simple)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfPeriod_simple)
 {
 
   // Setup a line that is a
@@ -133,7 +133,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalf
 }
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfPeriod)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfPeriod)
 {
 
   // Setup a line that is a
@@ -152,7 +152,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalf
 }
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeSmallestPositiveRoot)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot)
 {
 
   // Setup a line that is a
@@ -172,7 +172,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeSmallestPositiveRoot)
 
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeSmallestPositiveRoot_largeSlope)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot_largeSlope)
 {
 
   // Setup a line that is a
@@ -192,7 +192,7 @@ TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeSmallestPositiveRoot_largeS
 
 
 
-TEST(CDCLocalTrackingTest, numerics_SinEqLine_computeRootForLargeSlope)
+TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootForLargeSlope)
 {
   // Setup a line that is a
   FloatType rootX = 150.0 * Unit::deg;

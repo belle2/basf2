@@ -18,7 +18,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(CDCLocalTrackingTest, geometry_Helix_closest)
+TEST(TrackFindingCDCTest, geometry_Helix_closest)
 {
   // Tests the calculation of points of closest approach under various orientation of the helix.
   // Here this is done by moving the coordinate system and thereby changing the perigee point to different representations.

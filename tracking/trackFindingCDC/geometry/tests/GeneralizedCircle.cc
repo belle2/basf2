@@ -18,7 +18,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_Getters)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_Getters)
 {
   float absError = 10e-6;
 
@@ -45,7 +45,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_Getters)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_orientation)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_orientation)
 {
   GeneralizedCircle circle(1.0, 0.0, 0.0, 1.0);
   EXPECT_EQ(CCW, circle.orientation());
@@ -62,7 +62,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_orientation)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_closest)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
   Vector2D up(1.0, 2.0);
@@ -85,7 +85,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_closest)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_arcLengthFactor)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthFactor)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
   FloatType smallAngle = PI / 100;
@@ -100,7 +100,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_arcLengthFactor)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_arcLengthBetween)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
   Vector2D origin(0.0, 0.0);
@@ -137,7 +137,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_arcLengthBetween)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_passiveMoveBy)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_passiveMoveBy)
 {
   Vector2D center(4.0, 2.0);
   FloatType radius = 5.0;
@@ -153,7 +153,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_passiveMoveBy)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_intersections)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_intersections)
 {
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(Vector2D(1.0, 1.0), 1);
@@ -174,7 +174,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_intersections)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_atArcLength)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
 {
   FloatType radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -203,7 +203,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_atArcLength)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_isLine)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
 {
   FloatType radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -220,7 +220,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_isLine)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_isCircle)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isCircle)
 {
   FloatType radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
@@ -237,7 +237,7 @@ TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_isCircle)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_GeneralizedCircle_distance)
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_distance)
 {
   float absError = 10e-6;
 

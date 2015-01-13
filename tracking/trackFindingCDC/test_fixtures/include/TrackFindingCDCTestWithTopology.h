@@ -21,13 +21,13 @@ namespace Belle2 {
 
        Reminder: You can filter for specific test by running
 
-       $ test_tracking --gtest_filter="CDCLocalTrackingTest*"
+       $ test_tracking --gtest_filter="TrackFindingCDCTest*"
 
        which runs only CDCLocalTracking test (positiv match).
 
        Run
 
-       $ test_tracking --gtest_filter="-CDCLocalTrackingTest*"
+       $ test_tracking --gtest_filter="-TrackFindingCDCTest*"
 
        to exclude test with this fixture. Also consider
        test_tracking --help for more details

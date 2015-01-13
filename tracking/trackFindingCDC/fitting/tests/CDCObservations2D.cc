@@ -19,7 +19,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(CDCLocalTrackingTest, fitting_CDCObservations2D_centralize)
+TEST(TrackFindingCDCTest, fitting_CDCObservations2D_centralize)
 {
   CDCObservations2D observations;
 

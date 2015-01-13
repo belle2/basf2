@@ -21,7 +21,7 @@ using namespace TrackFindingCDC;
 
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_inheritance)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 {
 
   FloatType curvature = 1.0;
@@ -61,7 +61,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_inheritance)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_minimalPolarR)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalPolarR)
 {
   FloatType curvature = 1.0 / 2.0;
   FloatType tangtialPhi = PI / 4.0;
@@ -74,7 +74,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_minimalPolarR)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_maximalPolarR)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalPolarR)
 {
   FloatType curvature = 1.0 / 2.0;
   FloatType tangtialPhi = PI / 4.0;
@@ -89,7 +89,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_maximalPolarR)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_setCenterAndRadius)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
 {
   PerigeeCircle circle;
   Vector2D center(0.5, 0.0);
@@ -105,7 +105,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_setCenterAndRadius)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_distance)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
 {
 
   FloatType curvature = -1.;
@@ -138,7 +138,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_distance)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_setNull)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
 {
 
   PerigeeCircle defaultCircle;
@@ -229,7 +229,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_setNull)
 }
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_passiveMoveBy)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
 {
   Vector2D center(4.0, 2.0);
   FloatType radius = 5.0;
@@ -246,7 +246,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_passiveMoveBy)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_atArcLength)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
 {
   FloatType radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);

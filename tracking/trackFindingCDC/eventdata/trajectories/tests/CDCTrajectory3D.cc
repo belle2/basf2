@@ -18,7 +18,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(CDCLocalTrackingTest, eventdata_trajectories_CDCTrajectory3D_constructorPosMomCharge)
+TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosMomCharge)
 {
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
@@ -44,7 +44,7 @@ TEST(CDCLocalTrackingTest, eventdata_trajectories_CDCTrajectory3D_constructorPos
 
 
 
-TEST(CDCLocalTrackingTest, CDCTrajectory3D_clear)
+TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
 {
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);

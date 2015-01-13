@@ -17,7 +17,7 @@ Its purpose is mainly to asure the programmer that his assumptions about run tim
 
 #include <gtest/gtest.h>
 
-TEST(CDCLocalTrackingTest, root_TMatrixD)
+TEST(TrackFindingCDCTest, root_TMatrixD)
 {
   TMatrixD jacobian(2, 2);
   jacobian(0, 0) = 0;

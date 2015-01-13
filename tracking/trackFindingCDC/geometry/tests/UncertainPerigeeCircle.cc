@@ -20,7 +20,7 @@ using namespace TrackFindingCDC;
 
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_passiveMoveByJacobian)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 {
   UncertainPerigeeCircle circle(1.0, -PI / 2, 0);
 
@@ -68,7 +68,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 {
   TMatrixDSym perigeeVariance(3);
   perigeeVariance(0, 0) = 1.0;
@@ -175,7 +175,7 @@ TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 
 
 
-TEST(CDCLocalTrackingTest, geometry_PerigeeCircle_passiveMove)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMove)
 {
 
   TMatrixDSym perigeeVariance(3);

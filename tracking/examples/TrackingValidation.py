@@ -9,9 +9,9 @@
   simulated events. This can speed up the development process allows for an easier reproducibility
   in single events.
 
-  Example to run only the CDCLocalTracking:
+  Example to run only the cellular automaton track finder in the CDC:
 
-  python tracking/examples/TrackingValidation.py -i <input.root> -o <output.root> -m CDCLocalTracking
+  python tracking/examples/TrackingValidation.py -i <input.root> -o <output.root> -m TrackFinderCDCAutomaton
 
   Example to run the full reconstruction:
 
@@ -72,7 +72,7 @@ def main():
                                  nargs="?", default="TrackingValidation.root",
                                  help='Name of the output file used to store the validation plots.')
 
-    argument_parser.add_argument('-m', '--module', type=str, choices=['CDCLocalTracking', 'CDCLegendreTracking', 'FullReco'],
+    argument_parser.add_argument('-m', '--module', type=str, choices=['TrackFinderCDCAutomaton', 'CDCLegendreTracking', 'FullReco'],
                                  default='FullReco',
                                  help='Track finding module or FullReco for the full reconstruction chain.')
 

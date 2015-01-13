@@ -166,10 +166,18 @@ namespace Belle2 {
 
       vecD.SetXYZ(vecA); // reset
 
-// //     EXPECT_DOUBLE_EQ( 2.* vecA, vecA + vecA);
-// //     EXPECT_DOUBLE_EQ( vecA * 2., vecA + vecA);
-// //     EXPECT_DOUBLE_EQ( tVecA + tVecA, vecA + vecA);
-      EXPECT_DOUBLE_EQ(tVecA * tVecA, vecA * vecA);
+      B2INFO("vecA: " + vecA.PrintString());
+      B2INFO("vecA+vecA: " + (vecA + vecA).PrintString());
+      B2INFO("2.*vecA: " + (2. * vecA).PrintString());
+
+      EXPECT_EQ(2. * vecA, vecA + vecA);
+      EXPECT_EQ(vecA * 2., vecA + vecA);
+      EXPECT_EQ(-1.* vecA, -vecA);
+
+      EXPECT_EQ(0.5 * vecA, 0.5 * tVecA);
+      EXPECT_EQ(tVecA + tVecA, vecA + vecA);
+      EXPECT_EQ(tVecA * tVecA, vecA * vecA);
+      EXPECT_EQ(-tVecA, -vecA);
 
     }
 

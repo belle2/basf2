@@ -208,7 +208,7 @@ namespace Belle2 {
     /**  Addition of 3-vectors. */
     B2Vector3<DataType> operator + (const B2Vector3<DataType>& b) const {
 //    return std::move(B2Vector3<DataType>(X() + X(), Y() + Y(), Z() + b.Z())); // C++11-version
-      return B2Vector3<DataType>(X() + X(), Y() + Y(), Z() + b.Z());
+      return B2Vector3<DataType>(X() + b.X(), Y() + b.Y(), Z() + b.Z());
     }
 
 
@@ -689,6 +689,33 @@ namespace Belle2 {
 //    b << m_coordinates;
 //    }
 //  }
+
+    /** create a string containing vectorParameters */
+    std::string PrintString() const {
+      return
+        name() +
+        "(x,y,z)=(" +
+        std::to_string(X()) +
+        "," +
+        std::to_string(Y()) +
+        "," +
+        std::to_string(Z()) +
+        ") (rho, theta, phi)=(" +
+        std::to_string(Mag()) +
+        "," +
+        std::to_string(Theta() * TMath::RadToDeg()) +
+        "," +
+        std::to_string(Phi() * TMath::RadToDeg()) +
+        ")";
+    }
+
+    /** just for backward compatibility */
+    void Print() {
+      {
+        //print vector parameters
+        Printf(PrintString().c_str());
+      }
+    }
   }; //B2Vector3 - end
 
 

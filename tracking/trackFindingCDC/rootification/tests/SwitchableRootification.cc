@@ -29,7 +29,7 @@ using namespace TrackFindingCDC;
 #ifdef TRACKFINDINGCDC_USE_ROOT
 
 template <typename T>
-class CDCLocalTrackingRootificationTest : public TrackFindingCDCTestWithTopology {;};
+class TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {;};
 
 typedef ::testing::Types <
 Vector2D
@@ -45,9 +45,9 @@ Vector2D
 > RootifiedTypes;
 
 
-TYPED_TEST_CASE(CDCLocalTrackingRootificationTest, RootifiedTypes);
+TYPED_TEST_CASE(TrackFindingCDCTestRootification, RootifiedTypes);
 
-TYPED_TEST(CDCLocalTrackingRootificationTest, rootification_UsableAsStoreObject)
+TYPED_TEST(TrackFindingCDCTestRootification, rootification_UsableAsStoreObject)
 {
 
   DataStore& datastore = DataStore::Instance();

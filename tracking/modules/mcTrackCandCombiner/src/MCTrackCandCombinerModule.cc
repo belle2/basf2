@@ -48,13 +48,11 @@ MCTrackCandCombinerModule::MCTrackCandCombinerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //Parameter definition
-  //addParam("UseClusters", m_useClusters, "Set true if you want to use PXD/SVD clusters instead of PXD/SVD trueHits", bool(false));
   addParam("CDCTrackCandidatesColName", m_cdcTrackCandColName, "Name of collection holding the genfit::TrackCandidates from CDC track finding (input)", string(""));
   addParam("VXDTrackCandidatesColName", m_vxdTrackCandColName, "Name of collection holding the genfit::TrackCandidates from VXD track finding(input)", string(""));
   addParam("OutputTrackCandidatesColName", m_combinedTrackCandColName, "Name of collection holding the combined genfit::TrackCandidates (output)", string(""));
   addParam("HitsRatio", m_hitsRatio, "minimal ratio of hits belonging to one MCParticle to declare a track candidate coming from this MCParticle", 0.6);
-  addParam("InsertCorrectPDGCode", m_addMcInfo, "set the correct PDG code from the MCParticle in the output track candidates", true);
-//  addParam("UseClusters", m_useClusters, "Set true if you want to use PXD/SVD clusters instead of PXD/SVD trueHits", bool(false));
+  addParam("InsertCorrectPDGCode", m_useMCpdg, "set the correct PDG code from the MCParticle in the output track candidates", false);
 }
 
 
@@ -264,49 +262,34 @@ void MCTrackCandCombinerModule::event()
     //easiest case; no curler finding yet
     B2DEBUG(100, "The track caused by MCParticle with index " << iPart << " and PDG code " << truePdgCode << " that has p = " << aMcParticle->getMomentum().Mag() << " GeV and θ = " << aMcParticle->getMomentum().Theta() * 180 / TMath::Pi() << "° was found by at least one track finder.");
     B2DEBUG(100, "goodVxdCands.size() " << goodVxdCands.size() << " goodCdcCands.size() " << goodCdcCands.size());
-    if (goodVxdCands.size() == 1 and goodCdcCands.size() == 1) { //from one mcparticle we have one tc in vxd and one in cdc
-      genfit::TrackCand* combinedTrackCand = outCands.appendNew();
-      (*combinedTrackCand) = *(goodVxdCands[0]);
-      if (m_addMcInfo) {
-        combinedTrackCand->setMcTrackId(iPart);
-        combinedTrackCand->setPdgCode(truePdgCode);
+
+    // Build the final track candidate for the output array.
+    genfit::TrackCand* combinedTrackCand = 0;
+    if (goodVxdCands.size() == 1) {
+      combinedTrackCand = outCands.appendNew(*(goodVxdCands[0]));
+
+      if (goodCdcCands.size() == 1) {
+        int nCdcCandHits = goodCdcCands[0]->getNHits();
+        for (int i = 0 ; i != nCdcCandHits; ++i) {
+          combinedTrackCand->addHit(goodCdcCands[0]->getHit(i)->clone());
+        }
+        B2DEBUG(100, "combined 2 TCs into one");
+      } else {
+        B2DEBUG(100, "copy one TC to the output that had only hits in the VXD but non in the CDC");
+        ++m_nVxdTcsWithoutPartner;
       }
 
-      //combinedTrackCand.append(*(goodCdcCands[0])); // append does not work with the store array because it does not make a deep copy of the trackCandHtis (this is fixed in genfit version 978
+    } else if (goodCdcCands.size() == 1) {
+      combinedTrackCand = outCands.appendNew(*(goodCdcCands[0]));
 
-      int nCdcCandHits = goodCdcCands[0]->getNHits();
-      int detId = -1;
-      int hitId = -1;
-      int planeId = -1;
-      double rho = -1;
-      for (int i = 0 ; i not_eq nCdcCandHits; ++i) {
-        goodCdcCands[0]->getHit(i, detId, hitId, rho);
-        combinedTrackCand->addHit(detId, hitId, planeId, rho);
-      }
-      B2DEBUG(100, "combined 2 TCs to one")
-    }
-
-    if (goodVxdCands.size() == 1 and goodCdcCands.size() == 0) {
-      genfit::TrackCand* combinedTrackCand = outCands.appendNew();
-      (*combinedTrackCand) = *(goodVxdCands[0]);
-      if (m_addMcInfo) {
-        combinedTrackCand->setMcTrackId(iPart);
-        combinedTrackCand->setPdgCode(truePdgCode);
-      }
-      B2DEBUG(100, "copy one TC to the output that had only hits in the VXD but non in the CDC")
-      ++m_nVxdTcsWithoutPartner;
-    }
-
-    if (goodVxdCands.size() == 0 and goodCdcCands.size() == 1) {
-      genfit::TrackCand* combinedTrackCand = outCands.appendNew();
-      (*combinedTrackCand) = *(goodCdcCands[0]);
-      if (m_addMcInfo) {
-        combinedTrackCand->setMcTrackId(iPart);
-        combinedTrackCand->setPdgCode(truePdgCode);
-      }
-      B2DEBUG(100, "copy one TC to the output that had only hits in the CDC but non in the VXD")
+      B2DEBUG(100, "copy one TC to the output that had only hits in the CDC but non in the VXD");
       ++m_nCdcTcsWithoutPartner;
     }
+
+    // Add MC info.
+    combinedTrackCand->setMcTrackId(iPart);
+    if (m_useMCpdg)
+      combinedTrackCand->setPdgCode(truePdgCode);
 
   }//end loop over MCParticles
 

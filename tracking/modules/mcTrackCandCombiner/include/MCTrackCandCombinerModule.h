@@ -88,6 +88,6 @@ namespace Belle2 {
     int m_nOutputTcs;                             /**< total number of output TCs created by the module */
     int m_nCdcTcsWithoutPartner;                  /**< total number of output TCs that have only hits in the CDC */
     int m_nVxdTcsWithoutPartner;                  /**< total number of output TCs that have only hits in the VXD */
-    bool m_addMcInfo;                             /**< if true the correct PDG code from the MCParticle and the MCParticleID will be put in the output track candidates*/
+    bool m_useMCpdg;                             /**< if true the correct PDG code from the MCParticle and the MCParticleID will be put in the output track candidates*/
   };
 }

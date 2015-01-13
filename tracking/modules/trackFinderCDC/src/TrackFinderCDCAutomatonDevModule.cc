@@ -68,14 +68,14 @@ void TrackFinderCDCAutomatonDevModule::initialize()
 #endif
 }
 
-void  TrackFinderCDCAutomatonDevModule::beginRun()
+void TrackFinderCDCAutomatonDevModule::beginRun()
 {
   TrackFinderCDCBaseModule::beginRun();
 }
 
-void  TrackFinderCDCAutomatonDevModule::event()
+void TrackFinderCDCAutomatonDevModule::event()
 {
-  B2DEBUG(100, "########## CDCLocalTracking begin ##########");
+  B2DEBUG(100, "########## TrackFinderCDCAutomatonDevModule begin ##########");
 
 #ifdef TRACKFINDINGCDC_USE_MC_INFORMATION
   CDCMCManager::getInstance().clear();
@@ -115,16 +115,16 @@ void  TrackFinderCDCAutomatonDevModule::event()
   CALLGRIND_STOP_INSTRUMENTATION;
 #endif
 
-  B2DEBUG(100, "########## CDCLocalTracking end ############");
+  B2DEBUG(100, "########## TrackFinderCDCAutomatonDevModule end ############");
 
 }
 
-void  TrackFinderCDCAutomatonDevModule::endRun()
+void TrackFinderCDCAutomatonDevModule::endRun()
 {
   TrackFinderCDCBaseModule::endRun();
 }
 
-void  TrackFinderCDCAutomatonDevModule::terminate()
+void TrackFinderCDCAutomatonDevModule::terminate()
 {
   if (m_param_runSecondStage) {
     //m_segmentTripleTrackingWorker.terminate();

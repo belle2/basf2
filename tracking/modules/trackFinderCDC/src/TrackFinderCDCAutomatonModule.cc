@@ -55,7 +55,7 @@ void TrackFinderCDCAutomatonModule::beginRun()
 
 void TrackFinderCDCAutomatonModule::event()
 {
-  B2DEBUG(100, "########## CDCLocalTracking begin ##########");
+  B2DEBUG(100, "########## TrackFinderCDCAutomaton begin ##########");
 
   // Load the hits from the DataStore into the CDCWireHitTopology.
   TrackFinderCDCBaseModule::event();
@@ -73,7 +73,7 @@ void TrackFinderCDCAutomatonModule::event()
   // m_segmentTripleTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
   m_segmentPairTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
 
-  B2DEBUG(100, "########## CDCLocalTracking end ############");
+  B2DEBUG(100, "########## TrackFinderCDCAutomaton end ############");
 }
 
 void TrackFinderCDCAutomatonModule::endRun()

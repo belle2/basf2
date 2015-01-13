@@ -14,6 +14,8 @@
 
 #include <array>
 
+#include <tracking/vectorTools/B2Vector3.h> // gradually moving to B2Vector3 instead of TVector3
+
 #include <TVector3.h>
 #include <TFile.h>
 #include <TTree.h>
@@ -98,6 +100,18 @@ namespace Belle2 {
       std::array<std::vector<double>, c_nPlanes> MisMatchMomZ; /**< Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
     };
 
+    /**
+    * struct for easier handling of getting U- & V-position of SpacePoints and some difficulties that arise within this task.
+    */
+    struct TaggedUVPos {
+      bool m_setU; /**< indicator if U is set */
+      bool m_setV; /**< indicator if V is set */
+      double m_U; /**< U-position */
+      double m_V; /**< V-position */
+
+      TaggedUVPos() : m_setU(false), m_setV(false), m_U(0.), m_V(0.) {} /**< default constructor initializes both bools to false and both doubles to 0. */
+    };
+
   protected:
 
     bool m_PARAMsplitCurlers; /**< indicating if the SpacePointTrackCands should only be analyzed for curling behaviour, or analyzed and split into TrackCand Stubs */
@@ -118,7 +132,7 @@ namespace Belle2 {
 
     bool m_saveCompleteCurler; /**< set to true if all parts of a curling TrackCand should be stored in a separate StoreArray (no parameter!) */
 
-    TVector3 m_origin; /**< origin used internally (set from user set value) */
+    Belle2::B2Vector3<SpacePoint::SpBaseType> m_origin; /**< origin used internally (set from user set value) */
 
     int m_spacePointTCCtr; /**< Counter for presented SpacePointTrackCands */
 
@@ -127,6 +141,8 @@ namespace Belle2 {
     int m_createdTrackStubsCtr; /**< Counter for created TrackCand Stubs by splitting a SpacePointTrackCand */
 
     int m_noDecisionPossibleCtr; /**< Counter for TrackCands where a decision if curling or not is not possible */
+
+    int m_NoSingleTrueHitCtr; /**< Counter for SpacePoints that relate to more than one TrueHit */
 
     void initializeCounters(); /**< initialize all counters to 0 for avoiding undeterministic behaviour. */
 
@@ -139,7 +155,8 @@ namespace Belle2 {
      * Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
      */
     template<class TrueHit>
-    std::pair<const TVector3, const TVector3> getGlobalPositionAndMomentum(TrueHit* aTrueHit);
+    std::pair<const Belle2::B2Vector3<SpacePoint::SpBaseType>, const Belle2::B2Vector3<SpacePoint::SpBaseType> >
+    getGlobalPositionAndMomentum(TrueHit* aTrueHit);
 
     /**
      * Split a culring track candidate into (up to NTracklets) tracklets
@@ -148,7 +165,7 @@ namespace Belle2 {
     splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices);
 
     /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
-    bool getDirectionOfFlight(const std::pair<const TVector3, const TVector3>& hitPosAndMom, const TVector3 origin);
+    bool getDirectionOfFlight(const std::pair<const Belle2::B2Vector3<SpacePoint::SpBaseType>, const Belle2::B2Vector3<SpacePoint::SpBaseType>>& hitPosAndMom, const Belle2::B2Vector3<SpacePoint::SpBaseType> origin);
 
     /**
      * Exception for case when no TrueHit can be found for a Cluster
@@ -208,7 +225,8 @@ namespace Belle2 {
     std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomY; /**< Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
     std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomZ; /**< Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
 
-    std::pair<double, double> getUV(const Belle2::SpacePoint* spacePoint); /**< get U&V for a SpacePoint (via its relation to Clusters) (SpacePoint can only return normalized U&V coordinates) */
+    /** get U&V for a SpacePoint (via its relation to Clusters) (SpacePoint can only return normalized U&V coordinates). Returning a TaggedUVPos makes it possible to properly analyze SpacePoints with only one Cluster */
+    TaggedUVPos getUV(const Belle2::SpacePoint* spacePoint);
 
     template <class TrueHit>
     void getValuesForRoot(const Belle2::SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables); /**< Get The Values that are later written to a ROOT file */

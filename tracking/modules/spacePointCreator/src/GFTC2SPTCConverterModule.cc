@@ -45,13 +45,14 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
   addParam("genfitTCName", m_genfitTCName, "Name of container of genfit::TrackCands", string(""));
   addParam("SpacePointTCName", m_SPTCName, "Name of the container under which SpacePointTrackCands will be stored in the DataStore (NOTE: These SpaceTrackCands are not checked for curling behaviour, but are simply converted and stored!)", string(""));
 
-  addParam("SingleClusterSVDSP", m_SingleClusterSVDSPName, "Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string(""));
+  addParam("SingleClusterSVDSP", m_SingleClusterSVDSPName, "Single Cluster SVD SpacePoints collection name. NOTE: This StoreArray will be searched for SpacePoints only if useSingleClusterSP is set to true!", string(""));
   addParam("NoSingleClusterSVDSP", m_NoSingleClusterSVDSPName, "Non Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string(""));
   addParam("PXDClusterSP", m_PXDClusterSPName, "PXD Cluster SpacePoints collection name.", string(""));
 
   addParam("checkTrueHits", m_PARAMcheckTrueHits, "Set to true if you want TrueHits of Clusters forming a SpacePoint (e.g. SVD) to be checked for equality", false);
 
   addParam("useSingleClusterSP", m_PARAMuseSingleClusterSP, "Set to true if you want to use singleCluster SVD SpacePoints if no doubleCluster SVD SpacePoint can be found", true);
+  addParam("checkNoSingleSVDSP", m_PARAMcheckNoSingleSVDSP, "Set to false if you want to disable the initial check for the StoreArray of Non Single Cluster SVD SpacePoints. NOTE: The module will still search for these SpacePoints first, so you have to make sure you are not registering SpacePoints under the StoreArray with the NoSingleClusterSVDSP name! (Disable the module that registers these SpacePoints)", true);
 
   initializeCounters(); // NOTE: they get initialized in initialize again!!
 }
@@ -67,13 +68,13 @@ void GFTC2SPTCConverterModule::initialize()
   StoreArray<PXDCluster>::required(m_PXDClusterName);
   StoreArray<SVDCluster>::required(m_SVDClusterName);
   if (m_PARAMuseSingleClusterSP) { StoreArray<SpacePoint>::required(m_SingleClusterSVDSPName); }
-  StoreArray<SpacePoint>::required(m_NoSingleClusterSVDSPName);
+  if (m_PARAMcheckNoSingleSVDSP) { StoreArray<SpacePoint>::required(m_NoSingleClusterSVDSPName); }
   StoreArray<SpacePoint>::required(m_PXDClusterSPName);
 
   StoreArray<genfit::TrackCand> gfTrackCand(m_genfitTCName);
   gfTrackCand.required(m_genfitTCName);;
 
-  // registering StoreArray for SpacePointTrackCand (is this done correctly like this?)
+  // registering StoreArray for SpacePointTrackCand
   StoreArray<SpacePointTrackCand> spTrackCand(m_SPTCName);
   spTrackCand.registerPersistent(m_SPTCName);
 
@@ -253,7 +254,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
 
   // search for NoSinglCluster SpacePoints
   RelationVector<SpacePoint> spacePoints = svdCluster->getRelationsFrom<SpacePoint>(m_NoSingleClusterSVDSPName);
-  B2DEBUG(60, "Found " << spacePoints.size() << " related SpacePoints for SVDCluster " << svdCluster->getArrayIndex() << " from StoreArray " << svdCluster->getArrayName());
+  B2DEBUG(60, "Found " << spacePoints.size() << " related SpacePoints in StoreArray " << m_NoSingleClusterSVDSPName << " for SVDCluster " << svdCluster->getArrayIndex() << " from StoreArray " << svdCluster->getArrayName());
 
   // if there is no relation to two cluster SpacePoint return the single cluster SpacePoint
   if (spacePoints.size() == 0) return getSingleClusterSVDSpacePoint(svdCluster, flaggedHitIDs, iHit);

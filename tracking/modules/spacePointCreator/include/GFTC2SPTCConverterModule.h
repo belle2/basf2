@@ -87,6 +87,8 @@ namespace Belle2 {
 
     bool m_PARAMuseSingleClusterSP; /**< Parameter Indicating if SingleCluster SVD SpacePoints should be used if no double Cluster SVD SpacePoint can be found */
 
+    bool m_PARAMcheckNoSingleSVDSP; /**< Switch for checking the StoreArray of non-single cluster SVD SpacePoints in initialize. Need this for cases, where only single Cluster SVD SpacePoints are presented to the module */
+
     // some counters for testing
     unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were converted (if a curling track is split up, this counter will still be only increased by 1!) */
 

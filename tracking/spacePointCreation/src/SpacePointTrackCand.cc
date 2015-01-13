@@ -139,7 +139,8 @@ void SpacePointTrackCand::setSortingParameters(const std::vector<double>& sortPa
 
 // genfit::TrackCand prints to stdout, as does the Print method from ROOT TVectorD (which is invoked here).
 // I build a stringstrem, which I then hand over B2DEBUG
-// there is a somewhat nasty hack to intercept the output to the stdout by redirecting the stdout to a buffer, which can then be put into a stringstream. This is however platform-dependent and not very C++ like and therefore not done here
+// there is a somewhat nasty hack to intercept the output to the stdout by redirecting the stdout to a buffer, which can then be put into a stringstream. This is however platform-dependent and not very C++ like and therefore not done here (this would be needed for having the ROOT output in the log files which are created from within a steering file)
+// however the LogSystem provides a way to check if ROOT output is actually needed (check the LogLevel and the DebugLevel)
 void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
 {
   stringstream output;

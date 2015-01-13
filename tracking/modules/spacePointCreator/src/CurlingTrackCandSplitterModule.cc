@@ -61,6 +61,11 @@ CurlingTrackCandSplitterModule::CurlingTrackCandSplitterModule()
   addParam("rootFileName", m_PARAMrootFileName, "Filename and write-mode ('RECREATE' or 'UPDATE'). If given more than 2 strings this module will cause termination", defaultRootFName);
 
   initializeCounters(); // NOTE: they get initialized in initialize again!!
+
+  // initialize other variables to some default values to avoid unintended behaviour
+  m_saveCompleteCurler = false;
+  m_treePtr = NULL;
+  m_rootFilePtr = NULL;
 }
 
 // ================================================= INITIALIZE =========================================================
@@ -227,7 +232,7 @@ void CurlingTrackCandSplitterModule::event()
   StoreArray<SpacePointTrackCand> spacePointTCs(m_PARAMsptcName);
   int nTCs = spacePointTCs.getEntries();
 
-  B2DEBUG(15, "Found " << nTCs << " in StoreArray " << spacePointTCs.getName() << " for this event");
+  B2DEBUG(15, "Found " << nTCs << " SpacePointTrackCands in StoreArray " << spacePointTCs.getName() << " for this event");
 
   RootVariables rootVariables;
 
@@ -301,8 +306,7 @@ void CurlingTrackCandSplitterModule::event()
 // =================================================== TERMINATE ========================================================
 void CurlingTrackCandSplitterModule::terminate()
 {
-  B2INFO("CurlingTrackCandSplitter::terminate(): checked " << m_spacePointTCCtr << " SpacePointTrackCands for curling behaviour. " << m_curlingTCCtr << " of them were curling and " << m_createdTrackStubsCtr << " TrackStubs were created. In " << m_noDecisionPossibleCtr << " cases no decision could be made.");
-
+  B2INFO("CurlingTrackCandSplitter::terminate(): checked " << m_spacePointTCCtr << " SpacePointTrackCands for curling behaviour. " << m_curlingTCCtr << " of them were curling and " << m_createdTrackStubsCtr << " TrackStubs were created. In " << m_noDecisionPossibleCtr << " cases no decision could be made. There were " << m_NoSingleTrueHitCtr << " SpacePoints that were related to more than one TrueHit");
   // do ROOT file stuff
   if (m_treePtr != NULL) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
@@ -317,6 +321,8 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
   const std::vector<const Belle2::SpacePoint*>& tcSpacePoints = SPTrackCand.getHits();
   unsigned int nHits = SPTrackCand.getNHits();
 
+  B2DEBUG(70, "SpacePointTrackCand contains " << nHits << " SpacePoints");
+
   std::vector<int> returnVector; // fill this vector with indices, if no indices can be found, leave it empty
 
   std::pair<bool, bool> directions; // only store the last two directions to decide if it has changed or not. .first is always last hit, .second is present hit.
@@ -326,8 +332,10 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
     const SpacePoint* spacePoint = tcSpacePoints[iHit];
     auto detType = spacePoint->getType();
 
+    B2DEBUG(100, "Now checking SpacePoint " << iHit << " in SPTC. This SpacePoint has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName());
+
     // get global position and momentum for every spacePoint in the SpacePointTrackCand
-    std::pair<TVector3, TVector3> hitGlobalPosMom;
+    std::pair<B2Vector3<SpacePoint::SpBaseType>, B2Vector3<SpacePoint::SpBaseType> > hitGlobalPosMom;
 
     if (detType == VXD::SensorInfoBase::PXD) {
       // first get PXDCluster, from that get TrueHit
@@ -340,6 +348,8 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
         throw FoundNoTrueHit();
       }
 
+      B2DEBUG(100, "Found PXDCluster " << pxdCluster->getArrayIndex() << " and " << " PXDTrueHit " << pxdTrueHit->getArrayIndex() << " from StoreArray " << pxdTrueHit->getArrayName() << " related to this SpacePoint");
+
       B2DEBUG(100, "Now getting global position and momentum for PXDCluster " << pxdCluster->getArrayIndex() << " from Array " << pxdCluster->getArrayName());
       hitGlobalPosMom = getGlobalPositionAndMomentum(pxdTrueHit);
 
@@ -348,11 +358,11 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 
     } else if (detType == VXD::SensorInfoBase::SVD) {
       // get all related SVDClusters and do some sanity checks, before getting the SVDTrueHits and then using them to get global position and momentum
-      RelationVector<SVDCluster> svdClusters = spacePoint->getRelationsTo<SVDCluster>("ALL"); // COULDDO: search only certain Cluster Arrays -> get name somehow
+      RelationVector<SVDCluster> svdClusters = spacePoint->getRelationsTo<SVDCluster>("ALL"); // COULDDO: search only certain Cluster Arrays -> get name somehow (addidional parameter?)
       if (svdClusters.size() > 2) { throw SpacePoint::InvalidNumberOfClusters(); } // should never throw, since this check should already be done in SpacePoint creation!
       if (svdClusters.size() == 0) {
         B2WARNING("Found no related clusters for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". With no Cluster no information if a track is curling or not can be obtained");
-        throw FoundNoCluster(); // this should also never happen, as the vice versa way is used above to get to the SpacePoints in the first place!!
+        throw FoundNoCluster(); // this should also never happen, as the vice versa way is used to get to the SpacePoints in the first place (in the GFTC2SPTCConverterModule e.g.)
       } else {
         // collect the TrueHits, if there is more than one compare them, to see if both Clusters point to the same TrueHit
         // WARNING there can be more! more than one TrueHit can be 'hidden' in one Cluster!!!
@@ -372,15 +382,19 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 
         // if there is only one cluster related to the SpacePoint simply check if one (or more TrueHits are present). Additionally checking the size for svdTrueHits again is not necessary here, because if there was only one Cluster and no TrueHits were found this part is never reached!
         // WARNING: It is not guaranteed that this actually leads to a valid relation between SpacePoint and TrueHit!!
-        if (svdClusters.size() == 1) {
-          stringstream inds;
-          for (const SVDTrueHit * trueHit : svdTrueHits) { inds << trueHit->getArrayIndex() << ", "; }
-          B2DEBUG(150, "Found only one Cluster related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". To this Cluster " << svdTrueHits.size() << " related TrueHits were found. Indices: " << inds.str());
-          continue; // start over with next SpacePoint
-        }
+        // TODO: continuing with next SpacePoint skips check for curling behavior!!! FIX this!!!
+//         if (svdClusters.size() == 1) {
+//           stringstream inds;
+//           for (const SVDTrueHit * trueHit : svdTrueHits) { inds << trueHit->getArrayIndex() << ", "; }
+//           B2DEBUG(150, "Found only one Cluster related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". To this Cluster " << svdTrueHits.size() << " related TrueHits were found. Indices: " << inds.str());
+//    m_NoSingleTrueHitCtr++;
+//           continue; // start over with next SpacePoint
+//         }
+
         // if there are 2 Clusters, there have to be at least 2 TrueHits (else above part would have thrown)
+        // if there are more than one TrueHits check if they can be "reduced" to one via sort and resize (regardless if only one Cluster led to these TrueHits)
         if (svdTrueHits.size() > 1) {
-          B2DEBUG(150, "Found " << svdTrueHits.size() << " related to Clusters related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". Now checking if they are compatible")
+          B2DEBUG(150, "Found " << svdTrueHits.size() << " SVDTrueHits related to Clusters related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". Now checking if they are compatible")
 
           //
           std::sort(svdTrueHits.begin(), svdTrueHits.end());
@@ -388,7 +402,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
           auto newEnd = std::unique(svdTrueHits.begin(), svdTrueHits.end());
           svdTrueHits.resize(std::distance(svdTrueHits.begin(), newEnd));
 
-          // WARNING if there are one (or more) matching TrueHits only the first TrueHit is used for comparison!!!
+          // If there is no overlapping TrueHit get all indices of the TrueHits and print a warning. If position Analysis is enabled calculate the position differences of the TrueHits. In the end throw an Exception (only if the TrueHits belong to a non-single Cluster SVD SpacePoint)
           if (svdTrueHits.size() == oldSize) {
             stringstream trueHitInds;
             for (const SVDTrueHit * trueHit : svdTrueHits) { trueHitInds << trueHit->getArrayIndex() << ", "; }
@@ -396,14 +410,15 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 
             // Only do these calculations if output to root is is enabled
             if (m_PARAMpositionAnalysis) {
-              std::vector<TVector3> globalPositions;
-              std::vector<TVector3> globalMomenta;
+              std::vector<B2Vector3<SpacePoint::SpBaseType> > globalPositions;
+              std::vector<B2Vector3<SpacePoint::SpBaseType> > globalMomenta;
               // collect all values
               for (unsigned int i = 0; i < svdTrueHits.size(); ++i) {
                 auto posMom = getGlobalPositionAndMomentum(svdTrueHits[i]);
                 globalPositions.push_back(posMom.first);
                 globalMomenta.push_back(posMom.second);
               }
+              // WARNING: getting only layer number of first TrueHit in vector here. Although this should not change, this is never actually checked!!
               int layer = svdTrueHits[0]->getSensorID().getLayerNumber() - 1; // layer numbering starts at 1, indexing of array at 0
               // do the calculations (starting from one because of comparison of two elements in each run through loop)
               for (unsigned int i = 1; i < globalPositions.size(); ++i) {
@@ -416,21 +431,30 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
                 rootVariables.MisMatchPosU.at(layer).push_back((svdTrueHits[i]->getU() - svdTrueHits[i - 1]->getU()));
                 rootVariables.MisMatchPosV.at(layer).push_back((svdTrueHits[i]->getV() - svdTrueHits[i - 1]->getV()));
 
-                TVector3 momDiff = globalMomenta[i] - globalMomenta[i - 1];
+                B2Vector3<SpacePoint::SpBaseType> momDiff = globalMomenta[i] - globalMomenta[i - 1];
                 rootVariables.MisMatchMomX.at(layer).push_back(momDiff.X());
                 rootVariables.MisMatchMomY.at(layer).push_back(momDiff.Y());
                 rootVariables.MisMatchMomZ.at(layer).push_back(momDiff.Z());
               }
             }
-            throw TrueHitsNotMatching();
+            // if the TrueHits are related from a singleCluster SVD SpacePoint (i.e. more than one TrueHits are molded into one Cluster) do not throw this exception but continue with the curling checking
+            if (svdClusters.size() > 1) { TrueHitsNotMatching(); }
           }
         }
 
-        B2DEBUG(100, "Now getting global position and momentum for SVDCluster " << svdClusters[0]->getArrayIndex() << " from Array " << svdClusters[0]->getArrayName());
+        // if there is more than one TrueHit remaining for one SpacePoint increase the counter
+        if (svdTrueHits.size() > 1) {
+          m_NoSingleTrueHitCtr++;
+        }
+
+        // WARNING if there are more than one matching TrueHits only the first TrueHit is used for comparison and for position analysis
+        B2DEBUG(100, "Now getting global position and momentum for SVDCluster " << svdClusters[0]->getArrayIndex() << " from Array " << svdClusters[0]->getArrayName() << " via SVDTrueHit " << svdTrueHits[0]->getArrayIndex() << " from StoreArray " << svdTrueHits[0]->getArrayName());
         hitGlobalPosMom = getGlobalPositionAndMomentum(svdTrueHits[0]);
 
         // if position analysis is set to true, print to root file
-        if (m_PARAMpositionAnalysis) { getValuesForRoot(spacePoint, svdTrueHits[0], rootVariables); }
+        // only do so if there is only one TrueHit (this is only for the moment!!!)
+        // TODO: Decide how to handle such cases where more than one TrueHit is left and implement accordingly
+        if (m_PARAMpositionAnalysis && svdTrueHits.size() == 1) { getValuesForRoot(spacePoint, svdTrueHits[0], rootVariables); }
       }
     } else { // this should never be reached, because it should be caught in the creation of the SpacePointTrackCand which is passed to this function!
       throw SpacePointTrackCand::UnsupportedDetType();
@@ -452,7 +476,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 
 // ======================================= GET GLOBAL POSITION AND MOMENTUM ============================================================
 template<class TrueHit>
-std::pair<const TVector3, const TVector3> CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
+std::pair<const Belle2::B2Vector3<SpacePoint::SpBaseType>, const Belle2::B2Vector3<SpacePoint::SpBaseType> > CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
 {
   // get sensor stuff (needed for pointToGlobal)
   VxdID aVxdId = aTrueHit->getSensorID();
@@ -463,29 +487,34 @@ std::pair<const TVector3, const TVector3> CurlingTrackCandSplitterModule::getGlo
   const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(aVxdId);
 
   // get position
-  TVector3 hitLocal = TVector3(aTrueHit->getU(), aTrueHit->getV(), 0);
-  TVector3 hitGlobal = sensorInfoBase.pointToGlobal(hitLocal); // should work like this, since local coordinates are only 2D
+  B2Vector3<SpacePoint::SpBaseType> hitLocal = B2Vector3<SpacePoint::SpBaseType>(aTrueHit->getU(), aTrueHit->getV(), 0);
+  B2Vector3<SpacePoint::SpBaseType> hitGlobal = sensorInfoBase.pointToGlobal(hitLocal); // should work like this, since local coordinates are only 2D
   B2DEBUG(100, "Local position of hit is (" << hitLocal.X() << "," << hitLocal.Y() << "," << hitLocal.Z() << "), Global position of hit is (" << hitGlobal.X() << "," << hitGlobal.Y() << "," << hitGlobal.Z() << ")");
 
   // get momentum
-  TVector3 pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum());
+  B2Vector3<SpacePoint::SpBaseType> pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum());
   B2DEBUG(100, "Global momentum of hit is (" << pGlobal.X() << "," << pGlobal.Y() << "," << pGlobal.Z() << ")");
 
   return std::make_pair(hitGlobal, pGlobal);
 }
 
 // ======================================= GET DIRECTION OF FLIGHT ======================================================================
-bool CurlingTrackCandSplitterModule::getDirectionOfFlight(const std::pair<const TVector3, const TVector3>& hitPosAndMom, const TVector3 origin)
+bool CurlingTrackCandSplitterModule::getDirectionOfFlight(const std::pair<const Belle2::B2Vector3<SpacePoint::SpBaseType>, const Belle2::B2Vector3<SpacePoint::SpBaseType>>& hitPosAndMom, const Belle2::B2Vector3<SpacePoint::SpBaseType> origin)
 {
-  TVector3 originToHit = hitPosAndMom.first - origin;
-  TVector3 momentumAtHit = hitPosAndMom.second + originToHit;
+  B2Vector3<SpacePoint::SpBaseType> originToHit = hitPosAndMom.first - origin;
+  B2Vector3<SpacePoint::SpBaseType> momentumAtHit = hitPosAndMom.second + originToHit;
+
+  // additional debug output from developement to find a possible B2Vector3 bug
+//   B2DEBUG(250, "hitPosMom.first (" << hitPosAndMom.first.X() << "," << hitPosAndMom.first.Y() << "," << hitPosAndMom.first.Z() << "). hitPosAndMom.second: (" << hitPosAndMom.second.X() << "," << hitPosAndMom.second.Y() << "," << hitPosAndMom.second.Z() << "). origin: (" << origin.X() << "," << origin.Y() << "," << origin.Z() << ")");
 
   B2DEBUG(100, "Position of hit relative to origin is (" << originToHit.X() << "," << originToHit.Y() << "," << originToHit.Z() << "). Momentum relative to hit (relative to origin) (" << momentumAtHit.X() << "," << momentumAtHit.Y() << "," << momentumAtHit.Z() << ")");
 
-  // cylindrical coordinates (?) -> use TVector3.Perp() to get the radial component of a given vector
-  // for spherical coordinates -> use TVector3.Mag() for the same purposes
+  // cylindrical coordinates (?) -> use B2Vector3.Perp() to get the radial component of a given vector
+  // for spherical coordinates -> use B2Vector3.Mag() for the same purposes
   double hitRadComp = originToHit.Perp(); // radial component of hit coordinates
-  double hitMomRadComp = momentumAtHit.Perp(); // radial component of the tip of the momentum vector, when its origin would be the hit position (as it is only the direction of the momentum that matters here, units are completely ignored -> COULDDO: use the unit() method from TVector3
+  double hitMomRadComp = momentumAtHit.Perp(); // radial component of the tip of the momentum vector, when its origin would be the hit position (as it is only the direction of the momentum that matters here, units are completely ignored -> COULDDO: use the unit() method from B2Vector3
+
+  B2DEBUG(250, " radial component of hit coordinates: " << hitRadComp << ", radial component of tip of momentum vector with its origin set to hit position: " << hitMomRadComp);
 
   if (hitMomRadComp < hitRadComp) {
     B2DEBUG(100, "Direction of flight is inwards for this hit");
@@ -523,7 +552,7 @@ CurlingTrackCandSplitterModule::splitCurlingTrackCand(const Belle2::SpacePointTr
     int lastInd = rangeIndices[iTr].second;
     int firstInd = rangeIndices[iTr].first;
 
-    B2DEBUG(75, "Creating Track Stub " << iTr << " of " << splitIndices.size() << " possible Track Stub for this SpacePointTrackCand. The indices for this Tracklet are (first,last): (" << firstInd << "," << lastInd << "). This SpacePointTrackCand contains " << SPTrackCand.getNHits() << " SpacePoints.");
+    B2DEBUG(75, "Creating Track Stub " << iTr << " of " << splitIndices.size() << " possible Track Stub for this SpacePointTrackCand. The indices for this Tracklet are (first,last): (" << firstInd << "," << lastInd << "). This SpacePointTrackCand contains " << SPTrackCand.getNHits() << " SpacePoints in total.");
 
     const std::vector<const SpacePoint*> trackletSpacePoints = SPTrackCand.getHitsInRange(firstInd, lastInd);
     const std::vector<double> trackletSortingParams = SPTrackCand.getSortingParametersInRange(firstInd, lastInd);
@@ -554,64 +583,73 @@ CurlingTrackCandSplitterModule::splitCurlingTrackCand(const Belle2::SpacePointTr
 template <class TrueHit>
 void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables)
 {
-  B2DEBUG(100, "Getting positions of SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " and TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName());
-
-  // get positions from SpacePoint and add them to rootVariables
-  const TVector3& spacePointGlobal = spacePoint->getPosition();
-  std::pair<double, double> spacePointUV = getUV(spacePoint);
-  const TVector3 spacePointLocal = TVector3(spacePointUV.first, spacePointUV.second, 0);
+  B2DEBUG(100, "Getting positions (for ROOT output) of SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " and TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName());
 
   // get VxdIDs of spacePoint and trueHit (and their according layer numbers for storing the information in the appropriate arrays)
   VxdID spacePointVxdId = spacePoint->getVxdID();
   VxdID trueHitVxdId = trueHit->getSensorID();
 
+  // get positions from SpacePoint
+  const B2Vector3<SpacePoint::SpBaseType>& spacePointGlobal = spacePoint->getPosition(); // COULDDO: uneccesary, spacePoint->X(), etc. returns the same information!
+//   std::pair<double, double> spacePointUV = getUV(spacePoint);
+  TaggedUVPos spacePointUV = getUV(spacePoint);
+  const B2Vector3<SpacePoint::SpBaseType> spacePointLocal = B2Vector3<SpacePoint::SpBaseType>(spacePointUV.m_U, spacePointUV.m_V, 0);
+
+  // get local position from TrueHit
+  const B2Vector3<SpacePoint::SpBaseType> trueHitLocal = B2Vector3<SpacePoint::SpBaseType>(trueHit->getU(), trueHit->getV(), 0);
+
+  // get sensor Info for global position of TrueHit
+  const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(trueHitVxdId);
+
+  // get global position from TrueHit
+  const B2Vector3<SpacePoint::SpBaseType> trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal);
+
   // Layer numbering starts at 1 not at 0 so deduce layer by one to access array
   int spLayer = spacePointVxdId.getLayerNumber() - 1;
   int thLayer = trueHitVxdId.getLayerNumber() - 1;
 
-  rootVariables.SpacePointXGlobal.at(spLayer).push_back(spacePoint->X());
-  rootVariables.SpacePointYGlobal.at(spLayer).push_back(spacePoint->Y());
-  rootVariables.SpacePointZGlobal.at(spLayer).push_back(spacePoint->Z());
+  if (spLayer != thLayer) {
+    B2FATAL("Layer numbers of TrueHit and SpacePoint do not match!") // this should never happen -> FATAL if it does, because something has gone amiss then
+  }
 
-  rootVariables.SpacePointULocal.at(spLayer).push_back(spacePointUV.first);
-  rootVariables.SpacePointVLocal.at(spLayer).push_back(spacePointUV.second);
+  // all positions collected, but only write the values to ROOT that have been set appropriately!
+  bool singleCluster = true; // for debug output
+  if (spacePointUV.m_setU) {
+    rootVariables.SpacePointULocal.at(spLayer).push_back(spacePointUV.m_U);
+    rootVariables.TrueHitULocal.at(thLayer).push_back(trueHit->getU());
+    rootVariables.PosResidueULocal.at(spLayer).push_back((spacePointUV.m_U - trueHit->getU()));
+  }
+  if (spacePointUV.m_setV) {
+    rootVariables.SpacePointVLocal.at(spLayer).push_back(spacePointUV.m_V);
+    rootVariables.TrueHitVLocal.at(thLayer).push_back(trueHit->getV());
+    rootVariables.PosResidueVLocal.at(spLayer).push_back((spacePointUV.m_V - trueHit->getV()));
+  }
+  if (spacePointUV.m_setU && spacePointUV.m_setV) {
+    rootVariables.SpacePointXGlobal.at(spLayer).push_back(spacePoint->X());
+    rootVariables.SpacePointYGlobal.at(spLayer).push_back(spacePoint->Y());
+    rootVariables.SpacePointZGlobal.at(spLayer).push_back(spacePoint->Z());
 
-  B2DEBUG(200, "Global (x,y,z)/Local (U,V) positions of SpacePoint: (" << spacePointGlobal.X() << "," << spacePointGlobal.Y() << "," << spacePointGlobal.Z() << ")/(" << spacePointLocal.X() << "," << spacePointLocal.Y() << ")");
-
-  // get positions from TrueHit
-
-  const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(trueHitVxdId);
-
-  const TVector3 trueHitLocal = TVector3(trueHit->getU(), trueHit->getV(), 0);
-  const TVector3 trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal);
-
-  rootVariables.TrueHitXGlobal.at(thLayer).push_back(spacePoint->X());
-  rootVariables.TrueHitYGlobal.at(thLayer).push_back(spacePoint->Y());
-  rootVariables.TrueHitZGlobal.at(thLayer).push_back(spacePoint->Z());
-
-  rootVariables.TrueHitULocal.at(thLayer).push_back(trueHit->getU());
-  rootVariables.TrueHitVLocal.at(thLayer).push_back(trueHit->getV());
-
-  B2DEBUG(200, "Global (x,y,z)/Local (U,V) positions of TrueHit: (" << trueHitGlobal.X() << "," << trueHitGlobal.Y() << "," << trueHitGlobal.Z() << ")/(" << trueHitLocal.X() << "," << trueHitLocal.Y() << ")");
-
-  B2DEBUG(200, "This leads to position differences global/local: " << (spacePointGlobal - trueHitGlobal).Mag() << "/" << (spacePointLocal - trueHitLocal).Mag());
-
-  // calculate position differences (& check if both are on the same layer, but should be)
-  if (spLayer == thLayer) {
-    rootVariables.PosResiduesGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).Mag());
-    rootVariables.PosResiduesLocal.at(spLayer).push_back((spacePointLocal - trueHitLocal).Mag());
+    rootVariables.TrueHitXGlobal.at(thLayer).push_back(trueHitGlobal.X());
+    rootVariables.TrueHitYGlobal.at(thLayer).push_back(trueHitGlobal.Y());
+    rootVariables.TrueHitZGlobal.at(thLayer).push_back(trueHitGlobal.Z());
 
     rootVariables.PosResidueXGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).X());
     rootVariables.PosResidueYGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).Y());
     rootVariables.PosResidueZGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).Z());
 
-    rootVariables.PosResidueULocal.at(spLayer).push_back((spacePointUV.first - trueHit->getU()));
-    rootVariables.PosResidueVLocal.at(spLayer).push_back((spacePointUV.second - trueHit->getV()));
+    rootVariables.PosResiduesGlobal.at(spLayer).push_back((spacePointGlobal - trueHitGlobal).Mag());
+    rootVariables.PosResiduesLocal.at(spLayer).push_back((spacePointLocal - trueHitLocal).Mag());
 
-  } else {
-    B2WARNING("SpacePoint " << spacePoint->getArrayIndex() << " (Array " << spacePoint->getArrayName() << ") and TrueHit " << trueHit->getArrayIndex() << " (Array " << trueHit->getArrayName() << ") are not on the same Layer in getValuesForRoot()");
+    singleCluster = false;
   }
+
+  B2DEBUG(200, "Global (x,y,z)/Local (U,V) positions of SpacePoint: (" << spacePointGlobal.X() << "," << spacePointGlobal.Y() << "," << spacePointGlobal.Z() << ")/(" << spacePointLocal.X() << "," << spacePointLocal.Y() << "). This was a singleCluster SpacePoint: " << singleCluster);
+
+  B2DEBUG(200, "Global (x,y,z)/Local (U,V) positions of TrueHit: (" << trueHitGlobal.X() << "," << trueHitGlobal.Y() << "," << trueHitGlobal.Z() << ")/(" << trueHitLocal.X() << "," << trueHitLocal.Y() << ")");
+
+  B2DEBUG(200, "This leads to position differences global/local: " << (spacePointGlobal - trueHitGlobal).Mag() << "/" << (spacePointLocal - trueHitLocal).Mag());
+
 }
 
 // =================================== WRITE TO ROOT ===============================================================================
@@ -655,9 +693,9 @@ void CurlingTrackCandSplitterModule::writeToRoot(RootVariables& rootVariables)
   m_treePtr->Fill();
 }
 
-// ========================================================= GET U AND V ============================================================
-std::pair<double, double> CurlingTrackCandSplitterModule::getUV(const Belle2::SpacePoint* spacePoint)
+CurlingTrackCandSplitterModule::TaggedUVPos CurlingTrackCandSplitterModule::getUV(const Belle2::SpacePoint* spacePoint)
 {
+  TaggedUVPos returnVals; // initialized to: both bools false, both doubles to 0.
   auto detType = spacePoint->getType();
   if (detType == VXD::SensorInfoBase::PXD) {
     PXDCluster* pxdCluster = spacePoint->getRelatedTo<PXDCluster>("ALL"); // COULDDO: search only certain StoreArrays
@@ -665,7 +703,11 @@ std::pair<double, double> CurlingTrackCandSplitterModule::getUV(const Belle2::Sp
       B2ERROR("Found no relation to a PXDCluster for SpacePoint " << spacePoint->getArrayIndex() << " from StoreArray" << spacePoint->getArrayName() << ". This SpacePoint will be skipped and will not be contained in the genfit::TrackCand");
       throw (FoundNoCluster()); // Should never happen
     }
-    return std::make_pair(pxdCluster->getU(), pxdCluster->getV());
+    // set return values
+    returnVals.m_U = pxdCluster->getU();
+    returnVals.m_setU = true;
+    returnVals.m_V = pxdCluster->getV();
+    returnVals.m_setV = true;
   } else if (detType == VXD::SensorInfoBase::SVD) {
     RelationVector<SVDCluster> svdClusters = spacePoint->getRelationsTo<SVDCluster>("ALL"); // COULDDO: search only certain StoreArrays
     if (svdClusters.size() > 2) { throw SpacePoint::InvalidNumberOfClusters(); }
@@ -673,19 +715,18 @@ std::pair<double, double> CurlingTrackCandSplitterModule::getUV(const Belle2::Sp
       B2ERROR("Found no relation to a SVDCluster for SpacePoint " << spacePoint->getArrayIndex() << " from StoreArray" << spacePoint->getArrayName() << ". This SpacePoint will be skipped and will not be contained in the genfit::TrackCand");
       throw (FoundNoCluster());
     }
-    double uPos = 0.;
-    double vPos = 0.;
+    // loop over all Clusters of the SpacePoint and set the appropriate values.
     for (const SVDCluster & aCluster : svdClusters) {
       if (aCluster.isUCluster()) {
-        uPos = aCluster.getPosition();
+        returnVals.m_U = aCluster.getPosition();
+        returnVals.m_setU = true;
       } else {
-        vPos = aCluster.getPosition();
+        returnVals.m_V = aCluster.getPosition();
+        returnVals.m_setV = true;
       }
     }
-    return std::make_pair(uPos, vPos);
-  } else { // COULDDO: throw SpacePointTrackCand::UnsupportedDetType()
-    return std::make_pair(0., 0.);
   }
+  return returnVals;
 }
 
 // ====================================================== INITIALIZE COUNTERS =======================================================
@@ -695,4 +736,5 @@ void CurlingTrackCandSplitterModule::initializeCounters()
   m_curlingTCCtr = 0;
   m_noDecisionPossibleCtr = 0;
   m_spacePointTCCtr = 0;
+  m_NoSingleTrueHitCtr = 0;
 }

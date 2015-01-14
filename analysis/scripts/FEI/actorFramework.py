@@ -205,6 +205,7 @@ class Play(object):
         self.seq.append(Actor(RequireManually, a=key))
 
     def showProgress(self, total, done, ready):
+        """ Print FEI progress """
         sys.stderr.write("FEI progress: %g%% (%d/%d actors)\n" % (done * 100.0 / total, done, total))
 
     def run(self, path, verbose=False, cacheFile=None, preload=False, nProcesses=1):

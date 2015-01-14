@@ -64,7 +64,7 @@ path.add_module(geometry)
 
 add_reconstruction(path, components)
 for m in path.modules():
-    if m.name == 'GenFitter':
+    if m.name() == 'GenFitter':
         m.param('PDGCodes', [get_generated_pdg_code()])
 
 output_file_name = arguments.output_files

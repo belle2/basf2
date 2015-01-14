@@ -240,7 +240,7 @@ void TrackProcessor::createGFTrackCandidates(string& m_gfTrackCandsColName)
     if (trackCand->getTrackHits().size() < 5) continue;
 //    B2INFO("Number of hits: " << trackCand->getNHits());
     gfTrackCandidates.appendNew();
-    std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
+//    std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
 //    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCand, ref_point_temp);
 
 

@@ -63,13 +63,13 @@ namespace Belle2 {
       /** Return position of the hit on the track expressed in rads */
       double getAlpha(TrackCandidate* cand, std::pair<double, double> pos);
 
-//      void assignStereohitsByAngleWithQuadtree(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0 = 0.);
+      void assignStereohitsByAngleWithQuadtree(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0 = 0.);
 
     private:
 
       static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
 
-//      TrackFindingCDC::QuadTree* m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
+      TrackFindingCDC::QuadTree* m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
 
     };
   }

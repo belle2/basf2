@@ -12,7 +12,7 @@ using namespace TrackFindingCDC;
 
 StereohitsProcesser::StereohitsProcesser()
 {
-//  m_cdcLegendreQuadTree = new QuadTree(-0.15, 0.15,  /*-1.*m_rc, m_rc,*/ 0, 8192, 0, NULL);
+  m_cdcLegendreQuadTree = new QuadTree(-0.15, 0.15,  /*-1.*m_rc, m_rc,*/ 0, 8192, 0, NULL);
 //  m_cdcLegendreQuadTree->setLastLevel(12);
 
 }
@@ -20,10 +20,10 @@ StereohitsProcesser::StereohitsProcesser()
 StereohitsProcesser::~StereohitsProcesser()
 {
 
-//  m_cdcLegendreQuadTree->clearTree();
-//  QuadTreeCandidateCreator::Instance().clearNodes();
-//  QuadTreeCandidateCreator::Instance().clearCandidates();
-//  delete m_cdcLegendreQuadTree;
+  m_cdcLegendreQuadTree->clearTree();
+  QuadTreeCandidateCreator::Instance().clearNodes();
+  QuadTreeCandidateCreator::Instance().clearCandidates();
+  delete m_cdcLegendreQuadTree;
 
 }
 
@@ -123,7 +123,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
   int nbins = 60;
   double thetaMin = 15.;
   double thetaMax = 170.;
-  double binWidth = m_PI / static_cast<double>(nbins);
+//  double binWidth = m_PI / static_cast<double>(nbins);
 
 //    TCanvas canv1("canv1", "canv", 0, 0, 1400, 600);
 //    canv1.Divide(2, 3);
@@ -248,10 +248,10 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
       hit->setHitUsage(TrackHit::used_in_track);
 
       //Compare to original CDCHit
-      const CDCSimHit* cdcSimHit = DataStore::getRelatedToObj<CDCSimHit>(hit->getOriginalCDCHit());
-      double zHitOriginal = cdcSimHit->getPosWire().Z();
+//      const CDCSimHit* cdcSimHit = DataStore::getRelatedToObj<CDCSimHit>(hit->getOriginalCDCHit());
+//      double zHitOriginal = cdcSimHit->getPosWire().Z();
 
-      cdcSimHit = nullptr;
+//      cdcSimHit = nullptr;
 
       //        B2INFO("Delta Z position: " << zHitOriginal - hit->getZReference() << "; Z original: " << zHitOriginal);
 
@@ -265,7 +265,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
 }
 
-/*
+
 void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0)
 {
   B2INFO("Tree stereo tracklet finding");
@@ -309,7 +309,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
     std::pair<StereoHit, StereoHit> stereoHitPair;
 
-    try{
+    try {
       stereoHitPair = getDisplacements(cand, trackHit, trackCharge);
     } catch (...) {
       continue;
@@ -324,12 +324,12 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
     double dist2 = Rcand - sqrt(SQR(trackHit->getWirePosition().X() - cand->getXc()) + SQR(trackHit->getWirePosition().Y() - cand->getYc())) + stereoHitPair.second.getInnerOuter() * trackHit->getDriftLength();
 
 
-    double lWire = fabs(trackHit->getBackwardWirePosition().Z() - trackHit->getForwardWirePosition().Z());
+//    double lWire = fabs(trackHit->getBackwardWirePosition().Z() - trackHit->getForwardWirePosition().Z());
     double rWire = sqrt(SQR(trackHit->getBackwardWirePosition().x() - trackHit->getForwardWirePosition().x()) + SQR(trackHit->getBackwardWirePosition().y() - trackHit->getForwardWirePosition().y()));
 
-    if ((fabs(dist1) > rWire/1.5) || (fabs(dist2) > rWire/1.5)) continue;
+    if ((fabs(dist1) > rWire / 0.9) || (fabs(dist2) > rWire / 0.9)) continue;
 
-    if(dist1<dist2){
+    if (dist1 < dist2) {
       trackHit->setZReference(stereoHitPair.first.getAlpha() * Rcand / tan(theta) + Z0);
     } else {
       trackHit->setZReference(stereoHitPair.second.getAlpha() * Rcand / tan(theta) + Z0);
@@ -339,26 +339,64 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   }
 
 
-  TrackCandidate* stereoPart;
+  TrackCandidate* stereoPart = nullptr;
 
   m_cdcLegendreQuadTree->clearTree();
   QuadTreeCandidateCreator::Instance().clearNodes();
   QuadTreeCandidateCreator::Instance().clearCandidates();
 
-  double limit = 6;
-  double rThreshold = 0.15;
-  m_cdcLegendreQuadTree->provideHitSet(hits_set);
-//  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
-//  m_cdcLegendreQuadTree->setHitsThreshold(limit);
-  m_cdcLegendreQuadTree->startFillingTree(true, stereoPart);
+  double __attribute__((unused)) limit = 6;
+  double __attribute__((unused)) rThreshold = 0.15;
 
-  if(stereoPart != nullptr){
+  std::vector<QuadTree*> nodeList;
+
+  int lastlevel(0);
+  lastlevel = m_cdcLegendreQuadTree->getLastLevel();
+  m_cdcLegendreQuadTree->setLastLevel(9);
+
+  m_cdcLegendreQuadTree->provideHitSet(hits_set);
+  B2INFO("Number of stereohits = " << hits_set.size());
+//  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
+  m_cdcLegendreQuadTree->setHitsThreshold(limit);
+
+  m_cdcLegendreQuadTree->startFillingTree(true, nodeList);
+
+  m_cdcLegendreQuadTree->setLastLevel(lastlevel);
+
+
+  if (nodeList.size() != 0) {
+    B2INFO(nodeList.size() << " NODES WERE ADDED!");
+
+    QuadTree* nodeWithMostHits = nullptr;
+
+    for (QuadTree * node : nodeList) {
+      if (nodeWithMostHits == nullptr) {
+        nodeWithMostHits = node;
+      } else {
+        if (nodeWithMostHits->getHits().size() < node->getHits().size())
+          nodeWithMostHits = node;
+      }
+    }
+
+    for (TrackHit * hit : nodeWithMostHits->getHits()) {
+      cand->addHit(hit);
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+
+    nodeWithMostHits = nullptr;
+
+    /*
+    B2INFO("NUMBER OF HITS TO ADD = " << stereoPart->getTrackHits().size());
     for(TrackHit* hit: stereoPart->getTrackHits()){
       cand->addHit(hit);
     }
 
     delete stereoPart;
+    */
+  } else {
+    B2INFO("NO NODES WERE ADDED!");
   }
+
 
   m_cdcLegendreQuadTree->clearTree();
   QuadTreeCandidateCreator::Instance().clearNodes();
@@ -367,15 +405,13 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
 }
 
-*/
+
 
 
 
 void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0)
 {
 
-
-//  assignStereohitsByAngleWithQuadtree(cand, theta, stereohits, Z0);
 
 //  return;
 
@@ -436,10 +472,10 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
       hit->setHitUsage(TrackHit::used_in_track);
 
       //Compare to original CDCHit
-      const CDCSimHit* cdcSimHit = DataStore::getRelatedToObj<CDCSimHit>(hit->getOriginalCDCHit());
-      double zHitOriginal = cdcSimHit->getPosWire().Z();
+//      const CDCSimHit* cdcSimHit = DataStore::getRelatedToObj<CDCSimHit>(hit->getOriginalCDCHit());
+//      double zHitOriginal = cdcSimHit->getPosWire().Z();
 
-      cdcSimHit = nullptr;
+//      cdcSimHit = nullptr;
 
 //        B2INFO("Delta Z position: " << zHitOriginal - hit->getZReference() << "; Z original: " << zHitOriginal);
 
@@ -452,6 +488,8 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
   }
 
 
+  assignStereohitsByAngleWithQuadtree(cand, theta, stereohits, Z0);
+
 
 }
 
@@ -461,7 +499,7 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
 std::pair<StereoHit, StereoHit> StereohitsProcesser::getDisplacements(TrackCandidate* cand, TrackHit* hit,  int trackCharge)
 {
 
-  double Rcand = cand->getRadius();
+//  double Rcand = cand->getRadius();
 
   if (trackCharge == 0) {
     int vote_pos(0), vote_neg(0);
@@ -499,7 +537,7 @@ std::pair<StereoHit, StereoHit> StereohitsProcesser::getDisplacements(TrackCandi
   if (std::isnan(stereoHitInner.getAlpha()) || std::isnan(stereoHitOuter.getAlpha()))
     throw "Alpha is NAN!" ;
 
-  double lWire = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z());
+//  double lWire = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z());
   double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
 
   if ((fabs(stereoHitInner.getDisplacement()) > rWire) && (fabs(stereoHitOuter.getDisplacement()) > rWire))
@@ -600,7 +638,7 @@ double StereohitsProcesser::getAlpha(TrackCandidate* cand, std::pair<double, dou
     hitPhi = 2 * TMath::Pi() + atan(pos.second / pos.first);
   }
 
-  int charge = cand->getChargeSign();
+//  int charge = cand->getChargeSign();
 
   double delta_phi_outer = hitPhi - (cand->getPhi() - m_PI * cand->getChargeSign() / 2.) /*cand->getTheta()*/;
   if (delta_phi_outer > 3.1415) delta_phi_outer -= 2.*3.1415;

@@ -66,6 +66,8 @@ namespace Belle2 {
       /** Initialize structure and prepare children */
       void initialize();
 
+      void terminate();
+
       /** Create vector with children of current node */
       void initializeChildren();
 
@@ -84,11 +86,17 @@ namespace Belle2 {
       /** Sets threshold on pt of candidates */
       static void setLastLevel(double lastLevel) {s_lastLevel = static_cast<float>(lastLevel);};
 
+      /** Sets threshold on pt of candidates */
+      int getLastLevel() const {return s_lastLevel;};
+
       /** Copy information about hits into member of class (node at level 0 should be used  because other levels fills by parents) */
       void provideHitSet(const std::set<TrackHit*>& hits_set);
 
       /** Fill the tree structure */
-      void startFillingTree(bool returnCandidate = false, TrackCandidate* cand = nullptr);
+      void startFillingTree();
+
+      /** Fill the tree structure */
+      void startFillingTree(bool returnResult, std::vector<QuadTree*>& nodeList);
 
       /**
        * Fill children of node with hits (according to bin crossing criteria)

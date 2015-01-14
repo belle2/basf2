@@ -22,8 +22,8 @@ using namespace TrackFindingCDC;
 TrackCandidate::TrackCandidate(
   TrackCandidate& candidate) :
   m_theta(candidate.m_theta), m_r(candidate.m_r), m_xc(candidate.m_xc), m_yc(candidate.m_yc),
-  m_charge(candidate.m_charge), m_type(candidate.m_type),
-  m_calcedMomentum(candidate.m_calcedMomentum), m_momEstimation(candidate.m_momEstimation), m_ref_x(candidate.m_ref_x), m_ref_y(candidate.m_ref_y)
+  m_ref_x(candidate.m_ref_x), m_ref_y(candidate.m_ref_y), m_charge(candidate.m_charge), m_type(candidate.m_type),
+  m_calcedMomentum(candidate.m_calcedMomentum), m_momEstimation(candidate.m_momEstimation)
 
 {
   m_hitPattern = candidate.getHitPattern();
@@ -36,8 +36,8 @@ TrackCandidate::~TrackCandidate()
 
 TrackCandidate::TrackCandidate(double theta, double r, int charge,
                                const std::vector<TrackHit*>& trackHitList) :
-  m_theta(theta), m_r(r), m_xc(cos(theta) / r), m_yc(sin(theta) / r), m_charge(charge), m_axialHits(0), m_stereoHits(0), m_calcedMomentum(false), m_momEstimation(0, 0, 0),
-  m_ref_x(0), m_ref_y(0)
+  m_theta(theta), m_r(r), m_xc(cos(theta) / r), m_yc(sin(theta) / r), m_ref_x(0), m_ref_y(0),
+  m_charge(charge), m_axialHits(0), m_stereoHits(0), m_calcedMomentum(false), m_momEstimation(0, 0, 0)
 {
   m_TrackHits.reserve(256);
 
@@ -61,8 +61,8 @@ TrackCandidate::TrackCandidate(double theta, double r, int charge,
 }
 
 TrackCandidate::TrackCandidate(const std::vector<QuadTree*>& nodeList) :
-  m_theta(0), m_r(0), m_xc(0), m_yc(0), m_charge(0), m_axialHits(0), m_stereoHits(0), m_calcedMomentum(false), m_momEstimation(0, 0, 0),
-  m_ref_x(0), m_ref_y(0)
+  m_theta(0), m_r(0), m_xc(0), m_yc(0), m_ref_x(0), m_ref_y(0), m_charge(0), m_axialHits(0), m_stereoHits(0),
+  m_calcedMomentum(false), m_momEstimation(0, 0, 0)
 {
   m_TrackHits.reserve(256);
 

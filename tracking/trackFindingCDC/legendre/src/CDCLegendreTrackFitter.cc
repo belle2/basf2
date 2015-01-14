@@ -42,7 +42,7 @@ double TrackFitter::fitTrackCandidateFast(
     double weight;// weight of each hit, so far no difference in hit quality
     double sumWeights = 0, divisor; // sumWeights is sum of weights, divisor is 1/sumWeights;
 
-    int nhits = hits.size();
+//    int nhits = hits.size();
 
     // if with_drift_time if true, uses drift time information in fitting procedure
     if (!with_drift_time) {
@@ -81,8 +81,8 @@ double TrackFitter::fitTrackCandidateFast(
 
         x = hit->getWirePosition().X();
         y = hit->getWirePosition().Y();
-        double R_dist = sqrt(SQR(xc_track - x) + SQR(yc_track - y));
-        double dist = radius_track - R_dist;
+        double __attribute__((unused)) R_dist = sqrt(SQR(xc_track - x) + SQR(yc_track - y));
+//        double dist = radius_track - R_dist;
         double driftLength = hit->getDriftLength();
         /*
                 if (dist > 0) {
@@ -365,7 +365,7 @@ double TrackFitter::fitTrackCandidateFast(
       B2INFO("x: " << x << "; y: " << y << "; xy: " << xy << "; acos(xy/x*y):" << asin(x*y/xy));
     */
 
-    double angle_rot(0);
+    double __attribute__((unused)) angle_rot(0);
     angle_rot = atan2(2.*xy, x2 - y2) / 2. ;
 
     double new_x(x), new_y(y);//, rotation(tan(xy));
@@ -390,7 +390,7 @@ double TrackFitter::fitTrackCandidateFast(
       //    double y_hit = sin(angle_rot)*x_translation + cos(angle_rot) * y_translation;
 
 
-      double r2_temp = x_hit * x_hit + y_hit * y_hit;
+//      double r2_temp = x_hit * x_hit + y_hit * y_hit;
 
       x += x_hit * w;
       y += y_hit * w;
@@ -511,7 +511,7 @@ double TrackFitter::fitTrackCandidateFast(
     track_par.second = -1. * rho;
     B2DEBUG(100, "After:  theta: " << track_par.first << "; r: " << track_par.second);
 
-    double chi2 = sum_w * (1. + rho * dist) * (1. + rho * dist) * (sin(phi) * sin(phi) * Cxx - 2.*sin(phi) * cos(phi) * Cxy + cos(phi) * cos(phi) * Cyy - kappa * kappa * Cr2r2); /// returns chi2
+    chi2 = sum_w * (1. + rho * dist) * (1. + rho * dist) * (sin(phi) * sin(phi) * Cxx - 2.*sin(phi) * cos(phi) * Cxy + cos(phi) * cos(phi) * Cyy - kappa * kappa * Cr2r2); /// returns chi2
     //B2INFO( "chi2: " << chi2);
 
     //  B2INFO("x: " << x << "; y: " << y << "; xy: " << xy << "; atan(xy): " << atan(xy));
@@ -600,8 +600,8 @@ void TrackFitter::estimatePolarAngle(TrackCandidate* track)
     double Zpos_1 = sign_final * (lWire * fabs(dist_1)) / rWire ;
     double Zpos_2 = sign_final * (lWire * fabs(dist_2)) / rWire ;
 
-    double omega_1 = Zpos_1 / (alpha * track->getRadius());
-    double omega_2 = Zpos_2 / (alpha * track->getRadius());
+    double __attribute__((unused)) omega_1 = Zpos_1 / (alpha * track->getRadius());
+    double __attribute__((unused)) omega_2 = Zpos_2 / (alpha * track->getRadius());
 
 //    double theta_track_1 = (atan(omega_1) + 3.1415/2 ) * 180. / 3.1415;
 //    double theta_track_2 = (atan(omega_2) + 3.1415/2 ) * 180. / 3.1415;
@@ -667,7 +667,7 @@ bool TrackFitter::fitTrackCandWithSVD(TrackCandidate* track, /*std::vector<SVDCl
     for (SVDCluster * svdVCluster : svdClustersTrackCand) {
       if (svdVCluster->isUCluster())continue;
       if (svdVCluster->getSensorID() != svdUCluster->getSensorID()) continue;
-      float  posSVD = svdUCluster->getPosition();
+      float __attribute__((unused)) posSVD = svdUCluster->getPosition();
       VxdID sensorID = svdUCluster->getSensorID();
 //      B2INFO("posSVD = " << posSVD);
 //      B2INFO("sensorID = " << sensorID);
@@ -971,7 +971,7 @@ void TrackFitter::fitTrackCandidateStepped(
   alpha = -1. / tan(track_theta);
   beta = track_r / sin(track_theta);
   summ = 0.;
-  BOOST_FOREACH(TrackHit * hit, track->first) {
+  for (TrackHit * hit : track->first) {
     x0 = hit->getConformalX();
     y0 = hit->getConformalY();
     summ += SQR(x0 - (x0 + alpha * (y0 - beta)) / (SQR(alpha + 1))) + SQR(y0 - (alpha * x0 + alpha * alpha * y0 + beta) / (SQR(alpha + 1)));
@@ -996,7 +996,7 @@ void TrackFitter::fitTrackCandidateStepped(
     alpha = -1. / tan(track_theta);
     beta = track_r / sin(track_theta);
 
-    BOOST_FOREACH(TrackHit * hit, track->first) {
+    for (TrackHit * hit : track->first) {
       x0 = hit->getConformalX();
       y0 = hit->getConformalY();
       drift_time = hit->getConformalDriftLength();
@@ -1083,7 +1083,7 @@ void TrackFitter::fitTrackCandidateStepped(
     alpha = -1. / tan(track_theta);
     beta = track_r / sin(track_theta);
 
-    BOOST_FOREACH(TrackHit * hit, track->first) {
+    for (TrackHit * hit : track->first) {
       x0 = hit->getConformalX();
       y0 = hit->getConformalY();
       drift_time = hit->getConformalDriftLength();
@@ -1164,7 +1164,7 @@ void TrackFitter::fitTrackCandidateNormalSpace(
   track_r_initial = track_r;
   R_initial = R;
 
-  BOOST_FOREACH(TrackHit * hit, track->first) {
+  for (TrackHit * hit : track->first) {
     x0_hit = hit->getOriginalWirePosition().X();
     y0_hit = hit->getOriginalWirePosition().Y();
     summ += SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());

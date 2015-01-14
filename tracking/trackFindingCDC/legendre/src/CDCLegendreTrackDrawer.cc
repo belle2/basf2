@@ -15,7 +15,7 @@ using namespace TrackFindingCDC;
 
 
 TrackDrawer::TrackDrawer(bool drawCandInfo, bool drawCandidates, bool batchMode) :
-  m_drawCandInfo(drawCandInfo), m_drawCandidates(drawCandidates), m_rMin(-0.15), m_rMax(0.15), m_batchMode(batchMode)
+  m_drawCandInfo(drawCandInfo), m_drawCandidates(drawCandidates), m_batchMode(batchMode), m_rMin(-0.15), m_rMax(0.15)
 {
 
 }

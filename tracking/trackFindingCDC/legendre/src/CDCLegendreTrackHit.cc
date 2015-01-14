@@ -141,6 +141,9 @@ void TrackHit::setWirePosition()
   m_wirePosition.SetZ(m_zReference);
   m_wirePosition.SetX(wireBegin.x() + fraction * (wireEnd.x() - wireBegin.x()));
   m_wirePosition.SetY(wireBegin.y() + fraction * (wireEnd.y() - wireBegin.y()));
+
+  performConformalTransformation();
+
 }
 
 void TrackHit::performConformalTransformation()

@@ -17,7 +17,7 @@ using namespace TrackFindingCDC;
 
 float* QuadTree::s_sin_theta;
 float* QuadTree::s_cos_theta;
-bool QuadTree::s_sin_lookup_created;
+bool QuadTree::s_sin_lookup_created = false;
 int QuadTree::s_nbinsTheta;
 unsigned int QuadTree::s_hitsThreshold;
 float QuadTree::s_rThreshold;
@@ -46,7 +46,7 @@ QuadTree::QuadTree(float rMin, float rMax, int thetaMin, int thetaMax, int level
     m_parent = parent;
   } else {
     m_parent = NULL;
-    s_sin_lookup_created = false;
+//    s_sin_lookup_created = false;
     s_rThreshold = 0.15; //whole phase-space;
   }
 
@@ -83,13 +83,23 @@ QuadTree::~QuadTree()
     delete[] m_thetaBin;
 
   }
+}
+
+
+void QuadTree::terminate()
+{
+
+  clearTree();
 
   if ((m_level == 0) && (s_sin_lookup_created)) {
     delete[] s_sin_theta;
     delete[] s_cos_theta;
+    s_sin_lookup_created = false;
   }
 
+
 }
+
 
 bool QuadTree::checkLimitsR()
 {
@@ -269,7 +279,16 @@ void QuadTree::clearTree()
 
 }
 
-void QuadTree::startFillingTree(bool returnCandidate, TrackCandidate* cand)
+
+void QuadTree::startFillingTree()
+{
+
+  std::vector<QuadTree*> nodeList;
+  startFillingTree(false, nodeList);
+
+}
+
+void QuadTree::startFillingTree(bool returnResult, std::vector<QuadTree*>& nodeList)
 {
   if (m_hits.size() < s_hitsThreshold) return;
   if (m_rMin * m_rMax >= 0 && fabs(m_rMin) > s_rThreshold && fabs(m_rMax) > s_rThreshold) return;
@@ -279,23 +298,29 @@ void QuadTree::startFillingTree(bool returnCandidate, TrackCandidate* cand)
 
     QuadTreeCandidateCreator::Instance().createCandidateDirect(this);
 
-    /*
-    if(!returnCandidate) QuadTreeCandidateCreator::Instance().createCandidateDirect(this);
+
+    if (not returnResult) QuadTreeCandidateCreator::Instance().createCandidateDirect(this);
     else {
+      nodeList.push_back(this);
+      /*
+      B2INFO("returnCandidate = true!");
       if(cand == nullptr){
+        B2INFO("CREATE NEW STEREO CANDIDATE!");
         cleanHitsInNode();
         std::vector<QuadTree*> nodeList;
         nodeList.push_back(this);
         cand = new TrackCandidate(nodeList);
       } else if(cand->getTrackHits().size() < getHits().size()){
         delete cand;
+        B2INFO("RE-CREATE STEREO CANDIDATE!");
 
         cleanHitsInNode();
         std::vector<QuadTree*> nodeList;
         nodeList.push_back(this);
         cand = new TrackCandidate(nodeList);
       }
-    }*/
+      */
+    }
 
     return;
   }
@@ -330,7 +355,7 @@ void QuadTree::startFillingTree(bool returnCandidate, TrackCandidate* cand)
     binUsed[t_index][r_index] = true;
 
     m_children[t_index][r_index]->cleanHitsInNode();
-    m_children[t_index][r_index]->startFillingTree();
+    m_children[t_index][r_index]->startFillingTree(returnResult, nodeList);
 
   }
 }

@@ -91,12 +91,12 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
 
 
-  int tracknr(0);
+//  int tracknr(0);
 
   for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
     std::vector<TrackHit*> trackHits;
     for (TrackHit * hit : m_AxialHitList) {
-      for (int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
+      for (unsigned int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
         if (hit->getStoreIndex() == gfTrackCands[iCand]->getHit(iHit)->getHitId()) {
           trackHits.push_back(hit);
           continue;
@@ -105,9 +105,9 @@ void CDCLegendreDAFStereoAssigningModule::event()
     }
 
 
-    std::pair<double, double> ref_point = std::make_pair(0., 0.);
+//    std::pair<double, double> ref_point = std::make_pair(0., 0.);
     std::pair<double, double> track_par = std::make_pair(-999, -999);
-    double chi2;
+//    double chi2;
     double r = 1.5 * 0.00299792458 / gfTrackCands[iCand]->getMomSeed().Pt();
     double theta = gfTrackCands[iCand]->getMomSeed().Phi() - gfTrackCands[iCand]->getChargeSeed() * TMath::Pi() / 2.;
 
@@ -168,7 +168,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
     double theta = 0;
 
-    B2INFO(" Creating TrackCand");
+    B2DEBUG(100, " Creating TrackCand");
     genfit::TrackCand* aTrackCandPointer = new genfit::TrackCand();
 
     TVector3 position;
@@ -214,7 +214,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
       trackHitVector.push_back(hit);
     }
 
-    double Rcand = cand->getRadius();
+//    double Rcand = cand->getRadius();
 
     for (TrackHit * hit : m_StereoHitList) {
 
@@ -237,7 +237,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
       if (std::isnan(dist_2)) continue;
 
 
-      double lWire = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z());
+//     double lWire = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z());
       double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
 
       if ((fabs(dist_1) > rWire / 3.) || (fabs(dist_2) > rWire / 3.)) continue;
@@ -305,7 +305,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
       //B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed(0, 0)) << "  " << sqrt(covSeed(1, 1)) << "  " << sqrt(covSeed(2, 2)));
       B2DEBUG(100, "Start values: pdg:      " << currentPdgCode);
 
-      B2INFO(" Creating MeasurementFactory");
+      B2DEBUG(100, " Creating MeasurementFactory");
 
       genfit::MeasurementFactory<genfit::AbsMeasurement> factory;
 
@@ -329,15 +329,15 @@ void CDCLegendreDAFStereoAssigningModule::event()
       covSeed(5, 5) = 0.04e-3;
       aTrackCandPointer->setCovSeed(covSeed);
 
-      B2INFO(" Creating RKTrackRep");
+      B2DEBUG(100, " Creating RKTrackRep");
 
       genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
 
-      B2INFO(" Creating Track");
+      B2DEBUG(100, " Creating Track");
 
       genfit::Track* gfTrack = new genfit::Track(*aTrackCandPointer, factory, trackRep); //create the track with the corresponding track representation
 
-      B2INFO(" Checking Track");
+      B2DEBUG(100, " Checking Track");
 
       const int nHitsInTrack = gfTrack->getNumPointsWithMeasurement();
       B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
@@ -372,7 +372,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
       // Select the fitter.  scoped_ptr ensures that it's destructed at the right point.
 
-      B2INFO(" Creating AbsKalmanFitter");
+      B2DEBUG(100, " Creating AbsKalmanFitter");
 
       boost::scoped_ptr<genfit::AbsKalmanFitter> fitter(0);
 
@@ -439,15 +439,15 @@ void CDCLegendreDAFStereoAssigningModule::event()
           kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
           fitSuccess = fitSuccess && kfs;
         }
-        B2INFO("-----> Fit results:");
-        B2INFO("       Fitted and converged: " << fitSuccess);
+        B2DEBUG(100, "-----> Fit results:");
+        B2DEBUG(100, "       Fitted and converged: " << fitSuccess);
         if (fitSuccess) {
-          B2INFO("       Chi2 of the fit: " << kfs->getChi2());
+          B2DEBUG(100, "       Chi2 of the fit: " << kfs->getChi2());
           //B2DEBUG(99,"       Forward Chi2: "<<gfTrack.getForwardChi2());
-          B2INFO("       NDF of the fit: " << kfs->getBackwardNdf());
+          B2DEBUG(100, "       NDF of the fit: " << kfs->getBackwardNdf());
           //Calculate probability
           double pValue = gfTrack->getFitStatus()->getPVal();
-          B2INFO("       pValue of the fit: " << pValue);
+          B2DEBUG(100, "       pValue of the fit: " << pValue);
 
           candFitted = true;
 
@@ -511,7 +511,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
     for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
       if (trackCand->getGfTrackCand() != gfTrackCands[iCand]) continue;
 
-      std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
+//      std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
       TVector3 position;
       position = trackCand->getReferencePoint();
 

@@ -438,7 +438,6 @@ void CDCLegendreTrackingModule::DoTreeTrackFinding()
     it = hits_set.insert(it, trackHit);
   }
 
-  unsigned int n_hits = 999;
   double limit = 40;
   double rThreshold = 0.07;
   m_cdcLegendreQuadTree->provideHitSet(hits_set);
@@ -491,7 +490,6 @@ void CDCLegendreTrackingModule::DoTreeTrackFindingFinal()
     if ((trackHit->getHitUsage() != TrackHit::used_in_track) && (trackHit->getHitUsage() != TrackHit::background)) it = hits_set.insert(it, trackHit);
   }
 
-  unsigned int n_hits = 999;
   double limit = 20;
   double rThreshold = 0.15;
   m_cdcLegendreQuadTree->clearTree();
@@ -697,6 +695,7 @@ void CDCLegendreTrackingModule::endRun()
 
 void CDCLegendreTrackingModule::terminate()
 {
+  m_cdcLegendreQuadTree->terminate();
   delete m_cdcLegendreQuadTree;
   delete m_cdcLegendreQuadTreeCandidateCreator;
 //  delete m_cdcLegendreConformalPosition;

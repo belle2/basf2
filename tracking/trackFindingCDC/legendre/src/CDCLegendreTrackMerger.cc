@@ -803,8 +803,8 @@ void TrackMerger::splitTracks()
 {
   for (TrackCandidate * cand : m_trackList) {
 //    if(cand->getCandidateType() == TrackCandidate::tracklet) continue;
-    double theta = cand->getTheta();
-    double r = cand->getR();
+//    double theta = cand->getTheta();
+//    double r = cand->getR();
     double yc = cand->getXc();
     double xc = cand->getYc();
 

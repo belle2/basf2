@@ -83,7 +83,7 @@ void CDCLegendreHistogrammingModule::event()
     //vector with TrackHit objects belonging to the same track
     std::vector<TrackHit*> trackHits;
     for (TrackHit * hit : m_AxialHitList) {
-      for (int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
+      for (unsigned int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
         if (hit->getStoreIndex() == gfTrackCands[iCand]->getHit(iHit)->getHitId()) {
           trackHits.push_back(hit);
           continue;
@@ -92,9 +92,9 @@ void CDCLegendreHistogrammingModule::event()
     }
 
     //set parameters of the track
-    std::pair<double, double> ref_point = std::make_pair(0., 0.);
+//    std::pair<double, double> ref_point = std::make_pair(0., 0.);
     std::pair<double, double> track_par = std::make_pair(-999, -999);
-    double chi2;
+//    double chi2;
     double r = 1.5 * 0.00299792458 / gfTrackCands[iCand]->getMomSeed().Pt();
     //here: theta is azimuthal angle of the candidate (in XY plane)
     double theta = gfTrackCands[iCand]->getMomSeed().Phi() - gfTrackCands[iCand]->getChargeSeed() * TMath::Pi() / 2.;
@@ -159,7 +159,7 @@ void CDCLegendreHistogrammingModule::event()
     for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
       if (trackCand->getGfTrackCand() != gfTrackCands[iCand]) continue;
 
-      std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
+//     std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
       TVector3 position;
       position = trackCand->getReferencePoint();
 

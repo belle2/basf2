@@ -288,7 +288,7 @@ bool PatternChecker::isTrackComplete(TrackCandidate* track)
     }
   }
 
-  int charge;
+  int __attribute__((unused)) charge(0);
 
   if (nPositiveHits > nNegativeHits) {
     charge = TrackCandidate::charge_positive;
@@ -298,6 +298,6 @@ bool PatternChecker::isTrackComplete(TrackCandidate* track)
 
   //TODO
 
-
+  return true;
 }
 

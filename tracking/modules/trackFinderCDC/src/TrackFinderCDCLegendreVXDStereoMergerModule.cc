@@ -91,12 +91,12 @@ void CDCLegendreVXDStereoMergerModule::event()
 
 
 
-  int tracknr(0);
+//  int tracknr(0);
 
   for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
     std::vector<TrackHit*> trackHits;
     for (TrackHit * hit : m_AxialHitList) {
-      for (int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
+      for (unsigned int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
         if (hit->getStoreIndex() == gfTrackCands[iCand]->getHit(iHit)->getHitId()) {
           trackHits.push_back(hit);
           continue;
@@ -105,9 +105,9 @@ void CDCLegendreVXDStereoMergerModule::event()
     }
 
 
-    std::pair<double, double> ref_point = std::make_pair(0., 0.);
+//    std::pair<double, double> ref_point = std::make_pair(0., 0.);
     std::pair<double, double> track_par = std::make_pair(-999, -999);
-    double chi2;
+//    double chi2;
     double r = 1.5 * 0.00299792458 / gfTrackCands[iCand]->getMomSeed().Pt();
     double theta = gfTrackCands[iCand]->getMomSeed().Phi() - gfTrackCands[iCand]->getChargeSeed() * TMath::Pi() / 2.;
 
@@ -201,9 +201,9 @@ void CDCLegendreVXDStereoMergerModule::event()
     TVector3 vxdmomBest;
     TVector3 vxdposBest;
 
-    for (unsigned int iVxdTrack = 0; iVxdTrack < VXDGFTracks.getEntries(); iVxdTrack++) { //extrapolate to the innermost hit of track candidate
-      double chi_2 = 999;
-      double CHI2_MAX = 999;
+    for (int iVxdTrack = 0; iVxdTrack < VXDGFTracks.getEntries(); iVxdTrack++) { //extrapolate to the innermost hit of track candidate
+//      double chi_2 = 999;
+//      double CHI2_MAX = 999;
       try {
         genfit::MeasuredStateOnPlane vxd_sop = VXDGFTracks[iVxdTrack]->getFittedState(-1);
         vxd_sop.extrapolateToCylinder(dist_hit_min/*m_CDC_wall_radius*/, position, momentum);
@@ -297,7 +297,7 @@ void CDCLegendreVXDStereoMergerModule::event()
 
 //      if(not vxdTrackCandRel)continue;
 
-      bool areTracksConsistent = false;
+//      bool areTracksConsistent = false;
 
 //      if (vxdTrackCandRel) areTracksConsistent = m_cdcLegendreTrackFitter->fitTrackCandWithSVD(cand, vxdTrackCandRel);
 
@@ -337,7 +337,7 @@ void CDCLegendreVXDStereoMergerModule::event()
     for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
       if (trackCand->getGfTrackCand() != gfTrackCands[iCand]) continue;
 
-      std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
+//      std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);
       TVector3 position;
       position = trackCand->getReferencePoint();
 

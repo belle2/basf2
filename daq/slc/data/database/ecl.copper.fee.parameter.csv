@@ -51,3 +51,18 @@ CPR6007, ECL:Collector:default:a, SHAPER_MASK_LOW,0, 0xFF
 CPR6007, ECL:Collector:default:b, SHAPER_MASK_LOW,0, 0xFF
 CPR6008, ECL:Collector:default:a, SHAPER_MASK_LOW,0, 0xFF
 CPR6008, ECL:Collector:default:b, SHAPER_MASK_LOW,0, 0xFF
+CPR6008, ECL:Collector:default:b, SHAPER_MASK_HIGH,0, 0x0F
+CPR6008, ECL:Collector:default:b, TTD_TRG_RARE_FACTOR,0, 0xc1
+CPR6008, ECL:Collector:default:b, TTD_TRG_TYPE,0, 0x11
+CPR6008, ECL:Collector:default:b, CALIB_AMPL0_LOW,0, 0x00
+CPR6008, ECL:Collector:default:b, CALIB_AMPL0_HIGH,0, 0x00
+CPR6008, ECL:Collector:default:b, CALIB_AMPL_STEP_HIGH,0, 0x00
+CPR6008, ECL:Collector:default:b, CALIB_AMPL_STEP_HIGH,0, 0x00
+CPR6008, ECL:Collector:default:b, CALIB_DELAY0_LOW,0, 0x00
+CPR6008, ECL:Collector:default:b, CALIB_DELAY0_HIGH,0, 0x00
+CPR6008, ECL:Collector:default:b, CALIB_DELAY_STEP_LOW,0, 0x00
+CPR6008, ECL:Collector:default:b, CALIB_DELAY_STEP_HIGH,0, 0x00
+CPR6008, ECL:Collector:default:b, CALIB_EVENTS_PER_STEP,0, 0x00
+
+
+

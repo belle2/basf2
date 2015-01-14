@@ -118,6 +118,15 @@ insert into "fieldinfo.type" (name, alias) values ('nsm::float', 'float');
 insert into "fieldinfo.type" (name, alias) values ('nsm::double', 'double precision');
 insert into "fieldinfo.type" (name, alias) values ('nsm::object', 'bigint');
 
+create table runnumberinfo (
+  record_time  timestamp with time zone  not null default current_timestamp,
+  id serial primary key,
+  expno int not null,
+  runno int not null,
+  subno int not null,
+  isstart boolean not null
+);
+
 create table configinfo (
   record_time timestamp with time zone not null default current_timestamp, 
   id serial primary key, 

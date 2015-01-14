@@ -20,6 +20,13 @@ namespace Belle2 {
       read(file1, true);
       read(file2, true);
     }
+    ConfigFile(const std::string& file1,
+               const std::string& file2,
+               const std::string& file3) {
+      read(file1, true);
+      read(file2, true);
+      read(file3, true);
+    }
     ConfigFile(const std::string& file1, const char* file2) {
       read(file1, true);
       read(file2, true);

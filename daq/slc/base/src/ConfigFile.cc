@@ -13,16 +13,22 @@ const std::string ConfigFile::getFilePath(const std::string& filename)
 {
   std::string file_path;
   if (filename.at(0) != '/') {
-    const char* path = getenv("BELLE2_LOCAL_DIR");
+    char* path = getenv("BELLE2_DAQ_SLC");
     if (path == NULL) {
-      std::cerr << "[ERROR] Enveriment varialble : BELLE_LOCAL_DIR" << std::endl;
-      exit(1);
-    }
-    file_path = path;
-    if (filename.find("/") == std::string::npos) {
-      file_path += "/daq/slc/data/config/" + filename + ".conf";
+      path = getenv("BELLE2_LOCAL_DIR");
+      if (path == NULL) {
+        std::cerr << "[ERROR] Enveriment varialble : BELLE_LOCAL_DIR" << std::endl;
+        exit(1);
+      }
+      file_path = path;
+      file_path += "/daq/slc/";
     } else {
-      file_path += "/daq/slc/data/" + filename + ".conf";
+      file_path = path;
+    }
+    if (filename.find("/") == std::string::npos) {
+      file_path += "/data/config/" + filename + ".conf";
+    } else {
+      file_path += "/data/" + filename + ".conf";
     }
   } else {
     file_path = filename;

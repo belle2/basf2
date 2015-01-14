@@ -94,3 +94,8 @@ long long StringUtil::atoll(const std::string str)
 {
   return atoll(str.c_str());
 }
+
+bool StringUtil::find(const std::string& s, const std::string& str)
+{
+  return s.find(str) != std::string::npos;
+}

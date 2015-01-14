@@ -22,6 +22,7 @@ namespace Belle2 {
     static int atoi(const std::string str);
     static double atof(const std::string str);
     static long long atoll(const std::string str);
+    static bool find(const std::string& s, const std::string& str);
 
   };
 

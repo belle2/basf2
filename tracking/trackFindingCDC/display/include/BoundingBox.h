@@ -51,6 +51,14 @@ namespace Belle2 {
 
       }
 
+      /// Expands the rectangle in each direction by the given value delta.
+      void expand(const float& delta) {
+        m_left -= delta;
+        m_bottom -= delta;
+        m_right += delta;
+        m_top += delta;
+      }
+
       /// Getter for the width of the bounding box rectangle.
       float getWidth()
       { return getRight() - getLeft(); }

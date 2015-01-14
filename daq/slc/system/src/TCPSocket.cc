@@ -55,6 +55,11 @@ int TCPSocket::connect() throw (IOException)
       host = gethostbyaddr((char*)&ip_address, sizeof(ip_address), AF_INET);
     }
   }
+  if (host == NULL) {
+    close();
+    throw (IOException("Failed to connect host %s:%d",
+                       m_ip.c_str(), m_port));
+  }
   addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
 
   if (::connect(m_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {

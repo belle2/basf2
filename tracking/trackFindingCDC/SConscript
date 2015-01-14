@@ -20,7 +20,9 @@ env['LIBS'] = [
 # Forward the compilation option 
 belle2_option = os.environ["BELLE2_OPTION"]
 
-cpp_flags = ['-O3', '-g',]
+#cpp_flags = ['-O3', '-g',]
+cpp_flags = []
+
 if belle2_option == "debug":
     cpp_defines = ['TRACKFINDINGCDC_COMPILE_DEBUG',]
 

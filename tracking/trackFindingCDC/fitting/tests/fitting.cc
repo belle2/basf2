@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <cdc/translators/SimpleTDCCountTranslator.h>

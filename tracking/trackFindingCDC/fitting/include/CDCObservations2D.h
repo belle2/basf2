@@ -294,12 +294,12 @@ namespace Belle2 {
 
 #ifndef __CINT__
       /// Appends all wire positions of the hits in the legendre track hits. Always use position since there is no other mode as long as there are no right left passage information available.
-      size_t append(const std::vector<TrackFinderCDCLegendre::TrackHit*>& legendreTrackHits,
+      size_t append(const std::vector<TrackFindingCDC::TrackHit*>& legendreTrackHits,
                     bool usePosition  __attribute__((unused)) = false) {
         size_t result = 0;
-        for (const TrackFinderCDCLegendre::TrackHit * ptrLegendreTrackHit : legendreTrackHits) {
+        for (const TrackFindingCDC::TrackHit * ptrLegendreTrackHit : legendreTrackHits) {
           if (not ptrLegendreTrackHit) continue;
-          const TrackFinderCDCLegendre::TrackHit& legendreTrackHit = *ptrLegendreTrackHit;
+          const TrackFindingCDC::TrackHit& legendreTrackHit = *ptrLegendreTrackHit;
           const TVector3&& wirePos = legendreTrackHit.getWirePosition();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0;

@@ -26,7 +26,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 
@@ -248,7 +248,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
       trackHitVector.push_back(hit);
     }
 
-    TrackFinderCDCLegendre::TrackCreator::sortHits(trackHitVector, cand->getChargeSign());
+    TrackFindingCDC::TrackProcessor::sortHits(trackHitVector, cand->getChargeSign());
 
 
     for (TrackHit * trackHit : trackHitVector) {

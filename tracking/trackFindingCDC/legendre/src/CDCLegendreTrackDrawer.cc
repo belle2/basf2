@@ -11,7 +11,7 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
 
 using namespace Belle2;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 
 TrackDrawer::TrackDrawer(bool drawCandInfo, bool drawCandidates, bool batchMode) :

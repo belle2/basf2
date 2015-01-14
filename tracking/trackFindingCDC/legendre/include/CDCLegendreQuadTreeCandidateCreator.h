@@ -12,7 +12,7 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendrePatternChecker.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCreator.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 
@@ -30,9 +30,9 @@
 
 namespace Belle2 {
 
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
-    class TrackCreator;
+    class TrackProcessor;
     class QuadTree;
     class TrackFitter;
     class TrackMerger;
@@ -56,7 +56,7 @@ namespace Belle2 {
       static void setHits(std::vector<TrackHit*>& axialHits) {s_axialHits = axialHits;};
 
       /** Set candidate fitter */
-      static void setCandidateCreator(TrackCreator* cdcLegendreTrackCreator) {s_cdcLegendreTrackCreator = cdcLegendreTrackCreator;};
+      static void setCandidateCreator(TrackProcessor* cdcLegendreTrackProcessor) {s_cdcLegendreTrackProcessor = cdcLegendreTrackProcessor;};
 
       /** Add node to the list of nodes with candidated */
       static inline void addNode(QuadTree* node) {s_nodesWithCandidates.push_back(node);};
@@ -92,7 +92,7 @@ namespace Belle2 {
       static std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > > s_candidates; /**< Holds list of track candidates */
       static std::list<QuadTree*> s_nodesWithCandidates; /**< List of nodes with possible track candidates */
       static TrackFitter* s_cdcLegendreTrackFitter; /**< Track fitter object */
-      static TrackCreator* s_cdcLegendreTrackCreator; /**< Track creator object */
+      static TrackProcessor* s_cdcLegendreTrackProcessor; /**< Track creator object */
       static TrackMerger* s_cdcLegendreTrackMerger; /**< Track merger object */
       static std::vector<TrackHit*> s_axialHits; /**< Holds list of acial hits */
 

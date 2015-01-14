@@ -14,7 +14,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class ConformalPosition {
     public:

@@ -38,7 +38,7 @@
 #include <iostream>
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class TrackCandidate;
     class TrackHit;

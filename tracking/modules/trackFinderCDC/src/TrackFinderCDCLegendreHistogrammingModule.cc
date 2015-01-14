@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 

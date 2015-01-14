@@ -12,13 +12,13 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 QuadTreeCandidateCreator* QuadTreeCandidateCreator::s_cdcLegendreQuadTreeCandidateCreator = 0;
 std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > > QuadTreeCandidateCreator::s_candidates; /**< Holds list of track candidates */
 std::list<QuadTree*> QuadTreeCandidateCreator::s_nodesWithCandidates;
 TrackFitter* QuadTreeCandidateCreator::s_cdcLegendreTrackFitter;
-TrackCreator* QuadTreeCandidateCreator::s_cdcLegendreTrackCreator;
+TrackProcessor* QuadTreeCandidateCreator::s_cdcLegendreTrackProcessor;
 TrackMerger* QuadTreeCandidateCreator::s_cdcLegendreTrackMerger;
 std::vector<TrackHit*> QuadTreeCandidateCreator::s_axialHits;
 
@@ -139,14 +139,14 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
 
   TrackCandidate* trackCandidate;
   if (AxialVsStereo >= 0) {
-    trackCandidate = s_cdcLegendreTrackCreator->createLegendreTrackCandidate(nodeList);
+    trackCandidate = s_cdcLegendreTrackProcessor->createLegendreTrackCandidate(nodeList);
 
     s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
 //    trackCandidate->clearBadHits();
 //    s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
 //    s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, true);
 
-  } else trackCandidate = s_cdcLegendreTrackCreator->createLegendreStereoTracklet(nodeList);
+  } else trackCandidate = s_cdcLegendreTrackProcessor->createLegendreStereoTracklet(nodeList);
 
 
   int neighborsOrder = 5;
@@ -198,13 +198,13 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
 
 
   SimpleFilter m_cdcLegendreSimpleFilter;
-  m_cdcLegendreSimpleFilter.processTracks(s_cdcLegendreTrackCreator->getTrackList());
-  for (TrackCandidate * cand : s_cdcLegendreTrackCreator->getTrackList()) {
+  m_cdcLegendreSimpleFilter.processTracks(s_cdcLegendreTrackProcessor->getTrackList());
+  for (TrackCandidate * cand : s_cdcLegendreTrackProcessor->getTrackList()) {
     s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
   }
-  m_cdcLegendreSimpleFilter.appenUnusedHits(s_cdcLegendreTrackCreator->getTrackList(), s_axialHits);
+  m_cdcLegendreSimpleFilter.appenUnusedHits(s_cdcLegendreTrackProcessor->getTrackList(), s_axialHits);
 
-  PatternChecker cdcLegendrePatternChecker(s_cdcLegendreTrackCreator);
+  PatternChecker cdcLegendrePatternChecker(s_cdcLegendreTrackProcessor);
   cdcLegendrePatternChecker.checkCandidate(trackCandidate);
 
 

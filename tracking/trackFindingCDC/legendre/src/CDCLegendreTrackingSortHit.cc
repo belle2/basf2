@@ -3,7 +3,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 bool SortHits::operator()(TrackHit* hit1,
                           TrackHit* hit2)

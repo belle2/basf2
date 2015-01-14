@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCreator.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
@@ -27,10 +27,10 @@
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class FastHough;
-    class TrackCreator;
+    class TrackProcessor;
 
     /* TODO: Check whether track overlaps with other tracks; may be try to sort tracks according to number of inresections/overlappings, some weights might be applied
      * if track sharing more than, for example, 50% of hits, that track should be definitely splitted into few*/
@@ -39,7 +39,7 @@ namespace Belle2 {
 
       TrackMerger(std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList,
                   std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter,
-                  FastHough* cdcLegendreFastHough, TrackCreator* cdcLegendreTrackCreator);
+                  FastHough* cdcLegendreFastHough, TrackProcessor* cdcLegendreTrackProcessor);
 
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
@@ -110,7 +110,7 @@ namespace Belle2 {
       std::list<TrackCandidate*>& m_stereoTrackletList; /**< List of tracklets. */
       TrackFitter* m_cdcLegendreTrackFitter; /**< Track fitter */
       FastHough* m_cdcLegendreFastHough;  /**< Fast Hough finder */
-      TrackCreator* m_cdcLegendreTrackCreator; /**< Track creator */
+      TrackProcessor* m_cdcLegendreTrackProcessor; /**< Track creator */
 
 
     };

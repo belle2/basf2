@@ -9,7 +9,7 @@
 
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 NiceDrawing::NiceDrawing(std::string& TrackCandColName, std::string& trackColName,
                          std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,

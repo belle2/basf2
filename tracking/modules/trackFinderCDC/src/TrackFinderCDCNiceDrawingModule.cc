@@ -24,7 +24,7 @@
 
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 REG_MODULE(CDCNiceDrawing)
 

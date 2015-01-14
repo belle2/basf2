@@ -19,7 +19,7 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreStereohitsProcesser.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCreator.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendrePatternChecker.h>
@@ -40,7 +40,7 @@ namespace Belle2 {
   class PatternChecker;
   class FastHough;
   class TrackMerger;
-  class TrackCreator;
+  class TrackProcessor;
   class TrackDrawer;
   class QuadTree;
   class ConformalPosition;
@@ -99,20 +99,20 @@ namespace Belle2 {
     std::string m_cdcHitsColName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
     std::string m_gfTrackCandsColName; /**< Output genfit track candidates collection name*/
 
-    std::vector<TrackFinderCDCLegendre::TrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
-    std::vector<TrackFinderCDCLegendre::TrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
-    std::list<TrackFinderCDCLegendre::TrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
-    std::list<TrackFinderCDCLegendre::TrackCandidate*> m_trackletList; /**< List of tracklets. */
-    std::list<TrackFinderCDCLegendre::TrackCandidate*> m_stereoTrackletList; /**< List of tracklets. */
+    std::vector<TrackFindingCDC::TrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
+    std::vector<TrackFindingCDC::TrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
+    std::list<TrackFindingCDC::TrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
+    std::list<TrackFindingCDC::TrackCandidate*> m_trackletList; /**< List of tracklets. */
+    std::list<TrackFindingCDC::TrackCandidate*> m_stereoTrackletList; /**< List of tracklets. */
 
-    TrackFinderCDCLegendre::TrackFitter* m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
-    TrackFinderCDCLegendre::PatternChecker* m_cdcLegendrePatternChecker; /**< Used for check patterns of tracks */
-    TrackFinderCDCLegendre::FastHough* m_cdcLegendreFastHough; /**< Fast Hough transformer */
-    TrackFinderCDCLegendre::TrackMerger* m_cdcLegendreTrackMerger; /**< Object which make track merging inside the module */
-    TrackFinderCDCLegendre::TrackCreator* m_cdcLegendreTrackCreator; /**< Object for creating tracks */
-    TrackFinderCDCLegendre::QuadTree* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
-//    TrackFinderCDCLegendre::ConformalPosition* m_cdcLegendreConformalPosition; /**< Object which holds pre-calculated conformal transformation of each wire */
-    TrackFinderCDCLegendre::QuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator; /**< Object which creates track candidates using quadtree nodes */
+    TrackFindingCDC::TrackFitter* m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
+    TrackFindingCDC::PatternChecker* m_cdcLegendrePatternChecker; /**< Used for check patterns of tracks */
+    TrackFindingCDC::FastHough* m_cdcLegendreFastHough; /**< Fast Hough transformer */
+    TrackFindingCDC::TrackMerger* m_cdcLegendreTrackMerger; /**< Object which make track merging inside the module */
+    TrackFindingCDC::TrackProcessor* m_cdcLegendreTrackProcessor; /**< Object for creating tracks */
+    TrackFindingCDC::QuadTree* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
+//    TrackFindingCDC::ConformalPosition* m_cdcLegendreConformalPosition; /**< Object which holds pre-calculated conformal transformation of each wire */
+    TrackFindingCDC::QuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator; /**< Object which creates track candidates using quadtree nodes */
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/
@@ -143,7 +143,7 @@ namespace Belle2 {
     bool m_assignStereoHits;      /**< Try to append new hits to track candidate*/
     bool m_batchMode;             /**< Sets ROOT to batch mode (don't show canvases) */
 
-    TrackFinderCDCLegendre::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
+    TrackFindingCDC::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
 
     int m_treeFinder;
     int m_steppedFinder;

@@ -9,7 +9,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 QuadTreeNeighborFinder* QuadTreeNeighborFinder::s_cdcLegendreQuadTreeNeighborFinder = 0;
 

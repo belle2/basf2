@@ -24,7 +24,7 @@
 #include "TMath.h"
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class TrackHit;
     class TrackCandidate;

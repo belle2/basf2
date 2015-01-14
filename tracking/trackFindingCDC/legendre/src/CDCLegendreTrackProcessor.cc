@@ -8,21 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCreator.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
-TrackCreator::TrackCreator(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList,
-                           std::list<TrackCandidate*>& stereoTrackletList, bool appendHits, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer):
+TrackProcessor::TrackProcessor(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList,
+                               std::list<TrackCandidate*>& stereoTrackletList, bool appendHits, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer):
   m_AxialHitList(AxialHitList), m_StereoHitList(StereoHitList), m_trackList(trackList), m_trackletList(trackletList), m_stereoTrackletList(stereoTrackletList), m_appendHits(appendHits),
   m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreTrackDrawer(cdcLegendreTrackDrawer)
 {
 
 }
 
-void TrackCreator::createLegendreTrackCandidate(
+void TrackProcessor::createLegendreTrackCandidate(
   const std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track,
   std::pair<double, double>& ref_point)
 {
@@ -86,7 +86,7 @@ void TrackCreator::createLegendreTrackCandidate(
   }
 }
 
-TrackCandidate* TrackCreator::createLegendreTrackCandidate(std::vector<QuadTree*> nodeList)
+TrackCandidate* TrackProcessor::createLegendreTrackCandidate(std::vector<QuadTree*> nodeList)
 {
   std::pair<double, double> ref_point = std::make_pair(0., 0.);;
   TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
@@ -106,7 +106,7 @@ TrackCandidate* TrackCreator::createLegendreTrackCandidate(std::vector<QuadTree*
 }
 
 
-TrackCandidate* TrackCreator::createLegendreTracklet(std::vector<TrackHit*>& hits)
+TrackCandidate* TrackProcessor::createLegendreTracklet(std::vector<TrackHit*>& hits)
 {
   std::pair<double, double> ref_point = std::make_pair(0., 0.);
   std::pair<double, double> track_par = std::make_pair(-999, -999);
@@ -133,7 +133,7 @@ TrackCandidate* TrackCreator::createLegendreTracklet(std::vector<TrackHit*>& hit
 }
 
 
-TrackCandidate* TrackCreator::createLegendreStereoTracklet(std::vector<QuadTree*> nodeList)
+TrackCandidate* TrackProcessor::createLegendreStereoTracklet(std::vector<QuadTree*> nodeList)
 {
   TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
   std::pair<double, double> ref_point = std::make_pair(0., 0.);
@@ -149,7 +149,7 @@ TrackCandidate* TrackCreator::createLegendreStereoTracklet(std::vector<QuadTree*
 }
 
 
-void TrackCreator::appendNewHits(TrackCandidate* track)
+void TrackProcessor::appendNewHits(TrackCandidate* track)
 {
   if (not m_appendHits) return;
   double x0_track = track->getXc();
@@ -166,7 +166,7 @@ void TrackCreator::appendNewHits(TrackCandidate* track)
   }
 }
 
-void TrackCreator::processTrack(TrackCandidate* trackCandidate, std::list<TrackCandidate*>& trackList)
+void TrackProcessor::processTrack(TrackCandidate* trackCandidate, std::list<TrackCandidate*>& trackList)
 {
 
 
@@ -200,7 +200,7 @@ void TrackCreator::processTrack(TrackCandidate* trackCandidate, std::list<TrackC
 }
 
 
-bool TrackCreator::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/)
+bool TrackProcessor::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/)
 {
 //  if (trackCandidate->getNAxialHits() < m_threshold)
 //    return false;
@@ -211,19 +211,19 @@ bool TrackCreator::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/)
   return true;
 }
 
-void TrackCreator::moveCandidate(list<TrackCandidate*>& initialTrackList, list<TrackCandidate*>& resultTrackList, TrackCandidate* cand)
+void TrackProcessor::moveCandidate(list<TrackCandidate*>& initialTrackList, list<TrackCandidate*>& resultTrackList, TrackCandidate* cand)
 {
   initialTrackList.remove(cand);
   resultTrackList.push_back(cand);
 }
 
-void TrackCreator::removeFromList(list<TrackCandidate*>& trackList, TrackCandidate* cand)
+void TrackProcessor::removeFromList(list<TrackCandidate*>& trackList, TrackCandidate* cand)
 {
   trackList.remove(cand);
 }
 
 
-void TrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColName)
+void TrackProcessor::createGFTrackCandidates(string& m_gfTrackCandsColName)
 {
   //StoreArray for genfit::TrackCandidates: interface class to Genfit
   StoreArray<genfit::TrackCand> gfTrackCandidates(m_gfTrackCandsColName);
@@ -286,7 +286,7 @@ void TrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColName)
 }
 
 
-void TrackCreator::sortHits(
+void TrackProcessor::sortHits(
   std::vector<TrackHit*>& hits, int charge)
 {
   SortHits sorter(charge);

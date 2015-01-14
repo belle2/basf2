@@ -22,7 +22,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 using namespace VXD;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 using namespace TrackFindingCDC;
 
 double TrackFitter::fitTrackCandidateFast(
@@ -535,7 +535,7 @@ void TrackFitter::estimatePolarAngle(TrackCandidate* track)
   }
   B2INFO("Number of stereohits is: " << vectorHits.size());
   if (vectorHits.size() == 0) {
-    B2DEBUG(100, "TrackFinderCDCLegendre::TrackFitter: track has no stereohits!");
+    B2DEBUG(100, "TrackFindingCDC::TrackFitter: track has no stereohits!");
     return;
   }
 

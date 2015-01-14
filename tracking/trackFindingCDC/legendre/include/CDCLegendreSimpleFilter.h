@@ -22,7 +22,7 @@
 
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class SimpleFilter {
 

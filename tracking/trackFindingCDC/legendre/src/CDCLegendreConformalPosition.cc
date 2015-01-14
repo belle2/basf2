@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 ConformalPosition* ConformalPosition::s_cdcLegendreConformalPosition = 0;
 

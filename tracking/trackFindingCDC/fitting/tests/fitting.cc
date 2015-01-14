@@ -210,7 +210,7 @@ TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_LineFit_WithDriftLength)
 TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
 {
 
-  const std::vector<TrackFinderCDCLegendre::TrackHit*> legendreTrackHits;
+  const std::vector<TrackFindingCDC::TrackHit*> legendreTrackHits;
 
   {
     CDCRiemannFitter riemannFitter = CDCRiemannFitter::getFitter();

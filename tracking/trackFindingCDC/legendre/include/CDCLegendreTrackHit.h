@@ -24,7 +24,7 @@
 #include <iostream>
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class TrackCandidate;
 
@@ -178,7 +178,7 @@ namespace Belle2 {
       int m_hitUsage; /**< Indicates whether hit was used */
 
     }; //end class CDCTrackHit
-  } //end namespace TrackFinderCDCLegendre
+  } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 

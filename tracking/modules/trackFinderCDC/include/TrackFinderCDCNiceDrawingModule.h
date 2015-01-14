@@ -64,7 +64,7 @@ namespace Belle2 {
 
     bool m_drawCands;
 
-    TrackFinderCDCLegendre::NiceDrawing* m_cdcLegendreNiceDrawing;
+    TrackFindingCDC::NiceDrawing* m_cdcLegendreNiceDrawing;
 
   };
 

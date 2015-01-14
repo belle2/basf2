@@ -3,7 +3,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 
@@ -169,7 +169,7 @@ bool PatternChecker::checkCandidate(TrackCandidate* track, int minNHitsSLayer)
     for (TrackHit * hit : track->getTrackHits()) {
       if (patterns[ii].hasLayer(hit->getLayerId())) trackletHits.push_back(hit);
     }
-    if (trackletHits.size() > 0) m_cdcLegendreTrackCreator->createLegendreTracklet(trackletHits)->setCandidateType(TrackCandidate::tracklet);
+    if (trackletHits.size() > 0) m_cdcLegendreTrackProcessor->createLegendreTracklet(trackletHits)->setCandidateType(TrackCandidate::tracklet);
     trackletHits.clear();
   }
 

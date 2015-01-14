@@ -15,11 +15,11 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 TrackMerger::TrackMerger(
-  std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter, FastHough* cdcLegendreFastHough, TrackCreator* cdcLegendreTrackCreator):
-  m_trackList(trackList), m_trackletList(trackletList), m_stereoTrackletList(stereoTrackletList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreFastHough(cdcLegendreFastHough), m_cdcLegendreTrackCreator(cdcLegendreTrackCreator)
+  std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter, FastHough* cdcLegendreFastHough, TrackProcessor* cdcLegendreTrackProcessor):
+  m_trackList(trackList), m_trackletList(trackletList), m_stereoTrackletList(stereoTrackletList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreFastHough(cdcLegendreFastHough), m_cdcLegendreTrackProcessor(cdcLegendreTrackProcessor)
 {
 
 }
@@ -121,7 +121,7 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool
 
 
     /*
-    m_cdcLegendreTrackCreator->createLegendreTracklet(c_list_temp);
+    m_cdcLegendreTrackProcessor->createLegendreTracklet(c_list_temp);
     for (TrackHit * hit : c_list_temp) {
       hit->setHitUsage(TrackHit::used_in_track);
     }
@@ -850,10 +850,10 @@ void TrackMerger::splitTracks()
 
 
       if (hitsForNewTrack.size() > 5) {
-        TrackCandidate* newTracklet = m_cdcLegendreTrackCreator->createLegendreTracklet(hitsForNewTrack);
+        TrackCandidate* newTracklet = m_cdcLegendreTrackProcessor->createLegendreTracklet(hitsForNewTrack);
         newTracklet->setCandidateType(TrackCandidate::tracklet);
         newTracklet->reestimateCharge();
-        PatternChecker cdcLegendrePatternChecker(m_cdcLegendreTrackCreator);
+        PatternChecker cdcLegendrePatternChecker(m_cdcLegendreTrackProcessor);
         cdcLegendrePatternChecker.checkCandidate(newTracklet);
         cdcLegendrePatternChecker.checkCandidate(cand);
         m_cdcLegendreTrackFitter->fitTrackCandidateFast(newTracklet);
@@ -1452,7 +1452,7 @@ void TrackMerger::extendTracklet(TrackCandidate* tracklet, std::vector<TrackHit*
         }
       }
 
-      m_cdcLegendreTrackCreator->createLegendreTracklet(hits_in_candidate);
+      m_cdcLegendreTrackProcessor->createLegendreTracklet(hits_in_candidate);
 
   */
 

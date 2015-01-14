@@ -28,7 +28,7 @@
 
 namespace Belle2 {
 
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     /** Class for perform svg drawing of track candidates */
     class NiceDrawing {

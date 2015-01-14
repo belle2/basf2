@@ -22,7 +22,7 @@
 /*
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCreator.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendrePatternChecker.h>
@@ -88,7 +88,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 
@@ -181,11 +181,11 @@ void CDCLegendreTrackingModule::initialize()
 
   m_cdcLegendreFastHough = new FastHough(m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMax);
 
-  m_cdcLegendreTrackCreator = new TrackCreator(m_AxialHitList, m_StereoHitList, m_trackList, m_trackletList, m_stereoTrackletList, m_appendHits, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
+  m_cdcLegendreTrackProcessor = new TrackProcessor(m_AxialHitList, m_StereoHitList, m_trackList, m_trackletList, m_stereoTrackletList, m_appendHits, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
 
-  m_cdcLegendreTrackMerger = new TrackMerger(m_trackList, m_trackletList, m_stereoTrackletList, m_cdcLegendreTrackFitter, m_cdcLegendreFastHough, m_cdcLegendreTrackCreator);
+  m_cdcLegendreTrackMerger = new TrackMerger(m_trackList, m_trackletList, m_stereoTrackletList, m_cdcLegendreTrackFitter, m_cdcLegendreFastHough, m_cdcLegendreTrackProcessor);
 
-  m_cdcLegendrePatternChecker = new PatternChecker(m_cdcLegendreTrackCreator);
+  m_cdcLegendrePatternChecker = new PatternChecker(m_cdcLegendreTrackProcessor);
 
 //  m_cdcLegendreConformalPosition = new ConformalPosition();
 
@@ -196,7 +196,7 @@ void CDCLegendreTrackingModule::initialize()
 
   m_cdcLegendreQuadTreeCandidateCreator = new QuadTreeCandidateCreator();
   QuadTreeCandidateCreator m_cdcLegendreQuadTreeCandidateCreator_temp __attribute__((unused)) =  QuadTreeCandidateCreator::Instance();
-  QuadTreeCandidateCreator::setCandidateCreator(m_cdcLegendreTrackCreator);
+  QuadTreeCandidateCreator::setCandidateCreator(m_cdcLegendreTrackProcessor);
   QuadTreeCandidateCreator::setFitter(m_cdcLegendreTrackFitter);
   QuadTreeCandidateCreator::setMerger(m_cdcLegendreTrackMerger);
 
@@ -321,7 +321,7 @@ void CDCLegendreTrackingModule::event()
   }
 
   //create GenFit Track candidates
-  m_cdcLegendreTrackCreator->createGFTrackCandidates(m_gfTrackCandsColName);
+  m_cdcLegendreTrackProcessor->createGFTrackCandidates(m_gfTrackCandsColName);
 
   //memory management
   clear_pointer_vectors();
@@ -372,7 +372,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
         bool merged = false;
         if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate, hits_set, m_fitTracksEarly);
 
-        if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate, ref_point);
+        if (!merged) m_cdcLegendreTrackProcessor->createLegendreTrackCandidate(candidate, ref_point);
 
         if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
 
@@ -401,7 +401,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
             bool merged = false;
             if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate_temp, hits_set, m_fitTracksEarly);
 
-            if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate_temp, ref_point);
+            if (!merged) m_cdcLegendreTrackProcessor->createLegendreTrackCandidate(candidate_temp, ref_point);
 
             if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
           }
@@ -669,7 +669,7 @@ void CDCLegendreTrackingModule::processTracks()
   /*
 
 
-      PatternChecker cdcLegendrePatternChecker(m_cdcLegendreTrackCreator);
+      PatternChecker cdcLegendrePatternChecker(m_cdcLegendreTrackProcessor);
       for (TrackCandidate * cand : m_trackList) {
         cand->reestimateCharge();
         cdcLegendrePatternChecker.checkCandidate(cand);
@@ -705,7 +705,7 @@ void CDCLegendreTrackingModule::terminate()
   delete m_cdcLegendrePatternChecker;
   delete m_cdcLegendreFastHough;
   delete m_cdcLegendreTrackMerger;
-  delete m_cdcLegendreTrackCreator;
+  delete m_cdcLegendreTrackProcessor;
 
 }
 

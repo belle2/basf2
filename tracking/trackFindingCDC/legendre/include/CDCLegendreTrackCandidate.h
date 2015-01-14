@@ -30,7 +30,7 @@
 #include "TMath.h"
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class QuadTree;
 

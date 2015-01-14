@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 TrackHit::TrackHit(CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIWire())
 {

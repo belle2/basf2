@@ -17,7 +17,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 TrackCandidate::TrackCandidate(
   TrackCandidate& candidate) :

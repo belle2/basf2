@@ -13,7 +13,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFinderCDCLegendre;
+using namespace TrackFindingCDC;
 
 float* QuadTree::s_sin_theta;
 float* QuadTree::s_cos_theta;

@@ -47,7 +47,7 @@
 #include <cmath>
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class QuadTreeNeighborFinder;
 

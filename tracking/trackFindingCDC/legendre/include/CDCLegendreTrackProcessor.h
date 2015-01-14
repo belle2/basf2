@@ -35,15 +35,15 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class QuadTree;
     class TrackDrawer;
     class TrackFitter;
 
-    class TrackCreator {
+    class TrackProcessor {
     public:
-      TrackCreator(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, bool appendHits, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer);
+      TrackProcessor(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, bool appendHits, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer);
 
       /**
        * @brief Function to create a track candidate

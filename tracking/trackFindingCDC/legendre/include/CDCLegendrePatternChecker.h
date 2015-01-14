@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCreator.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
@@ -9,16 +9,16 @@
 
 namespace Belle2 {
 
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
-    class TrackCreator;
+    class TrackProcessor;
 
     /** Class for working with hit patterns. */
     /* TODO: Check whether track overlaps with other tracks; may be try to sort tracks according to number of inresections/overlappings, some weights might be applied
      * if track sharing more than, for example, 50% of hits, that track should be definitely splitted into few*/
     class PatternChecker {
     public:
-      PatternChecker(TrackCreator* cdcLegendreTrackCreator) : m_cdcLegendreTrackCreator(cdcLegendreTrackCreator) {};
+      PatternChecker(TrackProcessor* cdcLegendreTrackProcessor) : m_cdcLegendreTrackProcessor(cdcLegendreTrackProcessor) {};
 
       ~PatternChecker() {};
 
@@ -50,7 +50,7 @@ namespace Belle2 {
 
     private:
 
-      TrackCreator* m_cdcLegendreTrackCreator; /**< object for track candidate creating */
+      TrackProcessor* m_cdcLegendreTrackProcessor; /**< object for track candidate creating */
 
       static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
       static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/

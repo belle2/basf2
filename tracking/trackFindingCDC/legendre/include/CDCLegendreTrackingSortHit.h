@@ -4,7 +4,7 @@
 #include <boost/tuple/tuple.hpp>
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     /**
        * Small helper class to perform sorting of hits in the CDC pattern reco

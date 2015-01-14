@@ -34,7 +34,7 @@
 #include "TMath.h"
 
 namespace Belle2 {
-  namespace TrackFinderCDCLegendre {
+  namespace TrackFindingCDC {
 
     class TrackHit;
     class TrackCandidate;
@@ -69,7 +69,7 @@ namespace Belle2 {
 
       static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
 
-//      TrackFinderCDCLegendre::QuadTree* m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
+//      TrackFindingCDC::QuadTree* m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
 
     };
   }

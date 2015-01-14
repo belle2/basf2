@@ -6,6 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::TrackFindingCDC::BoundingBox-;
+#pragma link C++ class Belle2::TrackFindingCDC::PrimitivePlotter-;
 
 #ifdef TRACKFINDINGCDC_USE_ROOT
 

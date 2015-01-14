@@ -17,6 +17,8 @@
 #include <errno.h>
 #include "belle2nsm.h"
 
+#include <sys/time.h>
+
 extern "C" {
 #ifdef USE_READLINE
 #include <readline/readline.h>
@@ -368,10 +370,15 @@ main(int argc, char** argv)
       break;
     } else if (strcasecmp(av[0], "start") == 0) {
       if (ac < 3 || ! isdigit(av[2][0])) {
-        printf("usage: start <node> <run-number>\n");
+        printf("usage: start <node> <expno> <runno>\n");
       } else {
-        int runno = atoi(av[2]);
-        b2nsm_sendreq(av[1], "START", 1, &runno);
+        int expno = atoi(av[2]);
+        int runno = atoi(av[3]);
+        timeval tv;
+        gettimeofday(&tv, 0);
+        int ctime = tv.tv_sec;
+        int pars[4] = {expno, runno, 0, ctime};
+        b2nsm_sendreq(av[1], "START", 4, pars);
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
       if (ac < 2) {

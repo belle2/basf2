@@ -7,6 +7,5 @@
 
 #pragma link C++ class Belle2::TOPTBSimHit+;
 #pragma link C++ class Belle2::TOPTBDigit+;
-#pragma link C++ class Belle2::TOPWaveform+;
 
 #endif

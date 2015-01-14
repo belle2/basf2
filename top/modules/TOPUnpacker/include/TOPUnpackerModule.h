@@ -72,9 +72,67 @@ namespace Belle2 {
      */
     void unpackProductionFormat(const int* buffer, int bufferSize);
 
+    /**
+     * Unpack raw data given in waveform format
+     * @param buffer raw data buffer
+     * @param bufferSize buffer size
+     */
+    void unpackWaveformFormat(const int* buffer, int bufferSize);
+
     TOP::TOPGeometryPar* m_topgp;  /**< geometry parameters */
 
   };
+
+
+  namespace TOP {
+
+    /**
+     * Helper class for getting data words from a finesse buffer
+     */
+    class DataArray {
+
+    public:
+
+      /**
+       * Constructor
+       * @param data pointer to finesse buffer (pointer must be valid)
+       * @param size buffer size
+       */
+      DataArray(const int* data, int size) {
+        m_data = data;
+        m_size = size;
+        m_i = 0;
+      }
+
+      /**
+       * Returns consecutive data word
+       * @return data word
+       */
+      int getWord() {
+        m_i++;
+        if (m_i < m_size) {
+          return m_data[m_i];
+        }
+        B2ERROR("Bug in data format: DataArray - index out of range");
+        return 0;
+      }
+
+      /**
+       * Returns index of last returned data word
+       * @return index
+       */
+      int getIndex() const {return m_i;}
+
+    private:
+
+      int m_size;        /**< buffer size */
+      const int* m_data; /**< buffer data */
+      int m_i;           /**< index */
+
+    };
+
+  } // TOP namespace
+
 
 } // Belle2 namespace
 

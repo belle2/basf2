@@ -11,5 +11,6 @@
 #pragma link C++ class Belle2::TOPBarHit+;
 #pragma link C++ class Belle2::TOPLikelihood+;
 #pragma link C++ class Belle2::TOPRecBunch+;
+#pragma link C++ class Belle2::TOPRawWaveform+;
 
 #endif

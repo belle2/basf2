@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <testbeam/top/dataobjects/TOPWaveform.h>
+#include <top/dataobjects/TOPRawWaveform.h>
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TOPWaveform)
+ClassImp(TOPRawWaveform)
 
 
 

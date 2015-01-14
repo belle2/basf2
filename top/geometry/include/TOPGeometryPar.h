@@ -537,6 +537,16 @@ namespace Belle2 {
       }
 
       /**
+       * Returns hardware channel ID
+       * @param ColRowChannel packed word ASICChannel(0:2), ASICRow(3:4), ASICCol(5:6)
+       * @param column electronics module number (a column within TOP module)
+       * @return hardware channel ID
+       */
+      unsigned getHardwareChannelID(unsigned ColRowChannel, unsigned column) const {
+        return ColRowChannel + column * 128;
+      }
+
+      /**
        * Convert new numbering scheme to the old one
        * @param channelID channel ID in the new numbering scheme
        * @return channel ID in the old numbering scheme

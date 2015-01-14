@@ -24,8 +24,10 @@
 #include <framework/logging/Logger.h>
 
 // Dataobject classes
-#include <top/dataobjects/TOPDigit.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawTOP.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawWaveform.h>
 
 using namespace std;
 
@@ -66,6 +68,9 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     digits.registerInDataStore();
 
+    StoreArray<TOPRawWaveform> waveforms;
+    waveforms.registerInDataStore();
+
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
     if (mapSize == 0) B2ERROR("No front-end mapping available for TOP");
@@ -93,6 +98,9 @@ namespace Belle2 {
         switch (dataFormat) {
           case 1:
             unpackProductionFormat(buffer, bufferSize);
+            break;
+          case 2:
+            unpackWaveformFormat(buffer, bufferSize);
             break;
           default:
             B2ERROR("TOPUnpacker: unknown data format type = " << dataFormat);
@@ -132,7 +140,76 @@ namespace Belle2 {
         }
         break;
       default:
-        B2ERROR("TOPUnpacker: unknown data format version = " << version);
+        B2ERROR("TOPUnpacker::unpackProductionFormat: unknown data format version = "
+                << version);
+    }
+
+  }
+
+
+  void TOPUnpackerModule::unpackWaveformFormat(const int* buffer, int bufferSize)
+  {
+
+    StoreArray<TOPRawWaveform> waveforms;
+    StoreObjPtr<EventMetaData> evtMetaData;
+
+    unsigned short scrodID = buffer[0] & 0xFFFF;
+    const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
+    if (!feemap) {
+      B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
+      return;
+    }
+    int barID = feemap->barID;
+    int column = feemap->column;
+
+    DataArray array(buffer, bufferSize);
+    unsigned version = (buffer[0] >> 16) & 0xFF;
+    switch (version) {
+      case 1: {
+        unsigned scrod = array.getWord();
+        unsigned freezeDate = array.getWord();
+        unsigned eventNumber = array.getWord();
+        if (eventNumber != evtMetaData->getEvent()) {
+          B2ERROR("TOPUnpacker::unpackWaveformFormat: inconsistent event number, "
+                  "expect " << evtMetaData->getEvent() << " got " << eventNumber);
+          return;
+        }
+        unsigned triggerType = array.getWord();
+        unsigned flags = array.getWord();
+        int numofWaveforms = array.getWord();
+        for (int k = 0; k < numofWaveforms; k++) {
+          unsigned referenceASIC = array.getWord();
+          int numofSegments = array.getWord();
+          for (int iseg = 0; iseg < numofSegments; iseg++) {
+            unsigned segmentASIC = array.getWord();
+            unsigned hardChID = m_topgp->getHardwareChannelID(segmentASIC >> 9, column);
+            int channelID = m_topgp->getChannelID(hardChID);
+            int numofPoints = array.getWord();
+            std::vector<unsigned short> wfdata;
+            for (int i = 0; i < numofPoints / 2; i++) {
+              unsigned data = array.getWord();
+              wfdata.push_back(data & 0xFFFF);
+              wfdata.push_back(data >> 16);
+            }
+            if (numofPoints % 2 != 0) {
+              unsigned data = array.getWord();
+              wfdata.push_back(data & 0xFFFF);
+            }
+            waveforms.appendNew(barID, channelID, hardChID, scrod, freezeDate,
+                                triggerType, flags, referenceASIC, segmentASIC,
+                                wfdata);
+          }
+        }
+        int n = bufferSize - array.getIndex() - 1;
+        if (n > 0) {
+          B2ERROR("TOPUnpacker::unpackWaveformFormat: " << n <<
+                  " words of data buffer unused");
+        }
+      }
+      break;
+      default:
+        B2ERROR("TOPUnpacker::unpackWaveformFormat: unknown data format version = "
+                << version);
     }
 
   }

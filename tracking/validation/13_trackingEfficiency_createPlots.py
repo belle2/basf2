@@ -92,7 +92,7 @@ def main():
     # create efficiency in bins of pt plot
     calculate_efficiency_in_pt(data_tree)
 
-    pt_of_interest = [0.25, 1.]
+    pt_of_interest = [0.1, 0.25, 1.]
 
     for pt_value in pt_of_interest:
         # create plots of efficiency in bins of cos Theta for different pt

@@ -31,10 +31,6 @@ def get_generated_pdg_code():
     return 13
 
 
-def get_generated_pdg_code():
-    return 13
-
-
 def get_generated_pt_value(index):
     """
     List with generated pt values is created in this function. With the

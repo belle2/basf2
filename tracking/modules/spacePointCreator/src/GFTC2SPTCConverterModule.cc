@@ -139,6 +139,9 @@ void GFTC2SPTCConverterModule::event()
     } catch (TrueHitsDoNotMatch& anEx) {
       B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
       m_abortedTrueHitCtr++;
+    } catch (NonSingleTrueHit& anEx) {
+      B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
+      m_abortedNonSingleTrueHitCtr++;
     }
   }
 }
@@ -146,7 +149,7 @@ void GFTC2SPTCConverterModule::event()
 // -------------------------------- TERMINATE --------------------------------------------------------
 void GFTC2SPTCConverterModule::terminate()
 {
-  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found  and in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap). (TrueHits have been checked: " << m_PARAMcheckTrueHits << ")");
+  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found, in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap) and in " << m_abortedNonSingleTrueHitCtr << " cases there was more than one TrueHit related to a SpacePoint. (TrueHits have been checked: " << m_PARAMcheckTrueHits << ")");
 }
 
 // ---------------------------------------- Create SpacePoint TrackCand
@@ -465,11 +468,16 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const PXDCluster*> cl
       B2WARNING("Got more than one PXDCluster in trueHitsAreGood. Will only check the first!")
     }
     RelationVector<PXDTrueHit> relTrueHits = clusters[0]->getRelationsTo<PXDTrueHit>("ALL"); // COULDDO: search only certain arrays
-    if (relTrueHits.size() > 0) {
+    // Only return true if there is ONLY ONE related TrueHit (this should always be the case for PXDClusters / PXD SpacePoints, but this is not guaranteed)
+    if (relTrueHits.size() == 1) {
+      B2DEBUG(200, "Found one related TrueHit (index " << relTrueHits[0]->getArrayIndex() << ", Array: " << relTrueHits[0]->getArrayName() << ") for PXDCluster " << clusters[0]->getArrayIndex() << " from Array " << clusters[0]->getArrayName());
+      return true;
+    } else {
       stringstream inds;
       for (const PXDTrueHit & trueHit : relTrueHits) { inds << trueHit.getArrayIndex() << ", "; }
-      B2DEBUG(200, "Found " << relTrueHits.size() << " TrueHits related to the only passed PXDCluster " << clusters[0]->getArrayIndex() << ". The indices of these TrueHits are: " << inds.str());
-      return true;
+      B2DEBUG(200, "Found " << relTrueHits.size() << " TrueHits related to the first passed PXDCluster " << clusters[0]->getArrayIndex() << ". The indices of these TrueHits are: " << inds.str() << ". This Cluster did not pass the TrueHit check!");
+      throw NonSingleTrueHit(); // throw this exception here. The TrueHitNotFound exception gets thrown, if this function returns false (in calling function!)
+//       return true;
     }
   }
   return false;
@@ -481,11 +489,15 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
     // if only one cluster is passed simply check if there exists a related TrueHit
     if (clusters.size() == 1) {
       RelationVector<SVDTrueHit> relTrueHits = clusters[0]->getRelationsTo<SVDTrueHit>("ALL"); // COULDDO: search only certain arrays
-      if (relTrueHits.size() > 0) {
+      if (relTrueHits.size() == 1) {
+        B2DEBUG(200, "Found one related TrueHit (index " << relTrueHits[0]->getArrayIndex() << ", Array: " << relTrueHits[0]->getArrayName() << ") forSVDCluster " << clusters[0]->getArrayIndex() << " from Array " << clusters[0]->getArrayName());
+        return true;
+      } else {
         stringstream inds;
         for (const SVDTrueHit & trueHit : relTrueHits) { inds << trueHit.getArrayIndex() << ", "; }
-        B2DEBUG(200, "Found " << relTrueHits.size() << " TrueHits related to the only passed SVDCluster " << clusters[0]->getArrayIndex() << ". The indices of these TrueHits are: " << inds.str());
-        return true;
+        B2DEBUG(200, "Found " << relTrueHits.size() << " TrueHits related to the only passed SVDCluster " << clusters[0]->getArrayIndex() << ". The indices of these TrueHits are: " << inds.str() << ". This Cluster did not pass the TrueHit check!");
+        throw NonSingleTrueHit(); // throw this exception here. The TrueHitNotFound exception gets thrown, if this function returns false (in calling function!)
+//         return true;
       }
     } else {
       // COULDDO: compare StoreArray Indices instead of pointers!
@@ -529,8 +541,14 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
       // It is possible that there is more than one TrueHit left but still the Clusters are related to the same TrueHit(s).
       // COULDDO:
 //       if (clusters.size() % allTrueHits.size() == 0) return true; // assumption here to say that a given TrueHit is in every passed Cluster
-      if (allTrueHits.size() < oldPtSize) return true;  // assumption here: there is at least one TrueHit, that is shared by at least 2 Clusters
-//       if (allTrueHits.size() == 1) return true; // assumption here: there is ONLY ONE TrueHit related to all Clusters, this excludes some cases where more than one TrueHit is contained in one Cluster!
+//       if (allTrueHits.size() < oldPtSize) return true;  // assumption here: there is at least one TrueHit, that is shared by at least 2 Clusters
+      if (allTrueHits.size() == 1) { // assumption here: there is ONLY ONE TrueHit related to all Clusters, this excludes some cases where more than one TrueHit is contained in one Cluster! (at the moment only "clear" cases are wanted, until decided what to do with unclear cases)
+        B2DEBUG(200, "Found one TrueHit (Index " << allTrueHits[0]->getArrayIndex() << ", Array " << allTrueHits[0]->getArrayName() << ") related to Clusters " << clusters[0]->getArrayIndex() << " and " << clusters[1]->getArrayIndex() << " from Array " << clusters[0]->getArrayIndex()); // NOTE: assuming that both clusters are from the same Array here!!
+        return true;
+      } else {
+        // DEBUG message already printed before decision only throw here
+        throw NonSingleTrueHit();
+      }
     }
   }
   return false;
@@ -543,6 +561,7 @@ void GFTC2SPTCConverterModule::initializeCounters()
   m_abortedTrueHitCtr = 0;
   m_abortedUnsuitableTCCtr = 0;
   m_abortedNoSPCtr = 0;
+  m_abortedNonSingleTrueHitCtr = 0;
 }
 
 void GFTC2SPTCConverterModule::markHitAsUsed(std::vector<flaggedPair<int> >& flaggedHitIDs, int hitToMark)

@@ -100,6 +100,8 @@ namespace Belle2 {
 
     unsigned int m_abortedNoSPCtr; /**< Counter for aborted conversions because no SpacePoint has been found */
 
+    unsigned int m_abortedNonSingleTrueHitCtr; /**< Counter for aborted conversions due to more than one related TrueHits for one SpacePoint */
+
 // #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
     template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */
 // #endif
@@ -146,7 +148,10 @@ namespace Belle2 {
     /**
      * Exception thrown, when the TrueHits of different Clusters of one SpacePoint do not match
      */
-    BELLE2_DEFINE_EXCEPTION(TrueHitsDoNotMatch, "The TrueHits of two Clusters of a SpacePoint do not match");
+    BELLE2_DEFINE_EXCEPTION(TrueHitsDoNotMatch, "The TrueHits of two Clusters of a SpacePoint do not match.");
+
+    /** Exception thrown, when there is more than one TrueHit related to any given SpacePoint or Cluster */
+    BELLE2_DEFINE_EXCEPTION(NonSingleTrueHit, "There is more than one TrueHit related to a SpacePoint.");
   };
 
 }

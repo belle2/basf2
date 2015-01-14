@@ -113,8 +113,9 @@ param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
     'NoSingleClusterSVDSP': 'nosingleSP',
     'SingleClusterSVDSP': 'singleSP',
     'PXDClusterSP': 'pxdOnly',
-    'checkTrueHits': False,
+    'checkTrueHits': True,
     'useSingleClusterSP': False,
+    'checkNoSingleSVDSP': True,
     }
 trackCandConverter.param(param_trackCandConverter)
 
@@ -140,6 +141,7 @@ curlingSplitter.logging.log_level = MyOtherLogLevel
 curlingSplitter.logging.debug_level = MyOtherDebugLevel
 param_curlingSplitter = {  # set positionAnalysis to true if you want to analyze the position of SpacePoints and the TrueHits they are related to
                            # set splitCurlers to false if you do not want to split curling TrackCandidates but simply analyze them for curling behaviour
+                           # set useNonSingleTHinPA to False always, at the moment only a testing feature!
     'SpacePointTCName': 'SPTracks',
     'curlingFirstOutName': 'firstOutParts',
     'curlingAllInName': 'allInParts',
@@ -149,6 +151,7 @@ param_curlingSplitter = {  # set positionAnalysis to true if you want to analyze
     'nTrackStubs': int(0),
     'setOrigin': [0., 0., 0.],
     'positionAnalysis': True,
+    'useNonSingleTHinPA': False,
     'rootFileName': ['SPtoTrueHitAnalysis_nosingle', 'RECREATE'],
     }
 curlingSplitter.param(param_curlingSplitter)

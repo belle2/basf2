@@ -144,6 +144,8 @@ namespace Belle2 {
 
     int m_NoSingleTrueHitCtr; /**< Counter for SpacePoints that relate to more than one TrueHit */
 
+    bool m_PARAMuseNonSingleTHinPA; /**< Switch for using SpacePoints in position Analysis that are related to more than one TrueHit. NOTE: probably only here while developing */
+
     void initializeCounters(); /**< initialize all counters to 0 for avoiding undeterministic behaviour. */
 
     /**

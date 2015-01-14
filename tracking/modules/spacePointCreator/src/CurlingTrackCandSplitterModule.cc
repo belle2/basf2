@@ -60,6 +60,9 @@ CurlingTrackCandSplitterModule::CurlingTrackCandSplitterModule()
 
   addParam("rootFileName", m_PARAMrootFileName, "Filename and write-mode ('RECREATE' or 'UPDATE'). If given more than 2 strings this module will cause termination", defaultRootFName);
 
+
+  addParam("useNonSingleTHinPA", m_PARAMuseNonSingleTHinPA, "Switch for using SpacePoints in position Analysis that are related to more than one TrueHit", false);
+
   initializeCounters(); // NOTE: they get initialized in initialize again!!
 
   // initialize other variables to some default values to avoid unintended behaviour
@@ -452,9 +455,9 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
         hitGlobalPosMom = getGlobalPositionAndMomentum(svdTrueHits[0]);
 
         // if position analysis is set to true, print to root file
-        // only do so if there is only one TrueHit (this is only for the moment!!!)
+        // only do so if there is only one TrueHit (this is only for the moment!!!) OR if the switch is set to do so even if there is more than one TrueHit
         // TODO: Decide how to handle such cases where more than one TrueHit is left and implement accordingly
-        if (m_PARAMpositionAnalysis && svdTrueHits.size() == 1) { getValuesForRoot(spacePoint, svdTrueHits[0], rootVariables); }
+        if (m_PARAMpositionAnalysis && (svdTrueHits.size() == 1 || m_PARAMuseNonSingleTHinPA)) { getValuesForRoot(spacePoint, svdTrueHits[0], rootVariables); }
       }
     } else { // this should never be reached, because it should be caught in the creation of the SpacePointTrackCand which is passed to this function!
       throw SpacePointTrackCand::UnsupportedDetType();

@@ -457,6 +457,8 @@ const Const::ParticleType Const::pi0 = Const::ParticleType(111);
 const Const::ParticleType Const::neutron = Const::ParticleType(2112);
 const Const::ParticleType Const::Kshort = Const::ParticleType(310);
 const Const::ParticleType Const::Klong = Const::ParticleType(130);
+const Const::ParticleType Const::lambda = Const::ParticleType(3122);
+const Const::ParticleType Const::antiLambda = Const::ParticleType(-3122);
 const Const::ParticleType Const::invalidParticle = Const::ParticleType(9900000);
 
 const double Const::electronMass = Const::electron.getMass();

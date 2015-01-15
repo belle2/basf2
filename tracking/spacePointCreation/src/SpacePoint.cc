@@ -107,7 +107,8 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
   if ((aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth()) == true) { // isWedgeSensor
     m_position = aSensorInfo->pointToGlobal(
                    TVector3(
-                     (aSensorInfo->getWidth(vCoord) / aSensorInfo->getWidth(0)) * uCoord,
+                     getUWedged({uCoord, vCoord}, m_vxdID, aSensorInfo),
+//                      (aSensorInfo->getWidth(vCoord) / aSensorInfo->getWidth(0)) * uCoord,
                      vCoord,
                      0
                    )

@@ -105,14 +105,15 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
   }
 
   if ((aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth()) == true) { // isWedgeSensor
+    SpBaseType uWedged = getUWedged({ uCoord, vCoord } , m_vxdID, aSensorInfo);
     m_position = aSensorInfo->pointToGlobal(
                    TVector3(
-                     getUWedged({uCoord, vCoord}, m_vxdID, aSensorInfo),
-//                      (aSensorInfo->getWidth(vCoord) / aSensorInfo->getWidth(0)) * uCoord,
+                     uWedged,
                      vCoord,
                      0
                    )
                  );
+    m_normalizedLocal = convertLocalToNormalizedCoordinates({ uWedged, vCoord } , m_vxdID, aSensorInfo);
   } else {
     m_position = aSensorInfo->pointToGlobal(
                    TVector3(
@@ -121,6 +122,7 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
                      0
                    )
                  );
+    m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
   }
 
 
@@ -130,7 +132,6 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
 
   setPositionError(uSigma, vSigma, aSensorInfo);
 
-  m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
 
   m_sensorType = aSensorInfo->getType();
 }

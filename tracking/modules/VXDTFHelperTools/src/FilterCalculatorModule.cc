@@ -273,16 +273,7 @@ void FilterCalculatorModule::initialize()
   if (m_useTEL) { StoreArray<TelTrueHit>::required(); }
   if (m_usePXD) { StoreArray<PXDTrueHit>::required(); }
   if (m_useSVD) { StoreArray<SVDTrueHit>::required(); }
-}
 
-
-
-/// /// /// /// /// /// /// /// BEGIN RUN /// /// /// /// /// /// /// ///
-void FilterCalculatorModule::beginRun()
-{
-  B2INFO("~~~~~~~~~~~FilterCalculator - beginRun ~~~~~~~~~~")
-
-//   InitializeVariables();
 
 
   int numCuts = m_PARAMpTcuts.size();
@@ -347,6 +338,18 @@ void FilterCalculatorModule::beginRun()
     m_treeEventWisePtr = NULL;
   }
 
+
+
+}
+
+
+
+/// /// /// /// /// /// /// /// BEGIN RUN /// /// /// /// /// /// /// ///
+void FilterCalculatorModule::beginRun()
+{
+  B2INFO("~~~~~~~~~~~FilterCalculator - beginRun ~~~~~~~~~~")
+
+//   InitializeVariables();
 }
 
 
@@ -1286,10 +1289,18 @@ void FilterCalculatorModule::event()
 /// /// /// /// /// /// /// /// END RUN /// /// /// /// /// /// /// ///
 void FilterCalculatorModule::endRun()
 {
+  B2INFO("~~~~~~~~~~~FilterCalculator - end of endRun ~~~~~~~~~~")
+}
+
+
+
+/// /// /// /// /// /// /// /// TERMINATE /// /// /// /// /// /// /// ///
+void FilterCalculatorModule::terminate()
+{
   int totalTrackletCounter = 0;
   int totalHitCounter = 0;
   m_eventCounter++;
-  B2INFO("~~~~~~~~~~~FilterCalculator - endRun ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~FilterCalculator - terminate ~~~~~~~~~~")
   for (int i = 0; i < int(m_PARAMsecMapNames.size()); ++i) {
     B2INFO(" within " << m_eventCounter << " events we got " << m_trackletMomentumCounter.at(i) << " tracklets in the " << m_PARAMsecMapNames.at(i) << " setup")
   }
@@ -1427,14 +1438,6 @@ void FilterCalculatorModule::endRun()
     delete secMap;
   }
   m_sectorMaps.clear();
-  B2INFO("~~~~~~~~~~~FilterCalculator - end of endRun ~~~~~~~~~~")
-}
-
-
-
-/// /// /// /// /// /// /// /// TERMINATE /// /// /// /// /// /// /// ///
-void FilterCalculatorModule::terminate()
-{
   B2INFO(" FilterCalculatorModule, everything is done. Terminating.")
 }
 
@@ -1499,72 +1502,9 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
   int aLayerID = aVxdID.getLayerNumber();
 
 
-//   if (m_PARAMuseOldSecCalc == true) {
-//     double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0, centerU = 0, centerV = 0;
-//     TVector3 centerOfSector;
-//
-//     int aUniID = aVxdID.getID();
-//     int aLayerID = aVxdID.getLayerNumber();
-//     B2DEBUG(20, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ") @layer: " << aLayerID);
-//     unsigned int aSecID = 0;
-//     string aSectorName;
-//
-//     // searching for sector:
-//     for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
-//       B2DEBUG(150, "uCuts(j)*uSize: " << m_PARAMsectorConfigU.at(j)*uSizeAtHit << " uCuts(j+1)*uSize: " << m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit);
-//
-//       if (uCoord >= (m_PARAMsectorConfigU.at(j)*uSizeAtHit * 2) && uCoord <= (m_PARAMsectorConfigU.at(j + 1)*uSizeAtHit * 2)) {
-//
-//         for (int k = 0; k != int(m_PARAMsectorConfigV.size() - 1); ++k) {
-//           B2DEBUG(150, " vCuts(k)*vSize: " << m_PARAMsectorConfigV.at(k)*vSize1 << " vCuts(k+1)*vSize: " << m_PARAMsectorConfigV.at(k + 1)*vSize1);
-//
-//           if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
-//             aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
-//
-//             sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
-//             sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
-//             uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
-//             uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
-//             sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
-//             sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
-//             sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
-//             sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
-// //           centerV = sectorEdgeV1 + 0.5 * fabs(sectorEdgeV1 - sectorEdgeV2); /// WARNING Berechnung falsch!
-//             //           centerU = aSensorInfo.getUSize(centerV); // uSizeAtCenterV
-//             //           centerU = centerU*(m_PARAMsectorConfigU.at(j) * 2 - 1 + (m_PARAMsectorConfigU.at(j) + 0.5*fabs(m_PARAMsectorConfigU.at(j) - m_PARAMsectorConfigU.at(j+1))));
-//             // calculating the intersection of two lines connecting the edges of the trapezoid. Therefore the first step is to calculate the slope parameter mu (deltaV & tempVal are used to make the code more readable):
-//             double deltaV = sectorEdgeV2 - sectorEdgeV1;
-//             double tempVal = deltaV / (sectorEdgeU2OfV2 - sectorEdgeU1OfV1);
-//             double deltaU2112 = sectorEdgeU2OfV1 - sectorEdgeU1OfV2;
-//             double mu = (deltaV - sectorEdgeU1OfV2 * tempVal + sectorEdgeU1OfV1 * tempVal) / (deltaV + deltaU2112 * tempVal); // TODO implement isInf or isNan-check....
-//             centerU = sectorEdgeU1OfV2 + mu * deltaU2112;
-//             centerV = sectorEdgeV2 - mu * deltaV;
-//             centerOfSector.SetXYZ(centerU, centerV, 0);
-//             centerOfSector = aSensorInfo.pointToGlobal(centerOfSector);
-//             dist2Origin = (centerOfSector - m_origin).Mag();
-//             // [DEBUG] Sector edges: O(-6.144,-2.88), U(6.144,-2.88), V(-6.144,2.88), UV(6.144,2.88), centerU/V: inf/-inf  { module: FilterCalculator @tracking/modules/VXDTFHelperTools/src/FilterCalculatorModule.cc:1332 }
-//
-//             aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
-//             B2DEBUG(20, "I have found a SecID: " << aSectorName << " with centerU/V: " << centerU << "/" << centerV << " and tempvalues of deltaV/tempVal/deltaU2112/mu: " << deltaV << "/" << tempVal << "/" << deltaU2112 << "/" << mu);
-//             B2DEBUG(50, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << "), centerU/V: " << centerU << "/" << centerV)
-//
-//             if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-// //               Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, dist2Origin, aSectorName);
-//               Sector newSector(aSectorName, {sectorEdgeU1OfV1, sectorEdgeV1}, {sectorEdgeU2OfV1, sectorEdgeV1}, {sectorEdgeU1OfV2, sectorEdgeV2}, {sectorEdgeU2OfV2, sectorEdgeV2}, dist2Origin);
-//               thisSecMap->insert({aSectorName, newSector});
-//             } else {
-//               thisSecMap->find(aSectorName)->second.increaseCounter();
-//             }
-//           }
-//         }
-//       }
-//     } //sector-searching loop
-//   }
-
-//   else { // new way to calc sectorID
   std::pair<double, double> aCoorNormalized,
 //            aCoorLocal = {uCoord, vCoord},
-      aCoorLocal = {hitLocal[0], hitLocal[1]},
+      aCoorLocal = {u, v},
       aCornerCoordinate;
 
   // Normalization of the Coordinates

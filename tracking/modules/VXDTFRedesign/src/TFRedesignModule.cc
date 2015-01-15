@@ -1684,7 +1684,7 @@ Belle2::SectorNameAndPointerPair TFRedesignModule::searchSector4Hit(VxdID aVxdID
   // Normalization of the Coordinates
   aCoorNormalized = SpacePoint::convertLocalToNormalizedCoordinates(aCoorLocal, aVxdID);
 
-  B2DEBUG(100, "searchSector4Hit: aCoorNormalized: " << aCoorNormalized.first << "/ " << aCoorNormalized.second);
+  B2DEBUG(100, "searchSector4Hit: aCoorLocal: " << aCoorLocal.first << "/" << aCoorLocal.second << ", vxdID: " << aVxdID << ", aCoorNormalized: " << aCoorNormalized.first << "/ " << aCoorNormalized.second);
 
   // Calculate the SectorID (SectorTool-Object)
   aSecID = aTool.calcSecID(uConfig, vConfig, aCoorNormalized);
@@ -5465,14 +5465,13 @@ void TFRedesignModule::assignPXDHitsToSectors()
   * m_collector,
   *
   ** in-module-function-calls:
-  * searchSector4Hit(aVxdID, transformedHitLocal, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV)
+  * searchSector4Hit(aVxdID, hitLocal, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV)
   */
 
   B2DEBUG(3, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << m_evInfoPack.nPXDClusters << ", SVDCLuster: " << m_evInfoPack.nSVDClusters << ", m_clustersOfEvent: " << m_clustersOfEvent.size());
 
-  TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
+  TVector3 hitLocal, hitSigma;
   PositionInfo hitInfo;
-  double vSize, uSizeAtHit;
   FullSecID aSecID;
   VxdID aVxdID;
   m_evInfoPack.newTic();
@@ -5501,14 +5500,6 @@ void TFRedesignModule::assignPXDHitsToSectors()
     hitInfo.hitSigma = aSensorInfo.vectorToGlobal(hitSigma);
     B2DEBUG(100, " pxdluster got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z())
 
-    // local(0,0,0) is the _center_ of the sensorplane, not at the edge!
-    vSize = 0.5 * aSensorInfo.getVSize();
-    uSizeAtHit = 0.5 * aSensorInfo.getUSize(hitLocal[1]);
-
-    transformedHitLocal.SetXYZ(hitLocal[0] + uSizeAtHit, hitLocal[1] + vSize, 0);
-
-    localSensorSize.SetXYZ(uSizeAtHit, vSize, 0);
-
     B2DEBUG(175, "local pxd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ")");
 
     int passNumber = 0;
@@ -5517,7 +5508,7 @@ void TFRedesignModule::assignPXDHitsToSectors()
       if (currentPass->usePXDHits == false) { continue; }  // PXD is included in 0 & -1
       if (aLayerID > currentPass->highestAllowedLayer) { continue; }   // skip particle if True
       SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
-                                                                  transformedHitLocal,
+                                                                  hitLocal,
                                                                   currentPass->sectorMap,
                                                                   currentPass->secConfigU,
                                                                   currentPass->secConfigV);
@@ -5560,7 +5551,7 @@ void TFRedesignModule::assignPXDHitsToSectors()
         // Connection Hit <=> Hit in Collector
         pTFHit->setCollectorID(hitId);
 
-        B2DEBUG(100, "Coor asecid: " << aSecID << ", position Hit: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", uCoord: " << transformedHitLocal.X() << ", vCoord: " << transformedHitLocal.Y());
+        B2DEBUG(100, "Coor asecid: " << aSecID << ", position Hit: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", uCoord: " << hitLocal.X() << ", vCoord: " << hitLocal.Y());
 
       }
 
@@ -5601,14 +5592,14 @@ void TFRedesignModule::assignSVDHitsToSectors()
    * m_badSectorRangeCounter, m_totalSVDClusterCombis,
    *
    ** in-module-function-calls:
-   * searchSector4Hit(aVxdID, transformedHitLocal, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV)
+   * searchSector4Hit(aVxdID, hitLocal, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV)
    * findSensors4Clusters(activatedSensors, m_clustersOfEvent)
    * find2DSVDHits(activatedSensors, clusterHitList)
    * stopBrokenEvent()
    */
   m_evInfoPack.newTic();
 
-  TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
+  TVector3 hitLocal, hitSigma;
   PositionInfo hitInfo;
   double vSize, uSizeAtHit, uCoord, vCoord;
   FullSecID aSecID;
@@ -5661,7 +5652,8 @@ void TFRedesignModule::assignSVDHitsToSectors()
     aLayerID = aVxdID.getLayerNumber();
     VXD::SensorInfoBase aSensorInfo = VXD::GeoCache::get(aVxdID);
     if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true) {   // isWedgeSensor
-      hitLocal.SetX((aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition());
+      hitLocal.SetX(SpacePoint::getUWedged({uClusterPtr->getPosition(), vClusterPtr->getPosition()}, aVxdID, &aSensorInfo));
+//       hitLocal.SetX((aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition());
     } else { // rectangular Sensor
       hitLocal.SetX(uClusterPtr->getPosition());
     }
@@ -5698,9 +5690,6 @@ void TFRedesignModule::assignSVDHitsToSectors()
       m_TESTERdistortedHitCtr++;
     }
 
-    transformedHitLocal.SetXYZ(uCoord, vCoord, 0);
-    localSensorSize.SetXYZ(uSizeAtHit * 2., vSize * 2., 0); /// Reset ater Warning
-
     B2DEBUG(175, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ")");
 
     int passNumber = 0;
@@ -5727,7 +5716,6 @@ void TFRedesignModule::assignSVDHitsToSectors()
 
       SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
                                                                   hitLocal,
-                                                                  //                                                                     localSensorSize,
                                                                   currentPass->sectorMap,
                                                                   currentPass->secConfigU,
                                                                   currentPass->secConfigV);

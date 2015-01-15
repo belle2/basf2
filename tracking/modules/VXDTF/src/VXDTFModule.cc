@@ -1084,7 +1084,7 @@ void VXDTFModule::the_real_event()
 
   B2DEBUG(3, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << nPxdClusters << ", SVDCLuster: " << nSvdClusters << ", nTelClusters: " << nTelClusters << ", clustersOfEvent: " << clustersOfEvent.size());
 
-  TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
+  TVector3 hitLocal, hitSigma;
   PositionInfo hitInfo;
   double vSize, uSizeAtHit, uCoord, vCoord;
   FullSecID aSecID;
@@ -1111,16 +1111,6 @@ void VXDTFModule::the_real_event()
     hitInfo.hitSigma = aSensorInfo.vectorToGlobal(hitSigma);
     B2DEBUG(100, " telCluster at vxdID " << aVxdID << " got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z())
 
-    // local(0,0,0) is the _center_ of the sensorplane, not at the edge!
-    vSize = 0.5 * aSensorInfo.getVSize();
-    uSizeAtHit = 0.5 * aSensorInfo.getUSize(hitLocal[1]);
-
-    uCoord = hitLocal[0] + uSizeAtHit; // *0,5 putting (0,0) from the center to the edge of the plane (considers the trapeziodal shape)
-    vCoord = hitLocal[1] + vSize;
-    transformedHitLocal.SetXYZ(uCoord, vCoord, 0);
-//   localSensorSize.SetXYZ(uSizeAtHit, vSize, 0);
-    localSensorSize.SetXYZ(uSizeAtHit * 2., vSize * 2., 0); /// Reset after Warning
-
     B2DEBUG(175, "local tel hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ")");
 
     passNumber = 0;
@@ -1134,7 +1124,7 @@ void VXDTFModule::the_real_event()
         continue;
       }  // PXD is included in 0 & -1
 
-      SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID, transformedHitLocal, /*localSensorSize,*/ currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV);
+      SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID, hitLocal, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV);
 
       aSecID = activatedSector.first;
       MapOfSectors::iterator secMapIter = activatedSector.second;
@@ -1181,15 +1171,6 @@ void VXDTFModule::the_real_event()
     hitInfo.hitSigma = aSensorInfo.vectorToGlobal(hitSigma);
     B2DEBUG(100, " pxdluster got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z())
 
-    // local(0,0,0) is the _center_ of the sensorplane, not at the edge!
-    vSize = 0.5 * aSensorInfo.getVSize();
-    uSizeAtHit = 0.5 * aSensorInfo.getUSize(hitLocal[1]);
-
-    uCoord = hitLocal[0] + uSizeAtHit; // *0,5 putting (0,0) from the center to the edge of the plane (considers the trapeziodal shape)
-    vCoord = hitLocal[1] + vSize;
-    transformedHitLocal.SetXYZ(uCoord, vCoord, 0);
-    localSensorSize.SetXYZ(uSizeAtHit, vSize, 0);
-
     B2DEBUG(175, "local pxd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ")");
 
     passNumber = 0;
@@ -1198,7 +1179,7 @@ void VXDTFModule::the_real_event()
       if (aLayerID > currentPass->highestAllowedLayer) { continue; }   // skip particle if True
       if (currentPass->usePXDHits == false) { continue; }  // PXD is included in 0 & -1
       SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
-                                                                  transformedHitLocal,
+                                                                  hitLocal,
                                                                   currentPass->sectorMap,
                                                                   currentPass->secConfigU,
                                                                   currentPass->secConfigV);
@@ -1241,7 +1222,7 @@ void VXDTFModule::the_real_event()
         // Connection Hit <=> Hit in Collector
         pTFHit->setCollectorID(hitId);
 
-        B2DEBUG(100, "Coor asecid: " << aSecID << ", position Hit: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", uCoord: " << uCoord << ", vCoord: " << vCoord);
+        B2DEBUG(100, "Coor asecid: " << aSecID << ", position Hit: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", uCoord: " << hitLocal[0] << ", vCoord: " << hitLocal[1]);
 
       }
 
@@ -1310,7 +1291,8 @@ void VXDTFModule::the_real_event()
       aLayerID = aVxdID.getLayerNumber();
       VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
       if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true) {   // isWedgeSensor
-        hitLocal.SetX((aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition());
+        hitLocal.SetX(SpacePoint::getUWedged({uClusterPtr->getPosition(), vClusterPtr->getPosition()}, aVxdID, &aSensorInfo));
+//         hitLocal.SetX((aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition());
       } else { // rectangular Sensor
         hitLocal.SetX(uClusterPtr->getPosition());
       }
@@ -1347,9 +1329,6 @@ void VXDTFModule::the_real_event()
         m_TESTERdistortedHitCtr++;
       }
 
-      transformedHitLocal.SetXYZ(uCoord, vCoord, 0);
-      localSensorSize.SetXYZ(uSizeAtHit * 2., vSize * 2., 0); /// Reset ater Warning
-
       B2DEBUG(175, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ")");
 
       passNumber = 0;
@@ -1377,7 +1356,6 @@ void VXDTFModule::the_real_event()
 
         SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
                                                                     hitLocal,
-//                                                                     localSensorSize,
                                                                     currentPass->sectorMap,
                                                                     currentPass->secConfigU,
                                                                     currentPass->secConfigV);
@@ -6205,7 +6183,8 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
 
   if (uClusterInfo != NULL) {
     if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true && vClusterInfo != NULL) {   // isWedgeSensor and 2D-Info
-      hitLocal.SetX((hitLocal.Y() / aSensorInfo.getWidth(0)) * uClusterInfo->getSVDCluster()->getPosition()); // hitLocal.Y is already set
+      hitLocal.SetX(SpacePoint::getUWedged({uClusterInfo->getSVDCluster()->getPosition(), hitLocal.Y()}, aVxdID, &aSensorInfo));    // hitLocal.Y is already set
+//       hitLocal.SetX((hitLocal.Y() / aSensorInfo.getWidth(0)) * uClusterInfo->getSVDCluster()->getPosition()); // hitLocal.Y is already set
     } else { // rectangular Sensor and/or no 2D-info (in this case the X-value of the center of the sensor is taken)
       hitLocal.SetX(uClusterInfo->getSVDCluster()->getPosition());
     }

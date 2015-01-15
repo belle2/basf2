@@ -104,13 +104,24 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
     }
   }
 
-  m_position = aSensorInfo->pointToGlobal(
-                 TVector3(
-                   uCoord,
-                   vCoord,
-                   0
-                 )
-               );
+  if ((aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth()) == true) { // isWedgeSensor
+    m_position = aSensorInfo->pointToGlobal(
+                   TVector3(
+                     (aSensorInfo->getWidth(vCoord) / aSensorInfo->getWidth(0)) * uCoord,
+                     vCoord,
+                     0
+                   )
+                 );
+  } else {
+    m_position = aSensorInfo->pointToGlobal(
+                   TVector3(
+                     uCoord,
+                     vCoord,
+                     0
+                   )
+                 );
+  }
+
 
   // if sigma for a coordinate is not known, a uniform distribution over the whole sensor is asumed:
   if (uSigma < 0) { uSigma = aSensorInfo->getUSize(vCoord) / sqrt(12.); }

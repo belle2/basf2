@@ -166,11 +166,12 @@ function merge_root_files {
   then
     echo "There are no root files to merge"
   else
-    echo "Merge root files"
+    echo "Merging root files..."
     for file in "$jobDirectory"/1/*.root
     do
       file=$(basename "$file")
-      hadd -f "$collectionDirectoryReal"/"$file" "$jobDirectory"/*/"$file" || return 1
+      rm -f "$collectionDirectoryReal"/"$file"
+      fei_merge_files "$collectionDirectoryReal"/"$file" "$jobDirectory"/*/"$file" || return 1
       ln -s "$collectionDirectoryReal"/"$file" "$collectionDirectory"/"$file"
     done
   fi

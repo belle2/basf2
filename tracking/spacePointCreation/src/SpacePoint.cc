@@ -210,7 +210,7 @@ std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertNor
 
   SpacePoint::SpBaseType uSizeAtHit = aSensorInfo->getUSize(localVPosition);
   SpacePoint::SpBaseType localUPosition = (hitNormalized.first - 0.5) * uSizeAtHit;
-  boundaryCheck(localUPosition, -0.5 * aSensorInfo->getUSize(), uSizeAtHit); // restrain hits to sensor boundaries
+  boundaryCheck(localUPosition, -0.5 * uSizeAtHit, 0.5 * uSizeAtHit); // restrain hits to sensor boundaries
 
   return { localUPosition, localVPosition };
 }

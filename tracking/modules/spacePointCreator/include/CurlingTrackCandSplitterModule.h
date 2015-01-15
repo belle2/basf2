@@ -11,6 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <array>
 
@@ -42,6 +43,8 @@ namespace Belle2 {
   class CurlingTrackCandSplitterModule : public Module {
 
   public:
+
+    typedef SpacePoint::SpBaseType ModBaseType; /**< typedef for less writing effort and to have the same BaseType in all modules */ // TODO: utilize this throughout the Module
 
     CurlingTrackCandSplitterModule(); /**< Constructor */
 

@@ -699,36 +699,25 @@ void CurlingTrackCandSplitterModule::writeToRoot(RootVariables& rootVariables)
 CurlingTrackCandSplitterModule::TaggedUVPos CurlingTrackCandSplitterModule::getUV(const Belle2::SpacePoint* spacePoint)
 {
   TaggedUVPos returnVals; // initialized to: both bools false, both doubles to 0.
-  auto detType = spacePoint->getType();
-  if (detType == VXD::SensorInfoBase::PXD) {
-    PXDCluster* pxdCluster = spacePoint->getRelatedTo<PXDCluster>("ALL"); // COULDDO: search only certain StoreArrays
-    if (pxdCluster == NULL) {
-      B2ERROR("Found no relation to a PXDCluster for SpacePoint " << spacePoint->getArrayIndex() << " from StoreArray" << spacePoint->getArrayName() << ". This SpacePoint will be skipped and will not be contained in the genfit::TrackCand");
-      throw (FoundNoCluster()); // Should never happen
-    }
-    // set return values
-    returnVals.m_U = pxdCluster->getU();
-    returnVals.m_setU = true;
-    returnVals.m_V = pxdCluster->getV();
-    returnVals.m_setV = true;
-  } else if (detType == VXD::SensorInfoBase::SVD) {
-    RelationVector<SVDCluster> svdClusters = spacePoint->getRelationsTo<SVDCluster>("ALL"); // COULDDO: search only certain StoreArrays
-    if (svdClusters.size() > 2) { throw SpacePoint::InvalidNumberOfClusters(); }
-    else if (svdClusters.size() == 0) {
-      B2ERROR("Found no relation to a SVDCluster for SpacePoint " << spacePoint->getArrayIndex() << " from StoreArray" << spacePoint->getArrayName() << ". This SpacePoint will be skipped and will not be contained in the genfit::TrackCand");
-      throw (FoundNoCluster());
-    }
-    // loop over all Clusters of the SpacePoint and set the appropriate values.
-    for (const SVDCluster & aCluster : svdClusters) {
-      if (aCluster.isUCluster()) {
-        returnVals.m_U = aCluster.getPosition();
-        returnVals.m_setU = true;
-      } else {
-        returnVals.m_V = aCluster.getPosition();
-        returnVals.m_setV = true;
-      }
-    }
-  }
+
+  // get the normalized local coordinates from SpacePoint and convert them to local coordinates (have to do so because at the slanted parts the local U-position is dependant on the local V-position)
+  ModBaseType normU = spacePoint->getNormalizedLocalU();
+  ModBaseType normV = spacePoint->getNormalizedLocalV();
+
+  // convert normalized coordinates to local coordinates and then 'unwedge them'
+  std::pair<ModBaseType, ModBaseType> localUV = SpacePoint::convertNormalizedToLocalCoordinates(std::make_pair(normU, normV), spacePoint->getVxdID());
+  //ModBaseType unwedgedU = SpacePoint::getUUnwedged(localUV, spacePoint->getVxdID());
+
+  // set values for return: set both m_U and m_V regardless if they have actually been set in the SpacePoint and simply assign the m_setX tags, as they decide if a value is actually used
+//   std::pair<bool,bool> setCoords = spacePoint->bla(); // still to be implemented by Jakob!!
+  std::pair<bool, bool> setCoords = spacePoint->getIfClustersAssigned();
+  // WARNING: for now both values are set to true
+//   std::pair<bool,bool> setCoords = std::make_pair(true, true);
+  returnVals.m_setU = setCoords.first;
+  returnVals.m_setV = setCoords.second;
+  returnVals.m_U = localUV.first;
+  returnVals.m_V = localUV.second;
+
   return returnVals;
 }
 

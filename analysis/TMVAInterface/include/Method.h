@@ -34,8 +34,9 @@ namespace Belle2 {
        * @param type string representation of type, see TMVA::Types::EMVA for possible names (dicarding the leading k).
        * @param config string with the config which is given to the TMVA method when its booked. See TMVA UserGuide for possible options
        * @param variables vector of variable names, which have to be registered in the VariableManager
+       * @param spectators vector of spectator names, which have to be registered in the VariableManager
        */
-      Method(std::string name, std::string type, std::string config, std::vector<std::string> variables);
+      Method(std::string name, std::string type, std::string config, std::vector<std::string> variables, std::vector<std::string> spectators = {});
 
       /**
        * Getter for name of the method
@@ -67,10 +68,17 @@ namespace Belle2 {
        */
       const std::vector<const Variable::Manager::Var*>& getVariables() { return m_variables; }
 
+      /**
+       * Getter for spectators of the method
+       * @return spectators
+       */
+      const std::vector<const Variable::Manager::Var*>& getSpectators() { return m_spectators; }
+
     private:
       std::string m_name; /**< name of the method */
       std::string m_config; /**< config string given to the method */
       std::vector<const Variable::Manager::Var*> m_variables; /**< Pointers to the input variables loaded from VariableManager */
+      std::vector<const Variable::Manager::Var*> m_spectators; /**< Pointers to the input spectators loaded from VariableManager */
       TMVA::Types::EMVA m_type; /**< type of the method */
       std::string m_type_as_string; /**< type of the method as string */
     };

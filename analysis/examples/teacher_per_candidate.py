@@ -15,6 +15,7 @@ from modularAnalysis import *
 main = create_path()
 
 main.add_module(register_module('RootInput'))
+main.add_module(register_module('Gearbox'))
 main.add_module(register_module('ParticleLoader'))
 
 # Train TMVA Teacher using all electron candidates as input data
@@ -46,6 +47,7 @@ teacher = register_module('TMVATeacher')
 teacher.param('prefix', 'TMVA')
 teacher.param('methods', methods)
 teacher.param('variables', variables)
+teacher.param('spectators', ['nTracks', 'nClusters'])
 teacher.param('target', 'isSignal')
 teacher.param('listNames', 'e-')
 main.add_module(teacher)

@@ -56,6 +56,11 @@ namespace Belle2 {
       std::vector<std::string> getVariablesFromXML(const boost::property_tree::ptree& pt) const;
 
       /**
+       * Load spectators from config file
+       */
+      std::vector<std::string> getSpectatorsFromXML(const boost::property_tree::ptree& pt) const;
+
+      /**
        * Load class fractions from config file
        */
       std::map<int, float> getClassFractionsFromXML(const boost::property_tree::ptree& pt) const;
@@ -74,6 +79,7 @@ namespace Belle2 {
       std::shared_ptr<TMVA::Reader> m_reader; /**<TMVA::Reader, which steers the booked TMVA method */
       std::vector<float> m_input; /**< Store place for the input variables */
       std::vector<const Variable::Manager::Var*> m_variables; /**< Pointers to the input variables */
+      std::vector<const Variable::Manager::Var*> m_spectators; /**< Pointers to the input spectators */
 
     };
   }

@@ -49,7 +49,7 @@ namespace {
 
   TEST(TMVAInterfaceTest, BuiltinMethodIsConstructedCorrectly)
   {
-    auto method = Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"}));
+    auto method = Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"}), std::vector<std::string>({"isSignal"}));
     EXPECT_EQ(method.getName(), "BoostedDecisionTrees");
     EXPECT_EQ(method.getType(), TMVA::Types::kBDT);
     EXPECT_EQ(method.getTypeAsString(), "BDT");
@@ -58,18 +58,20 @@ namespace {
     EXPECT_EQ(method.getVariables()[0]->name, "p");
     EXPECT_EQ(method.getVariables()[1]->name, "pt");
     EXPECT_EQ(method.getVariables()[2]->name, "eid");
+    EXPECT_EQ(method.getSpectators()[0]->name, "isSignal");
   }
 
 
   TEST(TMVAInterfaceTest, BuiltinMethodFailsCorrectly)
   {
     EXPECT_B2ERROR(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "DOES_NOT_EXIST", "eid"})));
+    EXPECT_B2WARNING(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "eid"}), std::vector<std::string>({"DOES_NOT_EXIST", "eid"})));
     EXPECT_DEATH(Method("BoostedDecisionTree", "DOES_NOT_EXIST", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"})), ".*");
   }
 
   TEST(TMVAInterfaceTest, PluginMethodIsConstructedCorrectly)
   {
-    auto method = Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", std::vector<std::string>({"p", "pt", "eid"}));
+    auto method = Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", std::vector<std::string>({"p", "pt", "eid"}), std::vector<std::string>({"isSignal"}));
     EXPECT_EQ(method.getName(), "MockPlugin");
     EXPECT_EQ(method.getType(), TMVA::Types::kPlugins);
     EXPECT_EQ(method.getTypeAsString(), "Plugin");
@@ -78,6 +80,7 @@ namespace {
     EXPECT_EQ(method.getVariables()[0]->name, "p");
     EXPECT_EQ(method.getVariables()[1]->name, "pt");
     EXPECT_EQ(method.getVariables()[2]->name, "eid");
+    EXPECT_EQ(method.getSpectators()[0]->name, "isSignal");
   }
 
 
@@ -168,10 +171,11 @@ namespace {
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
 
     std::vector<std::string> variables = {"p", "getExtraInfo(someInput)"};
+    std::vector<std::string> spectators = {"M"};
     std::string target = "getExtraInfo(target)";
 
     std::vector<TMVAInterface::Method> methods;
-    methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables));
+    methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables, spectators));
 
     TMVAInterface::Teacher teacher("unittest", ".", target, methods);
 
@@ -216,10 +220,11 @@ namespace {
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
 
     std::vector<std::string> variables = {"p", "False", "getExtraInfo(someInput)"};
+    std::vector<std::string> spectators = {"M"};
     std::string target = "getExtraInfo(target)";
 
     std::vector<TMVAInterface::Method> methods;
-    methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables));
+    methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables, spectators));
 
     TMVAInterface::Teacher teacher("unittest2", ".", target, methods);
 

@@ -37,6 +37,7 @@ namespace Belle2 {
     addParam("prefix", m_methodPrefix, "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information", std::string("TMVA"));
     addParam("workingDirectory", m_workingDirectory, "Working directory in which the config file and the weight file directory is created", std::string("."));
     addParam("variables", m_variables, "Input variables used by the TMVA method");
+    addParam("spectators", m_spectators, "Input spectators used by the TMVA method");
     addParam("target", m_target, "Target used by the method, has to be an integer-valued variable which defines clusters in the sample.");
     addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification"));
     addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
@@ -64,7 +65,7 @@ namespace Belle2 {
       std::string config = std::get<2>(x);
       if (m_createMVAPDFs)
         config = std::string("CreateMVAPdfs:") + config;
-      methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables));
+      methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables, m_spectators));
     }
     m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, m_target, methods, m_useExistingData);
 

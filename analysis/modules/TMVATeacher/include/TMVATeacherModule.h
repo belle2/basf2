@@ -63,6 +63,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::vector<std::string> m_variables; /**< input variables for the TMVA method */
+    std::vector<std::string> m_spectators; /**< input spectators for the TMVA method */
     std::string m_target; /**< target used by multivariate analysis method has to be integer valued variable which defines clusters in the sample. */
     std::vector<std::tuple<std::string, std::string, std::string>> m_methods; /**< tuple(name, type, config) for every method */
     std::string m_methodPrefix; /**< common prefix for the methods trained by TMVATeacher */

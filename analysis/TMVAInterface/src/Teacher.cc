@@ -50,7 +50,8 @@ namespace Belle2 {
 
       // Create new tree which stores the input and target variable
       const auto& variables = m_methods[0].getVariables();
-      m_input.resize(variables.size());
+      const auto& spectators = m_methods[0].getSpectators();
+      m_input.resize(variables.size() + spectators.size());
 
       // If we want to use existing data we open the file in UPDATE mode,
       // otherwise we recreate the file (overwrite it!)
@@ -78,11 +79,15 @@ namespace Belle2 {
 
         for (unsigned int i = 0; i < variables.size(); ++i)
           tree->Branch(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+        for (unsigned int i = 0; i < spectators.size(); ++i)
+          tree->Branch(Variable::makeROOTCompatible(spectators[i]->name).c_str(), &m_input[i + variables.size()]);
         tree->Branch(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
 
       } else {
         for (unsigned int i = 0; i < variables.size(); ++i)
           tree->SetBranchAddress(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+        for (unsigned int i = 0; i < spectators.size(); ++i)
+          tree->SetBranchAddress(Variable::makeROOTCompatible(spectators[i]->name).c_str(), &m_input[i + variables.size()]);
         tree->SetBranchAddress(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
       }
 
@@ -120,6 +125,10 @@ namespace Belle2 {
       for (unsigned int i = 0; i < variables.size(); ++i) {
         m_input[i] = variables[i]->function(particle);
       }
+      const auto& spectators = m_methods[0].getSpectators();
+      for (unsigned int i = 0; i < spectators.size(); ++i) {
+        m_input[i + variables.size()] = spectators[i]->function(particle);
+      }
 
       // The target variable is converted to an integer
       m_target = int(m_target_var->function(particle) + 0.5);
@@ -140,6 +149,15 @@ namespace Belle2 {
         m_input[i] = variables[i]->function(particle);
         if (!std::isfinite(m_input[i])) {
           B2ERROR("Output of variable " << variables[i]->name << " is " << m_input[i] << ", please fix it. Candidate will be skipped.");
+          return;
+        }
+      }
+
+      const auto& spectators = m_methods[0].getSpectators();
+      for (unsigned int i = 0; i < spectators.size(); ++i) {
+        m_input[i + variables.size()] = spectators[i]->function(particle);
+        if (!std::isfinite(m_input[i + variables.size()])) {
+          B2ERROR("Output of spectator " << variables[i]->name << " is " << m_input[i + variables.size()] << ", please fix it. Candidate will be skipped.");
           return;
         }
       }
@@ -209,14 +227,26 @@ namespace Belle2 {
           B2WARNING("Removed variable " << x->name << " from TMVA training because it's constant!")
         }
       }
+
+      std::vector<std::string> spectator_names;
+      for (auto & x : m_methods[0].getSpectators()) {
+        spectator_names.push_back(x->name);
+      }
+
       for (auto & method : m_methods) {
-        method = Method(method.getName(), method.getTypeAsString(), method.getConfig(), cleaned_variables);
+        method = Method(method.getName(), method.getTypeAsString(), method.getConfig(), cleaned_variables, spectator_names);
       }
 
       for (auto & x : m_methods[0].getVariables()) {
         boost::property_tree::ptree node;
         node.put("Name", x->name);
         pt.add_child("Setup.Variables.Variable", node);
+      }
+
+      for (auto & x : m_methods[0].getSpectators()) {
+        boost::property_tree::ptree node;
+        node.put("Name", x->name);
+        pt.add_child("Setup.Spectators.Spectator", node);
       }
 
       if (cluster_count.size() <= 1) {
@@ -265,6 +295,10 @@ namespace Belle2 {
       // Add variables to the factory
       for (auto & var : m_methods[0].getVariables()) {
         factory.AddVariable(Variable::makeROOTCompatible(var->name));
+      }
+
+      for (auto & var : m_methods[0].getSpectators()) {
+        factory.AddSpectator(Variable::makeROOTCompatible(var->name));
       }
 
       auto signalCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str());

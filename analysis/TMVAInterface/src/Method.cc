@@ -18,7 +18,7 @@
 namespace Belle2 {
   namespace TMVAInterface {
 
-    Method::Method(std::string name, std::string type, std::string config, std::vector<std::string> variables)
+    Method::Method(std::string name, std::string type, std::string config, std::vector<std::string> variables, std::vector<std::string> spectators)
     {
 
       m_name = name;
@@ -57,6 +57,14 @@ namespace Belle2 {
           continue;
         }
         m_variables.push_back(x);
+      }
+      for (auto & variable : spectators) {
+        const Variable::Manager::Var* x =  manager.getVariable(variable);
+        if (x == nullptr) {
+          B2WARNING("Couldn't find spectator " << variable << " via the Variable::Manager. Check the name!")
+          continue;
+        }
+        m_spectators.push_back(x);
       }
 
     }

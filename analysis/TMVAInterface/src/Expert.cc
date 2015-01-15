@@ -92,6 +92,10 @@ namespace Belle2 {
         m_input[i] = m_variables[i]->function(particle);
       }
 
+      for (unsigned int i = 0; i < m_spectators.size(); ++i) {
+        m_input[i + m_variables.size()] = m_spectators[i]->function(particle);
+      }
+
       double result = 0;
       if (signalFraction < 0 and signalFraction > -1.5)
         result = m_reader->EvaluateMVA(m_methodName);
@@ -120,6 +124,21 @@ namespace Belle2 {
       return variables;
     }
 
+    std::vector<std::string> Expert::getSpectatorsFromXML(const boost::property_tree::ptree& pt) const
+    {
+      std::vector<std::string> spectators;
+      boost::optional< const boost::property_tree::ptree& > child = pt.get_child_optional("Setup.Spectators");
+      if (!child)
+        return spectators;
+
+      for (const auto & f : pt.get_child("Setup.Spectators")) {
+        if (f.first.data() != std::string("Spectator"))
+          continue;
+        spectators.push_back(f.second.get<std::string>("Name"));
+      }
+      return spectators;
+    }
+
     std::map<int, float> Expert::getClassFractionsFromXML(const boost::property_tree::ptree& pt) const
     {
       std::map<int, float> classFractions;
@@ -139,6 +158,7 @@ namespace Belle2 {
     {
 
       auto variables = getVariablesFromXML(pt);
+      auto spectators = getSpectatorsFromXML(pt);
 
       for (const auto & f : pt.get_child("Setup.Trainings")) {
         if (f.first.data() != std::string("Training"))
@@ -155,13 +175,17 @@ namespace Belle2 {
             continue;
 
           std::string methodType = g.second.get<std::string>("MethodType");
-          Method method(m_methodName, methodType, std::string(), variables);
+          Method method(m_methodName, methodType, std::string(), variables, spectators);
 
           auto reader = std::make_shared<TMVA::Reader>("!Color:!Silent");
           m_variables = method.getVariables();
-          m_input.resize(m_variables.size(), 0);
+          m_spectators = method.getSpectators();
+          m_input.resize(m_variables.size() + m_spectators.size(), 0);
           for (unsigned int i = 0; i < m_variables.size(); ++i) {
             reader->AddVariable(Variable::makeROOTCompatible(m_variables[i]->name), &m_input[i]);
+          }
+          for (unsigned int i = 0; i < m_spectators.size(); ++i) {
+            reader->AddSpectator(Variable::makeROOTCompatible(m_spectators[i]->name), &m_input[i + m_variables.size()]);
           }
 
           std::string weightfile = g.second.get<std::string>("Weightfile");

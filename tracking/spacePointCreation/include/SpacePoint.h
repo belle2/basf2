@@ -60,8 +60,9 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     SpacePoint() :
-      m_qualityIndicator(0.5),
-      m_isAssigned(false) {}
+      m_clustersAssigned({false, false}),
+                       m_qualityIndicator(0.5),
+    m_isAssigned(false) {}
 
 
 
@@ -179,6 +180,15 @@ namespace Belle2 {
 
     /** returns the current state of assignment - returns true if it is assigned and therefore blocked for reuse. */
     bool getAssignmentState() const {return m_isAssigned; }
+
+
+
+    /** returns which local coordinate is based on assigned Cluster (only relevant for SVD, for other types, this is always true.
+    *
+    * .first is true, if this SpacePoint has a UCluster (only relevant for SVD, PXD always true),
+    * .second is true, if this SpacePoint has a VCluster (only relevant for SVD, PXD always true),
+    */
+    std::pair<bool, bool> getIfClustersAssigned() const {return m_clustersAssigned; }
 
 
 
@@ -300,6 +310,15 @@ namespace Belle2 {
 
 
 
+    /** The bool value is true, when correct information of the coordinate exists.
+     *
+     *  .first is true, if this SpacePoint has a UCluster (only relevant for SVD, PXD always true),
+     * .second is true, if this SpacePoint has a VCluster (only relevant for SVD, PXD always true),
+     */
+    std::pair<bool, bool> m_clustersAssigned;
+
+
+
     /** stores the vxdID */
     VxdID::baseType m_vxdID;
 
@@ -328,6 +347,6 @@ namespace Belle2 {
 
 
 
-    ClassDef(SpacePoint, 8) // last member changed: m_position, m_positionError, m_qualityIndicator
+    ClassDef(SpacePoint, 9) // last member changed: m_ClustersAssigned
   };
 }

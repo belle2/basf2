@@ -22,6 +22,7 @@ ClassImp(TBSpacePoint)
 TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
                            const VXD::SensorInfoBase* aSensorInfo)
 {
+  SpacePoint::m_clustersAssigned = {true, true};
   SpacePoint::m_vxdID = telCluster->getSensorID();
   if (telCluster == NULL) { throw SpacePoint::InvalidNumberOfClusters(); }
   SpacePoint::m_qualityIndicator = 0.5;

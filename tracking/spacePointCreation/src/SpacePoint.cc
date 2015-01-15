@@ -21,9 +21,10 @@ ClassImp(SpacePoint)
 
 SpacePoint::SpacePoint(const Belle2::PXDCluster* pxdCluster,
                        const Belle2::VXD::SensorInfoBase* aSensorInfo) :
-  m_vxdID(pxdCluster->getSensorID()),
-  m_qualityIndicator(0.5),
-  m_isAssigned(false)
+  m_clustersAssigned({true, true}),
+                   m_vxdID(pxdCluster->getSensorID()),
+                   m_qualityIndicator(0.5),
+                   m_isAssigned(false)
 {
   if (pxdCluster == NULL) { throw InvalidNumberOfClusters(); }
 
@@ -52,9 +53,10 @@ SpacePoint::SpacePoint(const Belle2::PXDCluster* pxdCluster,
 
 SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
                        const Belle2::VXD::SensorInfoBase* aSensorInfo) :
-  m_vxdID(clusters.at(0)->getSensorID()),
-  m_qualityIndicator(0.5),
-  m_isAssigned(false)
+  m_clustersAssigned({false, false}),
+                   m_vxdID(clusters.at(0)->getSensorID()),
+                   m_qualityIndicator(0.5),
+                   m_isAssigned(false)
 {
   unsigned int nClusters = clusters.size();
   SpacePoint::SpBaseType uCoord = 0; // 0 = center of Sensor
@@ -92,9 +94,11 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
   // retrieve position and sigma-values
   for (const SVDCluster * aCluster : clusters) {
     if (aCluster->isUCluster() == true) {
+      m_clustersAssigned.first = true;
       uCoord = aCluster->getPosition();
       uSigma = aCluster->getPositionSigma();
     } else {
+      m_clustersAssigned.second = true;
       vCoord = aCluster->getPosition();
       vSigma = aCluster->getPositionSigma();
     }

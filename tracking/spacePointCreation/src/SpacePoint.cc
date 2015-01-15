@@ -184,17 +184,13 @@ std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertLoc
   SpacePoint::SpBaseType sensorSizeU =  aSensorInfo->getUSize(hitLocal.second); // this deals with the case of trapezoidal sensors too
   SpacePoint::SpBaseType sensorSizeV =  aSensorInfo->getVSize();
 
-//   SpacePoint::SpBaseType localUPosition = hitLocal.first +  0.5 * sensorSizeU;
-//   localUPosition /= sensorSizeU;
+  SpacePoint::SpBaseType normalizedUPosition = (hitLocal.first +  0.5 * sensorSizeU) / sensorSizeU; // indepedent of the trapezoidal sensor-issue by definition
+  boundaryCheck(normalizedUPosition, 0, 1);
 
-  SpacePoint::SpBaseType localUPosition = (((aSensorInfo->getUSize(0) / sensorSizeU) * hitLocal.first) + 0.5 * sensorSizeU) / sensorSizeU;
+  SpacePoint::SpBaseType normalizedVPosition = (hitLocal.second +  0.5 * sensorSizeV) / sensorSizeV;
+  boundaryCheck(normalizedVPosition, 0, 1);
 
-  boundaryCheck(localUPosition, 0, 1);
-  SpacePoint::SpBaseType localVPosition = hitLocal.second +  0.5 * sensorSizeV;
-  localVPosition /= sensorSizeV;
-  boundaryCheck(localVPosition, 0, 1);
-
-  return { localUPosition, localVPosition };
+  return { normalizedUPosition, normalizedVPosition };
 }
 
 

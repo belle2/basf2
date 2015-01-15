@@ -202,17 +202,6 @@ namespace Belle2 {
 
 // static converter functions:
 
-    /** converts a local hit into sensor-independent relative coordinates.
-     *
-     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of SpBaseTypes.
-     * second parameter is the coded vxdID, which carries the sensorID.
-     * third parameter, a sensorInfo can be passed for testing purposes.
-     *  If no sensorInfo is passed, the member gets its own pointer to it.
-     */
-    static std::pair<SpBaseType, SpBaseType> convertLocalToNormalizedCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
-
-
-
     /** converts a local hit on a given sensor into global coordinates.
      *
      * so this practically does what sensorInfo::pointToGlobal is doing, the difference is, that you do not need to have the sensorInfo beforehand (it will be retrieved using the VxdID)
@@ -220,8 +209,27 @@ namespace Belle2 {
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
+    *
+    * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      */
     static B2Vector3F getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+
+
+
+    /** converts a local hit into sensor-independent relative coordinates.
+       *
+       * first parameter is the local hit (as provided by SpacePoint::getUWedged(...) and Cluster::getV!) stored as a pair of SpBaseTypes.
+       * second parameter is the coded vxdID, which carries the sensorID.
+       * third parameter, a sensorInfo can be passed for testing purposes.
+       *  If no sensorInfo is passed, the member gets its own pointer to it.
+     *
+     * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
+     * The normalized coordinates are independent of wedged-sensor-issues
+       */
+    static std::pair<SpBaseType, SpBaseType> convertLocalToNormalizedCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+
+
+
 
 
 
@@ -236,14 +244,48 @@ namespace Belle2 {
 
 
 
+    /** takes a general uCoordinate, and transforms it to corrected uCoordinate for wedged sensors.
+     *
+     * Use this if you want to add the information of the vCluster to the local uPosition.
+     * The returned value is now dependent of vCluster and valid only for this cluster!
+     * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
+     *
+     */
+    static SpBaseType getUWedged(const std::pair<SpBaseType, SpBaseType> hitLocalUnwedged, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL) {
+      if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }
+      return (aSensorInfo->getWidth(hitLocalUnwedged.second) / aSensorInfo->getWidth()) * hitLocalUnwedged.first;
+    }
+
+
+
+    /** takes a wedged uCoordinate, and transforms it to general uCoordinate.
+     *
+     * Use this if you want to "unwedge" your u-coordinate.
+     * The returned value shall be like the value delivered by a uCluster without information of v (== aCluster.getPosition() ).
+     * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
+     */
+    static SpBaseType getUUnwedged(const std::pair<SpBaseType, SpBaseType> hitLocalWedged, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL) {
+      if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }
+      return (aSensorInfo->getWidth() / aSensorInfo->getWidth(hitLocalWedged.second)) * hitLocalWedged.first;
+    }
+
+
+
     /** checks first parameter for boundaries.
      *
      * does take second/third argument for checking for lower/upper boundary.
      * if boundary is crossed, value gets reset to boundary value
      * */
     static void boundaryCheck(SpBaseType& value, SpBaseType lower = 0, SpBaseType higher = 1) {
-      if (value < lower) { value = lower; }
-      if (value > higher) { value = higher; }
+      if (value < lower) {
+        B2WARNING("SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower)
+        value = lower;
+      }
+      if (value > higher) {
+        B2WARNING("SpacePoint::boundaryCheck: value had to be moved (higherCheck)! old: " << value << ", new: " << higher)
+        value = higher;
+      }
+
     }
 
 

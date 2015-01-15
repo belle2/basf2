@@ -41,7 +41,7 @@ function create_play {
         basename=`basename "$mcFile"`
         ln -s "$mcFile" "rawinput_$basename"
     done
-    cd -
+    cd - > /dev/null
   done
 }
 
@@ -71,7 +71,7 @@ function create_ntuples_with_finished_training {
         basename=`basename "$mcFile"`
         ln -s "$mcFile" "rawinput_$basename"
     done
-    cd -
+    cd - > /dev/null
 
     cd "$jobDirectory"/"$i"
     echo -n "time basf2 -l warning --execute-path basf2_path.pickle " > basf2_script.sh
@@ -81,7 +81,7 @@ function create_ntuples_with_finished_training {
     echo -n " &> my_output_hack.log " >> basf2_script.sh
     echo -n "&& touch basf2_finished_successfully" >> basf2_script.sh
     chmod +x basf2_script.sh
-    cd -
+    cd - > /dev/null
   done
     
 }
@@ -89,7 +89,7 @@ function create_ntuples_with_finished_training {
 function run_basf2 {
   cd "$collectionDirectory"
   basf2 $steeringFile --dump-path basf2_path.pickle -i "$persistentDirectory"/1/basf2_input.root -- -ve -nproc 20 -cache cache.pkl --preload -summary || return 1
-  cd -
+  cd - > /dev/null
 }
 
 function setup_jobDirectory {
@@ -124,7 +124,7 @@ done
 touch basf2_finished_successfully
 EOF
             chmod +x basf2_script.sh
-            cd -
+            cd - > /dev/null
 
             ln -s "$absolutePath" "$jobDirectory"/"$i"/
       done
@@ -141,7 +141,7 @@ function submit_jobs {
     #qsub -cwd -q express,short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
     #bsub -q s -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid
     bsub -q s -e /home/belle/pulver/joboutput -o /home/belle/pulver/joboutput ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid
-    cd -
+    cd - > /dev/null
   done
 }
 
@@ -183,8 +183,9 @@ function update_input_files {
   for i in $(seq "$nJobs")
   do
     cd "$persistentDirectory"/"$i"
+    #use mv without alias (i.e. overwrite without warning)
     command mv basf2_output.root basf2_input.root
-    cd -
+    cd - > /dev/null
   done
 
 }

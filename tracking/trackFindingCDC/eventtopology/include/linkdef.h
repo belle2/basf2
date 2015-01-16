@@ -7,9 +7,9 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
+#ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitTopology+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitTopology-;
 
 #endif
 

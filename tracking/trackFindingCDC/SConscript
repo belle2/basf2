@@ -17,23 +17,4 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     ]
 
-# Forward the compilation option 
-belle2_option = os.environ["BELLE2_OPTION"]
-
-#cpp_flags = ['-O3', '-g',]
-cpp_flags = []
-
-if belle2_option == "debug":
-    cpp_defines = ['TRACKFINDINGCDC_COMPILE_DEBUG',]
-
-elif belle2_option == "opt":
-    cpp_defines = ['TRACKFINDINGCDC_COMPILE_OPT',]
-
-elif belle2_option == "clang":
-    cpp_defines = ['TRACKFINDINGCDC_COMPILE_CLANG',]
-    cpp_flags += ['-Wno-deprecated-register', '-Wno-overloaded-virtual', '-Wno-redeclared-class-member',]
-
-env.Append(CPPDEFINES=cpp_defines)
-env.Append(CPPFLAGS=cpp_flags)
-
 Return('env')

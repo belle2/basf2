@@ -9,21 +9,10 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
-
-#pragma link C++ class Belle2::TrackFindingCDC::MCFacetFilter+;
-
-#pragma link C++ class Belle2::TrackFindingCDC::AllFacetFilter+;
-#pragma link C++ class Belle2::TrackFindingCDC::SimpleFacetFilter+;
-
-#else
-
 #pragma link C++ class Belle2::TrackFindingCDC::MCFacetFilter-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::AllFacetFilter-;
 #pragma link C++ class Belle2::TrackFindingCDC::SimpleFacetFilter-;
-
-#endif
 
 #endif
 

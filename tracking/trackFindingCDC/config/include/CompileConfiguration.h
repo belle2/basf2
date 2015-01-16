@@ -1,10 +1,2 @@
-#ifdef TRACKFINDINGCDC_COMPILE_DEBUG
-
-#endif
-
-#ifdef TRACKFINDINGCDC_COMPILE_OPT
-
-#endif
-
-
+// Always use the dictionaries.
 #define TRACKFINDINGCDC_USE_ROOT_DICTIONARY

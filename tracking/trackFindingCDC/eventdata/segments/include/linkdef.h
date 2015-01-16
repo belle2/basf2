@@ -9,20 +9,6 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
-
-#pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitCluster+;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitSegment+;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHitSegment+;
-
-#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoTangentSegment+;
-
-#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoSegment2D+;
-
-#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoSegment3D+;
-
-#else
-
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitCluster-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitSegment-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHitSegment-;
@@ -32,8 +18,6 @@
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRecoSegment2D-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRecoSegment3D-;
-
-#endif
 
 #endif
 

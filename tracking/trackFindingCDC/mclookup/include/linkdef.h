@@ -11,15 +11,7 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
-
-#pragma link C++ class Belle2::TrackFindingCDC::CDCMCSegmentLookUp+;
-
-#else
-
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCSegmentLookUp-;
-
-#endif
 
 #endif
 

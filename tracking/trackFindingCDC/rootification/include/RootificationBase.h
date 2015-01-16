@@ -20,10 +20,16 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
-    const bool ROOTIFICATIONNBASE_IS_ACTIVE = true;
+#ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
+    const bool ROOTIFICATION_DICTIONARY_IS_ACTIVE = true;
 #else
-    const bool ROOTIFICATIONNBASE_IS_ACTIVE = false;
+    const bool ROOTIFICATION_DICTIONARY_IS_ACTIVE = false;
+#endif
+
+#if defined TRACKFINDINGCDC_USE_ROOT_DICTIONARY && defined TRACKFINDINGCDC_USE_ROOT_BASE
+    const bool ROOTIFICATION_BASE_IS_ACTIVE = true;
+#else
+    const bool ROOTIFICATION_BASE_IS_ACTIVE = false;
 #endif
 
     /** Base class for the ROOT inheritance.
@@ -34,10 +40,14 @@ namespace Belle2 {
 
     public:
       /// Returns true, if this class is the active base and all other objects are accessable from Python.
-      static bool getIsActive() { return ROOTIFICATIONNBASE_IS_ACTIVE; }
+      static bool getBaseIsActive() { return ROOTIFICATION_BASE_IS_ACTIVE; }
+
+      /// Returns true, if the tracking objects have dictionary created by ROOT CINT.
+      static bool getDictionaryIsActive() { return ROOTIFICATION_DICTIONARY_IS_ACTIVE; }
 
     private:
-      static const bool s_isActive = ROOTIFICATIONNBASE_IS_ACTIVE;
+      static const bool s_isBaseActive = ROOTIFICATION_BASE_IS_ACTIVE;
+      static const bool s_isDictionaryActive = ROOTIFICATION_DICTIONARY_IS_ACTIVE;
 
     private:
       /// ROOT Macro to unconditionally make RootificationBase a ROOT class.

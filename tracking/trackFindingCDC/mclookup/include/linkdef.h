@@ -7,10 +7,20 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitLookUp+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitLookUp-;
+
+#ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_BASE
+
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCSegmentLookUp+;
+
+#else
+
+#pragma link C++ class Belle2::TrackFindingCDC::CDCMCSegmentLookUp-;
+
+#endif
+
 #endif
 
 #endif

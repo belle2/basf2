@@ -41,7 +41,7 @@ namespace Belle2 {
     // accidentally checks in a version with ROOT switch on.
 
 
-#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
+#if defined TRACKFINDINGCDC_USE_ROOT_DICTIONARY && defined TRACKFINDINGCDC_USE_ROOT_BASE
     /// Typedef the normal TObject as the base class of the track finder in case the ROOT inheritance is switched on.
     typedef RootificationBase SwitchableRootificationBase;
 
@@ -111,7 +111,6 @@ private:                \
 #define TRACKFINDINGCDC_SwitchableClassImp(CLASSNAME)
 
 #endif
-
 
   } //end namespace TrackFindingCDC
 

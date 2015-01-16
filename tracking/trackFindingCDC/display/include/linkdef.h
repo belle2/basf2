@@ -11,8 +11,4 @@
 #pragma link C++ class Belle2::TrackFindingCDC::PrimitivePlotter-;
 #pragma link C++ class Belle2::TrackFindingCDC::SVGPrimitivePlotter-;
 
-#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
-
-#endif
-
 #endif

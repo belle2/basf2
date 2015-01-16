@@ -7,12 +7,23 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
+
 #ifdef TRACKFINDINGCDC_USE_ROOT_BASE
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWire+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireLayer+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireSuperLayer+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireTopology+;
+
+#else
+
+#pragma link C++ class Belle2::TrackFindingCDC::CDCWire-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCWireLayer-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCWireSuperLayer-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCWireTopology-;
+
+#endif
 
 #endif
 

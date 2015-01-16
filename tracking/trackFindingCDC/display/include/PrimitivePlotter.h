@@ -25,6 +25,7 @@ namespace Belle2 {
     class PrimitivePlotter {
 
     public:
+      /// A map type for attributes names to values for additional drawing information
       typedef std::map<std::string, std::string> AttributeMap;
 
       /// Default constructor for ROOT compatibility. Cell weight defaults to 1
@@ -54,7 +55,7 @@ namespace Belle2 {
                             const float& startY,
                             const float& endX,
                             const float& endY,
-                            const AttributeMap& attributeMap);
+                            const AttributeMap& attributeMap = AttributeMap());
 
       /** Adds an arrow to the plot
        *
@@ -70,7 +71,7 @@ namespace Belle2 {
                              const float& startY,
                              const float& endX,
                              const float& endY,
-                             const AttributeMap& attributeMap);
+                             const AttributeMap& attributeMap = AttributeMap());
 
 
       /** Adds a circle to the plot
@@ -85,7 +86,7 @@ namespace Belle2 {
       virtual void drawCircle(const float& centerX,
                               const float& centerY,
                               const float& radius,
-                              const AttributeMap& attributeMap);
+                              const AttributeMap& attributeMap = AttributeMap());
 
       /** Adds a circle arc to the plot
        *
@@ -107,14 +108,14 @@ namespace Belle2 {
                                  const float& radius,
                                  const bool& longArc,
                                  const bool& sweepFlag,
-                                 const AttributeMap& attributeMap);
+                                 const AttributeMap& attributeMap = AttributeMap());
 
       /** Indicates the start of a group of drawn elements. Meaning depends on the actual implementation.
        *
        *  Does nothing in the base implementation
        *
        */
-      virtual void startGroup(const AttributeMap& attributeMap);
+      virtual void startGroup(const AttributeMap& attributeMap = AttributeMap());
 
       /** Indicates the end of a group of drawn elements. Meaning depends on the actual implementation.
        *
@@ -143,14 +144,16 @@ namespace Belle2 {
       /// Clears the current bounding box. Only draw calls following draw calls contribute to the bounding box
       void clearBoundingBox();
 
+      /// Getter for the bounding box of all drawed objects.
+      const BoundingBox& getBoundingBox() const
+      { return m_boundingBox; }
+
     private:
       /// Bounding box of the currently drawn objects.
       BoundingBox m_boundingBox;
-
-
 
     }; //class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // BOUNDINGBOX_H_
+#endif // PRIMITIVEPLOTTER_H_

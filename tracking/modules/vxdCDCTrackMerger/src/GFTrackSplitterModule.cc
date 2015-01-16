@@ -90,22 +90,24 @@ void GFTrackSplitterModule::event()
   //int htrack=-1;
   for (unsigned int i = 0; i < nTracks; i++) {
     genfit::Track* aTrkPtr = GFTracksColName[i];
-    const genfit::TrackCand* aTrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(aTrkPtr, m_storeTrackCandName);
-    if (aTrkCandPtr == NULL) {
-      B2WARNING("Track candidate pointer is NULL (GFSplitterModule)");
-      continue;
-    }
-    std::vector<int> cca = aTrkCandPtr->getDetIDs();
-    if ((cca[0]) > 2) {
-      //for(int cci=0; cci<5; cci++)
-      //std::cout << "CDC: " << cca[cci] << std::endl;
-      cdc_mcTracks.appendNew(*(GFTracksColName[i]));
-      //htrack++;
-    } else {
-      si_mcTracks.appendNew(*(GFTracksColName[i]));
-      //std::vector<int> svb=aTrkCandPtr->getDetIDs();
-      //for(int svj=0; svj<5; svj++)
-      //  std::cout << "Si: " << svb[svj] << std::endl;
+    if (DataStore::getRelatedToObj<genfit::TrackCand>(aTrkPtr, m_storeTrackCandName) != NULL) {
+      const genfit::TrackCand* aTrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(aTrkPtr, m_storeTrackCandName);
+      if (aTrkCandPtr == NULL) {
+        B2WARNING("Track candidate pointer is NULL (GFSplitterModule)");
+        continue;
+      }
+      std::vector<int> cca = aTrkCandPtr->getDetIDs();
+      if ((cca[0]) > 2) {
+        //for(int cci=0; cci<5; cci++)
+        //std::cout << "CDC: " << cca[cci] << std::endl;
+        cdc_mcTracks.appendNew(*(GFTracksColName[i]));
+        //htrack++;
+      } else {
+        si_mcTracks.appendNew(*(GFTracksColName[i]));
+        //std::vector<int> svb=aTrkCandPtr->getDetIDs();
+        //for(int svj=0; svj<5; svj++)
+        //  std::cout << "Si: " << svb[svj] << std::endl;
+      }
     }
   }
 }

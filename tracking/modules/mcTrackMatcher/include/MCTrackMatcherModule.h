@@ -47,8 +47,10 @@ namespace Belle2 {
    *  a minus sign if the PRTrack is a clone, or the MCTrack is merged into another PRTrack. The McTrackId is either set to the
    *  index of the MCParticle or to some negative value indicating the severity of the mismatch. (Classification details below).
    *
-   *  Moreover, only PRTracks that exceed the minimal purity requirement will have their purity stored and will take part in the matching.
+   *  Moreover, only PRTracks that exceed the minimal purity requirement and a minimal efficiency requirement
+   *  will have their purity/efficiency stored and will take part in the matching.
    *  The minimal purity can be choosen by the minimalPurity parameter (default 2.0/3.0).
+   *  The minimal efficiency can be choosen by the minimalEfficiency parameter (default 0.05).
    *
    *  Last but not least a RelationArray from matched PRTracks to MCParticles is build and
    *  the McTrackId property of the PRTrack is set to the StoreArray index of the MCParticle
@@ -88,7 +90,8 @@ namespace Belle2 {
    *      - PRTracks classified as background are not entered in the purity RelationArray.
    *
    *  - GHOST
-   *      - The highest purity MCTrack to this PRTrack has a purity lower than the minimal purity given in the parameter minimalPurity.
+   *      - The highest purity MCTrack to this PRTrack has a purity lower than the minimal purity given in the parameter minimalPurity or
+   *      - has an efficiency lower than the efficiency given in the parameter minimalEfficiency.
    *      - This means that the PRTrack does not contain a significat number of a specific MCTrack nor can it considered only made of background.
    *      - For ghost tracks the McTrackId of the GFTrackCand is set to -999.
    *      - No relation from the PRTrack to the MCParticle is inserted.
@@ -153,7 +156,7 @@ namespace Belle2 {
 
     double m_param_minimalEfficiency;                                  /**< Minimal efficiency of a MCTrack to be considered matchable to a PRTrack.
                     This number encodes which fraction of the true hits must at least be in the reconstructed track.
-                    The default 0.2 suggests that at least 20% of the true hits should have been picked up.*/
+                    The default 0.05 suggests that at least 5% of the true hits should have been picked up.*/
 
 
     /*int m_param_minimalExcessNdf;                                     < Minimum number of degrees of freedom in the PRtrack. 2D hits count as 2.

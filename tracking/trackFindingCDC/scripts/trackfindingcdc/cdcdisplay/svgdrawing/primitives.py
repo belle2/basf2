@@ -12,7 +12,7 @@ def createSVGDocument(width, height, viewBox=''):
   height - height of the svg image
 
   Optional parameters:
-  viewbox - string of the format '{x_min} {y_min} {x_max} {y_max}' setting
+  viewbox - string of the format '{x_min} {y_min} {width} {height}' setting
             up the local coordinate system within the image
             defaults to '0 0 {width} {height}'
   """

@@ -1,3 +1,8 @@
+
+# For safety since we encountered a hanging process
+# when this file is executed with basf2
+import basf2
+
 import os
 
 import ROOT

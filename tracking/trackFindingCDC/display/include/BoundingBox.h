@@ -60,11 +60,11 @@ namespace Belle2 {
       }
 
       /// Getter for the width of the bounding box rectangle.
-      float getWidth()
+      float getWidth() const
       { return getRight() - getLeft(); }
 
       /// Getter for the height of the bounding box rectangle.
-      float getHeight()
+      float getHeight() const
       { return getTop() - getBottom(); }
 
       /// Getter for the location of the left of the bounding box rectangle (lower x bound). NAN if unset.

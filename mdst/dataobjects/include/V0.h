@@ -26,7 +26,9 @@ namespace Belle2 {
     /** Constructor without arguments; needed for I/O. */
     V0();
 
-    /** Constructor, just for compatibility reasons. Deprecated and will be removed soon. */
+    /** Deprecated
+     *  Constructor, just for compatibility reasons.
+     */
     V0(const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairPositive,
        const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairNegative);
 
@@ -52,13 +54,19 @@ namespace Belle2 {
       return std::make_pair(m_trackIndexPositive, m_trackIndexNegative);
     }
 
+    /** Deprecated
+     *  Getter just for compatibility reason.
+     */
     std::pair<TrackFitResult*, TrackFitResult*> getTrackFitResultPtrs() {
       B2WARNING("Deprecated. Ask for the hypothesis explicit.")
       StoreArray<TrackFitResult> trackFitResults;
       return std::make_pair(trackFitResults[m_trackFitResultIndexPiPlus], trackFitResults[m_trackFitResultIndexPiMinus]);
     }
 
-    /** Get pair of TrackFitResults, that are part of the V0 particle.*/
+    /** Get pair of TrackFitResults, that are part of the V0 particle for a given V0 hypothesis.
+     * @param particleType Kshort, Lambda or Anti-Lambda
+     * @return
+     * */
     std::pair<TrackFitResult*, TrackFitResult*> getTrackFitResultPtrs(const Const::ParticleType& particleType) {
       StoreArray<TrackFitResult> trackFitResults;
       if (particleType == Const::Kshort) return std::make_pair(trackFitResults[m_trackFitResultIndexPiPlus], trackFitResults[m_trackFitResultIndexPiMinus]);
@@ -70,7 +78,10 @@ namespace Belle2 {
       }
     }
 
-    /** Get indices of the TrackFitResults, that are part of the V0 particle. */
+    /** Get indices of the TrackFitResults, that are part of the V0 particle for a given V0 hypothesis.
+     * @param particleType particleType Kshort, Lambda or Anti-Lambda
+     * @return
+     */
     std::pair<short, short> getTrackFitResultIndices(const Const::ParticleType& particleType) {
       if (particleType == Const::Kshort) return std::make_pair(m_trackFitResultIndexPiPlus, m_trackFitResultIndexPiMinus);
       if (particleType == Const::lambda) return std::make_pair(m_trackFitResultIndexProton, m_trackFitResultIndexPiMinus);

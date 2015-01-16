@@ -108,7 +108,7 @@ void AllFacetWorker::generate()
 void AllFacetWorker::copyToDataStoreForDebug() const
 {
 
-#ifdef TRACKFINDINGCDC_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
   // IO for monitoring in python
   StoreArray < CDCRecoFacet > storedRecoFacets;
   storedRecoFacets.create(true); //Force all content to be cleared.

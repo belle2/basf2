@@ -58,7 +58,7 @@ namespace Belle2 {
 
 
         // IO for monitoring in python
-#ifdef TRACKFINDINGCDC_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
 #endif
 
       }

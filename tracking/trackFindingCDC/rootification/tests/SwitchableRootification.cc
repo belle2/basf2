@@ -26,7 +26,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-#ifdef TRACKFINDINGCDC_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
 
 template <typename T>
 class TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {;};

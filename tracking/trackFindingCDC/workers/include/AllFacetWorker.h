@@ -35,7 +35,7 @@ namespace Belle2 {
 
       /// Forwards the initialize method of the module to the facet creator and the neighborhood chooser
       void initialize() {
-#ifdef TRACKFINDINGCDC_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
         StoreArray < CDCRecoFacet >::registerTransient();
 #endif
       }

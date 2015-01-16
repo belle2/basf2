@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-#ifdef TRACKFINDINGCDC_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
     const bool ROOTIFICATIONNBASE_IS_ACTIVE = true;
 #else
     const bool ROOTIFICATIONNBASE_IS_ACTIVE = false;

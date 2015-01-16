@@ -35,13 +35,13 @@ namespace Belle2 {
     // enables access from Python as well as access through the DataStore
 
     // In the scons build system you can activate the additional compile time macro using
-    // scons --extra-ccflags='-DTRACKFINDINGCDC_USE_ROOT'.
+    // scons --extra-ccflags='-DTRACKFINDINGCDC_USE_ROOT_BASE'.
     // Forgeting to give the flag should result in the correct
     // default behaviour, which is to build without ROOT support. This avoids that one
     // accidentally checks in a version with ROOT switch on.
 
 
-#ifdef TRACKFINDINGCDC_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
     /// Typedef the normal TObject as the base class of the track finder in case the ROOT inheritance is switched on.
     typedef RootificationBase SwitchableRootificationBase;
 

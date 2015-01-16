@@ -45,7 +45,7 @@ namespace Belle2 {
       /// Forwards the initialize method of the module to the facet creator and the neighborhood chooser
       void initialize() {
 
-#ifdef TRACKFINDINGCDC_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
         if (m_copyToDataStoreForDebug) {
           StoreArray < CDCRecoTangentSegment >::registerTransient();
           StoreArray < CDCRecoSegment2D >::registerTransient();
@@ -199,7 +199,7 @@ namespace Belle2 {
 
 
         // IO for monitoring in python
-#ifdef TRACKFINDINGCDC_USE_ROOT
+#ifdef TRACKFINDINGCDC_USE_ROOT_BASE
         // IO wire hit clusters
 
         StoreArray < CDCWireHitCluster > storedClusters;

@@ -6,7 +6,69 @@ import os
 from basf2 import *
 from sys import argv
 
-numEvents = 100
+numEvents = 1
+
+# some flags for easier access up here, than searching them below
+useEvtGen = True
+usePGun = True
+
+# flag for creating two Cluster and single Cluster SVD SpacePoints
+create2ClusterSP = True
+createSingleClusterSP = False
+
+# flags for GFTC2SPTC
+checkTH = False
+useSingle = False
+checkNoSingle = True
+# flags for CurlingChecker
+useNonSingleTH = True
+
+# some sanity checks on the flags
+if createSingleClusterSP == False:
+    ## makes no sense to check for StoreArray of single Cluster SVD SpacePoints if they are not created!!
+    useSingle = False
+if create2ClusterSP == False:
+    ## makes no sense to check for StoreArray if they do not get created
+    checkNoSingle = False
+if checkTH:
+    ## makes no sense to use them, as they will no longer be present then !!
+    useNonSingleTH = False
+
+# flags for the pGun
+numTracks = 1
+# transverseMomentum:
+momentumMin = 1.  # GeV/c
+momentumMax = 1.  # %
+# theta: starting angle of particle direction in r-z-plane
+thetaMin = 15.0  # degrees
+# thetaMax = 60.  # degrees
+# thetaMax = 30.  # only slanted parts
+thetaMax = 153.  # Full detector from 150 to 17 (officially), to have some reserves exceeding these two values slightly
+# phi: starting angle of particle direction in x-y-plane (r-phi-plane)
+phiMin = 0.  # degrees
+phiMax = 360.  # degrees
+
+# automatically generate root file name from tags above
+firstPart = ''
+if useEvtGen:
+    firstPart = 'EvtGen_'
+if usePGun:
+    firstPart = firstPart + 'PartGun_' + 'theta_' + str(int(thetaMin)) + '_' \
+        + str(int(thetaMax)) + '_'
+
+SPstring = ''
+if create2ClusterSP:
+    SPstring = '_NoSingles_'
+if createSingleClusterSP:
+    SPstring = '_OnlySingles_'
+if create2ClusterSP and createSingleClusterSP:
+    SPstring = '_All_'
+
+posAnalysisRootFileName = firstPart + 'TH_' + str(checkTH) + SPstring \
+    + 'allTH_' + str(useNonSingleTH) + '_' + str(int(numEvents / 1000)) + 'k'
+
+# print the root file name
+print 'Saving to root file-name ' + posAnalysisRootFileName + '.root'
 
 # setting debuglevels for more than one module at once (currently set for the converter modules)
 MyLogLevel = LogLevel.INFO
@@ -41,11 +103,31 @@ progress.param('maxN', 2)
 gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
-geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',
-               'PXD', 'SVD'])
+geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
+               'PXD', 'SVD'])  # 'components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',........
 
+# evtgen
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.WARNING
+
+# particle gun
+particlegun = register_module('ParticleGun')
+param_pGun = {  # 13: muons, 211: charged pions
+                # fixed, uniform, normal, polyline, uniformPt, normalPt, inversePt, polylinePt or discrete
+    'pdgCodes': [13, -13],
+    'nTracks': numTracks,
+    'momentumGeneration': 'uniformPt',
+    'momentumParams': [momentumMin, momentumMax],
+    'thetaGeneration': 'uniform',
+    'thetaParams': [thetaMin, thetaMax],
+    'phiGeneration': 'uniform',
+    'phiParams': [phiMin, phiMax],
+    'vertexGeneration': 'uniform',
+    'xVertexParams': [-0.01, 0.01],
+    'yVertexParams': [-0.01, 0.01],
+    'zVertexParams': [-0.5, 0.5],
+    }
+particlegun.param(param_pGun)
 
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)  # need for MCTrackfinder to work correctly
@@ -113,9 +195,9 @@ param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
     'NoSingleClusterSVDSP': 'nosingleSP',
     'SingleClusterSVDSP': 'singleSP',
     'PXDClusterSP': 'pxdOnly',
-    'checkTrueHits': True,
-    'useSingleClusterSP': False,
-    'checkNoSingleSVDSP': True,
+    'checkTrueHits': checkTH,
+    'useSingleClusterSP': useSingle,
+    'checkNoSingleSVDSP': checkNoSingle,
     }
 trackCandConverter.param(param_trackCandConverter)
 
@@ -151,8 +233,8 @@ param_curlingSplitter = {  # set positionAnalysis to true if you want to analyze
     'nTrackStubs': int(0),
     'setOrigin': [0., 0., 0.],
     'positionAnalysis': True,
-    'useNonSingleTHinPA': False,
-    'rootFileName': ['SPtoTrueHitAnalysis_nosingle', 'RECREATE'],
+    'useNonSingleTHinPA': useNonSingleTH,
+    'rootFileName': [posAnalysisRootFileName, 'RECREATE'],
     }
 curlingSplitter.param(param_curlingSplitter)
 
@@ -163,19 +245,32 @@ main.add_module(eventinfoprinter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(evtgeninput)
+
+if useEvtGen:
+  ##following modules only for evtGen:
+    main.add_module(evtgeninput)
+    if usePGun:
+        main.add_module(particlegun)
+else:
+  ## following modules only for pGun:
+    main.add_module(particlegun)
+
 main.add_module(g4sim)
 main.add_module(pxdDigitizer)
 main.add_module(svdDigitizer)
 main.add_module(pxdClusterizer)
 main.add_module(svdClusterizer)
 main.add_module(spCreatorPXD)
-main.add_module(spCreatorSVD)
-main.add_module(spCreatorSVDsingle)
+if create2ClusterSP:
+  ## only create these if flag is set
+    main.add_module(spCreatorSVD)
+if createSingleClusterSP:
+  ## only create these if flag is set
+    main.add_module(spCreatorSVDsingle)
 main.add_module(mcTrackFinder)
 
 main.add_module(trackCandConverter)
-main.add_module(curlingSplitter)  # for easier debug reading
+main.add_module(curlingSplitter)  # for easier debug reading in this position
 main.add_module(btrackCandConverter)
 main.add_module(tcConverterTest)
 

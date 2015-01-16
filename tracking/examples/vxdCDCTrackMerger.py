@@ -14,7 +14,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [100])
+eventinfosetter.param('evtNumList', [200])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
@@ -42,7 +42,8 @@ pGun = register_module('ParticleGun')
 # choose the particles you want to simulate with pGun
 param_pGun = {  # ---    'momentumParams': [0.4, 1.6],
                 # fixed, uniform
-    'pdgCodes': [13, -13],
+                # [0, 5],
+    'pdgCodes': [13],
     'nTracks': 10,
     'varyNTracks': 0,
     'momentumGeneration': 'uniform',
@@ -87,7 +88,7 @@ si_mctrackfinder_param = {  # ---        'MinimalNDF': 6,
                             # 'WhichParticles': ['PXD', 'SVD'],
     'UseCDCHits': 0,
     'UseSVDHits': 1,
-    'UsePXDHits': 1,
+    'UsePXDHits': 0,
     'GFTrackCandidatesColName': 'VXDTracksCand',
     }
         # 'Force2DSVDClusters': 1,
@@ -128,6 +129,15 @@ cdc_mctrackfinder_param = {  # ---        'MinimalNDF': 6,
         # 'Force2DSVDClusters': 1,
         # 'forceExisting2DClusters4SVD': 0
 cdc_mctrackfinder.param(cdc_mctrackfinder_param)
+
+cdc_trackfinder = register_module('Trasan')
+cdc_trackfinder.logging.log_level = LogLevel.WARNING
+cdc_trackfinder_param = {'GFTrackCandidatesColName': 'CDCTracksCand'}  # 'UseCDCHits': 1,
+                                                                       # 'UseSVDHits': 0,
+                                                                       # 'UsePXDHits': 0,
+        # 'Force2DSVDClusters': 1,
+        # 'forceExisting2DClusters4SVD': 0
+cdc_trackfinder.param(cdc_trackfinder_param)
 
 cand_merger = register_module('TrackCandMerger')
 cand_merger_param = {'SiTrackCandidatesColName': 'VXDTracksCand',
@@ -206,7 +216,7 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
     'GFTracksColName': 'GFTracks',
     'TrackCandColName': 'TracksCand',
     'UnMergedCands': 'UnMergedCand',
-    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
+    'root_output_filename': 'VXD_CDC_0-5GeV_10Mu_MC_Trasan_200evt.root',
     'chi2_max': 100,
     'merge_radius': 2.0,
     }
@@ -249,6 +259,26 @@ display.param('showTrackLevelObjects', True)
 display.param('options', 'DHMPS')
 # display.param(display_param)
 
+# ...MCPrinter...
+mcparticleprinter = register_module('PrintMCParticles')
+mcparticleprinter.param('maxLevel', -1)
+
+## match the found track candidates with MCParticles
+# cdcmcmatching = register_module('CDCMCMatching')
+# param_cdcmcmatching = {'GFTrackCandidatesColName': 'CDCTracksCand'}
+# cdcmcmatching.param(param_cdcmcmatching)
+
+mctf = register_module('TrackFinderMCTruth')
+mctf.param('GFTrackCandidatesColName', 'MCGFTrackCands')
+
+matcher1 = register_module('MCTrackMatcher')
+# matcher1.param('MCGFTrackCandsColName','MCGFTrackCands')
+matcher1.param('PRGFTrackCandsColName', 'VXDTracksCand')
+
+matcher2 = register_module('MCTrackMatcher')
+# matcher2.param('MCGFTrackCandsColName','MCGFTrackCands')
+matcher2.param('PRGFTrackCandsColName', 'CDCTracksCand')
+
 # Create paths
 main = create_path()
 
@@ -258,6 +288,7 @@ main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
+# main.add_module(mcparticleprinter)
 # main.add_module(evtgeninput)
 main.add_module(g4sim)
 main.add_module(pxdDigitizer)
@@ -266,7 +297,13 @@ main.add_module(svdDigitizer)
 main.add_module(svdClusterizer)
 main.add_module(cdcDigitizer)
 main.add_module(si_mctrackfinder)
-main.add_module(cdc_mctrackfinder)
+# main.add_module(vxd_trackfinder)
+# main.add_module(cdc_mctrackfinder)
+main.add_module(cdc_trackfinder)
+# main.add_module(cdcmcmatching)
+main.add_module(mctf)
+main.add_module(matcher1)
+main.add_module(matcher2)
 main.add_module(cand_merger)
 # main.add_module(si_fitting)
 main.add_module(fitting)

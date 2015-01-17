@@ -704,15 +704,13 @@ CurlingTrackCandSplitterModule::TaggedUVPos CurlingTrackCandSplitterModule::getU
   ModBaseType normU = spacePoint->getNormalizedLocalU();
   ModBaseType normV = spacePoint->getNormalizedLocalV();
 
-  // convert normalized coordinates to local coordinates and then 'unwedge them'
+  // convert normalized coordinates to local coordinates (those are already 'unwedged')
   std::pair<ModBaseType, ModBaseType> localUV = SpacePoint::convertNormalizedToLocalCoordinates(std::make_pair(normU, normV), spacePoint->getVxdID());
   //ModBaseType unwedgedU = SpacePoint::getUUnwedged(localUV, spacePoint->getVxdID());
 
   // set values for return: set both m_U and m_V regardless if they have actually been set in the SpacePoint and simply assign the m_setX tags, as they decide if a value is actually used
-//   std::pair<bool,bool> setCoords = spacePoint->bla(); // still to be implemented by Jakob!!
   std::pair<bool, bool> setCoords = spacePoint->getIfClustersAssigned();
-  // WARNING: for now both values are set to true
-//   std::pair<bool,bool> setCoords = std::make_pair(true, true);
+
   returnVals.m_setU = setCoords.first;
   returnVals.m_setV = setCoords.second;
   returnVals.m_U = localUV.first;

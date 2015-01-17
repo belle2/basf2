@@ -50,8 +50,8 @@ namespace Belle2 {
    * If no SpacePoint can be found for any Cluster in the genfit::TrackCand, an exception is thrown, and the conversion is skipped.
    *
    * Some Statements on how TrueHits are checked (if activated)
-   * 1) for PXD SpacePoints or single Cluster SVD SpacePoints it is only checked if a relation to one (or more) TrueHits exists
-   * 2) for double Cluster SVD SpacePoints, all TrueHits related to both SVDClusters are collected. The collection is then searched for TrueHits appearing twice. If one (or more) TrueHits appear twice the SpacePoint is accepted, else it is not and the TrackCand will be skipped from conversion
+   * 1) for PXD SpacePoints or single Cluster SVD SpacePoints it is only checked if a relation to ONLY ONE TrueHits exists
+   * 2) for double Cluster SVD SpacePoints, all TrueHits related to both SVDClusters are collected. The collection is then searched for TrueHits appearing twice. All TrueHits appearing twice are removed (such that they appear only once now). If ONLY one TrueHit is left after this, the SpacePoint passes the check
    *
    * TODO: clean-up and bring in line with coding conventions!
    */

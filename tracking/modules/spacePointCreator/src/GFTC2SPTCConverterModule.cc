@@ -10,8 +10,6 @@
 #include <tracking/modules/spacePointCreator/GFTC2SPTCConverterModule.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
-// #include <testbeam/vxd/dataobjects/TelCluster.h> // for completeness (not yet needed)
-
 #include <genfit/TrackCand.h>
 #include <genfit/TrackCandHit.h>
 
@@ -26,7 +24,6 @@
 #include <boost/tuple/tuple_comparison.hpp>
 #include <boost/concept_check.hpp>
 
-// more debugging purposes, these won't be used in the final version!
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 
@@ -113,9 +110,7 @@ void GFTC2SPTCConverterModule::event()
 
     B2DEBUG(10, "===========================================================================================================\nNow processing genfit::TrackCand " << iTC << ".");
     try {
-      // have to have two trys here. first try is 'overall' try, that catches anything that gets re-thrown by catch-clauses of conversions
-      // I have to do this, because a genfit::TrackCand first gets converted and stored, and then gets checked for curling behaviour. Both of this operations throw exceptions. In order to differentiate at least a little from which operation an exception came i split the two operations into two different try blocks
-      // convert the genfit::TrackCand and store it in the DataStore. Curling behaviour will be checked later!
+      // convert the genfit::TrackCand and store it in the DataStore. Curling behaviour will be checked in another module
       const SpacePointTrackCand spacePointTC = createSpacePointTC(trackCand);
       SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC);
       m_SpacePointTCCtr += 1;
@@ -263,13 +258,13 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
   if (spacePoints.size() == 0) return getSingleClusterSVDSpacePoint(svdCluster, flaggedHitIDs, iHit);
   else {
     // if size != 0 there is at least on SpacePoint. Now loop over all related SpacePoints to decide which one to use
-    // WARNING: It is possible that more than one SpacePoint has a valid combination of Clusters in the genfit::TrackCand -> TODO: decide which one of these is the right one!
+    // WARNING: It is possible that more than one SpacePoint has a valid combination of Clusters in the genfit::TrackCand -> No longer possible since to be valid the Clusers have to appear in consecutive order in the GFTC now.
     // If this decision cannot be made -> throw
     // How it is tried to make this decision:
     // 1) Check which SpacePoints are allowed by the indices of their Clusters and also check if one of these Clusters is already used by another SpacePoint already added to the SpacePointTrackCand
     // 2) If ONLY ONE SpacePoint is allowed and its Clusters are not used by any other SpacePoint in the SpacePointTrackCand (i.e. only one valid SpacePoint) -> use this SpacePoint
     // 3) If more than one SpacePoints are allowed, but ONLY ONE of these uses Clusters that are not yet used -> use this SpacePoint
-    // 4) If more than one SpacePoints are allowed and more than one SpacePoint uses Clusters that are not yet used, find that SpacePoint which has Cluster indices that appear in consecutive order in the genfit::TrackCand -> use that SpacePoint (if consecutive order cannot be found, use the SpacePoint with the smallest difference of positions)
+    // 4) If more than one SpacePoints are allowed and more than one SpacePoint uses Clusters that are not yet used, find that SpacePoint which has Cluster indices that appear in consecutive order in the genfit::TrackCand -> use that SpacePoint (if consecutive order cannot be found, throw)
     // 5) If ONLY ONE SpacePoint is allowed BUT one of his Clusters is already used by another SpacePoint -> throw
     // 6) If no SpacePoint can be found that is allowed and has unused hits -> add this Cluster as singleCluster SpacePoint
 
@@ -345,7 +340,8 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       B2DEBUG(100, "Found no valid SpacePoint and no SpacePoint with existing but used Clusters/Hits. Adding a SingleClusterSpacePoint related to SVDCluser " << svdCluster->getArrayIndex() <<  " from " << svdCluster->getArrayName());
       return getSingleClusterSVDSpacePoint(svdCluster, flaggedHitIDs, iHit);
     }
-    // if only one valid SpacePoint can be found, add that SpacePoint
+    // if only one valid SpacePoint can be found, check its position distance and throw if it is not equal to 1
+    // COULDDO: add a singleCluster SpacePoint if the position distance is not equal to 1
     else if (nValidSP == 1) {
       unsigned int iSP = std::find(existAndValidSP.begin(), existAndValidSP.end(), std::make_pair(true, true)) - existAndValidSP.begin();
       const SpacePoint* spacePoint = spacePoints[iSP];
@@ -377,9 +373,9 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
 
       return spacePoint;
     }
-    // if more than one valid SpacePoint can be found, choose the one with smallest difference of Cluster positions inside the genfit::TrackCand
+    // if more than one valid SpacePoint can be found, choose the one with difference of Cluster positions inside the genfit::TrackCand of 1
     else if (nValidSP > 1) {
-      std::vector<fourTuple<int> > positionInfos; // 1) index of SpacePoint in RelationVector, 2) squared position difference, 3) & 4) are positions
+      std::vector<fourTuple<int> > positionInfos; // 1) index of SpacePoint in RelationVector, 2) squared position difference, 3) & 4) are positions inside genfit::TrackCand (valid positions)
 
       for (unsigned int iSP = 0 ; iSP < spacePoints.size(); ++iSP) {
         if (!existAndValidSP[iSP].second) continue; // if not valid continue with next SpacePoint from RelationVector

@@ -15,7 +15,6 @@ namespace Belle2 {
   /**
    * Module for converting SpacePointTrackCands to genfit::SpacePointTrackCands.
    * Module simply takes every SpacePoint from the SpacePointTrackCand and gets all the Clusters related to it. From the indices of the Cluster in its StoreArray a genfit::TrackCandHit can be generated which is then added to the genfit::TrackCand. If further information is present (e.g. PDG code, charge estimate, etc.) this information is also added to the genfit::TrackCand.
-   * NOTE: this is in draft state, and there might be some uncaught errors.
    */
   class SPTC2GFTCConverterModule : public Module {
 

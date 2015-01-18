@@ -200,9 +200,12 @@ class ValidationPlot(object):
                     # Clip the lower bound such that it concides with an actual value,
                     # which prevents empty bins from being produced
                     indices_above_lower_outlier_bound = finite_xs \
-                        > lower_outlier_bound
-                    lower_bound = \
-                        np.min(finite_xs[indices_above_lower_outlier_bound])
+                        >= lower_outlier_bound
+                    if np.any(indices_above_lower_outlier_bound):
+                        lower_bound = \
+                            np.min(finite_xs[indices_above_lower_outlier_bound])
+                    else:
+                        lower_bound = np.min(finite_xs)
 
                     get_logger().debug('Lower bound %s', lower_bound)
                     get_logger().debug('Lower outlier bound %s',
@@ -216,10 +219,13 @@ class ValidationPlot(object):
                     upper_outlier_bound = x_mean + outlier_z_score * x_std
                     # Clip the upper bound such that it concides with an actual value,
                     # which prevents empty bins from being produced
-                    indices_above_upper_outlier_bound = finite_xs \
-                        < upper_outlier_bound
-                    upper_bound = \
-                        np.nanmax(finite_xs[indices_above_upper_outlier_bound])
+                    indices_below_upper_outlier_bound = finite_xs \
+                        <= upper_outlier_bound
+                    if np.any(indices_below_upper_outlier_bound):
+                        upper_bound = \
+                            np.max(finite_xs[indices_below_upper_outlier_bound])
+                    else:
+                        upper_bound = np.max(finite_xs)
 
                     get_logger().debug('Upper bound %s', upper_bound)
                     get_logger().debug('Upper outlier bound %s',

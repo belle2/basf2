@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import basf2
-# necessary for the logging to work properly
-from basf2 import *
-import simulation
-from reconstruction import add_reconstruction
+import logging
 
+import basf2
+
+from tracking.run.event_generation import ReadOrGenerateEventsRun
+from tracking.modules import StandardTrackingReconstructionModule, BrowseFileOnTerminateModule
 from tracking.validation.module import TrackingValidationModule
 
 TRACKING_MAILING_LIST = 'tracking@belle2.kek.jp'
+
+
+def get_logger():
+    return logging.getLogger(__name__)
 
 
 def get_basf2_module(module_or_module_name):
@@ -27,93 +31,130 @@ def get_basf2_module(module_or_module_name):
                                              type(module_or_module_name)))
 
 
-class TrackingValidationRun(object):
+def get_basf2_module_name(module_or_module_name):
+    if isinstance(module_or_module_name, str):
+        module_name = module_or_module_name
+        return module_name
+    elif isinstance(module_or_module_name, basf2.Module):
+        module = module_or_module_name
+        module_name = module.name()
+        return module_name
+    else:
+        message_template = \
+            '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
+        raise ValueError(message_template % (module_or_module_name,
+                                             type(module_or_module_name)))
 
-    n_events = 10000
-    generator_module = 'EvtGenInput'
-    root_input_file = None
-    components = ['PXD', 'SVD', 'CDC', 'BeamPipe',
-                  'MagneticFieldConstant4LimitedRCDC']
-    finder_module = None  # To be specified
+
+class NonstrictChoices(list):
+
+    def contains(self, value):
+        return True
+
+    def __iter__(self):
+        # Append an ellipses to indicate that there are more choices.
+        copy = list(super(NonstrictChoices, self).__iter__())
+        copy.append('...')
+        return iter(copy)
+
+    def __str__(self):
+        # Append an ellipses to indicate that there are more choices.
+        copy = list(self)
+        copy.append('...')
+        return str(copy)
+
+
+class TrackingValidationRun(ReadOrGenerateEventsRun):
+    finder_module = "StandardReco"  # To be specified
     tracking_coverage = {'UsePXDHits': True, 'UseSVDHits': True,
                          'UseCDCHits': True}
-    run_simulation = True
-    fit_geometry = None
-    pulls = True
+    fit_geometry = None  # Determines which fit geometry should be used. Validate seed values of the candidates if None.
+    pulls = True  # Generate the pulls of track parameters
     contact = TRACKING_MAILING_LIST
-    output_file_name = 'StandardTrackingValidation.root'
+    output_file_name = 'TrackingValidation.root'
+    show_results = False
 
-    # Allow override from instances only in these field names to prevent some spelling errors
-    __slots__ = [
-        'n_events',
-        'generator_module',
-        'root_input_file',
-        'components',
-        'finder_module',
-        'run_simulation',
-        'tracking_coverage',
-        'fit_geometry',
-        'contract',
-        'output_file_name']
+    def create_argument_parser(self, **kwds):
+        argument_parser = super(TrackingValidationRun, self).create_argument_parser(**kwds)
 
-    @property
-    def name(self):
-        return self.__class__.__name__
+        # Indication if tracks should be fitted with which geomety
+        # Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
+        # Geometry name to be used in the Genfit extrapolation.
+        argument_parser.add_argument(
+            '-f',
+            '--finder',
+            choices=NonstrictChoices([
+                'StandardReco',
+                'VXDTF',
+                'TrackFinderCDCAutomaton',
+                'TrackFinderCDCLegendre',
+                'CDCLegendreTracking',  # Legacy
+                'CDCLocalTracking',  # Legacy
+            ]),
+            default=self.finder_module,
+            dest='finder_module',
+            help='Name of the finder module to be evaluated.',
+        )
 
-    def determineTrackingCoverage(self, finder_module):
-        if finder_module == "CDCLocalTracking" or finder_module == "CDCLegendreTracking" or finder_module.startswith('TrackFinderCDC'):
-            return {'UsePXDHits': False, 'UseSVDHits': False, 'UseCDCHits': True}
-        elif finder_module == "VXDTF":
-            return {'UsePXDHits': True, 'UseSVDHits': True, 'UseCDCHits': False}
-        elif finder_module == "FullReco":
-            return {'UsePXDHits': True, 'UseSVDHits': True, 'UseCDCHits': True}
+        argument_parser.add_argument(
+            '--fit-geometry',
+            choices=['TGeo', 'Geant4'],
+            default=self.fit_geometry,
+            dest="fit_geometry",
+            help='Geometry to be used with Genfit. If unset validate the seed values instead',
+        )
+
+        argument_parser.add_argument(
+            '-s',
+            '--show',
+            action='store_true',
+            default=self.show_results,
+            dest='show_results',
+            help='Show generated plots in a TBrowser immediatly.',
+        )
+
+        return argument_parser
+
+    def determine_tracking_coverage(self, finder_module_or_name):
+        finder_module_name = get_basf2_module_name(finder_module_or_name)
+        if finder_module_name == "CDCLocalTracking" or finder_module_name == "CDCLegendreTracking" or finder_module_name.startswith('TrackFinderCDC'):
+            return {
+                'UsePXDHits': False,
+                'UseSVDHits': False,
+                'UseCDCHits': True,
+            }
+        elif finder_module_name == "VXDTF":
+            return {
+                'UsePXDHits': True,
+                'UseSVDHits': True,
+                'UseCDCHits': False,
+            }
+        elif finder_module_name in {"StandardReco", "StandardTrackingReconstruction"}:
+            return {
+                'UsePXDHits': "PXD" in self.components,
+                'UseSVDHits': "SVD" in self.components,
+                'UseCDCHits': "CDC" in self.components,
+            }
         else:
-            basf2.B2FATAL("Track finder module " + finder_module + " is not supported.")
+            get_logger().info("Could not determine tracking coverage for module name %s. Using value stored in self.tracking_coverage which is %s", finder_module_name, self.tracking_coverage)
+            return self.tracking_coverage
 
-    def execute(self):
-        # Compose basf2 module path #
-        #############################
-        main_path = basf2.create_path()
+    def create_path(self):
+        # Sets up a path that plays back pregenerated events or generates events
+        # based on the properties in the base class.
+        main_path = super(TrackingValidationRun, self).create_path()
 
-        # Master module
-        eventInfoSetterModule = basf2.register_module('EventInfoSetter')
-        eventInfoSetterModule.param({'evtNumList': [self.n_events],
-                                     'runList': [1], 'expList': [1]})
-        main_path.add_module(eventInfoSetterModule)
-
-        # Progress module
-        progressModule = basf2.register_module('Progress')
-        main_path.add_module(progressModule)
-
-        # use Generator if no root input file is specified
-        if self.root_input_file is None:
-            generatorModule = get_basf2_module(self.generator_module)
-            main_path.add_module(generatorModule)
-        else:
-            rootInputModule = get_basf2_module('RootInput')
-            rootInputModule.param({'inputFileName': self.root_input_file})
-            main_path.add_module(rootInputModule)
-
-        # Simulation
-        print "self.run_simulation = " + str(self.run_simulation)
-        components = self.components
-        if self.run_simulation:
-            simulation.add_simulation(main_path, components=components)
-        else:
-            # gearbox & geometry needs to be registered any way
-            gearbox = get_basf2_module('Gearbox')
-            main_path.add_module(gearbox)
-            geometry = get_basf2_module('Geometry')
-            geometry.param('components', components)
-            main_path.add_module(geometry)
+        if self.show_results:
+            browseFileOnTerminateModule = BrowseFileOnTerminateModule(self.output_file_name)
+            main_path.add_module(browseFileOnTerminateModule)
 
         # Setup track finder
         # determine which sub-detector hits will be used
-        self.tracking_coverage = self.determineTrackingCoverage(self.finder_module)
+        tracking_coverage = self.determine_tracking_coverage(self.finder_module)
 
-        if self.finder_module == "FullReco":
-            # add the full reconstruction chain
-            add_reconstruction(main_path, components)
+        if self.finder_module == "StandardReco":
+            trackFinderModule = StandardTrackingReconstructionModule(components=self.components)
+            main_path.add_module(trackFinderModule)
         else:
             trackFinderModule = get_basf2_module(self.finder_module)
             main_path.add_module(trackFinderModule)
@@ -137,7 +178,7 @@ class TrackingValidationRun(object):
         trackFinderMCTruthModule.param({'WhichParticles': ['primary'],
                                         'EnergyCut': 0.1,
                                         'GFTrackCandidatesColName': 'MCTrackCands'})
-        trackFinderMCTruthModule.param(self.tracking_coverage)
+        trackFinderMCTruthModule.param(tracking_coverage)
         main_path.add_module(trackFinderMCTruthModule)
 
         # Track matcher
@@ -145,21 +186,28 @@ class TrackingValidationRun(object):
         mcTrackMatcherModule.param({'MCGFTrackCandsColName': 'MCTrackCands',
                                     'MinimalPurity': 0.66,
                                     'RelateClonesToMCParticles': True})
-        mcTrackMatcherModule.param(self.tracking_coverage)
+        mcTrackMatcherModule.param(tracking_coverage)
         main_path.add_module(mcTrackMatcherModule)
 
         # Validation module generating plots
+        validation_name = self.name
         fit = bool(self.fit_geometry)
         pulls = self.pulls
         contact = self.contact
         output_file_name = self.output_file_name
-        trackingValidationModule = TrackingValidationModule(self.name,
+        trackingValidationModule = TrackingValidationModule(validation_name,
                                                             contact=contact, fit=fit, pulls=pulls,
                                                             output_file_name=output_file_name)
         main_path.add_module(trackingValidationModule)
 
-        # Run basf2 module path #
-        #########################
-        print 'Start processing'
-        basf2.process(main_path)
-        print basf2.statistics
+        return main_path
+
+
+def main():
+    trackingValiddationRun = TrackingValidationRun()
+    trackingValiddationRun.configure_and_execute_from_commandline()
+
+
+if __name__ == '__main__':
+    logging.basicConfig()
+    main()

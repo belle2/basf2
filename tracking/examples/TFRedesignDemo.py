@@ -11,8 +11,8 @@ numEvents = 200
 initialValue = 1
 
 usePXD = True
-useEvtGen = False
-usePGun = True
+useEvtGen = True
+usePGun = False
 
 # flags for the pGun
 numTracks = 5
@@ -115,15 +115,12 @@ g4sim.param('StoreAllSecondaries', True)
 vxdtf = register_module('TFRedesign')
 vxdtf.logging.log_level = LogLevel.DEBUG
 vxdtf.logging.debug_level = 1
-param_vxdtf = {
-    'sectorSetup': secSetup,
-    'GFTrackCandidatesColName': 'caTracks',
-    'writeToRoot': True,
-    'activateSlopeRZ': False,
-    'activateDistanceXY': False,
-    'activateDistance3D': False,
-    'tuneCutoffs': tuneValue,
-    }
+param_vxdtf = {'sectorSetup': secSetup,
+               'GFTrackCandidatesColName': 'caTracks',
+               'tuneCutoffs': tuneValue}  # 'writeToRoot': True,
+                                          # 'activateSlopeRZ': False,
+                                          # 'activateDistanceXY': False,
+                                          # 'activateDistance3D': False,
 # , 'calcQIType': 'kalman'
 vxdtf.param(param_vxdtf)
 

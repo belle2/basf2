@@ -148,7 +148,6 @@ trackfitter = register_module('GenFitter')
 # trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('GFTrackCandidatesColName', 'caTracks')
 trackfitter.param('FilterId', 'Kalman')
-trackfitter.param('UseClusters', True)
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO

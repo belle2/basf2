@@ -1,3 +1,7 @@
+
+#ifndef __nsmlib2_h__
+#define __nsmlib2_h__
+
 /* -- INCLUDE FILES -------------------------------------------------- */
 #include <netinet/in.h>  /* for struct sockaddr_in */
 
@@ -118,6 +122,8 @@ void* nsmlib_openmem(NSMcontext* nsmc,
                      const char* dat, const char* fmt, int rev);
 void* nsmlib_allocmem(NSMcontext* nsmc,
                       const char* dat, const char* fmt, int rev, float cycle);
+int nsmlib_flushmem(NSMcontext* nsmc,
+                    const void* ptr, int siz);
 int nsmlib_sendreq(NSMcontext* nsmc,
                    const char* node, const char* req,
                    uint npar, int* pars, int len, const char* datap);
@@ -126,8 +132,8 @@ NSMcontext* nsmlib_init(const char* nodename, const char* host,
 void nsmlib_usesig(NSMcontext* nsmc, int usesig);
 NSMcontext* nsmlib_selectc(int usesig, unsigned int msec);
 void nsmlib_call(NSMcontext* nsmc, NSMtcphead* hp);
-//char* nsmlib_parsefile(const char* datname, int revision, const char* incpath,
-//                       char* fmtstr, int* revisionp);
+char* nsmlib_parsefile(const char* datname, int revision, const char* incpath,
+                       char* fmtstr, int* revisionp);
 
 #if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
 __dummy_open_bracket_to_cheat_emacs_auto_indent {
@@ -135,6 +141,8 @@ __dummy_open_bracket_to_cheat_emacs_auto_indent {
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* __nsmlib2_h__ */
 
 /* -- (emacs outline mode setup) ------------------------------------- */
 /*

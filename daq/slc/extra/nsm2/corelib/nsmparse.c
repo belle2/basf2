@@ -10,6 +10,8 @@
   20140902 memset fix (T.Konno)
   20140903 n_same fix for nested struct
   20140917 -1 to skip revision check
+  20140918 nsmparse_struct fix (uninitialized malloc for ->next)
+  20140919 bytes is added to NSMparse
  */
 
 #include <stdio.h>
@@ -299,7 +301,6 @@ nsmparse_struct(char *filebuf, const char *datname)
 
       define_ptr->next
 	= (define_t *)nsmparse_malloc(sizeof(define_t), "define", "t");
-      memset(define_ptr->next, 0, sizeof(define_t));
       define_ptr->name = nsmparse_malloc(namelen + 1, "define", "name");
       strncpy(define_ptr->name, definep, namelen);
       define_ptr->name[namelen] = 0;
@@ -442,8 +443,8 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 					       "scan", file);
 	parsep = parsetop;
       }
-      memset(parsep, 0, sizeof(NSMparse));
       parsep->type = '(';
+      parsep->bytes = 0;
       parsep->offset = offset; /* probably not correct */
       
       if (isalnum(*ptr) || *ptr == '_') {
@@ -471,6 +472,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 						   "scan", file);
 	parsep = parsep->next;
 	parsep->type = ')';
+        parsep->bytes = 0;
 	parsep->offset = offset; /* probably not correct */
 	
 	ptr++;
@@ -522,8 +524,8 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 						 "scan", file);
 	  parsep = parsetop;
 	}
-	memset(parsep, 0, sizeof(NSMparse));
 	parsep->type = typep->type;
+        parsep->bytes = typep->siz;
 	parsep->offset = offset;
 	ptr += len+1;
 	break;

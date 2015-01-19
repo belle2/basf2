@@ -1,10 +1,17 @@
 #ifndef __nsm2_h__
 #define __nsm2_h__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+#if defined(__dummy_close_bracket_to_cheat_emacs_auto_indent)
+}
+#endif
+
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1926 /* protocol version */
-#define NSM_PACKAGE_VERSION  1939 /* package  version */
+#define NSM_PACKAGE_VERSION  1941 /* package  version */
 
 /*
   20120723 1900 file created
@@ -45,6 +52,8 @@
   20140903 1937 nsmparse fix (see nsmparse.c)
   20140917 1938 newclient error return fix / shm cleanup fix
   20140917 1939 skip revision check by -1
+  20140921 1940 bytes in nsmparse_t, flushmem, less DBG in nsmd2
+  20140922 1941 nsmget is added
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
@@ -130,24 +139,28 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMEBADREV    (-33) /* data revision is inconsistent (openmem) */
 #define NSMEPARSE     (-34) /* data format parse error (openmem) */
 #define NSMECONNECT   (-35) /* connection error */
+#define NSMEINVPTR    (-36) /* invalid data pointer */
 
 /* NSMmsg (in host byte order) */
 typedef struct {
-  uint16_t req;
-  uint16_t seq;
-  int16_t  node; /* source/destination nodeid, or (-1) if not an NSM client */
-  uint8_t  npar;
-  uint16_t len;
-  int32_t  pars[256]; /* signed */
-  const char* datap;
+uint16_t req;
+uint16_t seq;
+int16_t  node; /* source/destination nodeid, or (-1) if not an NSM client */
+uint8_t  npar;
+uint16_t len;
+int32_t  pars[256]; /* signed */
+const char* datap;
 } NSMmsg;
 
 typedef void (*NSMcallback_t)(NSMmsg* msg, NSMcontext* nsmc);
 typedef void (*NSMfunc_t)(NSMmsg* msg, NSMcontext* nsmc);
 
-/* -- FUNCTIONS ------------------------------------------------------ */
-
-
+#if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
+__dummy_open_bracket_to_cheat_emacs_auto_indent {
+#endif
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* __nsm2_h__ */
 

@@ -15,9 +15,10 @@
    20140305 1929 checkpoints, no fprintf
    20140306 1930 logfp again, but write instead of fwrite/fprintf
    20140902 1935 memset fix
+   20140921 1940 flushmem
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.35";
+const char *belle2nsm_version = "belle2nsm 1.9.40";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -379,6 +380,20 @@ b2nsm_allocmem(const char *dat, const char *fmt, int rev, float cycle)
     nsmlib_log("%sallocmem(%s,rev.%d) at %p\n", xt(), dat, rev, ptr);
   }
   return ptr;
+}
+/* -- b2nsm_flushmem ---------------------------------------------------- */
+int
+b2nsm_flushmem(const void *ptr, int siz)
+{
+  int ret;
+  if (! nsm) return 0;
+  ret = nsmlib_flushmem(nsm, ptr, siz);
+
+  if (logfp && ret < 0) {
+    nsmlib_log("%sflushmem(%x,%d) failed (ret=%d): %s\n",
+	       xt(), ptr, siz, ret, b2nsm_strerror());
+  }
+  return ret;
 }
 /* -- b2nsm_wait -------------------------------------------------------- */
 int

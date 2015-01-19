@@ -21,9 +21,10 @@
    20140902 1935 memset fix
    20140903 1937 nsmparse fix (see nsmparse.c)
    20140917 1939 skip revision check for -1
+   20140921 1940 flushmem
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.39";
+const char *nsmlib2_version   = "nsmlib2 1.9.40";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -306,15 +307,17 @@ nsmlib_strerror(NSMcontext *nsmc)
     syserr = "cannot open NSMmem shared memory"; break;
   case NSMESHMATSYS: syserr = "shmat(NSMsys)"; break;
   case NSMESHMATMEM: syserr = "shmat(NSMmem)"; break;
-  case NSMENOINIT: return "NSM is not initialized yet";
-  case NSMEPERM: return "operation not allowed for anonymous node";
+  case NSMENOINIT:  return "NSM is not initialized yet";
+  case NSMEPERM:    return "operation not allowed for anonymous node";
   case NSMEINVDATA: return "invalid send data parameter";
   case NSMEINVFUNC: return "invalid callback function type";
   case NSMEMAXFUNC: return "no more callback functions";
-  case NSMENOMEM:  return errs; /* openmem */
-  case NSMEBADFMT: return errs; /* openmem */
-  case NSMEBADREV: return errs; /* openmem/allocmem */
-  case NSMEPARSE:  return errs; /* openmem/allocmem */
+  case NSMENOMEM:   return errs; /* openmem */
+  case NSMEBADFMT:  return errs; /* openmem */
+  case NSMEBADREV:  return errs; /* openmem/allocmem */
+  case NSMEPARSE:   return errs; /* openmem/allocmem */
+  case NSMEINVPTR:  return "invalid pointer";
+
   default:
     if (*errs) return errs;
     if (! nsmc) {
@@ -1107,6 +1110,7 @@ nsmlib_initsig(NSMcontext *nsmc)
   nsmlib_callbackid(nsmc, NSMCMD_NEWCLIENT, "cmd_newclient", 0, NSMLIB_FNSYS);
   nsmlib_callbackid(nsmc, NSMCMD_ALLOCMEM,  "cmd_allocmem",  0, NSMLIB_FNSYS);
   nsmlib_callbackid(nsmc, NSMCMD_OPENMEM,   "cmd_openmem",   0, NSMLIB_FNSYS);
+  nsmlib_callbackid(nsmc, NSMCMD_FLUSHMEM,  "cmd_flushmem",  0, NSMLIB_FNSYS);
   nsmlib_callbackid(nsmc, NSMCMD_NEWREQ,    "cmd_newreq",    0, NSMLIB_FNSYS);
   /* implement delclient as FNSTD */
   nsmlib_callbackid(nsmc, NSMCMD_DELCLIENT, "cmd_delclient",
@@ -1485,6 +1489,73 @@ nsmlib_openmem(NSMcontext *nsmc,
     return 0;
   }
   return (char *)memp + ntohl(datp->dtpos);
+}
+/* -- nsmlib_flushmem ------------------------------------------------ */
+int
+nsmlib_flushmem(NSMcontext *nsmc, const void *ptr, int psiz)
+{
+  NSMmsg msg;
+  NSMsys *sysp;
+  size_t ppos;
+  size_t dpos = 0;
+  size_t dsiz = 0;
+  int nnext;
+  int n = 0; /* to check inf-loop */
+  int ret;
+  
+  if (! nsmc || nsmc->nodeid < 0 || nsmc->nodeid >= NSMSYS_MAX_NOD) {
+    return NSMENOINIT;
+  }
+  
+  if (! (sysp = nsmc->sysp) || ! nsmc->memp) {
+    return nsmc->errc = NSMENOINIT;
+  }
+  
+  ppos = MEMPOS(nsmc->memp, ptr);
+  if (psiz < 0 || ppos < 0 || ppos >= NSM2_MEMSIZ || ppos+psiz > NSM2_MEMSIZ) {
+    DBG("flushmem(invptr): psiz=%d ppos=%d", (int)psiz, (int)ppos);
+    return nsmc->errc = NSMEINVPTR;
+  }
+
+  /* linked list search (only through owned data) */
+  nnext = (int16_t)ntohs(sysp->nod[nsmc->nodeid].noddat);
+  while (nnext >= 0 && nnext < NSMSYS_MAX_DAT) {
+    NSMdat *datp = sysp->dat + nnext;
+    dpos = (int32_t)ntohl(datp->dtpos);
+    dsiz = (int16_t)ntohs(datp->dtsiz);
+    DBG("flushmem: ppos=%d dpos=%d ppos+psiz=%d dpos+dsiz=%d",
+        (int)ppos, (int)dpos, (int)(ppos+psiz), (int)(dpos+dsiz));
+    if (ppos == dpos && psiz == 0) psiz = dsiz;
+    if (ppos >= dpos && ppos+psiz <= dpos+dsiz) break;
+    
+    nnext = (int16_t)ntohs(datp->nnext);
+    if (++n > NSMSYS_MAX_DAT) nnext = -1; /* avoid inf-loop by broken nnext */
+  }
+  if (nnext < 0 || nnext >= NSMSYS_MAX_DAT) {
+    sprintf(nsmc->errs, "data not found for pos=%d siz=%d",
+            (int)ppos, (int)psiz);
+    return nsmc->errc = NSMENOMEM; /* end of linked list or error */
+  }
+  
+  /* send it */
+  memset(&msg, 0, sizeof(msg));
+  msg.req = NSMCMD_FLUSHMEM;
+  msg.node = -1; /* no particular destination */
+  msg.npar = 2;
+  msg.pars[0] = ppos;
+  msg.pars[1] = psiz;
+  DBG("flushmem: psiz=%d ppos=%d", (int)psiz, (int)ppos);
+  nsmc->reqwait = msg.req;
+  nsmc->errc = nsmlib_send(nsmc, &msg);
+  if (nsmc->errc < 0) {
+    nsmc->reqwait = 0;
+    return 0;
+  }
+
+  /* receive response */
+  ret = nsmlib_recvpar(nsmc);
+  nsmc->reqwait = 0;
+  return ret;
 }
 /* -- nsmlib_allocmem ------------------------------------------------ */
 void *

@@ -18,6 +18,9 @@ FILES = \
  corelib/nsmparse.h \
  corelib/nsmreq2.h \
  corelib/nsmsys2.h \
+ nsmget/Makefile \
+ nsmget/libnsmget.cc \
+ nsmget/nsmget.h \
  daemon/Makefile \
  daemon/nsmd2.cc \
  daemon/nsmhash.c \
@@ -33,12 +36,14 @@ FILES = \
  example/client_wait.cc \
  example/master.cc \
  example/readdat.cc \
+ example/nsmget.cc \
  doc/nsm2.pdf
 
 all:
 	(cd daemon  ; make clean all)
 	(cd corelib ; make clean all)
 	(cd b2lib   ; make clean all)
+	(cd nsmget  ; make clean all)
 	(cd example ; make clean all ||\
 	              make -f Makefile.no-readline clean all )
 
@@ -46,6 +51,7 @@ clean:
 	(cd daemon  ; make clean)
 	(cd corelib ; make clean)
 	(cd b2lib   ; make clean)
+	(cd nsmget  ; make clean)
 	(cd example ; make clean)
 
 daemon/nsm2.h: $(FILES)

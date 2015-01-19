@@ -1,4 +1,7 @@
 
+#ifndef __belle2nsm_h__
+#define __belle2nsm_h__
+
 #include "nsm2.h"
 
 #if defined(__cplusplus)
@@ -18,6 +21,7 @@ int b2nsm_callback(const char* name, NSMcallback_t callback);
 int b2nsm_readmem(void* buf, const char* dat, const char* fmt, int rev);
 void* b2nsm_openmem(const char* dat, const char* fmt, int rev);
 void* b2nsm_allocmem(const char* dat, const char* fmt, int rev, float cycle);
+int b2nsm_flushmem(const void* ptr, int siz);
 int b2nsm_sendany(const char* node, const char* req, int npar, int32_t* pars,
                   int len, const char* datp, const char* caller);
 int b2nsm_sendreq(const char* node, const char* req, int npar, int32_t* pars);
@@ -42,3 +46,5 @@ __dummy_open_bracket_to_cheat_emacs_auto_indent {
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* __belle2nsm_h__ */

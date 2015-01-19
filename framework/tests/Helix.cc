@@ -23,10 +23,10 @@ using namespace Belle2;
 #define EXPECT_ANGLE_NEAR(expected, actual, delta) EXPECT_PRED3(angleNear, expected, actual, delta)
 
 /// Assertation macro for angle values that should not care for a multiple of 2 * PI difference between the values
-#define ASSERT_ANGLE_NEAR(expected, actual, delta) EXPECT_PRED3(angleNear, expected, actual, delta)
+#define ASSERT_ANGLE_NEAR(expected, actual, delta) ASSERT_PRED3(angleNear, expected, actual, delta)
 
 /// Assertation macro that two values carry the same sign.
-#define EXPECT_SAME_SIGN(expected, actual) ASSERT_PRED2(sameSign, expected, actual)
+#define EXPECT_SAME_SIGN(expected, actual) EXPECT_PRED2(sameSign, expected, actual)
 
 /// Assertation macro that two values carry the same sign.
 #define ASSERT_SAME_SIGN(expected, actual) ASSERT_PRED2(sameSign, expected, actual)

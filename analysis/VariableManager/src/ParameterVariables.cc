@@ -197,7 +197,7 @@ namespace Belle2 {
     }
 
     // Continuum Suppression --------------------------------------------------
-    double Constant(const Particle* particle, const std::vector<double>& constant)
+    double Constant(const Particle*, const std::vector<double>& constant)
     {
       return constant[0];
     }

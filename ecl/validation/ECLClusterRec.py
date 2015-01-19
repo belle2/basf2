@@ -2,15 +2,11 @@
 # -*- coding: utf-8 -*-
 
 #######################################################
-# This steering file is an example on how to use
-# EclDataAnalysis module.
-#
 # 1000 500 MeV-electrons are generated with ParticleGun
 # and reconstructed. ECL-related infos are dumped on
 # a TTree saved in an output file named
 # ECLClusterOutput_500mev.root .
 #
-# Example steering file - 2014 Belle II Collaboration
 ########################################################
 
 import os
@@ -27,8 +23,11 @@ eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # random number for generation
-import random
-intseed = random.randint(1, 10000000)
+# import random
+# intseed = random.randint(1, 10000000)
+
+# Fixed random seed
+set_random_seed(123456)
 
 # single particle generator settings
 pGun = register_module('ParticleGun')

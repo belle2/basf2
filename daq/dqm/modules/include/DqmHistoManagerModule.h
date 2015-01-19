@@ -49,6 +49,9 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    int StreamHistograms(TDirectory*, MsgHandler*);
+
+  private:
     std::string m_histfile; /**< Name of histogram output file. */
     std::string m_hostname; /**< Host name to send histograms */
     int m_port;
@@ -61,6 +64,7 @@ namespace Belle2 {
     // Socket interface
     EvtSocketSend*  m_sock;
     MsgHandler*     m_msg;
+    int             m_nobjs;
 
 
 

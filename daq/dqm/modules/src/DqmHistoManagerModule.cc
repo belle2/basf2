@@ -8,6 +8,8 @@
 
 #include <daq/dqm/modules/DqmHistoManagerModule.h>
 
+#include "TText.h"
+
 using namespace Belle2;
 using namespace std;
 
@@ -56,7 +58,7 @@ void DqmHistoManagerModule::initialize()
 
   // Connect to Histogram Server
   m_sock = new EvtSocketSend(m_hostname, m_port);
-  //  printf ( "EvtSocketSend : fd = %d\n", (m_sock->sock())->sock() );
+  printf("EvtSocketSend : fd = %d\n", (m_sock->sock())->sock());
 
   // Message Handler
   m_msg = new MsgHandler(0);    // Compression level = 0
@@ -94,38 +96,25 @@ void DqmHistoManagerModule::event()
     RbTupleManager::Instance().begin(ProcHandler::EvtProcID());
     m_initialized = true;
   }
-  //  printf ( "DqmHistoManager: event = %d\n", m_nevent );
   if (m_nevent % m_interval == 0) {
+    //    printf ( "DqmHistoManager: event = %d\n", m_nevent );
     //    printf ( "DqmHistoManger: dumping histos.....\n" );
     m_msg->clear();
-    TList* keylist = gDirectory->GetList();
-    //    keylist->ls();
+    m_nobjs = 0;
 
-    TIter nextkey(keylist);
-    TKey* key = 0;
-    TKey* oldkey = 0;
-    int nobjs = 0;
-    int nkeys = 0;
-    while ((key = (TKey*)nextkey())) {
-      nkeys++;
-      if (oldkey && !strcmp(oldkey->GetName(), key->GetName())) continue;
-      //      TObject* obj = key->ReadObj();
-      TObject* obj = gDirectory->FindObject(key->GetName());
-      if (obj->IsA()->InheritsFrom("TH1")) {
-        TH1* h1 = (TH1*) obj;
-        //  printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
-        m_msg->add(h1, h1->GetName());
-        nobjs++;
-      }
-    }
+    // Stream histograms with directory structure
+    StreamHistograms(gDirectory, m_msg);
+
     EvtMessage* msg = m_msg->encode_msg(MSG_EVENT);
+    //    printf ( "Message Size = %d\n", msg->size() );
+
     (msg->header())->reserved[0] = 0;
-    (msg->header())->reserved[1] = nobjs;
+    (msg->header())->reserved[1] = m_nobjs;
     (msg->header())->reserved[2] = 0;
 
-    if (nobjs > 0) {
-      printf("DqmHistoManger: dumping histos.....%d (of %d) histos\n",
-             nobjs, nkeys);
+    if (m_nobjs > 0) {
+      printf("DqmHistoManger: dumping histos.....%d histos\n",
+             m_nobjs);
       m_sock->send(msg);
     }
 
@@ -141,38 +130,63 @@ void DqmHistoManagerModule::terminate()
   if (m_initialized) {
     //    cout << "DqmHistoManager::terminating event process : PID=" << ProcHandler::EvtProcID() << endl;
     m_msg->clear();
-    TList* keylist = gDirectory->GetList();
-    //    keylist->ls();
 
-    TIter nextkey(keylist);
-    TKey* key = 0;
-    TKey* oldkey = 0;
-    int nobjs = 0;
-    while ((key = (TKey*)nextkey())) {
-      if (oldkey && !strcmp(oldkey->GetName(), key->GetName())) continue;
-      //      TObject* obj = key->ReadObj();
-      TObject* obj = gDirectory->FindObject(key->GetName());
-      if (obj->IsA()->InheritsFrom("TH1")) {
-        TH1* h1 = (TH1*) obj;
-        //  printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
-        m_msg->add(h1, h1->GetName());
-        nobjs++;
-      }
-    }
+    m_nobjs = 0;
+    StreamHistograms(gDirectory, m_msg);
+
+    printf("terminate : m_nobjs = %d\n", m_nobjs);
     EvtMessage* msg = m_msg->encode_msg(MSG_EVENT);
     (msg->header())->reserved[0] = 0;
-    (msg->header())->reserved[1] = nobjs;
+    (msg->header())->reserved[1] = m_nobjs;
     (msg->header())->reserved[2] = 0;
 
     m_sock->send(msg);
 
     delete(msg);
 
-    RbTupleManager::Instance().terminate();
-    delete m_sock;
-    delete m_msg;
+    //    RbTupleManager::Instance().terminate();
+    //    delete m_sock;
+    //    delete m_msg;
   }
 }
+
+int DqmHistoManagerModule::StreamHistograms(TDirectory* curdir, MsgHandler* msg)
+{
+  TList* keylist = curdir->GetList();
+  //    keylist->ls();
+
+  TIter nextkey(keylist);
+  TKey* key = 0;
+  int nkeys = 0;
+  int nobjs = 0;
+  while ((key = (TKey*)nextkey())) {
+    nkeys++;
+    TObject* obj = curdir->FindObject(key->GetName());
+    if (obj->IsA()->InheritsFrom("TH1")) {
+      TH1* h1 = (TH1*) obj;
+      //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
+      m_msg->add(h1, h1->GetName());
+      nobjs++;
+      m_nobjs++;
+    } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
+      //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
+      TDirectory* tdir = (TDirectory*) obj;
+      //      m_msg->add(tdir, tdir->GetName());
+      TText subdir(0, 0, tdir->GetName());
+      m_msg->add(&subdir, "SUBDIR:" + string(obj->GetName())) ;
+      nobjs++;
+      m_nobjs++;
+      tdir->cd();
+      StreamHistograms(tdir , msg);
+      TText command(0, 0, "COMMAND:EXIT");
+      m_msg->add(&command, "SUBDIR:EXIT");
+      nobjs++;
+      m_nobjs++;
+      curdir->cd();
+    }
+  }
+}
+
 
 
 

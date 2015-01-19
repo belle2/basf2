@@ -73,9 +73,21 @@ int HistoServer::server()
           int ds = msghdl.decode_msg(hmsg, objlist, strlist);
           int nobjs = (hmsg->header())->reserved[1];
           int narys = (hmsg->header())->reserved[2];
+          //    string subdir = "ROOT";
+          string subdir = "";
+          //    printf ( "nobjs = %d\n", nobjs );
           for (int i = 0; i < nobjs; i++) {
-            //      printf ( "Object : %s received\n", (strlist.at(i)).c_str() );
-            m_hman->update(strlist.at(i), fd, (TH1*)objlist.at(i));
+            //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
+            //         (objlist.at(i))->ClassName() );
+            string objname = strlist.at(i);
+            int lpos = objname.find_first_not_of("SUBDIR:", 0);
+            if (lpos != 0) {
+              subdir = objname.substr(lpos);
+              if (subdir == "EXIT") subdir = "";
+              //        printf ( "HistoServer : subdirectory set to %s\n", subdir.c_str() );
+            } else {
+              m_hman->update(subdir, strlist.at(i), fd, (TH1*)objlist.at(i));
+            }
           }
         }
       }

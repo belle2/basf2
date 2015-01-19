@@ -117,9 +117,9 @@ namespace Belle2 {
 
     /** Next entry to be read in event tree.
      *
-     * Can be set from steering file to skip some events.
+     * Can be set from steering file to skip some events (skipNEvents parameter).
      */
-    int m_counterNumber;
+    int m_nextEntry;
 
     /** Level of parent files to be read. */
     int m_parentLevel;

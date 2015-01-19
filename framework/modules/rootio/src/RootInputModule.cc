@@ -34,7 +34,7 @@ REG_MODULE(RootInput)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
-RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_persistent(0)
+RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_tree(0), m_persistent(0)
 {
   //Set module properties
   setDescription("Reads objects/arrays from one or more .root files saved by the RootOutput module and makes them available through the DataStore. Files do not necessarily have to be local, http:// and root:// (for files in xrootd) URLs are supported as well.");
@@ -45,7 +45,7 @@ RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames or wildcards instead. Can be overridden using the -i argument to basf2.", string(""));
   addParam("inputFileNames", m_inputFileNames, "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.", emptyvector);
 
-  addParam("eventNumber", m_counterNumber, "Skip this number of events before starting.", 0);
+  addParam("skipNEvents", m_nextEntry, "Skip this number of events before starting.", 0);
 
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of event durability branches to be read. Empty means all branches. (EventMetaData is always read)", emptyvector);
   addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of persistent durability branches to be read. Empty means all branches. (FileMetaData is always read)", emptyvector);
@@ -156,19 +156,19 @@ void RootInputModule::event()
   const long nextEntry = InputController::getNextEntry();
   if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
     B2INFO("RootInput: will read entry " << nextEntry << " next.");
-    m_counterNumber = nextEntry;
+    m_nextEntry = nextEntry;
   } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0 && InputController::getNextEvent() >= 0) {
     const long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(m_tree->GetTree(), InputController::getNextEvent(), InputController::getNextRun(), InputController::getNextExperiment());
     if (entry >= 0) {
       const long chainentry = m_tree->GetChainEntryNumber(entry);
       B2INFO("RootInput: will read entry " << chainentry << " (entry " << entry << " in current file) next.");
-      m_counterNumber = chainentry;
+      m_nextEntry = chainentry;
     }
   }
-  InputController::eventLoaded(m_counterNumber);
+  InputController::eventLoaded(m_nextEntry);
 
   readTree();
-  m_counterNumber++;
+  m_nextEntry++;
 }
 
 
@@ -189,7 +189,7 @@ void RootInputModule::readTree()
   const string prevFile = m_tree->GetCurrentFile()->GetName();
 
   // Check if there are still new entries available.
-  int localEntryNumber = m_tree->LoadTree(m_counterNumber);
+  int localEntryNumber = m_tree->LoadTree(m_nextEntry);
 
   if (localEntryNumber == -2) {
     return; //end of file
@@ -198,7 +198,7 @@ void RootInputModule::readTree()
     return;
   }
 
-  B2DEBUG(200, "Reading file entry " << m_counterNumber);
+  B2DEBUG(200, "Reading file entry " << m_nextEntry);
 
   //Make sure transient members of objects are reinitialised
   for (auto entry : m_storeEntries) {
@@ -212,7 +212,7 @@ void RootInputModule::readTree()
 
   int bytesRead = m_tree->GetTree()->GetEntry(localEntryNumber);
   if (bytesRead <= 0) {
-    B2FATAL("Could not read 'tree' entry " << m_counterNumber << " in file " << m_tree->GetCurrentFile()->GetName());
+    B2FATAL("Could not read 'tree' entry " << m_nextEntry << " in file " << m_tree->GetCurrentFile()->GetName());
   }
 
   if (prevFile != m_tree->GetCurrentFile()->GetName()) {

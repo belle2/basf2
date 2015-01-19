@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Poyuan Chen, Benjamin Oberhof                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,8 +42,6 @@
 #include <iomanip>
 #include <utility> //contains pair
 
-
-
 using namespace std;
 using namespace boost;
 using namespace Belle2;
@@ -61,7 +59,6 @@ REG_MODULE(ECLMCMatching)
 ECLMCMatchingModule::ECLMCMatchingModule() : Module()
 {
   // Set description
-//  setDescription("ECLHitMakerModule");
 
   setDescription("ECLMCMatchingModule");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -104,7 +101,6 @@ void ECLMCMatchingModule::beginRun()
 void ECLMCMatchingModule::event()
 {
 
-
   int DigiIndex[8736];
   int DigiOldTrack[8736];
   for (int i = 0; i < 8736; i++) {
@@ -116,49 +112,49 @@ void ECLMCMatchingModule::event()
   eclPrimaryMap.clear();
   int nParticles = mcParticles.getEntries();
   if (nParticles > 1000)nParticles = 1000; //skip many mcParticles from ROF to speed up
+
   for (int iPart = 0; iPart < nParticles ; ++iPart) {
     if (mcParticles[iPart]->getMother() == NULL
         && !mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
         && !mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator)) continue;
 
     bool adhoc_StableInGeneratorFlag(mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator));
-    if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
-        && adhoc_StableInGeneratorFlag) {
-      if (mcParticles[iPart]->getArrayIndex() == -1)
-      {     eclPrimaryMap.insert(pair<int, int>(iPart, iPart));}
-      else {eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), mcParticles[iPart]->getArrayIndex()));}
+    if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle) && adhoc_StableInGeneratorFlag) {
+      if (mcParticles[iPart]->getArrayIndex() == -1) {
+        eclPrimaryMap.insert(pair<int, int>(iPart, iPart));
+      } else {eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), mcParticles[iPart]->getArrayIndex()));}
     } else {
       if (mcParticles[iPart]->getMother() == NULL) continue;
       if (eclPrimaryMap.find(mcParticles[iPart]->getMother()->getArrayIndex()) != eclPrimaryMap.end()) {
-        eclPrimaryMap.insert(
-          pair<int, int>(mcParticles[iPart]->getArrayIndex(), eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex()]));
+        eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex()]));
       }//if mother of mcParticles is stored.
     }//if c_StableInGenerator and c_PrimaryParticle
-
   }//for mcParticles
 
 
   StoreArray<ECLHit> eclHitArray;
   RelationArray eclHitRel(mcParticles, eclHitArray);
   StoreArray<ECLDigit> eclDigiArray;
-  RelationArray  eclDigiToMCPart(eclDigiArray, mcParticles);
+  RelationArray eclDigiToMCPart(eclDigiArray, mcParticles);
 
   for (int ii = 0; ii < eclDigiArray.getEntries(); ii++) {
     ECLDigit* aECLDigi = eclDigiArray[ii];
     float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
-    int cId          = (aECLDigi->getCellId() - 1);
-    if (FitEnergy < 0.) {continue;}
+    int cId            = (aECLDigi->getCellId() - 1);
+    if (FitEnergy < 0.) {
+      continue;
+    }
     DigiIndex[cId] = ii;
   }
 
-
   for (int index = 0; index < eclHitRel.getEntries(); index++) {
-
     int PrimaryIndex = -1;
     map<int, int>::iterator iter = eclPrimaryMap.find(eclHitRel[index].getFromIndex());
-
     if (iter != eclPrimaryMap.end()) {
-      PrimaryIndex = iter->second;
+      PrimaryIndex = iter->first;
+      //std::cout << "Primary Index: " << PrimaryIndex << endl;
+      //PrimaryIndex = iter->second;
+      //std::cout << "Dependent Index: " << PrimaryIndex << endl;
     } else continue;
 
     for (int hit = 0; hit < (int)eclHitRel[index].getToIndices().size(); hit++) {
@@ -177,10 +173,8 @@ void ECLMCMatchingModule::event()
   StoreArray<ECLShower> eclRecShowerArray;
   StoreArray<ECLHitAssignment> eclHitAssignmentArray;
   RelationArray  eclShowerToMCPart(eclRecShowerArray, mcParticles);
-
   PrimaryTrackMap eclMCParticleContributionMap;//the cell could be below to several
   eclMCParticleContributionMap.clear();
-
 
   for (int iShower = 0; iShower < eclRecShowerArray.getEntries(); iShower++) {
     ECLShower* aECLShower = eclRecShowerArray[iShower];

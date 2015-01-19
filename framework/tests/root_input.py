@@ -25,6 +25,7 @@ input.param('branchNames', [
     'PXDTrueHits',
     'PXDClusters', ])
 input.param('excludeBranchNames', ['PXDClusters'])
+input.param('skipNEvents', 1)
 input.logging.log_level = LogLevel.WARNING
 
 main = create_path()

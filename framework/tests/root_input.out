@@ -4,23 +4,6 @@
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
-[INFO] EXP:        0        RUN:        1        EVT:        0
-[INFO] ============================================================================
-[INFO] DataStore collections in event 0
-[INFO] ============================================================================
-[INFO] Type                 Name                       #Entries           <Event>
-[INFO] EventMetaData        EventMetaData
-[INFO] RelationContainer    PXDClustersToPXDDigits
-[INFO] RelationContainer    PXDClustersToPXDTrueHits
-[INFO] PXDDigit[]           PXDDigits                  177
-[INFO] PXDTrueHit[]         PXDTrueHits                40
-[INFO] 
-[INFO] ----------------------------------------------------------------------------
-[INFO] Type                 Name                       #Entries      <Persistent>
-[INFO] FileMetaData         FileMetaData
-[INFO] ProcessStatistics    ProcessStatistics
-[INFO] 
-[INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        1
 [INFO] ============================================================================
 [INFO] DataStore collections in event 1

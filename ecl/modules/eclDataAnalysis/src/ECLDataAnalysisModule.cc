@@ -30,7 +30,6 @@
 #include <list>
 #include <iostream>
 
-
 using namespace std;
 using namespace Belle2;
 
@@ -51,13 +50,137 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
 
   addParam("writeToRoot", m_writeToRoot,
            "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
-
   addParam("rootFileName", m_rootFileName,
            "fileName used for root file where info are saved. Will be ignored if parameter 'writeToRoot' is false (standard)",
            string("eclDataAnalysis"));
-
   addParam("doTracking", m_doTracking,
            "set true if you want to save the informations from TrackFitResults'rootFileName'", bool(true));
+  /*
+  m_eclDigitMultip=0;
+  m_eclDigitIdx->clear();
+  m_eclDigitToMc->clear();
+  m_eclDigitCellId->clear();
+  m_eclDigitAmp->clear();
+  m_eclDigitTimeFit->clear();
+  m_eclDigitFitQuality->clear();
+
+  m_eclSimHitMultip=0;
+  m_eclSimHitIdx->clear();
+  m_eclSimHitToMc->clear();
+  m_eclSimHitCellId->clear();
+  m_eclSimHitPdg->clear();
+  m_eclSimHitEnergyDep->clear();
+  m_eclSimHitFlightTime->clear();
+  m_eclSimHitX->clear();
+  m_eclSimHitY->clear();
+  m_eclSimHitZ->clear();
+  m_eclSimHitPx->clear();
+  m_eclSimHitPy->clear();
+  m_eclSimHitPz->clear();
+
+  m_eclHitMultip=0;
+  m_eclHitIdx->clear();
+  m_eclHitToMc->clear();
+  m_eclHitCellId->clear();
+  m_eclHitEnergyDep->clear();
+  m_eclHitTimeAve->clear();
+
+  m_eclShowerMultip=0;
+  m_eclShowerIdx->clear();
+  m_eclShowerToMc->clear();
+  m_eclShowerToGamma->clear();
+  m_eclShowerEnergy->clear();
+  m_eclShowerTheta->clear();
+  m_eclShowerPhi->clear();
+  m_eclShowerR->clear();
+  m_eclShowerNHits->clear();
+  m_eclShowerE9oE25->clear();
+  m_eclShowerUncEnergy->clear();
+
+  m_eclClusterMultip=0;
+  m_eclClusterIdx->clear();
+  m_eclClusterToMc->clear();
+  m_eclClusterToShower->clear();
+  m_eclClusterToTrack->clear();
+  m_eclClusterEnergy->clear();
+  m_eclClusterEnergyError->clear();
+  m_eclClusterTheta->clear();
+  m_eclClusterThetaError->clear();
+  m_eclClusterPhi->clear();
+  m_eclClusterPhiError->clear();
+  m_eclClusterR->clear();
+  m_eclClusterEnergyDepSum->clear();
+  m_eclClusterTiming->clear();
+  m_eclClusterTimingError->clear();
+  m_eclClusterE9oE25->clear();
+  m_eclClusterHighestE->clear();
+  m_eclClusterLat->clear();
+  m_eclClusterNofCrystals->clear();
+  m_eclClusterCrystalHealth->clear();
+  m_eclClusterMergedPi0->clear();
+  m_eclClusterPx->clear();
+  m_eclClusterPy->clear();
+  m_eclClusterPz->clear();
+  m_eclClusterIsTrack->clear();
+  m_eclClusterPi0Likel->clear();
+  m_eclClusterEtaLikel->clear();
+  m_eclClusterDeltaL->clear();
+  m_eclClusterBeta->clear();
+
+
+  m_eclGammaMultip=0;
+  m_eclGammaIdx->clear();
+  m_eclGammaEnergy->clear();
+  m_eclGammaTheta->clear();
+  m_eclGammaPhi->clear();
+  m_eclGammaR->clear();
+  m_eclGammaPx->clear();
+  m_eclGammaPy->clear();
+  m_eclGammaPz->clear();
+
+  m_eclPi0Multip=0;
+  m_eclPi0Idx->clear();
+  m_eclPi0ToGamma->clear();
+  m_eclPi0ShowerId1->clear();
+  m_eclPi0ShowerId2->clear();
+  m_eclPi0Energy->clear();
+  m_eclPi0Px->clear();
+  m_eclPi0Py->clear();
+  m_eclPi0Pz->clear();
+  m_eclPi0Mass->clear();
+  m_eclPi0MassFit->clear();
+  m_eclPi0Chi2->clear();
+  m_eclPi0PValue->clear();
+
+  m_mcMultip=0;
+  m_mcIdx->clear();
+  m_mcPdg->clear();
+  m_mcMothPdg->clear();
+  m_mcGMothPdg->clear();
+  m_mcGGMothPdg->clear();
+  m_mcEnergy->clear();
+  m_mcPx->clear();
+  m_mcPy->clear();
+  m_mcPz->clear();
+  m_mcDecayVtxX->clear();
+  m_mcDecayVtxY->clear();
+  m_mcDecayVtxZ->clear();
+  m_mcProdVtxX->clear();
+  m_mcProdVtxY->clear();
+  m_mcProdVtxZ->clear();
+  m_mcSecondaryPhysProc->clear();
+
+  m_trkMultip=0;
+  m_trkIdx->clear();
+  m_trkPdg->clear();
+  m_trkCharge->clear();
+  m_trkPx->clear();
+  m_trkPy->clear();
+  m_trkPz->clear();
+  m_trkX->clear();
+  m_trkY->clear();
+  m_trkZ->clear();
+  */
 
 }
 
@@ -96,7 +219,7 @@ void ECLDataAnalysisModule::initialize()
   m_eclTriggerCellId = new std::vector<int>();
   m_eclTriggerTime = new std::vector<double>();
   */
-
+  /*
   m_eclDigitMultip = 0;
   m_eclDigitIdx = new std::vector<int>();
   m_eclDigitToMc = new std::vector<int>();
@@ -221,7 +344,7 @@ void ECLDataAnalysisModule::initialize()
   m_trkX = new std::vector<double>();
   m_trkY = new std::vector<double>();
   m_trkZ = new std::vector<double>();
-
+  */
 
   m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
   m_tree->Branch("runNo", &m_iRun, "runNo/I");

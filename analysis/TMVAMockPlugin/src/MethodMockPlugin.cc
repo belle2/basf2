@@ -71,14 +71,17 @@ void TMVA::MethodMockPlugin::Train()
   UInt_t nEvents = Data()->GetNTrainingEvents();
   UInt_t nFeatures = GetNvar();
 
-  inspector.train_events.clear();
+  inspector.clear();
   for (unsigned int iEvent = 0; iEvent < nEvents; ++iEvent) {
     std::vector<float> event(nFeatures + 1, 0);
+    const Event* ev = GetTrainingEvent(iEvent);
     for (unsigned int iFeature = 0; iFeature < nFeatures; iFeature++) {
-      event[iFeature] = GetTrainingEvent(iEvent)->GetValue(iFeature);
+      event[iFeature] = ev->GetValue(iFeature);
     }
-    event[nFeatures] = DataInfo().IsSignal(GetTrainingEvent(iEvent));
+    event[nFeatures] = DataInfo().IsSignal(ev);
     inspector.train_events.push_back(event);
+    inspector.train_event_weights.push_back(ev->GetOriginalWeight());
+    inspector.train_event_classes.push_back(ev->GetClass());
   }
 
 }
@@ -107,6 +110,8 @@ Double_t TMVA::MethodMockPlugin::GetMvaValue(Double_t*, Double_t*)
     event[iFeature] = ev->GetValue(iFeature);
   }
   inspector.test_event = event;
+  inspector.test_event_weight = ev->GetOriginalWeight();
+  inspector.test_event_class = ev->GetClass();
 
   return inspector.mva_value;
 

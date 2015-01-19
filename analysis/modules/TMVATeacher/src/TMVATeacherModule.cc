@@ -39,6 +39,7 @@ namespace Belle2 {
     addParam("variables", m_variables, "Input variables used by the TMVA method");
     addParam("spectators", m_spectators, "Input spectators used by the TMVA method. These variables are saved in the output file, but not used as training input.", empty);
     addParam("target", m_target, "Target used by the method, has to be an integer-valued variable which defines clusters in the sample.");
+    addParam("weight", m_weight, "Weight used by the method, has to be a variable defined in the variable manager.", std::string("constant(1.0)"));
     addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification"));
     addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
     addParam("createMVAPDFs", m_createMVAPDFs, "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.", true);
@@ -67,7 +68,7 @@ namespace Belle2 {
         config = std::string("CreateMVAPdfs:") + config;
       methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables, m_spectators));
     }
-    m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, m_target, methods, m_useExistingData);
+    m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, m_target, m_weight, methods, m_useExistingData);
 
     Variable::Manager& manager = Variable::Manager::Instance();
     m_target_var = manager.getVariable(m_target);

@@ -196,6 +196,12 @@ namespace Belle2 {
       return cleoCones.at(cone[0] - 1);
     }
 
+    // Continuum Suppression --------------------------------------------------
+    double Constant(const Particle* particle, const std::vector<double>& constant)
+    {
+      return constant[0];
+    }
+
     VARIABLE_GROUP("ParameterFunctions");
     REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdg)", NumberOfMCParticlesInEvent , "Returns number of MC Particles (including anti particles) with the given pdg in the event.");
     REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass , "Returns invariant mass of the given daughter particles.");
@@ -205,6 +211,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter");
     REGISTER_VARIABLE("massDifferenceError(i)", massDifferenceError, "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter");
     REGISTER_VARIABLE("massDifferenceSignificance(i)", massDifferenceSignificance, "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]");
+
+    REGISTER_VARIABLE("constant(i)", Constant, "Returns constant number");
 
     REGISTER_VARIABLE("CleoCone(i)", CleoCones, "Cleo cones (i-th cone)");
   }

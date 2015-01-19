@@ -20,7 +20,7 @@ main.add_module(register_module('ParticleLoader'))
 
 # Train TMVA Teacher using all electron candidates as input data
 # Select the candidates
-fillParticleList('e-', path=main)
+fillParticleList('e-', '', path=main)
 
 # Define Variables
 variables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH',
@@ -49,6 +49,8 @@ teacher.param('methods', methods)
 teacher.param('variables', variables)
 teacher.param('spectators', ['nTracks', 'nClusters'])
 teacher.param('target', 'isSignal')
+teacher.param('weight', 'constant(100.1)')
+teacher.param('prepareOption', '!V:SplitMode=random:NormMode=None')
 teacher.param('listNames', 'e-')
 main.add_module(teacher)
 

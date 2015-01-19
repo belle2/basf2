@@ -183,19 +183,19 @@ namespace Belle2 {
       for (auto & x : m_methods_Muon_TL) {
         methods_Muon_TL.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables_Muon_TL));
       }
-      m_teacher_Muon_TL = new TMVAInterface::Teacher(m_methodPrefix_Muon_TL, m_workingDirectory, m_target_Muon_TL, methods_Muon_TL, false);
+      m_teacher_Muon_TL = new TMVAInterface::Teacher(m_methodPrefix_Muon_TL, m_workingDirectory, m_target_Muon_TL, "constant(1)", methods_Muon_TL, false);
 
       std::vector<TMVAInterface::Method> methods_Kaon_TL;
       for (auto & x : m_methods_Kaon_TL) {
         methods_Kaon_TL.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables_Kaon_TL));
       }
-      m_teacher_Kaon_TL = new TMVAInterface::Teacher(m_methodPrefix_Kaon_TL, m_workingDirectory, m_target_Kaon_TL, methods_Kaon_TL, false);
+      m_teacher_Kaon_TL = new TMVAInterface::Teacher(m_methodPrefix_Kaon_TL, m_workingDirectory, m_target_Kaon_TL, "constant(1)", methods_Kaon_TL, false);
 
       std::vector<TMVAInterface::Method> methods_SlowPion_TL;
       for (auto & x : m_methods_SlowPion_TL) {
         methods_SlowPion_TL.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables_SlowPion_TL));
       }
-      m_teacher_SlowPion_TL = new TMVAInterface::Teacher(m_methodPrefix_SlowPion_TL, m_workingDirectory, m_target_SlowPion_TL, methods_SlowPion_TL, false);
+      m_teacher_SlowPion_TL = new TMVAInterface::Teacher(m_methodPrefix_SlowPion_TL, m_workingDirectory, m_target_SlowPion_TL, "constant(1)", methods_SlowPion_TL, false);
 
     }
 
@@ -204,7 +204,7 @@ namespace Belle2 {
       for (auto & x : m_methods_Muon_EL) {
         methods_Muon_EL.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables_Muon_EL));
       }
-      m_teacher_Muon_EL = new TMVAInterface::Teacher(m_methodPrefix_Muon_EL, m_workingDirectory, m_target_Muon_EL, methods_Muon_EL);
+      m_teacher_Muon_EL = new TMVAInterface::Teacher(m_methodPrefix_Muon_EL, m_workingDirectory, m_target_Muon_EL, "constant(1)", methods_Muon_EL);
     }
 
 

@@ -173,14 +173,15 @@ namespace {
     std::vector<std::string> variables = {"p", "getExtraInfo(someInput)"};
     std::vector<std::string> spectators = {"M"};
     std::string target = "getExtraInfo(target)";
+    std::string weight = "getExtraInfo(weight)";
 
     std::vector<TMVAInterface::Method> methods;
     methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables, spectators));
 
-    TMVAInterface::Teacher teacher("unittest", ".", target, methods);
+    TMVAInterface::Teacher teacher("unittest", ".", target, weight, methods);
 
     std::string factoryOption = "!V:Silent:Color:DrawProgressBar:AnalysisType=Classification";
-    std::string prepareOption = "!V:SplitMode=block";
+    std::string prepareOption = "!V:SplitMode=block:NormMode=None";
 
     gRandom->SetSeed(23);
 
@@ -194,11 +195,13 @@ namespace {
       Particle p(v, 211);
       float momentum = v.P();
       float someInput = i;//gRandom->Gaus() + target * 1.0;
+      float weight = i * 3;
       p.addExtraInfo("someInput", someInput);
       p.addExtraInfo("target", target);
+      p.addExtraInfo("weight", weight);
       teacher.addSample(&p);
       if (i < n / 2) {
-        given_samples.insert({momentum, someInput, target});
+        given_samples.insert({momentum, someInput, target, weight});
       }
     }
 
@@ -207,7 +210,9 @@ namespace {
 
     EXPECT_EQ(n / 2, inspector.GetTrainEvents().size());
     std::set<std::vector<float>> received_samples;
+    unsigned int i = 0;
     for (auto event : inspector.GetTrainEvents()) {
+      event.push_back(inspector.GetTrainWeight(i++));
       received_samples.insert(event);
     }
 
@@ -222,14 +227,15 @@ namespace {
     std::vector<std::string> variables = {"p", "False", "getExtraInfo(someInput)"};
     std::vector<std::string> spectators = {"M"};
     std::string target = "getExtraInfo(target)";
+    std::string weight = "constant(1.1)";
 
     std::vector<TMVAInterface::Method> methods;
     methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables, spectators));
 
-    TMVAInterface::Teacher teacher("unittest2", ".", target, methods);
+    TMVAInterface::Teacher teacher("unittest2", ".", target, weight, methods);
 
     std::string factoryOption = "!V:Silent:Color:DrawProgressBar:AnalysisType=Classification";
-    std::string prepareOption = "!V:SplitMode=block";
+    std::string prepareOption = "!V:SplitMode=block:NormMode=None";
 
     gRandom->SetSeed(23);
 
@@ -258,6 +264,10 @@ namespace {
     std::set<std::vector<float>> received_samples;
     for (auto event : inspector.GetTrainEvents()) {
       received_samples.insert(event);
+    }
+
+    for (auto weight : inspector.GetTrainWeights()) {
+      EXPECT_FLOAT_EQ(weight, 1.1);
     }
 
     EXPECT_EQ(given_samples, received_samples);

@@ -32,7 +32,7 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix),
+    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::string weight, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix),
       m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree("", DataStore::c_Persistent)
     {
 
@@ -47,6 +47,13 @@ namespace Belle2 {
         B2FATAL("Couldn't find target variable " << target << " via the Variable::Manager. Check the name!")
       }
       m_target = 0;
+
+      // Get Pointer to Variable::Manager::Var for the provided weight name
+      m_weight_var =  manager.getVariable(weight);
+      if (m_weight_var == nullptr) {
+        B2FATAL("Couldn't find weight variable " << weight << " via the Variable::Manager. Check the name!")
+      }
+      m_weight = 0;
 
       // Create new tree which stores the input and target variable
       const auto& variables = m_methods[0].getVariables();
@@ -82,6 +89,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < spectators.size(); ++i)
           tree->Branch(Variable::makeROOTCompatible(spectators[i]->name).c_str(), &m_input[i + variables.size()]);
         tree->Branch(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+        tree->Branch("__weight__", &m_weight);
 
       } else {
         for (unsigned int i = 0; i < variables.size(); ++i)
@@ -89,6 +97,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < spectators.size(); ++i)
           tree->SetBranchAddress(Variable::makeROOTCompatible(spectators[i]->name).c_str(), &m_input[i + variables.size()]);
         tree->SetBranchAddress(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+        tree->SetBranchAddress("__weight__", &m_weight);
       }
 
       m_tree.registerInDataStore(tree_name, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
@@ -116,25 +125,9 @@ namespace Belle2 {
 
     void Teacher::addSample(const Particle* particle)
     {
-      // Change the workling directory to the user defined working directory
-      std::string oldDirectory = gSystem->WorkingDirectory();
-      gSystem->ChangeDirectory(m_workingDirectory.c_str());
-
-      // Fill the tree with the input variables
-      const auto& variables = m_methods[0].getVariables();
-      for (unsigned int i = 0; i < variables.size(); ++i) {
-        m_input[i] = variables[i]->function(particle);
-      }
-      const auto& spectators = m_methods[0].getSpectators();
-      for (unsigned int i = 0; i < spectators.size(); ++i) {
-        m_input[i + variables.size()] = spectators[i]->function(particle);
-      }
-
       // The target variable is converted to an integer
       m_target = int(m_target_var->function(particle) + 0.5);
-      m_tree->get().Fill();
-
-      gSystem->ChangeDirectory(oldDirectory.c_str());
+      addClassSample(particle, m_target);
     }
 
     void Teacher::addClassSample(const Particle* particle, int classid)
@@ -164,6 +157,10 @@ namespace Belle2 {
 
       // The target variable is converted to an integer
       m_target = classid;
+
+      //Calculate weight of this candidate/event
+      m_weight = m_weight_var->function(particle);
+
       m_tree->get().Fill();
 
       gSystem->ChangeDirectory(oldDirectory.c_str());
@@ -300,6 +297,8 @@ namespace Belle2 {
       for (auto & var : m_methods[0].getSpectators()) {
         factory.AddSpectator(Variable::makeROOTCompatible(var->name));
       }
+
+      factory.SetWeightExpression("__weight__");
 
       auto signalCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str());
       unsigned long int signalEvents = (maxEventsPerClass == 0) ? cluster_count[signalClass] : maxEventsPerClass;

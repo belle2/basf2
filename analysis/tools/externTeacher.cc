@@ -133,7 +133,8 @@ int main(int argc, char* argv[])
 
   std::vector<TMVAInterface::Method> methods;
   methods.push_back(TMVAInterface::Method(methodName, methodType, methodConfig, variables));
-  TMVAInterface::Teacher* teacher = new TMVAInterface::Teacher(prefix, workingDirectory, target, methods, true);
+  // weight == constant(1), the weights will be taken from the defined root file, the constant(1) variable will be never used!
+  TMVAInterface::Teacher* teacher = new TMVAInterface::Teacher(prefix, workingDirectory, target, "constant(1)", methods, true);
   teacher->train(factoryOption, prepareOption, maxEventsPerClass);
 
   delete teacher;

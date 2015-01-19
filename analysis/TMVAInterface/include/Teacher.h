@@ -40,10 +40,11 @@ namespace Belle2 {
        * @param prefix which used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml
        * @param workingDirectory where the config file and weight file directory is stored
        * @param target the name of the target variable (registered in Variable::Manager), which is used as expected output for the chosen TMVA method
+       * @param weight the name of the weight variable (registered in Variable::Manager)
        * @param methods vector of Method
        * @param useExistingData if correct TFile and TTree exists already exists, use the stored samples for training
        */
-      Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData = false);
+      Teacher(std::string prefix, std::string workingDirectory, std::string target, std::string weight, std::vector<Method> methods, bool useExistingData = false);
 
       /**
        * Destructor
@@ -102,6 +103,8 @@ namespace Belle2 {
 
       const Variable::Manager::Var* m_target_var; /**< Variable Pointer to target variable */
       int m_target; /**< Storage for the target variable */
+      const Variable::Manager::Var* m_weight_var; /**< Variable Pointer to weight variable */
+      float m_weight; /**< Storage for the weight variable */
       std::vector<float> m_input; /**< Storage for input variables */
     };
 

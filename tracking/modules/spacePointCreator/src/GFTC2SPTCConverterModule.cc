@@ -485,7 +485,7 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
     // if only one cluster is passed simply check if there exists a related TrueHit
     if (clusters.size() == 1) {
       RelationVector<SVDTrueHit> relTrueHits = clusters[0]->getRelationsTo<SVDTrueHit>("ALL"); // COULDDO: search only certain arrays
-      if (relTrueHits.size() == 1) {
+      if (relTrueHits.size() == 1) { // NOTE: very strict requirement!!
         B2DEBUG(200, "Found one related TrueHit (index " << relTrueHits[0]->getArrayIndex() << ", Array: " << relTrueHits[0]->getArrayName() << ") forSVDCluster " << clusters[0]->getArrayIndex() << " from Array " << clusters[0]->getArrayName());
         return true;
       } else {

@@ -394,12 +394,11 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 //           continue; // start over with next SpacePoint
 //         }
 
-        // if there are 2 Clusters, there have to be at least 2 TrueHits (else above part would have thrown)
-        // if there are more than one TrueHits check if they can be "reduced" to one via sort and resize (regardless if only one Cluster led to these TrueHits)
-        if (svdTrueHits.size() > 1) {
+        // if there is at least one TrueHit in the vector check how many unique TrueHits there are
+        if (svdTrueHits.size() >= 1) {
           B2DEBUG(150, "Found " << svdTrueHits.size() << " SVDTrueHits related to Clusters related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". Now checking if they are compatible")
 
-          //
+          // sort & unique to find the unique entries of the relation vector
           std::sort(svdTrueHits.begin(), svdTrueHits.end());
           unsigned int oldSize = svdTrueHits.size();
           auto newEnd = std::unique(svdTrueHits.begin(), svdTrueHits.end());

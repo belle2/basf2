@@ -17,6 +17,8 @@ namespace Belle2 {
     static const HVCommand RECOVER;
     static const HVCommand TURNON;
     static const HVCommand TURNOFF;
+    static const HVCommand HVGET;
+    static const HVCommand HVSET;
     static const HVCommand HVAPPLY;
 
   public:

@@ -2,7 +2,7 @@
 # Login to Belle II Run control
 #
 
-hostname : ropc02.kek.jp
+hostname : 130.87.227.249
 port : 9090
 nsmhost : 172.22.32.11
 nsmport : 8122

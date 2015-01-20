@@ -11,5 +11,5 @@ fi
 source ../tools/setup_belle2
 setuprel
 export NSM2_INCDIR=$BELLE2_LOCAL_DIR/daq/slc/data/nsm
-$1 $2 -d
+$1 $2 $3 -d
 

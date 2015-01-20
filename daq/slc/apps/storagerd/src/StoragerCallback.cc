@@ -55,13 +55,6 @@ void StoragerCallback::term() throw()
 bool StoragerCallback::load() throw()
 {
 
-  const std::string ibuf_name = m_file.get("input.buf.name");
-  const std::string rbuf_name = m_file.get("record.buf.name");
-  const std::string obuf_name = m_file.get("output.buf.name");
-  const std::string ibuf_size = m_file.get("input.buf.size");
-  const std::string rbuf_size = m_file.get("record.buf.size");
-  const std::string obuf_size = m_file.get("output.buf.size");
-
   bool is_up_all = true;
   for (size_t i = 0; i < m_con.size(); i++) {
     if (!m_con[0].isAlive()) {
@@ -71,6 +64,13 @@ bool StoragerCallback::load() throw()
   }
   if (is_up_all) return true;
   abort();
+
+  const std::string ibuf_name = m_file.get("input.buf.name");
+  const std::string rbuf_name = m_file.get("record.buf.name");
+  const std::string obuf_name = m_file.get("output.buf.name");
+  const std::string ibuf_size = m_file.get("input.buf.size");
+  const std::string rbuf_size = m_file.get("record.buf.size");
+  const std::string obuf_size = m_file.get("output.buf.size");
 
   m_con[0].clearArguments();
   m_con[0].setExecutable("storagein");

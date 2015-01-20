@@ -15,6 +15,7 @@
 
 using namespace Belle2;
 
+bool LogFile::g_stderr = true;
 bool LogFile::g_opened = false;
 std::string LogFile::g_filepath;
 std::ofstream LogFile::g_stream;
@@ -168,7 +169,8 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
   vsprintf(s, msg.c_str(), ap);
   ss << s << std::endl;
   std::string str = ss.str();
-  //std::cerr << color << str << "\x1b[49m\x1b[39m";
+  if (g_stderr)
+    std::cerr << color << str << "\x1b[49m\x1b[39m";
   if (g_opened) {
     g_stream << str;
     g_stream.flush();

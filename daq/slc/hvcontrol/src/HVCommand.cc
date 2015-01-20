@@ -11,7 +11,9 @@ const HVCommand HVCommand::STANDBY(111, "STANDBY");
 const HVCommand HVCommand::SHOULDER(112, "SHOULDER");
 const HVCommand HVCommand::PEAK(113, "PEAK");
 const HVCommand HVCommand::RECOVER(121, "RECOVER");
-const HVCommand HVCommand::HVAPPLY(131, "HVAPPLY");
+const HVCommand HVCommand::HVGET(131, "HVGET");
+const HVCommand HVCommand::HVSET(132, "HVSET");
+const HVCommand HVCommand::HVAPPLY(999, "HVAPPLY");
 
 const HVCommand& HVCommand::operator=(const std::string& label) throw()
 {
@@ -23,6 +25,8 @@ const HVCommand& HVCommand::operator=(const std::string& label) throw()
   else if (label == PEAK.getLabel()) *this = PEAK;
   else if (label == RECOVER.getLabel()) *this = RECOVER;
   else if (label == HVAPPLY.getLabel()) *this = HVAPPLY;
+  else if (label == HVSET.getLabel()) *this = HVSET;
+  else if (label == HVGET.getLabel()) *this = HVGET;
   else if (label == NSMCommand::OK.getLabel()) *this = NSMCommand::OK;
   else if (label == NSMCommand::ERROR.getLabel()) *this = NSMCommand::ERROR;
   else if (label == NSMCommand::NSMGET.getLabel()) *this = NSMCommand::NSMGET;

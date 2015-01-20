@@ -14,7 +14,7 @@
 #include <string>
 #include <map>
 
-#include "../corelib/nsmparse.h"
+#include "nsmparse.h"
 
 enum nsmget_native_t {
   INT64  = 0,

@@ -350,10 +350,14 @@ public class RunControlMainPane extends TabPane implements NSMObserver {
                     if (cobj.hasObject("node")) {
                         int n = 0;
                         for (ConfigObject obj : cobj.getObjects("node")) {
-                            NSMData cdata = (NSMData) data.getObject("node", n);
-                            statelabel_v[n].update(cdata.getInt("state"),
-                                    cdata.getInt("excluded") == 0 && obj.getBool("used"));
-                            n++;
+                            if (data.hasObject("node") && n < data.getNObjects("node")) {
+                                NSMData cdata = (NSMData) data.getObject("node", n);
+                                statelabel_v[n].update(cdata.getInt("state"),
+                                        cdata.getInt("excluded") == 0 && obj.getBool("used"));
+                                n++;
+                            } else {
+                                break;
+                            }
                         }
                     }
                 }

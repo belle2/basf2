@@ -33,7 +33,8 @@ throw() : NSMCallback(node, 1)
   add(HVCommand::PEAK);
   add(HVCommand::TURNON);
   add(HVCommand::TURNOFF);
-  add(HVCommand::HVAPPLY);
+  add(HVCommand::HVGET);
+  add(HVCommand::HVSET);
   setTimeout(1);
 }
 

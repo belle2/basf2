@@ -9,8 +9,8 @@ CXX       = g++
 OPT = -g
 DEPS   = nsmget.h Makefile
 EXTRA_CFLAGS = -shared -fPIC
-CFLAGS = $(OPT) $(EXTRA_CFLAGS)
-CXXFLAGS = $(OPT) $(EXTRA_CFLAGS)
+CFLAGS = $(OPT) $(EXTRA_CFLAGS) -I../corelib/
+CXXFLAGS = $(OPT) $(EXTRA_CFLAGS) -I../corelib/
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -35,6 +35,6 @@ clean::
 
 b2nsmaccess.o: $(DEPS)
 
-nsmparse.o: $(DEPS) nsmparse.h
+nsmparse.o: $(DEPS) ../corelib/nsmparse.h
 
 

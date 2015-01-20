@@ -82,6 +82,9 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
     } else if (cmd == RCCommand::LOAD) {
       result = preload(msg) && load();
     } else if (cmd == RCCommand::START) {
+      getConfig().setExpNumber(msg.getParam(0));
+      getConfig().setRunNumber(msg.getParam(1));
+      getConfig().setSubNumber(msg.getParam(2));
       result = start();
     } else if (cmd == RCCommand::STOP) {
       result = stop();
@@ -169,7 +172,8 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
           } else {
             m_config.setObject(table.get(configid));
           }
-          LogFile::info("Loaded from DB %s:%s", nodename.c_str(), runtype.c_str());
+          LogFile::info("Loaded from DB %s:%s",
+                        nodename.c_str(), runtype.c_str());
           if (m_db_close)
             m_db->close();
         } catch (const DBHandlerException& e) {

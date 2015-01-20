@@ -24,6 +24,7 @@ namespace Belle2 {
     ~LogFile() {}
 
   private:
+    static bool g_stderr;
     static bool g_opened;
     static std::string g_filepath;
     static std::ofstream g_stream;
@@ -45,6 +46,9 @@ namespace Belle2 {
     static void error(const std::string& msg, ...);
     static void fatal(const std::string& msg, ...);
     static void put(Priority priority, const std::string& msg, ...);
+    static void setStdErr(bool stderr) {
+      g_stderr = stderr;
+    }
 
   private:
     static int put_impl(const std::string& msg, Priority priority, va_list ap);

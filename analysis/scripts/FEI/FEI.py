@@ -205,7 +205,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
             play.addProperty('MVAConfig_{c}'.format(c=channel.name), channel.mvaConfig)
             play.addProperty('MVAConfigTarget_{c}'.format(c=channel.name), channel.mvaConfig.target)
             play.addProperty('PreCutConfig_{c}'.format(c=channel.name), channel.preCutConfig)
-            play.addProperty('DecayModeID{c}'.format(c=channel.name), channel.decayModeID)
+            play.addProperty('DecayModeID_{c}'.format(c=channel.name), channel.decayModeID)
             if commonTarget is None:
                 commonTarget = channel.mvaConfig.target
             if channel.mvaConfig.target != commonTarget:
@@ -238,7 +238,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               channelName='Name_{c}'.format(c=channel.name),
                               daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
                               preCut='PreCut_{c}'.format(c=channel.name),
-                              decayModeID='DecayModeID{c}'.format(c=channel.name))
+                              decayModeID='DecayModeID_{c}'.format(c=channel.name))
                 play.addActor(FitVertex,
                               channelName='Name_{c}'.format(c=channel.name),
                               particleList='RawParticleList_{c}'.format(c=channel.name),

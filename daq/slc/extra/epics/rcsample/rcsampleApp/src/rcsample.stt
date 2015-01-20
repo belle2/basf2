@@ -7,46 +7,41 @@ monitor rcrequest;
 string rcstate;
 assign rcstate to "{USER}:rc:state";
 
-int flag = 0;
-
 ss rcsample_control 
 {
-  state notready {
+  state NOTREADY {
     entry {
-      flag = 0;
       strcpy(rcstate, "NOTREADY");
       printf("state = %s\n", rcstate);
       pvPut(rcstate);
     }
     when (strcmp(rcrequest, "LOAD") == 0) {
       printf("request = %s\n", rcrequest);
-    } state ready
+    } state LOADING
     when (strcmp(rcrequest, "ABORT") == 0) {
       printf("request = %s\n", rcrequest);
-    } state aborting
+    } state ABORTING
   }
 
-  state ready {
+  state READY {
     entry {
       strcpy(rcstate, "READY");
       printf("state = %s\n", rcstate);
       pvPut(rcstate);
     }
-    when (flag == 0 && strcmp(rcrequest, "LOAD") == 0) {
-      flag = 1;
+    when (strcmp(rcrequest, "LOAD") == 0) {
       printf("request = %s\n", rcrequest);
-    } state ready
+    } state LOADING
     when (strcmp(rcrequest, "START") == 0) {
       printf("request = %s\n", rcrequest);
-    } state running
+    } state RUNNING
     when (strcmp(rcrequest, "ABORT") == 0) {
       printf("request = %s\n", rcrequest);
-    } state aborting
+    } state ABORTING
   } 
 
-  state running {
+  state RUNNING {
     entry {
-      flag = 0;
       strcpy(rcstate, "RUNNING");
       printf("state = %s\n", rcstate);
       pvPut(rcstate);
@@ -56,10 +51,10 @@ ss rcsample_control
     } state paused
     when (strcmp(rcrequest, "STOP") == 0) {
       printf("request = %s\n", rcrequest);
-    } state ready
+    } state READY
     when (strcmp(rcrequest, "ABORT") == 0) {
       printf("request = %s\n", rcrequest);
-    } state aborting
+    } state ABORTING
   }
 
   state paused {
@@ -70,22 +65,26 @@ ss rcsample_control
     }
     when (strcmp(rcrequest, "RESUME") == 0) {
       printf("request = %s\n", rcrequest);
-    } state running
+    } state RUNNING
     when (strcmp(rcrequest, "STOP") == 0) {
-      flag = 0;
       printf("request = %s\n", rcrequest);
-    } state ready
+    } state READY
   }
 
-  state aborting {
+  state LOADING {
+    when() {
+      strcpy(rcrequest, "");
+    } state READY
+  }
+
+  state ABORTING {
     entry {
-      flag = 0;
       strcpy(rcstate, "ABORTING");
       printf("state = %s\n", rcstate);
       pvPut(rcstate);
     }
-    when (1) {
-      printf("request = %s\n", rcstate);
-    } state notready
+    when () {
+      strcpy(rcrequest, "");
+    } state NOTREADY
   }
 }

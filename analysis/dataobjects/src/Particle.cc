@@ -429,9 +429,10 @@ const ECLCluster* Particle::getECLCluster() const
     return eclClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
     StoreArray<Track> tracks;
-    return tracks[m_mdstIndex]->getRelatedTo<ECLCluster>();
-  } else
+    return tracks[m_mdstIndex]->getRelatedFrom<ECLCluster>();
+  } else {
     return nullptr;
+  }
 }
 
 const KLMCluster* Particle::getKLMCluster() const

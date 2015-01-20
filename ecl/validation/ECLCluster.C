@@ -1,7 +1,7 @@
 void ECLCluster()
 {
   // open the file with simulated and reconstructed EvtGen particles
-  TFile* input_500 = TFile::Open("./ECLClusterOutput_500mev.root");
+  TFile* input_500 = TFile::Open("../ECLClusterOutput_500mev.root");
   TTree* tree = (TTree*) input_500->Get("m_tree");
 
   TH1F* hMultip_500 = new TH1F("hMultip_500","Reconstructed Cluster Multiplicity", 10, 0., 10.);

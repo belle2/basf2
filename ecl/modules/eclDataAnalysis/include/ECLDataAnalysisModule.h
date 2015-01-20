@@ -160,10 +160,11 @@ namespace Belle2 {
     std::vector<double>* m_eclGammaTheta;
     std::vector<double>* m_eclGammaPhi;
     std::vector<double>* m_eclGammaR;
+    std::vector<int>* m_eclGammaToPi0;
 
     int m_eclPi0Multip;
     std::vector<int>* m_eclPi0Idx;
-    std::vector<int>* m_eclPi0ToGamma;
+    //    std::vector<int>* m_eclPi0ToGamma;
     std::vector<int>* m_eclPi0ShowerId1;
     std::vector<int>* m_eclPi0ShowerId2;
     std::vector<double>* m_eclPi0Energy;

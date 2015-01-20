@@ -14,8 +14,8 @@ kinematic_variables = ['p', 'pt', 'p_CMS', 'pt_CMS', 'M', 'E', 'px', 'py', 'pz',
 vertex_variables = ['dr', 'dz', 'dx', 'dy', 'chiProb', 'cosAngleBetweenMomentumAndVertexVector', 'significanceOfDistance', 'distance']
 
 B_variables = ['dr', 'dz', 'dx', 'dy', 'distance', 'chiProb', 'significanceOfDistance', 'deltaE', 'cosAngleBetweenMomentumAndVertexVector',
-               'daughter(0, dz)', 'daughter(0, distance)', 'daughter(1, dz)', 'daughter(1, distance)', 'decayAngle(0)', 'decayAngle(1)',
-               'daughterAngle(0,1)', 'daughterInvariantMass(0,1)']
+               'daughter({}, dz)', 'daughter({}, distance)', 'decayAngle({})', 'daughterAngle({},{})',
+               'daughterInvariantMass({},{})', 'daughterInvariantMass({},{}, {})', 'daughter({},extraInfo(SignalProbability))']
 
 postCut = Particle.PostCutConfiguration(
     value=0.1

@@ -1,0 +1,91 @@
+program rcsample
+
+string rcrequest;
+assign rcrequest to "{USER}:rc:request";
+monitor rcrequest;
+
+string rcstate;
+assign rcstate to "{USER}:rc:state";
+
+int flag = 0;
+
+ss rcsample_control 
+{
+  state notready {
+    entry {
+      flag = 0;
+      strcpy(rcstate, "NOTREADY");
+      printf("state = %s\n", rcstate);
+      pvPut(rcstate);
+    }
+    when (strcmp(rcrequest, "LOAD") == 0) {
+      printf("request = %s\n", rcrequest);
+    } state ready
+    when (strcmp(rcrequest, "ABORT") == 0) {
+      printf("request = %s\n", rcrequest);
+    } state aborting
+  }
+
+  state ready {
+    entry {
+      strcpy(rcstate, "READY");
+      printf("state = %s\n", rcstate);
+      pvPut(rcstate);
+    }
+    when (flag == 0 && strcmp(rcrequest, "LOAD") == 0) {
+      flag = 1;
+      printf("request = %s\n", rcrequest);
+    } state ready
+    when (strcmp(rcrequest, "START") == 0) {
+      printf("request = %s\n", rcrequest);
+    } state running
+    when (strcmp(rcrequest, "ABORT") == 0) {
+      printf("request = %s\n", rcrequest);
+    } state aborting
+  } 
+
+  state running {
+    entry {
+      flag = 0;
+      strcpy(rcstate, "RUNNING");
+      printf("state = %s\n", rcstate);
+      pvPut(rcstate);
+    }
+    when (strcmp(rcrequest, "PAUSE") == 0) {
+      printf("request = %s\n", rcrequest);
+    } state paused
+    when (strcmp(rcrequest, "STOP") == 0) {
+      printf("request = %s\n", rcrequest);
+    } state ready
+    when (strcmp(rcrequest, "ABORT") == 0) {
+      printf("request = %s\n", rcrequest);
+    } state aborting
+  }
+
+  state paused {
+    entry {
+      strcpy(rcstate, "PAUSED");
+      printf("state = %s\n", rcstate);
+      pvPut(rcstate);
+    }
+    when (strcmp(rcrequest, "RESUME") == 0) {
+      printf("request = %s\n", rcrequest);
+    } state running
+    when (strcmp(rcrequest, "STOP") == 0) {
+      flag = 0;
+      printf("request = %s\n", rcrequest);
+    } state ready
+  }
+
+  state aborting {
+    entry {
+      flag = 0;
+      strcpy(rcstate, "ABORTING");
+      printf("state = %s\n", rcstate);
+      pvPut(rcstate);
+    }
+    when (1) {
+      printf("request = %s\n", rcstate);
+    } state notready
+  }
+}

@@ -118,7 +118,7 @@ def SelectParticleList(path, hash, particleName, particleLabel, runs_in_ROE):
     return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, '__cache__': True}
 
 
-def MakeAndMatchParticleList(path, hash, particleName, particleLabel, channelName, daughterParticleLists, preCut):
+def MakeAndMatchParticleList(path, hash, particleName, particleLabel, channelName, daughterParticleLists, preCut, decayModeID):
     """
     Creates a ParticleList by combining other particleLists via the ParticleCombiner module and match MC truth for this new list.
         @param path the basf2 path
@@ -128,6 +128,7 @@ def MakeAndMatchParticleList(path, hash, particleName, particleLabel, channelNam
         @param channelName unique name describing the channel
         @param daughterParticleLists list of ParticleList name of every daughter particles
         @param preCut dictionary containing 'cutstring', a string which defines the cut which is applied before the combination of the daughter particles.
+        @param decayModeID integer ID of this decay channel, added to extra-info of Particles
         @return Resource named RawParticleList_{channelName} corresponding list is stored as {particleName}:{hash}
     """
     B2INFO("Enter: Make and Match Particle List {p} with label {l} for channel {c}".format(p=particleName, l=particleLabel, c=channelName))
@@ -139,7 +140,7 @@ def MakeAndMatchParticleList(path, hash, particleName, particleLabel, channelNam
         return {'RawParticleList_{c}'.format(c=channelName): None, '__cache__': True}
 
     decayString = outputList + ' ==> ' + ' '.join(daughterParticleLists)
-    modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], 0, writeOut=True, path=path)
+    modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], decayModeID, writeOut=True, path=path)
     modularAnalysis.matchMCTruth(outputList, path=path)
     B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
     return {'RawParticleList_{c}'.format(c=channelName): outputList, '__cache__': True}

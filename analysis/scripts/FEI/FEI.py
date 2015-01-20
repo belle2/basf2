@@ -53,7 +53,7 @@ class Particle(object):
     ## Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
     PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
-    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig')
+    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig, decayModeID')
 
     def __init__(self, identifier, mvaConfig, preCutConfig=None, postCutConfig=None):
         """
@@ -103,7 +103,8 @@ class Particle(object):
         self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,
                                                    mvaConfig=mvaConfig,
-                                                   preCutConfig=preCutConfig))
+                                                   preCutConfig=preCutConfig,
+                                                   decayModeID=len(self.channels)))
         return self
 
     def __str__(self):
@@ -146,7 +147,7 @@ class Particle(object):
                 output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
 
             for channel in self.channels:
-                output += '    {name}\n'.format(name=channel.name)
+                output += '    {name} (decayModeID: {id})\n'.format(name=channel.name, id=channel.decayModeID)
                 if not samePreCutConfig:
                     if self.postCutConfig is None:
                         output += '    PreCutConfiguration: None\n'
@@ -204,6 +205,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
             play.addProperty('MVAConfig_{c}'.format(c=channel.name), channel.mvaConfig)
             play.addProperty('MVAConfigTarget_{c}'.format(c=channel.name), channel.mvaConfig.target)
             play.addProperty('PreCutConfig_{c}'.format(c=channel.name), channel.preCutConfig)
+            play.addProperty('DecayModeID{c}'.format(c=channel.name), channel.decayModeID)
             if commonTarget is None:
                 commonTarget = channel.mvaConfig.target
             if channel.mvaConfig.target != commonTarget:
@@ -235,7 +237,8 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               particleLabel='Label_{i}'.format(i=particle.identifier),
                               channelName='Name_{c}'.format(c=channel.name),
                               daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
-                              preCut='PreCut_{c}'.format(c=channel.name))
+                              preCut='PreCut_{c}'.format(c=channel.name),
+                              decayModeID='DecayModeID{c}'.format(c=channel.name))
                 play.addActor(FitVertex,
                               channelName='Name_{c}'.format(c=channel.name),
                               particleList='RawParticleList_{c}'.format(c=channel.name),

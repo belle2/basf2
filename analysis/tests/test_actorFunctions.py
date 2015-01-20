@@ -99,7 +99,7 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
         self.path = MockPath()
 
     def test_standard(self):
-        result = MakeAndMatchParticleList(self.path, 'hash', 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
+        result = MakeAndMatchParticleList(self.path, 'hash', 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], {'cutstring': '0 < M < 10'}, 42)
         self.assertTrue('RawParticleList_D+ChannelUnique' in result)
         self.assertEqual(result['RawParticleList_D+ChannelUnique'], 'D+:hash')
         self.assertDictEqual(result, {'RawParticleList_D+ChannelUnique': 'D+:hash', '__cache__': True})
@@ -109,12 +109,13 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
         self.assertEqual(parameters['decayString'], 'D+:hash ==> pi+ K-')
         self.assertEqual(parameters['cut'], '0 < M < 10')
         self.assertEqual(parameters['writeOut'], True)
+        self.assertEqual(parameters['decayMode'], 42)
 
         parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
         self.assertEqual(parameters['listName'], 'D+:hash')
 
     def test_missing_precut(self):
-        result = MakeAndMatchParticleList(self.path, 'hash', 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], None)
+        result = MakeAndMatchParticleList(self.path, 'hash', 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], None, 0)
         self.assertDictEqual(result, {'RawParticleList_D+ChannelUnique': None, '__cache__': True})
         self.assertEqual(len(self.path.modules()), 0)
 

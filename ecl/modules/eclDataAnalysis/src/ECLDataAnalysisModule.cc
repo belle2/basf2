@@ -435,10 +435,11 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclGammaPx",         "std::vector<double>",    &m_eclGammaPx);
   m_tree->Branch("eclGammaPy",         "std::vector<double>",    &m_eclGammaPy);
   m_tree->Branch("eclGammaPz",         "std::vector<double>",    &m_eclGammaPz);
+  m_tree->Branch("eclGammaToPi0",      "std::vector<int>",       &m_eclGammaToPi0);
 
   m_tree->Branch("eclPi0Multip",     &m_eclPi0Multip,      "eclPi0Multip/I");
   m_tree->Branch("eclPi0Idx",     "std::vector<int>",       &m_eclPi0Idx);
-  m_tree->Branch("eclPi0ToGamma",      "std::vector<int>",       &m_eclPi0ToGamma);
+  //m_tree->Branch("eclPi0ToGamma",      "std::vector<int>",       &m_eclPi0ToGamma);
   m_tree->Branch("eclPi0ShowerId1",  "std::vector<int>",    &m_eclPi0ShowerId1);
   m_tree->Branch("eclPi0ShowerId2",  "std::vector<int>",    &m_eclPi0ShowerId2);
   m_tree->Branch("eclPi0Energy",     "std::vector<double>", &m_eclPi0Energy);
@@ -516,9 +517,9 @@ void ECLDataAnalysisModule::event()
   m_eclShowerR->clear();  m_eclShowerNHits->clear();  m_eclShowerE9oE25->clear();  m_eclShowerUncEnergy->clear();
 
   m_eclGammaEnergy->clear();  m_eclGammaTheta->clear();  m_eclGammaPhi->clear();  m_eclGammaR->clear();
-  m_eclGammaPx->clear();  m_eclGammaPy->clear();  m_eclGammaPz->clear(); m_eclGammaIdx->clear();
+  m_eclGammaPx->clear();  m_eclGammaPy->clear();  m_eclGammaPz->clear(); m_eclGammaIdx->clear();  m_eclGammaToPi0->clear();
 
-  m_eclPi0ToGamma->clear();
+  //  m_eclPi0ToGamma->clear();
   m_eclPi0ShowerId1->clear(); m_eclPi0ShowerId2->clear(); m_eclPi0Idx->clear();
   m_eclPi0Energy->clear(); m_eclPi0Px->clear(); m_eclPi0Py->clear(); m_eclPi0Pz->clear();
   m_eclPi0Mass->clear(); m_eclPi0MassFit->clear(); m_eclPi0Chi2->clear(); m_eclPi0PValue->clear();
@@ -642,6 +643,11 @@ void ECLDataAnalysisModule::event()
     m_eclGammaTheta->push_back(aECLgammas->getPositon().Theta());
     m_eclGammaPhi->push_back(aECLgammas->getPositon().Phi());
     m_eclGammaR->push_back(aECLgammas->getPositon().Mag());
+    if (aECLgammas->getRelated<ECLPi0>() != (nullptr)) {
+      const ECLPi0* gamma_pi0 = aECLgammas->getRelated<ECLPi0>();
+      m_eclGammaToPi0->push_back(gamma_pi0->getArrayIndex());
+    } else
+      m_eclGammaToPi0->push_back(-1);
   }
 
   m_eclPi0Multip = pi0s.getEntries();
@@ -659,12 +665,13 @@ void ECLDataAnalysisModule::event()
     m_eclPi0MassFit->push_back(aECLPi0s->getMassFit());
     m_eclPi0Chi2->push_back(aECLPi0s->getChi2());
     m_eclPi0PValue->push_back(aECLPi0s->getPValue());
-
+    /*
     if (aECLPi0s->getRelated<ECLGamma>() != (nullptr)) {
       const ECLGamma* gamma_pi0 = aECLPi0s->getRelated<ECLGamma>();
       m_eclPi0ToGamma->push_back(gamma_pi0->getArrayIndex());
     } else
       m_eclPi0ToGamma->push_back(-1);
+    */
   }
 
   m_eclClusterMultip = clusters.getEntries();

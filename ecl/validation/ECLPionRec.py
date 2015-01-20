@@ -20,15 +20,15 @@ eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
 eventinfoprinter = register_module('EventInfoPrinter')
 
-import random
-intseed = random.randint(1, 10000000)
+# Fixed random seed
+set_random_seed(123456)
 
 pGun = register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [211],
     'nTracks': 1,
-    'momentumGeneration': 'uniform',
-    'momentumParams': [0, 1],
+    'momentumGeneration': 'fixed',
+    'momentumParams': [1],
     'thetaGeneration': 'uniform',
     'thetaParams': [0., 180.],
     'phiGeneration': 'uniform',

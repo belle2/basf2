@@ -100,7 +100,11 @@ class Particle(object):
         daughters = [d + ':generic' if ':' not in d else d for d in daughters]
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
-        mvaConfig.variables = sum(([v.format(*c) for c in itertools.combinations(range(0, len(daughters)), v.count('{}'))] for v in mvaConfig.variables if v.count('{}') <= len(daughters)), [])
+        mvaVars = []
+        for v in mvaConfig.variables:
+            if v.count('{}') <= len(daughters):
+                mvaVars += [v.format(*c) for c in itertools.combinations(range(0, len(daughters)), v.count('{}'))]
+        mvaConfig = mvaConfig._replace(variables=mvaVars)
         self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,
                                                    mvaConfig=mvaConfig,

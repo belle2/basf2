@@ -19,6 +19,8 @@ RFServerBase* g_nsmserver = 0;
 
 RFNSM_Status* RFNSM_Status::s_instance = 0;
 
+NSMcontext* RFNSM::g_context = 0;
+
 // Constructor / Destructor
 RFNSM::RFNSM(char* nodename, RFServerBase* server)
 {
@@ -27,7 +29,7 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
   //  nsmlib_debuglevel ( 1 );
 
   // Initialize NSM
-  if (!b2nsm_init(nodename)) {
+  if (!(g_context = b2nsm_init(nodename))) {
     fprintf(RFNSMOUT, "RFNSM : %s initialization failure, %s\n",
             nodename, b2nsm_strerror());
   }

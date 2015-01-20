@@ -9,6 +9,7 @@
 #include <daq/slc/base/Date.h>
 
 extern "C" {
+#include <nsm2/nsm2.h>
 #include <nsm2/nsmlib2.h>
 #include <nsm2/belle2nsm.h>
 }
@@ -36,6 +37,12 @@ throw()
   m_nsmc = NULL;
   m_host = host;
   m_port = port;
+}
+
+NSMCommunicator::NSMCommunicator(NSMcontext* nsmc) throw()
+{
+  m_nsmc = nsmc;
+  m_id = m_nsmc->nodeid;
 }
 
 void NSMCommunicator::init(const NSMNode& node,
@@ -366,6 +373,16 @@ void NSMCommunicator::readContext(NSMcontext* nsmc) throw()
       m_masters.insert(NSMNodeList::value_type(nodename, NSMNode(nodename)));
     }
   }
+}
+
+void NSMCommunicator::callContext() throw(NSMHandlerException)
+{
+  char buf[NSM_TCPMSGSIZ];
+  NSMcontext* nsmc = m_nsmc;
+  if (nsmlib_recv(nsmc, (NSMtcphead*)buf, 1000) < 0) {
+    throw (NSMHandlerException("Failed to read NSM context"));
+  }
+  nsmlib_call(nsmc, (NSMtcphead*)buf);
 }
 
 void NSMCommunicator::setContext(NSMcontext* nsmc) throw(NSMHandlerException)

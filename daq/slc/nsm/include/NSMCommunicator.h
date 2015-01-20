@@ -35,6 +35,7 @@ namespace Belle2 {
 
   public:
     NSMCommunicator(const std::string& host = "", int port = -1) throw();
+    NSMCommunicator(NSMcontext* nsmc) throw();
     ~NSMCommunicator() throw() {}
 
   public:
@@ -61,6 +62,7 @@ namespace Belle2 {
     bool sendFatal(const std::string& message);
     void sendState(const NSMNode& node) throw(NSMHandlerException);
     void readContext(NSMcontext* nsmc) throw();
+    void callContext() throw(NSMHandlerException);
 
   public:
     NSMcontext* getContext() throw() { return m_nsmc; }

@@ -63,10 +63,15 @@ namespace Belle2 {
     void AllocMem(char* format);
     RfNodeInfo* GetNodeInfo();
 
+    static NSMcontext* GetContext() {
+      return g_context;
+    }
+
   private:
     std::string m_nodename;
     std::string m_formatfile;
     RfNodeInfo* m_info;
+    static NSMcontext* g_context;
     //    RFServerBase* m_server;
 
     // Wrappers to be called from NSM

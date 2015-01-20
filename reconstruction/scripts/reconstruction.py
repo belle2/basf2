@@ -112,7 +112,7 @@ def add_posttracking_reconstruction(path, components=None):
         path.add_module(mdstPID)
 
 
-def add_tracking_reconstruction(path, components=None):
+def add_tracking_reconstruction(path, components=None, pruneTracks=1):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -188,10 +188,11 @@ def add_tracking_reconstruction(path, components=None):
     path.add_module(dEdxPID)
 
     # prune genfit tracks
-    path.add_module(PruneGenfitTracks())
+    if pruneTracks:
+        path.add_module(PruneGenfitTracks())
 
 
-def add_mc_tracking_reconstruction(path, components=None):
+def add_mc_tracking_reconstruction(path, components=None, pruneTracks=1):
     """
     This function adds the standard reconstruction modules for MC tracking
     to a path.
@@ -242,29 +243,30 @@ def add_mc_tracking_reconstruction(path, components=None):
     path.add_module(dEdxPID)
 
     # prune genfit tracks
-    path.add_module(PruneGenfitTracks())
+    if pruneTracks:
+        path.add_module(PruneGenfitTracks())
 
 
-def add_reconstruction(path, components=None):
+def add_reconstruction(path, components=None, pruneTracks=1):
     """
     This function adds the standard reconstruction modules to a path.
     """
 
     # tracking
-    add_tracking_reconstruction(path, components)
+    add_tracking_reconstruction(path, components, pruneTracks)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)
 
 
-def add_mc_reconstruction(path, components=None):
+def add_mc_reconstruction(path, components=None, pruneTracks=1):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
     """
 
     # tracking
-    add_mc_tracking_reconstruction(path, components)
+    add_mc_tracking_reconstruction(path, components, pruneTracks)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)

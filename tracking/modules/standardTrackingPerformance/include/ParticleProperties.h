@@ -29,6 +29,9 @@ namespace Belle2 {
     double y; /** < measured y value of position */
     double z; /** < measured z value of position */
 
+    int nPXDhits;  /** Number of PXD hits in reconstructed track  */
+    int nSVDhits;  /** Number of SVD hits in reconstructed track  */
+    int nCDChits;  /** Number of CDC hits in reconstructed track  */
 
     double mass_gen; /**< generated mass */
     double px_gen; /**< generated momentum in x direction */
@@ -52,6 +55,10 @@ namespace Belle2 {
       x = value;
       y = value;
       z = value;
+
+      nPXDhits = (int)value;
+      nSVDhits = (int)value;
+      nCDChits = (int)value;
 
       mass_gen = value;
       px_gen = value;

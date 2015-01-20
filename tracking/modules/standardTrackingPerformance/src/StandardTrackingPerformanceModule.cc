@@ -17,11 +17,16 @@
 #include <framework/datastore/RelationVector.h>
 
 #include <genfit/FieldManager.h>
+#include <genfit/Track.h>
+#include <genfit/TrackPoint.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 
-#include <genfit/Track.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <root/TFile.h>
 #include <root/TTree.h>
@@ -139,6 +144,25 @@ void StandardTrackingPerformanceModule::event()
           m_trackProperties.y = fitResult->getPosition().Y();
           m_trackProperties.z = fitResult->getPosition().Z();
 
+          // Count hits
+          m_trackProperties.nPXDhits = 0;
+          m_trackProperties.nSVDhits = 0;
+          m_trackProperties.nCDChits = 0;
+          for (size_t iTP = 0; iTP < gfTrack->getNumPointsWithMeasurement(); ++iTP) {
+            const genfit::TrackPoint* tp = gfTrack->getPointWithMeasurement(iTP);
+            for (genfit::AbsMeasurement * m : tp->getRawMeasurements()) {
+              if (dynamic_cast<PXDRecoHit*>(m))
+                ++m_trackProperties.nPXDhits;
+              else if (dynamic_cast<SVDRecoHit*>(m))
+                ++m_trackProperties.nSVDhits;
+              else if (dynamic_cast<SVDRecoHit2D*>(m))
+                m_trackProperties.nSVDhits += 2;
+              else if (dynamic_cast<CDCRecoHit*>(m))
+                ++m_trackProperties.nCDChits;
+              else
+                B2ERROR("Unknown AbsMeasurement in track.");
+            }
+          }
           m_pValue = fitResult->getPValue();
         }
       }
@@ -239,6 +263,10 @@ void StandardTrackingPerformanceModule::setupTree()
   addVariableToTree("mass_gen", m_trackProperties.mass_gen);
 
   addVariableToTree("pValue", m_pValue);
+
+  addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
+  addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
+  addVariableToTree("nCDChits", m_trackProperties.nCDChits);
 }
 
 const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResult(
@@ -372,9 +400,16 @@ void StandardTrackingPerformanceModule::setVariablesToDefaultValue()
   m_pValue = -999;
 }
 
-void StandardTrackingPerformanceModule::addVariableToTree(std::string varName, double& varReference)
+void StandardTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)
 {
   std::stringstream leaf;
   leaf << varName << "/D";
+  m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
+}
+
+void StandardTrackingPerformanceModule::addVariableToTree(const std::string& varName, int& varReference)
+{
+  std::stringstream leaf;
+  leaf << varName << "/I";
   m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
 }

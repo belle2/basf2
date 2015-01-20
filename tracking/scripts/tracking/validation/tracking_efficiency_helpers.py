@@ -44,6 +44,7 @@ def get_generated_pt_value(index):
 
     # pt_values = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0]
     pt_values = [
+        0.05,
         0.1,
         0.25,
         0.4,
@@ -76,6 +77,7 @@ def get_generated_pt_values():
     list = []
     for index in xrange(get_generated_pt_value(-1)):
         list.append(get_generated_pt_value(index))
+
     return list
 
 
@@ -85,8 +87,16 @@ def run_simulation(path, pt_value, output_filename):
     # components which are used for the simulation and reconstruction
     # In order to avoid, that tracks came back in the cdc after they have left
     # TOP is added in the simulation
-    components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD'
-                  , 'CDC']
+    components = [
+        'MagneticFieldConstant4LimitedRCDC',
+        'BeamPipe',
+        'PXD',
+        'SVD',
+        'CDC',
+        'HeavyMetalShield',
+        'VXDService',
+        'Cryostat',
+        ]
 
     # evt meta
     eventinfosetter = register_module('EventInfoSetter')

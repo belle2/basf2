@@ -123,7 +123,8 @@ namespace Belle2 {
     /** write root tree to output file and close the file */
     void writeData();
 
-    void addVariableToTree(std::string varName, double& varReference);
+    void addVariableToTree(const std::string& varName, double& varReference);
+    void addVariableToTree(const std::string& varName, int& varReference);
 
 
     std::string m_outputFileName; /**< name of output root file */

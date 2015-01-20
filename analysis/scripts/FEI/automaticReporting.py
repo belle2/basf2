@@ -996,7 +996,7 @@ def createCPUTimeTexFile(channelNames, inputLists, channelPlaceholders, mcCounts
     sum_trueCandidates = 0
     sum_allCandidates = 0
     statTable = []
-    moduleTypes = ('ParticleSelector', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatching', 'TMVAExpert', 'Other')
+    moduleTypes = ('ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatching', 'TMVAExpert', 'Other')
     for name, plist, currentPlaceholders in zip(channelNames, inputLists, channelPlaceholders):
         if plist is None:
             continue

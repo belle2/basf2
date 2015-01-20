@@ -54,7 +54,7 @@ add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', 'ECLClusterOutput_500mev.root')
+ecldataanalysis.param('rootFileName', '../ECLClusterOutput_500mev.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 

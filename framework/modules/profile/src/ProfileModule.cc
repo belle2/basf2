@@ -43,10 +43,12 @@ void ProfileModule::initialize()
   StoreObjPtr<ProfileInfo> profileInfoPtr;
   StoreObjPtr<ProfileInfo> profileInfoStartPtr("ProfileInfo_Start", DataStore::c_Persistent);
   StoreObjPtr<ProfileInfo> profileInfoEndPtr("ProfileInfo_End", DataStore::c_Persistent);
+  StoreObjPtr<TH1D> profileHistogram("MemoryProfile", DataStore::c_Persistent);
   // Register the profile info objects in the data store
   profileInfoPtr.registerInDataStore();
   profileInfoStartPtr.registerInDataStore();
   profileInfoEndPtr.registerInDataStore();
+  profileHistogram.registerInDataStore();
 
   // Store and print profile info at initialization
   profileInfoStartPtr.create();
@@ -108,15 +110,16 @@ void ProfileModule::terminate()
     B2INFO("Execution time per event [ms]   : " << 1000 * (m_endInfo.time - m_startInfo.time) / (m_nEvents - k_burnIn));
   }
 
-  // Create and save a plot of the memory usage
+  // Create and save a plot of the memory usage vs. time
+  int nPoints = m_nEvents / m_step;
+  double factorMB = 1. / 1024;
   if (!m_outputFileName.empty()) {
     TDirectory* saveDir = gDirectory;
     gROOT->cd();
     TCanvas* can = new TCanvas();
-    int nPoints = m_nEvents / m_step;
     TGraph* graph = new TGraph(nPoints);
     for (int i = 0; i < nPoints; i++) {
-      graph->SetPoint(i, m_eventInfo[i].time, (double)m_eventInfo[i].mem / 1024);
+      graph->SetPoint(i, m_eventInfo[i].time, m_eventInfo[i].mem * factorMB);
     }
     graph->SetMarkerStyle(kMultiply);
     graph->Draw("ALP");
@@ -126,5 +129,16 @@ void ProfileModule::terminate()
     histo->GetXaxis()->SetTitle("Time [s]");
     can->Print(m_outputFileName.c_str());
     saveDir->cd();
+  }
+
+  // Create a histogram of the memory usage vs. number of events and add it to the DataStore
+  StoreObjPtr<TH1D> profileHistogram("MemoryProfile", DataStore::c_Persistent);
+  profileHistogram.construct("MemoryProfile", "Memory usage",  nPoints + 1, 0 - 0.5 * m_step, m_nEvents + 0.5 * m_step);
+  profileHistogram->SetStats(0);
+  profileHistogram->GetYaxis()->SetTitle("Memory Usage [MB]");
+  profileHistogram->GetXaxis()->SetTitle("Event");
+  profileHistogram->SetBinContent(1, m_initializeInfo.mem * factorMB);
+  for (int i = 0; i < nPoints; i++) {
+    profileHistogram->SetBinContent(i + 2, m_eventInfo[i].mem * factorMB);
   }
 }

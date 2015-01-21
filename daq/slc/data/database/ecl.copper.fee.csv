@@ -35,19 +35,4 @@
    CPR5017,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
    CPR5018,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
    CPR5018,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
-   CPR6001,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
-   CPR6001,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
-   CPR6002,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
-   CPR6002,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
-   CPR6003,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
-   CPR6003,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
-   CPR6004,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
-   CPR6004,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
-   CPR6005,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
-   CPR6005,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
-   CPR6006,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
-   CPR6006,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
-   CPR6007,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
-   CPR6007,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
-   CPR6008,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:a
-   CPR6008,ECL:Collector:default,0,ECL, b2l_ecl.bit,ECL:Collector:default, ECL:Collector:default:b
+   CPR9001,ECL:Trigger:default,0,ECL, ,ECL:Trigger:default, ECL:Trigger:default:a

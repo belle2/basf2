@@ -19,11 +19,4 @@
    ECL02, default,  CPR5016,  CPR5016_STATUS,  ronode_status,4
    ECL02, default,  CPR5017,  CPR5017_STATUS,  ronode_status,4
    ECL02, default,  CPR5018,  CPR5018_STATUS,  ronode_status,4
-   ECL02, default,  CPR6001,  CPR6001_STATUS,  ronode_status,4
-   ECL02, default,  CPR6002,  CPR6002_STATUS,  ronode_status,4
-   ECL02, default,  CPR6003,  CPR6003_STATUS,  ronode_status,4
-   ECL02, default,  CPR6004,  CPR6004_STATUS,  ronode_status,4
-   ECL02, default,  CPR6005,  CPR6005_STATUS,  ronode_status,4
-   ECL02, default,  CPR6006,  CPR6006_STATUS,  ronode_status,4
-   ECL02, default,  CPR6007,  CPR6007_STATUS,  ronode_status,4
-   ECL02, default,  CPR6008,  CPR6008_STATUS,  ronode_status,4
+   ECL02, default,  CPR9001,  CPR9001_STATUS,  ronode_status,4

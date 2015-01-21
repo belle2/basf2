@@ -233,3 +233,4 @@ nodename,         config,   paramname, address, size
   CPR5018,ECL:Collector:default, CALIB_DELAY_STEP_LOW, 0x46,1
   CPR5018,ECL:Collector:default, CALIB_DELAY_STEP_HIGH, 0x47,1
   CPR5018,ECL:Collector:default, CALIB_EVENTS_PER_STEP, 0x48,1
+  CPR9001,ECL:Trigger:default, TEMP, 0x0,1

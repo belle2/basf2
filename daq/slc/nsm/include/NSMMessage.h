@@ -79,6 +79,7 @@ namespace Belle2 {
     void setParam(int i, unsigned int v) throw();
     void setData(int len, const char* data)  throw();
     void setData(const std::string& text)  throw();
+    //void setData(const Serializable& obj) throw(IOException);
 
   public:
     virtual void readObject(Reader&) throw(IOException);
@@ -97,6 +98,7 @@ namespace Belle2 {
     Buffer m_data;
     mutable std::string m_nodename;
     mutable std::string m_reqname;
+    bool m_hasobj;
 
   };
 

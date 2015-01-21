@@ -24,6 +24,7 @@ void NSMMessage::init() throw()
 {
   m_nsmc = NULL;
   memset(&m_nsm_msg, 0, sizeof(NSMmsg));
+  m_hasobj = false;
 }
 
 NSMMessage::NSMMessage() throw()
@@ -56,6 +57,20 @@ NSMMessage::NSMMessage(const NSMNode& node,
   memcpy(m_nsm_msg.pars, pars, sizeof(int) * npar);
 }
 
+/*
+NSMMessage::NSMMessage(const NSMNode& node,
+                       const NSMCommand& cmd,
+                       int par, const Serializable& obj) throw()
+{
+  init();
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
+  m_nsm_msg.npar = 1;
+  m_nsm_msg.pars[0] = par;
+  setData(obj);
+}
+*/
+
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
                        int par, const std::string& obj) throw()
@@ -67,6 +82,18 @@ NSMMessage::NSMMessage(const NSMNode& node,
   m_nsm_msg.pars[0] = par;
   setData(obj);
 }
+
+/*
+NSMMessage::NSMMessage(const NSMNode& node,
+                       const NSMCommand& cmd,
+                       const Serializable& obj) throw()
+{
+  init();
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
+  setData(obj);
+}
+*/
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
@@ -98,6 +125,7 @@ const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
   m_nsm_msg.len = msg.m_nsm_msg.len;
   m_nodename = msg.m_nodename;
   m_reqname = msg.m_reqname;
+  m_hasobj = msg.m_hasobj;
   return *this;
 }
 
@@ -239,6 +267,27 @@ void NSMMessage::setParam(int i, unsigned int v) throw()
   m_nsm_msg.pars[i] = v;
 }
 
+void NSMMessage::getData(Serializable& obj) const throw(IOException)
+{
+  BufferedReader reader(getLength(), (unsigned char*)m_data.ptr());
+  reader.readObject(obj);
+}
+
+/*
+void NSMMessage::setData(const Serializable& obj) throw(IOException)
+{
+  StreamSizeCounter counter;
+  counter.writeObject(obj);
+  m_data = Buffer(counter.count());
+  m_nsm_msg.len = counter.count();
+  if (counter.count() > 0) {
+    BufferedWriter writer(counter.count(), (unsigned char*)m_data.ptr());
+    writer.writeObject(obj);
+    m_hasobj = true;
+  }
+}
+*/
+
 void NSMMessage::setData(int len, const char* data)  throw()
 {
   m_nsm_msg.len = len;
@@ -246,6 +295,7 @@ void NSMMessage::setData(int len, const char* data)  throw()
     m_data = Buffer(len);
     memcpy(m_data.ptr(), data, len);
   }
+  m_hasobj = false;
 }
 
 void NSMMessage::setData(const std::string& text)  throw()
@@ -333,8 +383,20 @@ void NSMMessage::writeObject(Writer& writer) const throw(IOException)
   for (int i = 0; i < getNParams(); i++) {
     writer.writeInt(getParam(i));
   }
-  writer.writeInt(getLength());
+  if (m_hasobj) {
+    writer.writeInt(-1);
+  } else {
+    writer.writeInt(getLength());
+  }
+  printf("length = %d\n", getLength());
   if (getLength() > 0) {
+    /*
+    char* buf = (char*)m_data.ptr();
+    for (int i = 0; i < getLength(); i++) {
+      printf("%.1x", buf[i]);
+    }
+    printf("\n");
+    */
     writer.write(m_data.ptr(), getLength());
   }
 }

@@ -123,6 +123,7 @@ void NSM2SocketCallback::timeout() throw()
         msg.setNodeName(data.getName());
         msg.setRequestName(NSMCommand::NSMSET);
         data.update();
+        //msg.setData(data);
         m_bridge->sendMessage(msg, data);
       }
     } catch (const NSMHandlerException& e) {

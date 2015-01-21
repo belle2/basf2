@@ -60,8 +60,25 @@ bool NSM2SocketBridge::sendMessage(const NSMMessage& msg,
   } catch (const IOException& e) {
     LogFile::warning("Connection failed for writing");
     m_socket.close();
+    m_mutex.unlock();
   }
-  m_mutex.unlock();
+  return false;
+}
+
+bool NSM2SocketBridge::sendMessage(const NSMMessage& msg,
+                                   const Serializable& obj) throw()
+{
+  m_mutex.lock();
+  try {
+    m_writer.writeObject(msg);
+    m_writer.writeObject(obj);
+    m_mutex.unlock();
+    return true;
+  } catch (const IOException& e) {
+    LogFile::warning("Connection failed for writing");
+    m_socket.close();
+    m_mutex.unlock();
+  }
   return false;
 }
 
@@ -104,6 +121,7 @@ bool NSM2SocketBridge::recieveMessage(NSMMessage& msg) throw()
 
 void NSM2SocketBridge::run() throw()
 {
+  //PThread(new Sender(this));
   sleep(5);
   while (true) {
     NSMMessage msg_out(m_callback->getNode());
@@ -126,11 +144,12 @@ void NSM2SocketBridge::run() throw()
         ConfigObject obj = ConfigObjectTable(m_db).get(configname, nodename);
         msg_out.setNodeName(nodename);
         msg_out.setRequestName(NSMCommand::DBSET);
+        //msg_out.setData(obj);
         sendMessage(msg_out, obj);
         ConfigObjectTable(m_db).get(configname, nodename);
       } catch (const DBHandlerException& e) {
-        LogFile::error(e.what());
-        sendError(ERRORNo::DATABASE, nodename, "Failed to read DB");
+        //LogFile::error(e.what());
+        //sendError(ERRORNo::DATABASE, nodename, "Failed to read DB");
       }
       m_db->close();
     } else if (cmd == NSMCommand::DBSET) {
@@ -142,8 +161,8 @@ void NSM2SocketBridge::run() throw()
           ConfigObjectTable(m_db).addAll(obj, true);
         }
       } catch (const DBHandlerException& e) {
-        LogFile::error(e.what());
-        sendError(ERRORNo::DATABASE, obj.getNode(), "Failed to write DB");
+        //LogFile::error(e.what());
+        //sendError(ERRORNo::DATABASE, obj.getNode(), "Failed to write DB");
       }
       m_db->close();
     } else if (cmd == NSMCommand::LISTGET) {
@@ -165,8 +184,8 @@ void NSM2SocketBridge::run() throw()
         sendMessage(msg_out);
       } catch (const DBHandlerException& e) {
         m_db->close();
-        LogFile::error(e.what());
-        sendError(ERRORNo::DATABASE, nodename, "Failed to read DB list");
+        //LogFile::error(e.what());
+        //sendError(ERRORNo::DATABASE, nodename, "Failed to read DB list");
       }
     } else if (cmd == NSMCommand::NSMGET) {
       StringList argv = StringUtil::split(msg.getData(), ' ', 2);
@@ -176,6 +195,7 @@ void NSM2SocketBridge::run() throw()
         if (data.isAvailable()) {
           msg_out.setNodeName(data.getName());
           msg_out.setRequestName(NSMCommand::NSMSET);
+          //msg_out.setData(data);
           sendMessage(msg_out, data);
         }
       } catch (const NSMHandlerException& e) {
@@ -197,3 +217,21 @@ void NSM2SocketBridge::run() throw()
   }
 }
 
+void NSM2SocketBridge::Sender::run() throw()
+{
+  while (true) {
+    m_bridge->m_mutex.lock();
+    while (m_bridge->m_msg_l.empty()) {
+      m_bridge->m_cond.wait(m_bridge->m_mutex);
+    }
+    NSMMessage msg = m_bridge->m_msg_l.front();
+    m_bridge->m_msg_l.pop_front();
+    m_bridge->m_mutex.unlock();
+    try {
+      m_bridge->m_writer.writeObject(msg);
+    } catch (const IOException& e) {
+      LogFile::warning("Connection failed for writing");
+      m_bridge->m_socket.close();
+    }
+  }
+}

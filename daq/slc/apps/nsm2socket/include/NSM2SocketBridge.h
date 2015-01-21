@@ -11,6 +11,7 @@
 #include <daq/slc/system/TCPSocketWriter.h>
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Mutex.h>
+#include <daq/slc/system/Cond.h>
 
 #include <daq/slc/base/ERRORNo.h>
 
@@ -46,6 +47,23 @@ namespace Belle2 {
     TCPSocketWriter m_writer;
     TCPSocketReader m_reader;
     Mutex m_mutex;
+    Cond m_cond;
+    std::list<NSMMessage> m_msg_l;
+
+    friend class Sender;
+  private:
+    class Sender {
+    public:
+      Sender(NSM2SocketBridge* bridge)
+        : m_bridge(bridge) {}
+
+    public:
+      void run() throw();
+
+    private:
+      NSM2SocketBridge* m_bridge;
+
+    };
 
   };
 

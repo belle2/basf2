@@ -272,6 +272,24 @@ namespace Belle2 {
         }
       }
 
+      // Now lets create forward and backward endmounts for the ribs
+      BOOST_FOREACH(const GearDir & endmount, params.getNodes("Endmount")) {
+        double height = endmount.getLength("height") / Unit::mm / 2.0;
+        double width = endmount.getLength("width") / Unit::mm / 2.0;
+        double length = endmount.getLength("length") / Unit::mm / 2.0;
+        double zpos = endmount.getLength("z") / Unit::mm;
+        double rpos = endmount.getLength("r") / Unit::mm;
+        G4VSolid* endmountBox = new G4Box("endmountBox", height, width, length);
+        if (outer) { // holes for the ribs
+          endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(-spacing)*placement * G4Translate3D(-rpos, 0, -zpos));
+          endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(spacing)*placement * G4Translate3D(-rpos, 0, -zpos));
+        }
+        G4LogicalVolume* endmountVolume = new G4LogicalVolume(
+          endmountBox, geometry::Materials::get(support.getString("SupportRibs/endmount/Material")),
+          (boost::format("%1%.Layer%2%.%3%Endmount") % m_prefix % layer % endmount.getString("@name")).str());
+        supportAssembly.add(endmountVolume, G4Translate3D(rpos, 0, zpos));
+      }
+
       // If there has been at least one Box, create the volumes and add them to the assembly
       if (inner) {
         outer = new G4SubtractionSolid("outerBox", outer, inner);

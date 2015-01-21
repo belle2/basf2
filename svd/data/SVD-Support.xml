@@ -115,7 +115,7 @@
 		<!-- length in z direction of the endrings -->
 		<length unit="mm"> 15.000</length>
 		<!-- thickness of the base ring on the carbon cone -->
-		<baseThickness unit="mm">2.000</baseThickness>
+		<baseThickness unit="mm">6.000</baseThickness>
 		<Layer id="4">
 			<Endring name="Forward">
 				<!-- z position of the endring -->
@@ -123,9 +123,9 @@
 				<!-- inner radius of the base -->
 				<baseRadius unit="mm">  35.600</baseRadius>
 				<!-- inner radius of the endring -->
-				<innerRadius unit="mm"> 45.000</innerRadius>
+				<innerRadius unit="mm"> 40.000</innerRadius>
 				<!-- outer radius of the endring -->
-				<outerRadius unit="mm"> 52.000</outerRadius>
+				<outerRadius unit="mm"> 49.000</outerRadius>
 				<!-- width of the horizontal bar between endring and base -->
 				<horizontalBar unit="mm">3.000</horizontalBar>
 				<!-- width of the vertical bar between endring and base -->
@@ -134,7 +134,7 @@
 			<Endring name="Backward">
 				<z unit="mm">         -206.500</z>
 				<baseRadius unit="mm">  40.100</baseRadius>
-				<innerRadius unit="mm"> 59.500</innerRadius>
+				<innerRadius unit="mm"> 50.500</innerRadius>
 				<outerRadius unit="mm"> 65.500</outerRadius>
 				<horizontalBar unit="mm">2.000</horizontalBar>
 				<verticalBar unit="mm">  3.000</verticalBar>
@@ -144,36 +144,36 @@
 			<Endring name="Forward">
 				<z unit="mm">          318.000</z>
 				<baseRadius unit="mm">  44.600</baseRadius>
-				<innerRadius unit="mm"> 60.000</innerRadius>
+				<innerRadius unit="mm"> 58.000</innerRadius>
 				<outerRadius unit="mm"> 67.500</outerRadius>
-				<horizontalBar unit="mm">2.000</horizontalBar>
-				<verticalBar unit="mm">  8.300</verticalBar>
+				<horizontalBar unit="mm">6.000</horizontalBar>
+				<verticalBar unit="mm">  6.000</verticalBar>
 			</Endring>
 			<Endring name="Backward">
 				<z unit="mm">         -252.500</z>
 				<baseRadius unit="mm">  53.100</baseRadius>
-				<innerRadius unit="mm"> 85.000</innerRadius>
+				<innerRadius unit="mm"> 80.000</innerRadius>
 				<outerRadius unit="mm"> 90.500</outerRadius>
-				<horizontalBar unit="mm">5.000</horizontalBar>
-				<verticalBar unit="mm">  5.000</verticalBar>
+				<horizontalBar unit="mm">6.000</horizontalBar>
+				<verticalBar unit="mm">  6.000</verticalBar>
 			</Endring>
 		</Layer>
 		<Layer id="6">
 			<Endring name="Forward">
 				<z unit="mm">          387.500</z>
 				<baseRadius unit="mm">  61.100</baseRadius>
-				<innerRadius unit="mm"> 77.000</innerRadius>
+				<innerRadius unit="mm"> 76.000</innerRadius>
 				<outerRadius unit="mm"> 86.000</outerRadius>
-				<horizontalBar unit="mm">2.000</horizontalBar>
-				<verticalBar unit="mm">  8.300</verticalBar>
+				<horizontalBar unit="mm">6.000</horizontalBar>
+				<verticalBar unit="mm">  6.000</verticalBar>
 			</Endring>
 			<Endring name="Backward">
 				<z unit="mm">         -305.500</z>
 				<baseRadius unit="mm">  69.100</baseRadius>
-				<innerRadius unit="mm">115.000</innerRadius>
+				<innerRadius unit="mm">111.000</innerRadius>
 				<outerRadius unit="mm">120.800</outerRadius>
-				<horizontalBar unit="mm">4.000</horizontalBar>
-				<verticalBar unit="mm">  5.000</verticalBar>
+				<horizontalBar unit="mm">6.000</horizontalBar>
+				<verticalBar unit="mm">  6.000</verticalBar>
 			</Endring>
 		</Layer>
 	</Endrings>
@@ -197,7 +197,25 @@
 			<!-- total outer width, inner part will be placed centered around this -->
 			<width unit="mm">3.280</width>
 		</outer>
+		<!-- parametres for the support of the ribs -->
+		<endmount>
+			<Material>Fe</Material>
+		</endmount>
 		<Layer id="3">
+			<Endmount name="Forward">
+				<height unit="mm">6.000</height>
+				<width unit="mm">15.000</width>
+				<length unit="mm">73.000</length>
+				<z unit="mm">194.500</z>
+				<r unit="mm">0.800</r>
+			</Endmount>
+			<Endmount name="Backward">
+				<height unit="mm">8.000</height>
+				<width unit="mm">15.000</width>
+				<length unit="mm">100.000</length>
+				<z unit="mm">-148.000</z>
+				<r unit="mm">4.000</r>
+			</Endmount>
 			<!-- spacing is different for layer 3 -->
 			<spacing unit="mm">8.000</spacing>
 			<!-- height is different for layer 3 -->
@@ -242,6 +260,20 @@
 			</tab>
 		</Layer>
 		<Layer id="4">
+			<Endmount name="Forward">
+				<height unit="mm">11.000</height>
+				<width unit="mm">24.000</width>
+				<length unit="mm">27.000</length>
+				<z unit="mm">232.500</z>
+				<r unit="mm">-25.000</r>
+			</Endmount>
+			<Endmount name="Backward">
+				<height unit="mm">10.000</height>
+				<width unit="mm">29.000</width>
+				<length unit="mm">46.000</length>
+				<z unit="mm">-198.500</z>
+				<r unit="mm">-8.000</r>
+			</Endmount>
 			<box>
 				<length unit="mm">268.000</length>
 				<z unit="mm">-47.260</z>
@@ -322,6 +354,20 @@
 			</tab>
 		</Layer>
 		<Layer id="5">
+			<Endmount name="Forward">
+				<height unit="mm">11.000</height>
+				<width unit="mm">24.000</width>
+				<length unit="mm">23.000</length>
+				<z unit="mm">317.000</z>
+				<r unit="mm">-31.000</r>
+			</Endmount>
+			<Endmount name="Backward">
+				<height unit="mm">10.000</height>
+				<width unit="mm">29.000</width>
+				<length unit="mm">41.000</length>
+				<z unit="mm">-235.000</z>
+				<r unit="mm">-8.500</r>
+			</Endmount>
 			<box>
 				<length unit="mm">393.000</length>
 				<z unit="mm">-24.000</z>
@@ -447,6 +493,20 @@
 			</tab>
 		</Layer>
 		<Layer id="6">
+			<Endmount name="Forward">
+				<height unit="mm">11.000</height>
+				<width unit="mm">26.000</width>
+				<length unit="mm">23.000</length>
+				<z unit="mm">385.000</z>
+				<r unit="mm">-43.400</r>
+			</Endmount>
+			<Endmount name="Backward">
+				<height unit="mm">10.000</height>
+				<width unit="mm">29.000</width>
+				<length unit="mm">41.000</length>
+				<z unit="mm">-293.000</z>
+				<r unit="mm">-9.000</r>
+			</Endmount>
 			<box>
 				<length unit="mm">519.500</length>
 				<z unit="mm">-15.750</z>

@@ -18,16 +18,16 @@ def get_logger():
 # Default settings and shorthand names for generator with specific settings #
 #############################################################################
 
-## PDG code of an electorn
+# PDG code of an electorn
 electron_pdg_code = 11
 
-## PDG code of a muon
+# PDG code of a muon
 muon_pdg_code = 13
 
-## PDG code of a tau
+# PDG code of a tau
 tau_pdg_code = 15
 
-## Generator module names hashed by shorthand menomics. Includes None as a special value for background only simulation
+# Generator module names hashed by shorthand menomics. Includes None as a special value for background only simulation
 generator_module_names_by_short_name = {
     'gun': 'ParticleGun',
     'simple_gun': 'ParticleGun',
@@ -36,14 +36,14 @@ generator_module_names_by_short_name = {
     'bkg': None,
     }
 
-## Names of module names and short names of the generators usable in this script.
+# Names of module names and short names of the generators usable in this script.
 valid_generator_names = list(generator_module_names_by_short_name.keys()) \
     + list(generator_module_names_by_short_name.values())
 
 # Strip of the None value
 valid_generator_names.remove(None)
 
-## Default parameters of the generator modules hashed by their respective module name
+# Default parameters of the generator modules hashed by their respective module name
 default_generator_params_by_generator_name = {
     'simple_gun': {
         'pdgCodes': [muon_pdg_code, -muon_pdg_code],
@@ -101,16 +101,16 @@ class ReadOrGenerateEventsRun(object):
     def name(self):
         return self.__class__.__name__
 
-    def create_argument_parser(self, **kwds):
+    def create_argument_parser(self, allow_input, **kwds):
         # Argument parser that gives a help full message on error,
         # which includes the options that are valid.
         argument_parser = tracking.utilities.DefaultHelpArgumentParser(**kwds)
 
-        argument_parser.add_argument('-i', '--input',
-                                     default=self.root_input_file,
-                                     dest='root_input_file',
-                                     help='File path to the ROOT file from which the simulated events shall be loaded.'
-                                     )
+        if allow_input:
+            argument_parser.add_argument('-i', '--input',
+                    default=self.root_input_file, dest='root_input_file',
+                    help='File path to the ROOT file from which the simulated events shall be loaded.'
+                    )
 
         argument_parser.add_argument(
             '-g',
@@ -261,11 +261,11 @@ def is_bkg_file(bkg_file_path):
 
 def get_bkg_file_paths(bkg_dir_or_file_paths):
     """Unpacks the content of a single or a list of directories and/or files filtering for files containing background mixins.
-    
+
     Parameters
     ----------
     bkg_dir_or_file_paths : string or iterable of strings
-        Single file or single directory in which background files are located or a list of files and/or directories. 
+        Single file or single directory in which background files are located or a list of files and/or directories.
 
     Returns
     -------
@@ -331,10 +331,10 @@ def get_generator_module_name(generator_name):
 
 def update_default_generator_params(generator_name, additional_params):
     """Takes to default parameters of the generator module and returns a copy updated with the explicitly given additional parameters.
-    
+
     Parameters
     ----------
-    generator_name : string 
+    generator_name : string
         Name or short name of a generator module
     additional_params : dict
         Parameters that shall overwrite the defaults
@@ -377,7 +377,8 @@ def get_generator_module(generator_module_or_generator_name):
 def main():
     readOrGenerateEventsRun = ReadOrGenerateEventsRun()
 
-    argument_parser = readOrGenerateEventsRun.create_argument_parser()
+    argument_parser = \
+        readOrGenerateEventsRun.create_argument_parser(allow_input=False)
 
     argument_parser.add_argument('root_output_file',
                                  help='Output file to which the simulated events shall be written.'

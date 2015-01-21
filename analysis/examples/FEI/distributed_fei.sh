@@ -6,15 +6,21 @@
 
 
 function create_play {
-  echo "Recreate directories"
+  if [ "$collectionDirectory" = "$collectionDirectoryReal" ]
+  then
+    echo "Error: \$collectionDirectory and \$collectionDirectoryReal must be different, please check your configuration!"
+    return 1
+  fi
+
+  echo "Recreating directories..."
   rm -rf "$persistentDirectory"
-  mkdir -p "$persistentDirectory"
+  rm -rf "$jobDirectory"
   rm -rf "$collectionDirectory"
   rm -rf "$collectionDirectoryReal"
+  mkdir -p "$persistentDirectory"
+  mkdir -p "$jobDirectory"
   mkdir -p "$collectionDirectory"
   mkdir -p "$collectionDirectoryReal"
-  rm -rf "$jobDirectory"
-  mkdir -p "$jobDirectory"
 
   echo "Create persistent job files"
   for i in $(seq "$nJobs")
@@ -25,7 +31,6 @@ function create_play {
     local count=0
     for mcFile in ${allMcFiles[@]}
     do
-        #echo "test: $mcFile"
       count=$((count + 1))
       if [ $((count % nJobs)) -eq $((i-1)) ]
       then
@@ -36,6 +41,7 @@ function create_play {
     mkdir -p  "$persistentDirectory"/"$i"
     cd "$persistentDirectory"/"$i"
     #hadd basf2_input.root "${mcFiles[@]}"
+    #copying data is slow, just create symlinks
     for mcFile in ${mcFiles[@]}
     do
         basename=`basename "$mcFile"`
@@ -77,13 +83,11 @@ function create_ntuples_with_finished_training {
     echo -n "time basf2 -l warning --execute-path basf2_path.pickle " > basf2_script.sh
     echo -n "-i $persistentDirectory/$i/rawinput_\*.root " >> basf2_script.sh
     echo -n "-o $persistentDirectory/$i/basf2_output.root " >> basf2_script.sh
-    #echo -n " &> /home/belle/pulver/joboutput/${i}_my_output_hack.log " >> basf2_script.sh
     echo -n " &> my_output_hack.log " >> basf2_script.sh
     echo -n "&& touch basf2_finished_successfully" >> basf2_script.sh
     chmod +x basf2_script.sh
     cd - > /dev/null
   done
-    
 }
 
 function run_basf2 {
@@ -139,8 +143,7 @@ function submit_jobs {
     echo "submitting $i"
     cd "$jobDirectory"/"$i"
     #qsub -cwd -q express,short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
-    #bsub -q s -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid
-    bsub -q s -e /home/belle/pulver/joboutput -o /home/belle/pulver/joboutput ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid
+    bsub -q s -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid
     cd - > /dev/null
   done
 }
@@ -179,7 +182,6 @@ function merge_root_files {
 }
 
 function update_input_files {
-  
   for i in $(seq "$nJobs")
   do
     cd "$persistentDirectory"/"$i"
@@ -187,32 +189,31 @@ function update_input_files {
     command mv basf2_output.root basf2_input.root
     cd - > /dev/null
   done
-
 }
 
 function clean_jobDirectory {
-  
   find $jobDirectory -maxdepth 2 -type l -delete
   find $jobDirectory -maxdepth 2 -name basf2_finished_successfully -delete
   find $jobDirectory -maxdepth 2 -name error.log -delete
   find $jobDirectory -maxdepth 2 -name output.log -delete
   find $jobDirectory -maxdepth 2 -name my_output_hack.log -delete
   find $jobDirectory -maxdepth 2 -name *.root -delete
-  
 }
 
 function next_act {
-  
+  echo "Running actors locally..."
   run_basf2 || return 1
-  echo "Finished basf2 here -- wait 3 seconds"
+  echo "Finished running actors locally -- wait 3 seconds"
   sleep 3
   setup_jobDirectory
+  echo "Starting job submission..."
   submit_jobs
   wait_for_jobs || return 1
-  echo "Finished basf2 cluster -- wait 3 seconds"
+  echo "All cluster jobs finished -- wait 3 seconds"
   sleep 3
+  echo "Merging files..."
   merge_root_files || return 1
   update_input_files
+  echo "Cleaning up..."
   clean_jobDirectory
-
 }

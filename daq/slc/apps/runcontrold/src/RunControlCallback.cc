@@ -590,6 +590,7 @@ void RunControlCallback::timeout() throw()
       continue;
     }
     if (!state.isStable() && count % 2 == 0) {
+      //if (state == Enum::UNKNOWN/*!state.isStable() */&& count % 2 == 0) {
       try {
         LogFile::debug("STATECHECK >> %s", node.getName().c_str());
         com.sendRequest(NSMMessage(node, RCCommand::STATECHECK));

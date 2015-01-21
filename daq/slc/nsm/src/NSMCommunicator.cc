@@ -377,12 +377,16 @@ void NSMCommunicator::readContext(NSMcontext* nsmc) throw()
 
 void NSMCommunicator::callContext() throw(NSMHandlerException)
 {
+#if NSM_PACKAGE_VERSION >= 1914
   char buf[NSM_TCPMSGSIZ];
   NSMcontext* nsmc = m_nsmc;
   if (nsmlib_recv(nsmc, (NSMtcphead*)buf, 1000) < 0) {
     throw (NSMHandlerException("Failed to read NSM context"));
   }
   nsmlib_call(nsmc, (NSMtcphead*)buf);
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
 }
 
 void NSMCommunicator::setContext(NSMcontext* nsmc) throw(NSMHandlerException)

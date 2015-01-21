@@ -267,27 +267,6 @@ void NSMMessage::setParam(int i, unsigned int v) throw()
   m_nsm_msg.pars[i] = v;
 }
 
-void NSMMessage::getData(Serializable& obj) const throw(IOException)
-{
-  BufferedReader reader(getLength(), (unsigned char*)m_data.ptr());
-  reader.readObject(obj);
-}
-
-/*
-void NSMMessage::setData(const Serializable& obj) throw(IOException)
-{
-  StreamSizeCounter counter;
-  counter.writeObject(obj);
-  m_data = Buffer(counter.count());
-  m_nsm_msg.len = counter.count();
-  if (counter.count() > 0) {
-    BufferedWriter writer(counter.count(), (unsigned char*)m_data.ptr());
-    writer.writeObject(obj);
-    m_hasobj = true;
-  }
-}
-*/
-
 void NSMMessage::setData(int len, const char* data)  throw()
 {
   m_nsm_msg.len = len;
@@ -388,15 +367,7 @@ void NSMMessage::writeObject(Writer& writer) const throw(IOException)
   } else {
     writer.writeInt(getLength());
   }
-  printf("length = %d\n", getLength());
   if (getLength() > 0) {
-    /*
-    char* buf = (char*)m_data.ptr();
-    for (int i = 0; i < getLength(); i++) {
-      printf("%.1x", buf[i]);
-    }
-    printf("\n");
-    */
     writer.write(m_data.ptr(), getLength());
   }
 }

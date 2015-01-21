@@ -65,23 +65,6 @@ bool NSM2SocketBridge::sendMessage(const NSMMessage& msg,
   return false;
 }
 
-bool NSM2SocketBridge::sendMessage(const NSMMessage& msg,
-                                   const Serializable& obj) throw()
-{
-  m_mutex.lock();
-  try {
-    m_writer.writeObject(msg);
-    m_writer.writeObject(obj);
-    m_mutex.unlock();
-    return true;
-  } catch (const IOException& e) {
-    LogFile::warning("Connection failed for writing");
-    m_socket.close();
-    m_mutex.unlock();
-  }
-  return false;
-}
-
 bool NSM2SocketBridge::sendLog(const DAQLogMessage& log) throw()
 {
   NSMMessage msg(m_callback->getNode());

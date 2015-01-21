@@ -124,7 +124,7 @@ public class PowerSupplyMainPaneController implements Initializable, NSMObserver
                 commandButtonController.clearStack();
             }
         } else if (command.equals(NSMCommand.DBSET)) {
-            cobj = NSMListenerService.getDB(msg.getNodeName());
+            ConfigObject cobj = (ConfigObject)msg.getObject();
             if (cobj.getId() > 0 && sent_listrequest) {
                 sent_listrequest = false;
                 networkconfigController.add(cobj);

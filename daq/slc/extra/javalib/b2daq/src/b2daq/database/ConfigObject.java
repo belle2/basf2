@@ -22,57 +22,79 @@ public class ConfigObject extends DBObject {
 
     @Override
     public void readObject(Reader reader) throws IOException {
-        reset();
-        setId(reader.readInt());
-        setName(reader.readString());
-        setNode(reader.readString());
-        setTable(reader.readString());
-        setRevision(reader.readInt());
-        int npar = reader.readInt();
-        for (int i = 0; i < npar; i++) {
-            String name = reader.readString();
-            int type = reader.readInt();
-            switch (type) {
-                case FieldInfo.BOOL:
-                    addBool(name, reader.readBoolean());
-                    break;
-                case FieldInfo.CHAR:
-                    addChar(name, reader.readChar());
-                    break;
-                case FieldInfo.SHORT:
-                    addShort(name, reader.readShort());
-                    break;
-                case FieldInfo.INT:
-                    addInt(name, reader.readInt());
-                    break;
-                case FieldInfo.LONG:
-                    addLong(name, reader.readLong());
-                    break;
-                case FieldInfo.FLOAT:
-                    addFloat(name, reader.readFloat());
-                    break;
-                case FieldInfo.DOUBLE:
-                    addDouble(name, reader.readDouble());
-                    break;
-                case FieldInfo.TEXT:
-                    addText(name, reader.readString());
-                    break;
-                case FieldInfo.OBJECT: {
-                    ArrayList<ConfigObject> obj_v = new ArrayList<>();
-                    int nobj = reader.readInt();
-                    for (int n = 0; n < nobj; n++) {
-                        ConfigObject obj = new ConfigObject();
-                        obj.readObject(reader);
-                        obj.setIndex(n);
-                        obj_v.add(obj);
+        int npar = 0;
+        int i_tmp = 0;
+        try {
+            reset();
+            setId(reader.readInt());
+            setName(reader.readString());
+            setNode(reader.readString());
+            setTable(reader.readString());
+            setRevision(reader.readInt());
+            npar = reader.readInt();
+            i_tmp = 0;
+            for (int i = 0; i < npar; i++) {
+                i_tmp = i;
+                String name = reader.readString();
+                int type = reader.readInt();
+                System.out.println("param = " + getName() + " '" + name + "' " + type);
+                switch (type) {
+                    case FieldInfo.BOOL:
+                        addBool(name, reader.readBoolean());
+                        break;
+                    case FieldInfo.CHAR:
+                        addChar(name, reader.readChar());
+                        break;
+                    case FieldInfo.SHORT:
+                        addShort(name, reader.readShort());
+                        break;
+                    case FieldInfo.INT:
+                        addInt(name, reader.readInt());
+                        break;
+                    case FieldInfo.LONG:
+                        addLong(name, reader.readLong());
+                        break;
+                    case FieldInfo.FLOAT:
+                        addFloat(name, reader.readFloat());
+                        break;
+                    case FieldInfo.DOUBLE:
+                        addDouble(name, reader.readDouble());
+                        break;
+                    case FieldInfo.TEXT:
+                        String value = reader.readString();
+                        addText(name, value);
+                        System.out.println("text = " + name + " '" + value + "'");
+                        break;
+                    case FieldInfo.OBJECT: {
+                        ArrayList<ConfigObject> obj_v = new ArrayList<>();
+                        int nobj = reader.readInt();
+                        try {
+                            for (int n = 0; n < nobj; n++) {
+                                ConfigObject obj = new ConfigObject();
+                                obj.readObject(reader);
+                                obj.setIndex(n);
+                                obj_v.add(obj);
+                            }
+                        } catch (IOException e) {
+                            System.err.println(getName() + " " + nobj);
+                        }
+                        addObjects(name, obj_v);
                     }
-                    addObjects(name, obj_v);
-                }
-                ;
-                break;
-                default:
+                    ;
                     break;
+                    default:
+                        break;
+                }
             }
+        } catch (IOException e) {
+            System.err.println(getId());
+            System.err.println(getName());
+            System.err.println(getNode());
+            System.err.println(getTable());
+            System.err.println(getRevision());
+            System.err.println(npar);
+            System.err.println(i_tmp);
+            throw(e);
         }
     }
 
@@ -151,10 +173,10 @@ public class ConfigObject extends DBObject {
         FieldInfo.Property pro = new FieldInfo.Property(type, 0, 0);
         int size = pro.getTypeSize();
         /*
-        if (size <= 0) {
-            return;
-        }
-                */
+         if (size <= 0) {
+         return;
+         }
+         */
         if (!hasField(name)) {
             add(name, pro);
         }
@@ -183,7 +205,7 @@ public class ConfigObject extends DBObject {
         if (!hasText(name)) {
             return "";
         }
-        return (String)m_value_m.get(name);
+        return (String) m_value_m.get(name);
     }
 
     public ArrayList<ConfigObject> getObjects(String name) {

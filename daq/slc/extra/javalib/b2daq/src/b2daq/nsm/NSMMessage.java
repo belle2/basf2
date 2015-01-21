@@ -5,6 +5,9 @@ import java.io.IOException;
 import b2daq.core.Reader;
 import b2daq.core.Serializable;
 import b2daq.core.Writer;
+import b2daq.database.ConfigObject;
+import b2daq.io.DataReader;
+import b2daq.io.DataWriter;
 import b2daq.runcontrol.core.RCCommand;
 
 public final class NSMMessage implements Serializable {
@@ -13,6 +16,7 @@ public final class NSMMessage implements Serializable {
     private String _nodename = "";
     private int[] _pars = new int[0];
     private String _data = "";
+    private Serializable _obj = null;
 
     public NSMMessage() {
 
@@ -104,7 +108,11 @@ public final class NSMMessage implements Serializable {
     }
 
     public String getData() {
-        return _data.replace("\0", "");
+        return _data;
+    }
+
+    public Serializable getObject() {
+        return _obj;
     }
 
     public void setNParams(int npar) {
@@ -125,6 +133,10 @@ public final class NSMMessage implements Serializable {
         _data = data;
     }
 
+    public void setData(Serializable data) {
+        _obj = data;
+    }
+
     @Override
     public void readObject(Reader reader) throws IOException {
         setReqName(reader.readString());
@@ -138,11 +150,22 @@ public final class NSMMessage implements Serializable {
         if (length > 0) {
             StringBuilder buf = new StringBuilder();
             for (int i = 0; i < length; i++) {
-                buf.append(reader.readChar());
+                buf.append((char) reader.readChar());
             }
-            _data = buf.toString().replace("\0", "");
+            _data = buf.toString();
+            System.out.println("reqest = '" + getReqName() + "' " + _data);
+        } else if (getReqName().matches("DBSET")) {
+            System.out.println(getReqName());
+            _obj = new ConfigObject();
+            reader.readObject(_obj);
+            ((ConfigObject) _obj).print();
+        } else if (getReqName().matches("NSMSET")) {
+            _obj = new NSMData();
+            reader.readObject(_obj);
+            //((NSMData)_obj).print();
         } else {
             _data = "";
+            _obj = null;
         }
     }
 
@@ -155,11 +178,14 @@ public final class NSMMessage implements Serializable {
             writer.writeInt(_pars[i]);
         }
         if (_data != null) {
-            writer.writeInt(_data.length()+1);
-            for (char c : _data.toCharArray()) {
-                writer.writeChar(c);
+            writer.writeInt(_data.length() + 1);
+            for (byte b : _data.getBytes()) {
+                writer.writeChar((char) b);
             }
             writer.writeChar('\0');
+        } else if (_obj != null) {
+            writer.writeInt(-1);
+            writer.writeObject(_obj);
         } else {
             writer.writeInt(0);
         }

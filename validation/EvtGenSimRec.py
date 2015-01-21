@@ -44,7 +44,13 @@ output = register_module('RootOutput')
 output.param('outputFileName', '../EvtGenSimRec.root')
 main.add_module(output)
 
+# memory profile
+main.add_module(register_module('Profile'))
+
 process(main)
 
 # Print call statistics
 print statistics
+
+from validation import statistics_plots
+statistics_plots('EvtGenSimRec_statistics.root')

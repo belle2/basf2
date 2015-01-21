@@ -28,8 +28,6 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-#include <boost/regex.hpp>
-#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace Belle2 {
@@ -51,6 +49,12 @@ namespace Belle2 {
         B2WARNING("Wrong number of arguments for meta function extraInfo")
         return nullptr;
       }
+    }
+
+    Manager::FunctionPtr extraInfo_deprecated(const std::vector<std::string>& arguments)
+    {
+      B2WARNING("Variable getExtraInfo() is deprecated, please use extraInfo() instead.");
+      return extraInfo(arguments);
     }
 
     Manager::FunctionPtr isInRegion(const std::vector<std::string>& arguments)
@@ -753,7 +757,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf, "Returns product of a variable over all daughters.");
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf, "Returns sum of a variable over all daughters.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo, "Returns extra info stored under the given name.");
-    REGISTER_VARIABLE("getExtraInfo(name)", extraInfo, "Deprecated, use extraInfo(name) instead.");
+    REGISTER_VARIABLE("getExtraInfo(name)", extraInfo_deprecated, "Deprecated, use extraInfo(name) instead.");
     REGISTER_VARIABLE("abs(variable)", abs, "Returns absolute value of the given variable.");
     REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing, "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");

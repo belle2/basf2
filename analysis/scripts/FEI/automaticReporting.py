@@ -614,7 +614,6 @@ def addHyphenations(someString):
         ':': r':\allowbreak ',
         '(': r'(\allowbreak ',
         'extraInfo': r'ex\-tra\-In\-fo',
-        'getExtraInfo': r'get\-Ex\-tra\-In\-fo',
         'SignalProbability': r'Sig\-nal\-Prob\-a\-bil\-i\-ty',
         'cosAngleBetweenMomentumAndVertexVector': r'cosAngle\-Between\-Momentum\-And\-Vertex\-Vector'}
     for key, value in substitutes.iteritems():

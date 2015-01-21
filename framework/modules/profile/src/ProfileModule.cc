@@ -134,6 +134,7 @@ void ProfileModule::terminate()
   // Create a histogram of the memory usage vs. number of events and add it to the DataStore
   StoreObjPtr<TH1D> profileHistogram("MemoryProfile", DataStore::c_Persistent);
   profileHistogram.construct("MemoryProfile", "Memory usage",  nPoints + 1, 0 - 0.5 * m_step, m_nEvents + 0.5 * m_step);
+  profileHistogram->SetDirectory(0);
   profileHistogram->SetStats(0);
   profileHistogram->GetYaxis()->SetTitle("Memory Usage [MB]");
   profileHistogram->GetXaxis()->SetTitle("Event");

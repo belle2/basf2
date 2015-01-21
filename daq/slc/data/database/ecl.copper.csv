@@ -17,15 +17,7 @@
   CPR5016, default,  cpr5016, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33003
   CPR5017, default,  cpr5017, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33004
   CPR5018, default,  cpr5018, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33005
-  CPR6001, default,  cpr6001, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33006
-  CPR6002, default,  cpr6002, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33007
-  CPR6003, default,  cpr6003, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33008
-  CPR6004, default,  cpr6004, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33009
-  CPR6005, default,  cpr6005, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33010
-  CPR6006, default,  cpr6006, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33011
-  CPR6007, default,  cpr6007, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33012
-  CPR6008, default,  cpr6008, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33013
-  CPR9001, default,  cpr9001, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33014
+  CPR9001, default,  cpr9001, ECL:V01:rck022,   true,  true,  false,  false,100, ECL:Trigger:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33006
   CPR5001,debug:dummycpu,  cpr5001, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33001
   CPR5002,debug:dummycpu,  cpr5002, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33002
   CPR5003,debug:dummycpu,  cpr5003, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33003
@@ -44,15 +36,7 @@
   CPR5016,debug:dummycpu,  cpr5016, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33003
   CPR5017,debug:dummycpu,  cpr5017, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33004
   CPR5018,debug:dummycpu,  cpr5018, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33005
-  CPR6001,debug:dummycpu,  cpr6001, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33006
-  CPR6002,debug:dummycpu,  cpr6002, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33007
-  CPR6003,debug:dummycpu,  cpr6003, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33008
-  CPR6004,debug:dummycpu,  cpr6004, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33009
-  CPR6005,debug:dummycpu,  cpr6005, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33010
-  CPR6006,debug:dummycpu,  cpr6006, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33011
-  CPR6007,debug:dummycpu,  cpr6007, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33012
-  CPR6008,debug:dummycpu,  cpr6008, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33013
-  CPR9001,debug:dummycpu,  cpr9001, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Trigger:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33014
+  CPR9001,debug:dummycpu,  cpr9001, ECL:V01:dummycpu,   true,  true,  false,  false,100, ECL:Trigger:default,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33006
   CPR5001,debug:dumhslb:020:rand4k,  cpr5001, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33001
   CPR5002,debug:dumhslb:020:rand4k,  cpr5002, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33002
   CPR5003,debug:dumhslb:020:rand4k,  cpr5003, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33003
@@ -71,15 +55,7 @@
   CPR5016,debug:dumhslb:020:rand4k,  cpr5016, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33003
   CPR5017,debug:dumhslb:020:rand4k,  cpr5017, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33004
   CPR5018,debug:dumhslb:020:rand4k,  cpr5018, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33005
-  CPR6001,debug:dumhslb:020:rand4k,  cpr6001, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33006
-  CPR6002,debug:dumhslb:020:rand4k,  cpr6002, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33007
-  CPR6003,debug:dumhslb:020:rand4k,  cpr6003, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33008
-  CPR6004,debug:dumhslb:020:rand4k,  cpr6004, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33009
-  CPR6005,debug:dumhslb:020:rand4k,  cpr6005, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33010
-  CPR6006,debug:dumhslb:020:rand4k,  cpr6006, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33011
-  CPR6007,debug:dumhslb:020:rand4k,  cpr6007, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33012
-  CPR6008,debug:dumhslb:020:rand4k,  cpr6008, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33013
-  CPR9001,debug:dumhslb:020:rand4k,  cpr6008, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Trigger:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33014
+  CPR9001,debug:dumhslb:020:rand4k,  cpr6008, ECL:V01:dumhslb:020:rand4k,   true,  true,  false,  false,100, ECL:Trigger:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33006
   CPR5001,debug:yamadahslb:10kHz,  cpr5001,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33001
   CPR5002,debug:yamadahslb:10kHz,  cpr5002,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33002
   CPR5003,debug:yamadahslb:10kHz,  cpr5003,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33003
@@ -98,12 +74,4 @@
   CPR5016,debug:yamadahslb:10kHz,  cpr5016,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33003
   CPR5017,debug:yamadahslb:10kHz,  cpr5017,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33004
   CPR5018,debug:yamadahslb:10kHz,  cpr5018,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33005
-  CPR6001,debug:yamadahslb:10kHz,  cpr6001,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33006
-  CPR6002,debug:yamadahslb:10kHz,  cpr6002,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33007
-  CPR6003,debug:yamadahslb:10kHz,  cpr6003,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33008
-  CPR6004,debug:yamadahslb:10kHz,  cpr6004,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33009
-  CPR6005,debug:yamadahslb:10kHz,  cpr6005,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33010
-  CPR6006,debug:yamadahslb:10kHz,  cpr6006,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33011
-  CPR6007,debug:yamadahslb:10kHz,  cpr6007,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33012
-  CPR6008,debug:yamadahslb:10kHz,  cpr6008,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Collector:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33013
-  CPR9001,debug:yamadahslb:10kHz,  cpr9001,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Trigger:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33014
+  CPR9001,debug:yamadahslb:10kHz,  cpr9001,ECL:V01:yamadahslb:10kHz,   true,  true,  false,  false,100, ECL:Trigger:default,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33006

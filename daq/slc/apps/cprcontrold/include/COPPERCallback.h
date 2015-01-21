@@ -48,6 +48,7 @@ namespace Belle2 {
     bool m_dummymode;
     bool m_force_boothslb;
     std::string m_hslb_firm;
+    bool m_err;
 
   };
 

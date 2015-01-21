@@ -43,7 +43,7 @@ bool ECLFEEController::load(HSLBController& hslb,
   std::ifstream fin("/home/usr/b2daq/belle2/release/daq/slc/data/database/eclcollector.txt");
   std::string name;
   unsigned int adr, val;
-  while (fin >> name, adr, val) {
+  while (fin >> name >> adr >> val) {
     LogFile::debug("write val=%x to adr=%x (%s)", val, adr, name.c_str());
     hslb.writefee(adr, val);
     /*

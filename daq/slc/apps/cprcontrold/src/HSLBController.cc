@@ -80,62 +80,35 @@ bool HSLBController::boot(const std::string& runtype,
                           const std::string& firmware) throw()
 {
   if (m_hslb.fd <= 0) return true;
-  if (firmware.size() > 0) {
-    if (File::exist(firmware)) {
-      if (!bootfpga(firmware)) {
-        m_errmsg = StringUtil::form("Failed to boot HSLB %c (firmware=%s)",
-                                    (char)('a' + m_hslb.fin),
-                                    firmware.c_str());
-        LogFile::error(m_errmsg);
-        return false;
-      }
-      /*
-      std::string cmd = StringUtil::form("booths -%c %s", (char)('a' + m_hslb.fin),
-      firmware.c_str());
-      LogFile::debug(cmd);
-      system(cmd.c_str());
-      */
-      //std::string FEE("FEE");
-      int ntry = 0;
-      while (!checkfee()) {
-        writefn(0x82, 0x1000);
-        writefn(0x82, 0x10);
-        /*
-          cmd = StringUtil::form("reghs -%c checkfee", (char)('a' + m_hslb.fin));
-          LogFile::debug(cmd);
-          std::string ret = perform(cmd);
-          LogFile::debug(ret);
-          if (ret.compare(0, FEE.size(), FEE) == 0) break;
-          cmd = StringUtil::form("reghs -%c 82 1000", (char)('a' + m_hslb.fin));
-          LogFile::debug(cmd);
-          system(cmd.c_str());
-          cmd = StringUtil::form("reghs -%c 82 10", (char)('a' + m_hslb.fin));
-          LogFile::debug(cmd);
-          system(cmd.c_str());
-        */
-        ntry++;
-        if (ntry > 50) {
-          m_errmsg = StringUtil::form("Can not establish b2link at HSLB %c",
-                                      (char)('a' + m_hslb.fin));
-          LogFile::error(m_errmsg);
-          return false;
-        }
-        usleep(10);
-      }
-    } else {
-      m_errmsg = StringUtil::form("No file exists : %s", firmware.c_str());
+  int ntry = 0;
+  /*
+  if (!bootfpga(firmware)) {
+      m_errmsg = StringUtil::form("Failed to boot HSLB %c",
+          (char)('a' + m_hslb.fin));
+      LogFile::error(m_errmsg);
+  }
+  */
+  while (!checkfee()) {
+    writefn32(0x82, 0x1000);
+    usleep(100);
+    writefn32(0x82, 0x10);
+    ntry++;
+    if (ntry > 100) {
+      m_errmsg = StringUtil::form("Can not establish b2link at HSLB %c",
+                                  (char)('a' + m_hslb.fin));
       LogFile::error(m_errmsg);
       return false;
     }
-    if (runtype.find("dumhslb") != std::string::npos) {
-      StringList str_v = StringUtil::split(runtype, ':');
-      const std::string datfile = StringUtil::form("/home/usr/b2daq/run/dumhslb/%s.dat",
-                                                   str_v[str_v.size() - 1].c_str());
-      std::string cmd = StringUtil::form("write-dumhslb -%c %s", (char)('a' + m_hslb.fin),
-                                         datfile.c_str());
-      LogFile::debug(cmd);
-      system(cmd.c_str());
-    }
+    usleep(100);
+  }
+  if (runtype.find("dumhslb") != std::string::npos) {
+    StringList str_v = StringUtil::split(runtype, ':');
+    const std::string datfile = StringUtil::form("/home/usr/b2daq/run/dumhslb/%s.dat",
+                                                 str_v[str_v.size() - 1].c_str());
+    std::string cmd = StringUtil::form("write-dumhslb -%c %s", (char)('a' + m_hslb.fin),
+                                       datfile.c_str());
+    LogFile::debug(cmd);
+    system(cmd.c_str());
   }
   return true;
 }

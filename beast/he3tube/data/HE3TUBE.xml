@@ -21,7 +21,7 @@ whitespace, comma or semi-colon -->
 <MaterialGas>HE3TUBE-Material</MaterialGas>
 <x_he3tube unit="cm">57.62000</x_he3tube>
 <y_he3tube unit="cm">-4.38000</y_he3tube>
-<z_he3tube unit="cm">40.00000</z_he3tube>
+<z_he3tube unit="cm">-40.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
@@ -38,7 +38,7 @@ whitespace, comma or semi-colon -->
 <MaterialGas>HE3TUBE-Material</MaterialGas>
 <x_he3tube unit="cm">-57.62000</x_he3tube>
 <y_he3tube unit="cm">-4.38000</y_he3tube>
-<z_he3tube unit="cm">40.00000</z_he3tube>
+<z_he3tube unit="cm">-40.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
@@ -55,7 +55,7 @@ whitespace, comma or semi-colon -->
 <MaterialGas>HE3TUBE-Material</MaterialGas>
 <x_he3tube unit="cm">-4.38000</x_he3tube>
 <y_he3tube unit="cm">42.62000</y_he3tube>
-<z_he3tube unit="cm">40.00000</z_he3tube>
+<z_he3tube unit="cm">-40.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
@@ -72,7 +72,7 @@ whitespace, comma or semi-colon -->
 <MaterialGas>HE3TUBE-Material</MaterialGas>
 <x_he3tube unit="cm">-4.38000</x_he3tube>
 <y_he3tube unit="cm">-42.62000</y_he3tube>
-<z_he3tube unit="cm">40.00000</z_he3tube>
+<z_he3tube unit="cm">-40.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>

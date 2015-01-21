@@ -15,856 +15,425 @@
          whitespace, comma or semi-colon -->
     <bar unit="mm">1 2 3 4 5 6 7 8 9 10 11 12
     </bar>
-    <!-- 1-1 -->
+    <!-- 0-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">0.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">-10.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
    </Active>
-   <!-- 2-2-->
+   <!-- 1-2 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">0.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">-10.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
    </Active>
-   <!-- 3-3 -->
+   <!-- 2-3 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">0.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">-10.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
    </Active>
-   <!-- 4-4 -->
+   <!-- 3-4 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">0.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">-10.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
    </Active>
-   <!-- 5-1 -->
+   <!-- 4-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">2.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 6-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">2.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 7-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">2.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 8-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">2.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 9-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-2.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 10-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-2.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 11-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">-2.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 12-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">-2.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 13-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">4.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 14-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">4.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 15-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">4.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 16-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">4.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 17-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-4.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 18-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-4.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 19-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">-4.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 20-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">-4.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 21-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">6.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 22-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">6.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 23-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">6.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 24-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">6.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 25-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-6.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 26-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-6.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 27-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">-6.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 28-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">-6.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 29-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
       <z_pindiode unit="cm">-8.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
    </Active>
-   <!-- 30-2 -->
+   <!-- 5-2 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
       <z_pindiode unit="cm">-8.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
    </Active>
-   <!-- 31-3 -->
+   <!-- 6-3 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
       <z_pindiode unit="cm">-8.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
    </Active>
-   <!-- 32-4 -->
+   <!-- 7-4 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
       <z_pindiode unit="cm">-8.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
    </Active>
-   <!-- 33-1 -->
+   <!-- 8-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
+      <z_pindiode unit="cm">-6.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+   </Active>
+   <!-- 9-2 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-6.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
+   </Active>
+   <!-- 10-3 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-6.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
+   </Active>
+   <!-- 11-4 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-6.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+   </Active>
+   <!-- 12-1 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-4.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+   </Active>
+   <!-- 13-2 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-4.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
+   </Active>
+   <!-- 14-3 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-4.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
+   </Active>
+   <!-- 15-4 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-4.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+   </Active>
+   <!-- 16-1 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-2.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+   </Active>
+   <!-- 17-2 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-2.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
+   </Active>
+   <!-- 18-3 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-2.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
+   </Active>
+   <!-- 19-4 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-2.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+   </Active>
+   <!-- 20-1 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">0.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+   </Active>
+   <!-- 21-2 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">0.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
+   </Active>
+   <!-- 22-3 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">0.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
+   </Active>
+   <!-- 23-4 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">0.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+   </Active>
+
+    <!-- 24-1 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">10.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+   </Active>
+   <!-- 25-2 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">10.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
+   </Active>
+   <!-- 26-3 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">10.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
+   </Active>
+   <!-- 27-4 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">10.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+   </Active>
+   <!-- 28-1 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">8.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
    </Active>
-   <!-- 34-2 -->
+   <!-- 29-2 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
       <z_pindiode unit="cm">8.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
+   </Active>
+   <!-- 30-3 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">8.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
+   </Active>
+   <!-- 31-4 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">8.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+   </Active>
+   <!-- 32-1 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">6.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+   </Active>
+   <!-- 33-2 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">6.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
    </Active>
    <!-- 34-3 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">8.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">6.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
    </Active>
    <!-- 35-4 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">8.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">6.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
    </Active>
    <!-- 36-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-10.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">4.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
    </Active>
    <!-- 37-2 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-10.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">4.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
    </Active>
    <!-- 38-3 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">-10.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">4.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
    </Active>
    <!-- 39-4 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">-10.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">4.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
    </Active>
    <!-- 40-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">10.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">2.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
    </Active>
    <!-- 41-2 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">10.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">2.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
    </Active>
    <!-- 42-3 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">10.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">2.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
    </Active>
    <!-- 43-4 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">10.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">2.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
    </Active>
+
+
    <!-- 44-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-12.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">-100.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
    </Active>
    <!-- 45-2 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-12.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">-100.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
    </Active>
    <!-- 46-3 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">-12.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">-100.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
    </Active>
    <!-- 47-4 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">-12.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">-100.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
    </Active>
    <!-- 48-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">12.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">166.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
    </Active>
    <!-- 49-2 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-4.8</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">12.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <z_pindiode unit="cm">166.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
    </Active>
    <!-- 50-3 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">4.8</y_pindiode>
-      <z_pindiode unit="cm">12.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">166.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
    </Active>
    <!-- 51-4 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-4.8</y_pindiode>
-      <z_pindiode unit="cm">12.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <z_pindiode unit="cm">166.0</z_pindiode>
+      <r_pindiode unit="cm">4.8</r_pindiode>
+      <ThetaZ unit="deg">180.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
    </Active>
-   <!-- 52-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">30</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">120.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 53-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-30</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">120.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 54-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">30</y_pindiode>
-      <z_pindiode unit="cm">120.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 55-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-30</y_pindiode>
-      <z_pindiode unit="cm">120.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 56-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">30</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-120.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 57-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-30</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-120.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 58-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">30</y_pindiode>
-      <z_pindiode unit="cm">-120.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 59-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-30</y_pindiode>
-      <z_pindiode unit="cm">-120.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 60-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">30</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">200.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 61-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-30</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">200.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 62-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">30</y_pindiode>
-      <z_pindiode unit="cm">200.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 63-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-30</y_pindiode>
-      <z_pindiode unit="cm">200.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 64-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">30</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-200.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 65-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-30</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-200.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-90.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   <!-- 66-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">30</y_pindiode>
-      <z_pindiode unit="cm">-200.0</z_pindiode>
-      <AngleX unit="deg">-90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   <!-- 67-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-30</y_pindiode>
-      <z_pindiode unit="cm">-200.0</z_pindiode>
-      <AngleX unit="deg">90.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-
-<!--
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">6.2</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">5.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-6.2</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">5.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-
-
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">6.2</y_pindiode>
-      <z_pindiode unit="cm">5.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">-90.0</AngleZ>
-   </Active>
-
-
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-6.2</y_pindiode>
-      <z_pindiode unit="cm">5.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">-90.0</AngleZ>
-   </Active>
-
-
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">6.2</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-5.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">-6.2</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">-5.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-
-
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">6.2</y_pindiode>
-      <z_pindiode unit="cm">-5.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">-90.0</AngleZ>
-   </Active>
-
-
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
-      <y_pindiode unit="cm">-6.2</y_pindiode>
-      <z_pindiode unit="cm">-5.0</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">-90.0</AngleZ>
-   </Active>
- -->
-<!--
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="mm">2.65</x_pindiode>
-      <y_pindiode unit="mm">2.65</y_pindiode>
-      <z_pindiode unit="mm">0.25</z_pindiode>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">-11.5</AngleY>
-      <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-
-   <Active>
-     <Material>PINDIODE-Material</Material>
-     <x_pindiode unit="cm">0.0</x_pindiode>
-     <y_pindiode unit="cm">7.5</y_pindiode>
-     <z_pindiode unit="cm">36.8637</z_pindiode>
-     <AngleX unit="deg">11.5</AngleX>
-     <AngleY unit="deg">0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   
-   <Active>
-     <Material>PINDIODE-Material</Material>
-     <x_pindiode unit="cm">-7.5</x_pindiode>
-     <y_pindiode unit="cm">0.0</y_pindiode>
-     <z_pindiode unit="cm">36.8637</z_pindiode>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">11.5</AngleY>
-     <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   
-   <Active>
-     <Material>PINDIODE-Material</Material>
-     <x_pindiode unit="cm">0.0</x_pindiode>
-     <y_pindiode unit="cm">-7.5</y_pindiode>
-     <z_pindiode unit="cm">36.8637</z_pindiode>
-     <AngleX unit="deg">-11.5</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-
-   <Active>
-     <Material>PINDIODE-Material</Material>
-     <x_pindiode unit="cm">7.5</x_pindiode>
-     <y_pindiode unit="cm">0.0</y_pindiode>
-     <z_pindiode unit="cm">-20.6061</z_pindiode>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">-160.0</AngleY>
-     <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-
-   <Active>
-     <Material>PINDIODE-Material</Material>
-     <x_pindiode unit="cm">0.0</x_pindiode>
-     <y_pindiode unit="cm">7.5</y_pindiode>
-     <z_pindiode unit="cm">-20.6061</z_pindiode>
-     <AngleX unit="deg">160.0</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-   
-   
-   <Active>
-     <Material>PINDIODE-Material</Material>
-     <x_pindiode unit="cm">-7.5</x_pindiode>
-     <y_pindiode unit="cm">0.0</y_pindiode>
-     <z_pindiode unit="cm">-20.6061</z_pindiode>
-     <AngleX unit="deg">0.0</AngleX>
-     <AngleY unit="deg">160.0</AngleY>
-     <AngleZ unit="deg">90.0</AngleZ>
-   </Active>
-   
-   <Active>
-     <Material>PINDIODE-Material</Material>
-     <x_pindiode unit="cm">0.0</x_pindiode>
-     <y_pindiode unit="cm">-7.5</y_pindiode>
-     <z_pindiode unit="cm">-20.6061</z_pindiode>
-     <AngleX unit="deg">-160.0</AngleX>
-     <AngleY unit="deg">0.0</AngleY>
-     <AngleZ unit="deg">0.0</AngleZ>
-   </Active>
-
--->
 
   </Content>
 </DetectorComponent>

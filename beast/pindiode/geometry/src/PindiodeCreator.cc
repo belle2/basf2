@@ -37,6 +37,10 @@
 #include <G4RegionStore.hh>
 #include "G4Tubs.hh"
 
+//Visualization
+#include "G4Colour.hh"
+#include <G4VisAttributes.hh>
+
 using namespace std;
 using namespace boost;
 
@@ -102,36 +106,59 @@ namespace Belle2 {
         G4LogicalVolume* l_PINDIODE2 = new G4LogicalVolume(s_PINDIODE2, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_PINDIODE2", 0, m_sensitive);
         G4LogicalVolume* l_layer = new G4LogicalVolume(s_layer,  geometry::Materials::get("G4_Au"), "l_layer");
 
+        G4VisAttributes* red = new G4VisAttributes(G4Colour(1, 0, 0));
+        red->SetForceAuxEdgeVisible(true);
+        l_layer->SetVisAttributes(red);
+        G4VisAttributes* blue = new G4VisAttributes(G4Colour(1, 1, 1));
+        blue->SetForceAuxEdgeVisible(true);
+        l_PINDIODE1->SetVisAttributes(blue);
+        l_PINDIODE2->SetVisAttributes(blue);
+
         //Lets limit the Geant4 stepsize inside the volume
         l_PINDIODE1->SetUserLimits(new G4UserLimits(stepSize));
         l_PINDIODE2->SetUserLimits(new G4UserLimits(stepSize));
+        /*
+              //position pindiode assembly
+              G4ThreeVector PINDIODEpos = G4ThreeVector(
+                                            activeParams.getLength("x_pindiode") * CLHEP::cm,
+                                            activeParams.getLength("y_pindiode") * CLHEP::cm,
+                                            activeParams.getLength("z_pindiode") * CLHEP::cm
+                                          );
+              //pindiode 1 position
+              G4ThreeVector PINDIODEpos1 = G4ThreeVector(2. * dx_diode, 0, 0);
+              //pindiode 1 gold layer position
+              G4ThreeVector Layerpos = G4ThreeVector(2. * dx_diode, 0, dz_diode + dz_layer);
+              //pindiode 2 position
+              G4ThreeVector PINDIODEpos2 = G4ThreeVector(-2. * dx_diode, 0, 0);
+        */
 
-        //position pindiode assembly
-        G4ThreeVector PINDIODEpos = G4ThreeVector(
-                                      activeParams.getLength("x_pindiode") * CLHEP::cm,
-                                      activeParams.getLength("y_pindiode") * CLHEP::cm,
-                                      activeParams.getLength("z_pindiode") * CLHEP::cm
-                                    );
-        //pindiode 1 position
-        G4ThreeVector PINDIODEpos1 = G4ThreeVector(2.*  dx_diode, 0, 0);
-        //pindiode gold layer 1 position
-        G4ThreeVector Layerpos = G4ThreeVector(2. * dx_diode, 0, dz_diode + dz_layer);
-        //pindiode 2 position
-        G4ThreeVector PINDIODEpos2 = G4ThreeVector(-2. * dx_diode, 0, 0);
+        //G4RotationMatrix* rot_pindiode = new G4RotationMatrix();
+        //rot_pindiode->rotateX(activeParams.getAngle("AngleX"));
+        //rot_pindiode->rotateY(activeParams.getAngle("AngleY"));
+        //rot_pindiode->rotateZ(activeParams.getAngle("AngleZ"));
+        double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
+        double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
+        double phi = activeParams.getAngle("Phi");
+        double thetaZ = activeParams.getAngle("ThetaZ");
+        G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
+        // * G4RotateY3D(-M_PI / 2 - thetaX) * G4RotateZ3D(-M_PI / 2 - thetaY);
+        new G4PVPlacement(transform, l_Box, "p_Box", &topVolume, false, 1);
+        transform = G4RotateZ3D(phi) * G4Translate3D(2. * dx_diode, r, z + dz_diode + dz_layer) * G4RotateX3D(-M_PI / 2 - thetaZ);
+        // * G4RotateY3D(-M_PI / 2 - thetaX)  * G4RotateZ3D(-M_PI / 2 - thetaY);
+        new G4PVPlacement(transform, l_layer, "p_layer", &topVolume, false, 1);
+        transform = G4RotateZ3D(phi) * G4Translate3D(2. * dx_diode, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
+        // * G4RotateY3D(-M_PI / 2 - thetaX)  * G4RotateZ3D(-M_PI / 2 - thetaY);
+        new G4PVPlacement(transform, l_PINDIODE1, "p_PINDIODE1", &topVolume, false, detID * 2);
+        transform = G4RotateZ3D(phi) * G4Translate3D(-2. * dx_diode, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
+        // * G4RotateY3D(-M_PI / 2 - thetaX)  * G4RotateZ3D(-M_PI / 2 - thetaY);
+        new G4PVPlacement(transform, l_PINDIODE2, "p_PINDIODE2", &topVolume, false, detID * 2 + 1);
 
-
-        G4RotationMatrix* rot_pindiode = new G4RotationMatrix();
-        rot_pindiode->rotateX(activeParams.getAngle("AngleX"));
-        rot_pindiode->rotateY(activeParams.getAngle("AngleY"));
-        rot_pindiode->rotateZ(activeParams.getAngle("AngleZ"));
-        //geometry::setColor(*l_PINDIODE, "#006699");
-
-
-        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_Box, "p_Box", &topVolume, false, 1);
-        new G4PVPlacement(rot_pindiode, PINDIODEpos + Layerpos, l_layer, "p_layer", &topVolume, false, 1);
-        new G4PVPlacement(rot_pindiode, PINDIODEpos + PINDIODEpos1, l_PINDIODE1, "p_PINDIODE1", &topVolume, false, detID);
-        new G4PVPlacement(rot_pindiode, PINDIODEpos + PINDIODEpos2, l_PINDIODE2, "p_PINDIODE2", &topVolume, false, detID++);
-
+        /*
+              new G4PVPlacement(rot_pindiode, PINDIODEpos, l_Box, "p_Box", &topVolume, false, 1);
+              new G4PVPlacement(rot_pindiode, PINDIODEpos + Layerpos, l_layer, "p_layer", &topVolume, false, 1);
+        new G4PVPlacement(rot_pindiode, PINDIODEpos + PINDIODEpos1, l_PINDIODE1, "p_PINDIODE1", &topVolume, false, detID*2);
+        new G4PVPlacement(rot_pindiode, PINDIODEpos + PINDIODEpos2, l_PINDIODE2, "p_PINDIODE2", &topVolume, false, detID*2+1);
+        */
         detID++;
       }
     }

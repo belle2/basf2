@@ -134,11 +134,13 @@ namespace Belle2 {
       //create ph1bpipe volume
       G4double startAngle = 0.*CLHEP::deg;
       G4double spanningAngle = 360.*CLHEP::deg;
-      /*G4Tubs* s_PH1BPIPE = new G4Tubs("s_PH1BPIPE",
-                                      content.getLength("pipe_innerRadius")*CLHEP::cm,
-                                      content.getLength("pipe_outerRadius")*CLHEP::cm,
-                                      content.getLength("pipe_hz")*CLHEP::cm,
-                                      startAngle, spanningAngle);*/
+      /*
+      G4VSolid* s_PH1BPIPE = new G4Tubs("s_PH1BPIPE",
+          content.getLength("pipe_outerRadius_x")*CLHEP::cm,
+          content.getLength("pipe_outerRadius_y")*CLHEP::cm,
+          content.getLength("pipe_hz")*CLHEP::cm,
+          startAngle, spanningAngle);
+      */
 
       G4VSolid* s_PH1BPIPE1 = new G4Ellipsoid("s_PH1BPIPE1",
                                               content.getLength("pipe_outerRadius_x")*CLHEP::cm,
@@ -151,11 +153,6 @@ namespace Belle2 {
                                               content.getLength("pipe_innerRadius_y")*CLHEP::cm,
                                               content.getLength("pipe_hz")*CLHEP::cm,
                                               -2.* content.getLength("pipe_hz")*CLHEP::cm, 2.* content.getLength("pipe_hz")*CLHEP::cm);
-      /*G4VSolid* s_PH1BPIPE2 = new G4Tubs("s_PH1BPIPE2",
-                                         content.getLength("pipe_innerRadius_x")*CLHEP::cm,
-                                         content.getLength("pipe_innerRadius_y")*CLHEP::cm,
-                                         content.getLength("pipe_hz")*CLHEP::cm,
-                                         startAngle, spanningAngle);*/
 
       G4VSolid* s_PH1BPIPE = new G4SubtractionSolid("s_PH1BPIPE", s_PH1BPIPE1, s_PH1BPIPE2);
 

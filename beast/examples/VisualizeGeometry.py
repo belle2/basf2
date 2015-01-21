@@ -22,7 +22,7 @@ eventinfosetter.param('evtNumList', [1])
 
 g4sim.param('EnableVisualization', True)
 g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-            '/vis/scene/add/axes 0 0 0 1000 mm',
+            '/vis/scene/add/axes 0 0 0 10 mm',
             '/vis/scene/add/trajectories smooth',
             '/vis/modeling/trajectories/create/drawByCharge'])  # Use VRML2 backend
                                                                 # Draw the geometry

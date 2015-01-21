@@ -17,9 +17,9 @@ void ECLPion()
   //  TH1F* hGammas = new TH1F("hGammas", "Fake Reconstructed Gamma from  1000 muons should be less than 5%", 10,0,10);
   TH1F* hClusterMultip = new TH1F("hClusterMultip", "Cluster Multiplicity Pions", 10,0,10);
   hClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity charged pion");
-  hClusterE->GetListOfFunctions()->Add(new TNamed("Description",
+  hClusterMultip->GetListOfFunctions()->Add(new TNamed("Description",
     "ECL cluster multiplicity for 1 GeV charged pion")); 
-  hClusterE->GetListOfFunctions()->Add(new TNamed("Check",
+  hClusterMultip->GetListOfFunctions()->Add(new TNamed("Check",
     "Cluster multiplicity should be low"));
   m_tree->Draw("eclClusterMultip>>hClusterMultip","eclClusterMultip>0");
   //hGammas->Write();

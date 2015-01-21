@@ -132,11 +132,11 @@ float Helix::getArcLengthAtXY(const float& x, const float& y) const
 TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
 {
   /*
-    /   \     /                      \     /                             \
-    | x |     | cos phi0   -sin phi0 |     |    - sin(chi)  / omega      |
-    |   |  =  |                      |  *  |                             |
-    | y |     | sin phi0    cos phi0 |     | (1 - cos(chi)) / omega - d0 |
-    \   /     \                      /     \                             /
+    /   \     /                      \     /                              \
+    | x |     | cos phi0   -sin phi0 |     |    - sin(chi)  / omega       |
+    |   |  =  |                      |  *  |                              |
+    | y |     | sin phi0    cos phi0 |     | -(1 - cos(chi)) / omega - d0 |
+    \   /     \                      /     \                              /
 
     and
 

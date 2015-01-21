@@ -10,21 +10,5 @@ env['LIBS'] = [
     'tracking_trackFindingCDC',
     ]
 
-import os
-
-# Forward the compilation option 
-belle2_option = os.environ["BELLE2_OPTION"]
-
-if belle2_option == "debug":
-    cpp_defines = ['TRACKFINDINGCDC_COMPILE_DEBUG',]
-
-elif belle2_option == "opt":
-    cpp_defines = ['TRACKFINDINGCDC_COMPILE_OPT',]
-
-elif belle2_option == "clang":
-    cpp_defines = ['TRACKFINDINGCDC_COMPILE_CLANG',]
-
-env.Append(CPPDEFINES=cpp_defines)
-
 Return('env')
 

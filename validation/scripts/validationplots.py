@@ -422,6 +422,8 @@ def create_RootObjects_from_file(root_file, is_reference):
         # Determine which type of object it is, i.e. TH1, TH2 or TNtuple
         if root_object.InheritsFrom('TNtuple'):
             root_object_type = 'TNtuple'
+        # this will also match TProfile, as this root class derives from
+        # TH1D
         elif root_object.InheritsFrom('TH1'):
             if root_object.InheritsFrom('TH2'):
                 root_object_type = 'TH2'
@@ -511,22 +513,48 @@ def create_RootObjects_from_file(root_file, is_reference):
     return file_objects, file_keys, package
 
 
-def get_style(index):
+def get_style(index, overallItemCount):
     """
     Takes an index and returns the corresponding line attributes,
     i.e. LineColor, LineWidth and LineStyle.
     """
-    line_styles = [ROOT.TAttLine(ROOT.kGreen + 1, 10, 2),
-                   ROOT.TAttLine(ROOT.kOrange, 1, 2),
-                   ROOT.TAttLine(ROOT.kPink + 7, 10, 2),
-                   ROOT.TAttLine(ROOT.kOrange + 7, 1, 2),
-                   ROOT.TAttLine(ROOT.kPink, 10, 2),
-                   ROOT.TAttLine(ROOT.kAzure - 3, 1, 2),
-                   ROOT.TAttLine(ROOT.kTeal - 6, 10, 2)]
 
+    # Define the colors for the plot
+    colors = [ROOT.kGreen + 1,
+              ROOT.kOrange,
+              ROOT.kPink + 7,
+              ROOT.kOrange,
+              ROOT.kPink,
+              ROOT.kAzure - 3,
+              ROOT.kTeal - 6]
+
+    # Define the linestyles for the plot
+    linestyles = {'dashed': 2,    # Dashed: - - - - -
+                  'solid': 1,    # Solid: ----------
+                  'dashdot': 10}    # Dash-dot: -⋅-⋅-⋅-
+    ls_index = {0: 'dashed', 1: 'solid', 2: 'dashdot'}
+
+    # Define the linewidth for the plots
+    linewidth = 2
+
+    # make sure the index is set
     if not index:
         index = 0
-    return line_styles[index % len(line_styles)]
+
+    # Get the color for the (index)th revisions
+    color = colors[index % len(colors)]
+
+    # Figure out the linestyle
+    # If there is only one revision, make it solid!
+    # It cannot overlap with any other line
+    if overallItemCount == 1:
+        linestyle = linestyles['solid']
+    # Otherwise make sure the newest revision (which is drawn on top) gets a
+    # dashed linestyle
+    else:
+        linestyle = linestyles[ls_index[index % len(ls_index)]]
+
+    return ROOT.TAttLine(color, linestyle, linewidth)
 
 
 def create_revision_list_html():
@@ -541,7 +569,7 @@ def create_revision_list_html():
 
     for item in available_revisions():
         ind = index_from_revision(item)
-        color = ROOT.gROOT.GetColor(get_style(ind).GetLineColor()).AsHexString()
+        color = ROOT.gROOT.GetColor(get_style(ind, len(available_revisions())).GetLineColor()).AsHexString()
         date_of_revision = datetime.datetime.utcfromtimestamp(int(
             date_from_revision(item)))
         revisions.write('<label title="Data created: {0} (UTC)">'
@@ -872,15 +900,17 @@ class Plotuple:
             self.draw_ref(pad)
 
         # Now draw the normal plots
+        itemsToPlotCount = len(self.elements)
         for plot in reversed(self.elements):
 
             # Get the index of the current plot
             index = index_from_revision(plot.revision)
+            style = get_style(index, itemsToPlotCount)
 
             # Set line properties accordingly
-            plot.object.SetLineColor(get_style(index).GetLineColor())
-            plot.object.SetLineWidth(get_style(index).GetLineWidth())
-            plot.object.SetLineStyle(get_style(index).GetLineStyle())
+            plot.object.SetLineColor(style.GetLineColor())
+            plot.object.SetLineWidth(style.GetLineWidth())
+            plot.object.SetLineStyle(style.GetLineStyle())
 
             # Switch to the correct sub-panel of the canvas. If a ref-plot
             # exists, we have to go one panel further compared to the
@@ -901,7 +931,7 @@ class Plotuple:
             # Write the title in the correct color
             title = pad.GetListOfPrimitives().FindObject('title')
             if title:
-                title.SetTextColor(get_style(index).GetLineColor())
+                title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
         path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
@@ -978,16 +1008,18 @@ class Plotuple:
             if self.reference is not None:
                 self.draw_ref(pad)
 
+        itemsToPlotCount = len(self.elements)
         # Now draw the normal plots
         for plot in reversed(self.elements):
 
             # Get the index of the current plot
             index = index_from_revision(plot.revision)
+            style = get_style(index, itemsToPlotCount)
 
             # Set line properties accordingly
-            plot.object.SetLineColor(get_style(index).GetLineColor())
-            plot.object.SetLineWidth(get_style(index).GetLineWidth())
-            plot.object.SetLineStyle(get_style(index).GetLineStyle())
+            plot.object.SetLineColor(style.GetLineColor())
+            plot.object.SetLineWidth(style.GetLineWidth())
+            plot.object.SetLineStyle(style.GetLineStyle())
 
             # If we have a one-dimensional histogram
             if mode == '1D':
@@ -1018,7 +1050,7 @@ class Plotuple:
                 # Write the title in the correct color
                 title = pad.GetListOfPrimitives().FindObject('title')
                 if title:
-                    title.SetTextColor(get_style(index).GetLineColor())
+                    title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
         path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
@@ -1072,7 +1104,7 @@ class Plotuple:
             ind = index_from_revision(ntuple.revision)
 
             # Now get the color of the revision
-            color = (ROOT.gROOT.GetColor(get_style(ind)
+            color = (ROOT.gROOT.GetColor(get_style(ind, len(self.elements))
                      .GetLineColor()).AsHexString())
 
             line = '<tr><td style="color: {0};">'.format(color)

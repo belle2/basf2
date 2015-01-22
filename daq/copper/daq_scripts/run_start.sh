@@ -28,22 +28,22 @@
 # basf2 program BEFORE eb0(event builder 0) on a readout PC
 #
 #    print 'Usage : RecvStream0.py <COPPER hostname> <Use NSM(Network Shared Memory)? yes=1/no=0> <port # of eb0> <NSM nodename>
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr001 0 34001 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr002 0 34002 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr003 0 34003 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr004 0 34004 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr005 0 34005 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr006 0 34006 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr007 0 34007 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr008 0 34008 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr009 0 34009 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr010 0 34010 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr011 0 34011 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr012 0 34012 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr013 0 34013 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr014 0 34014 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr015 0 34015 hogehoge1000; sleep 3000000;" &
-/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream0.sh cpr016 0 34016 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr001 0 34001 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr002 0 34002 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr003 0 34003 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr004 0 34004 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr005 0 34005 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr006 0 34006 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr007 0 34007 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr008 0 34008 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+242 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr009 0 34009 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr010 0 34010 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr011 0 34011 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr012 0 34012 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr013 0 34013 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr014 0 34014 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr015 0 34015 hogehoge1000; sleep 3000000;" &
+/usr/bin/xterm -fn 7x14 -geometry 40x10+400+442 -e "${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvStream2.sh cpr016 0 34016 hogehoge1000; sleep 3000000;" &
 
 #
 # event builder on ROPC (usually automatically invoked by inetd)

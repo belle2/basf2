@@ -9,6 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleCustomFloatsTool.h>
+#include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 #include <TBranch.h>
 #include <boost/algorithm/string.hpp>
@@ -45,10 +46,7 @@ void NtupleCustomFloatsTool::setupTree()
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     for (int iVar = 0; iVar < nVars; iVar++) {
       int iPos = iProduct * nDecayProducts + iVar;
-      string varName = m_strVarNames[iVar];
-      varName.erase(std::remove(varName.begin(), varName.end(), '('), varName.end());
-      varName.erase(std::remove(varName.begin(), varName.end(), ')'), varName.end());
-      varName.erase(std::remove(varName.begin(), varName.end(), ','), varName.end());
+      string varName = Variable::makeROOTCompatible(m_strVarNames[iVar]);
 
       // getExtraInfoVariableName -> VariableName
       boost::erase_all(varName, "getExtraInfo");

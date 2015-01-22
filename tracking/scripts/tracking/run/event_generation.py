@@ -101,7 +101,7 @@ class ReadOrGenerateEventsRun(object):
     def name(self):
         return self.__class__.__name__
 
-    def create_argument_parser(self, allow_input, **kwds):
+    def create_argument_parser(self, allow_input=True, **kwds):
         # Argument parser that gives a help full message on error,
         # which includes the options that are valid.
         argument_parser = tracking.utilities.DefaultHelpArgumentParser(**kwds)

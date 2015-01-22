@@ -89,11 +89,10 @@ bool ProcessController::abort()
 
 void ProcessSubmitter::run()
 {
-  dup2(m_iopipe[1], STDOUT_FILENO);
-  dup2(m_iopipe[1], STDERR_FILENO);
-  close(STDIN_FILENO);
-  close(STDOUT_FILENO);
-  close(STDERR_FILENO);
+  close(1);
+  dup2(m_iopipe[1], 1);
+  close(2);
+  dup2(m_iopipe[1], 2);
   close(m_iopipe[0]);
   Executor executor;
   if (m_con->getExecutable().size() == 0) {

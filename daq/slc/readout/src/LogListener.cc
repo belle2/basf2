@@ -43,6 +43,9 @@ void LogListener::run()
         s = m_con->getName() + " : " + ss.str();
         ss.str("");
         m_con->lock();
+        if (priority == LogFile::UNKNOWN) {
+          priority = LogFile::DEBUG;
+        }
         LogFile::put(priority, s);
         if (node.getState() != RCState::STOPPING_TS &&
             node.getState() != RCState::ABORTING_RS &&

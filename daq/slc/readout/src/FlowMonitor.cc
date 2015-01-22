@@ -15,13 +15,13 @@ bool FlowMonitor::open(RunInfoBuffer* info)
   m_ioinfo[0].setLocalPort(m_info->getInputPort());
   m_ioinfo[0].setLocalAddress(m_info->getInputAddress());
   m_ip[0] = m_ioinfo[0].getLocalIP();
-  LogFile::debug("in host:port=%s:%d", m_ip[0].c_str(),
-                 m_ioinfo[0].getLocalPort());
+  //LogFile::debug("in host:port=%s:%d", m_ip[0].c_str(),
+  //               m_ioinfo[0].getLocalPort());
   m_ioinfo[1].setLocalPort(m_info->getOutputPort());
   m_ioinfo[1].setLocalAddress(m_info->getOutputAddress());
   m_ip[1] = m_ioinfo[1].getLocalIP();
-  LogFile::debug("out host:port=%s:%d", m_ip[1].c_str(),
-                 m_ioinfo[1].getLocalPort());
+  //LogFile::debug("out host:port=%s:%d", m_ip[1].c_str(),
+  //               m_ioinfo[1].getLocalPort());
   return true;
 }
 

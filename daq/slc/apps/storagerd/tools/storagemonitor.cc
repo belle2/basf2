@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     printf("\n");
     printf(" %13s | in |      count | freq [kHz] | rate [MB/s] | evtsize [kB]", "node");
     printf(" | out |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n");
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 3; i++) {
       storage_status::node_status& node(info->node[i]);
       if (i == 2) continue;
       std::string name = "basf2";
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
              StringUtil::form("%03.2f", node.evtsize_out).c_str());
     }
     printf("\n");
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 3; i++) {
       float available = 100. - info->disk[i].available;
       if (available <= 10) {
         printf("\x1b[49m\x1b[31m");

@@ -117,6 +117,7 @@ void DummyDataPackerModule::event()
 //     RawARICH* raw_epid = raw_epidarray.appendNew();
 //     RawECL* raw_ecl = raw_eclarray.appendNew();
 //     RawKLM* raw_klm = raw_klmarray.appendNew();
+//     RawTRG* raw_trg = raw_trgarray.appendNew();
 
 
     int* buf_hslb1, *buf_hslb2, *buf_hslb3, *buf_hslb4;

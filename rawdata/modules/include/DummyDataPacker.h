@@ -29,6 +29,7 @@
 #include <rawdata/dataobjects/RawARICH.h>
 #include <rawdata/dataobjects/RawECL.h>
 #include <rawdata/dataobjects/RawKLM.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 
 namespace Belle2 {
@@ -95,6 +96,9 @@ namespace Belle2 {
 
     //! RawKLM array
     StoreArray<RawKLM> raw_klmarray;
+
+    //! RawARICH array
+    StoreArray<RawTRG> raw_trgarray;
 
 
   };

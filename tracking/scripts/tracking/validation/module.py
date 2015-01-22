@@ -17,6 +17,58 @@ import ROOT
 from ROOT import Belle2
 
 
+# contains all informations necessary for track filters to decide whether
+# track will be included into the processed list of tracks
+# This class is used for both providing information on pattern reco and
+# MC tracks
+
+class FilterProperties(object):
+
+    def __init__(
+        self,
+        trackCand=None,
+        mcParticle=None,
+        mcParticles=None,
+        wasFitted=False,
+        fitResult=None,
+        seedResult=None,
+        ):
+
+        self.trackCand = trackCand
+        self.mcParticle = mcParticle
+        self.mcParticles = mcParticles
+        self.wasFitted = wasFitted
+        self.fitResult = fitResult
+        self.seedResult = seedResult
+
+
+# This class will accept all pattern reco and mctracks
+# It is used as the default option for the TrackingValidationModule
+#
+# It can be used as a starting point to implement your own particle filter class
+# and supply it to the TrackingValidationModule via the init method's
+# track_filter_object property.
+#
+#  doesPrPass is called for all pattern reconstructed tracks
+#    Objects available infilterProperties:
+#    trackCand is guaranteed to be != None
+#    If wasFitted == True, fitResult will be set
+#        otherwise seedResult will be set
+#
+#  doesMcPass is called for all MC tracks
+#    Objects available infilterProperties:
+#    mcParticle is guaranteed to be != None
+#
+
+class AlwaysPassFilter(object):
+
+    def doesPrPass(self, filterProperties):
+        return True
+
+    def doesMcPass(self, filterProperties):
+        return True
+
+
 class TrackingValidationModule(basf2.Module):
 
     """Module to collect matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding."""
@@ -28,6 +80,11 @@ class TrackingValidationModule(basf2.Module):
         fit=False,
         pulls=False,
         output_file_name=None,
+        track_filter_object=AlwaysPassFilter(),
+        plot_name_postfix='',
+        plot_title_postfix='',
+        exclude_profile_mc_parameter='',
+        exclude_profile_pr_parameter='',
         ):
 
         super(TrackingValidationModule, self).__init__()
@@ -37,6 +94,11 @@ class TrackingValidationModule(basf2.Module):
         self.pulls = pulls
         self.output_file_name = output_file_name or self.name \
             + 'TrackingValidation.root'
+        self.track_filter_object = track_filter_object
+        self.plot_name_postfix = plot_name_postfix
+        self.plot_title_postfix = plot_title_postfix
+        self.exclude_profile_pr_parameter = exclude_profile_pr_parameter
+        self.exclude_profile_mc_parameter = exclude_profile_mc_parameter
 
     def initialize(self):
         self.trackMatchLookUp = Belle2.TrackMatchLookUp('MCTrackCands')
@@ -61,6 +123,10 @@ class TrackingValidationModule(basf2.Module):
         self.mc_matches = collections.deque()
         self.mc_d0s = collections.deque()
         self.mc_tan_lambdas = collections.deque()
+        # direction of the track in theta
+        self.mc_theta = collections.deque()
+        # direction of the track in phi
+        self.mc_phi = collections.deque()
         self.mc_pts = collections.deque()
         self.mc_hit_efficiencies = collections.deque()
         self.mc_multiplicities = collections.deque()
@@ -78,6 +144,7 @@ class TrackingValidationModule(basf2.Module):
         trackMatchLookUp = self.trackMatchLookUp
 
         trackCands = Belle2.PyStoreArray('TrackCands')
+        mcParticles = Belle2.PyStoreArray('MCParticles')
         if not trackCands:
             return
 
@@ -85,11 +152,33 @@ class TrackingValidationModule(basf2.Module):
             is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
             is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
 
+            omega_truth = float('nan')
+            tan_lambda_truth = float('nan')
+            mcParticle = None
+            if is_matched or is_clone:
+                # Only matched and clone tracks have a related MCParticle
+                mcParticle = trackMatchLookUp.getRelatedMCParticle(trackCand)
+                mcHelix = getHelixFromMCParticle(mcParticle)
+                omega_truth = mcHelix.getOmega()
+                tan_lambda_truth = mcHelix.getTanLambda()
+
+            # fill the FilterProperties will all properties on this track
+            # gathered so far
+            filterProperties = FilterProperties(trackCand=trackCand,
+                    mcParticle=mcParticle, mcParticles=mcParticles)
+
             if self.fit:
                 prTrackFitResult = \
                     trackMatchLookUp.getRelatedTrackFitResult(trackCand)
+                filterProperties.wasFitted = True
+                filterProperties.fitResult = prTrackFitResult
             else:
                 prTrackFitResult = getSeedTrackFitResult(trackCand)
+                filterProperties.seedResult = prTrackFitResult
+
+            # skip this track due to the filtering rules ?
+            if not self.track_filter_object.doesPrPass(filterProperties):
+                continue
 
             omega_estimate = float('nan')
             omega_variance = float('nan')
@@ -118,15 +207,6 @@ class TrackingValidationModule(basf2.Module):
                 momentum = prTrackFitResult.getMomentum()
                 momentum_pt = momentum.Perp()
 
-            omega_truth = float('nan')
-            tan_lambda_truth = float('nan')
-            if is_matched or is_clone:
-                # Only matched and clone tracks have a related MCParticle
-                mcParticle = trackMatchLookUp.getRelatedMCParticle(trackCand)
-                mcHelix = getHelixFromMCParticle(mcParticle)
-                omega_truth = mcHelix.getOmega()
-                tan_lambda_truth = mcHelix.getTanLambda()
-
             # store properties of the seed
             self.pr_seed_tan_lambdas.append(seed_tan_lambda)
             self.pr_seed_phi.append(seed_phi)
@@ -153,6 +233,7 @@ class TrackingValidationModule(basf2.Module):
 
         # Analyse from the Monte Carlo reference side
         mcTrackCands = Belle2.PyStoreArray('MCTrackCands')
+        mcParticles = Belle2.PyStoreArray('MCParticles')
         if not mcTrackCands:
             return
 
@@ -166,6 +247,14 @@ class TrackingValidationModule(basf2.Module):
             mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
             mcHelix = getHelixFromMCParticle(mcParticle)
 
+            # fill the FilterProperties will all properties on this track
+            # gathered so far
+            filterProperties = FilterProperties(mcParticle=mcParticle,
+                    mcParticles=mcParticles)
+
+            if not self.track_filter_object.doesMcPass(filterProperties):
+                continue
+
             momentum = mcParticle.getMomentum()
             pt = momentum.Perp()
             tan_lambda = 1 / math.tan(momentum.Theta())
@@ -177,6 +266,8 @@ class TrackingValidationModule(basf2.Module):
             self.mc_d0s.append(d0)
             self.mc_tan_lambdas.append(tan_lambda)
             self.mc_multiplicities.append(multiplicity)
+            self.mc_theta.append(momentum.Theta())
+            self.mc_phi.append(momentum.Phi())
 
     def terminate(self):
         name = self.name
@@ -186,8 +277,13 @@ class TrackingValidationModule(basf2.Module):
         ############################
         track_finding_efficiency = np.mean(self.mc_matches)
         fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
-        clone_rate = 1.0 - np.average(self.pr_matches,
-                                      weights=self.pr_clones_and_matches)
+        # can only be computed if there are entries
+        if len(self.pr_clones_and_matches) > 0:
+            clone_rate = 1.0 - np.average(self.pr_matches,
+                    weights=self.pr_clones_and_matches)
+        else:
+            clone_rate = float('nan')
+
         hit_efficiency = np.nanmean(self.mc_hit_efficiencies)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
@@ -236,7 +332,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Fit quality #
         ###############
         if self.pulls:
-            plot_name_prefix = name
+            plot_name_prefix = name + self.plot_name_postfix
             if not self.fit:
                 plot_name_prefix += '_seed'
 
@@ -246,7 +342,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             pr_omega_variances = np.array(self.pr_omega_variances)
 
             curvature_pull_analysis = PullAnalysis('#omega', unit='1/cm',
-                    plot_name_prefix=plot_name_prefix + '_omega')
+                    plot_name_prefix=plot_name_prefix + '_omega',
+                    plot_title_postfix=self.plot_title_postfix)
             curvature_pull_analysis.analyse(pr_omega_truths,
                     pr_omega_estimates, pr_omega_variances)
             curvature_pull_analysis.contact = contact
@@ -258,7 +355,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             pr_tan_lambda_variances = np.array(self.pr_tan_lambda_variances)
 
             curvature_pull_analysis = PullAnalysis('tan #lambda',
-                    plot_name_prefix=plot_name_prefix + '_tan_lambda')
+                    plot_name_prefix=plot_name_prefix + '_tan_lambda',
+                    plot_title_postfix=self.plot_title_postfix)
             curvature_pull_analysis.analyse(pr_tan_lambda_truths,
                     pr_tan_lambda_estimates, pr_tan_lambda_variances)
             curvature_pull_analysis.contact = contact
@@ -299,22 +397,35 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         xs,
         quantity_name,
         unit=None,
-        parameter_names=['d_0', 'p_t', 'tan_lambda', 'multiplicity'],
+        parameter_names=[
+            'd_0',
+            'p_t',
+            'tan_lambda',
+            'multiplicity',
+            'phi',
+            'theta',
+            ],
         make_hist=True,
         ):
+
+        # apply exclusion list
+        new_parameter_names = [item for item in parameter_names if item
+                               not in self.exclude_profile_mc_parameter]
 
         # Profile versus the various parameters
         profile_parameters = {
             'd_{0}': self.mc_d0s,
             'p_{t}': self.mc_pts,
             'tan #lambda': self.mc_tan_lambdas,
+            '#phi': self.mc_phi,
+            '#theta': self.mc_theta,
             'multiplicity': self.mc_multiplicities,
             }
 
         return self.profiles_by_parameters_base(
             xs,
             quantity_name,
-            parameter_names,
+            new_parameter_names,
             profile_parameters,
             unit,
             make_hist,
@@ -329,6 +440,10 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         make_hist=True,
         ):
 
+        # apply exclusion list
+        new_parameter_names = [item for item in parameter_names if item
+                               not in self.exclude_profile_pr_parameter]
+
         # Profile versus the various parameters
         profile_parameters = {'Seed tan #lambda': self.pr_seed_tan_lambdas,
                               'Seed #phi': self.pr_seed_phi,
@@ -337,7 +452,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         return self.profiles_by_parameters_base(
             xs,
             quantity_name,
-            parameter_names,
+            new_parameter_names,
             profile_parameters,
             unit,
             make_hist,
@@ -356,7 +471,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         contact = self.contact
 
         validation_plots = []
-        plot_name_prefix = self.name + '_' + root_save_name(quantity_name)
+        plot_name_prefix = self.name + '_' + root_save_name(quantity_name) \
+            + self.plot_name_postfix
 
         if make_hist:
             # Histogram of the quantity
@@ -367,6 +483,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             histogram.description = 'Not a serious plot yet.'
             histogram.check = ''
             histogram.contact = contact
+            histogram.title = quantity_name + self.plot_title_postfix
 
             validation_plots.append(histogram)
 
@@ -382,7 +499,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 profile_plot.xlabel = compose_axis_label(parameter_name)
                 profile_plot.ylabel = compose_axis_label(quantity_name, unit)
                 profile_plot.title = quantity_name + ' by ' + parameter_name \
-                    + ' profile'
+                    + ' profile' + self.plot_title_postfix
 
                 profile_plot.description = \
                     'Dependence of %s of the track over the true %s' \

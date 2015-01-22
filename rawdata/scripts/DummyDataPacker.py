@@ -18,7 +18,6 @@ max_event = int(argvs[1])
 packer = register_module('DummyDataPacker')
 packer.param('MaxEventNum', max_event)
 
-
 # File output
 # dump = register_module('SeqRootOutput')
 dump = register_module('RootOutput')

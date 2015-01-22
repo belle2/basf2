@@ -53,6 +53,7 @@ void Convert2RawDetModule::initialize()
   StoreArray<RawARICH>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
+  StoreArray<RawTRG>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
 
 
@@ -159,6 +160,9 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
         (ary.appendNew())->SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
       } else if ((subsys_id & DETECTOR_MASK) == EKLM_ID) {
         StoreArray<RawKLM> ary;
+        (ary.appendNew())->SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
+      } else if (((subsys_id & DETECTOR_MASK) & 0xF0000000)  == TRGDATA_ID) {
+        StoreArray<RawTRG> ary;
         (ary.appendNew())->SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
       } else {
         printf("Undefined detector ID(0x%.8x). Exiting...", subsys_id);

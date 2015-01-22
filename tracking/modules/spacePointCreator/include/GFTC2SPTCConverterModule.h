@@ -102,13 +102,19 @@ namespace Belle2 {
 
     unsigned int m_abortedNonSingleTrueHitCtr; /**< Counter for aborted conversions due to more than one related TrueHits for one SpacePoint */
 
+    unsigned int m_noTwoClusterSPCtr; /**< Counter for cases where no related two Cluster could be found for a Cluster. NOTE: Counter counts cases where there really was no SpacePoint for a Cluster but does not count the cases where a found two Cluster SP was rejected later on in the process! */
+
+    unsigned int singleTrueHitCtr; /**< Counter for occurencies of only one TrueHit being related to a SpacePoint */
+    unsigned int passedTHCheckCtr; /**< Counter for testing how many SpacePoints would have passed another check then the currently applied */
+    unsigned int nonSingleTrueHitCtr; /**< Counter for occurencies of more than one TrueHit being related to a SpacePoint */
+
 // #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
     template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */
 // #endif
 
     template<typename T> using fourTuple = boost::tuple<T, T, T, T>; /**< typdef, for some less writing effort in the code */
 
-    template<typename T> using flaggedPair = boost::tuple<bool, T, T>; /**< typdef, for avoiding haveing a vector<bool> and a vector<pair<T,T>> */
+    template<typename T> using flaggedPair = boost::tuple<bool, T, T>; /**< typdef, for avoiding having a vector<bool> and a vector<pair<T,T>> */
 
     void initializeCounters(); /**< reset counters to 0 to avoid indeterministic behaviour */
 

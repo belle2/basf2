@@ -77,6 +77,14 @@ void GFTC2SPTCConverterModule::initialize()
 
   // register Relation to genfit::TrackCand
   spTrackCand.registerRelationTo(gfTrackCand);
+
+  // if TrueHits shall be checked also check if the StoreArrays can be found
+  // COULDDO: register a Relation from TrueHit to SpacePoint, after checking the TrueHits. This would make it easier to access the TrueHits related to a SpacePoint in other modules (e.g. the CurlingTrackCandSplitterModule) plus reduce code size, since getting a TrueHit from a SpacePoint is always done the same.
+  // CAUTION: if the StoreArray of the TrueHits is named, this check fails!!!
+  if (m_PARAMcheckTrueHits) {
+    StoreArray<PXDTrueHit>::required();
+    StoreArray<SVDTrueHit>::required();
+  }
 }
 
 // ------------------------------------- EVENT -------------------------------------------------------
@@ -90,7 +98,6 @@ void GFTC2SPTCConverterModule::event()
   StoreArray<SpacePointTrackCand> spacePointTrackCands(m_SPTCName); // StoreArray for complete (i.e. unchecked for curling behaviour and unsplit) SpacePointTrackCands
 
   std::vector<HitInfo<SpacePoint> > tcSpacePoints; // collection of all SpacePoints, that will be used to create the SpacePointTrackCandidate
-
   int nTCs = mcTrackCands.getEntries();
 
   B2DEBUG(15, "Found " << nTCs << " genfit::TrackCands in StoreArray " << mcTrackCands.getName());
@@ -98,7 +105,6 @@ void GFTC2SPTCConverterModule::event()
   for (int iTC = 0; iTC < nTCs; ++iTC) {
     genfit::TrackCand* trackCand = mcTrackCands[iTC];
     m_genfitTCCtr += 1;
-//       trackCand->Print(); // debug purposes
 
     // for easier handling fill a taggedPair (typedef) with a boolen to indicate whether this hit has already been used or if it has still to be processed
     std::vector<flaggedPair<int> > fHitIDs;
@@ -109,6 +115,7 @@ void GFTC2SPTCConverterModule::event()
     }
 
     B2DEBUG(10, "===========================================================================================================\nNow processing genfit::TrackCand " << iTC << ".");
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 15, PACKAGENAME())) { trackCand->Print(); } // prints to stdout
     try {
       // convert the genfit::TrackCand and store it in the DataStore. Curling behaviour will be checked in another module
       const SpacePointTrackCand spacePointTC = createSpacePointTC(trackCand);
@@ -144,7 +151,8 @@ void GFTC2SPTCConverterModule::event()
 // -------------------------------- TERMINATE --------------------------------------------------------
 void GFTC2SPTCConverterModule::terminate()
 {
-  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found, in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap) and in " << m_abortedNonSingleTrueHitCtr << " cases there was more than one TrueHit related to a SpacePoint. (TrueHits have been checked: " << m_PARAMcheckTrueHits << ")");
+  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found (in " << m_noTwoClusterSPCtr << " cases there was no related two Cluster SpacePoint to a Cluster), in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap) and in " << m_abortedNonSingleTrueHitCtr << " cases there was more than one TrueHit related to a SpacePoint. (TrueHits have been checked: " << m_PARAMcheckTrueHits << ")");
+  B2INFO("In " << passedTHCheckCtr << " cases the TrueHit check would have been passed if oldSize/newSize == 2 was enabled. In " << singleTrueHitCtr << " cases the SpacePoint was related to only one TrueHit. In " << nonSingleTrueHitCtr << " cases a SpacePoint was related to more than one TrueHit.")
 }
 
 // ---------------------------------------- Create SpacePoint TrackCand
@@ -255,8 +263,10 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
   B2DEBUG(60, "Found " << spacePoints.size() << " related SpacePoints in StoreArray " << m_NoSingleClusterSVDSPName << " for SVDCluster " << svdCluster->getArrayIndex() << " from StoreArray " << svdCluster->getArrayName());
 
   // if there is no relation to two cluster SpacePoint return the single cluster SpacePoint
-  if (spacePoints.size() == 0) return getSingleClusterSVDSpacePoint(svdCluster, flaggedHitIDs, iHit);
-  else {
+  if (spacePoints.size() == 0) {
+    m_noTwoClusterSPCtr++; // increase counter by one, to distinguish cases where there really was no SpacePoint to a Cluster and cases where a related SpacePoint was rejected
+    return getSingleClusterSVDSpacePoint(svdCluster, flaggedHitIDs, iHit);
+  } else {
     // if size != 0 there is at least on SpacePoint. Now loop over all related SpacePoints to decide which one to use
     // WARNING: It is possible that more than one SpacePoint has a valid combination of Clusters in the genfit::TrackCand -> No longer possible since to be valid the Clusers have to appear in consecutive order in the GFTC now.
     // If this decision cannot be made -> throw
@@ -271,7 +281,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
     std::vector<std::pair<bool, bool> > existAndValidSP; // .first: Cluster Combination exists in the TrackCand, .second: Cluster Combination exists and has not yet been used
     std::vector<std::pair<int, int> > clusterPositions; // .first: index of SpacePoint in RelationVector, .second: Index of Cluster in the genfit::TrackCand
 
-    // loop over all SpacePoints
+    // loop over all SpacePoints to look if their Cluster combination is valid (or existing but used, etc...)
     for (unsigned int iSP = 0; iSP < spacePoints.size(); ++iSP) {
       const SpacePoint* aSP = spacePoints[iSP];
       B2DEBUG(100, "Processing SpacePoint " << iSP + 1 << " of " << spacePoints.size() << " with Index " << aSP->getArrayIndex() << " in StoreArray " << aSP->getArrayName() << " related with SVDCluster " << svdCluster->getArrayIndex());
@@ -314,7 +324,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
             B2DEBUG(100, "Hit is not contained in genfit::TrackCand")
           }
         }
-        B2DEBUG(100, "validID = (" << validID.get<1>() << "," << validID.get<2>() << "), found at position " << validPos << ", existingID found at position " << existingPos  << " of " << flaggedHitIDs.size());
+        B2DEBUG(100, "validID = (" << validID.get<1>() << "," << validID.get<2>() << "), found at position " << validPos << ", existingID found at position " << existingPos  << " of " << flaggedHitIDs.size()); // NOTE: id validPos or existingPos are equal to flaggedHitIDs.size() this means that the according flaggedPair was not found!! (for debug output reading)
         clusterPositions.push_back({iSP, validPos});
       }
 
@@ -350,7 +360,9 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       int pos1 = clusterPositions[2 * iSP].second;
       int pos2 = clusterPositions[2 * iSP + 1].second;
 
+      // taking the squared distance to have only positive numbers
       int distance = (pos1 - pos2) * (pos1 - pos2);
+      B2DEBUG(80, "Its squared position distance is: " << distance)
       if (distance != 1) {
         B2WARNING("The squared distance between the two Clusters of the only valid SpacePoint is " << distance << " This leads to wrong ordered TrackCandHits. This TrackCand will not be converted!");
         throw UnsuitableGFTrackCand();
@@ -387,7 +399,7 @@ const Belle2::SpacePoint* GFTC2SPTCConverterModule::getSVDSpacePoint(const SVDCl
       }
 
       // sort to find the smallest difference
-      std::sort(positionInfos.begin(), positionInfos.end(), [](const fourTuple<int> lTuple, const fourTuple<int> rTuple) { return lTuple.get<1>() < rTuple.get<1>(); });
+      std::sort(positionInfos.begin(), positionInfos.end(), [](const fourTuple<int>& lTuple, const fourTuple<int>& rTuple) { return lTuple.get<1>() < rTuple.get<1>(); });
       int iSP = positionInfos[0].get<0>(); // SpacePoint with smallest difference of positions is on first position in positinInfo
 
       int distance = positionInfos[0].get<1>();
@@ -530,18 +542,31 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
       inds.clear();
       inds.str(std::string());
       for (int index : trueHitsInds) { inds << index << ", "; }
-      inds << " direct via getArrayIndex(): ";
-      for (const SVDTrueHit * trueHit : allTrueHits) { inds << trueHit->getArrayIndex() << ", "; }
+      // further DEBUGGING (commented out for now)
+//       inds << " Indices direct via getArrayIndex() from TrueHits (not from vector of indices): ";
+//       for (const SVDTrueHit * trueHit : allTrueHits) { inds << trueHit->getArrayIndex() << ", "; }
       B2DEBUG(200, "Unique indices of TrueHits " << inds.str());
 
+      // count occurencies of different
+      if (allTrueHits.size() > 1) { nonSingleTrueHitCtr++; }
+      if (oldPtSize / allTrueHits.size() == 2) { passedTHCheckCtr++; }
+
       // It is possible that there is more than one TrueHit left but still the Clusters are related to the same TrueHit(s).
-      // COULDDO:
-//       if (clusters.size() % allTrueHits.size() == 0) return true; // assumption here to say that a given TrueHit is in every passed Cluster
-//       if (allTrueHits.size() < oldPtSize) return true;  // assumption here: there is at least one TrueHit, that is shared by at least 2 Clusters
+      // DECISION MAKING taking into account different possibilities. TODO: choose the one that filters out all 'bad' guys but still lets pass most of the 'good' guys
       if (allTrueHits.size() == 1) { // assumption here: there is ONLY ONE TrueHit related to all Clusters, this excludes some cases where more than one TrueHit is contained in one Cluster! (at the moment only "clear" cases are wanted, until decided what to do with unclear cases)
         B2DEBUG(200, "Found one TrueHit (Index " << allTrueHits[0]->getArrayIndex() << ", Array " << allTrueHits[0]->getArrayName() << ") related to Clusters " << clusters[0]->getArrayIndex() << " and " << clusters[1]->getArrayIndex() << " from Array " << clusters[0]->getArrayIndex()); // NOTE: assuming that both clusters are from the same Array here!!
+        singleTrueHitCtr++;
+//         return true;
+//       if (clusters.size() % allTrueHits.size() == 0) { // assumption here to say that a given TrueHit is in every passed Cluster // WARNING: doesn't work because if two different TrueHits are found this will pass as well
+//       if (allTrueHits.size() < oldPtSize) return true;  // assumption here: there is at least one TrueHit, that is shared by at least 2 Clusters
+//       if(oldPtSize / allTrueHits.size() == 2) { // assumption: all TrueHits are related to both Clusters. WARNING: this is not guraranteed! There are cases where this check does not fail although it should (think about an even number of shared TrueHits)
+// //   // WARNING: integer division here!!! there are more problematic cases!!!
+//   B2DEBUG(200, "Found " << allTrueHits.size() << " TrueHits related to Clusters " << clusters[0]->getArrayIndex() << " and " << clusters[1]->getArrayIndex() << " from Array " << clusters[0]->getArrayName() << " The indices of the TrueHits are: " << inds.str()); // NOTE: assuming that both clusters are from the same Array here!!
+//   if( allTrueHits.size() == 1) { singleTrueHitCtr++; }
+//   passedTHCheckCtr++;
         return true;
       } else {
+        B2DEBUG(200, "TrueHit indices not passed " << inds.str())
         // DEBUG message already printed before decision only throw here
         throw NonSingleTrueHit();
       }
@@ -558,6 +583,10 @@ void GFTC2SPTCConverterModule::initializeCounters()
   m_abortedUnsuitableTCCtr = 0;
   m_abortedNoSPCtr = 0;
   m_abortedNonSingleTrueHitCtr = 0;
+  m_noTwoClusterSPCtr = 0;
+  singleTrueHitCtr = 0;
+  passedTHCheckCtr = 0;
+  nonSingleTrueHitCtr = 0;
 }
 
 void GFTC2SPTCConverterModule::markHitAsUsed(std::vector<flaggedPair<int> >& flaggedHitIDs, int hitToMark)

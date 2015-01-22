@@ -39,18 +39,24 @@ add_simulation(main, bkgfiles=bg)
 # reconstruction
 add_reconstruction(main)
 
+# memory profile
+main.add_module(register_module('Profile'))
+
 # output
 output = register_module('RootOutput')
 output.param('outputFileName', '../EvtGenSimRec.root')
 main.add_module(output)
-
-# memory profile
-main.add_module(register_module('Profile'))
 
 process(main)
 
 # Print call statistics
 print statistics
 
-from validation import statistics_plots
-statistics_plots('EvtGenSimRec_statistics.root')
+from validation import *
+statistics_plots('EvtGenSimRec_statistics.root', contact='tkuhr',
+                 jobDesc='a standard simulation and reconstruction job with generic EvtGen events'
+                 )
+event_timing_plot('../EvtGenSimRec.root', 'EvtGenSimRec_statistics.root',
+                  contact='tkuhr',
+                  jobDesc='a standard simulation and reconstruction job with generic EvtGen events'
+                  )

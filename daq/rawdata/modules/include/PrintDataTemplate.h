@@ -37,6 +37,7 @@
 #include <rawdata/dataobjects/RawECL.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawPXD.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 #include <daq/rawdata/modules/DAQConsts.h>
 #ifndef REDUCED_RAWCOPPER

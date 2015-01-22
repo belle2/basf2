@@ -283,6 +283,15 @@ void PrintDataTemplateModule::event()
   }
 
 
+  StoreArray<RawTRG> raw_trgarray;
+  for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+    for (int j = 0; j < raw_trgarray[ i ]->GetNumEntries(); j++) {
+      printf("\n===== DataBlock(RawARICH) : Block # %d ", i);
+      printCOPPEREvent(raw_trgarray[ i ], j);
+    }
+  }
+
+
   //  printf("loop %d\n", n_basf2evt);
   n_basf2evt++;
 

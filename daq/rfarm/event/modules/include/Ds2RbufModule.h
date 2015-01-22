@@ -16,7 +16,7 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/pcore/DataStoreStreamer.h>
-//#include <framework/datastore/DataStore.h>
+#include <framework/datastore/DataStore.h>
 
 #include <string>
 

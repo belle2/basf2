@@ -8,6 +8,7 @@
 
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFNSM.h"
+#include "daq/slc/nsm/NSMCommunicator.h"
 #include <time.h>
 
 extern "C" {
@@ -26,11 +27,6 @@ using namespace Belle2;
 
 RFProcessManager::RFProcessManager(char* nodename)
 {
-  // Create IO pipe for output logging
-  if (pipe(m_iopipe) < 0) {
-    perror("pipe");
-    m_iopipe[0] = -1; m_iopipe[1] = -1;
-  }
 }
 
 RFProcessManager::~RFProcessManager()
@@ -44,6 +40,12 @@ void RFProcessManager::signal_handler(int num)
 
 int RFProcessManager::Execute(char* scr, int nargs, char** args)
 {
+
+  // Create IO pipe for output logging
+  if (pipe(m_iopipe) < 0) {
+    perror("pipe");
+    m_iopipe[0] = -1; m_iopipe[1] = -1;
+  }
 
   printf("RFProcessManager : Execute : scr=%s, nargs=%d\n", scr, nargs);
   // Fork processes
@@ -87,6 +89,7 @@ int RFProcessManager::Execute(char* scr, int nargs, char** args)
   }
   // Parent process (pid>0 : success, pid<0 : error )
   printf("RFProcessManager : forked. pid=%d\n", pid);
+  close(m_iopipe[1]);
 
   return pid;
 }
@@ -139,6 +142,9 @@ int RFProcessManager::CheckOutput()
   FD_ZERO(&fdset);
   if (m_iopipe[0] > 0) FD_SET(m_iopipe[0], &fdset);
   int highest = m_iopipe[0];
+  NSMcontext* nsmc = RFNSM::GetContext();
+  if (nsmc->sock > highest) highest = nsmc->sock;
+  FD_SET(nsmc->sock, &fdset);
 
   // Time out parameter
   struct timeval tv;

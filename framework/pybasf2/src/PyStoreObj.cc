@@ -11,37 +11,40 @@
 using namespace Belle2;
 
 PyStoreObj::PyStoreObj(const std::string& name, int durability):
-  m_storeObjPtr(0),
+  m_storeObjPtr(nullptr),
+  m_class(nullptr),
   m_name(name),
   m_durability(durability)
 {
   DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(name, DataStore::EDurability(durability), TObject::Class(), false));
-  if (entry)
+  if (entry) {
     m_storeObjPtr = &(entry->ptr);
-  m_storeObjPtr = DataStore::Instance().getObject(StoreAccessorBase(name, DataStore::EDurability(durability), TObject::Class(), false));
+    m_class = entry->object->IsA();
+  }
 }
 
 TClass* PyStoreObj::getClass(const std::string& name)
 {
   TClass* cl = TClass::GetClass(("Belle2::" + name).c_str());
+  if (!cl)
+    cl = TClass::GetClass(name.c_str());
   if (!cl) {
-    B2ERROR("Class 'Belle2::" << name << "' not found! Note that you may need to load the corresponding library first, e.g. for some PXD object:\n  from ROOT import gSystem\n  gSystem.Load('libpxd_dataobjects')\nAfterwards, creating objects of this type should work.");
+    B2ERROR("Class 'Belle2::" << name << "' (or '" << name << "') not found! Note that you may need to load the corresponding library first, e.g. for some PXD object:\n  from ROOT import gSystem\n  gSystem.Load('libpxd_dataobjects')\nAfterwards, creating objects of this type should work.");
   }
   return cl;
 }
 
 bool PyStoreObj::create(bool replace)
 {
-  TClass* cl = getClass(m_name);
-  if (!cl)
+  if (!m_class)
     return false;
 
-  return DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), cl, false));
+  return DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), m_class, false));
 }
 
-bool PyStoreObj::registerInDataStore(int storeFlags)
+bool PyStoreObj::registerInDataStore(std::string className, int storeFlags)
 {
-  TClass* cl = getClass(m_name);
+  TClass* cl = getClass(className);
   if (!cl)
     return false;
 

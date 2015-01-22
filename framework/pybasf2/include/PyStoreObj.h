@@ -79,7 +79,16 @@ namespace Belle2 {
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(int storeFlags = 0);
+    bool registerInDataStore(int storeFlags = 0) { return registerInDataStore(m_name, storeFlags); }
+
+    /** Register the object in the data store.
+     *  This must be called in the initialization phase.
+     *
+     *  @param className   C++ name of class (Belle2:: prefix may be omitted)
+     *  @param storeFlags  ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
+     *  @return            True if the registration succeeded.
+     */
+    bool registerInDataStore(std::string className, int storeFlags = 0);
 
     /** Does this PyStoreObj contain a valid datastore object?
      *
@@ -95,6 +104,7 @@ namespace Belle2 {
     static TClass* getClass(const std::string& name);
 
     TObject** m_storeObjPtr; /**< Pointer to pointer to object */
+    TClass* m_class; /**< Class of this object. */
     std::string m_name; /**< Name of data store entry. */
     int m_durability; /**< Durability of data store entry. */
   };

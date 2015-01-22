@@ -58,6 +58,7 @@ void RawInputModule::initialize()
   StoreArray<RawARICH>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
+  StoreArray<RawTRG>::registerPersistent();
   StoreArray<RawFTSW>::registerPersistent();
 
   // Open input file
@@ -150,6 +151,10 @@ void RawInputModule::registerRawCOPPERs()
     } else if (subsysid == BKLM_ID || subsysid == EKLM_ID) {
       //      printf ( "KLM identified\n" );
       StoreArray<RawKLM> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if ((subsysid & 0xF0000000) == TRGDATA_ID) {
+      //      printf ( "TRG identified\n" );
+      StoreArray<RawTRG> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else {
       //      printf ( "Fall back COPPER identified\n" );

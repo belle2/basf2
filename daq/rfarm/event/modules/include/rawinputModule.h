@@ -36,6 +36,7 @@
 #include <rawdata/dataobjects/RawTOP.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawFTSW.h>
+#include <rawdata/dataobjects/RawTRG.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 //#include <rawdata/dataobjects/RawHeader.h>
 //#include <rawdata/dataobjects/RawTrailer.h>

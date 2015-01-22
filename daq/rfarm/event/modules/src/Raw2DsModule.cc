@@ -181,6 +181,9 @@ void Raw2DsModule::registerRawCOPPERs()
     } else if ((subsysid & DETECTOR_MASK) == EKLM_ID) {
       StoreArray<RawKLM> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+    } else if (((subsysid & DETECTOR_MASK) & 0xF0000000) == TRGDATA_ID) {
+      StoreArray<RawTRG> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else {
       StoreArray<RawCOPPER> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);

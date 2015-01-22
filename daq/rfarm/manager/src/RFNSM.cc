@@ -90,7 +90,6 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
             m_nodename.c_str(), b2nsm_strerror());
   }
 
-  PThread(new RFNSMListener());
 }
 
 RFNSM::~RFNSM()

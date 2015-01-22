@@ -164,6 +164,7 @@ void RFMasterCallback::timeout() throw()
     NSMNode& node(m_nodes[*it]);
     if (node.getState() == RCState::ABORTING_RS) {
       LogFile::debug("RF_UNCONFIGURE >> %s", node.getName().c_str());
+      b2nsm_context(getCommunicator()->getContext());
       b2nsm_sendreq(node.getName().c_str(), "RF_UNCONFIGURE", 0, NULL);
       break;
     }

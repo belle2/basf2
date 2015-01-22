@@ -63,9 +63,7 @@ namespace Belle2 {
     void AllocMem(char* format);
     RfNodeInfo* GetNodeInfo();
 
-    static NSMcontext* GetContext() {
-      return g_context;
-    }
+    static NSMcontext* GetContext() { return g_context; }
 
   private:
     std::string m_nodename;

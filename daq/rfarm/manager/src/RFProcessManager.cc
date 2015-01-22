@@ -149,9 +149,23 @@ int RFProcessManager::CheckOutput()
   int nfd;
   for (;;) {
     if ((nfd = select(highest + 1, &fdset, NULL, NULL, &tv)) < 0) {
+      switch (errno) {
+        case EINTR: continue;
+        case EAGAIN: continue;
+        default:
+          close(m_iopipe[0]);
+          m_iopipe[0] = -1;
+          return 0;
+      }
       if (errno == EINTR) continue;
     } else {
-      break;
+      if (FD_ISSET(nsmc->sock, &fdset)) {
+        NSMCommunicator(nsmc).callContext();
+      }
+      if (m_iopipe[0] > 0 &&
+          FD_ISSET(m_iopipe[0], &fdset)) {
+        break;
+      }
     }
     sleep(1);
   }

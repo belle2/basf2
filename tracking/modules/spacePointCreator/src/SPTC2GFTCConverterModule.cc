@@ -115,6 +115,7 @@ void SPTC2GFTCConverterModule::event()
       // set other properties of TrackCand
       genfitTC.set6DSeedAndPdgCode(trackCand->getStateSeed(), trackCand->getPdgCode());
       genfitTC.setCovSeed(trackCand->getCovSeed());
+      genfitTC.setMcTrackId(trackCand->getMcTrackID());
 
       // add genfit::TrackCand to StoreArray
       m_genfitTCCtr += 1;

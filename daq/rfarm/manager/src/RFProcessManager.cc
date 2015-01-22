@@ -8,7 +8,6 @@
 
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFNSM.h"
-#include "daq/slc/nsm/NSMCommunicator.h"
 #include <time.h>
 
 extern "C" {
@@ -140,9 +139,6 @@ int RFProcessManager::CheckOutput()
   FD_ZERO(&fdset);
   if (m_iopipe[0] > 0) FD_SET(m_iopipe[0], &fdset);
   int highest = m_iopipe[0];
-  NSMcontext* nsmc = RFNSM::GetContext();
-  if (highest < nsmc->sock) highest = nsmc->sock;
-  FD_SET(nsmc->sock, &fdset);
 
   // Time out parameter
   struct timeval tv;
@@ -155,12 +151,7 @@ int RFProcessManager::CheckOutput()
     if ((nfd = select(highest + 1, &fdset, NULL, NULL, &tv)) < 0) {
       if (errno == EINTR) continue;
     } else {
-      if (FD_ISSET(nsmc->sock, &fdset)) {
-        NSMCommunicator(nsmc).callContext();
-      }
-      if (FD_ISSET(m_iopipe[0], &fdset)) {
-        break;
-      }
+      break;
     }
     sleep(1);
   }
@@ -175,10 +166,6 @@ int RFProcessManager::GetFd()
 {
   return m_iopipe[0];
 }
-
-
-
-
 
 
 

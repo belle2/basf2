@@ -7,6 +7,8 @@
 //-
 
 #include "daq/rfarm/manager/RFNSM.h"
+#include "daq/slc/system/PThread.h"
+
 #define RFNSMOUT stdout
 
 using namespace std;
@@ -87,6 +89,8 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
     fprintf(stderr, "RFNSM : %s hooking ERROR failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
+
+  PThread(new RFNSMListener());
 }
 
 RFNSM::~RFNSM()
@@ -235,3 +239,9 @@ int RFNSM_Status::get_flag()
   return m_flag;
 }
 
+void RFNSM::RFNSMListener::run() throw()
+{
+  while (true) {
+    b2nsm_wait(5);
+  }
+}

@@ -223,7 +223,6 @@ bool RFMasterCallback::error() throw()
 
 bool RFMasterCallback::configure() throw()
 {
-  b2nsm_context(getCommunicator()->getContext());
   bool ready_all = true;
   bool ready_evp = true;
   for (std::vector<std::string>::iterator it = m_name_v.begin();
@@ -240,6 +239,7 @@ bool RFMasterCallback::configure() throw()
         node.setState(RCState::LOADING_TS);
         usleep(200000);
         LogFile::debug("RF_CONFIGURE >> %s", node.getName().c_str());
+        b2nsm_context(getCommunicator()->getContext());
         b2nsm_sendreq(node.getName().c_str(), "RF_CONFIGURE", 0, NULL);
       }
       if (node.getName().find("evp_") == std::string::npos)
@@ -255,7 +255,6 @@ bool RFMasterCallback::configure() throw()
 
 bool RFMasterCallback::unconfigure() throw()
 {
-  b2nsm_context(getCommunicator()->getContext());
   bool notready_all = true;
   bool notready_evp = true;
   for (std::vector<std::string>::reverse_iterator it = m_name_v.rbegin();
@@ -272,6 +271,7 @@ bool RFMasterCallback::unconfigure() throw()
         node.setState(RCState::ABORTING_RS);
         usleep(200000);
         LogFile::debug("RF_UNCONFIGURE >> %s", node.getName().c_str());
+        b2nsm_context(getCommunicator()->getContext());
         b2nsm_sendreq(node.getName().c_str(), "RF_UNCONFIGURE", 0, NULL);
       }
       if (node.getName().find("evp_") == std::string::npos)

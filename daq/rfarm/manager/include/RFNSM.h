@@ -88,6 +88,15 @@ namespace Belle2 {
     static void m_OK(NSMmsg*, NSMcontext*);
     static void m_ERROR(NSMmsg*, NSMcontext*);
 
+  private:
+    class RFNSMListener {
+    public:
+      RFNSMListener() throw() {}
+      ~RFNSMListener() throw() {}
+    public:
+      void run() throw();
+    };
+
   };
 };
 #endif

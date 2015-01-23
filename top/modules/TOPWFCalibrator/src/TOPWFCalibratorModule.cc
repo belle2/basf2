@@ -28,11 +28,13 @@
 #include <top/dataobjects/TOPRawWaveform.h>
 
 #include "TFile.h"
+#include "TTree.h"
 #include <sstream>
 
 using namespace std;
 
 namespace Belle2 {
+  using namespace TOP;
 
   //-----------------------------------------------------------------
   //                 Register module
@@ -51,8 +53,11 @@ namespace Belle2 {
     setDescription("Calibration of waveforms (under development)");
 
     // Add parameters
-    addParam("outputFileName", m_outputFileName, "Output root file",
+    addParam("outputFileName", m_outputFileName, "Output root file (DB)",
              string("WFCalibration.root"));
+
+    addParam("histogramFileName", m_histogramFileName, "Output root file (histograms)",
+             string(""));
 
     addParam("barID", m_barID, "ID of TOP module to calibrate");
 
@@ -118,15 +123,71 @@ namespace Belle2 {
   void TOPWFCalibratorModule::terminate()
   {
 
-    TFile* file = new TFile(m_outputFileName.c_str(), "RECREATE");
-    file->cd();
-    for (int i = 0; i < c_NumChannels; i++) {
-      for (int k = 0; k < c_NumWindows; k++) {
+    StoreObjPtr<EventMetaData> evtMetaData;
+
+    if (!m_histogramFileName.empty()) {
+      TFile* file = new TFile(m_histogramFileName.c_str(), "RECREATE");
+      if (file->IsZombie()) {
+        B2ERROR("Couldn't open file '" << m_histogramFileName << "' for writing!");
+      } else {
+        file->cd();
+        for (int i = 0; i < c_NumChannels; i++) {
+          for (int k = 0; k < c_NumWindows; k++) {
+            TProfile* prof = m_profile[i][k];
+            if (prof) prof->Write();
+          }
+        }
+      }
+      file->Close();
+    }
+
+    unsigned numWindows = 0;
+    for (unsigned i = 0; i < c_NumChannels; i++) {
+      for (unsigned k = 0; k < c_NumWindows; k++) {
         TProfile* prof = m_profile[i][k];
-        if (prof) prof->Write();
+        if (!prof) continue;
+        if (k > numWindows) numWindows = k;
       }
     }
-    file->Close();
+    numWindows++;
+    B2INFO("TOPWFCalibratorModule: number of active ASIC storage windows: " << numWindows);
+
+    IRSConstants constants;
+    constants.setFileName(m_outputFileName);
+
+    for (int channel = 0; channel < c_NumChannels; channel++) {
+      auto* channelConstants = new ASICChannelConstants(m_barID, channel, numWindows);
+      for (int window = 0; window < c_NumWindows; window++) {
+        TProfile* prof = m_profile[channel][window];
+        if (prof) {
+          ASICWindowConstants windowConstants(window);
+          windowConstants.setPedestals(prof);
+          bool ok = channelConstants->setAsicWindowConstants(windowConstants);
+          if (!ok) {
+            B2ERROR("TOPWFCalibratorModule: can't set window constants for channel "
+                    << channel << " storage window " << window);
+          }
+        }
+      }
+
+      constants.setConstants(channelConstants);
+    }
+
+    constants.writeConstants(evtMetaData->getRun());
+
+    int all = 0;
+    int incomplete = 0;
+    for (int channel = 0; channel < c_NumChannels; channel++) {
+      auto* chan = constants.getConstants(m_barID, channel);
+      if (chan) {
+        all++;
+        if (chan->getNumofGoodWindows() != chan->getNumofWindows()) incomplete++;
+      }
+    }
+
+    B2RESULT("TOPWFCalibratorModule: bar ID = " << m_barID <<
+             ", number of calibrated channels " << all <<
+             " (" << incomplete << " are incomplete)");
 
   }
 

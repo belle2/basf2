@@ -103,16 +103,10 @@ class WFDisplay(Module):
             self.hist[k].Reset()
             self.hist[k].SetMinimum(0)
             self.hist[k].SetMaximum(4096)
-            scrod = waveform.getScrodID()
-            col = waveform.getAsicCol()
-            row = waveform.getAsicRow()
-            chan = waveform.getAsicChannel()
+            chan = waveform.getHardwareChannelID()
             window = waveform.getStorageWindow()
             refwin = waveform.getReferenceWindow()
-            title = 'scrod ' + str(scrod) + ' '
-            title += 'row ' + str(row) + ' '
-            title += 'col ' + str(col) + ' '
-            title += 'ch ' + str(chan) + ' '
+            title = 'chan ' + str(chan) + ' '
             title += 'win ' + str(window) + ' (' + str(refwin) + ')'
             self.hist[k].SetTitle(title)
             self.hist[k].SetStats(False)

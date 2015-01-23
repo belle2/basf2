@@ -14,11 +14,13 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <TProfile.h>
+#include <top/calibration/IRSConstants.h>
 
 namespace Belle2 {
 
   /**
    * Calibration of waveforms (pedestals, gains, time axis)
+   * (under development)
    */
   class TOPWFCalibratorModule : public Module {
 
@@ -65,9 +67,16 @@ namespace Belle2 {
 
   private:
 
-    enum {c_NumChannels = 512, c_NumWindows = 512};
+    /**
+     * number of channels per module, storage windows per channel, samples per window
+     */
+    enum {c_NumChannels = TOP::IRSConstants::c_NumChannels,
+          c_NumWindows = 512,
+          c_WindowSize = TOP::ASICWindowConstants::c_WindowSize
+         };
 
-    std::string m_outputFileName; /**< output file name (root file) */
+    std::string m_outputFileName;     /**< output file name (root file) */
+    std::string m_histogramFileName;  /**< output file name for histograms */
     int m_barID; /**< ID of TOP module to calibrate */
 
     TProfile* m_profile[c_NumChannels][c_NumWindows]; /**< profile histograms */

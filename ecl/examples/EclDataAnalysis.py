@@ -22,7 +22,7 @@ main = create_path()
 
 # Event setting and info
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # random number for generation
@@ -32,8 +32,8 @@ intseed = random.randint(1, 10000000)
 # single particle generator settings
 pGun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [11],
-    'nTracks': 0,
+    'pdgCodes': [111],
+    'nTracks': 2,
     'momentumGeneration': 'fixed',
     'momentumParams': [0.5],
     'thetaGeneration': 'uniform',
@@ -49,12 +49,30 @@ param_pGun = {
 pGun.param(param_pGun)
 main.add_module(pGun)
 
-add_simulation(main)
+bkgdir = '/sw/belle2/bkg/'
+# bkg = glob.glob(bkgdir+'*.root')
+
+bkgFiles = [
+    bkgdir + 'Coulomb_HER_100us.root',
+    bkgdir + 'Coulomb_LER_100us.root',
+    bkgdir + 'Coulomb_HER_100usECL.root',
+    bkgdir + 'Coulomb_LER_100usECL.root',
+    bkgdir + 'RBB_HER_100us.root',
+    bkgdir + 'RBB_LER_100us.root',
+    bkgdir + 'RBB_HER_100usECL.root',
+    bkgdir + 'RBB_LER_100usECL.root',
+    bkgdir + 'Touschek_HER_100us.root',
+    bkgdir + 'Touschek_LER_100us.root',
+    bkgdir + 'Touschek_HER_100usECL.root',
+    bkgdir + 'Touschek_LER_100usECL.root',
+    ]
+
+add_simulation(main, components, bkgfiles=bkgFiles)
 add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', 'EclDataAnalysis_electrons_500mev.root')
+ecldataanalysis.param('rootFileName', 'EclDataAnalysis_2Pi0_500Mev.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 

@@ -27,10 +27,10 @@ void NtupleContinuumSuppressionTool::setupTree()
   if (strNames.empty()) return;
 
   if (m_strOption.empty()) {
-    B2INFO("KSFW moments calculated from B primary daughers: default option");
+    B2INFO("KSFW moments calculated from B primary daughters: default option");
   } else {
     if (m_strOption == "FS1") {
-      B2INFO("KSFW moments calculated from B final state particle: user specified option " << m_strOption);
+      B2INFO("KSFW moments calculated from B final state particles: user specified option " << m_strOption);
       m_useFS1 = true;
     } else {
       B2FATAL("Invalid option used for ContinuumSuppression ntuple tool. Set to 'FS1' to store the KSFW moments formed using the B final state particles, or leave the option empty to use the default KSFW moments formed from the B primary daughters: " << m_strOption);

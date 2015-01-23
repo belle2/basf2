@@ -751,6 +751,33 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr transformedNetworkOutput(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        double low = 0;
+        double high = 0;
+        try {
+          low  = boost::lexical_cast<double>(arguments[1]);
+          high = boost::lexical_cast<double>(arguments[2]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second and third argument of transformedNetworkOutput meta function must be floats!");
+          return nullptr;
+        }
+        auto extraInfoName = arguments[0];
+        auto func = [extraInfoName, low, high](const Particle * particle) -> double {
+          if (particle == nullptr) {
+            StoreObjPtr<EventExtraInfo> eventExtraInfo;
+            return eventExtraInfo->getExtraInfo(extraInfoName);
+          }
+          return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function transformedNetworkOutput")
+        return nullptr;
+      }
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion, "Returns 1 if given variable is inside a given region. Otherwise 0.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
@@ -762,6 +789,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing, "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
     REGISTER_VARIABLE("KSFWVariables(variable)", KSFWVariables, "Returns et, mm2, or one of the 16 KSFW moments.");
+    REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
 
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
     REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightClass, extraInfoFromB)", InputQrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");

@@ -568,7 +568,7 @@ def trainTMVAMethod(
 def applyTMVAMethod(
     decayString,
     method='FastBDT',
-    signalProbabilityName='isSignal',
+    expertOutputName='isSignal',
     signalFraction=-1,
     signalClass=1,
     prefix='TMVA',
@@ -592,7 +592,7 @@ def applyTMVAMethod(
     expert.param('method', method)
     expert.param('workingDirectory', workingDirectory)
     expert.param('listNames', decayString)
-    expert.param('signalProbabilityName', signalProbabilityName)
+    expert.param('expertOutputName', signalProbabilityName)
     expert.param('signalFraction', signalFraction)
     expert.param('signalClass', signalClass)
     path.add_module(expert)

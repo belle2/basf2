@@ -43,7 +43,7 @@ namespace Belle2 {
              "and by TMVA method itself to read the files weights/$prefix_$method.class.C "
              "and weights/$prefix_$method.weights.xml with additional information", std::string("TMVA"));
     addParam("workingDirectory", m_workingDirectory, "Working directory in which the expert finds the config file and the weight file directory", std::string("."));
-    addParam("signalProbabilityName", m_signalProbabilityName, "Name under which the signal probability is stored in the ExtraInfo of the Particle object.");
+    addParam("expertOutputName", m_expertOutputName, "Name under which the output of the expert is stored in the ExtraInfo of the Particle object.");
     addParam("signalClass", m_signalClass, "Class which is considered as signal. e.g. the pdg of the Particle which is considered signal if "
              "you trained the method with pdg as target variable. Or 1 if you trained with isSignal as target.", 1);
     addParam("signalFraction", m_signalFraction, "signalFraction to calculate probability, -1 if no transformation of the method output should be performed, -2 if training signal/background ratio should be used. WARNING: If you want to use "
@@ -118,11 +118,11 @@ namespace Belle2 {
       for (unsigned i = 0; i < list->getListSize(); ++i) {
         Particle* particle = list->getParticle(i);
         float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(particle, m_signalFraction));
-        if (particle->hasExtraInfo(m_signalProbabilityName)) {
+        if (particle->hasExtraInfo(m_expertOutputName)) {
           B2WARNING("Extra Info with given name is already set! Overwriting old value!")
-          particle->setExtraInfo(m_signalProbabilityName, targetValue);
+          particle->setExtraInfo(m_expertOutputName, targetValue);
         } else {
-          particle->addExtraInfo(m_signalProbabilityName, targetValue);
+          particle->addExtraInfo(m_expertOutputName, targetValue);
         }
       }
     }
@@ -130,11 +130,11 @@ namespace Belle2 {
       StoreObjPtr<EventExtraInfo> eventExtraInfo;
       if (not eventExtraInfo.isValid())
         eventExtraInfo.create();
-      if (eventExtraInfo->hasExtraInfo(m_signalProbabilityName)) {
+      if (eventExtraInfo->hasExtraInfo(m_expertOutputName)) {
         B2WARNING("Extra Info with given name is already set! I won't set it again!")
       } else {
         float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(nullptr, m_signalFraction));
-        eventExtraInfo->addExtraInfo(m_signalProbabilityName, targetValue);
+        eventExtraInfo->addExtraInfo(m_expertOutputName, targetValue);
       }
     }
   }

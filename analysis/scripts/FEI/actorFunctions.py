@@ -398,7 +398,7 @@ def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribut
         expert.param('method', mvaConfig.name)
         expert.param('signalFraction', -2)  # Use signalFraction from training
         #expert.param('signalFraction', -1)  # No transformation of output
-        expert.param('signalProbabilityName', 'SignalProbability')
+        expert.param('expertOutputName', 'SignalProbability')
         expert.param('signalClass', 1)
         expert.param('inverseSamplingRates', inverseSamplingRates)
         expert.param('listNames', [particleList])

@@ -75,7 +75,7 @@ namespace Belle2 {
     std::string m_methodName; /**< name of the TMVA method specified in the training by TMVATeacher */
     std::string m_methodPrefix; /**< common prefix for the methods trained by TMVATeacher */
     std::string m_workingDirectory; /**< Working directory in which the expert finds the config file and the weight file directory */
-    std::string m_signalProbabilityName /**< Name under which the SignalProbability is stored in the ExtraInfo of the Particle object. */;
+    std::string m_expertOutputName; /**< Name under which the SignalProbability is stored in the ExtraInfo of the Particle object. */
     int m_signalClass; /**< Class which is considered signal.  */
     std::shared_ptr<TMVAInterface::Expert> m_method; /**< Method used to calculate the target variable */
     float m_signalFraction; /**< signalFraction to calculate probability, -1 if no transformation of the method output should be performed */

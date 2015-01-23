@@ -22,7 +22,7 @@ for method in methods:
     expert.param('prefix', 'TMVA')
     expert.param('method', method)
     expert.param('listNames', 'e-')
-    expert.param('signalProbabilityName', method + '_Probability')
+    expert.param('expertOutputName', method + '_Probability')
     expert.param('signalClass', 11)
     main.add_module(expert)
 

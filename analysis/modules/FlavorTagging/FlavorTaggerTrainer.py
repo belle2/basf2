@@ -246,7 +246,7 @@ for (symbol, category) in trackLevelParticles:
         applyTMVAMethod(
             particleList,
             prefix=methodPrefixTrackLevel,
-            signalProbabilityName=targetVariable,
+            expertOutputName=targetVariable,
             method=methods[0][0],
             signalFraction=signalFraction,
             workingDirectory=workingDirectory,
@@ -332,7 +332,7 @@ if eventLevelReady:
             applyTMVAMethod(
                 particleList,
                 prefix=methodPrefixEventLevel,
-                signalProbabilityName=targetVariable,
+                expertOutputName=targetVariable,
                 method=methods[0][0],
                 signalFraction=signalFraction,
                 workingDirectory=workingDirectory,
@@ -401,7 +401,7 @@ if combinerLevelReady:
         B2INFO('Apply TMVAMethod on combiner level')
         applyTMVAMethod(
             [],
-            signalProbabilityName='qrCombined',
+            expertOutputName='qrCombined',
             prefix=methodPrefixCombinerLevel,
             signalClass=1,
             method=method_Combiner[0][0],

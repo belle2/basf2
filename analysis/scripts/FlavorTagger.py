@@ -282,7 +282,7 @@ def TrackLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
             applyTMVAMethod(
                 particleList,
                 prefix=methodPrefixTrackLevel,
-                signalProbabilityName=targetVariable,
+                expertOutputName=targetVariable,
                 method=methods[0][0],
                 signalFraction=signalFraction,
                 workingDirectory=workingDirectory,
@@ -331,7 +331,7 @@ def EventLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
             applyTMVAMethod(
                 particleList,
                 prefix=methodPrefixEventLevel,
-                signalProbabilityName=targetVariable,
+                expertOutputName=targetVariable,
                 method=methods[0][0],
                 signalFraction=signalFraction,
                 workingDirectory=workingDirectory,
@@ -363,7 +363,7 @@ def CombinerLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
         B2INFO('Apply TMVAMethod on combiner level')
         applyTMVAMethod(
             [],
-            signalProbabilityName='qrCombined',
+            expertOutputName='qrCombined',
             prefix=methodPrefixCombinerLevel,
             signalClass=1,
             method=methodsCombiner[0][0],

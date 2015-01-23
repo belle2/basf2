@@ -44,7 +44,7 @@ def stdPi0(path=analysis_main):
                  + '/analysis/data/TMVA/StandardPi0/')
     expert.param('method', 'BDTG')
     expert.param('listNames', ['pi0:all'])
-    expert.param('signalProbabilityName', 'BDT')
+    expert.param('expertOutputName', 'BDT')
     path.add_module(expert)
 
     cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < extraInfo(BDT) < 1.0',

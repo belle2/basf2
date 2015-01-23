@@ -72,7 +72,7 @@ matchMCTruth('pi0')
 # Apply previously trained TMVA method. The training files are identified by the prefix.
 # The expert calculates for each candidate in the pi0 particle list the classifier response
 # and stores the value in the extra info field of the particle under the key BDT.
-applyTMVAMethod('pi0', method='BDTG', signalProbabilityName='BDT', prefix='PI0-B2A501-TMVA')
+applyTMVAMethod('pi0', method='BDTG', expertOutputName='BDT', prefix='PI0-B2A501-TMVA')
 
 toolsPI0 = ['MCTruth', '^pi0 -> gamma gamma']
 toolsPI0 += ['Kinematics', '^pi0 -> ^gamma ^gamma']

@@ -19,7 +19,7 @@ for method in methods:
     expert = register_module('TMVAExpert')
     expert.param('prefix', 'TMVA')
     expert.param('method', method)
-    expert.param('signalProbabilityName', method + '_Probability')
+    expert.param('expertOutputName', method + '_Probability')
     main.add_module(expert)
 
 output = register_module('VariablesToNtuple')

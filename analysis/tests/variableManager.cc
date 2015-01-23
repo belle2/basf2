@@ -220,6 +220,7 @@ namespace {
     EXPECT_EQ("", makeROOTCompatible(":() (),"));
     EXPECT_EQ("cba", makeROOTCompatible("c:()b (),a"));
     EXPECT_EQ("c8951aBZWVZUEOH_Rhtnsqba", makeROOTCompatible("c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a"));
+    EXPECT_EQ("foobar012394", makeROOTCompatible("foo(bar,-0.123, 94)"));
   }
 
 }  // namespace

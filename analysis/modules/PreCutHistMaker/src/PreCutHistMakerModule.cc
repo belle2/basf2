@@ -58,8 +58,7 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   addParam("variable", m_variable, "Variable for which the distributions are calculated");
   addParam("target", m_targetVariable, "Variable which defines signal and background.", std::string("isSignal"));
   addParam("customBinning", m_customBinning, "Custom binning, which is used instead of histParams. Specify low-edges for each bin, with nbins+1 entries.", std::vector<float>());
-  addParam("inverseSamplingRate", m_inverseSamplingRate, "Inverse Sampling rate for 'all' histogram.", static_cast<unsigned int>(1));
-
+  addParam("inverseSamplingRate", m_inverseSamplingRate, "Inverse sampling rate for 'all' histogram.", static_cast<unsigned int>(1));
 }
 
 PreCutHistMakerModule::~PreCutHistMakerModule()

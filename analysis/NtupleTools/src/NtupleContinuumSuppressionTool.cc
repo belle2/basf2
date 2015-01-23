@@ -25,6 +25,19 @@ void NtupleContinuumSuppressionTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) return;
+
+  if (m_strOption.empty()) {
+    B2INFO("KSFW moments calculated from B primary daughers: default option");
+  } else {
+    if (m_strOption == "FS1") {
+      B2INFO("KSFW moments calculated from B final state particle: user specified option " << m_strOption);
+      m_useFS1 = true;
+    } else {
+      B2FATAL("Invalid option used for ContinuumSuppression ntuple tool. Set to 'FS1' to store the KSFW moments formed using the B final state particles, or leave the option empty to use the default KSFW moments formed from the B primary daughters: " << m_strOption);
+    }
+  }
+
+
   m_fThrustB = 0;
   m_fThrustO = 0;
   m_tree->Branch((strNames[0] + "_ThrustB").c_str(), &m_fThrustB, (strNames[0] + "_ThrustB/F").c_str());
@@ -37,80 +50,6 @@ void NtupleContinuumSuppressionTool::setupTree()
 
   m_fR2 = 0;
   m_tree->Branch((strNames[0] + "_R2").c_str()     , &m_fR2     , (strNames[0] + "_R2/F").c_str());
-
-  m_fk0mm2   = 0;
-  m_fk0et    = 0;
-  m_fk0hso00 = 0;
-  m_fk0hso01 = 0;
-  m_fk0hso02 = 0;
-  m_fk0hso03 = 0;
-  m_fk0hso04 = 0;
-  m_fk0hso10 = 0;
-  m_fk0hso12 = 0;
-  m_fk0hso14 = 0;
-  m_fk0hso20 = 0;
-  m_fk0hso22 = 0;
-  m_fk0hso24 = 0;
-  m_fk0hoo0  = 0;
-  m_fk0hoo1  = 0;
-  m_fk0hoo2  = 0;
-  m_fk0hoo3  = 0;
-  m_fk0hoo4  = 0;
-  m_tree->Branch((strNames[0] + "_k0mm2").c_str()  , &m_fk0mm2  , (strNames[0] + "_k0mm2/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0et").c_str()   , &m_fk0et   , (strNames[0] + "_k0et/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso00").c_str(), &m_fk0hso00, (strNames[0] + "_k0hso00/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso01").c_str(), &m_fk0hso01, (strNames[0] + "_k0hso01/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso02").c_str(), &m_fk0hso02, (strNames[0] + "_k0hso02/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso03").c_str(), &m_fk0hso03, (strNames[0] + "_k0hso03/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso04").c_str(), &m_fk0hso04, (strNames[0] + "_k0hso04/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso10").c_str(), &m_fk0hso10, (strNames[0] + "_k0hso10/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso12").c_str(), &m_fk0hso12, (strNames[0] + "_k0hso12/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso14").c_str(), &m_fk0hso14, (strNames[0] + "_k0hso14/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso20").c_str(), &m_fk0hso20, (strNames[0] + "_k0hso20/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso22").c_str(), &m_fk0hso22, (strNames[0] + "_k0hso22/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hso24").c_str(), &m_fk0hso24, (strNames[0] + "_k0hso24/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo0").c_str() , &m_fk0hoo0 , (strNames[0] + "_k0hoo0/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo1").c_str() , &m_fk0hoo1 , (strNames[0] + "_k0hoo1/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo2").c_str() , &m_fk0hoo2 , (strNames[0] + "_k0hoo2/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo3").c_str() , &m_fk0hoo3 , (strNames[0] + "_k0hoo3/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo4").c_str() , &m_fk0hoo4 , (strNames[0] + "_k0hoo4/F").c_str());
-
-  m_fk1mm2   = 0;
-  m_fk1et    = 0;
-  m_fk1hso00 = 0;
-  m_fk1hso01 = 0;
-  m_fk1hso02 = 0;
-  m_fk1hso03 = 0;
-  m_fk1hso04 = 0;
-  m_fk1hso10 = 0;
-  m_fk1hso12 = 0;
-  m_fk1hso14 = 0;
-  m_fk1hso20 = 0;
-  m_fk1hso22 = 0;
-  m_fk1hso24 = 0;
-  m_fk1hoo0  = 0;
-  m_fk1hoo1  = 0;
-  m_fk1hoo2  = 0;
-  m_fk1hoo3  = 0;
-  m_fk1hoo4  = 0;
-  m_tree->Branch((strNames[0] + "_k1mm2").c_str()  , &m_fk1mm2  , (strNames[0] + "_k1mm2/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1et").c_str()   , &m_fk1et   , (strNames[0] + "_k1et/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso00").c_str(), &m_fk1hso00, (strNames[0] + "_k1hso00/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso01").c_str(), &m_fk1hso01, (strNames[0] + "_k1hso01/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso02").c_str(), &m_fk1hso02, (strNames[0] + "_k1hso02/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso03").c_str(), &m_fk1hso03, (strNames[0] + "_k1hso03/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso04").c_str(), &m_fk1hso04, (strNames[0] + "_k1hso04/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso10").c_str(), &m_fk1hso10, (strNames[0] + "_k1hso10/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso12").c_str(), &m_fk1hso12, (strNames[0] + "_k1hso12/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso14").c_str(), &m_fk1hso14, (strNames[0] + "_k1hso14/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso20").c_str(), &m_fk1hso20, (strNames[0] + "_k1hso20/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso22").c_str(), &m_fk1hso22, (strNames[0] + "_k1hso22/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hso24").c_str(), &m_fk1hso24, (strNames[0] + "_k1hso24/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo0").c_str() , &m_fk1hoo0 , (strNames[0] + "_k1hoo0/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo1").c_str() , &m_fk1hoo1 , (strNames[0] + "_k1hoo1/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo2").c_str() , &m_fk1hoo2 , (strNames[0] + "_k1hoo2/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo3").c_str() , &m_fk1hoo3 , (strNames[0] + "_k1hoo3/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo4").c_str() , &m_fk1hoo4 , (strNames[0] + "_k1hoo4/F").c_str());
 
   m_fcc1 = 0;
   m_fcc2 = 0;
@@ -130,6 +69,48 @@ void NtupleContinuumSuppressionTool::setupTree()
   m_tree->Branch((strNames[0] + "_cc7").c_str()  , &m_fcc7  , (strNames[0] + "_cc7/F").c_str());
   m_tree->Branch((strNames[0] + "_cc8").c_str()  , &m_fcc8  , (strNames[0] + "_cc8/F").c_str());
   m_tree->Branch((strNames[0] + "_cc9").c_str()  , &m_fcc9  , (strNames[0] + "_cc9/F").c_str());
+
+
+  string FS = "";
+  if (m_useFS1)
+    FS = "_FS1";
+
+  m_fmm2   = 0;
+  m_fet    = 0;
+  m_fhso00 = 0;
+  m_fhso01 = 0;
+  m_fhso02 = 0;
+  m_fhso03 = 0;
+  m_fhso04 = 0;
+  m_fhso10 = 0;
+  m_fhso12 = 0;
+  m_fhso14 = 0;
+  m_fhso20 = 0;
+  m_fhso22 = 0;
+  m_fhso24 = 0;
+  m_fhoo0  = 0;
+  m_fhoo1  = 0;
+  m_fhoo2  = 0;
+  m_fhoo3  = 0;
+  m_fhoo4  = 0;
+  m_tree->Branch((strNames[0] + "_mm2"   + FS).c_str(), &m_fmm2  , (strNames[0] + "_mm2"   + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_et"    + FS).c_str(), &m_fet   , (strNames[0] + "_et"    + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso00" + FS).c_str(), &m_fhso00, (strNames[0] + "_hso00" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso01" + FS).c_str(), &m_fhso01, (strNames[0] + "_hso01" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso02" + FS).c_str(), &m_fhso02, (strNames[0] + "_hso02" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso03" + FS).c_str(), &m_fhso03, (strNames[0] + "_hso03" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso04" + FS).c_str(), &m_fhso04, (strNames[0] + "_hso04" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso10" + FS).c_str(), &m_fhso10, (strNames[0] + "_hso10" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso12" + FS).c_str(), &m_fhso12, (strNames[0] + "_hso12" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso14" + FS).c_str(), &m_fhso14, (strNames[0] + "_hso14" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso20" + FS).c_str(), &m_fhso20, (strNames[0] + "_hso20" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso22" + FS).c_str(), &m_fhso22, (strNames[0] + "_hso22" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hso24" + FS).c_str(), &m_fhso24, (strNames[0] + "_hso24" + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hoo0"  + FS).c_str(), &m_fhoo0 , (strNames[0] + "_hoo0"  + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hoo1"  + FS).c_str(), &m_fhoo1 , (strNames[0] + "_hoo1"  + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hoo2"  + FS).c_str(), &m_fhoo2 , (strNames[0] + "_hoo2"  + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hoo3"  + FS).c_str(), &m_fhoo3 , (strNames[0] + "_hoo3"  + FS + "/F").c_str());
+  m_tree->Branch((strNames[0] + "_hoo4"  + FS).c_str(), &m_fhoo4 , (strNames[0] + "_hoo4"  + FS + "/F").c_str());
 }
 
 void NtupleContinuumSuppressionTool::eval(const Particle* particle)
@@ -149,48 +130,7 @@ void NtupleContinuumSuppressionTool::eval(const Particle* particle)
     m_fCosTBTO = qq->getCosTBTO();
     m_fCosTBz  = qq->getCosTBz();
 
-    m_fR2      = qq->getR2();
-
-    // use_finalstate_for_sig == 0
-    std::vector<float> ksfwFS0 = qq->getKsfwFS0();
-    m_fk0mm2    = ksfwFS0.at(0);
-    m_fk0et     = ksfwFS0.at(1);
-    m_fk0hso00  = ksfwFS0.at(2);
-    m_fk0hso01  = ksfwFS0.at(3);
-    m_fk0hso02  = ksfwFS0.at(4);
-    m_fk0hso03  = ksfwFS0.at(5);
-    m_fk0hso04  = ksfwFS0.at(6);
-    m_fk0hso10  = ksfwFS0.at(7);
-    m_fk0hso12  = ksfwFS0.at(8);
-    m_fk0hso14  = ksfwFS0.at(9);
-    m_fk0hso20  = ksfwFS0.at(10);
-    m_fk0hso22  = ksfwFS0.at(11);
-    m_fk0hso24  = ksfwFS0.at(12);
-    m_fk0hoo0   = ksfwFS0.at(13);
-    m_fk0hoo1   = ksfwFS0.at(14);
-    m_fk0hoo2   = ksfwFS0.at(15);
-    m_fk0hoo3   = ksfwFS0.at(16);
-    m_fk0hoo4   = ksfwFS0.at(17);
-    // use_finalstate_for_sig == 1
-    std::vector<float> ksfwFS1 = qq->getKsfwFS1();
-    m_fk1mm2    = ksfwFS1.at(0);
-    m_fk1et     = ksfwFS1.at(1);
-    m_fk1hso00  = ksfwFS1.at(2);
-    m_fk1hso01  = ksfwFS1.at(3);
-    m_fk1hso02  = ksfwFS1.at(4);
-    m_fk1hso03  = ksfwFS1.at(5);
-    m_fk1hso04  = ksfwFS1.at(6);
-    m_fk1hso10  = ksfwFS1.at(7);
-    m_fk1hso12  = ksfwFS1.at(8);
-    m_fk1hso14  = ksfwFS1.at(9);
-    m_fk1hso20  = ksfwFS1.at(10);
-    m_fk1hso22  = ksfwFS1.at(11);
-    m_fk1hso24  = ksfwFS1.at(12);
-    m_fk1hoo0   = ksfwFS1.at(13);
-    m_fk1hoo1   = ksfwFS1.at(14);
-    m_fk1hoo2   = ksfwFS1.at(15);
-    m_fk1hoo3   = ksfwFS1.at(16);
-    m_fk1hoo4   = ksfwFS1.at(17);
+    m_fR2  = qq->getR2();
 
     std::vector<float> cleoCones = qq->getCleoCones();
     m_fcc1 = cleoCones.at(0);
@@ -202,6 +142,32 @@ void NtupleContinuumSuppressionTool::eval(const Particle* particle)
     m_fcc7 = cleoCones.at(6);
     m_fcc8 = cleoCones.at(7);
     m_fcc9 = cleoCones.at(8);
+
+    // Defualt KSFW moments calculated using B primary daughters.
+    std::vector<float> ksfw = qq->getKsfwFS0();
+
+    // User speficied override: Store KSFW moments calculated using B final-state particles.
+    if (m_useFS1)
+      ksfw = qq->getKsfwFS1();
+
+    m_fmm2    = ksfw.at(0);
+    m_fet     = ksfw.at(1);
+    m_fhso00  = ksfw.at(2);
+    m_fhso01  = ksfw.at(3);
+    m_fhso02  = ksfw.at(4);
+    m_fhso03  = ksfw.at(5);
+    m_fhso04  = ksfw.at(6);
+    m_fhso10  = ksfw.at(7);
+    m_fhso12  = ksfw.at(8);
+    m_fhso14  = ksfw.at(9);
+    m_fhso20  = ksfw.at(10);
+    m_fhso22  = ksfw.at(11);
+    m_fhso24  = ksfw.at(12);
+    m_fhoo0   = ksfw.at(13);
+    m_fhoo1   = ksfw.at(14);
+    m_fhoo2   = ksfw.at(15);
+    m_fhoo3   = ksfw.at(16);
+    m_fhoo4   = ksfw.at(17);
   }
 
 }

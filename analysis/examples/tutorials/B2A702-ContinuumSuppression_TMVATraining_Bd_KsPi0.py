@@ -104,8 +104,6 @@ methods = [('FastBDT', 'Plugin',
            ), ('NeuroBayes', 'Plugin',
            'H:V:CreateMVAPdfs:NtrainingIter=20:Preprocessing=612:ShapeTreat=DIAG:TrainingMethod=BFGS'
            )]
-               # fei
-               # ov
 
 # TMVA training/testing
 teacher = register_module('TMVATeacher')

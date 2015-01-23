@@ -32,12 +32,12 @@ intseed = random.randint(1, 10000000)
 # single particle generator settings
 pGun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [111],
-    'nTracks': 2,
+    'pdgCodes': [22],
+    'nTracks': 1,
     'momentumGeneration': 'fixed',
-    'momentumParams': [0.5],
+    'momentumParams': [1],
     'thetaGeneration': 'uniform',
-    'thetaParams': [40., 120.],
+    'thetaParams': [20., 24.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'vertexGeneration': 'uniform',
@@ -72,7 +72,7 @@ add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', 'EclDataAnalysis_2Pi0_500Mev.root')
+ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Photon_1GeV_Bkg.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 

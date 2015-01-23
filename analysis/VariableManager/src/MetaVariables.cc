@@ -720,18 +720,24 @@ namespace Belle2 {
     // Continuum Suppression related -----------------------------------------------
     Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
+      if (arguments.size() == 1 || arguments.size() == 2) {
+        bool useFS1 = false;
         auto variableName = arguments[0];
-        // auto useFinalState = arguments[1];
+        if (arguments.size() == 2) {
+          if (arguments[1] == "FS1") {
+            useFS1 = true;
+          } else {
+            B2FATAL("Second argument in KSFWVariables can only be 'FS1' to use the KSFW moments calculated from the B final state particles! Do not include a second argument to use the default KSFW moments calculated from the B primary daughters.");
+            return nullptr;
+          }
+        }
         int index = -1;
 
-        // Next make FS0 (aka k0) default.
-        // If user specifies FS1 in arguments[1], overwrite k0 with k1 in loop.
-        std::vector<std::string> names = {"k0mm2",   "k0et",
-                                          "k0hso00", "k0hso01", "k0hso02", "k0hso03", "k0hso04",
-                                          "k0hso10", "k0hso12", "k0hso14",
-                                          "k0hso20", "k0hso22", "k0hso24",
-                                          "k0hoo0",  "k0hoo1",  "k0hoo2",  "k0hoo3",  "k0hoo4"
+        std::vector<std::string> names = {"mm2",   "et",
+                                          "hso00", "hso01", "hso02", "hso03", "hso04",
+                                          "hso10", "hso12", "hso14",
+                                          "hso20", "hso22", "hso24",
+                                          "hoo0",  "hoo1",  "hoo2",  "hoo3",  "hoo4"
                                          };
 
         for (unsigned i = 0; i < names.size(); ++i) {
@@ -739,14 +745,16 @@ namespace Belle2 {
             index = i;
         }
 
-        auto func = [index](const Particle * particle) -> double {
+        auto func = [index, useFS1](const Particle * particle) -> double {
           const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-          std::vector<float> ksfwFS0 = qq->getKsfwFS0();
-          return ksfwFS0.at(index);
+          std::vector<float> ksfw = qq->getKsfwFS0();
+          if (useFS1)
+            ksfw = qq->getKsfwFS1();
+          return ksfw.at(index);
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function KSFWVariables");
+        B2FATAL("Wrong number of arguments for meta function KSFWVariables. It only takes one or two arguments. The first argument must be the variable and the second can either be left blank or must be FS1 to use the KSFW moments calculated from the B final state particles.");
         return nullptr;
       }
     }
@@ -788,7 +796,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("abs(variable)", abs, "Returns absolute value of the given variable.");
     REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing, "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
-    REGISTER_VARIABLE("KSFWVariables(variable)", KSFWVariables, "Returns et, mm2, or one of the 16 KSFW moments.");
+    REGISTER_VARIABLE("KSFWVariables(variable,finalState)", KSFWVariables, "Returns et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If finalState is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
 
     VARIABLE_GROUP("MetaFunctions FlavorTagging")

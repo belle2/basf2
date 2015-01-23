@@ -760,7 +760,7 @@ namespace Belle2 {
           low  = boost::lexical_cast<double>(arguments[1]);
           high = boost::lexical_cast<double>(arguments[2]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second and third argument of transformedNetworkOutput meta function must be floats!");
+          B2WARNING("Second and third argument of transformedNetworkOutput meta function must be doubles!");
           return nullptr;
         }
         auto extraInfoName = arguments[0];

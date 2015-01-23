@@ -87,11 +87,14 @@ namespace Belle2 {
     m_outputAntiListName       = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
 
     // Input lists
-    unsigned nProducts = m_inputListNames.size();
-    for (unsigned i = 0; i < nProducts; ++i) {
-      bool valid = m_decaydescriptor.init(m_inputListNames[i]);
-      if (!valid)
-        B2ERROR("Invalid input ParticleList name: " << m_inputListNames[i]);
+    for (const std::string & listName : m_inputListNames) {
+      if (listName == m_outputListName) {
+        B2ERROR("ParticleListManipulatorModule: cannot copy Particles from " << listName << " to itself! Use applyCuts() (ParticleSelector module) instead.");
+      } else if (!m_decaydescriptor.init(listName)) {
+        B2ERROR("Invalid input ParticleList name: " << listName);
+      } else {
+        StoreObjPtr<ParticleList>::required(listName);
+      }
     }
 
     StoreObjPtr<ParticleList> particleList(m_outputListName);
@@ -102,12 +105,7 @@ namespace Belle2 {
       antiParticleList.registerInDataStore(flags);
     }
 
-    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      StoreObjPtr<ParticleList>::required(m_inputListNames[i]);
-    }
-
     m_cut.init(m_cutParameter);
-
   }
 
   void ParticleListManipulatorModule::beginRun()

@@ -18,7 +18,7 @@
 #include <framework/datastore/RelationArray.h> // not sure if I actually use this
 
 #include <algorithm>
-#include <mdst/dataobjects/MCParticle.h>
+// #include <mdst/dataobjects/MCParticle.h>
 
 #include <TVector3.h> // COULDDO: B2Vector3.h
 

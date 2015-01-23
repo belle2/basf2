@@ -11,6 +11,7 @@
 
 // framework
 #include <framework/core/Module.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // ROOT
 #include <TFile.h>

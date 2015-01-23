@@ -197,15 +197,10 @@ def copyList(
     @param ouputListName copied ParticleList
     @param inputListName original ParticleList to be copied
     @param writeOut      wether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path 
+    @param path          modules are added to this path
     """
 
-    pmanipulate = register_module('ParticleListManipulator')
-    pmanipulate.set_name('PListCopy_' + outputListName)
-    pmanipulate.param('outputListName', outputListName)
-    pmanipulate.param('inputListNames', [inputListName])
-    pmanipulate.param('writeOut', writeOut)
-    path.add_module(pmanipulate)
+    copyLists(outputListName, [inputListName], writeOut, path)
 
 
 def copyLists(
@@ -216,7 +211,7 @@ def copyLists(
     ):
     """
     Copy all Particle indices from all input ParticleLists to the single output ParticleList.
-    
+
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
     @param writeOut      wether RootOutput module should save the created ParticleList
@@ -239,9 +234,9 @@ def cutAndCopyLists(
     path=analysis_main,
     ):
     """
-    Copy Particle indices that pass selection criteria from all 
+    Copy Particle indices that pass selection criteria from all
     input ParticleLists to the single output ParticleList.
-    
+
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
     @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
@@ -276,13 +271,7 @@ def cutAndCopyList(
     @param path          modules are added to this path
     """
 
-    pmanipulate = register_module('ParticleListManipulator')
-    pmanipulate.set_name('PListCutAndCopy_' + outputListName)
-    pmanipulate.param('outputListName', outputListName)
-    pmanipulate.param('inputListNames', [inputListName])
-    pmanipulate.param('cut', cut)
-    pmanipulate.param('writeOut', writeOut)
-    path.add_module(pmanipulate)
+    cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False,

@@ -127,6 +127,11 @@ namespace Belle2 {
      */
     bool isValidPDGCode(const int pdgCode);
 
+    /**
+     * recursively append bottom of a particle's decay chain (daughters of mother, granddaughters of daughter and so on).
+     */
+    void appendDaughtersRecursive(Particle* mother);
+
     bool m_useMCParticles;  /**< Load MCParticle as Particle instead of the corresponding MDST dataobject */
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
@@ -141,6 +146,8 @@ namespace Belle2 {
     std::vector<PList> m_KLMClusters2Plists; /**< Collection of PLists that will collect Particles created from KLMClusters */
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
+    bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
+
   };
 
 } // Belle2 namespace

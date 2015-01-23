@@ -360,6 +360,7 @@ def fillParticleList(
 def fillParticleListFromMC(
     decayString,
     cut,
+    addDaughters=False,
     writeOut=False,
     path=analysis_main,
     ):
@@ -371,6 +372,7 @@ def fillParticleListFromMC(
     
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
+    @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
@@ -378,13 +380,18 @@ def fillParticleListFromMC(
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('addDaughters', addDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
 
 
-def fillParticleListsFromMC(decayStringsWithCuts, writeOut=False,
-                            path=analysis_main):
+def fillParticleListsFromMC(
+    decayStringsWithCuts,
+    addDaughters=False,
+    writeOut=False,
+    path=analysis_main,
+    ):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -397,6 +404,7 @@ def fillParticleListsFromMC(decayStringsWithCuts, writeOut=False,
     
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
+    @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
@@ -404,6 +412,7 @@ def fillParticleListsFromMC(decayStringsWithCuts, writeOut=False,
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('addDaughters', addDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)

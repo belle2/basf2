@@ -62,6 +62,8 @@ namespace Belle2 {
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+
+    addParam("addDaughters", m_addDaughters, "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set", false);
   }
 
   ParticleLoaderModule::~ParticleLoaderModule()
@@ -511,6 +513,9 @@ namespace Belle2 {
         Particle* newPart = particles.appendNew(particle);
         newPart->addRelationTo(mcParticle);
 
+        //append the whole bottom part of the decay tree to this particle
+        if (m_addDaughters) appendDaughtersRecursive(newPart);
+
         string listName = get<c_PListName>(mcParticle2Plist);
         Variable::Cut* cut = get<c_CutPointer>(mcParticle2Plist);
         StoreObjPtr<ParticleList> plist(listName);
@@ -542,5 +547,28 @@ namespace Belle2 {
 
     return result;
   }
+
+  void ParticleLoaderModule::appendDaughtersRecursive(Particle* mother)
+  {
+    StoreArray<Particle> particles;
+    MCParticle* mcmother = mother->getRelated<MCParticle>();
+
+    if (!mcmother)
+      return;
+
+    vector<MCParticle*> mcdaughters = mcmother->getDaughters();
+
+    for (unsigned int i = 0; i < mcdaughters.size(); i++) {
+      Particle particle(mcdaughters[i]);
+      Particle* daughter = particles.appendNew(particle);
+      daughter->addRelationTo(mcdaughters[i]);
+      mother->appendDaughter(daughter);
+
+      if (mcdaughters[i]->getNDaughters() > 0)
+        appendDaughtersRecursive(daughter);
+    }
+  }
+
+
 } // end Belle2 namespace
 

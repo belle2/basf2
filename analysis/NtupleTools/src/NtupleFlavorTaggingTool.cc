@@ -18,13 +18,13 @@ void NtupleFlavorTaggingTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) return;
-  float B0Probability = 0;
-  float B0barProbability = 0;
-  float qrCombined = 0;
-  float qrMC = 0;
-  float NTracksInROE = 0;
-  float NECLClustersInROE = 0;
-  float NKLMClustersInROE = 0;
+  B0Probability = 0;
+  B0barProbability = 0;
+  qrCombined = 0;
+  qrMC = 0;
+  NTracksInROE = 0;
+  NECLClustersInROE = 0;
+  NKLMClustersInROE = 0;
 
   m_tree->Branch((strNames[0] + "_B0Probability").c_str(), &B0Probability, (strNames[0] + "_B0Probability/F").c_str());
   m_tree->Branch((strNames[0] + "_B0barProbability").c_str(), &B0barProbability, (strNames[0] + "_B0barProbability/F").c_str());

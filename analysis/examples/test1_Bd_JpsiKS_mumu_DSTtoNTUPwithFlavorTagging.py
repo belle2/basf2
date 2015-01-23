@@ -48,18 +48,17 @@ tools = [
     'RecoStats',
     'B0',
     'Kinematics',
-    '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
+    '^B0 -> [^K_S0 -> ^pi+ ^pi-] [^J/psi -> ^mu+ ^mu-]',
     'MCTruth',
-    '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
+    '^B0 ->  [^K_S0 -> ^pi+ ^pi-] [^J/psi -> ^mu+ ^mu-]',
     'DeltaEMbc',
-    '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
+    '^B0 ->  [K_S0 -> pi+ pi-] [J/psi -> mu+ mu-]',
     'MCHierarchy',
-    'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
+    'B0 ->  [K_S0 -> ^pi+ ^pi-] [J/psi -> ^mu+ ^mu-]',
     'PID',
-    'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
+    'B0 ->  [K_S0 -> ^pi+ ^pi-] [J/psi -> ^mu+ ^mu-]',
     'FlavorTagging',
-    '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
-    ]
+    '^B0 ->  [K_S0 -> pi+ pi-] [J/psi -> mu+ mu-]', ]
 
 ntupleTree('Bd_JpsiKS_tuple', 'B0', tools)
 
@@ -72,12 +71,11 @@ eventtools = [
     'DetectorStatsRec',
     'B-',
     'DetectorStatsSim',
-    'B-',
-    ]
+    'B-', ]
 
 ntupleTree('eventtuple', '', eventtools)
 
-summaryOfLists(['J/psi', 'K_S0', 'B0'])
+summaryOfLists(['K_S0', 'J/psi', 'B0'])
 
 # ----> start processing of modules
 process(analysis_main)

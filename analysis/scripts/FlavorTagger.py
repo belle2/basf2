@@ -57,8 +57,11 @@ class MoveTaggerInformationToBExtraInfoModule(Module):
         info = Belle2.PyStoreObj('EventExtraInfo')
         someParticle = Belle2.Particle(None)
         B0Probability = info.obj().getExtraInfo('qrCombined')
+        print 'MOEDEBUG B0PROBABILITY ' + str(B0Probability)
         B0barProbability = 1 - info.obj().getExtraInfo('qrCombined')
+        print 'MOEDEBUG B0BARPROBABITLITY ' + str(B0barProbability)
         qrCombined = 2 * (info.obj().getExtraInfo('qrCombined') - 0.5)
+        print 'MOEDEBUG QRCOMBINED' + str(qrCombined)
         qrMC = 2 * (mc_variables.variables.evaluate('qrCombined',
                     someParticle) - 0.5)
         NTracksInROE = roe.obj().getNTracks()
@@ -66,6 +69,7 @@ class MoveTaggerInformationToBExtraInfoModule(Module):
         NKLMClustersInROE = roe.obj().getNKLMClusters()
         B0 = roe.obj().getRelated('Particles')
         B0.addExtraInfo('B0Probability', B0Probability)
+        print 'MOEDEBUG B0 PROB GETTER FROM B0 ' + str(B0.getExtraInfo('B0Probability'))
         B0.addExtraInfo('B0barProbability', B0barProbability)
         B0.addExtraInfo('qrCombined', qrCombined)
         B0.addExtraInfo('qrMC', qrMC)
@@ -94,8 +98,7 @@ variables['Electron'] = [
     'SemiLeptonicVariables(CosTheta_missing_CMS)',
     'SemiLeptonicVariables(EW90)',
     'eid_ARICH',
-    'eid_ECL',
-    ]
+    'eid_ECL', ]
 variables['IntermediateElectron'] = variables['Electron']
 variables['Muon'] = [
     'p_CMS',
@@ -109,8 +112,7 @@ variables['Muon'] = [
     'SemiLeptonicVariables(p_missing_CMS)',
     'SemiLeptonicVariables(CosTheta_missing_CMS)',
     'SemiLeptonicVariables(EW90)',
-    'muid_ARICH',
-    ]
+    'muid_ARICH', ]
 variables['IntermediateMuon'] = variables['Muon']
 variables['KinLepton'] = [
     'p_CMS',
@@ -129,8 +131,7 @@ variables['KinLepton'] = [
     'eid_dEdx',
     'eid_TOP',
     'eid_ARICH',
-    'eid_ECL',
-    ]
+    'eid_ECL', ]
 variables['Kaon'] = [
     'p_CMS',
     'pt_CMS',
@@ -142,8 +143,7 @@ variables['Kaon'] = [
     'Kid_ARICH',
     'NumberOfKShortinRemainingROEKaon',
     'ptTracksRoe',
-    'distance',
-    ]
+    'distance', ]
 variables['SlowPion'] = [
     'p_CMS',
     'pt_CMS',
@@ -157,8 +157,7 @@ variables['SlowPion'] = [
     'pi_vs_edEdxid',
     'cosTPTO',
     'Kid',
-    'eid',
-    ]
+    'eid', ]
 variables['FastPion'] = variables['SlowPion']
 variables['Lambda'] = [
     'lambdaFlavor',
@@ -171,8 +170,7 @@ variables['Lambda'] = [
     'p_CMS',
     'p',
     'chiProb',
-    'distance',
-    ]
+    'distance', ]
 variables['KaonPion'] = ['HighestProbInCat(K+:ROE, IsFromB(Kaon))',
                          'HighestProbInCat(pi+:ROE, IsFromB(SlowPion))',
                          'cosKaonPion', 'KaonPionHaveOpositeCharges', 'Kid']
@@ -182,8 +180,7 @@ variables['MaximumP*'] = [
     'p',
     'pt',
     'cosTPTO',
-    'ImpactXY',
-    ]
+    'ImpactXY', ]
 variables['FSC'] = [
     'p_CMS',
     'cosTPTO',
@@ -191,8 +188,7 @@ variables['FSC'] = [
     'FSCVariables(p_CMS_Fast)',
     'FSCVariables(cosSlowFast)',
     'FSCVariables(cosTPTO_Fast)',
-    'FSCVariables(SlowFastHaveOpositeCharges)',
-    ]
+    'FSCVariables(SlowFastHaveOpositeCharges)', ]
 
 # Variables for the Combiner
 variablesCombiner = [  # 'QrOf(e+:ROE, IsRightClass(IntermediateElectron), IsFromB(IntermediateElectron))'
@@ -208,18 +204,15 @@ variablesCombiner = [  # 'QrOf(e+:ROE, IsRightClass(IntermediateElectron), IsFro
     'QrOf(pi+:ROE, IsRightClass(MaximumP*), IsFromB(MaximumP*))',
     'QrOf(pi+:ROE, IsRightClass(FSC), IsFromB(SlowPion))',
     'QrOf(K+:ROE, IsRightClass(KaonPion), IsFromB(Kaon))',
-    'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))',
-    ]
+    'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))', ]
 
 # Methods for Track and Event Levels
 methods = [('FastBDT', 'Plugin',
-           'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
-           )]
+           'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
 
 # Methods for Combiner Level
 methodsCombiner = [('FastBDT', 'Plugin',
-                   'CreateMVAPdfs:NbinsMVAPdf=300:!H:!V:NTrees=300:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
-                   )]
+                   'CreateMVAPdfs:NbinsMVAPdf=300:!H:!V:NTrees=300:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
 # SignalFraction to calculate probability, -2 if training signal/background ratio should be used
 signalFraction = -2
 
@@ -231,8 +224,7 @@ TrackLevelParticleLists = [  # ('e+', 'IntermediateElectron'),
     ('K+', 'Kaon'),
     ('pi+', 'SlowPion'),
     ('pi+', 'FastPion'),
-    ('Lambda0', 'Lambda'),
-    ]
+    ('Lambda0', 'Lambda'), ]
 
 EventLevelParticleLists = [  # ('e+', 'IntermediateElectron'),
                              # ('mu+', 'IntermediateMuon'),
@@ -245,8 +237,7 @@ EventLevelParticleLists = [  # ('e+', 'IntermediateElectron'),
     ('pi+', 'MaximumP*'),
     ('pi+', 'FSC'),
     ('K+', 'KaonPion'),
-    ('Lambda0', 'Lambda'),
-    ]
+    ('Lambda0', 'Lambda'), ]
 
 
 def TrackLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
@@ -259,36 +250,24 @@ def TrackLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
 
       # Select particles in ROE for different categories of flavour tagging.
         if symbol != 'Lambda0':
-            selectParticle(particleList,
-                           'isInRestOfEvent > 0.5 and chiProb > 0.001',
-                           path=path)
+            fillParticleList(particleList, 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=path)
       # Check if there is K short in this event
         if symbol == 'K+':
             applyCuts('K+:ROE', '0.1<Kid', path=path)  # Precut done to prevent from overtraining, might be redundant
-            selectParticle('pi+:inKaonRoe',
-                           'isInRestOfEvent > 0.5 and chiProb > 0.001',
-                           path=path)
-            reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
-                             '0.40<=M<=0.60', 1, path=path)
+            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=path)
+            reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe', '0.40<=M<=0.60', 1, path=path)
             fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=path)
 
         if symbol == 'Lambda0':
-            selectParticle('pi+:inLambdaRoe',
-                           'isInRestOfEvent > 0.5 and chiProb > 0.001',
-                           path=path)
-            selectParticle('p+:inLambdaRoe',
-                           'isInRestOfEvent > 0.5 and chiProb > 0.001',
-                           path=path)
-            reconstructDecay('Lambda0:ROE -> pi-:inLambdaRoe p+:inLambdaRoe',
-                             '1.00<=M<=1.23', 1, path=path)
-            reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe'
-                             , '0.40<=M<=0.60', 1, path=path)
+            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=path)
+            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=path)
+            reconstructDecay('Lambda0:ROE -> pi-:inLambdaRoe p+:inLambdaRoe', '1.00<=M<=1.23', 1, path=path)
+            reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe', '0.40<=M<=0.60', 1, path=path)
             fitVertex('Lambda0:ROE', 0.01, fitter='kfitter', path=path)
             matchMCTruth('Lambda0:ROE', path=path)
             fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
 
-        if not isTMVAMethodAvailable(workingDirectory + '/'
-                                     + methodPrefixTrackLevel):
+        if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixTrackLevel):
             B2INFO('PROCESSING: trainTMVAMethod on track level')
             trainTMVAMethod(
                 particleList,
@@ -297,8 +276,7 @@ def TrackLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
                 methods=methods,
                 prefix=methodPrefixTrackLevel,
                 workingDirectory=workingDirectory,
-                path=path,
-                )
+                path=path, )
         else:
             B2INFO('PROCESSING: applyTMVAMethod on track level')
             applyTMVAMethod(
@@ -308,8 +286,7 @@ def TrackLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
                 method=methods[0][0],
                 signalFraction=signalFraction,
                 workingDirectory=workingDirectory,
-                path=path,
-                )
+                path=path, )
             ReadyMethods += 1
 
     if ReadyMethods != len(TrackLevelParticleLists):
@@ -330,15 +307,13 @@ def EventLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
       # 'isInElectronOrMuonCat < 0.5',
       # path=path)
         if category == 'KaonPion':
-            selectParticle(particleList, 'hasHighestProbInCat(' + particleList
-                           + ',' + 'IsFromB(Kaon)) > 0.5', path=path)
+            fillParticleList(particleList, 'hasHighestProbInCat(' + particleList + ',' + 'IsFromB(Kaon)) > 0.5', path=path)
         elif category == 'FSC':
-            selectParticle(particleList, 'hasHighestProbInCat(' + particleList
-                           + ',' + 'IsFromB(SlowPion)) > 0.5', path=path)
+            fillParticleList(particleList, 'hasHighestProbInCat(' + particleList + ',' + 'IsFromB(SlowPion)) > 0.5', path=path)
+        elif category == 'Lambda':
+            applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' + 'IsFromB(Lambda)) > 0.5', path=path)
         else:
-            selectParticle(particleList, 'hasHighestProbInCat(' + particleList
-                           + ',' + 'IsFromB(' + category + ')) > 0.5',
-                           path=path)
+            fillParticleList(particleList, 'hasHighestProbInCat(' + particleList + ',' + 'IsFromB(' + category + ')) > 0.5', path=path)
 
         if not isTMVAMethodAvailable(workingDirectory + '/'
                                      + methodPrefixEventLevel):
@@ -350,8 +325,7 @@ def EventLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
                 prefix=methodPrefixEventLevel,
                 methods=methods,
                 workingDirectory=workingDirectory,
-                path=path,
-                )
+                path=path, )
         else:
             B2INFO('PROCESSING: applyTMVAMethod on event level')
             applyTMVAMethod(
@@ -361,8 +335,7 @@ def EventLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
                 method=methods[0][0],
                 signalFraction=signalFraction,
                 workingDirectory=workingDirectory,
-                path=path,
-                )
+                path=path, )
             ReadyMethods += 1
 
     if ReadyMethods != len(EventLevelParticleLists):
@@ -384,8 +357,7 @@ def CombinerLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
             prefix=methodPrefixCombinerLevel,
             methods=methodsCombiner,
             workingDirectory=workingDirectory,
-            path=path,
-            )
+            path=path, )
         return False
     else:
         B2INFO('Apply TMVAMethod on combiner level')
@@ -397,8 +369,7 @@ def CombinerLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
             method=methodsCombiner[0][0],
             signalFraction=signalFraction,
             workingDirectory=workingDirectory,
-            path=path,
-            )
+            path=path, )
         return True
 
 
@@ -421,20 +392,23 @@ def FlavorTagger(weightFiles='B2JpsiKs_mu', path=analysis_main):
     roe_path.add_module(ROEEmptyTrigger)
     ROEEmptyTrigger.if_true(emptypath)
 
+    # track training or expert
     TrackLevel(weightFiles, roe_path)
 
+    # if track expert -> event
     if TrackLevel(weightFiles, roe_path):
         EventLevel(weightFiles, roe_path)
 
+    # if event expert -> combiner
     if EventLevel(weightFiles, roe_path):
         CombinerLevel(weightFiles, roe_path)
     else:
+        # combiner trainer
         roe_path.add_module(RemoveExtraInfoModule())
 
+    # if combiner expert -> final output
     if CombinerLevel(weightFiles, roe_path):
         roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())  # Move and remove extraInfo
         roe_path.add_module(RemoveExtraInfoModule())
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-
-

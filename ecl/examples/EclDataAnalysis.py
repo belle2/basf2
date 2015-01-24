@@ -67,14 +67,14 @@ bkgFiles = [
     bkgdir + 'Touschek_LER_100usECL.root',
     ]
 
-add_simulation(main, components, bkgfiles=bkgFiles)
+add_simulation(main, bkgfiles=bkgFiles)
 add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
 ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Photon_1GeV_Bkg.root')
 ecldataanalysis.param('doTracking', 1)
-main.add_module(ecldataanalysis)
+main.add_module(ecldatanalysis)
 
 process(main)
 print statistics

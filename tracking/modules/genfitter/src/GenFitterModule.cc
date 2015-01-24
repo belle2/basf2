@@ -400,6 +400,8 @@ void GenFitterModule::event()
       if (m_filterId == "Kalman") {
         fitter.reset(new genfit::KalmanFitterRefTrack());
         fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
+        fitter->setMinIterations(m_nMinIter);
+        fitter->setMaxIterations(m_nMaxIter);
       } else if (m_filterId == "DAF") {
         // FIXME ... testing
         //fitter.reset(new genfit::DAF(false));
@@ -408,11 +410,11 @@ void GenFitterModule::event()
       } else if (m_filterId == "simpleKalman") {
         fitter.reset(new genfit::KalmanFitter(4, 1e-3, 1e3, false));
         fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
+        fitter->setMinIterations(m_nMinIter);
+        fitter->setMaxIterations(m_nMaxIter);
       } else {
         B2FATAL("Unknown filter id " << m_filterId << " requested.");
       }
-      fitter->setMinIterations(m_nMinIter);
-      fitter->setMaxIterations(m_nMaxIter);
       fitter->setMaxFailedHits(m_nMaxFailed);
       if (m_resolveWireHitAmbi != "default") {
         if (m_resolveWireHitAmbi == "weightedAverage") {

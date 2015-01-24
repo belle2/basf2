@@ -74,7 +74,7 @@ add_reconstruction(main)
 ecldataanalysis = register_module('ECLDataAnalysis')
 ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Photon_1GeV_Bkg.root')
 ecldataanalysis.param('doTracking', 1)
-main.add_module(ecldatanalysis)
+main.add_module(ecldataanalysis)
 
 process(main)
 print statistics

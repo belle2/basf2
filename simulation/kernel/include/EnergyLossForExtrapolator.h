@@ -13,8 +13,12 @@
 #ifndef ENERGYLOSSFOREXTRAPOLATOR_H_
 #define ENERGYLOSSFOREXTRAPOLATOR_H_
 
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
 #include <globals.hh>
 #include <G4PhysicsTable.hh>
+#include <G4DataVector.hh>
 #include <vector>
 
 class G4ParticleDefinition;
@@ -167,9 +171,20 @@ namespace Belle2 {
       //! Pointer to definition of the proton
       const G4ParticleDefinition* proton;
 
+      //! Pointer to definition of the antiproton
+      const G4ParticleDefinition* antiproton;
+
+      //! Pointer to definition of the deuteron
+      const G4ParticleDefinition* deuteron;
+
+      //! Pointer to definition of the antideuteron
+      const G4ParticleDefinition* antideuteron;
+
+      //! Vector of particle cuts
+      G4DataVector cuts;
 
       //! Pointer to the internal cache of default G4ProductionCuts
-      G4ProductionCuts*        cuts;
+      G4ProductionCuts* pcuts;
 
       //! List of material-cuts pairings
       std::vector<const G4MaterialCutsCouple*> couples;
@@ -195,6 +210,9 @@ namespace Belle2 {
       //! Pointer to the proton's specific ionization energy loss vs KE table
       G4PhysicsTable*          dedxProton;
 
+      //! Pointer to the deuteron's specific ionization energy loss vs KE table
+      G4PhysicsTable*          dedxDeuteron;
+
       //! Pointer to the electron's range vs KE table
       G4PhysicsTable*          rangeElectron;
 
@@ -213,6 +231,9 @@ namespace Belle2 {
       //! Pointer to the proton's range vs KE table
       G4PhysicsTable*          rangeProton;
 
+      //! Pointer to the deuteron's range vs KE table
+      G4PhysicsTable*          rangeDeuteron;
+
       //! Pointer to the electron's inverse-range vs KE table
       G4PhysicsTable*          invRangeElectron;
 
@@ -230,6 +251,9 @@ namespace Belle2 {
 
       //! Pointer to the proton's inverse-range vs KE table
       G4PhysicsTable*          invRangeProton;
+
+      //! Pointer to the deuteron's inverse-range vs KE table
+      G4PhysicsTable*          invRangeDeuteron;
 
       //! Pointer to the electron's multiple-scattering cross section vs KE table
       G4PhysicsTable*          mscElectron;
@@ -344,7 +368,7 @@ namespace Belle2 {
       if (SetupKinematics(part, mat, kinEnergy)) {
         G4double t = stepLength / radLength;
         G4double y = std::max(0.001, t);
-        theta = 19.23 * MeV * std::sqrt(charge2 * t) * (1.0 + 0.038 * std::log(y)) / (beta2 * gam * mass);
+        theta = 19.23 * CLHEP::MeV * std::sqrt(charge2 * t) * (1.0 + 0.038 * std::log(y)) / (beta2 * gam * mass);
       }
       return theta;
     }
@@ -372,7 +396,7 @@ namespace Belle2 {
       G4double sig2 = 0.0;
       if (SetupKinematics(part, mat, kinEnergy)) {
         G4double step = ComputeTrueStep(mat, part, kinEnergy, stepLength);
-        sig2 = (1.0 / beta2 - 0.5) * twopi_mc2_rcl2 * tmax * step * electronDensity * charge2;
+        sig2 = (1.0 / beta2 - 0.5) * CLHEP::twopi_mc2_rcl2 * tmax * step * electronDensity * charge2;
       }
       return sig2;
     }

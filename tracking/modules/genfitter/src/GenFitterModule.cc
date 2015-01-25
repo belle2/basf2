@@ -304,7 +304,7 @@ void GenFitterModule::event()
       int currentPdgCode = m_pdgCodes[iPdg];
       // Note that for leptons positive PDG codes correspond to the
       // negatively charged particles.
-      if (signbit(part->Charge()) != signbit(aTrackCandPointer->getChargeSeed()))
+      if (std::signbit(part->Charge()) != std::signbit(aTrackCandPointer->getChargeSeed()))
         currentPdgCode *= -1;
       // Charges in the PDG tables are counted in multiples of 1/3e.
       if (TDatabasePDG::Instance()->GetParticle(currentPdgCode)->Charge()

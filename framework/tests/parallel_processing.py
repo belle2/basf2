@@ -154,8 +154,8 @@ output.param('outputFileName', 'parallel_processing_test.root')
 main = create_path()
 # init path
 main.add_module(eventinfosetter)
-main.add_module(gearbox)
 main.add_module(particlegun)
+main.add_module(gearbox)
 
 # event path
 main.add_module(geometry)
@@ -175,6 +175,8 @@ if not simulation.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
 # Process events
 set_nprocesses(2)
 process(main)
+
+print statistics
 
 # check wether output file contains correct number of events
 from ROOT import TFile

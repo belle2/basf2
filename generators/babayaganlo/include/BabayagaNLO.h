@@ -81,6 +81,16 @@ namespace Belle2 {
     */
     void setEpsilon(double epsilon) { m_epsilon = epsilon; }
 
+    /** Sets vacuum polarization
+     * @param vacPol Vacuum polarization option
+     */
+    void setVacPol(std::string vacPol) { m_vacPol = vacPol; }
+
+    /** Sets model
+     * @param model sets exp or ps
+     */
+    void setModel(std::string model) { m_model = model; }
+
     /** Sets final state,.
      * @param finalState Minimum energy for leptons/photons in the final state, in GeV
      */
@@ -114,6 +124,7 @@ namespace Belle2 {
     double m_massW;                 /**< W mass  [GeV] for on shell sin2theta and GF. */
     double m_massZ;                 /**< Z mass  [GeV]. */
     double m_widthZ;                /**< Z width [GeV] (may be recalculated by EW library). */
+    std::string m_vacPol;           /**< vacuum polarization: off, hadr5 (Jegerlehner) or hmnt (Teubner). */
     std::string m_finalState;       /**< final state: ee, gg or mm. */
     std::string m_model;            /**< model: matched or ps only. */
     std::string m_order;            /**< Fix number of final state photons. */

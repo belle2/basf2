@@ -118,11 +118,14 @@ BabayagaNLO::~BabayagaNLO()
 
 void BabayagaNLO::setDefaultSettings()
 {
-  m_cmsEnergy = 10.58 * Unit::GeV;
+  m_cmsEnergy = 10.580 * Unit::GeV;
 
   m_applyBoost = true;
 
   m_finalState = "ee";
+  m_vacPol     = "hadr5";
+  m_order      = "exp";
+  m_model      = "matched";
 
   m_pi               = 3.1415926535897932384626433832795029;
   m_conversionFactor = 0.389379660e6;
@@ -142,7 +145,7 @@ void BabayagaNLO::setDefaultSettings()
   m_nPhotMode = -1;
 
   m_nSearchMax = 50000;
-  m_fMax = -1.;
+  m_fMax       = -1.;
 
 }
 
@@ -262,7 +265,11 @@ void BabayagaNLO::applySettings()
   if (m_model == "matched") m_npar[21] = 1;
   else if (m_model == "ps") m_npar[21] = 2;
 
-  if (m_finalState == "exp") m_npar[22] = 1;
+  if (m_order == "exp") m_npar[22] = 1;
+
+  if (m_vacPol == "off") m_npar[23] = 1;
+  else if (m_vacPol == "hadr5") m_npar[23] = 2;
+  else if (m_vacPol == "hmnt") m_npar[23] = 3;
 
   int mode = -1; //use mode to control init/generation/finalize in FORTRAN code
   belle_(&mode, m_xpar, m_npar);

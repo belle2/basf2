@@ -38,12 +38,14 @@ BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
   setDescription("Generates radiative Bhabha scattering and exclusive two-photon events with Babayaga.NLO.");
 
   //Parameter definition
-  addParam("FinalState", m_finalState, "Final state: ee, mm or gg", std::string("ee"));
+  addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner) or hmnt (Teubner)", std::string("hadr5"));
+  addParam("Model", m_model, "Model: exp or ps", std::string("exp"));
+  addParam("FinalState", m_finalState, "Final state: ee, mm (not recommended) or gg", std::string("ee"));
   addParam("MinEnergyFrac", m_eMinFrac, "Fractional minimum energy for leptons/photons in the final state [fraction of ECMS]", -1.0);
   addParam("MinEnergy", m_eMin, "Minimum energy for leptons/photons in the final state [GeV]", 0.150);
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator [fraction of ECMS/2]", 5.e-4);
-  addParam("MaxAcollinearity", m_maxAcollinearity, "Mximum acollinearity angle between finale state leptons/photons [degree]", 180.0);
-  addParam("CMSEnergy", m_cmsEnergy, "CMS energy", 10.580);
+  addParam("MaxAcollinearity", m_maxAcollinearity, "Maximum acollinearity angle between finale state leptons/photons [degree]", 180.0);
+  addParam("CMSEnergy", m_cmsEnergy, "CMS energy [GeV]", 10.580);
   addParam("FMax", m_fMax, "Maximum of differential cross section weight (fmax)", -1.);
   addParam("SearchMax", m_nSearchMax, "Number of events used to search for maximum of differential cross section", 500000);
   addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 0);
@@ -98,6 +100,8 @@ void BabayagaNLOInputModule::initialize()
   m_generator.setMaxAcollinearity(m_maxAcollinearity);
   m_generator.setFinalState(m_finalState);
   m_generator.setEpsilon(m_epsilon);
+  m_generator.setVacPol(m_vacPol);
+  m_generator.setModel(m_model);
 
   if (m_eMinFrac >= 0.) {
     B2INFO("Setting EMIN using fraction " << m_eMinFrac << " of CMS energy: cut=" << m_eMinFrac * m_cmsEnergy << " GeV")

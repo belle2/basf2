@@ -21,6 +21,7 @@
       character*6   arun
       character*6   ord
       character*10  model
+      character*10  vacpol
       character*100 outfile,storefile
       character*3   eventlimiter,store
       common/beforesort/p1o(0:3),p2o(0:3),qpho(40,0:3)
@@ -41,8 +42,9 @@
       common/intinput/iwriteout,iseed,nsearch,iverbose
       common/qedORDER/ord
       integer*8 iord
-      common/charinput/model,eventlimiter,store,storefile,outfile
+      common/charinput/model,vacpol,eventlimiter,store,storefile,outfile
        integer*8 imodel
+       integer*8 ivacpol
       common/realinput/anpoints,sdifmax
       common/nmaxphalpha/nphmaxalpha
       common/ialpharunning/iarun
@@ -168,14 +170,14 @@
 	model = 'matched'
       ELSEIF (imodel.EQ.2) THEN 
 	model = 'ps'
-      END IF      
+      END IF
 
       ord = 'exp'
       iord = NPAR(22)
       IF(iord.EQ.1) THEN 
 	ord = 'exp'
       END IF
-      
+
       nphotmode = NPAR(0)
 
       thmin = XPAR(20)
@@ -186,25 +188,30 @@
       thgmax = thmax
       ebeam = ecms/2.d0
       
-!       iseed    = 700253512
-      
-      nsearch  = NPAR(1)
-      anpoints = nsearch
-      egmin    = 0.02d0
-      sdifmax  = 1.d-18
-!       darkmod      = 'off'
+      nsearch      = NPAR(1)
+      anpoints     = nsearch
+      egmin        = 0.02d0
+      sdifmax      = 1.d-18
       amassU       = 0.4d0
       gammaU       = -1. 
       gvectU       = 1.d-3
       gaxU         = 0.d0
       amassainvmin = 0.d0
       amassainvmax = ecms
-      idarkon = 0
-      iarun = 0
+      idarkon      = 0
+      iarun        = 0
 
 !     RUNNING ALPHA
-      arun='hadr5'
-      iarun = 0
+      arun = 'hadr5'
+      ivacpol = NPAR(23)
+      IF (ivacpol.EQ.1) THEN
+	arun = 'off'
+      ELSEIF (ivacpol.EQ.2) THEN
+	arun = 'hadr5'
+      ELSEIF (ivacpol.EQ.3) THEN
+	arun = 'hmnt'
+      END IF      
+
       if (arun.eq.'on'.or.arun.eq.'hadr5') then
         iarun = 1
         iteubn = 0
@@ -215,16 +222,18 @@
         iarun = iarun
       endif
       
-!       if (iarun.eq.1) then
-! 	if (iteubn.lt.1) then
-! 	  print*,'                  '
-! 	  print*, 'Using HADR5N09 routine for Delta alpha.'
-! 	else
-! 	  print*,'                  '
-! 	  print*, 'Using HMNT routine for Delta alpha.'
-! 	endif
-!       endif
-      
+      if (iarun.eq.1) then
+	if (iteubn.lt.1) then
+	  print*,'                  '
+	  print*, '>>> using HADR5N09 routine for Delta alpha.'
+	else
+	  print*,'                  '
+	  print*, '>>> using HMNT routine for Delta alpha.'
+	endif
+      else 
+      	  print*,'                  '
+	  print*, '>>> running of alpha is switched off.'
+      endif
 !       call rluxgo(lux,iseed,k1,k2)
 
 ! CALLED FROM INTERFACE.f (TF)

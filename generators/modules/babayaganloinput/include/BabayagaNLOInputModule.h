@@ -56,6 +56,8 @@ namespace Belle2 {
   protected:
 
     /** Module parameters */
+    std::string m_model; /**< model: exp or ps. */
+    std::string m_vacPol; /**< Vacuum polarization: off, hadr5 or hmnt. */
     std::string m_finalState; /**< Final state: ee, mm or gg. */
     double m_eMinFrac; /**< Fractional energy (of cms energy) for leptons in the final state. (overrides m_eMin) */
     double m_eMin; /**< Minimum energy for leptons in the final state, in GeV. */

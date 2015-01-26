@@ -46,6 +46,8 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
   addParam("NoSingleClusterSVDSP", m_NoSingleClusterSVDSPName, "Non Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string(""));
   addParam("PXDClusterSP", m_PXDClusterSPName, "PXD Cluster SpacePoints collection name.", string(""));
 
+  addParam("minNoOfSpacePoints", m_PARAMminNoOfSpacePoints, "Minimum number of SpacePoints (PXD + SVD) a SpacePointTrackCand has to contain. If a SPTC contains less, it will not be stored. If set to 0, any number is accepted", 0);
+
   addParam("checkTrueHits", m_PARAMcheckTrueHits, "Set to true if you want TrueHits of Clusters forming a SpacePoint (e.g. SVD) to be checked for equality", false);
 
   addParam("useSingleClusterSP", m_PARAMuseSingleClusterSP, "Set to true if you want to use singleCluster SVD SpacePoints if no doubleCluster SVD SpacePoint can be found", true);
@@ -119,10 +121,17 @@ void GFTC2SPTCConverterModule::event()
     try {
       // convert the genfit::TrackCand and store it in the DataStore. Curling behaviour will be checked in another module
       const SpacePointTrackCand spacePointTC = createSpacePointTC(trackCand);
+      // check if the SPTC contains enough SpacePoints
+      if (spacePointTC.getNHits() < uint(m_PARAMminNoOfSpacePoints)) { // casting to unsigned int here, for Wsign-compare (declaring module parameters as unsigned is not possible)
+        m_abortedMinNoOfSPCtr++;
+        B2DEBUG(10, "The SpacePointTrackCand created from genfit::TrackCand " << iTC << " contained only " << spacePointTC.getNHits() << " SpacePoints but the minimum number of SpacePoints per SPTC is set to " << m_PARAMminNoOfSpacePoints << ". This SPTC will not be stored!")
+        continue; // continue with next GFTC
+      }
       SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC);
       m_SpacePointTCCtr += 1;
       newSPTC->addRelationTo(trackCand);
       B2DEBUG(10, "Added new SpacePointTrackCand to StoreArray " << spacePointTrackCands.getName());
+
     } catch (SpacePointTrackCand::UnsupportedDetType& anEx) {
       B2WARNING("Caught an exception during creation of SpacePointTrackCand: " << anEx.what() << " This TrackCandidate will not be processed");
     } catch (UnusedHits& anEx) {
@@ -151,7 +160,7 @@ void GFTC2SPTCConverterModule::event()
 // -------------------------------- TERMINATE --------------------------------------------------------
 void GFTC2SPTCConverterModule::terminate()
 {
-  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found (in " << m_noTwoClusterSPCtr << " cases there was no related two Cluster SpacePoint to a Cluster), in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap) and in " << m_abortedNonSingleTrueHitCtr << " cases there was more than one TrueHit related to a SpacePoint. (TrueHits have been checked: " << m_PARAMcheckTrueHits << ")");
+  B2INFO("GFTC2SPTCConverter::terminate: got " << m_genfitTCCtr << " genfit::TrackCands and created " << m_SpacePointTCCtr << " SpacePointTrackCands. In " << m_abortedUnsuitableTCCtr << " cases no conversion was made due to an unsuitable genfit::TrackCand, in " << m_abortedNoSPCtr << " cases no (allowed) SpacePoint has been found (in " << m_noTwoClusterSPCtr << " cases there was no related two Cluster SpacePoint to a Cluster), in " << m_abortedTrueHitCtr << " cases the TrueHits of an SVD SpacePoint did not match (overlap) and in " << m_abortedNonSingleTrueHitCtr << " cases there was more than one TrueHit related to a SpacePoint. (TrueHits have been checked: " << m_PARAMcheckTrueHits << "). " << m_abortedMinNoOfSPCtr << " SPTCs did not contain enough SpacePoints and were not stored");
   B2INFO("In " << passedTHCheckCtr << " cases the TrueHit check would have been passed if oldSize/newSize == 2 was enabled. In " << singleTrueHitCtr << " cases the SpacePoint was related to only one TrueHit. In " << nonSingleTrueHitCtr << " cases a SpacePoint was related to more than one TrueHit.")
 }
 
@@ -547,23 +556,26 @@ bool GFTC2SPTCConverterModule::trueHitsAreGood(std::vector<const SVDCluster*> cl
 //       for (const SVDTrueHit * trueHit : allTrueHits) { inds << trueHit->getArrayIndex() << ", "; }
       B2DEBUG(200, "Unique indices of TrueHits " << inds.str());
 
+      // CAUTION: make sure to comment in/out all the right lines below to get reasonable results
       // count occurencies of different
       if (allTrueHits.size() > 1) { nonSingleTrueHitCtr++; }
-      if (oldPtSize / allTrueHits.size() == 2) { passedTHCheckCtr++; }
+//       if (oldPtSize / allTrueHits.size() == 2) { passedTHCheckCtr++; }
+
+      if (allTrueHits.size() == 1) { singleTrueHitCtr++; }
+
 
       // It is possible that there is more than one TrueHit left but still the Clusters are related to the same TrueHit(s).
       // DECISION MAKING taking into account different possibilities. TODO: choose the one that filters out all 'bad' guys but still lets pass most of the 'good' guys
-      if (allTrueHits.size() == 1) { // assumption here: there is ONLY ONE TrueHit related to all Clusters, this excludes some cases where more than one TrueHit is contained in one Cluster! (at the moment only "clear" cases are wanted, until decided what to do with unclear cases)
-        B2DEBUG(200, "Found one TrueHit (Index " << allTrueHits[0]->getArrayIndex() << ", Array " << allTrueHits[0]->getArrayName() << ") related to Clusters " << clusters[0]->getArrayIndex() << " and " << clusters[1]->getArrayIndex() << " from Array " << clusters[0]->getArrayIndex()); // NOTE: assuming that both clusters are from the same Array here!!
-        singleTrueHitCtr++;
+//       if (allTrueHits.size() == 1) { // assumption here: there is ONLY ONE TrueHit related to all Clusters, this excludes some cases where more than one TrueHit is contained in one Cluster! (at the moment only "clear" cases are wanted, until decided what to do with unclear cases)
+//         B2DEBUG(200, "Found one TrueHit (Index " << allTrueHits[0]->getArrayIndex() << ", Array " << allTrueHits[0]->getArrayName() << ") related to Clusters " << clusters[0]->getArrayIndex() << " and " << clusters[1]->getArrayIndex() << " from Array " << clusters[0]->getArrayIndex()); // NOTE: assuming that both clusters are from the same Array here!!
+//         singleTrueHitCtr++;
 //         return true;
 //       if (clusters.size() % allTrueHits.size() == 0) { // assumption here to say that a given TrueHit is in every passed Cluster // WARNING: doesn't work because if two different TrueHits are found this will pass as well
 //       if (allTrueHits.size() < oldPtSize) return true;  // assumption here: there is at least one TrueHit, that is shared by at least 2 Clusters
-//       if(oldPtSize / allTrueHits.size() == 2) { // assumption: all TrueHits are related to both Clusters. WARNING: this is not guraranteed! There are cases where this check does not fail although it should (think about an even number of shared TrueHits)
-// //   // WARNING: integer division here!!! there are more problematic cases!!!
-//   B2DEBUG(200, "Found " << allTrueHits.size() << " TrueHits related to Clusters " << clusters[0]->getArrayIndex() << " and " << clusters[1]->getArrayIndex() << " from Array " << clusters[0]->getArrayName() << " The indices of the TrueHits are: " << inds.str()); // NOTE: assuming that both clusters are from the same Array here!!
-//   if( allTrueHits.size() == 1) { singleTrueHitCtr++; }
-//   passedTHCheckCtr++;
+      if (oldPtSize / allTrueHits.size() == 2) { // assumption: all TrueHits are related to both Clusters. WARNING: this is not guraranteed! There are cases where this check does not fail although it should (think about an even number of shared TrueHits)
+//   // WARNING: integer division here!!! there are more problematic cases!!!
+        B2DEBUG(200, "Found " << allTrueHits.size() << " TrueHits related to Clusters " << clusters[0]->getArrayIndex() << " and " << clusters[1]->getArrayIndex() << " from Array " << clusters[0]->getArrayName() << " The indices of the TrueHits are: " << inds.str()); // NOTE: assuming that both clusters are from the same Array here!!
+        passedTHCheckCtr++;
         return true;
       } else {
         B2DEBUG(200, "TrueHit indices not passed " << inds.str())
@@ -587,6 +599,7 @@ void GFTC2SPTCConverterModule::initializeCounters()
   singleTrueHitCtr = 0;
   passedTHCheckCtr = 0;
   nonSingleTrueHitCtr = 0;
+  m_abortedMinNoOfSPCtr = 0;
 }
 
 void GFTC2SPTCConverterModule::markHitAsUsed(std::vector<flaggedPair<int> >& flaggedHitIDs, int hitToMark)

@@ -89,6 +89,8 @@ namespace Belle2 {
 
     bool m_PARAMcheckNoSingleSVDSP; /**< Switch for checking the StoreArray of non-single cluster SVD SpacePoints in initialize. Need this for cases, where only single Cluster SVD SpacePoints are presented to the module */
 
+    int m_PARAMminNoOfSpacePoints; /**< parameter for specifying the minimal number of SpacePoints a SpacePointTrackCand has to have */
+
     // some counters for testing
     unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were converted (if a curling track is split up, this counter will still be only increased by 1!) */
 
@@ -107,6 +109,8 @@ namespace Belle2 {
     unsigned int singleTrueHitCtr; /**< Counter for occurencies of only one TrueHit being related to a SpacePoint */
     unsigned int passedTHCheckCtr; /**< Counter for testing how many SpacePoints would have passed another check then the currently applied */
     unsigned int nonSingleTrueHitCtr; /**< Counter for occurencies of more than one TrueHit being related to a SpacePoint */
+
+    unsigned int m_abortedMinNoOfSPCtr; /**< Counter for SpacePointTrackCands that were not stored due to a too small number of SpacePoints */
 
 // #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
     template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */

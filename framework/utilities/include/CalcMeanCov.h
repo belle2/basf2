@@ -243,8 +243,11 @@ namespace Belle2 {
      * symmetric matrix including diagonal elements if the elements are
      * stored in a continous array of size n(n+1)/2
      */
-    constexpr int getIndex(int i, int j) const {
-      return (i < j) ? ((j + 1) * j / 2 + i) : ((i + 1) * i / 2 + j);
+    constexpr int getIndex(unsigned int i, unsigned int j) const {
+      if (i < j)
+        return ((j + 1) * j / 2 + i);
+      else
+        return ((i + 1) * i / 2 + j);
     }
 #endif
 

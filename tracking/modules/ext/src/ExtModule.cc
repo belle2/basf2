@@ -172,19 +172,16 @@ void ExtModule::initialize()
   m_MinRadiusSq = (rMaxCoil * 0.25) * (rMaxCoil * 0.25); // roughly 40 cm
 
   // Hypotheses for extrapolation
+  const Const::ParticleSet set = Const::chargedStableSet;
   if (m_PDGCode.empty()) {
-    m_ChargedStable.push_back(Const::pion);
-    m_ChargedStable.push_back(Const::electron);
-    m_ChargedStable.push_back(Const::muon);
-    m_ChargedStable.push_back(Const::kaon);
-    m_ChargedStable.push_back(Const::proton);
+    for (const Const::ChargedStable & pdgIter : set) {
+      m_ChargedStable.push_back(pdgIter);
+    }
   } else { // user defined
     std::vector<Const::ChargedStable> stack;
-    stack.push_back(Const::pion);
-    stack.push_back(Const::electron);
-    stack.push_back(Const::muon);
-    stack.push_back(Const::kaon);
-    stack.push_back(Const::proton);
+    for (const Const::ChargedStable & pdgIter : set) {
+      stack.push_back(pdgIter);
+    }
     for (unsigned i = 0; i < m_PDGCode.size(); ++i) {
       for (unsigned k = 0; k < stack.size(); ++k) {
         if (abs(m_PDGCode[i]) == stack[k].getPDGCode()) {
@@ -232,8 +229,8 @@ void ExtModule::event()
   }
 
   // Loop over the reconstructed tracks.
-  // Do extrapolation for each hypotheses (pion, electron, muon, kaon, proton)
-  // of each reconstructed track.
+  // Do extrapolation for each hypotheses (pion, electron, muon, kaon, proton,
+  // deuteron) of each reconstructed track.
   // Pion hypothesis:  extrapolate until calorimeter exit
   // Other hypotheses: extrapolate up to but not including calorimeter
 

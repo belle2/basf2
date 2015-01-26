@@ -48,6 +48,9 @@ namespace Belle2 {
     //! @return proton PDF value for this extrapolation (normalized with all others)
     double getProtonPDFValue() const { return m_ProtonPDFValue; }
 
+    //! @return deuteron PDF value for this extrapolation (normalized with all others)
+    double getDeuteronPDFValue() const { return m_DeuteronPDFValue; }
+
     //! @return electron PDF value for this extrapolation (normalized with all others)
     double getElectronPDFValue() const { return m_ElectronPDFValue; }
 
@@ -65,6 +68,9 @@ namespace Belle2 {
 
     //! @return proton log-likelihood for this extrapolation (not normalized)
     double getLogL_p() const {return m_LogL_p;}
+
+    //! @return deuteron log-likelihood for this extrapolation (not normalized)
+    double getLogL_d() const {return m_LogL_d;}
 
     //! @return electron log-likelihood for this extrapolation (not normalized)
     double getLogL_e() const {return m_LogL_e;}
@@ -131,6 +137,10 @@ namespace Belle2 {
     //! @param pdfValue proton PDF value (normalized) for this extrapolation
     void setProtonPDFValue(double pdfValue) { m_ProtonPDFValue = pdfValue; }
 
+    //! assign deuteron PDF value for this extrapolation
+    //! @param pdfValue deuteron PDF value (normalized) for this extrapolation
+    void setDeuteronPDFValue(double pdfValue) { m_DeuteronPDFValue = pdfValue; }
+
     //! assign electron PDF value for this extrapolation
     //! @param pdfValue electron PDF value (normalized) for this extrapolation
     void setElectronPDFValue(double pdfValue) { m_ElectronPDFValue = pdfValue; }
@@ -154,6 +164,10 @@ namespace Belle2 {
     //! assign proton log-likelihood for this extrapolation
     //! @param value logarithm of proton PDF value (unnormalized) for this extrapolation
     void setLogL_p(double value) { m_LogL_p = value; }
+
+    //! assign deuteron log-likelihood for this extrapolation
+    //! @param value logarithm of deuteron PDF value (unnormalized) for this extrapolation
+    void setLogL_d(double value) { m_LogL_d = value; }
 
     //! assign electron log-likelihood for this extrapolation
     //! @param value logarithm of electron PDF value (unnormalized) for this extrapolation
@@ -227,6 +241,9 @@ namespace Belle2 {
     //! Proton PDF value for this extrapolation (normalized with all others)
     double m_ProtonPDFValue;
 
+    //! Deuteron PDF value for this extrapolation (normalized with all others)
+    double m_DeuteronPDFValue;
+
     //! Electron PDF value for this extrapolation (normalized with all others)
     double m_ElectronPDFValue;
 
@@ -244,6 +261,9 @@ namespace Belle2 {
 
     //! Proton log-likelihood for this extrapolation (not normalized)
     double m_LogL_p;
+
+    //! Deuteron log-likelihood for this extrapolation (not normalized)
+    double m_LogL_d;
 
     //! Electron log-likelihood for this extrapolation (not normalized)
     double m_LogL_e;
@@ -294,7 +314,7 @@ namespace Belle2 {
     unsigned int m_HitLayerPattern;
 
     //! Needed to make the ROOT object storable
-    ClassDef(Muid, 3)
+    ClassDef(Muid, 4)
 
   };
 }

@@ -32,7 +32,7 @@ namespace Belle2 {
   MuidPar::MuidPar(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
   {
     fillPDFs(expNo, hypothesisName);
-    if (m_ReducedChiSquaredDx == 0.0) { B2ERROR("Failed to read " << hypothesisName << " PDFs for experiment " << expNo) }
+    if (m_ReducedChiSquaredDx == 0.0) { B2FATAL("Failed to read " << hypothesisName << " PDFs for experiment " << expNo) }
   }
 
   MuidPar::~MuidPar()
@@ -41,13 +41,19 @@ namespace Belle2 {
 
   void MuidPar::fillPDFs(int expNo, const char hypothesisName[])
   {
-    expNo = 0; // DIVOT ignore supplied value for now
 
+    int myExpNo = expNo + 1;
     char line[128];
-    sprintf(line, "/Detector/Tracking/MuidParameters/Experiment[@exp=\"%d\"]/%s/", expNo, hypothesisName);
-    GearDir content(line);
-    if (!content) {
-      B2ERROR("Required XML content MuidParameters not found")
+    GearDir content("/Detector/Tracking/MuidParameters");
+    bool exists = false;
+    while (!exists && (myExpNo > 0)) {
+      sprintf(line, "/Experiment[@exp=\"%d\"]/%s/", --myExpNo, hypothesisName);
+      exists = content.exists(line);
+    }
+    if (exists) {
+      content.append(line);
+    } else {
+      B2FATAL("MuidPar::fillPDFs(): Required XML content /Detector/Tracking/MuidParameters not found for expt #" << expNo << " or earlier")
     }
 
     m_ReducedChiSquaredDx = MUID_ReducedChiSquaredLimit / MUID_ReducedChiSquaredNbins;   // bin size
@@ -94,8 +100,10 @@ namespace Belle2 {
         }
       }
     }
-    if (m_ReducedChiSquaredDx == 0.0) {
-      B2FATAL("Failed to read PDFs")
+    if (myExpNo == expNo) {
+      B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo)
+    } else {
+      B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo << " (requested #" << expNo << ")")
     }
   }
 

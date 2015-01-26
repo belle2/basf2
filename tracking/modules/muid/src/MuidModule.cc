@@ -121,6 +121,8 @@ MuidModule::MuidModule() :
   m_KaonMinusPar(NULL),
   m_ProtonPar(NULL),
   m_AntiprotonPar(NULL),
+  m_DeuteronPar(NULL),
+  m_AntideuteronPar(NULL),
   m_ElectronPar(NULL),
   m_PositronPar(NULL)
 {
@@ -297,12 +299,11 @@ void MuidModule::initialize()
   if (m_PDGCode.empty()) {
     m_ChargedStable.push_back(Const::muon);
   } else { // user defined
+    const Const::ParticleSet set = Const::chargedStableSet;
     std::vector<Const::ChargedStable> stack;
-    stack.push_back(Const::pion);
-    stack.push_back(Const::electron);
-    stack.push_back(Const::muon);
-    stack.push_back(Const::kaon);
-    stack.push_back(Const::proton);
+    for (const Const::ChargedStable & pdgIter : set) {
+      stack.push_back(pdgIter);
+    }
     for (unsigned i = 0; i < m_PDGCode.size(); ++i) {
       for (unsigned k = 0; k < stack.size(); ++k) {
         if (abs(m_PDGCode[i]) == stack[k].getPDGCode()) {
@@ -348,9 +349,10 @@ void MuidModule::beginRun()
   m_KaonMinusPar = new MuidPar(expNo, "KaonMinus");
   m_ProtonPar = new MuidPar(expNo, "Proton");
   m_AntiprotonPar = new MuidPar(expNo, "Antiproton");
+  m_DeuteronPar = new MuidPar(expNo, "Deuteron");
+  m_AntideuteronPar = new MuidPar(expNo, "Antideuteron");
   m_ElectronPar = new MuidPar(expNo, "Electron");
   m_PositronPar = new MuidPar(expNo, "Positron");
-
 }
 
 void MuidModule::event()
@@ -495,6 +497,8 @@ void MuidModule::terminate()
   delete m_KaonMinusPar;
   delete m_ProtonPar;
   delete m_AntiprotonPar;
+  delete m_DeuteronPar;
+  delete m_AntideuteronPar;
   delete m_ElectronPar;
   delete m_PositronPar;
 
@@ -1121,11 +1125,13 @@ void MuidModule::finishTrack(Muid* muid, int charge)
   double pion = 0.0;
   double kaon = 0.0;
   double proton = 0.0;
+  double deuteron = 0.0;
   double electron = 0.0;
   double logL_mu = -1.0E20;
   double logL_pi = -1.0E20;
   double logL_K = -1.0E20;
   double logL_p = -1.0E20;
+  double logL_d = -1.0E20;
   double logL_e = -1.0E20;
   if (outcome != 0) { // extrapolation reached KLM sensitive volume
     if (charge > 0.0) {
@@ -1133,21 +1139,24 @@ void MuidModule::finishTrack(Muid* muid, int charge)
       pion = m_PionPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
       kaon = m_KaonPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
       proton = m_ProtonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      deuteron = m_DeuteronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
       electron = m_PositronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
     } else {
       muon = m_MuonMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
       pion = m_PionMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
       kaon = m_KaonMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
       proton = m_AntiprotonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      deuteron = m_AntideuteronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
       electron = m_ElectronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
     }
     if (muon > 0.0) logL_mu = log(muon);
     if (pion > 0.0) logL_pi = log(pion);
     if (kaon > 0.0) logL_K = log(kaon);
     if (proton > 0.0) logL_p = log(proton);
+    if (deuteron > 0.0) logL_d = log(deuteron);
     if (electron > 0.0) logL_e = log(electron);
     // normalize the PDF values
-    double denom = muon + pion + kaon + proton + electron;
+    double denom = muon + pion + kaon + proton + deuteron + electron;
     if (denom < 1.0E-20) {
       junk = 1.0; // anomaly: should be very rare
     } else {
@@ -1155,6 +1164,7 @@ void MuidModule::finishTrack(Muid* muid, int charge)
       pion /= denom;
       kaon /= denom;
       proton /= denom;
+      deuteron /= denom;
       electron /= denom;
     }
   }
@@ -1164,11 +1174,13 @@ void MuidModule::finishTrack(Muid* muid, int charge)
   muid->setPionPDFValue(pion);
   muid->setKaonPDFValue(kaon);
   muid->setProtonPDFValue(proton);
+  muid->setDeuteronPDFValue(deuteron);
   muid->setElectronPDFValue(electron);
   muid->setLogL_mu(logL_mu);
   muid->setLogL_pi(logL_pi);
   muid->setLogL_K(logL_K);
   muid->setLogL_p(logL_p);
+  muid->setLogL_d(logL_d);
   muid->setLogL_e(logL_e);
 
 }

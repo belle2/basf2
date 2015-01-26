@@ -318,6 +318,12 @@ namespace Belle2 {
     //! probability density function for antiproton hypothesis
     MuidPar* m_AntiprotonPar;
 
+    //! probability density function for deuteron hypothesis
+    MuidPar* m_DeuteronPar;
+
+    //! probability density function for antideuteron hypothesis
+    MuidPar* m_AntideuteronPar;
+
     //! probability density function for electron hypothesis
     MuidPar* m_ElectronPar;
 

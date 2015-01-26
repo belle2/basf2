@@ -140,7 +140,6 @@ namespace {
   {
     for (const Const::ChargedStable & c : Const::chargedStableSet) {
       int pdg = c.getPDGCode();
-      B2WARNING("pdg: " << pdg)
       EXPECT_EQ(pdg, Const::chargedStableSet.find(pdg).getPDGCode());
     }
     EXPECT_TRUE(Const::chargedStableSet.find(12356467) == Const::invalidParticle);

@@ -52,7 +52,7 @@ void CDCLegendreDAFStereoAssigningModule::initialize()
 void CDCLegendreDAFStereoAssigningModule::event()
 {
 
-  B2INFO("**********   CDCLegendreHistogrammingModule  ************");
+  B2INFO("**********   CDCLegendreDAFModule  ************");
 
   StoreArray<CDCHit> cdcHits("");
   B2DEBUG(100,
@@ -160,7 +160,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
   int m_successfulGFTrackCandFitCounter(0);
   int m_failedGFTrackCandFitCounter(0);
 
-  std::vector<std::pair<genfit::Track*, double>> gfTracksWithPVal;
+  std::vector<std::pair<genfit::Track, double>> gfTracksWithPVal;
 
 
   for (TrackCandidate * cand : m_trackList) {
@@ -335,11 +335,11 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
       B2DEBUG(100, " Creating Track");
 
-      genfit::Track* gfTrack = new genfit::Track(*aTrackCandPointer, factory, trackRep); //create the track with the corresponding track representation
+      genfit::Track gfTrack(*aTrackCandPointer, factory, trackRep); //create the track with the corresponding track representation
 
       B2DEBUG(100, " Checking Track");
 
-      const int nHitsInTrack = gfTrack->getNumPointsWithMeasurement();
+      const int nHitsInTrack = gfTrack.getNumPointsWithMeasurement();
       B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
 
 
@@ -426,14 +426,14 @@ void CDCLegendreDAFStereoAssigningModule::event()
       //now fit the track
       try {
 
-        fitter->processTrack(gfTrack);
+        fitter->processTrack(&gfTrack);
 
         //gfTrack.Print();
-        bool fitSuccess = gfTrack->hasFitStatus(trackRep);
+        bool fitSuccess = gfTrack.hasFitStatus(trackRep);
         genfit::FitStatus* fs = 0;
         genfit::KalmanFitStatus* kfs = 0;
         if (fitSuccess) {
-          fs = gfTrack->getFitStatus(trackRep);
+          fs = gfTrack.getFitStatus(trackRep);
           fitSuccess = fitSuccess && fs->isFitted();
           fitSuccess = fitSuccess && fs->isFitConverged();
           kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
@@ -446,7 +446,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
           //B2DEBUG(99,"       Forward Chi2: "<<gfTrack.getForwardChi2());
           B2DEBUG(100, "       NDF of the fit: " << kfs->getBackwardNdf());
           //Calculate probability
-          double pValue = gfTrack->getFitStatus()->getPVal();
+          double pValue = gfTrack.getFitStatus()->getPVal();
           B2DEBUG(100, "       pValue of the fit: " << pValue);
 
           candFitted = true;
@@ -457,7 +457,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
           TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
           TMatrixDSym cov(6);
 
-          genfit::MeasuredStateOnPlane mop = gfTrack->getFittedState();
+          genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
           mop.extrapolateToLine(pos, lineDirection);
           mop.getPosMomCov(poca, dirInPoca, cov);
 
@@ -467,7 +467,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
           stereohitsProcesser.assignStereohitsByAngle(cand, theta, m_StereoHitList, poca.Z());
 
-          gfTracksWithPVal.push_back(std::make_pair(gfTrack, pValue));
+//          gfTracksWithPVal.push_back(std::make_pair(gfTrack, pValue));
         }
 
       } catch (...) {
@@ -479,15 +479,19 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
     if (candFitted == true) m_successfulGFTrackCandFitCounter++;
     else m_failedGFTrackCandFitCounter++;
+
+    delete aTrackCandPointer;
   }
+  /*
+    std::sort(gfTracksWithPVal.begin(), gfTracksWithPVal.end(),
+    [](std::pair<genfit::Track, double> const a, std::pair<genfit::Track, double> const b) {return a.second < b.second;});
 
-  std::sort(gfTracksWithPVal.begin(), gfTracksWithPVal.end(),
-  [](std::pair<genfit::Track*, double> const a, std::pair<genfit::Track*, double> const b) {return a.second < b.second;});
-
-  for (auto entry : gfTracksWithPVal) {
-    B2INFO("pVal form track: " << entry.first->getFitStatus()->getPVal() << "; pVal from vector: " << entry.second);
-  }
-
+    for (auto entry : gfTracksWithPVal) {
+      B2INFO("pVal form track: " << entry.first.getFitStatus()->getPVal() << "; pVal from vector: " << entry.second);
+  //    delete entry.first->getTrackRep(0);
+  //    delete entry.first;
+    }
+  */
   B2INFO(" m_failedFitCounter = " << m_failedFitCounter);
   B2INFO(" m_successfulGFTrackCandFitCounter = " << m_successfulGFTrackCandFitCounter);
   B2INFO(" m_failedGFTrackCandFitCounter = " << m_failedGFTrackCandFitCounter);

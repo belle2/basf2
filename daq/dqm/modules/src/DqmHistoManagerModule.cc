@@ -39,14 +39,15 @@ DqmHistoManagerModule::DqmHistoManagerModule() : Module(), m_initmain(false), m_
 DqmHistoManagerModule::~DqmHistoManagerModule()
 {
   //  if (m_initmain) {
-  if (ProcHandler::EvtProcID() == -1) {   // should be called from main proc.
-    //    cout << "DqmHistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
-    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
-      cout << "DqmHistoManager:: adding histogram files" << endl;
-      RbTupleManager::Instance().hadd();
-      cout << "DqmHistoManager:: adding histogram files done" << endl;
-    }
+  //  if (ProcHandler::EvtProcID() == -1) {   // should be called from main proc.
+  //    cout << "DqmHistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
+  //    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
+  if (Environment::Instance().getNumberProcesses() > 0) {
+    cout << "DqmHistoManager:: adding histogram files" << endl;
+    RbTupleManager::Instance().hadd();
+    cout << "DqmHistoManager:: adding histogram files done" << endl;
   }
+  //  }
 }
 
 void DqmHistoManagerModule::initialize()

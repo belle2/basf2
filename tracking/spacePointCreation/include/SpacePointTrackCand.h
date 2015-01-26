@@ -28,6 +28,7 @@
 // ROOT
 #include <TVectorD.h>
 #include <TMatrixD.h>
+#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -85,6 +86,12 @@ namespace Belle2 {
 
     /** get state seed as 6D vector */
     const TVectorD& getStateSeed() const { return m_state6D; }
+
+    /** get position seed as TVector3 */
+    const TVector3 getPosSeed() const { return TVector3(m_state6D[0], m_state6D[1], m_state6D[2]); }
+
+    /** get momentum seed as TVector3 */
+    const TVector3 getMomSeed() const { return TVector3(m_state6D[3], m_state6D[4], m_state6D[5]); }
 
     /**
      * get the sorting parameters

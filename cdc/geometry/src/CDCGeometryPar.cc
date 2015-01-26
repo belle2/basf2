@@ -282,6 +282,9 @@ void CDCGeometryPar::read()
     readPropSpeed(gbxParams, 1);
   }
 
+  //calculate and save shifts in super-layers
+  setShiftInSuperLayer();
+
   //Print();
 
 }
@@ -1284,4 +1287,172 @@ double CDCGeometryPar::ClosestApproach(const TVector3 bwp, const TVector3 fwp, c
 
   return distance;
 
+}
+
+
+const signed short CCW = 1; ///< Constant for counterclockwise orientation
+const signed short CW  = -1; ///< Constant for clockwise orientation
+const signed short CW_OUT_NEIGHBOR  = 1; //Constant for clockwise outwards
+const signed short CW_NEIGHBOR      = 3; //Constant for clockwise
+const signed short CW_IN_NEIGHBOR   = 5; // Constant for clockwise inwards
+const signed short CCW_IN_NEIGHBOR  = 7; // Constant for counterclockwise inwards
+const signed short CCW_NEIGHBOR     = 9; // Constant for counterclockwise
+const signed short CCW_OUT_NEIGHBOR = 11; // Constant for counterclockwise outwards
+
+unsigned short CDCGeometryPar::areNeighbors(const WireID wireId, const WireID otherWireId) const
+{
+  //require within the same super-layer
+  if (otherWireId.getISuperLayer() != wireId.getISuperLayer()) return 0;
+
+  const signed short iWire       =      wireId.getIWire();
+  const signed short iOtherWire  = otherWireId.getIWire();
+  const signed short iCLayer     =      wireId.getICLayer();
+  const signed short iOtherCLayer = otherWireId.getICLayer();
+
+  //require nearby wire
+  if (iWire == iOtherWire) {
+  } else if (iWire == (iOtherWire + 1) % static_cast<signed short>(m_nWires[iOtherCLayer])) {
+  } else if ((iWire + 1) % static_cast<signed short>(m_nWires[iCLayer]) == iOtherWire) {
+  } else {
+    return 0;
+  }
+  //  std::cout <<"iCLayer,iLayer,nShifts= " << iCLayer <<" "<< iLayer <<" "<< nShifts(iCLayer) << std::endl;
+
+  signed short iLayerDifference = otherWireId.getILayer() - wireId.getILayer();
+  if (abs(iLayerDifference) > 1) return 0;
+
+  if (iLayerDifference == 0) {
+    if (iWire == (iOtherWire + 1) % static_cast<signed short>(m_nWires[iCLayer])) return CW_NEIGHBOR;
+    else if ((iWire + 1) % static_cast<signed short>(m_nWires[iCLayer]) == iOtherWire) return CCW_NEIGHBOR;
+    else return 0;
+  } else if (iLayerDifference == -1) {
+    //    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
+    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] - m_shiftInSuperLayer[wireId.getISuperLayer()][wireId.getILayer()];
+    //    std::cout <<"in deltaShift,iOtherWire,iWire= " << deltaShift <<" "<< iOtherWire <<" "<< iWire << std::endl;
+    if (iWire == iOtherWire) {
+      if (deltaShift ==  CW) return  CW_IN_NEIGHBOR;
+      else if (deltaShift == CCW) return CCW_IN_NEIGHBOR;
+      else return 0;
+    } else if (iWire == (iOtherWire + 1) % static_cast<signed short>(m_nWires[iOtherCLayer])) {
+      if (deltaShift == CCW) return  CW_IN_NEIGHBOR;
+      else return 0;
+    } else if ((iWire + 1) % static_cast<signed short>(m_nWires[iCLayer]) == iOtherWire) {
+      if (deltaShift ==  CW) return CCW_IN_NEIGHBOR;
+      else return 0;
+    } else return 0;
+  } else if (iLayerDifference == 1) {
+    //    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
+    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] - m_shiftInSuperLayer[wireId.getISuperLayer()][wireId.getILayer()];
+    //    std::cout <<"out deltaShift,iOtherWire,iWire= " << deltaShift <<" "<< iOtherWire <<" "<< iWire << std::endl;
+    if (iWire == iOtherWire) {
+      if (deltaShift ==  CW) return  CW_OUT_NEIGHBOR;
+      else if (deltaShift == CCW) return CCW_OUT_NEIGHBOR;
+      else return 0;
+    } else if (iWire == (iOtherWire + 1) % static_cast<signed short>(m_nWires[iOtherCLayer])) {
+      if (deltaShift == CCW) return  CW_OUT_NEIGHBOR;
+      else return 0;
+    } else if ((iWire + 1) % static_cast<signed short>(m_nWires[iCLayer]) == iOtherWire) {
+      if (deltaShift ==  CW) return CCW_OUT_NEIGHBOR;
+      else return 0;
+    } else return 0;
+  } else return 0;
+
+}
+
+unsigned short CDCGeometryPar::areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, const WireID otherWireId) const
+{
+  //require within the same super-layer
+  if (otherWireId.getISuperLayer() != iSuperLayer) return 0;
+
+  const signed short iOtherWire  = otherWireId.getIWire();
+  const signed short iOtherCLayer = otherWireId.getICLayer();
+
+  //require nearby wire
+  if (iWire == iOtherWire) {
+  } else if (iWire == (iOtherWire + 1) % static_cast<signed short>(m_nWires[iOtherCLayer])) {
+  } else if ((iWire + 1) % static_cast<signed short>(m_nWires[iCLayer]) == iOtherWire) {
+  } else {
+    return 0;
+  }
+
+  //  std::cout <<"iCLayer,iLayer,nShifts= " << iCLayer <<" "<< iLayer <<" "<< nShifts(iCLayer) << std::endl;
+  signed short iLayerDifference = otherWireId.getILayer() - iLayer;
+  if (abs(iLayerDifference) > 1) return 0;
+
+  if (iLayerDifference == 0) {
+    if (iWire == (iOtherWire + 1) % static_cast<signed short>(m_nWires[iCLayer])) return CW_NEIGHBOR;
+    else if ((iWire + 1) % static_cast<signed short>(m_nWires[iCLayer]) == iOtherWire) return CCW_NEIGHBOR;
+    else return 0;
+  } else if (iLayerDifference == -1) {
+    //    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
+    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] - m_shiftInSuperLayer[iSuperLayer][iLayer];
+    //    std::cout <<"in deltaShift,iOtherWire,iWire= " << deltaShift <<" "<< iOtherWire <<" "<< iWire << std::endl;
+    if (iWire == iOtherWire) {
+      if (deltaShift ==  CW) return  CW_IN_NEIGHBOR;
+      else if (deltaShift == CCW) return CCW_IN_NEIGHBOR;
+      else return 0;
+    } else if (iWire == (iOtherWire + 1) % static_cast<signed short>(m_nWires[iOtherCLayer])) {
+      if (deltaShift == CCW) return  CW_IN_NEIGHBOR;
+      else return 0;
+    } else if ((iWire + 1) % static_cast<signed short>(m_nWires[iCLayer]) == iOtherWire) {
+      if (deltaShift ==  CW) return CCW_IN_NEIGHBOR;
+      else return 0;
+    } else return 0;
+  } else if (iLayerDifference == 1) {
+    //    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
+    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] - m_shiftInSuperLayer[iSuperLayer][iLayer];
+    //    std::cout <<"out deltaShift,iOtherWire,iWire= " << deltaShift <<" "<< iOtherWire <<" "<< iWire << std::endl;
+    if (iWire == iOtherWire) {
+      if (deltaShift ==  CW) return  CW_OUT_NEIGHBOR;
+      else if (deltaShift == CCW) return CCW_OUT_NEIGHBOR;
+      else return 0;
+    } else if (iWire == (iOtherWire + 1) % static_cast<signed short>(m_nWires[iOtherCLayer])) {
+      if (deltaShift == CCW) return  CW_OUT_NEIGHBOR;
+      else return 0;
+    } else if ((iWire + 1) % static_cast<signed short>(m_nWires[iCLayer]) == iOtherWire) {
+      if (deltaShift ==  CW) return CCW_OUT_NEIGHBOR;
+      else return 0;
+    } else return 0;
+  } else return 0;
+
+}
+
+void CDCGeometryPar::setShiftInSuperLayer()
+{
+  const unsigned short nLayers[nSuperLayers] = {8, 6, 6, 6, 6, 6, 6, 6, 6}; //tentaive
+
+  for (unsigned short SLayer = 0; SLayer < nSuperLayers; ++SLayer) {
+    unsigned short firstCLayer = 0;
+    for (unsigned short i = 0; i < SLayer; ++i) {
+      firstCLayer += nLayers[i];
+    }
+    //    std::cout <<"SLayer,firstCLayer= " << SLayer <<" "<< firstCLayer << std::endl;
+
+    TVector3 firstBPos = wireBackwardPosition(firstCLayer, 0);
+    for (unsigned short Layer = 0; Layer < nLayers[SLayer]; ++Layer) {
+      unsigned short CLayer = firstCLayer + Layer;
+
+      if (CLayer == firstCLayer) {
+        m_shiftInSuperLayer[SLayer][Layer] = 0;
+
+      } else if (CLayer == firstCLayer + 1) {
+        TVector3 BPos = wireBackwardPosition(CLayer, 0);
+        m_shiftInSuperLayer[SLayer][Layer] = (BPos.Cross(firstBPos)).Z() > 0. ? -1 : 1;
+        //  std::cout <<"CLayer,Layer,shift= " << CLayer <<" "<< Layer <<" "<< m_shiftInSuperLayer[SLayer][Layer] <<" "<< (BPos.Cross(firstBPos)).Z() << std::endl;
+
+      } else {
+        if (Layer % 2 == 0) {
+          m_shiftInSuperLayer[SLayer][Layer] = 0;
+        } else {
+          m_shiftInSuperLayer[SLayer][Layer] = m_shiftInSuperLayer[SLayer][1];
+        }
+      }
+      //      std::cout <<"CLayer,Layer,shift= " << CLayer <<" "<< Layer <<" "<< m_shiftInSuperLayer[SLayer][Layer] << std::endl;
+    }
+  }
+}
+
+signed short CDCGeometryPar::getShiftInSuperLayer(unsigned short iSuperLayer, unsigned short iLayer) const
+{
+  return m_shiftInSuperLayer[iSuperLayer][iLayer];
 }

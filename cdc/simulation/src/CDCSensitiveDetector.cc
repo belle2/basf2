@@ -35,6 +35,8 @@
 
 #include "TVector3.h"
 
+//#include <iomanip>
+
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
@@ -56,6 +58,10 @@ namespace Belle2 {
     StoreArray<CDCEBSimHit> cdcEBArray;
     RelationArray cdcSimHitRel(mcParticles, cdcSimHits);
     registerMCParticleRelation(cdcSimHitRel);
+    //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_doNothing);
+    //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_negativeWeight);
+    //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_deleteElement);
+    //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_zeroWeight);
     cdcSimHits.registerAsPersistent();
     cdcEBArray.registerAsTransient();
     RelationArray::registerPersistent<MCParticle, CDCSimHit>();
@@ -72,17 +78,27 @@ namespace Belle2 {
     //    m_wireSag = gd.getBool("WireSag");
     m_wireSag = false;
     B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
+    m_modifiedLeftRightFlag = gd.getBool("ModifiedLeftRightFlag");
+    B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
 
     //    m_minTrackLength = gd.getDouble("MinTrackLength");
     m_minTrackLength = gd.getWithUnit("MinTrackLength");
     m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
     B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
+
+    //For activating Initialize and EndOfEvent functions
+    if (m_modifiedLeftRightFlag) {
+      G4SDManager::GetSDMpointer()->AddNewDetector(this);
+    }
   }
 
   void CDCSensitiveDetector::Initialize(G4HCofThisEvent*)
   {
     // Initialize
     m_nonUniformField = 0;
+    //    std::cout << "Initialize called" << std::endl;
+    //    m_nPosHits = 0;
+    //    m_nNegHits = 0;
   }
 
   //-----------------------------------------------------
@@ -108,9 +124,14 @@ namespace Belle2 {
     // Get step information
     const G4Track& t = * aStep->GetTrack();
 
-    // No save in MCParticle if track-length is short
+    G4double hitWeight = Simulation::TrackInfo::getInfo(t).getIgnore() ? -1 : 1;
+    // save in MCParticle if track-length is enough long
     if (t.GetTrackLength() > m_minTrackLength) {
       Simulation::TrackInfo::getInfo(t).setIgnore(false);
+      hitWeight = 1.;
+      //     std::cout <<"setignore=false for track= "<< t.GetTrackID() << std::endl;
+      //    } else {
+      //      std::cout <<"setignore=true for track= "<< t.GetTrackID() << std::endl;
     }
 
     const G4double charge = t.GetDefinition()->GetPDGCharge();
@@ -123,6 +144,7 @@ namespace Belle2 {
 
     const G4int pid = t.GetDefinition()->GetPDGEncoding();
     const G4int trackID = t.GetTrackID();
+    //    std::cout << "pid,stepl,trackID,trackl,weight= " << pid <<" "<< stepLength <<" "<< trackID <<" "<< t.GetTrackLength() <<" "<< hitWeight << std::endl;
 
     const G4VPhysicalVolume& v = * t.GetVolume();
     const G4StepPoint& in = * aStep->GetPreStepPoint();
@@ -383,12 +405,15 @@ namespace Belle2 {
       const TVector3 tMom(mom.x(), mom.y(), mom.z());
       G4int lr = cdcg.getOldLeftRight(tPosW, tPosTrack, tMom);
       G4int newLrRaw = cdcg.getNewLeftRightRaw(tPosW, tPosTrack, tMom);
-      G4int newLr = newLrRaw; //tentative !
+      //      if(abs(pid) == 11) {
+      //  std::cout <<"pid,lr,newLrRaw 4electron= " << pid <<" "<< lr <<" "<< newLrRaw << std::endl;
+      //      }
+      G4int newLr = newLrRaw; //to be modified in EndOfEvent
 
       if (nWires == 1) {
 
         //        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, newLrRaw, newLr, speed);
-        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * CLHEP::cm, pOnTrack, posW, posIn, posOut, posTrack, lr, newLrRaw, newLr, speed);
+        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * CLHEP::cm, pOnTrack, posW, posIn, posOut, posTrack, lr, newLrRaw, newLr, speed, hitWeight);
 #if defined(CDC_DEBUG)
         std::cout << "saveSimHit" << std::endl;
         std::cout << "momIn    = " << momIn    << std::endl;
@@ -453,7 +478,7 @@ namespace Belle2 {
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
           //          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed);
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * CLHEP::cm, pOnTrack, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * CLHEP::cm, pOnTrack, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed, hitWeight);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
           std::cout << "p_In    = " << p_In     << std::endl;
@@ -481,7 +506,7 @@ namespace Belle2 {
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
           //          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed);
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * CLHEP::cm, pOnTrack, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * CLHEP::cm, pOnTrack, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed, hitWeight);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
           std::cout << "p_In    = " << p_In     << std::endl;
@@ -507,9 +532,184 @@ namespace Belle2 {
   }
 
 
-  //  void CDCSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
-  //  {
-  //  }
+  /*
+  void CDCSensitiveDetector::BeginOfEvent(G4HCofThisEvent*)
+  {
+    std::cout <<"CDCSensitiveDetector::BeginOfEvent callded." << std::endl;
+  }
+  */
+
+
+  void CDCSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
+  {
+    if (!m_modifiedLeftRightFlag) return;
+
+    //    std::cout <<"#posHits,#negHits= " << m_nPosHits <<" "<< m_nNegHits << std::endl;
+
+    // Get SimHit array and relation betw. MC and SimHit
+    // N.B. MCParticle is incomplete at this stage; the relation betw it and
+    // simHit is Okay.
+    // MCParticle will be completed after all sub-detectors' EndOfEvent calls.
+    StoreArray<CDCSimHit>  simHits;
+    StoreArray<MCParticle> mcParticles;
+    RelationArray mcPartToSimHits(mcParticles, simHits);
+    int nRelationsMinusOne = mcPartToSimHits.getEntries() - 1;
+
+    if (nRelationsMinusOne == -1) return;
+
+    //    std::cout <<"#simHits= " << simHits.getEntries() << std::endl;
+    //    std::cout <<"#mcParticles= " << mcParticles.getEntries() << std::endl;
+    //    std::cout <<"#mcPartToSimHits= " << mcPartToSimHits.getEntries() << std::endl;
+
+    //set pointer to cdcgeometrypar
+    m_ptrToCDCGeo = &(CDCGeometryPar::Instance());
+
+    //reset some of negative weights to positive; this is needed for the hits
+    //created by secondary particles whose track-lengths get larger than the
+    //threshold (set by the user) during G4 swimming (i.e. the weights are
+    //first set to negative as far as the track-lengths are shorther than the
+    //threshold; set to positive when the track-lengths exceed the threshold).
+
+    size_t iRelation = 0;
+    int trackIdOld = INT_MAX;
+    //    std::cout << "INT_MAX= " << INT_MAX << std::endl;
+    m_hitWithPosWeight.clear();
+    m_hitWithNegWeight.clear();
+
+    for (int it = nRelationsMinusOne; it >= 0; --it) {
+      RelationElement& mcPartToSimHit = const_cast<RelationElement&>(mcPartToSimHits[it]);
+      size_t nRelatedHits = mcPartToSimHit.getSize();
+      if (nRelatedHits > 1) B2FATAL("CDCSensitiveDetector::EndOfEvent: MCParticle<-> CDCSimHit relation is not one-to-one !");
+
+      unsigned short trackId = mcPartToSimHit.getFromIndex();
+      RelationElement::weight_type weight = mcPartToSimHit.getWeight(iRelation);
+      if (weight > 0.) {
+        trackIdOld = trackId;
+      } else if (weight <= 0. && trackId == trackIdOld) {
+        //  RelationElement::index_type iSimHit = mcPartToSimHit.getToIndex(iRelation);
+        weight *= -1.;
+        mcPartToSimHit.setToIndex(mcPartToSimHit.getToIndex(iRelation), weight);
+        trackIdOld = trackId;
+        //  std::cout <<"trackId,,iSimHit,wgtafterreset= "<<  trackId <<" "<< iSimHit <<" "<< mcPartToSimHit.getWeight(iRelation) << std::endl;
+      }
+
+      CDCSimHit* sHit = simHits[mcPartToSimHit.getToIndex(iRelation)];
+
+      if (weight > 0.) {
+        m_hitWithPosWeight.insert(std::pair<unsigned short, CDCSimHit*>(sHit->getWireID().getISuperLayer(), sHit));
+      } else {
+        m_hitWithNegWeight.push_back(sHit);
+      }
+    }
+
+    /*
+    //    std::cout <<"m_hitWithPosWeight.size= " << m_hitWithPosWeight.size() << std::endl;
+    for(int i=0; i<9; ++i) {
+      //      if (m_hitWithPosWeight.find(i) != m_hitWithPosWeight.end()) {
+      //  std::cout << i << " found" << std::endl;
+      //      }
+      m_posWeightMapItBegin.push_back(m_hitWithPosWeight.find(i));
+      m_posWeightMapItEnd.push_back(m_hitWithPosWeight.find(i+1));
+    }
+    */
+
+    //reassign L/R flag
+    reAssignLeftRightInfo();
+
+    //reset all weights positive; this is required for completing MCParticle object at the EndOfEvent action of FullSim
+    // is this part really needed ??? check again !
+    for (int it = 0; it <= nRelationsMinusOne; ++it) {
+      RelationElement& mcPartToSimHit = const_cast<RelationElement&>(mcPartToSimHits[it]);
+      RelationElement::weight_type weight = mcPartToSimHit.getWeight(iRelation);
+      if (weight < 0.) {
+        mcPartToSimHit.setToIndex(mcPartToSimHit.getToIndex(iRelation), -1.*weight);
+      }
+    }
+
+  }
+
+
+  void CDCSensitiveDetector::reAssignLeftRightInfo()
+  {
+    CDCSimHit* sHit = nullptr;
+    WireID sWireId             = WireID();
+    TVector3 sPos              = TVector3();
+    unsigned short sClayer     = 0;
+    unsigned short sSuperLayer = 0;
+    unsigned short sLayer      = 0;
+    unsigned short sWire       = 0;
+
+    CDCSimHit* fHit = nullptr;
+
+    CDCSimHit* pHit = nullptr;
+    WireID pWireId = WireID();
+    double minDistance2 = DBL_MAX;
+    double    distance2 = DBL_MAX;
+    //    unsigned short bestNeighb = 0;
+    unsigned short neighb = 0;
+
+    std::multimap<unsigned short, CDCSimHit*>::iterator pItBegin = m_hitWithPosWeight.begin();
+    std::multimap<unsigned short, CDCSimHit*>::iterator pItEnd   = m_hitWithPosWeight.end();
+
+    //Find a primary track close to the input 2'ndary hit in question
+    for (std::vector<CDCSimHit*>::iterator nIt = m_hitWithNegWeight.begin(), nItEnd = m_hitWithNegWeight.end(); nIt != nItEnd; ++nIt) {
+
+      sHit = *nIt;
+      sPos    = sHit->getPosTrack();
+      sWireId = sHit->getWireID();
+      sClayer     = sWireId.getICLayer();
+      sSuperLayer = sWireId.getISuperLayer();
+      sLayer      = sWireId.getILayer();
+      sWire       = sWireId.getIWire();
+
+      fHit = sHit;
+
+      pItBegin = m_hitWithPosWeight.find(sSuperLayer);
+      pItEnd   = m_hitWithPosWeight.find(sSuperLayer + 1);
+      /*
+      if (sSuperLayer <= 8) {
+      pItBegin = m_posWeightMapItBegin.at(sSuperLayer);
+      pItEnd   = m_posWeightMapItEnd.at(sSuperLayer);
+      } else {
+      B2FATAL("CDCSensitiveDetector::EndOfEvent: invalid super-layer id ! " << sSuperLayer);
+      }
+      */
+
+      minDistance2 = DBL_MAX;
+      //      bestNeighb = 0;
+
+      /*      for (std::multimap<unsigned short, CDCSimHit*>::iterator pIt = m_hitWithPosWeight.begin(); pIt != m_hitWithPosWeight.end(); ++pIt) {
+        std::cout <<"superLyr#= " << pIt->first << std::endl;
+      }
+      */
+
+      for (std::multimap<unsigned short, CDCSimHit*>::iterator pIt = pItBegin; pIt != pItEnd; ++pIt) {
+
+        //scan hits in the same/neighboring cells
+        pHit = pIt->second;
+        pWireId = pHit->getWireID();
+        //      neigh = cdcg.areNeighbors(sWireId, pWireId);
+        neighb = m_ptrToCDCGeo->areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
+        if (neighb != 0 || pWireId == sWireId) {
+          distance2 = (pHit->getPosTrack() - sPos).Mag2();
+          if (distance2 < minDistance2) {
+            fHit = pHit;
+            minDistance2 = distance2;
+            //      bestNeighb = neighb;
+          }
+        }
+      }
+
+      //reassign LR using the momentum-direction of the primary particle found
+      unsigned short lR = m_ptrToCDCGeo->getNewLeftRightRaw(sHit->getPosWire(),
+                                                            sHit->getPosTrack(),
+                                                            fHit->getMomentum());
+      //      unsigned short bflr = sHit->getLeftRightPassage();
+      sHit->setLeftRightPassage(lR);
+      //      std::cout <<"neighb, bfaf lrs, minDistance= " << bestNeighb <<" "<<" "<< bflr <<" "<< sHit->getLeftRightPassage() <<" "<< std::scientific << sqrt(minDistance2) << std::endl;
+    }
+  }
+
 
   int
   CDCSensitiveDetector::saveSimHit(const G4int layerId,
@@ -528,7 +728,8 @@ namespace Belle2 {
                                    const G4int lr,
                                    const G4int newLrRaw,
                                    const G4int newLr,
-                                   const G4double speed)
+                                   const G4double speed,
+                                   const G4double hitWeight)
   {
 
     // Discard the hit below Edep_th
@@ -585,7 +786,16 @@ namespace Belle2 {
 #endif
 
     B2DEBUG(150, "HitNumber: " << m_hitNumber);
-    cdcSimHitRel.add(trackID, m_hitNumber);
+    if (m_modifiedLeftRightFlag) {
+      //N.B. Negative hitWeight is allowed intentionally here; all weights are to be reset to positive in EndOfEvent
+      cdcSimHitRel.add(trackID, m_hitNumber, hitWeight);
+    } else {
+      cdcSimHitRel.add(trackID, m_hitNumber);
+    }
+
+    //    if (hitWeight > 0) m_nPosHits++;
+    //    if (hitWeight < 0) m_nNegHits++;
+    //    std::cout <<"trackID,HitNumber,weight,driftL,edep= "<< trackID <<" "<< m_hitNumber <<" "<< hitWeight <<" "<< distance <<" "<< edep << std::endl;
     return (m_hitNumber);
   }
 

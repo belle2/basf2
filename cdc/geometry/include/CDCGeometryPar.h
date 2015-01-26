@@ -24,6 +24,7 @@ const unsigned MAX_N_SLAYERS =    56;
 const unsigned MAX_N_SCELLS  =   384;
 const unsigned MAX_N_FLAYERS =    55;
 const unsigned nSenseWires   = 14336;
+const unsigned nSuperLayers  =     9;
 
 namespace Belle2 {
   namespace CDC {
@@ -321,6 +322,18 @@ namespace Belle2 {
       */
       double getWireSagCoef(EWirePosition set, int layerId, int cellId) const;
 
+      //! Calculates and saves shifts in super-layers (to be used in searching hits in neighboring cells)
+      /*!
+      */
+      void setShiftInSuperLayer();
+
+      //! Returns shift in the super-layer
+      /*!
+      \param iSuperLayer The super-layer id.
+      \param iLayer      The layer id. in the super-layer
+      */
+      signed short getShiftInSuperLayer(unsigned short iSuperLayer, unsigned short iLayer) const;
+
       //! Returns radius of sense wire in each layer.
       /*!
           \param layerId The layer id.
@@ -596,6 +609,25 @@ namespace Belle2 {
       double ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut, TVector3& hitPosition, TVector3& wirePosition) const;
 
       /**
+       * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
+       * @param[in] wireId wire-id. in question (reference)
+       * @param[in] otherWireId another wire-id. in question
+       */
+
+      unsigned short areNeighbors(const WireID wireId, const WireID otherWireId) const;
+
+      /**
+       * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
+       * @param[in] iCLayer later-id (continuous) in question (reference)
+       * @param[in] iSuperLayer super-later-id in question (reference)
+       * @param[in] iLayer later-id in the super-layer in question (reference)
+       * @param[in] iWire wire-id in the layer in question (reference)
+       * @param[in] otherWireId another wire-id. in question
+       */
+
+      unsigned short areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, const WireID otherWireId) const;
+
+      /**
        * Set the desizend wire parameters.
        * @param[in] layerID Layer ID
        * @param[in] cellID Cell ID
@@ -628,6 +660,7 @@ namespace Belle2 {
       bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
       std::string m_version; /*!< The version of geometry parameters. */
       int m_materialDefinitionMode; /*!< Control switch for gas and wire material definition. */
+      signed short m_shiftInSuperLayer[nSuperLayers][8]; /*!< shift in phi-direction wrt the 1st layer in each super layer*/
       int m_nSLayer;         /*!< The number of sense wire layer. */
       int m_nFLayer;         /*!< The number of field wire layer. */
       double m_rWall[4];     /*!< The array to store radius of inner wall and outer wall. */
@@ -853,7 +886,7 @@ namespace Belle2 {
     {
       return (m_zSBackwardLayer[i] + (m_zSForwardLayer[i] - m_zSBackwardLayer[i]) / 2);
     }
-  }
+  } // end of namespace CDC
 } // end of namespace Belle2
 
 #endif

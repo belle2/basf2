@@ -15,17 +15,20 @@
 //#include <cdc/simcdc/CDCB4VHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
+#include <vector>
+#include <map>
 
 
 namespace Belle2 {
+  class CDCSimHit;
   namespace CDC {
+
+    class CDCGeometryPar;
+
     //! The Class for CDC Sensitive Detector
     /*! In this class, every variable defined in CDCB4VHit will be calculated.
       And save CDCB4VHit into hits collection.
     */
-
-    // Wire configuration
-
 
     class CDCSensitiveDetector: public Simulation::SensitiveDetectorBase {
 
@@ -43,8 +46,14 @@ namespace Belle2 {
       //! Process each step and calculate variables defined in CDCB4VHit
       bool step(G4Step* aStep, G4TouchableHistory* history);
 
-      //  Do what you want to do at the end of each event
-      //      void EndOfEvent(G4HCofThisEvent*);
+      //!  Do what you want to do at the beginning of each event (why this is not called ?)
+      //      void BeginOfEvent(G4HCofThisEvent*);
+
+      //!  Do what you want to do at the end of each event
+      void EndOfEvent(G4HCofThisEvent*);
+
+      //!  Re-assign left/right info.
+      void reAssignLeftRightInfo();
 
       //! Save CDCSimHit into datastore
       int saveSimHit(const G4int layerId,
@@ -63,7 +72,8 @@ namespace Belle2 {
                      const G4int lr,
                      const G4int NewLrRaw,
                      const G4int NewLr,
-                     const G4double speed);
+                     const G4double speed,
+                     const G4double hitWeight);
 
       //! Save CDCEBSimHit into datastore
       int saveEBSimHit(const G4int layerId,
@@ -311,10 +321,24 @@ namespace Belle2 {
 
       G4bool m_wireSag; /**< Switch to activate wire sag effect. */
 
+      G4bool m_modifiedLeftRightFlag; /**< Switch for left/right flag modified for tracking. */
+
       G4double m_minTrackLength; /**< Min. track length (mm) required for saving in MCParticle. */
 
       int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/
       int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC EB array.*/
+
+      CDCGeometryPar* m_ptrToCDCGeo; /**< Pointer to CDCGeometry object. */
+
+      std::multimap<unsigned short, CDCSimHit*> m_hitWithPosWeight; /**< Map containing hits with positive weight. Map may be replaced by vector, which may make the job speed faster... Try later. */
+
+      std::vector<CDCSimHit*> m_hitWithNegWeight; /**< Vector containing hits with negative weight. */
+
+      //      std::vector<std::multimap<unsigned short, CDCSimHit*>::iterator> m_posWeightMapItBegin; /**< Iterator showing begin of positive hit map*/
+
+      //      std::vector<std::multimap<unsigned short, CDCSimHit*>::iterator> m_posWeightMapItEnd; /**< Iterator showing end of positive hit map*/
+
+      //      int m_nPosHits, m_nNegHits;
     };
   }
 } // end of namespace Belle2

@@ -52,7 +52,7 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool
 
     m_trackList.remove(cand2);
     delete cand2;
-    cand2 = NULL;
+    cand2 = nullptr;
 
   } else {
 

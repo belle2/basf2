@@ -323,11 +323,11 @@ void CDCLegendreTrackingModule::event()
   //create GenFit Track candidates
   m_cdcLegendreTrackProcessor->createGFTrackCandidates(m_gfTrackCandsColName);
 
+  m_cdcLegendreTrackDrawer->finalizeFile();
+
+
   //memory management
   clear_pointer_vectors();
-
-
-  m_cdcLegendreTrackDrawer->finalizeFile();
 }
 
 void CDCLegendreTrackingModule::DoSteppedTrackFinding()
@@ -695,7 +695,7 @@ void CDCLegendreTrackingModule::endRun()
 
 void CDCLegendreTrackingModule::terminate()
 {
-  m_cdcLegendreQuadTree->terminate();
+//  m_cdcLegendreQuadTree->terminate();
   delete m_cdcLegendreQuadTree;
   delete m_cdcLegendreQuadTreeCandidateCreator;
 //  delete m_cdcLegendreConformalPosition;

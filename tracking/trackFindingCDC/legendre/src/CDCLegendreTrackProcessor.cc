@@ -86,7 +86,7 @@ void TrackProcessor::createLegendreTrackCandidate(
   }
 }
 
-TrackCandidate* TrackProcessor::createLegendreTrackCandidate(std::vector<QuadTree*> nodeList)
+TrackCandidate* TrackProcessor::createLegendreTrackCandidate(std::vector<QuadTree*>& nodeList)
 {
   std::pair<double, double> ref_point = std::make_pair(0., 0.);;
   TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
@@ -133,7 +133,7 @@ TrackCandidate* TrackProcessor::createLegendreTracklet(std::vector<TrackHit*>& h
 }
 
 
-TrackCandidate* TrackProcessor::createLegendreStereoTracklet(std::vector<QuadTree*> nodeList)
+TrackCandidate* TrackProcessor::createLegendreStereoTracklet(std::vector<QuadTree*>& nodeList)
 {
   TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
   std::pair<double, double> ref_point = std::make_pair(0., 0.);

@@ -225,7 +225,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
   meanTheta = (range1 + range2) / 2.;
 
-  B2INFO("THETA WINDOW: range1: " << range1 * 180. / 3.1415 << "; range2: " << range2 * 180. / 3.1415);
+  B2DEBUG(100, "THETA WINDOW: range1: " << range1 * 180. / 3.1415 << "; range2: " << range2 * 180. / 3.1415);
 
   TH1F hist5("hist5", "hist", 30, 0, 15);
 
@@ -260,6 +260,14 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
       //restore default hit coordinates
       hit->setZReference(0);
     }
+    /*
+        std::vector<TrackHit*> stereoHitsToAdd;
+        for (auto stereoHitPair : hits_to_add) {
+          if(stereoHitPair.first.getTrackHit()->getHitUsage() != TrackHit::not_used) continue;
+          stereoHitsToAdd.push_back(stereoHitPair.first.getTrackHit());
+        }
+    */
+//    assignStereohitsByAngle(cand, meanTheta, stereoHitsToAdd);
 
   }
 
@@ -365,7 +373,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
 
   if (nodeList.size() != 0) {
-    B2INFO(nodeList.size() << " NODES WERE ADDED!");
+//    B2INFO(nodeList.size() << " NODES WERE ADDED!");
 
     QuadTree* nodeWithMostHits = nullptr;
 
@@ -394,7 +402,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
     delete stereoPart;
     */
   } else {
-    B2INFO("NO NODES WERE ADDED!");
+//    B2INFO("NO NODES WERE ADDED!");
   }
 
 
@@ -488,7 +496,7 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
   }
 
 
-  assignStereohitsByAngleWithQuadtree(cand, theta, stereohits, Z0);
+//  assignStereohitsByAngleWithQuadtree(cand, theta, stereohits, Z0);
 
 
 }

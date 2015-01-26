@@ -57,13 +57,13 @@ namespace Belle2 {
       /**
        * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
        */
-      TrackCandidate* createLegendreTrackCandidate(std::vector<QuadTree*> nodeList);
+      TrackCandidate* createLegendreTrackCandidate(std::vector<QuadTree*>& nodeList);
 
       /** Create tracklet using vector of hits and store it */
       TrackCandidate* createLegendreTracklet(std::vector<TrackHit*>& hits);
 
       /** Create stereo tracklet using vector of hits and store it */
-      TrackCandidate* createLegendreStereoTracklet(std::vector<QuadTree*> nodeList);
+      TrackCandidate* createLegendreStereoTracklet(std::vector<QuadTree*>& nodeList);
 
       /**
        * @brief Perform the necessary operations after the track candidate has been constructed

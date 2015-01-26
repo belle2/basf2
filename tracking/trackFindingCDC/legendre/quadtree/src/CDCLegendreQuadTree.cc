@@ -65,9 +65,12 @@ QuadTree::~QuadTree()
 {
   if (not m_isMaxLevel) {
 
+//    B2INFO("DELETE NODE: lvl=" << m_level << "; r=" << getRMean() << "; theta=" << getThetaMean() );
+
     if (m_children != nullptr) {
       for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
         for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
+          if (m_children[t_index][r_index] == nullptr) continue;
           delete m_children[t_index][r_index];
         }
         delete[] m_children[t_index];
@@ -229,7 +232,9 @@ void QuadTree::cleanHitsInNode()
 
 void QuadTree::clearTree()
 {
-  if (!m_filled)return;
+//  if (not m_filled)return;
+
+//  B2INFO("CLEAR NODE: lvl=" << m_level << "; r=" << getRMean() << "; theta=" << getThetaMean() );
 
   clearNode();
   if (checkFilled()) {
@@ -239,18 +244,22 @@ void QuadTree::clearTree()
       }
     }
   }
-  m_filled = false;
 
   if (m_level == 0) {
-    for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
-      for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
-        delete m_children[t_index][r_index];
+    if (m_children != nullptr) {
+      for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
+        for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
+          if (m_children[t_index][r_index] == nullptr) continue;
+          delete m_children[t_index][r_index];
+        }
+        delete[] m_children[t_index];
       }
-      delete[] m_children[t_index];
+      delete[] m_children;
+      m_children = nullptr;
     }
-    delete[] m_children;
-    m_children = nullptr;
   }
+
+  m_filled = false;
 
 }
 
@@ -271,7 +280,7 @@ void QuadTree::startFillingTree(bool returnResult, std::vector<QuadTree*>& nodeL
 //    B2INFO("Last level! Not filling children. Level = " << m_level << "; bin " << m_rMin << "-" << m_rMax << "x" << m_thetaMin << "-" << m_thetaMax);
 //    B2INFO("Candidate: " << m_rMin << "-" << m_rMax << "x" << m_thetaMin << "-" << m_thetaMax << "; nhits=" << m_hits.size());
 
-    QuadTreeCandidateCreator::Instance().createCandidateDirect(this);
+//    QuadTreeCandidateCreator::Instance().createCandidateDirect(this);
 
 
     if (not returnResult) QuadTreeCandidateCreator::Instance().createCandidateDirect(this);

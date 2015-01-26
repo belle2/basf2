@@ -196,9 +196,12 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
 
   if (trackCandidate->getPt() < 0.9) s_cdcLegendreTrackMerger->tryToMergeTrack(trackCandidate);
 
+  if (trackCandidate == nullptr) return false;
+
 
   SimpleFilter m_cdcLegendreSimpleFilter;
   m_cdcLegendreSimpleFilter.processTracks(s_cdcLegendreTrackProcessor->getTrackList());
+
   for (TrackCandidate * cand : s_cdcLegendreTrackProcessor->getTrackList()) {
     s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
   }

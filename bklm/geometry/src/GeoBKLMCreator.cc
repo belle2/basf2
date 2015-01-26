@@ -83,10 +83,8 @@ namespace Belle2 {
     GeoBKLMCreator::~GeoBKLMCreator()
     {
       delete m_Sensitive;
-      std::cout << "GeoBKLMCreator::~GeoBKLMCreator(): " << m_VisAttributes.size() << " G4VisAttributes will be deleted ..." << std::endl;
       for (std::vector<G4VisAttributes*>::iterator j = m_VisAttributes.begin();
            j != m_VisAttributes.end(); ++j) {
-        std::cout << "  V" << (*j)->IsVisible() << ", A" << (*j)->GetColour().GetAlpha() << ", R" << (*j)->GetColour().GetRed() << ", G" << (*j)->GetColour().GetGreen() << ", B" << (*j)->GetColour().GetBlue() << std::endl;
         delete *j;
       }
       m_VisAttributes.clear();

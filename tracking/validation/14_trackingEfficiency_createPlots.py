@@ -168,7 +168,7 @@ def draw_hit_counts(data_tree, pt_values):
                               'Hit count profile for the %s;pT;nHits' % det,
                               number_bins, pt_lower, pt_upper)
 
-        description = 'Distibution of  Hit Counts for %s (Contact: %s).' \
+        description = 'Distribution of Hit Counts in %s (Contact: %s).' \
             % (det, CONTACT_PERSON['Email'])
         check = ''
 
@@ -214,7 +214,7 @@ def draw_pvalue(data_tree):
     hist_pvalue.SetXTitle('pValue')
     hist_pvalue.SetYTitle('number of entries')
 
-    description = 'Distibution of pValues of the single tracks (Contact: %s).' \
+    description = 'Distribution of pValues of the tracks (Contact: %s).' \
         % CONTACT_PERSON['Email']
     check = 'Should be a flat distribution.'
 

@@ -12,13 +12,16 @@
 #define GEOBKLMCREATOR_H
 
 #include <geometry/CreatorBase.h>
+#include <bklm/geometry/GeometryPar.h>
 
 class G4VSolid;
 class G4Box;
 class G4Tubs;
+class G4Polyhedra;
 class G4LogicalVolume;
 class G4VSensitiveDetector;
 class G4String;
+class G4VisAttributes;
 
 namespace Belle2 {
 
@@ -114,6 +117,51 @@ namespace Belle2 {
 
       //! Radial displacement of polygon to create an azimuthal iron rib
       double m_RibShift;
+
+      //! Pointer to solid for cap
+      G4Polyhedra* m_CapSolid;
+
+      //! Pointer to logical volumes for cap
+      G4LogicalVolume* m_CapLogical[2];
+
+      //! Pointer to solid for inner iron
+      G4VSolid* m_InnerIronSolid;
+
+      //! Pointer to logical volumes for inner iron
+      G4LogicalVolume* m_InnerIronLogical[4];
+
+      //! Pointer to solid for inner air
+      G4VSolid* m_InnerAirSolid;
+
+      //! Pointer to logical volumes for inner air
+      G4LogicalVolume* m_InnerAirLogical[4];
+
+      //! Pointer to logical volumes for support structure
+      G4LogicalVolume* m_SupportLogical[2];
+
+      //! Pointer to logical volumes for brackets
+      G4LogicalVolume* m_BracketsLogical;
+
+      //! Pointers to solids for iron in each layer
+      G4Polyhedra* m_LayerIronSolid[NLAYER + 1];
+
+      //! Pointers to logical volumes for iron in each layer
+      G4LogicalVolume* m_LayerIronLogical[2 * (NLAYER + 1)];
+
+      //! Pointer to solid for sector's enclosing tube
+      G4Tubs* m_SectorTube;
+
+      //! Pointers to logical volumes for each sector
+      G4LogicalVolume* m_SectorLogical[NSECTOR];
+
+      //! Pointer to solid for solenoid
+      G4Tubs* m_SolenoidTube;
+
+      //! Pointers to logical volumes for scintillator strips
+      std::vector<G4LogicalVolume*> m_ScintLogicals;
+
+      //! Vector of pointers to G4VisAttributes objects
+      std::vector<G4VisAttributes*> m_VisAttributes;
 
     };
 

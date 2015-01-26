@@ -47,7 +47,7 @@ REG_MODULE(FastSeqRootInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-FastSeqRootInputModule::FastSeqRootInputModule() : Module()
+FastSeqRootInputModule::FastSeqRootInputModule() : Module(), m_streamer(nullptr), m_size(0), m_size2(0)
 {
   //Set module properties
   setDescription("SeqROOT input module (with parallel deserialization). EXPERIMENTAL.");

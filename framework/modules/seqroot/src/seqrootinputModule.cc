@@ -32,7 +32,7 @@ REG_MODULE(SeqRootInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SeqRootInputModule::SeqRootInputModule() : Module()
+SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size(0), m_size2(0)
 {
   //Set module properties
   setDescription("SeqROOT input module");

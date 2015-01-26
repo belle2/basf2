@@ -26,13 +26,12 @@ REG_MODULE(SeqRootOutput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SeqRootOutputModule::SeqRootOutputModule() : Module()
+SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nullptr), m_size(0), m_size2(0)
 {
   //Set module properties
   setDescription("Module for sequential ROOT I/O. As an alternative to the TTree format, this format stores data as a sequential stream of objects plus a small meta-data header, which doesn't impose the overhead of the TTree and may result in higher read rates from very fast hard disks. It is also the storage format used by DAQ and HLT. SeqRoot files however tend be a factor 2-3 larger than their .root equivalents, and on normal disks performance is comparable to using RootOutput without compression.");
   m_file = 0;
   m_msghandler = 0;
-  m_streamer = 0;
 
   vector<string> emptyvector;
   //Parameter definition

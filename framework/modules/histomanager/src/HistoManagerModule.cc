@@ -39,13 +39,14 @@ HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_tupleM
 HistoManagerModule::~HistoManagerModule()
 {
   //  if (m_initmain) {
-  if (ProcHandler::EvtProcID() == -1) {   // should be called from main proc.
-    //    cout << "HistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
-    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
-      cout << "HistoManager:: adding histogram files" << endl;
-      RbTupleManager::Instance().hadd();
-    }
+  //  if (ProcHandler::EvtProcID() == -1) {   // should be called from main proc.
+  //    cout << "HistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
+  //    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
+  if (Environment::Instance().getNumberProcesses() > 0) {
+    cout << "HistoManager:: adding histogram files" << endl;
+    RbTupleManager::Instance().hadd();
   }
+  //  }
 }
 
 void HistoManagerModule::initialize()

@@ -11,6 +11,8 @@
 #include <analysis/TMVAInterface/Method.h>
 #include <analysis/TMVAInterface/Teacher.h>
 
+#include <framework/logging/LogSystem.h>
+
 #include <boost/program_options.hpp>
 #include <iostream>
 
@@ -23,11 +25,11 @@ int main(int argc, char* argv[])
 
   po::options_description options("Options");
   options.add_options()
-  ("help", "produce help message")
+  ("help", "print this message")
   ("methodName", po::value<std::string>()->required(), "name of method")
   ("methodType", po::value<std::string>()->required(), "type of method")
   ("methodConfig", po::value<std::string>()->required(), "config of method")
-  ("variables", po::value<std::vector<std::string>>()->multitoken(), "variables")
+  ("variables", po::value<std::vector<std::string>>()->required()->multitoken(), "variables")
   ("target", po::value<std::string>(), "target variable used to distinguish between signal and background, isSignal is used as default.")
   ("prefix", po::value<std::string>(), "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information")
   ("workingDirectory", po::value<std::string>(), "Working directory in which the config file and the weight file directory is created")
@@ -38,38 +40,24 @@ int main(int argc, char* argv[])
   ;
 
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, options), vm);
+  try {
+    po::store(po::parse_command_line(argc, argv, options), vm);
 
-  if (vm.count("help")) {
-    std::cout << options << "\n";
-    return 1;
-  }
-  //check for required arguments etc. after parsing --help
-  po::notify(vm);
+    if (vm.count("help")) {
+      std::cout << options << "\n";
+      return 1;
+    }
 
-  std::string methodName = "";
-  if (vm.count("methodName") == 1) {
-    methodName = vm["methodName"].as<std::string>();
-  } else {
-    std::cerr << "Please input one methodName" << std::endl;
-    return 1;
-  }
-
-  std::string methodType = "";
-  if (vm.count("methodType") == 1) {
-    methodType = vm["methodType"].as<std::string>();
-  } else {
-    std::cerr << "Please input one methodType" << std::endl;
+    //check for required arguments etc. after parsing --help
+    po::notify(vm);
+  } catch (po::error& err) {
+    std::cerr << "Error: " << err.what() << "\n";
     return 1;
   }
 
-  std::string methodConfig = "";
-  if (vm.count("methodConfig") == 1) {
-    methodConfig = vm["methodConfig"].as<std::string>();
-  } else {
-    std::cerr << "Please input one methodConfig" << std::endl;
-    return 1;
-  }
+  std::string methodName = vm["methodName"].as<std::string>();
+  std::string methodType = vm["methodType"].as<std::string>();
+  std::string methodConfig = vm["methodConfig"].as<std::string>();
 
   if (vm.count("createMVAPDFs")) {
     methodConfig = std::string("CreateMVAPdfs:") + methodConfig;
@@ -100,15 +88,7 @@ int main(int argc, char* argv[])
     prepareOption = vm["prepareOption"].as<std::string>();
   }
 
-  std::vector<std::string> variables;
-  if (not vm["variables"].empty()) {
-    variables = vm["variables"].as< std::vector<std::string> >();
-  }
-
-  if (variables.empty()) {
-    std::cerr << "Please input some variables" << std::endl;
-    return 1;
-  }
+  std::vector<std::string> variables = vm["variables"].as< std::vector<std::string> >();
 
   int maxEventsPerClass = 0;
   if (vm.count("maxEventsPerClass") == 1) {
@@ -125,7 +105,7 @@ int main(int argc, char* argv[])
   std::cout << "\t factoryOption \t" << factoryOption << std::endl;
   std::cout << "\t prepareOption \t" << prepareOption << std::endl;
   std::cout << "\t maxEventsPerClass \t" << maxEventsPerClass << std::endl;
-  std::cout << "\t Variables " << std::endl;
+  std::cout << "\t variables " << std::endl;
 
   for (auto & var : variables) {
     std::cout << "\t\t " << var << std::endl;
@@ -134,6 +114,13 @@ int main(int argc, char* argv[])
   std::vector<TMVAInterface::Method> methods;
   methods.push_back(TMVAInterface::Method(methodName, methodType, methodConfig, variables));
   // weight == constant(1), the weights will be taken from the defined root file, the constant(1) variable will be never used!
+
+  //check this didn't result in errors...
+  if (LogSystem::Instance().getMessageCounter(LogConfig::c_Error) > 0) {
+    std::cerr << "Errors encountered during method initialisation, aborting.\n";
+    return 1;
+  }
+
   TMVAInterface::Teacher* teacher = new TMVAInterface::Teacher(prefix, workingDirectory, target, "constant(1)", methods, true);
   teacher->train(factoryOption, prepareOption, maxEventsPerClass);
 

@@ -5,7 +5,7 @@
  *      Author: vtrusov
  */
 
-#include "tracking/trackFindingCDC/legendre/CDCLegendreQuadTreeNeighborFinder.h"
+#include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
 
 using namespace std;
 using namespace Belle2;
@@ -22,6 +22,10 @@ QuadTreeNeighborFinder& QuadTreeNeighborFinder::Instance()
 
 void QuadTreeNeighborFinder::controller(QuadTree* origin_node, QuadTree* caller_node, QuadTree* node)
 {
+
+  return;
+
+
   /*  B2INFO("LOOKING for neighbors");
     B2INFO("LEVEL = " << node->getLevel());
     B2INFO("Node: " << node->getThetaMin() << "x" << node->getThetaMax() << "x" << node->getRMin() << "x" << node->getRMax());
@@ -55,7 +59,7 @@ void QuadTreeNeighborFinder::levelDown(QuadTree* origin_node, QuadTree* node)
 {
   for (int t_index = 0; t_index < node->getThetaNbins(); ++t_index) {
     for (int r_index = 0; r_index < node->getRNbins(); ++r_index) {
-      QuadTree* child_node = node->getChildren(t_index, r_index);
+      QuadTree* child_node = node->getChild(t_index, r_index);
 
       if (child_node == origin_node) continue;
 
@@ -77,7 +81,7 @@ void QuadTreeNeighborFinder::findNeighbors(QuadTree* origin_node, QuadTree* call
 {
   for (int t_index = 0; t_index < node->getThetaNbins(); ++t_index) {
     for (int r_index = 0; r_index < node->getRNbins(); ++r_index) {
-      QuadTree* child_node = node->getChildren(t_index, r_index);
+      QuadTree* child_node = node->getChild(t_index, r_index);
 
       if (child_node == origin_node) continue;
 

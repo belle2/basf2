@@ -21,8 +21,10 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 
 
-#include "tracking/trackFindingCDC/legendre/CDCLegendreQuadTreeNeighborFinder.h"
-#include <tracking/trackFindingCDC/legendre/CDCLegendreQuadTreeCandidateCreator.h>
+#include "tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h"
+
+#include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeCandidateCreator.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
@@ -128,7 +130,7 @@ namespace Belle2 {
 
       //TODO: IMPORTANT! check functionality of this method and impact of uncommenting _m_level_ ! */
       /** Check whether node is leaf (lowest node in the tree) */
-      bool isLeaf() const {return /*m_level ==*/ s_lastLevel;};
+      bool isLeaf() const {return m_level >= s_lastLevel;};
 
       /** Check whether node has been processed, i.e. children nodes has been filled */
       inline bool checkFilled() const {return m_filled; };
@@ -137,7 +139,7 @@ namespace Belle2 {
       void setFilled() {m_filled = true; };
 
       /** Get mean value of theta */
-      inline double getThetaMean() const {return static_cast<double>((m_thetaMin + m_thetaMax) / 2. * m_PI / s_nbinsTheta);};
+      inline double getThetaMean() const {return static_cast<double>((m_thetaMin + m_thetaMax) / 2. * m_PI / TrigonometricalLookupTable::Instance().getNBinsTheta());};
 
       /** Get mean value of r */
       inline double getRMean() const {return static_cast<double>((m_rMin + m_rMax) / 2.);};
@@ -164,7 +166,7 @@ namespace Belle2 {
       inline QuadTree* getParent() const {return m_parent;};
 
       /** Get child of the node by index */
-      QuadTree* getChildren(int t_index, int r_index) const ;
+      QuadTree* getChild(int t_index, int r_index) ;
 
       /** Add pointer to some node to list of neighbors of current node */
       void addNeighbor(QuadTree* node) {m_neighbors.push_back(node);};
@@ -212,10 +214,6 @@ namespace Belle2 {
       int* m_thetaBin;      /**< bins range on theta */
       int m_nbins_r;        /**< number of r bins */
       int m_nbins_theta;    /**< number of theta bins */
-      static float* s_sin_theta; /**< Lookup array for calculation of sin */
-      static float* s_cos_theta; /**< Lookup array for calculation of cos */
-      static bool s_sin_lookup_created; /**< Allows to use the same lookup table for sin and cos */
-      static int s_nbinsTheta; /**< Number of theta bins */
       static unsigned int s_hitsThreshold;
       static float s_rThreshold; /**< Threshold on r variable; allows to set threshold on pt of tracks */
       static int s_lastLevel;

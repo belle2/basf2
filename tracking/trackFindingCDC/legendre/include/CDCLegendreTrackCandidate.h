@@ -12,7 +12,7 @@
 
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
 #include <framework/datastore/StoreArray.h>

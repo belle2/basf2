@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreQuadTreeCandidateCreator.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeCandidateCreator.h>
 
 using namespace std;
 using namespace Belle2;
@@ -227,7 +227,7 @@ QuadTree* QuadTreeCandidateCreator::findNode(QuadTree* tree, double r, double th
 
       for (int rBin = 0; rBin < tree->getRNbins(); rBin++) {
         for (int thetaBin = 0; thetaBin < tree->getThetaNbins(); thetaBin++) {
-          returnNode = findNode(tree->getChildren(thetaBin, rBin), r, theta);
+          returnNode = findNode(tree->getChild(thetaBin, rBin), r, theta);
           if (returnNode != 0) return returnNode;
         }
       }

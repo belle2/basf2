@@ -15,9 +15,9 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreStereohit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreQuadTree.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreQuadTreeCandidateCreator.h>
-#include "tracking/trackFindingCDC/legendre/CDCLegendreQuadTreeNeighborFinder.h"
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeCandidateCreator.h>
+#include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/HitPatternCDC.h>

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 
 #include <framework/logging/Logger.h>
 #include <algorithm>

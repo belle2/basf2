@@ -8,17 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-float* QuadTree::s_sin_theta;
-float* QuadTree::s_cos_theta;
-bool QuadTree::s_sin_lookup_created = false;
-int QuadTree::s_nbinsTheta;
 unsigned int QuadTree::s_hitsThreshold;
 float QuadTree::s_rThreshold;
 int QuadTree::s_lastLevel;
@@ -45,7 +41,7 @@ QuadTree::QuadTree(float rMin, float rMax, int thetaMin, int thetaMax, int level
   if (m_level > 0) {
     m_parent = parent;
   } else {
-    m_parent = NULL;
+    m_parent = nullptr;
 //    s_sin_lookup_created = false;
     s_rThreshold = 0.15; //whole phase-space;
   }
@@ -91,13 +87,6 @@ void QuadTree::terminate()
 
   clearTree();
 
-  if ((m_level == 0) && (s_sin_lookup_created)) {
-    delete[] s_sin_theta;
-    delete[] s_cos_theta;
-    s_sin_lookup_created = false;
-  }
-
-
 }
 
 
@@ -117,20 +106,6 @@ bool QuadTree::checkLimitsR()
 
 void QuadTree::initialize()
 {
-  if (not s_sin_lookup_created) {
-    //B2INFO("Create lookup table");
-    s_nbinsTheta = 8192;
-    float bin_width = m_PI / s_nbinsTheta;
-    s_sin_theta = new float[s_nbinsTheta + 1];
-    s_cos_theta = new float[s_nbinsTheta + 1];
-
-    for (int i = 0; i <= s_nbinsTheta; ++i) {
-      s_sin_theta[i] = sin(i * bin_width);
-      s_cos_theta[i] = cos(i * bin_width);
-    }
-
-    s_sin_lookup_created = true;
-  }
 
   //B2DEBUG(100, "DELTA r: " << delta_r << "; r_max-r_min: " << fabs(r_max - r_min));
 
@@ -206,8 +181,8 @@ void QuadTree::initializeChildren()
 //        int theta1 = m_thetaBin[i];
 //        int theta2 = m_thetaBin[i + 1];
 
-        if (theta1 < 0)theta1 = m_thetaBin[i];
-        if (theta2 >= 8192)theta2 = m_thetaBin[i + 1];
+        if (theta1 < 0) theta1 = m_thetaBin[i];
+        if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())theta2 = m_thetaBin[i + 1];
 
 
         m_children[i][j] = new QuadTree(r1, r2, theta1, theta2, m_level + 1, this);
@@ -396,11 +371,11 @@ void QuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>& hits*/)
 
       // for bin overlapping!
       if (t_index < m_nbins_theta)
-        r_temp = hit->getConformalX() * s_cos_theta[m_children[t_index][0]->getThetaMin()] +
-                 hit->getConformalY() * s_sin_theta[m_children[t_index][0]->getThetaMin()];
+        r_temp = hit->getConformalX() * TrigonometricalLookupTable::Instance().cosTheta(m_children[t_index][0]->getThetaMin()) +
+                 hit->getConformalY() * TrigonometricalLookupTable::Instance().sinTheta(m_children[t_index][0]->getThetaMin()) ;
       else
-        r_temp = hit->getConformalX() * s_cos_theta[m_children[t_index - 1][0]->getThetaMax()] +
-                 hit->getConformalY() * s_sin_theta[m_children[t_index - 1][0]->getThetaMax()];
+        r_temp = hit->getConformalX() * TrigonometricalLookupTable::Instance().cosTheta(m_children[t_index - 1][0]->getThetaMax()) +
+                 hit->getConformalY() * TrigonometricalLookupTable::Instance().sinTheta(m_children[t_index - 1][0]->getThetaMax());
 
 
 //      r_temp = CDCLegendreConformalPosition::InstanceTrusted().getConformalR(hit->getLayerId(), hit->getWireId(), m_thetaBin[t_index]);
@@ -448,7 +423,7 @@ void QuadTree::fillChildrenForced()
 void QuadTree::findNeighbors()
 {
   if (not m_neighborsDefined) {
-    QuadTreeNeighborFinder::Instance().controller(this, this, m_parent);
+//    QuadTreeNeighborFinder::Instance().controller(this, this, m_parent);
     m_neighborsDefined = true;
   }
 //  B2INFO("Number of neighbors: " << m_neighbors.size());
@@ -472,15 +447,19 @@ std::vector<QuadTree*>& QuadTree::getNeighborsVector()
 {
   if (not m_neighborsDefined) {
     B2WARNING("Trying to get neighbors of the node which are not defined. Starting neighbors finding");
-    findNeighbors();
+//    findNeighbors();
   }
   return m_neighbors;
 }
 
-QuadTree* QuadTree::getChildren(int t_index, int r_index) const
+QuadTree* QuadTree::getChild(int t_index, int r_index)
 {
   if ((t_index > m_nbins_theta) || (r_index > m_nbins_r))
     B2FATAL("BAD THETA OR R INDEX OF CHILDREN NODE! m_nbins_theta=" << m_nbins_theta << ", m_nbins_r" << m_nbins_r << "; t_index=" << t_index << ", r_index" << r_index);
+
+  if (m_children == nullptr) initializeChildren();
+//  if (!checkFilled()) fillChildren();
+
   return m_children[t_index][r_index];
 };
 

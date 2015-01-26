@@ -29,6 +29,7 @@ namespace Belle2 {
   class TRGCDC;
   class TRGCDCTrack;
   class TRGCDCEventTime;
+  class TRGCDCSegmentHit;
 
   /// A class to fit tracks in 3D
   class TRGCDCFitter3D {
@@ -54,6 +55,8 @@ namespace Belle2 {
     /// Does track fitting.
     int doit(const std::vector<TRGCDCTrack *> & trackListIn,
              std::vector<TRGCDCTrack *> & trackListOut);
+    /// Utility functions.
+    static double calPhi(TRGCDCSegmentHit const * segmentHit, double eventTime);
     /// Function for mc debugging.
     void getMCValues( TRGCDCTrack* aTrack );
 

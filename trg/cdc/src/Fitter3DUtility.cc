@@ -173,14 +173,23 @@ void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, doubl
 
 double Fitter3DUtility::calPhi(double wirePhi, double driftLength, double eventTime, double rr, int lr){
   double result = wirePhi;
-  double t_dPhi=driftLength*10 - eventTime;
+  // JB: EventTime definition was changed. 2015.01.03
+  //double t_dPhi=driftLength*10 - eventTime;
+  // driftLength is cm scale. eventTime is ns scale.
+  double t_dPhi=driftLength*10 - eventTime*40/1000;
   // Change to radian
+  // rr is cm scale.
   t_dPhi=atan(t_dPhi/rr/10);
-  // Use LR to add dPhi
   if(lr == 1) result -= t_dPhi;
   else if(lr == 2) result += t_dPhi;
   return result;
 }
+
+double Fitter3DUtility::calPhi(int localId, int nWires, double driftLength, double eventTime, double rr, int lr){
+  double wirePhi = (double)localId/nWires*4*M_PI;
+  return Fitter3DUtility::calPhi(wirePhi, driftLength, eventTime, rr, lr);
+}
+
 
 double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, double rr, double rho, double myphi0){
   if(1==2) cout<<anglest<<ztostraw<<endl; // Removes warnings when compileing

@@ -39,6 +39,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
 #include "trg/cdc/Fitter3DUtility.h"
+#include "trg/cdc/Fitter3D.h"
 
 using namespace std;
 
@@ -362,7 +363,8 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     for(unsigned j=0; j< hits.size(); j++) {
         if(hits[j]==0) {cout<<"[0] POINTER IS ZERO"<<endl; continue;}
         st0TSs[j] = (double)hits[j]->cell().localId()/m_nWires[0]*4*m_Trg_PI;
-        driftSt0TSs[j] = hits[j]->segment().phiPosition();
+        //driftSt0TSs[j] = hits[j]->segment().phiPosition();
+        driftSt0TSs[j] = TRGCDCFitter3D::calPhi(hits[j],_cdc.getEventTime());
         //cout<<st0TSs[j]<<" "<<hits[j]->segment().phiPosition()<<endl;
         stTSs[0].push_back(st0TSs[j]);
         p_stTSs[0].push_back(hits[j]);
@@ -377,7 +379,8 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     for(unsigned j=0; j< hits.size(); j++) {
         if(hits[j]==0) {cout<<"[1] POINTER IS ZERO"<<endl; continue;}
         st1TSs[j] = (double)hits[j]->cell().localId()/m_nWires[1]*4*m_Trg_PI;
-        driftSt1TSs[j] = hits[j]->segment().phiPosition();
+        //driftSt1TSs[j] = hits[j]->segment().phiPosition();
+        driftSt1TSs[j] = TRGCDCFitter3D::calPhi(hits[j],_cdc.getEventTime());
         stTSs[1].push_back(st1TSs[j]);
         p_stTSs[1].push_back(hits[j]);
     }
@@ -391,7 +394,8 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     for(unsigned j=0; j< hits.size(); j++) {
         if(hits[j]==0) {cout<<"[2] POINTER IS ZERO"<<endl; continue;}
         st2TSs[j] = (double)hits[j]->cell().localId()/m_nWires[2]*4*m_Trg_PI;
-        driftSt2TSs[j] = hits[j]->segment().phiPosition();
+        //driftSt2TSs[j] = hits[j]->segment().phiPosition();
+        driftSt2TSs[j] = TRGCDCFitter3D::calPhi(hits[j],_cdc.getEventTime());
         stTSs[2].push_back(st2TSs[j]);
         p_stTSs[2].push_back(hits[j]);
     }
@@ -405,7 +409,8 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     for(unsigned j=0; j< hits.size(); j++) {
         if(hits[j]==0) {cout<<"[3] POINTER IS ZERO"<<endl; continue;}
         st3TSs[j] = (double)hits[j]->cell().localId()/m_nWires[3]*4*m_Trg_PI;
-        driftSt3TSs[j] = hits[j]->segment().phiPosition();
+        //driftSt3TSs[j] = hits[j]->segment().phiPosition();
+        driftSt3TSs[j] = TRGCDCFitter3D::calPhi(hits[j],_cdc.getEventTime());
         stTSs[3].push_back(st3TSs[j]);
         p_stTSs[3].push_back(hits[j]);
     }

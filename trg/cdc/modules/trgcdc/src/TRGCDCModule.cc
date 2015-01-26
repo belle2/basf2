@@ -68,7 +68,7 @@ TRGCDCModule::TRGCDCModule()
       _wireHitInefficiency(0.),
       _fileTSF(0),
       _fileHough3D(0),
-      _finder3DMode(0),
+      _finder3DMode(2),
       _fileFitter3D(0),
       _trgCDCDataInputMode(0),
       _cdc(0),

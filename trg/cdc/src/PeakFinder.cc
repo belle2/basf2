@@ -500,13 +500,16 @@ cout <<"========"<<endl; } *///testp1
 	vector<unsigned short>().swap(p);
 							}
 						}
-cout << "size of p1m=" << p1m.size() << endl;
-cout << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl;
+//cout << "size of p1m=" << p1m.size() << endl; //JB: Please use TRGDebug
+if (TRGDebug::level()) cout << TRGDebug::tab() << "size of p1m=" << p1m.size() << endl;
+//cout << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl; //JB: Please use TRGDebug
+if (TRGDebug::level()) cout << TRGDebug::tab() << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl;
 //...create pattern1...end   (output p1m)
 
 
 //...Pattern2 & Find Peak...begin
-	cout << ">>>>>>>>>>Pattern 2 & Find Peak Begin!!!>>>>>>>>>>" << endl;
+	//cout << ">>>>>>>>>>Pattern 2 & Find Peak Begin!!!>>>>>>>>>>" << endl; //JB: Please use TRGDebug
+	if (TRGDebug::level()) cout << TRGDebug::tab() << ">>>>>>>>>>Pattern 2 & Find Peak Begin!!!>>>>>>>>>>" << endl;
 	vector<unsigned short> p0(5,0);
 	vector< vector<unsigned short> > op2;
 ///test(CFI)
@@ -520,7 +523,8 @@ cout << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl;
 	unsigned short a=0;
 	unsigned short aa=0;
 	bool p1rel=false;
-	cout << "no."<< j << endl;//test
+	//cout << "no."<< j << endl;//test //JB: Please use TRGDebug
+	if (TRGDebug::level()) cout << TRGDebug::tab() << "no."<< j << endl;//test
 
 // XYZ  (begin)
                 //X
@@ -534,10 +538,12 @@ cout << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl;
 			aa=k;
 
 			if( !rlrel(p1m[aa],p1m[i]) ){
-						cout << "no." <<  j << " & no." << a << " / X no rel" << endl;  ///test
+						//cout << "no." <<  j << " & no." << a << " / X no rel" << endl;  ///test //JB: Please use TRGDebug
+						if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / X no rel" << endl;  ///test
 						p1rel=false;}
 			else {
-						cout << "no." <<  j << " & no." << a << " / X rel" << endl;  ///test
+						//cout << "no." <<  j << " & no." << a << " / X rel" << endl;  ///test //JB: Please use TRGDebug
+						if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / X rel" << endl;  ///test
 						p1rel=true;}
 				break;}
 						}
@@ -553,10 +559,12 @@ cout << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl;
 		if (a==p1m[k][0]) {
 			aa=k;
 			if( !udrel(p1m[aa],p1m[i]) ){
-						cout << "no." <<  j << " & no." << a << " / Y no rel" << endl;  ///test
+						//cout << "no." <<  j << " & no." << a << " / Y no rel" << endl;  ///test //JB: Please use TRGDebug
+						if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y no rel" << endl;  ///test
 						p1rel=false;}
 			else {
-						cout << "no." <<  j << " & no." << a << " / Y rel" << endl;  ///test
+						//cout << "no." <<  j << " & no." << a << " / Y rel" << endl;  ///test //JB: Please use TRGDebug
+						if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y rel" << endl;  ///test
 						p1rel=true;}
 				break;}
 						}
@@ -575,10 +583,12 @@ cout << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl;
 			aa=k;
 
 			if( !mirel(p1m[aa],p1m[i]) ){
-						cout << "no." <<  j << " & no." << a << " / Z no rel" << endl;  ///test
+						//cout << "no." <<  j << " & no." << a << " / Z no rel" << endl;  ///test //JB: Please use TRGDebug
+						if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Z no rel" << endl;  ///test
 						p1rel=false;}
 			else {
-						cout << "no." <<  j << " & no." << a << " / Z rel" << endl;  ///test
+						//cout << "no." <<  j << " & no." << a << " / Z rel" << endl;  ///test //JB: Please use TRGDebug
+						if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Z rel" << endl;  ///test
 						p1rel=true;}
 				break;}
 						}
@@ -744,7 +754,8 @@ cout <<"========"<<endl; }*/ //testp2
 			fcpys=1;}
 	fcpy=fcpy+(fcpn/80)*2+fcpys;
 
-	cout << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test
+	//cout << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test //JB: Please use TRGDebug
+	if (TRGDebug::level()) cout << TRGDebug::tab() << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test
 	ofstream vhdlxOut("/home/ph202/p1p2/phii", fstream::app);//test
 	//	vhdlxOut << "VHDL center of peak  x=" << fcpx << "  y=" << (fcpy-10) <<endl; //test
 		vhdlxOut<< (2*fcpx+1)*1.125<<endl; //test
@@ -761,7 +772,8 @@ cout <<"========"<<endl; }*/ //testp2
 	peak_xy.push_back(p);
 
 ///Find center peak(end)
-cout << "~~~~~~~~~~Pattern 2 & Find Peak End!!!~~~~~~~~~~" << endl;
+//cout << "~~~~~~~~~~Pattern 2 & Find Peak End!!!~~~~~~~~~~" << endl; //JB: Please use TRGDebug
+if (TRGDebug::level()) cout << TRGDebug::tab() << "~~~~~~~~~~Pattern 2 & Find Peak End!!!~~~~~~~~~~" << endl;
 	vector<unsigned short>().swap(p2_state);
 	vector< vector<unsigned short> >().swap(final_op2);
 	vector<unsigned short>().swap(p2v);
@@ -778,7 +790,8 @@ cout << "~~~~~~~~~~Pattern 2 & Find Peak End!!!~~~~~~~~~~" << endl;
 //		vhdlyOut.close();
 //... Pattren 2...end
 
-cout << "total peaks="<< peak_xy.size() << endl; //test
+//cout << "total peaks="<< peak_xy.size() << endl; //test //JB: Please use TRGDebug
+if (TRGDebug::level()) cout << TRGDebug::tab() << "total peaks="<< peak_xy.size() << endl; //test
 if(peak_xy.size()>1)
 {ofstream effiOut("/home/ph202/p1p2/effi", fstream::app);
 		effiOut << "1"  << endl;}

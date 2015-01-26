@@ -234,7 +234,8 @@ TRGCDC::TRGCDC(const string & configFile,
       _eventTime(0),
       _trgCDCDataInputMode(trgCDCDataInputMode) {
 
-    cout << "		-------------A TRGCDC is declared-------------" << endl;
+    //cout << "		-------------A TRGCDC is declared-------------" << endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC constructor");
 
 
 #ifdef TRGCDC_DISPLAY
@@ -266,7 +267,8 @@ TRGCDC::TRGCDC(const string & configFile,
 */
     }
 
-    cout << "               -------------A TRGCDC is ending declared-------------"<< endl;
+    //cout << "               -------------A TRGCDC is ending declared-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC constructor");
 
 }
 
@@ -275,7 +277,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
                    unsigned houghFinderMeshY,
                    unsigned houghFinderPeakMin) {
 
-    cout << "               -------------A TRGCDC is initialized!!"<< endl;
+    //cout << "               -------------A TRGCDC is initialized!!"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC initialize");
 
     //...CDC...
     Belle2::CDC::CDCGeometryPar & cdc2 =
@@ -650,14 +653,16 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 
 
 
-    cout << "               -------------End TRGCDC initialization-------------"<< endl;
+    //cout << "               -------------End TRGCDC initialization-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC initialize");
 
 }
 
 void
 TRGCDC::terminate(void) {
 
-    cout << "               -------------A TRGCDC is terminated-------------"<< endl;
+    //cout << "               -------------A TRGCDC is terminated-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC terminate");
 ///*
     if(_tsFinder) {
         _tsFinder->terminate();
@@ -673,13 +678,15 @@ TRGCDC::terminate(void) {
         m_file->Close();
     }
 //*/
-    cout << "               -------------End of termination-------------"<< endl;
+    //cout << "               -------------End of termination-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC terminate");
 
 }
 
 void
 TRGCDC::dump(const string & msg) const {
-    cout << "               -------------A TRGCDC is dumped-------------"<< endl;
+    //cout << "               -------------A TRGCDC is dumped-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC dump");
 
     if (msg.find("name")    != string::npos ||
         msg.find("version") != string::npos ||
@@ -799,7 +806,8 @@ TRGCDC::dump(const string & msg) const {
         }
     }
 
-    cout << "               -------------End of dump-------------"<< endl;
+    //cout << "               -------------End of dump-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC dump");
 }
 
 const TCWire *
@@ -853,7 +861,9 @@ TRGCDC::wire(float , float) const {
 void
 TRGCDC::clear(void) {
 
-    cout << "               -------------A TRGCDC is cleared-------------"<< endl;
+    //cout << "               -------------A TRGCDC is cleared-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC clear");
+
     TCWHit::removeAll();
     TCSHit::removeAll();
     TCLink::removeAll();
@@ -885,7 +895,8 @@ TRGCDC::clear(void) {
     for (unsigned i = 0; i < 9; i++)
         _segmentHitsSL[i].clear();
 
-    cout << "               -------------End of clear-------------"<< endl;
+    //cout << "               -------------End of clear-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC clear");
 }
 
 void
@@ -895,14 +906,13 @@ TRGCDC::fastClear(void) {
 void
 TRGCDC::update(bool) {
 
-    cout << "               -------------A TRGCDC is updated-------------"<< endl;
+    //cout << "               -------------A TRGCDC is updated-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC update");
 
     if (_trgCDCDataInputMode != 0) {
         updateByData(_trgCDCDataInputMode);
     }
     else {
-
-        TRGDebug::enterStage("TRGCDC update");
 
         //...Clear old information...
         //  fastClear();
@@ -1071,10 +1081,10 @@ TRGCDC::update(bool) {
             }
         }
 
-        TRGDebug::leaveStage("TRGCDC update");
     }
 
-    cout << "               -------------End of updating-------------"<< endl;
+    //cout << "               -------------End of updating-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC update");
 
 }
 
@@ -1082,10 +1092,9 @@ TRGCDC::update(bool) {
 void
 TRGCDC::updateByData(int inputMode) {
 
-    cout << "               -------------A TRGCDC is updateByData-------------"<< endl;
+    //cout << "               -------------A TRGCDC is updateByData-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC updateByData");
 
-
-    TRGDebug::enterStage("TRGCDC update");
     //...Clear old information...
     clear();
     //cout<<"Event: "<<m_eventNum<<endl;
@@ -1480,9 +1489,9 @@ TRGCDC::updateByData(int inputMode) {
 
     m_eventNum++;
 
-    TRGDebug::leaveStage("TRGCDC update");
 
-    cout << "               -------------End of updateByData-------------"<< endl;
+    //cout << "               -------------End of updateByData-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC updateByData");
 
 }
 
@@ -1490,7 +1499,8 @@ TRGCDC::updateByData(int inputMode) {
 
 void
 TRGCDC::classification(void) {
-    cout << "               -------------classification-------------"<< endl;
+    //cout << "               -------------classification-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC classification");
 
     unsigned n = _hits.size();
 
@@ -1559,7 +1569,8 @@ TRGCDC::classification(void) {
         h->state(state);
     }
 
-    cout << "               -------------End of classification-------------"<< endl;
+    //cout << "               -------------End of classification-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC classification");
 }
 
 vector<const TCWHit *>
@@ -1880,7 +1891,8 @@ TRGCDC::axialStereoSuperLayerId(unsigned aors, unsigned i) const {
 
 TRGCDC::~TRGCDC() {
 
-    cout << "               -------------A TRGCDC is destructed-------------"<< endl;
+    //cout << "               -------------A TRGCDC is destructed-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC destructor");
     clear();
 
     delete [] _width;
@@ -1900,6 +1912,9 @@ TRGCDC::~TRGCDC() {
         delete D;
     cout << "TRGCDC ... rphi displays deleted" << endl;
 #endif
+
+    TRGDebug::leaveStage("TRGCDC destructor");
+
 }
 
 bool
@@ -1922,7 +1937,8 @@ TRGCDC::neighbor(const TCWire & w0, const TCWire & w1) const {
 
 void
 TRGCDC::simulate(void) {
-    cout << "               -------------A TRGCDC is simulated-------------"<< endl;
+    //cout << "               -------------A TRGCDC is simulated-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC simulate");
 
     const bool fast = (_simulationMode & 1);
     const bool firm = (_simulationMode & 2);
@@ -1931,18 +1947,18 @@ TRGCDC::simulate(void) {
     if (firm)
         firmwareSimulation();
 
-    cout << "               -------------End of simulate-------------"<< endl;
+    //cout << "               -------------End of simulate-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC simulate");
 }
 
 void
 TRGCDC::fastSimulation(void) {
-    cout << "               -------------A TRGCDC is fastsimulated-------------"<< endl;
+    //cout << "               -------------A TRGCDC is fastsimulated-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC fastSimulation");
 
 #ifdef TRGCDC_DISPLAY
     D->beginningOfEvent();
 #endif
-
-    TRGDebug::enterStage("TRGCDC fast simulation");
 
     //...Options...
     const bool trackSegmentSimulationOnly = _fastSimulationMode & 1;
@@ -2022,19 +2038,23 @@ TRGCDC::fastSimulation(void) {
     }
 
     //...2D tracker : Hough finder...
-    cout<<"################start##########"<<endl;
+    //cout<<"################start##########"<<endl; //JB: Please use TRGDebug
+	  if (TRGDebug::level()) cout << TRGDebug::tab() <<"################start##########"<<endl;
     vector<TCTrack *> trackList;
     if (_perfect2DFinder)
         _pFinder->doit(trackList);
     else
         _hFinder->doit(trackList);
-    cout<<"################end##########"<<endl;
-    cout<<"Number of tracks: "<<trackList.size()<<endl;
+    //cout<<"################end##########"<<endl; //JB: Please use TRGDebug
+    if (TRGDebug::level()) cout << TRGDebug::tab() <<"################end##########"<<endl;
+    //cout<<"Number of tracks: "<<trackList.size()<<endl; //JB: Please use TRGDebug
+    if (TRGDebug::level()) cout << TRGDebug::tab() <<"Number of tracks: "<<trackList.size()<<endl;
 
     for(unsigned iTrack=0; iTrack<trackList.size(); iTrack++){
         const TCRelation& trackRelation = trackList[iTrack]->relation();
         const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
-        cout<<"Pt: "<<trackMCParticle.getMomentum().Pt()<<endl;
+        //cout<<"Pt: "<<trackMCParticle.getMomentum().Pt()<<endl; //JB: Please use TRGDebug
+        if (TRGDebug::level()) cout << TRGDebug::tab() <<"Pt: "<<trackMCParticle.getMomentum().Pt()<<endl;
 	ofstream vhdlxOut("/home/ph202/p1p2/MCpt", fstream::app);//test
 	vhdlxOut << trackMCParticle.getMomentum().Pt() <<endl;
 	ofstream phiout("/home/ph202/p1p2/MCphi", fstream::app);
@@ -2059,7 +2079,7 @@ TRGCDC::fastSimulation(void) {
     }
 
     //...Stereo finder...
-    //_h3DFinder->doit(trackList, m_eventNum);
+    _h3DFinder->doit(trackList, m_eventNum);
 
     //...Check tracks...
     if (TRGDebug::level()) {
@@ -2084,7 +2104,7 @@ TRGCDC::fastSimulation(void) {
 
     //...3D tracker...
     vector<TCTrack*> trackList3D;
-    //_fitter3D->doit(trackList, trackList3D);
+    _fitter3D->doit(trackList, trackList3D);
 
     //...End of simulation...
 
@@ -2370,22 +2390,21 @@ TRGCDC::fastSimulation(void) {
     //     }
 #endif
 
-    TRGDebug::leaveStage("TRGCDC fast simulation");
+    TRGDebug::leaveStage("TRGCDC fastSimulation");
     return;
-    cout << "               -------------End of fastsimulate-------------"<< endl;
+    //cout << "               -------------End of fastsimulate-------------"<< endl; //JB: Please use TRGDebug
 }
 
 void
 TRGCDC::firmwareSimulation(void) {
 
-    cout << "               -------------A TRGCDC is firmwaresimulated -------------"<< endl;
+    //cout << "               -------------A TRGCDC is firmwaresimulated -------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC firmwareSimulation");
 
     //...Wire level simulation is in update().
 #ifdef TRGCDC_DISPLAY
     D->beginningOfEvent();
 #endif
-
-    TRGDebug::enterStage("TRGCDC firmware simulation");
 
     //...Front ends...
     const unsigned nFronts = _fronts.size();
@@ -2496,15 +2515,15 @@ TRGCDC::firmwareSimulation(void) {
     //     }
 #endif
 
-    TRGDebug::enterStage("TRGCDC firmware simulation");
-
-    cout << "               -------------End of firmwaresimulate-------------"<< endl;
+    //cout << "               -------------End of firmwaresimulate-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC firmwareSimulation");
 }
 
 void
 TRGCDC::configure(void) {
 
-    cout << "               -------------A TRGCDC is configured-------------"<< endl;
+    //cout << "               -------------A TRGCDC is configured-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::enterStage("TRGCDC configure");
 
     //...Open configuration file...
     ifstream infile(_configFilename.c_str(), ios::in);
@@ -2748,7 +2767,8 @@ TRGCDC::configure(void) {
     }
     infile.close();
 
-    cout << "               -------------End of configure-------------"<< endl;
+    //cout << "               -------------End of configure-------------"<< endl; //JB: Please use TRGDebug
+    TRGDebug::leaveStage("TRGCDC configure");
 }
 
 const TRGCDCSegment&

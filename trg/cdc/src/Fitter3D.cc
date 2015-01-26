@@ -60,6 +60,7 @@ namespace Belle2 {
       const std::map<std::string, bool> &flags)
       : m_name(name), m_cdc(TRGCDC),
        m_mBool(flags), m_rootFitter3DFileName(rootFitter3DFile){
+         m_fileFitter3D = 0;
   }
 
   TRGCDCFitter3D::~TRGCDCFitter3D() {
@@ -113,26 +114,40 @@ namespace Belle2 {
     else m_mDouble["eventTime"] = m_cdc.getEventTime();
     if(m_mBool["fRootFile"]) m_mDouble["iSave"] = 0;
 
+
     // Loop over all tracks
     for(unsigned iTrack=0; iTrack<trackListIn.size(); iTrack++){
 
+      // Run only one time for each event.
       if(m_mBool["fRootFile"]==1 && m_mDouble["iSave"]==0) initializeRoot("event");
 
       TCTrack & aTrack = * trackListIn[iTrack];
 
       ///////////////////////////////////////
-      // Check if all superlayers have one TS
+      // Check if all superlayers have one TS  for the track.
       bool trackFull=1;
       for (unsigned iSL = 0; iSL < m_cdc.nSuperLayers(); iSL++) {
         // Check if all superlayers have one TS
         const vector<TCLink *> & links = aTrack.links(iSL);
         const unsigned nSegments = links.size();
+        // Find if there is a TS with a priority hit.
+        // Loop over all TS in same superlayer.
+        bool priorityHitTS = 0;
+        for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+          const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
+          if (t_segment->center().hit() != 0)  priorityHitTS = 1;
+        }
         if(nSegments != 1) {
           if (nSegments == 0){
             trackFull = 0;
             //cout<<"Fitter3D::doit() => Not enough TS."<<endl;
           } else {
             cout<<"Fitter3D::doit() => multiple TS are assigned."<<endl;
+          }
+        } else {
+          if (priorityHitTS == 0) {
+            trackFull = 0;
+            cout<<"Fitter3D::doit() => There are no priority hit TS"<<endl;
           }
         }
       } // End superlayer loop
@@ -163,7 +178,8 @@ namespace Belle2 {
         const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
         m_mVector["wirePhi"][iSL] = (double) t_segment->localId()/m_mConstV["nWires"][iSL]*4*m_mConstD["Trg_PI"];
 //        m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
-        m_mVector["lutLR"][iSL] = t_segment->LUT()->getValue(t_segment->hitPattern());
+        //m_mVector["lutLR"][iSL] = t_segment->LUT()->getValue(t_segment->hitPattern());
+        m_mVector["lutLR"][iSL] = t_segment->LUT()->getValue(t_segment->lutPattern());
         m_mVector["mcLR"][iSL] = t_segment->hit()->mcLR();
         m_mVector["driftLength"][iSL] = t_segment->hit()->drift();
         if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSL] = m_mVector["mcLR"][iSL];
@@ -208,7 +224,9 @@ namespace Belle2 {
         // Float 3D fitter
         // Calculate phi3D using driftTime.
         m_mVector["phi3D"] = vector<double> (4);
-        for (unsigned iSt = 0; iSt < 4; iSt++) m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], m_mVector["driftLength"][iSt*2+1], m_mDouble["eventTime"], m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+        for (unsigned iSt = 0; iSt < 4; iSt++) {
+          m_mVector["phi3D"][iSt] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iSt*2+1], m_mVector["driftLength"][iSt*2+1], m_mDouble["eventTime"], m_mConstV["rr3D"][iSt], m_mVector["LR"][iSt*2+1]);
+        }
         // Calculate zz
         m_mVector["zz"] = vector<double> (4);
         for (unsigned iSt = 0; iSt < 4; iSt++) m_mVector["zz"][iSt] = Fitter3DUtility::calZ(m_mDouble["charge"], m_mConstV["angleSt"][iSt], m_mConstV["zToStraw"][iSt], m_mConstV["rr3D"][iSt], m_mVector["phi3D"][iSt], m_mDouble["rho"], m_mDouble["phi0"]);
@@ -252,12 +270,32 @@ namespace Belle2 {
     } // End track loop
 
     // Save values to file
-    if(m_mBool["fRootFile"]) m_treeTrackFitter3D->Fill();
+    if(m_mBool["fRootFile"]) {
+      // To prevent crash when there are no tracks in first event.
+      // If there is no track in first case then the ROOT saving functions will fail.
+      // This is due to bad software design.
+      // The first event that have tracks will be event 0 in ROOT file.
+      if(m_fileFitter3D!=0) {
+        m_treeTrackFitter3D->Fill();
+      }
+    }
 
     TRGDebug::leaveStage("Fitter 3D");
     return 1;
 
   };
+
+  double TRGCDCFitter3D::calPhi(TRGCDCSegmentHit const * segmentHit, double eventTime){
+    CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
+    unsigned localId = segmentHit->segment().center().localId();
+    unsigned layerId = segmentHit->segment().center().layerId();
+    int nWires = cdcp.nWiresInLayer(layerId)*2;
+    double rr = cdcp.senseWireR(layerId);
+    double driftLength = segmentHit->drift();
+    int lr = segmentHit->segment().LUT()->getValue(segmentHit->segment().lutPattern());
+    return Fitter3DUtility::calPhi(localId, nWires, driftLength, eventTime, rr, lr);
+  }
+
 
   /////////////////////////////////////////////////////////////////////////////////////////////
   ////// Function for saving

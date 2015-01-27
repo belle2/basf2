@@ -20,7 +20,9 @@
 #include <daq/slc/system/TCPSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Time.h>
+#include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/base/Date.h>
 
 using namespace Belle2;
 
@@ -49,6 +51,7 @@ int main(int argc, char** argv)
   int runno = 0;
   int subno = 0;
   int ntried = 0;
+  File tmpfile(Date().toString("/rawdata/disk01/%Y-%m-%d-%H-%M-%S.dat"), "rw");
   while (true) {
     while (socket.get_fd() <= 0) {
       try {
@@ -80,6 +83,7 @@ int main(int argc, char** argv)
         int nword = data.getWordSize();
         reader.read((data.getBuffer() + 1), nbyte);
         nbyte += sizeof(int);
+        tmpfile.write(data.getBuffer(), nbyte);
         if (info.isAvailable()) {
           info.addInputCount(1);
           info.addInputNBytes(nbyte);

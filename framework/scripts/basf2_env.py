@@ -44,13 +44,23 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 fw = Framework()
 
 
-def _add_module(self, name, logLevel=None, debugLevel=None, **kwargs):
-    """Small helper to speed up registering a module and setting
-        parameters"""
-    if isinstance(name, Module):
-        module = name
+def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
+    """
+    Add given module (either object or name) at the end of this path.
+
+    >>> path = create_path()
+    >>> path.add_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
+    <pybasf2.Module at 0x1e356e0>
+
+    >>> path = create_path()
+    >>> eventinfosetter = register_module('EventInfoSetter')
+    >>> path.add_module(eventinfosetter)
+    <pybasf2.Module at 0x2289de8>
+    """
+    if isinstance(module, Module):
+        module = module
     else:
-        module = fw.register_module(name)
+        module = fw.register_module(module)
 
     if kwargs:
         module.param(kwargs)

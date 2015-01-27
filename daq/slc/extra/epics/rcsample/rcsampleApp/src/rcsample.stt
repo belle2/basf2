@@ -48,7 +48,7 @@ ss rcsample_control
     }
     when (strcmp(rcrequest, "PAUSE") == 0) {
       printf("request = %s\n", rcrequest);
-    } state paused
+    } state PAUSED
     when (strcmp(rcrequest, "STOP") == 0) {
       printf("request = %s\n", rcrequest);
     } state READY
@@ -57,7 +57,7 @@ ss rcsample_control
     } state ABORTING
   }
 
-  state paused {
+  state PAUSED {
     entry {
       strcpy(rcstate, "PAUSED");
       printf("state = %s\n", rcstate);

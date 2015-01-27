@@ -77,6 +77,15 @@ namespace Belle2 {
      */
     TObject* appendNew();
 
+    /** Raw access to the underlying TClonesArray.
+     *
+     *  \warning TClonesArray is dangerously easy to misuse. Whatever you do will probably
+     *           be slow, leak memory, and murder your pets.
+     *           In most cases, you'll want to use functions like operator[],
+     *           getEntries() or appendNew() instead.
+     */
+    TClonesArray* getPtr() { return m_storeArray; }
+
   private:
     TClonesArray* m_storeArray; /**< Pointer to array */
   };

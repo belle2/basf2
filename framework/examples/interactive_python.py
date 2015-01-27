@@ -23,8 +23,8 @@ class MinModule(Module):
                "\n  print evtmetadata.obj().getEvent()"
                "\n  particles[0].Dump()"
                "\n  help(particles[0])"
-               "\nTo continue non-interactively, press Ctrl+D."
-               "\nPress Ctrl+C first to exit basf2.")
+               "\nTo continue non-interactively (until next event), press Ctrl+D."
+               "\nPress Ctrl+C followed by Ctrl+D to exit basf2.")
         B2INFO(80 * '=')
         interactive.embed()
 

@@ -324,7 +324,8 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
             play.addActor(VariablesToNTuple,
                           particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
                           particleList='ParticleList_{i}'.format(i=particle.identifier),
-                          signalProbability='SignalProbability_{i}'.format(i=particle.identifier))
+                          signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
+                          target='MVAConfigTarget_{i}'.format(i=particle.identifier))
 
     # The last act creates the automatic reporting summary pdf
     finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]

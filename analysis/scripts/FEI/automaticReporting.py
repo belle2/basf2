@@ -186,16 +186,16 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
 
     placeholders['cpuTimeSummary'] = '\input{' + cpuTimeSummaryPlaceholders['texFile'] + '}\n'
 
-    placeholders['NSignal'] = 0
+    placeholders['NUniqueSignal'] = 0
     placeholders['NBackground'] = 0
     placeholders['NEvents'] = mcCounts['NEvents']
 
     for bPlaceholder in combinedParticlePlaceholders:
         if bPlaceholder['particleName'] in ['B+', 'B0', 'B-', 'anti-B0']:
-            placeholders['NSignal'] += int(bPlaceholder['particleNSignalAfterPostCut'])
+            placeholders['NUniqueSignal'] += int(bPlaceholder['particleNUniqueSignalAfterPostCut'])
             placeholders['NBackground'] += int(bPlaceholder['particleNBackgroundAfterPostCut'])
 
-    placeholders['overallSignalEfficiencyInPercent'] = '{:.2f}'.format(efficiency(placeholders['NSignal'], placeholders['NEvents']) * 100)
+    placeholders['overallSignalEfficiencyInPercent'] = '{:.2f}'.format(efficiency(placeholders['NUniqueSignal'], placeholders['NEvents']) * 100)
 
     hash = actorFramework.create_hash([placeholders])
     placeholders['texFile'] = 'FEIsummary.tex'
@@ -204,35 +204,41 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     return placeholders
 
 
-def createMoneyPlotTexFile(ntuple, type, mcCounts, target):
+def createMoneyPlotTexFile(nTuple, type, mcCounts, target):
     """
-    Creates a tex document with MBC or CosBDL Plot from the given ntuple
-        @param ntuple the ntuple containing the needed information
+    Creates a tex document with MBC or CosBDL Plot from the given nTuple
+        @param nTuple the ntuple containing the needed information
         @param type string identifier of plot type
         @param mcCounts number of MCParticles for each particle
         @param target name of target (signal) variable for this plot
     """
     placeholders = {}
-    prefix = ntuple[:-5] + '_' + type
+    prefix = nTuple[:-5] + '_' + type
     plotFile = prefix + '_money.pdf'
     placeholders['particleName'] = plotFile[4:].split(':', 1)[0]
     if type == 'Mbc':
         template_file = 'analysis/scripts/FEI/templates/MBCTemplate.tex'
         if not os.path.isfile(plotFile):
-            makeMbcPlot(ntuple, plotFile, target)
+            makeMbcPlot(nTuple, plotFile, target)
     elif type == 'CosBDL':
         template_file = 'analysis/scripts/FEI/templates/CosBDLTemplate.tex'
         if not os.path.isfile(plotFile):
-            makeCosBDLPlot(ntuple, plotFile, target)
+            makeCosBDLPlot(nTuple, plotFile, target)
     elif type == 'ROC':
         template_file = 'analysis/scripts/FEI/templates/ROCTemplate.tex'
         if not os.path.isfile(plotFile):
             nTrueSignal = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
-            makeROCPlotFromNtuple(ntuple, plotFile, nTrueSignal, target)
+            makeROCPlotFromNtuple(nTuple, plotFile, nTrueSignal, target)
     else:
         raise RuntimeError('Unknown money plot type')
     placeholders['moneyPlot'] = plotFile
     placeholders['texFile'] = prefix + '_money.tex'
+
+    rootfile = ROOT.TFile(nTuple)
+    tree = rootfile.Get('variables')
+    isUnique = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(isUnique)')
+    placeholders['particleNUniqueSignalAfterPostCut'] = int(tree.GetEntries('isSignal && ' + isUnique))
+
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], template_file, placeholders)
     return placeholders
@@ -653,7 +659,7 @@ def makeROCPlot(tmvaFilename, plotName):
 def makeDiagPlotPerParticle(nTuple, plotName, mvaConfig):
 
     nbins = 100
-    probabilityVar = 'extraInfoSignalProbability'  # ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(SignalProbability)')
+    probabilityVar = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(SignalProbability)')
 
     if nTuple is not None:
         nTupleFile = ROOT.TFile(nTuple)

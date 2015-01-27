@@ -41,7 +41,7 @@ rcbridged_LIBS += $(EPICS_BASE_IOC_LIBS)
 #===========================
 
 daq_slc_base_DIR = $(BELLE2_DAQ_SLC_LIB_DIR)
-pg_DIR = $(PGSQL_LIB_PATH)/lib
+pq_DIR = $(PGSQL_LIB_PATH)/lib
 
 include $(TOP)/configure/RULES
 #----------------------------------------

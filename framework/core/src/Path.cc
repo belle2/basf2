@@ -153,7 +153,7 @@ void Path::exposePythonAPI()
 {
   class_<Path>("Path", no_init)
   .def("__str__", &Path::getPathString)
-  .def("add_module", &Path::addModule)
+  .def("_add_module_object", &Path::addModule)
   .def("add_path", &Path::addPath)
   .def("modules", &_getModulesPython)
   .def("for_each", &Path::forEach)

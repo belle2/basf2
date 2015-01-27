@@ -37,17 +37,10 @@ class TestModule(Module):
 
         self.iEvent += 1
 
-
-input = register_module('RootInput')
-eventinfo = register_module('EventInfoPrinter')
-printcollections = register_module('PrintCollections')
-
 inputfiles = [
     Belle2.FileSystem.findFile('framework/tests/chaintest_1.root'),
     Belle2.FileSystem.findFile('framework/tests/chaintest_2.root')
 ]
-input.param('inputFileNames', inputfiles)
-input.logging.log_level = LogLevel.WARNING
 
 main = create_path()
 
@@ -55,9 +48,9 @@ main = create_path()
 # can be found if it's not the first module in the path.
 main.add_module(NoopModule())
 
-main.add_module(input)
-main.add_module(eventinfo)
-main.add_module(printcollections)
+main.add_module('RootInput', logLevel=LogLevel.WARNING, inputFileNames=inputfiles)
+main.add_module('EventInfoPrinter')
+main.add_module('PrintCollections')
 
 main.add_module(TestModule())
 

@@ -7,7 +7,8 @@ from pybasf2 import *
 
 # workaround for possible hang with PyROOT on SL5
 # see https://belle2.cc.kek.jp/redmine/issues/1236
-# note: platform.libc_ver() is _really_ broken, so i'm checking the version via ldd (ships with libc)
+# note: platform.libc_ver() is _really_ broken, so i'm checking the
+# version via ldd (ships with libc)
 import subprocess
 ldd_ver = subprocess.check_output(['ldd', '--version'])
 sl5_libc_string = "ldd (GNU libc) 2.5"
@@ -24,7 +25,7 @@ if sl5_libc_string in ldd_ver:
 # -----------------------------------------------
 basf2label = 'BASF2 (Belle Analysis Framework 2)'
 basf2version = os.environ.get('BELLE2_RELEASE', 'unknown')
-basf2copyright = 'Copyright(C) 2010-2014  Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2015  Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2
@@ -43,6 +44,26 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 fw = Framework()
 
 
+def _add_module(self, name, logLevel=None, debugLevel=None, **kwargs):
+    """Small helper to speed up registering a module and setting
+        parameters"""
+    if isinstance(name, Module):
+        module = name
+    else:
+        module = fw.register_module(name)
+
+    if kwargs:
+        module.param(kwargs)
+    if logLevel is not None:
+        module.set_log_level(logLevel)
+    if debugLevel is not None:
+        module.set_debug_level(debugLevel)
+    self._add_module_object(module)
+    return module
+
+Path.add_module = _add_module
+
+
 def serialize_value(module, parameter):
     return serialize_path(parameter.values) if parameter.name == 'path' and module.type() == 'SubEvent' else parameter.values
 
@@ -52,8 +73,9 @@ def deserialize_value(module, parameter_state):
 
 
 def serialize_module(module):
-    return {'name': module.name(), 'type': module.type(), 'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
-            'parameters': [{'name': parameter.name, 'values': serialize_value(module, parameter)} for parameter in module.available_params() if parameter.setInSteering or module.type() == 'SubEvent']}
+    return {
+        'name': module.name(), 'type': module.type(), 'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
+        'parameters': [{'name': parameter.name, 'values': serialize_value(module, parameter)} for parameter in module.available_params() if parameter.setInSteering or module.type() == 'SubEvent']}
 
 
 def deserialize_module(module_state):
@@ -62,7 +84,8 @@ def deserialize_module(module_state):
     if module_state['flag']:
         module.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
     for parameter_state in module_state['parameters']:
-        module.param(parameter_state['name'], deserialize_value(module, parameter_state))
+        module.param(parameter_state['name'],
+                     deserialize_value(module, parameter_state))
     return module
 
 

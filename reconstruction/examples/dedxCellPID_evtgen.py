@@ -51,6 +51,8 @@ main.add_module(geometry)
 main.add_module(evtgeninput)
 main.add_module(g4sim)
 
+main.add_module(register_module('SVDDigitizer'))
+main.add_module(register_module('SVDClusterizer'))
 main.add_module(register_module('CDCDigitizer'))
 
 mctrackfinder = register_module('TrackFinderMCTruth')
@@ -59,7 +61,7 @@ mctrackfinder.param('UseClusters', True)
 main.add_module(mctrackfinder)
 
 genfit = register_module('GenFitter')
-genfit.param('UseClusters', True)
+# genfit.param('UseClusters', True)
 main.add_module(genfit)
 
 # run the events through the dE/dx module

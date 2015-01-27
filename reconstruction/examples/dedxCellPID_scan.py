@@ -28,6 +28,8 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 geometry.param('excludedComponents', ['EKLM'])
 
+genfit = register_module('SetupGenfitExtrapolation')
+
 # create paths
 main = create_path()
 
@@ -35,6 +37,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(geometry)
+main.add_module(genfit)
 
 dedx = register_module('DedxScan')
 main.add_module(dedx)

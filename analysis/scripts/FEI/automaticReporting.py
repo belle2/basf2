@@ -528,7 +528,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
             varName = addHyphenations(escapeForLatex(v))
             description = escapeForLatex(variables.getVariable(v).description)
             if rank in lines_by_rank:
-                raise runtime_error("Rank %d occurs more than once! Something is wrong in TMVA or in our parsing of the variable ranking." % (rank))
+                raise RuntimeError("Rank %d occurs more than once! Something is wrong in TMVA or in our parsing of the variable ranking." % (rank))
             lines_by_rank[rank] = varName + ' & ' + description + ' & ' + rankStr + '& ' + value + r' \\'
 
         placeholders['mvaVariables'] = ''

@@ -80,9 +80,9 @@ namespace Belle2 {
       if (tree == nullptr) {
 
         if (useExistingData)
-          B2WARNING("Couldn't find existing data, create new tree")
+          B2WARNING("Couldn't find existing data, create new tree");
 
-          tree = new TTree(tree_name.c_str(), tree_name.c_str());
+        tree = new TTree(tree_name.c_str(), tree_name.c_str());
 
         for (unsigned int i = 0; i < variables.size(); ++i)
           tree->Branch(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
@@ -247,7 +247,7 @@ namespace Belle2 {
       }
 
       if (cluster_count.size() <= 1) {
-        B2ERROR("Found less than two clusters in sample, no training necessary!")
+        B2FATAL("Found less than two clusters in sample, no training necessary!");
         return;
       } else if (cluster_count.size() ==  2) {
         int maxId = cluster_count.begin()->first;

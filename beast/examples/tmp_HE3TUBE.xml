@@ -16,6 +16,12 @@
     <bar unit="mm">1 2 3 4
     </bar>
 
+    <!-- default file containing garfield drift data -->
+    <GarfieldFile>data/garfieldDrift.dat</GarfieldFile>
+    <!-- default value of sigma for the gaussian impulse response -->
+    <impulseSigma>347.44</impulseSigma>
+
+
    <Active>
      <Material>HE3TUBE-Material</Material>
      <MaterialTube>StainlessSteel304</MaterialTube>

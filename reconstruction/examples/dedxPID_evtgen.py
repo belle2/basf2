@@ -57,7 +57,7 @@ mctrackfinder.param('UseClusters', True)
 main.add_module(mctrackfinder)
 
 genfit = register_module('GenFitter')
-genfit.param('UseClusters', True)
+# genfit.param('UseClusters', True)
 main.add_module(genfit)
 
 dedx = register_module('DedxPID')

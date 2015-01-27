@@ -592,7 +592,7 @@ def applyTMVAMethod(
     expert.param('method', method)
     expert.param('workingDirectory', workingDirectory)
     expert.param('listNames', decayString)
-    expert.param('expertOutputName', signalProbabilityName)
+    expert.param('expertOutputName', expertOutputName)
     expert.param('signalFraction', signalFraction)
     expert.param('signalClass', signalClass)
     path.add_module(expert)

@@ -496,7 +496,7 @@ void MCTrackMatcherModule::event()
     const TrackCandId& mcTrackCandId = purestMCTrackCandId.first;
     const Purity& purity = purestMCTrackCandId.second;
 
-    if (purity < m_param_minimalPurity) {
+    if (not(purity > 0) or not(purity >= m_param_minimalPurity)) {
       // GHOST
       prTrackCand->setMcTrackId(-999);
       B2DEBUG(100, "Stored PRTrack " << prTrackCandId << " as ghost (McTrackId=" << prTrackCand->getMcTrackId()  << ")");
@@ -546,8 +546,8 @@ void MCTrackMatcherModule::event()
           B2DEBUG(100, "Purity rel: prId " << prTrackCandId << " -> mcId " << mcTrackCandId << " : " << -purity);
 
         } else {
-          // Pattern recognition track fails the minimal purity requirement
-          // We might want to introduce a different classification here, we see problems
+          // Pattern recognition track fails the minimal efficiency requirement to be matched
+          // We might want to introduce a different classification here, if we see problems
           // with too many ghosts and want to investigate the specific source of the mismatch
           //
 
@@ -598,7 +598,14 @@ void MCTrackMatcherModule::event()
     const TrackCandId& prTrackCandId = mostEfficiencyPRTrackCandId.first;
     const Efficiency& efficiency = mostEfficiencyPRTrackCandId.second;
 
-    if (prGFTrackCands[prTrackCandId]->getMcTrackId() < 0 or not(efficiency >= m_param_minimalEfficiency)) {
+    if (prTrackCandId >= nPRTrackCands or prTrackCandId < 0) {
+      B2ERROR("Index of pattern recognition tracks out of range.");
+    }
+
+    if (prGFTrackCands[prTrackCandId]->getMcTrackId() < 0 or
+        not(efficiency > 0) or
+        not(efficiency >= m_param_minimalEfficiency)) {
+
       // MISSING
       // No related pattern recognition track
       // Do not create a relation.

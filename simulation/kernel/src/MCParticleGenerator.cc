@@ -56,10 +56,16 @@ void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
 
   //Loop over the primary particles. The MCParticle collection has to be
   //sorted breadth first: primary particles come first and then the daughters
+  // ... at least that would be the case if there is only one generator, but if
+  // more than one generator is used that is not necessarily true. So ignore
+  // that last statement.
+  //
+  // Let's add all top level particles, i.e. without mother, and addParticle
+  // will be called recursively for all daughters
   int nPart = mcParticles.getEntries();
   for (int iPart = 0; iPart < nPart; iPart++) {
     MCParticle* currParticle = mcParticles[iPart];
-    if (currParticle->getMother() != NULL) break;
+    if (currParticle->getMother() != NULL) continue;
 
     //Add primary particle (+ daughters) and the vertex
     addParticle(*currParticle, event, NULL, 0, true);

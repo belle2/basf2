@@ -10,7 +10,12 @@
 #ifndef EVENTDATAPLOTTER_H_
 #define EVENTDATAPLOTTER_H_
 
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/dataobjects/CDCHit.h>
+
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/display/BoundingBox.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -20,14 +25,17 @@ namespace Belle2 {
 
 
     public:
+      typedef PrimitivePlotter::AttributeMap AttributeMap;
+
+    public:
       /// Default constructor for ROOT compatibility. Uses an SVGPrimitivePlotter as backend.
-      EventDataPlotter();
+      EventDataPlotter(bool animate = false);
 
       /** Constructor taking the specifc PrimitivePlotter instance as backend.
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
-      EventDataPlotter(PrimitivePlotter* primitivePlotter);
+      EventDataPlotter(PrimitivePlotter* primitivePlotter, bool animate = false);
 
       /// Copy constructor
       EventDataPlotter(const EventDataPlotter& EventDataPlotter);
@@ -59,11 +67,14 @@ namespace Belle2 {
       void clear();
 
     public:
+      /// Getter for the current bounding box
+      BoundingBox getBoundingBox() const;
+
       /// Getter for the canvas width in pixels.
-      float getCanvasWidth();
+      float getCanvasWidth() const;
 
       /// Getter for the canvas height in pixels.
-      float getCanvasHeight();
+      float getCanvasHeight() const;
 
       /** Setter for the canvas width in pixels.
        *  The canvas height denotes the size of the image being produced.
@@ -77,9 +88,44 @@ namespace Belle2 {
        *  which is stored in the bounding box (getBoundingBox()). */
       void setCanvasHeight(const float& height);
 
+
+
+
+    public:
+      /// Converts a time given in nanoseconds to a time sting of the from "%fs".
+      std::string getAnimationTimeFromNanoSeconds(const float& nanoseconds)
+      { return std::to_string(nanoseconds) + "s"; }
+
+    public:
+      // Drawing methods for the variuous event data objects.
+
+
+      /// Draws the CDCSimHit as a momentum arrow starting at the track position with a length proportional to its momentum.
+      void draw(const CDCSimHit& simHit, const AttributeMap& attributeMap);
+
+      /// Draws the CDCWire as a small circle at the reference position.
+      void draw(const CDCWire& wire, const AttributeMap& attributeMap);
+
+      /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
+      void draw(const CDCWireHit& wireHit, const AttributeMap& attributeMap);
+
+      /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
+      void draw(const CDCHit& cdcHit, const AttributeMap& attributeMap);
+
+      /// Draws a range iterable collection of drawable elements
+      template<class Range>
+      void draw(const Range& range, const AttributeMap& attributeMap) {
+        for (const auto & element : range) {
+          draw(element, attributeMap);
+        }
+      }
+
     private:
       /// Reference to the primitivePlotter instance used as backend for the draw commands.
       PrimitivePlotter* m_ptrPrimitivePlotter;
+
+      /// Memory for the flag if the event data should be animated. If animation is supported is backend dependent.
+      bool m_animate;
 
     }; //class
 

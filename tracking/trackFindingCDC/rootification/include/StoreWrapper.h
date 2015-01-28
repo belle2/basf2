@@ -1,0 +1,75 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oliver Frost                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#ifndef STOREWRAPPER_H_
+#define STOREWRAPPER_H_
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/algorithms/SortableVector.h>
+
+#include <framework/datastore/RelationsObject.h>
+#include <tracking/trackFindingCDC/config/CompileConfiguration.h>
+
+namespace Belle2 {
+
+  namespace TrackFindingCDC {
+
+    /** This template functions as a wrapper for objects
+     *  that do not inherit from TObject to be put on the DataStore.
+     *
+     *  It there for overcomes the limitation, that objects on the DataStore
+     *  must have TObject at the bottom of the inheritance chain, which would
+     *  be to invasive and costly in terms of memory consumption an creation overhead.
+     *  Objects wrapped like this cannot be written to output.
+     */
+    template<class T>
+    class StoreWrapper : public RelationsObject {
+
+    public:
+      /// Constant getter for the the contained object.
+      const T& get() const
+      { return m_item; }
+
+      /// Getter for the the contained object.
+      T& get()
+      { return m_item; }
+
+      /// Alias getter for the the contained object to stress that the wrapper is being removed.
+      T& unwrap()
+      { return m_item; }
+
+      /// Forwarding -> access to the wrapped object as if the wrapper would be a pointer to it.
+      T* operator->() { return &m_item; }
+
+      /// Forwarding -> access to the wrapped object as if the wrapper would be a pointer to it.
+      const T* operator->() const { return &m_item; }
+
+      /// Unpacks the wrapped object as if the wrapper was a pointer to it.
+      T& operator*() { return m_item; }
+
+      /// Unpacks the wrapped object as if the wrapper was a pointer to it.
+      const T& operator*() const { return m_item; }
+
+    public:
+      /// Memory for the wrapped item.
+      T m_item; //! Do not include in the Streamer since the object might not implement it.
+
+    private:
+      /// ROOT Macro to unconditionally make StoreWrapper a ROOT class.
+      ClassDef(StoreWrapper, 1);
+    };
+
+  } //end namespace TrackFindingCDC
+
+} //end namespace Belle2
+
+
+#endif // STOREWRAPPER_H_

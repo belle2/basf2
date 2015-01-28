@@ -261,36 +261,34 @@ void EventDataPlotter::draw(const CDCWireSuperLayer& wireSuperLayer, const Attri
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  float centerX = 0.0;
-  float centerY = 0.0;
+  primitivePlotter.startGroup(attributeMap);
+  for (const CDCWireLayer & wireLayer : wireSuperLayer) {
+    for (const CDCWire & wire : wireLayer) {
+      draw(wire);
+    }
+  }
+  primitivePlotter.endGroup();
 
-  float innerR = wireSuperLayer.getInnerPolarR();
-  primitivePlotter.drawCircle(centerX, centerY, innerR, attributeMap);
-
-  float outerR = wireSuperLayer.getOuterPolarR();
-  primitivePlotter.drawCircle(centerX, centerY, outerR, attributeMap);
 }
 
 /// --------------------- Draw CDCWireTopology------------------------
-void EventDataPlotter::draw(const CDCWireTopology& wireTopology, const AttributeMap& attributeMap)
+void EventDataPlotter::draw(const CDCWireTopology& wireTopology, AttributeMap attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
   for (const CDCWireSuperLayer & wireSuperLayer : wireTopology.getWireSuperLayers()) {
-    AttributeMap superLayerAttributes {
+    AttributeMap defaultSuperLayerAttributeMap {
       {"fill" , wireSuperLayer.isAxial() ? "black" : "lightgray"},
       {"stroke" , "none"}
     };
-    primitivePlotter.startGroup(superLayerAttributes);
-    for (const CDCWireLayer & wireLayer : wireSuperLayer) {
-      for (const CDCWire & wire : wireLayer) {
-        draw(wire, attributeMap);
-      }
-    }
-    primitivePlotter.endGroup();
-  }
 
+    AttributeMap superLayerAttributeMap(attributeMap);
+
+    // Insert the values as defaults. Does not overwrite attributes with the same name.
+    superLayerAttributeMap.insert(defaultSuperLayerAttributeMap.begin(), defaultSuperLayerAttributeMap.end());
+    draw(wireSuperLayer, superLayerAttributeMap);
+  }
 }
 
 

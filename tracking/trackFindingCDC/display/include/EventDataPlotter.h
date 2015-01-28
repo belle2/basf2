@@ -132,7 +132,7 @@ namespace Belle2 {
 
       /// Draws the all wires in the CDC
       void draw(const Belle2::TrackFindingCDC::CDCWireTopology& wireTopology,
-                const AttributeMap& attributeMap = AttributeMap());
+                AttributeMap attributeMap = AttributeMap());
 
       /// Draws the CDCSimHit as a momentum arrow starting at the track position with a length proportional to its momentum.
       void draw(const Belle2::CDCSimHit& simHit,

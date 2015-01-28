@@ -160,6 +160,10 @@ namespace Belle2 {
       const BoundingBox& getBoundingBox() const
       { return m_boundingBox; }
 
+      /// Setter for the bounding box of all drawed objects.
+      void setBoundingBox(const BoundingBox& boundingBox)
+      { m_boundingBox = boundingBox; }
+
     public:
       /// Getter for the canvas width in pixels.
       const float& getCanvasWidth()

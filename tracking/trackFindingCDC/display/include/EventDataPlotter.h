@@ -168,6 +168,15 @@ namespace Belle2 {
         drawRange(recoSegment3D, attributeMap);
       }
 
+      /// Draws the pair of segments as an arrow connecting the centers of them.
+      void draw(const CDCAxialAxialSegmentPair& axialAxialSegmentPair, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws the pair of segments as an arrow connecting the centers of them.
+      void draw(const CDCAxialStereoSegmentPair& axialStereoSegmentPair, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws the triple of segments as two arrows connecting the centers from start to the middle segment and from the middle to the end segment.
+      void draw(const CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
+
       /// Draws all CDCRecoHits3D of the segment
       void draw(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap()) {
         drawRange(track, attributeMap);

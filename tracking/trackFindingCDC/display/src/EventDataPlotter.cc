@@ -433,6 +433,126 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
 
 }
 
+void EventDataPlotter::draw(const CDCAxialAxialSegmentPair& axialAxialSegmentPair,
+                            const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const CDCRecoSegment2D* ptrFromSegment = axialAxialSegmentPair.getStart();
+  const CDCRecoSegment2D* ptrToSegment = axialAxialSegmentPair.getEnd();
+
+  if (not ptrFromSegment or not ptrToSegment) return;
+
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+
+  const Vector2D& fromPos = fromSegment.getCenterOfMass2D();
+  const Vector2D& toPos = toSegment.getCenterOfMass2D();
+
+  if (fromPos.hasNAN()) {
+    B2WARNING("Center of mass of first segment in a pair contains NAN values.");
+    return;
+  }
+
+  if (toPos.hasNAN()) {
+    B2WARNING("Center of mass of second segment in a pair contains NAN values.");
+    return;
+  }
+
+  const float fromX = fromPos.x();
+  const float fromY = fromPos.y();
+
+  const float toX = toPos.x();
+  const float toY = toPos.y();
+
+  primitivePlotter.drawArrow(fromX, fromY, toX, toY, attributeMap);
+
+}
+
+void EventDataPlotter::draw(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
+                            const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const CDCRecoSegment2D* ptrFromSegment = axialStereoSegmentPair.getStartSegment();
+  const CDCRecoSegment2D* ptrToSegment = axialStereoSegmentPair.getEndSegment();
+
+  if (not ptrFromSegment or not ptrToSegment) return;
+
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+
+  const Vector2D& fromPos = fromSegment.getCenterOfMass2D();
+  const Vector2D& toPos = toSegment.getCenterOfMass2D();
+
+  if (fromPos.hasNAN()) {
+    B2WARNING("Center of mass of first segment in a pair contains NAN values.");
+    return;
+  }
+
+  if (toPos.hasNAN()) {
+    B2WARNING("Center of mass of second segment in a pair contains NAN values.");
+    return;
+  }
+
+  const float fromX = fromPos.x();
+  const float fromY = fromPos.y();
+
+  const float toX = toPos.x();
+  const float toY = toPos.y();
+
+  primitivePlotter.drawArrow(fromX, fromY, toX, toY, attributeMap);
+}
+
+void EventDataPlotter::draw(const CDCSegmentTriple& segmentTriple,
+                            const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const CDCRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
+  const CDCRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
+  const CDCRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
+
+  if (not ptrStartSegment or not ptrMiddleSegment or not ptrEndSegment) return;
+
+  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCRecoSegment2D& middleSegment = *ptrMiddleSegment;
+  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+
+  const Vector2D& startPos = startSegment.getCenterOfMass2D();
+  const Vector2D& middlePos = middleSegment.getCenterOfMass2D();
+  const Vector2D& endPos = endSegment.getCenterOfMass2D();
+
+  if (startPos.hasNAN()) {
+    B2WARNING("Center of mass of first segment in a pair contains NAN values.");
+    return;
+  }
+
+  if (middlePos.hasNAN()) {
+    B2WARNING("Center of mass of second segment in a pair contains NAN values.");
+    return;
+  }
+
+  if (endPos.hasNAN()) {
+    B2WARNING("Center of mass of third segment in a pair contains NAN values.");
+    return;
+  }
+
+  const float startX = startPos.x();
+  const float startY = startPos.y();
+
+  const float middleX = middlePos.x();
+  const float middleY = middlePos.y();
+
+  const float endX = endPos.x();
+  const float endY = endPos.y();
+
+  primitivePlotter.drawArrow(startX, startY, middleX, middleY, attributeMap);
+  primitivePlotter.drawArrow(middleX, middleY, endX, endY, attributeMap);
+}
 
 void EventDataPlotter::draw(const genfit::TrackCand& gfTrackCand, const AttributeMap& attributeMap)
 {

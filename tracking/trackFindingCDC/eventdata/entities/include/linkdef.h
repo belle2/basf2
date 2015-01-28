@@ -25,6 +25,16 @@
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRecoHit3D-;
 
+/// Some dictionaries for vectors that will be needed
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCWireHit>-;
+#pragma link C++ class std::vector<const Belle2::TrackFindingCDC::CDCWireHit*>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRLWireHit>-;
+#pragma link C++ class std::vector<const Belle2::TrackFindingCDC::CDCRLWireHit*>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoHit2D>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoTangent>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoFacet>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoHit3D>-;
+
 #endif
 
 #endif

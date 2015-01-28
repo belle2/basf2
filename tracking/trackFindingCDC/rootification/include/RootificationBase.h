@@ -11,6 +11,9 @@
 #ifndef ROOTIFICATIONBASE_H_
 #define ROOTIFICATIONBASE_H_
 
+// Including vector here since we often want to generate dictionaries for vectors for the many basic objets.
+#include <vector>
+
 #include <framework/datastore/RelationsObject.h>
 #include <tracking/trackFindingCDC/config/CompileConfiguration.h>
 

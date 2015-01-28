@@ -36,3 +36,26 @@ TEST(TrackFindingCDCTest, cpp_max)
   EXPECT_EQ(value, maximum2);
 
 }
+
+
+TEST(TrackFindingCDCTest, cpp_stringstream_copy)
+{
+  // Howto copy a string stream even if its constant.
+
+  std::stringstream filled_non_const;
+  filled_non_const << "filled " << "with " << "stuff.";
+
+  const std::stringstream& filled = filled_non_const;
+
+  std::stringstream copy1;
+  copy1 << filled.rdbuf();
+  filled.rdbuf()->pubseekpos(0, std::ios_base::in);
+
+  std::stringstream copy2;
+  copy2 << filled.rdbuf();
+  filled.rdbuf()->pubseekpos(0, std::ios_base::in);
+
+  EXPECT_EQ(filled.str(), copy1.str());
+  EXPECT_EQ(filled.str(), copy2.str());
+
+}

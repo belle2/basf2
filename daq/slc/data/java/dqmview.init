@@ -3,7 +3,7 @@
 #
 
 dqmview.host : localhost
-dqmview.port : 50101
+dqmview.port : 50100
 dqmview.node : DQMGUI
 
 #

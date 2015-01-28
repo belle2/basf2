@@ -9,6 +9,8 @@
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 #include <cstdlib>
 #include <vector>
 
@@ -90,6 +92,7 @@ void HistSender::run()
             std::string name = it->first;
             TString class_name = h->ClassName();
             socket_writer.writeString(class_name.Data());
+            socket_writer.writeString(reader.getDirectory(name));
             socket_writer.writeString(name);
             socket_writer.writeString(std::string(h->GetTitle()) + ";" +
                                       h->GetXaxis()->GetTitle()  + ";" +
@@ -167,7 +170,6 @@ void HistSender::run()
 void HistSender::sendContents(DQMFileReader& reader, Writer& writer)
 throw(IOException)
 {
-  //LogFile::debug("Sending package : %s", reader.getName().c_str());
   writer.writeString(reader.getName());
   writer.writeInt(reader.getHists().size());
   for (TH1Map::iterator it = reader.getHists().begin();

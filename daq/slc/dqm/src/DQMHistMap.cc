@@ -2,10 +2,16 @@
 
 using namespace Belle2;
 
-void DQMHistMap::addHist(TH1* hist, const char* name)
+void DQMHistMap::addHist(TH1* hist,
+                         const std::string& dir,
+                         const std::string& name)
 {
   if (!hasHist(name)) {
     m_hist_m.insert(TH1Map::value_type(name, hist));
+    if (m_dir_m.find(name) == m_dir_m.end()) {
+      m_ndirs++;
+    }
+    m_dir_m.insert(std::map<std::string, std::string>::value_type(name, dir));
   } else {
     m_hist_m[name] = hist;
   }
@@ -28,4 +34,6 @@ void DQMHistMap::clear()
     delete it->second;
   }
   m_hist_m = TH1Map();
+  m_dir_m = std::map<std::string, std::string>();
+  m_ndirs = 0;
 }

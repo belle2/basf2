@@ -6,15 +6,15 @@
 int main(int argc, char** argv)
 {
   TMapFile* file = TMapFile::Create(argv[1], "recreate", 512000000, "test");
-  TH1F* hx1 = new TH1F("h_HitXPositionCh01", "Hit X position (Ch-01);X [mm];Entires", 1000, -20, 20);
-  TH1F* hy1 = new TH1F("h_HitYPositionCh01", "Hit Y position (Ch-01);Y [mm];Entires", 1000, -30, 30);
-  TH2F* hxy1 = new TH2F("h_HitXYPositionCh01", "Hit X - Y (Ch-01);X [mm];Y [mm]", 90, -20, 20, 90, -30, 30);
-  TH1F* hx2 = new TH1F("h_HitXPositionCh02", "Hit X position (Ch-02);X [mm];Entires", 1000, -20, 20);
-  TH1F* hy2 = new TH1F("h_HitYPositionCh02", "Hit Y position (Ch-02);Y [mm];Entires", 1000, -30, 30);
-  TH2F* hxy2 = new TH2F("h_HitXYPositionCh02", "Hit X - Y (Ch-02);X [mm];Y [mm]", 90, -20, 20, 90, -30, 30);
-  TH1F* hx3 = new TH1F("h_HitXPositionCh03", "Hit X position (Ch-03);X [mm];Entires", 1000, -20, 20);
-  TH1F* hy3 = new TH1F("h_HitYPositionCh03", "Hit Y position (Ch-03);Y [mm];Entires", 1000, -30, 30);
-  TH2F* hxy3 = new TH2F("h_HitXYPositionCh03", "Hit X - Y (Ch-03);X [mm];Y [mm]", 90, -20, 20, 90, -30, 30);
+  TH1F* hx1 = new TH1F("ECL/h_HitXPositionCh01", "Hit X position (Ch-01);X [mm];Entires", 1000, -20, 20);
+  TH1F* hy1 = new TH1F("ECL/h_HitYPositionCh01", "Hit Y position (Ch-01);Y [mm];Entires", 1000, -30, 30);
+  TH2F* hxy1 = new TH2F("ECL/h_HitXYPositionCh01", "Hit X - Y (Ch-01);X [mm];Y [mm]", 90, -20, 20, 90, -30, 30);
+  TH1F* hx2 = new TH1F("CDC/h_HitXPositionCh02", "Hit X position (Ch-02);X [mm];Entires", 1000, -20, 20);
+  TH1F* hy2 = new TH1F("CDC/h_HitYPositionCh02", "Hit Y position (Ch-02);Y [mm];Entires", 1000, -30, 30);
+  TH2F* hxy2 = new TH2F("CDC/h_HitXYPositionCh02", "Hit X - Y (Ch-02);X [mm];Y [mm]", 90, -20, 20, 90, -30, 30);
+  TH1F* hx3 = new TH1F("ARICH/h_HitXPositionCh03", "Hit X position (Ch-03);X [mm];Entires", 1000, -20, 20);
+  TH1F* hy3 = new TH1F("ARICH/h_HitYPositionCh03", "Hit Y position (Ch-03);Y [mm];Entires", 1000, -30, 30);
+  TH2F* hxy3 = new TH2F("ARICH/h_HitXYPositionCh03", "Hit X - Y (Ch-03);X [mm];Y [mm]", 90, -20, 20, 90, -30, 30);
   file->Add(hx1);
   file->Add(hy1);
   file->Add(hxy1);

@@ -7,6 +7,8 @@
 #include <daq/slc/dqm/Histo1D.h>
 #include <daq/slc/dqm/Histo2D.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 #include "TH2.h"
 #include "TFile.h"
 
@@ -29,7 +31,6 @@ bool DQMFileReader::init()
 {
   m_mutex.lock();
   if (m_file) m_file->Close();
-  LogFile::debug("Reading TMapfile: %s", m_hist_m.getFileName().c_str());
   m_file = TMapFile::Create(m_hist_m.getFileName().c_str());
   m_hist_m.clear();
   TMapRec* mr = m_file->GetFirst();
@@ -39,10 +40,16 @@ bool DQMFileReader::init()
       TString class_name = obj->ClassName();
       if (class_name.Contains("TH1") ||  class_name.Contains("TH2")) {
         TH1* h = (TH1*)obj;
-        LogFile::debug("%s in %s", h->GetName(), m_name.c_str());
-        TString name = h->GetName();
-        h = (TH1*)h->Clone(name + "_copy");
-        m_hist_m.addHist(h, name);
+        std::string name = h->GetName();
+        StringList str_v = StringUtil::split(name, '/');
+        std::string dir = "";
+        if (str_v.size() > 1) {
+          dir = str_v[0];
+          name = str_v[1];
+        }
+        h = (TH1*)h->Clone((name + "_copy").c_str());
+        m_hist_m.addHist(h, dir, name);
+
       }
     }
     mr = mr->GetNext();
@@ -60,6 +67,8 @@ int DQMFileReader::update()
   for (TH1Map::iterator it = m_hist_m.getHists().begin();
        it != m_hist_m.getHists().end(); it++) {
     std::string name = it->first;
+    std::string dir = m_hist_m.getDirectory(name);
+    if (dir.size() > 0) name = dir + "/" + name;
     TH1* h = it->second;
     TH1* h0 = (TH1*)m_file->Get(name.c_str());
     if (h->GetEntries() != h0->GetEntries()) {
@@ -68,9 +77,6 @@ int DQMFileReader::update()
       updated = true;
     }
     delete h0;
-    if (m_updateid % 1000 == 0) {
-      LogFile::debug("Entries of %s = %d", name.c_str(), (int)h->GetEntries());
-    }
   }
   if (updated) m_updateid++;
   int updateid = m_updateid;
@@ -85,11 +91,13 @@ bool DQMFileReader::dump(const std::string& dir,
   m_file->Update();
   std::string filepath = Form("%s/DQM_%s_%04d_%06d.root",
                               dir.c_str(), m_name.c_str(), expno, runno);
-  LogFile::debug("created DQM dump file: %s", filepath.c_str());
+  LogFile::info("created DQM dump file: %s", filepath.c_str());
   TFile* file = new TFile(filepath.c_str(), "recreate");
   for (TH1Map::iterator it = m_hist_m.getHists().begin();
        it != m_hist_m.getHists().end(); it++) {
     std::string name = it->first;
+    std::string dir = m_hist_m.getDirectory(name);
+    if (dir.size() > 0) name = dir + "/" + name;
     TH1* h = (TH1*)m_file->Get(name.c_str());
     h->Write();
   }

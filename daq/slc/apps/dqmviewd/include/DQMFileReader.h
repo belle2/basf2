@@ -30,6 +30,9 @@ namespace Belle2 {
     TH1* getHist(const std::string& name);
     TH1Map& getHists() { return m_hist_m.getHists(); }
     const TH1Map& getHists() const { return m_hist_m.getHists(); }
+    const std::string& getDirectory(const std::string& name) {
+      return m_hist_m.getDirectory(name);
+    }
     bool isReady() const { return m_ready; }
     bool dump(const std::string& dir,
               unsigned int expno, unsigned int runno);

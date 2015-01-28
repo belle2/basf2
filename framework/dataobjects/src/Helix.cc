@@ -403,6 +403,7 @@ void Helix::setCartesian(const TVector3& position,
 }
 
 namespace Belle2 {
+  /** Output operator for debugging and the generation of unittest error messages.*/
   std::ostream& operator<<(std::ostream& output, const Helix& helix)
   {
     return output

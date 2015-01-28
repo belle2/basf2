@@ -14,7 +14,7 @@
 #include <TVector3.h>
 
 #include <cstdlib>
-#include <vector>
+#include <cmath>
 
 namespace Belle2 {
 

@@ -44,6 +44,8 @@ namespace Belle2 {
       c_normalCosDistribution,
       /** Discrete spectrum, parameters are first the values and then the weights (non-negative) for each value */
       c_discreteSpectrum,
+      /** Discrete pt spectrum, parameters are first the values and then the weights (non-negative) for each value */
+      c_discretePtSpectrum,
       /** Distribution uniform in the inverse pt distribution, that is uniform in track curvature */
       c_inversePtDistribution,
       /** Distribution given as list of (x,y) points. The Distribution will
@@ -93,6 +95,10 @@ namespace Belle2 {
       /** If true, the number of tracks per event will fluctuate according to
        * Poisson distribution */
       bool varyNumberOfTracks = true;
+      /* generates particle momentum according to the specified
+       * distribution and assigns this momentum to all particles generated
+       * for one event */
+      bool fixedMomentumPerEvent = false;
     };
 
     /** Default constructor */

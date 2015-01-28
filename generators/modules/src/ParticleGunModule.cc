@@ -99,6 +99,10 @@ ParticleGunModule::ParticleGunModule() : Module()
   addParam("independentVertices", m_parameters.independentVertices,
            "If false, all tracks of one event will start from the same vertex, "
            "otherwise a new vertex is generated for every particle", false);
+  addParam("fixedMomentumPerEvent", m_parameters.fixedMomentumPerEvent,
+           "generates particle momentum according to the specified "
+           "distribution and assigns this momentum to all particles generated "
+           "for one event", false);
   addParam("momentumParams", m_parameters.momentumParams,
            "Parameters for the momentum generation. Meaning of the parameters "
            "depends on the chosen distribution", m_parameters.momentumParams);
@@ -131,6 +135,7 @@ ParticleGun::EDistribution ParticleGunModule::convertDistribution(std::string na
   if (name == "normalpt")       return ParticleGun::c_normalPtDistribution;
   if (name == "normalcos")      return ParticleGun::c_normalCosDistribution;
   if (name == "discrete")       return ParticleGun::c_discreteSpectrum;
+  if (name == "discretept")     return ParticleGun::c_discretePtSpectrum;
   if (name == "inversept")      return ParticleGun::c_inversePtDistribution;
   if (name == "polyline")       return ParticleGun::c_polylineDistribution;
   if (name == "polylinept")     return ParticleGun::c_polylinePtDistribution;

@@ -88,6 +88,7 @@ double ParticleGun::generateValue(EDistribution dist, const vector<double>& para
     case c_normalCosDistribution:
       return acos(gRandom->Gaus(params[0], params[1]));
     case c_discreteSpectrum:
+    case c_discretePtSpectrum:
       //Create weighted discrete distribution
       //First we sum all the weights (second half of the array)
       for (size_t i = params.size() / 2; i < params.size(); ++i) rand += params[i];
@@ -127,6 +128,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
   }
 
   //Make list of particles
+  double firstMomentum = 0.0;
   for (int i = 0; i < nTracks; ++i) {
     MCParticleGraph::GraphParticle& p = graph.addParticle();
     p.setStatus(MCParticle::c_PrimaryParticle);
@@ -147,12 +149,18 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
 
     //lets generate the momentum vector:
     double momentum = generateValue(m_params.momentumDist, m_params.momentumParams);
+    // if the fixed momentum option enabled, either store the generated momentum for the first
+    // particle or reuse for all others
+    if (m_params.fixedMomentumPerEvent) {
+      i == 0 ? firstMomentum = momentum : momentum = firstMomentum;
+    }
     double phi      = generateValue(m_params.phiDist, m_params.phiParams);
     double theta    = generateValue(m_params.thetaDist, m_params.thetaParams);
 
     double pt = momentum * sin(theta);
     if (m_params.momentumDist == c_uniformPtDistribution || m_params.momentumDist == c_normalPtDistribution ||
-        m_params.momentumDist == c_inversePtDistribution || m_params.momentumDist == c_polylinePtDistribution) {
+        m_params.momentumDist == c_inversePtDistribution || m_params.momentumDist == c_polylinePtDistribution ||
+        m_params.momentumDist == c_discretePtSpectrum) {
       //this means we are actually generating the Pt and not the P, so exchange values
       pt = momentum;
       momentum = (sin(theta) > 0) ? (pt / sin(theta)) : numeric_limits<double>::max();
@@ -209,6 +217,7 @@ bool ParticleGun::setParameters(const Parameters& p)
     {c_polylinePtDistribution,  "polylinePt"},
     {c_polylineCosDistribution, "polylineCos"},
     {c_discreteSpectrum,        "discrete"},
+    {c_discretePtSpectrum,      "discretePt"}
   };
   //Small helper lambda to get the distribution by name
   auto getDist = [&p](const std::string & dist) -> EDistribution {
@@ -271,17 +280,19 @@ bool ParticleGun::setParameters(const Parameters& p)
       ok = false;
     }
     //Check even number of parameters for discrete or polyline distributions
-    if (dist == c_discreteSpectrum || dist == c_polylineDistribution || dist == c_polylinePtDistribution || dist == c_polylineCosDistribution) {
+    if (dist == c_discreteSpectrum || dist == c_discretePtSpectrum ||
+        dist == c_polylineDistribution || dist == c_polylinePtDistribution || dist == c_polylineCosDistribution) {
       if ((hasParams % 2) != 0) {
         B2ERROR(par << " generation: " << distributionNames[dist] << " requires an even number of parameters");
         ok = false;
-      } else if (dist == c_discreteSpectrum || hasParams >= 4) {
+      } else if (dist == c_discreteSpectrum || dist == c_discretePtSpectrum || hasParams >= 4) {
         //Check wellformedness of polyline pdf: ascending x coordinates and positive y coordinates with at least one nonzero value
         //Discrete spectrum only requires positive weights, no sorting needed
         const std::vector<double>& p = getPars(par);
-        const std::string parname = (dist == c_discreteSpectrum) ? "weight" : "y coordinate";
+        const std::string parname = (dist == c_discreteSpectrum || dist == c_discretePtSpectrum)
+                                    ? "weight" : "y coordinate";
         //Check for sorting for polylines
-        if (dist != c_discreteSpectrum) {
+        if ((dist != c_discreteSpectrum) && (dist != c_discretePtSpectrum)) {
           for (size_t i = 0; i < (hasParams / 2) - 1; ++i) {
             if (p[i] > p[i + 1]) {
               B2ERROR(par << " generation: " << distributionNames[dist] << " requires x coordinates in ascending order");

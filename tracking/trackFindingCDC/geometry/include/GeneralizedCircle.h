@@ -272,6 +272,10 @@ namespace Belle2 {
       /// Calculates the closest approach to the two dimensional origin
       Vector2D perigee() const;
 
+      /// Calculates the point on the circle that is furthest away from the origin.
+      /** This results in Vector2D(NAN, NAN) in the straight line case.*/
+      Vector2D apogee() const;
+
       /// Calculates if the to vector is closer to the from vector following the along orientation of the circle or against.
       /** Returns:
        *  * FORWARD in case the to vector is closer following the along the orientation

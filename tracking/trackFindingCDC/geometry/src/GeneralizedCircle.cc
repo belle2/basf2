@@ -178,6 +178,14 @@ Vector2D GeneralizedCircle::perigee() const
   return result;
 }
 
+Vector2D GeneralizedCircle::apogee() const
+{
+  Vector2D result(n12());
+  result.setPolarR(- impact() - 2 * radius());
+  return result;
+}
+
+
 Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const
 {
 

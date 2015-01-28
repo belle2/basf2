@@ -26,13 +26,21 @@
        <Element fraction="1.0">Al</Element>
     </Components>
   </Material>
-  
+
   <Material name="Aluminum">
      <density unit="g/cm3">2.70</density>
      <Components>
         <Element fraction="1.0">Al</Element>
      </Components>
    </Material>
+
+  <Material name="MaterialTiN">
+    <density unit="g/cm3">5.22</density>
+    <Components>
+       <Element fraction="0.226376">N</Element>
+       <Element fraction="0.773624">Ti</Element>
+    </Components>
+  </Material>
 
 </Materials>
   

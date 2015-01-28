@@ -16,6 +16,7 @@
 
     <Material>PH1BPIPE-Material</Material>
     <MaterialPipe>PH1BPIPE-Material</MaterialPipe>
+    <MaterialTiN>PH1BPIPE-Material</MaterialTiN>
     <x_ph1bpipe unit="cm">0.0</x_ph1bpipe>
     <y_ph1bpipe unit="cm">0.0</y_ph1bpipe>
     <z_ph1bpipe unit="cm">0.0</z_ph1bpipe>

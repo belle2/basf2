@@ -62,7 +62,7 @@ namespace Belle2 {
 
     void Ph1bpipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
-      G4String symbol;
+      /*G4String symbol;
       G4double a, z;
       G4double density;
       G4int ncomponents;
@@ -71,7 +71,7 @@ namespace Belle2 {
       G4Material* matTiN = new G4Material("TiN", density = 5.22 * CLHEP::g / CLHEP::cm3, ncomponents = 2);
       matTiN->AddElement(eN, 0.226376);
       matTiN->AddElement(eTi, 0.773624);
-
+      */
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
@@ -168,6 +168,7 @@ namespace Belle2 {
 
 
       string matPipe = content.getString("MaterialPipe");
+      string matTiN = content.getString("MaterialTiN");
       //G4LogicalVolume* l_PH1BPIPE = new G4LogicalVolume(s_PH1BPIPE, geometry::Materials::get(matPipe), "l_PH1BPIPE", 0, m_sensitive);
       G4LogicalVolume* l_PH1BPIPE = new G4LogicalVolume(s_PH1BPIPE, geometry::Materials::get(matPipe), "l_PH1BPIPE", 0, 0);
 
@@ -286,7 +287,7 @@ namespace Belle2 {
 
       //G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, m_sensitive);
       G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, 0);
-      G4LogicalVolume* l_TiN = new G4LogicalVolume(s_Xshape1TiN, matTiN, "l_TiN", 0, 0);
+      G4LogicalVolume* l_TiN = new G4LogicalVolume(s_Xshape1TiN, geometry::Materials::get(matTiN), "l_TiN", 0, 0);
 
       transform_X = G4Translate3D(0, 0, 0);
       transform_X = transform_X * G4RotateY3D(-0.083 / 2. * CLHEP::rad);

@@ -460,6 +460,9 @@ void RootInputModule::readPersistentEntry(long entry)
   }
 
   for (auto entry : m_persistentStoreEntries) {
+    if (!entry->object) {
+      B2FATAL("Persistent entry " << entry << " does not contain object " << entry->name << ", aborting.");
+    }
     bool isMergeable = entry->object->InheritsFrom(Mergeable::Class());
     if (isMergeable) {
       const Mergeable* oldObj = static_cast<Mergeable*>(entry->ptr);

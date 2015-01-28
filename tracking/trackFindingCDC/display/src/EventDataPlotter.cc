@@ -175,6 +175,53 @@ void EventDataPlotter::startAnimationGroup(const Belle2::CDCHit* ptrHit)
   primitivePlotter.startGroup();
 }
 
+void EventDataPlotter::drawInteractionPoint()
+{
+  Vector2D center(0.0, 0.0);
+  float radius = 1.0;
+
+  const Circle2D interactionPoint(center, radius);
+
+  AttributeMap attributeMap {
+    { "fill" , "black"},
+    {"stroke-width" , "0"}
+  };
+
+  draw(interactionPoint, attributeMap);
+}
+
+void EventDataPlotter::drawInnerCDCWall(const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+
+  const CDCWireSuperLayer& wireSuperLayer = wireTopology.getWireSuperLayers().front();
+
+  float centerX = 0.0;
+  float centerY = 0.0;
+  float innerR = wireSuperLayer.getInnerPolarR();
+
+  primitivePlotter.drawCircle(centerX, centerY, innerR, attributeMap);
+}
+
+void EventDataPlotter::drawOuterCDCWall(const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+
+  const CDCWireSuperLayer& wireSuperLayer = wireTopology.getWireSuperLayers().back();
+
+  float centerX = 0.0;
+  float centerY = 0.0;
+  float outerR = wireSuperLayer.getOuterPolarR();
+
+  primitivePlotter.drawCircle(centerX, centerY, outerR, attributeMap);
+}
+
 /// --------------------- Draw Circle2D ------------------------
 void EventDataPlotter::draw(const Circle2D& circle,
                             AttributeMap attributeMap)
@@ -198,7 +245,6 @@ void EventDataPlotter::draw(const Circle2D& circle,
 
   primitivePlotter.drawCircle(x, y, radius, attributeMap);
 }
-
 
 /// --------------------- Draw CDCWire ------------------------
 void EventDataPlotter::draw(const CDCWire& wire, const AttributeMap& attributeMap)

@@ -106,6 +106,16 @@ namespace Belle2 {
       void startAnimationGroup(const Belle2::CDCHit* ptrHit);
 
     public:
+      /// Marks the position of the interaction point with a filled circle.
+      void drawInteractionPoint();
+
+      /// Draw the inner wall of the CDC.
+      void drawInnerCDCWall(const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draw the outer wall of the CDC.
+      void drawOuterCDCWall(const AttributeMap& attributeMap = AttributeMap());
+
+    public:
       // Drawing methods for the variuous event data objects.
 
       /// Draws a filled circle.

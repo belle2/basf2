@@ -162,13 +162,13 @@ def loadMCParticles(path=analysis_main):
     THIS FUNCTION IS NO LONGER NEEDED. IT IS OBSOLETE AND IT DOES NOTHING.
     """
 
-    print ''
-    print '* ************************************************* *'
-    print '* loadMCParticles function is no longer needed.     *'
-    print '* IT IS OBSOLETE AND IT DOES NOTHING.               *'
-    print '* Delete loadMCParticles() from your python script. *'
-    print '* ************************************************* *'
-    print ''
+    B2WARNING('''
+* ************************************************* *
+* loadMCParticles function is no longer needed.     *
+* IT IS OBSOLETE AND IT DOES NOTHING.               *
+* Delete loadMCParticles() from your python script. *
+* ************************************************* *
+''')
 
 
 def loadReconstructedParticles(path=analysis_main):
@@ -176,13 +176,13 @@ def loadReconstructedParticles(path=analysis_main):
     THIS FUNCTION IS NO LONGER NEEDED. IT IS OBSOLETE AND IT DOES NOTHING.
     """
 
-    print ''
-    print '* ************************************************************ *'
-    print '* loadMCParticles function is no longer needed.                *'
-    print '* IT IS OBSOLETE AND IT DOES NOTHING.                          *'
-    print '* Delete loadReconstructedParticles() from your python script. *'
-    print '* ************************************************************ *'
-    print ''
+    B2WARNING('''
+* ************************************************************ *
+* loadReconstructedParticles function is no longer needed.     *
+* IT IS OBSOLETE AND IT DOES NOTHING.                          *
+* Delete loadReconstructedParticles() from your python script. *
+* ************************************************************ *
+''')
 
 
 def copyList(
@@ -419,12 +419,12 @@ def selectParticle(
     USE fillParticleList INSTEAD!
     """
 
-    print ''
-    print '* ******************************************************* *'
-    print '* selectParticle is obsolete.                             *'
-    print '* Replace it with fillParticleList in your python script. *'
-    print '* ******************************************************* *'
-    print ''
+    B2WARNING('''
+* ******************************************************* *
+* selectParticle is obsolete.                             *
+* Replace it with fillParticleList in your python script. *
+* ******************************************************* *
+''')
 
     fillParticleList(decayString, cut, writeOut, path)
 
@@ -579,7 +579,7 @@ def applyTMVAMethod(
     Applies a trained TMVA method to a particle list
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param method name of the TMVA method
-    @param target name which is used to store signalProbability in extra info of the particle
+    @param expertOutputName extra-info name which is used to store the classifier output in the particle
     @param signalFraction to calculate probability, -1 if no transformation, -2 to use training signal/background
     @param signalClass is the cluster to calculate the probability of beeing signal
     @param prefix prefix which is used to identify the weight files created by TMVA

@@ -44,7 +44,9 @@ SVGPrimitivePlotter::SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter) :
   m_nIndentationSpaces(plotter.m_nIndentationSpaces),
   m_svgAttributes(plotter.m_svgAttributes)
 {
+  // Copy the stream of the other plotter and rewind it to its original position.
   m_svgContentStream << plotter.m_svgContentStream.rdbuf();
+  plotter.m_svgContentStream.rdbuf()->pubseekpos(0, std::ios_base::in);
 }
 
 SVGPrimitivePlotter::~SVGPrimitivePlotter()
@@ -226,7 +228,10 @@ const std::string SVGPrimitivePlotter::save(const std::string& fileName)
   writeOpeningTag(outputFileStream, "svg", standardAttributeMap, variableAttributeMap);
 
   writeSVGDefs(outputFileStream);
+
+  // Copy the stream the output and rewind it to its original position.
   outputFileStream << m_svgContentStream.rdbuf();
+  m_svgContentStream.rdbuf()->pubseekpos(0, std::ios_base::in);
 
   writeClosingTag(outputFileStream, "svg");
 

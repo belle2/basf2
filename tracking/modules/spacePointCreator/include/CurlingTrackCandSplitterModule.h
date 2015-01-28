@@ -147,6 +147,8 @@ namespace Belle2 {
 
     int m_NoSingleTrueHitCtr; /**< Counter for SpacePoints that relate to more than one TrueHit */
 
+    int m_NoCurlingTCsCtr; /**< Counter for SPTCs that were not curling and hence were added to the StoreArray of first out parts */
+
     bool m_PARAMuseNonSingleTHinPA; /**< Switch for using SpacePoints in position Analysis that are related to more than one TrueHit. NOTE: probably only here while developing */
 
     void initializeCounters(); /**< initialize all counters to 0 for avoiding undeterministic behaviour. */

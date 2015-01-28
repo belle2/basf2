@@ -248,8 +248,12 @@ void CurlingTrackCandSplitterModule::event()
       const std::vector<int> splittingIndices = checkTrackCandForCurling(*spacePointTC, rootVariables);
 
       if (splittingIndices.empty()) {
-        B2DEBUG(15, "This SpacePointTrackCand shows no curling behaviour");
+        B2DEBUG(15, "This SpacePointTrackCand shows no curling behaviour and will be added to collection: " << m_PARAMcurlingOutFirstName);
         spacePointTC->setTrackStubIndex(0); // set TrackStubIndex to 0 (indicates, that this TrackCandidate shows no curling behaviour)
+        // add this spacePoint to the StoreArray with the first outgoing parts since the whole TC is outgoing
+        SpacePointTrackCand* newSPTC = outgoingFirstTCs.appendNew(*spacePointTC);
+        newSPTC->addRelationTo(spacePointTC);
+        m_NoCurlingTCsCtr++;
       } else {
         B2DEBUG(15, "This SpacePointTrackCand shows curling behaviour");
         if (!m_PARAMsplitCurlers) {
@@ -309,7 +313,7 @@ void CurlingTrackCandSplitterModule::event()
 // =================================================== TERMINATE ========================================================
 void CurlingTrackCandSplitterModule::terminate()
 {
-  B2INFO("CurlingTrackCandSplitter::terminate(): checked " << m_spacePointTCCtr << " SpacePointTrackCands for curling behaviour. " << m_curlingTCCtr << " of them were curling and " << m_createdTrackStubsCtr << " TrackStubs were created. In " << m_noDecisionPossibleCtr << " cases no decision could be made. There were " << m_NoSingleTrueHitCtr << " SpacePoints that were related to more than one TrueHit");
+  B2INFO("CurlingTrackCandSplitter::terminate(): checked " << m_spacePointTCCtr << " SpacePointTrackCands for curling behaviour. " << m_curlingTCCtr << " of them were curling and " << m_createdTrackStubsCtr << " TrackStubs were created. " << m_NoCurlingTCsCtr << " SPTCs were not curling and were merely copied into StoreArray " << m_PARAMcurlingOutFirstName << ". In " << m_noDecisionPossibleCtr << " cases no decision could be made. There were " << m_NoSingleTrueHitCtr << " SpacePoints that were related to more than one TrueHit");
   // do ROOT file stuff
   if (m_treePtr != NULL) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
@@ -726,4 +730,5 @@ void CurlingTrackCandSplitterModule::initializeCounters()
   m_noDecisionPossibleCtr = 0;
   m_spacePointTCCtr = 0;
   m_NoSingleTrueHitCtr = 0;
+  m_NoCurlingTCsCtr = 0;
 }

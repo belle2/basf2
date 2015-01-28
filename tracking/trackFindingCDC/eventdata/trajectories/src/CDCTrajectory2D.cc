@@ -152,14 +152,9 @@ Vector2D CDCTrajectory2D::getOuterExit() const
 
 Vector2D CDCTrajectory2D::getExit() const
 {
-  const CDCWireTopology& topology = CDCWireTopology::getInstance();
-  const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
-  FloatType innerPolarR = innerMostLayer.getInnerPolarR();
-
   Vector2D outerExit = getOuterExit();
   const Vector2D innerExit = getInnerExit();
   return getGlobalCircle().chooseNextForwardOf(getLocalOrigin(), outerExit, innerExit);
-
 }
 
 

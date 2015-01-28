@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import basf2
 import logging
 
 from tracking.run.event_generation import ReadOrGenerateEventsRun
@@ -12,6 +13,7 @@ class CDCDisplayRun(ReadOrGenerateEventsRun):
 
     output_folder = '/tmp'
     iteractive = True
+    use_track_finder_mc = False
 
     def __init__(self):
         super(CDCDisplayRun, self).__init__()
@@ -40,6 +42,11 @@ class CDCDisplayRun(ReadOrGenerateEventsRun):
                                      help='Run in batch mode and do not show the each event.'
                                      )
 
+        argument_parser.add_argument('-m', '--mc-tracks', dest='use_track_finder_mc',
+                                     action='store_true',
+                                     help='Generate the mc tracks using the TrackFinderMCTruth.'
+                                     )
+
         subparser_description = \
             """
 Various options to configure what shall be drawn in the display.
@@ -47,15 +54,15 @@ Note that some options are only relevant, if the cellular automaton finder in th
 """
         draw_argument_group = \
             argument_parser.add_argument_group(title='Draw options',
-                description=subparser_description)
+                                               description=subparser_description)
 
         cdc_display_module = self.cdc_display_module
         for option in sorted(cdc_display_module.drawoptions):
             options_flag = '--%s ' % option.replace('_', '-')
 
             draw_argument_group.add_argument(options_flag, dest=option,
-                    action='store_true', default=getattr(cdc_display_module,
-                    option))
+                                             action='store_true', default=getattr(cdc_display_module,
+                                                                                  option))
 
         return argument_parser
 
@@ -78,6 +85,11 @@ Note that some options are only relevant, if the cellular automaton finder in th
 
     def create_path(self):
         path = super(CDCDisplayRun, self).create_path()
+
+        if self.use_track_finder_mc:
+            trackFinderMCModule = basf2.register_module("TrackFinderMCTruth")
+            path.add_module(trackFinderMCModule)
+
         path.add_module(self.cdc_display_module)
         return path
 

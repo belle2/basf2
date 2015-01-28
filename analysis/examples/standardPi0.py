@@ -22,7 +22,7 @@ inputMdst(inputMdstFileName)
 
 # fetch the standard photon (input for standard pi0 reconstruction)
 # the reconstructed photon Particles are collected in the gamma:all ParticleList
-stdPhoton()
+#stdPhoton()     already in the stdPi0()
 
 # make  standard pi0 reconstruction
 # the reconstructed pi0 Particles are collected in the pi0:all, pi0:loose, and pi0:good ParticleList

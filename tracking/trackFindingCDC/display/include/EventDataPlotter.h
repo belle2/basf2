@@ -102,22 +102,33 @@ namespace Belle2 {
     public:
       // Drawing methods for the variuous event data objects.
 
-
-      /// Draws the CDCSimHit as a momentum arrow starting at the track position with a length proportional to its momentum.
-      void draw(const Belle2::CDCSimHit& simHit, const AttributeMap& attributeMap);
+      /// Draws a circle at the position with the given radius
+      void draw(const Belle2::TrackFindingCDC::Circle2D& circle,
+                AttributeMap attributeMap = AttributeMap());
 
       /// Draws the CDCWire as a small circle at the reference position.
-      void draw(const Belle2::TrackFindingCDC::CDCWire& wire, const AttributeMap& attributeMap);
+      void draw(const Belle2::TrackFindingCDC::CDCWire& wire,
+                AttributeMap attributeMap = AttributeMap());
+
+      /// Draws the inner and the outer bound of the super layer.
+      void draw(const Belle2::TrackFindingCDC::CDCWireSuperLayer& wireSuperLayer,
+                AttributeMap attributeMap = AttributeMap());
+
+      /// Draws the CDCSimHit as a momentum arrow starting at the track position with a length proportional to its momentum.
+      void draw(const Belle2::CDCSimHit& simHit,
+                AttributeMap attributeMap = AttributeMap());
 
       /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
-      void draw(const Belle2::TrackFindingCDC::CDCWireHit& wireHit, const AttributeMap& attributeMap);
+      void draw(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
+                AttributeMap attributeMap);
 
       /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
-      void draw(const Belle2::CDCHit& cdcHit, const AttributeMap& attributeMap);
+      void draw(const Belle2::CDCHit& cdcHit,
+                AttributeMap attributeMap = AttributeMap());
 
       /// Draws a range iterable collection of drawable elements
       template<class Range>
-      void draw(const Range& range, const AttributeMap& attributeMap) {
+      void draw(const Range& range, AttributeMap attributeMap = AttributeMap()) {
         for (const auto & element : range) {
           draw(element, attributeMap);
         }

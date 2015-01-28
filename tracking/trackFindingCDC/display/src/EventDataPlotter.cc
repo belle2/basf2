@@ -161,8 +161,74 @@ void EventDataPlotter::setCanvasHeight(const float& height)
 
 }
 
+
+/// --------------------- Draw Circle2D ------------------------
+void EventDataPlotter::draw(const Circle2D& circle,
+                            AttributeMap attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  float radius = circle.radius();
+
+  AttributeMap defaultAttributeMap {
+    {"stroke", "black"},
+    {"stroke-width", std::to_string(radius)},
+  };
+
+  // Overwrite with the given values.
+  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
+  updateFillToStroke(attributeMap);
+
+  const Vector2D& pos = circle.center();
+
+  float x = pos.x();
+  float y = pos.y();
+
+  primitivePlotter.drawCircle(x, y, radius, attributeMap);
+}
+
+
+/// --------------------- Draw CDCWire ------------------------
+void EventDataPlotter::draw(const CDCWire& wire, AttributeMap attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const float wireRadius = 0.1;
+  const Vector2D& refPos = wire.getRefPos2D();
+
+  draw(Circle2D(refPos, wireRadius), attributeMap);
+}
+
+/// --------------------- Draw CDCWireSuperLayer ------------------------
+void EventDataPlotter::draw(const CDCWireSuperLayer& wireSuperLayer, AttributeMap attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  AttributeMap defaultAttributeMap {
+    {"stroke", "black"},
+    {"stroke-width", "0.2"},
+    {"fill", "none"},
+  };
+
+  // Add attributes if not present
+  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
+
+  float centerX = 0.0;
+  float centerY = 0.0;
+
+  float innerR = wireSuperLayer.getInnerPolarR();
+  primitivePlotter.drawCircle(centerX, centerY, innerR, attributeMap);
+
+  float outerR = wireSuperLayer.getOuterPolarR();
+  primitivePlotter.drawCircle(centerX, centerY, outerR, attributeMap);
+}
+
+
 /// --------------------- Draw CDCSimHit ------------------------
-void EventDataPlotter::draw(const CDCSimHit& simHit, const AttributeMap& attributeMap)
+void EventDataPlotter::draw(const CDCSimHit& simHit, AttributeMap attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
@@ -180,14 +246,14 @@ void EventDataPlotter::draw(const CDCSimHit& simHit, const AttributeMap& attribu
     primitivePlotter.startGroup();
   }
 
-  AttributeMap attributeMapWithDefaults {
+  AttributeMap defaultAttributeMap {
     {"stroke", "yellow"},
     { "stroke-width", "0.02"}
   };
 
-  // Overwrite with the given values.
-  attributeMapWithDefaults.insert(attributeMap.begin(), attributeMap.end());
-  updateFillToStroke(attributeMapWithDefaults);
+  // Add attributes if not present
+  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
+  updateFillToStroke(attributeMap);
 
   // Draw hit position as a small circle
   TVector3 position = simHit.getPosTrack();
@@ -195,7 +261,7 @@ void EventDataPlotter::draw(const CDCSimHit& simHit, const AttributeMap& attribu
   float y = position.Y();
   float radius = 0.015;
 
-  primitivePlotter.drawCircle(x, y, radius, attributeMapWithDefaults);
+  primitivePlotter.drawCircle(x, y, radius, attributeMap);
 
   // Draw momentum as an arrow proportional to the transverse component of the momentum
   const float momentumToArrowLength = 1.5;
@@ -204,43 +270,14 @@ void EventDataPlotter::draw(const CDCSimHit& simHit, const AttributeMap& attribu
   float endX = x + momentum.X() * momentumToArrowLength;
   float endY = y + momentum.Y() * momentumToArrowLength;
 
-  primitivePlotter.drawArrow(x, y, endX, endY, attributeMapWithDefaults);
+  primitivePlotter.drawArrow(x, y, endX, endY, attributeMap);
 
   primitivePlotter.endGroup();
 
 }
 
-
-/// --------------------- Draw CDCWire ------------------------
-void EventDataPlotter::draw(const CDCWire& wire, const AttributeMap& attributeMap)
-{
-  if (not m_ptrPrimitivePlotter) return;
-  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
-
-  const float wireRadius = 0.1;
-
-  AttributeMap attributeMapWithDefaults {
-    {"stroke", "black"},
-    { "stroke-width", std::to_string(wireRadius)},
-  };
-
-  // Overwrite with the given values.
-  attributeMapWithDefaults.insert(attributeMap.begin(), attributeMap.end());
-  updateFillToStroke(attributeMapWithDefaults);
-
-  const Vector2D& refPos = wire.getRefPos2D();
-
-  float x = refPos.x();
-  float y = refPos.y();
-  float radius = wireRadius;
-
-  primitivePlotter.drawCircle(x, y, radius, attributeMapWithDefaults);
-
-}
-
-
 /// --------------------- Draw CDCWireHit ------------------------
-void EventDataPlotter::draw(const CDCWireHit& wireHit, const AttributeMap& attributeMap)
+void EventDataPlotter::draw(const CDCWireHit& wireHit, AttributeMap attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
@@ -269,14 +306,14 @@ void EventDataPlotter::draw(const CDCWireHit& wireHit, const AttributeMap& attri
   const CDCWire& wire = wireHit.getWire();
   draw(wire, attributeMap);
 
-  AttributeMap attributeMapWithDefaults {
+  AttributeMap defaultAttributeMap {
     {"stroke", "black"},
-    { "stroke-width", "0.02"},
-    { "fill", "none"}
+    {"stroke-width", "0.02"},
+    {"fill", "none"}
   };
 
-  // Overwrite with the given values.
-  attributeMapWithDefaults.insert(attributeMap.begin(), attributeMap.end());
+  // Add attributes if not present
+  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
 
   const Vector2D& refPos = wireHit.getRefPos2D();
 
@@ -290,7 +327,7 @@ void EventDataPlotter::draw(const CDCWireHit& wireHit, const AttributeMap& attri
 
 
 /// --------------------- Draw CDCHit ------------------------
-void EventDataPlotter::draw(const CDCHit& hit, const AttributeMap& attributeMap)
+void EventDataPlotter::draw(const CDCHit& hit, AttributeMap attributeMap)
 {
   CDCWireHit wireHit(&hit);
   draw(wireHit, attributeMap);

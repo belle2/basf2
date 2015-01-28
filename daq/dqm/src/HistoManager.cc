@@ -46,8 +46,8 @@ bool HistoManager::add(string& subdir, string& name, int pid, TH1* histo)
   map<int, TH1*>& hlist = dirlist[name];
   if (hlist.find(pid) == hlist.end()) {
     hlist[pid] = histo;
-    printf("HistoManager: histogram %s from %d registered in %s\n",
-           histo->GetName(), pid, subdir.c_str());
+    //    printf("HistoManager: histogram %s from %d registered in %s\n",
+    //           histo->GetName(), pid, subdir.c_str());
     //    histo->Print();
     return true;
   }

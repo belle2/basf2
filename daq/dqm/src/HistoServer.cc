@@ -47,6 +47,7 @@ int HistoServer::server()
   char* buffer = new char[MAXBUFSIZE];
   //  vector<int> recvsock;
   int loop_counter = 0;
+  bool updated = false;
   while (m_force_exit == 0) {
     int exam_stat = m_man->examine();
     if (exam_stat == 0) {
@@ -65,7 +66,8 @@ int HistoServer::server()
             m_man->remove(fd);
             break;
           }
-          //    printf ( "EvtMessage received : size = %d\n", is );
+          updated = true;
+          //    printf ( "EvtMessage received : size = %d from fd=%d\n", is, fd );
 
           EvtMessage* hmsg = new EvtMessage(buffer);
           vector<TObject*> objlist;
@@ -82,9 +84,10 @@ int HistoServer::server()
             string objname = strlist.at(i);
             int lpos = objname.find_first_not_of("SUBDIR:", 0);
             if (lpos != 0) {
+              //              subdir = objname.substr(lpos-1);
               subdir = objname.substr(lpos);
               if (subdir == "EXIT") subdir = "";
-              //        printf ( "HistoServer : subdirectory set to %s\n", subdir.c_str() );
+              //        printf ( "HistoServer : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str() );
             } else {
               m_hman->update(subdir, strlist.at(i), fd, (TH1*)objlist.at(i));
             }
@@ -94,11 +97,12 @@ int HistoServer::server()
     }
     usleep(1000);
     loop_counter++;
-    if (loop_counter % MERGE_INTERVAL == 0) {
-      //      printf("HistoServer: merging histograms\n");
+    if (loop_counter % MERGE_INTERVAL == 0 && updated) {
+      printf("HistoServer: merging histograms\n");
       //      m_mapfile->AcquireSemaphore();
       m_hman->merge();
       //      m_mapfile->ReleaseSemaphore();
+      updated = false;
     }
   }
   return 0;

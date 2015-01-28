@@ -33,6 +33,7 @@
 #include <ecl/dataobjects/ECLHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
@@ -40,6 +41,9 @@
 
 // Root
 #include <TRandom3.h>
+
+//std::find
+#include <algorithm>
 
 using namespace std;
 
@@ -91,6 +95,9 @@ namespace Belle2 {
     addParam("maxTimePXD", m_maxTimePXD,
              "Time window upper edge for PXD in nano seconds", 10000.0);
 
+    addParam("beambackhits", m_BeamBackHits,
+             "If true also add the BeamBackHits collection for the selected "
+             "subdetectors to the output file", false);
   }
 
   BeamBkgMixerModule::~BeamBkgMixerModule()
@@ -247,6 +254,9 @@ namespace Belle2 {
       if (m_EKLM and bkg.tree->GetBranch("EKLMSimHits"))
         bkg.tree->SetBranchAddress("EKLMSimHits", &bkg.simHits.EKLM);
 
+      if (m_BeamBackHits and bkg.tree->GetBranch("BeamBackHits"))
+        bkg.tree->SetBranchAddress("BeamBackHits", &bkg.simHits.BeamBackHits);
+
       // print INFO
       std::string unit(" ns");
       double realTime = bkg.realTime;
@@ -272,6 +282,7 @@ namespace Belle2 {
     StoreArray<ECLHit>::optional();
     StoreArray<BKLMSimHit>::optional();
     StoreArray<EKLMSimHit>::optional();
+    StoreArray<BeamBackHit>::optional();
 
   }
 
@@ -289,6 +300,7 @@ namespace Belle2 {
     StoreArray<ECLHit> eclHits;
     StoreArray<BKLMSimHit> bklmSimHits;
     StoreArray<EKLMSimHit> eklmSimHits;
+    StoreArray<BeamBackHit> beamBackHits;
 
     if (m_PXD && !pxdSimHits.isValid()) pxdSimHits.create();
     if (m_SVD && !svdSimHits.isValid()) svdSimHits.create();
@@ -298,6 +310,7 @@ namespace Belle2 {
     if (m_ECL && !eclHits.isValid()) eclHits.create();
     if (m_BKLM && !bklmSimHits.isValid()) bklmSimHits.create();
     if (m_EKLM && !eklmSimHits.isValid()) eklmSimHits.create();
+    if (m_BeamBackHits && !beamBackHits.isValid()) beamBackHits.create();
 
 
     for (auto & bkg : m_backgrounds) {
@@ -319,6 +332,7 @@ namespace Belle2 {
         addSimHits(eclHits, bkg.simHits.ECL, timeShift, m_minTime, m_maxTime);
         addSimHits(bklmSimHits, bkg.simHits.BKLM, timeShift, m_minTime, m_maxTime);
         addSimHits(eklmSimHits, bkg.simHits.EKLM, timeShift, m_minTime, m_maxTime);
+        addBeamBackHits(beamBackHits, bkg.simHits.BeamBackHits, timeShift, m_minTime, m_maxTime);
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {
@@ -411,13 +425,10 @@ namespace Belle2 {
                                                const std::string& component)
   {
     if (m_components.empty()) return true;
-
-    for (unsigned i = 0; i < components.size(); ++i) {
-      if (components[i] == component) {
-        components.erase(components.begin() + i);
-        --i;
-        return true;
-      }
+    auto iterator = std::find(components.begin(), components.end(), component);
+    if (iterator != components.end()) {
+      components.erase(iterator);
+      return true;
     }
     return false;
   }

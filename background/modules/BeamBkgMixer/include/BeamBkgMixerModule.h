@@ -85,12 +85,14 @@ namespace Belle2 {
       TClonesArray* ECL; /**< ECL SimHits from collision file */
       TClonesArray* BKLM; /**< BKLM SimHits from collision file */
       TClonesArray* EKLM; /**< EKLM SimHits from collision file */
+      TClonesArray* BeamBackHits; /**< BeamBackHits from collision file */
 
       /**
        * default constructor
        */
       BkgHits():
-        PXD(0), SVD(0), CDC(0), TOP(0), ARICH(0), ECL(0), BKLM(0), EKLM(0)
+        PXD(0), SVD(0), CDC(0), TOP(0), ARICH(0), ECL(0), BKLM(0), EKLM(0),
+        BeamBackHits(0)
       {}
     };
 
@@ -176,6 +178,35 @@ namespace Belle2 {
 
     }
 
+    template<class HIT>
+    void addBeamBackHits(StoreArray<HIT>& hits, TClonesArray* cloneArray,
+                         double timeShift, double minTime, double maxTime) {
+      //Match SubDet id from BeamBackHits to whether we keep it or not
+      bool keep[] = {false, m_PXD, m_SVD, m_CDC, m_ARICH, m_TOP, m_ECL, m_EKLM, m_BKLM};
+      if (!cloneArray) return;
+      if (!hits.isValid()) return;
+      // this is basically a copy of addSimHits but we only add the
+      // BeamBackHits from the specified sub detectors so we have to check
+      // each if it is from one of the enabled subdetectors
+      int numEntries = cloneArray->GetEntriesFast();
+      for (int i = 0; i < numEntries; i++) {
+        HIT* bkgHit =  static_cast<HIT*>(cloneArray->AddrAt(i));
+        //Only keep selected
+        if (!keep[bkgHit->getSubDet()]) continue;
+        HIT* hit = hits.appendNew(*bkgHit);
+        hit->shiftInTime(timeShift);
+        //TODO: BeamBackHits does not have a setBackgroundTag so we do not
+        //check or set it
+        if (m_wrapAround) {
+          double time = hit->getTime();
+          if (time > maxTime) {
+            double windowSize = maxTime - minTime;
+            double shift = int((time - minTime) / windowSize) * windowSize;
+            hit->shiftInTime(-shift);
+          }
+        }
+      }
+    }
 
     /**
      * Returns true if a component is found in components or the list is empty.
@@ -223,6 +254,7 @@ namespace Belle2 {
     bool m_ECL; /**< true if found in m_components */
     bool m_BKLM; /**< true if found in m_components */
     bool m_EKLM; /**< true if found in m_components */
+    bool m_BeamBackHits; /**<  if true add also background hits */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */
 

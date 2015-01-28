@@ -174,6 +174,9 @@ namespace Belle2 {
     //! set the neutron weight
     void setNeutronWeight(double w) {m_neutronWeight = w;}
 
+    /** shift in time for beambkgmixer */
+    void shiftInTime(double time) { m_t += time; }
+
   private:
     int m_subDet;               /**< The name of the subdetector */
     int m_identifier;           /**< The identifier of subdetector component */

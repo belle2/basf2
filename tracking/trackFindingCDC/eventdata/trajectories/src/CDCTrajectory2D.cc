@@ -110,14 +110,22 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine, con
 
 Vector2D CDCTrajectory2D::getInnerExit() const
 {
-
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
-
   FloatType innerPolarR = innerMostLayer.getInnerPolarR();
 
-  return getGlobalCircle().samePolarRForwardOf(getLocalOrigin(), innerPolarR);
+  const Vector2D support = getSupport();
+  const GeneralizedCircle globalCircle = getGlobalCircle();
+  if (support.polarR() < innerPolarR) {
+    // If we start inside of the volume of the CDC we want the trajectory to enter the CDC
+    // and not stop at first intersection with the inner wall.
+    // Therefore we take the inner exit that comes after the apogee (far point of the circle).
+    const Vector2D apogee = globalCircle.apogee();
+    return globalCircle.samePolarRForwardOf(apogee, innerPolarR);
 
+  } else {
+    return globalCircle.samePolarRForwardOf(support, innerPolarR);
+  }
 }
 
 Vector2D CDCTrajectory2D::getOuterExit() const
@@ -128,15 +136,28 @@ Vector2D CDCTrajectory2D::getOuterExit() const
 
   FloatType outerPolarR = outerMostLayer.getOuterPolarR();
 
-  return getGlobalCircle().samePolarRForwardOf(getLocalOrigin(), outerPolarR);
+  const Vector2D support = getSupport();
+  const GeneralizedCircle globalCircle = getGlobalCircle();
+  if (support.polarR() > outerPolarR) {
+    // If we start outside of the volume of the CDC we want the trajectory to enter the CDC
+    // and not stop at first intersection with the outer wall.
+    // Therefore we take the outer exit that comes after the perigee.
+    const Vector2D perigee = globalCircle.perigee();
+    return globalCircle.samePolarRForwardOf(perigee, outerPolarR);
 
+  } else {
+    return getGlobalCircle().samePolarRForwardOf(support, outerPolarR);
+  }
 }
 
 Vector2D CDCTrajectory2D::getExit() const
 {
-  Vector2D outerExit = getOuterExit();
-  Vector2D innerExit = getInnerExit();
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
+  FloatType innerPolarR = innerMostLayer.getInnerPolarR();
 
+  Vector2D outerExit = getOuterExit();
+  const Vector2D innerExit = getInnerExit();
   return getGlobalCircle().chooseNextForwardOf(getLocalOrigin(), outerExit, innerExit);
 
 }

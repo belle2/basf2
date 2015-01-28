@@ -70,6 +70,9 @@ namespace Belle2 {
       /// Getter for the current bounding box
       BoundingBox getBoundingBox() const;
 
+      /// Setter for the bounding box of all drawed objects.
+      void setBoundingBox(const BoundingBox& boundingBox);
+
       /// Getter for the canvas width in pixels.
       float getCanvasWidth() const;
 
@@ -101,16 +104,16 @@ namespace Belle2 {
 
 
       /// Draws the CDCSimHit as a momentum arrow starting at the track position with a length proportional to its momentum.
-      void draw(const CDCSimHit& simHit, const AttributeMap& attributeMap);
+      void draw(const Belle2::CDCSimHit& simHit, const AttributeMap& attributeMap);
 
       /// Draws the CDCWire as a small circle at the reference position.
-      void draw(const CDCWire& wire, const AttributeMap& attributeMap);
+      void draw(const Belle2::TrackFindingCDC::CDCWire& wire, const AttributeMap& attributeMap);
 
       /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
-      void draw(const CDCWireHit& wireHit, const AttributeMap& attributeMap);
+      void draw(const Belle2::TrackFindingCDC::CDCWireHit& wireHit, const AttributeMap& attributeMap);
 
       /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
-      void draw(const CDCHit& cdcHit, const AttributeMap& attributeMap);
+      void draw(const Belle2::CDCHit& cdcHit, const AttributeMap& attributeMap);
 
       /// Draws a range iterable collection of drawable elements
       template<class Range>

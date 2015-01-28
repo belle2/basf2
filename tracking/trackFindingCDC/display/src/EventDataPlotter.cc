@@ -109,9 +109,19 @@ BoundingBox EventDataPlotter::getBoundingBox() const
     PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
     return primitivePlotter.getBoundingBox();
   } else {
-    return BoundingBox(NAN, NAN, NAN, NAN);
+    return BoundingBox(0, 0, 0, 0);
   }
 }
+
+
+void EventDataPlotter::setBoundingBox(const BoundingBox& boundingBox)
+{
+  if (m_ptrPrimitivePlotter) {
+    PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+    return primitivePlotter.setBoundingBox(boundingBox);
+  }
+}
+
 
 float EventDataPlotter::getCanvasWidth() const
 {

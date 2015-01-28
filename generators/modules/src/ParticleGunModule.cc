@@ -52,6 +52,7 @@ ParticleGunModule::ParticleGunModule() : Module()
     "- discrete:    Discrete Spectrum given as a list of weights and values:\n"
     "               [weight1, value1, weight2, value2, ...]\n"
     "               (useful for radiactive sources)\n"
+    "- discretePt:  same as above but for transverse momentum\n"
   );
   setPropertyFlags(c_Input);
 
@@ -140,15 +141,6 @@ ParticleGun::EDistribution ParticleGunModule::convertDistribution(std::string na
   if (name == "polyline")       return ParticleGun::c_polylineDistribution;
   if (name == "polylinept")     return ParticleGun::c_polylinePtDistribution;
   if (name == "polylinecos")    return ParticleGun::c_polylineCosDistribution;
-  //TODO: backwards compatibility
-  if (name == "uniformcosinus") {
-    B2WARNING("Name for uniform cos() distribution changed to 'uniformCos'");
-    return ParticleGun::c_uniformCosDistribution;
-  }
-  if (name == "discretespectrum") {
-    B2WARNING("Name for discrete spectrum distribution changed to 'discrete'");
-    return ParticleGun::c_discreteSpectrum;
-  }
   B2ERROR("Unknown distribution '" << name << "', using fixed");
   return ParticleGun::c_fixedValue;
 }

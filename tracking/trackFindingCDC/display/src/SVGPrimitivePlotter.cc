@@ -25,19 +25,27 @@ int SVGPrimitivePlotter::s_addtionalNIndentationSpaces = 2;
 SVGPrimitivePlotter::SVGPrimitivePlotter() :
   PrimitivePlotter(),
   m_svgContentStream(),
-  m_nIndentationSpaces(s_defaultNIndentationSpaces)
+  m_nIndentationSpaces(s_defaultNIndentationSpaces),
+  m_svgAttributes()
+{
+}
+
+SVGPrimitivePlotter::SVGPrimitivePlotter(const AttributeMap& svgAttributes) :
+  PrimitivePlotter(),
+  m_svgContentStream(),
+  m_nIndentationSpaces(s_defaultNIndentationSpaces),
+  m_svgAttributes(svgAttributes)
 {
 }
 
 SVGPrimitivePlotter::SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter) :
   PrimitivePlotter(plotter),
   m_svgContentStream(),
-  m_nIndentationSpaces(plotter.m_nIndentationSpaces)
+  m_nIndentationSpaces(plotter.m_nIndentationSpaces),
+  m_svgAttributes(plotter.m_svgAttributes)
 {
   m_svgContentStream << plotter.m_svgContentStream.rdbuf();
 }
-
-
 
 SVGPrimitivePlotter::~SVGPrimitivePlotter()
 {
@@ -210,8 +218,10 @@ const std::string SVGPrimitivePlotter::save(const std::string& fileName)
   AttributeMap variableAttributeMap {
     {"height", std::to_string(getCanvasHeight())},
     {"width", std::to_string(getCanvasWidth())},
-    {"viewBox", viewBoxStringStream.str()}
+    {"viewBox", viewBoxStringStream.str()},
   };
+
+  variableAttributeMap.insert(m_svgAttributes.begin(), m_svgAttributes.end());
 
   writeOpeningTag(outputFileStream, "svg", standardAttributeMap, variableAttributeMap);
 

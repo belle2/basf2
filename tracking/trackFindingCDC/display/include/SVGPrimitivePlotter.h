@@ -29,6 +29,10 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       SVGPrimitivePlotter();
 
+      /// Constructor taking additional attributes that go into the toplevel svg tag.
+      /** @param svgAttributes    A map of attributes that goes into the toplevel svg tag. */
+      SVGPrimitivePlotter(const AttributeMap& svgAttributes);
+
       /// Copy constructor
       SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter);
 
@@ -227,6 +231,9 @@ namespace Belle2 {
 
       /// Memory for the number of spaces that shall be prepended to each line.
       int m_nIndentationSpaces;
+
+      /// Memory for additional attributes to the toplevel svg element.
+      AttributeMap m_svgAttributes;
 
     }; //class
 

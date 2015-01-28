@@ -155,14 +155,14 @@ void He3DigitizerModule::event()
 
   }
 
-  /*
-  for(int i=0; i<8; i++){
-    if(edepDet[i]!=0){
-      He3tubeHit *a = He3Hits.appendNew(He3tubeHit(edepDet[i], i, peak[i], lowTime[i]));                         //create He3tubeHit
-      if(peak[i]>0.09) B2INFO(edepDet[i]<<" deposited in tube #"<<i<<" with waveform peak of "<<peak[i]);        //if peak is likely from a neutron hit, print to console
+
+  for (int i = 0; i < 8; i++) {
+    if (edepDet[i] != 0) {
+      He3tubeHit* a = He3Hits.appendNew(He3tubeHit(edepDet[i], i, peak[i], lowTime[i]));                         //create He3tubeHit
+      if (peak[i] > 0.09) B2INFO(edepDet[i] << " deposited in tube #" << i << " with waveform peak of " << peak[i]); //if peak is likely from a neutron hit, print to console
     }
   }
-  */
+
 
   //reset arrays
   for (int j = 0; j < 8; j++) {

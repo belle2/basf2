@@ -62,6 +62,16 @@ namespace Belle2 {
 
     void Ph1bpipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+      G4String symbol;
+      G4double a, z;
+      G4double density;
+      G4int ncomponents;
+      G4Element* eN  = new G4Element("Nitrogen",  symbol = "N"  , z =  7., a = 14.00672 * g / mole);
+      G4Element* eTi = new G4Element("Titanium", z = 22., a = 47.8670 * CLHEP::g / CLHEP::mole);
+      G4Material* matTiN = new G4Material("TiN", density = 5.22 * CLHEP::g / CLHEP::cm3, ncomponents = 2);
+      matTiN->AddElement(eN, 0.226376);
+      matTiN->AddElement(eTi, 0.773624);
+
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
@@ -208,6 +218,12 @@ namespace Belle2 {
                                        content.getLength("xpipe_outerRadius")*CLHEP::cm,
                                        content.getLength("xpipe_hz")*CLHEP::cm,
                                        startAngle, spanningAngle);
+      double innerRadiusTiN = content.getLength("xpipe_innerRadius") / 2.*CLHEP::cm - 200 * 1e-7 / 2.*CLHEP::cm;
+      G4VSolid* s_Xshape1TiN = new G4Tubs("s_Xshape1TiN",
+                                          innerRadiusTiN,
+                                          content.getLength("xpipe_innerRadius")*CLHEP::cm,
+                                          content.getLength("xpipe_hz")*CLHEP::cm,
+                                          startAngle, spanningAngle);
       G4VSolid* s_Xshape2 = new G4Tubs("s_Xshape2",
                                        content.getLength("xpipe_innerRadius")*CLHEP::cm,
                                        content.getLength("xpipe_outerRadius")*CLHEP::cm,
@@ -223,11 +239,23 @@ namespace Belle2 {
                                          content.getLength("xpipe_outerRadius")*CLHEP::cm,
                                          content.getLength("xpipeMIN_hz")*CLHEP::cm,
                                          startAngle, spanningAngle);
+      G4VSolid* s_XshapePOSTiN = new G4Tubs("s_XshapePOSclTiN",
+                                            innerRadiusTiN,
+                                            content.getLength("xpipe_innerRadius")*CLHEP::cm,
+                                            content.getLength("xpipePOS_hz")*CLHEP::cm,
+                                            startAngle, spanningAngle);
+      G4VSolid* s_XshapeMINTiN = new G4Tubs("s_XshapeMINclTiN",
+                                            innerRadiusTiN,
+                                            content.getLength("xpipe_innerRadius")*CLHEP::cm,
+                                            content.getLength("xpipeMIN_hz")*CLHEP::cm,
+                                            startAngle, spanningAngle);
 
       G4double POStubpos =  content.getLength("xpipe_hz") / 2.*CLHEP::cm + content.getLength("xpipePOS_hz") / 2.*CLHEP::cm;
       G4double MINtubpos = -content.getLength("xpipe_hz") / 2.*CLHEP::cm - content.getLength("xpipeMIN_hz") / 2.*CLHEP::cm;
       s_Xshape1 = new G4UnionSolid("s_Xshape1+s_XshapePOS", s_Xshape1, s_XshapePOS, G4Translate3D(0., 0., POStubpos));
       s_Xshape1 = new G4UnionSolid("s_Xshape1+s_XshapeMIN", s_Xshape1, s_XshapeMIN, G4Translate3D(0., 0., MINtubpos));
+      s_Xshape1TiN = new G4UnionSolid("s_Xshape1TiN+s_XshapePOSTiN", s_Xshape1TiN, s_XshapePOSTiN, G4Translate3D(0., 0., POStubpos));
+      s_Xshape1TiN = new G4UnionSolid("s_Xshape1TiN+s_XshapeMINTiN", s_Xshape1TiN, s_XshapeMINTiN, G4Translate3D(0., 0., MINtubpos));
 
       s_Xshape2 = new G4UnionSolid("s_Xshape2+s_XshapePOS", s_Xshape2, s_XshapePOS, G4Translate3D(0., 0., POStubpos));
       s_Xshape2 = new G4UnionSolid("s_Xshape2+s_XshapeMIN", s_Xshape2, s_XshapeMIN, G4Translate3D(0., 0., MINtubpos));
@@ -258,10 +286,13 @@ namespace Belle2 {
 
       //G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, m_sensitive);
       G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, 0);
+      G4LogicalVolume* l_TiN = new G4LogicalVolume(s_Xshape1TiN, matTiN, "l_TiN", 0, 0);
 
       transform_X = G4Translate3D(0, 0, 0);
       transform_X = transform_X * G4RotateY3D(-0.083 / 2. * CLHEP::rad);
       new G4PVPlacement(transform_X, l_X, "p_X", &topVolume, false, 1);
+      transform_X = transform_X * G4RotateY3D(0.083 * CLHEP::rad);
+      new G4PVPlacement(transform_X, l_TiN, "p_TiN", &topVolume, false, 1);
 
     }
   } // ph1bpipe namespace

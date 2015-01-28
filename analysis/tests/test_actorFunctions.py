@@ -7,6 +7,8 @@ from FEI import Particle
 from basf2 import *
 import unittest
 import os
+import tempfile
+import shutil
 
 # @cond internal_test
 
@@ -359,6 +361,11 @@ class TestSignalProbability(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    tempdir = tempfile.mkdtemp()
+    os.chdir(tempdir)
+
     unittest.main()
+
+    shutil.rmtree(tempdir)
 
 # @endcond

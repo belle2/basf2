@@ -22,24 +22,17 @@ using namespace TrackFindingCDC;
 int SVGPrimitivePlotter::s_defaultNIndentationSpaces = 2;
 int SVGPrimitivePlotter::s_addtionalNIndentationSpaces = 2;
 
-float SVGPrimitivePlotter::s_defaultCanvasWidth = 1120.0;
-float SVGPrimitivePlotter::s_defaultCanvasHeight = 1120.0;
-
 SVGPrimitivePlotter::SVGPrimitivePlotter() :
   PrimitivePlotter(),
   m_svgContentStream(),
-  m_nIndentationSpaces(s_defaultNIndentationSpaces),
-  m_canvasWidth(s_defaultCanvasWidth),
-  m_canvasHeight(s_defaultCanvasHeight)
+  m_nIndentationSpaces(s_defaultNIndentationSpaces)
 {
 }
 
 SVGPrimitivePlotter::SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter) :
   PrimitivePlotter(plotter),
   m_svgContentStream(),
-  m_nIndentationSpaces(plotter.m_nIndentationSpaces),
-  m_canvasWidth(plotter.m_canvasWidth),
-  m_canvasHeight(plotter.m_canvasHeight)
+  m_nIndentationSpaces(plotter.m_nIndentationSpaces)
 {
   m_svgContentStream << plotter.m_svgContentStream.rdbuf();
 }
@@ -51,7 +44,7 @@ SVGPrimitivePlotter::~SVGPrimitivePlotter()
 }
 
 
-SVGPrimitivePlotter* SVGPrimitivePlotter::clone()
+SVGPrimitivePlotter* SVGPrimitivePlotter::clone() const
 {
   SVGPrimitivePlotter* cloned = new SVGPrimitivePlotter(*this);
   return cloned;

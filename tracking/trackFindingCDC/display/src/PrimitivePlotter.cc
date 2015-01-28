@@ -14,8 +14,13 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+float PrimitivePlotter::s_defaultCanvasWidth = 1120.0;
+float PrimitivePlotter::s_defaultCanvasHeight = 1120.0;
 
-PrimitivePlotter::PrimitivePlotter() : m_boundingBox()
+PrimitivePlotter::PrimitivePlotter() :
+  m_boundingBox(),
+  m_canvasWidth(s_defaultCanvasWidth),
+  m_canvasHeight(s_defaultCanvasHeight)
 {
 }
 
@@ -25,7 +30,7 @@ PrimitivePlotter::~PrimitivePlotter()
 }
 
 
-PrimitivePlotter* PrimitivePlotter::clone()
+PrimitivePlotter* PrimitivePlotter::clone() const
 {
   PrimitivePlotter* cloned = new PrimitivePlotter(*this);
   return cloned;

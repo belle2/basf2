@@ -21,14 +21,23 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A two dimensional rectangle that keeps track of the extend of a drawing
+    /// A base class for plots of primitive objects.
     class PrimitivePlotter {
 
     public:
       /// A map type for attributes names to values for additional drawing information
       typedef std::map<std::string, std::string> AttributeMap;
 
-      /// Default constructor for ROOT compatibility. Cell weight defaults to 1
+    public:
+      /// The default width of the canvas to be plotted into
+      static float s_defaultCanvasWidth;
+
+      /// The default height of the canvas to be plotted into
+      static float s_defaultCanvasHeight;
+
+    public:
+
+      /// Default constructor for ROOT compatibility.
       PrimitivePlotter();
 
       /// Make destructor virtual to handle polymorphic deconstruction.
@@ -38,7 +47,7 @@ namespace Belle2 {
       /// Returns a newly created plotter instance containing all information of this.
       /** The new object is created on the heap. The ownership is to the caller who has the responsibility to destroy it.
        */
-      virtual PrimitivePlotter* clone();
+      virtual PrimitivePlotter* clone() const;
 
     public:
       /** Adds a line to the plot
@@ -124,11 +133,11 @@ namespace Belle2 {
        */
       virtual void endGroup();
 
-      /** Saves the current plot stead to a file.
+      /** Saves the current plot state to a file.
        *
        *  Deriving instances may should implement the approriate thing here and
        *  may return a modified string indicating the file name to which the plot as been written.
-       *  It is allows to append or change the file extension if the concret implementation decides to do so.
+       *  It is allowed to append or change the file extension if the concret implementation decides to do so.
        *
        *  @param fileName       fileName where the plot shall be saved
        *  @return               Potentially modifed file name where the file has actually been written to.
@@ -148,9 +157,38 @@ namespace Belle2 {
       const BoundingBox& getBoundingBox() const
       { return m_boundingBox; }
 
+    public:
+      /// Getter for the canvas width in pixels.
+      const float& getCanvasWidth()
+      { return m_canvasWidth; }
+
+      /// Getter for the canvas height in pixels.
+      const float& getCanvasHeight()
+      { return m_canvasHeight; }
+
+      /** Setter for the canvas width in pixels.
+       *  The canvas height denotes the size of the image being produced.
+       *  The coordinates space that is visible in the picture is a seperate concept
+       *  which is stored in the bounding box (getBoundingBox()). */
+      void setCanvasWidth(const float& width)
+      { m_canvasWidth = width; }
+
+      /** Setter for the canvas height in pixels
+       *  The canvas height denotes the size of the image being produced.
+       *  The coordinates space that is visible in the picture is a seperate concept
+       *  which is stored in the bounding box (getBoundingBox()). */
+      void setCanvasHeight(const float& height)
+      { m_canvasHeight = height; }
+
     private:
       /// Bounding box of the currently drawn objects.
       BoundingBox m_boundingBox;
+
+      /// Memory for the width of the SVG drawing in pixels
+      float m_canvasWidth;
+
+      /// Memory for the height of the SVG drawing in pixels
+      float m_canvasHeight;
 
     }; //class
 

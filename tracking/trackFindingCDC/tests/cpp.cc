@@ -13,8 +13,12 @@ This file contains test to check the behaviour of the c++ programming language.
 Its purpose is mainly to asure the programmer that his assumptions about run time behaviour are correct.
 */
 
+
 #include <cmath>
 #include <gtest/gtest.h>
+
+#include <map>
+
 
 using namespace std;
 
@@ -29,6 +33,8 @@ TEST(TrackFindingCDCTest, cpp_float)
 TEST(TrackFindingCDCTest, cpp_max)
 {
   float value = 1.0;
+
+  // If the values are incomparable the first one is always returned.
   double maximum = std::max(NAN, value);
   EXPECT_TRUE(std::isnan(maximum));
 
@@ -57,5 +63,22 @@ TEST(TrackFindingCDCTest, cpp_stringstream_copy)
 
   EXPECT_EQ(filled.str(), copy1.str());
   EXPECT_EQ(filled.str(), copy2.str());
+
+}
+
+
+TEST(TrackFindingCDCTest, cpp_map_insert)
+{
+  std::map<int, int> defaults {{ 1, 1}, {2, 2}};
+
+  std::map<int, int> concret {{ 1, 10}};
+
+  concret.insert(defaults.begin(), defaults.end());
+
+  // Does not overwrite a value that was present before.
+  EXPECT_EQ(10, concret[1]);
+
+  // Inserts new value.
+  EXPECT_EQ(2, concret[2]);
 
 }

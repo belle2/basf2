@@ -54,7 +54,7 @@ namespace Belle2 {
         BkgSensitiveDetector* sensitive = new BkgSensitiveDetector(m_subdetector.c_str(), id);
         volume->SetSensitiveDetector(sensitive);
         //and place it at the correct position
-        G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r * CLHEP::cm, z * CLHEP::cm) * G4RotateX3D(-M_PI / 2 - theta);
+        G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r * CLHEP::cm, z * CLHEP::cm) * G4RotateX3D(-M_PI / 2 - theta);
         new G4PVPlacement(transform, volume, name, top, false, 1);
       }
     }

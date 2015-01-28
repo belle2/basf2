@@ -2,16 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import math
-import xml.dom.minidom
 
-import converter
-import primitives
+from ROOT import gSystem
+gSystem.Load('libtracking_trackFindingCDC')
+
+from ROOT import Belle2  # make Belle2 namespace available
 
 
 class CDCSVGPlotter:
 
     """
     Helper class to generated the svg image from the various tracking objects.
+    This is a tiny wrapper around the TrackFindingCDC.EventDataPlotter.
     """
 
     def __init__(self, animate=False):
@@ -19,102 +21,144 @@ class CDCSVGPlotter:
         Constructor methode.
         @param animate switch indicating if an animated SVG should be generated
         """
+        top = -112
+        left = -112
+        right = 112
+        bottom = 112
 
-        default_bound = primitives.Bound(top=-112, left=-112, right=112,
-                bottom=112)
+        default_bound = Belle2.TrackFindingCDC.BoundingBox(left, bottom, right, top)
         default_width = 1120
         default_height = 1120
-        default_viewbox = default_bound.viewbox
 
-        ## Switch to indicating if an animated SVG should be generated
+        # Switch to indicating if an animated SVG should be generated
         self.animate = animate
+        self.eventdata_plotter = Belle2.TrackFindingCDC.EventDataPlotter(self.animate)
 
-        # Create the xml.dom.minidom document object set up with the right headers
-        # The viewbox is set to a default value and is to be updated later
-        document = primitives.createSVGDocument(default_width, default_height,
-                default_viewbox)
-
-        ## xml.dom.minidom.Document which holds the linked representation of all svg elements to be written to file
-        self.document = document
-
-        # Create helper object to convert the various dataobjects to svg
-        # primitive element objects
-        # The document serves as a factory for the xml.dom.minidom elements
-
-        ## Helper object to translate the various tracking objects to xml.dom.minidom objects
-        self.converter = converter.CDCDataobjectsConverter(document,
-                animate=animate)
-
-        defsFactory = primitives.SVGDefsFactory(document)
-        defs = [defsFactory.createEndArrow('markerEndArrow')]
-        defsElement = defsFactory.createDefs(*defs)
-
-        self.document.documentElement.appendChild(defsElement)
+        self.eventdata_plotter.setBoundingBox(default_bound)
+        self.eventdata_plotter.setCanvasHeight(default_height)
+        self.eventdata_plotter.setCanvasWidth(default_width)
 
     def clone(self):
         """
         Make a copy of the current status of the plotter.
         """
+        cloned_plotter = CDCSVGPlotter(self.animate)
+        cloned_plotter.eventdata_plotter = Belle2.TrackFindingCDC.EventDataPlotter(self.eventdata_plotter)
+        return cloned_plotter
 
-        clonedPlotter = CDCSVGPlotter()
-        clonedPlotter.document = self.document.cloneNode(deep=True)
-        return clonedPlotter
+    def styling_to_attribute_map(self, **styling):
+        attribute_map = Belle2.TrackFindingCDC.PrimitivePlotter.AttributeMap()
 
-    def append(self, obj, **kwd):
-        """
-        Take the tracking object, translate it to svg and append it to the svg document
-        """
+        for key, value in styling.items():
+            attribute_map[str(key)] = str(value)
 
-        svgElement = self.converter.toSVG(obj, **kwd)
-        if svgElement:
-            mainElement = self.document.documentElement
-            mainElement.appendChild(svgElement)
+        return attribute_map
 
-    def updateViewBox(self):
-        """
-        Adjust the view box to accomodate the current content of the document.
-        """
+    def draw_superlayer_boundaries(self, **styling):
+        attribute_map = self.styling_to_attribute_map(**styling)
+        self.eventdata_plotter.drawSuperLayerBoundaries(attribute_map)
 
-        clipBound = primitives.Bound.fromSVG(self.document.documentElement)
+    def draw_interaction_point(self):
+        self.eventdata_plotter.drawInteractionPoint()
 
-        if not clipBound:
-            defaultBound = primitives.Bound(top=-112, left=-112, right=112,
-                    bottom=112)
-            clipBound = defaultBound
+    def draw_outer_cdc_wall(self, **styling):
+        attribute_map = self.styling_to_attribute_map(**styling)
+        self.eventdata_plotter.drawOuterCDCWall(attribute_map)
 
-        viewbox = clipBound.viewbox
+    def draw_inner_cdc_wall(self, **styling):
+        attribute_map = self.styling_to_attribute_map(**styling)
+        self.eventdata_plotter.drawInnerCDCWall(attribute_map)
 
-        mainElement = self.document.documentElement
-        mainElement.setAttribute('viewBox', viewbox)
+    @staticmethod
+    def unpack_attributes(styling, i_obj=0, obj=None):
+        """Mapping function to unpack the attributes from the attribute maps. Mechanism and interface inspired by d3.js"""
+        result = {}
+        for (key, value) in styling.items():
+            if callable(value):
+                result[key] = value(i_obj, obj)
+            elif isinstance(value, str):
+                result[key] = value
+            elif hasattr(value, '__getitem__'):
+                result[key] = value[i_obj % len(value)]
+            else:
+                result[key] = value
+        return result
 
-    def toxml(self, totalPoints=1120 * 1120):
-        """
-        Generate the xml string for the current dom object representation.
-        """
+    def draw_iterable(self, iterable, **styling):
+        draw = self.draw
+        unpack_attributes = self.unpack_attributes
+        for (i_obj, obj) in enumerate(iterable):
+            obj_styling = unpack_attributes(styling, i_obj, obj)
+            draw(obj, **obj_styling)
 
-        mainElement = self.document.documentElement
+    def draw_storevector(self, storeobj_name, **styling):
+        print 'Drawing vector from DataStore:', storeobj_name,
+        print
+        pystoreobj = Belle2.PyStoreObj(storeobj_name)
 
-        viewbox = mainElement.getAttribute('viewBox')
-        bound = primitives.Bound.fromViewBox(viewbox)
+        if pystoreobj:
+            # Wrapper around std::vector like
+            wrapped_vector = pystoreobj.obj()
+            vector = wrapped_vector.get()
 
-        # set the image to proper aspect ratio
-        svgHeight = round(math.sqrt(totalPoints * float(bound.height)
-                          / bound.width))
-        svgWidth = round(math.sqrt(totalPoints * float(bound.width)
-                         / bound.height))
+            print 'with', vector.size(), 'entries'
+            print 'Attributes are'
+            for (key, value) in styling.items():
+                print str(key), ':', str(value)
 
-        mainElement.setAttribute('width', repr(svgWidth))
-        mainElement.setAttribute('height', repr(svgHeight))
+            self.draw_iterable(vector, **styling)
 
-        return self.document.toprettyxml()
+        else:
+            print "### not present in the DataStore"
+            print "Current content of the DataStore"
+            print "StoreArrays:"
+            Belle2.PyStoreArray.list()
+            print "StoreObjPtr:"
+            Belle2.PyStoreObj.list()
+
+    def draw_storearray(self, storearray_name, **styling):
+        print 'Drawing StoreArray:', storearray_name,
+        print
+        storearray = Belle2.PyStoreArray(storearray_name)
+        if storearray:
+            print 'with', storearray.getEntries(), 'entries'
+            print 'Attributes are'
+            for (key, value) in styling.items():
+                print str(key), ':', str(value)
+
+            self.draw_iterable(storearray, **styling)
+
+        else:
+            print "### not present in the DataStore"
+            print "Current content of the DataStore"
+            print "StoreArrays:"
+            Belle2.PyStoreArray.list()
+            print "StoreObjPtr:"
+            Belle2.PyStoreObj.list()
+
+    def draw(self, obj, **styling):
+        attribute_map = self.styling_to_attribute_map(**styling)
+        self.eventdata_plotter.draw(obj, attribute_map)
 
     def saveSVGFile(self, svgFileName='display.svg'):
         """
         Save the current dom object representation to disk.
         """
 
-        output = open(svgFileName, 'w')
-        output.write(self.toxml())
-        output.close()
+        eventdata_plotter = self.eventdata_plotter
 
+        boundingBox = eventdata_plotter.getBoundingBox()
 
+        height = boundingBox.getHeight()
+        width = boundingBox.getWidth()
+
+        totalPoints = 1120 * 1120
+        svgHeight = round(math.sqrt(totalPoints * float(height)
+                                    / width))
+        svgWidth = round(math.sqrt(totalPoints * float(width)
+                                   / height))
+
+        eventdata_plotter.setCanvasHeight(svgHeight)
+        eventdata_plotter.setCanvasWidth(svgWidth)
+
+        return eventdata_plotter.save(svgFileName)

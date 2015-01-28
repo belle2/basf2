@@ -3,15 +3,16 @@
   <Creator library="vxd">VXDServiceCreator</Creator>
   <Content>
     <DockBoxes>
-      <!-- Define dimensions for PXD DockBox -->
-      <BoxType name="PXD">
+      <RecordBackground>false</RecordBackground>
+      <!-- Define dimensions for PXD DockBox, identifier is the BeamBackHit identifier if RecordBackground is set to true -->
+      <BoxType name="PXD" identifier="300">
         <material>PXD-DockBox</material>
         <width unit="mm">130.5</width>
         <length unit="mm">415</length>
         <height unit="mm">89</height>
       </BoxType>
       <!-- Define dimensions for PXD DockBox -->
-      <BoxType name="SVD">
+      <BoxType name="SVD" identifier="300">
         <material>SVD-DockBox</material>
         <width unit="mm">203</width>
         <length unit="mm">410</length>
@@ -31,12 +32,8 @@
       </Position>
       <!-- Define envelope for backward DockBox position -->
       <Position name="backward">
-        <!-- FIXME: Overlap with CDC when using original Positions
         <minZ unit="mm">-1410</minZ>
         <maxZ unit="mm">-995</maxZ>
-        For now we just shift until there is no overlap -->
-        <minZ unit="mm">-1425</minZ>
-        <maxZ unit="mm">-1010</maxZ>
         <minR unit="mm">344</minR>
         <maxR unit="mm">446</maxR>
         <divisions>10</divisions>

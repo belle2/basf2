@@ -12,6 +12,7 @@
 #include <vxd/geometry/GeoVXDComponents.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <G4Transform3D.hh>
@@ -40,6 +41,7 @@ namespace Belle2 {
     {
       //Create the Boxes
       std::map<std::string, GeoVXDComponent> boxes;
+      bool active = content.getBool("RecordBackground", false);
       BOOST_FOREACH(const GearDir & boxtype, content.getNodes("BoxType")) {
         GeoVXDComponent box;
         box.width = boxtype.getLength("width") / 2.0 / Unit::mm;
@@ -50,6 +52,12 @@ namespace Belle2 {
         G4VSolid* shape_box = new G4Box(name, box.height, box.width, box.length);
         box.volume = new G4LogicalVolume(shape_box, Materials::get(box.material), name);
         B2INFO("Created " << name << " DockBox with a mass of " << (box.volume->GetMass(true) / CLHEP::kg) << "kg");
+        if (active) {
+          int identifier = boxtype.getInt("@identifier", 0);
+          B2DEBUG(50, "Creating BkgSensitiveDetector for DockBox " << name << " with identifier " <<  identifier);
+          BkgSensitiveDetector* sensitive = new BkgSensitiveDetector(name.c_str(), identifier);
+          box.volume->SetSensitiveDetector(sensitive);
+        }
         boxes[name] = box;
       }
 

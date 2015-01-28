@@ -10,7 +10,7 @@ from basf2 import *
 from ROOT import Belle2
 
 inputFile = Belle2.FileSystem.findFile('analysis/tests/mdst_r10142.root')
-steeringFile = Belle2.FileSystem.findFile('analysis/tests/fei_mini_steeringfile.internal')
+steeringFile = Belle2.FileSystem.findFile('analysis/tests/fei_mini_cache_steeringfile.internal')
 
 tempdir = tempfile.mkdtemp()
 print tempdir
@@ -22,14 +22,14 @@ cmd = "basf2 " + steeringFile + " -i inputdata.root -o inputdata.root -- -cache 
 
 #fsp variablestontuple
 assert 0 == os.system(cmd)
+assert len(glob.glob('cache.pkl')) == 1
+assert len(glob.glob('mcParticlesCount.root')) == 1
 #fsp TMVATeacher
 assert 0 == os.system(cmd)
-#fsp training and D hists
+#fsp training, final variablestontuple
 assert 0 == os.system(cmd)
 assert len(glob.glob('weights/*')) == 4
-assert len(glob.glob('CutHistograms_D0*.root')) == 1
-#D channels ignored.
-assert 0 == os.system(cmd)
-assert len(glob.glob('D0*.root')) == 0
+assert len(glob.glob('var*generic*.root*')) == 2
+assert len(glob.glob('analysisPathDone.root')) == 1
 
 shutil.rmtree(tempdir)

@@ -10,11 +10,13 @@
 #ifndef EVENTDATAPLOTTER_H_
 #define EVENTDATAPLOTTER_H_
 
+#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 #include <tracking/trackFindingCDC/display/BoundingBox.h>
 
 namespace Belle2 {
@@ -106,68 +108,98 @@ namespace Belle2 {
     public:
       // Drawing methods for the variuous event data objects.
 
-      /// Draws a circle at the position with the given radius
+      /// Draws a filled circle.
       void draw(const Belle2::TrackFindingCDC::Circle2D& circle,
                 AttributeMap attributeMap = AttributeMap());
 
       /// Draws the CDCWire as a small circle at the reference position.
       void draw(const Belle2::TrackFindingCDC::CDCWire& wire,
-                AttributeMap attributeMap = AttributeMap());
+                const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the inner and the outer bound of the super layer.
       void draw(const Belle2::TrackFindingCDC::CDCWireSuperLayer& wireSuperLayer,
-                AttributeMap attributeMap = AttributeMap());
+                const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws the all wires in the CDC
+      void draw(const Belle2::TrackFindingCDC::CDCWireTopology& wireTopology,
+                const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCSimHit as a momentum arrow starting at the track position with a length proportional to its momentum.
       void draw(const Belle2::CDCSimHit& simHit,
-                AttributeMap attributeMap = AttributeMap());
+                const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
-      void draw(const Belle2::CDCHit& cdcHit,
-                AttributeMap attributeMap = AttributeMap());
+      void draw(const Belle2::CDCHit& hit,
+                const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCWireHit as the wire position and its drift circle at the wire reference position.
       void draw(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-                AttributeMap attributeMap = AttributeMap());
+                const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCRecoHit2D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
       void draw(const Belle2::TrackFindingCDC::CDCRecoHit2D& recoHit2D,
-                AttributeMap attributeMap = AttributeMap());
+                const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
       void draw(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D,
-                AttributeMap attributeMap = AttributeMap()) {
+                const AttributeMap& attributeMap = AttributeMap()) {
         draw(recoHit3D.getRecoHit2D(), attributeMap);
       }
 
+      /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
+      void draw(const Belle2::TrackFindingCDC::CDCRecoTangent& recoTangent,
+                const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws the CDCTrajectory from the start point until it first exits the CDC.
       void draw(const CDCTrajectory2D& trajectory2D, AttributeMap attributeMap = AttributeMap());
 
-      /// Draws a range iterable collection of drawable elements
-      template<class Range>
-      void draw(const Range& range, AttributeMap attributeMap = AttributeMap()) {
-        for (const auto & element : range) {
-          draw(element, attributeMap);
-        }
-      }
-
       /// Draws all CDCWireHits of the cluster
-      void draw(const CDCWireHitCluster& wireHitCluster, AttributeMap attributeMap = AttributeMap()) {
-        draw(wireHitCluster, attributeMap);
+      void draw(const CDCWireHitCluster& wireHitCluster, const AttributeMap& attributeMap = AttributeMap()) {
+        drawRange(wireHitCluster, attributeMap);
       }
 
       /// Draws all CDCRecoHits2D of the segment
-      void draw(const CDCRecoSegment2D& recoSegment2D, AttributeMap attributeMap = AttributeMap()) {
-        draw(recoSegment2D, attributeMap);
+      void draw(const CDCRecoSegment2D& recoSegment2D, const AttributeMap& attributeMap = AttributeMap()) {
+        drawRange(recoSegment2D, attributeMap);
       }
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCRecoSegment3D& recoSegment3D, AttributeMap attributeMap = AttributeMap()) {
-        draw(recoSegment3D, attributeMap);
+      void draw(const CDCRecoSegment3D& recoSegment3D, const AttributeMap& attributeMap = AttributeMap()) {
+        drawRange(recoSegment3D, attributeMap);
       }
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCTrack& track, AttributeMap attributeMap = AttributeMap()) {
-        draw(track, attributeMap);
+      void draw(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap()) {
+        drawRange(track, attributeMap);
+      }
+
+      /// Draws the hit content of the Genfit track candidate.
+      void draw(const genfit::TrackCand& gfTrackCand, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Allow the drawing of pointers checking if the pointer is nonzero.
+      template<class T>
+      void draw(const T* ptr, const AttributeMap& attributeMap = AttributeMap()) {
+        if (ptr) draw(*ptr, attributeMap);
+      }
+
+      /// Draw store array
+      template<class T>
+      void draw(const StoreArray<T>& storeArray, const AttributeMap& attributeMap = AttributeMap()) {
+        if (storeArray) {
+          drawRange(storeArray, attributeMap);
+        }
+      }
+
+      /// Draws a range iterable collection of drawable elements
+      template<class Range>
+      void drawRange(const Range& range, const AttributeMap& attributeMap = AttributeMap()) {
+        if (not m_ptrPrimitivePlotter) return;
+        PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+        primitivePlotter.startGroup(attributeMap);
+        for (const auto & element : range) {
+          draw(element);
+        }
+        primitivePlotter.endGroup();
       }
 
     private:

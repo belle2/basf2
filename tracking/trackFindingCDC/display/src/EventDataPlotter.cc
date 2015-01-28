@@ -12,6 +12,7 @@
 
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
 
@@ -19,39 +20,13 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-
-  /// Returns the time of flight of the related CDCSimHit. NAN if not found.
-  float getFlightTime(const CDCHit* ptrHit)
-  {
-    float tof = NAN;
-    if (ptrHit) {
-      const CDCHit& hit = *ptrHit;
-      const CDCSimHit* ptrSimHit = hit.getRelated<CDCSimHit>();
-      if (ptrSimHit) {
-        const CDCSimHit& simHit = *ptrSimHit;
-        tof = simHit.getFlightTime();
-      }
-    }
-    return tof;
-  }
-
-  /// Updates the fill color to the stroke color unless it has already been set otherwise.
-  void updateFillToStroke(EventDataPlotter::AttributeMap& attributeMap)
-  {
-    if (not attributeMap.count("fill") or attributeMap["fill"] != "") {
-      if (attributeMap.count("stroke")) {
-        attributeMap["fill"] = attributeMap["stroke"];
-      }
-    }
-  }
-
-}
-
-
 EventDataPlotter::EventDataPlotter(bool animate) :
-  m_ptrPrimitivePlotter(new SVGPrimitivePlotter()),
-  m_animate(animate)
+  m_ptrPrimitivePlotter(new SVGPrimitivePlotter(AttributeMap {
+  {"stroke", "orange"},
+  {"stroke-width", "0.4"},
+  {"fill", "none"}
+})),
+m_animate(animate)
 {
 }
 
@@ -200,7 +175,6 @@ void EventDataPlotter::startAnimationGroup(const Belle2::CDCHit* ptrHit)
   primitivePlotter.startGroup();
 }
 
-
 /// --------------------- Draw Circle2D ------------------------
 void EventDataPlotter::draw(const Circle2D& circle,
                             AttributeMap attributeMap)
@@ -210,14 +184,12 @@ void EventDataPlotter::draw(const Circle2D& circle,
 
   float radius = circle.radius();
 
-  AttributeMap defaultAttributeMap {
-    {"stroke", "black"},
-    {"stroke-width", std::to_string(radius)},
-  };
-
-  // Overwrite with the given values.
-  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
-  updateFillToStroke(attributeMap);
+  if (not attributeMap.count("fill") or attributeMap["fill"] != "") {
+    if (attributeMap.count("stroke")) {
+      attributeMap["fill"] = attributeMap["stroke"];
+      attributeMap.erase("stroke");
+    }
+  }
 
   const Vector2D& pos = circle.center();
 
@@ -229,7 +201,7 @@ void EventDataPlotter::draw(const Circle2D& circle,
 
 
 /// --------------------- Draw CDCWire ------------------------
-void EventDataPlotter::draw(const CDCWire& wire, AttributeMap attributeMap)
+void EventDataPlotter::draw(const CDCWire& wire, const AttributeMap& attributeMap)
 {
   const float wireRadius = 0.1;
   const Vector2D& refPos = wire.getRefPos2D();
@@ -238,19 +210,10 @@ void EventDataPlotter::draw(const CDCWire& wire, AttributeMap attributeMap)
 }
 
 /// --------------------- Draw CDCWireSuperLayer ------------------------
-void EventDataPlotter::draw(const CDCWireSuperLayer& wireSuperLayer, AttributeMap attributeMap)
+void EventDataPlotter::draw(const CDCWireSuperLayer& wireSuperLayer, const AttributeMap& attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
-
-  AttributeMap defaultAttributeMap {
-    {"stroke", "black"},
-    {"stroke-width", "0.2"},
-    {"fill", "none"},
-  };
-
-  // Add attributes if not present
-  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
 
   float centerX = 0.0;
   float centerY = 0.0;
@@ -262,29 +225,42 @@ void EventDataPlotter::draw(const CDCWireSuperLayer& wireSuperLayer, AttributeMa
   primitivePlotter.drawCircle(centerX, centerY, outerR, attributeMap);
 }
 
+/// --------------------- Draw CDCWireTopology------------------------
+void EventDataPlotter::draw(const CDCWireTopology& wireTopology, const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  for (const CDCWireSuperLayer & wireSuperLayer : wireTopology.getWireSuperLayers()) {
+    AttributeMap superLayerAttributes {
+      {"fill" , wireSuperLayer.isAxial() ? "black" : "lightgray"},
+      {"stroke" , "none"}
+    };
+    primitivePlotter.startGroup(superLayerAttributes);
+    for (const CDCWireLayer & wireLayer : wireSuperLayer) {
+      for (const CDCWire & wire : wireLayer) {
+        draw(wire, attributeMap);
+      }
+    }
+    primitivePlotter.endGroup();
+  }
+
+}
+
 
 /// --------------------- Draw CDCSimHit ------------------------
-void EventDataPlotter::draw(const CDCSimHit& simHit, AttributeMap attributeMap)
+void EventDataPlotter::draw(const CDCSimHit& simHit, const AttributeMap& attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
   startAnimationGroup(simHit);
 
-  AttributeMap defaultAttributeMap {
-    {"stroke", "yellow"},
-    { "stroke-width", "0.02"}
-  };
-
-  // Add attributes if not present
-  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
-  updateFillToStroke(attributeMap);
-
   // Draw hit position as a small circle
   TVector3 position = simHit.getPosTrack();
   float x = position.X();
   float y = position.Y();
-  float radius = 0.015;
+  float radius = 0.2;
 
   primitivePlotter.drawCircle(x, y, radius, attributeMap);
 
@@ -302,31 +278,19 @@ void EventDataPlotter::draw(const CDCSimHit& simHit, AttributeMap attributeMap)
 }
 
 /// --------------------- Draw CDCHit ------------------------
-void EventDataPlotter::draw(const CDCHit& hit, AttributeMap attributeMap)
+void EventDataPlotter::draw(const CDCHit& hit, const AttributeMap& attributeMap)
 {
   CDCWireHit wireHit(&hit);
   draw(wireHit, attributeMap);
 }
 
 /// --------------------- Draw CDCWireHit ------------------------
-void EventDataPlotter::draw(const CDCWireHit& wireHit, AttributeMap attributeMap)
+void EventDataPlotter::draw(const CDCWireHit& wireHit, const AttributeMap& attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
   startAnimationGroup(wireHit.getHit());
-
-  const CDCWire& wire = wireHit.getWire();
-  draw(wire, attributeMap);
-
-  AttributeMap defaultAttributeMap {
-    {"stroke", "black"},
-    {"stroke-width", "0.02"},
-    {"fill", "none"}
-  };
-
-  // Add attributes if not present
-  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
 
   const Vector2D& refPos = wireHit.getRefPos2D();
 
@@ -339,7 +303,7 @@ void EventDataPlotter::draw(const CDCWireHit& wireHit, AttributeMap attributeMap
 }
 
 /// --------------------- Draw CDCRecoHit2D ------------------------
-void EventDataPlotter::draw(const CDCRecoHit2D& recoHit2D, AttributeMap attributeMap)
+void EventDataPlotter::draw(const CDCRecoHit2D& recoHit2D, const AttributeMap& attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
@@ -348,36 +312,44 @@ void EventDataPlotter::draw(const CDCRecoHit2D& recoHit2D, AttributeMap attribut
 
   startAnimationGroup(wireHit.getHit());
 
-  const CDCWire& wire = wireHit.getWire();
-  draw(wire, attributeMap);
-
-  AttributeMap defaultAttributeMap {
-    {"stroke", "black"},
-    {"stroke-width", "0.02"},
-    {"fill", "none"}
-  };
-
-  // Add attributes if not present
-  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
-
   const Vector2D& refPos2D = wireHit.getRefPos2D();
   const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
-
-  if (recoPos2D.hasNAN()) {
-    attributeMap["stroke"] = "red";
-  }
 
   float x = refPos2D.x();
   float y = refPos2D.y();
   float radius = wireHit.getRefDriftLength();
   primitivePlotter.drawCircle(x, y, radius, attributeMap);
 
-  updateFillToStroke(attributeMap);
   float supportPointRadius = 0.2;
   Circle2D supportPoint(recoPos2D, supportPointRadius);
   draw(supportPoint, attributeMap);
 
   primitivePlotter.endGroup();
+}
+
+
+/// --------------------- Draw CDCRecoHit2D ------------------------
+void EventDataPlotter::draw(const CDCRecoTangent& recoTangent, const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const Vector2D fromPos = recoTangent.getFromRecoPos2D();
+  const float fromX =  fromPos.x();
+  const float fromY =  fromPos.y();
+
+  const Vector2D toPos = recoTangent.getToRecoPos2D();
+  const float toX =  toPos.x();
+  const float toY =  toPos.y();
+
+  primitivePlotter.drawLine(fromX, fromY, toX, toY, attributeMap);
+
+  float touchPointRadius = 0.015;
+  const Circle2D fromTouchPoint(fromPos, touchPointRadius);
+  draw(fromTouchPoint, attributeMap);
+
+  const Circle2D toTouchPoint(toPos, touchPointRadius);
+  draw(toTouchPoint, attributeMap);
 }
 
 /// --------------------- Draw CDCTrajectory2D ------------------------
@@ -386,12 +358,9 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  AttributeMap defaultAttributeMap {
-    {"stroke", "black"},
-    {"stroke-width", "0.2"},
-    {"fill", "none"}
-  };
+  AttributeMap defaultAttributeMap {};
 
+  // Make the default color charge dependent
   int charge = trajectory2D.getChargeSign();
   if (charge > 0) {
     defaultAttributeMap["stroke"] = "red";
@@ -463,4 +432,29 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
   }
 
 }
+
+
+void EventDataPlotter::draw(const genfit::TrackCand& gfTrackCand, const AttributeMap& attributeMap)
+{
+  StoreArray<CDCHit> storedHits;
+  auto hitIDs = gfTrackCand.getHitIDs(Const::CDC);
+
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  primitivePlotter.startGroup(attributeMap);
+
+  for (int hitID : hitIDs) {
+    const CDCHit* ptrHit = storedHits[hitID];
+    if (ptrHit) {
+      const CDCHit& hit = *ptrHit;
+      draw(hit);
+    }
+  }
+
+  primitivePlotter.endGroup();
+
+}
+
+
 

@@ -306,17 +306,20 @@ void AAFHInterface::generateEvent(MCParticleGraph& mpg)
 void AAFHInterface::finish()
 {
   aafhdiag36_finish_();
-  B2INFO("Final cross section:         " << std::setprecision(3) << output_.crosec
-         << "+-" << std::setprecision(3) << output_.ercros << " nb");
-  B2INFO("Minimum invariant mass:      " << sqrt(bound_.w2min)*input_.eb << " GeV");
-  B2INFO("Maximum invariant mass:      " << sqrt(bound_.w2max)*input_.eb << " GeV");
-  B2INFO("Maximum subgenerator weight: " << westat_.maxwe << " ("
-         << westat_.mwe[0] << ", "
-         << westat_.mwe[1] << ", "
-         << westat_.mwe[2] << ", "
-         << westat_.mwe[3] << ")"
-        );
-  B2INFO("Maximum final weight:        " << ftstat_.ftmax);
+  B2RESULT("AAFH Generation finished.");
+  B2RESULT("Final cross section:         "
+           << std::setprecision(3) << output_.crosec << "+-"
+           << std::setprecision(3) << output_.ercros << " nb");
+  B2RESULT("Minimum invariant mass:      "
+           << sqrt(bound_.w2min)*input_.eb << " GeV");
+  B2RESULT("Maximum invariant mass:      "
+           << sqrt(bound_.w2max)*input_.eb << " GeV");
+  B2RESULT("Maximum subgenerator weight: " << westat_.maxwe << " ("
+           << westat_.mwe[0] << ", "
+           << westat_.mwe[1] << ", "
+           << westat_.mwe[2] << ", "
+           << westat_.mwe[3] << ")");
+  B2RESULT("Maximum final weight:        " << ftstat_.ftmax);
   //The fortran source says that it's advisable if all subgenerators have the
   //same probability to account for all peaks in the differental cross section
   //and that it runs with the highest efficiency when the maximum weights in
@@ -351,16 +354,20 @@ void AAFHInterface::finish()
     }
   }
 
-  B2INFO("To get the same maximum event weight and chance for each sub generator, try:");
-  B2INFO("   'subgeneratorWeights': [" << std::scientific
-         << std::setprecision(3) << idealWAP[0] << ", "
-         << std::setprecision(3) << idealWAP[1] << ", "
-         << std::setprecision(3) << idealWAP[2] << ", "
-         << std::setprecision(3) << idealWAP[3] << ", "
-         << "\n                                  "
-         << std::setprecision(3) << idealWBP[0] << ", "
-         << std::setprecision(3) << idealWBP[1] << ", "
-         << std::setprecision(3) << idealWBP[2] << ", "
-         << std::setprecision(3) << idealWBP[3] << "]"
-        );
+  B2RESULT("To get the same maximum event weight and chance for each sub "
+           "generator use these parameters:");
+  B2RESULT("   'maxFinalWeight': " << std::setprecision(3)
+           << ftstat_.ftmax * 1.1 << ",");
+  B2RESULT("   'maxSubgeneratorWeight': " << std::setprecision(3)
+           << westat_.maxwe * 1.1 << ",");
+  B2RESULT("   'subgeneratorWeights': [" << std::scientific
+           << std::setprecision(3) << idealWAP[0] << ", "
+           << std::setprecision(3) << idealWAP[1] << ", "
+           << std::setprecision(3) << idealWAP[2] << ", "
+           << std::setprecision(3) << idealWAP[3] << ", ");
+  B2RESULT("                           " << std::scientific
+           << std::setprecision(3) << idealWBP[0] << ", "
+           << std::setprecision(3) << idealWBP[1] << ", "
+           << std::setprecision(3) << idealWBP[2] << ", "
+           << std::setprecision(3) << idealWBP[3] << "],");
 }

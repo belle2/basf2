@@ -410,7 +410,7 @@ def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribut
     return {'__needed__': False}
 
 
-def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbability, target, gearbox):
+def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbability, target, extraVars, gearbox):
     """
     Saves the calculated signal probability for this particle list
         @param path the basf2 path
@@ -419,6 +419,7 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
         @param particleList the particleList
         @param signalProbability signalProbability as additional dependency
         @param target target variable
+        @param extraVars list of additional variables (can be empty)
         @param gearbox ensures gearbox is loaded first
         @return Resource named VariablesToNTuple_{particleIdentifier} providing root filename
     """
@@ -430,13 +431,10 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
     filename = removeJPsiSlash('var_{i}_{h}.root'.format(i=particleIdentifier, h=hash))
 
     if not os.path.isfile(filename):
-        uniqueSignal = path.add_module('TagUniqueSignal', particleList=particleList, target=target, extraInfoName='uniqueSignal')
-        uniqueSignal.set_name('TagUniqueSignal_' + particleList)
-
         output = register_module('VariablesToNtuple')
         output.set_name('VariablesToNtuple_' + particleList)
         output.param('particleList', particleList)
-        output.param('variables', [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcStatus', 'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)'])
+        output.param('variables', [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcStatus', 'cosThetaBetweenParticleAndTrueB'] + extraVars)
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)
@@ -445,6 +443,25 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
 
     B2INFO("Write variables to ntuple for particle {i}. But file already exists, so nothing to do here.".format(i=particleIdentifier))
     return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): filename, '__cache__': True}
+
+
+def TagUniqueSignal(path, hash, particleIdentifier, particleList, signalProbability, target, gearbox):
+    """
+    Saves the calculated signal probability for this particle list
+        @param path the basf2 path
+        @param hash of all input parameters
+        @param particleIdentifier valid pdg particle name + optional user label seperated by :
+        @param particleList the particleList
+        @param signalProbability signalProbability as additional dependency
+        @param target target variable
+        @param gearbox ensures gearbox is loaded first
+        @return Resource named TagUnique_{particleIdentifier} providing variable name that provides tag
+    """
+    if particleList is not None and signalProbability is not None:
+        B2INFO("Tagging unique signal for particle {i}.".format(i=particleIdentifier))
+        uniqueSignal = path.add_module('TagUniqueSignal', particleList=particleList, target=target, extraInfoName='uniqueSignal')
+        uniqueSignal.set_name('TagUniqueSignal_' + particleList)
+    return {'TagUniqueSignal_{i}'.format(i=particleIdentifier): 'extraInfo(uniqueSignal)', '__cache__': True}
 
 
 def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCutConfig, preCut, preCutHistogram, mvaConfig, signalProbability, postCutConfig, postCut):

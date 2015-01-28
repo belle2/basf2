@@ -189,6 +189,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
     play = actorFramework.Play()
 
     # Than add the properties of the particles to the play
+    finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
     for particle in particles:
         play.addProperty('Name_{i}'.format(i=particle.identifier), particle.name)
         play.addProperty('Label_{i}'.format(i=particle.identifier), particle.label)
@@ -321,14 +322,23 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
             if particle.name != pdg.conjugate(particle.name):
                 play.addCollection('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), ['SignalProbability_{i}'.format(i=particle.identifier)])
+            extraVars = []
+            if particle in finalParticles:
+                play.addActor(TagUniqueSignal,
+                              particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
+                              particleList='ParticleList_{i}'.format(i=particle.identifier),
+                              signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
+                              target='MVAConfigTarget_{i}'.format(i=particle.identifier))
+                extraVars = ['TagUniqueSignal_{i}'.format(i=particle.identifier)]
+
             play.addActor(VariablesToNTuple,
                           particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
                           particleList='ParticleList_{i}'.format(i=particle.identifier),
                           signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
+                          extraVars=extraVars,
                           target='MVAConfigTarget_{i}'.format(i=particle.identifier))
 
     # The last act creates the automatic reporting summary pdf
-    finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
     play.addActor(SaveModuleStatistics,
                   finalParticleSignalProbabilities=['SignalProbability_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles])
 

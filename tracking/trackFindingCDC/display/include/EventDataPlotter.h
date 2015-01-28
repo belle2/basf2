@@ -91,13 +91,17 @@ namespace Belle2 {
        *  which is stored in the bounding box (getBoundingBox()). */
       void setCanvasHeight(const float& height);
 
-
-
-
     public:
       /// Converts a time given in nanoseconds to a time sting of the from "%fs".
       std::string getAnimationTimeFromNanoSeconds(const float& nanoseconds)
       { return std::to_string(nanoseconds) + "s"; }
+
+    private:
+      /// Start a group in the underlying plotter with an animation uncovering the elements at the time of flight of the CDCSimHit.
+      void startAnimationGroup(const Belle2::CDCSimHit& simHit);
+
+      /// Start a group in the underlying plotter with an animation uncovering the elements at the time of flight of the related CDCSimHit.
+      void startAnimationGroup(const Belle2::CDCHit* ptrHit);
 
     public:
       // Drawing methods for the variuous event data objects.
@@ -119,12 +123,24 @@ namespace Belle2 {
                 AttributeMap attributeMap = AttributeMap());
 
       /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
-      void draw(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-                AttributeMap attributeMap);
-
-      /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
       void draw(const Belle2::CDCHit& cdcHit,
                 AttributeMap attributeMap = AttributeMap());
+
+      /// Draws the CDCWireHit as the wire position and its drift circle at the wire reference position.
+      void draw(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
+                AttributeMap attributeMap = AttributeMap());
+
+      /// Draws the CDCRecoHit2D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
+      void draw(const Belle2::TrackFindingCDC::CDCRecoHit2D& recoHit2D,
+                AttributeMap attributeMap = AttributeMap());
+
+      /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
+      void draw(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D,
+                AttributeMap attributeMap = AttributeMap()) {
+        draw(recoHit3D.getRecoHit2D(), attributeMap);
+      }
+
+      void draw(const CDCTrajectory2D& trajectory2D, AttributeMap attributeMap = AttributeMap());
 
       /// Draws a range iterable collection of drawable elements
       template<class Range>
@@ -132,6 +148,26 @@ namespace Belle2 {
         for (const auto & element : range) {
           draw(element, attributeMap);
         }
+      }
+
+      /// Draws all CDCWireHits of the cluster
+      void draw(const CDCWireHitCluster& wireHitCluster, AttributeMap attributeMap = AttributeMap()) {
+        draw(wireHitCluster, attributeMap);
+      }
+
+      /// Draws all CDCRecoHits2D of the segment
+      void draw(const CDCRecoSegment2D& recoSegment2D, AttributeMap attributeMap = AttributeMap()) {
+        draw(recoSegment2D, attributeMap);
+      }
+
+      /// Draws all CDCRecoHits3D of the segment
+      void draw(const CDCRecoSegment3D& recoSegment3D, AttributeMap attributeMap = AttributeMap()) {
+        draw(recoSegment3D, attributeMap);
+      }
+
+      /// Draws all CDCRecoHits3D of the segment
+      void draw(const CDCTrack& track, AttributeMap attributeMap = AttributeMap()) {
+        draw(track, attributeMap);
       }
 
     private:

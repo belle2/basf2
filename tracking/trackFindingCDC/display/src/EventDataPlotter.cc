@@ -162,6 +162,45 @@ void EventDataPlotter::setCanvasHeight(const float& height)
 }
 
 
+void EventDataPlotter::startAnimationGroup(const Belle2::CDCSimHit& simHit)
+{
+  // In case the event should be animated
+  // uncover the group of elements at the time of flight of the CDCSimHit.
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  if (m_animate) {
+    float tof = simHit.getFlightTime();
+    AttributeMap groupAttributeMap {
+      {"_showAt", getAnimationTimeFromNanoSeconds(tof)}
+    };
+    primitivePlotter.startGroup(groupAttributeMap);
+
+  } else {
+    primitivePlotter.startGroup();
+  }
+}
+
+void EventDataPlotter::startAnimationGroup(const Belle2::CDCHit* ptrHit)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  if (m_animate) {
+    if (ptrHit) {
+      const CDCHit& hit = *ptrHit;
+      const CDCSimHit* ptrSimHit = hit.getRelated<CDCSimHit>();
+      if (ptrSimHit) {
+        const CDCSimHit& simHit = *ptrSimHit;
+        startAnimationGroup(simHit);
+        return;
+      }
+    }
+  }
+  primitivePlotter.startGroup();
+}
+
+
 /// --------------------- Draw Circle2D ------------------------
 void EventDataPlotter::draw(const Circle2D& circle,
                             AttributeMap attributeMap)
@@ -192,9 +231,6 @@ void EventDataPlotter::draw(const Circle2D& circle,
 /// --------------------- Draw CDCWire ------------------------
 void EventDataPlotter::draw(const CDCWire& wire, AttributeMap attributeMap)
 {
-  if (not m_ptrPrimitivePlotter) return;
-  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
-
   const float wireRadius = 0.1;
   const Vector2D& refPos = wire.getRefPos2D();
 
@@ -233,18 +269,7 @@ void EventDataPlotter::draw(const CDCSimHit& simHit, AttributeMap attributeMap)
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  // In case the event should be animated
-  // uncover the group of elements at the time of flight of the CDCSimHit.
-  if (m_animate) {
-    float tof = simHit.getFlightTime();
-    AttributeMap groupAttributeMap {
-      {"_showAt", getAnimationTimeFromNanoSeconds(tof)}
-    };
-    primitivePlotter.startGroup(groupAttributeMap);
-
-  } else {
-    primitivePlotter.startGroup();
-  }
+  startAnimationGroup(simHit);
 
   AttributeMap defaultAttributeMap {
     {"stroke", "yellow"},
@@ -276,32 +301,20 @@ void EventDataPlotter::draw(const CDCSimHit& simHit, AttributeMap attributeMap)
 
 }
 
+/// --------------------- Draw CDCHit ------------------------
+void EventDataPlotter::draw(const CDCHit& hit, AttributeMap attributeMap)
+{
+  CDCWireHit wireHit(&hit);
+  draw(wireHit, attributeMap);
+}
+
 /// --------------------- Draw CDCWireHit ------------------------
 void EventDataPlotter::draw(const CDCWireHit& wireHit, AttributeMap attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  if (m_animate) {
-    // Try to get the time of flight from the related CDCSimHit.
-    const CDCHit* ptrHit = wireHit.getHit();
-    float tof = getFlightTime(ptrHit);
-
-    if (not std::isnan(tof)) {
-      AttributeMap groupAttributeMap {
-        {"_showAt", getAnimationTimeFromNanoSeconds(tof)}
-      };
-      primitivePlotter.startGroup(groupAttributeMap);
-
-    } else {
-      primitivePlotter.startGroup();
-
-    }
-
-  } else {
-    primitivePlotter.startGroup();
-
-  }
+  startAnimationGroup(wireHit.getHit());
 
   const CDCWire& wire = wireHit.getWire();
   draw(wire, attributeMap);
@@ -325,10 +338,129 @@ void EventDataPlotter::draw(const CDCWireHit& wireHit, AttributeMap attributeMap
   primitivePlotter.endGroup();
 }
 
-
-/// --------------------- Draw CDCHit ------------------------
-void EventDataPlotter::draw(const CDCHit& hit, AttributeMap attributeMap)
+/// --------------------- Draw CDCRecoHit2D ------------------------
+void EventDataPlotter::draw(const CDCRecoHit2D& recoHit2D, AttributeMap attributeMap)
 {
-  CDCWireHit wireHit(&hit);
-  draw(wireHit, attributeMap);
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  const CDCWireHit& wireHit = recoHit2D.getWireHit();
+
+  startAnimationGroup(wireHit.getHit());
+
+  const CDCWire& wire = wireHit.getWire();
+  draw(wire, attributeMap);
+
+  AttributeMap defaultAttributeMap {
+    {"stroke", "black"},
+    {"stroke-width", "0.02"},
+    {"fill", "none"}
+  };
+
+  // Add attributes if not present
+  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
+
+  const Vector2D& refPos2D = wireHit.getRefPos2D();
+  const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
+
+  if (recoPos2D.hasNAN()) {
+    attributeMap["stroke"] = "red";
+  }
+
+  float x = refPos2D.x();
+  float y = refPos2D.y();
+  float radius = wireHit.getRefDriftLength();
+  primitivePlotter.drawCircle(x, y, radius, attributeMap);
+
+  updateFillToStroke(attributeMap);
+  float supportPointRadius = 0.2;
+  Circle2D supportPoint(recoPos2D, supportPointRadius);
+  draw(supportPoint, attributeMap);
+
+  primitivePlotter.endGroup();
 }
+
+/// --------------------- Draw CDCTrajectory2D ------------------------
+void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  AttributeMap defaultAttributeMap {
+    {"stroke", "black"},
+    {"stroke-width", "0.2"},
+    {"fill", "none"}
+  };
+
+  int charge = trajectory2D.getChargeSign();
+  if (charge > 0) {
+    defaultAttributeMap["stroke"] = "red";
+  } else if (charge < 0) {
+    defaultAttributeMap["stroke"] = "blue";
+  } else {
+    defaultAttributeMap["stroke"] = "green";
+  }
+
+  // Add attributes if not present
+  attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
+
+  if (trajectory2D.getLocalCircle().isCircle()) {
+
+    const float radius = trajectory2D.getLocalCircle().absRadius();
+
+    const Vector2D trajectoryExit = trajectory2D.getExit();
+    const float& endX = trajectoryExit.x();
+    const float& endY = trajectoryExit.y();
+
+    if (trajectoryExit.hasNAN()) {
+      // No exit point out of the cdc could be detected.
+      // Draw full circle
+
+      const Vector2D center = trajectory2D.getGlobalCircle().center();
+      const float radius = trajectory2D.getLocalCircle().absRadius();
+      const float& centerX = center.x();
+      const float& centerY = center.y();
+
+      primitivePlotter.drawCircle(centerX, centerY, radius);
+
+
+    } else {
+
+      const Vector2D start = trajectory2D.getSupport();
+      const float& startX = start.x();
+      const float& startY = start.y();
+
+      const int curvature = -charge;
+      const bool sweepFlag = curvature > 0;
+
+      // check if exit point is on the close or
+      // on the far side of the circle
+      const bool longArc = (trajectory2D.calcPerpS(trajectoryExit) > 0) ? false : true;
+      primitivePlotter.drawCircleArc(startX,
+                                     startY,
+                                     endX,
+                                     endY,
+                                     radius,
+                                     longArc,
+                                     sweepFlag,
+                                     attributeMap);
+    }
+  } else {
+    // trajectory is a straight line
+    const Vector2D start = trajectory2D.getSupport();
+    const float& startX = start.x();
+    const float& startY = start.y();
+
+    const Vector2D trajectoryExit = trajectory2D.getExit();
+    const float endX = trajectoryExit.x();
+    const float endY = trajectoryExit.y();
+
+    if (trajectoryExit.hasNAN()) {
+      B2WARNING("Could not compute point off exit in a straight line case.");
+    } else {
+      primitivePlotter.drawLine(startX, startY, endX, endY, attributeMap);
+    }
+  }
+
+}
+

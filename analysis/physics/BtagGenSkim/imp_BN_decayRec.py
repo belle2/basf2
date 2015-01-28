@@ -139,7 +139,7 @@ def reconstructB0DMYPS1(q):  # reconstruct B0 -> D- Y+(S=1) decays
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 39)
         reconstructDecay('B0:40 -> D-:all K+:all K+:all K-:all K_S0:all K_S0:all'
                          , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 40)
-        mmin = 40
+        mmax = 40
 
     # merge individual B0 lists into one list
     copyListFun(mmin, mmax, 'B0:D-Y+S1')

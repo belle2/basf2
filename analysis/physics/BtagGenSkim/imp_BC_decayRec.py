@@ -66,7 +66,7 @@ def reconstructBPD0YPS0(q):  # reconstruct B+ -> anti-D0 Y+(S=0) decays
 
     if q == 1:
         # rest of decay modes (less frequent)
-        reconstructDecay('B+:16 -> anti-D0:all pi+:all K+:all K-:all pi0:all pi0:all'
+        reconstructDecay('B+:16 -> anti-D0:all pi+:all K+:all K-:all K_S0:all K_S0:all'
                          , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 16)
         mmax = 16
 

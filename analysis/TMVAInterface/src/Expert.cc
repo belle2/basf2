@@ -104,6 +104,11 @@ namespace Belle2 {
       else
         result = m_reader->GetProba(m_methodName, signalFraction);
 
+      if (result == -999) {
+        B2WARNING("TMVA returned -999, which indicates that something went wrong during applying the MVA method. In consequence the returned probability is not constraint to [0,1]!");
+        return result;
+      }
+
       if (m_reverse) {
         return 1 - result;
       } else {

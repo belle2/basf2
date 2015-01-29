@@ -164,6 +164,21 @@ namespace {
     EXPECT_FLOAT_EQ(1.0, test_event[1]); // p
   }
 
+  TEST(TMVAInterfaceTest, WarningIf999IsMVAOutput)
+  {
+    //network only expects 'eid' and 'p' as input
+    //eid isn't set (-> 0.5)
+    Particle p({ 0.0 , 1.0, 0.0, 1.1 }, 11);
+    MockPluginInspector& inspector = MockPluginInspector::GetInstance();
+
+    Expert expert("TMVA", FileSystem::findFile("/analysis/tests/"), "MockPlugin", 0);
+
+    // signalToBackgroundRatio default == -1 -> No Transformation
+    inspector.SetMvaValue(-999);
+    EXPECT_B2WARNING(expert.analyse(&p, -1))
+    EXPECT_FLOAT_EQ(-999, expert.analyse(&p, -1));
+  }
+
   TEST(TMVAInterfaceTest, TeacherTrainsCorrectly)
   {
     TestHelpers::TempDirCreator tempdir;

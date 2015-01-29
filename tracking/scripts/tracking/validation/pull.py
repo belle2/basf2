@@ -62,7 +62,7 @@ class PullAnalysis:
         """Compares the concrete estimate to the truth and generates plots of the estimates, residuals, pulls and p-values.
         Close indicates if the figure shall be closed after they are saved."""
 
-                # truths can contain NaN entries if no MC track could be matched
+        # truths can contain NaN entries if no MC track could be matched
 
         quantity_name = self.quantity_name
 
@@ -71,7 +71,7 @@ class PullAnalysis:
         plot_name_prefix = self.plot_name_prefix
         outlier_z_score = self.outlier_z_score
 
-        residuals = truths - estimates
+        residuals = estimates - truths
 
         if variances is not None:
             sigmas = np.sqrt(variances)

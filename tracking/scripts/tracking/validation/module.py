@@ -85,6 +85,7 @@ class TrackingValidationModule(basf2.Module):
         plot_title_postfix='',
         exclude_profile_mc_parameter='',
         exclude_profile_pr_parameter='',
+        use_expert_folder=True,
         ):
 
         super(TrackingValidationModule, self).__init__()
@@ -99,6 +100,7 @@ class TrackingValidationModule(basf2.Module):
         self.plot_title_postfix = plot_title_postfix
         self.exclude_profile_pr_parameter = exclude_profile_pr_parameter
         self.exclude_profile_mc_parameter = exclude_profile_mc_parameter
+        self.use_expert_folder = use_expert_folder
 
     def initialize(self):
         self.trackMatchLookUp = Belle2.TrackMatchLookUp('MCTrackCands')
@@ -383,8 +385,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         for validation_plot in validation_plots:
             validation_plot.write()
 
-        expert_tdirectory = output_tfile.mkdir('expert', 'Expert')
-        expert_tdirectory.cd()
+        if self.use_expert_folder:
+            expert_tdirectory = output_tfile.mkdir('expert', 'Expert')
+            expert_tdirectory.cd()
         ROOT.gStyle.SetOptFit(opt_fit)
 
         for pull_analysis in pull_analyses:

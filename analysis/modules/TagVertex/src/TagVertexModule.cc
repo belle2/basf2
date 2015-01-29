@@ -392,7 +392,6 @@ namespace Belle2 {
         if (m_useMCassociation == "breco") {
           StoreArray<MCParticle> mcParticles;
           const MCParticle* mcBr = Breco->getRelated<MCParticle>();
-          m_MCVertReco = mcBr->getDecayVertex();
           if (mcBr == mc) {
             isBreco = true;
           } else {
@@ -511,6 +510,7 @@ namespace Belle2 {
 
       TVector3 mom1;
       if (trak1Res) mom1 = trak1Res->getMomentum();
+      if (std::isinf(mom1.Mag2()) == true || std::isnan(mom1.Mag2()) == true) continue;
       if (!trak1Res) continue;
 
       bool isKsDau = false;
@@ -523,6 +523,7 @@ namespace Belle2 {
 
           TVector3 mom2;
           if (trak2Res) mom2 = trak2Res->getMomentum();
+          if (std::isinf(mom2.Mag2()) == true || std::isnan(mom2.Mag2()) == true) continue;
           if (!trak2Res) continue;
 
           double Mass2 = TMath::Power(TMath::Sqrt(mom1.Mag2() + mpi * mpi) + TMath::Sqrt(mom2.Mag2() + mpi * mpi), 2)

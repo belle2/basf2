@@ -44,11 +44,11 @@ namespace Belle2 {
 
     /** The status information for the MCParticle. */
     enum StatusBit {
-      c_PrimaryParticle   = 1,   /**< bit 0:  Particle is primary particle. */
-      c_StableInGenerator = 2,   /**< bit 1:  Particle is stable in the generator. */
+      c_PrimaryParticle   = 1,   /**< bit 0:  Particle is primary particle. For example, All the particles from the generator.  */
+      c_StableInGenerator = 2,   /**< bit 1:  Particle is stable, i.e., not decaying in the generator.  */
       c_LeftDetector      = 4,   /**< bit 2:  Particle left the detector (the simulation volume). */
       c_StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in the detector (the simulation volume). */
-      c_IsVirtual         = 16,  /**< bit 4:  Particle is virtual and not going to Geant4 */
+      c_IsVirtual         = 16,  /**< bit 4:  Particle is virtual and not going to Geant4. Exchange boson, off-shell, unknown to Geant4, etc. */
       c_Initial           = 32   /**< bit 5:  Particle is initial such as e+ or e- and not going to Geant4 */
     };
 

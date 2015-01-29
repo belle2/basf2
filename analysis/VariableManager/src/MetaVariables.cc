@@ -207,10 +207,12 @@ namespace Belle2 {
                 target = particle;
               }
             }
-            prob = target -> getExtraInfo(extraInfoRightClass); //Gets the probability of beeing right classified flavor from the event level
-            maximum_q = target -> getCharge(); //Gets the flavor of the track selected as target
-            if (extraInfoFromB == "IsFromB(Lambda)") {
-              maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
+            if (target != nullptr) {
+              prob = target -> getExtraInfo(extraInfoRightClass); //Gets the probability of beeing right classified flavor from the event level
+              maximum_q = target -> getCharge(); //Gets the flavor of the track selected as target
+              if (extraInfoFromB == "IsFromB(Lambda)") {
+                maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
+              }
             }
           }
           //float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */

@@ -86,7 +86,10 @@ methods = [('FastBDT', 'Plugin',
 # Methods for Combiner Level
 methodsCombiner = [('FastBDT', 'Plugin',
                    'CreateMVAPdfs:NbinsMVAPdf=300:!H:!V:NTrees=300:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
-# SignalFraction to calculate probability, -2 if training signal/background ratio should be used
+
+# SignalFraction: TMVA feature
+# For smooth output set to -1, this will break the calibration.
+# For correct calibration set to -2, leads to peaky output.
 signalFraction = -2
 
 TrackLevelParticleLists = [  # ('e+', 'IntermediateElectron'),
@@ -104,13 +107,13 @@ EventLevelParticleLists = [  # ('e+', 'IntermediateElectron'),
     ('e+', 'Electron'),
     ('mu+', 'Muon'),
     ('mu+', 'KinLepton'),
-    ('K+', 'Kaon'),
+    # ('K+', 'Kaon'),
     ('pi+', 'SlowPion'),
     ('pi+', 'FastPion'),
     ('pi+', 'MaximumP*'),
     ('pi+', 'FSC'),
-    ('K+', 'KaonPion'),
-    ('Lambda0', 'Lambda'), ]
+    ('K+', 'KaonPion'), ]
+    # ('Lambda0', 'Lambda'),
 
 
 def TrackLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
@@ -123,17 +126,17 @@ def TrackLevel(weightFiles='B2JpsiKs_mu', path=analysis_main):
 
       # Select particles in ROE for different categories of flavour tagging.
         if symbol != 'Lambda0':
-            fillParticleList(particleList, 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=path)
+            fillParticleList(particleList, 'isInRestOfEvent > 0.5', path=path)
       # Check if there is K short in this event
         if symbol == 'K+':
             applyCuts('K+:ROE', '0.1<Kid', path=path)  # Precut done to prevent from overtraining, might be redundant
-            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=path)
+            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5', path=path)
             reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe', '0.40<=M<=0.60', 1, path=path)
             fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=path)
 
         if symbol == 'Lambda0':
-            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=path)
-            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=path)
+            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5', path=path)
+            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5', path=path)
             reconstructDecay('Lambda0:ROE -> pi-:inLambdaRoe p+:inLambdaRoe', '1.00<=M<=1.23', 1, path=path)
             reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe', '0.40<=M<=0.60', 1, path=path)
             fitVertex('Lambda0:ROE', 0.01, fitter='kfitter', path=path)

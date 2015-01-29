@@ -42,11 +42,15 @@ class RemoveEmptyROEModule(Module):
 
 main = create_path()
 # ***************************************
+progress = register_module('Progress')
+main.add_module(progress)
+
 roinput = register_module('RootInput')
 inputFiles = []
 for i in xrange(10):
     inputFiles.append('/remote/pcbelle06/ligioi/dstFiles/B2JpsiKs_mu_e0001r'
                       + '%04d' % (i + 1) + '_s00_BGx0.mdst.root')
+#roinput.param('skipNEvents', 955)
 roinput.param('inputFileNames', inputFiles)
 main.add_module(roinput)
 # ***************************************
@@ -93,7 +97,8 @@ variables['Electron'] = [
     'SemiLeptonicVariables(CosTheta_missing_CMS)',
     'SemiLeptonicVariables(EW90)',
     'eid_ARICH',
-    'eid_ECL', ]
+    'eid_ECL',
+    'chiProb', ]
 variables['IntermediateElectron'] = variables['Electron']
 variables['Muon'] = [
     'p_CMS',
@@ -107,7 +112,8 @@ variables['Muon'] = [
     'SemiLeptonicVariables(p_missing_CMS)',
     'SemiLeptonicVariables(CosTheta_missing_CMS)',
     'SemiLeptonicVariables(EW90)',
-    'muid_ARICH', ]
+    'muid_ARICH',
+    'chiProb', ]
 variables['IntermediateMuon'] = variables['Muon']
 variables['KinLepton'] = [
     'p_CMS',
@@ -126,7 +132,8 @@ variables['KinLepton'] = [
     'eid_dEdx',
     'eid_TOP',
     'eid_ARICH',
-    'eid_ECL', ]
+    'eid_ECL',
+    'chiProb', ]
 variables['Kaon'] = [
     'p_CMS',
     'pt_CMS',
@@ -138,7 +145,8 @@ variables['Kaon'] = [
     'Kid_ARICH',
     'NumberOfKShortinRemainingROEKaon',
     'ptTracksRoe',
-    'distance', ]
+    'distance',
+    'chiProb', ]
 variables['SlowPion'] = [
     'p_CMS',
     'pt_CMS',
@@ -152,7 +160,8 @@ variables['SlowPion'] = [
     'pi_vs_edEdxid',
     'cosTPTO',
     'Kid',
-    'eid', ]
+    'eid',
+    'chiProb', ]
 variables['FastPion'] = variables['SlowPion']
 variables['Lambda'] = [
     'lambdaFlavor',
@@ -209,18 +218,18 @@ for (symbol, category) in trackLevelParticles:
 
     # Select particles in ROE for different categories of flavour tagging.
     if symbol != 'Lambda0':
-        fillParticleList(particleList, 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=roe_path)
+        fillParticleList(particleList, 'isInRestOfEvent > 0.5', path=roe_path)
     # Check if there is K short in this event
     if symbol == 'K+':
         applyCuts('K+:ROE', '0.1<Kid', path=roe_path)  # Precut done to prevent from overtraining, might be redundant
-        fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=roe_path)
+        fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5', path=roe_path)
         reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe', '0.40<=M<=0.60', 1, path=roe_path)
         fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=roe_path)
         # modify confidence level?!
 
     if symbol == 'Lambda0':
-        fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=roe_path)
-        fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5 and chiProb > 0.001', path=roe_path)
+        fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5', path=roe_path)
+        fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5', path=roe_path)
         reconstructDecay('Lambda0:ROE -> pi-:inLambdaRoe p+:inLambdaRoe', '1.00<=M<=1.23', 1, path=roe_path)
         reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe', '0.40<=M<=0.60', 1, path=roe_path)
         fitVertex('Lambda0:ROE', 0.01, fitter='kfitter', path=roe_path)
@@ -280,13 +289,13 @@ eventLevelParticles = [  # ('e+', 'IntermediateElectron'),
     ('e+', 'Electron'),
     ('mu+', 'Muon'),
     ('mu+', 'KinLepton'),
-    ('K+', 'Kaon'),
+    #    ('K+', 'Kaon'),
     ('pi+', 'SlowPion'),
     ('pi+', 'FastPion'),
     ('pi+', 'MaximumP*'),
     ('pi+', 'FSC'),
-    ('K+', 'KaonPion'),
-    ('Lambda0', 'Lambda'), ]
+    ('K+', 'KaonPion'), ]
+    #    ('Lambda0', 'Lambda'),
 
 if eventLevelReady:
     B2INFO('EVENT LEVEL')
@@ -364,13 +373,15 @@ if combinerLevelReady:
         'QrOf(e+:ROE, IsRightClass(Electron), IsFromB(Electron))',
         'QrOf(mu+:ROE, IsRightClass(Muon), IsFromB(Muon))',
         'QrOf(mu+:ROE, IsRightClass(KinLepton), IsFromB(KinLepton))',
-        'QrOf(K+:ROE, IsRightClass(Kaon), IsFromB(Kaon))',
+        # 'QrOf(K+:ROE, IsRightClass(Kaon), IsFromB(Kaon))',
+        'InputQrOf(K+:ROE, IsRightClass(Kaon), IsFromB(Kaon))',
         'QrOf(pi+:ROE, IsRightClass(SlowPion), IsFromB(SlowPion))',
         'QrOf(pi+:ROE, IsRightClass(FastPion), IsFromB(FastPion))',
         'QrOf(pi+:ROE, IsRightClass(MaximumP*), IsFromB(MaximumP*))',
         'QrOf(pi+:ROE, IsRightClass(FSC), IsFromB(SlowPion))',
         'QrOf(K+:ROE, IsRightClass(KaonPion), IsFromB(Kaon))',
-        'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))', ]
+        # 'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))', ]
+        'InputQrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))', ]
 
     method_Combiner = [('FastBDT', 'Plugin',
                        'CreateMVAPdfs:NbinsMVAPdf=300:!H:!V:NTrees=300:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
@@ -461,6 +472,7 @@ if combinerLevelReady:
         'TaggingInformation', workingDirectory + '/FlavorTaggerOutput.root', path=main)
 
 main.add_module(register_module('ProgressBar'))
+
 process(main)
 print statistics
 

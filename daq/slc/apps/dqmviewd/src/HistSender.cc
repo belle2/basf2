@@ -134,6 +134,7 @@ void HistSender::run()
     ZipDeflater buf(buf_size, buf_size * 1.01 + 12);
 
     try {
+      bool updated = false;
       while (true) {
         //bool revised = false;
         m_callback->lock();
@@ -144,7 +145,7 @@ void HistSender::run()
         int ic = 0;
         for (size_t i = 0; i < reader_v.size(); i++) {
           if (monitored_v[i]) {
-            if (reader_v[i].getUpdateId() != updateid_v[i]) {
+            if (!updated || reader_v[i].getUpdateId() != updateid_v[i]) {
               updateid_v[i] = reader_v[i].getUpdateId();
               buf.seekTo(0);
               socket_writer.writeInt(ic);
@@ -155,11 +156,13 @@ void HistSender::run()
             ic++;
           }
         }
+        updated = true;
         socket_writer.writeInt(-1);
         m_callback->wait();
         m_callback->unlock();
       }
     } catch (const IOException& e) {
+      LogFile::error(e.what());
       m_callback->unlock();
       m_socket.close();
       return;

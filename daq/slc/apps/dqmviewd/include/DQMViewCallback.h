@@ -39,6 +39,7 @@ namespace Belle2 {
     unsigned int getRunNumber() const { return m_runno; }
     void notify() { m_cond.broadcast(); }
     void wait() { m_cond.wait(m_mutex); }
+    //void wait(int timeout = 5) { m_cond.wait(m_mutex, timeout); }
     void lock() { m_mutex.lock(); }
     void unlock() { m_mutex.unlock(); }
 

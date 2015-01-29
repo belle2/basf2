@@ -41,15 +41,18 @@ bool DQMFileReader::init()
       if (class_name.Contains("TH1") ||  class_name.Contains("TH2")) {
         TH1* h = (TH1*)obj;
         std::string name = h->GetName();
+        LogFile::debug("%s:(%d, %f, %f)", name.c_str(), (int)h->GetXaxis()->GetNbins(),
+                       h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax());
         StringList str_v = StringUtil::split(name, '/');
         std::string dir = "";
         if (str_v.size() > 1) {
           dir = str_v[0];
           name = str_v[1];
         }
-        h = (TH1*)h->Clone((name + "_copy").c_str());
-        m_hist_m.addHist(h, dir, name);
-
+        TH1* h1 = (TH1*)h->Clone((name + "_copy").c_str());
+        h1->Reset();
+        h1->Add(h);
+        m_hist_m.addHist(h1, dir, name);
       }
     }
     mr = mr->GetNext();
@@ -72,6 +75,8 @@ int DQMFileReader::update()
     TH1* h = it->second;
     TH1* h0 = (TH1*)m_file->Get(name.c_str());
     if (h->GetEntries() != h0->GetEntries()) {
+      LogFile::debug("%s:%.0f - %.0f = %.0f", name.c_str(), h0->GetEntries()
+                     , h->GetEntries(), h0->GetEntries() - h->GetEntries());
       h->Reset();
       h->Add(h0);
       updated = true;

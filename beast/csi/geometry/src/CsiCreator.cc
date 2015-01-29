@@ -86,9 +86,9 @@ namespace Belle2 {
 
       G4Element* Tl = nistManager->FindOrBuildElement("Tl");
 
-      G4Material* CsI_Tl = new G4Material("CsI_Tl", density = 4.51 * g / cm3, ncomponents = 2);
-      CsI_Tl->AddMaterial(CsIodide, abundance = 99.97 * perCent);
-      CsI_Tl->AddElement(Tl, abundance = 0.03 * perCent);
+      G4Material* CsI_Tl = new G4Material("CsI_Tl", density = 4.51 * CLHEP::g / CLHEP::cm3, ncomponents = 2);
+      CsI_Tl->AddMaterial(CsIodide, abundance = 99.97 * CLHEP::perCent);
+      CsI_Tl->AddElement(Tl, abundance = 0.03 * CLHEP::perCent);
 
       std::cout << CsI_Tl << std::endl;
 
@@ -119,7 +119,7 @@ namespace Belle2 {
           B2INFO("Crystal Number " << eclp->CsiVolNameToCellID(VolumeName) <<
                  " placed at (r[cm],[deg],z[cm]) = (" << setprecision(1) <<  fixed <<
                  volume->GetTranslation().perp() / CLHEP::cm << "," <<
-                 volume->GetTranslation().phi() * 180 / PI << "," <<
+                 volume->GetTranslation().phi() * 180. / PI << "," <<
                  volume->GetTranslation().z() / CLHEP::cm << ")");
         }
 

@@ -49,7 +49,7 @@ namespace Belle2 {
       c_LeftDetector      = 4,   /**< bit 2:  Particle left the detector (the simulation volume). */
       c_StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in the detector (the simulation volume). */
       c_IsVirtual         = 16,  /**< bit 4:  Particle is virtual and not going to Geant4 */
-      c_Initial           = 32   /**< bit 5:  Particle is initial such as ISR and not going to Geant4 */
+      c_Initial           = 32   /**< bit 5:  Particle is initial such as e+ or e- and not going to Geant4 */
     };
 
 

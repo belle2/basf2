@@ -68,16 +68,11 @@ class FilterMcParticleInPtBin(object):
     # all tracks generated in one event have the exact same Pt
     # therefore, a cut on the first entry can be applied
     def doesPass(self, filterProperties):
-        # if len(mcTrackCands) > 0:
+        # todo: check the length of the PyStoreArray to be >0
         pt = filterProperties.mcParticles[0].getMomentum().Pt()
-        # print " bin " + str( self.ptBin) + " -- PT " + str(pt)
         doesPass = pt > self.ptBin[0] and pt < self.ptBin[1]
-        # print "does Pass " + str(doesPass)
         return doesPass
 
-
-        # else:
-        #    print "not sufficient mc particles to determine bin"
 
 # Specialized version of the tracking validation
 # which creates seperate root files with dedicated plots

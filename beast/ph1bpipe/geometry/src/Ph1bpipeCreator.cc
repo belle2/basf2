@@ -219,7 +219,7 @@ namespace Belle2 {
                                        content.getLength("xpipe_outerRadius")*CLHEP::cm,
                                        content.getLength("xpipe_hz")*CLHEP::cm,
                                        startAngle, spanningAngle);
-      double innerRadiusTiN = content.getLength("xpipe_innerRadius") / 2.*CLHEP::cm - 200 * 1e-7 / 2.*CLHEP::cm;
+      double innerRadiusTiN = content.getLength("xpipe_innerRadius") * CLHEP::cm - 200 * 1e-7 * CLHEP::cm;
       G4VSolid* s_Xshape1TiN = new G4Tubs("s_Xshape1TiN",
                                           innerRadiusTiN,
                                           content.getLength("xpipe_innerRadius")*CLHEP::cm,

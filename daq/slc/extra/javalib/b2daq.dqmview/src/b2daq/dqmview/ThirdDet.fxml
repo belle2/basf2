@@ -104,7 +104,7 @@
                                 </CanvasPanel>
                                 <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="180.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
                                     <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="top">
+                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="bottom">
                                             <histograms>
                                                 <FXCollections fx:factory="observableArrayList">
                                                     <Histo1D name="h_HitYPositionCh03:diff" lineColor="blue" fillColor="cyan" />

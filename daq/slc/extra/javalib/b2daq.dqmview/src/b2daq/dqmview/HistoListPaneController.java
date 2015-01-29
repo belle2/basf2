@@ -11,8 +11,6 @@ import b2daq.dqm.core.MonObject;
 import b2daq.dqm.ui.CanvasPanel;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;

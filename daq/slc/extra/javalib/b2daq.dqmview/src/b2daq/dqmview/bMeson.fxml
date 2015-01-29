@@ -32,7 +32,7 @@
                                         <HistogramCanvas fillColor="lightgray" fontSize="0.9" stat="true" title=" " yLabelAlignment="bottom">
                                             <histograms>
                                                 <FXCollections fx:factory="observableArrayList">
-                                                    <Histo2D fx:id="h_HitXYPositionCh02" name="h_HitXYPositionCh02" />
+                                                    <Histo2D name="Mbc-deltaE" />
                                                 </FXCollections>
                                             </histograms>
                                         </HistogramCanvas> 
@@ -47,7 +47,7 @@
                                         <HistogramCanvas fillColor="lightgray" fontSize="0.9" stat="true" title=" " yLabelAlignment="bottom">
                                             <histograms>
                                                 <FXCollections fx:factory="observableArrayList">
-                                                    <Histo1D fx:id="h_HitXPositionCh02" name="h_HitXPositionCh02" lineColor="blue" fillColor="cyan" />
+                                                    <Histo1D name="Mbc" lineColor="blue" fillColor="cyan" />
                                                 </FXCollections>
                                             </histograms>
                                         </HistogramCanvas>
@@ -55,10 +55,10 @@
                                 </CanvasPanel>
                                 <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="180.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
                                     <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="top">
+                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="bottom">
                                             <histograms>
                                                 <FXCollections fx:factory="observableArrayList">
-                                                    <Histo1D fx:id="h_HitYPositionCh02" name="h_HitYPositionCh02" lineColor="blue" fillColor="cyan" />
+                                                    <Histo1D name="deltaE" lineColor="blue" fillColor="cyan" />
                                                 </FXCollections>
                                             </histograms>
                                         </HistogramCanvas>
@@ -81,7 +81,7 @@
                                         <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="bottom">
                                             <histograms>
                                                 <FXCollections fx:factory="observableArrayList">
-                                                    <Histo2D name="h_HitXYPositionCh02:diff" />
+                                                    <Histo2D name="Mbc-deltaE:diff" />
                                                 </FXCollections>
                                             </histograms>
                                         </HistogramCanvas>
@@ -96,7 +96,7 @@
                                         <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="bottom">
                                             <histograms>
                                                 <FXCollections fx:factory="observableArrayList">
-                                                    <Histo1D name="h_HitXPositionCh02:diff" lineColor="blue" fillColor="cyan" />
+                                                    <Histo1D name="Mbc:diff" lineColor="blue" fillColor="cyan" />
                                                 </FXCollections>
                                             </histograms>
                                         </HistogramCanvas>
@@ -104,10 +104,10 @@
                                 </CanvasPanel>
                                 <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="180.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
                                     <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="bottom">
+                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="top">
                                             <histograms>
                                                 <FXCollections fx:factory="observableArrayList">
-                                                    <Histo1D name="h_HitYPositionCh02:diff" lineColor="blue" fillColor="cyan" />
+                                                    <Histo1D name="deltaE:diff" lineColor="blue" fillColor="cyan" />
                                                 </FXCollections>
                                             </histograms>
                                         </HistogramCanvas>

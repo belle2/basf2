@@ -19,8 +19,6 @@ import b2daq.dqm.ui.property.GColorAxisProperty;
 import java.util.ArrayList;
 import javafx.scene.layout.Pane;
 
-import javax.swing.JComponent;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

@@ -60,9 +60,11 @@ public class GHisto2 extends GHisto {
                 }
                 if (color != null) {
                     Paint c = canvas.getLine().getColor();
+                    Paint cf = canvas.getFill().getColor();
                     canvas.getFill().setColor(color);
                     canvas.getLine().setColor(null);
-                    canvas.drawRect(X, Y - height * 1.2, width * 1.2, height * 1.2);
+                    canvas.drawRect(X, Y - height, width, height, 1);
+                    canvas.getFill().setColor(cf);
                     canvas.getLine().setColor(c);
                 }
                 if (histo.getLineColor() != null) {
@@ -70,7 +72,7 @@ public class GHisto2 extends GHisto {
                     canvas.getFill().setColor(null);
                     canvas.getLine().setColor(histo.getLineColor());
                     canvas.getLine().setWidth(histo.getLineWidth());
-                    canvas.drawRect(X, Y - height * 1.2, width * 1.2, height * 1.2);
+                    canvas.drawRect(X, Y - height, width, height, 1);
                     canvas.getFill().setColor(c);
                 }
             }

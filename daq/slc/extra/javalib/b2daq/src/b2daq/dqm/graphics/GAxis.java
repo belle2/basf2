@@ -174,7 +174,7 @@ public abstract class GAxis extends GShape {
     }
 
     @Override
-    public void setLineColor(Paint color) {
+    public final void setLineColor(Paint color) {
         super.setLineColor(color);
         border_line0.setLineColor(color);
         border_line1.setLineColor(color);
@@ -298,7 +298,7 @@ public abstract class GAxis extends GShape {
         return (axis.getMin() > 0) && log_scale;
     }
 
-    public void setLogScale(boolean enable) {
+    public final void setLogScale(boolean enable) {
         log_scale = enable;
     }
 
@@ -313,7 +313,7 @@ public abstract class GAxis extends GShape {
             base = Math.floor(Math.log10(axis.getMax() - axis.getMin()));
             double scale = Math.pow(10d, base);
             double dx = Math.pow(10d, base - 1) * 2;
-            if (axis.getMax() < dx * 25) {
+            if (axis.getMax() - axis.getMin() < dx * 25) {
                 dx /= 2;
             }
             long n_min = (int) Math.floor(axis.getMin() / dx), n_max = (int) Math.floor(axis.getMax() / dx);
@@ -349,7 +349,7 @@ public abstract class GAxis extends GShape {
                     }
                 }
             } else {
-                for (long n = n_min-1; n <= n_max+1; n++) {
+                for (long n = n_min; n <= n_max; n++) {
                     x = n * dx;
                     if (x >= axis.getMin() && x <= axis.getMax()) {
                         if (n % ndivisions == 0) {

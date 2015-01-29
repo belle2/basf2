@@ -9,8 +9,6 @@ import b2daq.dqm.core.Histo;
 import b2daq.dqm.core.HistoPackage;
 import b2daq.dqm.ui.CanvasPanel;
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -39,7 +39,7 @@ public class GColorAxis extends GAxisY {
             boolean fixMin, boolean fixMax, boolean logon) {
         super(nbin, min, max, label, fixMin, fixMax, logon);
         setHand(HAND_L);
-        getLabelsFont().setSize(0.90);
+        getLabelsFont().setSize(0.85);
     }
 
     @Override

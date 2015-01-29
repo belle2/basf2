@@ -119,16 +119,15 @@ public class FXGraphicsDrawer extends GraphicsDrawer {
 
     @Override
     public void drawRect(double x, double y, double width, double height) {
+        drawRect(x, y, width, height, 0);
+    }
+
+    @Override
+    public void drawRect(double x, double y, double width, double height, double addition) {
         double X = x * getWidth();
         double Y = y * getHeight();
-        double W = width * getWidth();
-        double H = height * getHeight();
-        if (W == 0 && width > 0) {
-            W = 1;
-        }
-        if (H == 0 && height > 0) {
-            H = 1;
-        }
+        double W = width * getWidth() + addition;
+        double H = height * getHeight() + addition;
         if (getFill().getColor() != null) {
             _graphics.setFill(getFill().getColor());
             _graphics.fillRect(X, Y, W, H);

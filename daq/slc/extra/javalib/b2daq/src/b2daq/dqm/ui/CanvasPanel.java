@@ -88,12 +88,12 @@ public class CanvasPanel extends AnchorPane implements Updatable {
     }
 
     @Override
-    public void setPrefSize(double width, double height) {
+    public final void setPrefSize(double width, double height) {
         super.setPrefSize(width, height);
         repaint();
     }
 
-    public void repaint() {
+    public final void repaint() {
         GraphicsContext graphics = _raw_canvas.getGraphicsContext2D();
         _graphics.setGraphics(graphics);
         graphics.clearRect(0, 0, getWidth(), getHeight());

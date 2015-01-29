@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Accordion;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
 
 /**

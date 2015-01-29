@@ -23,6 +23,7 @@ public abstract class GraphicsDrawer {
 	abstract public void drawPolygon(int begin, int end, double[] x, double[] y);
 	abstract public void drawPolyline(int begin, int end, double[] x, double[] y);
 	abstract public void drawRect(double x_begin, double y_begin, double _width, double _height);	
+	abstract public void drawRect(double x_begin, double y_begin, double _width, double _height, double addition);	
 	abstract public void drawString(String str, double x_begin, double y_begin, String align);
 	abstract public void drawString(String str, double x, double y, String align, double angle);
 	abstract public void drawMarker(double x, double y);

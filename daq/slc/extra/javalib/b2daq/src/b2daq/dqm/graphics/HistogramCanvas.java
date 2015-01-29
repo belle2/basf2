@@ -195,6 +195,7 @@ public class HistogramCanvas extends GRect {
         if (h.getDim() == 2) {
             if (colorAxis == null) {
                 colorAxis = new GColorAxis(10, 0, 1, "", false, false, false);
+                pad.setWidth(0.7);
             }
             colorAxis.setHand(GAxis.HAND_L);
             //resetPadding();

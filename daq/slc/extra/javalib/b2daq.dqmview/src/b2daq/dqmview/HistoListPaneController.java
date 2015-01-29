@@ -11,8 +11,12 @@ import b2daq.dqm.core.MonObject;
 import b2daq.dqm.ui.CanvasPanel;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -23,7 +27,9 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * FXML Controller class
@@ -69,6 +75,20 @@ public class HistoListPaneController implements Initializable {
                     return true;
                 }
             }
+        } else if (parent instanceof VBox) {
+            VBox vpane = (VBox) parent;
+            for (Node node : vpane.getChildren()) {
+                if (find(name, node)) {
+                    return true;
+                }
+            }
+        } else if (parent instanceof HBox) {
+            HBox hpane = (HBox) parent;
+            for (Node node : hpane.getChildren()) {
+                if (find(name, node)) {
+                    return true;
+                }
+            }
         } else if (parent instanceof ScrollPane) {
             ScrollPane spane = (ScrollPane) parent;
             if (find(name, spane.getContent())) {
@@ -105,26 +125,42 @@ public class HistoListPaneController implements Initializable {
                 }
             };
         });
-        list.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, histo) -> {
-            for (Node node : sidepane.getMainPanel().getPane().getChildren()) {
-                node.setVisible(false);
+
+        list.setOnMouseClicked(new EventHandler() {
+            @Override
+            public void handle(Event event) {
+                update();
             }
-            for (Node node : sidepane.getMainPanel().getPane().getChildren()) {
-                for (MonObject obj : pack.getMonObjects()) {
-                    Histo h = (Histo) obj;
-                    if (h.getName().endsWith(":diff") || h.getName().endsWith(":tmp")) {
-                        continue;
-                    }
-                    String dir = pack.getDirectory(h);
-                    if (m_dir.equals(dir) && h.getName().equals(histo.getName())) {
-                        if (find(histo.getName(), node)) {
-                            node.setVisible(true);
-                            return;
-                        }
+        });
+        
+    }
+
+    public void update() {
+        Histo histo = list.getSelectionModel().getSelectedItem();
+        if (histo == null) {
+            list.getSelectionModel().select(0);
+            histo = list.getSelectionModel().getSelectedItem();
+        }
+        for (Node node : sidepane.getMainPanel().getPane().getChildren()) {
+            node.setVisible(false);
+        }
+        for (Node node : sidepane.getMainPanel().getPane().getChildren()) {
+            for (MonObject obj : pack.getMonObjects()) {
+                Histo h = (Histo) obj;
+                if (h.getName().endsWith(":diff") || h.getName().endsWith(":tmp")) {
+                    continue;
+                }
+                String dir = pack.getDirectory(h);
+                if (m_dir.equals(dir) && 
+                        h.getName().equals(histo.getName())) {
+                    if (find(histo.getName(), node)) {
+                        sidepane.getViewMain().SetDirectory(dir);
+                        node.setVisible(true);
+                        return;
                     }
                 }
             }
-        });
+        }
     }
 
     public void init(HistoPackage pack, String dir, DQMSidePaneController sidepane) {

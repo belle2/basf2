@@ -37,9 +37,20 @@
         </MenuBar>
         <HBox alignment="CENTER_LEFT" minHeight="44.0" prefHeight="44.0" prefWidth="700.0" spacing="20.0" VBox.vgrow="NEVER">
             <children>
+                <StateLabel fx:id="slabel" prefHeight="27.0" prefWidth="112.0" />
                 <Label alignment="CENTER" text="Run # :" />
                 <Label fx:id="label_runno" text="0000.0000.000" />
-                <StateLabel fx:id="slabel" prefHeight="27.0" prefWidth="112.0" />
+            <Label alignment="CENTER" text="Last update :" />
+            <Label fx:id="label_update" text="----/--/-- --:--:--" />
+            <Label alignment="CENTER" text="Selected :">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="label_directory" text="---">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
             </children>
             <VBox.margin>
                 <Insets />

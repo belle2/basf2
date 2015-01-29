@@ -10,12 +10,16 @@ import b2daq.dqm.io.DQMObserver;
 import b2daq.dqm.io.PackageInfo;
 import b2daq.hvcontrol.ui.StateLabel;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
@@ -27,17 +31,19 @@ public class DQMViewGUIController implements Initializable, DQMObserver {
 
     @FXML
     private Accordion accordion;
-    
     @FXML
     private Label label_runno;
     @FXML
+    private Label label_update;
+    @FXML
+    private Label label_directory;
+    @FXML
     private StateLabel slabel;
-    
     @FXML
     private StackPane tabpane;
 
-    private final DQMMainPaneController _main_panel = new DQMMainPaneController();
-    private final DQMSidePaneController _side_panel = new DQMSidePaneController();
+    private final DQMMainPaneController _main_panel = new DQMMainPaneController(this);
+    private final DQMSidePaneController _side_panel = new DQMSidePaneController(this);
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -54,11 +60,6 @@ public class DQMViewGUIController implements Initializable, DQMObserver {
         _side_panel.getPane().setDisable(false);
     }
 
-    public void update() {
-        _main_panel.update();
-        _side_panel.update();
-    }
-
     @Override
     public void reset() {
         _main_panel.getPane().getChildren().clear();
@@ -67,7 +68,18 @@ public class DQMViewGUIController implements Initializable, DQMObserver {
 
     @Override
     public void update(int expno, int runno, int stateno) {
-
+        label_runno.setText(String.format("%04d.%04d", expno, runno));
+        final SimpleDateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        label_update.setText(dateformat.format(date));
+        //slabel.set("RUNNING", Color.CYAN, Color.CYAN, Color.BLACK);
+        _main_panel.update();
+        _side_panel.update();
     }
 
+    public void SetDirectory(String dir) {
+        label_directory.setText(dir);
+    }
+            
+    
 }

@@ -18,6 +18,5 @@ public interface DQMObserver {
     public void reset();
     public void init(ArrayList<HistoPackage> _pack_v, ArrayList<PackageInfo> _info_v);
     public void update(int expno, int runno, int stateno);
-    public void update();
     
 }

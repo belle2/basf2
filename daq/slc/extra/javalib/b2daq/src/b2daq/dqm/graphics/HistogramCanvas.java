@@ -76,7 +76,7 @@ public class HistogramCanvas extends GRect {
         return pad;
     }
 
-    public void resetPadding() {
+    public final void resetPadding() {
         if (!_use_pad) {
             return;
         }
@@ -154,6 +154,18 @@ public class HistogramCanvas extends GRect {
     }
 
     public void addHisto(Histo h) {
+        boolean hasHist = false;
+        for (Histo hist: histograms) {
+            if (hist.getName().equals(h.getName())) {
+                h.setFill(hist.getFill());
+                h.setLine(hist.getLine());
+                h.setFont(hist.getFont());
+                histograms.set(histograms.indexOf(hist), h);
+                hasHist = true;
+                _use_pad = false;
+                break;
+            }
+        }
         if (!_use_pad) {
             _use_pad = true;
             try {
@@ -195,7 +207,9 @@ public class HistogramCanvas extends GRect {
             axisx.setLabelAngle(45);
             axisx.setLabelAlignment("top");
         }
-        histograms.add(h);
+        if (!hasHist) {
+            histograms.add(h);
+        }
         resetPadding();
         update();
     }
@@ -253,7 +267,8 @@ public class HistogramCanvas extends GRect {
             }
             _stat_entries.setText("integral : " + ((int) _stat_histo.getEntries()));
         }
-        panel.repaint();
+        if (panel != null)
+            panel.repaint();
     }
 
     public void draw(GraphicsDrawer canvas) {
@@ -356,7 +371,7 @@ public class HistogramCanvas extends GRect {
         return _title.getText();
     }
 
-    public void setTitlePosition(String pos) {
+    public final void setTitlePosition(String pos) {
         if (pos.matches("center")) {
             _title_position = pos;
             _title.setX(0.5);
@@ -376,7 +391,7 @@ public class HistogramCanvas extends GRect {
         return _title_position;
     }
 
-    public void setTitle(String title) {
+    public final void setTitle(String title) {
         _title.setText(title);
         if (title.length() > 20) {
             setTitlePosition("left");

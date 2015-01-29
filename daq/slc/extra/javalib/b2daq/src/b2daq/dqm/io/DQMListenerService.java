@@ -170,7 +170,7 @@ public class DQMListenerService extends Thread {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                observer.update();
+                                observer.update(_expno, _runno, 0);
                             }
                         });
                     }
@@ -240,7 +240,6 @@ public class DQMListenerService extends Thread {
                     h_tmp.add(h);
                 }
             } else {
-                System.out.println("Not tmp histogram for " + h.getName());
             }
             int magic = reader.readInt();
             if (magic != 0x7FFF) {

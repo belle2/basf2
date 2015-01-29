@@ -51,7 +51,7 @@
         <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">
             <items>
                 <Accordion fx:id="accordion" disable="true" maxWidth="280.0" minWidth="0.0" HBox.hgrow="SOMETIMES" />
-                <TabPane fx:id="tabpane" disable="true" minHeight="400.0" minWidth="500.0" HBox.hgrow="ALWAYS" />
+                <StackPane fx:id="tabpane" disable="true" minHeight="400.0" minWidth="500.0" HBox.hgrow="ALWAYS" />
             </items>
         </SplitPane>
     </children>

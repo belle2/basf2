@@ -5,7 +5,6 @@
  */
 package b2daq.dqmview;
 
-import b2daq.core.NumberString;
 import b2daq.dqm.io.DQMListenerService;
 import b2daq.hvcontrol.core.HVState;
 import b2daq.io.ConfigFile;

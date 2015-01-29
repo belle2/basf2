@@ -10,13 +10,14 @@ import b2daq.dqm.core.HistoPackage;
 import b2daq.dqm.ui.CanvasPanel;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -26,12 +27,10 @@ import javafx.scene.layout.VBox;
  */
 public class DQMMainPaneController implements Initializable {
 
-    @FXML
-    private TabPane tabpane;
-
-    private ArrayList<HistoPackage> _pack_v = null;
-    private ArrayList<CanvasPanel> _canvas_v = null;
-    private DQMSidePaneController _side_panel;
+    private StackPane tabpane;
+    private ArrayList<HistoPackage> m_pack_v = null;
+    private ArrayList<CanvasPanel> m_canvas_v = null;
+    private DQMSidePaneController m_sidepanel;
 
     static public final String getCSSPath() {
         return DQMMainPaneController.class.getResource("DQMMainPane.css").toExternalForm();
@@ -47,33 +46,44 @@ public class DQMMainPaneController implements Initializable {
 
     public DQMMainPaneController() {
         super();
-        _pack_v = new ArrayList<>();
-        _canvas_v = new ArrayList<>();
+        m_pack_v = new ArrayList<>();
+        m_canvas_v = new ArrayList<>();
     }
 
     public ArrayList<HistoPackage> getPackages() {
-        return _pack_v;
+        return m_pack_v;
     }
 
     public void initPanels(ArrayList<HistoPackage> pack_v,
             DQMSidePaneController side_panel) {
         //removeAll();
-        _pack_v = pack_v;
-        _side_panel = side_panel;
-        _side_panel.setMainPanel(this);
-        for (HistoPackage pack : _pack_v) {
-            TabPane pane = new TabPane();
-            Tab tab = new Tab();
-            tab.setClosable(false);
-            tab.setText(pack.getName());
-            tab.setContent(pane);
-            VBox.setVgrow(pane, Priority.ALWAYS);
-            HBox.setHgrow(pane, Priority.ALWAYS);
-            tabpane.getTabs().add(tab);
+        m_pack_v = pack_v;
+        m_sidepanel = side_panel;
+        m_sidepanel.setMainPanel(this);
+        for (HistoPackage pack : m_pack_v) {
+            HashMap<String, StackPane> pane_v = new HashMap<>();
+            for (int i = 0; i < pack.getNHistos(); i++) {
+                String dir = pack.getDirectory(pack.getHisto(i));
+                if (!pane_v.containsKey(dir)) {
+                    StackPane pane = new StackPane();
+                    /*
+                    Tab tab = new Tab();
+                    tab.setClosable(false);
+                    tab.setText(dir);
+                    tab.setContent(pane);
+                    */
+                    VBox.setVgrow(pane, Priority.ALWAYS);
+                    HBox.setHgrow(pane, Priority.ALWAYS);
+                    tabpane.getChildren().add(pane);
+                    pane_v.put(dir, pane);
+                }
+            }
             ArrayList<Histo> histo_v = new ArrayList<>();
             for (int i = 0; i < pack.getNHistos(); i++) {
                 Histo h = (Histo) pack.getHisto(i);
-                System.out.println(h.getName());
+                String dir = pack.getDirectory(pack.getHisto(i));
+                System.out.println(dir + "/" + h.getName());
+                StackPane pane = pane_v.get(dir);
                 CanvasPanel canvas = new CanvasPanel(h.getName(), h.getTitle());
                 canvas.getCanvas().setStat(true);
                 canvas.setMinSize(400, 400);
@@ -81,16 +91,18 @@ public class DQMMainPaneController implements Initializable {
                 canvas.getCanvas().resetPadding();
                 VBox.setVgrow(canvas, Priority.ALWAYS);
                 HBox.setHgrow(canvas, Priority.ALWAYS);
-                _canvas_v.add(canvas);
+                m_canvas_v.add(canvas);
                 TabPane subpane = new TabPane();
                 VBox.setVgrow(subpane, Priority.ALWAYS);
                 HBox.setHgrow(subpane, Priority.ALWAYS);
+                /*
                 Tab subtab = new Tab();
                 subtab.setClosable(false);
-                //subtab.setText(h.getName());
                 subtab.setText(h.getTitle());
                 pane.getTabs().add(subtab);
                 subtab.setContent(subpane);
+                */
+                pane.getChildren().add(subpane);
                 Tab subsubtab = new Tab();
                 subsubtab.setText("Total");
                 subsubtab.setContent(canvas);
@@ -104,9 +116,8 @@ public class DQMMainPaneController implements Initializable {
                 canvas.getCanvas().resetPadding();
                 VBox.setVgrow(canvas, Priority.ALWAYS);
                 HBox.setHgrow(canvas, Priority.ALWAYS);
-                _canvas_v.add(canvas);
+                m_canvas_v.add(canvas);
                 subsubtab = new Tab();
-                subtab.setClosable(false);
                 subsubtab.setText("Difference");
                 subsubtab.setContent(canvas);
                 subsubtab.setClosable(false);
@@ -117,22 +128,22 @@ public class DQMMainPaneController implements Initializable {
                 histo_v.add(h1);
             }
             for (Histo h : histo_v) {
-                pack.addHisto(h);
+                pack.addHisto("", h);
             }
         }
     }
 
     public void update() {
-        for (CanvasPanel canvas : _canvas_v) {
+        for (CanvasPanel canvas : m_canvas_v) {
             canvas.update();
         }
     }
 
-    public TabPane getPane() {
+    public StackPane getPane() {
         return tabpane;
     }
 
-    public void setPane(TabPane pane) {
+    public void setPane(StackPane pane) {
         tabpane = pane;
     }
 

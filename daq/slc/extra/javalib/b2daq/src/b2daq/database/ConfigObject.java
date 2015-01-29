@@ -22,8 +22,6 @@ public class ConfigObject extends DBObject {
 
     @Override
     public void readObject(Reader reader) throws IOException {
-        int npar = 0;
-        int i_tmp = 0;
         try {
             reset();
             setId(reader.readInt());
@@ -31,13 +29,10 @@ public class ConfigObject extends DBObject {
             setNode(reader.readString());
             setTable(reader.readString());
             setRevision(reader.readInt());
-            npar = reader.readInt();
-            i_tmp = 0;
+            int npar = reader.readInt();
             for (int i = 0; i < npar; i++) {
-                i_tmp = i;
                 String name = reader.readString();
                 int type = reader.readInt();
-                System.out.println("param = " + getName() + " '" + name + "' " + type);
                 switch (type) {
                     case FieldInfo.BOOL:
                         addBool(name, reader.readBoolean());
@@ -63,7 +58,6 @@ public class ConfigObject extends DBObject {
                     case FieldInfo.TEXT:
                         String value = reader.readString();
                         addText(name, value);
-                        System.out.println("text = " + name + " '" + value + "'");
                         break;
                     case FieldInfo.OBJECT: {
                         ArrayList<ConfigObject> obj_v = new ArrayList<>();
@@ -87,13 +81,6 @@ public class ConfigObject extends DBObject {
                 }
             }
         } catch (IOException e) {
-            System.err.println(getId());
-            System.err.println(getName());
-            System.err.println(getNode());
-            System.err.println(getTable());
-            System.err.println(getRevision());
-            System.err.println(npar);
-            System.err.println(i_tmp);
             throw(e);
         }
     }

@@ -6,8 +6,6 @@ import b2daq.core.Reader;
 import b2daq.core.Serializable;
 import b2daq.core.Writer;
 import b2daq.database.ConfigObject;
-import b2daq.io.DataReader;
-import b2daq.io.DataWriter;
 import b2daq.runcontrol.core.RCCommand;
 
 public final class NSMMessage implements Serializable {
@@ -150,19 +148,18 @@ public final class NSMMessage implements Serializable {
         if (length > 0) {
             StringBuilder buf = new StringBuilder();
             for (int i = 0; i < length; i++) {
-                buf.append((char) reader.readChar());
+                char c = (char) reader.readChar();
+                if (c =='\n' || (c >= ' ' && c <= '~')) {
+                    buf.append(c);
+                }
             }
             _data = buf.toString();
-            System.out.println("reqest = '" + getReqName() + "' " + _data);
         } else if (getReqName().matches("DBSET")) {
-            System.out.println(getReqName());
             _obj = new ConfigObject();
             reader.readObject(_obj);
-            ((ConfigObject) _obj).print();
         } else if (getReqName().matches("NSMSET")) {
             _obj = new NSMData();
             reader.readObject(_obj);
-            //((NSMData)_obj).print();
         } else {
             _data = "";
             _obj = null;

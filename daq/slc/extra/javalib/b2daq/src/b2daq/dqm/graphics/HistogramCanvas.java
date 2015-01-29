@@ -6,6 +6,7 @@ import b2daq.dqm.core.MonObject;
 import b2daq.dqm.core.TimedGraph1;
 import b2daq.dqm.ui.CanvasPanel;
 import b2daq.graphics.FontProperty;
+import b2daq.graphics.GLine;
 import b2daq.graphics.GraphicsDrawer;
 import b2daq.graphics.GRect;
 import b2daq.graphics.GShape;
@@ -38,16 +39,18 @@ public class HistogramCanvas extends GRect {
     private GText _stat_update;
     private GText _stat_entries;
     private Histo _stat_histo = null;
-    private boolean stat;
+    private boolean stat = true;
     private CanvasPanel panel = null;
+    private GLine _stat_line;
 
     public HistogramCanvas(String name, String title, double width, double height, boolean use_stat) {
         super(0, 0, 1, 1);
         stat = use_stat;
-        _title = new GText("", 0.5, pad.getY() / 3 - _title_offset, "center top");
+        _title = new GText("", 0.5, pad.getY() * 0.45 - _title_offset, "left middle");
         setName(name);
-        setFont(new FontProperty(Color.BLACK, "Arial", 1.1, FontWeight.BOLD));
+        setFont(new FontProperty(Color.BLACK, "Arial", 1.0, FontWeight.BOLD));
         setTitle(title);
+        setTitlePosition("left");
         resetPadding();
         setFillColor(Color.WHITE);
     }
@@ -117,14 +120,14 @@ public class HistogramCanvas extends GRect {
     public ObservableList<GShape> getShapes() {
         return shapes;
     }
-    
+
     public void setShapes(ObservableList<GShape> shapes) {
         this.shapes.clear();
         for (GShape shape : shapes) {
-           this.shapes.add(shape);
+            this.shapes.add(shape);
         }
     }
-    
+
     public Legend getLegend() {
         return legend;
     }
@@ -134,18 +137,18 @@ public class HistogramCanvas extends GRect {
         if (colorAxis == null) {
             colorAxis = new GColorAxis();
         }
-        ((GColorAxis)colorAxis).setColorPattern(pattern);
+        ((GColorAxis) colorAxis).setColorPattern(pattern);
         resetPadding();
     }
 
     public String getColorPattern() {
         return colorPattern;
     }
-    
+
     public String colorPatternProperty() {
         return colorPattern;
     }
-    
+
     public void setMonObject(int index, Histo h) {
         histograms.set(index, h);
     }
@@ -194,6 +197,7 @@ public class HistogramCanvas extends GRect {
         }
         histograms.add(h);
         resetPadding();
+        update();
     }
 
     public void addShape(GShape shape) {
@@ -213,36 +217,38 @@ public class HistogramCanvas extends GRect {
             histo.getDrawer().setCanvas(this);
             histo.getDrawer().update();
         });
-        if (legend != null && 
-                legend.getHistograms().size() == 0) {
+        if (legend != null
+                && legend.getHistograms().size() == 0) {
             for (Histo histo : histograms) {
                 legend.add(histo);
             }
-         }
+        }
         if (stat && _stat_histo != null) {
             if (_stat_rect == null) {
                 _stat_rect = new GRect(0.71, 0.02, 0.28, 0.12, Color.WHITE, Color.BLACK);
                 _stat_name = new GText(_stat_histo.getName(), 0.85, 0.055, "center");
+                _stat_line = new GLine(0.71, 0.06, 0.99, 0.06, Color.BLACK);
                 _stat_name.setFontSize(0.52);
                 if (_stat_name.getText().length() > 20) {
                     _stat_name.setFontSize(0.47);
                 }
-                _stat_update = new GText("mean     : ", 0.72, 0.088, "left");
+                _stat_update = new GText("mean     : ", 0.72, 0.095, "left");
                 _stat_update.setFontSize(0.52);
-                _stat_entries = new GText("entries : " + _stat_histo.getEntries(), 0.72, 0.128, "left");
+                _stat_entries = new GText("entries : " + _stat_histo.getEntries(), 0.72, 0.135, "left");
                 _stat_entries.setFontSize(0.52);
                 addShape(_stat_rect);
+                addShape(_stat_line);
                 addShape(_stat_name);
                 addShape(_stat_update);
                 addShape(_stat_entries);
             }
             if (_stat_histo.getDim() == 1) {
-                String label = String.format("%1$.3f", _stat_histo.getMean());
+                String label = String.format("%1$.2f", _stat_histo.getMean());
                 _stat_update.setText("mean     : " + label);
             } else if (_stat_histo.getDim() == 2) {
                 Histo2 h = (Histo2) _stat_histo;
-                String label = String.format("(%1$.3f, ", h.getMeanX());
-                label += String.format("%1$.3f)", h.getMeanY());
+                String label = String.format("(%1$.2f, ", h.getMeanX());
+                label += String.format("%1$.2f)", h.getMeanY());
                 _stat_update.setText("mean     : " + label);
             }
             _stat_entries.setText("integral : " + ((int) _stat_histo.getEntries()));
@@ -252,7 +258,6 @@ public class HistogramCanvas extends GRect {
 
     public void draw(GraphicsDrawer canvas) {
         super.draw(canvas);
-        //update();
         if (histograms.size() > 0) {
             if (_use_pad) {
                 try {
@@ -355,15 +360,15 @@ public class HistogramCanvas extends GRect {
         if (pos.matches("center")) {
             _title_position = pos;
             _title.setX(0.5);
-            _title.setAlignment("center top");
+            _title.setAlignment("center middle");
         } else if (pos.matches("left")) {
             _title_position = pos;
             _title.setX(0.04);
-            _title.setAlignment("left top");
+            _title.setAlignment("left middle");
         } else if (pos.matches("right")) {
             _title_position = pos;
             _title.setX(0.96);
-            _title.setAlignment("right top");
+            _title.setAlignment("right middle");
         }
     }
 
@@ -442,21 +447,21 @@ public class HistogramCanvas extends GRect {
     public void setxPanel(CanvasPanel panel) {
         this.panel = panel;
     }
-    
+
     public String getXLabelAlignment() {
         return axisx.getLabelAlignment();
     }
-    
+
     public String getYLabelAlignment() {
         return axisy.getLabelAlignment();
     }
-    
+
     public void setXLabelAlignment(String align) {
         axisx.setLabelAlignment(align);
     }
-    
+
     public void setYLabelAlignment(String align) {
         axisy.setLabelAlignment(align);
     }
-        
+
 }

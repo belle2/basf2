@@ -54,29 +54,29 @@ public class RCState extends NSMState {
 
     @Override
     public void copy(String label) {
-        if (label.matches(NOTREADY_S._label)) {
+        if (label.equals(NOTREADY_S.getLabel())) {
             copy(NOTREADY_S);
-        } else if (label.matches(READY_S._label)) {
+        } else if (label.equals(READY_S.getLabel())) {
             copy(READY_S);
-        } else if (label.matches(RUNNING_S._label)) {
+        } else if (label.equals(RUNNING_S.getLabel())) {
             copy(RUNNING_S);
-        } else if (label.matches(PAUSED_S._label)) {
+        } else if (label.equals(PAUSED_S.getLabel())) {
             copy(PAUSED_S);
-        } else if (label.matches(LOADING_TS._label)) {
+        } else if (label.equals(LOADING_TS.getLabel())) {
             copy(LOADING_TS);
-        } else if (label.matches(STARTING_TS._label)) {
+        } else if (label.equals(STARTING_TS.getLabel())) {
             copy(STARTING_TS);
-        } else if (label.matches(STOPPING_TS._label)) {
+        } else if (label.equals(STOPPING_TS.getLabel())) {
             copy(STOPPING_TS);
-        } else if (label.matches(BOOTING_TS._label)) {
+        } else if (label.equals(BOOTING_TS.getLabel())) {
             copy(BOOTING_TS);
-        } else if (label.matches(ERROR_ES._label)) {
+        } else if (label.equals(ERROR_ES.getLabel())) {
             copy(ERROR_ES);
-        } else if (label.matches(FATAL_ES._label)) {
+        } else if (label.equals(FATAL_ES.getLabel())) {
             copy(FATAL_ES);
-        } else if (label.matches(RECOVERING_RS._label)) {
+        } else if (label.equals(RECOVERING_RS.getLabel())) {
             copy(RECOVERING_RS);
-        } else if (label.matches(ABORTING_RS._label)) {
+        } else if (label.equals(ABORTING_RS.getLabel())) {
             copy(ABORTING_RS);
         } else {
             copy(UNKNOWN);

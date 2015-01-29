@@ -16,7 +16,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
-import javafx.scene.control.TabPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
 /**
@@ -34,7 +34,7 @@ public class DQMViewGUIController implements Initializable, DQMObserver {
     private StateLabel slabel;
     
     @FXML
-    private TabPane tabpane;
+    private StackPane tabpane;
 
     private final DQMMainPaneController _main_panel = new DQMMainPaneController();
     private final DQMSidePaneController _side_panel = new DQMSidePaneController();
@@ -61,7 +61,7 @@ public class DQMViewGUIController implements Initializable, DQMObserver {
 
     @Override
     public void reset() {
-        _main_panel.getPane().getTabs().clear();
+        _main_panel.getPane().getChildren().clear();
         _side_panel.getPane().getPanes().clear();
     }
 

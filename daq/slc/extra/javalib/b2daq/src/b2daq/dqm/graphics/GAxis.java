@@ -56,8 +56,8 @@ public abstract class GAxis extends GShape {
     protected GLine border_line1 = new GLine(0, 0, 0, 0, Color.BLACK);
     protected String label_align;
     protected String label_position;
-    private String time_format = "";
-    private int ndivisions = 10;
+    protected String time_format = "";
+    protected int ndivisions = 10;
 
     public GAxis() {
         super();
@@ -349,7 +349,7 @@ public abstract class GAxis extends GShape {
                     }
                 }
             } else {
-                for (long n = n_min; n <= n_max; n++) {
+                for (long n = n_min-1; n <= n_max+1; n++) {
                     x = n * dx;
                     if (x >= axis.getMin() && x <= axis.getMax()) {
                         if (n % ndivisions == 0) {

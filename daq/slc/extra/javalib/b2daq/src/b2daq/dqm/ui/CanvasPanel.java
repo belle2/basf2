@@ -105,6 +105,7 @@ public class CanvasPanel extends AnchorPane implements Updatable {
 
     @Override
     public void update() {
+        canvas.get().update();
         canvas.get().resetPadding();
         repaint();
     }

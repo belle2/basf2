@@ -372,18 +372,6 @@ public class ROPCMonitorPane extends VBox implements NSMObserver {
                 graphEvtRateIn.addPoint(data.getFloat("evtrate_in"));
                 graphFlowRateIn.addPoint(data.getFloat("flowrate_in"));
                 setConnection(canvasArrawFrom, data.getInt("connection_in"));
-                /*
-                 flow.setNqueueIn(data.getInt("nqueue_in"));
-                 flow.setNeventIn(data.getInt("nevent_in"));
-                 flow.setEvtrateIn(data.getFloat("evtrate_in"));
-                 flow.setFlowrateIn(data.getFloat("flowrate_in"));
-                 flow.setEvtsizeIn(data.getFloat("evtsize_in"));
-                 flow.setNqueueIn(data.getInt("nqueue_out"));
-                 flow.setNeventIn(data.getInt("nevent_out"));
-                 flow.setEvtrateIn(data.getFloat("evtrate_out"));
-                 flow.setFlowrateIn(data.getFloat("flowrate_out"));
-                 flow.setEvtsizeIn(data.getFloat("evtsize_out"));
-                 */
                 fieldEvtRate.setText("" + data.getFloat("evtrate_out"));
                 fieldFlowRate.setText("" + data.getFloat("flowrate_out"));
                 graphEvtRateOut.addPoint(data.getFloat("evtrate_out"));

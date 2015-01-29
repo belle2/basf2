@@ -10,11 +10,13 @@ public class NSMCommand extends Enum {
 
     final static public NSMCommand UNKNOWN = new NSMCommand(0, "UNKNOWN");
     final static public NSMCommand OK = new NSMCommand(1, "OK");
-    final static public NSMCommand ERROR = new NSMCommand(2, "ERROR");//param[0] : command if >0
-    final static public NSMCommand LOG = new NSMCommand(3, "LOG");
+    final static public NSMCommand ERROR = new NSMCommand(2, "ERROR");
+    final static public NSMCommand FATAL = new NSMCommand(3, "FATAL");
+    final static public NSMCommand STATE = new NSMCommand(4, "STATE");
+    final static public NSMCommand LOG = new NSMCommand(5, "LOG");
+    final static public NSMCommand VGET = new NSMCommand(11, "VGET");
+    final static public NSMCommand VSET = new NSMCommand(12, "VSET");
     final static public NSMCommand STATECHECK = new NSMCommand(201, "STATECHECK");
-    final static public NSMCommand STATE = new NSMCommand(202, "STATE");
-    final static public NSMCommand NSMINIT = new NSMCommand(400, "NSMINIT");
     final static public NSMCommand NSMSET = new NSMCommand(401, "NSMSET");
     final static public NSMCommand NSMGET = new NSMCommand(402, "NSMGET");
     final static public NSMCommand DBSET = new NSMCommand(403, "DBSET");
@@ -51,11 +53,17 @@ public class NSMCommand extends Enum {
         } else if (msg.equals(LOG.getLabel())) {
             copy(LOG);
             return true;
-        } else if (msg.equals(STATECHECK.getLabel())) {
-            copy(STATECHECK);
-            return true;
         } else if (msg.equals(STATE.getLabel())) {
             copy(STATE);
+            return true;
+        } else if (msg.equals(VGET.getLabel())) {
+            copy(VGET);
+            return true;
+        } else if (msg.equals(VSET.getLabel())) {
+            copy(VSET);
+            return true;
+        } else if (msg.equals(STATECHECK.getLabel())) {
+            copy(STATECHECK);
             return true;
         } else if (msg.equals(NSMGET.getLabel())) {
             copy(NSMGET);
@@ -92,11 +100,17 @@ public class NSMCommand extends Enum {
         } else if (id == LOG.getId()) {
             copy(LOG);
             return true;
-        } else if (id == STATECHECK.getId()) {
-            copy(STATECHECK);
-            return true;
         } else if (id == STATE.getId()) {
             copy(STATE);
+            return true;
+        } else if (id == VGET.getId()) {
+            copy(VGET);
+            return true;
+        } else if (id == VSET.getId()) {
+            copy(VSET);
+            return true;
+        } else if (id == STATECHECK.getId()) {
+            copy(STATECHECK);
             return true;
         } else if (id == NSMGET.getId()) {
             copy(NSMGET);

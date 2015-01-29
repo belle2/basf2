@@ -346,7 +346,7 @@ public class RunControlMainPane extends TabPane implements NSMObserver {
                             data.getInt("configid", 0));
                 } else {
                     runSettingsPane.update(cobj, data);
-                    rcStateController.update(data.getInt("state"), true);
+                    //rcStateController.update(data.getInt("state"), true);
                     if (cobj.hasObject("node")) {
                         int n = 0;
                         for (ConfigObject obj : cobj.getObjects("node")) {
@@ -368,11 +368,6 @@ public class RunControlMainPane extends TabPane implements NSMObserver {
             rcStateController.update(state.getId(), true);
             if (!state.isTransition()) {
                 String dataname = getNSMDataProperties().get(0).getDataname();
-                /*
-                 logviewController.add(new LogMessage(msg.getNodeName(),
-                 LogLevel.INFO, "State shift " + msg.getNodeName() + ">> "
-                 + state.getLabel()));
-                 */
                 NSMListenerService.requestNSMGet(dataname, "", 0);
             }
             if (state.equals(RCState.RUNNING_S)) {

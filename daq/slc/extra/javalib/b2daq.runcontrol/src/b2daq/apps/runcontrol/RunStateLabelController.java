@@ -57,6 +57,7 @@ public class RunStateLabelController {
         setVisible(true);
         this.nodename = nodename;
         m_logview = logview;
+        menu.getItems().clear();
         menu.getItems().addAll(exclude, load, recover, abort);
         load.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -163,6 +164,13 @@ public class RunStateLabelController {
     public void update(RCState state, boolean used) {
         m_used = used;
         update(state);
+    }
+
+    public void update(boolean used) {
+        m_used = used;
+        if (!used) {
+            set(RCState.OFF_S.getLabel(), Color.WHITESMOKE, Color.LIGHTGRAY, Color.BLACK);
+        }
     }
 
     public void update(RCState state) {

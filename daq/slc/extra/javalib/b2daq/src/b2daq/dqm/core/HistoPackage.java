@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import b2daq.core.Reader;
 import b2daq.core.Serializable;
 import b2daq.core.Writer;
+import java.util.HashMap;
 
 public class HistoPackage implements Serializable {
 
     final public static byte ObjectFlag = (byte) 0xDC;
 
-    private ArrayList<MonObject> _histo_v = new ArrayList<MonObject>();
+    private ArrayList<MonObject> _histo_v = new ArrayList<>();
+    private HashMap<MonObject, String> _dir_v = new HashMap<>();
     private String _name;
     private int _update_id;
     private long _update_time;
@@ -53,8 +55,9 @@ public class HistoPackage implements Serializable {
         _histo_v.set(index, h);
     }
 
-    public Histo addHisto(Histo h) {
+    public Histo addHisto(String dir, Histo h) {
         _histo_v.add(h);
+        _dir_v.put(h, dir);
         return h;
     }
 
@@ -63,6 +66,10 @@ public class HistoPackage implements Serializable {
         return obj;
     }
 
+    public String getDirectory(MonObject obj) {
+        return _dir_v.get(obj);
+    }
+    
     public String getName() {
         return _name;
     }

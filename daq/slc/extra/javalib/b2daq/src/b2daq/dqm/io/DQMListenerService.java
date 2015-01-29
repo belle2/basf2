@@ -1,5 +1,6 @@
 package b2daq.dqm.io;
 
+import b2daq.core.Reader;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class DQMListenerService extends Thread {
     public static final int NO = -1;
 
     private Socket socket = null;
-    private DQMObserver obs = null;
+    private DQMObserver observer = null;
     private ArrayList<HistoPackage> _pack_v = null;
     private ArrayList<PackageInfo> _info_v = null;
     private int _expno = 0;
@@ -42,7 +43,7 @@ public class DQMListenerService extends Thread {
     public void init(String host, int port, String client, DQMObserver obs) throws IOException {
         this.host = host;
         this.port = port;
-        this.obs = obs;
+        this.observer = obs;
     }
 
     @Override
@@ -60,23 +61,19 @@ public class DQMListenerService extends Thread {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                if (obs != null) {
-                                    obs.reset();
+                                if (observer != null) {
+                                    observer.reset();
                                 }
                             }
                         });
                         _pack_v = new ArrayList<>();
                         int npacks = socket_reader.readInt();
-                        System.out.println("npacks="+npacks);
+                        System.out.println("npacks=" + npacks);
                         for (int n = 0; n < npacks; n++) {
                             String name = socket_reader.readString();
                             HistoPackage pack = new HistoPackage(name);
                             _pack_v.add(pack);
                         }
-                        //ArrayList<Boolean> monitored_v = PackageSelectPanel.showPane(_pack_v, configured);
-//                        for (int n = 0; n < monitored_v.size(); n++) {
-//                            socket_writer.writeByte(monitored_v.get(n) ? (byte) 1 : 0);
-//                        }
                         for (int n = 0; n < npacks; n++) {
                             socket_writer.writeByte((byte) 1);
                         }
@@ -98,19 +95,24 @@ public class DQMListenerService extends Thread {
                             System.out.println("config : # of histograms for " + name + " : " + nhists);
                             for (int i = 0; i < nhists; i++) {
                                 String class_name = socket_reader.readString();
+                                String dir = socket_reader.readString();
                                 name = socket_reader.readString();
+                                if (dir.isEmpty()) {
+                                    dir = "Default";
+                                }
+                                System.out.println("config : " + dir + " / " + name);
                                 String title = socket_reader.readString();
                                 int nbinsx = socket_reader.readInt();
                                 double xmin = socket_reader.readDouble();
                                 double xmax = socket_reader.readDouble();
-                                System.out.println("config : histogram " + name);
+                                //System.out.println("config : histogram " + name);
                                 if (class_name.contains("TH1")) {
-                                    pack.addHisto(new Histo1F(name, title, nbinsx, xmin, xmax));
+                                    pack.addHisto(dir, new Histo1F(name, title, nbinsx, xmin, xmax));
                                 } else if (class_name.contains("TH2")) {
                                     int nbinsy = socket_reader.readInt();
                                     double ymin = socket_reader.readDouble();
                                     double ymax = socket_reader.readDouble();
-                                    pack.addHisto(new Histo2F(name, title, nbinsx, xmin, xmax,
+                                    pack.addHisto(dir, new Histo2F(name, title, nbinsx, xmin, xmax,
                                             nbinsy, ymin, ymax));
                                 }
                                 int magic = socket_reader.readInt();
@@ -133,7 +135,7 @@ public class DQMListenerService extends Thread {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                obs.init(_pack_v, _info_v);
+                                observer.init(_pack_v, _info_v);
                             }
                         });
                         configured = true;
@@ -146,7 +148,7 @@ public class DQMListenerService extends Thread {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                obs.update(expno, runno, stateno);
+                                observer.update(expno, runno, stateno);
                             }
                         });
                         if (_expno != expno || _runno != runno) {
@@ -163,55 +165,12 @@ public class DQMListenerService extends Thread {
                             }
                             inflater.readBuffer(socket_reader);
                             HistoPackage pack = _pack_v.get(n);
-                            String name = inflater.readString();
-                            if (!name.matches(pack.getName())) {
-                                throw new IOException("Wrong package name :" + name + " for " + pack.getName());
-                            }
-                            int nhists = inflater.readInt();
-                            for (int i = 0; i < nhists; i++) {
-                                name = inflater.readString();
-                                Histo h = (Histo) pack.getHisto(i);
-                                Histo h_diff = (Histo) pack.getHisto(h.getName() + ":diff");
-                                Histo h_tmp = (Histo) pack.getHisto(h.getName() + ":tmp");
-                                if (!name.matches(h.getName())) {
-                                    throw new IOException("Wrong histo name :" + name + " for " + h.getName());
-                                }
-                                if (h.getDim() == 1) {
-                                    for (int nx = 0; nx < h.getAxisX().getNbins(); nx++) {
-                                        h.setBinContent(nx, inflater.readFloat());
-                                    }
-                                } else if (h.getDim() == 2) {
-                                    for (int ny = 0; ny < h.getAxisY().getNbins(); ny++) {
-                                        for (int nx = 0; nx < h.getAxisX().getNbins(); nx++) {
-                                            h.setBinContent(nx, ny, inflater.readFloat());
-                                        }
-                                    }
-                                }
-                                double entries = h_tmp.getEntries();
-                                if (entries > 0 && h.getEntries() != entries) {
-                                    h_diff.reset();
-                                    h_diff.add(h_tmp, -1);
-                                    h_diff.add(h);
-                                    h_tmp.reset();
-                                    h_tmp.add(h);
-                                } else {
-                                    h_tmp.reset();
-                                    h_tmp.add(h);
-                                }
-                                int magic = inflater.readInt();
-                                if (magic != 0x7FFF) {
-                                    throw new IOException("Wrong magic:" + magic);
-                                }
-                            }
-                            int magic = inflater.readInt();
-                            if (magic != 0x7FFF) {
-                                throw new IOException("Wrong magic:" + magic);
-                            }
+                            readContents(inflater, pack);
                         }
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                obs.update();
+                                observer.update();
                             }
                         });
                     }
@@ -227,8 +186,8 @@ public class DQMListenerService extends Thread {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (obs != null) {
-                        obs.reset();
+                    if (observer != null) {
+                        observer.reset();
                     }
                 }
             });
@@ -243,4 +202,54 @@ public class DQMListenerService extends Thread {
         }
     }
 
+    private void readContents(Reader reader, HistoPackage pack) throws IOException {
+        String name = reader.readString();
+        if (!name.matches(pack.getName())) {
+            throw new IOException("Wrong package name :" + name + " for " + pack.getName());
+        }
+        int nhists = reader.readInt();
+        for (int i = 0; i < nhists; i++) {
+            name = reader.readString();
+            Histo h = (Histo) pack.getHisto(i);
+            Histo h_diff = (Histo) pack.getHisto(h.getName() + ":diff");
+            Histo h_tmp = (Histo) pack.getHisto(h.getName() + ":tmp");
+            if (h.getDim() == 1) {
+                for (int nx = 0; nx < h.getAxisX().getNbins(); nx++) {
+                    double v = reader.readFloat();
+                    h.setBinContent(nx, v);
+                }
+            } else if (h.getDim() == 2) {
+                for (int ny = 0; ny < h.getAxisY().getNbins(); ny++) {
+                    for (int nx = 0; nx < h.getAxisX().getNbins(); nx++) {
+                        double v = reader.readFloat();
+                        h.setBinContent(nx, ny, v);
+                    }
+                }
+            }
+            if (h_tmp != null) {
+                double entries = h_tmp.getEntries();
+                if (entries > 0 && h.getEntries() != entries) {
+                    h_diff.reset();
+                    h_diff.add(h_tmp, -1);
+                    h_diff.add(h);
+                    h_tmp.reset();
+                    h_tmp.add(h);
+                } else {
+                    h_diff.reset();
+                    h_tmp.reset();
+                    h_tmp.add(h);
+                }
+            } else {
+                System.out.println("Not tmp histogram for " + h.getName());
+            }
+            int magic = reader.readInt();
+            if (magic != 0x7FFF) {
+                throw new IOException("Wrong magic:" + magic);
+            }
+        }
+        int magic = reader.readInt();
+        if (magic != 0x7FFF) {
+            throw new IOException("Wrong magic:" + magic);
+        }
+    }
 }

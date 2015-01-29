@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 public class Pad extends GRect {
 
     public Pad() {
-        this(0.13, 0.15, 0.74, 0.70);
+        this(0.15, 0.17, 0.76, 0.72);
     }
 
     public Pad(double x, double y, double width, double height) {

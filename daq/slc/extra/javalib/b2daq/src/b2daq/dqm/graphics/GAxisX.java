@@ -60,7 +60,7 @@ public class GAxisX extends GAxis {
         }
         canvas.drawString(get().getTitle(), x, y, align);
         if (base < 2000 && base > -2000 && (base > 3 || base < -2)) {
-            canvas.drawString("e"+(base<0?"-":"+")+(int)base, x0 + length, y0, "left middle");
+            canvas.drawString("e" + (base < 0 ? "-" : "+") + (int) base, x0 + length, y0, "left middle");
         }
         if (use_border_line == true) {
             border_line0.draw(canvas);

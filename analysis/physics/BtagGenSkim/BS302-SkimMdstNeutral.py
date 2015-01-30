@@ -65,7 +65,7 @@ fillParticleListsFromMC([
     muons,
     pi0,
     kshort,
-    ])
+    ], True)
 
 # next lines do the same as the lines for pi0 and K_S0
 # reconstruct charm

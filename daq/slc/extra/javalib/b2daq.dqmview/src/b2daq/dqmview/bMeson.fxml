@@ -29,7 +29,7 @@
                             <children>
                                 <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="450.0" VBox.vgrow="ALWAYS">
                                     <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" stat="true" title=" " yLabelAlignment="bottom">
+                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" stat="true" title=" " yLabelAlignment="middle">
                                             <histograms>
                                                 <FXCollections fx:factory="observableArrayList">
                                                     <Histo2D name="Mbc-deltaE" />

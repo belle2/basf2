@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <stdlib.h>
 
 extern "C" {
 #include "nsm2/nsmlib2.h"
@@ -19,6 +20,42 @@ extern "C" {
 using namespace Belle2;
 
 const unsigned int NSMMessage::DATA_SIZE = NSM_TCPDATSIZ;
+const NSMVar::NSMVar NSMVar::NOVALUE;
+
+int NSMVar::size() const
+{
+  int s = 1;
+  switch (m_type) {
+    case NONE: s = 0; return 0;
+    case INT: s = 4; break;
+    case FLOAT: s = 4; break;
+    case TEXT: s = 1; break;
+  }
+  return s * m_len;
+}
+
+void NSMVar::copy(const std::string& name,
+                  Type type, int len, const void* value)
+{
+  m_name = name;
+  m_type = type;
+  m_len = len;
+  int s = size();
+  if (s > 0) {
+    m_value = malloc(s);
+    memcpy(m_value, value, s);
+  } else {
+    m_name = "";
+    m_type = NONE;
+    m_len = 0;
+    m_value = NULL;
+  }
+}
+
+NSMVar::~NSMVar() throw()
+{
+  if (m_value) free(m_value);
+}
 
 void NSMMessage::init() throw()
 {
@@ -57,20 +94,6 @@ NSMMessage::NSMMessage(const NSMNode& node,
   memcpy(m_nsm_msg.pars, pars, sizeof(int) * npar);
 }
 
-/*
-NSMMessage::NSMMessage(const NSMNode& node,
-                       const NSMCommand& cmd,
-                       int par, const Serializable& obj) throw()
-{
-  init();
-  m_nodename = node.getName();
-  m_reqname = cmd.getLabel();
-  m_nsm_msg.npar = 1;
-  m_nsm_msg.pars[0] = par;
-  setData(obj);
-}
-*/
-
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
                        int par, const std::string& obj) throw()
@@ -82,18 +105,6 @@ NSMMessage::NSMMessage(const NSMNode& node,
   m_nsm_msg.pars[0] = par;
   setData(obj);
 }
-
-/*
-NSMMessage::NSMMessage(const NSMNode& node,
-                       const NSMCommand& cmd,
-                       const Serializable& obj) throw()
-{
-  init();
-  m_nodename = node.getName();
-  m_reqname = cmd.getLabel();
-  setData(obj);
-}
-*/
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
@@ -115,6 +126,30 @@ NSMMessage::NSMMessage(const NSMMessage& msg) throw()
 {
   init();
   *this = msg;
+}
+
+NSMMessage::NSMMessage(const NSMNode& node,
+                       const NSMVar& var) throw()
+{
+  init();
+  m_nodename = node.getName();
+  m_reqname = NSMCommand::VSET.getLabel();
+  m_nsm_msg.npar = 3;
+  m_nsm_msg.pars[0] = (int)var.getType();
+  m_nsm_msg.pars[1] = (int)var.getLength();
+  m_nsm_msg.pars[2] = var.getName().size();
+  if (var.getType() != NSMVar::NONE) {
+    int size = var.getName().size() + 1 + var.size();
+    m_data = Buffer(size);
+    char* pdata = (char*)m_data.ptr();
+    memcpy(pdata, var.getName().c_str(), var.getName().size());
+    pdata += var.getName().size();
+    *pdata = '\0';
+    pdata++;
+    memcpy(pdata, var.get(), var.size());
+    m_hasobj = false;
+    m_nsm_msg.len = size;
+  }
 }
 
 const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
@@ -279,7 +314,7 @@ void NSMMessage::setData(int len, const char* data)  throw()
 
 void NSMMessage::setData(const std::string& text)  throw()
 {
-  setData(text.size() + 1, text.c_str());
+  setData(text.size(), text.c_str());
 }
 
 int NSMMessage::try_read(int sock, char* buf, int datalen)

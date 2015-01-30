@@ -147,6 +147,7 @@ public class DQMMainPaneController implements Initializable {
 
     private Histo addClone(ArrayList<Histo> histo_v, Histo h, String newname) {
         Histo h_clone = (Histo) h.clone();
+        h_clone.reset();
         h_clone.setName(h.getName() + newname);
         histo_v.add(h_clone);
         return h_clone;
@@ -227,11 +228,10 @@ public class DQMMainPaneController implements Initializable {
                 return canvasnode;
             }
         } else if (parent instanceof CanvasPanel) {
-            System.out.println(parent.getClass().getName());
             CanvasPanel canvas = (CanvasPanel) parent;
             for (Histo hist : canvas.getCanvas().getHistograms()) {
-                System.out.println(hist.getName() + " : "+ name);
                 if (hist.getName().equals(name)) {
+                    System.out.println("found " + name);
                     canvas.addHisto(h);
                     canvas.getCanvas().setName("c_"+h.getName());
                     canvas.getCanvas().setTitle(h.getTitle());

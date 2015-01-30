@@ -5,6 +5,8 @@ import b2daq.graphics.GraphicsDrawer;
 import b2daq.graphics.GLine;
 
 public class GAxisY extends GAxis {
+    
+    protected String direction = "left";
 
     public GAxisY() {
         super();
@@ -69,7 +71,7 @@ public class GAxisY extends GAxis {
         }
         canvas.drawString(get().getTitle(), x, y, align, -90);
         if (base < 2000 && base > -2000 && (base > 3 || base < -2)) {
-            canvas.drawString("e"+(base<0?"-":"+")+(int)base, x0, y0 - length, "center bottom");
+            canvas.drawString("e"+(base<0?"-":"+")+(int)base, x0, y0 - length, direction + " bottom");
         }
         if (use_border_line == true) {
             border_line0.draw(canvas);

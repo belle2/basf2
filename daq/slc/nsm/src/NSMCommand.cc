@@ -9,6 +9,8 @@ const NSMCommand NSMCommand::ERROR(2, "ERROR");
 const NSMCommand NSMCommand::FATAL(3, "FATAL");
 const NSMCommand NSMCommand::STATE(4, "STATE");
 const NSMCommand NSMCommand::LOG(5, "LOG");
+const NSMCommand NSMCommand::VGET(11, "VGET");
+const NSMCommand NSMCommand::VSET(12, "VSET");
 const NSMCommand NSMCommand::NSMGET(401, "NSMGET");
 const NSMCommand NSMCommand::NSMSET(402, "NSMSET");
 const NSMCommand NSMCommand::DBSET(403, "DBSET");
@@ -26,6 +28,8 @@ const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
   else if (label == FATAL.getLabel()) *this = FATAL;
   else if (label == LOG.getLabel()) *this = LOG;
   else if (label == STATE.getLabel()) *this = STATE;
+  else if (label == VGET.getLabel()) *this = VGET;
+  else if (label == VSET.getLabel()) *this = VSET;
   else if (label == NSMGET.getLabel()) *this = NSMGET;
   else if (label == NSMSET.getLabel()) *this = NSMSET;
   else if (label == DBSET.getLabel()) *this = DBSET;
@@ -46,6 +50,8 @@ const NSMCommand& NSMCommand::operator=(int id) throw()
   else if (id == FATAL.getId()) *this = FATAL;
   else if (id == LOG.getId()) *this = LOG;
   else if (id == STATE.getId()) *this = STATE;
+  else if (id == VSET.getId()) *this = VSET;
+  else if (id == VGET.getId()) *this = VGET;
   else if (id == NSMSET.getId()) *this = NSMSET;
   else if (id == NSMGET.getId()) *this = NSMGET;
   else if (id == DBSET.getId()) *this = DBSET;

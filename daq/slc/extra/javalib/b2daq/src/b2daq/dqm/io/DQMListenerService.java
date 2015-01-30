@@ -98,7 +98,7 @@ public class DQMListenerService extends Thread {
                                 String dir = socket_reader.readString();
                                 name = socket_reader.readString();
                                 if (dir.isEmpty()) {
-                                    dir = "Default";
+                                    dir = pack.getName()+":default";
                                 }
                                 System.out.println("config : " + dir + " / " + name);
                                 String title = socket_reader.readString();

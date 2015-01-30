@@ -155,7 +155,7 @@ public class HistogramCanvas extends GRect {
 
     public void addHisto(Histo h) {
         boolean hasHist = false;
-        for (Histo hist: histograms) {
+        for (Histo hist : histograms) {
             if (hist.getName().equals(h.getName())) {
                 h.setFill(hist.getFill());
                 h.setLine(hist.getLine());
@@ -240,17 +240,18 @@ public class HistogramCanvas extends GRect {
         }
         if (stat && _stat_histo != null) {
             if (_stat_rect == null) {
+
                 _stat_rect = new GRect(0.71, 0.02, 0.28, 0.12, Color.WHITE, Color.BLACK);
-                _stat_name = new GText(_stat_histo.getName(), 0.85, 0.055, "center");
+                _stat_name = new GText(_stat_histo.getName(), 0.71 + 0.14, 0.055, "center");
                 _stat_line = new GLine(0.71, 0.06, 0.99, 0.06, Color.BLACK);
                 _stat_name.setFontSize(0.52);
                 if (_stat_name.getText().length() > 20) {
-                    _stat_name.setFontSize(0.47);
+                    _stat_name.setFontSize(0.45);
                 }
-                _stat_update = new GText("mean     : ", 0.72, 0.095, "left");
-                _stat_update.setFontSize(0.52);
-                _stat_entries = new GText("entries : " + _stat_histo.getEntries(), 0.72, 0.135, "left");
-                _stat_entries.setFontSize(0.52);
+                _stat_update = new GText("Mean     : ", 0.72, 0.095, "left");
+                _stat_update.setFontSize(0.5);
+                _stat_entries = new GText("Entries : " + _stat_histo.getEntries(), 0.72, 0.135, "left");
+                _stat_entries.setFontSize(0.5);
                 addShape(_stat_rect);
                 addShape(_stat_line);
                 addShape(_stat_name);
@@ -259,17 +260,18 @@ public class HistogramCanvas extends GRect {
             }
             if (_stat_histo.getDim() == 1) {
                 String label = String.format("%1$.2f", _stat_histo.getMean());
-                _stat_update.setText("mean     : " + label);
+                _stat_update.setText("Mean    : " + label);
             } else if (_stat_histo.getDim() == 2) {
                 Histo2 h = (Histo2) _stat_histo;
                 String label = String.format("(%1$.2f, ", h.getMeanX());
                 label += String.format("%1$.2f)", h.getMeanY());
-                _stat_update.setText("mean     : " + label);
+                _stat_update.setText("Mean    : " + label);
             }
-            _stat_entries.setText("integral : " + ((int) _stat_histo.getEntries()));
+            _stat_entries.setText("Entries : " + ((int) _stat_histo.getEntries()));
         }
-        if (panel != null)
+        if (panel != null) {
             panel.repaint();
+        }
     }
 
     public void draw(GraphicsDrawer canvas) {
@@ -277,6 +279,27 @@ public class HistogramCanvas extends GRect {
         if (histograms.size() > 0) {
             if (_use_pad) {
                 try {
+                    if (_stat_rect != null) {
+                        if (canvas.getWidth() / canvas.getHeight() < 0.95) {
+                            _stat_name.setFontSize(0.45);
+                            _stat_update.setFontSize(0.5);
+                            _stat_entries.setFontSize(0.5);
+                            _stat_rect.set(0.61, 0.02, 0.38, 0.11);
+                            _stat_name.setPosition(0.61 + 0.19, 0.055);
+                            _stat_line.set(0.61, 0.06, 0.99, 0.06);
+                            _stat_update.setPosition(0.62, 0.095);
+                            _stat_entries.setPosition(0.62, 0.125);
+                        } else {
+                            _stat_name.setFontSize(0.42);
+                            _stat_update.setFontSize(0.45);
+                            _stat_entries.setFontSize(0.45);
+                            _stat_rect.set(0.71, 0.02, 0.28, 0.12);
+                            _stat_name.setPosition(0.71 + 0.14, 0.055);
+                            _stat_line.set(0.71, 0.065, 0.99, 0.065);
+                            _stat_update.setPosition(0.72, 0.10);
+                            _stat_entries.setPosition(0.72, 0.135);
+                        }
+                    }
                     Histo histo = histograms.get(0);
                     canvas.drawRect(pad.getX(), pad.getY(), pad.getWidth(), pad.getHeight());
                     getAxisX().get().copyRange(histo.getAxisX());

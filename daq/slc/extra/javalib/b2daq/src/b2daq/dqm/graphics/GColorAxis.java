@@ -29,15 +29,18 @@ public class GColorAxis extends GAxisY {
     
     public GColorAxis() {
         super();
+        direction = "right";
     }
 
     public GColorAxis(Axis axis) {
         super(axis);
+        direction = "right";
     }
 
     public GColorAxis(int nbin, double min, double max, String label,
             boolean fixMin, boolean fixMax, boolean logon) {
         super(nbin, min, max, label, fixMin, fixMax, logon);
+        direction = "right";
         setHand(HAND_L);
         getLabelsFont().setSize(0.85);
     }

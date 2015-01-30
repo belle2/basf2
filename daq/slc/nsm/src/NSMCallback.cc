@@ -20,6 +20,8 @@ NSMCallback::NSMCallback(const NSMNode& node, int timeout) throw()
   add(NSMCommand::STATE);
   add(NSMCommand::EXCLUDE);
   add(NSMCommand::INCLUDE);
+  add(NSMCommand::VGET);
+  add(NSMCommand::VSET);
   m_timeout = timeout;
 }
 
@@ -46,6 +48,21 @@ throw()
     return exclude();
   } else if (cmd == NSMCommand::INCLUDE) {
     return include();
+  } else if (cmd == NSMCommand::VGET) {
+    std::string vname = msg.getData();
+    LogFile::debug("VGET %s", vname.c_str());
+    NSMVar var(vget(vname));
+    if (var.getType() != NSMVar::NONE) {
+      var.setName(vname);
+      m_comm->sendRequest(NSMMessage(NSMNode(msg.getNodeName()), var));
+    }
+    return true;
+  } else if (cmd == NSMCommand::VSET) {
+    std::string vname = msg.getData();
+    const char* value = (msg.getData() + msg.getParam(3) + 1);
+    vset(NSMVar(vname, (NSMVar::Type)msg.getParam(0),
+                msg.getParam(1), value));
+    return true;
   }
   return false;
 }

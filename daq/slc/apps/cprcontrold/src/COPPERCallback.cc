@@ -90,7 +90,7 @@ void COPPERCallback::timeout() throw()
     eflag |= m_ttrx.isLinkUpError() << 29;
 
     const std::string name = getNode().getName();
-    if (!m_err && m_copper.isFifoFull()) {
+    if (!m_iserr && m_copper.isFifoFull()) {
       err = true;
       std::string msg = "COPPER FIFO full";
       //LogFile::error(msg);
@@ -98,38 +98,38 @@ void COPPERCallback::timeout() throw()
     }
     if (m_copper.isFifoEmpty()) {
     }
-    if (!m_err && m_copper.isLengthFifoFull()) {
+    if (!m_iserr && m_copper.isLengthFifoFull()) {
       std::string msg = "COPPER length FIFO full";
       //LogFile::warning(msg);
       com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
     }
     for (int i = 0; i < 4; i++) {
       if (m_config.useHSLB(i)) {
-        if (!m_err && m_hslb[i].isBelle2LinkDown()) {
+        if (!m_iserr && m_hslb[i].isBelle2LinkDown()) {
           err = true;
           std::string msg = StringUtil::form("HSLB %c Belle2 link down", (char)(i + 'a'));
           //LogFile::error(msg);
           com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
         }
-        if (!m_err && m_hslb[i].isCOPPERFifoFull()) {
+        if (!m_iserr && m_hslb[i].isCOPPERFifoFull()) {
           err = true;
           std::string msg = StringUtil::form("HSLB %c COPPER fifo full", (char)(i + 'a'));
           //LogFile::warning(msg);
           com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
         }
-        if (!m_err && m_hslb[i].isCOPPERLengthFifoFull()) {
+        if (!m_iserr && m_hslb[i].isCOPPERLengthFifoFull()) {
           err = true;
           std::string msg = StringUtil::form("HSLB %c COPPER length fifo full", (char)(i + 'a'));
           //LogFile::warning(msg);
           com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
         }
-        if (!m_err && m_hslb[i].isFifoFull()) {
+        if (!m_iserr && m_hslb[i].isFifoFull()) {
           err = true;
           std::string msg = StringUtil::form("HSLB %c fifo full", (char)(i + 'a'));
           //LogFile::warning(msg);
           com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
         }
-        if (!m_err && m_hslb[i].isCRCError()) {
+        if (!m_iserr && m_hslb[i].isCRCError()) {
           err = true;
           std::string msg = StringUtil::form("HSLB %c CRC error", (char)(i + 'a'));
           //LogFile::warning(msg);
@@ -137,23 +137,23 @@ void COPPERCallback::timeout() throw()
         }
       }
     }
-    if (!m_err && m_ttrx.isBelle2LinkError()) {
+    if (!m_iserr && m_ttrx.isBelle2LinkError()) {
       err = true;
       std::string msg = "TTRX Belle2 link error";
       //LogFile::error(msg);
       com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
     }
-    if (!m_err && m_ttrx.isLinkUpError()) {
+    if (!m_iserr && m_ttrx.isLinkUpError()) {
       err = true;
       std::string msg = "TTRX Link up error";
       //LogFile::error(msg);
       com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
     }
   }
+  m_iserr = err;
   if (err && !state.isTransition()) {
     getNode().setState(RCState::NOTREADY_S);
   }
-  m_err = err;
   if (m_data.isAvailable()) {
     ronode_status* nsm = (ronode_status*)m_data.get();
     if (m_flow.isAvailable()) {
@@ -173,25 +173,6 @@ void COPPERCallback::timeout() throw()
       nsm->loadavg = (float)loads[0];
     } else {
       nsm->loadavg = -1;
-    }
-    eflag = 0xFF & m_con.getInfo().getErrorFlag();
-    if (eflag > 0) {
-      if (eflag == RunInfoBuffer::PROCESS_DOWN) {
-        if (getNode().getState() == RCState::RUNNING_S) {
-          /*
-                abort();
-                if (recover()) {
-                  start();
-                  getNode().setState(RCState::RUNNING_S);
-                  com.replyOK(getNode());
-                } else {
-                  com.replyError(RunInfoBuffer::PROCESS_DOWN,
-                                 "Process recover failed " +
-                                 m_con.getExecutable());
-                }
-          */
-        }
-      }
     }
   }
 }
@@ -265,7 +246,7 @@ bool COPPERCallback::recover() throw()
   }
   timeout();
   m_force_boothslb = true;
-  if (m_err || !bootBasf2()) {
+  if (m_iserr || !bootBasf2()) {
     getNode().setState(RCState::NOTREADY_S);
     return false;
   }

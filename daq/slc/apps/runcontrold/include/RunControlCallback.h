@@ -55,6 +55,8 @@ namespace Belle2 {
     virtual bool stateCheck() throw() { return replyOK(); }
     virtual bool exclude() throw();
     virtual bool include() throw();
+    virtual NSMVar vget(const std::string& vname) throw();
+    virtual bool vset(const NSMVar& var) throw();
 
   public:
     LogFile::Priority getPriorityToDB() const { return m_priority_db; }

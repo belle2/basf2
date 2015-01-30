@@ -35,6 +35,8 @@ namespace Belle2 {
     virtual bool state() throw() { return true; }
     virtual bool exclude() throw() { return true; }
     virtual bool include() throw() { return true; }
+    virtual NSMVar vget(const std::string&) throw() { return NSMVar(); }
+    virtual bool vset(const NSMVar&) throw() { return true; }
     virtual void timeout() throw() {}
     bool isReady() const throw();
 

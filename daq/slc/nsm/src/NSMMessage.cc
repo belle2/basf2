@@ -20,7 +20,7 @@ extern "C" {
 using namespace Belle2;
 
 const unsigned int NSMMessage::DATA_SIZE = NSM_TCPDATSIZ;
-const NSMVar::NSMVar NSMVar::NOVALUE;
+const NSMVar NSMVar::NOVALUE;
 
 int NSMVar::size() const
 {

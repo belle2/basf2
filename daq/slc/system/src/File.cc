@@ -20,11 +20,13 @@ throw(IOException)
     mode = O_WRONLY;
     if (mode_s.find("r") != std::string::npos) {
       mode = O_RDWR;
+    } else {
+      mode |= O_CREAT;
     }
   }
-  if ((m_fd = ::open(path.c_str(), mode)) < 0) {
+  if ((m_fd = ::open(path.c_str(), mode, 0666)) < 0) {
     perror("open");
-    throw (IOException("Failed to open fifo."));
+    throw (IOException("Failed to open file : %s", path.c_str()));
   }
 }
 
@@ -73,7 +75,7 @@ size_t File::read(void* buf, size_t count) throw(IOException)
         case EAGAIN: continue;
         default:
           perror("read");
-          throw (IOException("Error while reading."));
+          throw (IOException("Error while reading. %d", errno));
       }
     }
     c += ret;

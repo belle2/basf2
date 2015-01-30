@@ -12,9 +12,9 @@ dbLoadDatabase "dbd/rcbridged.dbd"
 rcbridged_registerRecordDeviceDriver pdbbase
 
 ## Load record instances
-dbLoadRecords("db/rc.db","user=PXD")
+dbLoadRecords("db/rc.db","user=PXD_ONSEN")
 
-rcConfig("PXD","b2slow2.kek.jp", 9122)
+rcConfig("PXD_ONSEN","172.22.32.11", 8222)
 
 cd ${TOP}/iocBoot/${IOC}
 iocInit

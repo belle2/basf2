@@ -540,60 +540,18 @@ namespace Belle2 {
     double isRestOfEventEmpty(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
-      float q_MC = 0; //Flavor of B
+      float ObjectsInROE = 0; //Flavor of B
       if (roe-> getNTracks() != 0) {
-        for (auto & track : roe->getTracks()) {
-          const MCParticle* mcParticle = track->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
-            }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
-          }
-        }
+        ObjectsInROE++;
       } else if (roe-> getNECLClusters() != 0) {
-        for (auto & cluster : roe-> getECLClusters()) {
-          const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
-            }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
-          }
-        }
+        ObjectsInROE++;
       } else if (roe-> getNKLMClusters() != 0) {
-        for (auto & klmcluster : roe-> getKLMClusters()) {
-          const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
-            }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
-          }
-        }
+        ObjectsInROE++;
       }
-      if (q_MC > 0) {
-        return 1;
-      } else if (q_MC < 0) {
-        return -1;
+      if (ObjectsInROE > 0) {
+        return ObjectsInROE;
       } else return -2;
     }
-
 
     double isRestOfEventB0Flavor(const Particle*)
     {

@@ -35,7 +35,7 @@ void EB2RXCallback::init() throw()
                    ronode_status_revision);
   m_data.allocate(getCommunicator());
   m_con.setCallback(this);
-  m_con.init("recvStream1", 1);
+  m_con.init("eb2rx", 1);
 }
 
 void EB2RXCallback::term() throw()
@@ -48,11 +48,11 @@ bool EB2RXCallback::load() throw()
 {
   if (m_con.isAlive()) return true;
   m_con.clearArguments();
-  m_con.setExecutable("/home/usr/b2daq/eb/eb0");
+  m_con.setExecutable("/home/usr/b2daq/eb/eb2rx");
   m_con.addArgument("-l");
-  m_con.addArgument("5101");
-  for (int i = 1; i <= 16; i++)
-    m_con.addArgument(StringUtil::form("localhost:%d", 34000 + i));
+  m_con.addArgument("5141");
+  m_con.addArgument("192.168.60.12:4000");
+  m_con.addArgument("192.168.100.18:24");
   m_con.load(0);
 
   return true;

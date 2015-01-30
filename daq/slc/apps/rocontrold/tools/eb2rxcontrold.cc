@@ -13,8 +13,8 @@ using namespace Belle2;
 int main(int argc, char** argv)
 {
   ConfigFile config("slowcontrol", argv[1]);
-  const std::string hostname = config.get("nsm.local.host");
-  const int port = config.getInt("nsm.local.port");
+  const std::string hostname = config.get("nsm.global.host");
+  const int port = config.getInt("nsm.global.port");
   const std::string name = config.get("nsm.nodename");
   if (!Daemon::start(("eb2rxcontrold." + name).c_str(), argc - 1, argv + 1)) {
     return 1;

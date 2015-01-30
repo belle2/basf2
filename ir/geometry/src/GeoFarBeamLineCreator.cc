@@ -580,12 +580,12 @@ namespace Belle2 {
       //---------------------------
 
       //neutron shield (poly)
-      logi_polyShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1001));
-      logi_polyShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1002));
+      //logi_polyShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1001));
+      //logi_polyShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1002));
 
       //additional neutron shield (concrete)
-      logi_ConcreteShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1003));
-      logi_ConcreteShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1004));
+      //logi_ConcreteShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1003));
+      //logi_ConcreteShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1004));
 
       //gate shield (concrete)
       //logi_GateShield->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1005));

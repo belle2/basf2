@@ -1123,13 +1123,13 @@ namespace Belle2 {
       setColor(*logi_Lv2VacLERDwn, cLv2VacLERDwn.getString("Color", "#CCCCCC"));
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2VacLERDwn, "phys_Lv2VacLERDwn_name", logi_Lv1TaLERDwn, false, 0);
 
-      logi_Lv3AuCoat->SetSensitiveDetector(new BkgSensitiveDetector("IR", 11));
-      logi_Lv1TaFwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", 12));
-      logi_Lv1TaBwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", 13));
-      logi_Lv1TaLERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", 14));
-      logi_Lv1TaHERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", 15));
-      logi_Lv1TaHERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", 16));
-      logi_Lv1TaLERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", 17));
+      //logi_Lv3AuCoat->SetSensitiveDetector(new BkgSensitiveDetector("IR", 11));
+      //logi_Lv1TaFwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", 12));
+      //logi_Lv1TaBwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", 13));
+      //logi_Lv1TaLERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", 14));
+      //logi_Lv1TaHERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", 15));
+      //logi_Lv1TaHERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", 16));
+      //logi_Lv1TaLERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", 17));
 
       //-
       //----------

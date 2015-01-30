@@ -886,7 +886,7 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
   m_h1_phi_pll->Fill(phi_res / phi_err);
   m_h1_omega_pll->Fill(omega_res / omega_err);
   m_h1_z0_pll->Fill(z0_res / z0_err);
-  m_h1_cotTheta_pll->Fill(cotTheta_res / cotTheta_res);
+  m_h1_cotTheta_pll->Fill(cotTheta_res / cotTheta_err);
 
 }
 

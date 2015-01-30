@@ -48,11 +48,12 @@ namespace Belle2 {
     double getPhi();
     double getOmega();
     double getCotTheta();
+    double getChi();
 
   private:
 
     const MCParticle& m_mcParticle;
-    const TVector3& m_magField;
+    double m_myBz;
     double m_charge;
 
   };

@@ -16,9 +16,11 @@ using namespace Belle2;
 
 MCParticleInfo::MCParticleInfo(const MCParticle& the_mcParticle, const TVector3& the_magField)
   : m_mcParticle(the_mcParticle)
-  , m_magField(the_magField)
+  , m_myBz(the_magField.Mag())
   , m_charge(the_mcParticle.getCharge())
 {
+  // set units to: cm, GeV/c
+  m_myBz *= 0.299792 / 100;
 } ;
 
 MCParticleInfo::~MCParticleInfo() {};
@@ -32,9 +34,8 @@ MCParticleInfo::getD0()
   double py = this->getPy();
   double x = this->getX();
   double y = this->getY();
+  double R = 1 / this->getOmega(); //cm
 
-  double qe = 1;
-  double R = pt / 0.3 / m_magField.Mag() / qe * 100; //cm
   double alpha =  R / pt * m_charge; //cm/GeV
   double Cx = x + alpha * py; //cm
   double Cy = y - alpha * px; //cm
@@ -47,29 +48,43 @@ MCParticleInfo::getD0()
 double
 MCParticleInfo::getPhi()
 {
+  return  atan2(this->getPy(), this->getPx()) - this->getChi();
+};
 
-  //this is an approximation
-  return  atan2(this->getPy(), this->getPx());
+double
+MCParticleInfo::getChi()
+{
+  double px = this->getPx();
+  double py = this->getPy();
+  double pt = this->getPt();
+  double x = this->getX();
+  double y = this->getY();
+
+  double sinChi = -m_charge * (px * x + py * y);
+  double cosChi = -m_charge * (px * y - py * x - (pt * pt) / m_charge / m_myBz);
+
+  return  atan2(sinChi, cosChi);
+
 };
 
 double
 MCParticleInfo::getOmega()
 {
-  double R = this->getPt() / m_magField.Mag() / 0.3 / m_charge * 100; // cm
+  double R = this->getPt() / m_myBz / m_charge; // cm
   return 1 / R;
 };
 
 double
 MCParticleInfo::getZ0()
 {
-  //to be implemented
-  return -999;
+  return this->getZ() + this->getPz() / m_charge / m_myBz * this->getChi();
 };
 
 double
 MCParticleInfo::getCotTheta()
 {
-  //to be implemented
-  return -999;
+  double tanDip = this->getPz() / this->getPt();
+
+  return tanDip;
 };
 

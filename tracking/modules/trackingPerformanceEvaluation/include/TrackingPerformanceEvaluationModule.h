@@ -153,13 +153,23 @@ namespace Belle2 {
     TH2F* m_h2_d0errphi0err_rz;
     TH2F* m_h2_z0errcotThetaerr_xy;
 
-    TH2F* m_h2_VXDhitsUsed_xy;
-    TH2F* m_h2_VXDhitsUsed_rz;
+    TH2F* m_h2_VXDhitsPR_xy;
+    TH2F* m_h2_VXDhitsPR_rz;
+    TH1F* m_h1_nVXDhitsPR;
+    TH1F* m_h1_nVXDhitsWeighted;
     TH1F* m_h1_nVXDhitsUsed;
+    TH1F* m_h1_nCDChitsPR;
+    TH1F* m_h1_nCDChitsWeighted;
+    TH1F* m_h1_nCDChitsUsed;
     TH1F* m_h1_nHitDetID;
+    TH2F* m_h2_TrackPointFitWeightVXD;
+    TH2F* m_h2_TrackPointFitWeightCDC;
 
     TH1F* m_h1_pValue;
 
+    TH2F* m_h2_z0errVSpt_wpxd;
+    TH2F* m_h2_z0errVSpt_wopxd;
+    TH2F* m_h2_z0errVSpt;
     TH2F* m_h2_d0errVSpt_wpxd;
     TH2F* m_h2_d0errVSpt_wopxd;
     TH2F* m_h2_d0errVSpt;

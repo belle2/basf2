@@ -26,7 +26,7 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
-
+#include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <genfit/Track.h>
 #include <genfit/TrackCand.h>
@@ -34,6 +34,8 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
+
+#include <genfit/KalmanFitterInfo.h>
 
 #include <root/TTree.h>
 #include <root/TAxis.h>
@@ -136,20 +138,39 @@ void TrackingPerformanceEvaluationModule::initialize()
                                                        m_histoList);
 
   //hits used in the fit
-  m_h1_nHitDetID = createHistogram1D("h1nHitDetID", "detector ID per hit", 4, -0.5, 3.5, "0=PXD, 1=SVD2D, 2=SVD,3=CDC", m_histoList);
-  m_h1_nVXDhitsUsed = createHistogram1D("h1nVXDHitsUsed", "number of VXD hits per Layer", 6, 0.5, 6.5, "VXD Layer", m_histoList);
-  m_h2_VXDhitsUsed_xy = createHistogram2D("h2hitsUsedXY", "hits used in the fit to the tracks, transverse plane",
-                                          2000, -15, 15, "x (cm)",
-                                          2000, -15, 15, "y (cm)",
-                                          m_histoList);
 
-  m_h2_VXDhitsUsed_rz = createHistogram2D("h2hitsUsedRZ", "hits used in the fit to the tracks, r_{t} z",
-                                          2000, -30, 40, "z (cm)",
-                                          2000, 0, 15, "r_{t} (cm)",
-                                          m_histoList);
+
+  m_h2_TrackPointFitWeightVXD = createHistogram2D("h2TPFitWeightVXD", "VXD TrackPoint Fit Weight", 6, 0.5, 6.5, "VXD layer", 20, 0, 1, "weight", m_histoList);
+  m_h2_TrackPointFitWeightCDC = createHistogram2D("h2TPFitWeightCDC", "CDC TrackPoint Fit Weight", 56, -0.5, 55.5, "CDC layer", 20, 0, 1, "weight", m_histoList);
+
+  m_h1_nHitDetID = createHistogram1D("h1nHitDetID", "detector ID per hit", 4, -0.5, 3.5, "0=PXD, 1=SVD2D, 2=SVD,3=CDC", m_histoList);
+  m_h1_nCDChitsPR = createHistogram1D("h1nCDCHitsPR", "number of CDC hits from PR per Layer", 56, -0.5, 55.5, "CDC Layer", m_histoList);
+  m_h1_nCDChitsWeighted = (TH1F*)duplicateHistogram("h1nCDCHitsWeighted", "CDC hits used in the fit per Layer, weighted", m_h1_nCDChitsPR, m_histoList);
+  m_h1_nCDChitsUsed = (TH1F*)duplicateHistogram("h1nCDCHitsUsed", "approximated number of CDC hits used in the fit per Layer, weighted", m_h1_nCDChitsPR, m_histoList);
+  m_h1_nVXDhitsPR = createHistogram1D("h1nVXDHitsPR", "number of VXD hits from PR per Layer", 6, 0.5, 6.5, "VXD Layer", m_histoList);
+  m_h1_nVXDhitsWeighted = (TH1F*)duplicateHistogram("h1nVXDHitsWeighted", "number of VXD hits used in the fit per Layer, weighted", m_h1_nVXDhitsPR, m_histoList);
+  m_h1_nVXDhitsUsed = (TH1F*)duplicateHistogram("h1nVXDHitsUsed", "approximate number of VXD hits used in the fit per Layer, weighted", m_h1_nVXDhitsPR, m_histoList);
+  m_h2_VXDhitsPR_xy = createHistogram2D("h2hitsPRXY", "Pattern Recognition hits, transverse plane",
+                                        2000, -15, 15, "x (cm)",
+                                        2000, -15, 15, "y (cm)",
+                                        m_histoList);
+
+  m_h2_VXDhitsPR_rz = createHistogram2D("h2hitsPRRZ", "Pattern Recognition Hits, r_{t} z",
+                                        2000, -30, 40, "z (cm)",
+                                        2000, 0, 15, "r_{t} (cm)",
+                                        m_histoList);
 
   m_h1_pValue = createHistogram1D("h1pValue", "pValue of the fit", 100, 0, 1, "pValue", m_histoList);
 
+
+  m_h2_z0errVSpt = createHistogram2D("h2z0errVSpt", "#sigma_{z0} VS p_{t}",
+                                     100, 0, 2, "p_{t} (GeV/c)",
+                                     100, 0, 0.1, "#sigma_{z0} (cm)",
+                                     m_histoList);
+
+  m_h2_z0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wPXD", "#sigma_{z0} VS p_{t}, with PXD hits", m_h2_z0errVSpt, m_histoList);
+
+  m_h2_z0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2z0errVSpt_woPXD", "#sigma_{z0} VS p_{t}, no PXD hits", m_h2_z0errVSpt, m_histoList);
 
   m_h2_d0errVSpt = createHistogram2D("h2d0errVSpt", "#sigma_{d0} VS p_{t}",
                                      100, 0, 2, "p_{t} (GeV/c)",
@@ -381,6 +402,24 @@ void TrackingPerformanceEvaluationModule::event()
     fillTrackErrParams2DHistograms(fitResult);
 
     fillHitsUsedInTrackFitHistograms(track);
+
+    for (int layer = 0; layer < 56; layer++) {
+      if (fitResult->getHitPatternCDC().hasLayer(layer))
+        m_h1_nCDChitsUsed->Fill(layer);
+    }
+    for (int layer = 0; layer < 2; layer++) {
+      for (int i = 0; i < fitResult->getHitPatternVXD().getPXDLayer(layer); i++)
+        m_h1_nVXDhitsUsed->Fill(layer + 1);
+    }
+    for (int layer = 0; layer < 4; layer++) {
+      int n1 = fitResult->getHitPatternVXD().getSVDLayer(layer).first;
+      int n2 = fitResult->getHitPatternVXD().getSVDLayer(layer).second;
+      int N = n1 + n2;
+
+      for (int i = 0; i < N; i++)
+        m_h1_nVXDhitsUsed->Fill(layer + 3);
+    }
+
 
     //2.a retrieve all TrackCands related to the Track
     RelationVector<genfit::TrackCand> TrackCands_fromTrack = DataStore::getRelationsToObj<genfit::TrackCand>(&track);
@@ -880,6 +919,8 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
 
   m_h2_d0errVSpt->Fill(pt, d0_err);
 
+  m_h2_z0errVSpt->Fill(pt, z0_err);
+
 
   m_h2_d0errMSVSpt->Fill(pt, d0_err * beta * p * pow(sinTheta, 3 / 2) / 0.0136);
 
@@ -894,82 +935,136 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
   bool hasPXDhit = false;
   double d0_err = -999;
+  double z0_err = -999;
   double pt = -999;
   const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
 
   if (fitResult != NULL) { // valid TrackFitResult found
     d0_err = sqrt((fitResult->getCovariance5())[0][0]);
+    z0_err = sqrt((fitResult->getCovariance5())[3][3]);
     pt = fitResult->getMomentum().Pt();
   }
 
+  bool hasCDChit[56] = { false };
+
   for (int i = 0; i < nHits; i++) {
     genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
-    genfit::AbsMeasurement* absMeas = tp->getRawMeasurement();
 
-    double detId(-999);
-    TVector3 globalHit(-999, -999, -999);
+    int nMea = tp->getNumRawMeasurements();
+    for (int mea = 0; mea < nMea; mea++) {
 
-    PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
-    SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
-    SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
+      genfit::AbsMeasurement* absMeas = tp->getRawMeasurement(mea);
+      double weight = 0;
+
+      std::vector<double> weights;
+      genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
+      if (kalmanInfo)
+        weights = kalmanInfo->getWeights();
+      else //no kalman fitter info, fill the weights vector with 0 (VXD), or 0,0 (CDC)
+        B2WARNING(" No KalmanFitterInfo associated to the TrackPoint!");
+
+      double detId(-999);
+      TVector3 globalHit(-999, -999, -999);
+
+      PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
+      SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
+      SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
+      CDCRecoHit* cdcHit =  dynamic_cast<CDCRecoHit*>(absMeas);
+
+      if (pxdHit) {
+        hasPXDhit = true;
+
+        if (kalmanInfo)
+          weight = weights.at(mea);
+
+        detId = 0;
+        double uCoor = pxdHit->getU();
+        double vCoor = pxdHit->getV();
+        VxdID sensor = pxdHit->getSensorID();
+
+        m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
+
+        m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+
+        m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
+        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
+        globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+
+      } else if (svdHit2D) {
+
+        if (kalmanInfo)
+          weight = weights.at(mea);
+
+        detId = 1;
+        double uCoor = svdHit2D->getU();
+        double vCoor = svdHit2D->getV();
+        VxdID sensor = svdHit2D->getSensorID();
+
+        m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
+
+        m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+
+        m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
+
+        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
+        globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+
+      } else if (svdHit) {
+
+        if (kalmanInfo)
+          weight = weights.at(mea);
+
+        detId = 2;
+        double uCoor = 0;
+        double vCoor = 0;
+        if (svdHit->isU())
+          uCoor = svdHit->getPosition();
+        else
+          vCoor =  svdHit->getPosition();
+
+        VxdID sensor = svdHit->getSensorID();
+        m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
+
+        m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+
+        m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
+        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
+        globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+      } else if (cdcHit) {
+
+        if (kalmanInfo)
+          weight = weights.at(mea);
+
+        WireID wire = cdcHit->getWireID();
+        if (! hasCDChit[wire.getICLayer()]) { //needed to validate the HitPatternCDC filling
+          m_h1_nCDChitsPR->Fill(wire.getICLayer());
+
+          m_h1_nCDChitsWeighted->Fill(wire.getICLayer() , weight);
+          //    hasCDChit[wire.getICLayer()] = true;  //to validate the HitPatternCDC filling: uncomment this
+        }
+        m_h2_TrackPointFitWeightCDC->Fill(wire.getICLayer(), weight);
+        detId = 3;
+      }
 
 
-    if (pxdHit) {
-      hasPXDhit = true;
 
-      detId = 0;
-      double uCoor = pxdHit->getU();
-      double vCoor = pxdHit->getV();
-      VxdID sensor = pxdHit->getSensorID();
+      m_h1_nHitDetID ->Fill(detId);
 
-      m_h1_nVXDhitsUsed->Fill(sensor.getLayerNumber());
+      m_h2_VXDhitsPR_xy->Fill(globalHit.X(), globalHit.Y());
 
-      const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-      globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+      m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Perp());
 
-    } else if (svdHit2D) {
-
-      detId = 1;
-      double uCoor = svdHit2D->getU();
-      double vCoor = svdHit2D->getV();
-      VxdID sensor = svdHit2D->getSensorID();
-
-      m_h1_nVXDhitsUsed->Fill(sensor.getLayerNumber());
-
-      const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-      globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
-
-    } else if (svdHit) {
-
-      detId = 2;
-      double uCoor = 0;
-      double vCoor = 0;
-      if (svdHit->isU())
-        uCoor = svdHit->getPosition();
-      else
-        vCoor =  svdHit->getPosition();
-
-      VxdID sensor = svdHit->getSensorID();
-      m_h1_nVXDhitsUsed->Fill(sensor.getLayerNumber());
-
-      const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-      globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
-    } else
-      detId = 3;
-
-
-    m_h1_nHitDetID ->Fill(detId);
-
-    m_h2_VXDhitsUsed_xy->Fill(globalHit.X(), globalHit.Y());
-
-    m_h2_VXDhitsUsed_rz->Fill(globalHit.Z(), globalHit.Perp());
+    }
   }
 
   if (fitResult != NULL) {
-    if (hasPXDhit)
+    if (hasPXDhit) {
       m_h2_d0errVSpt_wpxd->Fill(pt, d0_err);
-    else
+      m_h2_z0errVSpt_wpxd->Fill(pt, z0_err);
+    } else {
       m_h2_d0errVSpt_wopxd->Fill(pt, d0_err);
+      m_h2_z0errVSpt_wopxd->Fill(pt, z0_err);
+    }
   }
 
 }
@@ -1075,6 +1170,12 @@ void TrackingPerformanceEvaluationModule::addEfficiencyPlots(TList* histoList)
   TH1F* h_effPR = createHistogramsRatio("heffPR", "PR efficiency VS VXD Layer, normalized to MCTrackCand", m_h1_HitsTrackCandPerMCTrackCand, m_h1_HitsMCTrackCand, true, 0);
   histoList->Add(h_effPR);
 
+  //tracks used in the fit
+  TH1F* h_effVXDHitFit = createHistogramsRatio("heffVXDHitFit", "weighted hits used in the fit VS VXD Layer, normalized to hits form PR", m_h1_nVXDhitsWeighted, m_h1_nVXDhitsPR, true, 0);
+  histoList->Add(h_effVXDHitFit);
+
+  TH1F* h_effCDCHitFit = createHistogramsRatio("heffCDCHitFit", "weighted hits used in the fit VS CDC Layer, normalized to hits form PR", m_h1_nCDChitsWeighted, m_h1_nCDChitsPR, true, 0);
+  histoList->Add(h_effCDCHitFit);
 
 }
 

@@ -27,7 +27,7 @@ class RemoveEmptyROEModule(Module):
         self.return_value(0)
         roe = Belle2.PyStoreObj('RestOfEvent')
         B0 = roe.obj().getRelated('Particles')
-        if mc_variables.variables.evaluate('isRestOfEventEmpty', B0) == -2:
+        if mc_variables.variables.evaluate('qrCombined', B0) == -2:
             B2INFO('FOUND NO B0 IN ROE! NOT USED FOR TRAINING! COMBINER OUTPUT IS MANUALLY SET'
                    )
             B0.addExtraInfo('B0Probability', 0.5)
@@ -41,20 +41,7 @@ class RemoveEmptyROEModule(Module):
 
 
 main = create_path()
-# ***************************************
-progress = register_module('Progress')
-main.add_module(progress)
-
-roinput = register_module('RootInput')
-inputFiles = []
-for i in xrange(10):
-    inputFiles.append('/remote/pcbelle06/ligioi/dstFiles/B2JpsiKs_mu_e0001r'
-                      + '%04d' % (i + 1) + '_s00_BGx0.mdst.root')
-#roinput.param('skipNEvents', 955)
-roinput.param('inputFileNames', inputFiles)
-main.add_module(roinput)
-# ***************************************
-# main.add_module(register_module('RootInput'))
+main.add_module(register_module('RootInput'))
 main.add_module(register_module('Gearbox'))
 loadReconstructedParticles(path=main)
 

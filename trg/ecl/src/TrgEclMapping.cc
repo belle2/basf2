@@ -37,6 +37,7 @@ TrgEclMapping::getTCIdFromXtalId(int XtalId)
   //
   if (XtalId < 1 || XtalId > 8736) {
     B2ERROR("TrgEclMapping> input XtalId is wrong!!!");
+    return -1;
   }
   // 'XtalId' is Xtal ID
   // 'XtalId0' is 'XtalId' - 1
@@ -133,6 +134,8 @@ TrgEclMapping::getTCSubIdFromXtalId(int XtalId)
 {
   if (XtalId < 1 || XtalId > 8736) {
     B2ERROR("TrgEclMapping> input XtalId is wrong!!!");
+    return -1;
+
   }
   if (XtalId <= 1152) {
     //
@@ -198,6 +201,7 @@ TrgEclMapping::getTCThetaIdFromTCId(int TCId)
 
   if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> input TCId is wrong!!!");
+    return -1;
   }
   int TCId0 = TCId - 1;
   // forward-endcap  [Xtal=   1-1152, TC=  1- 80(80)]
@@ -223,6 +227,7 @@ TrgEclMapping::getTCPhiIdFromTCId(int TCId)
 
   if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> input TCId is wrong!!!");
+    return -1;
   }
   int TCId0 = TCId - 1;
   // forward-endcap  [Xtal=   1-1152, TC=  1- 80(80)]

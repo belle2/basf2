@@ -14,26 +14,28 @@ using namespace Belle2;
 
 ClassImp(TrackFitResult);
 
-TrackFitResult::TrackFitResult() : m_pdg(0), m_pValue(0), m_tau(), m_cov5(), m_hitPatternCDCInitializer(0), m_hitPatternVXDInitializer(0)
+TrackFitResult::TrackFitResult() : m_pdg(0), m_pValue(0), m_tau(), m_cov5(), m_hitPatternCDCInitializer(0), m_hitPatternCDCInitializer_part2(0), m_hitPatternVXDInitializer(0)
 {
 }
 
 TrackFitResult::TrackFitResult(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
                                const short int charge, const Const::ParticleType& particleType, const float pValue,
                                const float bField,
-                               const unsigned long hitPatternCDCInitializer, const unsigned short hitPatternVXDInitializer) :
+                               const long long int hitPatternCDCInitializer, const uint32_t hitPatternVXDInitializer) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
-  m_hitPatternCDCInitializer(hitPatternCDCInitializer), m_hitPatternVXDInitializer(hitPatternVXDInitializer)
+  m_hitPatternCDCInitializer(hitPatternCDCInitializer & 0xFFFFFFFF),
+  m_hitPatternCDCInitializer_part2(hitPatternCDCInitializer >> 32),
+  m_hitPatternVXDInitializer(hitPatternVXDInitializer)
 {
   cartesianToPerigee(position, momentum, covariance, charge, bField);
 }
 
 TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                                const Const::ParticleType& particleType, const float pValue,
-                               const unsigned long hitPatternCDCInitializer, const unsigned short hitPatternVXDInitializer) :
+                               const long long int hitPatternCDCInitializer, const uint32_t hitPatternVXDInitializer) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_tau(tau), m_cov5(cov5),
-  m_hitPatternCDCInitializer(hitPatternCDCInitializer), m_hitPatternVXDInitializer(hitPatternVXDInitializer)
+  m_hitPatternCDCInitializer(hitPatternCDCInitializer & 0xFFFFFFFF), m_hitPatternCDCInitializer_part2(hitPatternCDCInitializer >> 32), m_hitPatternVXDInitializer(hitPatternVXDInitializer)
 {
 
 }

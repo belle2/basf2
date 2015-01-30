@@ -6,7 +6,9 @@
  * Contributors: Martin Heck & Oksana Brovchenko & Moritz Nadler           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+ ********************
+
+******************************************************/
 #pragma once
 
 #include <framework/core/Module.h>
@@ -14,6 +16,8 @@
 #include <genfit/KalmanFitter.h>
 #include <genfit/KalmanFitterRefTrack.h>
 #include <genfit/DAF.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 
 #include <fstream>
 #include <string>
@@ -73,6 +77,9 @@ namespace Belle2 {
     std::string m_tracksColName;                     /**< Tracks collection name */
     std::string m_gfTracksColName;                   /**< genfit::Tracks collection name */
     bool m_suppressGFExceptionOutput;                /**< Switch on/off printing GenFit error message output */
+
+    HitPatternCDC getHitPatternCDC(genfit::Track); /**< returns HitPatternCDC of the Track */
+    HitPatternVXD getHitPatternVXD(genfit::Track); /**< returns the HitPatternVXD of the Track*/
 
     //These are two different counters, the counter for genfit::TrackCands refers to the number of input genfit::TrackCands. The number of total successfull/failed fits may be different, if genfit::TrackCand is fitted several times under different PDG hypothesises.
     int m_failedFitCounter;                          /**< Number of failed fits. */

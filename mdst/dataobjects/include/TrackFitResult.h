@@ -21,6 +21,7 @@
 #include <TMatrixD.h>
 #include <TMatrixDSym.h>
 
+#include <stdint.h>
 #include <cstdlib>
 #include <vector>
 
@@ -61,7 +62,7 @@ namespace Belle2 {
     TrackFitResult(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
                    const short int charge, const Const::ParticleType& particleType, const float pValue,
                    const float bField,
-                   const unsigned long hitPatternCDCInitializer, const unsigned short hitPatternVXDInitializer);
+                   const long long int hitPatternCDCInitializer, const uint32_t hitPatternVXDInitializer);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -73,7 +74,7 @@ namespace Belle2 {
      */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                    const Const::ParticleType& particleType, const float pValue,
-                   const unsigned long hitPatternCDCInitializer, const unsigned short hitPatternVXDInitializer);
+                   const long long int hitPatternCDCInitializer, const uint32_t hitPatternVXDInitializer);
 
     /** Getter for vector of position at closest approach of track in r/phi projection. */
     TVector3 getPosition() const;
@@ -173,16 +174,18 @@ namespace Belle2 {
 
     /** Getter for the hit pattern in the CDC; @sa HitPatternCDC */
     HitPatternCDC getHitPatternCDC()const {
-      return HitPatternCDC(m_hitPatternCDCInitializer);
+      long long int hitPatternCDCInitializer = ((long long int) m_hitPatternCDCInitializer_part2 << 32) | m_hitPatternCDCInitializer;
+      return HitPatternCDC(hitPatternCDCInitializer);
     }
 
-    /** Getter for the hit pattern in the CDC; @sa HitPatternCDC */
+    /** Getter for the hit pattern in the VXD; @sa HitPatternVXD */
     HitPatternVXD getHitPatternVXD()const {
       return HitPatternVXD(m_hitPatternVXDInitializer);
     }
 
     ///--------------------------------------------------------------------------------------------------------------------------
   private:
+
     /** Calculates the alpha value for a given magnetic field in Tesla */
     double getAlpha(const float bField) const;
 
@@ -303,16 +306,17 @@ namespace Belle2 {
      *
      *  @sa HitPatternCDC
      */
-    const unsigned long m_hitPatternCDCInitializer;
+    const uint32_t m_hitPatternCDCInitializer;
+    const uint32_t m_hitPatternCDCInitializer_part2; //from bit32 to bit 63
 
     /** Member for initializing the information about hits in the VXD.
      *
      *  @sa HitPatternVXD
      */
-    const unsigned short m_hitPatternVXDInitializer;
+    const uint32_t m_hitPatternVXDInitializer;
 
     /** Streamer version. */
-    ClassDef(TrackFitResult, 3);
+    ClassDef(TrackFitResult, 4);
   };
 }
 

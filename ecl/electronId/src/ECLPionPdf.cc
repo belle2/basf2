@@ -15,6 +15,11 @@ void  ECLPionPdf::init(const char* parametersFileName)
   unsigned int len = nbins * nCosTheta ;
   m_params = new Parameters [ len ];
   m_integralPion = new double [ len ];
+  m_muonlike.m_params = new ECLMuonPdf::Parameters [ len ];
+  m_muonlike.m_integral1 = new double [ len ];
+  m_muonlike.m_integral2 = new double [ len ];
+  ECLAbsPdf& abs = m_muonlike;
+  abs.init(map);
   for (unsigned int ip = 1; ip < nbins; ++ip)
     for (unsigned int ith = 0; ith < nCosTheta; ++ith) {
       unsigned int i = index(ip, ith);

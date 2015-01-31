@@ -36,6 +36,7 @@ REG_MODULE(ECLElectronId)
 ECLElectronIdModule::ECLElectronIdModule() : Module()
 {
   setDescription("E/p based Electron ID. Likelihood values for each particle hypothesis are stored in an ECLPidLikelihood object.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) m_pdf[i] = 0;
   //add module parameters here [see one of the following tutorials]
 }
@@ -52,8 +53,7 @@ void ECLElectronIdModule::initialize()
   StoreArray<ECLPidLikelihood> ECLPidLikelihoodArray;
   ECLPidLikelihoodArray.registerInDataStore();
   Tracks.registerRelationTo(ECLPidLikelihoodArray);
-  // StoreArray<ECLPidLikelihood>::registerPersistent(); oboslete.
-  // RelationArray::registerPersistent<Track, ECLPidLikelihood>(); obsolete.
+
 
   string eParams = FileSystem::findFile("/data/ecl/electrons.dat");
   string muParams = FileSystem::findFile("/data/ecl/muons.dat");
@@ -97,8 +97,8 @@ void ECLElectronIdModule::event()
         if (currentpdf == 0) currentpdf = m_pdf[ Const::pion.getIndex() ]; // use pion pdf when specialized pdf is not assigned.
         double p = fitRes  -> getMomentum() . Mag();
         double eop = energy / p;
-        likelihoods[hypo.getIndex()] = log(currentpdf->pdf(eop, p));
-
+        double costheta = fitRes  -> getMomentum() . CosTheta();
+        likelihoods[hypo.getIndex()] = log(currentpdf->pdf(eop, p, costheta));
       } else likelihoods[hypo.getIndex()] = -700;
 
     } // end loop on hypo

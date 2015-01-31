@@ -97,6 +97,7 @@ namespace Belle2 {
 
   protected:
 
-    ClassDef(TBSpacePoint, 2) // last stuff added: telCluster-constructor;
+    // last stuff added: m_clustersAssigned for SpacePoint
+    ClassDef(TBSpacePoint, 3)
   };
 }

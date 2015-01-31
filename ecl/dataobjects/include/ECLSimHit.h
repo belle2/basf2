@@ -80,7 +80,7 @@ namespace Belle2 {
 
     /*! Set Position
      */
-    void setPosIn(TVector3 Position) { m_Position = Position; }
+    //KM void setPosIn(TVector3 Position) { m_Position = Position; }
 
     /*! Set Position
      */

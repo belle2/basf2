@@ -6,8 +6,9 @@
 namespace Belle2 {
   class ECLElectronPdf : public ECLAbsPdf {
   public:
-    double pdf(double eop, double p) const;
+    double pdf(double eop, double p, double costheta) const;
     void init(const char* parametersFileName);
+    ~ECLElectronPdf();
   private:
     struct Parameters {
       double mu1;
@@ -19,9 +20,9 @@ namespace Belle2 {
       double nn;
     };
 
-    Parameters m_params[8];
-    double m_integral1[8];
-    double m_integral2[8];
+    Parameters* m_params;
+    double* m_integral1;
+    double* m_integral2;
 
   };
 }

@@ -178,6 +178,14 @@ namespace Belle2 {
 
     }
 
+    /**
+     * functions that add BeamBackHits to those in the DataStore
+     * @param hits a reference to DataStore BeamBackHits
+     * @param cloneArray a pointer to BeamBackHits read from a file
+     * @param timeShift time shift to be applied to BeamBackHits
+     * @param minTime time window left edge
+     * @param maxTime time window right edge
+     */
     template<class HIT>
     void addBeamBackHits(StoreArray<HIT>& hits, TClonesArray* cloneArray,
                          double timeShift, double minTime, double maxTime) {

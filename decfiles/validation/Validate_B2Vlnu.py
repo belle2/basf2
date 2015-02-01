@@ -12,11 +12,11 @@ from reconstruction import add_mdst_output
 from modularAnalysis import *
 from ROOT import Belle2
 
-generateY4S(1000, Belle2.FileSystem.findFile('decfiles/dec/Bu_Dst0enu.dec'))
+generateY4S(10000, Belle2.FileSystem.findFile('decfiles/dec/Bu_Dst0enu.dec'))
 loadGearbox()
-findMCDecay('B+:sig', 'B+ -> [anti-D*0 -> anti-D0 pi0] e+ nu_e')
+findMCDecay('B+:sig', 'B+ => [anti-D*0 -> anti-D0 pi0] e+ nu_e')
 
-ntupleFile('Validate_B2Vlnu.root')
+ntupleFile('../Validate_B2Vlnu.root')
 tools = ['EventMetaData', '^B+']
 tools += ['Kinematics', '^B+ -> ^anti-D*0 ^e+ ^nu_e']
 tools += ['VVAngles', 'B+ -> [anti-D*0 -> ^D0 ^pi0] ^e+ ^nu_e']

@@ -31,13 +31,15 @@ void  ECLElectronPdf::init(const char* parametersFileName)
 
       double sig = TMath::Abs(sigma);
       double tmin = - m0 / sig;
-
-      double a = TMath::Power(n / absAlpha, n) * std::exp(-0.5 * absAlpha * absAlpha);
-      double b = n / absAlpha - absAlpha;
-      double term1 = a * sig / (1.0 - n) * (1.0 / (TMath::Power(b - tmin, n - 1.0)) - 1.0 / (TMath::Power(n / absAlpha, n - 1.0)));
-      double term2 = sig * s_sqrtPiOver2 * (1 - TMath::Erf(-absAlpha / s_sqrt2));
-
-      m_integral2[i] = (term1 + term2);
+      if (tmin >= -absAlpha)
+        m_integral2[i] = 0.5 * (1 - TMath::Erf(- prm.mu2 / prm.sigma2 / s_sqrt2));
+      else {
+        double a = TMath::Power(n / absAlpha, n) * std::exp(-0.5 * absAlpha * absAlpha);
+        double b = n / absAlpha - absAlpha;
+        double term1 = a * sig / (1.0 - n) * (1.0 / (TMath::Power(b - tmin, n - 1.0)) - 1.0 / (TMath::Power(n / absAlpha, n - 1.0)));
+        double term2 = sig * s_sqrtPiOver2 * (1 - TMath::Erf(-absAlpha / s_sqrt2));
+        m_integral2[i] = (term1 + term2);
+      }
     }
 }
 

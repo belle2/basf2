@@ -45,14 +45,14 @@ def outputMdst(filename, path=analysis_main):
     reconstruction.add_mdst_output(path, mc=True, filename=filename)
 
 
-def outputUdst(filename, path=analysis_main):
+def outputUdst(filename, particleLists=[], path=analysis_main):
     """
-    Save uDST (micro-Data Summary Tables) = MDST + Particles
+    Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
     """
 
     import reconstruction
     partBranches = ['Particles', 'ParticlesToMCParticles',
-                    'ParticlesToPIDLikelihoods']
+                    'ParticlesToPIDLikelihoods'] + particleLists
     reconstruction.add_mdst_output(path, mc=True, filename=filename,
                                    additionalBranches=partBranches)
 

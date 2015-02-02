@@ -112,12 +112,12 @@ namespace Belle2 {
     }
 
     /** Return iterator to the begin of the cache. Items are sorted by access: most recently inserted */
-    iterator begin() { return m_container.begin();  }
+    iterator begin() const { return m_container.begin();  }
     /** Return iterator to the end of the cache */
-    iterator end() { return m_container.end();  }
+    iterator end() const { return m_container.end();  }
 
     /** Return actual size of the cache */
-    size_t size() { return m_container.size(); }
+    size_t size() const { return m_container.size(); }
     /** Clear cache */
     void clear() {
       m_container.clear();
@@ -129,13 +129,13 @@ namespace Belle2 {
     /** Set maximum number of cache entries */
     void setMaxSize(size_t maxSize) { m_maxSize = maxSize; }
     /** Get maximum number of cache entries */
-    size_t getMaxSize() { return m_maxSize; }
+    size_t getMaxSize() const { return m_maxSize; }
     /** Get number of cache hits since creation/last clear */
-    unsigned int getHits() { return m_hits; }
+    unsigned int getHits() const { return m_hits; }
     /** Get number of cache misses since creation/last clear */
-    unsigned int getMisses() { return m_misses; }
+    unsigned int getMisses() const { return m_misses; }
     /** Get number of overflows (dropped items) since creation/last clear */
-    unsigned int getOverflows() { return m_overflows; }
+    unsigned int getOverflows() const { return m_overflows; }
 
   protected:
     /**

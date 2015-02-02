@@ -47,6 +47,7 @@ fw = Framework()
 def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
     """
     Add given module (either object or name) at the end of this path.
+    All unknown arguments are passed as module parameters.
 
     >>> path = create_path()
     >>> path.add_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
@@ -75,16 +76,26 @@ Path.add_module = _add_module
 
 
 def serialize_value(module, parameter):
-    return serialize_path(parameter.values) if parameter.name == 'path' and module.type() == 'SubEvent' else parameter.values
+    if parameter.name == 'path' and module.type() == 'SubEvent':
+        return serialize_path(parameter.values)
+    else:
+        return parameter.values
 
 
 def deserialize_value(module, parameter_state):
-    return deserialize_path(parameter_state['values']) if parameter_state['name'] == 'path' and module.type() == 'SubEvent' else parameter_state['values']
+    if parameter_state['name'] == 'path' and module.type() == 'SubEvent':
+        return deserialize_path(parameter_state['values'])
+    else:
+        return parameter_state['values']
 
 
 def serialize_module(module):
+    if module.type() == '':
+        raise RuntimeError("Module '%s' doesn't have a type! Note that --dump-path cannot work properly with basf2 modules written in Python." % (module.name()))
     return {
-        'name': module.name(), 'type': module.type(), 'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
+        'name': module.name(),
+        'type': module.type(),
+        'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
         'parameters': [{'name': parameter.name, 'values': serialize_value(module, parameter)} for parameter in module.available_params() if parameter.setInSteering or module.type() == 'SubEvent']}
 
 
@@ -92,6 +103,7 @@ def deserialize_module(module_state):
     module = fw.register_module(module_state['type'])
     module.set_name(module_state['name'])
     if module_state['flag']:
+        # for some modules, this flag might be changed from the default
         module.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
     for parameter_state in module_state['parameters']:
         module.param(parameter_state['name'],

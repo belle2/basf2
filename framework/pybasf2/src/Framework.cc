@@ -213,6 +213,7 @@ void Framework::exposePythonAPI()
   .def("create_path", &Framework::createPath)
   .def("process", &Framework::process, process_overloads())
   .def("get_pickle_path", &Framework::getPicklePath)
+  .def("set_pickle_path", &Framework::setPicklePath)
   .def("set_nprocesses", &Framework::setNumberProcesses)
   .def("get_nprocesses", &Framework::getNumberProcesses)
   ;

@@ -4,4 +4,5 @@
 import sys
 from basf2 import *
 
+# for actual implementation, see process()
 process(None)

@@ -78,7 +78,7 @@ namespace Belle2 {
         addParam("FacetsStoreObjName",
                  m_param_facetsStoreObjName,
                  "Name of the output StoreObjPtr of the facets generated within this module.",
-                 std::string("CDCWireHitFacetVector"));
+                 std::string("CDCRecoFacetVector"));
 
         addParam("WriteTangentSegments",
                  m_param_writeTangentSegments,
@@ -309,6 +309,14 @@ namespace Belle2 {
           m_facetCreator.createFacets(*m_ptrFacetFilter, cluster, m_wirehitNeighborhood, m_facets);
           B2DEBUG(100, "  Created " << m_facets.size()  << " CDCRecoFacets");
 
+          // Copy facets to the DataStore
+          if (m_param_writeFacets and ptrFacets) {
+            std::vector<CDCRecoFacet>& facets = *ptrFacets;
+            for (const CDCRecoFacet & facet : m_facets) {
+              facets.push_back(facet);
+            }
+          }
+
           // Create the facet neighborhood
           B2DEBUG(100, "Creating the CDCRecoFacet neighborhood");
           m_facetsNeighborhood.clear();
@@ -333,14 +341,6 @@ namespace Belle2 {
             std::vector<CDCRecoTangentSegment>& tangentSegments = *ptrTangentSegments;
             for (const std::vector<const CDCRecoFacet*>& facetPath : m_facetPaths) {
               tangentSegments.push_back(CDCRecoTangentSegment::condense(facetPath));
-            }
-          }
-
-          // Move facets to the DataStore
-          if (m_param_writeFacets and ptrFacets) {
-            std::vector<CDCRecoFacet>& facets = *ptrFacets;
-            for (const CDCRecoFacet & facet : m_facets) {
-              facets.push_back(std::move(facet));
             }
           }
 

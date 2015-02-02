@@ -26,15 +26,11 @@ using namespace TrackFindingCDC;
 CellWeight MCFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
 {
   bool isCorrectFacet = isCorrect(facet, 3);
-
-  CDCRecoFacet reversedFacet = facet.reversed();
-
-  bool isCorrectReverseFacet = isCorrect(reversedFacet, 3);
+  bool isCorrectReverseFacet = m_allowReverse and isCorrect(facet.reversed(), 3);
 
   if (isCorrectFacet or isCorrectReverseFacet) {
-    //if (oldCellState == 3.0) {
     facet.adjustLines();
-    return 3;
+    return 3.0;
   } else {
     return NOT_A_CELL;
   }

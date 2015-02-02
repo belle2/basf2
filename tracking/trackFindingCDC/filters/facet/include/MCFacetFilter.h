@@ -24,12 +24,20 @@ namespace Belle2 {
     class MCFacetFilter : public BaseFacetFilter {
 
     public:
+      /// Constructor also setting the switch if the reversed version of a facet (in comparision to MC truth) shall be accepted.
+      MCFacetFilter(bool allowReverse = true) : m_allowReverse(allowReverse) {;}
+
+    public:
       /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
-      CellWeight isGoodFacet(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
+      virtual CellWeight isGoodFacet(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses
       bool isCorrect(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999) const;
+
+    private:
+      /// Switch to indicate if the reversed version of the facet shall also be accepted (default is true).
+      bool m_allowReverse;
 
     }; // end class MCFacetFilter
   } //end namespace TrackFindingCDC

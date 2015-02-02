@@ -20,6 +20,10 @@ namespace Belle2 {
     class MCFacetNeighborChooser : public BaseFacetNeighborChooser {
 
     public:
+      /// Constructor also setting the switch if the reversed version of a facet (in comparision to MC truth) shall be accepted.
+      MCFacetNeighborChooser(bool allowReverse = true) : m_mcFacetFilter(allowReverse) {;}
+
+    public:
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       virtual NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
                                             const CDCRecoFacet& neighborFacet) override final {

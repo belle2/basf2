@@ -15,7 +15,6 @@
 
 #include <vector>
 
-
 namespace Belle2 {
   /**
    * Module to set event, run, experiment numbers.

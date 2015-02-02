@@ -12,8 +12,9 @@
 
 #include <framework/core/Environment.h>
 
-#include <vector>
 #include <chrono>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -33,7 +34,7 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
   m_colIndex = 0;
 
   //Set module properties
-  setDescription("Sets the event meta data information (exp, run, evt). You must use this module to tell basf2 about the number of events you want to generate, unless you have an input module that already does so.");
+  setDescription("Sets the event meta data information (exp, run, evt). You must use this module to tell basf2 about the number of events you want to generate, unless you have an input module that already does so. Note that all experiment/run combinations specified must be unique");
 
   //Parameter definition
   std::vector<int> defaultExpRunList;
@@ -73,6 +74,14 @@ void EventInfoSetterModule::initialize()
     B2ERROR("Parameters are inconsistent. The exp, run and evt lists must have the same number of entries.")
   } else if (defListSize == 0) {
     B2ERROR("There are no events to be processed!")
+  } else {
+    set<pair<int, int>> expRunSet;
+    for (unsigned int i = 0; i < defListSize; i++) {
+      auto ret = expRunSet.insert(make_pair(m_expList[i], m_runList[i]));
+      if (!ret.second) {
+        B2ERROR("Exp " << ret.first->first << ", run " << ret.first->second << " used more than once! Please make sure all experiment/run combinations are unique.");
+      }
+    }
   }
 
   m_evtNumber = 0;

@@ -86,8 +86,10 @@ void AllFacetWorker::generate()
       // Create the facets
       B2DEBUG(100, "Creating the CDCRecoFacets");
 
-      FacetCreator<AllFacetFilter> m_allFacetCreator;
-      m_allFacetCreator.createFacets(cluster, m_wirehitNeighborhood, m_recoFacets);
+      FacetCreator facetCreator;
+      AllFacetFilter allFacetFilter;
+
+      facetCreator.createFacets(allFacetFilter, cluster, m_wirehitNeighborhood, m_recoFacets);
 
       B2DEBUG(100, "  Created " << m_recoFacets.size()  << " CDCRecoFacets");
 

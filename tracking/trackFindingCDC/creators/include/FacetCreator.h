@@ -21,15 +21,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the facets.
-    template<class FacetFilter>
     class FacetCreator {
 
     public:
       /// Constructor with the default filter.
-      FacetCreator() : m_facetFilter() {;}
-
-      /// Constructor taking the facet filter with externally setup parameters
-      FacetCreator(const FacetFilter& facetFilter) : m_facetFilter(facetFilter) {;}
+      FacetCreator() {;}
 
       /// Empty deconstructor
       ~FacetCreator() {;}
@@ -37,39 +33,24 @@ namespace Belle2 {
       /// The neighborhood type used to generate wire hit triples
       typedef WeightedNeighborhood<const CDCWireHit> Neighborhood;
 
-      /// Creates the facets from the given wire hits and the neighborhood among them, pushes the results into the given sortable facets vector and sorts it.
-      template<class CDCWireHitMayBePtrRange>
-      void createFacets(const CDCWireHitMayBePtrRange& wirehits,
+      template<class FacetFilter, class CDCWireHitMayBePtrRange>
+      void createFacets(FacetFilter& facetFilter,
+                        const CDCWireHitMayBePtrRange& wirehits,
                         const Neighborhood& neighborhood,
                         SortableVector<CDCRecoFacet>& facets) const {
-        createFacetsGeneric(wirehits, neighborhood, facets);
+        createFacetsGeneric(facetFilter, wirehits, neighborhood, facets);
         facets.sort();
 
       }
 
-
-
-      /// Forwards the modules initialize method to the filter.
-      void initialize() {
-        m_facetFilter.initialize();
-      }
-
-
-
-      /// Forwards the modules terminate method to the filter
-      void terminate() {
-        m_facetFilter.terminate();
-      }
-
-
-
     private:
       /// Generates facets on the given wire hits generating neighboring triples of hits. Inserts the result to the end of the GenericFacetCollection.
-      template<class CDCWireHitMayBePtrRange, class GenericFacetCollection>
-      void createFacetsGeneric(const CDCWireHitMayBePtrRange& wirehits,
+      template<class FacetFilter, class CDCWireHitMayBePtrRange, class GenericFacetCollection>
+      void createFacetsGeneric(FacetFilter& facetFilter,
+                               const CDCWireHitMayBePtrRange& wirehits,
                                const Neighborhood& neighborhood,
                                GenericFacetCollection& facets) const {
-        m_facetFilter.clear();
+
         for (const auto & mayBePtrMiddleWireHit : wirehits) {
 
           Neighborhood::range nextNeighborRange = neighborhood.equal_range(mayBePtrMiddleWireHit);
@@ -91,10 +72,12 @@ namespace Belle2 {
                 //skip combinations where the facet starts and ends on the same wire
                 if (not(ptrStartWireHit->getWire() ==  ptrEndWireHit->getWire())) {
 
-                  createFacetsForHitTriple(ptrStartWireHit, ptrMiddleWireHit, ptrEndWireHit, facets);
-                  //++nGroupsOfThree;
+                  createFacetsForHitTriple(facetFilter,
+                                           ptrStartWireHit,
+                                           ptrMiddleWireHit,
+                                           ptrEndWireHit,
+                                           facets);
                 }
-
               } //end for itEndWireHit
             } //end for itStartWireHit
           } //end if neighborRange.first != neighborRange.second
@@ -103,8 +86,9 @@ namespace Belle2 {
       }
 
       /// Generates reconstruted facets on the three given wire hits by hypothesizing over the 8 left right passage combinations. Inserts the result to the end of the GenericFacetCollection.
-      template<class GenericFacetCollection>
-      void createFacetsForHitTriple(const CDCWireHit* startWireHit,
+      template<class FacetFilter, class GenericFacetCollection>
+      void createFacetsForHitTriple(FacetFilter& facetFilter,
+                                    const CDCWireHit* startWireHit,
                                     const CDCWireHit* middleWireHit,
                                     const CDCWireHit* endWireHit,
                                     GenericFacetCollection& facets) const {
@@ -128,7 +112,7 @@ namespace Belle2 {
               //Obtain a constant interface to pass to the filter method following
               const CDCRecoFacet& constFacet = facet;
 
-              CellState cellWeight = m_facetFilter.isGoodFacet(constFacet);
+              CellState cellWeight = facetFilter.isGoodFacet(constFacet);
 
               if (not isNotACell(cellWeight)) {
                 facet.getAutomatonCell().setCellWeight(cellWeight);
@@ -138,9 +122,6 @@ namespace Belle2 {
           } //end for middleRLWireHit
         } //end for startRLWireHit
       }
-
-    private:
-      mutable FacetFilter m_facetFilter; ///< Instance of the filter used to judge the hit triple quality.
 
     }; //end class FacetCreator
   } //end namespace TrackFindingCDC

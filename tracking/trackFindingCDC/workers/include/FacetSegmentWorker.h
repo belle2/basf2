@@ -58,7 +58,7 @@ namespace Belle2 {
 
         m_clustersInSuperLayer.reserve(20);
 
-        m_facetCreator.initialize();
+        m_facetFilter.initialize();
         m_facetNeighborChooser.initialize();
 
       }
@@ -67,7 +67,7 @@ namespace Belle2 {
 
       /// Forwards the terminate method of the module to the facet creator and the neighborhood chooser
       void terminate() {
-        m_facetCreator.terminate();
+        m_facetFilter.terminate();
         m_facetNeighborChooser.terminate();
       }
 
@@ -134,7 +134,7 @@ namespace Belle2 {
             //create the facets
             B2DEBUG(100, "Creating the CDCRecoFacets");
             m_facets.clear();
-            m_facetCreator.createFacets(cluster, m_wirehitNeighborhood, m_facets);
+            m_facetCreator.createFacets(m_facetFilter, cluster, m_wirehitNeighborhood, m_facets);
             B2DEBUG(100, "  Created " << m_facets.size()  << " CDCRecoFacets");
 
             //create the facet neighborhood
@@ -278,8 +278,11 @@ namespace Belle2 {
 
       //object creators
 
+      //Instance of the facet filter
+      FacetFilter m_facetFilter;
+
       /// Instance of the facet creator
-      FacetCreator<FacetFilter> m_facetCreator;
+      FacetCreator m_facetCreator;
 
       /// Instance of the filter used in edge / neighborhood creation.
       FacetNeighborChooser m_facetNeighborChooser;

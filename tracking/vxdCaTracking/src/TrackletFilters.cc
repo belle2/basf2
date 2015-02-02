@@ -533,7 +533,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
          n3 = eigenVectors(2, minValueIndex);
 
   /** In the case of a straight line, the HelixFit can not work. So we check if the plane is "straight up", or the z-normal vector is zero, n3 has the unit of cm(?) */
-  if (fabs(n3) < 1e-06) { throw FilterExceptions::Straight_Line(); } /// WARNING: this value for catching straight lines is hardcoded: its resolution should be finer than the possible resolution of the detectors (we assume that the unit is cm)
+  if (fabs(n3) < 1e-09) { throw FilterExceptions::Straight_Line(); } /// WARNING: this value for catching straight lines is hardcoded: its resolution should be finer than the possible resolution of the detectors (we assume that the unit is cm)
 
   /** In the case of the fitted plane being parallel to the x-y plane, helixFit produces a nan pZ. TODO Why */
   if (fabs(n1) < 1e-10 && fabs(n2) < 1e-10) { throw FilterExceptions::Center_Is_Origin(); }

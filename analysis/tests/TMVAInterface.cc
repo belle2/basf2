@@ -185,10 +185,10 @@ namespace {
 
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
 
-    std::vector<std::string> variables = {"p", "getExtraInfo(someInput)"};
+    std::vector<std::string> variables = {"p", "extraInfo(someInput)"};
     std::vector<std::string> spectators = {"M"};
-    std::string target = "getExtraInfo(target)";
-    std::string weight = "getExtraInfo(weight)";
+    std::string target = "extraInfo(target)";
+    std::string weight = "extraInfo(weight)";
 
     std::vector<TMVAInterface::Method> methods;
     methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables, spectators));
@@ -239,9 +239,9 @@ namespace {
     TestHelpers::TempDirCreator tempdir;
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
 
-    std::vector<std::string> variables = {"p", "False", "getExtraInfo(someInput)"};
+    std::vector<std::string> variables = {"p", "False", "extraInfo(someInput)"};
     std::vector<std::string> spectators = {"M"};
-    std::string target = "getExtraInfo(target)";
+    std::string target = "extraInfo(target)";
     std::string weight = "constant(1.1)";
 
     std::vector<TMVAInterface::Method> methods;

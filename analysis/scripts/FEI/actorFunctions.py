@@ -566,8 +566,21 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     for (ntuple, target) in zip(finalParticleNTuples, finalParticleTargets):
         if ntuple is not None:
             type = 'CosBDL' if 'semileptonic' in ntuple else 'Mbc'
-            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, type, mcCounts, target))
-            finalParticlePlaceholders.append(automaticReporting.createMoneyPlotTexFile(ntuple, "ROC", mcCounts, target))
+            plot = automaticReporting.createMoneyPlotTexFile(ntuple, type, mcCounts, target)
+            rocPlot = automaticReporting.createMoneyPlotTexFile(ntuple, "ROC", mcCounts, target)
+            finalParticlePlaceholders.append(plot)
+            finalParticlePlaceholders.append(rocPlot)
+
+            rootfile = ROOT.TFile(ntuple)
+            tree = rootfile.Get('variables')
+            uniqueSignal = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(uniqueSignal)')
+            nUniqueSignal = int(tree.GetEntries(target + ' && ' + uniqueSignal))
+
+            #add nUniqueSignal back in corresponding combined particle placeholder
+            for i, cplaceholder in enumerate(combinedParticlePlaceholders):
+                if cplaceholder['particleName'] == plot['particleName']:
+                    combinedParticlePlaceholders[i]['particleNUniqueSignalAfterPostCut'] = nUniqueSignal
+
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
 
     subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/FEI/templates/nordbert.pdf')), shell=True)

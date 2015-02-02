@@ -2104,7 +2104,8 @@ TRGCDC::fastSimulation(void) {
 
     //...3D tracker...
     vector<TCTrack*> trackList3D;
-    _fitter3D->doit(trackList, trackList3D);
+    //_fitter3D->doit(trackList, trackList3D);
+    _fitter3D->doitComplex(trackList, trackList3D);
 
     //...End of simulation...
 

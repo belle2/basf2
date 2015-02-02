@@ -3,6 +3,8 @@
 # 2012/10/11 : param_cdcdigi, Threshold added
 # 2013/11/05 : Updated for release-00-03-00
 # 2014/02/12 : Updated for build-2014-01-19 //JB
+# 2015/01/28 : Updated for build-2015-01-03 //JB
+# 2015/02/02 : Added KKGen, Background, RootInput/RootOutput
 
 from basf2 import *
 
@@ -11,11 +13,47 @@ set_log_level(LogLevel.ERROR)
 set_random_seed(0)
 basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 
-#...Particle Gun...
-particlegun = register_module('ParticleGun')
+
+##########################################################
+# Register modules
+evtmetagen        = register_module('EventInfoSetter')
+evtmetainfo       = register_module('Progress')
+paramloader       = register_module('Gearbox')
+geobuilder        = register_module('Geometry')
+particlegun       = register_module('ParticleGun')
+evtgeninput       = register_module('EvtGenInput')
+kkgeninput        = register_module('KKGenInput')
+mcparticleprinter = register_module('PrintMCParticles')
+g4sim             = register_module('FullSim')
+bkgmixer          = register_module('BeamBkgMixer')
+cdcdigitizer      = register_module('CDCDigitizer')
+cdctrg            = register_module("TRGCDC")
+rootOut           = register_module('RootOutput')
+rootIn            = register_module('RootInput')
+
+
+##########################################################
+# Module settings
+
+#...Global settings...
+#simulatedComponents = ['MagneticField', 'CDC'
+#                 ,'PXD', 'SVD', 'BeamPipe'
+#                ]
+simulatedComponents = ['MagneticField', 'CDC'
+                ]
+
+#...EventInfoSetter...
+# Set number of events and runs
+evtmetagen.param({'evtNumList': [10], 'runList': [1]})
+
+#...Geometry...
+# Set what dectectors to simulate.
+geobuilder.param('Components', simulatedComponents)
+# Set verbose of geometry simulation
+#geobuilder.log_level = LogLevel.INFO
+
+#...ParticleGun...
 #particlegun.param('randomSeed', 3452346)
-#particlegun.param('randomSeed', 345)
-#particlegun.param('randomSeed', 346)
 particlegun.param('pdgCodes', [13])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')
@@ -34,83 +72,49 @@ particlegun.param('xVertexParams', [0, 0])
 particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [0, 0])
 
-#Register modules
-evtmetagen  = register_module('EventInfoSetter')
-evtmetainfo = register_module('Progress')
-#evtmetainfo = fw.register_module("EvtMetaInfo")
-paramloader = register_module('Gearbox')
-geobuilder = register_module('Geometry')
-#geobuilder.log_level = LogLevel.INFO
-g4sim       = register_module('FullSim')
-cdcdigitizer = register_module('CDCDigitizer')
-#out         = register_module('SimpleOutput')
-cdctrg      = fw.register_module("TRGCDC")
-mcparticle  = fw.register_module('PrintMCParticles')
+#...EvtGenInput...
+#evtgeninput.param('userDECFile', 'USER.DEC')
+evtgeninput.param('boost2LAB', True)
 
-#...G4Sim...
+#...KKGenInput...
+# You need to copy mu.input.dat to the current directory, that is
+# found in "data/generators/kkmc".
+kkdir = '/sw/belle2/releases/build-2014-10-22/generators/'
+kkgeninput.param('tauinputFile', kkdir+'kkmc/data/mu.input.dat')
+kkgeninput.param('KKdefaultFile', kkdir+'kkmc/data/KK2f_defaults.dat')
+kkgeninput.param('taudecaytableFile', '')
+
+#...PrintMCParticles...
+mcparticleprinter.param('maxLevel',-1)
+
+#...FullSim...
 # Turn off physics processes
 #    "physics.mac" is located at "trg/examples/".
 #g4sim.param('UICommands',['/control/execute physics.mac'])
 # or below line can be used when trgcdc.py is not in trg/examples directory //JB
-#g4sim.param('UICommands',['/control/execute ' + os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None),"trg/cdc/examples/physics.mac")])
+g4sim.param('UICommands',['/control/execute ' + os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None),"trg/cdc/examples/physics.mac")])
 
-#...EvtMetaGen...
-evtmetagen.param({'evtNumList': [5], 'runList': [1]})
+#...BeamBkgMixer...
+# Mix background (From beamBkgMixer.py)
+dir = '/sw/belle2/bkg/'  # change the directory name if you don't run on KEKCC
+bkg_files = [
+    dir + 'Coulomb_HER_100us.root',
+    dir + 'Coulomb_LER_100us.root',
+    dir + 'RBB_HER_100us.root',
+    dir + 'RBB_LER_100us.root',
+    dir + 'Touschek_HER_100us.root',
+    dir + 'Touschek_LER_100us.root',
+]
+#bkg_file = glob.glob(dir + '/*.root')
+bkgScaleFactor = 1
+bkgmixer.param('backgroundFiles', bkg_files)
+bkgmixer.param('components', simulatedComponents)
+bkgmixer.param('scaleFactors', [('Coulomb_LER', bkgScaleFactor), ('Coulomb_HER', bkgScaleFactor) 
+                             ,('RBB_LER', bkgScaleFactor), ('RBB_HER', bkgScaleFactor)
+                             ,('Touschek_LER',bkgScaleFactor), ('Touschek_HER', bkgScaleFactor)
+                             ])
 
-#...GeoBuilder... Exclude detectors other than CDC
-geobuilder.param('Components', ['MagneticField', 'CDC'])
-
-#...CDC Trigger...
-#cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051.dat"))
-cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051_2013beamtest.dat"))
-
-
-#cdctrg.param('makeRootFile', True)
-
-#TSLUT (latest version @ 2014.07)
-cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir,"trg/cdc/innerLUT_v2.2.coe"))
-cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir,"trg/cdc/outerLUT_v2.2.coe"))
-
-#L/R LUTs (old version). will be removed.
-#cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUTIN.coe"))
-#cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUT.coe"))
-#cdctrg.param('TSFLUTSL0DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL0.coe"))
-#cdctrg.param('TSFLUTSL1DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL1.coe"))
-#cdctrg.param('TSFLUTSL2DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL2.coe"))
-#cdctrg.param('TSFLUTSL3DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL3.coe"))
-#cdctrg.param('TSFLUTSL4DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL4.coe"))
-#cdctrg.param('TSFLUTSL5DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL5.coe"))
-#cdctrg.param('TSFLUTSL6DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL6.coe"))
-#cdctrg.param('TSFLUTSL7DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL7.coe"))
-#cdctrg.param('TSFLUTSL8DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL8.coe"))
-cdctrg.param('DebugLevel', 10)
-cdctrg.param('CurlBackStop', 1)
-cdctrg.param('SimulationMode', 3)        # 1:fast, 2:firm, 3:fast and firm
-cdctrg.param('FastSimulationMode', 0)
-cdctrg.param('2DFinderPerfect',0)
-cdctrg.param('HoughFinderMeshX',160)
-cdctrg.param('HoughFinderMeshY',26)
-#cdctrg.param('SimulationMode',0x11)
-#cdctrg.param('RootTRGCDCFile', 'TRGCDC1.root')
-#cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
-#cdctrg.param('Fitter3DLRLUT', 0)
-#cdctrg.param('TRGCDCRootFile',1)
-#cdctrg.param('TSFRootFile',1)
-#cdctrg.param('Hough3DRootFile',1)
-#cdctrg.param('Fitter3DRootFile',1)
-# 0: perfect finder, 1: Hough3DFinder, 2: (Default) GeoFinder, 3: VHDL GeoFinder
-#cdctrg.param('Finder3DMode',2)
-# 0: (Default) Logic TSF, 1: LUT TSF
-#cdctrg.param('TSFLogicLUT', 1)
-
-#set mcprinter
-mcparticleprinter = register_module('PrintMCParticles')
-mcparticleprinter.param('maxLevel',-1)
-
-#set geometry(geobuilder)
-geobuilder.param('Components', ['MagneticField', 'CDC'
-                ])
-
+#...CDCDigitizer...
 #set digitizer to no smearing
 param_cdcdigi = {'Fraction': 1,
                  'Resolution1': 0.,
@@ -120,30 +124,125 @@ cdcdigitizer.param(param_cdcdigi)
 cdcdigitizer.param('AddInWirePropagationDelay', True)
 cdcdigitizer.param('AddTimeOfFlight', True)
 
-# For B Bbar events.
-evtgeninput = register_module('EvtGenInput')
-#evtgeninput.param('userDECFile', 'USER.DEC')
-evtgeninput.param('boost2LAB', True)
+#...CDC Trigger...
+#---General settings---
+#cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051.dat"))
+cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051_2013beamtest.dat"))
+#cdctrg.param('DebugLevel', 1)
+cdctrg.param('CurlBackStop', 1)
+cdctrg.param('SimulationMode', 1)        # 1:fast, 2:firm, 3:fast and firm
+cdctrg.param('FastSimulationMode', 0)
+#cdctrg.param('SimulationMode',0x11)
+#cdctrg.param('TRGCDCRootFile',1)
+#cdctrg.param('RootTRGCDCFile', 'TRGCDC.root')
+#---TSF settings---
+#TSLUT (latest version @ 2014.07)
+cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir,"trg/cdc/innerLUT_v2.2.coe"))
+cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir,"trg/cdc/outerLUT_v2.2.coe"))
+#cdctrg.param('TSFLogicLUT', 1)
+#cdctrg.param('TSFRootFile',1)
+#---2D finder settings---
+cdctrg.param('2DFinderPerfect',1)
+cdctrg.param('HoughFinderMeshX',160)
+cdctrg.param('HoughFinderMeshY',26)
+#---3D finder settings---
+#cdctrg.param('Hough3DRootFile',1)
+# 0: perfect finder, 1: Hough3DFinder, 2: (Default) GeoFinder, 3: VHDL GeoFinder
+# 0: (Default) Logic TSF, 1: LUT TSF
+#cdctrg.param('Finder3DMode',2)
+#---3D fitter settings---
+#cdctrg.param('Fitter3DRootFile',1)
+#cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
+#cdctrg.param('Fitter3DLRLUT', 0)
+
+#...RootOutput...
+rootOut.param('outputFileName', 'basf2.root')
+
+#...RootInput...
+rootIn.param('inputFileName', 'basf2.root')
 
 
-##Create paths
-main = create_path()
+##########################################################
+#  Path settings.
 
+# For full simulation.
+fullMain = create_path()
 #Add modules to paths
-main.add_module(evtmetagen)
-main.add_module(evtmetainfo)
-main.add_module(paramloader)
-main.add_module(geobuilder)
-main.add_module(particlegun)
-#main.add_module(evtgeninput)
-main.add_module(mcparticleprinter)
-main.add_module(g4sim)
-main.add_module(cdcdigitizer)
-main.add_module(cdctrg)
-#main.add_module(out)
+fullMain.add_module(evtmetagen)
+fullMain.add_module(evtmetainfo)
+fullMain.add_module(paramloader)
+fullMain.add_module(geobuilder)
+fullMain.add_module(particlegun)
+#fullMain.add_module(evtgeninput)
+#fullMain.add_module(kkgeninput)
+fullMain.add_module(mcparticleprinter)
+fullMain.add_module(g4sim)
+#fullMain.add_module(bkgmixer)
+fullMain.add_module(cdcdigitizer)
+fullMain.add_module(cdctrg)
 
-#Process events
-process(main)
+# For only generator+G4Sim and save file. (To save time)
+g4SimMain = create_path()
+#Add modules to paths
+g4SimMain.add_module(evtmetagen)
+g4SimMain.add_module(evtmetainfo)
+g4SimMain.add_module(paramloader)
+g4SimMain.add_module(geobuilder)
+#g4SimMain.add_module(particlegun)
+g4SimMain.add_module(evtgeninput)
+#g4SimMain.add_module(kkgeninput)
+g4SimMain.add_module(mcparticleprinter)
+g4SimMain.add_module(g4sim)
+#g4SimMain.add_module(bkgmixer)
+g4SimMain.add_module(cdcdigitizer)
+g4SimMain.add_module(rootOut)
 
-#Print call statistics
+# For TSIM with generator+G4Sim saved file. (To save time)
+savedG4SimMain = create_path()
+#Add modules to paths
+savedG4SimMain.add_module(rootIn)
+savedG4SimMain.add_module(evtmetainfo)
+savedG4SimMain.add_module(paramloader)
+savedG4SimMain.add_module(geobuilder)
+savedG4SimMain.add_module(cdctrg)
+
+# For only generator and save file.
+generatorMain = create_path()
+#Add modules to paths
+generatorMain.add_module(evtmetagen)
+generatorMain.add_module(evtmetainfo)
+generatorMain.add_module(paramloader)
+generatorMain.add_module(geobuilder)
+generatorMain.add_module(particlegun)
+#generatorMain.add_module(evtgeninput)
+#generatorMain.add_module(kkgeninput)
+generatorMain.add_module(mcparticleprinter)
+generatorMain.add_module(g4sim)
+generatorMain.add_module(rootOut)
+
+# For TSIM with generator saved file. 
+savedGeneratorMain = create_path()
+#Add modules to paths
+savedGeneratorMain.add_module(rootIn)
+savedGeneratorMain.add_module(evtmetainfo)
+savedGeneratorMain.add_module(paramloader)
+savedGeneratorMain.add_module(geobuilder)
+#savedGeneratorMain.add_module(bkgmixer)
+savedGeneratorMain.add_module(cdcdigitizer)
+savedGeneratorMain.add_module(cdctrg)
+
+##########################################################
+# Process events
+# Full simulation.
+process(fullMain)
+## Only generator+G4Sim and save file. (To save time)
+#process(g4SimMain)
+# For TSIM with generator+G4Sim saved file. (To save time)
+#process(savedG4SimMain)
+## For only generator and save file.
+#process(generatorMain)
+## For TSIM with generator saved file.
+#process(savedGeneratorMain)
+
+# Print call statistics
 print statistics

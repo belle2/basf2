@@ -30,6 +30,9 @@ namespace Belle2 {
   class TRGCDCTrack;
   class TRGCDCEventTime;
   class TRGCDCSegmentHit;
+  class TRGCDCJSignal;
+  class TRGCDCJLUT;
+  class TRGCDCJSignalData;
 
   /// A class to fit tracks in 3D
   class TRGCDCFitter3D {
@@ -48,12 +51,14 @@ namespace Belle2 {
 
     /// Initialization.
     void initialize();
-    void initializeLUTs();
     /// Termination.
     void terminate();
 
     /// Does track fitting.
     int doit(const std::vector<TRGCDCTrack *> & trackListIn,
+             std::vector<TRGCDCTrack *> & trackListOut);
+
+    int doitComplex(const std::vector<TRGCDCTrack *> & trackListIn,
              std::vector<TRGCDCTrack *> & trackListOut);
     /// Utility functions.
     static double calPhi(TRGCDCSegmentHit const * segmentHit, double eventTime);
@@ -61,11 +66,10 @@ namespace Belle2 {
     void getMCValues( TRGCDCTrack* aTrack );
 
     /// Functions for saving.
-    void initializeRoot(std::string = "");
-    void saveInitializationValues();
-    void saveTrackValues();
+    void saveVhdlAndCoe();
+    void saveAllSignals();
+    void saveIoSignals();
 
-    void terminateRoot();
 
     std::string name(void) const;
     std::string version(void) const;
@@ -82,12 +86,18 @@ namespace Belle2 {
       /// Map to hold vector values for Fitter3D.
       std::map<std::string, std::vector<double> > m_mVector;
       /// Map to hold const values for Fitter3D.
+      std::map<std::string, double> m_mConstants;
       std::map<std::string, double> m_mConstD;
       std::map<std::string, std::vector<double> > m_mConstV;
       /// Map to hold input options.
       std::map<std::string, bool> m_mBool;
-      /// Map to hold converter information. (min, max, #bits)
-      std::map<std::string, std::vector<double> > m_mConvert;
+
+      // Map to hold JSignals.
+      std::map<std::string, TRGCDCJSignal> m_mSignalStorage;
+      // Map to hold JLuts.
+      std::map<std::string, TRGCDCJLUT*> m_mLutStorage;
+      // For VHDL code.
+      TRGCDCJSignalData* m_commonData;
 
       /// Members for saving.
       std::string m_rootFitter3DFileName;
@@ -96,6 +106,8 @@ namespace Belle2 {
       TTree* m_treeConstantsFitter3D;
       std::map<std::string, TVectorD*> m_mTVectorD;
       std::map<std::string, TClonesArray*> m_mTClonesArray;
+      std::map<std::string, std::vector<signed long long> > m_mSavedSignals;
+      std::map<std::string, std::vector<signed long long> > m_mSavedIoSignals;
 
   };
 

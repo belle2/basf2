@@ -34,12 +34,14 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Forward declaration of the module implementing the segment generation by cellular automaton on facets using specific filter instances.
-    template<class FacetFilter, class FacetNeighborChooser>
+    template<class FacetFilter = SimpleFacetFilter, class FacetNeighborChooser = SimpleFacetNeighborChooser>
     class SegmentFinderCDCFacetAutomatonImplModule;
+  }
 
-    /// Module specialisation using the default Monte Carlo free filters. To be used in production.
-    typedef  SegmentFinderCDCFacetAutomatonImplModule<SimpleFacetFilter, SimpleFacetNeighborChooser> SegmentFinderCDCFacetAutomatonModule;
+  /// Module specialisation using the default Monte Carlo free filters. To be used in production.
+  typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule<> SegmentFinderCDCFacetAutomatonModule;
 
+  namespace TrackFindingCDC {
     template<class FacetFilter, class FacetNeighborChooser>
     class SegmentFinderCDCFacetAutomatonImplModule : public SegmentFinderCDCBaseModule {
 
@@ -95,7 +97,7 @@ namespace Belle2 {
       }
 
       ///  Initialize the Module before event processing
-      virtual void initialize() override final {
+      virtual void initialize() override {
         SegmentFinderCDCBaseModule::initialize();
 
         if (m_param_writeClusters) {

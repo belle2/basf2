@@ -21,7 +21,7 @@ void NtupleSLTool::setupTree()
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) return;
 
-  m_tree->Branch((strNames[0] + "_hel").c_str(), &m_helA, (strNames[0] + "_hel/F").c_str());
+  m_tree->Branch((strNames[0] + "_lephel").c_str(), &m_helA, (strNames[0] + "_lephel/F").c_str());
   m_tree->Branch((strNames[0] + "_q2").c_str() , &m_q2, (strNames[0] + "_q2/F").c_str());
 
 }
@@ -29,23 +29,23 @@ void NtupleSLTool::setupTree()
 void NtupleSLTool::eval(const Particle* particle)
 {
   if (!particle) {
-    B2ERROR("NtupleSLTool::eval - no Particle found!");
+    B2ERROR("NtupleSLTool::eval - ERROR, no Particle found!\n");
     return;
   }
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  if (selparticles.size() != 2) {
-    B2ERROR("NtupleSLTool::eval - you must select exactly 2 particles in the decay A->1+2!");
+  if (selparticles.size() != 3) {
+    B2ERROR("NtupleSLTool::eval - ERROR, you must select exactly 3 particles in the decay 1->had+2+3!\n");
     return;
   }
 
   //get daughter1
-  const Particle*  daughter1 = selparticles[0];
+  const Particle*  daughter1 = selparticles[1];
 
   //get daughter2
-  const Particle*  daughter2 = selparticles[1];
+  const Particle*  daughter2 = selparticles[2];
 
   TLorentzVector daughter1Momentum = daughter1->get4Vector();
   TLorentzVector daughter2Momentum = daughter2->get4Vector();

@@ -20,6 +20,15 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(SegmentFinderCDCMCTruth);
 
+
+void SegmentFinderCDCMCTruthModule::initialize()
+{
+  SegmentFinderCDCBaseModule::initialize();
+  StoreArray <CDCSimHit>::required();
+  StoreArray <MCParticle>::required();
+}
+
+
 void SegmentFinderCDCMCTruthModule::generate(std::vector<CDCRecoSegment2D>& outputSegments)
 {
   CDCMCManager::getInstance().fill();

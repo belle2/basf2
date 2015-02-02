@@ -21,6 +21,9 @@ namespace Belle2 {
   class SegmentFinderCDCMCTruthModule : public SegmentFinderCDCBaseModule {
 
   public:
+    virtual void initialize() override;
+
+  public:
     /// Generates the segment from Monte Carlo information. Default orientation is the flight direction.
     virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override;
 

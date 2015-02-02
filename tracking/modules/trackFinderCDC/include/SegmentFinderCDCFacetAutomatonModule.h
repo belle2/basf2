@@ -91,6 +91,7 @@ namespace Belle2 {
                  std::string("CDCRecoTangentSegmentVector"));
       }
 
+      /// Destructor deleting the filters.
       ~SegmentFinderCDCFacetAutomatonImplModule() {
         if (m_ptrFacetFilter) delete m_ptrFacetFilter;
         m_ptrFacetFilter = nullptr;

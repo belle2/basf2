@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <framework/datastore/StoreArray.h>
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -52,6 +53,8 @@ namespace Belle2 {
           StoreArray < CDCWireHitCluster >::registerTransient();
         }
 #endif
+
+        StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> >::registerTransient("CDCRecoSegment2DVector");
 
         m_clustersInSuperLayer.reserve(20);
 
@@ -188,6 +191,14 @@ namespace Belle2 {
 
         if (m_copyToDataStoreForDebug) {
           copyToDataStoreForDebug();
+        }
+
+
+        StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > wrappedStoredSegments2D("CDCRecoSegment2DVector");
+        wrappedStoredSegments2D.create();
+        std::vector<CDCRecoSegment2D>& storedSegments2D =  *wrappedStoredSegments2D;
+        for (const CDCRecoSegment2D & segment2D : m_segments2D) {
+          storedSegments2D.push_back(segment2D);
         }
 
         outputSegments.swap(m_segments2D);

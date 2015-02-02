@@ -15,22 +15,22 @@ from ROOT import Belle2
 generateY4S(1000, Belle2.FileSystem.findFile('decfiles/dec/B2Xulnu.dec'))
 loadGearbox()
 
-ntupleFile('Validate_B2Xulnu.root')
+ntupleFile('../Validate_B2Xulnu.root')
 
-findMCDecay('B+:pi', 'B+ -> pi0 e+ nu_e')
+findMCDecay('B+:pi', 'B+ => pi0 e+ nu_e')
 toolsPi = ['EventMetaData', '^B+']
 toolsPi += ['Kinematics', '^B+ -> ^pi0 ^e+ ^nu_e']
 toolsPi += ['SL', 'B+ -> pi0 ^e+ ^nu_e']
 ntupleTree('PiTree', 'B+:pi', toolsPi)
 
-findMCDecay('B+:rho', 'B+ -> [ rho0 -> pi+ pi- ] e+ nu_e')
+findMCDecay('B+:rho', 'B+ => [ rho0 -> pi+ pi- ] e+ nu_e')
 toolsRho = ['EventMetaData', '^B+']
 toolsRho += ['Kinematics', '^B+ -> ^rho0 ^e+ ^nu_e']
 toolsRho += ['VVAngles', 'B+ -> [ rho0 -> ^pi+ ^pi- ] ^e+ ^nu_e']
 toolsRho += ['SL', 'B+ -> [ rho0 -> pi+ pi- ] ^e+ ^nu_e']
 ntupleTree('RhoTree', 'B+:rho', toolsRho)
 
-findMCDecay('B+:Xu', 'B+ -> Xu0 e+ nu_e')
+findMCDecay('B+:Xu', 'B+ => Xu0 e+ nu_e')
 toolsXu = ['EventMetaData', '^B+']
 toolsXu += ['Kinematics', '^B+ -> ^Xu0 ^e+ ^nu_e']
 toolsXu += ['SL', 'B+ -> Xu0 ^e+ ^nu_e']
@@ -42,7 +42,7 @@ tools2Pi += ['Kinematics', '^B+ -> ^pi+ ^pi- ^e+ ^nu_e']
 tools2Pi += ['VVAngles', 'B+ -> ^pi+ ^pi- ^e+ ^nu_e']
 ntupleTree('PiPiTree', 'B+:pipi', tools2Pi)
 
-findMCDecay('B+:pitau', 'B+ -> pi0 tau+ nu_tau')
+findMCDecay('B+:pitau', 'B+ => pi0 tau+ nu_tau')
 toolsPiTau = ['EventMetaData', '^B+']
 toolsPiTau += ['Kinematics', '^B+ -> ^pi0 ^tau+ ^nu_tau']
 toolsPiTau += ['SL', 'B+ -> pi0 ^tau+ ^nu_tau']

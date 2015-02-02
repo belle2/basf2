@@ -13,7 +13,7 @@ from ROOT import Belle2
 
 generateY4S(1000, Belle2.FileSystem.findFile('decfiles/dec/Bu_D0taunu.dec'))
 loadGearbox()
-findMCDecay('B+:sig', 'B+ -> anti-D0  tau+ nu_tau')
+findMCDecay('B+:sig', 'B+ => anti-D0  tau+ nu_tau')
 
 ntupleFile('Validate_B2Plnu.root')
 toolsTruth = ['EventMetaData', '^B+']

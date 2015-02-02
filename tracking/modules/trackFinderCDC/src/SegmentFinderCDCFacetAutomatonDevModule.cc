@@ -92,6 +92,14 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
 
   SegmentFinderCDCFacetAutomatonImplModule<>::initialize();
 
+  if ((m_param_facetNeighborChooser == string("mc")) or
+      (m_param_facetNeighborChooser == string("mc_symmetric")) or
+      (m_param_facetNeighborChooser == string("mc")) or
+      (m_param_facetNeighborChooser == string("mc_symmetric"))) {
+    StoreArray <CDCSimHit>::required();
+    StoreArray <MCParticle>::required();
+  }
+
 }
 
 

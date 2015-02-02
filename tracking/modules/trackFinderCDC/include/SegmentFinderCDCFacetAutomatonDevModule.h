@@ -22,9 +22,10 @@ namespace Belle2 {
     /// Constructor of the module. Setting up parameters and description.
     SegmentFinderCDCFacetAutomatonDevModule();
 
-    ///  Initialize the Module before event processing
+    /// Initialize the Module before event processing
     virtual void initialize() override;
 
+    /// Event method exectured for each event.
     virtual void event() override;
 
   private:

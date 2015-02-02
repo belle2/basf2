@@ -81,7 +81,13 @@ Note that some options are only relevant, if the cellular automaton finder in th
     def create_path(self):
         path = super(CDCDebugDisplayRun, self).create_path()
 
-        finder_module = basf2.register_module(self.finder_module)
+        finder_module = self.finder_module
+        if isinstance(finder_module, str):
+            finder_module = basf2.register_module(finder_module)
+
+        finder_module.logging.log_level = basf2.LogLevel.DEBUG
+        finder_module.logging.debug_level = 200
+
         path.add_module(finder_module)
 
         path.add_module(self.cdc_display_module)

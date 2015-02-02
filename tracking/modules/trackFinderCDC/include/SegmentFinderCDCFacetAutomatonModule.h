@@ -314,6 +314,10 @@ namespace Belle2 {
           m_facetsNeighborhood.createUsing(*m_ptrFacetNeighborChooser, m_facets);
           B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
 
+          if (m_facetsNeighborhood.size() == 0) {
+            continue; //No neighborhood generated. Next cluster.
+          }
+
           // Apply the cellular automaton in a multipass manner
           m_facetPaths.clear();
           m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetPaths);

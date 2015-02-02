@@ -15,7 +15,6 @@
 
 #include <framework/gearbox/Interface.h>
 #include <framework/gearbox/InputHandler.h>
-#include <framework/core/MRUCache.h>
 
 #include "framework/gearbox/types.h"
 #include "framework/gearbox/Backend.h"
@@ -42,6 +41,7 @@ namespace Belle2 {
     void* openXmlUri(const char*);
     class GBResult;
   }
+  template <class KEY, class VALUE> class MRUCache;
 
   /** Singleton class responsible for loading detector parameters from an XML file.
    *
@@ -49,8 +49,8 @@ namespace Belle2 {
    */
   class Gearbox: public gearbox::Interface {
   public:
-    /** Default cache size for the Gearbox */
-    enum { DefaultCacheSize = 200 };
+    /** Default cache size (in entries) for the Gearbox */
+    enum { c_DefaultCacheSize = 200 };
 
     /** Struct for caching results from the xml file */
     struct PathValue {
@@ -77,7 +77,7 @@ namespace Belle2 {
     };
 
     /** Free structures on destruction */
-    ~Gearbox() { close(); clearBackends(); }
+    ~Gearbox();
 
     /** Return reference to the Gearbox instance */
     static Gearbox& getInstance();
@@ -109,7 +109,7 @@ namespace Belle2 {
      * @param database Load from the XML database
      * @param cacheSize maximum cache size in entries
      */
-    void open(const std::string& name = "Belle2.xml", bool database = false, size_t cacheSize = DefaultCacheSize);
+    void open(const std::string& name = "Belle2.xml", bool database = false, size_t cacheSize = c_DefaultCacheSize);
 
     /** Free internal structures of previously parsed tree and clear cache */
     void close();
@@ -118,7 +118,7 @@ namespace Belle2 {
      * Return the state of the Gearbox.
      * @return True if the Gearbox has an initialized backend and opened a document for reading.
      */
-    bool isOpen() { return m_xmlDocument != 0; }
+    bool isOpen() const { return m_xmlDocument != 0; }
 
     /**
      * Return the number of nodes a given path will expand to
@@ -261,7 +261,7 @@ namespace Belle2 {
     /** Singleton: private constructor */
     Gearbox();
     /** Singleton: private copy constructor */
-    Gearbox(const Gearbox& other): gearbox::Interface(other), m_parameterCache(DefaultCacheSize) {}
+    Gearbox(const Gearbox& other) = delete;
 
     /** Function to be called when libxml requests a new input uri to be opened */
     gearbox::InputContext* openXmlUri(const std::string& uri) const;
@@ -281,7 +281,7 @@ namespace Belle2 {
     /** Pointer to the libxml XPath context */
     xmlXPathContextPtr m_xpathContext;
     /** Cache for already queried paths */
-    mutable MRUCache<std::string, PathValue> m_parameterCache;
+    mutable MRUCache<std::string, PathValue>* m_parameterCache;
     /** Map of queried objects (path -> TObject*). Objects will be removed once they are no longer valid. */
     mutable std::map<std::string, TObject*> m_ownedObjects;
 

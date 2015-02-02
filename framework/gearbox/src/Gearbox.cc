@@ -7,6 +7,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/GBResult.h>
+#include <framework/core/MRUCache.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Stream.h>
 
@@ -69,7 +70,7 @@ namespace Belle2 {
     }
   }
 
-  Gearbox::Gearbox(): m_xmlDocument(0), m_xpathContext(0), m_parameterCache(DefaultCacheSize)
+  Gearbox::Gearbox(): m_xmlDocument(0), m_xpathContext(0), m_parameterCache(new MRUCache<std::string, PathValue>(c_DefaultCacheSize))
   {
     xmlInitParser();
     LIBXML_TEST_VERSION;
@@ -78,6 +79,12 @@ namespace Belle2 {
     // do random seed only once
     gearbox::randomSeed();
 
+  }
+  Gearbox::~Gearbox()
+  {
+    close();
+    clearBackends();
+    delete m_parameterCache;
   }
 
   Gearbox& Gearbox::getInstance()
@@ -180,7 +187,7 @@ namespace Belle2 {
     xmlXPathOrderDocElems(m_xmlDocument);
 
     //Set cachesize
-    m_parameterCache.setMaxSize(cacheSize);
+    m_parameterCache->setMaxSize(cacheSize);
   }
 
   void Gearbox::close()
@@ -195,7 +202,7 @@ namespace Belle2 {
     }
     m_ownedObjects.clear();
 
-    m_parameterCache.clear();
+    m_parameterCache->clear();
   }
 
   void Gearbox::overridePathValue(const PathOverride& poverride)
@@ -266,7 +273,7 @@ namespace Belle2 {
     PathValue value;
     if (m_xpathContext == NULL) B2FATAL("Gearbox is not connected");
     //Get from cache if possible
-    if (m_parameterCache.retrieve(path, value)) {
+    if (m_parameterCache->retrieve(path, value)) {
       return value;
     }
     //Nothing in cache, query xml
@@ -302,7 +309,7 @@ namespace Belle2 {
       boost::trim(value.unit);
     }
     //Add to cache, empty or not: results won't change
-    m_parameterCache.insert(path, value);
+    m_parameterCache->insert(path, value);
     B2DEBUG(1000, "Gearbox XPath result: " << value.numNodes << ", " << value.value << ", " << value.unit);
 
     xmlXPathFreeObject(result);

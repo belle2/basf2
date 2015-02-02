@@ -13,7 +13,6 @@
 //#define LOG_NO_B2DEBUG
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
-#include <tracking/trackFindingCDC/workers/FacetSegmentWorker.h>
 #include <tracking/trackFindingCDC/workers/SegmentTripleTrackingWorker.h>
 
 #include <tracking/trackFindingCDC/workers/SegmentPairTrackingWorker.h>

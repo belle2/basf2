@@ -30,8 +30,8 @@ namespace Belle2 {
     };
 
   public:
-    /// Constructor of the module. Setting up parameters and description.
-    SegmentFinderCDCBaseModule();
+    /// Constructor of the module overwritting the default desired orientation of the Segments.
+    SegmentFinderCDCBaseModule(EOrientation orientation = c_None);
 
     /// Destructor of the module.
     virtual ~SegmentFinderCDCBaseModule() {;}

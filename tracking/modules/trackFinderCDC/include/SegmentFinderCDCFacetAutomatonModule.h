@@ -47,8 +47,8 @@ namespace Belle2 {
 
     public:
       /// Default constructor initialising the filters with the default settings
-      SegmentFinderCDCFacetAutomatonImplModule() :
-        SegmentFinderCDCBaseModule(),
+      SegmentFinderCDCFacetAutomatonImplModule(EOrientation orientation = c_None) :
+        SegmentFinderCDCBaseModule(orientation),
         m_ptrFacetFilter(new FacetFilter()),
         m_ptrFacetNeighborChooser(new FacetNeighborChooser()),
         m_param_writeClusters(false),

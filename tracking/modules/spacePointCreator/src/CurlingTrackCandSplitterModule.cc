@@ -351,7 +351,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
       PXDTrueHit* pxdTrueHit = pxdCluster->getRelatedTo<PXDTrueHit>("ALL"); // COULDDO: search only certain PXDTrueHit arrays -> new parameter for module
 
       if (pxdTrueHit == NULL) {
-        B2WARNING("Found no PXDTrueHit for PXDCluster " << pxdCluster->getArrayIndex() << " from Array " << pxdCluster->getArrayName() << ". This PXDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
+        B2DEBUG(1, "Found no PXDTrueHit for PXDCluster " << pxdCluster->getArrayIndex() << " from Array " << pxdCluster->getArrayName() << ". This PXDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
         throw FoundNoTrueHit();
       }
 
@@ -379,7 +379,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
           // CAUTION: there can be more than one TrueHit for a given Cluster!!!
           RelationVector<SVDTrueHit> relTrueHits = aCluster.getRelationsTo<SVDTrueHit>("ALL"); // COULDDO: search only certain SVDTrueHit arrays -> new parameter for module
           if (relTrueHits.size() == 0) {
-            B2WARNING("Found no SVDTrueHit for SVDCluster " << aCluster.getArrayIndex() << " from Array " << aCluster.getArrayName() << ". This SVDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
+            B2DEBUG(1, "Found no SVDTrueHit for SVDCluster " << aCluster.getArrayIndex() << " from Array " << aCluster.getArrayName() << ". This SVDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
             throw FoundNoTrueHit();
           }
 
@@ -412,7 +412,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
           if (svdTrueHits.size() == oldSize) {
             stringstream trueHitInds;
             for (const SVDTrueHit * trueHit : svdTrueHits) { trueHitInds << trueHit->getArrayIndex() << ", "; }
-            B2WARNING("There is no overlapping TrueHit for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". The Indices of the TrueHits are: " << trueHitInds.str());
+            B2DEBUG(1, "There is no overlapping TrueHit for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". The Indices of the TrueHits are: " << trueHitInds.str());
 
             // Only do these calculations if output to root is is enabled
             if (m_PARAMpositionAnalysis) {

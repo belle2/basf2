@@ -57,8 +57,8 @@ namespace Belle2 {
       }
 
       /// Main filter method returning the weight of the neighborhood relation. Return always returns NOT_A_NEIGHBOR to reject all facet neighbors.
-      virtual inline NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
-                                                   const CDCRecoFacet& neighborFacet) {
+      virtual inline NeighborWeight isGoodNeighbor(const CDCRecoFacet&,
+                                                   const CDCRecoFacet&) {
         return NOT_A_NEIGHBOR;
       }
     }; // end class

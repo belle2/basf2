@@ -20,8 +20,8 @@ namespace Belle2 {
 
     public:
       /// Main filter method returning the weight of the neighborhood relation. Return -2 for all valid combinations to accepting all facets, but compensating for overlap.
-      virtual NeighborWeight isGoodNeighbor(const CDCRecoFacet& ,
-                                            const CDCRecoFacet&) override final {
+      virtual NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
+                                            const CDCRecoFacet& neighborFacet) override final {
 
         //the last wire of the neighbor should not be the same as the start wire of the facet
         if (facet.getStartWire() == neighborFacet.getEndWire()) {

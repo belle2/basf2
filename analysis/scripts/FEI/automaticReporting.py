@@ -181,7 +181,9 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
     placeholders['finalParticleInputs'] = ''
+    finalParticleNames = []
     for particlePlaceholder in finalParticlePlaceholders:
+        finalParticleNames.append(particlePlaceholder['particleName'])
         placeholders['finalParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
 
     placeholders['cpuTimeSummary'] = '\input{' + cpuTimeSummaryPlaceholders['texFile'] + '}\n'
@@ -191,7 +193,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     placeholders['NEvents'] = mcCounts['NEvents']
 
     for bPlaceholder in combinedParticlePlaceholders:
-        if bPlaceholder['particleName'] in ['B+', 'B0', 'B-', 'anti-B0']:
+        if bPlaceholder['particleName'] in finalParticleNames:
             placeholders['NUniqueSignal'] += int(bPlaceholder['particleNUniqueSignalAfterPostCut'])
             placeholders['NBackground'] += int(bPlaceholder['particleNBackgroundAfterPostCut'])
 

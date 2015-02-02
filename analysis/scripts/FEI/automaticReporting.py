@@ -236,8 +236,8 @@ def createMoneyPlotTexFile(nTuple, type, mcCounts, target):
 
     rootfile = ROOT.TFile(nTuple)
     tree = rootfile.Get('variables')
-    isUnique = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(isUnique)')
-    placeholders['particleNUniqueSignalAfterPostCut'] = int(tree.GetEntries('isSignal && ' + isUnique))
+    uniqueSignal = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(uniqueSignal)')
+    placeholders['particleNUniqueSignalAfterPostCut'] = int(tree.GetEntries('isSignal && ' + uniqueSignal))
 
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], template_file, placeholders)

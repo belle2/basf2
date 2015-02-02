@@ -13,14 +13,13 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/geometry/SensorInfoBase.h>
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance3DSquared.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance2DXYSquared.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZ.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/SlopeRZ.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance3DNormed.h"
+#include <tracking/trackFindingVXD/TwoHitFilters/Distance3DSquared.h>
+#include <tracking/trackFindingVXD/TwoHitFilters/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/TwoHitFilters/Distance1DZ.h>
+#include <tracking/trackFindingVXD/TwoHitFilters/SlopeRZ.h>
+#include <tracking/trackFindingVXD/TwoHitFilters/Distance3DNormed.h>
 
-
-#include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
+#include <tracking/trackFindingVXD/FilterTools/Shortcuts.h>
 
 #include <tracking/vxdCaTracking/VXDSector.h>
 #include <tracking/vxdCaTracking/SegFinderFilters.h>

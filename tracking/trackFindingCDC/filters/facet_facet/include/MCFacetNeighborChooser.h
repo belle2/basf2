@@ -20,20 +20,9 @@ namespace Belle2 {
     class MCFacetNeighborChooser : public BaseFacetNeighborChooser {
 
     public:
-
-      /** Constructor. */
-      MCFacetNeighborChooser() {;}
-
-      /** Destructor.*/
-      ~MCFacetNeighborChooser() {;}
-
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      inline
-      NeighborWeight
-      isGoodNeighbor(
-        const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet
-      ) const {
+      virtual NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
+                                            const CDCRecoFacet& neighborFacet) override final {
 
         //the last wire of the neighbor should not be the same as the start wire of the facet
         if (facet.getStartWire() == neighborFacet.getEndWire()) {
@@ -57,7 +46,7 @@ namespace Belle2 {
       }
 
     private:
-      const MCFacetFilter m_mcFacetFilter; ///< Monte Carlo cell filter to reject neighborhoods have false cells
+      MCFacetFilter m_mcFacetFilter; ///< Monte Carlo cell filter to reject neighborhoods have false cells
 
     }; // end class
   } //end namespace TrackFindingCDC

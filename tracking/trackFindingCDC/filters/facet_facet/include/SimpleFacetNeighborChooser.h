@@ -28,13 +28,8 @@ namespace Belle2 {
       SimpleFacetNeighborChooser(FloatType allowedDeviationCos) : m_allowedDeviationCos(allowedDeviationCos)
       {;}
 
-      /** Destructor.*/
-      ~SimpleFacetNeighborChooser() {;}
-
-      inline NeighborWeight isGoodNeighbor(
-        const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet
-      ) const {
+      virtual inline NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
+                                                   const CDCRecoFacet& neighborFacet) override final {
 
         if (facet.getStartWire() == neighborFacet.getEndWire()) return NOT_A_NEIGHBOR;
 

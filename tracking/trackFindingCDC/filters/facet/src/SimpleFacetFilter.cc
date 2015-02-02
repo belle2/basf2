@@ -42,7 +42,7 @@ SimpleFacetFilter::SimpleFacetFilter(FloatType allowedDeviationCos):
 
 
 
-CellState SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
+CellState SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
 {
 
   facet.adjustLines();
@@ -68,20 +68,3 @@ CellState SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
   }
 
 }
-
-
-
-void SimpleFacetFilter::clear() const {;}
-
-
-void SimpleFacetFilter::initialize()
-{
-}
-
-
-void SimpleFacetFilter::terminate()
-{
-}
-
-
-

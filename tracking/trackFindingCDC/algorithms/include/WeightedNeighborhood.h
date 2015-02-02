@@ -329,7 +329,7 @@ namespace Belle2 {
 
       /// Clears the neighborhood and creates relations between elements in the given range using the NeighborChooser given as first function argument.
       template<class NeighborChooser, class ItemRange>
-      void createUsing(const NeighborChooser& chooser, const ItemRange& itemRange) {
+      void createUsing(NeighborChooser& chooser, const ItemRange& itemRange) {
         clear();
         appendUsing(chooser, itemRange);
       }
@@ -343,7 +343,7 @@ namespace Belle2 {
 
       /// Appends relations between elements in the given range using the NeighborChooser given as first function argument to the existing neighborhood.
       template<class NeighborChooser, class ItemRange>
-      void appendUsing(const NeighborChooser& chooser, const ItemRange& itemRange) {
+      void appendUsing(NeighborChooser& chooser, const ItemRange& itemRange) {
         //forget everything from former creations
         chooser.clear();
         for (const Item & item : itemRange) {

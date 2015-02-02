@@ -37,7 +37,7 @@ namespace Belle2 {
       void initialize();
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet, const CDCRecoFacet& neighborFacet);
+      virtual NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet, const CDCRecoFacet& neighborFacet) override final;
 
       /// Forwards the modules initialize to the filter.
       void terminate();

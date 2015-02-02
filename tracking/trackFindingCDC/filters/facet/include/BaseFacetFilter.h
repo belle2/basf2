@@ -8,25 +8,38 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALLFACETFILTER_H_
-#define ALLFACETFILTER_H_
-
-#include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
+#ifndef BASEFACETFILTER_H_
+#define BASEFACETFILTER_H_
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter for the constuction of good facets based on simple criterions.
-    class AllFacetFilter : public BaseFacetFilter {
+    /// Base class for all facet filters
+    class BaseFacetFilter {
 
     public:
-      /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
-      virtual CellWeight isGoodFacet(const CDCRecoFacet&) override final { return 3.0; }
+      /// Constructor using default direction of flight deviation cut off.
+      BaseFacetFilter() {;}
 
-    }; //end class AllFacetFilter
+      /// Constructor using default direction of flight deviation cut off.
+      virtual ~BaseFacetFilter() {;}
+
+      /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
+      virtual CellWeight isGoodFacet(const CDCRecoFacet&) { return 3.0; }
+
+      /// Clears all remember information from the last event.
+      virtual void clear() {;}
+
+      /// Forwards the modules initialize to the filter.
+      virtual void initialize() {;}
+
+      /// Forwards the modules initialize to the filter.
+      virtual void terminate() {;}
+
+    }; //end class BaseFacetFilter
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif // ALLFACETFILTER_H_
+#endif // BASEFACETFILTER_H_

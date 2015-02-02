@@ -22,7 +22,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    ///Base class  for filtering the neighborhood of facets
+    /// Base class for filtering the neighborhood of facets.
     /** Base implementation providing the getLowestPossibleNeighbor and isStillPossibleNeighbor method
      *  using the geometry of the facet.
      *  Besides that it accepts all facets. The isGoodNeighbor method has to be made more sophisticated by a subclass.
@@ -35,17 +35,16 @@ namespace Belle2 {
       BaseFacetNeighborChooser() {;}
 
       /// Empty destructor
-      ~BaseFacetNeighborChooser() {;}
+      virtual ~BaseFacetNeighborChooser() {;}
 
       /// Clears information from former events
-      inline void clear() const {/*nothing to remember*/;}
+      virtual void clear() {;}
 
       /// Forwards the initialize method from the module
-      void initialize() {;}
+      virtual void initialize() {;}
 
       /// Forwards the terminate method from the module
-      void terminate() {;}
-
+      virtual void terminate() {;}
 
       /// Returns a two iterator range covering the range of possible neighboring facets of the given facet out of the sorted range given by the two other argumets.
       template<class CDCRecoFacetIterator>
@@ -55,17 +54,11 @@ namespace Belle2 {
 
         std::pair<CDCRecoFacetIterator, CDCRecoFacetIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, rearRLWireHitPair);
         return boost::iterator_range<CDCRecoFacetIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
-        //return boost::iterator_range<CDCRecoFacetIterator>(itEnd,itEnd);
-
       }
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      inline
-      Weight
-      isGoodNeighbor(
-        const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet
-      ) const {
+      virtual inline NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
+                                                   const CDCRecoFacet& neighborFacet) {
 
         //the last wire of the neighbor should not be the same as the start wire of the facet
         if (facet.getStartWire() == neighborFacet.getEndWire()) {

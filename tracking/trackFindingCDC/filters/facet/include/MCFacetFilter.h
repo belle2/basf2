@@ -11,41 +11,25 @@
 #ifndef MCFACETFILTER_H_
 #define MCFACETFILTER_H_
 
+#include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
 
     /// Filter for the constuction of good facets based on monte carlo information
-    class MCFacetFilter : public SwitchableRootificationBase {
+    class MCFacetFilter : public BaseFacetFilter {
 
     public:
-      /// Empty Constructor.
-      MCFacetFilter();
-
       /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
-      CellState isGoodFacet(const CDCRecoFacet& facet) const;
-
-    public:
-      /// Clears all remember information from the last event
-      void clear() const;
-
-      /// Forwards the modules initialize to the filter
-      void initialize();
-
-      /// Forwards the modules initialize to the filter
-      void terminate();
-
+      CellWeight isGoodFacet(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses
       bool isCorrect(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999) const;
-
-    private:
-      /// ROOT Macro to make MCFacetFilter a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(MCFacetFilter, 1);
 
     }; // end class MCFacetFilter
   } //end namespace TrackFindingCDC

@@ -11,13 +11,16 @@
 #ifndef SIMPLEFACETFILTER_H_
 #define SIMPLEFACETFILTER_H_
 
+#include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
+
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Filter for the constuction of good facets based on simple criterions.
-    class SimpleFacetFilter : public SwitchableRootificationBase {
+    class SimpleFacetFilter : public BaseFacetFilter {
 
     public:
       /// Constructor using default direction of flight deviation cut off.
@@ -27,23 +30,10 @@ namespace Belle2 {
       SimpleFacetFilter(FloatType allowedDeviationCos);
 
       /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
-      CellState isGoodFacet(const CDCRecoFacet& facet) const;
-
-      /// Clears all remember information from the last event
-      void clear() const;
-
-      /// Forwards the modules initialize to the filter.
-      void initialize();
-
-      /// Forwards the modules initialize to the filter.
-      void terminate();
+      virtual CellWeight isGoodFacet(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
 
     private:
       const FloatType m_allowedDeviationCos; ///< Memory for the used direction of flight deviation.
-
-    private:
-      /// ROOT Macro to make SimpleFacetFilter a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(SimpleFacetFilter, 1);
 
     }; // end class SimpleFacetFilter
   } //end namespace TrackFindingCDC

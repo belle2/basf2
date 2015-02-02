@@ -42,7 +42,7 @@ main.add_module(geometry)
 
 # ---------------------------------------------------------------
 # Produce a microdst
-outputUdst('../MDSTtoUDST.udst.root', main)
+outputUdst('../MDSTtoUDST.udst.root', path=main)
 
 # Go
 process(main)

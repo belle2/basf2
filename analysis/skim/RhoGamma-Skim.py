@@ -69,8 +69,8 @@ myRhoGammaskim_path = create_path()
 # The filter provides a boolean, which is true if any of the argument particle lists are not empty
 skimfilter.if_value('=1', myRhoGammaskim_path, AfterConditionPath.CONTINUE)
 # skim output contains Particles & Trash.PhysicsParticleLists along with mdst information
-outputUdst('test_bck.udst.root', myRhoGammaskim_path)
-outputMdst('test_bck.mdst.root', myRhoGammaskim_path)
+outputUdst('test_bck.udst.root', path=myRhoGammaskim_path)
+outputMdst('test_bck.mdst.root', path=myRhoGammaskim_path)
 # Process the events
 process(analysis_main)
 

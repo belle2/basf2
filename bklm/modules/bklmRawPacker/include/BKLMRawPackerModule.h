@@ -20,10 +20,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/logging/Logger.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawKLM.h>
-
+#include <iostream>
 
 namespace Belle2 {
 

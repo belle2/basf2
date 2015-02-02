@@ -28,6 +28,7 @@ SpacePointCreatorPXDModule::SpacePointCreatorPXDModule() :
   InitializeCounters();
 
   setDescription("Imports Clusters of the PXD detector and converts them to spacePoints.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
   addParam("PXDClusters", m_pxdClustersName,

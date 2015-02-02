@@ -28,6 +28,7 @@ SpacePointCreatorSVDModule::SpacePointCreatorSVDModule() :
   InitializeCounters();
 
   setDescription("Imports Clusters of the SVD detector and converts them to spacePoints.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
   addParam("SVDClusters", m_svdClustersName,

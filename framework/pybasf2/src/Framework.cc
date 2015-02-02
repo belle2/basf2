@@ -95,7 +95,8 @@ void Framework::process(PathPtr startPath, long maxEvent)
 
   static bool already_executed = false;
   if (already_executed) {
-    B2WARNING("Calling process() more than once per steering file is still experimental, please check results carefully!")
+    B2FATAL("You can only call process() once per steering file!")
+    return;
   }
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if (numLogError != 0) {
@@ -104,9 +105,6 @@ void Framework::process(PathPtr startPath, long maxEvent)
   }
 
   try {
-    DataStore::Instance().reset();
-    DataStore::Instance().setInitializeActive(true);
-
     already_executed = true;
     if (Environment::Instance().getNumberProcesses() == 0) {
       EventProcessor processor;

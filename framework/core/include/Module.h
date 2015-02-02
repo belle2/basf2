@@ -109,10 +109,10 @@ namespace Belle2 {
     /**
      * Initialize the Module.
      *
-     * This method is called only once before the actual event processing starts.
+     * This method is called once before the actual event processing starts.
      * Use this method to initialize variables, open files etc.
      *
-     * This method has to be implemented by subclasses.
+     * This method can be implemented by subclasses.
      */
     virtual void initialize() {};
 
@@ -122,7 +122,7 @@ namespace Belle2 {
      * Called at the beginning of each run, the method gives you the chance to
      * change run dependent constants like alignment parameters, etc.
      *
-     * This method has to be implemented by subclasses.
+     * This method can be implemented by subclasses.
      */
     virtual void beginRun() {};
 
@@ -132,7 +132,7 @@ namespace Belle2 {
      * This method is called for each event. All processing of the event has to
      * take place in this method.
      *
-     * This method has to be implemented by subclasses.
+     * This method can be implemented by subclasses.
      */
     virtual void event() {};
 
@@ -141,7 +141,7 @@ namespace Belle2 {
      *
      * Use this method to store information, which should be aggregated over one run.
      *
-     * This method has to be implemented by subclasses.
+     * This method can be implemented by subclasses.
      */
     virtual void endRun() {};
 
@@ -151,21 +151,17 @@ namespace Belle2 {
      * This method is called only once after the event processing finished.
      * Use this method for cleaning up, closing files, etc.
      *
-     * This method has to be implemented by subclasses.
+     * This method can be implemented by subclasses.
      */
     virtual void terminate() {};
 
     /**
      * Returns the name of the module.
-     *
-     * @return The name of the module as string.
      */
     const std::string& getName() const {return m_name;}
 
     /**
      * Returns the type of the module.
-     *
-     * @return The type of the module as string.
      */
     const std::string& getType() const {return m_type;}
 
@@ -177,43 +173,31 @@ namespace Belle2 {
 
     /**
      * Returns the description of the module.
-     *
-     * @return The description of the module as string.
      */
     const std::string& getDescription() const {return m_description;}
 
     /**
      * Returns the log system configuration.
-     *
-     * @return The log system configuration.
      */
     LogConfig& getLogConfig() {return m_logConfig;}
 
     /**
      * Set the log system configuration.
-     *
-     * @param logConfig The log system configuration.
      */
     void setLogConfig(const LogConfig& logConfig) {m_logConfig = logConfig;}
 
     /**
      * Configure the log level.
-     *
-     * @param logLevel The log level.
      */
     void setLogLevel(int logLevel);
 
     /**
      * Configure the debug messaging level.
-     *
-     * @param debugLevel The debug level.
      */
     void setDebugLevel(int debugLevel);
 
     /**
      * Configure the abort log level.
-     *
-     * @param abortLevel The abort log level.
      */
     void setAbortLevel(int abortLevel);
 
@@ -292,12 +276,8 @@ namespace Belle2 {
      */
     bool evalCondition();
 
-    /**
-     * Returns the path of the condition.
-     *
-     * @return The path of the condition.
-     */
-    const boost::shared_ptr<Path>& getConditionPath() const {return m_conditionPath; };
+    /** Returns the path of the condition.  */
+    boost::shared_ptr<Path> getConditionPath() const {return m_conditionPath; };
 
 
     /** What to do after a conditional path is finished. */
@@ -306,15 +286,12 @@ namespace Belle2 {
     /**
      * Returns true if all specified property flags are available in this module.
      *
-     * @param propertyFlags The flags which should be compared with the module flags.
-     * @return True if all specified property flags are available in this module.
+     * @param propertyFlags Ored EModulePropFlags which should be compared with the module flags.
      */
     bool hasProperties(unsigned int propertyFlags) const;
 
     /**
      * Returns true if the module has still unset parameters which the user has to set in the steering file.
-     *
-     * @return True if the module has still unset parameters which the user has to set in the steering file.
      */
     bool hasUnsetForcedParams() const;
 
@@ -549,7 +526,6 @@ namespace Belle2 {
 
     /**
      * Returns the module name of the module associated to this proxy.
-     * @return The module name of the module associated to this proxy.
      */
     const std::string& getModuleName() const {return m_moduleName; }
 

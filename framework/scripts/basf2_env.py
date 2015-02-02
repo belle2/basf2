@@ -92,6 +92,8 @@ def deserialize_value(module, parameter_state):
 def serialize_module(module):
     if module.type() == '':
         raise RuntimeError("Module '%s' doesn't have a type! Note that --dump-path cannot work properly with basf2 modules written in Python." % (module.name()))
+    if module.has_condition():
+        raise RuntimeError("Module '%s' has a condition set. --dump-path currently does not support this" % (module.name()))
     return {
         'name': module.name(),
         'type': module.type(),

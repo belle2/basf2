@@ -19,6 +19,7 @@
 #include <framework/core/Module.h>
 #include <framework/core/PyModule.h>
 #include <framework/core/ModuleManager.h>
+#include <framework/core/Path.h>
 
 
 using namespace std;
@@ -244,6 +245,8 @@ void Module::exposePythonAPI()
   .def("if_value", &Module::if_value, if_value_overloads())
   .def("if_false", &Module::if_false, if_false_overloads())
   .def("if_true", &Module::if_true, if_true_overloads())
+  .def("has_condition", &Module::hasCondition)
+  .def("get_condition_path", &Module::getConditionPath)
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)

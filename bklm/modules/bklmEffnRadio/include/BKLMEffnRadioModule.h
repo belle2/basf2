@@ -19,12 +19,14 @@
 #include "TH2D.h"
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Matrix/Matrix.h"
 
 #include <bklm/geometry/Module.h>
+#include <iostream>
 
 using namespace std;
 using namespace CLHEP;

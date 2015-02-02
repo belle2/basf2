@@ -106,7 +106,7 @@ void BKLMEffnRadioModule::initialize()
 
 
   if (!m_strips || !m_stripsEff)
-  {cout << "no strips!" << endl; B2ERROR("no strip");}
+  { B2ERROR("no strip");}
   float stripPix = 1000 / 48;
   float stripPixScinti = 1000 / 54;
 
@@ -116,7 +116,7 @@ void BKLMEffnRadioModule::initialize()
     m_strips[i] = new TBox**** [15];
     m_stripsEff[i] = new TBox**** [15];
     if (!m_strips[i] || !m_stripsEff[i])
-    {cout << "no strips!  i" << endl; B2ERROR("no strip");}
+    {B2INFO("no strips!  i" << endl); B2ERROR("no strip");}
     m_stripHits[i] = new int** *[15];
     m_stripHitsEff[i] = new int** *[15];
     m_stripNonHitsEff[i] = new int** *[15];
@@ -143,7 +143,7 @@ void BKLMEffnRadioModule::initialize()
       m_eff2DExpected[i][iLay] = new TH2D*[2];
 
       if (!m_strips[i][iLay] || !m_stripsEff[i][iLay])
-      {cout << "no strips! ilay" << endl; B2ERROR("no strip");}
+      {B2INFO("no strips! ilay" << endl); B2ERROR("no strip");}
       m_stripHits[i][iLay] = new int** [2];
       m_stripHitsEff[i][iLay] = new int** [2];
       m_stripNonHitsEff[i][iLay] = new int** [2];
@@ -167,7 +167,7 @@ void BKLMEffnRadioModule::initialize()
         m_strips[i][iLay][j] = new TBox** [2];
         m_stripsEff[i][iLay][j] = new TBox** [2];
         if (!m_strips[i][iLay][j] || !m_stripsEff[i][iLay][j])
-        {cout << "no strips! j" << endl; B2ERROR("no strip");}
+        {B2INFO("no strips! j" << endl); B2ERROR("no strip");}
         m_stripHits[i][iLay][j] = new int*[2];
         m_stripHitsEff[i][iLay][j] = new int*[2];
         m_stripNonHitsEff[i][iLay][j] = new int*[2];
@@ -182,7 +182,7 @@ void BKLMEffnRadioModule::initialize()
           m_strips[i][iLay][j][k] = new TBox*[54];
           m_stripsEff[i][iLay][j][k] = new TBox*[54];
           if (!m_strips[i][iLay][j][k] || !m_stripsEff[i][iLay][j][k])
-          {cout << "no strips! c" << endl; B2ERROR("no strip");}
+          {B2INFO("no strips! c" << endl); B2ERROR("no strip");}
           m_stripHits[i][iLay][j][k] = new int[54];
           m_stripHitsEff[i][iLay][j][k] = new int[54];
           m_stripNonHitsEff[i][iLay][j][k] = new int[54];
@@ -269,10 +269,10 @@ void BKLMEffnRadioModule::event()
 {
   m_eventCounter++;
   if (!(m_eventCounter % 1000))
-    cout << "looking at event nr " << m_eventCounter << endl;
+    B2INFO("looking at event nr " << m_eventCounter << endl);
 
   StoreArray<BKLMHit1d> hits1D;
-  //  cout <<" we have " << hits1D.getEntries() << " 1D hits " << endl;
+  //   cout <<" we have " << hits1D.getEntries() << " 1D hits " << endl;
 
   m_hHitsPerEvent1D->Fill(hits1D.getEntries());
   int hitsPerLayer[16];
@@ -280,13 +280,13 @@ void BKLMEffnRadioModule::event()
   for (int h = 0; h < hits1D.getEntries(); h++) {
     int sector = hits1D[h]->getSector() - 1;
     if ((sector < 0) || (sector >= 8)) {
-      cout << "sector:" << sector << endl;
+      B2INFO("sector:" << sector << endl);
       B2ERROR("wrong sector number ");
     }
     int layer = hits1D[h]->getLayer() - 1;
     //      cout <<"layer is : "<< layer <<endl;
     if ((layer < 0) || (layer >= 15)) {
-      cout << "layer: " << layer << endl;
+      B2INFO("layer: " << layer << endl);
       B2ERROR("wrong layer number");
     }
     hitsPerLayer[layer]++;
@@ -302,7 +302,7 @@ void BKLMEffnRadioModule::event()
 
     //scintillator layers have 54 channels, not 48 like the rpcs
     if (channelMin < 0 || channelMax < 0 || channelMin > channelMax || channelMax >= 54 || channelMin >= 54) {
-      cout << "wrong channel, min : " << channelMin << " max: " << channelMax << " layer: " << layer << endl;
+      B2INFO("wrong channel, min : " << channelMin << " max: " << channelMax << " layer: " << layer << endl);
       B2ERROR("wrong channel");
       continue;
     }
@@ -358,7 +358,7 @@ void BKLMEffnRadioModule::terminate()
     float lInd = i / (float)48;
     float colorIndex = lInd * 48 + 51;
     int roundInd = fabs(lInd * maxStripHits + 0.5);
-    cout << "lInd is " << lInd << " color index is: " << colorIndex << " max strip: " << maxStripHits << " round ind: " << roundInd << endl;
+    B2INFO("lInd is " << lInd << " color index is: " << colorIndex << " max strip: " << maxStripHits << " round ind: " << roundInd << endl);
     char buffer[200];
     sprintf(buffer, "%d", roundInd);
 
@@ -484,7 +484,7 @@ void BKLMEffnRadioModule::getEffs()
 
   StoreArray<BKLMHit2d> hits2D;
   m_GeoPar = GeometryPar::instance();
-
+  //  cout <<"we have " <<hits2D.getEntries() <<" 2d hits " <<endl;
   m_hHitsPerEvent2D->Fill(hits2D.getEntries());
 
   //we should
@@ -676,8 +676,9 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
 {
 
   set<int> locIndices;
-  if (points.size() > 0)
-    cout << "point vector not empty..." << endl;
+  if (points.size() > 0) {
+    B2INFO("point vector not empty..." << endl);
+  }
 
   int layer1 = hits2D[firstHit]->getLayer();
   int sector1 = hits2D[firstHit]->getSector();

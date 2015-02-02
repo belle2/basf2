@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+import tempfile
 from basf2 import *
+
+testFile = tempfile.NamedTemporaryFile(prefix='b2filemetadata_')
 
 # Register modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -11,7 +14,7 @@ output = register_module('RootOutput')
 # Set module parameters
 eventinfosetter.param('evtNumList', 10)
 
-output.param('outputFileName', 'filemetadata.root')
+output.param('outputFileName', testFile.name)
 output.param('updateFileCatalog', False)
 
 # Create paths
@@ -25,11 +28,9 @@ main.add_module(output)
 process(main)
 
 # Check the file meta data
-assert 0 == os.system('showmetadata filemetadata.root')
+assert 0 == os.system('showmetadata ' + testFile.name)
 
 os.system('touch Belle2FileCatalog.xml')
-assert 0 == os.system('addmetadata --id 12345 --guid ABCD --lfn /logical/file/name --logfile 67890 filemetadata.root')
+assert 0 == os.system('addmetadata --id 12345 --guid ABCD --lfn /logical/file/name --logfile 67890 ' + testFile.name)
 
-assert 0 == os.system('showmetadata filemetadata.root')
-
-os.remove('filemetadata.root')
+assert 0 == os.system('showmetadata ' + testFile.name)

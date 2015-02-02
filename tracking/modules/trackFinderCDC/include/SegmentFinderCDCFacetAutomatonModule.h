@@ -34,12 +34,15 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Forward declaration of the module implementing the segment generation by cellular automaton on facets using specific filter instances.
-    template<class FacetFilter = SimpleFacetFilter, class FacetNeighborChooser = SimpleFacetNeighborChooser>
+    template<class FacetFilter = BaseFacetFilter, class FacetNeighborChooser = BaseFacetNeighborChooser>
     class SegmentFinderCDCFacetAutomatonImplModule;
   }
 
   /// Module specialisation using the default Monte Carlo free filters. To be used in production.
-  typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule<> SegmentFinderCDCFacetAutomatonModule;
+  typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule <
+  TrackFindingCDC::SimpleFacetFilter,
+                  TrackFindingCDC::SimpleFacetNeighborChooser
+                  > SegmentFinderCDCFacetAutomatonModule;
 
   namespace TrackFindingCDC {
     template<class FacetFilter, class FacetNeighborChooser>
@@ -128,7 +131,6 @@ namespace Belle2 {
       void setFacetFilter(FacetFilter* ptrFacetFilter) {
         if (m_ptrFacetFilter) delete m_ptrFacetFilter;
         m_ptrFacetFilter = ptrFacetFilter;
-        ptrFacetFilter = nullptr;
       }
 
       /// Getter for the current facet filter. The module keeps ownership of the pointer.
@@ -137,10 +139,9 @@ namespace Belle2 {
       }
 
       /// Setter for the facet neighbor chooser used to connect facets in a network. The module takes ownership of the pointer.
-      void setFacetNeighborChooser(FacetNeighborChooser*& ptrFacetNeighborChooser) {
+      void setFacetNeighborChooser(FacetNeighborChooser* ptrFacetNeighborChooser) {
         if (m_ptrFacetNeighborChooser) delete m_ptrFacetNeighborChooser;
         m_ptrFacetNeighborChooser = ptrFacetNeighborChooser;
-        ptrFacetNeighborChooser = nullptr;
       }
 
     private:

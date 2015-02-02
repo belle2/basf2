@@ -83,7 +83,7 @@ namespace Belle2 {
     bool accept(const argumentType& arg1,
                 const argumentType& arg2) const {
       typename Variable::variableType value = Variable::value(arg1, arg2);
-      Observer::notify(arg1, arg2 , Variable(), value);
+      Observer::notify(Variable(), value, arg1, arg2, m_range);
       return m_range.contains(value);
 
     }
@@ -221,7 +221,7 @@ namespace Belle2 {
     bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
                 const typename Filter< Variable, Range, Observer>::argumentType& arg2) const {
       typename Variable::variableType value = Variable::value(arg1, arg2);
-      Observer::notify(arg1, arg2 , Variable(), value);
+      Observer::notify(Variable(), value, arg1, arg2, Filter< Variable, Range, Observer >::m_range);
       return m_bypass || Filter< Variable, Range, Observer >::m_range.contains(value);
     }
 
@@ -297,7 +297,7 @@ namespace Belle2 {
     bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
                 const typename Filter< Variable, Range, Observer>::argumentType& arg2) const {
       typename Variable::variableType value = Variable::value(arg1, arg2);
-      Observer::notify(arg1, arg2 , Variable(), value);
+      Observer::notify(Variable(), value, arg1, arg2, Filter< Variable, Range, Observer >::m_range);
       return (! m_enable) || Filter< Variable, Range, Observer >::m_range.contains(value);
     }
 

@@ -24,11 +24,12 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  class SlopeRZ : public SelectionVariable< SpacePoint , float > {
+  template <typename PointType >
+  class SlopeRZ : public SelectionVariable< PointType , float > {
   public:
 
     /** calculates the distance between the hits in z (1D), returning unit: cm */
-    static float value(const SpacePoint& outerHit, const SpacePoint& innerHit) {
+    static float value(const PointType& outerHit, const PointType& innerHit) {
       float result = atan(
                        std::sqrt(
                          std::pow((outerHit.X() - innerHit.X()), 2)

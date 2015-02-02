@@ -94,11 +94,9 @@ namespace VXDTFfilterTest {
   /** this observer does simply count the number of times, the attached Filter was used */
   class Observer : public VoidObserver {
   public:
-    template<class Var>
-    static void notify(const typename Var::argumentType& ,
-                       const typename Var::argumentType& ,
-                       const Var& ,
-                       typename Var::variableType) {
+    template<class Var, typename ... otherTypes>
+    static void notify(const Var& ,
+                       otherTypes ...) {
       counter<Var>::N ++ ;
     }
 

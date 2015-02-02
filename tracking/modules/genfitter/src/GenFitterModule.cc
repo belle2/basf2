@@ -108,6 +108,7 @@ GenFitterModule::GenFitterModule() :
   addParam("ProbCut", m_probCut, "Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001", double(0.001));
   addParam("PruneFlags", m_pruneFlags, "Determine which information to keep after track fit, by default we keep everything, but please note that add_reconstruction prunes track after all other reconstruction is processed.  See genfit::Track::prune for options.", std::string(""));
   addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
+  addParam("UseClusters", m_useClusters, "If set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
   addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final genfit::Tracks (will be created by this module)", string(""));
@@ -341,13 +342,27 @@ void GenFitterModule::event()
       genfit::MeasurementFactory<genfit::AbsMeasurement> factory;
 
       //create MeasurementProducers for PXD, SVD and CDC and add producers to the factory with correct detector Id
-      if (nPXDClusters) {
-        auto pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
-        factory.addProducer(Const::PXD, pxdClusterProducer);
-      }
-      if (nSVDClusters) {
-        auto svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
-        factory.addProducer(Const::SVD, svdClusterProducer);
+      if (m_useClusters) {
+        // By default use clusters.
+        if (nPXDClusters) {
+          auto pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
+          factory.addProducer(Const::PXD, pxdClusterProducer);
+        }
+        if (nSVDClusters) {
+          auto svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
+          factory.addProducer(Const::SVD, svdClusterProducer);
+        }
+      } else {
+        // Use MC true hits instead.
+        if (pxdTrueHits.getEntries()) {
+          auto PXDProducer =  new genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
+          factory.addProducer(Const::PXD, PXDProducer);
+        }
+        if (svdTrueHits.getEntries()) {
+          auto SVDProducer =  new genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
+          factory.addProducer(Const::SVD, SVDProducer);
+        }
+
       }
       if (cdcHits.getEntries()) {
         auto CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());

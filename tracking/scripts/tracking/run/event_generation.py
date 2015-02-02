@@ -6,7 +6,7 @@ import os
 import basf2
 import simulation
 
-import tracking.utilities
+import tracking.utilities as utilities
 
 import logging
 
@@ -34,7 +34,7 @@ generator_module_names_by_short_name = {
     'generic': 'EvtGenInput',
     'cosmics': 'Cosmics',
     'bkg': None,
-    }
+}
 
 # Names of module names and short names of the generators usable in this script.
 valid_generator_names = list(generator_module_names_by_short_name.keys()) \
@@ -53,7 +53,7 @@ default_generator_params_by_generator_name = {
         'momentumParams': [0.6, 1.4],
         'thetaGeneration': 'uniform',
         'thetaParams': [17., 150.],
-        },
+    },
     'gun': {
         'pdgCodes': [muon_pdg_code, -muon_pdg_code],
         'nTracks': 10,
@@ -61,11 +61,11 @@ default_generator_params_by_generator_name = {
         'momentumGeneration': 'uniform',
         'thetaGeneration': 'uniform',
         'thetaParams': [17., 150.],
-        },
+    },
     'cosmics': {},
     'ParticleGun': {},
     'EvtGenInput': {},
-    }
+}
 
 
 # Standard run for generating or reading event #
@@ -104,13 +104,13 @@ class ReadOrGenerateEventsRun(object):
     def create_argument_parser(self, allow_input=True, **kwds):
         # Argument parser that gives a help full message on error,
         # which includes the options that are valid.
-        argument_parser = tracking.utilities.DefaultHelpArgumentParser(**kwds)
+        argument_parser = utilities.DefaultHelpArgumentParser(**kwds)
 
         if allow_input:
             argument_parser.add_argument('-i', '--input',
-                    default=self.root_input_file, dest='root_input_file',
-                    help='File path to the ROOT file from which the simulated events shall be loaded.'
-                    )
+                                         default=self.root_input_file, dest='root_input_file',
+                                         help='File path to the ROOT file from which the simulated events shall be loaded.'
+                                         )
 
         argument_parser.add_argument(
             '-g',
@@ -118,9 +118,9 @@ class ReadOrGenerateEventsRun(object):
             dest='generator_module',
             default=self.generator_module,
             metavar='GENERATOR_NAME',
-            choices=valid_generator_names,
+            choices=utilities.NonstrictChoices(valid_generator_names),
             help='Name module or short name of the generator to be used.',
-            )
+        )
 
         argument_parser.add_argument(
             '-n',
@@ -129,7 +129,7 @@ class ReadOrGenerateEventsRun(object):
             default=self.n_events,
             type=int,
             help='Number of events to be generated',
-            )
+        )
 
         argument_parser.add_argument(
             '-b',
@@ -138,9 +138,8 @@ class ReadOrGenerateEventsRun(object):
             default=self.bkg_files,
             action='append',
             metavar='BACKGROUND_DIRECTORY',
-            help='Path to folder of files or to a file containing the background to be used. Can be given multiple times.'
-                ,
-            )
+            help='Path to folder of files or to a file containing the background to be used. Can be given multiple times.',
+        )
 
         return argument_parser
 
@@ -164,7 +163,7 @@ class ReadOrGenerateEventsRun(object):
         # Master module
         eventInfoSetterModule = basf2.register_module('EventInfoSetter')
         eventInfoSetterModule.param({'evtNumList': [self.n_events],
-                                    'runList': [1], 'expList': [1]})
+                                     'runList': [1], 'expList': [1]})
         main_path.add_module(eventInfoSetterModule)
 
         # Progress module
@@ -241,7 +240,7 @@ class ReadOrGenerateEventsRun(object):
             message_template = \
                 '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
             raise ValueError(message_template % (module_or_module_name,
-                             type(module_or_module_name)))
+                                                 type(module_or_module_name)))
 
 
 def is_bkg_file(bkg_file_path):
@@ -304,8 +303,14 @@ def is_generator_name(generator_name):
         If the name is a module name or a valid short hand for a module
     """
 
-    return generator_name in generator_module_names_by_short_name.values() \
-        or generator_name in generator_module_names_by_short_name.keys()
+    if generator_name in generator_module_names_by_short_name.values() \
+            or generator_name in generator_module_names_by_short_name.keys():
+        return True
+    else:
+        # Also except any module from the generator package
+        # although there are false positives.
+        generator_module = basf2.register_module(generator_name)
+        return generator_module.package() == "generators"
 
 
 def get_generator_module_name(generator_name):
@@ -323,10 +328,10 @@ def get_generator_module_name(generator_name):
 
     if is_generator_name(generator_name):
         return generator_module_names_by_short_name.get(generator_name,
-                generator_name)
+                                                        generator_name)
     else:
         raise ValueError('%s does not refer to a valid module name or short hand'
-                          % generator_name)
+                         % generator_name)
 
 
 def update_default_generator_params(generator_name, additional_params):
@@ -360,7 +365,7 @@ def get_generator_module(generator_module_or_generator_name):
             generator_module = basf2.register_module(generator_module_name)
             generator_params = \
                 default_generator_params_by_generator_name.get(generator_name,
-                    {})
+                                                               {})
             get_logger().info('Setting up generator with parameters %s',
                               generator_params)
             generator_module.param(generator_params)

@@ -8,6 +8,7 @@ from basf2 import *
 import unittest
 import os
 import tempfile
+import atexit
 import shutil
 
 # @cond internal_test
@@ -363,9 +364,9 @@ class TestSignalProbability(unittest.TestCase):
 if __name__ == '__main__':
     tempdir = tempfile.mkdtemp()
     os.chdir(tempdir)
+    # main() never returns, so install exit handler to do our cleanup
+    atexit.register(shutil.rmtree, tempdir)
 
     unittest.main()
-
-    shutil.rmtree(tempdir)
 
 # @endcond

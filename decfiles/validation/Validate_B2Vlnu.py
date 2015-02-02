@@ -19,8 +19,8 @@ findMCDecay('B+:sig', 'B+ => [anti-D*0 -> anti-D0 pi0] e+ nu_e')
 ntupleFile('../Validate_B2Vlnu.root')
 tools = ['EventMetaData', '^B+']
 tools += ['Kinematics', '^B+ -> ^anti-D*0 ^e+ ^nu_e']
-tools += ['VVAngles', 'B+ -> [anti-D*0 -> ^D0 ^pi0] ^e+ ^nu_e']
-tools += ['SL', 'B+ -> [anti-D*0 -> D0 pi0] ^e+ ^nu_e']
+tools += ['VVAngles', '^B+ -> [anti-D*0 -> ^D0 ^pi0] ^e+ ^nu_e']
+tools += ['SL', '^B+ -> [anti-D*0 -> D0 pi0] ^e+ ^nu_e']
 ntupleTree('TruthTree', 'B+:sig', tools)
 
 process(analysis_main)

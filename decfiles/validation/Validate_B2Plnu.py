@@ -18,7 +18,7 @@ findMCDecay('B+:sig', 'B+ => anti-D0  tau+ nu_tau')
 ntupleFile('Validate_B2Plnu.root')
 toolsTruth = ['EventMetaData', '^B+']
 toolsTruth += ['Kinematics', '^B+ -> ^anti-D0 ^tau+ ^nu_tau']
-toolsTruth += ['SL', 'B+ -> anti-D0 ^tau+ ^nu_tau']
+toolsTruth += ['SL', '^B+ -> anti-D0 ^tau+ ^nu_tau']
 ntupleTree('TruthTree', 'B+:sig', toolsTruth)
 
 process(analysis_main)

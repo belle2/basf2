@@ -21,6 +21,9 @@
 #include <TMath.h>
 #include <string>
 
+#include <iostream>     // std::cout, std::fixed
+#include <iomanip>      // std::setprecision
+
 #include <typeinfo>
 // #if 0 || defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 // #include <cxxabi.h>
@@ -692,24 +695,39 @@ namespace Belle2 {
 
     /** create a string containing vectorParameters */
     std::string PrintString() const {
-      return
-        name() +
-        "(x,y,z)=(" +
-        std::to_string(X()) +
-        "," +
-        std::to_string(Y()) +
-        "," +
-        std::to_string(Z()) +
-        ") (rho, theta, phi)=(" +
-        std::to_string(Mag()) +
-        "," +
-        std::to_string(Theta() * TMath::RadToDeg()) +
-        "," +
-        std::to_string(Phi() * TMath::RadToDeg()) +
-        ")";
+      return name() + PrintStringXYZ() + " " + PrintStringCyl();
     }
 
-    /** just for backward compatibility */
+    /** create a string containing vectorParameters */
+    std::string PrintStringXYZ(unsigned precission = 4) const {
+      std::ostringstream output;
+      output  << "(x,y,z)=("
+              << std::fixed
+              << std::setprecision(precission)
+              << X()
+              << ","
+              << Y()
+              << ","
+              << Z() << ")";
+      return output.str();
+    }
+
+    /** create a string containing vectorParameters */
+    std::string PrintStringCyl(unsigned precission = 4) const {
+      std::ostringstream output;
+      output  << "(rho, theta, phi)=("
+              << std::fixed
+              << std::setprecision(precission)
+              << Mag()
+              << ","
+              << Theta() * TMath::RadToDeg()
+              << ","
+              << Phi() * TMath::RadToDeg()
+              << ")";
+      return output.str();
+    }
+
+    /** just for backward compatibility, should not be used with new code */
     void Print() {
       {
         //print vector parameters
@@ -755,6 +773,35 @@ namespace Belle2 {
     return B2Vector3<DataType>(a * p.X(), a * p.Y(), a * p.Z());
   }
 
+
+
+  /** non-memberfunction for adding a TVector3 to a B2Vector3 */
+  template < typename DataType>
+  B2Vector3<DataType> operator + (const TVector3& a, const B2Vector3<DataType>& b)
+  {
+    return B2Vector3<DataType>(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z());
+  }
+
+  /** non-memberfunction for substracting a TVector3 from a B2Vector3 */
+  template < typename DataType>
+  B2Vector3<DataType> operator - (const TVector3& a, const B2Vector3<DataType>& b)
+  {
+    return B2Vector3<DataType>(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z());
+  }
+
+  /** non-memberfunction for adding a B2Vector3 to a TVector3 */
+  template < typename DataType>
+  B2Vector3<DataType> operator + (const B2Vector3<DataType>& a, const TVector3& b)
+  {
+    return B2Vector3<DataType>(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z());
+  }
+
+  /** non-memberfunction for substracting a B2Vector3 from a TVector3 */
+  template < typename DataType>
+  B2Vector3<DataType> operator - (const B2Vector3<DataType>& a, const TVector3& b)
+  {
+    return B2Vector3<DataType>(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z());
+  }
 
   /** non-memberfunction Scaling of 3-vectors with a real number */
 // //   template < typename DataType>

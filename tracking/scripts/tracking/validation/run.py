@@ -9,6 +9,7 @@ from tracking.run.event_generation import ReadOrGenerateEventsRun
 from tracking.modules import StandardTrackingReconstructionModule, \
     BrowseFileOnTerminateModule
 from tracking.validation.module import TrackingValidationModule
+import tracking.utilities as utilities
 
 TRACKING_MAILING_LIST = 'tracking@belle2.kek.jp'
 
@@ -29,7 +30,7 @@ def get_basf2_module(module_or_module_name):
         message_template = \
             '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
         raise ValueError(message_template % (module_or_module_name,
-                         type(module_or_module_name)))
+                                             type(module_or_module_name)))
 
 
 def get_basf2_module_name(module_or_module_name):
@@ -44,25 +45,7 @@ def get_basf2_module_name(module_or_module_name):
         message_template = \
             '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
         raise ValueError(message_template % (module_or_module_name,
-                         type(module_or_module_name)))
-
-
-class NonstrictChoices(list):
-
-    def contains(self, value):
-        return True
-
-    def __iter__(self):
-        # Append an ellipses to indicate that there are more choices.
-        copy = list(super(NonstrictChoices, self).__iter__())
-        copy.append('...')
-        return iter(copy)
-
-    def __str__(self):
-        # Append an ellipses to indicate that there are more choices.
-        copy = list(self)
-        copy.append('...')
-        return str(copy)
+                                             type(module_or_module_name)))
 
 
 class TrackingValidationRun(ReadOrGenerateEventsRun):
@@ -84,8 +67,8 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
         # Validation module generating plots
         fit = bool(self.fit_geometry)
         trackingValidationModule = TrackingValidationModule(self.name,
-                contact=self.contact, fit=fit, pulls=self.pulls,
-                output_file_name=self.output_file_name)
+                                                            contact=self.contact, fit=fit, pulls=self.pulls,
+                                                            output_file_name=self.output_file_name)
         main_path.add_module(trackingValidationModule)
 
     def create_argument_parser(self, **kwds):
@@ -99,21 +82,21 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
                                        # Legacy
             '-f',
             '--finder',
-            choices=NonstrictChoices([
+            choices=utilities.NonstrictChoices([
                 'StandardReco',
                 'VXDTF',
                 'TrackFinderCDCAutomaton',
                 'TrackFinderCDCLegendre',
                 'CDCLegendreTracking',
                 'CDCLocalTracking',
-                ]),
+            ]),
             default=self.finder_module,
             dest='finder_module',
             help='Name of the finder module to be evaluated.',
-            )
+        )
 
         argument_parser.add_argument('--fit-geometry', choices=['TGeo',
-                                     'Geant4'], default=self.fit_geometry,
+                                                                'Geant4'], default=self.fit_geometry,
                                      dest='fit_geometry',
                                      help='Geometry to be used with Genfit. If unset validate the seed values instead'
                                      )
@@ -125,15 +108,15 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
             default=self.show_results,
             dest='show_results',
             help='Show generated plots in a TBrowser immediatly.',
-            )
+        )
 
         return argument_parser
 
     def determine_tracking_coverage(self, finder_module_or_name):
         finder_module_name = get_basf2_module_name(finder_module_or_name)
         if finder_module_name == 'CDCLocalTracking' or finder_module_name \
-            == 'CDCLegendreTracking' \
-            or finder_module_name.startswith('TrackFinderCDC'):
+                == 'CDCLegendreTracking' \
+                or finder_module_name.startswith('TrackFinderCDC'):
             return {'UsePXDHits': False, 'UseSVDHits': False,
                     'UseCDCHits': True}
         elif finder_module_name == 'VXDTF':
@@ -146,8 +129,7 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
                     'UseSVDHits': 'SVD' in self.components,
                     'UseCDCHits': 'CDC' in self.components}
         else:
-            get_logger().info('Could not determine tracking coverage for module name %s. Using value stored in self.tracking_coverage which is %s'
-                              , finder_module_name, self.tracking_coverage)
+            get_logger().info('Could not determine tracking coverage for module name %s. Using value stored in self.tracking_coverage which is %s', finder_module_name, self.tracking_coverage)
             return self.tracking_coverage
 
     def create_path(self):
@@ -190,17 +172,17 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
         # Reference Monte Carlo tracks
         trackFinderMCTruthModule = basf2.register_module('TrackFinderMCTruth')
         trackFinderMCTruthModule.param({'WhichParticles': ['primary'],
-                                       'EnergyCut': 0.1,
-                                       'GFTrackCandidatesColName': 'MCTrackCands'
-                                       })
+                                        'EnergyCut': 0.1,
+                                        'GFTrackCandidatesColName': 'MCTrackCands'
+                                        })
         trackFinderMCTruthModule.param(tracking_coverage)
         main_path.add_module(trackFinderMCTruthModule)
 
         # Track matcher
         mcTrackMatcherModule = basf2.register_module('MCTrackMatcher')
         mcTrackMatcherModule.param({'MCGFTrackCandsColName': 'MCTrackCands',
-                                   'MinimalPurity': 0.66,
-                                   'RelateClonesToMCParticles': True})
+                                    'MinimalPurity': 0.66,
+                                    'RelateClonesToMCParticles': True})
         mcTrackMatcherModule.param(tracking_coverage)
         main_path.add_module(mcTrackMatcherModule)
 

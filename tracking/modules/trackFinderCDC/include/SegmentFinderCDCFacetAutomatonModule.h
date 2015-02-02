@@ -115,11 +115,32 @@ namespace Belle2 {
           StoreWrappedObjPtr< std::vector<CDCRecoTangentSegment> >::registerTransient(m_param_tangentSegmentsStoreObjName);
         }
 
+        if (m_ptrFacetFilter) {
+          m_ptrFacetFilter->initialize();
+        }
+
+        if (m_ptrFacetNeighborChooser) {
+          m_ptrFacetNeighborChooser->initialize();
+        }
+
       }
 
       /// Generates the segment from Monte Carlo information. Default orientation is the flight direction.
       virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override final;
       // implementation below
+
+
+      virtual void terminate() override {
+        if (m_ptrFacetFilter) {
+          m_ptrFacetFilter->terminate();
+        }
+
+        if (m_ptrFacetNeighborChooser) {
+          m_ptrFacetNeighborChooser->terminate();
+        }
+
+        SegmentFinderCDCBaseModule::terminate();
+      }
 
     public:
       /// Getter for the current facet filter. The module keeps ownership of the pointer.

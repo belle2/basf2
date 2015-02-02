@@ -20,9 +20,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <iostream>
-
-#include <framework/logging/Logger.h>
 
 
 namespace Belle2 {
@@ -215,7 +212,7 @@ namespace Belle2 {
       if (valueProxy.check()) {
         tmpValue = static_cast<Scalar>(valueProxy);
       } else {
-        throw std::runtime_error(std::string("Could not set module parameter: Expected type '") + Type<Scalar>::name() + "' instead.");
+        throw std::runtime_error(std::string("Could not set module parameter: Expected type '") + Type<Scalar>::name() + "' instead of '" + pyObject.ptr()->ob_type->tp_name + "'.");
       }
       return tmpValue;
 
@@ -285,7 +282,7 @@ namespace Belle2 {
     {
       static const unsigned N = std::tuple_size<TupleType>::value;
       if ((unsigned)boost::python::len(pyTuple) != N) {
-        B2ERROR("Given python tuple has wrong dimensions expected " << N << " received " << boost::python::len(pyTuple))
+        throw std::runtime_error(std::string("Given python tuple has length ") + std::to_string(boost::python::len(pyTuple)) + ", expected " + std::to_string(N));
       }
       SetTuple(tuple, pyTuple, SizeT<N>());
     }

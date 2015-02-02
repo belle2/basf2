@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import basf2
 from basf2 import *
 
 from ROOT import gSystem
@@ -32,8 +33,8 @@ class IfModule(Module):
 
     """Wrapper module to conditionally execute module and continue with the normal path afterwards.
 
-    There are two ways to specify the condition. 
-    One way is to override the condtion(self) method in a subclass. 
+    There are two ways to specify the condition.
+    One way is to override the condtion(self) method in a subclass.
     The second way is to give a function as the second argument to the module constructor, which is called
     each event.
 
@@ -47,7 +48,7 @@ class IfModule(Module):
     """
 
     def __init__(self, module, condition=None):
-        """Initialisation method taking the module instance to 
+        """Initialisation method taking the module instance to
 
         Parameters
         ----------
@@ -61,7 +62,7 @@ class IfModule(Module):
         super(IfModule, self).__init__()
 
         if condition is not None:
-            ## Condition function called at each event to determine if wrapped module should be executed
+            # Condition function called at each event to determine if wrapped module should be executed
             self.condition = condition
 
         conditional_path = create_path()
@@ -70,7 +71,7 @@ class IfModule(Module):
 
     def condition(self):
         """Condition method called if not given a condition function during construction.
-        
+
         Can be overridden by a concrete subclass to specify under which condition the wrapped module should be executed.
         It can also be shadowed by a condition function given to the constructor of this module.
 
@@ -92,39 +93,13 @@ class IfModule(Module):
         self.return_value(bool(condition_is_met))
 
 
-class MCSegmenterModule(Module):
-
-    """Simple module to generate segment to the DataStore."""
-
-    def __init__(self, allow_backward=False):
-        """Initalizes the module and sets up the method, with which the segments ought to be fitted."""
-
-        ## Indicates if also segments that are reverse to the actual track should be generated.
-        self.allow_backward = allow_backward
-
-        super(MCSegmenterModule, self).__init__()
-
-    def initialize(self):
-        """Initializes the segment worker"""
-
-        self.theMCHitLookUp = CDCMCHitLookUp.getInstance()
-        self.theWireHitTopology = \
-            Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
-
-        self.mcSegmentWorker = Belle2.TrackFindingCDC.MCSegmentWorker()
-        self.mcSegmentWorker.initialize()
-
-    def event(self):
-        """Generates the segments into the DataStore and fits them."""
-
-        self.theMCHitLookUp.fill()
-        self.theWireHitTopology.fill()
-        self.mcSegmentWorker.generate(self.allow_backward)
-
-    def terminate(self):
-        """Terminates the segment worker"""
-
-        self.mcSegmentWorker.terminate()
+# Scheduled to be removed
+def MCSegmenterModule(allow_backward=False):
+    mc_segmenter_module = basf2.register_module("SegmentFinderCDCMCTruth")
+    mc_segmenter_module.param({
+        "Orientation": "symmetric" if allow_backward else "none"
+    })
+    return mc_segmenter_module
 
 
 class SegmentFitterModule(Module):
@@ -143,7 +118,7 @@ class SegmentFitterModule(Module):
             See default_fit_method for an example. Defaults to None meaning the default_fit_method is used
         """
 
-        ## Method used to fit the individual segment pairs
+        # Method used to fit the individual segment pairs
         self.fit_method = fit_method
         if not fit_method:
             self.fit_method = self.default_fit_method
@@ -167,7 +142,7 @@ class SegmentFitterModule(Module):
 class MCAxialStereoPairCreatorModule(Module):
 
     """A BASF2 python module that creates segment pairs from the segments stored in the CDCRecoSegment2Ds array on the DataStore.
-    
+
     Generated segment pairs are stored in the DataStore in the CDCAxialStereoSegmentPairs array.
     Their cell weight is set to the value assigned by the return value of the MCAxialStereoSegmentPairFilter.
     Optionally forward backward symmetry can be keep by a parameter, meaning that additionally to true segment pairs also their reversed counter part is accepted as true.
@@ -181,7 +156,7 @@ class MCAxialStereoPairCreatorModule(Module):
     Parameters
     ----------
     create_mc_true_only : bool
-        Switch if only true segment pairs shall be written to the DataStore. 
+        Switch if only true segment pairs shall be written to the DataStore.
         If False wrong segment pairs are stored as well with weight of NOT_A_CELL (NAN).
         Defaults to True.
     allow_backward : bool
@@ -195,27 +170,27 @@ class MCAxialStereoPairCreatorModule(Module):
     """
 
     def __init__(
-        self,
-        create_mc_true_only=True,
-        allow_backward=False,
-        filter_method=None,
-        ):
+            self,
+            create_mc_true_only=True,
+            allow_backward=False,
+            filter_method=None,
+    ):
 
-        ## Limit the segment pair generation that are aligned in a true track
+        # Limit the segment pair generation that are aligned in a true track
         self.create_mc_true_only = create_mc_true_only
 
-        ## Give a positive decision for segment pairs that are aligned in the opposite direction of a true track.
+        # Give a positive decision for segment pairs that are aligned in the opposite direction of a true track.
         self.allow_backward = allow_backward
 
-        ## Method used to prevent segment pairs to be stored in the DataStore
+        # Method used to prevent segment pairs to be stored in the DataStore
         self.filter_method = filter_method
         if not filter_method:
             self.filter_method = self.default_filter_method
 
-        ## Counter for the signal events that are accepted from the MCAxialStereoSegmentPairFilter
+        # Counter for the signal events that are accepted from the MCAxialStereoSegmentPairFilter
         self.num_signal = 0
 
-        ## Counter for the signal events rejected by the filter_method
+        # Counter for the signal events rejected by the filter_method
         self.num_rejected_signal = 0
 
         super(MCAxialStereoPairCreatorModule, self).__init__()
@@ -240,7 +215,7 @@ class MCAxialStereoPairCreatorModule(Module):
         CDCRecoSegment2D.registerRelationTo('CDCAxialStereoSegmentPairs')
 
     def event(self):
-        """Generates valid axial stereo segment pairs from the CDCRecoSegment2Ds 
+        """Generates valid axial stereo segment pairs from the CDCRecoSegment2Ds
         on the DataStore filtering by MCAxialStereoSegmentPairFilter and output the result to the DataStore."""
 
         Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair.clearStoreArray()
@@ -248,7 +223,7 @@ class MCAxialStereoPairCreatorModule(Module):
         segmentsByISuperLayer = self.getSegmentsByISuperLayer()
 
         for (iSuperLayer, segmentsForISuperLayer) in \
-            enumerate(segmentsByISuperLayer):
+                enumerate(segmentsByISuperLayer):
 
             iSuperLayerIn = iSuperLayer - 1
             if iSuperLayerIn >= 0:
@@ -298,7 +273,7 @@ class MCAxialStereoPairCreatorModule(Module):
         axialStereoSegmentPair = CDCAxialStereoSegmentPair()
 
         for (startSegment, endSegment) in itertools.product(startSegments,
-                endSegments):
+                                                            endSegments):
             if startSegment == endSegment:
                 continue
             axialStereoSegmentPair.setSegments(startSegment, endSegment)
@@ -306,7 +281,7 @@ class MCAxialStereoPairCreatorModule(Module):
 
             mcWeight = \
                 mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair,
-                    allow_backward)
+                                                                            allow_backward)
 
             if mcWeight == mcWeight or not create_mc_true_only:
                 self.num_signal += 1
@@ -323,7 +298,7 @@ class MCAxialStereoPairCreatorModule(Module):
         CDCAxialStereoSegmentPair = \
             Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair
         for axialStereoSegmentPair in \
-            CDCAxialStereoSegmentPair.getStoreArray():
+                CDCAxialStereoSegmentPair.getStoreArray():
             startSegment = axialStereoSegmentPair.getStartSegment()
             endSegment = axialStereoSegmentPair.getEndSegment()
 
@@ -333,8 +308,7 @@ class MCAxialStereoPairCreatorModule(Module):
     def terminate(self):
         self.mcAxialStereoSegmentPairFilter.terminate()
         logger = getLogger()
-        logger.info('Number of pairs accepted by the MCAxialStereoSegmentPairFilter : %s'
-                    , self.num_signal)
+        logger.info('Number of pairs accepted by the MCAxialStereoSegmentPairFilter : %s', self.num_signal)
         logger.info('Number of signal pairs rejected by filter method: %s',
                     self.num_rejected_signal)
 
@@ -347,7 +321,7 @@ class AxialStereoPairFitterModule(Module):
 
         CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
         CDCAxialStereoFusion.reconstructFuseTrajectories(axialStereoSegmentPair,
-                True)
+                                                         True)
 
     def __init__(self, fit_method=None):
         """
@@ -356,7 +330,7 @@ class AxialStereoPairFitterModule(Module):
             See default_fit_method for an example. Defaults to None meaning the default_fit_method is used
         """
 
-        ## Method used to fit the individual segment pairs
+        # Method used to fit the individual segment pairs
         self.fit_method = fit_method
         if not fit_method:
             self.fit_method = self.default_fit_method
@@ -373,7 +347,5 @@ class AxialStereoPairFitterModule(Module):
         CDCAxialStereoSegmentPair = \
             Belle2.TrackFindingCDC.CDCAxialStereoSegmentPair
         for axialStereoSegmentPair in \
-            CDCAxialStereoSegmentPair.getStoreArray():
+                CDCAxialStereoSegmentPair.getStoreArray():
             fit_method(axialStereoSegmentPair)
-
-

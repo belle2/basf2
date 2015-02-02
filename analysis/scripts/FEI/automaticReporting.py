@@ -237,7 +237,7 @@ def createMoneyPlotTexFile(nTuple, type, mcCounts, target):
     rootfile = ROOT.TFile(nTuple)
     tree = rootfile.Get('variables')
     uniqueSignal = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(uniqueSignal)')
-    placeholders['particleNUniqueSignalAfterPostCut'] = int(tree.GetEntries('isSignal && ' + uniqueSignal))
+    placeholders['particleNUniqueSignalAfterPostCut'] = int(tree.GetEntries(target + ' && ' + uniqueSignal))
 
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], template_file, placeholders)
@@ -804,10 +804,6 @@ def makeMbcPlot(fileName, outputFileName, targetVar):
     canvas = ROOT.TCanvas(outputFileName, plotTitle, 600, 400)
     canvas.cd()
 
-    #testTree.SetLineColor(ROOT.kBlack)
-    #testTree.Draw('Mbc', 'Mbc > 5.23', '')
-    #testTree.SetLineStyle(ROOT.kDotted)
-    #testTree.Draw('Mbc', '!isSignal', 'same')
     color = ROOT.kRed + 4
     first_plot = True
     for cut in [0.01, 0.1, 0.5]:

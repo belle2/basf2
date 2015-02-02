@@ -15,13 +15,15 @@
 #include <framework/core/Module.h>
 
 #include <framework/datastore/StoreArray.h>
-
+#include <framework/logging/Logger.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <map>
 #include <string>
+#include <iostream>
+
 
 using namespace std;
 

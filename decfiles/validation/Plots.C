@@ -1,20 +1,20 @@
 TCanvas *canvas= new TCanvas("ValidationCanvas","ValidationCanvas");
-void B2VV();
-void B2Vlnu();
+void B2VV(TString thefile, TString thetree);
+void B2Vlnu(TString thefile, TString thetree);
 
 void Plots(){
 
   canvas->Print("Validation.pdf[");
-  //B2VV();
-  B2Vlnu();
+  B2VV("../Validate_B2VV.root","TruthTree");
+  B2Vlnu("../Validate_B2Vlnu.root","TruthTree");
   canvas->Print("Validation.pdf]");
 
 }
 
-void B2VV(){
+void B2VV(TString thefile, TString thetree){
 
-  TString infile (Form("../Validate_B2VV.root"));
-  TChain* truthTree = new TChain("TruthTree");
+  TString infile (thefile);
+  TChain* truthTree = new TChain(thetree);
   truthTree->AddFile(infile);
   TH1F* h_helicityAngleV1;
   TH1F* h_helicityAngleV2;
@@ -25,7 +25,7 @@ void B2VV(){
   h_chiPlanarAngle  = new TH1F("chiPlanarAngle", ";#chi(Planar Angle);Arb. Norm.",50,-3.2,3.2);
 
   Float_t B_hel1;
-  Float_t B_hel1;
+  Float_t B_hel2;
   Float_t B_chiPlanar;
 
   truthTree->SetBranchAddress("B_hel1",&B_hel1);
@@ -49,10 +49,10 @@ void B2VV(){
 
 }
 
-void B2Vlnu(){
+void B2Vlnu(TString thefile, TString thetree){
 
-  TString infile (Form("Validate_B2Vlnu.root"));
-  TChain* truthTree = new TChain("TruthTree");
+  TString infile (thefile);
+  TChain* truthTree = new TChain(thetree);
   truthTree->AddFile(infile);
   TH1F* h_helicityAngleV1;
   TH1F* h_helicityAngleV2;

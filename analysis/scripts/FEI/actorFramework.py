@@ -253,6 +253,8 @@ class Play(object):
             nReady = len(ready)
             nActorsDone = nActors - len(actors) - nReady
             if nProcesses > 1:
+                self.showProgress(nActors, nActorsDone, nReady)
+
                 def _execute_actor_parallel(actor):
                     call_actor(results, result_cache, path_cache, actor, preload)
                     return actor

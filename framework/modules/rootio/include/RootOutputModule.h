@@ -122,6 +122,10 @@ namespace Belle2 {
     /** Flag to enable or disable the update of the metadata catalog */
     bool m_updateFileCatalog;
 
+    /** Ignore filename override from command line
+     */
+    bool m_ignoreCommandLineOverride;
+
 
     //then those for purely internal use:
 
@@ -160,10 +164,6 @@ namespace Belle2 {
     /** Highest event number in highest run.
      */
     unsigned long m_eventHigh;
-
-    /** Ignore filename override from command line
-     */
-    bool m_ignoreCommandLineOverride;
   };
 } // end namespace Belle2
 

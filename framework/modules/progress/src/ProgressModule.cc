@@ -30,6 +30,7 @@ void ProgressModule::initialize()
 {
   //Force module logging level to be info
   setLogLevel(LogConfig::c_Info);
+  m_runNr = m_evtNr = 0;
 }
 
 void ProgressModule::beginRun()

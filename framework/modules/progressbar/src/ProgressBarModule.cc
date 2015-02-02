@@ -28,6 +28,7 @@ ProgressBarModule::ProgressBarModule() : Module(), m_evtNr(0), m_nTotal(0), m_st
 
 void ProgressBarModule::initialize()
 {
+  m_evtNr = 0;
   m_nTotal = InputController::numEntries();
   int numEventsArgument = Environment::Instance().getNumberEventsOverride();
   if (numEventsArgument != 0)

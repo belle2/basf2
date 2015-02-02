@@ -115,17 +115,18 @@ namespace Belle2 {
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
-    /** Next entry to be read in event tree.
-     *
-     * Can be set from steering file to skip some events (skipNEvents parameter).
-     */
-    int m_nextEntry;
+
+    /* Can be set from steering file to skip the first N events. */
+    int m_skipNEvents;
 
     /** Level of parent files to be read. */
     int m_parentLevel;
 
 
     //then those for purely internal use:
+
+    /** Next entry to be read in event tree.  */
+    int m_nextEntry;
 
     /**  TTree for event input. */
     TChain* m_tree;

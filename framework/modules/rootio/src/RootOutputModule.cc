@@ -70,6 +70,7 @@ void RootOutputModule::initialize()
   //buffer size in bytes (default value used by root)
   const int bufsize = 32000;
 
+
   //create a file level metadata object in the data store
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   fileMetaData.registerInDataStore();
@@ -246,6 +247,11 @@ void RootOutputModule::terminate()
   dir->cd();
 
   delete m_file;
+
+  for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
+    m_entries[jj].clear();
+  }
+  m_parents.clear();
 
   B2DEBUG(200, "terminate() finished");
 }

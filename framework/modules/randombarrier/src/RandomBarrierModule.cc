@@ -37,6 +37,7 @@ void RandomBarrierModule::initialize()
   //initialize from existing RNG (using a subset of the current state)
   //if no random numbers have been used yet, m_random and gRandom now have the same state.
   //Since they're used for different things, this should be ok.
+  delete m_random;
   m_random = new TRandom3(gRandom->GetSeed());
 
   gRandom = m_random;

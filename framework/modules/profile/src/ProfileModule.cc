@@ -40,6 +40,10 @@ ProfileModule::ProfileModule() : Module(), m_outputFileName(""), m_timeOffset(Ut
 
 void ProfileModule::initialize()
 {
+  m_timeOffset = Utils::getClock() / Unit::s;
+  m_nEvents = 0;
+  m_step = 1;
+
   StoreObjPtr<ProfileInfo> profileInfoPtr;
   StoreObjPtr<ProfileInfo> profileInfoStartPtr("ProfileInfo_Start", DataStore::c_Persistent);
   StoreObjPtr<ProfileInfo> profileInfoEndPtr("ProfileInfo_End", DataStore::c_Persistent);

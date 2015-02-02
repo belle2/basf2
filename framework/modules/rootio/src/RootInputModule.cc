@@ -1,7 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2012 - Belle II Collaboration                             *
- :cc
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Heck, Christian Pulvermacher, Thomas Kuhr         *
  *                                                                        *
@@ -45,7 +45,7 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_tree(0), m_pers
   addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames or wildcards instead. Can be overridden using the -i argument to basf2.", string(""));
   addParam("inputFileNames", m_inputFileNames, "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.", emptyvector);
 
-  addParam("skipNEvents", m_nextEntry, "Skip this number of events before starting.", 0);
+  addParam("skipNEvents", m_skipNEvents, "Skip this number of events before starting.", 0);
 
   addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of event durability branches to be read. Empty means all branches. (EventMetaData is always read)", emptyvector);
   addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of persistent durability branches to be read. Empty means all branches. (FileMetaData is always read)", emptyvector);
@@ -62,6 +62,8 @@ RootInputModule::~RootInputModule() { }
 
 void RootInputModule::initialize()
 {
+  m_nextEntry = m_skipNEvents;
+
   loadDictionaries();
 
   const vector<string>& inputFiles = getInputFiles();
@@ -178,6 +180,15 @@ void RootInputModule::terminate()
   delete m_tree;
   delete m_persistent;
   for (auto entry : m_parentTrees) delete entry.second->GetCurrentFile();
+
+  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
+    m_connectedBranches[ii].clear();
+  }
+  m_storeEntries.clear();
+  m_persistentStoreEntries.clear();
+  m_currentParent.clear();
+  m_parentStoreEntries.clear();
+  m_parentTrees.clear();
 }
 
 

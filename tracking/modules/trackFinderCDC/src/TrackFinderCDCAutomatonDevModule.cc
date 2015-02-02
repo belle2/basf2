@@ -37,28 +37,21 @@ using namespace TrackFindingCDC;
 REG_MODULE(TrackFinderCDCAutomatonDev);
 
 TrackFinderCDCAutomatonDevModule::TrackFinderCDCAutomatonDevModule() :
-  TrackFinderCDCBaseModule(),
-  m_segmentWorker(true),
+  SegmentFinderCDCFacetAutomatonDevModule(),
   m_segmentTripleTrackingWorker(true),
   m_segmentPairTrackingWorker(true)
 {
   setDescription("For development purposes of the cellular automaton track finding.");
   addParam("runSecondStage",  m_param_runSecondStage, "Switch to deactive the second stage of the tracking algorithm.", true);
-
 }
 
-TrackFinderCDCAutomatonDevModule::~TrackFinderCDCAutomatonDevModule()
-{
-}
 
 void TrackFinderCDCAutomatonDevModule::initialize()
 {
-  TrackFinderCDCBaseModule::initialize();
-
-  m_segmentWorker.initialize();
+  SegmentFinderCDCFacetAutomatonDevModule::initialize();
 
   if (m_param_runSecondStage) {
-    //m_segmentTripleTrackingWorker.initialize();
+    // m_segmentTripleTrackingWorker.initialize();
     m_segmentPairTrackingWorker.initialize();
   }
 
@@ -66,16 +59,14 @@ void TrackFinderCDCAutomatonDevModule::initialize()
   StoreArray <CDCSimHit>::required();
   StoreArray <MCParticle>::required();
 #endif
+
 }
 
-void TrackFinderCDCAutomatonDevModule::beginRun()
-{
-  TrackFinderCDCBaseModule::beginRun();
-}
 
 void TrackFinderCDCAutomatonDevModule::event()
 {
   B2DEBUG(100, "########## TrackFinderCDCAutomatonDevModule begin ##########");
+  // Load the hits from the DataStore into the CDCWireHitTopology.
 
 #ifdef TRACKFINDINGCDC_USE_MC_INFORMATION
   CDCMCManager::getInstance().clear();
@@ -86,9 +77,6 @@ void TrackFinderCDCAutomatonDevModule::event()
   CALLGRIND_START_INSTRUMENTATION;
 #endif
 
-  // Load the hits from the DataStore into the CDCWireHitTopology.
-  TrackFinderCDCBaseModule::event();
-
   //Start callgrind recording
   //To profile start basf2 with
   //  nohup valgrind --tool=callgrind --instr-atstart=no basf2 [basf2-options] > output.txt &
@@ -96,18 +84,21 @@ void TrackFinderCDCAutomatonDevModule::event()
   // Do a callgrind_control -b for an intermediate output or callgrind_control -b -e
   // Definitions need callgrind.h
 
+
   // Stage one
-  // Build the segments
-  m_recoSegments.clear();
-  m_segmentWorker.generate(m_recoSegments);
-  B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
+  SegmentFinderCDCFacetAutomatonDevModule::event();
+
+  StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_segmentsStoreObjName);
+  std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
+  B2DEBUG(100, "Received " << recoSegments.size() << " RecoSegments from worker");
 
   if (m_param_runSecondStage) {
     // Stage two
     // Build the gfTracks
     StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandsStoreArrayName);
-    //m_segmentTripleTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
-    m_segmentPairTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
+
+    // m_segmentTripleTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
+    m_segmentPairTrackingWorker.apply(recoSegments, storedGFTrackCands);
   }
 
   // End callgrind recording
@@ -116,13 +107,8 @@ void TrackFinderCDCAutomatonDevModule::event()
 #endif
 
   B2DEBUG(100, "########## TrackFinderCDCAutomatonDevModule end ############");
-
 }
 
-void TrackFinderCDCAutomatonDevModule::endRun()
-{
-  TrackFinderCDCBaseModule::endRun();
-}
 
 void TrackFinderCDCAutomatonDevModule::terminate()
 {
@@ -131,11 +117,14 @@ void TrackFinderCDCAutomatonDevModule::terminate()
     m_segmentPairTrackingWorker.terminate();
   }
 
-  m_segmentWorker.terminate();
+  SegmentFinderCDCFacetAutomatonDevModule::terminate();
 
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS;
 #endif
-  TrackFinderCDCBaseModule::terminate();
+
 }
+
+
+
 

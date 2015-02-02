@@ -25,60 +25,41 @@ using namespace TrackFindingCDC;
 REG_MODULE(TrackFinderCDCAutomaton);
 
 TrackFinderCDCAutomatonModule::TrackFinderCDCAutomatonModule() :
-  TrackFinderCDCBaseModule(),
-  m_segmentWorker(false),
+  SegmentFinderCDCFacetAutomatonModule(c_Symmetric),
   m_segmentTripleTrackingWorker(false),
   m_segmentPairTrackingWorker(false)
 {
   setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
 }
 
-TrackFinderCDCAutomatonModule::~TrackFinderCDCAutomatonModule()
-{
-}
-
 void TrackFinderCDCAutomatonModule::initialize()
 {
-  TrackFinderCDCBaseModule::initialize();
-
-  m_segmentWorker.initialize();
+  SegmentFinderCDCFacetAutomatonModule::initialize();
 
   // m_segmentTripleTrackingWorker.initialize();
   m_segmentPairTrackingWorker.initialize();
-
-}
-
-void TrackFinderCDCAutomatonModule::beginRun()
-{
-  TrackFinderCDCBaseModule::beginRun();
 }
 
 void TrackFinderCDCAutomatonModule::event()
 {
   B2DEBUG(100, "########## TrackFinderCDCAutomaton begin ##########");
-
   // Load the hits from the DataStore into the CDCWireHitTopology.
-  TrackFinderCDCBaseModule::event();
 
   // Stage one
-  // Build the segments
-  m_recoSegments.clear();
-  m_segmentWorker.generate(m_recoSegments);
-  B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
+  SegmentFinderCDCFacetAutomatonModule::event();
+
+  StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_segmentsStoreObjName);
+  std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
+  B2DEBUG(100, "Received " << recoSegments.size() << " RecoSegments from worker");
 
   // Stage two
   // Build the gfTracks
   StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandsStoreArrayName);
 
   // m_segmentTripleTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
-  m_segmentPairTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
+  m_segmentPairTrackingWorker.apply(recoSegments, storedGFTrackCands);
 
   B2DEBUG(100, "########## TrackFinderCDCAutomaton end ############");
-}
-
-void TrackFinderCDCAutomatonModule::endRun()
-{
-  TrackFinderCDCBaseModule::endRun();
 }
 
 void TrackFinderCDCAutomatonModule::terminate()
@@ -86,8 +67,6 @@ void TrackFinderCDCAutomatonModule::terminate()
   m_segmentPairTrackingWorker.terminate();
   // m_segmentTripleTrackingWorker.terminate();
 
-  m_segmentWorker.terminate();
-
-  TrackFinderCDCBaseModule::terminate();
+  SegmentFinderCDCFacetAutomatonModule::terminate();
 }
 

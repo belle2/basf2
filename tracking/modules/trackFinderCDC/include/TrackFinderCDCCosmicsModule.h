@@ -12,15 +12,15 @@
 
 //#define LOG_NO_B2DEBUG
 
+// Base track finder module
+#include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonModule.h>
+
+
 // Workers
-#include <tracking/trackFindingCDC/workers/FacetSegmentWorker.h>
 #include <tracking/trackFindingCDC/workers/SegmentPairTrackingWorker.h>
 #include <tracking/trackFindingCDC/workers/SegmentTripleTrackingWorker.h>
 
 // Filters
-#include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_facet/SimpleFacetNeighborChooser.h>
-
 #include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/axial_stereo/SimpleAxialStereoSegmentPairFilter.h>
 
@@ -29,47 +29,26 @@
 #include <tracking/trackFindingCDC/filters/segment_triple/SimpleSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_triple_segment_triple/SimpleSegmentTripleNeighborChooser.h>
 
-// Base track finder module
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>
-
 namespace Belle2 {
 
   /// Module for the cellular automaton tracking for the CDC on cosmic events
-  class TrackFinderCDCCosmicsModule: public TrackFinderCDCBaseModule {
+  class TrackFinderCDCCosmicsModule:  public SegmentFinderCDCFacetAutomatonModule {
 
   public:
 
     /// Constructor of the module. Setting up parameters and description.
     TrackFinderCDCCosmicsModule();
 
-    /// Destructor of the module.
-    virtual ~TrackFinderCDCCosmicsModule();
-
     ///  Initialize the Module before event processing
     virtual void initialize();
 
-    /// Called when entering a new run.
-    virtual void beginRun();
-
     /// Processes the event and generates track candidates
     virtual void event();
-
-    /// Called at the end of a run.
-    virtual void endRun();
 
     /// Terminate and free resources after last event has been processed
     virtual void terminate();
 
   private:
-    /// Worker to carry out the first stage for segment generation
-    TrackFindingCDC::FacetSegmentWorker <
-    TrackFindingCDC::SimpleFacetFilter,
-                    TrackFindingCDC::SimpleFacetNeighborChooser
-                    > m_segmentWorker;
-
-    /// Pool to store the segments between the stages
-    std::vector< Belle2::TrackFindingCDC::CDCRecoSegment2D > m_recoSegments;
-
     /// Worker to carry out the second stage generating tracks from segments.
     TrackFindingCDC::SegmentTripleTrackingWorker <
     TrackFindingCDC::SimpleAxialAxialSegmentPairFilter,

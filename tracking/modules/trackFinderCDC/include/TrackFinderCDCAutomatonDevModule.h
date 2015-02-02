@@ -19,7 +19,7 @@
 #include <tracking/trackFindingCDC/workers/SegmentPairTrackingWorker.h>
 
 // Base track finder module
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>
+#include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonDevModule.h>
 
 // Base track finder module
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCAutomatonDevFilters.h>
@@ -28,27 +28,17 @@
 namespace Belle2 {
 
   /// Module for development of the cellular automaton tracking for the CDC
-  class TrackFinderCDCAutomatonDevModule : public TrackFinderCDCBaseModule {
+  class TrackFinderCDCAutomatonDevModule : public SegmentFinderCDCFacetAutomatonDevModule {
 
   public:
-
     /// Constructor of the module. Setting up parameters and description.
     TrackFinderCDCAutomatonDevModule();
-
-    /// Destructor of the module.
-    virtual ~TrackFinderCDCAutomatonDevModule();
 
     ///  Initialize the Module before event processing
     virtual void initialize();
 
-    /// Called when entering a new run.
-    virtual void beginRun();
-
     /// Processes the event and generates track candidates
     virtual void event();
-
-    /// Called at the end of a run.
-    virtual void endRun();
 
     /// Terminate and free resources after last event has been processed
     virtual void terminate();
@@ -56,15 +46,6 @@ namespace Belle2 {
   private:
     /// Parameter: Switch in indicating if the second stage, which is the building of tracks from segments, shall be run.
     bool m_param_runSecondStage;
-
-    /// Worker to carry out the first stage for segment generation
-    TrackFindingCDC::FacetSegmentWorker <
-    TrackFindingCDC::FacetFilter,
-                    TrackFindingCDC::FacetNeighborChooser
-                    > m_segmentWorker;
-
-    /// Pool to store the segments between the stages
-    std::vector< Belle2::TrackFindingCDC::CDCRecoSegment2D > m_recoSegments;
 
     /// Worker to carry out the second stage generating tracks from segments.
     TrackFindingCDC::SegmentTripleTrackingWorker <
@@ -78,6 +59,7 @@ namespace Belle2 {
     TrackFindingCDC::AxialStereoSegmentPairFilter,
                     TrackFindingCDC::AxialStereoSegmentPairNeighborChooser
                     > m_segmentPairTrackingWorker;
+
   }; // end class
 } // end namespace Belle2
 

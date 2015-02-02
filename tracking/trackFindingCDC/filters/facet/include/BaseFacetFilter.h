@@ -26,8 +26,8 @@ namespace Belle2 {
       /// Constructor using default direction of flight deviation cut off.
       virtual ~BaseFacetFilter() {;}
 
-      /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
-      virtual CellWeight isGoodFacet(const CDCRecoFacet&) { return 3.0; }
+      /// Main filter method returning the weight of the facet. Returns NOT_A_CELL to reject all facets.
+      virtual CellWeight isGoodFacet(const CDCRecoFacet&) { return NOT_A_CELL; }
 
       /// Clears all remember information from the last event.
       virtual void clear() {;}

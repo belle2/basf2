@@ -56,25 +56,10 @@ namespace Belle2 {
         return boost::iterator_range<CDCRecoFacetIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
       }
 
-      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
+      /// Main filter method returning the weight of the neighborhood relation. Return always returns NOT_A_NEIGHBOR to reject all facet neighbors.
       virtual inline NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
                                                    const CDCRecoFacet& neighborFacet) {
-
-        //the last wire of the neighbor should not be the same as the start wire of the facet
-        if (facet.getStartWire() == neighborFacet.getEndWire()) {
-          return NOT_A_NEIGHBOR;
-        }
-
-        //besides that the base implemetation accepts all facets
-        //to be specialised by a sub class
-
-        // the weight must be -2 because the overlap of the facets is two points
-        // so the amount of two facets is 4 points hence the cellular automat
-        // must calculate 3 + (-2) + 3 = 4 as cellstate
-        // this can of course be adjusted for a more realistic information measure
-        // ( together with the facet creator filter)
-        return -2;
-
+        return NOT_A_NEIGHBOR;
       }
     }; // end class
 

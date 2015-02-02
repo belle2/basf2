@@ -9,8 +9,6 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#pragma link C++ class Belle2::TrackFindingCDC::AllFacetWorker-;
-
 #pragma link C++ class Belle2::TrackFindingCDC::MCSegmentWorker-;
 
 #endif

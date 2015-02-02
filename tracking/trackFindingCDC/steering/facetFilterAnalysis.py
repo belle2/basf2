@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-######### Imports #########
+# ######## Imports #########
 
 import sys
 import os
 import optparse
 
+import basf2
 from basf2 import *
 from ROOT import Belle2
 
@@ -30,7 +31,7 @@ Usage:
 
 parser = optparse.OptionParser(usage=usage)
 
-##### Define options ##########
+# #### Define options ##########
 
 (options, args) = parser.parse_args()
 
@@ -40,7 +41,7 @@ else:
     input_file_name = 'mc_gun.root'
 
 
-########## Custom modules ##########
+# ######### Custom modules ##########
 
 def vector_iterator(v):
     return (v.at(i) for i in xrange(v.size()))
@@ -60,10 +61,6 @@ class AnalyseFacetFiltering(Module):
         # Prepare a filter based on Monte Carlo information
         self.mcFacetFilter = Belle2.TrackFindingCDC.MCFacetFilter()
         self.mcFacetFilter.initialize()
-
-        # Create the worker that creates the facets
-        self.allFacetWorker = Belle2.TrackFindingCDC.AllFacetWorker()
-        self.allFacetWorker.initialize()
 
         # Initalize some counters to be extended
         self.nFacets = 0
@@ -96,12 +93,14 @@ class AnalyseFacetFiltering(Module):
         # Unpack the hits from CDCSimHits and attach the geometry to them
         self.theWireHitTopology.fill()
 
-        # Generate all facets
-        self.allFacetWorker.generate()
+        # Retrieve all facets
+        stored_facets = Belle2.PyStoreObj("CDCRecoFacetVector")
 
-        print '#Facets', self.allFacetWorker.getRecoFacets().size()
+        # Wrapper around std::vector like
+        wrapped_facets = stored_facets.obj()
+        facets = wrapped_facets.get()
 
-        for facet in vector_iterator(self.allFacetWorker.getRecoFacets()):
+        for facet in facets:
             self.nFacets += 1
 
             isSignal = self.isSignalFacet(facet)
@@ -128,7 +127,7 @@ class AnalyseFacetFiltering(Module):
             / nBackgroundFacets
 
 
-########## Register modules ##########
+# ######### Register modules ##########
 
 rootInputModule = register_module('RootInput')
 rootInputModule.param({'inputFileName': input_file_name})
@@ -136,16 +135,26 @@ rootInputModule.param({'inputFileName': input_file_name})
 gearboxModule = register_module('Gearbox')
 geometryModule = register_module('Geometry')
 
-########## Create paths and add modules ##########
+# Prepare the module that creates the facets
+allFacetModule = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+allFacetModule.param({
+    "FacetFilter": "all",
+    "FacetNeighborChooser": "none",
+    "WriteFacets": True,
+    "FacetsStoreObjName": "CDCRecoFacetVector",
+})
+
+
+# ######### Create paths and add modules ##########
 
 main = create_path()
 main.add_module(rootInputModule)
 main.add_module(gearboxModule)
 main.add_module(geometryModule)
+main.add_module(allFacetModule)
 
 main.add_module(AnalyseFacetFiltering())
 
-########## Run paths and print statistics ##########
+# ######### Run paths and print statistics ##########
 process(main)
 print statistics
-

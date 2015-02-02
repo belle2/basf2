@@ -23,6 +23,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <iostream>
 
 using namespace std;
 

@@ -43,7 +43,7 @@ HistoManagerModule::~HistoManagerModule()
   //    cout << "HistoManager:: destructor called from pid=" << ProcHandler::EvtProcID() << endl;
   //    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
   if (Environment::Instance().getNumberProcesses() > 0) {
-    cout << "HistoManager:: adding histogram files" << endl;
+    B2INFO("HistoManager:: adding histogram files");
     RbTupleManager::Instance().hadd();
   }
   //  }

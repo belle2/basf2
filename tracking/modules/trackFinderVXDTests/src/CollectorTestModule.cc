@@ -1,5 +1,6 @@
 #include <tracking/modules/trackFinderVXDTests/CollectorTestModule.h>
 
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;

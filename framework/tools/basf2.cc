@@ -33,22 +33,20 @@
 #include <boost/python.hpp> //Has to be the first include (restriction due to python)
 
 #include <framework/core/Environment.h>
+#include <framework/core/DataFlowVisualization.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
-#include <framework/core/DataFlowVisualization.h>
 #include <framework/utilities/FileSystem.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/predicate.hpp> //for iequals()
 
 #include <unistd.h>
 #include <signal.h>
 #include <cstdlib>
-#include <sys/utsname.h>
 #include <iostream>
-#include <iterator>
 #include <algorithm>
 #include <string>
 #include <vector>

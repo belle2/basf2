@@ -11,7 +11,7 @@ import math
 def statistics_plots(
     fileName='',
     timingMethods=[statistics.INIT, statistics.EVENT],
-    memoryMethods=[statistics.EVENT],
+    memoryMethods=[statistics.INIT, statistics.EVENT],
     contact='',
     jobDesc='',
     ):

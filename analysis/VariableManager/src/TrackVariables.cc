@@ -29,7 +29,6 @@
 #include <algorithm>
 #include <cmath>
 
-class getRelatedTo;
 using namespace std;
 
 namespace Belle2 {

@@ -42,37 +42,37 @@ namespace Belle2 {
        * Getter for name of the method
        * @return name
        */
-      std::string getName() { return m_name; }
+      std::string getName() const { return m_name; }
 
       /**
        * Getter for type of the method
        * @return type
        */
-      TMVA::Types::EMVA getType() { return m_type; }
+      TMVA::Types::EMVA getType() const { return m_type; }
 
       /**
        * Getter for type as string of the method
        * @return type
        */
-      std::string getTypeAsString() { return m_type_as_string; }
+      std::string getTypeAsString() const { return m_type_as_string; }
 
       /**
        * Getter for config of the method
        * @return config
        */
-      std::string getConfig() { return m_config; }
+      std::string getConfig() const { return m_config; }
 
       /**
        * Getter for variabels of the method
        * @return variables
        */
-      const std::vector<const Variable::Manager::Var*>& getVariables() { return m_variables; }
+      const std::vector<const Variable::Manager::Var*>& getVariables() const { return m_variables; }
 
       /**
        * Getter for spectators of the method
        * @return spectators
        */
-      const std::vector<const Variable::Manager::Var*>& getSpectators() { return m_spectators; }
+      const std::vector<const Variable::Manager::Var*>& getSpectators() const { return m_spectators; }
 
     private:
       std::string m_name; /**< name of the method */

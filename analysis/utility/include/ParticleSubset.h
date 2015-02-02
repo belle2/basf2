@@ -41,7 +41,7 @@ namespace Belle2 {
     void fixParticleLists(const std::map<int, int>& oldToNewMap);
 
     /** replace entries in vec via oldToNewMap, removing those not found. */
-    void fixVector(std::vector<int>& vec, const std::map<int, int>& oldToNewMap);
+    static void fixVector(std::vector<int>& vec, const std::map<int, int>& oldToNewMap);
 
   };
 }

@@ -32,7 +32,7 @@ class FilterProperties(object):
         wasFitted=False,
         fitResult=None,
         seedResult=None,
-        ):
+    ):
 
         self.trackCand = trackCand
         self.mcParticle = mcParticle
@@ -86,7 +86,7 @@ class TrackingValidationModule(basf2.Module):
         exclude_profile_mc_parameter='',
         exclude_profile_pr_parameter='',
         use_expert_folder=True,
-        ):
+    ):
 
         super(TrackingValidationModule, self).__init__()
         self.name = name
@@ -167,7 +167,7 @@ class TrackingValidationModule(basf2.Module):
             # fill the FilterProperties will all properties on this track
             # gathered so far
             filterProperties = FilterProperties(trackCand=trackCand,
-                    mcParticle=mcParticle, mcParticles=mcParticles)
+                                                mcParticle=mcParticle, mcParticles=mcParticles)
 
             if self.fit:
                 prTrackFitResult = \
@@ -195,11 +195,11 @@ class TrackingValidationModule(basf2.Module):
             # this information can we used when plotting fake tracks, for example
             seed_position = trackCand.getPosSeed()
             seed_momentum = trackCand.getMomSeed()
-            seed_tan_lambda = 1 / math.tan(seed_momentum.Theta())
+            seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))  # Avoid zero division exception
             seed_phi = seed_position.Phi()
             seed_theta = seed_position.Theta()
 
-            if prTrackFitResult != None:
+            if prTrackFitResult:
                 omega_estimate = prTrackFitResult.getOmega()
                 omega_variance = prTrackFitResult.getCov()[9]
 
@@ -252,14 +252,14 @@ class TrackingValidationModule(basf2.Module):
             # fill the FilterProperties will all properties on this track
             # gathered so far
             filterProperties = FilterProperties(mcParticle=mcParticle,
-                    mcParticles=mcParticles)
+                                                mcParticles=mcParticles)
 
             if not self.track_filter_object.doesMcPass(filterProperties):
                 continue
 
             momentum = mcParticle.getMomentum()
             pt = momentum.Perp()
-            tan_lambda = 1 / math.tan(momentum.Theta())
+            tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))  # Avoid zero division exception
             d0 = mcHelix.getD0()
 
             self.mc_matches.append(is_matched)
@@ -282,14 +282,14 @@ class TrackingValidationModule(basf2.Module):
         # can only be computed if there are entries
         if len(self.pr_clones_and_matches) > 0:
             clone_rate = 1.0 - np.average(self.pr_matches,
-                    weights=self.pr_clones_and_matches)
+                                          weights=self.pr_clones_and_matches)
         else:
             clone_rate = float('nan')
 
         hit_efficiency = np.nanmean(self.mc_hit_efficiencies)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
-                % name)
+                                                    % name)
         figures_of_merit['finding_efficiency'] = track_finding_efficiency
         figures_of_merit['fake_rate'] = fake_rate
         figures_of_merit['clone_rate'] = clone_rate
@@ -313,7 +313,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Finding efficiency #
         ######################
         plots = self.profiles_by_mc_parameters(self.mc_matches,
-                'finding efficiency', make_hist=False)
+                                               'finding efficiency', make_hist=False)
         validation_plots.extend(plots)
 
         # Fake rate (all tracks not matched or clone            #
@@ -322,13 +322,13 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         #########################################################
         print 'fake list: ' + str(len(self.pr_fakes))
         plots = self.profiles_by_pr_parameters(self.pr_fakes, 'fake rate',
-                make_hist=False)
+                                               make_hist=False)
         validation_plots.extend(plots)
 
         # Hit efficiency #
         ##################
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
-                'hit efficiency')
+                                               'hit efficiency')
         validation_plots.extend(plots)
 
         # Fit quality #
@@ -344,10 +344,10 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             pr_omega_variances = np.array(self.pr_omega_variances)
 
             curvature_pull_analysis = PullAnalysis('#omega', unit='1/cm',
-                    plot_name_prefix=plot_name_prefix + '_omega',
-                    plot_title_postfix=self.plot_title_postfix)
+                                                   plot_name_prefix=plot_name_prefix + '_omega',
+                                                   plot_title_postfix=self.plot_title_postfix)
             curvature_pull_analysis.analyse(pr_omega_truths,
-                    pr_omega_estimates, pr_omega_variances)
+                                            pr_omega_estimates, pr_omega_variances)
             curvature_pull_analysis.contact = contact
             pull_analyses.append(curvature_pull_analysis)
 
@@ -357,10 +357,10 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             pr_tan_lambda_variances = np.array(self.pr_tan_lambda_variances)
 
             curvature_pull_analysis = PullAnalysis('tan #lambda',
-                    plot_name_prefix=plot_name_prefix + '_tan_lambda',
-                    plot_title_postfix=self.plot_title_postfix)
+                                                   plot_name_prefix=plot_name_prefix + '_tan_lambda',
+                                                   plot_title_postfix=self.plot_title_postfix)
             curvature_pull_analysis.analyse(pr_tan_lambda_truths,
-                    pr_tan_lambda_estimates, pr_tan_lambda_variances)
+                                            pr_tan_lambda_estimates, pr_tan_lambda_variances)
             curvature_pull_analysis.contact = contact
             pull_analyses.append(curvature_pull_analysis)
 
@@ -407,9 +407,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'multiplicity',
             'phi',
             'theta',
-            ],
+        ],
         make_hist=True,
-        ):
+    ):
 
         # apply exclusion list
         new_parameter_names = [item for item in parameter_names if item
@@ -423,7 +423,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             '#phi': self.mc_phi,
             '#theta': self.mc_theta,
             'multiplicity': self.mc_multiplicities,
-            }
+        }
 
         return self.profiles_by_parameters_base(
             xs,
@@ -432,7 +432,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             profile_parameters,
             unit,
             make_hist,
-            )
+        )
 
     def profiles_by_pr_parameters(
         self,
@@ -441,7 +441,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         unit=None,
         parameter_names=['Seed tan #lambda', 'Seed #phi', 'Seed #theta'],
         make_hist=True,
-        ):
+    ):
 
         # apply exclusion list
         new_parameter_names = [item for item in parameter_names if item
@@ -459,7 +459,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             profile_parameters,
             unit,
             make_hist,
-            )
+        )
 
     def profiles_by_parameters_base(
         self,
@@ -469,7 +469,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         profile_parameters,
         unit,
         make_hist,
-        ):
+    ):
 
         contact = self.contact
 
@@ -492,7 +492,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         for (parameter_name, parameter_values) in profile_parameters.items():
             if parameter_name in parameter_names \
-                or root_save_name(parameter_name) in parameter_names:
+                    or root_save_name(parameter_name) in parameter_names:
 
                 profile_plot_name = plot_name_prefix + '_by_' \
                     + root_save_name(parameter_name)
@@ -545,8 +545,6 @@ def getSeedTrackFitResult(trackCand):
         b_field,
         cdc_hit_pattern,
         svd_hit_pattern,
-        )
+    )
 
     return track_fit_result
-
-

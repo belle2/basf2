@@ -82,21 +82,21 @@ double TrackFitter::fitTrackCandidateFast(
         x = hit->getWirePosition().X();
         y = hit->getWirePosition().Y();
         double __attribute__((unused)) R_dist = sqrt(SQR(xc_track - x) + SQR(yc_track - y));
-//        double dist = radius_track - R_dist;
+        double dist = radius_track - R_dist;
         double driftLength = hit->getDriftLength();
-        /*
-                if (dist > 0) {
-                  x = x + hit->getDriftLength() * (R_dist / (x - xc_track));
-                  y = y + hit->getDriftLength() * (R_dist / (y - yc_track));
-                } else {
-                  x = x - hit->getDriftLength() * (R_dist / (x - xc_track));
-                  y = y - hit->getDriftLength() * (R_dist / (y - yc_track));
-                }
-        */
 
-        x = (xc_track * driftLength + x * radius_track) / (driftLength + radius_track);
-        y = (yc_track * driftLength + y * radius_track) / (driftLength + radius_track);
+        if (dist > 0) {
+          x = x + hit->getDriftLength() * ((x - xc_track) / R_dist);
+          y = y + hit->getDriftLength() * ((y - yc_track) / R_dist);
+        } else {
+          x = x - hit->getDriftLength() * ((x - xc_track) / R_dist);
+          y = y - hit->getDriftLength() * ((y - yc_track) / R_dist);
+        }
 
+
+//        x = (xc_track * driftLength + x * radius_track) / (driftLength + radius_track);
+//        y = (yc_track * driftLength + y * radius_track) / (driftLength + radius_track);
+//
 
         x2 = x * x;
         y2 = y * y;
@@ -518,7 +518,9 @@ double TrackFitter::fitTrackCandidateFast(
 
   }
 
-  return chi2 / (hits.size() - 4);
+//  if(with_drift_time) B2INFO( "chi2: " << chi2 / (hits.size() - 3));
+
+  return chi2 / (hits.size() - 3);
 
 }
 
@@ -897,6 +899,7 @@ void TrackFitter::fitTrackCandidateFast(
   std::pair<double, double> track_par = std::make_pair(0., 0.);
 
   chi2 = fitTrackCandidateFast(track->first, track_par, ref_point, with_drift_time);
+  if (not with_drift_time) chi2 = fitTrackCandidateFast(track->first, track_par, ref_point, true);
 
   track->second.first = track_par.first;
   track->second.second = track_par.second;
@@ -915,6 +918,7 @@ void TrackFitter::fitTrackCandidateFast(
   double chi2;
 
   chi2 = fitTrackCandidateFast(track->getTrackHits(), track_par, ref_point, with_drift_time);
+  if (not with_drift_time) chi2 = fitTrackCandidateFast(track->getTrackHits(), track_par, ref_point, true);
 
   track->setTheta(track_par.first);
   track->setR(track_par.second);
@@ -934,6 +938,7 @@ void TrackFitter::fitTrackCandidateFast(TrackCandidate* track,
   std::pair<double, double> ref_point;
 
   chi2 = fitTrackCandidateFast(track->getTrackHits(), track_par, ref_point, with_drift_time);
+  if (not with_drift_time) chi2 = fitTrackCandidateFast(track->getTrackHits(), track_par, ref_point, true);
 
   track->setTheta(track_par.first);
   track->setR(track_par.second);

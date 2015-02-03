@@ -70,6 +70,11 @@ namespace Belle2 {
       void drawTrackCand(TrackCandidate* TrackCand);
 
       /**
+       * Draw given track candidate
+       */
+      void drawListOfTrackCands(std::list<TrackCandidate*>& trackList);
+
+      /**
        * Finalize svg file
        */
       void finalizeFile();
@@ -122,7 +127,8 @@ namespace Belle2 {
       bool m_batchMode;  /**< Sets ROOT to batch mode (don't show canvases) */
       int m_iTrack; /**< Track counter */
 //    FILE* pipeout_fp; /**< Chacks whether conformal and legendre transformation should be drawn */
-      int m_trackCounter; /**< Track counter; used for saving track finding progress */
+      int m_trackCounter; /**< Track counter; used for saving track finding progress (single track drawing) */
+      int m_trackListCounter; /**< Track counter; used for saving track finding progress (list of tracks drawing) */
 
       //for ROOT drawing:
       std::vector<TF1*> m_hitsLegendre; /**< Holds cdc hits transformation into legendre space */

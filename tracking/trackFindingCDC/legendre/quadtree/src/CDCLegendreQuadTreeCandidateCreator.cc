@@ -141,7 +141,7 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
   if (AxialVsStereo >= 0) {
     trackCandidate = s_cdcLegendreTrackProcessor->createLegendreTrackCandidate(nodeList);
 
-    s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
+//    s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
 //    trackCandidate->clearBadHits();
 //    s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
 //    s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, true);

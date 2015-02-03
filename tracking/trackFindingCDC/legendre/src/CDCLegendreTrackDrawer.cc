@@ -63,6 +63,8 @@ void TrackDrawer::event()
 
   m_trackCounter = 1;
 
+  m_trackListCounter = 1;
+
   initFig();
 
   drawWires();
@@ -119,6 +121,69 @@ void TrackDrawer::drawTrackCand(TrackCandidate* TrackCand)
   m_fig << ss.str();
 
   m_iTrack++;
+
+
+}
+
+void TrackDrawer::drawListOfTrackCands(std::list<TrackCandidate*>& trackList)
+{
+  if (not m_drawCandInfo) return;
+
+  int iTrack(0);
+
+  StoreArray<genfit::TrackCand> CandArray(m_TrackCandColName);
+  StoreArray<CDCHit> HitArray(m_HitColName);
+
+  std::stringstream ss;
+
+  ss << m_StoreDirectory << std::setfill('0') << std::setw(4) << m_eventCounter << "_cdc_list_" << m_trackListCounter << ".svg";
+
+  std::ofstream fig;
+
+  fig.open(ss.str().c_str());
+
+  fig << "<?xml version=\"1.0\" ?> \n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"" << m_max << "pt\" height=\"" << m_max << "pt\" viewBox=\"0 0 " << m_max << " " << m_max << "\" version=\"1.1\">\n";
+
+  fig << m_wireString.str();
+
+
+  if (HitArray.getEntries() == 0)
+    return;
+
+  for (int iHit = 0; iHit < HitArray.getEntries(); ++iHit) {
+    CDCHit* cdcHit = HitArray[iHit];
+
+    drawCDCHit(ss, cdcHit, "black");
+  }
+
+  fig << ss.str();
+
+
+  for (TrackCandidate * TrackCand : trackList) {
+    std::string trackColor = getColor(iTrack);
+    TVector2 momentum(TrackCand->getMomentumEstimation().X(), TrackCand->getMomentumEstimation().Y());
+    TVector2 position(TrackCand->getReferencePoint().X(), TrackCand->getReferencePoint().Y());
+    int charge = TrackCand->getChargeSign() * 1.1;
+
+    drawAnyTrack(ss, momentum, charge, trackColor, position);
+
+    for (TrackHit * hit : TrackCand->getTrackHits()) {
+      CDCHit* TrackHit = HitArray[hit->getStoreIndex()];
+
+      drawCDCHit(ss, TrackHit, trackColor);
+    }
+
+    fig << ss.str();
+
+    iTrack++;
+
+  }
+
+  fig << "</svg>\n";
+  fig.close();
+
+
+  m_trackListCounter++;
 
 
 }

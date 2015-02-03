@@ -620,12 +620,12 @@ void CDCLegendreTrackingModule::processTracks()
 
   m_cdcLegendreTrackMerger->doTracksMerging();
 
-  m_cdcLegendreTrackMerger->splitTracks();
+//  m_cdcLegendreTrackMerger->splitTracks();
 
-  for (TrackCandidate * cand : m_trackList) {
+//  for (TrackCandidate * cand : m_trackList) {
 //     if (cand->getCandidateType() != TrackCandidate::tracklet) continue;
-    m_cdcLegendreTrackMerger->extendTracklet(cand, m_AxialHitList);
-  }
+//    m_cdcLegendreTrackMerger->extendTracklet(cand, m_AxialHitList);
+//  }
 
 
 
@@ -638,9 +638,9 @@ void CDCLegendreTrackingModule::processTracks()
   m_cdcLegendreTrackMerger->doTracksMerging();
 
 
-  for (TrackCandidate * cand : m_trackList) {
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-  }
+//  for (TrackCandidate * cand : m_trackList) {
+//    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+//  }
 
 
   for (TrackCandidate * cand : m_trackList) {
@@ -649,9 +649,9 @@ void CDCLegendreTrackingModule::processTracks()
 
 
 
-  for (TrackCandidate * cand : m_trackList) {
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-  }
+//  for (TrackCandidate * cand : m_trackList) {
+//    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+//  }
 
   SimpleFilter m_cdcLegendreSimpleFilter;
   m_cdcLegendreSimpleFilter.processTracks(m_trackList);
@@ -676,7 +676,7 @@ void CDCLegendreTrackingModule::processTracks()
   */
 
 
-  m_cdcLegendreTrackMerger->doTracksMerging();
+//  m_cdcLegendreTrackMerger->doTracksMerging();
   /**/
 
   for (TrackCandidate * cand : m_trackList) {

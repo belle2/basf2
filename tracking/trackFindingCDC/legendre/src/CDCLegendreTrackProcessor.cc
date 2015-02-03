@@ -185,6 +185,8 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate, std::list<Trac
 
     m_cdcLegendreTrackDrawer->showPicture();
 
+    m_cdcLegendreTrackDrawer->drawListOfTrackCands(trackList);
+
   }
 
   else {

@@ -44,10 +44,15 @@ TEST(TrackFindingCDCTest, cpp_max)
 }
 
 
+TEST(TrackFindingCDCTest, cpp_char_is_signed)
+{
+  char isSigned = -1;
+  EXPECT_GT(0, isSigned);
+}
+
 TEST(TrackFindingCDCTest, cpp_stringstream_copy)
 {
   // Howto copy a string stream even if its constant.
-
   std::stringstream filled_non_const;
   filled_non_const << "filled " << "with " << "stuff.";
 

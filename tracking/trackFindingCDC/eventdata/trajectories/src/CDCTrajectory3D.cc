@@ -25,6 +25,7 @@ using namespace TrackFindingCDC;
 TRACKFINDINGCDC_SwitchableClassImp(CDCTrajectory3D)
 
 
+
 CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const Vector3D& mom3D,
                                  const FloatType& charge) :
@@ -44,10 +45,6 @@ CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle) :
                   mcParticle.getMomentum(),
                   mcParticle.getCharge())
 {
-
-
-
-
 }
 
 
@@ -57,6 +54,73 @@ CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
   m_localOrigin(trajectory2D.getLocalOrigin()),
   m_localHelix(trajectory2D.getLocalCircle(), trajectorySZ.getSZLine())
 {
+}
+
+
+CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
+  CDCTrajectory3D(gfTrackCand.getPosSeed(),
+                  gfTrackCand.getMomSeed(),
+                  gfTrackCand.getChargeSeed())
+{
+  // Maybe push these out of this function:
+  // Indices of the cartesian coordinates
+  const int iX = 0;
+  const int iY = 1;
+  const int iZ = 2;
+  const int iPx = 3;
+  const int iPy = 4;
+  const int iPz = 5;
+
+  TMatrixDSym cov6 = gfTrackCand.getCovSeed();
+
+  // 1. Rotate to a system where phi0 = 0
+  TMatrixD jacobianRot(6, 6);
+  jacobianRot.Zero();
+
+  const double px = gfTrackCand.getStateSeed()[iPx];
+  const double py = gfTrackCand.getStateSeed()[iPy];
+  const double pt = hypot(px, py);
+
+  const double cosPhi0 = px / pt;
+  const double sinPhi0 = py / pt;
+
+  // Passive rotation matrix by phi0:
+  jacobianRot(iX, iX) = cosPhi0;
+  jacobianRot(iX, iY) = sinPhi0;
+  jacobianRot(iY, iX) = -sinPhi0;
+  jacobianRot(iY, iY) = cosPhi0;
+  jacobianRot(iZ, iZ) = 1.0;
+
+  jacobianRot(iPx, iPx) = cosPhi0;
+  jacobianRot(iPx, iPy) = sinPhi0;
+  jacobianRot(iPy, iPx) = -sinPhi0;
+  jacobianRot(iPy, iPy) = cosPhi0;
+  jacobianRot(iPz, iPz) = 1.0;
+
+  cov6.Similarity(jacobianRot);
+
+  // 2. Translate to perigee parameters
+  TMatrixD jacobianReduce(5, 6);
+  jacobianReduce.Zero();
+
+  const double invPt = 1 / pt;
+  const double invPtSquared = invPt * invPt;
+  const double pz = gfTrackCand.getStateSeed()[iPz];
+  const double alpha = getAlphaZ(gfTrackCand.getPosSeed());
+  const double charge = gfTrackCand.getChargeSeed();
+
+  jacobianReduce(iCurv, iPx) = charge * invPtSquared / alpha ;
+  jacobianReduce(iPhi0, iPy) = invPt;
+  jacobianReduce(iI, iY) = 1;
+  jacobianReduce(iSZ, iPx) = - pz * invPtSquared;
+  jacobianReduce(iSZ, iPz) = invPt;
+  jacobianReduce(iZ0, iZ) = 1;
+  // Note the column corresponding to iX is completely zero as expectable.
+
+  cov6.Similarity(jacobianReduce);
+
+  // The covariance should now be the correct 5x5 covariance matrix.
+  m_localHelix.setHelixCovariance(HelixCovariance(cov6));
 }
 
 
@@ -75,7 +139,7 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
 
 
 
-void CDCTrajectory3D::fillInto(genfit::TrackCand& trackCand) const
+void CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
 {
   Vector3D position = getSupport();
   Vector3D momentum = getMom3DAtSupport();
@@ -88,9 +152,82 @@ void CDCTrajectory3D::fillInto(genfit::TrackCand& trackCand) const
   momError.SetXYZ(0.1, 0.1, 0.5);
 
   // Set the start parameters
-  SignType q = getChargeSign();
-  trackCand.setPosMomSeed(position, momentum, q);
+  SignType charge = getChargeSign();
+  gfTrackCand.setPosMomSeed(position, momentum, charge);
 
+  // Now translate and set the covariance matrix.
+  const UncertainHelix& localHelix = getLocalHelix();
+
+
+  const FloatType& impactXY = localHelix.impactXY();
+  const Vector2D& tangentialXY = localHelix.tangentialXY();
+
+  const FloatType& sinPhi0 = tangentialXY.x();
+  const FloatType& cosPhi0 = tangentialXY.y();
+
+  const FloatType& curvatureXY = localHelix.curvatureXY();
+  const FloatType& tanLambda = localHelix.tanLambda();
+
+  // 0. Define indices
+  // Maybe push these out of this function:
+  // Indices of the cartesian coordinates
+  const int iX = 0;
+  const int iY = 1;
+  const int iZ = 2;
+  const int iPx = 3;
+  const int iPy = 4;
+  const int iPz = 5;
+
+  TMatrixDSym cov5 = localHelix.helixCovariance();
+
+  // 1. Inflat the perigee covariance to a cartesian covariance where phi0 = 0 is assumed
+  // Jacobian matrix for the translation
+  TMatrixD jacobianInflate(6, 5);
+  jacobianInflate.Zero();
+
+  const double alpha = getAlphaZ(position);
+  const double chargeAlphaCurv = charge * alpha * curvatureXY;
+  const double chargeAlphaCurv2 = charge * alpha * std::pow(curvatureXY, 2);
+
+  const double invChargeAlphaCurv = 1.0 / chargeAlphaCurv;
+  const double invChargeAlphaCurv2 = 1.0 / chargeAlphaCurv2;
+
+  // Position
+  jacobianInflate(iX, iPhi0) = -impactXY;
+  jacobianInflate(iY, iI) = 1.0;
+  jacobianInflate(iZ, iZ0) = 1.0;
+
+  // Momentum
+  jacobianInflate(iPx, iCurv) = invChargeAlphaCurv2;
+  jacobianInflate(iPy, iPhi0) = - invChargeAlphaCurv;
+  jacobianInflate(iPz, iCurv) = tanLambda * invChargeAlphaCurv2;
+  jacobianInflate(iPz, iSZ) = - invChargeAlphaCurv;
+
+  // Transform
+  TMatrixDSym cov6 = cov5; //copy
+  cov6.Similarity(jacobianInflate);
+
+  /// 2. Rotate to the right phi0
+  TMatrixD jacobianRot(6, 6);
+  jacobianRot.Zero();
+
+  // Active rotation matrix by phi0:
+  jacobianRot(iX, iX) = cosPhi0;
+  jacobianRot(iX, iY) = -sinPhi0;
+  jacobianRot(iY, iX) = sinPhi0;
+  jacobianRot(iY, iY) = cosPhi0;
+  jacobianRot(iZ, iZ) = 1.0;
+
+  jacobianRot(iPx, iPx) = cosPhi0;
+  jacobianRot(iPx, iPy) = -sinPhi0;
+  jacobianRot(iPy, iPx) = sinPhi0;
+  jacobianRot(iPy, iPy) = cosPhi0;
+  jacobianRot(iPz, iPz) = 1.0;
+
+  cov6.Similarity(jacobianRot);
+
+  // 3. Forward the covariance matrix.
+  gfTrackCand.setCovSeed(cov6);
 }
 
 

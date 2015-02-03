@@ -10,6 +10,7 @@
 
 #include "../include/CDCBField.h"
 
+#include "TMath.h"
 #include <cmath>
 #include <cassert>
 
@@ -46,6 +47,20 @@ const FloatType& TrackFindingCDC::getBFieldZ(const Vector3D&)
 }
 
 
+FloatType TrackFindingCDC::getAlphaFromBField(const double& bField)
+{
+  return 1.0 / (bField * TMath::C()) * 1E11;
+}
+
+FloatType TrackFindingCDC::getAlphaZ(const Vector2D& pos2D)
+{
+  return getAlphaFromBField(getBFieldZ(pos2D));
+}
+
+FloatType TrackFindingCDC::getAlphaZ(const Vector3D& pos3D)
+{
+  return getAlphaFromBField(getBFieldZ(pos3D));
+}
 
 SignType TrackFindingCDC::ccwInfoToChargeSign(const CCWInfo& ccwInfo)
 {

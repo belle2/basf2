@@ -51,6 +51,17 @@ namespace Belle2 {
     /// Getter for the signed magnetic field stength in z direction ( in Tesla )
     const FloatType& getBFieldZ(const Vector3D& pos3D);
 
+    /// Translater from magnetic field strength in Tesla to the alpha value.
+    FloatType getAlphaFromBField(const double& bField);
+
+    /// Getter for the signed alpha of the magnetic field in z direction
+    FloatType getAlphaZ(const Vector2D& pos2D);
+
+    /// Getter for the signed alpha of the magnetic field in z direction
+    FloatType getAlphaZ(const Vector3D& pos3D);
+
+
+
     /// Conversion helper from clockwise or counterclockwise travel to the charge sign.
     /** Return the charge sign based on the travel direction on the fitted circle. \n
      *  With the Lorentz force F = q * v x B \n

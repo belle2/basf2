@@ -662,7 +662,7 @@ class CDCSVGDisplayModule(Module):
                     trajectory = \
                         Belle2.TrackFindingCDC.CDCTrajectory2D(position,
                                                                momentum, charge)
-                    trajectories.draw(trajectory)
+                    trajectories.append(trajectory)
 
                 plotter.draw_iterable(trajectories, **styleDict)
             else:

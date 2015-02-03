@@ -160,19 +160,15 @@ class ReadOrGenerateEventsRun(object):
         #############################
         main_path = basf2.create_path()
 
-        # Master module
-        eventInfoSetterModule = basf2.register_module('EventInfoSetter')
-        eventInfoSetterModule.param({'evtNumList': [self.n_events],
-                                     'runList': [1], 'expList': [1]})
-        main_path.add_module(eventInfoSetterModule)
-
-        # Progress module
-        progressModule = basf2.register_module('Progress')
-        main_path.add_module(progressModule)
-
         # use Generator if no root input file is specified
         components = self.components
         if self.root_input_file is None:
+            # Master module
+            eventInfoSetterModule = basf2.register_module('EventInfoSetter')
+            eventInfoSetterModule.param({'evtNumList': [self.n_events],
+                                         'runList': [1], 'expList': [1]})
+            main_path.add_module(eventInfoSetterModule)
+
             generatorModule = get_generator_module(self.generator_module)
             if generatorModule is not None:
                 # Allow for Background only execution
@@ -198,6 +194,10 @@ class ReadOrGenerateEventsRun(object):
             geometry = basf2.register_module('Geometry')
             geometry.param('components', components)
             main_path.add_module(geometry)
+
+        # Progress module
+        progressModule = basf2.register_module('Progress')
+        main_path.add_module(progressModule)
 
         return main_path
 

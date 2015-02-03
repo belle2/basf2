@@ -75,7 +75,7 @@ namespace VXDTFtwoHitFilterTest {
   class counter {
   public:
     static unsigned int used; /**< count number of times used */
-    static unsigned int accepted; /**< count number of times result was accepted */
+    static unsigned int accepted; /**count number of times result was accepted */
     static unsigned int rejected; /**< count number of times result was rejected */
     static unsigned int wasInf; /**< count number of times result was inf */
     static unsigned int wasNan; /**< count number of times result was nan */
@@ -91,43 +91,20 @@ namespace VXDTFtwoHitFilterTest {
   };
 
   /** Initialise all static variables */
+  template<class T>
+  unsigned int counter<T>::used(0);
 
-  /** a counter to be used by Distance3DSquared */
-  template<>
-  unsigned int counter< Distance3DSquared<SpacePoint> >::used(0);
+  template<class T>
+  unsigned int counter<T>::accepted(0);
 
-  template<>
-  unsigned int counter< Distance3DSquared<SpacePoint> >::accepted(0);
+  template<class T>
+  unsigned int counter<T>::rejected(0);
 
-  template<>
-  unsigned int counter< Distance3DSquared<SpacePoint> >::rejected(0);
+  template<class T>
+  unsigned int counter<T>::wasInf(0);
 
-  template<>
-  unsigned int counter< Distance3DSquared<SpacePoint> >::wasInf(0);
-
-  template<>
-  unsigned int counter< Distance3DSquared<SpacePoint> >::wasNan(0);
-
-
-  /** a counter to be used by Distance2DXYSquared */
-  template<>
-  unsigned int counter< Distance2DXYSquared<SpacePoint> >::used(0);
-
-  template<>
-  unsigned int counter< Distance2DXYSquared<SpacePoint> >::accepted(0);
-
-  template<>
-  unsigned int counter< Distance2DXYSquared<SpacePoint> >::rejected(0);
-
-  template<>
-  unsigned int counter< Distance2DXYSquared<SpacePoint> >::wasInf(0);
-
-  template<>
-  unsigned int counter< Distance2DXYSquared<SpacePoint> >::wasNan(0);
-//
-
-
-
+  template<class T>
+  unsigned int counter<T>::wasNan(0);
 
   /** this observer does simply count the number of times, the attached Filter was used */
   class CountingObserver : public VoidObserver {

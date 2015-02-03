@@ -27,6 +27,8 @@
 
 #include <framework/logging/Logger.h>
 
+#define g4ePDGcode 0
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
@@ -49,7 +51,9 @@ void ExtPhysicsConstructor::ConstructParticle()
   // running the geant4e extrapolator.  These particles will have a
   // limited process list and can coexist with geant4 particles: they
   // are distinguished by their name having the prefix "g4e_" and their
-  // "PDG code" lying between 50 and 56 (or -51 and -56 for antiparticles).
+  // "PDG code" always being the reserved value of 0 (which means that
+  // the user must use FindParticle(name) rather than FindParticle(#)
+  // to look up these special particles.
   // Arguments for G4ParticleDefinition() are as follows:
   //               name             mass          width         charge
   //             2*spin           parity  C-conjugation
@@ -67,114 +71,113 @@ void ExtPhysicsConstructor::ConstructParticle()
     G4double muBpositron = 0.5 * CLHEP::eplus * CLHEP::hbar_Planck / (0.51099906 * CLHEP::MeV / CLHEP::c_squared);
     G4double muBmuon = 0.5 * CLHEP::eplus * CLHEP::hbar_Planck / (0.1056584 * CLHEP::GeV / CLHEP::c_squared);
     G4double muNucleon = CLHEP::eplus * CLHEP::hbar_Planck / 2. / (CLHEP::proton_mass_c2 / CLHEP::c_squared);
-    B2INFO("Simulation::ExtPhysicsConstructor::ConstructParticle(): Ignore the following warnings from G4ParticleDefinition ...")
     // Copied from G4Gamma.cc
     g4eParticle = new G4ParticleDefinition(
       "g4e_gamma", 0.0 * CLHEP::MeV, 0.0 * CLHEP::MeV, 0.0,
       2,               -1,          -1,
       0,                0,           0,
-      "gamma",          0,           0,  50,
+      "gamma",          0,           0,  g4ePDGcode,
       true,           0.0,        NULL,
-      false,     "photon",          50
+      false,     "photon",  g4ePDGcode
     );
     // Copied from G4Electron.cc
     new G4ParticleDefinition(
       "g4e_e-", 0.51099906 * CLHEP::MeV, 0.0 * CLHEP::MeV, -1.0 * CLHEP::eplus,
       1,                0,           0,
       0,                0,           0,
-      "lepton",         1,           0,  51,
+      "lepton",         1,           0,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,          "e",         -51, -1.0011596521859 * muBpositron
+      false,          "e",  g4ePDGcode, -1.0011596521859 * muBpositron
     );
     // Copied from G4Positron.cc
     new G4ParticleDefinition(
       "g4e_e+", 0.51099906 * CLHEP::MeV, 0.0 * CLHEP::MeV, +1.0 * CLHEP::eplus,
       1,                0,           0,
       0,                0,           0,
-      "lepton",        -1,           0, -51,
+      "lepton",        -1,           0,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,          "e",          51,  1.0011596521859 * muBpositron
+      false,          "e",  g4ePDGcode,  1.0011596521859 * muBpositron
     );
     // Copied from G4MuonPlus.cc
     new G4ParticleDefinition(
       "g4e_mu+", 0.1056584 * CLHEP::GeV, 2.99591e-16 * CLHEP::MeV, +1.0 * CLHEP::eplus,
       1,                0,           0,
       0,                0,           0,
-      "lepton",        -1,           0, -52,
+      "lepton",        -1,           0,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,         "mu",          52,  1.0011659208 * muBmuon
+      false,         "mu",  g4ePDGcode,  1.0011659208 * muBmuon
     );
     // Copied from G4MuonMinus.cc
     new G4ParticleDefinition(
       "g4e_mu-", 0.1056584 * CLHEP::GeV, 2.99591e-16 * CLHEP::MeV, -1.0 * CLHEP::eplus,
       1,                0,           0,
       0,                0,           0,
-      "lepton",         1,           0,  52,
+      "lepton",         1,           0,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,         "mu",         -52, -1.0011659208 * muBmuon
+      false,         "mu",  g4ePDGcode, -1.0011659208 * muBmuon
     );
     // Copied from G4PionPlus.cc
     new G4ParticleDefinition(
       "g4e_pi+", 0.1395700 * CLHEP::GeV, 2.5284e-14 * CLHEP::MeV, +1.0 * CLHEP::eplus,
       0,               -1,           0,
       2,               +2,          -1,
-      "meson",          0,           0,  53,
+      "meson",          0,           0,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,         "pi",         -53
+      false,         "pi",  g4ePDGcode
     );
     // Copied from G4PionMinus.cc
     new G4ParticleDefinition(
       "g4e_pi-", 0.1395700 * CLHEP::GeV, 2.5284e-14 * CLHEP::MeV, -1.0 * CLHEP::eplus,
       0,               -1,           0,
       2,               -2,          -1,
-      "meson",          0,           0, -53,
+      "meson",          0,           0,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,         "pi",          53
+      false,         "pi",  g4ePDGcode
     );
     // Copied from G4KaonPlus.cc
     new G4ParticleDefinition(
       "g4e_kaon+", 0.493677 * CLHEP::GeV, 5.315e-14 * CLHEP::MeV, +1.0 * CLHEP::eplus,
       0,               -1,           0,
       1,               +1,           0,
-      "meson",          0,           0,  54,
+      "meson",          0,           0,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,       "kaon",         -54
+      false,       "kaon",  g4ePDGcode
     );
     // Copied from G4KaonMinus.cc
     new G4ParticleDefinition(
       "g4e_kaon-", 0.493677 * CLHEP::GeV, 5.315e-14 * CLHEP::MeV, -1.0 * CLHEP::eplus,
       0,               -1,           0,
       1,               -1,           0,
-      "meson",          0,           0, -54,
+      "meson",          0,           0,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,       "kaon",          54
+      false,       "kaon",  g4ePDGcode
     );
     // Copied from G4Proton.cc except use G4ParticleDefinition instead of G4Ions
     new G4ParticleDefinition(
       "g4e_proton", 0.9382723 * CLHEP::GeV, 0.0 * CLHEP::MeV, +1.0 * CLHEP::eplus,
       1,               +1,           0,
       1,               +1,           0,
-      "baryon",         0,          +1,  55,
+      "baryon",         0,          +1,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,    "nucleon",         -55,  2.792847351 * muNucleon
+      false,    "nucleon",  g4ePDGcode,  2.792847351 * muNucleon
     );
     // Copied from G4AntiProton.cc except use G4ParticleDefinition instead of G4Ions
     new G4ParticleDefinition(
       "g4e_anti_proton", 0.9382723 * CLHEP::GeV, 0.0 * CLHEP::MeV, -1.0 * CLHEP::eplus,
       1,               +1,           0,
       1,               -1,           0,
-      "baryon",         0,          -1, -55,
+      "baryon",         0,          -1,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,    "nucleon",          55, -2.792847351 * muNucleon
+      false,    "nucleon",  g4ePDGcode, -2.792847351 * muNucleon
     );
     // copied from G4Deuteron.hh except use G4ParticleDefinition instead of G4Ions
     new G4ParticleDefinition(
       "g4e_deuteron", 1.875613 * CLHEP::GeV, 0.0 * CLHEP::MeV, +1.0 * CLHEP::eplus,
       2,               +1,           0,
       0,                0,           0,
-      "nucleus",        0,          +2,  56,
+      "nucleus",        0,          +2,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,     "static",         -56,  0.857438230 *  muNucleon
+      false,     "static",  g4ePDGcode,  0.857438230 *  muNucleon
 
     );
     // copied from G4AntiDeuteron.hh except use G4ParticleDefinition instead of G4Ions
@@ -182,9 +185,9 @@ void ExtPhysicsConstructor::ConstructParticle()
       "g4e_anti_deuteron", 1.875613 * CLHEP::GeV, 0.0 * CLHEP::MeV, -1.0 * CLHEP::eplus,
       2,               +1,           0,
       0,                0,           0,
-      "anti_nucleus",   0,          -2, -56,
+      "anti_nucleus",   0,          -2,  g4ePDGcode,
       true,          -1.0,        NULL,
-      false,     "static",          56, -0.857438230 * muNucleon
+      false,     "static",  g4ePDGcode, -0.857438230 * muNucleon
     );
 
   }

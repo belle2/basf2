@@ -21,6 +21,7 @@
 #include <G4UnitsTable.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTable.hh>
+#include <G4AntiDeuteron.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -30,6 +31,11 @@ ExtPhysicsList::ExtPhysicsList() : G4VModularPhysicsList()
 {
   defaultCutValue  = 0.7 * CLHEP::mm; //Default production cut value. Unit given in Geant4 units.
   //defaultCutValue = 1.0E+9 * CLHEP::cm; // set big step so that AlongStep computes all the energy
+
+  // G4EmStandardPhysics() defines Gamma, Electron, Positron, MuonPlus, MuonMinus, PionPlus, PionMinus,
+  // KaonPlus, KaonMinus, Proton, AntiProton, Deuteron, Triton, He3, Alpha, and GenericIon -- but not
+  // AntiDeuteron -- so we force the AntiDeuteron into the G4ParticleTable beforehand.
+  G4AntiDeuteron::AntiDeuteron();
   RegisterPhysics(new G4EmStandardPhysics);
   RegisterPhysics(new Simulation::ExtPhysicsConstructor);
   if (false) SetCuts();

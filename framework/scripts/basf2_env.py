@@ -125,6 +125,16 @@ def deserialize_path(path_state):
     return path
 
 
+def get_path_from_file(path_filename):
+    import pickle
+    return deserialize_path(pickle.load(open(path_filename, 'r')))
+
+
+def write_path_to_file(path, filename):
+    import pickle
+    pickle.dump(serialize_path(path), open(filename, 'w'))
+
+
 # -----------------------------------------------
 #             Print output
 # -----------------------------------------------

@@ -31,5 +31,12 @@ assert 0 == os.system(cmd)
 assert len(glob.glob('weights/*')) == 4
 assert len(glob.glob('var*generic*.root*')) == 2
 assert len(glob.glob('analysisPathDone.root')) == 1
+os.unlink('analysisPathDone.root')
+
+#create full path and run again
+#mostly just need to omit --preload, usually one would use --dump-path to get a stable version
+cmd = "basf2 " + steeringFile + " -i " + inputFile + " -- -cache cache.pkl"
+assert 0 == os.system(cmd)
+assert len(glob.glob('analysisPathDone.root')) == 1
 
 shutil.rmtree(tempdir)

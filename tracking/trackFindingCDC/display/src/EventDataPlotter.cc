@@ -274,9 +274,6 @@ void EventDataPlotter::draw(const CDCWireSuperLayer& wireSuperLayer, const Attri
 /// --------------------- Draw CDCWireTopology------------------------
 void EventDataPlotter::draw(const CDCWireTopology& wireTopology, AttributeMap attributeMap)
 {
-  if (not m_ptrPrimitivePlotter) return;
-  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
-
   for (const CDCWireSuperLayer & wireSuperLayer : wireTopology.getWireSuperLayers()) {
     AttributeMap defaultSuperLayerAttributeMap {
       {"fill" , wireSuperLayer.isAxial() ? "black" : "lightgray"},

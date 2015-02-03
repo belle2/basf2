@@ -15,6 +15,9 @@
 
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include "genfit/TrackCand.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,6 +28,9 @@ namespace Belle2 {
 
       /// Default constructor for ROOT compatibility.
       CDCRLWireHitSegment() {;}
+
+      /// Construct from a genfit track candidate.
+      explicit CDCRLWireHitSegment(const genfit::TrackCand& trackCand);
 
       /// Empty deconstructor
       ~CDCRLWireHitSegment() {;}

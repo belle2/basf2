@@ -306,8 +306,8 @@ namespace Belle2 {
      *
      *  @sa HitPatternCDC
      */
-    const uint32_t m_hitPatternCDCInitializer;
-    const uint32_t m_hitPatternCDCInitializer_part2; //from bit32 to bit 63
+    const uint32_t m_hitPatternCDCInitializer; /**< Member for initializing the information about hits in the CDC, from bit 0 to 31*/
+    const uint32_t m_hitPatternCDCInitializer_part2; /**< Member for initializing the information about hits in the CDC, from bit 32 to 63*/
 
     /** Member for initializing the information about hits in the VXD.
      *

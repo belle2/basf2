@@ -365,6 +365,7 @@ namespace Belle2 {
     // parameters for the module
     int m_PARAMstepSize; /**< Informes the user that event: (eventCounter-modulo(stepSize)) is currently executed */
     bool m_PARAMshowClusterStatistics; /**< if activated, some statistics for SVD and PXD Clusters are measured */
+    bool m_PARAMallowMultiThreaded; /**< if false, the module suppresses multithreaded execution of this and its following modules in the module-path */
 
     // member variables
     int m_eventCounter; /**< knows current event number */

@@ -38,10 +38,12 @@ EventCounterModule::EventCounterModule() : Module()
 
   //Set module properties
   setDescription("Highlights current event and does some minimal statistics for VXD Clusters");
-  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("stepSize", m_PARAMstepSize, "e.g. 100 will highlight every 100th event", int(100));
   addParam("showClusterStatistics", m_PARAMshowClusterStatistics, "if activated, some statistics for SVD and PXD Clusters are measured", bool(true));
+  addParam("allowMultiThreaded", m_PARAMallowMultiThreaded, "if false, the module suppresses multithreaded execution of this and its following modules in the module-path", bool(true));
+
+  if (m_PARAMallowMultiThreaded) { setPropertyFlags(c_ParallelProcessingCertified); }
 }
 
 

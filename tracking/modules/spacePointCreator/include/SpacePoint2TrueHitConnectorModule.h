@@ -21,6 +21,9 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <tuple>
+
+#include <numeric> // std::accumulate
 
 namespace Belle2 {
 
@@ -92,8 +95,55 @@ namespace Belle2 {
 
     void initializeCounters(); /**< initialize all counters to 0 */
 
-    /**< get the unique indices of all TrueHits that are related to a SpacePoint (done via their Clusters) */
+    // COULDDO: place the (rather) general functions below into a header to make it accessible to more than just this module
+
+    /**<get the contents of the map as string. NOTE: only templated to such a degree that is actually needed in this module! should compile without warning for any map (e.g. map, multimap, unordered_map,...) with unsigned int as key and values of a type that have a defined stream insertion operator (only tested for multimap and unordered_multimap!)
+     */
+    template <typename MapType>
+    std::string printMap(const MapType& aMap);
+
+    /**
+     * get the unique keys of a map
+     * WARNING: major shortcoming at the moment: expects keys to be of type unsigned int!
+     */
+    template <typename MapType>
+    std::vector<unsigned int> getUniqueKeys(const MapType& aMap);
+
+    /**
+     * get the number of unique keys inside the map
+     */
+    template <typename MapType>
+    unsigned int getUniqueSize(const MapType& aMap) { return getUniqueKeys<MapType>(aMap).size(); }
+
+    /**
+     * get the unique keys of a map together with the number of values associated to each key. first elements are keys, second are number of values
+     * WARNING: major shortcoming at the moment: expects keys to be of type unsigned int!
+     */
+    template <typename MapType>
+    std::vector<std::pair<unsigned int, unsigned int> > getNValuesPerKey(const MapType& aMap);
+
+    /**
+     * get all values stored in the map for a given keys
+     * WARNING: major shortcoming at the moment: expects keys to be of type unsigned int and values to be of type float
+     */
+    template <typename MapType>
+    std::vector<float> getValuesToKey(const MapType& aMap, unsigned int aKey);
+
+    /**
+     * calculate the mean value of all values in vector<T>
+     * NOTE: uses std::accumulate so T has to be compatible with it!
+     */
+    template <typename T>
+    T calculateMean(std::vector<T> V) {
+      T sum = std::accumulate(V.begin(), V.end(), 0.0);
+      return sum / V.size();
+    }
+
+    /**< tuple containing the indices and the weights of all unique TrueHits related to a SpacePoint as well as the information if all TrueHits are shared by all Clusters of the SpacePoint */
+    typedef std::tuple<std::vector<unsigned int>, std::vector<float>, bool> TrueHitsInfo;
+
+    /**< get the unique indices of all TrueHits that are related to a SpacePoint (done via their Clusters). The boolean entry of TrueHitsInfo is set to true if a SpacePoint with only one Cluster is passed! */
     template<typename ClusterType>
-    std::vector<unsigned int> getUniqueTrueHitIndices(Belle2::SpacePoint* spacePoint, RelationArray& clusters2TrueHits);
+    TrueHitsInfo getUniqueTrueHitsInfo(Belle2::SpacePoint* spacePoint, RelationArray& clusters2TrueHits);
   };
 }

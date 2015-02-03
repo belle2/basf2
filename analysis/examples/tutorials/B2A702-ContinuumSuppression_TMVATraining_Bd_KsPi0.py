@@ -25,6 +25,11 @@ from stdV0s import stdKshorts
 # the continuum MC sample created with no beam background in
 # MC campaign 3.5, therefore it can be run only on KEKCC computers.
 #
+# To run NeuroBayes on KEKCC execute the following before running:
+#  export PHIT_LICENCE_PATH=${PHIT_LICENCE_PATH=${SWBELLE}/local/etc/neurobayes}
+#  export PHIT_LICENCE_SERVER=bweb3.cc.kek.jp:16820
+#  source /sw/belle/local/neurobayes/belle_default_64bit/setup_neurobayes.sh
+#
 # Contributors: P. Goldenzweig (January 2015)
 #
 ######################################################

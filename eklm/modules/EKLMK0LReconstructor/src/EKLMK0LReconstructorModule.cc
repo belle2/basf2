@@ -318,9 +318,12 @@ EKLMK0LReconstructorModule::~EKLMK0LReconstructorModule()
 
 void EKLMK0LReconstructorModule::initialize()
 {
-  RelationArray::registerPersistent<EKLMK0L, EKLMHit2d>();
-  StoreArray<EKLMK0L>::registerPersistent();
-  StoreArray<KLMCluster>::registerPersistent();
+  StoreArray<EKLMK0L> k0ls;
+  StoreArray<KLMCluster> clusters;
+  StoreArray<EKLMHit2d> hit2ds;
+  k0ls.registerInDataStore();
+  clusters.registerInDataStore();
+  k0ls.registerRelationTo(hit2ds);
 }
 
 void EKLMK0LReconstructorModule::beginRun()

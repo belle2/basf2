@@ -36,11 +36,10 @@ EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type)
 
   StoreArray<EKLMSimHit> simHits;
   StoreArray<MCParticle> particles;
+  simHits.registerInDataStore();
+  particles.registerRelationTo(simHits);
   RelationArray particleToSimHits(particles, simHits);
   registerMCParticleRelation(particleToSimHits);
-
-  StoreArray<EKLMSimHit>::registerPersistent();
-  RelationArray::registerPersistent<MCParticle, EKLMSimHit>();
 }
 
 //-----------------------------------------------------

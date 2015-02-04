@@ -72,7 +72,7 @@ TEST(TrackFindingCDCTest, legendre_QuadTreeTest)
   qt.startFillingTree(lmdProcessor);
   auto later = std::chrono::high_resolution_clock::now();
 
-  EXPECT_EQ(2, candidateNodes.size());
+  EXPECT_EQ(3, candidateNodes.size());
 
   std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(later - now);
   B2INFO("QuadTree took " << time_span.count() << " seconds, found " << candidateNodes.size() << " candidates");

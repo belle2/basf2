@@ -14,6 +14,7 @@ def statistics_plots(
     memoryMethods=[statistics.INIT, statistics.EVENT],
     contact='',
     jobDesc='',
+    prefix='',
     ):
     """
     Add memory usage and execution time validation plots to the given root file.
@@ -31,7 +32,7 @@ def statistics_plots(
 
     # Global timing
     methodName = {}
-    hGlobalTiming = TH1D('GlobalTiming', 'Global Timing', 5, 0, 5)
+    hGlobalTiming = TH1D(prefix + 'GlobalTiming', 'Global Timing', 5, 0, 5)
     hGlobalTiming.SetStats(0)
     hGlobalTiming.GetXaxis().SetTitle('method')
     hGlobalTiming.GetYaxis().SetTitle('time/call [ms]')
@@ -59,8 +60,8 @@ def statistics_plots(
 
     # Timing per module for the different methods
     modules = statistics.modules
-    hModuleTiming = TH1D('ModuleTiming', 'Module Timing', len(modules), 0,
-                         len(modules))
+    hModuleTiming = TH1D(prefix + 'ModuleTiming', 'Module Timing',
+                         len(modules), 0, len(modules))
     hModuleTiming.SetStats(0)
     hModuleTiming.GetXaxis().SetTitle('module')
     hModuleTiming.GetYaxis().SetTitle('time/call [ms]')
@@ -82,7 +83,7 @@ def statistics_plots(
                                       * 1e-6)
             hModuleTiming.GetXaxis().SetBinLabel(index, modstat.name)
             index += 1
-        hModuleTiming.Write('%sTiming' % methodName[method])
+        hModuleTiming.Write('%s%sTiming' % (prefix, methodName[method]))
         hModuleTiming.GetListOfFunctions().RemoveLast()
 
     # Memory usage profile
@@ -96,12 +97,12 @@ def statistics_plots(
         if contact:
             memoryProfile.obj().GetListOfFunctions().Add(TNamed('Contact',
                     contact))
-        memoryProfile.obj().Write()
+        memoryProfile.obj().Write(prefix + 'MemoryProfile')
 
     # Memory usage per module for the different methods
     sqrtN = 1 / math.sqrt(statistics.getGlobal().calls() - 1)
-    hModuleMemory = TH1D('ModuleMemory', 'Module Memory', len(modules), 0,
-                         len(modules))
+    hModuleMemory = TH1D(prefix + 'ModuleMemory', 'Module Memory',
+                         len(modules), 0, len(modules))
     hModuleMemory.SetStats(0)
     hModuleMemory.GetXaxis().SetTitle('module')
     hModuleMemory.GetYaxis().SetTitle('memory increase/call [kB]')
@@ -122,7 +123,7 @@ def statistics_plots(
                                       * sqrtN)
             hModuleMemory.GetXaxis().SetBinLabel(index, modstat.name)
             index += 1
-        hModuleMemory.Write('%sMemory' % methodName[method])
+        hModuleMemory.Write('%s%sMemory' % (prefix, methodName[method]))
         hModuleMemory.GetListOfFunctions().RemoveLast()
 
     if plotFile:
@@ -137,6 +138,7 @@ def event_timing_plot(
     burnIn=1,
     contact='',
     jobDesc='',
+    prefix='',
     ):
     """
     Add a validation histogram of event execution time to the given root file.
@@ -166,7 +168,7 @@ def event_timing_plot(
     # Create and fill histogram with event execution time distribution
     stat = gStyle.GetOptStat()
     gStyle.SetOptStat(101110)
-    hTiming = TH1D('Timing', 'Event Timing', 100, 0, maxTime)
+    hTiming = TH1D(prefix + 'Timing', 'Event Timing', 100, 0, maxTime)
     hTiming.UseCurrentStyle()
     hTiming.GetXaxis().SetTitle('time [s]')
     hTiming.GetYaxis().SetTitle('events')

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Jarek Wiechczynski,  Giulia Casarosa, Eugenio Paoloni    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -49,60 +49,32 @@ namespace Belle2 {
        *Initializes the Module.
        */
       virtual void initialize();
-
       virtual void beginRun();
-
       virtual void event();
-
       virtual void endRun();
 
-      /**
-       * Termination action.
-       */
       virtual void terminate();
 
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
-      std::string m_svdTransparentDigitListName;
       std::string m_xmlMapFileName;
-      std::string m_noiseMapFileName;
 
-      float m_APVLatency;
-      float m_APVSamplingTime;
-      int m_failedChecks;
-      int m_wrongFTBHeader;
-      int m_noAPVHeader;
-      int m_noNewDigit;
-      int m_NewDigit;
-      int m_wrongFADCHeader;
-      int m_wrongRunType;
-      int m_wrongFADCTrailer;
-      int m_wrongFADCcrc;
       int m_wrongFTBcrc;
-      int m_badEvent;
-      int m_wrongFTBtrailer;
-      int m_f0;
-      int m_f3;
-      int m_f5;
-      int m_f6;
-      int m_f7;
+
 
     private:
 
       SVDOnlineToOfflineMap* m_map;
+      //unsigned short m_runType;
 
-      SVDStripNoiseMap* m_noiseMap;
-
-      unsigned short m_runType;
-
-      bool  m_enableFineCMC;
-      short m_nCmcGroup;
+      void loadMap();
+      void printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
 
       // The following assumes i386 byte order: MSB comes last!
 
       struct FTBHeader {
-        unsigned int controlWord : 32; //LSB
-        unsigned int errorsField : 8;
+        // unsigned int controlWord : 32; //LSB
+        unsigned int errorsField : 8; //LSB
         unsigned int eventNumber : 24; //MSB
       };
 
@@ -129,30 +101,20 @@ namespace Belle2 {
         unsigned int check : 2; //MSB
       };
 
-      struct data {
-        unsigned char sample[3]; //LSB
+
+      struct data_A {
+        unsigned int sample1 : 8; //LSB
+        unsigned int sample2 : 8;
+        unsigned int sample3 : 8;
         unsigned int stripNum : 7;
         unsigned int check : 1; //MSB
       };
 
-      struct tp_APVHeader { // APV header for transparent mode
-        unsigned int CMC1 : 8; //LSB
-
-        unsigned int CMC2 : 4;
-        unsigned int sample : 3;
-        unsigned int errorBit : 1;
-
-        unsigned int pipelineAddr : 8;
-
-        unsigned int APVnum : 6;
-        unsigned int check : 2; //MSB
-      };
-
-      struct tp_data { // data for transparent mode
-        unsigned short adc_1 : 10; //LSB
-        unsigned short reserved_1 : 6;
-        unsigned short adc_2 : 10; //LSB
-        unsigned short reserved_2 : 5;
+      struct data_B {
+        unsigned int sample4 : 8; //LSB
+        unsigned int sample5 : 8;
+        unsigned int sample6 : 8;
+        unsigned int stripNum : 7;
         unsigned int check : 1; //MSB
       };
 
@@ -174,26 +136,20 @@ namespace Belle2 {
       };
 
 
-      bool sanityChecks(int nWords, uint32_t* data32);
 
-      bool verifyFTBcrc(int nWords, uint32_t* data32_start, unsigned int crc16);
+      union {
+        uint32_t data32; // input
+        FTBHeader m_FTBHeader;
+        MainHeader m_MainHeader;
+        APVHeader m_APVHeader;
+        data_A  m_data_A;
+        data_B  m_data_B;
+        FADCTrailer m_FADCTrailer;
+        FTBTrailer m_FTBTrailer;
+      };
 
-      void loadMap();
 
-      void fillSVDDigitList(int nWords, uint32_t* data32_in, StoreArray<SVDDigit>* svdDigits);
 
-      void fillSVDTransparentDigitList(int nWords, uint32_t* data32, StoreArray<SVDTransparentDigit>* svdTransparentDigits);
-
-      void emulateCmc(StoreArray<SVDTransparentDigit>* svdTransparentDigits);
-
-      void emulateZeroSupp(StoreArray<SVDTransparentDigit>* svdTransparentDigits, StoreArray<SVDDigit>* svdDigits);
-
-      void printDebug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
-
-      void printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
-
-      //temporary: to check format from Vienna test files:
-      //      void printbitssimple(int n, int nBits);
 
     };//end class declaration
 

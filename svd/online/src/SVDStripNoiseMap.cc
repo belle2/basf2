@@ -116,10 +116,10 @@ int SVDStripNoiseMap::initializeMap(const string noisefilename)
       }
       unsigned short apv_id   = apv_base + apv;
       VxdID vxd_id =
-        (m_onl2offl_map_ptr->getChipInfo(fadc_id, apv_id)).m_sensorID;
+        (m_onl2offl_map_ptr->getSensorInfo(fadc_id, apv_id)).m_sensorID;
       //bool is_u = (((fadc_id>>7)&0x1)==0x0) ? true : false;
       bool is_u =
-        (m_onl2offl_map_ptr->getChipInfo(fadc_id, apv_id)).m_uSide;
+        (m_onl2offl_map_ptr->getSensorInfo(fadc_id, apv_id)).m_uSide;
       short svd_sensor_id = SVDPar::getSVDSensorID(vxd_id, is_u);
       if (svd_sensor_id < 0) {
         B2ERROR("Invalid SVDSensorID: " << svd_sensor_id << " (FADC ID: " << fadc_id << ", APV: " << apv << ")");

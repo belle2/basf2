@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Giulia Casarosa, Eugenio Paoloni, Jarek Wiechczynski     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -71,23 +71,58 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
 }
 
 
-const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(
-  unsigned char FADC, unsigned char APV25)
+const SVDOnlineToOfflineMap::SensorInfo& SVDOnlineToOfflineMap::getSensorInfo(unsigned char FADC, unsigned char APV25)
 {
-
   ChipID id(FADC, APV25);
-  auto chipIter = m_chips.find(id);
-  if (chipIter == m_chips.end()) {
+  auto sensorIter = m_sensors.find(id);
+
+  if (sensorIter == m_sensors.end()) {
     B2WARNING(" FADC #" <<  int(FADC) << " and " << "APV # " << int(APV25) <<
               " : combination not found in the SVD On-line to Off-line map ");
-    m_currentChipInfo.m_sensorID = 0;
-    m_currentChipInfo.m_channel0 = 0;
-    m_currentChipInfo.m_channel127 = 0;
+    m_currentSensorInfo.m_sensorID = 0;
+    m_currentSensorInfo.m_channel0 = 0;
+    m_currentSensorInfo.m_channel127 = 0;
+    return m_currentSensorInfo;
+  }
+  m_currentSensorInfo = sensorIter->second;
+  return m_currentSensorInfo;
+}
+
+
+
+const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsigned short layer,  unsigned short ladder, unsigned short dssd, bool side, unsigned short strip)
+{
+  SensorID id(layer, ladder, dssd, side);
+  auto chipIter = m_chips.find(id);
+
+  if (chipIter == m_chips.end()) {
+    B2WARNING(" sensorID: " <<  layer << "." << ladder << "." << dssd << ", isU=" << side << ", strip=" << strip << " : combination not found in the SVD Off-line to On-line map ");
+
+    m_currentChipInfo.fadc = 0;
+    m_currentChipInfo.apv = 0;
+    m_currentChipInfo.stripFirst = 0;
+    m_currentChipInfo.stripLast = 0;
+    m_currentChipInfo.apvChannel = 0;
     return m_currentChipInfo;
   }
-  m_currentChipInfo = chipIter->second;
+
+  vector<ChipInfo> vecChipInfo = chipIter->second;
+
+  ChipInfo* pinfo;
+
+  for (std::vector<ChipInfo>::iterator it = vecChipInfo.begin() ; it != vecChipInfo.end(); ++it) {
+    ChipInfo& chipInfo = *it;
+    if (strip >= chipInfo.stripFirst and strip <= chipInfo.stripLast) {
+      pinfo = &chipInfo;
+      pinfo->apvChannel = strip - (pinfo->stripFirst);
+    }
+
+  }
+
+  m_currentChipInfo = *pinfo;
   return m_currentChipInfo;
 }
+
 
 
 SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
@@ -99,7 +134,7 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
     B2WARNING(" channel #" <<  int(channel) << " out of range (0-127).");
     return NULL;
   }
-  const ChipInfo& info = getChipInfo(FADC, APV25);
+  const SensorInfo& info = getSensorInfo(FADC, APV25);
   short strip = getStripNumber(channel, info);
 
   return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
@@ -112,8 +147,9 @@ SVDOnlineToOfflineMap::ReadLayer(int nlayer, ptree const& xml_layer)
   // traverse xml_layer: let us navigate through the daughters of <layer>
   for (ptree::value_type const & v : xml_layer) {
     // if the daughter is a <ladder> then read it!
-    if (v.first == "ladder")
+    if (v.first == "ladder") {
       ReadLadder(nlayer, v.second.get<int>("<xmlattr>.n") , v.second);
+    }
   }
 }
 
@@ -123,8 +159,9 @@ SVDOnlineToOfflineMap::ReadLadder(int nlayer, int nladder, ptree const& xml_ladd
   // traverse xml_ladder: let us navigate through the daughters of <ladder>
   for (ptree::value_type const & v : xml_ladder) {
     // if the daughter is a <sensor> then read it!
-    if (v.first == "sensor")
+    if (v.first == "sensor") {
       ReadSensor(nlayer, nladder, v.second.get<int>("<xmlattr>.n") , v.second);
+    }
   }
 }
 
@@ -159,15 +196,23 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
 
   // traverse xml_sensor: let us navigate through the daughters of <side>
 
+
+  vector<ChipInfo> vecInfo;   // for packer
+  SensorID sid(nlayer, nladder, nsensor, isU);
+
   for (ptree::value_type const & v : xml_side) {
     // if the daughter is a <chip>
+
     if (v.first == "chip") {
       auto tags = v.second;
       unsigned char  chipN = tags.get<unsigned char>("<xmlattr>.n");
       unsigned char  FADCn = tags.get<unsigned char>("<xmlattr>.FADCn");
-      ChipID id(FADCn, chipN);
-      auto chipIter = m_chips.find(id);
-      if (chipIter != m_chips.end()) {
+
+      ChipID cid(FADCn, chipN);
+
+      auto sensorIter = m_sensors.find(cid);
+
+      if (sensorIter != m_sensors.end()) {
         B2WARNING("Repeated insertion for FADC " << FADCn << " and APV "
                   << chipN << ", layer/ladder/sensor " << nlayer << "/" << nladder
                   << "/" << nsensor << ", side " << (isU ? "u" : "v"));
@@ -175,16 +220,28 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
       unsigned short stripNumberCh0  = tags.get<unsigned short>("<xmlattr>.strip_number_of_ch0");
       unsigned short stripNumberCh127 = tags.get<unsigned short>("<xmlattr>.strip_number_of_ch127");
 
-      ChipInfo info;
-      info.m_sensorID = VxdID(nlayer, nladder, nsensor);
-      info.m_uSide = isU;
-      info.m_parallel = (stripNumberCh127 > stripNumberCh0);
-      info.m_channel0 = stripNumberCh0;
-      info.m_channel127 = stripNumberCh127;
 
-      m_chips[id] = info;
+      SensorInfo sinfo;
+      sinfo.m_sensorID = VxdID(nlayer, nladder, nsensor);
+      sinfo.m_uSide = isU;
+      sinfo.m_parallel = (stripNumberCh127 > stripNumberCh0);
+      sinfo.m_channel0 = stripNumberCh0;
+      sinfo.m_channel127 = stripNumberCh127;
+
+      m_sensors[cid] = sinfo;
+
+      // for packer
+      ChipInfo cinfo;
+      cinfo.fadc = FADCn;
+      cinfo.apv  = chipN;
+      cinfo.stripFirst = stripNumberCh0;
+      cinfo.stripLast = stripNumberCh127;
+
+      vecInfo.push_back(cinfo);
+
     } //chip
 
   } // for daughters
 
+  m_chips[sid] = vecInfo;  // for packer
 }

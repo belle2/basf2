@@ -25,7 +25,7 @@ main(int argc, char** argv)
   printf("\n");
 
   printf("Find (layer, ladder, sensor, side, strip) for (FADC, APV, channel)\n");
-  auto info = test.getChipInfo(129, 6);
+  auto info = test.getSensorInfo(129, 6);
   short strip = test.getStripNumber(119, info);
   printf("Layer/Ladder/Sensor: %i/%i/%i ",
          info.m_sensorID.getLayerNumber(),

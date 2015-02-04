@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Giulia Casarosa, Eugenio Paoloni, Jarek Wiechczynski     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,6 +23,10 @@ namespace Belle2 {
    * Basf2 SVD hits are identified by PXD Sensor-id, side, strip number
    * MODIFICATIONS 06/01/2014 by PKvasnick:
    * The code no longer relies on consecutive numbering of FADCs or APVs.
+   *
+   * 3 Feb. 2015
+   * MODIFIED and EXTENDED by Jarek Wiechczynski to work with packer (new) and unpacker (updated version)
+   *
    */
 
 
@@ -33,9 +37,11 @@ namespace Belle2 {
     class ChipID {
     public:
       /** Typedefs of the compound id type and chip number types */
-      typedef unsigned short baseType;
+      typedef unsigned short baseType; // id
       /** Type of chip numbers */
-      typedef unsigned char chipNumberType;
+      typedef unsigned char chipNumberType; // FADC/APV number
+
+
       /** Constructor taking a compound id */
       ChipID(baseType id = 0) { m_id.id = id; }
       /** Constructor taking chip numbers */
@@ -43,6 +49,7 @@ namespace Belle2 {
       { m_id.parts.FADC = FADC; m_id.parts.APV25 = APV25; }
       /** Copy ctor */
       ChipID(const ChipID& other): m_id(other.m_id) {}
+
       /** Assignment from same type */
       ChipID& operator=(ChipID other) { m_id.id = other.m_id.id; return *this; }
       /** Assignment from base type */
@@ -53,6 +60,8 @@ namespace Belle2 {
       bool operator==(const ChipID& other) const { return (m_id.id == other.m_id.id); }
       /** ordering */
       bool operator<(const ChipID& other) const { return (m_id.id < other.m_id.id); }
+
+
       /** Get chip ID */
       baseType getID() const { return m_id.id; }
       /** Get FADC number */
@@ -65,6 +74,7 @@ namespace Belle2 {
       void setFADC(chipNumberType FADC) { m_id.parts.FADC = FADC; }
       /** Set APV25 number */
       void setAPV25(chipNumberType APV25) { m_id.parts.APV25 = APV25; }
+
     private:
       /** Union type representing the ChipID compound */
       union {
@@ -77,13 +87,57 @@ namespace Belle2 {
         } parts;
       } m_id;
     }; //ChipID class
+
+
+    class SensorID {  //moja dodatkowa klasa zagniezdzona w SVDOnlineToOfflineMap
+    public:
+      /** Typedefs of the compound id type and chip number types */
+      typedef unsigned short baseType;
+      /** Type of chip numbers */
+      typedef unsigned short sensorNumberType;
+
+
+      /** Constructor taking a compound id */
+      SensorID(baseType id = 0) { m_ID.id = id; }
+      /** Constructor taking sensor info */
+      SensorID(sensorNumberType layer,  sensorNumberType ladder, sensorNumberType dssd, bool side)
+      { m_ID.PARTS.layer = layer; m_ID.PARTS.ladder = ladder; m_ID.PARTS.dssd = dssd; m_ID.PARTS.side = side; }
+
+      SensorID& operator=(baseType id) { m_ID.id = id; return *this; }
+      operator baseType() { return m_ID.id; }
+
+    private:
+      /** Union type representing the SensorID compound */
+      union {
+        /** unique id */
+        baseType id : 10;
+        /** Alternative struct representation */
+        struct {
+          sensorNumberType layer  : 2;
+          sensorNumberType ladder : 4;
+          sensorNumberType dssd   : 3;
+          bool side           : 1;
+        } PARTS;
+      } m_ID;
+
+    }; //SensorID class
+
     /** Struct to hold data about an APV25 chip.*/
-    struct ChipInfo {
+    struct SensorInfo {
       VxdID m_sensorID;           /**< Sensor ID */
       bool m_uSide;               /**< True if u-side of the sensor */
       bool m_parallel;            /**< False if numbering is reversed */
       unsigned short m_channel0;   /**< Strip corresponding to channel 0 */
       unsigned short m_channel127; /**< Strip corresponding to channel 127 */
+    }; // SensorInfo struct
+
+
+    struct ChipInfo {
+      unsigned short fadc;
+      unsigned char apv;
+      unsigned short stripFirst;
+      unsigned short stripLast;
+      unsigned char apvChannel;
     }; // ChipInfo struct
 
     // SVDOnlineOffLineMap
@@ -114,14 +168,15 @@ namespace Belle2 {
      * @return a reference to the corresponding ChipInfo object, all-zero if
      * nonsensical input.
      */
-    const ChipInfo& getChipInfo(unsigned char FADC, unsigned char APV25);
+    const SensorInfo& getSensorInfo(unsigned char FADC, unsigned char APV25);
+    const ChipInfo& getChipInfo(unsigned short layer,  unsigned short ladder, unsigned short dssd, bool side, unsigned short strip);
 
     /** Convert APV channel number to a strip number using a ChipInfo object.
      * @param channel APV25 channel
      * @param info Const reference to ChipInfo object.
      * @return The corresponding strip number, -1 if nonsensical input
      */
-    short getStripNumber(unsigned char channel, const ChipInfo& info) const
+    short getStripNumber(unsigned char channel, const SensorInfo& info) const
     { return (info.m_channel0 + ((unsigned short)channel) * (info.m_parallel ? 1 : -1)); }
 
 
@@ -144,10 +199,12 @@ namespace Belle2 {
      */
     void ReadSensorSide(int nLayer, int nLadder, int nSensor, bool isU, boost::property_tree::ptree const& xml_side);
 
-    /** m_chips[ChipID(FADC,APV25)] gives the ChipInfo for the given APV25 on
-     * the given FADC.
+    /** m_sensors[ChipID(FADC,APV25)] gives the SensorInfo for the given APV25 on
+     * the given FADC (Unpacker)
      */
-    std::unordered_map< ChipID::baseType, ChipInfo > m_chips;
+    std::unordered_map< ChipID::baseType, SensorInfo > m_sensors;
+    std::unordered_map< SensorID::baseType, std::vector<ChipInfo> > m_chips; // for packer
+
 
     /** add chipN on FADCn to the map
      */
@@ -164,6 +221,7 @@ namespace Belle2 {
                 );
 
     ChipInfo m_currentChipInfo; /**< internal instance of chipinfo used by the getter */
+    SensorInfo m_currentSensorInfo;
 
   };
 

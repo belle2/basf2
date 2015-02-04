@@ -55,7 +55,7 @@ void ProfileModule::initialize()
   profileHistogram.registerInDataStore();
 
   // Store and print profile info at initialization
-  profileInfoStartPtr.create();
+  profileInfoStartPtr.create(true);
   profileInfoStartPtr->set(m_timeOffset);
   m_initializeInfo.mem = profileInfoStartPtr->getMemory();
   m_initializeInfo.time = profileInfoStartPtr->getTimeInSec();
@@ -66,7 +66,7 @@ void ProfileModule::event()
 {
   // Store and print profile info at this event
   StoreObjPtr<ProfileInfo> profileInfoPtr;
-  profileInfoPtr.create();
+  profileInfoPtr.create(true);
   profileInfoPtr->set(m_timeOffset);
   m_eventInfo.push_back(MemTime(profileInfoPtr->getMemory(), profileInfoPtr->getTimeInSec()));
   B2DEBUG(100, "Memory usage [MB]: " << profileInfoPtr->getMemory() / 1024);
@@ -103,7 +103,7 @@ void ProfileModule::terminate()
 {
   // Store and print profile info at termination
   StoreObjPtr<ProfileInfo> profileInfoEndPtr("ProfileInfo_End", DataStore::c_Persistent);
-  profileInfoEndPtr.create();
+  profileInfoEndPtr.create(true);
   profileInfoEndPtr->set(m_timeOffset);
   m_terminateInfo.mem = profileInfoEndPtr->getMemory();
   m_terminateInfo.time = profileInfoEndPtr->getTimeInSec();

@@ -367,7 +367,12 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 //  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
   m_cdcLegendreQuadTree->setHitsThreshold(limit);
 
-  m_cdcLegendreQuadTree->startFillingTree(true, nodeList);
+  // store all candidates in a simple vector
+  QuadTree::CandidateProcessorLambda lmdCandidateProcessing = [&nodeList](QuadTree * qt) -> void {
+    nodeList.push_back(qt);
+  };
+
+  m_cdcLegendreQuadTree->startFillingTree(lmdCandidateProcessing);
 
   m_cdcLegendreQuadTree->setLastLevel(lastlevel);
 

@@ -62,6 +62,24 @@ TrackHit::TrackHit(CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIW
 
 }
 
+TrackHit::TrackHit(int hitId, int wireID, double driftLength, double sigmaDriftLength,
+                   unsigned short charge, int superlayerId, int layerId, TVector3 wirePosition)
+{
+  m_cdcHitIndex = hitId;
+  m_hitUsage = TrackHit::not_used;
+  m_wireId = wireID;
+  m_cdcHit = nullptr;
+  m_zReference = 0;
+  m_isAxial = true;
+  m_driftLength = driftLength;
+  m_sigmaDriftLength = sigmaDriftLength;
+  m_charge = charge;
+  m_superlayerId = superlayerId;
+  m_layerId = layerId;
+  m_wirePosition = m_wirePositionOrig = wirePosition;
+  performConformalTransformation();
+}
+
 TrackHit::TrackHit(const TrackHit& rhs)
 {
   m_cdcHitIndex = rhs.m_cdcHitIndex;

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bastian Kronenbitter                                     *
+ * Contributors: Bastian Kronenbitter, Thomas Hauth                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -444,11 +444,18 @@ void CDCLegendreTrackingModule::DoTreeTrackFinding()
   m_cdcLegendreQuadTree->setRThreshold(rThreshold);
   int nSteps = 0;
 
-//  Start loop, where tracks are searched for
+  // this lambda function will forward the found candidates to the CandidateCreate for further processing
+  // hits belonging to found candidates will be marked as used and ignored for further
+  // filling iterations
+  QuadTree::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTree * qt) -> void {
+    QuadTreeCandidateCreator::Instance().createCandidateDirect(qt);
+  };
+
+  //  Start loop, where tracks are searched for
   do {
     m_cdcLegendreQuadTree->setRThreshold(rThreshold);
     m_cdcLegendreQuadTree->setHitsThreshold(limit);
-    m_cdcLegendreQuadTree->startFillingTree();
+    m_cdcLegendreQuadTree->startFillingTree(lmdCandidateProcessing);
 
     limit = limit * m_stepScale;
 //    rThreshold *= 2.;
@@ -497,11 +504,18 @@ void CDCLegendreTrackingModule::DoTreeTrackFindingFinal()
   m_cdcLegendreQuadTree->setRThreshold(rThreshold);
   int nSteps = 0;
 
+  // this lambda function will forward the found candidates to the CandidateCreate for further processing
+  // hits belonging to found candidates will be marked as used and ignored for further
+  // filling iterations
+  QuadTree::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTree * qt) -> void {
+    QuadTreeCandidateCreator::Instance().createCandidateDirect(qt);
+  };
+
 //  Start loop, where tracks are searched for
   do {
     m_cdcLegendreQuadTree->setRThreshold(rThreshold);
     m_cdcLegendreQuadTree->setHitsThreshold(limit);
-    m_cdcLegendreQuadTree->startFillingTree();
+    m_cdcLegendreQuadTree->startFillingTree(lmdCandidateProcessing);
 
     limit = limit * m_stepScale;
     rThreshold *= 2.;
@@ -535,6 +549,13 @@ void CDCLegendreTrackingModule::DoTreeStereoTrackletFinding()
     it = hits_set.insert(it, trackHit);
   }
 
+  // this lambda function will forward the found candidates to the CandidateCreate for further processing
+  // hits belonging to found candidates will be marked as used and ignored for further
+  // filling iterations
+  QuadTree::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTree * qt) -> void {
+    QuadTreeCandidateCreator::Instance().createCandidateDirect(qt);
+  };
+
   for (int iSLayer = 1; iSLayer <= 7; iSLayer += 2) {
     std::set<TrackHit*> hits_set;
     std::set<TrackHit*>::iterator it = hits_set.begin();
@@ -553,7 +574,7 @@ void CDCLegendreTrackingModule::DoTreeStereoTrackletFinding()
     m_cdcLegendreQuadTree->setRThreshold(rThreshold);
     m_cdcLegendreQuadTree->setRThreshold(rThreshold);
     m_cdcLegendreQuadTree->setHitsThreshold(limit);
-    m_cdcLegendreQuadTree->startFillingTree();
+    m_cdcLegendreQuadTree->startFillingTree(lmdCandidateProcessing);
 
   }
 

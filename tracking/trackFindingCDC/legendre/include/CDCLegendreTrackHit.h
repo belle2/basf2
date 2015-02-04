@@ -50,6 +50,9 @@ namespace Belle2 {
        */
       TrackHit(CDCHit* hit, int iHit);
 
+      TrackHit(int hitId, int wireID, double driftLength, double sigmaDriftLength,
+               unsigned short charge, int superlayerId, int layerId, TVector3 wirePosition);
+
       /** Copy constructor.
        *
        */

@@ -3,7 +3,7 @@
 * Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Viktor Trusov                                            *
+* Contributors: Viktor Trusov, Thomas Hauth                              *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -31,12 +31,15 @@
 
 #include <framework/logging/Logger.h>
 
+#include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/utility.hpp>
+#include <boost/multi_array.hpp>
 
 #include <set>
 #include <vector>
+#include <array>
 #include <algorithm>
 
 #include <cstdlib>
@@ -47,21 +50,56 @@
 #include <algorithm>
 #include <memory>
 #include <cmath>
+#include <functional>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     class QuadTreeNeighborFinder;
+    class QuadTree;
+
+    class QuadChildren {
+    public:
+      typedef boost::multi_array< QuadTree*, 2> ChildrenArray;
+
+      QuadChildren(size_t sizeX = 2, size_t sizeY = 2);
+
+      void apply(std::function<void(QuadTree*)> lmd);
+
+      ~QuadChildren();
+
+      void set(size_t x, size_t y, QuadTree* qt) {
+        m_children[x][y] = qt;
+      }
+
+      QuadTree* get(size_t x, size_t y) {
+        return m_children[x][y];
+      }
+
+    private:
+
+      const size_t m_sizeX;
+      const size_t m_sizeY;
+      ChildrenArray m_children;
+    };
+
 
     class QuadTree {
 
     public:
 
+      // a lambda expression with this signature is used to process each of the
+      // found candidates during the startFillingTree call
+      typedef std::function< void(QuadTree*) > CandidateProcessorLambda;
+
+      typedef std::array<float, 3> FloatBinTuple;
+      typedef std::array<int, 3> IntBinTuple;
+      typedef std::vector<QuadTree*> NodeList;
+      //typedef boost::multi_array< QuadTree *, 2> ChildrenArray;
+
       QuadTree();
 
       QuadTree(float rMin, float rMax, int thetaMin, int thetaMax, int level, QuadTree* parent);
-
-      ~QuadTree();
 
 //    void setParameters(double rMin, double rMax, int thetaMin, int thetaMax, int level, CDCLegendreQuadTree* parent);
 
@@ -94,11 +132,19 @@ namespace Belle2 {
       /** Copy information about hits into member of class (node at level 0 should be used  because other levels fills by parents) */
       void provideHitSet(const std::set<TrackHit*>& hits_set);
 
-      /** Fill the tree structure */
-      void startFillingTree();
+      // legacy interface, remove
+      /*      void startFillingTree() {
+              CandidateProcessorLambda lmd = [](QuadTree*)->void {};
+              startFillingTree(lmd);
+            }*/
+      /** legacy interface, remove */
+      /*      void startFillingTree(bool returnResult, std::vector<QuadTree*>& nodeList) {
+              CandidateProcessorLambda lmd = [](QuadTree*)->void {};
+              startFillingTree(returnResult, nodeList, lmd);
+            }*/
 
       /** Fill the tree structure */
-      void startFillingTree(bool returnResult, std::vector<QuadTree*>& nodeList);
+      void startFillingTree(CandidateProcessorLambda& lmdProcessor);
 
       /**
        * Fill children of node with hits (according to bin crossing criteria)
@@ -139,7 +185,7 @@ namespace Belle2 {
       void setFilled() {m_filled = true; };
 
       /** Get mean value of theta */
-      inline double getThetaMean() const {return static_cast<double>((m_thetaMin + m_thetaMax) / 2. * m_PI / TrigonometricalLookupTable::Instance().getNBinsTheta());};
+      inline double getThetaMean() const {return static_cast<double>((m_thetaMin + m_thetaMax) / 2. * boost::math::constants::pi<double>() / TrigonometricalLookupTable::Instance().getNBinsTheta());};
 
       /** Get mean value of r */
       inline double getRMean() const {return static_cast<double>((m_rMin + m_rMax) / 2.);};
@@ -186,12 +232,13 @@ namespace Belle2 {
       /** Clear hits which the node holds */
       void clearNode() {m_hits.clear(); };
 
-      /** Clear hits which the node holds */
+      /** Clear hits which the node holds and destroy all children below this node.
+       * This method must only be called on the root node, for fast QuadTree reusage */
       void clearTree();
 
     private:
 
-      static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
+      void applyToChildren(std::function<void(QuadTree*)>);
 
       float m_rMin; /**< Lower border of the node (R) */
       float m_rMax; /**< Upper border of the node (R) */
@@ -207,11 +254,13 @@ namespace Belle2 {
 
       std::vector<QuadTree*> m_neighbors; /**< 8 neighbours of each node (or 5 at borders) */
 
-      QuadTree*** m_children; /**< Pointers to the children nodes */
+      //QuadTree*** m_children; /**< Pointers to the children nodes */
+      std::unique_ptr< QuadChildren > m_children;
+
       bool m_isMaxLevel;  /**< If node is leaf */
 
-      float* m_r;          /**< bins range on r */
-      int* m_thetaBin;      /**< bins range on theta */
+      FloatBinTuple m_r;          /**< bins range on r */
+      IntBinTuple m_thetaBin;      /**< bins range on theta */
       int m_nbins_r;        /**< number of r bins */
       int m_nbins_theta;    /**< number of theta bins */
       static unsigned int s_hitsThreshold;

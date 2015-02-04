@@ -19,6 +19,7 @@ TrigonometricalLookupTable* TrigonometricalLookupTable::s_trigonometricalLookupT
 
 TrigonometricalLookupTable& TrigonometricalLookupTable::Instance()
 {
+  // todo: memory leak
   if (!s_trigonometricalLookupTable) s_trigonometricalLookupTable = new TrigonometricalLookupTable();
   return *s_trigonometricalLookupTable;
 }

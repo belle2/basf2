@@ -75,6 +75,12 @@ namespace Belle2 {
 
     unsigned int m_regSVDrelCtr; /**< number of (newly) registerd relations for SVD SpacePoints */
 
+    unsigned int m_negWeightCtr; /**< number of negative weights */
+
+    unsigned int m_totWeightsCtr; /**< total number of weights */
+
+    unsigned int m_noTrueHitCtr; /**< Number of SpacePoints that contained a Cluster to which no TrueHit has been found */
+
     std::array<unsigned int, 5> m_nRelPXDTrueHitsCtr; /**< counter for counting different numbers of related TrueHits (to a SpacePoint) with one variable */
 
     std::array<unsigned int, 5> m_nRelSVDTrueHitsCtr; /**< counter for counting different numbers of related TrueHits (to a SpacePoint) with one variable */
@@ -93,11 +99,16 @@ namespace Belle2 {
 
     std::vector<e_detTypes> m_detectorTypes; /**< vector storing the detector types for easier access during initialization */
 
+    std::vector<float> m_weightDiffsByAvg; /**< To investigate how the difference of weigts divided by the average of the weights is distributed -> maybe learn something from it */
+
+    unsigned int m_moreThan2Weights; /**< Count the cases whith more than two weights */
+
     void initializeCounters(); /**< initialize all counters to 0 */
 
     // COULDDO: place the (rather) general functions below into a header to make it accessible to more than just this module
 
-    /**<get the contents of the map as string. NOTE: only templated to such a degree that is actually needed in this module! should compile without warning for any map (e.g. map, multimap, unordered_map,...) with unsigned int as key and values of a type that have a defined stream insertion operator (only tested for multimap and unordered_multimap!)
+    /**
+     * get the contents of the map as string. NOTE: only templated to such a degree that is actually needed in this module! should compile without warning for any map (e.g. map, multimap, unordered_map,...) with unsigned int as key and values of a type that have a defined stream insertion operator (only tested for multimap and unordered_multimap!)
      */
     template <typename MapType>
     std::string printMap(const MapType& aMap);
@@ -139,11 +150,16 @@ namespace Belle2 {
       return sum / V.size();
     }
 
-    /**< tuple containing the indices and the weights of all unique TrueHits related to a SpacePoint as well as the information if all TrueHits are shared by all Clusters of the SpacePoint */
+    /** tuple containing the indices and the weights of all unique TrueHits related to a SpacePoint as well as the information if all TrueHits are shared by all Clusters of the SpacePoint */
     typedef std::tuple<std::vector<unsigned int>, std::vector<float>, bool> TrueHitsInfo;
 
-    /**< get the unique indices of all TrueHits that are related to a SpacePoint (done via their Clusters). The boolean entry of TrueHitsInfo is set to true if a SpacePoint with only one Cluster is passed! */
-    template<typename ClusterType>
-    TrueHitsInfo getUniqueTrueHitsInfo(Belle2::SpacePoint* spacePoint, RelationArray& clusters2TrueHits);
+    /**
+     * get the unique indices of all TrueHits that are related to a SpacePoint (done via their Clusters). The boolean entry of TrueHitsInfo is set to true if a SpacePoint with only one Cluster is passed!
+     * NOTE: using RelationArray instead of the RelationInterface to be independent of different types of PXDTrueHit and SVDTrueHit (Possible to get the related Clusters from the passed SpacePoint with a template parameter, but not to get the related TrueHit from that Cluster then with another template parameter)
+     */
+    template<typename ClusterType, typename TrueHitType>
+    TrueHitsInfo getUniqueTrueHitsInfo(Belle2::SpacePoint* spacePoint);//, RelationArray& clusters2TrueHits);
+
+    BELLE2_DEFINE_EXCEPTION(NoTrueHitToCluster, "Found no related TrueHit for a Cluster!"); /**< Exception for when no related TrueHit can be found for a Cluster */
   };
 }

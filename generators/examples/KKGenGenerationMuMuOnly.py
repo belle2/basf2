@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from ROOT import Belle2
 set_log_level(LogLevel.INFO)
 
 # to run the framework the used modules need to be registered
 kkgeninput = register_module('KKGenInput')
-# You need to copy mu.input.dat to the current directory, that is
-# found in "data/generators/kkmc".
-kkgeninput.param('tauinputFile', '../kkmc/data/mu.input.dat')
-kkgeninput.param('KKdefaultFile', '../kkmc/data/KK2f_defaults.dat')
+kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
+kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
 kkgeninput.param('taudecaytableFile', '')
 
 eventinfosetter = register_module('EventInfoSetter')

@@ -6,6 +6,7 @@
 #include <daq/slc/dqm/DQMHistMap.h>
 
 #include <daq/slc/system/Mutex.h>
+#include <daq/slc/base/StringUtil.h>
 
 #include <TH1.h>
 #include <TMapFile.h>
@@ -38,9 +39,11 @@ namespace Belle2 {
               unsigned int expno, unsigned int runno);
     void lock() { m_mutex.lock(); }
     void unlock() { m_mutex.unlock(); }
+    StringList& getHistNames() { return m_name_v; }
 
   private:
     std::string m_name;
+    StringList m_name_v;
     DQMHistMap m_hist_m;
     TMapFile* m_file;
     bool m_ready;

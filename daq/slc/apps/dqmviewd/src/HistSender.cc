@@ -86,10 +86,10 @@ void HistSender::run()
           DQMFileReader& reader(reader_v[i]);
           socket_writer.writeString(reader.getName());
           socket_writer.writeInt(reader.getHists().size());
-          for (TH1Map::iterator it = reader.getHists().begin();
-               it != reader.getHists().end(); it++) {
-            TH1* h = (TH1*)it->second;
-            std::string name = it->first;
+          for (StringList::iterator it = reader.getHistNames().begin();
+               it != reader.getHistNames().end(); it++) {
+            std::string name = *it;
+            TH1* h = (TH1*)reader.getHist(name);
             TString class_name = h->ClassName();
             socket_writer.writeString(class_name.Data());
             socket_writer.writeString(reader.getDirectory(name));
@@ -97,11 +97,27 @@ void HistSender::run()
             socket_writer.writeString(std::string(h->GetTitle()) + ";" +
                                       h->GetXaxis()->GetTitle()  + ";" +
                                       h->GetYaxis()->GetTitle());
+            if (h->GetXaxis()->GetLabels() != NULL) {
+              socket_writer.writeInt(h->GetXaxis()->GetNbins());
+              for (int i = 0; i < h->GetXaxis()->GetNbins(); i++) {
+                socket_writer.writeString(h->GetXaxis()->GetBinLabel(i + 1));
+              }
+            } else {
+              socket_writer.writeInt(0);
+            }
             socket_writer.writeInt(h->GetXaxis()->GetNbins());
             socket_writer.writeDouble(h->GetXaxis()->GetXmin());
             socket_writer.writeDouble(h->GetXaxis()->GetXmax());
             if (class_name.Contains("TH1")) {
             } else if (class_name.Contains("TH2")) {
+              if (h->GetYaxis()->GetLabels() != NULL) {
+                socket_writer.writeInt(h->GetYaxis()->GetNbins());
+                for (int i = 0; i < h->GetYaxis()->GetNbins(); i++) {
+                  socket_writer.writeString(h->GetYaxis()->GetBinLabel(i + 1));
+                }
+              } else {
+                socket_writer.writeInt(0);
+              }
               socket_writer.writeInt(h->GetYaxis()->GetNbins());
               socket_writer.writeDouble(h->GetYaxis()->GetXmin());
               socket_writer.writeDouble(h->GetYaxis()->GetXmax());
@@ -114,6 +130,7 @@ void HistSender::run()
       socket_writer.writeInt(0x7FFF);
       m_callback->unlock();
     } catch (const IOException& e) {
+      LogFile::error(e.what());
       m_callback->unlock();
       m_socket.close();
       return;
@@ -175,10 +192,10 @@ throw(IOException)
 {
   writer.writeString(reader.getName());
   writer.writeInt(reader.getHists().size());
-  for (TH1Map::iterator it = reader.getHists().begin();
-       it != reader.getHists().end(); it++) {
-    std::string name = it->first;
-    TH1* h = (TH1*)it->second;
+  for (StringList::iterator it = reader.getHistNames().begin();
+       it != reader.getHistNames().end(); it++) {
+    std::string name = *it;
+    TH1* h = (TH1*)reader.getHist(name);
     TString class_name = h->ClassName();
     writer.writeString(name);
     const int nbinsx = h->GetXaxis()->GetNbins();

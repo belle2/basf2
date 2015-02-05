@@ -131,7 +131,10 @@ class SegmentFitterModule(Module):
     def fitStoredSegments(self):
         """Executes a fit on each segment generated"""
 
-        segments = Belle2.PyStoreArray('CDCRecoSegment2Ds')
+        stored_segments = Belle2.PyStoreObj('CDCRecoSegment2DVector')
+        wrapped_segments = stored_segments.obj()
+        segments = wrapped_segments.get()
+
         fit_method = self.fit_method
         for segment in segments:
             fit = fit_method(segment)

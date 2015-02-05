@@ -36,7 +36,7 @@ namespace Belle2 {
      *  It also presents an iterable range of all wires in the CDC. \n
      *  The range is sorted with increasing wire ids for maximal fast look up. \n
      *  Also there are methods for getting to the closest and secondary of each wire. \n
-     *  The class does provide the memory for all instances of wires, layers and superlayers by its self.
+     *  The class does provide the memory for all instances of wires, layers and superlayers by itself.
      */
     class CDCWireTopology : public TrackFindingCDC::SwitchableRootificationBase {
 

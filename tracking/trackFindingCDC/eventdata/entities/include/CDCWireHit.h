@@ -23,6 +23,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
+#include <cdc/dataobjects/TDCCountTranslatorBase.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -37,6 +39,9 @@ namespace Belle2 {
     class CDCWireHit : public SwitchableRootificationBase {
 
     public:
+      static CDC::TDCCountTranslatorBase& getTDCCountTranslator();
+
+    public:
 
       /// Default constructor for ROOT compatibility.
       CDCWireHit();
@@ -49,9 +54,15 @@ namespace Belle2 {
 
     public:
       /// Constructor for augmenting the CDCHit with the geometry information of the CDCWire.
-      /** Binds to the CDCHit and the corresponding wire together. Also takes the index of the StoreArray
-        * from which the hit has been taken. Necessary for later translation to genfit.*/
-      CDCWireHit(const CDCHit* ptrHit);
+      /** Binds to the CDCHit and the corresponding wire together and translates the TDC count to a driftlength.
+       *  Also takes the index of the StoreArray
+       *  from which the hit has been taken. Necessary for later translation to genfit.
+       *
+       *  @param  ptrHit          Reference to the CDCHit that should be
+       *  @param  ptrTranslator   Optional xt relation used to translate the tdc count to a drift length.
+       *                          If omitted use the default from the CDCWireHitTopology.
+       */
+      CDCWireHit(const CDCHit* ptrHit, CDC::TDCCountTranslatorBase* ptrTranslator = nullptr);
 
       /// Constructor to taking a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID, const FloatType& driftLength);

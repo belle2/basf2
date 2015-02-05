@@ -25,6 +25,8 @@
 
 #include <tracking/trackFindingCDC/algorithms/SortableVector.h>
 
+#include <cdc/dataobjects/TDCCountTranslatorBase.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -52,10 +54,10 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      CDCWireHitTopology() {;}
+      CDCWireHitTopology();
 
       /// Empty deconstructor
-      ~CDCWireHitTopology() {;}
+      ~CDCWireHitTopology();
 
     public:
       /// Fill the topology from the raw cdc hits.
@@ -95,9 +97,17 @@ namespace Belle2 {
       const Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCRLWireHit>& getRLWireHits() const
       { return m_rlWireHits; }
 
+      /// Getter for the tdc count translator that was used at the beginning of the event.
+      CDC::TDCCountTranslatorBase& getTDCCountTranslator()
+      { return *m_initialTDCCountTranslator; }
+
     private:
       SortableVector<CDCWireHit> m_wireHits; ///< Memory for the wire hits to be stored
       SortableVector<CDCRLWireHit> m_rlWireHits; ///< Memory for the oriented wire hits to be stored
+
+      bool m_useSimpleTDCCountTranslator; ///< Switch whether the simple or the realistic tdc count translator shall be used.
+
+      CDC::TDCCountTranslatorBase* m_initialTDCCountTranslator; ///< Reference of the tdc count translator used at the beginning of this event.
 
     private:
       /// ROOT Macro to make CDCWireTopology a ROOT class

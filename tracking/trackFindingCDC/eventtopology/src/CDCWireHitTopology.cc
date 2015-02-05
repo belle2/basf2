@@ -16,6 +16,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
+#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -31,10 +34,40 @@ CDCWireHitTopology& CDCWireHitTopology::getInstance()
   return *g_wireHitTopology;
 }
 
+CDCWireHitTopology::CDCWireHitTopology() :
+  m_useSimpleTDCCountTranslator(true),
+  m_initialTDCCountTranslator(m_useSimpleTDCCountTranslator ?
+                              static_cast<CDC::TDCCountTranslatorBase*>(new CDC::SimpleTDCCountTranslator()) :
+                              static_cast<CDC::TDCCountTranslatorBase*>(new CDC::RealisticTDCCountTranslator())
+                             )
+{
+}
+
+CDCWireHitTopology::~CDCWireHitTopology()
+{
+  if (m_initialTDCCountTranslator) {
+    delete m_initialTDCCountTranslator;
+    m_initialTDCCountTranslator = nullptr;
+  }
+}
+
+
 size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
 {
-  //clear all wire hits and oriented wire hits that might be left over from the last event
+  // clear all wire hits and oriented wire hits that might be left over from the last event
   clear();
+
+  // Refresh the TDC count translator?
+  if (m_initialTDCCountTranslator) {
+    delete m_initialTDCCountTranslator;
+    m_initialTDCCountTranslator = nullptr;
+  }
+  if (m_useSimpleTDCCountTranslator) {
+    m_initialTDCCountTranslator = new CDC::SimpleTDCCountTranslator();
+  } else {
+    m_initialTDCCountTranslator = new CDC::RealisticTDCCountTranslator();
+  }
+
 
   // get the relevant cdc hits from the datastore
   StoreArray<CDCHit> cdcHits(cdcHitsStoreArrayName);
@@ -51,7 +84,7 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
       B2ERROR("CDCHit.getArrayIndex() produced wrong result. Expected : " << iHit << " Actual : " << hit.getArrayIndex());
     }
 
-    m_wireHits.push_back(CDCWireHit(ptrHit));
+    m_wireHits.push_back(CDCWireHit(ptrHit, m_initialTDCCountTranslator));
 
     const WireID wireID(hit.getID());
     if (wireID.getEWire() != hit.getID()) {

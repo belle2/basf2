@@ -10,6 +10,8 @@
 
 #include "../include/CDCWireHit.h"
 
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
@@ -22,35 +24,12 @@ using namespace TrackFindingCDC;
 
 TRACKFINDINGCDC_SwitchableClassImp(CDCWireHit)
 
-namespace {
-  // Setup instance for the tdc count translation
 
-  SimpleTDCCountTranslator* s_simpleTDCCountTranslator = nullptr;
-  SimpleTDCCountTranslator& getSimpleTDCCountTranslatorInstance()
-  {
-    if (not s_simpleTDCCountTranslator) s_simpleTDCCountTranslator = new SimpleTDCCountTranslator();
-    return *s_simpleTDCCountTranslator;
-  }
-
-
-
-  RealisticTDCCountTranslator* s_realisticTDCCountTranslator = nullptr;
-
-  // Declare function as currently unused to avoid compiler warning
-  RealisticTDCCountTranslator& getRealisticTDCCountTranslatorInstance()  __attribute__((__unused__));
-
-  RealisticTDCCountTranslator& getRealisticTDCCountTranslatorInstance()
-  {
-    if (not s_realisticTDCCountTranslator) s_realisticTDCCountTranslator = new RealisticTDCCountTranslator();
-    return *s_realisticTDCCountTranslator;
-  }
-
-
-  TDCCountTranslatorBase& getTDCCountTranslatorInstance()
-  { return getSimpleTDCCountTranslatorInstance(); }
-  //{ return getRealisticTDCCountTranslatorInstance(); }
-
+TDCCountTranslatorBase& CDCWireHit::getTDCCountTranslator()
+{
+  return CDCWireHitTopology::getInstance().getTDCCountTranslator();
 }
+
 
 
 
@@ -70,7 +49,7 @@ CDCWireHit::CDCWireHit(const CDCWire* wire):
   m_automatonCell(1)
 {;}
 
-CDCWireHit::CDCWireHit(const CDCHit* ptrHit):
+CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslator):
   m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
   m_hit(ptrHit),
   m_refDriftLength(0.0),
@@ -83,7 +62,7 @@ CDCWireHit::CDCWireHit(const CDCHit* ptrHit):
   }
   const CDCHit& hit = *ptrHit;
 
-  TDCCountTranslatorBase& translator = getTDCCountTranslatorInstance();
+  TDCCountTranslatorBase& translator = ptrTranslator ? *ptrTranslator : getTDCCountTranslator();
 
   float initialTOFEstimate = 0;
 
@@ -121,7 +100,7 @@ CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
   m_wire(CDCWire::getInstance(wireID)),
   m_hit(nullptr),
   m_refDriftLength(driftLength),
-  m_refDriftLengthVariance(getSimpleTDCCountTranslatorInstance().getDriftLengthResolution(driftLength, wireID, false, NAN, NAN)),
+  m_refDriftLengthVariance(getTDCCountTranslator().getDriftLengthResolution(driftLength, wireID, false, NAN, NAN)),
   m_automatonCell(1)
 {;}
 

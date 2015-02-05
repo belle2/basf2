@@ -68,7 +68,6 @@ void ProfileModule::event()
   StoreObjPtr<ProfileInfo> profileInfoPtr;
   profileInfoPtr.create(true);
   profileInfoPtr->set(m_timeOffset);
-  m_eventInfo.push_back(MemTime(profileInfoPtr->getMemory(), profileInfoPtr->getTimeInSec()));
   B2DEBUG(100, "Memory usage [MB]: " << profileInfoPtr->getMemory() / 1024);
 
   // Remember profile info at first (+burn in) and last event

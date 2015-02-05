@@ -97,6 +97,13 @@ namespace Belle2 {
     void putModules(const std::list<boost::shared_ptr<Module> >& mlist);
 
     /**
+     * Does this Path contain a module of the given type?
+     *
+     * Useable in Python via '"ModuleType" in path' syntax.
+     */
+    bool contains(std::string moduleType) const;
+
+    /**
      * similar to addPath()/add_path(), this will execute path at the current position, but
      * will run it once for each object in the given array 'foreach', and set the loop variable
      * 'objectName' (a StoreObjPtr of same type as array) to the current object.

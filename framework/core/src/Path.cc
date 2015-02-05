@@ -92,6 +92,15 @@ void Path::forEach(std::string objectName, std::string foreach, PathPtr path)
   addModule(module);
 }
 
+bool Path::contains(std::string moduleType) const
+{
+  const std::list<ModulePtr>& modules = getModules();
+
+  auto sameTypeFunc = [moduleType](ModulePtr m) -> bool { return m->getType() == moduleType; };
+  return std::find_if(modules.begin(), modules.end(), sameTypeFunc) != modules.end();
+}
+
+
 
 //============================================================================
 //                              Private methods
@@ -157,6 +166,7 @@ void Path::exposePythonAPI()
   .def("add_path", &Path::addPath)
   .def("modules", &_getModulesPython)
   .def("for_each", &Path::forEach)
+  .def("__contains__", &Path::contains)
   ;
 
   register_ptr_to_python<PathPtr>();

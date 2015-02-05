@@ -127,7 +127,7 @@ TCanvas* HistogramFactory::PlotStackedBars(TFile* f, const set<string>& componen
   c_barPlot = new TCanvas(canvasName.c_str(), canvasDescription.c_str());
   //THStack and legend
   THStack* hBarStack = new THStack("hBarStack", canvasDescription.c_str());
-  TLegend* hBarLegend = new TLegend(0.6, 0.6, 0.85, 0.85);
+  TLegend* hBarLegend = new TLegend(0.6, 0.6, 0.8, 0.85);
   hBarLegend->SetHeader("Background component");
   hBarLegend->SetBorderSize(0);
   for (auto componentName : componentNames) {
@@ -155,11 +155,74 @@ TCanvas* HistogramFactory::PlotStackedBars(TFile* f, const set<string>& componen
   return c_barPlot;
 }
 
+TCanvas* HistogramFactory::PlotCompareBars(TFile* f1, TFile* f2, const pair<string, string>& categories, const string& componentName, const string& valueName)
+{
+  // Retrieve full value name from the BgValues map
+  string fullValueName(getTitle(valueName));
+  // Make canvas
+  string canvasName("c_comp_" + componentName + valueName);
+  string canvasDescription(fullValueName + ", comparison by layer");
+  TCanvas* c_barPlot = (TCanvas*)gROOT->GetListOfCanvases()->FindObject(canvasName.c_str());
+  if (c_barPlot) delete c_barPlot;
+  c_barPlot = new TCanvas(canvasName.c_str(), canvasDescription.c_str());
+  //TLegend
+  TLegend* hBarLegend = new TLegend(0.6, 0.6, 0.8, 0.75);
+  hBarLegend->SetHeader("Setting:");
+  hBarLegend->SetBorderSize(0);
+  //FIXME: Correct as soon as it is corrected in the MakeBarPlot method.
+  string comp_id(fullValueName + "_" + componentName);
+  std::replace(comp_id.begin(), comp_id.end(), ' ', '_');
+  string histo_name = "hBar_" + comp_id;
+  string histo_title(fullValueName + " for " + componentName);  // keep original component name for legend
+  TH1F* histo1 = (TH1F*)f1->Get(histo_name.c_str());
+  if (!histo1) {
+    cout << "WARNING: First histogram " << histo_name.c_str() << " not found." << endl;
+    return c_barPlot;
+  }
+
+  histo1->SetFillColor(component_colors[componentName]);
+  histo1->SetFillStyle(3001);
+  histo1->SetLineColor(kBlack);
+  histo1->SetBarWidth(c_barwidth);
+  histo1->SetBarOffset(0.5 * (1 - c_barwidth) - 0.5 * c_barwidth);
+  hBarLegend->AddEntry(histo1, categories.first.c_str(), "F");
+
+  TH1F* histo2 = (TH1F*)f2->Get(histo_name.c_str());
+  if (!histo2) {
+    cout << "WARNING: Second histogram " << histo_name.c_str() << " not found." << endl;
+    return c_barPlot;
+  }
+  histo2->SetFillColor(component_colors[componentName]);
+  histo2->SetBarWidth(c_barwidth);
+  histo2->SetLineColor(kBlack);
+  histo2->SetBarOffset(0.5 * (1 - c_barwidth) + 0.5 * c_barwidth);
+  hBarLegend->AddEntry(histo2, categories.second.c_str(), "F");
+
+  c_barPlot->cd();
+  histo1->Draw("B");
+  histo1->GetXaxis()->SetTitle("SVD layer");
+  histo1->GetYaxis()->SetTitle(getAxisLabel(valueName).c_str());
+  double max1 = histo1->GetMaximum();
+  double max2 = histo2->GetMaximum();
+  histo1->GetYaxis()->SetLimits(0, 1.1 * max(max1, max2));
+  histo1->GetYaxis()->SetRangeUser(0, 1.1 * max(max1, max2));
+
+  histo2->Draw("B same");
+  hBarLegend->Draw();
+  string plotTitle(fullValueName + " for " + componentName);
+  histo1->SetTitle(plotTitle.c_str());
+  histo2->SetTitle(plotTitle.c_str());
+  c_barPlot->SetTitle(plotTitle.c_str());
+  c_barPlot->Modified(); c_barPlot->Update();
+  return c_barPlot;
+}
+
+
 TH1F* HistogramFactory::MakeFluencePlot(const string& componentName, const string& valueName, int layer)
 {
   // Retrieve full value name from the BgValues map
   const string fullValueName(getTitle(valueName));
-  string comp_id(fullValueName + "_" + componentName + str(format("_%i") % layer));
+  string comp_id(fullValueName + " for " + componentName + str(format("_%i") % layer));
   std::replace(comp_id.begin(), comp_id.end(), ' ', '_');
   string histo_name = "hStack_" + comp_id;
   string histo_title(componentName);  // keep original component name for legend; will not be used in actual plot anyway.

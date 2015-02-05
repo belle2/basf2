@@ -16,6 +16,7 @@
 #include <TH2F.h>
 #include <THStack.h>
 #include <set>
+#include <utility>
 #include <map>
 #include <string>
 
@@ -97,6 +98,19 @@ namespace Belle2 {
        * @return TCanvas with the stacked bar plot. Transfers ownership.
        */
       TCanvas* PlotStackedBars(TFile* f, const std::set<std::string>& componentNames, const std::string& valueName);
+      /** Plot stacked bar plot comparing a quantity for two categories, taking the bar
+       * plots from two ROOT files.
+       * This makes a complete TCanvas with legends, titles etc.
+       * @param f1 first source TFile object
+       * @param f2 second source TFile object
+       * @param categories the two categories for which comparison is made
+       * @param componentName full beam background component name
+       * @param valueName _short_ name of quantity to plot, as listed with getValueLabel().
+       * @return TCanvas with the stacked bar plot. Transfers ownership.
+       */
+      TCanvas* PlotCompareBars(TFile* f1, TFile* f2, const std::pair<std::string, std::string>& categories,
+                               const std::string& componentName, const std::string& valueName);
+
       /** Make a histogram of value valueName for a beam background component componentName
        * @param componentName _full_ name of the beam background component, as in component_colors
        * @param valueName _short_ name of the quantity to plot, as listed with getAxisLabel().
@@ -113,8 +127,8 @@ namespace Belle2 {
         {"RBB LER", 29},      // greenish
         {"RBB HER", 30},
         {"twoPhoton", 40},      // blue
-        {"SR LER", 25},      // grayish
-        {"SR HER", 28}
+        {"SynchRad LER", 25},      // grayish
+        {"SynchRad HER", 28}
       };
       const char* c_layerlabels[4] = {"3", "4", "5", "6"};
       const float c_barwidth = 0.4;

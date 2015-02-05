@@ -3,6 +3,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <fstream>
+#include <sstream>
+
 
 // IMPORTANT!!!!! OUTSIDE THE RANGE OF THE DATA, THE VALUE IS SET TO THE CLOSEST KNOWN VALUE
 //
@@ -49,12 +51,20 @@ TNiel::TNiel(const string FileName)
   B2INFO("Reading file " << FileName);
 
   int i = 0;
-  while (!inputfile.eof()) {
-    inputfile >> E_nielfactor[i] >> nielfactor[i];
+  string line;
+  while (getline(inputfile, line)) {
+    istringstream iss(line);
+    if (!(iss >> E_nielfactor[i] >> nielfactor[i])) {
+      B2FATAL("Error reading NIEL correction data from " << fullName.c_str());
+      break;
+    }
     i++;
   }
   inputfile.close();
   niel_N = i;
+  B2INFO("INITIALIZED TNIEL FROM " << fullName.c_str());
+  for (int j = 0; j < niel_N; j++)
+    B2DEBUG(100, "E: " << E_nielfactor[j] << " N: " << nielfactor[j]);
 }
 
 double TNiel::getNielFactor(double EMeV)

@@ -20,6 +20,7 @@
 #include "CDCRecoTangentSegment.h"
 #include "CDCRecoFacetSegment.h"
 
+#include "genfit/TrackCand.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -34,16 +35,17 @@ namespace Belle2 {
       /// Empty deconstructor
       ~CDCRecoSegment2D() {;}
 
-      /// Averages the recostructed positions from hits that overlap in adjacent tangents in the given tangent segment
+
+      /// Averages the reconstructed positions from hits that overlap in adjacent tangents in the given tangent segment
       static CDCRecoSegment2D condense(const CDCRecoTangentSegment& recoTangentSegment);
 
-      /// Averages the recostructed positions from hits that overlap in adjacent tangents in the given tangent path
+      /// Averages the reconstructed positions from hits that overlap in adjacent tangents in the given tangent path
       static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoTangent* >& recoTangentPath);
 
-      /// Averages the recostructed positions from hits that overlap in adjacent facets in the given facet segment.
+      /// Averages the reconstructed positions from hits that overlap in adjacent facets in the given facet segment.
       static CDCRecoSegment2D condense(const CDCRecoFacetSegment& recoFacetSegment);
 
-      /// Averages the recostructed positions from hits that overlap in adjacent facet in the given facet path.
+      /// Averages the reconstructed positions from hits that overlap in adjacent facet in the given facet path.
       static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoFacet* >& recoFacetPath);
 
 
@@ -95,6 +97,9 @@ namespace Belle2 {
         }
         return rlWireHitSegment;
       }
+
+      /// Fill the hit content of this segment into a genfit::TrackCand
+      void fillInto(genfit::TrackCand& gfTrackCand) const;
 
       /// Makes a copy of the segment with the reversed hits in the opposite order.
       CDCRecoSegment2D reversed() const {

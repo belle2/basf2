@@ -10,6 +10,10 @@
 
 #include "../include/CDCRecoSegment2D.h"
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -239,4 +243,27 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegm
   CDCRecoFacetSegment recoFacetSegment;
   createRecoFacetSegment(rlWireHitSegment, recoFacetSegment);
   return condense(recoFacetSegment);
+}
+
+
+void CDCRecoSegment2D::fillInto(genfit::TrackCand& gfTrackCand) const
+{
+  // Dummy error estimates
+  SZCovariance szCovariance;
+
+  szCovariance(iSZ, iSZ) = 2.0; // Error in pz double the error in pt, good estimate?
+  szCovariance(iZ0, iSZ) = 0.0;
+  szCovariance(iSZ, iZ0) = 0.0;
+  szCovariance(iZ0, iZ0) = 2.0;
+
+  // A dummy line with no increasing z coordinate
+  double tanLambda = 0.0;
+  double z0 = 0.0;
+  UncertainSZLine uncertainSZLine(tanLambda, z0, szCovariance);
+
+  CDCTrajectorySZ trajectorySZ(uncertainSZLine);
+
+  CDCTrajectory3D trajectory3D(getTrajectory2D(), trajectorySZ);
+  trajectory3D.fillInto(gfTrackCand);
+  fillHitsInto(*this, gfTrackCand);
 }

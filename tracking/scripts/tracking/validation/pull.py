@@ -4,25 +4,13 @@
 from tracking.validation.plot import ValidationPlot, compose_axis_label, \
     root_save_name
 
+# get error function as a np.ufunc vectorised for numpy array
+from tracking.validation.utilities import erf
+
 import math
 import collections
 
 import numpy as np
-
-try:
-    from scipy.special import erf
-except ImportError:
-    # Minimal workaround that only relies on numpy and python 2.7
-    # erf as a vectorized function
-    # Will convert the incoming nparray to dtype 'object', if nin
-    # values are contained
-    # use numpy.asfarray(...) to convert back
-    erf_ufunc = np.frompyfunc(math.erf, 1, 1)
-
-
-    def erf(*args):
-        result = erf_ufunc(*args)
-        return np.asfarray(result)
 
 
 class PullAnalysis:

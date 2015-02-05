@@ -53,6 +53,9 @@ namespace Belle2 {
     /// Parameter: String that states the orientation. Valid orientations are "none" (as generated), "symmetric", "outwards", "downwards".
     std::string m_param_orientationString;
 
+    /// Parameter: Switch if the segments shall be fitted after the generation
+    bool m_param_fitSegments;
+
     /// Parameter: Switch if genfit::TrackCandidates shall be generated for each segment.
     bool  m_param_createGFTrackCands;
 

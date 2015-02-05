@@ -37,13 +37,11 @@ void NtupleMCTruthTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_iTruthID[iProduct] = 0;
-    m_iTruthIDMatch[iProduct] = 0;
 
     const MCParticle* mcparticle = selparticles[iProduct]->getRelatedTo<MCParticle>();
-
-    if (mcparticle) {
+:   if (mcparticle) {
       m_iTruthID[iProduct]      = mcparticle->getPDG();
-      m_iTruthIDMatch[iProduct] = MCMatching::getMCTruthStatus(selparticles[iProduct], mcparticle);
     }
+    m_iTruthIDMatch[iProduct] = MCMatching::getMCTruthStatus(selparticles[iProduct], mcparticle);
   }
 }

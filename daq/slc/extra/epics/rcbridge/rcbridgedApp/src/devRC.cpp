@@ -225,7 +225,6 @@ long write_rc_state_stringout(stringoutRecord *record)
     NSMNode& node(g_callback->getNode());
     node.setState(state);
     try {
-      std::cout << record->name << "=" << record->val << std::endl;
       if (state.isStable()) {
 	g_callback->setCommand(RCCommand::UNKNOWN);
 	scanIoRequest(*g_pvt_request);

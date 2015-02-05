@@ -25,9 +25,9 @@ TEMPLATE_TOP=$(EPICS_BASE)/templates/makeBaseApp/top
 #SNCSEQ=$(EPICS_BASE)/../modules/soft/seq
 
 # EPICS_BASE usually appears last so other apps can override stuff:
-EPICS_BASE=/home/usr/tkonno/epics/base-3.14.12.2
+EPICS_BASE=/home/tkonno/epics/base-3.14.12.2
 
 # Set RULES here if you want to take build rules from somewhere
 # other than EPICS_BASE:
 #RULES=/path/to/epics/support/module/rules/x-y
-SNCSEQ=/home/usr/tkonno/epics/seq-2.1.16
+SNCSEQ=/home/tkonno/epics/seq-2.1.16

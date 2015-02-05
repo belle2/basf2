@@ -152,29 +152,34 @@ void add_ca2nsm(const char* pvname)
 
 void printChidInfo(chid chid, const char* message)
 {
+  /*
   printf("\n%s\n",message);
   printf("pv: %s  type(%d) nelements(%ld) host(%s)",
 	 ca_name(chid),ca_field_type(chid),ca_element_count(chid),
 	 ca_host_name(chid));
   printf(" read(%d) write(%d) state(%d)\n",
 	 ca_read_access(chid),ca_write_access(chid),ca_state(chid));
+  */
 }
 
 void exceptionCallback(struct exception_handler_args args)
 {
+  /*
   chid chid = args.chid;
-  long stat = args.stat; /* Channel access status code*/
+  long stat = args.stat; 
   const char* channel;
   channel = (chid ? ca_name(chid) : g_noname);
   if(chid) printChidInfo(chid, "exceptionCallback");
   printf("exceptionCallback stat %s channel %s\n",
 	 ca_message(stat),channel);
+  */
+  /* Channel access status code*/
 }
 
 void connectionCallback(struct connection_handler_args args)
 {
   chid chid = args.chid;
-  printChidInfo(chid,"connectionCallback");
+  //printChidInfo(chid,"connectionCallback");
 }
 
 void accessRightsCallback(struct access_rights_handler_args args)

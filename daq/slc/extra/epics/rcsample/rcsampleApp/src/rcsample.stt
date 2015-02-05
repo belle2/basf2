@@ -12,62 +12,62 @@ ss rcsample_control
   state NOTREADY {
     entry {
       strcpy(rcstate, "NOTREADY");
-      printf("state = %s\n", rcstate);
+      printf("Updated RC state = %s\n", rcstate);
       pvPut(rcstate);
     }
     when (strcmp(rcrequest, "LOAD") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state LOADING
     when (strcmp(rcrequest, "ABORT") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state ABORTING
   }
 
   state READY {
     entry {
       strcpy(rcstate, "READY");
-      printf("state = %s\n", rcstate);
+      printf("Updated RC state = %s\n", rcstate);
       pvPut(rcstate);
     }
     when (strcmp(rcrequest, "LOAD") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state LOADING
     when (strcmp(rcrequest, "START") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state RUNNING
     when (strcmp(rcrequest, "ABORT") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state ABORTING
   } 
 
   state RUNNING {
     entry {
       strcpy(rcstate, "RUNNING");
-      printf("state = %s\n", rcstate);
+      printf("Updated RC state = %s\n", rcstate);
       pvPut(rcstate);
     }
     when (strcmp(rcrequest, "PAUSE") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state PAUSED
     when (strcmp(rcrequest, "STOP") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state READY
     when (strcmp(rcrequest, "ABORT") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state ABORTING
   }
 
   state PAUSED {
     entry {
       strcpy(rcstate, "PAUSED");
-      printf("state = %s\n", rcstate);
+      printf("Updated RC state = %s\n", rcstate);
       pvPut(rcstate);
     }
     when (strcmp(rcrequest, "RESUME") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state RUNNING
     when (strcmp(rcrequest, "STOP") == 0) {
-      printf("request = %s\n", rcrequest);
+      printf("Got RC request = %s\n", rcrequest);
     } state READY
   }
 
@@ -80,7 +80,7 @@ ss rcsample_control
   state ABORTING {
     entry {
       strcpy(rcstate, "ABORTING");
-      printf("state = %s\n", rcstate);
+      printf("Updated RC state = %s\n", rcstate);
       pvPut(rcstate);
     }
     when () {

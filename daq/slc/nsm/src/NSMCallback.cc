@@ -50,7 +50,6 @@ throw()
     return include();
   } else if (cmd == NSMCommand::VGET) {
     std::string vname = msg.getData();
-    LogFile::debug("VGET %s", vname.c_str());
     NSMVar var(vget(vname));
     if (var.getType() != NSMVar::NONE) {
       var.setName(vname);

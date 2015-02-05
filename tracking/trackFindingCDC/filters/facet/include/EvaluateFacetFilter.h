@@ -14,8 +14,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include "MCFacetFilter.h"
 #include "FacetFilterTree.h"
@@ -25,7 +25,7 @@ namespace Belle2 {
 
     /// Filter for facets using a real facet filter and compares it to the Monte Carlo decision and writing the events to file for analysis.
     template<class RealFacetFilter>
-    class EvaluateFacetFilter {
+    class EvaluateFacetFilter : public BaseFacetFilter {
 
     public:
 
@@ -33,19 +33,19 @@ namespace Belle2 {
       EvaluateFacetFilter();
 
       /** Destructor.*/
-      ~EvaluateFacetFilter();
+      virtual ~EvaluateFacetFilter();
 
       /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
-      CellState isGoodFacet(const CDCRecoFacet& facet);
+      virtual CellWeight isGoodFacet(const CDCRecoFacet& facet) override final;
 
       /// Clears all remember information from the last event
-      void clear();
+      virtual void clear() override final;
 
       /// Forwards the modules initialize to the filter
-      void initialize();
+      virtual void initialize() override final;
 
       /// Forwards the modules initialize to the filter
-      void terminate();
+      virtual void terminate() override final;
 
       /// Getter for the file name the tree shall be written to
       std::string getFileName() const;
@@ -81,6 +81,7 @@ namespace Belle2 {
 
     template<class RealFacetFilter>
     EvaluateFacetFilter<RealFacetFilter>::EvaluateFacetFilter()
+      : BaseFacetFilter()
     {
     }
 

@@ -4,15 +4,6 @@
 from basf2 import *
 
 
-def _has_module(path, module_type):
-    "Check if a module of a given type is already in the path"
-    result = module_type in (e.type() for e in path.modules())
-    if result:
-        B2WARNING("add_simulation: Module '%s' already present in path, "
-                  "skipping" % module_type)
-    return result
-
-
 def check_simulation(path):
     """Check if the minimum number of modules required for simulation are in
     the path and in the correct order"""
@@ -31,11 +22,11 @@ def check_simulation(path):
                 found.append(module.type())
 
     if len(required) != len(found):
-        #Apparently at least one module is missing
+        # Apparently at least one module is missing
         for r in required:
             if r not in found:
                 B2ERROR("No '%s' module found but needed for simulation" % r)
-    #We have all modules but do they have the correct order?
+    # We have all modules but do they have the correct order?
     elif required != found:
         B2ERROR("Simulation modules in wrong order. Should be '%s' but is '%s'"
                 % (", ".join(required), ", ".join(found)))
@@ -47,12 +38,12 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
     """
 
     # geometry parameter database
-    if not _has_module(path, 'Gearbox'):
+    if 'Gearbox' not in path:
         gearbox = register_module('Gearbox')
         path.add_module(gearbox)
 
     # detector geometry
-    if not _has_module(path, 'Geometry'):
+    if 'Geometry' not in path:
         geometry = register_module('Geometry')
         if components:
             geometry.param('components', components)
@@ -70,7 +61,7 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
         path.add_module(bkgmixer)
 
     # detector simulation
-    if not _has_module(path, 'FullSim'):
+    if 'FullSim' not in path:
         g4sim = register_module('FullSim')
         path.add_module(g4sim)
 

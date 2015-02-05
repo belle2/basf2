@@ -108,7 +108,7 @@ const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsign
 
   vector<ChipInfo> vecChipInfo = chipIter->second;
 
-  ChipInfo* pinfo;
+  ChipInfo* pinfo = &vecChipInfo.at(0);
 
   for (std::vector<ChipInfo>::iterator it = vecChipInfo.begin() ; it != vecChipInfo.end(); ++it) {
     ChipInfo& chipInfo = *it;

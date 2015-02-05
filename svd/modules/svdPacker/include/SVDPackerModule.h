@@ -66,7 +66,7 @@ namespace Belle2 {
 
 
       SVDOnlineToOfflineMap* m_map;
-      SVDStripNoiseMap* m_noiseMap;
+      //SVDStripNoiseMap* m_noiseMap;
       std::unordered_map<unsigned short, unsigned short> fadcNumbers;
       short iCRC;
       vector<uint32_t> data_words;

@@ -114,7 +114,7 @@ void SVDUnpackerModule::event()
         //printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
 
         uint32_t* data32_it = data32tab[buf];
-        short fadc, apv, strip, sample[6];
+        short fadc = 255, apv = 63, strip, sample[6];
         vector<uint32_t> crc16vec;
 
         for (; data32_it != &data32tab[buf][nWords[buf]]; data32_it++) {

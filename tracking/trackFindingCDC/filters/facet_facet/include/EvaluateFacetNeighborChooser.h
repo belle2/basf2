@@ -31,16 +31,16 @@ namespace Belle2 {
       EvaluateFacetNeighborChooser();
 
       /// Empty deconstructor
-      ~EvaluateFacetNeighborChooser();
+      virtual ~EvaluateFacetNeighborChooser();
 
       /// Forwards the modules initialize to the filter
-      void initialize();
+      virtual void initialize() override final;
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       virtual NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet, const CDCRecoFacet& neighborFacet) override final;
 
       /// Forwards the modules initialize to the filter.
-      void terminate();
+      virtual void terminate() override final;
 
       /// Getter for the filter to be evaluted.
       RealFacetNeighborChooser& getRealFacetNeighborChooser()

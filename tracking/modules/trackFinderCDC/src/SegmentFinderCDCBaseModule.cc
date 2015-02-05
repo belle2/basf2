@@ -75,7 +75,7 @@ void SegmentFinderCDCBaseModule::event()
   generatedSegments.reserve(90);
   generate(generatedSegments);
 
-  // Now aquire the store vectore
+  // Now aquire the store vector
   StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_segmentsStoreObjName);
   storedRecoSegments.create();
   std::vector<CDCRecoSegment2D>& outputSegments = *storedRecoSegments;
@@ -112,6 +112,14 @@ void SegmentFinderCDCBaseModule::event()
   }
 
   // Put code to generate gf track cands here if requested.
+  if (m_param_createGFTrackCands) {
+    StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_gfTrackCandsStoreArrayName);
+    for (const CDCRecoSegment2D & segment : outputSegments) {
+      genfit::TrackCand* ptrTrackCand = storedGFTrackCands.appendNew();
+      segment.fillInto(*ptrTrackCand);
+    }
+  }
+
 
 
 }

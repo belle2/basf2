@@ -11,46 +11,29 @@
 #ifndef MCAXIALSTEREOSEGMENTPAIRFILTER_H
 #define MCAXIALSTEREOSEGMENTPAIRFILTER_H
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+
+#include "BaseAxialStereoSegmentPairFilter.h"
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to stereo segment pairs based on Monte Carlo information.
-    class MCAxialStereoSegmentPairFilter : public SwitchableRootificationBase {
+    class MCAxialStereoSegmentPairFilter : public BaseAxialStereoSegmentPairFilter {
 
     public:
-
       /// Constructor
-      MCAxialStereoSegmentPairFilter();
-
-      /// Empty destructor
-      ~MCAxialStereoSegmentPairFilter();
-
-    public:
-
-      /// Clears all remember information from the last event
-      void clear();
-
-      /// Forwards the modules initialize to the filter
-      void initialize();
-
-      /// Forwards the modules initialize to the filter
-      void terminate();
+      MCAxialStereoSegmentPairFilter(bool allowReverse = true) : m_allowReverse(allowReverse) {;}
 
       /// Checks if a axial stereo segment pair is a good combination.
-      CellWeight isGoodAxialStereoSegmentPair(const Belle2::TrackFindingCDC::CDCAxialStereoSegmentPair& axialAxialSegmentPair,
-                                              bool allowBackward = false) const;
+      virtual CellWeight isGoodAxialStereoSegmentPair(const Belle2::TrackFindingCDC::CDCAxialStereoSegmentPair& axialAxialSegmentPair) IF_NOT_CINT(override final);
 
     private:
-      /// ROOT Macro to make MCAxialStereoSegmentPairFilter a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(MCAxialStereoSegmentPairFilter, 1);
+      /// Switch to indicate if the reversed version of the facet shall also be accepted (default is true).
+      bool m_allowReverse;
 
     }; // end class MCAxialStereoSegmentPairFilter
-
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

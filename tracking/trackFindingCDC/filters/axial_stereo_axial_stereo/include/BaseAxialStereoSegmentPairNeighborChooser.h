@@ -24,7 +24,6 @@ namespace Belle2 {
     class BaseAxialStereoSegmentPairNeighborChooser {
 
     public:
-
       /// Default constructor
       BaseAxialStereoSegmentPairNeighborChooser() {;}
 
@@ -32,13 +31,13 @@ namespace Belle2 {
       ~BaseAxialStereoSegmentPairNeighborChooser() {;}
 
       /// Clears information from former events
-      inline void clear() const {/*nothing to remember*/;}
+      virtual void clear() {;}
 
       /// Forwards the initialize method from the module
-      void initialize() {;}
+      virtual void initialize() {;}
 
       /// Forwards the terminate method from the module
-      void terminate() {;}
+      virtual void terminate() {;}
 
 
       /// Returns a two iterator range covering the range of possible neighboring axial stereo segment pairs of the given axial stereo segment pair out of the sorted range given by the two other argumets.
@@ -56,10 +55,10 @@ namespace Belle2 {
       }
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      inline NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
-                                           const CDCAxialStereoSegmentPair& neighborAxialStereoSegmentPair __attribute__((unused))) const {
+      virtual NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair&,
+                                            const CDCAxialStereoSegmentPair&) {
 
-        return  -axialStereoSegmentPair.getEndSegment()->size();
+        return NOT_A_NEIGHBOR;
 
       }
     }; // end class

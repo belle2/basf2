@@ -20,40 +20,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-MCAxialStereoSegmentPairFilter::MCAxialStereoSegmentPairFilter()
-{
-
-
-}
-
-MCAxialStereoSegmentPairFilter::~MCAxialStereoSegmentPairFilter()
-{
-
-
-
-}
-
-
-
-void MCAxialStereoSegmentPairFilter::clear()
-{
-}
-
-
-
-void MCAxialStereoSegmentPairFilter::initialize()
-{
-}
-
-
-
-void MCAxialStereoSegmentPairFilter::terminate()
-{
-}
-
-
-
-CellWeight MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair, bool allowBackward) const
+CellWeight MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
@@ -77,7 +44,7 @@ CellWeight MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CD
   ForwardBackwardInfo pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrEndSegment);
   if (pairFBInfo == INVALID_INFO) return NOT_A_CELL;
 
-  if (pairFBInfo == FORWARD or (allowBackward and pairFBInfo == BACKWARD)) {
+  if (pairFBInfo == FORWARD or (m_allowReverse and pairFBInfo == BACKWARD)) {
     // Final check for the distance between the segment
     Index startNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrStartSegment);
     if (startNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;

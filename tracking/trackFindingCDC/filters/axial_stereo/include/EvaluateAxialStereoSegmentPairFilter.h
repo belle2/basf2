@@ -21,29 +21,24 @@ namespace Belle2 {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
     template<class RealAxialStereoSegmentPairFilter>
-    class EvaluateAxialStereoSegmentPairFilter {
+    class EvaluateAxialStereoSegmentPairFilter : public BaseAxialStereoSegmentPairFilter {
 
     public:
-
       /// Constructor setting up an out file and a tree to be filled
       EvaluateAxialStereoSegmentPairFilter();
 
-      /// Deconstructor writing the tree to disk and closing the file
-      ~EvaluateAxialStereoSegmentPairFilter();
-
     public:
-
       /// Clears all remember information from the last event
-      void clear();
+      virtual void clear() override final;
 
       /// Forwards the modules initialize to the filter
-      void initialize();
+      virtual void initialize() override final;
 
       /// Forwards the modules initialize to the filter
-      void terminate();
+      virtual void terminate() override final;
 
       /// Checks if a pair of axial segments is a good combination
-      CellWeight isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
+      virtual CellWeight isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) override final;
 
     private:
       /// Getter for the test filter.
@@ -74,12 +69,6 @@ namespace Belle2 {
 
     template<class RealAxialStereoSegmentPairFilter>
     EvaluateAxialStereoSegmentPairFilter<RealAxialStereoSegmentPairFilter>::EvaluateAxialStereoSegmentPairFilter()
-    {
-    }
-
-
-    template<class RealAxialStereoSegmentPairFilter>
-    EvaluateAxialStereoSegmentPairFilter<RealAxialStereoSegmentPairFilter>::~EvaluateAxialStereoSegmentPairFilter()
     {
     }
 
@@ -118,8 +107,6 @@ namespace Belle2 {
       m_mcAxialStereoSegmentPairFilter.terminate();
 
     }
-
-
 
     template<class RealAxialStereoSegmentPairFilter>
     CellWeight EvaluateAxialStereoSegmentPairFilter<RealAxialStereoSegmentPairFilter>::isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)

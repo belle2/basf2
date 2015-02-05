@@ -22,28 +22,6 @@ SimpleAxialStereoSegmentPairFilter::SimpleAxialStereoSegmentPairFilter() : m_rie
   m_riemannFitter.useOnlyOrientation();
 }
 
-SimpleAxialStereoSegmentPairFilter::~SimpleAxialStereoSegmentPairFilter()
-{
-
-}
-
-
-void SimpleAxialStereoSegmentPairFilter::clear()
-{
-
-}
-
-
-
-void SimpleAxialStereoSegmentPairFilter::initialize()
-{
-}
-
-
-void SimpleAxialStereoSegmentPairFilter::terminate()
-{
-}
-
 
 
 CellWeight SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)

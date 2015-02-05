@@ -14,33 +14,21 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
+#include "BaseAxialStereoSegmentPairFilter.h"
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class SimpleAxialStereoSegmentPairFilter {
+    class SimpleAxialStereoSegmentPairFilter : public BaseAxialStereoSegmentPairFilter {
 
     public:
 
       /// Constructor
       SimpleAxialStereoSegmentPairFilter();
 
-      /// Empty destructor
-      ~SimpleAxialStereoSegmentPairFilter();
-
-    public:
-
-      /// Clears all remember information from the last event
-      void clear();
-
-      /// Forwards the modules initialize to the filter
-      void initialize();
-
-      /// Forwards the modules initialize to the filter
-      void terminate();
-
       /// Checks if a pair of axial segments is a good combination
-      CellWeight isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
+      virtual CellWeight isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) override final;
 
       /// Returns the trajectory of the segment. Also fits it if necessary.
       const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;

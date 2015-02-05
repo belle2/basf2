@@ -23,19 +23,15 @@ namespace Belle2 {
 
     public:
       /** Constructor. */
-      MCAxialStereoSegmentPairNeighborChooser()
+      MCAxialStereoSegmentPairNeighborChooser(bool allowReverse = true) : m_mcAxialStereoSegmentPairFilter(allowReverse)
       {;}
 
-      /** Destructor.*/
-      ~MCAxialStereoSegmentPairNeighborChooser() {;}
-
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      inline NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
-                                           const CDCAxialStereoSegmentPair& neighborAxialStereoSegmentPair) const {
+      virtual NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
+                                            const CDCAxialStereoSegmentPair& neighborAxialStereoSegmentPair) override final {
 
-
-        CellState mcPairWeight = m_mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair);
-        CellState mcNeighborPairWeight = m_mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(neighborAxialStereoSegmentPair);
+        CellWeight mcPairWeight = m_mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair);
+        CellWeight mcNeighborPairWeight = m_mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(neighborAxialStereoSegmentPair);
 
         bool mcDecision = (not isNotACell(mcPairWeight)) and (not isNotACell(mcNeighborPairWeight));
 

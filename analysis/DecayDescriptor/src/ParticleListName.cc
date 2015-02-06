@@ -3,6 +3,8 @@
 
 #include <analysis/utility/EvtPDLUtil.h>
 
+#include <stdexcept>
+
 using namespace Belle2;
 
 std::string ParticleListName::antiParticleListName(const std::string& listName)

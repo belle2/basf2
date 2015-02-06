@@ -100,35 +100,33 @@ namespace Belle2 {
       /** meta functions stored take a const std::vector<std::string>& and return a FunctionPtr. */
       typedef std::function<FunctionPtr(const std::vector<std::string>&)> MetaFunctionPtr;
 #endif
-
-      /** A variable returning a floating-point value for a given Particle. */
-      struct Var {
+      /** Base class for information common to all types of variables. */
+      struct VarBase {
         std::string name; /**< Unique identifier of the function, used as key. */
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
+        VarBase(std::string n, std::string d, std::string g) : name(n), description(d), group(g) { }
+      };
+
+      /** A variable returning a floating-point value for a given Particle. */
+      struct Var : public VarBase {
         FunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : name(n), description(d), group(g), function(f) { }
+        Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
       };
 
       /** A variable taking additional floating-point arguments to influence the behaviour. */
-      struct ParameterVar {
-        std::string name; /**< Unique identifier of the function, used as key. */
-        std::string description; /**< Description of what this function does. */
-        std::string group; /**< Associated group. */
+      struct ParameterVar : public VarBase {
         ParameterFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        ParameterVar(std::string n, ParameterFunctionPtr f, std::string d, std::string g = "") : name(n), description(d), group(g), function(f) { }
+        ParameterVar(std::string n, ParameterFunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
       };
 
       /** A variable taking string arguments returning a variable. */
-      struct MetaVar {
-        std::string name; /**< Unique identifier of the function, used as key. */
-        std::string description; /**< Description of what this function does. */
-        std::string group; /**< Associated group. */
+      struct MetaVar : public VarBase {
         MetaFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        MetaVar(std::string n, MetaFunctionPtr f, std::string d, std::string g = "") : name(n), description(d), group(g), function(f) { }
+        MetaVar(std::string n, MetaFunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
       };
 
       /** get singleton instance. */
@@ -140,10 +138,11 @@ namespace Belle2 {
        */
       const Var* getVariable(const std::string& name);
 
+      /** Return list of all variables (in order registered). */
+      std::vector<const Belle2::Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
+
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 #else
-      /** Return list of all variables (in order registered). */
-      std::vector<const Var*> getVariables() const { return m_variablesInRegistrationOrder; }
 
       /** All variables registered after VARIABLE_GROUP(groupName) will be added to this group. */
       void setVariableGroup(const std::string& groupName);
@@ -167,9 +166,6 @@ namespace Belle2 {
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;
 
-      /** Print list of all variables with description (in order registered). */
-      void printList() const;
-
     private:
       Manager() {};
       /** Copy constructor disabled (not defined). */
@@ -189,7 +185,7 @@ namespace Belle2 {
       std::map<std::string, MetaVar*> m_meta_variables;
 
       /** List of variables in registration order. */
-      std::vector<const Var*> m_variablesInRegistrationOrder;
+      std::vector<const VarBase*> m_variablesInRegistrationOrder;
     };
 
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)

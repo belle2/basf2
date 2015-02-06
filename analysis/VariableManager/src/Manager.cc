@@ -49,7 +49,6 @@ void Variable::Manager::setVariableGroup(const std::string& groupName)
 
 bool Variable::Manager::createVariable(const std::string& name)
 {
-
   boost::match_results<std::string::const_iterator> results;
 
   // Check if name is a simple number
@@ -62,7 +61,6 @@ bool Variable::Manager::createVariable(const std::string& name)
     if (var == nullptr)
       return false;
     m_variables[name] = var;
-    m_variablesInRegistrationOrder.push_back(var);
     return true;
   }
 
@@ -96,7 +94,6 @@ bool Variable::Manager::createVariable(const std::string& name)
       if (var == nullptr)
         return false;
       m_variables[name] = var;
-      m_variablesInRegistrationOrder.push_back(var);
       return true;
 
     }
@@ -109,7 +106,6 @@ bool Variable::Manager::createVariable(const std::string& name)
       if (var == nullptr)
         return false;
       m_variables[name] = var;
-      m_variablesInRegistrationOrder.push_back(var);
       return true;
     }
   }
@@ -159,6 +155,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     }
     B2DEBUG(100, "Registered parameter Variable " << rawName)
     m_parameter_variables[rawName] = var;
+    m_variablesInRegistrationOrder.push_back(var);
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
@@ -181,6 +178,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     }
     B2DEBUG(100, "Registered meta Variable " << rawName)
     m_meta_variables[rawName] = var;
+    m_variablesInRegistrationOrder.push_back(var);
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
@@ -190,43 +188,10 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
 std::vector<std::string> Variable::Manager::getNames() const
 {
   std::vector<std::string> names;
-  for (const Var * var : m_variablesInRegistrationOrder) {
+  for (const VarBase * var : m_variablesInRegistrationOrder) {
     names.push_back(var->name);
   }
   return names;
-}
-
-void Variable::Manager::printList() const
-{
-  std::string group;
-  for (const Var * var : getVariables()) {
-    if (var->group != group) {
-      //group changed, print header
-      std::cout << "\n" << var->group << ":\n";
-      group = var->group;
-    }
-    std::cout << std::setw(14) << var->name << "  " << var->description << std::endl;
-  }
-
-  for (auto & pair : m_parameter_variables) {
-    auto* var = pair.second;
-    if (var->group != group) {
-      //group changed, print header
-      std::cout << "\n" << var->group << ":\n";
-      group = var->group;
-    }
-    std::cout << std::setw(30) << var->name << "  " << var->description << std::endl;
-  }
-
-  for (auto & pair : m_meta_variables) {
-    auto* var = pair.second;
-    if (var->group != group) {
-      //group changed, print header
-      std::cout << "\n" << var->group << ":\n";
-      group = var->group;
-    }
-    std::cout << std::setw(30) << var->name << "  " << var->description << std::endl;
-  }
 }
 
 double Variable::Manager::evaluate(const std::string& varName, const Particle* p)

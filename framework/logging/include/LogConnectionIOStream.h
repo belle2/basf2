@@ -35,6 +35,9 @@ namespace Belle2 {
      */
     LogConnectionIOStream(std::ostream& outputStream, bool color = false);
 
+    /** Returns true if the current terminal is a tty and supports colors. */
+    static bool terminalSupportsColors();
+
     /**
      * The LogConnectionIOStream destructor.
      */

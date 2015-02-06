@@ -15,10 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
-#include <unistd.h> // isatty()
-
 #include <cstdio>
-#include <cstdlib>
 #include <iostream>
 #include <unordered_map>
 #include <functional>
@@ -155,16 +152,7 @@ LogSystem::LogSystem() :
 
   resetMessageCounter();
 
-  //enable color for TTYs with color support (list taken from gtest)
-  const bool isTTY = isatty(fileno(stdout));
-  const string termName = getenv("TERM") ? getenv("TERM") : "";
-  const bool useColor = isTTY and (
-                          termName == "xterm" or
-                          termName == "xterm-color" or
-                          termName == "xterm-256color" or
-                          termName == "linux" or
-                          termName == "cygwin");
-
+  bool useColor = LogConnectionIOStream::terminalSupportsColors();
   addLogConnection(new LogConnectionIOStream(std::cout, useColor));
 
   m_errorLog.reserve(100);

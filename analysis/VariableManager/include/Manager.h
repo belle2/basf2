@@ -166,6 +166,9 @@ namespace Belle2 {
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;
 
+      /** Abort with B2FATAL if name is not a valid name for a variable. */
+      void assertValidName(const std::string& name);
+
     private:
       Manager() {};
       /** Copy constructor disabled (not defined). */

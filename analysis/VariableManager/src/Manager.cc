@@ -42,6 +42,16 @@ const Variable::Manager::Var* Variable::Manager::getVariable(const std::string& 
   return mapIter->second;
 }
 
+void Variable::Manager::assertValidName(const std::string& name)
+{
+  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
+
+  if (!boost::regex_match(name, allowedNameRegex)) {
+    B2FATAL("Variable '" << name << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
+  }
+}
+
+
 void Variable::Manager::setVariableGroup(const std::string& groupName)
 {
   m_currentGroup = groupName;
@@ -121,11 +131,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     B2FATAL("No function provided for variable '" << name << "'.");
   }
 
-  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
-
-  if (!boost::regex_match(name, allowedNameRegex)) {
-    B2FATAL("Variable '" << name << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
-  }
+  assertValidName(name);
 
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
@@ -144,15 +150,11 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     B2FATAL("No function provided for variable '" << name << "'.");
   }
 
-  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
-
   auto mapIter = m_parameter_variables.find(name);
   if (mapIter == m_parameter_variables.end()) {
     ParameterVar* var = new ParameterVar(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
-    if (!boost::regex_match(rawName, allowedNameRegex)) {
-      B2FATAL("Variable '" << rawName << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
-    }
+    assertValidName(rawName);
     B2DEBUG(100, "Registered parameter Variable " << rawName)
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var);
@@ -167,15 +169,11 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     B2FATAL("No function provided for variable '" << name << "'.");
   }
 
-  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
-
   auto mapIter = m_meta_variables.find(name);
   if (mapIter == m_meta_variables.end()) {
     MetaVar* var = new MetaVar(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
-    if (!boost::regex_match(rawName, allowedNameRegex)) {
-      B2FATAL("Variable '" << rawName << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
-    }
+    assertValidName(rawName);
     B2DEBUG(100, "Registered meta Variable " << rawName)
     m_meta_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var);

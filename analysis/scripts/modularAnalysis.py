@@ -51,8 +51,18 @@ def outputUdst(filename, particleLists=[], path=analysis_main):
     """
 
     import reconstruction
+    import ROOT
+    ROOT.gSystem.Load('libanalysis_DecayDescriptor')
+    from ROOT import Belle2
+    # also add anti-particle lists
+    plSet = set(particleLists)
+    for name in particleLists:
+        antiName = Belle2.ParticleListName.antiParticleListName(name)
+        plSet.add(antiName)
+
     partBranches = ['Particles', 'ParticlesToMCParticles',
-                    'ParticlesToPIDLikelihoods'] + particleLists
+                    'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
+                    'EventExtraInfo'] + list(plSet)
     reconstruction.add_mdst_output(path, mc=True, filename=filename,
                                    additionalBranches=partBranches)
 

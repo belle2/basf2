@@ -15,7 +15,6 @@ from modularAnalysis import *
 main = create_path()
 
 main.add_module(register_module('RootInput'))
-main.add_module(register_module('ParticleLoader'))
 
 # Train TMVA Teacher using all electron candidates as input data
 # Select the candidates

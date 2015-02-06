@@ -9,7 +9,6 @@ from modularAnalysis import *
 
 selection_path = create_path()
 selection_path.add_module(register_module('RootInput'))
-selection_path.add_module(register_module('ParticleLoader'))
 fillParticleList('mu+', 'muid > 0.6 and nTracks <= 12', writeOut=True, path=selection_path)
 reconstructDecay('tau+ ->  mu+', '', writeOut=True, path=selection_path)
 matchMCTruth('tau+', path=selection_path)

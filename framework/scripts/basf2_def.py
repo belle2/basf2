@@ -3,7 +3,6 @@
 
 from basf2_env import *
 
-import textwrap
 import os
 from subprocess import Popen, PIPE
 
@@ -35,6 +34,8 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
     first_row_is_heading: header specifies if we should take the first row
                           as table header and offset it a bit
     """
+
+    import textwrap
 
     # figure out how much space we need for each column (without separators)
     act_column_widths = [len(cell) for cell in table[0]]
@@ -101,6 +102,47 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
         if not header_shown and first_row_is_heading:
             print term_width * '-'
             header_shown = True
+
+
+def pretty_print_description_list(rows):
+    """
+    Given a list of 2-tuples, print a nicely formatted description list.
+    Rows with only one entry are interpreted as sub-headings
+    """
+    term_width = get_terminal_width()
+    # indentation width
+    module_width = 15
+    # text wrapper class to format description to terminal width
+    import textwrap
+    wrapper = textwrap.TextWrapper(width=term_width, initial_indent="",
+                                   subsequent_indent=" " * (module_width))
+
+    useColors = LogPythonInterface.terminal_supports_colors()
+
+    def bold(text):
+        """Use ANSI sequence to show string in bold"""
+        if useColors:
+            return '\x1b[1m' + text + '\x1b[0m'
+        return text
+
+    print ''
+    print term_width * '-'
+    # loop over all modules
+    for row in rows:
+        if len(row) == 1:
+            subheading = row[0]
+            print ''
+            print bold(subheading).center(term_width)
+        else:
+            name, description = row
+            # set indent of the first description line to have enough space for the
+            # module name (at least module_width)
+            wrapper.initial_indent = max(module_width, len(name) + 1) * " "
+            # and output a bold module name and the description next to it
+            print bold(name.ljust(module_width - 1)), wrapper.fill(description).lstrip()
+
+    print term_width * '-'
+    print ''
 
 
 def register_module(name, shared_lib_path=None):
@@ -173,13 +215,11 @@ def print_all_modules(moduleList, package=''):
     term_width = get_terminal_width()
 
     table = []
-    max_moduleNameLength = 10
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
         try:
             current_module = register_module(moduleName)
             if package == '' or current_module.package() == package:
-                table.append([moduleName, current_module.description()])
-                max_moduleNameLength = max(max_moduleNameLength, len(moduleName))
+                table.append((moduleName, current_module.description()))
         except:
             B2ERROR('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
@@ -187,14 +227,8 @@ def print_all_modules(moduleList, package=''):
         B2FATAL('Print module information: No module or package named "'
                 + package + '" found!')
 
-    print term_width * '-'
-    print ''
+    pretty_print_description_list(table)
 
-    pretty_print_table(table, [max_moduleNameLength, '*'], first_row_is_heading=False)
-
-    print ''
-    print term_width * '-'
-    print ''
     print 'To show detailed information on a module, including its parameters,'
     print "type \'basf2 -m ModuleName\'. Use \'basf2 -m package\' to only list"
     print 'modules belonging to a given package.'

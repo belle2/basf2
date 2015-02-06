@@ -89,7 +89,7 @@ namespace Belle2 {
 
     public:
       /// Copies the trajectory information to the Genfit track candidate
-      void fillInto(genfit::TrackCand& trackCand) const;
+      bool fillInto(genfit::TrackCand& trackCand) const;
 
 
     public:

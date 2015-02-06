@@ -139,25 +139,26 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
 
 
 
-void CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
+bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
 {
+  // Set the start parameters
   Vector3D position = getSupport();
   Vector3D momentum = getMom3DAtSupport();
-
-  // The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong - took them from Oksana
-  // Currently unused
-  TVector3 posError;
-  posError.SetXYZ(2.0, 2.0, 2.0);
-  TVector3 momError;
-  momError.SetXYZ(0.1, 0.1, 0.5);
-
-  // Set the start parameters
   SignType charge = getChargeSign();
+
+  // Do not propagate invalid fits, signal that the fit is invalid to the caller.
+  if (not isValidSign(charge) or momentum.hasNAN() or position.hasNAN()) {
+    // B2INFO("Charge " <<  charge);
+    // B2INFO("Position " <<  position);
+    // B2INFO("Local origin " <<  getLocalOrigin());
+    // B2INFO("Momentum " <<  momentum);
+    return false;
+  }
+
   gfTrackCand.setPosMomSeed(position, momentum, charge);
 
   // Now translate and set the covariance matrix.
   const UncertainHelix& localHelix = getLocalHelix();
-
 
   const FloatType& impactXY = localHelix.impactXY();
   const Vector2D& tangentialXY = localHelix.tangentialXY();
@@ -228,6 +229,8 @@ void CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
 
   // 3. Forward the covariance matrix.
   gfTrackCand.setCovSeed(cov6);
+
+  return true;
 }
 
 

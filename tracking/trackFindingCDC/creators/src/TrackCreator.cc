@@ -121,8 +121,8 @@ void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegme
     if (not ptrFirstSegmentPair) B2ERROR("Nullptr encounter in CDCAxialStereoSegmentPairTrack");
     const CDCAxialStereoSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
 
-    // Set the start fits of the track to the ones of the first segment
-    track.setStartTrajectory3D(firstSegmentPair.getTrajectory2D(), firstSegmentPair.getTrajectorySZ());
+    // Keep the fit of the first segment pair to set it as the fit at the start of the track
+    CDCTrajectory3D startTrajectory3D = firstSegmentPair.getTrajectory3D();
 
     FloatType perpSOffset = 0.0;
     appendStartRecoHits3D(firstSegmentPair, perpSOffset, track);
@@ -148,17 +148,16 @@ void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegme
     const CDCAxialStereoSegmentPair& lastSegmentPair = *ptrFirstSegmentPair;
     appendEndRecoHits3D(lastSegmentPair, perpSOffset, track);
 
-    // Set the end fits of the track to the ones of the first segment
-    CDCTrajectory2D endTrajectory2D = lastSegmentPair.getTrajectory2D();
-    CDCTrajectorySZ endTrajectorySZ = lastSegmentPair.getTrajectorySZ();
+    // Keep the fit of the last segment pair to set it as the fit at the end of the track
+    CDCTrajectory3D endTrajectory3D = lastSegmentPair.getTrajectory3D();
 
+    // Move the reference point of the start fit to the first observered position
+    startTrajectory3D.setLocalOrigin(track.getStartRecoHit3D().getRecoPos3D());
+    track.setStartTrajectory3D(startTrajectory3D);
 
-    // Set the reference point on the trajectories to the last reconstructed hit
-    FloatType perpSShift = endTrajectory2D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos2D());
-    endTrajectorySZ.passiveMoveS(perpSShift);
-    //Both fits now have the travel distance scale from the last hit as it should be
-    track.setEndTrajectory3D(endTrajectory2D, endTrajectorySZ);
-
+    // Move the reference point of the end fit to the last observered position
+    endTrajectory3D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos3D());
+    track.setEndTrajectory3D(endTrajectory3D);
   }
 
 }

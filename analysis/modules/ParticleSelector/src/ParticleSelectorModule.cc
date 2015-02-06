@@ -12,19 +12,14 @@
 #include <analysis/modules/ParticleSelector/ParticleSelectorModule.h>
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-
-// utilities
-#include <analysis/utility/EvtPDLUtil.h>
 
 using namespace std;
 

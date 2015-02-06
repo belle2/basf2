@@ -14,6 +14,7 @@
 #include <analysis/utility/MCMatching.h>
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
@@ -103,9 +104,9 @@ void PreCutHistMakerModule::initialize()
 
     m_tmpLists.emplace_back(listName);
     m_tmpLists.back().registerInDataStore(DataStore::c_DontWriteOut);
-    bool isSelfConjugated = !(Belle2::EvtPDLUtil::hasAntiParticle(daughterPDG));
-    if (!isSelfConjugated) {
-      std::string antiListName = Belle2::EvtPDLUtil::antiParticleListName(daughterPDG, "HistMaker");
+
+    std::string antiListName = ParticleListName::antiParticleListName(listName);
+    if (listName != antiListName) {
       StoreObjPtr<ParticleList> antiList(antiListName, DataStore::c_Event);
       antiList.registerInDataStore(DataStore::c_DontWriteOut);
     }
@@ -219,14 +220,13 @@ void PreCutHistMakerModule::clearTemporaryLists()
 {
   for (auto & list : m_tmpLists) {
     int pdg = list->getPDGCode();
-    std::string name = list->getParticleListName();
+    std::string name = list.getName();
     list.create(true);
     list->initialize(pdg, name);
 
     //create and bind antiparticle list if necessary
-    bool isSelfConjugated = !(Belle2::EvtPDLUtil::hasAntiParticle(pdg));
-    if (!isSelfConjugated) {
-      std::string antiListName = Belle2::EvtPDLUtil::antiParticleListName(pdg, "HistMaker");
+    std::string antiListName = ParticleListName::antiParticleListName(name);
+    if (name != antiListName) {
       StoreObjPtr<ParticleList> antiParticleList(antiListName);
       antiParticleList.create(true);
       antiParticleList->initialize(-pdg, antiListName);
@@ -323,7 +323,7 @@ void PreCutHistMakerModule::event()
 
     //create temporary input lists (and replace any existing object)
     m_tmpLists[i].create(true);
-    m_tmpLists[i]->initialize(list->getPDGCode(), list->getParticleListName());
+    m_tmpLists[i]->initialize(list->getPDGCode(), list.getName());
     //antiparticle lists are created in clearTemporaryLists(), so this doesn't need to be done here
   }
 

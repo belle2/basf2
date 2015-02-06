@@ -23,7 +23,7 @@
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
 // utilities
-#include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <algorithm>
 
@@ -87,10 +87,8 @@ namespace Belle2 {
     m_pdgCode = mother->getPDGCode();
     m_listName = mother->getFullName();
 
-    m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(
-                                     m_pdgCode));
-    m_antiListName = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode,
-                                                              mother->getLabel());
+    m_antiListName = ParticleListName::antiParticleListName(m_listName);
+    m_isSelfConjugatedParticle = (m_listName == m_antiListName);
 
     // Daughters
     int nProducts = m_decaydescriptor.getNDaughters();

@@ -49,12 +49,12 @@ namespace Belle2 {
      \\ create ParticleList for particles (K+)
      StoreObjPtr<ParticleList> pList("K+:all");
      pList.create();
-     pList->initialize( 321, "K+:all");
+     pList->initialize( 321, pList.getName());
 
      \\ create ParticleList for anti-particles (K-)
      StoreObjPtr<ParticleList> antipList("K-:all");
      antipList.create();
-     antipList->initialize(-321, "K-:all");
+     antipList->initialize(-321, antipList.getName());
 
      \\ bind the two lists together
      pList->bindAntiParticleList(*antipList);

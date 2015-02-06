@@ -25,7 +25,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 // utilities
-#include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/DecayDescriptor/ParticleListName.h>
 
 using namespace std;
 
@@ -83,8 +83,8 @@ namespace Belle2 {
 
     m_pdgCode  = mother->getPDGCode();
 
-    m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
-    m_outputAntiListName       = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
+    m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
+    m_isSelfConjugatedParticle = (m_outputListName == m_outputAntiListName);
 
     // Input lists
     for (const std::string & listName : m_inputListNames) {

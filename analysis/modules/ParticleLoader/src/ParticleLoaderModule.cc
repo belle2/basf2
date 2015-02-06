@@ -30,7 +30,7 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // utilities
-#include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/DecayDescriptor/ParticleListName.h>
 
 using namespace std;
 
@@ -147,8 +147,8 @@ namespace Belle2 {
         if (not isValidPDGCode(pdgCode) and m_useMCParticles == false)
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 
-        bool isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(pdgCode));
-        string antiListName             = Belle2::EvtPDLUtil::antiParticleListName(pdgCode, mother->getLabel());
+        string antiListName = ParticleListName::antiParticleListName(listName);
+        bool isSelfConjugatedParticle = (listName == antiListName);
 
         StoreObjPtr<ParticleList> particleList(listName);
         if (!particleList.isOptional()) {

@@ -38,7 +38,7 @@ namespace Belle2 {
 
 
       /// Copies the hit and trajectory content of this track to the Genfit track candidate
-      void fillInto(genfit::TrackCand& trackCand) const;
+      bool fillInto(genfit::TrackCand& trackCand) const;
 
 
 

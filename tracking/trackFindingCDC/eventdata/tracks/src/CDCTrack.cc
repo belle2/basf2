@@ -19,15 +19,8 @@ using namespace genfit;
 
 TRACKFINDINGCDC_SwitchableClassImp(CDCTrack)
 
-void CDCTrack::fillInto(genfit::TrackCand& trackCand) const
+bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
 {
-  // Translate the trajectory information
-  if (getFBInfo() == BACKWARD) {
-    getEndTrajectory3D().fillInto(trackCand);
-  } else {
-    getStartTrajectory3D().fillInto(trackCand);
-  }
-
   // Add the hits
   if (getFBInfo() == BACKWARD) {
     bool reverseRLInfo = true;
@@ -37,6 +30,15 @@ void CDCTrack::fillInto(genfit::TrackCand& trackCand) const
     bool reverseRLInfo = false;
     fillHitsInto(*this, trackCand, reverseRLInfo);
   }
+
+  // Translate the trajectory information
+  if (getFBInfo() == BACKWARD) {
+    CDCTrajectory3D endTrajectory3D = getEndTrajectory3D().reversed();
+    return endTrajectory3D.fillInto(trackCand);
+  } else {
+    return getStartTrajectory3D().fillInto(trackCand);
+  }
+
 }
 
 

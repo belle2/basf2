@@ -55,6 +55,9 @@ namespace Belle2 {
 
   protected:
 
+    double getBeamEnergyCM(double e1, double e2, double angle);
+
+
     /** Module parameters */
     std::string m_model; /**< model: exp or ps. */
     std::string m_vacPol; /**< Vacuum polarization: off, hadr5 or hmnt. */

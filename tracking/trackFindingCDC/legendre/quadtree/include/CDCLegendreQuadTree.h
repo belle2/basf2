@@ -60,27 +60,25 @@ namespace Belle2 {
 
     class QuadChildren {
     public:
-      typedef boost::multi_array< QuadTree*, 2> ChildrenArray;
-
-      QuadChildren(size_t sizeX = 2, size_t sizeY = 2);
+      QuadChildren();
 
       void apply(std::function<void(QuadTree*)> lmd);
 
       ~QuadChildren();
 
-      void set(size_t x, size_t y, QuadTree* qt) {
+      inline void set(const size_t x, const size_t y, QuadTree* qt) {
         m_children[x][y] = qt;
       }
 
-      QuadTree* get(size_t x, size_t y) {
+      inline QuadTree* get(const size_t x, const size_t y) {
         return m_children[x][y];
       }
+      static constexpr size_t m_sizeX = 2;
+      static constexpr size_t m_sizeY = 2;
 
     private:
 
-      const size_t m_sizeX;
-      const size_t m_sizeY;
-      ChildrenArray m_children;
+      QuadTree* m_children[m_sizeX][m_sizeY];
     };
 
 
@@ -238,15 +236,21 @@ namespace Belle2 {
 
     private:
 
+      /** apply a lambda expression to all children of this tree node */
       void applyToChildren(std::function<void(QuadTree*)>);
+
+      /** Check if we reach limitation on dr and dtheta; returns true when reached limit */
+      bool checkLimitsR();
+
+      static unsigned int s_hitsThreshold;
+      static float s_rThreshold; /**< Threshold on r variable; allows to set threshold on pt of tracks */
+      static int s_lastLevel;
 
       float m_rMin; /**< Lower border of the node (R) */
       float m_rMax; /**< Upper border of the node (R) */
       int m_thetaMin;  /**< Lower border of the node (Theta) */
       int m_thetaMax;  /**< Upper border of the node (Theta) */
       int m_level;  /**< Level of node in the tree */
-//      double Rcell;  /**< Approximate radius of drift cell */
-//      double m_deltaR;  /**< Value of R, when node splitting whould be stopped; currently not used */
 
       std::vector<TrackHit*> m_hits;  /**< Vector of hits which belongs to the node */
 
@@ -254,25 +258,15 @@ namespace Belle2 {
 
       std::vector<QuadTree*> m_neighbors; /**< 8 neighbours of each node (or 5 at borders) */
 
-      //QuadTree*** m_children; /**< Pointers to the children nodes */
+      /** Pointers to the children nodes */
       std::unique_ptr< QuadChildren > m_children;
-
-      bool m_isMaxLevel;  /**< If node is leaf */
 
       FloatBinTuple m_r;          /**< bins range on r */
       IntBinTuple m_thetaBin;      /**< bins range on theta */
       int m_nbins_r;        /**< number of r bins */
       int m_nbins_theta;    /**< number of theta bins */
-      static unsigned int s_hitsThreshold;
-      static float s_rThreshold; /**< Threshold on r variable; allows to set threshold on pt of tracks */
-      static int s_lastLevel;
       bool m_filled; /**< Is the node has been filled with hits */
       bool m_neighborsDefined; /**< Checks whether neighbors of current node has been defined */
-
-
-      /** Check if we reach limitation on dr and dtheta; returns true when reached limit */
-      bool checkLimitsR();
-
 
     };
   }

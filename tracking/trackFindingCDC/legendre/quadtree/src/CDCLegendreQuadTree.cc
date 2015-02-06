@@ -21,10 +21,8 @@ float QuadTree::s_rThreshold;
 int QuadTree::s_lastLevel;
 
 
-QuadChildren::QuadChildren(size_t sizeX , size_t sizeY) : m_sizeX(sizeX), m_sizeY(sizeY),
-  m_children(boost::extents[sizeX][sizeY])
+QuadChildren::QuadChildren()
 {
-
   // initialize to null
   for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {
     for (size_t r_index = 0; r_index < m_sizeY; ++r_index) {
@@ -76,7 +74,6 @@ QuadTree::QuadTree(float rMin, float rMax, int thetaMin, int thetaMax,
     s_rThreshold = 0.15; //whole phase-space;
   }
 
-  m_isMaxLevel = checkLimitsR();
   initialize();
 }
 
@@ -194,15 +191,7 @@ void QuadTree::clearTree()
   m_children.reset(nullptr);
   m_filled = false;
 }
-/*
-void QuadTree::startFillingTree(CandidateProcessorLambda& lmdProcessor)
-{
 
-  std::vector<QuadTree*> nodeList;
-  startFillingTree(false, nodeList, lmdProcessor);
-
-}
-*/
 void QuadTree::startFillingTree(CandidateProcessorLambda& lmdProcessor)
 {
   //std::cout << "startFillingTree with " << m_hits.size() << "hits at level "

@@ -6,19 +6,11 @@ find potential decay channels of future interest that have not yet been consider
 
 USAGE:
 
-1. GENERATION (BS10*)
+1. RUN ONE SKIM JOB (Btag-SkimMdst.py)
+   Provide an input file and output file name for skimming the data. Provide the 0/1 choice for reconstructing all or only most frequent decay modes
+   - basf2 Btag-SkimMdst.py input.root output.root 1
 
-Change the decay mode of the B-sig, if you are interested in a different decay mode. Run these scripts for mdst data generation: 
-   - "basf2 BS101-BBChargedGen.py 1000 output.root" for generating 1000 pairs of charged BB events into output.root file.
-   - "basf2 BS102-BBNeutralGen.py 1000 output.root" for generating 1000 pairs of neutral BB events into output.root file.
 
-1. PRINTOUT (BS201*)
-
-Here you can verify the decay chain:
-   - "basf2 BS201-PrintOutMCParticles.py input.root -n 10" for printing out decay trees for the first 10 events in the input.root file.
-
-2. SKIM (BS30*)
-
-Run these scripts for skimming the original mdst data. This produces a new mdst file, which contains only relevant events.
-   - "basf2 BS301-SkimMdstCharged.py input.root output.root 1" for reconstruction of ALL included decay modes of charged BB pairs (for shorter version run "basf2 BS301-SkimMdstCharged.py 0")
-   - "basf2 BS302-SkimMdstNeutral.py input.root output.root 1" for reconstruction of ALL included decay modes of neutral BB pairs (for shorter version run "basf2 BS302-SkimMdstNeutral.py 0")
+2. RUN MULTIPLE SKIM JOBS (Btag-SkimMdst.py)
+   Provide an input directory for skimming the data. Skimmed files are produced in a new rootFiles/ directory. Provide the 0/1 choice for reconstructing all or only most frequent decay modes
+   - basf2 Btag-SkimMdstJobs.py inputDir 1

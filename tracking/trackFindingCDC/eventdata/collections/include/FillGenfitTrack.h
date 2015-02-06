@@ -55,7 +55,7 @@ namespace Belle2 {
 
         // Check if reversion is requested
         if (reverseRLInfo) {
-          rlInfo = reversed(rlInfo);
+          rlInfo = reversedInfo(rlInfo);
         }
 
         // Note:  rlInfo < 0 means LEFT,   rlInfo > 0 means RIGHT,  which is the same as in Genfit

@@ -37,7 +37,7 @@ namespace Belle2 {
 
     typedef OrientationInfo IncDecInfo; ///< Indicator for increasing or decreasing
     const IncDecInfo INCREASING = 1; ///< Constant for increasing quantity
-    const IncDecInfo CONSTANT = 1; ///< Constant for increasing quantity
+    const IncDecInfo CONSTANT = 0; ///< Constant for constant quantity
     const IncDecInfo DECREASING = -1; ///< Constant for decreasing quantity
 
     typedef OrientationInfo CCWInfo; ///< Indicator for clockwise or counterclockwise orientation
@@ -45,8 +45,12 @@ namespace Belle2 {
     const CCWInfo CW = -1;    ///< Constant for clockwise orientation
 
     /// Return the reversed orientation info. Leaves invalid infos the same.
-    inline OrientationInfo reversed(const OrientationInfo& info)
+    inline OrientationInfo reversedInfo(const OrientationInfo& info)
     { return OrientationInfo(-info); }
+
+    /// Return the reversed orientation info. Leaves invalid infos the same.
+    inline OrientationInfo isValidInfo(const OrientationInfo& info)
+    { return std::abs(info) <= 1; }
 
     /// Combines two orientation informations to their most likely common one
     /** Returns the average of two orientation information like. \n
@@ -56,7 +60,7 @@ namespace Belle2 {
      *  ( 0, 0 ) -> 0 \n
      *  plus the inverse and permutation cases. */
     inline OrientationInfo averageInfo(const OrientationInfo& one, const OrientationInfo& two)
-    { return sign(one + two); }
+    { return isValidInfo(one) and isValidInfo(two) ? sign(one + two) : INVALID_INFO; }
 
     /// Combines three orientation informations to their most likely common one
     /** Returns the average of two orientation information like. \n
@@ -70,8 +74,12 @@ namespace Belle2 {
     inline OrientationInfo averageInfo(
       const OrientationInfo& one,
       const OrientationInfo& two,
-      const OrientationInfo& three
-    ) { return sign(one + two + three); }
+      const OrientationInfo& three)
+    {
+      return isValidInfo(one) and isValidInfo(two) and isValidInfo(three) ?
+             sign(one + two + three) :
+             INVALID_INFO;
+    }
     /**@}*/
 
   }

@@ -38,17 +38,17 @@ BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
   setDescription("Generates radiative Bhabha scattering and exclusive two-photon events with Babayaga.NLO.");
 
   //Parameter definition
-  addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner) or hmnt (Teubner)", std::string("hadr5"));
-  addParam("Model", m_model, "Model: exp or ps", std::string("exp"));
-  addParam("FinalState", m_finalState, "Final state: ee, mm (not recommended) or gg", std::string("ee"));
+  addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner, default) or hmnt (Teubner)", std::string("hadr5"));
+  addParam("Model", m_model, "Model: exp (default) or ps", std::string("exp"));
+  addParam("FinalState", m_finalState, "Final state: ee (default), mm (not recommended) or gg", std::string("ee"));
   addParam("MinEnergyFrac", m_eMinFrac, "Fractional minimum energy for leptons/photons in the final state [fraction of ECMS]", -1.0);
   addParam("MinEnergy", m_eMin, "Minimum energy for leptons/photons in the final state [GeV]", 0.150);
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator [fraction of ECMS/2]", 5.e-4);
   addParam("MaxAcollinearity", m_maxAcollinearity, "Maximum acollinearity angle between finale state leptons/photons [degree]", 180.0);
-  addParam("CMSEnergy", m_cmsEnergy, "CMS energy [GeV]", 10.580);
-  addParam("FMax", m_fMax, "Maximum of differential cross section weight (fmax)", -1.);
+  addParam("CMSEnergy", m_cmsEnergy, "CMS energy [GeV] (default: take from xml)", 0.0);
+  addParam("FMax", m_fMax, "Maximum of differential cross section weight (fmax)", 50000.);
   addParam("SearchMax", m_nSearchMax, "Number of events used to search for maximum of differential cross section", 500000);
-  addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 0);
+  addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 1);
   addParam("ScatteringAngleRange", m_ScatteringAngleRange, "Min [0] and Max [1] value for the scattering angle [deg].", make_vector(15.0, 165.0));
   addParam("ExtraFile", m_fileNameExtraInfo, "ROOT file that contains additional information.", std::string(""));
 
@@ -65,6 +65,9 @@ void BabayagaNLOInputModule::initialize()
 {
   StoreArray<MCParticle>::registerPersistent();
 
+  //Depending on the settings, use the Belle II or Belle boost
+  double ecm = -1.; //center of mass energy, >0 if boost is set
+
   //open extrafile
   if (m_fileNameExtraInfo != "") {
     m_fileExtraInfo = new TFile(m_fileNameExtraInfo.c_str(), "RECREATE") ;
@@ -79,6 +82,10 @@ void BabayagaNLOInputModule::initialize()
 
     m_generator.setBoost(getBoost(her.getDouble("energy"), ler.getDouble("energy"),
                                   her.getDouble("angle") - ler.getDouble("angle"), her.getDouble("angle")));
+
+    //get CMS energy
+    ecm = getBeamEnergyCM(her.getDouble("energy"), ler.getDouble("energy"), her.getDouble("angle") - ler.getDouble("angle"));
+
   } else {
     if (m_boostMode == 2) {
 
@@ -91,12 +98,30 @@ void BabayagaNLOInputModule::initialize()
       double pE  = sqrt(electronBeamEnergy * electronBeamEnergy - 0.000510998918 * 0.000510998918);
       TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP, electronBeamEnergy + positronBeamEnergy);
       m_generator.setBoost(boostVector.BoostVector());
+
+      //get CMS energy
+      ecm = getBeamEnergyCM(electronBeamEnergy, positronBeamEnergy, crossingAngle);
     }
   }
 
   m_generator.enableBoost(m_boostMode > 0);
+
+  //overwrite user setting if boost is enabled!
+  if (m_boostMode) {
+    if (m_cmsEnergy > 0.) { //user has set a cms energy... should not be
+      B2WARNING("CM energy set manually, but boost mode enabled, resetting ECM to " << ecm);
+    }
+    m_generator.setCMSEnergy(ecm);
+
+  } else {
+    if (m_cmsEnergy <= 0. && ecm < 0.) {
+      B2FATAL("CM energy not set: " << m_cmsEnergy);
+    }
+    m_generator.setCMSEnergy(m_cmsEnergy);
+  }
+
   m_generator.setScatAngle(vectorToPair(m_ScatteringAngleRange, "ScatteringAngleRange"));
-  m_generator.setCMSEnergy(m_cmsEnergy);
+//   m_generator.setCMSEnergy(m_cmsEnergy);
   m_generator.setMaxAcollinearity(m_maxAcollinearity);
   m_generator.setFinalState(m_finalState);
   m_generator.setEpsilon(m_epsilon);
@@ -129,6 +154,20 @@ void BabayagaNLOInputModule::event()
   if (m_fileExtraInfo) {
     m_th1dSDif->Fill(m_generator.getSDif(), 1.);
   }
+}
+
+double BabayagaNLOInputModule::getBeamEnergyCM(double E1,
+                                               double E2,
+                                               double crossing_angle)
+{
+
+  double m = Const::electronMass;
+  double ca = cos(crossing_angle);
+
+  double P1 = sqrt(E1 * E1 - m * m);
+  double P2 = sqrt(E2 * E2 - m * m);
+  Double_t Etotcm = sqrt(2.*m * m + 2.*(E1 * E2 + P1 * P2 * ca));
+  return Etotcm;
 }
 
 

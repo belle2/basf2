@@ -57,11 +57,12 @@ main.add_module(register_module('CDCDigitizer'))
 
 mctrackfinder = register_module('TrackFinderMCTruth')
 mctrackfinder.param('UseCDCHits', True)
-mctrackfinder.param('UseClusters', True)
 main.add_module(mctrackfinder)
 
+genfitextrap = register_module('SetupGenfitExtrapolation')
+main.add_module(genfitextrap)
+
 genfit = register_module('GenFitter')
-# genfit.param('UseClusters', True)
 main.add_module(genfit)
 
 # run the events through the dE/dx module

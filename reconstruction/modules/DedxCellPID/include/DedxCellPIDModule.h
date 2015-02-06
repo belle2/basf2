@@ -36,7 +36,7 @@ namespace Belle2 {
    * Outputs a DataStore object (DedxCell), which contains pertinent
    * information for each CDC hit of an associated track.
    *
-   * Adapted from DedxPIDModule
+   * Adapted from dedxPIDModule
    */
   class DedxCellPIDModule : public Module {
 
@@ -91,7 +91,7 @@ namespace Belle2 {
     double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
     double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */
 
-    bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in DedxTrack objects */
+    bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in DedxCell objects */
     string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
 

@@ -69,7 +69,8 @@ DedxCellPIDModule::DedxCellPIDModule() : Module(), m_pdfs()
 
   addParam("enableDebugOutput", m_enableDebugOutput, "Option to write out debugging information to DedxCells (DataStore objects).", false);
 
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r14253_400k.root"));
+  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r14253_400k_events_including_deuterons.root"));
+
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;

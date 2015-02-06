@@ -16,9 +16,15 @@ from basf2 import *
 from modularAnalysis import inputMdst
 from modularAnalysis import printPrimaryMCParticles
 from modularAnalysis import analysis_main
+import sys
+
+if len(sys.argv) != 2:
+    sys.exit('Must provide enough arguments: [input file name]')
+
+inputName = sys.argv[1]
 
 # load input ROOT file. First you must produce these files!
-inputMdst('BS102-BBNeutralGen.root')
+inputMdst(inputName)
 
 # print out the contents of the StoreArray<MCParticle>
 printPrimaryMCParticles()

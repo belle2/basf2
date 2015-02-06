@@ -34,16 +34,19 @@ from imp_cc_decayRec import *
 from imp_BN_decayRec import *
 import sys
 
-# input parameters: e.g. basf2 BS302-SkimMdstNeutral.py 0
+# input parameters: e.g. basf2 BS302-SkimMdstNeutral.py input.root output.root 0
 # "0": include only most common decay modes
 # "1": include all written decay modes
 
-if len(sys.argv) != 2:
-    sys.exit('Must provide argument enough')
+if len(sys.argv) != 4:
+    sys.exit('Must provide enough arguments: [input file name(s)] [output file name] [0/1]'
+             )
 
-recLong = sys.argv[1]
+inputNames = sys.argv[1]
+outputName = sys.argv[2]
+recLong = sys.argv[3]
 
-inputFiles = ['BS102-BBNeutralGen.root']
+inputFiles = [inputNames]
 
 # load files
 inputMdstList(inputFiles)
@@ -108,7 +111,7 @@ analysis_main.add_module(skim)
 
 # save event to a new mdst file if it contained at least one B-tag meson
 new_analysis_main = create_path()
-add_mdst_output(new_analysis_main, True, 'BS302-SkimMdstNeutral.root')
+add_mdst_output(new_analysis_main, True, outputName)
 skim.if_true(new_analysis_main, AfterConditionPath.CONTINUE)
 
 # print out some further info

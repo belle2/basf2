@@ -9,17 +9,16 @@ USAGE:
 1. GENERATION (BS10*)
 
 Change the decay mode of the B-sig, if you are interested in a different decay mode. Run these scripts for mdst data generation: 
-   - "basf2 BS101-BBChargedGen.py 1000" for generating 1000 pairs of charged BB events.
-   - "basf2 BS102-BBNeutralGen.py 1000" for generating 1000 pairs of neutral BB events.
+   - "basf2 BS101-BBChargedGen.py 1000 output.root" for generating 1000 pairs of charged BB events into output.root file.
+   - "basf2 BS102-BBNeutralGen.py 1000 output.root" for generating 1000 pairs of neutral BB events into output.root file.
 
-1. PRINTOUT (BS20*)
+1. PRINTOUT (BS201*)
 
 Here you can verify the decay chain:
-   - "basf2 BS201-PrintOutMCParticlesCharged.py -n 10" for printing out decay trees of the first 10 events of charged BB events.
-   - "basf2 BS202-PrintOutMCParticlesNeutral.py -n 10" for printing out decay trees of the first 10 events of neutral BB events.
+   - "basf2 BS201-PrintOutMCParticles.py input.root -n 10" for printing out decay trees for the first 10 events in the input.root file.
 
 2. SKIM (BS30*)
 
 Run these scripts for skimming the original mdst data. This produces a new mdst file, which contains only relevant events.
-    - "basf2 BS301-SkimMdstCharged.py 1" for reconstruction of ALL included decay modes of charged BB pairs (for shorter version run "basf2 BS301-SkimMdstCharged.py 0")
-    - "basf2 BS302-SkimMdstNeutral.py 1" for reconstruction of ALL included decay modes of neutral BB pairs (for shorter version run "basf2 BS302-SkimMdstNeutral.py 0")
+   - "basf2 BS301-SkimMdstCharged.py input.root output.root 1" for reconstruction of ALL included decay modes of charged BB pairs (for shorter version run "basf2 BS301-SkimMdstCharged.py 0")
+   - "basf2 BS302-SkimMdstNeutral.py input.root output.root 1" for reconstruction of ALL included decay modes of neutral BB pairs (for shorter version run "basf2 BS302-SkimMdstNeutral.py 0")

@@ -105,10 +105,11 @@ namespace Belle2 {
 
         //create the gftracks
         for (const CDCTrack & track : m_tracks) {
-          genfit::TrackCand* ptrTrackCand = storedGFTrackCands.appendNew();
-          track.fillInto(*ptrTrackCand);
+          genfit::TrackCand gfTrackCand;
+          if (track.fillInto(gfTrackCand)) {
+            storedGFTrackCands.appendNew(gfTrackCand);
+          }
         }
-
 
         if (m_copyToDataStoreForDebug) {
           copyToDataStoreForDebug();

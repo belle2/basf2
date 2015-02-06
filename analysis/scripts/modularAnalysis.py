@@ -48,6 +48,7 @@ def outputMdst(filename, path=analysis_main):
 def outputUdst(filename, particleLists=[], path=analysis_main):
     """
     Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
+    The charge-conjugate lists of those given in particleLists are also stored.
     """
 
     import reconstruction
@@ -638,7 +639,7 @@ def fitVertex(
     @param path         modules are added to this path
     """
 
-    if 'Geometry' in [m.name() for m in path.modules()]:
+    if 'Geometry' in path:
         B2INFO('fitVertex: Geometry already in path')
     else:
         geometry = register_module('Geometry')
@@ -1005,7 +1006,7 @@ def TagV(
     @param path      modules are added to this path
     """
 
-    if 'Geometry' in [m.name() for m in path.modules()]:
+    if 'Geometry' in path:
         B2INFO('TagV: Geometry already in path')
     else:
         geometry = register_module('Geometry')
@@ -1068,7 +1069,8 @@ def calibratePhotonEnergy(list_name, path=analysis_main):
 
 def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
     """
-    Description: Removes all Particles that are not in a given list of ParticleLists (or daughters of those). All relations from/to Particles, daughter indices, and other ParticleLists are fixed.
+    Removes all Particles that are not in a given list of ParticleLists (or daughters of those).
+    All relations from/to Particles, daughter indices, and other ParticleLists are fixed.
 
     @param lists_to_keep Keep the Particles and their daughters in these ParticleLists.
     @param path      modules are added to this path

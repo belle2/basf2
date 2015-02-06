@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <boost/range/irange.hpp>
 
 #include <gtest/gtest.h>
 
@@ -17,6 +18,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+using boost::irange;
 
 TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosMomCharge)
 {
@@ -77,4 +79,56 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
 
   lineSZ.setNull();
   EXPECT_TRUE(lineSZ.isNull());
+}
+
+
+TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
+{
+  Vector3D expectedMomentum(1.0, 0.0, 0.0);
+  Vector3D expectedPosition(0.0, 1.0, 0.0);
+  SignType expectedCharge = PLUS;
+
+  genfit::TrackCand expectedGFTrackCand;
+  expectedGFTrackCand.setPosMomSeed(expectedPosition,
+                                    expectedMomentum,
+                                    expectedCharge);
+
+  TMatrixDSym expectedCov6(6);
+  expectedCov6.Zero();
+  expectedCov6(0, 0) = 0; // There cannot be a covariance in the x direction since the direction along the track has no constraint.
+  expectedCov6(1, 1) = 2;
+  expectedCov6(2, 2) = 3;
+  expectedCov6(3, 3) = 4;
+  expectedCov6(4, 4) = 5;
+  expectedCov6(5, 5) = 6;
+  expectedGFTrackCand.setCovSeed(expectedCov6);
+
+
+  CDCTrajectory3D trajectory3D(expectedGFTrackCand);
+
+  genfit::TrackCand gfTrackCand;
+  trajectory3D.fillInto(gfTrackCand);
+
+  Vector3D position = gfTrackCand.getPosSeed();
+  Vector3D momentum = gfTrackCand.getMomSeed();
+  SignType charge = gfTrackCand.getChargeSeed();
+  TMatrixDSym cov6 = gfTrackCand.getCovSeed();
+
+
+  EXPECT_NEAR(expectedPosition.x(), position.x(), 10e-7);
+  EXPECT_NEAR(expectedPosition.y(), position.y(), 10e-7);
+  EXPECT_NEAR(expectedPosition.z(), position.z(), 10e-7);
+
+  EXPECT_NEAR(expectedMomentum.x(), momentum.x(), 10e-7);
+  EXPECT_NEAR(expectedMomentum.y(), momentum.y(), 10e-7);
+  EXPECT_NEAR(expectedMomentum.z(), momentum.z(), 10e-7);
+
+  EXPECT_EQ(expectedCharge, charge);
+
+  for (int i : irange(0, 5)) {
+    for (int j : irange(0, 5)) {
+      EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 10e-7);
+    }
+  }
+
 }

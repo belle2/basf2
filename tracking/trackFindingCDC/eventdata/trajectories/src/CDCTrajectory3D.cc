@@ -162,8 +162,8 @@ void CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
   const FloatType& impactXY = localHelix.impactXY();
   const Vector2D& tangentialXY = localHelix.tangentialXY();
 
-  const FloatType& sinPhi0 = tangentialXY.x();
-  const FloatType& cosPhi0 = tangentialXY.y();
+  const FloatType& cosPhi0 = tangentialXY.x();
+  const FloatType& sinPhi0 = tangentialXY.y();
 
   const FloatType& curvatureXY = localHelix.curvatureXY();
   const FloatType& tanLambda = localHelix.tanLambda();

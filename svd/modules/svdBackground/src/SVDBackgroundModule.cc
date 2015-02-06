@@ -291,9 +291,9 @@ void SVDBackgroundModule::event()
     // Fluency plots are by component and are deposition histograms for a particular type of particle and compoonent.
     // Special treatment of corrupt p's in TrueHits:
     TVector3 hitMomentum(hit.getMomentum());
-    hitMomentum.SetX(isfinite(hitMomentum.X()) ? hitMomentum.X() : 0.0);
-    hitMomentum.SetY(isfinite(hitMomentum.Y()) ? hitMomentum.Y() : 0.0);
-    hitMomentum.SetZ(isfinite(hitMomentum.Z()) ? hitMomentum.Z() : 0.0);
+    hitMomentum.SetX(std::isfinite(hitMomentum.X()) ? hitMomentum.X() : 0.0);
+    hitMomentum.SetY(std::isfinite(hitMomentum.Y()) ? hitMomentum.Y() : 0.0);
+    hitMomentum.SetZ(std::isfinite(hitMomentum.Z()) ? hitMomentum.Z() : 0.0);
     int pdg = abs(simhit->getPDGcode());
     double kineticEnergy(0.0);
     double nielWeight(0.0);
@@ -345,7 +345,7 @@ void SVDBackgroundModule::event()
     }
 
     // Only set weight for supported particles
-    nielWeight = isfinite(nielWeight) ? nielWeight : 0.0;
+    nielWeight = std::isfinite(nielWeight) ? nielWeight : 0.0;
     bData.m_sensorData[currentSensorID].m_neutronFlux += nielWeight * stepLength / currentSensorThickness / currentSensorArea / currentComponentTime * c_smy;
 
     // Store data in a SVDNeutronFluxEvent object

@@ -42,6 +42,3 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 # Create default framework, also initialises environment
 fw = Framework()
-
-print '>>> basf2 Python environment set'
-print '>>> Framework object created: fw'

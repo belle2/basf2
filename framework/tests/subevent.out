@@ -1,6 +1,4 @@
 [INFO] Steering file: framework/tests/subevent.py
->>> basf2 Python environment set
->>> Framework object created: fw
 [EventInfoSetter -> ParticleGun -> for_each(MCParticle : MCParticles) -> PrintCollections]
 [INFO] ========================================================================
 [INFO] >>> Start new run: 0

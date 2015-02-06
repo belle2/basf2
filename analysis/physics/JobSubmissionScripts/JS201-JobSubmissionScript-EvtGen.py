@@ -18,14 +18,28 @@
 import os
 import sys
 
+if len(sys.argv) != 5:
+    sys.exit('Must provide enough arguments: [# of jobs] [# of events per job] [decay file] [output file name]'
+             )
+
+noJobs = int(sys.argv[1])
+noEvents = int(sys.argv[2])
+decFile = sys.argv[3]
+outputName = sys.argv[4]
+
 logDirectory = 'log/'
 if not os.path.exists(logDirectory):
     os.makedirs(logDirectory)
 
+if outputName.endswith('.root'):
+    outputName = outputName[:-5]
+
 # in each loop create a specific command string
-for x in range(0, 10):
-    logFile = logDirectory + 'JS202-JobSubmissionScript-' + str(x) + '.log'
-    command = 'bsub -q s -o ' + logFile + ' basf2 JS101-SteeringFile.py ' \
-        + str(x)
+for x in range(0, noJobs):
+    logFile = logDirectory + 'JS201-JobSubmissionScript-EvtGen-' + str(x) \
+        + '.log'
+    command = 'bsub -q s -o ' + logFile \
+        + ' basf2 JS101-SteeringFile-EvtGen.py ' + str(noEvents) + ' ' \
+        + decFile + ' ' + outputName + '-' + str(x) + '.root'
     print command  # this prints out the command
     os.system(command)  # this evaluates it in the terminal

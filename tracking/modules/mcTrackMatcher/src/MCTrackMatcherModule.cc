@@ -208,7 +208,12 @@ void MCTrackMatcherModule::event()
   B2DEBUG(100, "Number patter recognition tracks is " << nPRTrackCands);
   B2DEBUG(100, "Number Monte-Carlo tracks is " << nMCTrackCands);
 
-
+  if (not nMCTrackCands or not nPRTrackCands) {
+    // Neither no pattern recognition tracks
+    // or no Monte Carlo tracks are present in this event
+    // Cannot perform matching.
+    return;
+  }
 
   //### Build a detector_id hit_id to trackcand map for easier lookup later ###
   typedef int DetId;

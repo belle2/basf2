@@ -19,7 +19,7 @@ namespace Belle2 {
 
     /// Type transporting a sign
     typedef signed short SignType;
-    //typedef signed char SignType; // This can be used for performance maximization but makes lousy outpu
+    //typedef signed char SignType; // This can be used for performance maximization but makes lousy output
 
     /// Constant for plus sign.
     const SignType PLUS = 1;

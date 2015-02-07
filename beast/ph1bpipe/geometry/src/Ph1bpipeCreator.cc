@@ -220,6 +220,7 @@ namespace Belle2 {
                                        content.getLength("xpipe_hz")*CLHEP::cm,
                                        startAngle, spanningAngle);
       double innerRadiusTiN = content.getLength("xpipe_innerRadius") * CLHEP::cm - 200 * 1e-7 * CLHEP::cm;
+      cout << "innerRadiusTiN " << innerRadiusTiN* CLHEP::cm << " cm w/o CLHEP " << innerRadiusTiN << " cm outerRadius " << content.getLength("xpipe_innerRadius")*CLHEP::cm << endl;
       G4VSolid* s_Xshape1TiN = new G4Tubs("s_Xshape1TiN",
                                           innerRadiusTiN,
                                           content.getLength("xpipe_innerRadius")*CLHEP::cm,
@@ -294,7 +295,9 @@ namespace Belle2 {
       new G4PVPlacement(transform_X, l_X, "p_X", &topVolume, false, 1);
       transform_X = transform_X * G4RotateY3D(0.083 * CLHEP::rad);
       new G4PVPlacement(transform_X, l_TiN, "p_TiN", &topVolume, false, 1);
-
+      //transform_X = G4Translate3D(0, 0, 0);
+      //transform_X = transform_X * G4RotateY3D(-0.083 / 2. * CLHEP::rad);
+      //new G4PVPlacement(transform_X, l_TiN, "p_TiN", &topVolume, false, 1);
     }
   } // ph1bpipe namespace
 } // Belle2 namespace

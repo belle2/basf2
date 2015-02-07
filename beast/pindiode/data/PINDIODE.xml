@@ -19,7 +19,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-10.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -27,7 +27,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-10.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -35,7 +35,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-10.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -43,7 +43,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-10.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -51,7 +51,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-8.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -59,7 +59,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-8.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -67,7 +67,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-8.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -75,7 +75,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-8.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -83,7 +83,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-6.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -91,7 +91,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-6.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -99,7 +99,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-6.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -107,7 +107,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-6.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -115,7 +115,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-4.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -123,7 +123,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-4.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -131,7 +131,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-4.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -139,7 +139,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-4.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -147,7 +147,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-2.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -155,7 +155,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-2.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -163,7 +163,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-2.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -171,7 +171,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-2.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -179,7 +179,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -187,7 +187,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -195,7 +195,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -203,7 +203,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -212,7 +212,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">10.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -220,7 +220,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">10.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -228,7 +228,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">10.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -236,7 +236,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">10.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -244,7 +244,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">8.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -252,7 +252,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">8.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -260,7 +260,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">8.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -268,7 +268,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">8.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -276,7 +276,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">6.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -284,7 +284,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">6.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -292,7 +292,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">6.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -300,7 +300,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">6.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -308,7 +308,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">4.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -316,7 +316,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">4.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -324,7 +324,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">4.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -332,7 +332,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">4.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -340,7 +340,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">2.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -348,7 +348,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">2.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -356,7 +356,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">2.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -364,7 +364,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">2.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -374,7 +374,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-100.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">36.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -382,7 +382,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-100.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">36.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -390,7 +390,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-100.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">36.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -398,7 +398,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">-100.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">36.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>
@@ -406,7 +406,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">166.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">36.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
    </Active>
@@ -414,7 +414,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">166.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">36.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">90.0</Phi>
    </Active>
@@ -422,7 +422,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">166.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">36.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">-90.0</Phi>
    </Active>
@@ -430,7 +430,7 @@
     <Active>
       <Material>PINDIODE-Material</Material>
       <z_pindiode unit="cm">166.0</z_pindiode>
-      <r_pindiode unit="cm">4.8</r_pindiode>
+      <r_pindiode unit="cm">36.8</r_pindiode>
       <ThetaZ unit="deg">180.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
    </Active>

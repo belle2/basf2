@@ -2,11 +2,38 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from ROOT import Belle2
 import os
 import sys
 import math
 import string
 import datetime
+
+
+class PyTrigger(Module):
+
+    """Returns 1 if current event contains at least one BEAST hit, 0 otherwise"""
+
+    def initialize(self):
+        """reimplementation of Module::initialize()."""
+
+    def event(self):
+        """reimplementation of Module::event()."""
+
+        self.return_value(0)
+        mcparticles = Belle2.PyStoreArray('MCParticles')
+        for p in mcparticles:
+            print
+            if len(p.getRelationsTo('MicrotpcSimHits')) > 0 \
+                or len(p.getRelationsTo('He3tubeSimHits')) > 0 \
+                or len(p.getRelationsTo('PindiodeSimHits')) > 0 \
+                or len(p.getRelationsTo('BgoSimHits')) > 0 \
+                or len(p.getRelationsTo('CsiSimHits')) > 0:
+#                B2INFO('found a Beast!')
+                self.return_value(1)
+
+                break
+
 
 d = datetime.datetime.today()
 print d.strftime('job start: %Y-%m-%d %H:%M:%S\n')
@@ -44,13 +71,16 @@ if name.find('far') != -1:
 else:
     range = 400
 
+# inputfilename = 'phase1_fullsim2/' +  name  + '.root'
 inputfilename = 'forIgal/' + name + '.root'
 logfilename = 'log/' + name + '_' + num + '.log'
-outputfilename = 'output/phase1_' + name + '_' + num + '.root'
+outputfilename = 'output/out_phase1_pos_TiN_' + name + '_' + num + '.root'
 seed = '1' + num + num + '1'
 
 # readouttime  [ns]
-readouttime = 1000  # [ns]
+### good readouttime = 100000 #[ns]
+readouttime = 100000  # [ns]
+# readouttime = 1000 #[ns]
 nevent = 10000000
 # overwrite below
 # note that nevent for RBB sample should not exceed the
@@ -175,6 +205,7 @@ touschekinput.param('Range', range)
 ## which are required for the simulation.
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
+gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
 fullsim = register_module('FullSim')
 
 param_fullsim = {'RegisterOptics': 1, 'PhotonFraction': 0.3}
@@ -190,7 +221,6 @@ fullsim.param('SecondariesEnergyCut', 0.0)  # in MeV
 # fullsim.set_log_level(LogLevel.DEBUG)
 
 ## Add additional modules according to your own needs
-# pxddigi   = register_module('PXDDigitizer')
 progress = register_module('Progress')
 
 ## Write the output to a file
@@ -198,7 +228,13 @@ rootoutput = register_module('RootOutput')
 rootoutput.param('outputFileName', outputfilename)
 rootoutput.param('updateFileCatalog', False)
 # rootoutput.param('branchNames', ["BeamBackHits"])
-# output.param('branchNames', ["BeamBackHits","EKLMStepHits"])
+# routoutput.param('branchNames', ["BeamBackHits","EKLMStepHits"])
+# rootoutput.param('branchNames', ["BgoSimHits","MicrotpcSimHits","PindiodeSimHits","He3tubeSimHits","BeamBackHits","MCParticles"])
+# rootoutput.param('branchNames', ["BgoSimHits","MicrotpcSimHits","PindiodeSimHits","He3tubeSimHits","CsiSimHits","MCParticles"])
+# rootoutput.param('branchNames', ["BgoSimHits","MicrotpcSimHits","PindiodeSimHits","He3tubeSimHits","CsiSimHits"])
+# rootoutput.param('branchNames', ["BgoSimHits","MicrotpcSimHits","PindiodeSimHits","He3tubeSimHits","CsiSimHits","MCParticles"])
+rootoutput.param('branchNames', ['BgoSimHits', 'MicrotpcSimHits',
+                 'PindiodeSimHits', 'He3tubeSimHits', 'CsiSimHits'])
 
 ## Create the main path and add the required modules
 main = create_path()
@@ -208,7 +244,24 @@ main.add_module(touschekinput)
 main.add_module(geometry)
 main.add_module(fullsim)
 main.add_module(progress)
+########################################
+# simulation is done now, so we'll put the PyTrigger module here
+##trigger = PyTrigger()
+##main.add_module(trigger)
+
+# if PyTrigger returns 0, we'll jump into an empty path
+# (skipping further modules in 'main': Beast2 SimHits)
+##emptypath = create_path()
+##trigger.if_false(emptypath)
+########################################
 main.add_module(rootoutput)
+
+# he3digi = register_module('He3Digitizer')
+# main.add_module(he3digi)
+# sampletime=10000
+# he3tube = register_module('He3tube')
+# he3tube.param('sampleTime', sampletime);
+# main.add_module(he3tube)
 
 process(main)
 

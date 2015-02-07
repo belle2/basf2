@@ -3,7 +3,6 @@
 
 """
 <header>
-  <output>SVDEtaDistributionData.root</output>
   <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
   <description>
 ....This module is part of the SVD validation suite. It creates 

@@ -3,7 +3,6 @@
 
 """
 <header>
-  <output>SVDClusterPullData.root</output>
   <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
   <description>
 ....This module is part of the SVD validation suite. It creates 
@@ -20,13 +19,15 @@ import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
 
+import time
+
 # Define a ROOT struct to hold output data in the TTree.
 gROOT.ProcessLine('struct ClusterData {\
-	float clusterPosition;\
-	float clusterPositionSigma;\
-	float truehitPosition;\
-	float pull;\
-};'
+		float clusterPosition;\
+		float clusterPositionSigma;\
+		float truehitPosition;\
+		float pull;\
+		};'
                   )
 
 from ROOT import ClusterData
@@ -56,8 +57,8 @@ class SVDClusterPull(Module):
                 self.Vtree.Branch(key, AddressOf(self.data, key), key
                                   + formstring)
 
-    def beginRun(self):
-        """ Does nothing """
+                def beginRun(self):
+                    """ Does nothing """
 
     def event(self):
         """Find clusters and save needed information."""

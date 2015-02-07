@@ -3,7 +3,9 @@
 
 """
 <header>
-  <output>SVDGenData.root</output>
+  <output>SVDClusterPullData.root</output>
+  <output>SVDEtaDistributionData.root</output>
+  <output>SVDEnergyLossData.root</output>
   <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
   <description>This steering file is an SVD test.</description>
 </header>
@@ -51,7 +53,7 @@ particlegun.param({  # Generate 5 tracks (on average)
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
 # specify number of events to be generated
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -77,8 +79,8 @@ svdetadistribution = SVDEtaDistribution()
 svdenergyloss = SVDEnergyLoss()
 
 # Save to a ROOT file
-rootoutput = register_module('RootOutput')
-rootoutput.param('outputFileName', 'SVDGenData.root')
+# rootoutput = register_module('RootOutput')
+# rootoutput.param('outputFileName', 'SVDGenData.root')
 
 # ============================================================================
 # create processing path
@@ -91,10 +93,10 @@ main.add_module(geometry)
 main.add_module(fullsim)
 main.add_module(svddigitizer)
 main.add_module(svdclusterizer)
+# main.add_module(rootoutput)
 main.add_module(svdclusterpull)
 main.add_module(svdetadistribution)
 main.add_module(svdenergyloss)
-main.add_module(rootoutput)
 
 process(main)
 

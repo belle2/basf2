@@ -3,7 +3,6 @@
 
 """
 <header>
-  <output>SVDEnergyLossData.root</output>
   <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
   <description>This steering file is an SVD test.</description>
 </header>

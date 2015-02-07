@@ -13,13 +13,12 @@
 """
 
 from basf2 import *
+import SensorType
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
-
-import time
 
 # Define a ROOT struct to hold output data in the TTree.
 gROOT.ProcessLine('struct ClusterData {\
@@ -42,8 +41,18 @@ class SVDClusterPull(Module):
         ## Output ROOT file.
         self.file = ROOT.TFile('SVDClusterPullData.root', 'recreate')
         ## TTree for output data
-        self.Utree = ROOT.TTree('Utree', 'Cluster data for U direction')
-        self.Vtree = ROOT.TTree('Vtree', 'Cluster data for V direction')
+        self.Layer3Utree = ROOT.TTree('Layer3Utree',
+                                      'Cluster data for Layer3 U direction')
+        self.Layer3Vtree = ROOT.TTree('Layer3Vtree',
+                                      'Cluster data for Layer3 V direction')
+        self.SlantedUtree = ROOT.TTree('SlantedUtree',
+                                       'Cluster data for Slanted U direction')
+        self.SlantedVtree = ROOT.TTree('SlantedVtree',
+                                       'Cluster data for Slanted V direction')
+        self.OtherUtree = ROOT.TTree('OtherUtree',
+                                     'Cluster data for Other U direction')
+        self.OtherVtree = ROOT.TTree('OtherVtree',
+                                     'Cluster data for Other V direction')
         ## Instance of EventData class
         self.data = ClusterData()
         # Declare tree branches
@@ -52,10 +61,18 @@ class SVDClusterPull(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.Utree.Branch(key, AddressOf(self.data, key), key
-                                  + formstring)
-                self.Vtree.Branch(key, AddressOf(self.data, key), key
-                                  + formstring)
+                self.Layer3Utree.Branch(key, AddressOf(self.data, key), key
+                        + formstring)
+                self.Layer3Vtree.Branch(key, AddressOf(self.data, key), key
+                        + formstring)
+                self.SlantedUtree.Branch(key, AddressOf(self.data, key), key
+                        + formstring)
+                self.SlantedVtree.Branch(key, AddressOf(self.data, key), key
+                        + formstring)
+                self.OtherUtree.Branch(key, AddressOf(self.data, key), key
+                                       + formstring)
+                self.OtherVtree.Branch(key, AddressOf(self.data, key), key
+                                       + formstring)
 
                 def beginRun(self):
                     """ Does nothing """
@@ -88,11 +105,25 @@ class SVDClusterPull(Module):
             self.data.truehitPosition = truehitPos
             self.data.pull = pull
 
+            sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
+            sensorID = cluster.getSensorID()
+            sensorType = SensorType.getSensorType(sensorID)
+
             self.file.cd()
             if cluster.isUCluster():
-                self.Utree.Fill()
+                if 'Layer3' in sensorType:
+                    self.Layer3Utree.Fill()
+                elif 'Slanted' in sensorType:
+                    self.SlantedUtree.Fill()
+                else:
+                    self.OtherUtree.Fill()
             else:
-                self.Vtree.Fill()
+                if 'Layer3' in sensorType:
+                    self.Layer3Vtree.Fill()
+                elif 'Slanted' in sensorType:
+                    self.SlantedVtree.Fill()
+                else:
+                    self.OtherVtree.Fill()
 
     def terminate(self):
         """ Close the output file."""

@@ -14,6 +14,7 @@
 """
 
 from basf2 import *
+import SensorType
 
 # Some ROOT tools
 import ROOT
@@ -38,8 +39,18 @@ class SVDEtaDistribution(Module):
         ## Output ROOT file.
         self.file = ROOT.TFile('SVDEtaDistributionData.root', 'recreate')
         ## TTree for output data
-        self.Utree = ROOT.TTree('Utree', 'Eta data for U direction')
-        self.Vtree = ROOT.TTree('Vtree', 'Eta data for V direction')
+        self.Layer3Utree = ROOT.TTree('Layer3Utree',
+                                      'Eta data for Layer3 U direction')
+        self.Layer3Vtree = ROOT.TTree('Layer3Vtree',
+                                      'Eta data for Layer3 V direction')
+        self.SlantedUtree = ROOT.TTree('SlantedUtree',
+                                       'Eta data for Slanted U direction')
+        self.SlantedVtree = ROOT.TTree('SlantedVtree',
+                                       'Eta data for Slanted V direction')
+        self.OtherUtree = ROOT.TTree('OtherUtree',
+                                     'Eta data for Other U direction')
+        self.OtherVtree = ROOT.TTree('OtherVtree',
+                                     'Eta data for Other V direction')
         ## Instance of EtaData class
         self.data = EtaData()
         # Declare tree branches
@@ -48,10 +59,18 @@ class SVDEtaDistribution(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.Utree.Branch(key, AddressOf(self.data, key), key
-                                  + formstring)
-                self.Vtree.Branch(key, AddressOf(self.data, key), key
-                                  + formstring)
+                self.Layer3Utree.Branch(key, AddressOf(self.data, key), key
+                        + formstring)
+                self.Layer3Vtree.Branch(key, AddressOf(self.data, key), key
+                        + formstring)
+                self.SlantedUtree.Branch(key, AddressOf(self.data, key), key
+                        + formstring)
+                self.SlantedVtree.Branch(key, AddressOf(self.data, key), key
+                        + formstring)
+                self.OtherUtree.Branch(key, AddressOf(self.data, key), key
+                                       + formstring)
+                self.OtherVtree.Branch(key, AddressOf(self.data, key), key
+                                       + formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -68,6 +87,8 @@ class SVDEtaDistribution(Module):
                 continue
 
             sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
+            sensorID = cluster.getSensorID()
+            sensorType = SensorType.getSensorType(sensorID)
 
             if cluster.isUCluster():
                 pitch = sensorInfo.getUPitch(cluster.getPosition())
@@ -80,9 +101,19 @@ class SVDEtaDistribution(Module):
 
             self.file.cd()
             if cluster.isUCluster():
-                self.Utree.Fill()
+                if 'Layer3' in sensorType:
+                    self.Layer3Utree.Fill()
+                elif 'Slanted' in sensorType:
+                    self.SlantedUtree.Fill()
+                else:
+                    self.OtherUtree.Fill()
             else:
-                self.Vtree.Fill()
+                if 'Layer3' in sensorType:
+                    self.Layer3Vtree.Fill()
+                elif 'Slanted' in sensorType:
+                    self.SlantedVtree.Fill()
+                else:
+                    self.OtherVtree.Fill()
 
     def terminate(self):
         """ Close the output file."""

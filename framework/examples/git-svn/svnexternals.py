@@ -3,6 +3,18 @@
 
 import sys
 import os
+
+# this script only works with python > 2.7,
+# but git can prepend /usr/bin to PATH!
+if sys.hexversion < 0x02070600:
+    # but we know where our python version should reside, so let's call
+    # ourselves with the newer interpreter
+    VIRTUAL_ENV = os.environ["VIRTUAL_ENV"]
+    from subprocess import call
+    args = [VIRTUAL_ENV + '/bin/python'] + sys.argv
+    ret = call(args)
+    sys.exit(ret)
+
 import re
 from subprocess import check_output, call, CalledProcessError
 
@@ -47,6 +59,7 @@ def find_svnrevision(commit="HEAD"):
 
     return None
 
+
 # Get Belle2 environment variables
 try:
     LOCAL_DIR = os.environ["BELLE2_LOCAL_DIR"]
@@ -90,9 +103,8 @@ os.chdir(LOCAL_DIR)
 # See if there is already an gitignore file, if so read it
 gitignore = []
 if os.path.exists(".gitignore"):
-    f = open(".gitignore")
-    gitignore = f.readlines()
-    f.close()
+    with open(".gitignore") as f:
+        gitignore = f.readlines()
 
 # Get the latest revision we checked out. This might not be the revision the
 # current branch is based on but finding that revision is more difficult.
@@ -144,6 +156,5 @@ for e in externals:
                           exclude + "\n"]
 
 # Write gitignore file
-f = open(".gitignore", "w")
-f.writelines(gitignore)
-f.close()
+with open(".gitignore", "w") as f:
+    f.writelines(gitignore)

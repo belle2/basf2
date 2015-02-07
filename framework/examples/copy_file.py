@@ -9,13 +9,14 @@ from basf2 import *
 
 main = create_path()
 
-input = register_module('RootInput')
-main.add_module(input)
+# read files, needs -i param
+main.add_module('RootInput')
 
-output = register_module('RootOutput')
-main.add_module(output)
+# write file, you can set the file name via -o param
+main.add_module('RootOutput')
 
-main.add_module(register_module('ProgressBar'))
+# Show progress and remaining time
+main.add_module('ProgressBar')
 
 
 process(main)

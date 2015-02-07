@@ -3,17 +3,19 @@
 
 """
 <header>
-  <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
+  <contact>D. Cervenkov, cervenkov@ipnp.troja.mff.cuni.cz</contact>
   <description>
-....This module is part of the SVD validation suite. It creates 
-....separate eta distributions for U and V directions, where 
-....eta = (cluster_pos % pitch) / pitch
-....and saves them to a ROOT file.
+    This module is part of the SVD validation suite. It creates 
+    separate eta distributions for the 3 types of sensors:
+    Layer3, Slanted and Other and for the two directions (U, V)
+    and saves them to a ROOT file.
+    eta = (cluster_pos % pitch) / pitch
   </description>
 </header>
 """
 
 from basf2 import *
+# Package that gives you SVD sensor type for given sensorID
 import SensorType
 
 # Some ROOT tools
@@ -33,12 +35,10 @@ from ROOT import EtaData
 class SVDEtaDistribution(Module):
 
     def __init__(self):
-        """Initialize the module"""
-
         super(SVDEtaDistribution, self).__init__()
         ## Output ROOT file.
         self.file = ROOT.TFile('SVDEtaDistributionData.root', 'recreate')
-        ## TTree for output data
+        ## TTrees for output data
         self.Layer3Utree = ROOT.TTree('Layer3Utree',
                                       'Eta data for Layer3 U direction')
         self.Layer3Vtree = ROOT.TTree('Layer3Vtree',
@@ -51,9 +51,11 @@ class SVDEtaDistribution(Module):
                                      'Eta data for Other U direction')
         self.OtherVtree = ROOT.TTree('OtherVtree',
                                      'Eta data for Other V direction')
-        ## Instance of EtaData class
+        ## Instance of the data class
         self.data = EtaData()
         # Declare tree branches
+        # Each tree has the same branches but only one of the trees
+        # gets filled by a cluster depending on the cluster and sensor type
         for key in EtaData.__dict__.keys():
             if not '__' in key:
                 formstring = '/F'
@@ -73,11 +75,9 @@ class SVDEtaDistribution(Module):
                                        + formstring)
 
     def beginRun(self):
-        """ Does nothing """
+        """ Dummy method """
 
     def event(self):
-        """Find clusters and save needed information."""
-
         clusters = Belle2.PyStoreArray('SVDClusters')
         for cluster in clusters:
             clusterTruehits = cluster.getRelationsTo('SVDTrueHits')
@@ -87,9 +87,9 @@ class SVDEtaDistribution(Module):
                 continue
 
             sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
-            sensorID = cluster.getSensorID()
-            sensorType = SensorType.getSensorType(sensorID)
 
+            # The strip detectors are oriented in two different directions so
+            # we have to take the the relevant pitch
             if cluster.isUCluster():
                 pitch = sensorInfo.getUPitch(cluster.getPosition())
             else:
@@ -98,6 +98,9 @@ class SVDEtaDistribution(Module):
             eta = cluster.getPosition() % pitch / pitch
             self.data.pitch = pitch
             self.data.eta = eta
+
+            sensorID = cluster.getSensorID()
+            sensorType = SensorType.getSensorType(sensorID)
 
             self.file.cd()
             if cluster.isUCluster():
@@ -116,8 +119,6 @@ class SVDEtaDistribution(Module):
                     self.OtherVtree.Fill()
 
     def terminate(self):
-        """ Close the output file."""
-
         self.file.cd()
         self.file.Write()
         self.file.Close()

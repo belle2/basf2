@@ -3,8 +3,11 @@
 
 """
 <header>
-  <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
-  <description>This steering file is an SVD test.</description>
+  <contact>D. Cervenkov, cervenkov@ipnp.troja.mff.cuni.cz</contact>
+  <description>
+    This module is part of the SVD validation suite. It creates
+    an energy loss distribution and saves it to a ROOT file.
+  </description>
 </header>
 """
 
@@ -28,15 +31,7 @@ from ROOT import EnergyLossData
 
 class SVDEnergyLoss(Module):
 
-    """
-    A simple module to check the simulation of PXDTrueHits with Geant4 steps.
-    This module writes its output to a ROOT tree.
-    Primary goal is supporting of validation plots
-    """
-
     def __init__(self):
-        """Initialize the module"""
-
         super(SVDEnergyLoss, self).__init__()
         ## Output ROOT file.
         self.file = ROOT.TFile('SVDEnergyLossData.root', 'recreate')
@@ -54,11 +49,9 @@ class SVDEnergyLoss(Module):
                                  + formstring)
 
     def beginRun(self):
-        """ Does nothing """
+        """ Dummy module """
 
     def event(self):
-        """Find simhits with a truehit and save needed information."""
-
         # Start with truehits and use the relation to get the corresponding
         # simhits.
         truehits = Belle2.PyStoreArray('SVDTrueHits')
@@ -72,13 +65,16 @@ class SVDEnergyLoss(Module):
                     continue
 
                 length = (simhit.getPosOut() - simhit.getPosIn()).Mag()
+                # The deposited energy is the number of electrons multiplied
+                # by the energy required to create an electron-hole pair
                 energy = simhit.getElectrons() * Belle2.Const.ehEnergy
 
                 self.data.simhit_length = length
                 self.data.simhit_energy = energy
                 self.data.simhit_dEdx = energy / length
 
-                if self.data.simhit_dEdx > 0.02:
+                # A reasonable cut to see a nice Landau distribution
+                if self.data.simhit_dEdx > 0.015:
                     continue
 
                 # Fill tree
@@ -86,8 +82,6 @@ class SVDEnergyLoss(Module):
                 self.tree.Fill()
 
     def terminate(self):
-        """ Close the output file."""
-
         self.file.cd()
         self.file.Write()
         self.file.Close()

@@ -6,16 +6,16 @@
   <output>SVDClusterPullData.root</output>
   <output>SVDEtaDistributionData.root</output>
   <output>SVDEnergyLossData.root</output>
-  <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
-  <description>This steering file is an SVD test.</description>
+  <contact>D. Cervenkov, cervenkov@ipnp.troja.mff.cuni.cz</contact>
+  <description>This is an SVD validation steering file.</description>
 </header>
 """
 
 from basf2 import *
+# Individual validation packages
 from SVDClusterPull import *
 from SVDEtaDistribution import *
 from SVDEnergyLoss import *
-import glob
 
 set_random_seed(12345)
 
@@ -52,7 +52,7 @@ particlegun.param({  # Generate 5 tracks (on average)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-# specify number of events to be generated
+# Specify number of events to be generated
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
 # Show progress of processing
@@ -78,10 +78,6 @@ svdclusterpull = SVDClusterPull()
 svdetadistribution = SVDEtaDistribution()
 svdenergyloss = SVDEnergyLoss()
 
-# Save to a ROOT file
-# rootoutput = register_module('RootOutput')
-# rootoutput.param('outputFileName', 'SVDGenData.root')
-
 # ============================================================================
 # create processing path
 main = create_path()
@@ -93,7 +89,6 @@ main.add_module(geometry)
 main.add_module(fullsim)
 main.add_module(svddigitizer)
 main.add_module(svdclusterizer)
-# main.add_module(rootoutput)
 main.add_module(svdclusterpull)
 main.add_module(svdetadistribution)
 main.add_module(svdenergyloss)

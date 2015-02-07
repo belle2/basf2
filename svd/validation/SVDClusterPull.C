@@ -23,7 +23,6 @@ void SVDClusterPull()
   // open the output file for the validation histograms
   TFile* output = TFile::Open("SVDClusterPull.root", "recreate");
 
-  // an example of a 1D histogram
   TH1F* hLayer3Upull = new TH1F("hLayer3Upull", "Layer3 U pull", 100, -5, 5);
   hLayer3Upull->GetXaxis()->SetTitle("x");
   hLayer3Upull->GetYaxis()->SetTitle("Entries");

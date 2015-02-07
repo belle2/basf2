@@ -3,16 +3,18 @@
 
 """
 <header>
-  <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
+  <contact>D. Cervenkov, cervenkov@ipnp.troja.mff.cuni.cz</contact>
   <description>
-....This module is part of the SVD validation suite. It creates 
-....cluster position pull distributions for U and V directions
-....and saves them to a ROOT file.
+    This module is part of the SVD validation suite. It creates 
+    cluster position pull distributions for the 3 types of sensors:
+    Layer3, Slanted and Other and for the two directions (U, V)
+    and saves them to a ROOT file.
   </description>
 </header>
 """
 
 from basf2 import *
+# Package that gives you SVD sensor type for given sensorID
 import SensorType
 
 # Some ROOT tools
@@ -20,7 +22,7 @@ import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
 
-# Define a ROOT struct to hold output data in the TTree.
+# Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct ClusterData {\
 		float clusterPosition;\
 		float clusterPositionSigma;\
@@ -35,12 +37,10 @@ from ROOT import ClusterData
 class SVDClusterPull(Module):
 
     def __init__(self):
-        """Initialize the module"""
-
         super(SVDClusterPull, self).__init__()
-        ## Output ROOT file.
+        ## Output ROOT file
         self.file = ROOT.TFile('SVDClusterPullData.root', 'recreate')
-        ## TTree for output data
+        ## TTrees for output data
         self.Layer3Utree = ROOT.TTree('Layer3Utree',
                                       'Cluster data for Layer3 U direction')
         self.Layer3Vtree = ROOT.TTree('Layer3Vtree',
@@ -53,9 +53,11 @@ class SVDClusterPull(Module):
                                      'Cluster data for Other U direction')
         self.OtherVtree = ROOT.TTree('OtherVtree',
                                      'Cluster data for Other V direction')
-        ## Instance of EventData class
+        ## Instance of the data class
         self.data = ClusterData()
         # Declare tree branches
+        # Each tree has the same branches but only one of the trees
+        # gets filled by a cluster depending on the cluster and sensor type
         for key in ClusterData.__dict__.keys():
             if not '__' in key:
                 formstring = '/F'
@@ -74,12 +76,10 @@ class SVDClusterPull(Module):
                 self.OtherVtree.Branch(key, AddressOf(self.data, key), key
                                        + formstring)
 
-                def beginRun(self):
-                    """ Does nothing """
+    def beginRun(self):
+        """ Dummy method """
 
     def event(self):
-        """Find clusters and save needed information."""
-
         clusters = Belle2.PyStoreArray('SVDClusters')
         for cluster in clusters:
             clusterTruehits = cluster.getRelationsTo('SVDTrueHits')
@@ -93,6 +93,8 @@ class SVDClusterPull(Module):
             clusterPos = cluster.getPosition()
             clusterSigma = cluster.getPositionSigma()
 
+            # The strip detectors are oriented in two different directions so
+            # we have to take the truehit position in the relevant direction
             if cluster.isUCluster():
                 truehitPos = truehit.getU()
             else:
@@ -105,10 +107,10 @@ class SVDClusterPull(Module):
             self.data.truehitPosition = truehitPos
             self.data.pull = pull
 
-            sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
             sensorID = cluster.getSensorID()
             sensorType = SensorType.getSensorType(sensorID)
 
+            # Just make sure we're writing to the right file
             self.file.cd()
             if cluster.isUCluster():
                 if 'Layer3' in sensorType:
@@ -126,8 +128,6 @@ class SVDClusterPull(Module):
                     self.OtherVtree.Fill()
 
     def terminate(self):
-        """ Close the output file."""
-
         self.file.cd()
         self.file.Write()
         self.file.Close()

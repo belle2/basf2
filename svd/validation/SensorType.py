@@ -1,23 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Package for parsing XML
+
 """
 <header>
   <contact>cervenkov@ipnp.troja.mff.cuni.cz</contact>
   <description>
-....This module is part of the SVD validation suite. It retrieves
-....the sensor type for a given sensorID.
+    This module is part of the SVD validation suite. It retrieves
+    the sensor type for a given sensorID.
   </description>
 </header>
 """
 
 import xml.etree.ElementTree as ET
 from basf2 import *
-
-# Some ROOT tools
-import ROOT
-from ROOT import Belle2
-from ROOT import gROOT, AddressOf
 
 
 def getSensorType(sensorID):
@@ -28,6 +25,7 @@ def getSensorType(sensorID):
     tree = ET.parse('../../../../data/SVD-Components.xml')
     root = tree.getroot()
 
+    # Parse the XML tree to get the sensor type string
     for ladder in root.iter('Ladder'):
         if int(ladder.get('layer')) == layerNum:
             for sensor in ladder.findall('Sensor'):

@@ -93,9 +93,9 @@ print statistics
 
 from validation import *
 statistics_plots('AAFHeeeeSimRec_statistics.root', contact='ferber',
-                 jobDesc='a standard simulation and reconstruction job with non radiative ee->eeee events'
-                 )
+                 jobDesc='a standard simulation and reconstruction job with non radiative ee->eeee events using AAFH'
+                 , prefix='AAFHeeeeSimRec')
 event_timing_plot('../AAFHeeeeSimRec.root', 'AAFHeeeeSimRec_statistics.root',
                   contact='ferber',
-                  jobDesc='a standard simulation and reconstruction job with non radiative ee->eeee events'
-                  )
+                  jobDesc='a standard simulation and reconstruction job with non radiative ee->eeee events using AAFH'
+                  , prefix='AAFHeeeeSimRec')

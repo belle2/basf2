@@ -75,9 +75,9 @@ print statistics
 
 from validation import *
 statistics_plots('BabayagaNLOBhabhaSimRec_statistics.root', contact='ferber',
-                 jobDesc='a standard simulation and reconstruction job with radiative Bhabha events'
-                 )
+                 jobDesc='a standard simulation and reconstruction job with radiative Bhabha events using Babayaga.NLO'
+                 , prefix='BabayagaNLOBhabhaSimRec')
 event_timing_plot('../BabayagaNLOBhabhaSimRec.root',
                   'BabayagaNLOBhabhaSimRec_statistics.root', contact='ferber',
-                  jobDesc='a standard simulation and reconstruction job with radiative Bhabha events'
-                  )
+                  jobDesc='a standard simulation and reconstruction job with radiative Bhabha events using Babayaga.NLO'
+                  , prefix='BabayagaNLOBhabhaSimRec')

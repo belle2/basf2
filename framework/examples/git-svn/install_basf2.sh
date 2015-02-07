@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # A script to do a fully automatic installation of basf2 and externals (using git-svn for basf2)
 
+# Get it via svn export https://belle2.cc.kek.jp/svn/trunk/software/framework/examples/git-svn/install_basf2.sh
+# and run bash install_basf2.sh inside your install directory.
+
 #TODO: could start cloning at beginning, while tools are being installed...
-#TODO: just get externals from .externals in HEAD
 #TODO v00-05-04 has a different set of binaries (ubuntu1204 gone, 1404, sl5-32bit added)
 
 #abort on errors
@@ -42,28 +44,32 @@ source tools/setup_belle2
 
 echo "================================================================================"
 CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software 2>/dev/null | head -2 | tail -1 | awk '{print $1}'`
-echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 200MB for 100 commits, or 900MB for all). Ctrl-c to abort."
+echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 900MB for storing the entire history, 220MB for the latest alone). Ctrl-c to abort."
 select SVN_CLONE_FROM in "all" $CURRENT_REV; do
   echo "Selected: $SVN_CLONE_FROM"
   break
 done
 
-echo "Looking for available externals..."
-AVAILABLE_EXTERNALS=`get_externals.sh | head -n -1` #skip development, added manually
-
 echo "================================================================================"
-echo "Please select your preferred externals version. Ctrl-c to abort."
-select EXTERNALS_VERSION in $AVAILABLE_EXTERNALS development; do
-  echo "Selected: $EXTERNALS_VERSION"
-  break
-done
+echo "Looking for current externals version..."
+EXTERNALS_VERSION=`svn cat https://belle2.cc.kek.jp/svn/trunk/software/.externals`
+echo "Will install externals version $EXTERNALS_VERSION."
+
+#echo "Looking for available externals..."
+#AVAILABLE_EXTERNALS=`get_externals.sh | head -n -1` #skip development, added manually
+#
+#echo "================================================================================"
+#echo "Please select your preferred externals version. Ctrl-c to abort."
+#select EXTERNALS_VERSION in $AVAILABLE_EXTERNALS development; do
+#  echo "Selected: $EXTERNALS_VERSION"
+#  break
+#done
 
 if [ ! -d externals/$EXTERNALS_VERSION ]
 then
   if [ "$EXTERNALS_VERSION" == "development" ]; then
     BINARY_VARIANT=""
   else
-    echo "================================================================================"
     echo "Select a binary variant of the externals for your system, or 'source' to compile them from source. All variants are for 64 bit unless mentioned otherwise. Ctrl-c to abort."
     select BINARY_VARIANT in "source" sl5 debian6 fedora16 ubuntu1004 ubuntu1204 ubuntu1204_32bit; do
       if [ "$BINARY_VARIANT" == "source" ]; then

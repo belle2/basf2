@@ -103,8 +103,10 @@ os.chdir(LOCAL_DIR)
 # See if there is already an gitignore file, if so read it
 gitignore = []
 if os.path.exists(".gitignore"):
-    with open(".gitignore") as f:
-        gitignore = f.readlines()
+    f = open(".gitignore")
+    gitignore = f.readlines()
+    f.close()
+
 
 # Get the latest revision we checked out. This might not be the revision the
 # current branch is based on but finding that revision is more difficult.
@@ -156,5 +158,6 @@ for e in externals:
                           exclude + "\n"]
 
 # Write gitignore file
-with open(".gitignore", "w") as f:
-    f.writelines(gitignore)
+f = open(".gitignore", "w")
+f.writelines(gitignore)
+f.close()

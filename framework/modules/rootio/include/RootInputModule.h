@@ -116,7 +116,7 @@ namespace Belle2 {
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
 
-    /* Can be set from steering file to skip the first N events. */
+    /** Can be set from steering file to skip the first N events. */
     int m_skipNEvents;
 
     /** Level of parent files to be read. */

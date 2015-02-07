@@ -105,6 +105,7 @@ namespace Belle2 {
         std::string name; /**< Unique identifier of the function, used as key. */
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
+        /** ctor */
         VarBase(std::string n, std::string d, std::string g) : name(n), description(d), group(g) { }
       };
 

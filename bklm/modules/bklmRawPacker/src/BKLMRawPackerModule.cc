@@ -93,10 +93,12 @@ void BKLMRawPackerModule::event()
   int hitCounter = -1;
   int* buf1, *buf2, *buf3, *buf4;
   int nwords_1st = 2 * numHits, nwords_2nd = 2 * numHits, nwords_3rd = 2 * numHits, nwords_4th = 2 * numHits;
-  buf1 = new int[ nwords_1st];
-  buf2 = new int[ nwords_2nd];
-  buf3 = new int[ nwords_3rd];
-  buf4 = new int[ nwords_4th];
+
+  //we have to add one, because some sort of counter is expected by the unpacker
+  buf1 = new int[ nwords_1st + 1];
+  buf2 = new int[ nwords_2nd + 1];
+  buf3 = new int[ nwords_3rd + 1];
+  buf4 = new int[ nwords_4th + 1];
   for (int iLay = 1; iLay < 14; iLay++)    {
     for (int iAx = 0; iAx < 2; iAx++) {
       hitCounter++;
@@ -172,10 +174,10 @@ void BKLMRawPackerModule::event()
 
     }
   }
-  raw_klm->PackDetectorBuf(buf1, nwords_1st,
-                           buf2, nwords_2nd,
-                           buf3, nwords_3rd,
-                           buf4, nwords_4th,
+  raw_klm->PackDetectorBuf(buf1, nwords_1st + 1,
+                           buf2, nwords_2nd + 1,
+                           buf3, nwords_3rd + 1,
+                           buf4, nwords_4th + 1,
                            rawcprpacker_info);
 
   delete [] buf1;

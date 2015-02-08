@@ -62,7 +62,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("histogramDirectoryName", m_histogramDirectoryName,
-             "histogram directory in ROOT file", string("top"));
+             "histogram directory in ROOT file", string("TOP"));
 
   }
 

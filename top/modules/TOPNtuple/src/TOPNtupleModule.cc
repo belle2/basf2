@@ -94,8 +94,9 @@ namespace Belle2 {
     m_tree->Branch("phiDec", &m_top.phiDec, "phiDec/F");
 
     m_tree->Branch("numPhot", &m_top.numPhot, "numPhot/I");
-    m_tree->Branch("phot",  &m_top.phot,  "e/F:mu:pi:K:p");
-    m_tree->Branch("logL",  &m_top.logL,  "e/F:mu:pi:K:p");
+    m_tree->Branch("numBkg", &m_top.numBkg, "numBkg/F");
+    m_tree->Branch("phot",  &m_top.phot,  "e/F:mu:pi:K:p:d");
+    m_tree->Branch("logL",  &m_top.logL,  "e/F:mu:pi:K:p:d");
 
     m_tree->Branch("extHit",  &m_top.extHit,  "barID/I:PDG:x/F:y:z:p:theta:phi:time");
     m_tree->Branch("barHit",  &m_top.barHit,  "barID/I:PDG:x/F:y:z:p:theta:phi:time");
@@ -118,17 +119,16 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtMetaData;
     StoreArray<Track> tracks;
 
-    for (int itra = 0; itra < tracks.getEntries(); ++itra) {
-      const Track* track = tracks[itra];
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::pion);
+    for (const auto & track : tracks) {
+      const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
       if (!trackFit) continue;
-      const TOPLikelihood* top = track->getRelated<TOPLikelihood>();
+      const TOPLikelihood* top = track.getRelated<TOPLikelihood>();
       if (!top) continue;
       if (top->getFlag() != 1) continue;
 
       const ExtHit* extHit = top->getRelated<ExtHit>();
       const TOPBarHit* barHit = top->getRelated<TOPBarHit>();
-      const MCParticle* mcParticle = track->getRelated<MCParticle>();
+      const MCParticle* mcParticle = track.getRelated<MCParticle>();
       const MCParticle* mother = 0;
       if (mcParticle) mother = mcParticle->getMother();
 
@@ -159,16 +159,20 @@ namespace Belle2 {
       }
 
       m_top.numPhot = top->getNphot();
-      m_top.phot.e  = top->getNphot_e();
-      m_top.phot.mu = top->getNphot_mu();
-      m_top.phot.pi = top->getNphot_pi();
-      m_top.phot.K  = top->getNphot_K();
-      m_top.phot.p  = top->getNphot_p();
-      m_top.logL.e  = top->getLogL_e();
-      m_top.logL.mu = top->getLogL_mu();
-      m_top.logL.pi = top->getLogL_pi();
-      m_top.logL.K  = top->getLogL_K();
-      m_top.logL.p  = top->getLogL_p();
+      m_top.numBkg = top->getEstBkg();
+      m_top.phot.e  = top->getEstPhot(Const::electron);
+      m_top.phot.mu = top->getEstPhot(Const::muon);
+      m_top.phot.pi = top->getEstPhot(Const::pion);
+      m_top.phot.K  =  top->getEstPhot(Const::kaon);
+      m_top.phot.p  = top->getEstPhot(Const::proton);
+      m_top.phot.d  = top->getEstPhot(Const::deuteron);
+
+      m_top.logL.e  = top->getLogL(Const::electron);
+      m_top.logL.mu = top->getLogL(Const::muon);
+      m_top.logL.pi = top->getLogL(Const::pion);
+      m_top.logL.K  = top->getLogL(Const::kaon);
+      m_top.logL.p  = top->getLogL(Const::proton);
+      m_top.logL.d  = top->getLogL(Const::deuteron);
 
       if (extHit) {
         int barID = extHit->getCopyID();

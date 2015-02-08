@@ -25,18 +25,19 @@ namespace Belle2 {
       Float_t pi;  /**< for pion */
       Float_t K;   /**< for kaon */
       Float_t p;   /**< for proton */
+      Float_t d;   /**< for deuteron */
 
       /**
        * Default constructor
        */
-      Likelihoods(): e(0), mu(0), pi(0), K(0), p(0)
+      Likelihoods(): e(0), mu(0), pi(0), K(0), p(0), d(0)
       {}
 
       /**
        * Clear the structure: set elements to zero
        */
       void clear() {
-        e = mu = pi = K = p = 0;
+        e = mu = pi = K = p = d = 0;
       }
     };
 
@@ -96,7 +97,8 @@ namespace Belle2 {
       Float_t phiDec;  /**< decay vertex (cylindrical coordinate phi) of MCParticle */
 
       Int_t numPhot;      /**< number of detected photons */
-      Likelihoods phot;   /**< number of expected photons */
+      Float_t numBkg;     /**< number of expected background photons */
+      Likelihoods phot;   /**< number of expected photons (signal + bkg)*/
       Likelihoods logL;   /**< log likelihoods */
 
       TrackHit extHit;  /**< extrapolated Track hit (in local bar frame) */
@@ -107,7 +109,7 @@ namespace Belle2 {
        */
       TOPTree(): evt(0), run(0), p(0), cth(0), phi(0), pValue(0), PDG(0), motherPDG(0),
         primary(0), seen(0), rhoProd(0), zProd(0), phiProd(0), rhoDec(0), zDec(0),
-        phiDec(0), numPhot(0)
+        phiDec(0), numPhot(0), numBkg(0)
       {}
 
       /**
@@ -134,6 +136,7 @@ namespace Belle2 {
         phiDec = 0;
 
         numPhot = 0;
+        numBkg = 0;
         phot.clear();
         logL.clear();
 

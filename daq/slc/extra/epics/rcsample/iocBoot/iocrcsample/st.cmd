@@ -18,4 +18,4 @@ cd ${TOP}/iocBoot/${IOC}
 iocInit
 
 ## Start any sequence programs
-seq rcsample,"USER=PXD"
+seq rcsample,"USER=KONNO"

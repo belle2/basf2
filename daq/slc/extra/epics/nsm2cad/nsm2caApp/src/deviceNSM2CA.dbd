@@ -1,0 +1,6 @@
+device(stringin,INST_IO,dev_nsm2_request_in,"nsm2_request_in")
+device(stringin,INST_IO,dev_nsm2_state_in,"nsm2_state_in")
+device(stringout,INST_IO,dev_nsm2_request_out,"nsm2_request_out")
+device(ai,INST_IO,dev_nsm2_data_ai,"nsm2_data_ai")
+device(longin,INST_IO,dev_nsm2_data_longin,"nsm2_data_longin")
+

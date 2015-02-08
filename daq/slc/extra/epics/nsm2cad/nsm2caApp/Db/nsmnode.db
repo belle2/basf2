@@ -1,0 +1,24 @@
+record(stringin, "nsm2:$(nodename):request_in")
+{
+	field(DESC, "Received request from NSM2 node")
+	field(SCAN, "I/O Intr")
+	field(VAL, "UNKNOWN")
+	field(DTYP, "nsm2_request_in")
+}
+
+record(stringout, "nsm2:$(nodename):request_out")
+{
+	field(DESC, "Sent request to NSM2 node")
+	field(SCAN, "Passive")
+	field(VAL, "UNKNOWN")
+	field(DTYP, "nsm2_request_out")
+}
+
+record(stringin, "nsm2:$(nodename):state")
+{
+	field(DESC, "RC state response to NSM2 request") 
+	field(SCAN, "I/O Intr")
+	field(VAL,  "NOTREADY") 
+	field(DTYP, "nsm2_state_in")
+}
+

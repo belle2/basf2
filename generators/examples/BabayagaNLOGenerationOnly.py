@@ -39,24 +39,28 @@ babayaganlo.param('SearchMax', 500000)
 # final state: ee or gg, mm is unstable!
 babayaganlo.param('FinalState', 'ee')
 
-# soft photon cutoff, final result is indepedent of the cut off as long as its small (<1e-3)
-# photon multiplicity (and exclusive cross sections depent on that parameter)
+# soft photon cutoff, final result is indepedent of the cut off as long as its small (<1e-3) in fraction of beam energy
+# however: photon multiplicity (and exclusive cross sections) depent on that parameter
 # EXPERTS ONLY
 #babayaganlo.param('Epsilon', 5.e-4)
 
-# CMS energy [GeV]  (default: 10.58GeV)
-babayaganlo.param('CMSEnergy', 10.580)
+# CMS energy [GeV]  (default: from gearbox), set BoostMode to 0 if you want to use this option
+#babayaganlo.param('CMSEnergy', 10.580)
 
-# minimum energy for leptons/photons in the final state, in GeV (default 0.01GeV)
-babayaganlo.param('MinEnergyFrac', 0.01)
+# minimum energy for leptons (ee mode) or photons (gg mode) in the final state, in GeV (default 0.15GeV)
+#babayaganlo.param('MinEnergy', 0.15)
 
-# maximum acollinearity angle between finale state leptons/photons in degrees
+# minimum fractional energy for leptons (ee mode) or photons (gg mode) in the final state, in fraction of the CMS energy
+# if this option is set, it overrides 'MinEnergy'
+#babayaganlo.param('FracMinEnergy', 0.01)
+
+# maximum acollinearity angle between finale state leptons (ee mode) or photons (gg mode), in degrees CMS
 babayaganlo.param('MaxAcollinearity', 180.0)
 
-# min/max angle in CMS (checked for both leptons and the highest energetic gammas)
+# min/max angle in CMS, applied to primary produced leptons (ee mode) or the two highest energetic photons (gg mode), in degrees CMS
 babayaganlo.param('ScatteringAngleRange', [15., 165.])
 
-# extra outfile (contains the used weights, check against FMax value)
+# extra outfile (contains the used weights, user should check against FMax value)
 babayaganlo.param('ExtraFile', 'extrababayaganlo.root')
 
 # geometry parameter database

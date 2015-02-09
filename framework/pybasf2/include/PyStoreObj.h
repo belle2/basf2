@@ -103,6 +103,9 @@ namespace Belle2 {
     /** Return TClass for given name; or NULL if not found. */
     static TClass* getClass(const std::string& name);
 
+    /** Attach to object in DataStore, if possible. */
+    void attach();
+
     TObject** m_storeObjPtr; /**< Pointer to pointer to object */
     TClass* m_class; /**< Class of this object. */
     std::string m_name; /**< Name of data store entry. */

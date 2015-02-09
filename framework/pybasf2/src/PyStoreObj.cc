@@ -16,7 +16,12 @@ PyStoreObj::PyStoreObj(const std::string& name, int durability):
   m_name(name),
   m_durability(durability)
 {
-  DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(name, DataStore::EDurability(durability), TObject::Class(), false));
+  attach();
+}
+
+void PyStoreObj::attach()
+{
+  DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(m_name, DataStore::EDurability(m_durability), TObject::Class(), false));
   if (entry) {
     m_storeObjPtr = &(entry->ptr);
     m_class = entry->object->IsA();
@@ -39,16 +44,20 @@ bool PyStoreObj::create(bool replace)
   if (!m_class)
     return false;
 
-  return DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), m_class, false));
+  if (!DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), m_class, false)))
+    return false;
+
+  attach();
+  return true;
 }
 
 bool PyStoreObj::registerInDataStore(std::string className, int storeFlags)
 {
-  TClass* cl = getClass(className);
-  if (!cl)
+  m_class = getClass(className);
+  if (!m_class)
     return false;
 
-  return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), cl, false, storeFlags);
+  return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), m_class, false, storeFlags);
 }
 
 void PyStoreObj::list(int durability)

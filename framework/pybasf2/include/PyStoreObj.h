@@ -12,6 +12,7 @@
 #define PYSTOREOBJ_H
 
 #include <string>
+#include <vector>
 
 class TClass;
 class TObject;
@@ -60,8 +61,11 @@ namespace Belle2 {
 
     ~PyStoreObj() { }
 
+    /** Return list of available objects for given durability. */
+    static std::vector<std::string> list(int durability = 0);
+
     /** Print list of available objects for given durability. */
-    static void list(int durability = 0);
+    static void printList(int durability = 0);
 
     /** Create a default object in the data store.
      *

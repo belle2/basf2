@@ -5,6 +5,7 @@
 #include <framework/datastore/StoreAccessorBase.h>
 
 using namespace Belle2;
+using namespace std;
 
 PyStoreArray::PyStoreArray(const std::string& name, int durability):
   m_storeArray(0)
@@ -35,12 +36,20 @@ TObject* PyStoreArray::operator [](int i) const
   return m_storeArray->At(i);
 }
 
-void PyStoreArray::list(int durability)
+std::vector<std::string> PyStoreArray::list(int durability)
 {
+  vector<string> list;
   const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
   for (const auto & entrypair : map) {
     if (entrypair.second.isArray) {
-      B2INFO(entrypair.first);
+      list.push_back(entrypair.first);
     }
   }
+  return list;
+}
+
+void PyStoreArray::printList(int durability)
+{
+  for (auto n : list(durability))
+    B2INFO(n);
 }

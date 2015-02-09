@@ -9,6 +9,7 @@
 #include <TClass.h>
 
 using namespace Belle2;
+using namespace std;
 
 PyStoreObj::PyStoreObj(const std::string& name, int durability):
   m_storeObjPtr(nullptr),
@@ -60,15 +61,23 @@ bool PyStoreObj::registerInDataStore(std::string className, int storeFlags)
   return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), m_class, false, storeFlags);
 }
 
-void PyStoreObj::list(int durability)
+vector<string> PyStoreObj::list(int durability)
 {
+  vector<string> list;
   const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
   for (const auto & entrypair : map) {
     if (!entrypair.second.isArray) {
       const TObject* obj = entrypair.second.object;
       if (obj and dynamic_cast<const RelationContainer*>(obj))
         continue; //ignore relations in list
-      B2INFO(entrypair.first);
+      list.push_back(entrypair.first);
     }
   }
+  return list;
+}
+
+void PyStoreObj::printList(int durability)
+{
+  for (auto n : list(durability))
+    B2INFO(n);
 }

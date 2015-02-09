@@ -112,9 +112,9 @@ class CDCSVGPlotter:
             print "### not present in the DataStore"
             print "Current content of the DataStore"
             print "StoreArrays:"
-            Belle2.PyStoreArray.list()
+            Belle2.PyStoreArray.printList()
             print "StoreObjPtr:"
-            Belle2.PyStoreObj.list()
+            Belle2.PyStoreObj.printList()
 
     def draw_storearray(self, storearray_name, **styling):
         print 'Drawing StoreArray:', storearray_name,
@@ -132,9 +132,9 @@ class CDCSVGPlotter:
             print "### not present in the DataStore"
             print "Current content of the DataStore"
             print "StoreArrays:"
-            Belle2.PyStoreArray.list()
+            Belle2.PyStoreArray.printList()
             print "StoreObjPtr:"
-            Belle2.PyStoreObj.list()
+            Belle2.PyStoreObj.printList()
 
     def draw(self, obj, **styling):
         attribute_map = self.styling_to_attribute_map(**styling)

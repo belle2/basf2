@@ -67,6 +67,9 @@ namespace Belle2 {
     /** returns number of entries for current event. */
     int getEntries() const { return m_storeArray ? (m_storeArray->GetEntriesFast()) : 0;}
 
+    /** Support for len(). */
+    int __len__() const { return getEntries(); }
+
     /** Allow iteration using for in Python.
      **/
     TIter __iter__() const {

@@ -11,6 +11,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <framework/logging/Logger.h>
+#include <math.h>
 
 using namespace Belle2;
 
@@ -105,7 +106,7 @@ bool EKLMHitBase::operator==(const EKLMHitBase& right)  const // to be justified
     return false;
   if (m_Sector != right.getSector())
     return false;
-  if (abs(m_Time - right.getTime()) > 1)
+  if (fabs(m_Time - right.getTime()) > 1)
     return false;
   return true;
 }

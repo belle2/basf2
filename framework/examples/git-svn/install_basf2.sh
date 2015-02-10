@@ -33,13 +33,17 @@ then
 fi
 
 echo "================================================================================"
-echo "Looking for current basf2 version..."
-CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software 2>/dev/null | head -2 | tail -1 | awk '{print $1}'`
-echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 900MB for storing the entire history, 220MB for the latest alone). Ctrl-c to abort."
-select SVN_CLONE_FROM in "all" $CURRENT_REV; do
-  echo "Selected: $SVN_CLONE_FROM"
-  break
-done
+if [ ! -d basf2 ]; then
+  echo "Looking for current basf2 version..."
+  CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software 2>/dev/null | head -2 | tail -1 | awk '{print $1}'`
+  echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 900MB for storing the entire history, 220MB for the latest alone). Ctrl-c to abort."
+  select SVN_CLONE_FROM in "all" $CURRENT_REV; do
+    echo "Selected: $SVN_CLONE_FROM"
+    break
+  done
+else
+  echo "basf2/ already exists."
+fi
 
 echo "================================================================================"
 echo "Looking for current externals version..."
@@ -99,19 +103,17 @@ else
   EXTERNALS_PID=$!
 fi
 
-echo "Cloning SVN repository into basf2/... (this will take a while)"
-if [ "$SVN_CLONE_FROM" == "all" ]; then
-  GIT_SVN_CLONE_ARGS=""
-else
-  GIT_SVN_CLONE_ARGS="-$SVN_CLONE_FROM:HEAD"
-fi
-
-
 if [ ! -d basf2 ]; then
+  echo "Cloning SVN repository into basf2/... (this will take a while)"
+  if [ "$SVN_CLONE_FROM" == "all" ]; then
+    GIT_SVN_CLONE_ARGS=""
+  else
+    GIT_SVN_CLONE_ARGS="-$SVN_CLONE_FROM:HEAD"
+  fi
+
   git svn clone $GIT_SVN_CLONE_ARGS $BASF2_SVN basf2
   # remaining setup
-  pushd .
-  cd basf2
+  pushd basf2
   ln -s site_scons/SConstruct .
   echo "head" > .release
   echo "$EXTERNALS_VERSION" > .externals
@@ -141,7 +143,7 @@ echo "Waiting for externals install..."
 if wait $EXTERNALS_PID; then
   echo "Externals install successful!"
 
-  cd basf2
+  pushd basf2
   setuprel
   echo "Fetching svn:externals..."
   ./.git/hooks/svnexternals.py

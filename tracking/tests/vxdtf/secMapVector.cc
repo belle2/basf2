@@ -131,7 +131,7 @@ namespace Belle2 {
     aSecMapVector.push_back(secondPack);
     B2INFO("creating a secMap named " << anotherSecMap.getMapName() << " having " << anotherSecMap.getMaxDistance2origin() << " as maxDistance2Origin- and " << anotherSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " << anotherSecMap.getNumOfValues())
 
-    for (const SecMapVector::MapPack & aMap : aSecMapVector.getFullVector()) {
+    for (SecMapVector::MapPack & aMap : aSecMapVector.getFullVector()) {
       B2INFO("vector stored map with name " << aMap.second.getMapName() << " and lower threshold " << aMap.second.getLowerMomentumThreshold() << " and nValues: " << aMap.second.getNumOfValues())
     }
 

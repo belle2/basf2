@@ -375,7 +375,7 @@ namespace Belle2 {
       return 0.0;
     }
 
-    double particleMCStatus(const Particle* p)
+    double mcParticleStatus(const Particle* p)
     {
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (mcp) {
@@ -1452,7 +1452,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent, "Returns number of tracks in ROE - number of tracks of given particle");
 
     REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
-    REGISTER_VARIABLE("particleMCStatus", particleMCStatus, "Returns mcErrors of related MCParticle or -1 if MCParticle relation is not set.");
+    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus, "Returns status bits of related MCParticle or -1 if MCParticle relation is not set.");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle, "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("False", False, "returns always 0, used for testing and debugging.");
 

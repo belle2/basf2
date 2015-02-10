@@ -349,8 +349,16 @@ void pEventProcessor::analyzePath(const PathPtr& path)
   bool createAllPaths = false; //usually we might not need e.g. an output path
   int stage = 0; //0: in, 1: event/main, 2: out
   for (const ModulePtr & module : path->getModules()) {
-    //TODO also check conditional path, or have setConditionPath() update module flag...
-    const bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
+    bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
+    //entire conditional path must also be compatible
+    if (hasParallelFlag and module->hasCondition()) {
+      for (auto m : module->getConditionPath()->getModules()) {
+        if (!m->hasProperties(Module::c_ParallelProcessingCertified)) {
+          hasParallelFlag = false;
+          break;
+        }
+      }
+    }
 
     if (module->hasProperties(Module::c_TerminateInAllProcesses))
       createAllPaths = true; //ensure there are all kinds of processes

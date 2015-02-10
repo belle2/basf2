@@ -59,6 +59,14 @@
 
 
 
+#include "TROOT.h"
+#include "TNtuple.h"
+#include "TTree.h"
+#include "TFile.h"
+#include "TCanvas.h"
+#include "TH1.h"
+
+
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
@@ -77,10 +85,11 @@ namespace Belle2 {
 
     //! Module functions to be called from event process
     virtual void event();
-    virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);
+    virtual void printCOPPEREvent(RawCOPPER* raw_array, int i, int array_index);
     virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
     virtual void printBuffer(int* buf, int nwords);
     virtual void printPXDEvent(RawPXD* raw_pxd);
+    virtual void endRun();
 
 #ifndef REDUCED_RAWCOPPER
 #else
@@ -103,6 +112,26 @@ namespace Belle2 {
 
     //!
     int m_print_cnt;
+
+    //!
+    TH1F* hist[10];
+
+    //!
+    unsigned int  m_start_utime;
+
+    //!
+    timeval  prev_tv[1000];
+
+    //!
+    unsigned int  prev_tv_eve[1000];
+
+    //!
+    int prev_tv_pos;
+
+    //!
+    int tv_flag[1000];
+
+
 
   };
 

@@ -10,6 +10,13 @@
 #include <daq/rawdata/modules/PrintData.h>
 #include <framework/core/InputController.h>
 
+#include <iostream>
+#include <fstream>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+
 
 using namespace std;
 using namespace Belle2;
@@ -35,6 +42,8 @@ PrintDataModule::PrintDataModule() : Module()
   m_ncpr = 0;
   m_nftsw = 0;
   m_print_cnt = 0;
+
+
 }
 
 
@@ -45,7 +54,9 @@ PrintDataModule::~PrintDataModule()
 
 void PrintDataModule::initialize()
 {
+
   B2INFO("PrintData: initialize() started.");
+  prev_tv_pos = 0;
 
   //  StoreArray<RawCOPPER>::registerTransient(s_auxMCParticlesName.c_str());
   //  StoreObjPtr<RawCOPPER>::registerTransient();
@@ -55,7 +66,65 @@ void PrintDataModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
   B2INFO("PrintData: initialize() done.");
 
+
+  char hname[100];
+
+
+  char title[100];
+  int size = 0;
+  int min = 0.;
+  int max = 100.;
+
+
+  sprintf(title, "Event Number");
+  sprintf(hname, "h_00");
+  size = 1000; min = 0.; max = 1.e5;
+  hist[ 0 ] = new TH1F(hname, title, size, min, max);
+  sprintf(title, "Size per COPPER");
+  sprintf(hname, "h_01");
+  size = 1000; min = 0.; max = 1000.;
+  hist[ 1 ] = new TH1F(hname, title, size, min, max);
+  sprintf(title, "nodeid");
+  sprintf(hname, "h_02");
+  size = 50; min = 0.; max = 50.;
+  hist[ 2 ] = new TH1F(hname, title, size, min, max);
+  sprintf(hname, "h_03");
+  sprintf(title, "event rate");
+  size = 5000; min = 0.; max = 5000.;
+  hist[ 3 ] = new TH1F(hname, title, size, min, max);
+  sprintf(hname, "h_04");
+  sprintf(title, "time difference");
+  size = 300; min = 0.; max = 3.;
+  hist[ 4 ] = new TH1F(hname, title, size, min, max);
+  sprintf(title, "time difference");
+  size = 2000; min = -0.01; max = 0.01;
+  sprintf(hname, "h_05");
+  hist[ 5 ] = new TH1F(hname, title, size, min, max);
+  sprintf(hname, "h_06");
+  hist[ 6 ] = new TH1F(hname, title, size, min, max);
+  sprintf(hname, "h_07");
+  hist[ 7 ] = new TH1F(hname, title, size, min, max);
+  sprintf(hname, "h_08");
+  hist[ 8 ] = new TH1F(hname, title, size, min, max);
+  sprintf(hname, "h_09");
+  hist[ 9 ] = new TH1F(hname, title, size, min, max);
+
 }
+
+void PrintDataModule::endRun()
+{
+
+  TFile f("temp.root", "RECREATE");
+  //  TFile f(argv[1], "RECREATE");
+  //  tree.Write();
+  for (int i = 0; i < 10 ; i++) {
+    hist[ i ]->Write();
+    delete hist[ i ];
+  }
+  f.Close();
+
+}
+
 
 
 
@@ -172,16 +241,91 @@ void PrintDataModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 #endif
 
 
-void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
+void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_index)
 {
 
+//   printf("%%%%%%%%%%%%%%%%%%%%%%%%%\n");
+//   printBuffer(raw_copper->GetWholeBuffer(),raw_copper->TotalBufNwords());
+
+  unsigned int eve = raw_copper->GetEveNo(n);
+
+  if (array_index == 0 && n == 0) {
+    timeval tv;
+    raw_copper->GetTTTimeVal(n, &tv);
+    //    printf("%.8x %.8x %x\n", raw_copper->GetTTUtime(n), raw_copper->GetTTCtimeTRGType(n), raw_copper->GetTTCtime(n));
+    if (hist[3]->GetEntries() == 0) {
+      m_start_utime =  raw_copper->GetTTUtime(n);
+    }
+
+
+    prev_tv[ prev_tv_pos ] = tv;
+    prev_tv_eve[ prev_tv_pos ] = eve;
+    tv_flag[ prev_tv_pos ] = 0;
+    prev_tv_pos++;
+
+    // 1
+    for (int i = 0; i < prev_tv_pos ; i++) {
+      if (eve - prev_tv_eve[ i ] == 1) {
+        float diff = (float)(tv.tv_sec - prev_tv[ i ].tv_sec) + (float)(tv.tv_usec - prev_tv[ i ].tv_usec) * 1.e-6 ;
+        hist[ 4 ]->Fill(diff);
+        hist[ 5 ]->Fill(diff);
+        tv_flag[ i ] |= 0x2;
+        tv_flag[ prev_tv_pos - 1 ] |= 0x1;
+      }
+      if (eve - prev_tv_eve[ i ] == -1) {
+        float diff = (float)(tv.tv_sec - prev_tv[ i ].tv_sec) + (float)(tv.tv_usec - prev_tv[ i ].tv_usec) * 1.e-6 ;
+        hist[ 4 ]->Fill(-diff);
+        hist[ 5 ]->Fill(-diff);
+        tv_flag[ i ] |= 0x1;
+        tv_flag[ prev_tv_pos - 1 ] |= 0x2;
+      }
+    }
+
+    for (int i = 0; i < prev_tv_pos ; i++) {
+      if (tv_flag[ i ] == 3) {
+        for (int j = i; j < prev_tv_pos - 1 ; j++) {
+          prev_tv[ j ] =  prev_tv[ j + 1 ];
+          prev_tv_eve[ j ] =  prev_tv_eve[ j + 1 ];
+          tv_flag[ j ] = tv_flag[ j + 1 ];
+        }
+        prev_tv_pos--;
+      }
+    }
+
+    if (eve % 10000 == 0)   printf("1 %d %d\n", tv.tv_sec - 1422134556, eve);
+    if (prev_tv_pos > 100) {
+      for (int i = 0; i < prev_tv_pos ; i++) {
+        printf(" a %d %d %d\n", i, prev_tv_eve[i ], tv_flag[ i ]);
+      }
+      exit(1);
+    }
+
+
+
+
+    hist[ 3 ]->Fill((float)(raw_copper->GetTTUtime(n) - m_start_utime));
+  }
+
+  hist[ 0 ]->Fill((float)(eve));
+  hist[ 1 ]->Fill((float)(raw_copper->GetBlockNwords(n)));
+  hist[ 2 ]->Fill((float)(raw_copper->GetCOPPERNodeId(n) & 0xFFF));
+
+
+  for (int i = 0; i < 4; i++) {
+    if (raw_copper->Get1stFINESSENwords(n) > 0) {
+
+    }
+  }
+
+  return;
   printf(": Event # %d : node ID 0x%.8x : block size %d bytes\n",
-         raw_copper->GetEveNo(i), raw_copper->GetCOPPERNodeId(i),
-         raw_copper->GetBlockNwords(i) * sizeof(int));
+         raw_copper->GetEveNo(n), raw_copper->GetCOPPERNodeId(n),
+         raw_copper->GetBlockNwords(n) * sizeof(int));
+
 
   //#ifdef DEBUG
   printf("===== Raw COPPER data block(including 4 FINESSE buffers )\n");
-  printBuffer(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
+  printBuffer(raw_copper->GetBuffer(n), raw_copper->GetBlockNwords(n));
 
 //   if (!(raw_copper->CheckCOPPERMagic( i ))) {
 //     ErrorMessage print_err;
@@ -200,45 +344,6 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
   //
   // Print data from each FINESSE
   //
-  if (raw_copper->Get1stFINESSENwords(i) > 0) {
-    printf("===== FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
-    printBuffer(raw_copper->Get1stFINESSEBuffer(i), raw_copper->Get1stFINESSENwords(i));
-  }
-
-  if (raw_copper->Get1stDetectorNwords(i) > 0) {
-    printf("===== Detector Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
-    printBuffer(raw_copper->Get1stDetectorBuffer(i), raw_copper->Get1stDetectorNwords(i));
-  }
-  printf("\n");
-  if (raw_copper->Get2ndFINESSENwords(i) > 0) {
-    printf("===== FINESSE  Buffer(FINESSE B) 0x%x words \n", raw_copper->Get2ndDetectorNwords(i));
-    printBuffer(raw_copper->Get2ndFINESSEBuffer(i), raw_copper->Get2ndFINESSENwords(i));
-  }
-
-  if (raw_copper->Get2ndDetectorNwords(i) > 0) {
-    printf("====== Detector Buffer(FINESSE B)\n");
-    printBuffer(raw_copper->Get2ndDetectorBuffer(i), raw_copper->Get2ndDetectorNwords(i));
-  }
-  printf("\n");
-  if (raw_copper->Get3rdFINESSENwords(i) > 0) {
-    printf("===== FINESSE  Buffer(FINESSE C) 0x%x words \n", raw_copper->Get3rdDetectorNwords(i));
-    printBuffer(raw_copper->Get3rdFINESSEBuffer(i), raw_copper->Get3rdFINESSENwords(i));
-  }
-
-  if (raw_copper->Get3rdDetectorNwords(i) > 0) {
-    printf("===== Detector Buffer(FINESSE C)\n");
-    printBuffer(raw_copper->Get3rdDetectorBuffer(i), raw_copper->Get3rdDetectorNwords(i));
-  }
-  printf("\n");
-  if (raw_copper->Get4thFINESSENwords(i) > 0) {
-    printf("===== FINESSE  Buffer(FINESSE D) 0x%x words \n", raw_copper->Get4thDetectorNwords(i));
-    printBuffer(raw_copper->Get4thFINESSEBuffer(i), raw_copper->Get4thFINESSENwords(i));
-  }
-
-  if (raw_copper->Get4thDetectorNwords(i) > 0) {
-    printf("===== Detector Buffer(FINESSE D)\n");
-    printBuffer(raw_copper->Get4thDetectorBuffer(i), raw_copper->Get4thDetectorNwords(i));
-  }
 
   m_ncpr++;
 
@@ -256,136 +361,12 @@ void PrintDataModule::event()
 {
 
   B2INFO("aPrintData: event() started.");
-  //
-  // FTSW + COPPER can be combined in the array
-  //
-  StoreArray<RawDataBlock> raw_datablkarray;
-
-  for (int i = 0; i < raw_datablkarray.getEntries(); i++) {
-
-    for (int j = 0; j < raw_datablkarray[ i ]->GetNumEntries(); j++) {
-      int* temp_buf = raw_datablkarray[ i ]->GetBuffer(j);
-      int nwords = raw_datablkarray[ i ]->GetBlockNwords(j);
-      printf("nwords %d\n", nwords);
-      int delete_flag = 0;
-      int num_nodes = 1;
-      int num_events = 1;
-      if (raw_datablkarray[ i ]->CheckFTSWID(j)) {
-        // FTSW data block
-        printf("\n===== DataBlock( RawDataBlock(FTSW) ) : Block # %d ", i);
-        RawFTSW temp_raw_ftsw;
-        temp_raw_ftsw.SetBuffer(temp_buf, nwords, delete_flag, num_nodes, num_events);
-        printFTSWEvent(&temp_raw_ftsw, 0);
-      } else if (raw_datablkarray[ i ]->CheckTLUID(j)) {
-        // No operation
-      } else {
-
-        // COPPER data block
-        printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d tot %d ", i,
-               raw_datablkarray[ i ]->TotalBufNwords());
-        RawCOPPER temp_raw_copper;
-        temp_raw_copper.SetBuffer(temp_buf, nwords, delete_flag, num_nodes, num_events);
-        printCOPPEREvent(&temp_raw_copper, 0);
-
-      }
-    }
-  }
-
-  //
-  // FTSW data
-  //
-  StoreArray<RawFTSW> raw_ftswarray;
-  for (int i = 0; i < raw_ftswarray.getEntries(); i++) {
-    for (int j = 0; j < raw_ftswarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawFTSW): Block # %d ", i);
-      printFTSWEvent(raw_ftswarray[ i ], j);
-    }
-  }
-
-
-
-  //
-  // Data from COPPER ( data from any detectors(e.g. CDC, SVD, ... ))
-  //
-  StoreArray<RawCOPPER> rawcprarray;
-  for (int i = 0; i < rawcprarray.getEntries(); i++) {
-    for (int j = 0; j < rawcprarray[ i ]->GetNumEntries(); j++) {
-      printf("\n\n===== DataBlock(RawCOPPER): Block # %d ", i);
-      printCOPPEREvent(rawcprarray[ i ], j);
-    }
-  }
-
-
-//
-  // Data from COPPER named as RawSVD by software
-  //
-  StoreArray<RawSVD> raw_svdarray;
-  for (int i = 0; i < raw_svdarray.getEntries(); i++) {
-
-    for (int j = 0; j < raw_svdarray[ i ]->GetNumEntries(); j++) {
-//       printf("\n===== DataBlock(RawSVD) : Block # %d : tempval %d", i,
-//       raw_svdarray[ i ]->m_temp_value );
-      printf("\n===== DataBlock(RawSVD) : Block # %d\n", i);
-      //      raw_svdarray[ i ]->ShowBuffer();
-      printCOPPEREvent(raw_svdarray[ i ], j);
-    }
-    //    raw_svdarray[ i ]->m_temp_value = 12345678 + i ;
-  }
-
-
-
-
-  //
-  // Data from COPPER named as RawCDC by software
-  //
-  StoreArray<RawCDC> raw_cdcarray;
-  for (int i = 0; i < raw_cdcarray.getEntries(); i++) {
-    for (int j = 0; j < raw_cdcarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawCDC) : Block # %d ", i);
-      printCOPPEREvent(raw_cdcarray[ i ], j);
-    }
-  }
-
-  //
-  // Data from COPPER named as RawPXD by software
-  //
-  StoreArray<RawPXD> raw_pxdarray;
-  for (int i = 0; i < raw_pxdarray.getEntries(); i++) {
-    printf("\n===== DataBlock(RawPXD) : Block # %d ", i);
-    printPXDEvent(raw_pxdarray[ i ]);
-  }
-
-
-
-  StoreArray<RawTOP> raw_bpidarray;
-  for (int i = 0; i < raw_bpidarray.getEntries(); i++) {
-    for (int j = 0; j < raw_bpidarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawTOP) : Block # %d ", i);
-      printCOPPEREvent(raw_bpidarray[ i ], j);
-    }
-  }
-
-  StoreArray<RawARICH> raw_epidarray;
-  for (int i = 0; i < raw_epidarray.getEntries(); i++) {
-    for (int j = 0; j < raw_epidarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawARICH) : Block # %d ", i);
-      printCOPPEREvent(raw_epidarray[ i ], j);
-    }
-  }
-
-  StoreArray<RawKLM> raw_klmarray;
-  for (int i = 0; i < raw_klmarray.getEntries(); i++) {
-    for (int j = 0; j < raw_klmarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawKLM) : Block # %d ", i);
-      printCOPPEREvent(raw_klmarray[ i ], j);
-    }
-  }
 
   StoreArray<RawECL> raw_eclarray;
   for (int i = 0; i < raw_eclarray.getEntries(); i++) {
     for (int j = 0; j < raw_eclarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawECL) : Block # %d ", i);
-      printCOPPEREvent(raw_eclarray[ i ], j);
+      //      printf("\n===== DataBlock(RawECL) : Block # %d ", i);
+      printCOPPEREvent(raw_eclarray[ i ], j, i);
     }
   }
 

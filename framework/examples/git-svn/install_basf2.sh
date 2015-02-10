@@ -32,17 +32,8 @@ then
   exit 1
 fi
 
-if [ ! -d tools/ ]
-then
-  svn co https://belle2.cc.kek.jp/svn/trunk/tools
-  ./tools/prepare_belle2.sh || true # optional packages still cause bad return value...
-  ./tools/install.sh
-fi
-
-echo "Tools installed."
-source tools/setup_belle2
-
 echo "================================================================================"
+echo "Looking for current basf2 version..."
 CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software 2>/dev/null | head -2 | tail -1 | awk '{print $1}'`
 echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 900MB for storing the entire history, 220MB for the latest alone). Ctrl-c to abort."
 select SVN_CLONE_FROM in "all" $CURRENT_REV; do
@@ -80,6 +71,17 @@ then
   fi
 fi
 
+if [ ! -d tools/ ]
+then
+  svn co https://belle2.cc.kek.jp/svn/trunk/tools
+  ./tools/prepare_belle2.sh || true # optional packages still cause bad return value...
+  ./tools/install.sh
+fi
+
+echo "Tools installed."
+source tools/setup_belle2
+
+
 echo "================================================================================"
 if [ ! -d externals/ ]
 then
@@ -104,39 +106,47 @@ else
   GIT_SVN_CLONE_ARGS="-$SVN_CLONE_FROM:HEAD"
 fi
 
-git svn clone $GIT_SVN_CLONE_ARGS $BASF2_SVN basf2
 
-# remaining setup
-pushd .
-cd basf2
-ln -s site_scons/SConstruct .
-echo "head" > .release
-echo "$EXTERNALS_VERSION" > .externals
+if [ ! -d basf2 ]; then
+  git svn clone $GIT_SVN_CLONE_ARGS $BASF2_SVN basf2
+  # remaining setup
+  pushd .
+  cd basf2
+  ln -s site_scons/SConstruct .
+  echo "head" > .release
+  echo "$EXTERNALS_VERSION" > .externals
 
-echo "Installing pre-commit hook"
-cp framework/examples/git-svn/pre-commit .git/hooks/
-chmod 755 .git/hooks/pre-commit
-
-
-echo "Installing hooks to deal with svn:externals (e.g. genfit2 package)"
-cp framework/examples/git-svn/svnexternals.py .git/hooks/
-pushd .git/hooks > /dev/null
-chmod 755 svnexternals.py
-ln -s svnexternals.py post-rewrite
-ln -s svnexternals.py post-checkout
-popd > /dev/null
+  echo "Installing pre-commit hook"
+  cp framework/examples/git-svn/pre-commit .git/hooks/
+  chmod 755 .git/hooks/pre-commit
 
 
-echo "git svn clone finished. Waiting for externals install..."
+  echo "Installing hooks to deal with svn:externals (e.g. genfit2 package)"
+  cp framework/examples/git-svn/svnexternals.py .git/hooks/
+  pushd .git/hooks > /dev/null
+  chmod 755 svnexternals.py
+  ln -s svnexternals.py post-rewrite
+  ln -s svnexternals.py post-checkout
+  popd > /dev/null
+  popd > /dev/null
+
+
+  echo "git svn clone finished."
+else
+  echo "basf2/ already exists, skipping git svn clone."
+fi
+
+echo "Waiting for externals install..."
 
 if wait $EXTERNALS_PID; then
   echo "Externals install successful!"
 
+  cd basf2
   setuprel
   echo "Fetching svn:externals..."
   ./.git/hooks/svnexternals.py
 
-  popd
+  popd > /dev/null
 else
   echo "Something went wrong during installation of externals, please check get_externals.log!"
   exit 1
@@ -147,4 +157,4 @@ echo "Installation finished. You can now set up your basf2 environment using"
 echo "  source tools/setup_belle2"
 echo "  cd basf2"
 echo "  setuprel"
-echo "and compile basf2 using 'scons' (use -j4 to compile with e.g. 4 cores)"
+echo "and compile basf2 using 'scons' (use -j4 to limit scons to only use e.g. 4 cores)"

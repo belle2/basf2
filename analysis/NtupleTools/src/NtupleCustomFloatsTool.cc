@@ -48,8 +48,8 @@ void NtupleCustomFloatsTool::setupTree()
       int iPos = iProduct * nDecayProducts + iVar;
       string varName = Variable::makeROOTCompatible(m_strVarNames[iVar]);
 
-      // getExtraInfoVariableName -> VariableName
-      boost::erase_all(varName, "getExtraInfo");
+      // extraInfoVariableName -> VariableName
+      boost::erase_all(varName, "extraInfo");
 
       // daughter0VariableName -> d0_VariableName
       boost::regex re("daughter([0-9])");

@@ -50,17 +50,13 @@ namespace Belle2 {
 
     typedef std::unordered_multimap<int, float> baseMapT; /**< typedef to have the same type of map throughout the module */
 
-    enum e_detTypes { // TODO: this actually exists globally, use global stuff instead!!!
-      c_PXD = 1,
-      c_SVD = 2
+    /**
+     * enum to distinguish the detectortypes
+     */
+    enum e_detTypes {
+      c_PXD = Belle2::VXD::SensorInfoBase::PXD,
+      c_SVD = Belle2::VXD::SensorInfoBase::SVD,
     };
-
-//     /**
-//      * helper struct that contains StoreArrays<XYZTrueHits> where XYZ is either PXD or SVD. Needed to avoid having too much duplicate code in module
-//      */
-//     struct TrueHitsArrays {
-//
-//     };
 
     std::string m_PARAMoutputSuffix; /**< suffix that will be appended to the StoreArray names of the output StoreArrays */
 
@@ -73,6 +69,12 @@ namespace Belle2 {
     bool m_PARAMstoreSeparate; /**< switch for storing the SpacePoints that can be related to a TrueHit into separate StoreArrays, where only such SpacePoints are stored */
 
     bool m_PARAMregisterAll; /**< switch for registereing all relations for all TrueHits for all SpacePoints (there can be more than 1 related TrueHit to each SpacePoint). The module can be used to get all TrueHits for a SpacePoint and then the user can decide what to do with it. */;
+
+    double m_PARAMmaxGlobalDiff; /**< maximum difference of global position coordinates for each direction between TrueHit and SpacePoint */
+
+//     double m_PARAMmaxLocalDiff; /**< maximum difference of local position coordinates for each direction between TrueHit and SpacePoint */
+
+    double m_PARAMmaxPosSigma; /**< defining th maximum difference of local coordinates in units of PitchSize / sqrt(12) */
 
     unsigned int m_nContainers; /**< number of passed containers -> storing the size of an input vector for not having to obtain it every time */
 
@@ -95,6 +97,20 @@ namespace Belle2 {
     unsigned int m_ghostHitCtr; /**< counter for SpacePoints that are considered ghost hits */
 
     unsigned int m_regRelationsCtr; /**< counter for all registered relations */
+
+    unsigned int m_single2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, but only one of them has two weights */
+
+    unsigned int m_nonSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, with more than one of them having two weights */
+
+    unsigned int m_all2WTHCtr; /**< Counter for SpacePoints where alle possible TrueHits have two weights */
+
+    unsigned int m_accSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, but only one of them has two weights, where a relation was registered to a TrueHit */
+
+    unsigned int m_accNonSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, with more than one of them having two weights where a relation was registered to a TrueHit */
+
+    unsigned int m_accAll2WTHCtr; /**< Counter for SpacePoints where alle possible TrueHits have two weights, where a relation was registered to a TrueHit */
+
+    unsigned int m_oneCluster2THCtr; /**< Counter for SpacePoints with only one Cluster but two possible TrueHits (in these cases, the one with the bigger weight gets automatically accepted) */
 
     std::array<unsigned int, 5> m_nRelPXDTrueHitsCtr; /**< counter for counting different numbers of related TrueHits (to a SpacePoint) with one variable */
 
@@ -193,5 +209,7 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(NoClusterToSpacePoint, "Found no related Cluster for a SpacePoint!"); /**< Exception for when no related Cluster can be found for a SpacePoint */
 
     BELLE2_DEFINE_EXCEPTION(SpacePointIsGhostHit, "The combination of related TrueHits suggest that this SpacePoint is a ghost hit!"); /**< Exception thrown, when there is no TrueHit related to both of the Clusters of a SpacePoint (can only happen in SVD) */
+
+    std::pair<double, double> getLocalPos(Belle2::SpacePoint* spacePoint);
   };
 }

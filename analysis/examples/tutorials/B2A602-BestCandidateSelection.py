@@ -12,7 +12,7 @@
 # ntuple tool.
 #
 # To look at the results, one might use:
-# ntuple->Scan("D0__dM:D0__chiProb:D0__absdM_rank:D0__chiProb_rank:D0_mcStatus")
+# ntuple->Scan("D0__dM:D0__chiProb:D0__absdM_rank:D0__chiProb_rank:D0_mcErrors")
 #
 #
 # Note: This example uses the signal MC sample created in

@@ -104,7 +104,7 @@ void test2_Validation_B2Dpi() {
     float B_mbc;
     float B_deltae;
 
-    int B_mcStatus;
+    int B_mcErrors;
 
     int nCands;
     int iCand;
@@ -118,7 +118,7 @@ void test2_Validation_B2Dpi() {
     recoTree->SetBranchAddress("B_mbc",      &B_mbc);
     recoTree->SetBranchAddress("B_deltae",   &B_deltae);
 
-    recoTree->SetBranchAddress("B_mcStatus", &B_mcStatus);
+    recoTree->SetBranchAddress("B_mcErrors", &B_mcErrors);
 
     recoTree->SetBranchAddress("nCands", &nCands);
     recoTree->SetBranchAddress("iCand", &iCand);
@@ -135,7 +135,7 @@ void test2_Validation_B2Dpi() {
         h_deltae->Fill(B_deltae);
 
         //Simple Truth Match of the Tracks and their mothers
-        if( B_mcStatus>=4 ) continue;
+        if( B_mcErrors>=4 ) continue;
 
         h_mbctruthmatch->Fill(B_mbc);
         h_deltaetruthmatch->Fill(B_deltae);
@@ -269,7 +269,7 @@ void test2_Validation_B2JpsiKS() {
     Float_t B0_mbc;
     Float_t B0_deltae;
 
-    Float_t B0_mcStatus;
+    Float_t B0_mcErrors;
 
     Int_t nCands;
     Int_t iCand;
@@ -283,7 +283,7 @@ void test2_Validation_B2JpsiKS() {
     recoTree->SetBranchAddress("B0_mbc",     &B0_mbc);
     recoTree->SetBranchAddress("B0_deltae",  &B0_deltae);
 
-    recoTree->SetBranchAddress("B0_mcStatus", &B0_mcStatus);
+    recoTree->SetBranchAddress("B0_mcErrors", &B0_mcErrors);
     
     recoTree->SetBranchAddress("nCands", &nCands);
     recoTree->SetBranchAddress("iCand", &iCand);
@@ -307,7 +307,7 @@ void test2_Validation_B2JpsiKS() {
         h_mks   ->Fill(lv_B0_KS0.M());
 
         //Simple Truth Match of the Tracks and their mothers
-        if(B0_mcStatus>=4) continue;
+        if(B0_mcErrors>=4) continue;
         
         h_mbctruthmatch     ->Fill(B0_mbc);
         h_deltaetruthmatch  ->Fill(B0_deltae);
@@ -468,7 +468,7 @@ void test2_Validation_B2Kstgamma() {
 
     float B0_KST0_K_PIDk;
 
-    int B0_mcStatus;
+    int B0_mcErrors;
     
     int nCands;
     int iCand;
@@ -484,7 +484,7 @@ void test2_Validation_B2Kstgamma() {
 
     recoTree->SetBranchAddress("B0_KST0_K_PIDk",   &B0_KST0_K_PIDk);
 
-    recoTree->SetBranchAddress("B0_mcStatus",   &B0_mcStatus);
+    recoTree->SetBranchAddress("B0_mcErrors",   &B0_mcErrors);
 
     recoTree->SetBranchAddress("nCands", &nCands);
     recoTree->SetBranchAddress("iCand", &iCand);
@@ -510,7 +510,7 @@ void test2_Validation_B2Kstgamma() {
         h_mkst->Fill(lv_B0_KST0.M());
 
         //Simple Truth Match of the Tracks and their mothers
-        if(B0_mcStatus>=4)continue;
+        if(B0_mcErrors>=4)continue;
 
         h_mbctruthmatch->Fill(B0_mbc);
         h_deltaetruthmatch->Fill(B0_deltae);
@@ -616,7 +616,7 @@ void test2_Validation_B2rho0gamma() {
     float B0_mbc;
     float B0_deltae;
 
-    int B0_mcStatus;
+    int B0_mcErrors;
     
     int nCands;
     int iCand;
@@ -630,7 +630,7 @@ void test2_Validation_B2rho0gamma() {
     recoTree->SetBranchAddress("B0_mbc",        &B0_mbc);
     recoTree->SetBranchAddress("B0_deltae",     &B0_deltae);
 
-    recoTree->SetBranchAddress("B0_mcStatus",   &B0_mcStatus);
+    recoTree->SetBranchAddress("B0_mcErrors",   &B0_mcErrors);
     
     recoTree->SetBranchAddress("nCands", &nCands);
     recoTree->SetBranchAddress("iCand", &iCand);
@@ -654,7 +654,7 @@ void test2_Validation_B2rho0gamma() {
         h_mrho->Fill(lv_B0_rho0.M());
 
         //Simple Truth Match of the Tracks and their mothers
-        if(B0_mcStatus>=4)continue;
+        if(B0_mcErrors>=4)continue;
 
         h_mbctruthmatch->Fill(B0_mbc);
         h_deltaetruthmatch->Fill(B0_deltae);

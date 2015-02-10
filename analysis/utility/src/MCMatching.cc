@@ -14,7 +14,7 @@
 using namespace Belle2;
 using namespace std;
 
-const std::string MCMatching::c_extraInfoMCStatus = "MCTruthStatus";
+const std::string MCMatching::c_extraInfoMCErrors = "mcErrors";
 
 std::string MCMatching::explainFlags(unsigned int flags)
 {
@@ -76,9 +76,9 @@ int MCMatching::findCommonMother(const MCParticle* mcP, const vector<int>& first
 
 bool MCMatching::setMCTruth(const Particle* particle)
 {
-  //if MCTruthStatus is set, we already handled this particle
+  //if extra-info is set, we already handled this particle
   //TODO check wether this actually speeds things up or not
-  if (particle->hasExtraInfo(c_extraInfoMCStatus))
+  if (particle->hasExtraInfo(c_extraInfoMCErrors))
     return true;
 
   const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
@@ -157,37 +157,37 @@ bool MCMatching::setMCTruth(const Particle* particle)
   return true;
 }
 
-int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticle)
+int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcParticle)
 {
   auto setStatus = [](Particle * particle, int s) -> int {
-    particle->addExtraInfo(c_extraInfoMCStatus, s);
+    particle->addExtraInfo(c_extraInfoMCErrors, s);
     return s;
   };
 
   int status = 0;
 
   if (!mcParticle)
-    return setStatus(particle, status | MCMatchStatus::c_InternalError);
+    return setStatus(particle, status | MCErrorFlags::c_InternalError);
 
   unsigned nChildren = particle->getNDaughters();
   if (nChildren == 0) { //FSP-like
     if (particle->getPDGCode() != mcParticle->getPDG()) {
       if (!mcParticle->hasStatus(MCParticle::c_PrimaryParticle)) {
         //secondary particle, so the original particle probably decayed
-        status |= MCMatchStatus::c_DecayInFlight;
+        status |= MCErrorFlags::c_DecayInFlight;
         //find first primary mother
         const MCParticle* primary = mcParticle->getMother();
         while (primary and !primary->hasStatus(MCParticle::c_PrimaryParticle))
           primary = primary->getMother();
 
         if (!primary) {
-          status |= MCMatchStatus::c_InternalError;
+          status |= MCErrorFlags::c_InternalError;
         } else if (particle->getPDGCode() != primary->getPDG()) {
           //if primary particle also has wrong PDG code, we're actually MisIDed
-          status |= MCMatchStatus::c_MisID;
+          status |= MCErrorFlags::c_MisID;
         }
       } else {
-        status |= MCMatchStatus::c_MisID;
+        status |= MCErrorFlags::c_MisID;
       }
     }
 
@@ -197,14 +197,14 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   const Particle::EFlavorType flavorType = particle->getFlavorType();
   if ((flavorType == Particle::c_Flavored and particle->getPDGCode() != mcParticle->getPDG())
       or (flavorType == Particle::c_Unflavored and abs(particle->getPDGCode()) != abs(mcParticle->getPDG())))
-    status |= MCMatchStatus::c_AddedWrongParticle;
+    status |= MCErrorFlags::c_AddedWrongParticle;
 
   //add up all (accepted) status flags we collected for our daughters
   const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError;
   int daughterStatus = 0;
   for (unsigned i = 0; i < nChildren; ++i) {
     const Particle* daughter = particle->getDaughter(i);
-    daughterStatus |= getMCTruthStatus(daughter);
+    daughterStatus |= getMCErrors(daughter);
   }
   status |= (daughterStatus & daughterStatusAcceptMask);
 
@@ -213,14 +213,14 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   return setStatus(particle, status);
 }
 
-int MCMatching::getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
+int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle)
 {
-  if (particle->hasExtraInfo(c_extraInfoMCStatus)) {
-    return particle->getExtraInfo(c_extraInfoMCStatus);
+  if (particle->hasExtraInfo(c_extraInfoMCErrors)) {
+    return particle->getExtraInfo(c_extraInfoMCErrors);
   } else {
     if (!mcParticle)
       mcParticle = particle->getRelatedTo<MCParticle>();
-    return setMCTruthStatus(const_cast<Particle*>(particle), mcParticle);
+    return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
   }
 }
 
@@ -277,7 +277,7 @@ namespace {
       const MCParticle* mcParticle = daug->getRelatedTo<MCParticle>();
       if (mcParticle) {
         mcMatchedParticles.insert(mcParticle);
-        if (daug->getNDaughters() == 0 and (unsigned int)daug->getExtraInfo(c_extraInfoMCStatus) & c_DecayInFlight) {
+        if (daug->getNDaughters() == 0 and (unsigned int)daug->getExtraInfo(c_extraInfoMCErrors) & c_DecayInFlight) {
           //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
           //so we'll also add all mother MCParticles until the first primary mother
           do {

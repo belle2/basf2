@@ -160,7 +160,7 @@ def CopyParticleLists(path, hash, particleName, particleLabel, inputLists, postC
     B2INFO("Enter: Gather Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     outputList = particleName + ':' + hash
 
-    inputLists = [l for l in inputLists if l is not None]
+    inputLists = filter(None, inputLists)
     if inputLists == []:
         B2INFO("Gather Particle List {p} with label {l} in list {o}. But there are no particles to gather :-(.".format(p=particleName, l=particleLabel, o=outputList))
         return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): None,
@@ -434,7 +434,7 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
         output = register_module('VariablesToNtuple')
         output.set_name('VariablesToNtuple_' + particleList)
         output.param('particleList', particleList)
-        output.param('variables', [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcStatus', 'cosThetaBetweenParticleAndTrueB'] + extraVars)
+        output.param('variables', [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'cosThetaBetweenParticleAndTrueB'] + extraVars)
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)

@@ -114,21 +114,21 @@ void pi_plots(bool runOffline) {
     Float_t pi_P;
     Float_t pi_P4[4];
     Float_t pi_z0;
-    Int_t   pi_mcStatus;
+    Int_t   pi_mcErrors;
     Float_t pi_TruthP;
     Float_t pi_TruthP4[4];
 
     recoTree->SetBranchAddress("pi_P", &pi_P);
     recoTree->SetBranchAddress("pi_P4", pi_P4);
     recoTree->SetBranchAddress("pi_z0", &pi_z0);
-    recoTree->SetBranchAddress("pi_mcStatus", &pi_mcStatus);
+    recoTree->SetBranchAddress("pi_mcErrors", &pi_mcErrors);
     recoTree->SetBranchAddress("pi_TruthP", &pi_TruthP);
     recoTree->SetBranchAddress("pi_TruthP4", pi_TruthP4);
 
     for(Int_t iloop=0; iloop<recoTree->GetEntries(); iloop++) {
         recoTree->GetEntry(iloop);
 
-        if(pi_mcStatus>0)   continue;
+        if(pi_mcErrors>0)   continue;
         TLorentzVector p4_pi(pi_P4);
         TLorentzVector p4_truth_pi(pi_TruthP4);;
         float pBias = (p4_pi.Pt()-p4_truth_pi.Pt())/p4_truth_pi.Pt();
@@ -311,13 +311,13 @@ void photon_plots(bool runOffline) {
 
     Float_t gamma_P;
     Float_t gamma_P4[4];
-    Int_t   gamma_mcStatus;
+    Int_t   gamma_mcErrors;
     Float_t gamma_TruthP;
     Float_t gamma_TruthP4[4];
 
     recoTree->SetBranchAddress("gamma_P", &gamma_P);
     recoTree->SetBranchAddress("gamma_P4", gamma_P4);
-    recoTree->SetBranchAddress("gamma_mcStatus", &gamma_mcStatus);
+    recoTree->SetBranchAddress("gamma_mcErrors", &gamma_mcErrors);
     recoTree->SetBranchAddress("gamma_TruthP", &gamma_TruthP);
     recoTree->SetBranchAddress("gamma_TruthP4", gamma_TruthP4);
 
@@ -330,7 +330,7 @@ void photon_plots(bool runOffline) {
         if((lv_gamma.Theta()<2.23 && lv_gamma.Theta()>=0.58) ) region=2; //barrel
         if((lv_gamma.Theta()<2.71 && lv_gamma.Theta()>=2.23) ) region=3; //backward
 
-        if(gamma_mcStatus>0)    continue;
+        if(gamma_mcErrors>0)    continue;
         float pBias = (gamma_P-gamma_TruthP)/gamma_TruthP;
         int p_bin = find_bin( gamma_P );
 

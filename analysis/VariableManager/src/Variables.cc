@@ -356,7 +356,7 @@ namespace Belle2 {
       s  << p->getPDGCode();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (mcp) {
-        s << " -> MC: " << mcp->getPDG() << ", mcStatus: " << MCMatching::getMCTruthStatus(p, mcp);
+        s << " -> MC: " << mcp->getPDG() << ", mcErrors: " << MCMatching::getMCErrors(p, mcp);
         s << ", mc-index " << mcp->getIndex();
         s << ", mc-pdg " << mcp->getPDG();
       } else {
@@ -411,7 +411,7 @@ namespace Belle2 {
       if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
         return 0.0;
 
-      int status = MCMatching::getMCTruthStatus(part, mcparticle);
+      int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
       status &= (~MCMatching::c_MissingResonance);
@@ -442,7 +442,7 @@ namespace Belle2 {
       if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
         return 0.0;
 
-      int status = MCMatching::getMCTruthStatus(part, mcparticle);
+      int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
       status &= (~MCMatching::c_MissingResonance);
@@ -466,9 +466,9 @@ namespace Belle2 {
       return std::abs(particleMCMatchPDGCode(part));
     }
 
-    double particleMCMatchStatus(const Particle* part)
+    double particleMCErrors(const Particle* part)
     {
-      return MCMatching::getMCTruthStatus(part);
+      return MCMatching::getMCErrors(part);
     }
 
     // Flavour tagging variables
@@ -1404,7 +1404,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino", isSignalAcceptMissingNeutrino, "same as isSignal, but also accept missing neutrino");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
-    REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");
+    REGISTER_VARIABLE("mcErrors", particleMCErrors,  "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
 
     VARIABLE_GROUP("Flavour tagging");
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0.");
@@ -1452,7 +1452,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent, "Returns number of tracks in ROE - number of tracks of given particle");
 
     REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
-    REGISTER_VARIABLE("particleMCStatus", particleMCStatus, "Returns mcStatus of related MCParticle or -1 if MCParticle relation is not set.");
+    REGISTER_VARIABLE("particleMCStatus", particleMCStatus, "Returns mcErrors of related MCParticle or -1 if MCParticle relation is not set.");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle, "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("False", False, "returns always 0, used for testing and debugging.");
 

@@ -232,9 +232,9 @@ namespace Belle2 {
     double particleMCMatchPDGCode(const Particle* particle);
 
     /**
-     * return combination of MCMatching::MCMatchStatus flags.
+     * return combination of MCMatching::MCErrorFlags flags.
      */
-    double particleMCMatchStatus(const Particle* particle);
+    double particleMCErrors(const Particle* particle);
 
     /**
      * return 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle

@@ -16,14 +16,14 @@ namespace Belle2 {
    *
    * End users should usually not need to run these functions directly, but can use the matchMCTruth() python function in modularAnalysis (or the MCMatching module). Afterwards, Particles have relations to the matched MCParticle.
    *
-   * Different MCMatchStatus flags can be queried using getMCTruthStatus(), or the associated 'mcStatus' variable (available via VariablesToNtuple, the MCTruth ntuple tool, etc.). For checking if a Particle is correctly reconstructed, the 'isSignal' variable can be used.
+   * Different MCErrorFlags flags can be queried using getMCErrors(), or the associated 'mcErrors' variable (available via VariablesToNtuple, the MCTruth ntuple tool, etc.). For checking if a Particle is correctly reconstructed, the 'isSignal' variable can be used.
    */
   namespace MCMatching {
-    /** Name of extra-info field stored in Particle (MCTruthStatus). */
-    extern const std::string c_extraInfoMCStatus;
+    /** Name of extra-info field stored in Particle. */
+    extern const std::string c_extraInfoMCErrors;
 
     /** Flags that describe different reconstruction errors. */
-    enum MCMatchStatus {
+    enum MCErrorFlags {
       c_Correct             = 0,  /**< This Particle and all its daughters are perfectly reconstructed. */
       c_MissFSR             = 1, /**< A Final State Radiation (FSR) photon is not reconstructed. Note that distinction from c_MissGamma is based only on number of other daughters and may be wrong. */
       c_MissingResonance    = 2, /**< The associated MCParticle decay contained additional particles (e.g. a rho) that weren't reconstructed. This is probably O.K. in most cases*/
@@ -57,25 +57,25 @@ namespace Belle2 {
     /**
      * Returns the status (quality indicator) of the match. The status is given as a bit pattern,
      * where the individual bits indicate the the type of mismatch. The values are defined in the
-     * MCMatchStatus enum and described in detail there.
+     * MCErrorFlags enum and described in detail there.
      *
      * Status equal to c_Correct == 0 indicates a perfect MC match (everything OK).
      *
-     * The mctruth value is also stored inside the MCTruthStatus extrainfo (so it is calculated only once per candidate).
+     * The mctruth value is also stored inside the Particle's extra-info fields
+     * (so it is calculated only once per candidate).
      *
      * @param particle pointer to the particle
      * @param mc pointer to the matched MCParticle. Can be specified to avoid repeated lookups.
      *
      * @return status (bit pattern) of the mc match
      */
-    int getMCTruthStatus(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
+    int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
 
-    /** Sets mctruth flag in MCTruthStatus extrainfo (also returns it).
+    /** Sets mctruth flag in extra-info (also returns it).
      *
-     * Users should use getMCTruthStatus(), which only calculates this information when necessary.
-     *
-     * */
-    int setMCTruthStatus(Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
+     * Users should use getMCErrors(), which only calculates this information when necessary.
+     */
+    int setMCErrorsExtraInfo(Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
 
     /**
      * Fills vector with array (1-based) indices of all generator ancestors of given MCParticle.
@@ -117,7 +117,7 @@ namespace Belle2 {
      * Determines which daughters of 'mcParticle' are not reconstructed by any daughter of
      * 'particle'.
      *
-     * @returns ORed combination of MCMatchStatus flags for missing particles.
+     * @returns ORed combination of MCErrorFlags flags for missing particles.
      */
     int getMissingParticleFlags(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
   }

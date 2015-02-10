@@ -22,7 +22,7 @@ def appendBDTools(toolsList, decayString):
          , decayString]
     # MC truth for the D
     toolsList += \
-        ['CustomFloats[daughter(0,mcPDG):daughter(0,mcStatus):daughter(0,M):daughter(0,ErrM):daughter(0,SigM)]'
+        ['CustomFloats[daughter(0,mcPDG):daughter(0,mcErrors):daughter(0,M):daughter(0,ErrM):daughter(0,SigM)]'
          , decayString]
     # invariant masses of daughters
     toolsList += \
@@ -63,7 +63,7 @@ def appendBDSTTools(toolsList, decayString):
          , decayString]
     # MC truth for the D
     toolsList += \
-        ['CustomFloats[daughter(0,mcPDG):daughter(0,mcStatus):daughter(0,M):daughter(0,ErrM):daughter(0,SigM)]'
+        ['CustomFloats[daughter(0,mcPDG):daughter(0,mcErrors):daughter(0,M):daughter(0,ErrM):daughter(0,SigM)]'
          , decayString]
     # invariant masses of daughters
     toolsList += \

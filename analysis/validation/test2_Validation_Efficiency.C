@@ -181,11 +181,11 @@ void test2_Validation_Efficiency_Track_Reco(TString filename, TList* list) {
     tree->AddFile(filename);
 
     float pi_TruthP4[4];
-    int pi_mcStatus;
+    int pi_mcErrors;
     int iCand;
     int nCands;
     int evt_no;
-    tree->SetBranchAddress("pi_mcStatus", &pi_mcStatus);
+    tree->SetBranchAddress("pi_mcErrors", &pi_mcErrors);
     tree->SetBranchAddress("pi_TruthP4",  &pi_TruthP4);
     tree->SetBranchAddress("iCand",       &iCand);
 
@@ -204,7 +204,7 @@ void test2_Validation_Efficiency_Track_Reco(TString filename, TList* list) {
         if( check_for_duplicate( all_evt_tracks, lv_pi ) )   continue;
         all_evt_tracks.push_back(lv_pi);
 
-        if( pi_mcStatus>0 ) continue;
+        if( pi_mcErrors>0 ) continue;
 
         ( (TH1*)list->FindObject( Form( "pi_P" ) ) )->Fill(lv_pi.Pt());
         if(lv_pi.Pt()<0.25) {
@@ -270,12 +270,12 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename, TList* list) {
     float gamma_clusterTiming;
     float gamma_TruthP4[4];
     float gamma_TruthP;
-    int gamma_mcStatus;
+    int gamma_mcErrors;
     int iCand;
     tree->SetBranchAddress("gamma_clusterTiming",  &gamma_clusterTiming);
     tree->SetBranchAddress("gamma_TruthP4", &gamma_TruthP4);
     tree->SetBranchAddress("gamma_TruthP",  &gamma_TruthP);
-    tree->SetBranchAddress("gamma_mcStatus",   &gamma_mcStatus);
+    tree->SetBranchAddress("gamma_mcErrors",   &gamma_mcErrors);
     tree->SetBranchAddress("iCand",         &iCand);
 
     // Run a check on cluster duplicates
@@ -286,7 +286,7 @@ void test2_Validation_Efficiency_Photon_Reco(TString filename, TList* list) {
         TLorentzVector lv_gamma(gamma_TruthP4);
         if(iCand==0) all_evt_clusters.clear();
 
-        if( gamma_mcStatus>0 ) continue;
+        if( gamma_mcErrors>0 ) continue;
         //if( abs(gamma_mcPDG)!=pid[photon] ) continue;
         if(lv_gamma.E()<0.02) continue;
         if(lv_gamma.Theta()>2.71 || lv_gamma.Theta()<0.21) continue;

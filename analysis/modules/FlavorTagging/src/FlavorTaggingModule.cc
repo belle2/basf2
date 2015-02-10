@@ -228,7 +228,7 @@ namespace Belle2 {
       for (unsigned i = 0; i < plist -> getListSize(); i++) {
         Particle* particle =  plist->getParticle(i);
         bool ok = getTagObjects(particle);
-        bool mc_ok = ((MCMatching::getMCTruthStatus(particle, particle ->getRelated<MCParticle>()) == 0) && (TMath::Abs(particle -> getPDGCode()) == 511));
+        bool mc_ok = ((MCMatching::getMCErrors(particle, particle ->getRelated<MCParticle>()) == 0) && (TMath::Abs(particle -> getPDGCode()) == 511));
         if (ok) {
           Muon_Category(particle);
           Kaon_Category();

@@ -50,9 +50,6 @@ namespace Belle2 {
         m_nbinsTheta(nbinsTheta), m_rMin(rMin), m_rMax(rMax), m_fitTracks(fitTracks)
       {};
 
-
-      ~TrackFitter();
-
       /**
        * @brief Perform fast circular fitting
        * @param hits Hits pattern which we are going to fit

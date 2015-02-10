@@ -42,15 +42,14 @@ class HighlighterModule(Module):
 
 main = create_path()
 
-main.add_module(register_module('RootInput'))
-main.add_module(register_module('ParticleLoader'))
-main.add_module(register_module('Gearbox'))
-main.add_module(register_module('Geometry'))
+main.add_module('RootInput')
+main.add_module('Gearbox')
+main.add_module('Geometry')
 
 
-selectParticle('K-', 'Kid > 0.1', path=main)
-selectParticle('pi+', 'piid > 0.1', path=main)
-selectParticle('gamma', '', path=main)
+fillParticleList('K-', 'Kid > 0.1', path=main)
+fillParticleList('pi+', 'piid > 0.1', path=main)
+fillParticleList('gamma', '', path=main)
 
 reconstructDecay('pi0 -> gamma gamma', '0.110 < M < 0.150', path=main)
 
@@ -60,7 +59,6 @@ reconstructDecay('D*+ -> D0 pi+', '1.9 < M < 2.1', path=main)
 
 main.add_module(HighlighterModule())
 
-display = register_module('Display')
-main.add_module(display)
+main.add_module('Display')
 
 process(main)

@@ -96,11 +96,11 @@ namespace Belle2 {
 
       /// Defines wire hits and raw hits to be coaligned.
       friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit)
-      { return wireHit.getWire().getEWire() < hit.getID() or (wireHit.getWire().getEWire() == hit.getID() and wireHit.getStoreIHit() < hit.getArrayIndex()); }
+      { return wireHit.getWire().getEWire() < hit.getID(); }
 
       /// Defines wire hits and raw hits to be coaligned.
       friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit)
-      { return hit.getID() < wireHit.getWire().getEWire() or (hit.getID() == wireHit.getWire().getEWire() and hit.getArrayIndex() < wireHit.getStoreIHit()); }
+      { return hit.getID() < wireHit.getWire().getEWire(); }
 
       /// Defines wires and wire hits to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)

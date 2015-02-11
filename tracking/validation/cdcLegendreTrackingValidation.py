@@ -16,6 +16,8 @@ ACTIVE = True
 import basf2
 basf2.set_random_seed(1337)
 
+import logging
+
 from tracking.validation.run import TrackingValidationRun
 
 
@@ -32,5 +34,6 @@ def main():
     validation_run.configure_and_execute_from_commandline()
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()

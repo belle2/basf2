@@ -252,7 +252,7 @@ class ReadOrGenerateEventsRun(object):
         #########################
         get_logger().info('Start processing')
         basf2.process(main_path)
-        get_logger().info("%s\n", str(basf2.statistics))
+        get_logger().info("\n%s", str(basf2.statistics))
 
     def configure_and_execute_from_commandline(self):
         self.configure_from_commandline()

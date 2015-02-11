@@ -67,7 +67,8 @@ void TrackCreator::create(const CDCSegmentTripleTrack& segmentTripleTrack,
     const CDCSegmentTriple* firstTriple = *itSegmentTriple++;
 
     // Set the start fits of the track to the ones of the first segment
-    track.setStartTrajectory3D(firstTriple->getTrajectory2D(), firstTriple->getTrajectorySZ());
+    CDCTrajectory3D startTrajectory3D(firstTriple->getTrajectory2D(), firstTriple->getTrajectorySZ());
+
 
     FloatType perpSOffset = 0.0;
     appendStartRecoHits3D(*firstTriple, perpSOffset, track);
@@ -92,13 +93,14 @@ void TrackCreator::create(const CDCSegmentTripleTrack& segmentTripleTrack,
     // Set the end fits of the track to the ones of the first segment
     CDCTrajectory2D endTrajectory2D = firstTriple->getTrajectory2D();
     CDCTrajectorySZ endTrajectorySZ = firstTriple->getTrajectorySZ();
+    CDCTrajectory3D endTrajectory3D(endTrajectory2D, endTrajectorySZ);
 
     // Set the reference point on the trajectories to the last reconstructed hit
-    FloatType perpSShift = endTrajectory2D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos2D());
-    endTrajectorySZ.passiveMoveS(perpSShift);
-    //Both fits now have the travel distance scale from the last hit as it should be
+    startTrajectory3D.setLocalOrigin(track.getStartRecoHit3D().getRecoPos3D());
+    endTrajectory3D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos3D());
 
-    track.setEndTrajectory3D(endTrajectory2D, endTrajectorySZ);
+    track.setStartTrajectory3D(startTrajectory3D);
+    track.setEndTrajectory3D(endTrajectory3D);
 
   }
 
@@ -161,41 +163,6 @@ void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegme
   }
 
 }
-
-
-bool TrackCreator::create(const CDCAxialRecoSegment2D& segment,
-                          CDCTrack& track) const
-{
-
-  CDCTrajectorySZ trajectorySZ(0, 0); // line with z = 0*s + 0 best we can assume for axial segments only
-
-  CDCTrajectory2D trajectory2D;
-  CDCRiemannFitter fitter2D;
-  fitter2D.useOnlyOrientation(); // do be adjusted for best results
-  fitter2D.update(trajectory2D, segment);
-
-  if (not segment.isForwardTrajectory(trajectory2D)) {
-
-    //B2WARNING("Fit is not oriented correctly");
-    return false;
-
-  } else {
-
-    appendRecoHits3D(segment, trajectory2D, trajectorySZ, 0.0, track);
-
-    track.setStartTrajectory3D(trajectory2D, trajectorySZ);
-
-    //Shift fit to the last reco hit and assigne the end fit of the track as well
-    FloatType perpSShift = trajectory2D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos2D());
-    trajectorySZ.passiveMoveS(perpSShift); //this does not really do anythin for the line z = 0*s + 0
-    // mentioned only for completeness
-
-    track.setEndTrajectory3D(trajectory2D, trajectorySZ);
-    return true;
-
-  }
-}
-
 
 
 

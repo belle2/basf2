@@ -65,13 +65,6 @@ namespace Belle2 {
                   CDCTrack& track) const;
 
 
-
-      /// Copies the hit content of the segment to the CDCTrack
-      bool create(const CDCRecoSegment2D& segment,
-                  CDCTrack& track) const;
-
-
-
     private:
 
       ///Reconstruct the start segment of a triple and append it to the track

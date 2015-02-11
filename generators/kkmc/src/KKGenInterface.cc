@@ -257,8 +257,8 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   gParticle->setProductionTime(hepevt_.vhep[index - 1][3]*Unit::mm / Const::speedOfLight);
   gParticle->setValidVertex(true);
 
-  gParticle->setStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
-
+  //all(!) particles from the generator have to be primary
+  gParticle->addStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
 
   // initial beam electron and positron should be Initial.
   if (abs(hepevt_.idhep[index - 1]) == 11 &&
@@ -266,7 +266,7 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
       hepevt_.jmohep[index - 1][1] == 0 &&
       hepevt_.isthep[index - 1] == 3 &&
       index > 0 && index < 3) {
-    gParticle->setStatus(MCParticle::c_Initial);
+    gParticle->addStatus(MCParticle::c_Initial);
   }
 
   // Z or W should be virtual

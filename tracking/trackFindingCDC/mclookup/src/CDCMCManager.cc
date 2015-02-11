@@ -61,7 +61,7 @@ void CDCMCManager::fill()
 
   if (storedEventMetaData.isValid()) {
     if (m_eventMetaData == *storedEventMetaData) {
-      //Event has already been filled with the current event
+      //Instance has already been filled with the current event
       return;
     }
   }

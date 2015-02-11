@@ -19,6 +19,34 @@ using namespace genfit;
 
 TRACKFINDINGCDC_SwitchableClassImp(CDCTrack)
 
+CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
+  m_startTrajectory3D(segment.getTrajectory2D()),
+  m_endTrajectory3D(segment.getTrajectory2D())
+{
+  if (segment.empty()) return;
+
+  // Adjust the start point
+  const CDCRecoHit2D& startRecoHit2D = segment.front();
+  const CDCRecoHit2D& endRecoHit2D = segment.back();
+
+  Vector3D startPos3D(startRecoHit2D.getRecoPos2D(), 0.0);
+  Vector3D endPos3D(endRecoHit2D.getRecoPos2D(), 0.0);
+
+  m_startTrajectory3D.setLocalOrigin(startPos3D);
+  m_endTrajectory3D.setLocalOrigin(endPos3D);
+
+  for (const CDCRecoHit2D & recoHit2D : segment) {
+    const CDCRLWireHit* ptrRLWireHit = &(recoHit2D.getRLWireHit());
+    Vector3D recoPos3D(recoHit2D.getRecoPos2D(), 0.0);
+    FloatType perpS = m_startTrajectory3D.calcPerpS(recoPos3D);
+    push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
+  }
+
+  // TODO: Maybe enhance the estimation of the z coordinate with the superlayer slopes.
+}
+
+
+
 bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
 {
   // Add the hits

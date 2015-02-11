@@ -32,15 +32,14 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCTrack() : m_fbInfo(UNKNOWN) {;}
 
+      /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
+      explicit CDCTrack(const CDCRecoSegment2D& segment);
+
       /// Empty destructor
       ~CDCTrack() {;}
 
-
-
       /// Copies the hit and trajectory content of this track to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand) const;
-
-
 
       /// Getter for the first reconstructed hit in the track. Does not account for the forward backward info.
       const Belle2::TrackFindingCDC::CDCRecoHit3D& getStartRecoHit3D() const

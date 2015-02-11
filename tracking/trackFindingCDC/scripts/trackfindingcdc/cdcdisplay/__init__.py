@@ -30,7 +30,7 @@ class CDCSVGDisplayModule(Module):
     Personal two dimensional event display based on scalable vector graphics
     """
 
-    def __init__(self, output_folder, interactive=True):
+    def __init__(self, output_folder="/tmp", interactive=True):
         """
         Constructor method
 

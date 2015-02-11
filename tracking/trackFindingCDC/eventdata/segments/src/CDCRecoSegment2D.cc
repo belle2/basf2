@@ -246,24 +246,16 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegm
 }
 
 
-void CDCRecoSegment2D::fillInto(genfit::TrackCand& gfTrackCand) const
+bool CDCRecoSegment2D::fillInto(genfit::TrackCand& gfTrackCand) const
 {
-  // Dummy error estimates
-  SZCovariance szCovariance;
+  CDCTrajectory3D trajectory3D(getTrajectory2D());
 
-  szCovariance(iSZ, iSZ) = 2.0; // Error in pz double the error in pt, good estimate?
-  szCovariance(iZ0, iSZ) = 0.0;
-  szCovariance(iSZ, iZ0) = 0.0;
-  szCovariance(iZ0, iZ0) = 2.0;
+  if (not empty()) {
+    const CDCRecoHit2D& startRecoHit2D = front();
+    Vector3D startPos3D(startRecoHit2D.getRecoPos2D(), 0.0);
+    trajectory3D.setLocalOrigin(startPos3D);
+  }
 
-  // A dummy line with no increasing z coordinate
-  double tanLambda = 0.0;
-  double z0 = 0.0;
-  UncertainSZLine uncertainSZLine(tanLambda, z0, szCovariance);
-
-  CDCTrajectorySZ trajectorySZ(uncertainSZLine);
-
-  CDCTrajectory3D trajectory3D(getTrajectory2D(), trajectorySZ);
-  trajectory3D.fillInto(gfTrackCand);
   fillHitsInto(*this, gfTrackCand);
+  return trajectory3D.fillInto(gfTrackCand);
 }

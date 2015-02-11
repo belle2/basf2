@@ -100,8 +100,8 @@ namespace Belle2 {
         return rlWireHitSegment;
       }
 
-      /// Fill the hit content of this segment into a genfit::TrackCand
-      void fillInto(genfit::TrackCand& gfTrackCand) const;
+      /// Fill the hit content of this segment into a genfit::TrackCand. Return true, if the trajectory information is valid, false otherwise.
+      bool fillInto(genfit::TrackCand& gfTrackCand) const;
 
       /// Makes a copy of the segment with the reversed hits in the opposite order.
       CDCRecoSegment2D reversed() const {

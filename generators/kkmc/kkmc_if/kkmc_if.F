@@ -2,9 +2,9 @@ C
 C     KK interface
 C
 CCCCCC
-      subroutine KK_init (DatX_d,DatX_u,DatX_p,IRAND1)
+      subroutine KK_init (DatX_d,DatX_u,DatX_p,IRAND1,DatX_o)
       implicit         none
-      character*132 DatX_d, DatX_u, DatX_p
+      character*132 DatX_d, DatX_u, DatX_p, DatX_o
 
       integer imax
       parameter (imax = 10000)
@@ -17,6 +17,8 @@ CCCCCC
       double precision dum(4)
 
 C   Input environment
+      open(16,FILE=DatX_o,STATUS='new',ACTION='write')
+
       Print *,'KK DATAX_0 : '//DatX_d
       Print *,'KK DATAX_1 : '//DatX_u
       Print *,'KK DATAX_P : '//DatX_p
@@ -135,6 +137,8 @@ CCCCCC
 C      call TAUFIF(2)                              ! TAUOLA fifo
       CALL KK2f_Finalize
       CALL KK2f_GetXsecMC(xSecPb, xErrPb)         ! get MC x-section
+
+      close(16)
 
       end
 

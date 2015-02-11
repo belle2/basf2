@@ -48,7 +48,7 @@ extern pydat2_type pydat2_;
 
 extern "C" {
 
-  void kk_init_(const char*, const char*, const char*, int*);
+  void kk_init_(const char*, const char*, const char*, int*, const char*);
   void kk_begin_run_(double*);
   void kk_init_seed_();
   void kk_term_(double*, double*);
@@ -83,7 +83,7 @@ namespace Belle2 {
      */
     ~KKGenInterface() {}
 
-    int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName); /**< Setup for KKMC/TAUOLA  */
+    int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */
 
     void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER, double Espread_HER); /**< Setup for beam inforamtion to KKMC */
 

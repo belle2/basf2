@@ -39,16 +39,17 @@ KKGenInterface::KKGenInterface()
   myevtpdl = new EvtPDL();
 }
 
-int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName)
+int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName)
 {
   B2INFO("Begin initialisation of KKGen Interface.");
 
   // This is to avoid character corruption of TAUOLA output
-  char DatX_d[132], DatX_u[132], DatX_p[132];
+  char DatX_d[132], DatX_u[132], DatX_p[132], DatX_o[132];
   for (int i = 0; i < 132; ++i) {
     DatX_d[i] = ' ';
     DatX_u[i] = ' ';
     DatX_p[i] = ' ';
+    DatX_o[i] = ' ';
   }
   strcpy(DatX_d, KKdefaultFileName.c_str());
   int length = strlen(DatX_d);
@@ -59,8 +60,11 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
   strcpy(DatX_p, taudecaytableFileName.c_str());
   length = strlen(DatX_p);
   DatX_p[length] = ' ';
+  strcpy(DatX_o, KKMCOutputFileName.c_str());
+  length = strlen(DatX_o);
+  DatX_o[length] = ' ';
   int irand = 0;
-  kk_init_(DatX_d, DatX_u, DatX_p, &irand);
+  kk_init_(DatX_d, DatX_u, DatX_p, &irand, DatX_o);
 
 
   // seed of random generator should be set here

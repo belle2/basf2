@@ -27,6 +27,7 @@
 #include <boost/filesystem.hpp>
 
 #include <TRandom.h>
+#include <stdio.h>
 
 using namespace std;
 using namespace Belle2;
@@ -60,6 +61,7 @@ KKGenInputModule::KKGenInputModule() : Module()
   string default_KKdefaultFileName = string("");
   string default_tauinputFileName = string("");
   string default_taudecaytableFileName = string("");
+  string default_KKMCOutputFileName = string("fort.16");
   B2DEBUG(100, "Default setting files are set: empty...");
 
   if (belle2_release_dir != NULL) {
@@ -97,15 +99,30 @@ KKGenInputModule::KKGenInputModule() : Module()
   addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu-pairs generation setting", default_tauinputFileName);
   addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name", default_taudecaytableFileName);
   addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename", default_evtpdlfilename);
+  addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", default_KKMCOutputFileName);
 }
 
 
 void KKGenInputModule::initialize()
 {
   B2INFO("starting initialisation of KKGen Input Module. ");
+  FILE* fp;
+  if (fp = fopen(m_KKMCOutputFileName.c_str(), "r")) {
+    fclose(fp);
+    remove(m_KKMCOutputFileName.c_str());
+  } else {
+    if (fp = fopen(m_KKMCOutputFileName.c_str(), "w")) {
+      fclose(fp);
+      remove(m_KKMCOutputFileName.c_str());
+    } else {
+      B2FATAL("failed to make KKMC output file!");
+      exit(1);
+    }
+  }
+
 
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
-                 m_taudecaytableFileName, m_EvtPDLFileName);
+                 m_taudecaytableFileName, m_EvtPDLFileName, m_KKMCOutputFileName);
 
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();

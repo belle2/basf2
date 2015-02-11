@@ -56,6 +56,7 @@ namespace Belle2 {
     std::string m_tauinputFileName; /**<  KKMC setting file for generating fermions.  */
     std::string m_taudecaytableFileName; /**<  tau decay tables in PYTHIA6 manner.  */
     std::string m_EvtPDLFileName; /**<  pdl file.  */
+    std::string m_KKMCOutputFileName; /**<  KKMC output file previously as set "fort.16".  */
     double m_EHER; /**< Energy for HER [GeV]. */
     double m_ELER; /**< Energy for LER [GeV]. */
     double m_HER_Espread; /**< Energy spread for HER [GeV]. */

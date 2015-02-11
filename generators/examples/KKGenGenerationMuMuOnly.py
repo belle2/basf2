@@ -10,6 +10,7 @@ kkgeninput = register_module('KKGenInput')
 kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
 kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
 kkgeninput.param('taudecaytableFile', '')
+kkgeninput.param('kkmcoutputfilename', 'testoutput.txt')
 
 eventinfosetter = register_module('EventInfoSetter')
 paramloader = register_module('Gearbox')

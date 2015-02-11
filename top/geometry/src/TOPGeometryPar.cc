@@ -210,7 +210,7 @@ namespace Belle2 {
 
       m_NTDC = detParams.getInt("Module/TDCbits");
       m_TDCwidth = detParams.getTime("Module/TDCbitwidth");
-      m_TDCoffset = detParams.getTime("Module/TDCoffset");
+      m_TDCoffset = detParams.getTime("Module/TDCoffset", 0);
 
       //! TTS
 

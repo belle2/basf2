@@ -41,7 +41,7 @@ namespace Belle2 {
        */
       static bool registerTransient(const std::string& name = "",
                                     DataStore::EDurability durability = DataStore::c_Event,
-                                    bool errorIfExisting = true) {
+                                    bool errorIfExisting = false) {
         return StoreObjPtr<StoreWrapper<T> >::registerTransient(name, durability, errorIfExisting);
       }
 

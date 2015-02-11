@@ -97,6 +97,7 @@ void SegmentFinderCDCBaseModule::event()
   StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_segmentsStoreObjName);
   storedRecoSegments.create();
   std::vector<CDCRecoSegment2D>& outputSegments = *storedRecoSegments;
+  outputSegments.clear();
 
   /// Copy segments to output fixing their segmentOrientation
   if (m_segmentOrientation == c_None) {

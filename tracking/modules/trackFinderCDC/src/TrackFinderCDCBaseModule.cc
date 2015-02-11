@@ -150,6 +150,7 @@ void TrackFinderCDCBaseModule::event()
   StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
   storedTracks.create();
   std::vector<CDCTrack>& outputTracks = *storedTracks;
+  outputTracks.clear();
 
   // Copy Tracks to output fixing their orientation
   if (m_trackOrientation == c_None) {

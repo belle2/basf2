@@ -7,6 +7,7 @@
 ##############################################################################
 
 import math
+import sys
 import os
 from basf2 import *
 import ROOT as root
@@ -44,6 +45,9 @@ show_contours = None
 # colours for the chosen contours: can either be None, a single color name or a
 # list of color names matching the chosen contours
 contour_colors = 'k'
+# line width of contour lines. Can either be one number or an array of numbers
+# denoting the width of each line
+contour_width = 0.1
 
 # example: show 1.4 to 1.6 tesla contours in blue, cyan, green, magenta, red
 # show_contours = [1.4, 1.45, 1.5, 1.55, 1.6]
@@ -190,10 +194,11 @@ for component in ["Bx", "By", "Bz", "Br"]:
         y += ystep / 2
         x, y = np.meshgrid(x[:-1], y[:-1])
         # draw contour plot and label it
-        cs = a.contour(x, y, data, levels=show_contours, colors=contour_colors)
+        cs = a.contour(x, y, data, levels=show_contours, colors=contour_colors,
+                       linewidths=contour_width)
         a.clabel(cs, fmt="%.2f T", fontsize=6)
 
-    #label the plot
+    # label the plot
     a.set_title(h.GetTitle())
     a.set_xlabel(r"$%s/{\rm cm}$" % scan_type[0])
     a.set_ylabel(r"$%s/{\rm cm}$" % scan_type[1])

@@ -123,6 +123,15 @@ namespace Belle2 {
       { return CDCTrajectory3D(getLocalOrigin(), getLocalHelix().reversed()) ; }
 
 
+      /// Calculate the travel distance from the start position of the trajectory.
+      /** Returns the travel distance on the trajectory from the start point to \n
+       *  the given point. This is subjected to a discontinuity at the far point \n
+       *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
+       *  If you have a heavily curling track you have care about the feasibility of this \n
+       *  calculation. */
+      FloatType calcPerpS(const Vector3D& point) const
+      { return getLocalHelix().circleXY().arcLengthBetween(Vector2D(0.0, 0.0), (point - getLocalOrigin()).xy()); }
+
 
       /// Get unit momentum vector at a specific postion.
       /** Return the unit travel direction at the closest approach to the position */

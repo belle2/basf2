@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(TrackFinderCDCSegmentPairAutomatonDev);
 
 TrackFinderCDCSegmentPairAutomatonDevModule::TrackFinderCDCSegmentPairAutomatonDevModule() :
-  TrackFinderCDCSegmentPairAutomatonImplModule<>(c_Symmetric),
+  TrackFinderCDCSegmentPairAutomatonImplModule<>(c_None),
   m_param_segmentPairFilter("simple"),
   m_param_segmentPairNeighborChooser("simple")
 {

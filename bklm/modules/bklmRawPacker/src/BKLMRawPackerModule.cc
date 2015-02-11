@@ -185,14 +185,6 @@ void BKLMRawPackerModule::event()
   delete [] buf3;
   delete [] buf4;
 
-  //
-  // Update EventMetaData : Not affect on the output
-  //
-  m_eventMetaDataPtr.create();
-  m_eventMetaDataPtr->setExperiment(rawcprpacker_info.exp_num);
-  m_eventMetaDataPtr->setRun(rawcprpacker_info.run_subrun_num);
-  m_eventMetaDataPtr->setEvent(n_basf2evt);
-
   printf("Event # %.8d\n", n_basf2evt);
   fflush(stdout);
 

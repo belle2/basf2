@@ -49,24 +49,9 @@ CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
 
 bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
 {
-  // Add the hits
-  if (getFBInfo() == BACKWARD) {
-    bool reverseRLInfo = true;
-    fillHitsInto(reverseRange(), trackCand, reverseRLInfo);
-
-  } else {
-    bool reverseRLInfo = false;
-    fillHitsInto(*this, trackCand, reverseRLInfo);
-  }
-
-  // Translate the trajectory information
-  if (getFBInfo() == BACKWARD) {
-    CDCTrajectory3D endTrajectory3D = getEndTrajectory3D().reversed();
-    return endTrajectory3D.fillInto(trackCand);
-  } else {
-    return getStartTrajectory3D().fillInto(trackCand);
-  }
-
+  bool reverseRLInfo = false;
+  fillHitsInto(*this, trackCand, reverseRLInfo);
+  return getStartTrajectory3D().fillInto(trackCand);
 }
 
 

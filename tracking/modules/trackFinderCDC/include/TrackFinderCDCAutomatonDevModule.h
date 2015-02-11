@@ -11,23 +11,17 @@
 #define TRACKFINDERCDCAUTOMATONDEVMODULE_H_
 
 //#define LOG_NO_B2DEBUG
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
-
-#include <tracking/trackFindingCDC/workers/SegmentTripleTrackingWorker.h>
-
-#include <tracking/trackFindingCDC/workers/SegmentPairTrackingWorker.h>
 
 // Base track finder module
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonDevModule.h>
-
-// Base track finder module
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCAutomatonDevFilters.h>
-
+#include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonDevModule.h>
 
 namespace Belle2 {
 
   /// Module for development of the cellular automaton tracking for the CDC
-  class TrackFinderCDCAutomatonDevModule : public SegmentFinderCDCFacetAutomatonDevModule {
+  class TrackFinderCDCAutomatonDevModule :
+    public SegmentFinderCDCFacetAutomatonDevModule,
+    public TrackFinderCDCSegmentPairAutomatonDevModule {
 
   public:
     /// Constructor of the module. Setting up parameters and description.
@@ -45,19 +39,6 @@ namespace Belle2 {
   private:
     /// Parameter: Switch in indicating if the second stage, which is the building of tracks from segments, shall be run.
     bool m_param_runSecondStage;
-
-    /// Worker to carry out the second stage generating tracks from segments.
-    TrackFindingCDC::SegmentTripleTrackingWorker <
-    TrackFindingCDC::AxialAxialSegmentPairFilter,
-                    TrackFindingCDC::SegmentTripleFilter,
-                    TrackFindingCDC::SegmentTripleNeighborChooser
-                    > m_segmentTripleTrackingWorker;
-
-    /// Worker to carry out the second stage generating tracks from segments utilizing pairs of segments.
-    TrackFindingCDC::SegmentPairTrackingWorker <
-    TrackFindingCDC::AxialStereoSegmentPairFilter,
-                    TrackFindingCDC::AxialStereoSegmentPairNeighborChooser
-                    > m_segmentPairTrackingWorker;
 
   }; // end class
 } // end namespace Belle2

@@ -12,12 +12,15 @@
 
 #include "../include/CDCWireHitTopology.h"
 
-
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 #include <framework/logging/Logger.h>
 
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+
+#include<unordered_set>
 
 using namespace std;
 using namespace Belle2;
@@ -34,7 +37,27 @@ CDCWireHitTopology& CDCWireHitTopology::getInstance()
   return *g_wireHitTopology;
 }
 
+namespace {
+  bool maximalOneHitPerWire(StoreArray<CDCHit>& storedHits)
+  {
+    unordered_set<unsigned short> hitEWires;
+
+    for (const CDCHit & hit : storedHits) {
+      unsigned short eWire = hit.getID();
+      if (hitEWires.count(eWire)) {
+        return false;
+      } else {
+        hitEWires.insert(eWire);
+      }
+    }
+    return true;
+  }
+
+}
+
+
 CDCWireHitTopology::CDCWireHitTopology() :
+  m_eventMetaData(-999, -999, -999),
   m_useSimpleTDCCountTranslator(true),
   m_initialTDCCountTranslator(m_useSimpleTDCCountTranslator ?
                               static_cast<CDC::TDCCountTranslatorBase*>(new CDC::SimpleTDCCountTranslator()) :
@@ -51,6 +74,127 @@ CDCWireHitTopology::~CDCWireHitTopology()
   }
 }
 
+void CDCWireHitTopology::initialize()
+{
+  StoreObjPtr<EventMetaData>::required();
+  StoreArray<CDCHit>::required();
+}
+
+
+size_t CDCWireHitTopology::event()
+{
+  StoreObjPtr<EventMetaData> storedEventMetaData;
+
+  if (storedEventMetaData.isValid() and m_eventMetaData == *storedEventMetaData) {
+    return m_wireHits.size();
+  } else {
+    size_t nHits = fill("");
+    m_eventMetaData = *storedEventMetaData;
+    return nHits;
+  }
+
+}
+
+size_t CDCWireHitTopology::useAll()
+{
+  // Ensure the store array is filled with the basic hits.
+  event();
+
+  // Unblock every wire hit
+  for (const CDCWireHit & wireHit : m_wireHits) {
+    wireHit.getAutomatonCell().unsetDoNotUseFlag();
+  }
+
+  return m_wireHits.size();
+}
+
+size_t CDCWireHitTopology::dontUse(const std::vector<int>& iHits)
+{
+  // Ensure the store array is filled with the basic hits.
+  event();
+
+  StoreArray<CDCHit> storedHits;
+  int nHits = storedHits.getEntries();
+
+  size_t nBlockedHits = 0;
+  for (const int & iHit : iHits) {
+    if (iHit >= 0 and iHit < nHits) {
+      const CDCHit* ptrHit = storedHits[iHit];
+      const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
+      if (ptrWireHit) {
+        const CDCWireHit& wireHit = *ptrWireHit;
+        if (wireHit.getAutomatonCell().hasDoNotUseFlag()) {
+          wireHit.getAutomatonCell().setDoNotUseFlag();
+          ++nBlockedHits;
+        }
+      } else {
+        B2WARNING("No CDCWireHit for CDCHit");
+      }
+    } else {
+      B2WARNING("Hit index out of bounds");
+    }
+  }
+
+  return nBlockedHits;
+}
+
+size_t CDCWireHitTopology::useAllBut(const std::vector<int>& iHits)
+{
+  size_t nHits = useAll();
+  size_t nBlockedHits = dontUse(iHits);
+  return nHits - nBlockedHits;
+}
+
+size_t CDCWireHitTopology::useOnly(const std::vector<int>& iHits)
+{
+  // Ensure the store array is filled with the basic hits.
+  event();
+
+  // Block every wire hit first
+  for (const CDCWireHit & wireHit : m_wireHits) {
+    wireHit.getAutomatonCell().setDoNotUseFlag();
+  }
+
+  StoreArray<CDCHit> storedHits;
+  int nHits = storedHits.getEntries();
+
+  for (const int & iHit : iHits) {
+    if (iHit >= 0 and iHit < nHits) {
+      const CDCHit* ptrHit = storedHits[iHit];
+      const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
+      if (ptrWireHit) {
+        const CDCWireHit& wireHit = *ptrWireHit;
+        wireHit.getAutomatonCell().unsetDoNotUseFlag();
+      } else {
+        B2WARNING("No CDCWireHit for CDCHit");
+      }
+    } else {
+      B2WARNING("Hit index out of bounds");
+    }
+  }
+
+  return iHits.size();
+}
+
+std::vector<int> CDCWireHitTopology::getIHitsRelatedFrom(const std::string& storeArrayName) const
+{
+  std::vector<int> iHits;
+
+  StoreArray<CDCHit> storedHits;
+  int nHits = storedHits.getEntries();
+
+  for (Index iHit = 0; iHit < nHits; ++iHit) {
+    const CDCHit* ptrHit = storedHits[iHit];
+    if (ptrHit) {
+      const CDCHit& hit = *ptrHit;
+      TObject* ptrRelatedObj = hit.getRelatedFrom<TObject>(storeArrayName);
+      if (ptrRelatedObj) {
+        iHits.push_back(iHit);
+      }
+    }
+  }
+  return iHits;
+}
 
 size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
 {
@@ -71,6 +215,8 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
 
   // get the relevant cdc hits from the datastore
   StoreArray<CDCHit> cdcHits(cdcHitsStoreArrayName);
+
+  assert(maximalOneHitPerWire(cdcHits));
 
   //create the wirehits into a collection
   Index nHits = cdcHits.getEntries();
@@ -98,8 +244,6 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
     if (hit.getArrayIndex() != wireHit.getStoreIHit()) {
       B2ERROR("CDCHit.getArrayIndex() differs from CDCWireHit.getStoreIHit");
     }
-
-
   }
 
   m_wireHits.ensureSorted();
@@ -117,8 +261,8 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
   }
 
   return nHits;
-
 }
+
 
 void CDCWireHitTopology::clear()
 {

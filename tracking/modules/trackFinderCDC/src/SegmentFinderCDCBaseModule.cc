@@ -68,19 +68,16 @@ void SegmentFinderCDCBaseModule::initialize()
   } else if (m_param_segmentOrientationString == string("downwards")) {
     m_segmentOrientation = c_Downwards;
   } else {
-    B2WARNING("Unexpected 'SegmentOrientation' parameter of segment finder module : '" << m_param_segmentOrientationString << "'. Default to none");
+    B2WARNING("Unexpected 'SegmentOrientation' parameter of segment finder module : '" << m_param_segmentOrientationString << "'. Defaults to none");
     m_segmentOrientation = c_None;
-  }
-
-  if (m_param_createGFTrackCands) {
-    StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandsStoreArrayName);
   }
 
 }
 
 void SegmentFinderCDCBaseModule::event()
 {
-  TrackFinderCDCBaseModule::event();
+  size_t nHits = prepareHits();
+  if (nHits == 0) return;
 
   // Generate the segments
   std::vector<CDCRecoSegment2D> generatedSegments;
@@ -140,6 +137,7 @@ void SegmentFinderCDCBaseModule::event()
   // Put code to generate gf track cands here if requested.
   if (m_param_createGFTrackCands) {
     StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_gfTrackCandsStoreArrayName);
+    storedGFTrackCands.create();
     for (const CDCRecoSegment2D & segment : outputSegments) {
       genfit::TrackCand* ptrTrackCand = storedGFTrackCands.appendNew();
       segment.fillInto(*ptrTrackCand);

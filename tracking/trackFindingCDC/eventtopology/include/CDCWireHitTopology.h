@@ -26,6 +26,7 @@
 #include <tracking/trackFindingCDC/algorithms/SortableVector.h>
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -60,12 +61,60 @@ namespace Belle2 {
       ~CDCWireHitTopology();
 
     public:
+      /// Initialize the wire hit topology at the begin of the run. Requires the StoreArray of CDCHits.
+      void initialize();
+
       /// Fill the topology from the raw cdc hits.
-      size_t fill(const std::string& cdcHitsStoreArrayName = "");
+      size_t event();
+
+      /// Use all cdc hits
+      size_t useAll();
+
+      /// Blocks the cdc hits given as indices to the store array. Returns the number of blocked hits
+      size_t dontUse(const std::vector<int>& iHits);
+
+      /// Use all but the cdc hits given as indices to the store array.
+      size_t useAllBut(const std::vector<int>& iHits);
+
+      /// Only use the cdc hits given as indices to the store array.
+      size_t useOnly(const std::vector<int>& iHits);
+
+      /// Only use the cdc hits that have a relation from the StoreArray given by full name.
+      size_t dontUseRelatedFrom(const std::string& storeArrayName) {
+        std::vector<int> iHits = getIHitsRelatedFrom(storeArrayName);
+        return dontUse(iHits);
+      }
+
+      /// Only use the cdc hits that have a relation from the StoreArray given by full name.
+      size_t useOnlyRelatedFrom(const std::string& storeArrayName) {
+        std::vector<int> iHits = getIHitsRelatedFrom(storeArrayName);
+        return useOnly(iHits);
+      }
+
+      /// Use all but the cdc hits that have a relation from the StoreArray given by full name.
+      size_t useAllButRelatedFrom(const std::string& storeArrayName) {
+        std::vector<int> iHits = getIHitsRelatedFrom(storeArrayName);
+        return useAllBut(iHits);
+      }
+
+    private:
+      /// Returns all indices of cdc hits that have a relation from the StoreArray given by its full name.
+      std::vector<int> getIHitsRelatedFrom(const std::string& storeArrayName) const;
+
+    private:
+      /**
+       * Fill the topology from the raw cdc hits
+       * Note this methode should only called once per event,
+       * since it is likely that pointers to the translated hits are keep through out the reconstruction procedure.
+       *
+       * @param  cdcHitsStoreArrayName  Name of the store array the raw cdc hits shall be used for tracking.
+       */
+      size_t fill(const std::string& cdcHitsStoreArrayName);
 
       /// Clear content of the topology after the event is processed.
       void clear();
 
+    public:
       /// Getter for the oriented wire hit with the opposite orientation.
       const Belle2::TrackFindingCDC::CDCRLWireHit* getReverseOf(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
 
@@ -102,6 +151,10 @@ namespace Belle2 {
       { return *m_initialTDCCountTranslator; }
 
     private:
+
+      /// Memory for the event, run and experminent number corresponding to the currently stored data.
+      EventMetaData m_eventMetaData;
+
       SortableVector<CDCWireHit> m_wireHits; ///< Memory for the wire hits to be stored
       SortableVector<CDCRLWireHit> m_rlWireHits; ///< Memory for the oriented wire hits to be stored
 

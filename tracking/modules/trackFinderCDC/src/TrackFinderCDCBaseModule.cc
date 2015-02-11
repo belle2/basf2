@@ -33,16 +33,24 @@ using namespace TrackFindingCDC;
 
 TrackFinderCDCBaseModule::TrackFinderCDCBaseModule(ETrackOrientation trackOrientation) :
   Module(),
-  m_param_cdcHitsStoreArrayName(""),
+  m_param_useOnlyCDCHitsRelatedFromStoreArrayName(""),
+  m_param_dontUseCDCHitsRelatedFromStoreArrayName(""),
   m_param_trackOrientationString(""),
   m_param_tracksStoreObjName("CDCTrackVector"),
   m_param_gfTrackCandsStoreArrayName(""),
   m_trackOrientation(trackOrientation)
 {
   setDescription("This a base module for all track finders in the CDC");
-  addParam("CDCHitsStoreArrayName",
-           m_param_cdcHitsStoreArrayName,
-           "Name of the input StoreArray of the CDCHits.",
+  addParam("UseOnlyCDCHitsRelatedFrom",
+           m_param_useOnlyCDCHitsRelatedFromStoreArrayName,
+           "Full name of a StoreArray that has a Relation to the CDCHits StoreArray. "
+           "Only CDCHits that have a relation will be used in this track finder.",
+           string(""));
+
+  addParam("DontUseCDCHitsRelatedFrom",
+           m_param_dontUseCDCHitsRelatedFromStoreArrayName,
+           "Full name of a StoreArray that has a Relation to the CDCHits StoreArray. "
+           "CDCHits that have a relation will be blocked in this track finder.",
            string(""));
 
   addParam("TrackOrientation",
@@ -67,12 +75,16 @@ TrackFinderCDCBaseModule::~TrackFinderCDCBaseModule()
 
 void TrackFinderCDCBaseModule::initialize()
 {
+  // Preload geometry during initialization
+  // Marked as unused intentionally to avoid a compile warning
+  CDC::CDCGeometryPar& cdcGeo __attribute__((unused)) = CDC::CDCGeometryPar::Instance();
+  CDCWireTopology& wireTopology  __attribute__((unused)) = CDCWireTopology::getInstance();
+
   // Input StoreArray of CDCHits
-  StoreArray <CDCHit>::required(m_param_cdcHitsStoreArrayName);
+  CDCWireHitTopology::getInstance().initialize();
 
   // Output StoreArray
   StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandsStoreArrayName);
-
   StoreWrappedObjPtr< std::vector<CDCTrack> >::registerTransient(m_param_tracksStoreObjName);
 
   if (m_param_trackOrientationString == string("")) {
@@ -89,33 +101,45 @@ void TrackFinderCDCBaseModule::initialize()
     B2WARNING("Unexpected 'TrackOrientation' parameter of track finder module : '" << m_param_trackOrientationString << "'. Default to none");
     m_trackOrientation = c_None;
   }
-
-
-  // Preload geometry during initialization
-  // Marked as unused intentionally to avoid a compile warning
-  CDC::CDCGeometryPar& cdcGeo __attribute__((unused)) = CDC::CDCGeometryPar::Instance();
-  CDCWireTopology& topo __attribute__((unused)) = CDCWireTopology::getInstance();
 }
 
 void TrackFinderCDCBaseModule::beginRun()
 {
 }
 
-void TrackFinderCDCBaseModule::event()
+
+size_t TrackFinderCDCBaseModule::prepareHits()
 {
-  // Try to fetch the CDCHits from the datastore
-  B2DEBUG(100, "Getting the CDCHits from the data store");
-  StoreArray <CDCHit> storedCDCHits(m_param_cdcHitsStoreArrayName);
-  B2DEBUG(100, "  storedCDCHits.getEntries() == " << storedCDCHits.getEntries());
+  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
   // Create the wirehits - translate the CDCHits and attach the geometry.
   B2DEBUG(100, "Creating all CDCWireHits");
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  size_t nHits = wireHitTopology.fill(m_param_cdcHitsStoreArrayName);
+  size_t nHits = wireHitTopology.event();
+  size_t useNHits = nHits;
+
+  if (m_param_useOnlyCDCHitsRelatedFromStoreArrayName != std::string("")) {
+    B2DEBUG(100, "  Use only CDCHits related from " << m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
+    useNHits = wireHitTopology.useOnlyRelatedFrom(m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
+  }
+
+  if (m_param_dontUseCDCHitsRelatedFromStoreArrayName != std::string("")) {
+    B2DEBUG(100, "  Don't use CDCHits related from " << m_param_dontUseCDCHitsRelatedFromStoreArrayName);
+    useNHits -= wireHitTopology.dontUseRelatedFrom(m_param_dontUseCDCHitsRelatedFromStoreArrayName);
+  }
+
+  B2DEBUG(100, "  Created number of CDCWireHits == " << nHits);
+  B2DEBUG(100, "  Number of usable CDCWireHits == " << useNHits);
+
   if (nHits == 0) {
     B2WARNING("Event with no hits");
   }
 
+  return nHits;
+}
+
+void TrackFinderCDCBaseModule::event()
+{
+  prepareHits();
 
   // Generate the tracks
   std::vector<CDCTrack> generatedTracks;
@@ -173,7 +197,7 @@ void TrackFinderCDCBaseModule::event()
   }
 }
 
-void TrackFinderCDCBaseModule::generate(std::vector<CDCTrack>& tracks)
+void TrackFinderCDCBaseModule::generate(std::vector<CDCTrack>&)
 {
 
 }

@@ -53,6 +53,9 @@ namespace Belle2 {
     virtual void event();
 
     /// Generates the tracks into the output argument. To be overriden in a concrete subclass.
+    size_t prepareHits();
+
+    /// Generates the tracks into the output argument. To be overriden in a concrete subclass.
     virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
 
     /// Called at the end of a run.
@@ -85,8 +88,12 @@ namespace Belle2 {
     const T& getParamValue(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError);
 
   protected:
-    /// Parameter: Name of the input StoreArray of the CDCHits.
-    std::string m_param_cdcHitsStoreArrayName;
+
+    /// Parameter: Full name of a StoreArray that has a Relation to the CDCHits StoreArray. Only CDCHits that have a relation will be used in this track finder.
+    std::string m_param_useOnlyCDCHitsRelatedFromStoreArrayName;
+
+    /// Parameter: Full name of a StoreArray that has a Relation to the CDCHits StoreArray. CDCHits that have a relation will be blocked in this track finder.
+    std::string m_param_dontUseCDCHitsRelatedFromStoreArrayName;
 
     /// Parameter: String that states the desired track orientation. Valid orientations are "none" (as generated), "symmetric", "outwards", "downwards".
     std::string m_param_trackOrientationString;

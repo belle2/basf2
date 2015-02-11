@@ -25,7 +25,6 @@ namespace Belle2 {
 
 
     /// Class providing construction combinatorics for the segment triples.
-    template<class AxialStereoSegmentPairFilter>
     class AxialStereoSegmentPairCreator {
 
     private:
@@ -42,20 +41,6 @@ namespace Belle2 {
 
       /// Empty destructor.
       ~AxialStereoSegmentPairCreator() {;}
-
-
-
-      /// Forwards the initialize method of the module to the filters
-      void initialize() {
-        m_axialStereoSegmentPairFilter.initialize();
-      }
-
-      /// Forwards the terminate method of the module to the filters
-      void terminate() {
-        m_axialStereoSegmentPairFilter.terminate();
-      }
-
-
 
       bool checkSegmentsSortedBySuperLayer(const std::vector<CDCRecoSegment2D>& segments) const {
         if (segments.empty()) return true;
@@ -75,7 +60,9 @@ namespace Belle2 {
 
 
       /// Create the segment triples by combining close by segments in the combination axial-stereo-axial based on the filter selection criteria.
-      inline void create(const std::vector<CDCRecoSegment2D>& segments,
+      template<class AxialStereoSegmentPairFilter>
+      inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
+                         const std::vector<CDCRecoSegment2D>& segments,
                          std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const {
 
 
@@ -87,7 +74,7 @@ namespace Belle2 {
           segmentRangesBySuperLayer[iSuperLayer].push_back(ptrSegment);
         }
 
-        create(segmentRangesBySuperLayer, axialStereoSegmentPairs);
+        create(axialStereoSegmentPairFilter, segmentRangesBySuperLayer, axialStereoSegmentPairs);
 
         std::sort(std::begin(axialStereoSegmentPairs), std::end(axialStereoSegmentPairs));
 
@@ -96,11 +83,13 @@ namespace Belle2 {
 
     private:
       /// Creates the axial stereo segment pairs from the segments, which have been grouped by their superlayer id.
-      inline void create(const SegmentRangesBySuperLayer& segmentRangesBySuperLayer,
+      template<class AxialStereoSegmentPairFilter>
+      inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
+                         const SegmentRangesBySuperLayer& segmentRangesBySuperLayer,
                          std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const {
 
         //clear the remembered fits
-        m_axialStereoSegmentPairFilter.clear();
+        axialStereoSegmentPairFilter.clear();
 
         //Make pairs of closeby superlayers
         for (ISuperLayerType iSuperLayer = 0; iSuperLayer < CDCWireTopology::N_SUPERLAYERS; ++iSuperLayer) {
@@ -112,7 +101,7 @@ namespace Belle2 {
             ILayerType iSuperLayerIn = iSuperLayer - 1;
             if (isValidISuperLayer(iSuperLayerIn)) {
               const CDCRecoSegmentRange& endSegments = segmentRangesBySuperLayer[iSuperLayerIn];
-              create(startSegments, endSegments, axialStereoSegmentPairs);
+              create(axialStereoSegmentPairFilter, startSegments, endSegments, axialStereoSegmentPairs);
             }
           }
 
@@ -121,7 +110,7 @@ namespace Belle2 {
             ILayerType iSuperLayerOut = iSuperLayer + 1;
             if (isValidISuperLayer(iSuperLayerOut)) {
               const CDCRecoSegmentRange& endSegments = segmentRangesBySuperLayer[iSuperLayerOut];
-              create(startSegments, endSegments, axialStereoSegmentPairs);
+              create(axialStereoSegmentPairFilter, startSegments, endSegments, axialStereoSegmentPairs);
             }
           }
 
@@ -130,7 +119,9 @@ namespace Belle2 {
 
 
       /// Creates segment tiples from a combination of start segment, middle segments and end segments.
-      inline void create(const CDCRecoSegmentRange& startSegments,
+      template<class AxialStereoSegmentPairFilter>
+      inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
+                         const CDCRecoSegmentRange& startSegments,
                          const CDCRecoSegmentRange& endSegments,
                          std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const {
 
@@ -153,7 +144,7 @@ namespace Belle2 {
               continue;
             }
 
-            CellWeight pairWeight = m_axialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair);
+            CellWeight pairWeight = axialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair);
             bool pairIsGood = not isNotACell(pairWeight);
             if (pairIsGood) {
               axialStereoSegmentPair.getAutomatonCell().setCellWeight(pairWeight);
@@ -163,12 +154,6 @@ namespace Belle2 {
           }
         }
       }
-
-    private:
-
-      /// Instance of the axial to axial stereo filter.
-      mutable AxialStereoSegmentPairFilter m_axialStereoSegmentPairFilter;
-
     };
 
   } //end namespace TrackFindingCDC

@@ -162,10 +162,7 @@ namespace Belle2 {
 
       //object creators
       /// Instance of the axial stereo segment pair creator.
-      AxialStereoSegmentPairCreator<AxialStereoSegmentPairFilter> m_axialStereoSegmentPairCreator;
-
-      /// Instance of the axial stereo pair neighbor chooser
-      AxialStereoSegmentPairNeighborChooser m_axialStereoSegmentPairNeighborChooser;
+      AxialStereoSegmentPairCreator m_axialStereoSegmentPairCreator;
 
       //cellular automat
       /// Instance of the cellular automaton.
@@ -190,13 +187,13 @@ namespace Belle2 {
       //create the segment pairs
       B2DEBUG(100, "Combining CDCReco2DSegments to CDCAxialStereoSegmentPairs");
       m_axialStereoSegmentPairs.clear();
-      m_axialStereoSegmentPairCreator.create(segments, m_axialStereoSegmentPairs);
+      m_axialStereoSegmentPairCreator.create(*m_ptrAxialStereoSegmentPairFilter, segments, m_axialStereoSegmentPairs);
       B2DEBUG(100, "  Created " << m_axialStereoSegmentPairs.size()  << " CDCAxialStereoSegmentPair");
 
       //create the segment pair neighborhood
       B2DEBUG(100, "Creating the CDCAxialStereoSegmentPair neighborhood");
       m_axialStereoSegmentPairNeighborhood.clear();
-      m_axialStereoSegmentPairNeighborhood.createUsing(m_axialStereoSegmentPairNeighborChooser, m_axialStereoSegmentPairs);
+      m_axialStereoSegmentPairNeighborhood.createUsing(*m_ptrAxialStereoSegmentPairNeighborChooser, m_axialStereoSegmentPairs);
       B2DEBUG(100, "  Created " << m_axialStereoSegmentPairNeighborhood.size()  << " AxialStereoPairNeighborhoods");
 
       //multiple passes if growMany is active and one track is created at a time

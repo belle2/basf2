@@ -71,9 +71,11 @@ namespace Belle2 {
       ///Total number of superlayers
       static const ILayerType N_SUPERLAYERS = 9;
 
+    private:
       /// Initializes all wires, wire layers and wire superlayers their interdependences from the CDCGeometryPar.
       void initialize();
 
+    public:
       /** @name Wire range
        */
       /**@{*/

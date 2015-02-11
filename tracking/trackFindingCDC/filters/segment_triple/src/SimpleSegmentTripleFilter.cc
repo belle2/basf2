@@ -53,7 +53,7 @@ void SimpleSegmentTripleFilter::terminate()
 
 
 
-CellWeight SimpleSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple) const
+CellWeight SimpleSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple)
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
@@ -184,7 +184,7 @@ CellWeight SimpleSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple
 
   }
 
-  CellState result = startSegment.size() + middleSegment.size() + endSegment.size();
+  CellWeight result = startSegment.size() + middleSegment.size() + endSegment.size();
 
   if (not isNotACell(result)) {
 

@@ -21,30 +21,6 @@ SimpleAxialAxialSegmentPairFilter::SimpleAxialAxialSegmentPairFilter() : m_riema
   m_riemannFitter.useOnlyOrientation();
 }
 
-SimpleAxialAxialSegmentPairFilter::~SimpleAxialAxialSegmentPairFilter()
-{
-
-}
-
-
-void SimpleAxialAxialSegmentPairFilter::clear()
-{
-
-}
-
-
-
-void SimpleAxialAxialSegmentPairFilter::initialize()
-{
-}
-
-
-void SimpleAxialAxialSegmentPairFilter::terminate()
-{
-}
-
-
-
 CellWeight SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
 {
 

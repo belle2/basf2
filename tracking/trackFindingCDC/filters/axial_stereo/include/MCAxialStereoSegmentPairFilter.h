@@ -30,7 +30,7 @@ namespace Belle2 {
       virtual CellWeight isGoodAxialStereoSegmentPair(const Belle2::TrackFindingCDC::CDCAxialStereoSegmentPair& axialAxialSegmentPair) IF_NOT_CINT(override final);
 
     private:
-      /// Switch to indicate if the reversed version of the facet shall also be accepted (default is true).
+      /// Switch to indicate if the reversed version of the segment pair shall also be accepted (default is true).
       bool m_allowReverse;
 
     }; // end class MCAxialStereoSegmentPairFilter

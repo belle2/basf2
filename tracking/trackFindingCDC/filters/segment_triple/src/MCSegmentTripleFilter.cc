@@ -22,7 +22,9 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-MCSegmentTripleFilter::MCSegmentTripleFilter()
+MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
+  m_allowReverse(allowReverse),
+  m_mcAxialAxialSegmentPairFilter(allowReverse)
 {
 }
 
@@ -55,7 +57,7 @@ void MCSegmentTripleFilter::terminate()
 
 
 
-CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple, bool allowBackward) const
+CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple)
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
@@ -80,7 +82,7 @@ CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& se
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   /// Recheck the axial axial compatability
-  CellWeight pairWeight =  m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(segmentTriple, allowBackward);
+  CellWeight pairWeight =  m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(segmentTriple);
   if (isNotACell(pairWeight)) return NOT_A_CELL;
 
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
@@ -97,7 +99,7 @@ CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& se
 
 
   if ((startToMiddleFBInfo == FORWARD and middleToEndFBInfo == FORWARD) or
-      (allowBackward and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
+      (m_allowReverse and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
 
     // Do fits
     setTrajectoryOf(segmentTriple);

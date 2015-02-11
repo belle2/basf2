@@ -13,6 +13,8 @@
 
 #include <tracking/trackFindingCDC/filters/segment_triple/MCSegmentTripleFilter.h>
 
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
+
 #include "BaseSegmentTripleNeighborChooser.h"
 
 namespace Belle2 {
@@ -22,17 +24,23 @@ namespace Belle2 {
 
     public:
       /** Constructor. */
-      MCSegmentTripleNeighborChooser()
-      {;}
+      MCSegmentTripleNeighborChooser(bool allowReverse = true);
 
       /** Destructor.*/
-      ~MCSegmentTripleNeighborChooser() {;}
+      virtual ~MCSegmentTripleNeighborChooser() {;}
+
+      /// Clears stored information for a former event
+      virtual void clear() IF_NOT_CINT(override final);
+
+      /// Forwards the initialize method from the module
+      virtual void initialize() IF_NOT_CINT(override final);
+
+      /// Forwards the terminate method from the module
+      virtual void terminate() IF_NOT_CINT(override final);
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      inline NeighborWeight isGoodNeighbor(
-        const CDCSegmentTriple& triple,
-        const CDCSegmentTriple& neighborTriple
-      ) const {
+      virtual NeighborWeight isGoodNeighbor(const CDCSegmentTriple& triple,
+                                            const CDCSegmentTriple& neighborTriple) override final {
 
         CellState mcTripleWeight = m_mcSegmentTripleFilter.isGoodSegmentTriple(triple);
         CellState mcNeighborTripleWeight = m_mcSegmentTripleFilter.isGoodSegmentTriple(neighborTriple);
@@ -44,7 +52,8 @@ namespace Belle2 {
       }
 
     private:
-      MCSegmentTripleFilter m_mcSegmentTripleFilter; ///< Instance of the Monte Carlo segment triple filter for rejection of false cells.
+      /// Instance of the Monte Carlo segment triple filter for rejection of false cells.
+      MCSegmentTripleFilter m_mcSegmentTripleFilter;
 
     }; // end class
 

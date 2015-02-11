@@ -11,13 +11,11 @@
 #ifndef BASESEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define BASESEGMENTTRIPLENEIGHBORCHOOSER_H_
 
-#include <boost/range/iterator_range.hpp>
-
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
+#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
+
+#include <boost/range/iterator_range.hpp>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -36,26 +34,24 @@ namespace Belle2 {
       {;}
 
       /// Empty destructor
-      ~BaseSegmentTripleNeighborChooser() {;}
+      virtual ~BaseSegmentTripleNeighborChooser() {;}
 
       /// Clears stored information for a former event
-      inline void clear() const {/*nothing to remember*/;}
+      virtual void clear() {;}
 
       /// Forwards the initialize method from the module
-      void initialize() {;}
+      virtual void initialize() {;}
 
       /// Forwards the terminate method from the module
-      void terminate() {;}
+      virtual void terminate() {;}
 
 
       /// Returns a two iterator range covering the range of possible neighboring segment triples of the given facet out of the sorted range given by the two other argumets.
       template<class CDCSegmentTripleIterator>
       boost::iterator_range<CDCSegmentTripleIterator>
-      getPossibleNeighbors(
-        const CDCSegmentTriple& triple,
-        const CDCSegmentTripleIterator& itBegin,
-        const CDCSegmentTripleIterator& itEnd
-      ) const {
+      getPossibleNeighbors(const CDCSegmentTriple& triple,
+                           const CDCSegmentTripleIterator& itBegin,
+                           const CDCSegmentTripleIterator& itEnd)  {
 
         const CDCAxialRecoSegment2D* endSegment = triple.getEnd();
         std::pair<CDCSegmentTripleIterator,  CDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, endSegment);
@@ -64,19 +60,11 @@ namespace Belle2 {
       }
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      inline Weight isGoodNeighbor(
-        const CDCSegmentTriple& triple __attribute__((unused)) ,
-        const CDCSegmentTriple& neighborTriple
-      ) const {
+      virtual NeighborWeight isGoodNeighbor(const CDCSegmentTriple&,
+                                            const CDCSegmentTriple&) {
 
-        // Just let all found neighors pass for the base implementation
-        // with the default weight
-        return  -neighborTriple.getStart()->size();
-
+        return NOT_A_NEIGHBOR;
       }
-
-    private:
-
     }; // end class
 
 

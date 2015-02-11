@@ -11,14 +11,16 @@
 #ifndef SIMPLEAXIALAXIALSEGMENTPAIRFILTER_H_
 #define SIMPLEAXIALAXIALSEGMENTPAIRFILTER_H_
 
+#include "BaseAxialAxialSegmentPairFilter.h"
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class SimpleAxialAxialSegmentPairFilter {
+    class SimpleAxialAxialSegmentPairFilter : public BaseAxialAxialSegmentPairFilter {
 
     public:
 
@@ -26,22 +28,23 @@ namespace Belle2 {
       SimpleAxialAxialSegmentPairFilter();
 
       /// Empty destructor
-      ~SimpleAxialAxialSegmentPairFilter();
+      virtual ~SimpleAxialAxialSegmentPairFilter() {;}
 
     public:
 
       /// Clears all remember information from the last event
-      void clear();
+      virtual void clear() override final {;}
 
       /// Forwards the modules initialize to the filter
-      void initialize();
+      virtual void initialize() override final {;}
 
       /// Forwards the modules initialize to the filter
-      void terminate();
+      virtual void terminate() override final {;}
 
       /// Checks if a pair of axial segments is a good combination
-      CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
+      virtual CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) override final;
 
+    public:
       /// Returns the trajectory of the axial segment. Also fits it if necessary.
       const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;
 

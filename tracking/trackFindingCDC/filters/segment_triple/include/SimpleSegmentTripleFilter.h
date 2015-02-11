@@ -13,19 +13,16 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
-
 #include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
 
-#include "boost/tuple/tuple.hpp"
-#include "boost/tuple/tuple_comparison.hpp"
+#include "BaseSegmentTripleFilter.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of segment triples based on simple criterions
-    class SimpleSegmentTripleFilter {
+    class SimpleSegmentTripleFilter : public BaseSegmentTripleFilter {
 
     public:
 
@@ -33,23 +30,22 @@ namespace Belle2 {
       SimpleSegmentTripleFilter();
 
       /** Destructor.*/
-      ~SimpleSegmentTripleFilter();
+      virtual ~SimpleSegmentTripleFilter();
 
     public:
       /// Clears all remember information from the last event
-      void clear();
+      virtual void clear() override final;
 
       /// Forwards the modules initialize to the filter
-      void initialize();
+      virtual void initialize() override final;
 
       /// Forwards the modules initialize to the filter
-      void terminate();
-
+      virtual void terminate() override final;
 
       /// Checks if a triple of axial, stereo and axial segments is a good combination to be stored as an automaton cell
       /** Checks the proper alignement and the quality of connection between all three segments.
        *  Returns NOT_A_CELL if the connection shall not be made or a finit value be used as the cell weight of the cell to constructed. */
-      CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple) const;
+      virtual CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple) override final;
 
     private:
       /// Returns the sz trajectory of the reconstructed stereo segment of the segment triple. Does a fit if necessary.
@@ -64,7 +60,6 @@ namespace Belle2 {
 
       /// Subsidiary filter to use the fitter from it.
       SimpleAxialAxialSegmentPairFilter m_simpleAxialAxialSegmentPairFilter;
-
 
     }; // end class SimpleSegmentTripleFilter
 

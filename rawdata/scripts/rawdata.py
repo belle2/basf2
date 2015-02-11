@@ -81,10 +81,20 @@ def add_packers(path, components=None):
 
         path.add_module(pxdpacker)
 
-    # BPID
+    # SVD
+    if components == None or 'SVD' in components:
+        svdpacker = register_module('SVDPacker')
+        path.add_module(svdpacker)
+
+    # TOP
     if components == None or 'TOP' in components:
-        bpidpacker = register_module('TOPPacker')
-        path.add_module(bpidpacker)
+        toppacker = register_module('TOPPacker')
+        path.add_module(toppacker)
+
+    # BKLM
+    if components == None or 'BKLM' in components:
+        bklmpacker = register_module('BKLMRawPacker')
+        path.add_module(bklmpacker)
 
 
 def add_unpackers(path, components=None):
@@ -102,10 +112,20 @@ def add_unpackers(path, components=None):
         pxdhitsorter.param('mergeFrames', False)
         path.add_module(pxdhitsorter)
 
-    # BPID
+    # SVD
+    if components == None or 'SVD' in components:
+        svdunpacker = register_module('SVDUnpacker')
+        path.add_module(svdunpacker)
+
+    # TOP
     if components == None or 'TOP' in components:
-        bpidunpacker = register_module('TOPUnpacker')
-        path.add_module(bpidunpacker)
+        topunpacker = register_module('TOPUnpacker')
+        path.add_module(topunpacker)
+
+    # BKLM
+    if components == None or 'BKLM' in components:
+        bklmunpacker = register_module('BKLMUnpacker')
+        path.add_module(bklmunpacker)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):
@@ -115,8 +135,7 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
 
     output = register_module('RootOutput')
     output.param('outputFileName', filename)
-    branches = ['RawPXDs']
-    branches += ['RawBPIDs']
+    branches = ['RawPXDs', 'RawSVDs', 'RawTOPs', 'RawKLMs']
     branches += additionalBranches
     output.param('branchNames', branches)
     path.add_module(output)

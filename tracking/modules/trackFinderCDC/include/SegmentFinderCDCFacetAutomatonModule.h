@@ -60,6 +60,9 @@ namespace Belle2 {
         m_param_facetsStoreObjName("CDCFacetVector"),
         m_param_writeTangentSegments(false),
         m_param_tangentSegmentsStoreObjName("CDCRecoTangentSegmentVector") {
+
+        setDescription("Generates segments from hits using a cellular automaton build from hit triples (facets).");
+
         addParam("WriteClusters",
                  m_param_writeClusters,
                  "Switch if clusters shall be written to the DataStore",

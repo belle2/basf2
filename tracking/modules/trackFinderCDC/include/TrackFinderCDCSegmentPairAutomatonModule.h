@@ -56,9 +56,12 @@ namespace Belle2 {
         m_ptrAxialStereoSegmentPairNeighborChooser(new AxialStereoSegmentPairNeighborChooser()),
         m_param_writeSegmentPairs(false),
         m_param_segmentPairsStoreObjName("CDCAxialStereoSegmentPairVector") {
+
+        setDescription("Generates tracks from segments using a cellular automaton build from segment pairs.");
+
         addParam("WriteSegmentPairs",
                  m_param_writeSegmentPairs,
-                 "Switch if facets shall be written to the DataStore",
+                 "Switch if segment pairs shall be written to the DataStore",
                  false);
 
         addParam("SegmentPairsStoreObjName",
@@ -112,37 +115,37 @@ namespace Belle2 {
       }
 
     public:
-      /// Getter for the current facet filter. The module keeps ownership of the pointer.
+      /// Getter for the current segment pair filter. The module keeps ownership of the pointer.
       AxialStereoSegmentPairFilter* getAxialStereoSegmentPairFilter() {
         return m_ptrAxialStereoSegmentPairFilter;
       }
 
-      /// Setter for the facet filter used in the facet creation. The module takes ownership of the pointer.
+      /// Setter for the segment pair filter used in the segment pair creation. The module takes ownership of the pointer.
       void setAxialStereoSegmentPairFilter(AxialStereoSegmentPairFilter* ptrAxialStereoSegmentPairFilter) {
         if (m_ptrAxialStereoSegmentPairFilter) delete m_ptrAxialStereoSegmentPairFilter;
         m_ptrAxialStereoSegmentPairFilter = ptrAxialStereoSegmentPairFilter;
       }
 
-      /// Getter for the current facet filter. The module keeps ownership of the pointer.
+      /// Getter for the current segment pair neighbor chooser. The module keeps ownership of the pointer.
       AxialStereoSegmentPairNeighborChooser* getAxialStereoSegmentPairNeighborChooser() {
         return m_ptrAxialStereoSegmentPairNeighborChooser;
       }
 
-      /// Setter for the facet neighbor chooser used to connect facets in a network. The module takes ownership of the pointer.
+      /// Setter for the segment neighbor chooser. The module takes ownership of the pointer.
       void setAxialStereoSegmentPairNeighborChooser(AxialStereoSegmentPairNeighborChooser* ptrAxialStereoSegmentPairNeighborChooser) {
         if (m_ptrAxialStereoSegmentPairNeighborChooser) delete m_ptrAxialStereoSegmentPairNeighborChooser;
         m_ptrAxialStereoSegmentPairNeighborChooser = ptrAxialStereoSegmentPairNeighborChooser;
       }
 
     private:
-      /// Reference to the filter to be used for the facet generation.
+      /// Reference to the filter to be used for the segment pair generation.
       AxialStereoSegmentPairFilter* m_ptrAxialStereoSegmentPairFilter;
 
-      /// Reference to the chooser to be used to construct the facet network.
+      /// Reference to the chooser to be used to construct the segment pair network.
       AxialStereoSegmentPairNeighborChooser* m_ptrAxialStereoSegmentPairNeighborChooser;
 
     private:
-      /// Parameter: Switch if facets shall be written to the DataStore
+      /// Parameter: Switch if segment pairs shall be written to the DataStore
       bool m_param_writeSegmentPairs;
 
       /// Parameter: Name of the output StoreObjPtr of the axial stereo segment pairs generated within this module.

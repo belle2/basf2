@@ -22,6 +22,7 @@ REG_MODULE(SegmentFinderCDCMCTruth);
 
 SegmentFinderCDCMCTruthModule::SegmentFinderCDCMCTruthModule() : SegmentFinderCDCBaseModule()
 {
+  setDescription("Generates segments from Monte Carlo information.");
   addParam("MinCDCHits", m_minCDCHits, "Minimum number of CDC hits needed to allow the created of a track candidate", 0);
 }
 

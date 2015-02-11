@@ -60,6 +60,8 @@ namespace Belle2 {
         m_param_writeSegmentTriples(false),
         m_param_segmentTriplesStoreObjName("CDCSegmentTripleVector") {
 
+        setDescription("Generates tracks from segments using a cellular automaton build from segment triples.");
+
         addParam("WriteSegmentTriples",
                  m_param_writeSegmentTriples,
                  "Switch if segment triples shall be written to the DataStore",

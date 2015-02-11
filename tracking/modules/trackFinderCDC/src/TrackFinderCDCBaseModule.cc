@@ -120,6 +120,8 @@ size_t TrackFinderCDCBaseModule::prepareHits()
   if (m_param_useOnlyCDCHitsRelatedFromStoreArrayName != std::string("")) {
     B2DEBUG(100, "  Use only CDCHits related from " << m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
     useNHits = wireHitTopology.useOnlyRelatedFrom(m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
+  } else {
+    useNHits = wireHitTopology.useAll();
   }
 
   if (m_param_dontUseCDCHitsRelatedFromStoreArrayName != std::string("")) {

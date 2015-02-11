@@ -147,6 +147,17 @@ namespace Belle2 {
     m_smearTrack = m_sigmaRphi > 0 || m_sigmaZ > 0 || m_sigmaTheta > 0 ||
                    m_sigmaPhi > 0;
 
+    // check if geometry parametes are loaded
+
+    if (!m_topgp->isInitialized()) {
+      GearDir content("/Detector/DetectorComponent[@name='TOP']/Content");
+      m_topgp->Initialize(content);
+    }
+    if (!m_topgp->isInitialized()) {
+      B2ERROR("Component TOP not found in Gearbox");
+      return;
+    }
+
     // Configure TOP detector
 
     TOPconfigure config;

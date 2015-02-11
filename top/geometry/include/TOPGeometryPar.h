@@ -66,6 +66,12 @@ namespace Belle2 {
        */
       void read(const GearDir& content);
 
+      /**
+       * check if parameters read from Gearbox
+       * @return true if parameters read
+       */
+      bool isInitialized() const {return m_initialized;}
+
       /** to return values in the default units */
       void setBasfUnits() {m_unit = Unit::cm;}
 
@@ -686,6 +692,7 @@ namespace Belle2 {
       static TOPGeometryPar* p_B4TOPGeometryParDB;  /**< Pointer to class instance */
       GearDir m_alignment;                          /**< GearDir of alignment */
       double m_unit;                                /**< conversion unit for length */
+      bool m_initialized;                           /**< true if Initialize() called */
 
     };
 

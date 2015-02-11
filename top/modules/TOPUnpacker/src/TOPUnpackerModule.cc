@@ -71,6 +71,12 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms;
     waveforms.registerInDataStore();
 
+    if (!m_topgp->isInitialized()) {
+      GearDir content("/Detector/DetectorComponent[@name='TOP']/Content");
+      m_topgp->Initialize(content);
+    }
+    if (!m_topgp->isInitialized()) B2ERROR("Component TOP not found in Gearbox");
+
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
     if (mapSize == 0) B2ERROR("No front-end mapping available for TOP");

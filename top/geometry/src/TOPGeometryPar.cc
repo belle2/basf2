@@ -50,6 +50,7 @@ namespace Belle2 {
       read(content);
       GearDir frontEndMapping(content, "FrontEndMapping");
       m_mapper.initialize(frontEndMapping);
+      m_initialized = true;
     }
 
     void TOPGeometryPar::clear(void)
@@ -140,6 +141,7 @@ namespace Belle2 {
       //! Other
 
       m_unit = Unit::cm;
+      m_initialized = false;
 
     }
 

@@ -39,13 +39,15 @@ void NtupleFlavorTaggingTool::setupTree()
 void NtupleFlavorTaggingTool::eval(const Particle* particle)
 {
   if (!particle) {
-    B2ERROR("NtupleFlavorTaggingTool::eval - no Particle found!");
+//     B2ERROR("NtupleFlavorTaggingTool::eval - no Particle found!");
+    printf("NtupleFlavorTaggingTool::eval - no Particle found!");
     return;
   }
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
+  if (selparticles[0]->getExtraInfo("ModeCode") != 1) return;
   B0Probability = selparticles[0]->getExtraInfo("B0Probability");
   B0barProbability = selparticles[0]->getExtraInfo("B0barProbability");
   qrCombined = selparticles[0]->getExtraInfo("qrCombined");

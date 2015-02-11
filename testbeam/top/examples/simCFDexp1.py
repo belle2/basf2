@@ -35,7 +35,7 @@ beam = {
     'varyNTracks': False,
     'momentumGeneration': 'normal',
     'momentumParams': [2.12, 0.21],
-    'thetaGeneration': 'uniformCosinus',
+    'thetaGeneration': 'uniformCos',
     'thetaParams': [thetaBeam - dtheta, thetaBeam + dtheta],
     'phiGeneration': 'uniform',
     'phiParams': [phiBeam - dphi, phiBeam + dphi],

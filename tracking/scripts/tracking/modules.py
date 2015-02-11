@@ -157,6 +157,13 @@ class PathModule(basf2.Module):
         self._path = path
         self.if_true(path, basf2.AfterConditionPath.CONTINUE)
 
+    @classmethod
+    def from_modules(cls, *modules):
+        path = basf2.create_path()
+        for module in modules:
+            path.add_module(module)
+        return cls(path)
+
     def event(self):
         """Event method of the module
 

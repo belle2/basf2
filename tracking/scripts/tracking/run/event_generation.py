@@ -132,6 +132,15 @@ class ReadOrGenerateEventsRun(object):
         )
 
         argument_parser.add_argument(
+            '-c',
+            '--component',
+            dest='components',
+            default=None,
+            action='append',
+            help='Add component. Multiple repeatition adds more component. If not given use tracking detectors with limited constant magnetic field to the CDC.',
+        )
+
+        argument_parser.add_argument(
             '-n',
             '--n-events',
             dest='n_events',
@@ -156,8 +165,11 @@ class ReadOrGenerateEventsRun(object):
         # Simply translate the arguments that have
         # the same name as valid instance arguments
         for (key, value) in vars(arguments).items():
+            if value is None:
+                continue
             if hasattr(self, key):
                 setattr(self, key, value)
+                get_logger().info("Setting %s to %s", key, value)
 
     def configure_from_commandline(self):
         argument_parser = self.create_argument_parser()
@@ -177,6 +189,16 @@ class ReadOrGenerateEventsRun(object):
             eventInfoSetterModule.param({'evtNumList': [self.n_events],
                                          'runList': [1], 'expList': [1]})
             main_path.add_module(eventInfoSetterModule)
+
+            # geometry parameter database
+            gearboxModule = basf2.register_module('Gearbox')
+            main_path.add_module(gearboxModule)
+
+            # detector geometry
+            geometryModule = basf2.register_module('Geometry')
+            if components:
+                geometryModule.param('components', components)
+                main_path.add_module(geometryModule)
 
             generatorModule = get_generator_module(self.generator_module)
             if generatorModule is not None:
@@ -198,11 +220,11 @@ class ReadOrGenerateEventsRun(object):
             main_path.add_module(rootInputModule)
 
             # gearbox & geometry needs to be registered any way
-            gearbox = basf2.register_module('Gearbox')
-            main_path.add_module(gearbox)
-            geometry = basf2.register_module('Geometry')
-            geometry.param('components', components)
-            main_path.add_module(geometry)
+            gearboxModule = basf2.register_module('Gearbox')
+            main_path.add_module(gearboxModule)
+            geometryModule = basf2.register_module('Geometry')
+            geometryModule.param('components', components)
+            main_path.add_module(geometryModule)
 
         # Progress module
         progressModule = basf2.register_module('Progress')
@@ -228,9 +250,9 @@ class ReadOrGenerateEventsRun(object):
 
         # Run basf2 module path #
         #########################
-        print 'Start processing'
+        get_logger().info('Start processing')
         basf2.process(main_path)
-        print basf2.statistics
+        get_logger().info("%s\n", str(basf2.statistics))
 
     def configure_and_execute_from_commandline(self):
         self.configure_from_commandline()
@@ -416,5 +438,5 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig()
+    logging.basicConfig(level=logging.INFO)
     main()

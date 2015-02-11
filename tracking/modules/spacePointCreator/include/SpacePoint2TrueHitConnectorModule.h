@@ -32,7 +32,19 @@ namespace Belle2 {
   /**
    * Module that tries to register a relation between SpacePoints and TrueHits, hence making some MC Information easily accesible for other modules working with SpacePoints (e.g. CurlingTrackCandSplitter or GFTC2SPTCConverter).
    *
-   * NOTE: this module is not yet fully functional! The future goal is to get all the stuff that concerns SpacePoint <-> TrueHit relations into this module and to keep the Converter (and the CurlingTrackCandSplitter) modules free of it and only feeding them SpacePoints that were processed by this module before.
+   * As there is no direct relation between SpacePoints and TrueHits, the relations between SpacePoints and Clusters and the relations between Clusters and TrueHits are used to relate SpacePoints and TrueHits. In a first step all (unique) TrueHits that are related to all Clusters of a SpacePoint are collected (including the weight of the relation). It is then possible that there is more than one TrueHit after this.
+   * + If 'storeSeperate' is set to true a new StoreArray of SpacePoints is created for every input StoreArray of SpacePoints with the same name and the 'outputSuffix' appended to it. This can be useful to have a StoreArray of SpacePoints where only 'checked' SpacePoints are (e.g. without ghost hits) that can then be used to feed the GFTC2SPTCConverter for example. If it is set to false, the relations will get registered in the existing StoreArray.
+   * + If 'registerAll' is set to true, the module simply registers a relation to all of these TrueHits. The weight of this new built relation is the sum of the weights of the relations between the Cluster(s) and the according TrueHit. In this way the decision which TrueHit to use is left to the user. NOTE: The information how many Clusters of a SpacePoint were related to a TrueHit and the weights of the single relations between Clusters and TrueHits is 'lost' (can be retrieved again if actually needed).
+   * + If 'registerAll' is set to false, the module tries to find a relation to only one TrueHit:
+   *  1) If there is only one TrueHit -> register relation to SpacePoint with weight being the sum of the weights of the relations between Cluster(s) of SpacePoint and TrueHit <BR>
+   *  2) If there is more than one TrueHit but only one TrueHit has a relation to both Clusters of a SpacePoint -> register relation to this TrueHit (again the weight of the relation is the sum of the weights of the relation between the Clusters and the TrueHit) <BR>
+   *  3) If there is more than one TrueHit with a relation to both Clusters of a SpacePoint -> register relation to the TrueHit with the largest sum of weights (of relation between Clusters and TrueHits)<BR>
+   *  4) If the SpacePoint has only one Cluster (e.g. PXD) and there is more than one TrueHit -> register relation to the TrueHit with the largest weight (of relation between Cluster and TrueHit)<BR>
+   *
+   * NOTE: It is not guaranteed that every SpacePoint gets related to a TrueHit if 'registerAll' is set to false! E.g. 'ghost hits' should be sorted out.
+   * NOTE: Choosing the TrueHit with the biggest weight (or sum of weights) if there is more than one possible TrueHit does not guarantee that the 'right' TrueHit is chosen! It is possible that in such cases no relation will get registered in the future if this proves to be a source of errors!
+   *
+   * NOTE: This module should be used to connect SpacePoints and TrueHits if MC information is needed afterwards (e.g. in the upcoming RefereeModule for SpacePointTrackCands) to avoid having to look up the relations to obtain these informations seperately in every Module. Furthermore some modules will no longer be able to do so after some rework!
    */
   class SpacePoint2TrueHitConnectorModule : public Module {
 
@@ -166,12 +178,12 @@ namespace Belle2 {
 
     /**
      * get the TrueHit from information that is stored in the map (conditions are checked in the following order):
-     * +) if there is only one TrueHit in the map, return a pointer to it and as weight the sum of the weights of the relations between the Clusters and the TrueHits
-     * +) if there is only one TrueHit in the map with two weights associated (and all other TrueHits have only one weight or there is no other TrueHit), return a pointer to it and the weight is again the sum of the weights in the map
-     * +) if there are more than one TrueHits with two weights associated, return the one with the biggest sum of weights
-     * +) if there are only TrueHits with one weight associated, return the one with the biggest weight
+     * + if there is only one TrueHit in the map, return a pointer to it and as weight the sum of the weights of the relations between the Clusters and the TrueHits
+     * + if there is only one TrueHit in the map with two weights associated (and all other TrueHits have only one weight or there is no other TrueHit), return a pointer to it and the weight is again the sum of the weights in the map
+     * + if there are more than one TrueHits with two weights associated, return the one with the biggest sum of weights
+     * + if there are only TrueHits with one weight associated, return the one with the biggest weight ONLY if the SpacePoint is related to only one Cluster (e.g. PXD)
      * NOTE: as this method is rather specific, it is not very much templated!
-     * NOTE: throws if one of the further checks that are then done fails!
+     * NOTE: the possible return of a NULL pointer has to be handled!
      */
     template <typename MapType, typename TrueHitType>
     std::pair<TrueHitType*, double> getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits, Belle2::SpacePoint* spacePoint);

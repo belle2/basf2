@@ -347,7 +347,7 @@ void SpacePoint2TrueHitConnectorModule::initializeCounters()
   m_all2WTHCtr = 0;
   m_accSingle2WTHCtr = 0;
   m_accNonSingle2WTHCtr = 0;
-  m_accNonSingle2WTHCtr = 0;
+  m_accAll2WTHCtr = 0;
 
   m_oneCluster2THCtr = 0;
 }

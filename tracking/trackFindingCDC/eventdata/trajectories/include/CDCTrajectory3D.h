@@ -70,6 +70,9 @@ namespace Belle2 {
       CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
                       const CDCTrajectorySZ& trajectorySZ);
 
+      /// Construct a trajectory from a two dimensional circular trajectory filling the remaining two parameters and covariance matrix with default values.
+      explicit CDCTrajectory3D(const CDCTrajectory2D& trajectory2D);
+
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
       explicit CDCTrajectory3D(const genfit::TrackCand& gfTrackCand);
 

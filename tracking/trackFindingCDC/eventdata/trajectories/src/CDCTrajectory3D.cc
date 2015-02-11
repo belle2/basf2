@@ -56,6 +56,11 @@ CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
 {
 }
 
+CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D) :
+  CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption())
+{
+}
+
 
 CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
   CDCTrajectory3D(gfTrackCand.getPosSeed(),

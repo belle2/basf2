@@ -131,6 +131,11 @@ namespace Belle2 {
       { return m_endTrajectory3D; }
 
 
+      /// Reverse the track inplace
+      void reverse();
+
+      /// Return a reversed copy of the track.
+      CDCTrack reversed() const;
 
       /// Getter for the forward backward indicator variable
       ForwardBackwardInfo getFBInfo() const

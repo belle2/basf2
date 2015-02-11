@@ -44,5 +44,34 @@ bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
 
 
 
+void CDCTrack::reverse()
+{
+  if (empty()) return;
 
+  // Exchange the forward and backward trajectory and reverse them
+  std::swap(m_startTrajectory3D, m_endTrajectory3D);
+  m_startTrajectory3D.reverse();
+  m_endTrajectory3D.reverse();
 
+  const CDCRecoHit3D& lastRecoHit3D = back();
+  FloatType lastPerpS = lastRecoHit3D.getPerpS();
+  FloatType newLastPerpS = m_startTrajectory3D.calcPerpS(lastRecoHit3D.getRecoPos3D());
+
+  // Reverse the left right passage hypotheses and reverse the measured travel distance
+  for (CDCRecoHit3D & recoHit3D : *this) {
+    recoHit3D.reverse();
+    FloatType perpS = recoHit3D.getPerpS();
+    recoHit3D.setPerpS(newLastPerpS + lastPerpS - perpS);
+  }
+
+  // Reverse the arrangement of hits.
+  std::reverse(begin(), end());
+
+}
+
+CDCTrack CDCTrack::reversed() const
+{
+  CDCTrack reversedTrack;
+  reversedTrack.reverse();
+  return reversedTrack;
+}

@@ -92,8 +92,8 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
 
   SegmentFinderCDCFacetAutomatonImplModule<>::initialize();
 
-  if ((m_param_facetNeighborChooser == string("mc")) or
-      (m_param_facetNeighborChooser == string("mc_symmetric")) or
+  if ((m_param_facetFilter == string("mc")) or
+      (m_param_facetFilter == string("mc_symmetric")) or
       (m_param_facetNeighborChooser == string("mc")) or
       (m_param_facetNeighborChooser == string("mc_symmetric"))) {
     StoreArray <CDCSimHit>::required();
@@ -105,8 +105,8 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
 
 void SegmentFinderCDCFacetAutomatonDevModule::event()
 {
-  if ((m_param_facetNeighborChooser == string("mc")) or
-      (m_param_facetNeighborChooser == string("mc_symmetric")) or
+  if ((m_param_facetFilter == string("mc")) or
+      (m_param_facetFilter == string("mc_symmetric")) or
       (m_param_facetNeighborChooser == string("mc")) or
       (m_param_facetNeighborChooser == string("mc_symmetric"))) {
 

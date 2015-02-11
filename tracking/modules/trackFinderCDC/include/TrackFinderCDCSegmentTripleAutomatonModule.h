@@ -31,7 +31,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Forward declaration of the module implementing the track generation by cellular automaton on segment pairs using specific filter instances.
+    /// Forward declaration of the module implementing the track generation by cellular automaton on segment triples using specific filter instances.
     template < class AxialAxialSegmentPairFilter = BaseAxialAxialSegmentPairFilter,
              class SegmentTripleFilter = BaseSegmentTripleFilter,
              class SegmentTripleNeighborChooser = BaseSegmentTripleNeighborChooser >
@@ -213,7 +213,17 @@ namespace Belle2 {
     >::generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments,
                 std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
     {
-      //create the segment triples
+      // Attain segment triple vector on the DataStore if needed.
+      std::vector<CDCSegmentTriple>* ptrSegmentTriples = nullptr;
+      if (m_param_writeSegmentTriples) {
+        StoreWrappedObjPtr< std::vector<CDCSegmentTriple> > storedSegmentTriples(m_param_segmentTriplesStoreObjName);
+        storedSegmentTriples.create();
+        std::vector<CDCSegmentTriple>& segmentTriples = *storedSegmentTriples;
+        ptrSegmentTriples = &segmentTriples;
+      }
+
+
+      // Create the segment triples
       B2DEBUG(100, "Combining CDCReco2DSegments to CDCSegmentTriples");
       m_segmentTriples.clear();
       m_segmentTripleCreator.create(*m_ptrAxialAxialSegmentPairFilter,
@@ -222,18 +232,25 @@ namespace Belle2 {
                                     m_segmentTriples);
       B2DEBUG(100, "  Created " << m_segmentTriples.size()  << " CDCSegmentTriples");
 
-      //create the segment triple neighorhood
+      // Create the segment triple neighorhood
       B2DEBUG(100, "Creating the CDCSegmentTriple neighborhood");
       m_segmentTripleNeighborhood.clear();
       m_segmentTripleNeighborhood.createUsing(*m_ptrSegmentTripleNeighborChooser, m_segmentTriples);
       B2DEBUG(100, "  Created " << m_segmentTripleNeighborhood.size()  << " SegmentTripleNeighborhoods");
 
-      //multiple passes if growMany is active and one track is created at a time
+      if (m_param_writeSegmentTriples) {
+        std::vector<CDCSegmentTriple>& segmentTriples = *ptrSegmentTriples;
+        for (const CDCSegmentTriple & segmentTriple : m_segmentTriples) {
+          segmentTriples.push_back(segmentTriple);
+        }
+      }
+
+      // Multiple passes if growMany is active and one track is created at a time
       m_segmentTriplePaths.clear();
       m_cellularPathFinder.apply(m_segmentTriples, m_segmentTripleNeighborhood, m_segmentTriplePaths);
       B2DEBUG(100, "  Created " << m_segmentTriplePaths.size()  << " SegmentTripleTracks");
 
-      //reduce to plain tracks
+      // Reduce to plain tracks
       B2DEBUG(100, "Reducing the SegmentTripleTracks to CDCTracks");
       tracks.clear();
       m_trackCreator.create(m_segmentTriplePaths, tracks);

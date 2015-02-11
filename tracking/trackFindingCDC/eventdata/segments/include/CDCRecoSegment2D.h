@@ -60,6 +60,8 @@ namespace Belle2 {
         SortableVector<CDCRecoHit2D>& rawLHS = lhs;
         SortableVector<CDCRecoHit2D>& rawRHS = rhs;
         rawLHS.swap(rawRHS);
+        std::swap(lhs.m_trajectory2D, rhs.m_trajectory2D);
+        std::swap(lhs.m_automatonCell, rhs.m_automatonCell);
         B2DEBUG(200, "CDCRecoSegment::swap");
       }
 
@@ -109,11 +111,17 @@ namespace Belle2 {
         for (const CDCRecoHit2D & recohit : reverseRange()) {
           reverseSegment.push_back(recohit.reversed());
         }
+
+        reverseSegment.setTrajectory2D(getTrajectory2D().reversed());
+        reverseSegment.m_automatonCell = m_automatonCell;
         return reverseSegment;
       }
 
       /// Reverses the order of hits and their right left passage hypotheses inplace
       void reverse() {
+        // Reverse the trajectory
+        m_trajectory2D.reverse();
+
         // Reverse the left right passage hypotheses
         for (CDCRecoHit2D & recoHit2D : *this) {
           recoHit2D.reverse();

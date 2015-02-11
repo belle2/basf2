@@ -65,6 +65,10 @@ namespace Belle2 {
       /// Empty destructor
       ~CDCTrajectorySZ() {;}
 
+      /// Constucts a basic assumption, what the z start position and the sz slope are, including some broad values for the covariance matrix.
+      static CDCTrajectorySZ basicAssumption();
+
+
       /// Translates the travel distance to the z coordinate
       inline FloatType mapSToZ(const FloatType& s = 0) const
       { return getSZLine().map(s); }

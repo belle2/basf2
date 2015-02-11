@@ -17,3 +17,24 @@ using namespace TrackFindingCDC;
 TRACKFINDINGCDC_SwitchableClassImp(CDCTrajectorySZ)
 
 
+
+CDCTrajectorySZ CDCTrajectorySZ::basicAssumption()
+{
+  // Dummy error estimates
+  SZCovariance szCovariance;
+
+  szCovariance(iSZ, iSZ) = 2.0; // Error in pz double the error in pt, good estimate?
+  szCovariance(iZ0, iSZ) = 0.0;
+  szCovariance(iSZ, iZ0) = 0.0;
+  szCovariance(iZ0, iZ0) = 2.0;
+
+  // A dummy line with no increasing z coordinate
+  double tanLambda = 0.0;
+  double z0 = 0.0;
+  UncertainSZLine uncertainSZLine(tanLambda, z0, szCovariance);
+
+  CDCTrajectorySZ trajectorySZ(uncertainSZLine);
+
+
+  return trajectorySZ;
+}

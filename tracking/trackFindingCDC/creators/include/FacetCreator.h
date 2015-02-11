@@ -58,24 +58,34 @@ namespace Belle2 {
           if (nextNeighborRange.first != nextNeighborRange.second) {
 
             const CDCWireHit* ptrMiddleWireHit = nextNeighborRange.first.getItem();
+            if (not ptrMiddleWireHit) continue;
+            const CDCWireHit& middleWireHit = *ptrMiddleWireHit;
+            if (middleWireHit.getAutomatonCell().hasDoNotUseFlag()) continue;
 
             for (Neighborhood::iterator itStartWireHit = nextNeighborRange.first;
                  itStartWireHit != nextNeighborRange.second; ++itStartWireHit) {
 
               const CDCWireHit* ptrStartWireHit = itStartWireHit.getNeighbor();
+              if (not ptrStartWireHit) continue;
+              const CDCWireHit& startWireHit = *ptrStartWireHit;
+              if (startWireHit.getAutomatonCell().hasDoNotUseFlag()) continue;
+
 
               for (Neighborhood::iterator itEndWireHit = nextNeighborRange.first;
                    itEndWireHit != nextNeighborRange.second; ++itEndWireHit) {
 
                 const CDCWireHit* ptrEndWireHit = itEndWireHit.getNeighbor();
+                if (not ptrEndWireHit) continue;
+                const CDCWireHit& endWireHit = *ptrEndWireHit;
+                if (endWireHit.getAutomatonCell().hasDoNotUseFlag()) continue;
 
                 //skip combinations where the facet starts and ends on the same wire
                 if (not(ptrStartWireHit->getWire() ==  ptrEndWireHit->getWire())) {
 
                   createFacetsForHitTriple(facetFilter,
-                                           ptrStartWireHit,
-                                           ptrMiddleWireHit,
-                                           ptrEndWireHit,
+                                           startWireHit,
+                                           middleWireHit,
+                                           endWireHit,
                                            facets);
                 }
               } //end for itEndWireHit
@@ -88,18 +98,16 @@ namespace Belle2 {
       /// Generates reconstruted facets on the three given wire hits by hypothesizing over the 8 left right passage combinations. Inserts the result to the end of the GenericFacetCollection.
       template<class FacetFilter, class GenericFacetCollection>
       void createFacetsForHitTriple(FacetFilter& facetFilter,
-                                    const CDCWireHit* startWireHit,
-                                    const CDCWireHit* middleWireHit,
-                                    const CDCWireHit* endWireHit,
+                                    const CDCWireHit& startWireHit,
+                                    const CDCWireHit& middleWireHit,
+                                    const CDCWireHit& endWireHit,
                                     GenericFacetCollection& facets) const {
-
-        if (startWireHit == nullptr or middleWireHit == nullptr or endWireHit == nullptr) return;
 
         const CDCWireHitTopology& cdcWireHitTopology = CDCWireHitTopology::getInstance();
 
-        CDCWireHitTopology::CDCRLWireHitRange startRLWireHits = cdcWireHitTopology.getRLWireHits(*startWireHit);
-        CDCWireHitTopology::CDCRLWireHitRange middleRLWireHits = cdcWireHitTopology.getRLWireHits(*middleWireHit);
-        CDCWireHitTopology::CDCRLWireHitRange endRLWireHits = cdcWireHitTopology.getRLWireHits(*endWireHit);
+        CDCWireHitTopology::CDCRLWireHitRange startRLWireHits = cdcWireHitTopology.getRLWireHits(startWireHit);
+        CDCWireHitTopology::CDCRLWireHitRange middleRLWireHits = cdcWireHitTopology.getRLWireHits(middleWireHit);
+        CDCWireHitTopology::CDCRLWireHitRange endRLWireHits = cdcWireHitTopology.getRLWireHits(endWireHit);
 
         for (const CDCRLWireHit & startRLWireHit : startRLWireHits) {
           for (const CDCRLWireHit & middleRLWireHit : middleRLWireHits) {

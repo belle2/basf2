@@ -31,6 +31,7 @@ tau_pdg_code = 15
 generator_module_names_by_short_name = {
     'gun': 'ParticleGun',
     'simple_gun': 'ParticleGun',
+    'forward_gun': 'ParticleGun',
     'generic': 'EvtGenInput',
     'cosmics': 'Cosmics',
     'bkg': None,
@@ -61,6 +62,14 @@ default_generator_params_by_generator_name = {
         'momentumGeneration': 'uniform',
         'thetaGeneration': 'uniform',
         'thetaParams': [17., 150.],
+    },
+    'forward_gun': {
+        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
+        'nTracks': 1,
+        'varyNTracks': False,
+        'momentumGeneration': 'uniform',
+        'thetaGeneration': 'uniform',
+        'thetaParams': [30., 31.],
     },
     'cosmics': {},
     'ParticleGun': {},

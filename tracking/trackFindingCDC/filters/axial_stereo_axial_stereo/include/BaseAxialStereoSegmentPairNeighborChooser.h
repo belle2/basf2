@@ -28,7 +28,7 @@ namespace Belle2 {
       BaseAxialStereoSegmentPairNeighborChooser() {;}
 
       /// Empty destructor
-      ~BaseAxialStereoSegmentPairNeighborChooser() {;}
+      virtual ~BaseAxialStereoSegmentPairNeighborChooser() {;}
 
       /// Clears information from former events
       virtual void clear() {;}

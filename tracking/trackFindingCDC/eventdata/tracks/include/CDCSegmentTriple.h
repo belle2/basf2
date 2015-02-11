@@ -71,6 +71,15 @@ namespace Belle2 {
       friend bool operator<(const CDCAxialRecoSegment2D* axialSegment, CDCSegmentTriple const& segmentTriple)
       { return axialSegment < segmentTriple.getStart(); }
 
+      /// Allow automatic taking of the address.
+      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
+       *  This method activally exposes this inheritance to be able to write algorithms
+       *  that work for objects and poiinters alike without code duplication.
+       *  \note Once reference qualifiers become available use an & after the trailing const
+       *  to constrain the cast to lvalues.*/
+      operator const Belle2::TrackFindingCDC::CDCSegmentTriple* () const
+      { return this; }
+
       /// Checks the references to the contained three segment for nullptrs
       bool checkSegments() const
       { return CDCAxialAxialSegmentPair::checkSegments() and not(m_middleSegment == nullptr); }

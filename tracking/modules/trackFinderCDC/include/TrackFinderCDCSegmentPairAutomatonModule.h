@@ -56,7 +56,7 @@ namespace Belle2 {
         m_ptrAxialStereoSegmentPairNeighborChooser(new AxialStereoSegmentPairNeighborChooser()),
         m_param_writeSegmentPairs(false),
         m_param_segmentPairsStoreObjName("CDCAxialStereoSegmentPairVector") {
-        addParam("WriteAxialStereoSegmentPairs",
+        addParam("WriteSegmentPairs",
                  m_param_writeSegmentPairs,
                  "Switch if facets shall be written to the DataStore",
                  false);
@@ -184,12 +184,27 @@ namespace Belle2 {
     >::generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments,
                 std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
     {
+      // Attain segment pair vector on the DataStore if needed.
+      std::vector<CDCAxialStereoSegmentPair>* ptrSegmentPairs = nullptr;
+      if (m_param_writeSegmentPairs) {
+        StoreWrappedObjPtr< std::vector<CDCAxialStereoSegmentPair> > storedSegmentPairs(m_param_segmentPairsStoreObjName);
+        storedSegmentPairs.create();
+        std::vector<CDCAxialStereoSegmentPair>& segmentPairs = *storedSegmentPairs;
+        ptrSegmentPairs = &segmentPairs;
+      }
 
-      //create the segment pairs
+      // Create the segment pairs
       B2DEBUG(100, "Combining CDCReco2DSegments to CDCAxialStereoSegmentPairs");
       m_axialStereoSegmentPairs.clear();
       m_axialStereoSegmentPairCreator.create(*m_ptrAxialStereoSegmentPairFilter, segments, m_axialStereoSegmentPairs);
       B2DEBUG(100, "  Created " << m_axialStereoSegmentPairs.size()  << " CDCAxialStereoSegmentPair");
+
+      if (m_param_writeSegmentPairs) {
+        std::vector<CDCAxialStereoSegmentPair>& segmentPairs = *ptrSegmentPairs;
+        for (const CDCAxialStereoSegmentPair & segmentPair : m_axialStereoSegmentPairs) {
+          segmentPairs.push_back(segmentPair);
+        }
+      }
 
       //create the segment pair neighborhood
       B2DEBUG(100, "Creating the CDCAxialStereoSegmentPair neighborhood");

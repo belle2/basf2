@@ -18,7 +18,7 @@
 
 namespace Belle2 {
   /// Worker for building reconstructed segments form wirehits using reconstructed facets
-  class SegmentFinderCDCBaseModule : public TrackFinderCDCBaseModule {
+  class SegmentFinderCDCBaseModule : public virtual TrackFinderCDCBaseModule {
 
   public:
     /// Constructor of the module overwritting the default desired orientation of the Segments.

@@ -120,4 +120,5 @@
 			</Layer>
 		</HalfShell>
 	</Content>
+<xi:include href="svd_mapping.xml"/>
 </DetectorComponent>

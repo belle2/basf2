@@ -16,6 +16,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <arpa/inet.h>
 #include <boost/crc.hpp>
@@ -48,8 +49,8 @@ SVDPackerModule::SVDPackerModule() : Module()
   // Parameter definitions
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
-  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
-
+  //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
+  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("NodeID", m_nodeid, "Node ID", 0);
   // initialize event #
   n_basf2evt = 0;

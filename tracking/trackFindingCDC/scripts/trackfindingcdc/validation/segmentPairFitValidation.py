@@ -23,6 +23,8 @@ from tracking.modules import BrowseFileOnTerminateModule
 
 import logging
 
+CONTACT = "oliver.frost@desy.de"
+
 
 def get_logger():
     return logging.getLogger(__name__)
@@ -30,19 +32,25 @@ def get_logger():
 
 from trackfindingcdc import (
     SegmentFitterModule,
-    MCAxialStereoPairCreatorModule,
     AxialStereoPairFitterModule)
 
 
-class SegmentFitValidationRun(ReadOrGenerateEventsRun):
-    segment_finder_module = "SegmentFinderCDCMCTruth"
-    segment_pair_finder_module = MCAxialStereoPairCreatorModule()
+class SegmentPairFitValidationRun(ReadOrGenerateEventsRun):
+    segment_finder_module = basf2.register_module("SegmentFinderCDCMCTruth")
+    segment_finder_module.param({"MinCDCHits": 4})
+
+    segment_pair_finder_module = basf2.register_module("TrackFinderCDCSegmentPairAutomatonDev")
+    segment_pair_finder_module.param({
+        "WriteSegmentPairs": True,
+        "SegmentPairFilter": "mc",
+        "SegmentPairNeighborChooser": "none",
+    })
     fit_method_name = "fuse-xy"
     output_file_name = "SegmentFitValidation.root"
     show_results = False
 
     def create_argument_parser(self, **kwds):
-        argument_parser = super(SegmentFitValidationRun, self).create_argument_parser(**kwds)
+        argument_parser = super(SegmentPairFitValidationRun, self).create_argument_parser(**kwds)
 
         argument_parser.add_argument(
             '-f',
@@ -83,28 +91,28 @@ class SegmentFitValidationRun(ReadOrGenerateEventsRun):
         fit_method_name = self.fit_method_name
 
         if fit_method_name == 'zreco':
-            sz_fitterSZ = Belle2.CDCLocalTracking.CDCSZFitter.getFitter()
+            sz_fitterSZ = Belle2.TrackFindingCDC.CDCSZFitter.getFitter()
 
             def z_reconstruction_fit(pair):
                 return sz_iftter.update(pair)
             return z_reconstruction_fit
 
         elif fit_method_name == 'fuse-simple':
-            CDCAxialStereoFusion = Belle2.CDCLocalTracking.CDCAxialStereoFusion
+            CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
             def simple_axial_stereo_fusion_fit(pair):
                 return CDCAxialStereoFusion.reconstructTrajectories(pair)
             return simple_axial_stereo_fusion_fit
 
-        elif fit_method_name == 'fuse-xy-priority':
-            CDCAxialStereoFusion = Belle2.CDCLocalTracking.CDCAxialStereoFusion
+        elif fit_method_name == 'fuse-xy':
+            CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
             def xy_axial_stereo_fusion_fit(pair):
                 return CDCAxialStereoFusion.reconstructFuseTrajectories(pair, False)
             return xy_axial_stereo_fusion_fit
 
-        elif fit_method_name == 'fuse-sz-priority':
-            CDCAxialStereoFusion = Belle2.CDCLocalTracking.CDCAxialStereoFusion
+        elif fit_method_name == 'fuse-sz':
+            CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
             def sz_axial_stereo_fusion_fit(pair):
                 return CDCAxialStereoFusion.reconstructFuseTrajectories(pair, True)
@@ -116,7 +124,7 @@ class SegmentFitValidationRun(ReadOrGenerateEventsRun):
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        main_path = super(SegmentFitValidationRun, self).create_path()
+        main_path = super(SegmentPairFitValidationRun, self).create_path()
 
         if self.show_results:
             browseFileOnTerminateModule = \
@@ -147,7 +155,7 @@ class SegmentPairFitValidationModule(basf2.Module):
         self.mc_segment_lookup = None
 
         self.start_superlayer_ids = array.array("f")
-        self.end_superayer_id = array.array("f")
+        self.end_superlayer_ids = array.array("f")
 
         self.start_sizes = array.array("f")
         self.end_sizes = array.array("f")
@@ -168,7 +176,7 @@ class SegmentPairFitValidationModule(basf2.Module):
         self.p_values = array.array("f")
 
     def initialize(self):
-        self.mc_segment_lookup = Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
+        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
     def event(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
@@ -177,17 +185,18 @@ class SegmentPairFitValidationModule(basf2.Module):
     def gather_segment_pairs(self):
         mc_segment_lookup = self.mc_segment_lookup
 
-        # TODO: fix me
-        axial_stereo_segment_pairs = CDCAxialStereoSegmentPair.getStoreArray()
+        stored_axial_stereo_segment_pairs = Belle2.PyStoreObj("CDCAxialStereoSegmentPairVector")
+        wrapped_axial_stereo_segment_pairs = stored_axial_stereo_segment_pairs.obj()
+        axial_stereo_segment_pairs = wrapped_axial_stereo_segment_pairs.get()
 
         for axial_stereo_segment_pair in axial_stereo_segment_pairs:
             if not self.pick_segment_pair(axial_stereo_segment_pair):
                 continue
 
-            mc_particle = mc_segment_lookup.getMCParticle(start_segment)
-
             start_segment = axial_stereo_segment_pair.getStartSegment()
             end_segment = axial_stereo_segment_pair.getEndSegment()
+
+            mc_particle = mc_segment_lookup.getMCParticle(start_segment)
 
             start_superlayer_id = start_segment.getISuperLayer()
             end_superlayer_id = end_segment.getISuperLayer()
@@ -224,7 +233,7 @@ class SegmentPairFitValidationModule(basf2.Module):
             self.curvature_truths.append(curvature_truth)
 
             self.start_curvature_estimates.append(start_fit2d.getCurvature())
-            self.end_curvature_estimates.append(end_fFit2d.getCurvature())
+            self.end_curvature_estimates.append(end_fit2d.getCurvature())
 
             self.tan_lambda_estimates.append(tan_lambda_estimate)
             self.tan_lambda_variances.append(tan_lambda_variance)
@@ -310,7 +319,7 @@ class SegmentPairFitValidationModule(basf2.Module):
             if start_superlayer_id is None and end_superlayer_id is None:
                 in_sl = slice(None)
                 root_folder_name = "all"
-                print "All pairs", "#", len(startISuperLayers)
+                print "All pairs", "#", len(start_superlayer_ids)
 
             else:
                 in_sl = ((start_superlayer_ids == start_superlayer_id) & (end_superlayer_ids == end_superlayer_id)) | \
@@ -328,20 +337,20 @@ class SegmentPairFitValidationModule(basf2.Module):
             validation_plots = []
 
             get_logger().info("Start pull analysis - curvature.")
-            curvature_pull_analysis = PullAnalysis("curvature", unit="1/cm")
+            curvature_pull_analysis = PullAnalysis("curvature", unit="1/cm", outlier_z_score=1.0)
             curvature_pull_analysis.analyse(curvature_truths[in_sl],
                                             curvature_estimates[in_sl],
                                             curvature_variances[in_sl])
             validation_plots.append(curvature_pull_analysis)
 
-            absolute_curvature_pull_analysis = PullAnalysis("absolute curvature", unit="1/cm")
+            absolute_curvature_pull_analysis = PullAnalysis("absolute curvature", unit="1/cm", outlier_z_score=1.0)
             absolute_curvature_pull_analysis.analyse(absolute_curvature_truths[in_sl],
                                                      absolute_curvature_estimates[in_sl],
                                                      curvature_variances[in_sl])
             validation_plots.append(absolute_curvature_pull_analysis)
 
             get_logger().info("Start pull analysis - tan lambda.")
-            tan_lambda_pull_analysis = PullAnalysis("tan #lambda")
+            tan_lambda_pull_analysis = PullAnalysis("tan #lambda", outlier_z_score=1.0)
             tan_lambda_pull_analysis.analyse(tan_lambda_truths[in_sl],
                                              tan_lambda_estimates[in_sl],
                                              tan_lambda_variances[in_sl])

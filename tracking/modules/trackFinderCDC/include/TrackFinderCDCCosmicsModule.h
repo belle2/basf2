@@ -14,25 +14,14 @@
 
 // Base track finder module
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonModule.h>
-
-
-// Workers
-#include <tracking/trackFindingCDC/workers/SegmentPairTrackingWorker.h>
-#include <tracking/trackFindingCDC/workers/SegmentTripleTrackingWorker.h>
-
-// Filters
-#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/axial_stereo/SimpleAxialStereoSegmentPairFilter.h>
-
-#include <tracking/trackFindingCDC/filters/axial_stereo_axial_stereo/SimpleAxialStereoSegmentPairNeighborChooser.h>
-
-#include <tracking/trackFindingCDC/filters/segment_triple/SimpleSegmentTripleFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_triple_segment_triple/SimpleSegmentTripleNeighborChooser.h>
+#include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonModule.h>
 
 namespace Belle2 {
 
   /// Module for the cellular automaton tracking for the CDC on cosmic events
-  class TrackFinderCDCCosmicsModule:  public SegmentFinderCDCFacetAutomatonModule {
+  class TrackFinderCDCCosmicsModule:
+    public SegmentFinderCDCFacetAutomatonModule,
+    public TrackFinderCDCSegmentPairAutomatonModule {
 
   public:
 
@@ -47,20 +36,6 @@ namespace Belle2 {
 
     /// Terminate and free resources after last event has been processed
     virtual void terminate();
-
-  private:
-    /// Worker to carry out the second stage generating tracks from segments.
-    TrackFindingCDC::SegmentTripleTrackingWorker <
-    TrackFindingCDC::SimpleAxialAxialSegmentPairFilter,
-                    TrackFindingCDC::SimpleSegmentTripleFilter,
-                    TrackFindingCDC::SimpleSegmentTripleNeighborChooser
-                    > m_segmentTripleTrackingWorker;
-
-    /// Worker to carry out the second stage generating tracks from segments utilizing pairs of segments.
-    TrackFindingCDC::SegmentPairTrackingWorker <
-    TrackFindingCDC::SimpleAxialStereoSegmentPairFilter,
-                    TrackFindingCDC::SimpleAxialStereoSegmentPairNeighborChooser
-                    > m_segmentPairTrackingWorker;
 
   }; // end class
 } // end namespace Belle2

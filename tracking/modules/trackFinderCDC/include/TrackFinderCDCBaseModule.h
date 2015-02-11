@@ -24,6 +24,15 @@ namespace Belle2 {
   class TrackFinderCDCBaseModule : public Module {
 
   public:
+    // Constant for the orientation of segments to be generated.
+    enum ETrackOrientation {
+      c_None,
+      c_Symmetric,
+      c_Outwards,
+      c_Downwards
+    };
+
+  public:
 
     /// Constructor of the module. Setting up parameters and description.
     TrackFinderCDCBaseModule();

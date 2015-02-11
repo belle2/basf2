@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCBaseModule.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
@@ -22,13 +21,13 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SegmentFinderCDCBaseModule::SegmentFinderCDCBaseModule(EOrientation orientation) :
+SegmentFinderCDCBaseModule::SegmentFinderCDCBaseModule(ETrackOrientation segmentOrientation) :
   TrackFinderCDCBaseModule(),
   m_param_segmentsStoreObjName("CDCRecoSegment2DVector"),
-  m_param_orientationString(""),
+  m_param_segmentOrientationString(""),
   m_param_fitSegments(false),
   m_param_createGFTrackCands(false),
-  m_orientation(orientation)
+  m_segmentOrientation(segmentOrientation)
 {
   addParam("SegmentsStoreObjName",
            m_param_segmentsStoreObjName,
@@ -40,8 +39,8 @@ SegmentFinderCDCBaseModule::SegmentFinderCDCBaseModule(EOrientation orientation)
            "Switch to indicate if the segments shall be fitted after they have been generated.",
            false);
 
-  addParam("Orientation",
-           m_param_orientationString,
+  addParam("SegmentOrientation",
+           m_param_segmentOrientationString,
            "Option which orientation of segments shall be generate. Valid options are '' (default of the finder), 'none' (one orientation, algorithm dependent), 'symmetric', 'outwards', 'downwards'.",
            string(""));
 
@@ -58,19 +57,19 @@ void SegmentFinderCDCBaseModule::initialize()
   TrackFinderCDCBaseModule::initialize();
   StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> >::registerTransient(m_param_segmentsStoreObjName);
 
-  if (m_param_orientationString == string("")) {
+  if (m_param_segmentOrientationString == string("")) {
     // Keep the default value in this case, if the user did not specify anything.
-  } else if (m_param_orientationString == string("none")) {
-    m_orientation = c_None;
-  } else if (m_param_orientationString == string("symmetric")) {
-    m_orientation = c_Symmetric;
-  } else if (m_param_orientationString == string("outwards")) {
-    m_orientation = c_Outwards;
-  } else if (m_param_orientationString == string("downwards")) {
-    m_orientation = c_Downwards;
+  } else if (m_param_segmentOrientationString == string("none")) {
+    m_segmentOrientation = c_None;
+  } else if (m_param_segmentOrientationString == string("symmetric")) {
+    m_segmentOrientation = c_Symmetric;
+  } else if (m_param_segmentOrientationString == string("outwards")) {
+    m_segmentOrientation = c_Outwards;
+  } else if (m_param_segmentOrientationString == string("downwards")) {
+    m_segmentOrientation = c_Downwards;
   } else {
-    B2WARNING("Unexpected 'Orientation' parameter of segment finder module : '" << m_param_orientationString << "'. Default to none");
-    m_orientation = c_None;
+    B2WARNING("Unexpected 'SegmentOrientation' parameter of segment finder module : '" << m_param_segmentOrientationString << "'. Default to none");
+    m_segmentOrientation = c_None;
   }
 
   if (m_param_createGFTrackCands) {
@@ -102,16 +101,16 @@ void SegmentFinderCDCBaseModule::event()
   storedRecoSegments.create();
   std::vector<CDCRecoSegment2D>& outputSegments = *storedRecoSegments;
 
-  /// Copy segments to output fixing their orientation
-  if (m_orientation == c_None) {
+  /// Copy segments to output fixing their segmentOrientation
+  if (m_segmentOrientation == c_None) {
     std::swap(generatedSegments, outputSegments);
-  } else if (m_orientation == c_Symmetric) {
+  } else if (m_segmentOrientation == c_Symmetric) {
     outputSegments.reserve(2 * generatedSegments.size());
     for (const CDCRecoSegment2D & segment : generatedSegments) {
       outputSegments.push_back(segment.reversed());
       outputSegments.push_back(std::move(segment));
     }
-  } else if (m_orientation == c_Outwards) {
+  } else if (m_segmentOrientation == c_Outwards) {
     outputSegments.reserve(generatedSegments.size());
     for (const CDCRecoSegment2D & segment : generatedSegments) {
       outputSegments.push_back(std::move(segment));
@@ -122,7 +121,7 @@ void SegmentFinderCDCBaseModule::event()
         lastSegment.reverse();
       }
     }
-  } else if (m_orientation == c_Downwards) {
+  } else if (m_segmentOrientation == c_Downwards) {
     outputSegments.reserve(generatedSegments.size());
     for (const CDCRecoSegment2D & segment : generatedSegments) {
       outputSegments.push_back(std::move(segment));
@@ -134,7 +133,7 @@ void SegmentFinderCDCBaseModule::event()
       }
     }
   } else {
-    B2WARNING("Unexpected 'Orientation' parameter of segment finder module : '" << m_orientation << "'. No segments generated.");
+    B2WARNING("Unexpected 'SegmentOrientation' parameter of segment finder module : '" << m_segmentOrientation << "'. No segments generated.");
   }
 
 

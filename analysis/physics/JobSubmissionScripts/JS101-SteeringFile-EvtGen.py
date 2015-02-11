@@ -32,10 +32,6 @@ noEvents = int(sys.argv[1])
 decFile = sys.argv[2]
 outputName = sys.argv[3]
 
-directory = 'rootFiles/'
-if not os.path.exists(directory):
-    os.makedirs(directory)
-
 # Generate Y(4S) events.
 generateY4S(noEvents, decFile)
 
@@ -43,7 +39,7 @@ generateY4S(noEvents, decFile)
 # then the Gearbox needs to be loaded with the loadGearbox() function.
 loadGearbox()
 
-add_mdst_output(analysis_main, True, directory + outputName)
+add_mdst_output(analysis_main, True, outputName)
 
 # -------------------------------------------
 

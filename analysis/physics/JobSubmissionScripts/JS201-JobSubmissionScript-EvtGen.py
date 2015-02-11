@@ -31,15 +31,18 @@ logDirectory = 'log/'
 if not os.path.exists(logDirectory):
     os.makedirs(logDirectory)
 
+directory = 'rootFiles/'
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
 if outputName.endswith('.root'):
     outputName = outputName[:-5]
 
 # in each loop create a specific command string
 for x in range(0, noJobs):
-    logFile = logDirectory + 'JS201-JobSubmissionScript-EvtGen-' + str(x) \
-        + '.log'
+    logFile = logDirectory + outputName + '-' + str(x) + '.log'
     command = 'bsub -q s -o ' + logFile \
         + ' basf2 JS101-SteeringFile-EvtGen.py ' + str(noEvents) + ' ' \
-        + decFile + ' ' + outputName + '-' + str(x) + '.root'
+        + decFile + ' ' + directory + outputName + '-' + str(x) + '.root'
     print command  # this prints out the command
     os.system(command)  # this evaluates it in the terminal

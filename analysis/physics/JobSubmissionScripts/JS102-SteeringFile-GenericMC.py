@@ -21,6 +21,9 @@ import os
 # input parameters: e.g. basf2 JS101-SteeringFile.py charged 1405 BGx0 s12 3
 # this loads 100 files with index 03xx from stream s12, BGx0, mcprod1405 folder, where each file has 1k events
 
+if len(sys.argv) != 5:
+    sys.exit('Must provide enough arguments: [charged/mixed/..] [BGx0/BGx1] [s12/s34/..] [0-9]')
+
 mcType = sys.argv[1]
 bkg = sys.argv[2]
 stream = sys.argv[3]
@@ -33,14 +36,13 @@ if int(fileNo) == 0:
     inputFiles += ['/group/belle2/MC/generic/' + mcType + '/mcprod1405/' + bkg
                    + '/*' + stream + '/' + mcType + '_e0001r1000*.root']
 
-outputFile = 'rootFiles/' + mcType + '/data_' + mcType + '_mc35_' + bkg + '_' \
-    + stream + '-' + fileNo + '.root'
-directory = os.path.dirname(outputFile)
-
-# check if the rootFiles directory exists
-# if not, create it
+directory = 'rootFiles/'
 if not os.path.exists(directory):
     os.makedirs(directory)
+
+outputFile = directory + mcType + '/data_' + mcType + '_mc35_' + bkg + '_' \
+    + stream + '-' + fileNo + '.root'
+directory = os.path.dirname(outputFile)
 
 # load files
 inputMdstList(inputFiles)

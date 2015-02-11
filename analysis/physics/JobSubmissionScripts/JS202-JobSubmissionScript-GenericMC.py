@@ -25,8 +25,8 @@ if not os.path.exists(logDirectory):
     os.makedirs(logDirectory)
 
 # x and y to loop over all stream (s00-s49)
-for x in range(0, 1):
-    for y in range(0, 1):
+for x in range(0, 5):
+    for y in range(0, 10):
         stream = 's' + str(x) + str(y)
         # z to run over all groups of files of 100 (300-399, 400-499, ...)
         for z in range(0, 10):

@@ -22,7 +22,6 @@
 #include <algorithm>
 // #include <map>
 #include <unordered_map>
-#include <boost/concept_check.hpp>
 
 #include <TFile.h>
 #include <TTree.h>

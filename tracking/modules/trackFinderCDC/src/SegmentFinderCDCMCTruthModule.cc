@@ -20,6 +20,10 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(SegmentFinderCDCMCTruth);
 
+SegmentFinderCDCMCTruthModule::SegmentFinderCDCMCTruthModule() : SegmentFinderCDCBaseModule()
+{
+  addParam("MinCDCHits", m_minCDCHits, "Minimum number of CDC hits needed to allow the created of a track candidate", 0);
+}
 
 void SegmentFinderCDCMCTruthModule::initialize()
 {

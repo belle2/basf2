@@ -17,15 +17,21 @@
 
 namespace Belle2 {
 
-  /// Worker for building reconstructed segments form wirehits using reconstructed facets
+  /// Module to build segments from pure Monte Carlo information.
   class SegmentFinderCDCMCTruthModule : public SegmentFinderCDCBaseModule {
 
   public:
+    SegmentFinderCDCMCTruthModule();
+
     virtual void initialize() override;
 
   public:
     /// Generates the segment from Monte Carlo information. Default orientation is the flight direction.
-    virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override;
+    virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override final;
+
+  private:
+    /// Minimum number of CDC hits per segment.
+    int m_minCDCHits;
 
   }; // end class SegmentFinderCDCMCTruthModule
 

@@ -546,8 +546,8 @@ def FlavorTagger(
         if TrackLevel(mode, weightFiles, roe_path):
             if EventLevel(mode, weightFiles, roe_path):
                 CombinerLevel(mode, weightFiles, roe_path)
-                roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())  # Move and remove extraInfo
 
+    roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())  # Move and remove extraInfo
     roe_path.add_module(RemoveExtraInfoModule())
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

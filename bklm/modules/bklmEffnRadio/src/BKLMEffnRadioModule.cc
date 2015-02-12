@@ -17,7 +17,9 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
+
 #include <math.h>
+#include <set>
 
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>

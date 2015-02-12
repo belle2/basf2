@@ -42,6 +42,23 @@ namespace Belle2 {
   public:
 
     /**
+     * Exception thrown, when an Unsupported Detector Type occurs. Momentarily supported: PXD & SVD
+     */
+    BELLE2_DEFINE_EXCEPTION(UnsupportedDetType, "The Detector Type is not supported by this class. Supported are: PXD and SVD");
+
+    /** Status information that can be set to indicate several properties of the SpacePointTrackCand
+     * NOTE: there are some properties that are at the moment stored in other members of the SpacePointTrackCand but can be moved into here if memory usage is an issue
+     */
+    enum RefereeStatusBit {
+      c_checkedByReferee = 1, /**< bit 0: SpacePointTrackCand has been checked by a Referee */
+      c_checkedClean = 2, /**< bit 1: The SpacePointTrackCand shows no 'problematic' behaviour */
+      c_hitsOnSameSensor = 4, /**< bit 2: SpacePointTrackCand has two (or more) SpacePoints on same sensor */
+      c_hitsLowDistance = 8, /**< bit 3: SpacePointTrackCand has two (or more) SpacePoints that are not far enough apart. NOTE: distance is judged by referee (and also set there) */
+      c_removedHits = 16, /**< bit 4: SpacePoints were removed from this SpacePointTrackCand */
+      c_checkedTrueHits =  32, /**< bit 5: All of the SpacePoints of the SpacePointTrackCand have a relation to (at least one) TrueHit(s) */
+    };
+
+    /**
      * empty constructor sets pdg code to zero, such that it is possible to determine whether a particle hyptohesis has been asigned to the track candidate or not
      * Also MCTrackID is initialized to -1,
      */
@@ -103,15 +120,39 @@ namespace Belle2 {
      */
     const std::vector<double> getSortingParametersInRange(int firstIndex, int lastIndex) const;
 
-    /**
-     * set the sorting parameters
-     */
-    void setSortingParameters(const std::vector<double>& sortParams);
+    /** get TrackStub Index */
+    int getTrackStubIndex() const { return m_iTrackStub; }
 
     /**
      * get the MC Track ID
      */
     int getMcTrackID() const { return m_MCTrackID; }
+
+    /**
+     * Return the refere status code of the SpacePointTrackCand.
+     * @param bitmask is an optional bitmask that is compared to the referee status of the SpacePointTrackCand
+     */
+    unsigned short int getRefereeStatus(unsigned short int bitmask = USHRT_MAX) const { return m_refereeStatus & bitmask; }
+
+    /**
+     * Check if the SpacePointTrackCand has the status characterized by the bitmask
+     */
+    bool hasRefereeStatus(unsigned int short bitmask) const { return (m_refereeStatus & bitmask) == bitmask; }
+
+    /**
+     * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
+     */
+    void print(int debuglevel = 150, const Option_t* = "") const;
+
+    /**
+     * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!), NOTE: returns false if both TrackCands do not contain any SpacePoints
+     */
+    bool operator == (const SpacePointTrackCand& rhs);
+
+    /**
+     * set the sorting parameters
+     */
+    void setSortingParameters(const std::vector<double>& sortParams);
 
     /**
      * set a hypothesis for the particle by setting a pdgcode (will also set the appropriate charge)
@@ -139,21 +180,6 @@ namespace Belle2 {
     void addSpacePoint(const SpacePoint* newSP, double sortParam) { m_trackSpacePoints.push_back(newSP); m_sortingParameters.push_back(sortParam); }
 
     /**
-     * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
-     */
-    void print(int debuglevel = 150, const Option_t* = "") const;
-
-    /**
-     * Exception thrown, when an Unsupported Detector Type occurs. Momentarily supported: PXD & SVD
-     */
-    BELLE2_DEFINE_EXCEPTION(UnsupportedDetType, "The Detector Type is not supported by this class. Supported are: PXD and SVD");
-
-    /**
-     * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!), NOTE: returns false if both TrackCands do not contain any SpacePoints
-     */
-    bool operator == (const SpacePointTrackCand& rhs);
-
-    /**
      * set the direction of flight (true is outgoing, false is ingoing). Initialized to true by default!
      */
     void setFlightDirection(bool direction) { m_flightDirection = direction; }
@@ -166,8 +192,26 @@ namespace Belle2 {
     /** set TrackStub index */
     void setTrackStubIndex(int trackStubInd) { m_iTrackStub = trackStubInd; }
 
-    /** get TrackStub Index */
-    int getTrackStubIndex() const { return m_iTrackStub; }
+    /** get if the TrackCand is curling. CAUTION: returns false if it has not been checked for curling */
+    bool isCurling() const { return m_iTrackStub > 0; }
+
+    /** check if the TrackCand has been checked for Curling. */
+    bool checkedForCurling() const { return m_iTrackStub != -1; }
+
+    /** set referee status (resets the complete to the passed status!) */
+    void setRefereeStatus(unsigned short int bitmask) { m_refereeStatus = bitmask; }
+
+    /** add a referee status */
+    void addRefereeStatus(unsigned short int bitmask) { m_refereeStatus |= bitmask; }
+
+    /** remove a referee status */
+    void removeRefereeStatus(unsigned short int bitmask) { m_refereeStatus &= (~bitmask); }
+
+    /** clear the referee status */
+    void clearRefereeStatus() { m_refereeStatus = 0; }
+
+    /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
+    void removeSpacePoint(int indexInTrackCand);
 
   protected:
     /**
@@ -220,6 +264,11 @@ namespace Belle2 {
      */
     int m_iTrackStub;
 
-    ClassDef(SpacePointTrackCand, 4) // last members added: m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2)
+    /**
+     * bit-field to indicate different properties that are checked by the referee module
+     */
+    unsigned short int m_refereeStatus;
+
+    ClassDef(SpacePointTrackCand, 5) // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2)
   };
 }

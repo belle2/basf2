@@ -44,12 +44,12 @@ namespace Belle2 {
     EXPECT_EQ(emptySectorArray.getEntries(), 0);
 
 //     string workingMapName = "sectorList_evtNormSecHIGH_SVD";
-    string workingMapName = "belle2SimpleCaseTet35t80phi0t360SVD-50to500MeV_SVD";
+    string workingMapName = "evtGenPGunR15345Feb2015OldVXDStd-moreThan400MeV_PXDSVD";
     SectorMapFactory workingFactory(workingMapName);
 
     // loading the same map as the factory:
     string directory = "/Detector/Tracking/CATFParameters/" + workingMapName;
-    const VXDTFSecMap* rootMap = dynamic_cast<const VXDTFSecMap*>(gb.getTObject(directory.c_str()));
+    const VXDTFSecMap* rootMap = static_cast<const VXDTFSecMap*>(gb.getTObject(directory.c_str()));
 
     workingFactory.importRootMap();
     StoreArray<Sector> workingSectorArray(workingFactory.getMapName());

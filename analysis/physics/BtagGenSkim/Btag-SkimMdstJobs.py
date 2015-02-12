@@ -32,6 +32,9 @@ rootDirectory = 'rootFiles/'
 if not os.path.exists(rootDirectory):
     os.makedirs(rootDirectory)
 
+if not inputDir.endswith('/'):
+    inputDir = inputDir + '/'
+
 # in each loop create a specific command string
 for fileName in os.listdir(inputDir):
 
@@ -40,7 +43,7 @@ for fileName in os.listdir(inputDir):
 
     logFile = logDirectory + 'Skimmed-' + logName + '.log'
     command = 'bsub -q l -o ' + logFile + ' basf2 Btag-SkimMdst.py ' \
-        + fileName + ' ' + rootDirectory + 'Skimmed-' + fileName + ' ' \
+        + inputDir + fileName + ' ' + rootDirectory + 'Skimmed-' + fileName + ' ' \
         + str(recLong)
     print command  # this prints out the command
     os.system(command)  # this evaluates it in the terminal

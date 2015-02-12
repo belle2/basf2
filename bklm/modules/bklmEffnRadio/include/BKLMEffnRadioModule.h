@@ -27,6 +27,7 @@
 
 #include <bklm/geometry/Module.h>
 #include <iostream>
+#include <set>
 
 using namespace std;
 using namespace CLHEP;

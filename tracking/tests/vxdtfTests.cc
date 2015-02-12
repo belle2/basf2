@@ -28,8 +28,9 @@
 #include "vxdtf/vXDTFRawSecMap.cc"
 
 /// for the redesign:
-#include "vxdtfRedesign/twoHitFilters.cc"
+#include "vxdtfRedesign/observers.cc"
 #include "vxdtfRedesign/oldVSNewSegFinderFilters.cc"
+#include "vxdtfRedesign/twoHitFilters.cc"
 
 
 /// for testing:

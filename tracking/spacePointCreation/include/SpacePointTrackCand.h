@@ -46,16 +46,23 @@ namespace Belle2 {
      */
     BELLE2_DEFINE_EXCEPTION(UnsupportedDetType, "The Detector Type is not supported by this class. Supported are: PXD and SVD");
 
+    /**
+     * Exception thrown, when trying to access SpacePoints by their index inside of SpacePointTrackCand, but index is out of bounds
+     */
+    BELLE2_DEFINE_EXCEPTION(SPTCIndexOutOfBounds, "Trying to acces a SpacePoint from a SpacePointTrackCand via an index that is out of bounds!");
+
     /** Status information that can be set to indicate several properties of the SpacePointTrackCand
      * NOTE: there are some properties that are at the moment stored in other members of the SpacePointTrackCand but can be moved into here if memory usage is an issue
      */
     enum RefereeStatusBit {
-      c_checkedByReferee = 1, /**< bit 0: SpacePointTrackCand has been checked by a Referee */
+      c_checkedByReferee = 1, /**< bit 0: SpacePointTrackCand has been checked by a Referee (all possible tests) */
       c_checkedClean = 2, /**< bit 1: The SpacePointTrackCand shows no 'problematic' behaviour */
       c_hitsOnSameSensor = 4, /**< bit 2: SpacePointTrackCand has two (or more) SpacePoints on same sensor */
       c_hitsLowDistance = 8, /**< bit 3: SpacePointTrackCand has two (or more) SpacePoints that are not far enough apart. NOTE: distance is judged by referee (and also set there) */
       c_removedHits = 16, /**< bit 4: SpacePoints were removed from this SpacePointTrackCand */
       c_checkedTrueHits =  32, /**< bit 5: All of the SpacePoints of the SpacePointTrackCand have a relation to (at least one) TrueHit(s) */
+      c_checkedSameSensors = 64, /**< bit 6: It has been checked if two consecutive SpacePoints are on the same sensor for this SpacePointTrackCand */
+      c_checkedMinDistance =  128, /**< bit 7: It has been checked if two consecutive SpacePoints are far enough apart */
     };
 
     /**
@@ -140,6 +147,28 @@ namespace Belle2 {
     bool hasRefereeStatus(unsigned int short bitmask) const { return (m_refereeStatus & bitmask) == bitmask; }
 
     /**
+     * Check if the SpacePointTrackCand contains consecutive SpacePoints that are on the same sensor
+     * WARNING: does not check if this has actually been assigned!
+     */
+    bool hasHitsOnSameSensor() const { return hasRefereeStatus(c_hitsOnSameSensor); }
+
+    /**
+     * Check if the SpacePointTrackCand has been checked for consecutive hits on same sensor
+     */
+    bool checkedSameSensors() const { return hasRefereeStatus(c_checkedSameSensors); }
+
+    /**
+     * Check if consecutive SpacePoints are far enough apart throughout the SpacePointTrackCand
+     * WARNING: does not check if this has actually been assigned!
+     */
+    bool hasHitsLowDistance() const { return hasRefereeStatus(c_hitsLowDistance); }
+
+    /**
+     * Check if the SpacePointTrackCand has been checked for consecutive hits being far enough apart
+     */
+    bool checkedMinDistance() const { return hasRefereeStatus(c_checkedMinDistance); }
+
+    /**
      * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */
     void print(int debuglevel = 150, const Option_t* = "") const;
@@ -210,8 +239,8 @@ namespace Belle2 {
     /** clear the referee status */
     void clearRefereeStatus() { m_refereeStatus = 0; }
 
-//     /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
-//     void removeSpacePoint(int indexInTrackCand);
+    /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
+    void removeSpacePoint(int indexInTrackCand);
 
   protected:
     /**

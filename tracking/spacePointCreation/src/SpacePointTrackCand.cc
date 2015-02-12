@@ -41,7 +41,8 @@ SpacePointTrackCand::SpacePointTrackCand() :
   m_cov6D(6),
   m_q(0),
   m_flightDirection(true),
-  m_iTrackStub(-1)
+  m_iTrackStub(-1),
+  m_refereeStatus(0)
 {
 
 }
@@ -50,7 +51,8 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
   m_state6D(6),
   m_cov6D(6),
   m_flightDirection(true),
-  m_iTrackStub(-1)
+  m_iTrackStub(-1),
+  m_refereeStatus(0)
 {
   m_pdg = pdgCode;
   m_q = charge;
@@ -77,6 +79,15 @@ SpacePointTrackCand::~SpacePointTrackCand()
 // get SpacePoints in range
 const std::vector<const Belle2::SpacePoint*> SpacePointTrackCand::getHitsInRange(int firstInd, int lastInd) const
 {
+  if (lastInd < firstInd) { // exchange ranges if they are in wrong order
+    int tmp = firstInd;
+    firstInd = lastInd;
+    lastInd = tmp;
+  }
+  // check if the indices are in range!
+  if (firstInd < 0 || uint(lastInd) >= m_trackSpacePoints.size() || uint(firstInd) >= m_trackSpacePoints.size() || lastInd < 0) {
+    throw SPTCIndexOutOfBounds();
+  }
   std::vector<const SpacePoint*> spacePoints;
   for (int iSP = firstInd; iSP <= lastInd; ++iSP) {
     spacePoints.push_back(m_trackSpacePoints[iSP]);
@@ -87,6 +98,15 @@ const std::vector<const Belle2::SpacePoint*> SpacePointTrackCand::getHitsInRange
 // get Sorting Parameters in range
 const std::vector<double> SpacePointTrackCand::getSortingParametersInRange(int firstIndex, int lastIndex) const
 {
+  if (lastIndex < firstIndex) { // exchange ranges if they are in wrong order
+    int tmp = firstIndex;
+    firstIndex = lastIndex;
+    lastIndex = tmp;
+  }
+  // check if the indices are in range!
+  if (firstIndex < 0 || uint(lastIndex) >= m_trackSpacePoints.size() || uint(firstIndex) >= m_trackSpacePoints.size() || lastIndex < 0) {
+    throw SPTCIndexOutOfBounds();
+  }
   std::vector<double> sortingParams;
   for (int iSP = firstIndex; iSP <= lastIndex; ++iSP) {
     sortingParams.push_back(m_sortingParameters[iSP]);
@@ -137,6 +157,17 @@ void SpacePointTrackCand::setSortingParameters(const std::vector<double>& sortPa
   for (auto aValue : sortParams) { m_sortingParameters.push_back(aValue); }
 }
 
+// remove a SpacePoint by index
+void SpacePointTrackCand::removeSpacePoint(int indexInTrackCand)
+{
+  // check if the index is in bounds
+  if (uint(indexInTrackCand) >= m_trackSpacePoints.size()) { throw SPTCIndexOutOfBounds(); }
+
+  // erase the entry from vector
+  m_trackSpacePoints.erase(m_trackSpacePoints.begin() + indexInTrackCand);
+  if (uint(indexInTrackCand) < m_sortingParameters.size()) { m_sortingParameters.erase(m_sortingParameters.begin() + indexInTrackCand); } // only remove if possible
+}
+
 // genfit::TrackCand prints to stdout, as does the Print method from ROOT TVectorD (which is invoked here).
 // I build a stringstrem, which I then hand over B2DEBUG
 // there is a somewhat nasty hack to intercept the output to the stdout by redirecting the stdout to a buffer, which can then be put into a stringstream. This is however platform-dependent and not very C++ like and therefore not done here (this would be needed for having the ROOT output in the log files which are created from within a steering file)
@@ -168,4 +199,14 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
     output << "SpacePoint " << i << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() << ". Sorting Parameter: " << m_sortingParameters[i] << "\n";
   }
   B2DEBUG(debuglevel, output.str());
+
+  // reset the output stream
+  output.str(std::string(""));
+  output.clear();
+
+  output << "referee properties of this SPTC:\n";
+  output << "checked for SPs on same sensors: " << this->hasRefereeStatus(c_checkedSameSensors) << " -> result: " << this->hasRefereeStatus(c_hitsOnSameSensor) << "\n";
+  output << "checked for min distance between SPs: " << this->hasRefereeStatus(c_checkedMinDistance) << " -> result: " << this->hasRefereeStatus(c_hitsLowDistance) << "\n";
+  output << "checked for curling: " << this->checkedForCurling() << " -> result: " << this->isCurling() << "\n";
+  B2DEBUG(debuglevel, output.str())
 }

@@ -138,6 +138,7 @@ namespace VXDTFObserversTest {
         pxdCluster->addRelationTo(aParticle);
 
         SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
+        B2INFO(" setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID())
         newSP->addRelationTo(pxdCluster);
       }
 
@@ -307,6 +308,14 @@ namespace VXDTFObserversTest {
                    << outerHit.getPosition().PrintStringXYZ()
                    << "/"
                    << innerHit.getPosition().PrintStringXYZ()
+                   << " having indices "
+                   << outerHit.getArrayIndex()
+                   << "/"
+                   << innerHit.getArrayIndex()
+                   << " and VxdIDs "
+                   << outerHit.getVxdID()
+                   << "/"
+                   << innerHit.getVxdID()
                    << " results in "
                    << fResult
                    << " & accepted: "
@@ -338,52 +347,77 @@ namespace VXDTFObserversTest {
                        const typename Var::argumentType& innerHit,
                        const RangeType& range) {
 
-      RelationVector<PXDCluster> relatedPXDClusters = outerHit.template getRelationsTo<PXDCluster>();
-      RelationVector<SVDCluster> relatedSVDClusters = outerHit.template getRelationsTo<SVDCluster>(); /// TODO innerHit
-
       vector<int> collectedPDGs;
 
-      for (PXDCluster & aCluster : relatedPXDClusters) {
-        for (MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
-          collectedPDGs.push_back(aParticle.getPDG());
-        }
-      }
+      RelationVector<PXDCluster> relatedToPXDClusters = outerHit.template getRelationsTo<PXDCluster>();
+      RelationVector<SVDCluster> relatedToSVDClusters = outerHit.template getRelationsTo<SVDCluster>();
 
-      for (SVDCluster & aCluster : relatedSVDClusters) {
-        for (MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
-          collectedPDGs.push_back(aParticle.getPDG());
-        }
-      }
+      collectPDGs(outerHit, collectedPDGs);
+      collectPDGs(innerHit, collectedPDGs);
 
-      relatedPXDClusters = innerHit.template getRelationsTo<PXDCluster>();
-      relatedSVDClusters = innerHit.template getRelationsTo<SVDCluster>();
-
-      for (PXDCluster & aCluster : relatedPXDClusters) {
-        for (MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
-          collectedPDGs.push_back(aParticle.getPDG());
-        }
-      }
-
-      for (SVDCluster & aCluster : relatedSVDClusters) {
-        for (MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
-          collectedPDGs.push_back(aParticle.getPDG());
-        }
-      }
+      B2DEBUG(100, "CountAcceptedRejectedMCParticleObserver::notify:before unique: found total of " << collectedPDGs.size() << " mcParticles connected to given hits")
 
       std::sort(collectedPDGs.begin(), collectedPDGs.end());
       auto newEndIterator = std::unique(collectedPDGs.begin(), collectedPDGs.end());
       collectedPDGs.resize(std::distance(collectedPDGs.begin(), newEndIterator));
 
+      B2DEBUG(100, "CountAcceptedRejectedMCParticleObserver::notify:after unique: found total of " << collectedPDGs.size() << " mcParticles connected to given hits")
+
       auto foundPos = counterMC< Var >::pdGacceptedRejected.find(collectedPDGs);
       if (foundPos == counterMC< Var >::pdGacceptedRejected.end())  {
-        foundPos = counterMC< Var >::pdGacceptedRejected.insert({collectedPDGs, {0, 0} });
-      }
+        B2DEBUG(100, " the pdgs " << vec2str(collectedPDGs) << " collected haven't been found yet")
+        foundPos = counterMC< Var >::pdGacceptedRejected.insert({collectedPDGs, {0, 0} }).first;
+      } else { B2DEBUG(100, " the pdgs " << vec2str(collectedPDGs) << " collected were already there") }
 
       if (range.contains(fResult)) {
-        foundPos->first += 1;
+        foundPos->second.first += 1;
       } else {
-        foundPos->second += 1;
+        foundPos->second.second += 1;
       }
+
+      for (const auto & entry : counterMC< Var >::pdGacceptedRejected) {
+        B2INFO("Key " << vec2str(entry.first) << " has " << entry.second.first << "/" << entry.second.second << " accepted/rejected values")
+      }
+    }
+
+
+
+    /** collects all PDGs connected to given hit.
+    *
+    * does only work, if hit has direct relations PXD/SVDCluster which have relations to MCParticle.
+    *
+    * first parameter is a hit (e.g. spacePoint) which is related to MCParticles.
+    * second parameter is the vector for collecting the PDGcodes found.
+    * */
+    template <class hitType>
+    static void collectPDGs(const hitType& aHit, std::vector<int>& collectedPDGs) {
+      RelationVector<PXDCluster> relatedToPXDClusters = aHit.template getRelationsTo<PXDCluster>();
+      RelationVector<SVDCluster> relatedToSVDClusters = aHit.template getRelationsTo<SVDCluster>();
+
+      for (const PXDCluster & aCluster : relatedToPXDClusters) {
+        for (const MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
+          collectedPDGs.push_back(aParticle.getPDG());
+        }
+      }
+
+      for (const SVDCluster & aCluster : relatedToSVDClusters) {
+        for (const MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
+          collectedPDGs.push_back(aParticle.getPDG());
+        }
+      }
+    }
+
+
+
+    /** small helper for easily printing vectors */
+    template<class Type> static std::string vec2str(const vector<Type>& vec) {
+      string output;
+
+      for (const auto & entry : vec) {
+        output += " " + std::to_string(entry);
+      }
+
+      return std::move(output);
     }
   };
 
@@ -482,10 +516,15 @@ namespace VXDTFObserversTest {
   /** tests whether the setup of relations is doing what it is supposed to do */
   TEST_F(ObserversTest, TestRelationSetup)
   {
+    EXPECT_EQ(6, spacePointData.getEntries());
+
     for (SpacePoint & aSP : spacePointData) {
+      unsigned nullptrTrap = 0;
       RelationVector<PXDCluster> pxDClusters = aSP.getRelationsTo<PXDCluster>();
       for (PXDCluster & aCluster : pxDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
+        if (aParticle == NULL) { nullptrTrap = 1; }
+        EXPECT_EQ(0, nullptrTrap);
 
         EXPECT_EQ(aSP.getArrayIndex(), aCluster.getArrayIndex());
         EXPECT_EQ(aSP.getArrayIndex(), aParticle->getArrayIndex());
@@ -493,11 +532,14 @@ namespace VXDTFObserversTest {
         EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
         EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
 
+        nullptrTrap = 0;
       }
 
       RelationVector<SVDCluster> svDClusters = aSP.getRelationsTo<SVDCluster>();
       for (SVDCluster & aCluster : svDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
+        if (aParticle == NULL) { nullptrTrap = 2; }
+        EXPECT_EQ(0, nullptrTrap);
 
         EXPECT_EQ(aSP.getArrayIndex(), 2 + aCluster.getArrayIndex() / 2);
         EXPECT_EQ(aSP.getArrayIndex() / 4, aParticle->getArrayIndex());
@@ -505,7 +547,11 @@ namespace VXDTFObserversTest {
         EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
         EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
 
+        nullptrTrap = 0;
       }
+
+      // at least one cluster type has to be connected to given spacePoint!
+      EXPECT_NE(0, pxDClusters.size() + svDClusters.size());
     }
   }
 
@@ -518,15 +564,20 @@ namespace VXDTFObserversTest {
   {
     Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > unobservedFilter(Range<float, float>(2.5, 3.5));
     /// TODO
-//  Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilter(unobservedFilter);
-//
-//  for (int i = 1 ; i < spacePointData.getEntries(); i++) {
+    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilter(unobservedFilter);
+
+    for (int i = 1 ; i < spacePointData.getEntries(); i++) {
 //    SpacePoint spA = *spacePointData[i];
 //    SpacePoint spB = *spacePointData[i-1];
+      B2INFO("spData-Sps got arraIndices: " << spacePointData[i]->getArrayIndex() << "/" << spacePointData[i - 1]->getArrayIndex() << " and VxdIDs " << spacePointData[i]->getVxdID() << "/" << spacePointData[i - 1]->getVxdID())
 //    observedFilter.accept(spA, spB);
-//  }
+      observedFilter.accept(*spacePointData[i], *spacePointData[i - 1]); // has to be passed directly! intermediate step deletes StoreArray-related info!
+    }
 
-//  EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.size());
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.size());
+
+    /// TODO further tests!
+
   }
 
 

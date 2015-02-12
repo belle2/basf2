@@ -2730,7 +2730,7 @@ SVDHoughtrackingModule::writeStrip(VxdID sensorID, bool n_side, short strip, flo
   short layer = sensorID.getLayerNumber();
   short strips_per_apv = 128;
   short apv, max_strips, rest_strip;
-  short apv_offset;
+  short apv_offset = 0;
 
   if (m_tbMapping) {
     if (layer == 3 || !n_side) {
@@ -2738,6 +2738,7 @@ SVDHoughtrackingModule::writeStrip(VxdID sensorID, bool n_side, short strip, flo
     } else {
       max_strips = 512;
     }
+    B2DEBUG(3500, "\tMaximum number of strips: " << max_strips);
 
     switch (layer) {
       case 3:

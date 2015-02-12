@@ -31,9 +31,11 @@ using namespace CDC;
 // register module
 REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
-  m_tdcOffset(0.0), m_cdcp(), m_aCDCSimHit(), m_tdcBinWidth(1.0),
-  m_tdcBinWidthInv(1.0), m_tdcResol(0.2887), m_driftV(4.0e-3),
-  m_driftVInv(250.0), m_propSpeedInv(27.25)
+  m_tdcOffset(0.0), m_cdcp(), m_aCDCSimHit(), m_posFlag(0),
+  m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
+  m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0), m_tdcBinHwidth(0.5),
+  m_tdcResol(0.2887), m_driftV(4.0e-3),
+  m_driftVInv(250.0), m_propSpeedInv(27.25), m_misalign(true)
 {
   // Set description
   setDescription("Creates CDCHits from CDCSimHits.");

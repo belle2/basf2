@@ -560,26 +560,31 @@ CurlingTrackCandSplitterModule::splitCurlingTrackCand(const Belle2::SpacePointTr
 
     B2DEBUG(75, "Creating Track Stub " << iTr << " of " << splitIndices.size() << " possible Track Stub for this SpacePointTrackCand. The indices for this Tracklet are (first,last): (" << firstInd << "," << lastInd << "). This SpacePointTrackCand contains " << SPTrackCand.getNHits() << " SpacePoints in total.");
 
-    const std::vector<const SpacePoint*> trackletSpacePoints = SPTrackCand.getHitsInRange(firstInd, lastInd);
-    const std::vector<double> trackletSortingParams = SPTrackCand.getSortingParametersInRange(firstInd, lastInd);
+    // encapsulate these functions into a try-clause since both throw
+    try {
+      const std::vector<const SpacePoint*> trackletSpacePoints = SPTrackCand.getHitsInRange(firstInd, lastInd);
+      const std::vector<double> trackletSortingParams = SPTrackCand.getSortingParametersInRange(firstInd, lastInd);
 
-    SpacePointTrackCand newSPTrackCand = SpacePointTrackCand(trackletSpacePoints, SPTrackCand.getPdgCode(), SPTrackCand.getChargeSeed(), SPTrackCand.getMcTrackID());
-    newSPTrackCand.setSortingParameters(trackletSortingParams);
+      SpacePointTrackCand newSPTrackCand = SpacePointTrackCand(trackletSpacePoints, SPTrackCand.getPdgCode(), SPTrackCand.getChargeSeed(), SPTrackCand.getMcTrackID());
+      newSPTrackCand.setSortingParameters(trackletSortingParams);
 
-    // TODO: set state seed and cov seed for all but the first tracklets (first is just the seed of the original TrackCand)
-    if (iTr < 1) {
-      newSPTrackCand.set6DSeed(SPTrackCand.getStateSeed());
-      newSPTrackCand.setCovSeed(SPTrackCand.getCovSeed());
+      // TODO: set state seed and cov seed for all but the first tracklets (first is just the seed of the original TrackCand)
+      if (iTr < 1) {
+        newSPTrackCand.set6DSeed(SPTrackCand.getStateSeed());
+        newSPTrackCand.setCovSeed(SPTrackCand.getCovSeed());
+      }
+
+      // set direction of flight and flip it for the next track stub (track is split where the direction of flight changes so this SHOULD not introduce any errors)
+      newSPTrackCand.setFlightDirection(outgoing);
+      outgoing = !outgoing;
+
+      // if the TrackCandidate curls this index starts at 1, if it is a curling TrackCand
+      newSPTrackCand.setTrackStubIndex(iTr + 1);
+
+      spacePointTCs.push_back(newSPTrackCand);
+    } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
+      B2WARNING("Caught an exception while trying to split SpacePointTrackCands: " << anE.what() << " This SPTC will be skipped from splitting!")
     }
-
-    // set direction of flight and flip it for the next track stub (track is split where the direction of flight changes so this SHOULD not introduce any errors)
-    newSPTrackCand.setFlightDirection(outgoing);
-    outgoing = !outgoing;
-
-    // if the TrackCandidate curls this index starts at 1, if it is a curling TrackCand
-    newSPTrackCand.setTrackStubIndex(iTr + 1);
-
-    spacePointTCs.push_back(newSPTrackCand);
   }
 
   return spacePointTCs;

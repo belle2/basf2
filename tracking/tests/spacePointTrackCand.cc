@@ -13,7 +13,6 @@
 
 // class to be tested
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <boost/concept_check.hpp>
 
 // stuff needed for setting up the tests
 
@@ -166,5 +165,52 @@ namespace Belle2 {
     // B+ Meson
     aSpacePointTC.setPdgCode(521);
     EXPECT_DOUBLE_EQ(aSpacePointTC.getChargeSeed(), 1);
+  }
+
+  /**
+   * Test the get hits in range method
+   */
+  TEST_F(SpacePointTrackCandTest, testGetHitsInRange)
+  {
+    // TODO
+  }
+
+  /**
+   * Test the setRefereeStatus and getRefereeStatus methods
+   */
+  TEST_F(SpacePointTrackCandTest, testRefereeStatus)
+  {
+    SpacePointTrackCand trackCand; // default constructor -> should initialize the referee status to 0 (i.e. no status should be set)
+
+    unsigned short int initialStatus = trackCand.getRefereeStatus();
+    EXPECT_EQ(initialStatus, 0);
+
+    // design an arbitrary status and set it, then test if the returned status is the set status
+    unsigned short int newStatus = 0;
+    newStatus += SpacePointTrackCand::c_checkedByReferee;
+    newStatus += SpacePointTrackCand::c_checkedTrueHits;
+    trackCand.setRefereeStatus(newStatus);
+    EXPECT_EQ(trackCand.getRefereeStatus(), newStatus);
+
+    // clear the status and test if its the initial status again (0)
+    trackCand.clearRefereeStatus();
+    EXPECT_EQ(trackCand.getRefereeStatus(), initialStatus);
+
+    // add several statusses one by one and test if the overall status is as expected (once with 'overall status' and once with status one by one)
+    trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedClean);
+    EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_checkedClean));
+    trackCand.addRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor);
+    EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor));
+    unsigned short int expectedStatus = SpacePointTrackCand::c_checkedClean + SpacePointTrackCand::c_hitsOnSameSensor;
+    EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
+
+
+    // remove one status and test if it actuall gets removed
+    trackCand.removeRefereeStatus(SpacePointTrackCand::c_checkedClean);
+    expectedStatus -= SpacePointTrackCand::c_checkedClean;
+    EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
+
+    // test if the status that remains is still set
+    EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor));
   }
 }

@@ -26,6 +26,8 @@ namespace Belle2 {
    * + check if two subsequent SpacePoints of a SPTC are on the same sensor
    * + do all this checks either by using MC information or with information that can be obtained from the SpacePoint
    *
+   *
+   *
    * NOTE: currently under developement
    */
   class SPTCRefereeModule : public Module {
@@ -69,6 +71,7 @@ namespace Belle2 {
 
     unsigned int m_totalTrackCandCtr; /**< counter for the total number of TrackCands */
 
+    unsigned int m_kickedSpacePointsCtr; /**< counter of kicked SpacePoints */
     /**
      * initialize all counters to 0
      */
@@ -76,6 +79,7 @@ namespace Belle2 {
       m_SameSensorCtr = 0;
       m_minDistanceCtr = 0;
       m_totalTrackCandCtr = 0;
+      m_kickedSpacePointsCtr = 0;
     }
 
 
@@ -84,12 +88,12 @@ namespace Belle2 {
     /**
      * Check if two subsequent SpacePoints are on the same sensor. Returns empty vector if it is not the case and the indices of the SpacePoints that are on a sensor if there are SpacePoints on the same sensors
      */
-    std::vector<int> checkSameSensor(Belle2::SpacePointTrackCand* trackCand);
+    const std::vector<int> checkSameSensor(Belle2::SpacePointTrackCand* trackCand);
 
     /**
      * Check if two subsequent SpacePoints are seperated by at least the provided minDistance. Return empty vector if all SpacePoints are far enough apart, indices of SpacePoints that are not elsewise
      */
-    std::vector<int> checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance);
+    const std::vector<int> checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance);
 
   };
 }

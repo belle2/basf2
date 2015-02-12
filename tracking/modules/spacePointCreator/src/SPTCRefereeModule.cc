@@ -19,6 +19,7 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <tracking/vectorTools/B2Vector3.h> // use TVector3 instead?
+#include <boost/range/adaptor/reversed.hpp> // for ranged based loops in reversed order
 
 using namespace Belle2;
 using namespace std;
@@ -93,27 +94,61 @@ void SPTCRefereeModule::event()
     SpacePointTrackCand* trackCand = trackCands[iTC];
     B2DEBUG(20, "Processing SpacePointTrackCand " << iTC << ": It has " << trackCand->getNHits() << " SpacePoints in it");
 
+    unsigned short int refereeStatus = 0; // collect the referee status throughout this loop and set it at the end -> COULDDO: (probably less error prone, use addRefereeStatus instead to add each status seperately)
+    bool removedTrueHits = false; // to avoid adding this more than once, via the bitfield (would lead to wrong results!)
+
     if (m_PARAMcheckSameSensor) { // check same sensors if desired
-      std::vector<int> sameSonsorInds = checkSameSensor(trackCand);
+      refereeStatus += SpacePointTrackCand::c_checkedSameSensors;
+      const std::vector<int> sameSonsorInds = checkSameSensor(trackCand);
       if (!sameSonsorInds.empty()) {
         m_SameSensorCtr++;
-        // TODO: handle this stuff
+        refereeStatus += SpacePointTrackCand::c_hitsOnSameSensor;
+        if (m_PARAMkickSpacePoint) {
+          try {
+            for (int index : boost::adaptors::reverse(sameSonsorInds)) { // have to start from highest index, as the vector in the trackCand is resized in this step!
+              trackCand->removeSpacePoint(index);
+              m_kickedSpacePointsCtr++;
+            }
+            removedTrueHits = true;
+          } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
+            B2WARNING("Caught an Exception while trying to remove a SpacePoint from a SpacePointTrackCand: " << anE.what());
+          }
+        }
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints on the same sensor for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")")
-        // TODO: handle this case
       }
+      B2DEBUG(30, "refereeStatus after checkSameSensor " << refereeStatus);
     }
 
     if (m_PARAMcheckMinDistance) { // check min distance if desired
-      std::vector<int> lowDistanceInds = checkMinDistance(trackCand, m_PARAMminDistance);
+      refereeStatus += SpacePointTrackCand::c_checkedMinDistance;
+      const std::vector<int> lowDistanceInds = checkMinDistance(trackCand, m_PARAMminDistance);
       if (!lowDistanceInds.empty()) {
         m_minDistanceCtr++;
-        // TODO: handle this stuff
+        refereeStatus += SpacePointTrackCand::c_hitsLowDistance;
+        if (m_PARAMkickSpacePoint) {
+          try {
+            for (int index : boost::adaptors::reverse(lowDistanceInds)) { // have to start from highest index, as the vector in the trackCand is resized in this step!
+              trackCand->removeSpacePoint(index);
+              m_kickedSpacePointsCtr++;
+            }
+            removedTrueHits = true;
+          } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
+            B2WARNING("Caught an Exception while trying to remove a SpacePoint from a SpacePointTrackCand: " << anE.what());
+          }
+        }
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints that were closer than " << m_PARAMminDistance << " cm together for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")")
-        // TODO: handle this case
       }
+      B2DEBUG(30, "refereeStatus after checkMinDistance " << refereeStatus);
     }
+
+    // assign the referee status to the SpacePointTrackCand
+    if (removedTrueHits) refereeStatus += SpacePointTrackCand::c_removedHits;
+    if (m_PARAMcheckMinDistance && m_PARAMcheckSameSensor) refereeStatus += SpacePointTrackCand::c_checkedByReferee; // CAUTION: if there are new tests implemented this has to be updated!!!
+    B2DEBUG(20, "referee Status that will be assigned to trackCand " << refereeStatus);
+    trackCand->setRefereeStatus(refereeStatus);
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) { trackCand->print(); }
   }
 }
 
@@ -123,11 +158,12 @@ void SPTCRefereeModule::terminate()
   stringstream summary;
   if (m_PARAMcheckSameSensor) { summary << "Checked for consecutive SpacePoints on same sensor and found " << m_SameSensorCtr << " TrackCands showing this behavior."; }
   if (m_PARAMcheckMinDistance) { summary << "Checked for minimal distance between two consecutive SpacePoints and found " << m_minDistanceCtr << " TrackCands with SpacePoints not far enough apart."; }
+  if (m_PARAMkickSpacePoint) { summary << m_kickedSpacePointsCtr << " SpacePoints have been removed from SpacePointTrackCands\n"; }
   B2INFO("SPTCRefere::terminate(): Module got " << m_totalTrackCandCtr << " SpacePointTrackCands. " << summary.str())
 }
 
 // ====================================================================== CHECK SAME SENSORS ====================================================================
-std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrackCand* trackCand)
+const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrackCand* trackCand)
 {
   B2DEBUG(25, "Checking SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() << " for consecutive SpacePoints on the same sensor")
   std::vector<int> sameSensorInds; // return vector
@@ -139,7 +175,7 @@ std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrackCand*
     VxdID sensorId = spacePoints.at(iSp)->getVxdID();
     B2DEBUG(50, "Checking SpacePoint " << iSp << ". SensorId of this SpacePoint: " << sensorId << ", SensorId of last SpacePoint: " << lastSensorId)
     if (sensorId == lastSensorId) {
-      sameSensorInds.push_back(iSp); // COULDDO: push_back not only this but the ind of the previously checked SpacePoint as well (decide later which one to use)
+      sameSensorInds.push_back(iSp - 1); // push back the index of the first SpacePoint (50:50 chance of getting the right one without further testing) -> retrieving the other index is no big science from this index!!
       B2DEBUG(30, "SpacePoint " << iSp << " and " << iSp - 1 << " are on the same sensor: " << sensorId)
     }
     lastSensorId = sensorId;
@@ -149,7 +185,7 @@ std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrackCand*
 }
 
 // ========================================================================= CHECK MIN DISTANCE =================================================================
-std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance)
+const std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance)
 {
   B2DEBUG(25, "Checking the distances between consecutive SpacePoints for SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayIndex())
   std::vector<int> lowDistanceInds; // return vector
@@ -164,7 +200,7 @@ std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTrackCand
 
     if (diffPos.Mag() <= minDistance) {
       B2DEBUG(30, "Position difference is " << diffPos.Mag() <<  " but minDistance is set to " << minDistance << ". SpacePoints: " << iSp << " and " << iSp - 1)
-      lowDistanceInds.push_back(iSp); // COULDDO: push_back both indices of concerned SpacePoints -> decide later what to do, but retrieving the other index is no big science from this index!
+      lowDistanceInds.push_back(iSp); // push back the index of the first SpacePoint (50:50 chance of getting the right one without further testing)
     }
     oldPosition = position;
   }

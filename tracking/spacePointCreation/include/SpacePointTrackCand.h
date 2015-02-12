@@ -210,8 +210,8 @@ namespace Belle2 {
     /** clear the referee status */
     void clearRefereeStatus() { m_refereeStatus = 0; }
 
-    /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
-    void removeSpacePoint(int indexInTrackCand);
+//     /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
+//     void removeSpacePoint(int indexInTrackCand);
 
   protected:
     /**

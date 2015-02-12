@@ -56,7 +56,6 @@ using namespace Belle2::SVD;
   B2LOGMESSAGE_IFENABLED(LogConfig::c_Debug, level, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 
 
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -66,7 +65,7 @@ REG_MODULE(SVDHoughtracking)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), totFakeTracks(0.0), totTracks(0),
+SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), totFakeTracks(0.0), totTracks(0), allTracks(0),
   curROIEff(0.0), totROITrueHits(0), curHitsInROIs(0), m_rootFile(0), m_histROIy(0), m_histROIz(0), m_histSimHits(0)
 {
   //Set module properties
@@ -116,6 +115,10 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
            "Use True Hit Clusters?", bool(false));
   addParam("UseSimHitClusters", m_useSimHitClusters,
            "Use True Hit Clusters?", bool(false));
+  addParam("SaveHits", m_saveHits,
+           "Save hits for FPGA conversion", bool(false));
+  addParam("SaveStrips", m_saveStrips,
+           "Save strips for FPGA conversion", bool(false));
   addParam("FullTrackingPipeline", m_fullTrackingPipeline,
            "Run full tracking pipelin?", bool(false));
   addParam("WriteHoughSpace", m_writeHoughSpace,
@@ -138,7 +141,16 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
            "Compare reconstructed tracks with MC Particles?", bool(false));
   addParam("CompareWithMCParticleVerbose", m_compareMCParticleVerbose,
            "Verbose output of the comparator function", bool(false));
-  /* ROIS */
+  addParam("ConformalTrafoP", m_conformalTrafoP,
+           "Use Conformal trafo in P", bool(true));
+  addParam("ConformalTrafoN", m_conformalTrafoN,
+           "Use Conformal trafo in N", bool(false));
+  addParam("TbMapping", m_tbMapping,
+           "Use testbeam mapping", bool(false));
+  addParam("StraightTracks", m_straightTracks,
+           "Reconstruct only straight tracks", bool(false));
+
+  /* ROIs */
   addParam("CreateROIs", m_createROI,
            "Create Region of Interests", bool(true));
   addParam("CreatePXDMap", m_createPXDMap,
@@ -162,8 +174,9 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
   addParam("rootFilename", m_rootFilename,
            "File name for statistics generation", string(""));
 
-
   // 4. Noise Filter
+  addParam("DisableNoiseFilter", m_disableNoiseFilter,
+           "Disable noise filter for clusters?", bool(false));
   addParam("noiseFactor", m_noiseFactor,
            "Factor for next neighbour detecton", (unsigned int)(4));
   addParam("noiseDownThreshold", m_noiseUpThreshold,
@@ -190,11 +203,18 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
            "Scale rectengular in N", (double)(1.0));
   addParam("rectScaleP", m_rectScaleP,
            "Scale rectengular in P", (double)(1.0));
+  addParam("rectXP1", m_rectXP1,
+           "Size of rectengular in x P", (double)(M_PI / -2.0));
+  addParam("rectXP2", m_rectXP2,
+           "Size of rectengular in x P", (double)(M_PI / 2.0));
+  addParam("rectXN1", m_rectXN1,
+           "Size of rectengular in x N", (double)(M_PI / -2.0));
+  addParam("rectXN2", m_rectXN2,
+           "Size of rectengular in x N", (double)(M_PI / 2.0));
   addParam("RadiusThreshold", m_radiusThreshold,
            "Cut off radius threshold", (double)(5.0));
   addParam("MergeThreshold", m_mergeThreshold,
            "Merge threshold", (double)(0.01));
-
 }
 
 void
@@ -364,7 +384,7 @@ SVDHoughtrackingModule::initialize()
     m_histFakeTheta->GetXaxis()->SetTitle(xAxisTheta);
     m_histFakeTheta->GetYaxis()->SetTitle("# fake tracks");
     /* Histogram for average fake rate */
-    m_histPtAverageFake = new TH1D("AverageFakepT", "Average # fake tracks vs pT", 394, 0.03, 2.0);
+    m_histPtAverageFake = new TH1D("AverageFakepT", "Average # fake tracks vs pT", pt_bins, 0.02, 2.0);
     m_histPtAverageFake->GetXaxis()->SetTitle(xAxisPt);
     m_histPtAverageFake->GetYaxis()->SetTitle("Average # fake tracks");
     m_histPhiAverageFake = new TH1D("AverageFakePhi", "Average Number of Fake Tracks vs Phi", phi_bins, -180, 180);
@@ -408,6 +428,10 @@ SVDHoughtrackingModule::beginRun()
   /* Clear total clock cycles */
   totClockCycles = 0.0;
 
+  /* Init some event variables */
+  runNumber = 0;
+  validEvents = 0;
+
   /* Cache PXD sensors */
   pxd_sensors.clear();
   /*VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -438,19 +462,21 @@ SVDHoughtrackingModule::endRun()
 
   if (m_printStatistics) {
     B2INFO("End of Run: Hough Statistics: ");
+    B2INFO("  Events processed: " << runNumber);
+    B2INFO("  Reconstructed tracks: " << allTracks);
     B2INFO("  Total tracks found: " << totTracks);
-    B2INFO("  Track total efficiency: " << curTrackEff / ((double) runNumber));
-    B2INFO("  Track Theta efficiency: " << curTrackEffN / ((double) runNumber));
-    B2INFO("  Track Phi efficiency: " << curTrackEffP / ((double) runNumber));
-    B2INFO("  Fake Rate: " << totFakeTracks / ((double) runNumber));
+    B2INFO("  Track total efficiency: " << curTrackEff / ((double) validEvents));
+    B2INFO("  Track Theta efficiency: " << curTrackEffN / ((double) validEvents));
+    B2INFO("  Track Phi efficiency: " << curTrackEffP / ((double) validEvents));
+    B2INFO("  Fake Rate: " << totFakeTracks / ((double) validEvents));
     B2INFO("  Total time: " << totClockCycles << " ms");
-    B2INFO("  Average time: " << totClockCycles / ((double) runNumber) << " ms");
+    B2INFO("  Average time: " << totClockCycles / ((double) validEvents) << " ms");
     B2INFO("  Min R: " << minR << " Max R: " << maxR);
 
     if (m_PXDExtrapolation) {
-      B2INFO("  Average hits found: " << totROITrueHits / ((double) runNumber));
-      B2INFO("  Average Hits in ROIs: " << ((double) curHitsInROIs) / ((double) runNumber));
-      B2INFO("  ROI efficiency: " << curROIEff / ((double) runNumber));
+      B2INFO("  Average hits found: " << totROITrueHits / ((double) validEvents));
+      B2INFO("  Average Hits in ROIs: " << ((double) curHitsInROIs) / ((double) validEvents));
+      B2INFO("  ROI efficiency: " << curROIEff / ((double) validEvents));
       B2INFO("  DRF: " << ((double) totROITrueHits) / ((double) curHitsInROIs));
     } else {
       B2INFO("  Average hits found: " << "disabled");
@@ -481,11 +507,11 @@ SVDHoughtrackingModule::endRun()
     statout << m_critIterationsN << "\t" << m_critIterationsP << "\t"
             << boost::format("%1.3f") % (double) m_rectSizeN << "\t"
             << boost::format("%1.3f") % (double) m_rectSizeP << "\t"
-            << boost::format("%1.3f") % (curTrackEffP / (double) runNumber) << "\t"
-            << boost::format("%1.3f") % (curTrackEffN / (double) runNumber) << "\t"
-            << boost::format("%1.3f") % (curTrackEff / (double) runNumber) << "\t"
-            << (totFakeTracks / ((double) runNumber)) << "\t"
-            << boost::format("%1.3f") % (curROIEff / ((double) runNumber)) << "\t"
+            << boost::format("%1.3f") % (curTrackEffP / (double) validEvents) << "\t"
+            << boost::format("%1.3f") % (curTrackEffN / (double) validEvents) << "\t"
+            << boost::format("%1.3f") % (curTrackEff / (double) validEvents) << "\t"
+            << (totFakeTracks / ((double) validEvents)) << "\t"
+            << boost::format("%1.3f") % (curROIEff / ((double) validEvents)) << "\t"
             << boost::format("%1.3f") % (((double) totROITrueHits) / ((double) curHitsInROIs)) << "\t"
             << endl;
 
@@ -612,6 +638,16 @@ SVDHoughtrackingModule::event()
       clusterStrips();
     }
 
+    /* Save hits for FPGA conversion */
+    if (m_saveHits) {
+      saveHits();
+    }
+
+    /* Save hits for FPGA conversion */
+    if (m_saveStrips) {
+      saveStrips();
+    }
+
     /* Create plots for analysing the clusters */
     if (m_analyseFPGAClusters) {
       analyseClusterStrips();
@@ -639,10 +675,13 @@ SVDHoughtrackingModule::event()
         createResiduals();
       }
     }
+
+    /* Print the customazible summary */
+    printCustomSummary();
   } else {
     int num_simhit = storeSVDSimHit.getEntries();
     if (m_histSimHits) {
-      m_histSimHits->Fill(runNumber, num_simhit);
+      m_histSimHits->Fill(validEvents, num_simhit);
     }
 
     for (int i = 0; i < num_simhit; ++i) {
@@ -754,6 +793,144 @@ SVDHoughtrackingModule::event()
   }
 }
 
+/*
+ * Convert given integer into Verilog 32 bit value
+ */
+char*
+SVDHoughtrackingModule::convertInt(int32_t n)
+{
+  size_t size = 256;
+  static char* buf = NULL;
+  if (buf == NULL) {
+    if ((buf = (char*) malloc(size * sizeof(char))) == NULL) {
+      perror("Error: malloc() ");
+      return NULL;
+    }
+  }
+  memset(buf, 0, size);
+
+  if (n < 0) {
+    snprintf(buf, size, "-32'sd%i", -1 * n);
+  } else {
+    snprintf(buf, size, "32'sd%i", n);
+  }
+
+  return (buf);
+}
+
+void
+SVDHoughtrackingModule::saveHits()
+{
+  uint32_t cnt;
+  bool createLUT = true;
+  bool hess = true;
+  double scale = 1024.0 * 1024.0 * 1024.0;
+  double r;
+  double x, y, z;
+  int32_t x32, y32, z32;
+  short layer;
+  ofstream p_pos;
+
+  if (m_tbMapping) {
+    hess = false;
+    scale = 1;
+  }
+
+  /* Open file for output position writing */
+  if (createLUT) {
+    p_pos.open("p_clusters.v", ofstream::out);
+    p_pos << "\t\t\tcase(cnt)" << endl;
+    cnt = 0;
+
+    p_pos << "\t\t\t\t32'd" << cnt << ": begin" << endl;
+    p_pos << "\t\t\t\t\tx <= " << convertInt(0) << ";" << endl;
+    p_pos << "\t\t\t\t\ty <= " << convertInt(0) << ";" << endl;
+    p_pos << "\t\t\t\t\twr <= 0;" << endl;
+    p_pos << "\t\t\t\t\tlayer <= 2'd" << 0 << ";" << endl;
+    p_pos << "\t\t\t\t\tlast_out <= 0;" << endl;
+    p_pos << "\t\t\t\tend" << endl;
+    ++cnt;
+
+    for (auto it = p_clusters.begin(); it != p_clusters.end(); ++it) {
+      x = it->second.second.X() / Unit::um;
+      y = it->second.second.Y() / Unit::um;
+      z = it->second.second.Z() / Unit::um;
+      layer = it->second.first.getLayerNumber() - 3; /* we start at layer 0 */
+
+      if (hess) {
+        r = ((x * x) + (y * y));
+        x = x / r;
+        y = y / r;
+      }
+
+      x32 = (int32_t)(x * scale);
+      y32 = (int32_t)(y * scale);
+      z32 = (int32_t)(z * scale);
+
+      p_pos << "\t\t\t\t32'd" << cnt << ": begin" << endl;
+      p_pos << "\t\t\t\t\tx <= " << convertInt(x32) << ";" << endl;
+      p_pos << "\t\t\t\t\ty <= " << convertInt(y32) << ";" << endl;
+      p_pos << "\t\t\t\t\twr <= 1;" << endl;
+      p_pos << "\t\t\t\t\tlayer <= 2'd" << layer << ";" << endl;
+      p_pos << "\t\t\t\t\tlast_out <= 0;" << endl;
+      p_pos << "\t\t\t\tend" << endl;
+      ++cnt;
+    }
+    p_pos << "\t\t\tendcase" << endl;
+    p_pos.close();
+
+    /* N clusters */
+    p_pos.open("n_clusters.v", ofstream::out);
+    p_pos << "\t\t\tcase(cnt)" << endl;
+    cnt = 0;
+
+    p_pos << "\t\t\t\t32'd" << cnt << ": begin" << endl;
+    p_pos << "\t\t\t\t\tx <= " << convertInt(0) << ";" << endl;
+    p_pos << "\t\t\t\t\ty <= " << convertInt(0) << ";" << endl;
+    p_pos << "\t\t\t\t\twr <= 0;" << endl;
+    p_pos << "\t\t\t\t\tlayer <= 2'd" << 0 << ";" << endl;
+    p_pos << "\t\t\t\t\tlast_out <= 0;" << endl;
+    p_pos << "\t\t\t\tend" << endl;
+    ++cnt;
+
+    for (auto it = n_clusters.begin(); it != n_clusters.end(); ++it) {
+      x = it->second.second.X() / Unit::um;
+      y = it->second.second.Y() / Unit::um;
+      z = it->second.second.Z() / Unit::um;
+      layer = it->second.first.getLayerNumber() - 3; /* we start at layer 0 */
+
+      if (hess) {
+        r = ((x * x) + (y * y));
+        x = x / r;
+        y = y / r;
+      }
+
+      x32 = (int32_t)(x * scale);
+      y32 = (int32_t)(y * scale);
+      z32 = (int32_t)(z * scale);
+
+      p_pos << "\t\t\t\t32'd" << cnt << ": begin" << endl;
+      p_pos << "\t\t\t\t\tx <= " << convertInt(x32) << ";" << endl;
+      p_pos << "\t\t\t\t\ty <= " << convertInt(z32) << ";" << endl;
+      p_pos << "\t\t\t\t\twr <= 1;" << endl;
+      p_pos << "\t\t\t\t\tlayer <= 2'd" << layer << ";" << endl;
+      p_pos << "\t\t\t\t\tlast_out <= 0;" << endl;
+      p_pos << "\t\t\t\tend" << endl;
+      ++cnt;
+    }
+    p_pos << "\t\t\tendcase" << endl;
+  } else {
+    p_pos.open("p_clusters.dat", ofstream::out);
+
+    for (auto it = p_clusters.begin(); it != p_clusters.end(); ++it) {
+      p_pos << it->second.second.X() << " " << it->second.second.Y() << " "
+            << it->second.second.Z() << " " << endl;
+    }
+  }
+
+  p_pos.close();
+}
+
 void
 SVDHoughtrackingModule::save_hits()
 {
@@ -859,15 +1036,16 @@ SVDHoughtrackingModule::clustering(bool pxd)
   for (iter = pos_map.begin(); iter != pos_map.end(); ++iter) {
     TVector3 clus_pos;
     cnt = 0;
-    for (inner_iter = cpy_map.begin(); inner_iter != cpy_map.end(); ++inner_iter) {
+    for (inner_iter = cpy_map.begin(); inner_iter != cpy_map.end();) {
       TVector3 diff = iter->second - inner_iter->second;
       if (fabs(diff.Px()) < clusterDelta.Px() && fabs(diff.Py()) < clusterDelta.Py()
           && fabs(diff.Pz()) < clusterDelta.Pz()) {
         ++cnt;
         clus_pos += inner_iter->second;
         cluster_id = inner_iter->first;
-        cpy_map.erase(inner_iter);
+        cpy_map.erase(inner_iter++);
       } else {
+        ++inner_iter;
       }
     }
 
@@ -1042,12 +1220,19 @@ SVDHoughtrackingModule::trackingPipeline()
     storeHoughTrack.getPtr()->Clear();
   }
 
+  /* For testbeam only !! */
+  if (m_tbMapping) {
+    if (n_clusters.size() >= 12 || p_clusters.size() >= 12) {
+      return;
+    }
+  }
+
   /* Start time measurement */
   start = clock();
 
   /* Hough transformation */
-  houghTrafo2d(n_clusters, true, false); /* in z, no Hess transformation */
-  houghTrafo2d(p_clusters, false, true); /* in y, with Hess */
+  houghTrafo2d(n_clusters, true, m_conformalTrafoN); /* in z, no Hess transformation */
+  houghTrafo2d(p_clusters, false, m_conformalTrafoP); /* in y, with Hess */
 
   /*
    * Run hough trackign on P-Side
@@ -1056,10 +1241,10 @@ SVDHoughtrackingModule::trackingPipeline()
   rect_size = m_rectSizeP;
   scale_y = m_rectScaleP;
   /* Set start values */
-  v1_s.Set((-1.0 * ((M_PI / 2)) - 0.0f), (scale_y * rect_size));
-  v2_s.Set((M_PI / 2 - 0.0f), (scale_y * rect_size));
-  v3_s.Set((M_PI / 2 - 0.0f), (-1.0 * scale_y * rect_size));
-  v4_s.Set((-1.0 * ((M_PI / 2)) - 0.0f), (-1.0 * scale_y * rect_size));
+  v1_s.Set(m_rectXP1, (scale_y * rect_size));
+  v2_s.Set(m_rectXP2, (scale_y * rect_size));
+  v3_s.Set(m_rectXP2, (-1.0 * scale_y * rect_size));
+  v4_s.Set(m_rectXP1, (-1.0 * scale_y * rect_size));
   /* Run intercept finder */
   fastInterceptFinder2d(p_hough, false, v1_s, v2_s, v3_s, v4_s, 0, m_critIterationsP,
                         m_maxIterationsP, p_rect, m_minimumLines);
@@ -1075,10 +1260,10 @@ SVDHoughtrackingModule::trackingPipeline()
   rect_size = m_rectSizeN;
   scale_y = m_rectScaleN;
   /* Set start values */
-  v1_s.Set((-1.0 * ((M_PI / 2)) - 0.0f), (scale_y * rect_size));
-  v2_s.Set((M_PI / 2 - 0.0f), (scale_y * rect_size));
-  v3_s.Set((M_PI / 2 - 0.0f), (-1.0 * scale_y * rect_size));
-  v4_s.Set((-1.0 * ((M_PI / 2)) - 0.0f), (-1.0 * scale_y * rect_size));
+  v1_s.Set(m_rectXN1, (scale_y * rect_size));
+  v2_s.Set(m_rectXN2, (scale_y * rect_size));
+  v3_s.Set(m_rectXN2, (-1.0 * scale_y * rect_size));
+  v4_s.Set(m_rectXN1, (-1.0 * scale_y * rect_size));
   /* Run intercept finder */
   fastInterceptFinder2d(n_hough, true, v1_s, v2_s, v3_s, v4_s, 0, m_critIterationsN,
                         m_maxIterationsN, n_rect, m_minimumLines);
@@ -1123,6 +1308,13 @@ SVDHoughtrackingModule::fac3d()
   double r, phi, theta;
   bool all = false; /* combine every track in N and P */
 
+  /* During testbeam it is best to combine every track, because the sensors are very
+   * noisy and partly broken.
+   */
+  if (m_tbMapping) {
+    all = true;
+  }
+
   if (!storeHoughTrack.isValid()) {
     storeHoughTrack.create();
   } else {
@@ -1139,14 +1331,27 @@ SVDHoughtrackingModule::fac3d()
       p_tc = it->getCoord();
       r = 1.0 / (2.0 * p_tc.Y());
 
-      if (r < 0.0) {
-        phi = 1.0 * p_tc.X() + M_PI / 2.0;
+      /* Determine if we use tb mapping or not */
+      if (m_tbMapping) {
+        if (r < 0.0) {
+          phi = 1.0 * p_tc.X() + M_PI / 2.0;
+        } else {
+          phi = (1.0 * p_tc.X() + M_PI / 2.0) - M_PI;
+        }
+        if (phi > M_PI) {
+        } else if (phi < -1.0 * M_PI) {
+          phi += 2 * M_PI;
+        }
       } else {
-        phi = (1.0 * p_tc.X() + M_PI / 2.0) - M_PI;
-      }
-      if (phi > M_PI) {
-      } else if (phi < -1.0 * M_PI) {
-        phi += 2 * M_PI;
+        if (r < 0.0) {
+          phi = 1.0 * p_tc.X() + M_PI / 2.0;
+        } else {
+          phi = (1.0 * p_tc.X() + M_PI / 2.0) - M_PI;
+        }
+        if (phi > M_PI) {
+        } else if (phi < -1.0 * M_PI) {
+          phi += 2 * M_PI;
+        }
       }
 
       /* Radius Filter */
@@ -1168,10 +1373,19 @@ SVDHoughtrackingModule::fac3d()
       ++tracks;
       n_tc = it->getCoord();
 
-      if (n_tc.X() > 0.0) {
-        theta = n_tc.X(); // (M_PI) - n_tc.X();
+      /* Determine if we use tb mapping or not */
+      if (m_tbMapping) {
+        if (n_tc.X() > 0.0) {
+          theta = n_tc.X(); // (M_PI) - n_tc.X();
+        } else {
+          theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
+        }
       } else {
-        theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
+        if (n_tc.X() > 0.0) {
+          theta = n_tc.X(); // (M_PI) - n_tc.X();
+        } else {
+          theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
+        }
       }
 
       storeHoughTrack.appendNew(SVDHoughTrack(tracks, 0.0, 0.0, theta));
@@ -1191,29 +1405,64 @@ SVDHoughtrackingModule::fac3d()
         p_tc = it_in->getCoord();
         r = 1.0 / (2.0 * p_tc.Y());
 
-        if (r < 0.0) {
-          phi = 1.0 * p_tc.X() + M_PI / 2.0;
-        } else {
-          phi = (1.0 * p_tc.X() + M_PI / 2.0) - M_PI;
-        }
-        if (phi > M_PI) {
-        } else if (phi < -1.0 * M_PI) {
-          phi += 2 * M_PI;
+
+        if (m_straightTracks && all) {
+          storeHoughTrack.appendNew(SVDHoughTrack(p_tc.X(), p_tc.Y(), n_tc.X(), n_tc.Y()));
+          return;
         }
 
-        if (n_tc.X() > 0.0) {
-          theta = -1.0 * n_tc.X(); // (M_PI) - n_tc.X();
-        } else {
-          theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
-        }
+        /* Determine if we use tb mapping or not */
+        if (m_tbMapping) {
+          if (r < 0.0) {
+            phi = 1.0 * p_tc.X() + M_PI / 2.0;
+          } else {
+            phi = (1.0 * p_tc.X() + M_PI / 2.0) - M_PI;
+          }
+          if (phi > M_PI) {
+            phi -= 2.0 * M_PI;
+          } else if (phi < -1.0 * M_PI) {
+            phi += 2.0 * M_PI;
+          }
 
-        /* Radius Filter */
-        if (m_useRadiusFilter) {
-          if (fabs(r) > m_radiusThreshold) {
+          if (n_tc.X() > 0.0) {
+            theta = n_tc.X(); // (M_PI) - n_tc.X();
+          } else {
+            theta = n_tc.X(); //(M_PI / 2) - n_tc.X();
+          }
+
+          /* Radius Filter */
+          if (m_useRadiusFilter) {
+            if (fabs(r) > m_radiusThreshold) {
+              storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
+            }
+          } else {
             storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
           }
         } else {
-          storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
+          if (r < 0.0) {
+            phi = 1.0 * p_tc.X() + M_PI / 2.0;
+          } else {
+            phi = (1.0 * p_tc.X() + M_PI / 2.0) - M_PI;
+          }
+          if (phi > M_PI) {
+          } else if (phi < -1.0 * M_PI) {
+            phi += 2 * M_PI;
+          }
+
+          if (n_tc.X() > 0.0) {
+            theta = -1.0 * n_tc.X(); // (M_PI) - n_tc.X();
+          } else {
+            theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
+          }
+
+          /* Radius Filter */
+          if (m_useRadiusFilter) {
+            if (fabs(r) > m_radiusThreshold) {
+              storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
+            }
+          } else {
+            storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
+          }
         }
       }
     }
@@ -1296,6 +1545,7 @@ SVDHoughtrackingModule::printTracks()
   StoreArray<SVDHoughTrack> storeHoughTrack(m_storeHoughTrack);
   int nTracks;
   double r, phi, theta;
+  double m1, m2, a1, a2;
 
   nTracks = storeHoughTrack.getEntries();
 
@@ -1305,16 +1555,31 @@ SVDHoughtrackingModule::printTracks()
     B2DEBUG(1, "Found tracks: ");
   }
   for (int i = 0; i < nTracks; ++i) {
-    r = storeHoughTrack[i]->getTrackR();
-    phi = storeHoughTrack[i]->getTrackPhi();
-    theta = storeHoughTrack[i]->getTrackTheta();
-    if (m_printTrackInfo) {
-      cout << "  Track [ " << i << " ] Radius: " << r << " Phi: " << phi << " (" << phi / Unit::deg << ")"
-           << " Theta: " << theta << " (" << theta / Unit::deg << ")" << endl;
+    if (storeHoughTrack[i]->getTrackType()) {
+      m1 = storeHoughTrack[i]->getTrackM1();
+      a1 = storeHoughTrack[i]->getTrackA1();
+      m2 = storeHoughTrack[i]->getTrackM2();
+      a2 = storeHoughTrack[i]->getTrackA2();
+      if (m_printTrackInfo) {
+        cout << "  Straight Track [ " << i << " ] M1: " << m1 << " A1: " << a1 << " M2: " << m2
+             << " A2: " << a2 << endl;
+      } else {
+        B2DEBUG(1, "  Straight Track [ " << i << " ] M1: " << m1 << " A1: " << a1 << " M2: " << m2
+                << " A2: " << a2);
+      }
     } else {
-      B2DEBUG(1, "  Track [ " << i << " ] Radius: " << r << " Phi: " << phi << " (" << phi / Unit::deg << ")"
-              << " Theta: " << theta << " (" << theta / Unit::deg << ")");
+      r = storeHoughTrack[i]->getTrackR();
+      phi = storeHoughTrack[i]->getTrackPhi();
+      theta = storeHoughTrack[i]->getTrackTheta();
+      if (m_printTrackInfo) {
+        cout << "  Track [ " << i << " ] Radius: " << r << " Phi: " << phi << " (" << phi / Unit::deg << ")"
+             << " Theta: " << theta << " (" << theta / Unit::deg << ")" << endl;
+      } else {
+        B2DEBUG(1, "  Track [ " << i << " ] Radius: " << r << " Phi: " << phi << " (" << phi / Unit::deg << ")"
+                << " Theta: " << theta << " (" << theta / Unit::deg << ")");
+      }
     }
+    ++allTracks;
   }
 }
 
@@ -1680,7 +1945,7 @@ SVDHoughtrackingModule::pxdExtrapolationFull()
     /* Determine qOH */
     if (r > 500.0) {
       qOH = 2;
-    } else if (r > 250) {
+    } else if (r > 250.0) {
       qOH = 1;
     } else {
       qOH = 0;
@@ -2379,6 +2644,177 @@ SVDHoughtrackingModule::createTbResiduals()
 }
 
 /*
+ * Save digits.
+ */
+void
+SVDHoughtrackingModule::saveStrips()
+{
+  StoreArray<SVDDigit> storeDigits(m_storeSVDDigitsName);
+  int nDigits, sample_cnt;
+  SVDDigit* digit;
+  VxdID sensorID, last_sensorID;
+  bool new_strip;
+  bool n_side, last_side;
+  short strip, last_strip;
+  float sample;
+  float samples[6];
+  ofstream of_pstrip, of_nstrip;
+
+  /* Open file for output position writing */
+  of_pstrip.open("p_strips.dat", ofstream::out);
+  of_nstrip.open("n_strips.dat", ofstream::out);
+  of_pstrip << "Event " << runNumber << endl;
+  of_nstrip << "Event " << runNumber << endl;
+
+  of_pstrip << "FADC 1" << endl;
+  of_nstrip << "FADC 129" << endl;
+
+  last_sensorID = VxdID(0);
+  last_side = false;
+  new_strip = true;
+  last_strip = 0;
+  sample_cnt = 0;
+
+  nDigits = storeDigits.getEntries();
+  B2DEBUG(250, "Save strips: " << nDigits);
+  if (nDigits == 0) {
+    return;
+  }
+
+  /* Loop over all Digits and aggregate first all samples from a
+   * single strip.
+   * We assume they are sorted!
+   */
+  for (int i = 0; i < nDigits; i++) {
+    digit = storeDigits[i];
+    sensorID = digit->getSensorID();
+    n_side = digit->isUStrip();
+    strip = digit->getCellID();
+    sample = digit->getCharge();
+
+    const SensorInfo* sensorInfo = dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
+    B2DEBUG(350, "  ** Width: " << (sensorInfo->getWidth() / 2.0) << " Length: "
+            << (sensorInfo->getLength() / 2.0));
+
+    /* Same strip, add up all samples */
+    if (sample_cnt == 5) {
+      samples[sample_cnt] = sample;
+      writeStrip(sensorID, n_side ? false : true, strip, samples, n_side ? of_pstrip : of_nstrip);
+      sample_cnt = 0;
+      new_strip = true;
+    } else {
+      if (!new_strip && (last_side != n_side || last_sensorID != sensorID || last_strip != strip)) {
+        B2WARNING("Strips not sorted!");
+      }
+
+      new_strip = false;
+      samples[sample_cnt] = sample;
+      ++sample_cnt;
+    }
+
+    last_strip = strip;
+    last_side = n_side;
+    last_sensorID = sensorID;
+  }
+
+  of_pstrip.close();
+  of_nstrip.close();
+}
+
+/*
+ * Write strips to file.
+ */
+void
+SVDHoughtrackingModule::writeStrip(VxdID sensorID, bool n_side, short strip, float* samples, ofstream& of)
+{
+  short layer = sensorID.getLayerNumber();
+  short strips_per_apv = 128;
+  short apv, max_strips, rest_strip;
+  short apv_offset;
+
+  if (m_tbMapping) {
+    if (layer == 3 || !n_side) {
+      max_strips = 768;
+    } else {
+      max_strips = 512;
+    }
+
+    switch (layer) {
+      case 3:
+        apv_offset = 0;
+        break;
+      case 4:
+        if (n_side) {
+          apv_offset = 7;
+        } else {
+          apv_offset = 6;
+        }
+        break;
+      case 5:
+        if (n_side) {
+          apv_offset = 25;
+        } else {
+          apv_offset = 24;
+        }
+        break;
+      case 6:
+        apv_offset = 30;
+        break;
+    }
+
+    apv = (strip / strips_per_apv);
+    rest_strip = strip - (apv * strips_per_apv);
+
+    /* For testbeam we need to remap layer 4 and 5 n-side */
+    if (layer == 5 && n_side) {
+      switch (apv) {
+        case 0:
+          apv = 25;
+          break;
+        case 1:
+          apv = 24;
+          break;
+        case 2:
+          apv = 27;
+          break;
+        case 3:
+          apv = 26;
+          break;
+      }
+    } else if (layer == 4 && n_side) {
+      switch (apv) {
+        case 0:
+          apv = 7;
+          break;
+        case 1:
+          apv = 6;
+          break;
+        case 2:
+          apv = 9;
+          break;
+        case 3:
+          apv = 8;
+          break;
+      }
+    } else {
+      apv += apv_offset;
+    }
+
+    /* Write to stream, format:
+     * apv strip sample1 sample2 sample3 sample4 sample5 sample6
+     */
+    of << apv << " " << rest_strip << " " << samples[0] << " " << samples[1] << " " << samples[2] << " "
+       << samples[3] << " " << samples[4] << " " << samples[5] << endl;
+
+    B2DEBUG(250, "  Sensor: " << sensorID << " Side: " << n_side << " Strip: " << strip
+            << " Charge: " << samples[0] << " " << samples[1] << " " << samples[2] << " " << samples[3]
+            << " " << samples[4] << " " << samples[5] << " APV: " << apv << " Rest strip: " << rest_strip);
+  } else {
+    B2WARNING("Only testbeam mapping implemented so far for write strips!");
+  }
+}
+
+/*
  * Top module for the Strip Cluster engine.
  */
 void
@@ -2429,6 +2865,10 @@ SVDHoughtrackingModule::clusterStrips()
     sample = digit->getCharge();
     pos = digit->getCellPosition();
 
+    B2DEBUG(350, "  Sensor: " << sensorID << " Side: " << n_side << " Strip: " << strip
+            << " Charge: " << sample << " Position: " << pos);
+
+
     if ((last_sensorID == sensorID && last_side == n_side) || first) {
       /* Same strip, add up all samples */
       if ((strip == last_strip && sample_cnt != 6) || first) {
@@ -2473,9 +2913,6 @@ SVDHoughtrackingModule::clusterStrips()
       ++sample_cnt;
       //create_strip_cluster();
     }
-    B2DEBUG(200, "  Sensor: " << sensorID << " Side: " << n_side << " Strip: " << strip
-            << " Charge: " << sample << " Position: " << pos);
-
     last_strip = strip;
     last_side = n_side;
     last_sensorID = sensorID;
@@ -2502,6 +2939,10 @@ SVDHoughtrackingModule::noiseFilter(float* samples, int size, float* peak_sample
   int i, peak_pos;
   *peak_sample = 0.0;
   peak_pos = 0;
+
+  if (m_disableNoiseFilter) {
+    return true;
+  }
 
   /* Find maximum sample and save position */
   for (i = 0; i < size; ++i) {
@@ -3223,7 +3664,7 @@ void
 SVDHoughtrackingModule::clusterAdd(VxdID sensorID, bool n_side, short seed_strip, int size)
 {
   Sensor sensor;
-  double pitch;
+  double pitch, corr;
   TVector3 pos, local_pos, first_pos;
   const SensorInfo* sensorInfo = dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
 
@@ -3236,8 +3677,15 @@ SVDHoughtrackingModule::clusterAdd(VxdID sensorID, bool n_side, short seed_strip
   pos.SetX(first_pos.X());
   if (n_side) {
     pitch = sensorInfo->getUPitch();
+
+    if (sensorID.getLayerNumber() == 5) {
+      corr = 4.8 * Unit::mm;
+    } else {
+      corr = 0.0;
+    }
+
     pos.SetY(0.0);
-    pos.SetZ(clusterPosition(pitch, seed_strip, size, (sensorInfo->getWidth() / 2.0)));
+    pos.SetZ(clusterPosition(pitch, seed_strip, size, (sensorInfo->getWidth() / 2.0)) + corr);
     n_clusters.insert(std::make_pair(n_idx, std::make_pair(sensorID, pos)));
     ++n_idx;
   } else {
@@ -3399,16 +3847,16 @@ SVDHoughtrackingModule::printClusters(svdClusterMap& cluster, bool n_side)
   VxdID sensorID;
 
   if (n_side) {
-    B2INFO("Clusters N-Side: " << cluster.size());
+    B2DEBUG(1, "Clusters N-Side: " << cluster.size());
   } else {
-    B2INFO("Clusters P-Side: " << cluster.size());
+    B2DEBUG(1, "Clusters P-Side: " << cluster.size());
   }
 
   for (auto it = cluster.begin(); it != cluster.end(); ++it) {
     clusterInfo = it->second;
     pos = clusterInfo.second;
     sensorID = clusterInfo.first;
-    B2INFO("  " << pos.X() << " "  << pos.Y() << " " <<  pos.Z());
+    B2DEBUG(1, "  " << pos.X() << " "  << pos.Y() << " " <<  pos.Z() << " in Sensor " << sensorID);
   }
 }
 
@@ -3438,7 +3886,7 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   double m_r = 0.0;
   double frac = 360.0;
   double projected_theta;
-  TVector3 mom;
+  TVector3 mom, prim_mom;
 
   nMCParticles = storeMCParticles.getEntries();
   nTracks = storeHoughTrack.getEntries();
@@ -3446,8 +3894,21 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   /* Don't analyse high occ events */
   if (nTracks > 10000) {
     B2WARNING("High occupancy event. Skipping...");
+    ++validEvents; /* High occ doesn't mean it's not a valid event */
     return;
   }
+
+  /* In Tb mode we skip this event, when there are not enough hits created in the
+   * sensor to create a track.
+   */
+  if (m_tbMapping) {
+    if (n_clusters.size() < 3 || p_clusters.size() < 3) {
+      return;
+    }
+  }
+
+  /* Valid event */
+  ++validEvents;
 
   /* Disable Theta reco */
   if (m_usePhiOnly) {
@@ -3473,7 +3934,10 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   for (int i = 0; i < nMCParticles; ++i) {
     charge = storeMCParticles[i]->getCharge();
     mom = storeMCParticles[i]->getMomentum();
+    TVector3 vertex = storeMCParticles[i]->getVertex();
     if (storeMCParticles[i]->getMother() == NULL || !primeOnly) {
+      B2DEBUG(20000, "Vertex: " << vertex.X() << " " << vertex.Y() << " " << vertex.Z());
+      prim_mom = mom;
       /* Get pT of particles */
       pT = mom.Perp();
       /* Write pT in pT histogram */
@@ -3482,7 +3946,11 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
       m_histPhiDist->Fill(mom.Phi() / Unit::deg);
       m_histThetaDist->Fill(mom.Theta() / Unit::deg);
       //projected_theta = atan(fabs(mom.Y()) / fabs(mom.Z())); /* Calculate the projected theta */
-      projected_theta = atan(mom.Y() / mom.Z()); /* Calculate the projected theta */
+      if (m_tbMapping) {
+        projected_theta = mom.Theta();
+      } else {
+        projected_theta = atan(mom.Y() / mom.Z()); /* Calculate the projected theta */
+      }
       m_histProjectedThetaDist->Fill(projected_theta / Unit::deg);
 
       B2DEBUG(250, "  MCParticleInfo: Mom Vec: " << mom.X() << " " << mom.Y() << " " << mom.Z());
@@ -3661,9 +4129,9 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
 
   /* For Fake study, only when we have one primary track */
   if (nPrimary == 1) {
-    m_histPtFakePhi->Fill(pT, (double)(nTracks - nCorrRecoP));
-    m_histFakePhi->Fill(mom.Phi() / Unit::deg, (double)(nTracks - nCorrRecoP));
-    m_histFakeTheta->Fill(mom.Theta() / Unit::deg, (double)(nTracks - nCorrRecoP));
+    m_histPtFakePhi->Fill(prim_mom.Perp(), (double)(nTracks - nCorrRecoP));
+    m_histFakePhi->Fill(prim_mom.Phi() / Unit::deg, (double)(nTracks - nCorrRecoP));
+    m_histFakeTheta->Fill(prim_mom.Theta() / Unit::deg, (double)(nTracks - nCorrRecoP));
   }
 
   ++run;
@@ -3671,6 +4139,15 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   delete[] track_match_n;
   delete[] track_match_p;
   delete[] track_match;
+}
+
+void
+SVDHoughtrackingModule::printCustomSummary()
+{
+  B2DEBUG(1, "--------- Custom Summary ---------");
+  printClusters(n_clusters, true);
+  printClusters(p_clusters, false);
+  B2DEBUG(1, "--------- End Custom Summary ---------");
 }
 
 /*
@@ -3820,7 +4297,7 @@ SVDHoughtrackingModule::createGhosts()
   ghost.push_back(TVector3(6.51591, -1.039503, -3.1254667));
 
   for (unsigned int i = 0; i < ghost.size(); ++i) {
-    //  cluster_map.insert(std::make_pair((iter->first) + 1 + i, ghost[i]));
+    //cluster_map.insert(std::make_pair((iter->first) + 1 + i, ghost[i]));
   }
 }
 

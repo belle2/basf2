@@ -243,6 +243,12 @@ namespace Belle2 {
       /* Processing hits */
       void save_hits();
 
+      /* Save hits for FPGA tests */
+      void saveHits();
+
+      /* Convert integer into verilog 32bit unsigned */
+      char* convertInt(int32_t);
+
       /** Cluster strips */
       void clusterStrips();
 
@@ -254,6 +260,12 @@ namespace Belle2 {
 
       /** Calculate Cluster position */
       double clusterPosition(double, short, int, double);
+
+      /** Save Strips for FPGA LUT */
+      void saveStrips();
+
+      /** Helper function to convert and assign total strips to apv and rest strip */
+      void writeStrip(VxdID, bool, short, float*, ofstream&);
 
       /** Convert TrueHits into the cluster format */
       void convertTrueHits();
@@ -328,6 +340,8 @@ namespace Belle2 {
       void printTracks();
 
       void print_num();
+
+      void printCustomSummary();
 
       /** Print Clusters */
       void printClusters(svdClusterMap&, bool);
@@ -431,6 +445,8 @@ namespace Belle2 {
       bool m_analyseFPGAClusters;
       bool m_useTrueHitClusters;
       bool m_useSimHitClusters;
+      bool m_saveHits;
+      bool m_saveStrips;
       /* Tracking */
       bool m_fullTrackingPipeline;
       bool m_writeHoughSpace;
@@ -445,6 +461,10 @@ namespace Belle2 {
       bool m_compareMCParticleVerbose;
       bool m_usePhiExtrapolation;
       bool m_useThetaExtrapolation;
+      bool m_conformalTrafoP;
+      bool m_conformalTrafoN;
+      bool m_tbMapping;
+      bool m_straightTracks;
       /* ROIs */
       bool m_createROI;
       bool m_createPXDMap;
@@ -456,6 +476,7 @@ namespace Belle2 {
       bool m_printStatistics;
 
       // 4. Noise options
+      bool m_disableNoiseFilter;
       unsigned int m_noiseFactor;
       unsigned int m_noiseUpThreshold;
       unsigned int m_noiseDownThreshold;
@@ -471,6 +492,10 @@ namespace Belle2 {
       double m_rectSizeP;
       double m_rectScaleN;
       double m_rectScaleP;
+      double m_rectXP1;
+      double m_rectXP2;
+      double m_rectXN1;
+      double m_rectXN2;
       double m_mergeThreshold;
 
       // Other data members:
@@ -513,7 +538,9 @@ namespace Belle2 {
       double curTrackEff, curTrackEffN, curTrackEffP;
       double totFakeTracks;
       unsigned int totTracks;
+      unsigned int allTracks;
       unsigned int runNumber;
+      unsigned int validEvents;
 
       /** Current ROI performance efficiency */
       double curROIEff;

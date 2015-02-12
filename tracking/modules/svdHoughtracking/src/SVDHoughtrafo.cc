@@ -79,7 +79,11 @@ SVDHoughtrackingModule::houghTrafo2d(svdClusterMap& mapClusters, bool n_side, bo
         r = ((pow(pos.X() - center.X(), 2.0) + pow(pos.Z() - center.Y(), 2.0)));
         hough.Set(pos.X() / r, pos.Z() / r);
       } else {
-        hough.Set(pos.Y(), pos.Z());
+        if (m_tbMapping) {
+          hough.Set(pos.X(), pos.Z());
+        } else {
+          hough.Set(pos.Y(), pos.Z());
+        }
       }
       n_hough.insert(make_pair(cnt, make_pair(sensorID, hough)));
       B2DEBUG(200, "  Sensor: " << clusterInfo.first << " Position: "

@@ -172,7 +172,82 @@ namespace Belle2 {
    */
   TEST_F(SpacePointTrackCandTest, testGetHitsInRange)
   {
-    // TODO
+    SpacePointTrackCand fullTrackCand;
+
+    // set up some SpacePoints and add them to a SpacePointTrackCand
+    VxdID aVxdID1 = VxdID(1, 1, 1);
+    VXD::SensorInfoBase sensorInfoBase1 = createSensorInfo(aVxdID1, 2.3, 4.2);
+    PXDCluster aCluster = PXDCluster(aVxdID1, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
+    const SpacePoint aPXDSpacePoint = SpacePoint(&aCluster, &sensorInfoBase1);
+    fullTrackCand.addSpacePoint(&aPXDSpacePoint, 1.23); // add a SpacePoint with an arbitrary sorting parameter
+
+    VxdID aVxdID2 = VxdID(2, 2, 2);
+    VXD::SensorInfoBase sensorInfoBase2 = createSensorInfo(aVxdID2, 2.3, 4.2);
+    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    std::vector<const SVDCluster*> UVClusterVec1 = { &aUCluster, &aVCluster };
+    std::vector<const SVDCluster*> VClusterVec = { &aVCluster };
+    std::vector<const SVDCluster*> UClusterVec = { &aUCluster };
+    const SpacePoint SVDSpacePoint1 = SpacePoint(UVClusterVec1, &sensorInfoBase2);
+    const SpacePoint SVDSpacePoint2 = SpacePoint(VClusterVec, &sensorInfoBase2);
+    const SpacePoint SVDSpacePoint3 = SpacePoint(UClusterVec, &sensorInfoBase2);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint1, 2.34);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint2, 3.45);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint3, 4.56);
+
+    VxdID aVxdId3 = VxdID(3, 3, 3);
+    VXD::SensorInfoBase sensorInfoBase3 = createSensorInfo(aVxdId3, 2.3, 4.2);
+    SVDCluster aUCluster2 = SVDCluster(aVxdId3, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aVCluster2 = SVDCluster(aVxdId3, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    std::vector<const SVDCluster*> UVClusterVec2 = { &aUCluster2, &aVCluster2 };
+    std::vector<const SVDCluster*> VClusterVec2 = { &aVCluster2 };
+    std::vector<const SVDCluster*> UClusterVec2 = { &aUCluster2 };
+    const SpacePoint SVDSpacePoint4 = SpacePoint(UVClusterVec2, &sensorInfoBase3);
+    const SpacePoint SVDSpacePoint5 = SpacePoint(VClusterVec2, &sensorInfoBase3);
+    const SpacePoint SVDSpacePoint6 = SpacePoint(UClusterVec2, &sensorInfoBase3);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint4, 5.67);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint5, 6.78);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint6, 7.89);
+
+    // set up some 'shorter' SpacePointTrackCands
+    SpacePointTrackCand shortTC1;
+    shortTC1.addSpacePoint(&aPXDSpacePoint, 1.23);
+    shortTC1.addSpacePoint(&SVDSpacePoint1, 2.34);
+    shortTC1.addSpacePoint(&SVDSpacePoint2, 3.45);
+    shortTC1.addSpacePoint(&SVDSpacePoint3, 4.56);
+
+    SpacePointTrackCand shortTC2;
+    shortTC2.addSpacePoint(&SVDSpacePoint2, 3.45);
+    shortTC2.addSpacePoint(&SVDSpacePoint3, 4.56);
+    shortTC2.addSpacePoint(&SVDSpacePoint4, 5.67);
+    shortTC2.addSpacePoint(&SVDSpacePoint5, 6.78);
+
+    SpacePointTrackCand subTrackCand1 = fullTrackCand.getHitsInRange(0, 3);
+    EXPECT_TRUE(subTrackCand1 == shortTC1);
+    std::vector<double> sortParams1 = { 1.23, 2.34, 3.45, 4.56 };
+    std::vector<double> sortParamsTC1 = fullTrackCand.getSortingParametersInRange(0, 3);
+    EXPECT_EQ(sortParams1.size(), sortParamsTC1.size());
+    for (unsigned int i = 0; i < sortParamsTC1.size(); ++i) { EXPECT_DOUBLE_EQ(sortParams1.at(i), sortParamsTC1.at(i)); }
+
+    SpacePointTrackCand subTrackCand2 = fullTrackCand.getHitsInRange(2, 5);
+    EXPECT_TRUE(subTrackCand2 == shortTC2);
+    std::vector<double> sortParams2 = { 3.45, 4.56, 5.67, 6.78 };
+    std::vector<double> sortParamsTC2 = fullTrackCand.getSortingParametersInRange(2, 5);
+    EXPECT_EQ(sortParams2.size(), sortParamsTC2.size());
+    for (unsigned int i = 0; i < sortParamsTC2.size(); ++i) { EXPECT_DOUBLE_EQ(sortParams2.at(i), sortParamsTC2.at(i)); }
+
+    // test throwing of exceptions
+    unsigned int nHits = fullTrackCand.getNHits();
+    ASSERT_THROW(fullTrackCand.getHitsInRange(0, nHits), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
+    ASSERT_NO_THROW(fullTrackCand.getHitsInRange(nHits - 2, nHits - 1));
+    ASSERT_THROW(fullTrackCand.getHitsInRange(-1, 3), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
+    ASSERT_THROW(fullTrackCand.getHitsInRange(0, 10), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
+    ASSERT_THROW(fullTrackCand.getHitsInRange(10, 11), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
+    ASSERT_THROW(fullTrackCand.getHitsInRange(10, -1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(-1, 2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(0, 10), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(12, 3), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(10, -2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
   }
 
   /**
@@ -201,6 +276,7 @@ namespace Belle2 {
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_checkedClean));
     trackCand.addRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor);
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor));
+    EXPECT_FALSE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsLowDistance));
     unsigned short int expectedStatus = SpacePointTrackCand::c_checkedClean + SpacePointTrackCand::c_hitsOnSameSensor;
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
 
@@ -212,5 +288,59 @@ namespace Belle2 {
 
     // test if the status that remains is still set
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor));
+
+    // check if adding of the same status twice works
+    trackCand.clearRefereeStatus();
+    trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedSameSensors);
+    trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedSameSensors);
+    EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_checkedSameSensors));
+  }
+
+  /**
+   * Test the removeSpacePoint method
+   */
+  TEST_F(SpacePointTrackCandTest, testRemoveSpacePoints)
+  {
+    // set up SpacePointTrackCand
+    SpacePointTrackCand fullTrackCand;
+
+    // set up some SpacePoints and add them to a SpacePointTrackCand
+    VxdID aVxdID1 = VxdID(1, 1, 1);
+    VXD::SensorInfoBase sensorInfoBase1 = createSensorInfo(aVxdID1, 2.3, 4.2);
+    PXDCluster aCluster = PXDCluster(aVxdID1, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
+    const SpacePoint aPXDSpacePoint = SpacePoint(&aCluster, &sensorInfoBase1);
+    fullTrackCand.addSpacePoint(&aPXDSpacePoint, 1.23); // add a SpacePoint with an arbitrary sorting parameter
+
+    VxdID aVxdID2 = VxdID(2, 2, 2);
+    VXD::SensorInfoBase sensorInfoBase2 = createSensorInfo(aVxdID2, 2.3, 4.2);
+    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    std::vector<const SVDCluster*> UVClusterVec1 = { &aUCluster, &aVCluster };
+    std::vector<const SVDCluster*> VClusterVec = { &aVCluster };
+    std::vector<const SVDCluster*> UClusterVec = { &aUCluster };
+    const SpacePoint SVDSpacePoint1 = SpacePoint(UVClusterVec1, &sensorInfoBase2);
+    const SpacePoint SVDSpacePoint2 = SpacePoint(VClusterVec, &sensorInfoBase2);
+    const SpacePoint SVDSpacePoint3 = SpacePoint(UClusterVec, &sensorInfoBase2);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint1, 2.34);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint2, 3.45);
+    fullTrackCand.addSpacePoint(&SVDSpacePoint3, 4.56);
+
+    // set up a second TC, but ommit one SpacePoint
+    SpacePointTrackCand expectedTC;
+    expectedTC.addSpacePoint(&aPXDSpacePoint, 1.23);
+    expectedTC.addSpacePoint(&SVDSpacePoint2, 3.45);
+    expectedTC.addSpacePoint(&SVDSpacePoint3, 4.56);
+
+    // remove SpcePoint from first TrackCand amd compare it with the expected TrackCand
+    fullTrackCand.removeSpacePoint(1);
+    EXPECT_TRUE(expectedTC == fullTrackCand);
+
+    std::vector<double> expectedSortParams = { 1.23, 3.45, 4.56 };
+    std::vector<double> sortParams = fullTrackCand.getSortingParameters();
+    EXPECT_EQ(expectedSortParams.size(), sortParams.size());
+    for (unsigned int i = 0; i < sortParams.size(); ++i) { EXPECT_DOUBLE_EQ(sortParams.at(i), expectedSortParams.at(i)); }
+
+    // try to remove a SpacePoint that is out of bounds
+    ASSERT_THROW(fullTrackCand.removeSpacePoint(10), SpacePointTrackCand::SPTCIndexOutOfBounds);
   }
 }

@@ -435,6 +435,8 @@
 !=====(((
 !#     CALL GPRINT(9001) 
 !=====)))
+      TEMPNOUT = NOUT
+      NOUT = 6
       WRITE(NOUT,BXOPE)
       WRITE(NOUT,BXTXT) '*********************************'
       WRITE(NOUT,BXTXT) '  BHWIDE:        WINDOW A        '
@@ -447,13 +449,17 @@
       WRITE(NOUT,BXL1I) NEVNEG,     ' WT<0              ','NEVNEG','A6'
       WRITE(NOUT,BXL1I) NEVOVE,     ' WT>WTMAX          ','NEVOVE','A7'
       WRITE(NOUT,BXL1F) WTMAX ,     ' Maximum WT        ','WWMX  ','A8'
-      WRITE(NOUT,BXCLO)  
+      WRITE(NOUT,BXCLO)
+      NOUT = TEMPNOUT
 ! PRINT ADDITIONAL INFOS                  
 !------------------------------------------------------------       
       CALL GMONIT(   1,IDA+1, AWT1 ,DWT1 ,DUMM3)                  
       CALL GMONIT(   1,IDA+2, AWT2 ,DWT2 ,DUMM3)         
       CALL GMONIT(   1,IDA+3, AWT3 ,DWT3 ,DUMM3)         
-      CALL GMONIT(   1,IDA+4, AWT4 ,DWT4 ,DUMM3) 
+      CALL GMONIT(   1,IDA+4, AWT4 ,DWT4 ,DUMM3)
+      
+      TEMPNOUT = NOUT
+      NOUT = 6
       WRITE(NOUT,BXOPE)
       WRITE(NOUT,BXTXT) '*********************************'
       WRITE(NOUT,BXTXT) '  BHWIDE:        WINDOW B        '
@@ -471,13 +477,17 @@
       DWT19 = XWT19*RWT19
       WRITE(NOUT,BXL2F) XWT19,DWT19,'xsec/xtot: WT<0    ','WT    ','B7'
       WRITE(NOUT,BXCLO)  
+      NOUT = TEMPNOUT
 ! ---------------------------------------------------------------
       CALL GMONIT( 1,IDC+1,AWT1,DWT1,DUMM3)                            
       CALL GMONIT( 1,IDC+2,AWT2,DWT2,DUMM3)          
       CALL GMONIT( 1,IDC+3,AWT3,DWT3,DUMM3)          
       CALL GMONIT( 1,IDC+4,AWT4,DWT4,DUMM3)          
       CALL GMONIT( 1,IDC+5,AWT5,DWT5,DUMM3)          
-      CALL GMONIT( 1,IDC+6,AWT6,DWT6,DUMM3)          
+      CALL GMONIT( 1,IDC+6,AWT6,DWT6,DUMM3)
+      
+      TEMPNOUT = NOUT
+      NOUT = 6
       WRITE(NOUT,BXOPE)
       WRITE(NOUT,BXTXT) '*********************************'
       WRITE(NOUT,BXTXT) '  BHWIDE:        WINDOW C        '
@@ -490,7 +500,9 @@
       WRITE(NOUT,BXL2F) AWT4,DWT4  ,'<WCTB1>            ','      ','C4'
       WRITE(NOUT,BXL2F) AWT5,DWT5  ,'<WCTB2>            ','      ','C5'
       WRITE(NOUT,BXL2F) AWT6,DWT6  ,'<WCTB1*WCTB2>      ','      ','C6'
-      WRITE(NOUT,BXCLO)  
+      WRITE(NOUT,BXCLO) 
+      NOUT = TEMPNOUT
+
       ENDIF 
 *     =====
       END  
@@ -542,7 +554,7 @@
 !--
       SAVE   / INOUT  /, / RANPAR /, / TRANSR /, / BHCRUD /
       SAVE   / BHPAR1 /, / BHPAR2 /, / BHPAR3 /, / BHPAR4 /, / BHPARZ /
-      SAVE
+!       SAVE
       EXTERNAL dsigbo
 !--
       CMSENE = XPAR(1)
@@ -728,6 +740,8 @@ cc      trmid = SVAR*       (1 -beteli*betelf*COS(thmid))/2 -2*AMEL**2
       CALL GAUSJD(dsigbo,trminb,trmaxb,eeps,BORNXS)
       KeyRad = KeyTem
 !---------------------------------------------------------------------
+      TEMPNOUT = NOUT
+      NOUT = 6
       WRITE(NOUT,BXOPE)
       WRITE(NOUT,BXTXT) '*********************************'
       WRITE(NOUT,BXTXT) '  BHWIDE: INPUT PARAMETRES       '
@@ -771,7 +785,8 @@ cc      trmid = SVAR*       (1 -beteli*betelf*COS(thmid))/2 -2*AMEL**2
       WRITE(NOUT,BXL1F) AMTOP ,     ' t-quark mass [GeV]','AMTOP ','X14'
       WRITE(NOUT,BXL1F) AMHIG ,     ' Higgs   mass [GeV]','AMHIG ','X15'
       WRITE(NOUT,BXL1G) BORNXS,     ' Born Xsecion [pb] ','BORNXS','  '
-      WRITE(NOUT,BXCLO)  
+      WRITE(NOUT,BXCLO)
+      NOUT = TEMPNOUT
       END 
 
       FUNCTION dsigbo(tran)

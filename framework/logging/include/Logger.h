@@ -108,8 +108,10 @@
  * \def B2FATAL(streamText)
  * Send a fatal message, program will abort after printing it.
  */
-#define B2FATAL(streamText) \
-  B2LOGMESSAGE(Belle2::LogConfig::c_Fatal, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
+#define B2FATAL(streamText) { \
+    B2LOGMESSAGE(Belle2::LogConfig::c_Fatal, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__) \
+    exit(1); \
+  }
 
 #ifdef LOG_NO_B2ASSERT
 #define B2ASSERT(message, condition)
@@ -120,7 +122,7 @@
  */
 #define B2ASSERT(message, condition) { \
     if (!(condition)) { \
-      B2LOGMESSAGE(Belle2::LogConfig::c_Fatal, 0, message, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__) \
+      B2FATAL(message) \
     } \
   }
 #endif

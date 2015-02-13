@@ -69,11 +69,9 @@ void RootInputModule::initialize()
   const vector<string>& inputFiles = getInputFiles();
   if (inputFiles.empty()) {
     B2FATAL("You have to set either the 'inputFileName' or the 'inputFileNames' parameter, or start basf2 with the '-i MyFile.root' option.");
-    return;
   }
   if (!m_inputFileName.empty() && !m_inputFileNames.empty()) {
     B2FATAL("Cannot use both 'inputFileName' and 'inputFileNames' parameters!");
-    return;
   }
 
   //expand any expansions in inputFiles
@@ -103,7 +101,6 @@ void RootInputModule::initialize()
     TFile* f = TFile::Open(fileName.c_str(), "READ");
     if (!f || !f->IsOpen()) {
       B2FATAL("Couldn't open input file " + fileName);
-      return;
     }
     delete f;
   }
@@ -206,7 +203,6 @@ void RootInputModule::readTree()
     return; //end of file
   } else if (localEntryNumber < 0) {
     B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. (TChain::LoadTree() returned error " << localEntryNumber << ")");
-    return;
   }
 
   B2DEBUG(200, "Reading file entry " << m_nextEntry);
@@ -251,7 +247,6 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
   const TObjArray* branches = tree->GetListOfBranches();
   if (!branches) {
     B2FATAL("Tree '" << tree->GetName() << "' doesn't contain any branches!");
-    return false;
   }
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
     TBranch* branch = static_cast<TBranch*>(branches->At(jj));

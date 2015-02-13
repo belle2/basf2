@@ -71,7 +71,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function isInRegion");
-        return nullptr;
       }
     }
 
@@ -89,7 +88,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterProductOf");
-        return nullptr;
       }
     }
 
@@ -107,7 +105,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterSumOf");
-        return nullptr;
       }
     }
 
@@ -119,7 +116,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function abs");
-        return nullptr;
       }
     }
 
@@ -145,7 +141,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughter");
-        return nullptr;
       }
     }
 
@@ -170,7 +165,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function NBDeltaIfMissing");
-        return nullptr;
       }
     }
 
@@ -217,7 +211,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments (3 required) for meta function QrOf");
-        return nullptr;
       }
     }
 
@@ -304,7 +297,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments (3 required) for meta function QrOf");
-        return nullptr;
       }
     }
 
@@ -423,7 +415,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments (1 required) for meta function IsRightClass");
-        return nullptr;
       }
     }
 
@@ -510,7 +501,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments (1 required) for meta function IsFromB");
-        return nullptr;
       }
     }
 
@@ -541,7 +531,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments (2 required) for meta function hasHighestProbInCat");
-        return nullptr;
       }
     }
 
@@ -565,7 +554,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments (2 required) for meta function hasHighestProbInCat");
-        return nullptr;
       }
     }
 
@@ -616,13 +604,11 @@ namespace Belle2 {
             return E_W_90;
           } else {
             B2FATAL("Wrong variable requested. The possibilities are recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90");
-            return 0;
           }
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments (1 required) for meta function SemiLeptonicVariables");
-        return nullptr;
       }
     }
 
@@ -655,13 +641,11 @@ namespace Belle2 {
             } else return 0;
           } else {
             B2FATAL("Wrong variable requested. The possibilities are p_CMS_Fast, cosSlowFast or cosTPTO_Fast");
-            return 0;
           }
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments (1 required) for meta function FSCVariables");
-        return nullptr;
       }
     }
 
@@ -676,13 +660,11 @@ namespace Belle2 {
             return ListOfParticles->getListSize();
           } else {
             B2FATAL("Wrong requested Variable. Available is getListSize for particle lists");
-            return 0;
           }
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments (2 required) for meta function CheckingVariables");
-        return nullptr;
       }
     }
 
@@ -724,7 +706,6 @@ namespace Belle2 {
             useFS1 = true;
           } else {
             B2FATAL("Second argument in KSFWVariables can only be 'FS1' to use the KSFW moments calculated from the B final state particles! Do not include a second argument to use the default KSFW moments calculated from the B primary daughters.");
-            return nullptr;
           }
         }
         int index = -1;
@@ -751,7 +732,6 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function KSFWVariables. It only takes one or two arguments. The first argument must be the variable and the second can either be left blank or must be FS1 to use the KSFW moments calculated from the B final state particles.");
-        return nullptr;
       }
     }
 

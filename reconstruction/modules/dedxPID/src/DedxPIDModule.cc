@@ -273,7 +273,6 @@ void DedxPIDModule::event()
 
     if (gftrack->getFitStatus(trackrep)->isTrackPruned()) {
       B2FATAL("GFTrack is pruned, please run DedxPID only on unpruned tracks! Aborting.");
-      return;
     }
 
     dedxTrack->m_pdg_hyp = fitResult->getParticleType().getPDGCode();

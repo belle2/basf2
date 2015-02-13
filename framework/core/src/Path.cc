@@ -42,7 +42,6 @@ void Path::addPath(PathPtr path)
 {
   if (path.get() == this) {
     B2FATAL("Attempting to add a path to itself!");
-    return;
   }
   m_elements.push_back(path);
 }

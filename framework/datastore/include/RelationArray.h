@@ -199,7 +199,7 @@ namespace Belle2 {
      */
     template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, const std::string& name = "",
                                                   DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase((name == "") ? DataStore::relationName(from.getName(), to.getName()) : name, durability, RelationContainer::Class(), false),
+      StoreAccessorBase(name.empty() ? DataStore::relationName(from.getName(), to.getName()) : name, durability, RelationContainer::Class(), false),
       m_accessorFrom(from.getAccessorParams()),
       m_accessorTo(to.getAccessorParams()),
       m_relations(0) {
@@ -237,9 +237,8 @@ namespace Belle2 {
     explicit RelationArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event):
       StoreAccessorBase(name, durability, RelationContainer::Class(), false),
       m_relations(0) {
-      if (name == "") {
+      if (name.empty()) {
         B2FATAL("Cannot guess relation name, please supply correct name");
-        return;
       }
     }
 
@@ -383,9 +382,8 @@ namespace Belle2 {
     explicit RelationArray(const AccessorParams& params):
       StoreAccessorBase(params.first, params.second, RelationContainer::Class(), false),
       m_relations(0) {
-      if (params.first == "") {
+      if (params.first.empty()) {
         B2FATAL("Cannot guess relation name, please supply correct name");
-        return;
       }
     }
 

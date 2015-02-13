@@ -248,7 +248,6 @@ namespace Belle2 {
 
       if (cluster_count.size() <= 1) {
         B2FATAL("Found less than two clusters in sample, no training necessary!");
-        return;
       } else if (cluster_count.size() ==  2) {
         int maxId = cluster_count.begin()->first;
         for (const auto & pair : cluster_count) {

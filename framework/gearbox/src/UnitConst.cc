@@ -155,7 +155,6 @@ void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
 
   if (!indec) {
     B2FATAL("EvtGenDatabasePDG::ReadPDGTable: Could not open PDG particle file " << filename);
-    return;
   }
 
   std::map<int, TParticlePDG*> pdgToPartMap;

@@ -69,7 +69,6 @@ namespace Belle2 {
 
       if (m_reader == nullptr) {
         B2FATAL("Failed to load a TMVA::Reader with the given name and signalClass from the config file.")
-        return;
       }
 
       // Change back to old directory

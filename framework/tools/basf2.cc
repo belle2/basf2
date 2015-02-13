@@ -182,7 +182,6 @@ int main(int argc, char* argv[])
       int nprocesses = varMap["processes"].as<int>();
       if (nprocesses < 0) {
         B2FATAL("Invalid number of processes!");
-        return 1;
       }
       Environment::Instance().setNumberProcessesOverride(nprocesses);
     }
@@ -249,7 +248,6 @@ int main(int argc, char* argv[])
       int nevents = varMap["events"].as<int>();
       if (nevents <= 0) {
         B2FATAL("Invalid number of events!");
-        return 1;
       }
       Environment::Instance().setNumberEventsOverride(nevents);
     }
@@ -279,7 +277,6 @@ int main(int argc, char* argv[])
       }
       if (level < 0) {
         B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
-        return 1;
       }
 
       //set log level

@@ -146,10 +146,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     maxEvent = numEventsArgument;
   }
 
-  if (numProcesses == 0) {
+  if (numProcesses == 0)
     B2FATAL("pEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
-    return;
-  }
 
   // 1. Analyze start path and split into parallel paths
   analyzePath(spath);

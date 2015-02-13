@@ -124,7 +124,6 @@ void PreCutHistMakerModule::initialize()
   m_file = new TFile(m_fileName.c_str(), "RECREATE");
   if (!m_file->IsOpen()) {
     B2FATAL("Could not create file " << m_fileName);
-    return;
   }
   m_file->cd();
 

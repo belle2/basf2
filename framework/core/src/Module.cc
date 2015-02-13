@@ -107,7 +107,6 @@ bool Module::evalCondition()
   //okay, a condition was set for this Module...
   if (!m_hasReturnValue) {
     B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
-    return false;
   }
   return CondParser::evalCondition(m_returnValue, m_conditionValue, m_conditionOperator);
 }

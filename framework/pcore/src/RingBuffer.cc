@@ -67,7 +67,6 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
       m_new = false;
     } else {
       B2FATAL("RingBuffer: error to open shm file");
-      return;
     }
     m_shmkey = ftok(m_pathname.c_str(), 1);
     m_semkey = ftok(m_pathname.c_str(), 2);
@@ -121,13 +120,11 @@ void RingBuffer::openSHM(int size)
     m_shmid = shmget(IPC_PRIVATE, sizeBytes, IPC_CREAT | 0600);
     if (m_shmid < 0) {
       B2FATAL("RingBuffer: shmget(" << size * sizeof(int) << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
-      return;
     }
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
     B2FATAL("RingBuffer: Attaching to shared memory segment via shmat() failed");
-    return;
   }
 
   // 2. Open Semaphore
@@ -135,7 +132,6 @@ void RingBuffer::openSHM(int size)
   if (m_semid < 0) {
     cleanup();
     B2FATAL("Aborting execution because we couldn't create a semaphore (see previous error messages for details).");
-    return;
   }
   SemaphoreLocker locker(m_semid); //prevent simultaneous initialization
 

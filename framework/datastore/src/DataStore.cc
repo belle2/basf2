@@ -171,7 +171,6 @@ bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& acce
   const char* entryType = (entry.isArray) ? "array" : "object";
   if (entry.isArray != accessor.isArray()) {
     B2FATAL("Existing entry '" << entry.name << "' is an " << entryType << " and the requested one an " << ((accessor.isArray()) ? "array" : "object"));
-    return false;
   }
 
   // Check whether the existing entry has the same type
@@ -181,7 +180,6 @@ bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& acce
   }
   if (!entryClass->InheritsFrom(accessor.getClass())) {
     B2FATAL("Existing " << accessor.readableName() << " of type " << entryClass->GetName() << " doesn't match requested type " << accessor.getClass()->GetName());
-    return false;
   }
 
   return true;

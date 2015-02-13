@@ -151,7 +151,6 @@ namespace Belle2 {
 
     if (m_Bfield == 0) {
       B2FATAL("ParticleVertexFitter: No magnetic field");
-      return false;
     }
 
     if (m_withConstraint != "ipprofile" &&
@@ -316,7 +315,6 @@ namespace Belle2 {
 
     if (pi0Children.size() > 1) {
       B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFitter does not support fit with multiple pi0s (yet).");
-      return false;
     }
 
     if (fitChildren.size() < 2) {
@@ -389,7 +387,6 @@ namespace Belle2 {
 
     if (pi0Children.size() > 1) {
       B2FATAL("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFitter does not support fit with multiple pi0s (yet).");
-      return false;
     }
 
     if (fitChildren.size() < 2) {
@@ -775,7 +772,6 @@ namespace Belle2 {
     };
     if (!okFT) {
       B2FATAL("fitType : " << m_fitType << " ***invalid fit type ");
-      return false;
     }
 
 

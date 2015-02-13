@@ -63,6 +63,12 @@ namespace Belle2 {
 
     double m_PARAMminDistance; /**< minimal distance two subsequent SpacePoints have to be seperated */
 
+    std::vector<double> m_PARAMsetOrigin; /**< assumed interaction point from which the SpacePointTrackCands emerge. Needed to determine the direction of flight */
+
+    // ======================================================= INTERNALY USED MEMBERS ===============================================================
+
+    B2Vector3F m_origin; /**< origin used internally. Gets assigned to the values of m_PARAMsetOrigin, after some sanity checks have been done on it */
+
     // ========================================== COUNTER VARIABLES ==================================================================================
 
     unsigned int m_SameSensorCtr; /**< counter for TrackCands with SpacePoints on the same sensor */
@@ -72,6 +78,8 @@ namespace Belle2 {
     unsigned int m_totalTrackCandCtr; /**< counter for the total number of TrackCands */
 
     unsigned int m_kickedSpacePointsCtr; /**< counter of kicked SpacePoints */
+
+    unsigned int m_curlingTracksCtr; /**< counter for tracks that curl */
     /**
      * initialize all counters to 0
      */
@@ -80,6 +88,7 @@ namespace Belle2 {
       m_minDistanceCtr = 0;
       m_totalTrackCandCtr = 0;
       m_kickedSpacePointsCtr = 0;
+      m_curlingTracksCtr = 0;
     }
 
 
@@ -95,5 +104,35 @@ namespace Belle2 {
      */
     const std::vector<int> checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance);
 
+    /**
+     * Check if the SpacePointTrackCand shows curling behavior. Returns empty vector if it is not the case and the indices where the SpacePointTrackCand can be split into TrackStubs such that each of them is no longer curling
+     */
+    const std::vector<int> checkCurling(Belle2::SpacePointTrackCand* trackCand, bool useMCInfo);
+
+    /**
+     * get the directions of Flight for every SpacePoint in the passed vector. true is outgoing, false is ingoing. using MC information can be switched with useMCInfo
+     */
+    const std::vector<bool> getDirectionsOfFlight(const std::vector<const Belle2::SpacePoint*>& spacePoints, bool useMCInfo);
+
+    /**
+     * get the direction of flight for a SpacePoint by using information from the underlying TrueHit
+     * @param origin the assumed interaction point
+     * NOTE: this method assumes that there are already registered relations to a (if there are more only the first in the RelationVector will be used!) TrueHit for each SpacePoint
+     */
+    template <typename TrueHitType>
+    bool getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoint, B2Vector3F origin);
+
+    /**
+     * get the directions of flight for a vector of SpacePoints using only information from SpacePoints (i.e. no MC information)
+     * NOTE: as the momentum is no property that can be infered from one SpacePoint. the difference of positions between two consecutive SpacePoints is assumed to be the direction of the momentum (i.e. linear approximation)
+     * WARNING: using this it is assumed, that the SpacePointTrackCand emerges from the origin (origin is used to calculate the estimate for the momentum of the first SpacePoint)
+     */
+    std::vector<bool> getDirsOfFlightSpacePoints(const std::vector<const Belle2::SpacePoint*>& spacePoints, B2Vector3F origin);
+
+    /**
+     * get the direction of flight provided the global position and momentum of a SpacePoint/TrueHit
+     * for the TrueHit the momentum can be obtained from information stored in it. For SpacePoints it has to be guessed somehow
+     */
+    bool getDirOfFlightPosMom(B2Vector3F position, B2Vector3F momentum, B2Vector3F origin);
   };
 }

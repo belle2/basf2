@@ -44,6 +44,11 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
 
   // other
   addParam("minDistance", m_PARAMminDistance, "Minimal Distance [cm] that two subsequent SpacePoints have to be seperated if 'checkMinDistance' is enabled", double(0));
+  std::vector<double> defaultOrigin = { 0., 0., 0. };
+  addParam("setOrigin", m_PARAMsetOrigin, "WARNING: still need to find out the units that are used internally! Reset origin to given point. Used for determining the direction of flight of a particle for a given hit. Needs to be reset for e.g. testbeam, where origin is not at (0,0,0)", defaultOrigin);
+
+  // initialize counters (cppcheck)
+  initializeCounters();
 }
 
 // ======================================================================= INITIALIZE ========================================================================
@@ -72,6 +77,14 @@ void SPTCRefereeModule::initialize()
   if (m_PARAMkickSpacePoint) {
     B2WARNING("'kickSpacePoint' is set to true, but the module kicks the whole SpacePointTrackCand at the moment if one of the checks fails!")
   }
+
+  if (m_PARAMsetOrigin.size() != 3) {
+    B2WARNING("CurlingTrackCandSplitter::initialize: Provided origin is not a 3D point! Please provide 3 values (x,y,z). Rejecting user input and setting origin to (0,0,0) for now!");
+    m_PARAMsetOrigin.clear();
+    m_PARAMsetOrigin.assign(3, 0);
+  }
+  m_origin.SetXYZ(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
+  B2DEBUG(10, "Set origin to (x,y,z): (" << m_origin.X() << "," << m_origin.Y() << "," << m_origin.Z() << ")");
 
   initializeCounters();
 }
@@ -102,7 +115,6 @@ void SPTCRefereeModule::event()
       const std::vector<int> sameSonsorInds = checkSameSensor(trackCand);
       if (!sameSonsorInds.empty()) {
         m_SameSensorCtr++;
-        refereeStatus += SpacePointTrackCand::c_hitsOnSameSensor;
         if (m_PARAMkickSpacePoint) {
           try {
             for (int index : boost::adaptors::reverse(sameSonsorInds)) { // have to start from highest index, as the vector in the trackCand is resized in this step!
@@ -113,7 +125,7 @@ void SPTCRefereeModule::event()
           } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
             B2WARNING("Caught an Exception while trying to remove a SpacePoint from a SpacePointTrackCand: " << anE.what());
           }
-        }
+        } else { refereeStatus += SpacePointTrackCand::c_hitsOnSameSensor; } // only add status if the SpacePoints on the same sensors have not been removed!
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints on the same sensor for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")")
       }
@@ -125,7 +137,6 @@ void SPTCRefereeModule::event()
       const std::vector<int> lowDistanceInds = checkMinDistance(trackCand, m_PARAMminDistance);
       if (!lowDistanceInds.empty()) {
         m_minDistanceCtr++;
-        refereeStatus += SpacePointTrackCand::c_hitsLowDistance;
         if (m_PARAMkickSpacePoint) {
           try {
             for (int index : boost::adaptors::reverse(lowDistanceInds)) { // have to start from highest index, as the vector in the trackCand is resized in this step!
@@ -136,11 +147,31 @@ void SPTCRefereeModule::event()
           } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
             B2WARNING("Caught an Exception while trying to remove a SpacePoint from a SpacePointTrackCand: " << anE.what());
           }
-        }
+        } else { refereeStatus += SpacePointTrackCand::c_hitsLowDistance; } // only add status if the SpacePoints not far enough apart have not been removed!
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints that were closer than " << m_PARAMminDistance << " cm together for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")")
       }
       B2DEBUG(30, "refereeStatus after checkMinDistance " << refereeStatus);
+    }
+
+    if (m_PARAMcheckCurling) { // check curling if desired
+      // TODO: comment in line below when all tests work!
+//       trackCand->setTrackStubIndex(0); // indicating that this trackCand has been checked for curling -> COULDDO: put another element into enum SpacePointTrackCand::RefereeStatusBit
+      const std::vector<int> curlingSplitInds = checkCurling(trackCand, m_PARAMuseMCInfo);
+      if (!curlingSplitInds.empty()) {
+        refereeStatus += SpacePointTrackCand::c_curlingTrack;
+        m_curlingTracksCtr++;
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (m_PARAMsplitCurlers) {
+          // TODO
+          if (m_PARAMkeepOnlyFirstPart) {
+            // TODO
+          }
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+      }
+    } else {
+      B2DEBUG(20, "SpacePointTrackCand " << trackCand->getArrayIndex() << " is not curling!");
     }
 
     // assign the referee status to the SpacePointTrackCand
@@ -160,6 +191,7 @@ void SPTCRefereeModule::terminate()
   if (m_PARAMcheckMinDistance) { summary << "Checked for minimal distance between two consecutive SpacePoints and found " << m_minDistanceCtr << " TrackCands with SpacePoints not far enough apart."; }
   if (m_PARAMkickSpacePoint) { summary << m_kickedSpacePointsCtr << " SpacePoints have been removed from SpacePointTrackCands\n"; }
   B2INFO("SPTCRefere::terminate(): Module got " << m_totalTrackCandCtr << " SpacePointTrackCands. " << summary.str())
+  if (!m_PARAMuseMCInfo && m_PARAMcheckCurling) { B2WARNING("The curling checking without MC Information is at the moment at a very crude and unsophisticated state. If you have MC information available you should use it to do this check!"); }
 }
 
 // ====================================================================== CHECK SAME SENSORS ====================================================================
@@ -206,4 +238,107 @@ const std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTra
   }
 
   return lowDistanceInds;
+}
+
+// ============================================================================= CHECK CURLING ======================================================================
+const std::vector<int> SPTCRefereeModule::checkCurling(Belle2::SpacePointTrackCand* trackCand, bool useMCInfo)
+{
+  std::vector<int> splitInds; // return vector
+
+  std::string mcInfoStr = useMCInfo ? std::string("with") : std::string("without");
+  B2DEBUG(25, "Checking SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() << " for curling behavior " << mcInfoStr << " MC Information");
+
+  // get the SpacePoints of the TrackCand
+  const std::vector<const SpacePoint*>& tcSpacePoints = trackCand->getHits();
+  B2DEBUG(50, "SPTC has " << tcSpacePoints.size() << " SpacePoints");
+
+  const std::vector<bool> dirsOfFlight = getDirectionsOfFlight(tcSpacePoints, useMCInfo); // get the directions of flight for every SpacePoint
+
+//   if(trackCand->getNHits() != dirsOfFlight.size()) B2FATAL("did not get a direction of flight for every SpacePoint") // should not /cannot happen
+
+  // loop over all entries of dirsOfFlight and compare them pair-wise. If they change -> add Index to splitInds.
+  if (!dirsOfFlight.at(0)) splitInds.push_back(0); // if the direction of flight is inwards for the first hit, push_back 0 -> make information accessible from outside this function
+  for (unsigned int i = 1; i < dirsOfFlight.size(); ++i) {
+    if (dirsOfFlight.at(i) ^ dirsOfFlight.at(i - 1)) splitInds.push_back(i); // NOTE: using the bitoperator for XOR here to determine if the bools differ!
+  }
+  return splitInds;
+}
+
+// ========================================================= GET DIRECTIONS OF FLIGHT =================================================================================
+const std::vector<bool> SPTCRefereeModule::getDirectionsOfFlight(const std::vector<const Belle2::SpacePoint*>& spacePoints, bool useMCInfo)
+{
+  std::vector<bool> dirsOfFlight; // return vector
+
+  if (useMCInfo) {
+    try {
+      for (const SpacePoint * spacePoint : spacePoints) { // loop over all SpacePoints
+        if (spacePoint->getType() == VXD::SensorInfoBase::PXD) { dirsOfFlight.push_back(getDirOfFlightTrueHit<PXDTrueHit>(spacePoint, m_origin)); }
+        else if (spacePoint->getType() == VXD::SensorInfoBase::SVD) { dirsOfFlight.push_back(getDirOfFlightTrueHit<SVDTrueHit>(spacePoint, m_origin)); }
+        else throw SpacePointTrackCand::UnsupportedDetType(); // NOTE: should never happen, because SpacePointTrackCand can only handle PXD and SVD at the moment!
+      }
+    } catch (SpacePointTrackCand::UnsupportedDetType& anE) {
+      B2FATAL("Caught a fatal exception while checking if a SpacePointTrackCand curls: " << anE.what()) // FATAL because if this happens this needs some time to implement and it affects more than only this module!
+    }
+  } else {
+    dirsOfFlight = getDirsOfFlightSpacePoints(spacePoints, m_origin);
+  }
+
+  return dirsOfFlight;
+}
+
+// ================================================ GET DIRECTION OF FLIGHT FROM TRUEHIT =================================================================================
+template <typename TrueHitType>
+bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoint, B2Vector3F origin)
+{
+  TrueHitType* trueHit = spacePoint->template getRelatedTo<TrueHitType>("ALL"); // COULDDO: search only certain arrays
+
+  // get SensorId - needed for transforming local to global coordinates
+  VxdID vxdID = trueHit->getSensorID();
+
+  const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID); // get the sensorInfoBase to use pointToGlobal and VectorToGlobal
+  B2Vector3F position = sensorInfoBase.pointToGlobal(B2Vector3F(trueHit->getU(), trueHit->getV(), 0)); // global position
+  B2Vector3F momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum()); // global momentum
+
+  B2DEBUG(150, "Getting the direction of flight for SpacePoint " << spacePoint->getArrayIndex() << ", related to TrueHit " << trueHit->getArrayIndex() << ". Both are on Sensor " << vxdID << ". (TrueHit) Position: (" << position.x() << "," << position.y() << "," << position.z() << "), (TrueHit) Momentum: (" << momentum.x() << "," << momentum.y() << "," << momentum.z() << ")");
+
+  return getDirOfFlightPosMom(position, momentum, origin);
+}
+
+// ==================================================== GET DIRECTION OF FLIGHT FROM SPACEPOINT ==============================================================================
+std::vector<bool> SPTCRefereeModule::getDirsOfFlightSpacePoints(const std::vector<const Belle2::SpacePoint*>& spacePoints, B2Vector3F origin)
+{
+  std::vector<bool> dirsOfFlight; // return vector
+
+  B2Vector3F oldPosition = origin; // assumption: first position is origin
+  for (unsigned int iSP = 0; iSP < spacePoints.size(); ++iSP) {
+    B2Vector3F position = spacePoints.at(iSP)->getPosition();
+    B2Vector3F momentumEst = position - oldPosition; // estimate momentum by linearizing between old position and new position -> WARNING: not a very good estimate!!!
+    dirsOfFlight.push_back(getDirOfFlightPosMom(position, momentumEst, origin));
+    oldPosition = position; // reassign for next round
+  }
+
+  return dirsOfFlight;
+}
+
+// ============================================================ GET DIRECTION OF FLIGHT FROM POSITION AND MOMENTUM ==========================================================
+bool SPTCRefereeModule::getDirOfFlightPosMom(B2Vector3F position, B2Vector3F momentum, B2Vector3F origin)
+{
+  // calculate the positon relative to the set origin, and add the momentum to the position to get the direction of flight
+  B2Vector3F originToHit = position - origin;
+  B2Vector3F momentumAtHit = originToHit + momentum;
+
+  B2DEBUG(250, "Position relative to origin: (" << originToHit.x() << "," << originToHit.y() << "," << originToHit.z() << "). Momentum (origin set to position of hit relative to origin): (" << momentumAtHit.x() << "," << momentumAtHit.y() << "," << momentumAtHit.z() << ").");
+
+  // get the radial components (resp. the square values) in cylindrical coordinates and compare them to make a decision on the direction of flight
+  float hitRadComp = originToHit.Perp2(); // using perp2 because possibly faster and only interested in ratio
+  float hitMomRadComp = momentumAtHit.Perp2();
+  B2DEBUG(250, "squared radial component of hit coordinates: " << hitRadComp << ", squared radial component of tip of momentum vector with its origin set to hit position: " << hitMomRadComp);
+
+  if (hitMomRadComp < hitRadComp) {
+    B2DEBUG(100, "Direction of flight is inwards for this hit");
+    return false;
+  } else {
+    B2DEBUG(100, "Direction of flight is outwards for this hit");
+    return true;
+  }
 }

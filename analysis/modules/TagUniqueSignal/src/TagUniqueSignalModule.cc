@@ -8,6 +8,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
+#include <set>
 
 using namespace std;
 using namespace Belle2;

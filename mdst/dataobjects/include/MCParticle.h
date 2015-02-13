@@ -331,7 +331,7 @@ namespace Belle2 {
      * @param bitmask The status code which should be removed from the existing
      *        MonteCarlo particle status code.
      */
-    void removeStatus(unsigned short int bitmask) { m_status &= (!bitmask); }
+    void removeStatus(unsigned short int bitmask) { m_status &= (~bitmask); }
 
     /**
      * Set particle mass.

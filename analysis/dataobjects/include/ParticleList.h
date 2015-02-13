@@ -142,8 +142,8 @@ namespace Belle2 {
       m_pdg(0),
       m_pdgbar(0),
       m_particleStore("Particles"),
-      m_thisListName(""),
-      m_antiListName("") {
+      m_thisListName(),
+      m_antiListName() {
     }
 
     /**
@@ -291,13 +291,12 @@ namespace Belle2 {
     void print() const;
 
   private:
-
-    /**
-     * Adds particle to the anti-particle List.
+    /** Returns bound anti-particle list.
+     *
+     * Aborts if no list is present (might occur with I/O problems).
+     * Please check m_antiListName is not empty() before calling this.
      */
-    void addParticleToAntiList(unsigned iparticle, int pdg, Particle::EFlavorType type);
-
-  private:
+    ParticleList& getAntiParticleList() const;
 
     int m_pdg;                   /**< PDG code of Particle */
     int m_pdgbar;                /**< PDG code of antiparticle */

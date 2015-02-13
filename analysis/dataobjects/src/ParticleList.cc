@@ -30,21 +30,15 @@ void ParticleList::initialize(int pdg, std::string name)
   m_pdgbar = pdg;
 
   m_thisListName = name;
-  m_antiListName = "";
+  m_antiListName.clear();
 }
 
 void ParticleList::setParticleCollectionName(std::string name, bool forAntiParticle)
 {
   m_particleStore = name;
 
-  if (m_antiListName.empty() || forAntiParticle == false)
-    return;
-
-  StoreObjPtr<ParticleList> antiList(m_antiListName);
-  if (antiList) {
-    antiList->setParticleCollectionName(name, false);
-  } else
-    B2ERROR("ParticleList::setParticleCollectionName unable to load anti-particle List!");
+  if (forAntiParticle and !m_antiListName.empty())
+    getAntiParticleList().setParticleCollectionName(name, false);
 }
 
 void ParticleList::addParticle(const Particle* particle)
@@ -77,18 +71,6 @@ void ParticleList::bindAntiParticleList(ParticleList& antiList, bool includingAn
     antiList.bindAntiParticleList(*this, false);
 }
 
-void ParticleList::addParticleToAntiList(unsigned iparticle, int pdg, Particle::EFlavorType type)
-{
-  if (m_antiListName.empty())
-    return;
-
-  StoreObjPtr<ParticleList> antiList(m_antiListName);
-  if (antiList) {
-    antiList->addParticle(iparticle, pdg, type, false);
-  } else
-    B2ERROR("ParticleList::addParticleToAntiList unable to load anti-particle List!");
-}
-
 void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorType type, bool includingAntiList)
 {
   if (abs(pdg) != abs(getPDGCode())) {
@@ -110,13 +92,13 @@ void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorTyp
     }
 
     // add it to the self-conjugated list
-    if (includingAntiList)
-      addParticleToAntiList(iparticle, pdg, type);
+    if (includingAntiList and !m_antiListName.empty())
+      getAntiParticleList().addParticle(iparticle, pdg, type, false);
   } else if (type == Particle::c_Flavored) {
     unsigned antiParticle = (pdg == getPDGCode()) ? 0 : 1;
 
     if (antiParticle)
-      addParticleToAntiList(iparticle, pdg, type);
+      getAntiParticleList().addParticle(iparticle, pdg, type, false);
     else {
       if (std::find(m_fsList.begin(), m_fsList.end(), iparticle) == m_fsList.end()) {
         m_fsList.push_back(iparticle);
@@ -149,9 +131,7 @@ void ParticleList::removeParticles(const std::vector<unsigned int>& toRemove, bo
   m_scList = newList;
 
   if (removeFromAntiList and !m_antiListName.empty()) {
-    StoreObjPtr<ParticleList> antiList(m_antiListName);
-    if (antiList)
-      antiList->removeParticles(toRemove, false);
+    getAntiParticleList().removeParticles(toRemove, false);
   }
 }
 
@@ -161,9 +141,7 @@ void ParticleList::clear(bool includingAntiList)
   m_scList.clear();
 
   if (includingAntiList and !m_antiListName.empty()) {
-    StoreObjPtr<ParticleList> antiList(m_antiListName);
-    if (antiList)
-      antiList->clear(false);
+    getAntiParticleList().clear(false);
   }
 }
 
@@ -178,17 +156,10 @@ Particle* ParticleList::getParticle(unsigned i, bool includingAntiList) const
     return Particles[m_scList[i]];
   }
 
-  if (!includingAntiList)
-    return 0;
+  if (includingAntiList and !m_antiListName.empty())
+    return getAntiParticleList().getParticle(i - m_fsList.size() - m_scList.size(), false);
 
-  if (m_antiListName.empty())
-    return 0;
-
-  StoreObjPtr<ParticleList> antiList(m_antiListName);
-  if (antiList)
-    return antiList->getParticle(i - m_fsList.size() - m_scList.size(), false);
-
-  return 0;
+  return nullptr;
 }
 
 unsigned ParticleList::getListSize(bool includingAntiList) const
@@ -220,11 +191,7 @@ const std::vector<int>& ParticleList::getList(EParticleType K, bool forAntiParti
     if (m_antiListName.empty())
       return emptyList;
 
-    StoreObjPtr<ParticleList> antiList(m_antiListName);
-    if (antiList)
-      return antiList->getList(K);
-
-    return emptyList;
+    return getAntiParticleList().getList(K);
   }
 }
 
@@ -254,6 +221,16 @@ void ParticleList::print() const
            << " + " << m_antiListName << " (" << antiFSCount << "+" << antiSCCount << ")");
   } else {
     B2INFO(" ParticleList : " << m_thisListName << " (" << thisFSCount << "+" << thisSCCount << ")");
+  }
+}
+
+ParticleList& ParticleList::getAntiParticleList() const
+{
+  StoreObjPtr<ParticleList> antiList(m_antiListName);
+  if (antiList) {
+    return *antiList;
+  } else {
+    B2FATAL("Anti-particle list " << m_antiListName << " for " << m_thisListName << " not found, even though one was set via bindAntiParticleList(). Maybe you only saved one list into a .root file?");
   }
 }
 

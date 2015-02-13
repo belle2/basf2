@@ -51,10 +51,19 @@ namespace Belle2 {
 
   protected:
 
+    double getBeamEnergyCM(double e1, double e2, double angle);
+
     /** Module parameters */
     int m_boostMode; /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
     std::vector<double> m_ScatteringAngleRangePositron; /**< Min [0] and Max [1] value for the scattering angle [deg] of the positron. */
     std::vector<double> m_ScatteringAngleRangeElectron; /**< Min [0] and Max [1] value for the scattering angle [deg] of the electron. */
+
+    std::string m_vacPolString; /**< Vacuum polarization as string*/
+    BHWide::PhotonVacPolarization m_vacPol; /**< Vacuum polarization */
+    double m_eMin; /**< Minimum energy for leptons in the final state, in GeV. */
+    double m_maxAcollinearity; /**< maximum acollinearity angle between finale state leptons in degrees. */
+    double m_cmsEnergy; /**< CMS energy. */
+    double m_wtMax; /**< Maximum weight (wtmax). */
 
     /** Variables */
     BHWide m_generator;        /**< The BHWide generator. */

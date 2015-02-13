@@ -41,8 +41,8 @@ BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
   addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner, default) or hmnt (Teubner)", std::string("hadr5"));
   addParam("Model", m_model, "Model: exp (default) or ps", std::string("exp"));
   addParam("FinalState", m_finalState, "Final state: ee (default), mm (not recommended) or gg", std::string("ee"));
-  addParam("MinEnergyFrac", m_eMinFrac, "Fractional minimum energy for leptons/photons in the final state [fraction of ECMS]", -1.0);
-  addParam("MinEnergy", m_eMin, "Minimum energy for leptons/photons in the final state [GeV]", 0.150);
+  addParam("MinEnergyFrac", m_eMinFrac, "Fractional minimum energy for leptons (ee mode) or photons (gg mode) in the final state [fraction of ECMS]", -1.0);
+  addParam("MinEnergy", m_eMin, "Minimum energy for leptons (ee mode) or photons (gg mode) in the final state [GeV]", 0.150);
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator [fraction of ECMS/2]", 5.e-4);
   addParam("MaxAcollinearity", m_maxAcollinearity, "Maximum acollinearity angle between finale state leptons/photons [degree]", 180.0);
   addParam("CMSEnergy", m_cmsEnergy, "CMS energy [GeV] (default: take from xml)", 0.0);
@@ -100,7 +100,7 @@ void BabayagaNLOInputModule::initialize()
       m_generator.setBoost(boostVector.BoostVector());
 
       //get CMS energy
-      ecm = getBeamEnergyCM(electronBeamEnergy, positronBeamEnergy, crossingAngle);
+      ecm = getBeamEnergyCM(electronBeamEnergy, positronBeamEnergy, crossingAngle * 0.001);
     }
   }
 

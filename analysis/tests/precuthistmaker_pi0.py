@@ -16,7 +16,7 @@ rootinput.param('inputFileName', Belle2.FileSystem.findFile('analysis/tests/mdst
 
 
 main.add_module(rootinput)
-main.add_module(register_module('EventInfoPrinter'))
+main.add_module('EventInfoPrinter')
 
 
 #loose cut on energy

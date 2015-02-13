@@ -24,7 +24,7 @@ main = create_path()
 # Add modules to main path
 main.add_module(eventinfosetter)
 main.add_module(eventinfo)
-main.add_module(register_module('Gearbox'))
+main.add_module('Gearbox')
 
 # Process all events
 process(main)

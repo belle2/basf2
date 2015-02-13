@@ -8,7 +8,7 @@ from modularAnalysis import *
 
 
 analysis_path = create_path()
-analysis_path.add_module(register_module('RootOutput'))
+analysis_path.add_module('RootOutput')
 
 particles = get_default_channnels()
 main = fullEventInterpretation(None, analysis_path, particles)

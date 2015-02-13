@@ -31,12 +31,12 @@ class TestModule(Module):
 
 
 subeventpath = create_path()
-subeventpath.add_module(register_module('EventInfoPrinter'))
+subeventpath.add_module('EventInfoPrinter')
 subeventpath.add_module(TestModule())
 #read: for each  $objName   in $arrayName   run over $path
 path.for_each('MCParticle', 'MCParticles', subeventpath)
 
-path.add_module(register_module('PrintCollections'))
+path.add_module('PrintCollections')
 
 print path
 process(path)

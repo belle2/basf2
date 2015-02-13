@@ -410,7 +410,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
     path = create_path()
     if user_selection_path is None:
-        path.add_module(register_module('RootInput'))
+        path.add_module('RootInput')
 
     if finished_training:
         if user_selection_path is not None:
@@ -419,13 +419,13 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
         if user_analysis_path is not None:
             path.add_path(user_analysis_path)
     else:
-        fei_path.add_module(register_module('RootOutput'))
+        fei_path.add_module('RootOutput')
         if is_first_run and user_selection_path is not None:
             path.add_path(user_selection_path)
             path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
         else:
             if user_selection_path is not None:
-                path.add_module(register_module('RootInput'))
+                path.add_module('RootInput')
             path.add_path(fei_path)
 
     if not is_first_run:
@@ -434,5 +434,5 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
             if module.type() == 'RootInput':
                 module.param('excludeBranchNamesPersistent', [])
 
-    path.add_module(register_module('ProgressBar'))
+    path.add_module('ProgressBar')
     return path

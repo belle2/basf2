@@ -16,7 +16,7 @@ rootinput.param('inputFileName', Belle2.FileSystem.findFile('analysis/tests/mdst
 
 
 main.add_module(rootinput)
-main.add_module(register_module('EventInfoPrinter'))
+main.add_module('EventInfoPrinter')
 
 
 fillParticleList('K-', 'Kid > 0.1', path=main)
@@ -51,7 +51,7 @@ ntupler.param('variables', ['M', 'isSignal'])
 ntupler.param('particleList', combinedlist)
 main.add_module(ntupler)
 
-#main.add_module(register_module('Interactive'))
+#main.add_module('Interactive')
 
 process(main)
 

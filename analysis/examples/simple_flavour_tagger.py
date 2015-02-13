@@ -44,8 +44,8 @@ class RemoveEmptyROEModule(Module):
 
 main = create_path()
 
-main.add_module(register_module('RootInput'))
-main.add_module(register_module('Gearbox'))
+main.add_module('RootInput')
+main.add_module('Gearbox')
 loadReconstructedParticles(path=main)
 
 # Signal side B_sig
@@ -395,7 +395,7 @@ if combinerLevelReady:
                       workingDirectory + '/B0_B0bar_final.root', path=main)
 
 
-main.add_module(register_module('ProgressBar'))
+main.add_module('ProgressBar')
 process(main)
 print statistics
 

@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Peter Kvasnicka, Martin Ritter             *
+ *               Alexandre Beaulieu
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

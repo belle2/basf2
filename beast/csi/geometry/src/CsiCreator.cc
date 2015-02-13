@@ -74,24 +74,14 @@ namespace Belle2 {
     void CsiCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
 
-      // Print materials
+      //Print the type (not used for now)
+      B2DEBUG(200, "CsI Geometry Type: " << type);
+
+      // Print list of defined materials
+      /*
       G4NistManager* nistManager = G4NistManager::Instance();
-      //cout << *(G4Material::GetMaterialTable()) << endl;
-      G4Material* CsIodide = nistManager->FindOrBuildMaterial("G4_CESIUM_IODIDE");
-      nistManager->PrintG4Material("G4_CESIUM_IODIDE");
-
-      G4int ncomponents = 0;
-      G4double abundance = 0;
-      G4double density = 0;
-
-      G4Element* Tl = nistManager->FindOrBuildElement("Tl");
-
-      G4Material* CsI_Tl = new G4Material("CsI_Tl", density = 4.51 * CLHEP::g / CLHEP::cm3, ncomponents = 2);
-      CsI_Tl->AddMaterial(CsIodide, abundance = 99.97 * CLHEP::perCent);
-      CsI_Tl->AddElement(Tl, abundance = 0.03 * CLHEP::perCent);
-
-      std::cout << CsI_Tl << std::endl;
-
+      cout << *(G4Material::GetMaterialTable()) << endl;
+      */
 
       G4Transform3D BrR = G4RotateZ3D(0.0);
 
@@ -119,14 +109,13 @@ namespace Belle2 {
           B2INFO("Crystal Number " << eclp->CsiVolNameToCellID(VolumeName) <<
                  " placed at (r[cm],[deg],z[cm]) = (" << setprecision(1) <<  fixed <<
                  volume->GetTranslation().perp() / CLHEP::cm << "," <<
-                 volume->GetTranslation().phi() * 180. / PI << "," <<
+                 volume->GetTranslation().phi() * 180.0 / PI << "," <<
                  volume->GetTranslation().z() / CLHEP::cm << ")");
         }
 
 
       }// for all physical volumes in the assembly
     }// create
-
 
     void CsiCreator::PutCrystal(const GearDir& content,
                                 G4AssemblyVolume* assembly,
@@ -156,13 +145,12 @@ namespace Belle2 {
       double tl2 = counter.getLength("K_tl2") * CLHEP::cm;
       double alpha1 = counter.getAngle("K_alpha1");
       double alpha2 = counter.getAngle("K_alpha2");
-
+      double halflength = counter.getLength("k_HalfLength") * CLHEP::cm;
 
       // Read and create material
       string strMatCrystal = counter.getString("Material", "Air");
       G4Material* crystalMaterial = geometry::Materials::get(strMatCrystal);
 
-      cout << crystalMaterial << endl;
 
       G4VisAttributes* CrystalVisAtt = new G4VisAttributes(G4Colour(1.0, 1.0, 0.0, 1.0));
 
@@ -172,7 +160,7 @@ namespace Belle2 {
         CrystalVisAtt->SetColour(0.0, 0.5, 1.0);
       }
 
-      // add forward foil dimensions ////////////////////////////
+      ////////// add foil dimensions ////////////////////////////
       double fwtrapangle1 = atan(2 * h1 / (bl1 - tl1)); // the smaller angle of the trap
       double fwtrapangle2 = atan(2 * h2 / (bl2 - tl2));
       double foilh1 = h1 + foilthickness;
@@ -181,7 +169,7 @@ namespace Belle2 {
       double foilbl1 = bl1 + foilthickness / tan(fwtrapangle1 / 2);
       double foiltl2 = tl2 + foilthickness * tan(fwtrapangle2 / 2);
       double foilbl2 = foiltl2 + (foilbl1 - foiltl1) * foilh2 / foilh1;
-      double halflength = 15.0 * CLHEP::cm;
+
       double foilhalflength = halflength + foilthickness;
       ///////////////////////////////////////////////////////////
 
@@ -196,8 +184,7 @@ namespace Belle2 {
       Crystal->SetSensitiveDetector(m_sensitive);
 
 
-      /////////////////  add forward foil ///////////////////////////////////////
-
+      /////////////////  add actual foil ///////////////////////////////////////
       G4Trap* Foilout = new G4Trap((format("Foilout_%1%") % iCry).str().c_str(),
                                    foilhalflength , 0 , 0, foilh1,  foilbl1,
                                    foiltl1, alpha1 , foilh2, foilbl2,
@@ -227,7 +214,6 @@ namespace Belle2 {
 
     }
 
-
     void CsiCreator::BuildEnclosure(const GearDir& content, G4AssemblyVolume* assembly, string side, int iEnclosure)
     {
 
@@ -247,7 +233,7 @@ namespace Belle2 {
       double fold   = content.getLength("Enclosures/Fold") * CLHEP::cm;
       double lidthk = content.getLength("Enclosures/LidThickness") * CLHEP::cm;
       double halflength = 15.0 * CLHEP::cm;
-      double zshift = 0.5 * length - thk - halflength; /*< Shifi of the box along z-axis to make crystal tough the panel **/
+      double zshift = 0.5 * length - thk - halflength; /*< Shift of the box along z-axis to make crystal tough the panel **/
 
       string strMatEnclosure = content.getString("Enclosures/Material", "Air");
       G4Material* EnclosureMat = geometry::Materials::get(strMatEnclosure);
@@ -268,7 +254,6 @@ namespace Belle2 {
 
       //Thread the strings
       string enclosurePath = (format("/%1%[%2%]") % gearPath % iEnclosure).str();
-      string shapeName     = (format("%1%Enclosure_%2%") % side % iEnclosure).str();
       string logiVolName   = (format("%1%Enclosure_%2%") % side % iEnclosure).str();
       string logiLidVolName = (format("%1%EnclosureLid_%2%") % side % iEnclosure).str();
 

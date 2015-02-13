@@ -43,7 +43,9 @@ namespace Belle2 {
         const G4double tof,
         const G4double edep,
         G4ThreeVector mom,
-        TVector3 WightedPos
+        G4ThreeVector pos,
+        G4ThreeVector PosCell,
+        G4ThreeVector VecCell
       );
 
     protected:
@@ -66,7 +68,7 @@ namespace Belle2 {
       int m_trackID;                    /** track id */
       G4ThreeVector m_startPos;         /**  Position of prestep */
       G4ThreeVector m_endPos;           /**  Position of poststep*/
-      TVector3 m_WightedPos;            /**  Wighted step Position*/
+      G4ThreeVector m_WightedPos;            /**  Wighted step Position*/
       G4ThreeVector m_momentum;         /**  momentum of track */
       double m_startTime;               /** global time */
       double m_endTime;                 /** global time */
@@ -75,11 +77,11 @@ namespace Belle2 {
       double m_energyDeposit;     /** energy deposited in volume */
       double m_trackLength;       /** length of the track in the volume */
 
-      //int ECLHitIndex[8736][80]; /** Hit index of StoreArray */
+      int CsiHitIndex[8736][80]; /** Hit index of StoreArray */
       int iECLCell;              /** Hit Energy of StoreArray */
       int TimeIndex;             /** Hit Time of StoreArray */
-      TVector3 PosCell;          /** center of crystal position */
-      TVector3 VecCell;          /** vector of crystal axis */
+      //TVector3 PosCell;          /** center of crystal position */
+      //TVector3 VecCell;          /** vector of crystal axis */
       double local_pos;          /** position alongthe vector of crystal axis   */
       double T_ave;              /** flight time to diode sensor  */
       int firstcall;             /** flag of first call   */

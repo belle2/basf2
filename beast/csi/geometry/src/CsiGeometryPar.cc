@@ -53,32 +53,106 @@ CsiGeometryPar::~CsiGeometryPar()
 
 void CsiGeometryPar::clear()
 {
-  /*
-  mPar_cellID = 0;
-  mPar_thetaID = 0;
-  mPar_phiID = 0;
-  mPar_thetaIndex = 0;
-  mPar_phiIndex = 0;
-  */
+  m_cellID = 0;
+
+  m_Position.clear();
+  m_Orientation.clear();
+  m_BoxID.clear();
+  m_SlotID.clear();
+  m_thetaID.clear();
+  m_phiID.clear();
 
 }
 
 void CsiGeometryPar::read()
 {
-  /*
-  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"ECL\"]/Content/");
-  for (int iCry = 1 ; iCry <= 132 ; ++iCry) {
 
-    GearDir counter(content);
-    counter.append((format("EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CSI\"]/Content/");
+  string gearPath = "Enclosures/Enclosure";
+  int nEnc = content.getNumberNodes(gearPath);
 
-    m_ECThetaCrystal[iCry - 1]  = counter.getAngle("K_Ptheta") * 180 / PI;
-    m_ECPhiCrystal[iCry - 1] = counter.getAngle("K_Rphi2")  * 180 / PI;
-    m_ECRpos[iCry - 1]  = counter.getLength("K_Pr") ;
-    m_ECThetapos[iCry - 1]  = counter.getAngle("K_Ptheta") * 180 / PI;
-    m_ECPhipos[iCry - 1]  = counter.getAngle("K_Pphi") * 180 / PI;
+  int iCell = 0;
+
+  for (int iEnc = 1; iEnc <= nEnc; iEnc++) {
+    // Build the box (same for all)
+//      double width  = content.getLength("Enclosures/Width") * CLHEP::cm;
+    double length = content.getLength("Enclosures/Length") * CLHEP::cm;
+//      double depth  = content.getLength("Enclosures/Depth") * CLHEP::cm;
+    double thk    = content.getLength("Enclosures/Thickness") * CLHEP::cm;
+//      double fold   = content.getLength("Enclosures/Fold") * CLHEP::cm;
+//      double lidthk = content.getLength("Enclosures/LidThickness") * CLHEP::cm;
+    double halflength = 15.0 * CLHEP::cm;
+    double zshift = 0.5 * length - thk - halflength; /*< Shift of the box along z-axis (cry touches panel) **/
+
+    string enclosurePath = (boost::format("/%1%[%2%]") % gearPath % iEnc).str();
+
+    // Connect the appropriate Gearbox path
+    GearDir enclosureContent(content);
+    enclosureContent.append(enclosurePath);
+
+    // Read position
+    double PosZ  = enclosureContent.getLength("PosZ") * CLHEP::cm;
+    double PosR  = enclosureContent.getLength("PosR") * CLHEP::cm;
+    double PosT  = enclosureContent.getAngle("PosT") ;
+
+    // Read Orientation
+    double Phi1  = enclosureContent.getAngle("AngPhi1") ;
+    double Theta = enclosureContent.getAngle("AngTheta") ;
+    double Phi2  = enclosureContent.getAngle("AngPhi2") ;
+
+    Transform3D zsh = Translate3D(0, 0, zshift);
+    Transform3D m1 = RotateZ3D(Phi1);
+    Transform3D m2 = RotateY3D(Theta);
+    Transform3D m3 = RotateZ3D(Phi2);
+    Transform3D position = Translate3D(PosR * cos(PosT), PosR * sin(PosT), PosZ);
+//      Transform3D lidpos   = Translate3D(0, 0.5 * (depth + lidthk), 0);
+
+    /** Position of the nominal centre of crystals in the box **/
+    Transform3D Tr    = position * m3 * m2 * m1;
+
+    int nSlots = enclosureContent.getNumberNodes("CrystalInSlot");
+    for (int iSlot = 1; iSlot <= nSlots; iSlot++) {
+      iCell++;
+
+      //Thread the strings
+      string slotPath = (boost::format("/Enclosures/Slot[%1%]") % iSlot).str();
+
+      GearDir slotContent(content);
+      slotContent.append(slotPath);
+
+      double SlotX = slotContent.getLength("PosX") * CLHEP::cm;
+      double SlotY = slotContent.getLength("PosY") * CLHEP::cm;
+      double SlotZ = slotContent.getLength("PosZ") * CLHEP::cm;
+      Transform3D Pos = Translate3D(SlotX, SlotY, SlotZ);
+
+//       int    CryID  = enclosureContent.getInt((boost::format("/CrystalInSlot[%1%]") % iSlot).str());
+
+      Transform3D CrystalPos = Tr * Pos;
+      RotationMatrix CrystalRot = CrystalPos.getRotation();
+
+      m_Position.push_back(CrystalPos.getTranslation() * 1.0 / CLHEP::cm);
+      m_Orientation.push_back(CrystalRot.colZ());
+
+      m_thetaID.push_back(CrystalPos.getTranslation().z() > 0 ? 0 : 1);
+      m_phiID.push_back(iCell - 12 * m_thetaID.back());
+
+      m_BoxID.push_back(iEnc - 1);
+      m_SlotID.push_back(iSlot - 1);
+    }
+    //
   }
-  */
+
+  //comnvert all that to tvector3's for speed
+
+  vector<ThreeVector>::iterator it;
+  for (it = m_Position.begin(); it != m_Position.end(); ++it) {
+    m_PositionTV3.push_back(ConvertToTVector3(*it));
+  }
+  for (it = m_Orientation.begin(); it != m_Orientation.end(); ++it) {
+    m_OrientationTV3.push_back(ConvertToTVector3(*it));
+  }
+
+
 }
 
 
@@ -101,4 +175,18 @@ int CsiGeometryPar::CsiVolNameToCellID(const G4String VolumeName)
   if (cellID < 0) B2WARNING("CsiGeometryPar: volume " << VolumeName << " is not a crystal");
 
   return cellID;
+}
+
+
+void CsiGeometryPar::Print(int cid)
+{
+  B2INFO("Cell ID : " << cid);
+
+  B2INFO("   Position  x : " << GetPosition(cid).x());
+  B2INFO("   Position  y : " << GetPosition(cid).y());
+  B2INFO("   Position  z : " << GetPosition(cid).z());
+
+  B2INFO("   Orientation  x : " << GetOrientation(cid).x());
+  B2INFO("   Orientation  y : " << GetOrientation(cid).y());
+  B2INFO("   Orientation  z : " << GetOrientation(cid).z());
 }

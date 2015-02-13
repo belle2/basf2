@@ -11,9 +11,9 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
-
 #include <beast/csi/modules/CsiModule.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
+#include <beast/csi/dataobjects/CsiHit.h>
 #include <beast/csi/modules/CsIStudyModule.h>
 
 
@@ -38,7 +38,13 @@ REG_MODULE(CsIStudy)
 //                 Implementation
 //-----------------------------------------------------------------
 
-CsIStudyModule::CsIStudyModule() : HistoModule()
+CsIStudyModule::CsIStudyModule() : HistoModule(),
+  h_CrystalEdep(NULL),
+  h_CrystalSpectrum(NULL),
+  h_CrystalRadDose(NULL),
+  h_CrystalRadDoseSH(NULL),
+  h_NhitCrystal(NULL),
+  h_LightYieldCrystal(NULL)
 {
   // Set module properties
   setDescription("Analyze simulations of CsI readings in BEAST. Requires HistoManager module.");
@@ -54,10 +60,12 @@ CsIStudyModule::~CsIStudyModule()
 
 void CsIStudyModule::defineHisto()
 {
-  h_EdistTotal  = new TH1F("TotalCSI_E_dist", "Energy distribution in all crystals;GeV", 100, 0, 4);
-  h_EdistCrystal = new TH1F("Crystal_E_dist", "Energy distribution in each crystals;GeV", 100, 0, 0.1);
-  h_NhitCrystal  = new TH1F("Crystal_g_yield", "Light yield each  crystal;ThetaID:gamma/GeV", 16, -0.5, 15.5);
-  h_CrystalRadDose = new TH1F("Crystal_Rad_Dose", "Crystal Radiation Dose;ThetaID;Gy/yr", 16, -0.5, 15.5);
+  h_CrystalEdep         = new TH1F("Crystal_Edep",  "Energy distribution in each crystal;CellID", 16, -0.5, 15.5);
+  h_CrystalSpectrum     = new TH1F("Crystal_Edist",  "Photon energy distribution in all crystals;", 100, 0, 0.1);
+  h_NhitCrystal         = new TH1F("Crystal_HitRate", "Number of hit per crystal;CellID; hit/s", 16, -0.5, 15.5);
+  h_CrystalRadDose      = new TH1F("Crystal_RadDose", "Crystal Radiation Dose;CellID;Gy/yr", 16, -0.5, 15.5);
+  h_CrystalRadDoseSH    = new TH1F("Crystal_RadDose_SH", "Crystal Radiation Dose from SimHits;CellID;Gy/yr", 16, -0.5, 15.5);
+  h_LightYieldCrystal   = new TH1F("Crystal_g_yield", "Light yield each crystal;CellID;gamma/sample", 16, -0.5, 15.5);
 }
 
 void CsIStudyModule::initialize()
@@ -65,6 +73,7 @@ void CsIStudyModule::initialize()
   REG_HISTOGRAM   // required to register histograms to HistoManager
 
   m_hits.isRequired();
+  m_simhits.isRequired();
 }
 
 void CsIStudyModule::beginRun()
@@ -73,43 +82,67 @@ void CsIStudyModule::beginRun()
 
 void CsIStudyModule::endRun()
 {
-  //h_NhitCrystal    ->Divide(h_CrystalRadDose);
+  //  h_LightYieldCrystal->Divide( h_CrystalEdep );
+  //  h_LightYieldCrystal->Scale( 1e-6 );
 }
 
 
 void CsIStudyModule::event()
 {
-
-
-
+  //Loop over CsiHits
   if (m_hits.getEntries() > 0) {
     int hitNum = m_hits.getEntries(); /**< Number of Crystal hits */
 
     double E_tmp[16] = {0};       /**< Sum energy deposited in each cell */
     double edepSum = 0;           /**< Sum energy deposited in all cells */
 
-    double Mass = 5;  /**< Mass of the crystal **/
-    double  edeptodose = GeVtoJ / Mass * usInYr / Sampletime;
+    double Mass = 5;             /**< Mass of the crystal (to be replaced with data from the xml once actual mass is known)**/
+    double edeptodose = GeVtoJ / Mass * usInYr / Sampletime; /**< Get dose in Gy/yr from Edep */
 
-    for (int i = 0; i < hitNum; i++) { // Loop over ECLSimHits
-      CsiSimHit* aCsIHit = m_hits[i];
+    /// Actual looping over CsIHits
+    for (int i = 0; i < hitNum; i++) {
+      CsiHit* aCsIHit = m_hits[i];
       int m_cellID = aCsIHit->getCellId();       /**< Index of the Cell*/
       double edep = aCsIHit->getEnergyDep();     /**< Energy deposited in the current hit */
-      TVector3 hitPosn = aCsIHit->getPosition(); /**< Position of the hit*/
+      //double hitTime = aCsIHit->getTimeAve();    /**< Time of the hit*/
 
       edepSum += edep;
       E_tmp[m_cellID] += edep;
 
+      // Fill histograms
+      h_CrystalSpectrum->Fill(edep);
+      h_CrystalEdep->Fill(m_cellID, edep);
+      h_CrystalRadDose->Fill(m_cellID, edep * edeptodose);
+
+      //Number of hits per second
+      h_NhitCrystal->Fill(m_cellID, 1.0e9 / Sampletime);
+    }
+  }
+
+  //Loop over CsiSimHits
+  if (m_simhits.getEntries() > 0) {
+    int hitNum = m_simhits.getEntries(); /**< Number of Crystal hits */
+
+    double Mass = 5;  /**< Mass of the crystal **/
+    double  edeptodose = GeVtoJ / Mass * usInYr / Sampletime;/**< Get dose in Gy/yr from Edep */
+
+    /// Actual looping over CsISimHits
+    for (int i = 0; i < hitNum; i++) {
+      CsiSimHit* aCsIHit = m_simhits[i];
+      int m_cellID = aCsIHit->getCellId();       /**< Index of the Cell*/
+      double edep = aCsIHit->getEnergyDep();     /**< Energy deposited in the current hit */
 
       // Fill histograms
-      h_EdistCrystal->Fill(edep);
-      h_EdistTotal->Fill(edepSum);
-      h_CrystalRadDose->Fill(m_cellID, edep * edeptodose);
-      h_NhitCrystal->Fill(m_cellID, edeptodose);
-    }
+      h_CrystalRadDoseSH->Fill(m_cellID, edep * edeptodose);
 
+      // To get the Number of photons per GeV (divide by total edep before plotting)
+      if (22 == aCsIHit->getPDGCode()) {
+        h_LightYieldCrystal->Fill(m_cellID);
+      }
+    }
   }
 }
+
 
 void CsIStudyModule::terminate()
 {

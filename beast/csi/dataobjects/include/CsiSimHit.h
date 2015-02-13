@@ -20,12 +20,12 @@
 
 namespace Belle2 {
 
-  /** ClassCsiSimHit - Geant4 simulated hit for the CsI crystal in beast..
+  /** ClassCsiSimHit - Geant4 simulated hits in CsI crystals in BEAST.
     *
-    * This class holds particle hit data from geant4 simulation. As the simulated
+    * This class holds each hit data from geant4 simulation. As the simulated
     * hit classes are used to generate detector response information.
-    * relation to MCParticle
-    * filled in beast/csi/simulation/src/SensitiveDetector.cc
+    * Relation to MCParticle.
+    * Filled in beast/csi/simulation/src/SensitiveDetector.cc
     */
 
   class CsiSimHit : public SimHitBase {
@@ -40,7 +40,7 @@ namespace Belle2 {
       float FlightTime,      /**< Flight time from IP */
       float Edep,            /**< Deposit energy */
       TVector3 Momentum,     /**< Momentum */
-      TVector3 Position        /**< Position */
+      TVector3 Position      /**< Position */
     ): SimHitBase() {
       m_CellId = CellId;
       m_TrackId = TrackId;
@@ -51,8 +51,6 @@ namespace Belle2 {
       m_Position = Position;
 
     }
-
-
 
 
     /*! Set Cell ID

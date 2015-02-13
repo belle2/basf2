@@ -72,3 +72,29 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         return len(self.figures_by_name)
 
 
+class ValidationManyFiguresOfMerit(ValidationFiguresOfMerit):
+
+    def __str__(self):
+        return 'Not supported.'
+
+    def write(self):
+        """Writes the figures of merit as a TNtuple to the currently open TFile in the format complient with the validation frame work."""
+
+        name = self.name
+        figure_names = list(self.figures_by_name.keys())
+        values = list(self.figures_by_name.values())
+
+        leaf_specification = ':'.join(figure_names)
+        title = ''
+        ntuple = ROOT.TNtuple(name, title, leaf_specification)
+
+        for value in zip(*values):
+            ntuple.Fill(*value)
+
+        ntuple.SetAlias('Description', self.description)
+        ntuple.SetAlias('Check', self.check)
+        ntuple.SetAlias('Contact', self.contact)
+
+        ntuple.Write()
+
+

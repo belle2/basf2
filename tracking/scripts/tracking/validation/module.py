@@ -86,6 +86,8 @@ class TrackingValidationModule(basf2.Module):
         exclude_profile_mc_parameter='',
         exclude_profile_pr_parameter='',
         use_expert_folder=True,
+        trackCandidatesColumnName="TrackCands",
+        mcTrackCandidatesColumName="MCTrackCands"
     ):
 
         super(TrackingValidationModule, self).__init__()
@@ -101,9 +103,11 @@ class TrackingValidationModule(basf2.Module):
         self.exclude_profile_pr_parameter = exclude_profile_pr_parameter
         self.exclude_profile_mc_parameter = exclude_profile_mc_parameter
         self.use_expert_folder = use_expert_folder
+        self.trackCandidatesColumnName = trackCandidatesColumnName
+        self.mcTrackCandidatesColumnName = mcTrackCandidatesColumName
 
     def initialize(self):
-        self.trackMatchLookUp = Belle2.TrackMatchLookUp('MCTrackCands')
+        self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
         # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
         self.pr_clones_and_matches = collections.deque()
@@ -145,8 +149,8 @@ class TrackingValidationModule(basf2.Module):
         # Analyse from the pattern recognition side
         trackMatchLookUp = self.trackMatchLookUp
 
-        trackCands = Belle2.PyStoreArray('TrackCands')
-        mcParticles = Belle2.PyStoreArray('MCParticles')
+        trackCands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
+        mcParticles = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
         if not trackCands:
             return
 
@@ -234,7 +238,7 @@ class TrackingValidationModule(basf2.Module):
         trackMatchLookUp = self.trackMatchLookUp
 
         # Analyse from the Monte Carlo reference side
-        mcTrackCands = Belle2.PyStoreArray('MCTrackCands')
+        mcTrackCands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
         mcParticles = Belle2.PyStoreArray('MCParticles')
         if not mcTrackCands:
             return

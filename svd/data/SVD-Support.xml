@@ -106,6 +106,38 @@
 				<point><z unit="mm">525.000</z><x unit="mm">148.000</x></point>
 			</InnerPoints>
 		</RotationSolid>
+		<RotationSolid>
+			<Name>BackwardEnd</Name>
+			<Color>#ccc</Color>
+			<Material>Al</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.95</minPhi>
+			<maxPhi unit="deg"> 89.95</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm">-400.000</z><x unit="mm">127.000</x></point>
+				<point><z unit="mm">-380.000</z><x unit="mm">127.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm">-400.000</z><x unit="mm">100.000</x></point>
+				<point><z unit="mm">-380.000</z><x unit="mm">100.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
+		<RotationSolid>
+			<Name>ForwardEnd</Name>
+			<Color>#ccc</Color>
+			<Material>Al</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.95</minPhi>
+			<maxPhi unit="deg"> 89.95</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm">460.000</z><x unit="mm">120.000</x></point>
+				<point><z unit="mm">525.000</z><x unit="mm">120.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm">460.000</z><x unit="mm">105.000</x></point>
+				<point><z unit="mm">525.000</z><x unit="mm">105.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
 	</HalfShell>
 
 	<Endrings>

@@ -322,7 +322,6 @@ int RingBuffer::remq(int* buf)
 {
   SemaphoreLocker locker(m_semid);
   if (m_bufinfo->nbuf < 0) {
-    B2FATAL("RingBuffer: nbuf < 0");
     throw std::runtime_error("[RingBuffer::remq ()] number of entries is negative: " + std::to_string(m_bufinfo->nbuf));
   }
   if (m_bufinfo->nbuf == 0) {

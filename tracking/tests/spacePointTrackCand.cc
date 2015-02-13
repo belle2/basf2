@@ -242,12 +242,12 @@ namespace Belle2 {
     ASSERT_NO_THROW(fullTrackCand.getHitsInRange(nHits - 2, nHits - 1));
     ASSERT_THROW(fullTrackCand.getHitsInRange(-1, 3), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
     ASSERT_THROW(fullTrackCand.getHitsInRange(0, 10), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
-    ASSERT_THROW(fullTrackCand.getHitsInRange(10, 11), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
-    ASSERT_THROW(fullTrackCand.getHitsInRange(10, -1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
+    ASSERT_THROW(fullTrackCand.getHitsInRange(10, 0), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
+    ASSERT_THROW(fullTrackCand.getHitsInRange(2, -1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
     ASSERT_THROW(fullTrackCand.getSortingParametersInRange(-1, 2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
     ASSERT_THROW(fullTrackCand.getSortingParametersInRange(0, 10), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
     ASSERT_THROW(fullTrackCand.getSortingParametersInRange(12, 3), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
-    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(10, -2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(2, -2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
   }
 
   /**
@@ -277,7 +277,9 @@ namespace Belle2 {
     trackCand.addRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor);
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor));
     EXPECT_FALSE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsLowDistance));
-    unsigned short int expectedStatus = SpacePointTrackCand::c_checkedClean + SpacePointTrackCand::c_hitsOnSameSensor;
+
+    trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedByReferee);
+    unsigned short int expectedStatus = SpacePointTrackCand::c_checkedClean + SpacePointTrackCand::c_hitsOnSameSensor + SpacePointTrackCand::c_checkedByReferee;
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
 
 
@@ -285,17 +287,53 @@ namespace Belle2 {
     trackCand.removeRefereeStatus(SpacePointTrackCand::c_checkedClean);
     expectedStatus -= SpacePointTrackCand::c_checkedClean;
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
+    trackCand.removeRefereeStatus(SpacePointTrackCand::c_checkedClean); // remove again and check if nothing changes
+    EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
 
     // test if the status that remains is still set
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor));
+    EXPECT_TRUE(trackCand.hasHitsOnSameSensor()); // echeck the wrapper function
+
 
     // check if adding of the same status twice works
     trackCand.clearRefereeStatus();
     trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedSameSensors);
     trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedSameSensors);
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_checkedSameSensors));
-  }
+    EXPECT_TRUE(trackCand.checkedSameSensors());
 
+    trackCand.addRefereeStatus(SpacePointTrackCand::c_curlingTrack);
+    EXPECT_TRUE(trackCand.isCurling());
+
+
+    trackCand.clearRefereeStatus();
+    // test that at least n bits are present for storing stuff in the m_refereeStatus (update this test if you add a new flag to the RefereeStatusBit)
+    // WARNING: hardcoded -> make sure to keep this thing up to date!
+    int n = 8;
+    int maxUsedStatus = pow(2, n);
+    trackCand.addRefereeStatus(maxUsedStatus);
+    EXPECT_TRUE(trackCand.hasRefereeStatus(maxUsedStatus));
+
+    int maxN = 15; // unsigned short int has 2 bytes (-> 16 bits) to store information
+    int maxPossibleStatus = pow(2, maxN); // maximum possible status to store
+    trackCand.addRefereeStatus(maxPossibleStatus);
+    EXPECT_TRUE(trackCand.hasRefereeStatus(maxPossibleStatus));
+
+    int impossibleStatus = maxPossibleStatus * 2; // create an integer that is too big to be stored in a unsigned short integer
+    trackCand.clearRefereeStatus();
+    trackCand.setRefereeStatus(impossibleStatus); // this should lead to an overflow in SpacePointTrackCand::m_refereeStatus
+    EXPECT_NE(trackCand.getRefereeStatus(), impossibleStatus); // -> overflow leads this test to fail
+
+    trackCand.clearRefereeStatus();
+    int wrongStatus = 7; // set a wrong status, that causes some of the checks to be true although they shouldn't
+    trackCand.addRefereeStatus(wrongStatus);
+    EXPECT_TRUE(trackCand.hasRefereeStatus(1));
+    EXPECT_TRUE(trackCand.hasRefereeStatus(2));
+    EXPECT_TRUE(trackCand.hasRefereeStatus(4));
+    wrongStatus = 15;
+    trackCand.addRefereeStatus(wrongStatus);
+    EXPECT_TRUE(trackCand.hasRefereeStatus(8));
+  }
   /**
    * Test the removeSpacePoint method
    */

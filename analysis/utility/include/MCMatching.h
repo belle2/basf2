@@ -38,6 +38,15 @@ namespace Belle2 {
     };
 
     /** Return string with all human-readable flags, e.g. explainFlags(402) returns "c_MissingResonance | c_MissGamma | c_MisID | c_AddedWrongParticle".
+     *
+     * Can also be used from Python:
+     * \code{.py}
+        from basf2 import *
+        from ROOT import gSystem
+        gSystem.Load('libanalysis')
+        from ROOT import Belle2
+        print Belle2.MCMatching.explainFlags(402)
+       \endcode
      */
     std::string explainFlags(unsigned int flags);
 
@@ -55,23 +64,23 @@ namespace Belle2 {
     bool setMCTruth(const Belle2::Particle* particle);
 
     /**
-     * Returns the status (quality indicator) of the match. The status is given as a bit pattern,
+     * Returns quality indicator of the match as a bit pattern
      * where the individual bits indicate the the type of mismatch. The values are defined in the
      * MCErrorFlags enum and described in detail there.
      *
-     * Status equal to c_Correct == 0 indicates a perfect MC match (everything OK).
+     * A return value equal to c_Correct == 0 indicates a perfect MC match (everything OK).
      *
-     * The mctruth value is also stored inside the Particle's extra-info fields
+     * The value is also stored inside the Particle's extra-info fields
      * (so it is calculated only once per candidate).
      *
-     * @param particle pointer to the particle
+     * @param particle pointer to the particle. setMCTruth() must have been called previously (usually via the MCMatching module)!
      * @param mc pointer to the matched MCParticle. Can be specified to avoid repeated lookups.
      *
-     * @return status (bit pattern) of the mc match
+     * @return ORed combination of MCErrorFlags describing differences between reconstructed particle and MC truth.
      */
     int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
 
-    /** Sets mctruth flag in extra-info (also returns it).
+    /** Sets error flags in extra-info (also returns it).
      *
      * Users should use getMCErrors(), which only calculates this information when necessary.
      */

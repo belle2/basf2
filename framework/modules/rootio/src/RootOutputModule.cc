@@ -80,7 +80,6 @@ void RootOutputModule::initialize()
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
     B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
-    return;
   }
   m_file->SetCompressionLevel(m_compressionLevel);
 
@@ -196,7 +195,7 @@ void RootOutputModule::terminate()
     TTree* tree = m_tree[DataStore::c_Event];
     unsigned long numEntries = tree->GetEntries();
     if (numEntries > 10000000) {
-      //10M events correspond to about 240MB for the TTreeIndex object. from ~45M on this causes crashes, broken files :(
+      //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
       B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
     } else if (tree->GetBranch("EventMetaData")) {
       tree->SetBranchAddress("EventMetaData", 0);

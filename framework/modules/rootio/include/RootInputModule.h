@@ -93,7 +93,10 @@ namespace Belle2 {
     bool readParentTrees();
 
     /** Loads given entry from persistent tree. */
-    void readPersistentEntry(long entry);
+    void readPersistentEntry(long fileEntry);
+
+    /** Check if we warn the user or abort after an entry was missing after changing files. */
+    void entryNotFound(std::string entryOrigin, std::string name);
 
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */

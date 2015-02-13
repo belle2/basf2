@@ -15,6 +15,8 @@
 #include <framework/core/InputController.h>
 #include <framework/pcore/Mergeable.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/DependencyMap.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <TClonesArray.h>
@@ -209,10 +211,14 @@ void RootInputModule::readTree()
 
   //Make sure transient members of objects are reinitialised
   for (auto entry : m_storeEntries) {
+    if (!entry->object)
+      continue;
     entry->resetForGetEntry();
   }
   for (auto storeEntries : m_parentStoreEntries) {
     for (auto entry : storeEntries) {
+      if (!entry->object)
+        continue;
       entry->resetForGetEntry();
     }
   }
@@ -232,6 +238,8 @@ void RootInputModule::readTree()
   }
 
   for (auto entry : m_storeEntries) {
+    if (!entry->object)
+      entryNotFound("Event durability tree (global entry: " + std::to_string(m_nextEntry) + ")", entry->name);
     entry->ptr = entry->object;
   }
 
@@ -447,9 +455,20 @@ bool RootInputModule::readParentTrees()
   return true;
 }
 
-void RootInputModule::readPersistentEntry(long entry)
+void RootInputModule::entryNotFound(std::string entryOrigin, std::string name)
+{
+  if (DataStore::Instance().getDependencyMap().isUsedAs(name, DependencyMap::c_Input)) {
+    B2FATAL(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain required object " << name << ", aborting.")
+  } else {
+    B2WARNING(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name << " that was present in a previous entry.")
+  }
+}
+
+void RootInputModule::readPersistentEntry(long fileEntry)
 {
   for (auto entry : m_persistentStoreEntries) {
+    if (!entry->object)
+      continue;
     bool isMergeable = entry->object->InheritsFrom(Mergeable::Class());
     TObject* copyOfPreviousVersion = nullptr;
     if (isMergeable) {
@@ -460,22 +479,23 @@ void RootInputModule::readPersistentEntry(long entry)
     entry->ptr = copyOfPreviousVersion;
   }
 
-  int bytesRead = m_persistent->GetEntry(entry);
+  int bytesRead = m_persistent->GetEntry(fileEntry);
   if (bytesRead <= 0) {
-    B2FATAL("Could not read 'persistent' TTree #" << entry << " in file " << m_tree->GetCurrentFile()->GetName());
+    B2FATAL("Could not read 'persistent' TTree #" << fileEntry << " in file " << m_tree->GetCurrentFile()->GetName());
   }
 
   for (auto entry : m_persistentStoreEntries) {
-    if (!entry->object) {
-      B2FATAL("Persistent entry " << entry << " does not contain object " << entry->name << ", aborting.");
-    }
-    bool isMergeable = entry->object->InheritsFrom(Mergeable::Class());
-    if (isMergeable) {
-      const Mergeable* oldObj = static_cast<Mergeable*>(entry->ptr);
-      Mergeable* newObj = static_cast<Mergeable*>(entry->object);
-      newObj->merge(oldObj);
+    if (entry->object) {
+      bool isMergeable = entry->object->InheritsFrom(Mergeable::Class());
+      if (isMergeable) {
+        const Mergeable* oldObj = static_cast<Mergeable*>(entry->ptr);
+        Mergeable* newObj = static_cast<Mergeable*>(entry->object);
+        newObj->merge(oldObj);
 
-      delete entry->ptr;
+        delete entry->ptr;
+      }
+    } else {
+      entryNotFound("Persistent tree", entry->name);
     }
     entry->ptr = entry->object;
   }

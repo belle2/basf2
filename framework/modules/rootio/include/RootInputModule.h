@@ -129,7 +129,10 @@ namespace Belle2 {
     //then those for purely internal use:
 
     /** Next entry to be read in event tree.  */
-    int m_nextEntry;
+    long m_nextEntry;
+
+    /** last entry to be in persistent tree.  */
+    long m_lastPersistentEntry;
 
     /**  TTree for event input. */
     TChain* m_tree;

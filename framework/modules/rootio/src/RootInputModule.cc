@@ -36,7 +36,7 @@ REG_MODULE(RootInput)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
-RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_tree(0), m_persistent(0)
+RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentEntry(-1), m_tree(0), m_persistent(0)
 {
   //Set module properties
   setDescription("Reads objects/arrays from one or more .root files saved by the RootOutput module and makes them available through the DataStore. Files do not necessarily have to be local, http:// and root:// (for files in xrootd) URLs are supported as well.");
@@ -65,6 +65,7 @@ RootInputModule::~RootInputModule() { }
 void RootInputModule::initialize()
 {
   m_nextEntry = m_skipNEvents;
+  m_lastPersistentEntry = -1;
 
   loadDictionaries();
 
@@ -196,8 +197,6 @@ void RootInputModule::readTree()
   if (!m_tree)
     return;
 
-  const string prevFile = m_tree->GetCurrentFile()->GetName();
-
   // Check if there are still new entries available.
   int localEntryNumber = m_tree->LoadTree(m_nextEntry);
 
@@ -228,10 +227,17 @@ void RootInputModule::readTree()
     B2FATAL("Could not read 'tree' entry " << m_nextEntry << " in file " << m_tree->GetCurrentFile()->GetName());
   }
 
-  if (prevFile != m_tree->GetCurrentFile()->GetName()) {
+  //In case someone is tempted to change this:
+  // TTree::GetCurrentFile() returns a TFile pointer to a fixed location,
+  // calling GetName() on the TFile almost works as expected, but starts with the
+  // last file in a TChain. (-> we re-read the first persistent tree with TChain,
+  // with ill results for Mergeable objects.)
+  // GetTreeNumber() also starts at the last entry before we read the first event from m_tree,
+  // so we'll save the last persistent tree loaded and only reload on changes.
+  const long treeNum = m_tree->GetTreeNumber();
+  if (m_lastPersistentEntry != treeNum) {
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
-    B2DEBUG(100, "File changed, loading persistent data.");
-    readPersistentEntry(m_tree->GetTreeNumber());
+    readPersistentEntry(treeNum);
     StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
     FileCatalog::Instance().getParentMetaData(m_parentLevel, 0, *fileMetaData, m_parentMetaData);
     m_currentParent.resize(0);
@@ -249,6 +255,7 @@ void RootInputModule::readTree()
 
 bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durability, StoreEntries* storeEntries)
 {
+  B2DEBUG(100, "File changed, loading persistent data.");
   DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(durability);
 
   //Go over the branchlist and connect the branches with DataStore entries
@@ -466,6 +473,8 @@ void RootInputModule::entryNotFound(std::string entryOrigin, std::string name)
 
 void RootInputModule::readPersistentEntry(long fileEntry)
 {
+  m_lastPersistentEntry = fileEntry;
+
   for (auto entry : m_persistentStoreEntries) {
     if (!entry->object)
       continue;

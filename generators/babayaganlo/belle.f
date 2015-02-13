@@ -244,31 +244,31 @@
       cmin   = dcos(thmax)
       npoints = anpoints           
 
-!       print*,'SETTING UP'
-!       print *, "events for maximum search: " ,nsearch
-!       print *, "fmax:                      " ,fmax
-!       print*,'fs:    ',fs
-!       print*,'ord:   ',ord
-!       print*,'eps:   ',eps
-!       print*,'  soft cutoff:   ',eps * ecms/2.d0
-!       print*,'model: ',model
-!       print*,'E_CMS: ',ecms
-!       print*,'THMIN: ',thmin
-!       print*,'THMAX: ',thmax
-!       print*,'ACOL: ',zmax
-!       print*,'EMIN: ',emin
-!       print*,'Mass (Z): ',zm
-!       print*,'Mass (W): ',wm
-!       print*,'Mass (e): ',ame
-!       print*,'Mass (mu): ',ammu
-!       print*,'Width (Z): ',gz
-!       print*,'s2th (on shell):   ',s2th
-!       print*,'GFermi (on shell): ',gfermi
-!       print*,'hbarc --> nb:      ',convfac
-!       print*,'alpha(0):          ',alpha  
-!       print*,'nphotmode:         ',nphotmode  
-!       print*,'running alpha:           ',iarun  
-!       print*,'running alpha (Teubner): ',iteubn  
+      print*,'SETTING UP'
+      print *, "events for maximum search: " ,nsearch
+      print *, "fmax:                      " ,fmax
+      print*,'fs:    ',fs
+      print*,'ord:   ',ord
+      print*,'eps:   ',eps
+      print*,'  soft cutoff:   ',eps * ecms/2.d0
+      print*,'model: ',model
+      print*,'E_CMS: ',ecms
+      print*,'THMIN: ',thmin
+      print*,'THMAX: ',thmax
+      print*,'ACOL: ',zmax
+      print*,'EMIN: ',emin
+      print*,'Mass (Z): ',zm
+      print*,'Mass (W): ',wm
+      print*,'Mass (e): ',ame
+      print*,'Mass (mu): ',ammu
+      print*,'Width (Z): ',gz
+      print*,'s2th (on shell):   ',s2th
+      print*,'GFermi (on shell): ',gfermi
+      print*,'hbarc --> nb:      ',convfac
+      print*,'alpha(0):          ',alpha  
+      print*,'nphotmode:         ',nphotmode  
+      print*,'running alpha:           ',iarun  
+      print*,'running alpha (Teubner): ',iteubn  
 
       am1 = ame
       am2 = ame

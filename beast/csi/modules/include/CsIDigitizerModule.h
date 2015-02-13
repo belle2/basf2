@@ -104,7 +104,6 @@ namespace Belle2 {
        * param _u: The input signal in Volts
        * param _NsamBL: Number of samples to conduct the baseline measurement (8,32,128)
        * param _Treshold: Treshold above which generate a trigger (in LSB)
-       * param _PreTrigger: time to record before trigger (in ns)
        * param _TriggerHoldoff: Width of signal integration (in ns)
        * param _GateWidth: Width of signal integration (in ns)
        * param _GateOffset: Width of signal integration (in ns)
@@ -112,8 +111,7 @@ namespace Belle2 {
        * returnthe index of after the end of the holdoff (where to pick up if we have more peaks in the signal)
        */
       int  doChargeIntegration(Signal _u, int _NsamBL, uint64_t* Q, uint* t, int _Treshold,
-                               double _PreTrigger, double _TriggerHoldoff = 0.0,
-                               double _GateWidth = 320.0, double _GateOffset = 40.0);
+                               double _TriggerHoldoff = 0.0, double _GateWidth = 320.0, double _GateOffset = 40.0);
 
       /** Digitizes the signal the signal
        *

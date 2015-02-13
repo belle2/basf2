@@ -87,8 +87,8 @@ void CsIDigitizerModule::event()
   if (m_aSimHit.getEntries() > 0) {
     int hitNum = m_aSimHit.getEntries(); /**< Number of Crystal hits */
 
-    double E_tmp[16] = {0};       /**< Sum energy deposited in each cell */
-    double edepSum = 0;           /**< Sum energy deposited in all cells */
+    // double E_tmp[16] = {0};       /**< Sum energy deposited in each cell */
+    // double edepSum = 0;           /**< Sum energy deposited in all cells */
     double localPos = 0;          /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
     double  propagTime = 0;          /**< Time when photons from the hit reach the PIN-diode (in ns).*/
     for (int i = 0 ; i < 12 ; i++) {
@@ -153,7 +153,7 @@ void CsIDigitizerModule::terminate()
 }
 
 int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint64_t* Q, uint* t,
-                                             int _Treshold, double _PreTrigger, double _TriggerHoldoff,
+                                             int _Treshold, double _TriggerHoldoff,
                                              double _GateWidth, double _GateOffset)
 {
   vector<int> x = doDigitization(_u, m_Resolution);

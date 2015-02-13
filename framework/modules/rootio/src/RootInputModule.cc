@@ -464,7 +464,7 @@ bool RootInputModule::readParentTrees()
 
 void RootInputModule::entryNotFound(std::string entryOrigin, std::string name)
 {
-  if (DataStore::Instance().getDependencyMap().isUsedAs(name, DependencyMap::c_Input)) {
+  if (name == "ProcessStatistics" or DataStore::Instance().getDependencyMap().isUsedAs(name, DependencyMap::c_Input)) {
     B2FATAL(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain required object " << name << ", aborting.")
   } else {
     B2WARNING(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name << " that was present in a previous entry.")

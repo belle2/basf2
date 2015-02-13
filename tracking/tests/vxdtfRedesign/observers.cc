@@ -34,6 +34,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/RelationsObject.h>
+#include <../genfit2/code2/extern/boost/concept_check.hpp>
 
 #include <tuple>
 #include <utility>
@@ -138,7 +139,7 @@ namespace VXDTFObserversTest {
         pxdCluster->addRelationTo(aParticle);
 
         SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
-        B2INFO(" setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID())
+        B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID())
         newSP->addRelationTo(pxdCluster);
       }
 
@@ -207,15 +208,161 @@ namespace VXDTFObserversTest {
     }
   };
 
+
+
+  /** a container for counting accepted and rejected stuff, just delivers some interfaces to make the code more readable */
+  class CountContainer {
+  public:
+    CountContainer() { m_container.clear(); }
+
+    /** a vector containing IDs */
+    typedef std::vector<int> Particles;
+
+
+    /** key for the internal container of this map
+     *
+     * .first is a bool which is true, if combination was from the same particle which was primary
+     * .second vector of IDs (e.g. PDG or mcParticleIDs)
+     */
+    typedef std::pair< bool, Particles > Key;
+
+
+    /** */
+    struct AcceptRejectPair {
+      AcceptRejectPair() : accept(0), reject(0) {}
+
+      void Increase(bool accepted) {
+        if (accepted) {
+          accept += 1;
+        } else {
+          reject += 1;
+        }
+      }
+
+      unsigned accept; /**< counts nTimes when it was accepted */
+      unsigned reject; /**< counts nTimes when it was rejected */
+    };
+
+
+    /** clear container */
+    void clear() { m_container.clear(); }
+
+
+    /** size of container */
+    unsigned int size() { return m_container.size(); }
+
+
+    /** cleans a container of double entries */
+    template<class ContainerType> static void uniqueIdentifier(ContainerType& particles) {
+      std::sort(particles.begin(), particles.end());
+      auto newEndIterator = std::unique(particles.begin(), particles.end());
+      particles.resize(std::distance(particles.begin(), newEndIterator));
+    }
+
+
+    /** accepts a key (first parameter) and if given key was accepted by the filter (second parameter) */
+    bool IncreaseCounter(Key& aKey, bool accepted) {
+      bool keyAlreadyExisted = true;
+      auto foundPos = m_container.find(aKey);
+      if (foundPos == m_container.end())  {
+        B2DEBUG(100, " the IDs " << key2str(aKey) << " collected haven't been found yet")
+        foundPos = m_container.insert({aKey, AcceptRejectPair() }).first;
+        keyAlreadyExisted = false;
+      } else { B2DEBUG(100, " the IDs " << key2str(aKey) << " collected were already there") }
+
+      foundPos->second.Increase(accepted);
+
+      return keyAlreadyExisted;
+    }
+
+
+
+    /** for given key, the function returns the result found. If key was not found in container, a AcceptRejectPair with 0, 0 is returned */
+    AcceptRejectPair ReturnResult(const Key& givenKey) {
+
+      auto foundPos =  m_container.find(givenKey);
+
+      if (foundPos == m_container.end())  {
+        return AcceptRejectPair();
+      }
+
+      return foundPos->second;
+    }
+
+
+
+    /** for given key, the function returns the result found. If key was not found in container, a AcceptRejectPair with 0, 0 is returned */
+    AcceptRejectPair ReturnResult(const Particles& givenKey) {
+      for (const auto & aKey : m_container) {
+        B2DEBUG(100, "comparing given particles: " << vec2str(givenKey) << " with entry: " << vec2str(aKey.first.second) << " with result " << (aKey.first.second == givenKey))
+        if (aKey.first.second == givenKey) { return aKey.second; }
+      }
+
+      return AcceptRejectPair();
+    }
+
+
+
+    /** for easy printing of results collected so far */
+    void PrintResults(string identifier = "unknown") {
+      for (auto & entry : m_container) {
+        B2WARNING(" for " << identifier << "-combination: " <<
+                  key2str(entry.first) <<
+                  ", combi was accepted/rejected: " <<
+                  entry.second.accept <<
+                  "/" <<
+                  entry.second.reject)
+      }
+    }
+
+
+
+    /** small helper for easily printing vectors */
+    static std::string key2str(const Key& aKey) {
+      return key2str(&aKey);
+    }
+
+
+    /** small helper for easily printing vectors */
+    static std::string key2str(const Key* aKey) {
+      string output;
+
+      if (aKey->first == true) { output += "GoodCombi: "; }
+      else { output += "BadCombi: "; }
+
+      output += vec2str(aKey->second);
+
+      return std::move(output);
+    }
+
+
+    /** small helper for easily printing vectors */
+    template<class Type> static std::string vec2str(const vector<Type>& vec) {
+      string output;
+
+      for (const auto & entry : vec) {
+        output += " " + std::to_string(entry);
+      }
+
+      return std::move(output);
+    }
+  protected:
+    std::map< Key, AcceptRejectPair> m_container; /**< collects the data */
+  };
+
+
+
   /** a tiny counter class for counting stuff retrieved from MC-bla */
   template < class T>
   class counterMC {
   public:
-    static map<vector<int>, pair<unsigned, unsigned> > pdGacceptedRejected; /** map for particleTypes (key: vector of mcParticles found for given hits, sorted) storing how often it was accepted/rejected  value.first/value.second */
+    static CountContainer pdGacceptedRejected; /** map for pdgCodes (key: vector of pdgCodes found for given hits, sorted) storing how often it was accepted/rejected  value.first/value.second */
+    static CountContainer mcIDacceptedRejected; /** map for mcParticleIDs (key, vector of mcParticleIDs (pair: first: true, if combination was from the same particle which was primary, found for given hits, sorted), storing how often it was accepted/rejected value.first/value.second */
     counterMC() {};
     ~counterMC() {};
     static void resetCounter() {
       counterMC<T>::pdGacceptedRejected.clear();
+      counterMC<T>::mcIDacceptedRejected.clear();
     }
   };
 
@@ -228,7 +375,8 @@ namespace VXDTFObserversTest {
   template<class T> unsigned int counter<T>::wasInf(0);
   template<class T> unsigned int counter<T>::wasNan(0);
 
-  template<class T> map<vector<int>, pair<unsigned, unsigned> > counterMC< T >::pdGacceptedRejected = {};
+  template<class T> CountContainer counterMC< T >::pdGacceptedRejected = CountContainer(); /**< counts nCases accepted/rejected for each pdgCode-combination occured */
+  template<class T> CountContainer counterMC< T >::mcIDacceptedRejected = CountContainer(); /**< counts nCases accepted/rejected for each particleID-combination occured */
 
 
 
@@ -339,6 +487,7 @@ namespace VXDTFObserversTest {
   /** this observer identifies the McParticles responsible for creating underlying clusters for given spacePoints and counts how often a particle type was accepted and how often it was rejected */
   class CountAcceptedRejectedMCParticleObserver : public VoidObserver {
   public:
+
     /** notifier producing a info message if SelectionVariable was accepted and a Warning if otherwise */
     template<class Var, class RangeType>
     static void notify(const Var& ,
@@ -347,37 +496,17 @@ namespace VXDTFObserversTest {
                        const typename Var::argumentType& innerHit,
                        const RangeType& range) {
 
-      vector<int> collectedPDGs;
+      // we use the pdgCodes of the particles as identifier (not unique, since more than one primary particle can have the same PDG-code) and count their acceptance rate:
+      CountContainer::Key myPDGs = createKey(outerHit, innerHit, true);
 
-      RelationVector<PXDCluster> relatedToPXDClusters = outerHit.template getRelationsTo<PXDCluster>();
-      RelationVector<SVDCluster> relatedToSVDClusters = outerHit.template getRelationsTo<SVDCluster>();
+      counterMC< Var >::pdGacceptedRejected.IncreaseCounter(myPDGs, range.contains(fResult));
 
-      collectPDGs(outerHit, collectedPDGs);
-      collectPDGs(innerHit, collectedPDGs);
 
-      B2DEBUG(100, "CountAcceptedRejectedMCParticleObserver::notify:before unique: found total of " << collectedPDGs.size() << " mcParticles connected to given hits")
+      // now we do the same but with mcParticleIDs:
 
-      std::sort(collectedPDGs.begin(), collectedPDGs.end());
-      auto newEndIterator = std::unique(collectedPDGs.begin(), collectedPDGs.end());
-      collectedPDGs.resize(std::distance(collectedPDGs.begin(), newEndIterator));
+      CountContainer::Key myPIDs = createKey(outerHit, innerHit, false);
 
-      B2DEBUG(100, "CountAcceptedRejectedMCParticleObserver::notify:after unique: found total of " << collectedPDGs.size() << " mcParticles connected to given hits")
-
-      auto foundPos = counterMC< Var >::pdGacceptedRejected.find(collectedPDGs);
-      if (foundPos == counterMC< Var >::pdGacceptedRejected.end())  {
-        B2DEBUG(100, " the pdgs " << vec2str(collectedPDGs) << " collected haven't been found yet")
-        foundPos = counterMC< Var >::pdGacceptedRejected.insert({collectedPDGs, {0, 0} }).first;
-      } else { B2DEBUG(100, " the pdgs " << vec2str(collectedPDGs) << " collected were already there") }
-
-      if (range.contains(fResult)) {
-        foundPos->second.first += 1;
-      } else {
-        foundPos->second.second += 1;
-      }
-
-      for (const auto & entry : counterMC< Var >::pdGacceptedRejected) {
-        B2INFO("Key " << vec2str(entry.first) << " has " << entry.second.first << "/" << entry.second.second << " accepted/rejected values")
-      }
+      counterMC< Var >::mcIDacceptedRejected.IncreaseCounter(myPIDs, range.contains(fResult));
     }
 
 
@@ -390,19 +519,92 @@ namespace VXDTFObserversTest {
     * second parameter is the vector for collecting the PDGcodes found.
     * */
     template <class hitType>
-    static void collectPDGs(const hitType& aHit, std::vector<int>& collectedPDGs) {
+    static void collectPDGs(const hitType& aHit, vector< pair< bool, int> >& collectedPDGs) {
+
+      std::vector<const MCParticle*> collectedParticles;
+
+      collectMCParticles(aHit, collectedParticles);
+
+      for (const MCParticle * aParticle : collectedParticles) {
+        collectedPDGs.push_back({aParticle->hasStatus(MCParticle::c_PrimaryParticle), aParticle->getPDG()});
+      }
+    }
+
+
+
+    /** collects all particleIDs connected to given hit.
+    *
+    * does only work, if hit has direct relations PXD/SVDCluster which have relations to MCParticle.
+    *
+    * first parameter is a hit (e.g. spacePoint) which is related to MCParticles.
+    * second parameter is the vector for collecting the PDGcodes found.
+    * */
+    template <class hitType>
+    static void collectParticleIDs(const hitType& aHit, vector< pair< bool, int> >& collectedIDS) {
+
+      std::vector<const MCParticle*> collectedParticles;
+
+      collectMCParticles(aHit, collectedParticles);
+
+      for (const MCParticle * aParticle : collectedParticles) {
+        collectedIDS.push_back({aParticle->hasStatus(MCParticle::c_PrimaryParticle), aParticle->getIndex()});
+      }
+    }
+
+    /** for two hits given, a key for the CountContainer is returned. if usePDG == true, PDGcode will be used as identifyer, if false, the ParticleID will be used */
+    template <class hitType>
+    static CountContainer::Key createKey(const hitType& hitA, const hitType& hitB, bool usePDG) {
+      CountContainer::Key newKey;
+
+      vector< pair< bool, int> > collectedIDS;
+
+      if (usePDG) {
+        collectPDGs(hitA, collectedIDS);
+        collectPDGs(hitB, collectedIDS);
+      } else {
+        collectParticleIDs(hitA, collectedIDS);
+        collectParticleIDs(hitB, collectedIDS);
+      }
+
+      CountContainer::uniqueIdentifier(collectedIDS);
+
+      if (collectedIDS.size() == 1) {
+        newKey.first = collectedIDS[0].first;
+        newKey.second = { collectedIDS[0].second };
+        return std::move(newKey);
+      }
+
+      newKey.first = false;
+
+      for (auto & entry : collectedIDS) {
+        newKey.second.push_back(entry.second);
+      }
+
+      return std::move(newKey);
+    }
+
+
+    /** collects all mcParticles connected to given hit.
+    *
+    * does only work, if hit has direct relations PXD/SVDCluster which have relations to MCParticle.
+    *
+    * first parameter is a hit (e.g. spacePoint) which is related to MCParticles.
+    * second parameter is the vector for collecting the PDGcodes found.
+    * */
+    template <class hitType>
+    static void collectMCParticles(const hitType& aHit, std::vector<const MCParticle*>& collectedParticles) {
       RelationVector<PXDCluster> relatedToPXDClusters = aHit.template getRelationsTo<PXDCluster>();
       RelationVector<SVDCluster> relatedToSVDClusters = aHit.template getRelationsTo<SVDCluster>();
 
       for (const PXDCluster & aCluster : relatedToPXDClusters) {
         for (const MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
-          collectedPDGs.push_back(aParticle.getPDG());
+          collectedParticles.push_back(&aParticle);
         }
       }
 
       for (const SVDCluster & aCluster : relatedToSVDClusters) {
         for (const MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
-          collectedPDGs.push_back(aParticle.getPDG());
+          collectedParticles.push_back(&aParticle);
         }
       }
     }
@@ -563,20 +765,72 @@ namespace VXDTFObserversTest {
   TEST_F(ObserversTest, TestMCDataAccess)
   {
     Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > unobservedFilter(Range<float, float>(2.5, 3.5));
-    /// TODO
     Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilter(unobservedFilter);
 
     for (int i = 1 ; i < spacePointData.getEntries(); i++) {
-//    SpacePoint spA = *spacePointData[i];
-//    SpacePoint spB = *spacePointData[i-1];
-      B2INFO("spData-Sps got arraIndices: " << spacePointData[i]->getArrayIndex() << "/" << spacePointData[i - 1]->getArrayIndex() << " and VxdIDs " << spacePointData[i]->getVxdID() << "/" << spacePointData[i - 1]->getVxdID())
-//    observedFilter.accept(spA, spB);
-      observedFilter.accept(*spacePointData[i], *spacePointData[i - 1]); // has to be passed directly! intermediate step deletes StoreArray-related info!
+      SpacePoint& spA = *spacePointData[i];
+      SpacePoint& spB = *spacePointData[i - 1];
+      B2DEBUG(10, "spData-Sps got arraIndices: " << spacePointData[i]->getArrayIndex() << "/" << spacePointData[i - 1]->getArrayIndex() << " and VxdIDs " << spacePointData[i]->getVxdID() << "/" << spacePointData[i - 1]->getVxdID())
+      observedFilter.accept(spA, spB);
     }
 
     EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.size());
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.size());
+
+    counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.PrintResults("pdgCode");
 
     /// TODO further tests!
+    // the filter was too loose, everything is accepted
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11}).accept);
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11, 13}).accept);
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({13}).accept);
+    // and nothing was rejected...
+    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11}).reject);
+    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11, 13}).reject);
+    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({13}).reject);
+
+
+    counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.PrintResults("pID");
+
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1}).accept);
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1, 2}).accept);
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({2}).accept);
+
+    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1}).reject);
+    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1, 2}).reject);
+    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({2}).reject);
+
+
+    // now we set the filter using values which are too strict
+    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > unobservedFilterStrict(Range<float, float>(3.1, 3.5));
+    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilterStrict(unobservedFilterStrict);
+
+    for (int i = 1 ; i < spacePointData.getEntries(); i++) {
+      SpacePoint& spA = *spacePointData[i];
+      SpacePoint& spB = *spacePointData[i - 1];
+      observedFilterStrict.accept(spA, spB);
+    }
+
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.size());
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.size());
+
+    // first filter does write into the same container, therefore values didn't change for accepted
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11}).accept);
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11, 13}).accept);
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({13}).accept);
+
+    // second filter does reject everything:
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11}).reject);
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11, 13}).reject);
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({13}).reject);
+
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1}).accept);
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1, 2}).accept);
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({2}).accept);
+
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1}).reject);
+    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1, 2}).reject);
+    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({2}).reject);
 
   }
 

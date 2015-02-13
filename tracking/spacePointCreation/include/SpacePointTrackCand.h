@@ -63,6 +63,7 @@ namespace Belle2 {
       c_checkedTrueHits =  32, /**< bit 5: All of the SpacePoints of the SpacePointTrackCand have a relation to (at least one) TrueHit(s) */
       c_checkedSameSensors = 64, /**< bit 6: It has been checked if two consecutive SpacePoints are on the same sensor for this SpacePointTrackCand */
       c_checkedMinDistance =  128, /**< bit 7: It has been checked if two consecutive SpacePoints are far enough apart */
+      c_curlingTrack = 256, /**< bit 8: SpacePointTrackCand is curling (resp. is part of a curling SpacePointTrackCand) */
     };
 
     /**
@@ -86,7 +87,7 @@ namespace Belle2 {
 
     /**
      * get hits (SpacePoints) in range (indices of SpacePoint inside SpacePointTrackCand) [firstInd,lastInd] (the SpacePoint on firstInd and on lastInd wil be returned as well!).
-     * For all hits range is from 0 to getNHits - 1
+     * NOTE: For all hits range is from 0 to getNHits - 1. throws an exception when trying to access hits outside the allowed range!
      */
     const std::vector<const Belle2::SpacePoint*> getHitsInRange(int firstInd, int lastInd) const;
 
@@ -124,6 +125,7 @@ namespace Belle2 {
 
     /**
      * get the sorting parameters in range (indices of SpacePoints inside SpacePointTrackCand) including firstIndex and lastIndex
+     * NOTE: for all hits range is from zero to getNHits - 1. throws an exception when trying to access hits outside the allowed range!
      */
     const std::vector<double> getSortingParametersInRange(int firstIndex, int lastIndex) const;
 
@@ -167,6 +169,25 @@ namespace Belle2 {
      * Check if the SpacePointTrackCand has been checked for consecutive hits being far enough apart
      */
     bool checkedMinDistance() const { return hasRefereeStatus(c_checkedMinDistance); }
+
+    /**
+     * Check if a SpacePointTrackCand has removed hits (i.e. at some point it contained more hits than it does when this function is called, removal of hits e.g. by a referee module)
+     */
+    bool hasRemovedHits() const { return hasRefereeStatus(c_removedHits); }
+
+    /**
+     * check if particle is outgoing (simply returns member m_flightDirection)!
+     */
+    bool isOutgoing() const { return m_flightDirection; }
+
+    /**
+     * get if the TrackCand is curling.
+     * WARNING: does not check if this has actually been assigned!
+     */
+    bool isCurling() const { return hasRefereeStatus(c_curlingTrack); }
+
+    /** check if the TrackCand has been checked for Curling. */
+    bool checkedForCurling() const { return m_iTrackStub != -1; }
 
     /**
      * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
@@ -213,19 +234,8 @@ namespace Belle2 {
      */
     void setFlightDirection(bool direction) { m_flightDirection = direction; }
 
-    /**
-     * check if particle is outgoing (simply returns member m_flightDirection)!
-     */
-    bool isOutgoing() const { return m_flightDirection; }
-
     /** set TrackStub index */
     void setTrackStubIndex(int trackStubInd) { m_iTrackStub = trackStubInd; }
-
-    /** get if the TrackCand is curling. CAUTION: returns false if it has not been checked for curling */
-    bool isCurling() const { return m_iTrackStub > 0; }
-
-    /** check if the TrackCand has been checked for Curling. */
-    bool checkedForCurling() const { return m_iTrackStub != -1; }
 
     /** set referee status (resets the complete to the passed status!) */
     void setRefereeStatus(unsigned short int bitmask) { m_refereeStatus = bitmask; }

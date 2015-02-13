@@ -27,6 +27,7 @@ SkimFilterModule::SkimFilterModule() : Module()
 {
   //Set module properties
   setDescription("Filter based on ParticleLists, by setting return value to true if at least one of the given lists is not empty.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
 

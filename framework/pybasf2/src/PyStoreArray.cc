@@ -38,14 +38,7 @@ TObject* PyStoreArray::operator [](int i) const
 
 std::vector<std::string> PyStoreArray::list(int durability)
 {
-  vector<string> list;
-  const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
-  for (const auto & entrypair : map) {
-    if (entrypair.second.isArray) {
-      list.push_back(entrypair.first);
-    }
-  }
-  return list;
+  return DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::EDurability(durability));
 }
 
 void PyStoreArray::printList(int durability)

@@ -56,18 +56,12 @@ kaons = ('K+:all', '')
 gammas = ('gamma:all', '')
 electrons = ('e-:all', '')
 muons = ('mu+:all', '')
-pi0 = ('pi0:all', '')
-kshort = ('K_S0:all', '')
 
-fillParticleListsFromMC([
-    pions,
-    kaons,
-    gammas,
-    electrons,
-    muons,
-    pi0,
-    kshort,
-    ], True)
+fillParticleListsFromMC([pions, kaons, gammas, electrons, muons], True)
+
+# reconstruct pi0 and K_S0
+reconstructDecay('pi0:all -> gamma:all gamma:all', '0.10 < M < 0.15')
+reconstructDecay('K_S0:all -> pi+:all pi-:all', '0.45 < M < 0.55')
 
 # reconstruct charm
 reconstructD0()

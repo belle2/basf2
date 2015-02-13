@@ -11,7 +11,7 @@
 #ifndef DATAFLOWVISUALIZATION_H
 #define DATAFLOWVISUALIZATION_H
 
-#include <framework/datastore/DataStore.h>
+#include <framework/datastore/DependencyMap.h>
 
 #include <iosfwd>
 
@@ -22,7 +22,7 @@ namespace Belle2 {
   class DataFlowVisualization {
   public:
     /** Constructor. */
-    DataFlowVisualization(const std::map<std::string, DataStore::ModuleInfo>& moduleInfo);
+    DataFlowVisualization(const DependencyMap* dependencyMap);
 
     /** Create graphs with datastore inputs/outputs of each module in path
      *
@@ -44,17 +44,17 @@ namespace Belle2 {
     void plotPath(std::ofstream& file, const Path& path, const std::string& pathName = "");
 
     /** If the given array name isn't found in any of info's fields, it is added to m_unknownArrays (and true returned).*/
-    bool checkArrayUnknown(const std::string& name, const DataStore::ModuleInfo& info);
+    bool checkArrayUnknown(const std::string& name, const DependencyMap::ModuleInfo& info);
 
     /** Stores information on inputs/outputs of each module, as obtained by require()/createEntry(); */
-    const std::map<std::string, DataStore::ModuleInfo>& m_moduleInfo;
+    const DependencyMap* m_map;
 
     std::set<std::string> m_allInputs; /**< set of all inputs (including optionals), for steering file visualisation. */
     std::set<std::string> m_allOutputs; /**< set of all outputs, for steering file visualisation. */
     std::set<std::string> m_unknownArrays; /**< set of array only being used in relations, for steering file visualisation. */
 
-    std::string m_fillcolor[DataStore::ModuleInfo::c_NEntryTypes]; /**< fill colors. */
-    std::string m_arrowcolor[DataStore::ModuleInfo::c_NEntryTypes]; /**< arrow colors. */
+    std::string m_fillcolor[DependencyMap::c_NEntryTypes]; /**< fill colors. */
+    std::string m_arrowcolor[DependencyMap::c_NEntryTypes]; /**< arrow colors. */
   };
 }
 #endif

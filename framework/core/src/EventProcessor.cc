@@ -118,7 +118,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
   //do we want to visualize DataStore input/ouput?
   if (Environment::Instance().getVisualizeDataFlow()) {
-    DataFlowVisualization v(DataStore::Instance().getModuleInfoMap());
+    DataFlowVisualization v(&DataStore::Instance().getDependencyMap());
     v.visualizePath("dataflow.dot", *startPath);
   }
 
@@ -180,7 +180,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
     //Set the module dependent log level
     logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
-    DataStore::Instance().setModule(module->getName());
+    DataStore::Instance().getDependencyMap().setModule(module->getName());
 
     //Do initialization
     m_processStatisticsPtr->initModule(module);

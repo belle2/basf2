@@ -18,7 +18,6 @@
 
 #include <vector>
 #include <string>
-#include <set>
 #include <map>
 
 class TObject;
@@ -26,6 +25,7 @@ class TClass;
 
 namespace Belle2 {
   class StoreAccessorBase;
+  class DependencyMap;
   template <class T> class RelationVector;
   struct RelationEntry;
 
@@ -58,8 +58,8 @@ namespace Belle2 {
      */
     enum EStoreFlag {
       c_WriteOut = 0,                /**< Object/array should be saved by output modules. (default) */
-      c_DontWriteOut = 1 << 0,       /**< Object/array should be NOT saved by output modules. Can be overridden using the 'branchNames' parameter of RootOutput. */
-      c_ErrorIfAlreadyRegistered = 1 << 1,/**< If the object/array was already registered, produce an error (aborting initialisation). */
+      c_DontWriteOut = 1,            /**< Object/array should be NOT saved by output modules. Can be overridden using the 'branchNames' parameter of RootOutput. */
+      c_ErrorIfAlreadyRegistered = 2,/**< If the object/array was already registered, produce an error (aborting initialisation). */
     };
     /** Combination of DataStore::EStoreFlag flags. */
     typedef int EStoreFlags;
@@ -82,28 +82,6 @@ namespace Belle2 {
 
     /** Wraps a stored array/object, stored under unique (name, durability) key. */
     typedef Belle2::StoreEntry StoreEntry;
-
-    /** Stores information on inputs/outputs of a module, as obtained by requireInput()/optionalInput()/registerEntry(); */
-    struct ModuleInfo {
-      /** Possible types of entries/relations for a module. */
-      enum EEntryType {
-        c_Input, /**< required input. */
-        c_OptionalInput, /**< optional input. */
-        c_Output, /**< registered output. */
-
-        c_NEntryTypes /**< size of this enum. */
-      };
-      std::set<std::string> entries[c_NEntryTypes]; /**< objects/arrays. */
-      std::set<std::string> relations[c_NEntryTypes]; /**< relations between them. */
-
-      /** Adds given entry/relation. */
-      void addEntry(const std::string& name, EEntryType type, bool isRelation) {
-        if (isRelation)
-          relations[type].insert(name);
-        else
-          entries[type].insert(name);
-      }
-    };
 
     // Convenient typedefs.
     typedef std::map<std::string, StoreEntry> StoreEntryMap;  /**< Map for StoreEntries. */
@@ -486,15 +464,10 @@ namespace Belle2 {
     std::vector<std::string> getListOfRelatedArrays(const StoreAccessorBase& array) const;
 
     /** Returns a list of names of arrays which are of type arrayClass. */
-    std::vector<std::string> getListOfArrays(const TClass* arrayClass, EDurability durability) const {
-      std::vector<std::string> arrays;
-      getArrayNames(arrays, "ALL", arrayClass, durability);
-      return arrays;
-    }
+    std::vector<std::string> getListOfArrays(const TClass* arrayClass, EDurability durability) const;
 
 
-
-    //------------------------------ Start and end procedures --------------------------------------------------
+    //------------------------------ For internal use --------------------------------------------------
     /** Setter for m_initializeActive.
      *
      *  This should only be called by EventProcessor.
@@ -525,14 +498,8 @@ namespace Belle2 {
      */
     void reset();
 
-    /** Set the current module
-     *
-     * Currently called only in EventProcessor::processInitialize()
-     */
-    void setModule(const std::string& name) { m_currentModule = name; }
-
-    /** return information on inputs/outputs of each module, as obtained by requireInput()/optionalInput()/registerEntry(); */
-    const std::map<std::string, Belle2::DataStore::ModuleInfo>& getModuleInfoMap() const { return m_moduleInfo; }
+    /** Return map of depedencies between modules. */
+    DependencyMap& getDependencyMap() { return *m_dependencyMap; }
 
 
   private:
@@ -576,10 +543,7 @@ namespace Belle2 {
      */
     bool m_initializeActive;
 
-    /** Stores the current module, used to fill m_moduleInfo. */
-    std::string m_currentModule;
-
-    /** Stores information on inputs/outputs of each module, as obtained by requireInput()/optionalInput()/registerEntry(); */
-    std::map<std::string, Belle2::DataStore::ModuleInfo> m_moduleInfo;
+    /** Collect information about the dependencies between modules. */
+    DependencyMap* m_dependencyMap;
   };
 } // namespace Belle2

@@ -14,29 +14,30 @@
 #include <framework/core/ModuleManager.h>
 
 #include <framework/core/DataFlowVisualization.h>
+#include <framework/datastore/DataStore.h>
 
 
 #include <fstream>
 
 
 using namespace Belle2;
-typedef DataStore::ModuleInfo MInfo;
+typedef DependencyMap::ModuleInfo MInfo;
 
 
 namespace {
   const std::string unknownfillcolor = "gray82";
 }
 
-DataFlowVisualization::DataFlowVisualization(const std::map<std::string, DataStore::ModuleInfo>& moduleInfo):
-  m_moduleInfo(moduleInfo)
+DataFlowVisualization::DataFlowVisualization(const DependencyMap* dependencyMap):
+  m_map(dependencyMap)
 {
-  m_fillcolor[MInfo::c_Input] = "cornflowerblue";
-  m_fillcolor[MInfo::c_OptionalInput] = "lightblue";
-  m_fillcolor[MInfo::c_Output] = "orange";
+  m_fillcolor[DependencyMap::c_Input] = "cornflowerblue";
+  m_fillcolor[DependencyMap::c_OptionalInput] = "lightblue";
+  m_fillcolor[DependencyMap::c_Output] = "orange";
 
-  m_arrowcolor[MInfo::c_Input] = "cornflowerblue";
-  m_arrowcolor[MInfo::c_OptionalInput] = "lightblue";
-  m_arrowcolor[MInfo::c_Output] = "firebrick";
+  m_arrowcolor[DependencyMap::c_Input] = "cornflowerblue";
+  m_arrowcolor[DependencyMap::c_OptionalInput] = "lightblue";
+  m_arrowcolor[DependencyMap::c_Output] = "firebrick";
 }
 
 void DataFlowVisualization::visualizePath(const std::string& filename, const Path& path)
@@ -59,11 +60,11 @@ void DataFlowVisualization::visualizePath(const std::string& filename, const Pat
 
   //add nodes
   for (std::set<std::string>::const_iterator it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
-    file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Output] << "];\n";
+    file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[DependencyMap::c_Output] << "];\n";
   }
   for (std::set<std::string>::const_iterator it = m_allInputs.begin(); it != m_allInputs.end(); ++it) {
     if (m_allOutputs.count(*it) == 0)
-      file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Input] << "];\n";
+      file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[DependencyMap::c_Input] << "];\n";
   }
   for (std::set<std::string>::const_iterator it = m_unknownArrays.begin(); it != m_unknownArrays.end(); ++it) {
     if (m_allOutputs.count(*it) == 0 && m_allInputs.count(*it) == 0)
@@ -114,10 +115,10 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::s
     file << "digraph \"" << name << "\" {\n";
   file << "  \"" << name << "\";\n";
 
-  std::map<std::string, DataStore::ModuleInfo>::const_iterator foundInfoIter = m_moduleInfo.find(name);
-  if (foundInfoIter != m_moduleInfo.end()) {
+  std::map<std::string, MInfo>::const_iterator foundInfoIter = m_map->getModuleInfoMap().find(name);
+  if (foundInfoIter != m_map->getModuleInfoMap().end()) {
     const MInfo& moduleInfo = foundInfoIter->second;
-    for (int i = 0; i < MInfo::c_NEntryTypes; i++) {
+    for (int i = 0; i < DependencyMap::c_NEntryTypes; i++) {
       const std::set<std::string>& entries = moduleInfo.entries[i];
       const std::set<std::string>& relations = moduleInfo.relations[i];
       const std::string fillcolor = m_fillcolor[i];
@@ -126,7 +127,7 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const std::s
       for (std::set<std::string>::const_iterator setit = entries.begin(); setit != entries.end(); ++setit) {
         if (!steeringFileFlow)
           file << "  \"" << *setit << "\" [shape=box,style=filled,fillcolor=" << fillcolor << "];\n";
-        if (i == MInfo::c_Output) {
+        if (i == DependencyMap::c_Output) {
           m_allOutputs.insert(*setit);
           file << "  \"" << name << "\" -> \"" << *setit << "\" [color=" << arrowcolor << "];\n";
         } else {
@@ -176,12 +177,12 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
   //may throw some ERRORs, but that's OK.
   // TODO:(ignore missing inputs)
   gearboxPtr->initialize();
-  DataStore::Instance().setModule(modulePtr->getName());
+  DataStore::Instance().getDependencyMap().setModule(modulePtr->getName());
   modulePtr->initialize();
 
   // create plot
   const std::string filename = module + ".dot";
-  DataFlowVisualization v(DataStore::Instance().getModuleInfoMap());
+  DataFlowVisualization v(&DataStore::Instance().getDependencyMap());
   std::ofstream file(filename.c_str());
   v.generateModulePlot(file, module, false);
 
@@ -190,9 +191,9 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
   gearboxPtr->terminate();
 }
 
-bool DataFlowVisualization::checkArrayUnknown(const std::string& name, const DataStore::ModuleInfo& info)
+bool DataFlowVisualization::checkArrayUnknown(const std::string& name, const MInfo& info)
 {
-  for (int i = 0; i < MInfo::c_NEntryTypes; i++) {
+  for (int i = 0; i < DependencyMap::c_NEntryTypes; i++) {
     if (info.entries[i].count(name) != 0)
       return false; //found
   }

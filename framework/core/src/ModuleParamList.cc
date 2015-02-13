@@ -14,6 +14,7 @@
 #include <framework/core/ModuleParamList.h>
 
 #include <framework/core/ModuleParamInfoPython.h>
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -33,13 +34,10 @@ ModuleParamList::~ModuleParamList()
 
 bool ModuleParamList::hasUnsetForcedParams() const
 {
-  map<string, ModuleParamPtr>::const_iterator mapIter;
-
-  for (mapIter = m_paramMap.begin(); mapIter != m_paramMap.end(); ++mapIter) {
-    if ((mapIter->second->isForcedInSteering()) && (!mapIter->second->isSetInSteering())) return true;
-  }
-
-  return false;
+  return any_of(m_paramMap.begin(), m_paramMap.end(),
+  [](const pair<string, ModuleParamPtr>& mapEntry) {
+    return mapEntry.second->isForcedInSteering() && !mapEntry.second->isSetInSteering();
+  });
 }
 
 boost::python::list* ModuleParamList::getParamInfoListPython() const

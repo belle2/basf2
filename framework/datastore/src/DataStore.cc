@@ -12,6 +12,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationEntry.h>
+#include <framework/datastore/DependencyMap.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationIndexManager.h>
@@ -108,7 +109,7 @@ DataStore& DataStore::Instance()
 }
 
 
-DataStore::DataStore() : m_initializeActive(true)
+DataStore::DataStore() : m_initializeActive(true), m_dependencyMap(new DependencyMap)
 {
 }
 
@@ -118,13 +119,13 @@ DataStore::~DataStore()
     //release all memory in data store
     reset();
   }
+  delete m_dependencyMap;
 }
 
 void DataStore::reset()
 {
   m_initializeActive = true;
-  m_currentModule = "";
-  m_moduleInfo.clear();
+  m_dependencyMap->clear();
 
   for (int i = 0; i < c_NDurabilityTypes; i++)
     reset((EDurability)i);
@@ -198,8 +199,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
   const bool dontwriteout = storeFlags & c_DontWriteOut;
 
   //add to current module's outputs
-  ModuleInfo& info = m_moduleInfo[m_currentModule];
-  info.addEntry(name, ModuleInfo::c_Output, (objClass == RelationContainer::Class()));
+  m_dependencyMap->getCurrentModuleInfo().addEntry(name, DependencyMap::c_Output, (objClass == RelationContainer::Class()));
 
   // Check whether the map entry already exists
   const auto& it = m_storeEntryMap[durability].find(name);
@@ -616,6 +616,12 @@ std::vector<std::string> DataStore::getListOfRelatedArrays(const StoreAccessorBa
 
   return arrays;
 }
+std::vector<std::string> DataStore::getListOfArrays(const TClass* arrayClass, EDurability durability) const
+{
+  std::vector<std::string> arrays;
+  getArrayNames(arrays, "ALL", arrayClass, durability);
+  return arrays;
+}
 
 void DataStore::invalidateData(EDurability durability)
 {
@@ -628,8 +634,7 @@ void DataStore::invalidateData(EDurability durability)
 bool DataStore::requireInput(const StoreAccessorBase& accessor)
 {
   if (m_initializeActive) {
-    ModuleInfo& info = m_moduleInfo[m_currentModule];
-    info.addEntry(accessor.getName(), ModuleInfo::c_Input, (accessor.getClass() == RelationContainer::Class()));
+    m_dependencyMap->getCurrentModuleInfo().addEntry(accessor.getName(), DependencyMap::c_Input, (accessor.getClass() == RelationContainer::Class()));
   }
 
   if (!getEntry(accessor)) {
@@ -642,8 +647,7 @@ bool DataStore::requireInput(const StoreAccessorBase& accessor)
 bool DataStore::optionalInput(const StoreAccessorBase& accessor)
 {
   if (m_initializeActive) {
-    ModuleInfo& info = m_moduleInfo[m_currentModule];
-    info.addEntry(accessor.getName(), ModuleInfo::c_OptionalInput, (accessor.getClass() == RelationContainer::Class()));
+    m_dependencyMap->getCurrentModuleInfo().addEntry(accessor.getName(), DependencyMap::c_OptionalInput, (accessor.getClass() == RelationContainer::Class()));
   }
 
   return (getEntry(accessor) != nullptr);

@@ -8,7 +8,8 @@
     <xi:include href="ARICH-Mirrors.xml"/>
     <xi:include href="ARICH-QEsuperbialkali.xml"/>
     <xi:include href="ARICH-ModuleInfo.xml"/>
-    
+    <xi:include href="ARICH-FrontEndMapping.xml"/>
+  
     <Envelope>
       <zFront desc="Starting z position of aRICH envelope" unit="mm">1668</zFront>
       <zBack desc="Ending z position of aRICH envelope" unit="mm">1950</zBack>

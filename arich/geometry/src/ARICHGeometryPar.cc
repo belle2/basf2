@@ -56,6 +56,7 @@ namespace Belle2 {
     } else {
       modulesPosition(content);
       mirrorPositions();
+      frontEndMapping(content);
     }
     chipLocPosition();
     padPositions();
@@ -149,6 +150,91 @@ namespace Belle2 {
       m_NpointsQE++;
       m_QE[i] = qe.getDouble("qe");
     }
+  }
+
+  void ARICHGeometryPar::frontEndMapping(const GearDir& content)
+  {
+
+    GearDir mapping(content, "FrontEndMapping");
+
+    for (const GearDir & merger : mapping.getNodes("Merger")) {
+      unsigned mergerID = (unsigned) merger.getInt("@id");
+
+      auto testMer = m_mergerIDs.find(mergerID);
+      if (testMer != m_mergerIDs.end()) {
+        B2ERROR(mapping.getPath() << "/MergerID " << mergerID <<
+                " ***input already used");
+      }
+
+      m_mergerIDs.insert(mergerID);
+
+      std::vector<unsigned> boardIDs;
+      for (const GearDir & board : merger.getNodes("FEboards/FEboard")) {
+        unsigned boardID = board.getInt();
+        auto testBor = m_boardIDs.find(boardID);
+        if (testBor != m_boardIDs.end()) {
+          B2ERROR(mapping.getPath() << "/FEboardID " << boardID <<
+                  " ***input already used");
+        }
+        boardIDs.push_back(boardID);
+        m_boardIDs.insert(boardID);
+      }
+      m_merger2feb.insert(std::pair<int, std::vector<unsigned>>(mergerID, boardIDs));
+      unsigned copperID = (unsigned) merger.getInt("COPPERid");
+      string finesseSlot = merger.getString("FinesseSlot");
+      int finesse = 0;
+      if (finesseSlot == "A") {finesse = 0;}
+      else if (finesseSlot == "B") {finesse = 1;}
+      else if (finesseSlot == "C") {finesse = 2;}
+      else if (finesseSlot == "D") {finesse = 3;}
+      else {
+        B2ERROR(merger.getPath() << "/FinesseSlot " << finesseSlot <<
+                " ***invalid slot (valid are A, B, C, D)");
+        continue;
+      }
+
+      m_copperIDs.insert(copperID);
+
+      std::pair<unsigned, int> copfin(copperID, finesse);
+      m_copper2merger.insert(std::pair<std::pair<unsigned, int>, unsigned>(copfin, mergerID));
+
+    }
+
+  }
+
+  int ARICHGeometryPar::getMergerFromCooper(int copperID, int finesse)
+  {
+    auto merger = m_copper2merger.find(std::pair<unsigned, int>(copperID, finesse));
+    if (merger == m_copper2merger.end()) {
+      // B2INFO("getMergerFromCooper: " << " copper " << copperID << ", finesse "
+      //       << finesse << " is not assigned to any merger board");
+      return 0;
+    }
+
+    return merger->second;
+  }
+
+  int ARICHGeometryPar::getBoardFromMerger(int mergerID, int slot)
+  {
+    auto boards = m_merger2feb.find(mergerID);
+    if (boards == m_merger2feb.end()) {
+      B2ERROR("getBoardFromMerger: " << " merger " << mergerID << " is not mapped");
+      return -1;
+    }
+    if ((boards->second).size() <= unsigned(slot)) {
+      B2ERROR("getBoardFromMerger: " << " merger " << mergerID << " slot " << slot << " is not assigned to FE board.");
+      return -1;
+    }
+    return (boards->second).at(slot);
+  }
+
+  int ARICHGeometryPar::getNBoardsOnMerger(int mergerID)
+  {
+    auto boards = m_merger2feb.find(mergerID);
+    if (boards == m_merger2feb.end()) {
+      B2ERROR("getNBoardsOnMerger: " << " merger " << mergerID << " is not mapped");
+    }
+    return (boards->second).size();
   }
 
   void ARICHGeometryPar::readModuleInfo(const GearDir& content)

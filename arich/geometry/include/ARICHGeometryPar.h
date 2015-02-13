@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <unordered_set>
 #include <framework/gearbox/GearDir.h>
 #include "TVector3.h"
 #include "TVector2.h"
@@ -143,6 +144,17 @@ namespace Belle2 {
     void setActive(int module, int channel,  bool val);
     //! check the activity of the channel
     bool isActive(int module, int channel);
+
+    int getMergerFromCooper(int cooperID, int finesse);
+    int getBoardFromMerger(int mergerID, int slot);
+    int getNBoardsOnMerger(int mergerID);
+
+    //! Return a set of copper ID's
+
+    const std::unordered_set<unsigned int>& getCopperIDs() const {
+      return m_copperIDs;
+    }
+
   private:
 
     std::string m_version;       /*!< The version of geometry parameters. */
@@ -198,6 +210,8 @@ namespace Belle2 {
     //! Gets mirrors positions directly from xml file (in case of simple "beamtest" geometry).
     void mirrorPositionSimple(const GearDir& content);
 
+    void frontEndMapping(const GearDir& content);
+
     static ARICHGeometryPar* p_B4ARICHGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
     // vectors holding information on HAPDs and chips and pads positions.
@@ -214,6 +228,12 @@ namespace Belle2 {
     std::vector<TVector2> m_padWorldPositions; /*!< map holding channel global positions  */
     std::vector<TVector3> m_mirrornorm;       /*!< vector holding normal vectors of mirror plates */
     std::vector<TVector3> m_mirrorpoint;      /*!< vector holding one point of each mirror plate */
+
+    std::map<std::pair<unsigned, int>, unsigned> m_copper2merger;
+    std::map<int, std::vector<unsigned>> m_merger2feb;
+    std::unordered_set<unsigned int> m_copperIDs; /**< COPPER ID's */
+    std::unordered_set<unsigned int> m_mergerIDs; /**< Merger ID's */
+    std::unordered_set<unsigned int> m_boardIDs; /**< FEB ID's */
 
   };
 

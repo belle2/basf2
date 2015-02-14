@@ -89,8 +89,8 @@ const std::vector<const Belle2::SpacePoint*> SpacePointTrackCand::getHitsInRange
     throw SPTCIndexOutOfBounds();
   }
   std::vector<const SpacePoint*> spacePoints;
-  for (int iSP = firstInd; iSP <= lastInd; ++iSP) {
-    spacePoints.push_back(m_trackSpacePoints[iSP]);
+  for (int iSP = firstInd; iSP < lastInd; ++iSP) {
+    spacePoints.push_back(m_trackSpacePoints.at(iSP));
   }
   return spacePoints;
 }
@@ -108,8 +108,8 @@ const std::vector<double> SpacePointTrackCand::getSortingParametersInRange(int f
     throw SPTCIndexOutOfBounds();
   }
   std::vector<double> sortingParams;
-  for (int iSP = firstIndex; iSP <= lastIndex; ++iSP) {
-    sortingParams.push_back(m_sortingParameters[iSP]);
+  for (int iSP = firstIndex; iSP < lastIndex; ++iSP) {
+    sortingParams.push_back(m_sortingParameters.at(iSP));
   }
   return sortingParams;
 }

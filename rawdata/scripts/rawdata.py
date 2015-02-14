@@ -91,6 +91,11 @@ def add_packers(path, components=None):
         toppacker = register_module('TOPPacker')
         path.add_module(toppacker)
 
+    # ARICH
+    if components == None or 'ARICH' in components:
+        arichpacker = register_module('ARICHPacker')
+        path.add_module(arichpacker)
+
     # BKLM
     if components == None or 'BKLM' in components:
         bklmpacker = register_module('BKLMRawPacker')
@@ -121,6 +126,11 @@ def add_unpackers(path, components=None):
     if components == None or 'TOP' in components:
         topunpacker = register_module('TOPUnpacker')
         path.add_module(topunpacker)
+
+    # ARICH
+    if components == None or 'ARICH' in components:
+        arichunpacker = register_module('ARICHUnpacker')
+        path.add_module(arichunpacker)
 
     # BKLM
     if components == None or 'BKLM' in components:

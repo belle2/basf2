@@ -8,16 +8,15 @@ from rawdata import add_packers, add_raw_output
 main = create_path()
 
 # input
-# main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('rawdata/tests/digits.root'))
-# main.add_module('RootInput', inputFileName='digits.root')
 input = register_module('RootInput')
-input.param('inputFileNames', 'digits.root')
+input.param('inputFileNames', Belle2.FileSystem.findFile('rawdata/tests/digits.root'))
 main.add_module(input)
 
 # gearbox
-# main.add_module('Gearbox')
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
+main.add_module('Gearbox')
+
+# geometry, needed by arich
+main.add_module('Geometry')
 
 # conversion from digits to raw data
 add_packers(main)

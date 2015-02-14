@@ -38,9 +38,10 @@ namespace Belle2 {
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
+     * @param neuProc boolean which tells whether or not a process was a neutron process
      */
-    He3tubeSimHit(float energyDep, float energyNiel, int tkPDG, float tkKEnergy, float detNb, float GlTime, const float* tkPos, const float* tkMom, const float* tkMomDir):
-      SimHitBase(), m_energyDep(energyDep), m_energyNiel(energyNiel), m_tkPDG(tkPDG), m_tkKEnergy(tkKEnergy), m_detNb(detNb), m_GlTime(GlTime) {
+    He3tubeSimHit(float energyDep, float energyNiel, int tkPDG, float tkKEnergy, float detNb, float GlTime, const float* tkPos, const float* tkMom, const float* tkMomDir, bool neuProc):
+      SimHitBase(), m_energyDep(energyDep), m_energyNiel(energyNiel), m_tkPDG(tkPDG), m_tkKEnergy(tkKEnergy), m_detNb(detNb), m_GlTime(GlTime), m_neuProc(neuProc) {
       std::copy(tkPos, tkPos + 3, m_tkPos);
       std::copy(tkMom, tkMom + 3, m_tkMom);
       std::copy(tkMomDir, tkMomDir + 3, m_tkMomDir);
@@ -49,12 +50,12 @@ namespace Belle2 {
     /** Return the energy deposition in electrons */
     float getEnergyDep()      const { return m_energyDep; }
     /** Return the non-ionization energy in electrons */
-    float getEnergyNiel()     const { return m_energyNiel; }
+    float getEnergyNiel()    const { return m_energyNiel; }
     /** Return the PDG number of the track */
     int gettkPDG()           const { return m_tkPDG; }
     /** Return the kinetic energy of the track */
     float gettkKEnergy()  const { return m_tkKEnergy; }
-    /** Return the TPC number */
+    /** Return the He3tube number */
     float getdetNb()  const { return m_detNb; }
     /** Return the global time */
     float getGlTime()  const { return m_GlTime; }
@@ -70,6 +71,8 @@ namespace Belle2 {
     const float* getrkDirArray() const { return m_tkMom; }
     /** Return track momentum direction as float array */
     const float* getrkMomDirArray() const { return m_tkMomDir; }
+    /** Return whether or not the creator process was a neutron type */
+    bool getNeuProcess() {return m_neuProc;}
 
 
   private:
@@ -91,6 +94,8 @@ namespace Belle2 {
     float m_tkMom[3];
     /** track momentum direction */
     float m_tkMomDir[3];
+    /** true if creator process was a neutron type */
+    bool m_neuProc;
 
 
     ClassDef(He3tubeSimHit, 1)

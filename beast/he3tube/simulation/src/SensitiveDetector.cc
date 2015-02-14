@@ -18,6 +18,8 @@
 
 #include <G4Track.hh>
 #include <G4Step.hh>
+#include "G4VProcess.hh"
+
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the HE3TUBE detector */
@@ -77,6 +79,15 @@ namespace Belle2 {
       StoreArray<He3tubeSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
 
+      //find out if the process that created the particle was a neutron process
+      bool neuProc = false;
+      G4String CPName;
+      if (step->GetTrack()->GetCreatorProcess() != 0) {
+        const  G4VProcess* creator = step->GetTrack()->GetCreatorProcess();
+        CPName = creator->GetProcessName();
+        if (CPName.contains("Neutron")) neuProc = true;
+      }
+
       StoreArray<He3tubeSimHit> He3tubeHits;
       if (!He3tubeHits.isValid()) He3tubeHits.create();
       He3tubeSimHit* hit = He3tubeHits.appendNew(
@@ -88,7 +99,8 @@ namespace Belle2 {
                              GlTime,
                              tkPos,
                              tkMom,
-                             tkMomDir
+                             tkMomDir,
+                             neuProc
                            );
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since

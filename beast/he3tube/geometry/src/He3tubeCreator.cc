@@ -81,11 +81,6 @@ namespace Belle2 {
 
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
-      vector<double> bar = content.getArray("bar");
-      B2INFO("Contents of bar: ");
-      BOOST_FOREACH(double value, bar) {
-        B2INFO("value: " << value);
-      }
       int detID = 0;
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {

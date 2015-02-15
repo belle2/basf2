@@ -66,7 +66,8 @@ namespace Belle2 {
       SimpleKalman,
       RefKalman,
       DafSimple,
-      DafRef
+      DafRef,
+      Gbl
     };
 
 

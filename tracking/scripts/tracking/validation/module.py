@@ -150,7 +150,7 @@ class TrackingValidationModule(basf2.Module):
         trackMatchLookUp = self.trackMatchLookUp
 
         trackCands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
-        mcParticles = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
+        mcParticles = Belle2.PyStoreArray("MCParticles")
         if not trackCands:
             return
 

@@ -133,6 +133,24 @@ namespace Belle2 {
         std::vector<double> cleanCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of clean tracks reconstructed by the CATF */
         std::vector<double> completeCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of full tracks reconstructed by the CATF */
 
+        std::vector<double> totalMCVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks reconstructed by the MCTF */
+        std::vector<double> totalCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks reconstructed by the CATF */
+        std::vector<double> cleanCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
+        std::vector<double> completeCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of full tracks reconstructed by the CATF */
+        std::vector<double> totalVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
+
+        std::vector<double> totalMCVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks reconstructed by the MCTF */
+        std::vector<double> totalCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks reconstructed by the CATF */
+        std::vector<double> cleanCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
+        std::vector<double> completeCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of full tracks reconstructed by the CATF */
+        std::vector<double> totalVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
+
+        std::vector<double> totalMCVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks reconstructed by the MCTF */
+        std::vector<double> totalCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks reconstructed by the CATF */
+        std::vector<double> cleanCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
+        std::vector<double> completeCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of full tracks reconstructed by the CATF */
+        std::vector<double> totalVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
+
         std::vector<double> totalCAMomResidualAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of tracks reconstructed by the CATF */
         std::vector<double> cleanCAMomResidualAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of clean tracks reconstructed by the CATF */
         std::vector<double> completeCAMomResidualAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of full tracks reconstructed by the CATF */
@@ -344,6 +362,26 @@ namespace Belle2 {
       std::vector<double> m_rootTotalCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of tracks reconstructed by the CATF */
       std::vector<double> m_rootCleanCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of clean tracks reconstructed by the CATF */
       std::vector<double> m_rootCompleteCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of full tracks reconstructed by the CATF */
+
+
+      std::vector<double> m_rootTotalMCVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks reconstructed by the MCTF */
+      std::vector<double> m_rootTotalCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks reconstructed by the CATF */
+      std::vector<double> m_rootCleanCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
+      std::vector<double> m_rootCompleteCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of full tracks reconstructed by the CATF */
+      std::vector<double> m_rootTotalVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
+
+      std::vector<double> m_rootTotalMCVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks reconstructed by the MCTF */
+      std::vector<double> m_rootTotalCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks reconstructed by the CATF */
+      std::vector<double> m_rootCleanCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
+      std::vector<double> m_rootCompleteCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of full tracks reconstructed by the CATF */
+      std::vector<double> m_rootTotalVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
+
+      std::vector<double> m_rootTotalMCVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks reconstructed by the MCTF */
+      std::vector<double> m_rootTotalCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks reconstructed by the CATF */
+      std::vector<double> m_rootCleanCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
+      std::vector<double> m_rootCompleteCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of full tracks reconstructed by the CATF */
+      std::vector<double> m_rootTotalVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
+
 
       std::vector<double> m_rootTotalCAMomResidualsAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of tracks reconstructed by the CATF */
       std::vector<double> m_rootCleanCAMomResidualsAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of clean tracks reconstructed by the CATF */

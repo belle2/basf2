@@ -174,6 +174,24 @@ void TFAnalizerModule::initialize()
     m_treePtr->Branch("CompleteCAPhiValues", &m_rootCompleteCAPhiValues);
     m_treePtr->Branch("TotalPhiValues", &m_rootTotalPhiValues);
 
+    m_treePtr->Branch("TotalMCVertex2IP3DValues", &m_rootTotalMCVertex2IP3DValues);
+    m_treePtr->Branch("TotalCAVertex2IP3DValues", &m_rootTotalCAVertex2IP3DValues);
+    m_treePtr->Branch("CleanCAVertex2IP3DValues", &m_rootCleanCAVertex2IP3DValues);
+    m_treePtr->Branch("CompleteCAVertex2IP3DValues", &m_rootCompleteCAVertex2IP3DValues);
+    m_treePtr->Branch("TotalVertex2IP3DValues", &m_rootTotalVertex2IP3DValues);
+
+    m_treePtr->Branch("TotalMCVertex2IPXYValues", &m_rootTotalMCVertex2IPXYValues);
+    m_treePtr->Branch("TotalCAVertex2IPXYValues", &m_rootTotalCAVertex2IPXYValues);
+    m_treePtr->Branch("CleanCAVertex2IPXYValues", &m_rootCleanCAVertex2IPXYValues);
+    m_treePtr->Branch("CompleteCAVertex2IPXYValues", &m_rootCompleteCAVertex2IPXYValues);
+    m_treePtr->Branch("TotalVertex2IPXYValues", &m_rootTotalVertex2IPXYValues);
+
+    m_treePtr->Branch("TotalMCVertex2IPZValues", &m_rootTotalMCVertex2IPZValues);
+    m_treePtr->Branch("TotalCAVertex2IPZValues", &m_rootTotalCAVertex2IPZValues);
+    m_treePtr->Branch("CleanCAVertex2IPZValues", &m_rootCleanCAVertex2IPZValues);
+    m_treePtr->Branch("CompleteCAVertex2IPZValues", &m_rootCompleteCAVertex2IPZValues);
+    m_treePtr->Branch("TotalVertex2IPZValues", &m_rootTotalVertex2IPZValues);
+
     m_treePtr->Branch("TotalCAThetaResiduals", &m_rootTotalCAThetaResiduals);
     m_treePtr->Branch("CleanCAThetaResiduals", &m_rootCleanCAThetaResiduals);
     m_treePtr->Branch("CompleteCAThetaResiduals", &m_rootCompleteCAThetaResiduals);
@@ -433,6 +451,24 @@ void TFAnalizerModule::event()
     m_rootCleanCAPhiResiduals = rootVariables.cleanCAPhiResiduals;
     m_rootCompleteCAPhiResiduals = rootVariables.completeCAPhiResiduals;
 
+    m_rootTotalMCVertex2IP3DValues = rootVariables.totalMCVertex2IP3DValues;
+    m_rootTotalCAVertex2IP3DValues = rootVariables.totalCAVertex2IP3DValues;
+    m_rootCleanCAVertex2IP3DValues = rootVariables.cleanCAVertex2IP3DValues;
+    m_rootCompleteCAVertex2IP3DValues = rootVariables.completeCAVertex2IP3DValues;
+    m_rootTotalVertex2IP3DValues = rootVariables.totalVertex2IP3DValues;
+
+    m_rootTotalMCVertex2IPXYValues = rootVariables.totalMCVertex2IPXYValues;
+    m_rootTotalCAVertex2IPXYValues = rootVariables.totalCAVertex2IPXYValues;
+    m_rootCleanCAVertex2IPXYValues = rootVariables.cleanCAVertex2IPXYValues;
+    m_rootCompleteCAVertex2IPXYValues = rootVariables.completeCAVertex2IPXYValues;
+    m_rootTotalVertex2IPXYValues = rootVariables.totalVertex2IPXYValues;
+
+    m_rootTotalMCVertex2IPZValues = rootVariables.totalMCVertex2IPZValues;
+    m_rootTotalCAVertex2IPZValues = rootVariables.totalCAVertex2IPZValues;
+    m_rootCleanCAVertex2IPZValues = rootVariables.cleanCAVertex2IPZValues;
+    m_rootCompleteCAVertex2IPZValues = rootVariables.completeCAVertex2IPZValues;
+    m_rootTotalVertex2IPZValues = rootVariables.totalVertex2IPZValues;
+
     m_rootTotalCAMomResidualsAngles = rootVariables.totalCAMomResidualAngles;
     m_rootCleanCAMomResidualsAngles = rootVariables.cleanCAMomResidualAngles;
     m_rootCompleteCAMomResidualsAngles = rootVariables.completeCAMomResidualAngles;
@@ -632,6 +668,9 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
       rootVariables.completeCApTValues.push_back(mcTC.pTValue);
       rootVariables.completeCAThetaValues.push_back(thetaMC);
       rootVariables.completeCAPhiValues.push_back(phiMC);
+      rootVariables.completeCAVertex2IP3DValues.push_back(mcTC.vertex.Mag());
+      rootVariables.completeCAVertex2IPXYValues.push_back(mcTC.vertex.Perp());
+      rootVariables.completeCAVertex2IPZValues.push_back(mcTC.vertex.Z());
 
       rootVariables.completeCAMomResiduals.push_back(mcTC.pValue - caTC.pValue);
       rootVariables.completeCApTResiduals.push_back(mcTC.pTValue - caTC.pTValue);
@@ -655,6 +694,9 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
       rootVariables.cleanCApTValues.push_back(mcTC.pTValue);
       rootVariables.cleanCAThetaValues.push_back(thetaMC);
       rootVariables.cleanCAPhiValues.push_back(phiMC);
+      rootVariables.cleanCAVertex2IP3DValues.push_back(mcTC.vertex.Mag());
+      rootVariables.cleanCAVertex2IPXYValues.push_back(mcTC.vertex.Perp());
+      rootVariables.cleanCAVertex2IPZValues.push_back(mcTC.vertex.Z());
 
       rootVariables.cleanCAMomResiduals.push_back(mcTC.pValue - caTC.pValue);
       rootVariables.cleanCApTResiduals.push_back(mcTC.pTValue - caTC.pTValue);
@@ -684,6 +726,9 @@ void TFAnalizerModule::printInfo(int recoveryState, VXDTrackCandidate& mcTC, VXD
       rootVariables.totalCAThetaValues.push_back(thetaMC);
       rootVariables.totalCAPhiValues.push_back(phiMC);
       rootVariables.cAreconstructedTrackLength.push_back(caTC.coordinates.size());
+      rootVariables.totalCAVertex2IP3DValues.push_back(mcTC.vertex.Mag());
+      rootVariables.totalCAVertex2IPXYValues.push_back(mcTC.vertex.Perp());
+      rootVariables.totalCAVertex2IPZValues.push_back(mcTC.vertex.Z());
 
       rootVariables.totalCAMomResiduals.push_back(mcTC.pValue - caTC.pValue);
       rootVariables.totalCApTResiduals.push_back(mcTC.pTValue - caTC.pTValue);
@@ -755,6 +800,11 @@ void TFAnalizerModule::printMC(bool type, VXDTrackCandidate& mcTC, RootVariables
     rootVariables.totalMCThetaValues.push_back(theta);
     rootVariables.totalMCPhiValues.push_back(phi);
     rootVariables.mCreconstructedTrackLength.push_back(mcTC.coordinates.size());
+
+    rootVariables.totalMCVertex2IP3DValues.push_back(mcTC.vertex.Mag());
+    rootVariables.totalMCVertex2IPXYValues.push_back(mcTC.vertex.Perp());
+    rootVariables.totalMCVertex2IPZValues.push_back(mcTC.vertex.Z());
+
   }
 
   if (m_PARAMprintExtentialAnalysisData == true) {

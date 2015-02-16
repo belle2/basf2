@@ -70,6 +70,12 @@ namespace Belle2 {
     StoreArray<ARICHDigit> digits;
     digits.registerInDataStore();
 
+    if (!m_arichgp->isInit()) {
+      GearDir content("/Detector/DetectorComponent[@name='ARICH']/Content");
+      m_arichgp->Initialize(content);
+    }
+    if (!m_arichgp->isInit()) B2ERROR("Component ARICH not found in Gearbox");
+
   }
 
   void ARICHUnpackerModule::beginRun()

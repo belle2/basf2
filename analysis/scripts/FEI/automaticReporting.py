@@ -17,6 +17,9 @@ from string import Template
 
 
 def removeJPsiSlash(filename):
+    """
+    Removes the character / from the given filename
+    """
     return filename.replace('/', '')
 
 

@@ -21,19 +21,13 @@ import pdg
 import actorFramework
 import preCutDetermination
 import automaticReporting
+from automaticReporting import removeJPsiSlash
 
 import re
 import os
 import subprocess
 import json
 from string import Template
-
-
-def removeJPsiSlash(filename):
-    """
-    Removes the character / from the given filename
-    """
-    return filename.replace('/', '')
 
 
 def CountMCParticles(path, names, gearbox):

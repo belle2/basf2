@@ -1,11 +1,14 @@
 from FEI import Particle
 
 
-def get_default_channnels(BlevelExtraCut=''):
+def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True):
     """
-    returns list of Particle objects with all default channels for FEI.
-    For a training with analysis-specific signal selection, adding a cut on
-    nRemainingTracksInRestOfEvent is recommended.
+    returns list of Particle objects with all default channels for running
+    FEI on Upsilon(4S). For a training with analysis-specific signal selection,
+    adding a cut on nRemainingTracksInRestOfEvent is recommended.
+    @param neutralB wether to include B0
+    @param chargedB wether to include B+
+    @param semileptonicB wether to include semileptonic B decays
     """
     hadronicBuserCut = 'Mbc > 5.2 and abs(deltaE) < 0.5'
     if BlevelExtraCut != '':
@@ -368,7 +371,8 @@ def get_default_channnels(BlevelExtraCut=''):
     p.addChannel(['J/psi', 'K+', 'pi+', 'pi-'])
     p.addChannel(['J/psi', 'K+', 'pi0'])
     p.addChannel(['J/psi', 'K_S0', 'pi+'])
-    particles.append(p)
+    if chargedB:
+        particles.append(p)
 
     mva_BPlusSemileptonic = Particle.MVAConfiguration(
         variables=[
@@ -395,7 +399,8 @@ def get_default_channnels(BlevelExtraCut=''):
     p.addChannel(['D-', 'pi+', 'mu+'])
     p.addChannel(['D*-', 'pi+', 'e+'])
     p.addChannel(['D*-', 'pi+', 'mu+'])
-    particles.append(p)
+    if chargedB and semileptonicB:
+        particles.append(p)
 
 # #################################  B0 #################################
     mva_B0 = Particle.MVAConfiguration(
@@ -440,7 +445,8 @@ def get_default_channnels(BlevelExtraCut=''):
     p.addChannel(['J/psi', 'K_S0'])
     p.addChannel(['J/psi', 'K+', 'pi-'])
     p.addChannel(['J/psi', 'K_S0', 'pi+', 'pi-'])
-    particles.append(p)
+    if neutralB:
+        particles.append(p)
 
     mva_B0Semileptonic = Particle.MVAConfiguration(
         variables=[
@@ -466,6 +472,7 @@ def get_default_channnels(BlevelExtraCut=''):
     p.addChannel(['anti-D0', 'pi-', 'mu+'])
     p.addChannel(['anti-D*0', 'pi-', 'e+'])
     p.addChannel(['anti-D*0', 'pi-', 'mu+'])
-    particles.append(p)
+    if neutralB and semileptonicB:
+        particles.append(p)
 
     return particles

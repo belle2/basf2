@@ -4,12 +4,19 @@
 import sys
 import os
 
+# Get Belle2 environment variables
+try:
+    LOCAL_DIR = os.environ["BELLE2_LOCAL_DIR"]
+    VIRTUAL_ENV = os.environ["VIRTUAL_ENV"]
+except KeyError:
+    print "Belle II software not correctly set up, aborting"
+    sys.exit(1)
+
 # this script only works with python > 2.7,
 # but git can prepend /usr/bin to PATH!
 if sys.hexversion < 0x02070600:
     # but we know where our python version should reside, so let's call
     # ourselves with the newer interpreter
-    VIRTUAL_ENV = os.environ["VIRTUAL_ENV"]
     from subprocess import call
     args = [VIRTUAL_ENV + '/bin/python'] + sys.argv
     ret = call(args)
@@ -59,13 +66,6 @@ def find_svnrevision(commit="HEAD"):
 
     return None
 
-
-# Get Belle2 environment variables
-try:
-    LOCAL_DIR = os.environ["BELLE2_LOCAL_DIR"]
-except KeyError:
-    print "Belle II software not correctly set up, aborting"
-    sys.exit(1)
 
 # Checking all folders takes far to long, lets provide a list of dirs to check
 # as environment variable

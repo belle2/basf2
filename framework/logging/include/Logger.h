@@ -14,7 +14,6 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogSystem.h>
-#include <framework/logging/LogMethod.h>
 
 #include <sstream>
 
@@ -125,19 +124,6 @@
       B2FATAL(message) \
     } \
   }
-#endif
-
-/**
- * \def B2METHOD()
- * scoped logging for entering/leaving methods.
- * Use this in a code block (curly braces) to get a B2INFO mesage
- * at the point where B2METHOD is used, and again when execution
- * leaves the current block.
- */
-#ifdef LOG_NO_B2METHOD
-#define B2METHOD()
-#else
-#define B2METHOD() Belle2::LogMethod logMethod(PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
 #endif
 
 #endif  // LOGGER_H

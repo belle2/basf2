@@ -11,6 +11,8 @@
 #ifndef LOGMETHOD_H_
 #define LOGMETHOD_H_
 
+#include <framework/logging/Logger.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -55,5 +57,19 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
+
+
+/**
+ * \def B2METHOD()
+ * scoped logging for entering/leaving methods.
+ * Use this in a code block (curly braces) to get a B2INFO mesage
+ * at the point where B2METHOD is used, and again when execution
+ * leaves the current block.
+ */
+#ifdef LOG_NO_B2METHOD
+#define B2METHOD()
+#else
+#define B2METHOD() Belle2::LogMethod logMethod(PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
+#endif
 
 #endif /* LOGMETHOD_H_ */

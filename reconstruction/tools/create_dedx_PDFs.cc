@@ -1,4 +1,5 @@
 #include <framework/gearbox/Const.h>
+#include <framework/io/RootIOUtilities.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <TFile.h>
@@ -35,13 +36,7 @@ int main(int argc, char* argv[])
     std::cerr << "If OUTPUT_FILE is not given, histograms will be drawn instead of being saved.\n";
     return 1;
   }
-  gSystem->Load("libgenfit2");
-  gSystem->Load("libtracking");
-  gSystem->Load("libvxd");
-  gSystem->Load("libpxd");
-  gSystem->Load("libsvd");
-  gSystem->Load("libcdc");
-  gSystem->Load("libdataobjects");
+  RootIOUtilities::loadDictionaries();
 
   const TString input_filename(argv[1]);
   TString output_filename;

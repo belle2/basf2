@@ -25,6 +25,7 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
+#include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -993,6 +994,96 @@ namespace Belle2 {
       return result;
     }
 
+    // TDCPV related ---------------------------------------------------------
+
+    double particleTagVx(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getTagVertex().X();
+
+      return result;
+    }
+
+    double particleTagVy(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getTagVertex().Y();
+
+      return result;
+    }
+
+    double particleTagVz(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getTagVertex().Z();
+
+      return result;
+    }
+
+    double particleDeltaT(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getDeltaT();
+
+      return result;
+    }
+
+    double particleMCDeltaT(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getMCDeltaT();
+
+      return result;
+    }
+
+    double particleDeltaZ(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = particle->getZ() - vert->getTagVertex().Z();
+
+      return result;
+    }
+
+    double particleDeltaB(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert) {
+        PCmsLabTransform T;
+        TVector3 boost = T.getBoostVector().BoostVector();
+        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+        double c = Const::speedOfLight / 1000.; // cm ps-1
+        result = vert->getDeltaT() * bg * c;
+      }
+      return result;
+    }
+
     // Recoil Kinematics related ---------------------------------------------
 
     double particleClassifiedFlavor(const Particle* particle)
@@ -1435,6 +1526,15 @@ namespace Belle2 {
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
     REGISTER_VARIABLE("nROEClusters", nROEClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
+
+    VARIABLE_GROUP("TDCPV");
+    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
+    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
+    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
+    REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T (Brec - Btag) in ps");
+    REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT, "Generated Delta T (Brec - Btag) in ps");
+    REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
+    REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");

@@ -13,6 +13,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 class TTree;
 class TClass;
@@ -20,11 +21,19 @@ class TClass;
 namespace Belle2 {
   /** Some constants and helpers common to the RootInput and RootOutput modules. */
   namespace RootIOUtilities {
-    /** Sorts stringlist alphabetically and removes any duplicates.
+    /** Given a list of input branches and lists of branches to include/exclude, returns a list of branches that are accepted.
      *
-     *  @return true, if duplicates are found
+     * More precisely, an item b from 'branchesToFilter' will be in the returned set if
+     * b not excludeBranches and (b in branches or empty(branches) or b in relationsBetweenAcceptedBranches)
+     *
+     * TODO: arrays listed in excludeBranches will still have their (not otherwise excluded) relations in the output. need to incorporate DataStore / Branch type information to make this work properly.
+     *
+     * @param branchesToFilter input
+     * @param branches if not empty, the list of branches (without relations) to be accepted
+     * @param excludeBranches branches that should never end up in output (takes precedence over everything else)
+     * @param durability Durability being filtered (used for messages only)
      */
-    bool makeBranchNamesUnique(std::vector<std::string>& stringlist);
+    std::set<std::string> filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability);
 
     /** return entry number with given (event, run, experiment) from tree. Returns -1 on error. */
     long getEntryNumberWithEvtRunExp(TTree* tree, long event, long run, long experiment);

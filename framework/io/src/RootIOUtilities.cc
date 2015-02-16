@@ -1,5 +1,6 @@
-#include <framework/modules/rootio/RootIOUtilities.h>
+#include <framework/io/RootIOUtilities.h>
 
+#include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 
 #include <RVersion.h>
@@ -15,20 +16,48 @@
 #include <algorithm>
 
 
+using namespace std;
 using namespace Belle2;
 
 const std::string RootIOUtilities::c_treeNames[] = { "tree", "persistent" };
 const std::string RootIOUtilities::c_SteerBranchNames[] = { "branchNames", "branchNamesPersistent" };
 const std::string RootIOUtilities::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesPersistent" };
 
-bool RootIOUtilities::makeBranchNamesUnique(std::vector<std::string>& stringlist)
+std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability)
 {
-  const size_t oldsize = stringlist.size();
-  sort(stringlist.begin(), stringlist.end());
-  stringlist.resize(unique(stringlist.begin(), stringlist.end()) - stringlist.begin());
+  //TODO also move check wether exclud/incl branch is in DS/tree
+  set<string> branchSet, excludeBranchSet;
+  for (string b : branches) {
+    if (!branchSet.insert(b).second)
+      B2WARNING(c_SteerBranchNames[durability] << " has duplicate entry " << b);
+  }
+  for (string b : excludeBranches) {
+    if (!excludeBranchSet.insert(b).second)
+      B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);
+  }
 
-  return (oldsize != stringlist.size());
+  set<string> out, relations;
+  for (string branch : branchesToFilter) {
+    if (excludeBranchSet.count(branch))
+      continue;
+    if (branchSet.empty() or branchSet.count(branch))
+      out.insert(branch);
+  }
+  //add relations between accepted branches
+  for (string from : out) {
+    for (string to : out) {
+      string branch = DataStore::relationName(from, to);
+      if (branchesToFilter.count(branch) == 0)
+        continue; //not in input
+      if (excludeBranchSet.count(branch))
+        continue;
+      relations.insert(branch);
+    }
+  }
+  out.insert(relations.begin(), relations.end());
+  return out;
 }
+
 
 long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long run, long experiment)
 {

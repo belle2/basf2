@@ -10,7 +10,7 @@
 
 #include <framework/modules/rootio/RootOutputModule.h>
 
-#include <framework/modules/rootio/RootIOUtilities.h>
+#include <framework/io/RootIOUtilities.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
@@ -83,39 +83,40 @@ void RootOutputModule::initialize()
   }
   m_file->SetCompressionLevel(m_compressionLevel);
 
-  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ii++) {
-    // check for duplicate branch names
-    if (makeBranchNamesUnique(m_branchNames[ii]))
-      B2WARNING(c_SteerBranchNames[ii] << " has duplicate entries.");
-    if (makeBranchNamesUnique(m_excludeBranchNames[ii]))
-      B2WARNING(c_SteerExcludeBranchNames[ii] << " has duplicate entries.");
-    //m_branchNames[ii] and it's exclusion list are now sorted alphabetically and unique
-
-    DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(ii));
+  for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {
+    DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
 
     //check for branch names that are not in the DataStore
-    for (unsigned int iBranch = 0; iBranch < m_branchNames[ii].size(); iBranch++) {
-      if (map.find(m_branchNames[ii][iBranch]) == map.end()) {
-        B2INFO("The branch " << m_branchNames[ii][iBranch] << " has no entry in the DataStore.");
+    for (unsigned int iBranch = 0; iBranch < m_branchNames[durability].size(); iBranch++) {
+      if (map.find(m_branchNames[durability][iBranch]) == map.end()) {
+        B2INFO("The branch " << m_branchNames[durability][iBranch] << " has no entry in the DataStore.");
       }
     }
-    for (unsigned int iBranch = 0; iBranch < m_excludeBranchNames[ii].size(); iBranch++) {
-      if (map.find(m_excludeBranchNames[ii][iBranch]) == map.end()) {
-        B2INFO("The excluded branch " << m_excludeBranchNames[ii][iBranch] << " has no entry in the DataStore.");
+    for (unsigned int iBranch = 0; iBranch < m_excludeBranchNames[durability].size(); iBranch++) {
+      if (map.find(m_excludeBranchNames[durability][iBranch]) == map.end()) {
+        B2INFO("The excluded branch " << m_excludeBranchNames[durability][iBranch] << " has no entry in the DataStore.");
       }
     }
 
+    set<string> branchList;
+    for (auto pair : map)
+      branchList.insert(pair.first);
+    //skip branches the user doesn't want
+    branchList = filterBranches(branchList, m_branchNames[durability], m_excludeBranchNames[durability], durability);
+
     //create the tree and branches
-    m_tree[ii] = new TTree(c_treeNames[ii].c_str(), c_treeNames[ii].c_str());
+    m_tree[durability] = new TTree(c_treeNames[durability].c_str(), c_treeNames[durability].c_str());
     for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
-      //skip transient entries, excluded branches, and branches not in m_branchNames (if it is not empty)
-      if ((iter->second.dontWriteOut && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||
-          binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
-          (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
+      //skip transient entries (allow overriding via branchNames)
+      if (iter->second.dontWriteOut && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end())
+        continue;
+      //skip branches the user doesn't want
+      if (branchList.count(branchName) == 0) {
         //make sure FileMetaData and EventMetaData are always included in the output
-        if (((branchName != "FileMetaData") || (ii == DataStore::c_Event)) &&
-            ((branchName != "EventMetaData") || (ii == DataStore::c_Persistent))) continue;
+        if (((branchName != "FileMetaData") || (durability == DataStore::c_Event)) &&
+            ((branchName != "EventMetaData") || (durability == DataStore::c_Persistent)))
+          continue;
       }
 
       TClass* entryClass = iter->second.object->IsA();
@@ -136,9 +137,9 @@ void RootOutputModule::initialize()
           static_cast<TClonesArray*>(iter->second.object)->BypassStreamer(kFALSE);
         }
       }
-      m_tree[ii]->Branch(branchName.c_str(), &iter->second.object, bufsize, splitLevel);
-      m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second.object);
-      m_entries[ii].push_back(&iter->second);
+      m_tree[durability]->Branch(branchName.c_str(), &iter->second.object, bufsize, splitLevel);
+      m_tree[durability]->SetBranchAddress(branchName.c_str(), &iter->second.object);
+      m_entries[durability].push_back(&iter->second);
       B2DEBUG(150, "The branch " << branchName << " was created.");
     }
   }
@@ -237,10 +238,10 @@ void RootOutputModule::terminate()
   //write the trees
   TDirectory* dir = gDirectory;
   m_file->cd();
-  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
-    if (m_tree[ii]) {
-      B2INFO("Write TTree " << c_treeNames[ii]);
-      m_tree[ii]->Write(c_treeNames[ii].c_str(), TObject::kWriteDelete);
+  for (int durability = 0; durability < DataStore::c_NDurabilityTypes; ++durability) {
+    if (m_tree[durability]) {
+      B2INFO("Write TTree " << c_treeNames[durability]);
+      m_tree[durability]->Write(c_treeNames[durability].c_str(), TObject::kWriteDelete);
     }
   }
   dir->cd();

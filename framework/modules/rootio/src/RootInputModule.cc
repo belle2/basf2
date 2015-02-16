@@ -11,7 +11,7 @@
 
 #include <framework/modules/rootio/RootInputModule.h>
 
-#include <framework/modules/rootio/RootIOUtilities.h>
+#include <framework/io/RootIOUtilities.h>
 #include <framework/core/InputController.h>
 #include <framework/pcore/Mergeable.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -108,14 +108,6 @@ void RootInputModule::initialize()
     delete f;
   }
   dir->cd();
-
-  for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
-    if (makeBranchNamesUnique(m_branchNames[ii]))
-      B2WARNING(c_SteerBranchNames[ii] << " has duplicate entries.");
-    if (makeBranchNamesUnique(m_excludeBranchNames[ii]))
-      B2WARNING(c_SteerExcludeBranchNames[ii] << " has duplicate entries.");
-    //m_branchNames[ii] and its exclusion list are now sorted alphabetically and unique
-  }
 
   //Get TTree
   m_persistent = new TChain(c_treeNames[DataStore::c_Persistent].c_str());
@@ -263,15 +255,22 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
   if (!branches) {
     B2FATAL("Tree '" << tree->GetName() << "' doesn't contain any branches!");
   }
+  set<string> branchList;
+  for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
+    TBranch* branch = static_cast<TBranch*>(branches->At(jj));
+    if (branch)
+      branchList.insert(branch->GetName());
+  }
+  //skip branches the user doesn't want
+  branchList = filterBranches(branchList, m_branchNames[durability], m_excludeBranchNames[durability], durability);
   for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
     TBranch* branch = static_cast<TBranch*>(branches->At(jj));
     if (!branch) continue;
     const std::string branchName = branch->GetName();
     //skip already connected branches
-    if (m_connectedBranches[durability].find(branchName) != m_connectedBranches[durability].end()) continue;
-    //skip excluded branches, and branches not in m_branchNames (if it is not empty)
-    if (binary_search(m_excludeBranchNames[durability].begin(), m_excludeBranchNames[durability].end(), branchName) ||
-        (!m_branchNames[durability].empty() && !binary_search(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName))) {
+    if (m_connectedBranches[durability].find(branchName) != m_connectedBranches[durability].end())
+      continue;
+    if (branchList.count(branchName) == 0) {
       //make sure FileMetaData and EventMetaData of the main file are always loaded
       if (((branchName != "FileMetaData") || (tree != m_persistent)) &&
           ((branchName != "EventMetaData") || (tree != m_tree))) {

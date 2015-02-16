@@ -132,8 +132,16 @@ namespace Belle2 {
 
     const Belle2::SpacePoint* getSingleClusterSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the single cluster SVD SpacePoint */
 
-    bool trueHitsAreGood(std::vector<const SVDCluster*> clusters); /**< check if TrueHit is present (if only one Cluster is passed), or if all passed Cluster point to the same TrueHit */
-    bool trueHitsAreGood(std::vector<const PXDCluster*> clusters); /**< check if TrueHit is present */
+    // TODO TODO TODO TODO TODO CLEAN UP
+
+//     bool trueHitsAreGood(std::vector<const SVDCluster*> clusters); /**< check if TrueHit is present (if only one Cluster is passed), or if all passed Cluster point to the same TrueHit */
+//     bool trueHitsAreGood(std::vector<const PXDCluster*> clusters); /**< check if TrueHit is present */
+
+    // TODO TODO TODO TODO TODO CLEAN UP
+
+    /** check if there is a related TrueHit for a given SpacePoint. Possibility to pass an optional argument on the maximum number of allowed relations (defautls to 1) */
+    template <typename TrueHitType>
+    bool foundRelatedTrueHit(const Belle2::SpacePoint* spacePoint, unsigned int allowedRelations = 1);
 
     /**
      * Exception thrown, when not all hits of a genfit::TrackCand have been used for conversion.
@@ -153,15 +161,19 @@ namespace Belle2 {
     /**
      * Exception thrown, when no relation to a TrueHit can be found for a Cluster. Information from the TrueHit is needed for deciding if a track is curling or not
      */
-    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no related TrueHit for one (or more) Clusters of the Track Candidate. Cannot check if this is a curling track!");
+    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no related TrueHit for one (or more) SpacePoints of the Track Candidate!");
 
-    /**
-     * Exception thrown, when the TrueHits of different Clusters of one SpacePoint do not match
-     */
-    BELLE2_DEFINE_EXCEPTION(TrueHitsDoNotMatch, "The TrueHits of two Clusters of a SpacePoint do not match.");
+    // TODO TODO TODO TODO TODO CLEAN UP
 
-    /** Exception thrown, when there is more than one TrueHit related to any given SpacePoint or Cluster */
-    BELLE2_DEFINE_EXCEPTION(NonSingleTrueHit, "There is more than one TrueHit related to a SpacePoint.");
+//     /**
+//      * Exception thrown, when the TrueHits of different Clusters of one SpacePoint do not match
+//      */
+//     BELLE2_DEFINE_EXCEPTION(TrueHitsDoNotMatch, "The TrueHits of two Clusters of a SpacePoint do not match.");
+//
+//     /** Exception thrown, when there is more than one TrueHit related to any given SpacePoint or Cluster */
+//     BELLE2_DEFINE_EXCEPTION(NonSingleTrueHit, "There is more than one TrueHit related to a SpacePoint.");
+
+    // TODO TODO TODO TODO TODO CLEAN UP
   };
 
 }

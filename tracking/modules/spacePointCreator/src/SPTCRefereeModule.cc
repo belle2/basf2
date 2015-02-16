@@ -32,6 +32,7 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
 
   // names
   addParam("sptcName", m_PARAMsptcName, "Container name of the SpacePointTrackCands to be checked (input)", std::string(""));
+  addParam("newArrayName", m_PARAMnewArrayName, "Container name of SpacePointTrackCands if 'storeNewArray' is set to true", std::string(""));
 
   // flags
   addParam("checkSameSensor", m_PARAMcheckSameSensor, "Check if two subsequent SpacePoints are on the same sensor", true);
@@ -41,6 +42,7 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
   addParam("keepOnlyFirstPart", m_PARAMkeepOnlyFirstPart, "Keep only the first part of a curling SpacePointTrackCand (e.g. when only this is needed)", false);
   addParam("useMCInfo", m_PARAMuseMCInfo, "Set to true if the use of MC information (e.g. from underlying TrueHits) for the checks is wanted, and to false if the checks should all be done with information that can be obtained from SpacePoints directly. NOTE: the tests without MC information have to be developed first!", true);
   addParam("kickSpacePoint", m_PARAMkickSpacePoint, "Set to true if only the 'problematic' SpacePoint shall be kicked and not the whole SpacePointTrackCand", false);
+  addParam("storeNewArray", m_PARAMstoreNewArray, "Set to true if the checked SpacePointTrackCands should be stored in a new StoreArray. WARNING: all previously registered relations get lost in this way!", true);
 
   // other
   addParam("minDistance", m_PARAMminDistance, "Minimal Distance [cm] that two subsequent SpacePoints have to be seperated if 'checkMinDistance' is enabled", double(0));
@@ -56,7 +58,15 @@ void SPTCRefereeModule::initialize()
 {
   B2INFO("SPTCReferee::initialize(): ------------------------------------------------ ")
   // check if StoreArray of SpacePointTrackCands is her
-  StoreArray<SpacePointTrackCand>::required(m_PARAMsptcName);
+  StoreArray<SpacePointTrackCand> inputSpacePoints(m_PARAMsptcName);
+  inputSpacePoints.isRequired(m_PARAMsptcName);
+
+  // register new StoreArray
+  if (m_PARAMstoreNewArray) {
+    StoreArray<SpacePointTrackCand> newStoreArray(m_PARAMnewArrayName);
+    newStoreArray.registerInDataStore(m_PARAMnewArrayName, DataStore::c_DontWriteOut);
+    newStoreArray.registerRelationTo(inputSpacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
+  }
 
   // sanity checks on the other parameters
   if (m_PARAMcheckMinDistance) {
@@ -67,16 +77,6 @@ void SPTCRefereeModule::initialize()
   }
 
   B2DEBUG(1, "Provided Parameters: checkSameSensor - " << m_PARAMcheckSameSensor << ", checkMinDistance - " << m_PARAMcheckMinDistance << ", checkCurling - " << m_PARAMcheckCurling << ", splitCurlers - " << m_PARAMsplitCurlers << ", keepOnlyFirstPart - " << m_PARAMkeepOnlyFirstPart << ", useMCInfo - " << m_PARAMuseMCInfo << ", kickSpacePoint - " << m_PARAMkickSpacePoint)
-
-  if (m_PARAMcheckCurling || m_PARAMsplitCurlers || m_PARAMkeepOnlyFirstPart) {
-    B2WARNING("Curling Checking is not yet implemented! 'checkCurling', 'splitCurlers' and 'keepOnlyFirstPart' have no impact on the behavior at the moment!")
-  }
-  if (m_PARAMuseMCInfo) {
-    B2WARNING("'useMCInfo' is set to true, but there is not yet a feature that could use MC information!")
-  }
-  if (m_PARAMkickSpacePoint) {
-    B2WARNING("'kickSpacePoint' is set to true, but the module kicks the whole SpacePointTrackCand at the moment if one of the checks fails!")
-  }
 
   if (m_PARAMsetOrigin.size() != 3) {
     B2WARNING("CurlingTrackCandSplitter::initialize: Provided origin is not a 3D point! Please provide 3 values (x,y,z). Rejecting user input and setting origin to (0,0,0) for now!");
@@ -154,42 +154,75 @@ void SPTCRefereeModule::event()
       B2DEBUG(30, "refereeStatus after checkMinDistance " << refereeStatus);
     }
 
+
+    // momentary solution!! this will be changed (encapsulated in /////// )
+    std::vector<SpacePointTrackCand> curlingTrackStubs; // vector of TrackStubs that shall be saved to another StoreArray
     if (m_PARAMcheckCurling) { // check curling if desired
-      // TODO: comment in line below when all tests work!
-//       trackCand->setTrackStubIndex(0); // indicating that this trackCand has been checked for curling -> COULDDO: put another element into enum SpacePointTrackCand::RefereeStatusBit
-      const std::vector<int> curlingSplitInds = checkCurling(trackCand, m_PARAMuseMCInfo);
-      if (!curlingSplitInds.empty()) {
-        refereeStatus += SpacePointTrackCand::c_curlingTrack;
-        m_curlingTracksCtr++;
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (m_PARAMsplitCurlers) {
-          // TODO
-          if (m_PARAMkeepOnlyFirstPart) {
-            // TODO
+      // Only do curling checking if useMCInfo is false, OR if useMCInfo is true if the SPTCs SpacePoints have been checked for a relation to TrueHits!
+      if (!m_PARAMuseMCInfo || trackCand->hasRefereeStatus(SpacePointTrackCand::c_checkedTrueHits)) {
+        const std::vector<int> curlingSplitInds = checkCurling(trackCand, m_PARAMuseMCInfo);
+        if (!curlingSplitInds.empty()) {
+          refereeStatus += SpacePointTrackCand::c_curlingTrack;
+          m_curlingTracksCtr++;
+          if (m_PARAMsplitCurlers) {
+            // another sanity check // TODO TODO TODO: check why this is even neccessary!
+            if (!(curlingSplitInds.at(0) == 0 && curlingSplitInds.size() == 1)) {
+              const std::vector<SpacePointTrackCand> trackStubs = splitTrackCand(trackCand, curlingSplitInds, m_PARAMkeepOnlyFirstPart);
+              if (!trackStubs.empty()) {
+                ////////////////////////////////////////////////////
+                for (auto trackStub : trackStubs) {
+                  curlingTrackStubs.push_back(trackStub);
+                }
+                ///////////////////////////////////////////////////
+              } else { B2ERROR("The vector returned by splitTrackCand is empty!") } // safety measure
+            } else { B2ERROR("The only entry in the return vector of checkCurling is 0! Cannot Split this SPTC!") }
           }
+        } else {
+          B2DEBUG(20, "SpacePointTrackCand " << trackCand->getArrayIndex() << " is not curling!");
         }
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
+      } else {
+        B2WARNING("'useMCInfo' is set to true, but SpacePoints of SPTC have not been checked for relations to TrueHits! Not Checking this SPTC for curling!")
       }
-    } else {
-      B2DEBUG(20, "SpacePointTrackCand " << trackCand->getArrayIndex() << " is not curling!");
     }
 
     // assign the referee status to the SpacePointTrackCand
     if (removedTrueHits) refereeStatus += SpacePointTrackCand::c_removedHits;
-    if (m_PARAMcheckMinDistance && m_PARAMcheckSameSensor) refereeStatus += SpacePointTrackCand::c_checkedByReferee; // CAUTION: if there are new tests implemented this has to be updated!!!
+    if (m_PARAMcheckMinDistance && m_PARAMcheckSameSensor && m_PARAMcheckCurling) refereeStatus += SpacePointTrackCand::c_checkedByReferee; // CAUTION: if there are new tests implemented this has to be updated!!!
     B2DEBUG(20, "referee Status that will be assigned to trackCand " << refereeStatus);
-    trackCand->setRefereeStatus(refereeStatus);
+    trackCand->addRefereeStatus(refereeStatus);
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) { trackCand->print(); }
+
+    //////////////////////////////////////////
+    for (auto trackStub : curlingTrackStubs) { trackStub.addRefereeStatus(refereeStatus); }
+    //////////////////////////////////////////
+
+    if (m_PARAMstoreNewArray) {
+      StoreArray<SpacePointTrackCand> newArray(m_PARAMnewArrayName);
+      if (trackCand->checkedForCurling() && !trackCand->isCurling()) {
+        SpacePointTrackCand* newTC = newArray.appendNew(*trackCand);
+        newTC->addRelationTo(trackCand);
+        B2DEBUG(20, "Added new SPTC to StoreArray " << newTC->getArrayName() << " and registered relation to SPTC " << trackCand->getArrayIndex());
+      } else {
+        for (auto trackStub : curlingTrackStubs) {
+          SpacePointTrackCand* newTC = newArray.appendNew(trackStub);
+          newTC->addRelationTo(trackCand);
+          B2DEBUG(20, "Added new TrackStub to StoreArray " << newTC->getArrayName() << " and registered relation to SPTC " << trackCand->getArrayIndex())
+          m_regTrackStubsCtr++;
+        }
+      }
+    }
   }
 }
 
 // ============================================================================= TERMINATE =====================================================================
 void SPTCRefereeModule::terminate()
 {
+  // TODO: info output more sophisticated
   stringstream summary;
   if (m_PARAMcheckSameSensor) { summary << "Checked for consecutive SpacePoints on same sensor and found " << m_SameSensorCtr << " TrackCands showing this behavior."; }
   if (m_PARAMcheckMinDistance) { summary << "Checked for minimal distance between two consecutive SpacePoints and found " << m_minDistanceCtr << " TrackCands with SpacePoints not far enough apart."; }
   if (m_PARAMkickSpacePoint) { summary << m_kickedSpacePointsCtr << " SpacePoints have been removed from SpacePointTrackCands\n"; }
+  if (m_PARAMcheckCurling) { summary << m_curlingTracksCtr << " SPTCs were curling. Registered " << m_regTrackStubsCtr << " track stubs. 'splitCurlers' was set to " << m_PARAMsplitCurlers << "."; }
   B2INFO("SPTCRefere::terminate(): Module got " << m_totalTrackCandCtr << " SpacePointTrackCands. " << summary.str())
   if (!m_PARAMuseMCInfo && m_PARAMcheckCurling) { B2WARNING("The curling checking without MC Information is at the moment at a very crude and unsophisticated state. If you have MC information available you should use it to do this check!"); }
 }
@@ -264,6 +297,66 @@ const std::vector<int> SPTCRefereeModule::checkCurling(Belle2::SpacePointTrackCa
   return splitInds;
 }
 
+// ============================================================ SPLIT CURLING TRACK CAND ====================================================================
+const std::vector<Belle2::SpacePointTrackCand>
+SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, const std::vector<int>& splitIndices, bool onlyFirstPart)
+{
+  std::vector<SpacePointTrackCand> trackStubs; // return vector
+
+  B2DEBUG(25, "Splitting SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() << " number of entries in splitIndices " << splitIndices.size())
+//   int trackStub = 0;
+  bool dirOfFlight = splitIndices.at(0) != 0; // if first entry is zero the direction of flight is false (= ingoing)
+
+  for (int entry : splitIndices) { B2DEBUG(100, entry) }
+
+  int firstLast = dirOfFlight ? splitIndices.at(0) : splitIndices.at(1); // if the first entry of splitIndices is zero the first TrackStub is from 0 to second entry instead of from 0 to first entry
+  std::vector<std::pair<int, int> > rangeIndices; // .first is starting, .second is final index for each TrackStub. Store them in vector to be able to easily loop over them
+  rangeIndices.push_back(std::make_pair(0, firstLast));
+
+  if (!onlyFirstPart) { // if more than the first part is desired push_back the other ranges too
+    unsigned int iStart = dirOfFlight ? 1 : 2;
+    for (unsigned int i = iStart; i < splitIndices.size(); ++i) {
+      rangeIndices.push_back(std::make_pair(splitIndices.at(i - 1), splitIndices.at(i)));
+    }
+  }
+
+  B2DEBUG(30, "There will be " << rangeIndices.size() << " TrackStubs created for this TrackCand. (size of the passes splitIndices: " << splitIndices.size() << ", onlyFirstPart " << onlyFirstPart);
+
+
+  // loop over all entries in range indices and create a SpacePointTrackCand from it
+  for (unsigned int iTs = 0; iTs < rangeIndices.size(); ++iTs) {
+    int firstInd = rangeIndices.at(iTs).first;
+    int lastInd = rangeIndices.at(iTs).second;
+
+    // encapsulate in try block to catch indices out of range
+    try {
+      const std::vector<const SpacePoint*> spacePoints = trackCand->getHitsInRange(firstInd, lastInd);
+      const std::vector<double> sortingParams = trackCand->getSortingParametersInRange(firstInd, lastInd);
+
+      SpacePointTrackCand trackStub(spacePoints, trackCand->getPdgCode(), trackCand->getChargeSeed(), trackCand->getMcTrackID()); // create new TrackCand
+      trackStub.setSortingParameters(sortingParams);
+
+      // set the state seed and the cov seed only for the first trackStub of the TrackCand
+      if (iTs < 1) {
+        trackStub.set6DSeed(trackCand->getStateSeed());
+        trackStub.setCovSeed(trackCand->getCovSeed());
+      }
+
+      // set the direction of flight and flip it afterwards, because next trackCand hs changed direction of flight
+      trackStub.setFlightDirection(dirOfFlight);
+      dirOfFlight = !dirOfFlight;
+
+      trackStub.setTrackStubIndex(iTs + 1); // trackStub index starts at 1 for curling SPTCs. NOTE: this might be subject to chagnes with the new bitfield in SpacePointTrackCand
+
+      trackStubs.push_back(trackStub);
+    } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
+      B2WARNING("Caught an exception while trying to split a curling SpacePointTrackCand: " << anE.what() << " This trackStub will not be created!");
+    }
+  }
+
+  return trackStubs;
+}
+
 // ========================================================= GET DIRECTIONS OF FLIGHT =================================================================================
 const std::vector<bool> SPTCRefereeModule::getDirectionsOfFlight(const std::vector<const Belle2::SpacePoint*>& spacePoints, bool useMCInfo)
 {
@@ -292,6 +385,8 @@ bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoi
 {
   TrueHitType* trueHit = spacePoint->template getRelatedTo<TrueHitType>("ALL"); // COULDDO: search only certain arrays
 
+  if (trueHit == NULL) { B2ERROR("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()) }
+
   // get SensorId - needed for transforming local to global coordinates
   VxdID vxdID = trueHit->getSensorID();
 
@@ -313,6 +408,7 @@ std::vector<bool> SPTCRefereeModule::getDirsOfFlightSpacePoints(const std::vecto
   for (unsigned int iSP = 0; iSP < spacePoints.size(); ++iSP) {
     B2Vector3F position = spacePoints.at(iSP)->getPosition();
     B2Vector3F momentumEst = position - oldPosition; // estimate momentum by linearizing between old position and new position -> WARNING: not a very good estimate!!!
+    B2DEBUG(150, "Getting the direction of flight for SpacePoint " << spacePoints.at(iSP)->getArrayIndex() << ". Position: (" << position.x() << "," << position.y() << "," << position.z() << "), estimated momentum: (" << momentumEst.x() << "," << momentumEst.y() << "," << momentumEst.z() << ")");
     dirsOfFlight.push_back(getDirOfFlightPosMom(position, momentumEst, origin));
     oldPosition = position; // reassign for next round
   }

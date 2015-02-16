@@ -47,6 +47,8 @@ namespace Belle2 {
 
     std::string m_PARAMsptcName; /**< Name of input container of SpacePointTrackCands */
 
+    std::string m_PARAMnewArrayName; /**< Name of the output container of SpacePointTrackCands if 'storeNewArray' is set to true */
+
     bool m_PARAMcheckSameSensor; /**< parameter for indicating if the check for subsequent SpacePoints being on the same sensor should be done */
 
     bool m_PARAMcheckMinDistance; /**< parameter for indicating if the check for the minimal distance between two subsequent SpacePoints should be done */
@@ -60,6 +62,8 @@ namespace Belle2 {
     bool m_PARAMuseMCInfo; /**< parameter for indicating if MC information should be used or not */
 
     bool m_PARAMkickSpacePoint; /**< parameter for indicating if only the 'problematic' SpacePoint shall be removed from the SPTC or if the whole SPTC shall be kicked */
+
+    bool m_PARAMstoreNewArray; /**< parameter for indicating if all checked SpacePointTrackCands should be stored in a new StoreArray (NOTE: by storing the SpacePointTrackCands in a new StoreArray all previously registered relations are lost!) */
 
     double m_PARAMminDistance; /**< minimal distance two subsequent SpacePoints have to be seperated */
 
@@ -80,6 +84,8 @@ namespace Belle2 {
     unsigned int m_kickedSpacePointsCtr; /**< counter of kicked SpacePoints */
 
     unsigned int m_curlingTracksCtr; /**< counter for tracks that curl */
+
+    unsigned int m_regTrackStubsCtr; /**< counter for the number of track stubs that were registered by this module */
     /**
      * initialize all counters to 0
      */
@@ -89,6 +95,7 @@ namespace Belle2 {
       m_totalTrackCandCtr = 0;
       m_kickedSpacePointsCtr = 0;
       m_curlingTracksCtr = 0;
+      m_regTrackStubsCtr = 0;
     }
 
 
@@ -106,6 +113,7 @@ namespace Belle2 {
 
     /**
      * Check if the SpacePointTrackCand shows curling behavior. Returns empty vector if it is not the case and the indices where the SpacePointTrackCand can be split into TrackStubs such that each of them is no longer curling
+     * If the first entry of the returned vector is 0 the direction of flight is inward for the whole SpacePointTrackCand
      */
     const std::vector<int> checkCurling(Belle2::SpacePointTrackCand* trackCand, bool useMCInfo);
 
@@ -113,6 +121,13 @@ namespace Belle2 {
      * get the directions of Flight for every SpacePoint in the passed vector. true is outgoing, false is ingoing. using MC information can be switched with useMCInfo
      */
     const std::vector<bool> getDirectionsOfFlight(const std::vector<const Belle2::SpacePoint*>& spacePoints, bool useMCInfo);
+
+    /**
+     * split a curling SpacePointTrackCand into TrackStubs.
+     * @param onlyFirstPart return only the TrackStub that holds the SpacePoint from the first to the first entry of splitIndices (not included in returned SpacePointTrackCand)
+     */
+    const std::vector<Belle2::SpacePointTrackCand>
+    splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, const std::vector<int>& splitIndices, bool onlyFirstPart);
 
     /**
      * get the direction of flight for a SpacePoint by using information from the underlying TrueHit

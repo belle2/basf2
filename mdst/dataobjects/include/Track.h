@@ -8,13 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <framework/datastore/RelationsObject.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <algorithm>
-#include <bitset>
 
 namespace genfit { class Track; }
 
@@ -51,23 +48,7 @@ namespace Belle2 {
      *  @return TrackFitResult for fit with particle hypothesis given by ParticleCode.
      *  @sa TrackFitResult
      */
-    const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const {
-      if (m_trackFitIndices[chargedStable.getIndex()] < 0) {
-        B2DEBUG(100, "Attempt to access an unset TrackFitResult");
-        //ULTRA PRELIMINARY
-        short int index = -1; // MS: better to set to invalid value and test again after
-        for (unsigned int ii = 0; ii < Const::chargedStableSet.size(); ii++) {
-          if (m_trackFitIndices[ii] >= 0) {
-            index = m_trackFitIndices[ii];
-          }
-        }
-        if (index < 0) return 0; // MS: just in case and to be sure not to get garbage
-        StoreArray<TrackFitResult> trackFitResults;
-        return trackFitResults[index];
-      }
-      StoreArray<TrackFitResult> trackFitResults;
-      return trackFitResults[m_trackFitIndices[chargedStable.getIndex()]];
-    }
+    const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const;
 
     /** Set an index (for positive values) or unavailability-code (with negative values) for a specific mass hypothesis.
      *

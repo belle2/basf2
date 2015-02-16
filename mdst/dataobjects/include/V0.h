@@ -12,6 +12,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 #include <utility>
 
 namespace Belle2 {

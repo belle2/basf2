@@ -73,7 +73,7 @@ namespace Belle2 {
 
     /** Merge the data set in 'other' into this one. */
     void add(const CalcMeanCov<N, RealType>& other) {
-      const int n = m_entries + other.m_entries;
+      const value_type n = m_entries + other.m_entries;
       if (n == 0)
         return;
       for (int i = 0; i < N; ++i) {

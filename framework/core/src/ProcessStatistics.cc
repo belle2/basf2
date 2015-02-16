@@ -69,9 +69,9 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   std::vector<ModuleStatistics> modulesSortedByIndex(*modules);
   sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
 
-  float maxcalls = 0;
+  ModuleStatistics::value_type maxcalls = 0;
   for (const ModuleStatistics & stats : modulesSortedByIndex) {
-    const float calls = stats.getCalls(mode);
+    const ModuleStatistics::value_type calls = stats.getCalls(mode);
     if (calls > maxcalls)
       maxcalls = calls;
     out << output

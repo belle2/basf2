@@ -39,6 +39,9 @@ namespace Belle2 {
       c_Total
     };
 
+    /** type of float variable to use for calculations and storage */
+    typedef double value_type;
+
     /** Construct with a given name */
     ModuleStatistics(const std::string& name = ""): m_index(0), m_name(name) {}
 
@@ -47,7 +50,7 @@ namespace Belle2 {
      * @param time time used during execution
      * @param memory memory size change during execution
      */
-    void add(EStatisticCounters type, float time, float memory) {
+    void add(EStatisticCounters type, value_type time, value_type memory) {
       m_stats[type].add(time, memory);
       if (type != c_Total)
         m_stats[c_Total].add(time, memory);
@@ -71,37 +74,37 @@ namespace Belle2 {
     int getIndex() const { return m_index; }
 
     /** return the number of calls for a given counter type */
-    float getCalls(EStatisticCounters type = c_Total) const {
+    value_type getCalls(EStatisticCounters type = c_Total) const {
       return m_stats[type].getEntries();
     }
 
     /** return the sum of all execution times for a given counter */
-    float getTimeSum(EStatisticCounters type = c_Total) const {
+    value_type getTimeSum(EStatisticCounters type = c_Total) const {
       return m_stats[type].getSum<0>();
     }
     /** return the mean execution time for a given counter */
-    float getTimeMean(EStatisticCounters type = c_Total) const {
+    value_type getTimeMean(EStatisticCounters type = c_Total) const {
       return m_stats[type].getMean<0>();
     }
     /** return the stddev of the execution times for a given counter */
-    float getTimeStddev(EStatisticCounters type = c_Total) const {
+    value_type getTimeStddev(EStatisticCounters type = c_Total) const {
       return m_stats[type].getStddev<0>();
     }
     /** return the total used memory for a given counter */
-    float getMemorySum(EStatisticCounters type = c_Total) const {
+    value_type getMemorySum(EStatisticCounters type = c_Total) const {
       return m_stats[type].getSum<1>();
     }
     /** return the average memory change per call */
-    float getMemoryMean(EStatisticCounters type = c_Total) const {
+    value_type getMemoryMean(EStatisticCounters type = c_Total) const {
       return m_stats[type].getMean<1>();
     }
     /** return the stddev of the memory consumption changes per call */
-    float getMemoryStddev(EStatisticCounters type = c_Total) const {
+    value_type getMemoryStddev(EStatisticCounters type = c_Total) const {
       return m_stats[type].getStddev<1>();
     }
     /** return the pearson correlation coefficient between execution times
      * and memory consumption changes */
-    float getTimeMemoryCorrelation(EStatisticCounters type = c_Total) const {
+    value_type getTimeMemoryCorrelation(EStatisticCounters type = c_Total) const {
       return m_stats[type].getCorrelation<0, 1>();
     }
 
@@ -115,7 +118,7 @@ namespace Belle2 {
     /** name of module */
     std::string m_name;
     /** array with  mean/covariance for all counters */
-    CalcMeanCov<2, float> m_stats[c_Total + 1];
+    CalcMeanCov<2, value_type> m_stats[c_Total + 1];
   };
 
 } //Belle2 namespace

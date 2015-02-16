@@ -111,18 +111,41 @@ def formatTime(seconds):
     return string
 
 
-def purity(x, y):
-    if x == 0:
+def purity(nSig, nBg):
+    if nSig == 0:
         return 0.0
-    return x / float(x + y)
+    if nSig + nBg == 0:
+        return 0.0
+    return nSig / float(nSig + nBg)
 
 
-def efficiency(x, y):
-    if x == 0:
+def efficiency(nSig, nTrueSig):
+    if nSig == 0:
         return 0.0
-    if y == 0:
+    if nTrueSig == 0:
         return float('inf')
-    return x / float(y)
+    return nSig / float(nTrueSig)
+
+
+def efficiencyError(nSig, nTrueSig):
+    """
+    for an efficiency eps = nSig/nTrueSig, this function calculates the
+    standard deviation according to http://arxiv.org/abs/physics/0701199 .
+    """
+    if nTrueSig == 0:
+        return float('inf')
+
+    k = float(nSig)
+    n = float(nTrueSig)
+    variance = (k + 1) * (k + 2) / ((n + 2) * (n + 3)) - (k + 1) ** 2 / ((n + 2) ** 2)
+    return math.sqrt(variance)
+
+
+def purityError(nSig, nBg):
+    nTot = nSig + nBg
+    if nTot == 0:
+        return 0.0
+    return efficiencyError(nSig, nTot)
 
 
 def createTexFile(filename, templateFilename, placeholders):
@@ -470,10 +493,10 @@ def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
         ur = uc + 4 * d
         lm = hist.GetXaxis().GetXmin()
         um = hist.GetXaxis().GetXmax()
-        hist.GetXaxis().SetRangeUser(lr if lr > lm else lm, ur if ur < um else um)
+        hist.GetXaxis().SetRangeUser(max(lr, lm), min(ur, um))
         hist.Draw()
-        ll = ROOT.TLine(lc if lc > lm else lm, 0, lc if lc > lm else lm, hist.GetMaximum())
-        ul = ROOT.TLine(uc if uc < um else um, 0, uc if uc < um else um, hist.GetMaximum())
+        ll = ROOT.TLine(max(lc, lm), 0, max(lc, lm), hist.GetMaximum())
+        ul = ROOT.TLine(min(uc, um), 0, min(uc, um), hist.GetMaximum())
         ll.SetLineWidth(2)
         ul.SetLineWidth(2)
         ll.Draw()
@@ -635,16 +658,6 @@ def escapeForRegExp(someString):
     return someString.replace('*', r'\*').replace('+', r'\+')
 
 
-def efficiencyError(k, n):
-    """
-    for an efficiency eps = k/n, this function calculates the
-    standard deviation according to http://arxiv.org/abs/physics/0701199 .
-    """
-
-    variance = (k + 1) * (k + 2) / ((n + 2) * (n + 3)) - (k + 1) ** 2 / ((n + 2) ** 2)
-    return math.sqrt(variance)
-
-
 def makeOvertrainingPlot(tmvaFilename, plotName):
     subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
     #subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
@@ -712,17 +725,11 @@ def makeDiagPlot(signalHist, bgHist, plotName):
         nSig = 1.0 * signalHist.GetBinContent(i)
         nBg = 1.0 * bgHist.GetBinContent(i)
 
-        try:
-            purity = nSig / (nSig + nBg)
-            purityErr = efficiencyError(nSig, nSig + nBg)
-        except ZeroDivisionError:
-            purity = 0
-            purityErr = 0
         binCenter = signalHist.GetXaxis().GetBinCenter(i)
         x.append(binCenter)
-        y.append(purity)
+        y.append(purity(nSig, nBg))
         xerr.append(signalHist.GetXaxis().GetBinWidth(i) / 2)
-        yerr.append(purityErr)
+        yerr.append(purityError(nSig, nBg))
 
     purityPerBin = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
 
@@ -865,19 +872,10 @@ def makeROCPlotFromNtuple(fileName, outputFileName, nTrueSignal, targetVar):
         nSig = signalHist.Integral(cutBin, nbins + 1)
         nBg = bgHist.Integral(cutBin, nbins + 1)
 
-        efficiency = nSig / nTrueSignal
-        efficiencyErr = efficiencyError(nSig, nTrueSignal)
-        try:
-            purity = nSig / (nSig + nBg)
-            purityErr = efficiencyError(nSig, nSig + nBg)
-        except ZeroDivisionError:
-            purity = 0
-            purityErr = 0
-
-        x.append(100 * purity)
-        y.append(100 * efficiency)
-        xerr.append(100 * purityErr)
-        yerr.append(100 * efficiencyErr)
+        x.append(100 * purity(nSig, nBg))
+        y.append(100 * efficiency(nSig, nTrueSignal))
+        xerr.append(100 * purityError(nSig, nBg))
+        yerr.append(100 * efficiencyError(nSig, nTrueSignal))
 
     rocgraph = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
     rocgraph.SetLineColor(ROOT.kBlue - 2)

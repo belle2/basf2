@@ -13,10 +13,8 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
-#include <framework/logging/Logger.h>
 #include <framework/datastore/RelationsObject.h>
 
-#include <TObject.h>
 #include <TClonesArray.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
@@ -57,7 +55,6 @@ namespace Belle2 {
      * Default constructor for ROOT.
      */
     MCParticle():
-
       m_plist(0), m_index(0), m_status(0),
       m_pdg(0), m_mass(0), m_energy(0),
       m_momentum_x(0), m_momentum_y(0), m_momentum_z(0),
@@ -168,13 +165,13 @@ namespace Belle2 {
      * Return production vertex position, shorthand for getProductionVertex().
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    const TVector3 getVertex() const { return getProductionVertex(); }
+    TVector3 getVertex() const { return getProductionVertex(); }
 
     /**
      * Return production vertex position.
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    const TVector3 getProductionVertex() const {
+    TVector3 getProductionVertex() const {
       return TVector3(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z);
     }
 
@@ -182,7 +179,7 @@ namespace Belle2 {
      * Return momentum.
      * @return The momentum of the MonteCarlo particle in GeV.
      */
-    const TVector3 getMomentum() const {
+    TVector3 getMomentum() const {
       return TVector3(m_momentum_x, m_momentum_y, m_momentum_z);
     }
 
@@ -190,7 +187,7 @@ namespace Belle2 {
      * Return 4Vector of particle.
      * @return The 4-vector of the MonteCarlo particle.
      */
-    const TLorentzVector get4Vector() const {
+    TLorentzVector get4Vector() const {
       TLorentzVector vec; vec.SetXYZM(m_momentum_x, m_momentum_y, m_momentum_z, m_mass); return vec;
     }
 
@@ -201,7 +198,7 @@ namespace Belle2 {
      *         If the particle crosses the simulation volume boundary,
      *         it is set to the crossing position.
      */
-    const TVector3 getDecayVertex() const {
+    TVector3 getDecayVertex() const {
       return TVector3(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z);
     }
 
@@ -250,7 +247,7 @@ namespace Belle2 {
      * @return A list of all daughter particles. The list is empty if
      *         the MonteCarlo particle doesn't have any daughters.
      */
-    const std::vector<Belle2::MCParticle*> getDaughters() const;
+    std::vector<Belle2::MCParticle*> getDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /** Return number of daughter MCParticles. */

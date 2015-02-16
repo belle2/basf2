@@ -8,19 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/logging/Logger.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <TDatabasePDG.h>
+
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <cmath>
 
-#include <TDatabasePDG.h>
-
-#include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -51,7 +50,7 @@ float MCParticle::getCharge() const
 }
 
 
-const vector<MCParticle*> MCParticle::getDaughters() const
+vector<MCParticle*> MCParticle::getDaughters() const
 {
   vector<MCParticle*> result;
   if (m_firstDaughter > 0) {

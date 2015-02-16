@@ -8,21 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <iostream>
-#include <limits>
-#include <vector>
-#include <queue>
+#include <mdst/dataobjects/MCParticleGraph.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
-#include <boost/foreach.hpp>
-#include <boost/format.hpp>
 
-#include <mdst/dataobjects/MCParticleGraph.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
+#include <limits>
+#include <vector>
+#include <queue>
 
 
 using namespace std;

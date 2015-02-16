@@ -8,6 +8,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 #include <unordered_set>
 

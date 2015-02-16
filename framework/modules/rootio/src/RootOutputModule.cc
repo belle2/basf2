@@ -70,7 +70,6 @@ void RootOutputModule::initialize()
   //buffer size in bytes (default value used by root)
   const int bufsize = 32000;
 
-
   //create a file level metadata object in the data store
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   fileMetaData.registerInDataStore();
@@ -85,19 +84,6 @@ void RootOutputModule::initialize()
 
   for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {
     DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
-
-    //check for branch names that are not in the DataStore
-    for (unsigned int iBranch = 0; iBranch < m_branchNames[durability].size(); iBranch++) {
-      if (map.find(m_branchNames[durability][iBranch]) == map.end()) {
-        B2INFO("The branch " << m_branchNames[durability][iBranch] << " has no entry in the DataStore.");
-      }
-    }
-    for (unsigned int iBranch = 0; iBranch < m_excludeBranchNames[durability].size(); iBranch++) {
-      if (map.find(m_excludeBranchNames[durability][iBranch]) == map.end()) {
-        B2INFO("The excluded branch " << m_excludeBranchNames[durability][iBranch] << " has no entry in the DataStore.");
-      }
-    }
-
     set<string> branchList;
     for (auto pair : map)
       branchList.insert(pair.first);

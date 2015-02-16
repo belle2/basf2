@@ -13,6 +13,8 @@
 #include <TBaseClass.h>
 #include <TSystem.h>
 
+#include <wordexp.h>
+
 #include <algorithm>
 
 
@@ -25,13 +27,16 @@ const std::string RootIOUtilities::c_SteerExcludeBranchNames[] = { "excludeBranc
 
 std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability)
 {
-  //TODO also move check wether exclud/incl branch is in DS/tree
   set<string> branchSet, excludeBranchSet;
   for (string b : branches) {
+    if (branchesToFilter.count(b) == 0)
+      B2INFO("The branch " << b << " given in " << c_SteerBranchNames[durability] << " does not exist.");
     if (!branchSet.insert(b).second)
       B2WARNING(c_SteerBranchNames[durability] << " has duplicate entry " << b);
   }
   for (string b : excludeBranches) {
+    if (branchesToFilter.count(b) == 0)
+      B2INFO("The branch " << b << " given in " << c_SteerExcludeBranchNames[durability] << " does not exist.");
     if (!excludeBranchSet.insert(b).second)
       B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);
   }
@@ -55,6 +60,24 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
     }
   }
   out.insert(relations.begin(), relations.end());
+  return out;
+}
+
+std::vector<std::string> RootIOUtilities::expandWordExpansions(const std::vector<std::string>& filenames)
+{
+  vector<string> out;
+  wordexp_t expansions;
+  wordexp("", &expansions, 0);
+  for (const string & pattern : filenames) {
+    if (wordexp(pattern.c_str(), &expansions, WRDE_APPEND | WRDE_NOCMD | WRDE_UNDEF) != 0) {
+      B2ERROR("Failed to expand pattern '" << pattern << "'!");
+    }
+  }
+  out.resize(expansions.we_wordc);
+  for (unsigned int i = 0; i < expansions.we_wordc; i++) {
+    out[i] = expansions.we_wordv[i];
+  }
+  wordfree(&expansions);
   return out;
 }
 

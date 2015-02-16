@@ -35,6 +35,9 @@ namespace Belle2 {
      */
     std::set<std::string> filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability);
 
+    /** Performs wildcard expansion using wordexp(), returns matches. */
+    std::vector<std::string> expandWordExpansions(const std::vector<std::string>& filenames);
+
     /** return entry number with given (event, run, experiment) from tree. Returns -1 on error. */
     long getEntryNumberWithEvtRunExp(TTree* tree, long event, long run, long experiment);
 

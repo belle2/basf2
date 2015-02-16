@@ -22,8 +22,6 @@
 #include <TClonesArray.h>
 #include <TFile.h>
 
-#include <wordexp.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace RootIOUtilities;
@@ -76,27 +74,12 @@ void RootInputModule::initialize()
   if (!m_inputFileName.empty() && !m_inputFileNames.empty()) {
     B2FATAL("Cannot use both 'inputFileName' and 'inputFileNames' parameters!");
   }
-
-  //expand any expansions in inputFiles
-  wordexp_t expansions;
-  wordexp("", &expansions, 0);
-  for (const string & pattern : inputFiles) {
-    if (wordexp(pattern.c_str(), &expansions, WRDE_APPEND | WRDE_NOCMD | WRDE_UNDEF) != 0) {
-      B2ERROR("Failed to expand pattern '" << pattern << "'!");
-    }
-  }
-  m_inputFileNames.resize(expansions.we_wordc);
-  for (unsigned int i = 0; i < expansions.we_wordc; i++) {
-    m_inputFileNames[i] = expansions.we_wordv[i];
-  }
-  wordfree(&expansions);
-
-  //we'll only use m_inputFileNames from now on
-  m_inputFileName = "";
-
+  m_inputFileNames = expandWordExpansions(inputFiles);
   if (m_inputFileNames.empty()) {
     B2FATAL("No valid files specified!");
   }
+  m_inputFileName = "";
+  //we'll only use m_inputFileNames from now on
 
   //Open TFile
   TDirectory* dir = gDirectory;

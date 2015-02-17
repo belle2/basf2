@@ -18,8 +18,7 @@
 #include <boost/format.hpp>
 
 using namespace std;
-using namespace Belle2;
-using namespace SVD;
+using namespace Belle2::SVD;
 using boost::format;
 
 HistogramFactory::HistogramFactory()
@@ -115,10 +114,14 @@ TH1F* HistogramFactory::MakeBarPlot(const string& componentName, const string& v
   return result;
 }
 
-TCanvas* HistogramFactory::PlotStackedBars(TFile* f, const set<string>& componentNames, const string& valueName)
+TCanvas* HistogramFactory::PlotStackedBars(const component_tuples component_data, const string& valueName, double ymax)
 {
   // Retrieve full value name from the BgValues map
   string fullValueName(getTitle(valueName));
+  // Set special scaling for percentage plots
+  double percent_scale = 1.0;
+  if (valueName == "occupancyU" || valueName == "occupancyV")
+    percent_scale = 00.0;
   // Make canvas
   string canvasName("c_" + valueName);
   string canvasDescription(fullValueName + " by layer and background type");
@@ -130,17 +133,22 @@ TCanvas* HistogramFactory::PlotStackedBars(TFile* f, const set<string>& componen
   TLegend* hBarLegend = new TLegend(0.6, 0.6, 0.8, 0.85);
   hBarLegend->SetHeader("Background component");
   hBarLegend->SetBorderSize(0);
-  for (auto componentName : componentNames) {
-    //FIXME: Correct as soon as it is corrected in the MakeBarPlot method.
+  for (auto comp_tuple : component_data) {
+    const string componentName = std::get<0>(comp_tuple);
+    double scale = std::get<1>(comp_tuple);
+    TFile* f = std::get<2>(comp_tuple);
     string comp_id(fullValueName + "_" + componentName);
     std::replace(comp_id.begin(), comp_id.end(), ' ', '_');
     string histo_name = "hBar_" + comp_id;
     string histo_title(componentName);  // keep original component name for legend
+    f->cd();
     TH1F* histo = (TH1F*)f->Get(histo_name.c_str());
     if (!histo) {
-      cout << "WARNING: Histogram " << histo_name.c_str() << " not found." << endl;
+      cout << "WARNING: Histogram " << histo_name.c_str() << " not found. Dropping." << endl;
       continue;
     }
+    scale *= percent_scale;
+    if (scale != 1.0) histo->Scale(scale);
     histo->SetFillColor(component_colors[componentName]);
     histo->SetBarWidth(c_barwidth);
     hBarStack->Add(histo);
@@ -149,6 +157,10 @@ TCanvas* HistogramFactory::PlotStackedBars(TFile* f, const set<string>& componen
   c_barPlot->cd();
   hBarStack->Draw("B");
   hBarStack->GetXaxis()->SetTitle("SVD layer");
+  if (ymax > 0) { // Set fixed scale
+    hBarStack->GetYaxis()->SetLimits(0, ymax);
+    hBarStack->GetYaxis()->SetRangeUser(0, ymax);
+  }
   hBarStack->GetYaxis()->SetTitle(getAxisLabel(valueName).c_str());
   hBarLegend->Draw();
   c_barPlot->Modified(); c_barPlot->Update();

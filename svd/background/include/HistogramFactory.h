@@ -19,6 +19,7 @@
 #include <utility>
 #include <map>
 #include <string>
+#include <tuple>
 
 namespace Belle2 {
   namespace SVD {
@@ -42,6 +43,13 @@ namespace Belle2 {
         double m_rangeHigh;     /**< high limit of value range */
         int m_nBins;            /**< number of bins for value histogram(s) */
       }; // struct BgValue
+
+      /** Data to be read from definition file: for each component,
+       * - (hyphenated version) name,
+       * - scale factor with which histogram data will be multiplied
+       * - name of the source histogram file (produced by SVDBackgroundModule)
+       */
+      typedef std::set< std::tuple<std::string, double, TFile*> > component_tuples;
 
       /** Constructor
        * takes no parameters.
@@ -90,14 +98,13 @@ namespace Belle2 {
        * @return pointer to a TH1F histogram set to make a bar chart.
        */
       TH1F* MakeBarPlot(const std::string& componentName, const std::string& valueName);
-      /** Plot stacked bar plot of a quantity for bar plots stored in a ROOT file.
+      /** Plot stacked bar plot of a quantity for bar plots stored in a set of ROOT files.
        * This makes a complete TCanvas with legends, titles etc.
-       * @param f source TFile object
-       * @param componentNames set of full beam background component names
+       * @param componentData are tuples (comp_name, scale, ymax, TFile*), comp_name's are full component names
        * @param valueName _short_ name of quantity to plot, as listed with getValueLabel().
        * @return TCanvas with the stacked bar plot. Transfers ownership.
        */
-      TCanvas* PlotStackedBars(TFile* f, const std::set<std::string>& componentNames, const std::string& valueName);
+      TCanvas* PlotStackedBars(const component_tuples componentData, const std::string& valueName, double ymax = 0.0);
       /** Plot stacked bar plot comparing a quantity for two categories, taking the bar
        * plots from two ROOT files.
        * This makes a complete TCanvas with legends, titles etc.

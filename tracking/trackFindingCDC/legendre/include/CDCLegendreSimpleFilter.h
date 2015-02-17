@@ -47,7 +47,7 @@ namespace Belle2 {
 
       /** Tries to find and delete all "bad" hits in a track.
        * By doing so we will loose hit efficiency, but gain a low fake rate. */
-      static void deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability, TrackFitter* trackFitter);
+      static void deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability);
 
       /** Delete all hits markes as bad in a track. Should be called after every hit reassignment */
       static void deleteAllMarkedHits(TrackCandidate* trackCandidate);

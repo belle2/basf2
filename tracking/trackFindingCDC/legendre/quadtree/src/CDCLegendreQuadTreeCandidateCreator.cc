@@ -136,7 +136,7 @@ bool QuadTreeCandidateCreator::postprocessTrackCandidate(TrackCandidate* trackCa
 
 
   if (m_deleteHitsWhileFinding) {
-    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, s_cdcLegendreTrackFitter);
+    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
   }
 
   if (m_mergeTracksWhileFinding) {
@@ -159,7 +159,7 @@ bool QuadTreeCandidateCreator::postprocessTrackCandidate(TrackCandidate* trackCa
       s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
     }
 
-    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, s_cdcLegendreTrackFitter);
+    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
   }
 
   // UNUSED

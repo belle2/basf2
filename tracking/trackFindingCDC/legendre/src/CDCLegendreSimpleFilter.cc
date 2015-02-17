@@ -160,7 +160,7 @@ void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::
   }
 }
 
-void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability, TrackFitter* trackFitter)
+void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability)
 {
 
   std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();

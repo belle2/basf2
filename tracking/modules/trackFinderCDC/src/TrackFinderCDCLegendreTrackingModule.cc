@@ -475,7 +475,7 @@ void CDCLegendreTrackingModule::postprocessTracks()
 
   if (m_deleteHitsInTheEnd) {
     for (TrackCandidate * trackCandidate : m_trackList) {
-      SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, m_cdcLegendreTrackFitter);
+      SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
     }
     fitAllTracks();
   }
@@ -483,7 +483,7 @@ void CDCLegendreTrackingModule::postprocessTracks()
   if (m_mergeTracksInTheEnd) {
     TrackMerger::doTracksMerging(m_trackList, m_cdcLegendreTrackFitter);
     for (TrackCandidate * trackCandidate : m_trackList) {
-      SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, m_cdcLegendreTrackFitter);
+      SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
     }
     fitAllTracks();
 
@@ -509,7 +509,7 @@ void CDCLegendreTrackingModule::postprocessTracks()
     SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
     fitAllTracks();
     for (TrackCandidate * trackCandidate : m_trackList) {
-      SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, m_cdcLegendreTrackFitter);
+      SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
     }
     fitAllTracks();
   }

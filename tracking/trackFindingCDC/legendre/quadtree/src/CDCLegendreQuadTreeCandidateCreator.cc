@@ -19,7 +19,6 @@ std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > > Qua
 std::list<QuadTree*> QuadTreeCandidateCreator::s_nodesWithCandidates;
 TrackFitter* QuadTreeCandidateCreator::s_cdcLegendreTrackFitter;
 TrackProcessor* QuadTreeCandidateCreator::s_cdcLegendreTrackProcessor;
-TrackMerger* QuadTreeCandidateCreator::s_cdcLegendreTrackMerger;
 std::vector<TrackHit*> QuadTreeCandidateCreator::s_axialHits;
 bool QuadTreeCandidateCreator::m_appendHitsWhileFinding;
 bool QuadTreeCandidateCreator::m_mergeTracksWhileFinding;
@@ -141,7 +140,7 @@ bool QuadTreeCandidateCreator::postprocessTrackCandidate(TrackCandidate* trackCa
   }
 
   if (m_mergeTracksWhileFinding) {
-    s_cdcLegendreTrackMerger->tryToMergeTrackWithOtherTracks(trackCandidate);
+    TrackMerger::tryToMergeTrackWithOtherTracks(trackCandidate, s_cdcLegendreTrackProcessor->getTrackList(), s_cdcLegendreTrackFitter);
 
     // Has merging deleted the candidate?
     if (trackCandidate == nullptr) return false;

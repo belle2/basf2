@@ -20,7 +20,6 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendrePatternChecker.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
@@ -111,7 +110,6 @@ namespace Belle2 {
 
     TrackFindingCDC::TrackFitter* m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
     TrackFindingCDC::FastHough* m_cdcLegendreFastHough; /**< Fast Hough transformer */
-    TrackFindingCDC::TrackMerger* m_cdcLegendreTrackMerger; /**< Object which make track merging inside the module */
     TrackFindingCDC::TrackProcessor* m_cdcLegendreTrackProcessor; /**< Object for creating tracks */
     TrackFindingCDC::QuadTree* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
     TrackFindingCDC::QuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator; /**< Object which creates track candidates using quadtree nodes */

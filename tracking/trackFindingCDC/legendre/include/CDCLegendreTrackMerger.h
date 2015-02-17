@@ -33,16 +33,17 @@ namespace Belle2 {
     class TrackMerger {
     public:
 
-      TrackMerger(std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList,
-                  std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter,
-                  FastHough* cdcLegendreFastHough, TrackProcessor* cdcLegendreTrackProcessor);
+      /**
+       * This class is to be used static only.
+       */
+      TrackMerger() = delete;
 
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      void doTracksMerging(std::vector<TrackCandidate*> trackList, TrackFitter* trackFitter);
+      static void doTracksMerging(std::list<TrackCandidate*> trackList, TrackFitter* trackFitter);
 
       /** Try to merge given track with tracks in tracklist. */
-      void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, TrackFitter* trackFitter);
+      static void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::list<TrackCandidate*> trackList, TrackFitter* trackFitter);
 
       /** Trying select core of the tracks and fit them together, then add good hits
        * UNUSED */
@@ -112,11 +113,10 @@ namespace Belle2 {
       static void mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2);
 
       /**
-       * Marks hits away from the trajectory as bad and refit. This method is used for calculating the chi2 of the tracks to be merged.
+       * Marks hits away from the trajectory as bad. This method is used for calculating the chi2 of the tracks to be merged.
        * @param factor gives a number how far the hit is allowed to be.
-       * @return the chi2 of the new merged tracks. The input parameters like track_par and ref_point are reassigned.
        */
-      double removeStrangeHits(double factor, std::vector<TrackHit*>& trackHits, std::pair<double, double>& track_par, std::pair<double , double>& ref_point);
+      static void removeStrangeHits(double factor, std::vector<TrackHit*>& trackHits, std::pair<double, double>& track_par, std::pair<double , double>& ref_point);
 
       /** Try to merge the two tracks
        * For this, build a common hit list and do a fast fit.
@@ -124,7 +124,7 @@ namespace Belle2 {
        * As a result. the reduced chi2 is given.
        * The bad hits are marked but none of them is deleted!
        * This method does not do the actual merging. */
-      double doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, TrackFitter* trackFitter);
+      static double doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, TrackFitter* trackFitter);
 
       /**
        * Searches for the best candidate to merge this track to.
@@ -132,7 +132,7 @@ namespace Belle2 {
        * @param start_iterator the iterator where to start searching (this element included)
        * @return a pointer to the best fit candidate.
        */
-      BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged, std::list<TrackCandidate*>::iterator start_iterator);
+      static BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged, std::list<TrackCandidate*>::iterator start_iterator, std::list<TrackCandidate*>::iterator end_iterator, TrackFitter* trackFitter);
 
       static void resetHits(TrackCandidate* otherTrackCandidate);
 

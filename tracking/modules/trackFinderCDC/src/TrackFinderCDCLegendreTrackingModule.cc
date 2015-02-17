@@ -19,6 +19,9 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
+
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
+
 /*
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
@@ -229,8 +232,6 @@ void CDCLegendreTrackingModule::initialize()
 
   m_cdcLegendreTrackProcessor = new TrackProcessor(m_axialHitList, m_StereoHitList, m_trackList, m_trackletList, m_stereoTrackletList, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
 
-  m_cdcLegendreTrackMerger = new TrackMerger(m_trackList, m_trackletList, m_stereoTrackletList, m_cdcLegendreTrackFitter, m_cdcLegendreFastHough, m_cdcLegendreTrackProcessor);
-
   //m_cdcLegendrePatternChecker = new PatternChecker(m_cdcLegendreTrackProcessor);
 
 //  m_cdcLegendreConformalPosition = new ConformalPosition();
@@ -244,7 +245,6 @@ void CDCLegendreTrackingModule::initialize()
   QuadTreeCandidateCreator m_cdcLegendreQuadTreeCandidateCreator_temp __attribute__((unused)) =  QuadTreeCandidateCreator::Instance();
   QuadTreeCandidateCreator::setCandidateCreator(m_cdcLegendreTrackProcessor);
   QuadTreeCandidateCreator::setFitter(m_cdcLegendreTrackFitter);
-  QuadTreeCandidateCreator::setMerger(m_cdcLegendreTrackMerger);
   QuadTreeCandidateCreator::setAppendHitsWhileFinding(m_appendHitsWhileFinding);
   QuadTreeCandidateCreator::setMergeTracksWhileFinding(m_mergeTracksWhileFinding);
   QuadTreeCandidateCreator::setDeleteHitsWhileFinding(m_deleteHitsWhileFinding);
@@ -299,6 +299,7 @@ void CDCLegendreTrackingModule::event()
   B2DEBUG(100, "Perform track finding");
 
   DoTreeTrackFinding();
+  postprocessTracks();
 
 //  for (TrackCandidate * cand : m_trackList) {
 //     if (cand->getCandidateType() != TrackCandidate::tracklet) continue;
@@ -306,8 +307,8 @@ void CDCLegendreTrackingModule::event()
 //  }
 
   DoTreeTrackFindingFinal();
+  postprocessTracks();
   DoTreeTrackFindingFinal();
-
   postprocessTracks();
 
 //  if(m_AxialHitList.size() > 100) DoTreeTrackFinding();
@@ -480,7 +481,7 @@ void CDCLegendreTrackingModule::postprocessTracks()
   }
 
   if (m_mergeTracksInTheEnd) {
-    m_cdcLegendreTrackMerger->doTracksMerging();
+    TrackMerger::doTracksMerging(m_trackList, m_cdcLegendreTrackFitter);
     for (TrackCandidate * trackCandidate : m_trackList) {
       SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, m_cdcLegendreTrackFitter);
     }
@@ -542,7 +543,6 @@ void CDCLegendreTrackingModule::terminate()
   delete m_cdcLegendreQuadTreeCandidateCreator;
   delete m_cdcLegendreTrackDrawer;
   delete m_cdcLegendreFastHough;
-  delete m_cdcLegendreTrackMerger;
   delete m_cdcLegendreTrackProcessor;
 
   //  delete m_cdcLegendreConformalPosition;

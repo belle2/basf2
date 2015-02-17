@@ -49,9 +49,6 @@ namespace Belle2 {
       /** Set candidate fitter */
       static void setFitter(TrackFitter* cdcLegendreTrackFitter) {s_cdcLegendreTrackFitter = cdcLegendreTrackFitter;};
 
-      /** Set candidate merger */
-      static void setMerger(TrackMerger* cdcLegendreTrackMerger) {s_cdcLegendreTrackMerger = cdcLegendreTrackMerger;};
-
       /** Set hits */
       static void setHits(std::vector<TrackHit*>& axialHits) {s_axialHits = axialHits;};
 
@@ -111,7 +108,6 @@ namespace Belle2 {
       static std::list<QuadTree*> s_nodesWithCandidates; /**< List of nodes with possible track candidates */
       static TrackFitter* s_cdcLegendreTrackFitter; /**< Track fitter object */
       static TrackProcessor* s_cdcLegendreTrackProcessor; /**< Track creator object */
-      static TrackMerger* s_cdcLegendreTrackMerger; /**< Track merger object */
       static std::vector<TrackHit*> s_axialHits; /**< Holds list of acial hits */
 
       static bool m_appendHitsWhileFinding;

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
+#include <vector>
 
 #define SQR(x) ((x)*(x))
 
@@ -19,153 +20,41 @@ using namespace TrackFindingCDC;
 
 TrackMerger::TrackMerger(
   std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter, FastHough* cdcLegendreFastHough, TrackProcessor* cdcLegendreTrackProcessor):
-  m_trackList(trackList), m_trackletList(trackletList), m_stereoTrackletList(stereoTrackletList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreFastHough(cdcLegendreFastHough), m_cdcLegendreTrackProcessor(cdcLegendreTrackProcessor)
+  m_trackList(trackList), m_cdcLegendreTrackFitter(cdcLegendreTrackFitter),
+  m_trackletList(trackletList), m_stereoTrackletList(stereoTrackletList),  m_cdcLegendreTrackProcessor(cdcLegendreTrackProcessor), m_cdcLegendreFastHough(cdcLegendreFastHough)
 {
 
 }
 
-void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool remove_hits)
+void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2)
 {
   if (cand1 == cand2) return;
 
-  double new_chi2 = doTracksFitTogether(cand1, cand2, remove_hits);
-  B2DEBUG(100, "Track merging: chi2_1 = " << cand1->getChi2() << "; chi2_2 = " << cand2->getChi2() << "; new chi2 = " << new_chi2);
-
-  if (not remove_hits) {
-    for (TrackHit * hit : cand2->getTrackHits()) {
-      cand1->addHit(hit);
-    }
-    for (TrackHit * hit : cand1->getTrackHits()) {
-      if (hit->getHitUsage() == TrackHit::bad) {
-        hit->setHitUsage(TrackHit::used_in_track);
-      }
-    }
-
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
-
-    cand1->getTrackHits().erase(
-      std::unique(cand1->getTrackHits().begin(), cand1->getTrackHits().end()),
-      cand1->getTrackHits().end());
-
-
-    m_trackList.remove(cand2);
-    delete cand2;
-    cand2 = nullptr;
-
-  } else {
-
-    int cand1_good(0), cand1_bad(0);
-    double cand1_ratio(0);
-    for (TrackHit * hit : cand1->getTrackHits()) {
-      if (hit->getHitUsage() == TrackHit::used_in_track) cand1_good++;
-      if (hit->getHitUsage() == TrackHit::bad) cand1_bad++;
-    }
-
-    int cand2_good(0), cand2_bad(0);
-    double cand2_ratio(0);
-    for (TrackHit * hit : cand2->getTrackHits()) {
-      if (hit->getHitUsage() == TrackHit::used_in_track) cand2_good++;
-      if (hit->getHitUsage() == TrackHit::bad) cand2_bad++;
-    }
-
-    if (cand1_bad == 0) cand1_bad = 1;
-//    cand1_ratio = cand1_good / cand1_bad;
-    cand1_ratio = cand1_good / (cand1_good + cand1_bad);
-
-    if (cand2_bad == 0) cand2_bad = 1;
-//    cand2_ratio = cand2_good / cand2_bad;
-    cand2_ratio = cand2_good / (cand1_good + cand1_bad);
-
-    TrackCandidate* cand_good = NULL;
-    TrackCandidate* cand_bad = NULL;
-
-    if (cand1_ratio > cand2_ratio) {
-      cand_good = cand1;
-      cand_bad = cand2;
-    } else {
-      cand_good = cand2;
-      cand_bad = cand1;
-    }
-
-
-    for (TrackHit * hit : cand_bad->getTrackHits()) {
-      if (hit->getHitUsage() == TrackHit::used_in_track) {
-        cand_good->addHit(hit);
-        //      hit->setHitUsage(TrackHit::used_in_track);
-        //      cand_bad->removeHit(hit);
-      }
-    }
-
-    /*
-    std::vector<TrackHit*> c_list_temp;
-    for (TrackHit * hit : cand_good->getTrackHits()) {
-      if (hit->getHitUsage() == TrackHit::bad) {
-        c_list_temp.push_back(hit);
-      }
-    }
-    */
-
-    cand_bad->getTrackHits().erase(std::remove_if(cand_bad->getTrackHits().begin(), cand_bad->getTrackHits().end(),
-    [&](TrackHit * hit) {
-      return hit->getHitUsage() == TrackHit::used_in_track;
-    }), cand_bad->getTrackHits().end());
-
-
-    cand_good->getTrackHits().erase(std::remove_if(cand_good->getTrackHits().begin(), cand_good->getTrackHits().end(),
-    [&](TrackHit * hit) {
-      return hit->getHitUsage() == TrackHit::bad;
-    }),
-    cand_good->getTrackHits().end());
-
-
-    /*
-    m_cdcLegendreTrackProcessor->createLegendreTracklet(c_list_temp);
-    for (TrackHit * hit : c_list_temp) {
-      hit->setHitUsage(TrackHit::used_in_track);
-    }
-    */
-
-
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_good);
-    for (TrackHit * hit : cand_good->getTrackHits()) {
-      double x0_hit = hit->getOriginalWirePosition().X();
-      double y0_hit = hit->getOriginalWirePosition().Y();
-      double x0_track = cand_good->getXc();
-      double y0_track = cand_good->getYc();
-      double dist = fabs(fabs(cand_good->getRadius() - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
-      if (dist > hit->getDriftLength() * .5) {
-        hit->setHitUsage(TrackHit::not_used);
-      }
-    }
-    cand_good->getTrackHits().erase(std::remove_if(cand_good->getTrackHits().begin(), cand_good->getTrackHits().end(),
-    [&](TrackHit * hit) {
-      return hit->getHitUsage() == TrackHit::not_used;
-    }), cand_good->getTrackHits().end());
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_good);
-
-    for (TrackHit * hit : cand_bad->getTrackHits()) {
-      if (hit->getHitUsage() == TrackHit::bad) {
-        hit->setHitUsage(TrackHit::used_in_track);
-      }
-    }
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_bad);
-
-    cand_good->getTrackHits().erase(
-      std::unique(cand_good->getTrackHits().begin(), cand_good->getTrackHits().end()),
-      cand_good->getTrackHits().end());
-
-
-    cand_bad->getTrackHits().erase(
-      std::unique(cand_bad->getTrackHits().begin(), cand_bad->getTrackHits().end()),
-      cand_bad->getTrackHits().end());
-
+  //doTracksFitTogether(cand1, cand2);
+  // Maybe do the same as in doTracksFitTogether?
+  std::vector<TrackHit*>& commonHitListOfTwoTracks = cand1->getTrackHits();
+  for (TrackHit * hit : cand2->getTrackHits()) {
+    commonHitListOfTwoTracks.push_back(hit);
   }
 
+  // Do delete hits in the old track cands
+  cand2->getTrackHits().clear();
 
+  // Sorting is done via pointer addresses (!!). This is not very stable and also not very meaningful (in terms of physical meaning),
+  // but it does the job.
+  std::sort(commonHitListOfTwoTracks.begin(), commonHitListOfTwoTracks.end());
 
-//  m_trackList.remove(cand2);
-//  delete cand2;
-// cand2 = NULL;
+  // Only use hits once
+  commonHitListOfTwoTracks.erase(
+    std::unique(commonHitListOfTwoTracks.begin(), commonHitListOfTwoTracks.end()),
+    commonHitListOfTwoTracks.end());
+}
+
+void TrackMerger::resetHits(TrackCandidate* otherTrackCandidate)
+{
+  for (TrackHit * hit : otherTrackCandidate->getTrackHits()) {
+    hit->setHitUsage(TrackHit::used_in_track);
+  }
 }
 
 /* REPLACED BY OTHER METHOD
@@ -250,8 +139,8 @@ void TrackMerger::doTracksMerging()
         }
 
         if (chi2_best < chi2_best_reverse) {
-          mergeTracks(cand1, candidateToMergeBest, remove_hits /*false*/);
-/*m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+          mergeTracks(cand1, candidateToMergeBest, remove_hits );
+m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
 it1 = m_trackList.begin();
 tracks_merged++;
 } else {
@@ -301,40 +190,70 @@ hit->setHitUsage(TrackHit::used_in_track);
 
 }*/
 
-void TrackMerger::doTracksMerging()
+void TrackMerger::doTracksMerging(std::vector<TrackCandidate*> trackList, TrackFitter* trackFitter)
 {
-  bool have_merged_something(false);
-  do {
-    // Make a list with all possible best merge partners
 
-    std::vector<BestMergePartner> listOfBestMergePartners;
-    listOfBestMergePartners.resize(m_trackList.size());
+  // Search for best matches
+  unsigned int outerCounter = 0;
+  for (TrackCandidate * trackCandidate : trackList) {
+    unsigned int innerCounter = 0;
+    double prob = 0;
+    unsigned int bestCounter = 0;
+    TrackCandidate* bestCandidate = nullptr;
+    for (TrackCandidate * otherTrackCandidate : trackList) {
+      if (innerCounter <= outerCounter) {
+        innerCounter++;
+        continue;
+      }
 
-    unsigned int candidateCounter = 0;
-    for (TrackCandidate * trackCandidate : m_trackList) {
+      double probTemp = doTracksFitTogether(trackCandidate, otherTrackCandidate, trackFitter);
 
-      listOfBestMergePartners[candidateCounter] = calculateBestTrackToMerge(trackCandidate);
+      resetHits(otherTrackCandidate);
+      resetHits(trackCandidate);
 
-      candidateCounter++;
+      if (probTemp > prob) {
+        bestCounter = innerCounter;
+        prob = probTemp;
+        bestCandidate = otherTrackCandidate;
+      }
+
+      innerCounter++;
     }
 
-  } while (have_merged_something);
+    if (prob > m_minimum_probability_to_be_merged) {
+      mergeTracks(bestCandidate, trackCandidate);
+      trackFitter->fitTrackCandidateFast(bestCandidate);
+    }
+
+    outerCounter++;
+  }
+
+  trackList.erase(std::remove_if(trackList.begin(), trackList.end(),
+  [&](TrackCandidate * cand) { return (cand->getTrackHits().size() == 0); }),
+  trackList.end());
+
+  for (TrackCandidate * trackCandidate : trackList) {
+    trackFitter->fitTrackCandidateFast(trackCandidate);
+  }
 }
 
-TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged)
+TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged, std::list<TrackCandidate*>::iterator start_iterator, std::list<TrackCandidate*>::iterator end_iterator, TrackFitter* trackFitter)
 {
   double probabilityToBeMerged = 0;
   TrackCandidate* candidateToMergeBest = nullptr;
 
-  for (TrackCandidate * cand2 : m_trackList) {
-    if (trackCandidateToBeMerged == cand2) continue;
+  for (auto iterator = start_iterator; iterator != end_iterator; iterator++) {
+    TrackCandidate* cand2 = *iterator;
+    if (trackCandidateToBeMerged == cand2) {
+      continue;
+    }
 
-    if (cand2->getTrackHits().size() < 3) continue;
 
-    double chi2_temp = doTracksFitTogether(trackCandidateToBeMerged, cand2, true);
+    if (cand2->getTrackHits().size() < 3) {
+      continue;
+    }
 
-    int hit_size = trackCandidateToBeMerged->getNHits() + cand2->getNHits();
-    double probabilityTemp = TMath::Prob(chi2_temp * hit_size, hit_size);
+    double probabilityTemp = doTracksFitTogether(trackCandidateToBeMerged, cand2, trackFitter);
 
     // Reset hits, because we do not want to throw them away if this is not be best candidate to merge
     for (TrackHit * hit : trackCandidateToBeMerged->getTrackHits()) {
@@ -345,25 +264,28 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(TrackCandid
     }
 
     if (probabilityToBeMerged < probabilityTemp) {
-      candidateToMergeBest = cand2;
       probabilityToBeMerged = probabilityTemp;
+      candidateToMergeBest = cand2;
     }
   }
 
   return std::make_pair(candidateToMergeBest, probabilityToBeMerged);
 }
 
+
 void TrackMerger::tryToMergeTrackWithOtherTracks(TrackCandidate* cand1)
 {
 
   B2DEBUG(100, "Merger: Initial nCands = " << m_trackList.size());
 
-  bool have_merged_something(false);
+  bool have_merged_something;
 
   do {
     have_merged_something = false;
-    BestMergePartner candidateToMergeBest = calculateBestTrackToMerge(cand1);
-    if (candidateToMergeBest.second > m_minimum_probability_to_be_merged) {
+    BestMergePartner candidateToMergeBest = calculateBestTrackToMerge(cand1, m_trackList.begin());
+    Probability& probabilityWithCandidate = candidateToMergeBest.second;
+
+    if (probabilityWithCandidate > m_minimum_probability_to_be_merged) {
       /*
       //      B2INFO("chi2_best: " << chi2_best << "; chi2_track1: " << chi2_track1);
 
@@ -401,8 +323,8 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(TrackCandidate* cand1)
             //      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
       */
 
-      mergeTracks(cand1, candidateToMergeBest.first, true);
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+      TrackCandidate* bestFitTrackCandidate = candidateToMergeBest.first;
+      mergeTracks(cand1, bestFitTrackCandidate);
       have_merged_something = true;
     }
 
@@ -424,6 +346,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(TrackCandidate* cand1)
   }
 
 }
+
 
 double TrackMerger::removeStrangeHits(double factor, std::vector<TrackHit*>& trackHits, std::pair<double, double>& track_par, std::pair<double , double>& ref_point)
 {
@@ -447,8 +370,16 @@ double TrackMerger::removeStrangeHits(double factor, std::vector<TrackHit*>& tra
   return m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackHits, track_par, ref_point);
 }
 
-double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, bool remove_hits)
+double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, TrackFitter* trackFitter)
 {
+  // Check if the two tracks do have something in common!
+  /*TVector3 deltaMomentum = cand1->getMomentumEstimation() - cand2->getMomentumEstimation();
+  TVector3 deltaPosition = cand1->getReferencePoint() - cand2->getReferencePoint();
+
+  if(deltaMomentum.Mag() / cand1->getMomentumEstimation().Mag() < 0.01) {
+    B2INFO("Quick");
+    return 1;
+  }*/
 
   // Build common hit list
   std::vector<TrackHit*> commonHitListOfTwoTracks;
@@ -458,6 +389,10 @@ double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* c
   for (TrackHit * hit : cand2->getTrackHits()) {
     commonHitListOfTwoTracks.push_back(hit);
   }
+
+  // Sorting is done via pointer addresses (!!). This is not very stable and also not very meaningful (in terms of physical meaning),
+  // but it dies the job.
+  std::sort(commonHitListOfTwoTracks.begin(), commonHitListOfTwoTracks.end());
 
   commonHitListOfTwoTracks.erase(
     std::unique(commonHitListOfTwoTracks.begin(), commonHitListOfTwoTracks.end()),
@@ -473,29 +408,27 @@ double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* c
 
   double chi2_temp;
 
-  chi2_temp = m_cdcLegendreTrackFitter->fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
+  chi2_temp = trackFitter->fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
 
-  int charge = TrackCandidate::getChargeAssumption(track_par.first,
-                                                   track_par.second, commonHitListOfTwoTracks);
-  if (charge == TrackCandidate::charge_two_tracks) chi2_temp = 9999;
-
-  if (not remove_hits) return chi2_temp;
-
-  removeStrangeHits(5, commonHitListOfTwoTracks, track_par, ref_point);
-  removeStrangeHits(3, commonHitListOfTwoTracks, track_par, ref_point);
-  removeStrangeHits(2, commonHitListOfTwoTracks, track_par, ref_point);
-  removeStrangeHits(1, commonHitListOfTwoTracks, track_par, ref_point);
+  chi2_temp = removeStrangeHits(5, commonHitListOfTwoTracks, track_par, ref_point);
+  chi2_temp = removeStrangeHits(3, commonHitListOfTwoTracks, track_par, ref_point);
+  chi2_temp = removeStrangeHits(1, commonHitListOfTwoTracks, track_par, ref_point);
   chi2_temp = removeStrangeHits(1, commonHitListOfTwoTracks, track_par, ref_point);
 
-  charge = TrackCandidate::getChargeAssumption(track_par.first, track_par.second, commonHitListOfTwoTracks);
+  int charge = TrackCandidate::getChargeAssumption(track_par.first, track_par.second, commonHitListOfTwoTracks);
 
-  if (charge == TrackCandidate::charge_two_tracks) chi2_temp = 9999;
+  if (charge == TrackCandidate::charge_two_tracks) {
+    return 0;
+  }
 
   // Dismiss this possibility if the hit list size after all the removing of hits is even smaller than the two lists before or if the list is too small
   if (commonHitListOfTwoTracks.size() <= max(cand2->getTrackHits().size(), cand1->getTrackHits().size())
-      or commonHitListOfTwoTracks.size() < 15) chi2_temp = 9999.;
+      or commonHitListOfTwoTracks.size() < 15) {
+    return 0;
+  }
 
-  return chi2_temp;
+  unsigned int ndf = commonHitListOfTwoTracks.size() - 4;
+  return TMath::Prob(chi2_temp * ndf, ndf);
 }
 
 // UNUSED

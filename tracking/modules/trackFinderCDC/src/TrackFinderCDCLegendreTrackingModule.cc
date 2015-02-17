@@ -136,12 +136,12 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   addParam("DeleteHitsInTheEnd", m_deleteHitsInTheEnd,
            "Try to delete bad hits from track candidate in the end.", false);
   addParam("MergeTracksInTheEnd", m_mergeTracksInTheEnd,
-           "Try to merge tracks in the end.", false);
+           "Try to merge tracks in the end.", true);
   addParam("AppendHitsInTheEnd", m_appendHitsInTheEnd,
-           "Try to append new hits to track candidate in the end.", false);
+           "Try to append new hits to track candidate in the end.", true);
 
   addParam("DeleteHitsWhileFinding", m_deleteHitsWhileFinding,
-           "Try to delete bad hits from track candidate", false);
+           "Try to delete bad hits from track candidate", true);
   addParam("AppendHitsWhileFinding", m_appendHitsWhileFinding,
            "Try to append new hits to track candidate while finding.", false);
   addParam("MergeTracksWhileFinding", m_mergeTracksWhileFinding,
@@ -479,22 +479,12 @@ void CDCLegendreTrackingModule::postprocessTracks()
     fitAllTracks();
   }
 
-  if (m_appendHitsInTheEnd) {
-    SimpleFilter::processTracks(m_trackList);
-    fitAllTracks();
-    SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
-    fitAllTracks();
+  if (m_mergeTracksInTheEnd) {
+    m_cdcLegendreTrackMerger->doTracksMerging();
     for (TrackCandidate * trackCandidate : m_trackList) {
       SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, m_cdcLegendreTrackFitter);
     }
-  }
-
-  fitAllTracks();
-
-  if (m_mergeTracksInTheEnd) {
-    for (TrackCandidate * trackCandidate : m_trackList) {
-      m_cdcLegendreTrackMerger->tryToMergeTrackWithOtherTracks(trackCandidate);
-    }
+    fitAllTracks();
 
     //  m_cdcLegendreTrackMerger->splitTracks();
 
@@ -512,7 +502,16 @@ void CDCLegendreTrackingModule::postprocessTracks()
     m_cdcLegendreTrackMerger->doTracksMerging();*/
   }
 
-  fitAllTracks();
+  if (m_appendHitsInTheEnd) {
+    SimpleFilter::processTracks(m_trackList);
+    fitAllTracks();
+    SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
+    fitAllTracks();
+    for (TrackCandidate * trackCandidate : m_trackList) {
+      SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, m_cdcLegendreTrackFitter);
+    }
+    fitAllTracks();
+  }
 
   /*
 

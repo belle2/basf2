@@ -49,12 +49,12 @@ namespace Belle2 {
        * By doing so we will loose hit efficiency, but gain a low fake rate. */
       static void deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability, TrackFitter* trackFitter);
 
+      /** Delete all hits markes as bad in a track. Should be called after every hit reassignment */
+      static void deleteAllMarkedHits(TrackCandidate* trackCandidate);
+
     private:
 
       static constexpr double m_minimal_assignment_probability = 0.8;
-
-      /** Delete all hits markes as bad in a track. Should be calles after every hit reassignment */
-      static void deleteAllMarkedHits(TrackCandidate* trackCandidate);
 
       // UNUSED AT THE MOMENT
       // static constexpr double m_distFactor = 0.5; /**< Factor used in assignment probability estimation */

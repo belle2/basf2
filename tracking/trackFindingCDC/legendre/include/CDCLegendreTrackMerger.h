@@ -21,10 +21,6 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 
 #include <list>
-#include <set>
-#include <cstdlib>
-#include <vector>
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -43,10 +39,10 @@ namespace Belle2 {
 
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      void doTracksMerging();
+      void doTracksMerging(std::vector<TrackCandidate*> trackList, TrackFitter* trackFitter);
 
       /** Try to merge given track with tracks in tracklist. */
-      void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1);
+      void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, TrackFitter* trackFitter);
 
       /** Trying select core of the tracks and fit them together, then add good hits
        * UNUSED */
@@ -105,12 +101,15 @@ namespace Belle2 {
     private:
 
 
-      typedef std::pair<TrackCandidate*, double> BestMergePartner;
+      typedef unsigned int TrackCandidateIndex;
+      typedef std::pair<TrackCandidateIndex, TrackCandidate*> TrackCandidateWithIndex;
+      typedef double Probability;
+      typedef std::pair<TrackCandidate*, Probability> BestMergePartner;
 
       /**
        * @brief Function to merge two track candidates
        */
-      void mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2, bool remove_hits = false);
+      static void mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2);
 
       /**
        * Marks hits away from the trajectory as bad and refit. This method is used for calculating the chi2 of the tracks to be merged.
@@ -125,25 +124,27 @@ namespace Belle2 {
        * As a result. the reduced chi2 is given.
        * The bad hits are marked but none of them is deleted!
        * This method does not do the actual merging. */
-      double doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, bool remove_hits = true);
+      double doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, TrackFitter* trackFitter);
 
       /**
        * Searches for the best candidate to merge this track to.
        * @param trackCandidateToBeMerged
-       * @param probabilityToBeMerged output with the best probability.
+       * @param start_iterator the iterator where to start searching (this element included)
        * @return a pointer to the best fit candidate.
        */
-      BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged);
+      BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged, std::list<TrackCandidate*>::iterator start_iterator);
 
-      std::list<TrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
-      TrackFitter* m_cdcLegendreTrackFitter; /**< Track fitter */
+      static void resetHits(TrackCandidate* otherTrackCandidate);
 
-      const double m_minimum_probability_to_be_merged = 0.8;
+      //std::list<TrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
+      //TrackFitter* m_cdcLegendreTrackFitter; /**< Track fitter */
 
-      std::list<TrackCandidate*>& __attribute__((unused)) m_trackletList; /**< List of tracklets. */
-      std::list<TrackCandidate*>& __attribute__((unused)) m_stereoTrackletList; /**< List of tracklets. */
-      TrackProcessor* __attribute__((unused)) m_cdcLegendreTrackProcessor; /**< Track creator */
-      FastHough* __attribute__((unused)) m_cdcLegendreFastHough;  /**< Fast Hough finder */
+      static constexpr double m_minimum_probability_to_be_merged = 0.8;
+
+      //std::list<TrackCandidate*>& __attribute__((unused)) m_trackletList; /**< List of tracklets. */
+      //std::list<TrackCandidate*>& __attribute__((unused)) m_stereoTrackletList; /**< List of tracklets. */
+      //TrackProcessor* __attribute__((unused)) m_cdcLegendreTrackProcessor; /**< Track creator */
+      //FastHough* __attribute__((unused)) m_cdcLegendreFastHough;  /**< Fast Hough finder */
     };
   }
 }

@@ -137,7 +137,7 @@ bool QuadTreeCandidateCreator::postprocessTrackCandidate(TrackCandidate* trackCa
 
 
   if (m_deleteHitsWhileFinding) {
-    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.75, s_cdcLegendreTrackFitter);
+    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, s_cdcLegendreTrackFitter);
   }
 
   if (m_mergeTracksWhileFinding) {

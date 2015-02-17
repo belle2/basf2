@@ -74,13 +74,10 @@ namespace {
 
   }
 
-
-
   template<class StartRecoHit, class EndRecoHit, class StartRecoHitSegment, class EndRecoHitSegment>
   CDCTrajectory3D fuseTrajectoriesImpl(const StartRecoHitSegment& startSegment,
                                        const EndRecoHitSegment& endSegment)
   {
-
     if (startSegment.empty()) {
       B2WARNING("Start segment is empty.");
       return CDCTrajectory3D();
@@ -98,7 +95,6 @@ namespace {
                                                firstHitOfEndSegment.getRecoPos2D());
 
     Vector3D localOrigin3D(localOrigin2D, 0.0);
-
 
     if (not startSegment.getTrajectory2D().isFitted()) {
       if (startSegment.size() > 3) B2WARNING("Start segment not fitted.");
@@ -127,80 +123,276 @@ namespace {
     TMatrixD startH = calcAmbiguityImpl<StartRecoHit>(startSegment, startTrajectory2D);
     TMatrixD endH = calcAmbiguityImpl<EndRecoHit>(endSegment, endTrajectory2D);
 
-    TMatrixD startHTransposed = startH;
-    startHTransposed.T();
-
-    TMatrixD endHTransposed = endH;
-    endHTransposed.T();
-
-    TMatrixDSym startCovMatrix = startCircle.perigeeCovariance();
-    TMatrixDSym endCovMatrix = endCircle.perigeeCovariance();
-
-
-    TMatrixDSym startInvCovMatrix = startCovMatrix;
-    startInvCovMatrix.Invert();
-
-    TMatrixDSym endInvCovMatrix = endCovMatrix;
-    endInvCovMatrix.Invert();
-
-    TMatrixDSym startInvHelixCovMatrix = startInvCovMatrix;
-    startInvHelixCovMatrix.SimilarityT(startH);
-
-    TMatrixDSym endInvHelixCovMatrix = endInvCovMatrix;
-    endInvHelixCovMatrix.SimilarityT(endH);
-
-    TMatrixDSym helixCovMatrix = startInvHelixCovMatrix + endInvHelixCovMatrix;
-    helixCovMatrix.Invert();
-
-
-    TVectorD startParameters = startCircle.parameters();
-    TVectorD endParameters = endCircle.parameters();
-
-    TVectorD averageParameters = startParameters;
-    averageParameters += endParameters;
-    averageParameters *= 1.0 / 2.0;
-
-    if (useResidualParameters) {
-      startParameters -= averageParameters;
-      endParameters -= averageParameters;
-    }
-
-    TVectorD weightedSum =
-      startHTransposed * (startInvCovMatrix * startParameters) +
-      endHTransposed * (endInvCovMatrix * endParameters);
-
-    TVectorD helixParameters = helixCovMatrix * weightedSum;
-
-
-    TVectorD startPosteriorParameters = startH * helixParameters;
-    TVectorD endPosteriorParameters = endH * helixParameters;
-
-    TVectorD startResidual = startParameters - startPosteriorParameters;
-    TVectorD endResidual = endParameters - endPosteriorParameters;
-
-    Double_t startChi2 = startInvCovMatrix.Similarity(startResidual);
-    Double_t endChi2 = endInvCovMatrix.Similarity(endResidual);
-
-    Double_t chi2 =  startChi2 + endChi2;
-
-    if (useResidualParameters) {
-      helixParameters(iCurv) += averageParameters(iCurv);
-      helixParameters(iPhi0) += averageParameters(iPhi0);
-      helixParameters(iI) += averageParameters(iI);
-      //B2INFO("Tan lambda correction: " << helixParameters(iSZ));
-      //B2INFO("Z0 correction: " << helixParameters(iZ0));
-    }
-
-    UncertainHelix resultHelix(helixParameters, HelixCovariance(helixCovMatrix));
-    resultHelix.setChi2(chi2);
-    resultHelix.setNDF(1);
-
+    UncertainHelix resultHelix = CDCAxialStereoFusion::fuse(startCircle, startH, endCircle, endH);
     return CDCTrajectory3D(localOrigin3D, resultHelix);
+  }
+}
 
+
+double CDCAxialStereoFusion::average(const TVectorD& startParameters,
+                                     const TMatrixDSym& startCovMatrix,
+                                     const TVectorD& endParameters,
+                                     const TMatrixDSym& endCovMatrix,
+                                     TVectorD& avgParameters,
+                                     TMatrixDSym& avgCovMatrix)
+{
+  TMatrixDSym startInvCovMatrix = startCovMatrix;
+  startInvCovMatrix.Invert();
+
+  TMatrixDSym endInvCovMatrix = endCovMatrix;
+  endInvCovMatrix.Invert();
+
+  avgCovMatrix = startInvCovMatrix + endInvCovMatrix;
+  avgCovMatrix.Invert();
+
+  TVectorD weightedSumParameter = startInvCovMatrix * startParameters + endInvCovMatrix * endParameters;
+
+  avgParameters = avgCovMatrix * weightedSumParameter;
+
+
+  double chi2 = startInvCovMatrix.Similarity(startParameters) + endInvCovMatrix.Similarity(endParameters);
+
+  return chi2;
+}
+
+
+double CDCAxialStereoFusion::average(const TVectorD& startParameters,
+                                     const TMatrixDSym& startCovMatrix,
+                                     const TMatrixD& startAmbiguityMatrix,
+                                     const TVectorD& endParameters,
+                                     const TMatrixDSym& endCovMatrix,
+                                     const TMatrixD& endAmbiguityMatrix,
+                                     TVectorD& avgParameters,
+                                     TMatrixDSym& avgCovMatrix)
+{
+  TMatrixD startAmbiguityMatrixTransposed = startAmbiguityMatrix;
+  startAmbiguityMatrixTransposed.T();
+
+  TMatrixD endAmbiguityMatrixTransposed = endAmbiguityMatrix;
+  endAmbiguityMatrixTransposed.T();
+
+
+  TMatrixDSym startInvCovMatrix = startCovMatrix;
+  startInvCovMatrix.Invert();
+
+  TMatrixDSym endInvCovMatrix = endCovMatrix;
+  endInvCovMatrix.Invert();
+
+
+  TMatrixDSym startInflatedInvCovMatrix = startInvCovMatrix;
+  startInflatedInvCovMatrix.SimilarityT(startAmbiguityMatrix);
+
+  TMatrixDSym endInflatedInvCovMatrix = endInvCovMatrix;
+  endInflatedInvCovMatrix.SimilarityT(endAmbiguityMatrix);
+
+  avgCovMatrix = startInflatedInvCovMatrix + endInflatedInvCovMatrix;
+  avgCovMatrix.Invert();
+
+
+  TVectorD weightedSum =
+    startAmbiguityMatrixTransposed * (startInvCovMatrix * startParameters) +
+    endAmbiguityMatrixTransposed * (endInvCovMatrix * endParameters);
+
+  avgParameters = avgCovMatrix * weightedSum;
+
+
+  TVectorD startPosteriorParameters = startAmbiguityMatrix * avgParameters;
+  TVectorD endPosteriorParameters = endAmbiguityMatrix * avgParameters;
+
+  TVectorD startResidual = startParameters - startPosteriorParameters;
+  TVectorD endResidual = endParameters - endPosteriorParameters;
+
+  double startChi2 = startInvCovMatrix.Similarity(startResidual);
+  double endChi2 = endInvCovMatrix.Similarity(endResidual);
+
+  double chi2 =  startChi2 + endChi2;
+  return chi2;
+}
+
+
+UncertainPerigeeCircle CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& startPerigeeCircle,
+                                                  const UncertainPerigeeCircle& endPerigeeCircle)
+{
+  TVectorD startParameters = startPerigeeCircle.parameters();
+  TMatrixDSym startCovMatrix = startPerigeeCircle.perigeeCovariance();
+
+  TVectorD endParameters = endPerigeeCircle.parameters();
+  TMatrixDSym endCovMatrix = endPerigeeCircle.perigeeCovariance();
+
+  TMatrixDSym avgCovMatrix(3);
+  avgCovMatrix.Zero();
+
+  TVectorD avgParameters(3);
+  avgParameters.Zero();
+
+  double chi2 = average(startParameters,
+                        startCovMatrix,
+                        endParameters,
+                        endCovMatrix,
+                        avgParameters,
+                        avgCovMatrix);
+
+  // Calculating 3 parameters from 6 input parameters. 3 NDF remaining.
+  size_t ndf = 3;
+
+  return UncertainPerigeeCircle(avgParameters, PerigeeCovariance(avgCovMatrix), chi2, ndf);
+}
+
+
+UncertainHelix CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& startPerigeeCircle,
+                                          const TMatrixD& startAmbiguityMatrix,
+                                          const UncertainPerigeeCircle& endPerigeeCircle,
+                                          const TMatrixD& endAmbiguityMatrix)
+{
+  TVectorD startParameters = startPerigeeCircle.parameters();
+  TMatrixDSym startCovMatrix = startPerigeeCircle.perigeeCovariance();
+
+  TVectorD endParameters = endPerigeeCircle.parameters();
+  TMatrixDSym endCovMatrix = endPerigeeCircle.perigeeCovariance();
+
+  // Helix covariance
+  TMatrixDSym avgCovMatrix(5);
+  avgCovMatrix.Zero();
+
+  // Helix parameters
+  TVectorD avgParameters(5);
+  avgParameters.Zero();
+
+  // Calculating 5 parameters from 6 input parameters. 1 NDF remaining.
+  size_t ndf = 1;
+
+  double chi2 = 0;
+
+  if (useResidualParameters) {
+    // Use the mean circle parameters as the reference, since the ambiguity matrix is a expansion around that point.
+    TVectorD refParameters = startParameters + endParameters;
+    refParameters *= 0.5;
+
+    startParameters -= refParameters;
+    endParameters -= refParameters;
+
+    // Chi2 value
+    chi2 = average(startParameters,
+                   startCovMatrix,
+                   startAmbiguityMatrix,
+                   endParameters,
+                   endCovMatrix,
+                   endAmbiguityMatrix,
+                   avgParameters,
+                   avgCovMatrix);
+
+    avgParameters(iCurv) += refParameters(iCurv);
+    avgParameters(iPhi0) += refParameters(iPhi0);
+    avgParameters(iI) += refParameters(iI);
+
+  } else {
+    // Chi2 value
+    chi2 = average(startParameters,
+                   startCovMatrix,
+                   startAmbiguityMatrix,
+                   endParameters,
+                   endCovMatrix,
+                   endAmbiguityMatrix,
+                   avgParameters,
+                   avgCovMatrix);
   }
 
+  return UncertainHelix(avgParameters, HelixCovariance(avgCovMatrix), chi2, ndf);
+}
+
+UncertainHelix CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& startPerigeeCircle,
+                                          const TMatrixD& startAmbiguityMatrix,
+                                          const UncertainHelix& endHelix)
+{
+  TVectorD startParameters = startPerigeeCircle.parameters();
+  TMatrixDSym startCovMatrix = startPerigeeCircle.perigeeCovariance();
+
+  TVectorD endParameters = endHelix.parameters();
+  TMatrixDSym endCovMatrix = endHelix.helixCovariance();
+  TMatrixD endAmbiguityMatrix(5, 5);
+  endAmbiguityMatrix.UnitMatrix();
+
+  // Helix covariance
+  TMatrixDSym avgCovMatrix(5);
+  avgCovMatrix.Zero();
+
+  // Helix parameters
+  TVectorD avgParameters(5);
+  avgParameters.Zero();
+
+  // Calculating 5 parameters from 8 input parameters. 3 NDF remaining.
+  size_t ndf = 3;
+
+  double chi2 = 0;
 
 
+  if (useResidualParameters) {
+    // Use the circle parameters as the reference, since the ambiguity matrix is a expansion around that point.
+    TVectorD refParameters = startParameters;
+    refParameters *= 0.5;
+
+    startParameters -= refParameters;
+
+    // Only first three coordinates are effected by a change of the reference (expansion) point
+    endParameters(iCurv) -= refParameters(iCurv);
+    endParameters(iPhi0) -= refParameters(iPhi0);
+    endParameters(iI) -= refParameters(iI);
+
+    // Chi2 value
+    chi2 = average(startParameters,
+                   startCovMatrix,
+                   startAmbiguityMatrix,
+                   endParameters,
+                   endCovMatrix,
+                   endAmbiguityMatrix,
+                   avgParameters,
+                   avgCovMatrix);
+
+    avgParameters(iCurv) += refParameters(iCurv);
+    avgParameters(iPhi0) += refParameters(iPhi0);
+    avgParameters(iI) += refParameters(iI);
+
+  } else {
+    // Chi2 value
+    chi2 = average(startParameters,
+                   startCovMatrix,
+                   startAmbiguityMatrix,
+                   endParameters,
+                   endCovMatrix,
+                   endAmbiguityMatrix,
+                   avgParameters,
+                   avgCovMatrix);
+  }
+
+  return UncertainHelix(avgParameters, HelixCovariance(avgCovMatrix), chi2, ndf);
+}
+
+UncertainHelix CDCAxialStereoFusion::fuse(const UncertainHelix& startHelix,
+                                          const UncertainHelix& endHelix)
+{
+  TVectorD startParameters = startHelix.parameters();
+  TMatrixDSym startCovMatrix = startHelix.helixCovariance();
+
+  TVectorD endParameters = endHelix.parameters();
+  TMatrixDSym endCovMatrix = endHelix.helixCovariance();
+
+  TMatrixDSym avgCovMatrix(5);
+  avgCovMatrix.Zero();
+
+  TVectorD avgParameters(5);
+  avgParameters.Zero();
+
+  double chi2 = average(startParameters,
+                        startCovMatrix,
+                        endParameters,
+                        endCovMatrix,
+                        avgParameters,
+                        avgCovMatrix);
+
+  // Calculating 5 parameters from 10 input parameters. 5 NDF remaining.
+  size_t ndf = 5;
+
+  return UncertainHelix(avgParameters, HelixCovariance(avgCovMatrix), chi2, ndf);
 }
 
 
@@ -256,8 +448,6 @@ void CDCAxialStereoFusion::fuseTrajectories(const CDCAxialStereoSegmentPair& axi
 }
 
 
-
-
 CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
     const CDCRecoSegment2D& endSegment,
     bool priorityOnSZ)
@@ -311,7 +501,6 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
     // To reconstructed point in the three dimensional stereo segment all lie exactly on the circle they are reconstructed onto.
     // This part draws them away from the circle onto the sz trajectory instead leaving all the residuals visible in the xy projection.
     // Hence the two dimensional fit, which is used for the fusion afterwards can react to residuals and render the covariances of the stereo segment broader.
-    // This effect might be marginal though, which is why we make this step optional.
     for (CDCRecoHit3D & recoHit3D : stereoSegment3D) {
       const CDCWire& wire = recoHit3D.getWire();
 
@@ -352,9 +541,6 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   return fusedTrajectory3D;
 
 }
-
-
-
 
 
 void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,

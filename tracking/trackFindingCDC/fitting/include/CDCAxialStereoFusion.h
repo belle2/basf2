@@ -25,6 +25,45 @@ namespace Belle2 {
 
     class CDCAxialStereoFusion : public SwitchableRootificationBase {
 
+
+    public:
+      static FloatType average(const TVectorD& startParameters,
+                               const TMatrixDSym& startCovMatrix,
+                               const TVectorD& endParameters,
+                               const TMatrixDSym& endCovMatrix,
+                               TVectorD& avgParameters,
+                               TMatrixDSym& avgCovMatrix);
+
+      static FloatType average(const TVectorD& startParameters,
+                               const TMatrixDSym& startCovMatrix,
+                               const TMatrixD& startAmbiguityMatrix,
+                               const TVectorD& endParameters,
+                               const TMatrixDSym& endCovMatrix,
+                               const TMatrixD& endAmbiguityMatrix,
+                               TVectorD& avgParameters,
+                               TMatrixDSym& avgCovMatrix);
+
+    public:
+      static UncertainPerigeeCircle fuse(const UncertainPerigeeCircle& startPerigeeCircle,
+                                         const UncertainPerigeeCircle& endPerigeeCircle);
+
+      static UncertainHelix fuse(const UncertainPerigeeCircle& startPerigeeCircle,
+                                 const TMatrixD& startAmbiguityMatrix,
+                                 const UncertainPerigeeCircle& endPerigeeCircle,
+                                 const TMatrixD& endAmbiguityMatrix);
+
+      static UncertainHelix fuse(const UncertainHelix& startHelix,
+                                 const UncertainPerigeeCircle& endPerigeeCircle,
+                                 const TMatrixD& endAmbiguityMatrix)
+      { return fuse(endPerigeeCircle, endAmbiguityMatrix, startHelix); }
+
+      static UncertainHelix fuse(const UncertainPerigeeCircle& startPerigeeCircle,
+                                 const TMatrixD& startAmbiguityMatrix,
+                                 const UncertainHelix& endHelix);
+
+      static UncertainHelix fuse(const UncertainHelix& startHelix,
+                                 const UncertainHelix& endHelix);
+
     public:
       static TMatrixD calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
                                     const CDCTrajectory2D& trajectory2D);
@@ -33,7 +72,7 @@ namespace Belle2 {
                                     const CDCTrajectory2D& trajectory2D);
 
 
-
+    public:
       static CDCTrajectory3D fuseTrajectories(const CDCRecoSegment2D& startSegment,
                                               const CDCRecoSegment2D& endSegment);
 
@@ -46,7 +85,7 @@ namespace Belle2 {
       static void reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
                                               bool priorityOnSZ = true);
 
-    public:
+
       /** ROOT Macro to make CDCAxialStereoFusion a ROOT class.*/
       TRACKFINDINGCDC_SwitchableClassDef(CDCAxialStereoFusion, 1);
 

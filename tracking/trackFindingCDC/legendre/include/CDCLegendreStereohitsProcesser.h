@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeCandidateCreator.h>
 #include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
 
@@ -39,9 +40,11 @@ namespace Belle2 {
     class TrackHit;
     class TrackCandidate;
     class StereoHit;
+    class QuadTreeProcessor;
 
     class StereohitsProcesser {
     public:
+      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
 
       StereohitsProcesser();
 
@@ -81,7 +84,7 @@ namespace Belle2 {
 
       static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
 
-      TrackFindingCDC::QuadTree* m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
+      QuadTreeLegendre* m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
 
     };
   }

@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+//#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
 #include <vector>

@@ -16,7 +16,7 @@ using namespace TrackFindingCDC;
 
 QuadTreeCandidateCreator* QuadTreeCandidateCreator::s_cdcLegendreQuadTreeCandidateCreator = 0;
 std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > > QuadTreeCandidateCreator::s_candidates; /**< Holds list of track candidates */
-std::list<QuadTree*> QuadTreeCandidateCreator::s_nodesWithCandidates;
+std::list<QuadTreeLegendre*> QuadTreeCandidateCreator::s_nodesWithCandidates;
 TrackFitter* QuadTreeCandidateCreator::s_cdcLegendreTrackFitter;
 TrackProcessor* QuadTreeCandidateCreator::s_cdcLegendreTrackProcessor;
 std::vector<TrackHit*> QuadTreeCandidateCreator::s_axialHits;
@@ -31,26 +31,27 @@ QuadTreeCandidateCreator& QuadTreeCandidateCreator::Instance()
   return *s_cdcLegendreQuadTreeCandidateCreator;
 }
 
-bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
+bool QuadTreeCandidateCreator::createCandidateDirect(QuadTreeLegendre* node)
 {
-  node->cleanHitsInNode();
+  node->cleanUpItems<QuadTreeProcessor>();
+
   if (not node->checkNode()) return false;
 
   int AxialVsStereo = 0;
 
-  for (TrackHit * hit : node->getHits()) {
+  for (TrackHit * hit : node->getItemsVector()) {
     hit->setHitUsage(TrackHit::used_in_cand);
     if (hit->getIsAxial()) AxialVsStereo++;
     else AxialVsStereo--;
   }
 
-  std::vector<QuadTree*> nodeList;
+  std::vector<QuadTreeLegendre*> nodeList;
   nodeList.push_back(node);
 
   node->findNeighbors();
-  for (QuadTree * nodeNeighbor : node->getNeighborsVector()) {
-    if (nodeNeighbor->getNHits() == 0) nodeNeighbor->fillChildrenForced();
-    nodeNeighbor->cleanHitsInNode();
+  for (QuadTreeLegendre * nodeNeighbor : node->getNeighborsVector()) {
+    if (nodeNeighbor->getNItems() == 0) nodeNeighbor->fillChildrenForced<QuadTreeProcessor>();
+    nodeNeighbor->cleanUpItems<QuadTreeProcessor>();
   }
 
   /*
@@ -79,20 +80,20 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
   UNUSED
   int neighborsOrder = 5;
 
-  std::vector<QuadTree*> nodesInitial;
-  std::vector<QuadTree*> nodesNeighbors;
-  std::vector<QuadTree*> nodesCluster;
+  std::vector<QuadTreeLegendre*> nodesInitial;
+  std::vector<QuadTreeLegendre*> nodesNeighbors;
+  std::vector<QuadTreeLegendre*> nodesCluster;
 
-  for (QuadTree * node_temp : nodeList) {
+  for (QuadTreeLegendre * node_temp : nodeList) {
     nodesInitial.push_back(node_temp);
     nodesCluster.push_back(node_temp);
   }
   for (int order = 0; order < neighborsOrder; order++) {
     nodesNeighbors.clear();
-    for (QuadTree * node_temp : nodesInitial) {
-      for (QuadTree * nodeNeighbor : node_temp->getNeighborsVector()) {
+    for (QuadTreeLegendre * node_temp : nodesInitial) {
+      for (QuadTreeLegendre * nodeNeighbor : node_temp->getNeighborsVector()) {
         bool nodeToAdd = true;
-        for (QuadTree * nodeInVector : nodesCluster) {
+        for (QuadTreeLegendre * nodeInVector : nodesCluster) {
           if (nodeInVector == nodeNeighbor) nodeToAdd = false;
         }
         if (nodeToAdd) {
@@ -104,15 +105,15 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
 
 
     nodesInitial.clear();
-    for (QuadTree * node_temp : nodesNeighbors) {
+    for (QuadTreeLegendre * node_temp : nodesNeighbors) {
       nodesInitial.push_back(node_temp);
     }
   }
 
   std::vector<TrackHit*> hitsToProcess;
 
-  for (QuadTree * node_temp : nodesCluster) {
-    for (TrackHit * hit : node_temp->getHits()) {
+  for (QuadTreeLegendre * node_temp : nodesCluster) {
+    for (TrackHit * hit : node_temp->getItemsVector()) {
       bool hitToAdd = true;
       for (TrackHit * hitInVector : hitsToProcess) {
         if (hitInVector == hit) hitToAdd = false;
@@ -191,17 +192,19 @@ QuadTreeCandidateCreator::~QuadTreeCandidateCreator()
 
 // UNUSED
 /*
-QuadTree* QuadTreeCandidateCreator::findNode(QuadTree* tree, double r, double theta)
+QuadTreeLegendre* QuadTreeCandidateCreator::findNode(QuadTreeLegendre* tree, double r, double theta)
 {
-  if (((tree->getRMin() < r) && (tree->getRMax() > r)) && ((tree->getThetaMin() < theta) && (tree->getThetaMax() > theta))) {
+  if (((tree->getXMin() < r) && (tree->getXMax() > r)) && ((tree->getYMin() < theta) && (tree->getYMax() > theta))) {
     if (tree->isLeaf())
       return tree;
     else {
-      QuadTree* returnNode = 0;
+      QuadTreeLegendre* returnNode = 0;
 
-      for (int rBin = 0; rBin < tree->getRNbins(); rBin++) {
-        for (int thetaBin = 0; thetaBin < tree->getThetaNbins(); thetaBin++) {
-          returnNode = findNode(tree->getChild(thetaBin, rBin), r, theta);
+      for (int rBin = 0; rBin < tree->getXNbins(); rBin++) {
+        for (int thetaBin = 0; thetaBin < tree->getYNbins(); thetaBin++) {
+          if (tree->getChildren() == nullptr)
+            tree->initializeChildren<QuadTreeProcessor>();
+          returnNode = findNode(tree->getChildren()->get(thetaBin, rBin), r, theta);
           if (returnNode != 0) return returnNode;
         }
       }

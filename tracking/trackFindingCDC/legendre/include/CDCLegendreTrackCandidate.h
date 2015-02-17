@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
+#include "tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h"
+
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
@@ -22,6 +24,7 @@
 #include "TVector2.h"
 
 #include "boost/foreach.hpp"
+#include <boost/math/constants/constants.hpp>
 
 #include <list>
 #include <cmath>
@@ -32,11 +35,14 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class QuadTree;
+    template<typename typeX, typename typeY, class typeData>
+    class QuadTreeTemplate;
 
     /** Class for track candidates after CDC pattern recognition. */
     class TrackCandidate {
     public:
+
+      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
 
       /** Enum for charge hypotheses of track.*/
       enum ChargeHypotheses {
@@ -60,7 +66,7 @@ namespace Belle2 {
       TrackCandidate(TrackCandidate& candidate);
 
       /** Construct track candidate using information from CDCLegendreQuadTree nodes */
-      TrackCandidate(const std::vector<QuadTree*>& nodeList);
+      TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList);
 
       /** Destructor. */
       virtual ~TrackCandidate();
@@ -255,10 +261,12 @@ namespace Belle2 {
       /** get type of the track (see enum CandidateType) */
       inline int getCandidateType() const {return m_type;};
 
+
     private:
 
+
       std::vector<TrackHit*> m_TrackHits; /**< vector to store TrackCandidateHits belonging to this TrackCandidate */
-      std::vector<QuadTree*> m_nodes; /**< vector to store nodes containing hits which belong to the candidate */
+      std::vector<QuadTreeLegendre*> m_nodes; /**< vector to store nodes containing hits which belong to the candidate */
 
       double m_theta; /**< theta_value of the track candidate, given by Legendre track finding*/
       double m_r; /**< r_value of the track candidate, given by Legendre track finding*/

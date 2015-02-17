@@ -18,6 +18,7 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
@@ -33,13 +34,16 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class TrackProcessor;
-    class QuadTree;
+    template<typename typeX, typename typeY, class typeData>
+    class QuadTreeTemplate;
     class TrackFitter;
     class TrackMerger;
 
     class QuadTreeCandidateCreator {
 
     public:
+      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+
       QuadTreeCandidateCreator() {};
 
       ~QuadTreeCandidateCreator();
@@ -56,16 +60,16 @@ namespace Belle2 {
       static void setCandidateCreator(TrackProcessor* cdcLegendreTrackProcessor) {s_cdcLegendreTrackProcessor = cdcLegendreTrackProcessor;};
 
       /** Add node to the list of nodes with candidated */
-      static inline void addNode(QuadTree* node) {s_nodesWithCandidates.push_back(node);};
+      static inline void addNode(QuadTreeLegendre* node) {s_nodesWithCandidates.push_back(node);};
 
       /** Creating candidates using information from nodes */
       void createCandidates();
 
       /** Creating candidate using information from given node */
-      bool createCandidate(QuadTree* node);
+      bool createCandidate(QuadTreeLegendre* node);
 
       /** Creating candidate using information from given node */
-      bool createCandidateDirect(QuadTree* node);
+      bool createCandidateDirect(QuadTreeLegendre* node);
 
       /** Creating candidates using information from nodes */
       std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > >& getCandidates()
@@ -78,11 +82,11 @@ namespace Belle2 {
       void clearNodes();
 
       /** Find leaf node with given parameters r and theta */
-      QuadTree* findNode(QuadTree*, double, double);
+      QuadTreeLegendre* findNode(QuadTreeLegendre*, double, double);
 
 
       /** Sort nodes according to number of hits */
-      static bool sort_nodes(const QuadTree* node_one, const QuadTree* node_two);
+      static bool sort_nodes(const QuadTreeLegendre* node_one, const QuadTreeLegendre* node_two);
 
       static void setAppendHitsWhileFinding(bool appendHitsWhileFinding) {
         m_appendHitsWhileFinding = appendHitsWhileFinding;
@@ -105,7 +109,7 @@ namespace Belle2 {
       bool postprocessTrackCandidate(TrackCandidate* trackCandidate);
 
       static std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > > s_candidates; /**< Holds list of track candidates */
-      static std::list<QuadTree*> s_nodesWithCandidates; /**< List of nodes with possible track candidates */
+      static std::list<QuadTreeLegendre*> s_nodesWithCandidates; /**< List of nodes with possible track candidates */
       static TrackFitter* s_cdcLegendreTrackFitter; /**< Track fitter object */
       static TrackProcessor* s_cdcLegendreTrackProcessor; /**< Track creator object */
       static std::vector<TrackHit*> s_axialHits; /**< Holds list of acial hits */

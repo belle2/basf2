@@ -16,10 +16,13 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class QuadTree;
+    template<typename typeX, typename typeY, class typeData>
+    class QuadTreeTemplate;
 
     class QuadTreeNeighborFinder {
     public:
+      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+
       QuadTreeNeighborFinder() {};
       ~QuadTreeNeighborFinder() {};
 
@@ -27,19 +30,19 @@ namespace Belle2 {
       static QuadTreeNeighborFinder& Instance();
 
       /** Controls process of neighbors finding */
-      void controller(QuadTree*, QuadTree*, QuadTree*);
+      void controller(QuadTreeLegendre*, QuadTreeLegendre*, QuadTreeLegendre*);
 
       /** One level up in the tree */
-      void levelUp(QuadTree*, QuadTree*);
+      void levelUp(QuadTreeLegendre*, QuadTreeLegendre*);
 
       /** One level down in the tree */
-      void levelDown(QuadTree*, QuadTree*);
+      void levelDown(QuadTreeLegendre*, QuadTreeLegendre*);
 
       /** Trying to find neighbors to node */
-      void findNeighbors(QuadTree*, QuadTree*, QuadTree*);
+      void findNeighbors(QuadTreeLegendre*, QuadTreeLegendre*, QuadTreeLegendre*);
 
       /** Checks if nodes are neighbors */
-      bool compareNodes(QuadTree*, QuadTree*);
+      bool compareNodes(QuadTreeLegendre*, QuadTreeLegendre*);
 
     private:
 

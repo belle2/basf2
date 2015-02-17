@@ -12,7 +12,7 @@ using namespace TrackFindingCDC;
 
 StereohitsProcesser::StereohitsProcesser()
 {
-  m_cdcLegendreQuadTree = new QuadTree(-0.15, 0.15,  /*-1.*m_rc, m_rc,*/ 0, 8192, 0, NULL);
+  m_cdcLegendreQuadTree = new QuadTreeLegendre(-0.15, 0.15,  /*-1.*m_rc, m_rc,*/ 0, 8192, 0, NULL);
 //  m_cdcLegendreQuadTree->setLastLevel(12);
 
 }
@@ -384,23 +384,23 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   double __attribute__((unused)) limit = 6;
   double __attribute__((unused)) rThreshold = 0.15;
 
-  std::vector<QuadTree*> nodeList;
+  std::vector<QuadTreeLegendre*> nodeList;
 
   int lastlevel(0);
   lastlevel = m_cdcLegendreQuadTree->getLastLevel();
   m_cdcLegendreQuadTree->setLastLevel(9);
 
-  m_cdcLegendreQuadTree->provideHitSet(hits_set);
+  m_cdcLegendreQuadTree->provideItemsSet<QuadTreeProcessor>(hits_set);
   B2INFO("Number of stereohits = " << hits_set.size());
 //  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
-  m_cdcLegendreQuadTree->setHitsThreshold(limit);
+  m_cdcLegendreQuadTree->setNItemsThreshold(limit);
 
   // store all candidates in a simple vector
-  QuadTree::CandidateProcessorLambda lmdCandidateProcessing = [&nodeList](QuadTree * qt) -> void {
+  QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [&nodeList](QuadTreeLegendre * qt) -> void {
     nodeList.push_back(qt);
   };
 
-  m_cdcLegendreQuadTree->startFillingTree(lmdCandidateProcessing);
+  m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
 
   m_cdcLegendreQuadTree->setLastLevel(lastlevel);
 
@@ -408,18 +408,18 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   if (nodeList.size() != 0) {
 //    B2INFO(nodeList.size() << " NODES WERE ADDED!");
 
-    QuadTree* nodeWithMostHits = nullptr;
+    QuadTreeLegendre* nodeWithMostHits = nullptr;
 
-    for (QuadTree * node : nodeList) {
+    for (QuadTreeLegendre * node : nodeList) {
       if (nodeWithMostHits == nullptr) {
         nodeWithMostHits = node;
       } else {
-        if (nodeWithMostHits->getHits().size() < node->getHits().size())
+        if (nodeWithMostHits->getItemsVector().size() < node->getItemsVector().size())
           nodeWithMostHits = node;
       }
     }
 
-    for (TrackHit * hit : nodeWithMostHits->getHits()) {
+    for (TrackHit * hit : nodeWithMostHits->getItemsVector()) {
       cand->addHit(hit);
       hit->setHitUsage(TrackHit::used_in_track);
     }

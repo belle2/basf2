@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackingSortHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
@@ -37,12 +38,15 @@ using namespace std;
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class QuadTree;
+    template<typename typeX, typename typeY, class typeData>
+    class QuadTreeTemplate;
     class TrackDrawer;
     class TrackFitter;
 
     class TrackProcessor {
     public:
+      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+
       TrackProcessor(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer);
 
       /**
@@ -58,13 +62,13 @@ namespace Belle2 {
       /**
        * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
        */
-      TrackCandidate* createLegendreTrackCandidate(std::vector<QuadTree*>& nodeList);
+      TrackCandidate* createLegendreTrackCandidate(std::vector<QuadTreeLegendre*>& nodeList);
 
       /** Create tracklet using vector of hits and store it */
       TrackCandidate* createLegendreTracklet(std::vector<TrackHit*>& hits);
 
       /** Create stereo tracklet using vector of hits and store it */
-      TrackCandidate* createLegendreStereoTracklet(std::vector<QuadTree*>& nodeList);
+      TrackCandidate* createLegendreStereoTracklet(std::vector<QuadTreeLegendre*>& nodeList);
 
       /**
        * @brief Perform the necessary operations after the track candidate has been constructed

@@ -60,7 +60,7 @@ TrackCandidate::TrackCandidate(double theta, double r, int charge,
   m_type = goodTrack;
 }
 
-TrackCandidate::TrackCandidate(const std::vector<QuadTree*>& nodeList) :
+TrackCandidate::TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList) :
   m_theta(0), m_r(0), m_xc(0), m_yc(0), m_ref_x(0), m_ref_y(0), m_charge(0), m_axialHits(0), m_stereoHits(0),
   m_calcedMomentum(false), m_momEstimation(0, 0, 0)
 {
@@ -68,8 +68,8 @@ TrackCandidate::TrackCandidate(const std::vector<QuadTree*>& nodeList) :
 
   int nHitsNodeMax = 0;
   //only accepts hits, which support the correct curvature
-  for (QuadTree * node : nodeList) {
-    for (TrackHit * hit : node->getHits()) {
+  for (QuadTreeLegendre * node : nodeList) {
+    for (TrackHit * hit : node->getItemsVector()) {
 //            if ((m_charge == charge_positive || m_charge == charge_negative)
 //                && hit->getCurvatureSignWrt(getXc(), getYc()) != m_charge)
 //              continue;
@@ -78,10 +78,10 @@ TrackCandidate::TrackCandidate(const std::vector<QuadTree*>& nodeList) :
 
       m_hitPattern.setLayer(hit->getLayerId());
     }
-    if (nHitsNodeMax < node->getNHits()) {
-      nHitsNodeMax = node->getNHits();
-      m_theta = node->getThetaMean();
-      m_r = node->getRMean();
+    if (nHitsNodeMax < node->getNItems()) {
+      nHitsNodeMax = node->getNItems();
+      m_theta = node->getYMean() * boost::math::constants::pi<double>() / TrigonometricalLookupTable::Instance().getNBinsTheta();
+      m_r = node->getXMean();
     }
     m_nodes.push_back(node);
   }

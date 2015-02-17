@@ -24,7 +24,9 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendrePatternChecker.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
+//#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeCandidateCreator.h>
 #include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
 
@@ -46,6 +48,7 @@ namespace Belle2 {
   class QuadTreeCandidateCreator;
   */
   class CDCNiceDrawingModule;
+
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
@@ -95,6 +98,8 @@ namespace Belle2 {
 
   private:
 
+    typedef TrackFindingCDC::QuadTreeTemplate<double, int, TrackFindingCDC::TrackHit> QuadTreeLegendre;
+
     std::string m_cdcHitsColName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
     std::string m_gfTrackCandsColName; /**< Output genfit track candidates collection name*/
 
@@ -111,7 +116,7 @@ namespace Belle2 {
     TrackFindingCDC::TrackFitter* m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
     TrackFindingCDC::FastHough* m_cdcLegendreFastHough; /**< Fast Hough transformer */
     TrackFindingCDC::TrackProcessor* m_cdcLegendreTrackProcessor; /**< Object for creating tracks */
-    TrackFindingCDC::QuadTree* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
+    TrackFindingCDC::QuadTreeLegendre* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
     TrackFindingCDC::QuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator; /**< Object which creates track candidates using quadtree nodes */
 
     //TrackFindingCDC::PatternChecker* m_cdcLegendrePatternChecker; /**< Used for check patterns of tracks */

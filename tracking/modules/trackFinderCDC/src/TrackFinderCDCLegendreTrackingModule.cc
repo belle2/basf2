@@ -237,7 +237,7 @@ void CDCLegendreTrackingModule::initialize()
 //  m_cdcLegendreConformalPosition = new ConformalPosition();
 
 //  m_cdcLegendreQuadTree = new QuadTree(-1.*m_rc, m_rc, 0, m_nbinsTheta, 0, NULL);
-  m_cdcLegendreQuadTree = new QuadTree(m_rMin, m_rMax,  /*-1.*m_rc, m_rc,*/ 0, m_nbinsTheta, 0, NULL);
+  m_cdcLegendreQuadTree = new QuadTreeLegendre(m_rMin, m_rMax,  /*-1.*m_rc, m_rc,*/ 0, m_nbinsTheta, 0, NULL);
   m_cdcLegendreQuadTree->setLastLevel(m_maxLevel);
 //  m_cdcLegendreQuadTree->buildNeighborhood(m_maxLevel);
 
@@ -358,22 +358,20 @@ void CDCLegendreTrackingModule::DoTreeTrackFinding()
 
   double limit = 40;
   double rThreshold = 0.07;
-  m_cdcLegendreQuadTree->provideHitSet(hits_set);
-  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
+  m_cdcLegendreQuadTree->provideItemsSet<QuadTreeProcessor>(hits_set);
   int nSteps = 0;
 
   // this lambda function will forward the found candidates to the CandidateCreate for further processing
   // hits belonging to found candidates will be marked as used and ignored for further
   // filling iterations
-  QuadTree::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTree * qt) -> void {
+  QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTreeLegendre * qt) -> void {
     QuadTreeCandidateCreator::Instance().createCandidateDirect(qt);
   };
 
   //  Start loop, where tracks are searched for
   do {
-    m_cdcLegendreQuadTree->setRThreshold(rThreshold);
-    m_cdcLegendreQuadTree->setHitsThreshold(limit);
-    m_cdcLegendreQuadTree->startFillingTree(lmdCandidateProcessing);
+    m_cdcLegendreQuadTree->setNItemsThreshold(limit);
+    m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
 
     limit = limit * m_stepScale;
 //    rThreshold *= 2.;
@@ -417,22 +415,20 @@ void CDCLegendreTrackingModule::DoTreeTrackFindingFinal()
   double limit = 20;
   double rThreshold = 0.15;
   m_cdcLegendreQuadTree->clearTree();
-  m_cdcLegendreQuadTree->provideHitSet(hits_set);
-  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
+  m_cdcLegendreQuadTree->provideItemsSet<QuadTreeProcessor>(hits_set);
   int nSteps = 0;
 
   // this lambda function will forward the found candidates to the CandidateCreate for further processing
   // hits belonging to found candidates will be marked as used and ignored for further
   // filling iterations
-  QuadTree::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTree * qt) -> void {
+  QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTreeLegendre * qt) -> void {
     QuadTreeCandidateCreator::Instance().createCandidateDirect(qt);
   };
 
 //  Start loop, where tracks are searched for
   do {
-    m_cdcLegendreQuadTree->setRThreshold(rThreshold);
-    m_cdcLegendreQuadTree->setHitsThreshold(limit);
-    m_cdcLegendreQuadTree->startFillingTree(lmdCandidateProcessing);
+    m_cdcLegendreQuadTree->setNItemsThreshold(limit);
+    m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
 
     limit = limit * m_stepScale;
     rThreshold *= 2.;
@@ -609,7 +605,7 @@ void CDCLegendreTrackingModule::fitAllTracks()
   // this lambda function will forward the found candidates to the CandidateCreate for further processing
   // hits belonging to found candidates will be marked as used and ignored for further
   // filling iterations
-  QuadTree::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTree * qt) -> void {
+  QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [](QuadTreeLegendre * qt) -> void {
     QuadTreeCandidateCreator::Instance().createCandidateDirect(qt);
   };
 
@@ -627,11 +623,9 @@ void CDCLegendreTrackingModule::fitAllTracks()
 
     double limit = 6;
     double rThreshold = 0.15;
-    m_cdcLegendreQuadTree->provideHitSet(hits_set);
-    m_cdcLegendreQuadTree->setRThreshold(rThreshold);
-    m_cdcLegendreQuadTree->setRThreshold(rThreshold);
-    m_cdcLegendreQuadTree->setHitsThreshold(limit);
-    m_cdcLegendreQuadTree->startFillingTree(lmdCandidateProcessing);
+    m_cdcLegendreQuadTree->provideItemsSet<QuadTreeProcessor>(hits_set);
+    m_cdcLegendreQuadTree->setNItemsThreshold(limit);
+    m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
 
   }
 

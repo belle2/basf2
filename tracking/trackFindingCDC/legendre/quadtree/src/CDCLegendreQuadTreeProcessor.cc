@@ -7,13 +7,3 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
-
-#include <algorithm>
-
-using namespace std;
-using namespace Belle2;
-using namespace TrackFindingCDC;
-
-

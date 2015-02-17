@@ -18,16 +18,10 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-
-
 #include "tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h"
 
-#include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeCandidateCreator.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
 #include <framework/logging/Logger.h>
 
@@ -56,21 +50,42 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class QuadTreeNeighborFinder;
-    class QuadTree;
 
-    class QuadChildren {
+
+    template<typename typeX, typename typeY, class typeData>
+    class QuadTreeTemplate;
+
+    template<typename typeX, typename typeY, class typeData>
+    class QuadChildrenTemplate {
     public:
-      QuadChildren();
+      QuadChildrenTemplate() {
+        // initialize to null
+        for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {
+          for (size_t r_index = 0; r_index < m_sizeY; ++r_index) {
+            m_children[t_index][r_index] = nullptr;
+          }
+        }
+      };
 
-      void apply(std::function<void(QuadTree*)> lmd);
+      void apply(std::function<void(QuadTreeTemplate<typeX, typeY, typeData>*)> lmd) {
+        for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {
+          for (size_t r_index = 0; r_index < m_sizeY; ++r_index) {
+            if (m_children[t_index][r_index]) {
+              lmd(m_children[t_index][r_index]);
+            }
+          }
+        }
+      };
 
-      ~QuadChildren();
+      ~QuadChildrenTemplate() {
+        this->apply([](QuadTreeTemplate<typeX, typeY, typeData>* qt) { delete qt;});
+      };
 
-      inline void set(const size_t x, const size_t y, QuadTree* qt) {
+      inline void set(const size_t x, const size_t y, QuadTreeTemplate<typeX, typeY, typeData>* qt) {
         m_children[x][y] = qt;
       }
 
-      inline QuadTree* get(const size_t x, const size_t y) {
+      inline QuadTreeTemplate<typeX, typeY, typeData>* get(const size_t x, const size_t y) {
         return m_children[x][y];
       }
       static constexpr size_t m_sizeX = 2;
@@ -78,103 +93,174 @@ namespace Belle2 {
 
     private:
 
-      QuadTree* m_children[m_sizeX][m_sizeY];
+      QuadTreeTemplate<typeX, typeY, typeData>* m_children[m_sizeX][m_sizeY];
     };
 
 
-    class QuadTree {
+//    class QuadTreeProcessor;
+
+    template<typename typeX, typename typeY, class typeData>
+    class QuadTreeTemplate {
 
     public:
 
       // a lambda expression with this signature is used to process each of the
       // found candidates during the startFillingTree call
-      typedef std::function< void(QuadTree*) > CandidateProcessorLambda;
+      typedef std::function< void(QuadTreeTemplate<typeX, typeY, typeData>*) > CandidateProcessorLambda;
 
-      typedef std::array<float, 3> FloatBinTuple;
-      typedef std::array<int, 3> IntBinTuple;
-      typedef std::vector<QuadTree*> NodeList;
-      //typedef boost::multi_array< QuadTree *, 2> ChildrenArray;
+      typedef std::array<typeX, 3> XBinTuple;
+      typedef std::array<typeY, 3> YBinTuple;
+      typedef std::vector<QuadTreeTemplate<typeX, typeY, typeData>*> NodeList;
+      //typedef boost::multi_array< QuadTreeTemplate *, 2> ChildrenArray;
 
-      QuadTree();
+      QuadTreeTemplate() : m_xMin(0), m_xMax(0), m_yMin(0), m_yMax(0), m_level(0) {;};
 
-      QuadTree(float rMin, float rMax, int thetaMin, int thetaMax, int level, QuadTree* parent);
+      QuadTreeTemplate(typeX xMin, typeX xMax, typeY yMin, typeY yMax, int level, QuadTreeTemplate<typeX, typeY, typeData>* parent) :
+        m_xMin(xMin), m_xMax(xMax), m_yMin(yMin), m_yMax(yMax), m_level(level) {
+        m_filled = false;
+        m_neighborsDefined = false;
 
-//    void setParameters(double rMin, double rMax, int thetaMin, int thetaMax, int level, CDCLegendreQuadTree* parent);
+        if (m_level > 0) {
+          m_parent = parent;
+        } else {
+          m_parent = nullptr;
+        }
 
-      /** Initialize structure and prepare children */
-      void initialize();
+        m_nBinsX = 2;
+        m_nBinsY = 2;
 
-      void terminate();
+        m_xBins[0] = m_xMin;
+        m_xBins[1] = static_cast<typeX>(m_xMin + 0.5 * (m_xMax - m_xMin));
+        m_xBins[2] = m_xMax;
+
+        m_yBins[0] = m_yMin;
+        m_yBins[1] = static_cast<typeY>(m_yMin + 0.5 * (m_yMax - m_yMin));
+        m_yBins[2] = m_yMax;
+      };
+
+      void setParameters(typeX xMin, typeX xMax, typeY yMin, typeY yMax, int level, QuadTreeTemplate<typeX, typeY, typeData>* parent) {
+        m_xMin = xMin;
+        m_xMax = xMax;
+        m_yMin = yMin;
+        m_yMax = yMax;
+        m_level = level;
+
+        if (m_level > 0) {
+          m_parent = parent;
+        } else {
+          m_parent = nullptr;
+        }
+
+        m_nBinsX = 2;
+        m_nBinsY = 2;
+
+        m_xBins[0] = m_xMin;
+        m_xBins[1] = static_cast<typeX>(m_xMin + 0.5 * (m_xMax - m_xMin));
+        m_xBins[2] = m_xMax;
+
+        m_yBins[0] = m_yMin;
+        m_yBins[1] = static_cast<typeY>(m_yMin + 0.5 * (m_yMax - m_yMin));
+        m_yBins[2] = m_yMax;
+      }
+
+      void terminate() { clearTree();} ;
 
       /** Create vector with children of current node */
-      void initializeChildren();
+      template<class processor>
+      void initializeChildren() {
+        m_children.reset(new QuadChildrenTemplate<typeX, typeY, typeData>());
+
+        processor::initializeChildren(this, m_children.get());
+
+      } ;
 
       /** Build neighborhood for leafs */
-      void buildNeighborhood(int levelNeighborhood);
+      void buildNeighborhood(int levelNeighborhood) {
+        if (m_level < 13) {
+          applyToChildren([levelNeighborhood](QuadTreeTemplate<typeX, typeY, typeData>* qt) { qt->buildNeighborhood(levelNeighborhood);});
+        }
+
+        if (m_level > 3)
+          this->findNeighbors();
+      };
+
+      /** Returns level of the node in tree (i.e., how much ancestors the node has) */
+      inline QuadChildrenTemplate<typeX, typeY, typeData>* getChildren() const {return m_children.get();};
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
       inline int getLevel() const {return m_level;};
 
-      /** Sets threshold on number of hits in the node */
-      static void setHitsThreshold(unsigned int hitsThreshold) {s_hitsThreshold = hitsThreshold;};
+      /** Set threshold on number of items in the node */
+      void setNItemsThreshold(unsigned int hitsThreshold) {m_itemsThreshold = hitsThreshold;};
+
+      /** Get threshold on number of items in the node */
+      inline unsigned int getNItemsThreshold() const {return m_itemsThreshold;};
 
       /** Sets threshold on pt of candidates */
-      static void setRThreshold(double rThreshold) {s_rThreshold = static_cast<float>(rThreshold);};
+      void setLastLevel(double lastLevel) {m_lastLevel = static_cast<float>(lastLevel);};
 
       /** Sets threshold on pt of candidates */
-      static void setLastLevel(double lastLevel) {s_lastLevel = static_cast<float>(lastLevel);};
-
-      /** Sets threshold on pt of candidates */
-      int getLastLevel() const {return s_lastLevel;};
+      int getLastLevel() const {return m_lastLevel;};
 
       /** Copy information about hits into member of class (node at level 0 should be used  because other levels fills by parents) */
-      void provideHitSet(const std::set<TrackHit*>& hits_set);
+      template<class processor>
+      void provideItemsSet(const std::set<typeData*>& hits_set) {
+        processor::provideItemsSet(hits_set, m_items);
+      };
 
       // legacy interface, remove
       /*      void startFillingTree() {
-              CandidateProcessorLambda lmd = [](QuadTree*)->void {};
+              CandidateProcessorLambda lmd = [](QuadTreeTemplate*)->void {};
               startFillingTree(lmd);
             }*/
       /** legacy interface, remove */
-      /*      void startFillingTree(bool returnResult, std::vector<QuadTree*>& nodeList) {
-              CandidateProcessorLambda lmd = [](QuadTree*)->void {};
+      /*      void startFillingTree(bool returnResult, std::vector<QuadTreeTemplate*>& nodeList) {
+              CandidateProcessorLambda lmd = [](QuadTreeTemplate*)->void {};
               startFillingTree(returnResult, nodeList, lmd);
             }*/
 
       /** Fill the tree structure */
-      void startFillingTree(CandidateProcessorLambda& lmdProcessor);
-
-      /**
-       * Fill children of node with hits (according to bin crossing criteria)
-       */
-      void fillChildren(/*const std::vector<CDCLegendreTrackHit*>& hits*/);
+      template<class processor>
+      void startFillingTree(CandidateProcessorLambda& lmdProcessor) {
+        processor::fillTree(this, lmdProcessor);
+      } ;
 
       /** Forced filling of tree, skipping limitation on number of hits
        * Filling nodes which are parents to the current one
        */
-      void fillChildrenForced();
+      template<class processor>
+      void fillChildrenForced() {
+        if (!m_parent->checkFilled()) {
+          m_parent->fillChildrenForced<processor>();
+          processor::fillChildren(m_children.get(), m_items);
+          setFilled();
+        }
+      } ;
 
       /** Insert hit into node */
-      void insertHit(TrackHit* hit) {m_hits.push_back(hit); };
+      void insertItem(typeData* hit) {m_items.push_back(hit); };
 
       /** Reserve memory for holding hits */
-      void reserveHitsVector(int nHits) {m_hits.reserve(nHits); };
+      void reserveHitsVector(int nHits) {m_items.reserve(nHits); };
 
       /** Check if the node passes threshold on number of hits */
-      bool checkNode() const {return m_hits.size() >= s_hitsThreshold;};
+      bool checkNode() const {return m_items.size() >= m_itemsThreshold;};
 
       /** Get hits from node */
-      inline std::vector<TrackHit*>& getHits() {return m_hits;};
+      inline std::vector<typeData*>& getItemsVector() {return m_items;};
 
       /** Check if the node passes threshold on number of hits */
-      inline int getNHits() const {return m_hits.size();};
+      inline int getNItems() const {return m_items.size();};
 
       /** Removing used or bad hits */
-      void cleanHitsInNode() ;
+      template<class processor>
+      void cleanUpItems() {
+        processor::cleanUpItems(m_items);
+      } ;
 
       //TODO: IMPORTANT! check functionality of this method and impact of uncommenting _m_level_ ! */
       /** Check whether node is leaf (lowest node in the tree) */
-      bool isLeaf() const {return m_level >= s_lastLevel;};
+      bool isLeaf() const {return m_level >= m_lastLevel;};
 
       /** Check whether node has been processed, i.e. children nodes has been filled */
       inline bool checkFilled() const {return m_filled; };
@@ -183,37 +269,40 @@ namespace Belle2 {
       void setFilled() {m_filled = true; };
 
       /** Get mean value of theta */
-      inline double getThetaMean() const {return static_cast<double>((m_thetaMin + m_thetaMax) / 2. * boost::math::constants::pi<double>() / TrigonometricalLookupTable::Instance().getNBinsTheta());};
+      inline typeY getYMean() const {return static_cast<typeY>((m_yMin + m_yMax) / 2. /* boost::math::constants::pi<double>() / TrigonometricalLookupTable::Instance().getNBinsTheta()*/);};
 
       /** Get mean value of r */
-      inline double getRMean() const {return static_cast<double>((m_rMin + m_rMax) / 2.);};
+      inline typeX getXMean() const {return static_cast<typeX>((m_xMin + m_xMax) / 2.);};
 
       /** Get number of bins in "r" direction */
-      inline int getRNbins() const {return m_nbins_r;};
+      inline int getXNbins() const {return m_nBinsX;};
 
       /** Get minimal "r" value of the node */
-      inline double getRMin() const {return static_cast<double>(m_rMin);};
+      inline typeX getXMin() const {return static_cast<typeX>(m_xMin);};
 
       /** Get maximal "r" value of the node */
-      inline double getRMax() const {return static_cast<double>(m_rMax);};
+      inline typeX getXMax() const {return static_cast<typeX>(m_xMax);};
+
+      /** Get "r" value of given bin border */
+      inline typeX getXBin(unsigned int bin) const { return static_cast<typeX>(m_xBins[bin]); };
 
       /** Get number of bins in "Theta" direction */
-      inline int getThetaNbins() const {return m_nbins_theta;};
+      inline int getYNbins() const {return m_nBinsY;};
 
       /** Get minimal "Theta" value of the node */
-      inline int getThetaMin() const {return m_thetaMin;};
+      inline typeY getYMin() const {return m_yMin;};
 
       /** Get maximal "Theta" value of the node */
-      inline int getThetaMax() const {return m_thetaMax;};
+      inline typeY getYMax() const {return m_yMax;};
+
+      /** Get "r" value of given bin border */
+      inline typeX getYBin(unsigned int bin) const { return static_cast<typeX>(m_yBins[bin]); };
 
       /** Return pointer to the parent of the node */
-      inline QuadTree* getParent() const {return m_parent;};
-
-      /** Get child of the node by index */
-      QuadTree* getChild(int t_index, int r_index) ;
+      inline QuadTreeTemplate<typeX, typeY, typeData>* getParent() const {return m_parent;};
 
       /** Add pointer to some node to list of neighbors of current node */
-      void addNeighbor(QuadTree* node) {m_neighbors.push_back(node);};
+      void addNeighbor(QuadTreeTemplate<typeX, typeY, typeData>* node) {m_neighbors.push_back(node);};
 
       /** Get number of neighbors of the current node (used mostly for debugging purposes) */
       int getNneighbors() const {return m_neighbors.size();};
@@ -222,52 +311,98 @@ namespace Belle2 {
       inline bool isNeighborsDefined() const {return m_neighborsDefined;};
 
       /** Find and store neighbors of the node */
-      void findNeighbors();
+      void findNeighbors() {
+        if (not m_neighborsDefined) {
+          //    QuadTreeNeighborFinder::Instance().controller(this, this, m_parent);
+          m_neighborsDefined = true;
+        }
+        //  B2INFO("Number of neighbors: " << m_neighbors.size());
+
+        //  B2INFO("Number of hits in node: " << m_items.size());
+        /*  for(CDCLegendreQuadTree* node: m_neighbors){
+         if(node->getNItems() == 0) node->fillChildrenForced();
+         node->cleanUpItems();
+         */
+        //    B2INFO("Number of hits in neighbor: " << node->getNItems());
+        /*    if(node->checkNode()){
+         for(CDCLegendreTrackHit *hit: node->getItemsVector()){
+         m_items.push_back(hit);
+         }
+         */
+        //  }
+      };
 
       /** Get list of neighbors of the current node */
-      std::vector<QuadTree*>& getNeighborsVector();
+      std::vector<QuadTreeTemplate<typeX, typeY, typeData>*>& getNeighborsVector() {
+        if (not m_neighborsDefined) {
+          B2WARNING(
+            "Trying to get neighbors of the node which are not defined. Starting neighbors finding");
+          //    findNeighbors();
+        }
+        return m_neighbors;
+      }
 
       /** Clear hits which the node holds */
-      void clearNode() {m_hits.clear(); };
+      void clearNode() {m_items.clear(); };
 
       /** Clear hits which the node holds and destroy all children below this node.
-       * This method must only be called on the root node, for fast QuadTree reusage */
-      void clearTree();
+       * This method must only be called on the root node, for fast QuadTreeTemplate reusage */
+      void clearTree() {
+        // can only be called on root item
+        assert(m_level == 0);
+
+        // automatically removes all underlying objects
+        m_children.reset(nullptr);
+        m_filled = false;
+      };
 
     private:
 
       /** apply a lambda expression to all children of this tree node */
-      void applyToChildren(std::function<void(QuadTree*)>);
+      void applyToChildren(std::function<void(QuadTreeTemplate<typeX, typeY, typeData>*)> lmd) {
+        if (!m_children)
+          return;
+        m_children->apply(lmd);
+      };
 
       /** Check if we reach limitation on dr and dtheta; returns true when reached limit */
-      bool checkLimitsR();
+      bool checkLimitsR() {
+        if (m_level == 13)
+          return true;
 
-      static unsigned int s_hitsThreshold;
-      static float s_rThreshold; /**< Threshold on r variable; allows to set threshold on pt of tracks */
-      static int s_lastLevel;
+        //  if (fabs(m_rMax - m_rMin) < m_deltaR) {
+        //    return true;
+        //  }
 
-      float m_rMin; /**< Lower border of the node (R) */
-      float m_rMax; /**< Upper border of the node (R) */
-      int m_thetaMin;  /**< Lower border of the node (Theta) */
-      int m_thetaMax;  /**< Upper border of the node (Theta) */
+        return false;
+      };
+
+      unsigned int m_itemsThreshold;
+      int m_lastLevel;
+
+      typeX m_xMin; /**< Lower border of the node (R) */
+      typeX m_xMax; /**< Upper border of the node (R) */
+      typeY m_yMin;  /**< Lower border of the node (Theta) */
+      typeY m_yMax;  /**< Upper border of the node (Theta) */
       int m_level;  /**< Level of node in the tree */
 
-      std::vector<TrackHit*> m_hits;  /**< Vector of hits which belongs to the node */
+      std::vector<typeData*> m_items;  /**< Vector of hits which belongs to the node */
 
-      QuadTree* m_parent;  /**< Pointer to the parent node */
+      QuadTreeTemplate<typeX, typeY, typeData>* m_parent;  /**< Pointer to the parent node */
 
-      std::vector<QuadTree*> m_neighbors; /**< 8 neighbours of each node (or 5 at borders) */
+      std::vector<QuadTreeTemplate<typeX, typeY, typeData>*> m_neighbors; /**< 8 neighbours of each node (or 5 at borders) */
 
       /** Pointers to the children nodes */
-      std::unique_ptr< QuadChildren > m_children;
+      std::unique_ptr< QuadChildrenTemplate<typeX, typeY, typeData> > m_children;
 
-      FloatBinTuple m_r;          /**< bins range on r */
-      IntBinTuple m_thetaBin;      /**< bins range on theta */
-      int m_nbins_r;        /**< number of r bins */
-      int m_nbins_theta;    /**< number of theta bins */
+      XBinTuple m_xBins;          /**< bins range on r */
+      YBinTuple m_yBins;      /**< bins range on theta */
+      int m_nBinsX;        /**< number of r bins */
+      int m_nBinsY;    /**< number of theta bins */
       bool m_filled; /**< Is the node has been filled with hits */
       bool m_neighborsDefined; /**< Checks whether neighbors of current node has been defined */
 
     };
+
   }
 }

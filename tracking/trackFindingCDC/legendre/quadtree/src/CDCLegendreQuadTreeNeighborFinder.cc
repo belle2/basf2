@@ -20,7 +20,7 @@ QuadTreeNeighborFinder& QuadTreeNeighborFinder::Instance()
   return *s_cdcLegendreQuadTreeNeighborFinder;
 }
 
-void QuadTreeNeighborFinder::controller(QuadTree* origin_node, QuadTree* caller_node, QuadTree* node)
+void QuadTreeNeighborFinder::controller(QuadTreeLegendre* origin_node, QuadTreeLegendre* caller_node, QuadTreeLegendre* node)
 {
 
   return;
@@ -28,9 +28,9 @@ void QuadTreeNeighborFinder::controller(QuadTree* origin_node, QuadTree* caller_
 
   /*  B2INFO("LOOKING for neighbors");
     B2INFO("LEVEL = " << node->getLevel());
-    B2INFO("Node: " << node->getThetaMin() << "x" << node->getThetaMax() << "x" << node->getRMin() << "x" << node->getRMax());
-    B2INFO("Caller node: " << caller_node->getThetaMin() << "x" << caller_node->getThetaMax() << "x" << caller_node->getRMin() << "x" << caller_node->getRMax());
-    B2INFO("Origin node: " << origin_node->getThetaMin() << "x" << origin_node->getThetaMax() << "x" << origin_node->getRMin() << "x" << origin_node->getRMax());
+    B2INFO("Node: " << node->getYMin() << "x" << node->getYMax() << "x" << node->getXMin() << "x" << node->getXMax());
+    B2INFO("Caller node: " << caller_node->getYMin() << "x" << caller_node->getYMax() << "x" << caller_node->getXMin() << "x" << caller_node->getXMax());
+    B2INFO("Origin node: " << origin_node->getYMin() << "x" << origin_node->getYMax() << "x" << origin_node->getXMin() << "x" << origin_node->getXMax());
   */
 //  B2INFO("LEVEL= " << node->getLevel());
 //  if(origin_node == node){
@@ -42,7 +42,7 @@ void QuadTreeNeighborFinder::controller(QuadTree* origin_node, QuadTree* caller_
 
 //  findNeighbors(origin_node, caller_node, node);
 
-  if (((origin_node->getThetaMin() ==  0 || origin_node->getThetaMax() ==  8192) && origin_node->getNneighbors() < 5) || (origin_node->getNneighbors() < 8)) {
+  if (((origin_node->getYMin() ==  0 || origin_node->getYMax() ==  8192) && origin_node->getNneighbors() < 5) || (origin_node->getNneighbors() < 8)) {
 //    B2INFO("Number of neighbors: "<< origin_node->getNneighbors());
     if (node->getParent() != NULL)
       levelUp(origin_node, node);
@@ -50,21 +50,21 @@ void QuadTreeNeighborFinder::controller(QuadTree* origin_node, QuadTree* caller_
 
 }
 
-void QuadTreeNeighborFinder::levelUp(QuadTree* origin_node, QuadTree* caller_node)
+void QuadTreeNeighborFinder::levelUp(QuadTreeLegendre* origin_node, QuadTreeLegendre* caller_node)
 {
   controller(origin_node, caller_node, caller_node->getParent());
 }
 
-void QuadTreeNeighborFinder::levelDown(QuadTree* origin_node, QuadTree* node)
+void QuadTreeNeighborFinder::levelDown(QuadTreeLegendre* origin_node, QuadTreeLegendre* node)
 {
-  for (int t_index = 0; t_index < node->getThetaNbins(); ++t_index) {
-    for (int r_index = 0; r_index < node->getRNbins(); ++r_index) {
-      QuadTree* child_node = node->getChild(t_index, r_index);
+  for (int t_index = 0; t_index < node->getYNbins(); ++t_index) {
+    for (int r_index = 0; r_index < node->getXNbins(); ++r_index) {
+      QuadTreeLegendre* child_node = node->getChildren()->get(t_index, r_index);
 
       if (child_node == origin_node) continue;
 
       if (child_node->isLeaf()) {
-//        B2INFO("Child node: " << child_node->getThetaMin() << "x" << child_node->getThetaMax() << "x" << child_node->getRMin() << "x" << child_node->getRMax());
+//        B2INFO("Child node: " << child_node->getYMin() << "x" << child_node->getYMax() << "x" << child_node->getXMin() << "x" << child_node->getXMax());
         if (compareNodes(child_node, origin_node))
           origin_node->addNeighbor(child_node);
       } else {
@@ -77,18 +77,18 @@ void QuadTreeNeighborFinder::levelDown(QuadTree* origin_node, QuadTree* node)
 
 
 
-void QuadTreeNeighborFinder::findNeighbors(QuadTree* origin_node, QuadTree* caller_node, QuadTree* node)
+void QuadTreeNeighborFinder::findNeighbors(QuadTreeLegendre* origin_node, QuadTreeLegendre* caller_node, QuadTreeLegendre* node)
 {
-  for (int t_index = 0; t_index < node->getThetaNbins(); ++t_index) {
-    for (int r_index = 0; r_index < node->getRNbins(); ++r_index) {
-      QuadTree* child_node = node->getChild(t_index, r_index);
+  for (int t_index = 0; t_index < node->getYNbins(); ++t_index) {
+    for (int r_index = 0; r_index < node->getXNbins(); ++r_index) {
+      QuadTreeLegendre* child_node = node->getChildren()->get(t_index, r_index);
 
       if (child_node == origin_node) continue;
 
       if (child_node == caller_node) continue;
 
       if (child_node->isLeaf()) {
-//        B2INFO("Child node: " << child_node->getThetaMin() << "x" << child_node->getThetaMax() << "x" << child_node->getRMin() << "x" << child_node->getRMax());
+//        B2INFO("Child node: " << child_node->getYMin() << "x" << child_node->getYMax() << "x" << child_node->getXMin() << "x" << child_node->getXMax());
         if (compareNodes(child_node, origin_node))
           origin_node->addNeighbor(child_node);
       } else {
@@ -98,7 +98,7 @@ void QuadTreeNeighborFinder::findNeighbors(QuadTree* origin_node, QuadTree* call
   }
 }
 
-bool QuadTreeNeighborFinder::compareNodes(QuadTree* node1 , QuadTree* node2)
+bool QuadTreeNeighborFinder::compareNodes(QuadTreeLegendre* node1 , QuadTreeLegendre* node2)
 {
   /*check all possible combination borders; 8 combinations at total
    *  ________
@@ -108,24 +108,24 @@ bool QuadTreeNeighborFinder::compareNodes(QuadTree* node1 , QuadTree* node2)
    * node1 - checked node;
    * node2 - node, for which we are trying to find neighbor
    */
-  if (node1->getRMin() == node2->getRMax()) {
-    if (node1->getThetaMax() == node2->getThetaMin())
+  if (node1->getXMin() == node2->getXMax()) {
+    if (node1->getYMax() == node2->getYMin())
       return true;
-    else if (node1->getThetaMax() == node2->getThetaMax())
+    else if (node1->getYMax() == node2->getYMax())
       return true;
-    else if (node1->getThetaMin() == node2->getThetaMax())
+    else if (node1->getYMin() == node2->getYMax())
       return true;
-  } else if (node1->getRMax() == node2->getRMin()) {
-    if (node1->getThetaMax() == node2->getThetaMin())
+  } else if (node1->getXMax() == node2->getXMin()) {
+    if (node1->getYMax() == node2->getYMin())
       return true;
-    else if (node1->getThetaMax() == node2->getThetaMax())
+    else if (node1->getYMax() == node2->getYMax())
       return true;
-    else if (node1->getThetaMin() == node2->getThetaMax())
+    else if (node1->getYMin() == node2->getYMax())
       return true;
-  } else if (node1->getRMax() == node2->getRMax()) {
-    if (node1->getThetaMax() == node2->getThetaMin())
+  } else if (node1->getXMax() == node2->getXMax()) {
+    if (node1->getYMax() == node2->getYMin())
       return true;
-    else if (node1->getThetaMin() == node2->getThetaMax())
+    else if (node1->getYMin() == node2->getYMax())
       return true;
   }
   return false;

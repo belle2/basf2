@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 
 #include <set>
 #include <cmath>
@@ -25,12 +26,15 @@ using namespace TrackFindingCDC;
 
 TEST(TrackFindingCDCTest, legendre_QuadTreeTest)
 {
-  QuadTree qt(-1.0, 1.0, 0, std::pow(2, 13), 0, nullptr);
+
+  typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+
+  QuadTreeLegendre qt(-1.0, 1.0, 0, std::pow(2, 13), 0, nullptr);
 
   std::set<TrackHit*> hits_set;
   std::vector < std::shared_ptr< TrackHit > > hits;
 
-  QuadTree::NodeList candidateNodes;
+  QuadTreeLegendre::NodeList candidateNodes;
 
   // create hits for three sraight-line tracks
   // going outwards from the center
@@ -55,21 +59,22 @@ TEST(TrackFindingCDCTest, legendre_QuadTreeTest)
 
   }
 
-  qt.provideHitSet(hits_set);
+  qt.provideItemsSet<QuadTreeProcessor>(hits_set);
   qt.setLastLevel(13);
 
-  qt.setRThreshold(1.0f);
-  qt.setHitsThreshold(50);
+//  deprecated
+//  qt.setRThreshold(1.0f);
+  qt.setNItemsThreshold(50);
 
-  QuadTree::CandidateProcessorLambda lmdProcessor = [&candidateNodes](QuadTree * qt) {
-    std::for_each(qt->getHits().begin(), qt->getHits().end(), [](TrackHit * th) {th->setHitUsage(TrackHit::used_in_track);});
+  QuadTreeLegendre::CandidateProcessorLambda lmdProcessor = [&candidateNodes](QuadTreeLegendre * qt) {
+    std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](TrackHit * th) {th->setHitUsage(TrackHit::used_in_track);});
     candidateNodes.push_back(qt);
   };
 
   auto now = std::chrono::high_resolution_clock::now();
 
   // actual filling of the hits into the quad tree structure
-  qt.startFillingTree(lmdProcessor);
+  qt.startFillingTree<QuadTreeProcessor>(lmdProcessor);
   auto later = std::chrono::high_resolution_clock::now();
 
   EXPECT_EQ(3, candidateNodes.size());

@@ -15,75 +15,11 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 TrackProcessor::TrackProcessor(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList,
-                               std::list<TrackCandidate*>& stereoTrackletList, bool appendHits, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer):
-  m_AxialHitList(AxialHitList), m_StereoHitList(StereoHitList), m_trackList(trackList), m_trackletList(trackletList), m_stereoTrackletList(stereoTrackletList), m_appendHits(appendHits),
+                               std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer):
+  m_AxialHitList(AxialHitList), m_StereoHitList(StereoHitList), m_trackList(trackList), m_trackletList(trackletList), m_stereoTrackletList(stereoTrackletList),
   m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreTrackDrawer(cdcLegendreTrackDrawer)
 {
 
-}
-
-void TrackProcessor::createLegendreTrackCandidate(
-  const std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track,
-  std::pair<double, double>& ref_point)
-{
-
-  //get theta and r values for each track candidate
-  double track_theta = track.second.first;
-  double track_r = track.second.second;
-
-  //get charge estimation for the track candidate
-  int charge = TrackCandidate::getChargeAssumption(track_theta,
-                                                   track_r, track.first);
-
-  //for curlers, negative, and positive tracks we want to create one track candidate
-  if (charge == TrackCandidate::charge_positive
-      || charge == TrackCandidate::charge_negative
-      || charge == TrackCandidate::charge_curler) {
-    TrackCandidate* trackCandidate = new TrackCandidate(
-      track_theta, track_r, charge, track.first);
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, ref_point);
-    trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
-    appendNewHits(trackCandidate);
-//    trackCandidate->clearBadHits(ref_point);
-
-    processTrack(trackCandidate, m_trackList);
-
-    trackCandidate->setCandidateType(TrackCandidate::goodTrack);
-
-  }
-
-  //here we create two oppositely charged tracks (with the same theta and r value)
-  else if (charge == TrackCandidate::charge_two_tracks) {
-    TrackCandidate* trackCandidate_pos =
-      new TrackCandidate(track_theta, track_r,
-                         TrackCandidate::charge_positive, track.first);
-
-    TrackCandidate* trackCandidate_neg =
-      new TrackCandidate(track_theta, track_r,
-                         TrackCandidate::charge_negative, track.first);
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_pos, ref_point);
-    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_neg, ref_point);
-    trackCandidate_neg->setReferencePoint(ref_point.first, ref_point.second);
-    trackCandidate_pos->setReferencePoint(ref_point.first, ref_point.second);
-    appendNewHits(trackCandidate_pos);
-    appendNewHits(trackCandidate_neg);
-//    trackCandidate_pos->clearBadHits(ref_point);
-//    trackCandidate_neg->clearBadHits(ref_point);
-
-    processTrack(trackCandidate_pos, m_trackList);
-
-    processTrack(trackCandidate_neg, m_trackList);
-
-    trackCandidate_pos->setCandidateType(TrackCandidate::goodTrack);
-    trackCandidate_neg->setCandidateType(TrackCandidate::goodTrack);
-
-  }
-  //This shouldn't happen, check TrackCandidate::getChargeAssumption()
-  else {
-    B2ERROR(
-      "Strange behavior of TrackCandidate::getChargeAssumption");
-    exit(EXIT_FAILURE);
-  }
 }
 
 TrackCandidate* TrackProcessor::createLegendreTrackCandidate(std::vector<QuadTree*>& nodeList)
@@ -98,7 +34,6 @@ TrackCandidate* TrackProcessor::createLegendreTrackCandidate(std::vector<QuadTre
   trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
 
   processTrack(trackCandidate, m_trackList);
-  appendNewHits(trackCandidate);
 
   trackCandidate->setCandidateType(TrackCandidate::goodTrack);
 
@@ -132,7 +67,6 @@ TrackCandidate* TrackProcessor::createLegendreTracklet(std::vector<TrackHit*>& h
   return trackCandidate;
 }
 
-
 TrackCandidate* TrackProcessor::createLegendreStereoTracklet(std::vector<QuadTree*>& nodeList)
 {
   TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
@@ -146,24 +80,6 @@ TrackCandidate* TrackProcessor::createLegendreStereoTracklet(std::vector<QuadTre
 
   return trackCandidate;
 
-}
-
-
-void TrackProcessor::appendNewHits(TrackCandidate* track)
-{
-  if (not m_appendHits) return;
-  double x0_track = track->getXc();
-  double y0_track = track->getYc();
-  double R = track->getRadius();
-
-  for (TrackHit * hit : m_AxialHitList) {
-    if (hit->getHitUsage() != TrackHit::used_in_track || hit->getHitUsage() != TrackHit::background) {
-      double x0_hit = hit->getOriginalWirePosition().X();
-      double y0_hit = hit->getOriginalWirePosition().Y();
-      double dist = fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength();
-      if (dist < hit->getSigmaDriftLength() * 2.) track->addHit(hit);
-    }
-  }
 }
 
 void TrackProcessor::processTrack(TrackCandidate* trackCandidate, std::list<TrackCandidate*>& trackList)
@@ -201,7 +117,6 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate, std::list<Trac
 
 }
 
-
 bool TrackProcessor::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/)
 {
 //  if (trackCandidate->getNAxialHits() < m_threshold)
@@ -212,18 +127,6 @@ bool TrackProcessor::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/
 
   return true;
 }
-
-void TrackProcessor::moveCandidate(list<TrackCandidate*>& initialTrackList, list<TrackCandidate*>& resultTrackList, TrackCandidate* cand)
-{
-  initialTrackList.remove(cand);
-  resultTrackList.push_back(cand);
-}
-
-void TrackProcessor::removeFromList(list<TrackCandidate*>& trackList, TrackCandidate* cand)
-{
-  trackList.remove(cand);
-}
-
 
 void TrackProcessor::createGFTrackCandidates(string& m_gfTrackCandsColName)
 {
@@ -287,10 +190,107 @@ void TrackProcessor::createGFTrackCandidates(string& m_gfTrackCandsColName)
   }
 }
 
-
 void TrackProcessor::sortHits(
   std::vector<TrackHit*>& hits, int charge)
 {
   SortHits sorter(charge);
   stable_sort(hits.begin(), hits.end(), sorter);
 }
+
+
+// UNUSED
+/*
+void TrackProcessor::removeFromList(list<TrackCandidate*>& trackList, TrackCandidate* cand)
+{
+  trackList.remove(cand);
+}
+ */
+/*
+void TrackProcessor::moveCandidate(list<TrackCandidate*>& initialTrackList, list<TrackCandidate*>& resultTrackList, TrackCandidate* cand)
+{
+  initialTrackList.remove(cand);
+  resultTrackList.push_back(cand);
+}
+ */
+
+/*
+void TrackProcessor::appendNewHits(TrackCandidate* track)
+{
+  if (not m_appendHits) return;
+  double x0_track = track->getXc();
+  double y0_track = track->getYc();
+  double R = track->getRadius();
+
+  for (TrackHit * hit : m_AxialHitList) {
+    if (hit->getHitUsage() != TrackHit::used_in_track || hit->getHitUsage() != TrackHit::background) {
+      double x0_hit = hit->getOriginalWirePosition().X();
+      double y0_hit = hit->getOriginalWirePosition().Y();
+      double dist = fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength();
+      if (dist < hit->getSigmaDriftLength() * 2.) track->addHit(hit);
+    }
+  }
+}*/
+
+/*void TrackProcessor::createLegendreTrackCandidate(
+  const std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track,
+  std::pair<double, double>& ref_point)
+{
+
+  //get theta and r values for each track candidate
+  double track_theta = track.second.first;
+  double track_r = track.second.second;
+
+  //get charge estimation for the track candidate
+  int charge = TrackCandidate::getChargeAssumption(track_theta,
+                                                   track_r, track.first);
+
+  //for curlers, negative, and positive tracks we want to create one track candidate
+  if (charge == TrackCandidate::charge_positive
+      || charge == TrackCandidate::charge_negative
+      || charge == TrackCandidate::charge_curler) {
+    TrackCandidate* trackCandidate = new TrackCandidate(
+      track_theta, track_r, charge, track.first);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, ref_point);
+    trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
+    appendNewHits(trackCandidate);
+//    trackCandidate->clearBadHits(ref_point);
+
+    processTrack(trackCandidate, m_trackList);
+
+    trackCandidate->setCandidateType(TrackCandidate::goodTrack);
+
+  }
+
+  //here we create two oppositely charged tracks (with the same theta and r value)
+  else if (charge == TrackCandidate::charge_two_tracks) {
+    TrackCandidate* trackCandidate_pos =
+      new TrackCandidate(track_theta, track_r,
+                         TrackCandidate::charge_positive, track.first);
+
+    TrackCandidate* trackCandidate_neg =
+      new TrackCandidate(track_theta, track_r,
+                         TrackCandidate::charge_negative, track.first);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_pos, ref_point);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_neg, ref_point);
+    trackCandidate_neg->setReferencePoint(ref_point.first, ref_point.second);
+    trackCandidate_pos->setReferencePoint(ref_point.first, ref_point.second);
+    appendNewHits(trackCandidate_pos);
+    appendNewHits(trackCandidate_neg);
+//    trackCandidate_pos->clearBadHits(ref_point);
+//    trackCandidate_neg->clearBadHits(ref_point);
+
+    processTrack(trackCandidate_pos, m_trackList);
+
+    processTrack(trackCandidate_neg, m_trackList);
+
+    trackCandidate_pos->setCandidateType(TrackCandidate::goodTrack);
+    trackCandidate_neg->setCandidateType(TrackCandidate::goodTrack);
+
+  }
+  //This shouldn't happen, check TrackCandidate::getChargeAssumption()
+  else {
+    B2ERROR(
+      "Strange behavior of TrackCandidate::getChargeAssumption");
+    exit(EXIT_FAILURE);
+  }
+}*/

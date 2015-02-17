@@ -43,16 +43,17 @@ namespace Belle2 {
 
     class TrackProcessor {
     public:
-      TrackProcessor(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, bool appendHits, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer);
+      TrackProcessor(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer);
 
       /**
        * @brief Function to create a track candidate
        * @param track construction of std::pairs, describing the track candidate by the axial hits, belonging to it and the parameter r and theta
        * @param trackHitList list of all track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
+       * UNUSED
        */
-      void createLegendreTrackCandidate(
+      /*void createLegendreTrackCandidate(
         const std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track,
-        std::pair<double, double>& ref_point);
+        std::pair<double, double>& ref_point);*/
 
       /**
        * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
@@ -90,8 +91,8 @@ namespace Belle2 {
        */
       static void sortHits(std::vector<TrackHit*>& hitIndices, int charge);
 
-      /** Appends new unused hits from set of hits which might belong to current track */
-      void appendNewHits(TrackCandidate* track);
+      /** Appends new unused hits from set of hits which might belong to current track UNUSED */
+      // void appendNewHits(TrackCandidate* track);
 
       /** Move candidate between two collections */
       void moveCandidate(list<TrackCandidate*>&, list<TrackCandidate*>&, TrackCandidate*);
@@ -107,12 +108,9 @@ namespace Belle2 {
       std::list<TrackCandidate*>& m_trackList; /**< List of track candidates. */
       std::list<TrackCandidate*>& m_trackletList; /**< List of tracklets. */
       std::list<TrackCandidate*>& m_stereoTrackletList; /**< List of stereo tracklets. */
-      bool m_appendHits; /**< Trying to append new hits to track candidate*/
 
       TrackFitter* m_cdcLegendreTrackFitter; /**< Class which performs track candidate fitting */
       TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which performs in-module drawing */
-
-
     };
   }
 }

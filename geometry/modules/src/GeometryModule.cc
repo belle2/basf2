@@ -36,12 +36,6 @@ GeometryModule::GeometryModule()
            "Name of the components to excluded from creation", m_excluded);
   addParam("additionalComponents", m_additional,
            "Name of components to be created in addition to the default parameters", m_additional);
-
-  //TODO: Deprecated parameters, remove in future
-  addParam("Components", m_componentsOld,
-           "For Backward compatibility.", m_components);
-  addParam("ExcludedComponents", m_excludedOld,
-           "For Backward compatibility.", m_excluded);
 }
 
 void GeometryModule::initialize()
@@ -50,24 +44,6 @@ void GeometryModule::initialize()
   geoManager.setDetectorComponents(m_components);
   geoManager.setExcludedComponents(m_excluded);
   geoManager.setAdditionalComponents(m_additional);
-
-  //TODO: Check deprecated parameters, remove in future
-  if (getParam<std::vector<std::string>>("Components").isSetInSteering()) {
-    B2WARNING("Parameter 'Components' is deprecated, please use 'components' instead");
-    if (getParam<std::vector<std::string>>("components").isSetInSteering()) {
-      B2FATAL("Parameters 'Components' and 'components' cannot be given at the same time");
-    } else {
-      geoManager.setDetectorComponents(m_componentsOld);
-    }
-  }
-  if (getParam<std::vector<std::string>>("ExcludedComponents").isSetInSteering()) {
-    B2WARNING("Parameter 'ExcludedComponents' is deprecated, please use 'excludedComponents' instead");
-    if (getParam<std::vector<std::string>>("excludedComponents").isSetInSteering()) {
-      B2FATAL("Parameters 'ExcludedComponents' and 'excludedComponents' cannot be given at the same time");
-    } else {
-      geoManager.setExcludedComponents(m_excludedOld);
-    }
-  }
 
   geoManager.createGeometry(GearDir(m_geometryPath), geometry::FullGeometry);
 }

@@ -65,6 +65,18 @@ namespace Belle2 {
 
       void assignStereohitsByAngleWithQuadtree(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0 = 0.);
 
+      void MaxFastHoughStereofinding(
+        std::vector<TrackHit*>& hitsToAdd,
+        std::vector<std::pair<StereoHit, StereoHit>>& hits,
+        const int level,
+        const double lambda_min,
+        const double lambda_max,
+        const double z0_min,
+        const double z0_max);
+
+      inline bool sameSign(double n1, double n2, double n3, double n4)
+      {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
+
     private:
 
       static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/

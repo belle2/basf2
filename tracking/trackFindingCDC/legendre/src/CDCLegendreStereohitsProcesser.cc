@@ -63,7 +63,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
   for (TrackHit * hit : stereohits) {
 
-    if (hit->getHitUsage() == TrackHit::used_in_track) continue;
+//    if (hit->getHitUsage() == TrackHit::used_in_track) continue;
 
     std::pair<StereoHit, StereoHit> stereoHitPair;
 
@@ -76,6 +76,11 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
     double lWire = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z());
     double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
+
+    stereoHitPair.first.setRWire(rWire);
+    stereoHitPair.first.setLWire(lWire);
+    stereoHitPair.second.setRWire(rWire);
+    stereoHitPair.second.setLWire(lWire);
 
     int sign = 0;
     int sLayer = hit->getSuperlayerId();
@@ -101,24 +106,47 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
     double sign_final;
     sign_final = sign_phi * sign;
 
+
     if (std::isnan(sign_final)) continue;
     if (std::isnan(delta_phi)) continue;
 
+    stereoHitPair.first.setSign(sign_final);
+    stereoHitPair.second.setSign(sign_final);
+
+    stereoHitPair.first.setRcand(Rcand);
+    stereoHitPair.second.setRcand(Rcand);
+    stereoHitPair.first.setZ0(0);
+    stereoHitPair.second.setZ0(0);
 
 //      if(alpha > m_PI) sign_final *= -1.;
 
-    double theta1 = atan2(lWire * sign_final * stereoHitPair.first.getDisplacement(), stereoHitPair.first.getAlpha() * Rcand * rWire) + m_PI / 2.;
-    double theta2 = atan2(lWire * sign_final * stereoHitPair.second.getDisplacement(), stereoHitPair.second.getAlpha() * Rcand * rWire) + m_PI / 2.;
+//    double theta1 = atan2(lWire * sign_final * stereoHitPair.first.getDisplacement(), stereoHitPair.first.getAlpha() * Rcand * rWire) + m_PI / 2.;
+//    double theta2 = atan2(lWire * sign_final * stereoHitPair.second.getDisplacement(), stereoHitPair.second.getAlpha() * Rcand * rWire) + m_PI / 2.;
 
-    stereoHitPair.first.setPolarAngle(theta1);
-    stereoHitPair.second.setPolarAngle(theta2);
+//    stereoHitPair.first.setPolarAngle(theta1);
+//    stereoHitPair.second.setPolarAngle(theta2);
 
-    B2DEBUG(100, "SLayerID: " << sLayer <<  "; delta_phi: " << delta_phi << "; alpha: " <<  stereoHitPair.first.getAlpha() << "; sign_final: " << sign_final << "; lWire: " << lWire  << "; rWire: " << rWire << ";   Dist_1: " <<  stereoHitPair.first.getDisplacement() << "; Dist_2: " << stereoHitPair.second.getDisplacement() << "; theta1: " << theta1 * 180. / 3.1415 << "; theta2: " << theta2 * 180. / 3.1415);
+    stereoHitPair.first.computePolarAngle();
+    stereoHitPair.second.computePolarAngle();
+
+    B2DEBUG(100, "SLayerID: " << sLayer <<  "; delta_phi: " << delta_phi << "; alpha: " <<  stereoHitPair.first.getAlpha() << "; sign_final: " << sign_final
+            << "; lWire: " << lWire  << "; rWire: " << rWire << ";   Dist_1: " <<  stereoHitPair.first.getDisplacement() << "; Dist_2: " << stereoHitPair.second.getDisplacement()
+            << "; theta1: " << stereoHitPair.first.getPolarAngle() * 180. / 3.1415 << "; theta2: " << stereoHitPair.first.getPolarAngle() * 180. / 3.1415);
 
     hits_to_add.push_back(stereoHitPair);
 
   }
 
+  std::vector<TrackHit*> stereohitsForCandidate;
+
+  MaxFastHoughStereofinding(stereohitsForCandidate, hits_to_add, 0, tan(-75.*3.1415 / 180.), tan(75.*3.1415 / 180.), -20., 20.);
+
+  for (TrackHit * hit : stereohitsForCandidate) {
+    cand->addHit(hit);
+    hit->setHitUsage(TrackHit::used_in_track);
+  }
+
+  return;
 
   int nbins = 60;
   double thetaMin = 15.;
@@ -662,3 +690,121 @@ double StereohitsProcesser::getAlpha(TrackCandidate* cand, std::pair<double, dou
   return alpha;
 
 }
+
+
+
+void StereohitsProcesser::MaxFastHoughStereofinding(
+  std::vector<TrackHit*>& hitsToAdd,
+  std::vector<std::pair<StereoHit, StereoHit>>& hits,
+  const int level,
+  const double lambda_min,
+  const double lambda_max,
+  const double z0_min,
+  const double z0_max)
+{
+
+  //calculate bin borders of 2x2 bin "histogram"
+  double lambdaBin[3];
+  lambdaBin[0] = lambda_min;
+  lambdaBin[1] = lambda_min + (lambda_max - lambda_min) / 2;
+  lambdaBin[2] = lambda_max;
+
+  double z0[3];
+  z0[0] = z0_min;
+  z0[1] = z0_min + 0.5 * (z0_max - z0_min);
+  z0[2] = z0_max;
+
+  //2 x 2 voting plane
+  std::vector<std::pair<StereoHit, StereoHit>> voted_hits[2][2];
+  for (unsigned int i = 0; i < 2; ++i)
+    for (unsigned int j = 0; j < 2; ++j)
+      voted_hits[i][j].reserve(1024);
+
+  double lambda_1, lambda_2;
+  double dist_1[3][3];
+  double dist_2[3][3];
+
+  //Voting within the four bins
+  for (std::pair<StereoHit, StereoHit>& hit : hits) {
+//    if (hit.first.getTrackHit()->getHitUsage() != TrackHit::not_used) continue;
+    for (int z0_index = 0; z0_index < 3; ++z0_index) {
+
+      hit.first.setZ0(z0[z0_index]);
+      lambda_1 = hit.first.computePolarAngle();
+      hit.second.setZ0(z0[z0_index]);
+      lambda_2 = hit.second.computePolarAngle();
+
+      //calculate distances of lines to horizontal bin border
+      for (int lambda_index = 0; lambda_index < 3; ++lambda_index) {
+        dist_1[z0_index][lambda_index] = lambdaBin[lambda_index] - lambda_1;
+        dist_2[z0_index][lambda_index] = lambdaBin[lambda_index] - lambda_2;
+      }
+    }
+
+    //actual voting, based on the distances (test, if line is passing though the bin)
+    for (int z0_index = 0; z0_index < 2; ++z0_index) {
+      for (int lambda_index = 0; lambda_index < 2; ++lambda_index) {
+        //curves are assumed to be straight lines, might be a reasonable assumption locally
+        if (!sameSign(dist_1[z0_index][lambda_index], dist_1[z0_index][lambda_index + 1], dist_1[z0_index + 1][lambda_index], dist_1[z0_index + 1][lambda_index + 1]))
+          voted_hits[z0_index][lambda_index].push_back(hit);
+        else if (!sameSign(dist_2[z0_index][lambda_index], dist_2[z0_index][lambda_index + 1], dist_2[z0_index + 1][lambda_index], dist_2[z0_index + 1][lambda_index + 1]))
+          voted_hits[z0_index][lambda_index].push_back(hit);
+      }
+    }
+
+  }
+
+  bool binUsed[2][2];
+  for (int ii = 0; ii < 2; ii++)
+    for (int jj = 0; jj < 2; jj++)
+      binUsed[ii][jj] = false;
+
+//Processing, which bins are further investigated
+  for (int bin_loop = 0; bin_loop < 4; bin_loop++) {
+    int z0_index = 0;
+    int lambda_index = 0;
+    double max_value_temp = 0;
+    for (int z0_index_temp = 0; z0_index_temp < 2; ++z0_index_temp) {
+      for (int lambda_index_temp = 0; lambda_index_temp < 2; ++lambda_index_temp) {
+        if ((max_value_temp  < voted_hits[z0_index_temp][lambda_index_temp].size()) && (!binUsed[z0_index_temp][lambda_index_temp])) {
+          max_value_temp = voted_hits[z0_index_temp][lambda_index_temp].size();
+          z0_index = z0_index_temp;
+          lambda_index = lambda_index_temp;
+        }
+      }
+    }
+
+    binUsed[z0_index][lambda_index] = true;
+
+    //bin must contain more hits than the limit and maximal found track candidate
+
+
+    //bin must contain more hits than the limit and maximal found track candidate
+    if (voted_hits[z0_index][lambda_index].size() >= 5) {
+
+      //if max level of fast Hough is reached, mark candidate and return
+      //        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
+      if (level >= 7) {
+
+        if (hitsToAdd.size() >= voted_hits[z0_index][lambda_index].size()) continue;
+
+        hitsToAdd.clear();
+
+        for (std::pair<StereoHit, StereoHit>& hit : voted_hits[z0_index][lambda_index]) {
+          hitsToAdd.push_back(hit.first.getTrackHit());
+        }
+
+        B2INFO("Theta: " << lambdaBin[lambda_index] << "; Z0: " << z0[z0_index] << "; nhits: " << hitsToAdd.size());
+
+      } else {
+        //Recursive calling of the function with higher level and smaller box
+        MaxFastHoughStereofinding(hitsToAdd, voted_hits[z0_index][lambda_index], level + 1, lambdaBin[lambda_index], lambdaBin[lambda_index + 1],
+                                  z0[z0_index], z0[z0_index + 1]);
+
+      }
+    }
+  }
+
+}
+
+

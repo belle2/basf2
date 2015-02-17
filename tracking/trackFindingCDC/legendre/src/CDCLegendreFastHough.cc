@@ -522,6 +522,122 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
 
 }
 
+/*
+void MaxFastHoughStereofinding(
+            std::vector<TrackHit*>& hitsToAdd,
+            const std::vector<std::pair<StereoHit, StereoHit>>& hits,
+            const int level,
+            const int lambda_min,
+            const int lambda_max,
+            const double z0_min,
+            const double z0_max)
+{
+
+  //calculate bin borders of 2x2 bin "histogram"
+  double lambdaBin[3];
+  lambdaBin[0] = lambda_min;
+  lambdaBin[1] = lambda_min + (lambda_max - lambda_min) / 2;
+  lambdaBin[2] = lambda_max;
+
+  double z0[3];
+  z0[0] = z0_min;
+  z0[1] = z0_min + 0.5 * (z0_max - z0_min);
+  z0[2] = z0_max;
+
+  //2 x 2 voting plane
+  std::vector<std::pair<StereoHit, StereoHit>> voted_hits[2][2];
+  for (unsigned int i = 0; i < 2; ++i)
+    for (unsigned int j = 0; j < 2; ++j)
+      voted_hits[i][j].reserve(1024);
+
+  double lambda_1, lambda_2;
+  double dist_1[3][3];
+  double dist_2[3][3];
+
+  //Voting within the four bins
+  for (std::pair<StereoHit, StereoHit> & hit : hits) {
+    if (hit.first.getTrackHit()->getHitUsage() != TrackHit::not_used) continue;
+    for (int z0_index = 0; z0_index < 3; ++z0_index) {
+
+      hit.first.setZ0(z0[z0_index]);
+      lambda_1 = hit.first.computePolarAngle();
+      hit.second.setZ0(z0[z0_index]);
+      lambda_2 = hit.second.computePolarAngle();
+
+      //calculate distances of lines to horizontal bin border
+      for (int lambda_index = 0; lambda_index < 3; ++lambda_index) {
+        dist_1[z0_index][lambda_index] = lambdaBin[lambda_index] - lambda_1;
+        dist_2[z0_index][lambda_index] = lambdaBin[lambda_index] - lambda_2;
+      }
+    }
+
+    //actual voting, based on the distances (test, if line is passing though the bin)
+    for (int z0_index = 0; z0_index < 2; ++z0_index) {
+      for (int lambda_index = 0; lambda_index < 2; ++lambda_index) {
+        //curves are assumed to be straight lines, might be a reasonable assumption locally
+        if (!sameSign(dist_1[z0_index][lambda_index], dist_1[z0_index][lambda_index + 1], dist_1[z0_index + 1][lambda_index], dist_1[z0_index + 1][lambda_index + 1]))
+          voted_hits[z0_index][lambda_index].push_back(hit);
+        else if (!sameSign(dist_2[z0_index][lambda_index], dist_2[z0_index][lambda_index + 1], dist_2[z0_index + 1][lambda_index], dist_2[z0_index + 1][lambda_index + 1]))
+          voted_hits[z0_index][lambda_index].push_back(hit);
+      }
+    }
+
+  }
+
+  bool binUsed[2][2];
+  for (int ii = 0; ii < 2; ii++)
+    for (int jj = 0; jj < 2; jj++)
+      binUsed[ii][jj] = false;
+
+//Processing, which bins are further investigated
+  for (int bin_loop = 0; bin_loop < 4; bin_loop++) {
+    int t_index = 0;
+    int r_index = 0;
+    double max_value_temp = 0;
+    for (int t_index_temp = 0; t_index_temp < 2; ++t_index_temp) {
+      for (int r_index_temp = 0; r_index_temp < 2; ++r_index_temp) {
+        if ((max_value_temp  < voted_hits[t_index_temp][r_index_temp].size()) && (!binUsed[t_index_temp][r_index_temp])) {
+          max_value_temp = voted_hits[t_index_temp][r_index_temp].size();
+          t_index = t_index_temp;
+          r_index = r_index_temp;
+        }
+      }
+    }
+
+    binUsed[t_index][r_index] = true;
+
+    //bin must contain more hits than the limit and maximal found track candidate
+
+
+    //bin must contain more hits than the limit and maximal found track candidate
+    if (voted_hits[t_index][r_index].size() >= 10) {
+
+      //if max level of fast Hough is reached, mark candidate and return
+      //        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
+      if (level >= 8) {
+
+        if(hitsToAdd.size() > voted_hits[t_index][r_index].size()) continue;
+
+        hitsToAdd.clear();
+
+        for (std::pair<StereoHit, StereoHit> & hit : voted_hits[t_index][r_index]){
+          hitsToAdd.push_back(hit.first.getTrackHit());
+        }
+
+      } else {
+        //Recursive calling of the function with higher level and smaller box
+        MaxFastHoughStereofinding(hitsToAdd, voted_hits[t_index][r_index], level + 1, lambdaBin[t_index], lambdaBin[t_index + 1],
+            z0[r_index], z0[r_index + 1]);
+
+      }
+    }
+  }
+
+}
+
+*/
+
+
 
 void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int theta_min, const int theta_max,
                                    double r_min, double r_max, int level)

@@ -94,6 +94,16 @@ namespace Belle2 {
                         const double r_min,
                         const double r_max);
 
+      /*
+            void MaxFastHoughStereofinding(const std::vector<std::pair<StereoHit, StereoHit>>& hits,
+                              const int level,
+                              const double lambda_min,
+                              const double lambda_max,
+                              const double z0_min,
+                              const double z0_max);
+      */
+
+
       /**
        * Same logic as in MaxFastHough, but looks only for HighPt tracks;
        * starts with 2x2 binning, but when reached desired dr resolution (which defined as 2*Rcell) makes 1xN binning and finish algorithm in one iteration

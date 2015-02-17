@@ -178,10 +178,6 @@ void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double
   // If the trackCandidate goes more or less through the IP, we have a problem with back-to-back tracks. These can be assigned to only on track.
   // If this is the case, we delete the smaller fraction here and let the track-finder find the remaining track again
 
-  std::pair<double, double> track_par = std::make_pair(trackCandidate->getTheta(), trackCandidate->getR());
-  std::pair<double, double> ref_point;
-  double probability_for_good_track_before = TMath::Prob(trackFitter->fitTrackCandidateFast(trackHits, track_par, ref_point) * ndf, ndf);
-
   if (trackCandidate->getCharge() == TrackCandidate::charge_two_tracks and trackCandidate->getReferencePoint().Mag() < 0.5) {
 
     unsigned int number_of_hits_in_one_half = 0;
@@ -219,8 +215,6 @@ void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double
 
   for (auto hitIterator = trackHits.begin(); hitIterator != trackHits.end(); hitIterator++) {
     double assignment_probability = getAssigmentProbability(*hitIterator, trackCandidate);
-
-    double probability_for_good_track = TMath::Prob(trackFitter->fitTrackCandidateFast(trackHits, track_par, ref_point) * (ndf - 1), ndf - 1);
 
     if (assignment_probability < minimal_assignment_probability) {
       (*hitIterator)->setHitUsage(TrackHit::bad);

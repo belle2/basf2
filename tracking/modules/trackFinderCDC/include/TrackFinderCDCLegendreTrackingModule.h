@@ -140,12 +140,13 @@ namespace Belle2 {
     bool m_drawCandidates;        /**< Draw each candidate in interactive mode*/
     bool m_drawCandInfo;          /**< Set whether TrackDrawer class will bw used at all*/
 
-    bool m_deleteHitsWhileFinding;            /**< Try to delete bad hits from track candidate */
-    bool m_deleteHitsInTheEnd;            /**< Try to delete bad hits from track candidate in the end */
-    bool m_appendHitsInTheEnd;            /**< Try to append new hits to track candidate in the end*/
-    bool m_appendHitsWhileFinding;            /**< Try to append new hits to track candidate while finding*/
-    bool m_mergeTracksWhileFinding;            /**< Try to merge tracks while finding*/
-    bool m_mergeTracksInTheEnd;      /**< Try to merge tracks in the end. */
+    bool m_deleteHitsWhileFinding;    /**< Try to delete bad hits from track candidate */
+    bool m_deleteHitsInTheEnd;        /**< Try to delete bad hits from track candidate in the end */
+    bool m_appendHitsInTheEnd;        /**< Try to append new hits to track candidate in the end*/
+    bool m_appendHitsWhileFinding;    /**< Try to append new hits to track candidate while finding*/
+    bool m_mergeTracksWhileFinding;   /**< Try to merge tracks while finding*/
+    bool m_mergeTracksInTheEnd;       /**< Try to merge tracks in the end. */
+    bool m_doPostprocessingOften;     /**< Repeat the postprocessing mode after every tree search. */
 
     bool m_multipleCandidateSearch; /**< Search multiple track candidates per run of FastHough algorithm*/
     bool m_useHitPrecalculatedR;  /**< To store r values inside hit objects or recalculate it each step */

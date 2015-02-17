@@ -145,12 +145,12 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
 
   addParam("DeleteHitsWhileFinding", m_deleteHitsWhileFinding,
            "Try to delete bad hits from track candidate", true);
-  addParam("AppendHitsWhileFinding", m_appendHitsWhileFinding,
-           "Try to append new hits to track candidate while finding.", false);
   addParam("MergeTracksWhileFinding", m_mergeTracksWhileFinding,
            "Try to merge tracks while finding.", false);
-
-
+  addParam("AppendHitsWhileFinding", m_appendHitsWhileFinding,
+           "Try to append new hits to track candidate while finding.", false);
+  addParam("DoPostprocessingOften", m_doPostprocessingOften,
+           "Repeat the postprocessing mode after every tree search.", true);
 
 
   addParam("DrawCandidates", m_drawCandidates,
@@ -299,7 +299,7 @@ void CDCLegendreTrackingModule::event()
   B2DEBUG(100, "Perform track finding");
 
   DoTreeTrackFinding();
-  postprocessTracks();
+  if (m_doPostprocessingOften) postprocessTracks();
 
 //  for (TrackCandidate * cand : m_trackList) {
 //     if (cand->getCandidateType() != TrackCandidate::tracklet) continue;
@@ -307,7 +307,7 @@ void CDCLegendreTrackingModule::event()
 //  }
 
   DoTreeTrackFindingFinal();
-  postprocessTracks();
+  if (m_doPostprocessingOften) postprocessTracks();
   DoTreeTrackFindingFinal();
   postprocessTracks();
 

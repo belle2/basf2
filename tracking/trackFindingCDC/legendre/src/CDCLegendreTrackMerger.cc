@@ -190,7 +190,6 @@ void TrackMerger::doTracksMerging(std::list<TrackCandidate*> trackList, TrackFit
   for (TrackCandidate * trackCandidate : trackList) {
     unsigned int innerCounter = 0;
     double prob = 0;
-    unsigned int bestCounter = 0;
     TrackCandidate* bestCandidate = nullptr;
     for (TrackCandidate * otherTrackCandidate : trackList) {
       if (innerCounter <= outerCounter) {
@@ -204,7 +203,6 @@ void TrackMerger::doTracksMerging(std::list<TrackCandidate*> trackList, TrackFit
       resetHits(trackCandidate);
 
       if (probTemp > prob) {
-        bestCounter = innerCounter;
         prob = probTemp;
         bestCandidate = otherTrackCandidate;
       }

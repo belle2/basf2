@@ -11,8 +11,6 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
 #include <vector>
 
-#define SQR(x) ((x)*(x))
-
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -22,8 +20,6 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2)
 {
   if (cand1 == cand2) return;
 
-  //doTracksFitTogether(cand1, cand2);
-  // Maybe do the same as in doTracksFitTogether?
   std::vector<TrackHit*>& commonHitListOfTwoTracks = cand1->getTrackHits();
   for (TrackHit * hit : cand2->getTrackHits()) {
     commonHitListOfTwoTracks.push_back(hit);
@@ -48,139 +44,6 @@ void TrackMerger::resetHits(TrackCandidate* otherTrackCandidate)
     hit->setHitUsage(TrackHit::used_in_track);
   }
 }
-
-/* REPLACED BY OTHER METHOD
-void TrackMerger::doTracksMerging()
-{
-
-  int ii = 0;
-
-  B2DEBUG(100, "Merger: Initial nCands = " << m_trackList.size());
-
-  bool merging_done(false);
-  bool remove_hits(true);
-
-  do {
-
-    int tracks_merged = 0;
-
-    //loop over all candidates
-    for (std::list<TrackCandidate*>::iterator it1 =
-           m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
-      TrackCandidate* cand1 = *it1;
-
-//      if(cand1->getCandidateType() ==  TrackCandidate::goodTrack) continue;
-      if (cand1->getTrackHits().size() < 3) continue;
-//      if (remove_hits && (cand1->getPt() < 0.9)) continue;
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
-
-      double chi2_best = 999;
-      TrackCandidate* candidateToMergeBest = NULL;
-
-      //loop over remaining candidates
-      std::list<TrackCandidate*>::iterator it2 = std::next(it1);
-      while (it2 != m_trackList.end()) {
-        TrackCandidate* cand2 = *it2;
-        ++it2;
-
-//        if(cand2->getCandidateType() ==  TrackCandidate::goodTrack) continue;
-
-        if (cand2->getTrackHits().size() < 3) continue;
-//        if (remove_hits && (cand2->getPt() < 0.9)) continue;
-        m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand2);
-        double chi2_temp = doTracksFitTogether(cand1, cand2, remove_hits);
-        for (TrackHit * hit : cand1->getTrackHits()) {
-          hit->setHitUsage(TrackHit::used_in_track);
-        }
-        for (TrackHit * hit : cand2->getTrackHits()) {
-          hit->setHitUsage(TrackHit::used_in_track);
-        }
-
-        if (chi2_best > chi2_temp) {
-          candidateToMergeBest = cand2;
-          chi2_best = chi2_temp;
-        }
-
-      }
-
-      if (chi2_best < 1.) {
-        //      B2INFO("chi2_best: " << chi2_best << "; chi2_track1: " << chi2_track1);
-
-        double chi2_best_reverse = 999.;
-        TrackCandidate* candidateToMergeBestReverse = NULL;
-        for (TrackCandidate * cand_temp : m_trackList) {
-          if (cand_temp == cand1) continue;
-          if (cand_temp == candidateToMergeBest) continue;
-          if (cand_temp->getTrackHits().size() < 3) continue;
-//          if(cand_temp->getCandidateType() ==  TrackCandidate::goodTrack) continue;
-
-
-          m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_temp);
-          double chi2_temp = doTracksFitTogether(candidateToMergeBest, cand_temp, remove_hits);
-          for (TrackHit * hit : candidateToMergeBest->getTrackHits()) {
-            hit->setHitUsage(TrackHit::used_in_track);
-          }
-          for (TrackHit * hit : cand_temp->getTrackHits()) {
-            hit->setHitUsage(TrackHit::used_in_track);
-          }
-
-          if (chi2_best_reverse > chi2_temp) {
-            candidateToMergeBestReverse = cand_temp;
-            chi2_best_reverse = chi2_temp;
-          }
-        }
-
-        if (chi2_best < chi2_best_reverse) {
-          mergeTracks(cand1, candidateToMergeBest, remove_hits );
-m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
-it1 = m_trackList.begin();
-tracks_merged++;
-} else {
-mergeTracks(candidateToMergeBest, candidateToMergeBestReverse, remove_hits);
-m_cdcLegendreTrackFitter->fitTrackCandidateFast(candidateToMergeBest);
-it1 = m_trackList.begin();
-tracks_merged++;
-}
-
-//      mergeTracks(cand1, candidateToMergeBest);
-//      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
-
-ii++;
-B2DEBUG(100, "ii = " << ii);
-
-}
-
-B2DEBUG(100, "Cand hits vector size = " << cand1->getTrackHits().size());
-B2DEBUG(100, "Cand R = " << cand1->getR());
-
-}
-
-if (tracks_merged == 0 && not remove_hits)merging_done = true;
-if (tracks_merged == 0 && remove_hits)remove_hits  = false;
-//    tracks_merged = 0;
-B2DEBUG(100, "tracks_merged = " << tracks_merged)
-
-m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(),
-[&](TrackCandidate * cand) {
-return (cand->getTrackHits().size() < 3);
-}), m_trackList.end());
-
-} while (not merging_done);
-
-m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(),
-[&](TrackCandidate * cand) {
-return (cand->getTrackHits().size() < 6);
-}), m_trackList.end());
-
-B2DEBUG(100, "Merger: Resulting nCands = " << m_trackList.size());
-
-for (TrackCandidate * cand : m_trackList) {
-for (TrackHit * hit : cand->getTrackHits()) {
-hit->setHitUsage(TrackHit::used_in_track);
-}
-}
-
-}*/
 
 void TrackMerger::doTracksMerging(std::list<TrackCandidate*> trackList, TrackFitter* trackFitter)
 {
@@ -347,7 +210,7 @@ void TrackMerger::removeStrangeHits(double factor, std::vector<TrackHit*>& track
     double y0_hit = hit->getOriginalWirePosition().Y();
     double x0_track = cos(track_par.first) / fabs(track_par.second) + ref_point.first;
     double y0_track = sin(track_par.first) / fabs(track_par.second) + ref_point.second;
-    double dist = fabs(fabs(1 / fabs(track_par.second) - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
+    double dist = fabs(fabs(1 / fabs(track_par.second) - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength());
     if (dist > hit->getDriftLength() * factor) {
       hit->setHitUsage(TrackHit::bad);
     }
@@ -422,6 +285,141 @@ double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* c
   unsigned int ndf = commonHitListOfTwoTracks.size() - 4;
   return TMath::Prob(chi2_temp * ndf, ndf);
 }
+
+
+/* REPLACED BY OTHER METHOD
+void TrackMerger::doTracksMerging()
+{
+
+  int ii = 0;
+
+  B2DEBUG(100, "Merger: Initial nCands = " << m_trackList.size());
+
+  bool merging_done(false);
+  bool remove_hits(true);
+
+  do {
+
+    int tracks_merged = 0;
+
+    //loop over all candidates
+    for (std::list<TrackCandidate*>::iterator it1 =
+           m_trackList.begin(); it1 != m_trackList.end(); ++it1) {
+      TrackCandidate* cand1 = *it1;
+
+//      if(cand1->getCandidateType() ==  TrackCandidate::goodTrack) continue;
+      if (cand1->getTrackHits().size() < 3) continue;
+//      if (remove_hits && (cand1->getPt() < 0.9)) continue;
+      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+
+      double chi2_best = 999;
+      TrackCandidate* candidateToMergeBest = NULL;
+
+      //loop over remaining candidates
+      std::list<TrackCandidate*>::iterator it2 = std::next(it1);
+      while (it2 != m_trackList.end()) {
+        TrackCandidate* cand2 = *it2;
+        ++it2;
+
+//        if(cand2->getCandidateType() ==  TrackCandidate::goodTrack) continue;
+
+        if (cand2->getTrackHits().size() < 3) continue;
+//        if (remove_hits && (cand2->getPt() < 0.9)) continue;
+        m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand2);
+        double chi2_temp = doTracksFitTogether(cand1, cand2, remove_hits);
+        for (TrackHit * hit : cand1->getTrackHits()) {
+          hit->setHitUsage(TrackHit::used_in_track);
+        }
+        for (TrackHit * hit : cand2->getTrackHits()) {
+          hit->setHitUsage(TrackHit::used_in_track);
+        }
+
+        if (chi2_best > chi2_temp) {
+          candidateToMergeBest = cand2;
+          chi2_best = chi2_temp;
+        }
+
+      }
+
+      if (chi2_best < 1.) {
+        //      B2INFO("chi2_best: " << chi2_best << "; chi2_track1: " << chi2_track1);
+
+        double chi2_best_reverse = 999.;
+        TrackCandidate* candidateToMergeBestReverse = NULL;
+        for (TrackCandidate * cand_temp : m_trackList) {
+          if (cand_temp == cand1) continue;
+          if (cand_temp == candidateToMergeBest) continue;
+          if (cand_temp->getTrackHits().size() < 3) continue;
+//          if(cand_temp->getCandidateType() ==  TrackCandidate::goodTrack) continue;
+
+
+          m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand_temp);
+          double chi2_temp = doTracksFitTogether(candidateToMergeBest, cand_temp, remove_hits);
+          for (TrackHit * hit : candidateToMergeBest->getTrackHits()) {
+            hit->setHitUsage(TrackHit::used_in_track);
+          }
+          for (TrackHit * hit : cand_temp->getTrackHits()) {
+            hit->setHitUsage(TrackHit::used_in_track);
+          }
+
+          if (chi2_best_reverse > chi2_temp) {
+            candidateToMergeBestReverse = cand_temp;
+            chi2_best_reverse = chi2_temp;
+          }
+        }
+
+        if (chi2_best < chi2_best_reverse) {
+          mergeTracks(cand1, candidateToMergeBest, remove_hits );
+m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+it1 = m_trackList.begin();
+tracks_merged++;
+} else {
+mergeTracks(candidateToMergeBest, candidateToMergeBestReverse, remove_hits);
+m_cdcLegendreTrackFitter->fitTrackCandidateFast(candidateToMergeBest);
+it1 = m_trackList.begin();
+tracks_merged++;
+}
+
+//      mergeTracks(cand1, candidateToMergeBest);
+//      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand1);
+
+ii++;
+B2DEBUG(100, "ii = " << ii);
+
+}
+
+B2DEBUG(100, "Cand hits vector size = " << cand1->getTrackHits().size());
+B2DEBUG(100, "Cand R = " << cand1->getR());
+
+}
+
+if (tracks_merged == 0 && not remove_hits)merging_done = true;
+if (tracks_merged == 0 && remove_hits)remove_hits  = false;
+//    tracks_merged = 0;
+B2DEBUG(100, "tracks_merged = " << tracks_merged)
+
+m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(),
+[&](TrackCandidate * cand) {
+return (cand->getTrackHits().size() < 3);
+}), m_trackList.end());
+
+} while (not merging_done);
+
+m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(),
+[&](TrackCandidate * cand) {
+return (cand->getTrackHits().size() < 6);
+}), m_trackList.end());
+
+B2DEBUG(100, "Merger: Resulting nCands = " << m_trackList.size());
+
+for (TrackCandidate * cand : m_trackList) {
+for (TrackHit * hit : cand->getTrackHits()) {
+hit->setHitUsage(TrackHit::used_in_track);
+}
+}
+
+}*/
+
 
 // UNUSED
 /*

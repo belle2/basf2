@@ -102,13 +102,15 @@ namespace Belle2 {
     private:
 
 
+      /** Some typedefs for the results of the merging process */
       typedef unsigned int TrackCandidateIndex;
       typedef std::pair<TrackCandidateIndex, TrackCandidate*> TrackCandidateWithIndex;
       typedef double Probability;
       typedef std::pair<TrackCandidate*, Probability> BestMergePartner;
 
       /**
-       * @brief Function to merge two track candidates
+       * Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.
+       * The hit sorting is not maintained.
        */
       static void mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2);
 
@@ -121,7 +123,7 @@ namespace Belle2 {
       /** Try to merge the two tracks
        * For this, build a common hit list and do a fast fit.
        * Then, throw away hits with a very high distance and fit again. Repeat this process three times.
-       * As a result. the reduced chi2 is given.
+       * As a result. the reduced probability for a good fit is given.
        * The bad hits are marked but none of them is deleted!
        * This method does not do the actual merging. */
       static double doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, TrackFitter* trackFitter);
@@ -134,11 +136,18 @@ namespace Belle2 {
        */
       static BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged, std::list<TrackCandidate*>::iterator start_iterator, std::list<TrackCandidate*>::iterator end_iterator, TrackFitter* trackFitter);
 
+      /**
+       * After the candidate-to-merge finding, some hits are marked as bad. This method resets them.
+       * @param otherTrackCandidate to reset
+       */
       static void resetHits(TrackCandidate* otherTrackCandidate);
 
       //std::list<TrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
       //TrackFitter* m_cdcLegendreTrackFitter; /**< Track fitter */
 
+      /**
+       * This parameter is the minimum probability a fit must have to lead to the result: merge
+       */
       static constexpr double m_minimum_probability_to_be_merged = 0.8;
 
       //std::list<TrackCandidate*>& __attribute__((unused)) m_trackletList; /**< List of tracklets. */

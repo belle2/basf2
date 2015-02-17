@@ -34,6 +34,8 @@ namespace Belle2 {
     std::vector<std::string> m_excluded;
     /** Components to be added in addition to the default ones */
     std::vector<std::string> m_additional;
+    /** Whether or not a region should be assigned to all volumes created by a given creator */
+    bool m_assignRegions {false};
   };
 } //Belle2 namespace
 #endif

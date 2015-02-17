@@ -99,6 +99,10 @@ namespace Belle2 {
         m_additional.insert(components.begin(), components.end());
       }
 
+      void setAssignRegions(bool assignRegions) {
+        m_assignRegions = assignRegions;
+      }
+
       /**
        * Delete the existing Geant4 Geometry.
        */
@@ -133,6 +137,10 @@ namespace Belle2 {
       std::set<std::string> m_excluded;
       /** List of additional components to be added to the default set of components */
       std::set<std::string> m_additional;
+      /** Bool to indicate whether we automatically assign a region with the
+       * creator name to all volumes created by that creator
+       */
+      bool m_assignRegions {false};
 
       /** Allow destruction of instance */
       friend class std::auto_ptr<GeometryManager>;

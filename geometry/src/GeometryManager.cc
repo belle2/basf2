@@ -167,6 +167,23 @@ namespace Belle2 {
                  << " solids, " << newLogical << " logical volumes and "
                  << newPhysical << " physical volumes");
           m_creators.push_back(creator);
+          if (m_assignRegions) {
+            //Automatically assign a region with the creator name to all volumes
+            G4Region* region {nullptr};
+            //We loop over all children of the top volume and check whether they
+            //have the correct region assigned
+            for (int i = 0; i < top_log->GetNoDaughters(); ++i) {
+              G4LogicalVolume* vol = top_log->GetDaughter(i)->GetLogicalVolume();
+              //We only assign a region if there is not already one
+              if (!vol->GetRegion()) {
+                //Ok, new region, create or get one if not already done and assign it
+                if (!region) region = G4RegionStore::GetInstance()->FindOrCreateRegion(name);
+                vol->SetRegion(region);
+                //And propagate the region to all child volumes
+                region->AddRootLogicalVolume(vol);
+              }
+            }
+          }
         }
       }
 

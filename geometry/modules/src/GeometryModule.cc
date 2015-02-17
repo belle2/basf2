@@ -36,6 +36,9 @@ GeometryModule::GeometryModule()
            "Name of the components to excluded from creation", m_excluded);
   addParam("additionalComponents", m_additional,
            "Name of components to be created in addition to the default parameters", m_additional);
+  addParam("assignRegions", m_assignRegions,
+           "If true, automatically assign a Geant4 Region with the name of the "
+           "creator to all volumes created by that creator", m_assignRegions);
 }
 
 void GeometryModule::initialize()
@@ -44,6 +47,7 @@ void GeometryModule::initialize()
   geoManager.setDetectorComponents(m_components);
   geoManager.setExcludedComponents(m_excluded);
   geoManager.setAdditionalComponents(m_additional);
+  geoManager.setAssignRegions(m_assignRegions);
 
   geoManager.createGeometry(GearDir(m_geometryPath), geometry::FullGeometry);
 }

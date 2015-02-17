@@ -58,6 +58,9 @@ namespace Belle2 {
       /// Unpacks the wrapped object as if the wrapper was a pointer to it.
       const T& operator*() const { return m_item; }
 
+      /// Forwards an iteration request from python to the wrapped object. If iteration is feasable depends on the wrapped object.
+      const T& __iter__() const { return m_item; }
+
     public:
       /// Memory for the wrapped item.
       T m_item; //! Do not include in the Streamer since the object might not implement it.

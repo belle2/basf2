@@ -21,6 +21,9 @@ TrackFitter* QuadTreeCandidateCreator::s_cdcLegendreTrackFitter;
 TrackProcessor* QuadTreeCandidateCreator::s_cdcLegendreTrackProcessor;
 TrackMerger* QuadTreeCandidateCreator::s_cdcLegendreTrackMerger;
 std::vector<TrackHit*> QuadTreeCandidateCreator::s_axialHits;
+bool QuadTreeCandidateCreator::m_appendHitsWhileFinding;
+bool QuadTreeCandidateCreator::m_mergeTracksWhileFinding;
+bool QuadTreeCandidateCreator::m_deleteHitsWhileFinding;
 
 
 QuadTreeCandidateCreator& QuadTreeCandidateCreator::Instance()
@@ -29,84 +32,8 @@ QuadTreeCandidateCreator& QuadTreeCandidateCreator::Instance()
   return *s_cdcLegendreQuadTreeCandidateCreator;
 }
 
-bool QuadTreeCandidateCreator::sort_nodes(const QuadTree* node_one, const QuadTree* node_two)
-{
-  return (node_one->getNHits() > node_two->getNHits());
-}
-
-
-void QuadTreeCandidateCreator::createCandidates()
-{
-  //B2INFO("Sorting nodes");
-  s_nodesWithCandidates.sort(QuadTreeCandidateCreator::sort_nodes);
-  //B2INFO("Done sorting nodes");
-
-  for (QuadTree * node : s_nodesWithCandidates) {
-    //B2INFO("Cleaning hits");
-    node->cleanHitsInNode();
-    if (not node->checkNode()) continue;
-
-    //B2INFO("Good node");
-
-
-    std::vector<TrackHit*> c_list;
-    std::pair<std::vector<TrackHit*>, std::pair<double, double> > candidate_temp =
-      std::make_pair(c_list, std::make_pair(-999, -999));
-
-
-
-
-    for (TrackHit * hit : node->getHits()) {
-      hit->setHitUsage(TrackHit::used_in_cand);
-    }
-
-    candidate_temp.first = node->getHits();
-    candidate_temp.second = std::make_pair(node->getThetaMean(), node->getRMean());
-    //B2INFO("Pushing new candidate");
-
-    s_candidates.push_back(candidate_temp);
-
-  }
-
-  B2INFO("Created " << s_candidates.size() << "candidates");
-}
-
-
-bool QuadTreeCandidateCreator::createCandidate(QuadTree* node)
-{
-  //B2INFO("Cleaning hits");
-  node->cleanHitsInNode();
-  if (not node->checkNode()) return false;
-
-  //B2INFO("Good node");
-
-
-  std::vector<TrackHit*> c_list;
-  std::pair<std::vector<TrackHit*>, std::pair<double, double> > candidate_temp =
-    std::make_pair(c_list, std::make_pair(-999, -999));
-
-
-
-
-  for (TrackHit * hit : node->getHits()) {
-    hit->setHitUsage(TrackHit::used_in_cand);
-  }
-
-  candidate_temp.first = node->getHits();
-  candidate_temp.second = std::make_pair(node->getThetaMean(), node->getRMean());
-  //B2INFO("Pushing new candidate");
-
-  s_candidates.push_back(candidate_temp);
-
-  return true;
-//  B2INFO("Created candidate");
-}
-
 bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
 {
-
-
-  //B2INFO("Cleaning hits");
   node->cleanHitsInNode();
   if (not node->checkNode()) return false;
 
@@ -126,16 +53,14 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
     if (nodeNeighbor->getNHits() == 0) nodeNeighbor->fillChildrenForced();
     nodeNeighbor->cleanHitsInNode();
   }
+
   /*
     for(CDCLegendreQuadTree* neighbors: node->getNeighborsVector()){
       if(neighbors->checkNode()){
         nodeList.push_back(neighbors);
       }
     }
-  */
-
-
-
+    */
 
   TrackCandidate* trackCandidate;
   if (AxialVsStereo >= 0) {
@@ -149,6 +74,10 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
   } else trackCandidate = s_cdcLegendreTrackProcessor->createLegendreStereoTracklet(nodeList);
 
 
+  return postprocessTrackCandidate(trackCandidate);
+
+  /*
+  UNUSED
   int neighborsOrder = 5;
 
   std::vector<QuadTree*> nodesInitial;
@@ -191,55 +120,55 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTree* node)
       }
       if (hitToAdd) hitsToProcess.push_back(hit);
     }
-  }
-
-
-  if (trackCandidate->getPt() < 0.9) s_cdcLegendreTrackMerger->tryToMergeTrack(trackCandidate);
-
-  if (trackCandidate == nullptr) return false;
-
-
-  SimpleFilter m_cdcLegendreSimpleFilter;
-  m_cdcLegendreSimpleFilter.processTracks(s_cdcLegendreTrackProcessor->getTrackList());
-
-  for (TrackCandidate * cand : s_cdcLegendreTrackProcessor->getTrackList()) {
-    s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-  }
-  m_cdcLegendreSimpleFilter.appenUnusedHits(s_cdcLegendreTrackProcessor->getTrackList(), s_axialHits);
-
-  PatternChecker cdcLegendrePatternChecker(s_cdcLegendreTrackProcessor);
-  cdcLegendrePatternChecker.checkCandidate(trackCandidate);
-
+  }*/
 
 //  s_cdcLegendreTrackMerger->extendTracklet(trackCandidate, /*hitsToProcess*/ s_axialHits);
-
-
-
-  return true;
-
 }
 
-
-QuadTree* QuadTreeCandidateCreator::findNode(QuadTree* tree, double r, double theta)
+bool QuadTreeCandidateCreator::postprocessTrackCandidate(TrackCandidate* trackCandidate)
 {
-  if (((tree->getRMin() < r) && (tree->getRMax() > r)) && ((tree->getThetaMin() < theta) && (tree->getThetaMax() > theta))) {
-    if (tree->isLeaf())
-      return tree;
-    else {
-      QuadTree* returnNode = 0;
-
-      for (int rBin = 0; rBin < tree->getRNbins(); rBin++) {
-        for (int thetaBin = 0; thetaBin < tree->getThetaNbins(); thetaBin++) {
-          returnNode = findNode(tree->getChild(thetaBin, rBin), r, theta);
-          if (returnNode != 0) return returnNode;
-        }
-      }
-    }
+  for (TrackCandidate * candidate : s_cdcLegendreTrackProcessor->getTrackList()) {
+    s_cdcLegendreTrackFitter->fitTrackCandidateFast(candidate);
   }
 
-  return 0;
-}
+  for (TrackCandidate * candidate : s_cdcLegendreTrackProcessor->getTrackList()) {
+    candidate->reestimateCharge();
+  }
 
+
+  if (m_deleteHitsWhileFinding) {
+    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.75, s_cdcLegendreTrackFitter);
+  }
+
+  if (m_mergeTracksWhileFinding) {
+    s_cdcLegendreTrackMerger->tryToMergeTrackWithOtherTracks(trackCandidate);
+
+    // Has merging deleted the candidate?
+    if (trackCandidate == nullptr) return false;
+  }
+
+  if (m_appendHitsWhileFinding) {
+    SimpleFilter::processTracks(s_cdcLegendreTrackProcessor->getTrackList());
+
+    for (TrackCandidate * cand : s_cdcLegendreTrackProcessor->getTrackList()) {
+      s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+    }
+
+    SimpleFilter::appendUnusedHits(s_cdcLegendreTrackProcessor->getTrackList(), s_axialHits, 0.8);
+
+    for (TrackCandidate * cand : s_cdcLegendreTrackProcessor->getTrackList()) {
+      s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+    }
+
+    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8, s_cdcLegendreTrackFitter);
+  }
+
+  // UNUSED
+  //PatternChecker cdcLegendrePatternChecker(s_cdcLegendreTrackProcessor);
+  //cdcLegendrePatternChecker.checkCandidate(trackCandidate);
+
+  return true;
+}
 
 void QuadTreeCandidateCreator::clearCandidates()
 {
@@ -260,3 +189,98 @@ QuadTreeCandidateCreator::~QuadTreeCandidateCreator()
   }
 
 }
+
+// UNUSED
+/*
+QuadTree* QuadTreeCandidateCreator::findNode(QuadTree* tree, double r, double theta)
+{
+  if (((tree->getRMin() < r) && (tree->getRMax() > r)) && ((tree->getThetaMin() < theta) && (tree->getThetaMax() > theta))) {
+    if (tree->isLeaf())
+      return tree;
+    else {
+      QuadTree* returnNode = 0;
+
+      for (int rBin = 0; rBin < tree->getRNbins(); rBin++) {
+        for (int thetaBin = 0; thetaBin < tree->getThetaNbins(); thetaBin++) {
+          returnNode = findNode(tree->getChild(thetaBin, rBin), r, theta);
+          if (returnNode != 0) return returnNode;
+        }
+      }
+    }
+  }
+
+  return 0;
+}*/
+/*
+bool QuadTreeCandidateCreator::sort_nodes(const QuadTree* node_one, const QuadTree* node_two)
+{
+  return (node_one->getNHits() > node_two->getNHits());
+}
+ */
+/*
+bool QuadTreeCandidateCreator::createCandidate(QuadTree* node)
+{
+  //B2INFO("Cleaning hits");
+  node->cleanHitsInNode();
+  if (not node->checkNode()) return false;
+
+  //B2INFO("Good node");
+
+
+  std::vector<TrackHit*> c_list;
+  std::pair<std::vector<TrackHit*>, std::pair<double, double> > candidate_temp =
+    std::make_pair(c_list, std::make_pair(-999, -999));
+
+
+
+
+  for (TrackHit * hit : node->getHits()) {
+    hit->setHitUsage(TrackHit::used_in_cand);
+  }
+
+  candidate_temp.first = node->getHits();
+  candidate_temp.second = std::make_pair(node->getThetaMean(), node->getRMean());
+  //B2INFO("Pushing new candidate");
+
+  s_candidates.push_back(candidate_temp);
+
+  return true;
+//  B2INFO("Created candidate");
+}*/
+
+/*
+void QuadTreeCandidateCreator::createCandidates()
+{
+  //B2INFO("Sorting nodes");
+  s_nodesWithCandidates.sort(QuadTreeCandidateCreator::sort_nodes);
+  //B2INFO("Done sorting nodes");
+
+  for (QuadTree * node : s_nodesWithCandidates) {
+    //B2INFO("Cleaning hits");
+    node->cleanHitsInNode();
+    if (not node->checkNode()) continue;
+
+    //B2INFO("Good node");
+
+
+    std::vector<TrackHit*> c_list;
+    std::pair<std::vector<TrackHit*>, std::pair<double, double> > candidate_temp =
+      std::make_pair(c_list, std::make_pair(-999, -999));
+
+
+
+
+    for (TrackHit * hit : node->getHits()) {
+      hit->setHitUsage(TrackHit::used_in_cand);
+    }
+
+    candidate_temp.first = node->getHits();
+    candidate_temp.second = std::make_pair(node->getThetaMean(), node->getRMean());
+    //B2INFO("Pushing new candidate");
+
+    s_candidates.push_back(candidate_temp);
+
+  }
+
+  B2INFO("Created " << s_candidates.size() << "candidates");
+}*/

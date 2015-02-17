@@ -87,14 +87,36 @@ namespace Belle2 {
       /** Sort nodes according to number of hits */
       static bool sort_nodes(const QuadTree* node_one, const QuadTree* node_two);
 
+      static void setAppendHitsWhileFinding(bool appendHitsWhileFinding) {
+        m_appendHitsWhileFinding = appendHitsWhileFinding;
+      }
+
+      static void setMergeTracksWhileFinding(bool mergeTracksWhileFinding) {
+        m_mergeTracksWhileFinding = mergeTracksWhileFinding;
+      }
+
+      static void setDeleteHitsWhileFinding(bool deleteHitsWhileFinding) {
+        m_deleteHitsWhileFinding = deleteHitsWhileFinding;
+      }
 
     private:
+      /**
+       * After havin find the trackCandidate, we try to postprocess only this single trackCandidate.
+       * @param trackCandidate
+       * @return a flag if everything was correct
+       */
+      bool postprocessTrackCandidate(TrackCandidate* trackCandidate);
+
       static std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > > s_candidates; /**< Holds list of track candidates */
       static std::list<QuadTree*> s_nodesWithCandidates; /**< List of nodes with possible track candidates */
       static TrackFitter* s_cdcLegendreTrackFitter; /**< Track fitter object */
       static TrackProcessor* s_cdcLegendreTrackProcessor; /**< Track creator object */
       static TrackMerger* s_cdcLegendreTrackMerger; /**< Track merger object */
       static std::vector<TrackHit*> s_axialHits; /**< Holds list of acial hits */
+
+      static bool m_appendHitsWhileFinding;
+      static bool m_mergeTracksWhileFinding;
+      static bool m_deleteHitsWhileFinding;
 
       static QuadTreeCandidateCreator* s_cdcLegendreQuadTreeCandidateCreator; /**< Instance of the class */
 

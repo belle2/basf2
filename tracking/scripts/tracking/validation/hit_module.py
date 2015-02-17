@@ -74,6 +74,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         self.ratio_hits_in_mc_tracks_and_not_in_pr_tracks = collections.deque()
         self.mc_is_primary = collections.deque()
         self.mc_number_of_hits = collections.deque()
+        self.mc_number_of_missing_hits = collections.deque()  # the number of hits from the mc track cand that are not found by the pr track cand (in any track)
 
         # PT information
         self.number_of_connected_tracks = collections.deque()  # This is the number of mcTrackCands sharing a hit with the track cand.
@@ -168,7 +169,11 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             self.mc_is_primary.append(is_primary)
             self.mc_number_of_hits.append(len(mcTrackCandHits))
 
-        self.mc_missing.append(is_missing)
+            self.mc_number_of_missing_hits.append(len(mcTrackCandHits)
+                    - len(mcTrackCandHits & totalHitListPR))
+
+            self.mc_missing.append(is_missing)
+
         self.number_of_total_hits.append(number_of_all_hits)
         self.number_of_mc_hits.append(number_of_mc_hits)
         self.number_of_pr_hits.append(number_of_pr_hits)
@@ -196,6 +201,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         mc_figures_of_merit['mc_missing'] = self.mc_missing
         mc_figures_of_merit['mc_is_primary'] = self.mc_is_primary
         mc_figures_of_merit['mc_number_of_hits'] = self.mc_number_of_hits
+        mc_figures_of_merit['mc_number_of_missing_hits'] = \
+            self.mc_number_of_missing_hits
         mc_figures_of_merit['ratio_hits_in_mc_tracks_and_not_in_pr_tracks'] = \
             self.ratio_hits_in_mc_tracks_and_not_in_pr_tracks
 

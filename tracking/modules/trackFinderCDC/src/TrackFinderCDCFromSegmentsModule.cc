@@ -64,14 +64,6 @@ void TrackFinderCDCFromSegmentsModule::generate(std::vector<CDCTrack>& tracks)
 
   std::vector<CDCRecoSegment2D>& segments = *storedRecoSegments;
 
-  // Regenerate the do not use flag
-  for (const CDCRecoSegment2D & segment : segments) {
-    for (const CDCRecoHit2D & recoHit2D : segment) {
-      const CDCWireHit& wireHit = recoHit2D.getWireHit();
-      wireHit.getAutomatonCell().unsetDoNotUseFlag();
-    }
-  }
-
   generate(segments, tracks);
 
   if (not m_minimalHitsForSingleSegmentTrackBySuperLayerId.empty()) {

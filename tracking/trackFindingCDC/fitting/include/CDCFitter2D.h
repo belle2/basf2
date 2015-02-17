@@ -46,41 +46,66 @@ namespace Belle2 {
       ~CDCFitter2D()
       { ; }
 
-      /// Fits a collection of hits typs which are convertable to observation circles.
+      /// Fits a collection of hit typs which are convertable to observation circles.
       template<class Hits>
       CDCTrajectory2D fit(const Hits& hits) const {
-        //B2INFO("Called generic.");
         CDCTrajectory2D result;
         update(result, hits);
         return result;
       }
 
+      /// Fits together two collections of hit types which are convertable to observation circles.
+      template<class StartHits, class EndHits>
+      CDCTrajectory2D fit(const StartHits& startHits, const EndHits& endHits) const {
+        CDCTrajectory2D result;
+        update(result, startHits, endHits);
+        return result;
+      }
+
       /// Fits the segment
       CDCTrajectory2D fit(const CDCRecoSegment2D& segment) const {
-        //B2INFO("Called const CDCRecoSegment2D& segment.");
         CDCTrajectory2D result;
         update(result, segment);
         return result;
       }
 
-      /// Fits to the wire positions
+      /// Fits to the wire positions. Explicit specialisation to be used from python.
       CDCTrajectory2D fit(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires) const {
-        //B2INFO("Called const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires.");
         CDCTrajectory2D result;
         update(result, wires);
         return result;
       }
 
-      /// Fits to the wire positions
+      /// Fits to the wire positions. Explicit specialisation to be used from python.
       CDCTrajectory2D fit(const CDCWireHitSegment& wireHits) const {
-        //B2INFO("Called CDCWireSegment wireHits.");
         CDCTrajectory2D result;
         update(result, wireHits);
         return result;
       }
 
+      /// Updates a given trajectory with a fit to two collection of hit types, which are convertable to observation circles.
+      template<class StartHits, class EndHits>
+      void update(CDCTrajectory2D& trajectory2D, const StartHits& startHits, const EndHits& endHits) const {
+        CDCObservations2D observations2D;
+        if (m_usePosition) {
+          observations2D.append(startHits, true);
+          observations2D.append(endHits, true);
+        }
+        if (m_useOrientation) {
+          observations2D.append(startHits, false);
+          observations2D.append(endHits, false);
+        }
 
-
+        if (observations2D.size() < 5) {
+          trajectory2D.clear();
+          return;
+        } else {
+          FitMethod::update(trajectory2D, observations2D);
+          ForwardBackwardInfo isCoaligned = observations2D.isCoaligned(trajectory2D);
+          if (isCoaligned == BACKWARD) trajectory2D.reverse();
+          //else if (isCoaligned != FORWARD) B2WARNING("Fit cannot be oriented correctly");
+        }
+      }
 
       /// Updates a given trajectory with a fit to a collection of hits typs, which are convertable to observation circles.
       template<class Hits>
@@ -102,7 +127,6 @@ namespace Belle2 {
           if (isCoaligned == BACKWARD) trajectory2D.reverse();
           //else if (isCoaligned != FORWARD) B2WARNING("Fit cannot be oriented correctly");
         }
-
       }
 
       /// Update the trajectory with a fit to the observations.

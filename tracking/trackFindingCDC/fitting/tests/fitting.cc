@@ -211,14 +211,17 @@ TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
 {
 
   const std::vector<TrackFindingCDC::TrackHit*> legendreTrackHits;
+  const std::vector<TrackFindingCDC::TrackHit*> legendreTrackHits2;
 
   {
     CDCRiemannFitter riemannFitter = CDCRiemannFitter::getFitter();
     CDCTrajectory2D trajctory2D = riemannFitter.fit(legendreTrackHits);
+    CDCTrajectory2D togetherTrajctory2D = riemannFitter.fit(legendreTrackHits, legendreTrackHits2);
   }
   {
     CDCKarimakiFitter karimakiFitter = CDCKarimakiFitter::getFitter();
     CDCTrajectory2D trajctory2D = karimakiFitter.fit(legendreTrackHits);
+    CDCTrajectory2D togetherTrajctory2D = karimakiFitter.fit(legendreTrackHits, legendreTrackHits2);
   }
 
 }

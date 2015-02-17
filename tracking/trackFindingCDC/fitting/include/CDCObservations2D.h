@@ -300,7 +300,7 @@ namespace Belle2 {
         for (const TrackFindingCDC::TrackHit * ptrLegendreTrackHit : legendreTrackHits) {
           if (not ptrLegendreTrackHit) continue;
           const TrackFindingCDC::TrackHit& legendreTrackHit = *ptrLegendreTrackHit;
-          const TVector3&& wirePos = legendreTrackHit.getWirePosition();
+          const TVector3 wirePos = legendreTrackHit.getWirePosition();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0;
           result += append(wirePos.X(), wirePos.Y(), driftLength, weight);

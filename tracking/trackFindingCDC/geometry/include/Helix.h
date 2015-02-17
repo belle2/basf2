@@ -47,7 +47,7 @@ namespace Belle2 {
       {;}
 
       explicit Helix(const TVectorD& parameters) :
-        m_circleXY(PerigeeCircle::fromPerigeeParameters(parameters(iCurv), parameters(iPhi0), parameters(iI))),
+        m_circleXY(parameters(iCurv), parameters(iPhi0), parameters(iI)),
         m_lineSZ(Line2D::fromSlopeIntercept(parameters(iSZ), parameters(iZ0)))
       {;}
 
@@ -56,7 +56,7 @@ namespace Belle2 {
             const FloatType& impact,
             const FloatType& szSlope,
             const FloatType& z0) :
-        m_circleXY(PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
+        m_circleXY(curvature, tangentialPhi, impact),
         m_lineSZ(Line2D::fromSlopeIntercept(szSlope, z0))
       {;}
 
@@ -66,7 +66,7 @@ namespace Belle2 {
             const FloatType& impact,
             const FloatType& szSlope,
             const FloatType& z0) :
-        m_circleXY(PerigeeCircle::fromPerigeeParameters(curvature, tangential, impact)),
+        m_circleXY(curvature, tangential, impact),
         m_lineSZ(Line2D::fromSlopeIntercept(szSlope, z0))
       {;}
 

@@ -37,6 +37,20 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       PerigeeCircle();
 
+      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as vector.
+      PerigeeCircle(const FloatType& curvature,
+                    const Vector2D& tangential,
+                    const FloatType& impact);
+
+      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as polar angle
+      PerigeeCircle(const FloatType& curvature,
+                    const FloatType& tangentialPhi,
+                    const FloatType& impact);
+
+      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as polar angle
+      PerigeeCircle(const TVectorD& parameters);
+
+
     private:
       /// Constructor taking all stored parameters for internal use.
       PerigeeCircle(const GeneralizedCircle& n0123,
@@ -66,6 +80,7 @@ namespace Belle2 {
                                  const Vector2D& n12,
                                  const FloatType& n3 = 0);
 
+
       /// Constructor from center, radius and a optional orientation
       /** The center and radius alone do not carry any orientation. However the generalized circle does.
        *  This constructor makes an orientated representation from them. If not given the orientation defaults to
@@ -73,19 +88,6 @@ namespace Belle2 {
       static PerigeeCircle fromCenterAndRadius(const Vector2D& center,
                                                const FloatType& absRadius,
                                                const CCWInfo& orientation = CCW);
-
-      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as vector.
-      static PerigeeCircle fromPerigeeParameters(const FloatType& curvature,
-                                                 const Vector2D& tangential,
-                                                 const FloatType& impact);
-
-      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as polar angle
-      static PerigeeCircle fromPerigeeParameters(const FloatType& curvature,
-                                                 const FloatType& tangentialPhi,
-                                                 const FloatType& impact);
-
-
-
 
       /// Empty deconstructor
       ~PerigeeCircle() {;}

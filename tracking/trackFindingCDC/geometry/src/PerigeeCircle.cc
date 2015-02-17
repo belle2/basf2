@@ -31,6 +31,33 @@ PerigeeCircle::PerigeeCircle() : GeneralizedCircle()
   setNull();
 }
 
+PerigeeCircle::PerigeeCircle(const FloatType& curvature,
+                             const Vector2D& tangential,
+                             const FloatType& impact) :
+  GeneralizedCircle(GeneralizedCircle::fromPerigeeParameters(curvature, tangential, impact)),
+  m_curvature(curvature),
+  m_tangentialPhi(tangential.phi()),
+  m_tangential(tangential),
+  m_impact(impact)
+{
+}
+
+PerigeeCircle::PerigeeCircle(const FloatType& curvature,
+                             const FloatType& tangentialPhi,
+                             const FloatType& impact) :
+  GeneralizedCircle(GeneralizedCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
+  m_curvature(curvature),
+  m_tangentialPhi(tangentialPhi),
+  m_tangential(Vector2D::Phi(tangentialPhi)),
+  m_impact(impact)
+{
+}
+
+
+PerigeeCircle::PerigeeCircle(const TVectorD& parameters) :
+  PerigeeCircle(parameters(iCurv), parameters(iPhi0), parameters(iI))
+{
+}
 
 PerigeeCircle::PerigeeCircle(const GeneralizedCircle& n0123,
                              const FloatType& curvature,
@@ -102,29 +129,6 @@ PerigeeCircle PerigeeCircle::fromCenterAndRadius(const Vector2D& center,
   circle.setCenterAndRadius(center, absRadius, orientation);
   return circle;
 }
-
-
-
-PerigeeCircle PerigeeCircle::fromPerigeeParameters(const FloatType& curvature,
-                                                   const Vector2D& tangential,
-                                                   const FloatType& impact)
-{
-  PerigeeCircle circle;
-  circle.setPerigeeParameters(curvature, tangential.unit(), impact);
-  return circle;
-}
-
-
-
-PerigeeCircle PerigeeCircle::fromPerigeeParameters(const FloatType& curvature,
-                                                   const FloatType& tangentialPhi,
-                                                   const FloatType& impact)
-{
-  PerigeeCircle circle;
-  circle.setPerigeeParameters(curvature, tangentialPhi, impact);
-  return circle;
-}
-
 
 
 Vector2D PerigeeCircle::atArcLength(const FloatType& arcLength) const

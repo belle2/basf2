@@ -50,7 +50,7 @@ namespace Belle2 {
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
                              const FloatType& chi2 = 0.0,
                              const size_t& ndf = 0) :
-        PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
+        PerigeeCircle(curvature, tangentialPhi, impact),
         m_perigeeCovariance(perigeeCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
@@ -65,7 +65,7 @@ namespace Belle2 {
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
                              const FloatType& chi2 = 0.0,
                              const size_t& ndf = 0) :
-        PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangential, impact)),
+        PerigeeCircle(curvature, tangential, impact),
         m_perigeeCovariance(perigeeCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
@@ -95,6 +95,17 @@ namespace Belle2 {
         m_chi2(chi2),
         m_ndf(ndf)
       {;}
+
+      explicit UncertainPerigeeCircle(const TVectorD& parameters,
+                                      const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                                      const FloatType& chi2 = 0.0,
+                                      const size_t& ndf = 0) :
+        PerigeeCircle(parameters),
+        m_perigeeCovariance(perigeeCovariance),
+        m_chi2(chi2),
+        m_ndf(ndf)
+      {;}
+
 
       /// Empty destructor
       ~UncertainPerigeeCircle() {;}

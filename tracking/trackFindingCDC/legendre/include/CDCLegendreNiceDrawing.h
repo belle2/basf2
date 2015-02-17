@@ -106,7 +106,8 @@ namespace Belle2 {
                       TVector2 position,
                       double radius,
                       std::string color,
-                      double linewidth = 1);
+                      double linewidth = 1,
+                      double opacity = 0.75);
 
       /** Arc drawing */
       void drawArc(std::stringstream& drawString,
@@ -115,7 +116,8 @@ namespace Belle2 {
                    double radius,
                    int charge,
                    std::string color,
-                   double linewidth = 1);
+                   double linewidth = 1,
+                   double opacity = 0.75);
 
       /** Translate coordinates from normal space to svg space */
       TVector3 translateCircle(TVector2 center, double radius);

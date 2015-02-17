@@ -150,9 +150,9 @@ void NiceDrawing::initWireString()
     for (unsigned int iWire = 0; iWire < CDC::CDCGeometryPar::Instance().nWiresInLayer(iLayer); ++iWire) {
       TVector2 wirePos = getWirePosition(iLayer, iWire);
       if (WireID(iLayer, iWire).getISuperLayer() % 2 == 0)
-        drawCircle(m_wireString, wirePos, rWire, "gray");
+        drawCircle(m_wireString, wirePos, rWire, "gray", 1., 1.);
       else
-        drawCircle(m_wireString, wirePos, rWire, "black");
+        drawCircle(m_wireString, wirePos, rWire, "black", 1., 1.);
     }
   }
 
@@ -206,7 +206,7 @@ TVector2 NiceDrawing::getWirePosition(int iLayer, int iWire)
   return TVector2(WireX, WireY);
 }
 
-void NiceDrawing::drawArc(std::stringstream& drawString, TVector2 position, TVector2 center, double radius, int charge, std::string color, double linewidth)
+void NiceDrawing::drawArc(std::stringstream& drawString, TVector2 position, TVector2 center, double radius, int charge, std::string color, double linewidth, double opacity)
 {
   std::pair<TVector2, TVector2> intersect_both = getIntersect(center, position);
 
@@ -229,14 +229,14 @@ void NiceDrawing::drawArc(std::stringstream& drawString, TVector2 position, TVec
 
   drawString << arc_new[0] << " " << arc_new[1] << "\" ";
 
-  drawString << "fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\" />\n";
+  drawString << "fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\" stroke-opacity=\"" << opacity << "\" />\n";
 }
 
-void NiceDrawing::drawCircle(std::stringstream& drawString, TVector2 position, double radius, std::string color, double linewidth)
+void NiceDrawing::drawCircle(std::stringstream& drawString, TVector2 position, double radius, std::string color, double linewidth, double opacity)
 {
   TVector3 circle_new = translateCircle(position, radius);
 
-  drawString << "<circle cx=\"" << circle_new[0] << "\" cy=\"" << circle_new[1] << "\" r=\"" << circle_new[2] << "\" fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\"  />\n";
+  drawString << "<circle cx=\"" << circle_new[0] << "\" cy=\"" << circle_new[1] << "\" r=\"" << circle_new[2] << "\" fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\" stroke-opacity=\"" << opacity << "\" />\n";
 }
 
 TVector3 NiceDrawing::translateCircle(TVector2 center, double radius)
@@ -491,7 +491,7 @@ void NiceDrawing::drawMCTracks()
       drawMCTrack(ss, part, "lightblue");
 
       for (const CDCHit & hit :  part->getRelationsTo<CDCHit>()) {
-        drawCDCHit(ss, &hit, "lightblue");
+        drawCDCHit(ss, &hit, "lightsteelblue");
       }
     }
   }

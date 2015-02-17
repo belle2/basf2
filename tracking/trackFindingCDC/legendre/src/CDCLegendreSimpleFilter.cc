@@ -20,25 +20,15 @@ using namespace TrackFindingCDC;
 
 double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* track)
 {
-
-  double prob = 0;
-
   double x0_track = track->getXc();
   double y0_track = track->getYc();
   double R = track->getRadius();
-
 
   double x0_hit = hit->getOriginalWirePosition().X();
   double y0_hit = hit->getOriginalWirePosition().Y();
   double dist = fabs(fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength());
 
-
-
-  prob = exp(-1. * dist / hit->getSigmaDriftLength());
-
-  if (dist < hit->getSigmaDriftLength() * 2.) prob = 1.;
-
-  return prob;
+  return 1.0 - exp(-1 / dist);
 }
 
 
@@ -100,12 +90,10 @@ void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
       hit->setHitUsage(TrackHit::used_in_track);
     }
 
-    if (cand->getTrackHits().size() == 0)continue;
+    if (cand->getTrackHits().size() == 0) continue;
 
     for (TrackHit * hit : cand->getTrackHits()) {
-      double prob = getAssigmentProbability(hit, cand);;
-
-//      if(prob<m_minProb){
+      double prob = getAssigmentProbability(hit, cand);
 
       double bestHitProb = prob;
       TrackCandidate* BestCandidate = NULL;
@@ -114,42 +102,20 @@ void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
         if (candInner == cand) continue;
         double probTemp = getAssigmentProbability(hit, candInner);
 
-//        int curve_sign = hit->getCurvatureSignWrt(cos(candInner->getTheta()) / candInner->getR(), sin(candInner->getTheta()) / candInner->getR());
-
-        if (probTemp > bestHitProb /*&& curve_sign == candInner->getCharge()*/) {
+        if (probTemp > bestHitProb) {
           BestCandidate = candInner;
           bestHitProb = probTemp;
         }
       }
 
       if (bestHitProb > prob) {
-//          filterCandidate->getLegendreCandidate()->removeHit(hit);
         BestCandidate->addHit(hit);
-//        cand->removeHit(hit);
         hit->setHitUsage(TrackHit::bad);
-//        B2INFO("Hit has been reassigned.");
       }
-
-
-//      }
-
     }
-    cand->getTrackHits().erase(std::remove_if(cand->getTrackHits().begin(), cand->getTrackHits().end(),
-    [&](TrackHit * hit) {
-      /*
-            if(hit->getHitUsage() == TrackHit::bad) {
-              hit->setHitUsage(TrackHit::used_in_track);
-              return true;
-            } else {
-              return false;
-            }
-      */
-      return hit->getHitUsage() == TrackHit::bad;
-    }),
-    cand->getTrackHits().end());
 
+    deleteAllMarkedHits(cand);
   }
-
 
   for (TrackCandidate * cand : m_trackList) {
     for (TrackHit * hit : cand->getTrackHits()) {
@@ -157,6 +123,114 @@ void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
     }
   }
 }
+
+void SimpleFilter::deleteAllMarkedHits(TrackCandidate* trackCandidate)
+{
+  trackCandidate->getTrackHits().erase(
+    std::remove_if(trackCandidate->getTrackHits().begin(), trackCandidate->getTrackHits().end(),
+  [&](TrackHit * hit) {return hit->getHitUsage() == TrackHit::bad;}),
+  trackCandidate->getTrackHits().end());
+
+}
+
+void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& axialHitList, double minimal_assignment_probability)
+{
+
+  for (TrackHit * hit : axialHitList) {
+    if (hit->getHitUsage() == TrackHit::used_in_track or hit->getHitUsage() == TrackHit::used_in_cand) continue;
+
+    // Search for best candidate to assign to
+    double bestHitProb = 0;
+    TrackCandidate* BestCandidate = nullptr;
+
+    for (TrackCandidate * cand : trackList) {
+      double probTemp = getAssigmentProbability(hit, cand);
+
+      if (probTemp > bestHitProb) {
+        BestCandidate = cand;
+        bestHitProb = probTemp;
+      }
+    }
+
+    if (bestHitProb > minimal_assignment_probability) {
+      BestCandidate->addHit(hit);
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+
+  }
+}
+
+void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability, TrackFitter* trackFitter)
+{
+
+  std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
+
+  if (trackHits.size() == 0) return;
+
+  for (TrackHit * hit : trackHits) {
+    hit->setHitUsage(TrackHit::used_in_track);
+  }
+
+  int ndf = trackHits.size() - 4;
+
+  if (ndf <= 0) return;
+
+  // If the trackCandidate goes more or less through the IP, we have a problem with back-to-back tracks. These can be assigned to only on track.
+  // If this is the case, we delete the smaller fraction here and let the track-finder find the remaining track again
+
+  std::pair<double, double> track_par = std::make_pair(trackCandidate->getTheta(), trackCandidate->getR());
+  std::pair<double, double> ref_point;
+  double probability_for_good_track_before = TMath::Prob(trackFitter->fitTrackCandidateFast(trackHits, track_par, ref_point) * ndf, ndf);
+
+  if (trackCandidate->getCharge() == TrackCandidate::charge_two_tracks and trackCandidate->getReferencePoint().Mag() < 0.5) {
+
+    unsigned int number_of_hits_in_one_half = 0;
+    unsigned int number_of_hits_in_other_half = 0;
+
+    double phiOfTrack = trackCandidate->getMomentumEstimation().Phi();
+
+    for (TrackHit * hit : trackHits) {
+      double phiOfHit = hit->getWirePosition().Phi();
+      if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
+        number_of_hits_in_one_half++;
+      } else {
+        number_of_hits_in_other_half++;
+      }
+    }
+
+    if (number_of_hits_in_one_half > 2 * number_of_hits_in_other_half) {
+      for (TrackHit * hit : trackHits) {
+        double phiOfHit = hit->getWirePosition().Phi();
+        if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) >= TMath::PiOver2()) {
+          hit->setHitUsage(TrackHit::bad);
+        }
+      }
+    } else if (number_of_hits_in_other_half > 2 * number_of_hits_in_one_half) {
+      for (TrackHit * hit : trackHits) {
+        double phiOfHit = hit->getWirePosition().Phi();
+        if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
+          hit->setHitUsage(TrackHit::bad);
+        }
+      }
+    }
+  }
+
+  deleteAllMarkedHits(trackCandidate);
+
+  for (auto hitIterator = trackHits.begin(); hitIterator != trackHits.end(); hitIterator++) {
+    double assignment_probability = getAssigmentProbability(*hitIterator, trackCandidate);
+
+    double probability_for_good_track = TMath::Prob(trackFitter->fitTrackCandidateFast(trackHits, track_par, ref_point) * (ndf - 1), ndf - 1);
+
+    if (assignment_probability < minimal_assignment_probability) {
+      (*hitIterator)->setHitUsage(TrackHit::bad);
+    }
+  }
+
+  deleteAllMarkedHits(trackCandidate);
+}
+
+// UNUSED AT THE MOMENT
 
 /*
 void SimpleFilter::trackCore()
@@ -207,32 +281,4 @@ void SimpleFilter::trackCore()
 
 */
 
-
-void SimpleFilter::appenUnusedHits(std::list<TrackCandidate*>& m_trackList, std::vector<TrackHit*>& AxialHitList)
-{
-
-  for (TrackHit * hit : AxialHitList) {
-//    if (hit->getHitUsage() != TrackHit::not_used) continue;
-    double bestHitProb = 0;
-    TrackCandidate* BestCandidate = NULL;
-
-    for (TrackCandidate * cand : m_trackList) {
-      double probTemp = getAssigmentProbability(hit, cand);
-
-//      int curve_sign = hit->getCurvatureSignWrt(cos(cand->getTheta()) / cand->getR(), sin(cand->getTheta()) / cand->getR());
-
-      if (probTemp > bestHitProb /*&& curve_sign == cand->getCharge()*/) {
-        BestCandidate = cand;
-        bestHitProb = probTemp;
-      }
-    }
-
-    if (bestHitProb > 0.8) {
-      BestCandidate->addHit(hit);
-      hit->setHitUsage(TrackHit::used_in_track);
-//      B2INFO("Unused hit has been assigned.");
-    }
-
-  }
-}
 

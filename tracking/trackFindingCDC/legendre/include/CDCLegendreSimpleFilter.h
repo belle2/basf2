@@ -28,28 +28,40 @@ namespace Belle2 {
 
     public:
 
+      /** This is a static class only. We do not need a constructor here */
+      SimpleFilter() = delete;
 
-      /** Constructor */
-      SimpleFilter() {};
+      /** Destructor is deleted */
+      ~SimpleFilter() = delete;
 
-      ~SimpleFilter() {};
-
-      /** Returns probability of hit assignment to track. TODO: more robust criteria should be implemented */
-      double getAssigmentProbability(TrackHit* hit, TrackCandidate* track);
+      /** Returns the probability of hit assignment to the track. Actually this is not a probability at all but only a number between 0 and 1.
+       * 1 is best.
+       * TODO: more robust criteria should be implemented */
+      static double getAssigmentProbability(TrackHit* hit, TrackCandidate* track);
 
       /** Hits reassignment */
-      void processTracks(std::list<TrackCandidate*>& trackList);
+      static void processTracks(std::list<TrackCandidate*>& trackList);
 
       /** Append unused hits to tracks */
-      void appenUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& AxialHitList);
+      static void appendUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& AxialHitList, double minimal_assignment_probability = m_minimal_assignment_probability);
+
+      /** Tries to find and delete all "bad" hits in a track.
+       * By doing so we will loose hit efficiency, but gain a low fake rate. */
+      static void deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability, TrackFitter* trackFitter);
 
     private:
 
-//    std::list<CDCLegendreFilterCandidate*> m_cdcLegendreFilterCandidateList;
-//    std::list<CDCLegendreTrackCandidate*>& m_trackList;
-//    std::list<CDCLegendreTrackCandidate*> m_trackCoreList;
-      const double m_distFactor = 0.5; /**< Factor used in assignment probability estimation */
-//    const double __attribute__((unused)) m_minProb = 0.98; /**< Minimal probability of hit assignment; currently no used*/
+      static constexpr double m_minimal_assignment_probability = 0.8;
+
+      /** Delete all hits markes as bad in a track. Should be calles after every hit reassignment */
+      static void deleteAllMarkedHits(TrackCandidate* trackCandidate);
+
+      // UNUSED AT THE MOMENT
+      // static constexpr double m_distFactor = 0.5; /**< Factor used in assignment probability estimation */
+      //    const double __attribute__((unused)) m_minProb = 0.98; /**< Minimal probability of hit assignment; currently no used*/
+      //    std::list<CDCLegendreFilterCandidate*> m_cdcLegendreFilterCandidateList;
+      //    std::list<CDCLegendreTrackCandidate*>& m_trackList;
+      //    std::list<CDCLegendreTrackCandidate*> m_trackCoreList;
 
     };
   }

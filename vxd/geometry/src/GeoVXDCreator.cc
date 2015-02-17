@@ -32,7 +32,6 @@
 #include <G4PVPlacement.hh>
 #include <G4AssemblyVolume.hh>
 #include <G4UserLimits.hh>
-#include <G4RegionStore.hh>
 #include <G4Point3D.hh>
 
 #include <G4TessellatedSolid.hh>
@@ -484,9 +483,6 @@ namespace Belle2 {
       G4Polycone* envelopeCone = geometry::createRotationSolid("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
       envelope = new G4LogicalVolume(envelopeCone, material, m_prefix + ".Envelope");
       setVisibility(*envelope, false);
-      G4Region* vxdRegion = G4RegionStore::GetInstance()->FindOrCreateRegion(m_prefix);
-      envelope->SetRegion(vxdRegion);
-      vxdRegion->AddRootLogicalVolume(envelope);
       G4VPhysicalVolume* physEnvelope = new G4PVPlacement(getAlignment(m_prefix), envelope, m_prefix + ".Envelope", &topVolume, false, 1);
 
       //Read the definition of all sensor types

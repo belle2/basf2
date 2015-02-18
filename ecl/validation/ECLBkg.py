@@ -52,8 +52,7 @@ eclanalysis.param('rootFileName', '../ECLBkgOutput.root')
 # eclanalysis.param('doTracking', 1)
 
 # Add Bkg in Simulation
-bkgdir = 'bkg/'
-
+bkgdir = '$BELLE2_BACKGROUND_DIR/'
 bkgFiles = [
     bkgdir + 'Coulomb_HER_100us.root',
     bkgdir + 'Coulomb_LER_100us.root',

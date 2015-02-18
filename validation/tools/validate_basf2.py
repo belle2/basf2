@@ -772,16 +772,16 @@ if os.environ.get('BELLE2_RELEASE', None) is None:
 # The main part is wrapped in a try/except-contruct to fetch keyboard interrupts
 try:
 
+    # Now we process the command line arguments.
+    # First of all, we read them in:
+    cmd_arguments = parse_cmd_line_arguments()
+
     # Create the validation object. 'validation' holds all global variables
     # and provides the logger!
     validation = Validation()
 
     # Write to log that we have started the validation process
     validation.log.note('Starting validation...')
-
-    # Now we process the command line arguments.
-    # First of all, we read them in:
-    cmd_arguments = parse_cmd_line_arguments()
 
     # Now we check whether we are running a complete validation or only
     # validating a certain set of packages:

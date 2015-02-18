@@ -59,7 +59,7 @@ components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD',
 print components
 print
 geometry = register_module('Geometry')
-geometry.param('Components', components)
+geometry.param('components', components)
 path.add_module(geometry)
 
 add_reconstruction(path, components, pruneTracks=0)

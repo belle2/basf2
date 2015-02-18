@@ -428,7 +428,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                 path.add_module('RootInput')
             path.add_path(fei_path)
 
-    if not is_first_run:
+    if args.preload and not is_first_run:
         # when preloader is used, make sure we also reload the statistics
         for module in path.modules():
             if module.type() == 'RootInput':

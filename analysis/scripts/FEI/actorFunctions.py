@@ -101,7 +101,7 @@ def SelectParticleList(path, hash, particleName, particleLabel, runs_in_ROE):
         @param hash of all input parameters
         @param particleName valid pdg particle name
         @param particleLabel user defined label
-        @param runs_in_ROE boolean determines if particles are selected frmo ROE
+        @param runs_in_ROE boolean determines if particles are selected from ROE
         @return Resource named RawParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
     """
     B2INFO("Enter: Select Particle List {p} with label {l}".format(p=particleName, l=particleLabel))

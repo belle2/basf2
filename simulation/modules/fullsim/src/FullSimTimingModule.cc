@@ -144,20 +144,27 @@ void FullSimTimingModule::terminate()
   //Call event one last time to get the last timing in case we were before the FullSim module
   event();
   //Ok, now finish the results
+  B2RESULT("FullSimTiming: Total simulation stepping time: " << (m_totalTime / Unit::s) << " s");
+  B2RESULT("FullSimTiming: Number of simulated events: " << m_eventCount);
+  //Remove stat box
+  m_timingProfile->SetStats(0);
+  //Convert to ms
+  m_timingProfile->Scale(1. / Unit::ms);
+  //Set the labels of the profile to the region names and check the maximum length
+  size_t regionWidth {6};
+  for (auto & it : m_regionIndices) {
+    m_timingProfile->GetXaxis()->SetBinLabel(it.second + 1, it.first->GetName().c_str());
+    regionWidth = std::max(regionWidth, it.first->GetName().size());
+  }
+  //Do we want a root file?
+  if (!m_rootFileName.empty()) {
+    TFile* file = new TFile(m_rootFileName.c_str(), "RECREATE");
+    file->cd();
+    m_timingProfile->Write();
+    file->Close();
+  }
   if (m_totalTime > 0) {
-    B2RESULT("FullSimTiming: Total simulation stepping time: " << (m_totalTime / Unit::s) << " s");
-    B2RESULT("FullSimTiming: Number of simulated events: " << m_eventCount);
-    //Remove stat box
-    m_timingProfile->SetStats(0);
-    //Convert to ms
-    m_timingProfile->Scale(1. / Unit::ms);
-    //Set the labels of the profile to the region names and check the maximum length
-    size_t regionWidth {6};
-    for (auto & it : m_regionIndices) {
-      m_timingProfile->GetXaxis()->SetBinLabel(it.second + 1, it.first->GetName().c_str());
-      regionWidth = std::max(regionWidth, it.first->GetName().size());
-    }
-    //Now print the result as a table. But first we need the total avg
+    //Now print the result as a table. But first we need the total average
     double totalAvg {0};
     size_t maxContentWidth {4};
     size_t maxErrorWidth {4};
@@ -187,13 +194,6 @@ void FullSimTimingModule::terminate()
                << std::setw(maxErrorWidth) << m_timingProfile->GetBinError(i + 1) << " ms ("
                << std::setw(6) << (m_timingProfile->GetBinContent(i + 1) / totalAvg) << " %)"
               );
-    }
-    //Do we want a root file?
-    if (!m_rootFileName.empty()) {
-      TFile* file = new TFile(m_rootFileName.c_str(), "RECREATE");
-      file->cd();
-      m_timingProfile->Write();
-      file->Close();
     }
   }
 }

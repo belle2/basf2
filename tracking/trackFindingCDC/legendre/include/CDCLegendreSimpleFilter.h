@@ -40,7 +40,7 @@ namespace Belle2 {
       static double getAssigmentProbability(TrackHit* hit, TrackCandidate* track);
 
       /** Hits reassignment */
-      static void processTracks(std::list<TrackCandidate*>& trackList);
+      static void reassignHitsFromOtherTracks(std::list<TrackCandidate*>& trackList);
 
       /** Append unused hits to tracks */
       static void appendUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& AxialHitList, double minimal_assignment_probability = m_minimal_assignment_probability);

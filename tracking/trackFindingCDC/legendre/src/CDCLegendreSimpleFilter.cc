@@ -33,7 +33,7 @@ double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* trac
 
 
 
-void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
+void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_trackList)
 {
 
   /*
@@ -102,6 +102,8 @@ void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
         if (candInner == cand) continue;
         double probTemp = getAssigmentProbability(hit, candInner);
 
+        // TODO: Do not process this hit of we construct a B2B candidate!
+
         if (probTemp > bestHitProb) {
           BestCandidate = candInner;
           bestHitProb = probTemp;
@@ -128,7 +130,7 @@ void SimpleFilter::deleteAllMarkedHits(TrackCandidate* trackCandidate)
 {
   trackCandidate->getTrackHits().erase(
     std::remove_if(trackCandidate->getTrackHits().begin(), trackCandidate->getTrackHits().end(),
-  [&](TrackHit * hit) {return hit->getHitUsage() == TrackHit::bad;}),
+  [&](TrackHit * hit) { return hit->getHitUsage() == TrackHit::bad; }),
   trackCandidate->getTrackHits().end());
 
 }
@@ -174,44 +176,6 @@ void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double
   int ndf = trackHits.size() - 4;
 
   if (ndf <= 0) return;
-
-  // If the trackCandidate goes more or less through the IP, we have a problem with back-to-back tracks. These can be assigned to only on track.
-  // If this is the case, we delete the smaller fraction here and let the track-finder find the remaining track again
-
-  if (trackCandidate->getCharge() == TrackCandidate::charge_two_tracks and trackCandidate->getReferencePoint().Mag() < 0.5) {
-
-    unsigned int number_of_hits_in_one_half = 0;
-    unsigned int number_of_hits_in_other_half = 0;
-
-    double phiOfTrack = trackCandidate->getMomentumEstimation().Phi();
-
-    for (TrackHit * hit : trackHits) {
-      double phiOfHit = hit->getWirePosition().Phi();
-      if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
-        number_of_hits_in_one_half++;
-      } else {
-        number_of_hits_in_other_half++;
-      }
-    }
-
-    if (number_of_hits_in_one_half > 2 * number_of_hits_in_other_half) {
-      for (TrackHit * hit : trackHits) {
-        double phiOfHit = hit->getWirePosition().Phi();
-        if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) >= TMath::PiOver2()) {
-          hit->setHitUsage(TrackHit::bad);
-        }
-      }
-    } else if (number_of_hits_in_other_half > 2 * number_of_hits_in_one_half) {
-      for (TrackHit * hit : trackHits) {
-        double phiOfHit = hit->getWirePosition().Phi();
-        if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
-          hit->setHitUsage(TrackHit::bad);
-        }
-      }
-    }
-  }
-
-  deleteAllMarkedHits(trackCandidate);
 
   for (auto hitIterator = trackHits.begin(); hitIterator != trackHits.end(); hitIterator++) {
     double assignment_probability = getAssigmentProbability(*hitIterator, trackCandidate);

@@ -151,6 +151,8 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            "Try to append new hits to track candidate while finding.", false);
   addParam("DoPostprocessingOften", m_doPostprocessingOften,
            "Repeat the postprocessing mode after every tree search.", true);
+  addParam("TreeFindingNumber", m_treeFindingNumber,
+           "Repeat the whole process that many times.", 3);
 
 
   addParam("DrawCandidates", m_drawCandidates,
@@ -299,17 +301,17 @@ void CDCLegendreTrackingModule::event()
   B2DEBUG(100, "Perform track finding");
 
   DoTreeTrackFinding();
-  if (m_doPostprocessingOften) postprocessTracks();
+  if (m_treeFindingNumber == 1 or m_doPostprocessingOften) postprocessTracks();
 
 //  for (TrackCandidate * cand : m_trackList) {
 //     if (cand->getCandidateType() != TrackCandidate::tracklet) continue;
 //    m_cdcLegendreTrackMerger->extendTracklet(cand, m_AxialHitList);
 //  }
 
-  DoTreeTrackFindingFinal();
-  if (m_doPostprocessingOften) postprocessTracks();
-  DoTreeTrackFindingFinal();
-  postprocessTracks();
+  for (int counter = 1; counter < m_treeFindingNumber; counter++) {
+    DoTreeTrackFindingFinal();
+    if (counter == m_treeFindingNumber - 1 or m_doPostprocessingOften) postprocessTracks();
+  }
 
 //  if(m_AxialHitList.size() > 100) DoTreeTrackFinding();
 //  else DoSteppedTrackFinding();
@@ -470,6 +472,8 @@ void CDCLegendreTrackingModule::postprocessTracks()
   fitAllTracks();
 
   if (m_deleteHitsInTheEnd) {
+    SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
+    fitAllTracks();
     for (TrackCandidate * trackCandidate : m_trackList) {
       SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
     }
@@ -500,7 +504,7 @@ void CDCLegendreTrackingModule::postprocessTracks()
   }
 
   if (m_appendHitsInTheEnd) {
-    SimpleFilter::processTracks(m_trackList);
+    SimpleFilter::reassignHitsFromOtherTracks(m_trackList);
     fitAllTracks();
     SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
     fitAllTracks();

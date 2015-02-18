@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 #include <vector>
 
 using namespace std;
@@ -47,7 +48,6 @@ void TrackMerger::resetHits(TrackCandidate* otherTrackCandidate)
 
 void TrackMerger::doTracksMerging(std::list<TrackCandidate*> trackList, TrackFitter* trackFitter)
 {
-
   // Search for best matches
   unsigned int outerCounter = 0;
   for (TrackCandidate * trackCandidate : trackList) {
@@ -87,6 +87,7 @@ void TrackMerger::doTracksMerging(std::list<TrackCandidate*> trackList, TrackFit
 
   for (TrackCandidate * trackCandidate : trackList) {
     trackFitter->fitTrackCandidateFast(trackCandidate);
+    trackCandidate->reestimateCharge();
   }
 }
 
@@ -196,6 +197,9 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::lis
     for (TrackHit * hit : cand->getTrackHits()) {
       hit->setHitUsage(TrackHit::used_in_track);
     }
+
+    trackFitter->fitTrackCandidateFast(cand);
+    cand->reestimateCharge();
   }
 
 }
@@ -224,13 +228,15 @@ void TrackMerger::removeStrangeHits(double factor, std::vector<TrackHit*>& track
 double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, TrackFitter* trackFitter)
 {
   // Check if the two tracks do have something in common!
-  /*TVector3 deltaMomentum = cand1->getMomentumEstimation() - cand2->getMomentumEstimation();
+  TVector3 deltaMomentum = cand1->getMomentumEstimation() - cand2->getMomentumEstimation();
   TVector3 deltaPosition = cand1->getReferencePoint() - cand2->getReferencePoint();
 
-  if(deltaMomentum.Mag() / cand1->getMomentumEstimation().Mag() < 0.01) {
-    B2INFO("Quick");
+  // Quick processing: if we have two tracks with approximately the same parameters, they can be merged!
+  if (deltaMomentum.Mag() / cand1->getMomentumEstimation().Mag() < 0.1 and
+      std::abs(TVector2::Phi_mpi_pi(cand1->getMomentumEstimation().Phi() - cand2->getMomentumEstimation().Phi())) < TMath::Pi() / 10 and
+      deltaPosition.Mag() < 10 and cand1->getChargeSign() == cand2->getChargeSign()) {
     return 1;
-  }*/
+  }
 
   // Build common hit list
   std::vector<TrackHit*> commonHitListOfTwoTracks;
@@ -242,7 +248,7 @@ double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* c
   }
 
   // Sorting is done via pointer addresses (!!). This is not very stable and also not very meaningful (in terms of physical meaning),
-  // but it dies the job.
+  // but it does the job.
   std::sort(commonHitListOfTwoTracks.begin(), commonHitListOfTwoTracks.end());
 
   commonHitListOfTwoTracks.erase(
@@ -284,6 +290,54 @@ double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* c
 
   unsigned int ndf = commonHitListOfTwoTracks.size() - 4;
   return TMath::Prob(chi2_temp * ndf, ndf);
+}
+
+TrackCandidate* TrackMerger::splitBack2BackTrack(TrackCandidate* trackCandidate)
+{
+  // If the trackCandidate goes more or less through the IP, we have a problem with back-to-back tracks. These can be assigned to only on track.
+  // If this is the case, we delete the smaller fraction here and let the track-finder find the remaining track again
+  std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
+
+  if (trackCandidate->getCharge() == TrackCandidate::charge_two_tracks) {
+    unsigned int number_of_hits_in_one_half = 0;
+    unsigned int number_of_hits_in_other_half = 0;
+
+    double phiOfTrack = trackCandidate->getMomentumEstimation(true).Phi();
+
+    for (TrackHit * hit : trackHits) {
+      double phiOfHit = hit->getWirePosition().Phi();
+      if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
+        number_of_hits_in_one_half++;
+      } else {
+        number_of_hits_in_other_half++;
+      }
+    }
+
+    if (number_of_hits_in_one_half > 0 and number_of_hits_in_other_half > 0) {
+
+      TrackCandidate* secondTrackCandidate = new TrackCandidate(*trackCandidate);
+      std::vector<TrackHit*>& secondTrackHits = secondTrackCandidate->getTrackHits();
+      secondTrackHits.clear();
+
+      for (TrackHit * hit : trackHits) {
+        double phiOfHit = hit->getWirePosition().Phi();
+        if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
+          secondTrackHits.push_back(hit);
+          hit->setHitUsage(TrackHit::bad);
+        }
+      }
+
+      SimpleFilter::deleteAllMarkedHits(trackCandidate);
+
+      for (TrackHit * hit : secondTrackHits) {
+        hit->setHitUsage(TrackHit::used_in_track);
+      }
+
+      return secondTrackCandidate;
+    }
+  }
+
+  return nullptr;
 }
 
 

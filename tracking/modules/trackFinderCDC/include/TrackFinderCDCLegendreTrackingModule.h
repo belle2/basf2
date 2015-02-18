@@ -152,6 +152,7 @@ namespace Belle2 {
     bool m_mergeTracksWhileFinding;   /**< Try to merge tracks while finding*/
     bool m_mergeTracksInTheEnd;       /**< Try to merge tracks in the end. */
     bool m_doPostprocessingOften;     /**< Repeat the postprocessing mode after every tree search. */
+    int m_treeFindingNumber;          /**< Repeat the whole process that many times. */
 
     bool m_multipleCandidateSearch; /**< Search multiple track candidates per run of FastHough algorithm*/
     bool m_useHitPrecalculatedR;  /**< To store r values inside hit objects or recalculate it each step */

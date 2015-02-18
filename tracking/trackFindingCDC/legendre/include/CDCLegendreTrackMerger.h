@@ -12,8 +12,6 @@
 
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
@@ -24,9 +22,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    class FastHough;
-    class TrackProcessor;
 
     /* TODO: Check whether track overlaps with other tracks; may be try to sort tracks according to number of inresections/overlappings, some weights might be applied
      * if track sharing more than, for example, 50% of hits, that track should be definitely splitted into few*/
@@ -44,6 +39,9 @@ namespace Belle2 {
 
       /** Try to merge given track with tracks in tracklist. */
       static void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::list<TrackCandidate*> trackList, TrackFitter* trackFitter);
+
+      /** Tries to split back-to-back tracks into two different tracks */
+      static TrackCandidate* splitBack2BackTrack(TrackCandidate* trackCandidate);
 
       /** Trying select core of the tracks and fit them together, then add good hits
        * UNUSED */
@@ -148,7 +146,7 @@ namespace Belle2 {
       /**
        * This parameter is the minimum probability a fit must have to lead to the result: merge
        */
-      static constexpr double m_minimum_probability_to_be_merged = 0.8;
+      static constexpr double m_minimum_probability_to_be_merged = 0.3;
 
       //std::list<TrackCandidate*>& __attribute__((unused)) m_trackletList; /**< List of tracklets. */
       //std::list<TrackCandidate*>& __attribute__((unused)) m_stereoTrackletList; /**< List of tracklets. */

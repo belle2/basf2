@@ -127,41 +127,67 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTreeLegendre* node)
 
 bool QuadTreeCandidateCreator::postprocessTrackCandidate(TrackCandidate* trackCandidate)
 {
-  for (TrackCandidate * candidate : s_cdcLegendreTrackProcessor->getTrackList()) {
-    s_cdcLegendreTrackFitter->fitTrackCandidateFast(candidate);
-  }
+  list<TrackCandidate*>& trackList = s_cdcLegendreTrackProcessor->getTrackList();
 
-  for (TrackCandidate * candidate : s_cdcLegendreTrackProcessor->getTrackList()) {
-    candidate->reestimateCharge();
-  }
-
+  // Before postprocessing, we need a fitted trackCandidate
+  s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
+  trackCandidate->reestimateCharge();
 
   if (m_deleteHitsWhileFinding) {
+    TrackCandidate* resultSplittedTrack = TrackMerger::splitBack2BackTrack(trackCandidate);
+    if (resultSplittedTrack != nullptr) {
+      trackList.push_back(resultSplittedTrack);
+      s_cdcLegendreTrackFitter->fitTrackCandidateFast(resultSplittedTrack);
+      resultSplittedTrack->reestimateCharge();
+
+      s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
+      trackCandidate->reestimateCharge();
+    }
+
     SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
+    s_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate);
+    trackCandidate->reestimateCharge();
   }
 
   if (m_mergeTracksWhileFinding) {
-    TrackMerger::tryToMergeTrackWithOtherTracks(trackCandidate, s_cdcLegendreTrackProcessor->getTrackList(), s_cdcLegendreTrackFitter);
+    TrackMerger::tryToMergeTrackWithOtherTracks(trackCandidate, trackList, s_cdcLegendreTrackFitter);
 
     // Has merging deleted the candidate?
     if (trackCandidate == nullptr) return false;
+
+    for (TrackCandidate * cand : trackList) {
+      SimpleFilter::deleteWrongHitsOfTrack(cand, 0.8);
+      s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+      cand->reestimateCharge();
+    }
   }
 
   if (m_appendHitsWhileFinding) {
-    SimpleFilter::processTracks(s_cdcLegendreTrackProcessor->getTrackList());
+    SimpleFilter::reassignHitsFromOtherTracks(trackList);
 
-    for (TrackCandidate * cand : s_cdcLegendreTrackProcessor->getTrackList()) {
+    for (TrackCandidate * cand : trackList) {
       s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+      cand->reestimateCharge();
     }
 
-    SimpleFilter::appendUnusedHits(s_cdcLegendreTrackProcessor->getTrackList(), s_axialHits, 0.8);
+    SimpleFilter::appendUnusedHits(trackList, s_axialHits, 0.8);
 
-    for (TrackCandidate * cand : s_cdcLegendreTrackProcessor->getTrackList()) {
+    for (TrackCandidate * cand : trackList) {
       s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+      cand->reestimateCharge();
     }
 
-    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
+    for (TrackCandidate * cand : trackList) {
+      SimpleFilter::deleteWrongHitsOfTrack(cand, 0.8);
+      s_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+      cand->reestimateCharge();
+    }
   }
+
+  // Delete a track if we have to few hits left
+  trackList.erase(std::remove_if(trackList.begin(), trackList.end(), [](TrackCandidate * trackCandidate) {
+    return trackCandidate->getNHits() < 3;
+  }), trackList.end());
 
   // UNUSED
   //PatternChecker cdcLegendrePatternChecker(s_cdcLegendreTrackProcessor);

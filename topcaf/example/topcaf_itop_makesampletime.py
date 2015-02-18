@@ -3,6 +3,64 @@
 
 from basf2 import *
 import sys
+import argparse
+
+parser = \
+    argparse.ArgumentParser(description='Calculate the sample to sample time calibration (for <=IRS3C). Typically, an electronic pulser run that includes data for all channels is used as the input to create this calibration.'
+                            , usage='%(prog)s [options]')
+
+parser.add_argument('--ped', metavar='PedestalFile (path/filename)',
+                    required=True,
+                    help='The pedestal file and path to be used for the analysis.   This parameter is REQUIRED'
+                    )
+
+parser.add_argument('--inputRun',
+                    metavar='InputRun (i.e. file name = InputRun.dat)',
+                    required=True,
+                    help='the root name for the input data files.  myInputRun.dat would have a root name of myInputRun.  This parameter is REQUIRED.'
+                    )
+
+parser.add_argument('--inputDir', metavar='InputDirectory (path)',
+                    required=True,
+                    help='the path to the data files (IRS and CAMAC) used for the analysis. This parameter is REQUIRED.'
+                    )
+
+parser.add_argument('--Output', metavar='Output File (path/filename)',
+                    help='the output file name.  A default based on the input will be created if this argument is not supplied'
+                    )
+
+parser.add_argument('--Conditions', action='store_true',
+                    help='Use the conditions service to store this calibration.'
+                    )
+
+parser.add_argument('--IOVi', metavar='Run_initial', default='NULL',
+                    help='The initial run in the conditions service interval of validity.'
+                    )
+
+parser.add_argument('--IOVf', metavar='Run_final', default='NULL',
+                    help='The final run in the conditions service interval of validity.'
+                    )
+
+args = parser.parse_args()
+
+print 'pedestal file = ' + args.ped
+print 'data file     = ' + args.inputDir + args.inputRun + '.dat'
+print 'camac file    = ' + args.inputDir + args.inputRun + '.cmc'
+
+if args.Conditions:
+    print 'Using conditions service with IOVi = ' + args.IOVi + ' and IOVf = ' \
+        + args.IOVf
+    Conditions = 1
+else:
+    print 'Not using conditions service.'
+    Conditions = 0
+
+WriteFile = 1
+if args.Output:
+    OutputFile = args.Output
+else:
+    OutputFile = args.inputRun + '_SampleCalibration.root'
+print 'Writing output calibration file to ' + OutputFile
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfoprinter = register_module('EventInfoPrinter')
@@ -11,41 +69,31 @@ output = register_module('RootOutput')
 
 # register topcaf modules
 
-if len(sys.argv) == 3:
-    IOVinitial = 'NULL'
-    IOVfinal = 'NULL'
-elif len(sys.argv) == 4:
-    IOVinitial = str(sys.argv[4])
-    IOVfinal = 'NULL'
-elif len(sys.argv) == 5:
-    IOVinitial = str(sys.argv[4])
-    IOVfinal = str(sys.argv[5])
-else:
-    print 'Usage: basf2 topcaf_itop_makesampletime.py -n <number of events> --arg <Path to Files> <Input Data Rootname> <Initial run for interval of validity> <Final run for interval of validity>'
-    print '               IOV inputs are optional, can also be set to NULL'
-    sys.exit()
-
 itopeventconverter = register_module('iTopRawConverter')
-itopeventconverter.param('InputFileName', str(sys.argv[2]) + '.dat')
-itopeventconverter.param('InputDirectory', str(sys.argv[1]))
+itopeventconverter.param('InputFileName', args.inputRun + '.dat')
+itopeventconverter.param('InputDirectory', args.inputDir)
 
 camacconverter = register_module('Camac')
 camacDict = {  #             'CrateID'            : 13369927,  # leps june 2013 itop test beam
                #             'FTSWslot'           : 7,  # leps june 2013 itop test beam
-               #             'FTSWword'           : 3 } # leps june 2013 itop test beam
+               #             'FTSWword'           : 3  # leps june 2013 itop test beam
                # 2014 itop crt
                # 2014 itop crt
                # 2014 itop crt
-    'InputFilename': str(sys.argv[1]) + str(sys.argv[2]) + '.cmc',
+    'InputFilename': args.inputDir + args.inputRun + '.cmc',
     'CrateID': 0x00cc0200,
     'FTSWslot': 6,
     'FTSWword': 5,
     }
-
 camacconverter.param(camacDict)
 
 pedmodule = register_module('Pedestal')
-pedestalDict = {'Mode': 1, 'WriteFile': 0, 'Conditions': 1}
+pedestalDict = {
+    'Mode': 1,
+    'WriteFile': 0,
+    'Conditions': 0,
+    'InputFileName': args.ped,
+    }
 pedmodule.param(pedestalDict)
 
 mergemodule = register_module('WaveMerging')
@@ -57,12 +105,12 @@ timemodule.param(timeDict)
 sampletimemodule = register_module('SampleTimeCalibration')
 
 sampletimeDict = {
-    'OutputFileName': 'test.root',
+    'OutputFileName': OutputFile,
     'Mode': 0,
     'WriteFile': 1,
-    'Conditions': 0,
-    'IOV_initialRun': IOVinitial,
-    'IOV_finalRun': IOVfinal,
+    'Conditions': Conditions,
+    'IOV_initialRun': args.IOVi,
+    'IOV_finalRun': args.IOVf,
     }
 sampletimemodule.param(sampletimeDict)
 

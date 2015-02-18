@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Detector xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Name>PLUME Detector</Name>
+  <Description>BEAST PLUME sub-detector</Description>
+  <!-- Define material and size of the global volume -->
+  <Global>
+    <material>Air</material>
+    <width  unit="m">3.0</width>
+    <length unit="m">3.0</length>
+    <height unit="m">3.0</height>
+  </Global>
+
+  <!-- include basic materials, directories always relative to current directory -->
+  <xi:include href="../../geometry/BasicMaterials.xml"/> 
+
+  <!-- include the beast Materials and detector component -->
+  <xi:include href="PLUME-Materials.xml"/>
+  <xi:include href="PLUME.xml"/>
+</Detector>

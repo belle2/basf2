@@ -107,6 +107,9 @@ int main(int argc, char* argv[])
     fileMetaData->Write("FileMetaData");
   }
 
+  // properly close file
+  file->Close();
+
   // update the local file catalog
   FileMetaData localMetaData = *fileMetaData;
   FileCatalog::Instance().registerFile(fileName, localMetaData);

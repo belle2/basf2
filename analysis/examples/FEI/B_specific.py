@@ -19,7 +19,8 @@ buildRestOfEvent('B+:sig', path=selection_path)
 analysis_path = create_path()
 analysis_path.add_module('RootOutput')
 
-particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInRestOfEvent == 0')
+# neutral B channels disabled, since we only intend to use B+/B- for our decay
+particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInRestOfEvent == 0', neutralB=False)
 main = fullEventInterpretation(selection_path, analysis_path, particles)
 
 # show constructed path

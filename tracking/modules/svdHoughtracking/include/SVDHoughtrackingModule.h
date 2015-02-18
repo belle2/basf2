@@ -265,7 +265,7 @@ namespace Belle2 {
       void saveStrips();
 
       /** Helper function to convert and assign total strips to apv and rest strip */
-      void writeStrip(VxdID, bool, short, float*, ofstream&);
+      void writeStrip(VxdID, bool, short, float*, std::ofstream&);
 
       /** Convert TrueHits into the cluster format */
       void convertTrueHits();

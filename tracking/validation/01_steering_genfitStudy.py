@@ -126,7 +126,7 @@ if cdc:
 else:
     componentList.append('MagneticFieldConstant4LimitedRSVD')
 
-geometry.param('Components', componentList)
+geometry.param('components', componentList)
 
 # Run simulation
 simulation = register_module('FullSim')

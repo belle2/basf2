@@ -102,6 +102,22 @@ void MaterialScan::UserSteppingAction(const G4Step* step)
   double stlen = step->GetStepLength();
   double x0 = stlen / (material->GetRadlen());
   double lambda = stlen / (material->GetNuclearInterLength());
+  B2DEBUG(20, "Step in at " << preStepPoint->GetPosition() << " in volume '"
+          << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
+          << " (" << region->GetName() << ")"
+          << " with length=" << stlen << " mm");
+  if (stlen < c_zeroTolerance) {
+    ++m_zeroSteps;
+  } else {
+    m_zeroSteps = 0;
+  }
+  if (m_zeroSteps > c_maxZeroSteps) {
+    B2FATAL("Track is stuck at " << preStepPoint->GetPosition() << " in volume '"
+            << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
+            << " (" << region->GetName() << "): "
+            << m_zeroSteps << " consecutive steps with length less then "
+            << c_zeroTolerance << " mm");
+  }
 
   //check if the depth is limited
   if (m_params.maxDepth > 0) {

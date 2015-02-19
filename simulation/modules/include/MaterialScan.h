@@ -55,6 +55,11 @@ namespace Belle2 {
       bool splitByMaterials;
     };
 
+    /** maximum Step length to be considered zero */
+    static constexpr double c_zeroTolerance = 1e-6;
+    /** maximum number of consecutive zero steps before aborting execution */
+    static constexpr int c_maxZeroSteps = 10;
+
     /** Constructor
      * @param rootFile Pointer to the ROOTFile where the histograms will be stored.
      * @param name Prefix to preprend to all Histograms
@@ -112,6 +117,8 @@ namespace Belle2 {
     double m_stepV;
     /** Tracklength of the current Ray */
     double m_curDepth;
+    /** Count the number of steps with (almost) zero length */
+    int m_zeroSteps {0};
     /** Map holding pointers to all created histograms */
     std::map<std::string, TH2D*> m_regions;
   };

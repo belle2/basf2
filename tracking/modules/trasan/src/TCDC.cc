@@ -28,6 +28,8 @@
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
+#include "cdc/translators/SimpleTDCCountTranslator.h"
+#include "cdc/translators/RealisticTDCCountTranslator.h"
 
 #define P3D HepGeom::Point3D<double>
 
@@ -51,7 +53,7 @@ namespace Belle {
   TCDC::_cdc = 0;
 
   TCDC*
-  TCDC::getTCDC(const string& configFile)
+  TCDC::getTCDC(const string& configFile, int tdcTranslator)
   {
     if (_cdc) {
       //delete _cdc;
@@ -59,7 +61,7 @@ namespace Belle {
     }
 
     if (configFile != "good-bye") {
-      _cdc = new TCDC(configFile);
+      _cdc = new TCDC(configFile, tdcTranslator);
     } else {
       cout << "TCDC::getTCDC ... good-bye" << endl;
       //        delete _cdc;
@@ -77,8 +79,9 @@ namespace Belle {
     return _cdc;
   }
 
-  TCDC::TCDC(const string&)
+  TCDC::TCDC(const string&, const int tdcTranslator)
     : _debugLevel(0),
+      _tdcTranslator(tdcTranslator),
       _fudgeFactor(1.),
       _width(0),
       _r(0),
@@ -90,6 +93,18 @@ namespace Belle {
   void
   TCDC::initialize(void)
   {
+
+    //TDC translator
+    if (_tdcTranslator == 0) {
+      _ptrToTDCTranslator = new Belle2::CDC::SimpleTDCCountTranslator();
+      if (_ptrToTDCTranslator) std::cout << "Trasan: SimpleTDCTranslator specified" << std::endl;
+    } else if (_tdcTranslator == 1) {
+      _ptrToTDCTranslator = new Belle2::CDC::RealisticTDCCountTranslator();
+      if (_ptrToTDCTranslator) std::cout << "Trasan: RealisticTDCTranslator specified" << std::endl;
+    } else {
+      std::cout << "Trasan: Invalid TDCTranslator specified !" << std::endl;
+      exit(1);
+    }
 
     //...CDC...
     Belle2::CDC::CDCGeometryPar& cdc2 =
@@ -493,8 +508,11 @@ namespace Belle {
       const int tdcCount = h.getTDCCount();
 
       //...Drift length from TDC...
-      const float driftLength = tdcCount * (40. / 10000.);
-      const float driftLengthError = 0.013;
+      //      const float driftLength = tdcCount * (40. / 10000.);
+      //      const float driftLengthError = 0.013;
+      const float driftLength = _ptrToTDCTranslator->getDriftLength(tdcCount, Belle2::WireID(h.getID()));
+      const float driftLengthError = sqrt(_ptrToTDCTranslator->getDriftLengthResolution(driftLength, Belle2::WireID(h.getID())));
+      //      std::cout <<"tdcCount,driftLength,driftLengthError= " << tdcCount <<" "<< driftLength <<" "<< driftLengthError << std::endl;
 
       //...Left/right...
       const int LRflag = SimHits[iSimHit]->getPosFlag();
@@ -961,6 +979,8 @@ namespace Belle {
     delete [] _width;
     delete [] _r;
     delete [] _r2;
+    delete _ptrToTDCTranslator;
+    //    std::cout <<"_ptrToTDCTranslator deleted" << std::endl;
   }
 
   bool

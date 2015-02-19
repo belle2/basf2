@@ -56,6 +56,10 @@ namespace Belle2 {
     addParam("helixFitterNtrialMax", _tra.b_helixFitterNtrialMax,
              "helix fitter max. # iterations", 20);
 
+    //...TDCTranslator...
+    addParam("tdcTranslator", _tra.b_tdcTranslator,
+             "TDCTranslator; =0: simple; =1: realistic", 0);
+
 #ifdef TRASAN_DEBUG
     cout << "TrasanModule ... created" << endl;
 #endif

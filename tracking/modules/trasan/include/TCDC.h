@@ -1,3 +1,4 @@
+
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
@@ -25,16 +26,22 @@
 #include "tracking/modules/trasan/TLayer.h"
 
 namespace HepGeom {
-    template <class T> class Point3D;
+  template <class T> class Point3D;
+}
+
+namespace Belle2 {
+  namespace CDC {
+    class TDCCountTranslatorBase;
+  }
 }
 
 namespace Belle {
 
-class CDCGeometryPar;
-class TLayer;
-class TWire;
-class TWireHit;
-class TWireHitMC;
+  class CDCGeometryPar;
+  class TLayer;
+  class TWire;
+  class TWireHit;
+  class TWireHitMC;
 
 ///  The instance of TCDC is a singleton. 'TCDC::getTCDC()'
 ///  gives you a pointer to access the TCDC. Geometrical information
@@ -42,21 +49,21 @@ class TWireHitMC;
 ///  user has to call 'update()' to initialize hit information event
 ///  by event.
 
-class TCDC {
+  class TCDC {
 
   public:
 
     /// returns TCDC object with specific configuration.
-    static TCDC * getTCDC(const std::string & configFile);
-    
+    static TCDC* getTCDC(const std::string& configFile, int tdcTranslator);
+
     /// returns TCDC object. TCDC should be created with specific
     /// configuration before calling this function.
-    static TCDC * getTCDC(void);
+    static TCDC* getTCDC(void);
 
   private:
 
     /// Constructor
-    TCDC(const std::string & configFile);
+    TCDC(const std::string& configFile, int tdcTranslator);
 
     /// Destructor
     virtual ~TCDC();
@@ -90,7 +97,7 @@ class TCDC {
     unsigned mode(unsigned);
 
     /// dumps debug information.
-    void dump(const std::string & message) const;
+    void dump(const std::string& message) const;
 
     /// returns debug level.
     int debugLevel(void) const;
@@ -108,23 +115,23 @@ class TCDC {
 
     /// returns a pointer to a wire. 0 will be returned if 'wireId' is
     /// invalid.
-    const TWire * wire(unsigned wireId) const;
+    const TWire* wire(unsigned wireId) const;
 
     /// returns a pointer to a wire. 'localId' can be negative. 0 will
     /// be returned if 'layerId' is invalid.
-    const TWire * wire(unsigned layerId, int localId) const;
+    const TWire* wire(unsigned layerId, int localId) const;
 
     /// returns a pointer to a wire.
 //    const TWire * wire(const HepGeom::Point3D<double> & point) const;
 
     /// returns a pointer to a wire.
-    const TWire * wire(float r, float phi) const;
+    const TWire* wire(float r, float phi) const;
 
     /// returns a pointer to a layer. 0 will be returned if 'id' is invalid.
-    const TLayer * layer(unsigned id) const;
+    const TLayer* layer(unsigned id) const;
 
     /// returns a pointer to a super-layer. 0 will be returned if 'id' is invalid.
-    const std::vector<TLayer *> * superLayer(unsigned id) const;
+    const std::vector<TLayer*>* superLayer(unsigned id) const;
 
     /// returns \# of wire layers in a super layer. 0 will be returned
     /// if 'superLayerId' is invalid.
@@ -179,19 +186,19 @@ class TCDC {
 
     /// returns a list of TWireHit. 'update()' must be called
     /// before calling this function.
-    std::vector<const TWireHit *> hits(void) const;
+    std::vector<const TWireHit*> hits(void) const;
 
     /// returns a list of axial hits. 'update()' must be called before
     /// calling this function.
-    std::vector<const TWireHit *> axialHits(void) const;
+    std::vector<const TWireHit*> axialHits(void) const;
 
     /// returns a list of stereo hits. 'update()' must be called
     /// before calling this function.
-    std::vector<const TWireHit *> stereoHits(void) const;
+    std::vector<const TWireHit*> stereoHits(void) const;
 
     /// returns a list of TWireHitMC. 'updateMC()' must be called
     /// before calling this function.
-    std::vector<const TWireHitMC *> hitsMC(void) const;
+    std::vector<const TWireHitMC*> hitsMC(void) const;
 
     /// returns bad hits(finding invalid hits).
 //  std::vector<const TWireHit *> badHits(void) const;
@@ -222,7 +229,7 @@ class TCDC {
                                      unsigned axialStereoLayerId) const;
 
     /// returns true if w0 and w1 are neighbor.
-    bool neighbor(const TWire & w0, const TWire & w1) const;
+    bool neighbor(const TWire& w0, const TWire& w1) const;
 
   private:
 
@@ -235,174 +242,198 @@ class TCDC {
   private:
 
     /// CDC trigger singleton.
-    static TCDC * _cdc;
+    static TCDC* _cdc;
 
     /// Debug level.
     mutable int _debugLevel;
 
     /// Super layers.
-    std::vector<std::vector<TLayer *> *> _superLayers;
+    std::vector<std::vector<TLayer*> *> _superLayers;
 
     /// Axial super layers.
-    std::vector<std::vector<TLayer *> *> _axialSuperLayers;
+    std::vector<std::vector<TLayer*> *> _axialSuperLayers;
 
     /// Stereo super layers.
-    std::vector<std::vector<TLayer *> *> _stereoSuperLayers;
+    std::vector<std::vector<TLayer*> *> _stereoSuperLayers;
 
     /// All layers.
-    std::vector<TLayer *> _layers;
+    std::vector<TLayer*> _layers;
 
     /// Axial layers.
-    std::vector<TLayer *> _axialLayers;
+    std::vector<TLayer*> _axialLayers;
 
     /// Stereo layers.
-    std::vector<TLayer *> _stereoLayers;
+    std::vector<TLayer*> _stereoLayers;
 
     /// All wires.
-    std::vector<TWire *> _wires;
+    std::vector<TWire*> _wires;
 
     /// Wires with a hit.
-    std::vector<TWire *> _hitWires;
+    std::vector<TWire*> _hitWires;
 
     /// CDC hits.
-    std::vector<TWireHit *> _hits;
+    std::vector<TWireHit*> _hits;
 
     /// CDC hits on axial wires.
-    std::vector<TWireHit *> _axialHits;
+    std::vector<TWireHit*> _axialHits;
 
     /// CDC hits on stereo wires.
-    std::vector<TWireHit *> _stereoHits;
+    std::vector<TWireHit*> _stereoHits;
 
     /// Bad CDC hits.(not used now)
-    std::vector<TWireHit *> _badHits;
+    std::vector<TWireHit*> _badHits;
 
     /// MC info. of CDC hits.
-    std::vector<TWireHitMC *> _hitsMC;
+    std::vector<TWireHitMC*> _hitsMC;
+
+    /// pointer to TDC translator
+    Belle2::CDC::TDCCountTranslatorBase* _ptrToTDCTranslator;
+
+    /// TDC translator
+    int _tdcTranslator;
 
     /// Fudge factor for position error.
     float _fudgeFactor;
 
     /// Cell width in radian.
-    float * _width;
+    float* _width;
 
     /// R of cell.
-    float * _r;
+    float* _r;
 
     /// R^2 of cell.
-    float * _r2;
-};
+    float* _r2;
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-int
-TCDC::debugLevel(void) const {
+  inline
+  int
+  TCDC::debugLevel(void) const
+  {
     return _debugLevel;
-}
+  }
 
-inline
-int
-TCDC::debugLevel(int a) const {
+  inline
+  int
+  TCDC::debugLevel(int a) const
+  {
     return _debugLevel = a;
-}
+  }
 
-inline
-unsigned
-TCDC::nLocalLayers(unsigned superLayerId) const {
-    std::vector<TLayer *> * superLayer = _superLayers[superLayerId];
+  inline
+  unsigned
+  TCDC::nLocalLayers(unsigned superLayerId) const
+  {
+    std::vector<TLayer*>* superLayer = _superLayers[superLayerId];
     if (! superLayer) return 0;
     return superLayer->size();
-}
+  }
 
-inline
-const TLayer *
-TCDC::layer(unsigned id) const {
+  inline
+  const TLayer*
+  TCDC::layer(unsigned id) const
+  {
     return _layers[id];
-}
+  }
 
-inline
-const std::vector<TLayer *> *
-TCDC::superLayer(unsigned id) const {
+  inline
+  const std::vector<TLayer*>*
+  TCDC::superLayer(unsigned id) const
+  {
     return _superLayers[id];
-}
+  }
 
-inline
-float
-TCDC::fudgeFactor(void) const {
+  inline
+  float
+  TCDC::fudgeFactor(void) const
+  {
     return _fudgeFactor;
-}
+  }
 
-inline
-float
-TCDC::fudgeFactor(float a) {
+  inline
+  float
+  TCDC::fudgeFactor(float a)
+  {
     return _fudgeFactor = a;
-}
+  }
 
-inline
-std::string
-TCDC::versionCDC(void) const {
+  inline
+  std::string
+  TCDC::versionCDC(void) const
+  {
     return std::string("standard");
-}
+  }
 
-inline
-unsigned
-TCDC::nWires(void) const {
+  inline
+  unsigned
+  TCDC::nWires(void) const
+  {
     return _wires.size();
-}
+  }
 
-inline
-unsigned
-TCDC::nSuperLayers(void) const {
+  inline
+  unsigned
+  TCDC::nSuperLayers(void) const
+  {
     return _superLayers.size();
-}
+  }
 
-inline
-unsigned
-TCDC::nStereoLayers(void) const {
+  inline
+  unsigned
+  TCDC::nStereoLayers(void) const
+  {
     return _stereoLayers.size();
-}
+  }
 
-inline
-unsigned
-TCDC::nAxialLayers(void) const {
+  inline
+  unsigned
+  TCDC::nAxialLayers(void) const
+  {
     return _axialLayers.size();
-}
+  }
 
-inline
-unsigned
-TCDC::nAxialSuperLayers(void) const {
+  inline
+  unsigned
+  TCDC::nAxialSuperLayers(void) const
+  {
     return _axialSuperLayers.size();
-}
+  }
 
-inline
-unsigned
-TCDC::nStereoSuperLayers(void) const {
+  inline
+  unsigned
+  TCDC::nStereoSuperLayers(void) const
+  {
     return _stereoSuperLayers.size();
-}
+  }
 
-inline
-unsigned
-TCDC::nLayers(void) const {
+  inline
+  unsigned
+  TCDC::nLayers(void) const
+  {
     return _layers.size();
-}
+  }
 
-inline
-float
-TCDC::cellWidth(unsigned a) const {
+  inline
+  float
+  TCDC::cellWidth(unsigned a) const
+  {
     return _width[a];
-}
+  }
 
-inline
-float
-TCDC::superLayerR(unsigned i) const {
+  inline
+  float
+  TCDC::superLayerR(unsigned i) const
+  {
     return _r[i];
-}
+  }
 
-inline
-float
-TCDC::superLayerR2(unsigned i) const {
+  inline
+  float
+  TCDC::superLayerR2(unsigned i) const
+  {
     return _r2[i];
-}
+  }
 
 } // namespace Belle
 

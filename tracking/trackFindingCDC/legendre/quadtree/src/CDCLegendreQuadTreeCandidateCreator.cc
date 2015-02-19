@@ -35,8 +35,6 @@ bool QuadTreeCandidateCreator::createCandidateDirect(QuadTreeLegendre* node)
 {
   node->cleanUpItems<QuadTreeProcessor>();
 
-  if (not node->checkNode()) return false;
-
   int AxialVsStereo = 0;
 
   for (TrackHit * hit : node->getItemsVector()) {

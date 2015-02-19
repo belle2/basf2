@@ -76,8 +76,7 @@ namespace Belle2 {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << "hits at level " << node->getLevel());
         if (node->getItemsVector().size() < node->getNItemsThreshold())
           return;
-//        if (node->getRMin() * node->getRMax() >= 0 && fabs(node->getRMin()) > node->getRThreshold()
-//            && fabs(node->getRMax()) > node->getRThreshold())
+//        if ((node->getXMin() * node->getXMax() >= 0) && (fabs(node->getXMin()) > rThreshold)  && (fabs(node->getXMax()) > rThreshold))
 //          return;
         if (node->getLevel() == node->getLastLevel()) {
           lmdProcessor(node);
@@ -118,12 +117,65 @@ namespace Belle2 {
 
           binUsed[t_index][r_index] = true;
 
+          node->getChildren()->get(t_index, r_index)->setNItemsThreshold(node->getNItemsThreshold());
           node->getChildren()->get(t_index, r_index)->cleanUpItems<QuadTreeProcessor>();
           node->getChildren()->get(t_index, r_index)->startFillingTree<QuadTreeProcessor>(lmdProcessor);
 
         }
       }
 
+
+      static void fillGivenTree(QuadTreeTemplate<double, int, TrackHit>* node, QuadTreeTemplate<double, int, TrackHit>::CandidateProcessorLambda& lmdProcessor, const unsigned int& m_nHitsThreshold, const int& m_rThreshold) {
+        B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << "hits at level " << node->getLevel());
+        if (node->getItemsVector().size() < m_nHitsThreshold)
+          return;
+        if ((node->getXMin() * node->getXMax() >= 0) && (fabs(node->getXMin()) > m_rThreshold)  && (fabs(node->getXMax()) > m_rThreshold))
+          return;
+        if (node->getLevel() == node->getLastLevel()) {
+          lmdProcessor(node);
+          return;
+        }
+
+        if (node->getChildren() == nullptr)
+          node->initializeChildren<QuadTreeProcessor>();
+
+        if (!node->checkFilled()) {
+          fillChildren(node->getChildren(), node->getItemsVector());
+          node->setFilled();
+        }
+
+        int m_nbins_theta = node->getYNbins();
+        int m_nbins_r = node->getXNbins();
+
+        bool binUsed[m_nbins_theta][m_nbins_r];
+        for (int ii = 0; ii < m_nbins_theta; ii++)
+          for (int jj = 0; jj < m_nbins_r; jj++)
+            binUsed[ii][jj] = false;
+
+        //Processing, which bins are further investigated
+        for (int bin_loop = 0; bin_loop < m_nbins_theta * m_nbins_r; bin_loop++) {
+          int t_index = 0;
+          int r_index = 0;
+          float max_value_temp = 0;
+          for (int t_index_temp = 0; t_index_temp < m_nbins_theta; ++t_index_temp) {
+            for (int r_index_temp = 0; r_index_temp < m_nbins_r; ++r_index_temp) {
+              if ((max_value_temp < node->getChildren()->get(t_index_temp, r_index_temp)->getNItems())
+                  && (!binUsed[t_index_temp][r_index_temp])) {
+                max_value_temp = node->getChildren()->get(t_index_temp, r_index_temp)->getNItems();
+                t_index = t_index_temp;
+                r_index = r_index_temp;
+              }
+            }
+          }
+
+          binUsed[t_index][r_index] = true;
+
+          node->getChildren()->get(t_index, r_index)->setNItemsThreshold(node->getNItemsThreshold());
+          node->getChildren()->get(t_index, r_index)->cleanUpItems<QuadTreeProcessor>();
+//          node->getChildren()->get(t_index, r_index)->startFillingTree<QuadTreeProcessor>(lmdProcessor);
+          QuadTreeProcessor::fillGivenTree(node->getChildren()->get(t_index, r_index), lmdProcessor, m_nHitsThreshold, m_rThreshold);
+        }
+      }
 
       static void fillChildren(QuadChildrenTemplate<double, int, TrackHit>* m_children, std::vector<TrackHit*>& m_hits) {
 
@@ -241,6 +293,10 @@ namespace Belle2 {
         [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}),
         hits.end());
       } ;
+
+
+      static double rThreshold;
+      static unsigned int nHitsThreshold;
 
 
     private:

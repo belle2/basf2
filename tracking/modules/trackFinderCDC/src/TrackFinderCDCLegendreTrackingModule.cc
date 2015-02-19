@@ -372,8 +372,13 @@ void CDCLegendreTrackingModule::DoTreeTrackFinding()
 
   //  Start loop, where tracks are searched for
   do {
+//    QuadTreeProcessor::rThreshold = rThreshold;
+//    QuadTreeProcessor::nHitsThreshold = limit;
+//    QuadTreeProcessor::fillGivenTree(m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
     m_cdcLegendreQuadTree->setNItemsThreshold(limit);
     m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
+
+
 
     limit = limit * m_stepScale;
 //    rThreshold *= 2.;
@@ -429,6 +434,9 @@ void CDCLegendreTrackingModule::DoTreeTrackFindingFinal()
 
 //  Start loop, where tracks are searched for
   do {
+//    QuadTreeProcessor::rThreshold = rThreshold;
+//    QuadTreeProcessor::nHitsThreshold = limit;
+//    QuadTreeProcessor::fillGivenTree(m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
     m_cdcLegendreQuadTree->setNItemsThreshold(limit);
     m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
 

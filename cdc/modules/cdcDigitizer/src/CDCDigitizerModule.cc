@@ -77,7 +77,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "A switch used to control adding time of flight into the final drift time or not; this is for signal hits.", false);
   addParam("AddTimeOfFlight4Bg",   m_addTimeOfFlight4Bg,
            "The same switch but for beam bg. hits.", true);
-  addParam("OutputNegativeDriftTime", m_outputNegativeDriftTime, "Output negative drift time", false);
+  addParam("OutputNegativeDriftTime", m_outputNegativeDriftTime, "Output hits with negative drift time", false);
 
   //Switch to control sense wire sag
   addParam("CorrectForWireSag",   m_correctForWireSag,
@@ -310,12 +310,17 @@ void CDCDigitizerModule::event()
     //remove negative drift time (TDC) upon request
 
     if (!m_outputNegativeDriftTime &&
-        iterSignalMap->second.m_driftTime < -m_tdcBinHwidth) {
+        iterSignalMap->second.m_driftTime < 0.) {
       continue;
     }
 
-    cdcHits.appendNew(static_cast<unsigned short>(iterSignalMap->second.m_driftTime * m_tdcBinWidthInv + 0.5) + m_tdcOffset, getADCCount(iterSignalMap->second.m_charge),
-                      iterSignalMap->first);
+//N.B. The real TDC module rounds down the measured time (information from KEK electronics division via N.Taniguchi).
+    cdcHits.appendNew(static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv), getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first);
+
+    /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
+    float driftTimeFromTDC = static_cast<float>(m_tdcOffset - (tdcInCommonStop + 0.5)) * m_tdcBinWidth;
+    std::cout <<"driftT bf digitization, TDC in common stop, digitized driftT = " << iterSignalMap->second.m_driftTime <<" "<< tdcInCommonStop <<" "<< driftTimeFromTDC << std::endl;
+    */
 
     //add entry : CDCSimHit <-> CDCHit
     cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);

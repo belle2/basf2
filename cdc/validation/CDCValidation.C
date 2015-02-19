@@ -25,6 +25,8 @@
 //  25 Jun 2013    ver. 0.2   TGraph -> TH1D 
 //                            histograms per super layer (saved in another root file)
 //  28 Jun 2013    ver. 0.21  Bug fix
+//  20 Feb 2015    ver.0.22   Common Start mode -> Common Stop mode
+//                            by Eiichi Nakano guided by Hitoshi Ozaki
 //
 
 /*
@@ -77,8 +79,8 @@ const Int_t kDrawLayerHisto = 0;   // 0: Disable   1: Enable
 
 // Bin definitions for TDC histograms
 Int_t NbinTDC = 251;
-Double_t MinTDC = 0;
-Double_t MaxTDC = 502;
+Double_t MinTDC = 7690;//0;   common start mode -> common stop
+Double_t MaxTDC = 8192;//502; common start mode -> common stop
 
 // Bin definitions for ADC histograms
 Int_t NbinADC = 8192;
@@ -92,8 +94,8 @@ Int_t Nbin2ADC = 250;                 // number of bins for ADC (horizontal) axi
 Double_t Min2ADC = 0;                 // minimum of ADC axis
 Double_t Max2ADC = 500;               // maximum of ADC axis
 Int_t Nbin2TDC = 250;                 // number of bins for TDC (vertical) axis
-Double_t Min2TDC = 0;                 // minimum of TDC axis
-Double_t Max2TDC = 500;               // maximum of TDC axis
+Double_t Min2TDC = 7692;//0;          // minimum of TDC axis
+Double_t Max2TDC = 8192;//500;        // maximum of TDC axis
 
 
 // Layer definitions

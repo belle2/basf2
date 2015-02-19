@@ -24,12 +24,13 @@ float SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
                                                float)
 {
   // translate TDC Count into time information:
-  float driftTime = static_cast<float>(tdcCount); // 1 Unit in the TDC count equals 1 ns
+  CDCGeometryPar& geometryPar = CDCGeometryPar::Instance();
+  float driftTime = (static_cast<float>(geometryPar.getTdcOffset() - (tdcCount + 0.5))); // 1 Unit in the TDC count equals 1 ns
 
   // Need to undo everything the simple digitization does in reverse order.
   // First: Undo propagation in wire, if it was used:
   if (m_useInWirePropagationDelay) {
-    CDCGeometryPar& geometryPar = CDCGeometryPar::Instance();
+    //    CDCGeometryPar& geometryPar = CDCGeometryPar::Instance();
     //    m_backWirePos =   geometryPar.wireBackwardPosition(wireID);
     m_backWirePos =   geometryPar.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
     //subtract distance divided by speed of electric signal in the wire from the drift time.
@@ -44,7 +45,8 @@ float SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  return (driftTime * 4e-3);
+  float driftL = (driftTime >= 0.) ? driftTime * 4e-3 : -999.;
+  return driftL;
 }
 
 

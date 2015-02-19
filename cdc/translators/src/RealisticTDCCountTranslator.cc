@@ -37,7 +37,8 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
                                                   float theta)
 {
   // translate TDC Count into time information:
-  float driftTime = (static_cast<float>(tdcCount - m_tdcOffset)) * m_tdcBinWidth;
+  // N.B. 0.5 is necessary since real TDC module rounds down the time.
+  float driftTime = (static_cast<float>(m_tdcOffset - (tdcCount + 0.5))) * m_tdcBinWidth;
 
   unsigned short layer = wireID.getICLayer();
 
@@ -58,7 +59,7 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  float driftL = m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha, theta);
+  float driftL = (driftTime >= 0.) ? m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha, theta) : -999.;
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

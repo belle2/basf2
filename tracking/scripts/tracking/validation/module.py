@@ -14,6 +14,7 @@ from tracking.validation.fom import ValidationFiguresOfMerit
 import basf2
 
 import ROOT
+ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
 
@@ -332,7 +333,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Hit efficiency #
         ##################
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
-                                               'hit efficiency')
+                                               'hit efficiency with matched tracks')
         validation_plots.extend(plots)
 
         # Fit quality #

@@ -23,22 +23,22 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
     """Module to collect more matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding. This module gives information on the number of hits etc. """
 
     def __init__(
-        self,
-        name,
-        contact,
-        fit=False,
-        pulls=False,
-        output_file_name=None,
-        track_filter_object=AlwaysPassFilter(),
-        plot_name_postfix='',
-        plot_title_postfix='',
-        exclude_profile_mc_parameter='',
-        exclude_profile_pr_parameter='',
-        use_expert_folder=True,
-        trackCandidatesColumnName='TrackCands',
-        mcTrackCandidatesColumnName='MCTrackCands',
-        cdcHitsColumnName='CDCHits',
-        ):
+            self,
+            name,
+            contact,
+            fit=False,
+            pulls=False,
+            output_file_name=None,
+            track_filter_object=AlwaysPassFilter(),
+            plot_name_postfix='',
+            plot_title_postfix='',
+            exclude_profile_mc_parameter='',
+            exclude_profile_pr_parameter='',
+            use_expert_folder=True,
+            trackCandidatesColumnName='TrackCands',
+            mcTrackCandidatesColumnName='MCTrackCands',
+            cdcHitsColumnName='CDCHits',
+            write_tables=False):
 
         TrackingValidationModule.__init__(
             self,
@@ -54,10 +54,10 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             exclude_profile_pr_parameter,
             use_expert_folder,
             trackCandidatesColumnName,
-            mcTrackCandidatesColumnName,
-            )
+            mcTrackCandidatesColumnName)
 
         self.cdcHitsColumnname = cdcHitsColumnName
+        self.write_tables = write_tables
 
     def initialize(self):
         TrackingValidationModule.initialize(self)
@@ -72,9 +72,14 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         # MC information
         self.mc_missing = collections.deque()
         self.ratio_hits_in_mc_tracks_and_not_in_pr_tracks = collections.deque()
+        self.ratio_hits_in_mc_tracks_and_in_pr_tracks = collections.deque()
+        self.ratio_hits_in_missing_mc_tracks_and_in_pr_tracks = collections.deque()
+        self.ratio_hits_in_mc_tracks_and_in_fake_pr_tracks = \
+            collections.deque()
+        self.ratio_hits_in_mc_tracks_and_in_good_pr_tracks = \
+            collections.deque()
         self.mc_is_primary = collections.deque()
         self.mc_number_of_hits = collections.deque()
-        self.mc_number_of_missing_hits = collections.deque()  # the number of hits from the mc track cand that are not found by the pr track cand (in any track)
 
         # PT information
         self.number_of_connected_tracks = collections.deque()  # This is the number of mcTrackCands sharing a hit with the track cand.
@@ -102,6 +107,22 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         totalHitListPR = set([cdcHitID for trackCand in trackCands
                              for cdcHitID in
                              trackCand.getHitIDs(Belle2.Const.CDC)])
+
+        totalHitListPRGood = set([cdcHitID for trackCand in trackCands
+                                 for cdcHitID in
+                                 trackCand.getHitIDs(Belle2.Const.CDC)
+                                 if self.trackMatchLookUp.isMatchedPRTrackCand(trackCand)])
+
+        totalHitListPRClone = set([cdcHitID for trackCand in trackCands
+                                  for cdcHitID in
+                                  trackCand.getHitIDs(Belle2.Const.CDC)
+                                  if self.trackMatchLookUp.isClonePRTrackCand(trackCand)])
+        totalHitListPRFake = set([cdcHitID for trackCand in trackCands
+                                 for cdcHitID in
+                                 trackCand.getHitIDs(Belle2.Const.CDC)
+                                 if self.trackMatchLookUp.isGhostPRTrackCand(trackCand)
+                                 or self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand)])
+
         totalHitList = set([cdcHit.getArrayIndex() for cdcHit in cdcHits])
 
         number_of_mc_hits = len(totalHitListMC)
@@ -139,7 +160,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                     max(list_of_numbers_of_hits_for_connected_tracks)
                 self.pr_number_of_matched_hits.append(sum(list_of_numbers_of_hits_for_connected_tracks))
                 self.number_of_wrong_hits.append(sum(list_of_numbers_of_hits_for_connected_tracks)
-                        - maximum_intersection)
+                                                 - maximum_intersection)
 
             self.number_of_connected_tracks.append(len(list_of_connected_mc_tracks))
 
@@ -158,9 +179,14 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             mcTrackCandHits = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
 
-            ratio = 1.0 - 1.0 * len(mcTrackCandHits & totalHitListPR) \
-                / len(mcTrackCandHits)
-            self.ratio_hits_in_mc_tracks_and_not_in_pr_tracks.append(ratio)
+            ratio = 1.0 * len(mcTrackCandHits & totalHitListPR) / len(mcTrackCandHits)
+
+            self.ratio_hits_in_mc_tracks_and_not_in_pr_tracks.append(1.0 - ratio)
+            self.ratio_hits_in_mc_tracks_and_in_pr_tracks.append(ratio)
+            if is_missing:
+                self.ratio_hits_in_missing_mc_tracks_and_in_pr_tracks.append(ratio)
+            self.ratio_hits_in_mc_tracks_and_in_good_pr_tracks.append(1.0 * len(mcTrackCandHits & totalHitListPRGood) / len(mcTrackCandHits))
+            self.ratio_hits_in_mc_tracks_and_in_fake_pr_tracks.append(1.0 * len(mcTrackCandHits & totalHitListPRFake) / len(mcTrackCandHits))
 
             mcParticle = \
                 self.trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
@@ -168,9 +194,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 mcParticle.hasStatus(Belle2.MCParticle.c_PrimaryParticle)
             self.mc_is_primary.append(is_primary)
             self.mc_number_of_hits.append(len(mcTrackCandHits))
-
-            self.mc_number_of_missing_hits.append(len(mcTrackCandHits)
-                    - len(mcTrackCandHits & totalHitListPR))
 
             self.mc_missing.append(is_missing)
 
@@ -186,65 +209,86 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         output_tfile = ROOT.TFile(self.output_file_name, 'update')
 
-        # MC Figures of merit
-        mc_figures_of_merit = \
-            ValidationManyFiguresOfMerit('%s_mc_figures_of_merit' % self.name)
+        validation_plots = []
 
-        mc_figures_of_merit['mc_pts'] = self.mc_pts
-        mc_figures_of_merit['mc_d0s'] = self.mc_d0s
-        mc_figures_of_merit['mc_matches'] = self.mc_matches
-        mc_figures_of_merit['mc_hit_efficiencies'] = self.mc_hit_efficiencies
-        mc_figures_of_merit['mc_multiplicities'] = self.mc_multiplicities
-        mc_figures_of_merit['mc_phis'] = self.mc_phi
-        mc_figures_of_merit['mc_tan_lambdas'] = self.mc_tan_lambdas
-        mc_figures_of_merit['mc_thetas'] = self.mc_theta
-        mc_figures_of_merit['mc_missing'] = self.mc_missing
-        mc_figures_of_merit['mc_is_primary'] = self.mc_is_primary
-        mc_figures_of_merit['mc_number_of_hits'] = self.mc_number_of_hits
-        mc_figures_of_merit['mc_number_of_missing_hits'] = \
-            self.mc_number_of_missing_hits
-        mc_figures_of_merit['ratio_hits_in_mc_tracks_and_not_in_pr_tracks'] = \
-            self.ratio_hits_in_mc_tracks_and_not_in_pr_tracks
+        # Hit ratios #
+        ######################
+        all_tracks_plot = self.profiles_by_parameters_base(xs=self.ratio_hits_in_mc_tracks_and_in_pr_tracks,
+                                                           quantity_name="ratio of hits in MCTracks found by the track finder", make_hist=True,
+                                                           parameter_names=[], profile_parameters={}, unit=None)
 
-        mc_figures_of_merit.write()
+        validation_plots.extend(all_tracks_plot)
 
-        # PR Figures of merit
-        pr_figures_of_merit = \
-            ValidationManyFiguresOfMerit('%s_pr_figures_of_merit' % self.name)
+        missing_tracks_plot = self.profiles_by_parameters_base(xs=self.ratio_hits_in_missing_mc_tracks_and_in_pr_tracks,
+                                                               quantity_name="ratio of hits in missing MCTracks found by the track finder", make_hist=True,
+                                                               parameter_names=[], profile_parameters={}, unit=None)
 
-        pr_figures_of_merit['pr_clones_and_matches'] = \
-            self.pr_clones_and_matches
-        pr_figures_of_merit['pr_matches'] = self.pr_matches
-        pr_figures_of_merit['pr_fakes'] = self.pr_fakes
-        pr_figures_of_merit['pr_number_of_hits'] = self.pr_number_of_hits
-        pr_figures_of_merit['pr_number_of_matched_hits'] = \
-            self.pr_number_of_matched_hits
-        pr_figures_of_merit['pr_seed_tan_lambdas'] = self.pr_seed_tan_lambdas
-        pr_figures_of_merit['pr_seed_phi'] = self.pr_seed_phi
-        pr_figures_of_merit['pr_seed_theta'] = self.pr_seed_theta
+        validation_plots.extend(missing_tracks_plot)
 
-        pr_figures_of_merit['number_of_connected_tracks'] = \
-            self.number_of_connected_tracks
-        pr_figures_of_merit['number_of_wrong_hits'] = self.number_of_wrong_hits
+        for validation_plot in validation_plots:
+            validation_plot.write()
 
-        pr_figures_of_merit.write()
+        if self.write_tables:
 
-        # Hit Figures of merit
-        hit_figures_of_merit = \
-            ValidationFiguresOfMerit('%s_hit_figures_of_merit' % self.name)
+            # MC Figures of merit
+            mc_figures_of_merit = \
+                ValidationManyFiguresOfMerit('%s_mc_figures_of_merit' % self.name)
 
-        hit_figures_of_merit['number_of_total_hits'] = \
-            np.sum(self.number_of_total_hits)
-        hit_figures_of_merit['number_of_mc_hits'] = \
-            np.sum(self.number_of_mc_hits)
-        hit_figures_of_merit['number_of_pr_hits'] = \
-            np.sum(self.number_of_pr_hits)
-        hit_figures_of_merit['is_hit_found'] = np.sum(self.is_hit_found)
-        hit_figures_of_merit['is_hit_matched'] = np.sum(self.is_hit_matched)
+            mc_figures_of_merit['mc_pts'] = self.mc_pts
+            mc_figures_of_merit['mc_d0s'] = self.mc_d0s
+            mc_figures_of_merit['mc_matches'] = self.mc_matches
+            mc_figures_of_merit['mc_hit_efficiencies'] = self.mc_hit_efficiencies
+            mc_figures_of_merit['mc_multiplicities'] = self.mc_multiplicities
+            mc_figures_of_merit['mc_phis'] = self.mc_phi
+            mc_figures_of_merit['mc_tan_lambdas'] = self.mc_tan_lambdas
+            mc_figures_of_merit['mc_thetas'] = self.mc_theta
+            mc_figures_of_merit['mc_missing'] = self.mc_missing
+            mc_figures_of_merit['mc_is_primary'] = self.mc_is_primary
+            mc_figures_of_merit['mc_number_of_hits'] = self.mc_number_of_hits
+            mc_figures_of_merit['ratio_hits_in_mc_tracks_and_in_good_pr_tracks'] = \
+                self.ratio_hits_in_mc_tracks_and_in_good_pr_tracks
+            mc_figures_of_merit['ratio_hits_in_mc_tracks_and_in_fake_pr_tracks'] = \
+                self.ratio_hits_in_mc_tracks_and_in_fake_pr_tracks
+            mc_figures_of_merit['ratio_hits_in_mc_tracks_and_not_in_pr_tracks'] = \
+                self.ratio_hits_in_mc_tracks_and_not_in_pr_tracks
 
-        print hit_figures_of_merit
-        hit_figures_of_merit.write()
+            mc_figures_of_merit.write()
+
+            # PR Figures of merit
+            pr_figures_of_merit = \
+                ValidationManyFiguresOfMerit('%s_pr_figures_of_merit' % self.name)
+
+            pr_figures_of_merit['pr_clones_and_matches'] = \
+                self.pr_clones_and_matches
+            pr_figures_of_merit['pr_matches'] = self.pr_matches
+            pr_figures_of_merit['pr_fakes'] = self.pr_fakes
+            pr_figures_of_merit['pr_number_of_hits'] = self.pr_number_of_hits
+            pr_figures_of_merit['pr_number_of_matched_hits'] = \
+                self.pr_number_of_matched_hits
+            pr_figures_of_merit['pr_seed_tan_lambdas'] = self.pr_seed_tan_lambdas
+            pr_figures_of_merit['pr_seed_phi'] = self.pr_seed_phi
+            pr_figures_of_merit['pr_seed_theta'] = self.pr_seed_theta
+
+            pr_figures_of_merit['number_of_connected_tracks'] = \
+                self.number_of_connected_tracks
+            pr_figures_of_merit['number_of_wrong_hits'] = self.number_of_wrong_hits
+
+            pr_figures_of_merit.write()
+
+            # Hit Figures of merit
+            hit_figures_of_merit = \
+                ValidationFiguresOfMerit('%s_hit_figures_of_merit' % self.name)
+
+            hit_figures_of_merit['number_of_total_hits'] = \
+                np.sum(self.number_of_total_hits)
+            hit_figures_of_merit['number_of_mc_hits'] = \
+                np.sum(self.number_of_mc_hits)
+            hit_figures_of_merit['number_of_pr_hits'] = \
+                np.sum(self.number_of_pr_hits)
+            hit_figures_of_merit['is_hit_found'] = np.sum(self.is_hit_found)
+            hit_figures_of_merit['is_hit_matched'] = np.sum(self.is_hit_matched)
+
+            print hit_figures_of_merit
+            hit_figures_of_merit.write()
 
         output_tfile.Close()
-
-

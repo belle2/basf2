@@ -8,7 +8,7 @@ import basf2
 from tracking.run.event_generation import ReadOrGenerateEventsRun
 from tracking.modules import StandardTrackingReconstructionModule, \
     BrowseFileOnTerminateModule
-from tracking.validation.module import TrackingValidationModule
+from tracking.validation.hit_module import ExpertTrackingValidationModule
 import tracking.utilities as utilities
 
 TRACKING_MAILING_LIST = 'tracking@belle2.kek.jp'
@@ -30,7 +30,7 @@ def get_basf2_module(module_or_module_name):
         message_template = \
             '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
         raise ValueError(message_template % (module_or_module_name,
-                                             type(module_or_module_name)))
+                         type(module_or_module_name)))
 
 
 def get_basf2_module_name(module_or_module_name):
@@ -45,7 +45,7 @@ def get_basf2_module_name(module_or_module_name):
         message_template = \
             '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
         raise ValueError(message_template % (module_or_module_name,
-                                             type(module_or_module_name)))
+                         type(module_or_module_name)))
 
 
 class TrackingValidationRun(ReadOrGenerateEventsRun):
@@ -58,6 +58,7 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
     contact = TRACKING_MAILING_LIST
     output_file_name = 'TrackingValidation.root'
     show_results = False
+    trackCandidatesColumnName = 'TrackCands'
 
     # The default way to add the validation module to the path
     # Derived classes can overload this method modify the validation module
@@ -66,9 +67,11 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
 
         # Validation module generating plots
         fit = bool(self.fit_geometry)
-        trackingValidationModule = TrackingValidationModule(self.name,
-                                                            contact=self.contact, fit=fit, pulls=self.pulls,
-                                                            output_file_name=self.output_file_name)
+        trackingValidationModule = ExpertTrackingValidationModule(self.name,
+                                                                  contact=self.contact, fit=fit, pulls=self.pulls,
+                                                                  output_file_name=self.output_file_name)
+        trackingValidationModule.trackCandidatesColumnName = \
+            self.trackCandidatesColumnName
         main_path.add_module(trackingValidationModule)
 
     def create_argument_parser(self, **kwds):
@@ -83,20 +86,19 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
             '-f',
             '--finder',
             choices=utilities.NonstrictChoices([
-                'StandardReco',
-                'VXDTF',
-                'TrackFinderCDCAutomaton',
-                'TrackFinderCDCLegendre',
-                'CDCLegendreTracking',
-                'CDCLocalTracking',
-            ]),
+                                               'StandardReco',
+                                               'VXDTF',
+                                               'TrackFinderCDCAutomaton',
+                                               'TrackFinderCDCLegendre',
+                                               'CDCLegendreTracking',
+                                               'CDCLocalTracking',
+                                               ]),
             default=self.finder_module,
             dest='finder_module',
-            help='Name of the finder module to be evaluated.',
-        )
+            help='Name of the finder module to be evaluated.',)
 
         argument_parser.add_argument('--fit-geometry', choices=['TGeo',
-                                                                'Geant4'], default=self.fit_geometry,
+                                     'Geant4'], default=self.fit_geometry,
                                      dest='fit_geometry',
                                      help='Geometry to be used with Genfit. If unset validate the seed values instead'
                                      )
@@ -107,16 +109,13 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
             action='store_true',
             default=self.show_results,
             dest='show_results',
-            help='Show generated plots in a TBrowser immediatly.',
-        )
+            help='Show generated plots in a TBrowser immediatly.',)
 
         return argument_parser
 
     def determine_tracking_coverage(self, finder_module_or_name):
         finder_module_name = get_basf2_module_name(finder_module_or_name)
-        if finder_module_name == 'CDCLocalTracking' or finder_module_name \
-                == 'CDCLegendreTracking' \
-                or finder_module_name.startswith('TrackFinderCDC'):
+        if finder_module_name == 'CDCLocalTracking' or finder_module_name == 'CDCLegendreTracking' or finder_module_name.startswith('TrackFinderCDC'):
             return {'UsePXDHits': False, 'UseSVDHits': False,
                     'UseCDCHits': True}
         elif finder_module_name == 'VXDTF':
@@ -129,7 +128,8 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
                     'UseSVDHits': 'SVD' in self.components,
                     'UseCDCHits': 'CDC' in self.components}
         else:
-            get_logger().info('Could not determine tracking coverage for module name %s. Using value stored in self.tracking_coverage which is %s', finder_module_name, self.tracking_coverage)
+            get_logger().info('Could not determine tracking coverage for module name %s. Using value stored in self.tracking_coverage which is %s',
+                              finder_module_name, self.tracking_coverage)
             return self.tracking_coverage
 
     def create_path(self):
@@ -170,19 +170,22 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
                 main_path.add_module(genFitterModule)
 
         # Reference Monte Carlo tracks
-        trackFinderMCTruthModule = basf2.register_module('TrackFinderMCTruth')
+        trackFinderMCTruthModule = \
+            basf2.register_module('TrackFinderMCTruth')
         trackFinderMCTruthModule.param({'WhichParticles': ['primary'],
-                                        'EnergyCut': 0.1,
-                                        'GFTrackCandidatesColName': 'MCTrackCands'
-                                        })
+                                       'EnergyCut': 0.1,
+                                       'GFTrackCandidatesColName': 'MCTrackCands'})
         trackFinderMCTruthModule.param(tracking_coverage)
         main_path.add_module(trackFinderMCTruthModule)
 
         # Track matcher
         mcTrackMatcherModule = basf2.register_module('MCTrackMatcher')
-        mcTrackMatcherModule.param({'MCGFTrackCandsColName': 'MCTrackCands',
-                                    'MinimalPurity': 0.66,
-                                    'RelateClonesToMCParticles': True})
+        mcTrackMatcherModule.param({
+                                   'MCGFTrackCandsColName': 'MCTrackCands',
+                                   'MinimalPurity': 0.66,
+                                   'RelateClonesToMCParticles': True,
+                                   'PRGFTrackCandsColName': self.trackCandidatesColumnName,
+                                   })
         mcTrackMatcherModule.param(tracking_coverage)
         main_path.add_module(mcTrackMatcherModule)
 

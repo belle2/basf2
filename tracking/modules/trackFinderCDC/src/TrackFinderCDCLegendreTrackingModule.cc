@@ -358,7 +358,7 @@ void CDCLegendreTrackingModule::DoTreeTrackFinding()
     it = hits_set.insert(it, trackHit);
   }
 
-  double limit = 40;
+  unsigned int limit = 40;
   double rThreshold = 0.07;
   m_cdcLegendreQuadTree->provideItemsSet<QuadTreeProcessor>(hits_set);
   int nSteps = 0;
@@ -374,9 +374,9 @@ void CDCLegendreTrackingModule::DoTreeTrackFinding()
   do {
 //    QuadTreeProcessor::rThreshold = rThreshold;
 //    QuadTreeProcessor::nHitsThreshold = limit;
-//    QuadTreeProcessor::fillGivenTree(m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
-    m_cdcLegendreQuadTree->setNItemsThreshold(limit);
-    m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
+    QuadTreeProcessor::fillGivenTree(m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
+//    m_cdcLegendreQuadTree->setNItemsThreshold(limit);
+//    m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
 
 
 
@@ -419,7 +419,7 @@ void CDCLegendreTrackingModule::DoTreeTrackFindingFinal()
     if ((trackHit->getHitUsage() != TrackHit::used_in_track) && (trackHit->getHitUsage() != TrackHit::background)) it = hits_set.insert(it, trackHit);
   }
 
-  double limit = 20;
+  unsigned int limit = 20;
   double rThreshold = 0.15;
   m_cdcLegendreQuadTree->clearTree();
   m_cdcLegendreQuadTree->provideItemsSet<QuadTreeProcessor>(hits_set);
@@ -436,9 +436,9 @@ void CDCLegendreTrackingModule::DoTreeTrackFindingFinal()
   do {
 //    QuadTreeProcessor::rThreshold = rThreshold;
 //    QuadTreeProcessor::nHitsThreshold = limit;
-//    QuadTreeProcessor::fillGivenTree(m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
-    m_cdcLegendreQuadTree->setNItemsThreshold(limit);
-    m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
+    QuadTreeProcessor::fillGivenTree(m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
+//    m_cdcLegendreQuadTree->setNItemsThreshold(limit);
+//    m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
 
     limit = limit * m_stepScale;
     rThreshold *= 2.;

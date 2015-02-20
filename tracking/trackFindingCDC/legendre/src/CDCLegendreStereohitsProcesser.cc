@@ -381,7 +381,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   QuadTreeCandidateCreator::Instance().clearNodes();
   QuadTreeCandidateCreator::Instance().clearCandidates();
 
-  double __attribute__((unused)) limit = 6;
+  unsigned int __attribute__((unused)) limit = 6;
   double __attribute__((unused)) rThreshold = 0.15;
 
   std::vector<QuadTreeLegendre*> nodeList;

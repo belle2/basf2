@@ -124,8 +124,7 @@ namespace Belle2 {
         }
       }
 
-
-      static void fillGivenTree(QuadTreeTemplate<double, int, TrackHit>* node, QuadTreeTemplate<double, int, TrackHit>::CandidateProcessorLambda& lmdProcessor, const unsigned int& m_nHitsThreshold, const int& m_rThreshold) {
+      static void fillGivenTree(QuadTreeTemplate<double, int, TrackHit>* node, QuadTreeTemplate<double, int, TrackHit>::CandidateProcessorLambda& lmdProcessor, unsigned int m_nHitsThreshold, double m_rThreshold) {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << "hits at level " << node->getLevel());
         if (node->getItemsVector().size() < m_nHitsThreshold)
           return;
@@ -170,7 +169,7 @@ namespace Belle2 {
 
           binUsed[t_index][r_index] = true;
 
-          node->getChildren()->get(t_index, r_index)->setNItemsThreshold(node->getNItemsThreshold());
+//          node->getChildren()->get(t_index, r_index)->setNItemsThreshold(node->getNItemsThreshold());
           node->getChildren()->get(t_index, r_index)->cleanUpItems<QuadTreeProcessor>();
 //          node->getChildren()->get(t_index, r_index)->startFillingTree<QuadTreeProcessor>(lmdProcessor);
           QuadTreeProcessor::fillGivenTree(node->getChildren()->get(t_index, r_index), lmdProcessor, m_nHitsThreshold, m_rThreshold);

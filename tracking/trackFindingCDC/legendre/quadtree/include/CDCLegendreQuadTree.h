@@ -197,7 +197,7 @@ namespace Belle2 {
       inline unsigned int getNItemsThreshold() const {return m_itemsThreshold;};
 
       /** Sets threshold on pt of candidates */
-      void setLastLevel(double lastLevel) {m_lastLevel = static_cast<float>(lastLevel);};
+      void setLastLevel(int lastLevel) {m_lastLevel = static_cast<float>(lastLevel);};
 
       /** Sets threshold on pt of candidates */
       int getLastLevel() const {return m_lastLevel;};

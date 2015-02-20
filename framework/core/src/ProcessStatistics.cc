@@ -53,7 +53,6 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
 {
   const ModuleStatistics& global = getGlobal();
   if (!modules) modules = &(getAll());
-  stringstream out;
   int moduleNameLength = 21; //minimum: 80 characters
   const int lengthOfRest = 80 - moduleNameLength;
   for (const ModuleStatistics & stats : *modules) {
@@ -61,11 +60,12 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
     if (len > moduleNameLength)
       moduleNameLength = len;
   }
-  std::string numTabsModule = (boost::format("%d") % (moduleNameLength + 1)).str();
-  std::string numWidth = (boost::format("%d") % (moduleNameLength + 1 + lengthOfRest)).str();
+  const std::string numTabsModule = (boost::format("%d") % (moduleNameLength + 1)).str();
+  const std::string numWidth = (boost::format("%d") % (moduleNameLength + 1 + lengthOfRest)).str();
   boost::format outputheader("%s %|" + numTabsModule + "t|| %10s | %10s | %10s | %17s\n");
   boost::format output("%s %|" + numTabsModule + "t|| %10.0f | %10.0f | %10.2f | %7.2f +-%7.2f\n");
 
+  stringstream out;
   out << boost::format("%|" + numWidth + "T=|\n");
   out << outputheader % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
   out << boost::format("%|" + numWidth + "T=|\n");
@@ -90,7 +90,7 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   out << boost::format("%|" + numWidth + "T=|\n");
   out << output
       % "Total"
-      % maxcalls
+      % maxcalls //getCalls() returns the sum of processed events (e.g. from previous basf2 executions)
       % (global.getMemorySum(mode) / 1024)
       % (global.getTimeSum(mode) / Unit::s)
       % (global.getTimeMean(mode) / Unit::ms)
@@ -101,13 +101,13 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
 
 void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObject)
 {
-  int minIndexUnmerged = 0;
+  unsigned int minIndexUnmerged = 0;
   if (otherObject->m_modulesToStatsIndex.empty()) {
     B2ERROR("ProcessStatistics::appendUnmergedModules(): Module -> index list is empty? This might produce wrong results");
   } else {
     minIndexUnmerged = otherObject->m_modulesToStatsIndex.begin()->second;
     for (auto pair : otherObject->m_modulesToStatsIndex) {
-      if (pair.second < minIndexUnmerged)
+      if (pair.second < (int)minIndexUnmerged)
         minIndexUnmerged = pair.second;
     }
   }
@@ -118,7 +118,7 @@ void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObje
 
 
   //the first minIndexUnmerged entries in m_stats should just be merged...
-  for (int i = 0; i < minIndexUnmerged; i++) {
+  for (unsigned int i = 0; i < minIndexUnmerged; i++) {
     ModuleStatistics& myStats = m_stats[i];
     const ModuleStatistics& otherStats = otherObject->m_stats[i];
     if (myStats.getName() == otherStats.getName()) {
@@ -129,7 +129,7 @@ void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObje
   }
 
   //append the rest
-  for (int i = minIndexUnmerged; i < otherObject->m_stats.size(); i++) {
+  for (unsigned int i = minIndexUnmerged; i < otherObject->m_stats.size(); i++) {
     const ModuleStatistics& otherStats = otherObject->m_stats[i];
     m_stats.emplace_back(otherStats);
     m_stats.back().setIndex(m_stats.size() - 1);

@@ -45,7 +45,7 @@ namespace Belle2 {
      *                used
      */
     std::string getStatisticsString(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
-                                    const std::vector<ModuleStatistics>* modules = 0);
+                                    const std::vector<ModuleStatistics>* modules = nullptr);
 
     /**
      * Return string with statistics for selected modules

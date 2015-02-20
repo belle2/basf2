@@ -271,8 +271,7 @@ void DisplayUI::selectionHandler(TEveElement* eveObj)
 }
 void DisplayUI::handleEvent(Event_t* event)
 {
-  //TODO: find a way to make this work if glviewers have focus
-  B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode)
+  //B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode)
   if (event->fType != kGKeyPress) {
     switch (event->fCode) {
       case 117: //Page Down

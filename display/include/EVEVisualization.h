@@ -125,9 +125,6 @@ namespace Belle2 {
     /** Destructor. */
     ~EVEVisualization();
 
-    /** Add TGeo geometry to Eve (only needs to be done once.) */
-    void addGeometry();
-
     // === adding event data ===
 
     /** Add this genfit::Track to event data.
@@ -265,9 +262,6 @@ namespace Belle2 {
     /** If true, secondary MCParticles (and hits created by them) will not be shown. */
     void setHideSecondaries(bool on) { m_hideSecondaries = on; }
 
-    /** Show full geometry instead of simplified shapes. */
-    void showFullGeo(bool on) { m_fullgeo = on; }
-
     /** Get TObject <-> TEveElement mapping. */
     const VisualRepMap* getVisualRepMap() const { return m_visualRepMap; }
 
@@ -284,15 +278,6 @@ namespace Belle2 {
     /** Create hit visualisation for the given options, and add them to 'eveTrack'. */
     void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
                    TEvePathMark::EType_e markType, bool drawErrors, int markerPos = 1);
-
-    /** enable/disable rendering of the volume 'name', or only its daughters if only_daughters is set. */
-    void enableVolume(const char* name, bool only_daughters = false, bool enable = true);
-
-    /** disable rendering of the volume 'name', or only its daughters if only_daughters is set. */
-    void disableVolume(const char* name, bool only_daughters = false) { enableVolume(name, only_daughters, false); }
-
-    /** set fill color of the volume 'name' to 'col'. */
-    void setVolumeColor(const char* name, Color_t col);
 
     /** adds given VXD hit to lines. */
     template <class SomeVXDHit> void addRecoHit(const SomeVXDHit* hit, TEveStraightLineSet* lines) {
@@ -328,9 +313,6 @@ namespace Belle2 {
      * @sa setOptions
      */
     std::string m_options;
-
-    /** Show full geometry instead of simplified shapes. */
-    bool m_fullgeo;
 
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */
     bool m_assignToPrimaries;

@@ -1,20 +1,19 @@
 #include <display/SplitGLView.h>
+#include <display/EveGeometry.h>
 #include <framework/logging/Logger.h>
 
-#include "TGFrame.h"
-#include "TEveGeoNode.h"
 #include "TEveScene.h"
-#include "TEveEventManager.h"
-#include "TEveSelection.h"
+#include "TEveManager.h"
+#include "TEveBrowser.h"
 #include "TEveViewer.h"
 #include "TEveWindowManager.h"
-#include "TGButton.h"
 #include "TGMenu.h"
 #include "TGStatusBar.h"
 #include "TGTab.h"
 #include "TGLPhysicalShape.h"
 #include "TGLLogicalShape.h"
-#include "TGeoManager.h"
+#include "TGLWidget.h"
+
 #include "TString.h"
 
 using namespace Belle2;
@@ -134,23 +133,6 @@ SplitGLView::~SplitGLView()
   delete m_cameraMenu;
 }
 
-void SplitGLView::saveExtract()
-{
-  TGeoManager* my_tgeomanager = gGeoManager;
-  TEveGeoTopNode* eve_top_node = dynamic_cast<TEveGeoTopNode*>(gEve->GetGlobalScene()->FirstChild());
-  if (!eve_top_node) {
-    B2ERROR("Couldn't find TEveGeoTopNode");
-    return;
-  }
-  eve_top_node->ExpandIntoListTrees();
-  eve_top_node->SaveExtract("geometry_extract.root", "Extract", false);
-
-  //this doesn't work too well (i.e. crashes when geometry is drawn)
-  //eve_top_node->ExpandIntoListTreesRecursively();
-  //eve_top_node->SaveExtract("display_geometry_full.root", "Extract", false);
-  gGeoManager = my_tgeomanager;
-}
-
 void SplitGLView::handleMenu(Int_t id)
 {
   // Handle menu items.
@@ -202,7 +184,7 @@ void SplitGLView::handleMenu(Int_t id)
       break;
 
     case kSaveGeometryExtract:
-      saveExtract();
+      EveGeometry::saveExtract();
       break;
 
     default:

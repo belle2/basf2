@@ -21,9 +21,9 @@
 
 #include <display/dataobjects/DisplayData.h>
 #include <display/VisualRepMap.h>
+#include <display/EveGeometry.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
 #include <vxd/geometry/GeoCache.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -49,9 +49,7 @@
 #include <TEveBox.h>
 #include <TEveCalo.h>
 #include <TEveManager.h>
-#include <TEveGeoNode.h>
 #include <TEveGeoShape.h>
-#include <TEveGeoShapeExtract.h>
 #include <TEveLine.h>
 #include <TEvePointSet.h>
 #include <TEveSelection.h>
@@ -60,9 +58,7 @@
 #include <TEveText.h>
 #include <TEveTrack.h>
 #include <TEveTrackPropagator.h>
-#include <TFile.h>
 #include <TGeoEltu.h>
-#include <TGeoManager.h>
 #include <TGeoMatrix.h>
 #include <TGeoNode.h>
 #include <TGeoSphere.h>
@@ -79,14 +75,13 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 
 
 using namespace Belle2;
 
 EVEVisualization::EVEVisualization():
-  m_fullgeo(false),
   m_assignToPrimaries(false),
   m_eclData(0),
   m_unassignedRecoHits(0),
@@ -102,13 +97,7 @@ EVEVisualization::EVEVisualization():
   m_trackpropagator->SetMagFieldObj(&m_bfield, false);
   m_trackpropagator->SetFitDaughters(false); //most secondaries are no longer immediate daughters since we might discard those!
 
-  //find a point that is inside the top node
-  TGeoVolume* top_node = gGeoManager->GetTopNode()->GetVolume();
-  double p[3] = { 380.0, 0.0, 0.0 }; //ok for normal Belle II geometry
-  while (!top_node->Contains(p)) {
-    p[0] *= 0.8;
-  }
-  m_trackpropagator->SetMaxR(p[0]); //don't draw tracks outside detector
+  m_trackpropagator->SetMaxR(EveGeometry::getMaxR()); //don't draw tracks outside detector
 
   //TODO is this actually needed?
   m_trackpropagator->SetMaxStep(1.0); //make sure to reeval magnetic field often enough
@@ -157,124 +146,6 @@ EVEVisualization::~EVEVisualization()
   delete m_trackpropagator;
   delete m_gftrackpropagator;
   delete m_calo3d;
-}
-
-void EVEVisualization::enableVolume(const char* name, bool only_daughters, bool enable)
-{
-  TGeoVolume* vol = gGeoManager->FindVolumeFast(name);
-  if (vol) {
-    if (!only_daughters)
-      vol->SetVisibility(enable);
-    vol->SetVisDaughters(enable);
-  } else {
-    B2DEBUG(100, "Volume " << name << " not found?");
-  }
-}
-
-void EVEVisualization::setVolumeColor(const char* name, Color_t col)
-{
-  TGeoVolume* vol = gGeoManager->FindVolumeFast(name);
-  if (vol) {
-    //while TGeoVolume derives from TAttFill, the line color actually is important here
-    vol->SetLineColor(col);
-  } else {
-    B2DEBUG(100, "Volume " << name << " not found?");
-  }
-}
-
-void EVEVisualization::addGeometry()
-{
-  if (!gGeoManager)
-    return;
-
-  B2DEBUG(100, "Setting up geometry for TEve...");
-  //set colours by atomic mass number
-  gGeoManager->DefaultColors();
-
-  //Set transparency of geometry
-  TObjArray* volumes = gGeoManager->GetListOfVolumes();
-  for (int i = 0; i < volumes->GetEntriesFast(); i++) {
-    TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
-    volume->SetTransparency(70); //0: opaque, 100: fully transparent
-  }
-
-  /*
-  //disable display of especially detailed subdetectors
-  disableVolume("logical_ecl", true);
-  disableVolume("LVCryo");
-  //disable all daughters of logical_CDC individually
-  TGeoVolume* cdc = gGeoManager->FindVolumeFast("logicalCDC");
-  if (!cdc) {
-    B2WARNING("Volume logicalCDC not found!");
-  } else {
-    const int nNodes = cdc->GetNdaughters();
-    for (int i = 0; i < nNodes; i++) {
-      cdc->GetNode(i)->GetVolume()->SetVisibility(false);
-    }
-  }
-  //reenable CDC boundaries
-  enableVolume("logicalInnerWall_0_Shield", false);
-  enableVolume("logicalOuterWall_0_Shield", false);
-  enableVolume("logicalBackwardCover2", false);
-  enableVolume("logicalForwardCover3", false);
-  enableVolume("logicalForwardCover4", false);
-  //ring things in endcap region
-  disableVolume("LVPoleTip");
-  disableVolume("LVPoleTip2");
-  disableVolume("LVPoleTip3");
-  //magnets and beam pipes outside IR (shielding left in)
-  disableVolume("logi_A1spc1_name");
-  disableVolume("logi_B1spc1_name");
-  disableVolume("logi_D1spc1_name");
-  disableVolume("logi_E1spc1_name");
-  */
-
-  //set some nicer colors (at top level only)
-  setVolumeColor("PXD.Envelope", kGreen + 3);
-  setVolumeColor("SVD.Envelope", kOrange + 8);
-  setVolumeColor("logical_ecl", kOrange - 3);
-  setVolumeColor("BKLM.EnvelopeLogical", kGreen + 3);
-  setVolumeColor("Endcap_1", kGreen + 3);
-  setVolumeColor("Endcap_2", kGreen + 3);
-
-  //make magnets more transparent
-  for (int i = 0; i < volumes->GetEntriesFast(); i++) {
-    TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
-    if (TString(volume->GetName()).BeginsWith("Magnet_")) {
-      volume->SetTransparency(97); //0: opaque, 100: fully transparent
-    }
-  }
-
-  TGeoNode* top_node = gGeoManager->GetTopNode();
-  assert(top_node != NULL);
-  TEveGeoTopNode* eve_top_node = new TEveGeoTopNode(gGeoManager, top_node);
-  eve_top_node->IncDenyDestroy();
-  eve_top_node->SetVisLevel(2);
-  gEve->AddGlobalElement(eve_top_node);
-
-  //don't show full geo unless turned on by user
-  eve_top_node->SetRnrSelfChildren(m_fullgeo, m_fullgeo);
-
-  //expand geometry in eve list (otherwise one needs three clicks to see that it has children)
-  eve_top_node->ExpandIntoListTreesRecursively();
-
-  B2DEBUG(100, "Loading geometry projections...");
-
-  const std::string extractPath = FileSystem::findFile("/data/display/geometry_extract.root");
-  TFile* f = TFile::Open(extractPath.c_str(), "READ");
-  TEveGeoShapeExtract* gse = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
-  TEveGeoShape* gs = TEveGeoShape::ImportShapeExtract(gse, 0);
-  gs->SetRnrSelf(false);
-  gs->IncDenyDestroy();
-  gs->SetName("Minimal geometry extract");
-  delete f;
-
-  //I want to show full geo in unprojected view,
-  //but I still need to add the extract to the geometry scene...
-  gEve->AddGlobalElement(gs);
-
-  gs->SetRnrSelfChildren(false, !m_fullgeo);
-  B2DEBUG(100, "Done.");
 }
 
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)

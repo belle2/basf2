@@ -35,6 +35,7 @@
 #include <TGTab.h>
 #include <TGTextEntry.h>
 #include <TGLViewer.h>
+#include <TGLWidget.h>
 #include <TObject.h>
 #include <TROOT.h>
 #include <TSystem.h>

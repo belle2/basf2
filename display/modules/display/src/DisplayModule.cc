@@ -3,6 +3,7 @@
 #include <display/dataobjects/DisplayData.h>
 #include <display/DisplayUI.h>
 #include <display/EVEVisualization.h>
+#include <display/EveGeometry.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <geometry/GeometryManager.h>
@@ -100,8 +101,7 @@ void DisplayModule::initialize()
 
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
-  m_visualizer->showFullGeo(m_fullGeometry);
-  m_visualizer->addGeometry();
+  EveGeometry::addGeometry(m_fullGeometry);
 
   m_display->hideObjects(m_hideObjects);
 

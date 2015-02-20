@@ -57,9 +57,11 @@ SplitGLView::SplitGLView() :
     if (iFrame == 1) {
       m_rhozManager = new TEveProjectionManager(TEveProjection::kPT_RhoZ);
       projectionMgr = m_rhozManager;
+      m_glViewer[iFrame]->CurrentCamera().Zoom(+300, false, false);
     } else if (iFrame == 2) {
       m_rphiManager = new TEveProjectionManager(TEveProjection::kPT_RPhi);
       projectionMgr = m_rphiManager;
+      m_glViewer[iFrame]->CurrentCamera().Zoom(-50, false, false);
     }
 
     // connect signals we are interested in

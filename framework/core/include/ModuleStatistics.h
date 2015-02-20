@@ -69,7 +69,7 @@ namespace Belle2 {
     void setIndex(int index) { m_index = index; }
 
     /** Return the previously set name */
-    std::string getName() const { return m_name; }
+    const std::string& getName() const { return m_name; }
     /** Return the index */
     int getIndex() const { return m_index; }
 
@@ -107,6 +107,11 @@ namespace Belle2 {
     value_type getTimeMemoryCorrelation(EStatisticCounters type = c_Total) const {
       return m_stats[type].getCorrelation<0, 1>();
     }
+
+    /** Check if name is identical. */
+    bool operator==(const ModuleStatistics& other) const { return m_name == other.m_name; }
+    /** inequality. */
+    bool operator!=(const ModuleStatistics& other) const { return !(*this == other); }
 
     /** Clear all statistics. */
     void clear() {

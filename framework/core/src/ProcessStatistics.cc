@@ -40,7 +40,11 @@ void ProcessStatistics::initModule(const Module* module)
   int index = getIndex(module);
   ModuleStatistics& stats = m_stats.at(index);
   if (module and stats.getName().empty()) {
-    stats.setName(module->getName());
+    const string& type = module->getType();
+    if (type == "Tx" or type == "Rx")
+      stats.setName(type);
+    else
+      stats.setName(module->getName());
   }
   stats.setIndex(index);
 }
@@ -95,42 +99,65 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   return out.str();
 }
 
+void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObject)
+{
+  int minIndexUnmerged = 0;
+  if (otherObject->m_modulesToStatsIndex.empty()) {
+    B2ERROR("ProcessStatistics::appendUnmergedModules(): Module -> index list is empty? This might produce wrong results");
+  } else {
+    minIndexUnmerged = otherObject->m_modulesToStatsIndex.begin()->second;
+    for (auto pair : otherObject->m_modulesToStatsIndex) {
+      if (pair.second < minIndexUnmerged)
+        minIndexUnmerged = pair.second;
+    }
+  }
+  if (minIndexUnmerged > m_stats.size())
+    B2FATAL("(minIndexUnmerged > m_stats.size()) :( ");
+  if (minIndexUnmerged > otherObject->m_stats.size())
+    B2FATAL("(minIndexUnmerged > otherObject->m_stats.size()) :( ");
+
+
+  //the first minIndexUnmerged entries in m_stats should just be merged...
+  for (int i = 0; i < minIndexUnmerged; i++) {
+    ModuleStatistics& myStats = m_stats[i];
+    const ModuleStatistics& otherStats = otherObject->m_stats[i];
+    if (myStats.getName() == otherStats.getName()) {
+      myStats.update(otherStats);
+    } else {
+      B2ERROR("mismatch in module names in statistics (" << myStats.getName() << " vs. " << otherStats.getName() << "). ProcessStatistics::merge() can only merge statistics that contain exactly the same modules.");
+    }
+  }
+
+  //append the rest
+  for (int i = minIndexUnmerged; i < otherObject->m_stats.size(); i++) {
+    const ModuleStatistics& otherStats = otherObject->m_stats[i];
+    m_stats.emplace_back(otherStats);
+    m_stats.back().setIndex(m_stats.size() - 1);
+  }
+  //copy m_modulesToStatsIndex
+  //shift indices by #entries missing in otherObject
+  const int shift = m_stats.size() - otherObject->m_stats.size();
+  if (shift < 0) {
+    B2FATAL("shift negative: " << shift);
+  }
+  for (auto pair : otherObject->m_modulesToStatsIndex) {
+    m_modulesToStatsIndex[pair.first] = pair.second + shift;
+  }
+}
+
+
 void ProcessStatistics::merge(const Mergeable* other)
 {
   const ProcessStatistics* otherObject = static_cast<const ProcessStatistics*>(other);
 
   m_global.update(otherObject->m_global);
 
-  if (m_stats.size() == otherObject->m_stats.size()) {
+  if (m_stats == otherObject->m_stats) {
     //fast version for merging between processes
-    for (unsigned int i = 0; i < otherObject->m_stats.size(); i++) {
-      ModuleStatistics& myStats = m_stats[i];
-      const ModuleStatistics& otherStats = otherObject->m_stats[i];
-      if (myStats.getName() == otherStats.getName()) {
-        myStats.update(otherStats);
-      } else {
-        B2ERROR("mismatch in module names in statistics. ProcessStatistics::merge() can only merge statistics that contain exactly the same modules.");
-      }
-    }
+    for (unsigned int i = 0; i < otherObject->m_stats.size(); i++)
+      m_stats[i].update(otherObject->m_stats[i]);
   } else {
-    //slow merging if we have different number of modules
-    for (const auto & otherStats : otherObject->m_stats) {
-      //find name in our statistics
-      bool found = false;
-      for (ModuleStatistics & myStats : m_stats) {
-        if (myStats.getName() == otherStats.getName()) {
-          myStats.update(otherStats);
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        //add module at end
-        m_stats.emplace_back(otherStats);
-        m_stats.back().setIndex(m_stats.size() - 1);
-      }
-    }
+    appendUnmergedModules(otherObject);
   }
 }
 
@@ -145,4 +172,10 @@ void ProcessStatistics::setCounters(double& time, double& memory,
 {
   time = Utils::getClock() - startTime;
   memory = Utils::getMemoryKB() - startMemory;
+}
+
+TObject* ProcessStatistics::Clone(const char*) const
+{
+  ProcessStatistics* p = new ProcessStatistics(*this);
+  return p;
 }

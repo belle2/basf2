@@ -148,7 +148,7 @@ void ProcessStatisticsPython::exposePythonAPI()
 
   //Wrap statistics class
   class_<ModuleStatistics>("ModuleStatistics")
-  .add_property("name", &ModuleStatistics::getName, &ModuleStatistics::setName)
+  .add_property("name", make_function(&ModuleStatistics::getName, return_value_policy<copy_const_reference>()), &ModuleStatistics::setName)
   .add_property("index", &ModuleStatistics::getIndex, &ModuleStatistics::setIndex)
   .def("time_sum", &ModuleStatistics::getTimeSum, stats_timeSum_overloads())
   .def("time_mean", &ModuleStatistics::getTimeMean, stats_timeMean_overloads())

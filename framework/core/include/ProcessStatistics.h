@@ -168,12 +168,21 @@ namespace Belle2 {
     /** Clear collected statistics but keep names of modules */
     virtual void clear();
 
+    /** Reimplement TObject::Clone() since we also need m_modulesToStatsIndex. */
+    virtual TObject* Clone(const char* newname = "") const; /* override */
 
   private:
-    /** Prohibit copy constructor */
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
     ProcessStatistics(const ProcessStatistics&);
+#else
+    /** Hide copy constructor */
+    ProcessStatistics(const ProcessStatistics&) = default;
+#endif
     /** Prohibit assignment operator */
     ProcessStatistics& operator=(ProcessStatistics&);
+
+    /** Merge dissimilar objects (mainly loading ProcessStatistics from file). */
+    void appendUnmergedModules(const ProcessStatistics* otherObject);
 
     /** Set counters time and memory to contain the current clock value
      * and memory consumption respectively.

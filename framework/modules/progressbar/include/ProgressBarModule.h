@@ -31,9 +31,9 @@ namespace Belle2 {
 
   protected:
     /** Number of processed events. */
-    int m_evtNr;
+    long m_evtNr;
     /** Total number of events. */
-    int m_nTotal;
+    long m_nTotal;
     /** Start time (ns). */
     long m_startTime;
     /** Timestamp when we last printed something (ns). */

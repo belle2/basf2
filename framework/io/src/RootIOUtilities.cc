@@ -84,8 +84,8 @@ std::vector<std::string> RootIOUtilities::expandWordExpansions(const std::vector
 
 long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long run, long experiment)
 {
-  const Int_t major = 1000000 * experiment + run;
-  const Int_t minor = event;
+  const long major = 1000000 * experiment + run;
+  const long minor = event;
 
   if (!tree->GetTreeIndex()) {
     B2INFO("No TTreeIndex found, rebuild it...");

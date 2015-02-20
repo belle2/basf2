@@ -295,9 +295,9 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
 bool RootInputModule::createParentStoreEntries()
 {
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
-  unsigned int experiment = fileMetaData->getExperimentLow();
-  unsigned int run = fileMetaData->getRunLow();
-  unsigned int event = fileMetaData->getEventLow();
+  long experiment = fileMetaData->getExperimentLow();
+  long run = fileMetaData->getRunLow();
+  long event = fileMetaData->getEventLow();
 
   // loop over parents and get their metadata
   FileCatalog::ParentMetaData* parentMetaData = &m_parentMetaData;
@@ -356,9 +356,9 @@ bool RootInputModule::createParentStoreEntries()
 bool RootInputModule::readParentTrees()
 {
   StoreObjPtr<EventMetaData> eventMetaData;
-  unsigned int experiment = eventMetaData->getExperiment();
-  unsigned int run = eventMetaData->getRun();
-  unsigned int event = eventMetaData->getEvent();
+  long experiment = eventMetaData->getExperiment();
+  long run = eventMetaData->getRun();
+  long event = eventMetaData->getEvent();
   long entry = -1;
 
   FileCatalog::ParentMetaData* parentMetaData = &m_parentMetaData;

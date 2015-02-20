@@ -239,7 +239,7 @@ void CDCLegendreTrackingModule::initialize()
 //  m_cdcLegendreConformalPosition = new ConformalPosition();
 
 //  m_cdcLegendreQuadTree = new QuadTree(-1.*m_rc, m_rc, 0, m_nbinsTheta, 0, NULL);
-  m_cdcLegendreQuadTree = new QuadTreeLegendre(m_rMin, m_rMax,  /*-1.*m_rc, m_rc,*/ 0, m_nbinsTheta, 0, NULL);
+  m_cdcLegendreQuadTree = new QuadTreeLegendre(0, m_nbinsTheta, m_rMin, m_rMax,  /*-1.*m_rc, m_rc,*/ 0, nullptr);
   m_cdcLegendreQuadTree->setLastLevel(m_maxLevel);
 //  m_cdcLegendreQuadTree->buildNeighborhood(m_maxLevel);
 

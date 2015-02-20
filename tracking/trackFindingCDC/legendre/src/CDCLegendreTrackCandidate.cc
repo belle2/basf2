@@ -80,8 +80,8 @@ TrackCandidate::TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList) :
     }
     if (nHitsNodeMax < node->getNItems()) {
       nHitsNodeMax = node->getNItems();
-      m_theta = node->getYMean() * boost::math::constants::pi<double>() / TrigonometricalLookupTable::Instance().getNBinsTheta();
-      m_r = node->getXMean();
+      m_theta = node->getXMean() * boost::math::constants::pi<double>() / TrigonometricalLookupTable::Instance().getNBinsTheta();
+      m_r = node->getYMean();
     }
     m_nodes.push_back(node);
   }

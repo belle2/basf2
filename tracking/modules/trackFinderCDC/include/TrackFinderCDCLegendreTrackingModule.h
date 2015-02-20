@@ -98,7 +98,7 @@ namespace Belle2 {
 
   private:
 
-    typedef TrackFindingCDC::QuadTreeTemplate<double, int, TrackFindingCDC::TrackHit> QuadTreeLegendre;
+    typedef TrackFindingCDC::QuadTreeTemplate<int, double, TrackFindingCDC::TrackHit> QuadTreeLegendre;
 
     std::string m_cdcHitsColName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
     std::string m_gfTrackCandsColName; /**< Output genfit track candidates collection name*/

@@ -42,7 +42,7 @@ namespace Belle2 {
     class QuadTreeCandidateCreator {
 
     public:
-      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+      typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
       QuadTreeCandidateCreator() {};
 

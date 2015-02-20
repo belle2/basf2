@@ -21,7 +21,7 @@ namespace Belle2 {
 
     class QuadTreeNeighborFinder {
     public:
-      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+      typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
       QuadTreeNeighborFinder() {};
       ~QuadTreeNeighborFinder() {};

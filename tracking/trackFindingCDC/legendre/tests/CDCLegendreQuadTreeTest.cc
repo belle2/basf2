@@ -27,7 +27,7 @@ using namespace TrackFindingCDC;
 TEST(TrackFindingCDCTest, legendre_QuadTreeTest)
 {
 
-  typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+  typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
   QuadTreeLegendre qt(-1.0, 1.0, 0, std::pow(2, 13), 0, nullptr);
 

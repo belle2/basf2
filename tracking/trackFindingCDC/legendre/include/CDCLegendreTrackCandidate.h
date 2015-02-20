@@ -42,7 +42,7 @@ namespace Belle2 {
     class TrackCandidate {
     public:
 
-      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+      typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
       /** Enum for charge hypotheses of track.*/
       enum ChargeHypotheses {

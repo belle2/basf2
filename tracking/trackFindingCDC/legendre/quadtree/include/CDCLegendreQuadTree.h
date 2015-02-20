@@ -232,7 +232,7 @@ namespace Belle2 {
       void fillChildrenForced() {
         if (!m_parent->checkFilled()) {
           m_parent->fillChildrenForced<processor>();
-          processor::fillChildren(m_children.get(), m_items);
+          processor::fillChildren(this, m_items);
           setFilled();
         }
       } ;
@@ -284,7 +284,7 @@ namespace Belle2 {
       inline typeX getXMax() const {return static_cast<typeX>(m_xMax);};
 
       /** Get "r" value of given bin border */
-      inline typeX getXBin(unsigned int bin) const { return static_cast<typeX>(m_xBins[bin]); };
+      inline typeX getXBin(int bin) const { return static_cast<typeX>(m_xBins[bin]); };
 
       /** Get number of bins in "Theta" direction */
       inline int getYNbins() const {return m_nBinsY;};
@@ -296,7 +296,7 @@ namespace Belle2 {
       inline typeY getYMax() const {return m_yMax;};
 
       /** Get "r" value of given bin border */
-      inline typeX getYBin(unsigned int bin) const { return static_cast<typeX>(m_yBins[bin]); };
+      inline typeY getYBin(int bin) const { return static_cast<typeY>(m_yBins[bin]); };
 
       /** Return pointer to the parent of the node */
       inline QuadTreeTemplate<typeX, typeY, typeData>* getParent() const {return m_parent;};

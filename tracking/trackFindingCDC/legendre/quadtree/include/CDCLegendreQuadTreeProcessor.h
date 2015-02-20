@@ -60,7 +60,7 @@ namespace Belle2 {
     template<typename typeX, typename typeY, class typeData>
     class QuadTreeTemplate;
 
-    typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+    typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
     class FastHough;
     class TrackHit;
@@ -72,7 +72,7 @@ namespace Belle2 {
 
       QuadTreeProcessor() {;};
 
-      static void fillTree(QuadTreeTemplate<double, int, TrackHit>* node, QuadTreeTemplate<double, int, TrackHit>::CandidateProcessorLambda& lmdProcessor) {
+      static void fillTree(QuadTreeTemplate<int, double, TrackHit>* node, QuadTreeTemplate<int, double, TrackHit>::CandidateProcessorLambda& lmdProcessor) {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << "hits at level " << node->getLevel());
         if (node->getItemsVector().size() < node->getNItemsThreshold())
           return;
@@ -87,12 +87,12 @@ namespace Belle2 {
           node->initializeChildren<QuadTreeProcessor>();
 
         if (!node->checkFilled()) {
-          fillChildren(node->getChildren(), node->getItemsVector());
+          fillChildren(node, node->getItemsVector());
           node->setFilled();
         }
 
-        int m_nbins_theta = node->getYNbins();
-        int m_nbins_r = node->getXNbins();
+        int m_nbins_theta = node->getXNbins();
+        int m_nbins_r = node->getYNbins();
 
         bool binUsed[m_nbins_theta][m_nbins_r];
         for (int ii = 0; ii < m_nbins_theta; ii++)
@@ -124,12 +124,12 @@ namespace Belle2 {
         }
       }
 
-      static void fillGivenTree(QuadTreeTemplate<double, int, TrackHit>* node, QuadTreeTemplate<double, int, TrackHit>::CandidateProcessorLambda& lmdProcessor, unsigned int m_nHitsThreshold, double m_rThreshold) {
+      static void fillGivenTree(QuadTreeTemplate<int, double, TrackHit>* node, QuadTreeTemplate<int, double, TrackHit>::CandidateProcessorLambda& lmdProcessor, unsigned int m_nHitsThreshold, double m_rThreshold) {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << "hits at level " << node->getLevel());
         if (node->getItemsVector().size() < m_nHitsThreshold)
           return;
-        if ((node->getXMin() * node->getXMax() >= 0) && (fabs(node->getXMin()) > m_rThreshold)  && (fabs(node->getXMax()) > m_rThreshold))
-          return;
+//        if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > m_rThreshold)  && (fabs(node->getYMax()) > m_rThreshold))
+//          return;
         if (node->getLevel() == node->getLastLevel()) {
           lmdProcessor(node);
           return;
@@ -139,12 +139,12 @@ namespace Belle2 {
           node->initializeChildren<QuadTreeProcessor>();
 
         if (!node->checkFilled()) {
-          fillChildren(node->getChildren(), node->getItemsVector());
+          fillChildren(node, node->getItemsVector());
           node->setFilled();
         }
 
-        int m_nbins_theta = node->getYNbins();
-        int m_nbins_r = node->getXNbins();
+        int m_nbins_theta = node->getXNbins();
+        int m_nbins_r = node->getYNbins();
 
         bool binUsed[m_nbins_theta][m_nbins_r];
         for (int ii = 0; ii < m_nbins_theta; ii++)
@@ -176,102 +176,103 @@ namespace Belle2 {
         }
       }
 
-      static void fillChildren(QuadChildrenTemplate<double, int, TrackHit>* m_children, std::vector<TrackHit*>& m_hits) {
+      static void fillChildren(QuadTreeTemplate<int, double, TrackHit>* m_node, std::vector<TrackHit*>& m_hits) {
 
-        float r_temp, r_1, r_2;
-        int sizeX = m_children->m_sizeX;
-        int sizeY = m_children->m_sizeY;
-        float dist_1[sizeX + 1][sizeY + 1];
-        float dist_2[sizeX + 1][sizeY + 1];
-        float m_r;
-        unsigned int m_theta;
+        int sizeX = 2;
+        int sizeY = 2;
+        double dist_1[2][2];
+        double dist_2[2][2];
+        const size_t neededSize = 2 * m_hits.size();
+        m_node->getChildren()->apply([neededSize](QuadTreeTemplate<int, double, TrackHit>* qt) {qt->reserveHitsVector(neededSize);});
 
         //Voting within the four bins
         for (TrackHit * hit : m_hits) {
           //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
           if (hit->getHitUsage() != TrackHit::not_used)
             continue;
-          for (int t_index = 0; t_index < sizeX + 1; ++t_index) {
 
-            // for bin overlapping!
-            if (t_index < sizeX)
-              m_theta = m_children->get(t_index, 0)->getYMin();
-            else
-              m_theta = m_children->get(t_index - 1, 0)->getYMax();
-
-
-            r_temp = hit->getConformalX()
-                     * TrigonometricalLookupTable::Instance().cosTheta(m_theta)
-                     + hit->getConformalY()
-                     * TrigonometricalLookupTable::Instance().sinTheta(m_theta);
-
-            r_1 = r_temp + hit->getConformalDriftLength();
-            r_2 = r_temp - hit->getConformalDriftLength();
-
-            //calculate distances of lines to horizontal bin border
-            for (int r_index = 0; r_index < sizeY + 1; ++r_index) {
-              if (r_index < sizeY)
-                m_r = static_cast<float>(m_children->get(0, r_index)->getXMin());
-              else
-                m_r = static_cast<float>(m_children->get(0, r_index - 1)->getXMax());
-
-              dist_1[t_index][r_index] = m_r - r_1;
-              dist_2[t_index][r_index] = m_r - r_2;
-            }
-          }
-
-          //B2DEBUG(100, "VOTING for hit " << hit_counter << " of " << nhitsToReserve);
-          //actual voting, based on the distances (test, if line is passing though the bin)
           for (int t_index = 0; t_index < sizeX; ++t_index) {
             for (int r_index = 0; r_index < sizeY; ++r_index) {
+
+              double r_temp_min = hit->getConformalX()
+                                  * TrigonometricalLookupTable::Instance().cosTheta(m_node->getChildren()->get(t_index, r_index)->getXMin())
+                                  + hit->getConformalY()
+                                  * TrigonometricalLookupTable::Instance().sinTheta(m_node->getChildren()->get(t_index, r_index)->getXMin());
+              double r_temp_max = hit->getConformalX()
+                                  * TrigonometricalLookupTable::Instance().cosTheta(m_node->getChildren()->get(t_index, r_index)->getXMax())
+                                  + hit->getConformalY()
+                                  * TrigonometricalLookupTable::Instance().sinTheta(m_node->getChildren()->get(t_index, r_index)->getXMax());
+
+              double r_min1 = r_temp_min - hit->getConformalDriftLength();
+              double r_min2 = r_temp_min + hit->getConformalDriftLength();
+              double r_max1 = r_temp_max - hit->getConformalDriftLength();
+              double r_max2 = r_temp_max + hit->getConformalDriftLength();
+
+              double m_rMin = static_cast<double>(m_node->getChildren()->get(t_index, r_index)->getYMin());
+              double m_rMax = static_cast<double>(m_node->getChildren()->get(t_index, r_index)->getYMax());
+
+              dist_1[0][0] = m_rMin - r_min1;
+              dist_1[0][1] = m_rMin - r_max1;
+              dist_1[1][0] = m_rMax - r_min1;
+              dist_1[1][1] = m_rMax - r_max1;
+
+              dist_2[0][0] = m_rMin - r_min2;
+              dist_2[0][1] = m_rMin - r_max2;
+              dist_2[1][0] = m_rMax - r_min2;
+              dist_2[1][1] = m_rMax - r_max2;
+
+
               //curves are assumed to be straight lines, might be a reasonable assumption locally
-              if (!FastHough::sameSign(dist_1[t_index][r_index],
-                                       dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index],
-                                       dist_1[t_index + 1][r_index + 1])) {
+              if (!FastHough::sameSign(dist_1[0][0], dist_1[0][1],
+                                       dist_1[1][0], dist_1[1][1])) {
                 //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
-                m_children->get(t_index, r_index)->insertItem(hit);
-              } else if (!FastHough::sameSign(dist_2[t_index][r_index],
-                                              dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index],
-                                              dist_2[t_index + 1][r_index + 1])) {
+                m_node->getChildren()->get(t_index, r_index)->insertItem(hit);
+              } else if (!FastHough::sameSign(dist_2[0][0], dist_2[0][1],
+                                              dist_2[1][0], dist_2[1][1])) {
                 //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
-                m_children->get(t_index, r_index)->insertItem(hit);
+                m_node->getChildren()->get(t_index, r_index)->insertItem(hit);
               }
+
+
+
             }
           }
+
           //B2DEBUG(100, "MOVING to next hit");
         }
       }
 
-      static void initializeChildren(QuadTreeTemplate<double, int, TrackHit>* node, QuadChildrenTemplate<double, int, TrackHit>* m_children) {
+      static void initializeChildren(QuadTreeTemplate<int, double, TrackHit>* node, QuadChildrenTemplate<int, double, TrackHit>* m_children) {
+
         for (int i = 0; i < 2; ++i) {
           //m_children[i] = new QuadTreeTemplate*[m_nbins_r];
           for (int j = 0; j < 2; ++j) {
             if (node->getLevel() < (node->getLastLevel() - 5)) {
-              m_children->set(i, j, new QuadTreeTemplate<double, int, TrackHit>(node->getXBin(j), node->getXBin(j + 1), node->getYBin(i),
-                              node->getYBin(i + 1), node->getLevel() + 1, node));
+              m_children->set(i, j, new QuadTreeTemplate<int, double, TrackHit>(node->getXBin(i), node->getXBin(i + 1), node->getYBin(j),
+                              node->getYBin(j + 1), node->getLevel() + 1, node));
               m_children->get(i, j)->setLastLevel(node->getLastLevel());
               m_children->get(i, j)->setNItemsThreshold(node->getNItemsThreshold());
             } else {
-              double r1 = node->getXBin(j) - fabs(node->getXBin(j + 1) - node->getXBin(j)) / 4.;
-              double r2 = node->getXBin(j + 1) + fabs(node->getXBin(j + 1) - node->getXBin(j)) / 4.;
+              double r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
+              double r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
               //        double r1 = m_r[j];
               //        double r2 = m_r[j+1];
               //            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
               //            theta_2_overlap = thetaBin[t_index + 1]/* + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
               //            theta_1_overlap = thetaBin[t_index] - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
               //            theta_2_overlap = thetaBin[t_index + 1] + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
-              int theta1 = node->getYBin(i) - abs(pow(2, node->getLastLevel() + 0 - node->getLevel()) / 4);
-              int theta2 = node->getYBin(i + 1)
+              int theta1 = node->getXBin(i) - abs(pow(2, node->getLastLevel() + 0 - node->getLevel()) / 4);
+              int theta2 = node->getXBin(i + 1)
                            + abs(pow(2, node->getLastLevel() + 0 - node->getLevel()) / 4);
               //        typeY theta1 = m_thetaBin[i];
               //        int theta2 = m_thetaBin[i + 1];
 
               if (theta1 < 0)
-                theta1 = node->getYBin(i);
+                theta1 = node->getXBin(i);
               if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
-                theta2 = node->getYBin(i + 1);
+                theta2 = node->getXBin(i + 1);
 
-              m_children->set(i, j, new QuadTreeTemplate<double, int, TrackHit>(r1, r2, theta1, theta2, node->getLevel() + 1,
+              m_children->set(i, j, new QuadTreeTemplate<int, double, TrackHit>(theta1, theta2, r1, r2, node->getLevel() + 1,
                               node));
               m_children->get(i, j)->setLastLevel(node->getLastLevel());
               m_children->get(i, j)->setNItemsThreshold(node->getNItemsThreshold());

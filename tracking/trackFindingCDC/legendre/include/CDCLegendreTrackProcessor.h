@@ -45,7 +45,7 @@ namespace Belle2 {
 
     class TrackProcessor {
     public:
-      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+      typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
       TrackProcessor(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer);
 

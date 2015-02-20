@@ -44,7 +44,7 @@ namespace Belle2 {
 
     class StereohitsProcesser {
     public:
-      typedef QuadTreeTemplate<double, int, TrackHit> QuadTreeLegendre;
+      typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
       StereohitsProcesser();
 

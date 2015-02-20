@@ -51,7 +51,8 @@ class Cluster:
         if belle2_release_dir is not None:
             self.setuprel += ' ' + belle2_release_dir.split('/')[-1]
         if belle2_local_dir is not None:
-            self.setuprel = 'MY_BELLE2_DIR=' + self.adjust_path(belle2_local_dir) + ' ' + self.setuprel
+            self.setuprel = 'MY_BELLE2_DIR=' + \
+                self.adjust_path(belle2_local_dir) + ' ' + self.setuprel
         if os.environ.get('BELLE2_OPTION') != 'debug':
             self.setuprel += '; setoption ' + os.environ.get('BELLE2_OPTION')
 
@@ -86,13 +87,15 @@ class Cluster:
 
         return True
 
-    def execute(self, job, options='', dry=False):
+    def execute(self, job, options='', dry=False, tag='current'):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
 
         @param job: The steering file object that should be executed
         @param options: Options that will be given to the basf2 command
+        @param dry: Whether to perform a dry run or not
+        @param tag: The folder within the results directory
         @return: None
         """
 
@@ -101,7 +104,8 @@ class Cluster:
         # convention, data files will be stored in the parent dir.
         # Then make sure the folder exists (create if it does not exist) and
         # change to cwd to this folder.
-        output_dir = os.path.abspath('./results/current/' + job.package)
+        output_dir = os.path.abspath('./results/{0}/{1}'.
+                                     format(tag, job.package))
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -146,23 +150,26 @@ class Cluster:
         os.chmod(tmp_name, st.st_mode | stat.S_IEXEC)
 
         # Prepare the command line command for submission to the cluster
-        params = self.submit_command.replace('LOGFILE', log_file).split() + [tmp_name]
+        params = self.submit_command.replace('LOGFILE',
+                                             log_file).split() + [tmp_name]
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
 
         # Submit it to the cluster. The steering
         # file output will be written to 'log_file' (see above).
-        # If we are performing a dry run, don't send anything to the cluster and just
-        # create the *.done file right away and delete the *.sh file.
+        # If we are performing a dry run, don't send anything to the cluster
+        # and just create the *.done file right away and delete the *.sh file.
         if not dry:
-            process = subprocess.Popen(params, stdout=self.clusterlog, stderr=self.clusterlog)
+            process = subprocess.Popen(params, stdout=self.clusterlog,
+                                       stderr=self.clusterlog)
 
             # Check whether the submission succeeded
             if process.wait() != 0:
                 job.status = 'failed'
         else:
-            os.system('echo 0 > {0}/script_{1}.done'.format(self.path, job.name))
+            os.system('echo 0 > {0}/script_{1}.done'.format(self.path,
+                                                            job.name))
             os.system('rm {0}'.format(tmp_name))
 
     def is_job_finished(self, job):
@@ -182,7 +189,7 @@ class Cluster:
         # finished.
         if os.path.isfile(donefile_path):
 
-            # Read the returncode / exit_status for the job from the *.done-file
+            # Read the returncode/exit_status for the job from the *.done-file
             with open(donefile_path) as f:
                 try:
                     returncode = int(f.read().strip())
@@ -192,7 +199,7 @@ class Cluster:
             # Delete the *.done file
             os.remove(donefile_path)
 
-            #Return that the job is finished + the return code for it
+            # Return that the job is finished + the return code for it
             return [True, returncode]
 
         # If no such file exists, the job has not yet finished

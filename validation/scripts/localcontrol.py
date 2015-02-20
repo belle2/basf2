@@ -10,7 +10,7 @@ class Local:
     subprocess-module. It provides two methods:
     - is_job_finished(job): Returns True or False, depending on whether the job
         has finished execution
-    - execute(job): Takes a job and executes it by spawning a new process for it
+    - execute(job): Takes a job and executes it by spawning a new process
     """
 
     def __init__(self, max_number_of_processes=None):
@@ -21,24 +21,29 @@ class Local:
         - Initialized a logger which writes to validate_basf2.py's log.
         """
 
-        ## A dict which holds the connections between the jobs (=Script objects)
+        # A dict which holds the connections between the jobs (=Script objects)
         # and the processes that were spawned for them
         self.jobs_processes = {}
 
-        ## Contains a reference to the logger-object from validate_basf2
+        # Contains a reference to the logger-object from validate_basf2
         # Set up the logging functionality for the 'local execution'-Class,
         # so we can log to validate_basf2.py's log what is going on in
         # .execute and .is_finished
         self.logger = logging.getLogger('validate_basf2')
 
-        ## Parameter for maximal number of parallel processes, use system CPU count if not specified
-        # use the default of 10 if the cpu_count call is not supported on current platform
+        # Parameter for maximal number of parallel processes, use system CPU
+        # count if not specified use the default of 10 if the cpu_count call
+        # is not supported on current platform
         try:
-            self.max_number_of_processes = multiprocessing.cpu_count() if max_number_of_processes is None else max_number_of_processes
+            if max_number_of_processes is None:
+                self.max_number_of_processes = multiprocessing.cpu_count()
+            else:
+                self.max_number_of_processes = max_number_of_processes
         except NotImplementedError:
             self.max_number_of_processes = 10
 
-        self.logger.note("Executing validation with " + str(self.max_number_of_processes) + " parallel processes")
+        self.logger.note("Executing validation with {0} parallel processes.".
+                         format(self.max_number_of_processes))
 
         ## Counter for number of running parallel processes
         self.current_number_of_processes = 0
@@ -50,15 +55,18 @@ class Local:
         @return: True if a new process can be spawned, otherwise False
         """
 
-        return (self.max_number_of_processes > 0) and (self.current_number_of_processes < self.max_number_of_processes)
+        return (self.max_number_of_processes > 0) and \
+            (self.current_number_of_processes < self.max_number_of_processes)
 
-    def execute(self, job, options='', dry=False):
+    def execute(self, job, options='', dry=False, tag='current'):
         """!
         Takes a Script object and a string with options and runs it locally,
         either with ROOT or with basf2, depending on the file type.
 
         @param job: The steering file object that should be executed
         @param options: Options that will be given to the basf2 command
+        @param dry: Whether to perform a dry run or not
+        @param tag: The name of the folder within the results directory
         @return: None
         """
 
@@ -71,7 +79,7 @@ class Local:
         # convention, data files will be stored in the parent dir.
         # Then make sure the folder exists (create if it does not exist) and
         # change to cwd to this folder.
-        output_dir = './results/current/' + job.package
+        output_dir = './results/{0}/{1}'.format(tag, job.package)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         os.chdir(output_dir)

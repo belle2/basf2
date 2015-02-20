@@ -135,8 +135,8 @@ def serve_existing_plots(list_of_revisions):
     """
 
     # The path where the content.html should be
-    src = './plots/{0}/content.html'.format('_'.join(
-        sorted(list_of_revisions)))
+    src = './plots/{0}/content.html'.\
+        format('_'.join(sorted(list_of_revisions)))
 
     # The path where we need it
     dst = './content.html'

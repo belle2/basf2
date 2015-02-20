@@ -31,9 +31,9 @@ import pprint
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
-################################################################################
-###                            Class Definition                              ###
-################################################################################
+###############################################################################
+###                            Class Definition                             ###
+###############################################################################
 
 class Validation:
     """!
@@ -45,56 +45,62 @@ class Validation:
     or a method.
     """
 
-    def __init__(self):
+    def __init__(self, tag='current'):
         """!
         The default constructor. Initializes all those variables that will be
         globally accessible later on. Does not return anything.
         """
 
-        # Copy the html skeleton if it is not yet available
+        # Copy the HTML skeleton if it is not yet available
         if not os.path.isdir('html'):
             belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
-            if belle2_local_dir is not None and os.path.isdir(belle2_local_dir + '/validation/html'):
+            if belle2_local_dir is not None and \
+               os.path.isdir(belle2_local_dir + '/validation/html'):
                 validation_dir = belle2_local_dir
             else:
                 validation_dir = os.environ['BELLE2_RELEASE_DIR']
             shutil.copytree(validation_dir + '/validation/html', 'html')
 
-        ## The logging-object for the validation (Instance of the logging-module)
-        # Initialize the log as 'None' and then call the method 'create_log()'
-        # to create the actual log.
+        # The name which will be used to create a folder in the results
+        # directory. Default is 'current'.
+        self.tag = tag
+
+        # The logging-object for the validation (Instance of the logging-
+        # module). Initialize the log as 'None' and then call the method
+        # 'create_log()' to create the actual log.
         self.log = None
         self.create_log()
 
-        ## This dictionary holds the paths to the local and central release dir
+        # This dictionary holds the paths to the local and central release dir
         # (or 'None' if one of them does not exist)
         self.basepaths = {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
-                          'central': os.environ.get('BELLE2_RELEASE_DIR', None)}
+                          'central': os.environ.get('BELLE2_RELEASE_DIR',
+                                                    None)}
 
-        ## The list which holds all steering file objects
+        # The list which holds all steering file objects
         # (as instances of class Script)
-        self.list_of_scripts = []   # Script objects
+        self.list_of_scripts = []
 
-        ## A list of all packages from which we have collected steering files
+        # A list of all packages from which we have collected steering files
         self.list_of_packages = []
 
-        ## The list of packages to be included in the validation. If we are
+        # The list of packages to be included in the validation. If we are
         #  running a complete validation, this will be None.
         self.packages = None
 
-        ## Additional arguments for basf2, if we received any from the command
+        # Additional arguments for basf2, if we received any from the command
         #  line arguments
         self.basf2_options = ''
 
-        ## A variable which holds the mode, i.e. 'local' for local
+        # A variable which holds the mode, i.e. 'local' for local
         #  multi-processing and 'cluster' for cluster usage
         self.mode = None
 
-        ## Defines whether the validation is run in quiet mode, i.e. without
+        # Defines whether the validation is run in quiet mode, i.e. without
         #  the dynamic progress bar
         self.quiet = False
 
-        ## Defines if a dry run is performed, i.e. a run where the steering
+        # Defines if a dry run is performed, i.e. a run where the steering
         #  files are not actually started (for debugging purposes)
         self.dry = False
 
@@ -112,7 +118,8 @@ class Validation:
         # It adds all steering files from the validation-folder as a default
         # dependency, because a lot of scripts depend on one data script that
         # is created by a steering file in the validation-folder.
-        default_depend = [script for script in validation.list_of_scripts if script.package == 'validation']
+        default_depend = [script for script in validation.list_of_scripts
+                          if script.package == 'validation']
         for script_object in self.list_of_scripts:
             if not script_object.header and script_object.package != \
                     'validation':
@@ -166,7 +173,7 @@ class Validation:
         # Now we add another custom level 'NOTE'. This is because we don't
         # want to print ERRORs and WARNINGs to the console output, therefore
         # we need a higher level.
-        # We define the new level and tell 'self.log' what to do when we use it.
+        # We define the new level and tell 'self.log' what to do when we use it
         logging.NOTE = 100
         logging.addLevelName(logging.NOTE, 'NOTE')
         self.log.note = lambda msg, *args: self.log._log(logging.NOTE,
@@ -193,12 +200,13 @@ class Validation:
         # information available for debugging later.
 
         # Make sure the folder for the log file exists
-        log_dir = './results/current/__general__/'
+        log_dir = './results/{0}/__general__/'.format(self.tag)
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
         # Define the handler and its level (=DEBUG to get everything)
-        file_handler = logging.FileHandler(log_dir + 'validate_basf2.log', 'w+')
+        file_handler = logging.FileHandler(log_dir + 'validate_basf2.log',
+                                           'w+')
         file_handler.setLevel(logging.DEBUG)
 
         # Format the handler. We want the datetime, the module that produced
@@ -224,7 +232,7 @@ class Validation:
 
         # Then add those central folders that do not have a local match
         for (package, folder) in get_validation_folders('central').items():
-            if not package in validation_folders.keys():
+            if package not in validation_folders.keys():
                 validation_folders[package] = folder
 
         # If we are not performing a complete validation, we need to remove
@@ -259,7 +267,8 @@ class Validation:
         """
 
         # Use the local execution for all plotting scripts
-        local_control = localcontrol.Local(max_number_of_processes=self.parallel)
+        local_control = localcontrol.\
+            Local(max_number_of_processes=self.parallel)
 
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
@@ -275,7 +284,8 @@ class Validation:
             print
 
         # The list of scripts that have to be processed
-        remaining_scripts = [script for script in self.list_of_scripts if script.status == 'waiting']
+        remaining_scripts = [script for script in self.list_of_scripts
+                             if script.status == 'waiting']
 
         # While there are scripts that have not yet been executed...
         while remaining_scripts:
@@ -287,7 +297,8 @@ class Validation:
                 if script_object.status == 'running':
 
                     # Check if the script has finished:
-                    result = script_object.control.is_job_finished(script_object)
+                    result = script_object.control.\
+                        is_job_finished(script_object)
 
                     # If it has finished:
                     if result[0]:
@@ -295,7 +306,8 @@ class Validation:
                         # Write to log that the script finished
                         self.log.debug('Finished: ' + script_object.path)
 
-                        # Check for the return code and set variables correspondingly
+                        # Check for the return code and set variables
+                        # accordingly
                         script_object.status = 'done'
                         script_object.returncode = result[1]
                         if result[1] != 0:
@@ -307,22 +319,33 @@ class Validation:
                             self.skip_script(script_object)
 
                         else:
-                            # Remove this script from the dependencies of dependent script objects
+                            # Remove this script from the dependencies
+                            # of dependent script objects
                             for dependent_script in remaining_scripts:
-                                if script_object in dependent_script.dependencies:
-                                    dependent_script.dependencies.remove(script_object)
+                                if script_object in \
+                                   dependent_script.dependencies:
+                                    dependent_script.dependencies.\
+                                        remove(script_object)
 
                         # Some printout in quiet mode
                         if self.quiet:
-                            waiting = [script for script in remaining_scripts if script.status == 'waiting']
-                            running = [script for script in remaining_scripts if script.status == 'running']
-                            print 'Finished [%d,%d]: %s -> %s' % (len(waiting), len(running), script_object.path, script_object.status)
+                            waiting = [script for script in remaining_scripts
+                                       if script.status == 'waiting']
+                            running = [script for script in remaining_scripts
+                                       if script.status == 'running']
+                            print 'Finished [{0},{1}]: {2} -> {3}'.\
+                                format(len(waiting), len(running),
+                                       script_object.path,
+                                       script_object.status)
 
-                # Otherwise (the script is waiting) and if it is ready to be executed
+                # Otherwise (the script is waiting) and if it is ready to be
+                # executed
                 elif not script_object.dependencies:
 
-                    # Determine the way of execution depending on whether data files are created
-                    if script_object.header and script_object.header.get('output', []):
+                    # Determine the way of execution depending on whether
+                    # data files are created
+                    if script_object.header and \
+                       script_object.header.get('output', []):
                         script_object.control = control
                     else:
                         script_object.control = local_control
@@ -330,22 +353,34 @@ class Validation:
                     # Do not spawn processes if there are already too many!
                     if script_object.control.available():
 
-                        # Start execution and set attributes for the script
+                        # Write to log which script is being started
                         self.log.debug('Starting ' + script_object.path)
+
+                        # Set script object variables accordingly
                         if script_object.status == 'failed':
-                            self.log.warning('Starting of {0} failed'.format(script_object.path))
+                            self.log.warning('Starting of {0} failed'.
+                                             format(script_object.path))
                         else:
                             script_object.status = 'running'
-                        script_object.control.execute(script_object, self.basf2_options, self.dry)
+
+                        # Actually start the script execution
+                        script_object.control.execute(script_object,
+                                                      self.basf2_options,
+                                                      self.dry, self.tag)
 
                         # Some printout in quiet mode
                         if self.quiet:
-                            waiting = [script for script in remaining_scripts if script.status == 'waiting']
-                            running = [script for script in remaining_scripts if script.status == 'running']
-                            print 'Started [%d,%d]: %s' % (len(waiting), len(running), script_object.path)
+                            waiting = [_ for _ in remaining_scripts
+                                       if _.status == 'waiting']
+                            running = [_ for _ in remaining_scripts
+                                       if _.status == 'running']
+                            print 'Started [{0},{1}]: {2}'.\
+                                format(len(waiting), len(running),
+                                       script_object.path)
 
             # Update the list of scripts that have to be processed
-            remaining_scripts = [script for script in remaining_scripts if script.status in ['waiting', 'running']]
+            remaining_scripts = [script for script in remaining_scripts if
+                                 script.status in ['waiting', 'running']]
 
             # Wait for one second before starting again
             time.sleep(1)
@@ -363,7 +398,8 @@ class Validation:
         @return: None
         """
 
-        # Go to the html directory and create a link to the results folder if it is not yet existing
+        # Go to the html directory and create a link to the results folder
+        # if it is not yet existing
         save_dir = os.getcwd()
         os.chdir('html')
         if not os.path.exists('results'):
@@ -387,38 +423,38 @@ class Script:
         The default constructor.
         """
 
-        ## Pointer to the script object itself
+        # Pointer to the script object itself
         # Is this necessary?
         self._object = self
 
-        ## The (absolute) path of the steering file
+        # The (absolute) path of the steering file
         self.path = path
 
-        ## The name of the steering file. Basically the file name of the
+        # The name of the steering file. Basically the file name of the
         # steering file, but everything that is not a letter is replaced
         # by an underscore. Useful e.g. for cluster controls.
         self.name = re.sub(r'[\W_]+', '_', str(os.path.basename(self.path)))
 
-        ## The package to which the steering file belongs
+        # The package to which the steering file belongs
         self.package = package
 
-        ## The information from the file header
+        # The information from the file header
         self.header = None
 
-        ## A list of script objects, on which this script depends
+        # A list of script objects, on which this script depends
         self.dependencies = []
 
-        ## Current status of the script.
+        # Current status of the script.
         # Possible values: 'waiting', 'running', 'finished', 'failed'
         self.status = 'waiting'
 
-        ## Which control is used for executing the script, i.e. cluster or
+        # Which control is used for executing the script, i.e. cluster or
         # local. Useful when using different script level, e.g. data creation
         # scripts are being run on the cluster, but plotting scripts are
         # executed locally
         self.control = None
 
-        ## The returncode of the script. Should be 0 if all went well.
+        # The returncode of the script. Should be 0 if all went well.
         self.returncode = None
 
     def dump(self):
@@ -467,7 +503,8 @@ class Script:
             # is presumed as a dependency
 
             # Get a list of all the script in the same directory
-            in_same_pkg = [script for script in validation.list_of_scripts if script.package == self.package]
+            in_same_pkg = [script for script in validation.list_of_scripts
+                           if script.package == self.package]
 
             # Divide that list into .py and .c files, because .py files are
             # always executed before .C files:
@@ -525,7 +562,8 @@ class Script:
             # The keywords that should be parsed into a list
             list_tags = ['input', 'output', 'contact']
 
-            # If the tag is empty branch.text is None. Replacing None with an empty string in this case.
+            # If the tag is empty branch.text is None. Replacing None with an
+            # empty string in this case.
             branch_text = branch.text or ""
 
             # Format the values of each branch
@@ -548,15 +586,15 @@ class Script:
 
 
 ###############################################################################
-###                         Function definitions                             ###
-################################################################################
+###                         Function definitions                            ###
+###############################################################################
 
 def find_creator(outputfile, package):
     """!
     This function receives the name of a file and tries to find the file
     in the given package which produces this file, i.e. find the file in
     whose header 'outputfile' is listed under <output></output>.
-    It then returns a list of all Scripts who claim to be creating 'outputfile'.
+    It then returns a list of all Scripts who claim to be creating 'outputfile'
 
     @param outputfile: The file of which we want to know by which script is
         created
@@ -565,7 +603,8 @@ def find_creator(outputfile, package):
 
     # Get a list of all Script objects for scripts in the given package as well
     # as from the validation-folder
-    candidates = [script for script in validation.list_of_scripts if script.package in [package, 'validation']]
+    candidates = [script for script in validation.list_of_scripts
+                  if script.package in [package, 'validation']]
 
     # Reserve some space for the results we will return
     results = []
@@ -573,7 +612,8 @@ def find_creator(outputfile, package):
     # Loop over all candidates and check if they have 'outputfile' listed
     # under their outputs
     for candidate in candidates:
-        if candidate.header and outputfile in candidate.header.get('output', []):
+        if candidate.header and \
+           outputfile in candidate.header.get('output', []):
             results.append(candidate)
 
     # Return our results and warn if there is more than one creator
@@ -642,24 +682,33 @@ def parse_cmd_line_arguments():
     parser = argparse.ArgumentParser()
 
     # Define the accepted command line flags and read them in
+    parser.add_argument("-d", "--dry", help="Perform a dry run, i.e. run the"
+                        "validation module without actually executing the"
+                        "steering files (for debugging purposes).",
+                        action='store_true')
+    parser.add_argument("-m", "--mode", help="The mode which will be used for "
+                        "running the validation. Two possible values: 'local' "
+                        "or 'cluster'. Default is 'local'",
+                        type=str, nargs='?', default='local')
     parser.add_argument("-o", "--options", help="A string which will be given"
                         "to basf2 as arguments. Example: '-n 100'. "
-                        "Quotes are necessary!", type=str, nargs='*')
+                        "Quotes are necessary!",
+                        type=str, nargs='*')
+    parser.add_argument("-p", "--parallel", help="The maximum number of "
+                        "parallel processes to run the validation. Only used "
+                        "for local execution. Default is number of CPU cores.",
+                        type=int, nargs='?', default=None)
     parser.add_argument("-pkg", "--packages", help="The name(s) of one or "
                         "multiple packages. Validation will be run "
                         "only on these packages! E.g. -pkg analysis arich",
                         type=str, nargs='*')
-    parser.add_argument("-m", "--mode", help="The mode which will be used for "
-                        "running the validation. Two possible values: 'local' or "
-                        "'cluster'. Default is 'local'", type=str, nargs='?', default='local')
-    parser.add_argument("-p", "--parallel", help="The maximum number of parallel processes "
-                        "to run the validation. Only used for local execution. Default is "
-                        "number of CPU cores.", type=int, nargs='?', default=None)
     parser.add_argument("-q", "--quiet", help="Suppress the progress bar",
                         action='store_true')
-    parser.add_argument("-d", "--dry", help="Perform a dry run, i.e. run the validation module "
-                        "without actually executing the steering files (for debugging purposes).",
-                        action='store_true')
+    parser.add_argument("-t", "--tag", help="The name that will be used for "
+                        "the current revision in the results folder. Possibly "
+                        "useful for local basf2 instances where there is no"
+                        "BuildBot'. Default is 'current'",
+                        type=str, nargs='?', default='current')
 
     # Return the parsed arguments!
     return parser.parse_args()
@@ -750,7 +799,7 @@ def draw_progress_bar(delete_lines, barlength=50):
     running = [os.path.basename(__.path) for __ in validation.list_of_scripts
                if __.status == 'running']
 
-    # If nothing is currently running
+    # If nothing is repeatedly running
     if not running:
         running = ['-']
 
@@ -760,16 +809,16 @@ def draw_progress_bar(delete_lines, barlength=50):
 
     return len(running) + 2
 
-################################################################################
-###                     Actual program starts here!                          ###
-################################################################################
+###############################################################################
+###                     Actual program starts here!                         ###
+###############################################################################
 
 # If there is no release of basf2 set up, we can stop the execution right here!
 if os.environ.get('BELLE2_RELEASE', None) is None:
     sys.exit('Error: No basf2 release set up!')
 
 # Otherwise we can start the execution.
-# The main part is wrapped in a try/except-contruct to fetch keyboard interrupts
+# The mainpart is wrapped in a try/except-contruct to fetch keyboard interrupts
 try:
 
     # Now we process the command line arguments.
@@ -778,10 +827,14 @@ try:
 
     # Create the validation object. 'validation' holds all global variables
     # and provides the logger!
-    validation = Validation()
+    # Argument is the tag, i.e. the name which will be used for the folder
+    # within the results directory to store the steering file outputs
+    validation = Validation(cmd_arguments.tag)
 
     # Write to log that we have started the validation process
     validation.log.note('Starting validation...')
+    validation.log.note('Results will stored in a folder named "{0}"...'.
+                        format(validation.tag))
 
     # Now we check whether we are running a complete validation or only
     # validating a certain set of packages:

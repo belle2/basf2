@@ -13,6 +13,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 
+#include <analysis/VariableManager/Variables.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -70,8 +71,8 @@ void RestOfEventBuilderModule::event()
 
   // output
   StoreArray<RestOfEvent> roeArray;
-
-  for (unsigned i = 0; i < plist->getListSize(); i++) {
+  unsigned int nParts = plist->getListSize();
+  for (unsigned i = 0; i < nParts; i++) {
     const Particle* particle = plist->getParticle(i);
 
     // create RestOfEvent object
@@ -123,7 +124,6 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   for (int i = 0; i < eclClusters.getEntries(); i++) {
     const ECLCluster* shower = eclClusters[i];
 
-    bool goodCluster = true;
     if (m_onlyGoodECLClusters) {
       // TODO: make this steerable
       double energy = shower->getEnergy();
@@ -139,15 +139,8 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
         region = 3.0;
       }
 
-      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.125 && e9e25 > 0.7;
-      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.100;
-      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.150;
-      if (!(goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3))
-        goodCluster = false;
-    }
-
-    if (m_onlyGoodECLClusters && !goodCluster) {
-      continue;
+      if (!Variable::isGoodGamma(region, energy, e9e25, false))
+        continue;
     }
 
     bool remainingCluster = true;

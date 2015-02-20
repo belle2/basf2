@@ -1184,22 +1184,32 @@ namespace Belle2 {
       return result;
     }
 
+    bool isGoodGamma(int region, double energy, double e9e25, bool calibrated)
+    {
+      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
+      if (!calibrated) {
+        goodGammaRegion1 = region == 1 && energy > 0.125 && e9e25 > 0.7;
+        goodGammaRegion2 = region == 2 && energy > 0.100;
+        goodGammaRegion3 = region == 3 && energy > 0.150;
+      } else {
+        goodGammaRegion1 = region == 1 && energy > 0.085 && e9e25 > 0.7;
+        goodGammaRegion2 = region == 2 && energy > 0.060;
+        goodGammaRegion3 = region == 3 && energy > 0.110;
+      }
+      //bool goodTiming       = timing > 800 && timing < 2400;
+
+      //((goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) && goodTiming)
+      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
+    }
+
     double goodGammaUncalibrated(const Particle* particle)
     {
       double energy = particle->getEnergy();
       double e9e25  = eclClusterE9E25(particle);
       int    region = eclClusterDetectionRegion(particle);
 
-      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.125 && e9e25 > 0.7;
-      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.100;
-      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.150;
-
-      if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3)
-        return 1.0;
-      else
-        return 0.0;
+      return (double)isGoodGamma(region, energy, e9e25, false);
     }
-
 
     double goodGamma(const Particle* particle)
     {
@@ -1208,16 +1218,7 @@ namespace Belle2 {
       double e9e25  = eclClusterE9E25(particle);
       int    region = eclClusterDetectionRegion(particle);
 
-      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.085 && e9e25 > 0.7;
-      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.060;
-      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.110;
-      //bool goodTiming       = timing > 800 && timing < 2400;
-
-      //if ((goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) && goodTiming)
-      if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3)
-        return 1.0;
-      else
-        return 0.0;
+      return (double)isGoodGamma(region, energy, e9e25, true);
     }
 
     double eclClusterUncorrectedE(const Particle* particle)

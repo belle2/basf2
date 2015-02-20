@@ -462,6 +462,12 @@ namespace Belle2 {
      */
     double eclClusterDetectionRegion(const Particle* particle);
 
+    /** Returns true if the cluster with given attributes passes 'good gamma' criteria.
+     *
+     * @param calibrated set to false for goodGammaUncalibrated().
+     */
+    bool isGoodGamma(int region, double energy, double e9e25, bool calibrated);
+
     /**
      * Return 1 if ECLCluster passes the following selection criteria:
      * Forward  : E >  85 MeV && E9/E25>0.7

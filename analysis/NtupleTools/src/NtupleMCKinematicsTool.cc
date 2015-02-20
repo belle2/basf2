@@ -49,6 +49,13 @@ void NtupleMCKinematicsTool::eval(const Particle* particle)
       m_fTruthP4[iProduct][2] = mcparticle_4vec.Pz();
       m_fTruthP4[iProduct][3]  = mcparticle->getEnergy();
       m_fTruthM[iProduct]  = mcparticle->getMass();
+    } else {
+      m_fTruthP[iProduct]     = 0.0;
+      m_fTruthP4[iProduct][0] = 0.0;
+      m_fTruthP4[iProduct][1] = 0.0;
+      m_fTruthP4[iProduct][2] = 0.0;
+      m_fTruthP4[iProduct][3] = 0.0;
+      m_fTruthM[iProduct]     = 0.0;
     }
   }
 }

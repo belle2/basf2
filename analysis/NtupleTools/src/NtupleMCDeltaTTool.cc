@@ -44,6 +44,9 @@ void NtupleMCDeltaTTool::eval(const Particle* particle)
   if (Ver) {
     m_fMCTagPDG = Ver->getMCTagBFlavor();
     m_fTruthDeltaT = Ver->getMCDeltaT();
+  } else {
+    m_fTruthDeltaT = 0.0;
+    m_fMCTagPDG    = 0.0;
   }
 }
 

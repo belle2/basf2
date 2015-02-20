@@ -47,6 +47,10 @@ void NtupleMCTagVertexTool::eval(const Particle* particle)
     m_fMCTagVx = Ver->getMCTagVertex().X();
     m_fMCTagVy = Ver->getMCTagVertex().Y();
     m_fMCTagVz = Ver->getMCTagVertex().Z();
+  } else {
+    m_fMCTagVx = 0.0;
+    m_fMCTagVy = 0.0;
+    m_fMCTagVz = 0.0;
   }
 }
 

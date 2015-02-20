@@ -43,7 +43,10 @@ void NtupleMCVertexTool::eval(const Particle* particle)
     const MCParticle* mcparticle = selparticles[iProduct]->getRelatedTo<MCParticle>();
 
     if (!mcparticle) {
-      B2WARNING("NtupleMCVertexTool::eval - no truth match found for this reco particle!");
+      m_fTruthX[iProduct]   = 0.0;
+      m_fTruthY[iProduct]   = 0.0;
+      m_fTruthZ[iProduct]   = 0.0;
+      m_fTruthRho[iProduct] = 0.0;
     } else {
       const TVector3 mcparticle_vert = mcparticle->getDecayVertex();
       m_fTruthX[iProduct] = mcparticle_vert.X();

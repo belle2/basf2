@@ -184,6 +184,9 @@ namespace Belle2 {
     /** Merge dissimilar objects (mainly loading ProcessStatistics from file). */
     void appendUnmergedModules(const ProcessStatistics* otherObject);
 
+    /** Set transient counters from otherObject. Needed since we swap objects inside input modules. */
+    void setTransientCounters(const ProcessStatistics* otherObject);
+
     /** Set counters time and memory to contain the current clock value
      * and memory consumption respectively.
      * @param time variable to store clock counter

@@ -159,6 +159,20 @@ void ProcessStatistics::merge(const Mergeable* other)
   } else {
     appendUnmergedModules(otherObject);
   }
+
+  //if the other object has transient data on modules, copy remaining counters
+  if (!otherObject->m_modulesToStatsIndex.empty())
+    setTransientCounters(otherObject);
+}
+
+void ProcessStatistics::setTransientCounters(const ProcessStatistics* otherObject)
+{
+  m_globalTime = otherObject->m_globalTime;
+  m_globalMemory = otherObject->m_globalMemory;
+  m_moduleTime = otherObject->m_moduleTime;
+  m_moduleMemory = otherObject->m_moduleMemory;
+  m_suspendedTime = otherObject->m_suspendedTime;
+  m_suspendedMemory = otherObject->m_suspendedMemory;
 }
 
 void ProcessStatistics::clear()

@@ -32,6 +32,7 @@ SubEventModule::SubEventModule():
 {
   //since we might be created via 'new'...
   setDescription("Internal module, please use the for_each() function in Path instead.");
+  setType("SubEvent");
 
   addParam("loopOver", m_loopOverName, "Name of array to iterate over.", std::string(""));
   addParam("objectName", m_objectName, "Name of the object holding the current iteration's item.", std::string(""));
@@ -76,6 +77,9 @@ void restoreContents(const DataStore::StoreEntryMap& orig, DataStore::StoreEntry
 
 void SubEventModule::initialize()
 {
+  if (!m_path) {
+    B2FATAL("SubEvent module not initialised properly.");
+  }
   m_loopOver.isRequired(m_loopOverName);
 
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);

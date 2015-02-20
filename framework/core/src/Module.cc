@@ -47,6 +47,19 @@ Module::~Module()
 
 }
 
+const std::string& Module::getType() const
+{
+  if (m_type.empty())
+    B2FATAL("Module type not set for " << getName());
+  return m_type;
+}
+
+void Module::setType(const std::string& type)
+{
+  if (!m_type.empty())
+    B2FATAL("Trying to change module type from " << m_type << " is not allowed, the value is assumed to be fixed.");
+  m_type = type;
+}
 
 void Module::setLogLevel(int logLevel)
 {

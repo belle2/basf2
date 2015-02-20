@@ -21,6 +21,7 @@ TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_blocking
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
   setPropertyFlags(c_Input | c_InternalSerializer);
+  setType("Tx");
 
   m_rbuf = rbuf;
   m_nsent = 0;

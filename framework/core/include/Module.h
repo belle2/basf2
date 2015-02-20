@@ -163,7 +163,7 @@ namespace Belle2 {
     /**
      * Returns the type of the module.
      */
-    const std::string& getType() const {return m_type;}
+    const std::string& getType() const;
 
     /**
      * Returns the package this module is in.
@@ -347,6 +347,8 @@ namespace Belle2 {
      * @param description A description of the module.
      */
     void setDescription(const std::string& description);
+
+    void setType(const std::string& type);
 
     /**
      * Adds a new parameter to the module. This method has to be called in the constructor of the module.

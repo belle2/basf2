@@ -126,6 +126,7 @@ void DataStoreStreamer::removeSideEffects()
     DataStore::StoreEntry& entry = entryPair.second;
     if (isMergeable(entry.object)) {
       static_cast<Mergeable*>(entry.object)->removeSideEffects();
+      static_cast<Mergeable*>(entry.object)->clear();
     }
   }
 }

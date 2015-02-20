@@ -99,7 +99,7 @@ namespace Belle2 {
     /** Assuming both objects are mergeable, merge 'received' into 'existing'. */
     static void mergeIntoExisting(TObject* existing, const TObject* received);
 
-    /** call removeSideEffects() for all Mergeable objects in datastore (for c_Persistent durability). */
+    /** call clear() and removeSideEffects() for all Mergeable objects in datastore (for c_Persistent durability). */
     static void removeSideEffects();
 
   private:

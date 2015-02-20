@@ -30,7 +30,7 @@ namespace Belle2 {
 
     /** Merge object 'other' into this one.
      *
-     * Your derived class should implement this function. You can static_cast 'other' to your own type
+     * Your derived class must implement this function. You can static_cast 'other' to your own type
      * (when called, this and other are guaranteed to point to objects of the same type).
      *
      * Note that 'other' will be deleted after the merge, so make sure you copy all data from it that you will need.
@@ -39,8 +39,9 @@ namespace Belle2 {
 
     /** Clear content of this object (e.g. set to zeroes).
      *
-     * Called after sending the objects to another process. If no clearing is performed, the same data (e.g. histogram
-     * entries) might be added again and again in each event.
+     * Called after sending the objects to another process and after forking processes to
+     * ensure there is at most one copy of the same data. If no clearing is performed,
+     * the same data (e.g. histogram entries) might be added again and again in each event.
      */
     virtual void clear() = 0;
 

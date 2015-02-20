@@ -124,7 +124,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            2.);
 
   addParam("MaxLevel", m_maxLevel,
-           "Maximal level of recursive calling of FastHough algorithm", 11);
+           "Maximal level of recursive calling of FastHough algorithm", 12);
 
   addParam("ReconstructCurler", m_reconstructCurler,
            "Flag, whether curlers should be reconstructed", false);

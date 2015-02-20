@@ -21,7 +21,13 @@ namespace Belle2 {
     //find a point that is inside the top node
     double getMaxR();
 
-    /** Save a geometry extract from the current state of the TGeo geometry. */
+    /** Save a geometry extract from the current state of the TGeo geometry.
+     *
+     * To actually create a reasonably sized extract, one needs to delete
+     * all objects in Top_1 that one doesn't want to save. Selecting them
+     * via their name and deleting them in a function should work, but really
+     * just crashes. This is all quite horrible, really.
+     */
     void saveExtract();
   }
 }

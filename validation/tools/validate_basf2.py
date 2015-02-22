@@ -43,6 +43,17 @@ class Validation:
     referenced as validation.[name of variable]. This makes it easier to
     distinguish them from local variables that only exist within the scope of a
     or a method.
+
+    @var tag: The name of the folder within the results directory
+    @var log: Reference to the logging object for this validation instance
+    @var basepaths: The paths to the local and central release directory
+    @var list_of_scripts: List of all Script objects for steering files
+    @var list_of_packages: List of all packages which contributed scripts
+    @var packages: The packages to be included in the validation (from cmd arg)
+    @var basf2_options: The options to be given to the basf2 command
+    @var mode: Whether to run locally or on a cluster
+    @var quiet: No progress bar in quiet mode
+    @var dry: Dry runs do not actually start any scripts (for debugging)
     """
 
     def __init__(self, tag='current'):
@@ -85,7 +96,7 @@ class Validation:
         self.list_of_packages = []
 
         # The list of packages to be included in the validation. If we are
-        #  running a complete validation, this will be None.
+        # running a complete validation, this will be None.
         self.packages = None
 
         # Additional arguments for basf2, if we received any from the command
@@ -416,6 +427,16 @@ class Validation:
 class Script:
     """!
     The object representation of a steering file.
+
+    @var path: The path to the steering file
+    @var name: The name of the file, but without special chars or spaces
+    @var package: The package to which the steering file belongs to
+    @var header: The contents of the XML file header
+    @var dependencies: On which scripts does the steering file depend
+    @var status: The current status, e.g. 'running' or 'finished'
+    @var control: Execute locally or on the cluster?
+    @var returncode: The returncode of the steering file
+    @var _object: Pointer to the object itself. Is this even necessary?
     """
 
     def __init__(self, path, package):

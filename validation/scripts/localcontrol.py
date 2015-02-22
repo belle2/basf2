@@ -11,6 +11,9 @@ class Local:
     - is_job_finished(job): Returns True or False, depending on whether the job
         has finished execution
     - execute(job): Takes a job and executes it by spawning a new process
+
+    @var jobs_processes: Map between jobs and the processes spawned for them
+    @var logger: Reference to the logging object
     """
 
     def __init__(self, max_number_of_processes=None):
@@ -19,6 +22,8 @@ class Local:
         - Initializes a list which holds a connection between Script-Objects
           and their respective processes.
         - Initialized a logger which writes to validate_basf2.py's log.
+
+        @param max_number_of_processes: The maximum number of processes
         """
 
         # A dict which holds the connections between the jobs (=Script objects)

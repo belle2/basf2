@@ -5,7 +5,7 @@ import multiprocessing
 
 
 class Local:
-    """
+    """!
     A class that provides the controls for local multi-processing via the
     subprocess-module. It provides two methods:
     - is_job_finished(job): Returns True or False, depending on whether the job
@@ -14,6 +14,8 @@ class Local:
 
     @var jobs_processes: Map between jobs and the processes spawned for them
     @var logger: Reference to the logging object
+    @var max_number_of_processes: The maximum number of parallel processes
+    @var current_number_of_processes: The number of processes currently running
     """
 
     def __init__(self, max_number_of_processes=None):

@@ -12,6 +12,7 @@
 ########################################################
 
 import os
+import glob
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -23,7 +24,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # Set the number of events to be processed (1000 events)
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
-eventinfoprinter = register_module('EventInfoPrinter')
+# eventinfoprinter = register_module('EventInfoPrinter')
 
 # Fixed random seed
 set_random_seed(123456)
@@ -52,7 +53,7 @@ eclanalysis.param('rootFileName', '../ECLBkgOutput.root')
 # eclanalysis.param('doTracking', 1)
 
 # Add Bkg in Simulation
-bkgdir = '$BELLE2_BACKGROUND_DIR/'
+bkgdir = '/sw/belle2/bkg/'
 bkgFiles = [
     bkgdir + 'Coulomb_HER_100us.root',
     bkgdir + 'Coulomb_LER_100us.root',
@@ -68,12 +69,16 @@ bkgFiles = [
     bkgdir + 'Touschek_LER_100usECL.root',
     ]
 
+bg = []
+if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
+    bg += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+
 # Create paths
 main = create_path()
 main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
+# main.add_module(eventinfoprinter)
 # main.add_module(pGun)
-add_simulation(main, bkgfiles=bkgFiles)
+add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
 main.add_module(eclanalysis)
 # main.add_module(simpleoutput)

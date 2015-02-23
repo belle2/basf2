@@ -29,7 +29,7 @@ TEST(TrackFindingCDCTest, legendre_QuadTreeTest)
 
   typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
-  QuadTreeLegendre qt(-1.0, 1.0, 0, std::pow(2, 13), 0, nullptr);
+  QuadTreeLegendre qt(0, std::pow(2, 13), -1.5, 1.5, 0, nullptr);
 
   std::set<TrackHit*> hits_set;
   std::vector < std::shared_ptr< TrackHit > > hits;

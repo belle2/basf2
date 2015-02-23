@@ -12,7 +12,7 @@ void ECLBkg()
 
   TFile* output = TFile::Open("ECLBkg.root", "recreate");
 
-  TH1F* hClusterE = new TH1F("ClusterE", "ECL cluster energy, bkg only", 100, 0., 0.5);
+  TH1F* hClusterE = new TH1F("hClusterE", "ECL cluster energy, bkg only", 100, 0., 0.5);
   hClusterE->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   hClusterE->GetListOfFunctions()->Add(new TNamed("Description",
     "Reconstructed cluster energy for bkg clusters")); 
@@ -22,7 +22,7 @@ void ECLBkg()
   tree->Draw("eclClusterEnergy>>hClusterE","eclClusterEnergy>0");
   hClusterE->Write();
 
-  TH1F* hClusterMultip = new TH1F("ClusterMultip", "Cluster Multiplicity Bkg Only", 150, 0, 300);
+  TH1F* hClusterMultip = new TH1F("hClusterMultip", "Cluster Multiplicity Bkg Only", 150, 0, 300);
   hClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity Bkg");
   hClusterMultip->GetListOfFunctions()->Add(new TNamed("Description",
     "ECL cluster multiplicity for bkg")); 
@@ -31,6 +31,6 @@ void ECLBkg()
   tree->Draw("eclClusterMultip>>hClusterMultip","eclClusterMultip>0");
   hClusterMultip->Write();
   
-  ouput->Close();
+  output->Close();
   delete output;
 }

@@ -13,8 +13,7 @@ void ECLPion(){
   // write output file for the validation histograms
   TFile* output = TFile::Open("ECLPion.root", "recreate");
 
-
-  TH1F* hClusterE = new TH1F("PiClusterE", "Cluster energy, 1 GeV charged pion", 100, 0., 1.2);
+  TH1F* hClusterE = new TH1F("hClusterE", "Cluster energy, 1 GeV charged pion", 100, 0., 1.2);
   hClusterE->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hClusterE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for single 1GeV charged pion")); 
   hClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be 0.2 GeV"));
@@ -23,7 +22,7 @@ void ECLPion(){
   hClusterE->Write();
 
 
-  TH1F* hClusterMultip = new TH1F("PiClusterMultip", "Cluster multiplicity, 1GeV charged pion", 10,0,10);
+  TH1F* hClusterMultip = new TH1F("hClusterMultip", "Cluster multiplicity, 1GeV charged pion", 10,0,10);
   hClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
   hClusterMultip->GetListOfFunctions()->Add(new TNamed("Description",
     "ECL cluster multiplicity for 1 GeV charged pion")); 

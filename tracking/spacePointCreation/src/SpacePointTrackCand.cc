@@ -85,7 +85,7 @@ const std::vector<const Belle2::SpacePoint*> SpacePointTrackCand::getHitsInRange
     lastInd = tmp;
   }
   // check if the indices are in range!
-  if (firstInd < 0 || uint(lastInd) >= m_trackSpacePoints.size() || uint(firstInd) >= m_trackSpacePoints.size() || lastInd < 0) {
+  if (firstInd < 0 || uint(lastInd) > m_trackSpacePoints.size() || uint(firstInd) > m_trackSpacePoints.size() || lastInd < 0) {
     throw SPTCIndexOutOfBounds();
   }
   std::vector<const SpacePoint*> spacePoints;
@@ -104,7 +104,7 @@ const std::vector<double> SpacePointTrackCand::getSortingParametersInRange(int f
     lastIndex = tmp;
   }
   // check if the indices are in range!
-  if (firstIndex < 0 || uint(lastIndex) >= m_trackSpacePoints.size() || uint(firstIndex) >= m_trackSpacePoints.size() || lastIndex < 0) {
+  if (firstIndex < 0 || uint(lastIndex) > m_trackSpacePoints.size() || uint(firstIndex) > m_trackSpacePoints.size() || lastIndex < 0) {
     throw SPTCIndexOutOfBounds();
   }
   std::vector<double> sortingParams;

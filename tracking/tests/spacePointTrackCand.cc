@@ -237,16 +237,17 @@ namespace Belle2 {
 
     // test throwing of exceptions
     unsigned int nHits = fullTrackCand.getNHits();
-    ASSERT_THROW(fullTrackCand.getHitsInRange(0, nHits), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
-    ASSERT_NO_THROW(fullTrackCand.getHitsInRange(nHits - 2, nHits - 1));
+    ASSERT_THROW(fullTrackCand.getHitsInRange(0, nHits + 1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
+    ASSERT_NO_THROW(fullTrackCand.getHitsInRange(nHits - 2, nHits));
     ASSERT_THROW(fullTrackCand.getHitsInRange(-1, 3), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
     ASSERT_THROW(fullTrackCand.getHitsInRange(0, 10), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
     ASSERT_THROW(fullTrackCand.getHitsInRange(10, 0), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
     ASSERT_THROW(fullTrackCand.getHitsInRange(2, -1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
     ASSERT_THROW(fullTrackCand.getSortingParametersInRange(-1, 2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
-    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(0, 10), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(0, nHits + 1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
     ASSERT_THROW(fullTrackCand.getSortingParametersInRange(12, 3), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
     ASSERT_THROW(fullTrackCand.getSortingParametersInRange(2, -2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
+    ASSERT_NO_THROW(fullTrackCand.getSortingParametersInRange(0, nHits));
   }
 
   /**
@@ -378,6 +379,6 @@ namespace Belle2 {
     for (unsigned int i = 0; i < sortParams.size(); ++i) { EXPECT_DOUBLE_EQ(sortParams.at(i), expectedSortParams.at(i)); }
 
     // try to remove a SpacePoint that is out of bounds
-    ASSERT_THROW(fullTrackCand.removeSpacePoint(10), SpacePointTrackCand::SPTCIndexOutOfBounds);
+    ASSERT_THROW(fullTrackCand.removeSpacePoint(fullTrackCand.getNHits()), SpacePointTrackCand::SPTCIndexOutOfBounds);
   }
 }

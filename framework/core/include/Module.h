@@ -348,6 +348,7 @@ namespace Belle2 {
      */
     void setDescription(const std::string& description);
 
+    /** Set the module type. Only for use by internal modules (which don't use the normal REG_MODULE mechanism). */
     void setType(const std::string& type);
 
     /**
@@ -510,9 +511,9 @@ namespace Belle2 {
     /**
      * The constructor of the ModuleProxyBase class.
      * The constructor registers the proxy to the ModuleManager.
-     * @param moduleName The type name of the module.
+     * @param moduleType The type name of the module.
      */
-    ModuleProxyBase(const std::string& moduleName, const std::string& package);
+    ModuleProxyBase(const std::string& moduleType, const std::string& package);
 
     /**
      * The destructor of the ModuleProxyBase class.
@@ -529,12 +530,12 @@ namespace Belle2 {
     /**
      * Returns the module name of the module associated to this proxy.
      */
-    const std::string& getModuleName() const {return m_moduleName; }
+    const std::string& getModuleName() const {return m_moduleType; }
 
 
   protected:
 
-    std::string m_moduleName; /**< The type name of the module. (without trailing "Module") */
+    std::string m_moduleType; /**< The type name of the module. (without trailing "Module") */
     std::string m_package; /**< Package this module is found in (may be empty). */
   };
 
@@ -553,9 +554,9 @@ namespace Belle2 {
     /**
      * The constructor of the ModuleProxy class.
      * Calls the constructor of the base class.
-     * @param moduleName The type name of the module.
+     * @param moduleType The type name of the module.
      */
-    ModuleProxy(const std::string& moduleName, const std::string& package = "") : ModuleProxyBase(moduleName, package) {};
+    ModuleProxy(const std::string& moduleType, const std::string& package = "") : ModuleProxyBase(moduleType, package) {};
 
     /**
      * The destructor of the ModuleProxy class.
@@ -568,8 +569,8 @@ namespace Belle2 {
      */
     ModulePtr createModule() const {
       ModulePtr nm(new T());
-      nm->m_name = m_moduleName;
-      nm->m_type = m_moduleName;
+      nm->setType(m_moduleType);
+      nm->setModuleName(m_moduleType);
       nm->m_package = m_package;
       return nm;
     }

@@ -18,7 +18,7 @@ namespace Belle2 {
     /** set fill color of the volume 'name' to 'col'. */
     void setVolumeColor(const char* name, Color_t col);
 
-    //find a point that is inside the top node
+    /** find a point that is inside the top node. */
     double getMaxR();
 
     /** Save a geometry extract from the current state of the TGeo geometry.

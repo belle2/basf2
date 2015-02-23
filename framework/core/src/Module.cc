@@ -28,8 +28,8 @@ using namespace boost::python;
 
 
 Module::Module() :
-  m_name(""),
-  m_type(""),
+  m_name(),
+  m_type(),
   m_description("Not set by the author"),
   m_propertyFlags(0),
   m_logConfig(),
@@ -286,7 +286,7 @@ void Module::exposePythonAPI()
 //                          ModuleProxyBase
 //=====================================================================
 
-ModuleProxyBase::ModuleProxyBase(const std::string& moduleName, const std::string& package) : m_moduleName(moduleName), m_package(package)
+ModuleProxyBase::ModuleProxyBase(const std::string& moduleType, const std::string& package) : m_moduleType(moduleType), m_package(package)
 {
   ModuleManager::Instance().registerModuleProxy(this);
 }

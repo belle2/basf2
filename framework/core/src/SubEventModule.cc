@@ -32,12 +32,10 @@ SubEventModule::SubEventModule():
 {
   //since we might be created via 'new'...
   setDescription("Internal module, please use the for_each() function in Path instead.");
-  setType("SubEvent");
 
   addParam("loopOver", m_loopOverName, "Name of array to iterate over.", std::string(""));
   addParam("objectName", m_objectName, "Name of the object holding the current iteration's item.", std::string(""));
   addParam("path", m_path, "Path to execute for each iteration.", PathPtr(nullptr));
-
 }
 
 SubEventModule::~SubEventModule()

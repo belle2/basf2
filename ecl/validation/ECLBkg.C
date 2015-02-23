@@ -28,6 +28,7 @@ void ECLBkg()
     "ECL cluster multiplicity for bkg")); 
   hClusterMultip->GetListOfFunctions()->Add(new TNamed("Check",
     "Cluster multiplicity should be around 160 (Jan 2015)"));
+  hClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   tree->Draw("eclClusterMultip>>hClusterMultip","eclClusterMultip>0");
   hClusterMultip->Write();
   

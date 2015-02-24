@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <tracking/trackFindingCDC/legendre/tests_fixtures/CDCLegendreTestFixture.h>
+
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 
@@ -24,46 +26,17 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TEST(TrackFindingCDCTest, legendre_QuadTreeTest)
+TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 {
-
-  typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
-
   QuadTreeLegendre qt(0, std::pow(2, 13), -1.5, 1.5, 0, nullptr);
 
-  std::set<TrackHit*> hits_set;
-  std::vector < std::shared_ptr< TrackHit > > hits;
+  markAllHitsAsUnused();
+  std::set<TrackHit*>& hits_set = getHitSet();
 
   QuadTreeLegendre::NodeList candidateNodes;
 
-  // create hits for three sraight-line tracks
-  // going outwards from the center
-  for (int i = 0; i < 100; i++) {
-    TrackHit* hit1 = new TrackHit(i, i, 1.0f, 0.2f,
-                                  500, i % 5, i % 6,
-                                  TVector3(i * 1.0f, i * 2.0f, 0.0f)
-                                 );
-    hits_set.insert(hit1);
-
-    TrackHit* hit2 = new TrackHit(i, i, 1.0f, 0.2f,
-                                  500, i % 5, i % 6,
-                                  TVector3(i * 0.0f, i * -2.0f, 0.0f)
-                                 );
-    hits_set.insert(hit2);
-
-    TrackHit* hit3 = new TrackHit(i, i, 1.0f, 0.2f,
-                                  500, i % 5, i % 6,
-                                  TVector3(i * 1.0f, i * -1.0f, 0.0f)
-                                 );
-    hits_set.insert(hit3);
-
-  }
-
   qt.provideItemsSet<QuadTreeProcessor>(hits_set);
   qt.setLastLevel(13);
-
-//  deprecated
-//  qt.setRThreshold(1.0f);
   qt.setNItemsThreshold(50);
 
   QuadTreeLegendre::CandidateProcessorLambda lmdProcessor = [&candidateNodes](QuadTreeLegendre * qt) {
@@ -77,12 +50,14 @@ TEST(TrackFindingCDCTest, legendre_QuadTreeTest)
   qt.startFillingTree<QuadTreeProcessor>(lmdProcessor);
   auto later = std::chrono::high_resolution_clock::now();
 
-  EXPECT_EQ(3, candidateNodes.size());
+  EXPECT_EQ(numberOfPossibleTrackCandidate, candidateNodes.size());
 
   std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(later - now);
   B2INFO("QuadTree took " << time_span.count() << " seconds, found " << candidateNodes.size() << " candidates");
 
-  // release TrackHits
-  std::for_each(hits_set.begin(), hits_set.end(), [](TrackHit * ht) { delete ht;});
+  // Check for the parameters of the track candidates
+  // The actual hit numbers are more than 50, but this is somewhat a lower bound
+  EXPECT_GE(candidateNodes[0]->getNItems(), 51);
+  EXPECT_GE(candidateNodes[1]->getNItems(), 50);
 }
 

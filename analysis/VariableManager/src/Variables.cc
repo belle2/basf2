@@ -90,12 +90,12 @@ namespace Belle2 {
 
     double particleCosTheta(const Particle* part)
     {
-      return part->getPz() / part->getP();
+      return part->get4Vector().CosTheta();
     }
 
     double particlePhi(const Particle* part)
     {
-      return atan2(part->getPy(), part->getPx()) / Unit::deg;
+      return part->get4Vector().Phi();
     }
 
     // momentum (CMS) -----------------------------------------------
@@ -982,7 +982,7 @@ namespace Belle2 {
       return result;
     }
 
-    double nROEClusters(const Particle* particle)
+    double nROEECLClusters(const Particle* particle)
     {
       double result = -1.0;
 
@@ -991,6 +991,17 @@ namespace Belle2 {
       if (roe)
         result = roe->getNECLClusters();
 
+      return result;
+    }
+
+    double nROEKLMClusters(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (roe)
+        result = roe->getNKLMClusters();
       return result;
     }
 
@@ -1457,7 +1468,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
     REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
-    REGISTER_VARIABLE("cth", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
 
     REGISTER_VARIABLE("p_CMS", particleP_CMS, "CMS momentum magnitude");
@@ -1467,7 +1477,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("pz_CMS", particlePz_CMS, "CMS momentum component z");
     REGISTER_VARIABLE("pt_CMS", particlePt_CMS, "CMS transverse momentum");
     REGISTER_VARIABLE("cosTheta_CMS", particleCosTheta_CMS, "CMS momentum cosine of polar angle");
-    REGISTER_VARIABLE("cth_CMS", particleCosTheta_CMS, "CMS momentum cosine of polar angle");
     REGISTER_VARIABLE("phi_CMS", particlePhi_CMS, "CMS momentum azimuthal angle in degrees");
 
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB", cosThetaBetweenParticleAndTrueB, "cosine of angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
@@ -1524,9 +1533,19 @@ namespace Belle2 {
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
     REGISTER_VARIABLE("KaonPionHaveOpositeCharges", KaonPionHaveOpositeCharges, "Returns 1 if the particles selected as target kaon and slow pion have oposite charges, 0 else")
 
+    VARIABLE_GROUP("Event");
+    REGISTER_VARIABLE("isContinuumEvent",  isContinuumEvent,  "[Eventbased] true if event doesn't contain an Y(4S)");
+    REGISTER_VARIABLE("nTracks",  nTracks,  "[Eventbased] number of tracks in the event");
+    REGISTER_VARIABLE("nECLClusters", nECLClusters, "[Eventbased] number of ECL in the event");
+    REGISTER_VARIABLE("nKLMClusters", nKLMClusters, "[Eventbased] number of KLM in the event");
+    REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "[Eventbased] total energy in ECL in the event");
+    REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "[Eventbased] total energy in KLM in the event");
+
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nROEClusters", nROEClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nROEECLClusters", nROEECLClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters, "number of remaining KLM clusters as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent, "Returns number of tracks in ROE - number of tracks of given particle");
 
     VARIABLE_GROUP("TDCPV");
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
@@ -1550,7 +1569,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
-    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent, "Returns number of tracks in ROE - number of tracks of given particle");
 
     REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus, "Returns status bits of related MCParticle or -1 if MCParticle relation is not set.");
@@ -1564,14 +1582,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterE9E25",      eclClusterE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
     REGISTER_VARIABLE("clusterNHits",      eclClusterNHits,           "number of hits associated to this cluster");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,    "number of charged track matched to this cluster");
-
-    VARIABLE_GROUP("Event");
-    REGISTER_VARIABLE("isContinuumEvent",  isContinuumEvent,  "[Eventbased] true if event doesn't contain an Y(4S)");
-    REGISTER_VARIABLE("nTracks",  nTracks,  "[Eventbased] number of tracks in the event");
-    REGISTER_VARIABLE("nECLClusters", nECLClusters, "[Eventbased] number of ECL in the event");
-    REGISTER_VARIABLE("nKLMClusters", nKLMClusters, "[Eventbased] number of KLM in the event");
-    REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "[Eventbased] total energy in ECL in the event");
-    REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "[Eventbased] total energy in KLM in the event");
 
     VARIABLE_GROUP("Continuum Suppression");
     REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");

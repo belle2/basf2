@@ -177,6 +177,11 @@ namespace Belle2 {
     double particleDeltaE(const Particle* part);
 
     /**
+     * return StoreArray index (0-based) of the MDST object from which the Particle was created
+     */
+    double particleMdstArrayIndex(const Particle* part);
+
+    /**
      * return prob(chi^2,ndf) of fit
      */
     double particlePvalue(const Particle* part);
@@ -195,11 +200,6 @@ namespace Belle2 {
      * return charge
      */
     double particleCharge(const Particle* part);
-
-    /**
-     * return StoreArray index (0-based) of the MDST object from which the Particle was created
-     */
-    double particleMdstArrayIndex(const Particle* part);
 
     /**
      * return cosine of angle between thrust axis of given particle and thrust axis of ROE
@@ -348,7 +348,14 @@ namespace Belle2 {
      *
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
      */
-    double nROEClusters(const Particle* particle);
+    double nROEECLClusters(const Particle* particle);
+
+    /**
+     * return number of remaining KLM clusters as given by the related RestOfEvent object
+     *
+     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
+     */
+    double nROEKLMClusters(const Particle* particle);
 
     /**
      * return X component of the tag vertex

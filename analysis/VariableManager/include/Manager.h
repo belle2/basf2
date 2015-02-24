@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <functional>
+#include <memory>
 
 namespace Belle2 {
   class Particle;
@@ -181,15 +182,20 @@ namespace Belle2 {
 
       /** Group last set via VARIABLE_GROUP(). */
       std::string m_currentGroup;
-      /** List of registered variables. */
-      std::map<std::string, Var*> m_variables;
-      /** List of registered variables. */
-      std::map<std::string, ParameterVar*> m_parameter_variables;
-      /** List of registered variables. */
-      std::map<std::string, MetaVar*> m_meta_variables;
 
       /** List of variables in registration order. */
       std::vector<const VarBase*> m_variablesInRegistrationOrder;
+
+#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
+#else
+      /** List of registered variables. */
+      std::map<std::string, std::shared_ptr<Var>> m_variables;
+      /** List of registered variables. */
+      std::map<std::string, std::shared_ptr<ParameterVar>> m_parameter_variables;
+      /** List of registered variables. */
+      std::map<std::string, std::shared_ptr<MetaVar>> m_meta_variables;
+#endif
+      //NOTE: do not put any data members between the endif and end of class! this would change the class layout in memory
     };
 
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)

@@ -1,5 +1,8 @@
 import variables as v
 
+#some variables should be there
+assert len(v.variables.getVariables()) > 0
+
 v.printVars()
 
 var = v.variables.getVariable('M')

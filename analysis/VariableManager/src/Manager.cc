@@ -18,9 +18,6 @@ using namespace Belle2;
 
 Variable::Manager::~Manager()
 {
-  for (auto & pair : m_variables) {
-    delete pair.second;
-  }
 }
 Variable::Manager& Variable::Manager::Instance()
 {
@@ -39,7 +36,7 @@ const Variable::Manager::Var* Variable::Manager::getVariable(const std::string& 
       }
     }
   }
-  return mapIter->second;
+  return mapIter->second.get();
 }
 
 void Variable::Manager::assertValidName(const std::string& name)
@@ -67,10 +64,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     auto func = [float_number](const Particle*) -> double {
       return float_number;
     };
-    Var* var = new Var(name, func, std::string("Returns number ") + name);
-    if (var == nullptr)
-      return false;
-    m_variables[name] = var;
+    m_variables[name] = std::make_shared<Var>(name, func, std::string("Returns number ") + name);
     return true;
   }
 
@@ -100,10 +94,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       }
       auto pfunc = parameterIter->second->function;
       auto func = [pfunc, arguments](const Particle * particle) -> double { return pfunc(particle, arguments); };
-      Var* var = new Var(name, func, parameterIter->second->description, parameterIter->second->group);
-      if (var == nullptr)
-        return false;
-      m_variables[name] = var;
+      m_variables[name] = std::make_shared<Var>(name, func, parameterIter->second->description, parameterIter->second->group);
       return true;
 
     }
@@ -112,10 +103,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     auto metaIter = m_meta_variables.find(functionName);
     if (metaIter != m_meta_variables.end()) {
       auto func = metaIter->second->function(functionArguments);
-      Var* var = new Var(name, func, metaIter->second->description, metaIter->second->group);
-      if (var == nullptr)
-        return false;
-      m_variables[name] = var;
+      m_variables[name] = std::make_shared<Var>(name, func, metaIter->second->description, metaIter->second->group);
       return true;
     }
   }
@@ -135,10 +123,10 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
 
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
-    Var* var = new Var(name, f, description, m_currentGroup);
+    auto var = std::make_shared<Var>(name, f, description, m_currentGroup);
     B2DEBUG(100, "Registered Variable " << name)
     m_variables[name] = var;
-    m_variablesInRegistrationOrder.push_back(var);
+    m_variablesInRegistrationOrder.push_back(var.get());
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
@@ -152,12 +140,12 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
 
   auto mapIter = m_parameter_variables.find(name);
   if (mapIter == m_parameter_variables.end()) {
-    ParameterVar* var = new ParameterVar(name, f, description, m_currentGroup);
+    auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
     B2DEBUG(100, "Registered parameter Variable " << rawName)
     m_parameter_variables[rawName] = var;
-    m_variablesInRegistrationOrder.push_back(var);
+    m_variablesInRegistrationOrder.push_back(var.get());
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
@@ -171,12 +159,12 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
 
   auto mapIter = m_meta_variables.find(name);
   if (mapIter == m_meta_variables.end()) {
-    MetaVar* var = new MetaVar(name, f, description, m_currentGroup);
+    auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
     B2DEBUG(100, "Registered meta Variable " << rawName)
     m_meta_variables[rawName] = var;
-    m_variablesInRegistrationOrder.push_back(var);
+    m_variablesInRegistrationOrder.push_back(var.get());
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }

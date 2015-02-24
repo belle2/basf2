@@ -32,10 +32,10 @@ namespace Belle2 {
       TrackMerger() = delete;
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      static void doTracksMerging(std::list<TrackCandidate*> trackList);
+      static void doTracksMerging(std::list<TrackCandidate*>& trackList);
 
       /** Try to merge given track with tracks in tracklist. */
-      static void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::list<TrackCandidate*> trackList);
+      static void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::list<TrackCandidate*>& trackList);
 
       /** Tries to split back-to-back tracks into two different tracks */
       static TrackCandidate* splitBack2BackTrack(TrackCandidate* trackCandidate);

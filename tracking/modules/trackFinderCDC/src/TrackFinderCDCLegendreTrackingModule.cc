@@ -228,9 +228,9 @@ void CDCLegendreTrackingModule::findTracks()
 void CDCLegendreTrackingModule::outputObjects()
 {
   for (TrackCandidate * cand : m_cdcLegendreTrackProcessor.getTrackList()) {
-    B2DEBUG(100,
-            "R value: " << cand->getR() << "; theta: " << cand->getTheta() << "; radius: " << cand->getRadius() << "; phi: "
-            << cand->getPhi() << "; charge: " << cand->getChargeSign() << "; Xc = " << cand->getXc() << "; Yc = " << cand->getYc());
+    B2DEBUG(100, "R value: " << cand->getR() << "; theta: " << cand->getTheta() << "; radius: " << cand->getRadius() << "; phi: "
+            << cand->getPhi() << "; charge: " << cand->getChargeSign() << "; Xc = " << cand->getXc() << "; Yc = " << cand->getYc() <<
+            "Hitsize: " << cand->getNHits());
   }
   //create GenFit Track candidates
   m_cdcLegendreTrackProcessor.createGFTrackCandidates(m_param_trackCandidatesColumnName);
@@ -288,9 +288,9 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limit, double rT
   } while (limit >= m_param_threshold && hits_set.size() >= m_param_threshold);
 
   //sort tracks by value of curvature
-  /* m_cdcLegendreTrackProcessor.getTrackList().sort([](const TrackCandidate * a, const TrackCandidate * b) {
-     return static_cast <bool>(a->getRadius() > b->getRadius());
-   });*/
+  m_cdcLegendreTrackProcessor.getTrackList().sort([](const TrackCandidate * a, const TrackCandidate * b) {
+    return static_cast <bool>(a->getRadius() > b->getRadius());
+  });
 
   // ?????
   std::vector<TrackHit*> hits_vector; //temporary array;

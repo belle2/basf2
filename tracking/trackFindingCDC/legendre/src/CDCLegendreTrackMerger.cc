@@ -46,7 +46,7 @@ void TrackMerger::resetHits(TrackCandidate* otherTrackCandidate)
   }
 }
 
-void TrackMerger::doTracksMerging(std::list<TrackCandidate*> trackList)
+void TrackMerger::doTracksMerging(std::list<TrackCandidate*>& trackList)
 {
   TrackFitter trackFitter;
 
@@ -129,7 +129,7 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(TrackCandid
 }
 
 
-void TrackMerger::tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::list<TrackCandidate*> trackList)
+void TrackMerger::tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::list<TrackCandidate*>& trackList)
 {
 
   TrackFitter trackFitter;

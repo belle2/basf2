@@ -35,16 +35,10 @@ double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* trac
 
 void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_trackList)
 {
-  int ii = 0;
 
   B2DEBUG(100, "NCands = " << m_trackList.size());
 
   for (TrackCandidate * cand : m_trackList) {
-    ii++;
-    B2DEBUG(100, "ii = " << ii);
-    B2DEBUG(100, "Processing: Cand hits vector size = " << cand->getTrackHits().size());
-    B2DEBUG(100, "Processing: Cand R = " << cand->getR());
-
     for (TrackHit * hit : cand->getTrackHits()) {
       hit->setHitUsage(TrackHit::used_in_track);
     }
@@ -55,22 +49,20 @@ void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_tra
       double prob = getAssigmentProbability(hit, cand);
 
       double bestHitProb = prob;
-      TrackCandidate* BestCandidate = NULL;
+      TrackCandidate* bestCandidate = NULL;
 
       for (TrackCandidate * candInner : m_trackList) {
         if (candInner == cand) continue;
         double probTemp = getAssigmentProbability(hit, candInner);
 
-        // TODO: Do not process this hit of we construct a B2B candidate!
-
         if (probTemp > bestHitProb) {
-          BestCandidate = candInner;
+          bestCandidate = candInner;
           bestHitProb = probTemp;
         }
       }
 
       if (bestHitProb > prob) {
-        BestCandidate->addHit(hit);
+        bestCandidate->addHit(hit);
         hit->setHitUsage(TrackHit::bad);
       }
     }

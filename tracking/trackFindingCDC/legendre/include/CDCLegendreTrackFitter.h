@@ -61,17 +61,6 @@ namespace Belle2 {
       /**
        * @brief Perform fast circular fitting
        * @param track Track candidate which are going to be fitted
-       * @param ref_point Reference point; In current case - point of closest approach to IP
-       * @param with_drift_time Parameter which allows to perform fitting with taking into account drift time of hits; Not stable!
-       */
-      void fitTrackCandidateFast(
-        TrackCandidate* track,
-        std::pair<double, double>& ref_point,
-        bool with_drift_time = false);
-
-      /**
-       * @brief Perform fast circular fitting
-       * @param track Track candidate which are going to be fitted
        * @param with_drift_time Parameter which allows to perform fitting with taking into account drift time of hits; Not stable!
        */
       void fitTrackCandidateFast(

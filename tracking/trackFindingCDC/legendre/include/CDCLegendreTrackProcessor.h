@@ -77,7 +77,7 @@ namespace Belle2 {
       }
 
       void initializeHitList(const StoreArray<CDCHit> cdcHits) {
-        B2DEBUG(100, "Number of digitized hits: " << cdcHits.getEntries());
+        B2DEBUG(90, "Number of digitized hits: " << cdcHits.getEntries());
 
         if (cdcHits.getEntries() == 0) {
           B2WARNING("cdcHitsCollection is empty!");
@@ -93,7 +93,7 @@ namespace Belle2 {
           }
         }
 
-        B2DEBUG(100, "Number of hits to be used by track finder: " << m_axialHitList.size());
+        B2DEBUG(90, "Number of hits to be used by track finder: " << m_axialHitList.size());
       }
 
       void clearVectors() {
@@ -196,6 +196,8 @@ namespace Belle2 {
         for (TrackHit * trackHit : m_axialHitList) {
           if ((trackHit->getHitUsage() != TrackHit::used_in_track) && (trackHit->getHitUsage() != TrackHit::background)) it = hits_set.insert(it, trackHit);
         }
+
+        B2DEBUG(90, "In hit set are " << hits_set.size() << " hits.")
 
         return hits_set;
       }

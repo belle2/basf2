@@ -254,6 +254,14 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limit, double rT
   QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [&](QuadTreeLegendre * qt) -> void {
     TrackCandidate* trackCandidate = m_cdcLegendreTrackProcessor.createLegendreTrackCandidateFromQuadNode(qt);
 
+    unsigned int numberOfUsedHits = 0;
+    for (TrackHit * hit : hits_set) {
+      if (hit->getHitUsage() == TrackHit::used_in_track)
+        numberOfUsedHits++;
+    }
+
+    B2DEBUG(90, "Number of used hits: " << numberOfUsedHits)
+
     // Postprocessing of one track candidate
     m_cdcLegendreTrackProcessor.fitOneTrack(trackCandidate);
 
@@ -270,6 +278,8 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limit, double rT
     }
 
     m_cdcLegendreTrackProcessor.deleteTracksWithASmallNumberOfHits();
+
+
   };
 
   // Start loop, where tracks are searched for
@@ -296,8 +306,9 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limit, double rT
   std::vector<TrackHit*> hits_vector; //temporary array;
   m_cdcLegendreTrackDrawer->finalizeROOTFile(hits_vector);
 
-  B2DEBUG(100, "Number of steps in tree track finding: " << nSteps);
-  B2DEBUG(100, "Threshold on number of hits: " << limit);
+  B2DEBUG(90, "Number of steps in tree track finding: " << nSteps);
+  B2DEBUG(90, "Threshold on number of hits: " << limit);
+  B2DEBUG(90, "Threshold on r: " << rThreshold);
 }
 
 void CDCLegendreTrackingModule::postprocessTracks()

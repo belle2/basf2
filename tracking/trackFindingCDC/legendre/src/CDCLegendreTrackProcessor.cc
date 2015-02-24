@@ -33,6 +33,8 @@ TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromQuadNode(QuadTre
   // Create the legendre Track Candidate from the nodes
   TrackCandidate* trackCandidate = createLegendreTrackCandidateFromQuadNodeList(nodeList);
 
+  B2DEBUG(90, "Found new track with " << trackCandidate->getNHits() << " hits.")
+
   return trackCandidate;
 }
 

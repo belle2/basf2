@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -40,7 +41,7 @@ ConformalPosition::ConformalPosition()
   double fraction;
 
   //Initialize look-up table
-  double bin_width = m_PI / m_nbinsTheta;
+  double bin_width = TMath::Pi() / m_nbinsTheta;
   m_sin_theta = new double[m_nbinsTheta + 1];
   m_cos_theta = new double[m_nbinsTheta + 1];
 

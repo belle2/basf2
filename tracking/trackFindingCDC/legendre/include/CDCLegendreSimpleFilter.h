@@ -31,9 +31,6 @@ namespace Belle2 {
       /** This is a static class only. We do not need a constructor here */
       SimpleFilter() = delete;
 
-      /** Destructor is deleted */
-      ~SimpleFilter() = delete;
-
       /** Returns the probability of hit assignment to the track. Actually this is not a probability at all but only a number between 0 and 1.
        * 1 is best.
        * TODO: more robust criteria should be implemented */
@@ -55,14 +52,6 @@ namespace Belle2 {
     private:
 
       static constexpr double m_minimal_assignment_probability = 0.8;
-
-      // UNUSED AT THE MOMENT
-      // static constexpr double m_distFactor = 0.5; /**< Factor used in assignment probability estimation */
-      //    const double __attribute__((unused)) m_minProb = 0.98; /**< Minimal probability of hit assignment; currently no used*/
-      //    std::list<CDCLegendreFilterCandidate*> m_cdcLegendreFilterCandidateList;
-      //    std::list<CDCLegendreTrackCandidate*>& m_trackList;
-      //    std::list<CDCLegendreTrackCandidate*> m_trackCoreList;
-
     };
   }
 }

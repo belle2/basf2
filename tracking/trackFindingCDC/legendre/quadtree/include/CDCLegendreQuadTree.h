@@ -404,5 +404,8 @@ namespace Belle2 {
 
     };
 
+
+    // a special instance
+    typedef TrackFindingCDC::QuadTreeTemplate<int, double, TrackFindingCDC::TrackHit> QuadTreeLegendre;
   }
 }

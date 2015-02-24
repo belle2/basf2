@@ -56,7 +56,6 @@ namespace Belle2 {
 
       double* m_sin_theta; /**< Lookup array for calculation of sin */
       double* m_cos_theta; /**< Lookup array for calculation of cos */
-      static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
 
       static const int nLayers_max = 56; /**< Number of layers */
       static const int nWires_max = 384; /**< max. number of wires in layer */

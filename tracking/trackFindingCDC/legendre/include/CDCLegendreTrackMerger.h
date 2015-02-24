@@ -23,8 +23,6 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /* TODO: Check whether track overlaps with other tracks; may be try to sort tracks according to number of inresections/overlappings, some weights might be applied
-     * if track sharing more than, for example, 50% of hits, that track should be definitely splitted into few*/
     class TrackMerger {
     public:
 
@@ -33,69 +31,14 @@ namespace Belle2 {
        */
       TrackMerger() = delete;
 
-
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      static void doTracksMerging(std::list<TrackCandidate*> trackList, TrackFitter* trackFitter);
+      static void doTracksMerging(std::list<TrackCandidate*> trackList);
 
       /** Try to merge given track with tracks in tracklist. */
-      static void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::list<TrackCandidate*> trackList, TrackFitter* trackFitter);
+      static void tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::list<TrackCandidate*> trackList);
 
       /** Tries to split back-to-back tracks into two different tracks */
       static TrackCandidate* splitBack2BackTrack(TrackCandidate* trackCandidate);
-
-      /** Trying select core of the tracks and fit them together, then add good hits
-       * UNUSED */
-      //double selectCoreMergeFit(TrackCandidate* cand1, TrackCandidate* cand2);
-
-      /** Calculate distance between track and hit
-       * UNUSED */
-      //double checkDist(TrackHit* hit, TrackCandidate* cand);
-
-      /** Split tracks into positive and negative parts
-       * UNUSED */
-      //void splitTracks();
-
-      /** Check whether tracks are overlapping;
-       * for overlapping tracks try to merge them or make clear separation
-       * UNUSED
-       */
-      //void checkOverlapping();
-
-      /**
-       * @brief Function to merge two track candidates
-       * All hits of track 2 are assigned to track 1 and the mean of the r and theta values of the two tracks are assigned to track 1
-       * Track 2 is deleted.
-       * UNUSED
-       */
-      //bool earlyCandidateMerge(std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track, std::set<TrackHit*>& hits_set, bool fitTracksEarly);
-
-      /**
-       * @brief Function to merge two track candidates
-       * All hits of track 2 are assigned to track 1 and the mean of the r and theta values of the two tracks are assigned to track 1
-       * Track 2 is deleted.
-       * UNUSED
-       */
-      //void mergeTracks(TrackCandidate* cand1, const std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track, std::set<TrackHit*>& hits_set);
-
-      /**
-       * Function which adds stereo tracklets to the track
-       * Uses simple combinations of tracks
-       * also theta angle determination implemented; for each tracklet which possibly can belong to the track theta angle are
-       * calculated, and then voting for better theta angle done
-       * UNUSED
-       */
-      //void addStereoTracklesToTrack();
-
-      /** Set stereowire z position
-       * first, estimate z-position of wires, fine ajustment of z position using info about drift time
-       * UNUSED
-       */
-      //double fitStereoTrackletsToTrack(TrackCandidate*, TrackCandidate*);
-
-      /** Extend tracklet using conformal transformation with respect to given point
-       * UNUSED */
-      //void extendTracklet(TrackCandidate* tracklet, std::vector<TrackHit*>& m_AxialHitList);
-
 
     private:
 
@@ -124,7 +67,7 @@ namespace Belle2 {
        * As a result. the reduced probability for a good fit is given.
        * The bad hits are marked but none of them is deleted!
        * This method does not do the actual merging. */
-      static double doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2, TrackFitter* trackFitter);
+      static double doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* cand2);
 
       /**
        * Searches for the best candidate to merge this track to.
@@ -132,7 +75,7 @@ namespace Belle2 {
        * @param start_iterator the iterator where to start searching (this element included)
        * @return a pointer to the best fit candidate.
        */
-      static BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged, std::list<TrackCandidate*>::iterator start_iterator, std::list<TrackCandidate*>::iterator end_iterator, TrackFitter* trackFitter);
+      static BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged, std::list<TrackCandidate*>::iterator start_iterator, std::list<TrackCandidate*>::iterator end_iterator);
 
       /**
        * After the candidate-to-merge finding, some hits are marked as bad. This method resets them.
@@ -140,18 +83,10 @@ namespace Belle2 {
        */
       static void resetHits(TrackCandidate* otherTrackCandidate);
 
-      //std::list<TrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
-      //TrackFitter* m_cdcLegendreTrackFitter; /**< Track fitter */
-
       /**
        * This parameter is the minimum probability a fit must have to lead to the result: merge
        */
       static constexpr double m_minimum_probability_to_be_merged = 0.3;
-
-      //std::list<TrackCandidate*>& __attribute__((unused)) m_trackletList; /**< List of tracklets. */
-      //std::list<TrackCandidate*>& __attribute__((unused)) m_stereoTrackletList; /**< List of tracklets. */
-      //TrackProcessor* __attribute__((unused)) m_cdcLegendreTrackProcessor; /**< Track creator */
-      //FastHough* __attribute__((unused)) m_cdcLegendreFastHough;  /**< Fast Hough finder */
     };
   }
 }

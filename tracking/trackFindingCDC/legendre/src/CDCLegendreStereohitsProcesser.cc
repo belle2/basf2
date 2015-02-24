@@ -3,28 +3,22 @@
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 
 #include <framework/logging/Logger.h>
-#include "TH1F.h"
-#include "TCanvas.h"
+#include <TH1F.h>
+#include <TCanvas.h>
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-StereohitsProcesser::StereohitsProcesser()
+StereohitsProcesser::StereohitsProcesser() : m_cdcLegendreQuadTree(-0.15, 0.15,  0, 8192, 0, NULL)
 {
-  m_cdcLegendreQuadTree = new QuadTreeLegendre(-0.15, 0.15,  /*-1.*m_rc, m_rc,*/ 0, 8192, 0, NULL);
-//  m_cdcLegendreQuadTree->setLastLevel(12);
-
 }
 
 StereohitsProcesser::~StereohitsProcesser()
 {
 
-  m_cdcLegendreQuadTree->clearTree();
-  QuadTreeCandidateCreator::Instance().clearNodes();
-  QuadTreeCandidateCreator::Instance().clearCandidates();
-  delete m_cdcLegendreQuadTree;
-
+  m_cdcLegendreQuadTree.clearTree();
 }
 
 void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<TrackHit*>& stereohits)
@@ -96,7 +90,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
       sign_phi = 1 * cand->getChargeSign();
     */
 
-    double delta_phi = hit->getPhi() - (cand->getPhi() - m_PI * trackCharge / 2.) /*cand->getTheta()*/;
+    double delta_phi = hit->getPhi() - (cand->getPhi() - TMath::Pi() * trackCharge / 2.) /*cand->getTheta()*/;
     if (delta_phi > 3.1415) delta_phi -= 2.*3.1415;
     if (delta_phi < -3.1415) delta_phi += 2.*3.1415;
 
@@ -377,9 +371,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
   TrackCandidate* stereoPart = nullptr;
 
-  m_cdcLegendreQuadTree->clearTree();
-  QuadTreeCandidateCreator::Instance().clearNodes();
-  QuadTreeCandidateCreator::Instance().clearCandidates();
+  m_cdcLegendreQuadTree.clearTree();
 
   unsigned int __attribute__((unused)) limit = 6;
   double __attribute__((unused)) rThreshold = 0.15;
@@ -387,22 +379,22 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   std::vector<QuadTreeLegendre*> nodeList;
 
   int lastlevel(0);
-  lastlevel = m_cdcLegendreQuadTree->getLastLevel();
-  m_cdcLegendreQuadTree->setLastLevel(9);
+  lastlevel = m_cdcLegendreQuadTree.getLastLevel();
+  m_cdcLegendreQuadTree.setLastLevel(9);
 
-  m_cdcLegendreQuadTree->provideItemsSet<QuadTreeProcessor>(hits_set);
+  m_cdcLegendreQuadTree.provideItemsSet<QuadTreeProcessor>(hits_set);
   B2INFO("Number of stereohits = " << hits_set.size());
 //  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
-  m_cdcLegendreQuadTree->setNItemsThreshold(limit);
+  m_cdcLegendreQuadTree.setNItemsThreshold(limit);
 
   // store all candidates in a simple vector
   QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [&nodeList](QuadTreeLegendre * qt) -> void {
     nodeList.push_back(qt);
   };
 
-  m_cdcLegendreQuadTree->startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
+  m_cdcLegendreQuadTree.startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
 
-  m_cdcLegendreQuadTree->setLastLevel(lastlevel);
+  m_cdcLegendreQuadTree.setLastLevel(lastlevel);
 
 
   if (nodeList.size() != 0) {
@@ -439,9 +431,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   }
 
 
-  m_cdcLegendreQuadTree->clearTree();
-  QuadTreeCandidateCreator::Instance().clearNodes();
-  QuadTreeCandidateCreator::Instance().clearCandidates();
+  m_cdcLegendreQuadTree.clearTree();
 
 
 }
@@ -681,11 +671,11 @@ double StereohitsProcesser::getAlpha(TrackCandidate* cand, std::pair<double, dou
 
 //  int charge = cand->getChargeSign();
 
-  double delta_phi_outer = hitPhi - (cand->getPhi() - m_PI * cand->getChargeSign() / 2.) /*cand->getTheta()*/;
+  double delta_phi_outer = hitPhi - (cand->getPhi() - TMath::Pi() * cand->getChargeSign() / 2.) /*cand->getTheta()*/;
   if (delta_phi_outer > 3.1415) delta_phi_outer -= 2.*3.1415;
   if (delta_phi_outer < -3.1415) delta_phi_outer += 2.*3.1415;
 
-  if (delta_phi_outer * cand->getChargeSign() < 0) alpha = m_PI * 2. - alpha;
+  if (delta_phi_outer * cand->getChargeSign() < 0) alpha = TMath::Pi() * 2. - alpha;
 
   return alpha;
 

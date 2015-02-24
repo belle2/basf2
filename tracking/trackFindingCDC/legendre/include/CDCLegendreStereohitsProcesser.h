@@ -17,7 +17,6 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeCandidateCreator.h>
 #include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
 
 #include <framework/datastore/StoreArray.h>
@@ -81,10 +80,7 @@ namespace Belle2 {
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
     private:
-
-      static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
-
-      QuadTreeLegendre* m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
+      QuadTreeLegendre m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
 
     };
   }

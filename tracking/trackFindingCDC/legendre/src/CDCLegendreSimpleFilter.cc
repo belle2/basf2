@@ -35,47 +35,6 @@ double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* trac
 
 void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_trackList)
 {
-
-  /*
-  double total_prob = 1.;
-  for (CDCLegendreFilterCandidate* filterCandidate : m_cdcLegendreFilterCandidateList) {
-
-    for(auto& hitMap: filterCandidate->getHitsMap()){
-      CDCLegendreTrackHit* hit = hitMap.first;
-      double prob = hitMap.second;
-
-  //     if(prob<m_minProb){
-
-        double bestHitProb = prob;
-        TrackCandidate* BestCandidate;
-
-        for (TrackCandidate * cand : m_trackList) {
-          double probTemp = getAssigmentProbability(hit, cand);
-
-          int curve_sign = hit->getCurvatureSignWrt(cos(cand->getTheta()) / cand->getR(), sin(cand->getTheta()) / cand->getR());
-
-          if(probTemp > bestHitProb && curve_sign == cand->getCharge()) {
-            BestCandidate = cand;
-            bestHitProb = probTemp;
-          }
-        }
-
-        if(bestHitProb > prob) {
-          filterCandidate->getLegendreCandidate()->removeHit(hit);
-          BestCandidate->addHit(hit);
-  //         filterCandidate->removeHit(hit);
-          B2INFO("Hit has been reassigned.");
-        }
-
-
-  //     }
-
-    }
-
-  }
-
-  */
-
   int ii = 0;
 
   B2DEBUG(100, "NCands = " << m_trackList.size());
@@ -164,7 +123,6 @@ void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::
 
 void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability)
 {
-
   std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
 
   if (trackHits.size() == 0) return;
@@ -187,56 +145,3 @@ void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double
 
   deleteAllMarkedHits(trackCandidate);
 }
-
-// UNUSED AT THE MOMENT
-
-/*
-void SimpleFilter::trackCore()
-{
-
-  for (TrackCandidate * cand : m_trackList) {
-
-//    if(cand->getTrackHits().size() < 10)
-
-    for (CDCLegendreTrackHit * hit : cand->getTrackHits()) {
-      bool removeHit = false;
-      double prob = getAssigmentProbability(hit, cand);;
-
-      if (prob < 0.9) {
-        removeHit = true;
-      } else {
-
-        double otherProbs = 0;
-
-        for (TrackCandidate * candInner : m_trackList) {
-          if (candInner == cand) continue;
-          double probTemp = getAssigmentProbability(hit, candInner);
-
-          if (probTemp > otherProbs && curve_sign == candInner->getCharge()) {
-
-            otherProbs = probTemp;
-          }
-        }
-
-        if (otherProbs > prob || otherProbs > 0.6) {
-          removeHit = true;
-        }
-      }
-
-      if (removeHit) {
-        cand->removeHit(hit);
-//        B2INFO("Hit has been removed!");
-      }
-
-
-    }
-
-  }
-
-
-
-}
-
-*/
-
-

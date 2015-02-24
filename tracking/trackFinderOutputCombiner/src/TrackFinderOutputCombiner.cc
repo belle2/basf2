@@ -72,7 +72,7 @@ double TrackFinderOutputCombiner::constructTrackCandidate(genfit::TrackCand* new
     return -1;
   }
 
-  TrackFindingCDC::TrackFitter fitter(0, 0, 0, true);
+  TrackFindingCDC::TrackFitter fitter;
   std::pair<double, double> reference_point;
   std::pair<double, double> track_parameter;
   fitter.fitTrackCandidateFast(hitsAxial, track_parameter, reference_point);

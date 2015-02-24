@@ -31,7 +31,7 @@ using namespace TrackFindingCDC;
 void fitTrackCandidate(TrackCandidate* trackCandidate)
 {
   // Fit the track to get good parameter assumptions
-  TrackFitter fitter(0, 0, 0, true);
+  TrackFitter fitter;
   std::pair<double, double> track_par;
   std::pair<double, double> ref_point;
 

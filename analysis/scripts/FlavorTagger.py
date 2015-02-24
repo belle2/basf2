@@ -3,7 +3,8 @@
 
  # *************  Flavor Tagging   ************
  # * Authors: Fernando Abudinen, Moritz Gelb  *
- # *.....     and Thomas Keck                 *
+ # *.....     and Thomas Keck
+ # * Contributor: Christian Roca
  # * This script is needed to test            *
  # * the previously trained flavor tagger.    *
  # ********************************************
@@ -13,6 +14,94 @@ from modularAnalysis import *
 import variables as mc_variables
 from ROOT import Belle2
 import os
+
+
+class FlavorTaggerInfoInitializer(Module):
+
+    """
+    Initializes FlavorTaggerInfoFiller module by registering the FlavorTagInfo DataObject in 
+    the DataStore. It needs to be done in a separate module because it will be added to the
+    main path, and not to the roe_path defined in the FlavorTagger function. Otherwise it won't work;
+    """
+
+    def initialize(self):
+        Belle2.PyStoreObj('FlavorTagInfo').registerInDataStore()
+
+    def event(self):
+        FlavorTaggerInfo = Belle2.PyStoreObj('FlavorTagInfo')
+        FlavorTaggerInfo.create()
+
+
+class FlavorTaggerInfoFiller(Module):
+
+    """
+    Creates a new FlavorTagInfo DataObject and saves there all the relevant information of the
+    FlavorTagging:
+    - Track probability of being the right target for every category (right target means 
+      coming directly from the B)
+    - Highest probability track's pointer
+    - Event probability of belonging to a given category
+    """
+
+    def event(self):
+      # Calls the event extra info were all Flavor Tagging Info is saved
+        path = analysis_main
+        info = Belle2.PyStoreObj('EventExtraInfo')
+        weightFiles = 'B2JpsiKs_mu'
+
+        FlavorTaggerInfo = Belle2.PyStoreObj('FlavorTagInfo')  # Already created in the Initializer above
+
+        for (symbol, category) in EventLevelParticleLists:
+            particleList = symbol + ':ROE'
+            methodPrefixEventLevel = weightFiles + 'EventLevel' + category \
+                + 'TMVA'
+            targetVariable = 'IsRightClass(' + category + ')'
+            if category == 'KaonPion':
+                fillParticleList(particleList, 'hasHighestProbInCat('
+                                 + particleList + ',' + 'IsFromB(Kaon)) > 0.5'
+                                 , path=path)
+            elif category == 'FSC':
+                fillParticleList(particleList, 'hasHighestProbInCat('
+                                 + particleList + ','
+                                 + 'IsFromB(SlowPion)) > 0.5', path=path)
+            elif category == 'Lambda':
+                applyCuts(particleList, 'hasHighestProbInCat(' + particleList
+                          + ',' + 'IsFromB(Lambda)) > 0.5', path=path)
+            else:
+                fillParticleList(particleList, 'hasHighestProbInCat('
+                                 + particleList + ',' + 'IsFromB(' + category
+                                 + ')) > 0.5', path=path)
+
+    # Load the Particle list in Python after the cuts
+            plist = Belle2.PyStoreObj(symbol + ':ROE')
+            for i in range(0, plist.obj().getListSize()):
+                particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
+
+                if not particle.hasExtraInfo('IsFromB(' + category + ')'):
+                    break
+
+                track = particle.getTrack()  # Track of the particle
+                targetProb = particle.getExtraInfo('IsFromB(' + category + ')')  # Prob of being the right target
+                categoryProb = particle.getExtraInfo('IsRightClass('
+                        + category + ')')  # Prob of belonging to a cat
+
+      # Find Mother of MCTruth - if B (511) give True -- temporally used
+                MCparticle = particle.getRelated('MCParticles')
+                MCMother = MCparticle.getMother()
+                if not MCMother:
+                    break
+                if MCMother.getPDG() == 511 or MCMother.getPDG() == -511:
+                    isIt = True
+                else:
+                    isIt = False
+
+      # Save information in the FlavorTagInfo DataObject
+                FlavorTaggerInfo.obj().setIsB(isIt)
+                FlavorTaggerInfo.obj().setTrack(track)
+                FlavorTaggerInfo.obj().setCategories(category)
+                FlavorTaggerInfo.obj().setCatProb(categoryProb)
+                FlavorTaggerInfo.obj().setTargProb(targetProb)
+                FlavorTaggerInfo.obj().setParticle(particle)
 
 
 class RemoveEmptyROEModule(Module):
@@ -546,9 +635,11 @@ def FlavorTagger(
         if TrackLevel(mode, weightFiles, roe_path):
             if EventLevel(mode, weightFiles, roe_path):
                 CombinerLevel(mode, weightFiles, roe_path)
+                roe_path.add_module(FlavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path
 
     roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())  # Move and remove extraInfo
     roe_path.add_module(RemoveExtraInfoModule())
+    path.add_module(FlavorTaggerInfoInitializer())  # Initialation of FlavorTag dataObject needs to be done in the main path
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 

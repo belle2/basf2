@@ -35,7 +35,7 @@ fi
 echo "================================================================================"
 if [ ! -d basf2 ]; then
   echo "Looking for current basf2 version..."
-  CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software 2>/dev/null | head -2 | tail -1 | awk '{print $1}'`
+  CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software | head -2 | tail -1 | awk '{print $1}'`
   echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 900MB for storing the entire history, 220MB for the latest alone). Ctrl-c to abort."
   select SVN_CLONE_FROM in "all" $CURRENT_REV; do
     echo "Selected: $SVN_CLONE_FROM"

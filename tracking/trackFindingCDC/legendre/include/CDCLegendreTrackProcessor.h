@@ -41,13 +41,15 @@ namespace Belle2 {
        * Do not copy this class
        */
       TrackProcessor(const TrackProcessor& copy) = delete;
+
+      /**
+       * Do not copy this class
+       */
       TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       /**
-       * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
+       * Using a node from the quad tree we create a new track candidate with all hits.
        */
-      TrackCandidate* createLegendreTrackCandidateFromQuadNodeList(const std::vector<QuadTreeLegendre*>& nodeList);
-
       TrackCandidate* createLegendreTrackCandidateFromQuadNode(QuadTreeLegendre* node);
 
       /** Create tracklet using vector of hits and store it
@@ -76,26 +78,15 @@ namespace Belle2 {
         return m_axialHitList;
       }
 
-      void initializeHitList(const StoreArray<CDCHit> cdcHits) {
-        B2DEBUG(90, "Number of digitized hits: " << cdcHits.getEntries());
+      /**
+       * Compile the hitList from the StoreArray with CDCHits.
+       * @param cdcHits
+       */
+      void initializeHitList(const StoreArray<CDCHit> cdcHits);
 
-        if (cdcHits.getEntries() == 0) {
-          B2WARNING("cdcHitsCollection is empty!");
-        }
-
-        m_axialHitList.reserve(2048);
-        for (int iHit = 0; iHit < cdcHits.getEntries(); iHit++) {
-          TrackHit* trackHit = new TrackHit(cdcHits[iHit], iHit);
-          if (trackHit->checkHitDriftLength() and trackHit->getIsAxial()) {
-            m_axialHitList.push_back(trackHit);
-          } else {
-            delete trackHit;
-          }
-        }
-
-        B2DEBUG(90, "Number of hits to be used by track finder: " << m_axialHitList.size());
-      }
-
+      /**
+       * After each event the created hits and trackCandidates should be deleted.
+       */
       void clearVectors() {
         for (TrackHit * hit : m_axialHitList) {
           delete hit;
@@ -108,99 +99,62 @@ namespace Belle2 {
         m_trackList.clear();
       }
 
-      void deleteHitsOfAllBadTracks() {
-        SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
-        fitAllTracks();
-        for (TrackCandidate * trackCandidate : m_trackList) {
-          SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
-        }
-        fitAllTracks();
-      }
+      /**
+       * Postprocessing: Delete hits that do not "match" to the tracks.
+       */
+      void deleteHitsOfAllBadTracks();
 
-      void deleteBadHitsOfOneTrack(TrackCandidate* trackCandidate) {
-        TrackCandidate* resultSplittedTrack = TrackMerger::splitBack2BackTrack(trackCandidate);
-        if (resultSplittedTrack != nullptr) {
-          m_trackList.push_back(resultSplittedTrack);
-          fitOneTrack(resultSplittedTrack);
-          fitOneTrack(trackCandidate);
-        }
-        SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
-        fitOneTrack(trackCandidate);
-      }
+      /**
+       * Postprocessing: Delete hits that do not "match" to the given track.
+       */
+      void deleteBadHitsOfOneTrack(TrackCandidate* trackCandidate);
 
-      void mergeOneTrack(TrackCandidate* trackCandidate) {
-        TrackMerger::tryToMergeTrackWithOtherTracks(trackCandidate, m_trackList);
+      /**
+       * Postprocessing: Try to merge this track candidate to the others.
+       */
+      void mergeOneTrack(TrackCandidate* trackCandidate);
 
-        // Has merging deleted the candidate?
-        if (trackCandidate == nullptr) return;
+      /**
+       * Postprocessing: Try to merge all track candidates with all others.
+       */
+      void mergeAllTracks();
 
-        for (TrackCandidate * cand : m_trackList) {
-          SimpleFilter::deleteWrongHitsOfTrack(cand, 0.8);
-          m_cdcLegendreTrackFitter.fitTrackCandidateFast(cand);
-          cand->reestimateCharge();
-        }
-      }
+      /**
+       * Postprocessing: Try to reassign hits between all tracks.
+       */
+      void appendHitsOfAllTracks();
 
-      void mergeAllTracks() {
-        TrackMerger::doTracksMerging(m_trackList);
-        for (TrackCandidate * trackCandidate : m_trackList) {
-          SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
-        }
-        fitAllTracks();
-      }
+      /**
+       * Fit all tracks and reestimate charge.
+       */
+      void fitAllTracks();
 
-      void appendHitsOfAllTracks() {
-        SimpleFilter::reassignHitsFromOtherTracks(m_trackList);
-        fitAllTracks();
-        SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.90);
-        fitAllTracks();
-        for (TrackCandidate * trackCandidate : m_trackList) {
-          SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
-          fitOneTrack(trackCandidate);
-        }
-      }
-
-      void fitAllTracks()  {
-        for (TrackCandidate * cand : m_trackList) {
-          fitOneTrack(cand);
-        }
-      }
-
+      /**
+       * Fits one track and reestimates the charge.
+       * @param trackCandidate
+       */
       void fitOneTrack(TrackCandidate* trackCandidate) {
         m_cdcLegendreTrackFitter.fitTrackCandidateFast(trackCandidate);
         trackCandidate->reestimateCharge();
       }
 
+      /**
+       * Sets the track drawer.
+       */
       void setTrackDrawer(TrackDrawer* cdcLegendreTrackDrawer) {
         m_cdcLegendreTrackDrawer = cdcLegendreTrackDrawer;
       }
 
-      void deleteTracksWithASmallNumberOfHits() {
-        // Delete a track if we have to few hits left
-        m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(), [](TrackCandidate * trackCandidate) {
-          return trackCandidate->getNHits() < 3;
-        }), m_trackList.end());
-      }
+      /**
+       * After processing we want to delete all tracks which are too small.
+       */
+      void deleteTracksWithASmallNumberOfHits();
 
-      std::set<TrackHit*> createHitSet() {
-        for (TrackCandidate * cand : m_trackList) {
-          for (TrackHit * hit : cand->getTrackHits()) {
-            hit->setHitUsage(TrackHit::used_in_track);
-          }
-        }
-
-
-        std::sort(m_axialHitList.begin(), m_axialHitList.end());
-        std::set<TrackHit*> hits_set;
-        std::set<TrackHit*>::iterator it = hits_set.begin();
-        for (TrackHit * trackHit : m_axialHitList) {
-          if ((trackHit->getHitUsage() != TrackHit::used_in_track) && (trackHit->getHitUsage() != TrackHit::background)) it = hits_set.insert(it, trackHit);
-        }
-
-        B2DEBUG(90, "In hit set are " << hits_set.size() << " hits.")
-
-        return hits_set;
-      }
+      /**
+       * For the use in the QuadTree use this hit set.
+       * @return the hit set to use in the QuadTree-Finding.
+       */
+      std::set<TrackHit*> createHitSet();
 
 
     private:
@@ -223,7 +177,10 @@ namespace Belle2 {
        */
       void processTrack(TrackCandidate* track);
 
-
+      /**
+       * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
+       */
+      TrackCandidate* createLegendreTrackCandidateFromQuadNodeList(const std::vector<QuadTreeLegendre*>& nodeList);
     };
   }
 }

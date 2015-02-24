@@ -130,3 +130,120 @@ void TrackProcessor::sortHits(std::vector<TrackHit*>& hits, int charge)
   SortHits sorter(charge);
   stable_sort(hits.begin(), hits.end(), sorter);
 }
+
+std::set<TrackHit*> TrackProcessor::createHitSet()
+{
+  for (TrackCandidate * cand : m_trackList) {
+    for (TrackHit * hit : cand->getTrackHits()) {
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+  }
+  std::sort(m_axialHitList.begin(), m_axialHitList.end());
+  std::set<TrackHit*> hits_set;
+  std::set<TrackHit*>::iterator it = hits_set.begin();
+  for (TrackHit * trackHit : m_axialHitList) {
+    if ((trackHit->getHitUsage() != TrackHit::used_in_track)
+        && (trackHit->getHitUsage() != TrackHit::background))
+      it = hits_set.insert(it, trackHit);
+  }
+  B2DEBUG(90, "In hit set are " << hits_set.size() << " hits.")
+  return hits_set;
+}
+
+void TrackProcessor::deleteTracksWithASmallNumberOfHits()
+{
+  // Delete a track if we have to few hits left
+  m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(), [](TrackCandidate * trackCandidate) {
+    for (TrackHit * trackHit : trackCandidate->getTrackHits()) {
+      trackHit->setHitUsage(TrackHit::not_used);
+    }
+    return trackCandidate->getNHits() < 3;
+  }), m_trackList.end());
+}
+
+void TrackProcessor::fitAllTracks()
+{
+  for (TrackCandidate * cand : m_trackList) {
+    fitOneTrack(cand);
+  }
+}
+
+
+void TrackProcessor::initializeHitList(const StoreArray<CDCHit> cdcHits)
+{
+  B2DEBUG(90, "Number of digitized hits: " << cdcHits.getEntries());
+  if (cdcHits.getEntries() == 0) {
+    B2WARNING("cdcHitsCollection is empty!");
+  }
+  m_axialHitList.reserve(2048);
+  for (int iHit = 0; iHit < cdcHits.getEntries(); iHit++) {
+    TrackHit* trackHit = new TrackHit(cdcHits[iHit], iHit);
+    if (trackHit->checkHitDriftLength() && trackHit->getIsAxial()) {
+      m_axialHitList.push_back(trackHit);
+    } else {
+      delete trackHit;
+    }
+  }
+  B2DEBUG(90,
+          "Number of hits to be used by track finder: " << m_axialHitList.size());
+}
+
+void TrackProcessor::deleteHitsOfAllBadTracks()
+{
+  SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
+  fitAllTracks();
+  for (TrackCandidate * trackCandidate : m_trackList) {
+    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
+  }
+  fitAllTracks();
+}
+
+void TrackProcessor::deleteBadHitsOfOneTrack(
+  TrackCandidate* trackCandidate)
+{
+  TrackCandidate* resultSplittedTrack = TrackMerger::splitBack2BackTrack(
+                                          trackCandidate);
+  if (resultSplittedTrack != nullptr) {
+    m_trackList.push_back(resultSplittedTrack);
+    fitOneTrack(resultSplittedTrack);
+    fitOneTrack(trackCandidate);
+  }
+  SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
+  fitOneTrack(trackCandidate);
+}
+
+void TrackProcessor::mergeOneTrack(TrackCandidate* trackCandidate)
+{
+  TrackMerger::tryToMergeTrackWithOtherTracks(trackCandidate, m_trackList);
+  // Has merging deleted the candidate?
+  if (trackCandidate == nullptr)
+    return;
+
+  for (TrackCandidate * cand : m_trackList) {
+    SimpleFilter::deleteWrongHitsOfTrack(cand, 0.8);
+    m_cdcLegendreTrackFitter.fitTrackCandidateFast(cand);
+    cand->reestimateCharge();
+  }
+}
+
+void TrackProcessor::mergeAllTracks()
+{
+  TrackMerger::doTracksMerging(m_trackList);
+  for (TrackCandidate * trackCandidate : m_trackList) {
+    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
+  }
+  fitAllTracks();
+}
+
+void TrackProcessor::appendHitsOfAllTracks()
+{
+  SimpleFilter::reassignHitsFromOtherTracks(m_trackList);
+  fitAllTracks();
+  SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.90);
+  fitAllTracks();
+  for (TrackCandidate * trackCandidate : m_trackList) {
+    SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
+    fitOneTrack(trackCandidate);
+  }
+}
+

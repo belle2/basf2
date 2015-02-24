@@ -520,6 +520,9 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       if (relDigitMCParticle) {
         typedef const RelationIndex<SVDDigit, MCParticle>::Element relMC_type;
         for (relMC_type & mcRel : relDigitMCParticle.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
+          //negative weights are from ignored particles, we don't like them and
+          //thus ignore them :D
+          if (mcRel.weight < 0) continue;
           mc_relations[mcRel.indexTo] += mcRel.weight;
         };
       };
@@ -527,6 +530,9 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       if (relDigitTrueHit) {
         typedef const RelationIndex<SVDDigit, SVDTrueHit>::Element relTrueHit_type;
         for (relTrueHit_type & trueRel : relDigitTrueHit.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
+          //negative weights are from ignored particles, we don't like them and
+          //thus ignore them :D
+          if (trueRel.weight < 0) continue;
           truehit_relations[trueRel.indexTo] += trueRel.weight;
         };
       };

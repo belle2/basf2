@@ -251,6 +251,12 @@ void PXDDigitizerModule::event()
       relMCParticleSimHit.getFirstElementTo(m_currentHit);
     if (mcRel) {
       m_currentParticle = mcRel->indexFrom;
+      if (mcRel->weight < 0) {
+        //This simhit is from a particle which was not saved by the simulation
+        //so we do not take it into account for relations. Otherwise we might
+        //end up adding positive and negative weights together
+        m_currentParticle = -1;
+      }
     } else {
       // Don't warn if this is a background SimHit
       if (m_currentHit->getBackgroundTag() == SimHitBase::bg_none)
@@ -260,7 +266,8 @@ void PXDDigitizerModule::event()
     }
     const RelationIndex<PXDTrueHit, PXDSimHit>::Element* trueRel =
       relTrueHitSimHit.getFirstElementTo(m_currentHit);
-    if (trueRel) {
+    //We only care about true hits from particles which have not been ignored
+    if (trueRel && trueRel->weight > 0) {
       m_currentTrueHit = trueRel->indexFrom;
     } else {
       m_currentTrueHit = -1;

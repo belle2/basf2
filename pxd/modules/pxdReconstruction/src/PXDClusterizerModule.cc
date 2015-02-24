@@ -252,6 +252,9 @@ void PXDClusterizerModule::fillRelationMap(const RelationLookup& lookup, std::ma
     const unsigned int size = element.getSize();
     //Add all Relations to the map
     for (unsigned int i = 0; i < size; ++i) {
+      //negative weights are from ignored particles, we don't like them and
+      //thus ignore them :D
+      if (element.getWeight(i) < 0) continue;
       relation[element.getToIndex(i)] += element.getWeight(i);
     }
   }

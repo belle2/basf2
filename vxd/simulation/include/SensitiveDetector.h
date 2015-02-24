@@ -122,8 +122,6 @@ namespace Belle2 {
       VXD::SensitiveDetectorBase(sensorInfo)
     {
       //Register output collections.
-      //Note that we have many SensitiveDetector classes, so this will be attempted many times,
-      //therefore we have to suppress errors.
       //m_mcparticles.required();
       m_simhits.registerInDataStore();
       m_truehits.registerInDataStore();
@@ -131,7 +129,7 @@ namespace Belle2 {
       m_relMCTrueHits.registerInDataStore();
       m_relTrueSimHits.registerInDataStore();
       registerMCParticleRelation(m_relMCSimHits, RelationArray::c_negativeWeight);
-      registerMCParticleRelation(m_relMCTrueHits, RelationArray::c_negativeWeight);
+      registerMCParticleRelation(m_relMCTrueHits, RelationArray::c_deleteElement);
     }
 
     template <class SimHitClass, class TrueHitClass>

@@ -120,18 +120,29 @@ namespace Belle2 {
      */
     void doTreeTrackFinding(unsigned int limit, double rThreshold, bool increaseThreshold = false);
 
+    /**
+     * Do the postprocessing like merging, reassignment or deleting of hits.
+     */
     void postprocessTracks();
 
     /**
      * All objects in m_hitList and m_trackList are deleted and the two lists are cleared.
-     * Necessary since we cannot use smart pointers up to now.
      */
     void clearVectors();
 
-    void setupGeometry();
-    void fitAllTracks();
+    /**
+     * Do the real tree track finding.
+     */
     void findTracks();
+
+    /**
+     * Startup code before the event starts.
+     */
     void startNewEvent();
+
+    /**
+     * Write the objects to the store array.
+     */
     void outputObjects();
   };
 

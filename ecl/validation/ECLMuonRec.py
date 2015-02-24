@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import os
 from basf2 import *
 
@@ -22,8 +23,9 @@ g4sim = register_module('FullSim')
 # Set the number of events to be processed (1000 events)
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
-import random
-intseed = random.randint(1, 10000000)
+# import random
+# intseed = random.randint(1, 10000000)
+set_random_seed(123456)
 
 pGun = register_module('ParticleGun')
 param_pGun = {
@@ -75,7 +77,7 @@ mctrackfinder.param(param_mctrackfinder)
 
 trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
-#trackfitter.param('NIterations', 3)
+# trackfitter.param('NIterations', 3)
 
 trackfitchecker = register_module('TrackFitChecker')
 trackfitchecker.logging.log_level = LogLevel.INFO

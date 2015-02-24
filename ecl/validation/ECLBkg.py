@@ -69,16 +69,16 @@ bkgFiles = [
     bkgdir + 'Touschek_LER_100usECL.root',
     ]
 
-bg = []
-if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
-    bg += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+# bg = []
+# if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
+#    bg += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 
 # Create paths
 main = create_path()
 main.add_module(eventinfosetter)
 # main.add_module(eventinfoprinter)
 # main.add_module(pGun)
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=bkgFiles)
 add_reconstruction(main)
 main.add_module(eclanalysis)
 # main.add_module(simpleoutput)

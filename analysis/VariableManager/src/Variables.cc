@@ -202,6 +202,12 @@ namespace Belle2 {
 
     double particleDistanceSignificance(const Particle* part)
     {
+      // significance is defined as s = r/sigma_r, therefore:
+      // s &= \frac{r}{\sqrt{ \sum_{ij} \frac{\partial r}{x_i} V_{ij} \frac{\partial r}{x_j}}}
+      //   &= \frac{r^2}{\sqrt{\vec{x}V\vec{x}}}
+      // where:
+      // r &= \sqrt{\vec{x}*\vec{x}}
+      // and V_{ij} is the covariance matrix
       const auto& vertex = part->getVertex();
       auto denominator = vertex * (part->getVertexErrorMatrix() * vertex);
       if (denominator <= 0)

@@ -64,7 +64,7 @@ namespace Belle2 {
      *
      * @return The initial random number generator object.
     */
-    static const TRandom3 getInitialRandom() {return s_initialRandom;};
+    static const TRandom3& getInitialRandom() { return s_initialRandom; }
 
 
     //--------------------------------------------------

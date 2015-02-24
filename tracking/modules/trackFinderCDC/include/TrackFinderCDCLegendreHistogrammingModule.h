@@ -67,6 +67,9 @@ namespace Belle2 {
     std::vector<TrackFindingCDC::TrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
     std::list<TrackFindingCDC::TrackCandidateWithStereoHits*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
 
+    std::string m_param_cdcHitsColumnName;
+    std::string m_param_trackCandidatesColumnName;
+
     void clear_pointer_vectors();
 
   };

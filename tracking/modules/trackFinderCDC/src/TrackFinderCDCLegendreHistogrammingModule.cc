@@ -22,7 +22,13 @@ REG_MODULE(CDCLegendreHistogramming)
 
 CDCLegendreHistogrammingModule::CDCLegendreHistogrammingModule()
 {
+  addParam("CDCHitsColName", m_param_cdcHitsColumnName,
+           "Input CDCHits collection (should be created by CDCDigi module)",
+           string("CDCHits"));
 
+  addParam("GFTrackCandidatesColName", m_param_trackCandidatesColumnName,
+           "Output GFTrackCandidates collection",
+           string("TrackCands"));
 }
 
 CDCLegendreHistogrammingModule::~CDCLegendreHistogrammingModule()
@@ -41,7 +47,7 @@ void CDCLegendreHistogrammingModule::event()
 
   B2INFO("**********   CDCLegendreHistogrammingModule  ************");
 
-  StoreArray<CDCHit> cdcHits("");
+  StoreArray<CDCHit> cdcHits(m_param_cdcHitsColumnName);
   B2DEBUG(100,
           "CDCTracking: Number of digitized Hits: " << cdcHits.getEntries());
 
@@ -68,7 +74,7 @@ void CDCLegendreHistogrammingModule::event()
 
 
   //get genfit candidates from StoreArray
-  StoreArray<genfit::TrackCand> gfTrackCands("");
+  StoreArray<genfit::TrackCand> gfTrackCands(m_param_trackCandidatesColumnName);
 
   if (gfTrackCands.getEntries() == 0) {
     B2WARNING("CDCTracking: gfTrackCands is empty!");

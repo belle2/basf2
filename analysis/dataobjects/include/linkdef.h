@@ -12,6 +12,7 @@
 #pragma link C++ class Belle2::RestOfEvent+;
 #pragma link C++ class Belle2::Vertex+;
 #pragma link C++ class Belle2::ContinuumSuppression+;
+#pragma link C++ class Belle2::FlavorTagInfo+;
 //these two are needed when using these types (returned by Particle) in PyROOT
 #pragma link C++ class vector<Belle2::Particle*>-;
 #pragma link C++ class vector<const Belle2::Particle*>-;

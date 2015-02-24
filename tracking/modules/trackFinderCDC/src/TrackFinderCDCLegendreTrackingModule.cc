@@ -106,7 +106,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            "Flag, whether curlers should be reconstructed", false);
 
   addParam("DeleteHitsInTheEnd", m_deleteHitsInTheEnd,
-           "Try to delete bad hits from track candidate in the end.", false);
+           "Try to delete bad hits from track candidate in the end.", true);
   addParam("MergeTracksInTheEnd", m_mergeTracksInTheEnd,
            "Try to merge tracks in the end.", true);
   addParam("AppendHitsInTheEnd", m_appendHitsInTheEnd,

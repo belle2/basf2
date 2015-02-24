@@ -152,7 +152,7 @@ namespace Belle2 {
       void appendHitsOfAllTracks() {
         SimpleFilter::reassignHitsFromOtherTracks(m_trackList);
         fitAllTracks();
-        SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
+        SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.90);
         fitAllTracks();
         for (TrackCandidate * trackCandidate : m_trackList) {
           SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);

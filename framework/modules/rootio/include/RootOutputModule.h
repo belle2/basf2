@@ -87,6 +87,9 @@ namespace Belle2 {
      */
     void fillTree(DataStore::EDurability durability);
 
+    /** Create and fill FileMetaData object. */
+    void fillFileMetaData();
+
     //first the steerable variables:
 
     /** Name for output file.

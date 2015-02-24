@@ -170,8 +170,7 @@ void RootOutputModule::event()
   }
 }
 
-
-void RootOutputModule::terminate()
+void RootOutputModule::fillFileMetaData()
 {
   //get pointer to file level metadata
   StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
@@ -189,7 +188,6 @@ void RootOutputModule::terminate()
       RootIOUtilities::buildIndex(tree);
     }
 
-    //fill the file level metadata
     fileMetaDataPtr->setEvents(numEntries);
     fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
     fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
@@ -199,11 +197,15 @@ void RootOutputModule::terminate()
   fileMetaDataPtr->setParents(m_parents);
   const char* release = getenv("BELLE2_RELEASE");
   if (!release) release = "unknown";
-  char* site = getenv("BELLE2_SITE");
-  if (!site) {
+  string site;
+  const char* belle2_site = getenv("BELLE2_SITE");
+  if (belle2_site) {
+    site = belle2_site;
+  } else {
     char hostname[1024];
-    gethostname(hostname, 1023);
-    site = static_cast<char*>(hostname);
+    gethostname(hostname, 1023); //will not work well for ipv6
+    hostname[1023] = '\0'; //if result is truncated, terminating null byte may be missing
+    site = hostname;
   }
   const char* user = getenv("BELLE2_USER");
   if (!user) user = getenv("USER");
@@ -217,6 +219,12 @@ void RootOutputModule::terminate()
   if (m_updateFileCatalog) {
     FileCatalog::Instance().registerFile(m_outputFileName, *fileMetaDataPtr);
   }
+}
+
+
+void RootOutputModule::terminate()
+{
+  fillFileMetaData();
 
   //fill Persistent data
   fillTree(DataStore::c_Persistent);

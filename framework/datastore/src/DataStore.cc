@@ -42,62 +42,11 @@ namespace {
 
   /** Workaround for
    * https://sft.its.cern.ch/jira/browse/ROOT-6995
-   * https://sft.its.cern.ch/jira/browse/ROOT-6996
    */
-  class FixClonesArray : public TClonesArray {
-  public:
-    void FixedAbsorbObjects(FixClonesArray* tc) {
-      // Directly move the object pointers from tc without cloning (copying).
-      // This TClonesArray takes over ownership of all of tc's object
-      // pointers. The tc array is left empty upon return.
-
-      // tests
-      if (tc == 0 || tc == this || tc->GetEntriesFast() == 0) return;
-      if (fClass != tc->fClass) {
-        Error("AbsorbObjects", "cannot absorb objects when classes are different");
-        return;
-      }
-
-      // cache the sorted status
-      Bool_t wasSorted = IsSorted() && tc->IsSorted() &&
-                         (Last() == 0 || Last()->Compare(tc->First()) == -1);
-
-      // expand this
-      Int_t oldSize = GetEntriesFast();
-      Int_t newSize = oldSize + tc->GetEntriesFast();
-      if (newSize > fSize)
-        Expand(newSize);
-
-      // move
-      for (Int_t i = 0; i < tc->GetEntriesFast(); ++i) {
-        fCont[oldSize + i] = tc->fCont[i];
-        ::operator delete((*fKeep)[oldSize + i]);
-        (*fKeep)[oldSize + i] = (*(tc->fKeep))[i];
-        tc->fCont[i] = 0;
-        (*(tc->fKeep))[i] = 0;
-        /* old stuff
-           fCont[oldSize+i] = tc->fCont[i];
-           (*fKeep)[oldSize+i] = (*(tc->fKeep))[i];
-           tc->fCont[i] = 0;
-           (*(tc->fKeep))[i] = 0;
-           */
-      }
-
-      // cleanup
-      fLast = newSize - 1;
-      tc->fLast = -1;
-      if (!wasSorted)
-        Changed();
-    }
-  };
-
   void fixAbsorbObjects(TClonesArray* from, TClonesArray* to)
   {
-    FixClonesArray* toHack = static_cast<FixClonesArray*>(to);
-    FixClonesArray* fromHack = static_cast<FixClonesArray*>(from);
-    toHack->FixedAbsorbObjects(fromHack);
+    to->AbsorbObjects(from, 0, from->GetEntriesFast() - 1);
   }
-
 }
 
 bool DataStore::s_DoCleanup = false;

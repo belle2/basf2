@@ -27,7 +27,7 @@ void NtupleROEMultiplicitiesTool::setupTree()
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_nROETracks").c_str(),  &m_nTracks[iProduct], (strNames[iProduct] + "_nROETracks/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_nROEClusters").c_str(), &m_nECLClusters[iProduct], (strNames[iProduct] + "_nROEClusters/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_nROEECLClusters").c_str(), &m_nECLClusters[iProduct], (strNames[iProduct] + "_nROEECLClusters/I").c_str());
   }
 }
 

@@ -83,7 +83,7 @@ bool TrackProcessor::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/
   return true;
 }
 
-void TrackProcessor::createGFTrackCandidates(string& m_gfTrackCandsColName)
+void TrackProcessor::createGFTrackCandidates(const string& m_gfTrackCandsColName)
 {
   StoreArray<genfit::TrackCand> gfTrackCandidates(m_gfTrackCandsColName);
   gfTrackCandidates.create();
@@ -154,10 +154,15 @@ void TrackProcessor::deleteTracksWithASmallNumberOfHits()
 {
   // Delete a track if we have to few hits left
   m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(), [](TrackCandidate * trackCandidate) {
-    for (TrackHit * trackHit : trackCandidate->getTrackHits()) {
-      trackHit->setHitUsage(TrackHit::not_used);
+    if (trackCandidate->getNHits() < 3) {
+      for (TrackHit * trackHit : trackCandidate->getTrackHits()) {
+        trackHit->setHitUsage(TrackHit::not_used);
+      }
+      return true;
+    } else {
+      return false;
     }
-    return trackCandidate->getNHits() < 3;
+
   }), m_trackList.end());
 }
 
@@ -169,7 +174,7 @@ void TrackProcessor::fitAllTracks()
 }
 
 
-void TrackProcessor::initializeHitList(const StoreArray<CDCHit> cdcHits)
+void TrackProcessor::initializeHitList(const StoreArray<CDCHit>& cdcHits)
 {
   B2DEBUG(90, "Number of digitized hits: " << cdcHits.getEntries());
   if (cdcHits.getEntries() == 0) {

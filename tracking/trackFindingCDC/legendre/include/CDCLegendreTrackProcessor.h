@@ -57,7 +57,7 @@ namespace Belle2 {
       TrackCandidate* createLegendreTracklet(std::vector<TrackHit*>& hits);
 
       /** Creates GeantFit Track Candidates from the stored CDCLegendreTrackCandidates */
-      void createGFTrackCandidates(string& m_gfTrackCandsColName);
+      void createGFTrackCandidates(const string& m_gfTrackCandsColName);
 
       /** Sort hits for fitting.
        * This method sorts hits to bring them in a correct order, which is needed for the fitting
@@ -82,7 +82,7 @@ namespace Belle2 {
        * Compile the hitList from the StoreArray with CDCHits.
        * @param cdcHits
        */
-      void initializeHitList(const StoreArray<CDCHit> cdcHits);
+      void initializeHitList(const StoreArray<CDCHit>& cdcHits);
 
       /**
        * After each event the created hits and trackCandidates should be deleted.

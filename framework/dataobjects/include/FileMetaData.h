@@ -16,6 +16,7 @@
 
 #include <iosfwd>
 #include <vector>
+#include <string>
 
 namespace Belle2 {
 

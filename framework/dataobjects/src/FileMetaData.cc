@@ -105,7 +105,7 @@ namespace Belle2 {
 
   std::istream& operator>> (std::istream& input, FileMetaData& metaData)
   {
-    new(&metaData) FileMetaData;
+    metaData = FileMetaData();
     if (input.eof()) return input;
 
     std::string line;
@@ -122,29 +122,29 @@ namespace Belle2 {
       std::string tag = line.substr(0, pos);
       std::string value = line.substr(pos, line.rfind("<") - pos);
       if (tag.compare("<ID>") == 0) {
-        metaData.m_id = atoi(value.c_str());
+        metaData.m_id = stoi(value);
       } else if (tag.compare("<LFN>") == 0) {
         metaData.m_lfn = value;
       } else if (tag.compare("<ExperimentLow>") == 0) {
-        metaData.m_experimentLow = atoi(value.c_str());
+        metaData.m_experimentLow = stoi(value);
       } else if (tag.compare("<RunLow>") == 0) {
-        metaData.m_runLow = atoi(value.c_str());
+        metaData.m_runLow = stoi(value);
       } else if (tag.compare("<EventLow>") == 0) {
-        metaData.m_eventLow = atoi(value.c_str());
+        metaData.m_eventLow = stoi(value);
       } else if (tag.compare("<ExperimentHigh>") == 0) {
-        metaData.m_experimentHigh = atoi(value.c_str());
+        metaData.m_experimentHigh = stoi(value);
       } else if (tag.compare("<RunHigh>") == 0) {
-        metaData.m_runHigh = atoi(value.c_str());
+        metaData.m_runHigh = stoi(value);
       } else if (tag.compare("<EventHigh>") == 0) {
-        metaData.m_eventHigh = atoi(value.c_str());
+        metaData.m_eventHigh = stoi(value);
       } else if (tag.compare("<Parents>") == 0) {
         pos = value.find(",");
         while (pos > 0) {
-          metaData.m_parents.push_back(atoi(value.substr(0, pos).c_str()));
+          metaData.m_parents.push_back(stoi(value.substr(0, pos)));
           value.erase(0, pos + 1);
           pos = value.find(",");
         }
-        metaData.m_parents.push_back(atoi(value.c_str()));
+        metaData.m_parents.push_back(stoi(value));
       }
     }
 

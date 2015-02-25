@@ -182,7 +182,7 @@ bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
 
 bool FileCatalog::getMetaData(int id, FileMetaData& metaData)
 {
-  new(&metaData) FileMetaData;
+  metaData = FileMetaData();
   if (m_fileName.empty()) return false;
 
   // get lock for read access to file catalog
@@ -210,7 +210,7 @@ bool FileCatalog::getMetaData(int id, FileMetaData& metaData)
 
 bool FileCatalog::getMetaData(std::string lfn, FileMetaData& metaData)
 {
-  new(&metaData) FileMetaData;
+  metaData = FileMetaData();
   if (m_fileName.empty()) return false;
 
   // get lock for read access to file catalog

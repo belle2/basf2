@@ -449,6 +449,7 @@ namespace Belle2 {
     static const ParticleType Kshort;    /**< K^0_S particle */
     static const ParticleType Klong;     /**< K^0_L particle */
     static const ParticleType lambda;    /**< Lambda particle */
+    static const ParticleType lambda_; /**< same as 'lambda', but that's a keyword in Python. */
     static const ParticleType antiLambda; /**< Anti-Lambda particle */
     static const ParticleType invalidParticle;     /**< Invalid particle, used internally. */
 

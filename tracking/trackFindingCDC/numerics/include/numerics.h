@@ -31,6 +31,10 @@ namespace Belle2 {
     inline bool isOdd(const IntNumber& x)
     { return (x % 2) != 0; }
 
+    /// Computes the square of an input value, and allows for operations like
+    /// TVector3 * TVector3, which results in a double return type
+    template <class TNumber>
+    inline auto square(TNumber t) -> decltype(t* t) {return t * t;}
 
     ///Checks if a float is not a number
     bool isNAN(const double x);

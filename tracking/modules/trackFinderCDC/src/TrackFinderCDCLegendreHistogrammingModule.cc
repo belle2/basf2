@@ -15,8 +15,6 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-#define SQR(x) ((x)*(x)) //we will use it in least squares fit
-
 //ROOT macro
 REG_MODULE(CDCLegendreHistogramming)
 

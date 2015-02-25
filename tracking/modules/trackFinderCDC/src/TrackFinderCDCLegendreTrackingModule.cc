@@ -21,6 +21,7 @@
 
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
+#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 #include "TH1F.h"
 #include "TCanvas.h"
@@ -74,8 +75,6 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
-
-#define SQR(x) ((x)*(x)) //we will use it in least squares fit
 
 //ROOT macro
 REG_MODULE(CDCLegendreTracking)

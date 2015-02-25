@@ -21,14 +21,13 @@
 
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
+#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
-
-#define SQR(x) ((x)*(x)) //we will use it in least squares fit
 
 //ROOT macro
 REG_MODULE(CDCLegendreVXDStereoMerger)
@@ -219,7 +218,7 @@ void CDCLegendreVXDStereoMergerModule::event()
       vxdpos.SetZ(0);
 
       double merge_radius = 5.;
-      double dist = TMath::Sqrt((pos - vxdpos) * (pos - vxdpos)) - driftLength_hit_min;
+      double dist = TMath::Sqrt(square(pos - vxdpos)) - driftLength_hit_min;
 
       // Extrapolate tracks to same plane & Match Tracks
       if (dist < merge_radius) {

@@ -14,9 +14,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-
-
-#define SQR(x) ((x)*(x)) //we will use it in least squares fit
+#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 using namespace std;
 using namespace Belle2;
@@ -79,7 +77,7 @@ double TrackFitter::fitTrackCandidateFast(
 
         x = hit->getWirePosition().X();
         y = hit->getWirePosition().Y();
-        double __attribute__((unused)) R_dist = sqrt(SQR(xc_track - x) + SQR(yc_track - y));
+        double __attribute__((unused)) R_dist = sqrt(square(xc_track - x) + square(yc_track - y));
         double dist = radius_track - R_dist;
         double driftLength = hit->getDriftLength();
 

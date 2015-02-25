@@ -22,7 +22,7 @@ set_log_level(LogLevel.ERROR)
 # Register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
 # Set the number of events to be processed (1000 events)
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
 # eventinfoprinter = register_module('EventInfoPrinter')
 

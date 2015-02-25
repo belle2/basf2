@@ -1,5 +1,6 @@
 0.08711                         * c*tau(tau life time) (mm) 
 1                               * switch for long lived (1:no decay, 0:decay)
+1                               * switch for KKMC-JETSET (1:on, 0:off)
 ********** Above is for basf *********
 
 BeginX

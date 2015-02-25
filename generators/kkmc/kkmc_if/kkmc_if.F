@@ -11,7 +11,9 @@ CCCCCC
       double precision xpar(imax)
 
       integer iflong, IRAND1
-
+      integer ijetset
+      common /KK_pythia/ ijetset
+      
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
       common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
       double precision dum(4)
@@ -42,6 +44,10 @@ C   Input c*tau
 C   Input flag for long lived particle (1:no decay, 0:decay)
       read(1,*) iflong
       Print *,'KK decay switch for long lived particle =',iflong
+
+C   Input flag for long lived particle (1:no decay, 0:decay)
+      read(1,*) ijetset
+      Print *,'KK switch for using KKMC-JETSET/PYTHIA6 =',ijetset
 
       close(1)  ! end of input-file open
 
@@ -175,6 +181,8 @@ c
 
       double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
       common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+      integer ijetset
+      common /KK_pythia/ ijetset
 
 C   TAUOLA fifo clear
       call TAUFIF(0)
@@ -184,8 +192,11 @@ C   Select decay channel
       call KK_select_decay_channel(15)   !tau-
 C   Make single event by KK2f
       CALL KK2f_Make
-C   Do subsequent decays by Pythia
-      call PYEXEC
+C   Switch on internal JETSET? (this is the default of Belle)
+      IF(ijetset.eq.1) THEN
+	call PYEXEC
+      ENDIF
+      
       call PYHEPC(1)       ! Pythia -> Hepevt
       
 c  test print

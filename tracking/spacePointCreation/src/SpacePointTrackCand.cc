@@ -211,3 +211,23 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   output << "direction of flight: " << m_flightDirection << ", removed SpacePoints: " << this->hasRefereeStatus(c_removedHits) << "\n";
   B2DEBUG(debuglevel, output.str())
 }
+
+// get referee status as string
+// COULDDO: this can possibly be done with switch - case, which is probably faster
+std::string SpacePointTrackCand::getRefereeStatusString(std::string delimiter) const
+{
+  std::string statusString;
+  if (getRefereeStatus() == 0) return statusString; // return empty string if there is no status
+  if (hasRefereeStatus(c_checkedByReferee)) statusString += "checkedByReferee" + delimiter;
+  if (hasRefereeStatus(c_checkedClean)) statusString += "checkedClean" + delimiter;
+  if (hasRefereeStatus(c_hitsOnSameSensor)) statusString += "hitsOnSameSensor" + delimiter;
+  if (hasRefereeStatus(c_hitsLowDistance)) statusString += "hitsLowDistance" + delimiter;
+  if (hasRefereeStatus(c_removedHits)) statusString += "removedHits" + delimiter;
+  if (hasRefereeStatus(c_checkedTrueHits)) statusString += "checkedTrueHits" + delimiter;
+  if (hasRefereeStatus(c_checkedSameSensors)) statusString += "checkedSameSensors" + delimiter;
+  if (hasRefereeStatus(c_checkedMinDistance)) statusString += "checkedMinDistance" + delimiter;
+  if (hasRefereeStatus(c_curlingTrack)) statusString += "curlingTrack" + delimiter;
+
+  statusString.erase(statusString.end() - delimiter.size(), statusString.end()); // remove last delimiter -> no error catching SHOULD be neccessary since the case of an empty (==0) refereeStatus is already dealt with above!
+  return statusString;
+}

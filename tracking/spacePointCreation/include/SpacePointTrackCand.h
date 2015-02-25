@@ -53,6 +53,7 @@ namespace Belle2 {
 
     /** Status information that can be set to indicate several properties of the SpacePointTrackCand
      * NOTE: there are some properties that are at the moment stored in other members of the SpacePointTrackCand but can be moved into here if memory usage is an issue
+     * NOTE: if you add something here, it should also be added in the 'getRefereeStatusString' method!
      */
     enum RefereeStatusBit {
       c_checkedByReferee = 1, /**< bit 0: SpacePointTrackCand has been checked by a Referee (all possible tests) */
@@ -196,6 +197,13 @@ namespace Belle2 {
      * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */
     void print(int debuglevel = 150, const Option_t* = "") const;
+
+    /**
+     * get the refereeStatus as a string (easier to read than an unsigned short int)
+     * @param delimiter delimiter to be put inbetween the individual strings, defaults to whitespace (1 character)
+     * NOTE: mainly for easier readability of debug output!
+     */
+    std::string getRefereeStatusString(std::string delimiter = " ") const;
 
     /**
      * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!), NOTE: returns false if both TrackCands do not contain any SpacePoints

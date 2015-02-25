@@ -207,7 +207,7 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   output << "referee properties of this SPTC:\n";
   output << "checked for SPs on same sensors: " << this->hasRefereeStatus(c_checkedSameSensors) << " -> result: " << this->hasRefereeStatus(c_hitsOnSameSensor) << "\n";
   output << "checked for min distance between SPs: " << this->hasRefereeStatus(c_checkedMinDistance) << " -> result: " << this->hasRefereeStatus(c_hitsLowDistance) << "\n";
-  output << "checked for curling: " << this->checkedForCurling() << " -> result: " << this->isCurling() << "\n";
+  output << "checked for curling: " << this->checkedForCurling() << " -> result: " << this->isCurling() << ", part of a curling SPTC: " << this->isPartOfCurlingTrack() << "\n";
   output << "direction of flight: " << m_flightDirection << ", removed SpacePoints: " << this->hasRefereeStatus(c_removedHits) << "\n";
   B2DEBUG(debuglevel, output.str())
 }

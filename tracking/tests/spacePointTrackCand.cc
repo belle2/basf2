@@ -290,6 +290,8 @@ namespace Belle2 {
     trackCand.removeRefereeStatus(SpacePointTrackCand::c_checkedClean); // remove again and check if nothing changes
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
 
+    EXPECT_TRUE(trackCand.hasRefereeStatus(expectedStatus));
+
     // test if the status that remains is still set
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor));
     EXPECT_TRUE(trackCand.hasHitsOnSameSensor()); // echeck the wrapper function

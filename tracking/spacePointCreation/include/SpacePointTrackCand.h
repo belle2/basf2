@@ -189,6 +189,9 @@ namespace Belle2 {
     /** check if the TrackCand has been checked for Curling. */
     bool checkedForCurling() const { return m_iTrackStub != -1; }
 
+    /** check if the TrackCand is part of a curling TrackCand. NOTE: returns false if curling has not been checked */
+    bool isPartOfCurlingTrack() const { return m_iTrackStub > 0; }
+
     /**
      * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */

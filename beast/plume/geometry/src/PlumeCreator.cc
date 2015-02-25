@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Igal Jaegle, FaHui Lin                    *
+ * Contributors: Martin Ritter, Igal Jaegle                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -71,6 +71,7 @@ namespace Belle2 {
       BOOST_FOREACH(double value, bar) {
         B2INFO("value: " << value);
       }
+
       int detID = 0;
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
@@ -107,6 +108,52 @@ namespace Belle2 {
 
         detID++;
       }
+
+      /*
+        //--------- Element definition ---------
+      G4int nel,natoms;
+      G4double a, z,density, temperature, pressure;
+      //ELEMENTS (to be differentiated from Materials) [they begin with "el"]
+      //G4Element (const G4String &name, const G4String &symbol, G4double Zeff, G4double Aeff)
+      G4Element* elH  = new G4Element("Hydrogen", "H", z=1.,  a= 1.01*g/mole);
+      // G4Element* elC  = new G4Element("Carbon"  , "O", z=6.,  a= 12.00*g/mole);
+      G4Element* elN  = new G4Element("Nitrogen", "N", z=7.,  a= 14.01*g/mole);
+      G4Element* elO  = new G4Element("Oxygen"  , "O", z=8.,  a= 16.00*g/mole);
+      G4Element* elSi = new G4Element("Silicon",  "Si",z=14., a= 28.01*g/mole);
+
+      //--------- Material definition ---------
+      //G4Material (const G4String &name, G4double z, G4double a, G4double density, G4State state=kStateUndefined, G4double temp=STP_Temperature, G4double pressure=STP_Pressure)
+      //Air Mixture
+      G4Material* Air = new G4Material("Air", density= 1.29*mg/cm3, nel=2);
+      Air->AddElement(elN, 70*perCent);
+      Air->AddElement(elO, 30*perCent);
+
+      //Water (chemical compound)
+      G4Material* Water = new G4Material("Water", density= 1.0*g/cm3, nel=2);
+      Water->AddElement(elH,natoms=2);
+      Water->AddElement(elO,natoms=1);
+
+      G4Material* matSi = new G4Material("Silicon", z=14., a=  28.09*g/mole, density=2.3290*g/cm3);
+
+      //Quartz (SiO2)
+      G4Material* Quartz = new G4Material("quartz",2.2*g/cm3, nel=2);
+      Quartz->AddElement(elSi, natoms=1);
+      Quartz->AddElement(elO , natoms=2);
+
+      //Vacuum is an "ordinary gas" with very low density->
+      G4Material* vacuum = new G4Material("Vacuum", z=1., a=1.01*g/mole, density=1.e-25*g/cm3,kStateGas,temperature=0.01*kelvin, pressure=1.e-19*pascal);
+
+      //default materials to be used in the construction. Attribution of pointers.
+      //air=Air;
+      //vacuo=vacuum;
+      //silicon=matSi;
+
+      G4VSolid *solidSubstrate = new G4Box("Substrate",fSubstrateLengthX/2,fSubstrateLengthY/2,fSubstrateLengthZ/2);
+      G4VLogival *logicSubstrate = new G4LogicalVolume(solidSubstrate,silicon,"Substrate");
+      for(int i=0;i<12;i++)
+      new G4PVPlacement(&rot,fPositionSubstrate,logicSubstrate,"Substrate", logicWorld,false,0); // Basf2
+      */
+
     }
   } // plume namespace
 } // Belle2 namespace

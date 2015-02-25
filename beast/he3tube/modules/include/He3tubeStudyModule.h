@@ -69,11 +69,6 @@ namespace Belle2 {
 
       /** Neutron Hits */
       TH1F* h_NeutronHits;
-
-      /** Energy of Neutrons */
-      TH1F* h_NeutronEnergy;
-      /** Kinetic Energy of Neutrons */
-      TH1F* h_NeutronKE;
       /** Energy deposited by Proton and Tritium */
       TH1F* h_Edep1H3H;
       /** Energy deposited by Proton and Tritium in each tube */
@@ -83,27 +78,16 @@ namespace Belle2 {
       /** Energy deposited by Tritiums */
       TH1F* h_Edep3H;
       /** Momentum of neutrons */
-      TH1F* h_NeutronMomentum;
-      /** Total energy deposited */
       TH1F* h_TotEdep;
       /** Energy deposited vs detector number  */
       TH1F* h_DetN_Edep;
       /** Neutron Hits per second */
       TH1F* h_NeutronRate;
       /** Position of Tritium origin */
-      TH3F* h_TritiumPositions;
-      /** Phi of neutrons */
-      TH1F* h_NeutronPhi;
-      /** Theta of Neutrons */
-      TH1F* h_NeutronTheta;
-      /** X coordinate of neutron production vertex */
-      TH1F* h_NeutronProdX;
-      /** Y coordinate of neutron production vertex */
-      TH1F* h_NeutronProdY;
-      /** Z coordinate of neutron production vertex */
-      TH1F* h_NeutronProdZ;
-      /** Pulse height of waveforms */
-      TH1F* h_PulseHeights;
+      /** Pulse height of waveforms from neutrons*/
+      TH1F* h_PulseHeights_Neutron;
+      /** Pulse height of waveforms from non-neutrons */
+      TH1F* h_PulseHeights_NotNeutron;
 
       /** Number of neutrons */
       int nNeutronHits = 0;

@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <string>
-
+#include <vector>
 
 namespace Belle2 {
   namespace he3tube {
@@ -59,13 +59,13 @@ namespace Belle2 {
       virtual void impulseResponse();
 
       /** Convolves the raw waveform with the impulse response function */
-      virtual void convolveWaveform(int detNB);
+      virtual void convolveWaveform(double* waveform, double* convolvedWaveform);
 
       /** gets the peak of the waveform from a given detector number */
-      virtual void findPeak(int detNB);
+      double findPeak(double* convolvedWaveform);
 
       /** print the convolved wafeform to file. Useful for debugging */
-      virtual void printConvWaveform(std::string fileName);
+      virtual void printConvWaveform(int eventNum, int detNB, double* convolvedWaveform);
 
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
@@ -79,20 +79,18 @@ namespace Belle2 {
       double radius_drift[248];
       /** drift time for each distance from center of tube */
       double time_drift[248];
+      /** size of waveforms */
+      static const int waveformSize = 15000;
+      /** number of detectors. Read from HE3TUBE.xml*/
+      int numOfTubes = 0;
       /** X coordinate of tube center */
-      double TubeCenterX[8];
+      std::vector<double> TubeCenterX;
       /** Y coordinate of tube center */
-      double TubeCenterY[8];
+      std::vector<double> TubeCenterY;
       /** Impulse response function */
       double iResponse[2400] = {0};
-      /** size of waveforms */
-      const int waveformSize = 14000;
-      /** raw waveform for each tube */
-      double waveform[8][14000] = {{0}};
-      /** waveform convolved with impulse function */
-      double convolvedWaveform[8][14000] = {{0}};
-      /** peak of waveform */
-      double peak[8] = {0};
+      /** Event counter */
+      int Event = 0;
 
     };
 

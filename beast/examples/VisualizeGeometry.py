@@ -12,6 +12,7 @@ os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
 eventinfosetter = register_module('EventInfoSetter')
 # Load XML parameters
 paramloader = register_module('Gearbox')
+#gearbox.param('fileName', '/geometry/Beast2_plume.xml')
 # Create Geometry
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO

@@ -22,12 +22,13 @@ namespace Belle2 {
    *
    * AIMS:
    * + check if a SPTC is curling (at the moment done by the CurlingTrackCandSplitter) and split into sub tracks if necessary
-   * + check if two subsequent SpacePoints of a SPTC are seperated at least by a user defined distance (needed for some filters)
    * + check if two subsequent SpacePoints of a SPTC are on the same sensor
+   * + check if two subsequent SpacePoints of a SPTC are seperated at least by a user defined distance (needed for some filters)
    * + do all this checks either by using MC information or with information that can be obtained from the SpacePoint
    *
    *
    *
+   * CAUTION: the referee Status of trackStubs is set before curling checking is performed! It is possible that a trackStub has a status, that should actually not be there!
    * NOTE: currently under developement
    */
   class SPTCRefereeModule : public Module {
@@ -43,11 +44,15 @@ namespace Belle2 {
 
   protected:
 
+    typedef std::tuple<std::vector<int>, std::vector<int>> CheckInfo; /**< typedef for storing the outcome of previously done checks to have them available later. NOTE: declared as tuple in order to be able to add more stuff to it later on, without breaking the code! */
+
     // ==================================================== PARAMETERS ===========================================================================
 
     std::string m_PARAMsptcName; /**< Name of input container of SpacePointTrackCands */
 
     std::string m_PARAMnewArrayName; /**< Name of the output container of SpacePointTrackCands if 'storeNewArray' is set to true */
+
+    std::string m_PARAMcurlingSuffix; /**< Suffix that will be used to get a name for the StoreArray that holds the trackStubs that were obtained by splitting a curling SPTC. Only needed if 'storeNewArray' is set to false */
 
     bool m_PARAMcheckSameSensor; /**< parameter for indicating if the check for subsequent SpacePoints being on the same sensor should be done */
 
@@ -73,6 +78,8 @@ namespace Belle2 {
 
     B2Vector3F m_origin; /**< origin used internally. Gets assigned to the values of m_PARAMsetOrigin, after some sanity checks have been done on it */
 
+    std::string m_curlingArrayName; /**< name of the StoreArray in which the trackStubs from a curling SPTC are stored */
+
     // ========================================== COUNTER VARIABLES ==================================================================================
 
     unsigned int m_SameSensorCtr; /**< counter for TrackCands with SpacePoints on the same sensor */
@@ -86,6 +93,8 @@ namespace Belle2 {
     unsigned int m_curlingTracksCtr; /**< counter for tracks that curl */
 
     unsigned int m_regTrackStubsCtr; /**< counter for the number of track stubs that were registered by this module */
+
+    unsigned int m_allInwardsCtr; /**< counter for the number of SPTCs which have direction of flight inward for all SpacePoints in them */
     /**
      * initialize all counters to 0
      */
@@ -96,6 +105,7 @@ namespace Belle2 {
       m_kickedSpacePointsCtr = 0;
       m_curlingTracksCtr = 0;
       m_regTrackStubsCtr = 0;
+      m_allInwardsCtr = 0;
     }
 
 
@@ -126,8 +136,8 @@ namespace Belle2 {
      * split a curling SpacePointTrackCand into TrackStubs.
      * @param onlyFirstPart return only the TrackStub that holds the SpacePoint from the first to the first entry of splitIndices (not included in returned SpacePointTrackCand)
      */
-    const std::vector<Belle2::SpacePointTrackCand>
-    splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, const std::vector<int>& splitIndices, bool onlyFirstPart);
+    std::vector<Belle2::SpacePointTrackCand>
+    splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, const std::vector<int>& splitIndices, bool onlyFirstPart, const CheckInfo& prevChecksInfo, bool removedHits);
 
     /**
      * get the direction of flight for a SpacePoint by using information from the underlying TrueHit
@@ -149,5 +159,31 @@ namespace Belle2 {
      * for the TrueHit the momentum can be obtained from information stored in it. For SpacePoints it has to be guessed somehow
      */
     bool getDirOfFlightPosMom(B2Vector3F position, B2Vector3F momentum, B2Vector3F origin);
+
+    /**
+     * copy the SpacePointTrackCand to a new StoreArray and register a relation to the original trackCand
+     * @param trackCand pointer to the original SPTC (which is not in newStoreArray befor this call!)
+     * @param newStoreArray StoreArray where a copy of trackCand will be stored with a relation to the trackCand in its original StoreArray
+     */
+    void copyToNewStoreArray(const Belle2::SpacePointTrackCand* trackCand, Belle2::StoreArray<Belle2::SpacePointTrackCand> newStoreArray);
+
+    /**
+     * register the SpacePointTrackCand (i.e. trackStub) in a new StoreArray and register also a relation to the original SpacePointTrackCand
+     * @param trackCand the SPTC that has to be registered in
+     * @param storeArray the StoreArray that the trackCand will be added to
+     * @param origTrackCand pointer to the SPTC to which a relation from the trackCand will be registered
+     */
+    void addToStoreArray(const Belle2::SpacePointTrackCand& trackCand, Belle2::StoreArray<Belle2::SpacePointTrackCand> storeArray, const Belle2::SpacePointTrackCand* origTrackCand);
+
+    /**
+     * get the checked referee status of a SPTC (i.e. only which checks have been performed, but not the results)
+     * at the moment returns the status of trackCand with c_removedHits, c_hitsOnSameSensor and c_hitsLowDistance resetted!
+     */
+    unsigned short int getCheckStatus(const Belle2::SpacePointTrackCand* trackCand);
+
+    template<typename T>
+    bool vectorHasValueBetween(std::vector<T> V, std::pair<T, T> P) {
+      return std::find_if(V.begin(), V.end(), [&P](const T & aValue) { return (aValue < P.second && aValue >= P.first);}) != V.end();
+    }
   };
 }

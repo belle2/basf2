@@ -1487,7 +1487,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB", cosThetaBetweenParticleAndTrueB, "cosine of angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector", cosAngleBetweenMomentumAndVertexVector, "cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
-    REGISTER_VARIABLE("distance", particleDistance, "distance relative to interaction point");
+    REGISTER_VARIABLE("distance", particleDistance, "3D distance relative to interaction point");
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance, "significance of distance relative to interaction point (-1 in case of numerical problems)");
     REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
     REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");

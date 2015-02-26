@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Viktor Trusov                                            *
+ * Contributors: Viktor Trusov, Nils Braun                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
 using namespace std;
 

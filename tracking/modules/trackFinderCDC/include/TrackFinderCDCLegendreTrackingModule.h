@@ -11,26 +11,17 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <fstream>
-
-#include <boost/tuple/tuple.hpp>
-#include <vector>
-
-#include <tracking/trackFindingCDC/legendre/CDCLegendreStereohitsProcesser.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendrePatternChecker.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
-#include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
-
-#include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
 namespace Belle2 {
+
+  namespace TrackFindingCDC {
+    class FastHough;
+    class TrackDrawer;
+  }
+
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)

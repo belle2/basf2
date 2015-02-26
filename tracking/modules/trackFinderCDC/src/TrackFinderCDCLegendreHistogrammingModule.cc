@@ -5,6 +5,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
@@ -12,7 +13,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace CDC;
 using namespace TrackFindingCDC;
 
 //ROOT macro

@@ -3,25 +3,21 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Viktor Trusov                                            *
+ * Contributors: Viktor Trusov, Nils Braun                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
-
-
-#include <cdc/geometry/CDCGeometryPar.h>
-
 #include <list>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    class TrackHit;
+    class TrackCandidate;
 
     class TrackMerger {
     public:

@@ -10,20 +10,12 @@
 
 #pragma once
 
-
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-
-#include <cdc/translators/SimpleTDCCountTranslator.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/CDCHit.h>
-
-#include "TVector3.h"
-
-#include <cmath>
-#include <TMath.h>
-#include <iostream>
+#include <tuple>
+#include <TVector3.h>
 
 namespace Belle2 {
+  class CDCHit;
+
   namespace TrackFindingCDC {
 
     class TrackCandidate;

@@ -10,17 +10,14 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <cmath>
+#include <TMath.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace CDC;
-using namespace VXD;
-using namespace TrackFindingCDC;
 using namespace TrackFindingCDC;
 
 double TrackFitter::fitTrackCandidateFast(

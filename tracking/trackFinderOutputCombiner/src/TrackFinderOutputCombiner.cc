@@ -13,6 +13,10 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <framework/logging/Logger.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

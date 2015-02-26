@@ -13,6 +13,7 @@
 #ifndef __CINT__
 #include <Eigen/Dense>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #endif
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>

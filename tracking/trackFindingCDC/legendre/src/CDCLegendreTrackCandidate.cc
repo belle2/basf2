@@ -9,8 +9,12 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
-
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
+#include <TMath.h>
 
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 

@@ -9,71 +9,14 @@
  **************************************************************************/
 
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCLegendreTrackingModule.h>
-
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
-
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
-#include <tracking/trackFindingCDC/numerics/numerics.h>
-
-#include "TH1F.h"
-#include "TCanvas.h"
-#include "TF1.h"
-#include "TGraph.h"
-
-
-#include "cdc/dataobjects/CDCSimHit.h"
-
-#include <genfit/Track.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
 #include <genfit/TrackCand.h>
-#include <genfit/RKTrackRep.h>
-#include <genfit/AbsKalmanFitter.h>
-#include <genfit/KalmanFitter.h>
-#include <genfit/KalmanFitterRefTrack.h>
-#include <genfit/KalmanFitStatus.h>
-#include <genfit/DAF.h>
-#include <genfit/Exception.h>
-#include <genfit/MeasurementFactory.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
-#include <TDatabasePDG.h>
-
-#include <cdc/translators/LinearGlobalADCCountTranslator.h>
-#include <cdc/translators/SimpleTDCCountTranslator.h>
-#include <cdc/translators/IdealCDCGeometryTranslator.h>
-#include <genfit/FieldManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
-#include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
-#include <TGeoManager.h>
-#include <TDatabasePDG.h>
-#include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-
-
-#include <cstdlib>
-#include <iomanip>
-#include <string>
-
-#include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/utility.hpp>
-
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <memory>
-#include <cmath>
+#include <cdc/dataobjects/CDCHit.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace CDC;
 using namespace TrackFindingCDC;
 
 //ROOT macro

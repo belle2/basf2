@@ -7,6 +7,21 @@
 
 #include "tracking/trackFindingCDC/legendre/CDCLegendreNiceDrawing.h"
 
+
+#include <framework/gearbox/Const.h>
+#include <tracking/mcTrackMatcher/TrackMatchLookUp.h>
+
+#include <cmath>
+
+#include <boost/foreach.hpp>
+
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+
+#include <genfit/TrackCand.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;

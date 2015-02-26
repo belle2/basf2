@@ -13,36 +13,22 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
-
-#include "tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h"
-
-#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
-#include "TVector3.h"
-#include "TVector2.h"
-
-#include "boost/foreach.hpp"
-#include <boost/math/constants/constants.hpp>
+#include <TVector3.h>
+#include <TVector2.h>
 
 #include <list>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include "TMath.h"
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<typename typeX, typename typeY, class typeData>
-    class QuadTreeTemplate;
+    class TrackHit;
 
     /** Class for track candidates after CDC pattern recognition. */
     class TrackCandidate {
     public:
-
-      typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
       /** Enum for charge hypotheses of track.*/
       enum ChargeHypotheses {

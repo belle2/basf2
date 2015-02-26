@@ -6,31 +6,41 @@
  */
 
 #pragma once
+#include <framework/datastore/StoreArray.h>
+#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <iomanip>
 
-
-#include "cdc/translators/SimpleTDCCountTranslator.h"
-#include "cdc/geometry/CDCGeometryPar.h"
-#include "mdst/dataobjects/MCParticle.h"
-#include "cdc/dataobjects/CDCHit.h"
-#include "cdc/dataobjects/CDCSimHit.h"
-
-#include "genfit/Track.h"
-#include "genfit/TrackCand.h"
-#include "framework/datastore/StoreArray.h"
-#include "framework/gearbox/Const.h"
-
-#include <boost/foreach.hpp>
-#include "TVector2.h"
+#include <TVector2.h>
+#include <TVector3.h>
+#include <TFile.h>
+#include <TNtuple.h>
 
 #include <fstream>
-#include <iomanip>
-#include <cmath>
+
+namespace genfit {
+  class TrackCand;
+}
 
 namespace Belle2 {
 
+  class TrackMatchLookUp;
+  class CDCHit;
+  class MCParticle;
+
+  namespace CDC {
+    class SimpleTDCCountTranslator;
+  }
+
+
   namespace TrackFindingCDC {
 
-    /** Class for perform svg drawing of track candidates */
+    class TrackHit;
+    class TrackCandidate;
+
+    /** Class for perform svg drawing of track candidates
+     * @todo switch from pointer to references!
+     * */
+
     class NiceDrawing {
 
     public:

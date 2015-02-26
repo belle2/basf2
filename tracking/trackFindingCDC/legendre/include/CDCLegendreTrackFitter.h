@@ -9,33 +9,12 @@
  **************************************************************************/
 
 #pragma once
-
-
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
-
-
 #include <framework/datastore/StoreArray.h>
-#include "genfit/TrackCand.h"
-#include "genfit/Track.h"
 
-
-#include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/utility.hpp>
-
-#include "TVector3.h"
-
-#include <cstdlib>
-#include <iomanip>
+#include <TVector3.h>
 #include <string>
 #include <list>
 #include <vector>
-#include <cmath>
-#include <iostream>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

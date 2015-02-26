@@ -10,6 +10,31 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
 
+
+#include <TCanvas.h>
+#include <TGraph.h>
+#include <TAxis.h>
+#include <TLine.h>
+
+#include <TROOT.h>
+#include <TRint.h>
+
+#include <genfit/Track.h>
+#include <genfit/TrackCand.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+
+#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+
+
+#include <cdc/dataobjects/CDCHit.h>
+
+#include <iomanip>
+#include <fstream>
+
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

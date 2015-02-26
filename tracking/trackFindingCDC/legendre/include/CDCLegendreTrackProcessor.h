@@ -3,30 +3,33 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Viktor Trusov                                            *
+ * Contributors: Viktor Trusov, Nils Braun                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
+#include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackingSortHit.h>
 
 #include <list>
 #include <vector>
 #include <string>
+#include <set>
 
 using namespace std;
 
 namespace Belle2 {
+
+  class CDCHit;
+
   namespace TrackFindingCDC {
+
+    class TrackDrawer;
 
     class TrackProcessor {
     public:

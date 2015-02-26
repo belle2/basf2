@@ -11,34 +11,17 @@
 #pragma once
 
 #include "tracking/trackFindingCDC/legendre/CDCLegendreNiceDrawing.h"
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
-#include "cdc/translators/SimpleTDCCountTranslator.h"
-#include "cdc/geometry/CDCGeometryPar.h"
-#include "genfit/Track.h"
-#include "genfit/TrackCand.h"
+#include <list>
 
-#include "framework/datastore/StoreArray.h"
-#include "cdc/dataobjects/CDCHit.h"
-
-#include "TF1.h"
-#include "TCanvas.h"
-#include "TGraph.h"
-#include "TAxis.h"
-#include "TEllipse.h"
-#include "TLine.h"
-
-#include "TROOT.h"
-#include "TRint.h"
-
-#include <iomanip>
-#include <fstream>
+#include <TF1.h>
+#include <TEllipse.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     class TrackHit;
+    class TrackCandidate;
 
     /** Class for in-module drawing (step-by-step drawing). For testing purposes only; contains hardcoded values and pathes*/
     class TrackDrawer : public NiceDrawing {

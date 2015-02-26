@@ -9,6 +9,14 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
+
+#include <TMath.h>
+#include <cmath>
+
+#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 using namespace std;
 using namespace Belle2;

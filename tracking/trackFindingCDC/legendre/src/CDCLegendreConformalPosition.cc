@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dataobjects/CDCHit.h>
 #include <TMath.h>
 
 using namespace std;

@@ -10,15 +10,18 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <genfit/TrackCand.h>
-#include <cdc/dataobjects/CDCHit.h>
 #include <string>
 #include <vector>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
 namespace Belle2 {
+  class CDCHit;
+
+  namespace TrackFindingCDC {
+    class TrackHit;
+  }
+
   class TrackFinderOutputCombiner {
 
   public:

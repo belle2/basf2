@@ -1,8 +1,5 @@
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
-#include <boost/tuple/tuple.hpp>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 

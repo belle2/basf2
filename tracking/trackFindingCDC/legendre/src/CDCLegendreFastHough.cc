@@ -9,6 +9,11 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
+#include <algorithm>
+#include <cmath>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

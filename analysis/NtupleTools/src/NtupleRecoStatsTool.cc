@@ -71,7 +71,7 @@ void NtupleRecoStatsTool::eval(const  Particle*)
       double energy = cluster->getEnergy();
       double e9e25  = cluster->getE9oE25();
       int    region = 0;
-      //double timing = cluster->getTiming();
+      double timing = cluster->getTiming();
 
       float theta = cluster->getTheta();
       if (theta < 0.555) {
@@ -82,13 +82,13 @@ void NtupleRecoStatsTool::eval(const  Particle*)
         region = 3.0;
       }
 
-      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.125 && e9e25 > 0.7;
-      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.100;
-      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.150;
-      //bool goodTiming       = timing > 800 && timing < 2400;
+      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.100;
+      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.090;
+      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.160;
+      bool goodTiming       = timing > 2200 && timing < 2450;
 
-      //if ((goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) && goodTiming) {
-      if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) {
+      if ((goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) && goodTiming) {
+        //if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) {
         m_goodNeutralECLEnergy += cluster->getEnergy();
         m_iGoodNeutralClusters++;
       }

@@ -43,7 +43,7 @@ GammaEnergyCalibrationModule::GammaEnergyCalibrationModule() : Module()
 
   // Parameter definitions
   addParam("gammaListName", m_gammaListName, "Input ParticleList name", std::string(""));
-
+  addParam("energyBias", m_energyBias, "Bias in energy that will get subtracted", 0.0);
 }
 
 void GammaEnergyCalibrationModule::initialize()
@@ -85,7 +85,7 @@ void GammaEnergyCalibrationModule::event()
 void GammaEnergyCalibrationModule::calibrateEnergy(Particle* particle) const
 {
   double oldE = particle->getEnergy();
-  double newE = oldE - 0.041;
+  double newE = oldE - m_energyBias;
 
   if (newE < 0)
     return;

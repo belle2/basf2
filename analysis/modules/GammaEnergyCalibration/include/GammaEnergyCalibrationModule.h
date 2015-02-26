@@ -51,12 +51,13 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the particle being selected */
 
     std::string m_gammaListName;  /**< Input ParticleList name */
+    double m_energyBias; /**< energy bias */
 
     /**
      * Calibrates energy for given photon Particle.
      *
      * The calibration function is:
-     * E_cal = E_orig - 0.041
+     * E_cal = E_orig - m_energyBias
      *
      * Particle's 4-momentum is recalculated iwth the new energy.
      */

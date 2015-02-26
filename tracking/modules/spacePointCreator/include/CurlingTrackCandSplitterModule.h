@@ -39,6 +39,7 @@ namespace Belle2 {
    * Explanation of compatible TrueHits:
    * For all Clusters related from a SpacePoint all related TrueHits are collected. If there is one (or more) shared TrueHit this is considered to be compatible (regardless of other non-matching TrueHits)
    *
+   * WARNING: deprecated: use SPTCReferee instead to check SPTCs for curling!
    */
   class CurlingTrackCandSplitterModule : public Module {
 

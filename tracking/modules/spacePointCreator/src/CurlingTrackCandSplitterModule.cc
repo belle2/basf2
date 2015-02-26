@@ -37,7 +37,7 @@ REG_MODULE(CurlingTrackCandSplitter)
 
 CurlingTrackCandSplitterModule::CurlingTrackCandSplitterModule()
 {
-  setDescription("Module for checking SpacePointTrackCands for curling behaviour and (if wanted) splitting them into SpacePointTrackCands that no longer show curling behaviour");
+  setDescription("Module for checking SpacePointTrackCands for curling behaviour and (if wanted) splitting them into SpacePointTrackCands that no longer show curling behaviour. WARNING: MODULE IS DEPRECATED use SPTCReferee instead!");
 
   addParam("splitCurlers", m_PARAMsplitCurlers, "Split curling SpacePointTrackCands into non-curling SpacePointTrackCands and store them", true);
   addParam("nTrackStubs", m_PARAMnTrackStubs, "Maximum number of SpacePointTrackCand Stubs to be created from a curling SpacePointTrackCand. Set to 0 if you want all possible TrackCand Stubs", 0);
@@ -76,7 +76,7 @@ void CurlingTrackCandSplitterModule::initialize()
 {
   initializeCounters();
   B2INFO("CurlingTrackCandSplitter ----------------------------- initialize() -------------------------------------");
-
+  B2WARNING("CurlingTrackCandSplitter is deprecated and will be removed from framework in the near future! use SPTCReferee instead!")
   // check if all necessary StoreArrays are present
   StoreArray<SpacePointTrackCand> spacePointTCs(m_PARAMsptcName);
   spacePointTCs.required(m_PARAMsptcName);

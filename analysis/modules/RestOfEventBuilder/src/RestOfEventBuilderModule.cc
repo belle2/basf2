@@ -139,7 +139,7 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
         region = 3.0;
       }
 
-      if (!Variable::isGoodGamma(region, energy, e9e25, false))
+      if (!Variable::isGoodGamma(region, energy, false))
         continue;
     }
 

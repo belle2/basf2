@@ -28,7 +28,7 @@ REG_MODULE(SPTCReferee) // register the module
 
 SPTCRefereeModule::SPTCRefereeModule() : Module()
 {
-  setDescription("Module that does some sanity checks on SpacePointTrackCands to prevent some problematic cases to be forwarded to other modules that rely on 'unproblematic' cases (e.g. FilterCalculator). Different checks can be enabled by setting the according flags. Using MC information for the tests can also be switched on/off for tests where MC information can be helpful. NOTE: module is currently under developement!");
+  setDescription("Module that does some sanity checks on SpacePointTrackCands to prevent some problematic cases to be forwarded to other modules that rely on 'unproblematic' cases (e.g. FilterCalculator). Different checks can be enabled by setting the according flags. Using MC information for the tests can also be switched on/off for tests where MC information can be helpful.");
 
   // names
   addParam("sptcName", m_PARAMsptcName, "Container name of the SpacePointTrackCands to be checked (input)", std::string(""));
@@ -83,15 +83,12 @@ void SPTCRefereeModule::initialize()
     }
   }
 
-  if (m_PARAMkickSpacePoint && m_PARAMsplitCurlers) B2WARNING("removing SpacePoints can lead to a wrong status of removedHits in trackStubs!")
-
-    B2DEBUG(1, "Provided Parameters: checkSameSensor - " << m_PARAMcheckSameSensor << ", checkMinDistance - " << m_PARAMcheckMinDistance << ", checkCurling - " << m_PARAMcheckCurling << ", splitCurlers - " << m_PARAMsplitCurlers << ", keepOnlyFirstPart - " << m_PARAMkeepOnlyFirstPart << ", useMCInfo - " << m_PARAMuseMCInfo << ", kickSpacePoint - " << m_PARAMkickSpacePoint)
-
-    if (m_PARAMsetOrigin.size() != 3) {
-      B2WARNING("CurlingTrackCandSplitter::initialize: Provided origin is not a 3D point! Please provide 3 values (x,y,z). Rejecting user input and setting origin to (0,0,0) for now!");
-      m_PARAMsetOrigin.clear();
-      m_PARAMsetOrigin.assign(3, 0);
-    }
+  B2DEBUG(1, "Provided Parameters: checkSameSensor - " << m_PARAMcheckSameSensor << ", checkMinDistance - " << m_PARAMcheckMinDistance << ", checkCurling - " << m_PARAMcheckCurling << ", splitCurlers - " << m_PARAMsplitCurlers << ", keepOnlyFirstPart - " << m_PARAMkeepOnlyFirstPart << ", useMCInfo - " << m_PARAMuseMCInfo << ", kickSpacePoint - " << m_PARAMkickSpacePoint)
+  if (m_PARAMsetOrigin.size() != 3) {
+    B2WARNING("CurlingTrackCandSplitter::initialize: Provided origin is not a 3D point! Please provide 3 values (x,y,z). Rejecting user input and setting origin to (0,0,0) for now!");
+    m_PARAMsetOrigin.clear();
+    m_PARAMsetOrigin.assign(3, 0);
+  }
   m_origin.SetXYZ(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
   B2DEBUG(10, "Set origin to (x,y,z): (" << m_origin.X() << "," << m_origin.Y() << "," << m_origin.Z() << ")");
 
@@ -130,23 +127,13 @@ void SPTCRefereeModule::event()
       if (!sameSensorInds.empty()) {
         m_SameSensorCtr++;
         allChecksClean = false;
-        if (m_PARAMkickSpacePoint) {
-          try {
-            for (int index : boost::adaptors::reverse(sameSensorInds)) { // have to start from highest index, as the vector in the trackCand is resized in this step!
-              trackCand->removeSpacePoint(index);
-              B2DEBUG(50, "Removed SpacePoint " << index << " from SPTCs")
-              m_kickedSpacePointsCtr++;
-            }
-            trackCand->addRefereeStatus(SpacePointTrackCand::c_removedHits);
-          } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
-            B2WARNING("Caught an Exception while trying to remove a SpacePoint from a SpacePointTrackCand: " << anE.what());
-          }
-        } else { trackCand->addRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor); } // only add status if the SpacePoints on the same sensors have not been removed!
+        if (m_PARAMkickSpacePoint) { std::get<0>(prevChecksInfo) = removeSpacePoints(trackCand, sameSensorInds); } // assign the actually removed indices to the prevChecksInfo
+        else { trackCand->addRefereeStatus(SpacePointTrackCand::c_hitsOnSameSensor); } // only add status if the SpacePoints on the same sensors have not been removed!
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints on the same sensor for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")")
       }
       trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedSameSensors);
-      B2DEBUG(50, "refereeStatus of TrackCand after checkSameSensor " << trackCand->getRefereeStatus() << " -> " << trackCand->getRefereeStatusString()); // TODO
+      B2DEBUG(50, "refereeStatus of TrackCand after checkSameSensor " << trackCand->getRefereeStatus() << " -> " << trackCand->getRefereeStatusString());
     }
 
     if (m_PARAMcheckMinDistance) { // check min distance if desired
@@ -155,18 +142,8 @@ void SPTCRefereeModule::event()
       if (!lowDistanceInds.empty()) {
         m_minDistanceCtr++;
         allChecksClean = false;
-        if (m_PARAMkickSpacePoint) {
-          try {
-            for (int index : boost::adaptors::reverse(lowDistanceInds)) { // have to start from highest index, as the vector in the trackCand is resized in this step!
-              trackCand->removeSpacePoint(index);
-              B2DEBUG(50, "Removed SpacePoint " << index << " from SPTCs")
-              m_kickedSpacePointsCtr++;
-            }
-            trackCand->addRefereeStatus(SpacePointTrackCand::c_removedHits);
-          } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
-            B2WARNING("Caught an Exception while trying to remove a SpacePoint from a SpacePointTrackCand: " << anE.what());
-          }
-        } else { trackCand->addRefereeStatus(SpacePointTrackCand::c_hitsLowDistance); } // only add status if the SpacePoints not far enough apart have not been removed!
+        if (m_PARAMkickSpacePoint) { std::get<1>(prevChecksInfo) = removeSpacePoints(trackCand, lowDistanceInds); } // assign the actually removed indices to the prevChecksInfo
+        else { trackCand->addRefereeStatus(SpacePointTrackCand::c_hitsLowDistance); } // only add status if the SpacePoints not far enough apart have not been removed!
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints that were closer than " << m_PARAMminDistance << " cm together for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")")
       }
@@ -202,7 +179,7 @@ void SPTCRefereeModule::event()
     if (allChecksClean) trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedClean);
 
     B2DEBUG(999, "referee Status of SPTC after referee module: " << trackCand->getRefereeStatus() << " -> " << trackCand->getRefereeStatusString())
-    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) { trackCand->print(); }
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) { trackCand->print();}
 
     // store in appropriate StoreArray
     if (m_PARAMstoreNewArray) {
@@ -218,36 +195,6 @@ void SPTCRefereeModule::event()
       }
     }
   }
-
-
-  // DEBUG output to be removed befor commit
-  StoreArray<SpacePointTrackCand> newArray(m_PARAMnewArrayName);
-  StoreArray<SpacePointTrackCand> anotherNewArray(m_curlingArrayName);
-  cout << newArray.getEntries() << " " << anotherNewArray.getEntries() << " " << trackCands.getEntries() << endl;
-
-  for (int i = 0; i < trackCands.getEntries(); ++i) {
-    SpacePointTrackCand* trackCand = trackCands[i];
-    genfit::TrackCand* gfTrackCand = trackCand->getRelatedTo<genfit::TrackCand>("ALL");
-    gfTrackCand->Print();
-    trackCand->print();
-    cout << "SPs in SPTC " << trackCand->getNHits() << endl;
-    cout << "array index trackCand " << trackCand->getArrayIndex() << endl;
-    cout << "refereeStatus trackCand " << trackCand->getRefereeStatus() << " " << trackCand->getRefereeStatusString() << endl;
-
-
-    RelationVector<SpacePointTrackCand> relTrackCands = trackCand->getRelationsFrom<SpacePointTrackCand>("ALL");
-
-    cout << relTrackCands.size() << " related TrackCands: " << endl;
-
-    if (relTrackCands.size() == 1) cout << "TrackCands are the same: " << (*trackCand == *relTrackCands[0]) << endl;
-
-    for (unsigned int j = 0; j < relTrackCands.size(); ++j) {
-      cout << "SPs in related SPTC " << relTrackCands[j]->getNHits() << endl;
-      cout << "trackStubIndex " << relTrackCands[j]->getTrackStubIndex() << endl;
-      cout << "referee Status trackStub " << relTrackCands[j]->getRefereeStatus() << " " <<  relTrackCands[j]->getRefereeStatusString() << endl;
-      relTrackCands[j]->print();
-    }
-  }
 }
 
 // ============================================================================= TERMINATE =====================================================================
@@ -255,8 +202,8 @@ void SPTCRefereeModule::terminate()
 {
   // TODO: info output more sophisticated
   stringstream summary;
-  if (m_PARAMcheckSameSensor) { summary << "Checked for consecutive SpacePoints on same sensor and found " << m_SameSensorCtr << " TrackCands showing this behavior."; }
-  if (m_PARAMcheckMinDistance) { summary << "Checked for minimal distance between two consecutive SpacePoints and found " << m_minDistanceCtr << " TrackCands with SpacePoints not far enough apart."; }
+  if (m_PARAMcheckSameSensor) { summary << "Checked for consecutive SpacePoints on same sensor and found " << m_SameSensorCtr << " TrackCands showing this behavior.\n"; }
+  if (m_PARAMcheckMinDistance) { summary << "Checked for minimal distance between two consecutive SpacePoints and found " << m_minDistanceCtr << " TrackCands with SpacePoints not far enough apart.\n"; }
   if (m_PARAMkickSpacePoint) { summary << m_kickedSpacePointsCtr << " SpacePoints have been removed from SpacePointTrackCands\n"; }
   if (m_PARAMcheckCurling) { summary << m_curlingTracksCtr << " SPTCs were curling. Registered " << m_regTrackStubsCtr << " track stubs. 'splitCurlers' was set to " << m_PARAMsplitCurlers << ", 'keepOnlyFirstPart' was set to " << m_PARAMkeepOnlyFirstPart << ". There were " << m_allInwardsCtr << " SPTCs that had flight direction 'inward' for all SpacePoints in them"; }
   B2INFO("SPTCRefere::terminate(): Module got " << m_totalTrackCandCtr << " SpacePointTrackCands. " << summary.str())
@@ -264,10 +211,11 @@ void SPTCRefereeModule::terminate()
 
 
   // TESTING purposes: to be removed before commit
-  if (m_SameSensorCtr) B2ERROR("SENSOR")
-    if (m_minDistanceCtr) B2ERROR("DISTANCE")
-      if (m_curlingTracksCtr) B2ERROR("CURLING")
-      }
+//   if (m_SameSensorCtr) B2ERROR("SENSOR")
+//   if (m_minDistanceCtr) B2ERROR("DISTANCE")
+//   if (m_curlingTracksCtr) B2ERROR("CURLING")
+//   if (m_curlingTracksCtr && (m_SameSensorCtr || m_minDistanceCtr)) B2ERROR("CURLINGOTHER")
+}
 
 // ====================================================================== CHECK SAME SENSORS ====================================================================
 const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrackCand* trackCand)
@@ -315,6 +263,30 @@ const std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTra
   return lowDistanceInds;
 }
 
+// =============================================================================== REMOVE SPACEPOINTS ===============================================================
+const std::vector<int> SPTCRefereeModule::removeSpacePoints(Belle2::SpacePointTrackCand* trackCand, const std::vector<int>& indsToRemove)
+{
+  std::vector<int> removedInds; // return vector
+  try {
+    unsigned int nInds = indsToRemove.size();
+    B2DEBUG(50, "Got " << nInds << " indices to remove from SPTC " << trackCand->getArrayIndex())
+
+    int nRemoved = 0;
+    for (int index : boost::adaptors::reverse(indsToRemove)) { // reverse iteration as trackCand gets 'resized' with every remove
+      B2DEBUG(999, "Removing " << nRemoved + 1 << " from " << nInds << ". index = " << index); // +1 only for better readability
+      trackCand->removeSpacePoint(index);
+      nRemoved++;
+      m_kickedSpacePointsCtr++;
+      B2DEBUG(50, "Removed SpacePoint " << index << " from SPTC " << trackCand->getArrayIndex())
+      removedInds.push_back(index - (nInds - nRemoved)); // NOTE: this way if a removed SpacePoint is "at the edge" between two trackStubs the status will be assigned to the second of those!
+    }
+    trackCand->addRefereeStatus(SpacePointTrackCand::c_removedHits);
+  } catch (SpacePointTrackCand::SPTCIndexOutOfBounds& anE) {
+    B2WARNING("Caught an Exception while trying to remove a SpacePoint from a SpacePointTrackCand: " << anE.what());
+  }
+
+  return removedInds;
+}
 // ============================================================================= CHECK CURLING ======================================================================
 const std::vector<int> SPTCRefereeModule::checkCurling(Belle2::SpacePointTrackCand* trackCand, bool useMCInfo)
 {
@@ -414,14 +386,26 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
 
       trackStub.setTrackStubIndex(iTs + 1); // trackStub index starts at 1 for curling SPTCs. NOTE: this might be subject to chagnes with the new bitfield in SpacePointTrackCand
 
+      cout << refStatus << endl;
+
       // determine and set the referee status of this trackStub based upon the information from the previous tests
       const std::vector<int>& sameSensInds = std::get<0>(prevChecksInfo);
       const std::vector<int>& lowDistInds = std::get<0>(prevChecksInfo);
+
+      if (!sameSensInds.empty() || !lowDistInds.empty()) B2ERROR("CURLINGOTHER")
+        cout << "sameSensInds " << endl;
+      for (int entry : sameSensInds) cout << entry << " ";
+      cout << endl << "lowDistInds " << endl;
+      for (int entry : lowDistInds) cout << entry << " ";
+      cout << endl;
       bool hasSameSens = vectorHasValueBetween(sameSensInds, rangeIndices.at(iTs));
       bool hasLowDist = vectorHasValueBetween(lowDistInds, rangeIndices.at(iTs));
+      cout << " hasSameSens " << hasSameSens << " hasLowDist " << hasLowDist << endl;
       if ((hasSameSens || hasLowDist) && removedHits) refStatus += SpacePointTrackCand::c_removedHits;
       if (hasSameSens && !removedHits) refStatus += SpacePointTrackCand::c_hitsOnSameSensor;
       if (hasLowDist && !removedHits) refStatus += SpacePointTrackCand::c_hitsLowDistance;
+
+      cout << refStatus << endl;
 
       trackStub.setRefereeStatus(refStatus);
       B2DEBUG(999, "Set TrackStubIndex " << iTs + 1 << " and refereeStatus " << trackStub.getRefereeStatus() << " for this trackStub (refStatus string: " << trackStub.getRefereeStatusString());

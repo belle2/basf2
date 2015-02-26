@@ -20,16 +20,14 @@ namespace Belle2 {
   /**
    * Module that does some sanity checks on SpacePointTrackCands that have been created by conversion from genfit::TrackCands by the TrackFinderMCTruth (or any other for that matter)
    *
-   * AIMS:
+   * If set by the parameters the module does:
    * + check if a SPTC is curling (at the moment done by the CurlingTrackCandSplitter) and split into sub tracks if necessary
    * + check if two subsequent SpacePoints of a SPTC are on the same sensor
    * + check if two subsequent SpacePoints of a SPTC are seperated at least by a user defined distance (needed for some filters)
-   * + do all this checks either by using MC information or with information that can be obtained from the SpacePoint
+   * + all this checks either by using MC information (where necessary) or with information that can be obtained from the SpacePoint
    *
+   * WARNING: Besides of setting different flags, splitting curling SPTCs and removing problematic SpacePoints (if set) the module does nothing! Every decision on how to handle the different outcomes of the different checks is left to the user!
    *
-   *
-   * CAUTION: the referee Status of trackStubs is set before curling checking is performed! It is possible that a trackStub has a status, that should actually not be there!
-   * NOTE: currently under developement
    */
   class SPTCRefereeModule : public Module {
 
@@ -181,6 +179,16 @@ namespace Belle2 {
      */
     unsigned short int getCheckStatus(const Belle2::SpacePointTrackCand* trackCand);
 
+    /**
+     * remove the SpacePoint passed to this function from the SpacePointTrackCand
+     * @return indices of the SpacePoints that are in took the places of the ones that were removed (i.e. if (i,j,k) are passed -> (i,j-1,k-2) is returned)
+     * NOTE: trackCand will be altered!
+     */
+    const std::vector<int> removeSpacePoints(Belle2::SpacePointTrackCand* trackCand, const std::vector<int>& indsToRemove);
+
+    /**
+     * function to determine if any of the values in vector V are between the values of P (i.e. any value of V is in [P.first, P.second) )
+     */
     template<typename T>
     bool vectorHasValueBetween(std::vector<T> V, std::pair<T, T> P) {
       return std::find_if(V.begin(), V.end(), [&P](const T & aValue) { return (aValue < P.second && aValue >= P.first);}) != V.end();

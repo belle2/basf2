@@ -157,6 +157,11 @@ namespace Belle2 {
     double particleInvariantMassSignificance(const Particle* part);
 
     /**
+     * return signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass
+     */
+    double particleInvariantMassBeforeFitSignificance(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);
@@ -465,6 +470,14 @@ namespace Belle2 {
     double extraEnergy(const Particle* particle);
 
     /**
+     * return extra energy in the calorimeter that is not associated to the given Particle
+     * ECLClusters passing goodGamma selection are used only.
+     *
+     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
+     */
+    double extraEnergyFromGoodGamma(const Particle* particle);
+
+    /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
      */
     double eclClusterDetectionRegion(const Particle* particle);
@@ -473,13 +486,13 @@ namespace Belle2 {
      *
      * @param calibrated set to false for goodGammaUncalibrated().
      */
-    bool isGoodGamma(int region, double energy, double e9e25, bool calibrated);
+    bool isGoodGamma(int region, double energy, bool calibrated);
 
     /**
      * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E >  85 MeV && E9/E25>0.7
-     * Barrel   : E >  60 MeV
-     * Backward : E > 110 MeV
+     * Forward  : E > 100 MeV
+     * Barrel   : E >  90 MeV
+     * Backward : E > 160 MeV
      */
     double goodGamma(const Particle* particle);
 

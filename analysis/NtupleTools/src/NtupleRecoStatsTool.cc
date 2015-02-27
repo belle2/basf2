@@ -88,7 +88,6 @@ void NtupleRecoStatsTool::eval(const  Particle*)
       bool goodTiming       = timing > 2200 && timing < 2450;
 
       if ((goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) && goodTiming) {
-        //if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) {
         m_goodNeutralECLEnergy += cluster->getEnergy();
         m_iGoodNeutralClusters++;
       }

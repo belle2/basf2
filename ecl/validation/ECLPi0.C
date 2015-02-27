@@ -10,22 +10,26 @@ void ECLPi0()
   // an example of a 1D histogram
   TH1F* hPi0s = new TH1F("hPi0s", "ECL Reconstructed Pi0 Energy for 1 GeV/c Pi0", 100, 0.2, 1.2);
   hPi0s->GetXaxis()->SetTitle("Pi0 Energy (GeV)");
+  hPi0s->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed energy for 1 GeV Pi0s")); 
+  hPi0s->GetListOfFunctions()->Add(new TNamed("Check","Should not be biased"));
+  hPi0s->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   tree->Draw("ECLPi0s.m_Energy>>hPi0s");
   hPi0s->Write();
 
   // an example of a 1D histogram
   TH1F* hPi0mass = new TH1F("hPi0mass", "ECL combined Pi0 Mass for 1 GeV/c Pi0", 100, 0.08, 0.18);
   hPi0mass->GetXaxis()->SetTitle("Pi0 combined mass (GeV/c^{2})");
+  hPi0mass->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed mass for 1 GeV Pi0s")); 
+  hPi0mass->GetListOfFunctions()->Add(new TNamed("Check","Should not be biased"));
+  hPi0mass->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   tree->Draw("ECLPi0s.m_Mass>>hPi0mass");
   hPi0mass->Write();
 
   // an example of a 1D histogram
-  TH1F* hPi0massFit = new TH1F("hPi0massFit", "ECL constrainted  Pi0 Mass for 1 GeV/c Pi0", 100, 0.08, 0.18);
-  hPi0massFit->GetXaxis()->SetTitle("Pi0 constrainted  mass (GeV/c^{2})");
-  tree->Draw("ECLPi0s.m_MassFit>>hPi0massFit");
-  hPi0massFit->Write();
-
-
+  //TH1F* hPi0massFit = new TH1F("hPi0massFit", "ECL constrainted  Pi0 Mass for 1 GeV/c Pi0", 100, 0.08, 0.18);
+  //hPi0massFit->GetXaxis()->SetTitle("Pi0 constrainted  mass (GeV/c^{2})");
+  //tree->Draw("ECLPi0s.m_MassFit>>hPi0massFit");
+  //hPi0massFit->Write();
 
   delete output;
 }

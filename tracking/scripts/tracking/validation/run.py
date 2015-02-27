@@ -115,7 +115,7 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
 
     def determine_tracking_coverage(self, finder_module_or_name):
         finder_module_name = get_basf2_module_name(finder_module_or_name)
-        if finder_module_name == 'CDCLocalTracking' or finder_module_name == 'CDCLegendreTracking' or finder_module_name.startswith('TrackFinderCDC'):
+        if finder_module_name == 'CDCLocalTracking' or finder_module_name == 'CDCLegendreTracking' or finder_module_name.startswith('TrackFinderCDC') or finder_module_name == "CDCFullFinder":
             return {'UsePXDHits': False, 'UseSVDHits': False,
                     'UseCDCHits': True}
         elif finder_module_name == 'VXDTF':
@@ -152,8 +152,36 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
                 StandardTrackingReconstructionModule(components=self.components)
             main_path.add_module(trackFinderModule)
         else:
-            trackFinderModule = get_basf2_module(self.finder_module)
-            main_path.add_module(trackFinderModule)
+            if self.finder_module == "CDCFullFinder":
+
+                legendre_track_finder_module = basf2.register_module("CDCLegendreTracking")
+                legendre_track_finder_module.param("GFTrackCandidatesColName", "LegendreTrackCands")
+
+                stereo_histogramming_finder = basf2.register_module("CDCLegendreHistogramming")
+                stereo_histogramming_finder.param("GFTrackCandidatesColName", "LegendreTrackCands")
+
+                not_assigned_hits_searcher_module = basf2.register_module("NotAssignedHitsSearcher")
+                not_assigned_hits_searcher_module.param({"TracksFromFinder": "LegendreTrackCands",
+                                                         "NotAssignedCDCHits": "NotAssignedCDCHits"})
+
+                local_track_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
+                local_track_finder_module.param({"UseOnlyCDCHitsRelatedFrom": "NotAssignedCDCHits",
+                                                 "GFTrackCandsStoreArrayName": "LocalTrackCands"})
+
+                not_assigned_hits_combiner_module = basf2.register_module("NotAssignedHitsCombiner")
+
+                not_assigned_hits_combiner_module.param({"TracksFromLegendreFinder": "LegendreTrackCands",
+                                                         "NotAssignedTracksFromLocalFinder": "LocalTrackCands",
+                                                         "ResultTrackCands": "TrackCands"})
+
+                main_path.add_module(legendre_track_finder_module)
+                main_path.add_module(not_assigned_hits_searcher_module)
+                main_path.add_module(local_track_finder_module)
+                main_path.add_module(not_assigned_hits_combiner_module)
+
+            else:
+                trackFinderModule = get_basf2_module(self.finder_module)
+                main_path.add_module(trackFinderModule)
 
             # setting up fitting is only necessary when testing
             # track finding comonenst ex-situ

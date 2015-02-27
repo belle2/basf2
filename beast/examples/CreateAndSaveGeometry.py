@@ -17,12 +17,11 @@ from basf2 import *
 
 # EventInfoSetter - generate event meta data
 eventinfosetter = register_module('EventInfoSetter')
-evtruninfo = {'ExpList': [0], 'RunList': [1], 'EvtNumList': [1]}
-eventinfosetter.param(evtruninfo)
+#eventinfosetter.param({'evtNumList': [nevent], 'runList': [1], 'expList': [1]})
 
 # Geometry parameter loader
 gearbox = register_module('Gearbox')
-
+gearbox.param('fileName', '/geometry/Beast2_phase2.xml')
 # Geometry builder
 geometry = register_module('Geometry')
 

@@ -13,153 +13,189 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2 3 4 5 6 7 8 
+    <bar unit="cm">1 2 3 4 5 6 7 8 
     </bar>
 
     <Active>
       <Material>CLAW-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">12.6686</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">32.0</k_zC>
-      <k_phiC unit="deg">50.5903</k_phiC>
+      <z_claw unit="cm">0.0</z_claw>
+      <r_claw unit="cm">3.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">16.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">2.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
     </Active>
 
     <Active>
       <Material>CLAW-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">12.6304</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">32.0</k_zC>
-      <k_phiC unit="deg">110.519</k_phiC>
+      <z_claw unit="cm">0.0</z_claw>
+      <r_claw unit="cm">3.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">16.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">2.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">0.0</z_claw>
+      <r_claw unit="cm">3.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">16.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">2.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">0.0</z_claw>
+      <r_claw unit="cm">3.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">16.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">2.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+<!--    
+    <Active>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">5.0</z_claw>
+      <r_claw unit="cm">4.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">2.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">1.5</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
     </Active>
 
     <Active>
       <Material>CLAW-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">12.6304</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">32.0</k_zC>
-      <k_phiC unit="deg">249.481</k_phiC>
+      <z_claw unit="cm">5.0</z_claw>
+      <r_claw unit="cm">4.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">90.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">2.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">1.5</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+    
+    <Active>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">5.0</z_claw>
+      <r_claw unit="cm">4.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">-90.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">2.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">1.5</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
     </Active>
 
     <Active>
       <Material>CLAW-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">12.6686</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">32.0</k_zC>
-      <k_phiC unit="deg">309.4097</k_phiC>
+      <z_claw unit="cm">5.0</z_claw>
+      <r_claw unit="cm">4.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">45.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">2.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">1.5</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
     </Active>
 
     <Active>
       <Material>CLAW-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">155.098</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">55.1259</k_phiC>
+      <z_claw unit="cm">5.0</z_claw>
+      <r_claw unit="cm">4.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">-45.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">2.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.01</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">1.5</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
     </Active>
+
 
     <Active>
       <Material>CLAW-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">161.193</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">113.578</k_phiC>
+      <z_claw unit="cm">5.0</z_claw>
+      <r_claw unit="cm">4.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">225.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">2.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">1.5</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
     </Active>
+
 
     <Active>
       <Material>CLAW-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">161.193</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">246.422</k_phiC>
+      <z_claw unit="cm">5.0</z_claw>
+      <r_claw unit="cm">4.1</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">135.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">2.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">1.5</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
     </Active>
-
-    <Active>
-      <Material>CLAW-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">155.098</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">304.8741</k_phiC>
-    </Active>
-
-
+-->
   </Content>
 </DetectorComponent>

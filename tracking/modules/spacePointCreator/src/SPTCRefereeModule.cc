@@ -208,13 +208,6 @@ void SPTCRefereeModule::terminate()
   if (m_PARAMcheckCurling) { summary << m_curlingTracksCtr << " SPTCs were curling. Registered " << m_regTrackStubsCtr << " track stubs. 'splitCurlers' was set to " << m_PARAMsplitCurlers << ", 'keepOnlyFirstPart' was set to " << m_PARAMkeepOnlyFirstPart << ". There were " << m_allInwardsCtr << " SPTCs that had flight direction 'inward' for all SpacePoints in them"; }
   B2INFO("SPTCRefere::terminate(): Module got " << m_totalTrackCandCtr << " SpacePointTrackCands. " << summary.str())
   if (!m_PARAMuseMCInfo && m_PARAMcheckCurling) { B2WARNING("The curling checking without MC Information is at the moment at a very crude and unsophisticated state. If you have MC information available you should use it to do this check!"); }
-
-
-  // TESTING purposes: to be removed before commit
-//   if (m_SameSensorCtr) B2ERROR("SENSOR")
-//   if (m_minDistanceCtr) B2ERROR("DISTANCE")
-//   if (m_curlingTracksCtr) B2ERROR("CURLING")
-//   if (m_curlingTracksCtr && (m_SameSensorCtr || m_minDistanceCtr)) B2ERROR("CURLINGOTHER")
 }
 
 // ====================================================================== CHECK SAME SENSORS ====================================================================
@@ -386,26 +379,14 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
 
       trackStub.setTrackStubIndex(iTs + 1); // trackStub index starts at 1 for curling SPTCs. NOTE: this might be subject to chagnes with the new bitfield in SpacePointTrackCand
 
-      cout << refStatus << endl;
-
       // determine and set the referee status of this trackStub based upon the information from the previous tests
       const std::vector<int>& sameSensInds = std::get<0>(prevChecksInfo);
       const std::vector<int>& lowDistInds = std::get<0>(prevChecksInfo);
-
-      if (!sameSensInds.empty() || !lowDistInds.empty()) B2ERROR("CURLINGOTHER")
-        cout << "sameSensInds " << endl;
-      for (int entry : sameSensInds) cout << entry << " ";
-      cout << endl << "lowDistInds " << endl;
-      for (int entry : lowDistInds) cout << entry << " ";
-      cout << endl;
       bool hasSameSens = vectorHasValueBetween(sameSensInds, rangeIndices.at(iTs));
       bool hasLowDist = vectorHasValueBetween(lowDistInds, rangeIndices.at(iTs));
-      cout << " hasSameSens " << hasSameSens << " hasLowDist " << hasLowDist << endl;
       if ((hasSameSens || hasLowDist) && removedHits) refStatus += SpacePointTrackCand::c_removedHits;
       if (hasSameSens && !removedHits) refStatus += SpacePointTrackCand::c_hitsOnSameSensor;
       if (hasLowDist && !removedHits) refStatus += SpacePointTrackCand::c_hitsLowDistance;
-
-      cout << refStatus << endl;
 
       trackStub.setRefereeStatus(refStatus);
       B2DEBUG(999, "Set TrackStubIndex " << iTs + 1 << " and refereeStatus " << trackStub.getRefereeStatus() << " for this trackStub (refStatus string: " << trackStub.getRefereeStatusString());

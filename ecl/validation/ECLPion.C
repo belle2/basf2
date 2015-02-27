@@ -26,7 +26,7 @@ void ECLPion(){
   hClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
   hClusterMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for 1 GeV charged pion")); 
   hClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be low"));
-  hClusterE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  hClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
   tree->Draw("eclClusterMultip>>hClusterMultip","eclClusterMultip>0");
   hClusterMultip->Write();
   

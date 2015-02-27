@@ -264,6 +264,9 @@ namespace Belle2 {
     //! Get ctime
     int GetTTCtime(int n);
 
+    //! Get trgtype
+    int GetTRGType(int n);
+
     //! Get timeval
     void GetTTTimeVal(int n, struct timeval* tv);
 
@@ -569,6 +572,12 @@ namespace Belle2 {
   {
     CheckVersionSetBuffer();
     return m_access->GetTTCtime(n);
+  }
+
+  inline int RawCOPPER::GetTRGType(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetTRGType(n);
   }
 
   inline void RawCOPPER::GetTTTimeVal(int n, struct timeval* tv)

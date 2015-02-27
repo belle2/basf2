@@ -203,6 +203,9 @@ namespace Belle2 {
     //! Get ctime
     int GetTTCtime(int n);
 
+    //! Get trgtype
+    int GetTRGType(int n);
+
     //! Get timeval
     void GetTTTimeVal(int n, struct timeval* tv);
 
@@ -603,6 +606,11 @@ namespace Belle2 {
     return tmp_header.GetTTCtime();
   }
 
+  inline int RawCOPPERFormat_v0::GetTRGType(int n)
+  {
+    tmp_header.SetBuffer(GetBuffer(n));
+    return tmp_header.GetTRGType();
+  }
 
   inline void RawCOPPERFormat_v0::GetTTTimeVal(int n, struct timeval* tv)
   {

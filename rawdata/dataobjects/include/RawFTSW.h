@@ -56,6 +56,9 @@ namespace Belle2 {
     //! Get ctime of the trigger
     int GetTTCtime(int n);
 
+    //! Get trgtype
+    int GetTRGType(int n);
+
     //! Get timeval from ctime and utime
     void GetTTTimeVal(int n, struct timeval* tv);
 
@@ -135,7 +138,8 @@ namespace Belle2 {
       RUNNO_SHIFT = 8,
       SUBRUNNO_MASK = 0x000000FF,
       TTCTIME_MASK = 0x7FFFFFF0,
-      TTCTIME_SHIFT = 4
+      TTCTIME_SHIFT = 4,
+      TRGTYPE_MASK = 0xF
     };
 
     enum {

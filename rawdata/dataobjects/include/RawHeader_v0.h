@@ -126,6 +126,8 @@ namespace Belle2 {
 
     int GetTTCtime();  //! get contents of header
 
+    int GetTRGType();  //! get TRGType
+
     unsigned int GetTTUtime();  //! get contents of header
 
     void GetTTTimeVal(struct  timeval* tv);    //! get contents of header
@@ -192,7 +194,8 @@ namespace Belle2 {
     /* To extract ctime */
     enum {
       TTCTIME_MASK = 0x7FFFFFF0,
-      TTCTIME_SHIFT = 4
+      TTCTIME_SHIFT = 4,
+      TRGTYPE_MASK = 0xF
     };
 
   private:
@@ -465,6 +468,13 @@ namespace Belle2 {
     CheckGetBuffer();
     return (int)((GetTTCtimeTRGType() & TTCTIME_MASK) >> TTCTIME_SHIFT);
   }
+
+  inline int RawHeader_v0::GetTRGType()
+  {
+    CheckGetBuffer();
+    return (int)(GetTTCtimeTRGType() & TRGTYPE_MASK);
+  }
+
 
   inline unsigned int RawHeader_v0::GetTTUtime()
   {

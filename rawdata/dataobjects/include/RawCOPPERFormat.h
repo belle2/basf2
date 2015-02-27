@@ -300,6 +300,9 @@ namespace Belle2 {
     //! Get ctime
     virtual int GetTTCtime(int n) = 0;
 
+    //! Get trgtype
+    virtual int GetTRGType(int n) = 0;
+
     //! Get timeval
     virtual void GetTTTimeVal(int n, struct timeval* tv) = 0;
 

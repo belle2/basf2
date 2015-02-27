@@ -36,9 +36,15 @@ unsigned int RawFTSW::GetTTCtimeTRGType(int n)
 }
 
 
+
 int RawFTSW::GetTTCtime(int n)
 {
   return (int)((GetTTCtimeTRGType(n) & TTCTIME_MASK) >> TTCTIME_SHIFT);
+}
+
+int RawFTSW::GetTRGType(int n)
+{
+  return (int)(GetTTCtimeTRGType(n) & TRGTYPE_MASK);
 }
 
 unsigned int RawFTSW::GetTTUtime(int n)

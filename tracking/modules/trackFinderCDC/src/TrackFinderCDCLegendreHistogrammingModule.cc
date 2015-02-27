@@ -37,7 +37,6 @@ CDCLegendreHistogrammingModule::~CDCLegendreHistogrammingModule()
 void CDCLegendreHistogrammingModule::initialize()
 {
 
-
 }
 
 void CDCLegendreHistogrammingModule::event()

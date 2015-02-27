@@ -8,7 +8,7 @@
 
 
 #pragma link C++ class pair <bool, bool>+;
-#pragma link C++ class pair <float, float>+;
+// #pragma link C++ class pair <float, float>+;
 // #pragma link C++ class pair <double, double>+;
 // #pragma link C++ class Belle2::B2Vector3<float>+; // implicit
 // #pragma link C++ class Belle2::B2Vector3<double>+;

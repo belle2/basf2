@@ -300,62 +300,62 @@ namespace Belle2 {
   TEST_F(SpacePointTest, testRootIOSP)
   {
     /// does not work - TODO solve!
-//  string fNameSP = "demoSPs.root";
-//  VxdID::baseType aVxdID = VxdID(1, 2, 3);
-//  VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
-//
-//
-//  /// create samples to be written in a root file:
-//  PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-//  EXPECT_EQ(aVxdID, aCluster.getSensorID());
-//
-//  SpacePoint testPoint = SpacePoint(&aCluster, &sensorInfoBase);
-//  EXPECT_EQ(aVxdID, testPoint.getVxdID());
-//
-//
-//  /// create root file, fill spacePoint into file, store it, close
-//  B2INFO("open root file:" << fNameSP)
-//  TFile f3(fNameSP.c_str(), "recreate");
-//  f3.cd();
-//  testPoint.Write();
-//  B2INFO("closing file:")
-//  f3.Close();
-//
-//  /// reopen file, read entries and check them
-//  TFile f4(fNameSP.c_str());
-//  if (f4.IsZombie()) { B2ERROR("file could not be reopened!"); }
-//  else {
-//    SpacePoint* retrievedSpacePoint;
-//    f4.GetListOfKeys()->Print();
-//
-//    TIter next(f4.GetListOfKeys());
-//    TKey* key;
-//    while ((key = (TKey*)next())) {
-//
-//    try {
-//      retrievedSpacePoint = static_cast<SpacePoint*>(key->ReadObj());
-//    } catch (exception& e) {
-//      B2WARNING("Key was not a SpacePoint, therefore error message: " << e.what() << "\n Skipping this key...")
-//      continue;
-//    }
-//
-//    EXPECT_EQ(retrievedSpacePoint->getVxdID(), testPoint.getVxdID());
-//    EXPECT_DOUBLE_EQ(retrievedSpacePoint->getPosition().X(), testPoint.getPosition().X());
-//    EXPECT_DOUBLE_EQ(retrievedSpacePoint->getPosition().Y(), testPoint.getPosition().Y());
-//    EXPECT_DOUBLE_EQ(retrievedSpacePoint->getPosition().Z(), testPoint.getPosition().Z());
-//    EXPECT_FLOAT_EQ(retrievedSpacePoint->getPositionError().X(), testPoint.getPositionError().X());
-//    EXPECT_FLOAT_EQ(retrievedSpacePoint->getPositionError().Y(), testPoint.getPositionError().Y());
-//    EXPECT_FLOAT_EQ(retrievedSpacePoint->getPositionError().Z(), testPoint.getPositionError().Z());
-//    EXPECT_DOUBLE_EQ(retrievedSpacePoint->getNormalizedLocalU(), testPoint.getNormalizedLocalU());
-//    EXPECT_DOUBLE_EQ(retrievedSpacePoint->getNormalizedLocalV(), testPoint.getNormalizedLocalV());
-//    }
-//    f4.Close();
-//  }
-//  /// delete file from disk, cleanup}
-//  if (remove(fNameSP.c_str()) != 0)
-//  { B2ERROR("could not delete file " << fNameSP << "!") }
-//  else
-//  { B2INFO(fNameSP <<" successfully deleted") }
+    string fNameSP = "demoSPs.root";
+    VxdID::baseType aVxdID = VxdID(1, 2, 3);
+    VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
+
+
+    /// create samples to be written in a root file:
+    PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
+    EXPECT_EQ(aVxdID, aCluster.getSensorID());
+
+    SpacePoint testPoint = SpacePoint(&aCluster, &sensorInfoBase);
+    EXPECT_EQ(aVxdID, testPoint.getVxdID());
+
+
+    /// create root file, fill spacePoint into file, store it, close
+    B2INFO("open root file:" << fNameSP)
+    TFile f3(fNameSP.c_str(), "recreate");
+    f3.cd();
+    testPoint.Write();
+    B2INFO("closing file:")
+    f3.Close();
+
+    /// reopen file, read entries and check them
+    TFile f4(fNameSP.c_str());
+    if (f4.IsZombie()) { B2ERROR("file could not be reopened!"); }
+    else {
+      SpacePoint* retrievedSpacePoint;
+      f4.GetListOfKeys()->Print();
+
+      TIter next(f4.GetListOfKeys());
+      TKey* key;
+      while ((key = (TKey*)next())) {
+
+        try {
+          retrievedSpacePoint = static_cast<SpacePoint*>(key->ReadObj());
+        } catch (exception& e) {
+          B2WARNING("Key was not a SpacePoint, therefore error message: " << e.what() << "\n Skipping this key...")
+          continue;
+        }
+
+        EXPECT_EQ(retrievedSpacePoint->getVxdID(), testPoint.getVxdID());
+        EXPECT_DOUBLE_EQ(retrievedSpacePoint->getPosition().X(), testPoint.getPosition().X());
+        EXPECT_DOUBLE_EQ(retrievedSpacePoint->getPosition().Y(), testPoint.getPosition().Y());
+        EXPECT_DOUBLE_EQ(retrievedSpacePoint->getPosition().Z(), testPoint.getPosition().Z());
+        EXPECT_FLOAT_EQ(retrievedSpacePoint->getPositionError().X(), testPoint.getPositionError().X());
+        EXPECT_FLOAT_EQ(retrievedSpacePoint->getPositionError().Y(), testPoint.getPositionError().Y());
+        EXPECT_FLOAT_EQ(retrievedSpacePoint->getPositionError().Z(), testPoint.getPositionError().Z());
+        EXPECT_DOUBLE_EQ(retrievedSpacePoint->getNormalizedLocalU(), testPoint.getNormalizedLocalU());
+        EXPECT_DOUBLE_EQ(retrievedSpacePoint->getNormalizedLocalV(), testPoint.getNormalizedLocalV());
+      }
+      f4.Close();
+    }
+    /// delete file from disk, cleanup}
+    if (remove(fNameSP.c_str()) != 0)
+    { B2ERROR("could not delete file " << fNameSP << "!") }
+    else
+    { B2INFO(fNameSP << " successfully deleted") }
   }
 
 

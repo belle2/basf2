@@ -2,9 +2,21 @@
 # showTMVAResults.sh TMVA.root
 # Shows Control Plots for a training stored in root file created by TMVATeacher
 
+printUsage() {
+  echo "Usage: showTMVAResults TMVA_TRAINING_OUTPUT"
+  echo "where TMVA_TRAINING_OUTPUT is the ROOT file produced during the training (usually with suffix _1.root)."
+}
 if [ $# -ne 1 ]
 then
-  echo "Usage: showTMVAResults TMVA_TRAINING_OUTPUT"
+  printUsage
+  exit 1
+fi
+
+if [ ! -f $1 ]
+then
+  printUsage
+  echo ""
+  echo "File '$1' not found!"
   exit 1
 fi
 

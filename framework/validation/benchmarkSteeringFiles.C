@@ -10,6 +10,8 @@
 #include <TNtuple.h>
 #include <TSystem.h>
 
+#include <iostream>
+
 
 //how often do we want to execute stuff? (result of first execution ignored to warm caches)
 const int nRuns = 3; //make this >= 3
@@ -58,11 +60,12 @@ void benchmarkSteeringFiles()
     for (int iRun = 0; iRun < nRuns; iRun++) {
       //(in /tmp/ to avoid producing .root files in current directory)
       //no idea how it actually finds the steering files after the cd...
-      const char* cmd = TString::Format("cd %s && basf2 %s%s", tmpdir.Data(), "../../../", files[iFile]).Data();
+      const TString cmd = TString::Format("cd %s && basf2 %s%s", tmpdir.Data(), "../../../", files[iFile]);
 
       TTimeStamp start;
       //do stuff
-      system(cmd);
+      if (system(cmd.Data()) != 0)
+          exit(1);
       TTimeStamp end;
 
       if (iRun == 0)
@@ -75,7 +78,7 @@ void benchmarkSteeringFiles()
 
     double sum = 0;
     double squares = 0;
-    for (int i = 0; i < times_ms.size(); i++) {
+    for (unsigned int i = 0; i < times_ms.size(); i++) {
       sum += times_ms[i];
       squares += times_ms[i] * times_ms[i];
       std::cout << "sum : " << sum << "\n";
@@ -89,7 +92,8 @@ void benchmarkSteeringFiles()
     bench->Write();
   }
 
-  system(TString::Format("rm -r %s", tmpdir.Data()).Data());
+  TString cmd = TString::Format("rm -r %s", tmpdir.Data());
+  system(cmd.Data());
 
   delete output;
 }

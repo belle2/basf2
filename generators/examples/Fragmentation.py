@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 ########################################################
 # Run PYTHIA on unfragmented final states
 #
@@ -22,7 +19,7 @@ eventinfosetter.param('evtNumList', [10])  # we want to process 100 events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
 
-# add root input module (if kkmc is not used)
+# add root input module
 rootinput = register_module('RootInput')
 rootinput.param('inputFileName', './continuum.root')
 

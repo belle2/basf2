@@ -211,20 +211,19 @@ def FitVertex(path, hash, channelName, particleList, daughterVertices, geometry)
     """
     B2INFO("Enter: Fitted vertex for channel {c}.".format(c=channelName))
     if particleList is None:
-        B2INFO("Didn't fitted vertex for channel {c}, because channel is ignored.".format(c=channelName))
+        B2INFO("Not fitting vertex for channel {c} because channel is ignored.".format(c=channelName))
         return {'VertexFit_{c}'.format(c=channelName): None, '__cache__': True}
 
     if re.findall(r"[\w']+", channelName).count('pi0') > 1:
-        B2INFO("Ignore vertex fit for this channel because multiple pi0 are not supported yet {c}.".format(c=channelName))
+        B2INFO("Ignoring vertex fit for this channel because multiple pi0 are not supported yet {c}.".format(c=channelName))
         return {'VertexFit_{c}'.format(c=channelName): hash, '__cache__': True}
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + particleList)
     pvfit.param('listName', particleList)
-    pvfit.param('confidenceLevel', 0)
+    pvfit.param('confidenceLevel', -2)  # don't remove Particles with failed fit (pValue = -1)
     pvfit.param('vertexFitter', 'kfitter')
     pvfit.param('fitType', 'vertex')
-    pvfit.param('dontDiscardOnError', True)
     path.add_module(pvfit)
 
     B2INFO("Fitted vertex for channel {c}.".format(c=channelName))

@@ -210,7 +210,7 @@ class TestFitVertex(unittest.TestCase):
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['listName'], 'D+:1')
-        self.assertEqual(parameters['confidenceLevel'], 0)
+        self.assertEqual(parameters['confidenceLevel'], -2)
 
     def test_missing_particle_list(self):
         result = FitVertex(self.path, 'hash', 'UniqueChannelName', None, ['v1', 'v2'], 'dummy')

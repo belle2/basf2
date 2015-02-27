@@ -29,4 +29,6 @@ then
   echo "Directory src/root/tmva/test not found in externals. Please re-install from source."
   exit 1
 fi
-root -l "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/TMVAGui.C(\"$FILE\")"
+
+#set TMVASYS to avoid some (noncritical) errors
+TMVASYS="$ROOTSYS" root -l "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/TMVAGui.C(\"$FILE\")"

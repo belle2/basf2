@@ -57,12 +57,11 @@ namespace Belle2 {
     // Add parameters
     addParam("listName", m_listName, "name of particle list", string(""));
     addParam("confidenceLevel", m_confidenceLevel,
-             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list.", 0.001);
+             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit", 0.001);
     addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
-    addParam("withConstraint", m_withConstraint, "additional constraint on vertex", string(""));
+    addParam("withConstraint", m_withConstraint, "additional constraint on vertex: ipprofile, iptube, iptubecut", string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
-    addParam("dontDiscardOnError", m_dontDiscardOnError, "If an error occurs during the fit, don't remove the corresponding Particle from the list", false);
   }
 
   ParticleVertexFitterModule::~ParticleVertexFitterModule()
@@ -85,9 +84,13 @@ namespace Belle2 {
       m_beamSpotCov(2, 2) = 154e-4 * 154e-4;
       m_beamSpotCov(0, 2) = TMath::Tan(-1.11e-2) * m_beamSpotCov(0, 0) * m_beamSpotCov(2, 2);
     }
-    if (m_withConstraint == "iptube") findConstraintBoost(10000);
+    if (m_withConstraint == "iptube") ParticleVertexFitterModule::findConstraintBoost(2.);
+    if (m_withConstraint == "iptubecut") {
+      m_BeamSpotCenter = TVector3(0.001, 0., .013);
+      findConstraintBoost(0.03);
+    }
 
-    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube")
+    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
     if (m_decayString != "")
@@ -110,6 +113,7 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::event()
   {
+
     StoreObjPtr<ParticleList> plist(m_listName);
     if (!plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
@@ -124,8 +128,8 @@ namespace Belle2 {
     for (unsigned i = 0; i < n; i++) {
       Particle* particle = plist->getParticle(i);
       bool ok = doVertexFit(particle);
-      if (!ok and !m_dontDiscardOnError) toRemove.push_back(particle->getArrayIndex());
-      else if (!ok) particle->setPValue(-3);
+      if (!ok) particle->setPValue(-1);
+      if (particle->getPValue() < m_confidenceLevel)toRemove.push_back(particle->getArrayIndex());
     }
     plist->removeParticles(toRemove);
 
@@ -155,6 +159,7 @@ namespace Belle2 {
 
     if (m_withConstraint != "ipprofile" &&
         m_withConstraint != "iptube" &&
+        m_withConstraint != "iptubecut" &&
         m_withConstraint != "")
       B2FATAL("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
 
@@ -164,7 +169,7 @@ namespace Belle2 {
       // TODO: add this functionality
       if (m_decayString != "")
         B2FATAL("ParticleVertexFitter: kfitter does not support yet selection of daughters via decay string!") ;
-      if (m_withConstraint == "iptube")
+      if (m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
         B2FATAL("ParticleVertexFitter: kfitter does not support yet the iptube constraint ");
 
       // vertex fit
@@ -180,7 +185,7 @@ namespace Belle2 {
 
       // mass-constrained vertex fit
       if (m_fitType == "massvertex") {
-        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube") {
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
           B2FATAL("ParticleVertexFitter: Invalid options - mass-constrained fit using kfitter does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKMassVertexFit(mother);
@@ -189,7 +194,7 @@ namespace Belle2 {
 
       // mass fit
       if (m_fitType == "mass") {
-        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube") {
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
           B2FATAL("ParticleVertexFitter: Invalid options - mass fit using kfitter does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKMassFit(mother);
@@ -221,7 +226,7 @@ namespace Belle2 {
 
     // steering ends here
 
-    if (mother->getPValue() < m_confidenceLevel) return false;
+    //if (mother->getPValue() < m_confidenceLevel) return false;
     return true;
 
   }
@@ -652,13 +657,11 @@ namespace Belle2 {
     if (mother->getNDaughters() < 2) return false;
 
     if (m_withConstraint == "") analysis::RaveSetup::getInstance()->unsetBeamSpot();
-    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube")
+    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
-
 
     analysis::RaveKinematicVertexFitter rf;
     if (m_fitType == "mass") rf.setVertFit(false);
-
 
     if (m_decayString.empty()) {
       rf.addMother(mother);
@@ -679,7 +682,7 @@ namespace Belle2 {
         for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
           if (tracksVertex[itrack] != mother) {
             rsf.addTrack(tracksVertex[itrack]);
-            B2INFO("ParticleVertexFitterModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
+            B2DEBUG(1, "ParticleVertexFitterModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
             nTrk++;
           }
           if (tracksVertex[itrack] == mother) mothSel = true;
@@ -917,7 +920,7 @@ namespace Belle2 {
     TMatrix r(3, 3);  r.Mult(rz, ry);
     TMatrix rt(3, 3); rt.Transpose(r);
 
-    TMatrix TubePart(3, 3);  TubePart.Mult(rt, m_beamSpotCov);
+    TMatrix TubePart(3, 3);  TubePart.Mult(rt, beamSpotCov);
     TMatrix Tube(3, 3); Tube.Mult(TubePart, r);
 
     m_beamSpotCov(0, 0) = Tube(0, 0);  m_beamSpotCov(0, 1) = Tube(0, 1);  m_beamSpotCov(0, 2) = Tube(0, 2);

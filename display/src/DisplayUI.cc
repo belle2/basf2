@@ -1,8 +1,11 @@
 //needs to be first
 #include <framework/core/ModuleParam.h>
 
+#include <display/dataobjects/DisplayData.h>
 #include <display/DisplayUI.h>
 #include <display/VisualRepMap.h>
+#include <display/BrowsableWrapper.h>
+#include <display/SplitGLView.h>
 
 #include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -11,10 +14,7 @@
 #include <framework/datastore/RelationVector.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <display/dataobjects/DisplayData.h>
-#include <display/async/AsyncWrapper.h>
-#include <display/BrowsableWrapper.h>
-#include <display/SplitGLView.h>
+#include <framework/pcore/AsyncWrapper.h>
 
 #include <TApplication.h>
 #include <TCanvas.h>

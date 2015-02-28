@@ -11,7 +11,7 @@
 #ifndef ASYNCDISPLAYMODULE_H
 #define ASYNCDISPLAYMODULE_H
 
-#include <display/async/AsyncWrapper.h>
+#include <framework/pcore/AsyncWrapper.h>
 
 namespace Belle2 {
   /** Wraps DisplayModule and starts it in a forked process. */

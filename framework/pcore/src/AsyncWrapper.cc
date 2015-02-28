@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <display/async/AsyncWrapper.h>
+#include <framework/pcore/AsyncWrapper.h>
 #include <framework/core/Path.h>
 
 #include <framework/core/EventProcessor.h>

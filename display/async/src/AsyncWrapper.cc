@@ -13,6 +13,7 @@
 
 #include <framework/core/EventProcessor.h>
 #include <framework/core/PathManager.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
@@ -47,16 +48,16 @@ void AsyncWrapper::stopMainProcess()
 }
 
 
-AsyncWrapper::AsyncWrapper(Module* wrapMe): Module(), m_wrappedModule(wrapMe), m_procHandler(0), m_ringBuffer(0), m_rx(0), m_tx(0)
+AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(), m_procHandler(0), m_ringBuffer(0), m_rx(0), m_tx(0)
 {
-  setParamList(wrapMe->getParamList()); //inherit parameters from wrapped module
+  m_wrappedModule = ModuleManager::Instance().registerModule(moduleType);
+  setParamList(m_wrappedModule->getParamList()); //inherit parameters from wrapped module
 
   addParam("discardOldEvents", m_discardOldEvents, "Discard old events when buffer is full. If false, the main process will wait until there is enough space in the buffer. (i.e. synchronous operation)", true);
 }
 
 AsyncWrapper::~AsyncWrapper()
 {
-  delete m_wrappedModule;
 }
 
 void AsyncWrapper::initialize()
@@ -67,6 +68,7 @@ void AsyncWrapper::initialize()
   const int bufferSizeInts = 8000000; //~32M, within Ubuntu's shmmax limit
   m_ringBuffer = new RingBuffer(bufferSizeInts);
   m_rx = new RxModule(m_ringBuffer);
+  m_rx->setLogLevel(LogConfig::c_Error); //suppress warnings about failed statistics merge in receiving process
   m_tx = new TxModule(m_ringBuffer);
   m_tx->setBlockingInsert(!m_discardOldEvents); //actually decouple this process
 
@@ -81,7 +83,7 @@ void AsyncWrapper::initialize()
     PathManager pathMgr;
     PathPtr path = pathMgr.createPath();
     path->addModule(ModulePtr(m_rx));
-    path->addModule(ModulePtr(m_wrappedModule));
+    path->addModule(m_wrappedModule);
 
     //LogSystem::Instance().resetMessageCounter(); //for testing parallel processing
 

@@ -11,7 +11,6 @@
 #ifndef ASYNCDISPLAYMODULE_H
 #define ASYNCDISPLAYMODULE_H
 
-#include <display/modules/display/DisplayModule.h>
 #include <display/async/AsyncWrapper.h>
 
 namespace Belle2 {
@@ -19,7 +18,7 @@ namespace Belle2 {
   class AsyncDisplayModule : public AsyncWrapper {
   public:
     /** constructor. */
-    AsyncDisplayModule(): AsyncWrapper(new DisplayModule()) {
+    AsyncDisplayModule(): AsyncWrapper("Display") {
       setDescription("Starts the Display module asynchronously (with buffered input). Note that the buffer is limited in size and not all events can be passed to the display once it is full. (Configurable using 'discardOldEvents' param).");
     }
     ~AsyncDisplayModule() { } //< dtor

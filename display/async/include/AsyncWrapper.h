@@ -18,7 +18,6 @@ namespace Belle2 {
   class TxModule;
   class RingBuffer;
   class ProcHandler;
-  class Module;
 
   /** Wraps a given Module to execute it asynchronously.
    *
@@ -26,8 +25,8 @@ namespace Belle2 {
    * event data that would normally be available to it, once available.
    * Anything written to the DataStore by the wrapped module will be lost.
    *
-   * To use it, inherit from AsyncWrapper and use the base class constructor
-   * in your own constructor, passing it an instance of the wrapped module class.
+   * To use it, inherit from AsyncWrapper and call it's constructor within
+   * your own constructor, passing it the name of the wrapped module.
    *
    * \sa See AsyncDisplayModule for an example that wraps DisplayModule.
    *
@@ -35,13 +34,14 @@ namespace Belle2 {
   class AsyncWrapper : public Module {
   public:
     /**
-     * Wrap the given module.
-     *
-     * Takes ownership of wrapMe.
+     * Wrap am module of given type.
      */
-    AsyncWrapper(Module* wrapMe);
+    AsyncWrapper(const std::string& moduleType);
 
     ~AsyncWrapper();
+
+    /** Access wrapped module (owned by AsyncWrapper). */
+    ModulePtr getWrapped() { return m_wrappedModule; }
 
     /** Call this from initialize().
      *
@@ -65,7 +65,7 @@ namespace Belle2 {
 
   private:
     /** The wrapped module. */
-    Module* m_wrappedModule;
+    ModulePtr m_wrappedModule;
 
     /** process manager. */
     ProcHandler* m_procHandler;

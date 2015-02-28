@@ -103,7 +103,7 @@ void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObje
 {
   unsigned int minIndexUnmerged = 0;
   if (otherObject->m_modulesToStatsIndex.empty()) {
-    B2ERROR("ProcessStatistics::appendUnmergedModules(): Module -> index list is empty? This might produce wrong results");
+    B2WARNING("ProcessStatistics::appendUnmergedModules(): Module -> index list is empty? This might produce wrong results");
   } else {
     minIndexUnmerged = otherObject->m_modulesToStatsIndex.begin()->second;
     for (auto pair : otherObject->m_modulesToStatsIndex) {

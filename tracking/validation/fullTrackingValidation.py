@@ -25,10 +25,11 @@ from tracking.validation.module import TrackingValidationModule
 
 import ROOT
 import itertools
-
+import logging
 
 # computes bins to have one bin containing
 # exactly one of the discrete values passed
+
 
 def computeBins(discreteValues):
     if len(discreteValues) < 2:
@@ -48,7 +49,7 @@ def computeBins(discreteValues):
         avg_low = (discreteValues[i] + discreteValues[i + 1]) / 2.
         avg_high = (discreteValues[i + 1] + discreteValues[i + 2]) / 2.
         bin_borders = bin_borders + [(avg_low, avg_high, discreteValues[i
-                                     + 1])]
+                                                                        + 1])]
 
     return bin_borders
 
@@ -107,7 +108,7 @@ class FullTracking(TrackingValidationRun):
             pulls=self.pulls,
             exclude_profile_mc_parameter=exclude_mc,
             output_file_name=self.output_file_name,
-            )
+        )
         main_path.add_module(trackingValidationModule)
 
         for ptBin in self.ptBinBorders:
@@ -127,7 +128,7 @@ class FullTracking(TrackingValidationRun):
                 plot_title_postfix=title_postfix,
                 exclude_profile_mc_parameter=exclude_mc + ['p_t'],
                 use_expert_folder=False,
-                )
+            )
             main_path.add_module(trackingValidationModule)
 
 
@@ -154,7 +155,7 @@ def main():
         2.,
         3.,
         4.,
-        ]
+    ]
     ptBinBorders = computeBins(ptDiscrete)
     validation_run = FullTracking(ptBinBorders=ptBinBorders)
 
@@ -171,7 +172,7 @@ def main():
         'yVertexParams': [0.0],
         'zVertexParams': [0.0],
         'thetaGeneration': 'uniformCos',
-        })
+    })
 
     # Execute the validation run #
     ##############################
@@ -179,5 +180,6 @@ def main():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()

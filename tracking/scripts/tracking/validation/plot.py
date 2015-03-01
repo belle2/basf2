@@ -9,7 +9,7 @@ import numpy as np
 
 import ROOT
 
-from tracking.validation.utilities import root_cd
+from tracking.validation.utilities import root_cd, root_save_name
 
 import logging
 
@@ -116,18 +116,10 @@ def compose_axis_label(quantity_name, unit=None):
     return axis_label
 
 
-def root_save_name(name):
-    """Strips all meta characters that might be unsafe to use as a ROOT name"""
-
-    deletechars = r"/$\#{}"
-    name = name.replace(' ', '_').replace('-', '_').translate(None, deletechars)
-    return name
-
-
 class ValidationPlot(object):
 
     def __init__(self, name):
-        self.name = name
+        self.name = root_save_name(name)
 
         self._description = ''
         self._check = ''

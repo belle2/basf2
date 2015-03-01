@@ -194,3 +194,38 @@ class StandardTrackingReconstructionModule(PathModule):
         path = basf2.create_path()
         reconstruction.add_tracking_reconstruction(path, *args, **kwds)
         super(StandardTrackingReconstructionModule, self).__init__(path)
+
+
+class CDCFullFinder(PathModule):
+
+    """Full finder sequence for the CDC with a step of Legendre tracking first and cellular automaton tracking second."""
+
+    def __init__(self):
+        path = basf2.create_path()
+
+        legendre_track_finder_module = basf2.register_module("CDCLegendreTracking")
+        legendre_track_finder_module.param("GFTrackCandidatesColName", "LegendreTrackCands")
+
+        stereo_histogramming_finder = basf2.register_module("CDCLegendreHistogramming")
+        stereo_histogramming_finder.param("GFTrackCandidatesColName", "LegendreTrackCands")
+
+        not_assigned_hits_searcher_module = basf2.register_module("NotAssignedHitsSearcher")
+        not_assigned_hits_searcher_module.param({"TracksFromFinder": "LegendreTrackCands",
+                                                 "NotAssignedCDCHits": "NotAssignedCDCHits"})
+
+        local_track_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
+        local_track_finder_module.param({"UseOnlyCDCHitsRelatedFrom": "NotAssignedCDCHits",
+                                         "GFTrackCandsStoreArrayName": "LocalTrackCands"})
+
+        not_assigned_hits_combiner_module = basf2.register_module("NotAssignedHitsCombiner")
+
+        not_assigned_hits_combiner_module.param({"TracksFromLegendreFinder": "LegendreTrackCands",
+                                                 "NotAssignedTracksFromLocalFinder": "LocalTrackCands",
+                                                 "ResultTrackCands": "TrackCands"})
+
+        path.add_module(legendre_track_finder_module)
+        path.add_module(not_assigned_hits_searcher_module)
+        path.add_module(local_track_finder_module)
+        path.add_module(not_assigned_hits_combiner_module)
+
+        super(CDCFullFinder, self).__init__(path)

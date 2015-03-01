@@ -8,6 +8,7 @@ import basf2
 from tracking.run.event_generation import ReadOrGenerateEventsRun
 from tracking.modules import StandardTrackingReconstructionModule, \
     BrowseFileOnTerminateModule
+import tracking.modules
 from tracking.validation.hit_module import ExpertTrackingValidationModule
 import tracking.utilities as utilities
 
@@ -30,7 +31,7 @@ def get_basf2_module(module_or_module_name):
         message_template = \
             '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
         raise ValueError(message_template % (module_or_module_name,
-                         type(module_or_module_name)))
+                                             type(module_or_module_name)))
 
 
 def get_basf2_module_name(module_or_module_name):
@@ -45,7 +46,7 @@ def get_basf2_module_name(module_or_module_name):
         message_template = \
             '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
         raise ValueError(message_template % (module_or_module_name,
-                         type(module_or_module_name)))
+                                             type(module_or_module_name)))
 
 
 class TrackingValidationRun(ReadOrGenerateEventsRun):
@@ -98,7 +99,7 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
             help='Name of the finder module to be evaluated.',)
 
         argument_parser.add_argument('--fit-geometry', choices=['TGeo',
-                                     'Geant4'], default=self.fit_geometry,
+                                                                'Geant4'], default=self.fit_geometry,
                                      dest='fit_geometry',
                                      help='Geometry to be used with Genfit. If unset validate the seed values instead'
                                      )
@@ -115,7 +116,7 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
 
     def determine_tracking_coverage(self, finder_module_or_name):
         finder_module_name = get_basf2_module_name(finder_module_or_name)
-        if finder_module_name == 'CDCLocalTracking' or finder_module_name == 'CDCLegendreTracking' or finder_module_name.startswith('TrackFinderCDC') or finder_module_name == "CDCFullFinder":
+        if finder_module_name in ('CDCLocalTracking', 'CDCLegendreTracking', 'CDCFullFinder') or finder_module_name.startswith('TrackFinderCDC'):
             return {'UsePXDHits': False, 'UseSVDHits': False,
                     'UseCDCHits': True}
         elif finder_module_name == 'VXDTF':
@@ -153,31 +154,8 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
             main_path.add_module(trackFinderModule)
         else:
             if self.finder_module == "CDCFullFinder":
-
-                legendre_track_finder_module = basf2.register_module("CDCLegendreTracking")
-                legendre_track_finder_module.param("GFTrackCandidatesColName", "LegendreTrackCands")
-
-                stereo_histogramming_finder = basf2.register_module("CDCLegendreHistogramming")
-                stereo_histogramming_finder.param("GFTrackCandidatesColName", "LegendreTrackCands")
-
-                not_assigned_hits_searcher_module = basf2.register_module("NotAssignedHitsSearcher")
-                not_assigned_hits_searcher_module.param({"TracksFromFinder": "LegendreTrackCands",
-                                                         "NotAssignedCDCHits": "NotAssignedCDCHits"})
-
-                local_track_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
-                local_track_finder_module.param({"UseOnlyCDCHitsRelatedFrom": "NotAssignedCDCHits",
-                                                 "GFTrackCandsStoreArrayName": "LocalTrackCands"})
-
-                not_assigned_hits_combiner_module = basf2.register_module("NotAssignedHitsCombiner")
-
-                not_assigned_hits_combiner_module.param({"TracksFromLegendreFinder": "LegendreTrackCands",
-                                                         "NotAssignedTracksFromLocalFinder": "LocalTrackCands",
-                                                         "ResultTrackCands": "TrackCands"})
-
-                main_path.add_module(legendre_track_finder_module)
-                main_path.add_module(not_assigned_hits_searcher_module)
-                main_path.add_module(local_track_finder_module)
-                main_path.add_module(not_assigned_hits_combiner_module)
+                trackFinderModule = tracking.modules.CDCFullFinder()
+                main_path.add_module(trackFinderModule)
 
             else:
                 trackFinderModule = get_basf2_module(self.finder_module)
@@ -201,8 +179,8 @@ class TrackingValidationRun(ReadOrGenerateEventsRun):
         trackFinderMCTruthModule = \
             basf2.register_module('TrackFinderMCTruth')
         trackFinderMCTruthModule.param({'WhichParticles': ['primary'],
-                                       'EnergyCut': 0.1,
-                                       'GFTrackCandidatesColName': 'MCTrackCands'})
+                                        'EnergyCut': 0.1,
+                                        'GFTrackCandidatesColName': 'MCTrackCands'})
         trackFinderMCTruthModule.param(tracking_coverage)
         main_path.add_module(trackFinderMCTruthModule)
 

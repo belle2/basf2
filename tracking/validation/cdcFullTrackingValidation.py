@@ -4,8 +4,8 @@
 """
 <header>
   <contact>tracking@belle2.kek.jp</contact>
-  <output>CDCLegendreTrackingValidation.root</output>
-  <description>This module validates that legendre track finding is capable of reconstructing tracks in Y(4S) runs.</description>
+  <output>CDCFullTrackingValidation.root</output>
+  <description>This script validates the full CDC tracking chain with a legendre step first and a cellular automaton setp second in Y(4S) runs.</description>
 </header>
 """
 

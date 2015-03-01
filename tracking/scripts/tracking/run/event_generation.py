@@ -273,6 +273,21 @@ class ReadOrGenerateEventsRun(object):
             raise ValueError(message_template % (module_or_module_name,
                                                  type(module_or_module_name)))
 
+    @staticmethod
+    def get_basf2_module_name(module_or_module_name):
+        if isinstance(module_or_module_name, str):
+            module_name = module_or_module_name
+            return module_name
+        elif isinstance(module_or_module_name, basf2.Module):
+            module = module_or_module_name
+            module_name = module.name()
+            return module_name
+        else:
+            message_template = \
+                '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
+            raise ValueError(message_template % (module_or_module_name,
+                                                 type(module_or_module_name)))
+
 
 def is_bkg_file(bkg_file_path):
     """Test if a file path points to a file containing background mixins.

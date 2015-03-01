@@ -15,6 +15,12 @@ from tracking.modules import BrowseFileOnTerminateModule
 from tracking.validation.utilities import root_cd, coroutine
 from tracking.validation.refiners import Refiner
 
+import logging
+
+
+def get_logger():
+    return logging.getLogger(__name__)
+
 
 def test():
     from tracking.validation.utilities import is_primary, is_stable_in_generator
@@ -27,7 +33,7 @@ def test():
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, select=["is_secondary", "pt"], stackby="is_secondary", folder_name="pt_stackby_is_secondary")
     @save_histograms(outlier_z_score=5.0, allow_discrete=True)
     @save_tree()
-    @harvest(foreach="MCParticles", pick=lambda mc_particle: not mc_particle.hasStatus(Belle2.MCParticle.c_IsVirtual), output_root_file="MCParticleOverview.root")
+    @harvest(foreach="MCParticles", pick=lambda mc_particle: not mc_particle.hasStatus(Belle2.MCParticle.c_IsVirtual), output_file_name="MCParticleOverview.root")
     def MCParticleOverview(mc_particle):
         momentum_tvector3 = mc_particle.getMomentum()
         pdg_code = mc_particle.getPDG()
@@ -56,12 +62,12 @@ class AttributeDict(dict):
         return self[name]
 
 
-def harvest(foreach="", pick=None, name=None, output_root_file=None):
+def harvest(foreach="", pick=None, name=None, output_file_name=None):
     def harvest_decorator(peel_func):
         name_or_default = name or peel_func.__name__
-        output_root_file_or_default = output_root_file or "%s.root" % name
+        output_file_name_or_default = output_file_name or "%s.root" % name
         harvesting_module = HarvestingModule(foreach=foreach,
-                                             output_root_file=output_root_file_or_default,
+                                             output_file_name=output_file_name_or_default,
                                              name=name_or_default)
         harvesting_module.peel = peel_func
         if pick:
@@ -71,17 +77,26 @@ def harvest(foreach="", pick=None, name=None, output_root_file=None):
 
 
 class HarvestingModule(basf2.Module):
+    default_expert_level = 1
 
-    def __init__(self, foreach, output_root_file=None, name=None):
+    def __init__(self,
+                 foreach,
+                 output_file_name=None,
+                 name=None,
+                 title=None,
+                 contact=None,
+                 expert_level=None):
+
         super(HarvestingModule, self).__init__()
         self.foreach = foreach
-        self.output_root_file = output_root_file
+        self.output_file_name = output_file_name
         self.refiners = []
+        self.contact = contact
+        self.expert_level = self.default_expert_level if expert_level is None else expert_level
 
-        if name is None:
-            self.name = self.__class__.__name__
-        else:
-            self.name = name
+        self.name = name or self.__class__.__name__
+
+        self.title = title or self.name
 
     def run(self,
             input_root_file,
@@ -95,7 +110,6 @@ class HarvestingModule(basf2.Module):
         root_input_module = basf2.register_module('RootInput')
         root_input_module.param({
             'inputFileName': input_root_file,
-            'branchNames': ["MCParticles", ],
         })
         main_path.add_module(root_input_module)
 
@@ -112,10 +126,11 @@ class HarvestingModule(basf2.Module):
                 main_path.add_module(geometry_module)
 
         # Display the root file on terminate
-        if show and self.output_root_file:
-            main_path.add_module(BrowseFileOnTerminateModule(self.output_root_file))
+        if show and self.output_file_name:
+            main_path.add_module(BrowseFileOnTerminateModule(self.output_file_name))
 
         main_path.add_module(self)
+        get_logger().info("Processing...")
         basf2.process(main_path)
 
     def initialize(self):
@@ -123,6 +138,7 @@ class HarvestingModule(basf2.Module):
         self.stash = self.barn()
 
     def event(self):
+        self.prepare()
         stash = self.stash.send
         pick = self.pick
         peel = self.peel
@@ -218,6 +234,9 @@ class HarvestingModule(basf2.Module):
         else:
             yield None
 
+    def prepare(self):
+        return
+
     def peel(self, crop):
         return crop
 
@@ -226,12 +245,12 @@ class HarvestingModule(basf2.Module):
 
     def refine(self, crops):
         kwds = {}
-        if self.output_root_file:
+        if self.output_file_name:
             # Save everything to a ROOT file
-            if isinstance(self.output_root_file, ROOT.TFile):
-                output_tdirectory = self.output_root_file
+            if isinstance(self.output_file_name, ROOT.TFile):
+                output_tdirectory = self.output_file_name
             else:
-                output_tfile = ROOT.TFile(self.output_root_file, 'recreate')
+                output_tfile = ROOT.TFile(self.output_file_name, 'recreate')
                 output_tdirectory = output_tfile
         else:
             output_tdirectory = None
@@ -249,8 +268,8 @@ class HarvestingModule(basf2.Module):
 
         finally:
             # If we opened the TFile ourselves, close it again
-            if self.output_root_file:
-                if not isinstance(self.output_root_file, ROOT.TFile):
+            if self.output_file_name:
+                if not isinstance(self.output_file_name, ROOT.TFile):
                     output_tfile.Close()
 
 

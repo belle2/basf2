@@ -40,7 +40,7 @@ class BrowseFileOnTerminateModule(basf2.Module):
 
     Attributes
     ----------
-    root_file_path : str or TFile
+    root_file: str or TFile
         Path to the file or the TFile that should be shown in the browser.
     """
 
@@ -57,10 +57,10 @@ class BrowseFileOnTerminateModule(basf2.Module):
         if isinstance(self.root_file, ROOT.TFile):
             tfile = self.root_file
         else:
-            tfile = ROOT.TFile(self.root_file_path)
+            tfile = ROOT.TFile(self.root_file)
 
         tBrowser = ROOT.TBrowser()
-        tBrowser.BrowseObject(tFile)
+        tBrowser.BrowseObject(tfile)
         tBrowser.Show()
 
         # FIXME: Is there a way to listen to the close event of the TBrowser?
@@ -68,7 +68,7 @@ class BrowseFileOnTerminateModule(basf2.Module):
 
         # If we opened the file ourselves close it again.
         if not isinstance(self.root_file, ROOT.TFile):
-            tFile.Close()
+            tfile.Close()
 
 
 class IfModule(basf2.Module):

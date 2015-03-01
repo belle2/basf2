@@ -560,7 +560,7 @@ class GroupByRefiner(Refiner):
                 groupby_parts = crops[part_name]
 
                 # Exclude the groupby variable if desired
-                selected_crops = selected_crops(crops, exclude=part_name if self.exclude_by else None)
+                selected_crops = select_crop_parts(crops, exclude=part_name if self.exclude_by else None)
 
                 unique_values = np.unique(groupby_parts)
                 for value in unique_values:

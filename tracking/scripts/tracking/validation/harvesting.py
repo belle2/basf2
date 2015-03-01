@@ -27,7 +27,7 @@ def test():
     from tracking.validation.refiners import save_histograms, save_tree, save_fom
 
     # Proposed syntax for quick generation of overview plots
-    @save_fom(aggregation=np.mean, select=["energy", "pt"], name="physics", prefix="mean_")
+    @save_fom(aggregation=np.mean, select=["energy", "pt"], name="physics", key="mean_{part_name}")
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, filter=lambda xs: xs != 0.0, filter_on="is_secondary", select=["pt", "is_secondary"], folder_name="secondary_pt")
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, groupby="status", select=["is_secondary", "pt"])
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, select=["is_secondary", "pt"], stackby="is_secondary", folder_name="pt_stackby_is_secondary")

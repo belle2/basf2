@@ -63,7 +63,7 @@ class PullAnalysis:
 
         if variances is not None:
             sigmas = np.sqrt(variances)
-            pulls = residuals / sigmas
+            pulls = np.divide(residuals, sigmas)
             p_values = 1.0 - erf(np.abs(pulls))
 
         # Truths #

@@ -21,6 +21,9 @@ import ROOT
 
 import logging
 
+import cProfile
+import pstats
+
 
 def get_logger():
     return logging.getLogger(__name__)
@@ -69,6 +72,73 @@ class BrowseFileOnTerminateModule(basf2.Module):
         # If we opened the file ourselves close it again.
         if not isinstance(self.root_file, ROOT.TFile):
             tfile.Close()
+
+
+class PyProfilingModule(basf2.Module):
+
+    """Wrapper module that evaluates the computational performance of python modules.
+
+    Uses cProfile
+
+    Attributes
+    ----------
+    module : basf2.Module
+        The wrapped module that should be profiled. Should be a module written in Python,
+        since the profile interacts with the interpretor for the measurements,
+        but cannot look into c++ implementations.
+    output_file_name : str, optional
+        Path to the file where the profiling information shall be stored. Defaults to profile.txt.
+    profiler : cProf
+    """
+
+    default_output_file_name = "profile.txt"
+
+    def __init__(self, module, output_file_name=None):
+        super(PyProfilingModule, self).__init__()
+        self.module = module
+
+        if output_file_name is None:
+            self.output_file_name = self.default_output_file_name
+        else:
+            self.output_file_name = output_file_name
+
+    @property
+    def param(self):
+        """Forwards the parameters"""
+        return self.module.param
+
+    @property
+    def name(self):
+        """Forwards the name"""
+        return self.module.name
+
+    def initialize(self):
+        """Initialize method of the module"""
+        self.profiler = cProfile.Profile()
+        self.module.initialize()
+
+    def beginRun(self):
+        """Begin run method of the module"""
+        self.module.beginRun()
+
+    def event(self):
+        """Event method of the module"""
+        profiler = self.profiler
+        profiler.enable()
+        self.module.event()
+        profiler.disable()
+
+    def endRun(self):
+        """End run method of the module"""
+        self.module.endRun()
+
+    def terminate(self):
+        """Terminate method of the module"""
+        self.module.terminate()
+        sortby = 'cumulative'
+        with open(self.output_file_name, 'w') as profile_output_file:
+            profile_stats = pstats.Stats(self.profiler, stream=profile_output_file).sort_stats(sortby)
+            profile_stats.print_stats()
 
 
 class IfModule(basf2.Module):

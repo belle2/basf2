@@ -430,11 +430,6 @@ class ValidationPlot(object):
             bin_edges = array.array("f", range(len(bin_labels) + 1))
             x_taxis.Set(n_bins, bin_edges)
 
-        # Expand the range for better view of the plot
-        y_range = y_upper_bound - y_lower_bound
-        histogram.SetMaximum(y_upper_bound + 0.1 * y_range)
-        histogram.SetMinimum(y_lower_bound)
-
         # Count the nan and inf values in x
         self.add_nan_inf_stats('x', xs)
 

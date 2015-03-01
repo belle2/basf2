@@ -4,12 +4,19 @@ import numpy as np
 import collections
 import copy
 
-from tracking.validation.plot import ValidationPlot
+from tracking.validation.plot import ValidationPlot, compose_axis_label
 from tracking.validation.fom import ValidationFiguresOfMerit
+from tracking.validation.pull import PullAnalysis
 
-from tracking.validation.utilities import root_cd
+from tracking.validation.utilities import root_cd, root_save_name
 
 import ROOT
+
+import logging
+
+
+def get_logger():
+    return logging.getLogger(__name__)
 
 
 class Refiner(object):
@@ -17,8 +24,8 @@ class Refiner(object):
     def __init__(self, refiner_function=None):
         self.refiner_function = refiner_function
 
-    def __get__(self, harvester_module, cls=None):
-        if harvester_module is None:
+    def __get__(self, harvesting_module, cls=None):
+        if harvesting_module is None:
             # Class access
             return self
         else:
@@ -26,118 +33,428 @@ class Refiner(object):
             refine = self.refine
 
             def bound_call(*args, **kwds):
-                return refine(harvester_module, *args, **kwds)
+                return refine(harvesting_module, *args, **kwds)
             return bound_call
 
-    def __call__(self, harvester_module, crops=None, *args, **kwds):
+    def __call__(self, harvesting_module, crops=None, *args, **kwds):
         if crops is None:
             # Decoration mode
-            harvester_module.refiners.append(self)
-            return harvester_module
+            harvesting_module.refiners.append(self)
+            return harvesting_module
         else:
             # Refining mode
-            return self.refine(harvester_module, crops, *args, **kwds)
+            return self.refine(harvesting_module, crops, *args, **kwds)
 
-    def refine(self, harvester_module, *args, **kwds):
-        self.refiner_function(harvester_module, *args, **kwds)
+    def refine(self, harvesting_module, *args, **kwds):
+        self.refiner_function(harvesting_module, *args, **kwds)
 
 
 class SaveFiguresOfMeritRefiner(Refiner):
+    default_name = "{module.name}_figures_of_merit"
+    default_title = "Figures of merit in {module.title}"
+    default_contact = "{module.contact}"
+    default_description = "Figures of merit are the {aggregation.__name__} of {keys}"
+    default_check = "Check for reasonable values"
+    default_key = "{aggregation.__name__}_{part_name}"
+
+    @staticmethod
+    def mean(xs):
+        return np.nanmean(xs)
+
+    # default aggregation if the mean of the parts
+    default_aggregation = mean
 
     def __init__(self,
                  name=None,
-                 aggregation=lambda xs: np.mean,
-                 title="",
-                 prefix="",
-                 contact="",
-                 description="",
-                 check="",
-                 fill=None):
+                 title=None,
+                 contact=None,
+                 description=None,
+                 check=None,
+                 key=None,
+                 aggregation=None,
+                 ):
 
-        self._aggregation = aggregation
+        super(SaveFiguresOfMeritRefiner, self).__init__()
+
         self.name = name
         self.title = title
-        self.prefix = prefix
 
-        self.contact = contact
         self.description = description
         self.check = check
+        self.contact = contact
 
-        if isinstance(prefix, basestring):
-            self.prefix = prefix
-        else:
-            self.format_part_name = prefix
-
-        if fill:
-            self.fill = fill
-
-    def aggregation(self, xs):
-        return self._aggregation(xs)
+        self.key = key
+        self.aggregation = aggregation
 
     def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
-        name = self.name or '%s_figures_of_merit' % harvesting_module.name
+        name = self.name or self.default_name
+        title = self.title or self.default_title
+        contact = self.contact or self.default_contact
+        description = self.description or self.default_description
+        check = self.check or self.default_check
 
-        figures_of_merit = ValidationFiguresOfMerit(name,
-                                                    contact=self.contact,
-                                                    description=self.description,
-                                                    check=self.check,
-                                                    title=self.title)
+        aggregation = self.aggregation or self.default_aggregation
 
-        self.fill(figures_of_merit, crops)
-        figures_of_merit.write(tdirectory)
+        name = name.format(refiner=self,
+                           module=harvesting_module,
+                           aggregation=aggregation)
 
-    def format_part_name(self, part_name):
-        return self.prefix + part_name
+        title = title.format(refiner=self,
+                             module=harvesting_module,
+                             aggregation=aggregation)
 
-    def fill(self, figures_of_merit, crops):
-        for part_name, parts in iter_crop_part_names_and_parts(crops):
-            fom_name = self.format_part_name(part_name)
-            figures_of_merit[fom_name] = self.aggregation(parts)
+        contact = contact.format(refiner=self,
+                                 module=harvesting_module)
+
+        figures_of_merit = ValidationFiguresOfMerit(root_save_name(name),
+                                                    contact=contact,
+                                                    title=title)
+
+        for part_name, parts in crops.items():
+            key = self.key or self.default_key
+
+            key = key.format(refiner=self,
+                             module=harvesting_module,
+                             part_name=part_name,
+                             aggregation=aggregation)
+
+            figures_of_merit[key] = aggregation(parts)
+
+        keys = list(figures_of_merit.keys())
+
+        description = description.format(refiner=self,
+                                         module=harvesting_module,
+                                         keys=keys,
+                                         aggregation=aggregation)
+
+        check = check.format(refiner=self,
+                             module=harvesting_module,
+                             keys=keys,
+                             aggregation=aggregation)
+
+        figures_of_merit.description = description
+        figures_of_merit.check = check
+
+        if tdirectory:
+            figures_of_merit.write(tdirectory)
 
 
 class SaveHistogramsRefiner(Refiner):
+    default_name = "{module.name}_{part_name}_histogram{stacked_by_indication}{stackby}"
+    default_title = "Histogram of {part_name}{stacked_by_indication}{stackby} in {module.title}"
+    default_contact = "{module.contact}"
+    default_description = "This is a histogram of {part_name}{stacked_by_indication}{stackby}."
+    default_check = "Check if the distribution is reasonable"
 
-    def __init__(self, outlier_z_score=None, allow_discrete=False, stackby=""):
+    def __init__(self,
+                 name=None,
+                 title=None,
+                 contact=None,
+                 description=None,
+                 check=None,
+                 outlier_z_score=None,
+                 allow_discrete=False,
+                 stackby=""):
         super(SaveHistogramsRefiner, self).__init__()
+
+        self.name = name
+        self.title = title
+
+        self.description = description
+        self.check = check
+        self.contact = contact
+
         self.outlier_z_score = outlier_z_score
         self.allow_discrete = allow_discrete
         self.stackby = stackby
 
     def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
+
+        contact = self.contact or self.default_contact
+        contact = contact.format(refiner=self,
+                                 module=harvesting_module)
+
         stackby = self.stackby
         if stackby:
-            stackby_parts = get_crop_part(crops, stackby)
-            stackby_name_postfix = "_" + stackby
-            stackby_title_postfix = " stacked by " + stackby
-
+            stackby_parts = crops[stackby]
         else:
             stackby_parts = None
-            stackby_name_postfix = ""
-            stackby_title_postfix = ""
 
-        for part_name, parts in iter_crop_part_names_and_parts(crops, default_name=harvesting_module.name):
-            histogram_name = "%s_histogram%s" % (part_name, stackby_name_postfix)
-            histogram = ValidationPlot(histogram_name)
+        for part_name, parts in crops.items():
+            name = self.name or self.default_name
+            title = self.title or self.default_title
+            description = self.description or self.default_description
+            check = self.check or self.default_check
+
+            name = name.format(refiner=self,
+                               module=harvesting_module,
+                               part_name=part_name,
+                               stackby=stackby,
+                               stacked_by_indication="_" if stackby else "")
+
+            title = title.format(refiner=self,
+                                 module=harvesting_module,
+                                 part_name=part_name,
+                                 stackby=stackby,
+                                 stacked_by_indication=" stacked by " if stackby else "")
+
+            description = description.format(refiner=self,
+                                             module=harvesting_module,
+                                             part_name=part_name,
+                                             stackby=stackby,
+                                             stacked_by_indication=" stacked by " if stackby else "")
+
+            check = check.format(refiner=self,
+                                 module=harvesting_module,
+                                 part_name=part_name,
+                                 stackby=stackby,
+                                 stacked_by_indication=" stacked by " if stackby else "")
+
+            histogram = ValidationPlot(root_save_name(name))
             histogram.hist(parts,
                            outlier_z_score=self.outlier_z_score,
                            allow_discrete=self.allow_discrete,
                            stackby=stackby_parts)
-            histogram.title = "Histogram of %s%s" % (part_name, stackby_name_postfix)
-            histogram.xlabel = part_name
+
+            histogram.title = title
+            histogram.contact = contact
+            histogram.description = description
+            histogram.check = check
+
+            histogram.xlabel = compose_axis_label(part_name)
 
             if tdirectory:
                 histogram.write(tdirectory)
 
 
+class SaveProfilesRefiner(Refiner):
+    default_name = "{module.name}_{y_part_name}_by_{x_part_name}_profile"
+    default_title = "Profile of {y_part_name} by {x_part_name} in {module.title}"
+    default_contact = "{module.contact}"
+    default_description = "This is a profile of {y_part_name} over {x_part_name}."
+    default_check = "Check if the trend line is resonable."
+
+    def __init__(self,
+                 y,
+                 x=None,
+                 name=None,
+                 title=None,
+                 contact=None,
+                 description=None,
+                 check=None,
+                 y_unit=None,
+                 outlier_z_score=None,
+                 skip_single_valued=False,
+                 allow_discrete=False):
+
+        super(SaveProfilesRefiner, self).__init__()
+
+        self.name = name
+        self.title = title
+
+        self.description = description
+        self.check = check
+        self.contact = contact
+
+        self.x = x
+        self.y = y
+        self.y_unit = y_unit
+
+        self.outlier_z_score = outlier_z_score
+        self.allow_discrete = allow_discrete
+
+        self.skip_single_valued = skip_single_valued
+
+    def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
+        contact = self.contact or self.default_contact
+        contact = contact.format(refiner=self,
+                                 module=harvesting_module)
+
+        y_crops = select_crop_parts(crops, select=self.y)
+        x_crops = select_crop_parts(crops, select=self.x, exclude=self.y)
+
+        for y_part_name, y_parts in y_crops.items():
+            for x_part_name, x_parts in x_crops.items():
+
+                if self.skip_single_valued and not self.has_more_than_one_value(x_parts):
+                    get_logger.info('Skipping "%s" by "%s" profile because x has only a single value "%s"',
+                                    y_part_name,
+                                    x_part_name,
+                                    x_parts[0])
+                    continue
+
+                if self.skip_single_valued and not self.has_more_than_one_value(y_parts):
+                    get_logger.info('Skipping "%s" by "%s" profile because y has only a single value "%s"',
+                                    y_part_name,
+                                    x_part_name,
+                                    y_parts[0])
+                    continue
+
+                name = self.name or self.default_name
+                title = self.title or self.default_title
+                description = self.description or self.default_description
+                check = self.check or self.default_check
+
+                name = name.format(refiner=self,
+                                   module=harvesting_module,
+                                   x_part_name=x_part_name,
+                                   y_part_name=y_part_name)
+
+                title = title.format(refiner=self,
+                                     module=harvesting_module,
+                                     x_part_name=x_part_name,
+                                     y_part_name=y_part_name)
+
+                description = description.format(refiner=self,
+                                                 module=harvesting_module,
+                                                 x_part_name=x_part_name,
+                                                 y_part_name=y_part_name)
+
+                check = check.format(refiner=self,
+                                     module=harvesting_module,
+                                     x_part_name=x_part_name,
+                                     y_part_name=y_part_name)
+
+                profile_plot = ValidationPlot(root_save_name(name))
+
+                profile_plot.profile(x_parts,
+                                     y_parts,
+                                     outlier_z_score=self.outlier_z_score,
+                                     allow_discrete=self.allow_discrete)
+
+                profile_plot.title = title
+                profile_plot.contact = contact
+                profile_plot.description = description
+                profile_plot.check = check
+
+                profile_plot.xlabel = compose_axis_label(x_part_name)
+                profile_plot.ylabel = compose_axis_label(y_part_name, self.y_unit)
+
+                if tdirectory:
+                    profile_plot.write(tdirectory)
+
+    @staticmethod
+    def has_more_than_one_value(xs):
+        first_x = xs[0]
+        for x in xs:
+            if x != first_x:
+                return True
+        else:
+            return False
+
+
+class SavePullAnalysis(Refiner):
+    default_name = "{module.name}_{quantity_name}"
+    default_contact = "{module.contact}"
+
+    default_truth_name = "{part_name}_truth"
+    default_estimate_name = "{part_name}_estimate"
+    default_variance_name = "{part_name}_variance"
+
+    def __init__(self,
+                 name=None,
+                 contact=None,
+                 part_name=None,
+                 truth_name=None,
+                 estimate_name=None,
+                 variance_name=None,
+                 quantity_name=None,
+                 unit=None,
+                 absolute=False):
+
+        self.name = name
+        self.contact = contact
+
+        self.part_name = part_name
+
+        self.truth_name = truth_name
+        self.estimate_name = estimate_name
+        self.variance_name = variance_name
+
+        self.quantity_name = quantity_name or part_name
+        self.unit = unit
+
+        self.absolute = absolute
+
+    def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
+        contact = self.contact or self.default_contact
+        contact = contact.format(refiner=self,
+                                 module=harvesting_module)
+
+        name = self.name or self.default_name
+
+        if self.absolute:
+            quantity_name_for_name = 'absolute ' + self.quantity_name,
+        else:
+            quantity_name_for_name = self.quantity_name
+
+        name = name.format(refiner=self,
+                           module=harvesting_module,
+                           quantity_name=quantity_name_for_name,
+                           part_name=self.part_name)
+
+        if self.truth_name is not None:
+            truth_name = self.truth_name
+        else:
+            truth_name = self.default_truth_name
+
+        if self.estimate_name is not None:
+            estimate_name = self.estimate_name
+        else:
+            estimate_name = self.default_estimate_name
+
+        if self.variance_name is not None:
+            variance_name = self.variance_name
+        else:
+            variance_name = self.default_variance_name
+
+        truth_name = truth_name.format(part_name=self.part_name)
+        estimate_name = estimate_name.format(part_name=self.part_name)
+        variance_name = variance_name.format(part_name=self.part_name)
+
+        truths = crops[truth_name]
+        estimates = crops[estimate_name]
+        variances = crops[variance_name]
+
+        # TODO: Think about a sensible way to propagate the postfix
+        pull_analysis = PullAnalysis(self.quantity_name,
+                                     unit=self.unit,
+                                     absolute=self.absolute,
+                                     plot_name_prefix=name,
+                                     plot_title_postfix='')
+
+        pull_analysis.analyse(truths, estimates, variances)
+
+        pull_analysis.contact = contact
+
+        if tdirectory:
+            pull_analysis.write(tdirectory)
+
+
 class SaveTreeRefiner(Refiner):
+    default_name = "{module.name}"
+    default_title = "Tree of {module.name}"
+
+    def __init__(self,
+                 name=None,
+                 title=None):
+        super(SaveTreeRefiner, self).__init__()
+        self.name = name
+        self.title = title
 
     def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
         with root_cd(tdirectory):
-            ttree_name = "%s_tree" % harvesting_module.name
-            ttree_title = "Tree of %s" % harvesting_module.name
+            name = self.name or self.default_name
+            title = self.title or self.default_title
 
-            output_ttree = ROOT.TTree(ttree_name, ttree_title)
-            for part_name, parts in iter_crop_part_names_and_parts(crops, default_name=harvesting_module.name):
+            name = name.format(refiner=self,
+                               module=harvesting_module)
+
+            title = title.format(refiner=self,
+                                 module=harvesting_module)
+
+            output_ttree = ROOT.TTree(root_save_name(name), title)
+            for part_name, parts in crops.items():
                 self.add_branch(output_ttree, part_name, parts)
 
             output_ttree.FlushBaskets()
@@ -170,14 +487,19 @@ class SaveTreeRefiner(Refiner):
 
 class FilterRefiner(Refiner):
 
-    def __init__(self, wrapped_refiner, filter, on=None):
+    def __init__(self, wrapped_refiner, filter=None, on=None):
         self.wrapped_refiner = wrapped_refiner
-        self.filter = filter
+
+        if filter is None:
+            self.filter = np.nonzero
+        else:
+            self.filter = filter
+
         self.on = on
 
-    def refine(self, harvester_module, crops, *args, **kwds):
+    def refine(self, harvesting_module, crops, *args, **kwds):
         filtered_crops = filter_crops(crops, self.filter, part_name=self.on)
-        self.wrapped_refiner(harvester_module, filtered_crops, *args, **kwds)
+        self.wrapped_refiner(harvesting_module, filtered_crops, *args, **kwds)
 
 
 class SelectRefiner(Refiner):
@@ -187,22 +509,31 @@ class SelectRefiner(Refiner):
         self.select = select
         self.exclude = exclude
 
-    def refine(self, harvester_module, crops, *args, **kwds):
+    def refine(self, harvesting_module, crops, *args, **kwds):
         selected_crops = select_crop_parts(crops, select=self.select, exclude=self.exclude)
-        self.wrapped_refiner(harvester_module, selected_crops, *args, **kwds)
+        self.wrapped_refiner(harvesting_module, selected_crops, *args, **kwds)
 
 
 class GroupByRefiner(Refiner):
-    default_folder_template = "groupby_{name}_{value}"
+    default_folder_name = "groupby_{part_name}_{value}"
+    default_folder_title = "Group by {part_name} for =={value}"
+    default_exclude_by = True
 
-    def __init__(self, wrapped_refiner, by=[], folder_template=default_folder_template):
+    def __init__(self,
+                 wrapped_refiner,
+                 by=[],
+                 folder_name=None,
+                 folder_title=None,
+                 exclude_by=None):
+
         self.wrapped_refiner = wrapped_refiner
         self.by = by
-        self.folder_template = folder_template
+        self.folder_name = folder_name
+        self.folder_title = folder_title
+        self.exclude_by = exclude_by if exclude_by is not None else self.default_exclude_by
 
-    def refine(self, harvester_module, crops, tdirectory, *args, **kwds):
+    def refine(self, harvesting_module, crops, tdirectory, *args, **kwds):
         by = self.by
-        folder_template = self.folder_template
 
         # A single name to do the group by
         if isinstance(by, basestring) or by is None:
@@ -212,17 +543,24 @@ class GroupByRefiner(Refiner):
 
         for part_name in by:
             if part_name is None:
-                if folder_template:
-                    folder_name = folder_template.format(name=part_name, value="")
-                    folder_title = "Group by on {name} for =={value}".format(name="nothing", value="*")
+                folder_name = self.folder_name if self.folder_name is not None else self.default_folder_name
+                folder_name = folder_name.format(part_name=part_name, value="")
+
+                if folder_name:
+                    folder_title = self.folder_title or self.default_folder_title
+                    folder_title = folder_title.format(part_name="nothing", value="*")
                     groupby_tdirectory = tdirectory.mkdir(folder_name, folder_title)
+
                 else:
                     groupby_tdirectory = tdirectory
 
-                self.wrapped_refiner(harvester_module, crops, tdirectory=groupby_tdirectory, *args, **kwds)
+                self.wrapped_refiner(harvesting_module, crops, tdirectory=groupby_tdirectory, *args, **kwds)
 
             else:
-                groupby_parts = get_crop_part(crops, part_name)
+                groupby_parts = crops[part_name]
+
+                # Exclude the groupby variable if desired
+                selected_crops = selected_crops(crops, exclude=part_name if self.exclude_by else None)
 
                 unique_values = np.unique(groupby_parts)
                 for value in unique_values:
@@ -231,16 +569,20 @@ class GroupByRefiner(Refiner):
                     else:
                         indices_for_value = groupby_parts == value
 
-                    filtered_crops = filter_crops(crops, indices_for_value)
+                    filtered_crops = filter_crops(selected_crops, indices_for_value)
 
-                    if folder_template:
-                        folder_name = folder_template.format(name=part_name, value=value)
-                        folder_title = "Group by on {name} for =={value}".format(name=part_name, value=value)
+                    folder_name = self.folder_name if self.folder_name is not None else self.default_folder_name
+                    folder_name = folder_name.format(part_name=part_name, value=value)
+
+                    if folder_name:
+                        folder_title = self.folder_title or self.default_folder_title
+                        folder_title = folder_title.format(part_name=part_name, value=value)
                         groupby_tdirectory = tdirectory.mkdir(folder_name, folder_title)
+
                     else:
                         groupby_tdirectory = tdirectory
 
-                    self.wrapped_refiner(harvester_module, filtered_crops, tdirectory=groupby_tdirectory, *args, **kwds)
+                    self.wrapped_refiner(harvesting_module, filtered_crops, tdirectory=groupby_tdirectory, *args, **kwds)
 
 
 class CdRefiner(Refiner):
@@ -249,10 +591,32 @@ class CdRefiner(Refiner):
         self.wrapped_refiner = wrapped_refiner
         self.folder_name = folder_name
 
-    def refine(self, harvester_module, crops, tdirectory, *args, **kwds):
+    def refine(self, harvesting_module, crops, tdirectory, *args, **kwds):
         with root_cd(tdirectory):
             with root_cd(self.folder_name) as tdirectory:
-                self.wrapped_refiner(harvester_module, crops, tdirectory, *args, **kwds)
+                self.wrapped_refiner(harvesting_module, crops, tdirectory, *args, **kwds)
+
+
+class ExpertLevelRefiner(Refiner):
+
+    def __init__(self, wrapped_refiner, above_expert_level=None, below_expert_level=None):
+        self.wrapped_refiner = wrapped_refiner
+        self.above_expert_level = above_expert_level
+        self.below_expert_level = below_expert_level
+
+    def refine(self, harvesting_module, crops, *args, **kwds):
+        above_expert_level = self.above_expert_level
+        below_expert_level = self.below_expert_level
+
+        proceed = True
+        if above_expert_level is not None:
+            proceed = proceed and harvesting_module.expert_level > above_expert_level
+
+        if below_expert_level is not None:
+            proceed = proceed and harvesting_module.expert_level < below_expert_level
+
+        if proceed:
+            self.wrapped_refiner(harvesting_module, crops, *args, **kwds)
 
 
 # Meta refiner decorators
@@ -285,9 +649,10 @@ def filter(refiner=None, **kwds):
 
 def refiner_with_context(refiner_factory):
     @functools.wraps(refiner_factory)
-    def module_decorator_with_context(folder_name=None,
+    def module_decorator_with_context(above_expert_level=None, below_expert_level=None,
+                                      folder_name=None,
                                       filter=None, filter_on=None,
-                                      groupby=None, groupby_folder_template=GroupByRefiner.default_folder_template,
+                                      groupby=None, groupby_folder_name=None, exclude_groupby=None,
                                       select=None, exclude=None,
                                       **kwds_for_refiner_factory):
 
@@ -298,13 +663,16 @@ def refiner_with_context(refiner_factory):
             refiner = SelectRefiner(refiner, select=select, exclude=exclude)
 
         if groupby is not None:
-            refiner = GroupByRefiner(refiner, by=groupby, folder_template=groupby_folder_template)
+            refiner = GroupByRefiner(refiner, by=groupby, folder_name=groupby_folder_name, exclude_by=exclude_groupby)
 
-        if filter is not None:
+        if filter is not None or filter_on is not None:
             refiner = FilterRefiner(refiner, filter=filter, on=filter_on)
 
         if folder_name is not None:
             refiner = CdRefiner(refiner, folder_name=folder_name)
+
+        if above_expert_level is not None or below_expert_level is not None:
+            refiner = ExpertLevelRefiner(refiner, above_expert_level=above_expert_level, below_expert_level=below_expert_level)
 
         return refiner
 
@@ -312,57 +680,28 @@ def refiner_with_context(refiner_factory):
 
 
 @refiner_with_context
-def save_histograms(**kwds_for_histograms):
-    return SaveHistogramsRefiner(**kwds_for_histograms)
+def save_fom(**kwds):
+    return SaveFiguresOfMeritRefiner(**kwds)
 
 
 @refiner_with_context
-def save_tree(**kwds_for_trees):
-    return SaveTreeRefiner(**kwds_for_trees)
+def save_histograms(**kwds):
+    return SaveHistogramsRefiner(**kwds)
 
 
 @refiner_with_context
-def save_fom(**kwds_for_histograms):
-    return SaveFiguresOfMeritRefiner(**kwds_for_histograms)
+def save_profiles(**kwds):
+    return SaveProfilesRefiner(**kwds)
 
 
-def iter_crop_part_names_and_parts(crops, default_name="value"):
-    if isinstance(crops, np.ndarray):
-        part_name = default_name
-        parts = crops
-        yield part_name, parts
-
-    elif isinstance(crops, collections.MutableMapping):
-        for part_name, parts in crops.items():
-            yield part_name, parts
-
-    elif hasattr(crops, "_asdict"):
-        # Special case for named tuples
-        for part_name, parts in crops._asdict().items():
-            yield part_name, parts
-
-    elif isinstance(crops, collections.Sequence):
-        for i_part, parts in enumerate(crops):
-            part_name = default_name + str(i_part)
-            yield part_name, parts
-
-    else:
-        raise ValueError("Unrecognised crop %s of type %s" % (crop, type(crop)))
+@refiner_with_context
+def save_pull_analysis(**kwds):
+    return SavePullAnalysis(**kwds)
 
 
-def get_crop_part(crops, part_name=None):
-    if part_name is None:
-        return crops
-
-    elif isinstance(crops, np.ndarray):
-        raise ValueError("Cannot get a part from a crop with only a single part.")
-
-    else:
-        try:
-            part = crops[part_name]
-            return part
-        except KeyError, IndexError:
-            return getattr(crops, part_name)
+@refiner_with_context
+def save_tree(**kwds):
+    return SaveTreeRefiner(**kwds)
 
 
 def select_crop_parts(crops, select=[], exclude=[]):
@@ -372,11 +711,11 @@ def select_crop_parts(crops, select=[], exclude=[]):
     if isinstance(exclude, basestring):
         exclude = [exclude, ]
 
-    if isinstance(crops, np.ndarray):
-        raise ValueError("Cannot selection from a crop with only a single part.")
-
-    elif isinstance(crops, collections.MutableMapping):
+    if isinstance(crops, collections.MutableMapping):
         part_names = list(crops.keys())
+
+        if not select and not exclude:
+            return crops
 
         if select:
             not_selected_part_names = [name for name in part_names if name not in select]
@@ -394,10 +733,17 @@ def select_crop_parts(crops, select=[], exclude=[]):
         selected_crops = copy.copy(crops)
         for part_name in set(excluded_part_names):
             del selected_crops[part_name]
+
+        if isinstance(select, collections.Mapping):
+            # select is a rename mapping
+            for part_name, new_part_name in select.items():
+                if part_name in selected_crops:
+                    parts = selected_crops[part_name]
+                    del selected_crops[part_name]
+                    selected_crops[new_part_name] = parts
+
         return selected_crops
 
-    elif isinstance(crop, collections.Sequence):
-        raise NotImplementedError("Cannot selection from a crop made from a tuple of parts.")
     else:
         raise ValueError("Unrecognised crop %s of type %s" % (crop, type(crop)))
 
@@ -406,7 +752,7 @@ def filter_crops(crops, filter_function, part_name=None):
     if isinstance(filter_function, np.ndarray):
         filter_indices = filter_function
     else:
-        parts = get_crop_part(crops, part_name)
+        parts = crops[part_name]
         filter_indices = filter_function(parts)
 
     if isinstance(crops, np.ndarray):
@@ -418,9 +764,6 @@ def filter_crops(crops, filter_function, part_name=None):
         for part_name, parts in crops.items():
             filtered_crops[part_name] = parts[filter_indices]
         return filtered_crops
-
-    elif isinstance(crop, collections.Sequence):
-        raise NotImplementedError("Cannot filter from a crop made from a tuple of parts.")
 
     else:
         raise ValueError("Unrecognised crop %s of type %s" % (crop, type(crop)))

@@ -138,14 +138,6 @@ def getPtBinsWithWeight(pt_values):
 
 
 def main():
-    argument_parser = argparse.ArgumentParser()
-
-    argument_parser.add_argument('-s', '--show', action='store_true',
-                                 help='Show generated plots in a TBrowser immediatly.'
-                                 )
-
-    arguments = argument_parser.parse_args()
-
     # Configure particle gun to produce with a discrete list of pt values #
     #######################################################################
 

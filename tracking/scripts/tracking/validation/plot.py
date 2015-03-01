@@ -82,11 +82,20 @@ def rice_exceptional_values(xs):
 
     unique_xs_count = np.bincount(indices)
 
-    n_data = len(xs)
-    n_exceptional = 1.0 * n_data / rice_n_bin(n_data)
+    exceptional_xs = []
 
-    excpetional_indices = unique_xs_count > n_exceptional
-    return unique_xs[excpetional_indices]
+    while True:
+        n_data = np.sum(unique_xs_count)
+        n_exceptional = 1.0 * n_data / rice_n_bin(n_data)
+        excpetional_indices = unique_xs_count > n_exceptional
+
+        if np.any(excpetional_indices):
+            exceptional_xs.extend(unique_xs[excpetional_indices])
+            unique_xs_count[excpetional_indices] = 0
+        else:
+            break
+
+    return np.array(sorted(exceptional_xs))
 
 
 units_by_quantity_name = {
@@ -273,11 +282,13 @@ class ValidationPlot(object):
                               y_bin_edges)
 
         if x_bin_labels:
+            get_logger().info("Scatter plot %s is discrete in x.", name)
             x_taxis = histogram.GetXaxis()
             for i_x_bin, x_bin_label in enumerate(x_bin_labels):
                 x_taxis.SetBinLabel(i_x_bin + 1, x_bin_label)
 
         if y_bin_labels:
+            get_logger().info("Scatter plot %s is discrete in y.", name)
             y_taxis = histogram.GetYaxis()
             for i_y_bin, y_bin_label in enumerate(y_bin_labels):
                 y_taxis.SetBinLabel(i_y_bin + 1, y_bin_label)
@@ -521,6 +532,7 @@ class ValidationPlot(object):
         histogram = th1_factory(name, '', n_bins, bin_edges)
 
         if bin_labels:
+            get_logger().info("One dimensional plot %s is discrete in x.", name)
             x_taxis = histogram.GetXaxis()
             for i_bin, bin_label in enumerate(bin_labels):
                 x_taxis.SetBinLabel(i_bin + 1, bin_label)
@@ -731,7 +743,7 @@ class ValidationPlot(object):
             # Also expand the upper bound by an epsilon
             # to prevent the highest value in xs from going in the overflow bin
             bin_edges[0] = lower_bound
-            bin_edges[-1] = upper_bound
+            bin_edges[-1] = np.nextafter(upper_bound, np.inf)
             debug('Bins %s', bin_edges)
 
         else:
@@ -740,7 +752,7 @@ class ValidationPlot(object):
 
         # Construct a float array forwardable to root.
         bin_edges = array.array('d', bin_edges)
-        debug('Bins %s', bin_edges)
+        debug('Bins %s for %s', bin_edges, self.name)
         return bin_edges, None
 
     def determine_bin_range(self,
@@ -852,10 +864,6 @@ class ValidationPlot(object):
                 debug('Upper bound after outlier detection')
                 debug('Upper bound %s', upper_bound)
                 debug('Upper outlier bound %s', upper_outlier_bound)
-
-        # Increase the upper bound by an epsilon to include the highest value in the range
-        # such that it will not be placed in the overflow bin.
-        upper_bound = np.nextafter(upper_bound, np.inf)
 
         if n_bins is None:
             # Assume number of bins according to the rice rule.

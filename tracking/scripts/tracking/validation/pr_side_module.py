@@ -232,8 +232,19 @@ class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
 
     """Module to collect more matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding. This module gives information on the number of hits etc."""
 
+    def prepare(self):
+        super(ExpertPRSideTrackingValidationModule, self).prepare()
+
+        mc_track_cands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
+
+        # Building the confusion matrix once more :-)
+        mc_track_cands_cdc_hit_ids = [frozenset(mc_track_cand.getHitIDs(Belle2.Const.CDC)) for mc_track_cand in mc_track_cands]
+        self.mc_track_cands_cdc_hit_ids = mc_track_cands_cdc_hit_ids
+
     def peel(self, trackCand):
         base_crops = super(ExpertPRSideTrackingValidationModule, self).peel(trackCand)
+
+        trackMatchLookUp = self.trackMatchLookUp
 
         trackCandHits = set(trackCand.getHitIDs(Belle2.Const.CDC))
 
@@ -245,8 +256,8 @@ class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
 
         mcTrackCands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
 
-        for mcTrackCand in mcTrackCands:
-            mcTrackCandHits = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
+        for mc_track_id, mcTrackCandHits in enumerate(self.mc_track_cands_cdc_hit_ids):
+            mcTrackCand = mcTrackCands[mc_track_id]
             length_of_intersection = len(mcTrackCandHits & trackCandHits)
             if length_of_intersection > 0:
                 list_of_connected_mc_tracks.add(mcTrackCand)

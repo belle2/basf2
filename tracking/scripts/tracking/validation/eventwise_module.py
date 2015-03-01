@@ -23,6 +23,8 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
                  trackCandidatesColumnName='TrackCands',
                  expert_level=None):
 
+        output_file_name = output_file_name or name + 'TrackingValidation.root'
+
         super(EventwiseTrackingValidationModule, self).__init__(foreach="EventMetaData",  # Dummy for on element per event
                                                                 name=name,
                                                                 output_file_name=output_file_name,
@@ -48,23 +50,22 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
         mcTrackCands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
         cdcHits = Belle2.PyStoreArray(self.cdcHitsColumnname)
 
-        totalHitListMC = set([cdcHitID for mcTrackCand in mcTrackCands
-                              for cdcHitID in
-                              mcTrackCand.getHitIDs(Belle2.Const.CDC)])
+        totalHitListMC = set()
+        for mcTrackCand in mcTrackCands:
+            totalHitListMC.update(mcTrackCand.getHitIDs(Belle2.Const.CDC))
 
-        totalHitListPR = set([cdcHitID for trackCand in trackCands
-                              for cdcHitID in
-                              trackCand.getHitIDs(Belle2.Const.CDC)])
-
+        totalHitListPR = set()
         is_hit_matched = 0
+
         for trackCand in trackCands:
             is_matched = self.trackMatchLookUp.isMatchedPRTrackCand(trackCand)
             is_clone = self.trackMatchLookUp.isClonePRTrackCand(trackCand)
 
+            trackCandHits = set(trackCand.getHitIDs(Belle2.Const.CDC))
+            totalHitListPR.update(trackCandHits)
+
             if is_matched or is_clone:
                 mcTrackCand = self.trackMatchLookUp.getRelatedMCTrackCand(trackCand)
-
-                trackCandHits = set(trackCand.getHitIDs(Belle2.Const.CDC))
                 mcTrackCandHits = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
 
                 is_hit_matched += len(trackCandHits & mcTrackCandHits)
@@ -96,3 +97,14 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
         aggregation=np.sum,
         key="{part_name}",
     )
+
+
+def main():
+    eventwiseTrackingValidationModule = EventwiseTrackingValidationModule(name='event_test', contact='dummy')
+    eventwiseTrackingValidationModule.run('tracked_gun100.root')
+
+
+if __name__ == '__main__':
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+    main()

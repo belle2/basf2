@@ -141,25 +141,30 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
         track_cands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
         trackMatchLookUp = self.trackMatchLookUp
 
-        self.pr_cdc_hit_ids = set(cdc_hit_id
-                                  for track_cand in track_cands
-                                  for cdc_hit_id in track_cand.getHitIDs(Belle2.Const.CDC))
+        pr_cdc_hit_ids = set()
+        pr_good_cdc_hit_ids = set()
+        pr_clone_cdc_hit_ids = set()
+        pr_fake_cdc_hit_ids = set()
 
-        self.pr_good_cdc_hit_ids = set(cdc_hit_id
-                                       for track_cand in track_cands
-                                       for cdc_hit_id in track_cand.getHitIDs(Belle2.Const.CDC)
-                                       if trackMatchLookUp.isMatchedPRTrackCand(track_cand))
+        for track_cand in track_cands:
+            cdc_hit_ids_of_track_cand = set(track_cand.getHitIDs(Belle2.Const.CDC))
 
-        self.pr_clone_cdc_hit_ids = set(cdc_hit_id
-                                        for track_cand in track_cands
-                                        for cdc_hit_id in track_cand.getHitIDs(Belle2.Const.CDC)
-                                        if trackMatchLookUp.isClonePRTrackCand(track_cand))
+            pr_cdc_hit_ids |= cdc_hit_ids_of_track_cand
 
-        self.pr_fake_cdc_hit_ids = set(cdc_hit_id
-                                       for track_cand in track_cands
-                                       for cdc_hit_id in track_cand.getHitIDs(Belle2.Const.CDC)
-                                       if trackMatchLookUp.isGhostPRTrackCand(track_cand)
-                                       or trackMatchLookUp.isBackgroundPRTrackCand(track_cand))
+            if trackMatchLookUp.isMatchedPRTrackCand(track_cand):
+                pr_good_cdc_hit_ids |= cdc_hit_ids_of_track_cand
+
+            if trackMatchLookUp.isClonePRTrackCand(track_cand):
+                pr_clone_cdc_hit_ids |= cdc_hit_ids_of_track_cand
+
+            if (trackMatchLookUp.isGhostPRTrackCand(track_cand) or
+                    trackMatchLookUp.isBackgroundPRTrackCand(track_cand)):
+                pr_fake_cdc_hit_ids |= cdc_hit_ids_of_track_cand
+
+        self.pr_cdc_hit_ids = pr_cdc_hit_ids
+        self.pr_good_cdc_hit_ids = pr_good_cdc_hit_ids
+        self.pr_clone_cdc_hit_ids = pr_clone_cdc_hit_ids
+        self.pr_fake_cdc_hit_ids = pr_fake_cdc_hit_ids
 
     def peel(self, mcTrackCand):
         base_crops = super(ExpertMCSideTrackingValidationModule, self).peel(mcTrackCand)

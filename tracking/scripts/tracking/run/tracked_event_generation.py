@@ -132,6 +132,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
 
 class StandardReconstructionEventsRun(ReadOrGenerateTrackedEventsRun):
+    generator_module = 'EvtGenInput'
     finder_module = 'StandardReco'
 
 

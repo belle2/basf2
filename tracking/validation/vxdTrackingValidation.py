@@ -23,6 +23,7 @@ from tracking.validation.run import TrackingValidationRun
 
 class VXD(TrackingValidationRun):
     n_events = N_EVENTS
+    generator_module = 'EvtGenInput'
     components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'
                   ]
     finder_module = basf2.register_module('VXDTF')

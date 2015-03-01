@@ -10,6 +10,8 @@ import tracking.utilities as utilities
 
 import logging
 
+from tracking.run.minimal import MinimalRun
+
 
 def get_logger():
     return logging.getLogger(__name__)
@@ -82,44 +84,15 @@ default_generator_params_by_generator_name = {
 
 # This also provides a commandline interface to specify some parameters.
 
-class ReadOrGenerateEventsRun(object):
-
+class ReadOrGenerateEventsRun(MinimalRun):
     # Declarative section which can be redefined in a subclass
-    n_events = 10000
-    generator_module = 'EvtGenInput'
+    generator_module = None
     bkg_files = []
-    root_input_file = None
     components = ['PXD', 'SVD', 'CDC', 'BeamPipe',
                   'MagneticFieldConstant4LimitedRCDC']
 
-    # Allow override from instances only in these field names to prevent some spelling errors
-    # __slots__ = [
-    #     '_path',
-    #     'n_events',
-    #     'generator_module',
-    #     'bkg_files',
-    #     'root_input_file',
-    #     'components',
-    #     ]
-
-    def __init__(self):
-        super(ReadOrGenerateEventsRun, self).__init__()
-        self._path = None
-
-    @property
-    def name(self):
-        return self.__class__.__name__
-
-    def create_argument_parser(self, allow_input=True, **kwds):
-        # Argument parser that gives a help full message on error,
-        # which includes the options that are valid.
-        argument_parser = utilities.DefaultHelpArgumentParser(**kwds)
-
-        if allow_input:
-            argument_parser.add_argument('-i', '--input',
-                                         default=self.root_input_file, dest='root_input_file',
-                                         help='File path to the ROOT file from which the simulated events shall be loaded.'
-                                         )
+    def create_argument_parser(self, **kwds):
+        argument_parser = super(ReadOrGenerateEventsRun, self).create_argument_parser(**kwds)
 
         argument_parser.add_argument(
             '-g',
@@ -129,24 +102,6 @@ class ReadOrGenerateEventsRun(object):
             metavar='GENERATOR_NAME',
             choices=utilities.NonstrictChoices(valid_generator_names),
             help='Name module or short name of the generator to be used.',
-        )
-
-        argument_parser.add_argument(
-            '-c',
-            '--component',
-            dest='components',
-            default=None,
-            action='append',
-            help='Add component. Multiple repeatition adds more component. If not given use tracking detectors with limited constant magnetic field to the CDC.',
-        )
-
-        argument_parser.add_argument(
-            '-n',
-            '--n-events',
-            dest='n_events',
-            default=self.n_events,
-            type=int,
-            help='Number of events to be generated',
         )
 
         argument_parser.add_argument(
@@ -161,132 +116,29 @@ class ReadOrGenerateEventsRun(object):
 
         return argument_parser
 
-    def configure(self, arguments):
-        # Simply translate the arguments that have
-        # the same name as valid instance arguments
-        for (key, value) in vars(arguments).items():
-            if value is None:
-                continue
-            if hasattr(self, key):
-                setattr(self, key, value)
-                get_logger().info("Setting %s to %s", key, value)
-
-    def configure_from_commandline(self):
-        argument_parser = self.create_argument_parser()
-        arguments = argument_parser.parse_args()
-        self.configure(arguments)
-
     def create_path(self):
         # Compose basf2 module path #
         #############################
-        main_path = basf2.create_path()
+        main_path = super(ReadOrGenerateEventsRun, self).create_path()
 
-        # use Generator if no root input file is specified
-        components = self.components
+        # Only generate events if no input file has been provided
         if self.root_input_file is None:
-            # Master module
-            eventInfoSetterModule = basf2.register_module('EventInfoSetter')
-            eventInfoSetterModule.param({'evtNumList': [self.n_events],
-                                         'runList': [1], 'expList': [1]})
-            main_path.add_module(eventInfoSetterModule)
-
-            # geometry parameter database
-            gearboxModule = basf2.register_module('Gearbox')
-            main_path.add_module(gearboxModule)
-
-            # detector geometry
-            geometryModule = basf2.register_module('Geometry')
-            if components:
-                geometryModule.param('components', components)
-                main_path.add_module(geometryModule)
-
-            generatorModule = get_generator_module(self.generator_module)
-            if generatorModule is not None:
+            generator_module = get_generator_module(self.generator_module)
+            if generator_module is not None:
                 # Allow for Background only execution
-                main_path.add_module(generatorModule)
+                main_path.add_module(generator_module)
 
             bkg_file_paths = get_bkg_file_paths(self.bkg_files)
-            simulation.add_simulation(main_path, components=components,
+            components = self.components
+            simulation.add_simulation(main_path,
+                                      components=components,
                                       bkgfiles=bkg_file_paths)
 
             # Catch if no generator is added, no background should be simulated and events are not read from a file.
-            if not bkg_file_paths and generatorModule is None:
-                raise RuntimeError('Need at least one of root_input_file, generator_module or bkg_files specified.'
-                                   )
-        else:
-
-            rootInputModule = basf2.register_module('RootInput')
-            rootInputModule.param({'inputFileName': self.root_input_file})
-            main_path.add_module(rootInputModule)
-
-            # gearbox & geometry needs to be registered any way
-            gearboxModule = basf2.register_module('Gearbox')
-            main_path.add_module(gearboxModule)
-            geometryModule = basf2.register_module('Geometry')
-            geometryModule.param('components', components)
-            main_path.add_module(geometryModule)
-
-        # Progress module
-        progressModule = basf2.register_module('Progress')
-        main_path.add_module(progressModule)
+            if not bkg_file_paths and generator_module is None:
+                raise RuntimeError('Need at least one of root_input_file, generator_module or bkg_files specified.')
 
         return main_path
-
-    @property
-    def path(self):
-        if self._path is None:
-            self._path = self.create_path()
-        return self._path
-
-    def add_module(self, module=None):
-        path = self.path
-        module = self.get_basf2_module(module)
-        path.add_module(module)
-
-    def execute(self):
-        # Create path and run #
-        #######################
-        main_path = self.path
-
-        # Run basf2 module path #
-        #########################
-        get_logger().info('Start processing')
-        basf2.process(main_path)
-        get_logger().info("\n%s", str(basf2.statistics))
-
-    def configure_and_execute_from_commandline(self):
-        self.configure_from_commandline()
-        self.execute()
-
-    @staticmethod
-    def get_basf2_module(module_or_module_name):
-        if isinstance(module_or_module_name, str):
-            module_name = module_or_module_name
-            module = basf2.register_module(module_name)
-            return module
-        elif isinstance(module_or_module_name, basf2.Module):
-            module = module_or_module_name
-            return module
-        else:
-            message_template = \
-                '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
-            raise ValueError(message_template % (module_or_module_name,
-                                                 type(module_or_module_name)))
-
-    @staticmethod
-    def get_basf2_module_name(module_or_module_name):
-        if isinstance(module_or_module_name, str):
-            module_name = module_or_module_name
-            return module_name
-        elif isinstance(module_or_module_name, basf2.Module):
-            module = module_or_module_name
-            module_name = module.name()
-            return module_name
-        else:
-            message_template = \
-                '%s of type %s is neither a module nor the name of module. Expected str or basf2.Module instance.'
-            raise ValueError(message_template % (module_or_module_name,
-                                                 type(module_or_module_name)))
 
 
 def is_bkg_file(bkg_file_path):
@@ -425,8 +277,12 @@ def get_generator_module(generator_module_or_generator_name):
     return generator_module
 
 
+class StandardEventGenerationRun(ReadOrGenerateEventsRun):
+    generator_module = 'EvtGenInput'
+
+
 def main():
-    readOrGenerateEventsRun = ReadOrGenerateEventsRun()
+    readOrGenerateEventsRun = StandardEventGenerationRun()
 
     argument_parser = \
         readOrGenerateEventsRun.create_argument_parser(allow_input=False)

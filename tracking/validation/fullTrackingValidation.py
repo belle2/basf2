@@ -81,6 +81,7 @@ class FilterMcParticleInPtBin(object):
 class FullTracking(TrackingValidationRun):
 
     n_events = N_EVENTS
+    generator_module = 'EvtGenInput'
     finder_module = 'StandardReco'
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

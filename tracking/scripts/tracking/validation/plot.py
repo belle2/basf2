@@ -568,12 +568,14 @@ class ValidationPlot(object):
     def write(self, tDirectory=None):
         if tDirectory is None:
             # Write histogram to current directory
+            ValidationPlot.set_tstyle()
             self.histogram.Write()
         else:
             # Temporarily switch the current directory
             save_directory = ROOT.gDirectory
             try:
                 tDirectory.cd()
+                ValidationPlot.set_tstyle()
                 self.histogram.Write()
             finally:
                 save_directory.cd()
@@ -736,10 +738,26 @@ class ValidationPlot(object):
     def fit_diag(self):
         self.fit('[0]*x', 'M')
 
+    @staticmethod
+    def set_tstyle():
+        belle2_validation_style_name = "belle2_validation_style"
+        belle2_validation_tstyle = ROOT.gROOT.GetStyle(belle2_validation_style_name)
+        if not belle2_validation_tstyle:
+            belle2_validation_tstyle = ROOT.TStyle(belle2_validation_style_name, belle2_validation_style_name)
+
+            opt_fit = 0112
+            belle2_validation_tstyle.SetOptFit(opt_fit)
+
+            opt_stat = 111111
+            belle2_validation_tstyle.SetOptStat(opt_stat)
+            ROOT.gROOT.SetStyle(belle2_validation_style_name)
+        else:
+
+            belle2_validation_tstyle.cd()
+
 
 def test():
-    opt_fit = 0112
-    ROOT.gStyle.SetOptFit(opt_fit)
+    ValidationPlot.set_tstyle()
 
     # Test a histogram plot with some nan and inf values
     normal_distributed_values = np.random.randn(1000)
@@ -766,9 +784,6 @@ def test():
 
     tFile = ROOT.TFile('test.root', 'RECREATE')
     tDirectory = tFile.mkdir('expert', 'Expert')
-    tDirectory.cd()
-    ROOT.gStyle.SetOptFit(opt_fit)
-    tFile.cd()
     validation_histogram.write(tFile)
     diagonal_plot.write(tDirectory)
 

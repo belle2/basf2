@@ -5,7 +5,7 @@
 
 Note
 ----
-A great deal of the these modules are quite general purpose helper constructs, 
+A great deal of the these modules are quite general purpose helper constructs,
 which might be helpful in other parts of the BASF2, and might therefore be better
 placed in the framework folder. Most noteably these are the
 
@@ -35,18 +35,18 @@ class BrowseFileOnTerminateModule(basf2.Module):
 
     This can be used to show results from a BASF2 run as soon as they are finished.
 
-    Put this module at an early position in your path or at least higher than the module 
+    Put this module at an early position in your path or at least higher than the module
     writing the ROOT file to be shown, since the terminate methods are called in reverse order.
 
     Attributes
     ----------
-    root_file_path : str
-        Path to the file that should be shown in the browser.
+    root_file_path : str or TFile
+        Path to the file or the TFile that should be shown in the browser.
     """
 
-    def __init__(self, root_file_path):
+    def __init__(self, root_file):
         super(BrowseFileOnTerminateModule, self).__init__()
-        self.root_file_path = root_file_path
+        self.root_file = root_file
 
     def terminate(self):
         """Termination method of the module
@@ -54,22 +54,29 @@ class BrowseFileOnTerminateModule(basf2.Module):
         Opens the ROOT file an opens a Browser to show it.
         """
 
-        tFile = ROOT.TFile(self.root_file_path)
+        if isinstance(self.root_file, ROOT.TFile):
+            tfile = self.root_file
+        else:
+            tfile = ROOT.TFile(self.root_file_path)
+
         tBrowser = ROOT.TBrowser()
         tBrowser.BrowseObject(tFile)
         tBrowser.Show()
 
         # FIXME: Is there a way to listen to the close event of the TBrowser?
         raw_input('Press enter to close.')
-        tFile.Close()
+
+        # If we opened the file ourselves close it again.
+        if not isinstance(self.root_file, ROOT.TFile):
+            tFile.Close()
 
 
 class IfModule(basf2.Module):
 
     """Wrapper module to conditionally execute module and continue with the normal path afterwards.
 
-    There are two ways to specify the condition. 
-    One way is to override the condtion(self) method in a subclass. 
+    There are two ways to specify the condition.
+    One way is to override the condtion(self) method in a subclass.
     The second way is to give a function as the second argument to the module constructor, which is called
     each event.
 
@@ -83,7 +90,7 @@ class IfModule(basf2.Module):
     """
 
     def __init__(self, module, condition=None):
-        """Initialisation method taking the module instance to 
+        """Initialisation method taking the module instance to
 
         Parameters
         ----------
@@ -130,7 +137,7 @@ class IfModule(basf2.Module):
 
 class PathModule(basf2.Module):
 
-    """Wrapper for a BASF2 path into a module such that 
+    """Wrapper for a BASF2 path into a module such that
     it can be passed around and added to a BASF2 path as BASF2 module.
 
     The wrapper is implement in such a way that it unconditionally executes
@@ -187,5 +194,3 @@ class StandardTrackingReconstructionModule(PathModule):
         path = basf2.create_path()
         reconstruction.add_tracking_reconstruction(path, *args, **kwds)
         super(StandardTrackingReconstructionModule, self).__init__(path)
-
-

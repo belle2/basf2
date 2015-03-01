@@ -16,6 +16,9 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
+unique_count_for_discrete = 20
+
+
 def iqr(array_like):
     """Computes the interquantile range, hence the distance from the 25% to 75% quantile."""
 
@@ -128,12 +131,36 @@ class ValidationPlot(object):
                              xs)
         return is_boolean or is_one_or_zero
 
+    @staticmethod
+    def is_discrete(xs):
+        all_integer = np.all(xs == np.round(xs))
+        if all_integer:
+            return True
+
+        # FIXME: improve test for discrete variable
+        unique_xs = np.unique(xs)
+        if len(unique_xs) < unique_count_for_discrete:
+            return True
+
+    @staticmethod
+    def format_bin_label(value):
+        if np.isfinite(value) and value == np.round(value):
+            return str(int(value))
+        else:
+            formated_value = "{:.5g}".format(value)
+
+            # if the label is to long, switch to shorter "e" format
+            if len(formated_value) > 8:
+                formated_value = "{:.3e}".format(value)
+            return formated_value
+
     def determine_bin_edges(self,
                             xs,
                             bins=None,
                             lower_bound=None,
                             upper_bound=None,
-                            outlier_z_score=None):
+                            outlier_z_score=None,
+                            allow_discrete=False):
 
         # Coerce values to a numpy array. Do not copy if already a numpy array.
         xs = np.array(xs, copy=False)
@@ -145,7 +172,8 @@ class ValidationPlot(object):
             # Construct a float array forwardable to root.
             bin_edges = bins
             bin_edges = array.array('f', bin_edges)
-            return bin_edges
+            bin_labels = None
+            return bin_edges, bin_labels
 
         if self.is_binary(xs):
             # if xs is a binary variable setup the histogram to
@@ -160,17 +188,30 @@ class ValidationPlot(object):
                 n_bins = 2
             else:
                 n_bins = int(bins) or 1
-        elif isinstance(xs[0], np.integer):
 
-            get_logger().debug('Integer binning values encountered')
+        elif allow_discrete and self.is_discrete(xs):
+            get_logger().debug('Discrete binning values encountered')
+            unique_xs = np.unique(xs)
+
+            # Crop the unique values between the lower and upper bound
             if lower_bound is None:
-                lower_bound = np.min(xs) - 0.5
+                lower_bound = np.min(unique_xs)
+            else:
+                unique_xs = unique_xs[unique_xs >= lower_bound]
 
             if upper_bound is None:
-                upper_bound = np.max(xs) + 0.5
+                upper_bound = np.min(unique_xs)
+            else:
+                unique_xs = unique_xs[unique_xs <= upper_bound]
 
             if bins is None:
-                n_bins = int(np.floor(upper_bound) - np.ceil(lower_bound)) + 1
+                # Construct a float array forwardable to root.
+                bin_edges = array.array('f', unique_xs)
+                format_bin_label = self.format_bin_label
+                bin_labels = [format_bin_label(value) for value in bin_edges]
+                bin_edges.append(bin_edges[-1] + 1)
+                return bin_edges, bin_labels
+
             else:
                 n_bins = int(bins)
                 # Do not allow negative bin numbers
@@ -182,8 +223,8 @@ class ValidationPlot(object):
             get_logger().debug('Lower bound %s', lower_bound)
             get_logger().debug('Upper bound %s', upper_bound)
             get_logger().debug('N bins %s', n_bins)
-        else:
 
+        else:
             finite_xs = xs[np.isfinite(xs)]
             if outlier_z_score is not None and (lower_bound is None
                                                 or upper_bound is None):
@@ -267,7 +308,7 @@ class ValidationPlot(object):
         # Construct a float array forwardable to root.
         bin_edges = array.array('f', bin_edges)
         get_logger().debug('Bins %s', bin_edges)
-        return bin_edges
+        return bin_edges, None
 
     def fill(self,
              xs,
@@ -287,7 +328,8 @@ class ValidationPlot(object):
              bins=None,
              lower_bound=None,
              upper_bound=None,
-             outlier_z_score=None):
+             outlier_z_score=None,
+             allow_discrete=False):
 
         name = self.name
 
@@ -296,13 +338,21 @@ class ValidationPlot(object):
         if weights is not None:
             weights = np.array(weights, copy=False)
 
-        bin_edges = self.determine_bin_edges(xs, bins=bins,
-                                             lower_bound=lower_bound, upper_bound=upper_bound,
-                                             outlier_z_score=outlier_z_score)
+        bin_edges, bin_labels = self.determine_bin_edges(xs,
+                                                         bins=bins,
+                                                         lower_bound=lower_bound,
+                                                         upper_bound=upper_bound,
+                                                         outlier_z_score=outlier_z_score,
+                                                         allow_discrete=allow_discrete)
 
         n_bins = len(bin_edges) - 1
         histogram = ROOT.TH1F(name, '', n_bins, bin_edges)
         self.histogram = histogram
+
+        if bin_labels:
+            x_taxis = histogram.GetXaxis()
+            for i_bin, bin_label in enumerate(bin_labels):
+                x_taxis.SetBinLabel(i_bin + 1, bin_label)
 
         finite_indices = ~np.isnan(xs)
         finite_selections = finite_indices
@@ -313,6 +363,11 @@ class ValidationPlot(object):
         for (x, weight, select) in zip(xs, weights, finite_selections):
             if select:
                 Fill(float(x), float(weight))
+
+        # Adjust the discrete bins after the filling to be equidistant
+        if bin_labels:
+            bin_edges = array.array("f", range(len(bin_labels) + 1))
+            x_taxis.Set(n_bins, bin_edges)
 
         # Count the nan and inf values in x
         self.add_nan_inf_stats('x', xs)
@@ -330,7 +385,8 @@ class ValidationPlot(object):
                 bins=None,
                 lower_bound=None,
                 upper_bound=None,
-                outlier_z_score=None):
+                outlier_z_score=None,
+                allow_discrete=False):
 
         name = self.name
 
@@ -340,16 +396,24 @@ class ValidationPlot(object):
         if weights is not None:
             weights = np.array(weights, copy=False)
 
-        bin_edges = self.determine_bin_edges(xs, bins=bins,
-                                             lower_bound=lower_bound, upper_bound=upper_bound,
-                                             outlier_z_score=outlier_z_score)
+        bin_edges, bin_labels = self.determine_bin_edges(xs,
+                                                         bins=bins,
+                                                         lower_bound=lower_bound,
+                                                         upper_bound=upper_bound,
+                                                         outlier_z_score=outlier_z_score,
+                                                         allow_discrete=allow_discrete)
 
         # Use determine bins to find the lower and upper bound with correct handling of nan and inf
-        (y_lower_bound, y_upper_bound) = self.determine_bin_edges(ys, bins=1)
+        (y_lower_bound, y_upper_bound), bin_labels = self.determine_bin_edges(ys, bins=1)
 
         n_bins = len(bin_edges) - 1
         histogram = ROOT.TProfile(name, '', n_bins, bin_edges)
         self.histogram = histogram
+
+        if bin_labels:
+            x_taxis = histogram.GetXaxis()
+            for i_bin, bin_label in enumerate(bin_labels):
+                x_taxis.SetBinLabel(i_bin + 1, bin_label)
 
         finite_indices = ~np.isnan(xs) & np.isfinite(ys)
         finite_selections = finite_indices
@@ -360,6 +424,11 @@ class ValidationPlot(object):
         for (x, y, weight, select) in zip(xs, ys, weights, finite_selections):
             if select:
                 Fill(float(x), float(y), float(weight))
+
+        # Adjust the discrete bins after the filling to be equidistant
+        if bin_labels:
+            bin_edges = array.array("f", range(len(bin_labels) + 1))
+            x_taxis.Set(n_bins, bin_edges)
 
         # Expand the range for better view of the plot
         y_range = y_upper_bound - y_lower_bound
@@ -385,7 +454,8 @@ class ValidationPlot(object):
                 bins=(None, None),
                 lower_bound=(None, None),
                 upper_bound=(None, None),
-                outlier_z_score=(None, None)):
+                outlier_z_score=(None, None),
+                allow_discrete=False):
 
         name = self.name
 
@@ -417,13 +487,19 @@ class ValidationPlot(object):
             x_outlier_z_score = outlier_z_score
             y_outlier_z_score = outlier_z_score
 
-        x_bin_edges = self.determine_bin_edges(xs, bins=x_bins,
-                                               lower_bound=x_lower_bound, upper_bound=x_upper_bound,
-                                               outlier_z_score=x_outlier_z_score)
+        x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
+                                                             bins=x_bins,
+                                                             lower_bound=x_lower_bound,
+                                                             upper_bound=x_upper_bound,
+                                                             outlier_z_score=x_outlier_z_score,
+                                                             allow_discrete=allow_discrete)
 
-        y_bin_edges = self.determine_bin_edges(ys, bins=y_bins,
-                                               lower_bound=y_lower_bound, upper_bound=y_upper_bound,
-                                               outlier_z_score=y_outlier_z_score)
+        y_bin_edges, y_bin_labels = self.determine_bin_edges(ys,
+                                                             bins=y_bins,
+                                                             lower_bound=y_lower_bound,
+                                                             upper_bound=y_upper_bound,
+                                                             outlier_z_score=y_outlier_z_score,
+                                                             allow_discrete=allow_discrete)
 
         n_x_bins = len(x_bin_edges) - 1
         n_y_bins = len(y_bin_edges) - 1
@@ -433,7 +509,18 @@ class ValidationPlot(object):
                               x_bin_edges,
                               n_y_bins,
                               y_bin_edges)
+
         self.histogram = histogram
+
+        if x_bin_labels:
+            x_taxis = histogram.GetXaxis()
+            for i_x_bin, x_bin_label in enumerate(x_bin_labels):
+                x_taxis.SetBinLabel(i_x_bin + 1, x_bin_label)
+
+        if y_bin_labels:
+            y_taxis = histogram.GetYaxis()
+            for i_y_bin, y_bin_label in enumerate(y_bin_labels):
+                y_taxis.SetBinLabel(i_y_bin + 1, y_bin_label)
 
         finite_indices = ~np.isnan(xs) & ~np.isnan(ys)
         finite_selections = finite_indices
@@ -444,6 +531,16 @@ class ValidationPlot(object):
         for (x, y, weight, select) in zip(xs, ys, weights, finite_selections):
             if select:
                 Fill(float(x), float(y), float(weight))
+
+        # Adjust the discrete bins after the filling to be equidistant
+        if x_bin_labels:
+            x_bin_edges = array.array("f", range(len(x_bin_labels) + 1))
+            x_taxis.Set(n_x_bins, x_bin_edges)
+
+        # Adjust the discrete bins after the filling to be equidistant
+        if y_bin_labels:
+            y_bin_edges = array.array("f", range(len(y_bin_labels) + 1))
+            y_taxis.Set(n_y_bins, y_bin_edges)
 
         # Count the nan and inf values in x
         self.add_nan_inf_stats('x', xs)

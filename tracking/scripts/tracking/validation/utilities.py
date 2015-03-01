@@ -5,6 +5,7 @@ from ROOT import Belle2
 import numpy as np
 import math
 import contextlib
+import functools
 
 # Vectorised version of the error function for numpy arrays
 try:
@@ -76,6 +77,15 @@ def root_cd(tdirectory):
 
     finally:
         save_tdirectory.cd()
+
+
+def coroutine(func):
+    @functools.wraps(func)
+    def start(*args, **kwargs):
+        cr = func(*args, **kwargs)
+        next(cr)
+        return cr
+    return start
 
 
 def is_primary(mc_particle):

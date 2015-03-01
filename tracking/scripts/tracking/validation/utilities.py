@@ -1,4 +1,5 @@
 import ROOT
+from ROOT import Belle2
 import numpy as np
 import math
 
@@ -31,12 +32,23 @@ except ImportError:
     prop = np.frompyfunc(ROOT.TMath.Prob, 2, 1)
 
 
-def is_primary(mcParticle):
+def is_primary(mc_particle):
     """Indicates if the given MCParticle is primary.
 
     Parameters
     ----------
-    mcParticle : Belle2.MCParticle
+    mc_particle : Belle2.MCParticle
         MCParticle to be checked"""
 
-    return mcParticle.hasStatus(1)
+    return mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle)
+
+
+def is_stable_in_generator(mc_particle):
+    """Indicates if the given MCParticle is stable in the generator
+
+    Parameters
+    ----------
+    mc_particle : Belle2.MCParticle
+        MCParticle to be checked"""
+
+    return mc_particle.hasStatus(Belle2.MCParticle.c_StableInGenerator)

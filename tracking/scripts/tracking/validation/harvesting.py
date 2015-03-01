@@ -12,6 +12,7 @@ import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 
 from tracking.modules import BrowseFileOnTerminateModule
+from tracking.modules import PyProfilingModule
 from tracking.validation.utilities import root_cd, coroutine
 from tracking.validation.refiners import Refiner
 
@@ -189,7 +190,8 @@ class HarvestingModule(basf2.Module):
             gearbox=False,
             geometry=False,
             components=False,
-            show=True):
+            show=True,
+            pyprofile=False):
 
         main_path = basf2.create_path()
 
@@ -215,7 +217,11 @@ class HarvestingModule(basf2.Module):
         if show and self.output_file_name:
             main_path.add_module(BrowseFileOnTerminateModule(self.output_file_name))
 
-        main_path.add_module(self)
+        if pyprofile:
+            main_path.add_module(PyProfilingModule(self))
+        else:
+            main_path.add_module(self)
+
         get_logger().info("Processing...")
         basf2.process(main_path)
 

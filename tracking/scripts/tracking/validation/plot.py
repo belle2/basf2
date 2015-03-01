@@ -179,18 +179,147 @@ class ValidationPlot(object):
                 formated_value = "{:.3e}".format(value)
             return formated_value
 
+    def determine_bin_range(self,
+                            xs,
+                            n_bins=None,
+                            lower_bound=None,
+                            upper_bound=None,
+                            outlier_z_score=None,
+                            include_exceptionals=True):
+        """Calculates the number of bins, the lower bound and the upper bound from a given data series
+        filling in the values that are not given.
+
+        If the outlier_z_score is given the method tries to exclude outliers that exceed a certain z-score.
+        The z-score is calculated (x - x_mean) / x_std. The be robust against outliers the necessary
+        mean and std deviation are based on truncated mean and a trimmed std calculated from the inter
+        quantile range (IQR).
+
+        If additional include_exceptionals is true the method tries to find exceptional values in the series
+        and always include them in the range if it finds any.
+        Exceptional values means exact values that appear often in the series for whatever reason.
+        Possible reasons include
+        * Interal / default values
+        * Failed evaluation conditions
+        * etc.
+        which should be not cropped away automatically if you are locking on the quality of your data.
+
+        Parameters
+        ----------
+        xs : numpy.ndarray (1d)
+            Data point for which a binning should be found.
+        n_bins : int or None, optional
+            Preset number of desired bins. The default, None, means the bound should be extracted from data.
+            The rice rule is used the determine the number of bins.
+        lower_bound : float or None, optional
+            Preset lower bound of the binning range. The default, None, means the bound should be extracted from data.
+        upper_bound : float or None, optional
+            Preset upper bound of the binning range. The default, None, means the bound should be extracted from data.
+        outlier_z_score : float or None, optional
+            Threshold z-score of outlier detection. The default, None, means no outlier detection.
+        include_exceptionals : bool, optional
+            If the outlier detection is active this switch indicates, if  values detected as exceptional shall be included
+            nevertheless into the binning range. Default is True, which means excpetional values as included even if they are
+            detected as outliers.
+
+        Returns
+        -------
+        n_bins, lower_bound, upper_bound : int, float, float
+            A triple of found number of bins, lower bound and upper bound of the binning range.
+        """
+
+        debug = get_logger().debug
+
+        finite_xs = xs[np.isfinite(xs)]
+
+        # Prepare for the estimation of outliers
+        if outlier_z_score is not None and (lower_bound is None
+                                            or upper_bound is None):
+            x_mean = truncated_mean(finite_xs)
+            x_std = trimmed_std(finite_xs)
+
+            lower_exceptional_x = np.nan
+            upper_exceptional_x = np.nan
+
+            if include_exceptionals:
+                exceptional_xs = self.get_exceptional_values(finite_xs)
+                if len(exceptional_xs):
+                    lower_exceptional_x = np.min(exceptional_xs)
+                    upper_exceptional_x = np.max(exceptional_xs)
+
+        # Find the lower bound, if it is not given.
+        if lower_bound is None:
+            lower_bound = np.min(finite_xs)
+            # Clip the lower bound by outliers that exceed the given z score
+            if outlier_z_score is not None:
+                # The lower bound at which outliers exceed the given z score
+                lower_outlier_bound = x_mean - outlier_z_score * x_std
+
+                # Clip the lower bound such that it concides with an actual value,
+                # which prevents empty bins from being produced
+                indices_above_lower_outlier_bound = finite_xs >= lower_outlier_bound
+
+                if np.any(indices_above_lower_outlier_bound):
+                    lower_bound = np.min(finite_xs[indices_above_lower_outlier_bound])
+
+                    # However we want to include at least the exceptional values in the range if there is any.
+                    lower_bound = np.nanmin([lower_bound, lower_exceptional_x])
+
+                debug('Lower bound after outlier detection')
+                debug('Lower bound %s', lower_bound)
+                debug('Lower outlier bound %s', lower_outlier_bound)
+
+        # Find the upper bound, if it is not given
+        if upper_bound is None:
+            upper_bound = np.max(finite_xs)
+            if outlier_z_score is not None:
+                # The upper bound at which outliers exceed the given z score
+                upper_outlier_bound = x_mean + outlier_z_score * x_std
+
+                # Clip the upper bound such that it concides with an actual value,
+                # which prevents empty bins from being produced
+                indices_below_upper_outlier_bound = finite_xs <= upper_outlier_bound
+
+                if np.any(indices_below_upper_outlier_bound):
+                    upper_bound = np.max(finite_xs[indices_below_upper_outlier_bound])
+
+                    # However we want to include at least the exceptional values in the range if there is any.
+                    upper_bound = np.nanmax([upper_bound, upper_exceptional_x])
+
+                debug('Upper bound after outlier detection')
+                debug('Upper bound %s', upper_bound)
+                debug('Upper outlier bound %s', upper_outlier_bound)
+
+        # Increase the upper bound by an epsilon to include the highest value in the range
+        # such that it will not be placed in the overflow bin.
+        np.nextafter(upper_bound, np.inf)
+
+        if n_bins is None:
+            # Assume number of bins according to the rice rule.
+            # The number of data points should not include outliers.
+            n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
+            rice_n_bins = int(rice_n_bin(n_data))
+            n_bins = rice_n_bins
+
+        else:
+            n_bins = int(n_bins)
+            # Do not allow negative bin numbers
+            if not n_bins > 0:
+                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % bins
+                raise ValueError(message)
+
+        return n_bins, lower_bound, upper_bound
+
     def determine_bin_edges(self,
                             xs,
                             bins=None,
                             lower_bound=None,
                             upper_bound=None,
                             outlier_z_score=None,
+                            include_exceptionals=True,
                             allow_discrete=False):
 
-        # Coerce values to a numpy array. Do not copy if already a numpy array.
-        xs = np.array(xs, copy=False)
-
-        get_logger().debug('Plot name %s', self.name)
+        debug = get_logger().debug
+        debug('Determine binning for plot named %s', self.name)
 
         if isinstance(bins, collections.Iterable):
             # Bins is considered as an array
@@ -200,23 +329,26 @@ class ValidationPlot(object):
             bin_labels = None
             return bin_edges, bin_labels
 
-        if self.is_binary(xs):
-            # if xs is a binary variable setup the histogram to
-            # have only two bins with the right boundaries.
-            if lower_bound is None:
-                lower_bound = -0.5
+        # If bins is not an iterable assume it is the number of bins or None
+        if bins is None:
+            n_bins = None
+        else:
+            # Check that bins can be coerced to an integer.
+            n_bins = int(bins)
 
-            if upper_bound is None:
-                upper_bound = 1.5
+            # Do not allow negative bin numbers
+            if not n_bins > 0:
+                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % bins
+                raise ValueError(message)
 
-            if bins is None:
-                n_bins = 2
-            else:
-                n_bins = int(bins) or 1
+        # Coerce values to a numpy array. Do not copy if already a numpy array.
+        xs = np.array(xs, copy=False)
 
-        elif allow_discrete and self.is_discrete(xs):
-            get_logger().debug('Discrete binning values encountered')
-            unique_xs = np.unique(xs)
+        if self.is_binary(xs) or (allow_discrete and self.is_discrete(xs)):
+            # This covers also the case
+            debug('Discrete binning values encountered')
+            finite_xs = xs[np.isfinite(xs)]
+            unique_xs = np.unique(finite_xs)
 
             # Crop the unique values between the lower and upper bound
             if lower_bound is None:
@@ -229,7 +361,7 @@ class ValidationPlot(object):
             else:
                 unique_xs = unique_xs[unique_xs <= upper_bound]
 
-            if bins is None:
+            if n_bins is None or n_bins >= len(unique_xs):
                 # Construct a float array forwardable to root.
                 bin_edges = array.array('d', unique_xs)
                 format_bin_label = self.format_bin_label
@@ -238,94 +370,25 @@ class ValidationPlot(object):
                 return bin_edges, bin_labels
 
             else:
-                n_bins = int(bins)
-                # Do not allow negative bin numbers
-                if not n_bins > 0:
-                    message = 'bins=%s which is not a number greater than 0.' \
-                        % bins
-                    raise ValueError(message)
+                # Ambiguous case what to do in case of a number of requested bins
+                # that is lower than the number of unique values?
 
-            get_logger().debug('Lower bound %s', lower_bound)
-            get_logger().debug('Upper bound %s', upper_bound)
-            get_logger().debug('N bins %s', n_bins)
+                # Continue with an equistant binning for now.
+                pass
+
+            debug('Lower bound %s', lower_bound)
+            debug('Upper bound %s', upper_bound)
+            debug('N bins %s', n_bins)
 
         else:
-            finite_xs = xs[np.isfinite(xs)]
-            if outlier_z_score is not None and (lower_bound is None
-                                                or upper_bound is None):
-                # Prepare for the estimation of outliers
-                x_mean = truncated_mean(finite_xs)
-                x_std = trimmed_std(finite_xs)
-                exceptional_xs = self.get_exceptional_values(finite_xs)
-                if len(exceptional_xs):
-                    lower_exceptional_x = np.min(exceptional_xs)
-                    upper_exceptional_x = np.max(exceptional_xs)
-                else:
-                    lower_exceptional_x = np.nan
-                    upper_exceptional_x = np.nan
+            bin_range = self.determine_bin_range(xs,
+                                                 n_bins=n_bins,
+                                                 lower_bound=lower_bound,
+                                                 upper_bound=upper_bound,
+                                                 outlier_z_score=outlier_z_score,
+                                                 include_exceptionals=include_exceptionals)
 
-            if lower_bound is None:
-                lower_bound = np.min(finite_xs)
-                # Clip the lower bound by outliers that exceed the given z score
-                if outlier_z_score is not None:
-                    # The lower bound at which outliers exceed the given z score
-                    lower_outlier_bound = x_mean - outlier_z_score * x_std
-                    # Clip the lower bound such that it concides with an actual value,
-                    # which prevents empty bins from being produced
-                    indices_above_lower_outlier_bound = finite_xs \
-                        >= lower_outlier_bound
-                    if np.any(indices_above_lower_outlier_bound):
-                        lower_bound = \
-                            np.min(finite_xs[indices_above_lower_outlier_bound])
-
-                        # However we want to include at least the exceptional values in out view
-                        lower_bound = np.nanmin([lower_bound, lower_exceptional_x])
-
-                    else:
-                        lower_bound = np.min(finite_xs)
-
-                    get_logger().debug('Lower bound %s', lower_bound)
-                    get_logger().debug('Lower outlier bound %s',
-                                       lower_outlier_bound)
-
-            if upper_bound is None:
-                if outlier_z_score is None:
-                    upper_bound = np.max(finite_xs)
-                else:
-                    # The upper bound at which outliers exceed the given z score
-                    upper_outlier_bound = x_mean + outlier_z_score * x_std
-                    # Clip the upper bound such that it concides with an actual value,
-                    # which prevents empty bins from being produced
-                    indices_below_upper_outlier_bound = finite_xs \
-                        <= upper_outlier_bound
-                    if np.any(indices_below_upper_outlier_bound):
-                        upper_bound = \
-                            np.max(finite_xs[indices_below_upper_outlier_bound])
-
-                        # However we want to include at least the exceptional values in out view
-                        upper_bound = np.nanmax([upper_bound, upper_exceptional_x])
-
-                    else:
-                        upper_bound = np.max(finite_xs)
-
-                    get_logger().debug('Upper bound %s', upper_bound)
-                    get_logger().debug('Upper outlier bound %s',
-                                       upper_outlier_bound)
-
-            if bins is None:
-                # Assume number of bins according to the rice rule.
-                # The number of data points should not include outliers.
-                n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
-                rice_n_bins = int(rice_n_bin(n_data))
-                n_bins = rice_n_bins
-            else:
-
-                n_bins = int(bins)
-                # Do not allow negative bin numbers
-                if not n_bins > 0:
-                    message = 'bins=%s which is not a number greater than 0.' \
-                        % bins
-                    raise ValueError(message)
+            n_bins, lower_bound, upper_bound = bin_range
 
         n_bin_edges = n_bins + 1
         if lower_bound != upper_bound:
@@ -337,8 +400,8 @@ class ValidationPlot(object):
             # Also expand the upper bound by an epsilon
             # to prevent the highest value in xs from going in the overflow bin
             bin_edges[0] = lower_bound
-            bin_edges[-1] = np.nextafter(upper_bound, np.inf)
-            get_logger().debug('Bins %s', bin_edges)
+            bin_edges[-1] = upper_bound
+            debug('Bins %s', bin_edges)
 
         else:
             # Fall back if the array contains only one value
@@ -346,7 +409,7 @@ class ValidationPlot(object):
 
         # Construct a float array forwardable to root.
         bin_edges = array.array('d', bin_edges)
-        get_logger().debug('Bins %s', bin_edges)
+        debug('Bins %s', bin_edges)
         return bin_edges, None
 
     def fill(self,
@@ -368,6 +431,7 @@ class ValidationPlot(object):
              lower_bound=None,
              upper_bound=None,
              outlier_z_score=None,
+             include_exceptionals=True,
              allow_discrete=False):
 
         name = self.name
@@ -382,6 +446,7 @@ class ValidationPlot(object):
                                                          lower_bound=lower_bound,
                                                          upper_bound=upper_bound,
                                                          outlier_z_score=outlier_z_score,
+                                                         include_exceptionals=include_exceptionals,
                                                          allow_discrete=allow_discrete)
 
         n_bins = len(bin_edges) - 1
@@ -425,6 +490,7 @@ class ValidationPlot(object):
                 lower_bound=None,
                 upper_bound=None,
                 outlier_z_score=None,
+                include_exceptionals=True,
                 allow_discrete=False):
 
         name = self.name
@@ -440,6 +506,7 @@ class ValidationPlot(object):
                                                          lower_bound=lower_bound,
                                                          upper_bound=upper_bound,
                                                          outlier_z_score=outlier_z_score,
+                                                         include_exceptionals=include_exceptionals,
                                                          allow_discrete=allow_discrete)
 
         # Use determine bins to find the lower and upper bound with correct handling of nan and inf
@@ -489,7 +556,8 @@ class ValidationPlot(object):
                 lower_bound=(None, None),
                 upper_bound=(None, None),
                 outlier_z_score=(None, None),
-                allow_discrete=False):
+                include_exceptionals=(True, True),
+                allow_discrete=(False, False)):
 
         name = self.name
 
@@ -521,19 +589,35 @@ class ValidationPlot(object):
             x_outlier_z_score = outlier_z_score
             y_outlier_z_score = outlier_z_score
 
+        try:
+            if len(include_exceptionals) == 2:
+                (x_include_exceptionals, y_include_exceptionals) = include_exceptionals
+        except TypeError:
+            x_include_exceptionals = include_exceptionals
+            y_include_exceptionals = include_exceptionals
+
+        try:
+            if len(allow_discrete) == 2:
+                (x_allow_discrete, y_allow_discrete) = allow_discrete
+        except TypeError:
+            x_allow_discrete = allow_discrete
+            y_allow_discrete = allow_discrete
+
         x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
                                                              bins=x_bins,
                                                              lower_bound=x_lower_bound,
                                                              upper_bound=x_upper_bound,
                                                              outlier_z_score=x_outlier_z_score,
-                                                             allow_discrete=allow_discrete)
+                                                             include_exceptionals=x_include_exceptionals,
+                                                             allow_discrete=x_allow_discrete)
 
         y_bin_edges, y_bin_labels = self.determine_bin_edges(ys,
                                                              bins=y_bins,
                                                              lower_bound=y_lower_bound,
                                                              upper_bound=y_upper_bound,
                                                              outlier_z_score=y_outlier_z_score,
-                                                             allow_discrete=allow_discrete)
+                                                             include_exceptionals=y_include_exceptionals,
+                                                             allow_discrete=y_allow_discrete)
 
         n_x_bins = len(x_bin_edges) - 1
         n_y_bins = len(y_bin_edges) - 1
@@ -834,7 +918,7 @@ class ValidationPlot(object):
             raise RuntimeError('Validation plot must be filled before it can be fitted.'
                                )
 
-        if isinstance(histogram, ROOT.TH2F):
+        if not isinstance(histogram, ROOT.TH1D):
             raise RuntimeError('Fitting is currently implemented / tested for one dimensional validation plots.'
                                )
 

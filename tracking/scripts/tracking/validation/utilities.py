@@ -1,7 +1,10 @@
+import basf2  # Import basf2 to make the Belle2 namespace available
 import ROOT
 from ROOT import Belle2
+
 import numpy as np
 import math
+import contextlib
 
 # Vectorised version of the error function for numpy arrays
 try:
@@ -30,6 +33,49 @@ except ImportError:
     # Minimal workaround that only relies on numpy and python 2.7
     # prob as a vectorized function
     prop = np.frompyfunc(ROOT.TMath.Prob, 2, 1)
+
+
+@contextlib.contextmanager
+def root_cd(tdirectory):
+    """Context manager that temporarily switches the current global ROOT directory while in the context.
+
+    If a string as the name of a directory is given as the argument
+    try to switch to the directory with that name in the current ROOT folder.
+
+    If it is not present create it.
+
+    Parameters
+    ----------
+    tdirectory : ROOT.TDirectory or str
+        ROOT directory to switch to or name of a folder to switch.
+
+    Returns
+    -------
+    ROOT.TDirectory
+        The new current ROOT directory.
+    """
+
+    # Do not use ROOT.gDirectory here.
+    # Since ROOT.gDirectory gets transported as a reference it changes on a call to cd() as well,
+    # and can therefore not serve to save the former directory.
+    save_tdirectory = ROOT.gROOT.CurrentDirectory()
+
+    if isinstance(tdirectory, basestring):
+        tdirectory_name = tdirectory
+        tdirectory = save_tdirectory.mkdir(tdirectory_name, tdirectory_name)
+        if not tdirectory:
+            # Creation failed, check if the folder exists
+            tdirectory = save_tdirectory.GetDirectory(tdirectory_name)
+            if not tdirectory:
+                raise RuntimeError("Could not create or find folder %s" % tdirectory_name)
+
+    try:
+        if tdirectory is not None:
+            tdirectory.cd()
+        yield tdirectory
+
+    finally:
+        save_tdirectory.cd()
 
 
 def is_primary(mc_particle):

@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tracking.validation.plot import ValidationPlot, compose_axis_label, \
-    root_save_name
+from tracking.validation.plot import ValidationPlot, compose_axis_label
 
 # get error function as a np.ufunc vectorised for numpy array
-from tracking.validation.utilities import erf
+from tracking.validation.utilities import erf, root_save_name
 
 import math
 import collections
@@ -20,25 +19,24 @@ class PullAnalysis:
         quantity_name,
         unit=None,
         outlier_z_score=5.0,
+        absolute=False,
+        contact='',
         plot_name_prefix='',
         plot_name_postfix='',
         plot_title_postfix='',
-        ):
+    ):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
         self.quantity_name = quantity_name
         self.unit = unit
         self.outlier_z_score = outlier_z_score
+        self.absolute = absolute
 
-        deletechars = r"/$\#"
-        save_quantity_name = quantity_name.replace(' ', '_').translate(None,
-                deletechars)
-        self.plot_name_prefix = plot_name_prefix \
-            or root_save_name(quantity_name)
+        self.plot_name_prefix = plot_name_prefix or root_save_name(quantity_name)
         self.plot_name_postfix = plot_name_postfix
         self.plot_title_postfix = plot_title_postfix
 
-        self._contact = ''
+        self._contact = contact
         self.plots = collections.OrderedDict()
 
     def analyse(
@@ -46,7 +44,7 @@ class PullAnalysis:
         truths,
         estimates,
         variances=None,
-        ):
+    ):
         """Compares the concrete estimate to the truth and generates plots of the estimates, residuals, pulls and p-values.
         Close indicates if the figure shall be closed after they are saved."""
 
@@ -58,6 +56,22 @@ class PullAnalysis:
 
         plot_name_prefix = self.plot_name_prefix
         outlier_z_score = self.outlier_z_score
+
+        absolute = self.absolute
+        # Compare only the absolute value by taking the absolute of hte curvature truth
+        # and flip the sign of the estimate
+        if absolute:
+            absolute_truths = truths.copy()
+            absolute_estimates = estimates.copy()
+
+            flip_sign_for = truths < 0
+            absolute_truths[flip_sign_for] = -truths[flip_sign_for]
+            absolute_estimates[flip_sign_for] = -estimates[flip_sign_for]
+
+            truths = absolute_truths
+            estimates = absolute_estimates
+
+            quantity_name = 'absolute ' + quantity_name
 
         residuals = estimates - truths
 
@@ -71,11 +85,11 @@ class PullAnalysis:
 
         # Distribution of truths
         truths_hist = ValidationPlot('%s_truths%s' % (plot_name_prefix,
-                                     self.plot_name_postfix))
+                                                      self.plot_name_postfix))
         truths_hist.hist(truths, outlier_z_score=outlier_z_score)
         truths_hist.xlabel = axis_label
         truths_hist.title = 'True distribution of %s%s' % (quantity_name,
-                self.plot_title_postfix)
+                                                           self.plot_title_postfix)
 
         self.plots['truths'] = truths_hist
 
@@ -84,7 +98,7 @@ class PullAnalysis:
 
         # Distribution of estimates
         estimates_hist = ValidationPlot('%s_estimates%s' % (plot_name_prefix,
-                self.plot_name_postfix))
+                                                            self.plot_name_postfix))
         estimates_hist.hist(estimates, outlier_z_score=outlier_z_score)
         estimates_hist.xlabel = axis_label
         estimates_hist.title = 'Distribution of %s estimates%s' \
@@ -97,9 +111,9 @@ class PullAnalysis:
 
         # Estimates versus truths scatter plot
         estimates_by_truths_scatter = ValidationPlot('%s_diag_scatter%s'
-                % (plot_name_prefix, self.plot_name_postfix))
+                                                     % (plot_name_prefix, self.plot_name_postfix))
         estimates_by_truths_scatter.scatter(truths, estimates,
-                outlier_z_score=outlier_z_score)
+                                            outlier_z_score=outlier_z_score)
         estimates_by_truths_scatter.xlabel = 'True ' + axis_label
         estimates_by_truths_scatter.ylabel = 'Estimated ' + axis_label
         estimates_by_truths_scatter.title = 'Diagonal %s scatter plot%s' \
@@ -109,9 +123,9 @@ class PullAnalysis:
 
         # Estimates versus truths profile plot
         estimates_by_truths_profile = ValidationPlot('%s_diag_profile%s'
-                % (plot_name_prefix, self.plot_name_postfix))
+                                                     % (plot_name_prefix, self.plot_name_postfix))
         estimates_by_truths_profile.profile(truths, estimates,
-                outlier_z_score=outlier_z_score)
+                                            outlier_z_score=outlier_z_score)
         estimates_by_truths_profile.xlabel = 'True ' + axis_label
         estimates_by_truths_profile.ylabel = 'Estimated ' + axis_label
         estimates_by_truths_profile.title = 'Diagonal %s profile plot%s' \
@@ -126,7 +140,7 @@ class PullAnalysis:
 
         # Distribution of the residuals
         residuals_hist = ValidationPlot('%s_residuals%s' % (plot_name_prefix,
-                self.plot_name_postfix))
+                                                            self.plot_name_postfix))
         residuals_hist.hist(residuals, outlier_z_score=outlier_z_score)
         residuals_hist.xlabel = axis_label
         residuals_hist.title = 'Distribution of %s residuals%s' \
@@ -140,7 +154,7 @@ class PullAnalysis:
 
             # Distribution of sigmas
             sigmas_hist = ValidationPlot('%s_sigmas%s' % (plot_name_prefix,
-                    self.plot_name_postfix))
+                                                          self.plot_name_postfix))
             sigmas_hist.hist(sigmas, lower_bound=0,
                              outlier_z_score=outlier_z_score)
             sigmas_hist.xlabel = axis_label
@@ -155,10 +169,10 @@ class PullAnalysis:
 
             # Distribution of pulls
             pulls_hist = ValidationPlot('%s_pulls%s' % (plot_name_prefix,
-                    self.plot_name_postfix))
+                                                        self.plot_name_postfix))
             pulls_hist.xlabel = axis_label
             pulls_hist.title = 'Distribution of %s pulls%s' % (quantity_name,
-                    self.plot_title_postfix)
+                                                               self.plot_title_postfix)
             pulls_hist.hist(pulls, outlier_z_score=outlier_z_score)
 
             pulls_hist.fit_gaus()
@@ -171,7 +185,7 @@ class PullAnalysis:
 
             # Distribution of p_values
             p_values_hist = ValidationPlot('%s_p_values%s'
-                    % (plot_name_prefix, self.plot_name_postfix))
+                                           % (plot_name_prefix, self.plot_name_postfix))
             p_values_hist.hist(p_values, lower_bound=0, upper_bound=1)
             p_values_hist.xlabel = axis_label
             p_values_hist.title = 'Distribution of %s p-values%s' \
@@ -198,5 +212,3 @@ class PullAnalysis:
         # Write all validation plot to the given Root directory
         for validation_plot in self.plots.values():
             validation_plot.write(tDirectory)
-
-

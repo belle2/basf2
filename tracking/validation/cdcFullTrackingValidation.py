@@ -23,6 +23,7 @@ from tracking.validation.run import TrackingValidationRun
 
 class CDCFull(TrackingValidationRun):
     n_events = N_EVENTS
+    generator_module = 'EvtGenInput'
     finder_module = 'CDCFullFinder'
     fit_geometry = None
     pulls = True

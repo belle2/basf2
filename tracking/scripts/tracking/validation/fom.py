@@ -4,6 +4,8 @@
 import collections
 import ROOT
 
+from tracking.validation.utilities import root_cd
+
 
 class ValidationFiguresOfMerit(collections.MutableMapping):
 
@@ -13,12 +15,14 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         description='',
         check='',
         contact='',
-        ):
+        title='',
+    ):
 
         self.name = name
         self.description = description
         self.check = check
         self.contact = contact
+        self.title = title
 
         self.figures_by_name = {}
 
@@ -28,7 +32,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         return '\n'.join('%s : %s' % (key, value) for (key, value) in
                          self.figures_by_name.items())
 
-    def write(self):
+    def write(self, tdirectory=None):
         """Writes the figures of merit as a TNtuple to the currently open TFile in the format complient with the validation frame work."""
 
         name = self.name
@@ -36,7 +40,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         values = list(self.figures_by_name.values())
 
         leaf_specification = ':'.join(figure_names)
-        title = ''
+        title = self.title or ""
         ntuple = ROOT.TNtuple(name, title, leaf_specification)
         ntuple.Fill(*values)
 
@@ -44,7 +48,8 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         ntuple.SetAlias('Check', self.check)
         ntuple.SetAlias('Contact', self.contact)
 
-        ntuple.Write()
+        with root_cd(tdirectory):
+            ntuple.Write()
 
     def __setitem__(self, figure_name, value):
         """Braketed item assignement for figures of merit"""
@@ -77,7 +82,7 @@ class ValidationManyFiguresOfMerit(ValidationFiguresOfMerit):
     def __str__(self):
         return 'Not supported.'
 
-    def write(self):
+    def write(self, tdirectory=None):
         """Writes the figures of merit as a TNtuple to the currently open TFile in the format complient with the validation frame work."""
 
         name = self.name
@@ -85,7 +90,7 @@ class ValidationManyFiguresOfMerit(ValidationFiguresOfMerit):
         values = list(self.figures_by_name.values())
 
         leaf_specification = ':'.join(figure_names)
-        title = ''
+        title = self.title or ""
         ntuple = ROOT.TNtuple(name, title, leaf_specification)
 
         for value in zip(*values):
@@ -95,6 +100,5 @@ class ValidationManyFiguresOfMerit(ValidationFiguresOfMerit):
         ntuple.SetAlias('Check', self.check)
         ntuple.SetAlias('Contact', self.contact)
 
-        ntuple.Write()
-
-
+        with root_cd(tdirectory):
+            ntuple.Write()

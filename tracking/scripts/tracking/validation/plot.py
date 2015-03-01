@@ -695,16 +695,28 @@ class ValidationPlot(object):
 
             # Crop the unique values between the lower and upper bound
             if lower_bound is None:
-                lower_bound = np.min(unique_xs)
+                if len(unique_xs) == 0:
+                    if upper_bound is None:
+                        lower_bound = 0
+                    else:
+                        lower_bound = upper_bound - 1
+                else:
+                    lower_bound = np.min(unique_xs)
             else:
                 unique_xs = unique_xs[unique_xs >= lower_bound]
 
             if upper_bound is None:
-                upper_bound = np.min(unique_xs)
+                if len(unique_xs) == 0:
+                    upper_bound = lower_bound + 1
+                else:
+                    upper_bound = np.min(unique_xs)
             else:
                 unique_xs = unique_xs[unique_xs <= upper_bound]
 
-            if n_bins is None or n_bins >= len(unique_xs):
+            if n_bins is None:
+                n_bins = len(unique_xs) or 1
+
+            if len(unique_xs) > 0 and n_bins >= len(unique_xs):
                 # Construct a float array forwardable to root.
                 bin_edges = array.array('d', unique_xs)
                 format_bin_label = self.format_bin_label

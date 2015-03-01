@@ -66,6 +66,27 @@ def truncated_mean(array_like, r=0.23):
     return np.mean(truncated_array)
 
 
+def cubic_root(x):
+    return pow(float(x), 1.0 / 3.0)
+
+
+def rice_n_bin(n_data):
+    return np.ceil(2.0 * cubic_root(n_data))
+
+
+def rice_exceptional_values(xs):
+    unique_xs, indices = np.unique(xs, return_inverse=True)
+    # Note: The indices are such that unique_xs[indices] == xs
+
+    unique_xs_count = np.bincount(indices)
+
+    n_data = len(xs)
+    n_exceptional = 1.0 * n_data / rice_n_bin(n_data)
+
+    excpetional_indices = unique_xs_count > n_exceptional
+    return unique_xs[excpetional_indices]
+
+
 units_by_quantity_name = {
     'pt': 'GeV',
     'p_{t}': 'GeV',
@@ -143,6 +164,10 @@ class ValidationPlot(object):
             return True
 
     @staticmethod
+    def get_exceptional_values(xs):
+        return rice_exceptional_values(xs)
+
+    @staticmethod
     def format_bin_label(value):
         if np.isfinite(value) and value == np.round(value):
             return str(int(value))
@@ -171,7 +196,7 @@ class ValidationPlot(object):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins
-            bin_edges = array.array('f', bin_edges)
+            bin_edges = array.array('d', bin_edges)
             bin_labels = None
             return bin_edges, bin_labels
 
@@ -206,7 +231,7 @@ class ValidationPlot(object):
 
             if bins is None:
                 # Construct a float array forwardable to root.
-                bin_edges = array.array('f', unique_xs)
+                bin_edges = array.array('d', unique_xs)
                 format_bin_label = self.format_bin_label
                 bin_labels = [format_bin_label(value) for value in bin_edges]
                 bin_edges.append(bin_edges[-1] + 1)
@@ -231,6 +256,13 @@ class ValidationPlot(object):
                 # Prepare for the estimation of outliers
                 x_mean = truncated_mean(finite_xs)
                 x_std = trimmed_std(finite_xs)
+                exceptional_xs = self.get_exceptional_values(finite_xs)
+                if len(exceptional_xs):
+                    lower_exceptional_x = np.min(exceptional_xs)
+                    upper_exceptional_x = np.max(exceptional_xs)
+                else:
+                    lower_exceptional_x = np.nan
+                    upper_exceptional_x = np.nan
 
             if lower_bound is None:
                 lower_bound = np.min(finite_xs)
@@ -245,6 +277,10 @@ class ValidationPlot(object):
                     if np.any(indices_above_lower_outlier_bound):
                         lower_bound = \
                             np.min(finite_xs[indices_above_lower_outlier_bound])
+
+                        # However we want to include at least the exceptional values in out view
+                        lower_bound = np.nanmin([lower_bound, lower_exceptional_x])
+
                     else:
                         lower_bound = np.min(finite_xs)
 
@@ -265,6 +301,10 @@ class ValidationPlot(object):
                     if np.any(indices_below_upper_outlier_bound):
                         upper_bound = \
                             np.max(finite_xs[indices_below_upper_outlier_bound])
+
+                        # However we want to include at least the exceptional values in out view
+                        upper_bound = np.nanmax([upper_bound, upper_exceptional_x])
+
                     else:
                         upper_bound = np.max(finite_xs)
 
@@ -272,16 +312,11 @@ class ValidationPlot(object):
                     get_logger().debug('Upper outlier bound %s',
                                        upper_outlier_bound)
 
-                # Correct the upper bound such that all values are strictly smaller than the upper bound
-                # Make one step in single precision in the positive direction
-                next_upper_bound = np.nextafter(np.single(upper_bound), np.inf)
-                upper_bound = next_upper_bound
-
             if bins is None:
                 # Assume number of bins according to the rice rule.
                 # The number of data points should not include outliers.
                 n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
-                rice_n_bins = int(np.ceil(2.0 * pow(n_data, 1.0 / 3.0)))
+                rice_n_bins = int(rice_n_bin(n_data))
                 n_bins = rice_n_bins
             else:
 
@@ -294,19 +329,23 @@ class ValidationPlot(object):
 
         n_bin_edges = n_bins + 1
         if lower_bound != upper_bound:
+            # Correct the upper bound such that all values are strictly smaller than the upper bound
+            # Make one step in single precision in the positive direction
             bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
 
             # Reinforce the upper and lower bound to be exact
+            # Also expand the upper bound by an epsilon
+            # to prevent the highest value in xs from going in the overflow bin
             bin_edges[0] = lower_bound
-            bin_edges[-1] = upper_bound
+            bin_edges[-1] = np.nextafter(upper_bound, np.inf)
             get_logger().debug('Bins %s', bin_edges)
-        else:
 
+        else:
             # Fall back if the array contains only one value
             bin_edges = [lower_bound, upper_bound + 1]
 
         # Construct a float array forwardable to root.
-        bin_edges = array.array('f', bin_edges)
+        bin_edges = array.array('d', bin_edges)
         get_logger().debug('Bins %s', bin_edges)
         return bin_edges, None
 
@@ -346,7 +385,7 @@ class ValidationPlot(object):
                                                          allow_discrete=allow_discrete)
 
         n_bins = len(bin_edges) - 1
-        histogram = ROOT.TH1F(name, '', n_bins, bin_edges)
+        histogram = ROOT.TH1D(name, '', n_bins, bin_edges)
         self.histogram = histogram
 
         if bin_labels:
@@ -366,7 +405,7 @@ class ValidationPlot(object):
 
         # Adjust the discrete bins after the filling to be equidistant
         if bin_labels:
-            bin_edges = array.array("f", range(len(bin_labels) + 1))
+            bin_edges = array.array("d", range(len(bin_labels) + 1))
             x_taxis.Set(n_bins, bin_edges)
 
         # Count the nan and inf values in x
@@ -427,7 +466,7 @@ class ValidationPlot(object):
 
         # Adjust the discrete bins after the filling to be equidistant
         if bin_labels:
-            bin_edges = array.array("f", range(len(bin_labels) + 1))
+            bin_edges = array.array("d", range(len(bin_labels) + 1))
             x_taxis.Set(n_bins, bin_edges)
 
         # Count the nan and inf values in x
@@ -498,7 +537,7 @@ class ValidationPlot(object):
 
         n_x_bins = len(x_bin_edges) - 1
         n_y_bins = len(y_bin_edges) - 1
-        histogram = ROOT.TH2F(name,
+        histogram = ROOT.TH2D(name,
                               '',
                               n_x_bins,
                               x_bin_edges,
@@ -529,12 +568,12 @@ class ValidationPlot(object):
 
         # Adjust the discrete bins after the filling to be equidistant
         if x_bin_labels:
-            x_bin_edges = array.array("f", range(len(x_bin_labels) + 1))
+            x_bin_edges = array.array("d", range(len(x_bin_labels) + 1))
             x_taxis.Set(n_x_bins, x_bin_edges)
 
         # Adjust the discrete bins after the filling to be equidistant
         if y_bin_labels:
-            y_bin_edges = array.array("f", range(len(y_bin_labels) + 1))
+            y_bin_edges = array.array("d", range(len(y_bin_labels) + 1))
             y_taxis.Set(n_y_bins, y_bin_edges)
 
         # Count the nan and inf values in x

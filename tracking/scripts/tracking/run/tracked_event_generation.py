@@ -8,6 +8,7 @@ import basf2
 from tracking.run.event_generation import ReadOrGenerateEventsRun
 from tracking.modules import StandardTrackingReconstructionModule, \
     BrowseFileOnTerminateModule
+import tracking.modules
 
 import tracking.utilities as utilities
 
@@ -16,7 +17,7 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-class GenerateTrackedEventsRun(ReadOrGenerateEventsRun):
+class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     finder_module = None
     tracking_coverage = {'UsePXDHits': True, 'UseSVDHits': True,
                          'UseCDCHits': True}
@@ -24,7 +25,7 @@ class GenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     trackCandidatesColumnName = 'TrackCands'
 
     def create_argument_parser(self, **kwds):
-        argument_parser = super(GenerateTrackedEventsRun, self).create_argument_parser(**kwds)
+        argument_parser = super(ReadOrGenerateTrackedEventsRun, self).create_argument_parser(**kwds)
 
         # Indication if tracks should be fitted with which geomety
         # Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
@@ -38,6 +39,7 @@ class GenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                                                 'TrackFinderCDCLegendre',
                                                 'CDCLegendreTracking',
                                                 'CDCLocalTracking',
+                                                'CDCFullFinder',
                                                 ]),
             default=self.finder_module,
             dest='finder_module',
@@ -55,7 +57,7 @@ class GenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
     def determine_tracking_coverage(self, finder_module_or_name):
         finder_module_name = self.get_basf2_module_name(finder_module_or_name)
-        if finder_module_name == 'CDCLocalTracking' or finder_module_name == 'CDCLegendreTracking' or finder_module_name.startswith('TrackFinderCDC'):
+        if finder_module_name in ('CDCLocalTracking', 'CDCLegendreTracking', 'CDCFullFinder') or finder_module_name.startswith('TrackFinderCDC'):
             return {'UsePXDHits': False, 'UseSVDHits': False,
                     'UseCDCHits': True}
         elif finder_module_name == 'VXDTF':
@@ -75,7 +77,7 @@ class GenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        main_path = super(GenerateTrackedEventsRun, self).create_path()
+        main_path = super(ReadOrGenerateTrackedEventsRun, self).create_path()
 
         if self.finder_module is not None:
             # Setup track finder
@@ -84,6 +86,10 @@ class GenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
             if self.finder_module == 'StandardReco':
                 trackFinderModule = StandardTrackingReconstructionModule(components=self.components)
+                main_path.add_module(trackFinderModule)
+
+            elif self.finder_module == "CDCFullFinder":
+                trackFinderModule = tracking.modules.CDCFullFinder()
                 main_path.add_module(trackFinderModule)
 
             else:
@@ -125,7 +131,7 @@ class GenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         return main_path
 
 
-class StandardReconstructionEventsRun(GenerateTrackedEventsRun):
+class StandardReconstructionEventsRun(ReadOrGenerateTrackedEventsRun):
     finder_module = 'StandardReco'
 
 

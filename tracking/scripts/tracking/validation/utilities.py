@@ -79,6 +79,14 @@ def root_cd(tdirectory):
         save_tdirectory.cd()
 
 
+def root_save_name(name):
+    """Strips all meta characters that might be unsafe to use as a ROOT name"""
+
+    deletechars = r"/$\#{}()"
+    name = name.replace(' ', '_').replace('-', '_').translate(None, deletechars)
+    return name
+
+
 def coroutine(func):
     @functools.wraps(func)
     def start(*args, **kwargs):
@@ -108,3 +116,39 @@ def is_stable_in_generator(mc_particle):
         MCParticle to be checked"""
 
     return mc_particle.hasStatus(Belle2.MCParticle.c_StableInGenerator)
+
+
+def getHelixFromMCParticle(mcParticle):
+    position = mcParticle.getVertex()
+    momentum = mcParticle.getMomentum()
+    charge_sign = (-1 if mcParticle.getCharge() < 0 else 1)
+    b_field = 1.5
+
+    seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
+    return seed_helix
+
+
+def getSeedTrackFitResult(trackCand):
+    position = trackCand.getPosSeed()
+    momentum = trackCand.getMomSeed()
+    cartesian_covariance = trackCand.getCovSeed()
+    charge_sign = (-1 if trackCand.getChargeSeed() < 0 else 1)
+    particle_type = Belle2.Const.ParticleType(trackCand.getPdgCode())
+    p_value = float('nan')
+    b_field = 1.5
+    cdc_hit_pattern = 0
+    svd_hit_pattern = 0
+
+    track_fit_result = Belle2.TrackFitResult(
+        position,
+        momentum,
+        cartesian_covariance,
+        charge_sign,
+        particle_type,
+        p_value,
+        b_field,
+        cdc_hit_pattern,
+        svd_hit_pattern,
+    )
+
+    return track_fit_result

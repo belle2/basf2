@@ -4,7 +4,7 @@
 import collections
 import ROOT
 
-from tracking.validation.utilities import root_cd
+from tracking.validation.utilities import root_cd, root_save_name
 
 
 class ValidationFiguresOfMerit(collections.MutableMapping):
@@ -18,7 +18,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         title='',
     ):
 
-        self.name = name
+        self.name = root_save_name(name)
         self.description = description
         self.check = check
         self.contact = contact
@@ -36,7 +36,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         """Writes the figures of merit as a TNtuple to the currently open TFile in the format complient with the validation frame work."""
 
         name = self.name
-        figure_names = list(self.figures_by_name.keys())
+        figure_names = [root_save_name(key) for key in self.figures_by_name.keys()]
         values = list(self.figures_by_name.values())
 
         leaf_specification = ':'.join(figure_names)
@@ -86,7 +86,7 @@ class ValidationManyFiguresOfMerit(ValidationFiguresOfMerit):
         """Writes the figures of merit as a TNtuple to the currently open TFile in the format complient with the validation frame work."""
 
         name = self.name
-        figure_names = list(self.figures_by_name.keys())
+        figure_names = [root_save_name(key) for key in self.figures_by_name.keys()]
         values = list(self.figures_by_name.values())
 
         leaf_specification = ':'.join(figure_names)

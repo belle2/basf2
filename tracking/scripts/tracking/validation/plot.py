@@ -15,8 +15,7 @@ import logging
 def get_logger():
     return logging.getLogger(__name__)
 
-
-unique_count_for_discrete = 20
+default_max_n_unique_for_discrete = 20
 
 
 def iqr(array_like):
@@ -153,14 +152,14 @@ class ValidationPlot(object):
         return is_boolean or is_one_or_zero
 
     @staticmethod
-    def is_discrete(xs):
+    def is_discrete(xs, max_n_unique=default_max_n_unique_for_discrete):
         all_integer = np.all(xs == np.round(xs))
         if all_integer:
             return True
 
         # FIXME: improve test for discrete variable
         unique_xs = np.unique(xs)
-        if len(unique_xs) < unique_count_for_discrete:
+        if len(unique_xs) < max_n_unique:
             return True
 
     @staticmethod

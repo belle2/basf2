@@ -81,7 +81,7 @@ class HarvestingModule(basf2.Module):
 
     def __init__(self,
                  foreach,
-                 output_file_name=None,
+                 output_file_name,
                  name=None,
                  title=None,
                  contact=None,
@@ -89,7 +89,12 @@ class HarvestingModule(basf2.Module):
 
         super(HarvestingModule, self).__init__()
         self.foreach = foreach
+
         self.output_file_name = output_file_name
+
+        if not isinstance(self.output_file_name, (ROOT.TFile, basestring)):
+            raise TypeError("output_file_name is allowed to be a string or a ROOT.TFile object")
+
         self.refiners = []
         self.contact = contact
         self.expert_level = self.default_expert_level if expert_level is None else expert_level
@@ -134,6 +139,14 @@ class HarvestingModule(basf2.Module):
         basf2.process(main_path)
 
     def initialize(self):
+        if isinstance(self.output_file_name, basestring) and self.output_file_name.startswith("datastore://"):
+            # Check if the tfile was registered on the datastore before
+            datastore_output_file_name = self.output_file_name[len("datastore://"):]
+            persistent = 1
+            stored_tfile = Belle2.PyStoreObj(datastore_output_file_name, persistent)
+            if not stored_tfile:
+                raise KeyError("No TFile with name %s created on the DataStore." % datastore_output_file_name)
+
         # prepare the barn to receive the harvested crops
         self.stash = self.barn()
 
@@ -227,7 +240,7 @@ class HarvestingModule(basf2.Module):
                         yield crop
                 except TypeError:
                     # Cannot iter the store object. Yield it instead.
-                    yield storeobj.obj()
+                    yield store_obj.obj()
 
             else:
                 raise KeyError("Name %s does not refer to a valid object on the data store" % self.foreach)
@@ -249,9 +262,18 @@ class HarvestingModule(basf2.Module):
             # Save everything to a ROOT file
             if isinstance(self.output_file_name, ROOT.TFile):
                 output_tdirectory = self.output_file_name
+            elif self.output_file_name.startswith("datastore://"):
+                # Check if the tfile was registered on the datastore before
+                datastore_output_file_name = self.output_file_name[len("datastore://"):]
+                persistent = 1
+                stored_tfile = Belle2.PyStoreObj(datastore_output_file_name, persistent)
+                if not stored_tfile:
+                    raise KeyError("No TFile with name %s created on the DataStore." % datastore_output_file_name)
+                output_tdirectory = stored_tfile.obj()
             else:
                 output_tfile = ROOT.TFile(self.output_file_name, 'recreate')
                 output_tdirectory = output_tfile
+
         else:
             output_tdirectory = None
 
@@ -267,9 +289,9 @@ class HarvestingModule(basf2.Module):
                     refiner(crops, tdirectory=output_tdirectory, **kwds)
 
         finally:
-            # If we opened the TFile ourselves, close it again
+            # If we opened the TFile ourself, close it again
             if self.output_file_name:
-                if not isinstance(self.output_file_name, ROOT.TFile):
+                if isinstance(self.output_file_name, basestring) and not self.output_file_name.startswith("datastore://"):
                     output_tfile.Close()
 
 

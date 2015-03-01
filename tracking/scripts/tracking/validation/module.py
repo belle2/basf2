@@ -11,11 +11,70 @@ from tracking.validation.plot import ValidationPlot, root_save_name, \
 from tracking.validation.pull import PullAnalysis
 from tracking.validation.fom import ValidationFiguresOfMerit
 
+from tracking.validation.mc_side_module import ExpertMCSideTrackingValidationModule
+from tracking.validation.pr_side_module import ExpertPRSideTrackingValidationModule
+from tracking.validation.eventwise_module import EventwiseTrackingValidationModule
+from tracking.modules import PathModule
+
 import basf2
+
+import logging
 
 import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
+
+
+class SeparatedTrackingValidationModule(PathModule):
+
+    MCSideModule = ExpertMCSideTrackingValidationModule
+    PRSideModule = ExpertPRSideTrackingValidationModule
+    EventwiseModule = EventwiseTrackingValidationModule
+
+    def __init__(self,
+                 name,
+                 contact,
+                 fit,
+                 output_file_name=None,
+                 trackCandidatesColumnName="TrackCands",
+                 expert_level=None):
+
+        open_tfile_module = basf2.register_module('OpenTFile')
+
+        storeName = "validation_output_tfile"
+
+        open_tfile_module.param(dict(
+            fileName=output_file_name,
+            storeName=storeName,
+            option="RECREATE",
+        ))
+
+        datastore_output_file_name = "datastore://" + storeName
+
+        mc_side_module = self.MCSideModule(name,
+                                           contact,
+                                           output_file_name=datastore_output_file_name,
+                                           trackCandidatesColumnName=trackCandidatesColumnName,
+                                           expert_level=expert_level)
+
+        pr_side_module = self.PRSideModule(name,
+                                           contact,
+                                           output_file_name=datastore_output_file_name,
+                                           fit=fit,
+                                           trackCandidatesColumnName=trackCandidatesColumnName,
+                                           expert_level=expert_level)
+
+        eventwise_module = self.EventwiseModule(name,
+                                                contact,
+                                                output_file_name=datastore_output_file_name,
+                                                trackCandidatesColumnName=trackCandidatesColumnName,
+                                                expert_level=expert_level)
+
+        path = basf2.create_path()
+        for module in [open_tfile_module, mc_side_module, pr_side_module, eventwise_module]:
+            path.add_module(module)
+
+        PathModule.__init__(self, path)
 
 
 # contains all informations necessary for track filters to decide whether
@@ -553,3 +612,23 @@ def getSeedTrackFitResult(trackCand):
     )
 
     return track_fit_result
+
+
+def main():
+    from tracking.run.tracked_event_generation import StandardReconstructionEventsRun
+    standard_reco_run = StandardReconstructionEventsRun()
+    standard_reco_run.configure_from_commandline()
+
+    validation_module = SeparatedTrackingValidationModule(name="test_run",
+                                                          contact="dummy",
+                                                          fit=True,
+                                                          output_file_name="test_separated_module.root",
+                                                          expert_level=0)
+
+    standard_reco_run.add_module(validation_module)
+    standard_reco_run.execute()
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    main()

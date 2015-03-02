@@ -44,27 +44,6 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
     def pick(self, trackCand):
         return True
-        trackMatchLookUp = self.trackMatchLookUp
-
-        trackCands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
-        mcParticles = Belle2.PyStoreArray("MCParticles")
-
-        # fill the FilterProperties will all properties on this track
-        # gathered so far
-        filterProperties = FilterProperties(trackCand=trackCand,
-                                            mcParticle=mcParticle,
-                                            mcParticles=mcParticles)
-
-        if self.fit:
-            prTrackFitResult = trackMatchLookUp.getRelatedTrackFitResult(trackCand)
-            filterProperties.wasFitted = True
-            filterProperties.fitResult = prTrackFitResult
-        else:
-            prTrackFitResult = getSeedTrackFitResult(trackCand)
-            filterProperties.seedResult = prTrackFitResult
-
-        # skip this track due to the filtering rules ?
-        return self.track_filter_object.doesPrPass(filterProperties)
 
     def peel(self, trackCand):
         """Looks at the individual pattern recognition tracks and store information about them"""

@@ -39,7 +39,7 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
         super(EventwiseTrackingValidationModule, self).initialize()
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
-    def pick(self, mcTrackCand):
+    def pick(self, event_meta_data=None):
         return True
 
     def peel(self, event_meta_data=None):

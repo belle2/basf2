@@ -14,7 +14,8 @@ from tracking.validation.fom import ValidationFiguresOfMerit
 from tracking.validation.mc_side_module import ExpertMCSideTrackingValidationModule
 from tracking.validation.pr_side_module import ExpertPRSideTrackingValidationModule
 from tracking.validation.eventwise_module import EventwiseTrackingValidationModule
-from tracking.modules import PathModule
+
+import tracking.metamodules as metamodules
 
 import basf2
 
@@ -25,7 +26,7 @@ ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
 
-class SeparatedTrackingValidationModule(PathModule):
+class SeparatedTrackingValidationModule(metamodules.PathModule):
 
     MCSideModule = ExpertMCSideTrackingValidationModule
     PRSideModule = ExpertPRSideTrackingValidationModule
@@ -70,11 +71,9 @@ class SeparatedTrackingValidationModule(PathModule):
                                                 trackCandidatesColumnName=trackCandidatesColumnName,
                                                 expert_level=expert_level)
 
-        path = basf2.create_path()
-        for module in [open_tfile_module, mc_side_module, pr_side_module, eventwise_module]:
-            path.add_module(module)
+        modules = [open_tfile_module, mc_side_module, pr_side_module, eventwise_module]
 
-        PathModule.__init__(self, path)
+        super(SeparatedTrackingValidationModule, self).__init__(modules=modules)
 
 
 # contains all informations necessary for track filters to decide whether

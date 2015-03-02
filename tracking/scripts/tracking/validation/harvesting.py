@@ -12,15 +12,16 @@ import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 
 from tracking.modules import BrowseFileOnTerminateModule
-from tracking.modules import PyProfilingModule
 from tracking.validation.utilities import root_cd, coroutine
 from tracking.validation.refiners import Refiner
+
+import tracking.metamodules as metamodules
 
 import logging
 
 
 def get_logger():
-    """Getter for the logger instance of thsi file."""
+    """Getter for the logger instance of this file."""
     return logging.getLogger(__name__)
 
 
@@ -218,7 +219,7 @@ class HarvestingModule(basf2.Module):
             main_path.add_module(BrowseFileOnTerminateModule(self.output_file_name))
 
         if pyprofile:
-            main_path.add_module(PyProfilingModule(self))
+            main_path.add_module(metamodules.PyProfilingModule(self))
         else:
             main_path.add_module(self)
 

@@ -208,7 +208,7 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
 
 def main():
     mcSideTrackingValidationModule = ExpertMCSideTrackingValidationModule(name='mc_test', contact='dummy')
-    mcSideTrackingValidationModule.run('tracked_generic100.root')
+    mcSideTrackingValidationModule.run('tracked_generic100.root', pyprofile=True)
 
 
 if __name__ == '__main__':

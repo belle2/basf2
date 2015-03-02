@@ -63,10 +63,12 @@ def root_cd(tdirectory):
 
     if isinstance(tdirectory, basestring):
         tdirectory_name = tdirectory
-        tdirectory = save_tdirectory.mkdir(tdirectory_name, tdirectory_name)
+
+        # Look for the tdirectory with the name
+        # before trying to create it
+        tdirectory = save_tdirectory.GetDirectory(tdirectory_name)
         if not tdirectory:
-            # Creation failed, check if the folder exists
-            tdirectory = save_tdirectory.GetDirectory(tdirectory_name)
+            tdirectory = save_tdirectory.mkdir(tdirectory_name, tdirectory_name)
             if not tdirectory:
                 raise RuntimeError("Could not create or find folder %s" % tdirectory_name)
 

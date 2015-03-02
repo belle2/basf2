@@ -93,7 +93,7 @@ if full:
     particlegun.param('momentumParams', [0.2, 3.0])
 else:
     particlegun.param('momentumParams', [0.9, 0.9])
-particlegun.param('thetaGeneration', 'uniformCosinus')
+particlegun.param('thetaGeneration', 'uniformCos')
 if full:
     particlegun.param('thetaParams', [17, 150])
 else:

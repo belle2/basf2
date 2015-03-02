@@ -21,6 +21,7 @@
 """
 
 from simulation import add_simulation
+from reconstruction import add_reconstruction, add_mc_reconstruction
 from basf2 import *
 import glob
 import os
@@ -29,6 +30,24 @@ import sys
 
 def get_generated_pdg_code():
     return 13
+
+
+def get_simulation_components():
+    return [
+        'MagneticFieldConstant4LimitedRCDC',
+        'BeamPipe',
+        'PXD',
+        'SVD',
+        'CDC',
+        'HeavyMetalShield',
+        'VXDService',
+        'Cryostat',
+        ]
+
+
+def get_reconstruction_components():
+    # Could be different from get_simulation_components, if only testing subdetectors.
+    return get_simulation_components()
 
 
 def get_generated_pt_value(index):
@@ -81,22 +100,8 @@ def get_generated_pt_values():
     return list
 
 
-def run_simulation(path, pt_value, output_filename):
+def run_simulation(path, pt_value, output_filename=''):
     """Add needed modules to the path and set parameters and start it"""
-
-    # components which are used for the simulation and reconstruction
-    # In order to avoid, that tracks came back in the cdc after they have left
-    # TOP is added in the simulation
-    components = [
-        'MagneticFieldConstant4LimitedRCDC',
-        'BeamPipe',
-        'PXD',
-        'SVD',
-        'CDC',
-        'HeavyMetalShield',
-        'VXDService',
-        'Cryostat',
-        ]
 
     # evt meta
     eventinfosetter = register_module('EventInfoSetter')
@@ -143,11 +148,34 @@ def run_simulation(path, pt_value, output_filename):
         print 'Number of used background files (%d): ' % len(background_files)
 
     # add simulation modules to the path
-    add_simulation(path, components, background_files)
+    add_simulation(path, get_simulation_components(), background_files)
 
     # write output root file
-    root_output = register_module('RootOutput')
-    root_output.param('outputFileName', output_filename)
-    path.add_module(root_output)
+    if output_filename != '':
+        root_output = register_module('RootOutput')
+        root_output.param('outputFileName', output_filename)
+        path.add_module(root_output)
+
+
+def run_reconstruction(path, output_file_name, input_file_name=''):
+    if input_file_name != '':
+        root_input = register_module('RootInput')
+        root_input.param('inputFileNames', input_file_name)
+        path.add_module(root_input)
+
+        gearbox = register_module('Gearbox')
+        path.add_module(gearbox)
+
+        geometry = register_module('Geometry')
+        geometry.param('components', get_reconstruction_components())
+        path.add_module(geometry)
+
+    add_reconstruction(path, get_reconstruction_components(), pruneTracks=0)
+    # add_mc_reconstruction(path, get_reconstruction_components(), pruneTracks=0)
+
+    tracking_efficiency = register_module('StandardTrackingPerformance')
+    # tracking_efficiency.logging.log_level = LogLevel.DEBUG
+    tracking_efficiency.param('outputFileName', output_file_name)
+    path.add_module(tracking_efficiency)
 
 

@@ -15,7 +15,11 @@
 
 """
 <header>
-    <input>trackingEfficiency_FinalData.root</input>
+    <input>trackingEfficiency_pt_0.10GeV.root,trackingEfficiency_pt_0.25GeV.root,
+    trackingEfficiency_pt_0.40GeV.root,trackingEfficiency_pt_0.60GeV.root,
+    trackingEfficiency_pt_1.00GeV.root,trackingEfficiency_pt_1.50GeV.root,
+    trackingEfficiency_pt_2.00GeV.root,trackingEfficiency_pt_3.00GeV.root,
+    trackingEfficiency_pt_4.00GeV.root</input>
     <output>TrackingValidation.root</output>
     <contact>michael.ziegler2@kit.edu</contact>
     <description>Create momentum resolution, impact parameter resolution and efficiency plots.</description>
@@ -27,8 +31,8 @@ from __future__ import division
 import ROOT
 
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-from ROOT import TFile, TTree, TH1F, TCanvas, TGraphErrors, TGraph, gStyle, \
-    TNamed, TF1, TProfile
+from ROOT import TFile, TChain, TTree, TH1F, TCanvas, TGraphErrors, TGraph, \
+    gStyle, TNamed, TF1, TProfile
 import sys
 import math
 import numpy as np
@@ -53,7 +57,7 @@ def main():
 
     option_parser = OptionParser()
     option_parser.add_option('-i', '--input-file', dest='input_file',
-                             default='../trackingEfficiency_FinalData.root',
+                             default='../trackingEfficiency_pt_*.root',
                              help='Root file with StandardTrackingPerformance output.'
                              )
     option_parser.add_option('-o', '--output-file', dest='output_file',
@@ -64,17 +68,10 @@ def main():
 
     gStyle.SetOptStat(0)
 
-    # load data file
-    input_file_name = options.input_file
-    print 'Load file %s' % input_file_name
-    input_root_file = TFile(input_file_name, 'read')
-    # raise exception if file could not be opened
-    if input_root_file.IsZombie():
-        raise OSError('File %s could not be opened.' % input_file_name)
-
     # load data tree
     tree_name = 'data'
-    data_tree = input_root_file.Get(tree_name)
+    data_tree = TChain(tree_name)  # input_root_file.Get(tree_name)
+    data_tree.Add(options.input_file)
 
     number_entries = 0
     try:
@@ -94,6 +91,7 @@ def main():
     calculate_efficiency_in_pt(data_tree)
 
     pt_of_interest = [0.05, 0.25, 1.]
+    # pt_of_interest = PT_VALUES
 
     for pt_value in pt_of_interest:
         # create plots of efficiency in bins of cos Theta for different pt
@@ -147,6 +145,7 @@ def main():
         )
 
     # close output file
+    output_root_file.Write()
     output_root_file.Close()
 
 
@@ -175,14 +174,28 @@ def draw_hit_counts(data_tree, pt_values):
         hists[det].GetListOfFunctions().Add(TNamed('Description', description))
         hists[det].GetListOfFunctions().Add(TNamed('Check', check))
 
+    hNweights = TH1F('hNweights', 'number of weights stored', 201, 0, 201)
+    hWeightsProfile = TProfile('hWeightsProfile', 'profile of weights', 201,
+                               0, 201)
+    hWeightsProfile.SetMinimum(0)
+    hWeightsProfile.SetMaximum(1.1)
+    hWeights = TH1F('hWeights', 'DAF weights', 50, 0, 1)
+
     for track in data_tree:
         if not track.pValue == -999:
             hists['PXD'].Fill(track.pt_gen, track.nPXDhits)
             hists['SVD'].Fill(track.pt_gen, track.nSVDhits)
             hists['CDC'].Fill(track.pt_gen, track.nCDChits)
+            hNweights.Fill(track.nWeights)
+            for i in range(track.nWeights):
+                hWeights.Fill(track.weights[i])
+                hWeightsProfile.Fill(i, track.weights[i])
 
     for key in hists:
         hists[key].Write()
+    hNweights.Write()
+    hWeights.Write()
+    hWeightsProfile.Write()
 
 
 def draw_pvalue(data_tree):
@@ -192,8 +205,11 @@ def draw_pvalue(data_tree):
 
     number_entries = data_tree.GetEntries()
     # Normalize number of bins to number of events to keep plots comparable.
-    hist_pvalue = TH1F('hpValue', 'p-Value Distribution',
-                       math.trunc(number_entries / 200), 0., 1.)
+    numBins = math.trunc(number_entries / 200)
+    hist_pvalue = TH1F('hpValue', 'p-Value Distribution', numBins, 0., 1.)
+    # Make axis range independent of first bin contents for more pleasant look
+    hist_pvalue.SetMinimum(0)
+    # hist_pvalue.SetMaximum(number_entries / 50.)
 
     for entry in xrange(number_entries):
         data_tree.GetEntry(entry)

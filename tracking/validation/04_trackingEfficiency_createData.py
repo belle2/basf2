@@ -22,7 +22,7 @@
 """
 
 from basf2 import *
-from tracking.validation.tracking_efficiency_helpers import run_simulation, get_generated_pt_value
+from tracking.validation.tracking_efficiency_helpers import run_simulation, run_reconstruction, get_generated_pt_value
 
 set_random_seed(1234)
 
@@ -34,6 +34,7 @@ print output_filename
 
 path = create_path()
 
-run_simulation(path, pt_value, output_filename)
+run_simulation(path, pt_value)
+run_reconstruction(path, output_filename)
 
 process(path)

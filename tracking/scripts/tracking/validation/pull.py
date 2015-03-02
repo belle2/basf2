@@ -12,13 +12,14 @@ import collections
 import numpy as np
 
 
-class PullAnalysis:
+class PullAnalysis(object):
+    default_outlier_z_score = 5.0
 
     def __init__(
         self,
         quantity_name,
         unit=None,
-        outlier_z_score=5.0,
+        outlier_z_score=None,
         absolute=False,
         contact='',
         plot_name_prefix='',
@@ -29,7 +30,12 @@ class PullAnalysis:
 
         self.quantity_name = quantity_name
         self.unit = unit
-        self.outlier_z_score = outlier_z_score
+
+        if outlier_z_score is None:
+            self.outlier_z_score = self.default_outlier_z_score
+        else:
+            self.outlier_z_score = outlier_z_score
+
         self.absolute = absolute
 
         self.plot_name_prefix = plot_name_prefix or root_save_name(quantity_name)

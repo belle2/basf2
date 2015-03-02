@@ -360,6 +360,7 @@ class SavePullAnalysis(Refiner):
                  variance_name=None,
                  quantity_name=None,
                  unit=None,
+                 outlier_z_score=None,
                  absolute=False):
 
         self.name = name
@@ -374,6 +375,7 @@ class SavePullAnalysis(Refiner):
         self.quantity_name = quantity_name or part_name
         self.unit = unit
 
+        self.outlier_z_score = outlier_z_score
         self.absolute = absolute
 
     def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
@@ -384,7 +386,7 @@ class SavePullAnalysis(Refiner):
         name = self.name or self.default_name
 
         if self.absolute:
-            quantity_name_for_name = 'absolute ' + self.quantity_name,
+            quantity_name_for_name = 'absolute ' + self.quantity_name
         else:
             quantity_name_for_name = self.quantity_name
 
@@ -420,6 +422,7 @@ class SavePullAnalysis(Refiner):
         pull_analysis = PullAnalysis(self.quantity_name,
                                      unit=self.unit,
                                      absolute=self.absolute,
+                                     outlier_z_score=self.outlier_z_score,
                                      plot_name_prefix=name,
                                      plot_title_postfix='')
 
@@ -516,20 +519,17 @@ class SelectRefiner(Refiner):
 
 class GroupByRefiner(Refiner):
     default_folder_name = "groupby_{part_name}_{value}"
-    default_folder_title = "Group by {part_name} for =={value}"
     default_exclude_by = True
 
     def __init__(self,
                  wrapped_refiner,
                  by=[],
                  folder_name=None,
-                 folder_title=None,
                  exclude_by=None):
 
         self.wrapped_refiner = wrapped_refiner
         self.by = by
         self.folder_name = folder_name
-        self.folder_title = folder_title
         self.exclude_by = exclude_by if exclude_by is not None else self.default_exclude_by
 
     def refine(self, harvesting_module, crops, tdirectory, *args, **kwds):
@@ -547,14 +547,20 @@ class GroupByRefiner(Refiner):
                 folder_name = folder_name.format(part_name=part_name, value="")
 
                 if folder_name:
-                    folder_title = self.folder_title or self.default_folder_title
-                    folder_title = folder_title.format(part_name="nothing", value="*")
-                    groupby_tdirectory = tdirectory.mkdir(folder_name, folder_title)
+                    with root_cd(tdirectory):
+                        with root_cd(folder_name) as groupby_tdirectory:
+                            self.wrapped_refiner(harvesting_module,
+                                                 crops,
+                                                 tdirectory=groupby_tdirectory,
+                                                 *args,
+                                                 **kwds)
 
                 else:
-                    groupby_tdirectory = tdirectory
-
-                self.wrapped_refiner(harvesting_module, crops, tdirectory=groupby_tdirectory, *args, **kwds)
+                    self.wrapped_refiner(harvesting_module,
+                                         crops,
+                                         tdirectory=tdirectory,
+                                         *args,
+                                         **kwds)
 
             else:
                 groupby_parts = crops[part_name]
@@ -575,14 +581,19 @@ class GroupByRefiner(Refiner):
                     folder_name = folder_name.format(part_name=part_name, value=value)
 
                     if folder_name:
-                        folder_title = self.folder_title or self.default_folder_title
-                        folder_title = folder_title.format(part_name=part_name, value=value)
-                        groupby_tdirectory = tdirectory.mkdir(folder_name, folder_title)
-
+                        with root_cd(tdirectory):
+                            with root_cd(folder_name) as groupby_tdirectory:
+                                self.wrapped_refiner(harvesting_module,
+                                                     filtered_crops,
+                                                     tdirectory=groupby_tdirectory,
+                                                     *args,
+                                                     **kwds)
                     else:
-                        groupby_tdirectory = tdirectory
-
-                    self.wrapped_refiner(harvesting_module, filtered_crops, tdirectory=groupby_tdirectory, *args, **kwds)
+                        self.wrapped_refiner(harvesting_module,
+                                             filtered_crops,
+                                             tdirectory=groupby_tdirectory,
+                                             *args,
+                                             **kwds)
 
 
 class CdRefiner(Refiner):

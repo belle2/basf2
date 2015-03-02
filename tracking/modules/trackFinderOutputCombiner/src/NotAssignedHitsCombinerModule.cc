@@ -253,25 +253,13 @@ void NotAssignedHitsCombinerModule::calculateFittingMatrices(const StoreArray<CD
   m_zDistMatrix = calculateFittingMatrix(recoSegments, resultTrackCands, zDistFunction);
 }
 
-void NotAssignedHitsCombinerModule::deleteWrongFits(const StoreArray<genfit::TrackCand>& resultTrackCands, std::vector<CDCRecoSegment2D>& recoSegments)
+bool NotAssignedHitsCombinerModule::isGoodEntry(unsigned int counterSegments, int counterTracks)
 {
-  // Delete all "wrong" fits:
-  for (unsigned int counterOuter = 0; counterOuter < recoSegments.size();
-       counterOuter++) {
-    for (int counterInner = 0; counterInner < resultTrackCands.getEntries();
-         counterInner++) {
-      if (m_fittingMatrix(counterOuter, counterInner)
-          < m_param_minimal_chi2_stereo
-          || std::abs(m_zMatrix(counterOuter, counterInner))
-          > m_param_maximum_momentum_z
-          || std::abs(m_zDistMatrix(counterOuter, counterInner))
-          > m_param_maximum_distance_z) {
-        resetEntry(m_fittingMatrix, counterOuter, m_zMatrix, m_zDistMatrix,
-                   counterInner);
-      }
-    }
-  }
+  return (m_fittingMatrix(counterSegments, counterTracks) > m_param_minimal_chi2_stereo
+          and std::abs(m_zMatrix(counterSegments, counterTracks)) < m_param_maximum_momentum_z
+          and std::abs(m_zDistMatrix(counterSegments, counterTracks)) < m_param_maximum_distance_z);
 }
+
 
 void NotAssignedHitsCombinerModule::event()
 {
@@ -283,9 +271,6 @@ void NotAssignedHitsCombinerModule::event()
 
   StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments("CDCRecoSegment2DVector");
   std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
-
-  //matchNewlyFoundLocalTracksToLegendreTracks(resultTrackCands, localTrackCands, legendreTrackCands, cdcHits);
-
 
   B2DEBUG(100, "Length of CDCSegments: " << recoSegments.size())
 
@@ -302,9 +287,7 @@ void NotAssignedHitsCombinerModule::event()
   // (2b) It can be background
   // As in most of the cases these segments are stereo segments, case (1) is the most common
 
-
   calculateFittingMatrices(cdcHits, resultTrackCands, recoSegments);
-  deleteWrongFits(resultTrackCands, recoSegments);
 
   B2DEBUG(100, "Fitting Matrix:\n" << m_fittingMatrix)
   B2DEBUG(100, "z Matrix:\n" << m_zMatrix)
@@ -314,12 +297,12 @@ void NotAssignedHitsCombinerModule::event()
 
   // Find all "easy" possibilities:
   for (unsigned int counterOuter = 0; counterOuter < recoSegments.size(); counterOuter++) {
-    unsigned int numberOfPossibleFits = 0; // How many tracks can be fittest to this segment in total
+    unsigned int numberOfPossibleFits = 0; // How many tracks can be fitted to this segment in total
     unsigned int bestFitIndex = 0;         // Which track has the highest chi2? For one possible fit partner this is the only possible index
     double highestChi2 = 0;                // Which is the highest chi2?
 
     for (int counterInner = 0; counterInner < resultTrackCands.getEntries(); counterInner++) {
-      if (m_fittingMatrix(counterOuter, counterInner) > 0) {
+      if (isGoodEntry(counterOuter, counterInner)) {
         numberOfPossibleFits++;
         if (m_fittingMatrix(counterOuter, counterInner) > highestChi2) {
           bestFitIndex = counterInner;
@@ -335,7 +318,7 @@ void NotAssignedHitsCombinerModule::event()
       if (numberOfPossibleFits > 0 and highestChi2 > m_param_minimal_chi2) {
         genfit::TrackCand* trackCandidate = resultTrackCands[bestFitIndex];
         fillHitsInto(recoSegment, trackCandidate);
-        resetEntry(m_fittingMatrix, counterOuter, m_zMatrix, m_zDistMatrix, bestFitIndex);
+        resetEntry(counterOuter, bestFitIndex);
       } else {
         notMatchedAxialSegments.push_back(recoSegment);
       }
@@ -345,13 +328,13 @@ void NotAssignedHitsCombinerModule::event()
 
       // Add segments with more or less the same parameters that fit to the track
       for (unsigned int counterSegments = 0; counterSegments < recoSegments.size(); counterSegments++) {
-        if (m_fittingMatrix(counterSegments, bestFitIndex) > 0 and
+        if (isGoodEntry(counterSegments, bestFitIndex) > 0 and
             std::abs(m_zMatrix(counterSegments, bestFitIndex) - zReference) < m_param_minimal_theta_difference / 2 and
             std::abs(m_zDistMatrix(counterSegments, bestFitIndex) - zDistReference) < m_param_minimal_z_difference) {
           const CDCRecoSegment2D& recoSegment = recoSegments[counterSegments];
           genfit::TrackCand* trackCandidate = resultTrackCands[bestFitIndex];
           fillHitsInto(recoSegment, trackCandidate);
-          resetEntry(m_fittingMatrix, counterSegments, m_zMatrix, m_zDistMatrix, bestFitIndex);
+          resetEntry(counterSegments, bestFitIndex);
         }
       }
     } else if (numberOfPossibleFits > 0)  {
@@ -365,7 +348,7 @@ void NotAssignedHitsCombinerModule::event()
             genfit::TrackCand* trackCandidate = resultTrackCands[counterInner];
             const CDCRecoSegment2D& recoSegment = recoSegments[counterOuter];
             fillHitsInto(recoSegment, trackCandidate);
-            resetEntry(m_fittingMatrix, counterOuter, m_zMatrix, m_zDistMatrix, counterInner);
+            resetEntry(counterOuter, counterInner);
           }
         }
       }
@@ -389,6 +372,27 @@ void NotAssignedHitsCombinerModule::event()
   }
 
   B2INFO(numberOfLeftSegments << " segments left.")
+  /*
+    if(numberOfLeftSegments > 0) {
+
+      genfit::TrackCand * newTrackCand = resultTrackCands.appendNew();
+
+      // Just a small test: we add all remaining good segment to one track, to see which ones are missing.
+      for (unsigned int counterOuter = 0; counterOuter < recoSegments.size(); counterOuter++) {
+        bool segmentIsLeft = false;
+        // Size - 1 because we have just added a new candidate!
+        for (int counterInner = 0; counterInner < resultTrackCands.getEntries() - 1; counterInner++) {
+          if (m_fittingMatrix(counterOuter, counterInner) > 0) {
+            segmentIsLeft = true;
+            break;
+          }
+        }
+
+        if(segmentIsLeft) {
+          fillHitsInto(recoSegments[counterOuter], newTrackCand);
+        }
+      }
+    }*/
 
   B2DEBUG(100, "Fitting Matrix:\n" << m_fittingMatrix)
   B2DEBUG(100, "z Matrix:\n" << m_zMatrix)
@@ -462,7 +466,7 @@ double NotAssignedHitsCombinerModule::calculateGoodFitIndex(const genfit::TrackC
 
     // Add the hits from the segment to the circle fit
     for (const CDCRecoHit2D & recoHit2D : segment) {
-      observationsCircle.append(recoHit2D.getRecoPos2D());
+      observationsCircle.append(recoHit2D);
     }
 
     // Add all axial hits from the track candidate to the circle fit. As we do not have a reconstructed position, we use the reference position of the wire.
@@ -470,7 +474,7 @@ double NotAssignedHitsCombinerModule::calculateGoodFitIndex(const genfit::TrackC
       CDCHit* cdcHit = cdcHits[cdcHitID];
       CDCWireHit cdcWireHit(cdcHit);
       if (cdcWireHit.getStereoType() == AXIAL) {
-        observationsCircle.append(cdcWireHit.getRefPos2D());
+        observationsCircle.append(cdcWireHit);
       }
     }
 

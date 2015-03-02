@@ -93,14 +93,14 @@ namespace Belle2 {
     void fillHitsInto(const TrackFindingCDC::CDCRecoSegment2D& recoSegment, genfit::TrackCand* bestTrackCand);
 
     double calculateGoodFitIndex(const genfit::TrackCand& trackCandidate, const TrackFindingCDC::CDCRecoSegment2D segment, const StoreArray<CDCHit>& cdcHits);
-    void resetEntry(Eigen::MatrixXf& fittingMatrix, unsigned int counterOuter, Eigen::MatrixXf& zMatrix, Eigen::MatrixXf& zDistMatrix, unsigned int counterInner) {
-      fittingMatrix(counterOuter, counterInner) = 0;
-      zMatrix(counterOuter, counterInner) = 0;
-      zDistMatrix(counterOuter, counterInner) = 0;
+    void resetEntry(unsigned int counterOuter, unsigned int counterInner) {
+      m_fittingMatrix(counterOuter, counterInner) = 0;
+      m_zMatrix(counterOuter, counterInner) = 0;
+      m_zDistMatrix(counterOuter, counterInner) = 0;
     }
 
     void calculateFittingMatrices(const StoreArray<CDCHit>& cdcHits, const StoreArray<genfit::TrackCand>& resultTrackCands, const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments);
-    void deleteWrongFits(const StoreArray<genfit::TrackCand>& resultTrackCands, std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments);
+    bool isGoodEntry(unsigned int counterSegments, int counterTracks);
     double calculateThetaOfTrackCandidate(genfit::TrackCand* trackCandidate, const StoreArray<CDCHit>& cdcHits);
   };
 }

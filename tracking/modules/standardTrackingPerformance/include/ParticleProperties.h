@@ -17,6 +17,7 @@ namespace Belle2 {
    */
   struct ParticleProperties {
 
+    static const int maxNweights = 160;
 
     double mass; /**< measured mass */
     double px; /**< measured momentum in x direction */
@@ -32,6 +33,9 @@ namespace Belle2 {
     int nPXDhits;  /** Number of PXD hits in reconstructed track  */
     int nSVDhits;  /** Number of SVD hits in reconstructed track  */
     int nCDChits;  /** Number of CDC hits in reconstructed track  */
+
+    int nWeights;  /** Number of entries in weights array  */
+    float weights[maxNweights];  /** Weights of the hits in sequence  */
 
     double mass_gen; /**< generated mass */
     double px_gen; /**< generated momentum in x direction */
@@ -59,6 +63,10 @@ namespace Belle2 {
       nPXDhits = (int)value;
       nSVDhits = (int)value;
       nCDChits = (int)value;
+
+      nWeights = 0;
+      for (int i = 0; i < maxNweights; ++i)
+        weights[i] = 0;
 
       mass_gen = value;
       px_gen = value;

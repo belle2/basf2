@@ -19,6 +19,7 @@
 #include <genfit/FieldManager.h>
 #include <genfit/Track.h>
 #include <genfit/TrackPoint.h>
+#include <genfit/KalmanFitterInfo.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -148,6 +149,7 @@ void StandardTrackingPerformanceModule::event()
           m_trackProperties.nPXDhits = 0;
           m_trackProperties.nSVDhits = 0;
           m_trackProperties.nCDChits = 0;
+          m_trackProperties.nWeights = 0;
           for (size_t iTP = 0; iTP < gfTrack->getNumPointsWithMeasurement(); ++iTP) {
             const genfit::TrackPoint* tp = gfTrack->getPointWithMeasurement(iTP);
             for (genfit::AbsMeasurement * m : tp->getRawMeasurements()) {
@@ -161,6 +163,18 @@ void StandardTrackingPerformanceModule::event()
                 ++m_trackProperties.nCDChits;
               else
                 B2ERROR("Unknown AbsMeasurement in track.");
+
+              std::vector<double> weights;
+              genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
+              if (kalmanInfo)
+                weights = kalmanInfo->getWeights();
+
+              for (size_t i = 0;
+                   (i < weights.size()
+                    && m_trackProperties.nWeights < ParticleProperties::maxNweights);
+                   ++i) {
+                m_trackProperties.weights[m_trackProperties.nWeights++] = weights[i];
+              }
             }
           }
           m_pValue = fitResult->getPValue();
@@ -267,6 +281,9 @@ void StandardTrackingPerformanceModule::setupTree()
   addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
   addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
   addVariableToTree("nCDChits", m_trackProperties.nCDChits);
+
+  m_dataTree->Branch("nWeights", &m_trackProperties.nWeights, "nWeights/I");
+  m_dataTree->Branch("weights", &m_trackProperties.weights, "weights[nWeights]/F");
 }
 
 const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResult(

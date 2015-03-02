@@ -18,14 +18,139 @@ import basf2
 from basf2 import *
 basf2.set_random_seed(1337)
 
-import argparse
 
 from tracking.validation.run import TrackingValidationRun
 from tracking.validation.module import TrackingValidationModule
 
+from tracking.validation.mc_side_module import MCSideTrackingValidationModule
+from tracking.validation.pr_side_module import PRSideTrackingValidationModule
+from tracking.validation.module import SeparatedTrackingValidationModule
+
 import ROOT
-import itertools
 import logging
+import numpy as np
+
+# In preparation for the switch to the separated modules for Monte Carlo and pattern recognition side validation:
+
+# the discrete pt values in GeV for which to generate particles using the
+# particle gun
+pt_values = [
+    0.1,
+    0.25,
+    0.4,
+    0.6,
+    1.,
+    1.5,
+    2.,
+    3.,
+    4.,
+]
+
+
+pt_bin_edges = [(low + high) / 2.0 for (low, high) in zip(pt_values[:-1], pt_values[1:])]
+
+
+def getPtBinsWithWeight(pt_values):
+    # each entry gets the same weight
+    pt_weights = [1. / len(pt_values)] * len(pt_values)
+    # weights are in the second half of the array going to ParticleGun
+    return pt_values + pt_weights
+
+
+class PtBinnedMCSideTrackingValidationModule(MCSideTrackingValidationModule):
+
+    def peel(self, mc_track_cand):
+        crops = super(PtBinnedMCSideTrackingValidationModule, self).peel(mc_track_cand)
+        # To few values in this setup to be relevant.
+        del crops["mc_d0"]
+        del crops["mc_multiplicity"]
+
+        # Add pt value that was used by the generator to produce this track
+        mc_pt = crops["mc_pt"]
+
+        # Search the pt value which was used for the MCParticle
+        # counters potential rounding errors
+        pt_bin_id, = np.digitize((mc_pt,), pt_bin_edges)
+        crops["pt_value"] = pt_values[pt_bin_id]
+
+        return crops
+
+    # TODO: Add some sort of groupby pt_value plots that we actually want
+    # Refiners to be executed on terminate #
+    # #################################### #
+
+
+class PtBinnedPRSideTrackingValidationModule(PRSideTrackingValidationModule):
+
+    def peel(self, track_cand):
+        crops = super(PtBinnedPRSideTrackingValidationModule, self).peel(track_cand)
+
+        trackMatchLookUp = self.trackMatchLookUp
+        mc_particle = trackMatchLookUp.getRelatedMCParticle(track_cand)
+
+        if mc_particle:
+            # Add pt value that was used by the generator to produce this track
+            mc_pt = mc_particle.getMomentum().Perp()
+
+            # Search the pt value which was used for the MCParticle
+            # counters potential rounding errors
+            pt_bin_id, = np.digitize((mc_pt,), pt_bin_edges)
+            crops["pt_value"] = pt_values[pt_bin_id]
+
+        else:
+            crops["pt_value"] = float("nan")
+
+        return crops
+
+    # TODO: Add some sort of groupby pt_value plots that we actually want
+    # Refiners to be executed on terminate #
+    # #################################### #
+
+
+class PtBinnedTrackingValidationModule(SeparatedTrackingValidationModule):
+    MCSideModule = PtBinnedMCSideTrackingValidationModule
+    PRSideModule = PtBinnedPRSideTrackingValidationModule
+
+
+class PtBinnedFullTracking(TrackingValidationRun):
+    n_events = N_EVENTS
+    generator_module = 'EvtGenInput'
+    finder_module = 'StandardReco'
+
+    generator_module = basf2.register_module('ParticleGun')
+    generator_module.param({
+        'pdgCodes': [13, -13],
+        'nTracks': 10,
+        'varyNTracks': 0,
+        'momentumGeneration': 'discretePt',
+        'momentumParams': getPtBinsWithWeight(pt_values),
+        'vertexGeneration': 'fixed',
+        'xVertexParams': [0.0],
+        'yVertexParams': [0.0],
+        'zVertexParams': [0.0],
+        'thetaGeneration': 'uniformCos',
+    })
+
+    output_file_name = VALIDATION_OUTPUT_FILE
+
+    def preparePathValidation(self, main_path):
+        fit = bool(self.fit_geometry)
+        validation_module = PtBinnedTrackingValidationModule(
+            name=self.name,
+            contact=self.contact,
+            fit=fit,
+            output_file_name=self.output_file_name,
+            expert_level=0  # No expert subfolder desired.
+        )
+
+        main_path.add_module(validation_module)
+
+
+def new_main():
+    validation_run = PtBinnedFullTracking()
+    validation_run.configure_and_execute_from_commandline()
+
+# End of preparation
 
 # computes bins to have one bin containing
 # exactly one of the discrete values passed
@@ -93,8 +218,7 @@ class FullTracking(TrackingValidationRun):
 
     def preparePathValidation(self, main_path):
 
-        output_file_name_noExt = os.path.splitext(self.output_file_name)[0]
-        ext = os.path.splitext(self.output_file_name)[1]
+        output_file_name_noExt, ext = os.path.splitext(self.output_file_name)
 
         # common exclude list for this test scenario
         exclude_mc = ['d_0', 'multiplicity']

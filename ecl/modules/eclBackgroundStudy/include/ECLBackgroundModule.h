@@ -20,7 +20,13 @@
 #include <ecl/dataobjects/ECLSimHit.h>
 
 #include <simulation/dataobjects/BeamBackHit.h>
+
+#include <ecl/modules/eclBackgroundStudy/def.h>
+
+// if the ARICH package is installed, compile ARICH components
+#ifdef DOARICH
 #include <arich/geometry/ARICHGeometryPar.h>
+#endif
 
 //C++/C standard lib elements
 #include <string>
@@ -183,7 +189,9 @@ namespace Belle2 {
 
 
     /** ARICH geometry paramaters */
+#ifdef DOARICH
     ARICHGeometryPar* m_arichgp;    /**< Geometry parameters of ARICH. */
+#endif
 
     //Below are the density for the BOARDS (not the HAPD themselves)
     //The values are Taken from Luka Šantelj's BeamBack_arich.cc

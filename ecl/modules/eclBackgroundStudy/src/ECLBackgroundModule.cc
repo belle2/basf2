@@ -16,8 +16,9 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 
+#ifdef DOARICH
 #include <arich/geometry/ARICHGeometryPar.h>
-#include <arich/dataobjects/ARICHSimHit.h>
+#endif
 
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <simulation/dataobjects/BeamBackHit.h>
@@ -152,7 +153,10 @@ void ECLBackgroundModule::initialize()
   if (m_doARICH)  B2INFO("ECLBackgroundModule: ARICH plots are being produced");
 
   // Initialize variables
+#ifdef DOARICH
   if (m_doARICH) m_arichgp = ARICHGeometryPar::Instance();
+#endif
+
   m_nEvent = 0;
   BuildECL();
 
@@ -404,6 +408,7 @@ void ECLBackgroundModule::terminate()
 // Methods to study performance of ECL shields
 //   and potential impact on ARICH doses
 /////////////////////////////////////////////
+#ifdef DOARICH
 int ECLBackgroundModule::FillARICHBeamBack(BeamBackHit* aBBHit)
 {
 
@@ -435,6 +440,10 @@ int ECLBackgroundModule::FillARICHBeamBack(BeamBackHit* aBBHit)
 
   return 1;
 }
+
+#else
+int ECLBackgroundModule::FillARICHBeamBack(BeamBackHit* aBBHit) { return 1;}
+#endif
 
 int ECLBackgroundModule::BuildECL()
 {

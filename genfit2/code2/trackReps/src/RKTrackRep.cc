@@ -31,7 +31,6 @@
 #include <map>
 
 #define MINSTEP 0.001   // minimum step [cm] for Runge Kutta and iteration to POCA
-//#define DEBUG
 
 namespace {
   // Use fast inversion instead of LU decomposition?
@@ -110,7 +109,8 @@ double RKTrackRep::extrapolateToPlane(StateOnPlane& state,
 
   // actual extrapolation
   bool isAtBoundary(false);
-  double coveredDistance = Extrap(*(state.getPlane()), *plane, getCharge(state), isAtBoundary, state7, fillExtrapSteps, covPtr, false, stopAtBoundary);
+  double flightTime = 0;
+  double coveredDistance = Extrap(*(state.getPlane()), *plane, getCharge(state), getMass(state), isAtBoundary, state7, flightTime, fillExtrapSteps, covPtr, false, stopAtBoundary);
 
   if (stopAtBoundary && isAtBoundary) {
     state.setPlane(SharedPlanePtr(new DetPlane(TVector3(state7[0], state7[1], state7[2]),
@@ -122,6 +122,7 @@ double RKTrackRep::extrapolateToPlane(StateOnPlane& state,
 
   // back to 5D
   getState5(state, state7);
+  setTime(state, getTime(state) + flightTime);
 
   lastEndState_ = state;
 
@@ -156,6 +157,8 @@ double RKTrackRep::extrapolateToLine(StateOnPlane& state,
 
   double step(0.), lastStep(0.), maxStep(1.E99), angle(0), distToPoca(0), tracklength(0);
   double charge = getCharge(state);
+  double mass = getMass(state);
+  double flightTime = 0;
   TVector3 dir(state7[3], state7[4], state7[5]);
   TVector3 lastDir(0,0,0);
   TVector3 poca, poca_onwire;
@@ -175,7 +178,7 @@ double RKTrackRep::extrapolateToLine(StateOnPlane& state,
     lastStep = step;
     lastDir = dir;
 
-    step = this->Extrap(startPlane, *plane, charge, isAtBoundary, state7, false, NULL, true, stopAtBoundary, maxStep);
+    step = this->Extrap(startPlane, *plane, charge, mass, isAtBoundary, state7, flightTime, false, NULL, true, stopAtBoundary, maxStep);
     tracklength += step;
 
     dir.SetXYZ(state7[3], state7[4], state7[5]);
@@ -209,10 +212,12 @@ double RKTrackRep::extrapolateToLine(StateOnPlane& state,
     getState5(lastEndState_, state7);
 
     tracklength = extrapolateToPlane(state, plane, false, true);
+    lastEndState_.getAuxInfo()(1) = state.getAuxInfo()(1); // Flight time
   }
   else {
     state.setPlane(plane);
     getState5(state, state7);
+    state.getAuxInfo()(1) += flightTime;
   }
 
   if (debugLvl_ > 0) {
@@ -268,6 +273,9 @@ double RKTrackRep::extrapToPoint(StateOnPlane& state,
   DetPlane startPlane(*(state.getPlane()));
   SharedPlanePtr plane(new DetPlane(point, dir));
   unsigned int iterations(0);
+  double charge = getCharge(state);
+  double mass = getMass(state);
+  double flightTime = 0;
 
   while(true){
     if(++iterations == maxIt) {
@@ -279,7 +287,7 @@ double RKTrackRep::extrapToPoint(StateOnPlane& state,
     lastStep = step;
     lastDir = dir;
 
-    step = this->Extrap(startPlane, *plane, getCharge(state), isAtBoundary, state7, false, NULL, true, stopAtBoundary, maxStep);
+    step = this->Extrap(startPlane, *plane, charge, mass, isAtBoundary, state7, flightTime, false, NULL, true, stopAtBoundary, maxStep);
     tracklength += step;
 
     dir.SetXYZ(state7[3], state7[4], state7[5]);
@@ -319,10 +327,12 @@ double RKTrackRep::extrapToPoint(StateOnPlane& state,
     getState5(lastEndState_, state7);
 
     tracklength = extrapolateToPlane(state, plane, false, true);
+    lastEndState_.getAuxInfo()(1) = state.getAuxInfo()(1); // Flight time
   }
   else {
     state.setPlane(plane);
     getState5(state, state7);
+    state.getAuxInfo()(1) += flightTime;
   }
 
 
@@ -371,6 +381,9 @@ double RKTrackRep::extrapolateToCylinder(StateOnPlane& state,
   DetPlane startPlane(*(state.getPlane()));
   SharedPlanePtr plane(new DetPlane());
   unsigned int iterations(0);
+  double charge = getCharge(state);
+  double mass = getMass(state);
+  double flightTime = 0;
 
   while(true){
     if(++iterations == maxIt) {
@@ -421,7 +434,7 @@ double RKTrackRep::extrapolateToCylinder(StateOnPlane& state,
     plane->setO(dest);
     plane->setUV((dest-linePoint).Cross(lineDirection), lineDirection);
 
-    tracklength += this->Extrap(startPlane, *plane, getCharge(state), isAtBoundary, state7, false, NULL, true, stopAtBoundary, maxStep);
+    tracklength += this->Extrap(startPlane, *plane, charge, mass, isAtBoundary, state7, flightTime, false, NULL, true, stopAtBoundary, maxStep);
 
     // check break conditions
     if (stopAtBoundary && isAtBoundary) {
@@ -444,10 +457,12 @@ double RKTrackRep::extrapolateToCylinder(StateOnPlane& state,
     getState5(lastEndState_, state7);
 
     tracklength = extrapolateToPlane(state, plane, false, true);
+    lastEndState_.getAuxInfo()(1) = state.getAuxInfo()(1); // Flight time
   }
   else {
     state.setPlane(plane);
     getState5(state, state7);
+    state.getAuxInfo()(1) += flightTime;
   }
 
   lastEndState_ = state;
@@ -490,6 +505,9 @@ double RKTrackRep::extrapolateToSphere(StateOnPlane& state,
   DetPlane startPlane(*(state.getPlane()));
   SharedPlanePtr plane(new DetPlane());
   unsigned int iterations(0);
+  double charge = getCharge(state);
+  double mass = getMass(state);
+  double flightTime = 0;
 
   while(true){
     if(++iterations == maxIt) {
@@ -528,7 +546,7 @@ double RKTrackRep::extrapolateToSphere(StateOnPlane& state,
 
     plane->setON(dest, dest-point);
 
-    tracklength += this->Extrap(startPlane, *plane, getCharge(state), isAtBoundary, state7, false, NULL, true, stopAtBoundary, maxStep);
+    tracklength += this->Extrap(startPlane, *plane, charge, mass, isAtBoundary, state7, flightTime, false, NULL, true, stopAtBoundary, maxStep);
 
     // check break conditions
     if (stopAtBoundary && isAtBoundary) {
@@ -550,10 +568,12 @@ double RKTrackRep::extrapolateToSphere(StateOnPlane& state,
     getState5(lastEndState_, state7);
 
     tracklength = extrapolateToPlane(state, plane, false, true);
+    lastEndState_.getAuxInfo()(1) = state.getAuxInfo()(1); // Flight time
   }
   else {
     state.setPlane(plane);
     getState5(state, state7);
+    state.getAuxInfo()(1) += flightTime;
   }
 
   lastEndState_ = state;
@@ -595,6 +615,9 @@ double RKTrackRep::extrapolateBy(StateOnPlane& state,
   DetPlane startPlane(*(state.getPlane()));
   SharedPlanePtr plane(new DetPlane());
   unsigned int iterations(0);
+  double charge = getCharge(state);
+  double mass = getMass(state);
+  double flightTime = 0;
 
   while(true){
     if(++iterations == maxIt) {
@@ -610,7 +633,7 @@ double RKTrackRep::extrapolateBy(StateOnPlane& state,
 
     plane->setON(dest, dir);
 
-    tracklength += this->Extrap(startPlane, *plane, getCharge(state), isAtBoundary, state7, false, NULL, true, stopAtBoundary, (step-tracklength));
+    tracklength += this->Extrap(startPlane, *plane, charge, mass, isAtBoundary, state7, flightTime, false, NULL, true, stopAtBoundary, (step-tracklength));
 
     // check break conditions
     if (stopAtBoundary && isAtBoundary) {
@@ -640,10 +663,12 @@ double RKTrackRep::extrapolateBy(StateOnPlane& state,
     getState5(lastEndState_, state7);
 
     tracklength = extrapolateToPlane(state, plane, false, true);
+    lastEndState_.getAuxInfo()(1) = state.getAuxInfo()(1); // Flight time
   }
   else {
     state.setPlane(plane);
     getState5(state, state7);
+    state.getAuxInfo()(1) += flightTime;
   }
 
   lastEndState_ = state;
@@ -750,10 +775,20 @@ double RKTrackRep::getSpu(const StateOnPlane& state) const {
   }
 
   const TVectorD& auxInfo = state.getAuxInfo();
-  if (auxInfo.GetNrows() == 1)
+  if (auxInfo.GetNrows() == 2
+      || auxInfo.GetNrows() == 1) // backwards compatibility with old RKTrackRep
     return state.getAuxInfo()(0);
   else
     return 1.;
+}
+
+double RKTrackRep::getTime(const StateOnPlane& state) const {
+
+  const TVectorD& auxInfo = state.getAuxInfo();
+  if (auxInfo.GetNrows() == 2)
+    return state.getAuxInfo()(1);
+  else
+    return 0.;
 }
 
 
@@ -906,46 +941,6 @@ double RKTrackRep::getRadiationLenght() const {
 }
 
 
-double RKTrackRep::getTOF() const {
-
-  // Todo: test
-
-  if (RKSteps_.size() == 0) {
-    Exception exc("RKTrackRep::getTOF ==> cache is empty.",__LINE__,__FILE__);
-    throw exc;
-  }
-
-  double m = getMass(lastStartState_); // GeV
-  double m2 = m*m;
-  static const double c = TMath::Ccgs(); // cm/s
-  double p1(0), p2(0), trackLen(0), beta(0);
-
-  double tof(0);
-
-  p1 = lastStartState_.getMomMag();
-
-  for (unsigned int i = 0; i<RKSteps_.size(); ++i) {
-    trackLen = RKSteps_[i].matStep_.stepSize_; // [cm]
-    p2 = momMag(RKSteps_[i].state7_);
-
-    if (fabs(p1-p2) < 1E-6) {
-      double p = (p1+p2)/2.;
-      beta = p / sqrt(m2 + p*p);
-      tof += 1.E9 * trackLen / (c*beta); // [ns]
-    }
-    else {
-      // assume linear momentum loss
-      tof += 1.E9 / c / (p1 - p2) * trackLen *
-             (sqrt(m2 + p1*p1) - sqrt(m2 + p2*p2) +
-              m * log( p1/p2 * (m + sqrt(m2 + p2*p2)) / (m + sqrt(m2 + p1*p1)) ) ); // [ns]
-    }
-
-    p1 = p2;
-  }
-
-  return tof;
-}
-
 
 void RKTrackRep::setPosMom(StateOnPlane& state, const TVector3& pos, const TVector3& mom) const {
 
@@ -968,9 +963,11 @@ void RKTrackRep::setPosMom(StateOnPlane& state, const TVector3& pos, const TVect
 
   // init auxInfo if that has not yet happened
   TVectorD& auxInfo = state.getAuxInfo();
-  if (auxInfo.GetNrows() != 1) {
-    auxInfo.ResizeTo(1);
-    setSpu(state, 1.);
+  if (auxInfo.GetNrows() != 2) {
+    bool alreadySet = auxInfo.GetNrows() == 1;  // backwards compatibility: don't overwrite old setting
+    auxInfo.ResizeTo(2);
+    if (!alreadySet)
+      setSpu(state, 1.);
   }
 
   if (state.getPlane() != NULL && state.getPlane()->distance(pos) < MINSTEP) { // pos is on plane -> do not change plane!
@@ -1125,8 +1122,13 @@ void RKTrackRep::setChargeSign(StateOnPlane& state, double charge) const {
 
 
 void RKTrackRep::setSpu(StateOnPlane& state, double spu) const {
-  state.getAuxInfo().ResizeTo(1);
+  state.getAuxInfo().ResizeTo(2);
   (state.getAuxInfo())(0) = spu;
+}
+
+void RKTrackRep::setTime(StateOnPlane& state, double time) const {
+  state.getAuxInfo().ResizeTo(2);
+  (state.getAuxInfo())(1) = time;
 }
 
 
@@ -1196,13 +1198,13 @@ double RKTrackRep::RKPropagate(M1x7& state7,
   if(jacobianT != NULL){
 
     // jacobianT
-    // 1 0 0 0 0 0 0
-    // 0 1 0 0 0 0 0
-    // 0 0 1 0 0 0 0
-    // x x x x x x 0
-    // x x x x x x 0
-    // x x x x x x 0
-    // x x x x x x 1
+    // 1 0 0 0 0 0 0  x
+    // 0 1 0 0 0 0 0  y
+    // 0 0 1 0 0 0 0  z
+    // x x x x x x 0  a_x
+    // x x x x x x 0  a_y
+    // x x x x x x 0  a_z
+    // x x x x x x 1  q/p
 
     double   dA0(0), dA2(0), dA3(0), dA4(0), dA5(0), dA6(0);
     double   dB0(0), dB2(0), dB3(0), dB4(0), dB5(0), dB6(0);
@@ -1334,8 +1336,8 @@ void RKTrackRep::initArrays() const {
   RKSteps_.reserve(100);
   ExtrapSteps_.reserve(100);
 
-  lastStartState_.getAuxInfo().ResizeTo(1);
-  lastEndState_.getAuxInfo().ResizeTo(1);
+  lastStartState_.getAuxInfo().ResizeTo(2);
+  lastEndState_.getAuxInfo().ResizeTo(2);
 }
 
 
@@ -1693,9 +1695,12 @@ void RKTrackRep::transformM6P(const M6x6& in6x6,
 bool RKTrackRep::RKutta(const M1x4& SU,
                         const DetPlane& plane,
                         double charge,
+                        double mass,
                         M1x7& state7,
                         M7x7* jacobianT,
+                        M1x7* J_MMT_unprojected_lastRow,
                         double& coveredDistance,
+                        double& flightTime,
                         bool& checkJacProj,
                         M7x7& noiseProjection,
                         StepLimits& limits,
@@ -1763,6 +1768,9 @@ bool RKTrackRep::RKutta(const M1x4& SU,
     // update paths
     coveredDistance += S;       // add stepsize to way (signed)
     Way  += fabs(S);
+
+    double beta = 1/hypot(1, mass*state7[6]/charge);
+    flightTime += S / beta / 29.9792458; // in ns
 
     // check way limit
     if(Way > Wmax){
@@ -1874,6 +1882,9 @@ bool RKTrackRep::RKutta(const M1x4& SU,
 
       coveredDistance += S;
       Way  += fabs(S);
+
+      double beta = 1/hypot(1, mass*state7[6]/charge);
+      flightTime += S / beta / 29.9792458; // in ns;
     }
     else if (debugLvl_ > 0)  {
       std::cout << " RKutta - last stepsize too small -> can't do linear extrapolation! \n";
@@ -1910,8 +1921,13 @@ bool RKTrackRep::RKutta(const M1x4& SU,
       if (calcOnlyLastRowOfJ)
         i = 42;
 
+      double* jacPtr = *jacobianT;
+
+      for(unsigned int j=42; j<49; j+=7) {
+        (*J_MMT_unprojected_lastRow)[j-42] = jacPtr[j];
+      }
+
       for(; i<49; i+=7) {
-	      double* jacPtr = *jacobianT;
         norm = (jacPtr[i]*SU[0] + jacPtr[i+1]*SU[1] + jacPtr[i+2]*SU[2]) * An;  // dR_normal / A_normal
         jacPtr[i]   -= norm*A [0];   jacPtr[i+1] -= norm*A [1];   jacPtr[i+2] -= norm*A [2];
         jacPtr[i+3] -= norm*SA[0];   jacPtr[i+4] -= norm*SA[1];   jacPtr[i+5] -= norm*SA[2];
@@ -1927,9 +1943,8 @@ bool RKTrackRep::RKutta(const M1x4& SU,
       if (!calcOnlyLastRowOfJ) {
         for (int iRow = 0; iRow < 3; ++iRow) {
           for (int iCol = 0; iCol < 3; ++iCol) {
-	    noiseProjection[iRow*7 + iCol]       = (iRow == iCol) - An * SU[iCol] * A[iRow];
-	    noiseProjection[(iRow + 3)*7 + iCol] =                - An * SU[iCol] * SA[iRow];
-
+            noiseProjection[iRow*7 + iCol]       = (iRow == iCol) - An * SU[iCol] * A[iRow];
+            noiseProjection[(iRow + 3)*7 + iCol] =                - An * SU[iCol] * SA[iRow];
           }
         }
 
@@ -2192,8 +2207,10 @@ TVector3 RKTrackRep::pocaOnLine(const TVector3& linePoint, const TVector3& lineD
 double RKTrackRep::Extrap(const DetPlane& startPlane,
                           const DetPlane& destPlane,
                           double charge,
+                          double mass,
                           bool& isAtBoundary,
                           M1x7& state7,
+                          double& flightTime,
                           bool fillExtrapSteps,
                           TMatrixDSym* cov, // 5D
                           bool onlyOneStep,
@@ -2235,24 +2252,22 @@ double RKTrackRep::Extrap(const DetPlane& startPlane,
     }
 
     // initialize jacobianT with unit matrix
-    for(int i = 0; i < 7*7; ++i) J_MMT_[i] = 0; // invalid: J_MMT_.fill(0);
+    for(int i = 0; i < 7*7; ++i) J_MMT_[i] = 0;
     for(int i=0; i<7; ++i) J_MMT_[8*i] = 1.;
 
     M7x7* noise = NULL;
     isAtBoundary = false;
-
-    // Remember previous state
-    M1x7 oldState7;
-    memcpy(oldState7, state7, sizeof(M1x7));
 
     // propagation
     bool checkJacProj = false;
     limits_.reset();
     limits_.setLimit(stp_sMaxArg, maxStep-fabs(coveredDistance));
 
-    if( ! RKutta(SU, destPlane, charge, state7, &J_MMT_,
-        coveredDistance, checkJacProj, noiseProjection_,
-        limits_, onlyOneStep, !fillExtrapSteps) ) {
+    M1x7 J_MMT_unprojected_lastRow;
+
+    if( ! RKutta(SU, destPlane, charge, mass, state7, &J_MMT_, &J_MMT_unprojected_lastRow,
+		 coveredDistance, flightTime, checkJacProj, noiseProjection_,
+		 limits_, onlyOneStep, !fillExtrapSteps) ) {
       Exception exc("RKTrackRep::Extrap ==> Runge Kutta propagation failed",__LINE__,__FILE__);
       exc.setFatal();
       throw exc;
@@ -2293,7 +2308,8 @@ double RKTrackRep::Extrap(const DetPlane& startPlane,
       RKStepsFXStart_ = RKStepsFXStop_;
 
       if (debugLvl_ > 0) {
-        std::cout << "momLoss: " << momLoss << " GeV; relative: " << momLoss/fabs(charge/state7[6]) << "\n";
+        std::cout << "momLoss: " << momLoss << " GeV; relative: " << momLoss/fabs(charge/state7[6])
+            << "; coveredDistance = " << coveredDistance << "\n";
         if (debugLvl_ > 1 && noise != NULL) {
           std::cout << "7D noise: \n";
           RKTools::printDim(*noise, 7, 7);
@@ -2302,17 +2318,72 @@ double RKTrackRep::Extrap(const DetPlane& startPlane,
 
       // do momLoss only for defined 1/momentum .ne.0
       if(fabs(state7[6])>1.E-10) {
+
+        if (debugLvl_ > 0) {
+          std::cout << "correct state7 with dx/dqop, dy/dqop ...\n";
+        }
+
+        dqop = charge/(fabs(charge/state7[6])-momLoss) - state7[6];
+
+        // Correct coveredDistance and flightTime and momLoss if checkJacProj == true
+        // The idea is to calculate the state correction (based on the mometum loss) twice:
+        // Once with the unprojected Jacobian (which preserves coveredDistance),
+        // and once with the projected Jacobian (which is constrained to the plane and does NOT preserve coveredDistance).
+        // The difference of these two corrections can then be used to calculate a correction factor.
+        if (checkJacProj && fabs(coveredDistance) > MINSTEP) {
+          M1x3 state7_correction_unprojected;
+          for (unsigned int i=0; i<3; ++i) {
+            state7_correction_unprojected[i] = 0.5 * dqop * J_MMT_unprojected_lastRow[i];
+            //std::cout << "J_MMT_unprojected_lastRow[i] " << J_MMT_unprojected_lastRow[i] << "\n";
+            //std::cout << "state7_correction_unprojected[i] " << state7_correction_unprojected[i] << "\n";
+          }
+
+          M1x3 state7_correction_projected;
+          for (unsigned int i=0; i<3; ++i) {
+            state7_correction_projected[i] = 0.5 * dqop * J_MMT_[6*7 + i];
+            //std::cout << "J_MMT_[6*7 + i] " << J_MMT_[6*7 + i] << "\n";
+            //std::cout << "state7_correction_projected[i] " << state7_correction_projected[i] << "\n";
+          }
+
+          // delta distance
+          M1x3 delta_state;
+          for (unsigned int i=0; i<3; ++i) {
+            delta_state[i] = state7_correction_unprojected[i] - state7_correction_projected[i];
+          }
+
+          double Dist = sqrt(delta_state[0]*delta_state[0]
+              + delta_state[1]*delta_state[1]
+              + delta_state[2]*delta_state[2] );
+
+          // sign: delta * a
+          if (delta_state[0]*state7[3] + delta_state[1]*state7[4] + delta_state[2]*state7[5] > 0)
+            Dist *= -1.;
+
+          double correctionFactor = 1. + Dist / coveredDistance;
+          flightTime *= correctionFactor;
+          momLoss *= correctionFactor;
+          coveredDistance = coveredDistance + Dist;
+
+          if (debugLvl_ > 0) {
+            std::cout << "correctionFactor-1 = " << correctionFactor-1. << "; Dist = " << Dist << "\n";
+            std::cout << "corrected momLoss: " << momLoss << " GeV; relative: " << momLoss/fabs(charge/state7[6])
+                << "; corrected coveredDistance = " << coveredDistance << "\n";
+          }
+        }
+
+        // correct state7 with dx/dqop, dy/dqop ... Greatly improves extrapolation accuracy!
         double qop = charge/(fabs(charge/state7[6])-momLoss);
         dqop = qop - state7[6];
         state7[6] = qop;
 
-        // correct state7 with dx/dqop, dy/dqop ... Greatly improves extrapolation accuracy!
-        if (debugLvl_ > 0) {
-          std::cout << "correct state7 with dx/dqop, dy/dqop ...\n";
-        }
         for (unsigned int i=0; i<6; ++i) {
           state7[i] += 0.5 * dqop * J_MMT_[6*7 + i];
         }
+        // normalize direction, just to make sure
+        double norm = 1. / sqrt(state7[3]*state7[3] + state7[4]*state7[4] + state7[5]*state7[5]);
+        for (unsigned int i=3; i<6; ++i)
+          state7[i] *= norm;
+
       }
     } // finished MatFX
 
@@ -2374,6 +2445,9 @@ double RKTrackRep::Extrap(const DetPlane& startPlane,
           std::cout << "In active area of destPlane. \n";
         else
           std::cout << "NOT in active area of plane. \n";
+
+        std::cout << "  position:  "; TVector3(state7[0], state7[1], state7[2]).Print();
+        std::cout << "  direction: "; TVector3(state7[3], state7[4], state7[5]).Print();
       }
       break;
     }
@@ -2477,8 +2551,8 @@ void RKTrackRep::checkCache(const StateOnPlane& state, const SharedPlanePtr* pla
 
 
 double RKTrackRep::momMag(const M1x7& state7) const {
-  double momMag2 = state7[3]*state7[3] + state7[4]*state7[4] + state7[5]*state7[5];
-  return sqrt(momMag2);
+  // FIXME given this interface this function cannot work for charge =/= +-1
+  return fabs(1/state7[6]);
 }
 
 

@@ -57,12 +57,19 @@ class AbsMeasurement : public TObject {
 
   const TVectorD& getRawHitCoords() const {return rawHitCoords_;}
   const TMatrixDSym& getRawHitCov() const {return rawHitCov_;}
+  TVectorD& getRawHitCoords() {return rawHitCoords_;}
+  TMatrixDSym& getRawHitCov() {return rawHitCov_;}
   int getDetId() const {return detId_;}
   int getHitId() const {return hitId_;}
+
+  //! If the AbsMeasurement is a wire hit, the left/right resolution will be used.
+  virtual bool isLeftRightMeasurement() const {return false;}
+  virtual int getLeftRightResolution() const {return 0;}
 
   unsigned int getDim() const {return rawHitCoords_.GetNrows();}
 
   void setRawHitCoords(const TVectorD& coords) {rawHitCoords_ = coords;}
+  void setRawHitCov(const TMatrixDSym& cov) {rawHitCov_ = cov;}
   void setDetId(int detId) {detId_ = detId;}
   void setHitId(int hitId) {hitId_ = hitId;}
 
@@ -112,8 +119,7 @@ class AbsMeasurement : public TObject {
   TrackPoint* trackPoint_; //! No ownership
 
  public:
-  ClassDef(AbsMeasurement, 1)
-
+  ClassDef(AbsMeasurement, 3)
 };
 
 } /* End of namespace genfit */

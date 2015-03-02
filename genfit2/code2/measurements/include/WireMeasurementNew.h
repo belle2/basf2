@@ -1,5 +1,6 @@
 /* Copyright 2008-2010, Technische Universitaet Muenchen,
-   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch
+             2014 Ludwig-Maximimilians-Universität München
+   Authors: Tobias Schlüter
 
    This file is part of GENFIT.
 
@@ -20,8 +21,8 @@
  * @{
  */
 
-#ifndef genfit_WireMeasurement_h
-#define genfit_WireMeasurement_h
+#ifndef genfit_WireMeasurementNew_h
+#define genfit_WireMeasurementNew_h
 
 #include "AbsMeasurement.h"
 #include "AbsHMatrix.h"
@@ -33,13 +34,16 @@ namespace genfit {
 /** @brief Class for measurements in wire detectors (Straw tubes and drift chambers)
  *  which do not measure the coordinate along the wire.
  *
- *  @author Christian H&ouml;ppner (Technische Universit&auml;t M&uuml;nchen, original author)
- *  @author Lia Lavezzi (INFN Pavia, original author)
- *  @author Sebastian Neubert  (Technische Universit&auml;t M&uuml;nchen, original author)
- *  @author Johannes Rauch  (Technische Universit&auml;t M&uuml;nchen, original author)
+ *  @author Tobias Schlüter
  *
- * This hit class is not valid for any kind of plane orientation
- * choice: to use it you MUST choose a plane described by u
+ * This is similar to WireMeasurement, but since WireMeasurement
+ * stores a 7x7 covariance matrix for what is a one-dimensional
+ * measurement, this class is preferable.  Protected inheritance of
+ * rawHitCoords_ and rawHitCov_ makes it impossible to rewrite
+ * WireMeasurement, as subclasses will access these members.
+ *
+ * This hit class is not valid for arbitrary choices of plane
+ * orientation: to use it you MUST choose a plane described by u
  * and v axes with v coincident with the wire (and u orthogonal
  * to it, obviously).
  * The hit will be described by 7 coordinates:
@@ -49,15 +53,15 @@ namespace genfit {
  * coordinate in the plane)
  *
  */
-class WireMeasurement : public AbsMeasurement {
+class WireMeasurementNew : public AbsMeasurement {
 
  public:
-  WireMeasurement(int nDim = 7);
-  WireMeasurement(const TVectorD& rawHitCoords, const TMatrixDSym& rawHitCov, int detId, int hitId, TrackPoint* trackPoint);
+  WireMeasurementNew();
+  WireMeasurementNew(double driftDistance, double driftDistanceError, const TVector3& endPoint1, const TVector3& endPoint2, int detId, int hitId, TrackPoint* trackPoint);
 
-  virtual ~WireMeasurement() {;}
+  virtual ~WireMeasurementNew() {;}
 
-  virtual AbsMeasurement* clone() const {return new WireMeasurement(*this);}
+  virtual WireMeasurementNew* clone() const {return new WireMeasurementNew(*this);}
 
   virtual SharedPlanePtr constructPlane(const StateOnPlane& state) const;
 
@@ -75,6 +79,10 @@ class WireMeasurement : public AbsMeasurement {
 
   virtual const AbsHMatrix* constructHMatrix(const AbsTrackRep*) const;
 
+  /** Reset the wire end points.
+   */
+  void setWireEndPoints(const TVector3& endPoint1, const TVector3& endPoint2);
+
   /** Set maximum drift distance. This is used to calculate the start weights of the two
    * measurementsOnPlane.
    */
@@ -87,23 +95,24 @@ class WireMeasurement : public AbsMeasurement {
    */
   void setLeftRightResolution(int lr);
 
-  virtual bool isLeftRightMeasurement() const {return true;}
-  virtual int getLeftRightResolution() const {return leftRight_;}
-
+  virtual bool isLeftRigthMeasurement() const {return true;}
   double getMaxDistance(){return maxDistance_;}
+  int getLeftRightResolution() const {return leftRight_;}
 
  protected:
 
+  double wireEndPoint1_[3]; //! Wire end point 1 (X, Y, Z)
+  double wireEndPoint2_[3]; //! Wire end point 2 (X, Y, Z)
   double maxDistance_;
-  signed char leftRight_;
+  double leftRight_;
 
  public:
 
-  ClassDef(WireMeasurement, 2)
+  ClassDef(WireMeasurementNew, 1)
 
 };
 
 } /* End of namespace genfit */
 /** @} */
 
-#endif // genfit_WireMeasurement_h
+#endif // genfit_WireMeasurementNew_h

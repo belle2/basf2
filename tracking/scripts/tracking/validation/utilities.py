@@ -5,7 +5,7 @@ from ROOT import Belle2
 import numpy as np
 import math
 import contextlib
-import functools
+
 
 # Vectorised version of the error function for numpy arrays
 try:
@@ -85,15 +85,6 @@ def root_save_name(name):
     deletechars = r"/$\#{}()"
     name = name.replace(' ', '_').replace('-', '_').translate(None, deletechars)
     return name
-
-
-def coroutine(func):
-    @functools.wraps(func)
-    def start(*args, **kwargs):
-        cr = func(*args, **kwargs)
-        next(cr)
-        return cr
-    return start
 
 
 def is_primary(mc_particle):

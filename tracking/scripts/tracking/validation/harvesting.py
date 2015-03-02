@@ -12,7 +12,8 @@ import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 
 from tracking.modules import BrowseFileOnTerminateModule
-from tracking.validation.utilities import root_cd, coroutine
+from tracking.utilities import coroutine
+from tracking.validation.utilities import root_cd
 from tracking.validation.refiners import Refiner
 
 import tracking.metamodules as metamodules

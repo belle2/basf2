@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import functools
 
 import argparse
 
@@ -15,7 +16,6 @@ class DefaultHelpArgumentParser(argparse.ArgumentParser):
         """Method invoked when a parsing error occured.
         Writes an extended help over the base ArgumentParser.
         """
-
         self.print_help()
         sys.stderr.write('error: %s\n' % message)
         sys.exit(2)
@@ -48,3 +48,19 @@ class NonstrictChoices(list):
         copy = list(self)
         copy.append('...')
         return str(copy)
+
+
+def coroutine(generator_func):
+
+    """Famous coroutine decorator.
+
+    Starts a receiving generator function to the first yield,
+    such that it can receive a send call immediatly.
+    """
+
+    @functools.wraps(generator_func)
+    def start(*args, **kwargs):
+        cr = generator_func(*args, **kwargs)
+        next(cr)
+        return cr
+    return start

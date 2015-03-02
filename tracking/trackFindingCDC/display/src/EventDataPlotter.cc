@@ -23,7 +23,7 @@ using namespace TrackFindingCDC;
 EventDataPlotter::EventDataPlotter(bool animate) :
   m_ptrPrimitivePlotter(new SVGPrimitivePlotter(AttributeMap {
   {"stroke", "orange"},
-  {"stroke-width", "0.4"},
+  {"stroke-width", "0.55"},
   {"fill", "none"}
 })),
 m_animate(animate)
@@ -249,7 +249,7 @@ void EventDataPlotter::draw(const Circle2D& circle,
 /// --------------------- Draw CDCWire ------------------------
 void EventDataPlotter::draw(const CDCWire& wire, const AttributeMap& attributeMap)
 {
-  const float wireRadius = 0.1;
+  const float wireRadius = 0.25;
   const Vector2D& refPos = wire.getRefPos2D();
 
   draw(Circle2D(refPos, wireRadius), attributeMap);
@@ -276,7 +276,7 @@ void EventDataPlotter::draw(const CDCWireTopology& wireTopology, AttributeMap at
 {
   for (const CDCWireSuperLayer & wireSuperLayer : wireTopology.getWireSuperLayers()) {
     AttributeMap defaultSuperLayerAttributeMap {
-      {"fill" , wireSuperLayer.isAxial() ? "black" : "lightgray"},
+      {"fill" , wireSuperLayer.isAxial() ? "black" : "gray"},
       {"stroke" , "none"}
     };
 

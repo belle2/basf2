@@ -380,7 +380,7 @@ class CDCSVGDisplayModule(Module):
             def color_map(iHit, hit):
                 simHit = hit.getRelated('CDCSimHits')
                 bkgTag = simHit.getBackgroundTag()
-                color = ('red' if bkgTag else 'gray')
+                color = ('gray' if bkgTag else 'red')
                 return color
 
             styleDict = {'stroke': color_map}

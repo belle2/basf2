@@ -125,6 +125,9 @@ def compose_axis_label(quantity_name, unit=None):
     return axis_label
 
 
+StatsEntry = ROOT.TParameter(float)
+
+
 class ValidationPlot(object):
 
     def __init__(self, name):
@@ -140,8 +143,6 @@ class ValidationPlot(object):
 
         self.plot = None
         self.histograms = []
-
-        self.additional_stats_by_name = {}
 
     def hist(self,
              xs,
@@ -646,11 +647,18 @@ class ValidationPlot(object):
             self.add_stats_entry(histogram, name + ' -inf', n_negative_inf)
 
     def add_stats_entry(self, histogram, label, value):
-        additional_stats = self.additional_stats_by_name.setdefault(histogram.GetName(), {})
-        additional_stats[label] = value
+        stats_entry = StatsEntry(str(label), float(value))
+        histogram.GetListOfFunctions().Add(stats_entry)
 
     def get_additional_stats(self, histogram):
-        return self.additional_stats_by_name.get(histogram.GetName(), {})
+        additional_stats = {}
+        for tobject in histogram.GetListOfFunctions():
+            if isinstance(tobject, StatsEntry):
+                stats_entry = tobject
+                label = stats_entry.GetName()
+                value = stats_entry.GetVal()
+                additional_stats[label] = value
+        return additional_stats
 
     def determine_bin_edges(self,
                             xs,
@@ -942,8 +950,7 @@ class ValidationPlot(object):
 
         # Create a formula which is zero in all cases but has space for n parameters
         # Formula string looks like 0*[0]+0*[1]+0*[2]+...
-        formula_string = '+'.join('0*[' + str(i) + ']' for i in
-                                  range(len(additional_stats)))
+        formula_string = '+'.join('0*[' + str(i) + ']' for i in range(len(additional_stats)))
 
         # Compose a function that carries the addtional information
         additional_stats_tf1 = ROOT.TF1("Stats", formula_string, lower_bound, upper_bound)

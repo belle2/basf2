@@ -61,7 +61,10 @@ def root_cd(tdirectory):
     # and can therefore not serve to save the former directory.
     save_tdirectory = ROOT.gROOT.CurrentDirectory()
 
-    if isinstance(tdirectory, basestring):
+    if not tdirectory or "." == tdirectory:
+        tdirectory = save_tdirectory
+
+    elif isinstance(tdirectory, basestring):
         tdirectory_name = tdirectory
 
         # Look for the tdirectory with the name

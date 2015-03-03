@@ -117,7 +117,10 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
         # setting up fitting is only necessary when testing
         # track finding comonenst ex-situ
-        if self.fit_geometry:
+        if (self.fit_geometry and
+                self.finder_module != 'StandardReco' and
+                not isinstance(self.finder_module, StandardTrackingReconstruction)):
+
             # Prepare Genfit extrapolation
             setupGenfitExtrapolationModule = basf2.register_module('SetupGenfitExtrapolation')
             setupGenfitExtrapolationModule.param({'whichGeometry': self.fit_geometry})

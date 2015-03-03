@@ -950,7 +950,7 @@ namespace Belle {
       b_helixFitterChisqMax(0.),
       b_helixFitterNtrialMax(20),
 
-      b_tdcTranslator(0),
+      b_tdcTranslator(1),
 
       b_doPerfectFinder(0),
       b_perfectFitting(0),

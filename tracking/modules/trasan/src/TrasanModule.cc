@@ -58,7 +58,7 @@ namespace Belle2 {
 
     //...TDCTranslator...
     addParam("tdcTranslator", _tra.b_tdcTranslator,
-             "TDCTranslator; =0: simple; =1: realistic", 0);
+             "TDCTranslator; =0: simple; =1: realistic", 1);
 
 #ifdef TRASAN_DEBUG
     cout << "TrasanModule ... created" << endl;

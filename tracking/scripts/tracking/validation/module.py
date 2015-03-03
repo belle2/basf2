@@ -35,7 +35,6 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
     def __init__(self,
                  name,
                  contact,
-                 fit,
                  output_file_name=None,
                  trackCandidatesColumnName="TrackCands",
                  expert_level=None):
@@ -61,7 +60,6 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
         pr_side_module = self.PRSideModule(name,
                                            contact,
                                            output_file_name=datastore_output_file_name,
-                                           fit=fit,
                                            trackCandidatesColumnName=trackCandidatesColumnName,
                                            expert_level=expert_level)
 
@@ -620,7 +618,6 @@ def main():
 
     validation_module = SeparatedTrackingValidationModule(name="test_run",
                                                           contact="dummy",
-                                                          fit=True,
                                                           output_file_name="test_separated_module.root",
                                                           expert_level=0)
 

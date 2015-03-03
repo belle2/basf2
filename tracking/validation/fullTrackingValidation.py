@@ -127,23 +127,14 @@ class PtBinnedPRSideTrackingValidationModule(PRSideTrackingValidationModule):
     # Refiners to be executed on terminate #
     # #################################### #
 
-    @refiners.Refiner
-    def save_binned_tan_lambda_pull_analysis(self, crops, **kwds):
-        if self.fit:
-            quantity_name = 'tan #lambda'
-        else:
-            quantity_name = 'seed tan #lambda'
-
-        save_pull_analysis = refiners.save_pull_analysis(
-            quantity_name=quantity_name,
-            groupby="pt_value",
-            part_name="pr_tan_lambda",
-            name="{module.name}_{quantity_name}_PtBin_{groupby_value}",
-            title_postfix=" Pt = {groupby_value} GeV",
-            # folder_name=".", #Dummy everything in the top level folder
-        )
-
-        save_pull_analysis(self, crops, **kwds)
+    save_binned_tan_lambda_pull_analysis = refiners.save_pull_analysis(
+        quantity_name="tan #lambda",
+        groupby="pt_value",
+        part_name="pr_tan_lambda",
+        name="{module.name}_{quantity_name}_PtBin_{groupby_value}",
+        title_postfix=" Pt = {groupby_value} GeV",
+        # folder_name=".", #Dummy everything in the top level folder
+    )
 
 
 class PtBinnedTrackingValidationModule(SeparatedTrackingValidationModule):
@@ -155,7 +146,7 @@ class PtBinnedFullTracking(TrackingValidationRun):
     n_events = N_EVENTS
     generator_module = 'EvtGenInput'
     finder_module = 'StandardReco'
-
+    fit_geometry = 'TGeo'
     generator_module = basf2.register_module('ParticleGun')
     generator_module.param({
         'pdgCodes': [13, -13],
@@ -173,11 +164,9 @@ class PtBinnedFullTracking(TrackingValidationRun):
     output_file_name = VALIDATION_OUTPUT_FILE
 
     def preparePathValidation(self, main_path):
-        fit = bool(self.fit_geometry)
         validation_module = PtBinnedTrackingValidationModule(
             name=self.name,
             contact=self.contact,
-            fit=fit,
             output_file_name=self.output_file_name,
             expert_level=0  # No expert subfolder desired.
         )

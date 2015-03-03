@@ -21,7 +21,6 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             self,
             name,
             contact,
-            fit=False,
             output_file_name=None,
             trackCandidatesColumnName="TrackCands",
             expert_level=None):
@@ -34,7 +33,6 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
                                                              output_file_name=output_file_name,
                                                              expert_level=expert_level)
 
-        self.fit = fit
         self.trackCandidatesColumnName = trackCandidatesColumnName
         self.mcTrackCandidatesColumnName = "MCTrackCands"
 
@@ -45,6 +43,35 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     def pick(self, trackCand):
         return True
 
+    @staticmethod
+    def peel_fit_result(fit_result, key="{part_name}"):
+        nan = float("nan")
+        if fit_result:
+            fit_crops = dict(
+                omega_estimate=fit_result.getOmega(),
+                omega_variance=fit_result.getCov()[9],
+                tan_lambda_estimate=fit_result.getCotTheta(),
+                tan_lambda_variance=fit_result.getCov()[14],
+                is_fitted=True,  # FIXME
+            )
+        else:
+            fit_crops = dict(
+                omega_estimate=nan,
+                omega_variance=nan,
+                tan_lambda_estimate=nan,
+                tan_lambda_variance=nan,
+                is_fitted=False,
+            )
+
+        if key:
+            fit_crops_with_keys = dict()
+            for part_name, value in fit_crops.items():
+                fit_crops_with_keys[key.format(part_name=part_name)] = value
+            return fit_crops_with_keys
+
+        else:
+            return fit_crops
+
     def peel(self, trackCand):
         """Looks at the individual pattern recognition tracks and store information about them"""
         trackMatchLookUp = self.trackMatchLookUp
@@ -54,6 +81,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
         is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
         is_matched_or_is_clone = is_matched or is_clone
+
+        # Seed information
+        # store seed information, they are always available from the pattern reco
+        # even if the fit was no successful
+        # this information can we used when plotting fake tracks, for example
+        seed_position = trackCand.getPosSeed()
+        seed_momentum = trackCand.getMomSeed()
 
         # True fit parametes
         if is_matched or is_clone:
@@ -67,40 +101,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             omega_truth = nan
             tan_lambda_truth = nan
 
-        # Get the fit result
-        if self.fit:
-            fit_result = trackMatchLookUp.getRelatedTrackFitResult(trackCand)
-        else:
-            fit_result = getSeedTrackFitResult(trackCand)
-
-        if fit_result:
-            omega_estimate = fit_result.getOmega()
-            omega_variance = fit_result.getCov()[9]
-
-            tan_lambda_estimate = fit_result.getCotTheta()
-            tan_lambda_variance = fit_result.getCov()[14]
-            momentum = fit_result.getMomentum()
-            momentum_pt = momentum.Perp()
-
-            is_fitted = True
-
-        else:
-            omega_estimate = nan
-            omega_variance = nan
-            tan_lambda_estimate = nan
-            tan_lambda_variance = nan
-            momentum_pt = nan
-
-            is_fitted = False
-
-        # Seed information
-        # store seed information, they are always available from the pattern reco
-        # even if the fit was no successful
-        # this information can we used when plotting fake tracks, for example
-        seed_position = trackCand.getPosSeed()
-        seed_momentum = trackCand.getMomSeed()
-
-        return dict(
+        crops = dict(
             # store properties of the seed
             pr_seed_tan_lambda=np.divide(1.0, math.tan(seed_momentum.Theta())),
             pr_seed_phi=seed_position.Phi(),
@@ -112,16 +113,20 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             pr_clone=is_clone,
             pr_fake=not is_matched_or_is_clone,
 
-            pr_omega_estimate=omega_estimate,
-            pr_omega_variance=omega_variance,
             pr_omega_truth=omega_truth,
-
-            pr_tan_lambda_estimate=tan_lambda_estimate,
-            pr_tan_lambda_variance=tan_lambda_variance,
             pr_tan_lambda_truth=tan_lambda_truth,
-
-            is_fitted=is_fitted,
         )
+
+        # Get the fit result
+        seed_fit_result = getSeedTrackFitResult(trackCand)
+        seed_fit_crops = self.peel_fit_result(seed_fit_result, key="pr_seed_{part_name}")
+        crops.update(seed_fit_crops)
+
+        fit_result = trackMatchLookUp.getRelatedTrackFitResult(trackCand)
+        fit_crops = self.peel_fit_result(seed_fit_result, key="pr_{part_name}")
+        crops.update(fit_crops)
+
+        return crops
 
     # Refiners to be executed on terminate #
     # #################################### #
@@ -148,47 +153,37 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         aggregation=np.mean,
     )
 
-    @refiners.Refiner
-    def save_omega_pull_analysis(self, crops, **kwds):
-        if self.fit:
-            quantity_name = '#omega'
-        else:
-            quantity_name = 'seed #omega'
+    # Pulls of seed parameters
+    save_seed_omega_pull_analysis = refiners.save_pull_analysis(
+        part_name="pr_seed_omega",
+        quantity_name="seed #omega",
+        folder_name="pull_seed_omega",
+        truth_name="pr_omega_truth",
+        unit="1/cm",
+    )
 
-        if self.expert_level < 1:
-            folder_name = None
-        else:
-            folder_name = 'expert'
+    save_seed_tan_lambda_pull_analysis = refiners.save_pull_analysis(
+        part_name="pr_seed_tan_lambda",
+        quantity_name="seed tan #lambda",
+        folder_name="pull_seed_tan_lambda",
+        truth_name="pr_tan_lambda_truth",
+    )
 
-        save_pull_analysis = refiners.save_pull_analysis(
-            part_name="pr_omega",
-            quantity_name=quantity_name,
-            folder_name=folder_name,
-            unit="1/cm",
-        )
+    # Pull of fitted parameters
+    save_fitted_omega_pull_analysis = refiners.save_pull_analysis(
+        part_name="pr_omega",
+        quantity_name="#omega",
+        folder_name="pull_fitted_omega",
+        unit="1/cm",
+        truth_name="pr_omega_truth",
+    )
 
-        save_pull_analysis(self, crops, **kwds)
-
-    @refiners.Refiner
-    def save_tan_lambda_pull_analysis(self, crops, **kwds):
-        if self.fit:
-            quantity_name = 'tan #lambda'
-        else:
-            quantity_name = 'seed tan #lambda'
-
-        # Do not use the expert folder in case of expert level = 0
-        if self.expert_level < 1:
-            folder_name = None
-        else:
-            folder_name = 'expert'
-
-        save_pull_analysis = refiners.save_pull_analysis(
-            quantity_name=quantity_name,
-            part_name="pr_tan_lambda",
-            folder_name=folder_name
-        )
-
-        save_pull_analysis(self, crops, **kwds)
+    save_fitted_tan_lambda_pull_analysis = refiners.save_pull_analysis(
+        part_name="pr_tan_lambda",
+        quantity_name="tan #lambda",
+        folder_name="pull_fitted_tan_lambda",
+        truth_name="pr_tan_lambda_truth",
+    )
 
     # Make profiles of the finding efficiencies versus various fit parameters
     # Rename the quatities to names that display nicely by root latex translation
@@ -216,7 +211,6 @@ class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
 
         mc_track_cands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
 
-        # Building the confusion matrix once more :-)
         mc_track_cands_cdc_hit_ids = [frozenset(mc_track_cand.getHitIDs(Belle2.Const.CDC)) for mc_track_cand in mc_track_cands]
         self.mc_track_cands_cdc_hit_ids = mc_track_cands_cdc_hit_ids
 

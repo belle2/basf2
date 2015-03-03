@@ -180,10 +180,12 @@ namespace Belle2 {
 
         int sizeX = 2;
         int sizeY = 2;
-        double dist_1[2][2];
-        double dist_2[2][2];
+        double dist_1[3][3];
+        double dist_2[3][3];
         const size_t neededSize = 2 * m_hits.size();
         m_node->getChildren()->apply([neededSize](QuadTreeTemplate<int, double, TrackHit>* qt) {qt->reserveHitsVector(neededSize);});
+
+
 
         //Voting within the four bins
         for (TrackHit * hit : m_hits) {
@@ -237,7 +239,6 @@ namespace Belle2 {
 
             }
           }
-
           //B2DEBUG(100, "MOVING to next hit");
         }
       }
@@ -247,7 +248,7 @@ namespace Belle2 {
         for (int i = 0; i < 2; ++i) {
           //m_children[i] = new QuadTreeTemplate*[m_nbins_r];
           for (int j = 0; j < 2; ++j) {
-            if ((node->getLevel() > (node->getLastLevel() - 6)) && (fabs(node->getYMean()) > 0.011)) {
+            if ((node->getLevel() > (node->getLastLevel() - 6)) && (fabs(node->getYMean()) > 0.006)) {
               double r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
               double r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
               //        double r1 = m_r[j];

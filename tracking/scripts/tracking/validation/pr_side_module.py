@@ -188,7 +188,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     # Make profiles of the finding efficiencies versus various fit parameters
     # Rename the quatities to names that display nicely by root latex translation
     renaming_select_for_fake_rate_profiles = {
-        'pr_fakes': 'fake rate',
+        'pr_fake': 'fake rate',
         'pr_seed_tan_lambda': 'seed tan #lambda',
         'pr_seed_phi': 'seed #phi',
         'pr_seed_theta': 'seed #theta',

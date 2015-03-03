@@ -86,7 +86,14 @@ class SaveFiguresOfMeritRefiner(Refiner):
         self.key = key
         self.aggregation = aggregation
 
-    def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
+    def refine(self,
+               harvesting_module,
+               crops,
+               tdirectory=None,
+               groupby_part_name=None,
+               groupby_value=None,
+               **kwds):
+
         name = self.name or self.default_name
         title = self.title or self.default_title
         contact = self.contact or self.default_contact
@@ -97,11 +104,15 @@ class SaveFiguresOfMeritRefiner(Refiner):
 
         name = name.format(refiner=self,
                            module=harvesting_module,
-                           aggregation=aggregation)
+                           aggregation=aggregation,
+                           groupby=groupby_part_name,
+                           groupby_value=groupby_value)
 
         title = title.format(refiner=self,
                              module=harvesting_module,
-                             aggregation=aggregation)
+                             aggregation=aggregation,
+                             groupby=groupby_part_name,
+                             groupby_value=groupby_value)
 
         contact = contact.format(refiner=self,
                                  module=harvesting_module)
@@ -125,12 +136,16 @@ class SaveFiguresOfMeritRefiner(Refiner):
         description = description.format(refiner=self,
                                          module=harvesting_module,
                                          keys=keys,
-                                         aggregation=aggregation)
+                                         aggregation=aggregation,
+                                         groupby=groupby_part_name,
+                                         groupby_value=groupby_value)
 
         check = check.format(refiner=self,
                              module=harvesting_module,
                              keys=keys,
-                             aggregation=aggregation)
+                             aggregation=aggregation,
+                             groupby=groupby_part_name,
+                             groupby_value=groupby_value)
 
         figures_of_merit.description = description
         figures_of_merit.check = check
@@ -155,6 +170,7 @@ class SaveHistogramsRefiner(Refiner):
                  outlier_z_score=None,
                  allow_discrete=False,
                  stackby=""):
+
         super(SaveHistogramsRefiner, self).__init__()
 
         self.name = name
@@ -168,7 +184,13 @@ class SaveHistogramsRefiner(Refiner):
         self.allow_discrete = allow_discrete
         self.stackby = stackby
 
-    def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
+    def refine(self,
+               harvesting_module,
+               crops,
+               tdirectory=None,
+               groupby_part_name=None,
+               groupby_value=None,
+               **kwds):
 
         contact = self.contact or self.default_contact
         contact = contact.format(refiner=self,
@@ -190,25 +212,33 @@ class SaveHistogramsRefiner(Refiner):
                                module=harvesting_module,
                                part_name=part_name,
                                stackby=stackby,
-                               stacked_by_indication="_" if stackby else "")
+                               stacked_by_indication="_" if stackby else "",
+                               groupby=groupby_part_name,
+                               groupby_value=groupby_value)
 
             title = title.format(refiner=self,
                                  module=harvesting_module,
                                  part_name=part_name,
                                  stackby=stackby,
-                                 stacked_by_indication=" stacked by " if stackby else "")
+                                 stacked_by_indication=" stacked by " if stackby else "",
+                                 groupby=groupby_part_name,
+                                 groupby_value=groupby_value)
 
             description = description.format(refiner=self,
                                              module=harvesting_module,
                                              part_name=part_name,
                                              stackby=stackby,
-                                             stacked_by_indication=" stacked by " if stackby else "")
+                                             stacked_by_indication=" stacked by " if stackby else "",
+                                             groupby=groupby_part_name,
+                                             groupby_value=groupby_value)
 
             check = check.format(refiner=self,
                                  module=harvesting_module,
                                  part_name=part_name,
                                  stackby=stackby,
-                                 stacked_by_indication=" stacked by " if stackby else "")
+                                 stacked_by_indication=" stacked by " if stackby else "",
+                                 groupby=groupby_part_name,
+                                 groupby_value=groupby_value)
 
             histogram = ValidationPlot(root_save_name(name))
             histogram.hist(parts,
@@ -265,7 +295,14 @@ class SaveProfilesRefiner(Refiner):
 
         self.skip_single_valued = skip_single_valued
 
-    def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
+    def refine(self,
+               harvesting_module,
+               crops,
+               tdirectory=None,
+               groupby_part_name=None,
+               groupby_value=None,
+               **kwds):
+
         contact = self.contact or self.default_contact
         contact = contact.format(refiner=self,
                                  module=harvesting_module)
@@ -298,22 +335,30 @@ class SaveProfilesRefiner(Refiner):
                 name = name.format(refiner=self,
                                    module=harvesting_module,
                                    x_part_name=x_part_name,
-                                   y_part_name=y_part_name)
+                                   y_part_name=y_part_name,
+                                   groupby=groupby_part_name,
+                                   groupby_value=groupby_value)
 
                 title = title.format(refiner=self,
                                      module=harvesting_module,
                                      x_part_name=x_part_name,
-                                     y_part_name=y_part_name)
+                                     y_part_name=y_part_name,
+                                     groupby=groupby_part_name,
+                                     groupby_value=groupby_value)
 
                 description = description.format(refiner=self,
                                                  module=harvesting_module,
                                                  x_part_name=x_part_name,
-                                                 y_part_name=y_part_name)
+                                                 y_part_name=y_part_name,
+                                                 groupby=groupby_part_name,
+                                                 groupby_value=groupby_value)
 
                 check = check.format(refiner=self,
                                      module=harvesting_module,
                                      x_part_name=x_part_name,
-                                     y_part_name=y_part_name)
+                                     y_part_name=y_part_name,
+                                     groupby=groupby_part_name,
+                                     groupby_value=groupby_value)
 
                 profile_plot = ValidationPlot(root_save_name(name))
 
@@ -378,7 +423,14 @@ class SavePullAnalysis(Refiner):
         self.outlier_z_score = outlier_z_score
         self.absolute = absolute
 
-    def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
+    def refine(self,
+               harvesting_module,
+               crops,
+               tdirectory=None,
+               groupby_part_name=None,
+               groupby_value=None,
+               **kwds):
+
         contact = self.contact or self.default_contact
         contact = contact.format(refiner=self,
                                  module=harvesting_module)
@@ -393,7 +445,9 @@ class SavePullAnalysis(Refiner):
         name = name.format(refiner=self,
                            module=harvesting_module,
                            quantity_name=quantity_name_for_name,
-                           part_name=self.part_name)
+                           part_name=self.part_name,
+                           groupby=groupby_part_name,
+                           groupby_value=groupby_value)
 
         if self.truth_name is not None:
             truth_name = self.truth_name
@@ -445,16 +499,27 @@ class SaveTreeRefiner(Refiner):
         self.name = name
         self.title = title
 
-    def refine(self, harvesting_module, crops, tdirectory=None, **kwds):
+    def refine(self,
+               harvesting_module,
+               crops,
+               tdirectory=None,
+               groupby_part_name=None,
+               groupby_value=None,
+               **kwds):
+
         with root_cd(tdirectory):
             name = self.name or self.default_name
             title = self.title or self.default_title
 
             name = name.format(refiner=self,
-                               module=harvesting_module)
+                               module=harvesting_module,
+                               groupby=groupby_part_name,
+                               groupby_value=groupby_value)
 
             title = title.format(refiner=self,
-                                 module=harvesting_module)
+                                 module=harvesting_module,
+                                 groupby=groupby_part_name,
+                                 groupby_value=groupby_value)
 
             output_ttree = ROOT.TTree(root_save_name(name), title)
             for part_name, parts in crops.items():
@@ -518,7 +583,6 @@ class SelectRefiner(Refiner):
 
 
 class GroupByRefiner(Refiner):
-    default_folder_name = "groupby_{part_name}_{value}"
     default_exclude_by = True
 
     def __init__(self,
@@ -529,10 +593,16 @@ class GroupByRefiner(Refiner):
 
         self.wrapped_refiner = wrapped_refiner
         self.by = by
-        self.folder_name = folder_name
         self.exclude_by = exclude_by if exclude_by is not None else self.default_exclude_by
 
-    def refine(self, harvesting_module, crops, tdirectory, *args, **kwds):
+    def refine(self,
+               harvesting_module,
+               crops,
+               groupby_part_name=None,
+               groupby_value=None,
+               *args,
+               **kwds):
+
         by = self.by
 
         # A single name to do the group by
@@ -543,24 +613,14 @@ class GroupByRefiner(Refiner):
 
         for part_name in by:
             if part_name is None:
-                folder_name = self.folder_name if self.folder_name is not None else self.default_folder_name
-                folder_name = folder_name.format(part_name=part_name, value="")
-
-                if folder_name:
-                    with root_cd(tdirectory):
-                        with root_cd(folder_name) as groupby_tdirectory:
-                            self.wrapped_refiner(harvesting_module,
-                                                 crops,
-                                                 tdirectory=groupby_tdirectory,
-                                                 *args,
-                                                 **kwds)
-
-                else:
-                    self.wrapped_refiner(harvesting_module,
-                                         crops,
-                                         tdirectory=tdirectory,
-                                         *args,
-                                         **kwds)
+                # Using the empty sting as groupby_value to indicate that all values have been selected
+                value = ""
+                self.wrapped_refiner(harvesting_module,
+                                     crops,
+                                     groupby_part_name=part_name,
+                                     groupby_value=value,
+                                     *args,
+                                     **kwds)
 
             else:
                 groupby_parts = crops[part_name]
@@ -577,35 +637,55 @@ class GroupByRefiner(Refiner):
 
                     filtered_crops = filter_crops(selected_crops, indices_for_value)
 
-                    folder_name = self.folder_name if self.folder_name is not None else self.default_folder_name
-                    folder_name = folder_name.format(part_name=part_name, value=value)
-
-                    if folder_name:
-                        with root_cd(tdirectory):
-                            with root_cd(folder_name) as groupby_tdirectory:
-                                self.wrapped_refiner(harvesting_module,
-                                                     filtered_crops,
-                                                     tdirectory=groupby_tdirectory,
-                                                     *args,
-                                                     **kwds)
-                    else:
-                        self.wrapped_refiner(harvesting_module,
-                                             filtered_crops,
-                                             tdirectory=groupby_tdirectory,
-                                             *args,
-                                             **kwds)
+                    self.wrapped_refiner(harvesting_module,
+                                         filtered_crops,
+                                         groupby_part_name=part_name,
+                                         groupby_value=value,
+                                         *args,
+                                         **kwds)
 
 
 class CdRefiner(Refiner):
+    # Folder name to be used if a groupby selection is active.
+    default_folder_name = ""
+    default_groupby_folder_name = "groupby_{groupby}_{groupby_value}"
 
-    def __init__(self, wrapped_refiner, folder_name=""):
+    def __init__(self,
+                 wrapped_refiner,
+                 folder_name=None):
+
         self.wrapped_refiner = wrapped_refiner
         self.folder_name = folder_name
 
-    def refine(self, harvesting_module, crops, tdirectory, *args, **kwds):
-        with root_cd(tdirectory):
-            with root_cd(self.folder_name) as tdirectory:
-                self.wrapped_refiner(harvesting_module, crops, tdirectory, *args, **kwds)
+    def refine(self,
+               harvesting_module,
+               crops,
+               tdirectory=None,
+               groupby_part_name=None,
+               groupby_value=None,
+               *args,
+               **kwds):
+
+        folder_name = self.folder_name
+        if folder_name is None:
+            if groupby_value is not None:
+                folder_name = self.default_groupby_folder_name
+            else:
+                folder_name = self.default_folder_name
+
+        folder_name = folder_name.format(groupby=groupby_part_name,
+                                         groupby_value=groupby_value)
+
+        if folder_name:
+            with root_cd(tdirectory):
+                with root_cd(folder_name) as tdirectory:
+                    self.wrapped_refiner(harvesting_module,
+                                         crops,
+                                         tdirectory=tdirectory,
+                                         groupby_part_name=groupby_part_name,
+                                         groupby_value=groupby_value,
+                                         *args,
+                                         **kwds)
 
 
 class ExpertLevelRefiner(Refiner):
@@ -663,7 +743,7 @@ def refiner_with_context(refiner_factory):
     def module_decorator_with_context(above_expert_level=None, below_expert_level=None,
                                       folder_name=None,
                                       filter=None, filter_on=None,
-                                      groupby=None, groupby_folder_name=None, exclude_groupby=None,
+                                      groupby=None, exclude_groupby=None,
                                       select=None, exclude=None,
                                       **kwds_for_refiner_factory):
 
@@ -673,14 +753,14 @@ def refiner_with_context(refiner_factory):
         if exclude is not None or select is not None:
             refiner = SelectRefiner(refiner, select=select, exclude=exclude)
 
+        if folder_name is not None or groupby is not None:
+            refiner = CdRefiner(refiner, folder_name=folder_name)
+
         if groupby is not None:
-            refiner = GroupByRefiner(refiner, by=groupby, folder_name=groupby_folder_name, exclude_by=exclude_groupby)
+            refiner = GroupByRefiner(refiner, by=groupby, exclude_by=exclude_groupby)
 
         if filter is not None or filter_on is not None:
             refiner = FilterRefiner(refiner, filter=filter, on=filter_on)
-
-        if folder_name is not None:
-            refiner = CdRefiner(refiner, folder_name=folder_name)
 
         if above_expert_level is not None or below_expert_level is not None:
             refiner = ExpertLevelRefiner(refiner, above_expert_level=above_expert_level, below_expert_level=below_expert_level)

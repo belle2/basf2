@@ -128,8 +128,8 @@ namespace Belle2 {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << "hits at level " << node->getLevel());
         if (node->getItemsVector().size() < m_nHitsThreshold)
           return;
-//        if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > m_rThreshold)  && (fabs(node->getYMax()) > m_rThreshold))
-//          return;
+        if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > m_rThreshold)  && (fabs(node->getYMax()) > m_rThreshold))
+          return;
         if (node->getLevel() == node->getLastLevel()) {
           lmdProcessor(node);
           return;
@@ -247,14 +247,9 @@ namespace Belle2 {
         for (int i = 0; i < 2; ++i) {
           //m_children[i] = new QuadTreeTemplate*[m_nbins_r];
           for (int j = 0; j < 2; ++j) {
-            if (node->getLevel() < (node->getLastLevel() - 5)) {
-              m_children->set(i, j, new QuadTreeTemplate<int, double, TrackHit>(node->getXBin(i), node->getXBin(i + 1), node->getYBin(j),
-                              node->getYBin(j + 1), node->getLevel() + 1, node));
-              m_children->get(i, j)->setLastLevel(node->getLastLevel());
-              m_children->get(i, j)->setNItemsThreshold(node->getNItemsThreshold());
-            } else {
-              double r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
-              double r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
+            if ((node->getLevel() > (node->getLastLevel() - 6)) && (fabs(node->getYMean()) > 0.011)) {
+              double r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
+              double r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
               //        double r1 = m_r[j];
               //        double r2 = m_r[j+1];
               //            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
@@ -274,6 +269,11 @@ namespace Belle2 {
 
               m_children->set(i, j, new QuadTreeTemplate<int, double, TrackHit>(theta1, theta2, r1, r2, node->getLevel() + 1,
                               node));
+              m_children->get(i, j)->setLastLevel(node->getLastLevel());
+              m_children->get(i, j)->setNItemsThreshold(node->getNItemsThreshold());
+            } else {
+              m_children->set(i, j, new QuadTreeTemplate<int, double, TrackHit>(node->getXBin(i), node->getXBin(i + 1), node->getYBin(j),
+                              node->getYBin(j + 1), node->getLevel() + 1, node));
               m_children->get(i, j)->setLastLevel(node->getLastLevel());
               m_children->get(i, j)->setNItemsThreshold(node->getNItemsThreshold());
             }

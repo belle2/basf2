@@ -119,7 +119,7 @@ void CDCLegendreTrackingModule::findTracks()
   B2DEBUG(100, "Perform track finding");
 
   // The first case is somewhat special
-  doTreeTrackFinding(40, 0.07, false);
+  doTreeTrackFinding(100, 0.07, false);
   if (m_treeFindingNumber == 1 || m_doPostprocessingOften)
     postprocessTracks();
 
@@ -142,10 +142,12 @@ void CDCLegendreTrackingModule::outputObjects()
   m_cdcLegendreTrackDrawer->finalizeFile();
 }
 
-void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limit, double rThreshold, bool increaseThreshold)
+void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, double rThreshold, bool increaseThreshold)
 {
   B2DEBUG(100, "Performing tree track finding");
   m_treeFinder++;
+
+  unsigned int limit = limitInitial;
 
   std::set<TrackHit*> hits_set = m_cdcLegendreTrackProcessor.createHitSet();
 
@@ -186,6 +188,11 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limit, double rT
 
 
   };
+
+
+
+  QuadTreeProcessor::fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 50, 0.011);
+  QuadTreeProcessor::fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 70, 0.02);
 
   // Start loop, where tracks are searched for
   do {

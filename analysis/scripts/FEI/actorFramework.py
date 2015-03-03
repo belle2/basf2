@@ -217,7 +217,7 @@ class Play(object):
         @param path basf2 path
         @param verbose output additional information
         @param cacheFile file containing a pickled dictionary with hash and result-dict
-        @param preload stuff from cache file
+        @param preload If true, actors present in cacheFile will not have their path attribute set (modules not executed again)
         @param nProcesses use n parallel processes for the execution of the actors
         """
         # We loop over all actors and check which actors are ready to run.

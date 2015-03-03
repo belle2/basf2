@@ -185,6 +185,9 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
     parser.add_argument('-cache', '--cache', dest='cacheFile', type=str, default=None, help='Cache actor results in the given file. If an actor is found in the file, it is not executed a second time.')
     args = parser.parse_args()
 
+    if args.preload and args.cacheFile is None:
+        B2FATAL('--preload does not work without a cache file. Please specify one using --cache.')
+
     # Add the basf2 module path
     play = actorFramework.Play()
 
@@ -395,7 +398,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                       finalParticleTargets=['MVAConfigTarget_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
                       cpuTimeSummaryPlaceholders='CPUTimeSummary',
                       mcCounts='mcCounts',
-                      particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
+                      particles=['Object_{i}'.format(i=particle.identifier) for particle in particles])
         play.addNeeded('FEIsummary.pdf')
 
     # Finally we add the final particles (normally B+ B0) as needed to the play
@@ -434,5 +437,6 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
             if module.type() == 'RootInput':
                 module.param('excludeBranchNamesPersistent', [])
 
+    # with RestOfEvent path, this will be the first module inside for_each
     path.add_module('ProgressBar')
     return path

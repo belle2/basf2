@@ -11,6 +11,7 @@
 #ifndef SIMPLETDCCOUNTTRANSLATOR_H
 #define SIMPLETDCCOUNTTRANSLATOR_H
 
+#include <framework/logging/Logger.h>
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
 #include <TVector3.h>
@@ -23,6 +24,7 @@ namespace Belle2 {
       /** Constructor, with the additional information, if propagation in the wire shall be considered. */
       SimpleTDCCountTranslator(bool useInWirePropagationDelay = false) :
         m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0) {
+        B2FATAL("This translator is disabled; please use realisticTDCCountTranslator instead.");
       }
 
       /** Destructor. */

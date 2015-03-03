@@ -55,7 +55,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   //Parameters for Digitization
   addParam("UseSimpleDigitization",       m_useSimpleDigitization,
-           "If true, a simple x-t with a constant velocity is used for the drift-length to -time conversion", true);
+           "If true, a simple x-t with a constant velocity is used for the drift-length to -time conversion", false);
 
   //float Gauss Parameters
   addParam("Fraction",                    m_fraction,    "Fraction of first Gaussian used to smear drift length in cm",    1.0);
@@ -70,7 +70,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   //Switches to control time information handling
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,
-           "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", false);
+           "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", true);
   addParam("AddInWirePropagationDelay4Bg",  m_addInWirePropagationDelay4Bg,
            "The same switch but for beam bg. hits.", true);
   addParam("AddTimeOfFlight",  m_addTimeOfFlight,

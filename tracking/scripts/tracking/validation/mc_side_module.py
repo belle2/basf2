@@ -98,7 +98,7 @@ hit_efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         'finding_efficiency': 'finding efficiency',
         'mc_d0': 'd_{0}',
         'mc_pt': 'p_{t}',
-        'mc_tan_lamda': 'tan #lambda',
+        'mc_tan_lambda': 'tan #lambda',
         'mc_multiplicity': 'multiplicity',
         'mc_phi': '#phi',
         'mc_theta': '#theta',
@@ -117,7 +117,7 @@ hit_efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         'hit_efficiency': 'hit efficiency',
         'mc_d0': 'd_{0}',
         'mc_pt': 'p_{t}',
-        'mc_tan_lamda': 'tan #lambda',
+        'mc_tan_lambda': 'tan #lambda',
         'mc_multiplicity': 'multiplicity',
         'mc_phi': '#phi',
         'mc_theta': '#theta'

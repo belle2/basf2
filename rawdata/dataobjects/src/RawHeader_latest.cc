@@ -86,8 +86,6 @@ void RawHeader_latest::CheckHeader(int* buf)
     exit(1);
   }
 
-  // subsystem ID
-
   // truncation mask
 
   // offset

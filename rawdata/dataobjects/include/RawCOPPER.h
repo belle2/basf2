@@ -145,7 +145,7 @@ namespace Belle2 {
 
     int GetTruncMask(int n);    //! get contents of header
 
-    int GetSubsysId(int n);     //! get subsystem-ID from data
+    int GetNodeID(int n);     //! get node-ID from data
 
     //
     // Get information from 13words "COPPER header" attached by COPPER board
@@ -374,10 +374,10 @@ namespace Belle2 {
   }
 
 
-  inline int RawCOPPER::GetSubsysId(int n)
+  inline int RawCOPPER::GetNodeID(int n)
   {
     CheckVersionSetBuffer();
-    return m_access->GetSubsysId(n);
+    return m_access->GetNodeID(n);
   }
 
 

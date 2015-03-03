@@ -183,7 +183,7 @@ namespace Belle2 {
 
     virtual int GetTruncMask(int n) = 0;    //! get contents of header
 
-    virtual int GetSubsysId(int n) = 0;     //! get subsystem-ID from data
+    virtual int GetNodeID(int n) = 0;     //! get node-ID from data
 
     //
     // Get information from 13words "COPPER header" attached by COPPER board

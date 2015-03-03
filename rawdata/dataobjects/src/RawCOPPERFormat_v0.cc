@@ -559,7 +559,7 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
   //
   // Set node ID, trunc_mask, data_type
   //
-  m_buffer[ tmp_header.POS_SUBSYS_ID ] = m_node_id;
+  m_buffer[ tmp_header.POS_NODE_ID ] = m_node_id;
   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 31) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
 
   //

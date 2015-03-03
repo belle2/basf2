@@ -59,7 +59,7 @@ namespace Belle2 {
     void SetEveNo(unsigned int eve_no);
 
     //! set contents of header
-    void SetSubsysId(int subsys_id);
+    void SetNodeID(int node_id);
 
     //! set contents of header
     void SetDataType(int data_type);
@@ -106,7 +106,7 @@ namespace Belle2 {
 
     unsigned int GetEveNo();  //! get contents of header
 
-    int GetSubsysId();  //! get contents of header
+    int GetNodeID();  //! get contents of header
 
     int GetDataType();  //! get contents of header
 
@@ -175,7 +175,7 @@ namespace Belle2 {
       POS_EVE_NO = 3,
       POS_TTCTIME_TRGTYPE = 4,
       POS_TTUTIME = 5,
-      POS_SUBSYS_ID = 6,
+      POS_NODE_ID = 6,
       POS_TRUNC_MASK_DATATYPE = 7,
       POS_OFFSET_1ST_FINESSE = 8,
       POS_OFFSET_2ND_FINESSE = 9,
@@ -270,10 +270,10 @@ namespace Belle2 {
     m_buffer[ POS_EVE_NO ] = eve_no;
   }
 
-  inline void RawHeader_latest::SetSubsysId(int subsys_id)
+  inline void RawHeader_latest::SetNodeID(int node_id)
   {
     CheckSetBuffer();
-    m_buffer[ POS_SUBSYS_ID ] = subsys_id;
+    m_buffer[ POS_NODE_ID ] = node_id;
   }
 
   inline void RawHeader_latest::SetDataType(int data_type)
@@ -403,18 +403,10 @@ namespace Belle2 {
     return m_buffer[ POS_EVE_NO ];
   }
 
-  inline int RawHeader_latest::GetSubsysId()
+  inline int RawHeader_latest::GetNodeID()
   {
     CheckGetBuffer();
-    return m_buffer[ POS_SUBSYS_ID ];
-//   unsigned int subsys = m_buffer[ POS_SUBSYSTEM_ID + tmp_header.RAWHEADER_NWORDS ];
-//   unsigned int crate = m_buffer[ POS_CRATE_ID + tmp_header.RAWHEADER_NWORDS ];
-//   unsigned int slot  = m_buffer[ POS_SLOT_ID + tmp_header.RAWHEADER_NWORDS ];
-//   return
-//     ((subsys << 16) & 0xFFFF0000) |
-//     ((crate << 8) & 0x0000FF00) |
-//     (slot & 0x000000FF);
-
+    return m_buffer[ POS_NODE_ID ];
   }
 
   inline int RawHeader_latest::GetDataType()

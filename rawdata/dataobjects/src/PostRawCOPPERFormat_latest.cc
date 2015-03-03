@@ -353,7 +353,7 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
   packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
   packed_buf[ tmp_header.POS_TTUTIME ] = rawcpr_info.tt_utime; // tt_utime
-  packed_buf[ tmp_header.POS_SUBSYS_ID ] = rawcpr_info.node_id; // subsystem(node) ID
+  packed_buf[ tmp_header.POS_NODE_ID ] = rawcpr_info.node_id; // node ID
 
   // fill the positions of finesse buffers
   packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;

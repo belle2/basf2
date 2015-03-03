@@ -500,18 +500,6 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   m_buffer[ tmp_header.POS_NWORDS ] = datablock_nwords;
 
 
-  //   if( m_buffer[ tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER
-  //    + SIZE_B2LHSLB_HEADER + POS_TT_UTIME ] !=
-  //       m_buffer[ datablock_nwords - tmp_trailer.RAWTRAILER_NWORDS
-  //    - SIZE_COPPER_DRIVER_TRAILER - SIZE_B2LHSLB_TRAILER
-  //    - (SIZE_B2LFEE_TRAILER - POS_TT_CTIME_B2LFEE ) ] ){
-  //     char err_buf[500];
-  //     sprintf(err_buf, "CORRUPTED DATA: You may be using an old b2tt core in FEE firmware. Please read Nakao-san's e-mail(b2link_ml:0143  Belle2link version 0.01 -SVN update ) and use the latest b2tt core. Exiting...\n %s %s %d\n",  __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  //     sprintf(err_buf, "%s %s %d\n",  __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  //     string err_str = err_buf; throw (err_str);
-  //   }
-
-
   //
   // Check the consistency between data length and length in RawHeader
   //
@@ -561,7 +549,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //
   // Set node ID, trunc_mask, data_type
   //
-  m_buffer[ tmp_header.POS_SUBSYS_ID ] = m_node_id;
+  m_buffer[ tmp_header.POS_NODE_ID ] = m_node_id;
   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 31) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
 
 
@@ -1122,7 +1110,7 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
   packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
   packed_buf[ tmp_header.POS_TTUTIME ] = rawcpr_info.tt_utime; // tt_utime
-  packed_buf[ tmp_header.POS_SUBSYS_ID ] = rawcpr_info.node_id; // subsystem(node) ID
+  packed_buf[ tmp_header.POS_NODE_ID ] = rawcpr_info.node_id; // node ID
 
 
 

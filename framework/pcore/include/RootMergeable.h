@@ -24,11 +24,13 @@ namespace Belle2 {
    *
    * To use it to save data in your module:
    * \code
-     setPropertyFlags(c_Parallelprocessing | c_terminateInAllProcesses);
+     setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
      \endcode
      create RootMergeable<X> in initalize (or in your constructor) of durability DataStore::c_Persistent,
-     register it by calling registerInDataStore() and construct() the actual histogram.
-     in terminate():
+     register it by calling registerInDataStore() and construct() the actual histogram. Especially for larger
+     TTrees, you should also create a TFile and cd() into it before creating the histogram. To actually save
+     the objects, use the following in terminate() to ensure this is done only in the output process (where
+     the data from all events will be collected):
      \code
      if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
        //use TFile you created in initialize()
@@ -41,7 +43,7 @@ namespace Belle2 {
    * case requires other classes.
    *
    * Be aware that for larger histograms, this way of sharing the data may not be a good idea.
-   * E.g. for hundred thousand bins, basf2 would transfer about half a MegaByte in each event,
+   * E.g. for hundred thousand bins, basf2 would transfer about half a megabyte in each event,
    * which may take a significant fraction of total processing time. Trees or Ntuples will however
    * only transfer the newly added data, which is probably manageable.
    *

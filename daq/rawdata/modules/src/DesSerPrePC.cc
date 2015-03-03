@@ -1003,7 +1003,7 @@ void DesSerPrePC::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
     if (!(rawdblk->CheckFTSWID(i)) && !(rawdblk->CheckTLUID(i))) {
       tmp_header.SetBuffer(rawdblk->GetBuffer(i));
       hdr->SetEventNumber(tmp_header.GetEveNo());
-      hdr->SetNodeID(tmp_header.GetSubsysId());
+      hdr->SetNodeID(tmp_header.GetNodeID());
       hdr->SetExpRunWord(tmp_header.GetExpRunNumberWord());
       break;
     }

@@ -84,10 +84,10 @@ void Path::putModules(const std::list<boost::shared_ptr<Module> >& mlist)
 }
 
 
-void Path::forEach(std::string objectName, std::string foreach, PathPtr path)
+void Path::forEach(std::string loopObjectName, std::string arrayName, PathPtr path)
 {
   ModulePtr module = ModuleManager::Instance().registerModule("SubEvent");
-  static_cast<SubEventModule&>(*module).initSubEvent(objectName, foreach, path);
+  static_cast<SubEventModule&>(*module).initSubEvent(loopObjectName, arrayName, path);
   addModule(module);
 }
 

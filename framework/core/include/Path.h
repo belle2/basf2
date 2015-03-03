@@ -104,14 +104,23 @@ namespace Belle2 {
     bool contains(std::string moduleType) const;
 
     /**
-     * similar to addPath()/add_path(), this will execute path at the current position, but
-     * will run it once for each object in the given array 'foreach', and set the loop variable
-     * 'objectName' (a StoreObjPtr of same type as array) to the current object.
+     * Similar to addPath()/add_path(), this will execute path at the current position, but
+     * will run it once for each object in the given array 'arrayName', and set the loop variable
+     * 'loopObjectName' (a StoreObjPtr of same type as array) to the current object.
+     *
+     * Main use case is after using the RestOfEventBuilder on a ParticeList, where
+     * you can use this feature to perform actions on only a part of the event
+     * for a given list of candidates:
      *
        \code
        #read: for each  $objName   in $arrayName   run over $path
-       path.for_each('MCParticle', 'MCParticles', subeventpath)
+       path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
        \endcode
+     *
+     * If 'RestOfEvents' contains two elements, during the execution of roe_path a StoreObjectPtr 'RestOfEvent'
+     * will be available, which will point to the first element in the first run, and the second element
+     * in the second run. You can use the variable 'isInRestOfEvent' to select Particles that
+     * originate from this part of the event.
      *
      * Changes to existing arrays / objects will be available to all modules after the for_each(),
      * including those made to the loop variable (it will simply modify the i'th item in the array looped over.)
@@ -119,7 +128,7 @@ namespace Belle2 {
      * creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
      * to the next MCParticle or exiting the loop.
      */
-    void forEach(std::string objectName, std::string foreach, PathPtr path);
+    void forEach(std::string loopObjectName, std::string arrayName, PathPtr path);
 
 
     //--------------------------------------------------

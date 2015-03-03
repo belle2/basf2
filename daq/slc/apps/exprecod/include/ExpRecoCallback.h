@@ -21,14 +21,14 @@ namespace Belle2 {
   class ExpRecoCallback : public RCCallback {
 
   public:
-    ExpRecoCallback(const NSMNode& node);
+    ExpRecoCallback();
     virtual ~ExpRecoCallback() throw();
 
   public:
-    virtual bool load() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
-    virtual bool recover() throw();
+    virtual void load(const DBObject&) throw(RCHandlerException);
+    virtual void start() throw(RCHandlerException);
+    virtual void stop() throw(RCHandlerException);
+    virtual void recover() throw(RCHandlerException);
 
     void ExpRecoLogger();
 

@@ -37,6 +37,16 @@ namespace Belle2 {
     const std::string& getTTRXFirmware() const { return m_ttrx_firmware; }
     const std::string& getHSLB(int i) const { return m_hslb[i]; }
     const std::string& getHSLBFirmware() const { return m_hslb_firmware; }
+    void setCrate(int crate) { m_crate = crate; }
+    void setSlot(int slot) { m_slot = slot; }
+    void setRunType(const std::string& v) { m_runtype = v; }
+    void setHostname(const std::string& v) { m_hostname = v; }
+    void setCopperId(const std::string& v) { m_copperid = v; }
+    void setSerialId(const std::string& v) { m_serialid = v; }
+    void setPrPMC(const std::string& v) { m_prpmc = v; }
+    void setTTRX(const std::string& v) { m_ttrx = v; }
+    void setTTRXFirmware(const std::string& v) { m_ttrx_firmware = v; }
+    void setHSLBFirmware(const std::string& v) { m_hslb_firmware = v; }
     void read(const DBObject& obj);
 
   private:

@@ -15,8 +15,8 @@ public class HVState extends NSMState {
     final static public HVState RAMPINGDOWN_TS = new HVState(33, "RAMPINGDOWN");
     final static public HVState ERROR_ES = new HVState(41, "ERROR");
     final static public HVState TRIP_ES = new HVState(42, "TRIP");
-    final static public HVState OVER_CURRENT_ES = new HVState(43, "OVER_CURRENT");
-    final static public HVState OVER_VOLTAGE_ES = new HVState(44, "OVER_VOLTAGE");
+    final static public HVState OCP = new HVState(43, "OCP");
+    final static public HVState OVP = new HVState(44, "OVP");
 
     static public final String getCSSPath() {
         return HVState.class.getResource("HVState.css").toExternalForm();
@@ -37,7 +37,7 @@ public class HVState extends NSMState {
     }
 
     public boolean isError() {
-        return getId() >= ERROR_ES.getId() && getId() <= OVER_VOLTAGE_ES.getId();
+        return getId() >= ERROR_ES.getId() && getId() <= OVP.getId();
     }
 
     public HVState() {
@@ -48,12 +48,16 @@ public class HVState extends NSMState {
         super(id, label);
     }
 
+    public HVState(String state) {
+        copy(state);
+    }
+
     public HVState(HVState state) {
         super(state.getId(), state.getLabel());
     }
 
     @Override
-    public void copy(String label) {
+    public final void copy(String label) {
         if (label.matches(OFF_S._label)) {
             copy(OFF_S);
         } else if (label.matches(STABLE_S._label)) {
@@ -74,10 +78,10 @@ public class HVState extends NSMState {
             copy(ERROR_ES);
         } else if (label.matches(TRIP_ES._label)) {
             copy(TRIP_ES);
-        } else if (label.matches(OVER_VOLTAGE_ES._label)) {
-            copy(OVER_VOLTAGE_ES);
-        } else if (label.matches(OVER_CURRENT_ES._label)) {
-            copy(OVER_CURRENT_ES);
+        } else if (label.matches(OVP._label)) {
+            copy(OVP);
+        } else if (label.matches(OCP._label)) {
+            copy(OCP);
         } else {
             copy(UNKNOWN);
         }
@@ -105,10 +109,10 @@ public class HVState extends NSMState {
             copy(ERROR_ES);
         } else if (id == TRIP_ES._id) {
             copy(TRIP_ES);
-        } else if (id == OVER_VOLTAGE_ES._id) {
-            copy(OVER_VOLTAGE_ES);
-        } else if (id == OVER_CURRENT_ES._id) {
-            copy(OVER_CURRENT_ES);
+        } else if (id == OVP._id) {
+            copy(OVP);
+        } else if (id == OCP._id) {
+            copy(OCP);
         } else {
             copy(UNKNOWN);
         }

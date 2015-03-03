@@ -1,0 +1,93 @@
+#include "daq/slc/nsm/Callback.h"
+#include "daq/slc/nsm/NSMCallback.h"
+
+#include "daq/slc/system/LogFile.h"
+
+#include "daq/slc/base/StringUtil.h"
+
+#include <algorithm>
+
+using namespace Belle2;
+
+int Callback::reset()
+{
+  for (NSMVHandlerList::iterator it = m_handler.begin();
+       it != m_handler.end(); it++) {
+    if (*it != NULL) delete *it;
+  }
+  m_handler = NSMVHandlerList();
+  return ++m_revision;
+}
+
+int Callback::add(NSMVHandler* handler)
+{
+  if (handler) {
+    for (size_t i = 0; i < m_handler.size(); i++) {
+      if (handler->getNode() == m_handler[i]->getNode() &&
+          handler->getName() == m_handler[i]->getName()) {
+        delete m_handler[i];
+        m_handler[i] = handler;
+        return i + 1;
+      }
+    }
+    if (handler->getNode().size() == 0)
+      LogFile::debug("added %s", handler->getName().c_str());
+    m_handler.push_back(handler);
+    return m_handler.size();
+  }
+  return 0;
+}
+
+NSMVHandler& Callback::getHandler(const std::string& node,
+                                  const std::string& name) throw(std::out_of_range)
+{
+  for (size_t i = 0; i < m_handler.size(); i++) {
+    if (node == m_handler[i]->getNode() &&
+        name == m_handler[i]->getName()) {
+      return *m_handler[i];
+    }
+  }
+  throw (std::out_of_range(StringUtil::form("no handler for %s:%s",
+                                            node.c_str(), name.c_str())));
+}
+
+int Callback::add(const DBObject& obj)
+{
+  DBObject::NameValueList list;
+  obj.search(list);
+  int id = 0;
+  for (DBObject::NameValueList::iterator it = list.begin();
+       it != list.end(); it++) {
+    const std::string& name(it->name);
+    switch (it->type) {
+      case DBField::BOOL:
+        id = add(new NSMVHandlerInt("", name, true, true, (int) * ((bool*)it->buf)));
+        break;
+      case DBField::CHAR:
+        id = add(new NSMVHandlerInt("", name, true, true, (int) * ((char*)it->buf)));
+        break;
+      case DBField::SHORT:
+        id = add(new NSMVHandlerInt("", name, true, true, (int) * ((short*)it->buf)));
+        break;
+      case DBField::INT:
+        id = add(new NSMVHandlerInt("", name, true, true, *((int*)it->buf)));
+        break;
+      case DBField::LONG:
+        id = add(new NSMVHandlerInt("", name, true, true, (int) * ((long long*)it->buf)));
+        break;
+      case DBField::FLOAT:
+        id = add(new NSMVHandlerFloat("", name, true, true, *((float*)it->buf)));
+        break;
+      case DBField::DOUBLE:
+        id = add(new NSMVHandlerFloat("", name, true, true, (float) * ((double*)it->buf)));
+        break;
+      case DBField::TEXT:
+        id = add(new NSMVHandlerText("", name, true, true, *((std::string*)it->buf)));
+        break;
+      default:
+        break;
+    }
+  }
+  return id;
+}
+

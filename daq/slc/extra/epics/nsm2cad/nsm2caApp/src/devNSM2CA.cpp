@@ -255,11 +255,11 @@ long read_nsm2_data_ai(aiRecord* record)
     if (!data.isAvailable()) {
       return 1;
     }
-    FieldInfo::Type type;
+    DBField::Type type;
     const void* buf = data.find(StringUtil::join(str, ":", 3), type);
-    if (type == FieldInfo::NSM_FLOAT) {
+    if (type == DBField::FLOAT) {
       return read_nsm2_ai(record, *(const float*)buf);
-    } else if (type == FieldInfo::NSM_DOUBLE) {
+    } else if (type == DBField::DOUBLE) {
       return read_nsm2_ai(record, *(const double*)buf);
     }
   }
@@ -301,23 +301,23 @@ long read_nsm2_data_longin(longinRecord* record)
     if (!data.isAvailable()) {
       return 1;
     }
-    FieldInfo::Type type;
+    DBField::Type type;
     const void* buf = data.find(StringUtil::join(str, ":", 3), type);
-    if (type == FieldInfo::NSM_CHAR) {
+    if (type == DBField::CHAR) {
       return read_nsm2_longin(record, *(const char*)buf);
-    } else if (type == FieldInfo::NSM_BYTE8) {
+    } else if (type == DBField::CHAR) {
       return read_nsm2_longin(record, *(const byte8*)buf);
-    } else if (type == FieldInfo::NSM_INT16) {
+    } else if (type == DBField::SHORT) {
       return read_nsm2_longin(record, *(const int16*)buf);
-    } else if (type == FieldInfo::NSM_UINT16) {
+    } else if (type == DBField::SHORT) {
       return read_nsm2_longin(record, *(const uint16*)buf);
-    } else if (type == FieldInfo::NSM_INT32) {
+    } else if (type == DBField::INT) {
       return read_nsm2_longin(record, *(const int32*)buf);
-    } else if (type == FieldInfo::NSM_UINT32) {
+    } else if (type == DBField::INT) {
       return read_nsm2_longin(record, *(const uint32*)buf);
-    } else if (type == FieldInfo::NSM_INT64) {
+    } else if (type == DBField::LONG) {
       return read_nsm2_longin(record, *(const int64*)buf);
-    } else if (type == FieldInfo::NSM_UINT64) {
+    } else if (type == DBField::LONG) {
       return read_nsm2_longin(record, *(const uint64*)buf);
     }
   }

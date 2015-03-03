@@ -1,7 +1,8 @@
 #include "daq/slc/nsm/NSMNodeDaemon.h"
 
+#include "daq/slc/nsm/NSMCommunicator.h"
+
 #include <daq/slc/system/LogFile.h>
-#include <daq/slc/system/PThread.h>
 #include <daq/slc/system/Time.h>
 
 #include <daq/slc/base/StringUtil.h>
@@ -12,49 +13,46 @@
 
 using namespace Belle2;
 
-NSMNodeDaemon::NSMNodeDaemon(NSMCallback* callback,
-                             const std::string host, int port)
+void NSMNodeDaemon::add(NSMCallback* callback,
+                        const std::string& host, int port)
 {
-  m_callback = callback;
-  try {
-    NSMNode& node(m_callback->getNode());
-    m_com = new NSMCommunicator(host, port);
-    m_com->init(node, host, port);
-    if (m_callback != NULL) {
-      m_com->setCallback(m_callback);
-      m_callback->init();
-    }
-  } catch (const NSMHandlerException& e) {
-    LogFile::fatal("Failed to connect NSM network (%s:%d). "
-                   "Terminating process : %s ",
-                   host.c_str(), port, e.what());
-    exit(1);
+  if (callback != NULL && host.size() > 0 && port > 0) {
+    NSMCommunicator* com = new NSMCommunicator();
+    NSMNode& node(callback->getNode());
+    com->init(node, host, port);
+    com->setCallback(callback);
+    callback->init(*com);
+    if (m_timeout == 0) m_timeout = callback->getTimeout();
+    m_callback.push_back(callback);
   }
-  LogFile::debug("Connected to NSM2 daemon (%s:%d)",
-                 host.c_str(), port);
 }
 
 void NSMNodeDaemon::run() throw()
 {
+  NSMCommunicatorList& com_v(NSMCommunicator::get());
   try {
     double t0 = Time().get();
-    unsigned int timeout = m_callback->getTimeout();
     while (true) {
-      if (m_com->wait(timeout)) {
-        NSMMessage& msg(m_com->getMessage());
-        m_callback->setMessage(msg);
-        m_callback->perform(msg);
-      }
+      try {
+        NSMCommunicator& com(NSMCommunicator::select(m_timeout));
+        com.getCallback().perform(com);
+      } catch (const TimeoutException& e) {}
       double t = Time().get();
-      if (t - t0 >= timeout) {
-        m_callback->timeout();
+      if (t - t0 >= m_timeout) {
+        for (size_t i = 0; i < com_v.size(); i++) {
+          NSMCommunicator& com(*com_v[i]);
+          com.getCallback().timeout(com);
+        }
         t0 = t;
       }
     }
   } catch (const std::exception& e) {
-    LogFile::fatal("NSM node daemon : Caught exception : %s"
+    LogFile::fatal("NSM node brdge : Caught exception %s\n"
                    "Terminate process...", e.what());
-    m_callback->setReply(e.what());
   }
-  m_callback->term();
+  for (size_t i = 0; i < com_v.size(); i++) {
+    NSMCommunicator& com(*com_v[i]);
+    com.getCallback().term();
+  }
 }
+

@@ -107,7 +107,7 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
     public void handleCombo() {
         String configname = (String) combo.getSelectionModel().getSelectedItem();
         if (!cobj_m.containsKey(configname)) {
-            NSMListenerService.requestDBGet(nodename, "", configname, 0);
+            //NSMListenerService.requestDBGet(nodename, "", configname, 0);
             combo.setDisable(true);
             tabpane.setDisable(true);
         } else {
@@ -138,7 +138,7 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
 
     @FXML
     public void handleReloadButon() {
-        NSMListenerService.requestList(nodename);
+       // NSMListenerService.requestList(nodename);
         combo.setDisable(true);
     }
 
@@ -207,7 +207,7 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
             cobj_out.addObject("valueset", ccobj_out);
         }
         cobj_out.print();
-        NSMListenerService.requestDBSet(cobj_out);
+        //NSMListenerService.requestDBSet(cobj_out);
     }
 
     @Override
@@ -222,7 +222,7 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
         }
         HVCommand command = new HVCommand();
         command.copy(msg.getReqName());
-        if (command.equals(NSMCommand.LISTSET)) {
+        if (command.equals(NSMCommand.DBLISTSET)) {
             String[] str = msg.getData().split("\n");
             String selected = "";
             if (combo.getItems().size() > 0) {

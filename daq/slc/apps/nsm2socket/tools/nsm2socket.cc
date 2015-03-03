@@ -1,16 +1,11 @@
 #include "daq/slc/apps/nsm2socket/NSM2SocketBridge.h"
-#include "daq/slc/apps/nsm2socket/NSM2SocketCallback.h"
-
-#include <daq/slc/database/PostgreSQLInterface.h>
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
 #include <daq/slc/system/TCPServerSocket.h>
-#include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/PThread.h>
+#include <daq/slc/system/Fork.h>
 #include <daq/slc/system/LogFile.h>
-
-#include <daq/slc/base/ConfigFile.h>
 
 #include <cstdlib>
 #include <unistd.h>
@@ -34,64 +29,25 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
-    LogFile::debug("usage: %s <port>", argv[0]);
+  int port = (argc > 1) ? atoi(argv[1]) : -1;
+  if (port <= 0) {
+    LogFile::debug("usage: %s <port> [-d]", argv[0]);
     return 1;
   }
-  daemon(0, 0);
-  ConfigFile config("slowcontrol");
-  DBInterface* db = new PostgreSQLInterface(config.get("database.host"),
-                                            config.get("database.dbname"),
-                                            config.get("database.user"),
-                                            config.get("database.password"),
-                                            config.getInt("database.port"));
+  if (argc > 2) daemon(0, 0);
   LogFile::open("nsm2socket");
-  const std::string host = "0.0.0.0";
-  const int port = atoi(argv[1]);
-  TCPServerSocket server_socket(host, port);
+  TCPServerSocket server_socket("0.0.0.0", port);
   try {
     server_socket.open();
-  } catch (const IOException& e) {
-    LogFile::error("Faield to open server socket.");
-    return 1;
-  }
-  while (true) {
-    TCPSocket socket;
-    try {
-      socket = server_socket.accept();
-      socket.print();
-    } catch (const IOException& e) {
-      LogFile::error("Faield to accept connection.");
-      return 1;
-    }
-    pid_t pid = fork();
-    if (pid < 0) {
-      LogFile::error("Faield to fork proces.");
-      return 1;
-    } else if (pid == 0) {
-      LogFile::close();
-      NSMNode node;
-      std::string host2nsm;
-      int port2nsm;
-      try {
-        TCPSocketReader reader(socket);
-        node = NSMNode(reader.readString());
-        host2nsm = reader.readString();
-        port2nsm = reader.readInt();
-      } catch (const IOException& e) {
-        LogFile::error("IO error : %s ", e.what());
-        return 1;
-      }
-      LogFile::open("nsm2socket." + node.getName());
-      NSM2SocketCallback* callback = new NSM2SocketCallback(node);
-      PThread(new NSMNodeDaemon(callback, host2nsm, port2nsm));
-      NSM2SocketBridge(socket, callback, db).run();
-      break;
-    } else {
-      PThread(new ProcessMonitor());
+    while (true) {
+      TCPSocket socket = server_socket.accept();
+      Fork(new NSM2SocketBridge(socket));
       socket.close();
+      PThread(new ProcessMonitor());
     }
+  } catch (const IOException& e) {
+    LogFile::error(e.what());
   }
   LogFile::debug("Terminate process");
-  return 1;
+  return 0;
 }

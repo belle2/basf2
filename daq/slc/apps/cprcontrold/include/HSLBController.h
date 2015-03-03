@@ -50,8 +50,7 @@ namespace Belle2 {
     bool bootfpga(const std::string& firmware) throw();
 
   public:
-    bool boot(const std::string& runtype,
-              const std::string& firmware) throw();
+    bool boot(const std::string& firmware) throw();
     const std::string getErrMessage() {
       return m_errmsg;
     }

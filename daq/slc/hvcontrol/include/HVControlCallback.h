@@ -2,8 +2,8 @@
 #define _Belle2_HVControlCallback_hh
 
 #include "daq/slc/hvcontrol/HVCallback.h"
-#include "daq/slc/hvcontrol/HVChannelStatus.h"
-#include "daq/slc/hvcontrol/HVConfig.h"
+
+#include <daq/slc/system/Mutex.h>
 
 #include <daq/slc/nsm/NSMData.h>
 
@@ -16,40 +16,43 @@ namespace Belle2 {
     friend class HVNodeMonitor;
 
   public:
-    HVControlCallback(const NSMNode& node) throw();
-    virtual ~HVControlCallback() throw();
+    HVControlCallback(const NSMNode& node)
+    throw() : HVCallback(), m_db(NULL) {
+      setNode(node);
+    }
+    virtual ~HVControlCallback() throw() {}
 
   public:
-    virtual void initialize() throw() = 0;
-    virtual bool configure() throw() = 0;
-    virtual bool turnon() throw() { return true; }
-    virtual bool turnoff() throw() { return true; }
-    virtual bool standby() throw() { return true; }
-    virtual bool shoulder() throw() { return true; }
-    virtual bool peak() throw() { return true; }
+    virtual void turnon() throw(HVHandlerException);
+    virtual void turnoff() throw(HVHandlerException);
+    virtual void standby() throw(HVHandlerException);
+    virtual void shoulder() throw(HVHandlerException);
+    virtual void peak() throw(HVHandlerException);
+    virtual void update() throw(HVHandlerException) {}
 
   public:
-    void setDB(DBInterface* db) throw() { m_db = db; }
-    size_t getNChannels() const throw() { return m_config.getNChannels(); }
-    HVConfig& getConfig() throw() { return m_config; }
-    HVChannelStatus& getChannelStatus(int i) throw() { return m_status_v[i]; }
+    virtual void init(NSMCommunicator&) throw();
+    virtual void timeout(NSMCommunicator&) throw();
 
   public:
-    virtual void init() throw();
-    virtual bool config() throw();
-    void monitor() throw();
+    void setDB(const std::string& table, DBInterface* db) throw() {
+      m_table = table;
+      m_db = db;
+    }
+    DBInterface* getDB() throw() { return m_db; }
 
   protected:
-    void setDefaultConfigName(const std::string& name) {
-      m_default_config = name;
-    }
+    void load(const HVConfig& config,
+              bool alloff, bool loadpars) throw(HVHandlerException);
+    void dbload(const std::string& confignames) throw(IOException);
+
+  private:
+    void monitor() throw();
 
   private:
     DBInterface* m_db;
     NSMData m_data;
-    HVConfig m_config;
-    HVChannelStatusList m_status_v;
-    std::string m_default_config;
+    std::string m_table;
 
   private:
     class HVNodeMonitor {

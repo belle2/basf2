@@ -1,5 +1,7 @@
 package b2daq.dqm.core;
 
+import java.util.ArrayList;
+
 public class Axis {
 
     private String name = "";
@@ -9,6 +11,7 @@ public class Axis {
     private boolean fixedMin = false;
     private boolean fixedMax = false;
     private String title = null;
+    private ArrayList<String> m_labels = null;
 
     public Axis(int nbin, double min, double max, String label) {
         nbins = nbin;
@@ -136,6 +139,14 @@ public class Axis {
         }
         script += "/>\n";
         return script;
+    }
+
+    public void setLabels(ArrayList<String> labels) {
+        m_labels = labels;
+    }
+
+    public ArrayList<String> getLabels() {
+        return m_labels;
     }
 
 }

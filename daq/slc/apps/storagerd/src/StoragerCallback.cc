@@ -1,6 +1,8 @@
 #include "daq/slc/apps/storagerd/StoragerCallback.h"
 #include "daq/slc/apps/storagerd/storage_status.h"
 
+#include "daq/slc/database/DBObjectLoader.h"
+
 #include "daq/slc/system/LogFile.h"
 #include "daq/slc/system/Time.h"
 
@@ -11,8 +13,7 @@
 
 using namespace Belle2;
 
-StoragerCallback::StoragerCallback(const NSMNode& node)
-  : RCCallback(node)
+StoragerCallback::StoragerCallback()
 {
   setTimeout(1);
   system("killall storagein");
@@ -23,25 +24,51 @@ StoragerCallback::StoragerCallback(const NSMNode& node)
 
 StoragerCallback::~StoragerCallback() throw()
 {
+  term();
 }
 
-void StoragerCallback::init() throw()
+bool StoragerCallback::initialize(const DBObject& obj) throw()
 {
-  m_data = NSMData("STORAGE_STATUS", "storage_status",
-                   storage_status_revision);
-  m_data.allocate(getCommunicator());
-  m_file.read("storage");
-  const size_t nproc = m_file.getInt("record.nproc");
-  m_con = std::vector<ProcessController>();
-  for (size_t i = 0; i < 3 + nproc; i++) {
-    m_con.push_back(ProcessController(this));
+  setData(getNode().getName() + "_STATUS", "storage_status",
+          storage_status_revision);
+  return configure(obj);
+}
+
+bool StoragerCallback::configure(const DBObject& obj) throw()
+{
+  abort();
+  term();
+  try {
+    setUseSet("input.buf.name", false);
+    setUseSet("input.buf.size", false);
+    setUseSet("output.buf.name", false);
+    setUseSet("output.buf.size", false);
+    setUseSet("record.buf.name", false);
+    setUseSet("record.buf.size", false);
+    setUseSet("record.dir", false);
+    setUseSet("record.ndisks", false);
+    setUseSet("record.file.diskid", false);
+    setUseSet("record.file.nfiles", false);
+    setUseSet("record.file.dbtmp", false);
+    const DBObject& record(obj.getObject("record"));
+    const size_t nproc = record.getInt("nproc");
+    m_con = std::vector<ProcessController>();
+    for (size_t i = 0; i < 3 + nproc; i++) {
+      m_con.push_back(ProcessController(this));
+    }
+    m_eb2rx = ProcessController(this);
+    m_eb2rx.init("eb2rx", 1);
+    m_con[0].init("storagein", 2);
+    m_con[1].init("storagerecord", 3);
+    m_con[2].init("storageout", 4);
+    for (size_t i = 3; i < m_con.size(); i++) {
+      m_con[i].init(StringUtil::form("storagebasf2_%d", i - 3), i + 2);
+    }
+  } catch (const std::out_of_range& e) {
+    LogFile::error("Bad configuration : %s", e.what());
+    return false;
   }
-  m_con[0].init("storagein", 1);
-  m_con[1].init("storagerecord", 2);
-  m_con[2].init("storageout", 3);
-  for (size_t i = 3; i < m_con.size(); i++) {
-    m_con[i].init(StringUtil::form("storagebasf2_%d", i - 3), i);
-  }
+  return true;
 }
 
 void StoragerCallback::term() throw()
@@ -50,126 +77,132 @@ void StoragerCallback::term() throw()
     m_con[i].abort();
     m_con[i].getInfo().unlink();
   }
+  m_eb2rx.abort();
+  m_eb2rx.getInfo().unlink();
 }
 
-bool StoragerCallback::load() throw()
+void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-
   bool is_up_all = true;
   for (size_t i = 0; i < m_con.size(); i++) {
-    if (!m_con[0].isAlive()) {
+    if (!m_con[i].isAlive()) {
       is_up_all = false;
       break;
     }
   }
-  if (is_up_all) return true;
-  abort();
-
-  const std::string ibuf_name = m_file.get("input.buf.name");
-  const std::string rbuf_name = m_file.get("record.buf.name");
-  const std::string obuf_name = m_file.get("output.buf.name");
-  const std::string ibuf_size = m_file.get("input.buf.size");
-  const std::string rbuf_size = m_file.get("record.buf.size");
-  const std::string obuf_size = m_file.get("output.buf.size");
+  if (is_up_all) return;
+  const DBObject& eb2rx(obj.getObject("eb2rx"));
+  const DBObject& input(obj.getObject("input"));
+  const DBObject& output(obj.getObject("output"));
+  const DBObject& record(obj.getObject("record"));
+  const DBObject& ibuf(input.getObject("buf"));
+  const DBObject& obuf(output.getObject("buf"));
+  const DBObject& rbuf(record.getObject("buf"));
+  const DBObject& isocket(input.getObject("socket"));
+  const DBObject& osocket(output.getObject("socket"));
+  const DBObject& file(record.getObject("file"));
+  if (eb2rx.getBool("used")) {
+    m_eb2rx.clearArguments();
+    m_eb2rx.setExecutable(eb2rx.getText("exe"));
+    m_eb2rx.addArgument("-l");
+    m_eb2rx.addArgument("%d", eb2rx.getInt("port"));
+    const DBObjectList& sender(eb2rx.getObjects("sender"));
+    for (DBObjectList::const_iterator it = sender.begin();
+         it != sender.end(); it++) {
+      m_eb2rx.addArgument("%s:%d", it->getText("host").c_str(), it->getInt("port"));
+    }
+    m_eb2rx.load(0);
+    LogFile::debug("Booted eb2rx");
+  }
 
   m_con[0].clearArguments();
   m_con[0].setExecutable("storagein");
-  m_con[0].addArgument(ibuf_name);
-  m_con[0].addArgument(ibuf_size);
-  m_con[0].addArgument(m_file.get("input.socket.host"));
-  m_con[0].addArgument(m_file.get("input.socket.port"));
+  m_con[0].addArgument(ibuf.getText("name"));
+  m_con[0].addArgument("%d", ibuf.getInt("size"));
+  m_con[0].addArgument(isocket.getText("host"));
+  m_con[0].addArgument("%d", isocket.getInt("port"));
   m_con[0].addArgument("storagein");
-  m_con[0].addArgument("1");
-  if (!m_con[0].load(20)) {
+  m_con[0].addArgument("2");
+  if (!m_con[0].load(10)) {
     std::string emsg = "storagein: Failed to connect to eb2rx";
-    setReply(emsg);
     LogFile::error(emsg);
-    return false;
+    throw (RCHandlerException(emsg));
   }
   LogFile::debug("Booted storagein");
 
   m_con[1].clearArguments();
   m_con[1].setExecutable("storagerecord");
-  m_con[1].addArgument(rbuf_name);
-  m_con[1].addArgument(rbuf_size);
-  m_con[1].addArgument(m_file.get("record.dir"));
-  m_con[1].addArgument(m_file.get("record.ndisks"));
-  m_con[1].addArgument(m_file.get("record.file.diskid"));
-  m_con[1].addArgument(m_file.get("record.file.nfiles"));
-  m_con[1].addArgument(m_file.get("record.file.dbtmp"));
-  m_con[1].addArgument(obuf_name);
-  m_con[1].addArgument(obuf_size);
+  m_con[1].addArgument(rbuf.getText("name"));
+  m_con[1].addArgument("%d", rbuf.getInt("size"));
+  m_con[1].addArgument(record.getText("dir"));
+  m_con[1].addArgument("%d", record.getInt("ndisks"));
+  m_con[1].addArgument(file.getText("diskid"));
+  m_con[1].addArgument(file.getText("dbtmp"));
+  m_con[1].addArgument(obuf.getText("name"));
+  m_con[1].addArgument("%d", obuf.getInt("size"));
   m_con[1].addArgument("storagerecord");
-  m_con[1].addArgument("2");
-  LogFile::debug("debug");
+  m_con[1].addArgument("3");
   if (!m_con[1].load(30)) {
     std::string emsg = "storagerecord: Failed to start";
-    setReply(emsg);
     LogFile::error(emsg);
-    return false;
+    throw (RCHandlerException(emsg));
   }
   LogFile::debug("Booted storagerecord");
 
-  if (m_file.getBool("output.used")) {
+  if (output.getBool("used")) {
     m_con[2].clearArguments();
     m_con[2].setExecutable("storageout");
-    m_con[2].addArgument(obuf_name);
-    m_con[2].addArgument(obuf_size);
-    m_con[2].addArgument(m_file.get("output.socketport"));
+    m_con[2].addArgument(obuf.getInt("oname"));
+    m_con[2].addArgument("%d", obuf.getInt("size"));
+    m_con[2].addArgument("%d", osocket.getInt("port"));
     m_con[2].addArgument("storageout");
-    m_con[2].addArgument("3");
+    m_con[2].addArgument("4");
     if (!m_con[2].load(10)) {
-      std::string emsg = "storageout: Not accepted connection from EXPRECO";
-      LogFile::warning(emsg);
+      LogFile::warning("storageout: Not accepted connection from EXPRECO");
     }
     LogFile::debug("Booted storageout");
+  } else {
+    LogFile::notice("storageout gets OFF");
   }
 
   for (size_t i = 3; i < m_con.size(); i++) {
     m_con[i].clearArguments();
     m_con[i].setExecutable("basf2");
-    m_con[i].addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                                          m_file.get("record.script").c_str()));
-    m_con[i].addArgument(ibuf_name);
-    m_con[i].addArgument(ibuf_size);
-    m_con[i].addArgument(rbuf_name);
-    m_con[i].addArgument(rbuf_size);
-    m_con[i].addArgument(StringUtil::form("storagebasf2_%d", i - 3));
-    m_con[i].addArgument(StringUtil::form("%d", i + 1));
+    m_con[i].addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+                         record.getText("script").c_str());
+    m_con[i].addArgument(ibuf.getText("name"));
+    m_con[i].addArgument("%d", ibuf.getInt("size"));
+    m_con[i].addArgument(rbuf.getText("name"));
+    m_con[i].addArgument("%d", rbuf.getInt("size"));
+    m_con[i].addArgument("storagebasf2_%d", i - 3);
+    m_con[i].addArgument("%d", i + 2);
     m_con[i].addArgument("1");
     if (!m_con[i].load(10)) {
       std::string emsg = StringUtil::form("Failed to start %d-th basf2", i - 3);
-      setReply(emsg);
       LogFile::error(emsg);
-      return false;
+      throw (RCHandlerException(emsg));
     }
     LogFile::debug("Booted %d-th basf2", i - 3);
   }
-
   m_flow = std::vector<FlowMonitor>();
   for (size_t i = 0; i < m_con.size(); i++) {
     FlowMonitor flow;
     flow.open(&(m_con[i].getInfo()));
     m_flow.push_back(flow);
   }
-  m_ibuf.open(ibuf_name, atoi(ibuf_size.c_str()) * 1000000);
-  m_rbuf.open(rbuf_name, atoi(rbuf_size.c_str()) * 1000000);
-
-  return true;
+  m_ibuf.open(ibuf.getText("name"), ibuf.getInt("size") * 1000000);
+  m_rbuf.open(rbuf.getText("name"), rbuf.getInt("size") * 1000000);
 }
 
-bool StoragerCallback::start() throw()
+void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
 {
   storage_status* status = (storage_status*)m_data.get();
   status->stime = Time().getSecond();
   for (size_t i = 0; i < m_con.size(); i++) {
     std::string name = m_con[i].getName();
-    if (!m_con[i].start()) {
+    if (!m_con[i].start(expno, runno)) {
       if (i != 2) {
-        std::string emsg = name[i] + " is not started";
-        setReply(emsg);
-        LogFile::error(emsg);
-        return false;
+        throw (RCHandlerException(name[i] + " is not started"));
       } else {
         std::string emsg = "storageout: Not accepted connection from EXPRECO yet";
         LogFile::warning(emsg);
@@ -177,45 +210,32 @@ bool StoragerCallback::start() throw()
     }
     LogFile::debug(name[i] + " started");
   }
-  return true;
 }
 
-bool StoragerCallback::stop() throw()
+void StoragerCallback::stop() throw(RCHandlerException)
 {
-  return true;
 }
 
-bool StoragerCallback::resume() throw()
-{
-  return true;
-}
-
-bool StoragerCallback::pause() throw()
-{
-  return true;
-}
-
-bool StoragerCallback::recover() throw()
+void StoragerCallback::recover() throw(RCHandlerException)
 {
   abort();
-  sleep(3);
-  return load();
 }
 
-bool StoragerCallback::abort() throw()
+void StoragerCallback::abort() throw(RCHandlerException)
 {
   for (size_t i = 0; i < m_con.size(); i++) {
     m_con[i].abort();
   }
-  return true;
+  m_eb2rx.abort();
 }
 
-void StoragerCallback::timeout() throw()
+void StoragerCallback::timeout(NSMCommunicator&) throw()
 {
-  if (!m_data.isAvailable()) return;
-  storage_status* info = (storage_status*)m_data.get();
+  NSMData& data(getData());
+  if (!data.isAvailable()) return;
+  storage_status* info = (storage_status*)data.get();
   info->ctime = Time().getSecond();
-  info->nnodes = m_flow.size();
+  info->nnodes = m_con.size();
   bool connected = false;
   bool writing = false;
   for (size_t i = 0; i < m_flow.size() && i < 8; i++) {

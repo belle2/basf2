@@ -33,7 +33,6 @@ void LogListener::run()
   std::stringstream ss;
   std::string s;
   LogFile::Priority priority = LogFile::UNKNOWN;
-  //NSMCommunicator* comm = m_con->getCallback()->getCommunicator();
   NSMNode& node(m_con->getCallback()->getNode());
   try {
     int count = 0;
@@ -47,11 +46,12 @@ void LogListener::run()
           priority = LogFile::DEBUG;
         }
         LogFile::put(priority, s);
-        if (node.getState() != RCState::STOPPING_TS &&
-            node.getState() != RCState::ABORTING_RS &&
-            node.getState() != RCState::RECOVERING_RS) {
-          //comm->sendLog(DAQLogMessage(node.getName(), priority, s));
-        }
+        /*
+              if (node.getState() != RCState::STOPPING_TS &&
+                  node.getState() != RCState::ABORTING_RS &&
+                  node.getState() != RCState::RECOVERING_RS) {
+              }
+        */
         m_con->unlock();
         count = 0;
         priority = LogFile::UNKNOWN;

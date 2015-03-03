@@ -5,6 +5,7 @@ import b2daq.nsm.NSMState;
 
 public class RCCommand extends NSMCommand {
 
+    final static public RCCommand CONFIGURE = new RCCommand(101, "CONFIGURE");
     final static public RCCommand LOAD = new RCCommand(102, "LOAD");
     final static public RCCommand START = new RCCommand(103, "START");
     final static public RCCommand STOP = new RCCommand(104, "STOP");
@@ -12,9 +13,6 @@ public class RCCommand extends NSMCommand {
     final static public RCCommand PAUSE = new RCCommand(106, "PAUSE");
     final static public RCCommand RECOVER = new RCCommand(107, "RECOVER");
     final static public RCCommand ABORT = new RCCommand(108, "ABORT");
-    final static public RCCommand TRGIFT = new RCCommand(109, "TRIGFT");
-    final static public RCCommand EXCLUDE = new RCCommand(110, "EXCLUDE");
-    final static public RCCommand INCLUDE = new RCCommand(111, "INCLUDE");
 
     public RCCommand() {
         copy(RCCommand.UNKNOWN);
@@ -30,6 +28,9 @@ public class RCCommand extends NSMCommand {
 
     public boolean copy(String msg) {
         if (super.copy(msg)) {
+            return true;
+        } else if (msg.equals(CONFIGURE.getLabel())) {
+            copy(CONFIGURE);
             return true;
         } else if (msg.equals(LOAD.getLabel())) {
             copy(LOAD);
@@ -52,21 +53,14 @@ public class RCCommand extends NSMCommand {
         } else if (msg.equals(ABORT.getLabel())) {
             copy(ABORT);
             return true;
-        } else if (msg.equals(TRGIFT.getLabel())) {
-            copy(TRGIFT);
-            return true;
-        } else if (msg.equals(EXCLUDE.getLabel())) {
-            copy(EXCLUDE);
-            return true;
-        } else if (msg.equals(INCLUDE.getLabel())) {
-            copy(INCLUDE);
-            return true;
         }
         return false;
     }
 
     public int available(NSMState state) {
-        if (equals(LOAD) && state.equals(RCState.NOTREADY_S)) {
+        if (equals(CONFIGURE) && state.equals(RCState.NOTREADY_S)) {
+            return ENABLED;
+        } else if (equals(LOAD) && state.equals(RCState.NOTREADY_S)) {
             return SUGGESTED;
         } else if (equals(LOAD) && state.equals(RCState.READY_S)) {
             return ENABLED;
@@ -80,10 +74,8 @@ public class RCCommand extends NSMCommand {
             return ENABLED;
         } else if (equals(RESUME) && state.equals(RCState.PAUSED_S)) {
             return SUGGESTED;
-        } else if (equals(STATECHECK) || equals(STATE) || equals(OK)
-                || equals(TRGIFT) || equals(ERROR) || equals(ABORT) || equals(RECOVER)
-                || equals(NSMGET) || equals(NSMSET) || equals(DBGET) || equals(DBSET)
-                || equals(EXCLUDE) || equals(INCLUDE)) {
+        } else if (equals(OK) || equals(ERROR) || equals(ABORT) || equals(RECOVER)
+                || equals(NSMDATAGET) || equals(NSMDATASET) || equals(DBGET) || equals(DBSET)) {
             return ENABLED;
         } else {
             return DISABLED;
@@ -133,6 +125,9 @@ public class RCCommand extends NSMCommand {
     public boolean copy(int id) {
         if (super.copy(id)) {
             return true;
+        } else if (id == CONFIGURE.getId()) {
+            copy(CONFIGURE);
+            return true;
         } else if (id == LOAD.getId()) {
             copy(LOAD);
             return true;
@@ -153,15 +148,6 @@ public class RCCommand extends NSMCommand {
             return true;
         } else if (id == ABORT.getId()) {
             copy(ABORT);
-            return true;
-        } else if (id == TRGIFT.getId()) {
-            copy(TRGIFT);
-            return true;
-        } else if (id == EXCLUDE.getId()) {
-            copy(EXCLUDE);
-            return true;
-        } else if (id == INCLUDE.getId()) {
-            copy(INCLUDE);
             return true;
         }
         return false;

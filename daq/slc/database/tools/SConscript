@@ -1,7 +1,10 @@
 Import('env')
 
-env['TOOLS_LIBS']['createParamTable'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['dblist'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['dbcreate'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['dbget'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['addParamConfig'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['runnumberget'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['testRunSetting'] = ['pthread', 'daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['cleanTables'] = ['pthread', 'daq', 'framework', '$PGSQL_LIBS', 'nsm2_b2lib', 'nsm2_corelib']
 

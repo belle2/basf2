@@ -2,25 +2,25 @@
 
 using namespace Belle2;
 
-const RFCommand RFCommand::RF_CONFIGURE(601, "RF_CONFIGURE");
-const RFCommand RFCommand::RF_UNCONFIGURE(602, "RF_UNCONFIGURE");
-const RFCommand RFCommand::RF_START(603, "RF_START");
-const RFCommand RFCommand::RF_STOP(604, "RF_STOP");
-const RFCommand RFCommand::RF_RESTART(605, "RF_RESTART");
-const RFCommand RFCommand::RF_PAUSE(606, "RF_PAUSE");
-const RFCommand RFCommand::RF_RESUME(607, "RF_RESUME");
-const RFCommand RFCommand::RF_STATUS(608, "RF_STATUS");
+const RFCommand RFCommand::CONFIGURE(601, "RF_CONFIGURE");
+const RFCommand RFCommand::UNCONFIGURE(602, "RF_UNCONFIGURE");
+const RFCommand RFCommand::START(603, "RF_START");
+const RFCommand RFCommand::STOP(604, "RF_STOP");
+const RFCommand RFCommand::RESTART(605, "RF_RESTART");
+const RFCommand RFCommand::PAUSE(606, "RF_PAUSE");
+const RFCommand RFCommand::RESUME(607, "RF_RESUME");
+const RFCommand RFCommand::STATUS(608, "RF_STATUS");
 
 const RFCommand& RFCommand::operator=(const std::string& label) throw()
 {
-  if (label == RF_CONFIGURE.getLabel()) *this = RF_CONFIGURE;
-  else if (label == RF_UNCONFIGURE.getLabel()) *this = RF_UNCONFIGURE;
-  else if (label == RF_START.getLabel()) *this = RF_START;
-  else if (label == RF_STOP.getLabel()) *this = RF_STOP;
-  else if (label == RF_RESTART.getLabel()) *this = RF_RESTART;
-  else if (label == RF_PAUSE.getLabel()) *this = RF_PAUSE;
-  else if (label == RF_RESUME.getLabel()) *this = RF_RESUME;
-  else if (label == RF_STATUS.getLabel()) *this = RF_STATUS;
+  if (label == CONFIGURE.getLabel()) *this = CONFIGURE;
+  else if (label == UNCONFIGURE.getLabel()) *this = UNCONFIGURE;
+  else if (label == START.getLabel()) *this = START;
+  else if (label == STOP.getLabel()) *this = STOP;
+  else if (label == RESTART.getLabel()) *this = RESTART;
+  else if (label == PAUSE.getLabel()) *this = PAUSE;
+  else if (label == RESUME.getLabel()) *this = RESUME;
+  else if (label == STATUS.getLabel()) *this = STATUS;
   else if (label == NSMCommand::OK.getLabel()) *this = NSMCommand::OK;
   else if (label == NSMCommand::ERROR.getLabel()) *this = NSMCommand::ERROR;
   else *this = Enum::UNKNOWN;

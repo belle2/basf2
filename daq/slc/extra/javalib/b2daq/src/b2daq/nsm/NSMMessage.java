@@ -131,7 +131,7 @@ public final class NSMMessage implements Serializable {
         _data = data;
     }
 
-    public void setData(Serializable data) {
+    public void setObejct(Serializable data) {
         _obj = data;
     }
 
@@ -145,24 +145,27 @@ public final class NSMMessage implements Serializable {
             _pars[i] = reader.readInt();
         }
         int length = reader.readInt();
+        NSMCommand command = new NSMCommand(getReqName());
+        _data = "";
+        _obj = null;
         if (length > 0) {
             StringBuilder buf = new StringBuilder();
             for (int i = 0; i < length; i++) {
                 char c = (char) reader.readChar();
-                if (c =='\n' || (c >= ' ' && c <= '~')) {
+                if (c == '\n' || (c >= ' ' && c <= '~')) {
                     buf.append(c);
                 }
             }
             _data = buf.toString();
-        } else if (getReqName().matches("DBSET")) {
+        } else if (command.equals(NSMCommand.DBSET)) {
             _obj = new ConfigObject();
             reader.readObject(_obj);
-        } else if (getReqName().matches("NSMSET")) {
+        } else if (command.equals(NSMCommand.NSMDATASET)) {
             _obj = new NSMData();
             reader.readObject(_obj);
-        } else {
-            _data = "";
-            _obj = null;
+        } else if (command.equals(NSMCommand.VSET)) {
+            _obj = new NSMVar();
+            reader.readObject(_obj);
         }
     }
 

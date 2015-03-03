@@ -9,6 +9,9 @@ extern "C" {
 #include "daq/slc/nsm/NSMHandlerException.h"
 #include "daq/slc/nsm/NSMCommand.h"
 #include "daq/slc/nsm/NSMNode.h"
+#include "daq/slc/nsm/NSMVar.h"
+
+#include "daq/slc/database/DAQLogMessage.h"
 
 #include <daq/slc/system/Buffer.h>
 
@@ -20,64 +23,6 @@ namespace Belle2 {
   class NSMCommand;
   class NSMNode;
   class NSMMessage;
-
-  class NSMVar {
-
-  public:
-    enum Type {
-      NONE = 0,
-      INT,
-      FLOAT,
-      TEXT
-    };
-
-  public:
-    static const NSMVar NOVALUE;
-
-  public:
-    NSMVar(): m_name(), m_type(NONE), m_len(0), m_value(NULL) {}
-    NSMVar(const std::string& name, Type type, int len, const void* value) {
-      copy(name, type, len, value);
-    }
-    NSMVar(const std::string& name, const std::string& value) {
-      copy(name, TEXT, 0, value.c_str());
-    }
-    NSMVar(const std::string& name, int value) { copy(name, INT, 0, &value); }
-    NSMVar(const std::string& name, float value) { copy(name, FLOAT, 0, &value); }
-    NSMVar(const std::string& name, int len, int* value) { copy(name, INT, len, value); }
-    NSMVar(const std::string& name, int len, float* value) { copy(name, FLOAT, len, value); }
-    NSMVar(const std::string& value) { copy("", TEXT, 0, value.c_str()); }
-    NSMVar(int value) { copy("", INT, 0, &value); }
-    NSMVar(float value) { copy("", FLOAT, 0, &value); }
-    NSMVar(int len, int* value) { copy("", INT, len, value); }
-    NSMVar(int len, float* value) { copy("", FLOAT, len, value); }
-    NSMVar(const NSMVar& var) { copy(var.m_name, var.m_type, var.m_len, var.m_value); }
-    ~NSMVar() throw();
-
-  public:
-    void setName(const std::string& name) { m_name = name; }
-    const void* get() const { return m_value; }
-    void* get() { return m_value; }
-    int size() const;
-    const std::string& getName() const { return m_name; }
-    Type getType() const { return m_type; }
-    int getLength() const { return m_len; }
-    int getInt() const { return (m_type == INT && m_len == 0) ? *(int*)m_value : 0; }
-    float getFloat() const { return (m_type == FLOAT && m_len == 0) ? *(float*)m_value : 0; }
-    std::string getText() const { return (m_type == TEXT && m_len > 0) ? (const char*)m_value : ""; }
-    int getInt(int i) const { return (m_type == INT && i < m_len) ? ((int*)m_value)[i] : 0; }
-    float getFloat(int i) const { return (m_type == FLOAT && i < m_len) ? ((float*)m_value)[i] : 0; }
-
-  private:
-    void copy(const std::string& name,
-              Type type, int len, const void* value);
-  private:
-    std::string m_name;
-    Type m_type;
-    int m_len;
-    void* m_value;
-
-  };
 
   class NSMMessage : public Serializable {
 
@@ -93,13 +38,20 @@ namespace Belle2 {
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
                int npar, int* pars) throw();
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
-               int par, const std::string& obj) throw();
+               int par, const std::string& data) throw();
+    NSMMessage(const NSMNode& node, const NSMCommand& cmd, int par) throw();
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
-               const std::string& obj) throw();
+               const std::string& data) throw();
+    NSMMessage(const NSMNode& node, const NSMVar& var) throw();
+    NSMMessage(const NSMNode& node, const DAQLogMessage& log,
+               bool recorded = false) throw();
     NSMMessage(const NSMCommand& cmd) throw();
+    NSMMessage(const NSMCommand& cmd, int par) throw();
+    NSMMessage(const NSMCommand& cmd, int npar, int* pars) throw();
+    NSMMessage(const NSMCommand& cmd, const std::string& data) throw();
+    NSMMessage(const NSMVar& var) throw();
+    NSMMessage(const DAQLogMessage& log, bool recorded = false) throw();
     NSMMessage(const NSMMessage& msg) throw();
-    NSMMessage(const NSMNode& node,
-               const NSMVar& var) throw();
     virtual ~NSMMessage() throw() { }
 
   public:
@@ -107,6 +59,8 @@ namespace Belle2 {
 
   public:
     void init() throw();
+    void init(const NSMNode& node, const NSMVar& var) throw();
+    void init(const NSMNode& node, const DAQLogMessage& log, bool recorded) throw();
     const char* getRequestName() const throw();
     const char* getNodeName() const throw();
     unsigned short getRequestId() const throw();
@@ -136,6 +90,10 @@ namespace Belle2 {
     void setData(int len, const char* data)  throw();
     void setData(const std::string& text)  throw();
     const NSMVar getVar();
+
+  public:
+    NSMMessage wait(int timeout);
+    void push(const NSMMessage& msg);
 
   public:
     virtual void readObject(Reader&) throw(IOException);

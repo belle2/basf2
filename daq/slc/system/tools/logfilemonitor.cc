@@ -1,6 +1,5 @@
 #include <daq/slc/database/PostgreSQLInterface.h>
 #include <daq/slc/database/DAQLogMessage.h>
-#include <daq/slc/database/LoggerObjectTable.h>
 
 #include <daq/slc/system/Inotify.h>
 #include <daq/slc/system/LogFile.h>
@@ -160,8 +159,6 @@ int main()
             }
             if (pri > LogFile::DEBUG) {
               DAQLogMessage log(dir, pri, message, t);
-              log.setNode("HLT");
-              LoggerObjectTable(db).add(log, true);
             }
           }
         } catch (const DBHandlerException& e) {

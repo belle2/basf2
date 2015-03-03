@@ -83,12 +83,12 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
         }
         try {
             NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.NSMSET)) {
+            if (command.equals(NSMCommand.NSMDATASET)) {
                 NSMData data = NSMListenerService.getData(label_nodename.getText()+"_STATUS");
                 ConfigObject cobj = NSMListenerService.getDB(label_nodename.getText());
                 if (cobj == null) {
-                    NSMListenerService.requestDBGet(label_nodename.getText(), 
-                            data.getInt("configid", 0));
+                    //NSMListenerService.requestDBGet(label_nodename.getText(), 
+                    //        data.getInt("configid", 0));
                 }
                 if (data == null || !data.getFormat().matches("rorc_status")) {
                     return;

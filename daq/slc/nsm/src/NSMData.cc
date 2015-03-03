@@ -3,34 +3,22 @@
 #include "daq/slc/nsm/NSMDataPaket.h"
 #include "daq/slc/nsm/NSMCommunicator.h"
 
+#include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Writer.h>
 #include <daq/slc/base/Reader.h>
-
-#include <daq/slc/system/TCPSocketWriter.h>
-#include <daq/slc/system/TCPSocketReader.h>
-#include <daq/slc/system/UDPSocket.h>
-#include <daq/slc/system/Time.h>
 
 #include <nsm2/belle2nsm.h>
 extern "C" {
 #include <nsm2/nsmlib2.h>
 }
 
-#include <iostream>
-#include <sstream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 using namespace Belle2;
-
-TCPSocket NSMData::g_socket;
-Mutex NSMData::g_mutex;
 
 NSMData::NSMData(const std::string& dataname,
                  const std::string& format, int revision)
@@ -40,31 +28,24 @@ throw() : DBObject(), m_allocated(false),
   setName(dataname);
   setFormat(format);
   setRevision(revision);
-  setConfig(false);
-  m_en = NULL;
 }
 
 NSMData::NSMData()
 throw() : DBObject(), m_allocated(false),
   m_pdata(NULL), m_size(0), m_offset(0)
 {
-  setConfig(false);
-  m_en = NULL;
 }
 
 NSMData::NSMData(const NSMData& data) throw()
   : DBObject(data)
 {
-  setConfig(false);
   m_allocated = data.m_allocated;
   m_size = data.m_size;
   setFormat(data.getFormat());
   setRevision(data.getRevision());
-  setNode(data.getNode());
   setIndex(data.getIndex());
   setName(data.getName());
   m_pdata = NULL;
-  m_en = data.m_en;
   if (m_allocated) {
     m_pdata = malloc(m_size);
     memcpy(m_pdata, data.m_pdata, m_size);
@@ -75,9 +56,9 @@ NSMData::NSMData(const NSMData& data) throw()
   for (FieldNameList::const_iterator it = name_v.begin();
        it != name_v.end(); it++) {
     const std::string& name(*it);
-    const FieldInfo::Property& pro(data.getProperty(name));
+    const DBField::Property& pro(data.getProperty(name));
     add(name, pro);
-    if (pro.getType() == FieldInfo::NSM_OBJECT) {
+    if (pro.getType() == DBField::OBJECT) {
       NSMDataList data_v(data.getObjects(name));
       for (size_t i = 0; i < data_v.size(); i++) {
         NSMData& cdata(data_v[i]);
@@ -108,9 +89,9 @@ void NSMData::reset() throw()
 }
 
 void NSMData::addValue(const std::string& name, const void* data,
-                       FieldInfo::Type type, int length) throw()
+                       DBField::Type type, int length) throw()
 {
-  FieldInfo::Property pro(type, length, m_offset);
+  DBField::Property pro(type, length, m_offset);
   if (length == 0) length = 1;
   int size = pro.getTypeSize() * length;
   if (size <= 0) return;
@@ -126,7 +107,7 @@ void NSMData::addValue(const std::string& name, const void* data,
 void NSMData::setValue(const std::string& name, const void* data,
                        int length) throw()
 {
-  const FieldInfo::Property& pro(getProperty(name));
+  const DBField::Property& pro(getProperty(name));
   if (length == 0) length = 1;
   int size = pro.getTypeSize() * length;
   if (data != NULL && hasField(name) && size > 0) {
@@ -134,158 +115,39 @@ void NSMData::setValue(const std::string& name, const void* data,
   }
 }
 
-void* NSMData::open(NSMCommunicator* comm, bool isnative)
-throw(NSMHandlerException)
+void* NSMData::open(NSMCommunicator& com) throw(NSMHandlerException)
 {
-  if (isnative) {
-    b2nsm_context(comm->getContext());
+  if (m_pdata == NULL) {
+    b2nsm_context(com.getContext());
+    if (getenv("NSM2_INCDIR") == NULL) {
+      ConfigFile file("slowconrol");
+      setenv("NSM2_INCDIR", file.get("nsm2.data.incdir").c_str(), 0);
+    }
     if ((m_pdata = b2nsm_openmem(getName().c_str(), getFormat().c_str(),
                                  getRevision())) == NULL) {
       throw (NSMHandlerException("Failed to open data memory %s",
-                                 nsmlib_strerror(comm->getContext())));
-    }
-    setNode(comm->getNode().getName());
-    parse();
-  } else {
-    NSMDataStore& dstore(NSMDataStore::getStore());
-    if (!dstore.isOpend()) {
-      dstore.open();
-    }
-    m_en = dstore.get(getName());
-    if (m_en == NULL) {
-      UDPSocket udp;
-      NSMDataPaket paket;
-      paket.hdr.flag = NSMCommand::NSMGET.getId();
-      paket.hdr.max = m_size;
-      paket.hdr.revision = getRevision();
-      std::string name = getName();
-      try {
-        g_mutex.lock();
-        std::string hostname = "255.255.255.255";
-        if (comm != NULL) hostname = comm->getHostName();
-        udp = UDPSocket(NSMDataPaket::PORT, hostname, true);
-        paket.hdr.id = 0;
-        strcpy(paket.buf, name.c_str());
-        udp.write(&paket, sizeof(NSMDataPaket::Header) + name.size() + 1);
-        udp.close();
-        g_mutex.unlock();
-      } catch (const IOException& e) {
-        udp.close();
-        g_mutex.unlock();
-        throw (NSMHandlerException("Connection error to datad %s", e.what()));
-      }
-      int ntried = 0;
-      while ((m_en = dstore.get(getName())) == NULL) {
-        dstore.lock();
-        dstore.wait(1);
-        dstore.unlock();
-        ntried++;
-        if (ntried > 3) break;
-      }
-      if (m_en == NULL) {
-        throw (NSMHandlerException("Data %s not registered yet",
-                                   getName().c_str()));
-      }
+                                 nsmlib_strerror(com.getContext())));
     }
     parse();
-    std::string path;
-    if (m_en->addr > 0) {
-      sockaddr_in sa;
-      sa.sin_addr.s_addr = m_en->addr;
-      path = StringUtil::form("%s:%s",
-                              inet_ntoa(sa.sin_addr),
-                              getName().c_str());
-    } else {
-      path = "127.0.0.1:" + getName();
-    }
-    m_mem.open(path, m_size);
-    m_pdata = (char*)m_mem.map();
-    setPointer();
   }
   return m_pdata;
 }
 
-void* NSMData::allocate(NSMCommunicator* comm,
-                        bool isnative, int interval)
-throw(NSMHandlerException)
+void* NSMData::allocate(NSMCommunicator& com, int interval) throw(NSMHandlerException)
 {
-  if (isnative) {
-    b2nsm_context(comm->getContext());
-    if ((m_pdata = b2nsm_allocmem(getName().c_str(), getFormat().c_str(),
-                                  getRevision(), interval)) == NULL) {
-      throw (NSMHandlerException("Failed to allocate data memory %s",
-                                 nsmlib_strerror(comm->getContext())));
-    }
-    setNode(comm->getNode().getName());
-    parse();
-    memset(m_pdata, 0, m_size);
-  } else {
-    parse();
-    m_mem.open("127.0.0.1:" + getName(), m_size);
-    m_pdata = (char*)m_mem.map();
-    setPointer();
-    NSMDataStore& dstore(NSMDataStore::getStore());
-    if (!dstore.isOpend()) {
-      dstore.open();
-    }
-    m_en = dstore.add(0, m_size, getRevision(),
-                      getName(), getFormat(), 0);
+  b2nsm_context(com.getContext());
+  if (getenv("NSM2_INCDIR") == NULL) {
+    ConfigFile file("slowconrol");
+    setenv("NSM2_INCDIR", file.get("nsm2.data.incdir").c_str(), 0);
   }
+  if ((m_pdata = b2nsm_allocmem(getName().c_str(), getFormat().c_str(),
+                                getRevision(), interval)) == NULL) {
+    throw (NSMHandlerException("Failed to allocate data memory %s",
+                               nsmlib_strerror(com.getContext())));
+  }
+  parse();
+  memset(m_pdata, 0, m_size);
   return m_pdata;
-}
-
-void NSMData::setPointer()
-{
-  const FieldNameList& name_v(getFieldNames());
-  for (FieldNameList::const_iterator it = name_v.begin();
-       it != name_v.end(); it++) {
-    const std::string& name(*it);
-    const FieldInfo::Property& pro(getProperty(name));
-    size_t length = pro.getLength();
-    if (length == 0) length = 1;
-    if (pro.getType() == FieldInfo::NSM_OBJECT) {
-      NSMDataList& data_v(getObjects(name));
-      for (size_t i = 0; i < length; i++) {
-        data_v[i].set((char*)m_pdata + pro.getOffset() + data_v[i].getSize()*i);
-      }
-    }
-  }
-}
-
-bool NSMData::update() throw()
-{
-  if (m_en == NULL || m_en->addr == 0) return true;
-  unsigned int utime = m_en->utime;
-  if (Time().get() - utime < 1) {
-    return false;
-  }
-  UDPSocket udp;
-  try {
-    NSMDataPaket paket;
-    paket.hdr.flag = NSMCommand::NSMGET.getId();
-    paket.hdr.max = m_size;
-    paket.hdr.revision = getRevision();
-    g_mutex.lock();
-    udp = UDPSocket(NSMDataPaket::PORT, m_en->addr);
-    paket.hdr.id = m_en->rid;
-    udp.write(&paket, sizeof(NSMDataPaket::Header));
-    udp.close();
-    g_mutex.unlock();
-    NSMDataStore& dstore(NSMDataStore::getStore());
-    int ntried = 0;
-    dstore.lock();
-    while (utime == m_en->utime) {
-      if (dstore.wait(1)) break;
-      ntried++;
-      if (ntried > 3) break;
-    }
-    dstore.unlock();
-  } catch (const IOException& e) {
-    udp.close();
-    g_mutex.unlock();
-    std::cout << e.what() << std::endl;
-  }
-  return m_en->utime != utime;
 }
 
 void* NSMData::parse(const char* incpath, bool malloc_new)
@@ -326,16 +188,16 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length,
     std::string name = ptr->name;
     int offset = ptr->offset;
     m_offset = offset;
-    if (type == 'l') type = FieldInfo::NSM_INT64;
-    else if (type == 'i') type = FieldInfo::NSM_INT32;
-    else if (type == 's') type = FieldInfo::NSM_INT16;
-    else if (type == 'c') type = FieldInfo::NSM_CHAR;
-    else if (type == 'L') type = FieldInfo::NSM_UINT64;
-    else if (type == 'I') type = FieldInfo::NSM_UINT32;
-    else if (type == 'S') type = FieldInfo::NSM_UINT16;
-    else if (type == 'C') type = FieldInfo::NSM_BYTE8;
-    else if (type == 'd') type = FieldInfo::NSM_DOUBLE;
-    else if (type == 'f') type = FieldInfo::NSM_FLOAT;
+    if (type == 'l') type = DBField::LONG;//INT64;
+    else if (type == 'i') type = DBField::INT;//INT32;
+    else if (type == 's') type = DBField::SHORT;//INT16;
+    else if (type == 'c') type = DBField::CHAR;//CHAR;
+    else if (type == 'L') type = DBField::LONG;//UINT64;
+    else if (type == 'I') type = DBField::INT;//UINT32;
+    else if (type == 'S') type = DBField::SHORT;//UINT16;
+    else if (type == 'C') type = DBField::CHAR;//BYTE8;
+    else if (type == 'd') type = DBField::DOUBLE;
+    else if (type == 'f') type = DBField::FLOAT;
     else if (type == '(') {
       NSMData data(getName(), getFormat() + "." + name, getRevision());
       data.m_pdata = (void*)((char*)m_pdata + offset);
@@ -346,18 +208,17 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length,
       for (int i = 0; i < len; i++) {
         NSMData cdata(data);
         cdata.setIndex(i);
-        cdata.setNode(getNode());
         cdata.m_pdata = (void*)((char*)data.get() + i * data.getSize());
         data_v.push_back(cdata);
       }
       m_data_v_m.insert(NSMDataListMap::value_type(name, data_v));
-      type = FieldInfo::NSM_OBJECT;
+      type = DBField::OBJECT;
       m_size += data.m_size * length;
     } else if (type == ')') {
       name_in = name;
       return ptr;
     }
-    FieldInfo::Property pro((FieldInfo::Type)type, length, offset);
+    DBField::Property pro((DBField::Type)type, length, offset);
     add(name, pro);
     int len = (length == 0) ? 1 : length;
     m_size += pro.getTypeSize() * len;
@@ -368,7 +229,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length,
 }
 #endif
 
-void* NSMData::getValue(const std::string& name) throw()
+void* NSMData::getValue(const std::string& name) throw(std::out_of_range)
 {
   if (!hasValue(name)) return NULL;
   char* data = (char*)get();
@@ -376,7 +237,7 @@ void* NSMData::getValue(const std::string& name) throw()
 }
 
 const void* NSMData::getValue(const std::string& name)
-const throw()
+const throw(std::out_of_range)
 {
   if (!hasValue(name)) return NULL;
   char* data = (char*)get();
@@ -398,13 +259,13 @@ void NSMData::readObject(Reader& reader) throw(IOException)
   int npars = reader.readInt();
   for (int n = 0; n < npars; n++) {
     std::string name = reader.readString();
-    FieldInfo::Type type = (FieldInfo::Type)reader.readInt();
+    DBField::Type type = (DBField::Type)reader.readInt();
     size_t length = reader.readInt();
     size_t offset = reader.readInt();
-    if (!hasValue(name)) add(name, FieldInfo::Property(type, length, offset));
+    if (!hasValue(name)) add(name, DBField::Property(type, length, offset));
     void* buf = getValue(name);
     if (length == 0) length = 1;
-    if (type == FieldInfo::NSM_OBJECT) {
+    if (type == DBField::OBJECT) {
       NSMDataList data_v;
       for (size_t i = 0; i < length; i++) {
         NSMData data;
@@ -416,16 +277,12 @@ void NSMData::readObject(Reader& reader) throw(IOException)
     } else {
       for (size_t i = 0; i < length; i++) {
         switch (type) {
-          case FieldInfo::NSM_CHAR: ((char*)buf)[i] = reader.readChar(); break;
-          case FieldInfo::NSM_INT16: ((int16*)buf)[i] = reader.readShort(); break;
-          case FieldInfo::NSM_INT32: ((int32*)buf)[i] = reader.readInt(); break;
-          case FieldInfo::NSM_INT64: ((int64*)buf)[i] = reader.readLong(); break;
-          case FieldInfo::NSM_BYTE8: ((byte8*)buf)[i] = reader.readChar(); break;
-          case FieldInfo::NSM_UINT16: ((uint16*)buf)[i] = reader.readShort(); break;
-          case FieldInfo::NSM_UINT32: ((uint32*)buf)[i] = reader.readInt(); break;
-          case FieldInfo::NSM_UINT64: ((uint64*)buf)[i] = reader.readLong(); break;
-          case FieldInfo::NSM_FLOAT: ((float*)buf)[i] = reader.readFloat(); break;
-          case FieldInfo::NSM_DOUBLE: ((double*)buf)[i] = reader.readDouble(); break;
+          case DBField::CHAR: ((char*)buf)[i] = reader.readChar(); break;
+          case DBField::SHORT: ((int16*)buf)[i] = reader.readShort(); break;
+          case DBField::INT: ((int32*)buf)[i] = reader.readInt(); break;
+          case DBField::LONG: ((int64*)buf)[i] = reader.readLong(); break;
+          case DBField::FLOAT: ((float*)buf)[i] = reader.readFloat(); break;
+          case DBField::DOUBLE: ((double*)buf)[i] = reader.readDouble(); break;
           default: break;
         }
       }
@@ -445,14 +302,14 @@ void NSMData::writeObject(Writer& writer) const throw(IOException)
        it != name_v.end(); it++) {
     const std::string& name(*it);
     writer.writeString(name);
-    const FieldInfo::Property& pro(getProperty(name));
+    const DBField::Property& pro(getProperty(name));
     writer.writeInt(pro.getType());
     writer.writeInt(pro.getLength());
     writer.writeInt(pro.getOffset());
     size_t length = pro.getLength();
     const void* buf = getValue(name);
     if (length == 0) length = 1;
-    if (pro.getType() == FieldInfo::NSM_OBJECT) {
+    if (pro.getType() == DBField::OBJECT) {
       const NSMDataList& data_v(getObjects(name));
       for (size_t i = 0; i < length; i++) {
         writer.writeObject(data_v[i]);
@@ -460,16 +317,12 @@ void NSMData::writeObject(Writer& writer) const throw(IOException)
     } else {
       for (size_t i = 0; i < length; i++) {
         switch (pro.getType()) {
-          case FieldInfo::NSM_CHAR:   writer.writeChar(((char*)buf)[i]); break;
-          case FieldInfo::NSM_INT16:  writer.writeShort(((int16*)buf)[i]); break;
-          case FieldInfo::NSM_INT64:  writer.writeLong(((int64*)buf)[i]); break;
-          case FieldInfo::NSM_INT32:  writer.writeInt(((int32*)buf)[i]); break;
-          case FieldInfo::NSM_BYTE8:  writer.writeChar(((byte8*)buf)[i]); break;
-          case FieldInfo::NSM_UINT16: writer.writeShort(((uint16*)buf)[i]); break;
-          case FieldInfo::NSM_UINT32: writer.writeInt(((uint32*)buf)[i]); break;
-          case FieldInfo::NSM_UINT64: writer.writeLong(((uint64*)buf)[i]); break;
-          case FieldInfo::NSM_FLOAT:  writer.writeFloat(((float*)buf)[i]); break;
-          case FieldInfo::NSM_DOUBLE: writer.writeDouble(((double*)buf)[i]); break;
+          case DBField::CHAR:   writer.writeChar(((char*)buf)[i]); break;
+          case DBField::SHORT:  writer.writeShort(((int16*)buf)[i]); break;
+          case DBField::INT:    writer.writeInt(((int64*)buf)[i]); break;
+          case DBField::LONG:   writer.writeLong(((int32*)buf)[i]); break;
+          case DBField::FLOAT:  writer.writeFloat(((float*)buf)[i]); break;
+          case DBField::DOUBLE: writer.writeDouble(((double*)buf)[i]); break;
           default : break;
         }
       }
@@ -477,28 +330,199 @@ void NSMData::writeObject(Writer& writer) const throw(IOException)
   }
 }
 
+void NSMData::print(const std::string& name_in) const throw()
+{
+  const FieldNameList& name_v(getFieldNames());
+  for (FieldNameList::const_iterator it = name_v.begin();
+       it != name_v.end(); it++) {
+    const std::string& name(*it);
+    const DBField::Property& pro(getProperty(name));
+    size_t length = pro.getLength();
+    std::string name_out = name_in;
+    if (name_in.size() > 0) name_out += ".";
+    else {
+      //name_out += (getName() + "@") + (getFormat() + ".");
+    }
+    name_out += name;
+    std::string pvtype;
+    if (length > 0) {
+      if (pro.getType() == DBField::OBJECT) {
+        const NSMDataList& data_v(getObjects(name));
+        for (size_t i = 0; i < length; i++) {
+          data_v[i].print(StringUtil::form("%s[%d]", name_out.c_str(), i));
+        }
+      } else {
+        const void* buf = getValue(name);
+        const char* name_c = name_out.c_str();
+        for (int i = 0; i < (int)length; i++) {
+          switch (pro.getType()) {
+            case DBField::CHAR:
+              printf("%s[%d] : char(%d)\n", name_c, i, ((char*)buf)[i]); break;
+            case DBField::SHORT:
+              printf("%s[%d] : short(%d)\n", name_c, i, ((int16*)buf)[i]); break;
+            case DBField::INT:
+              printf("%s[%d] : int(%d)\n", name_c, i, ((int32*)buf)[i]); break;
+            case DBField::LONG:
+              printf("%s[%d] : long(%ld)\n", name_c, i, ((int64*)buf)[i]); break;
+            case DBField::FLOAT:
+              printf("%s[%d] : float(%f)\n", name_c, i, ((float*)buf)[i]); break;
+            case DBField::DOUBLE:
+              printf("%s[%d] : double(%f)\n", name_c, i, ((double*)buf)[i]); break;
+            default : break;
+          }
+        }
+      }
+    } else {
+      if (pro.getType() == DBField::OBJECT) {
+        const NSMDataList& data_v(getObjects(name));
+        data_v[0].print(name_out);
+      } else {
+        const void* buf = getValue(name);
+        const char* name_c = name_out.c_str();
+        switch (pro.getType()) {
+          case DBField::CHAR:
+            printf("%s : char(%d)\n", name_c, *(char*)buf); break;
+          case DBField::SHORT:
+            printf("%s : short(%d)\n", name_c, *(int16*)buf); break;
+          case DBField::INT:
+            printf("%s : int(%d)\n", name_c, *(int32*)buf); break;
+          case DBField::LONG:
+            printf("%s : long(%ld)\n", name_c, *(int64*)buf); break;
+          case DBField::FLOAT:
+            printf("%s : float(%f)\n", name_c, *(float*)buf); break;
+          case DBField::DOUBLE:
+            printf("%s : double(%f)\n", name_c, *(double*)buf); break;
+          default : break;
+        }
+      }
+    }
+  }
+}
+
+void NSMData::printPV(const std::string& name_in) const throw()
+{
+  const FieldNameList& name_v(getFieldNames());
+  for (FieldNameList::const_iterator it = name_v.begin();
+       it != name_v.end(); it++) {
+    const std::string& name(*it);
+    const DBField::Property& pro(getProperty(name));
+    size_t length = pro.getLength();
+    std::string name_out = name_in;
+    if (name_in.size() > 0) name_out += ":";
+    else {
+      name_out += (getName() + ":") + (getFormat() + ":");
+    }
+    name_out += name;
+    std::string pvtype;
+    switch (pro.getType()) {
+      case DBField::CHAR:
+      case DBField::SHORT:
+      case DBField::INT:
+      case DBField::LONG:   pvtype = "longin"; break;
+      case DBField::FLOAT:
+      case DBField::DOUBLE: pvtype = "ai"; break;
+      default : break;
+    }
+    if (length > 0) {
+      if (pro.getType() == DBField::OBJECT) {
+        const NSMDataList& data_v(getObjects(name));
+        for (size_t i = 0; i < length; i++) {
+          data_v[i].printPV(StringUtil::form("%s[%d]", name_out.c_str(), i));
+        }
+      } else {
+        for (size_t i = 0; i < length; i++) {
+          printf("record(%s, \"nsm2:%s[%d]\")\n"
+                 "{\n"
+                 "  field(SCAN, \".1 second\")\n"
+                 "  field(DTYP, \"nsm2_data_%s\")\n"
+                 "}\n\n", pvtype.c_str(), name_out.c_str(), (int)i, pvtype.c_str());
+        }
+      }
+    } else {
+      if (pro.getType() == DBField::OBJECT) {
+        const NSMDataList& data_v(getObjects(name));
+        data_v[0].print(name_out);
+      } else {
+        printf("record(%s, \"nsm2:%s\")\n"
+               "{\n"
+               "  field(SCAN, \".1 second\")\n"
+               "  field(DTYP, \"nsm2_data_%s\")\n"
+               "}\n\n", pvtype.c_str(), name_out.c_str(), pvtype.c_str());
+      }
+    }
+  }
+}
+
+const void* NSMData::find(const std::string& name_in, DBField::Type& type)
+const throw()
+{
+  size_t pos;
+  std::string name_out = name_in;
+  if ((pos = name_in.find(".")) != std::string::npos)  {
+    StringList str = StringUtil::split(name_out, '.');
+    StringList sstr = StringUtil::split(str[0], '[');
+    const NSMDataList& data_v(getObjects(sstr[0]));
+    int index = 0;
+    if (sstr.size() > 1) {
+      index = atoi(sstr[1].c_str());
+    }
+    name_out = name_in.substr(pos + 1);
+    return data_v[index].find(name_out, type);
+  }
+  int index = 0;
+  if ((pos = name_out.find("[")) != std::string::npos)  {
+    StringList str = StringUtil::split(name_out, '[');
+    name_out = str[0];
+    index = atoi(str[1].c_str());
+  }
+  if (!hasValue(name_out)) return NULL;
+  const DBField::Property& pro(getProperty(name_out));
+  type = pro.getType();
+  const void* buf = getValue(name_out);
+  switch (type) {
+    case DBField::CHAR: return (((const char*)buf) + index);
+    case DBField::SHORT: return (((const int16*)buf) + index);
+    case DBField::INT: return (((const int32*)buf) + index);
+    case DBField::LONG: return (((const int64*)buf) + index);
+    case DBField::FLOAT: return (((const float*)buf) + index);
+    case DBField::DOUBLE: return (((const double*)buf) + index);
+    default: return NULL;
+  }
+  return NULL;
+}
+
 int NSMData::getNObjects(const std::string& name) const throw()
 {
-  return m_data_v_m[name].size();
+  NSMDataListMap::const_iterator it = m_data_v_m.find(name);
+  if (it != m_data_v_m.end()) return it->second.size();
+  return 0;
 }
 
-const DBObject& NSMData::getObject(const std::string& name, int index) const throw()
+const NSMData& NSMData::getObject(const std::string& name, int index) const throw(std::out_of_range)
 {
-  return m_data_v_m[name][index];
+  NSMDataListMap::const_iterator it = m_data_v_m.find(name);
+  if (it != m_data_v_m.end()) return it->second[index];
+  else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
 }
 
-DBObject& NSMData::getObject(const std::string& name, int index) throw()
+NSMData& NSMData::getObject(const std::string& name, int index) throw(std::out_of_range)
 {
-  return m_data_v_m[name][index];
+  NSMDataListMap::iterator it = m_data_v_m.find(name);
+  if (it != m_data_v_m.end()) return it->second[index];
+  else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
 }
 
-const NSMData::NSMDataList& NSMData::getObjects(const std::string& name) const throw()
+const NSMData::NSMDataList& NSMData::getObjects(const std::string& name) const throw(std::out_of_range)
 {
-  return m_data_v_m[name];
+  NSMDataListMap::const_iterator it = m_data_v_m.find(name);
+  if (it != m_data_v_m.end()) return it->second;
+  else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
 }
 
-NSMData::NSMDataList& NSMData::getObjects(const std::string& name) throw()
+NSMData::NSMDataList& NSMData::getObjects(const std::string& name) throw(std::out_of_range)
 {
-  return m_data_v_m[name];
+  NSMDataListMap::iterator it = m_data_v_m.find(name);
+  if (it != m_data_v_m.end()) return it->second;
+  else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
 }
 

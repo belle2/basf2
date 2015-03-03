@@ -5,6 +5,7 @@ using namespace Belle2;
 
 int main()
 {
-  HVControlDaemon(new ArichHVControlCallback(NSMNode("ARICH_HV"))).run();
+  HVControlDaemon(new ArichHVControlCallback(),
+                  "arich").run();
   return 0;
 }

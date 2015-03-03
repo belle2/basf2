@@ -118,7 +118,7 @@ public class PowerSupplyMainPaneController implements Initializable, NSMObserver
             long date = 1000l + msg.getParam(1);
             log(new LogMessage(from, LogLevel.Get(msg.getParam(0)),
                     new Date(date), ss.toString()));
-        } else if (command.equals(NSMCommand.LISTSET)) {
+        } else if (command.equals(NSMCommand.DBLISTSET)) {
             if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
                 namelist = msg.getData().split("\n");
                 commandButtonController.clearStack();
@@ -132,15 +132,17 @@ public class PowerSupplyMainPaneController implements Initializable, NSMObserver
                 psStatusController.setDB(cobj, logviewController);
                 hvmonitorController.setDB(cobj);
             }
-        } else if (command.equals(NSMCommand.NSMSET)) {
+        } else if (command.equals(NSMCommand.NSMDATASET)) {
             String dataname = getNSMDataProperties().get(0).getDataname();
             if (dataname.matches(msg.getNodeName())) {
                 NSMData data = NSMListenerService.getData(dataname);
                 networkconfigController.add(data);
                 NSMConfig config = NSMListenerService.getNSMConfig();
                 if (cobj.getId() == 0) {
+                    /*
                     NSMListenerService.requestDBGet(config.getNsmTarget(),
                             data.getInt("configid", 0));
+                            */
                     sent_listrequest = true;
                 } else {
                     HVState state = HVState.get(data.getInt("state"));
@@ -162,7 +164,6 @@ public class PowerSupplyMainPaneController implements Initializable, NSMObserver
                         + state.getLabel()));
                 NSMListenerService.requestNSMGet(dataname, "", 0);
             }
-        } else if (command.equals(HVCommand.STATE)) {
         }
     }
 

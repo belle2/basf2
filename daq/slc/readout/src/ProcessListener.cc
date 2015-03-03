@@ -10,6 +10,8 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <iostream>
+
 using namespace Belle2;
 
 void ProcessListener::run()
@@ -21,8 +23,8 @@ void ProcessListener::run()
     return;
   }
   m_con->lock();
-  NSMCommunicator* comm = m_con->getCallback()->getCommunicator();
-  NSMNode& node(m_con->getCallback()->getNode());
+  RCCallback& callback(*(m_con->getCallback()));
+  NSMNode& node(callback.getNode());
   if (m_con->getInfo().isAvailable()) {
     unsigned int state = m_con->getInfo().getState();
     switch (state) {
@@ -30,25 +32,32 @@ void ProcessListener::run()
         if (node.getState() == RCState::RUNNING_S ||
             node.getState() == RCState::LOADING_TS ||
             node.getState() == RCState::STARTING_TS) {
-          LogFile::error("Forked process %s was crashed", process_name.c_str());
-          //node.setState(RCState::RECOVERING_RS);
-          comm->sendError(StringUtil::form("Foked process %s was crashed", process_name.c_str()));
+          std::string emsg = StringUtil::form("Foked process %s was crashed", process_name.c_str());
+          LogFile::error(emsg);
+          callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
           m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
         }
         break;
-      case RunInfoBuffer::READY:
-        LogFile::warning("Forked process %s was not started", process_name.c_str());
-        //node.setState(RCState::RECOVERING_RS);
-        comm->sendError(StringUtil::form("Foked process %s was no started", process_name.c_str()));
+      case RunInfoBuffer::READY: {
+        std::string emsg = StringUtil::form("Foked process %s was not started", process_name.c_str());
+        LogFile::error(emsg);
+        callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
         m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
-        break;
+      } break;
       case RunInfoBuffer::NOTREADY:
-      default:
-        LogFile::debug("Forked process %s was finished", process_name.c_str());
-        comm->sendLog(DAQLogMessage(node.getName(), LogFile::INFO,
-                                    StringUtil::form("Foked process %s was finished",
-                                                     process_name.c_str())));
-        break;
+      default: {
+        if (node.getState() == RCState::LOADING_TS) {
+          std::string emsg = StringUtil::form("Foked process %s was not booted", process_name.c_str());
+          LogFile::error(emsg);
+          callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
+          m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
+        } else {
+          std::string emsg = StringUtil::form("Forked process %s was finished", process_name.c_str());
+          LogFile::debug(emsg);
+          DAQLogMessage lmsg(node.getName(), LogFile::INFO, emsg);
+          callback.reply(NSMMessage(lmsg));
+        }
+      } break;
     }
   }
   fork.set_id(-1);

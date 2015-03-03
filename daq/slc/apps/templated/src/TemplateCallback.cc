@@ -8,81 +8,59 @@
 
 using namespace Belle2;
 
-TemplateCallback::TemplateCallback(const NSMNode& node/*,
-                                   const std::string& format,
-                                   int revision*/)
-  : RCCallback(node, 5)
+TemplateCallback::TemplateCallback()
 {
-  //m_data = NSMData("STATUS_" + node.getName(), format, revision);
 }
 
 TemplateCallback::~TemplateCallback() throw()
 {
 }
 
-void TemplateCallback::init() throw()
+bool TemplateCallback::initialize(const DBObject& obj) throw()
 {
-  //m_data.allocate(getCommunicator());
-}
-
-void TemplateCallback::term() throw()
-{
-}
-
-void TemplateCallback::timeout() throw()
-{
-}
-
-bool TemplateCallback::load() throw()
-{
-  sleep(5);
-  getConfig().getObject().print();
+  obj.print();
   return true;
 }
 
-bool TemplateCallback::trigft() throw()
+bool TemplateCallback::configure(const DBObject& obj) throw()
 {
-  NSMMessage& msg(getMessage());
-  LogFile::debug("trigger type  : %d", msg.getParam(0));
-  LogFile::debug("dummy rate    : %d", msg.getParam(1));
-  LogFile::debug("trigger limit : %d", msg.getParam(2));
+  obj.print();
   return true;
 }
 
-bool TemplateCallback::start() throw()
+void TemplateCallback::timeout(NSMCommunicator&) throw()
 {
-  NSMMessage& msg(getMessage());
-  LogFile::debug("run # = %04d.%04d.%03d",
-                 msg.getParam(0), msg.getParam(1),
-                 msg.getParam(2));
-  return true;
 }
 
-bool TemplateCallback::stop() throw()
+void TemplateCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  return true;
+  obj.print();
 }
 
-bool TemplateCallback::resume() throw()
+void TemplateCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  return true;
+  LogFile::debug("run # = %04d.%04d.%03d", expno, runno, 0);
 }
 
-bool TemplateCallback::pause() throw()
+void TemplateCallback::stop() throw(RCHandlerException)
 {
-  return true;
 }
 
-bool TemplateCallback::recover() throw()
+void TemplateCallback::resume() throw(RCHandlerException)
 {
-  getNode().setState(RCState::READY_S);
-  return false;
 }
 
-bool TemplateCallback::abort() throw()
+void TemplateCallback::pause() throw(RCHandlerException)
 {
-  sleep(5);
-  getNode().setState(RCState::NOTREADY_S);
-  return true;
+}
+
+void TemplateCallback::recover() throw(RCHandlerException)
+{
+  setState(RCState::READY_S);
+}
+
+void TemplateCallback::abort() throw(RCHandlerException)
+{
+  setState(RCState::NOTREADY_S);
 }
 

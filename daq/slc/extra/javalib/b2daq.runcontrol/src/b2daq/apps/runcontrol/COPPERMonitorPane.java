@@ -292,7 +292,7 @@ public class COPPERMonitorPane extends VBox implements NSMObserver {
         }
         try {
             NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.NSMSET)) {
+            if (command.equals(NSMCommand.NSMDATASET)) {
                 ConfigObject cobj = NSMListenerService.getDB(labelNodeName.getText());
                 NSMData data = NSMListenerService.getData(labelNodeName.getText() + "_STATUS");
                 if (data == null || !data.getFormat().matches("ronode_status")) {

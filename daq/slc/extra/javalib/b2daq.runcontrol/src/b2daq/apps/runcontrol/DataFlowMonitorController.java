@@ -101,7 +101,7 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
         }
         try {
             NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.NSMSET)) {
+            if (command.equals(NSMCommand.NSMDATASET)) {
                 ConfigObject cobj = NSMListenerService.getDB(label_nodename.getText());
                 if (cobj != null) {
                     if (cobj.getTable().matches("copper")) {

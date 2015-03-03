@@ -77,7 +77,7 @@ class RunControlNodeConfigPane extends HBox {
             }
             comboConfig.getSelectionModel().select(configname);
         } else {
-            NSMListenerService.requestList(name);
+            //NSMListenerService.requestList(name);
         }
     }
 }

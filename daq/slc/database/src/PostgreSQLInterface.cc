@@ -62,9 +62,11 @@ DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
   for (size_t irecord = 0; irecord < nrecords; irecord++) {
     DBRecord record;
     for (size_t ifield = 0; ifield < nfields; ifield++) {
-      const char* value = PQgetvalue(m_sq_result, irecord, ifield);
-      if (value != NULL) {
-        record.add(name_v[ifield], value);
+      if (!PQgetisnull(m_sq_result, irecord, ifield)) {
+        const char* value = PQgetvalue(m_sq_result, irecord, ifield);
+        if (value != NULL) {
+          record.add(name_v[ifield], value);
+        }
       }
     }
     m_record_v.push_back(record);

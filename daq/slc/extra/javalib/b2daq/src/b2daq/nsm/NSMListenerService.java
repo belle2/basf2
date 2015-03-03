@@ -146,35 +146,45 @@ public class NSMListenerService extends Thread {
     }
 
     public static boolean requestNSMGet(NSMData data) {
-        return g_socket.requestNSMGet(data);
+        return requestNSMGet(data.getName(), data.getFormat(), data.getRevision());
     }
 
     public static boolean requestNSMGet(String dataname, String format, int revision) {
-        return g_socket.requestNSMGet(dataname, format, revision);
+        NSMMessage msg = new NSMMessage(NSMCommand.NSMDATAGET);
+        msg.setData(dataname + " " + format);
+        msg.setNParams(1);
+        msg.setParam(0, revision);
+        return request(msg);
     }
 
-    public static boolean requestList(String nodename) {
-        return g_socket.requestList(nodename);
+    public static boolean requestList(String table, String node, String prefix) {
+        return request(new NSMMessage(NSMCommand.DBLISTGET, table+"/"+node+"@"+prefix));
     }
 
-    public static boolean requestDBGet(ConfigObject obj) {
-        return g_socket.requestDBGet(obj);
+    public static boolean requestList(String table, String node) {
+        return request(new NSMMessage(NSMCommand.DBLISTGET, table+"/"+node));
     }
 
-    public static boolean requestDBGet(String node, String table, String name, int id) {
-        return g_socket.requestDBGet(node, table, name, id);
+    public static boolean requestDBGet(String config) {
+        return request(new NSMMessage(NSMCommand.DBGET, config));
     }
 
-    public static boolean requestDBGet(String node, int id) {
-        return g_socket.requestDBGet(node, "", "", id);
+    public static boolean requestDBSet(String table, ConfigObject obj) {
+        if (request(new NSMMessage(NSMCommand.DBGET, table))) {
+            return g_socket.writeObject(obj);
+        }
+        return false;
     }
 
-    public static boolean requestDBGet(String node, String table) {
-        return g_socket.requestDBGet(node, table, "", 0);
+    public static boolean requestVGet(String node, String vname) {
+        return request(new NSMMessage(node, NSMCommand.VGET, vname));
     }
 
-    public static boolean requestDBSet(ConfigObject obj) {
-        return g_socket.requestDBSet(obj);
+    public static boolean requestVSet(String node, NSMVar var) {
+        if (request(new NSMMessage(node, NSMCommand.VSET))) {
+            return g_socket.writeObject(var);
+        }
+        return false;
     }
 
     private static NSMMessage waitMessage() {
@@ -184,7 +194,7 @@ public class NSMListenerService extends Thread {
             command.copy(msg.getReqName());
             if (command.equals(NSMCommand.DBSET)) {
                 g_obj_m.put(msg.getNodeName(), (ConfigObject)msg.getObject());
-            } else if (command.equals(NSMCommand.LISTSET)) {
+            } else if (command.equals(NSMCommand.DBLISTSET)) {
                 if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
                     String [] namelist = msg.getData().split("\n");
                     ArrayList<String> name_v = new ArrayList<>();
@@ -193,7 +203,8 @@ public class NSMListenerService extends Thread {
                     }
                     g_confname_m.put(msg.getNodeName(), name_v);
                 }
-            } else if (command.equals(NSMCommand.NSMSET)) {
+            } else if (command.equals(NSMCommand.VSET)) {
+            } else if (command.equals(NSMCommand.NSMDATASET)) {
                 g_data_m.put(msg.getNodeName(), (NSMData)msg.getObject());
             }
         }

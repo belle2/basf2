@@ -21,22 +21,22 @@ namespace Belle2 {
   class StoragerCallback : public RCCallback {
 
   public:
-    StoragerCallback(const NSMNode& node);
+    StoragerCallback();
     virtual ~StoragerCallback() throw();
 
   public:
-    virtual void init() throw();
+    virtual bool initialize(const DBObject& obj) throw();
+    virtual bool configure(const DBObject& obj) throw();
+    virtual void load(const DBObject& obj) throw(RCHandlerException);
+    virtual void start(int expno, int runno) throw(RCHandlerException);
+    virtual void stop() throw(RCHandlerException);
+    virtual void recover() throw(RCHandlerException);
+    virtual void abort() throw(RCHandlerException);
+    virtual void timeout(NSMCommunicator& com) throw();
     virtual void term() throw();
-    virtual bool load() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
-    virtual bool resume() throw();
-    virtual bool pause() throw();
-    virtual bool recover() throw();
-    virtual bool abort() throw();
-    virtual void timeout() throw();
 
   private:
+    ProcessController m_eb2rx;
     std::vector<ProcessController> m_con;
     std::vector<FlowMonitor> m_flow;
     NSMData m_data;

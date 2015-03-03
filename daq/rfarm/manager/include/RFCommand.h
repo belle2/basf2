@@ -10,14 +10,14 @@ namespace Belle2 {
   class RFCommand : public NSMCommand {
 
   public:
-    static const RFCommand RF_CONFIGURE;
-    static const RFCommand RF_UNCONFIGURE;
-    static const RFCommand RF_START;
-    static const RFCommand RF_STOP;
-    static const RFCommand RF_RESTART;
-    static const RFCommand RF_PAUSE;
-    static const RFCommand RF_RESUME;
-    static const RFCommand RF_STATUS;
+    static const RFCommand CONFIGURE;
+    static const RFCommand UNCONFIGURE;
+    static const RFCommand START;
+    static const RFCommand STOP;
+    static const RFCommand RESTART;
+    static const RFCommand PAUSE;
+    static const RFCommand RESUME;
+    static const RFCommand STATUS;
 
   public:
     RFCommand() throw() {}

@@ -1,11 +1,8 @@
 #include "daq/slc/apps/dqmviewd/DQMFileReader.h"
 
-#include <daq/slc/system/LogFile.h>
+#include "daq/slc/apps/dqmviewd/DQMViewCallback.h"
 
-#include <daq/slc/dqm/HistoPackage.h>
-#include <daq/slc/dqm/Histo.h>
-#include <daq/slc/dqm/Histo1D.h>
-#include <daq/slc/dqm/Histo2D.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
 
@@ -27,13 +24,14 @@ TH1* DQMFileReader::getHist(const std::string& name)
   return m_hist_m.getHist(name);
 }
 
-bool DQMFileReader::init()
+bool DQMFileReader::init(int index, DQMViewCallback& callback)
 {
   m_mutex.lock();
   if (m_file) m_file->Close();
   m_file = TMapFile::Create(m_hist_m.getFileName().c_str());
   m_hist_m.clear();
   TMapRec* mr = m_file->GetFirst();
+  int i = 0;
   while (m_file->OrgAddress(mr)) {
     TObject* obj = m_file->Get(mr->GetName());
     if (obj != NULL) {
@@ -47,18 +45,39 @@ bool DQMFileReader::init()
           dir = str_v[0];
           name = str_v[1];
         }
-        LogFile::debug("%s / %s:(%d, %f, %f)", dir.c_str(), name.c_str(), (int)h->GetXaxis()->GetNbins(),
+        LogFile::debug("%s/%s:(%d, %f, %f)", dir.c_str(), name.c_str(), (int)h->GetXaxis()->GetNbins(),
                        h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax());
+        std::string vname = StringUtil::form("package[%d].hist[%d].", index, i);
+        callback.add(new NSMVHandlerText(vname + "name", true, false, h->GetName()));
+        callback.add(new NSMVHandlerText(vname + "title", true, false, h->GetTitle()));
+        callback.add(new NSMVHandlerInt(vname + "dim", true, false, h->GetDimension()));
+        callback.add(new NSMVHandlerText(vname + "xaxis.title", true, false, h->GetXaxis()->GetTitle()));
+        callback.add(new NSMVHandlerInt(vname + "xaxis.nbins", true, false, h->GetXaxis()->GetNbins()));
+        callback.add(new NSMVHandlerInt(vname + "xaxis.min", true, false, h->GetXaxis()->GetXmin()));
+        callback.add(new NSMVHandlerInt(vname + "xaxis.max", true, false, h->GetXaxis()->GetXmin()));
+        callback.add(new NSMVHandlerText(vname + "yaxis.title", true, false, h->GetYaxis()->GetTitle()));
+        callback.add(new NSMVHandlerInt(vname + "yaxis.nbins", true, false, h->GetYaxis()->GetNbins()));
+        callback.add(new NSMVHandlerInt(vname + "yaxis.min", true, false, h->GetYaxis()->GetXmin()));
+        callback.add(new NSMVHandlerInt(vname + "yaxis.max", true, false, h->GetYaxis()->GetXmin()));
+        callback.add(new NSMVHandlerText(vname + "zaxis.title", true, false, h->GetZaxis()->GetTitle()));
+        callback.add(new NSMVHandlerInt(vname + "zaxis.nbins", true, false, h->GetZaxis()->GetNbins()));
+        callback.add(new NSMVHandlerInt(vname + "zaxis.min", true, false, h->GetZaxis()->GetXmin()));
         TH1* h1 = (TH1*)h->Clone((name + "_copy").c_str());
         h1->Reset();
         h1->Add(h);
         m_hist_m.addHist(h1, dir, name);
         m_name_v.push_back(name);
+        i++;
       }
     }
     mr = mr->GetNext();
   }
-  bool ready = m_ready = m_hist_m.getHists().size() > 0;
+  int nhists = m_hist_m.getHists().size();
+  bool ready = m_ready = nhists > 0;
+  if (ready) {
+    std::string vname = StringUtil::form("package[%d].", index);
+    callback.add(new NSMVHandlerInt(vname + "nhists", true, false, nhists));
+  }
   m_mutex.unlock();
   return ready;
 }

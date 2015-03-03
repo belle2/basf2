@@ -6,8 +6,9 @@ namespace Belle2 {
   class Daemon {
 
   public:
-    static bool start(const char* logfile,
-                      int argc, char** argv);
+    static bool start(const char* title,
+                      int argc, char** argv,
+                      int nargc, const char* msg);
 
   };
 

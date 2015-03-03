@@ -3,26 +3,26 @@
 
 #include <daq/slc/nsm/NSMNode.h>
 
-#include <daq/slc/database/LoggerObject.h>
-#include <daq/slc/database/RunNumberInfo.h>
+#include <daq/slc/database/DBObject.h>
+#include <daq/slc/database/RunNumber.h>
 
 namespace Belle2 {
 
-  class RunSetting : public LoggerObject {
+  class RunSetting : public DBObject {
 
   public:
     RunSetting(const NSMNode& node);
     ~RunSetting() throw();
 
   public:
-    void setRunNumber(RunNumberInfo info);
+    void setRunNumber(const RunNumber& info);
     void setOperators(const std::string& operators) {
       setText("operators", operators);
     }
     void setComment(const std::string& comment) {
       setText("comment", comment);
     }
-    void setRunControl(const ConfigObject& obj);
+    void setRunControl(const DBObject& obj);
 
   };
 

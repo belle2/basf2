@@ -17,5 +17,4 @@ RCConfig::RCConfig(const RCConfig& config)
 
 void RCConfig::print() throw()
 {
-  m_obj.print();
 }

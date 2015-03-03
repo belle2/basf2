@@ -1,65 +1,50 @@
-#ifndef _Belle2_RFMasterCallback_hh
-#define _Belle2_RFMasterCallback_hh
+#ifndef _Belle2_RFMasterCallback_h
+#define _Belle2_RFMasterCallback_h
 
 #include "daq/rfarm/manager/RFConf.h"
 
-#include <daq/slc/nsm/NSMCallback.h>
+#include <daq/slc/runcontrol/RCState.h>
+#include <daq/slc/runcontrol/RCCallback.h>
+
 #include <daq/slc/nsm/NSMData.h>
 
-#include <daq/slc/runcontrol/RCState.h>
+#include <daq/slc/base/StringUtil.h>
 
 #include <vector>
 #include <map>
 
 namespace Belle2 {
 
-  class RFMaster;
   class RFRunControlCallback;
 
-  class RFMasterCallback : public NSMCallback {
-
-    typedef std::map<std::string, NSMNode> NSMNodeList;
-    typedef NSMNodeList::iterator NSMNodeIterator;
-    typedef NSMNodeList::reverse_iterator NSMNodeRIterator;
+  class RFMasterCallback : public RCCallback {
 
   public:
-    RFMasterCallback(const NSMNode& node,
-                     const NSMData& data,
-                     RFMaster* master,
-                     const char* confile);
-    virtual ~RFMasterCallback() throw();
+    RFMasterCallback() : m_callback(NULL) {}
+    virtual ~RFMasterCallback() throw() {}
 
   public:
-    virtual bool perform(const NSMMessage& msg) throw();
-    virtual void init() throw();
-    virtual void timeout() throw();
-    virtual bool ok() throw();
-    virtual bool error() throw();
-    virtual bool configure() throw();
-    virtual bool unconfigure() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
-    virtual bool pause() throw();
-    virtual bool resume() throw();
-    virtual bool restart() throw();
-    virtual bool status() throw();
+    virtual bool initialize(const DBObject& obj) throw();
+    virtual bool configure(const DBObject& obj) throw();
+    virtual void timeout(NSMCommunicator& com) throw();
+    virtual void ok(const char* node, const char* data) throw();
+    virtual void error(const char* node, const char* data) throw();
+    virtual void load(const DBObject& obj) throw(RCHandlerException);
+    virtual void start(int expno, int runno) throw(RCHandlerException);
+    virtual void stop() throw(RCHandlerException);
+    virtual void recover() throw(RCHandlerException);
+    virtual void resume() throw(RCHandlerException);
+    virtual void pause() throw(RCHandlerException);
+    virtual void abort() throw(RCHandlerException);
 
   public:
-    void setCallback(RFRunControlCallback* callback) {
-      m_callback = callback;
-    }
-    void reply(bool result);
-    void setState(const RCState& state);
+    void setState(NSMNode& node, const RCState& state);
+    void setCallback(RFRunControlCallback* callback) { m_callback = callback; }
 
   private:
-    NSMData m_data;
-    RFMaster* m_master;
-    std::vector<NSMData> m_data_v;
     RFRunControlCallback* m_callback;
-    RFConf m_conf;
-    int m_st_conf;
-    int m_st_unconf;
-    std::vector<std::string> m_name_v;
+    NSMDataList m_datas;
+    typedef std::vector<NSMNode> NSMNodeList;
     NSMNodeList m_nodes;
 
   };

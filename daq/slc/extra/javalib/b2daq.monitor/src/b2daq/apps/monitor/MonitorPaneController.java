@@ -70,7 +70,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
             long date = 1000l + msg.getParam(1);
             log(new LogMessage(from, LogLevel.Get(msg.getParam(0)),
                     new Date(date), ss.toString()));
-        } else if (command.equals(NSMCommand.LISTSET)) {
+        } else if (command.equals(NSMCommand.DBLISTSET)) {
             if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
                 namelist = msg.getData().split("\n");
                 //System.out.println(msg.getData());
@@ -80,7 +80,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
             if (cobj != null) {
                 networkconfigController.add(cobj);
             }
-        } else if (command.equals(NSMCommand.NSMSET)) {
+        } else if (command.equals(NSMCommand.NSMDATASET)) {
             String dataname = msg.getNodeName();
             NSMData data = NSMListenerService.getData(dataname);
             Tab tab = null;
@@ -147,7 +147,6 @@ public class MonitorPaneController implements Initializable, NSMObserver {
                 }
             }
         } else if (command.equals(RCCommand.OK)) {
-        } else if (command.equals(RCCommand.STATE)) {
         }
     }
 

@@ -73,7 +73,7 @@ public class HVStatusMonitorController implements Initializable, NSMObserver {
             return;
         }
         NSMCommand command = new NSMCommand(msg.getReqName());
-        if (command.equals(NSMCommand.NSMSET)) {
+        if (command.equals(NSMCommand.NSMDATASET)) {
             NSMData data = NSMListenerService.getData(msg.getNodeName());//;"CDC_HV_STATUS");
             if (obj == null || !obj.hasObject("channel")) {
                 return;

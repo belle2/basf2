@@ -25,6 +25,9 @@ namespace Belle2 {
     bool isFifoFull() throw();
     bool isFifoEmpty() throw();
     bool isLengthFifoFull() throw();
+    bool isError() throw() {
+      return isFifoFull() || isLengthFifoFull();
+    }
 
   private:
     int m_fd;

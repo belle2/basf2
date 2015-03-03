@@ -145,6 +145,7 @@ public abstract class GAxis extends GShape {
     public void addLabel(String label, double value) {
         auto_label = false;
         labels.add(new GValuedText(label, value, "top"));
+        ndivisions = 5;
     }
 
     public ObservableList<GValuedText> getLabels() {
@@ -365,7 +366,9 @@ public abstract class GAxis extends GShape {
                             }
                             tick_line_v.add(new GLine(x, 0, x, 2));
                         } else {
-                            tick_line_v.add(new GLine(x, 0, x, 1));
+                            if (auto_label) {
+                                tick_line_v.add(new GLine(x, 0, x, 1));
+                            }
                         }
                     }
                 }

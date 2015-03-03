@@ -24,21 +24,25 @@ namespace Belle2 {
   class NSM2SocketBridge {
 
   public:
-    NSM2SocketBridge(const TCPSocket& socket,
-                     NSM2SocketCallback* callback,
-                     DBInterface* db);
+    NSM2SocketBridge(const TCPSocket& socket);
     ~NSM2SocketBridge() throw();
 
   public:
     void run() throw();
-    bool sendMessage(const NSMMessage& msg) throw();
-    bool sendMessage(const NSMMessage& msg,
-                     const Serializable& obj) throw();
-    bool recieveMessage(NSMMessage& msg) throw();
-    bool sendLog(const DAQLogMessage& log) throw();
-    bool sendError(const ERRORNo& eno,
-                   const std::string& nodename,
-                   const std::string& message) throw();
+    bool send(const NSMMessage& msg) throw();
+    bool send(const NSMMessage& msg,
+              const Serializable& obj) throw();
+
+  protected:
+    void dbget(const std::string& table,
+               const std::string& config,
+               const NSMNode& node);
+    void dblistget(const std::string& table,
+                   const NSMNode& node, const std::string& grep);
+    void dbset(const std::string& table, const DBObject& obj);
+    void nsmdataget(int revision, const std::string& name,
+                    const std::string& format);
+    DBInterface& getDB() { return *m_db; }
 
   private:
     NSM2SocketCallback* m_callback;
@@ -48,22 +52,7 @@ namespace Belle2 {
     TCPSocketReader m_reader;
     Mutex m_mutex;
     Cond m_cond;
-    std::list<NSMMessage> m_msg_l;
-
-    friend class Sender;
-  private:
-    class Sender {
-    public:
-      Sender(NSM2SocketBridge* bridge)
-        : m_bridge(bridge) {}
-
-    public:
-      void run() throw();
-
-    private:
-      NSM2SocketBridge* m_bridge;
-
-    };
+    std::string m_table;
 
   };
 

@@ -2,10 +2,21 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <iostream>
 #include <sstream>
 #include <cstdlib>
 
 using namespace Belle2;
+
+std::string ArichHVMessage::encode(double value)
+{
+  return StringUtil::form("%04X", (unsigned int)value);
+}
+
+double ArichHVMessage::decode(const std::string& value)
+{
+  return strtoul(("0x" + value).c_str(), 0, 0);
+}
 
 ArichHVMessage::ArichHVMessage(MessageType type, Command command,
                                unsigned short unit, unsigned short ch)
@@ -23,10 +34,14 @@ ArichHVMessage::ArichHVMessage(MessageType type, Command command,
   m_store = 0;
 }
 
-std::string ArichHVMessage::toString()
+std::string ArichHVMessage::toString(bool use_ch)
 {
   std::stringstream ss;
-  ss << "#" << getUnit() << getChannel() << " ";
+  if (use_ch) {
+    ss << "#" << getUnit() << getChannel() << " ";
+  } else {
+    ss << "#" << getUnit() << " ";
+  }
   if (m_type == GET) {
     switch (m_command) {
       case ALL:            ss << "GET"; break;
@@ -44,134 +59,186 @@ std::string ArichHVMessage::toString()
     }
   } else if (m_type == SET) {
     switch (m_command) {
-      case ALL: ss << StringUtil::form("SET %04X,%d,%04X,%04X,%04X", getVoltageDemand(),
-                                         (int)isSwitchOn(), getVoltageLimit(), getCurrentLimit(),
-                                         getRampUpSpeed(), getRampDownSpeed()); break;
-      case SWITCH:         ss << "SW" << (int)isSwitchOn(); break;
-      case RAMPUP_SPEED:   ss << StringUtil::form("RVU %04X", getRampUpSpeed()); break;
-      case RAMPDOWN_SPEED: ss << StringUtil::form("RVD %04X", getRampDownSpeed()); break;
-      case VOLTAGE_DEMAND: ss << StringUtil::form("CH5 %04X", getVoltageDemand()); break;
-      case VOLTAGE_LIMIT:  ss << StringUtil::form("CH2 %04X", getVoltageLimit()); break;
-      case CURRENT_LIMIT:  ss << StringUtil::form("CH7 %04X", getCurrentLimit()); break;
-      case STORE:          ss << StringUtil::form("STORE %d", getStoreId()); break;
-      case RECALL:         ss << StringUtil::form("RECALL %d", getStoreId()); break;
+      case ALL: ss << "SET " << encode(getVoltageDemand())
+                     << "," << (int)getSwitchOn()
+                     << "," << encode(getVoltageLimit())
+                     << "," << encode(getCurrentLimit())
+                     << "," << encode(getRampUpSpeed())
+                     << "," << encode(getRampDownSpeed()); break;
+      case SWITCH:         ss << "SW" << (int)getSwitchOn(); break;
+      case RAMPUP_SPEED:   ss << "RVU " << encode(getRampUpSpeed()); break;
+      case RAMPDOWN_SPEED: ss << "RVD " << encode(getRampDownSpeed()); break;
+      case VOLTAGE_DEMAND: ss << "CH5 " << encode(getVoltageDemand()); break;
+      case VOLTAGE_LIMIT:  ss << "CH2 " << encode(getVoltageLimit()); break;
+      case CURRENT_LIMIT:  ss << "CH7 " << encode(getCurrentLimit()); break;
+      case STORE:          ss << "STORE " << (int)getStoreId(); break;
+      case RECALL:         ss << "RECALL " << (int)getStoreId(); break;
       default: break;
     }
   }
   return ss.str();
 }
 
-void ArichHVMessage::read(const std::string& str)
+std::string ArichHVMessage::toReplyText(bool use_ch)
 {
-  if (str.size() == 0) return;
-  std::string s = str;
-  if (str.at(0) == '#') {
-    setUnit(str.at(1) - '0');
-    setChannel(str.at(2) - '0');
-    s = s.substr(s.find(" ") + 1);
+  std::stringstream ss;
+  if (use_ch) {
+    ss << "#" << getUnit() << getChannel();
   } else {
-    setUnit(0);
+    ss << "#" << getUnit();
+  }
+  switch (getCommand()) {
+    case ALL: {
+      ss << "GET="
+         << encode(getVoltageMon()) << ","
+         << encode(getCurrentMon()) << ","
+         << getSwitchOn() << ","
+         << encode(getRampUpSpeed()) << ","
+         << encode(getRampDownSpeed());
+    } break;
+    case SWITCH:  ss << "SW=" << (int)getSwitchOn(); break;
+    case RAMPUP_SPEED: ss << "RVU=" << encode(getRampUpSpeed()); break;
+    case RAMPDOWN_SPEED: ss << "RVD=" << encode(getRampDownSpeed()); break;
+    case VOLTAGE_DEMAND: ss << "CH5=" << encode(getVoltageDemand()); break;
+    case VOLTAGE_LIMIT: ss << "CH2=" << encode(getVoltageLimit()); break;
+    case CURRENT_LIMIT: ss << "CH7=" << encode(getCurrentLimit()); break;
+    case VOLTAGE_MON: ss << "MNH1=" << encode(getVoltageMon()); break;
+    case CURRENT_MON: ss << "MNH2=" << encode(getCurrentMon()); break;
+    default: break;
+  }
+  return ss.str();
+}
+
+void ArichHVMessage::read(bool use_ch, Reader& reader) throw(IOException)
+{
+  std::stringstream ss;
+  while (true) {
+    char c = reader.readChar();
+    if (c == '\r') break;
+    ss << c;
+  }
+  read(use_ch, ss.str());
+}
+
+void ArichHVMessage::read(bool use_ch, const std::string& str)
+{
+  if (str.size() == 0 || str.at(0) != '#') return;
+  std::string s = str;
+  std::stringstream ss;
+  int i = 1;
+  if (use_ch) {
+    setUnit(s.at(1) - '0');
+    setChannel(s.at(2) - '0');
+    i = 3;
+  } else {
+    for (; i < (int)str.size(); i++) {
+      if (!isdigit(s.at(i))) break;
+      ss << s.at(i);
+    }
+    setUnit(atoi(ss.str().c_str()));
     setChannel(0);
   }
+  s = s.substr(i);
+  if (s.at(0) == ' ') s = s.substr(1);
   s = StringUtil::toupper(s);
   std::vector<std::string> s_v = StringUtil::split(s, ' ');
-  if (s_v.size() > 1 || s.find("SW1") != std::string::npos
-      || s.find("SW0") != std::string::npos) {
+  if (s_v.size() > 1 || StringUtil::find(s, "SW1") || StringUtil::find(s, "SW0")) {
     m_type = SET;
   } else {
     m_type = GET;
   }
   if (m_type == GET) {
     s_v = StringUtil::split(s, '=');
-    if (s_v[0].find("GET") != std::string::npos) {
+    if (StringUtil::find(s_v[0], "GET")) {
       m_command = ALL;
       if (s_v.size() > 1) {
         std::vector<std::string> ss_v = StringUtil::split(s_v[1], ',');
-        setVoltageMon(strtoul(("0x" + ss_v[0]).c_str(), 0, 0));
-        setCurrentMon(strtoul(("0x" + ss_v[1]).c_str(), 0, 0));
+        setVoltageMon(decode(ss_v[0]));
+        setCurrentMon(decode(ss_v[1]));
         setStatus((StatusFlag)atoi(ss_v[2].c_str()));
         setSwitchOn(ss_v[2] == "1");
-        setRampUpSpeed(strtoul(("0x" + ss_v[3]).c_str(), 0, 0));
-        setRampDownSpeed(strtoul(("0x" + ss_v[4]).c_str(), 0, 0));
+        setRampUpSpeed(decode(ss_v[3]));
+        setRampDownSpeed(decode(ss_v[4]));
       }
-    } else if (s_v[0].find("SW") != std::string::npos) {
+    } else if (StringUtil::find(s_v[0], "SW")) {
       m_command = SWITCH;
       if (s_v.size() > 1) {
         setSwitchOn(s_v[1] != "0");
         setStatus((StatusFlag)atoi(s_v[1].c_str()));
       }
-    } else if (s_v[0].find("RVU") != std::string::npos) {
+    } else if (StringUtil::find(s_v[0], "RVU")) {
       m_command = RAMPUP_SPEED;
-      if (s_v.size() > 1) setRampUpSpeed(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
-    } else if (s_v[0].find("RVD") != std::string::npos) {
+      if (s_v.size() > 1) setRampUpSpeed(decode(s_v[1]));
+    } else if (StringUtil::find(s_v[0], "RVD")) {
       m_command = RAMPDOWN_SPEED;
-      if (s_v.size() > 1) setRampDownSpeed(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
-    } else if (s_v[0].find("CH5") != std::string::npos) {
+      if (s_v.size() > 1) setRampDownSpeed(decode(s_v[1]));
+    } else if (StringUtil::find(s_v[0], "CH5")) {
       m_command = VOLTAGE_DEMAND;
-      if (s_v.size() > 1) setVoltageDemand(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
-    } else if (s_v[0].find("CH2") != std::string::npos) {
+      if (s_v.size() > 1) setVoltageDemand(decode(s_v[1]));
+    } else if (StringUtil::find(s_v[0], "CH2")) {
       m_command = VOLTAGE_LIMIT;
-      if (s_v.size() > 1) setVoltageLimit(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
-    } else if (s_v[0].find("CH7") != std::string::npos) {
+      if (s_v.size() > 1) setVoltageLimit(decode(s_v[1]));
+    } else if (StringUtil::find(s_v[0], "CH7")) {
       m_command = CURRENT_LIMIT;
-      if (s_v.size() > 1) setCurrentLimit(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
-    } else if (s_v[0].find("MNH1") != std::string::npos) {
+      if (s_v.size() > 1) setCurrentLimit(decode(s_v[1]));
+    } else if (StringUtil::find(s_v[0], "MNH1")) {
       m_command = VOLTAGE_MON;
-      if (s_v.size() > 1) setVoltageMon(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
-    } else if (s_v[0].find("MNH2") != std::string::npos) {
+      if (s_v.size() > 1) setVoltageMon(decode(s_v[1]));
+    } else if (StringUtil::find(s_v[0], "MNH2")) {
       m_command = CURRENT_MON;
-      if (s_v.size() > 1) setCurrentMon(strtoul(("0x" + s_v[1]).c_str(), 0, 0));
-    } else if (s_v[0].find("DATE") != std::string::npos) {
+      if (s_v.size() > 1) setCurrentMon(decode(s_v[1]));
+    } else if (StringUtil::find(s_v[0], "DATE")) {
       m_command = DATE;
-    } else if (s_v[0].find("RECALL") != std::string::npos) {
+    } else if (StringUtil::find(s_v[0], "RECALL")) {
       m_command = RECALL;
       if (s_v.size() > 1) setStoreId(atoi(s_v[1].c_str()));
-    } else if (s_v[0].find("STORE") != std::string::npos) {
+    } else if (StringUtil::find(s_v[0], "STORE")) {
       m_command = STORE;
       if (s_v.size() > 1) setStoreId(atoi(s_v[1].c_str()));
     }
   } else if (m_type == SET) {
-    if (s_v[0].find("SW0") != std::string::npos) {
+    if (StringUtil::find(s_v[0], "SW0")) {
       m_command = SWITCH;
       setSwitchOn(false);
-    } else if (s_v[0].find("SW1") != std::string::npos) {
+    } else if (StringUtil::find(s_v[0], "SW1")) {
       m_command = SWITCH;
       setSwitchOn(true);
     } else if (s_v.size() > 1) {
       std::string s = s_v[1];
-      if (s_v[0].find("SET") != std::string::npos) {
+      if (StringUtil::find(s_v[0], "SET")) {
         m_command = ALL;
         std::vector<std::string> ss_v = StringUtil::split(s, ',');
         if (ss_v.size() > 5) {
-          setVoltageDemand(strtoul(("0x" + ss_v[0]).c_str(), 0, 0));
+          setVoltageDemand(decode(ss_v[0]));
           setSwitchOn(ss_v[1] == "1");
-          setVoltageLimit(strtoul(("0x" + ss_v[2]).c_str(), 0, 0));
-          setCurrentLimit(strtoul(("0x" + ss_v[3]).c_str(), 0, 0));
-          setRampUpSpeed(strtoul(("0x" + ss_v[4]).c_str(), 0, 0));
-          setRampDownSpeed(strtoul(("0x" + ss_v[5]).c_str(), 0, 0));
+          setStatus((StatusFlag)atoi(ss_v[2].c_str()));
+          setVoltageLimit(decode(ss_v[2]));
+          setCurrentLimit(decode(ss_v[3]));
+          setRampUpSpeed(decode(ss_v[4]));
+          setRampDownSpeed(decode(ss_v[5]));
         }
-      } else if (s_v[0].find("RVU") != std::string::npos) {
+      } else if (StringUtil::find(s_v[0], "RVU")) {
         m_command = RAMPUP_SPEED;
-        setRampUpSpeed(strtoul(("0x" + s).c_str(), 0, 0));
-      } else if (s_v[0].find("RVD") != std::string::npos) {
+        setRampUpSpeed(decode(s));
+      } else if (StringUtil::find(s_v[0], "RVD")) {
         m_command = RAMPDOWN_SPEED;
-        setRampDownSpeed(strtoul(("0x" + s).c_str(), 0, 0));
-      } else if (s_v[0].find("CH5") != std::string::npos) {
+        setRampDownSpeed(decode(s));
+      } else if (StringUtil::find(s_v[0], "CH5")) {
         m_command = VOLTAGE_DEMAND;
-        setVoltageDemand(strtoul(("0x" + s).c_str(), 0, 0));
-      } else if (s_v[0].find("CH2") != std::string::npos) {
+        setVoltageDemand(decode(s));
+      } else if (StringUtil::find(s_v[0], "CH2")) {
         m_command = VOLTAGE_LIMIT;
-        setVoltageLimit(strtoul(("0x" + s).c_str(), 0, 0));
-      } else if (s_v[0].find("CH7") != std::string::npos) {
+        setVoltageLimit(decode(s));
+      } else if (StringUtil::find(s_v[0], "CH7")) {
         m_command = CURRENT_LIMIT;
-        setCurrentLimit(strtoul(("0x" + s).c_str(), 0, 0));
-      } else if (s_v[0].find("RECALL") != std::string::npos) {
+        setCurrentLimit(decode(s));
+      } else if (StringUtil::find(s_v[0], "RECALL")) {
         m_command = RECALL;
         setStoreId(atoi(s.c_str()));
-      } else if (s_v[0].find("STORE") != std::string::npos) {
+      } else if (StringUtil::find(s_v[0], "STORE")) {
         m_command = STORE;
         setStoreId(atoi(s.c_str()));
-      } else if (s_v[0].find("DATE") != std::string::npos) {
+      } else if (StringUtil::find(s_v[0], "DATE")) {
         m_command = DATE;
       }
     }

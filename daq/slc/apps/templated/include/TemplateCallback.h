@@ -14,26 +14,20 @@ namespace Belle2 {
   class TemplateCallback : public RCCallback {
 
   public:
-    TemplateCallback(const NSMNode& node/*,
-                     const std::string& format,
-                     int revision*/);
+    TemplateCallback();
     virtual ~TemplateCallback() throw();
 
   public:
-    virtual void init() throw();
-    virtual void term() throw();
-    virtual void timeout() throw();
-    virtual bool load() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
-    virtual bool resume() throw();
-    virtual bool pause() throw();
-    virtual bool recover() throw();
-    virtual bool abort() throw();
-    virtual bool trigft() throw();
-
-  private:
-    NSMData m_data;
+    virtual bool initialize(const DBObject& obj) throw();
+    virtual bool configure(const DBObject& obj) throw();
+    virtual void load(const DBObject& obj) throw(RCHandlerException);
+    virtual void start(int expno, int runno) throw(RCHandlerException);
+    virtual void stop() throw(RCHandlerException);
+    virtual void pause() throw(RCHandlerException);
+    virtual void resume() throw(RCHandlerException);
+    virtual void recover() throw(RCHandlerException);
+    virtual void abort() throw(RCHandlerException);
+    virtual void timeout(NSMCommunicator& com) throw();
 
   };
 

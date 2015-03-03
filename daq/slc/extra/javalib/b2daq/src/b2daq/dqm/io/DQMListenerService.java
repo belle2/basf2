@@ -98,22 +98,49 @@ public class DQMListenerService extends Thread {
                                 String dir = socket_reader.readString();
                                 name = socket_reader.readString();
                                 if (dir.isEmpty()) {
-                                    dir = pack.getName()+":default";
+                                    dir = pack.getName() + ":default";
                                 }
                                 System.out.println("config : " + dir + " / " + name);
                                 String title = socket_reader.readString();
+                                int nlabelsx = socket_reader.readInt();
+                                ArrayList<String> labelx = null;
+                                if (nlabelsx > 0) {
+                                    labelx = new ArrayList<>();
+                                    for (int ix = 0; ix < nlabelsx; ix++) {
+                                        labelx.add(socket_reader.readString());
+                                    }
+                                }
                                 int nbinsx = socket_reader.readInt();
                                 double xmin = socket_reader.readDouble();
                                 double xmax = socket_reader.readDouble();
                                 //System.out.println("config : histogram " + name);
                                 if (class_name.contains("TH1")) {
-                                    pack.addHisto(dir, new Histo1F(name, title, nbinsx, xmin, xmax));
+                                    Histo1F h = new Histo1F(name, title, nbinsx, xmin, xmax);
+                                    if (labelx != null) {
+                                        h.getAxisX().setLabels(labelx);
+                                    }
+                                    pack.addHisto(dir, h);
                                 } else if (class_name.contains("TH2")) {
+                                    int nlabelsy = socket_reader.readInt();
+                                    ArrayList<String> labely = null;
+                                    if (nlabelsx > 0) {
+                                        labely = new ArrayList<>();
+                                        for (int iy = 0; iy < nlabelsy; iy++) {
+                                            labely.add(socket_reader.readString());
+                                        }
+                                    }
                                     int nbinsy = socket_reader.readInt();
                                     double ymin = socket_reader.readDouble();
                                     double ymax = socket_reader.readDouble();
-                                    pack.addHisto(dir, new Histo2F(name, title, nbinsx, xmin, xmax,
-                                            nbinsy, ymin, ymax));
+                                    Histo2F h = new Histo2F(name, title, nbinsx, xmin, xmax,
+                                                            nbinsy, ymin, ymax);
+                                    if (labelx != null) {
+                                        h.getAxisX().setLabels(labelx);
+                                    }
+                                    if (labely != null) {
+                                        h.getAxisY().setLabels(labely);
+                                    }
+                                    pack.addHisto(dir, h);
                                 }
                                 int magic = socket_reader.readInt();
                                 if (magic != 0x7FFF) {
@@ -228,7 +255,7 @@ public class DQMListenerService extends Thread {
             }
             if (h_tmp != null) {
                 double entries = h_tmp.getEntries();
-                if (entries > 0 && h.getEntries() != entries) {
+                if (h.getEntries() != entries) {
                     h_diff.reset();
                     h_diff.add(h_tmp, -1);
                     h_diff.add(h);
@@ -243,7 +270,7 @@ public class DQMListenerService extends Thread {
             }
             int magic = reader.readInt();
             if (magic != 0x7FFF) {
-                throw new IOException("Wrong magic:" + magic);
+                throw new IOException(h.getName() + ": Wrong magic:" + magic);
             }
         }
         int magic = reader.readInt();

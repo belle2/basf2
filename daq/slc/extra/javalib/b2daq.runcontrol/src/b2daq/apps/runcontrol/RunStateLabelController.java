@@ -80,19 +80,6 @@ public class RunStateLabelController {
                 m_logview.add(new LogMessage("LOCAL", LogLevel.NOTICE, "Command ABORT >> " + nodename));
             }
         });
-        exclude.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String rcnodename = NSMListenerService.getNSMConfig().getNsmTarget();
-                if (exclude.getText().matches("EXCLUDE")) {
-                    NSMListenerService.request(new NSMMessage(rcnodename, RCCommand.EXCLUDE, nodename));
-                    m_logview.add(new LogMessage("LOCAL", LogLevel.NOTICE, "Command EXCLUDE >> " + nodename));
-                } else {
-                    NSMListenerService.request(new NSMMessage(rcnodename, RCCommand.INCLUDE, nodename));
-                    m_logview.add(new LogMessage("LOCAL", LogLevel.NOTICE, "Command INCLUDE >> " + nodename));
-                }
-            }
-        });
 
         text.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override

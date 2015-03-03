@@ -1,65 +1,65 @@
- nodename,  config, ismaster, runlength,    node, nsmdata
-RUNCONTROL, debug:dummycpu,true,480,debug:dummycpu, default
-RUNCONTROL, debug:dumhslb:020:rand4k,true,480, debug:dumhslb:020:rand4k, default
-RUNCONTROL, debug:yamadahslb:10kHz,true,480, debug:yamadahslb:10kHz, default
-RUNCONTROL, test:daq:none,true,480, test:daq:none, default
-RUNCONTROL, test:daq:aux,true,480, test:daq:aux, default
-RUNCONTROL, test:daq:i,true,480, test:daq:i, default
-RUNCONTROL, test:daq:tlu,true,480, test:daq:tlu, default
-RUNCONTROL, test:daq:pulse:unlimited:1Hz,true,480, test:daq:pulse:unlimited:1Hz, default
-RUNCONTROL, test:daq:pulse:unlimited:10Hz,true,480, test:daq:pulse:unlimited:10Hz, default
-RUNCONTROL, test:daq:pulse:unlimited:100Hz,true,480, test:daq:pulse:unlimited:100Hz, default
-RUNCONTROL, test:daq:pulse:unlimited:1kHz,true,480, test:daq:pulse:unlimited:1kHz, default
-RUNCONTROL, test:daq:pulse:unlimited:2kHz,true,480, test:daq:pulse:unlimited:2kHz, default
-RUNCONTROL, test:daq:pulse:unlimited:3kHz,true,480, test:daq:pulse:unlimited:3kHz, default
-RUNCONTROL, test:daq:pulse:unlimited:5kHz,true,480, test:daq:pulse:unlimited:5kHz, default
-RUNCONTROL, test:daq:pulse:unlimited:10kHz,true,480, test:daq:pulse:unlimited:10kHz, default
-RUNCONTROL, test:daq:pulse:unlimited:20kHz,true,480, test:daq:pulse:unlimited:20kHz, default
-RUNCONTROL, test:daq:pulse:unlimited:30kHz,true,480, test:daq:pulse:unlimited:30kHz, default
-RUNCONTROL, test:daq:pulse:unlimited:50kHz,true,480, test:daq:pulse:unlimited:50kHz, default
-RUNCONTROL, test:daq:pulse:unlimited:100kHz,true,480, test:daq:pulse:unlimited:100kHz, default
-RUNCONTROL, test:daq:pulse:limited:1Hz,true,480, test:daq:pulse:limited:1Hz, default
-RUNCONTROL, test:daq:pulse:limited:10Hz,true,480, test:daq:pulse:limited:10Hz, default
-RUNCONTROL, test:daq:pulse:limited:100Hz,true,480, test:daq:pulse:limited:100Hz, default
-RUNCONTROL, test:daq:pulse:limited:1kHz,true,480, test:daq:pulse:limited:1kHz, default
-RUNCONTROL, test:daq:pulse:limited:10kHz,true,480, test:daq:pulse:limited:10kHz, default
-RUNCONTROL, test:daq:pulse:limited:100kHz,true,480, test:daq:pulse:limited:100kHz, default
-RUNCONTROL, test:daq:revo:unlimited:1Hz,true,480, test:daq:revo:unlimited:1Hz, default
-RUNCONTROL, test:daq:revo:unlimited:10Hz,true,480, test:daq:revo:unlimited:10Hz, default
-RUNCONTROL, test:daq:revo:unlimited:100Hz,true,480, test:daq:revo:unlimited:100Hz, default
-RUNCONTROL, test:daq:revo:unlimited:1kHz,true,480, test:daq:revo:unlimited:1kHz, default
-RUNCONTROL, test:daq:revo:unlimited:2kHz,true,480, test:daq:revo:unlimited:2kHz, default
-RUNCONTROL, test:daq:revo:unlimited:3kHz,true,480, test:daq:revo:unlimited:3kHz, default
-RUNCONTROL, test:daq:revo:unlimited:5kHz,true,480, test:daq:revo:unlimited:5kHz, default
-RUNCONTROL, test:daq:revo:unlimited:10kHz,true,480, test:daq:revo:unlimited:10kHz, default
-RUNCONTROL, test:daq:revo:unlimited:20kHz,true,480, test:daq:revo:unlimited:20kHz, default
-RUNCONTROL, test:daq:revo:unlimited:30kHz,true,480, test:daq:revo:unlimited:30kHz, default
-RUNCONTROL, test:daq:revo:unlimited:50kHz,true,480, test:daq:revo:unlimited:50kHz, default
-RUNCONTROL, test:daq:revo:unlimited:100kHz,true,480, test:daq:revo:unlimited:100kHz, default
-RUNCONTROL, test:daq:revo:limited:1Hz,true,480, test:daq:revo:limited:1Hz, default
-RUNCONTROL, test:daq:revo:limited:10Hz,true,480, test:daq:revo:limited:10Hz, default
-RUNCONTROL, test:daq:revo:limited:100Hz,true,480, test:daq:revo:limited:100Hz, default
-RUNCONTROL, test:daq:revo:limited:1kHz,true,480, test:daq:revo:limited:1kHz, default
-RUNCONTROL, test:daq:revo:limited:10kHz,true,480, test:daq:revo:limited:10kHz, default
-RUNCONTROL, test:daq:revo:limited:100kHz,true,480, test:daq:revo:limited:100kHz, default
-RUNCONTROL, test:daq:random:unlimited:1Hz,true,480, test:daq:random:unlimited:1Hz, default
-RUNCONTROL, test:daq:random:unlimited:10Hz,true,480, test:daq:random:unlimited:10Hz, default
-RUNCONTROL, test:daq:random:unlimited:100Hz,true,480, test:daq:random:unlimited:100Hz, default
-RUNCONTROL, test:daq:random:unlimited:1kHz,true,480, test:daq:random:unlimited:1kHz, default
-RUNCONTROL, test:daq:random:unlimited:2kHz,true,480, test:daq:random:unlimited:2kHz, default
-RUNCONTROL, test:daq:random:unlimited:3kHz,true,480, test:daq:random:unlimited:3kHz, default
-RUNCONTROL, test:daq:random:unlimited:5kHz,true,480, test:daq:random:unlimited:5kHz, default
-RUNCONTROL, test:daq:random:unlimited:10kHz,true,480, test:daq:random:unlimited:10kHz, default
-RUNCONTROL, test:daq:random:unlimited:20kHz,true,480, test:daq:random:unlimited:20kHz, default
-RUNCONTROL, test:daq:random:unlimited:30kHz,true,480, test:daq:random:unlimited:30kHz, default
-RUNCONTROL, test:daq:random:unlimited:50kHz,true,480, test:daq:random:unlimited:50kHz, default
-RUNCONTROL, test:daq:random:unlimited:100kHz,true,480, test:daq:random:unlimited:100kHz, default
-RUNCONTROL, test:daq:random:limited:1Hz,true,480, test:daq:random:limited:1Hz, default
-RUNCONTROL, test:daq:random:limited:10Hz,true,480, test:daq:random:limited:10Hz, default
-RUNCONTROL, test:daq:random:limited:100Hz,true,480, test:daq:random:limited:100Hz, default
-RUNCONTROL, test:daq:random:limited:1kHz,true,480, test:daq:random:limited:1kHz, default
-RUNCONTROL, test:daq:random:limited:10kHz,true,480, test:daq:random:limited:10kHz, default
-RUNCONTROL, test:daq:random:limited:100kHz,true,480, test:daq:random:limited:100kHz, default
-RUNCONTROL, test:daq:once,true,480, test:daq:once, default
-RUNCONTROL, test:daq:stop,true,480, test:daq:stop, default
-RUNCONTROL, physics,true,480,physics, default
+ nodename,  config, node
+RUNCONTROL, RC:debug:dummycpu,node:debug:dummycpu
+RUNCONTROL, RC:debug:dumhslb:020:rand4k,node:debug:dumhslb:020:rand4k
+RUNCONTROL, RC:debug:yamadahslb:10kHz,node:debug:yamadahslb:10kHz
+RUNCONTROL, RC:test:daq:none,node:test:daq:none
+RUNCONTROL, RC:test:daq:aux,node:test:daq:aux
+RUNCONTROL, RC:test:daq:i,node:test:daq:i
+RUNCONTROL, RC:test:daq:tlu,node:test:daq:tlu
+RUNCONTROL, RC:test:daq:pulse:unlimited:1Hz,node:test:daq:pulse:unlimited:1Hz
+RUNCONTROL, RC:test:daq:pulse:unlimited:10Hz,node:test:daq:pulse:unlimited:10Hz
+RUNCONTROL, RC:test:daq:pulse:unlimited:100Hz,node:test:daq:pulse:unlimited:100Hz
+RUNCONTROL, RC:test:daq:pulse:unlimited:1kHz,node:test:daq:pulse:unlimited:1kHz
+RUNCONTROL, RC:test:daq:pulse:unlimited:2kHz,node:test:daq:pulse:unlimited:2kHz
+RUNCONTROL, RC:test:daq:pulse:unlimited:3kHz,node:test:daq:pulse:unlimited:3kHz
+RUNCONTROL, RC:test:daq:pulse:unlimited:5kHz,node:test:daq:pulse:unlimited:5kHz
+RUNCONTROL, RC:test:daq:pulse:unlimited:10kHz,node:test:daq:pulse:unlimited:10kHz
+RUNCONTROL, RC:test:daq:pulse:unlimited:20kHz,node:test:daq:pulse:unlimited:20kHz
+RUNCONTROL, RC:test:daq:pulse:unlimited:30kHz,node:test:daq:pulse:unlimited:30kHz
+RUNCONTROL, RC:test:daq:pulse:unlimited:50kHz,node:test:daq:pulse:unlimited:50kHz
+RUNCONTROL, RC:test:daq:pulse:unlimited:100kHz,node:test:daq:pulse:unlimited:100kHz
+RUNCONTROL, RC:test:daq:pulse:limited:1Hz,node:test:daq:pulse:limited:1Hz
+RUNCONTROL, RC:test:daq:pulse:limited:10Hz,node:test:daq:pulse:limited:10Hz
+RUNCONTROL, RC:test:daq:pulse:limited:100Hz,node:test:daq:pulse:limited:100Hz
+RUNCONTROL, RC:test:daq:pulse:limited:1kHz,node:test:daq:pulse:limited:1kHz
+RUNCONTROL, RC:test:daq:pulse:limited:10kHz,node:test:daq:pulse:limited:10kHz
+RUNCONTROL, RC:test:daq:pulse:limited:100kHz,node:test:daq:pulse:limited:100kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:1Hz,node:test:daq:revo:unlimited:1Hz
+RUNCONTROL, RC:test:daq:revo:unlimited:10Hz,node:test:daq:revo:unlimited:10Hz
+RUNCONTROL, RC:test:daq:revo:unlimited:100Hz,node:test:daq:revo:unlimited:100Hz
+RUNCONTROL, RC:test:daq:revo:unlimited:1kHz,node:test:daq:revo:unlimited:1kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:2kHz,node:test:daq:revo:unlimited:2kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:3kHz,node:test:daq:revo:unlimited:3kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:5kHz,node:test:daq:revo:unlimited:5kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:10kHz,node:test:daq:revo:unlimited:10kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:20kHz,node:test:daq:revo:unlimited:20kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:30kHz,node:test:daq:revo:unlimited:30kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:50kHz,node:test:daq:revo:unlimited:50kHz
+RUNCONTROL, RC:test:daq:revo:unlimited:100kHz,node:test:daq:revo:unlimited:100kHz
+RUNCONTROL, RC:test:daq:revo:limited:1Hz,node:test:daq:revo:limited:1Hz
+RUNCONTROL, RC:test:daq:revo:limited:10Hz,node:test:daq:revo:limited:10Hz
+RUNCONTROL, RC:test:daq:revo:limited:100Hz,node:test:daq:revo:limited:100Hz
+RUNCONTROL, RC:test:daq:revo:limited:1kHz,node:test:daq:revo:limited:1kHz
+RUNCONTROL, RC:test:daq:revo:limited:10kHz,node:test:daq:revo:limited:10kHz
+RUNCONTROL, RC:test:daq:revo:limited:100kHz,node:test:daq:revo:limited:100kHz
+RUNCONTROL, RC:test:daq:random:unlimited:1Hz,node:test:daq:random:unlimited:1Hz
+RUNCONTROL, RC:test:daq:random:unlimited:10Hz,node:test:daq:random:unlimited:10Hz
+RUNCONTROL, RC:test:daq:random:unlimited:100Hz,node:test:daq:random:unlimited:100Hz
+RUNCONTROL, RC:test:daq:random:unlimited:1kHz,node:test:daq:random:unlimited:1kHz
+RUNCONTROL, RC:test:daq:random:unlimited:2kHz,node:test:daq:random:unlimited:2kHz
+RUNCONTROL, RC:test:daq:random:unlimited:3kHz,node:test:daq:random:unlimited:3kHz
+RUNCONTROL, RC:test:daq:random:unlimited:5kHz,node:test:daq:random:unlimited:5kHz
+RUNCONTROL, RC:test:daq:random:unlimited:10kHz,node:test:daq:random:unlimited:10kHz
+RUNCONTROL, RC:test:daq:random:unlimited:20kHz,node:test:daq:random:unlimited:20kHz
+RUNCONTROL, RC:test:daq:random:unlimited:30kHz,node:test:daq:random:unlimited:30kHz
+RUNCONTROL, RC:test:daq:random:unlimited:50kHz,node:test:daq:random:unlimited:50kHz
+RUNCONTROL, RC:test:daq:random:unlimited:100kHz,node:test:daq:random:unlimited:100kHz
+RUNCONTROL, RC:test:daq:random:limited:1Hz,node:test:daq:random:limited:1Hz
+RUNCONTROL, RC:test:daq:random:limited:10Hz,node:test:daq:random:limited:10Hz
+RUNCONTROL, RC:test:daq:random:limited:100Hz,node:test:daq:random:limited:100Hz
+RUNCONTROL, RC:test:daq:random:limited:1kHz,node:test:daq:random:limited:1kHz
+RUNCONTROL, RC:test:daq:random:limited:10kHz,node:test:daq:random:limited:10kHz
+RUNCONTROL, RC:test:daq:random:limited:100kHz,node:test:daq:random:limited:100kHz
+RUNCONTROL, RC:test:daq:once,node:test:daq:once
+RUNCONTROL, RC:test:daq:stop,node:test:daq:stop
+RUNCONTROL, RC:physics,node:physics

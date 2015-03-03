@@ -89,14 +89,14 @@ public class ConfigMainPane extends TabPane implements NSMObserver {
                         obs = ttdpane;
                         cpane.setPane(obj.getNode(), ttdpane, ttdpane);
                     }
-                    NSMListenerService.requestList(obj.getNode());
+                    //NSMListenerService.requestList(obj.getNode());
                 }
                 if (obs != null) {
                     obs.reload(msg);
                 }
                 cpane.labelConfigIdPropery().setText("" + obj.getId());
                 cpane.labelDBTablePropery().setText(obj.getTable());
-            } else if (command.equals(NSMCommand.LISTSET)) {
+            } else if (command.equals(NSMCommand.DBLISTSET)) {
                 if (confMap.containsKey(msg.getNodeName())) {
                     ConfigEditorPane cpane = null;
                     for (Tab tab : getTabs()) {

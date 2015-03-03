@@ -50,13 +50,15 @@ public class NSM2SocketInitDialog {
                 file.add("nsmport", "" + nsmport);
                 file.add("nsmnode", nsmnode);
                 file.add("nsmtarget", nsmtarget);
-                for (int i = 0; i < data.length; i++) {
-                    String[] str = data[i].split(":");
-                    System.out.println(data[i]);
-                    if (str.length > 2) {
-                        file.add(String.format("data%02d.dataname", i), str[0]);
-                        file.add(String.format("data%02d.format", i), str[1]);
-                        file.add(String.format("data%02d.revision", i), str[2]);
+                if (data != null) {
+                    for (int i = 0; i < data.length; i++) {
+                        String[] str = data[i].split(":");
+                        System.out.println(data[i]);
+                        if (str.length > 2) {
+                            file.add(String.format("data%02d.dataname", i), str[0]);
+                            file.add(String.format("data%02d.format", i), str[1]);
+                            file.add(String.format("data%02d.revision", i), str[2]);
+                        }
                     }
                 }
             }

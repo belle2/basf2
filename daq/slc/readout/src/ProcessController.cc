@@ -45,24 +45,21 @@ bool ProcessController::load(int timeout)
   close(iopipe[1]);
   if (timeout > 0) {
     if (!m_info.waitReady(timeout)) {
-      m_callback->setReply("Failed to boot " + m_name);
+      throw (RCHandlerException("Failed to boot " + m_name));
       return false;
     }
   }
   return true;
 }
 
-bool ProcessController::start()
+bool ProcessController::start(int expno, int runno)
 {
   m_info.lock();
-  NSMMessage& msg(m_callback->getMessage());
-  if (msg.getNParams() > 2) {
-    m_info.setExpNumber(msg.getParam(0));
-    m_info.setRunNumber(msg.getParam(1));
-    m_info.setSubNumber(msg.getParam(2));
-  }
+  m_info.setExpNumber(expno);
+  m_info.setRunNumber(runno);
+  m_info.setSubNumber(0);
   if (m_info.getState() != RunInfoBuffer::RUNNING) {
-    m_callback->setReply(m_name + " is not running");
+    throw (RCHandlerException(m_name + " is not running"));
     m_info.unlock();
     return false;
   }
@@ -108,3 +105,12 @@ void ProcessSubmitter::run()
   executor.execute();
 }
 
+void ProcessController::addArgument(const char* format, ...)
+{
+  va_list ap;
+  static char ss[1024];
+  va_start(ap, format);
+  vsprintf(ss, format, ap);
+  va_end(ap);
+  m_arg_v.push_back(ss);
+}

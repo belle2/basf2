@@ -13,6 +13,8 @@
 
 namespace Belle2 {
 
+  class DQMViewCallback;
+
   class DQMFileReader {
 
   public:
@@ -23,7 +25,7 @@ namespace Belle2 {
     ~DQMFileReader();
 
   public:
-    bool init();
+    bool init(int index, DQMViewCallback& callback);
     int update();
     int getUpdateId() { return m_updateid; }
     const std::string& getName() { return m_name; }

@@ -1,72 +1,68 @@
 #ifndef _Belle2_NSMCallback_hh
 #define _Belle2_NSMCallback_hh
 
+#include "daq/slc/nsm/AbstractNSMCallback.h"
 #include "daq/slc/nsm/NSMHandlerException.h"
-#include "daq/slc/nsm/NSMMessage.h"
-#include "daq/slc/nsm/NSMNode.h"
 #include "daq/slc/nsm/NSMCommand.h"
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace Belle2 {
 
   class NSMCommunicator;
   class NSMMessage;
 
-  class NSMCallback {
+  typedef std::map<std::string, NSMNode> NSMNodeMap;
+
+  class NSMCallback : public AbstractNSMCallback {
 
     friend class NSMCommunicator;
-
-  private:
-    typedef std::vector<NSMCommand> NSMRequestList;
+    friend class NSMNodeDaemon;
 
   public:
-    NSMCallback(const NSMNode& node, int timeout = 5) throw();
+    NSMCallback(int timeout = 5) throw();
     virtual ~NSMCallback() throw() {}
 
   public:
-    virtual void init() throw() {}
-    virtual void term() throw() {}
-    virtual bool ok() throw() { return true; }
-    virtual bool error() throw() { return true; }
-    virtual bool fatal() throw() { return true; }
-    virtual bool log() throw() { return true; }
-    virtual bool state() throw() { return true; }
-    virtual bool exclude() throw() { return true; }
-    virtual bool include() throw() { return true; }
-    virtual NSMVar vget(const std::string&) throw() { return NSMVar(); }
-    virtual bool vset(const NSMVar&) throw() { return true; }
-    virtual void timeout() throw() {}
-    bool isReady() const throw();
-
-  public:
-    NSMMessage& getMessage();
-    const NSMMessage& getMessage() const;
-    void setMessage(const NSMMessage& msg);
-    NSMCommunicator* getCommunicator() { return m_comm; }
     NSMNode& getNode() throw() { return m_node; }
     const NSMNode& getNode() const throw() { return m_node; }
-    void setCommunicator(NSMCommunicator* comm) { m_comm = comm; }
-    int getTimeout() const { return m_timeout; }
-    void setTimeout(int timeout) { m_timeout = timeout; }
+    void setNode(const NSMNode& node) throw() { m_node = node; }
 
   public:
-    void setReply(const std::string& reply) throw() { m_reply = reply; }
-    const std::string& getReply() const throw() { return m_reply; }
-    void add(const NSMCommand& cmd) throw() { m_cmd_v.push_back(cmd); }
-    virtual bool perform(const NSMMessage& msg) throw();
+    virtual void init(NSMCommunicator&) throw() {}
+    virtual void term() throw() {}
+    virtual void timeout(NSMCommunicator&) throw() {}
+    virtual bool perform(NSMCommunicator& com) throw();
+    virtual void ok(const char* /*node*/, const char* /*data*/) throw() {}
+    virtual void error(const char* /*node*/, const char* /*data*/) throw() {}
+    virtual void log(const DAQLogMessage&) throw() {}
+    virtual void vget(NSMCommunicator& com, const std::string& vname) throw();
+    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
+    virtual void vlistget(NSMCommunicator& com) throw();
+    virtual void vlistset(NSMCommunicator& com) throw();
+    virtual void vreply(NSMCommunicator&, const std::string&, bool) throw() {}
+
+  public:
+    bool reply(const NSMMessage& msg) throw(NSMHandlerException);
+
+  protected:
+    virtual void notify(const NSMVar& var) throw();
+    void reg(const NSMCommand& cmd) throw() { m_cmd_v.push_back(cmd); }
+    void addNode(const NSMNode& node);
+    const NSMNodeMap& getNodes() { return m_nodes; }
 
   private:
-    NSMRequestList& getRequestList() throw() { return m_cmd_v; }
+    typedef std::vector<NSMCommand> NSMCommandList;
 
   private:
-    std::string m_reply;
+    NSMCommandList& getCommandList() throw() { return m_cmd_v; }
+
+  private:
     NSMNode m_node;
-    NSMCommunicator* m_comm;
-    NSMRequestList m_cmd_v;
-    NSMMessage m_msg;
-    int m_timeout;
+    NSMCommandList m_cmd_v;
+    NSMNodeMap m_nodes;
 
   };
 

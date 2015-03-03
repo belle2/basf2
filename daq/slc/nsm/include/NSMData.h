@@ -2,16 +2,8 @@
 #define _Belle2_NSMData_hh
 
 #include "daq/slc/nsm/NSMHandlerException.h"
-#include "daq/slc/nsm/NSMDataStore.h"
 
 #include <daq/slc/database/DBObject.h>
-
-#include <daq/slc/system/SharedMemory.h>
-#include "daq/slc/system/MMutex.h"
-#include "daq/slc/system/MCond.h"
-#include <daq/slc/system/TCPSocket.h>
-#include <daq/slc/system/Mutex.h>
-
 #include <daq/slc/base/StringUtil.h>
 
 extern "C" {
@@ -20,6 +12,7 @@ extern "C" {
 #include "nsm2/nsmparse.h"
 #endif
 }
+
 #include <map>
 #include <vector>
 
@@ -29,7 +22,6 @@ namespace Belle2 {
 
   class NSMData : public DBObject {
 
-  public:
     typedef std::vector<NSMData> NSMDataList;
     typedef std::map<std::string, NSMDataList> NSMDataListMap;
 
@@ -46,47 +38,48 @@ namespace Belle2 {
             const std::string& format, int revision) throw();
 
   public:
-    const std::string& getFormat() const throw() { return getTable(); }
+    int getRevision() const throw() { return m_revision; }
+    const std::string& getFormat() const throw() { return m_format; }
     int getSize() const throw() { return m_size; }
-    void setFormat(const std::string& format) throw() { setTable(format); }
+    void setRevision(int revision) throw() { m_revision = revision; }
+    void setFormat(const std::string& format) throw() { m_format = format; }
     void setSize(int size) throw() { m_size = size; }
     bool isAvailable() throw() { return (m_pdata != NULL); }
-    void* open(NSMCommunicator* comm,
-               bool isnative = true) throw(NSMHandlerException);
-    void* allocate(NSMCommunicator* comm,
-                   bool isnative = true,
-                   int interval = 2)
-    throw(NSMHandlerException);
-    void* parse(const char* inc_dir = NULL, bool allocated = false)
-    throw(NSMHandlerException);
-    bool update() throw();
+    void* open(NSMCommunicator& comm) throw(NSMHandlerException);
+    void* allocate(NSMCommunicator& comm, int interval = 2) throw(NSMHandlerException);
     void* get() throw() { return m_pdata; }
     const void* get() const throw() { return m_pdata; }
-    const NSMDataList& getObjects(const std::string& name) const throw();
-    NSMDataList& getObjects(const std::string& name) throw();
+    void* parse(const char* inc_dir = NULL, bool allocated = false)
+    throw(NSMHandlerException);
+
+    int getNObjects(const std::string& name) const throw();
+    const NSMDataList& getObjects(const std::string& name) const throw(std::out_of_range);
+    NSMDataList& getObjects(const std::string& name) throw(std::out_of_range);
+    const NSMData& getObject(const std::string& name, int index = 0) const throw(std::out_of_range);
+    NSMData& getObject(const std::string& name, int index = 0) throw(std::out_of_range);
+
+    void print(const std::string& name_in = "") const throw();
+    void printPV(const std::string& name_in = "") const throw();
+    const void* find(const std::string& name_in, DBField::Type& type) const throw();
 
   public:
-    virtual void reset() throw();
-    virtual void* getValue(const std::string& name) throw();
-    virtual const void* getValue(const std::string& name) const throw();
+    virtual void* getValue(const std::string& name) throw(std::out_of_range);
+    virtual const void* getValue(const std::string& name) const throw(std::out_of_range);
     virtual void setValue(const std::string& name, const void* value, int size) throw();
     virtual void addValue(const std::string& name, const void* value,
-                          FieldInfo::Type type, int length = 0) throw();
-    virtual int getNObjects(const std::string& name) const throw();
-    virtual const DBObject& getObject(const std::string& name, int index = 0) const throw();
-    virtual DBObject& getObject(const std::string& name, int index = 0) throw();
-    virtual const std::string getText(const std::string&) const throw() { return ""; }
+                          DBField::Type type, int length = 0) throw();
+    virtual const std::string& getText(const std::string&) const throw() { return m_empty; }
     virtual void addText(const std::string&, const std::string&) throw() {}
-    virtual void setObject(const std::string&, int, const Belle2::DBObject&) throw() {}
-    NSMDataStore::Entry* getEntry() { return m_en; }
 
   public:
     virtual void readObject(Reader& reader) throw(IOException);
     virtual void writeObject(Writer& writer) const throw(IOException);
 
+  protected:
+    virtual void reset() throw();
+
   private:
     void set(void* pdata) throw() { m_pdata = pdata; }
-    void setPointer();
     int initProperties() throw();
 #if NSM_PACKAGE_VERSION >= 1914
     NSMparse* parse(NSMparse* ptr, int& length,
@@ -98,15 +91,15 @@ namespace Belle2 {
     void* m_pdata;
     int m_size;
     int m_offset;
-    mutable NSMDataListMap m_data_v_m;
-    SharedMemory m_mem;
-    NSMDataStore::Entry* m_en;
-
-  private:
-    static TCPSocket g_socket;
-    static Mutex g_mutex;
+    std::string m_format;
+    int m_revision;
+    NSMDataListMap m_data_v_m;
+    std::string m_empty;
 
   };
+
+  typedef std::vector<NSMData> NSMDataList;
+  typedef std::map<std::string, NSMDataList> NSMDataListMap;
 
 }
 

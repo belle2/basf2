@@ -6,86 +6,39 @@
 
 using namespace Belle2;
 
-ECLShaperControllerCallback::ECLShaperControllerCallback(const NSMNode& node)
-  : RCCallback(node, 5)
-{
-  //m_data = NSMData("STATUS_" + node.getName(), format, revision);
-}
-
-ECLShaperControllerCallback::~ECLShaperControllerCallback() throw()
-{
-}
-
-void ECLShaperControllerCallback::init() throw()
-{
-  //m_data.allocate(getCommunicator());
-  m_forced = true;
-}
-
-void ECLShaperControllerCallback::term() throw()
-{
-}
-
-void ECLShaperControllerCallback::timeout() throw()
-{
-}
-
-bool ECLShaperControllerCallback::load() throw()
+void ECLShaperControllerCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
   m_config = ECLShaperConfig();
-  ConfigObjectList& shaper(getConfig().getObject().getObjects("shaper"));
-  for (size_t i = 0; i < shaper.size(); i++) {
-    ConfigObject& sh(shaper[i]);
-    int sh_num = sh.getInt("sh_num");
-    ConfigObjectList& registers(sh.getObjects("register"));
-    ECLShaperRegisterList regs;
-    for (size_t j = 0; j < registers.size(); j++) {
-      ECLShaperRegister reg;
-      reg.name = registers[i].getText("paramname");
-      reg.adr = registers[i].getInt("address");
-      regs.insert(ECLShaperRegisterList::value_type(reg.name, reg));
-    }
-    ConfigObjectList& parameters(sh.getObjects("parameter"));
-    for (size_t j = 0; j < parameters.size(); j++) {
-      ECLShaperRegisterList::iterator it =
-        regs.find(parameters[j].getText("paramname"));
-      if (it != regs.end()) {
-        it->second.val = parameters[j].getInt("value");
+  if (obj.hasObject("shaper")) {
+    const DBObjectList& c_shrs(obj.getObjects("shaper"));
+    for (size_t i = 0; i < c_shrs.size(); i++) {
+      const DBObject& c_shr(c_shrs[i]);
+      int sh_num = c_shr.getInt("sh_num");
+      const DBObjectList& c_regs(c_shr.getObjects("register"));
+      ECLShaperRegisterList regs;
+      for (size_t j = 0; j < c_regs.size(); j++) {
+        ECLShaperRegister reg;
+        reg.name = c_regs[j].getText("paramname");
+        reg.adr = c_regs[j].getInt("address");
+        regs.insert(ECLShaperRegisterList::value_type(reg.name, reg));
       }
+      const DBObjectList& c_pars(c_shr.getObjects("parameter"));
+      for (size_t j = 0; j < c_pars.size(); j++) {
+        ECLShaperRegisterList::iterator it =
+          regs.find(c_pars[j].getText("paramname"));
+        if (it != regs.end()) {
+          it->second.val = c_pars[j].getInt("value");
+        }
+      }
+      m_config.insert(ECLShaperConfig::value_type(sh_num, regs));
     }
-    m_config.insert(ECLShaperConfig::value_type(sh_num, regs));
+    if (m_forced) {
+      recover();
+    }
   }
-  if (m_forced) {
-    return recover();
-  }
-  return true;
 }
 
-bool ECLShaperControllerCallback::start() throw()
-{
-  NSMMessage& msg(getMessage());
-  LogFile::debug("run # = %04d.%04d.%03d",
-                 msg.getParam(0), msg.getParam(1),
-                 msg.getParam(2));
-  return true;
-}
-
-bool ECLShaperControllerCallback::stop() throw()
-{
-  return true;
-}
-
-bool ECLShaperControllerCallback::resume() throw()
-{
-  return true;
-}
-
-bool ECLShaperControllerCallback::pause() throw()
-{
-  return true;
-}
-
-bool ECLShaperControllerCallback::recover() throw()
+void ECLShaperControllerCallback::recover() throw(RCHandlerException)
 {
   try {
     m_con.boot(m_config);
@@ -93,16 +46,14 @@ bool ECLShaperControllerCallback::recover() throw()
   } catch (const IOException& e) {
     m_forced = true;
     getNode().setState(RCState::NOTREADY_S);
-    return false;
+    throw (RCHandlerException("Failed to revocer : %s", e.what()));
   }
   getNode().setState(RCState::READY_S);
   m_forced = false;
-  return false;
 }
 
-bool ECLShaperControllerCallback::abort() throw()
+void ECLShaperControllerCallback::abort() throw(RCHandlerException)
 {
   getNode().setState(RCState::NOTREADY_S);
-  return true;
 }
 

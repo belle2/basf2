@@ -5,13 +5,13 @@
 
 #include "daq/slc/system/LogFile.h"
 
-#include "daq/slc/database/ConfigObject.h"
+#include "daq/slc/database/DBObject.h"
 
 #include <string>
 
 namespace Belle2 {
 
-  class DAQLogMessage : public ConfigObject {
+  class DAQLogMessage : public DBObject {
 
   private:
     static const std::string g_tablename;
@@ -26,10 +26,15 @@ namespace Belle2 {
                   LogFile::Priority priority,
                   const std::string& message,
                   const Date& date) throw();
+    DAQLogMessage(const std::string& nodename,
+                  const std::string& priority,
+                  const std::string& message,
+                  const Date& date) throw();
     DAQLogMessage(const DAQLogMessage& log) throw();
     virtual ~DAQLogMessage() throw() {}
 
   public:
+    void setPriority(const std::string& priority) throw();
     void setPriority(LogFile::Priority priority) throw();
     void setNodeName(const std::string& name) throw();
     void setMessage(const std::string& message) throw();
@@ -38,6 +43,7 @@ namespace Belle2 {
     void setDate(const Date& date) throw();
     LogFile::Priority getPriority() const throw();
     int getPriorityInt() const throw();
+    const std::string getPriorityText() const throw();
     const std::string getNodeName() const throw();
     const std::string getMessage() const throw();
     int getDateInt() const throw();

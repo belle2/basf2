@@ -81,7 +81,7 @@ public class PowerControlCommandButtonPaneController implements Initializable {
         NSMMessage msg = new NSMMessage(nodename, cmd);
         if (cmd.equals(HVCommand.CONFIGURE)) {
             if (m_rcmain.getNameList() == null) {
-                NSMListenerService.requestList(nodename);
+                //NSMListenerService.requestList(nodename);
                 stack_wait.set(true);
                 m_rcmain.getLogView().add(new LogMessage("LOCAL", LogLevel.DEBUG,
                         "Loading run type lists..."));

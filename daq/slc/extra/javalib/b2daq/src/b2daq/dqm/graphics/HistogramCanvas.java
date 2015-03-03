@@ -56,7 +56,7 @@ public class HistogramCanvas extends GRect {
     }
 
     public HistogramCanvas(String name, String title, double width, double height) {
-        this(name, title, width, height, true);
+        this(name, title, width, height, false);
     }
 
     public HistogramCanvas(String name, String title) {
@@ -160,6 +160,7 @@ public class HistogramCanvas extends GRect {
                 h.setFill(hist.getFill());
                 h.setLine(hist.getLine());
                 h.setFont(hist.getFont());
+                h.setDraw(hist.getDraw());
                 histograms.set(histograms.indexOf(hist), h);
                 hasHist = true;
                 _use_pad = false;
@@ -176,12 +177,26 @@ public class HistogramCanvas extends GRect {
                         && xmin > -10 && xmin < -5) {
                     getAxisX().setNdivisions(5);
                 }
+                if (h.getAxisX().getLabels() != null) {
+                    int nbinsx = h.getAxisX().getNbins();
+                    double dx = (xmax - xmin) / nbinsx;
+                    for (int i = 0; i < nbinsx; i++) {
+                        getAxisX().addLabel(h.getAxisX().getLabels().get(i), xmin + dx*(0.5+i));
+                    }
+                }
                 getAxisY().get().copy(h.getAxisY());
                 xmax = getAxisY().get().getMax();
                 xmin = getAxisY().get().getMin();
                 if (xmax < 10 && xmax > 5
                         && xmin > -10 && xmin < -5) {
                     getAxisY().setNdivisions(5);
+                }
+                if (h.getAxisY().getLabels() != null) {
+                    int nbinsy = h.getAxisY().getNbins();
+                    double dy = (xmax - xmin) / nbinsy;
+                    for (int i = 0; i < nbinsy; i++) {
+                        getAxisY().addLabel(h.getAxisY().getLabels().get(i), xmin + dy*(0.5+i));
+                    }
                 }
                 if (getTitle().length() == 0) {
                     setTitle(h.getTitle());
@@ -240,7 +255,6 @@ public class HistogramCanvas extends GRect {
         }
         if (stat && _stat_histo != null) {
             if (_stat_rect == null) {
-
                 _stat_rect = new GRect(0.71, 0.02, 0.28, 0.12, Color.WHITE, Color.BLACK);
                 _stat_name = new GText(_stat_histo.getName(), 0.71 + 0.14, 0.055, "center");
                 _stat_line = new GLine(0.71, 0.06, 0.99, 0.06, Color.BLACK);
@@ -279,7 +293,7 @@ public class HistogramCanvas extends GRect {
         if (histograms.size() > 0) {
             if (_use_pad) {
                 try {
-                    if (_stat_rect != null) {
+                    if (stat && _stat_rect != null) {
                         if (canvas.getWidth() / canvas.getHeight() < 0.95) {
                             _stat_name.setFontSize(0.45);
                             _stat_update.setFontSize(0.5);

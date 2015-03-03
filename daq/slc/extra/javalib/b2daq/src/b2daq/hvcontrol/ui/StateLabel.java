@@ -62,7 +62,8 @@ public final class StateLabel extends Pane {
         setMaxHeight(36);
         widthProperty().addListener(listener);
         heightProperty().addListener(listener);
-        update(HVState.get(0));
+        set("OFF", Color.RED, Color.RED, Color.BLACK);
+        //update(HVState.get(0));
         repaint();
     }
 
@@ -117,6 +118,8 @@ public final class StateLabel extends Pane {
             set(state.getLabel(), Color.CYAN, Color.CYAN, Color.BLACK);
         } else if (state.isTransition()) {
             set(state.getLabel(), Color.ORANGE, Color.ORANGE, Color.BLACK);
+        } else if (state.isError()) {
+            set(state.getLabel(), Color.PINK, Color.PINK, Color.BLACK);
         } else {
             set(state.getLabel(), Color.BLACK, Color.BLACK, Color.WHITE);
         }

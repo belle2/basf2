@@ -4,8 +4,10 @@
 #include "daq/slc/runcontrol/RCState.h"
 #include "daq/slc/runcontrol/RCCommand.h"
 #include "daq/slc/runcontrol/RCConfig.h"
+#include "daq/slc/runcontrol/RCHandlerException.h"
 
 #include <daq/slc/nsm/NSMCallback.h>
+#include <daq/slc/nsm/NSMData.h>
 
 #include <daq/slc/system/Mutex.h>
 #include <daq/slc/system/Cond.h>
@@ -20,66 +22,65 @@ namespace Belle2 {
     friend class RCMonitor;
 
   public:
-    RCCallback(const NSMNode& node, int timeout = 2) throw();
+    RCCallback(int timeout = 5) throw();
     virtual ~RCCallback() throw() {}
 
   public:
-    const RCConfig& getConfig() const throw() { return m_config; }
-    RCConfig& getConfig() throw() { return m_config; }
+    virtual void init(NSMCommunicator& com) throw();
+    virtual void load(const DBObject&) throw(RCHandlerException) {}
+    virtual void start(int /*expno*/, int /*runno*/) throw(RCHandlerException) {}
+    virtual void stop() throw(RCHandlerException) {}
+    virtual void recover() throw(RCHandlerException) {}
+    virtual void resume() throw(RCHandlerException) {}
+    virtual void pause() throw(RCHandlerException) {}
+    virtual void abort() throw(RCHandlerException) {}
 
   public:
-    virtual bool load() throw() { return true; }
-    virtual bool boot() throw() { return true; }
-    virtual bool start() throw() { return true; }
-    virtual bool stop() throw() { return true; }
-    virtual bool recover() throw() { return true; }
-    virtual bool resume() throw() { return true; }
-    virtual bool pause() throw() { return true; }
-    virtual bool abort() throw() { return true; }
-    virtual bool trigft() throw() { return true; }
-    virtual bool stateCheck() throw() { return false; }
+    virtual bool perform(NSMCommunicator& com) throw();
 
   public:
-    void setDB(DBInterface* db) throw() { m_db = db; }
-    DBInterface* getDB() throw() { return m_db; }
-    const RCState& getStateDemand() const throw() { return m_state_demand; }
-    void setStateDemand(const RCState& state) throw() {
-      m_state_demand = state;
-    }
-    virtual bool perform(const NSMMessage& msg) throw();
-    virtual void update() throw() {}
-    void sendPause(const NSMNode& node) throw();
-    void sendPause() throw();
-    void setFilePath(const std::string path,
-                     const std::string tablename) throw() {
-      m_path = path;
-      m_tablename = tablename;
-    }
-    void setFilePath(const std::string tablename) throw() {
-      setFilePath("", tablename);
-    }
-    void setAutoReply(bool auto_reply) throw() {
-      m_auto_reply = auto_reply;
-    }
-    void setDBClose(bool db_close) throw() {
-      m_db_close = db_close;
-    }
+    virtual bool initialize(const DBObject&) throw() { return true; }
+    virtual bool configure(const DBObject&) throw() { return true; }
 
-  protected:
-    bool preload(const NSMMessage& msg) throw();
-    bool execute(const RCCommand& cmd) throw();
-    void execute() throw();
+  public:
+    NSMData& getData() throw() { return m_data; }
+    const NSMData& getData() const throw() { return m_data; }
+    void setData(const std::string& name, const std::string& format,
+                 int revision = -1) throw();
+    void setState(const RCState& state) throw();
+    void setRuntype(const std::string& runtype) { m_runtype = runtype; }
+    void setDBTable(const std::string& table) { m_table = table; }
+    const std::string& getDBTable() const { return m_table; }
+    void setAutoReply(bool auto_reply) { m_auto = auto_reply; }
+    void setDB(DBInterface* db, const std::string& table);
+    DBInterface* getDB() { return m_db; }
+
+  private:
+    void dbload(NSMCommunicator& com) throw(IOException);
 
   private:
     RCState m_state_demand;
-    RCConfig m_config;
+    DBObject m_obj;
     DBInterface* m_db;
-    std::string m_path;
-    std::string m_tablename;
-    bool m_auto_reply;
-    bool m_db_close;
+    std::string m_table;
+    bool m_auto;
+    std::string m_runtype;
+    NSMData m_data;
 
   };
+
+  inline void RCCallback::setDB(DBInterface* db, const std::string& table)
+  {
+    m_db = db;
+    m_table = table;
+  }
+
+  inline void RCCallback::setData(const std::string& name,
+                                  const std::string& format,
+                                  int revision) throw()
+  {
+    m_data = NSMData(name, format, revision);
+  }
 
 };
 

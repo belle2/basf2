@@ -1,4 +1,4 @@
-.PHONY : all clean base system database nsm readout dqm runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold apps/eclshaperd apps/templated 
+.PHONY : all clean base system database nsm readout dqm runcontrol hvcontrol apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold apps/eclshaperd apps/templated apps/ttdad
 
 SRCDIR=./src
 INCDIR=./include/daq/slc/
@@ -6,9 +6,9 @@ LIBDIR=./lib
 BINDIR=./bin
 TMPDIR=./tmp
 
-APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold apps/eclshaperd apps/templated 
+APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold apps/eclshaperd apps/templated apps/ttdad
 
-SUBPACKAGES = base system database nsm readout runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc $(APPS)
+SUBPACKAGES = base system database nsm readout runcontrol hvcontrol $(APPS)
 
 all: copyinc $(SUBPACKAGES)
 	@ make -C tools/

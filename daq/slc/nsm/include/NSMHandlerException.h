@@ -9,6 +9,7 @@ namespace Belle2 {
 
   public:
     NSMHandlerException(const std::string& format, ...) throw();
+    NSMHandlerException() throw() {}
 
   };
 

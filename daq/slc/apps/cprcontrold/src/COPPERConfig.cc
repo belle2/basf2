@@ -27,7 +27,7 @@ COPPERConfig::COPPERConfig(const COPPERSetup& setup,
   m_eb0_port = eb0_port;
 }
 
-void COPPERConfig::read(const ConfigObject& obj)
+void COPPERConfig::read(const DBObject& obj)
 {
   m_use_hslb[0] = obj.getBool("hslb_a");
   m_use_hslb[1] = obj.getBool("hslb_b");
@@ -38,7 +38,7 @@ void COPPERConfig::read(const ConfigObject& obj)
   m_eb0_host = obj.getText("eb0_host");
   m_eb0_port = obj.getInt("eb0_port");
   m_setup.read(obj.getObject("setup"));
-  const ConfigObjectList& fee(obj.getObjects("fee"));
+  const DBObjectList& fee(obj.getObjects("fee"));
   for (size_t i = 0; i < fee.size(); i++) {
     m_fee[i].read(fee[i]);
   }

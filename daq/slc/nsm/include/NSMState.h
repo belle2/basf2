@@ -8,6 +8,9 @@ namespace Belle2 {
   class NSMState : public Enum {
 
   public:
+    static const NSMState ONLINE_S;
+
+  public:
     NSMState() throw() : Enum(Enum::UNKNOWN) {}
     NSMState(const Enum& num) throw() : Enum(num) {}
     NSMState(const NSMState& st) throw() : Enum(st) {}

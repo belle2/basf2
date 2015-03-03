@@ -1,7 +1,7 @@
 #ifndef _Belle2_FEEConfig_h
 #define _Belle2_FEEConfig_h
 
-#include <daq/slc/database/ConfigObject.h>
+#include <daq/slc/database/DBObject.h>
 
 #include <vector>
 #include <string>
@@ -27,7 +27,7 @@ namespace Belle2 {
       const std::string& getParamName() const { return m_name; }
       int getAddress() const { return m_address; }
       int getSize() const { return m_size; }
-      void read(const ConfigObject& obj);
+      void read(const DBObject& obj);
 
     private:
       std::string m_name;
@@ -52,7 +52,7 @@ namespace Belle2 {
       const std::string& getName() const { return m_name; }
       int getIndex() const { return m_index; }
       int getValue() const { return m_value; }
-      void read(const ConfigObject& obj);
+      void read(const DBObject& obj);
 
     private:
       std::string m_name;
@@ -83,7 +83,7 @@ namespace Belle2 {
     const std::string& getFirmware() const { return m_firmware; }
     RegisterList& getRegisters() { return m_register; }
     ParameterList& getParameters() { return m_parameter; }
-    void read(const ConfigObject& obj);
+    void read(const DBObject& obj);
     RegisterList::iterator getRegister(const std::string& name);
 
   private:

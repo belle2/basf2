@@ -23,11 +23,11 @@ namespace Belle2 {
     virtual ~DQMViewCallback() throw() {}
 
   public:
-    virtual void init() throw();
-    virtual bool perform(const NSMMessage& msg) throw();
-    virtual void timeout() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
+    virtual void init(NSMCommunicator& com) throw();
+    virtual void timeout(NSMCommunicator& com) throw();
+    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
+
+    bool record() throw();
 
   public:
     void addReader(const std::string& pack_name,
@@ -39,18 +39,21 @@ namespace Belle2 {
     unsigned int getRunNumber() const { return m_runno; }
     void notify() { m_cond.broadcast(); }
     void wait() { m_cond.wait(m_mutex); }
-    //void wait(int timeout = 5) { m_cond.wait(m_mutex, timeout); }
     void lock() { m_mutex.lock(); }
     void unlock() { m_mutex.unlock(); }
+    void update() throw();
 
   private:
     ConfigFile& m_config;
     Mutex m_mutex;
     Cond m_cond;
-    unsigned int m_expno;
-    unsigned int m_runno;
-    unsigned int m_count;
+    int m_expno;
+    int m_runno;
+    int m_subno;
+    int m_count;
+    std::string m_dump_path;
     std::vector<DQMFileReader> m_reader_v;
+    NSMNode m_runcontrol;
 
   };
 

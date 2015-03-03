@@ -17,7 +17,7 @@ CFLAGS   = -g -Wall -fPIC -D_REENTRANT
 CFLAGS  += -I$(INCDIR) -I$(PGSQL_LIB_PATH)/include -I.
 
 #MAINS   = $(wildcard *.cc)
-MAINS   = datad.cc
+MAINS   = nsmvget.cc nsmvset.cc nsmvlistget.cc
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)
 
 SRCS   = $(wildcard $(SRCDIR)/*.cc)

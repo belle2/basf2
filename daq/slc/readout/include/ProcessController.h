@@ -10,6 +10,7 @@
 #include "daq/slc/system/Cond.h"
 
 #include <vector>
+#include <sstream>
 
 namespace Belle2 {
 
@@ -30,7 +31,7 @@ namespace Belle2 {
     bool init(const std::string& name, int nodeid = 0);
     void clear();
     bool load(int timeout);
-    bool start();
+    bool start(int expno, int runno);
     bool stop();
     bool abort();
     const std::string& getName() { return m_name; }
@@ -43,6 +44,9 @@ namespace Belle2 {
     void setName(const std::string& name) { m_name = name; }
     void setExecutable(const std::string& exe) { m_exename = exe; }
     void addArgument(const std::string& arg) { m_arg_v.push_back(arg); }
+    void addArgument(const char* format, ...);
+    template<typename T>
+    void addArgument(T arg);
     void clearArguments() { m_arg_v = std::vector<std::string>(); }
     bool isAlive() throw() { return m_fork.isAlive(); }
 
@@ -61,6 +65,13 @@ namespace Belle2 {
     std::string m_message;
 
   };
+
+  template<typename T>
+  inline void ProcessController::addArgument(T arg)
+  {
+    std::stringstream ss; ss << arg;
+    m_arg_v.push_back(ss.str());
+  }
 
   class ProcessSubmitter {
 

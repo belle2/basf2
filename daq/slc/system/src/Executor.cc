@@ -51,7 +51,7 @@ bool Executor::execute()
   std::cerr << std::endl;
   argv[m_arg_v.size() + 1] = NULL;
   if (execvp(m_path.c_str(), argv) == -1) {
-    LogFile::error("Faield to start receiver basf2 script");
+    LogFile::error("Faield to start %s", argv[0]);
     return false;
   }
 

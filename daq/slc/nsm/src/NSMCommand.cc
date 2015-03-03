@@ -11,14 +11,15 @@ const NSMCommand NSMCommand::STATE(4, "STATE");
 const NSMCommand NSMCommand::LOG(5, "LOG");
 const NSMCommand NSMCommand::VGET(11, "VGET");
 const NSMCommand NSMCommand::VSET(12, "VSET");
-const NSMCommand NSMCommand::NSMGET(401, "NSMGET");
-const NSMCommand NSMCommand::NSMSET(402, "NSMSET");
+const NSMCommand NSMCommand::VREPLY(13, "VREPLY");
+const NSMCommand NSMCommand::VLISTGET(14, "VLISTGET");
+const NSMCommand NSMCommand::VLISTSET(15, "VLISTSET");
+const NSMCommand NSMCommand::NSMDATAGET(401, "NSMDATAGET");
+const NSMCommand NSMCommand::NSMDATASET(402, "NSMDATASET");
 const NSMCommand NSMCommand::DBSET(403, "DBSET");
 const NSMCommand NSMCommand::DBGET(404, "DBGET");
-const NSMCommand NSMCommand::LISTSET(405, "LISTSET");
-const NSMCommand NSMCommand::LISTGET(406, "LISTGET");
-const NSMCommand NSMCommand::EXCLUDE(511, "EXCLUDE");
-const NSMCommand NSMCommand::INCLUDE(512, "INCLUDE");
+const NSMCommand NSMCommand::DBLISTSET(405, "DBLISTSET");
+const NSMCommand NSMCommand::DBLISTGET(406, "DBLISTGET");
 
 const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
 {
@@ -30,14 +31,15 @@ const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
   else if (label == STATE.getLabel()) *this = STATE;
   else if (label == VGET.getLabel()) *this = VGET;
   else if (label == VSET.getLabel()) *this = VSET;
-  else if (label == NSMGET.getLabel()) *this = NSMGET;
-  else if (label == NSMSET.getLabel()) *this = NSMSET;
+  else if (label == VREPLY.getLabel()) *this = VREPLY;
+  else if (label == VLISTGET.getLabel()) *this = VLISTGET;
+  else if (label == VLISTSET.getLabel()) *this = VLISTSET;
+  else if (label == NSMDATAGET.getLabel()) *this = NSMDATAGET;
+  else if (label == NSMDATASET.getLabel()) *this = NSMDATASET;
   else if (label == DBSET.getLabel()) *this = DBSET;
   else if (label == DBGET.getLabel()) *this = DBGET;
-  else if (label == LISTSET.getLabel()) *this = LISTSET;
-  else if (label == LISTGET.getLabel()) *this = LISTGET;
-  else if (label == EXCLUDE.getLabel()) *this = EXCLUDE;
-  else if (label == INCLUDE.getLabel()) *this = INCLUDE;
+  else if (label == DBLISTSET.getLabel()) *this = DBLISTSET;
+  else if (label == DBLISTGET.getLabel()) *this = DBLISTGET;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -52,14 +54,15 @@ const NSMCommand& NSMCommand::operator=(int id) throw()
   else if (id == STATE.getId()) *this = STATE;
   else if (id == VSET.getId()) *this = VSET;
   else if (id == VGET.getId()) *this = VGET;
-  else if (id == NSMSET.getId()) *this = NSMSET;
-  else if (id == NSMGET.getId()) *this = NSMGET;
+  else if (id == VREPLY.getId()) *this = VREPLY;
+  else if (id == VLISTSET.getId()) *this = VLISTSET;
+  else if (id == VLISTGET.getId()) *this = VLISTGET;
+  else if (id == NSMDATASET.getId()) *this = NSMDATASET;
+  else if (id == NSMDATAGET.getId()) *this = NSMDATAGET;
   else if (id == DBSET.getId()) *this = DBSET;
   else if (id == DBGET.getId()) *this = DBGET;
-  else if (id == LISTSET.getId()) *this = LISTSET;
-  else if (id == LISTGET.getId()) *this = LISTGET;
-  else if (id == EXCLUDE.getId()) *this = EXCLUDE;
-  else if (id == INCLUDE.getId()) *this = INCLUDE;
+  else if (id == DBLISTSET.getId()) *this = DBLISTSET;
+  else if (id == DBLISTGET.getId()) *this = DBLISTGET;
   else *this = Enum::UNKNOWN;
   return *this;
 }

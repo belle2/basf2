@@ -17,20 +17,13 @@ namespace Belle2 {
   class ECLShaperControllerCallback : public RCCallback {
 
   public:
-    ECLShaperControllerCallback(const NSMNode& node);
-    virtual ~ECLShaperControllerCallback() throw();
+    ECLShaperControllerCallback() : m_forced(true) {}
+    virtual ~ECLShaperControllerCallback() throw() {}
 
   public:
-    virtual void init() throw();
-    virtual void term() throw();
-    virtual void timeout() throw();
-    virtual bool load() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
-    virtual bool resume() throw();
-    virtual bool pause() throw();
-    virtual bool recover() throw();
-    virtual bool abort() throw();
+    virtual void load(const DBObject& obj) throw(RCHandlerException);
+    virtual void recover() throw(RCHandlerException);
+    virtual void abort() throw(RCHandlerException);
 
   private:
     ECLShaperController m_con;

@@ -33,13 +33,11 @@ int main(int argc, char** argv)
   const std::string node = argv[2];
   ConfigFile config("slowcontrol");
   if (argc > 4) config.read(argv[3]);
-  NSMCommunicator* comm = new NSMCommunicator();
-  comm->init(NSMNode(node),
-             config.get("nsm.global.host"),
-             config.getInt("nsm.global.port"));
+  NSMCommunicator com;
+  com.init(NSMNode(node), config.get("nsm.global.host"),
+           config.getInt("nsm.global.port"));
   NSMData data(stornode + "_STATUS", "rfunitinfo", rfunitinfo_revision);
-  rfunitinfo* info = (rfunitinfo*)data.open(comm);
-
+  rfunitinfo* info = (rfunitinfo*)data.open(com);
   while (true) {
     sleep(2);
     fputs("\033[2J\033[0;0H", stdout);

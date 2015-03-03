@@ -120,7 +120,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
         }
         try {
             NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.NSMSET)) {
+            if (command.equals(NSMCommand.NSMDATASET)) {
                 NSMData data = NSMListenerService.getData(label_nodename.getText() + "_STATUS");
                 if (data == null || !data.getFormat().matches("storage_status")) {
                     return;

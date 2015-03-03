@@ -16,7 +16,7 @@ dbLoadRecords("db/nsmnode.db","nodename=TOMO")
 dbLoadRecords("db/nsmnode.db","nodename=STORAGE")
 dbLoadRecords("db/nsmdata_storage.db","dataname=STORAGE_STATUS")
 
-rcConfig("NSM2CA","b2slow2.kek.jp", 9122)
+nsmConfig("NSM2CA","b2slow2.kek.jp", 9122)
 
 cd ${TOP}/iocBoot/${IOC}
 iocInit

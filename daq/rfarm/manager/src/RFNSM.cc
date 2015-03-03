@@ -31,7 +31,8 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
   //  nsmlib_debuglevel ( 1 );
 
   // Initialize NSM
-  if (!(g_context = b2nsm_init(nodename))) {
+  if (!(g_context = b2nsm_init2(nodename, 0, 0, 0, 0))) {
+    //if (!(g_context = b2nsm_init(nodename))) {
     fprintf(RFNSMOUT, "RFNSM : %s initialization failure, %s\n",
             nodename, b2nsm_strerror());
   }

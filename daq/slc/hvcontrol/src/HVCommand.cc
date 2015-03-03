@@ -4,16 +4,13 @@
 
 using namespace Belle2;
 
-const HVCommand HVCommand::CONFIGURE(101, "CONFIGURE");
-const HVCommand HVCommand::TURNON(102, "TURNON");
-const HVCommand HVCommand::TURNOFF(103, "TURNOFF");
-const HVCommand HVCommand::STANDBY(111, "STANDBY");
-const HVCommand HVCommand::SHOULDER(112, "SHOULDER");
-const HVCommand HVCommand::PEAK(113, "PEAK");
-const HVCommand HVCommand::RECOVER(121, "RECOVER");
-const HVCommand HVCommand::HVGET(131, "HVGET");
-const HVCommand HVCommand::HVSET(132, "HVSET");
-const HVCommand HVCommand::HVAPPLY(999, "HVAPPLY");
+const HVCommand HVCommand::CONFIGURE(101, "HV_CONFIGURE");
+const HVCommand HVCommand::TURNON(102, "HV_TURNON");
+const HVCommand HVCommand::TURNOFF(103, "HV_TURNOFF");
+const HVCommand HVCommand::STANDBY(111, "HV_STANDBY");
+const HVCommand HVCommand::SHOULDER(112, "HV_SHOULDER");
+const HVCommand HVCommand::PEAK(113, "HV_PEAK");
+const HVCommand HVCommand::RECOVER(121, "HV_RECOVER");
 
 const HVCommand& HVCommand::operator=(const std::string& label) throw()
 {
@@ -24,15 +21,10 @@ const HVCommand& HVCommand::operator=(const std::string& label) throw()
   else if (label == SHOULDER.getLabel()) *this = SHOULDER;
   else if (label == PEAK.getLabel()) *this = PEAK;
   else if (label == RECOVER.getLabel()) *this = RECOVER;
-  else if (label == HVAPPLY.getLabel()) *this = HVAPPLY;
-  else if (label == HVSET.getLabel()) *this = HVSET;
-  else if (label == HVGET.getLabel()) *this = HVGET;
   else if (label == NSMCommand::OK.getLabel()) *this = NSMCommand::OK;
   else if (label == NSMCommand::ERROR.getLabel()) *this = NSMCommand::ERROR;
-  else if (label == NSMCommand::NSMGET.getLabel()) *this = NSMCommand::NSMGET;
-  else if (label == NSMCommand::NSMSET.getLabel()) *this = NSMCommand::NSMSET;
-  else if (label == NSMCommand::DBGET.getLabel()) *this = NSMCommand::DBGET;
-  else if (label == NSMCommand::DBSET.getLabel()) *this = NSMCommand::DBSET;
+  else if (label == NSMCommand::VGET.getLabel()) *this = NSMCommand::VGET;
+  else if (label == NSMCommand::VSET.getLabel()) *this = NSMCommand::VSET;
   else *this = Enum::UNKNOWN;
   return *this;
 }

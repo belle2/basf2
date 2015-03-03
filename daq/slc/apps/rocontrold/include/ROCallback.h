@@ -1,41 +1,45 @@
-#ifndef _Belle2_ROCallback_hh
-#define _Belle2_ROCallback_hh
+#ifndef _Belle2_ROCallback_h
+#define _Belle2_ROCallback_h
 
-#include "daq/slc/readout/ProcessController.h"
+#include "daq/slc/apps/rocontrold/EB0Controller.h"
+#include "daq/slc/apps/rocontrold/Stream0Controller.h"
+#include "daq/slc/apps/rocontrold/Stream1Controller.h"
 
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/nsm/NSMData.h>
 
 #include "daq/slc/runcontrol/RCCallback.h"
-#include "daq/slc/readout/FlowMonitor.h"
 
 namespace Belle2 {
 
   class ROCallback : public RCCallback {
 
   public:
-    ROCallback(const NSMNode& node, const std::string& conf);
-    virtual ~ROCallback() throw();
+    ROCallback(const NSMNode& runcontrol);
+    virtual ~ROCallback() throw() {}
 
   public:
-    virtual void init() throw();
+    virtual bool initialize(const DBObject& obj) throw();
+    virtual bool configure(const DBObject& obj) throw();
+    virtual void load(const DBObject& obj) throw(RCHandlerException);
+    virtual void start(int expno, int runno) throw(RCHandlerException);
+    virtual void stop() throw(RCHandlerException);
+    virtual void recover() throw(RCHandlerException);
+    virtual void abort() throw(RCHandlerException);
+    virtual void timeout(NSMCommunicator& com) throw();
     virtual void term() throw();
-    virtual bool load() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
-    virtual bool resume() throw();
-    virtual bool pause() throw();
-    virtual bool recover() throw();
-    virtual bool abort() throw();
-    virtual void timeout() throw();
+    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
+
+  public:
+    const NSMNode& getRC() const { return m_runcontrol; }
+    NSMNode& getRC() { return m_runcontrol; }
 
   private:
-    std::vector<ProcessController> m_con;
-    std::vector<FlowMonitor> m_flow;
-    NSMData m_data;
-    ConfigFile m_file;
-    int m_eflag;
-    int m_reserved_i[2];
+    std::string m_conf;
+    NSMNode m_runcontrol;
+    EB0Controller m_eb0;
+    std::vector<Stream0Controller> m_stream0;
+    Stream1Controller m_stream1;
 
   };
 

@@ -12,7 +12,8 @@ namespace Belle2 {
 
     static StringList split(const std::string& str,
                             const char type, size_t max = 0);
-    static std::string join(StringList str_v, const std::string& s);
+    static std::string join(StringList str_v, const std::string& s,
+                            size_t start = 0, size_t end = 0);
     static std::string replace(const std::string& source,
                                const std::string& pattern,
                                const std::string& placement);
@@ -23,6 +24,7 @@ namespace Belle2 {
     static double atof(const std::string str);
     static long long atoll(const std::string str);
     static bool find(const std::string& s, const std::string& str);
+    static bool isdigit(const std::string& s);
 
   };
 

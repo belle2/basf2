@@ -12,6 +12,7 @@ Buffer::Buffer(unsigned int size, unsigned char* memory) throw()
 {
   if (memory == NULL) {
     m_memory = new unsigned char[size];
+    ::memset(m_memory, 0, size);
     m_allocated = true;
   }
 }
@@ -22,6 +23,7 @@ Buffer::Buffer(const Buffer& buf) throw()
 {
   if (m_allocated) {
     m_memory = new unsigned char [buf.m_size];
+    ::memset(m_memory, 0, buf.m_size);
     ::memcpy(m_memory, buf.m_memory, buf.m_size);
   } else {
     m_memory = buf.m_memory;
@@ -42,6 +44,7 @@ const Buffer& Buffer::operator=(const Buffer& buf) throw()
   m_allocated = buf.m_allocated;
   if (m_allocated) {
     m_memory = new unsigned char [buf.m_size];
+    ::memset(m_memory, 0, buf.m_size);
     ::memcpy(m_memory, buf.m_memory, buf.m_size);
   } else {
     m_memory = buf.m_memory;

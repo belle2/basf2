@@ -14,18 +14,18 @@ using namespace Belle2;
 
 void HVControlDaemon::run()
 {
-  ConfigFile config("slowcontrol");
-  DBInterface* db = new PostgreSQLInterface(config.get("database.host"),
-                                            config.get("database.dbname"),
-                                            config.get("database.user"),
-                                            config.get("database.password"),
-                                            config.getInt("database.port"));
-  m_callback->setDB(db);
-  const std::string nodename = m_callback->getNode().getName();
-  LogFile::open("hvcontrold." + nodename);
-  /*  */
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(m_callback,
-                                            config.get("nsm.local.host"),
-                                            config.getInt("nsm.local.port"));
-  daemon->run();
+  ConfigFile config("slowcontrol", "hvcontrol/" + m_filename);
+  PostgreSQLInterface db(config.get("database.host"),
+                         config.get("database.dbname"),
+                         config.get("database.user"),
+                         config.get("database.password"),
+                         config.getInt("database.port"));
+  const std::string nodename = config.get("nsm.nodename");
+  LogFile::open("hvcontrold." + nodename, LogFile::DEBUG);
+  m_callback->getNode().setName(nodename);
+  m_callback->setDB(config.get("hv.tablename"), &db);
+  m_callback->setTimeout(config.getInt("hv.interval"));
+  m_callback->setConfigNames(config.get("hv.confignames"));
+  NSMNodeDaemon(m_callback, config.get("nsm.host"),
+                config.getInt("nsm.port")).run();
 }

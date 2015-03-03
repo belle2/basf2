@@ -90,7 +90,7 @@ public class RunCommandButtonPane extends TitledPane {
         NSMMessage msg = new NSMMessage(nodename, cmd);
         if (cmd.equals(RCCommand.LOAD)) {
             if (m_rcmain.getNameList() == null) {
-                NSMListenerService.requestList(nodename);
+                //NSMListenerService.requestList(nodename);
                 stack_wait.set(true);
                 m_rcmain.getLogView().add(new LogMessage("LOCAL", LogLevel.DEBUG,
                         "Loading run type lists..."));

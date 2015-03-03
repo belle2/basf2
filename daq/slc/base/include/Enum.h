@@ -30,6 +30,8 @@ namespace Belle2 {
     bool operator==(const Enum& e) const throw();
     bool operator!=(const Enum& e) const throw();
     const Enum& operator=(const Enum& e) throw();
+    bool operator==(const std::string& label) const throw();
+    bool operator!=(const std::string& label) const throw();
 
   private:
     int m_id;
@@ -50,6 +52,14 @@ namespace Belle2 {
     m_id = e.m_id;
     m_label = e.m_label;
     return *this;
+  }
+  inline bool Enum::operator==(const std::string& label) const throw()
+  {
+    return m_label == label;
+  }
+  inline bool Enum::operator!=(const std::string& label) const throw()
+  {
+    return m_label != label;
   }
 
 }

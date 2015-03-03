@@ -15,17 +15,6 @@
 
 using namespace Belle2;
 
-std::string perform(const std::string& cmd)
-{
-  FILE* file = popen(cmd.c_str(), "r");
-  static char str[1024];
-  memset(str, '\0', 1024);
-  fread(str, 1, 1024 - 1, file);
-  pclose(file);
-  std::string s = str;
-  return s;//.substr(0, s.find_last_of("\n"));
-}
-
 const char* HSLBController::getFEEType(int type)
 {
   static const char* feetype[] = {
@@ -45,7 +34,6 @@ bool HSLBController::open(int fin) throw()
     m_hslb.fin = (m_hslb.fd < 0) ? -1 : fin;
   }
   if (m_hslb.fd < 0) return false;
-  monitor();
   return true;
 }
 
@@ -58,7 +46,7 @@ bool HSLBController::close() throw()
   return true;
 }
 
-bool HSLBController::load(/*int triggermode*/) throw()
+bool HSLBController::load() throw()
 {
   if (m_hslb.fd < 0) return false;
   linkfee(m_hslb.fd);
@@ -76,40 +64,9 @@ bool HSLBController::monitor() throw()
   return true;
 }
 
-bool HSLBController::boot(const std::string& runtype,
-                          const std::string& firmware) throw()
+bool HSLBController::boot(const std::string& firmware) throw()
 {
   if (m_hslb.fd <= 0) return true;
-  int ntry = 0;
-  /*
-  if (!bootfpga(firmware)) {
-      m_errmsg = StringUtil::form("Failed to boot HSLB %c",
-          (char)('a' + m_hslb.fin));
-      LogFile::error(m_errmsg);
-  }
-  */
-  while (!checkfee()) {
-    writefn32(0x82, 0x1000);
-    usleep(100);
-    writefn32(0x82, 0x10);
-    ntry++;
-    if (ntry > 100) {
-      m_errmsg = StringUtil::form("Can not establish b2link at HSLB %c",
-                                  (char)('a' + m_hslb.fin));
-      LogFile::error(m_errmsg);
-      return false;
-    }
-    usleep(100);
-  }
-  if (runtype.find("dumhslb") != std::string::npos) {
-    StringList str_v = StringUtil::split(runtype, ':');
-    const std::string datfile = StringUtil::form("/home/usr/b2daq/run/dumhslb/%s.dat",
-                                                 str_v[str_v.size() - 1].c_str());
-    std::string cmd = StringUtil::form("write-dumhslb -%c %s", (char)('a' + m_hslb.fin),
-                                       datfile.c_str());
-    LogFile::debug(cmd);
-    system(cmd.c_str());
-  }
   return true;
 }
 

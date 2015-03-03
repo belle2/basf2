@@ -1,12 +1,6 @@
 #include "daq/slc/apps/runcontrold/RunControlMasterCallback.h"
 
-#include <daq/slc/nsm/NSM2NSMBridge.h>
-#include <daq/slc/nsm/NSMNodeDaemon.h>
-
-#include <daq/slc/database/PostgreSQLInterface.h>
-
-#include <daq/slc/system/LogFile.h>
-#include <daq/slc/system/Daemon.h>
+#include <daq/slc/runcontrol/RCNodeDaemon.h>
 
 #include <daq/slc/base/ConfigFile.h>
 
@@ -14,36 +8,16 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  ConfigFile config("slowcontrol", argv[1]);
-  std::string name = config.get("nsm.nodename");
-  if (!Daemon::start(("runcontrold." + name).c_str(), argc - 1, argv + 1)) {
-    return 1;
+  if (Daemon::start(argv[1], argc, argv, 1, "<config>")) {
+    ConfigFile config("slowcontrol", argv[1]);
+    int port = config.getInt("provider.port");
+    RunControlCallback* callback = new RunControlCallback(port);
+    callback->setPriorityToDB(LogFile::getPriority(config.get("log.priority.db")));
+    callback->setPriorityToGlobal(LogFile::getPriority(config.get("log.priority.global")));
+    callback->setExcludedNodes(StringUtil::split(config.get("node.excluded"), ','));
+    RCCallback* callback2 = new RunControlMasterCallback(callback);
+    RCNodeDaemon(config, callback, callback2).run();
   }
-  DBInterface* db = new PostgreSQLInterface(config.get("database.host"),
-                                            config.get("database.dbname"),
-                                            config.get("database.user"),
-                                            config.get("database.password"),
-                                            config.getInt("database.port"));
-  const int port = config.getInt("provider.port");
-  NSMNode node(name);
-  RunControlCallback* callback =
-    new RunControlCallback(node, config.get("runtype"),
-                           config.get("nsm.mem.format"),
-                           config.getInt("nsm.mem.revision"), port);
-  callback->setPriorityToDB(LogFile::getPriority(config.get("log.priority.db")));
-  callback->setPriorityToLocal(LogFile::getPriority(config.get("log.priority.local")));
-  callback->setPriorityToGlobal(LogFile::getPriority(config.get("log.priority.global")));
-  callback->setExcludedNodes(StringUtil::split(config.get("node.excluded"), ','));
-
-  RunControlMasterCallback* master_callback =
-    new RunControlMasterCallback(node, callback);
-  callback->setDB(db);
-  NSM2NSMBridge* daemon = new NSM2NSMBridge(callback,
-                                            config.get("nsm.local.host"),
-                                            config.getInt("nsm.local.port"),
-                                            master_callback,
-                                            config.get("nsm.global.host"),
-                                            config.getInt("nsm.global.port"));
-  daemon->run();
   return 0;
 }
+

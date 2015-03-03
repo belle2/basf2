@@ -8,7 +8,6 @@ package b2daq.apps.runcontrol;
 import b2daq.database.ConfigObject;
 import b2daq.nsm.NSMListenerService;
 import b2daq.nsm.NSMMessage;
-import b2daq.runcontrol.core.RCCommand;
 import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -90,7 +89,6 @@ final class TTDConfigEditorPane extends VBox implements ConfigManager {
             pars[0] = comboTriggerTypePropery().getSelectionModel().getSelectedIndex();
             pars[1] = Integer.parseInt(fieldDummyRate.getText());
             pars[2] = Integer.parseInt(fieldTriggerLimit.getText());
-            NSMListenerService.request(new NSMMessage(nodename, RCCommand.TRGIFT, pars));
         });
 
     }

@@ -6,12 +6,11 @@
 #include <daq/slc/nsm/NSMNode.h>
 #include <daq/slc/nsm/NSMData.h>
 
-#include <daq/slc/database/LoggerObject.h>
-#include <daq/slc/database/LoggerObjectTable.h>
+#include <daq/slc/database/DBObject.h>
 
 namespace Belle2 {
 
-  class RunSummary : public LoggerObject {
+  class RunSummary : public DBObject {
 
     typedef std::vector<NSMNode> NSMNodeList;
     typedef std::vector<NSMData> NSMDataList;

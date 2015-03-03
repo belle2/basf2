@@ -23,8 +23,7 @@ void* RunExpRecoLogger(void*)
 
 
 
-ExpRecoCallback::ExpRecoCallback(const NSMNode& node)
-  : RCCallback(node)
+ExpRecoCallback::ExpRecoCallback()
 {
   // Conf file
   m_conf = new RFConf(getenv("EXPRECO_CONFFILE"));
@@ -38,7 +37,7 @@ ExpRecoCallback::~ExpRecoCallback() throw()
 
 }
 
-bool ExpRecoCallback::load() throw()
+void ExpRecoCallback::load(const DBObject&) throw(RCHandlerException)
 {
   // 1. Set execution directory
   //  char* chr_execdir = m_conf->getconf("expreco","execdir_base");
@@ -92,21 +91,17 @@ bool ExpRecoCallback::load() throw()
   char* evs = m_conf->getconf("expreco", "evsscript");
   char* evsport = m_conf->getconf("expreco", "evsport");
   m_pid_evs = m_proc->Execute(evs, rboutname, evsport);
-
-  return true;
 }
 
-bool ExpRecoCallback::start() throw()
+void ExpRecoCallback::start() throw(RCHandlerException)
 {
-  return true;
 }
 
-bool ExpRecoCallback::stop() throw()
+void ExpRecoCallback::stop() throw(RCHandlerException)
 {
-  return true;
 }
 
-bool ExpRecoCallback::recover() throw()
+void ExpRecoCallback::recover() throw(RCHandlerException)
 {
   // Kill processes
   int status;
@@ -149,8 +144,6 @@ bool ExpRecoCallback::recover() throw()
   char* evs = m_conf->getconf("expreco", "evsscript");
   char* evsport = m_conf->getconf("expreco", "evsport");
   m_pid_evs = m_proc->Execute(evs, rboutname, evsport);
-
-  return true;
 }
 
 void ExpRecoCallback::ExpRecoLogger()

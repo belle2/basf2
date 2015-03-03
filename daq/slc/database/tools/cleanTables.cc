@@ -1,4 +1,4 @@
-#include "daq/slc/database/TableInfoTable.h"
+//#include "daq/slc/database/TableInfoTable.h"
 
 #include <daq/slc/database/PostgreSQLInterface.h>
 
@@ -14,6 +14,8 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  return 1;
+  /*
   if (argc < 1) {
     LogFile::debug("usage: %s", argv[0]);
     return 1;
@@ -36,4 +38,5 @@ int main(int argc, char** argv)
   }
   db->close();
   return 0;
+  */
 }

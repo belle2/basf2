@@ -13,10 +13,10 @@ namespace Belle2 {
     static const RCState READY_S;
     static const RCState RUNNING_S;
     static const RCState PAUSED_S;
+    static const RCState CONFIGURING_TS;
     static const RCState LOADING_TS;
     static const RCState STARTING_TS;
     static const RCState STOPPING_TS;
-    static const RCState BOOTING_TS;
     static const RCState ERROR_ES;
     static const RCState FATAL_ES;
     static const RCState RECOVERING_RS;

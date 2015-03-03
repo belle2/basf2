@@ -1,7 +1,7 @@
 #ifndef Belle2_RCConfig_h
 #define Belle2_RCConfig_h
 
-#include <daq/slc/database/ConfigObject.h>
+#include <daq/slc/database/DBObject.h>
 
 namespace Belle2 {
 
@@ -16,9 +16,9 @@ namespace Belle2 {
 
   public:
     void print() throw();
-    ConfigObject& getObject() throw() { return m_obj; }
-    const ConfigObject& getObject() const throw() { return m_obj; }
-    void setObject(const ConfigObject& obj) throw() { m_obj = obj; }
+    DBObject& getObject() throw() { return m_obj; }
+    const DBObject& getObject() const throw() { return m_obj; }
+    void setObject(const DBObject& obj) throw() { m_obj = obj; }
     int getExpNumber() const throw() { return m_expno; }
     int getRunNumber() const throw() { return m_runno; }
     int getSubNumber() const throw() { return m_subno; }
@@ -31,12 +31,9 @@ namespace Belle2 {
     const std::string& getConfigName() const throw() {
       return m_obj.getName();
     }
-    const std::string& getNodeName() const throw() {
-      return m_obj.getNode();
-    }
 
   private:
-    ConfigObject m_obj;
+    DBObject m_obj;
     int m_expno;
     int m_runno;
     int m_subno;

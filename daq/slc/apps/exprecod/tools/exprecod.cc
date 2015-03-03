@@ -1,23 +1,16 @@
 #include "daq/slc/apps/exprecod/ExpRecoCallback.h"
 
-#include <daq/slc/nsm/NSMNodeDaemon.h>
+#include <daq/slc/runcontrol/RCNodeDaemon.h>
 
-#include <daq/slc/system/LogFile.h>
+#include <daq/slc/base/ConfigFile.h>
 
 using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
-    LogFile::debug("Usage : %s <name>", argv[0]);
-    return 1;
+  if (Daemon::start(argv[1], argc, argv, 1, "<config>")) {
+    ConfigFile config("slowcontrol", argv[1]);
+    RCNodeDaemon(config, new ExpRecoCallback()).run();
   }
-
-  const char* name = argv[1];
-  NSMNode node(name);
-  ExpRecoCallback* callback = new ExpRecoCallback(node);
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
-  daemon->run();
-
   return 0;
 }

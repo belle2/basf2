@@ -9,9 +9,6 @@ const int DAQLogMessage::g_revision = 1;
 
 DAQLogMessage::DAQLogMessage() throw()
 {
-  setConfig(false);
-  setTable(g_tablename);
-  setRevision(g_revision);
   addInt("date", Date().get());
   addText("nodename", "");
   addChar("priority", 0);
@@ -22,15 +19,11 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
                              LogFile::Priority priority,
                              const std::string& message) throw()
 {
-  setConfig(false);
-  setTable(g_tablename);
-  setRevision(g_revision);
   addInt("date", Date().get());
   addText("nodename", nodename);
   addChar("priority", 0);
   setPriority(priority);
   addText("message", message);
-  setNode(nodename);
 }
 
 DAQLogMessage::DAQLogMessage(const std::string& nodename,
@@ -38,22 +31,16 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
                              const std::string& message,
                              const Date& date) throw()
 {
-  setConfig(false);
-  setTable(g_tablename);
-  setRevision(g_revision);
   addInt("date", date.get());
   addText("nodename", nodename);
   addChar("priority", 0);
   setPriority(priority);
   addText("message", message);
-  setNode(nodename);
 }
 
 DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()
-  : ConfigObject(log)
+  : DBObject(log)
 {
-  setTable(g_tablename);
-  setRevision(g_revision);
   addInt("date", 0);
   addText("nodename", "");
   addChar("priority", 0);

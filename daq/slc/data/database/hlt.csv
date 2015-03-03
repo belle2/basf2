@@ -1,2 +1,2 @@
 nodename,   config, script
-     HLT,  default,   TEST
+     HLT,  RC:default,   TEST

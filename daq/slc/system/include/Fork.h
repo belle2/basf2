@@ -41,7 +41,7 @@ namespace Belle2 {
   public:
     pid_t get_id() const { return m_pid; }
     void set_id(pid_t id) { m_pid = id; }
-    bool isAlive() const { return m_pid > 0; }
+    bool isAlive() const { return kill(0); }
     bool kill(int signo) const {
       if (m_pid < 0) return false;
       return ::kill(m_pid, signo) == 0;
@@ -50,12 +50,7 @@ namespace Belle2 {
       if (m_pid < 0) return false;
       return ::waitpid(m_pid, NULL, opt);
     }
-    bool cancel() {
-      return kill(SIGINT);
-      //kill(SIGINT);
-      //kill(SIGQUIT);
-      //return kill(SIGKILL);
-    }
+    bool cancel() { return kill(SIGINT); }
 
   private:
     pid_t m_pid;

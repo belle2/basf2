@@ -2,33 +2,33 @@
 
 using namespace Belle2;
 
-void FEEConfig::Register::read(const ConfigObject& obj)
+void FEEConfig::Register::read(const DBObject& obj)
 {
   m_name = obj.getText("paramname");
   m_address = obj.getInt("address");
   m_size = obj.getInt("size");
 }
 
-void FEEConfig::Parameter::read(const ConfigObject& obj)
+void FEEConfig::Parameter::read(const DBObject& obj)
 {
   m_name = obj.getText("paramname");
   m_index = obj.getInt("arrayindex");
   m_value = obj.getInt("value");
 }
 
-void FEEConfig::read(const ConfigObject& obj)
+void FEEConfig::read(const DBObject& obj)
 {
   clear();
   m_slot = obj.getInt("slot");
   m_board = obj.getText("board");
   m_firmware = obj.getText("firmware");
-  const ConfigObjectList& registers(obj.getObjects("register"));
+  const DBObjectList& registers(obj.getObjects("register"));
   for (size_t i = 0; i < registers.size(); i++) {
     Register reg;
     reg.read(registers[i]);
     m_register.push_back(reg);
   }
-  const ConfigObjectList& parameters(obj.getObjects("parameter"));
+  const DBObjectList& parameters(obj.getObjects("parameter"));
   for (size_t i = 0; i < parameters.size(); i++) {
     Parameter param;
     param.read(parameters[i]);

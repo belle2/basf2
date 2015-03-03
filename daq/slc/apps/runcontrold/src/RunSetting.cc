@@ -4,10 +4,6 @@ using namespace Belle2;
 
 RunSetting::RunSetting(const NSMNode& node)
 {
-  setNode(node.getName());
-  setConfig(false);
-  setTable("runsetting");
-  setRevision(1);
   addInt("runnumberid", 0);
   //addInt("runcontrol", 0);
   addText("operators", "");
@@ -18,12 +14,12 @@ RunSetting::~RunSetting() throw()
 {
 }
 
-void RunSetting::setRunNumber(RunNumberInfo info)
+void RunSetting::setRunNumber(const RunNumber& info)
 {
   setInt("runnumberid", info.getId());
 }
 
-void RunSetting::setRunControl(const ConfigObject& obj)
+void RunSetting::setRunControl(const DBObject& obj)
 {
   //setInt("runcontrol", obj.getId());
   addObject("runcontrol", obj);

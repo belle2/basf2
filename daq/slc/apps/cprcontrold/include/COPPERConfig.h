@@ -4,7 +4,7 @@
 #include "daq/slc/apps/cprcontrold/FEEConfig.h"
 #include "daq/slc/apps/cprcontrold/COPPERSetup.h"
 
-#include <daq/slc/database/ConfigObject.h>
+#include <daq/slc/database/DBObject.h>
 
 namespace Belle2 {
 
@@ -24,10 +24,11 @@ namespace Belle2 {
     ~COPPERConfig() {}
 
   public:
-    void read(const ConfigObject& obj);
+    void read(const DBObject& obj);
     const std::string& getCopperId() const { return m_setup.getCopperId(); }
     const std::string& getHostname() const { return m_setup.getHostname(); }
     bool useHSLB(int index) const { return m_use_hslb[index]; }
+    void setHSLBEnabled(int index, bool enabled) { m_use_hslb[index] = enabled; }
     const COPPERSetup& getSetup() const { return m_setup; }
     COPPERSetup& getSetup() { return m_setup; }
     const FEEConfig& getFEE(int index) const { return m_fee[index]; }

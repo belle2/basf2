@@ -1,13 +1,13 @@
    nodename,  config, used,                           runtype, type, dbmode, sequential
-   ECL, default, true,ECLDSP/ecl/1/debug:v0001,0,1,      true
-   ECL, default, true,ECL01/runcontrol/1/default,0,1,      false
-   ECL, default, true,ECL02/runcontrol/1/default,0,1,      false
-   ECL, debug:dummycpu, true,ECLDSP/ecl/1/debug:v0001,0,1,      true
-   ECL, debug:dummycpu, true,ECL01/runcontrol/1/debug:dummycpu,0,1,      false
-   ECL, debug:dummycpu, true,ECL02/runcontrol/1/debug:dummycpu,0,1,      false
-   ECL, debug:dumhslb:020:rand4k, true,ECLDSP/ecl/1/debug:v0001,0,1,      true
-   ECL, debug:dumhslb:020:rand4k, true,ECL01/runcontrol/1/debug:dumhslb:020:rand4k,0,1,      false
-   ECL, debug:dumhslb:020:rand4k, true,ECL02/runcontrol/1/debug:dumhslb:020:rand4k,0,1,      false
-   ECL, debug:yamadahslb:10kHz, true,ECLDSP/ecl/1/debug:v0001,0,1,      true
-   ECL, debug:yamadahslb:10kHz, true,ECL01/runcontrol/1/debug:yamadahslb:10kHz,0,1,      false
-   ECL, debug:yamadahslb:10kHz, true,ECL02/runcontrol/1/debug:yamadahslb:10kHz,0,1,      false
+   ECL, RC:default, true,ECLDSP@RC:debug:001,0,1,      true
+   ECL, RC:default, true,ECL01@RC:default,0,1,      false
+   ECL, RC:default, true,ECL02@RC:default,0,1,      false
+   ECL, RC:debug:dummycpu, true,ECLDSP@RC:debug:0001,0,1,      true
+   ECL, RC:debug:dummycpu, true,ECL01@RC:debug:dummycpu,0,1,      false
+   ECL, RC:debug:dummycpu, true,ECL02@RC:debug:dummycpu,0,1,      false
+   ECL, RC:debug:dumhslb:020:rand4k, true,ECLDSP@RC:debug:0001,0,1,      true
+   ECL, RC:debug:dumhslb:020:rand4k, true,ECL01@RC:debug:dumhslb:020:rand4k,0,1,      false
+   ECL, RC:debug:dumhslb:020:rand4k, true,ECL02@RC:debug:dumhslb:020:rand4k,0,1,      false
+   ECL, RC:debug:yamadahslb:10kHz, true,ECLDSP@RC:debug:0001,0,1,      true
+   ECL, RC:debug:yamadahslb:10kHz, true,ECL01@RC:debug:yamadahslb:10kHz,0,1,      false
+   ECL, RC:debug:yamadahslb:10kHz, true,ECL02@RC:debug:yamadahslb:10kHz,0,1,      false

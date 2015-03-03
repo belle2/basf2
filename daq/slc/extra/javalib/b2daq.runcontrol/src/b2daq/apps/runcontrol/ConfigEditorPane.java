@@ -69,14 +69,14 @@ final class ConfigEditorPane extends VBox {
         VBox.setVgrow(this, Priority.ALWAYS);
         comboConfigName.setOnAction((event) -> {
             String confname = (String)comboConfigName.getSelectionModel().getSelectedItem();
-            if (nodename.length() > 0 && confname.length() > 0 && labelDBTable.getText().length() > 0)
-                NSMListenerService.requestDBGet(nodename, labelDBTable.getText(), confname, 0);
+            //if (nodename.length() > 0 && confname.length() > 0 && labelDBTable.getText().length() > 0)
+            //    NSMListenerService.requestDBGet(nodename, labelDBTable.getText(), confname, 0);
         });
         buttonCreateNew.setOnAction((event) -> {
             String confname = (String)comboConfigName.getSelectionModel().getSelectedItem()+"_1";
             String newconf = NewConfigDialog.showDialog(null, "New configuration", nodename, confname);
             ConfigObject obj = manager.update(nodename, newconf);
-            NSMListenerService.requestDBSet(obj);
+            //NSMListenerService.requestDBSet(obj);
             //obj.print();
             System.out.println(newconf);
         });

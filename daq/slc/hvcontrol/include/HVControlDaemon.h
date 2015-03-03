@@ -1,6 +1,8 @@
 #ifndef _Belle2_HVControlDaemon_h
 #define _Belle2_HVControlDaemon_h
 
+#include <string>
+
 namespace Belle2 {
 
   class HVControlCallback;
@@ -8,8 +10,10 @@ namespace Belle2 {
   class HVControlDaemon {
 
   public:
-    HVControlDaemon(HVControlCallback* callback)
-      : m_callback(callback) {}
+    HVControlDaemon(HVControlCallback* callback,
+                    const std::string& filename)
+      : m_callback(callback),
+        m_filename(filename) {}
     ~HVControlDaemon() throw() {}
 
   public:
@@ -17,6 +21,7 @@ namespace Belle2 {
 
   private:
     HVControlCallback* m_callback;
+    std::string m_filename;
 
   };
 

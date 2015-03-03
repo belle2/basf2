@@ -31,7 +31,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -237,7 +236,6 @@ public class RunControlMainPane extends TabPane implements NSMObserver {
         runSettingsPane.getFieldOperator1().textProperty().addListener(listener);
         runSettingsPane.readyProperty().addListener(listener);
         networkconfigController.setState(true, true);
-        NSMListenerService.request(new NSMMessage(NSMListenerService.getNSMConfig().getNsmTarget(), RCCommand.STATECHECK));
     }
 
     @Override
@@ -258,7 +256,7 @@ public class RunControlMainPane extends TabPane implements NSMObserver {
             long date = 1000l * msg.getParam(1);
             log(new LogMessage(from, LogLevel.Get(msg.getParam(0)),
                     new Date(date), ss.toString()));
-        } else if (command.equals(NSMCommand.LISTSET)) {
+        } else if (command.equals(NSMCommand.DBLISTSET)) {
             if (msg.getNodeName().matches(NSMListenerService.getNSMConfig().getNsmTarget()) &&
                     msg.getNParams() > 0 && msg.getParam(0) > 0) {
                 namelist = msg.getData().split("\n");
@@ -286,12 +284,12 @@ public class RunControlMainPane extends TabPane implements NSMObserver {
                                 label_m.put(name, statelabel_v[count]);
                             }
                             count++;
-                            NSMListenerService.requestDBGet(name, obj.getObject("runtype").getId());
+                            //NSMListenerService.requestDBGet(name, obj.getObject("runtype").getId());
                         }
                     }
                 }
             }
-        } else if (command.equals(NSMCommand.NSMSET)) {
+        } else if (command.equals(NSMCommand.NSMDATASET)) {
             String dataname = msg.getNodeName();
             NSMData data = NSMListenerService.getData(dataname);
             Tab tab = null;
@@ -342,8 +340,7 @@ public class RunControlMainPane extends TabPane implements NSMObserver {
                 }
 
                 if (cobj == null) {
-                    NSMListenerService.requestDBGet(config.getNsmTarget(),
-                            data.getInt("configid", 0));
+                    //NSMListenerService.requestDBGet(config.getNsmTarget(),data.getInt("configid", 0));
                 } else {
                     runSettingsPane.update(cobj, data);
                     //rcStateController.update(data.getInt("state"), true);
@@ -372,17 +369,6 @@ public class RunControlMainPane extends TabPane implements NSMObserver {
             }
             if (state.equals(RCState.RUNNING_S)) {
                 runSettingsPane.clear();
-            }
-        } else if (command.equals(RCCommand.STATE)) {
-            RCState state = new RCState();
-            String[] str_v = msg.getData().split(" ");
-            if (str_v.length > 1) {
-                if (label_m.containsKey(str_v[0])) {
-                    state.copy(str_v[1]);
-                    label_m.get(str_v[0]).update(state);
-                }
-            } else {
-                System.out.println("'" + msg.getData() + "' " + msg.getData().contains(" "));
             }
         }
     }

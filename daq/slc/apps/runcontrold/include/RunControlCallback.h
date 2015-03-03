@@ -1,18 +1,15 @@
 #ifndef _Belle2_RunControlCallback_h
 #define _Belle2_RunControlCallback_h
 
-#include "daq/slc/apps/runcontrold/RunSetting.h"
-#include "daq/slc/apps/runcontrold/RunSummary.h"
+#include <daq/slc/runcontrol/RCCallback.h>
+#include <daq/slc/runcontrol/RCNode.h>
 
-#include "daq/slc/runcontrol/RCCallback.h"
-
-#include "daq/slc/system/LogFile.h"
-
-#include "daq/slc/database/RunNumberInfoTable.h"
+#include <daq/slc/database/RunNumberTable.h>
 #include <daq/slc/database/DAQLogMessage.h>
 
 #include <daq/slc/nsm/NSMData.h>
-#include <daq/slc/nsm/NSMNode.h>
+
+#include <daq/slc/system/LogFile.h>
 
 #include <vector>
 #include <map>
@@ -21,101 +18,131 @@ namespace Belle2 {
 
   class RunControlCallback : public RCCallback {
 
-    typedef std::vector<NSMNode> NSMNodeList;
-    typedef NSMNodeList::iterator NSMNodeIterator;
+    typedef std::vector<RCNode> RCNodeList;
+    typedef RCNodeList::iterator RCNodeIterator;
     typedef std::vector<NSMData> NSMDataList;
 
   public:
-    RunControlCallback(const NSMNode& node,
-                       const std::string& runtype,
-                       const std::string& format,
-                       int revision, const int port);
+    RunControlCallback(int port);
     virtual ~RunControlCallback() throw() {}
 
   public:
-    virtual void init() throw();
-    virtual void timeout() throw();
-    virtual bool ok() throw();
-    virtual bool error() throw();
-    virtual bool log() throw();
-    NSMData& getData() { return m_data; }
-    void setCallback(RCCallback* callback) throw() {
-      m_callback = callback;
-    }
+    virtual bool initialize(const DBObject& obj) throw();
+    virtual bool configure(const DBObject& obj) throw();
+    virtual void ok(const char* nodename, const char* data) throw();
+    virtual void error(const char* nodename, const char* data) throw();
+    virtual void log(const DAQLogMessage&) throw();
+    virtual void load(const DBObject& obj) throw(RCHandlerException);
+    virtual void start(int expno, int runno) throw(RCHandlerException);
+    virtual void stop() throw(RCHandlerException);
+    virtual void recover() throw(RCHandlerException);
+    virtual void resume() throw(RCHandlerException);
+    virtual void pause() throw(RCHandlerException);
+    virtual void abort() throw(RCHandlerException);
+    virtual void timeout(NSMCommunicator& com) throw();
 
   public:
-    virtual bool load() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
-    virtual bool recover() throw() { return distribute(getMessage()); }
-    virtual bool pause() throw();
-    virtual bool resume() throw() { return distribute(getMessage()); }
-    virtual bool abort() throw();
-    virtual bool trigft() throw() { return true; }
-    virtual bool stateCheck() throw() { return replyOK(); }
-    virtual bool exclude() throw();
-    virtual bool include() throw();
-    virtual NSMVar vget(const std::string& vname) throw();
-    virtual bool vset(const NSMVar& var) throw();
-
-  public:
-    LogFile::Priority getPriorityToDB() const { return m_priority_db; }
-    LogFile::Priority getPriorityToLocal() const { return m_priority_local; }
-    LogFile::Priority getPriorityToGlobal() const { return m_priority_global; }
     void setPriorityToDB(LogFile::Priority pri) { m_priority_db = pri; }
-    void setPriorityToLocal(LogFile::Priority pri) { m_priority_local = pri; }
     void setPriorityToGlobal(LogFile::Priority pri) { m_priority_global = pri; }
     void setExcludedNodes(const StringList& excluded) { m_excluded_v = excluded; }
+    void setCallback(RCCallback* callback) { m_callback = callback; }
 
   private:
     void update() throw();
-    bool distribute(NSMMessage& msg) throw();
-    bool distribute_r(NSMMessage& msg) throw();
-    bool loadNode(int index) throw();
+    void distribute(NSMMessage msg) throw();
+    void distribute_r(NSMMessage msg) throw();
     void postRun() throw();
-    ConfigObjectList::iterator findConfig(const std::string& nodename, bool& finded) throw();
-    NSMNodeIterator findNode(const std::string& nodename) throw();
-    bool synchronize(NSMNode& node) throw();
-    void logging(const DAQLogMessage& log, bool recoreded = false);
-    bool sendState(const NSMNode& node) throw();
-    bool replyOK() throw();
+    RCNode& findNode(const std::string& nodename) throw(std::out_of_range);
+    bool check(const std::string& nodename, const RCState& state) throw();
+    void logging(const NSMNode& node, LogFile::Priority pri,
+                 const char* text, ...);
+    void logging_imp(const NSMNode& node, LogFile::Priority pri,
+                     const Date& date, const std::string& msg, bool recorded);
+    bool vaddAll(const DBObject& obj) throw();
+    using RCCallback::setState;
+    void setState(NSMNode& node, const RCState& state) throw();
 
   private:
-    RunSetting m_setting;
     RCCallback* m_callback;
-    NSMNodeList m_node_v;
-    NSMDataList m_data_v;
-    RunNumberInfo m_info;
-    NSMData m_data;
-    std::string m_runtype_default;
-    int m_port;
+    RCNodeList m_node_v;
+    RunNumber m_runno;
+    std::string m_operators;
+    std::string m_comment;
     LogFile::Priority m_priority_db;
-    LogFile::Priority m_priority_local;
     LogFile::Priority m_priority_global;
     StringList m_excluded_v;
-    int m_loadindex;
+    int m_port;
+
+  private:
+    class Distributer {
+    public:
+      Distributer(RunControlCallback& callback, const NSMMessage& msg)
+        : m_callback(callback), m_msg(msg), m_enabled(true) {}
+
+    public:
+      void operator()(RCNode& node) throw();
+
+    private:
+      RunControlCallback& m_callback;
+      NSMMessage m_msg;
+      bool m_enabled;
+
+    };
 
   private:
     class ConfigProvider {
-
     public:
-      static const int PORT = 20020;
-
-    public:
-      ConfigProvider(RunControlCallback* callback,
-                     const std::string hostname, int port)
-        : m_callback(callback), m_hostname(hostname), m_port(port) {
-      }
-
+      ConfigProvider(DBInterface& db, const std::string& dbtable, int port)
+        : m_db(db), m_dbtable(dbtable), m_port(port) {}
 
     public:
       void run();
 
     private:
-      RunControlCallback* m_callback;
-      std::string m_hostname;
+      DBInterface& m_db;
+      const std::string m_dbtable;
       int m_port;
     };
+
+  private:
+    static bool handleGetNNodes(Callback* callback, int& v,
+                                const std::string& name, const void* pdata);
+    static bool handleGetExpNumber(Callback* callback, int& v,
+                                   const std::string& name, const void* pdata);
+    static bool handleGetRunNumber(Callback* callback, int& v,
+                                   const std::string& name, const void* pdata);
+    static bool handleGetSubNumber(Callback* callback, int& v,
+                                   const std::string& name, const void* pdata);
+    static bool handleGetTStart(Callback* callback, int& v,
+                                const std::string& name, const void* pdata);
+    static bool handleGetConfig(Callback* callback, std::string& v,
+                                const std::string& name, const void* pdata);
+    static bool handleGetState(Callback* callback, std::string& v,
+                               const std::string& name, const void* pdata);
+    static bool handleGetOperators(Callback* callback, std::string& v,
+                                   const std::string& name, const void* pdata);
+    static bool handleGetComment(Callback* callback, std::string& v,
+                                 const std::string& name, const void* pdata);
+    static bool handleGetName(Callback* callback, std::string& v,
+                              const std::string& name, const void* pdata);
+    static bool handleGetUsed(Callback* callback, int& v,
+                              const std::string& name, const void* pdata);
+    static bool handleGetExcluded(Callback* callback, int& v,
+                                  const std::string& name, const void* pdata);
+    static bool handleSetExpNumber(Callback* callback, int v,
+                                   const std::string& name, const void* pdata);
+    static bool handleSetConfig(Callback* callback, const std::string& v,
+                                const std::string& name, const void* pdata);
+    static bool handleSetOperators(Callback* callback, const std::string& v,
+                                   const std::string& name, const void* pdata);
+    static bool handleSetComment(Callback* callback, const std::string& v,
+                                 const std::string& name, const void* pdata);
+    static bool handleSetRequest(Callback* callback, const std::string& v,
+                                 const std::string& name, const void* pdata);
+    static bool handleSetUsed(Callback* callback, int v,
+                              const std::string& name, const void* pdata);
+    static bool handleSetExcluded(Callback* callback, int v,
+                                  const std::string& name, const void* pdata);
 
   };
 

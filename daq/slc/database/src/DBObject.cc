@@ -1,340 +1,465 @@
 #include "daq/slc/database/DBObject.h"
 
-#include <daq/slc/system/LogFile.h>
-
-#include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Reader.h>
 #include <daq/slc/base/Writer.h>
-#include <daq/slc/base/Date.h>
 
-#include <iostream>
-#include <sstream>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 using namespace Belle2;
 
-DBObject::DBObject() : m_index(0)
+DBObject::DBObject()
 {
-  m_id = 0;
-  m_isconfig = true;
+}
+
+DBObject::DBObject(const std::string& path)
+{
+  setPath(path);
 }
 
 DBObject::DBObject(const DBObject& obj)
-  : m_index(obj.m_index), m_id(obj.m_id),
-    m_revision(obj.m_revision), m_name(obj.m_name),
-    m_node(obj.m_node), m_table(obj.m_table),
-    m_isconfig(obj.m_isconfig) {}
+  : AbstractDBObject(obj)
+{
+  copy(obj);
+}
+
+const DBObject& DBObject::operator=(const DBObject& obj) throw()
+{
+  copy(obj);
+  return *this;
+}
+
+void DBObject::copy(const DBObject& obj)
+{
+  reset();
+  setIndex(obj.getIndex());
+  setId(obj.getId());
+  setPath(obj.getPath());
+  setName(obj.getName());
+  for (FieldNameList::const_iterator it = obj.getFieldNames().begin();
+       it != obj.getFieldNames().end(); it++) {
+    const std::string& name(*it);
+    DBField::Type type = obj.getProperty(name).getType();
+    switch (type) {
+      case DBField::BOOL:   addBool(name, obj.getBool(name)); break;
+      case DBField::CHAR:   addChar(name, obj.getChar(name)); break;
+      case DBField::SHORT:  addShort(name, obj.getShort(name)); break;
+      case DBField::INT:    addInt(name, obj.getInt(name)); break;
+      case DBField::LONG:   addLong(name, obj.getLong(name)); break;
+      case DBField::FLOAT:  addFloat(name, obj.getFloat(name)); break;
+      case DBField::DOUBLE: addDouble(name, obj.getDouble(name)); break;
+      case DBField::TEXT:   addText(name, obj.getText(name)); break;
+      case DBField::OBJECT: addObjects(name, obj.getObjects(name)); break;
+      default: break;
+    }
+  }
+}
 
 DBObject::~DBObject() throw()
 {
   reset();
 }
 
-void DBObject::print() const throw()
+int DBObject::getNObjects(const std::string& name) const throw()
 {
-  const FieldNameList& name_v(getFieldNames());
-  std::cout << "name : '" << getName() << "'" << std::endl;
-  for (size_t ii = 0; ii < m_name_v.size(); ii++) {
-    std::string name = name_v.at(ii);
-    std::cout << name << " : ";
-    FieldInfo::Type type = getProperty(name).getType();
-    switch (type) {
-      case FieldInfo::BOOL:   std::cout << getBool(name); break;
-      case FieldInfo::CHAR:   std::cout << getChar(name); break;
-      case FieldInfo::SHORT:  std::cout << getShort(name); break;
-      case FieldInfo::INT:    std::cout << getInt(name); break;
-      case FieldInfo::LONG:   std::cout << getLong(name); break;
-      case FieldInfo::FLOAT:  std::cout << getFloat(name); break;
-      case FieldInfo::DOUBLE: std::cout << getDouble(name); break;
-      case FieldInfo::TEXT:   std::cout << getText(name); break;
-      case FieldInfo::OBJECT: {
-        size_t nobj = getNObjects(name);
-        if (nobj > 0) {
-          const DBObject& obj(getObject(name));
-          std::cout << obj.getTable() << " (" << obj.getRevision()
-                    << ")" << std::endl;
-          std::cout << "-------------------------" << std::endl;
-          for (size_t i = 0; i < nobj; i++) {
-            std::cout << "index : " << i << std::endl;
-            getObject(name, i).print();
-            std::cout << "-------------------------" << std::endl;
-          }
-        }
-        break;
-      }
-      case FieldInfo::NSM_CHAR:   std::cout << getChar(name); break;
-      case FieldInfo::NSM_INT16:  std::cout << getShort(name); break;
-      case FieldInfo::NSM_INT32:  std::cout << getInt(name); break;
-      case FieldInfo::NSM_INT64:  std::cout << getLong(name); break;
-      case FieldInfo::NSM_BYTE8:  std::cout << getUChar(name); break;
-      case FieldInfo::NSM_UINT16: std::cout << getUShort(name); break;
-      case FieldInfo::NSM_UINT32: std::cout << getUInt(name); break;
-      case FieldInfo::NSM_UINT64: std::cout << getULong(name); break;
-      case FieldInfo::NSM_FLOAT:  std::cout << getFloat(name); break;
-      case FieldInfo::NSM_DOUBLE: std::cout << getDouble(name); break;
-      case FieldInfo::NSM_OBJECT: {
-        size_t nobj = getNObjects(name);
-        std::cout << std::endl;
-        std::cout << "-------------------------" << std::endl;
-        for (size_t i = 0; i < nobj; i++) {
-          getObject(name, i).print();
-          std::cout << "-------------------------" << std::endl;
-        }
-        break;
-      }
-    }
-    if (!hasObject(name)) std::cout << std::endl;
-  }
+  FieldObjectList::const_iterator it = m_obj_v_m.find(name);
+  if (it != m_obj_v_m.end()) return it->second.size();
+  return 0;
+}
+
+DBObjectList& DBObject::getObjects(const std::string& name) throw(std::out_of_range)
+{
+  FieldObjectList::iterator it = m_obj_v_m.find(name);
+  if (it != m_obj_v_m.end()) return it->second;
+  else throw (std::out_of_range(StringUtil::form("%s not found in %s (%s:%d)",
+                                                   name.c_str(), getName().c_str(),
+                                                   __FILE__, __LINE__)));
+}
+
+const DBObjectList& DBObject::getObjects(const std::string& name) const throw(std::out_of_range)
+{
+  FieldObjectList::const_iterator it = m_obj_v_m.find(name);
+  if (it != m_obj_v_m.end()) return it->second;
+  else throw (std::out_of_range(StringUtil::form("%s not found in %s (%s:%d)",
+                                                   name.c_str(), getName().c_str(),
+                                                   __FILE__, __LINE__)));
+}
+
+DBObject& DBObject::getObject(const std::string& name, int i) throw(std::out_of_range)
+{
+  FieldObjectList::iterator it = m_obj_v_m.find(name);
+  if (it != m_obj_v_m.end()) return it->second[i];
+  else throw (std::out_of_range(StringUtil::form("%s not found in %s (%s:%d)",
+                                                   name.c_str(), getName().c_str(),
+                                                   __FILE__, __LINE__)));
+}
+
+const DBObject& DBObject::getObject(const std::string& name, int i) const throw(std::out_of_range)
+{
+  FieldObjectList::const_iterator it = m_obj_v_m.find(name);
+  if (it != m_obj_v_m.end()) return it->second[i];
+  else throw (std::out_of_range(StringUtil::form("%s not found in %s (%s:%d)",
+                                                   name.c_str(), getName().c_str(),
+                                                   __FILE__, __LINE__)));
 }
 
 void DBObject::reset() throw()
 {
-  for (size_t ii = 0; ii < m_name_v.size(); ii++) {
-    const std::string& name(m_name_v[ii]);
+  const FieldNameList& name_v(getFieldNames());
+  for (size_t ii = 0; ii < name_v.size(); ii++) {
+    const std::string& name(name_v[ii]);
     if (hasObject(name)) {
       size_t nobj = getNObjects(name);
       for (size_t i = 0; i < nobj; i++) getObject(name, i).reset();
     }
   }
-  m_index = 0;
-  m_name_v = FieldNameList();
-  m_pro_m = FieldPropertyList();
-}
-
-FieldInfo::Property DBObject::getProperty(const std::string& name) const throw()
-{
-  return m_pro_m[name];
-}
-
-size_t DBObject::getLength(const std::string& name) const throw()
-{
-  return getProperty(name).getLength();
-}
-
-bool DBObject::hasField(const std::string& name) const throw()
-{
-  return m_pro_m.find(name) != m_pro_m.end();
-}
-
-bool DBObject::hasArray(const std::string& name) const throw()
-{
-  return hasField(name) && !hasText(name) && m_pro_m[name].getLength() > 0;
-}
-
-bool DBObject::hasValue(const std::string& name) const throw()
-{
-  return hasField(name) &&
-         m_pro_m[name].getType() != FieldInfo::TEXT &&
-         m_pro_m[name].getType() != FieldInfo::OBJECT &&
-         m_pro_m[name].getType() != FieldInfo::NSM_OBJECT;
-}
-
-bool DBObject::hasText(const std::string& name) const throw()
-{
-  return hasField(name) && m_pro_m[name].getType() == FieldInfo::TEXT;
-}
-
-bool DBObject::hasObject(const std::string& name, int index) const throw()
-{
-  return hasField(name) && (m_pro_m[name].getType() == FieldInfo::OBJECT ||
-                            m_pro_m[name].getType() == FieldInfo::NSM_OBJECT) &&
-         (index < 0 || index < getNObjects(name));
-}
-
-bool DBObject::getBool(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return false;
-  return ((bool*)value)[index];
-}
-
-char DBObject::getChar(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((char*)value)[index];
-}
-
-short DBObject::getShort(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((short*)value)[index];
-}
-
-int DBObject::getInt(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((int*)value)[index];
-}
-
-long long DBObject::getLong(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((long long*)value)[index];
-}
-
-unsigned char DBObject::getUChar(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((unsigned char*)value)[index];
-}
-
-unsigned short DBObject::getUShort(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((unsigned short*)value)[index];
-}
-
-unsigned int DBObject::getUInt(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((unsigned int*)value)[index];
-}
-
-unsigned long long DBObject::getULong(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((unsigned long long*)value)[index];
-}
-
-float DBObject::getFloat(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((float*)value)[index];
-}
-
-double DBObject::getDouble(const std::string& name, int index) const throw()
-{
-  const void* value = getValue(name);
-  if (value == NULL && getLength(name)) return 0;
-  return ((double*)value)[index];
-}
-
-void DBObject::setBool(const std::string& name, bool value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setChar(const std::string& name, int value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setShort(const std::string& name, int value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setInt(const std::string& name, int value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setLong(const std::string& name, long long value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setUChar(const std::string& name, unsigned int value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setUShort(const std::string& name, unsigned int value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setUInt(const std::string& name, unsigned int value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setULong(const std::string& name, unsigned long long value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setFloat(const std::string& name, float value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::setDouble(const std::string& name, double value, int index) throw()
-{
-  setValue(name, &value, index);
-}
-
-void DBObject::add(const std::string& name, FieldInfo::Property pro) throw()
-{
-  if (!hasField(name)) {
-    m_name_v.push_back(name);
-    m_pro_m.insert(FieldPropertyList::value_type(name, pro));
+  for (FieldValueList::iterator it = m_value_m.begin();
+       it != m_value_m.end(); it++) {
+    free(it->second);
   }
+  m_value_m = FieldValueList();
+  m_text_m = FieldTextList();
+  m_obj_v_m = FieldObjectList();
+  AbstractDBObject::reset();
 }
 
-const std::string DBObject::getValueText(const std::string& name)
-const throw()
+void DBObject::readObject(Reader& reader) throw(IOException)
 {
-  if (hasField(name)) {
-    switch (getProperty(name).getType()) {
-      case FieldInfo::BOOL:   return getBool(name) ? "true" : "false";
-      case FieldInfo::CHAR:   return StringUtil::form("%d", (int)getChar(name));
-      case FieldInfo::SHORT:  return StringUtil::form("%d", (int)getShort(name));
-      case FieldInfo::INT:    return StringUtil::form("%d", (int)getInt(name));
-      case FieldInfo::LONG:   return StringUtil::form("%ld", getLong(name));
-      case FieldInfo::FLOAT:  return StringUtil::form("%f", getFloat(name));
-      case FieldInfo::DOUBLE: return StringUtil::form("%f", getDouble(name));
-      case FieldInfo::NSM_CHAR:   return StringUtil::form("%d", (int)getChar(name));
-      case FieldInfo::NSM_INT16:  return StringUtil::form("%d", (int)getShort(name));
-      case FieldInfo::NSM_INT32:  return StringUtil::form("%d", (int)getInt(name));
-      case FieldInfo::NSM_INT64:  return StringUtil::form("%ld", getLong(name));
-      case FieldInfo::NSM_BYTE8:  return StringUtil::form("%d", (int)getUChar(name));
-      case FieldInfo::NSM_UINT16: return StringUtil::form("%d", (int)getUShort(name));
-      case FieldInfo::NSM_UINT32: return StringUtil::form("%u", getUInt(name));
-      case FieldInfo::NSM_UINT64: return StringUtil::form("%lu", getULong(name));
-      case FieldInfo::NSM_FLOAT:  return StringUtil::form("%f", getFloat(name));
-      case FieldInfo::NSM_DOUBLE: return StringUtil::form("%f", getDouble(name));
+  reset();
+  setPath(reader.readString());
+  setName(reader.readString());
+  int npar = reader.readInt();
+  for (int i = 0; i < npar; i++) {
+    std::string name = reader.readString();
+    DBField::Type type = (DBField::Type)reader.readInt();
+    switch (type) {
+      case DBField::BOOL:   addBool(name, reader.readBool()); break;
+      case DBField::CHAR:   addChar(name, reader.readChar()); break;
+      case DBField::SHORT:  addShort(name, reader.readShort()); break;
+      case DBField::INT:    addInt(name, reader.readInt()); break;
+      case DBField::LONG:   addLong(name, reader.readLong()); break;
+      case DBField::FLOAT:  addFloat(name, reader.readFloat()); break;
+      case DBField::DOUBLE: addDouble(name, reader.readDouble()); break;
+      case DBField::TEXT:   addText(name, reader.readString()); break;
+      case DBField::OBJECT: {
+        DBObjectList obj_v;
+        int nobj = reader.readInt();
+        for (int n = 0; n < nobj; n++) {
+          DBObject obj;
+          obj.readObject(reader);
+          obj.setIndex(n);
+          obj_v.push_back(obj);
+        }
+        addObjects(name, obj_v);
+      }; break;
       default: break;
     }
   }
-  return "";
 }
 
-void DBObject::setValueText(const std::string& name,
-                            const std::string& value) throw()
+void DBObject::writeObject(Writer& writer) const throw(IOException)
 {
-  if (hasField(name)) {
-    switch (getProperty(name).getType()) {
-      case FieldInfo::BOOL:       setBool(name, value == "true" || value == "t"); break;
-      case FieldInfo::NSM_CHAR:
-      case FieldInfo::CHAR:       setChar(name, (char)atoi(value.c_str())); break;
-      case FieldInfo::NSM_INT16:
-      case FieldInfo::SHORT:      setShort(name, (short)atoi(value.c_str())); break;
-      case FieldInfo::NSM_INT32:
-      case FieldInfo::INT:        setInt(name, (int)atoi(value.c_str())); break;
-      case FieldInfo::NSM_INT64:
-      case FieldInfo::LONG:       setLong(name, (long long)atoi(value.c_str())); break;
-      case FieldInfo::NSM_FLOAT:
-      case FieldInfo::FLOAT:      setFloat(name, atof(value.c_str())); break;
-      case FieldInfo::NSM_DOUBLE:
-      case FieldInfo::DOUBLE:     setDouble(name, atof(value.c_str())); break;
-      case FieldInfo::NSM_BYTE8:  setUChar(name, strtoul(value.c_str(), NULL, 0)); break;
-      case FieldInfo::NSM_UINT16: setUShort(name, strtoul(value.c_str(), NULL, 0)); break;
-      case FieldInfo::NSM_UINT32: setUInt(name, strtoul(value.c_str(), NULL, 0)); break;
-      case FieldInfo::NSM_UINT64: setULong(name, strtoul(value.c_str(), NULL, 0)); break;
-      case FieldInfo::TEXT:       setText(name, value); break;
+  writer.writeString(getPath());
+  writer.writeString(getName());
+  const FieldNameList& name_v(getFieldNames());
+  writer.writeInt(name_v.size());
+  for (FieldNameList::const_iterator iname = name_v.begin();
+       iname != name_v.end(); iname++) {
+    const std::string name = *iname;
+    DBField::Type type = getProperty(name).getType();
+    writer.writeString(name);
+    writer.writeInt(type);
+    switch (type) {
+      case DBField::BOOL:   writer.writeBool(getBool(name)); break;
+      case DBField::CHAR:   writer.writeChar(getChar(name)); break;
+      case DBField::SHORT:  writer.writeShort(getShort(name)); break;
+      case DBField::INT:    writer.writeInt(getInt(name)); break;
+      case DBField::LONG:   writer.writeLong(getLong(name)); break;
+      case DBField::FLOAT:  writer.writeFloat(getFloat(name)); break;
+      case DBField::DOUBLE:  writer.writeDouble(getDouble(name)); break;
+      case DBField::TEXT:   writer.writeString(getText(name)); break;
+      case DBField::OBJECT:  {
+        const DBObjectList& obj_v(getObjects(name));
+        writer.writeInt(obj_v.size());
+        for (DBObjectList::const_iterator iobj = obj_v.begin();
+             iobj != obj_v.end(); iobj++) {
+          iobj->writeObject(writer);
+        }
+      }; break;
       default: break;
+    }
+  }
+}
+
+const void* DBObject::getValue(const std::string& name) const throw(std::out_of_range)
+{
+  if (!hasValue(name)) return NULL;
+  FieldValueList::const_iterator it = m_value_m.find(name);
+  if (it != m_value_m.end()) return it->second;
+  else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
+}
+
+const std::string& DBObject::getText(const std::string& name) const throw(std::out_of_range)
+{
+  if (!hasText(name)) return m_empty;
+  FieldTextList::const_iterator it = m_text_m.find(name);
+  if (it != m_text_m.end()) return it->second;
+  else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
+}
+
+void DBObject::addValue(const std::string& name, const void* value,
+                        DBField::Type type, int) throw()
+{
+  DBField::Property pro(type, 0, 0);
+  int size = pro.getTypeSize();
+  if (size <= 0) return;
+  if (!hasValue(name)) {
+    add(name, pro);
+    void* v = malloc(size);
+    memcpy(v, value, size);
+    m_value_m.insert(FieldValueList::value_type(name, v));
+  } else {
+    memcpy(m_value_m[name], value, size);
+  }
+}
+
+void DBObject::setValue(const std::string& name,
+                        const void* value, int) throw()
+{
+  const DBField::Property& pro(getProperty(name));
+  int size = pro.getTypeSize();
+  if (hasField(name) && size > 0) {
+    memcpy(m_value_m[name], value, size);
+  }
+}
+
+void DBObject::addText(const std::string& name,
+                       const std::string& value) throw()
+{
+  if (!hasField(name)) {
+    add(name, DBField::Property(DBField::TEXT, 0));
+    m_text_m.insert(FieldTextList::value_type(name, value));
+  } else {
+    m_text_m[name] = value;
+  }
+}
+
+void DBObject::addObject(const std::string& name,
+                         const DBObject& obj) throw()
+{
+  if (!hasField(name)) {
+    add(name, DBField::Property(DBField::OBJECT, 0));
+    m_obj_v_m.insert(FieldObjectList::value_type(name, DBObjectList()));
+  }
+  m_obj_v_m[name].push_back(obj);
+  getProperty(name).setLength(m_obj_v_m[name].size());
+}
+
+void DBObject::addObjects(const std::string& name,
+                          const DBObjectList& obj_v) throw()
+{
+  if (!hasField(name)) {
+    add(name, DBField::Property(DBField::OBJECT, obj_v.size()));
+    m_obj_v_m.insert(FieldObjectList::value_type(name, obj_v));
+  } else {
+    m_obj_v_m[name] = obj_v;
+  }
+}
+
+void DBObject::print(bool isfull) const throw()
+{
+  const std::string& name_in = "";
+  NameValueList map;
+  search(map, name_in, isfull);
+  size_t length = 0;
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    if (it->name.size() > length) length = it->name.size();
+  }
+  printf("#\n");
+  printf("# Config object (confname = %s)\n", getName().c_str());
+  printf("#\n");
+  printf("\n");
+  StringList s = StringUtil::split(getName(), '@');
+  if (s.size() > 1) {
+    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
+           "nodename", s[0].c_str());
+    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
+           "config", s[1].c_str());
+  } else {
+    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
+           "config", getName().c_str());
+  }
+  printf("\n");
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
+           it->name.c_str(), it->value.c_str());
+  }
+  printf("\n");
+  printf("#\n");
+  printf("#\n");
+  printf("#\n");
+}
+
+StringList DBObject::getNameList(bool isfull) const throw()
+{
+  const std::string& name_in = "";
+  NameValueList map;
+  search(map, name_in, isfull);
+  StringList str;
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    str.push_back(it->name);
+  }
+  return str;
+}
+
+void DBObject::search(NameValueList& map, const std::string& name_in, bool isfull)
+const throw()
+{
+  const FieldNameList& name_v(getFieldNames());
+  for (FieldNameList::const_iterator it = name_v.begin();
+       it != name_v.end(); it++) {
+    const std::string& name(*it);
+    const DBField::Property& pro(getProperty(name));
+    std::string name_out = name_in;
+    if (name_in.size() > 0) name_out += ".";
+    name_out += name;
+    std::string ptype;
+    switch (pro.getType()) {
+      case DBField::BOOL: ptype = "bool"; break;
+      case DBField::CHAR:  ptype = "char"; break;
+      case DBField::SHORT: ptype = "short"; break;
+      case DBField::INT:  ptype = "int"; break;
+      case DBField::LONG:  ptype = "long"; break;
+      case DBField::FLOAT:  ptype = "float"; break;
+      case DBField::DOUBLE: ptype = "double"; break;
+      default : break;
+    }
+    if (pro.getType() == DBField::OBJECT) {
+      int length = getNObjects(name);
+      if (!isfull && getObject(name).getPath().size() > 0) {
+        const DBObjectList& objs(getObjects(name));
+        if (length == 1 || objs[1].getPath().size() == 0 || objs[0].getPath() == objs[1].getPath()) {
+          std::string value = objs[0].getPath();
+          value = "object(" + value + ")";
+          NameValue nv;
+          nv.name = name_out.c_str();
+          nv.value = value;
+          nv.type = pro.getType();
+          map.push_back(nv);
+        } else {
+          for (int i = 0; i < length; i++) {
+            std::string value = objs[i].getPath();
+            value = "object(" + value + ")";
+            NameValue nv;
+            nv.name = StringUtil::form("%s[%d].%s", name.c_str(), i, name_out.c_str());
+            nv.value = value;
+            nv.type = pro.getType();
+            map.push_back(nv);
+          }
+        }
+      } else {
+        size_t length = getNObjects(name);
+        if (length > 1) {
+          const DBObjectList& objs(getObjects(name));
+          for (size_t i = 0; i < length; i++) {
+            objs[i].search(map, StringUtil::form("%s[%d]", name_out.c_str(), i), isfull);
+          }
+        } else {
+          const DBObject& obj(getObject(name));
+          obj.search(map, name_out, isfull);
+        }
+      }
+    } else {
+      std::string value = getValueText(name);
+      if (ptype.size() > 0) value = ptype + "(" + value + ")";
+      NameValue nv;
+      nv.name = name_out;
+      nv.value = value;
+      nv.type = pro.getType();
+      if (pro.getType() != DBField::TEXT) {
+        nv.buf = (void*)getValue(name);
+      } else {
+        nv.buf = (void*)&getText(name);
+      }
+      map.push_back(nv);
+    }
+  }
+}
+
+void DBObject::printSQL(const std::string& table, std::ostream& out,
+                        const std::string& name_inc, int index)  const throw()
+{
+  const std::string& name_in = (name_inc.size() == 0) ? getName() : name_inc;
+  if (index >= 0) {
+    out << StringUtil::form("insert into %s (name, path) values ('%s[%d]', '.%s.');",
+                            table.c_str(), getName().c_str(), index, name_in.c_str()) << std::endl;
+  } else {
+    out << StringUtil::form("insert into %s (name, path) values ('%s', '.%s.');",
+                            table.c_str(), getName().c_str(), name_in.c_str()) << std::endl;
+  }
+  const FieldNameList& name_v(getFieldNames());
+  for (FieldNameList::const_iterator it = name_v.begin();
+       it != name_v.end(); it++) {
+    const std::string& name(*it);
+    const DBField::Property& pro(getProperty(name));
+    std::string name_out = name_in;
+    if (name_in.size() > 0) name_out += ".";
+    name_out += name;
+    std::string ptype;
+    switch (pro.getType()) {
+      case DBField::BOOL: ptype = "value_b"; break;
+      case DBField::CHAR:  ptype = "value_c"; break;
+      case DBField::SHORT: ptype = "value_s"; break;
+      case DBField::INT:  ptype = "value_i"; break;
+      case DBField::LONG:  ptype = "value_l"; break;
+      case DBField::FLOAT:  ptype = "value_f"; break;
+      case DBField::DOUBLE: ptype = "value_d"; break;
+      case DBField::TEXT: ptype = "value_t"; break;
+      default : break;
+    }
+    if (pro.getType() == DBField::OBJECT) {
+      int length = getNObjects(name);
+      if (length > 1) {
+        const DBObjectList& objs(getObjects(name));
+        if (objs[0].getPath().size() > 0) {
+          if (objs[1].getPath().size() == 0 || objs[0].getPath() == objs[1].getPath()) {
+            out << StringUtil::form("insert into %s (name, path, value_o) values ('%s', '.%s.', '%s');",
+                                    table.c_str(), objs[0].getName().c_str(),
+                                    name_out.c_str(), objs[0].getPath().c_str()) << std::endl;
+          } else {
+            for (int i = 0; i < length; i++) {
+              out << StringUtil::form("insert into %s (name, path, value_o) values ('%s[%d]', '.%s[%d].', '%s');",
+                                      table.c_str(), objs[0].getName().c_str(),
+                                      i, name_out.c_str(), i, objs[0].getPath().c_str()) << std::endl;
+            }
+          }
+        } else {
+          for (int i = 0; i < length; i++) {
+            objs[i].printSQL(table, out, StringUtil::form("%s[%d]", name_out.c_str(), i), i);
+          }
+        }
+      } else {
+        const DBObject& obj(getObject(name));
+        if (obj.getPath().size() > 0) {
+          out << StringUtil::form("insert into %s (name, path, value_o) values ('%s', '.%s.', '%s');",
+                                  table.c_str(), obj.getName().c_str(),
+                                  name_out.c_str(), obj.getPath().c_str()) << std::endl;
+        } else {
+          obj.printSQL(table, out, name_out);
+        }
+      }
+    } else {
+      std::string value = getValueText(name);
+      if (pro.getType() == DBField::TEXT) value = "'" + value + "'";
+      out << StringUtil::form("insert into %s (name, path, %s) values ('%s', '.%s.', %s);",
+                              table.c_str(), ptype.c_str(), name.c_str(),
+                              name_out.c_str(), value.c_str()) << std::endl;
     }
   }
 }

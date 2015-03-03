@@ -33,14 +33,12 @@ int main(int argc, char** argv)
   const std::string hostname = argv[3];
   const int port = atoi(argv[4]);
   ConfigFile config("slowcontrol");
-  NSMCommunicator* comm = new NSMCommunicator();
-  comm->init(NSMNode(node), hostname, port);
+  NSMCommunicator com;
+  com.init(NSMNode(node), hostname, port);
   NSMData data(stornode + "_STATUS", "ronode_status", ronode_status_revision);
-  ronode_status* info = (ronode_status*)data.open(comm);
-
+  ronode_status* info = (ronode_status*)data.open(com);
   while (true) {
     sleep(2);
-    data.update();
     fputs("\033[2J\033[0;0H", stdout);
     rewind(stdout);
     ftruncate(1, 0);

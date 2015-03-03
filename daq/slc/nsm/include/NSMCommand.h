@@ -13,16 +13,19 @@ namespace Belle2 {
     static const NSMCommand ERROR;
     static const NSMCommand FATAL;
     static const NSMCommand LOG;
-    static const NSMCommand NSMGET;
-    static const NSMCommand NSMSET;
-    static const NSMCommand DBGET;
-    static const NSMCommand DBSET;
-    static const NSMCommand LISTGET;
-    static const NSMCommand LISTSET;
-    static const NSMCommand EXCLUDE;
-    static const NSMCommand INCLUDE;
+    static const NSMCommand VLISTGET;
+    static const NSMCommand VLISTSET;
     static const NSMCommand VGET;
     static const NSMCommand VSET;
+    static const NSMCommand VREPLY;
+
+  public:
+    static const NSMCommand NSMDATAGET;
+    static const NSMCommand NSMDATASET;
+    static const NSMCommand DBGET;
+    static const NSMCommand DBSET;
+    static const NSMCommand DBLISTGET;
+    static const NSMCommand DBLISTSET;
 
   public:
     static const int SUGGESTED = 2;
@@ -38,9 +41,9 @@ namespace Belle2 {
     NSMCommand(int id) throw() { *this = id; }
     ~NSMCommand() throw() {}
 
-  protected:
-    NSMCommand(int id, const char* label)
-    throw() : Enum(id, label) {}
+  public:
+    NSMCommand(int id, const char* label) throw()
+      : Enum(id, label) {}
 
   public:
     const NSMCommand& operator=(const std::string& label) throw();

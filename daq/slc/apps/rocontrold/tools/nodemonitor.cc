@@ -32,18 +32,16 @@ int main(int argc, char** argv)
   const std::string hostname = argv[2];
   const int port = atoi(argv[3]);
   ConfigFile config("slowcontrol");
-  NSMCommunicator* comm = new NSMCommunicator();
-  comm->init(NSMNode(monnode), hostname, port);
+  NSMCommunicator com;
+  com.init(NSMNode(monnode), hostname, port);
   std::vector<NSMData*> data_v;
   const std::string node = argv[4];
   NSMData data(node + "_STATUS", "ronode_status",
                ronode_status_revision);
-  data.open(comm, true);
-
+  data.open(com);
   while (true) {
     sleep(2);
     for (size_t i = 0; i < data_v.size(); i++) {
-      data.update();
       fputs("\033[2J\033[0;0H", stdout);
       rewind(stdout);
       ftruncate(1, 0);

@@ -26,13 +26,13 @@ StringList StringUtil::split(const std::string& str, const char type, size_t max
   return str_v;
 }
 
-std::string StringUtil::join(StringList str_v, const std::string& s)
+std::string StringUtil::join(StringList str_v, const std::string& s, size_t start, size_t end)
 {
   std::stringstream ss;
-  for (size_t i = 0; i < str_v.size() ;) {
+  for (size_t i = start; i < str_v.size();) {
     ss << str_v[i];
     i++;
-    if (i == str_v.size()) break;
+    if ((end > 0 && i == end) || i == str_v.size()) break;
     ss << s;
   }
   return ss.str();
@@ -98,4 +98,12 @@ long long StringUtil::atoll(const std::string str)
 bool StringUtil::find(const std::string& s, const std::string& str)
 {
   return s.find(str) != std::string::npos;
+}
+
+bool StringUtil::isdigit(const std::string& s)
+{
+  for (size_t i = 0; i < s.size(); i++) {
+    if (!::isdigit(s.at(i))) return false;
+  }
+  return s.size() > 0;
 }

@@ -4,19 +4,37 @@
 
 #include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/StringUtil.h>
+
+#include <iostream>
 #include <sstream>
 
 using namespace Belle2;
 
-ArichHVCommunicator::ArichHVCommunicator(HVControlCallback* callback,
-                                         unsigned int crateid,
-                                         const std::string& host, int port)
-  : m_callback(callback), m_crateid(crateid),
-    m_socket(host, port), m_available(false)
+Mutex g_mutex;
+
+ArichHVCommunicator::ArichHVCommunicator(int crateid,
+                                         const std::string& host,
+                                         int port, int use_ch, int debug)
+  : m_crateid(crateid), m_socket(host, port),
+    m_available(false), m_usech(use_ch), m_debug(debug)
 {
 }
 
-bool ArichHVCommunicator::connect() throw()
+ArichHVUnitListIter ArichHVCommunicator::find(int unit, int channel)
+{
+  for (ArichHVUnitListIter it = m_unit.begin();
+       it != m_unit.end(); it++) {
+    HVChannel& ch(it->getChannel());
+    if ((unit == 0 || ch.getSlot() == unit) &&
+        (channel == 0 || ch.getChannel() == channel)) {
+      return it;
+    }
+  }
+  return m_unit.end();
+}
+
+void ArichHVCommunicator::connect() throw(IOException)
 {
   m_mutex.lock();
   m_available = false;
@@ -30,174 +48,282 @@ bool ArichHVCommunicator::connect() throw()
     m_available = false;
     m_mutex.unlock();
     LogFile::debug("Socket connection error to HV crate: %s", e.what());
-    return false;
+    throw (e);
   }
   m_mutex.unlock();
-  return true;
 }
 
-bool ArichHVCommunicator::configure() throw()
+void ArichHVCommunicator::store(int index) throw(IOException)
 {
-  bool success = false;
-  m_mutex.lock();
-  if (m_available) {
-    try {
-      {
-        ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::SWITCH, 0, 0);
-        msg.setSwitchOn(false);
-        send(msg);
-      }
-      const HVConfig& config(m_callback->getConfig());
-      for (size_t j = 0; j < config.getNValueSets(); j++) {
-        const HVValueSet& value_v(config.getValueSet(j));
-        for (size_t i = 0; i < m_callback->getNChannels(); i++) {
-          const HVChannel& channel(config.getChannel(i));
-          if (channel.getCrate() != m_crateid) continue;
-          const HVValue& value(value_v[i]);
-          ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::ALL,
-                             channel.getSlot(), channel.getChannel());
-          msg.setVoltageLimit(value.getVoltageLimit());
-          msg.setCommand(ArichHVMessage::VOLTAGE_LIMIT);
-          send(msg);
-          msg.setCurrentLimit(value.getCurrentLimit());
-          msg.setCommand(ArichHVMessage::CURRENT_LIMIT);
-          send(msg);
-          msg.setRampUpSpeed(value.getRampUpSpeed());
-          msg.setCommand(ArichHVMessage::RAMPUP_SPEED);
-          send(msg);
-          msg.setRampDownSpeed(value.getRampDownSpeed());
-          msg.setCommand(ArichHVMessage::RAMPDOWN_SPEED);
-          send(msg);
-          msg.setCommand(ArichHVMessage::VOLTAGE_DEMAND);
-          int voltage_demand = value.getVoltageDemand() * channel.isTurnOn();
-          msg.setVoltageDemand(voltage_demand);
-          send(msg);
-        }
-        ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::STORE, 0, 0);
-        msg.setStoreId(j + 1);
-        send(msg);
-      }
-      success = true;
-    } catch (const IOException& e) {
-      LogFile::error("failed to configure HV crate (id=%s)", m_crateid);
-      success = false;
-    }
-  }
-  m_mutex.unlock();
-  return success;
-}
-
-bool ArichHVCommunicator::turnon() throw()
-{
-  m_mutex.lock();
-  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId(1);
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::STORE, 0);
+  msg.setStoreId(index);
   send(msg);
-  m_mutex.unlock();
-  msg.setCommand(ArichHVMessage::SWITCH);
+}
+
+void ArichHVCommunicator::recall(int index) throw(IOException)
+{
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0);
+  msg.setStoreId(index);
+  send(msg);
+}
+
+void ArichHVCommunicator::setRampUpSpeed(int unit, int ch, float rampup) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return;
+  it->getValue().setRampUpSpeed(rampup);
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RAMPUP_SPEED, unit, ch);
+  msg.setRampUpSpeed(it->getCalib().encodeVoltage(rampup));
+  send(msg);
+}
+
+void ArichHVCommunicator::setRampDownSpeed(int unit, int ch, float rampdown) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return;
+  it->getValue().setRampDownSpeed(rampdown);
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RAMPDOWN_SPEED, unit, ch);
+  msg.setRampDownSpeed(it->getCalib().encodeVoltage(rampdown));
+  send(msg);
+}
+
+void ArichHVCommunicator::setVoltageDemand(int unit, int ch, float voltage) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return;
+  it->getValue().setVoltageDemand(voltage);
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::VOLTAGE_DEMAND, unit, ch);
+  msg.setVoltageDemand(it->getCalib().encodeVoltage(voltage));
+  send(msg);
+}
+
+void ArichHVCommunicator::setVoltageLimit(int unit, int ch, float voltage) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return;
+  it->getValue().setVoltageLimit(voltage);
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::VOLTAGE_LIMIT, unit, ch);
+  msg.setVoltageLimit(it->getCalib().encodeVoltage(voltage));
+  send(msg);
+}
+
+void ArichHVCommunicator::setCurrentLimit(int unit, int ch, float current) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return;
+  it->getValue().setCurrentLimit(current);
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::CURRENT_LIMIT, unit, ch);
+  msg.setCurrentLimit(it->getCalib().encodeCurrent(current));
+  send(msg);
+}
+
+float ArichHVCommunicator::getRampUpSpeed(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getValue().getRampUpSpeed();
+}
+
+float ArichHVCommunicator::getRampDownSpeed(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getValue().getRampDownSpeed();
+}
+
+float ArichHVCommunicator::getVoltageDemand(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getValue().getVoltageDemand();
+}
+
+float ArichHVCommunicator::getVoltageLimit(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getValue().getVoltageLimit();
+}
+
+float ArichHVCommunicator::getCurrentLimit(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getValue().getCurrentLimit();
+}
+
+int ArichHVCommunicator::getState(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getStatus().getState();
+}
+
+float ArichHVCommunicator::getVoltageMonitor(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getStatus().getVoltageMon();
+}
+
+float ArichHVCommunicator::getCurrentMonitor(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getStatus().getCurrentMon();
+}
+
+void ArichHVCommunicator::switchOn(int unit, int ch) throw(IOException)
+{
+  ArichHVUnitListIter it = find(unit, ch);
+  if (!(unit == 0 && ch == 0) && it == m_unit.end()) return;
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::SWITCH, unit, ch);
   msg.setSwitchOn(true);
-  return perform(msg, HVState::STANDBY_S);
+  send(msg);
+  it->getValue().setTurnOn(true);
 }
 
-bool ArichHVCommunicator::turnoff() throw()
+void ArichHVCommunicator::switchOff(int unit, int ch) throw(IOException)
 {
-  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::SWITCH, 0, 0);
+  ArichHVUnitListIter it = find(unit, ch);
+  if (!(unit == 0 && ch == 0) && it == m_unit.end()) return;
+  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::SWITCH, unit, ch);
   msg.setSwitchOn(false);
-  return perform(msg, HVState::OFF_S);
+  send(msg);
+  it->getValue().setTurnOn(false);
 }
 
-bool ArichHVCommunicator::standby() throw()
+int ArichHVCommunicator::getSwitch(int unit, int ch) throw(IOException)
 {
-  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId(1);
-  return perform(msg, HVState::STANDBY_S);
+  ArichHVUnitListIter it = find(unit, ch);
+  if (it == m_unit.end()) return 0;
+  return it->getValue().isTurnOn();
 }
 
-bool ArichHVCommunicator::shoulder() throw()
+void ArichHVCommunicator::requestValueAll(int unit, int ch) throw(IOException)
 {
-  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId(2);
-  return perform(msg, HVState::SHOULDER_S);
+  requestSwitch(unit, ch);
+  requestRampUpSpeed(unit, ch);
+  requestRampDownSpeed(unit, ch);
+  requestVoltageDemand(unit, ch);
+  requestVoltageLimit(unit, ch);
+  requestCurrentLimit(unit, ch);
+  requestVoltageMonitor(unit, ch);
+  requestCurrentMonitor(unit, ch);
 }
 
-bool ArichHVCommunicator::peak() throw()
+void ArichHVCommunicator::requestSwitch(int unit, int ch) throw(IOException)
 {
-  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId(4);
-  return perform(msg, HVState::PEAK_S);
+  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::SWITCH, unit, ch);
+  send(msg);
 }
 
-ArichHVMessage ArichHVCommunicator::readParams(int slot, int channel) throw(IOException)
+void ArichHVCommunicator::requestRampUpSpeed(int unit, int ch) throw(IOException)
 {
-  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::ALL, slot, channel);
-  msg.read(send(msg));
-  msg.setCommand(ArichHVMessage::CURRENT_LIMIT);
-  msg.read(send(msg));
-  msg.setCommand(ArichHVMessage::VOLTAGE_LIMIT);
-  msg.read(send(msg));
-  msg.setCommand(ArichHVMessage::VOLTAGE_DEMAND);
-  msg.read(send(msg));
-  return msg;
+  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::RAMPUP_SPEED, unit, ch);
+  send(msg);
 }
 
-std::string ArichHVCommunicator::send(ArichHVMessage& msg)
+void ArichHVCommunicator::requestRampDownSpeed(int unit, int ch) throw(IOException)
+{
+  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::RAMPDOWN_SPEED, unit, ch);
+  send(msg);
+}
+
+void ArichHVCommunicator::requestVoltageDemand(int unit, int ch) throw(IOException)
+{
+  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::VOLTAGE_DEMAND, unit, ch);
+  send(msg);
+}
+
+void ArichHVCommunicator::requestVoltageLimit(int unit, int ch) throw(IOException)
+{
+  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::VOLTAGE_LIMIT, unit, ch);
+  send(msg);
+}
+
+void ArichHVCommunicator::requestCurrentLimit(int unit, int ch) throw(IOException)
+{
+  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::CURRENT_LIMIT, unit, ch);
+  send(msg);
+}
+
+void ArichHVCommunicator::requestVoltageMonitor(int unit, int ch) throw(IOException)
+{
+  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::VOLTAGE_MON, unit, ch);
+  send(msg);
+}
+
+void ArichHVCommunicator::requestCurrentMonitor(int unit, int ch) throw(IOException)
+{
+  ArichHVMessage msg(ArichHVMessage::GET, ArichHVMessage::CURRENT_MON, unit, ch);
+  send(msg);
+}
+
+void ArichHVCommunicator::send(ArichHVMessage& msg)
 throw(IOException)
 {
-  std::string s;
+  if (!m_available) return;
+  m_mutex.lock();
   try {
-    std::string str = msg.toString() + "\r";
-    m_writer.write(str.c_str(), str.size());
-    if (msg.getMessageType() == ArichHVMessage::GET) {
-      std::stringstream ss;
-      char c;
-      while (true) {
-        m_socket.select(10);
-        c = m_reader.readChar();
-        if (c == '\r') break;
-        ss << c;
-      }
-      s = ss.str();
+    std::string str = msg.toString(m_usech);
+    if (m_debug) {
+      std::cerr << str << std::endl;
     }
+    str += "\r";
+    m_writer.write(str.c_str(), str.size());
+    m_mutex.unlock();
   } catch (const IOException& e) {
     LogFile::debug("Socket error on HV crate: %s", e.what());
     m_socket.close();
     m_available = false;
+    m_mutex.unlock();
     throw (e);
   }
-  return s;
 }
 
-bool ArichHVCommunicator::perform(ArichHVMessage& msg, HVState state) throw()
+std::list<ArichHVMessage> ArichHVCommunicator::read()
+throw(IOException)
 {
-  bool success = false;
-  m_mutex.lock();
-  if (m_available) {
-    try {
-      send(msg);
-      const HVConfig& config(m_callback->getConfig());
-      for (size_t i = 0; i < m_callback->getNChannels(); i++) {
-        const HVChannel& channel(config.getChannel(i));
-        if (channel.getCrate() != m_crateid && channel.isTurnOn()) {
-          HVChannelStatus& status(m_callback->getChannelStatus(i));
-          HVState state_org = status.getState();
-          if (state_org.isStable()) {
-            if (state.getId() > state_org.getId()) {
-              status.setState(HVState::RAMPINGUP_TS);
-            } else if (state.getId() < state_org.getId()) {
-              status.setState(HVState::RAMPINGDOWN_TS);
-            }
-          } else {
-            status.setState(HVState::TRANSITION_TS);
+  std::stringstream ss;
+  char c;
+  std::vector<std::string> s;
+  while (true) {
+    c = m_reader.readChar();
+    if (c == '\r') break;
+    if (c == '#') {
+      s.push_back(ss.str());
+      ss.str("");
+    }
+    ss << c;
+  }
+  if (ss.str().size() > 0)
+    s.push_back(ss.str());
+  std::list<ArichHVMessage> msg_l;
+  for (size_t i = 0; i < s.size(); i++) {
+    if (useChannel()) {
+      ArichHVMessage msg;
+      StringList sl = StringUtil::split(s[i], '=');
+      if (sl.size() >= 2) {
+        StringList sll = StringUtil::split(sl[1], ',');
+        for (size_t j = 0; j < sll.size(); j++) {
+          if (sll.size() > 0) {
+            std::stringstream css;
+            css << StringUtil::form("#%c%d", sl[0].at(1), (int)j + 1)
+                << sl[0].substr(3) << "=" << sll[j];
+            msg.read(useChannel(), css.str());
+            msg_l.push_back(msg);
           }
         }
       }
-      success = true;
-    } catch (const IOException& e) {
-      LogFile::error("failed to configure HV crate (id=%s)", m_crateid);
-      success = false;
+    } else {
+      if (s[i].size() > 0) {
+        s[i] = StringUtil::replace(s[i], ",", "");
+        ArichHVMessage msg;
+        msg.read(useChannel(), s[i]);
+        msg_l.push_back(msg);
+      }
     }
   }
-  m_mutex.unlock();
-  return success;
+  return msg_l;
 }
-

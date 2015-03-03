@@ -17,9 +17,6 @@ namespace Belle2 {
     static const HVCommand RECOVER;
     static const HVCommand TURNON;
     static const HVCommand TURNOFF;
-    static const HVCommand HVGET;
-    static const HVCommand HVSET;
-    static const HVCommand HVAPPLY;
 
   public:
     HVCommand() throw() {}
@@ -35,7 +32,6 @@ namespace Belle2 {
     throw() : NSMCommand(id, label) {}
 
   public:
-    //virtual int isAvailable(const State& state) const throw();
     HVState nextState() const throw();
 
   public:

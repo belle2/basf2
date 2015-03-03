@@ -1,19 +1,37 @@
 #ifndef _Belle2_DBObjectLoader_h
 #define _Belle2_DBObjectLoader_h
 
-#include <daq/slc/database/ConfigObject.h>
+#include <daq/slc/database/DBObject.h>
+#include <daq/slc/database/DBInterface.h>
+
+#include <daq/slc/base/StringUtil.h>
 
 namespace Belle2 {
 
   class DBObjectLoader {
 
   public:
-    static ConfigObject load(const std::string& path,
-                             const std::string& tablename,
-                             bool search = false);
-    static ConfigObject load(const std::string& tablename) {
-      return load("", tablename);
-    }
+    static DBObject load(const std::string& filename);
+    static DBObject load(DBInterface& db,
+                         const std::string& tablename,
+                         const std::string& configname,
+                         bool isfull = true);
+    static bool createDB(DBInterface& db,
+                         const std::string& tablename,
+                         const DBObject& obj);
+    static StringList getDBlist(DBInterface& db,
+                                const std::string& tablename,
+                                const std::string& nodename,
+                                const std::string& grep);
+
+  private:
+    static bool setObject(DBObject& obj, StringList& str,
+                          DBField::Type type, const std::string& value,
+                          const std::string& table_in = "",
+                          const std::string& config_in = "",
+                          DBInterface* db = NULL);
+    static bool add(DBObject& obj, StringList& str,
+                    const std::string& name_in, const DBObject& cobj);
 
   };
 

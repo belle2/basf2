@@ -1,38 +1,44 @@
 #ifndef Belle2_HVValue_h
 #define Belle2_HVValue_h
 
-#include <daq/slc/database/ConfigObject.h>
+#include <vector>
+#include <string>
 
 namespace Belle2 {
 
   class HVValue {
 
+
   public:
-    HVValue(ConfigObject* obj) : m_obj(obj) {}
-    HVValue(const HVValue& config)
-      : m_obj(config.m_obj) {}
+    HVValue();
+    HVValue(const HVValue& config) ;
     ~HVValue() throw() {}
 
   public:
-    void print() throw() { m_obj->print(); }
-    const std::string& getConfigName() const { return m_obj->getName(); }
-    float getRampUpSpeed() const { return m_obj->getFloat("rampup_speed"); }
-    float getRampDownSpeed() const { return m_obj->getFloat("rampdown_speed"); }
-    float getVoltageDemand() const { return m_obj->getFloat("voltage_demand"); }
-    float getVoltageLimit() const { return m_obj->getFloat("voltage_limit"); }
-    float getCurrentLimit() const { return m_obj->getFloat("current_limit"); }
-    void set(ConfigObject* obj) throw() { m_obj = obj; }
-    ConfigObject& get() throw() { return *m_obj; }
+    bool  isTurnOn() const { return m_turnon; }
+    float getRampUpSpeed() const { return m_rampup_speed; }
+    float getRampDownSpeed() const { return m_rampdown_speed; }
+    float getVoltageDemand() const { return m_voltage_demand; }
+    float getVoltageLimit() const { return m_voltage_limit; }
+    float getCurrentLimit() const { return m_current_limit; }
+    const std::string& getConfigName() const { return m_configname; }
 
-    void setConfigName(const std::string& name) { m_obj->setName(name); }
-    void setRampUpSpeed(float rampup) { m_obj->setFloat("rampup_speed", rampup); }
-    void setRampDownSpeed(float rampdown) { m_obj->setFloat("rampdown_speed", rampdown); }
-    void setVoltageDemand(float voltage) { m_obj->setFloat("voltage_demand", voltage); }
-    void setVoltageLimit(float voltage) { m_obj->setFloat("voltage_limit", voltage); }
-    void setCurrentLimit(float current) { m_obj->setFloat("current_limit", current); }
+    void setTurnOn(bool turnon) { m_turnon = turnon; }
+    void setRampUpSpeed(float rampup) { m_rampup_speed = rampup; }
+    void setRampDownSpeed(float rampdown) { m_rampdown_speed = rampdown; }
+    void setVoltageDemand(float voltage) { m_voltage_demand = voltage; }
+    void setVoltageLimit(float voltage) { m_voltage_limit = voltage; }
+    void setCurrentLimit(float current) { m_current_limit = current; }
+    void setConfigName(const std::string& name) { m_configname = name; }
 
   private:
-    ConfigObject* m_obj;
+    bool m_turnon;
+    float m_rampup_speed;
+    float m_rampdown_speed;
+    float m_voltage_demand;
+    float m_voltage_limit;
+    float m_current_limit;
+    std::string m_configname;
 
   };
 

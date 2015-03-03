@@ -65,7 +65,7 @@ public class DataReader extends Reader {
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < length; i++) {
             c = readByte();
-            if (c == '\n' || (c >= ' ' && c <= '~')) {
+            if (c == '\n' || c == '\r' || (c >= ' ' && c <= '~')) {
                 buffer.append((char) c);
             }
         }

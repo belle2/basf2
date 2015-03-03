@@ -47,56 +47,57 @@ public class NSMSocket {
             return false;
         }
     }
+    /*
+     public boolean requestNSMGet(NSMData data) {
+     return requestNSMGet(data.getName(), data.getFormat(), data.getRevision());
+     }
 
-    public boolean requestNSMGet(NSMData data) {
-        return requestNSMGet(data.getName(), data.getFormat(), data.getRevision());
-    }
+     public boolean requestNSMGet(String dataname, String format, int revision) {
+     NSMMessage msg = new NSMMessage(NSMCommand.NSMGET);
+     msg.setData(dataname + " " + format);
+     msg.setNParams(1);
+     msg.setParam(0, revision);
+     return request(msg);
+     }
 
-    public boolean requestNSMGet(String dataname, String format, int revision) {
-        NSMMessage msg = new NSMMessage(NSMCommand.NSMGET);
-        msg.setData(dataname + " " + format);
-        msg.setNParams(1);
-        msg.setParam(0, revision);
-        return request(msg);
-    }
+     public boolean requestList(String nodename) {
+     return request(new NSMMessage(NSMCommand.LISTGET, nodename));
+     }
 
-    public boolean requestList(String nodename) {
-        return request(new NSMMessage(NSMCommand.LISTGET, nodename));
-    }
+     public boolean requestDBGet(ConfigObject obj) {
+     return requestDBGet(obj.getNode(), obj.getTable(), obj.getName(), obj.getId());
+     }
 
-    public boolean requestDBGet(ConfigObject obj) {
-        return requestDBGet(obj.getNode(), obj.getTable(), obj.getName(), obj.getId());
-    }
+     public boolean requestDBGet(String node, String table, String name, int id) {
+     NSMMessage msg = new NSMMessage(NSMCommand.DBGET);
+     if (name.length() > 0 || id > 0) {
+     if (id > 0) {
+     msg.setNParams(1);
+     msg.setParam(0, id);
+     } else {
+     msg.setNParams(0);
+     }
+     msg.setData("config " + node + " " + name + " " + table);
+     } else {
+     msg.setData("configlist " + node + " " + table);
+     }
+     return request(msg);
+     }
 
-    public boolean requestDBGet(String node, String table, String name, int id) {
-        NSMMessage msg = new NSMMessage(NSMCommand.DBGET);
-        if (name.length() > 0 || id > 0) {
-            if (id > 0) {
-                msg.setNParams(1);
-                msg.setParam(0, id);
-            } else {
-                msg.setNParams(0);
-            }
-            msg.setData("config " + node + " " + name + " " + table);
-        } else {
-            msg.setData("configlist " + node + " " + table);
-        }
-        return request(msg);
-    }
-
-    public boolean requestDBSet(ConfigObject obj) {
-        NSMMessage msg = new NSMMessage(NSMCommand.DBSET);
-        if (request(msg)) {
-            try {
-                m_writer.writeObject(obj);
-                return true;
-            } catch (IOException ex) {
-                Logger.getLogger(NSMSocket.class.getName()).log(Level.SEVERE, null, ex);
-                close();
-            }
-        }
-        return false;
-    }
+     public boolean requestDBSet(ConfigObject obj) {
+     NSMMessage msg = new NSMMessage(NSMCommand.DBSET);
+     if (request(msg)) {
+     try {
+     m_writer.writeObject(obj);
+     return true;
+     } catch (IOException ex) {
+     Logger.getLogger(NSMSocket.class.getName()).log(Level.SEVERE, null, ex);
+     close();
+     }
+     }
+     return false;
+     }
+     */
 
     public NSMMessage waitMessage() {
         try {
@@ -130,6 +131,17 @@ public class NSMSocket {
     boolean readObject(Serializable obj) {
         try {
             m_reader.readObject(obj);
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(NSMSocket.class.getName()).log(Level.SEVERE, null, ex);
+            close();
+        }
+        return false;
+    }
+
+    boolean writeObject(Serializable obj) {
+        try {
+            m_writer.writeObject(obj);
             return true;
         } catch (IOException ex) {
             Logger.getLogger(NSMSocket.class.getName()).log(Level.SEVERE, null, ex);

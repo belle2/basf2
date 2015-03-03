@@ -1,83 +1,225 @@
 #include "daq/slc/nsm/NSMCallback.h"
 
 #include "daq/slc/system/LogFile.h"
+#include "daq/slc/system/Time.h"
 
 #include "daq/slc/nsm/NSMCommunicator.h"
 
 #include <signal.h>
 #include <string.h>
 #include <cstdlib>
+#include <iostream>
+#include <sstream>
+#include <unistd.h>
 
 using namespace Belle2;
 
-NSMCallback::NSMCallback(const NSMNode& node, int timeout) throw()
-  : m_node(node), m_comm(NULL)
+NSMCallback::NSMCallback(const int timeout) throw()
+  : AbstractNSMCallback(timeout), m_node()
 {
-  add(NSMCommand::OK);
-  add(NSMCommand::ERROR);
-  add(NSMCommand::FATAL);
-  add(NSMCommand::LOG);
-  add(NSMCommand::STATE);
-  add(NSMCommand::EXCLUDE);
-  add(NSMCommand::INCLUDE);
-  add(NSMCommand::VGET);
-  add(NSMCommand::VSET);
-  m_timeout = timeout;
+  reg(NSMCommand::OK);
+  reg(NSMCommand::ERROR);
+  reg(NSMCommand::LOG);
+  reg(NSMCommand::VGET);
+  reg(NSMCommand::VSET);
+  reg(NSMCommand::VREPLY);
+  reg(NSMCommand::VLISTGET);
+  reg(NSMCommand::VLISTSET);
 }
 
-bool NSMCallback::isReady() const throw()
+void NSMCallback::addNode(const NSMNode& node)
 {
-  return m_comm != NULL && m_comm->isOnline();
+  std::string name = node.getName();
+  if (m_nodes.find(name) == m_nodes.end()) {
+    m_nodes.insert(NSMNodeMap::value_type(name, node));
+  }
 }
 
-bool NSMCallback::perform(const NSMMessage& msg)
-throw()
+bool NSMCallback::reply(const NSMMessage& msg)
+throw(NSMHandlerException)
 {
+  NSMMessage msg_out = msg;
+  for (NSMNodeMap::iterator it = m_nodes.begin();
+       it != m_nodes.end();) {
+    NSMNode& node(it->second);
+    msg_out.setNodeName(node.getName());
+    if (NSMCommunicator::send(msg)) {
+      it++;
+    } else {
+      m_nodes.erase(it++);
+    }
+  }
+  return true;
+}
+
+bool NSMCallback::perform(NSMCommunicator& com) throw()
+{
+  const NSMMessage& msg(com.getMessage());
   const NSMCommand cmd = msg.getRequestName();
-  if (cmd == NSMCommand::OK) {
-    return ok();
-  } else if (cmd == NSMCommand::ERROR) {
-    return error();
-  } else if (cmd == NSMCommand::FATAL) {
-    return fatal();
-  } else if (cmd == NSMCommand::LOG) {
-    return log();
-  } else if (cmd == NSMCommand::STATE) {
-    return state();
-  } else if (cmd == NSMCommand::EXCLUDE) {
-    return exclude();
-  } else if (cmd == NSMCommand::INCLUDE) {
-    return include();
-  } else if (cmd == NSMCommand::VGET) {
-    std::string vname = msg.getData();
-    NSMVar var(vget(vname));
-    if (var.getType() != NSMVar::NONE) {
-      var.setName(vname);
-      m_comm->sendRequest(NSMMessage(NSMNode(msg.getNodeName()), var));
+  if (cmd == NSMCommand::OK || cmd == NSMCommand::ERROR) {
+    if (msg.getLength() > 0) {
+      if (cmd == NSMCommand::OK) {
+        ok(msg.getNodeName(), msg.getData());
+      } else if (cmd == NSMCommand::ERROR) {
+        error(msg.getNodeName(), msg.getData());
+      }
     }
     return true;
-  } else if (cmd == NSMCommand::VSET) {
+  } else if (cmd == NSMCommand::VGET) {
     std::string vname = msg.getData();
-    const char* value = (msg.getData() + msg.getParam(3) + 1);
-    vset(NSMVar(vname, (NSMVar::Type)msg.getParam(0),
-                msg.getParam(1), value));
+    vget(com, vname);
+    return true;
+  } else if (cmd == NSMCommand::VSET) {
+    NSMVar var;
+    readVar(msg, var);
+    vset(com, var);
+    return true;
+  } else if (cmd == NSMCommand::VREPLY) {
+    vreply(com, msg.getData(), msg.getParam(0));
+    return true;
+  } else if (cmd == NSMCommand::VLISTGET) {
+    vlistget(com);
+    return true;
+  } else if (cmd == NSMCommand::VLISTSET) {
+    vlistset(com);
     return true;
   }
   return false;
 }
 
-NSMMessage& NSMCallback::getMessage()
+void NSMCallback::notify(const NSMVar& var) throw()
 {
-  return m_msg;
+  std::string vname = var.getName();
+  if (m_node_v_m.find(vname) != m_node_v_m.end()) {
+    try {
+      NSMNodeMap& node_v(m_node_v_m[vname]);
+      for (NSMNodeMap::iterator inode = node_v.begin();
+           inode != node_v.end();) {
+        NSMNode& node(inode->second);
+        if (NSMCommunicator::send(NSMMessage(node, var))) {
+          inode++;
+        } else {
+          node_v.erase(inode++);
+        }
+      }
+    } catch (const IOException& e) {
+      LogFile::error(e.what());
+    }
+  }
 }
 
-const NSMMessage& NSMCallback::getMessage() const
+void NSMCallback::vget(NSMCommunicator& com, const std::string& vname) throw()
 {
-  return m_msg;
+  NSMMessage msg(com.getMessage());
+  NSMNode node(msg.getNodeName());
+  NSMVar var(vname);
+  try {
+    for (size_t i = 0; i < m_handler.size(); i++) {
+      NSMVHandler& handler(*m_handler[i]);
+      if (var.getName() == handler.getName() &&
+          handler.useGet() && handler.handleGet(var)) {
+        var.setName(vname);
+        var.setId(i + 1);
+        var.setRevision(getRevision());
+        var.setNodeId(com.getNodeIdByName(getNode().getName()) + 1);
+        NSMCommunicator::send(NSMMessage(node, var));
+        if (m_node_v_m.find(vname) == m_node_v_m.end()) {
+          m_node_v_m.insert(NSMNodeMapMap::value_type(vname, NSMNodeMap()));
+        }
+        NSMNodeMap& node_v(m_node_v_m[vname]);
+        std::string nodename = msg.getNodeName();
+        if (node_v.find(nodename) == node_v.end()) {
+          node_v.insert(NSMNodeMap::value_type(nodename, NSMNode(nodename)));
+        }
+      }
+    }
+  } catch (const NSMHandlerException& e) {
+    LogFile::error(e.what());
+  }
 }
 
-void NSMCallback::setMessage(const NSMMessage& msg)
+void NSMCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 {
-  m_msg = msg;
+  if (!(var.getNodeId() == 0) &&
+      !(var.getRevision() == getRevision() &&
+        var.getNodeId() == com.getId() + 1 &&
+        var.getId() - 1 < (int)m_handler.size() &&
+        var.getName() != m_handler[var.getId() - 1]->getName())) {
+    return;
+  }
+  try {
+    NSMMessage msg(com.getMessage());
+    for (size_t i = 0; i < m_handler.size(); i++) {
+      NSMVHandler& handler(*m_handler[i]);
+      bool result = false;
+      if (var.getName() == handler.getName() && handler.useSet()) {
+        if ((result = handler.handleSet(var))) {
+          NSMNode node(msg.getNodeName());
+          NSMCommunicator::send(NSMMessage(node, NSMCommand::VREPLY,
+                                           result, var.getName()));
+          notify(var);
+        }
+      }
+    }
+  } catch (const NSMHandlerException& e) {
+    LogFile::error(e.what());
+  }
 }
 
+void NSMCallback::vlistget(NSMCommunicator& com) throw()
+{
+  std::stringstream ss;
+  int count = 0;
+  for (size_t i = 0; i < m_handler.size(); i++) {
+    NSMVHandler& handler(*m_handler[i]);
+    if (handler.getNode().size() == 0) {
+      ss << handler.getName() << ":"
+         << handler.get().getTypeLabel() << ":"
+         << (int)handler.useGet() << ":"
+         << (int)handler.useSet() << ":"
+         << i << "\n";
+      count++;
+    }
+  }
+  std::string nodename = com.getMessage().getNodeName();
+  NSMNode node(nodename);
+  try {
+    NSMCommunicator::send(NSMMessage(node, NSMCommand::VLISTSET,
+                                     count, ss.str()));
+  } catch (const NSMHandlerException& e) {
+    LogFile::error(e.what());
+  }
+}
+
+struct vlistentry_t {
+  std::string name;
+  int id;
+  std::string type;
+  bool useGet;
+  bool useSet;
+};
+
+void NSMCallback::vlistset(NSMCommunicator& com) throw()
+{
+  std::string data = com.getMessage().getData();
+  StringList s = StringUtil::split(data, '\n');
+  std::vector<vlistentry_t> vlist;
+  size_t length = 0;
+  for (size_t i = 0; i < s.size(); i++) {
+    StringList ss = StringUtil::split(s[i], ':');
+    if (ss.size() > 4) {
+      vlistentry_t en = { ss[0], atoi(ss[4].c_str()),
+                          ss[1], ss[2] == "1", ss[3] == "1"
+                        };
+      vlist.push_back(en);
+      if (length < ss[0].size()) length = ss[0].size();
+    }
+  }
+  for (size_t i = 0; i < vlist.size(); i++) {
+    vlistentry_t& en(vlist[i]);
+    std::cout << StringUtil::form(StringUtil::form("%%-%ds (id=%%d)", length).c_str(), en.name.c_str(), en.id)
+              << " : " << en.type << " "
+              << (en.useGet ? "get " : "")
+              << (en.useSet ? "set " : "")  << std::endl;
+  }
+}

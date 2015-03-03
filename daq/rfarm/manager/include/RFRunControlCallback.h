@@ -6,32 +6,19 @@
 
 namespace Belle2 {
 
-  class RFMaster;
   class RFMasterCallback;
 
   class RFRunControlCallback : public RCCallback {
 
   public:
-    RFRunControlCallback(const NSMNode& node, RFMaster* master,
-                         RFMasterCallback* callback);
-    virtual ~RFRunControlCallback() throw();
+    RFRunControlCallback(RFMasterCallback* callback);
+    virtual ~RFRunControlCallback() throw() {}
 
   public:
-    virtual void init() throw();
-    virtual bool load() throw();
-    virtual bool start() throw();
-    virtual bool stop() throw();
-    virtual bool recover() throw();
-    virtual bool abort() throw();
-    virtual bool stateCheck() throw();
-
-  public:
-    NSMData& getData() throw() { return m_data; }
+    virtual bool perform(NSMCommunicator& com) throw();
 
   private:
-    RFMaster* m_master;
     RFMasterCallback* m_callback;
-    NSMData m_data;
 
   };
 

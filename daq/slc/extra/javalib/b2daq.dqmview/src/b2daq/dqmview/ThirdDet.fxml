@@ -19,105 +19,19 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-    <tabs>
-        <Tab closable="false" text="Integreted">
-            <content>
-                <HBox>
-                    <children>
-                        <VBox prefWidth="450.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="450.0" VBox.vgrow="ALWAYS">
-                                    <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" stat="true" title=" " yLabelAlignment="bottom">
-                                            <histograms>
-                                                <FXCollections fx:factory="observableArrayList">
-                                                    <Histo2D fx:id="h_HitXYPositionCh03" name="h_HitXYPositionCh03" />
-                                                </FXCollections>
-                                            </histograms>
-                                        </HistogramCanvas> 
-                                    </canvas>
-                                </CanvasPanel>
-                            </children>
-                        </VBox>
-                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="400.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="180.0" prefWidth="600.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                                    <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" stat="true" title=" " yLabelAlignment="bottom">
-                                            <histograms>
-                                                <FXCollections fx:factory="observableArrayList">
-                                                    <Histo1D fx:id="h_HitXPositionCh03" name="h_HitXPositionCh03" lineColor="blue" fillColor="cyan" />
-                                                </FXCollections>
-                                            </histograms>
-                                        </HistogramCanvas>
-                                    </canvas>
-                                </CanvasPanel>
-                                <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="180.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
-                                    <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="top">
-                                            <histograms>
-                                                <FXCollections fx:factory="observableArrayList">
-                                                    <Histo1D fx:id="h_HitYPositionCh03" name="h_HitYPositionCh03" lineColor="blue" fillColor="cyan" />
-                                                </FXCollections>
-                                            </histograms>
-                                        </HistogramCanvas>
-                                    </canvas>
-                                </CanvasPanel>
-                            </children>
-                        </VBox>
-                    </children>
-                </HBox>
-            </content>
-        </Tab>
-        <Tab closable="false" text="Differential">
-            <content>
-                <HBox>
-                    <children>
-                        <VBox prefWidth="450.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="600.0" VBox.vgrow="ALWAYS">
-                                    <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="bottom">
-                                            <histograms>
-                                                <FXCollections fx:factory="observableArrayList">
-                                                    <Histo2D name="h_HitXYPositionCh03:diff" />
-                                                </FXCollections>
-                                            </histograms>
-                                        </HistogramCanvas>
-                                    </canvas>
-                                </CanvasPanel>
-                            </children>
-                        </VBox>
-                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="549.0" prefWidth="400.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="180.0" prefWidth="600.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                                    <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="bottom">
-                                            <histograms>
-                                                <FXCollections fx:factory="observableArrayList">
-                                                    <Histo1D name="h_HitXPositionCh03:diff" lineColor="blue" fillColor="cyan" />
-                                                </FXCollections>
-                                            </histograms>
-                                        </HistogramCanvas>
-                                    </canvas>
-                                </CanvasPanel>
-                                <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="180.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
-                                    <canvas>
-                                        <HistogramCanvas fillColor="lightgray" fontSize="0.9" name="c_node0_voltage_time" stat="true" title=" " yLabelAlignment="bottom">
-                                            <histograms>
-                                                <FXCollections fx:factory="observableArrayList">
-                                                    <Histo1D name="h_HitYPositionCh03:diff" lineColor="blue" fillColor="cyan" />
-                                                </FXCollections>
-                                            </histograms>
-                                        </HistogramCanvas>
-                                    </canvas>
-                                </CanvasPanel>
-                            </children>
-                        </VBox>
-                    </children>
-                </HBox>
-            </content>
-        </Tab>
-    </tabs>
-</TabPane>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <CanvasPanel maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="450.0" VBox.vgrow="ALWAYS">
+            <canvas>
+                <HistogramCanvas fillColor="lightgray" fontSize="0.9" stat="true" title=" " yLabelAlignment="bottom">
+                    <histograms>
+                        <FXCollections fx:factory="observableArrayList">
+                            <Histo1F draw="ALT" name="h_Trigger" fillColor="yellow" lineColor="black" />
+                        </FXCollections>
+                    </histograms>
+                </HistogramCanvas> 
+            </canvas>
+        </CanvasPanel>
+    </children>
+</VBox>

@@ -1,3 +1,4 @@
+#include <framework/logging/Logger.h>
 #include <tracking/modules/genfitter/Geant4MaterialInterface.h>
 #include <geometry/GeometryManager.h>
 
@@ -19,6 +20,7 @@
 static const bool debug = false;
 //static const bool debug = true;
 
+// Debug flag, use for comparison if differences in behavior occur.
 //#define LOOK_IN_TGEO
 
 using namespace Belle2;
@@ -66,6 +68,8 @@ namespace {
 
 #endif
 
+  G4ThreeVector where;
+
 }
 
 
@@ -76,7 +80,15 @@ void G4SafeNavigator::SetWorldVolume(G4VPhysicalVolume* pWorld)
   dX_ = box->GetXHalfLength();
   dY_ = box->GetYHalfLength();
   dZ_ = box->GetZHalfLength();
-  this->G4Navigator::SetWorldVolume(pWorld);
+  nav_.SetWorldVolume(pWorld);
+
+#ifdef LOOK_IN_TGEO
+  if (!gGeoManager) {
+    B2INFO("Building TGeo representation.");
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+  }
+#endif
 }
 
 
@@ -86,13 +98,21 @@ G4VPhysicalVolume* G4SafeNavigator::LocateGlobalPointAndSetup(const G4ThreeVecto
     const G4bool ignoreDirection)
 {
   G4ThreeVector p(point);
-  if (fabs(p.x()) > dX_)
+  if (fabs(p.x()) >= dX_)
     p.setX(0);
-  if (fabs(p.y()) > dY_)
+  if (fabs(p.y()) >= dY_)
     p.setY(0);
-  if (fabs(p.z()) > dZ_)
+  if (fabs(p.z()) >= dZ_)
     p.setZ(0);
-  return this->G4Navigator::LocateGlobalPointAndSetup(p, direction, pRelativeSearch, ignoreDirection);
+  where = p;
+
+  G4ThreeVector dir(*direction);
+  if (std::isnan(dir.x()) || std::isnan(dir.y()) || std::isnan(dir.z())) {
+    B2WARNING("nan in direction in G4SafeNavigator::LocateGlobalPointAndSetup");
+    dir.set(1., 0., 0.);
+  }
+  dir.setMag(1.);
+  return nav_.LocateGlobalPointAndSetup(p, &dir, pRelativeSearch, ignoreDirection);
 }
 
 G4double G4SafeNavigator::ComputeStep(const G4ThreeVector& pGlobalPoint,
@@ -101,13 +121,21 @@ G4double G4SafeNavigator::ComputeStep(const G4ThreeVector& pGlobalPoint,
                                       G4double&  pNewSafety)
 {
   G4ThreeVector p(pGlobalPoint);
-  if (fabs(p.x()) > dX_)
+  if (fabs(p.x()) >= dX_)
     p.setX(0);
-  if (fabs(p.y()) > dY_)
+  if (fabs(p.y()) >= dY_)
     p.setY(0);
-  if (fabs(p.z()) > dZ_)
+  if (fabs(p.z()) >= dZ_)
     p.setZ(0);
-  return this->G4Navigator::ComputeStep(p, pDirection, pCurrentProposedStepLength, pNewSafety);
+  where = p;
+
+  G4ThreeVector dir(pDirection);
+  if (std::isnan(dir.x()) || std::isnan(dir.y()) || std::isnan(dir.z())) {
+    B2WARNING("nan in direction in G4SafeNavigator::ComputeStep");
+    dir.set(1., 0., 0.);
+  }
+  dir.setMag(1.);
+  return nav_.ComputeStep(p, dir, pCurrentProposedStepLength, pNewSafety);
 }
 
 G4double G4SafeNavigator::CheckNextStep(const G4ThreeVector& pGlobalPoint,
@@ -116,13 +144,21 @@ G4double G4SafeNavigator::CheckNextStep(const G4ThreeVector& pGlobalPoint,
                                         G4double& pNewSafety)
 {
   G4ThreeVector p(pGlobalPoint);
-  if (fabs(p.x()) > dX_)
+  if (fabs(p.x()) >= dX_)
     p.setX(0);
-  if (fabs(p.y()) > dY_)
+  if (fabs(p.y()) >= dY_)
     p.setY(0);
-  if (fabs(p.z()) > dZ_)
+  if (fabs(p.z()) >= dZ_)
     p.setZ(0);
-  return this->G4Navigator::CheckNextStep(p, pDirection, pCurrentProposedStepLength, pNewSafety);
+  where = p;
+
+  G4ThreeVector dir(pDirection);
+  if (std::isnan(dir.x()) || std::isnan(dir.y()) || std::isnan(dir.z())) {
+    B2WARNING("nan in direction in G4SafeNavigator::CheckNextStep");
+    dir.set(1., 0., 0.);
+  }
+  dir.setMag(1.);
+  return nav_.CheckNextStep(p, dir, pCurrentProposedStepLength, pNewSafety);
 }
 
 
@@ -140,8 +176,9 @@ Geant4MaterialInterface::initTrack(double posX, double posY, double posZ,
 {
   G4ThreeVector pos(posX * CLHEP::cm, posY * CLHEP::cm, posZ * CLHEP::cm);
   G4ThreeVector dir(dirX, dirY, dirZ);
-  const G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir, true, false);
-
+  const G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir, false, false);
+  if (!newVolume)
+    std::cout << "hier " << pos << std::endl;
 #ifdef LOOK_IN_TGEO
   gGeoManager->IsSameLocation(posX, posY, posZ, kTRUE);
   // Set the intended direction.
@@ -162,6 +199,8 @@ Geant4MaterialInterface::getMaterialParameters(double& density,
                                                double& radiationLength,
                                                double& mEE)
 {
+  if (!currentVolume_)
+    std::cout << " oder hier " << where << std::endl;
   assert(currentVolume_);
 
   const G4Material* mat = currentVolume_->GetLogicalVolume()->GetMaterial();
@@ -209,28 +248,11 @@ Geant4MaterialInterface::getMaterialParameters(double& density,
 void
 Geant4MaterialInterface::getMaterialParameters(genfit::MaterialProperties& parameters)
 {
-  assert(currentVolume_);
-  G4Material* mat = currentVolume_->GetLogicalVolume()->GetMaterial();
-
-  double Z = 0;
-  double A = 0;
-  if (mat->GetNumberOfElements() == 1) {
-    Z = mat->GetZ();
-    A = mat->GetA();
-  } else {
-    // Calculate weight-averaged A, Z
-    for (unsigned i = 0; i < mat->GetNumberOfElements(); ++i) {
-      const G4Element* element = (*mat->GetElementVector())[i];
-      A += element->GetA() * mat->GetFractionVector()[i];
-      Z += element->GetZ() * mat->GetFractionVector()[i];
-    }
-  }
-  parameters.setMaterialProperties(mat->GetDensity() / CLHEP::g * CLHEP::cm3,
-                                   Z,
-                                   A * CLHEP::mole / CLHEP::g,
-                                   mat->GetRadlen() / CLHEP::cm,
-                                   mat->GetIonisation()->GetMeanExcitationEnergy() / CLHEP::eV);
+  double density, Z, A, radLen, mEE;
+  this->getMaterialParameters(density, Z, A, radLen, mEE);
+  parameters.setMaterialProperties(density, Z, A, radLen, mEE);
 }
+
 
 double
 Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
@@ -269,20 +291,23 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
   safety /= CLHEP::cm;
   double step = slDist;
 
-#if 0
+#ifdef LOOK_IN_TGEO
   gGeoManager->IsSameLocation(stateOrig[0], stateOrig[1], stateOrig[2], kTRUE);
   gGeoManager->SetCurrentDirection(stepSign * stateOrig[3], stepSign * stateOrig[4], stepSign * stateOrig[5]);
   gGeoManager->FindNextBoundary(fabs(sMax) - s);
   double safetyTG = gGeoManager->GetSafeDistance();
   double slDistTG = gGeoManager->GetStep();
-  double stepTG = slDist;
+  //double stepTG = slDist;
 
-  if (fabs(slDist - slDistTG) > 1e-3) {
-    std::cout << " different : "
-              << stateOrig[0] << " " << stateOrig[1] << " " << stateOrig[2]
+  if (1 || fabs(slDist - slDistTG) > 1e-3) {
+    if (fabs(slDist - slDistTG) < 1e-3)
+      std::cout << "not";
+    std::cout << " \033[0;01mdifferent\033[00m : "
+              << stateOrig[0] << " " << stateOrig[1] << " " << stateOrig[2] << " "
+              << stepSign* stateOrig[3] << " " << stepSign* stateOrig[4] << " " << stepSign* stateOrig[5] << "\n"
               << " sMax " << sMax
               << " slDist " << slDist << " " << slDistTG
-              << " safety " << safety << " " << safetyTG
+              << " safety " << safety << " " << safetyTG << std::endl
               << " volume = " << currentVolume_->GetLogicalVolume()->GetName() << " "
               << gGeoManager->FindNode(stateOrig[0], stateOrig[1], stateOrig[2])->GetName()
               << std::endl;
@@ -392,5 +417,29 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
       slDist /= CLHEP::cm;
     safety /= CLHEP::cm;
     step = slDist;
+
+#ifdef LOOK_IN_TGEO
+    gGeoManager->IsSameLocation(state7[0], state7[1], state7[2], kTRUE);
+    gGeoManager->SetCurrentDirection(stepSign * state7[3], stepSign * state7[4], stepSign * state7[5]);
+    gGeoManager->FindNextBoundary(fabs(sMax) - s);
+    safetyTG = gGeoManager->GetSafeDistance();
+    slDistTG = gGeoManager->GetStep();
+    //double stepTG = slDist;
+
+    if (1 || fabs(slDist - slDistTG) > 1e-3) {
+      if (fabs(slDist - slDistTG) < 1e-3)
+        std::cout << "not";
+      std::cout << " \033[0;35mdifferent\033[00m (following): "
+                << state7[0] << " " << state7[1] << " " << state7[2] << " "
+                << stepSign* state7[3] << " " << stepSign* state7[4] << " " << stepSign* state7[5] << "\n"
+                << " sMax-s " << fabs(sMax) - s
+                << " slDist " << slDist << " " << slDistTG
+                << " safety " << safety << " " << safetyTG << std::endl
+                << " volume = " << currentVolume_->GetLogicalVolume()->GetName() << " "
+                << gGeoManager->FindNode(state7[0], state7[1], state7[2])->GetName()
+                << std::endl;
+    }
+#endif
+
   }
 }

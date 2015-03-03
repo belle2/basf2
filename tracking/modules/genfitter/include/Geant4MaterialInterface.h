@@ -18,7 +18,7 @@
 namespace Belle2 {
 
 
-  class G4SafeNavigator : public G4Navigator {
+  class G4SafeNavigator {
     // Guards against leaving the physical volume.
   public:
     G4SafeNavigator() : dX_(0), dY_(0), dZ_(0) {}
@@ -41,9 +41,12 @@ namespace Belle2 {
                            const G4ThreeVector& pDirection,
                            const G4double pCurrentProposedStepLength,
                            G4double& pNewSafety);
+
+    void SetGeometricallyLimitedStep() { nav_.SetGeometricallyLimitedStep(); }
   private:
     // Half-sizes of the world volume, assumed to be a G4Box;
     double dX_, dY_, dZ_;
+    G4Navigator nav_;
   };
 
 

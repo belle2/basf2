@@ -127,6 +127,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=1):
     # Material effects for all track extrapolations
     material_effects = register_module('SetupGenfitExtrapolation')
     material_effects.param('whichGeometry', 'TGeo')
+    # material_effects.param('whichGeometry', 'Geant4')
     path.add_module(material_effects)
 
     # CDC track finder: trasan

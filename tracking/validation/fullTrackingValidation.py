@@ -25,6 +25,7 @@ from tracking.validation.module import TrackingValidationModule
 from tracking.validation.mc_side_module import MCSideTrackingValidationModule
 from tracking.validation.pr_side_module import PRSideTrackingValidationModule
 from tracking.validation.module import SeparatedTrackingValidationModule
+import tracking.validation.refiners as refiners
 
 import ROOT
 import logging
@@ -79,6 +80,26 @@ class PtBinnedMCSideTrackingValidationModule(MCSideTrackingValidationModule):
     # Refiners to be executed on terminate #
     # #################################### #
 
+    # Make profiles of the finding efficiencies versus various fit parameters
+    # Rename the quatities to names that display nicely by root latex translation
+    renaming_select_for_finding_efficiency_profiles = {
+        'finding_efficiency': 'finding efficiency',
+        'mc_tan_lambda': 'tan #lambda',
+        'mc_phi': '#phi',
+        'mc_theta': '#theta',
+    }
+
+    save_binned_finding_efficiency_profiles = refiners.save_profiles(
+        select=renaming_select_for_finding_efficiency_profiles,
+        groupby="pt_value",
+        y='finding efficiency',
+        outlier_z_score=5.0,
+        allow_discrete=True,
+        name="{module.name}_{y_part_name}_by_{x_part_name}_profile_PtBin_{groupby_value}",
+        title="Profile of {y_part_name} by {x_part_name} in {module.title} Pt = {groupby_value} GeV",
+        # folder_name=".", #Dummy everything in the top level folder
+    )
+
 
 class PtBinnedPRSideTrackingValidationModule(PRSideTrackingValidationModule):
 
@@ -105,6 +126,24 @@ class PtBinnedPRSideTrackingValidationModule(PRSideTrackingValidationModule):
     # TODO: Add some sort of groupby pt_value plots that we actually want
     # Refiners to be executed on terminate #
     # #################################### #
+
+    @refiners.Refiner
+    def save_binned_tan_lambda_pull_analysis(self, crops, **kwds):
+        if self.fit:
+            quantity_name = 'tan #lambda'
+        else:
+            quantity_name = 'seed tan #lambda'
+
+        save_pull_analysis = refiners.save_pull_analysis(
+            quantity_name=quantity_name,
+            groupby="pt_value",
+            part_name="pr_tan_lambda",
+            name="{module.name}_{quantity_name}_PtBin_{groupby_value}",
+            title_postfix=" Pt = {groupby_value} GeV",
+            # folder_name=".", #Dummy everything in the top level folder
+        )
+
+        save_pull_analysis(self, crops, **kwds)
 
 
 class PtBinnedTrackingValidationModule(SeparatedTrackingValidationModule):

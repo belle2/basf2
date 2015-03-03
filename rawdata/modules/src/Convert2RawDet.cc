@@ -132,7 +132,7 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
       int delete_flag;
       delete_flag = 0; // this buffer will not be deleted in RawCOPPER destructor.
       tempcpr.SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
-      int subsys_id = tempcpr.GetSubsysId(0);
+      int subsys_id = tempcpr.GetNodeID(0);
 
       delete_flag = 1; // this buffer will be deleted in Raw*** destructor.
 

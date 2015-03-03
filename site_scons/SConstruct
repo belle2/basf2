@@ -129,6 +129,13 @@ else:
     print 'Aborted because of unknown build option:', option
     Exit(1)
 
+
+#allow overriding some things from command line (e.g. to enable scan-build)
+override_from_environment = ['CC', 'CXX', 'LD']
+for v in override_from_environment:
+  if v in os.environ:
+    global_env[v] = os.environ[v]
+
 # central release
 repository = None
 if analysis:

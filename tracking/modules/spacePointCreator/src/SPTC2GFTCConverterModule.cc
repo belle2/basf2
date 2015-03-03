@@ -10,6 +10,8 @@
 #include <tracking/modules/spacePointCreator/SPTC2GFTCConverterModule.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
+#include <genfit/TrackCand.h>
+
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 

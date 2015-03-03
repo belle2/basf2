@@ -10,24 +10,17 @@
 
 // framework
 #include <framework/datastore/StoreArray.h>
-// #include <testbeam/vxd/dataobjects/TelCluster.h> // for completeness (in case someone wants to use telClusters) PLUS won't be neede in the future
 #include <framework/gearbox/Const.h>
-
-// testbeam SpacePoints
-// #include <testbeam/vxd/tracking/spacePointCreation/TBSpacePoint.h> // not allowed to use in this class -> outsource constructor to module (done already)
 
 // SpacePointTrackCand.h
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-
 
 #include <TDatabasePDG.h>
 #include <TVectorD.h>
 #include <TMatrixD.h>
 
 // debugging
-#include <iostream>
-#include <sstream>
-#include <algorithm> // sort & unique
+#include <sstream> // used in print method
 
 using namespace std;
 using namespace Belle2;

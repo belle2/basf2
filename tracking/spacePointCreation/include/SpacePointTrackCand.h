@@ -14,10 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreArray.h>
 
-// genfit TrackCand
-#include <genfit/TrackCand.h>
-#include <genfit/TrackCandHit.h>
-
 // SpacePoint
 #include <tracking/spacePointCreation/SpacePoint.h>
 
@@ -65,6 +61,7 @@ namespace Belle2 {
       c_checkedSameSensors = 64, /**< bit 6: It has been checked if two consecutive SpacePoints are on the same sensor for this SpacePointTrackCand */
       c_checkedMinDistance =  128, /**< bit 7: It has been checked if two consecutive SpacePoints are far enough apart */
       c_curlingTrack = 256, /**< bit 8: SpacePointTrackCand is curling (resp. is part of a curling SpacePointTrackCand) */
+      c_omittedClusters = 512, /**< bit 9: Not all Clusters of the genfit::TrackCand have been used to create this SpacePointTrackCand */
     };
 
     /**

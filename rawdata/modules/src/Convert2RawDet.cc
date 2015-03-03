@@ -78,6 +78,7 @@ void Convert2RawDetModule::event()
 
   StoreArray<RawDataBlock> raw_datablkarray;
   for (int i = 0; i < raw_datablkarray.getEntries(); i++) {
+
     convertDataObject(raw_datablkarray[ i ]);
   }
   raw_datablkarray.clear();
@@ -85,6 +86,7 @@ void Convert2RawDetModule::event()
 
   StoreArray<RawCOPPER> raw_cprarray;
   for (int i = 0; i < raw_cprarray.getEntries(); i++) {
+    //    (raw_cprarray[ i ]->GetBuffer(0))[ 6 ] |= 0x02000000;
     convertDataObject((RawDataBlock*)(raw_cprarray[ i ]));
   }
   raw_cprarray.clear();
@@ -122,7 +124,7 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
       int nwords = raw_dblk->GetBlockNwords(blkid);
       int* temp_buf = new int[ nwords ];
       memcpy(temp_buf, raw_dblk->GetBuffer(blkid), nwords * sizeof(int));
-
+      temp_buf[ 6 ] |=  0x02000000;
 
 
       // Set buffer to RawCOPPER class to access detector ID
@@ -134,7 +136,10 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
       tempcpr.SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
       int subsys_id = tempcpr.GetNodeID(0);
 
+
+
       delete_flag = 1; // this buffer will be deleted in Raw*** destructor.
+
 
 
       if ((subsys_id & DETECTOR_MASK) == SVD_ID) {
@@ -165,7 +170,7 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
         StoreArray<RawTRG> ary;
         (ary.appendNew())->SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
       } else {
-        printf("Undefined detector ID(0x%.8x). Exiting...", subsys_id);
+        printf("Undefained detector ID(0x%.8x). Exiting...", subsys_id);
         exit(1);
       }
 

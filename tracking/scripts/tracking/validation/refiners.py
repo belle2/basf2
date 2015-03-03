@@ -391,6 +391,7 @@ class SaveProfilesRefiner(Refiner):
 class SavePullAnalysis(Refiner):
     default_name = "{module.name}_{quantity_name}"
     default_contact = "{module.contact}"
+    default_title_postfix = " in {module.name}"
 
     default_truth_name = "{part_name}_truth"
     default_estimate_name = "{part_name}_estimate"
@@ -399,6 +400,7 @@ class SavePullAnalysis(Refiner):
     def __init__(self,
                  name=None,
                  contact=None,
+                 title_postfix=None,
                  part_name=None,
                  truth_name=None,
                  estimate_name=None,
@@ -410,6 +412,7 @@ class SavePullAnalysis(Refiner):
 
         self.name = name
         self.contact = contact
+        self.title_postfix = title_postfix
 
         self.part_name = part_name
 
@@ -449,6 +452,14 @@ class SavePullAnalysis(Refiner):
                            groupby=groupby_part_name,
                            groupby_value=groupby_value)
 
+        title_postfix = self.title_postfix or self.default_title_postfix
+        title_postfix = title_postfix.format(refiner=self,
+                                             module=harvesting_module,
+                                             quantity_name=quantity_name_for_name,
+                                             part_name=self.part_name,
+                                             groupby=groupby_part_name,
+                                             groupby_value=groupby_value)
+
         if self.truth_name is not None:
             truth_name = self.truth_name
         else:
@@ -478,7 +489,7 @@ class SavePullAnalysis(Refiner):
                                      absolute=self.absolute,
                                      outlier_z_score=self.outlier_z_score,
                                      plot_name_prefix=name,
-                                     plot_title_postfix='')
+                                     plot_title_postfix=title_postfix)
 
         pull_analysis.analyse(truths, estimates, variances)
 

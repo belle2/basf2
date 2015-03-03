@@ -151,8 +151,8 @@ void BKLMUnpackerModule::event()
           B2INFO(buffer);
 
           //Brandon uses 4 16 bit words
-          int firstBrandonWord;
-          int secondBrandonWord;
+          //          int firstBrandonWord;
+          //          int secondBrandonWord;
           char buffer1[100];
           char buffer2[100];
 

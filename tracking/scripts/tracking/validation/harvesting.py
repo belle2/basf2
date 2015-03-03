@@ -392,7 +392,7 @@ def test():
     @save_fom(aggregation=np.mean, select=["energy", "pt"], name="physics", key="mean_{part_name}")
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, filter=lambda xs: xs != 0.0, filter_on="is_secondary", select=["pt", "is_secondary"], folder_name="secondary_pt")
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, groupby="status", select=["is_secondary", "pt"])
-    @save_histograms(outlier_z_score=5.0, allow_discrete=True, select=["is_secondary", "pt"], stackby="is_secondary", folder_name="pt_stackby_is_secondary")
+    @save_histograms(outlier_z_score=5.0, allow_discrete=True, select=["is_secondary", "pt"], stackby="is_secondary", folder_name="pt_stackby_is_secondary/nested_test")
     @save_histograms(outlier_z_score=5.0, allow_discrete=True)
     @save_tree()
     @harvest(foreach="MCParticles", pick=lambda mc_particle: not mc_particle.hasStatus(Belle2.MCParticle.c_IsVirtual), output_file_name="MCParticleOverview.root")

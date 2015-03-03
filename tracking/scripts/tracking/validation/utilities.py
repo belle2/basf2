@@ -72,6 +72,10 @@ def root_cd(tdirectory):
             if not tdirectory:
                 raise RuntimeError("Could not create or find folder %s" % tdirectory_name)
 
+            # If tdirectory_name is as hierachy like a/b/c make sure we select the most nested folder
+            # (and not a as the documentation of TDirectory.mkdir suggests).
+            tdirectory = save_tdirectory.GetDirectory(tdirectory_name)
+
     try:
         if tdirectory is not None:
             tdirectory.cd()

@@ -314,17 +314,17 @@ class SaveProfilesRefiner(Refiner):
             for x_part_name, x_parts in x_crops.items():
 
                 if self.skip_single_valued and not self.has_more_than_one_value(x_parts):
-                    get_logger.info('Skipping "%s" by "%s" profile because x has only a single value "%s"',
-                                    y_part_name,
-                                    x_part_name,
-                                    x_parts[0])
+                    get_logger().info('Skipping "%s" by "%s" profile because x has only a single value "%s"',
+                                      y_part_name,
+                                      x_part_name,
+                                      x_parts[0])
                     continue
 
                 if self.skip_single_valued and not self.has_more_than_one_value(y_parts):
-                    get_logger.info('Skipping "%s" by "%s" profile because y has only a single value "%s"',
-                                    y_part_name,
-                                    x_part_name,
-                                    y_parts[0])
+                    get_logger().info('Skipping "%s" by "%s" profile because y has only a single value "%s"',
+                                      y_part_name,
+                                      x_part_name,
+                                      y_parts[0])
                     continue
 
                 name = self.name or self.default_name

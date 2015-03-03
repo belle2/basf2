@@ -14,7 +14,7 @@
 #include <TMath.h>
 #include <cmath>
 
-#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -30,7 +30,7 @@ TrackHit::TrackHit(CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIW
 
   m_cdcHit = hit;
 
-  CDC::SimpleTDCCountTranslator sDriftTimeTranslator;
+  CDC::RealisticTDCCountTranslator sDriftTimeTranslator;
   m_driftLength = sDriftTimeTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
   //FIXME: Provide correct parameters, as soon as driftTimeTranslator supports them
   m_sigmaDriftLength = sDriftTimeTranslator.getDriftLengthResolution(-999., WireID(hit->getID()), false, -999., -999.);

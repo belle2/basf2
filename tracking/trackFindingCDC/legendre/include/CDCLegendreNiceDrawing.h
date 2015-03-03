@@ -7,7 +7,7 @@
 
 #pragma once
 #include <framework/datastore/StoreArray.h>
-#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <iomanip>
 
 #include <TVector2.h>
@@ -28,7 +28,7 @@ namespace Belle2 {
   class MCParticle;
 
   namespace CDC {
-    class SimpleTDCCountTranslator;
+    class RealisticTDCCountTranslator;
   }
 
 
@@ -227,7 +227,7 @@ namespace Belle2 {
 
       std::ofstream m_fig; /**< Output file */
 
-      CDC::SimpleTDCCountTranslator m_driftTimeTranslator; /**< Drift time translator */
+      CDC::RealisticTDCCountTranslator m_driftTimeTranslator; /**< Drift time translator */
 
     private:
       /** Estimate the track quality based on hitpattern and so on. Just for testing purposes */

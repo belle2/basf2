@@ -95,6 +95,7 @@ void BKLMUnpackerModule::loadMap()
 
 }
 
+
 void BKLMUnpackerModule::beginRun()
 {
   loadMap();
@@ -123,16 +124,43 @@ void BKLMUnpackerModule::event()
 
       //is this the same as get1stDetectorBuffer??
       ///   int* data=rawKLM[i]->Get1stFINESSEBuffer(j);
-      int copperId = rawKLM[i]->GetCOPPERNodeId(j);
+      unsigned int copperId = rawKLM[i]->GetNodeID(j);
+      //                copperId=1;
+      //cout <<"uint copperId " <<copperId<<endl;
+      //short sCopperId = rawKLM[i]->GetCOPPERNodeId(j);
+      //  cout <<"s copperid: "<< sCopperId <<endl;
+
+
       rawKLM[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
+        //addendum: There is always an additional word (count) in the end
+        int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
+        int numHits = rawKLM[i]->GetDetectorNwords(j, finesse_num) / hitLength;
         int* buf_slot = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
-        //      cout <<"data in finesse num: " << finesse_num<< "(we have " << rawKLM[i]->GetDetectorNwords(j,finesse_num) << " words " <<endl;
+        cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j, finesse_num) << " words, " << numHits << " hits)" << endl;
+        if (numDetNwords > 0)
+          cout << "word counter is: " << ((buf_slot[numDetNwords - 1] >> 16) & 0xFFFF) << endl;
+        cout << "trigger tag is " << rawKLM[i]->GetTRGType(j) << endl;
+        cout << "ctime is : " << rawKLM[i]->GetTTCtime(j) << endl << endl;
         //we should get two words of 32 bits...
+
+
         for (int k = 0; k < rawKLM[i]->GetDetectorNwords(j, finesse_num); k++) {
           char buffer[200];
           sprintf(buffer, "%.8x\n", buf_slot[k]);
           B2INFO(buffer);
+
+          //Brandon uses 4 16 bit words
+          int firstBrandonWord;
+          int secondBrandonWord;
+          char buffer1[100];
+          char buffer2[100];
+
+          sprintf(buffer1, "%.4x\n", buf_slot[k] & 0xffff);
+          sprintf(buffer2, "%.4x\n", (buf_slot[k] >> 16) & 0xffff);
+
+          cout << buffer2 << buffer1;
+
           //          printf("%.8x\n", buf_slot[k]);
 
           //in Brandon's documenation a word is 16 bit, however the basf2 word seems to be 32 bit
@@ -144,20 +172,20 @@ void BKLMUnpackerModule::event()
           //TDC (lowest 11 bits)
           //fourth word:
           //charge (lowest 12bits)
-
+          if (!((k - 1) % (hitLength)))
+            cout << endl;
         }
 
-        int numHits = rawKLM[i]->GetDetectorNwords(j, finesse_num) / hitLength;
-        //addendum: There is always an additional word (count) in the end
-        int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
+
         //either no data (finesse not connected) or with the count word
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           char buffer[200];
-          sprintf(buffer, "not the correct number of words: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
+          sprintf(buffer, "word count incorrect: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
           B2ERROR(buffer);
           continue;
         }
         B2INFO("this finesse has " << numHits << " hits " << endl);
+
         if (numDetNwords > 0)
           B2INFO("counter is: " << (buf_slot[numDetNwords - 1] & 0xFFFF) << endl);
         for (int iHit = 0; iHit < numHits; iHit++) {
@@ -177,9 +205,10 @@ void BKLMUnpackerModule::event()
           unsigned short ctime = bword2 & 0xFFFF; //full bword
           unsigned short tdc = bword3 & 0x7FF;
           unsigned short charge = bword4 & 0xFFF;
+          //    cout <<"copperID: "<< copperId<<endl;
           B2INFO("copper: " << copperId << " finesse: " << finesse_num << ", ");
-          B2INFO("Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl);
-
+          //          B2INFO("Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl);
+          cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl;
 
           int electId = electCooToInt(copperId, finesse_num + 1, lane, axis);
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {

@@ -80,7 +80,7 @@ class HarvestingModule(basf2.Module):
     from on StoreArray.
 
     It runs as a proper module in the main path and examines each object in a StoreArray
-    in each event. Each
+    in each event.
 
 
     Notes
@@ -112,9 +112,8 @@ class HarvestingModule(basf2.Module):
     where self is the module instance, crops is the MutableMapping of numpy arrays and tdirectory is the current tdirectory to which
     the current output shall be written. The additional kwds leave room for future additional arguments.
 
-    Second way is to define the refiner method (like plot) out of line and add it the the harvesting module instance refiners list like
+    Second way is to define the refiner method (like plot) out of line and add it to the harvesting module instance refiners list like
     harvesting_module.refiners.append(plot).
-
 
     Other specialised decorators to mark a function as a Refiner such as
 
@@ -124,12 +123,13 @@ class HarvestingModule(basf2.Module):
 
     exist.
 
-    Predefined refiner function exist in the refiners python module.
+    Predefined refiner functions exist in the refiners python module as well.
     For instance
 
         save_tree = refiners.save_tree()
 
     is a predefined method to output the MutableMapping of numpy arrays as a TTree.
+
 
     Examples
     --------
@@ -152,10 +152,11 @@ class HarvestingModule(basf2.Module):
     title : string, optional
         Name of the harvest that is used in the title of ROOT plots and trees. Defaults to the name.
     contact : string, optional
-        Contract email adress to be used in the validation plots contract. Defaults to None.
+        Contact email adress to be used in the validation plots contact. Defaults to None.
     expert_level : int, optional
         Expert level that can be used to switch on more plots. Generally the higher the more detailed to analysis.
         Meaning depends entirely on the subclass implementing a certain policy. Defaults to default_expert_level.
+
 
     Attributes
     ----------

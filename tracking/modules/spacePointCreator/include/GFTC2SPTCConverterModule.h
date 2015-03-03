@@ -15,6 +15,10 @@
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
+#include <genfit/TrackCand.h>
+#include <genfit/TrackCandHit.h>
+
+
 #include <string>
 #include <utility>
 
@@ -69,6 +73,37 @@ namespace Belle2 {
 
   protected:
 
+    /**
+     * enum for differentiating different reasons why a conversion failed
+     * negative values mean fail!
+     */
+    enum conversionStatus {
+      c_noFail = 0, /**< conversion without any problems */
+      c_foundNoSpacePoint = -1, /**< conversion failed because no related SpacePoint was found to a Cluster/Hit of the GFTC */
+      c_foundNoTrueHit = -2, /**< conversion failed because there was no related SpacePoint to a TrueHit */
+      c_unsuitableGFTC = -3, /**< conversion failed because the GFTC is considered not suitable for conversion */
+      c_unusedHits = -4, /**< conversion failed because there were unused Hits */
+      c_nonSingleSP = -5, /**< conversion failed because there were more than one single Cluster SpacePoints related to a Cluster */
+      c_noValidSP = -6, /**< conversion failed because there was no valid SpacePoint (only possible for double Cluster SpacePoints) SpacePoints */
+      c_lowNDF = -7, /**< conversion failed because the created SpacePointTrackCand had not enough degrees of freedom */
+    };
+
+    /** get the enum representation of an integer */
+    conversionStatus getFailEnum(int intToConvert) {
+      switch (intToConvert) {
+        case 0: return c_noFail;
+        case -1: return c_foundNoSpacePoint;
+        case -2: return c_foundNoTrueHit;
+        case -3: return c_unsuitableGFTC;
+        case -4: return c_unusedHits;
+        case -5: return c_nonSingleSP;
+        case -6: return c_noValidSP;
+        case -7: return c_lowNDF;
+        default: return c_foundNoSpacePoint;
+      }
+    }
+
+    // ========================================================== PARAMETERS ============================================================================
     std::string m_PXDClusterName; /**< PXDCluster collection name */
 
     std::string m_SVDClusterName; /**< SVDCluster collection name */
@@ -89,9 +124,15 @@ namespace Belle2 {
 
     bool m_PARAMcheckNoSingleSVDSP; /**< Switch for checking the StoreArray of non-single cluster SVD SpacePoints in initialize. Need this for cases, where only single Cluster SVD SpacePoints are presented to the module */
 
+    bool m_PARAMskipCluster; /**< Switch for controlling the behavior of the converter, when for one or more Clusters no appropriate SpacePoint can be found */
+
     int m_PARAMminNoOfSpacePoints; /**< parameter for specifying the minimal number of SpacePoints a SpacePointTrackCand has to have */
 
-    // some counters for testing
+    int m_PARAMminNDF; /**< parameter for specifying a minimal number of degrees of freedom a SpacePointTrackCand has to have in order to be registered in the DataStore */
+
+    bool m_OLDWAY;
+
+    // ============================================================= COUNTER VARIABLES ====================================================================
     unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were converted (if a curling track is split up, this counter will still be only increased by 1!) */
 
     unsigned int m_genfitTCCtr; /**< Counter for genfit::TrackCands which were presented to the module */
@@ -107,10 +148,121 @@ namespace Belle2 {
     unsigned int m_noTwoClusterSPCtr; /**< Counter for cases where no related two Cluster could be found for a Cluster. NOTE: Counter counts cases where there really was no SpacePoint for a Cluster but does not count the cases where a found two Cluster SP was rejected later on in the process! */
 
     unsigned int singleTrueHitCtr; /**< Counter for occurencies of only one TrueHit being related to a SpacePoint */
+
     unsigned int passedTHCheckCtr; /**< Counter for testing how many SpacePoints would have passed another check then the currently applied */
+
     unsigned int nonSingleTrueHitCtr; /**< Counter for occurencies of more than one TrueHit being related to a SpacePoint */
 
     unsigned int m_abortedMinNoOfSPCtr; /**< Counter for SpacePointTrackCands that were not stored due to a too small number of SpacePoints */
+
+    // NEW
+
+    unsigned int m_abortedLowNDFCtr; /**< Counter for SpacePointTrackCands that were not stored due to a too small number of degrees of freedom */
+
+    unsigned int m_skippedPXDnoSPCtr; /**< Counter for skipped PXD Clusters, due to no found SpacePoint */
+
+    unsigned int m_skippedPXDnoTHCtr; /**< Counter for skipped PXD Clusters, due to no related TrueHit to a SpacePoint */
+
+    unsigned int m_skippedSVDnoSPCtr; /**< Counter for skipped SVD Clusters, due to no found SpacePoint */
+
+    unsigned int m_skippedSVDnoTHCtr; /**< Counter for skipped SVD Clusters, due to no related TrueHit to a SpacePoint */
+
+    unsigned int m_singleClusterSPCtr; /**< Counter for single cluster SVD SpacePoints */
+
+    unsigned int m_abortedMiscCtr; /**< temporary counter used for counting all failed conversions for which the reason cannot be deduced at the moment */
+
+    unsigned int m_skippedCluster; /**< Counter for skipped Cluster */
+
+    unsigned int m_skippedPXDunsuitableCtr;
+
+    unsigned int m_skippedSVDunsuitableCtr;
+
+    unsigned int m_nonSingleSPCtr; /**< Counter for cases where there is more than one single Cluster SpacePoint related to a Cluster */
+
+    unsigned int m_someUnnamedCtr;
+
+    /** reset counters to 0 to avoid indeterministic behaviour */
+    void initializeCounters() {
+      m_SpacePointTCCtr = 0;
+      m_genfitTCCtr = 0;
+      m_abortedTrueHitCtr = 0;
+      m_abortedUnsuitableTCCtr = 0;
+      m_abortedNoSPCtr = 0;
+      m_abortedNonSingleTrueHitCtr = 0;
+      m_noTwoClusterSPCtr = 0;
+      singleTrueHitCtr = 0;
+      passedTHCheckCtr = 0;
+      nonSingleTrueHitCtr = 0;
+      m_abortedMinNoOfSPCtr = 0;
+
+      // NEW
+      m_skippedPXDnoSPCtr = 0;
+      m_skippedPXDnoTHCtr = 0;
+      m_skippedSVDnoSPCtr = 0;
+      m_skippedSVDnoTHCtr = 0;
+      m_singleClusterSPCtr = 0;
+
+      m_abortedLowNDFCtr = 0;
+
+      m_skippedCluster = 0;
+      m_skippedPXDunsuitableCtr = 0;
+      m_skippedSVDunsuitableCtr = 0;
+      // TEMPORARY
+      m_abortedMiscCtr = 0;
+      m_someUnnamedCtr = 0;
+
+      // w/o output at the moment -> TODO: put into terminate
+      m_nonSingleSPCtr = 0;
+    }
+
+    /** increase the counter that 'belongs' to the conversionStatus */
+    void increaseFailCounter(conversionStatus status) {
+      switch (status) {
+        case c_foundNoSpacePoint: m_abortedNoSPCtr++; break;
+        case c_foundNoTrueHit: m_abortedTrueHitCtr++; break;
+        case c_unsuitableGFTC: m_abortedUnsuitableTCCtr++; break;
+        case c_lowNDF: m_abortedLowNDFCtr++; break;
+        default: m_abortedMiscCtr++; break;
+      }
+      return;
+    }
+
+    /**
+     * increase the appropriate counter variable if a Cluster is skipped (i.e. only called if 'skipClusters' is set to true!)
+     * WARNING: decides which counter to increase (i.e. which ClusterType) via the layerNumber (hardcoded values!)
+     */
+    template<typename ClusterType>
+    void increaseSkippedCounter(conversionStatus status, ClusterType* cluster) {
+      short unsigned int layerNumber = cluster->getSensorID().getLayerNumber();
+      std::cout << "layer number: " << layerNumber << " VxdID " << cluster->getSensorID() << std::endl;
+      B2ERROR("PENG")
+      switch (status) {
+        case c_foundNoSpacePoint:
+          if (layerNumber < 3) m_skippedPXDnoSPCtr++;
+          else if (layerNumber < 7) m_skippedSVDnoSPCtr++;
+          else throw SpacePointTrackCand::UnsupportedDetType();
+          break;
+        case c_foundNoTrueHit:
+          if (layerNumber < 3) m_skippedPXDnoTHCtr++;
+          else if (layerNumber < 7) m_skippedSVDnoTHCtr++;
+          else throw SpacePointTrackCand::UnsupportedDetType();
+          break;
+        case c_unsuitableGFTC:
+          if (layerNumber < 3) m_skippedPXDunsuitableCtr++;
+          else if (layerNumber < 7) m_skippedSVDunsuitableCtr++;
+          else throw SpacePointTrackCand::UnsupportedDetType();
+          break;
+        default:
+          m_skippedCluster++; break;
+      }
+      return;
+    }
+    // ================================================================ INTERNALLY USED VARIABLES ===========================================================
+    std::string svdMainArrayName; /**< Name of the Array of SVD SpacePoints that shall be searched first */
+
+    int m_NDF; /**< number of degrees of freedom. counted during creation of SpacePointTrackCand */
+
+    // ================================================= TYPEDEFS ============================================================================================================
 
 // #ifndef __CINT__ // was once needed, when it was defined in SpacePointTrackCand.h
     template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */
@@ -120,17 +272,94 @@ namespace Belle2 {
 
     template<typename T> using flaggedPair = boost::tuple<bool, T, T>; /**< typdef, for avoiding having a vector<bool> and a vector<pair<T,T>> */
 
-    void initializeCounters(); /**< reset counters to 0 to avoid indeterministic behaviour */
+    // ============================================================================ MODULE METHODS ==============================================================================
+
 
     void markHitAsUsed(std::vector<flaggedPair<int> >& flaggedHitIDs, int hitToMark); /**< mark a hit as used, i.e. change its boolean value to true. Code readability reasons mainly, Output hardcoded to debug level 150 */
 
-    const Belle2::SpacePointTrackCand createSpacePointTC(const genfit::TrackCand* genfitTC); /**< create a SpacePointTrackCand from the genfit::TrackCand */
+    const Belle2::SpacePointTrackCand OLDcreateSpacePointTC(const genfit::TrackCand* genfitTC); /**< create a SpacePointTrackCand from the genfit::TrackCand */
 
-    const Belle2::SpacePoint* getPXDSpacePoint(const PXDCluster* pxdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the SpacePoint related to the passed PXDCluster */
+    const Belle2::SpacePoint* OLDgetPXDSpacePoint(const PXDCluster* pxdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the SpacePoint related to the passed PXDCluster */
 
-    const Belle2::SpacePoint* getSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the appropriate SpacePoint of the passed SVD Cluster */
+    const Belle2::SpacePoint* OLDgetSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the appropriate SpacePoint of the passed SVD Cluster */
 
-    const Belle2::SpacePoint* getSingleClusterSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the single cluster SVD SpacePoint */
+    const Belle2::SpacePoint* OLDgetSingleClusterSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the single cluster SVD SpacePoint */
+
+
+    // NEW TEMPLATED VERSION
+    /**
+     * create a SpacePointTrackCand from the genfit::TrackCand
+     * @returns .first is the SPTC, .second is the conversion status, if < 0, something went wrong
+     */
+    std::pair<const Belle2::SpacePointTrackCand, conversionStatus>
+    createSpacePointTC(const genfit::TrackCand* genfitTC, const StoreArray<PXDCluster>& pxdClusters, const StoreArray<SVDCluster>& svdClusters);
+
+    /**
+     * TODO: documentation
+     */
+    std::pair<Belle2::SpacePoint*, conversionStatus>
+    processTrackCandHit(genfit::TrackCandHit* hit, const StoreArray<PXDCluster>& pxdClusters, const StoreArray<SVDCluster>& svdClusters, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit);
+
+    /**
+     * templated version to get a SpacePoint from a Cluster
+     * @param arrayName name of the StoreArray to be searched, defaults to empty string
+     * @param singleCluster singleCluster SpacePoint? (Can probably be done in another way as well)
+     * NOTE: returns NULL if no (appropriate) SpacePoint can be found!
+     * @returns .first is a pointer to the SpacePoint, .second is the status, if this is < 0, .first is NULL! (i.e. check .second first!)
+     */
+    template<typename ClusterType, typename TrueHitType>
+    std::pair<Belle2::SpacePoint*, conversionStatus>
+    getSpacePoint(const ClusterType* cluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit, bool singleCluster, std::string arrayName = ""); /**< get the SpacePoint related to a Cluster */
+
+    /**
+     * given a RelationVector with SpacePoints in it, it tries to get the appropriate one (see main documentation of module)
+     * NOTE: marks hits as used!
+     * NOTE: if no appropriate SpacePoint can be found, returns a NULL pointer!
+     * templated for easier handling of other ClusterTypes later, at the moment only SVDCluster needed!
+     * @returns .first is a pointer to the appropriate SpacePoint, .second is the conversion status, if this is <0 .first is NULL! (i.e. check .second first)
+     */
+    template<typename ClusterType>
+    std::pair<Belle2::SpacePoint*, conversionStatus>
+    findAppropriateSpacePoint(const Belle2::RelationVector<Belle2::SpacePoint>& spacePoints, std::vector<flaggedPair<int> >& flaggedHitIDs);
+
+    /**
+     * check if the Cluster (of a SpacePoint) is valid and/or exists in a genfit::TrackCand
+     * @param clusterInd index of Cluster to be checked in StoreArray
+     * @param detID detector id
+     * @param flaggedHitIDs (detId, hitId) of genfit::TrackCand with flag if hit has already been used
+     * @returns .first is validPos, .second is existingPos, if one is not found a negative number is returned!
+     */
+    std::pair<int, int> checkExistAndValid(int clusterInd, int detID, std::vector<flaggedPair<int> >& flaggedHitIDs);
+
+    /**
+     * get the position of the appropriate SpacePoint inside the RelationVector
+     * NOTE: returns negative index if no SpacePoint fitting the criteria can be found!
+     */
+    int getAppropriateSpacePointIndex(const std::vector<std::pair<bool, bool> >& existAndValidSPs, const std::vector<std::pair<int, int> >& clusterPositions);
+
+    /**
+     * get the indices of the Clusters related to the SpacePoint. size of returned vector is <= 2!
+     */
+    template<typename ClusterType>
+    std::vector<int> getClusterIndices(const Belle2::SpacePoint* spacePoint);
+
+    /**
+     * get the NDF of a SpacePoint
+     */
+    int getNDF(Belle2::SpacePoint* spacePoint);
+
+    /**
+     * check if all hits have been used (i.e. if all flags in the vector of flaggedPairs is set to true)
+     */
+    bool checkUsedAllHits(std::vector<flaggedPair<int> >& flaggedHitIDs);
+
+    /**
+     * handle some exceptions depending on if Clusters should be skipped or not
+     * + checks if an exception is of a kind that can be handled by omitting a Cluster or if it is something more serios (if so rethrow)
+     * NOTE: probably not needed, thus only minimally implemented at the moment!
+     */
+    template<typename ExceptionT>
+    bool handleBelle2Exceptions(ExceptionT& exception, bool skipClusters);
 
     // TODO TODO TODO TODO TODO CLEAN UP
 
@@ -175,5 +404,4 @@ namespace Belle2 {
 
     // TODO TODO TODO TODO TODO CLEAN UP
   };
-
 }

@@ -14,6 +14,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
+#include <genfit/TrackCand.h>
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>

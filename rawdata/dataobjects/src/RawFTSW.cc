@@ -72,9 +72,9 @@ int RawFTSW::GetNwordsHeader(int n)
 }
 
 
-int RawFTSW::GetFTSWNodeID(int n)
+unsigned int RawFTSW::GetFTSWNodeID(int n)
 {
-  return  m_buffer[ GetBufferPos(n) +  POS_NODE_ID ];
+  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_NODE_ID ]);
 }
 
 unsigned int RawFTSW::GetEveNo(int n)

@@ -42,7 +42,7 @@ namespace Belle2 {
     int GetNwordsHeader(int n);
 
     //! Get Node # ( should be "TTD " )
-    int GetFTSWNodeID(int n);
+    unsigned int GetFTSWNodeID(int n);
 
     //! Get event #
     unsigned int GetEveNo(int n);

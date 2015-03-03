@@ -42,7 +42,7 @@ namespace Belle2 {
     int GetNwordsHeader(int n);
 
     //! Get Node ID
-    int GetNodeID(int n);
+    unsigned int GetNodeID(int n);
 
     //! Get Event #
     unsigned int GetEveNo(int n);

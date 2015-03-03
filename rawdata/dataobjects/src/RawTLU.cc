@@ -32,9 +32,9 @@ int RawTLU::GetNwordsHeader(int n)
 }
 
 
-int RawTLU::GetNodeID(int n)
+unsigned int RawTLU::GetNodeID(int n)
 {
-  return  m_buffer[ GetBufferPos(n) +  POS_NODE_ID ];
+  return (unsigned int)(m_buffer[ GetBufferPos(n) +  POS_NODE_ID ]);
 }
 
 unsigned int RawTLU::GetEveNo(int n)

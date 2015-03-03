@@ -58,7 +58,7 @@ namespace Belle2 {
     //! set contents of header
     void SetEveNo(unsigned int eve_no);    //! set contents of header
 
-    void SetNodeID(int node_id);    //! set contents of header
+    void SetNodeID(unsigned int node_id);    //! set contents of header
 
     void SetDataType(int data_type);    //! set contents of header
 
@@ -104,7 +104,7 @@ namespace Belle2 {
 
     unsigned int GetEveNo();  //! get contents of header
 
-    int GetNodeID();  //! get contents of header
+    unsigned int GetNodeID();  //! get contents of header
 
     int GetDataType();  //! get contents of header
 
@@ -267,7 +267,7 @@ namespace Belle2 {
     m_buffer[ POS_EVE_NO ] = eve_no;
   }
 
-  inline void RawHeader_v0::SetNodeID(int node_id)
+  inline void RawHeader_v0::SetNodeID(unsigned int node_id)
   {
     CheckSetBuffer();
     m_buffer[ POS_NODE_ID ] = node_id;
@@ -400,10 +400,10 @@ namespace Belle2 {
     return m_buffer[ POS_EVE_NO ];
   }
 
-  inline int RawHeader_v0::GetNodeID()
+  inline unsigned int RawHeader_v0::GetNodeID()
   {
     CheckGetBuffer();
-    return m_buffer[ POS_NODE_ID ];
+    return (unsigned int)(m_buffer[ POS_NODE_ID ]);
   }
 
   inline int RawHeader_v0::GetDataType()

@@ -39,39 +39,51 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
                  trackCandidatesColumnName="TrackCands",
                  expert_level=None):
 
-        open_tfile_module = basf2.register_module('OpenTFile')
+        # Output TFile to be opened in the initialize methode
+        self.output_file_name = output_file_name
 
-        storeName = "validation_output_tfile"
-
-        open_tfile_module.param(dict(
-            fileName=output_file_name,
-            storeName=storeName,
-            option="RECREATE",
-        ))
-
-        datastore_output_file_name = "datastore://" + storeName
+        # First forward the output_file_name to the separate modules
+        # but we open the TFile in the top level and forward it to them on initialize.
 
         mc_side_module = self.MCSideModule(name,
                                            contact,
-                                           output_file_name=datastore_output_file_name,
+                                           output_file_name=output_file_name,
                                            trackCandidatesColumnName=trackCandidatesColumnName,
                                            expert_level=expert_level)
 
         pr_side_module = self.PRSideModule(name,
                                            contact,
-                                           output_file_name=datastore_output_file_name,
+                                           output_file_name=output_file_name,
                                            trackCandidatesColumnName=trackCandidatesColumnName,
                                            expert_level=expert_level)
 
         eventwise_module = self.EventwiseModule(name,
                                                 contact,
-                                                output_file_name=datastore_output_file_name,
+                                                output_file_name=output_file_name,
                                                 trackCandidatesColumnName=trackCandidatesColumnName,
                                                 expert_level=expert_level)
 
-        modules = [open_tfile_module, mc_side_module, pr_side_module, eventwise_module]
+        self.modules = [
+            mc_side_module,
+            pr_side_module,
+            eventwise_module]
 
-        super(SeparatedTrackingValidationModule, self).__init__(modules=modules)
+        super(SeparatedTrackingValidationModule, self).__init__(modules=self.modules)
+
+    def initialize(self):
+        super(SeparatedTrackingValidationModule, self).initialize()
+        output_tfile = ROOT.TFile(self.output_file_name, "RECREATE")
+
+        # Substitute the output file with the common output file opened in this module.
+        for module in self.modules:
+            module.output_file_name = output_tfile
+
+        self.output_tfile = output_tfile
+
+    def terminate(self):
+        self.output_tfile.Flush()
+        self.output_tfile.Close()
+        super(SeparatedTrackingValidationModule, self).terminate()
 
 
 # contains all informations necessary for track filters to decide whether

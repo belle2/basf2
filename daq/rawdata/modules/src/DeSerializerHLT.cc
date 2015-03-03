@@ -155,7 +155,7 @@ void DeSerializerHLTModule::event()
         //  RawHeader hdr;
         // Fill data to Raw*** class
 
-        switch (temp_rawcopper.GetSubsysId(k * num_nodes_in_sendblock + l) & DETECTOR_MASK) {
+        switch (temp_rawcopper.GetNodeID(k * num_nodes_in_sendblock + l) & DETECTOR_MASK) {
           case CDC_ID :
             RawCDC* rawcdc;
             rawcdc = raw_cdcarray.appendNew();

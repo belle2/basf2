@@ -125,7 +125,7 @@ void RawInputModule::registerRawCOPPERs()
     }
 
     // Get subsys id
-    int subsysid = tempcpr.GetSubsysId(cprid) & DETECTOR_MASK;
+    int subsysid = tempcpr.GetNodeID(cprid) & DETECTOR_MASK;
     //    B2INFO ( "--> subsys ID = " << subsysid << " Block words = " << nwds_buf );
     // Switch to each detector and register RawXXX
     if (subsysid == CDC_ID) {

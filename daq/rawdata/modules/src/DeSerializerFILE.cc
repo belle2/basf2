@@ -310,7 +310,7 @@ void DeSerializerFILEModule::event()
       RawCOPPER temp_raw_copper;
       temp_raw_copper.SetBuffer(temp_buf, size_word, 0, num_nodes, num_events);
       eve_num = temp_raw_copper.GetEveNo(block_num);
-      subsysid = temp_raw_copper.GetSubsysId(block_num);
+      subsysid = temp_raw_copper.GetNodeID(block_num);
     }
 
     if (eve_num != prev_eve_num && first_flag != 0) {

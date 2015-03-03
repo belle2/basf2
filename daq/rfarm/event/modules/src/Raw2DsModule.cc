@@ -150,8 +150,8 @@ void Raw2DsModule::registerRawCOPPERs()
 #endif
     RawCOPPER tempcpr;
     tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
-    //    int subsysid = ((RawCOPPER&)tempdblk).GetSubsysId(cprid);
-    int subsysid = tempcpr.GetSubsysId(cprid);
+    //    int subsysid = ((RawCOPPER&)tempdblk).GetNodeID(cprid);
+    int subsysid = tempcpr.GetNodeID(cprid);
 
     //    subsysid = (subsysid & 0xff000000) >> 24;
     //    printf("#################%.8x\n", subsysid);

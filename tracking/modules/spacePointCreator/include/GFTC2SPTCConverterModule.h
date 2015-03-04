@@ -18,11 +18,9 @@
 #include <genfit/TrackCand.h>
 #include <genfit/TrackCandHit.h>
 
-
 #include <string>
 #include <utility>
-
-#include <TVector3.h>
+#include <boost/tuple/tuple.hpp>
 
 namespace Belle2 {
   /**
@@ -126,11 +124,7 @@ namespace Belle2 {
 
     bool m_PARAMskipCluster; /**< Switch for controlling the behavior of the converter, when for one or more Clusters no appropriate SpacePoint can be found */
 
-    int m_PARAMminNoOfSpacePoints; /**< parameter for specifying the minimal number of SpacePoints a SpacePointTrackCand has to have */
-
     int m_PARAMminNDF; /**< parameter for specifying a minimal number of degrees of freedom a SpacePointTrackCand has to have in order to be registered in the DataStore */
-
-    bool m_OLDWAY;
 
     // ============================================================= COUNTER VARIABLES ====================================================================
     unsigned int m_SpacePointTCCtr; /**< Counter for SpacePointTrackCands which were converted (if a curling track is split up, this counter will still be only increased by 1!) */
@@ -143,19 +137,7 @@ namespace Belle2 {
 
     unsigned int m_abortedNoSPCtr; /**< Counter for aborted conversions because no SpacePoint has been found */
 
-    unsigned int m_abortedNonSingleTrueHitCtr; /**< Counter for aborted conversions due to more than one related TrueHits for one SpacePoint */
-
     unsigned int m_noTwoClusterSPCtr; /**< Counter for cases where no related two Cluster could be found for a Cluster. NOTE: Counter counts cases where there really was no SpacePoint for a Cluster but does not count the cases where a found two Cluster SP was rejected later on in the process! */
-
-    unsigned int singleTrueHitCtr; /**< Counter for occurencies of only one TrueHit being related to a SpacePoint */
-
-    unsigned int passedTHCheckCtr; /**< Counter for testing how many SpacePoints would have passed another check then the currently applied */
-
-    unsigned int nonSingleTrueHitCtr; /**< Counter for occurencies of more than one TrueHit being related to a SpacePoint */
-
-    unsigned int m_abortedMinNoOfSPCtr; /**< Counter for SpacePointTrackCands that were not stored due to a too small number of SpacePoints */
-
-    // NEW
 
     unsigned int m_abortedLowNDFCtr; /**< Counter for SpacePointTrackCands that were not stored due to a too small number of degrees of freedom */
 
@@ -173,13 +155,17 @@ namespace Belle2 {
 
     unsigned int m_skippedCluster; /**< Counter for skipped Cluster */
 
-    unsigned int m_skippedPXDunsuitableCtr;
+    unsigned int m_skippedPXDunsuitableCtr; /**< Counter for skipped PXD Clusters due to unsuitable GFTC. NOTE: this can actually not happen */
 
-    unsigned int m_skippedSVDunsuitableCtr;
+    unsigned int m_skippedSVDunsuitableCtr; /**< Counter for skipped SVD Clusters due to unsuitable GFTC. */
+
+    unsigned int m_skippedPXDnoValidSPCtr; /**< Counter for skipped PXD Clusters due to no found valid SpacePoint. NOTE: this can actually not happen */
+
+    unsigned int m_skippedSVDnoValidSPCtr; /**< Counter for skipped SVD Clusters due to no found valid SpacePoint */
 
     unsigned int m_nonSingleSPCtr; /**< Counter for cases where there is more than one single Cluster SpacePoint related to a Cluster */
 
-    unsigned int m_someUnnamedCtr;
+    unsigned int m_abortedNoValidSPCtr; /**< Counter for aborted conversions due to no found valid SpacePoint to any Cluster of the GFTC */
 
     /** reset counters to 0 to avoid indeterministic behaviour */
     void initializeCounters() {
@@ -188,31 +174,25 @@ namespace Belle2 {
       m_abortedTrueHitCtr = 0;
       m_abortedUnsuitableTCCtr = 0;
       m_abortedNoSPCtr = 0;
-      m_abortedNonSingleTrueHitCtr = 0;
-      m_noTwoClusterSPCtr = 0;
-      singleTrueHitCtr = 0;
-      passedTHCheckCtr = 0;
-      nonSingleTrueHitCtr = 0;
-      m_abortedMinNoOfSPCtr = 0;
+      m_abortedMiscCtr = 0;
+      m_abortedLowNDFCtr = 0;
+      m_abortedNoValidSPCtr = 0;
 
-      // NEW
+      m_noTwoClusterSPCtr = 0;
+      m_nonSingleSPCtr = 0;
+
       m_skippedPXDnoSPCtr = 0;
       m_skippedPXDnoTHCtr = 0;
       m_skippedSVDnoSPCtr = 0;
       m_skippedSVDnoTHCtr = 0;
       m_singleClusterSPCtr = 0;
 
-      m_abortedLowNDFCtr = 0;
-
       m_skippedCluster = 0;
       m_skippedPXDunsuitableCtr = 0;
       m_skippedSVDunsuitableCtr = 0;
-      // TEMPORARY
-      m_abortedMiscCtr = 0;
-      m_someUnnamedCtr = 0;
 
-      // w/o output at the moment -> TODO: put into terminate
-      m_nonSingleSPCtr = 0;
+      m_skippedPXDnoValidSPCtr = 0;
+      m_skippedSVDnoValidSPCtr = 0;
     }
 
     /** increase the counter that 'belongs' to the conversionStatus */
@@ -222,6 +202,7 @@ namespace Belle2 {
         case c_foundNoTrueHit: m_abortedTrueHitCtr++; break;
         case c_unsuitableGFTC: m_abortedUnsuitableTCCtr++; break;
         case c_lowNDF: m_abortedLowNDFCtr++; break;
+        case c_noValidSP: m_abortedNoValidSPCtr++; break;
         default: m_abortedMiscCtr++; break;
       }
       return;
@@ -234,23 +215,25 @@ namespace Belle2 {
     template<typename ClusterType>
     void increaseSkippedCounter(conversionStatus status, ClusterType* cluster) {
       short unsigned int layerNumber = cluster->getSensorID().getLayerNumber();
-      std::cout << "layer number: " << layerNumber << " VxdID " << cluster->getSensorID() << std::endl;
-      B2ERROR("PENG")
+      if (layerNumber > 6) throw SpacePointTrackCand::UnsupportedDetType();
       switch (status) {
+        case c_noFail:
+          break;
         case c_foundNoSpacePoint:
           if (layerNumber < 3) m_skippedPXDnoSPCtr++;
-          else if (layerNumber < 7) m_skippedSVDnoSPCtr++;
-          else throw SpacePointTrackCand::UnsupportedDetType();
+          else m_skippedSVDnoSPCtr++;
           break;
         case c_foundNoTrueHit:
           if (layerNumber < 3) m_skippedPXDnoTHCtr++;
-          else if (layerNumber < 7) m_skippedSVDnoTHCtr++;
-          else throw SpacePointTrackCand::UnsupportedDetType();
+          else m_skippedSVDnoTHCtr++;
           break;
         case c_unsuitableGFTC:
           if (layerNumber < 3) m_skippedPXDunsuitableCtr++;
-          else if (layerNumber < 7) m_skippedSVDunsuitableCtr++;
-          else throw SpacePointTrackCand::UnsupportedDetType();
+          else m_skippedSVDunsuitableCtr++;
+          break;
+        case c_noValidSP:
+          if (layerNumber < 3) m_skippedPXDnoValidSPCtr++;
+          else m_skippedSVDnoValidSPCtr++;
           break;
         default:
           m_skippedCluster++; break;
@@ -268,8 +251,6 @@ namespace Belle2 {
     template<typename HitType> using HitInfo = std::pair<double, const HitType*>; /**< container used for storing information, that is then put into the SpacePointTrackCand */
 // #endif
 
-    template<typename T> using fourTuple = boost::tuple<T, T, T, T>; /**< typdef, for some less writing effort in the code */
-
     template<typename T> using flaggedPair = boost::tuple<bool, T, T>; /**< typdef, for avoiding having a vector<bool> and a vector<pair<T,T>> */
 
     // ============================================================================ MODULE METHODS ==============================================================================
@@ -277,16 +258,6 @@ namespace Belle2 {
 
     void markHitAsUsed(std::vector<flaggedPair<int> >& flaggedHitIDs, int hitToMark); /**< mark a hit as used, i.e. change its boolean value to true. Code readability reasons mainly, Output hardcoded to debug level 150 */
 
-    const Belle2::SpacePointTrackCand OLDcreateSpacePointTC(const genfit::TrackCand* genfitTC); /**< create a SpacePointTrackCand from the genfit::TrackCand */
-
-    const Belle2::SpacePoint* OLDgetPXDSpacePoint(const PXDCluster* pxdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the SpacePoint related to the passed PXDCluster */
-
-    const Belle2::SpacePoint* OLDgetSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the appropriate SpacePoint of the passed SVD Cluster */
-
-    const Belle2::SpacePoint* OLDgetSingleClusterSVDSpacePoint(const SVDCluster* svdCluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit); /**< get the single cluster SVD SpacePoint */
-
-
-    // NEW TEMPLATED VERSION
     /**
      * create a SpacePointTrackCand from the genfit::TrackCand
      * @returns .first is the SPTC, .second is the conversion status, if < 0, something went wrong
@@ -295,7 +266,7 @@ namespace Belle2 {
     createSpacePointTC(const genfit::TrackCand* genfitTC, const StoreArray<PXDCluster>& pxdClusters, const StoreArray<SVDCluster>& svdClusters);
 
     /**
-     * TODO: documentation
+     * process a TrackCandHit (i.e. do the handling of the different ClusterTypes), this is essentially nothing more than a wrapper, that directly returns whats returned from getSpacePoint(args) that is called within!
      */
     std::pair<Belle2::SpacePoint*, conversionStatus>
     processTrackCandHit(genfit::TrackCandHit* hit, const StoreArray<PXDCluster>& pxdClusters, const StoreArray<SVDCluster>& svdClusters, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit);
@@ -353,21 +324,6 @@ namespace Belle2 {
      */
     bool checkUsedAllHits(std::vector<flaggedPair<int> >& flaggedHitIDs);
 
-    /**
-     * handle some exceptions depending on if Clusters should be skipped or not
-     * + checks if an exception is of a kind that can be handled by omitting a Cluster or if it is something more serios (if so rethrow)
-     * NOTE: probably not needed, thus only minimally implemented at the moment!
-     */
-    template<typename ExceptionT>
-    bool handleBelle2Exceptions(ExceptionT& exception, bool skipClusters);
-
-    // TODO TODO TODO TODO TODO CLEAN UP
-
-//     bool trueHitsAreGood(std::vector<const SVDCluster*> clusters); /**< check if TrueHit is present (if only one Cluster is passed), or if all passed Cluster point to the same TrueHit */
-//     bool trueHitsAreGood(std::vector<const PXDCluster*> clusters); /**< check if TrueHit is present */
-
-    // TODO TODO TODO TODO TODO CLEAN UP
-
     /** check if there is a related TrueHit for a given SpacePoint. Possibility to pass an optional argument on the maximum number of allowed relations (defautls to 1) */
     template <typename TrueHitType>
     bool foundRelatedTrueHit(const Belle2::SpacePoint* spacePoint, unsigned int allowedRelations = 1);
@@ -376,32 +332,5 @@ namespace Belle2 {
      * Exception thrown, when not all hits of a genfit::TrackCand have been used for conversion.
      */
     BELLE2_DEFINE_EXCEPTION(UnusedHits, "Not all hits of the genfit::TrackCand have been marked as used. This indicates that not all hits have been used to create a SpacePointTrackCand.");
-
-    /**
-     * Exception thrown, when no SpacePoint that is related to a Cluster in the genfit::TrackCand can be found
-     */
-    BELLE2_DEFINE_EXCEPTION(FoundNoSpacePoint, "Found no relation between Cluster and SpacePoint. This hit would not be in SpacePointTrackCand, therefore skipping TrackCand from conversion!");
-
-    /**
-     * Exception thrown, when a genfit::TrackCand occurs, that cannot be converted to a SpacePointTrackCand unambiguously (see Module documentation for more information)
-     */
-    BELLE2_DEFINE_EXCEPTION(UnsuitableGFTrackCand, "The genfit::TrackCand cannot be unambiguously converted to a SpacePointTrackCand.");
-
-    /**
-     * Exception thrown, when no relation to a TrueHit can be found for a Cluster. Information from the TrueHit is needed for deciding if a track is curling or not
-     */
-    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no related TrueHit for one (or more) SpacePoints of the Track Candidate!");
-
-    // TODO TODO TODO TODO TODO CLEAN UP
-
-//     /**
-//      * Exception thrown, when the TrueHits of different Clusters of one SpacePoint do not match
-//      */
-//     BELLE2_DEFINE_EXCEPTION(TrueHitsDoNotMatch, "The TrueHits of two Clusters of a SpacePoint do not match.");
-//
-//     /** Exception thrown, when there is more than one TrueHit related to any given SpacePoint or Cluster */
-//     BELLE2_DEFINE_EXCEPTION(NonSingleTrueHit, "There is more than one TrueHit related to a SpacePoint.");
-
-    // TODO TODO TODO TODO TODO CLEAN UP
   };
 }

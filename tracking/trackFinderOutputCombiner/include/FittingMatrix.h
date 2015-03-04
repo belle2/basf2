@@ -1,0 +1,182 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
+
+#include <string>
+#include <vector>
+
+#include <framework/logging/Logger.h>
+#include <framework/datastore/StoreArray.h>
+#include <Eigen/Dense>
+
+namespace genfit {
+  class TrackCand;
+}
+
+namespace Belle2 {
+  class CDCHit;
+
+
+  namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
+  }
+
+  class FittingMatrix {
+
+  public:
+    typedef unsigned int SegmentCounter;
+    typedef int TrackCounter;
+
+    /**
+     * Set the given cell to zero in all matrices.
+     */
+    void resetEntry(SegmentCounter segmentCounter, TrackCounter trackCounter) {
+      m_fittingMatrix(segmentCounter, trackCounter) = 0;
+      m_zMatrix(segmentCounter, trackCounter) = 0;
+      m_zDistMatrix(segmentCounter, trackCounter) = 0;
+    }
+
+    /**
+     * Set the given segment row to zero in all matrices.
+     */
+    void resetSegment(SegmentCounter counterSegment);
+
+    /**
+     * Calculate all matrices with the fitting procedure. Must be called before accessing the matrices.
+     */
+    void calculateMatrices(const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands, const StoreArray<CDCHit>& cdcHits);
+
+    /**
+     * Check if the given cell is good to work with. Checks for low theta-values and low z-distances and high chi2.
+     */
+    inline bool isGoodEntry(SegmentCounter counterSegments, TrackCounter counterTracks)  {
+      return (m_fittingMatrix(counterSegments, counterTracks) > m_param_minimal_chi2_stereo and
+              std::abs(m_zMatrix(counterSegments, counterTracks)) < m_param_maximum_theta and
+              std::abs(m_zDistMatrix(counterSegments, counterTracks)) < m_param_maximum_distance_z);
+    }
+
+
+    /**
+     * Checks if a given cell has parameters in the range of the given reference parameters.
+     */
+    inline bool segmentHasTheSameParameters(SegmentCounter segmentCounter, SegmentCounter referenceSegment, TrackCounter trackCounter) {
+      double zReference = getZ(referenceSegment, trackCounter);
+      double zDistReference = getDistZ(referenceSegment, trackCounter);
+
+      return isGoodEntry(segmentCounter, trackCounter) > 0
+             and std::abs(m_zMatrix(segmentCounter, trackCounter) - zReference)
+             < m_param_minimal_theta_difference / 2
+             and std::abs(m_zDistMatrix(segmentCounter, trackCounter) - zDistReference)
+             < m_param_minimal_z_difference;
+    }
+
+    /**
+     * Add a given segment to a track candidate and reset all entries of this segment.
+     */
+    void addSegmentToResultTrack(FittingMatrix::SegmentCounter counterSegment, FittingMatrix::TrackCounter counterTrack, const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands);
+
+    bool isSegmentUsed(SegmentCounter segmentCounter) {
+      return m_segmentIsUsed[segmentCounter];
+    }
+
+    /**
+     * Debug print
+     */
+    void print() {
+      B2DEBUG(100, "Fitting Matrix:\n" << m_fittingMatrix)
+      B2DEBUG(100, "z Matrix:\n" << m_zMatrix)
+      B2DEBUG(100, "z Dist Matrix:\n" << m_zDistMatrix)
+    }
+
+    /**
+     * Return the chi2 of a given cell.
+     */
+    double getChi2(SegmentCounter segmentCounter, TrackCounter trackCounter) const {
+      return m_fittingMatrix(segmentCounter, trackCounter);
+    }
+
+    /**
+     * Return the theta of a given cell.
+     */
+    double getZ(SegmentCounter segmentCounter, TrackCounter trackCounter) const {
+      return m_zMatrix(segmentCounter, trackCounter);
+    }
+
+    /**
+     * Return the z distance of a given cell.
+     */
+    double getDistZ(SegmentCounter segmentCounter, TrackCounter trackCounter) const {
+      return m_zDistMatrix(segmentCounter, trackCounter);
+    }
+
+    /**
+     * Parameter
+     */
+    double& getParamMaximumDistanceZ() {
+      return m_param_maximum_distance_z;
+    }
+
+    /**
+     * Parameter
+     */
+    double& getParamMaximumTheta() {
+      return m_param_maximum_theta;
+    }
+
+    /**
+     * Parameter
+     */
+    double& getParamMinimalChi2() {
+      return m_param_minimal_chi2;
+    }
+
+    /**
+     * Parameter
+     */
+    double& getParamMinimalChi2Stereo() {
+      return m_param_minimal_chi2_stereo;
+    }
+
+    /**
+     * Parameter
+     */
+    double& getParamMinimalThetaDifference() {
+      return m_param_minimal_theta_difference;
+    }
+
+    /**
+     * Parameter
+     */
+    double& getParamMinimalZDifference() {
+      return m_param_minimal_z_difference;
+    }
+
+    /**
+     * Fill the hits into a given track candidate.
+     */
+    static void fillHitsInto(const TrackFindingCDC::CDCRecoSegment2D& recoSegment, genfit::TrackCand* bestTrackCand);
+
+  private:
+
+    Eigen::MatrixXf m_fittingMatrix;  /*< The matrix with the chi2. One column corresponds to one track candiate and one row to a reco segement. */
+    Eigen::MatrixXf m_zMatrix;        /*< The matrix with the theta values */
+    Eigen::MatrixXf m_zDistMatrix;    /*< The matrix with the z distances */
+
+    std::vector<bool> m_segmentIsUsed;            /*< An array with status flasg if the segment is used or not */
+
+    double m_param_maximum_theta;
+    double m_param_maximum_distance_z;
+    double m_param_minimal_theta_difference;
+    double m_param_minimal_z_difference;
+    double m_param_minimal_chi2;
+    double m_param_minimal_chi2_stereo;
+  };
+}

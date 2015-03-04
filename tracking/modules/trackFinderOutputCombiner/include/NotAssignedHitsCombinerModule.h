@@ -16,7 +16,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <Eigen/Dense>
-
+#include <tracking/trackFinderOutputCombiner/FittingMatrix.h>
 
 // Forward declarations
 namespace genfit {
@@ -74,33 +74,15 @@ namespace Belle2 {
   private:
 
     std::string m_param_tracksFromLegendreFinder;                 /**< TrackCandidates store array name from the legendre track finder. */
-    std::string m_param_notAssignedTracksFromLocalFinder;         /**< TrackCandidates store array name from the local track finder. */
     std::string m_param_resultTrackCands;                         /**< TrackCandidates collection name from the combined results of the two recognition algorithm. The CDCHits are assumed to come from m_param_cdcHitsColName1. */
     std::string m_param_cdcHits;                                  /**< Name of the store array containing the hits. */
+    std::string m_param_badTrackCands;                            /**< Name of the Store Array for the bad segments for testing. */
+    std::string m_param_recoSegments;                             /**< Name of the Store Array for the segments from the local track finder. */
 
-    double m_param_minimal_chi2;
-    double m_param_minimal_chi2_stereo;
-
-    double m_param_maximum_momentum_z;
-    double m_param_maximum_distance_z;
-    double m_param_minimal_theta_difference;
-    double m_param_minimal_z_difference;
-
-    Eigen::MatrixXf m_fittingMatrix;
-    Eigen::MatrixXf m_zMatrix;
-    Eigen::MatrixXf m_zDistMatrix;
-
-    void fillHitsInto(const TrackFindingCDC::CDCRecoSegment2D& recoSegment, genfit::TrackCand* bestTrackCand);
+    FittingMatrix m_fittingMatrix;
 
     double calculateGoodFitIndex(const genfit::TrackCand& trackCandidate, const TrackFindingCDC::CDCRecoSegment2D segment, const StoreArray<CDCHit>& cdcHits);
-    void resetEntry(unsigned int counterOuter, unsigned int counterInner) {
-      m_fittingMatrix(counterOuter, counterInner) = 0;
-      m_zMatrix(counterOuter, counterInner) = 0;
-      m_zDistMatrix(counterOuter, counterInner) = 0;
-    }
-
-    void calculateFittingMatrices(const StoreArray<CDCHit>& cdcHits, const StoreArray<genfit::TrackCand>& resultTrackCands, const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments);
-    bool isGoodEntry(unsigned int counterSegments, int counterTracks);
     double calculateThetaOfTrackCandidate(genfit::TrackCand* trackCandidate, const StoreArray<CDCHit>& cdcHits);
+    void findEasyCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands, const StoreArray<genfit::TrackCand>& legendreTrackCands, const StoreArray<CDCHit>& cdcHits);
   };
 }

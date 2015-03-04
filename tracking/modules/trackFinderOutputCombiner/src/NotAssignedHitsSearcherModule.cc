@@ -36,23 +36,24 @@ NotAssignedHitsSearcherModule::NotAssignedHitsSearcherModule() : Module()
 
   addParam("TracksFromFinder",
            m_param_tracksFromTrackFinder,
-           "TrackCandidates store array name from the track finder.",
-           std::string("GoodTrackCands"));
+           "TrackCandidates store array name from the track finder.");
+  addParam("SplittedTracks",
+           m_param_splittedTracks,
+           "TrackCandidates store array name for the splitted tracks. If you do not turn on splitting (set MinimumDistanceToSplit > 1), this is just a copy of TrackFromFinder.");
   addParam("CDCHits",
            m_param_cdcHits,
            "Name of the store array containing the hits.",
            std::string("CDCHits"));
   addParam("NotAssignedCDCHits",
            m_param_notAssignedCDCHits,
-           "Name of the store array containing the hits not used by the track finding algorithm. This store array is created by this module.",
-           std::string("UnknownCDCHits"));
+           "Name of the store array containing the hits not used by the track finding algorithm. This store array is created by this module.");
   addParam("MinimumDistanceToSplit",
            m_param_minimumDistanceToSplit,
-           "Minimal distance to split up a track. This distance is measured in percentage of the whole track length.",
-           0.2);
+           "Minimal distance to split up a track. This distance is measured in percentage of the whole track length. A number greater than 1 leads to no splitting at all.",
+           0.1);
   addParam("InitialAssignmentValue",
            m_param_initialAssignmentValue,
-           "",
+           "If true, not add the now unassigned hits to the NotAssignedCDCHits StoreArray but only the hits from splitting. If false, add the hits from splitting and the now unassigned hits.",
            false);
 }
 
@@ -67,130 +68,132 @@ void NotAssignedHitsSearcherModule::initialize()
   StoreArray<CDCHit> notAssignedCDCHits(m_param_notAssignedCDCHits);
   notAssignedCDCHits.registerInDataStore();
   notAssignedCDCHits.registerRelationTo(cdcHits);
+
+  StoreArray<genfit::TrackCand> splittedTrackCands(m_param_splittedTracks);
+  splittedTrackCands.registerInDataStore();
 }
 
 void NotAssignedHitsSearcherModule::event()
 {
   StoreArray<genfit::TrackCand> trackCands(m_param_tracksFromTrackFinder);
+  StoreArray<genfit::TrackCand> splittedTrackCands(m_param_splittedTracks);
   StoreArray<CDCHit> cdcHits(m_param_cdcHits);
   StoreArray<CDCHit> notAssignedCDCHits(m_param_notAssignedCDCHits);
-  const CDCRiemannFitter& circleFitter = CDCRiemannFitter::getFitter();
+
+  splittedTrackCands.create();
+  notAssignedCDCHits.create();
 
   std::vector<bool> isAssigned;
   isAssigned.resize(cdcHits.getEntries(), m_param_initialAssignmentValue);
 
   for (genfit::TrackCand & legendreTrackCand : trackCands) {
-    // check for breaks in the hit pattern. If there are no such breaks, we mark every hit as assigned. If we find such a break, only add the longest train of hits if it is over a certain limit
-    typedef std::pair<double, unsigned int> hitWithSegmentLength;
-    std::list<hitWithSegmentLength> perpSList;
-    CDCTrajectory3D trajectory(legendreTrackCand.getPosSeed(), legendreTrackCand.getMomSeed(), legendreTrackCand.getChargeSeed());
-    const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
-    double radius = trajectory2D.getGlobalCircle().absRadius();
 
-    // calculate all circle segments lengths
-    for (unsigned int cdcHitID : legendreTrackCand.getHitIDs(Const::CDC)) {
-      CDCHit* cdcHit = cdcHits[cdcHitID];
-      CDCWireHit wireHit(cdcHit);
-      double perpS;
-      if (wireHit.getStereoType() == AXIAL) {
-        perpS = wireHit.getPerpS(trajectory2D);
-      } else {
-        TrackFindingCDC::CDCRecoHit3D recoHit3D = TrackFindingCDC::CDCRecoHit3D::reconstruct(TrackFindingCDC::CDCRLWireHit(wireHit), trajectory2D);
-        perpS = recoHit3D.getPerpS();
+    if (m_param_minimumDistanceToSplit > 1) {
+      for (unsigned int cdcHitID : legendreTrackCand.getHitIDs(Const::CDC)) {
+        isAssigned[cdcHitID] = true;
+      }
+      splittedTrackCands.appendNew(legendreTrackCand);
+    } else {
+
+      // check for breaks in the hit pattern. If there are no such breaks, we mark every hit as assigned. If we find such a break, only add the longest train of hits if it is over a certain limit
+      typedef std::pair<double, unsigned int> hitWithSegmentLength;
+      std::list<hitWithSegmentLength> perpSList;
+      CDCTrajectory3D trajectory(legendreTrackCand.getPosSeed(), legendreTrackCand.getMomSeed(), legendreTrackCand.getChargeSeed());
+      const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
+      double radius = trajectory2D.getGlobalCircle().absRadius();
+
+      // calculate all circle segments lengths
+      for (unsigned int cdcHitID : legendreTrackCand.getHitIDs(Const::CDC)) {
+        CDCHit* cdcHit = cdcHits[cdcHitID];
+        CDCWireHit wireHit(cdcHit);
+        double perpS;
+        if (wireHit.getStereoType() == AXIAL) {
+          perpS = wireHit.getPerpS(trajectory2D);
+        } else {
+          TrackFindingCDC::CDCRecoHit3D recoHit3D = TrackFindingCDC::CDCRecoHit3D::reconstruct(TrackFindingCDC::CDCRLWireHit(wireHit), trajectory2D);
+          perpS = recoHit3D.getPerpS();
+        }
+
+        if (perpS < 0) {
+          perpS = perpS + 2 * TMath::Pi() * radius;
+        }
+
+        perpSList.emplace_back(perpS, cdcHitID);
+
+        // we mark this hit as assigned. Later, we will maybe unmark it again.
+        isAssigned[cdcHitID] = true;
       }
 
-      if (perpS < 0) {
-        perpS = perpS + 2 * TMath::Pi() * radius;
-      }
+      // sort the hits according to their segment length
+      perpSList.sort([](const hitWithSegmentLength & first, const hitWithSegmentLength & second) -> bool {
+        return first.first > second.first;
+      });
 
-      perpSList.emplace_back(perpS, cdcHitID);
+      double trackLength = perpSList.back().first - perpSList.front().first;
 
-      // we mark this hit as assigned. Later, we will maybe unmark it again.
-      isAssigned[cdcHitID] = true;
-    }
-
-    // sort the hits according to their segment length
-    perpSList.sort([](const hitWithSegmentLength & first, const hitWithSegmentLength & second) -> bool {
-      return first.first > second.first;
-    });
-
-    double trackLength = perpSList.back().first - perpSList.front().first;
-
-    // search for the hit breaks
-    std::list<std::vector<hitWithSegmentLength>> hitTrains;
-    hitWithSegmentLength lastHit = std::make_pair(-99, 0);
-    auto endOfLastHitTrain = perpSList.begin();
-    for (const hitWithSegmentLength & hit : perpSList) {
-      if (lastHit.first != -99) {
-        // calculate "distance" between the hits. As the hits are sorted this should be positive every time.
-        double distance = hit.first - lastHit.first;
-        if (distance / trackLength > m_param_minimumDistanceToSplit) {
-          // add the hit train to the list
-          hitTrains.emplace_back();
-          std::vector<hitWithSegmentLength>& addedHitTrain = hitTrains.back();
-          for (; endOfLastHitTrain->second != hit.second; endOfLastHitTrain++) {
-            addedHitTrain.push_back(*endOfLastHitTrain);
+      // search for the hit breaks
+      std::list<std::vector<hitWithSegmentLength>> hitTrains;
+      hitWithSegmentLength lastHit = std::make_pair(-99, 0);
+      auto endOfLastHitTrain = perpSList.begin();
+      for (const hitWithSegmentLength & hit : perpSList) {
+        if (lastHit.first != -99) {
+          // calculate "distance" between the hits. As the hits are sorted this should be positive every time.
+          double distance = hit.first - lastHit.first;
+          if (distance / trackLength > m_param_minimumDistanceToSplit) {
+            // add the hit train to the list
+            hitTrains.emplace_back();
+            std::vector<hitWithSegmentLength>& addedHitTrain = hitTrains.back();
+            for (; endOfLastHitTrain->second != hit.second; endOfLastHitTrain++) {
+              addedHitTrain.push_back(*endOfLastHitTrain);
+            }
           }
         }
+
+        lastHit = hit;
       }
 
-      lastHit = hit;
-    }
+      // Also add the last train
+      hitTrains.emplace_back();
+      std::vector<hitWithSegmentLength>& addedHitTrain = hitTrains.back();
+      for (; endOfLastHitTrain != perpSList.end(); endOfLastHitTrain++) {
+        addedHitTrain.push_back(*endOfLastHitTrain);
+      }
 
-    // Also add the last train
-    hitTrains.emplace_back();
-    std::vector<hitWithSegmentLength>& addedHitTrain = hitTrains.back();
-    for (; endOfLastHitTrain != perpSList.end(); endOfLastHitTrain++) {
-      addedHitTrain.push_back(*endOfLastHitTrain);
-    }
+      hitTrains.sort([](const std::vector<hitWithSegmentLength>& first, const std::vector<hitWithSegmentLength>& second) -> bool {
+        return first.size() > second.size();
+      });
 
-    hitTrains.sort([](const std::vector<hitWithSegmentLength>& first, const std::vector<hitWithSegmentLength>& second) -> bool {
-      return first.size() > second.size();
-    });
+      // Reset the track candidate and only add the hits from the first hit train - the hit train with the maximum hits
+      genfit::TrackCand* splittedTrackCand = splittedTrackCands.appendNew(legendreTrackCand);
+      splittedTrackCand->reset();
+      unsigned int sortingParameter = 0;
+      for (const hitWithSegmentLength & hit : hitTrains.front()) {
+        // I DO NOT KNOW THE PLANE ID!
+        splittedTrackCand->addHit(Const::CDC, hit.second, -1, sortingParameter);
+        CDCWireHit cdcWireHit(cdcHits[hit.second]);
+        sortingParameter++;
+      }
 
-    // Reset the track candidate and only add the hits from the first hit train - the hit train with the maximum hits
-    legendreTrackCand.reset();
-    unsigned int sortingParameter = 0;
-    CDCObservations2D axialObservations;
-    for (const hitWithSegmentLength & hit : hitTrains.front()) {
-      // I DO NOT KNOW THE PLANE ID!
-      legendreTrackCand.addHit(Const::CDC, hit.second, -1, sortingParameter);
-      CDCWireHit cdcWireHit(cdcHits[hit.second]);
-      if (cdcWireHit.getStereoType() == AXIAL)
-        axialObservations.append(cdcWireHit);
-      sortingParameter++;
-    }
+      // now check the hit trains. If there is only on hit train, we mark all hits. As this is done already, we just go on.
+      // Else, we only unmark the hits not coming from the longest segment
+      if (hitTrains.size() == 1) {
+        continue;
+      } else if (hitTrains.size() > 1) {
 
-    // now check the hit trains. If there is only on hit train, we mark all hits. As this is done already, we just go on.
-    // Else, we only unmark the hits not coming from the longest segment
-    if (hitTrains.size() == 1) {
-      continue;
-    } else if (hitTrains.size() > 1) {
+        B2DEBUG(100, "Left: " << hitTrains.front().size())
 
-      B2INFO("Left: " << hitTrains.front().size())
-
-      // Delete the first element as it is the one with the maximum number of hits in it
-      hitTrains.pop_front();
-      B2INFO("Deleting " << hitTrains.size() << " hit trains.")
-      for (const std::vector<hitWithSegmentLength>& hitTrain : hitTrains) {
-        B2INFO("Deleting: " << hitTrain.size())
-        for (const hitWithSegmentLength & hit : hitTrain) {
-          isAssigned[hit.second] = false;
+        // Delete the first element as it is the one with the maximum number of hits in it
+        hitTrains.pop_front();
+        B2DEBUG(100, "Deleting " << hitTrains.size() << " hit trains.")
+        for (const std::vector<hitWithSegmentLength>& hitTrain : hitTrains) {
+          B2DEBUG(100, "Deleting: " << hitTrain.size())
+          for (const hitWithSegmentLength & hit : hitTrain) {
+            isAssigned[hit.second] = false;
+          }
         }
+      } else {
+        B2WARNING("Something is going wrong with the hit splitter. We could not find any hit trains.")
       }
-
-      // TODO: The fitting procedure does not work!
-      /*CDCTrajectory2D fittedTrajectory2D;
-      CDCTrajectorySZ fittedTrajectorySZ = CDCTrajectorySZ::basicAssumption();
-      circleFitter.update(fittedTrajectory2D, axialObservations);
-      CDCTrajectory3D fittedTrajectory3D(fittedTrajectory2D, fittedTrajectorySZ);
-
-      Vector3D position(legendreTrackCand.getPosSeed());
-      Vector3D momentum(fittedTrajectory2D.getUnitMom2D(position.xy()) * fittedTrajectory2D.getAbsMom2D(), 0);
-
-      legendreTrackCand.setPosMomSeed(position, momentum, legendreTrackCand.getChargeSeed());*/
-    } else {
-      B2WARNING("Something is going wrong with the hit splitter. We could not find any hit trains.")
     }
   }
 

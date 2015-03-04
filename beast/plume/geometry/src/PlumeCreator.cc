@@ -112,7 +112,7 @@ namespace Belle2 {
         G4double KaptonThickness = activeParams.getLength("KaptonThickness") / 2.*CLHEP::cm;
         G4double CupperThickness = activeParams.getLength("CupperThickness") / 2.*CLHEP::cm;
 
-        G4Box* s_foam = new G4Box("Foam", dx_foam, dy_foam, DistanceFromFoamCenter);
+        G4Box* s_foam = new G4Box("s_foam", dx_foam, dy_foam, DistanceFromFoamCenter);
         G4LogicalVolume* l_foam = new G4LogicalVolume(s_foam, geometry::Materials::get("SiC"), "l_foam");
         G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
         new G4PVPlacement(transform, l_foam, "p_foam", &topVolume, false, 0);

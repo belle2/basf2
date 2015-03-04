@@ -6,23 +6,22 @@ import sys
 
 from basf2 import *
 from simulation import add_simulation
-# from reconstruction import add_reconstruction
-# import glob
 
-argvs = sys.argv
-argc = len(argvs)
+if len(sys.argv) != 2:
+    sys.exit('Must provide one input parameter: [input_Belle_MDST_file].\nA small example Belle MDST file can be downloaded from http://www-f9.ijs.si/~zupanc/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst')
+
+inputBelleMDSTFile = sys.argv[1]
 
 main = create_path()
 
 # Input Module
 input = register_module('PantherInput')
-input.param('inputFileName', argvs[1])
-# input.param('inputFileName', '/pcidisk1-1/belle-data/e000055/HadronBJ/0307/on_resonance/00/HadronBJ-e000055r000002-b20070307_1108.mdst')
+input.param('inputFileName', inputBelleMDSTFile)
 main.add_module(input)
 
-# Dump Record
+# Print out the contents of the DataStore
 dump = register_module('PrintCollections')
-# main.add_module(dump)
+main.add_module(dump)
 
 # progress
 progress = register_module('Progress')

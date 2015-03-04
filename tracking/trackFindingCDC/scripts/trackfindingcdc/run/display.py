@@ -4,16 +4,15 @@
 import basf2
 import logging
 
-from tracking.run.event_generation import ReadOrGenerateEventsRun
+from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
 
 import trackfindingcdc.cdcdisplay as cdcdisplay
 
 
-class CDCDisplayRun(ReadOrGenerateEventsRun):
+class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
 
     output_folder = '/tmp'
     iteractive = True
-    use_track_finder_mc = False
 
     def __init__(self):
         super(CDCDisplayRun, self).__init__()
@@ -47,9 +46,11 @@ class CDCDisplayRun(ReadOrGenerateEventsRun):
         argument_parser.add_argument(
             '-m',
             '--mc-tracks',
-            dest='use_track_finder_mc',
-            action='store_true',
-            help='Generate the mc tracks using the TrackFinderMCTruth.'
+            action='store_const',
+            dest='finder_module',
+            const='TrackFinderMCTruth',
+            default=self.finder_module,
+            help='Generate the mc tracks using the TrackFinderMCTruth. Short hand for -f TrackFinderMCTruth'
         )
 
         subparser_description = \
@@ -93,14 +94,11 @@ Note that some options are only relevant, if the cellular automaton finder in th
                 setattr(cdc_display_module, option, is_active_option)
 
     def create_path(self):
-        path = super(CDCDisplayRun, self).create_path()
+        main_path = super(CDCDisplayRun, self).create_path()
 
-        if self.use_track_finder_mc:
-            track_finder_mc_module = basf2.register_module("TrackFinderMCTruth")
-            path.add_module(track_finder_mc_module)
+        main_path.add_module(self.cdc_display_module)
 
-        path.add_module(self.cdc_display_module)
-        return path
+        return main_path
 
 
 def main():

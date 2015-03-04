@@ -237,7 +237,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         description="Distribution of {part_name} in the segment fits",
     )
 
-    @refiners.groupby(by=[None, "superlayer_id_pair"])
+    @refiners.context(groupby=[None, "superlayer_id_pair"])
     def plot(self, crops, tdirectory, **kwds):
         tan_lambda_truths = crops["tan_lambda_truth"]
         p_values = crops["p_value"]

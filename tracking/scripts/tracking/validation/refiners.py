@@ -749,6 +749,38 @@ def filter(refiner=None, **kwds):
         return filter_decorator(refiner)
 
 
+def context(refiner=None,
+            above_expert_level=None, below_expert_level=None,
+            folder_name=None,
+            filter=None, filter_on=None,
+            groupby=None, exclude_groupby=None,
+            select=None, exclude=None):
+
+    def context_decorator(wrapped_refiner):
+        # Apply meta refiners in the reverse order that they shall be executed
+        if exclude is not None or select is not None:
+            wrapped_refiner = SelectRefiner(wrapped_refiner, select=select, exclude=exclude)
+
+        if folder_name is not None or groupby is not None:
+            wrapped_refiner = CdRefiner(wrapped_refiner, folder_name=folder_name)
+
+        if groupby is not None:
+            wrapped_refiner = GroupByRefiner(wrapped_refiner, by=groupby, exclude_by=exclude_groupby)
+
+        if filter is not None or filter_on is not None:
+            wrapped_refiner = FilterRefiner(wrapped_refiner, filter=filter, on=filter_on)
+
+        if above_expert_level is not None or below_expert_level is not None:
+            wrapped_refiner = ExpertLevelRefiner(wrapped_refiner, above_expert_level=above_expert_level, below_expert_level=below_expert_level)
+
+        return wrapped_refiner
+
+    if refiner is None:
+        return context_decorator
+    else:
+        return context_decorator(refiner)
+
+
 def refiner_with_context(refiner_factory):
     @functools.wraps(refiner_factory)
     def module_decorator_with_context(above_expert_level=None, below_expert_level=None,
@@ -760,23 +792,12 @@ def refiner_with_context(refiner_factory):
 
         refiner = refiner_factory(**kwds_for_refiner_factory)
 
-        # Apply meta refiners in the reverse order that they shall be executed
-        if exclude is not None or select is not None:
-            refiner = SelectRefiner(refiner, select=select, exclude=exclude)
-
-        if folder_name is not None or groupby is not None:
-            refiner = CdRefiner(refiner, folder_name=folder_name)
-
-        if groupby is not None:
-            refiner = GroupByRefiner(refiner, by=groupby, exclude_by=exclude_groupby)
-
-        if filter is not None or filter_on is not None:
-            refiner = FilterRefiner(refiner, filter=filter, on=filter_on)
-
-        if above_expert_level is not None or below_expert_level is not None:
-            refiner = ExpertLevelRefiner(refiner, above_expert_level=above_expert_level, below_expert_level=below_expert_level)
-
-        return refiner
+        return context(refiner,
+                       above_expert_level=above_expert_level, below_expert_level=below_expert_level,
+                       folder_name=folder_name,
+                       filter=filter, filter_on=filter_on,
+                       groupby=groupby, exclude_groupby=exclude_groupby,
+                       select=select, exclude=exclude)
 
     return module_decorator_with_context
 

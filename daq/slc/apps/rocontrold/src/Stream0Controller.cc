@@ -28,15 +28,19 @@ bool Stream0Controller::initArguments(const DBObject& obj) throw()
 
 void Stream0Controller::loadArguments() throw()
 {
-  int used, excluded, port;
+  int used = 0, excluded = 0, port = 0;
   std::string host, script;
   std::string vname = StringUtil::form("stream0.sender[%d]", m_id - 2);
   m_callback->get(vname + ".port", port);
   m_callback->get(vname + ".host", host);
   m_callback->get(vname + ".script", script);
   vname = StringUtil::form("%s", host.c_str());
-  m_callback->get(m_callback->getRC().getName(), vname + ".used", used);
-  m_callback->get(m_callback->getRC().getName(), vname + ".excluded", excluded);
+  try {
+    m_callback->get(m_callback->getRC().getName(), vname + ".used", used);
+    m_callback->get(m_callback->getRC().getName(), vname + ".excluded", excluded);
+  } catch (const RCHandlerException& e) {
+    LogFile::error(e.what());
+  }
   used &= !excluded;
   setUsed(used);
   if (used) {
@@ -58,10 +62,14 @@ void Stream0Controller::check() throw()
     std::string vname = StringUtil::form("stream0.sender[%d]", m_id - 2);
     m_callback->get(vname + ".host", host);
     vname = StringUtil::form("%s", host.c_str());
+    m_callback->get(m_callback->getRC(), vname + ".used", used);
+    m_callback->get(m_callback->getRC(), vname + ".excluded", excluded);
+    /*
     if (m_callback->get(m_callback->getRC(), vname + ".used", used))
       LogFile::debug("%s is used? %s", host.c_str(), (used ? "true" : "false"));
     if (m_callback->get(m_callback->getRC(), vname + ".excluded", excluded))
       LogFile::debug("%s is excluded? %s", host.c_str(), (excluded ? "true" : "false"));
+    */
   } catch (const std::exception& e) {
     LogFile::warning("timeout");
   }

@@ -30,6 +30,7 @@ namespace Belle2 {
         bool result = true;
         const std::string name = m_argv[3];
         NSMNode node(m_argv[2]);
+        NSMCommunicator::connected(node.getName());
         if (type == "int") {
           result = set(node, NSMVar(name, (int)atoi(m_argv[5])));
         } else if (type == "float") {
@@ -38,6 +39,8 @@ namespace Belle2 {
           result = set(node, NSMVar(name, m_argv[5]));
         }
         printf("%s %s\n", name.c_str(), (result ? "SUCCESS" : "FAILED"));
+      } catch (const NSMNotConnectedException& e) {
+        printf("node %s is not online\n", m_argv[2]);
       } catch (const NSMHandlerException& e) {
         printf("nsm2 error %s\n", e.what());
       } catch (const IOException& e) {

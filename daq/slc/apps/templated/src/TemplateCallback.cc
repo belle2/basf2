@@ -18,13 +18,11 @@ TemplateCallback::~TemplateCallback() throw()
 
 bool TemplateCallback::initialize(const DBObject& obj) throw()
 {
-  obj.print();
   return true;
 }
 
 bool TemplateCallback::configure(const DBObject& obj) throw()
 {
-  obj.print();
   return true;
 }
 

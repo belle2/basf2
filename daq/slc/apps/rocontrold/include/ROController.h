@@ -20,9 +20,9 @@ namespace Belle2 {
     bool init(ROCallback* callback, int id,
               const std::string& name,
               const DBObject& obj) throw();
-    bool load(int timeout) throw();
-    bool start(int expno, int runno) throw();
-    bool recover(int timeout) throw();
+    bool load(int timeout) throw(RCHandlerException);
+    bool start(int expno, int runno) throw(RCHandlerException);
+    bool recover(int timeout) throw(RCHandlerException);
     bool abort() throw();
     bool term() throw();
 
@@ -35,6 +35,7 @@ namespace Belle2 {
     void setUsed(bool used) throw() { m_used = used; }
     FlowMonitor& getFlow() { return m_flow; }
     const FlowMonitor& getFlow() const { return m_flow; }
+    ProcessController& getControl() { return m_con; }
 
   protected:
     bool m_used;

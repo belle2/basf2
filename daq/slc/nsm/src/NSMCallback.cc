@@ -25,6 +25,8 @@ NSMCallback::NSMCallback(const int timeout) throw()
   reg(NSMCommand::VREPLY);
   reg(NSMCommand::VLISTGET);
   reg(NSMCommand::VLISTSET);
+  reg(NSMCommand::DATAGET);
+  reg(NSMCommand::DATASET);
 }
 
 void NSMCallback::addNode(const NSMNode& node)
@@ -43,7 +45,7 @@ throw(NSMHandlerException)
        it != m_nodes.end();) {
     NSMNode& node(it->second);
     msg_out.setNodeName(node.getName());
-    if (NSMCommunicator::send(msg)) {
+    if (NSMCommunicator::send(msg_out)) {
       it++;
     } else {
       m_nodes.erase(it++);
@@ -64,6 +66,12 @@ bool NSMCallback::perform(NSMCommunicator& com) throw()
         error(msg.getNodeName(), msg.getData());
       }
     }
+    return true;
+  } else if (cmd == NSMCommand::DATAGET) {
+    nsmdataget(com);
+    return true;
+  } else if (cmd == NSMCommand::DATASET) {
+    nsmdataset(com);
     return true;
   } else if (cmd == NSMCommand::VGET) {
     std::string vname = msg.getData();
@@ -104,6 +112,53 @@ void NSMCallback::notify(const NSMVar& var) throw()
       }
     } catch (const IOException& e) {
       LogFile::error(e.what());
+    }
+  }
+}
+
+void NSMCallback::nsmdataset(NSMCommunicator& com) throw()
+{
+  const NSMMessage& msg(com.getMessage());
+  if (msg.getNParams() > 1 && msg.getLength() > 0) {
+    const int* pars = (const int*)msg.getParams();
+    int revision = pars[0];
+    int size = pars[1];
+    const char* pdata = msg.getData();
+    StringList ss = StringUtil::split(pdata, '\n');
+    if (ss.size() < 2) return;
+    std::string name = ss[0];
+    std::string format = ss[1];
+    pdata += strlen(pdata) + 1;
+    for (NSMDataMap::iterator it = m_datas.begin(); it != m_datas.end(); it++) {
+      NSMData& data(it->second);
+      if (data.isAvailable() &&
+          data.getName() == name && data.getFormat() == format &&
+          data.getRevision() == revision && data.getSize() == size) {
+        memcpy(data.get(), pdata, size);
+        return;
+      }
+    }
+  }
+}
+
+void NSMCallback::nsmdataget(NSMCommunicator& com) throw()
+{
+  NSMMessage msg(com.getMessage());
+  if (msg.getNParams() > 1) {
+    const int* pars = (const int*)msg.getParams();
+    int revision = pars[0];
+    int size = pars[1];
+    const char* pdata = (const char*)msg.getData();
+    StringList ss = StringUtil::split(pdata, '\n');
+    if (ss.size() < 2) return;
+    std::string name = ss[0];
+    std::string format = ss[1];
+    NSMData& data(getData());
+    if (data.isAvailable() &&
+        data.getName() == name && data.getFormat() == format &&
+        data.getRevision() == revision && data.getSize() == size) {
+      NSMCommunicator::send(NSMMessage(NSMNode(msg.getNodeName()), data));
+      return;
     }
   }
 }
@@ -153,12 +208,12 @@ void NSMCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
       NSMVHandler& handler(*m_handler[i]);
       bool result = false;
       if (var.getName() == handler.getName() && handler.useSet()) {
+        NSMNode node(msg.getNodeName());
         if ((result = handler.handleSet(var))) {
-          NSMNode node(msg.getNodeName());
-          NSMCommunicator::send(NSMMessage(node, NSMCommand::VREPLY,
-                                           result, var.getName()));
           notify(var);
         }
+        NSMCommunicator::send(NSMMessage(node, NSMCommand::VREPLY,
+                                         result, var.getName()));
       }
     }
   } catch (const NSMHandlerException& e) {
@@ -217,9 +272,31 @@ void NSMCallback::vlistset(NSMCommunicator& com) throw()
   }
   for (size_t i = 0; i < vlist.size(); i++) {
     vlistentry_t& en(vlist[i]);
-    std::cout << StringUtil::form(StringUtil::form("%%-%ds (id=%%d)", length).c_str(), en.name.c_str(), en.id)
+    std::cout << StringUtil::form(StringUtil::form("%%-%ds ", length).c_str(), en.name.c_str())
               << " : " << en.type << " "
               << (en.useGet ? "get " : "")
               << (en.useSet ? "set " : "")  << std::endl;
+  }
+}
+
+void NSMCallback::alloc_open(NSMCommunicator& com) throw()
+{
+  try {
+    if (!m_data.isAvailable() && m_data.getName().size() > 0 &&
+        m_data.getFormat().size() > 0 && m_data.getRevision() > 0) {
+      m_data.allocate(com);
+    }
+  } catch (const NSMHandlerException& e) {
+  }
+  for (NSMDataMap::iterator it = m_datas.begin();
+       it != m_datas.end(); it++) {
+    NSMData& data(it->second);
+    try {
+      if (!data.isAvailable() && data.getName().size() > 0 &&
+          data.getFormat().size() > 0 && data.getRevision() > 0) {
+        data.open(com);
+      }
+    } catch (const NSMHandlerException& e) {
+    }
   }
 }

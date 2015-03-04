@@ -37,7 +37,8 @@ NSMCommunicator& AbstractNSMCallback::wait(const NSMNode& node,
         return com;
       }
       com.getCallback().perform(com);
-      if (timeout > 0 && Time().get() - t0 >= timeout)
+      double t = Time().get();
+      if (timeout > 0 && t - t0 >= timeout)
         break;
     }
   } catch (const TimeoutException& e) {}
@@ -88,8 +89,9 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVar& var,
           com.getCallback().perform(com);
         }
       } catch (const IOException& e) {}
-      if (timeout > 0 && Time().get() - t0 >= timeout) {
-        throw (TimeoutException("timeout : waiting for VSET:s from %s",
+      double t = Time().get();
+      if (timeout > 0 && t - t0 >= timeout) {
+        throw (TimeoutException("timeout : waiting for VSET:%s from %s",
                                 var.getName().c_str(), node.getName().c_str()));
       }
     }
@@ -113,9 +115,41 @@ bool AbstractNSMCallback::set(const NSMNode& node, const NSMVar& var,
         }
         com.getCallback().perform(com);
       } catch (const TimeoutException& e) {}
-      if (timeout > 0 && Time().get() - t0 >= timeout) {
+      double t = Time().get();
+      if (timeout > 0 && t - t0 >= timeout) {
         throw (TimeoutException("timeout : waiting for VSET:%s from %s",
                                 var.getName().c_str(), node.getName().c_str()));
+      }
+    }
+  }
+  return false;
+}
+
+bool AbstractNSMCallback::get(const NSMNode& node, const NSMData& data,
+                              int timeout) throw(IOException)
+{
+  if (node.getName().size() > 0) {
+    const std::string name = data.getName() + "\n" + data.getFormat();
+    int pars[2] = {data.getRevision(), data.getSize()};
+    NSMCommunicator::send(NSMMessage(node, NSMCommand::DATAGET, 2, pars, name));
+    double t0 = Time().get();
+    while (true) {
+      try {
+        NSMCommunicator& com(wait(node, NSMCommand::DATASET, timeout));
+        NSMMessage msg = com.getMessage();
+        NSMCommand cmd(msg.getRequestName());
+        if (cmd == NSMCommand::DATASET) {
+          if (name == msg.getData()) {
+            com.getCallback().nsmdataset(com);
+            return true;
+          }
+          com.getCallback().perform(com);
+        }
+      } catch (const IOException& e) {}
+      double t = Time().get();
+      if (timeout > 0 && t - t0 >= timeout) {
+        throw (TimeoutException("timeout : waiting for DATASET:%s from %s",
+                                name.c_str(), node.getName().c_str()));
       }
     }
   }

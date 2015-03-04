@@ -1,7 +1,9 @@
 #include "daq/slc/nsm/NSMData.h"
 
-#include "daq/slc/nsm/NSMDataPaket.h"
 #include "daq/slc/nsm/NSMCommunicator.h"
+#include "daq/slc/nsm/NSMCallback.h"
+
+#include <daq/slc/system/Time.h>
 
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
@@ -120,8 +122,8 @@ void* NSMData::open(NSMCommunicator& com) throw(NSMHandlerException)
   if (m_pdata == NULL) {
     b2nsm_context(com.getContext());
     if (getenv("NSM2_INCDIR") == NULL) {
-      ConfigFile file("slowconrol");
-      setenv("NSM2_INCDIR", file.get("nsm2.data.incdir").c_str(), 0);
+      ConfigFile file("slowcontrol");
+      setenv("NSM2_INCDIR", file.get("nsm.data.incpath").c_str(), 0);
     }
     if ((m_pdata = b2nsm_openmem(getName().c_str(), getFormat().c_str(),
                                  getRevision())) == NULL) {
@@ -135,18 +137,26 @@ void* NSMData::open(NSMCommunicator& com) throw(NSMHandlerException)
 
 void* NSMData::allocate(NSMCommunicator& com, int interval) throw(NSMHandlerException)
 {
-  b2nsm_context(com.getContext());
-  if (getenv("NSM2_INCDIR") == NULL) {
-    ConfigFile file("slowconrol");
-    setenv("NSM2_INCDIR", file.get("nsm2.data.incdir").c_str(), 0);
+  if (m_pdata == NULL) {
+    b2nsm_context(com.getContext());
+    if (getenv("NSM2_INCDIR") == NULL) {
+      ConfigFile file("slowcontrol");
+      setenv("NSM2_INCDIR", file.get("nsm.data.incpath").c_str(), 0);
+    }
+    if ((m_pdata = b2nsm_allocmem(getName().c_str(), getFormat().c_str(),
+                                  getRevision(), interval)) == NULL) {
+      throw (NSMHandlerException("Failed to allocate data memory %s",
+                                 nsmlib_strerror(com.getContext())));
+    }
+    parse();
+    memset(m_pdata, 0, m_size);
+    m_com = &com;
+    m_tstamp = 0;
   }
-  if ((m_pdata = b2nsm_allocmem(getName().c_str(), getFormat().c_str(),
-                                getRevision(), interval)) == NULL) {
-    throw (NSMHandlerException("Failed to allocate data memory %s",
-                               nsmlib_strerror(com.getContext())));
-  }
-  parse();
-  memset(m_pdata, 0, m_size);
+  com.getCallback().add(new NSMVHandlerText("nsmdata.name", true, false, getName()));
+  com.getCallback().add(new NSMVHandlerText("nsmdata.format", true, false, getFormat()));
+  com.getCallback().add(new NSMVHandlerInt("nsmdata.revision", true, false, getRevision()));
+  com.getCallback().add(new NSMVHandlerInt("nsmdata.tstamp", true, false, m_tstamp));
   return m_pdata;
 }
 
@@ -172,8 +182,20 @@ throw(NSMHandlerException)
     m_allocated = true;
     return malloc(m_size);
   }
+#else
+  throw (NSMHandlerException("too old nsmlib (nsmparse) : version = %d", NSM_PACKAGE_VERSION));
 #endif
   return NULL;
+}
+
+void NSMData::flush() throw(NSMHandlerException)
+{
+#if NSM_PACKAGE_VERSION >= 1914
+  //nsmlib_flushmem(m_com->getContext(), get(), getSize());
+  m_tstamp = Time().getSecond();
+  sleep(1);
+  m_com->getCallback().set("nsmdata.tstamp", m_tstamp);
+#endif
 }
 
 #if NSM_PACKAGE_VERSION >= 1914

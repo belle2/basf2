@@ -46,12 +46,10 @@ void LogListener::run()
           priority = LogFile::DEBUG;
         }
         LogFile::put(priority, s);
-        /*
-              if (node.getState() != RCState::STOPPING_TS &&
-                  node.getState() != RCState::ABORTING_RS &&
-                  node.getState() != RCState::RECOVERING_RS) {
-              }
-        */
+        if (node.getState() != RCState::STOPPING_TS &&
+            node.getState() != RCState::ABORTING_RS &&
+            node.getState() != RCState::RECOVERING_RS) {
+        }
         m_con->unlock();
         count = 0;
         priority = LogFile::UNKNOWN;

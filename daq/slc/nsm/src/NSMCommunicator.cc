@@ -49,6 +49,7 @@ NSMCommunicator& NSMCommunicator::select(int sec) throw(IOException)
     }
   }
   while (true) {
+    errno = 0;
     if (sec >= 0) {
       timeval t = {sec, 0};
       ret = ::select(highest + 1, &fds, NULL, NULL, &t);
@@ -56,7 +57,6 @@ NSMCommunicator& NSMCommunicator::select(int sec) throw(IOException)
       ret = ::select(highest + 1, &fds, NULL, NULL, NULL);
     }
     if (ret != -1 || (errno != EINTR && errno != EAGAIN)) break;
-    errno = 0;
   }
   if (ret < 0) throw (NSMHandlerException("Failed to select"));
   for (NSMCommunicatorList::iterator it = g_comm.begin();

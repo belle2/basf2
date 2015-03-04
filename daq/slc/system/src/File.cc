@@ -74,7 +74,6 @@ size_t File::read(void* buf, size_t count) throw(IOException)
         case EINTR: continue;
         case EAGAIN: continue;
         default:
-          perror("read");
           throw (IOException("Error while reading. %d", errno));
       }
     }

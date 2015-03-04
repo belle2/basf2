@@ -18,7 +18,7 @@ bool Stream1Controller::initArguments(const DBObject& obj) throw()
 
 void Stream1Controller::loadArguments() throw()
 {
-  int port;
+  int port = 0;
   std::string script;
   m_callback->get("stream1.port", port);
   m_callback->get("stream1.script", script);

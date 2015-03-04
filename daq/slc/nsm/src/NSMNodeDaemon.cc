@@ -22,6 +22,7 @@ void NSMNodeDaemon::add(NSMCallback* callback,
     com->init(node, host, port);
     com->setCallback(callback);
     callback->init(*com);
+    callback->alloc_open(*com);
     if (m_timeout == 0) m_timeout = callback->getTimeout();
     m_callback.push_back(callback);
   }
@@ -42,6 +43,7 @@ void NSMNodeDaemon::run() throw()
         for (size_t i = 0; i < com_v.size(); i++) {
           NSMCommunicator& com(*com_v[i]);
           com.getCallback().timeout(com);
+          com.getCallback().alloc_open(com);
         }
         t0 = t;
       }

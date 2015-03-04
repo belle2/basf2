@@ -47,6 +47,7 @@ namespace Belle2 {
     bool isAvailable() throw() { return (m_pdata != NULL); }
     void* open(NSMCommunicator& comm) throw(NSMHandlerException);
     void* allocate(NSMCommunicator& comm, int interval = 2) throw(NSMHandlerException);
+    void flush() throw(NSMHandlerException);
     void* get() throw() { return m_pdata; }
     const void* get() const throw() { return m_pdata; }
     void* parse(const char* inc_dir = NULL, bool allocated = false)
@@ -95,6 +96,8 @@ namespace Belle2 {
     int m_revision;
     NSMDataListMap m_data_v_m;
     std::string m_empty;
+    NSMCommunicator* m_com;
+    int m_tstamp;
 
   };
 

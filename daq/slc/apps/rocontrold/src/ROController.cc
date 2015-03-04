@@ -32,7 +32,7 @@ bool ROController::term() throw()
   return true;
 }
 
-bool ROController::load(int timeout) throw()
+bool ROController::load(int timeout) throw(RCHandlerException)
 {
   if (m_con.isAlive()) return true;
   m_con.clearArguments();
@@ -40,12 +40,12 @@ bool ROController::load(int timeout) throw()
   return m_con.load(timeout);
 }
 
-bool ROController::start(int expno, int runno) throw()
+bool ROController::start(int expno, int runno) throw(RCHandlerException)
 {
   return m_con.start(expno, runno);
 }
 
-bool ROController::recover(int timeout) throw()
+bool ROController::recover(int timeout) throw(RCHandlerException)
 {
   return abort() && load(timeout);
 }

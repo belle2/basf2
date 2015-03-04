@@ -18,6 +18,23 @@
 
 #include <unistd.h>
 
+namespace Belle2 {
+
+  class NSMVHandlerROPID : public NSMVHandlerInt {
+  public:
+    NSMVHandlerROPID(ROController& con, const std::string& name)
+      : NSMVHandlerInt(name, true, false), m_con(con) {}
+    virtual ~NSMVHandlerROPID() throw() {}
+    bool handleGetInt(int& val) {
+      val = m_con.getControl().getFork().get_id();
+      return true;
+    }
+  private:
+    ROController& m_con;
+  };
+
+}
+
 using namespace Belle2;
 
 ROCallback::ROCallback(const NSMNode& runcontrol)
@@ -28,8 +45,8 @@ ROCallback::ROCallback(const NSMNode& runcontrol)
 
 bool ROCallback::initialize(const DBObject& obj) throw()
 {
-  setData(getNode().getName() + "_STATUS", "ronode_status",
-          ronode_status_revision);
+  allocData(getNode().getName() + "_STATUS", "ronode_status",
+            ronode_status_revision);
   return configure(obj);
 }
 
@@ -38,9 +55,10 @@ bool ROCallback::configure(const DBObject& obj) throw()
   try {
     const DBObject& stream0(obj.getObject("stream0"));
     const DBObjectList& senders(stream0.getObjects("sender"));
-    obj.print();
     m_eb0.init(this, 0, "eb0", obj);
+    add(new NSMVHandlerROPID(m_eb0, "eb0.pid"));
     m_stream1.init(this, 1, "stream1", obj);
+    add(new NSMVHandlerROPID(m_stream1, "stream1.pid"));
     m_stream0 = std::vector<Stream0Controller>();
     for (size_t i = 0; i < senders.size(); i++) {
       m_stream0.push_back(Stream0Controller());
@@ -48,6 +66,7 @@ bool ROCallback::configure(const DBObject& obj) throw()
     for (size_t i = 0; i < m_stream0.size(); i++) {
       std::string name = StringUtil::form("stream0_%d", (int)i);
       m_stream0[i].init(this, i + 2, name, obj);
+      add(new NSMVHandlerROPID(m_stream0[i], StringUtil::form("stream0.sender[%d].pid", (int)i)));
     }
     return true;
   } catch (const std::out_of_range& e) {
@@ -99,8 +118,6 @@ void ROCallback::start(int expno, int runno) throw(RCHandlerException)
 
 void ROCallback::stop() throw(RCHandlerException)
 {
-  ronode_status* status = (ronode_status*)getData().get();
-  status->stime = 0;
 }
 
 void ROCallback::recover() throw(RCHandlerException)
@@ -136,9 +153,7 @@ void ROCallback::timeout(NSMCommunicator&) throw()
     ronode_status* nsm = (ronode_status*)data.get();
     if (m_stream1.getFlow().isAvailable()) {
       ronode_status& status(m_stream1.getFlow().monitor());
-      uint32 stime = nsm->stime;
       memcpy(nsm, &status, sizeof(ronode_status));
-      nsm->stime = stime;
     }
     double loads[3];
     if (getloadavg(loads, 3) > 0) {
@@ -146,6 +161,7 @@ void ROCallback::timeout(NSMCommunicator&) throw()
     } else {
       nsm->loadavg = -1;
     }
+    data.flush();
   }
 }
 

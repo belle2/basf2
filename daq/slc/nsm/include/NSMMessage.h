@@ -20,9 +20,7 @@ extern "C" {
 namespace Belle2 {
 
   class NSMCommunicator;
-  class NSMCommand;
-  class NSMNode;
-  class NSMMessage;
+  class NSMData;
 
   class NSMMessage : public Serializable {
 
@@ -45,12 +43,16 @@ namespace Belle2 {
     NSMMessage(const NSMNode& node, const NSMVar& var) throw();
     NSMMessage(const NSMNode& node, const DAQLogMessage& log,
                bool recorded = false) throw();
+    NSMMessage(const NSMNode& node, const NSMData& data) throw();
     NSMMessage(const NSMCommand& cmd) throw();
     NSMMessage(const NSMCommand& cmd, int par) throw();
     NSMMessage(const NSMCommand& cmd, int npar, int* pars) throw();
+    NSMMessage(const NSMNode& node, const NSMCommand& cmd, int npar, int* pars,
+               const std::string& data) throw();
     NSMMessage(const NSMCommand& cmd, const std::string& data) throw();
     NSMMessage(const NSMVar& var) throw();
     NSMMessage(const DAQLogMessage& log, bool recorded = false) throw();
+    NSMMessage(const NSMData& data) throw();
     NSMMessage(const NSMMessage& msg) throw();
     virtual ~NSMMessage() throw() { }
 
@@ -61,6 +63,7 @@ namespace Belle2 {
     void init() throw();
     void init(const NSMNode& node, const NSMVar& var) throw();
     void init(const NSMNode& node, const DAQLogMessage& log, bool recorded) throw();
+    void init(const NSMNode& node, const NSMData& data) throw();
     const char* getRequestName() const throw();
     const char* getNodeName() const throw();
     unsigned short getRequestId() const throw();

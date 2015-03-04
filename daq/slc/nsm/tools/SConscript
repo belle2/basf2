@@ -1,10 +1,11 @@
 Import('env')
 
-env['TOOLS_LIBS']['nsmvget'] = ['daq', 'framework', '$PGSQL_LIBS']
-env['TOOLS_LIBS']['nsmvset'] = ['daq', 'framework', '$PGSQL_LIBS']
-env['TOOLS_LIBS']['nsmvlistget'] = ['daq', 'framework', '$PGSQL_LIBS']
-env['TOOLS_LIBS']['nsmdataget'] = ['pthread', 'ncurses', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['nsmdataparse'] = ['pthread', 'ncurses', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['nsm2pvrecord'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['nsmvget'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['nsmvset'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['nsmvlistget']  = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['nsmdataget']   = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['nsmdataparse'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['nsmrequest']   = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['nsm2pvrecord'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 
 Return('env')

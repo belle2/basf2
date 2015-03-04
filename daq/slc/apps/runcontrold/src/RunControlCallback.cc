@@ -28,6 +28,7 @@ RunControlCallback::RunControlCallback(int port)
 {
   m_port = port;
   setAutoReply(false);
+  m_showall = false;
 }
 
 bool RunControlCallback::initialize(const DBObject& obj) throw()
@@ -37,10 +38,11 @@ bool RunControlCallback::initialize(const DBObject& obj) throw()
     db.connect();
     m_runno.setExpNumber(RunNumberTable(db).getExpNumber());
     m_runno.setRunNumber(RunNumberTable(db).getRunNumber(m_runno.getExpNumber()));
+    m_runno.setStart(false);
   } catch (const DBHandlerException& e) {
   }
   db.close();
-  bool ret = vaddAll(obj);
+  bool ret = addAll(obj);
   if (m_port > 0) {
     PThread(new ConfigProvider(db, getDBTable(), m_port));
   }
@@ -49,7 +51,7 @@ bool RunControlCallback::initialize(const DBObject& obj) throw()
 
 bool RunControlCallback::configure(const DBObject& obj) throw()
 {
-  if (vaddAll(obj)) {
+  if (addAll(obj)) {
     distribute(NSMMessage(RCCommand::CONFIGURE, m_port));
   }
   return true;
@@ -116,9 +118,12 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         expno = m_runno.getExpNumber();
         runno = m_runno.getRunNumber();
         set("tstart", (int)m_runno.getRecordTime());
+        set("ismaster", (int)true);
       } else {
         throw (RCHandlerException("DB is not available"));
       }
+    } else {
+      set("ismaster", (int)false);
     }
     set("expno", expno);
     set("runno", runno);
@@ -220,9 +225,11 @@ void RunControlCallback::distribute_r(NSMMessage msg) throw()
 void RunControlCallback::postRun() throw()
 {
   try {
-    if (getDB()) {
+    int ismaster = 0;
+    get("ismaster", ismaster);
+    if (ismaster && m_runno.isStart() && getDB()) {
       DBInterface& db(*getDB());
-      if (!db.isConnected()) db.connect();
+      db.connect();
       m_runno.setStart(false);
       RunNumberTable(db).add(m_runno);
     }
@@ -281,11 +288,11 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
   }
 }
 
-bool RunControlCallback::vaddAll(const DBObject& obj) throw()
+bool RunControlCallback::addAll(const DBObject& obj) throw()
 {
   RCNodeList node_v;
   try {
-    obj.print(false);
+    //obj.print(false);
     const DBObjectList& objs(obj.getObjects("node"));
     for (DBObjectList::const_iterator it = objs.begin(); it != objs.end(); it++) {
       const DBObject& cobj(*it);
@@ -314,19 +321,20 @@ bool RunControlCallback::vaddAll(const DBObject& obj) throw()
   add(new NSMVHandlerInt("runno", true, false, m_runno.getRunNumber()));
   add(new NSMVHandlerInt("subno", true, false, 0));
   add(new NSMVHandlerInt("tstart", true, false, (int)m_runno.getRecordTime()));
+  add(new NSMVHandlerInt("ismaster", true, false, (int)true));
   add(new NSMVHandlerText("operators", true, true, m_operators));
   add(new NSMVHandlerText("comment",  true, true, m_comment));
   for (size_t i = 0; i < m_node_v.size(); i++) {
     RCNode& node(m_node_v[i]);
     std::string vname = StringUtil::form("node[%d]", (int)i);
     add(new NSMVHandlerText(vname + ".name", true, false, node.getName()));
-    add(new NSMVHandlerRCConfig(*this, vname + ".config", node));
+    add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCUsed(*this, vname + ".used", node));
     add(new NSMVHandlerRCExcluded(*this, vname + ".excluded", node));
     vname = StringUtil::form("%s", StringUtil::tolower(node.getName()).c_str());
-    add(new NSMVHandlerRCConfig(*this, vname + ".config", node));
+    add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCUsed(*this, vname + ".used", node));

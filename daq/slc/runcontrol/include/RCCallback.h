@@ -43,10 +43,6 @@ namespace Belle2 {
     virtual bool configure(const DBObject&) throw() { return true; }
 
   public:
-    NSMData& getData() throw() { return m_data; }
-    const NSMData& getData() const throw() { return m_data; }
-    void setData(const std::string& name, const std::string& format,
-                 int revision = -1) throw();
     void setState(const RCState& state) throw();
     void setRuntype(const std::string& runtype) { m_runtype = runtype; }
     void setDBTable(const std::string& table) { m_table = table; }
@@ -65,7 +61,9 @@ namespace Belle2 {
     std::string m_table;
     bool m_auto;
     std::string m_runtype;
-    NSMData m_data;
+
+  protected:
+    bool m_showall;
 
   };
 
@@ -73,13 +71,6 @@ namespace Belle2 {
   {
     m_db = db;
     m_table = table;
-  }
-
-  inline void RCCallback::setData(const std::string& name,
-                                  const std::string& format,
-                                  int revision) throw()
-  {
-    m_data = NSMData(name, format, revision);
   }
 
 };

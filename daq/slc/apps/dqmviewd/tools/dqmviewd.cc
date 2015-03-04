@@ -3,11 +3,8 @@
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
-#include <daq/slc/system/PThread.h>
 #include <daq/slc/system/Daemon.h>
-#include <daq/slc/system/LogFile.h>
 
-#include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/ConfigFile.h>
 
 using namespace Belle2;

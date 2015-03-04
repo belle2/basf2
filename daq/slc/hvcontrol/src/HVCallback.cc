@@ -34,7 +34,9 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
   try {
     NSMMessage msg(com.getMessage());
     HVCommand cmd(msg.getRequestName());
+    if (cmd == HVCommand::UNKNOWN) return false;
     HVState state(getNode().getState());
+    addNode(NSMNode(msg.getNodeName()));
     if (cmd == HVCommand::TURNOFF) {
       getNode().setState(HVState::TRANSITION_TS);
       turnoff();

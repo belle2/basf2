@@ -26,6 +26,12 @@ namespace Belle2 {
   public:
     virtual void init(NSMCommunicator&) throw() {
       NSMNode node(m_argv[2]);
+      try {
+        NSMCommunicator::connected(node.getName());
+      } catch (const NSMNotConnectedException& e) {
+        printf("node %s is not online\n", m_argv[2]);
+        exit(1);
+      }
       NSMCommunicator::send(NSMMessage(node, NSMCommand::VLISTGET));
     }
     virtual void timeout(NSMCommunicator&) throw() {

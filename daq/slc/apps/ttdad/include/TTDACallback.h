@@ -1,22 +1,19 @@
 #ifndef _Belle2_TTDACallback_hh
 #define _Belle2_TTDACallback_hh
 
-#include "daq/slc/readout/ProcessController.h"
-
 #include "daq/slc/runcontrol/RCCallback.h"
 #include "daq/slc/runcontrol/RCNode.h"
 
 #include <daq/slc/nsm/NSMData.h>
 
-#include <daq/slc/system/PThread.h>
+#include <map>
 
 namespace Belle2 {
 
   class TTDACallback : public RCCallback {
 
   public:
-    TTDACallback(const RCNode& ttd)
-      : RCCallback(5), m_ttdnode(ttd) {}
+    TTDACallback(const RCNode& ttd);
     virtual ~TTDACallback() throw() {}
 
   public:
@@ -31,9 +28,12 @@ namespace Belle2 {
     virtual void abort() throw(RCHandlerException);
     virtual void timeout(NSMCommunicator& com) throw();
     void trigft() throw(RCHandlerException);
+    bool setTriggerType(const std::string& type) throw();
 
   private:
     RCNode m_ttdnode;
+    std::map<std::string, int> m_trgcommands;
+    std::string m_trigger_type;
 
   private:
     void send(const NSMMessage& msg) throw(RCHandlerException);

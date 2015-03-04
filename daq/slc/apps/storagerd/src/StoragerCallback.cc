@@ -29,8 +29,8 @@ StoragerCallback::~StoragerCallback() throw()
 
 bool StoragerCallback::initialize(const DBObject& obj) throw()
 {
-  setData(getNode().getName() + "_STATUS", "storage_status",
-          storage_status_revision);
+  allocData(getNode().getName() + "_STATUS", "storage_status",
+            storage_status_revision);
   return configure(obj);
 }
 

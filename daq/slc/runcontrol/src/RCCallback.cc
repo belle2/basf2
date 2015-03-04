@@ -11,6 +11,7 @@
 #include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <cstring>
+#include <cstdlib>
 
 using namespace Belle2;
 
@@ -27,6 +28,7 @@ RCCallback::RCCallback(int timeout) throw()
   reg(RCCommand::ABORT);
   m_auto = true;
   m_db = NULL;
+  m_showall = true;
 }
 
 void RCCallback::init(NSMCommunicator& com) throw()
@@ -36,12 +38,6 @@ void RCCallback::init(NSMCommunicator& com) throw()
   reset();
   add(new NSMVHandlerText("rcstate", true, false, node.getState().getLabel()));
   add(new NSMVHandlerText("rcrequest", true, false, ""));
-  add(new NSMVHandlerText("rcconfig", true, false, m_obj.getName()));
-  if (m_data.isAvailable()) {
-    add(new NSMVHandlerText("nsmdata.name", true, false, m_data.getName()));
-    add(new NSMVHandlerText("nsmdata.format", true, false, m_data.getFormat()));
-    add(new NSMVHandlerInt("nsmdata.revision", true, false, m_data.getRevision()));
-  }
   if (m_table.size() == 0 || m_runtype.size() == 0) {
     LogFile::warning("dbtable or runtype is empty "
                      "(dbtable='%s', runtype='%s')",
@@ -56,11 +52,10 @@ void RCCallback::init(NSMCommunicator& com) throw()
       m_obj = DBObjectLoader::load("dbconf/" + m_table + "/" + config);
     }
   }
+  m_obj.print(m_showall);
+  add(new NSMVHandlerText("rcconfig", true, false, m_obj.getName()));
   add(m_obj);
   initialize(m_obj);
-  if (m_data.getName().size() > 0 && m_data.getFormat().size() > 0) {
-    m_data.allocate(com);
-  }
 }
 
 bool RCCallback::perform(NSMCommunicator& com) throw()
@@ -78,6 +73,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
   }
   LogFile::debug("%s >> %s (state = %s)", msg.getNodeName(),
                  cmd.getLabel(), state.getLabel());
+  addNode(NSMNode(msg.getNodeName()));
   try {
     set("rcrequest", msg.getRequestName());
   } catch (const std::exception& e) {
@@ -93,6 +89,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));
         }
+        set("rcconfig", m_obj.getName());
         configure(m_obj);
         setState(state);
         reply(NSMMessage(NSMCommand::OK, state.getLabel()));
@@ -130,6 +127,8 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
 
 void RCCallback::setState(const RCState& state) throw()
 {
+  LogFile::debug("state transit : %s >> %s",
+                 getNode().getState().getLabel(), state.getLabel());
   getNode().setState(state);
   try {
     set("rcstate", state.getLabel());
@@ -188,14 +187,10 @@ throw(IOException)
   } else {
     LogFile::warning("No DB objects was loaded");
   }
+  m_obj.print(m_showall);
   reset();
   add(new NSMVHandlerText("rcstate", true, false, getNode().getState().getLabel()));
   add(new NSMVHandlerText("rcrequest", true, false, ""));
   add(new NSMVHandlerText("rcconfig", true, false, m_obj.getName()));
-  if (m_data.isAvailable()) {
-    add(new NSMVHandlerText("nsmdata.name", true, false, m_data.getName()));
-    add(new NSMVHandlerText("nsmdata.format", true, false, m_data.getFormat()));
-    add(new NSMVHandlerInt("nsmdata.revision", true, false, m_data.getRevision()));
-  }
   add(m_obj);
 }

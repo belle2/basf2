@@ -20,8 +20,8 @@ namespace Belle2 {
     static const NSMCommand VREPLY;
 
   public:
-    static const NSMCommand NSMDATAGET;
-    static const NSMCommand NSMDATASET;
+    static const NSMCommand DATAGET;
+    static const NSMCommand DATASET;
     static const NSMCommand DBGET;
     static const NSMCommand DBSET;
     static const NSMCommand DBLISTGET;

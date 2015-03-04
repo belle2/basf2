@@ -36,6 +36,7 @@ namespace Belle2 {
     bool set(const NSMNode& node, const std::string& name, const std::string& val, int timeout = 5) throw(IOException);
     bool set(const NSMNode& node, const std::string& name, const std::vector<int>& val, int timeout = 5) throw(IOException);
     bool set(const NSMNode& node, const std::string& name, const std::vector<float>& val, int timeout = 5) throw(IOException);
+    bool get(const NSMNode& node, const NSMData& data, int timeout = 5) throw(IOException);
     bool get(DBObject& obj);
     bool get(const std::string& name, int& val) { return get("", name, val); }
     bool get(const std::string& name, float& val) { return get("", name, val); }

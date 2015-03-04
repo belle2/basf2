@@ -10,6 +10,8 @@ extern "C" {
 #include "nsm2/belle2nsm.h"
 }
 
+#include <daq/slc/nsm/NSMData.h>
+
 #include <daq/slc/system/BufferedReader.h>
 #include <daq/slc/system/BufferedWriter.h>
 #include <daq/slc/system/StreamSizeCounter.h>
@@ -68,6 +70,23 @@ void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log,
   setData(log.getNodeName() + "\n" + log.getMessage());
 }
 
+void NSMMessage::init(const NSMNode& node, const NSMData& data) throw()
+{
+  init();
+  m_nodename = node.getName();
+  m_reqname = NSMCommand::DATASET.getLabel();
+  setNParams(2);
+  setParam(0, data.getRevision());
+  setParam(1, data.getSize());
+  std::string s = data.getName() + "\n" + data.getFormat();
+  int len = s.size() + 1 + data.getSize();
+  m_nsm_msg.len = len;
+  m_data = Buffer(len);
+  memcpy(m_data.ptr(), s.c_str(), s.size());
+  memcpy(m_data.ptr() + s.size() + 1, data.get(), data.getSize());
+  m_hasobj = false;
+}
+
 NSMMessage::NSMMessage() throw()
 {
   init();
@@ -96,6 +115,19 @@ NSMMessage::NSMMessage(const NSMNode& node,
   m_reqname = cmd.getLabel();
   m_nsm_msg.npar = npar;
   memcpy(m_nsm_msg.pars, pars, sizeof(int) * npar);
+}
+
+NSMMessage::NSMMessage(const NSMNode& node,
+                       const NSMCommand& cmd,
+                       int npar, int* pars,
+                       const std::string& data) throw()
+{
+  init();
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
+  m_nsm_msg.npar = npar;
+  memcpy(m_nsm_msg.pars, pars, sizeof(int) * npar);
+  setData(data);
 }
 
 NSMMessage::NSMMessage(const NSMNode& node,
@@ -159,10 +191,14 @@ NSMMessage::NSMMessage(const NSMMessage& msg) throw()
   *this = msg;
 }
 
-NSMMessage::NSMMessage(const NSMNode& node,
-                       const NSMVar& var) throw()
+NSMMessage::NSMMessage(const NSMNode& node, const NSMVar& var) throw()
 {
   init(node, var);
+}
+
+NSMMessage::NSMMessage(const NSMNode& node, const NSMData& data) throw()
+{
+  init(node, data);
 }
 
 NSMMessage::NSMMessage(const NSMNode& node, const DAQLogMessage& log,
@@ -174,6 +210,11 @@ NSMMessage::NSMMessage(const NSMNode& node, const DAQLogMessage& log,
 NSMMessage::NSMMessage(const NSMVar& var) throw()
 {
   init(NSMNode(), var);
+}
+
+NSMMessage::NSMMessage(const NSMData& data) throw()
+{
+  init(NSMNode(), data);
 }
 
 NSMMessage::NSMMessage(const DAQLogMessage& log, bool recorded) throw()
@@ -253,7 +294,7 @@ const char* NSMMessage::getNodeName() const throw()
   if (m_nsmc != NULL)
     return nsmlib_nodename(m_nsmc, m_nsm_msg.node);
   else
-    return NULL;
+    return m_nodename.c_str();
 }
 
 unsigned short NSMMessage::getRequestId() const throw()

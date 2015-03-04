@@ -4,6 +4,7 @@
 #include "daq/slc/nsm/AbstractNSMCallback.h"
 #include "daq/slc/nsm/NSMHandlerException.h"
 #include "daq/slc/nsm/NSMCommand.h"
+#include "daq/slc/nsm/NSMData.h"
 
 #include <string>
 #include <vector>
@@ -15,6 +16,7 @@ namespace Belle2 {
   class NSMMessage;
 
   typedef std::map<std::string, NSMNode> NSMNodeMap;
+  typedef std::map<std::string, NSMData> NSMDataMap;
 
   class NSMCallback : public AbstractNSMCallback {
 
@@ -24,11 +26,6 @@ namespace Belle2 {
   public:
     NSMCallback(int timeout = 5) throw();
     virtual ~NSMCallback() throw() {}
-
-  public:
-    NSMNode& getNode() throw() { return m_node; }
-    const NSMNode& getNode() const throw() { return m_node; }
-    void setNode(const NSMNode& node) throw() { m_node = node; }
 
   public:
     virtual void init(NSMCommunicator&) throw() {}
@@ -43,9 +40,23 @@ namespace Belle2 {
     virtual void vlistget(NSMCommunicator& com) throw();
     virtual void vlistset(NSMCommunicator& com) throw();
     virtual void vreply(NSMCommunicator&, const std::string&, bool) throw() {}
+    virtual void nsmdataset(NSMCommunicator& com) throw();
+    virtual void nsmdataget(NSMCommunicator& com) throw();
 
   public:
     bool reply(const NSMMessage& msg) throw(NSMHandlerException);
+
+  public:
+    NSMNode& getNode() throw() { return m_node; }
+    const NSMNode& getNode() const throw() { return m_node; }
+    void setNode(const NSMNode& node) throw() { m_node = node; }
+    NSMDataMap& getDataMap() throw() { return m_datas; }
+    NSMData& getData(const std::string& name) throw(std::out_of_range);
+    NSMData& getData() throw() { return m_data; }
+    void openData(const std::string& name, const std::string& format,
+                  int revision = -1) throw();
+    void allocData(const std::string& name, const std::string& format,
+                   int revision) throw();
 
   protected:
     virtual void notify(const NSMVar& var) throw();
@@ -58,13 +69,40 @@ namespace Belle2 {
 
   private:
     NSMCommandList& getCommandList() throw() { return m_cmd_v; }
+    void alloc_open(NSMCommunicator& com) throw();
 
   private:
     NSMNode m_node;
     NSMCommandList m_cmd_v;
     NSMNodeMap m_nodes;
+    NSMData m_data;
+    NSMDataMap m_datas;
 
   };
+
+  inline NSMData& NSMCallback::getData(const std::string& name) throw(std::out_of_range)
+  {
+    if (m_datas.find(name) != m_datas.end()) {
+      return m_datas[name];
+    }
+    throw (std::out_of_range("nodata registered : " + name));
+  }
+
+  inline void NSMCallback::openData(const std::string& name,
+                                    const std::string& format,
+                                    int revision) throw()
+  {
+    if (m_datas.find(name) == m_datas.end()) {
+      m_datas.insert(NSMDataMap::value_type(name, NSMData(name, format, revision)));
+    }
+  }
+
+  inline void NSMCallback::allocData(const std::string& name,
+                                     const std::string& format,
+                                     int revision) throw()
+  {
+    m_data = NSMData(name, format, revision);
+  }
 
 };
 

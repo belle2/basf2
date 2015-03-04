@@ -1,7 +1,5 @@
 #include <daq/slc/nsm/NSMCommunicator.h>
 
-#include <daq/slc/runcontrol/RCCommand.h>
-
 #include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/ConfigFile.h>
@@ -24,10 +22,7 @@ int main(int argc, char** argv)
            config.get("nsm.host"), config.getInt("nsm.port"));
   NSMNode node(StringUtil::toupper(argv[2]));
   std::string request = StringUtil::toupper(argv[3]);
-  if (!StringUtil::find(request, "RC_")) {
-    request = "RC_" + request;
-  }
-  RCCommand cmd(request);
+  NSMCommand cmd(1000, request.c_str());
   if (argc > 4) {
     NSMCommunicator::send(NSMMessage(node, cmd, argv[4]));
   } else {

@@ -5,23 +5,30 @@
 
 #include <daq/slc/nsm/NSMData.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 namespace Belle2 {
 
-  class FlowMonitorCallback : public RCCallback {
+  class FlowMonitorCallback : public NSMCallback {
 
-    typedef std::vector<NSMNode> NSMNodeList;
+    typedef std::vector<NSMData> NSMDataList;
+    typedef std::map<std::string, NSMNode> NSMNodeMap;
 
   public:
-    FlowMonitorCallback(const std::string& conf);
+    FlowMonitorCallback(const std::string& node, const std::string& rcnode);
     virtual ~FlowMonitorCallback() throw() {}
 
   public:
+    virtual void init(NSMCommunicator& com) throw();
     virtual void timeout(NSMCommunicator& com) throw();
+    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
 
   private:
     NSMNode m_runcontrol;
-    NSMNodeList m_node;
-    NSMDataList m_data;
+    StringList m_names;
+    StringList m_hostnames;
+    StringList m_datanames;
+    NSMNodeMap m_nodes;
 
   };
 

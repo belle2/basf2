@@ -12,27 +12,27 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 3) {
-    LogFile::debug("Usage : %s <dataname> <format> [<parname>]", argv[0]);
+  if (argc < 4) {
+    LogFile::debug("Usage : %s <mynode> <dataname> <format> [<parname>]", argv[0]);
     return 1;
   }
   NSMCommunicator com;
-  com.init(NSMNode("READER"), "b2slow2.kek.jp", 9122);
-  NSMData data(argv[1], argv[2], -1);
+  com.init(NSMNode(argv[1]), "b2slow2.kek.jp", 9122);
+  NSMData data(argv[2], argv[3], -1);
   data.open(com);
   DBField::Type type;
-  if (argc > 3) {
-    const void* p = data.find(argv[3], type);
+  if (argc > 4) {
+    const void* p = data.find(argv[4], type);
     if (type == DBField::INT) {
-      printf("%s : %d\n", argv[3], *(int*)p);
+      printf("%s : %d\n", argv[4], *(int*)p);
     } else if (type == DBField::SHORT) {
-      printf("%s : %d\n", argv[3], *(short*)p);
+      printf("%s : %d\n", argv[4], *(short*)p);
     } else if (type == DBField::CHAR) {
-      printf("%s : %d\n", argv[3], *(char*)p);
+      printf("%s : %d\n", argv[4], *(char*)p);
     } else if (type == DBField::FLOAT) {
-      printf("%s : %f\n", argv[3], *(float*)p);
+      printf("%s : %f\n", argv[4], *(float*)p);
     } else if (type == DBField::DOUBLE) {
-      printf("%s : %f\n", argv[3], *(double*)p);
+      printf("%s : %f\n", argv[4], *(double*)p);
     }
   } else {
     data.print();

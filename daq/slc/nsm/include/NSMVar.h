@@ -14,7 +14,7 @@ namespace Belle2 {
       NONE = 0,
       INT,
       FLOAT,
-      TEXT
+      TEXT,
     };
 
   public:

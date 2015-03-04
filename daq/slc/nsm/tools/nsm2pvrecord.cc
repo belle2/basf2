@@ -20,6 +20,6 @@ int main(int argc, char** argv)
   }
   NSMData data(argv[1], argv[2], atoi(argv[3]));
   data.parse(argc > 4 ? argv[4] : NULL);
-  data.print();
+  data.printPV();
   return 0;
 }

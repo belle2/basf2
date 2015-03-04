@@ -58,7 +58,7 @@ namespace Belle2 {
                  const char* text, ...);
     void logging_imp(const NSMNode& node, LogFile::Priority pri,
                      const Date& date, const std::string& msg, bool recorded);
-    bool vaddAll(const DBObject& obj) throw();
+    bool addAll(const DBObject& obj) throw();
     using RCCallback::setState;
     void setState(NSMNode& node, const RCState& state) throw();
 

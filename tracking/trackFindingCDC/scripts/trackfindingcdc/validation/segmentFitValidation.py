@@ -3,8 +3,6 @@
 
 import basf2
 
-from trackfindingcdc import SegmentFitterModule
-
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import std
@@ -12,7 +10,6 @@ from ROOT import std
 import os
 import sys
 import numpy as np
-import array
 
 from tracking.run.event_generation import StandardEventGenerationRun
 
@@ -24,6 +21,8 @@ from tracking.modules import BrowseFileOnTerminateModule
 
 import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
+
+from trackfindingcdc import SegmentFitterModule
 
 import logging
 
@@ -159,9 +158,8 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         super(SegmentFitValidationModule, self).initialize()
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
-    def event(self):
+    def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
-        super(SegmentFitValidationModule, self).event()
 
     def pick(self, segment):
         mc_segment_lookup = self.mc_segment_lookup
@@ -229,7 +227,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         description="Distribution of {part_name} in the segment fits",
     )
 
-    @refiners.groupby(by=[None, "stereo_type", "superlayer_id"])
+    @refiners.context(groupby=[None, "stereo_type", "superlayer_id"])
     def plot(self, crops, tdirectory, **kwds):
         curvature_truths = crops["curvature_truth"]
         curvature_estimates = crops["curvature_estimate"]

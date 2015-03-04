@@ -10,7 +10,6 @@ from ROOT import std
 import os
 import sys
 import numpy as np
-import array
 
 from tracking.run.event_generation import StandardEventGenerationRun
 
@@ -23,18 +22,16 @@ from tracking.modules import BrowseFileOnTerminateModule
 import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
 
-import logging
+from trackfindingcdc import SegmentFitterModule, AxialStereoPairFitterModule
 
-CONTACT = "oliver.frost@desy.de"
+import logging
 
 
 def get_logger():
     return logging.getLogger(__name__)
 
 
-from trackfindingcdc import (
-    SegmentFitterModule,
-    AxialStereoPairFitterModule)
+CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentPairFitValidationRun(StandardEventGenerationRun):
@@ -160,14 +157,13 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
         super(SegmentPairFitValidationModule, self).initialize()
 
-    def event(self):
+    def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
-        super(SegmentPairFitValidationModule, self).event()
 
-    def pick(self, segment_pair):
+    def pick(self, axial_stereo_segment_pair):
         mc_segment_lookup = self.mc_segment_lookup
-        start_segment = segment_pair.getStartSegment()
-        end_segment = segment_pair.getEndSegment()
+        start_segment = axial_stereo_segment_pair.getStartSegment()
+        end_segment = axial_stereo_segment_pair.getEndSegment()
         mc_particle = mc_segment_lookup.getMCParticle(start_segment)
         return (mc_particle and
                 is_primary(mc_particle) and
@@ -211,10 +207,6 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
 
             curvature_truth=curvature_truth,
             curvature_estimate=curvature_estimate,
-
-            absolute_curvature_truth=abs(curvature_truth),
-            absolute_curvature_estimate=curvature_estimate if curvature_truth > 0 else -curvature_estimate,
-
             curvature_variance=fit3d.getLocalVariance(i_curv),
 
             tan_lambda_truth=fit3d_truth.getTanLambda(),

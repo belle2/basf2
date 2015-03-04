@@ -7,7 +7,13 @@
 # Author Benjamin Oberhof
 ########################################################
 
-# adapted from ExtrapCDCTracksToVXD.py
+"""
+<header>
+<output>VXDCDCMergerSinglePartTruthFinder.root</output>
+<contact>Benjamin Oberhof, tracking@belle2.kek.jp</contact>
+</header>
+"""
+
 import os
 import random
 from basf2 import *

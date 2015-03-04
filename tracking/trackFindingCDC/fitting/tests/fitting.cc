@@ -17,7 +17,8 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <gtest/gtest.h>
 
@@ -228,15 +229,15 @@ TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
 
 
 
-TEST(TrackFindingCDCTest, fitting_SIMPLE_DRIFT_LENGTH_VARIANCE_isConsistent)
+TEST(DISABLED_TrackFindingCDCTestWithTopology, fitting_SIMPLE_DRIFT_LENGTH_VARIANCE_isConsistent)
 {
-  CDC::SimpleTDCCountTranslator simpleTDCCountTranslator;
+  CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
   FloatType driftLength = 0.0;
   const WireID wireID;
   bool rl = false;
 
-  FloatType defaultDriftLengthVariance = simpleTDCCountTranslator.getDriftLengthResolution(driftLength, wireID, rl, 0.0, 0.0);
+  FloatType defaultDriftLengthVariance = tdcCountTranslator.getDriftLengthResolution(driftLength, wireID, rl, 0.0, 0.0);
   EXPECT_NEAR(SIMPLE_DRIFT_LENGTH_VARIANCE, defaultDriftLengthVariance, 10e-7);
 
 }

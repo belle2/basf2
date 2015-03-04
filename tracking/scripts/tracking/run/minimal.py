@@ -25,6 +25,7 @@ class MinimalRun(object):
     n_events = 10000
     root_input_file = None
     components = []
+    random_seed = None
 
     def __init__(self):
         super(MinimalRun, self).__init__()
@@ -40,10 +41,13 @@ class MinimalRun(object):
         argument_parser = utilities.DefaultHelpArgumentParser(**kwds)
 
         if allow_input:
-            argument_parser.add_argument('-i', '--input',
-                                         default=self.root_input_file, dest='root_input_file',
-                                         help='File path to the ROOT file from which the simulated events shall be loaded.'
-                                         )
+            argument_parser.add_argument(
+                '-i',
+                '--input',
+                default=self.root_input_file,
+                dest='root_input_file',
+                help='File path to the ROOT file from which the simulated events shall be loaded.'
+            )
 
         argument_parser.add_argument(
             '-c',
@@ -51,7 +55,8 @@ class MinimalRun(object):
             dest='components',
             default=None,
             action='append',
-            help='Add component. Multiple repeatition adds more components. If not given use the default settings of the run: %s' % type(self).components
+            help=('Add component. Multiple repeatition adds more components.'
+                  'If not given use the default settings of the run: %s' % type(self).components)
         )
 
         argument_parser.add_argument(
@@ -63,7 +68,21 @@ class MinimalRun(object):
             help='Number of events to be generated',
         )
 
+        argument_parser.add_argument(
+            '-r',
+            '--random-seed',
+            dest='random_seed',
+            default=self.random_seed,
+            type=int,
+            help='The random number generator seed to be used before the processing starts.',
+        )
+
         return argument_parser
+
+    def forward_random_seed(self):
+        if self.random_seed is not None:
+            get_logger().info("Setting random seed to %s" % self.random_seed)
+            basf2.set_random_seed(self.random_seed)
 
     def configure(self, arguments):
         # Simply translate the arguments that have
@@ -75,6 +94,8 @@ class MinimalRun(object):
                 setattr(self, key, value)
                 get_logger().info("Setting %s to %s", key, value)
 
+        self.forward_random_seed()
+
     def configure_from_commandline(self):
         argument_parser = self.create_argument_parser()
         arguments = argument_parser.parse_args()
@@ -85,31 +106,32 @@ class MinimalRun(object):
         #############################
         main_path = basf2.create_path()
 
-        # use Generator if no root input file is specified
-        components = self.components
-
+        # If there is no input file is the EventInfoSetter as master module
         if self.root_input_file is None:
-            # Master module
-            eventInfoSetterModule = basf2.register_module('EventInfoSetter')
-            eventInfoSetterModule.param({'evtNumList': [self.n_events],
-                                         'runList': [1], 'expList': [1]})
-            main_path.add_module(eventInfoSetterModule)
+            # Master module: EventInfoSetter
+            event_info_setter_module = basf2.register_module('EventInfoSetter')
+            event_info_setter_module.param({'evtNumList': [self.n_events],
+                                            'runList': [1], 'expList': [1]})
+            main_path.add_module(event_info_setter_module)
 
         else:
-            rootInputModule = basf2.register_module('RootInput')
-            rootInputModule.param({'inputFileName': self.root_input_file})
-            main_path.add_module(rootInputModule)
+            # Master module: RootInput
+            root_input_module = basf2.register_module('RootInput')
+            root_input_module.param({'inputFileName': self.root_input_file})
+            main_path.add_module(root_input_module)
 
         # gearbox & geometry needs to be registered any way
-        gearboxModule = basf2.register_module('Gearbox')
-        main_path.add_module(gearboxModule)
-        geometryModule = basf2.register_module('Geometry')
-        geometryModule.param('components', components)
-        main_path.add_module(geometryModule)
+        gearbox_module = basf2.register_module('Gearbox')
+        main_path.add_module(gearbox_module)
+
+        components = self.components
+        geometry_module = basf2.register_module('Geometry')
+        geometry_module.param('components', components)
+        main_path.add_module(geometry_module)
 
         # Progress module
-        progressModule = basf2.register_module('Progress')
-        main_path.add_module(progressModule)
+        progress_module = basf2.register_module('Progress')
+        main_path.add_module(progress_module)
 
         return main_path
 

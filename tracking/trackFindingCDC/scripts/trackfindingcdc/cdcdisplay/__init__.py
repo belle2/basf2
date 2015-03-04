@@ -679,7 +679,7 @@ class CDCSVGDisplayModule(Module):
             procDisplay = subprocess.Popen(['display', fileName])
             # procDisplay = subprocess.Popen(['display','-background','white',
             # '-flatten',fileName])
-
+            # procConverter = subprocess.Popen(['rsvg', root + '.svg', root + '.png'])
             raw_input('Hit enter for next event')
 
     def endRun(self):

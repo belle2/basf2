@@ -308,7 +308,7 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
 
   hist[ 0 ]->Fill((float)(eve));
   hist[ 1 ]->Fill((float)(raw_copper->GetBlockNwords(n)));
-  hist[ 2 ]->Fill((float)(raw_copper->GetCOPPERNodeId(n) & 0xFFF));
+  hist[ 2 ]->Fill((float)(raw_copper->GetNodeID(n) & 0xFFF));
 
 
   for (int i = 0; i < 4; i++) {
@@ -319,7 +319,7 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
 
   return;
   printf(": Event # %d : node ID 0x%.8x : block size %d bytes\n",
-         raw_copper->GetEveNo(n), raw_copper->GetCOPPERNodeId(n),
+         raw_copper->GetEveNo(n), raw_copper->GetNodeID(n),
          raw_copper->GetBlockNwords(n) * sizeof(int));
 
 

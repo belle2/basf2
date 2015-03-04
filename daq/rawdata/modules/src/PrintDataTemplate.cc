@@ -120,7 +120,7 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
 
   printf(": Event # %d : node ID 0x%.8x : block size %d bytes\n",
-         raw_copper->GetEveNo(i), raw_copper->GetCOPPERNodeId(i),
+         raw_copper->GetEveNo(i), raw_copper->GetNodeID(i),
          raw_copper->GetBlockNwords(i) * sizeof(int));
 
   //

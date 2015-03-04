@@ -128,6 +128,9 @@ class ReadOrGenerateEventsRun(MinimalRun):
                 # Allow for Background only execution
                 main_path.add_module(generator_module)
 
+            random_barrier_module = basf2.register_module("RandomBarrier")
+            main_path.add_module(random_barrier_module)
+
             bkg_file_paths = get_bkg_file_paths(self.bkg_files)
             components = self.components
             simulation.add_simulation(main_path,

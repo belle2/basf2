@@ -198,8 +198,8 @@ namespace Belle2 {
           l_epitaxial->SetVisAttributes(EpitaxialVisAtt);
           l_metalized->SetVisAttributes(MetalizedVisAtt);
 
-          LadderID++;
         }
+        LadderID++;
       }
     }
   } // plume namespace

@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import logging
-
 import basf2
 
 from tracking.run.event_generation import ReadOrGenerateEventsRun
-from tracking.modules import StandardTrackingReconstructionModule, \
-    BrowseFileOnTerminateModule
-import tracking.modules
+from tracking.modules import (
+    StandardTrackingReconstructionModule,
+    CDCFullFinder
+)
 
 import tracking.utilities as utilities
+
+import logging
 
 
 def get_logger():
@@ -89,7 +90,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 main_path.add_module(trackFinderModule)
 
             elif self.finder_module == "CDCFullFinder":
-                trackFinderModule = tracking.modules.CDCFullFinder()
+                trackFinderModule = CDCFullFinder()
                 main_path.add_module(trackFinderModule)
 
             else:
@@ -119,7 +120,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         # track finding comonenst ex-situ
         if (self.fit_geometry and
                 self.finder_module != 'StandardReco' and
-                not isinstance(self.finder_module, StandardTrackingReconstruction)):
+                not isinstance(self.finder_module, StandardTrackingReconstructionModule)):
 
             # Prepare Genfit extrapolation
             setupGenfitExtrapolationModule = basf2.register_module('SetupGenfitExtrapolation')

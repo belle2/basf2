@@ -18,7 +18,7 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-class BrowseFileOnTerminateModule(basf2.Module):
+class BrowseTFileOnTerminateModule(basf2.Module):
 
     """A simple module that shows a ROOT file on termination of the execution path.
 
@@ -37,7 +37,7 @@ class BrowseFileOnTerminateModule(basf2.Module):
     """
 
     def __init__(self, root_file):
-        super(BrowseFileOnTerminateModule, self).__init__()
+        super(BrowseTFileOnTerminateModule, self).__init__()
         self.root_file = root_file
 
     def terminate(self):
@@ -61,6 +61,8 @@ class BrowseFileOnTerminateModule(basf2.Module):
         # If we opened the file ourselves close it again.
         if not isinstance(self.root_file, ROOT.TFile):
             tfile.Close()
+
+        super(BrowseTFileOnTerminateModule, self).terminate()
 
 
 class StandardTrackingReconstructionModule(metamodules.PathModule):

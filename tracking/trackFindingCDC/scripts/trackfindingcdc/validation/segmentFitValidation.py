@@ -12,12 +12,11 @@ import sys
 import numpy as np
 
 from tracking.run.event_generation import StandardEventGenerationRun
+from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 
 from tracking.utilities import NonstrictChoices
 from tracking.validation.utilities import prob, is_primary
 from tracking.validation.plot import ValidationPlot
-
-from tracking.modules import BrowseFileOnTerminateModule
 
 import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
@@ -34,13 +33,12 @@ def get_logger():
 CONTACT = "oliver.frost@desy.de"
 
 
-class SegmentFitValidationRun(StandardEventGenerationRun):
+class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     segment_finder_module = "SegmentFinderCDCMCTruth"
     # segment_finder_module = "SegmentFinderCDCFacetAutomaton"
     fitter = Belle2.TrackFindingCDC.CDCRiemannFitter()
     fit_positions = "rl"
-    output_file_name = "SegmentFitValidation.root"
-    show_results = False
+    output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(SegmentFitValidationRun, self).create_argument_parser(**kwds)
@@ -79,15 +77,6 @@ class SegmentFitValidationRun(StandardEventGenerationRun):
                   "* 'reco' means only the reconstructed position\n"
                   "* 'circle' means only the drift circle *without* the right left passage\n"
                   "* 'rl' means only the drift circle with the right left passage\n")
-        )
-
-        argument_parser.add_argument(
-            '-s',
-            '--show',
-            action='store_true',
-            default=self.show_results,
-            dest='show_results',
-            help='Show generated plots in a TBrowser immediatly.',
         )
 
         return argument_parser
@@ -129,11 +118,6 @@ class SegmentFitValidationRun(StandardEventGenerationRun):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         main_path = super(SegmentFitValidationRun, self).create_path()
-
-        if self.show_results:
-            browseFileOnTerminateModule = \
-                BrowseFileOnTerminateModule(self.output_file_name)
-            main_path.add_module(browseFileOnTerminateModule)
 
         segment_finder_module = self.get_basf2_module(self.segment_finder_module)
         main_path.add_module(segment_finder_module)

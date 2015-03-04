@@ -12,12 +12,11 @@ import sys
 import numpy as np
 
 from tracking.run.event_generation import StandardEventGenerationRun
+from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 
 from tracking.utilities import NonstrictChoices
 from tracking.validation.utilities import prob, is_primary
 from tracking.validation.plot import ValidationPlot
-
-from tracking.modules import BrowseFileOnTerminateModule
 
 import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
@@ -34,7 +33,7 @@ def get_logger():
 CONTACT = "oliver.frost@desy.de"
 
 
-class SegmentPairFitValidationRun(StandardEventGenerationRun):
+class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     segment_finder_module = basf2.register_module("SegmentFinderCDCMCTruth")
     segment_finder_module.param({"MinCDCHits": 4})
 
@@ -45,8 +44,7 @@ class SegmentPairFitValidationRun(StandardEventGenerationRun):
         "SegmentPairNeighborChooser": "none",
     })
     fit_method_name = "fuse-xy"
-    output_file_name = "SegmentFitValidation.root"
-    show_results = False
+    output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(SegmentPairFitValidationRun, self).create_argument_parser(**kwds)
@@ -73,15 +71,6 @@ class SegmentPairFitValidationRun(StandardEventGenerationRun):
                   "* 'fuse-simple' means the axial-stereo fusion technique is used without a prior z reconstruction step.\n"
                   "* 'fuse-xy-priority' means the axial-stereo fusion technique is used with a prior z reconstruction step and a linear sz fit, on which the fusion technique acts as a correction..\n"
                   "* 'fuse-sz-priority' is like 'fuse-xy-priority' but the z position is reestimated after the sz linear fit has been performed, which means that the residuals become visible in xy plane again.")
-        )
-
-        argument_parser.add_argument(
-            '-s',
-            '--show',
-            action='store_true',
-            default=self.show_results,
-            dest='show_results',
-            help='Show generated plots in a TBrowser immediatly.',
         )
 
         return argument_parser
@@ -124,11 +113,6 @@ class SegmentPairFitValidationRun(StandardEventGenerationRun):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         main_path = super(SegmentPairFitValidationRun, self).create_path()
-
-        if self.show_results:
-            browseFileOnTerminateModule = \
-                BrowseFileOnTerminateModule(self.output_file_name)
-            main_path.add_module(browseFileOnTerminateModule)
 
         segment_finder_module = self.get_basf2_module(self.segment_finder_module)
         main_path.add_module(segment_finder_module)

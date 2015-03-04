@@ -6,8 +6,8 @@ import logging
 import basf2
 
 from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
-from tracking.modules import StandardTrackingReconstructionModule, \
-    BrowseFileOnTerminateModule
+from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
+from tracking.modules import StandardTrackingReconstructionModule
 import tracking.modules
 from tracking.validation.hit_module import ExpertTrackingValidationModule
 import tracking.utilities as utilities
@@ -19,11 +19,10 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-class TrackingValidationRun(ReadOrGenerateTrackedEventsRun):
+class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTrackedEventsRun):
     expert_level = None
     contact = TRACKING_MAILING_LIST
-    output_file_name = 'TrackingValidation.root'
-    show_results = False
+    output_file_name = 'TrackingValidation.root'  # Specification for BrowseTFileOnTerminateRunMixin
     pulls = True
 
     # The default way to add the validation module to the path
@@ -47,26 +46,12 @@ class TrackingValidationRun(ReadOrGenerateTrackedEventsRun):
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(TrackingValidationRun, self).create_argument_parser(**kwds)
-
-        argument_parser.add_argument(
-            '-s',
-            '--show',
-            action='store_true',
-            default=self.show_results,
-            dest='show_results',
-            help='Show generated plots in a TBrowser immediatly.',)
-
         return argument_parser
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         main_path = super(TrackingValidationRun, self).create_path()
-
-        if self.show_results:
-            browseFileOnTerminateModule = \
-                BrowseFileOnTerminateModule(self.output_file_name)
-            main_path.add_module(browseFileOnTerminateModule)
 
         # add the validation module to the path
         self.preparePathValidation(main_path)

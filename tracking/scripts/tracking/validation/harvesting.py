@@ -11,7 +11,7 @@ import basf2
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 
-from tracking.modules import BrowseFileOnTerminateModule
+from tracking.modules import BrowseTFileOnTerminateModule
 from tracking.utilities import coroutine
 from tracking.validation.utilities import root_cd
 from tracking.validation.refiners import Refiner
@@ -218,7 +218,7 @@ class HarvestingModule(basf2.Module):
 
         # Display the root file on terminate
         if show and self.output_file_name:
-            main_path.add_module(BrowseFileOnTerminateModule(self.output_file_name))
+            main_path.add_module(BrowseTFileOnTerminateModule(self.output_file_name))
 
         if pyprofile:
             main_path.add_module(metamodules.PyProfilingModule(self))

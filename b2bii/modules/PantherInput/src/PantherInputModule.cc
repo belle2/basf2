@@ -27,7 +27,12 @@
 // Belle tables
 #include "panther/hepevt.h"
 
+// PntDB
+#include "pntdb/TPntFDDB.h"
+#include "pntdb/TPntDB.h"
+
 // Belle II dataobjects
+>>> >>> > Added example access to pntdb
 #include <framework/dataobjects/EventMetaData.h>
 
 // analysis dataobjects
@@ -81,6 +86,14 @@ void PantherInputModule::initialize()
 
   // Initialize Belle II DataStore
   initializeDataStore();
+
+  // Open Database connection
+  Belle::TPntFDDB master("acc");  // use default hostname
+  Belle::TPntDB constant(master, "constant");  // implicitly call Open fddb/db
+  if (constant.IsOK()) {
+    B2INFO("PantherInput: Connected to acc::constant");
+  }
+
 
   // Open data file
   m_fd = new Belle::Panther_FileIO(m_inputFileName.c_str(), BBS_READ);

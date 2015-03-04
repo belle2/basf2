@@ -13,153 +13,35 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2 3 4 5 6 7 8 
+    <bar unit="cm">1 
     </bar>
-
+    
     <Active>
       <Material>PLUME-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">12.6686</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">32.0</k_zC>
-      <k_phiC unit="deg">50.5903</k_phiC>
-    </Active>
 
-    <Active>
-      <Material>PLUME-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">12.6304</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">32.0</k_zC>
-      <k_phiC unit="deg">110.519</k_phiC>
-    </Active>
+      <z_plume unit="cm">6.0</z_plume>
+      <r_plume unit="cm">4.0</r_plume>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">135.0</Phi>      
+      
+      <elecBandX unit="mm">0.300</elecBandX>
+      <integrationTime unit="us">100.0</integrationTime>
 
-    <Active>
-      <Material>PLUME-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">12.6304</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">32.0</k_zC>
-      <k_phiC unit="deg">249.481</k_phiC>
+      <MetalThickness unit="um">5.0</MetalThickness>
+      <SubstrateThickness unit="um">30.0</SubstrateThickness>
+      <EpitaxialThickness unit="um">15.0</EpitaxialThickness>
+      
+      <ElecBandY unit="mm">3.0</ElecBandY>      
+      <SensorDistance unit="um">500.0</SensorDistance>
+      <nPixelsX>1152</nPixelsX>
+      <nPixelsY>576</nPixelsY>
+      <pitchX unit="um"> 18.4</pitchX>
+      <pitchY unit="um"> 18.4</pitchY>
+      <DistanceFromFoamCenter unit="mm">1.0</DistanceFromFoamCenter>
+      <GlueThickness unit="um">10.0</GlueThickness>
+      <KaptonThickness unit="um">100.0</KaptonThickness>
+      <CupperThickness unit="um">40.0</CupperThickness>
     </Active>
-
-    <Active>
-      <Material>PLUME-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">12.6686</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">32.0</k_zC>
-      <k_phiC unit="deg">309.4097</k_phiC>
-    </Active>
-
-    <Active>
-      <Material>PLUME-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">155.098</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">55.1259</k_phiC>
-    </Active>
-
-    <Active>
-      <Material>PLUME-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">161.193</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">113.578</k_phiC>
-    </Active>
-
-    <Active>
-      <Material>PLUME-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">161.193</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">246.422</k_phiC>
-    </Active>
-
-    <Active>
-      <Material>PLUME-Material</Material>
-      <cDx1 unit="mm">17.974</cDx1>
-      <cDx2 unit="mm">20.394</cDx2>       
-      <cDy1 unit="mm">12.289</cDy1>
-      <cDx3 unit="mm">22.973</cDx3>
-      <cDy2 unit="mm">19.626</cDy2>
-      <cDx4 unit="mm">26.8378</cDx4>
-      <cDz unit="mm">124.0</cDz>
-      <cDtheta unit="deg">13.1856</cDtheta>
-      <cDphi unit="deg">-90.0</cDphi>
-      <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">155.098</k_z_TILTED>
-      <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">304.8741</k_phiC>
-    </Active>
-
 
   </Content>
 </DetectorComponent>

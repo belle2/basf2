@@ -58,7 +58,7 @@ namespace {
 
 CDCWireHitTopology::CDCWireHitTopology() :
   m_eventMetaData(-999, -999, -999),
-  m_useSimpleTDCCountTranslator(true),
+  m_useSimpleTDCCountTranslator(false),
   m_initialTDCCountTranslator(m_useSimpleTDCCountTranslator ?
                               static_cast<CDC::TDCCountTranslatorBase*>(new CDC::SimpleTDCCountTranslator()) :
                               static_cast<CDC::TDCCountTranslatorBase*>(new CDC::RealisticTDCCountTranslator())

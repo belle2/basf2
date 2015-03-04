@@ -76,7 +76,8 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
 
     # Generate the average finding efficiencies and hit efficiencies
     save_overview_figures_of_merit = refiners.save_fom(
-        name="{module.name}_efficiency_figures_of_merit",
+        name="{module.name}_overview_figures_of_merit",
+        title="Overview figures in {module.title}",
         aggregation=np.nanmean,
         key="{part_name}",
         select=["finding_efficiency", "hit_efficiency"],

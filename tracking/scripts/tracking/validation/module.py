@@ -45,11 +45,11 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
         # First forward the output_file_name to the separate modules
         # but we open the TFile in the top level and forward it to them on initialize.
 
-        mc_side_module = self.MCSideModule(name,
-                                           contact,
-                                           output_file_name=output_file_name,
-                                           trackCandidatesColumnName=trackCandidatesColumnName,
-                                           expert_level=expert_level)
+        eventwise_module = self.EventwiseModule(name,
+                                                contact,
+                                                output_file_name=output_file_name,
+                                                trackCandidatesColumnName=trackCandidatesColumnName,
+                                                expert_level=expert_level)
 
         pr_side_module = self.PRSideModule(name,
                                            contact,
@@ -57,16 +57,17 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
                                            trackCandidatesColumnName=trackCandidatesColumnName,
                                            expert_level=expert_level)
 
-        eventwise_module = self.EventwiseModule(name,
-                                                contact,
-                                                output_file_name=output_file_name,
-                                                trackCandidatesColumnName=trackCandidatesColumnName,
-                                                expert_level=expert_level)
+        mc_side_module = self.MCSideModule(name,
+                                           contact,
+                                           output_file_name=output_file_name,
+                                           trackCandidatesColumnName=trackCandidatesColumnName,
+                                           expert_level=expert_level)
 
         self.modules = [
-            mc_side_module,
+            eventwise_module,
             pr_side_module,
-            eventwise_module]
+            mc_side_module,
+        ]
 
         super(SeparatedTrackingValidationModule, self).__init__(modules=self.modules)
 

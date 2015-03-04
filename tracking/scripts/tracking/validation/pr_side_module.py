@@ -135,8 +135,8 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     save_tree = refiners.save_tree(folder_name="pr_tree", name="pr_tree", above_expert_level=1)
 
     save_clone_rate = refiners.save_fom(
-        name="{module.name}_clone_rate_figures_of_merit",
-        title="Clone rate in {module.title}",
+        name="{module.name}_overview_figures_of_merit",  # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
+        title="Overview figures in {module.title}",
         description="clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches)",
         key="clone rate",
         select="pr_clone",
@@ -145,8 +145,8 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     )
 
     save_fake_rate = refiners.save_fom(
-        name="{module.name}_fake_rate_figures_of_merit",
-        title="Fake rate in {module.title}",
+        name="{module.name}_overview_figures_of_merit",  # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
+        title="Overview figures in {module.title}",
         description="fake_rate - ratio of pattern recognition tracks that are not related to a particle (background, ghost) to all pattern recognition tracks",
         key="fake rate",
         select="pr_fake",

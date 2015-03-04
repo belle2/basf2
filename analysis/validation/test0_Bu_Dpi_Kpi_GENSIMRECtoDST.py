@@ -11,6 +11,7 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from ROOT import Belle2
 
 set_random_seed(12345)
 
@@ -26,8 +27,7 @@ main.add_module(eventinfosetter)
 # generate Bu->D0(K pi) pi events
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('boost2LAB', True)
-evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
-                  + '/generators/evtgen/decayfiles/Bu_D0pi,Kpi.dec')
+evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/generators/evtgen/decayfiles/Bu_D0pi,Kpi.dec'))
 
 main.add_module(evtgeninput)
 

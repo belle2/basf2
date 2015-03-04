@@ -4,6 +4,8 @@
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 16 - Feb - 2015
+//
+// Contributors: Anze Zupanc,
 //-
 
 #include <b2bii/modules/PantherInput/PantherInputModule.h>
@@ -19,22 +21,22 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <memory>
+#include <queue>
 
-// Panther tables
-#include "panther/belletdf.h"
-#include "panther/mdst.h"
+// Belle tables
+#include "panther/hepevt.h"
 
-// Belle2 objects
+// Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
-#include <mdst/dataobjects/V0.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
+// analysis dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+
+// Belle II utilities
+#include "framework/gearbox/Const.h"
+#include "framework/gearbox/Unit.h"
 
 // ROOT classes
 #include "TLorentzVector.h"
@@ -62,7 +64,7 @@ PantherInputModule::PantherInputModule() : Module()
   m_nevt = -1;
 
   //Parameter definition
-  addParam("inputFileName"  , m_inputFileName, "Panther file name.", string("PantherInput.sroot"));
+  addParam("inputFileName"  , m_inputFileName, "Panther MDST input file name.", string("PantherInput.sroot"));
 
   B2DEBUG(1, "PantherInput: Constructor done.");
 }
@@ -77,20 +79,49 @@ void PantherInputModule::initialize()
   // Initialize Panther
   BsInit(0);
 
-  // Initialize EvtMetaData
-  StoreObjPtr<EventMetaData>::registerPersistent();
-  StoreArray<Particle>::registerPersistent();  // just to use Particle Class
+  // Initialize Belle II DataStore
+  initializeDataStore();
 
   // Open data file
   m_fd = new Belle::Panther_FileIO(m_inputFileName.c_str(), BBS_READ);
 
-  // Read first event
+  // Read first event (note that this is not a real event)
   m_fd->read();
 
   // Process first event
   Convert();
 
   B2INFO("PantherInput: initialized.");
+}
+
+void PantherInputModule::initializeDataStore()
+{
+  B2DEBUG(99, "[PantherInputModule::initializeDataStore] initialization of DataStore started");
+
+  // event meta data Object pointer
+  StoreObjPtr<EventMetaData>::registerPersistent();
+
+  // list here all converted Belle2 objects
+  StoreArray<ECLCluster> eclClusters;
+  eclClusters.registerInDataStore();
+
+  StoreArray<Track> tracks;
+  tracks.registerInDataStore();
+
+  StoreArray<TrackFitResult> trackFitResults;
+  trackFitResults.registerInDataStore();
+
+  // needs to be registered, even if running over data, since this information is available only at the begin_run function
+  // TODO: Change to module parameter and check if consistent?
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.registerInDataStore();
+
+  //list here all Relations between Belle2 objects
+  tracks.registerRelationTo(mcParticles);
+  eclClusters.registerRelationTo(mcParticles);
+  eclClusters.registerRelationTo(tracks);
+
+  B2DEBUG(99, "[PantherInputModule::initializeDataStore] initialization of DataStore ended");
 }
 
 
@@ -103,24 +134,43 @@ void PantherInputModule::beginRun()
 void PantherInputModule::event()
 {
   m_nevt++;
-  // First event is already loaded
+
+  B2DEBUG(1, "[PantherInputModule::event] event #" << m_nevt);
+
+  // First event is already loaded (skip it)
   if (m_nevt == 0) return;
 
-  // Convert events
+  // Convert event
   Convert();
 }
 
 void PantherInputModule::Convert()
 {
+  B2DEBUG(99, "[PantherInputModule::Coversion] Started conversion for event #" << m_nevt);
+
   // Read event from Panther
   int rectype = -1;
   while (rectype < 0 && rectype != -2) {
     rectype = m_fd->read();
-    //    printf ( "rectype = %d\n", rectype );
+    B2DEBUG(99, "[PantherInputModule::Coversion] rectype = " << rectype);
   }
-  if (rectype == -2) return;   // EoF detected
+  if (rectype == -2) {   // EoF detected
+    B2DEBUG(99, "[PantherInputModule::Coversion] Conversion stopped at event #" << m_nevt << ". EOF detected!");
+    return;
+  }
 
   // 1. Fill EventMetadata
+  bool mc = convertBelleEventObject();
+
+  // 2. Convert MC information
+  if (mc) {
+    convertGenHepEvtTable();
+  }
+
+}
+
+bool PantherInputModule::convertBelleEventObject()
+{
   // Get Belle_event_Manager
   Belle::Belle_event_Manager& evman = Belle::Belle_event_Manager::get_manager();
   Belle::Belle_event& evt = evman[0];
@@ -128,31 +178,197 @@ void PantherInputModule::Convert()
   // Fill EventMetaData
   StoreObjPtr<EventMetaData> evtmetadata;
   evtmetadata.create();
+
+  // set exp/run/evt numbers
   evtmetadata->setExperiment(evt.ExpNo());
   evtmetadata->setRun(evt.RunNo());
   evtmetadata->setEvent(evt.EvtNo() & 0x0fffffff);
 
+  // set generated weight (>0 for MC; <0 for real DATA)
+  evtmetadata->setGeneratedWeight((evt.ExpMC() == 2) ? 1.0 : -1.0);
 
-  // 2. Particle Class
-  StoreArray<Particle> plist;
+  B2DEBUG(90, "[PantherInputModule] Convert exp/run/evt: " << evt.ExpNo() << "/" << evt.RunNo() << "/" << int(evt.EvtNo() & 0x0fffffff));
 
-  // 2.1 Mdst_charged
-  Belle::Mdst_charged_Manager& chgman = Belle::Mdst_charged_Manager::get_manager();
-  for (vector<Belle::Mdst_charged>::iterator it = chgman.begin(); it != chgman.end(); ++it) {
-    Belle::Mdst_charged& chg = *it;
-    Particle* b2chg = plist.appendNew();
-    b2chg->set4Vector(TLorentzVector(chg.px(), chg.py(), chg.pz(), chg.mass()));
-    //    printf ( "charged: px = %f, py = %f, pz = %f\n", chg.px(), chg.py(), chg.pz() );
+  return (evt.ExpMC() == 2) ? true : false;
+}
+
+void PantherInputModule::convertGenHepEvtTable()
+{
+
+  // clear the Gen_hepevt_ID <-> MCParticleGraphPosition map
+  genHepevtToMCParticle.clear();
+
+  // create MCParticle StoreArray
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.create();
+
+  // check if the Gen_hepevt table has any entries
+  Belle::Gen_hepevt_Manager& genMgr = Belle::Gen_hepevt_Manager::get_manager();
+  if (genMgr.count() == 0) {
+    return;
   }
-  // 2.2 Mdst_gamma
-  Belle::Mdst_gamma_Manager& gamman = Belle::Mdst_gamma_Manager::get_manager();
-  for (vector<Belle::Mdst_gamma>::iterator it = gamman.begin(); it != gamman.end(); ++it) {
-    Belle::Mdst_gamma& gam = *it;
-    Particle* b2gam = plist.appendNew();
-    b2gam->set4Vector(TLorentzVector(gam.px(), gam.py(), gam.pz(), 0.0));
-    //    printf ( "gamma: px = %f, py = %f, pz = %f\n", gam.px(), gam.py(), gam.pz() );
+
+  m_particleGraph.clear();
+
+  int position = m_particleGraph.size();
+  int nParticles = 0;
+
+  // Start with the root (mother-of-all) particle (1st particle in gen_hepevt table)
+  m_particleGraph.addParticle(); nParticles++;
+  Belle::Gen_hepevt rootParticle = genMgr(Belle::Panther_ID(1));
+  genHepevtToMCParticle[1] = position;
+
+  MCParticleGraph::GraphParticle* p = &m_particleGraph[position];
+  convertGenHepevtObject(rootParticle, p);
+
+  // at this stage (before all other particles) all "motherless" particles (i.e. beam background)
+  // have to be added to Particle graph
+  for (Belle::Gen_hepevt_Manager::iterator genIterator = genMgr.begin(); genIterator != genMgr.end(); genIterator++) {
+    Belle::Gen_hepevt hep = *genIterator;
+    if (hep.moFirst() == 0 && hep.moLast() == 0 && hep.get_ID() > 1) {
+      // Particle has no mother
+      // put the particle in the graph:
+      position = m_particleGraph.size();
+      m_particleGraph.addParticle(); nParticles++;
+      genHepevtToMCParticle[hep.get_ID()] = position;
+
+      MCParticleGraph::GraphParticle* graphParticle = &m_particleGraph[position];
+      convertGenHepevtObject(hep, graphParticle);
+    }
   }
 
+  typedef std::pair<MCParticleGraph::GraphParticle*, Belle::Gen_hepevt> halfFamily;
+  halfFamily currFamily;
+  halfFamily family;
+  std::queue < halfFamily > heritancesQueue;
+
+  for (int idaughter = rootParticle.daFirst(); idaughter <= rootParticle.daLast(); ++idaughter) {
+    if (idaughter == 0) {
+      B2DEBUG(95, "Trying to access generated daughter with Panther ID == 0");
+      continue;
+    }
+
+    currFamily.first = p;
+    currFamily.second = genMgr(Belle::Panther_ID(idaughter));
+    heritancesQueue.push(currFamily);
+  }
+
+  //now we can go through the queue:
+  while (!heritancesQueue.empty()) {
+    currFamily = heritancesQueue.front(); //get the first entry from the queue
+    heritancesQueue.pop(); //remove the entry.
+
+    MCParticleGraph::GraphParticle* currMother = currFamily.first;
+    Belle::Gen_hepevt& currDaughter = currFamily.second;
+
+    //putting the daughter in the graph:
+    position = m_particleGraph.size();
+    m_particleGraph.addParticle(); nParticles++;
+    genHepevtToMCParticle[currDaughter.get_ID()] = position;
+
+    MCParticleGraph::GraphParticle* graphDaughter = &m_particleGraph[position];
+    convertGenHepevtObject(currDaughter, graphDaughter);
+
+    //add relation between mother and daughter to graph:
+    currMother->decaysInto((*graphDaughter));
+
+    int nGrandChildren = currDaughter.daLast() - currDaughter.daFirst() + 1;
+
+    if (nGrandChildren > 0 && currDaughter.daFirst() != 0) {
+      for (int igrandchild = currDaughter.daFirst(); igrandchild <= currDaughter.daLast(); ++igrandchild) {
+        if (igrandchild == 0) {
+          B2DEBUG(95, "Trying to access generated daughter with Panther ID == 0");
+          continue;
+        }
+
+        family.first = graphDaughter;
+        family.second = genMgr(Belle::Panther_ID(igrandchild));
+        heritancesQueue.push(family);
+      }
+    }
+  }
+
+  m_particleGraph.generateList();
+}
+
+void PantherInputModule::convertGenHepevtObject(const Belle::Gen_hepevt& genHepevt, MCParticleGraph::GraphParticle* mcParticle)
+{
+  B2DEBUG(80, "Gen_ehepevt: idhep " << genHepevt.idhep() << " (" << genHepevt.isthep() << ") with ID = " << genHepevt.get_ID());
+
+  // updating the GraphParticle information from the Gen_hepevt information
+  const int idHep = recoverMoreThan24bitIDHEP(genHepevt.idhep());
+
+  // TODO: do not change 911 to 22
+  if (idHep == 0 || idHep == 911) {
+    mcParticle->setPDG(22);
+  } else {
+    mcParticle->setPDG(idHep);
+  }
+
+  if (genHepevt.isthep() > 0) {
+    mcParticle->setStatus(Belle2::MCParticle::c_PrimaryParticle);
+  }
+
+  mcParticle->setMass(genHepevt.M());
+
+  TLorentzVector p4(genHepevt.PX(), genHepevt.PY(), genHepevt.PZ(), genHepevt.E());
+  mcParticle->set4Vector(p4);
+
+  mcParticle->setProductionVertex(genHepevt.VX()*Unit::mm, genHepevt.VY()*Unit::mm, genHepevt.VZ()*Unit::mm);
+  mcParticle->setProductionTime(genHepevt.T()*Unit::mm / Belle2::Const::speedOfLight);
+
+  // decay time of this particle is production time of the daughter particle
+  if (genHepevt.daFirst() > 0) {
+    Belle::Gen_hepevt_Manager& genMgr = Belle::Gen_hepevt_Manager::get_manager();
+    Belle::Gen_hepevt daughterParticle = genMgr(Belle::Panther_ID(genHepevt.daFirst()));
+    mcParticle->setDecayTime(daughterParticle.T()*Unit::mm / Belle2::Const::speedOfLight);
+    mcParticle->setDecayVertex(daughterParticle.VX()*Unit::mm, daughterParticle.VY()*Unit::mm, daughterParticle.VZ()*Unit::mm);
+  }
+
+  mcParticle->setValidVertex(true);
+}
+
+int PantherInputModule::recoverMoreThan24bitIDHEP(int id)
+{
+  /*
+    QUICK CHECK: most of the normal particles are smaller than
+    0x100000, while all the corrupt id has some of the high bits on.
+
+    This bit check has to be revised when the table below is updated.
+  */
+  const int mask = 0x00f00000;
+  int high_bits = id & mask;
+  if (high_bits == 0 || high_bits == mask) return id;
+
+  switch (id) {
+    case   7114363: return      91000443; // X(3940)
+    case   6114363: return      90000443; // Y(3940)
+    case   6114241: return      90000321; // K_0*(800)+
+    case   6114231: return      90000311; // K_0*(800)0
+    case  -6865004: return       9912212; // p_diff+
+    case  -6865104: return       9912112; // n_diffr
+    case  -6866773: return       9910443; // psi_diff
+    case  -6866883: return       9910333; // phi_diff
+    case  -6866993: return       9910223; // omega_diff
+    case  -6867005: return       9910211; // pi_diff+
+    case  -6867103: return       9910113; // rho_diff0
+    case  -7746995: return       9030221; // f_0(1500)
+    case  -7756773: return       9020443; // psi(4415)
+    case  -7756995: return       9020221; // eta(1405)
+    case  -7766773: return       9010443; // psi(4160)
+    case  -7776663: return       9000553; // Upsilon(5S)
+    case  -7776773: return       9000443; // psi(4040)
+    case  -7776783: return       9000433; // D_sj(2700)+
+    case  -7776995: return       9000221; // f_0(600)
+    case  -6114241: return     -90000321; // K_0*(800)-
+    case  -6114231: return     -90000311; // anti-K_0*(800)0
+    case   6865004: return      -9912212; // anti-p_diff-
+    case   6865104: return      -9912112; // anti-n_diffr
+    case   6867005: return      -9910211; // pi_diff-
+    case   7776783: return      -9000433; // D_sj(2700)-
+    default:
+      return id;
+  }
 }
 
 void PantherInputModule::endRun()

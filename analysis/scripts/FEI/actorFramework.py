@@ -365,15 +365,15 @@ class Play(object):
         print "Saving dependency graph to FEIgraph.dot"
         dotfile = open("FEIgraph.dot", "w")
         dotfile.write("digraph FRdependencies {\n")
-        excludeList = ['Path', 'Geometry', 'Label_', 'Name_', 'Identifier_', 'MVAConfig_', 'PreCutConfig_', 'PostCutConfig_']
+        excludeList = ['None', 'path', 'hash', 'Geometry', 'Label_', 'Name_', 'Identifier_', 'MVAConfig_', 'PreCutConfig_', 'PostCutConfig_']
 
         for actor in needed:
             for provided in actor.provides:
-                if provided.startswith('SignalProbability'):
+                if provided.startswith('SignalProbability') or provided.startswith('Probability'):
                     style = '[shape=box,style=filled,fillcolor=orange]'
-                elif provided.startswith('ParticleList'):
+                elif provided.startswith('ParticleList') or provided.startswith('Particle'):
                     style = '[shape=box,style=filled,fillcolor=lightblue]'
-                elif provided.startswith('PreCut'):
+                elif provided.startswith('PreCut') or provided.startswith('Prefix'):
                     style = '[shape=box,style=filled,fillcolor=darkolivegreen1]'
                 else:
                     style = '[shape=box,style=filled,fillcolor=white]'

@@ -965,6 +965,104 @@ def sendMail():
     server.quit()
 
 
+def isFloat(element):
+    try:
+        float(element)
+        return True
+    except ValueError:
+        return False
+
+
+def isValidParticle(element):
+    try:
+        pdg.from_name(element)
+        return True
+    except LookupError:
+        return False
+
+
+def getBranchingFractions(filename):
+    branching_fractions = {}
+    mother = 'UNKOWN'
+    with open(filename, 'r') as f:
+        for line in f:
+            fields = line.split(' ')
+            fields = filter(lambda x: x != '', fields)
+            if len(fields) < 2:
+                continue
+            if fields[0][0] == '#':
+                continue
+            if fields[0] == 'Decay':
+                mother = fields[1].strip()
+                if mother not in branching_fractions:
+                    branching_fractions[mother] = dict()
+                continue
+            if fields[0] == 'Enddecay':
+                mother = 'UNKOWN'
+                continue
+            if mother == 'UNKOWN':
+                continue
+            fields = fields[:-1]
+            if len(fields) < 1:
+                continue
+            if not isFloat(fields[0]):
+                continue
+            while len(fields) > 1:
+                if not isValidParticle(fields[-1]):
+                    fields = fields[:-1]
+                else:
+                    break
+            if len(fields) < 1:
+                continue
+            if not all(isValidParticle(p) for p in fields[1:]):
+                continue
+            daughters = tuple(sorted(p for p in fields[1:]))
+            if daughters in branching_fractions[mother]:
+                print "WARNING: decay ", mother, " -> ", " ".join(daughters), "is specified twice"
+                branching_fractions[mother][daughters] += float(fields[0])
+            else:
+                branching_fractions[mother][daughters] = float(fields[0])
+    branching_fractions['D0'][('K-', 'pi+', 'pi0', 'pi0')] = 0.0  # UNKOWN
+    branching_fractions['anti-D0'][('K+', 'pi-', 'pi0', 'pi0')] = 0.0  # UNKOWN
+    branching_fractions['D_s+'][('K-', 'K_S0', 'pi+', 'pi+')] = 0.0164  # From PDG
+    branching_fractions['D_s+'][('K_S0', 'pi+', 'pi0')] = 0.005  # From PDG Mode D_s -> K0 pi- pi0 1%
+    branching_fractions['D_s-'][('K+', 'K_S0', 'pi-', 'pi-')] = 0.0164  # From PDG
+    branching_fractions['D_s-'][('K_S0', 'pi-', 'pi0')] = 0.005  # From PDG Mode D_s -> K0 pi- pi0 1%
+    branching_fractions['B+'][('J/psi', 'K_S0', 'pi+')] = 0.00094
+    branching_fractions['B-'][('J/psi', 'K_S0', 'pi-')] = 0.00094
+    branching_fractions['B0'][('J/psi', 'K_S0', 'pi+', 'pi-')] = 0.001
+    branching_fractions['anti-B0'][('J/psi', 'K_S0', 'pi+', 'pi-')] = 0.001
+    return branching_fractions
+
+
+def getCoveredBranchingFraction(particles, identifier, include_daughter_fractions=False, branching_fractions=getBranchingFractions('../externals/v00-05-03/share/evtgen/DECAY.DEC')):
+    n, l = identifier.split(':')
+    particle = [p for p in particles if p.identifier == identifier or p.identifier == pdg.conjugate(n) + ':' + l][0]
+    if len(particle.channels) == 0:
+        return 1.0
+    if particle.name not in branching_fractions:
+        return 0.0
+    pbr = branching_fractions[particle.name]
+    total = 0
+    for channel in particle.channels:
+        factor = 1
+        if include_daughter_fractions:
+            for d in channel.daughters:
+                factor *= getCoveredBranchingFraction(particles, d, True)
+        key = tuple(sorted(d.split(':')[0] for d in channel.daughters))
+        for i in ['e+', 'mu+', 'tau+']:
+            m = key.count(i) - key.count(pdg.conjugate(i))
+            if m > 0:
+                key = tuple(sorted(key + ('nu_' + i[:-1], ) * m))
+            elif m < 0:
+                key = tuple(sorted(key + ('anti-nu_' + i[:-1], ) * (-m)))
+        if key not in branching_fractions[particle.name]:
+            print "Missing information about", key
+        else:
+            total += branching_fractions[particle.name][key] * factor
+    return total
+
+
 def getModuleStatsFromFile(filename):
     """
     Gets a vector of ModuleStatistics objects from given file.

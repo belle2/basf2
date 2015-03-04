@@ -13,6 +13,7 @@ class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
 
     output_folder = '/tmp'
     iteractive = True
+    show_all_drawoptions = False  # Also show draw options that are related to the cellular automaton track finder on the command line?
 
     def __init__(self):
         super(CDCDisplayRun, self).__init__()
@@ -64,7 +65,13 @@ Note that some options are only relevant, if the cellular automaton finder in th
         )
 
         cdc_display_module = self.cdc_display_module
-        for option in sorted(cdc_display_module.drawoptions):
+
+        if self.show_all_drawoptions:
+            drawoptions = cdc_display_module.all_drawoptions
+        else:
+            drawoptions = cdc_display_module.drawoptions
+
+        for option in sorted(drawoptions):
             options_flag = '--%s ' % option.replace('_', '-')
 
             draw_argument_group.add_argument(
@@ -84,7 +91,12 @@ Note that some options are only relevant, if the cellular automaton finder in th
         cdc_display_module.output_folder = arguments.output_folder
         cdc_display_module.interactive = arguments.interactive
 
-        for option in cdc_display_module.drawoptions:
+        if self.show_all_drawoptions:
+            drawoptions = cdc_display_module.all_drawoptions
+        else:
+            drawoptions = cdc_display_module.drawoptions
+
+        for option in drawoptions:
             try:
                 is_active_option = getattr(arguments, option)
             except AttributeError:

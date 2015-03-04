@@ -4,19 +4,18 @@
 from basf2 import *
 from modularAnalysis import *
 
-import sys
-
 # ----------------------------------------------------------------------------------
 # This script loads specified ROOT file and prints the content of the DataStore
 # for each event. To be used for debugging.
+#
+# Execute script with:
+#
+#
+# basf2 printDataStore.py -i [input_ROOT_file]
+#
 # ----------------------------------------------------------------------------------
 
-if len(sys.argv) != 2:
-    sys.exit('Must provide one input parameter:[input_root_file_name]')
-
-inputMdstFileName = sys.argv[1]
-
-inputMdst(inputMdstFileName)
+analysis_main.add_module('RootInput')
 
 printDataStore()
 

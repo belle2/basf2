@@ -17,8 +17,7 @@ class CDCDisplayRun(ReadOrGenerateEventsRun):
 
     def __init__(self):
         super(CDCDisplayRun, self).__init__()
-        self._cdc_display_module = \
-            cdcdisplay.CDCSVGDisplayModule(self.output_folder)
+        self._cdc_display_module = cdcdisplay.CDCSVGDisplayModule(self.output_folder)
 
     @property
     def cdc_display_module(self):
@@ -28,41 +27,51 @@ class CDCDisplayRun(ReadOrGenerateEventsRun):
         return cdc_display_module
 
     def create_argument_parser(self, **kwds):
-        argument_parser = super(CDCDisplayRun,
-                                self).create_argument_parser(**kwds)
+        argument_parser = super(CDCDisplayRun, self).create_argument_parser(**kwds)
 
-        argument_parser.add_argument('-o', '--output-folder',
-                                     dest='output_folder',
-                                     default=self.output_folder,
-                                     help='Folder where the output files are written to. If the folder does not exist create it. '
-                                     )
+        argument_parser.add_argument(
+            '-o',
+            '--output-folder',
+            dest='output_folder',
+            default=self.output_folder,
+            help='Folder where the output files are written to. If the folder does not exist create it. '
+        )
 
-        argument_parser.add_argument('--non-interactive', dest='interactive',
-                                     action='store_false',
-                                     help='Run in batch mode and do not show the each event.'
-                                     )
+        argument_parser.add_argument(
+            '--non-interactive',
+            dest='interactive',
+            action='store_false',
+            help='Run in batch mode and do not show each event.'
+        )
 
-        argument_parser.add_argument('-m', '--mc-tracks', dest='use_track_finder_mc',
-                                     action='store_true',
-                                     help='Generate the mc tracks using the TrackFinderMCTruth.'
-                                     )
+        argument_parser.add_argument(
+            '-m',
+            '--mc-tracks',
+            dest='use_track_finder_mc',
+            action='store_true',
+            help='Generate the mc tracks using the TrackFinderMCTruth.'
+        )
 
         subparser_description = \
             """
 Various options to configure what shall be drawn in the display.
 Note that some options are only relevant, if the cellular automaton finder in the CDC has been run before.
 """
-        draw_argument_group = \
-            argument_parser.add_argument_group(title='Draw options',
-                                               description=subparser_description)
+        draw_argument_group = argument_parser.add_argument_group(
+            title='Draw options',
+            description=subparser_description
+        )
 
         cdc_display_module = self.cdc_display_module
         for option in sorted(cdc_display_module.drawoptions):
             options_flag = '--%s ' % option.replace('_', '-')
 
-            draw_argument_group.add_argument(options_flag, dest=option,
-                                             action='store_true', default=getattr(cdc_display_module,
-                                                                                  option))
+            draw_argument_group.add_argument(
+                options_flag,
+                dest=option,
+                action='store_true',
+                default=getattr(cdc_display_module, option)
+            )
 
         return argument_parser
 
@@ -87,16 +96,16 @@ Note that some options are only relevant, if the cellular automaton finder in th
         path = super(CDCDisplayRun, self).create_path()
 
         if self.use_track_finder_mc:
-            trackFinderMCModule = basf2.register_module("TrackFinderMCTruth")
-            path.add_module(trackFinderMCModule)
+            track_finder_mc_module = basf2.register_module("TrackFinderMCTruth")
+            path.add_module(track_finder_mc_module)
 
         path.add_module(self.cdc_display_module)
         return path
 
 
 def main():
-    cdcDisplayRun = CDCDisplayRun()
-    cdcDisplayRun.configure_and_execute_from_commandline()
+    cdc_display_run = CDCDisplayRun()
+    cdc_display_run.configure_and_execute_from_commandline()
 
 
 if __name__ == '__main__':

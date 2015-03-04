@@ -160,11 +160,11 @@ namespace Belle2 {
       for (int window = 0; window < c_NumWindows; window++) {
         TProfile* prof = m_profile[channel][window];
         if (prof) {
-          ASICWindowConstants windowConstants(window);
-          windowConstants.setPedestals(prof);
-          bool ok = channelConstants->setAsicWindowConstants(windowConstants);
+          ASICPedestals pedestals(window);
+          pedestals.setPedestals(prof);
+          bool ok = channelConstants->setPedestals(pedestals);
           if (!ok) {
-            B2ERROR("TOPWFCalibratorModule: can't set window constants for channel "
+            B2ERROR("TOPWFCalibratorModule: can't set pedestals for channel "
                     << channel << " storage window " << window);
           }
         }

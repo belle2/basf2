@@ -12,7 +12,8 @@
 #define ASICCHANNELCONSTANTS_H
 
 #include <TObject.h>
-#include <top/calibration/ASICWindowConstants.h>
+#include <top/calibration/ASICPedestals.h>
+#include <top/calibration/ASICGains.h>
 #include <vector>
 
 namespace Belle2 {
@@ -25,10 +26,15 @@ namespace Belle2 {
     public:
 
       /**
+       * time axis size (time axis is for 4 ASIC windows!)
+       */
+      enum {c_TimeAxisSize = ASICPedestals::c_WindowSize * 4};
+
+      /**
        * Default constructor
        */
       ASICChannelConstants(): m_barID(0), m_channel(0), m_timeInterval(0) {
-        for (unsigned i = 0; i < ASICWindowConstants::c_WindowSize; i++)
+        for (unsigned i = 0; i < c_TimeAxisSize; i++)
           m_timeAxis[i] = 0;
       }
 
@@ -40,34 +46,36 @@ namespace Belle2 {
        */
       ASICChannelConstants(int barID, unsigned channel, int numWindows):
         m_barID(barID), m_channel(channel) {
-        for (int i = 0; i < numWindows; i++) m_windows.push_back(NULL);
-
+        for (int i = 0; i < numWindows; i++) m_pedestals.push_back(NULL);
         float timeBin = 1 / 2.77; //TODO get correct value
         setTimeAxis(timeBin);
-        setTimeInterval(timeBin * ASICWindowConstants::c_WindowSize);
+        setTimeInterval(timeBin * c_TimeAxisSize);
       }
 
       /**
        * Destructor
        */
       ~ASICChannelConstants() {
-        for (auto & window : m_windows) {
+        for (auto & window : m_pedestals) {
+          if (window) delete window;
+        }
+        for (auto & window : m_gains) {
           if (window) delete window;
         }
       }
 
       /**
-       * Set calibration constants of a single ASIC window.
-       * @param windowConstants calibration constants of ASIC window
+       * Set pedestals of a single ASIC window.
+       * @param pedestals ASIC window pedestals
        * @return true on success
        */
-      bool setAsicWindowConstants(const ASICWindowConstants& windowConstants) {
-        unsigned i = windowConstants.getAsicWindow();
-        if (i < m_windows.size()) {
-          if (m_windows[i]) {
-            *m_windows[i] = windowConstants;
+      bool setPedestals(const ASICPedestals& pedestals) {
+        unsigned i = pedestals.getAsicWindow();
+        if (i < m_pedestals.size()) {
+          if (m_pedestals[i]) {
+            *m_pedestals[i] = pedestals;
           } else {
-            m_windows[i] = new ASICWindowConstants(windowConstants);
+            m_pedestals[i] = new ASICPedestals(pedestals);
           }
           return true;
         }
@@ -75,7 +83,28 @@ namespace Belle2 {
       }
 
       /**
-       * Set time interval between two consecutive ASIC windows
+       * Set gains of a single ASIC window.
+       * @param gains ASIC window gains
+       * @return true on success
+       */
+      bool setGains(const ASICGains& gains) {
+        if (m_gains.empty()) {
+          for (unsigned i = 0; i < m_pedestals.size(); i++) m_gains.push_back(NULL);
+        }
+        unsigned i = gains.getAsicWindow();
+        if (i < m_gains.size()) {
+          if (m_gains[i]) {
+            *m_gains[i] = gains;
+          } else {
+            m_gains[i] = new ASICGains(gains);
+          }
+          return true;
+        }
+        return false;
+      }
+
+      /**
+       * Set time interval to the next four ASIC windows
        * @param timeInterval time interval
        */
       void setTimeInterval(float timeInterval) {m_timeInterval = timeInterval;}
@@ -86,7 +115,7 @@ namespace Belle2 {
        */
       void setTimeAxis(float timeBin) {
         float t = 0;
-        for (unsigned i = 0; i < ASICWindowConstants::c_WindowSize; i++) {
+        for (unsigned i = 0; i < c_TimeAxisSize; i++) {
           m_timeAxis[i] = t;
           t += timeBin;
         }
@@ -98,7 +127,6 @@ namespace Belle2 {
        */
       int getBarID() const {return m_barID;}
 
-
       /**
        * Return hardware channel number
        * @return channel number
@@ -106,7 +134,7 @@ namespace Belle2 {
       unsigned getChannel() const {return m_channel;}
 
       /**
-       * Return time interval between two consecutive ASIC windows
+       * Return time interval to the next four ASIC windows
        * @return time interval
        */
       float getTimeInterval() const {return m_timeInterval;}
@@ -118,7 +146,7 @@ namespace Belle2 {
        */
       std::vector<float> getTimeAxis(float offset = 0) const {
         std::vector<float> timeAxis;
-        for (unsigned i = 0; i < ASICWindowConstants::c_WindowSize; i++) {
+        for (unsigned i = 0; i < c_TimeAxisSize; i++) {
           timeAxis.push_back(m_timeAxis[i] + offset);
         }
         return timeAxis;
@@ -129,37 +157,48 @@ namespace Belle2 {
        * @return number of windows
        */
       unsigned getNumofWindows() const {
-        return m_windows.size();
+        return m_pedestals.size();
       }
 
       /**
-       * Return calibration constants of i-th ASIC window
+       * Return pedestals of i-th ASIC window
        * @param i ASIC window number
-       * @return pointer to calibration constants or NULL
+       * @return pointer to pedestals or NULL
        */
-      const ASICWindowConstants* getAsicWindowConstants(unsigned i) const {
-        if (i < m_windows.size()) return m_windows[i];
+      const ASICPedestals* getPedestals(unsigned i) const {
+        if (i < m_pedestals.size()) return m_pedestals[i];
         return NULL;
       }
 
       /**
-       * Return number of good ASIC windows
+       * Return gains of i-th ASIC window
+       * @param i ASIC window number
+       * @return pointer to gains or NULL
+       */
+      const ASICGains* getGains(unsigned i) const {
+        if (i < m_gains.size()) return m_gains[i];
+        return NULL;
+      }
+
+      /**
+       * Return number of good ASIC windows (e.g. those with defined pedestals)
        * @return number of good windows
        */
       unsigned getNumofGoodWindows() const {
         unsigned n = 0;
-        for (auto & window : m_windows) if (window) n++;
+        for (auto & window : m_pedestals) if (window) n++;
         return n;
       }
 
 
     private:
 
-      int m_barID;         /**< bar ID */
-      unsigned m_channel;  /**< hardware channel ID */
+      int m_barID;          /**< bar ID */
+      unsigned m_channel;   /**< hardware channel ID */
       float m_timeInterval; /**< time interval between ASIC windows */
-      float m_timeAxis[ASICWindowConstants::c_WindowSize]; /**< time axis */
-      std::vector<ASICWindowConstants*> m_windows; /**< calib.constants of ASIC windows */
+      float m_timeAxis[c_TimeAxisSize]; /**< time axis */
+      std::vector<ASICPedestals*> m_pedestals; /**< pedestals */
+      std::vector<ASICGains*> m_gains;         /**< gains */
 
       ClassDef(ASICChannelConstants, 1); /**< ClassDef */
 

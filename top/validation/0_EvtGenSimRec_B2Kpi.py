@@ -12,6 +12,7 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from ROOT import Belle2
 
 set_random_seed(123451)
 
@@ -25,9 +26,8 @@ eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
 
 # generate events (B0 -> K+pi- + cc, other B0 generic)
-decayFile = os.environ['BELLE2_LOCAL_DIR'] + '/top/validation/B2Kpi.dec'
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', decayFile)
+evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('top/validation/B2Kpi.dec'))
 evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 

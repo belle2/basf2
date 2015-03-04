@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ASICWINDOWCONSTANTS_H
-#define ASICWINDOWCONSTANTS_H
+#ifndef ASICPEDESTALS_H
+#define ASICPEDESTALS_H
 
 #include <TObject.h>
 #include <TProfile.h>
@@ -18,34 +18,30 @@ namespace Belle2 {
   namespace TOP {
 
     /**
-     * Calibration constants of an ASIC window: pedestals, gains
+     * Calibration constants of a single ASIC window: pedestals
      */
-    class ASICWindowConstants : public TObject {
+    class ASICPedestals : public TObject {
     public:
 
       /**
        * Various constants
        */
       enum {c_WindowSize = 64, /**< number of samples */
-            c_Unit = 0x1000    /**< unit of fixed point number */
            };
 
       /**
        * Default constructor
        */
-      ASICWindowConstants(): m_asicWindow(0), m_offset(0), m_unit(c_Unit), m_gainError(0) {
+      ASICPedestals(): m_asicWindow(0), m_offset(0) {
         for (unsigned i = 0; i < c_WindowSize; i++) m_pedestals[i] = 0;
-        for (unsigned i = 0; i < c_WindowSize; i++) m_gains[i] = c_Unit;
       }
 
       /**
        * Constructor with ASIC window
        * @param asicWindow ASIC window ID
        */
-      ASICWindowConstants(unsigned short asicWindow):
-        m_asicWindow(asicWindow), m_offset(0), m_unit(c_Unit), m_gainError(0) {
+      ASICPedestals(unsigned short asicWindow): m_asicWindow(asicWindow), m_offset(0) {
         for (unsigned i = 0; i < c_WindowSize; i++) m_pedestals[i] = 0;
-        for (unsigned i = 0; i < c_WindowSize; i++) m_gains[i] = c_Unit;
       }
 
       /**
@@ -54,14 +50,6 @@ namespace Belle2 {
        * @return true, on success
        */
       bool setPedestals(const TProfile* profile);
-
-      /**
-       * Set gains
-       * @param gains vector of relative gains (size must be c_WindowSize)
-       * @param error error on gains
-       * @return true, on success
-       */
-      bool setGains(const std::vector<float> gains, float error = 0);
 
       /**
        * Return ASIC window number
@@ -99,37 +87,13 @@ namespace Belle2 {
         return 0;
       }
 
-      /**
-       * Return relative gain for i-th sample
-       * @param i sample number
-       * @return relative gain
-       */
-      float getGain(unsigned i) const {
-        if (i < c_WindowSize) {
-          return float(m_gains[i]) / float(m_unit);
-        }
-        return 0;
-      }
-
-      /**
-       * Return gain uncertainly
-       * @return gain uncertainty
-       */
-      float getGainError() const {
-        return float(m_gainError) / float(m_unit);
-      }
-
-
     private:
 
       unsigned short m_asicWindow;  /**< ASIC window number */
       unsigned short m_offset;      /**< common pedestal offset */
-      unsigned short m_unit;        /**< unit of fixed point number */
-      unsigned short m_gainError;   /**< gain error (fixed point format) */
       unsigned short m_pedestals[c_WindowSize]; /**< pedestals (packed: value, error) */
-      unsigned short m_gains[c_WindowSize];  /**< gains (in fixed point format) */
 
-      ClassDef(ASICWindowConstants, 1); /**< ClassDef */
+      ClassDef(ASICPedestals, 1); /**< ClassDef */
 
     };
 

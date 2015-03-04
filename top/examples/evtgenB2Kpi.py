@@ -6,6 +6,7 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
 import glob
+from ROOT import Belle2
 
 # ----------------------------------------------------------------------------------
 # Example of generating signal MC (B0 -> K- pi+, one of the benchmarks for TOP)
@@ -30,9 +31,9 @@ eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
 
 # Event generator (B0 -> K+pi- + cc, other B0 generic)
-decayFile = os.environ['BELLE2_LOCAL_DIR'] + '/top/examples/B2Kpi.dec'
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', decayFile)
+evtgeninput.param('userDECFile',
+                  Belle2.FileSystem.findFile('top/examples/B2Kpi.dec'))
 evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 

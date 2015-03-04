@@ -72,7 +72,7 @@ namespace Belle2 {
      */
     enum {c_NumChannels = TOP::IRSConstants::c_NumChannels,
           c_NumWindows = 512,
-          c_WindowSize = TOP::ASICWindowConstants::c_WindowSize
+          c_WindowSize = TOP::ASICPedestals::c_WindowSize
          };
 
     std::string m_outputFileName;     /**< output file name (root file) */

@@ -30,6 +30,7 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
   Module()
 {
   setDescription("Module for converting genfit::TrackCands (e.g. from TrackFinderMCTruth) to SpacePointTrackCands.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("PXDClusters", m_PXDClusterName, "PXDCluster collection name. WARNING: it is only checked if these exist, they are not actually used at the moment!", string(""));
   addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", string(""));
@@ -139,11 +140,11 @@ void GFTC2SPTCConverterModule::terminate()
   if (m_abortedLowNDFCtr) generalOutput << "For " << m_abortedLowNDFCtr << " SPTCs the NDF was below " << m_PARAMminNDF << "\n";
   // NEW output
   B2INFO(generalOutput.str())
-  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME())) { // TODO: put this into a more understandable format (i.e. interpretation of the counters)
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME())) {
     stringstream verboseOutput;
     verboseOutput << "counter variables: ";
-    verboseOutput << "abortedNoSP: " << m_abortedNoSPCtr << ", abortedTrueHit: " << m_abortedTrueHitCtr << ", abortedUnsuitableGFTC: " << m_abortedUnsuitableTCCtr;
-    verboseOutput << ", abortedNoValidSP: " << m_abortedNoValidSPCtr;
+    verboseOutput << "abortedNoSP: " << m_abortedNoSPCtr << ", abortedUnsuitableGFTC: " << m_abortedUnsuitableTCCtr << ", abortedNoValidSP: " << m_abortedNoValidSPCtr;
+    if (m_PARAMcheckTrueHits) verboseOutput << ", abortedTrueHit: " << m_abortedTrueHitCtr;
     if (m_PARAMskipCluster) {
       verboseOutput << ", skippedCluster: " << m_skippedCluster << ", skippedPXDnoSP: " << m_skippedPXDnoSPCtr;
       verboseOutput << ", skippedSVDnoSP: " << m_skippedSVDnoSPCtr << ", skippedPXDnoTH: " << m_skippedPXDnoTHCtr << ", skippedSVDnoTH: " << m_skippedSVDnoTHCtr;
@@ -151,8 +152,20 @@ void GFTC2SPTCConverterModule::terminate()
       verboseOutput << ", skippedPXDnoValidSP " << m_skippedPXDnoValidSPCtr << ", skippedSVDnoValidSP " << m_skippedSVDnoValidSPCtr;
     }
     if (m_nonSingleSPCtr) verboseOutput << ", nonSingleSP " << m_nonSingleSPCtr;
-    verboseOutput << ", singleClusterSVDSP: " << m_singleClusterSPCtr << ", noTwoClusterSP: " << m_noTwoClusterSPCtr;
+    verboseOutput << ", noTwoClusterSP: " << m_noTwoClusterSPCtr << ", singleClusterSVDSP: " << m_singleClusterSPCtr;
     B2DEBUG(1, verboseOutput.str())
+  }
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 2, PACKAGENAME())) {
+    stringstream explanation;
+    explanation << "explanation of counter variables (key words only):\n";
+    explanation << "NoSP -> Found no related SpacePoint to a Cluster\n";
+    explanation << "Unsuitable -> Cluster combination of SpacePoint was not in consecutive order in GFTC\n";
+    explanation << "NoValidSP -> Cluster combination of SpacePoint was not contained in GFTC\n";
+    if (m_PARAMcheckTrueHits) explanation << "TrueHit/noTH -> found no related TrueHit to a SpacePoint\n";
+    if (m_nonSingleSPCtr) explanation << "nonSingleSP -> more than one singleCluster SpacePoint related to a Cluster\n";
+    explanation << "noTwoClusterSP -> found no two Cluster SpacePoint\n";
+    explanation << "singleClusterSVDSP -> number of tries to add a singleCluster SpacePoint for latter cases\n";
+    B2DEBUG(2, explanation.str())
   }
 }
 
@@ -166,8 +179,6 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
 
   int nHits = genfitTC->getNHits();
   B2DEBUG(15, "genfit::TrackCand contains " << nHits << " hits");
-
-  bool checkedTrueHits = m_PARAMcheckTrueHits;
 
   // for easier handling fill a taggedPair (typedef) to distinguish whether a hit has already been used or if is still open for procession
   std::vector<flaggedPair<int> > fHitIDs;
@@ -183,8 +194,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
     double sortingParam = aTCHit->getSortingParameter();
 
     B2DEBUG(20, "Processing TrackCandHit " << iTCHit << " of " << nHits)
-    // check if this hit has already been used, if not process
-    if (fHitIDs[iTCHit].get<0>()) {
+    if (fHitIDs[iTCHit].get<0>()) { // check if this hit has already been used, if not process
       B2DEBUG(60, "This hit has already been added to the SpacePointTrackCand via a SpacePoint and will not be processed again");
     } else {
       std::pair<SpacePoint*, conversionStatus> aSpacePoint = processTrackCandHit(aTCHit, pxdClusters, svdClusters, fHitIDs, iTCHit);
@@ -204,6 +214,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
     }
   }
 
+  B2DEBUG(20, "NDF for this SpacePointTrackCand: " << m_NDF)
   if (m_NDF < m_PARAMminNDF) {
     B2DEBUG(10, "The created SpacePointTrackCand has not enough NDF: NDF is " << m_NDF << " but 'minNDF' is set to " << m_PARAMminNDF);
     return std::make_pair(SpacePointTrackCand(), c_lowNDF);
@@ -229,7 +240,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
   spacePointTC.setCovSeed(genfitTC->getCovSeed());
   spacePointTC.setSortingParameters(sortingParams);
 
-  if (checkedTrueHits) { spacePointTC.addRefereeStatus(SpacePointTrackCand::c_checkedTrueHits); }
+  if (m_PARAMcheckTrueHits) { spacePointTC.addRefereeStatus(SpacePointTrackCand::c_checkedTrueHits); }
   if (!usedAllHits) { spacePointTC.addRefereeStatus(SpacePointTrackCand::c_omittedClusters); }
 
   return std::make_pair(spacePointTC, c_noFail);
@@ -292,6 +303,7 @@ GFTC2SPTCConverterModule::getSpacePoint(const ClusterType* cluster, std::vector<
       m_noTwoClusterSPCtr++;
       if (m_PARAMuseSingleClusterSP) {
         B2DEBUG(80, "Trying to get a single Cluster SpacePoint now!")
+        m_singleClusterSPCtr++;
         return getSpacePoint<ClusterType, TrueHitType>(cluster, flaggedHitIDs, iHit, true, m_SingleClusterSVDSPName); // get single Cluster SVD PacePoint if desired. WARNING: hardcoded to SVD here at the moment!
       }
     }
@@ -450,7 +462,7 @@ int GFTC2SPTCConverterModule::getAppropriateSpacePointIndex(const std::vector<st
     }
 
     // sort to find the smallest difference
-    std::sort(positionInfos.begin(), positionInfos.end(), [](const std::pair<int, int>& lTuple, const std::pair<int, int>& rTuple) { return lTuple.second < rTuple.second; });
+    sort(positionInfos.begin(), positionInfos.end(), [](const pair<int, int>& lTuple, const pair<int, int>& rTuple) { return lTuple.second < rTuple.second; });
 
     if (positionInfos.at(0).second != 1) {
       B2DEBUG(80, "The shortest squared distance between two Clusters is " << positionInfos.at(0).second << "! This would lead to wrong ordered TrackCandHits.")

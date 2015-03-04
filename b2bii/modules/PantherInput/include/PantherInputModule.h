@@ -71,6 +71,13 @@ namespace Belle2 {
   private:
 
     /**
+     * Test panther database connection
+     * export BELLE_POSTGRES_SERVER=${BELLE_POSTGRES_SERVER=ekpbelle}
+     * export BELLE_INDEX_POSTGRES_SERVER=${BELLE_INDEX_POSTGRES_SERVER=al19}
+     */
+    void test_pntdb();
+
+    /**
      * Initializes Belle II DataStore.
      */
     void initializeDataStore();

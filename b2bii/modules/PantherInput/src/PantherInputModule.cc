@@ -27,12 +27,12 @@
 // Belle tables
 #include "panther/hepevt.h"
 
-// PntDB
-#include "pntdb/TPntFDDB.h"
-#include "pntdb/TPntDB.h"
+// PNTDB: Uncomment if you have pntdb in your externals
+//#include "pntdb/TPntFDDB.h"
+//#include "pntdb/TPntDB.h"
+//#include "tables/run_info.h"
 
 // Belle II dataobjects
->>> >>> > Added example access to pntdb
 #include <framework/dataobjects/EventMetaData.h>
 
 // analysis dataobjects
@@ -79,6 +79,41 @@ PantherInputModule::~PantherInputModule()
 {
 }
 
+void PantherInputModule::test_pntdb()
+{
+
+  // PNTDB: Uncomment if you have pntdb in your externals
+  /*
+  Belle::Beam_energy_Manager& Beam_mgr = Belle::Beam_energy_Manager::get_manager();
+  Beam_mgr.remove();
+
+  // Open Database connection
+  Belle::TPntFDDB master("rif");  // use default hostname
+  Belle::TPntDB constant(master, "benergy");  // implicitly call Open fddb/db
+
+  if (not constant.IsOK()) {
+    B2ERROR("PantherInput: Couldn't connect to rif::benergy");
+    return;
+  }
+
+  // Read out beam-energy of off-resonance data experiment 71!
+  // exp: 71: run: 1 (run indepent number is stored in 1, NOT 0), version: 2
+  if(constant.Get(71, 1 , 2) <= 0){
+    B2ERROR("PantherInput: Cannot get data from database correctly.");
+    return;
+  }
+
+  Belle::Beam_energy_Manager::iterator beit = Beam_mgr.begin();
+  if( beit == Beam_mgr.end()){
+    B2ERROR("PantherInput: There is no Beam Energy data.");
+    return;
+  } else {
+    B2INFO("PantherInput: BeamEnergy is" << beit->E_beam());
+  }
+  */
+
+}
+
 void PantherInputModule::initialize()
 {
   // Initialize Panther
@@ -87,13 +122,7 @@ void PantherInputModule::initialize()
   // Initialize Belle II DataStore
   initializeDataStore();
 
-  // Open Database connection
-  Belle::TPntFDDB master("acc");  // use default hostname
-  Belle::TPntDB constant(master, "constant");  // implicitly call Open fddb/db
-  if (constant.IsOK()) {
-    B2INFO("PantherInput: Connected to acc::constant");
-  }
-
+  test_pntdb();
 
   // Open data file
   m_fd = new Belle::Panther_FileIO(m_inputFileName.c_str(), BBS_READ);

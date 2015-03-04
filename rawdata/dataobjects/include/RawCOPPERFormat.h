@@ -191,9 +191,6 @@ namespace Belle2 {
     //! get COPPER counter(not event number)
     virtual unsigned int GetCOPPERCounter(int n) = 0;
 
-    //! get COPPER node id from data(Currently same as GetCOPPERNodeId)
-    virtual int GetCOPPERNodeId(int n) = 0;
-
     //! get # of FINNESEs which contains data
     virtual int GetNumFINESSEBlock(int n) = 0;
 

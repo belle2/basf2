@@ -153,9 +153,6 @@ namespace Belle2 {
     //! get COPPER counter(not event number)
     virtual unsigned int GetCOPPERCounter(int n);
 
-    //! get COPPER node id from data(Currently same as GetCOPPERNodeId)
-    virtual int GetCOPPERNodeId(int n);
-
     //! get # of FINNESEs which contains data
     virtual int GetNumFINESSEBlock(int n);
 
@@ -334,13 +331,6 @@ namespace Belle2 {
     CheckVersionSetBuffer();
     return m_access->GetDriverChkSum(n);
   }
-
-  inline int RawCOPPER::GetCOPPERNodeId(int n)
-  {
-    CheckVersionSetBuffer();
-    return m_access->GetCOPPERNodeId(n);
-  }
-
 
   inline int RawCOPPER::GetExpNo(int n)
   {

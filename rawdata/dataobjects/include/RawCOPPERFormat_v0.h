@@ -110,9 +110,6 @@ namespace Belle2 {
     //! get COPPER counter(not event number)
     virtual unsigned int GetCOPPERCounter(int n);
 
-    //! get COPPER node id from data(Currently same as GetCOPPERNodeId)
-    virtual int GetCOPPERNodeId(int n);
-
     //! get # of FINNESEs which contains data
     virtual int GetNumFINESSEBlock(int n);
 
@@ -338,13 +335,6 @@ namespace Belle2 {
                      - tmp_trailer.RAWTRAILER_NWORDS - SIZE_COPPER_DRIVER_TRAILER;
     return m_buffer[ pos_nwords ];
   }
-
-  inline int RawCOPPERFormat_v0::GetCOPPERNodeId(int n)
-  {
-    int pos_nwords = GetBufferPos(n) + tmp_header.POS_NODE_ID;
-    return m_buffer[ pos_nwords ];
-  }
-
 
   inline int RawCOPPERFormat_v0::GetExpNo(int n)
   {

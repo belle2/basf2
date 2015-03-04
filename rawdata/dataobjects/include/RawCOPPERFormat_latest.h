@@ -92,9 +92,6 @@ namespace Belle2 {
     // Get information from 13words "COPPER header" attached by COPPER board
     //
 
-    //! get COPPER node id from data(Currently same as GetCOPPERNodeId)
-    virtual int GetCOPPERNodeId(int n);
-
     //! get # of FINNESEs which contains data
     virtual int GetNumFINESSEBlock(int n);
 
@@ -166,14 +163,6 @@ namespace Belle2 {
     }
     return &(m_buffer[ pos_nwords ]);
   }
-
-
-  inline int RawCOPPERFormat_latest::GetCOPPERNodeId(int n)
-  {
-    int pos_nwords = GetBufferPos(n) + tmp_header.POS_NODE_ID;
-    return m_buffer[ pos_nwords ];
-  }
-
 
   inline int RawCOPPERFormat_latest::GetExpNo(int n)
   {

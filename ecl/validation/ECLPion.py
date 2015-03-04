@@ -4,6 +4,7 @@
 ########################################################
 # This steering file generates an ntuple for validation
 # purposes
+# Author Benjamin Oberhof
 ########################################################
 
 import os

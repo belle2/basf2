@@ -1,3 +1,17 @@
+/* ECLPion.C 
+ * ROOT macro for ECL validation plots 
+ * Authors: Elisa Manoni, Benjamin Oberhof 
+ * 2014
+*/
+
+/*
+<header>
+<input>ECLClusterOutput_500mev.root</input>
+<output>ECLCluster.root</output>
+<contact>ecl2ml@bpost.kek.jp</contact>
+</header>
+*/
+
 void ECLCluster()
 {
   // open the file with simulated and reconstructed EvtGen particles
@@ -36,7 +50,7 @@ void ECLCluster()
   hE9oE25_500->GetListOfFunctions()->Add(new TNamed("Description", "Energy deposited in 3x3 matrix around most energetic deposit over energy deposited in 5x5 matrix around most energetic deposit 500 MeV/c single photons"));
   hE9oE25_500->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
   hE9oE25_500->GetXaxis()->SetTitle("E9oE25");
-  hE90E25_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  hE9oE25_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   m_tree->Draw("eclClusterE9oE25>>hE9oE25_500");
 
   TH1F* hphi_500 = new TH1F("hphi_500", "Reconstructed #phi Angle", 100,-3.155,3.155);

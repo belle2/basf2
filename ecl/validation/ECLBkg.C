@@ -4,6 +4,14 @@
  * 2014
 */
 
+/*
+<header>
+<input>ECLBkgOutput.root</input>
+<output>ECLBkg.root</output>
+<contact>ecl2ml@bpost.kek.jp</contact>
+</header>
+*/
+
 void ECLBkg()
 {
 

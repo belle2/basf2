@@ -4,6 +4,14 @@
  * 2014
 */
 
+/*
+<header>
+<input>ECLPionOutput.root</input>
+<output>ECLPion.root</output>
+<contact>ecl2ml@bpost.kek.jp</contact>
+</header>
+*/
+
 void ECLPion(){
 
 

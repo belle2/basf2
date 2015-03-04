@@ -1,3 +1,18 @@
+/* ECLPion.C 
+ * ROOT macro for ECL validation plots 
+ * Authors: Poyuan Chen, Benjamin Oberhof 
+ * 2014
+*/
+
+/*
+<header>
+<input>ECLMuonOutput.root</input>
+<output>ECLMuon.root</output>
+<contact>ecl2ml@bpost.kek.jp</contact>
+</header>
+*/
+
+
 void ECLMuon()
 {
   // open the file with simulated and reconstructed EvtGen particles

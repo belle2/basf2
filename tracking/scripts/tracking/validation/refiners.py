@@ -167,6 +167,9 @@ class SaveHistogramsRefiner(Refiner):
                  contact=None,
                  description=None,
                  check=None,
+                 lower_bound=None,
+                 upper_bound=None,
+                 bins=None,
                  outlier_z_score=None,
                  allow_discrete=False,
                  stackby=""):
@@ -179,6 +182,10 @@ class SaveHistogramsRefiner(Refiner):
         self.description = description
         self.check = check
         self.contact = contact
+
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
+        self.bins = bins
 
         self.outlier_z_score = outlier_z_score
         self.allow_discrete = allow_discrete
@@ -242,6 +249,9 @@ class SaveHistogramsRefiner(Refiner):
 
             histogram = ValidationPlot(root_save_name(name))
             histogram.hist(parts,
+                           lower_bound=self.lower_bound,
+                           upper_bound=self.upper_bound,
+                           bins=self.bins,
                            outlier_z_score=self.outlier_z_score,
                            allow_discrete=self.allow_discrete,
                            stackby=stackby_parts)
@@ -273,6 +283,9 @@ class SaveProfilesRefiner(Refiner):
                  description=None,
                  check=None,
                  y_unit=None,
+                 lower_bound=None,
+                 upper_bound=None,
+                 bins=None,
                  outlier_z_score=None,
                  skip_single_valued=False,
                  allow_discrete=False):
@@ -289,6 +302,10 @@ class SaveProfilesRefiner(Refiner):
         self.x = x
         self.y = y
         self.y_unit = y_unit
+
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
+        self.bins = bins
 
         self.outlier_z_score = outlier_z_score
         self.allow_discrete = allow_discrete
@@ -364,6 +381,9 @@ class SaveProfilesRefiner(Refiner):
 
                 profile_plot.profile(x_parts,
                                      y_parts,
+                                     lower_bound=self.lower_bound,
+                                     upper_bound=self.upper_bound,
+                                     bins=self.bins,
                                      outlier_z_score=self.outlier_z_score,
                                      allow_discrete=self.allow_discrete)
 

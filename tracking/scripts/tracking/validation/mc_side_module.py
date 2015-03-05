@@ -1,10 +1,9 @@
 import math
 import numpy as np
 
-from tracking.validation.utilities import getHelixFromMCParticle, getSeedTrackFitResult, is_primary
-
 import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
+import tracking.validation.peelers as peelers
 
 import basf2
 
@@ -40,32 +39,37 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         super(MCSideTrackingValidationModule, self).initialize()
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
-    def pick(self, mcTrackCand):
+    def pick(self, mc_track_cand):
         return True
 
-    def peel(self, mcTrackCand):
+    def peel(self, mc_track_cand):
         """Looks at the individual Monte Carlo tracks and store information about them"""
         trackMatchLookUp = self.trackMatchLookUp
-        mcParticles = Belle2.PyStoreArray('MCParticles')
+        mc_particles = Belle2.PyStoreArray('MCParticles')
 
         # Analyse from the Monte Carlo reference side
-        mcTrackCands = Belle2.PyStoreArray(self.foreach)
-        multiplicity = mcTrackCands.getEntries()
+        mc_track_cands = Belle2.PyStoreArray(self.foreach)
+        multiplicity = mc_track_cands.getEntries()
 
-        mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
-        mcHelix = getHelixFromMCParticle(mcParticle)
-        momentum = mcParticle.getMomentum()
+        mc_particle = trackMatchLookUp.getRelatedMCParticle(mc_track_cand)
+        mc_particle_crops = peelers.peel_mc_particle(mc_particle)
+        hit_content_crops = peelers.peel_track_cand_hit_content(mc_track_cand)
+        mc_to_pr_match_info_crops = self.peel_mc_to_pr_match_info(mc_track_cand)
 
-        # Collected variables
+        crops = dict(multiplicity=multiplicity)
+        crops.update(mc_to_pr_match_info_crops)
+        crops.update(hit_content_crops)
+        crops.update(mc_particle_crops)
+        return crops
+
+    def peel_mc_to_pr_match_info(self, mc_track_cand):
+        trackMatchLookUp = self.trackMatchLookUp
         return dict(
-            finding_efficiency=trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand),
-            hit_efficiency=trackMatchLookUp.getRelatedEfficiency(mcTrackCand),
-            mc_pt=momentum.Perp(),
-            mc_tan_lambda=np.divide(1.0, math.tan(momentum.Theta())),  # Avoid zero division exception
-            mc_d0=mcHelix.getD0(),
-            mc_multiplicity=multiplicity,
-            mc_theta=momentum.Theta(),
-            mc_phi=momentum.Phi(),
+            is_matched=trackMatchLookUp.isMatchedMCTrackCand(mc_track_cand),
+            is_merged=trackMatchLookUp.isMergedMCTrackCand(mc_track_cand),
+            is_missing=trackMatchLookUp.isMissingMCTrackCand(mc_track_cand),
+            hit_efficiency=trackMatchLookUp.getRelatedEfficiency(mc_track_cand),
+            hit_purity=trackMatchLookUp.getRelatedPurity(mc_track_cand),
         )
 
     # Refiners to be executed on terminate #
@@ -80,10 +84,10 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         title="Overview figures in {module.title}",
         aggregation=np.nanmean,
         key="{part_name}",
-        select=["finding_efficiency", "hit_efficiency"],
+        select={"is_matched": "finding efficiency", "hit_efficiency": "hit efficiency", },
         description="""
-finding_efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks <br/>
-hit_efficiency - the ratio of hits picked up by a matched Carlo track  to all Monte Carlo tracks <br/>
+finding efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks <br/>
+hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Monte Carlo tracks
 """
     )
 
@@ -96,13 +100,12 @@ hit_efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
     # Make profiles of the finding efficiencies versus various fit parameters
     # Rename the quatities to names that display nicely by root latex translation
     renaming_select_for_finding_efficiency_profiles = {
-        'finding_efficiency': 'finding efficiency',
-        'mc_d0': 'd_{0}',
-        'mc_pt': 'p_{t}',
-        'mc_tan_lambda': 'tan #lambda',
-        'mc_multiplicity': 'multiplicity',
-        'mc_phi': '#phi',
-        'mc_theta': '#theta',
+        'is_matched': 'finding efficiency',
+        'd0_truth': 'd_{0}',
+        'pt_truth': 'p_{t}',
+        'tan_lambda_truth': 'tan #lambda',
+        'multiplicity': 'multiplicity',
+        'phi0_truth': '#phi',
     }
 
     save_finding_efficiency_profiles = refiners.save_profiles(
@@ -116,12 +119,11 @@ hit_efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
     # Rename the quatities to names that display nicely by root latex translation
     renaming_select_for_hit_efficiency_profiles = {
         'hit_efficiency': 'hit efficiency',
-        'mc_d0': 'd_{0}',
-        'mc_pt': 'p_{t}',
-        'mc_tan_lambda': 'tan #lambda',
-        'mc_multiplicity': 'multiplicity',
-        'mc_phi': '#phi',
-        'mc_theta': '#theta'
+        'd0_truth': 'd_{0}',
+        'pt_truth': 'p_{t}',
+        'tan_lambda_truth': 'tan #lambda',
+        'multiplicity': 'multiplicity',
+        'phi0_truth': '#phi',
     }
 
     save_hit_efficiency_profiles = refiners.save_profiles(
@@ -170,11 +172,6 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
     def peel(self, mcTrackCand):
         base_crops = super(ExpertMCSideTrackingValidationModule, self).peel(mcTrackCand)
 
-        is_missing = self.trackMatchLookUp.isMissingMCTrackCand(mcTrackCand)
-
-        mc_particle = self.trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
-        mc_is_primary = is_primary(mc_particle) if mc_particle else False
-
         mc_track_cand_cdc_hit_ids = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
 
         ratio = np.divide(1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
@@ -182,8 +179,6 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
         ratio_hits_in_mc_tracks_and_in_fake_pr_tracks = np.divide(1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_fake_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
 
         hit_crops = dict(
-            mc_missing=is_missing,
-            mc_is_primary=mc_is_primary,
             mc_number_of_hits=len(mc_track_cand_cdc_hit_ids),
             ratio_hits_in_mc_tracks_and_not_in_pr_tracks=1.0 - ratio,
             ratio_hits_in_mc_tracks_and_in_pr_tracks=ratio,
@@ -202,7 +197,7 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
     )
 
     save_ratio_hits_in_missing_mc_tracks_and_in_pr_tracks_hist = refiners.save_histograms(
-        filter_on="mc_missing",  # filter on missing to mimic what ratio_hits_in_missing_mc_tracks_and_in_pr_tracks used to be
+        filter_on="is_missing",  # filter on missing to mimic what ratio_hits_in_missing_mc_tracks_and_in_pr_tracks used to be
         select=dict(ratio_hits_in_mc_tracks_and_in_pr_tracks="ratio of hits in missing MCTracks found by the track finder")  # renaming quantity to name that is more suitable for display
     )
 

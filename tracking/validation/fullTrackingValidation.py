@@ -63,11 +63,11 @@ class PtBinnedMCSideTrackingValidationModule(MCSideTrackingValidationModule):
     def peel(self, mc_track_cand):
         crops = super(PtBinnedMCSideTrackingValidationModule, self).peel(mc_track_cand)
         # To few values in this setup to be relevant.
-        del crops["mc_d0"]
-        del crops["mc_multiplicity"]
+        del crops["d0_truth"]
+        del crops["multiplicity"]
 
         # Add pt value that was used by the generator to produce this track
-        mc_pt = crops["mc_pt"]
+        mc_pt = crops["pt_truth"]
 
         # Search the pt value which was used for the MCParticle
         # counters potential rounding errors
@@ -83,10 +83,9 @@ class PtBinnedMCSideTrackingValidationModule(MCSideTrackingValidationModule):
     # Make profiles of the finding efficiencies versus various fit parameters
     # Rename the quatities to names that display nicely by root latex translation
     renaming_select_for_finding_efficiency_profiles = {
-        'finding_efficiency': 'finding efficiency',
-        'mc_tan_lambda': 'tan #lambda',
-        'mc_phi': '#phi',
-        'mc_theta': '#theta',
+        'is_matched': 'finding efficiency',
+        'tan_lambda_truth': 'tan #lambda',
+        'phi0_truth': '#phi_0',
     }
 
     save_binned_finding_efficiency_profiles = refiners.save_profiles(
@@ -105,14 +104,9 @@ class PtBinnedPRSideTrackingValidationModule(PRSideTrackingValidationModule):
 
     def peel(self, track_cand):
         crops = super(PtBinnedPRSideTrackingValidationModule, self).peel(track_cand)
+        mc_pt = crops["pt_truth"]
 
-        trackMatchLookUp = self.trackMatchLookUp
-        mc_particle = trackMatchLookUp.getRelatedMCParticle(track_cand)
-
-        if mc_particle:
-            # Add pt value that was used by the generator to produce this track
-            mc_pt = mc_particle.getMomentum().Perp()
-
+        if np.isfinite(mc_pt):
             # Search the pt value which was used for the MCParticle
             # counters potential rounding errors
             pt_bin_id, = np.digitize((mc_pt,), pt_bin_edges)
@@ -130,7 +124,7 @@ class PtBinnedPRSideTrackingValidationModule(PRSideTrackingValidationModule):
     save_binned_tan_lambda_pull_analysis = refiners.save_pull_analysis(
         quantity_name="tan #lambda",
         groupby="pt_value",
-        part_name="pr_tan_lambda",
+        part_name="tan_lambda",
         name="{module.name}_{quantity_name}_PtBin_{groupby_value}",
         title_postfix=" Pt = {groupby_value} GeV",
         # folder_name=".", #Dummy everything in the top level folder
@@ -334,4 +328,4 @@ def main():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
-        main()
+        new_main()

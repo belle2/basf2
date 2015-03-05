@@ -862,6 +862,11 @@ def select_crop_parts(crops, select=[], exclude=[]):
 
         if select:
             not_selected_part_names = [name for name in part_names if name not in select]
+
+            select_not_in_part_names = [name for name in select if name not in part_names]
+            if select_not_in_part_names:
+                get_logger().warning("Cannot select %s, because they are not in crop part names %s",
+                                     select_not_in_part_names, part_names)
         else:
             not_selected_part_names = []
 
@@ -915,7 +920,7 @@ def filter_crops(crops, filter_function, part_name=None):
 def iter_items_sorted_for_key(crops):
     # is the type of crops is a dictionary assume, that it should be sorted
     # in all other cases the users class has to take care of the sorting
-    if type(crops) is dict:
+    if isinstance(crops, dict):
         keys = sorted(crops.keys())
         return ((key, crops[key]) for key in keys)
     else:

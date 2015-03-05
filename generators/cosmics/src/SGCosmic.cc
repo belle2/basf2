@@ -16,17 +16,11 @@
 #include <limits>
 #include <fstream>
 
-#include <generators/cosmics/cosmicsHelix.h>
-#include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/SymMatrix.h"
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Vector/LorentzVector.h"
-#include "CLHEP/Geometry/Point3D.h"
+#include <framework/dataobjects/Helix.h>
+#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace HepGeom;
-using namespace CLHEP;
 
 // #define DEBUG
 #ifdef DEBUG
@@ -108,46 +102,34 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
                                                  << pt << " " << dz << " " << tanl << endl;
 #endif
 
-    // making Helix parameter at IP
-    Point3D <double> IP(0.0, 0.0, 0.0);
-    HepVector newA(5);
-    HepSymMatrix Ea(5, 0);
-    newA[0] = dr;
-    newA[1] = phi - M_PI / 2; // phi0 = phi - pi/2
-    newA[2] = (double)charge / pt;
-    newA[3] = dz;
-    newA[4] = tanl;
-    cosmicsHelix CosmicMCHelix(IP, newA, Ea);
+    // Simulate helix parameter at perigee
+    const float bz = 1.5; // Magnetic field
+    float d0, phi0, omega, z0, tanLambda; // The definition is the same as in the Helix class
+    d0 = dr;
+    phi0 = phi;
+    omega = (double)charge / (pt * Helix::getAlpha(bz));
+    z0 = dz;
+    tanLambda = tanl;
+    Helix CosmicMCHelix(d0, phi0, omega, z0, tanLambda);
 
-    // move pivot to outside
-    // double Cr = 87.9; // radius (cm) of CDC CFRP body
-    double Cr = 125.0; // radius (cm) of ToP
-    double Hr = fabs(CosmicMCHelix.radius()); // radius of Helix
+    const float cylindricalR = 125.0; // radius (cm) of ToP
+    float arcLength;
+    // Get arc length at ToP radius
+    arcLength = CosmicMCHelix.getArcLengthAtCylindricalR(cylindricalR);
+    if (isnan(arcLength)) continue;
 
-    if (Cr > (2 * Hr)) {
-      continue;
-    }
-
-    double cosPhi = (2 * Hr * Hr - Cr * Cr) / (2 * Hr * Hr);
-    double addPhi;
-    if (charge > 0)
-      addPhi = -acos(cosPhi);
-    else
-      addPhi = acos(cosPhi);
-
-    // getting momentum at outside of CDC
-    Point3D <double> newPivot = CosmicMCHelix.x(addPhi);
-    CosmicMCHelix.pivot(newPivot);
+    // Calculate coordinates and momentum at ToP radius
+    TVector3 vector;
+    vector = CosmicMCHelix.getPositionAtArcLength(arcLength);
+    double vx = vector[0];
+    double vy = vector[1];
+    double vz = vector[2];
+    vector = CosmicMCHelix.getMomentumAtArcLength(arcLength, bz);
+    double px = - vector[0];
+    double py = - vector[1];
+    double pz = - vector[2];
     double m = p.getMass();
-    Hep3Vector momAtOutCDC = CosmicMCHelix.momentum(0.0, m);
-
-    double px = - momAtOutCDC.x();
-    double py = - momAtOutCDC.y();
-    double pz = - momAtOutCDC.z();
     double e  = sqrt(px * px + py * py + pz * pz + m * m);
-    double vx = newPivot.x();
-    double vy = newPivot.y();
-    double vz = newPivot.z();
 
 #ifdef DEBUG
     if (1 == m_params.level) ofs_cosmic1c << vx << " " << vy << " " << vz << " "

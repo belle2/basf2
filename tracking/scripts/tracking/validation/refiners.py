@@ -792,6 +792,9 @@ def context(refiner=None,
         if above_expert_level is not None or below_expert_level is not None:
             wrapped_refiner = ExpertLevelRefiner(wrapped_refiner, above_expert_level=above_expert_level, below_expert_level=below_expert_level)
 
+        if not isinstance(wrapped_refiner, Refiner):
+            wrapped_refiner = Refiner(wrapped_refiner)
+
         return wrapped_refiner
 
     if refiner is None:

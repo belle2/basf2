@@ -281,8 +281,8 @@ class HarvestingModule(basf2.Module):
 
             try:
                 while True:
-                    for part_name, part in crop.items():
-                        raw_crops[part_name].append(part)
+                    for part_name, parts in raw_crops.items():
+                        parts.append(crop[part_name])
                     # next crop
                     crop = (yield)
             except GeneratorExit:

@@ -21,12 +21,14 @@
 #include <genfit/TrackCandHit.h>
 #include <genfit/HMatrixU.h>
 
+#include <genfit/ICalibrationParametersDerivatives.h>
+
 #include <memory>
 
 
 namespace Belle2 {
   /** This class is used to transfer CDC information to the track fit. */
-  class CDCRecoHit : public genfit::AbsMeasurement  {
+  class CDCRecoHit : public genfit::AbsMeasurement, public genfit::ICalibrationParametersDerivatives  {
 
   public:
     /** Default Constructor for ROOT IO.*/
@@ -79,6 +81,33 @@ namespace Belle2 {
       return m_cdcHit;
     }
 
+    /**
+     * @brief Labels for (global) alignment/calibration parameters
+     *
+     * @return Vector of ints, one per each parameter
+     */
+    virtual std::vector< int > labels();
+    /**
+     * @brief Derivatives for (global) alignment/calibration parameters
+     *
+     * @param sop State on virtual plane to calculate derivatives
+     * @return TMatrixD of global derivatives, #columns=#params, #row=2 (or measurement dimension if > 2)
+     */
+    virtual TMatrixD derivatives(const genfit::StateOnPlane* sop);
+    /**
+     * @brief Derivatives for (local) fit parameters
+     *
+     * @param sop State on virtual plane to calculate derivatives
+     * @return TMatrixD of local derivatives, #columns=#params, #row=2 (or measurement dimension if > 2)
+     */
+    virtual TMatrixD localDerivatives(const genfit::StateOnPlane* sop);
+    /**
+     * @brief Labels for (local) alignment/calibration parameters
+     *
+     * @return Vector of ints, one per each parameter
+     */
+    virtual std::vector< int > localLabels();
+
   private:
 #ifndef __CINT__ // rootcint doesn't know smart pointers
     /** Object for ADC Count translation. */
@@ -110,8 +139,10 @@ namespace Belle2 {
     signed char m_leftRight;
 
     /** ROOT Macro.*/
-    ClassDef(CDCRecoHit, 8);
+    ClassDef(CDCRecoHit, 9);
     // Version history:
+    // ver 9: Derives from ICalibrationParametersDerivatives to expose
+    //        alignment/calibration interface
     // ver 8: Rewrite to deal with realistic translators.  No longer
     //        derives from genfit::WireMeasurement.
   };

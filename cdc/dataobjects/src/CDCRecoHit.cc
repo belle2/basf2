@@ -204,3 +204,23 @@ const genfit::HMatrixU* CDCRecoHit::constructHMatrix(const genfit::AbsTrackRep* 
 
   return new genfit::HMatrixU();
 }
+
+std::vector< int > CDCRecoHit::labels()
+{
+  return std::vector< int >();
+}
+
+TMatrixD CDCRecoHit::derivatives(const genfit::StateOnPlane*)
+{
+  return TMatrixD();
+}
+
+TMatrixD CDCRecoHit::localDerivatives(const genfit::StateOnPlane*)
+{
+  return TMatrixD();
+}
+
+std::vector< int > CDCRecoHit::localLabels()
+{
+  return std::vector< int >();
+}

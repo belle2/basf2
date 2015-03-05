@@ -180,7 +180,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
 
         sorted_superlayer_ids = sorted([start_superlayer_id, end_superlayer_id])
 
-        superlayer_id_pair = 10.0 * sorted_superlayer_ids[0] + sorted_superlayer_ids[1]
+        superlayer_id_pair = 10.0 * sorted_superlayer_ids[1] + sorted_superlayer_ids[0]
 
         return dict(
             start_superlayer_id=start_superlayer_id,

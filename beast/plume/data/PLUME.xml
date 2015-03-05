@@ -19,10 +19,38 @@
     <Active>
       <Material>PLUME-Material</Material>
 
-      <z_plume unit="cm">6.0</z_plume>
+      <z_plume unit="cm">6.6</z_plume>
       <r_plume unit="cm">4.0</r_plume>
       <ThetaZ unit="deg">0.0</ThetaZ>
       <Phi unit="deg">135.0</Phi>      
+      
+      <elecBandX unit="mm">0.300</elecBandX>
+      <integrationTime unit="us">100.0</integrationTime>
+
+      <MetalThickness unit="um">5.0</MetalThickness>
+      <SubstrateThickness unit="um">30.0</SubstrateThickness>
+      <EpitaxialThickness unit="um">15.0</EpitaxialThickness>
+      
+      <ElecBandY unit="mm">3.0</ElecBandY>      
+      <SensorDistance unit="um">500.0</SensorDistance>
+      <nPixelsX>1152</nPixelsX>
+      <nPixelsY>576</nPixelsY>
+      <pitchX unit="um"> 18.4</pitchX>
+      <pitchY unit="um"> 18.4</pitchY>
+      <DistanceFromFoamCenter unit="mm">1.0</DistanceFromFoamCenter>
+      <GlueThickness unit="um">10.0</GlueThickness>
+      <KaptonThickness unit="um">100.0</KaptonThickness>
+      <CupperThickness unit="um">40.0</CupperThickness>
+    </Active>
+
+
+    <Active>
+      <Material>PLUME-Material</Material>
+
+      <z_plume unit="cm">-0.4</z_plume>
+      <r_plume unit="cm">4.0</r_plume>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">225.0</Phi>      
       
       <elecBandX unit="mm">0.300</elecBandX>
       <integrationTime unit="us">100.0</integrationTime>

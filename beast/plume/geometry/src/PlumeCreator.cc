@@ -90,6 +90,7 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         //Create LADDER, LADDER is made of 7 layers
+        //Positioned LADDER in cylindrical coordinate
         G4double r = activeParams.getLength("r_plume") * CLHEP::cm;
         G4double z = activeParams.getLength("z_plume") * CLHEP::cm;
         G4double phi = activeParams.getAngle("Phi");
@@ -186,6 +187,7 @@ namespace Belle2 {
 
           G4Box* s_epitaxial = new G4Box("s_epitaxial", SensorLengthY / 2. , SensorLengthX / 2., EpitaxialThickness / 2.);
           G4LogicalVolume* l_epitaxial = new G4LogicalVolume(s_epitaxial, geometry::Materials::get("Silicon"), "l_epitaxial", 0, m_sensitive);
+          //Lets limit the Geant4 stepsize inside the volume
           l_epitaxial->SetUserLimits(new G4UserLimits(stepSize));
           if (i < 6) transform = G4RotateZ3D(phi) * G4Translate3D(0, r + r_epitaxial1, z - x_array[i] * (SensorLengthX + SensorDistance)) * G4RotateX3D(-M_PI / 2 - thetaZ);
           else transform = G4RotateZ3D(phi) * G4Translate3D(0, r + r_epitaxial2, z - x_array[i - 6] * (SensorLengthX + SensorDistance)) * G4RotateX3D(-M_PI / 2 - thetaZ);

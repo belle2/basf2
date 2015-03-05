@@ -52,7 +52,7 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
     })
 
     py_profile = True
-    output_file_name = "SegmentCreationValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
+    output_file_name = "SegmentPairCreationValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(SegmentPairCreationValidationRun, self).create_argument_parser(**kwds)

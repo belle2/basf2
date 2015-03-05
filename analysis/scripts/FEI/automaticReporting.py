@@ -1018,7 +1018,7 @@ def getBranchingFractions(filename):
                 continue
             daughters = tuple(sorted(p for p in fields[1:]))
             if daughters in branching_fractions[mother]:
-                print "WARNING: decay ", mother, " -> ", " ".join(daughters), "is specified twice"
+                #print "WARNING: decay ", mother, " -> ", " ".join(daughters), "is specified twice"
                 branching_fractions[mother][daughters] += float(fields[0])
             else:
                 branching_fractions[mother][daughters] = float(fields[0])
@@ -1035,7 +1035,7 @@ def getBranchingFractions(filename):
     return branching_fractions
 
 
-def getCoveredBranchingFraction(particles, identifier, include_daughter_fractions=False, branching_fractions=getBranchingFractions('../externals/v00-05-03/share/evtgen/DECAY.DEC')):
+def getCoveredBranchingFraction(particles, identifier, include_daughter_fractions=False, branching_fractions=getBranchingFractions(os.getenv('BELLE2_EXTERNALS_DIR') + '/share/evtgen/DECAY.DEC')):
     n, l = identifier.split(':')
     particle = [p for p in particles if p.identifier == identifier or p.identifier == pdg.conjugate(n) + ':' + l][0]
     if len(particle.channels) == 0:

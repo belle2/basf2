@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012, 2014 - Belle II Collaboration                       *
+ * Copyright(C) 2012, 2015 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guofu Cao, Martin Heck, Tobias Schlüter                  *

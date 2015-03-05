@@ -33,6 +33,7 @@
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/SpacepointMeasurement.h>
 #include <genfit/WireMeasurement.h>
+#include <genfit/WireMeasurementNew.h>
 #include <genfit/WirePointMeasurement.h>
 #include <genfit/AbsTrackRep.h>
 #include <genfit/DetPlane.h>
@@ -44,6 +45,8 @@
 #include <genfit/DAF.h>
 #include <genfit/KalmanFitterRefTrack.h>
 #include <genfit/GblFitter.h>
+
+#include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <TEveArrow.h>
 #include <TEveBox.h>
@@ -445,7 +448,9 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
         } else if (dynamic_cast<const SpacepointMeasurement*>(m) != NULL) {
           space_hit = true;
           plane_size = 4;
-        } else if (dynamic_cast<const WireMeasurement*>(m) != NULL) {
+        } else if (dynamic_cast<const CDCRecoHit*>(m)
+                   || dynamic_cast<const WireMeasurement*>(m)
+                   || dynamic_cast<const WireMeasurementNew*>(m)) {
           wire_hit = true;
           hit_u = fabs(hit_coords(0));
           hit_v = v * (track_pos - o); // move the covariance tube so that the track goes through it

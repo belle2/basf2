@@ -100,6 +100,40 @@ def get_generated_pt_values():
     return list
 
 
+def additional_options(path):
+    """
+    This sets the specifics of simulation and reconstruction in order
+    to use consistent settings across the various involved modules.
+    """
+
+    realisticCDCGeo = 1
+    useInWirePropagation = 1
+    useTime = 0
+    useWireSag = 1
+    for m in path.modules():
+        if realisticCDCGeo:
+            if m.name() == 'CDCDigitizer':
+                m.param('AddInWirePropagationDelay', useInWirePropagation)
+                m.param('AddTimeOfFlight', useTime)
+                m.param('CorrectForWireSag', useWireSag)
+            if m.name() == 'GenFitter':
+                m.param('RealisticCDCGeoTranslator', 1)
+                m.param('UseTrackTime', useTime)
+                m.param('CDCWireSag', useWireSag)
+        else:
+            if m.name() == 'CDCDigitizer':
+                m.param('AddInWirePropagationDelay', 0)
+                m.param('AddTimeOfFlight', 0)
+                m.param('CorrectForWireSag', 0)
+            if m.name() == 'GenFitter':
+                m.param('RealisticCDCGeoTranslator', 0)
+                m.param('UseTrackTime', 0)
+                m.param('CDCWireSag', 0)
+
+        if m.name() == 'GenFitter':
+            m.param('PDGCodes', [get_generated_pdg_code()])
+
+
 def run_simulation(path, pt_value, output_filename=''):
     """Add needed modules to the path and set parameters and start it"""
 
@@ -150,6 +184,7 @@ def run_simulation(path, pt_value, output_filename=''):
     # add simulation modules to the path
     add_simulation(path, get_simulation_components(), background_files)
 
+    additional_options(path)
     # write output root file
     if output_filename != '':
         root_output = register_module('RootOutput')
@@ -177,5 +212,7 @@ def run_reconstruction(path, output_file_name, input_file_name=''):
     # tracking_efficiency.logging.log_level = LogLevel.DEBUG
     tracking_efficiency.param('outputFileName', output_file_name)
     path.add_module(tracking_efficiency)
+
+    additional_options(path)
 
 

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2012, 2014 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck                                   *
+ * Contributors: Guofu Cao, Martin Heck, Tobias Schlüter                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,25 +16,23 @@
 #include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
-#include <genfit/WireMeasurement.h>
+#include <genfit/AbsMeasurement.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/TrackCandHit.h>
+#include <genfit/HMatrixU.h>
 
-#include <TMatrixD.h>
+#include <memory>
 
-//#include <boost/shared_ptr.hpp> // produces trouble for cint because of "Error: void type variable can not be declared "
 
 namespace Belle2 {
   /** This class is used to transfer CDC information to the track fit. */
-  class CDCRecoHit : public genfit::WireMeasurement  {
+  class CDCRecoHit : public genfit::AbsMeasurement  {
 
   public:
     /** Default Constructor for ROOT IO.*/
     CDCRecoHit();
 
-    /** Constructor needed for GenFit RecoHitFactory.
-     *
-     *  This constructor assumes, that no information from tracking is currently known.
+    /** Constructor.
      */
     CDCRecoHit(const CDCHit* cdcHit, const genfit::TrackCandHit* trackCandHit);
 
@@ -42,7 +40,7 @@ namespace Belle2 {
     ~CDCRecoHit() {}
 
     /** Creating a copy of this hit. */
-    genfit::AbsMeasurement* clone() const;
+    CDCRecoHit* clone() const;
 
     /** Getter for WireID object. */
     WireID getWireID() const {
@@ -52,22 +50,26 @@ namespace Belle2 {
     /** Setter for the Translators. */
     static void setTranslators(CDC::ADCCountTranslatorBase*    const adcCountTranslator,
                                CDC::CDCGeometryTranslatorBase* const cdcGeometryTranslator,
-                               CDC::TDCCountTranslatorBase*    const tdcCountTranslator);
-    /*
-    static void setTranslators(boost::shared_ptr<CDC::ADCCountTranslatorBase>    const& adcCountTranslator,
-                         boost::shared_ptr<CDC::CDCGeometryTranslatorBase> const& cdcGeometryTranslator,
-                         boost::shared_ptr<CDC::TDCCountTranslatorBase>   const& driftTimeTranslator);
-     */
+                               CDC::TDCCountTranslatorBase*    const tdcCountTranslator,
+                               bool useTrackTime = false);
 
-    /** Setter for the update option.
-     *
-     *  Currently it is strongly recommended to keep this option false.
+    /** Methods that actually interface to Genfit.
      */
-    static void setUpdate(bool update = false);
-
-    /** Method, that actually interfaces to Genfit.
-     */
+    genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane& state) const;
     std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
+    virtual const genfit::HMatrixU* constructHMatrix(const genfit::AbsTrackRep*) const;
+
+
+    /**
+     * select how to resolve the left/right ambiguity:
+     * -1: negative (left) side on vector (track direction) x (wire direction)
+     * 0: mirrors enter with same weight, DAF will decide.
+     * 1: positive (right) side on vector (track direction) x (wire direction)
+     */
+    virtual void setLeftRightResolution(int lr) { m_leftRight = lr; }
+
+    virtual bool isLeftRightMeasurement() const override { return true; }
+    virtual int getLeftRightResolution() const override { return m_leftRight; }
 
 
     /** get the pointer to the CDCHit object that was used to create this CDCRecoHit object.
@@ -78,65 +80,40 @@ namespace Belle2 {
     }
 
   private:
-    //--- GENFIT Stuff ----------------------------------------------------------------------------------------------------------
-    //NOTE: The endcap positions of the wire is stored in a variable inherited from GFRecoHitIfc<GFWireHitPolicy>.
-    /** A parameter for GENFIT. */
-    static const int c_nParHitRep = 7;
+#ifndef __CINT__ // rootcint doesn't know smart pointers
+    /** Object for ADC Count translation. */
+    static std::unique_ptr<CDC::ADCCountTranslatorBase>     s_adcCountTranslator;
 
-    /** Holds all elements of H Matrix.  A C-array is the only possibility to set TMatrixD elements with its constructor. */
-    static const double c_HMatrixContent[5];
+    /** Object for geometry translation. */
+    static std::unique_ptr<CDC::CDCGeometryTranslatorBase>  s_cdcGeometryTranslator;
 
-    /** H matrix needed for Genfit. getHMatrix will return this attribute.*/
-    static const  TMatrixD c_HMatrix;
+    /** Object for getting drift-length and -resolution. */
+    static std::unique_ptr<CDC::TDCCountTranslatorBase>    s_tdcCountTranslator;
+
+    /** Whether to use the track time or not when building the
+     * measurementOnPlane.  This needs to be in sync with the
+     * TDCCountTranslator.  */
+    static bool s_useTrackTime;
+
+#endif
 
     //---------------------------------------------------------------------------------------------------------------------------
-    /** Accumulated charge within one drift cell as ADC count. */
-    unsigned short m_adcCount;
-
-    /** Accumulated charge within one cell.  UNIT??? */
-    float m_charge;
-
     /** TDC Count as out of CDCHit. */
     unsigned short m_tdcCount;
-
-    /** Drift Length.
-     *
-     *  This is basically a cache to avoid recalculation of drift length every time.
-     */
-    float m_driftLength;
-    /** Drift Length Resolution.
-     *
-     *  Similar issues as with the drif length.
-     */
-    float m_driftLengthResolution;
 
     /** Wire Identifier. */
     WireID m_wireID;
 
-    /** Object for ADC Count translation. */
-    static CDC::ADCCountTranslatorBase*     s_adcCountTranslator;    //! Don't write to ROOT file, as pointer is meaningless, there
-    // static boost::shared_ptr<ADCCountTranslatorBase>   s_adcCountTranslator;    //! Don't write to ROOT file, as pointer is meaningless, there
-
-    /** Object for geometry translation. */
-    static CDC::CDCGeometryTranslatorBase*  s_cdcGeometryTranslator; //! Don't write to ROOT file, as pointer is meaningless, there
-    //static boost::shared_ptr<CDCGeometryTranslatorBase> s_cdcGeometryTranslator; //! Don't write to ROOT file, as pointer is meaningless, there
-
-    /** Object for getting drift-length and -resolution. */
-    static CDC::TDCCountTranslatorBase*    s_tdcCountTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
-    //static boost::shared_ptr<TDCCountTranslatorBase>   s_driftTimeTranslator;   //! Don't write to ROOT file, as pointer is meaningless, there
-
-    /** If set to false, the data from the cash is used for the get measurement function.
-     *
-     *  If set to true, the getMeasurement function tries to update the hit information using the current translators.
-     *  As with translator pointers, this is a static variable. So it is sufficient to switch this once to make all CDCRecoHits doing the same.
-     */
-    static bool s_update; //!                               Don't write to ROOT file, as pointer is meaningless, there
-
     /** Pointer to the CDCHit used to created this CDCRecoHit */
-    const CDCHit* m_cdcHit;
+    const CDCHit* m_cdcHit;  //!
+
+    signed char m_leftRight;
 
     /** ROOT Macro.*/
-    ClassDef(CDCRecoHit, 7);
+    ClassDef(CDCRecoHit, 8);
+    // Version history:
+    // ver 8: Rewrite to deal with realistic translators.  No longer
+    //        derives from genfit::WireMeasurement.
   };
 }
 #endif

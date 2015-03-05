@@ -588,11 +588,7 @@ void TrackFinderMCTruthModule::event()
         TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
         TVector3 simMom = aCDCSimHitPtr->getMomentum();
         TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
-        TVector3 wireStartPos = cdcGeometry.wireBackwardPosition(aCDCSimHitPtr->getWireID());
-        TVector3 wireDir = simHitPosOnWire - wireStartPos;
-        TVector3 wireToSimHit = simHitPos - simHitPosOnWire;
-        double scalarProduct = wireToSimHit * (wireDir.Cross(simMom));
-        char lrAmbiSign = boost::math::sign(scalarProduct);
+        char lrAmbiSign = cdcGeometry.getNewLeftRightRaw(simHitPosOnWire, simHitPos, simMom) ? 1 : -1;
         genfit::WireTrackCandHit* aCdcTrackCandHit = new genfit::WireTrackCandHit(Const::CDC, hitID, -1, time, lrAmbiSign); //do not delete! the genfit::TrackCand has ownership
         trackCandidates[counter]->addHit(aCdcTrackCandHit);
         B2DEBUG(101, "CDC hit " << hitID << " has reft/right sign " << int(lrAmbiSign));

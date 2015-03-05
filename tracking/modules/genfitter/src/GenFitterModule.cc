@@ -37,6 +37,8 @@
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/IdealCDCGeometryTranslator.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/translators/RealisticCDCGeometryTranslator.h>
 
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -109,6 +111,9 @@ GenFitterModule::GenFitterModule() :
   addParam("PruneFlags", m_pruneFlags, "Determine which information to keep after track fit, by default we keep everything, but please note that add_reconstruction prunes track after all other reconstruction is processed.  See genfit::Track::prune for options.", std::string(""));
   addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
   addParam("UseClusters", m_useClusters, "If set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
+  addParam("RealisticCDCGeoTranslator", m_realisticCDCGeoTranslator, "If true, realistic CDC geometry translators will be used (wire sag, misalignment).", false);
+  addParam("CDCWireSag", m_enableWireSag, "Whether to enable wire sag in the CDC geometry translation.  Needs to agree with simulation/digitization.", false);
+  addParam("UseTrackTime", m_useTrackTime, "Determines whether the realistic TDC track time converter and the CDCRecoHits will take the track propagation time into account.  The setting has to agree with those of the CDCDigitizer.", false);
   addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final genfit::Tracks (will be created by this module)", string(""));
@@ -202,8 +207,19 @@ void GenFitterModule::initialize()
   }
 
   // Create new Translators and give them to the CDCRecoHits.
-  // The way, I'm going to do it here will produce some small resource leak, but this will stop, once we go to ROOT 6 and have the possibility to use sharead_ptr
-  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
+  if (m_realisticCDCGeoTranslator) {
+    CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
+                               new RealisticCDCGeometryTranslator(m_enableWireSag),
+                               new RealisticTDCCountTranslator(m_useTrackTime),
+                               m_useTrackTime);
+  } else {
+    if (m_enableWireSag)
+      B2WARNING("Wire sag requested, but using idealized translator which ignores this.");
+    CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
+                               new IdealCDCGeometryTranslator(),
+                               new RealisticTDCCountTranslator(),
+                               m_useTrackTime);
+  }
 }
 
 void GenFitterModule::beginRun()

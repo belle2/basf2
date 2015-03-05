@@ -97,6 +97,9 @@ namespace Belle2 {
 
     bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */
     bool m_useClusters;                              /**< Boolean to mark if PXD/SVD cluster hits should be used instead of true hits in the track fit. */
+    bool m_realisticCDCGeoTranslator;                /**< Whether to use the realistic geometry translators.  */
+    bool m_enableWireSag;                            /**< Wire sag in CDCGeometryTranslator.  */
+    bool m_useTrackTime;                             /**< If true, CDCRecoHits will use the track propagation time.  */
     std::vector<int> m_pdgCodes;                     /**< holds the PDG codes the user sets. If empty the PDG code from genfit::TrackCand will be written into it*/
     bool m_usePdgCodeFromTrackCand;                  /**< flag to indicate if PDG code will be taken from genfit::TrackCand or from user input in m_pdgCodes*/
     std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */

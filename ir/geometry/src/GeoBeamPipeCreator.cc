@@ -489,6 +489,28 @@ namespace Belle2 {
       //-
       //----------
 
+      ////==============
+      ////= flanges
+
+      //get parameters from .xml file
+      GearDir cFlange(content, "Flange/");
+      //
+      double Flange_R  = cFlange.getLength("R") / Unit::mm;
+      double Flange_L1 = cFlange.getLength("L1") / Unit::mm;
+      double Flange_L2 = cFlange.getLength("L2") / Unit::mm;
+      double Flange_D  = cFlange.getLength("D") / Unit::mm;
+      double Flange_T  = cFlange.getLength("T") / Unit::mm;
+
+      //define geometry
+      //G4Box* geo_Flange0 = new G4Box("geo_Flange0_name", Flange_L2, Flange_R, Flange_T);
+      G4Tubs* geo_Flange0 = new G4Tubs("geo_Flange0_name", 0, 424 * Unit::mm, Flange_T, 0, 2 * M_PI);
+      G4Tubs* geo_Flange1 = new G4Tubs("geo_Flange1_name", 0, Flange_R, Flange_T, 0, 2 * M_PI);
+      G4Tubs* geo_Flange2 = new G4Tubs("geo_Flange2_name", 0, Flange_R, Flange_T, 0, 2 * M_PI);
+
+      G4UnionSolid* geo_Flange_x = new G4UnionSolid("geo_Flange_x_name", geo_Flange1, geo_Flange2, G4Translate3D(-Flange_L1 * 2, 0, 0));
+      G4IntersectionSolid* geo_Flange = new G4IntersectionSolid("geo_Flange_name", geo_Flange0, geo_Flange_x, G4Translate3D(Flange_L1, 0, 0));
+
+
       ////=
       ////==========
 
@@ -512,15 +534,26 @@ namespace Belle2 {
       G4Material* mat_Lv1TaFwd = Materials::get(strMat_Lv1TaFwd);
 
       //define geometry
-      G4Trd* geo_Lv1TaFwd = new G4Trd("geo_Lv1TaFwd_name", Lv1TaFwd_L2, Lv1TaFwd_L3, Lv1TaFwd_T1, Lv1TaFwd_T1, Lv1TaFwd_L1 / 2.0);
+      G4Trd* geo_Lv1TaFwd_xx = new G4Trd("geo_Lv1TaFwd_xx_name", Lv1TaFwd_L2, Lv1TaFwd_L3, Lv1TaFwd_T1, Lv1TaFwd_T1, Lv1TaFwd_L1 / 2.0);
+      G4UnionSolid* geo_Lv1TaFwd_x
+        = new G4UnionSolid("geo_Lv1TaFwd_x_name", geo_Lv1TaFwd_xx, geo_Flange,
+                           G4Translate3D(0, 0, Flange_D - (Lv1TaFwd_D1 + Lv1TaFwd_L1 / 2.0)));
+
+      //===MODIFY ME!!===
+      //avoid overlap with HeavyMetalShield
+      double HMS_Z[4]  = {350, 410, 450, 482};
+      double HMS_rI[4] = {35.5, 35.5, 42.5, 42.5};
+      double HMS_rO[4] = {100, 100, 100, 100};
+      G4Polycone* geo_HMS = new G4Polycone("geo_HMS_name", 0, 2 * M_PI, 4, HMS_Z, HMS_rI, HMS_rO);
+      G4SubtractionSolid* geo_Lv1TaFwd = new G4SubtractionSolid("geo_Lv1TaFwd_name", geo_Lv1TaFwd_x, geo_HMS,
+                                                                G4Translate3D(0, 0, -(Lv1TaFwd_D1 + Lv1TaFwd_L1 / 2.0)));
+
       G4LogicalVolume* logi_Lv1TaFwd = new G4LogicalVolume(geo_Lv1TaFwd, mat_Lv1TaFwd, "logi_Lv1TaFwd_name");
 
       //-   put volume at (0.,0.,D1 + L1/2)
       setColor(*logi_Lv1TaFwd, cLv1TaFwd.getString("Color", "#333333"));
       new G4PVPlacement(0, G4ThreeVector(0, 0, Lv1TaFwd_D1 + Lv1TaFwd_L1 / 2.0), logi_Lv1TaFwd, "phys_Lv1TaFwd_name", &topVolume, false, 0);
 
-      //-
-      //----------
 
       //----------
       //- Lv2VacFwd
@@ -673,7 +706,9 @@ namespace Belle2 {
       G4Material* mat_Lv1TaBwd = Materials::get(strMat_Lv1TaBwd);
 
       //define geometry
-      G4Trd* geo_Lv1TaBwd = new G4Trd("geo_Lv1TaBwd_name", Lv1TaBwd_L2, Lv1TaBwd_L3, Lv1TaBwd_T1, Lv1TaBwd_T1, Lv1TaBwd_L1 / 2.0);
+      G4Trd* geo_Lv1TaBwd_x = new G4Trd("geo_Lv1TaBwd_x_name", Lv1TaBwd_L2, Lv1TaBwd_L3, Lv1TaBwd_T1, Lv1TaBwd_T1, Lv1TaBwd_L1 / 2.0);
+      G4UnionSolid* geo_Lv1TaBwd = new G4UnionSolid("geo_Lv1TaBwd_name", geo_Lv1TaBwd_x, geo_Flange,
+                                                    G4Translate3D(0, 0, -Flange_D - (-Lv1TaBwd_D1 - Lv1TaBwd_L1 / 2.0)));
       G4LogicalVolume* logi_Lv1TaBwd = new G4LogicalVolume(geo_Lv1TaBwd, mat_Lv1TaBwd, "logi_Lv1TaBwd_name");
 
       //-   put volume
@@ -803,11 +838,6 @@ namespace Belle2 {
       new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logi_Lv2VacBwd, "phys_Lv2VacBwd_name", logi_Lv1TaBwd, false, 0);
 
       //-
-      //----------
-
-      ////=
-      ////==========
-
 
       ////==========
       ////= beam pipe Forward Forward
@@ -840,11 +870,13 @@ namespace Belle2 {
       //
       double Lv1TaLERUp_A1 = cLv1TaLERUp.getAngle("A1");
       //
-      const int Lv1TaLERUp_num = 2;
+      const int Lv1TaLERUp_num = 4;
       //
       double Lv1TaLERUp_Z[Lv1TaLERUp_num];
       Lv1TaLERUp_Z[0] = cLv1TaLERUp.getLength("L1") / Unit::mm;
       Lv1TaLERUp_Z[1] = cLv1TaLERUp.getLength("L2") / Unit::mm;
+      Lv1TaLERUp_Z[2] = cLv1TaLERUp.getLength("L3") / Unit::mm;
+      Lv1TaLERUp_Z[3] = cLv1TaLERUp.getLength("L4") / Unit::mm;
       //
       double Lv1TaLERUp_rI[Lv1TaLERUp_num];
       for (int i = 0; i < Lv1TaLERUp_num; i++)
@@ -852,7 +884,9 @@ namespace Belle2 {
       //
       double Lv1TaLERUp_rO[Lv1TaLERUp_num];
       Lv1TaLERUp_rO[0] = cLv1TaLERUp.getLength("R1") / Unit::mm;
-      Lv1TaLERUp_rO[1] = Lv1TaLERUp_rO[0];
+      Lv1TaLERUp_rO[1] = cLv1TaLERUp.getLength("R2") / Unit::mm;
+      Lv1TaLERUp_rO[2] = cLv1TaLERUp.getLength("R3") / Unit::mm;
+      Lv1TaLERUp_rO[3] = cLv1TaLERUp.getLength("R4") / Unit::mm;
       //
       string strMat_Lv1TaLERUp = cLv1TaLERUp.getString("Material");
       G4Material* mat_Lv1TaLERUp = Materials::get(strMat_Lv1TaLERUp);
@@ -882,6 +916,8 @@ namespace Belle2 {
       double Lv2VacLERUp_rO[Lv1TaLERUp_num];
       Lv2VacLERUp_rO[0] = cLv2VacLERUp.getLength("R1") / Unit::mm;
       Lv2VacLERUp_rO[1] = Lv2VacLERUp_rO[0];
+      Lv2VacLERUp_rO[2] = Lv2VacLERUp_rO[0];
+      Lv2VacLERUp_rO[3] = Lv2VacLERUp_rO[0];
       //
       string strMat_Lv2VacLERUp = cLv2VacLERUp.getString("Material");
       G4Material* mat_Lv2VacLERUp = Materials::get(strMat_Lv2VacLERUp);
@@ -907,11 +943,13 @@ namespace Belle2 {
       //
       double Lv1TaHERDwn_A1 = cLv1TaHERDwn.getAngle("A1");
       //
-      const int Lv1TaHERDwn_num = 2;
+      const int Lv1TaHERDwn_num = 4;
       //
       double Lv1TaHERDwn_Z[Lv1TaHERDwn_num];
       Lv1TaHERDwn_Z[0] = cLv1TaHERDwn.getLength("L1") / Unit::mm;
-      Lv1TaHERDwn_Z[1] = Lv1TaHERDwn_Z[0] + cLv1TaHERDwn.getLength("L2") / Unit::mm;
+      Lv1TaHERDwn_Z[1] = cLv1TaHERDwn.getLength("L2") / Unit::mm;
+      Lv1TaHERDwn_Z[2] = cLv1TaHERDwn.getLength("L3") / Unit::mm;
+      Lv1TaHERDwn_Z[3] = cLv1TaHERDwn.getLength("L4") / Unit::mm;
       //
       double Lv1TaHERDwn_rI[Lv1TaHERDwn_num];
       for (int i = 0; i < Lv1TaHERDwn_num; i++)
@@ -919,7 +957,9 @@ namespace Belle2 {
       //
       double Lv1TaHERDwn_rO[Lv1TaHERDwn_num];
       Lv1TaHERDwn_rO[0] = cLv1TaHERDwn.getLength("R1") / Unit::mm;
-      Lv1TaHERDwn_rO[1] = Lv1TaHERDwn_rO[0];
+      Lv1TaHERDwn_rO[1] = cLv1TaHERDwn.getLength("R2") / Unit::mm;
+      Lv1TaHERDwn_rO[2] = cLv1TaHERDwn.getLength("R3") / Unit::mm;
+      Lv1TaHERDwn_rO[3] = cLv1TaHERDwn.getLength("R4") / Unit::mm;
       //
       string strMat_Lv1TaHERDwn = cLv1TaHERDwn.getString("Material");
       G4Material* mat_Lv1TaHERDwn = Materials::get(strMat_Lv1TaHERDwn);
@@ -949,6 +989,8 @@ namespace Belle2 {
       double Lv2VacHERDwn_rO[Lv1TaHERDwn_num];
       Lv2VacHERDwn_rO[0] = cLv2VacHERDwn.getLength("R1") / Unit::mm;
       Lv2VacHERDwn_rO[1] = Lv2VacHERDwn_rO[0];
+      Lv2VacHERDwn_rO[2] = Lv2VacHERDwn_rO[0];
+      Lv2VacHERDwn_rO[3] = Lv2VacHERDwn_rO[0];
       //
       string strMat_Lv2VacHERDwn = cLv2VacHERDwn.getString("Material");
       G4Material* mat_Lv2VacHERDwn = Materials::get(strMat_Lv2VacHERDwn);
@@ -1000,11 +1042,13 @@ namespace Belle2 {
       //
       double Lv1TaHERUp_A1 = cLv1TaHERUp.getAngle("A1");
       //
-      const int Lv1TaHERUp_num = 2;
+      const int Lv1TaHERUp_num = 4;
       //
       double Lv1TaHERUp_Z[Lv1TaHERUp_num];
       Lv1TaHERUp_Z[0] = -cLv1TaHERUp.getLength("L1") / Unit::mm;
-      Lv1TaHERUp_Z[1] = Lv1TaHERUp_Z[0] - cLv1TaHERUp.getLength("L2") / Unit::mm;
+      Lv1TaHERUp_Z[1] = -cLv1TaHERUp.getLength("L2") / Unit::mm;
+      Lv1TaHERUp_Z[2] = -cLv1TaHERUp.getLength("L3") / Unit::mm;
+      Lv1TaHERUp_Z[3] = -cLv1TaHERUp.getLength("L4") / Unit::mm;
       //
       double Lv1TaHERUp_rI[Lv1TaHERUp_num];
       for (int i = 0; i < Lv1TaHERUp_num; i++)
@@ -1012,7 +1056,9 @@ namespace Belle2 {
       //
       double Lv1TaHERUp_rO[Lv1TaHERUp_num];
       Lv1TaHERUp_rO[0] = cLv1TaHERUp.getLength("R1") / Unit::mm;
-      Lv1TaHERUp_rO[1] = Lv1TaHERUp_rO[0];
+      Lv1TaHERUp_rO[1] = cLv1TaHERUp.getLength("R2") / Unit::mm;
+      Lv1TaHERUp_rO[2] = cLv1TaHERUp.getLength("R3") / Unit::mm;
+      Lv1TaHERUp_rO[3] = cLv1TaHERUp.getLength("R4") / Unit::mm;
       //
       string strMat_Lv1TaHERUp = cLv1TaHERUp.getString("Material");
       G4Material* mat_Lv1TaHERUp = Materials::get(strMat_Lv1TaHERUp);
@@ -1042,6 +1088,8 @@ namespace Belle2 {
       double Lv2VacHERUp_rO[Lv1TaHERUp_num];
       Lv2VacHERUp_rO[0] = cLv2VacHERUp.getLength("R1") / Unit::mm;
       Lv2VacHERUp_rO[1] = Lv2VacHERUp_rO[0];
+      Lv2VacHERUp_rO[2] = Lv2VacHERUp_rO[0];
+      Lv2VacHERUp_rO[3] = Lv2VacHERUp_rO[0];
       //
       string strMat_Lv2VacHERUp = cLv2VacHERUp.getString("Material");
       G4Material* mat_Lv2VacHERUp = Materials::get(strMat_Lv2VacHERUp);
@@ -1067,11 +1115,13 @@ namespace Belle2 {
       //
       double Lv1TaLERDwn_A1 = cLv1TaLERDwn.getAngle("A1");
       //
-      const int Lv1TaLERDwn_num = 2;
+      const int Lv1TaLERDwn_num = 4;
       //
       double Lv1TaLERDwn_Z[Lv1TaLERDwn_num];
       Lv1TaLERDwn_Z[0] = -cLv1TaLERDwn.getLength("L1") / Unit::mm;
-      Lv1TaLERDwn_Z[1] = Lv1TaLERDwn_Z[0] - cLv1TaLERDwn.getLength("L2") / Unit::mm;
+      Lv1TaLERDwn_Z[1] = -cLv1TaLERDwn.getLength("L2") / Unit::mm;
+      Lv1TaLERDwn_Z[2] = -cLv1TaLERDwn.getLength("L3") / Unit::mm;
+      Lv1TaLERDwn_Z[3] = -cLv1TaLERDwn.getLength("L4") / Unit::mm;
       //
       double Lv1TaLERDwn_rI[Lv1TaLERDwn_num];
       for (int i = 0; i < Lv1TaLERDwn_num; i++)
@@ -1079,7 +1129,9 @@ namespace Belle2 {
       //
       double Lv1TaLERDwn_rO[Lv1TaLERDwn_num];
       Lv1TaLERDwn_rO[0] = cLv1TaLERDwn.getLength("R1") / Unit::mm;
-      Lv1TaLERDwn_rO[1] = Lv1TaLERDwn_rO[0];
+      Lv1TaLERDwn_rO[1] = cLv1TaLERDwn.getLength("R2") / Unit::mm;
+      Lv1TaLERDwn_rO[2] = cLv1TaLERDwn.getLength("R3") / Unit::mm;
+      Lv1TaLERDwn_rO[3] = cLv1TaLERDwn.getLength("R4") / Unit::mm;
       //
       string strMat_Lv1TaLERDwn = cLv1TaLERDwn.getString("Material");
       G4Material* mat_Lv1TaLERDwn = Materials::get(strMat_Lv1TaLERDwn);
@@ -1109,6 +1161,8 @@ namespace Belle2 {
       double Lv2VacLERDwn_rO[Lv1TaLERDwn_num];
       Lv2VacLERDwn_rO[0] = cLv2VacLERDwn.getLength("R1") / Unit::mm;
       Lv2VacLERDwn_rO[1] = Lv2VacLERDwn_rO[0];
+      Lv2VacLERDwn_rO[2] = Lv2VacLERDwn_rO[0];
+      Lv2VacLERDwn_rO[3] = Lv2VacLERDwn_rO[0];
       //
       string strMat_Lv2VacLERDwn = cLv2VacLERDwn.getString("Material");
       G4Material* mat_Lv2VacLERDwn = Materials::get(strMat_Lv2VacLERDwn);
@@ -1122,6 +1176,38 @@ namespace Belle2 {
       //-   put volume
       setColor(*logi_Lv2VacLERDwn, cLv2VacLERDwn.getString("Color", "#CCCCCC"));
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2VacLERDwn, "phys_Lv2VacLERDwn_name", logi_Lv1TaLERDwn, false, 0);
+
+
+      //----------
+      // Cu flange
+
+      G4IntersectionSolid* geo_CuFlangeFwd_x2 = new G4IntersectionSolid("geo_CuFlangeFwd_x2_name", geo_AreaTubeFwdpcon, geo_Flange,
+          G4Translate3D(0, 0, Flange_D + Flange_T * 2));
+      G4SubtractionSolid* geo_CuFlangeFwd_x = new G4SubtractionSolid("geo_CuFlangeFwd_x_name", geo_CuFlangeFwd_x2, geo_Lv1TaLERUp, transform_Lv1TaLERUp);
+      G4SubtractionSolid* geo_CuFlangeFwd   = new G4SubtractionSolid("geo_CuFlangeFwd_name",  geo_CuFlangeFwd_x,  geo_Lv1TaHERDwn, transform_Lv1TaHERDwn);
+
+      G4LogicalVolume* logi_CuFlangeFwd = new G4LogicalVolume(geo_CuFlangeFwd, mat_Lv1TaLERUp, "logi_CuFlangeFwd_name");
+
+      //-   put volume
+      setColor(*logi_CuFlangeFwd, cFlange.getString("Color", "#CCCCCC"));
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_CuFlangeFwd, "phys_CuFlangeFwd_name", &topVolume, false, 0);
+
+
+
+
+      G4IntersectionSolid* geo_CuFlangeBwd_x2 = new G4IntersectionSolid("geo_CuFlangeBwd_x2_name", geo_AreaTubeBwdpcon, geo_Flange,
+          G4Translate3D(0, 0, -Flange_D - Flange_T * 2));
+      G4SubtractionSolid* geo_CuFlangeBwd_x = new G4SubtractionSolid("geo_CuFlangeBwd_x_name", geo_CuFlangeBwd_x2, geo_Lv1TaHERUp, transform_Lv1TaHERUp);
+      G4SubtractionSolid* geo_CuFlangeBwd   = new G4SubtractionSolid("geo_CuFlangeBwd_name",  geo_CuFlangeBwd_x,  geo_Lv1TaLERDwn, transform_Lv1TaLERDwn);
+
+      G4LogicalVolume* logi_CuFlangeBwd = new G4LogicalVolume(geo_CuFlangeBwd, mat_Lv1TaLERUp, "logi_CuFlangeBwd_name");
+
+      //-   put volume
+      setColor(*logi_CuFlangeBwd, cFlange.getString("Color", "#CCCCCC"));
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_CuFlangeBwd, "phys_CuFlangeBwd_name", &topVolume, false, 0);
+
+
+
 
       //logi_Lv3AuCoat->SetSensitiveDetector(new BkgSensitiveDetector("IR", 11));
       //logi_Lv1TaFwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", 12));

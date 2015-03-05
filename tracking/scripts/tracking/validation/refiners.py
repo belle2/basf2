@@ -503,7 +503,6 @@ class SavePullAnalysis(Refiner):
         estimates = crops[estimate_name]
         variances = crops[variance_name]
 
-        # TODO: Think about a sensible way to propagate the postfix
         pull_analysis = PullAnalysis(self.quantity_name,
                                      unit=self.unit,
                                      absolute=self.absolute,
@@ -866,7 +865,7 @@ def select_crop_parts(crops, select=[], exclude=[]):
             select_not_in_part_names = [name for name in select if name not in part_names]
             if select_not_in_part_names:
                 get_logger().warning("Cannot select %s, because they are not in crop part names %s",
-                                     select_not_in_part_names, part_names)
+                                     select_not_in_part_names, sorted(part_names))
         else:
             not_selected_part_names = []
 

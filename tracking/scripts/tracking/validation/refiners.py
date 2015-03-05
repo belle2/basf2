@@ -121,7 +121,7 @@ class SaveFiguresOfMeritRefiner(Refiner):
                                                     contact=contact,
                                                     title=title)
 
-        for part_name, parts in crops.items():
+        for part_name, parts in iter_items_sorted_for_key(crops):
             key = self.key or self.default_key
 
             key = key.format(refiner=self,
@@ -209,7 +209,7 @@ class SaveHistogramsRefiner(Refiner):
         else:
             stackby_parts = None
 
-        for part_name, parts in crops.items():
+        for part_name, parts in iter_items_sorted_for_key(crops):
             name = self.name or self.default_name
             title = self.title or self.default_title
             description = self.description or self.default_description
@@ -327,8 +327,8 @@ class SaveProfilesRefiner(Refiner):
         y_crops = select_crop_parts(crops, select=self.y)
         x_crops = select_crop_parts(crops, select=self.x, exclude=self.y)
 
-        for y_part_name, y_parts in y_crops.items():
-            for x_part_name, x_parts in x_crops.items():
+        for y_part_name, y_parts in iter_items_sorted_for_key(y_crops):
+            for x_part_name, x_parts in iter_items_sorted_for_key(x_crops):
 
                 if self.skip_single_valued and not self.has_more_than_one_value(x_parts):
                     get_logger().info('Skipping "%s" by "%s" profile because x has only a single value "%s"',
@@ -553,7 +553,7 @@ class SaveTreeRefiner(Refiner):
                                  groupby_value=groupby_value)
 
             output_ttree = ROOT.TTree(root_save_name(name), title)
-            for part_name, parts in crops.items():
+            for part_name, parts in iter_items_sorted_for_key(crops):
                 self.add_branch(output_ttree, part_name, parts)
 
             output_ttree.FlushBaskets()
@@ -910,3 +910,13 @@ def filter_crops(crops, filter_function, part_name=None):
 
     else:
         raise ValueError("Unrecognised crop %s of type %s" % (crop, type(crop)))
+
+
+def iter_items_sorted_for_key(crops):
+    # is the type of crops is a dictionary assume, that it should be sorted
+    # in all other cases the users class has to take care of the sorting
+    if type(crops) is dict:
+        keys = sorted(crops.keys())
+        return ((key, crops[key]) for key in keys)
+    else:
+        return crops.items()

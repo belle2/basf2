@@ -23,7 +23,6 @@ using namespace TrackFindingCDC;
 
 
 
-
 SimpleFacetFilter::SimpleFacetFilter():
   m_allowedDeviationCos(cos(PI / 180.0 * 9))
 {
@@ -51,10 +50,12 @@ CellState SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
   const ParameterLine2D& startToEnd    = facet.getStartToEndLine();
   const ParameterLine2D& middleToEnd   = facet.getMiddleToEndLine();
 
+  const FloatType startCos  = startToMiddle.tangential().cosWith(startToEnd.tangential());
+  // const FloatType middleCos = startToMiddle.tangential().cosWith(middleToEnd.tangential());
+  const FloatType endCos = startToEnd.tangential().cosWith(middleToEnd.tangential());
+
   /* cut on the angle of */
-  if (startToMiddle.tangential().cosWith(startToEnd.tangential()) > m_allowedDeviationCos and
-      startToEnd.tangential().cosWith(middleToEnd.tangential()) > m_allowedDeviationCos and
-      startToMiddle.tangential().cosWith(middleToEnd.tangential()) > m_allowedDeviationCos) {
+  if (startCos > m_allowedDeviationCos and endCos > m_allowedDeviationCos) {
 
     //Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically

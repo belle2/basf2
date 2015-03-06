@@ -46,6 +46,8 @@ namespace Belle2 {
 
     GeoPXDCreator::~GeoPXDCreator()
     {
+      for (SensorInfo * sensorInfo : m_SensorInfo) delete sensorInfo;
+      m_SensorInfo.clear();
     }
 
     VXD::SensorInfoBase* GeoPXDCreator::createSensorInfo(const GearDir& sensor)
@@ -74,6 +76,7 @@ namespace Belle2 {
         sensor.getTime("IntegrationStart"),
         sensor.getTime("IntegrationEnd")
       );
+      m_SensorInfo.push_back(info);
       return info;
     }
 

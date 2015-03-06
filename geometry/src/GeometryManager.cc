@@ -35,6 +35,7 @@
 //VGM stuff
 #include "Geant4GM/volumes/Factory.h"
 #include "RootGM/volumes/Factory.h"
+#include "VGM/volumes/IPlacement.h"
 #include "TGeoManager.h"
 
 #include <memory>
@@ -54,6 +55,8 @@ namespace Belle2 {
 
     void GeometryManager::clear()
     {
+      for (G4VisAttributes * visAttr : m_VisAttributes) delete visAttr;
+      m_VisAttributes.clear();
       for (CreatorBase * creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
@@ -232,6 +235,8 @@ namespace Belle2 {
       }
       g4Factory.Export(&rtFactory);
       gGeoManager->CloseGeometry();
+      delete g4Factory.Top();
+      delete rtFactory.Top();
     }
   }
 } //Belle2 namespace

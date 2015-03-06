@@ -36,6 +36,14 @@ namespace Belle2 {
       return *instance;
     }
 
+    Materials::~Materials()
+    {
+      for (G4MaterialPropertiesTable * propTable : m_PropTables) delete propTable;
+      m_PropTables.clear();
+      for (G4OpticalSurface * optSurf : m_OptSurfaces) delete optSurf;
+      m_OptSurfaces.clear();
+    }
+
     G4Material* Materials::getMaterial(const string& name, bool showErrors) const
     {
       G4Material* mat;
@@ -176,6 +184,7 @@ namespace Belle2 {
       if (parameters.getNumberNodes("Property") > 0) {
         //Apparantly we have properties, so lets add them to the Material
         G4MaterialPropertiesTable* g4PropTable = new G4MaterialPropertiesTable();
+        m_PropTables.push_back(g4PropTable);
         BOOST_FOREACH(const GearDir & property, parameters.getNodes("Property")) {
           string name;
           try {
@@ -272,6 +281,7 @@ namespace Belle2 {
 #undef CHECK_ENUM_VALUE
 
       G4OpticalSurface* optSurf = new G4OpticalSurface(name, model, finish, type, value);
+      m_OptSurfaces.push_back(optSurf);
 
       G4MaterialPropertiesTable* g4PropTable = createProperties(GearDir(parameters, "Properties"));
       if (g4PropTable) optSurf->SetMaterialPropertiesTable(g4PropTable);

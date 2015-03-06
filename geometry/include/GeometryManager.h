@@ -16,6 +16,10 @@
 #include <string>
 #include <memory>
 
+#include "G4VisAttributes.hh"
+#include "TGeoManager.h"
+#include <geometry/Materials.h>
+
 class G4VPhysicalVolume;
 
 namespace Belle2 {
@@ -117,11 +121,21 @@ namespace Belle2 {
        */
       void createTGeoRepresentation();
 
+      /**
+       * Create an anonymous G4VisAttributes for an existing G4LogicalVolume
+       *
+       * @return Pointer to the new G4VisAttributes object
+       */
+      G4VisAttributes* newVisAttributes() {
+        m_VisAttributes.push_back(new G4VisAttributes());
+        return m_VisAttributes.back();
+      }
+
     private:
       /** Default constructor declared private since class is a Singleton. */
       GeometryManager(): m_topVolume(0) {};
       /** Destructor declared private since class is a Singleton */
-      ~GeometryManager() { clear(); }
+      ~GeometryManager() { clear(); delete gGeoManager; }
       /** Copy constructor declared private since class is a Singleton. */
       GeometryManager(const GeometryManager&);
       /** Assignment operator declared private since class is a Singleton. */
@@ -141,7 +155,8 @@ namespace Belle2 {
        * creator name to all volumes created by that creator
        */
       bool m_assignRegions {false};
-
+      /** List of visualization attributes */
+      std::vector<G4VisAttributes*> m_VisAttributes;
       /** Allow destruction of instance */
       friend class std::auto_ptr<GeometryManager>;
     };

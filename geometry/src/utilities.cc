@@ -10,6 +10,7 @@
 
 #include <framework/logging/Logger.h>
 #include <geometry/utilities.h>
+#include <geometry/GeometryManager.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -83,14 +84,14 @@ namespace Belle2 {
     void setColor(G4LogicalVolume& volume, const string& color)
     {
       G4VisAttributes* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
-      if (!attr) attr = new G4VisAttributes();
+      if (!attr) attr = GeometryManager::getInstance().newVisAttributes();
       attr->SetColor(parseColor(color));
       volume.SetVisAttributes(attr);
     }
     void setVisibility(G4LogicalVolume& volume, bool visible)
     {
       G4VisAttributes* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
-      if (!attr) attr = new G4VisAttributes();
+      if (!attr) attr = GeometryManager::getInstance().newVisAttributes();
       attr->SetVisibility(visible);
       volume.SetVisAttributes(attr);
     }

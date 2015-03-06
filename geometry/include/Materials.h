@@ -44,6 +44,9 @@ namespace Belle2 {
       /** Get a reference to the singleton instance */
       static Materials& getInstance();
 
+      /** Destructor for objects that I have created */
+      ~Materials();
+
       /**
        * Find given material. Shorthand for Materials::getInstance().getMaterial()
        * @see Materials::getMaterial
@@ -106,6 +109,13 @@ namespace Belle2 {
 
       /** Cache for already searched Materials */
       mutable MRUCache<std::string, G4Material*> m_materialCache;
+
+      /** Vector of created G4MaterialProperties objects */
+      std::vector<G4MaterialPropertiesTable*> m_PropTables;
+
+      /** Vector of created G4OpticalSurfaces objects */
+      std::vector<G4OpticalSurface*> m_OptSurfaces;
+
     };
 
   } //geometry namespace

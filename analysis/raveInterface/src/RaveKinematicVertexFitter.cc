@@ -50,6 +50,7 @@ RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_
 
 RaveKinematicVertexFitter::~RaveKinematicVertexFitter()
 {
+  if (RaveSetup::getRawInstance()) delete RaveSetup::getRawInstance();
 }
 
 

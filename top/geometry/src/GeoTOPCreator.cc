@@ -20,6 +20,7 @@
 #include <top/simulation/SensitivePMT.h>
 #include <top/simulation/SensitiveBar.h>
 #include <simulation/background/BkgSensitiveDetector.h>
+#include <simulation/kernel/RunManager.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -68,6 +69,8 @@ namespace Belle2 {
     {
       m_sensitivePMT = new SensitivePMT();
       m_sensitiveBar = new SensitiveBar();
+      m_sensitivePCB1 = NULL;
+      m_sensitivePCB2 = NULL;
       m_topgp = TOPGeometryPar::Instance();
     }
 
@@ -76,7 +79,10 @@ namespace Belle2 {
     {
       if (m_sensitivePMT) delete m_sensitivePMT;
       if (m_sensitiveBar) delete m_sensitiveBar;
+      if (m_sensitivePCB1) delete m_sensitivePCB1;
+      if (m_sensitivePCB2) delete m_sensitivePCB2;
       if (m_topgp) delete m_topgp;
+      G4LogicalSkinSurface::CleanSurfaceTable();
     }
 
 
@@ -305,12 +311,13 @@ namespace Belle2 {
 
       /*! Put all segment into the Assembly volume */
 
-      G4RotationMatrix* rotasem = new G4RotationMatrix(0, 0, 0);
+      //- G4RotationMatrix* rotasem = new G4RotationMatrix(0, 0, 0); // Identity matrix not needed
       G4ThreeVector trnsasem(length / 2.0 + Bposition, 0, 0);
 
       G4AssemblyVolume* assemblyDetector = new G4AssemblyVolume();
-      assemblyDetector->AddPlacedVolume(qbar, trnsasem, rotasem);
-      assemblyDetector->AddPlacedVolume(qwedge, trnsasem, rotasem);
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyDetector);
+      assemblyDetector->AddPlacedVolume(qbar, trnsasem, 0);
+      assemblyDetector->AddPlacedVolume(qwedge, trnsasem, 0);
 
       //! get the PMT stack and position it
       G4LogicalVolume* stack = buildPMTstack(content);
@@ -323,6 +330,7 @@ namespace Belle2 {
 
 
       assemblyDetector->AddPlacedVolume(stack, trnssta, rotsta);
+      delete rotsta; // AddPlacedVolume() made an internal copy of the rotation matrix
 
       return assemblyDetector;
 
@@ -460,11 +468,11 @@ namespace Belle2 {
 
       /*! Build quartz bar and insert it into the air */
 
-      G4RotationMatrix* rota = new G4RotationMatrix(0, 0, 0);
+      //- G4RotationMatrix* rota = new G4RotationMatrix(0, 0, 0); // Identity matrix not needed
       G4ThreeVector transa(0, 0, 0);
       //      G4AssemblyVolume* bar = buildBar(content, moduleID);
       //      bar->MakeImprint(air, transa, rota, 100, false);
-      buildBar(content, moduleID)->MakeImprint(air, transa, rota, 100, false);
+      buildBar(content, moduleID)->MakeImprint(air, transa, 0, 100, false);
 
       //! Add electronics, this part is not finished, just for backgound studies.
       G4Material* PCBMaterial = Materials::get("TOPPCB");
@@ -474,8 +482,10 @@ namespace Belle2 {
       G4LogicalVolume* pcb2 = new G4LogicalVolume(el2, PCBMaterial, "Board.2");
 
       if (isBeamBkgStudy) {
-        pcb1->SetSensitiveDetector(new BkgSensitiveDetector("TOP", 1));
-        pcb2->SetSensitiveDetector(new BkgSensitiveDetector("TOP", 2));
+        m_sensitivePCB1 = new BkgSensitiveDetector("TOP", 1);
+        pcb1->SetSensitiveDetector(m_sensitivePCB1);
+        m_sensitivePCB2 = new BkgSensitiveDetector("TOP", 2);
+        pcb2->SetSensitiveDetector(m_sensitivePCB2);
       }
 
 
@@ -483,12 +493,11 @@ namespace Belle2 {
       setColor(*pcb2, "rgb(0.0,1.0,0.0,1.0)");
 
 
-      G4RotationMatrix* rotPBC = new G4RotationMatrix(0, 0, 0);
       G4ThreeVector transPCB(Z1 - WLength - 2 * m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) - m_topgp->getBotthickness() / 2.0, -Wextdown / 2.0, 0.);
       G4ThreeVector transPCB2(Z1 - WLength - 3 * m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) - m_topgp->getBotthickness() - y / 2.0, -Wextdown / 2.0, 0.);
 
-      new G4PVPlacement(rotPBC, transPCB, pcb1, "TOP.electronics", air, false, 0);
-      new G4PVPlacement(rotPBC, transPCB2, pcb2, "TOP.electronics", air, false, 0);
+      new G4PVPlacement(0, transPCB, pcb1, "TOP.electronics", air, false, 0);
+      new G4PVPlacement(0, transPCB2, pcb2, "TOP.electronics", air, false, 0);
 
 
 

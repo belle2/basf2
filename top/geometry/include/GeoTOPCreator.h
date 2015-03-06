@@ -15,10 +15,14 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <G4AssemblyVolume.hh>
-#include <G4LogicalVolume.hh>
+
+class G4LogicalVolume;
+class G4AssemblyVolume;
 
 namespace Belle2 {
+
+  class BkgSensitiveDetector;
+
   namespace TOP {
 
     class SensitivePMT;
@@ -84,6 +88,8 @@ namespace Belle2 {
 
       SensitivePMT* m_sensitivePMT;  /**< Sensitive vol. to register PMT hits */
       SensitiveBar* m_sensitiveBar;  /**< Sensitive vol. to register incoming particles */
+      BkgSensitiveDetector* m_sensitivePCB1;  /**< PCB sensitive vol. for background studies */
+      BkgSensitiveDetector* m_sensitivePCB2;  /**< PCB sensitive vol. for background studies */
       TOPGeometryPar* m_topgp;       /**< Geometry parameters from xml files */
       int isBeamBkgStudy;            /**< flag for beam backgound simulation */
     };

@@ -14,6 +14,7 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/simulation/SensitiveDetector.h>
 #include <simulation/background/BkgSensitiveDetector.h>
+#include <simulation/kernel/RunManager.h>
 
 
 #include <CLHEP/Geometry/Transform3D.h>
@@ -42,14 +43,12 @@
 #include <G4PVPlacement.hh>
 #include <G4AssemblyVolume.hh>
 #include <G4Transform3D.hh>
-#include <G4VisAttributes.hh>
 
 // add include subtraction /////
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4UnionSolid.hh>
 
-#include <G4VisAttributes.hh>
 ////////////////////////////////
 
 #include <iostream>
@@ -383,13 +382,18 @@ namespace Belle2 {
 
 
       G4AssemblyVolume* assemblyBrCrystals = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBrCrystals);
       G4AssemblyVolume* assemblyBrDiodes = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBrDiodes);
       // add assembly barrel foil ///////////////////////////////////
       G4AssemblyVolume* assemblyBrFoils = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBrFoils);
       ////////////////////////////////////////////////////////
       // add assembly barrel fin ///////////////////////////////////
       G4AssemblyVolume* assemblyBrFins = new G4AssemblyVolume(); // fins in different theta
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBrFins);
       G4AssemblyVolume* assemblyBrPhiFins = new G4AssemblyVolume(); // big fins in different phi with same theta range
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBrPhiFins);
       ////////////////////////////////////////////////////////
 
       int nBarrelCrystal = content.getNumberNodes("BarrelCrystals/BarrelCrystal");
@@ -672,9 +676,12 @@ namespace Belle2 {
       int iPhi = 0;
 
       G4AssemblyVolume* assemblyFwCrystals = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyFwCrystals);
       G4AssemblyVolume* assemblyFwDiodes = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyFwDiodes);
       // add assembly forward foil ///////////////////////////////
       G4AssemblyVolume* assemblyFwFoils = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyFwFoils);
       ///////////////////////////////////////////////////////////
 
       for (int iCry = 1 ; iCry <= 72 ; ++iCry) {
@@ -839,9 +846,12 @@ namespace Belle2 {
       nRing = 0;
       iPhi = 0;
       G4AssemblyVolume* assemblyBwCrystals = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBwCrystals);
       G4AssemblyVolume* assemblyBwDiodes = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBwDiodes);
       // add assembly backward foil ///////////////////////////////
       G4AssemblyVolume* assemblyBwFoils = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBwFoils);
       ///////////////////////////////////////////////////////////
 
       for (int iCry = 73 ; iCry <= 132 ; ++iCry) {
@@ -962,7 +972,6 @@ namespace Belle2 {
         assemblyBwFoils->MakeImprint(logical_ecl, BrR);  // foil
       }//16 sectior
 
-
       if (isBeamBkgStudy) {
         assemblyFwDiodes->MakeImprint(logical_ecl, Global_offset);
         assemblyBrDiodes->MakeImprint(logical_ecl, Global_offset);
@@ -978,6 +987,7 @@ namespace Belle2 {
       G4LogicalVolume* logical_BarrelCylinder = new G4LogicalVolume(BarrelCylinderWorld, medAir, "logical_BarrelCylinderWorld");
       physical_ECLBarrelCylinder = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_BarrelCylinder, "physicalBarrelCylinder", &topVolume, false, 0);
       G4AssemblyVolume* assemblyBarrelCylinderSupport = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBarrelCylinderSupport);
 
       double BarrelCylinder1Z[4] = {k_c1z1, k_c1z2, k_c1z2, k_c1z3};
       double BarrelCylinder1Rin[4] = {k_c1r1, k_c1r1, k_c1r1, k_c1r1};
@@ -1002,7 +1012,6 @@ namespace Belle2 {
       assemblyBarrelCylinderSupport->AddPlacedVolume(barCy2_logi, Global_offset);
       assemblyBarrelCylinderSupport->MakeImprint(logical_BarrelCylinder, Global_offset);
 
-
       makeEndcap(0);
       makeEndcap(1);
       // makeSupport(); // for 2014 Mar. MC production. K. Miya.
@@ -1016,6 +1025,7 @@ namespace Belle2 {
 //////makeBarrelSuppor/////
 ///////////////////////////
       G4AssemblyVolume* assemblyInnerBarrelSupport = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyInnerBarrelSupport);
       const EclRad InnerBarreloffset = (2.796 - 2.5) * CLHEP::deg;
       const int InnerBarrelnSectors = 144 / 2;
       const EclRad InnerBarreldPhi = 2 * PI / InnerBarrelnSectors;
@@ -1183,9 +1193,8 @@ namespace Belle2 {
 
       assemblyInnerBarrelSupport->MakeImprint(logical_ecl, Global_offset);
 
-
-
       G4AssemblyVolume* assemblyBarrelSupport = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBarrelSupport);
 
 
 // -------------------- Start Barrel Inner Support Spec ---------------------
@@ -1299,12 +1308,12 @@ namespace Belle2 {
       }
       assemblyBarrelSupport->MakeImprint(logical_ecl, Global_offset);
 
-
 ///////////////////////////
 //////makeEndCapSupport/////
 ///////////////////////////
 
       G4AssemblyVolume* assemblyBackwordEndcapSupport = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyBackwordEndcapSupport);
 
       const int ECSnSectors = 16;
       const double ECSdPhi = 2 * PI / ECSnSectors;
@@ -1406,6 +1415,7 @@ namespace Belle2 {
 
 
       G4AssemblyVolume* assemblyForwordEndcapSupport = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyForwordEndcapSupport);
 
       EclCM FwECSw_1 = 13.0 * CLHEP::cm;
       EclCM FwECSh_1 = 17.0 * CLHEP::cm;
@@ -1549,6 +1559,7 @@ namespace Belle2 {
 
       assemblyBackwordEndcapSupport->MakeImprint(logical_ecl, Global_offset);
       assemblyForwordEndcapSupport->MakeImprint(logical_ecl, Global_offset);
+
     }//makeSupport
 
     void GeoECLCreator::makeEndcap(const bool aForward)
@@ -1717,6 +1728,7 @@ namespace Belle2 {
 
 
       G4AssemblyVolume* assemblyEndcap = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(assemblyEndcap);
       assemblyEndcap->AddPlacedVolume(EndcapPhiFin, phFinTr1);
       assemblyEndcap->AddPlacedVolume(EndcapPhiFin, phFinTr2);
       assemblyEndcap->AddPlacedVolume(EndcapReinforcingBar2, rf2Tr1);
@@ -1733,11 +1745,9 @@ namespace Belle2 {
 
 
       for (int iPhiSeg(1) ; iPhiSeg != 1 + nPhiSegs ; ++iPhiSeg) {
-        G4RotateZ3D rotZ((iPhiSeg - 1)*deltaPhi) ;
         G4Transform3D EndcapSegRot = G4RotateZ3D((iPhiSeg - 1) * deltaPhi);
         assemblyEndcap->MakeImprint(logical_ecl, EndcapSegRot);
       }
-
 
     }//makeEndcap
 

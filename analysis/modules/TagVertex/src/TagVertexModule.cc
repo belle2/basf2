@@ -58,7 +58,7 @@ namespace Belle2 {
     // Parameter definitions
     addParam("listName", m_listName, "name of particle list", string(""));
     addParam("confidenceLevel", m_confidenceLevel,
-             "required confidence level of fit to keep particles in the list", 0.001);
+             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit", 0.001);
     addParam("MCAssociation", m_useMCassociation,
              "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
     addParam("useConstraint", m_useConstraint,
@@ -124,24 +124,30 @@ namespace Belle2 {
       if (ok && (m_useMCassociation == "breco" || m_useMCassociation == "internal")) BtagMCVertex(particle);
       if (ok) deltaT(particle);
 
-      if (!ok) toRemove.push_back(particle->getArrayIndex());
-
-      // save information in the Vertex StoreArray
-      if (ok) {
+      if (m_fitPval < m_confidenceLevel) {
+        toRemove.push_back(particle->getArrayIndex());
+      } else {
+        // save information in the Vertex StoreArray
         Vertex* ver = verArray.appendNew();
         // create relation: Particle <-> Vertex
         particle->addRelationTo(ver);
         // fill Vertex with content
-        ver->setTagVertex(m_tagV);
-        ver->setTagVertexErrMatrix(m_tagVErrMatrix);
-        ver->setTagVertexPval(m_fitPval);
-        ver->setDeltaT(m_deltaT);
-        ver->setMCTagVertex(m_MCtagV);
-        ver->setMCTagBFlavor(m_mcPDG);
-        ver->setMCDeltaT(m_MCdeltaT);
-
+        if (ok) {
+          ver->setTagVertex(m_tagV);
+          ver->setTagVertexErrMatrix(m_tagVErrMatrix);
+          ver->setTagVertexPval(m_fitPval);
+          ver->setDeltaT(m_deltaT);
+          ver->setMCTagVertex(m_MCtagV);
+          ver->setMCTagBFlavor(m_mcPDG);
+          ver->setMCDeltaT(m_MCdeltaT);
+        } else {
+          ver->setTagVertex(m_tagV);
+          ver->setTagVertexPval(-1.);
+          ver->setDeltaT(-1111.);
+          ver->setMCTagBFlavor(0.);
+          ver->setMCDeltaT(-1111.);
+        }
       }
-
 
     }
     plist->removeParticles(toRemove);
@@ -194,8 +200,6 @@ namespace Belle2 {
 
     deltaT(Breco);
 
-
-    if (m_fitPval < m_confidenceLevel) return false;
     return true;
 
   }

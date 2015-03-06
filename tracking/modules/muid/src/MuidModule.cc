@@ -317,7 +317,7 @@ void MuidModule::initialize()
     }
 
   for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
-    B2INFO("Hypothesis for PDG code " << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated")
+    B2INFO("Muid hypothesis for PDG code " << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated")
   }
 
   // Register output and relation arrays' persistence

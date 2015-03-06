@@ -14,12 +14,26 @@
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <G4VisManager.hh>
-
 #include <string>
 #include <vector>
 
+class G4MagneticField;
+class G4Mag_UsualEqRhs;
+class G4MagIntegratorStepper;
+class G4ChordFinder;
+class G4VUserPrimaryGeneratorAction;
+class G4VisManager;
+class G4StepLimiter;
+
 namespace Belle2 {
+
+  namespace Simulation {
+    class PhysicsList;
+    class EventAction;
+    class TrackingAction;
+    class SteppingAction;
+    class StackingAction;
+  }
 
   /** The full Geant4 simulation module.
    *
@@ -79,10 +93,6 @@ namespace Belle2 {
 
   protected:
 
-    MCParticleGraph m_mcParticleGraph;     /**< The MCParticle Graph used to manage the MCParticles before and after the simulation.*/
-
-    G4VisManager* m_visManager;            /**< The parameter variable for manager display */
-
     std::string m_mcParticleInputColName;  /**< The parameter variable for the name of the input MCParticle collection. */
     std::string m_mcParticleOutputColName; /**< The parameter variable for the name of the output MCParticle collection. */
     double m_thresholdImportantEnergy;     /**< A particle which got 'stuck' and has less than this energy will be killed after m_thresholdTrials trials. */
@@ -100,7 +110,7 @@ namespace Belle2 {
     bool m_storeOpticalPhotons;            /**< controls storing of optical photons in MCParticles */
     bool m_storeSecondaries;               /**< contorls storing of Geant secondaries in MCParticles */
     double m_energyCut;                    /**< kinetic energy cut for the stored Geant secondaries */
-    std::string m_magneticField;           /**< magnetic field stepper to use */
+    std::string m_magneticFieldName;       /**< magnetic field stepper to use */
     double m_magneticCacheDistance;        /**< minimal distance for magnetic field lookup. If distance is smaller, return last value */
     double m_deltaChordInMagneticField;    /**< The maximum miss-distance between the trajectory curve and its linear chord(s) approximation */
     int m_trajectoryStore;                 /**< If true, store the trajectories of all primary particles */
@@ -108,6 +118,30 @@ namespace Belle2 {
     double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
 
   private:
+
+    /** The MCParticle Graph used to manage the MCParticles before and after the simulation.*/
+    MCParticleGraph m_mcParticleGraph;
+
+    /** Pointer to the uncached magnetic field (might be superseded by its cached version) */
+    G4MagneticField* m_uncachedField;
+
+    /** Pointer to the (un)cached magnetic field */
+    G4MagneticField* m_magneticField;
+
+    /** Pointer to the equation of motion in the magnetic field (if not the default) */
+    G4Mag_UsualEqRhs* m_magFldEquation;
+
+    /** Pointer to the equation-of-motion stepper (if not the default) */
+    G4MagIntegratorStepper* m_stepper;
+
+    /** Pointer to the equation-of-motion chord finder (if not the default) */
+    G4ChordFinder* m_chordFinder;
+
+    /** Pointer to the visualization manager (if used) */
+    G4VisManager* m_visManager;
+
+    /** Pointer to the step limiter */
+    G4StepLimiter* m_stepLimiter;
 
   };
 }

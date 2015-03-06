@@ -11,7 +11,8 @@
 #include <simulation/modules/fullsim/FullSimModule.h>
 #include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/DetectorConstruction.h>
-#include <simulation/kernel/PhysicsList.h>
+//- #include <simulation/kernel/PhysicsList.h>
+#include <simulation/kernel/ExtPhysicsConstructor.h>
 #include <simulation/kernel/MagneticField.h>
 #include <simulation/kernel/PrimaryGeneratorAction.h>
 #include <simulation/kernel/EventAction.h>
@@ -31,6 +32,10 @@
 
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
+#include <G4PhysListFactory.hh>
+#include <G4ProcessVector.hh>
+#include <G4OpticalPhysics.hh>
+#include <G4ParticleDefinition.hh>
 #include <G4ParticleTable.hh>
 #include <G4DecayTable.hh>
 #include <G4EventManager.hh>
@@ -41,6 +46,9 @@
 #include <G4StepLimiter.hh>
 #include <G4LossTableManager.hh>
 #include <G4HadronicProcessStore.hh>
+#include <G4CascadeChannelTables.hh>
+#include <G4CascadeChannel.hh>
+#include <G4InuclParticleNames.hh>
 
 #include <G4Mag_UsualEqRhs.hh>
 #include <G4NystromRK4.hh>
@@ -51,6 +59,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
+using namespace G4InuclParticleNames;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -61,7 +70,7 @@ REG_MODULE(FullSim)
 //                 Implementation
 //-----------------------------------------------------------------
 
-FullSimModule::FullSimModule() : Module(), m_visManager(nullptr), m_useNativeGeant4(true)
+FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
 {
   //Set module properties and the description
   setDescription("Performs the full Geant4 detector simulation. Requires a valid geometry in memory.");
@@ -83,7 +92,7 @@ FullSimModule::FullSimModule() : Module(), m_visManager(nullptr), m_useNativeGea
   addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
   addParam("StoreAllSecondaries", m_storeSecondaries, "If set to True all secondaries produced by Geant over a kinetic energy cut are stored in MCParticles, otherwise do not store them", false);
   addParam("SecondariesEnergyCut", m_energyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
-  addParam("magneticField", m_magneticField, "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge", string("default"));
+  addParam("magneticField", m_magneticFieldName, "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge", string("default"));
   addParam("magneticCacheDistance", m_magneticCacheDistance, "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching", 0.0);
   addParam("deltaChordInMagneticField", m_deltaChordInMagneticField, "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
 
@@ -100,6 +109,13 @@ FullSimModule::FullSimModule() : Module(), m_visManager(nullptr), m_useNativeGea
 
   //Make sure the instance of the run manager is created now to initialize some stuff we need for geometry
   RunManager::Instance();
+  m_magneticField = NULL;
+  m_uncachedField = NULL;
+  m_magFldEquation = NULL;
+  m_stepper = NULL;
+  m_chordFinder = NULL;
+  m_visManager = NULL;
+  m_stepLimiter = NULL;
 }
 
 
@@ -124,40 +140,59 @@ void FullSimModule::initialize()
   runManager.SetUserInitialization(new DetectorConstruction());
 
   //Create the Physics list
-  PhysicsList* physicsList = new PhysicsList(m_physicsList);
-  physicsList->setProductionCutValue(m_productionCut);
-  if (m_optics) physicsList->registerOpticalPhysicsList();
+  //- PhysicsList* physicsList = new PhysicsList(m_physicsList);
+  //- physicsList->setProductionCutValue(m_productionCut);
+  //- if (m_optics) physicsList->registerOpticalPhysicsList();
+  //- runManager.SetUserInitialization(physicsList);
+  G4PhysListFactory physListFactory;
+  G4VModularPhysicsList* physicsList = NULL;
+  if (physListFactory.IsReferencePhysList(m_physicsList)) physicsList = physListFactory.GetReferencePhysList(m_physicsList);
+  if (physicsList == NULL) B2FATAL("Could not load the physics list " << m_physicsList);
+  physicsList->RegisterPhysics(new ExtPhysicsConstructor);
+  if (m_optics) physicsList->RegisterPhysics(new G4OpticalPhysics);
+  physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
+  // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
+  // all the energy (as is done in G4ErrorPhysicsList)
+  G4ParticleTable::G4PTblDicIterator* theParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
+  theParticleIterator->reset();
+  while ((*theParticleIterator)()) {
+    G4ParticleDefinition* particle = theParticleIterator->value();
+    if (particle->GetParticleName().compare(0, 4, "g4e_") == 0) {
+      physicsList->SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
+    }
+  }
   runManager.SetUserInitialization(physicsList);
 
+
   //Create the magnetic field for the Geant4 simulation
-  if (m_magneticField != "none") {
-    G4MagneticField* magneticField = new MagneticField();
+  if (m_magneticFieldName != "none") {
+    m_magneticField = new MagneticField();
     if (m_magneticCacheDistance > 0) {
-      magneticField = new G4CachedMagneticField(magneticField, m_magneticCacheDistance);
+      m_uncachedField = m_magneticField;
+      m_magneticField = new G4CachedMagneticField(m_uncachedField, m_magneticCacheDistance);
     }
     G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-    fieldManager->SetDetectorField(magneticField);
-    if (m_magneticField != "default") {
+    fieldManager->SetDetectorField(m_magneticField);
+    if (m_magneticFieldName != "default") {
 
       //We only use Magnetic field so let's try the specialized steppers
-      G4Mag_UsualEqRhs* pMagFldEquation = new G4Mag_UsualEqRhs(magneticField);
-      G4MagIntegratorStepper* stepper(0);
-      if (m_magneticField == "nystrom") {
-        stepper = new G4NystromRK4(pMagFldEquation);
-      } else if (m_magneticField == "expliciteuler") {
-        stepper = new G4HelixExplicitEuler(pMagFldEquation);
-      } else if (m_magneticField == "simplerunge") {
-        stepper = new G4HelixSimpleRunge(pMagFldEquation);
+      m_magFldEquation = new G4Mag_UsualEqRhs(m_magneticField);
+      if (m_magneticFieldName == "nystrom") {
+        m_stepper = new G4NystromRK4(m_magFldEquation);
+      } else if (m_magneticFieldName == "expliciteuler") {
+        m_stepper = new G4HelixExplicitEuler(m_magFldEquation);
+      } else if (m_magneticFieldName == "simplerunge") {
+        m_stepper = new G4HelixSimpleRunge(m_magFldEquation);
       } else {
-        B2FATAL("Unknown magnetic field option: " << m_magneticField);
+        B2FATAL("Unknown magnetic field option: " << m_magneticFieldName);
       }
 
       //Set a minimum stepsize (stepMinimum): The chordfinder should not attempt to limit
       //the stepsize to something less than 10µm (which is the default value of Geant4).
-      G4ChordFinder* chordFinder = new G4ChordFinder(magneticField, 1e-2 * CLHEP::mm, stepper);
-      fieldManager->SetChordFinder(chordFinder);
+      m_chordFinder = new G4ChordFinder(m_magneticField, 1e-2 * CLHEP::mm, m_stepper);
+      fieldManager->SetChordFinder(m_chordFinder);
     } else {
-      fieldManager->CreateChordFinder(magneticField);
+      fieldManager->CreateChordFinder(m_magneticField);
     }
 
     //Change DeltaCord (the max. miss-distance between the trajectory curve and its linear chord(s) approximation, if asked.
@@ -200,6 +235,8 @@ void FullSimModule::initialize()
   //Set the parameters for the G4Transportation system.
   //To make sure we really change all G4Transportation classes, we loop over all particles
   //even if the pointer to the G4Transportation object seems to be the same for all particles.
+  //Only one instance of G4StepLimiter is needed: see G4StepLimiterBuilder(), for example.
+  m_stepLimiter = new G4StepLimiter();
   G4ParticleTable::G4PTblDicIterator* partIter = G4ParticleTable::GetParticleTable()->GetIterator();
   partIter->reset();
   while ((*partIter)()) {
@@ -216,7 +253,7 @@ void FullSimModule::initialize()
     // Add StepLimiter process for charged tracks.
     double zeroChargeTol = 0.01 * Unit::e;
     if (fabs(currParticle->GetPDGCharge()) > zeroChargeTol) {
-      currParticle->GetProcessManager()->AddDiscreteProcess(new G4StepLimiter());
+      currParticle->GetProcessManager()->AddDiscreteProcess(m_stepLimiter);
       B2DEBUG(100, "Added StepLimiter process for " << currParticle->GetParticleName())
     }
   }
@@ -298,4 +335,46 @@ void FullSimModule::terminate()
   //And clean up the run manager
   if (m_visManager != nullptr) delete m_visManager;
   RunManager::Instance().destroy();
+  // Delete the Geant4 nuclear cascade tables ... grrr!
+  delete G4CascadeChannelTables::GetTable(gam * neu);
+  delete G4CascadeChannelTables::GetTable(gam * pro);
+  delete G4CascadeChannelTables::GetTable(k0 * neu);
+  delete G4CascadeChannelTables::GetTable(k0 * pro);
+  delete G4CascadeChannelTables::GetTable(k0b * neu);
+  delete G4CascadeChannelTables::GetTable(k0b * pro);
+  delete G4CascadeChannelTables::GetTable(kmi * neu);
+  delete G4CascadeChannelTables::GetTable(kmi * pro);
+  delete G4CascadeChannelTables::GetTable(kpl * neu);
+  delete G4CascadeChannelTables::GetTable(kpl * pro);
+  delete G4CascadeChannelTables::GetTable(lam * neu);
+  delete G4CascadeChannelTables::GetTable(lam * pro);
+  delete G4CascadeChannelTables::GetTable(neu * neu);
+  delete G4CascadeChannelTables::GetTable(neu * pro);
+  delete G4CascadeChannelTables::GetTable(pi0 * neu);
+  delete G4CascadeChannelTables::GetTable(pi0 * pro);
+  delete G4CascadeChannelTables::GetTable(pim * neu);
+  delete G4CascadeChannelTables::GetTable(pim * pro);
+  delete G4CascadeChannelTables::GetTable(pip * neu);
+  delete G4CascadeChannelTables::GetTable(pip * pro);
+  delete G4CascadeChannelTables::GetTable(pro * pro);
+  delete G4CascadeChannelTables::GetTable(s0 * neu);
+  delete G4CascadeChannelTables::GetTable(s0 * pro);
+  delete G4CascadeChannelTables::GetTable(sm * neu);
+  delete G4CascadeChannelTables::GetTable(sm * pro);
+  delete G4CascadeChannelTables::GetTable(sp * neu);
+  delete G4CascadeChannelTables::GetTable(sp * pro);
+  delete G4CascadeChannelTables::GetTable(xi0 * neu);
+  delete G4CascadeChannelTables::GetTable(xi0 * pro);
+  delete G4CascadeChannelTables::GetTable(xim * neu);
+  delete G4CascadeChannelTables::GetTable(xim * pro);
+  delete G4CascadeChannelTables::GetTable(om * neu);
+  delete G4CascadeChannelTables::GetTable(om * pro);
+  // Delete the step limiter process
+  delete m_stepLimiter;
+  // Delete the objects associated with transport in magnetic field
+  if (m_chordFinder) delete m_chordFinder;
+  if (m_stepper) delete m_stepper;
+  if (m_magFldEquation) delete m_magFldEquation;
+  if (m_uncachedField) delete m_uncachedField;
+  if (m_magneticField) delete m_magneticField;
 }

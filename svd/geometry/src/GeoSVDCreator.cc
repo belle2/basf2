@@ -48,6 +48,8 @@ namespace Belle2 {
 
     GeoSVDCreator::~GeoSVDCreator()
     {
+      for (SensorInfo * sensorInfo : m_SensorInfo) delete sensorInfo;
+      m_SensorInfo.clear();
     }
 
     VXD::SensorInfoBase* GeoSVDCreator::createSensorInfo(const GearDir& sensor)
@@ -70,6 +72,7 @@ namespace Belle2 {
         sensor.getDouble("CouplingCapacitance") * unit_pF
       );
 
+      m_SensorInfo.push_back(info);
       return info;
     }
 

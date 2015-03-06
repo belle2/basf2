@@ -12,11 +12,14 @@
 #ifndef GEOSVDCREATOR_H
 #define GEOSVDCREATOR_H
 
+#include <vector>
 #include <vxd/geometry/GeoVXDCreator.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the SVD */
   namespace SVD {
+
+    class SensorInfo;
 
     /** The creator for the SVD geometry of the Belle II detector.   */
     class GeoSVDCreator : public VXD::GeoVXDCreator {
@@ -62,6 +65,11 @@ namespace Belle2 {
        */
       virtual VXD::SensitiveDetectorBase* createSensitiveDetector(
         VxdID sensorID, const VXD::GeoVXDSensor& sensor, const VXD::GeoVXDSensorPlacement& placement);
+
+    private:
+
+      /** Vector of pointers to SensorInfo objects */
+      std::vector<SensorInfo*> m_SensorInfo;
 
     }; // class GeoSVDCreator
   } // namespace SVD

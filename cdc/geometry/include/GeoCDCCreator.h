@@ -20,8 +20,12 @@
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
+class G4VisAttributes;
 
 namespace Belle2 {
+
+  class BkgSensitiveDetector;
+
   namespace CDC {
 
     //!  The GeoCDCCreator class.
@@ -58,6 +62,11 @@ namespace Belle2 {
       //! Sensitive detector
       CDCSensitiveDetector* m_sensitive;
 
+      //! Sensitive detector for background studies
+      BkgSensitiveDetector* m_bkgsensitive;
+
+      //! Vector of pointers to G4VisAttributes
+      std::vector<G4VisAttributes*> m_VisAttributes;
 
     };
 

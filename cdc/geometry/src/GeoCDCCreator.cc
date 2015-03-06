@@ -57,15 +57,20 @@ namespace Belle2 {
     GeoCDCCreator::GeoCDCCreator()
     {
       m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)* CLHEP::eV, 10 * CLHEP::MeV);
+      m_bkgsensitive = NULL;
       logical_cdc = 0;
       physical_cdc = 0;
-
+      m_VisAttributes.clear();
+      m_VisAttributes.push_back(new G4VisAttributes(false)); // for "invisible"
     }
 
 
     GeoCDCCreator::~GeoCDCCreator()
     {
-
+      delete m_sensitive;
+      if (m_bkgsensitive) delete m_bkgsensitive;
+      for (G4VisAttributes * visAttr : m_VisAttributes) delete visAttr;
+      m_VisAttributes.clear();
     }
 
 
@@ -287,6 +292,7 @@ namespace Belle2 {
       // Construct outer wall
       //----------------------
 
+      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       for (int iOuterWall = 0; iOuterWall < nOuterWall; ++iOuterWall) {
         double length = (outerWallFZ[iOuterWall] - outerWallBZ[iOuterWall]) / 2.0;
         if (strstr((outerWallName[iOuterWall]).c_str(), "MiddleWall") != NULL) {
@@ -298,7 +304,7 @@ namespace Belle2 {
           outerWallName3 << "physical" << (outerWallName[iOuterWall]).c_str();
           G4Tubs* outerWallTubeShape = new G4Tubs(outerWallName1.str(), outerWallInnerR[iOuterWall]*CLHEP::cm, outerWallOuterR[iOuterWall]*CLHEP::cm, length * CLHEP::cm, 0 * CLHEP::deg, 360.*CLHEP::deg);
           G4LogicalVolume* outerWallTube = new G4LogicalVolume(outerWallTubeShape, medCFRP, outerWallName2.str(), 0, 0, 0);
-          outerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
+          outerWallTube->SetVisAttributes(m_VisAttributes.back());
           if (!simplifiedGeometry) {
             new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + outerWallBZ[iOuterWall])*CLHEP::cm), outerWallTube, outerWallName3.str(), logical_cdc, false, iOuterWall);
           }
@@ -311,7 +317,7 @@ namespace Belle2 {
           outerWallName3 << "physical" << (outerWallName[iOuterWall]).c_str();
           G4Tubs* outerWallTubeShape = new G4Tubs(outerWallName1.str(), outerWallInnerR[iOuterWall]*CLHEP::cm, outerWallOuterR[iOuterWall]*CLHEP::cm, length * CLHEP::cm, 0 * CLHEP::deg, 360.*CLHEP::deg);
           G4LogicalVolume* outerWallTube = new G4LogicalVolume(outerWallTubeShape, medAluminum, outerWallName2.str(), 0, 0, 0);
-          outerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
+          outerWallTube->SetVisAttributes(m_VisAttributes.back());
           if (!simplifiedGeometry) {
             new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + outerWallBZ[iOuterWall])*CLHEP::cm), outerWallTube, outerWallName3.str(), logical_cdc, false, iOuterWall);
           }
@@ -334,7 +340,7 @@ namespace Belle2 {
           innerWallName3 << "physical" << (innerWallName[iInnerWall]).c_str();
           G4Tubs* innerWallTubeShape = new G4Tubs(innerWallName1.str(), innerWallInnerR[iInnerWall]*CLHEP::cm, innerWallOuterR[iInnerWall]*CLHEP::cm, length * CLHEP::cm, 0 * CLHEP::deg, 360.*CLHEP::deg);
           G4LogicalVolume* innerWallTube = new G4LogicalVolume(innerWallTubeShape, medCFRP, innerWallName2.str(), 0, 0, 0);
-          innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
+          innerWallTube->SetVisAttributes(m_VisAttributes.back());
           // Commented by M. U. June 3rd, 2013
           //          G4VPhysicalVolume* phyinnerWallTube;
           if (!simplifiedGeometry) {
@@ -349,7 +355,7 @@ namespace Belle2 {
           innerWallName3 << "physical" << (innerWallName[iInnerWall]).c_str();
           G4Tubs* innerWallTubeShape = new G4Tubs(innerWallName1.str(), innerWallInnerR[iInnerWall]*CLHEP::cm, innerWallOuterR[iInnerWall]*CLHEP::cm, length * CLHEP::cm, 0 * CLHEP::deg, 360.*CLHEP::deg);
           G4LogicalVolume* innerWallTube = new G4LogicalVolume(innerWallTubeShape, medGlue, innerWallName2.str(), 0, 0, 0);
-          innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
+          innerWallTube->SetVisAttributes(m_VisAttributes.back());
           // Commented by M. U. June 3rd, 2013
           // G4VPhysicalVolume* phyinnerWallTube;
           if (!simplifiedGeometry) {
@@ -365,7 +371,7 @@ namespace Belle2 {
           innerWallName3 << "physical" << (innerWallName[iInnerWall]).c_str();
           G4Tubs* innerWallTubeShape = new G4Tubs(innerWallName1.str(), innerWallInnerR[iInnerWall]*CLHEP::cm, innerWallOuterR[iInnerWall]*CLHEP::cm, length * CLHEP::cm, 0 * CLHEP::deg, 360.*CLHEP::deg);
           G4LogicalVolume* innerWallTube = new G4LogicalVolume(innerWallTubeShape, medAluminum, innerWallName2.str(), 0, 0, 0);
-          innerWallTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
+          innerWallTube->SetVisAttributes(m_VisAttributes.back());
           // Commented by M. U. June 3rd, 2013
           //          G4VPhysicalVolume* phyinnerWallTube;
           if (!simplifiedGeometry) {
@@ -796,14 +802,14 @@ namespace Belle2 {
           G4Tubs* middleSensitiveSwireShape = new G4Tubs(sName, 0., sWireRadius, wireHalfLength, 0., 360. * CLHEP::deg);
           G4LogicalVolume* middleSensitiveSwire = new G4LogicalVolume(middleSensitiveSwireShape, medTungsten, sName);
           //    middleSensitiveSwire->SetSensitiveDetector(m_sensitive);
-          middleSensitiveSwire->SetVisAttributes(G4VisAttributes::GetInvisible()); // <- to speed up visualization
+          middleSensitiveSwire->SetVisAttributes(m_VisAttributes.front()); // <- to speed up visualization
 
           G4String fName = "fWire";
           const G4double fWireRadius  = 0.5 * cdcgp.fieldWireDiameter() * CLHEP::cm;
           G4Tubs* middleSensitiveFwireShape = new G4Tubs(fName, 0., fWireRadius, wireHalfLength, 0., 360. * CLHEP::deg);
           G4LogicalVolume* middleSensitiveFwire = new G4LogicalVolume(middleSensitiveFwireShape, medAluminum, fName);
           //    middleSensitiveFwire->SetSensitiveDetector(m_sensitive);
-          middleSensitiveFwire->SetVisAttributes(G4VisAttributes::GetInvisible()); // <- to speed up visualization
+          middleSensitiveFwire->SetVisAttributes(m_VisAttributes.front()); // <- to speed up visualization
 
           const G4double diameter = cdcgp.fieldWireDiameter();
 
@@ -933,6 +939,7 @@ namespace Belle2 {
         }  // end of wire definitions
 
         // Endplates
+        m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(1., 1., 0.)));
         const int nEPLayer4Loop = (simplifiedGeometry) ? -1 : nEPLayer;
         for (int iEPLayer = 0; iEPLayer < nEPLayer4Loop; ++iEPLayer) {
           std::ostringstream endplateName;
@@ -944,7 +951,7 @@ namespace Belle2 {
           double length_endplate = (epFZ[iSLayer][iEPLayer] - epBZ[iSLayer][iEPLayer]) / 2.0;
           G4Tubs* endplateTubeShape = new G4Tubs(endplateName.str().c_str(), epInnerR[iSLayer][iEPLayer]*CLHEP::cm, epOuterR[iSLayer][iEPLayer]*CLHEP::cm, length_endplate * CLHEP::cm, 0 * CLHEP::deg, 360.*CLHEP::deg);
           G4LogicalVolume* endplateTube = new G4LogicalVolume(endplateTubeShape, medAluminum, endplateName1.str().c_str(), 0, 0);
-          endplateTube->SetVisAttributes(G4VisAttributes(G4Colour(1., 1., 0.)));
+          endplateTube->SetVisAttributes(m_VisAttributes.back());
           // Commented by M. U. June 3rd, 2013
 
           if (iSLayer != (nSLayer - 1) || (iEPLayer != 2 && iEPLayer != 5))
@@ -955,6 +962,7 @@ namespace Belle2 {
       //--------------------------------------------------
       // Get paprameters and construct electronics boards
       //--------------------------------------------------
+      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       const int nEB = (simplifiedGeometry) ? -1 : content.getNumberNodes("ElectronicsBoards/ElectronicsBoard");
       for (int iEB = 0; iEB < nEB; ++iEB) {
         // Get parameters
@@ -972,8 +980,9 @@ namespace Belle2 {
 
         G4LogicalVolume* ebTube = new G4LogicalVolume(ebTubeShape, medNEMA_G10_Plate, (format("logicalSD_ElectronicsBoard_Layer%1%") % ebID).str().c_str(), 0, 0, 0);
         //ebTube->SetSensitiveDetector(m_sensitive);
-        ebTube->SetSensitiveDetector(new BkgSensitiveDetector("CDC", iEB));
-        ebTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
+        if (!m_bkgsensitive) m_bkgsensitive = new BkgSensitiveDetector("CDC", iEB);
+        ebTube->SetSensitiveDetector(m_bkgsensitive);
+        ebTube->SetVisAttributes(m_VisAttributes.back());
         // Commented by M. U. June 3rd, 2013
         //        G4VPhysicalVolume* phyebTube;
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (ebFZ + ebBZ)*CLHEP::cm / 2.0), ebTube, (format("physicalSD_ElectronicsBoard_Layer%1%") % ebID).str().c_str(), logical_cdc, false, ebID);
@@ -982,6 +991,7 @@ namespace Belle2 {
       //--------------------------------------
       // Get parameters and construct covers
       //--------------------------------------
+      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 1.)));
       const int nCover = (simplifiedGeometry) ? -1 : content.getNumberNodes("Covers/Cover");
       for (int iCover = 0; iCover < nCover; ++iCover) {
         // Get parameters
@@ -1006,7 +1016,7 @@ namespace Belle2 {
             const double rmax1 = coverOuterR1;
             G4Tubs* coverTubeShape = new G4Tubs((format("solidBackwardCover%1%") % coverID).str().c_str(), rmin1 * CLHEP::cm, rmax1 * CLHEP::cm, coverThick * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
             G4LogicalVolume* coverTube = new G4LogicalVolume(coverTubeShape, medAluminum, (format("logicalBackwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
-            coverTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
+            coverTube->SetVisAttributes(m_VisAttributes.back());
 
             new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, coverPosZ * CLHEP::cm - coverThick * CLHEP::cm / 2.0), coverTube, (format("physicalBackwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
 
@@ -1016,7 +1026,7 @@ namespace Belle2 {
             const double rmax1 = coverOuterR1;
             G4Tubs* coverTubeShape = new G4Tubs((format("solidBackwardCover%1%") % coverID).str().c_str(), rmin1 * CLHEP::cm, rmax1 * CLHEP::cm, coverThick * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
             G4LogicalVolume* coverTube = new G4LogicalVolume(coverTubeShape, medAluminum, (format("logicalBackwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
-            coverTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
+            coverTube->SetVisAttributes(m_VisAttributes.back());
 
             new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, coverPosZ * CLHEP::cm - coverThick * CLHEP::cm / 2.0), coverTube, (format("physicalBackwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
 
@@ -1034,14 +1044,14 @@ namespace Belle2 {
           if (coverID == 4) {
             G4Tubs* coverTubeShape = new G4Tubs((format("solidForwardCover%1%") % coverID).str().c_str(), 43.8 * CLHEP::cm, 113.71 * CLHEP::cm, coverThick * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
             G4LogicalVolume* coverTube = new G4LogicalVolume(coverTubeShape, medAluminum, (format("logicalForwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
-            coverTube->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
+            coverTube->SetVisAttributes(m_VisAttributes.back());
 
             new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 165.519 * CLHEP::cm - coverThick * CLHEP::cm / 2.0), coverTube, (format("physicalForwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
 
           } else {
             G4Cons* coverConeShape = new G4Cons((format("solidForwardCover%1%") % coverID).str().c_str(), rmin1 * CLHEP::cm, rmax1 * CLHEP::cm, rmin2 * CLHEP::cm, rmax2 * CLHEP::cm, coverLength * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
             G4LogicalVolume* coverCone = new G4LogicalVolume(coverConeShape, medAluminum, (format("logicalForwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
-            coverCone->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
+            coverCone->SetVisAttributes(m_VisAttributes.back());
             new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (coverPosZ + coverLength / 2.0)*CLHEP::cm), coverCone, (format("physicalForwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
           }
         }
@@ -1097,19 +1107,20 @@ namespace Belle2 {
         G4Material* shieldMat = B4C;
         */
 
+        m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 0., 1.)));
         G4Tubs* bgShieldTubeShape_0 = new G4Tubs("solid_B4C_0", 45.5 * CLHEP::cm, 60.0 * CLHEP::cm, 6.0 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
         G4LogicalVolume* bgShieldTube_0 = new G4LogicalVolume(bgShieldTubeShape_0, shieldMat, "logical_B4C_0", 0, 0, 0);
-        bgShieldTube_0->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
+        bgShieldTube_0->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -95.0 * CLHEP::cm), bgShieldTube_0, "physical_B4C_0", logical_cdc, false, 0);
 
         G4Tubs* bgShieldTubeShape_1 = new G4Tubs("solid_B4C_1", 29.2 * CLHEP::cm, 45.0 * CLHEP::cm, 4.0 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
         G4LogicalVolume* bgShieldTube_1 = new G4LogicalVolume(bgShieldTubeShape_1, shieldMat, "logical_B4C_1", 0, 0, 0);
-        bgShieldTube_1->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
+        bgShieldTube_1->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -90.0 * CLHEP::cm), bgShieldTube_1, "physical_B4C_1", logical_cdc, false, 0);
 
         G4Tubs* bgShieldTubeShape_2 = new G4Tubs("solid_B4C_2", 29.2 * CLHEP::cm, 30.2 * CLHEP::cm, 20.0 * CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);
         G4LogicalVolume* bgShieldTube_2 = new G4LogicalVolume(bgShieldTubeShape_2, shieldMat, "logical_B4C_2", 0, 0, 0);
-        bgShieldTube_2->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
+        bgShieldTube_2->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (-90.0 + 2.0 + 10.0)*CLHEP::cm), bgShieldTube_2, "physical_B4C_2", logical_cdc, false, 0);
 
         const double rmin1 = 27.1;
@@ -1126,7 +1137,7 @@ namespace Belle2 {
         const double zc = 0.5 * (z1 + z3);
         G4Cons* bgShieldConeShape_3 = new G4Cons("solid_B4C_3", rmin1 * CLHEP::cm, (rmin1 + dr1) * CLHEP::cm, rmin3 * CLHEP::cm, (rmin3 + dr3) * CLHEP::cm,  width * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
         G4LogicalVolume* bgShieldCone_3 = new G4LogicalVolume(bgShieldConeShape_3, shieldMat, "logical_B4C_3", 0, 0, 0);
-        bgShieldCone_3->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
+        bgShieldCone_3->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, zc * CLHEP::cm), bgShieldCone_3, "physicalbgShield_B4C_3", logical_cdc, false, 0);
 
         const double z4 = -45.0;
@@ -1136,7 +1147,7 @@ namespace Belle2 {
         const double zc4 = 0.5 * (z2 + z4);
         G4Cons* bgShieldConeShape_4 = new G4Cons("solid_B4C_4", rmin4 * CLHEP::cm, (rmin4 + dr4) * CLHEP::cm, rmin2 * CLHEP::cm, (rmin2 + dr2) * CLHEP::cm,  width4 * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
         G4LogicalVolume* bgShieldCone_4 = new G4LogicalVolume(bgShieldConeShape_4, shieldMat, "logical_B4C_4", 0, 0, 0);
-        bgShieldCone_4->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
+        bgShieldCone_4->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, zc4 * CLHEP::cm), bgShieldCone_4, "physicalbgShield_B4C_4", logical_cdc, false, 0);
 
 
@@ -1148,7 +1159,7 @@ namespace Belle2 {
           const double zc5 = 0.5*(z2+z5);
           G4Cons* bgShieldConeShape_5 = new G4Cons("solid_B4C_5", rmin2 * CLHEP::cm, (rmin2+dr4) * CLHEP::cm, rmin5 * CLHEP::cm, (rmin5 + dr5 ) * CLHEP::cm,  width5 * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
           G4LogicalVolume* bgShieldCone_5 = new G4LogicalVolume(bgShieldConeShape_5, shieldMat, "logical_B4C_5", 0, 0, 0);
-          bgShieldCone_5->SetVisAttributes(G4VisAttributes(G4Colour(0., 0., 1.)));
+          bgShieldCone_5->SetVisAttributes(m_VisAttributes.back());
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, zc5 * CLHEP::cm), bgShieldCone_5, "physicalbgShield_B4C_5", logical_cdc, false, 0);
 
         */
@@ -1156,6 +1167,18 @@ namespace Belle2 {
 
       }
 
+      for (int i = 0; i < nSLayer; ++i) {
+        delete [] epName[i];
+        delete [] epInnerR[i];
+        delete [] epOuterR[i];
+        delete [] epBZ[i];
+        delete [] epFZ[i];
+      }
+      delete [] epName;
+      delete [] epInnerR;
+      delete [] epOuterR;
+      delete [] epBZ;
+      delete [] epFZ;
 
       delete [] nEndplateLayer;
       delete [] flayerRadius;
@@ -1166,10 +1189,12 @@ namespace Belle2 {
       delete [] slayerZBack;
       delete [] slayerZFor;
 
+      delete [] outerWallName;
       delete [] outerWallInnerR;
       delete [] outerWallOuterR;
       delete [] outerWallBZ;
       delete [] outerWallFZ;
+      delete [] innerWallName;
       delete [] innerWallInnerR;
       delete [] innerWallOuterR;
       delete [] innerWallBZ;

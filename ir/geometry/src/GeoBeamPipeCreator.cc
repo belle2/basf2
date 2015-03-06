@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Hiroshi Nakano, Hiroyuki Nakayama,Yuri Soloviev                        *
+ * Contributors: Hiroshi Nakano, Hiroyuki Nakayama,Yuri Soloviev          *
  *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -1216,6 +1216,22 @@ namespace Belle2 {
       //logi_Lv1TaHERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", 15));
       //logi_Lv1TaHERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", 16));
       //logi_Lv1TaLERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", 17));
+      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 11)));
+      //logi_Lv3AuCoat->SetSensitiveDetector(m_sensitive.back());
+      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 12)));
+      //logi_Lv1TaFwd->SetSensitiveDetector(m_sensitive.back());
+      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 13)));
+      //logi_Lv1TaBwd->SetSensitiveDetector(m_sensitive.back());
+      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 14)));
+      //logi_Lv1TaLERUp->SetSensitiveDetector(m_sensitive.back());
+      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 15)));
+      //logi_Lv1TaHERDwn->SetSensitiveDetector(m_sensitive.back());
+      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 16)));
+      //logi_Lv1TaHERUp->SetSensitiveDetector(m_sensitive.back());
+      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 17)));
+      //logi_Lv1TaLERDwn->SetSensitiveDetector(m_sensitive.back());
+
+
 
       //-
       //----------

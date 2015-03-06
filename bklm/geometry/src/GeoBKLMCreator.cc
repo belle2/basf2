@@ -77,18 +77,15 @@ namespace Belle2 {
       }
       m_SolenoidTube = NULL;
       m_ScintLogicals.clear();
-      m_VisAttributes.push_back(new G4VisAttributes(false));
+      m_VisAttributes.clear();
+      m_VisAttributes.push_back(new G4VisAttributes(false)); // for "invisible"
     }
 
     GeoBKLMCreator::~GeoBKLMCreator()
     {
       delete m_Sensitive;
-      for (std::vector<G4VisAttributes*>::iterator j = m_VisAttributes.begin();
-           j != m_VisAttributes.end(); ++j) {
-        delete *j;
-      }
+      for (G4VisAttributes * visAttr : m_VisAttributes) delete visAttr;
       m_VisAttributes.clear();
-      // Geant4 will delete the solids and physical/logical volumes.
     }
 
     //-----------------------------------------------------------------

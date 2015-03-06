@@ -113,4 +113,9 @@ void ECLElectronIdModule::endRun()
 
 void ECLElectronIdModule::terminate()
 {
+  delete m_pdf[ Const::electron.getIndex() ];
+  delete m_pdf[ Const::muon.getIndex() ];
+  delete m_pdf[ Const::pion.getIndex() ];
+  if (m_pdf[ Const::proton.getIndex() ] != m_pdf[ Const::pion.getIndex() ]) delete m_pdf[ Const::proton.getIndex() ];
+  if (m_pdf[ Const::kaon.getIndex() ] != m_pdf[ Const::pion.getIndex() ]) delete m_pdf[ Const::kaon.getIndex() ];
 }

@@ -11,7 +11,7 @@ import os
 from basf2 import *
 from sys import argv
 
-numEvents = 1
+numEvents = 100
 
 # want EvtGen or ParticleGun? (or both)
 useEvtGen = True
@@ -20,8 +20,8 @@ usePGun = False
 # flags for the pGun
 numTracks = 2
 # transverseMomentum:
-momentumMin = 1.  # GeV/c
-momentumMax = 1.  # %
+momentumMin = .01  # GeV/c
+momentumMax = .2  #
 # theta: starting angle of particle direction in r-z-plane
 thetaMin = 15.0  # degrees
 # thetaMax = 60.  # degrees
@@ -31,9 +31,9 @@ thetaMax = 153.  # Full detector from 150 to 17 (officially), to have some reser
 phiMin = 0.  # degrees
 phiMax = 360.  # degrees
 
-# change the debug level for more than one module (currently set for: SPTCReferee, SpacePoint2TrueHitConnector, GFTC2SPTCConverter, CurlingTrackCandSplitter )
+# change the debug level for more than one module (currently set for: SpacePoint2TrueHitConnector, GFTC2SPTCConverter )
 MyLogLevel = LogLevel.INFO
-MyDebugLevel = 500
+MyDebugLevel = 2  # some of the modules print some additional information in terminate if debug level is set to 1 or 2
 
 # possibility of using another initial Value from the command line
 initialValue = 0  # 0 for random events
@@ -62,10 +62,7 @@ progress.param('maxN', 2)
 gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
-geometry.param('components', ['TB'])
-
-geometry = register_module('Geometry')
-geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
+geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',
                'PXD', 'SVD'])  # 'components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',........
 
 # evtgen
@@ -85,8 +82,8 @@ param_pGun = {  # 13: muons, 211: charged pions
     'phiGeneration': 'uniform',
     'phiParams': [phiMin, phiMax],
     'vertexGeneration': 'uniform',
-    'xVertexParams': [-0.01, 0.01],
-    'yVertexParams': [-0.01, 0.01],
+    'xVertexParams': [-.01, .01],
+    'yVertexParams': [-.01, .01],
     'zVertexParams': [-0.5, 0.5],
     }
 particlegun.param(param_pGun)
@@ -111,6 +108,14 @@ spCreatorSVD.logging.log_level = LogLevel.INFO
 spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
 spCreatorSVD.param('NameOfInstance', 'nosingleSP')
 spCreatorSVD.param('SpacePoints', 'nosingleSP')
+# spCreatorSVD.param('SVDClusters', 'mySVDClusters')
+
+# SpacePoint Creation (singleCluster SpacePoints)
+singleSpCreatorSVD = register_module('SpacePointCreatorSVD')
+singleSpCreatorSVD.logging.log_level = LogLevel.INFO
+singleSpCreatorSVD.param('OnlySingleClusterSpacePoints', True)
+singleSpCreatorSVD.param('NameOfInstance', 'singleSP')
+singleSpCreatorSVD.param('SpacePoints', 'singleSP')
 # spCreatorSVD.param('SVDClusters', 'mySVDClusters')
 
 spCreatorPXD = register_module('SpacePointCreatorPXD')
@@ -138,15 +143,17 @@ mcTrackFinder.param(param_mctrackfinder)
 ##################################################################### Converting and Referee ##############################################
 # module to create relations between SpacePoints and TrueHits -> some of the following modules will be utilizing these relations!
 sp2thConnector = register_module('SpacePoint2TrueHitConnector')
+# sp2thConnector.logging.log_level = LogLevel.WARNING
 sp2thConnector.logging.log_level = MyLogLevel
 sp2thConnector.logging.debug_level = MyDebugLevel
 param_sp2thConnector = {  # still have to find the appropriate value
                           # 'maxLocalPosDiff': 0.01,
-    'storeSeperate': False,
     'DetectorTypes': ['PXD', 'SVD'],
-    'SpacePointNames': ['pxdOnly', 'nosingleSP'],
     'TrueHitNames': ['', ''],
+    'ClusterNames': ['', ''],
+    'SpacePointNames': ['pxdOnly', 'nosingleSP', 'singleSP'],
     'outputSuffix': '_relTH',
+    'storeSeperate': True,
     'registerAll': False,
     'maxGlobalPosDiff': 0.05,
     'maxPosSigma': 5,
@@ -154,60 +161,46 @@ param_sp2thConnector = {  # still have to find the appropriate value
 sp2thConnector.param(param_sp2thConnector)
 
 # TCConverter, genfit -> SPTC
-# NOTE: at the moment the parameters are set as such, that this module only uses SpacePoints that are related to TrueHits!
 trackCandConverter = register_module('GFTC2SPTCConverter')
+# trackCandConverter.logging.log_level = LogLevel.INFO
 trackCandConverter.logging.log_level = MyLogLevel
 trackCandConverter.logging.debug_level = MyDebugLevel
 param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
                               #    'SVDClusters': 'mySVDClusters',
-    'NoSingleClusterSVDSP': 'nosingleSP',
+    'NoSingleClusterSVDSP': 'nosingleSP_relTH',
+    'SingleClusterSVDSP': 'singleSP_relTH',
+    'PXDClusterSP': 'pxdOnly_relTH',
     'checkNoSingleSVDSP': True,
-    'checkTrueHits': False,
+    'checkTrueHits': True,
     'useSingleClusterSP': False,
-    'PXDClusterSP': 'pxdOnly',
+    'skipCluster': False,
     'genfitTCName': 'mcTracks',
     'SpacePointTCName': 'SPTracks',
+    'minNDF': int(1),
     }
 trackCandConverter.param(param_trackCandConverter)
 
 # SpacePointTrackCand referee
 sptcReferee = register_module('SPTCReferee')
-sptcReferee.logging.log_level = MyLogLevel
+# sptcReferee.logging.log_level = MyLogLevel
+sptcReferee.logging.log_level = LogLevel.INFO
 sptcReferee.logging.debug_level = MyDebugLevel
 param_sptcReferee = {
     'sptcName': 'SPTracks',
-    'checkCurling': False,
-    'splitCurlers': False,
-    'keepOnlyFirstPart': False,
+    'newArrayName': 'checkedSPTCs',
+    'curlingSuffix': '_curlParts',
+    'storeNewArray': True,
+    'setOrigin': [0., 0., 0.],
+    'checkCurling': True,
+    'splitCurlers': True,
+    'keepOnlyFirstPart': True,
     'kickSpacePoint': False,
     'checkMinDistance': True,
-    'minDistance': 0.,
+    'minDistance': 0.05,
     'checkSameSensor': True,
-    'useMCInfo': False,
+    'useMCInfo': True,
     }
 sptcReferee.param(param_sptcReferee)
-
-# at the moment curling checking/splitting is done by a seperate module -> this will be merged into the SPTCReferee module in the future !
-posAnalysisRootFileName = 'PositionAnalysis_CurlingTrackCandSplitter'  # need output filename for this module!
-curlingSplitter = register_module('CurlingTrackCandSplitter')
-curlingSplitter.logging.log_level = MyLogLevel
-curlingSplitter.logging.debug_level = MyDebugLevel
-param_curlingSplitter = {  # set positionAnalysis to true if you want to analyze the position of SpacePoints and the TrueHits they are related to
-                           # set splitCurlers to false if you do not want to split curling TrackCandidates but simply analyze them for curling behaviour
-                           # set useNonSingleTHinPA to False always, at the moment only a testing feature!
-    'SpacePointTCName': 'SPTracks',
-    'curlingFirstOutName': 'firstOutParts',
-    'curlingAllInName': 'allInParts',
-    'curlingRestOutName': 'restOutParts',
-    'completeCurlerName': 'completeCurler',
-    'splitCurlers': True,
-    'nTrackStubs': int(0),
-    'setOrigin': [0., 0., 0.],
-    'positionAnalysis': False,
-    'useNonSingleTHinPA': False,
-    'rootFileName': [posAnalysisRootFileName, 'RECREATE'],
-    }
-curlingSplitter.param(param_curlingSplitter)
 
 # back conversion and testing commented out -> not needed at the moment
 # TCConverter, SPTC -> genfit
@@ -235,8 +228,8 @@ curlingSplitter.param(param_curlingSplitter)
 main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
-main.add_module(gearbox)
-main.add_module(geometry)
+main.add_module(progress)
+
 if useEvtGen:
   ##following modules only for evtGen:
     main.add_module(evtgeninput)
@@ -246,6 +239,8 @@ else:
   ## following modules only for pGun:
     main.add_module(particlegun)
 
+main.add_module(gearbox)
+main.add_module(geometry)
 main.add_module(g4sim)
 main.add_module(pxdDigitizer)
 main.add_module(svdDigitizer)
@@ -253,13 +248,13 @@ main.add_module(pxdClusterizer)
 main.add_module(svdClusterizer)
 main.add_module(spCreatorPXD)
 main.add_module(spCreatorSVD)
+main.add_module(singleSpCreatorSVD)
 
 main.add_module(mcTrackFinder)
 
 main.add_module(sp2thConnector)
 main.add_module(trackCandConverter)
 main.add_module(sptcReferee)
-# main.add_module(curlingSplitter)
 
 # main.add_module(btrackCandConverter)
 # main.add_module(tcConverterTest)

@@ -1,17 +1,11 @@
 Import('env')
 
-a=str(FindFile('ARICHGeometryPar.cc', '../../../arich/geometry/src/'))
-f=open('./include/def.h', 'w')
-
-if "None" in a:
-   f.write("  ")
-   env['LIBS'] = ['ecl', 'framework', 'geometry', 'ecl_dataobjects', 'simulation_dataobjects', 'mdst_dataobjects',
-                  'Geom', '$ROOT_LIBS']
-else:
-   f.write("#define DOARICH")
+if (FindFile('ARICHGeometryPar.cc', '../../../arich/geometry/src/')) is not "None":
+   env.Append(CPPDEFINES=['DOARICH'])
    env['LIBS'] = ['ecl', 'framework', 'geometry', 'arich', 'ecl_dataobjects', 'simulation_dataobjects', 'mdst_dataobjects',
                   'Geom', '$ROOT_LIBS']
-
-f.close()
+else:
+   env['LIBS'] = ['ecl', 'framework', 'geometry', 'ecl_dataobjects', 'simulation_dataobjects', 'mdst_dataobjects',
+                  'Geom', '$ROOT_LIBS']
 
 Return('env')

@@ -21,7 +21,7 @@
 
 #include <simulation/dataobjects/BeamBackHit.h>
 
-#include <ecl/modules/eclBackgroundStudy/def.h>
+//#include <ecl/modules/eclBackgroundStudy/def.h>
 
 // if the ARICH package is installed, compile ARICH components
 #ifdef DOARICH

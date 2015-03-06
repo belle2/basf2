@@ -132,6 +132,8 @@ void ProfileModule::terminate()
     histo->GetXaxis()->SetTitle("Time [s]");
     can->Print(m_outputFileName.c_str());
     saveDir->cd();
+    delete can;
+    delete graph;
   }
 
   // Create a histogram of the memory usage vs. number of events and add it to the DataStore

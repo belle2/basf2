@@ -21,6 +21,7 @@
 
 #include <EvtGenExternal/EvtExternalGenList.hh>
 #include <EvtGenBase/EvtAbsRadCorr.hh>
+#include <evtgen/EvtGenBase/EvtDecayTable.hh>
 #include <EvtGenBase/EvtDecayBase.hh>
 
 
@@ -29,6 +30,17 @@
 
 using namespace std;
 using namespace Belle2;
+
+EvtGenInterface::~EvtGenInterface()
+{
+  EvtDecayTable* evtDecayTable = EvtDecayTable::getInstance();
+  for (unsigned int i = 0; i < EvtPDL::entries(); ++i) {
+    for (int j = 0; j < evtDecayTable->getNMode(i); ++j) {
+      delete evtDecayTable->getDecay(i, j);
+    }
+  }
+  if (m_Generator) delete m_Generator;
+}
 
 int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName)
 {

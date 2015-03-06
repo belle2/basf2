@@ -46,9 +46,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EvtGenInterface() {
-      if (m_Generator) delete m_Generator;
-    }
+    ~EvtGenInterface();
 
     /** Setup evtgen with the given decay and pdl files  */
     int setup(const std::string& decayFileName, const std::string& pdlFileName,

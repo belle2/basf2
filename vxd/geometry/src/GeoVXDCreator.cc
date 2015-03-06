@@ -49,6 +49,7 @@ namespace Belle2 {
 
     GeoVXDCreator::GeoVXDCreator(const string& prefix) : m_prefix(prefix), m_radiationsensors(prefix)
     {
+      m_UserLimits.clear();
     }
 
     GeoVXDCreator::~GeoVXDCreator()
@@ -60,6 +61,8 @@ namespace Belle2 {
         delete sensitive;
       }
       m_sensitive.clear();
+      for (G4UserLimits * userLimit : m_UserLimits) delete userLimit;
+      m_UserLimits.clear();
     }
 
     GeoVXDAssembly GeoVXDCreator::createHalfShellSupport(GearDir) { return GeoVXDAssembly(); }
@@ -347,7 +350,8 @@ namespace Belle2 {
         m_sensitive.push_back(sensitive);
         G4LogicalVolume* active = new G4LogicalVolume(activeShape,  sensorMaterial, name + ".Active",
                                                       0, sensitive);
-        active->SetUserLimits(new G4UserLimits(m_activeStepSize));
+        m_UserLimits.push_back(new G4UserLimits(m_activeStepSize));
+        active->SetUserLimits(m_UserLimits.back());
 
         //Draw local axes to check orientation
         //Beware: do not enable for simulation, this is purely for visualization

@@ -29,6 +29,7 @@ class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VSolid;
 class G4Material;
+class G4UserLimits;
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the VXD */
@@ -201,6 +202,8 @@ namespace Belle2 {
       /** If this is true, only active Materials will be placed for tracking
        * studies. Dead Material will be ignored */
       bool m_onlyActiveMaterial {false};
+      /** Vector of G4UserLimit pointers */
+      std::vector<G4UserLimits*> m_UserLimits;
 
     }; // class GeoVXDCreator
 

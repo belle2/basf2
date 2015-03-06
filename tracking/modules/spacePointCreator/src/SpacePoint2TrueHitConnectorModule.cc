@@ -22,6 +22,7 @@
 #include <algorithm>
 // #include <map>
 #include <unordered_map>
+#include <boost/concept_check.hpp>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -43,9 +44,10 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
 
   std::vector<std::string> defaultInList; // default list for input StoreArrays
   defaultInList.push_back(std::string(""));
-  addParam("TrueHitNames", m_PARAMtrueHitNames, "Container names of TrueHits.", defaultInList);
+  addParam("TrueHitNames", m_PARAMtrueHitNames, "Container names of TrueHits. NOTE: need one name per 'DetectorType' (i.e. unique entries in 'DetectorType)!", defaultInList);
   addParam("SpacePointNames", m_PARAMspacePointNames, "Container names of SpacePoints.", defaultInList);
-  addParam("DetectorTypes", m_PARAMdetectorTypes, "detector types to determine which entries in 'TrueHitNames' and 'SpacePointNames' belong to which detector type. Entries have to be 'SVD' or 'PXD'!");
+  addParam("DetectorTypes", m_PARAMdetectorTypes, "detector types to determine which entries in 'TrueHitNames' and 'SpacePointNames' belong to which detector type. Entries have to be 'SVD' or 'PXD'. NOTE: if more 'SpacePointNames' than 'DetectorTypes' get passed, the last entry in 'DetectorTypes' is assumed to be valid for all remaining 'SpacePointNames'!");
+  addParam("ClusterNames", m_PARAMclusterNames, "Container names of Clusters. NOTE: need one name per ('DetectorType' (i.e. unique entries in 'DetectorType')!", defaultInList);
 
   addParam("outputSuffix", m_PARAMoutputSuffix, "Suffix that will be appended to the container names if 'storeSeperate' is set to true", std::string("_relTH"));
 
@@ -57,222 +59,183 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   initializeCounters();
 }
 
-
-
+// ================================================================ INITIALIZE ====================================================
 void SpacePoint2TrueHitConnectorModule::initialize()
 {
   B2INFO("SpacePoint2TrueHitConnector -------------------------- initialize --------------------------------");
 
-  // check the input and get some information from it
-  for (std::string entry : m_PARAMdetectorTypes) {
-    if (entry.compare(std::string("SVD")) != 0  && entry.compare(std::string("PXD")) != 0) {
-      B2FATAL("Found entry " << entry << " in DetectorTypes, but detectorTypes has to be either 'PXD' or 'SVD'!")
-    }
-    if (entry.compare(std::string("SVD")) == 0) { m_detectorTypes.push_back(c_SVD); } // to avoid having to do the string comparison every time store the detector type in a vector
-    else { m_detectorTypes.push_back(c_PXD); }
+  m_nContainers = m_PARAMspacePointNames.size(); // get number of passed arrays
+  unsigned int nTHNames = m_PARAMtrueHitNames.size();
+  unsigned int nDetTypes = m_PARAMdetectorTypes.size();
+  unsigned int nClNames = m_PARAMclusterNames.size();
+  if (m_nContainers < nTHNames || m_nContainers < nDetTypes || m_nContainers < nClNames) {
+    B2FATAL("Passed " << nTHNames << " TrueHitNames and " << nDetTypes << " DetectorTypes but number of passed SpacePointArrays is " << m_nContainers)
   }
-  if (m_PARAMdetectorTypes.size() != m_PARAMspacePointNames.size()) {
-    B2FATAL("The number of entries in 'DetectorTypes' and 'SpacePointNames' do not match!") // for the moment this is fatal -> COULDDO: solve this without stopping the whole process
-  }
-  if (m_PARAMdetectorTypes.size() != m_PARAMtrueHitNames.size()) {
-    B2FATAL("The number of entries in 'DetectorTypes' and 'TrueHitNames' do not match!") // for the moment this is fatal -> COULDDO: solve this without stopping the whole process
+  if ((nTHNames != nDetTypes) || (nClNames != nTHNames)) {
+    B2FATAL("Passed " << nTHNames << " TrueHitNames and " << nClNames << "ClusterNames but " << nDetTypes << " DetectorTypes!")
   }
 
-  m_nContainers = m_PARAMdetectorTypes.size(); // get the number of total entries
-  if (m_PARAMoutputSuffix.empty()) {
-    B2WARNING("'outputSuffix' is empty and 'storeSeperate' is set to true. This would lead to StoreArrays with the same name. Resetting to 'outputSuffix' to '_relTH'!");
-    m_PARAMoutputSuffix = "_relTH";
-  }
-
-  // put the StoreArrays in the according vectors
   for (unsigned int i = 0; i < m_nContainers; ++i) {
-    if (m_detectorTypes.at(i) == c_PXD) {
-      m_inputSpacePoints.push_back(std::make_pair(StoreArray<SpacePoint>(m_PARAMspacePointNames.at(i)), c_PXD)); // NEW
-      m_PXDTrueHits.push_back(StoreArray<PXDTrueHit>(m_PARAMtrueHitNames.at(i))); // NEEDED
-    } else {
-      m_inputSpacePoints.push_back(std::make_pair(StoreArray<SpacePoint>(m_PARAMspacePointNames.at(i)), c_SVD)); // NEW
-      m_SVDTrueHits.push_back(StoreArray<SVDTrueHit>(m_PARAMtrueHitNames.at(i))); // NEEDED
-    }
-  }
+    if (i < nDetTypes) { // handle the detector types
+      std::string detType = m_PARAMdetectorTypes.at(i);
+      if (detType.compare(std::string("SVD")) != 0 && detType.compare(std::string("PXD")) != 0) {
+        B2FATAL("Found entry " << detType << " in DetectorTypes, but only 'PXD' and 'SVD' are allowed!")
+      }
+      if (detType.compare(std::string("SVD")) == 0) {
+        m_detectorTypes.push_back(c_SVD);
+        m_SVDTrueHits = StoreArray<SVDTrueHit>(m_PARAMtrueHitNames.at(i));
+        m_SVDTrueHits.isRequired();
+        m_SVDClusters = StoreArray<SVDCluster>(m_PARAMclusterNames.at(i));
+        m_SVDClusters.isRequired();
+      } else {
+        m_detectorTypes.push_back(c_PXD);
+        m_PXDTrueHits = StoreArray<PXDTrueHit>(m_PARAMtrueHitNames.at(i));
+        m_PXDTrueHits.isRequired();
+        m_PXDClusters = StoreArray<PXDCluster>(m_PARAMclusterNames.at(i));
+        m_PXDClusters.isRequired();
+      }
+    } else { m_detectorTypes.push_back(m_detectorTypes.at(i - 1)); } // add the last entry again
 
-  // NEW: check the StoreArrays (hopefully a little bit more general)
-  int iPXD = 0, iSVD = 0; // need seperate counters for the vectors of StoreArrays of TrueHits (cannot put them together into one StoreArray!)
-  for (unsigned int i = 0; i < m_nContainers; ++i) {
+    m_inputSpacePoints.push_back(make_pair(StoreArray<SpacePoint>(m_PARAMspacePointNames.at(i)), m_detectorTypes.at(i)));
     m_inputSpacePoints.at(i).first.isRequired();
-    e_detTypes detType = m_inputSpacePoints.at(i).second; // get the detector type
 
-    if (detType == c_PXD) { // checking the TrueHit StoreArrays is detector dependent
-      m_PXDTrueHits.at(iPXD).isRequired();
-      iPXD++;
-    } else {
-      m_SVDTrueHits.at(iSVD).isRequired();
-      iSVD++;
+    // add counters
+    m_SpacePointsCtr.push_back(0);
+    m_nRelTrueHitsCtr.push_back(array<unsigned int, 5>());
+    m_noClusterCtr.push_back(0);
+    m_noTrueHitCtr.push_back(0);
+    m_regRelationsCtr.push_back(0);
+    m_ghostHitCtr.push_back(0);
+  }
+
+  if (m_PARAMstoreSeparate) {
+    if (m_PARAMoutputSuffix.empty()) {
+      B2WARNING("'outputSuffix' is empty and 'storeSeperate' is set to true. This would lead to StoreArrays with the same name. Resetting to 'outputSuffix' to '_relTH'!");
+      m_PARAMoutputSuffix = "_relTH";
     }
 
-    if (m_PARAMstoreSeparate) { // if desired create new StoreArrays and relations
+    for (unsigned int i = 0; i < m_nContainers; ++i) {
       std::string name = m_inputSpacePoints.at(i).first.getName() + m_PARAMoutputSuffix;
       m_outputSpacePoints.push_back(StoreArray<SpacePoint>(name));
       m_outputSpacePoints.at(i).registerInDataStore(name, DataStore::c_DontWriteOut);
 
-      // relation registering detector dependent again! (counters - 1, because they are already increased above)
-      if (detType == c_PXD) { m_outputSpacePoints.at(i).registerRelationTo(m_PXDTrueHits.at(iPXD - 1), DataStore::c_Event, DataStore::c_DontWriteOut); }
-      else { m_outputSpacePoints.at(i).registerRelationTo(m_SVDTrueHits.at(iSVD - 1), DataStore::c_Event, DataStore::c_DontWriteOut); }
-    } else { // register relations for existing StoreArrays
-      if (detType == c_PXD) { m_inputSpacePoints.at(i).first.registerRelationTo(m_PXDTrueHits.at(iPXD - 1), DataStore::c_Event, DataStore::c_DontWriteOut); }
-      else { m_inputSpacePoints.at(i).first.registerRelationTo(m_SVDTrueHits.at(iSVD - 1), DataStore::c_Event, DataStore::c_DontWriteOut); }
+      // register relations (detector dependent)
+      if (m_inputSpacePoints.at(i).second == c_SVD) {
+        m_outputSpacePoints.at(i).registerRelationTo(m_SVDTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
+        m_outputSpacePoints.at(i).registerRelationTo(m_SVDClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+      } else {
+        m_outputSpacePoints.at(i).registerRelationTo(m_PXDTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
+        m_outputSpacePoints.at(i).registerRelationTo(m_PXDClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+      }
+    }
+  } else {
+    for (unsigned int i = 0; i < m_nContainers; ++i) {
+      if (m_inputSpacePoints.at(i).second == c_SVD) {
+        m_inputSpacePoints.at(i).first.registerRelationTo(m_SVDTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
+      } else {
+        m_inputSpacePoints.at(i).first.registerRelationTo(m_PXDTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
+      }
     }
   }
 
-  // get the number of PXD and SVDStoreArrays (only needed for summary output in terminate)
-  m_nPXDarrays = m_PXDTrueHits.size();
-  m_nSVDarrays = m_SVDTrueHits.size();
-
-  // square the max position difference (later also squared values are used)
-  m_PARAMmaxGlobalDiff *= m_PARAMmaxGlobalDiff;
+  m_maxGlobalDiff = m_PARAMmaxGlobalDiff * m_PARAMmaxGlobalDiff; // only comparing squared values in module!
 //   m_PARAMmaxLocalDiff *= m_PARAMmaxLocalDiff;
 }
 
+// ========================================================== EVENT ===============================================================
 void SpacePoint2TrueHitConnectorModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCtr = eventMetaDataPtr->getEvent();
   B2DEBUG(10, "SpacePoint2TrueHitConnector::event(). Processing event " << eventCtr << " -----------------------");
 
-  // NEW WAY (hopefully more general than old way)
-  int iPXD = -1, iSVD = -1; // need again seperate counters for accessing the PXD and SVD TrueHits vectors correctly. initialized to -1, because they are increased by one before accessing related stuff for the first time!
-  for (unsigned int iCont = 0; iCont < m_nContainers; ++iCont) {
-    StoreArray<SpacePoint> spacePoints = m_inputSpacePoints.at(iCont).first;
+
+  // NEW LOOP! (leaving old untouched)
+  for (m_iCont = 0; m_iCont < m_nContainers; ++m_iCont) {
+    StoreArray<SpacePoint> spacePoints = m_inputSpacePoints.at(m_iCont).first;
     const int nSpacePoints = spacePoints.getEntries();
+    e_detTypes detType = m_inputSpacePoints.at(m_iCont).second;
+    std::string detTypeStr = detType == c_SVD ? "SVD" : "PXD";
+    B2DEBUG(10, "Found " << nSpacePoints << " SpacePoints in Array " << m_inputSpacePoints.at(m_iCont).first.getName() << " for this event. detType: " << detTypeStr)
 
-    B2DEBUG(10, "Found " << nSpacePoints << " SpacePoints in Array " << m_inputSpacePoints.at(iCont).first.getName() << " for this event.")
+    m_SpacePointsCtr.at(m_iCont) += nSpacePoints;
 
-    e_detTypes detType = m_inputSpacePoints.at(iCont).second;
-    if (detType == c_PXD) {
-      iPXD++; // increase for later use
-      B2DEBUG(12, "This are PXD arrays")
-      m_nPXDSpacePointsCtr += nSpacePoints;
-    } else {
-      iSVD++; // increase for later use
-      B2DEBUG(12, "This are SVD arrays")
-      m_nSVDSpacePointsCtr += nSpacePoints;
-    }
-
-    // have to get StoreArrays of TrueHits for both cases (regardless on the actual detType) here, to have them available throughout the event method (elsewise the code would have to be splitted into a PXD and a SVD section with a lot of duplicate code!)
-    // accessing only the appropriate StoreArray below!!
-    StoreArray<PXDTrueHit> pTrueHits("fooName"); // searching for a StoreArray with an arbitrary string as name such that the returned StoreArray is most probably empty
-    if (iPXD >= 0) { pTrueHits = m_PXDTrueHits.at(iPXD); }
-    StoreArray<SVDTrueHit> sTrueHits("fooName"); // searching for a StoreArray with an arbitrary string as name such that the returned StoreArray is most probably empty
-    if (iSVD >= 0) { sTrueHits = m_SVDTrueHits.at(iSVD); }
-
-    // loop over all SpacePoints in container
     for (int iSP = 0; iSP < nSpacePoints; ++iSP) {
-
       SpacePoint* spacePoint = spacePoints[iSP];
-      B2DEBUG(49, "Processing SpacePoint " << spacePoint->getArrayIndex())
+      B2DEBUG(49, "Processing SpacePoint " << iSP << " from " << nSpacePoints)
 
-      baseMapT trueHitMap; // (multi)map of TrueHit indices to weights
-      try {
-        if (detType == c_PXD) { trueHitMap = getRelatedTrueHits<baseMapT, PXDCluster, PXDTrueHit>(spacePoint); } // at the moment searching in ALL containers of Clusters and TrueHits!
-        // can only be SVD here! (everything else causes a B2FATAL in initialize)
-        else { trueHitMap = getRelatedTrueHits<baseMapT, SVDCluster, SVDTrueHit>(spacePoint); }// at the moment searching in ALL containers of Clusters and TrueHits!
-      } catch (NoClusterToSpacePoint& anE) {
-        B2WARNING("Caught an exception while trying to relate SpacePoints and TrueHits: " << anE.what()); // leave B2WARNING here since this really is an exception that should not occur
-        m_noClusterCtr++;
-        continue; // continue with next SpacePoint
-      } catch (NoTrueHitToCluster& anE) {
-        B2WARNING("Caught an exception while trying to relate SpacePoints and TrueHits: " << anE.what()); // leave B2WARNING here since this really is an exception that should not occur
-        m_noTrueHitCtr++;
-        continue; // continue with next SpacePoint
-      }
+      baseMapT trueHitMap = processSpacePoint<baseMapT>(spacePoint, detType);
+      if (trueHitMap.empty()) continue; // next SpacePoint if something went wrong
 
-//       std::vector<int> uniqueTHinds = getUniqueKeys(trueHitMap);
-      unsigned int nUniqueTHs = getUniqueSize(trueHitMap); // COULDDO: get this number from previously defined vector instead of a function call
+      unsigned int nUniqueTHs = getUniqueSize(trueHitMap);
       B2DEBUG(50, "Found " << nUniqueTHs << " TrueHits (unique) related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
-      // convert the number of related TrueHits to an index to increase the associated counter array entry. If the number is too big, truncate it, and increase the last entry (interpretation and output in terminate)
-      unsigned int iSize = nUniqueTHs > 4 ? 4 : nUniqueTHs - 1;
-      if (detType == c_PXD) { m_nRelPXDTrueHitsCtr.at(iSize)++; }
-      else { m_nRelSVDTrueHitsCtr.at(iSize)++; }
+      unsigned int iRels = nUniqueTHs > 4 ? 4 : nUniqueTHs - 1;
+      m_nRelTrueHitsCtr.at(m_iCont).at(iRels)++;
 
-      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 250, PACKAGENAME())) { // print the complete map if the debug level is set high enough
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 350, PACKAGENAME())) { // print the complete map if the debug level is set high enough
         std::string mapCont = printMap(trueHitMap);
         B2DEBUG(250, "The TrueHits and their weights for spacePoint " << spacePoint->getArrayIndex() << ": " + mapCont);
       }
 
-
-      // if registerAll is set to true, simply register a relation for every found TrueHit. the weight of the relation is the sum of the weights of the relations between Cluster and TrueHit!
       if (m_PARAMregisterAll) {
-        SpacePoint* newSP = spacePoint; // for less writing effort assign pointer to new variable
-        if (m_PARAMstoreSeparate) {
-          newSP = m_outputSpacePoints.at(iCont).appendNew(*spacePoint);  // get other pointer if needed
-          B2DEBUG(50, "Added new SpacePoint to StoreArray " << m_outputSpacePoints.at(iCont).getName() << ".")
-        }
-
-        std::vector<int> uniqueTHinds = getUniqueKeys(trueHitMap); // get the indices of all related TrueHits and loop over them
-        for (int aInd : uniqueTHinds) {
-          std::vector<float> weights = getValuesToKey(trueHitMap, aInd);
-          float sumOfWeights = std::accumulate(weights.begin(), weights.end(), 0.0); // sum all weights to the index -> sum of weights is used as weight for the relation between TrueHit and SpacePoint
-          VXDTrueHit* trueHit;
-          if (detType == c_PXD) { trueHit = pTrueHits[aInd]; }
-          else { trueHit = sTrueHits[aInd]; }
-          newSP->addRelationTo(trueHit, sumOfWeights); // add relation to SpacePoint
-          m_regRelationsCtr++;
-          B2DEBUG(50, "Added Relation to TrueHit " << trueHit->getArrayIndex() << " (weight = " << sumOfWeights << ") for SpacePoint " << newSP->getArrayIndex() << " in Array " << newSP->getArrayName())
-        }
-      } else { // do not register relations blindly, but try to make a relation to only one TrueHit
-        SpacePoint* newSP = spacePoint;
-
-        std::pair<VXDTrueHit*, double> trueHitwWeight;
-        try { // getTHwithWeight throws exceptions when the relating does not work
-          if (detType == c_PXD) {
-            trueHitwWeight = getTHwithWeight<baseMapT, PXDTrueHit>(trueHitMap, pTrueHits, spacePoint); // get the TrueHit (according to the conditions in header file)
-          } else {
-            trueHitwWeight = getTHwithWeight<baseMapT, SVDTrueHit>(trueHitMap, sTrueHits, spacePoint); // get the TrueHit (according to the conditions in header file)
+        registerAllRelations(spacePoint, trueHitMap, detType);
+      } else { // find THE ONE TrueHit (to rule them all, one TrueHit to find them all ...)
+        // COULDDO: wrap this up in a function
+        if (detType == c_PXD) {
+          pair<PXDTrueHit*, double> trueHitwWeight = getTHwithWeight<baseMapT, PXDTrueHit>(trueHitMap, m_PXDTrueHits, spacePoint);
+          if (trueHitwWeight.first != NULL) {
+            registerOneRelation(spacePoint, trueHitwWeight, detType);
+            continue;
           }
-          if (trueHitwWeight.first == NULL) { throw SpacePointIsGhostHit(); } // if there is no TrueHit it is MOST PROBABLY a ghost hit
-        } catch (SpacePointIsGhostHit& anE) {
-          B2DEBUG(1, "Caught an exception while trying to relate SpacePoints and TrueHits: " << anE.what()); // B2WARNING for now -> change to B2DEBUG(1,...) when done
-          m_ghostHitCtr++;
-          continue; // continue with next SpacePoint
+        } else {
+          pair<SVDTrueHit*, double> trueHitwWeight = getTHwithWeight<baseMapT, SVDTrueHit>(trueHitMap, m_SVDTrueHits, spacePoint);
+          if (trueHitwWeight.first != NULL) {
+            registerOneRelation<SVDTrueHit>(spacePoint, trueHitwWeight, detType);
+            continue;
+          }
         }
-
-        if (m_PARAMstoreSeparate) {
-          newSP = m_outputSpacePoints.at(iCont).appendNew(*spacePoint);
-          B2DEBUG(50, "Added new SpacePoint to StoreArray " << m_outputSpacePoints.at(iCont).getName() << ".");
-        }
-        newSP->addRelationTo(trueHitwWeight.first, trueHitwWeight.second);
-        m_regRelationsCtr++;
-        B2DEBUG(50, "Added Relation to TrueHit " << trueHitwWeight.first->getArrayIndex() << " (weight = " << trueHitwWeight.second << ") for SpacePoint " << newSP->getArrayIndex() << " in Array " << newSP->getArrayName())
+        // if NULL above -> probably ghost hit
+        B2DEBUG(10, "Could not relate one TrueHit to SpacePoint " << spacePoint->getArrayIndex() << ". This SpacePoint is probably a ghosthit!")
+        m_ghostHitCtr.at(m_iCont)++;
       }
-    }
-  }
+    } // end loop SpacePoints
+  } // end loop containers
 }
 
 // ================================================================ TERMINATE =======================================================================================
 void SpacePoint2TrueHitConnectorModule::terminate()
 {
-  stringstream pxdSummary;
-  pxdSummary << "Got " << m_nPXDarrays << " PXD containers. In those " << m_nPXDSpacePointsCtr << " SpacePoints were contained. The number of related TrueHits to a SpacePoint are:\n";
-  for (unsigned int i = 0; i < m_nRelPXDTrueHitsCtr.size() - 1; ++i) { pxdSummary << i + 1 << " related TrueHits to a SpacePoint: " << m_nRelPXDTrueHitsCtr.at(i) << "\n"; }
-  pxdSummary << "more than 4 related TrueHits to a SpacePoint: " << m_nRelPXDTrueHitsCtr.at(4) << "\n"; // WARNING: hardcoded at the moment!!!
+  unsigned int sumSpacePoints = accumulate(m_SpacePointsCtr.begin(), m_SpacePointsCtr.end(), 0);
+  unsigned int sumRelations = accumulate(m_regRelationsCtr.begin(), m_regRelationsCtr.end(), 0);
 
-  stringstream svdSummary;
-  svdSummary << "Got " << m_nSVDarrays << " SVD containers. In those " << m_nSVDSpacePointsCtr << " SpacePoints were contained. The number of related TrueHits to a SpacePoint are:\n";
-  for (unsigned int i = 0; i < m_nRelSVDTrueHitsCtr.size() - 1; ++i) {svdSummary << i + 1 << " related TrueHits to a SpacePoint: " << m_nRelSVDTrueHitsCtr.at(i) << "\n"; }
-  svdSummary << "more than 4 related TrueHits to a SpacePoint: " << m_nRelSVDTrueHitsCtr.at(4) << "\n"; // WARNING: hardcoded at the moment!!!
+  B2RESULT("SpacePoint2TrueHitConnector: Got " << sumSpacePoints << " SpacePoints in " << m_nContainers << " containers and registered " << sumRelations << " relations to TrueHits")
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME())) {
+    stringstream contSumm;
+    contSumm << "Container-wise summary: \n";
 
-  stringstream furtherSummary;
-  furtherSummary << "possible/accepted relations for cases:\n";
-  furtherSummary << m_all2WTHCtr << "/" << m_accAll2WTHCtr << " SP with THs (more than one) with all THs having two weights\n";
-  furtherSummary << m_single2WTHCtr << "/" << m_accSingle2WTHCtr << " SP with THs (more than one) with only one TH having two weights\n";
-  furtherSummary << m_nonSingle2WTHCtr << "/" << m_accNonSingle2WTHCtr << " SP with THs (more than one) with more than one but not all THs having two weights\n";
-  furtherSummary << "In " << m_oneCluster2THCtr << " cases there was a SP with only one Cluster but more than one related TrueHits";
+    for (unsigned int iCont = 0; iCont < m_nContainers; ++iCont) {
+      contSumm << "In Container " << iCont << " (container name: " << m_inputSpacePoints[iCont].first.getName() << ") " << m_SpacePointsCtr[iCont]  << " SpacePoints were contained. The number of related TrueHits to a SpacePoint are:\n";
+      for (unsigned int i = 0; i < m_nRelTrueHitsCtr[iCont].size() - 1; ++i) { contSumm << i + 1 << " related TrueHits to a SpacePoint : " << m_nRelTrueHitsCtr[iCont].at(i) << "\n"; }
+      contSumm << " more than 4 related TrueHits to a SpacePoint: " << m_nRelTrueHitsCtr[iCont].at(4) << "\n"; // WARNING hardcoded at the moment!!!
+      contSumm << m_ghostHitCtr.at(iCont) << " were probably ghost hits in this container!\n";
+    }
+    B2DEBUG(1, contSumm.str())
 
-  stringstream generalSummary;
-  generalSummary << "Registered " << m_regRelationsCtr << " new relations between SpacePoints and TrueHits. " << m_ghostHitCtr << " SpacePoints were probably ghost hits\n";
+    if (!m_PARAMregisterAll) {
+      // TODO: do this containerwise
+      stringstream furtherSummary;
+      furtherSummary << "Summary for all containers:\n";
+      furtherSummary << "possible/accepted relations for cases:\n";
+      furtherSummary << m_all2WTHCtr << "/" << m_accAll2WTHCtr << " SP with THs (more than one) with all THs having two weights\n";
+      furtherSummary << m_single2WTHCtr << "/" << m_accSingle2WTHCtr << " SP with THs (more than one) with only one TH having two weights\n";
+      furtherSummary << m_nonSingle2WTHCtr << "/" << m_accNonSingle2WTHCtr << " SP with THs (more than one) with more than one but not all THs having two weights\n";
+      furtherSummary << "In " << m_oneCluster2THCtr << " cases there was a SP with only one Cluster but more than one related TrueHits";
+      B2DEBUG(2, furtherSummary.str())
+    }
+  }
 
-  B2INFO("SpacePoint2TrueHitConnector::terminate(): Tried to relate SpacePoints in " << m_nContainers << " different containers\n" << generalSummary.str() << pxdSummary.str() << svdSummary.str() << furtherSummary.str())
 //   B2INFO("total number of weights: " << m_totWeightsCtr << " of which " << m_negWeightCtr << " were negative")
-//   B2INFO("Number of SpacePoints that contained a Cluster to which no related TrueHit could be found " << m_noTrueHitCtr << ". Number of SpacePoints that contained no Cluster " << m_noClusterCtr);
+//   B2INFO("Number of SpacePoints that contained a Cluster to which no related TrueHit could be found " << m_OLDnoTrueHitCtr << ". Number of SpacePoints that contained no Cluster " << m_OLDnoClusterCtr);
 //   B2INFO("m_moreThan2Weights = " << m_moreThan2Weights);
 
   // Write one varible to root NOT NEEDED AT THE MOMENT
@@ -283,6 +246,30 @@ void SpacePoint2TrueHitConnectorModule::terminate()
 //   aFile->cd();
 //   aTree->Write();
 //   aFile->Close();
+}
+
+// ====================================================== PROCESS SPACEPOINT ======================================================
+template<typename MapType>
+MapType SpacePoint2TrueHitConnectorModule::processSpacePoint(Belle2::SpacePoint* spacePoint, e_detTypes detType)
+{
+  B2DEBUG(50, "Processing SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
+  MapType trueHitMap;
+  try {
+    if (detType == c_PXD) {
+      trueHitMap = getRelatedTrueHits<MapType, PXDCluster, PXDTrueHit>(spacePoint, m_PXDClusters.getName(), m_PXDTrueHits.getName());
+    } else {
+      trueHitMap = getRelatedTrueHits<MapType, SVDCluster, SVDTrueHit>(spacePoint, m_SVDClusters.getName(), m_SVDTrueHits.getName());
+    }
+  } catch (std::runtime_error& anE) { // should catch all Belle2 exceptions in try-block
+    B2WARNING("Caught an exception while trying to relate SpacePoints and TrueHits: " << anE.what());
+    increaseExceptionCounter(anE);
+  } catch (...) { // catch the rest
+    B2ERROR("Caught undefined exception while trying to relate SpacePoints and TrueHtis")
+    throw; // throw further (maybe it is caught somewhere else)
+  }
+
+  B2DEBUG(499, "trueHitMap.size() before return in processSpacePoint: " << trueHitMap.size())
+  return trueHitMap;
 }
 
 /////////////////////////////////////////////// GET RELATED TRUE HITS /////////////////////////////////////////////////////////////////////////////
@@ -302,7 +289,7 @@ MapType SpacePoint2TrueHitConnectorModule::getRelatedTrueHits(Belle2::SpacePoint
   for (const ClusterType & cluster : spacePointClusters) {
     RelationVector<TrueHitType> clusterTrueHits = cluster.template getRelationsTo<TrueHitType>(trueHitName); // Note searching all StoreArrys here -> wanted? TODO: check
     if (clusterTrueHits.size() == 0) {
-      B2DEBUG(1, "Found no related TrueHit for Cluster " << cluster.getArrayIndex() << " contained by SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
+      B2DEBUG(3, "Found no related TrueHit for Cluster " << cluster.getArrayIndex() << " contained by SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
       throw NoTrueHitToCluster();
     }
     B2DEBUG(80, "Found " << clusterTrueHits.size() << " related TrueHits to Cluster " << cluster.getArrayIndex() << " from Array " << cluster.getArrayName())
@@ -318,27 +305,19 @@ MapType SpacePoint2TrueHitConnectorModule::getRelatedTrueHits(Belle2::SpacePoint
 // ================================================================= INITIALIZE COUNTERS ==============================================================================================
 void SpacePoint2TrueHitConnectorModule::initializeCounters()
 {
-  m_nContainers = 0;
-  m_nPXDarrays = 0;
-  m_nSVDarrays = 0;
-  m_nPXDSpacePointsCtr = 0;
-  m_nSVDSpacePointsCtr = 0;
+  // NEW
+  for (unsigned int i = 0; i < m_SpacePointsCtr.size(); ++i) {
+    m_SpacePointsCtr.at(i) = 0;
+    m_regRelationsCtr.at(i) = 0;
+    m_noClusterCtr.at(i) = 0;
+    m_ghostHitCtr.at(i) = 0;
+    m_noTrueHitCtr.at(i) = 0;
 
-  m_regRelationsCtr = 0;
-
-  for (unsigned int i = 0; i < m_nRelPXDTrueHitsCtr.size(); ++i) {
-    m_nRelPXDTrueHitsCtr.at(i) = 0;
-    m_nRelPXDTrueHitsCtr.at(i) = 0;
+    for (unsigned int j = 0; j < m_nRelTrueHitsCtr.at(i).size(); ++j) { m_nRelTrueHitsCtr.at(i).at(j) = 0; }
   }
 
   m_negWeightCtr = 0;
   m_totWeightsCtr = 0;
-  m_noTrueHitCtr = 0;
-
-  m_noClusterCtr = 0;
-
-  m_ghostHitCtr = 0;
-
   m_moreThan2Weights = 0;
 
   m_single2WTHCtr = 0;
@@ -349,6 +328,103 @@ void SpacePoint2TrueHitConnectorModule::initializeCounters()
   m_accAll2WTHCtr = 0;
 
   m_oneCluster2THCtr = 0;
+}
+
+// ================================================ INCREASE EXCEPTION COUNTER ====================================================
+void SpacePoint2TrueHitConnectorModule::increaseExceptionCounter(std::runtime_error& exception)
+{
+  const char* message = exception.what();
+  // NOTE comparing the messages of the exceptions to determine which exception got caught
+  if (strcmp(message, NoClusterToSpacePoint().what()) == 0) {
+    m_noClusterCtr.at(m_iCont)++;
+  } else if (strcmp(message, NoTrueHitToCluster().what()) == 0) {
+    m_noTrueHitCtr.at(m_iCont)++;
+  } else {
+    B2ERROR("Caught an unexpected runtime_error: " << exception.what()) // only the upper to should be caught!
+  }
+}
+
+// ===================================================== REGISTER ALL RELATIONS ===================================================
+template<typename MapType>
+void SpacePoint2TrueHitConnectorModule::registerAllRelations(Belle2::SpacePoint* spacePoint, MapType trueHitMap, e_detTypes detType)
+{
+  B2DEBUG(50, "Registering all possible relations for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << ". storeSeparate is set to " << m_PARAMstoreSeparate)
+  SpacePoint* newSP = spacePoint; // declaring pointer here, getting new pointer if storeSeparate ist true
+
+  if (m_PARAMstoreSeparate) { // if storing in separate Array, re-register the relations to the Clusters first
+    newSP = m_outputSpacePoints.at(m_iCont).appendNew(*spacePoint);
+    B2DEBUG(50, "Added new SpacePoint to Array " << m_outputSpacePoints[m_iCont].getName() << ".")
+    if (detType == c_PXD) reRegisterClusterRelations<PXDCluster>(spacePoint, newSP, m_PXDClusters.getName());
+    else reRegisterClusterRelations<SVDCluster>(spacePoint, newSP, m_SVDClusters.getName());
+  }
+
+  // register the Relations to the TrueHits
+  std::vector<int> uniqueTHinds = getUniqueKeys(trueHitMap); // get the unique indices of all related TrueHits and loop over them
+  for (int aInd : uniqueTHinds) {
+    std::vector<double> weights = getValuesToKey(trueHitMap, aInd);
+    double sumOfWeights = std::accumulate(weights.begin(), weights.end(), 0.0); // sum all weights to the index -> sum of weights is used as weight for the relation between TrueHit and SpacePoint
+    if (detType == c_PXD) registerTrueHitRelation<PXDTrueHit>(newSP, aInd, sumOfWeights, m_PXDTrueHits);
+    else registerTrueHitRelation<SVDTrueHit>(newSP, aInd, sumOfWeights, m_SVDTrueHits);
+  }
+}
+
+// =============================================== REGISTER ONE RELATION ==========================================================
+template<typename TrueHitType>
+void SpacePoint2TrueHitConnectorModule::registerOneRelation(Belle2::SpacePoint* spacePoint, std::pair<TrueHitType*, double> trueHitwWeight, e_detTypes detType)
+{
+  TrueHitType* trueHit = trueHitwWeight.first;
+  B2DEBUG(50, "Registering relation between to TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName())
+  SpacePoint* newSP = spacePoint; // declaring pointer here, getting new pointer if storeSeparate ist true
+
+  if (m_PARAMstoreSeparate) { // if storing in separate Array, re-register the relations to the Clusters first
+    newSP = m_outputSpacePoints.at(m_iCont).appendNew(*spacePoint);
+    B2DEBUG(50, "Added new SpacePoint to Array " << m_outputSpacePoints[m_iCont].getName() << ".")
+    if (detType == c_PXD) reRegisterClusterRelations<PXDCluster>(spacePoint, newSP, m_PXDClusters.getName());
+    else reRegisterClusterRelations<SVDCluster>(spacePoint, newSP, m_SVDClusters.getName());
+  }
+
+  newSP->addRelationTo(trueHit, trueHitwWeight.second);
+  m_regRelationsCtr.at(m_iCont)++;
+  B2DEBUG(50, "Added Relation to TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName() << " for SpacePoint " << spacePoint->getArrayIndex() << " (weight = " << trueHitwWeight.second << ")")
+}
+
+// ========================================================= REREGISTER CLUSTER RELATIONS =========================================
+template<typename ClusterType>
+void SpacePoint2TrueHitConnectorModule::reRegisterClusterRelations(Belle2::SpacePoint* origSpacePoint, Belle2::SpacePoint* newSpacePoint, std::string clusterName)
+{
+  B2DEBUG(100, "Registering the Relations to Clusters of SpacePoint " << origSpacePoint->getArrayIndex() << " in Array " << origSpacePoint->getArrayName() << " for SpacePoint " << newSpacePoint->getArrayIndex() << " in Array " << newSpacePoint->getArrayIndex())
+
+  vector<pair<ClusterType*, double> > clustersAndWeights = getRelatedClusters<ClusterType>(origSpacePoint, clusterName);
+  for (auto aCluster : clustersAndWeights) {
+    newSpacePoint->addRelationTo(aCluster.first, aCluster.second);
+    B2DEBUG(100, "Registered Relation to Cluster " << aCluster.first->getArrayIndex() << " with weight " << aCluster.second)
+  }
+}
+
+// =========================================================== GET RELATED CLUSTERS ===============================================
+template<typename ClusterType>
+std::vector<std::pair<ClusterType*, double> > SpacePoint2TrueHitConnectorModule::getRelatedClusters(Belle2::SpacePoint* spacePoint, std::string clusterName)
+{
+  vector<pair<ClusterType*, double> > indsAndWeights;
+  RelationVector<ClusterType> relClusters = spacePoint->getRelationsTo<ClusterType>(clusterName);
+
+  for (unsigned int iCl = 0; iCl < relClusters.size(); ++iCl) {
+    indsAndWeights.push_back(make_pair(relClusters[iCl], relClusters.weight(iCl)));
+  }
+
+  if (indsAndWeights.empty()) { B2ERROR("No Clusters related to SpacePoint " << spacePoint->getArrayIndex() << "!"); } // safety measure, should not / cannot happen (checked before)
+
+  return indsAndWeights;
+}
+
+// ====================================================== REGISTER TRUEHIT RELATIONS ==============================================
+template<typename TrueHitType>
+void SpacePoint2TrueHitConnectorModule::registerTrueHitRelation(Belle2::SpacePoint* spacePoint, int index, double weight, Belle2::StoreArray<TrueHitType> trueHits)
+{
+  TrueHitType* trueHit = trueHits[index];
+  spacePoint->addRelationTo(trueHit, weight);
+  m_regRelationsCtr.at(m_iCont)++; // increase counter of registered relations for this container
+  B2DEBUG(50, "Added Relation to TrueHit " << index << " from Array " << trueHits.getName() << " for SpacePoint " << spacePoint->getArrayIndex() << " (weight = " << weight << ")")
 }
 
 // ======================================================================== PRINT MAP ====================================================================================================
@@ -463,7 +539,7 @@ std::pair<TrueHitType*, double> SpacePoint2TrueHitConnectorModule::getTHwithWeig
   // 1) check if there is only one TrueHit
   if (indNweights.size() == 1) { // if there is only one TrueHit, sum up the weights in the map, and return
     B2DEBUG(999, "There is only one TrueHit for spacePoint " << spacePoint->getArrayIndex() << ". It has " << indNweights.at(0).second << " associated weights")
-    std::vector<float> weights = getValuesToKey(aMap, indNweights.at(0).first);
+    std::vector<typename MapType::mapped_type> weights = getValuesToKey(aMap, indNweights.at(0).first);
     double sumOfWeights = std::accumulate(weights.begin(), weights.end(), 0.0);
 
     TrueHitType* trueHit = trueHits[indNweights.at(0).first];
@@ -487,7 +563,7 @@ std::pair<TrueHitType*, double> SpacePoint2TrueHitConnectorModule::getTHwithWeig
     m_single2WTHCtr++; // at this point has to be another TrueHit without 2 weights -> increase counter
     int key = indsTwoWeights.at(0);
     B2DEBUG(999, "key of only entry in map with two weights: " << key << " (for SpacePoint " << spacePoint->getArrayIndex() << ")")
-    std::vector<float> weights = getValuesToKey(aMap, key);
+    std::vector<typename MapType::mapped_type> weights = getValuesToKey(aMap, key);
     double sumOfWeights = std::accumulate(weights.begin(), weights.end(), 0.0);
 
     TrueHitType* trueHit = trueHits[key];
@@ -504,7 +580,7 @@ std::pair<TrueHitType*, double> SpacePoint2TrueHitConnectorModule::getTHwithWeig
     // collect the sum of the weights of the TrueHits with 2 weights
     std::vector<std::pair<int, double> > weightSums;
     for (int anInd : indsTwoWeights) {
-      std::vector<float> weights = getValuesToKey(aMap, anInd);
+      std::vector<typename MapType::mapped_type> weights = getValuesToKey(aMap, anInd);
       B2DEBUG(999, "Getting the sum of weights for TrueHit " << anInd << " that has two attatched weights.")
       weightSums.push_back(std::make_pair(anInd, std::accumulate(weights.begin(), weights.end(), 0.0)));
     }
@@ -541,7 +617,7 @@ std::pair<TrueHitType*, double> SpacePoint2TrueHitConnectorModule::getTHwithWeig
     m_oneCluster2THCtr++; // at this point only possible way
     std::vector<std::pair<int, double> > weightSums;
     for (auto aPair : indNweights) {
-      std::vector<float> weights = getValuesToKey(aMap, aPair.first);
+      std::vector<typename MapType::mapped_type> weights = getValuesToKey(aMap, aPair.first);
       weightSums.push_back(std::make_pair(aPair.first, weights.at(0)));   // WARNING: only assuming here that there will be no more than one weight!!!
     }
 
@@ -609,13 +685,13 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
   // only if both local coordinates of a SpacePoint are set, compare also the global positions!
   if (setCoordinates.first && setCoordinates.second) {
     B2DEBUG(999, "Comparing the global positions, SpacePoint: (" << spacePoint->X() << "," << spacePoint->Y() << "," << spacePoint->Z() << "), TrueHit:  (" << trueHitGlobalPos.X() << "," << trueHitGlobalPos.Y() << "," << trueHitGlobalPos.Z() << ")")
-    if (pow(spacePoint->X() - trueHitGlobalPos.X(), 2) > m_PARAMmaxGlobalDiff || pow(spacePoint->Y() - trueHitGlobalPos.Y(), 2) > m_PARAMmaxGlobalDiff ||
-        pow(spacePoint->Z() - trueHitGlobalPos.Z(), 2) > m_PARAMmaxGlobalDiff) {
+    if (pow(spacePoint->X() - trueHitGlobalPos.X(), 2) > m_maxGlobalDiff || pow(spacePoint->Y() - trueHitGlobalPos.Y(), 2) > m_maxGlobalDiff ||
+        pow(spacePoint->Z() - trueHitGlobalPos.Z(), 2) > m_maxGlobalDiff) {
       B2DEBUG(150, "The position differences are for X: " << spacePoint->X() - trueHitGlobalPos.X() << ", Y: " << spacePoint->Y() - trueHitGlobalPos.Y() << " Z: " << spacePoint->Z() - trueHitGlobalPos.Z() << " but the maximum position difference is set to: " << sqrt(m_PARAMmaxGlobalDiff))
       return false;
     }
   } else {
-    B2DEBUG(1, "For SpacePoint " << spacePoint->getArrayIndex() << " one of the local coordinates was not assigned. The global positions and the un-assigned local coordinate were not compared!")
+    B2DEBUG(5, "For SpacePoint " << spacePoint->getArrayIndex() << " one of the local coordinates was not assigned. The global positions and the un-assigned local coordinate were not compared!")
   }
 
   return true;

@@ -8,7 +8,7 @@ RFRunControlCallback::RFRunControlCallback(RFMasterCallback* callback)
   : m_callback(callback)
 {
   callback->setCallback(this);
-  setData(getNode().getName() + "_STATUS", "rfunitinfo", 3);
+  //setData(getNode().getName() + "_STATUS", "rfunitinfo", 3);
 }
 
 bool RFRunControlCallback::perform(NSMCommunicator& com) throw()

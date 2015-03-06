@@ -69,6 +69,7 @@ namespace Belle2 {
     {
       delete m_sensitive;
       delete m_sensitiveAero;
+      G4LogicalSkinSurface::CleanSurfaceTable();
     }
 
 

@@ -19,6 +19,7 @@
 #include <vector>
 
 class G4LogicalVolume;
+class G4VisAttributes;
 //class G4Polycone
 
 namespace Belle2 {
@@ -48,6 +49,9 @@ namespace Belle2 {
     protected:
 
     private:
+
+      //! Vector of pointers to G4VisAttributes
+      std::vector<G4VisAttributes*> m_VisAttributes;
 
     };
   }

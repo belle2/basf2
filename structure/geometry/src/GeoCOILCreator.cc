@@ -66,13 +66,15 @@ namespace Belle2 {
 
     GeoCOILCreator::GeoCOILCreator()
     {
-
+      m_VisAttributes.clear();
+      m_VisAttributes.push_back(new G4VisAttributes(false)); // for "invisible"
     }
 
 
     GeoCOILCreator::~GeoCOILCreator()
     {
-
+      for (G4VisAttributes * visAttr : m_VisAttributes) delete visAttr;
+      m_VisAttributes.clear();
     }
 
     void GeoCOILCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
@@ -107,7 +109,8 @@ namespace Belle2 {
         new G4Tubs("Cavity1", Cav1Rmin, Cav1Rmax, Cav1Length, 0.0, M_PI * 2.0);
       G4LogicalVolume* Cav1LV =
         new G4LogicalVolume(Cav1Tube, Materials::get("G4_AIR"), "LVCav1", 0, 0, 0);
-      Cav1LV->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 0.)));
+      m_VisAttributes.push_back(new G4VisAttributes(G4Colour(0., 1., 0.)));
+      Cav1LV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), Cav1LV, "PVCav1", CryoLV, false, 0);
 
       double ShieldRmin   = content.getLength("RadShield/Rmin") / Unit::mm;
@@ -118,7 +121,8 @@ namespace Belle2 {
         new G4Tubs("RadShield", ShieldRmin, ShieldRmax,  ShieldLength, 0.0, M_PI * 2.0);
       G4LogicalVolume* ShieldLV =
         new G4LogicalVolume(ShieldTube, Materials::get("G4_Al"), "LVShield", 0, 0, 0);
-      ShieldLV->SetVisAttributes(G4VisAttributes(G4Colour(1., 1., 0.)));
+      m_VisAttributes.push_back(new G4VisAttributes(G4Colour(1., 1., 0.)));
+      ShieldLV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), ShieldLV, "PVShield", Cav1LV, false, 0);
 
       double Cav2Rmin   = content.getLength("Cavity2/Rmin") / Unit::mm;
@@ -129,7 +133,8 @@ namespace Belle2 {
         new G4Tubs("Cavity2", Cav2Rmin, Cav2Rmax, Cav2Length, 0.0, M_PI * 2.0);
       G4LogicalVolume* Cav2LV =
         new G4LogicalVolume(Cav2Tube, Materials::get("G4_AIR"), "LVCav2", 0, 0, 0);
-      Cav2LV->SetVisAttributes(G4VisAttributes(G4Colour(1., 1., 1.)));
+      m_VisAttributes.push_back(new G4VisAttributes(G4Colour(1., 1., 1.)));
+      Cav2LV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), Cav2LV, "PVCav2", ShieldLV, false, 0);
 
       double CoilRmin   = content.getLength("Coil/Rmin") / Unit::mm;
@@ -140,8 +145,10 @@ namespace Belle2 {
         new G4Tubs("Coil", CoilRmin, CoilRmax, CoilLength, 0.0, M_PI * 2.0);
       G4LogicalVolume* CoilLV =
         new G4LogicalVolume(CoilTube, Materials::get("G4_Al"), "LVCoil", 0, 0, 0);
-      CoilLV->SetVisAttributes(G4VisAttributes(G4Colour(0., 1., 1.)));
+      m_VisAttributes.push_back(new G4VisAttributes(G4Colour(0., 1., 1.)));
+      CoilLV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), CoilLV, "PVCoil", Cav2LV, false, 0);
+
     }
   }
 }

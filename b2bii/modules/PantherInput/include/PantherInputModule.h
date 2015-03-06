@@ -111,10 +111,10 @@ namespace Belle2 {
     //! Event counter
     int m_nevt;
 
-    // MCParticle Graph to build Belle2 MC Particles
+    //! MCParticle Graph to build Belle2 MC Particles
     Belle2::MCParticleGraph m_particleGraph;
 
-    // map of Gen_hepevt Panther IDs and corresponing MCParticle StoreArray indices
+    //! map of Gen_hepevt Panther IDs and corresponing MCParticle StoreArray indices
     std::map<int, int> genHepevtToMCParticle;
 
   };

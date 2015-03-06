@@ -265,7 +265,7 @@ void PantherInputModule::convertGenHepEvtTable()
 
   // at this stage (before all other particles) all "motherless" particles (i.e. beam background)
   // have to be added to Particle graph
-  for (Belle::Gen_hepevt_Manager::iterator genIterator = genMgr.begin(); genIterator != genMgr.end(); genIterator++) {
+  for (Belle::Gen_hepevt_Manager::iterator genIterator = genMgr.begin(); genIterator != genMgr.end(); ++genIterator) {
     Belle::Gen_hepevt hep = *genIterator;
     if (hep.moFirst() == 0 && hep.moLast() == 0 && hep.get_ID() > 1) {
       // Particle has no mother

@@ -62,9 +62,9 @@ namespace Belle2 {
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_negativeWeight);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_deleteElement);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_zeroWeight);
-    cdcSimHits.registerAsPersistent();
-    cdcEBArray.registerAsTransient();
-    RelationArray::registerPersistent<MCParticle, CDCSimHit>();
+    cdcSimHits.registerInDataStore();
+    cdcEBArray.registerInDataStore(DataStore::c_DontWriteOut);
+    mcParticles.registerRelationTo(cdcSimHits);
 
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
     gd.append("/SensitiveDetector");

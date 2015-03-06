@@ -9,12 +9,6 @@
 
 #include <b2bii/utility/BelleMdstToGenHepevt.h>
 
-#define BELLE_TARGET_H "belle-x86_64-unknown-linux-gnu-g++.h"
-
-#include "panther/hepevt.h"
-#include "panther/mdst.h"
-#include "panther/mdst_obs.h"
-
 // trace back to isthep>=0 or isthep=-10(decay-in-flight)
 static const Belle::Gen_hepevt& gen_level_step1(const Belle::Gen_hepevt& gen)
 {

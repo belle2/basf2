@@ -87,15 +87,37 @@ namespace Belle2 {
      */
     bool convertBelleEventObject();
 
+    //-----------------------------------------------------------------------------
+    // CONVERT TABLES
+    //-----------------------------------------------------------------------------
+
     /**
      * Reads and converts all entries of Gen_hepevt Panther table to MCParticle dataobjects and adds them to StoreArray<MCParticle>.
      */
     void convertGenHepEvtTable();
 
     /**
-     * Converts gen_hepevt record to MCParticleGraph object.
+     * Reads and converts all entries of Mdst_ecl Panther table to ECLCluster dataobjects and adds them to StoreArray<ECLCluster>.
+     */
+    void convertMdstECLTable();
+
+    //-----------------------------------------------------------------------------
+    // CONVERT OBJECTS
+    //-----------------------------------------------------------------------------
+
+    /**
+     * Converts Gen_hepevt record to MCParticleGraph object.
      */
     void convertGenHepevtObject(const Belle::Gen_hepevt& genHepevt, MCParticleGraph::GraphParticle* mcParticle);
+
+    /**
+     * Converts Mdst_ecl record to ECLCluster object.
+     */
+    void convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux, ECLCluster* eclCluster);
+
+    //-----------------------------------------------------------------------------
+    // MISC
+    //-----------------------------------------------------------------------------
 
     /**
      * Helper function to recover falsely set idhep info in GenHepEvt list

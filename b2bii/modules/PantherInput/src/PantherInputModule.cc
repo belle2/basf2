@@ -14,6 +14,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 
 #include <cmath>
 #include <stdlib.h>
@@ -25,12 +26,14 @@
 #include <queue>
 
 // Belle tables
+#include "panther/mdst.h"
+#include "panther/belletdf.h"
 #include "panther/hepevt.h"
 
 // PNTDB: Uncomment if you have pntdb in your externals
-//#include "pntdb/TPntFDDB.h"
-//#include "pntdb/TPntDB.h"
-//#include "tables/run_info.h"
+#include "pntdb/TPntFDDB.h"
+#include "pntdb/TPntDB.h"
+#include "tables/run_info.h"
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
@@ -38,6 +41,9 @@
 // analysis dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+
+// Belle utilities
+#include "b2bii/utility/BelleMdstToGenHepevt.h"
 
 // Belle II utilities
 #include "framework/gearbox/Const.h"
@@ -207,6 +213,7 @@ void PantherInputModule::Convert()
   // 2. Convert MC information
   if (mc) {
     convertGenHepEvtTable();
+    convertMdstECLTable();
   }
 
 }
@@ -233,6 +240,10 @@ bool PantherInputModule::convertBelleEventObject()
 
   return (evt.ExpMC() == 2) ? true : false;
 }
+
+//-----------------------------------------------------------------------------
+// CONVERT TABLES
+//-----------------------------------------------------------------------------
 
 void PantherInputModule::convertGenHepEvtTable()
 {
@@ -333,6 +344,53 @@ void PantherInputModule::convertGenHepEvtTable()
   m_particleGraph.generateList();
 }
 
+void PantherInputModule::convertMdstECLTable()
+{
+  // at this point MCParticles StoreArray should already exist
+  StoreArray<MCParticle> mcParticles;
+
+  // create ECLCluster StoreArray
+  StoreArray<ECLCluster> eclClusters;
+  eclClusters.create();
+
+  // Relations
+  RelationArray eclClustersToMCParticles(eclClusters, mcParticles);
+
+  // Loop over all Belle ECL clusters
+  Belle::Mdst_ecl_Manager& ecl_manager = Belle::Mdst_ecl_Manager::get_manager();
+  Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
+
+  for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); eclIterator++) {
+
+    Belle::Mdst_ecl mdstEcl = *eclIterator;
+    Belle::Mdst_ecl_aux mdstEclAux(ecl_aux_manager(Belle::Panther_ID(mdstEcl.get_ID())));
+
+    auto B2EclCluster = eclClusters.appendNew();
+
+    // convert Belle::MDST_ECL -> Belle2::ECLCluster
+    convertMdstECLObject(mdstEcl, mdstEclAux, B2EclCluster);
+
+    // create ECLCluster -> MCParticle relation
+    // step 1: MDST_ECL -> Gen_hepevt
+    const Belle::Gen_hepevt hep(get_hepevt(mdstEcl, 0));
+    if (hep) {
+      // step 2: Gen_hepevt -> MCParticle
+      if (genHepevtToMCParticle.count(hep.get_ID()) > 0) {
+        int matchedMCParticle = genHepevtToMCParticle[hep.get_ID()];
+        // step 3: set the relation
+        eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticle);
+      } else {
+        B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
+        B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+// CONVERT OBJECTS
+//-----------------------------------------------------------------------------
+
 void PantherInputModule::convertGenHepevtObject(const Belle::Gen_hepevt& genHepevt, MCParticleGraph::GraphParticle* mcParticle)
 {
   B2DEBUG(80, "Gen_ehepevt: idhep " << genHepevt.idhep() << " (" << genHepevt.isthep() << ") with ID = " << genHepevt.get_ID());
@@ -369,6 +427,40 @@ void PantherInputModule::convertGenHepevtObject(const Belle::Gen_hepevt& genHepe
 
   mcParticle->setValidVertex(true);
 }
+
+void PantherInputModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux, ECLCluster* eclCluster)
+{
+  if (ecl.match() > 0)
+    eclCluster->setisTrack(true);
+  else
+    eclCluster->setisTrack(false);
+
+  eclCluster->setEnergy(ecl.energy());
+  eclCluster->setPhi(ecl.phi());
+  eclCluster->setTheta(ecl.theta());
+  eclCluster->setR(ecl.r());
+
+  // TODO: check
+  // TODO: ECLCluster is an unclear mess
+  float covarianceMatrix[6];
+  covarianceMatrix[0] = ecl.error(0);
+  covarianceMatrix[1] = ecl.error(1);
+  covarianceMatrix[2] = ecl.error(2);
+  covarianceMatrix[3] = ecl.error(3);
+  covarianceMatrix[4] = ecl.error(4);
+  covarianceMatrix[5] = ecl.error(5);
+  eclCluster->setError(covarianceMatrix);
+
+  eclCluster->setEnedepSum(eclAux.mass());
+  eclCluster->setE9oE25(eclAux.e9oe25());
+  eclCluster->setHighestE(eclAux.seed());
+  eclCluster->setTiming(eclAux.property(0));
+  eclCluster->setNofCrystals(eclAux.nhits());
+}
+
+//-----------------------------------------------------------------------------
+// MISC
+//-----------------------------------------------------------------------------
 
 int PantherInputModule::recoverMoreThan24bitIDHEP(int id)
 {

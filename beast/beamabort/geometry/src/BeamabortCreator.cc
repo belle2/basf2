@@ -36,6 +36,10 @@
 #include <G4RegionStore.hh>
 #include "G4Tubs.hh"
 
+//Visualization
+#include "G4Colour.hh"
+#include <G4VisAttributes.hh>
+
 using namespace std;
 using namespace boost;
 
@@ -60,9 +64,13 @@ namespace Belle2 {
 
     void BeamabortCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+      //Visualization Attributes
+      G4VisAttributes* orange = new G4VisAttributes(G4Colour(1, 2, 0));
+      orange->SetForceAuxEdgeVisible(true);
+
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
-
+      /*
       //no get the array. Notice that the default framework unit is cm, so the
       //values will be automatically converted
       vector<double> bar = content.getArray("bar");
@@ -70,9 +78,16 @@ namespace Belle2 {
       BOOST_FOREACH(double value, bar) {
         B2INFO("value: " << value);
       }
+      */
       int detID = 0;
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+
+        //Positioned PIN diodes
+        double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
+        double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
+        double phi = activeParams.getAngle("Phi");
+        double thetaZ = activeParams.getAngle("ThetaZ");
 
         //create beamabort volumes
         G4double dx_ba = 4.5 / 2.*CLHEP::mm;
@@ -83,20 +98,9 @@ namespace Belle2 {
 
         //Lets limit the Geant4 stepsize inside the volume
         l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));
-
-        //position beamabort assembly
-        G4ThreeVector BEAMABORTpos = G4ThreeVector(
-                                       activeParams.getLength("x_beamabort") * CLHEP::cm,
-                                       activeParams.getLength("y_beamabort") * CLHEP::cm,
-                                       activeParams.getLength("z_beamabort") * CLHEP::cm
-                                     );
-
-        G4RotationMatrix* rot_beamabort = new G4RotationMatrix();
-        rot_beamabort->rotateX(activeParams.getAngle("AngleX"));
-        rot_beamabort->rotateY(activeParams.getAngle("AngleY"));
-        rot_beamabort->rotateZ(activeParams.getAngle("AngleZ"));
-
-        new G4PVPlacement(rot_beamabort, BEAMABORTpos + BEAMABORTpos, l_BEAMABORT, "p_BEAMABORT", &topVolume, false, detID);
+        l_BEAMABORT->SetVisAttributes(orange);
+        G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
+        new G4PVPlacement(transform, l_BEAMABORT, "p_BEAMABORT", &topVolume, false, detID);
 
         detID++;
       }

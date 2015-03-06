@@ -24,7 +24,7 @@ void Alignment()
 
   TString odir[] = { "ph1sustr" , "microtpc" , "he3tube" };
   TString ifn[] = { "tmp_PH1SUSTR.xml" , "tmp_MICROTPC.xml" , "tmp_HE3TUBE.xml" };
-  TString ofn[] = { "PH1SUSTR.xml" , "MICROTPC.xml" , "HE3TUBE.xml" };
+  TString ofn[] = { "PH1SUSTR.xml" , "MICROTPC-phase1.xml" , "HE3TUBE-phase1.xml" };
   
   //Set the Al plate position in centimeter
   /*

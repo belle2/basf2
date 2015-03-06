@@ -77,15 +77,15 @@ namespace Belle2 {
 
         //create bgo volume
         G4Trap* s_BGO = new G4Trap("s_BGO",
-                                   activeParams.getLength("cDz") / 2.*CLHEP::mm ,
+                                   activeParams.getLength("cDz") / 2.*CLHEP::cm ,
                                    activeParams.getLength("cDtheta") ,
                                    activeParams.getLength("cDphi") ,
-                                   activeParams.getLength("cDy1") / 2.*CLHEP::mm ,
-                                   activeParams.getLength("cDx2") / 2.*CLHEP::mm ,
-                                   activeParams.getLength("cDx1") / 2.*CLHEP::mm , 0,
-                                   activeParams.getLength("cDy2") / 2.*CLHEP::mm ,
-                                   activeParams.getLength("cDx4") / 2.*CLHEP::mm ,
-                                   activeParams.getLength("cDx3") / 2.*CLHEP::mm , 0);
+                                   activeParams.getLength("cDy1") / 2.*CLHEP::cm ,
+                                   activeParams.getLength("cDx2") / 2.*CLHEP::cm ,
+                                   activeParams.getLength("cDx1") / 2.*CLHEP::cm , 0,
+                                   activeParams.getLength("cDy2") / 2.*CLHEP::cm ,
+                                   activeParams.getLength("cDx4") / 2.*CLHEP::cm ,
+                                   activeParams.getLength("cDx3") / 2.*CLHEP::cm , 0);
 
         G4LogicalVolume* l_BGO = new G4LogicalVolume(s_BGO, geometry::Materials::get("BGO"), "l_BGO", 0, m_sensitive);
 

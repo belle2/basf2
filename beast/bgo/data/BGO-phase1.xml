@@ -13,7 +13,7 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="cm">1 2 3 4 5 6 7 8 
+    <bar unit="mm">1 2 3 4 5 6 7 8 
     </bar>
 
     <Active>

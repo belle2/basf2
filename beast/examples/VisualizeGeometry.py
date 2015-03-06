@@ -12,7 +12,10 @@ os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
 eventinfosetter = register_module('EventInfoSetter')
 # Load XML parameters
 paramloader = register_module('Gearbox')
-paramloader.param('fileName', '/geometry/Beast2_phase2.xml')
+#paramloader.param('fileName', '/geometry/Beast2_phase2.xml')
+paramloader.param('fileName', '/geometry/Beast2_phase1.xml')
+#paramloader.param('fileName', '/home/igal/src/belle2/release/beast/examples/Beast2_phase1.xml')
+#paramloader.param('fileName', '/beast/Beast2_phase1.xml')
 # Create Geometry
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO

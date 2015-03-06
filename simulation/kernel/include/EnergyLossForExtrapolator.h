@@ -35,8 +35,8 @@ namespace Belle2 {
 
     public:
 
-      //! Constructor (with GEANT4 verbosity flag)
-      EnergyLossForExtrapolator(G4int verb = 1);
+      //! Constructor (*WITHOUT* GEANT4 verbosity flag)
+      EnergyLossForExtrapolator();
 
       //! Destructor
       ~EnergyLossForExtrapolator();
@@ -63,12 +63,12 @@ namespace Belle2 {
                               const G4Material*, const G4ParticleDefinition* part);
 
       //! Get kinetic energy after a step in given material by given particle
-      inline G4double EnergyAfterStep(G4double kinEnergy, G4double step,
-                                      const G4Material*, const G4String& particleName);
+      //- inline G4double EnergyAfterStep(G4double kinEnergy, G4double step,
+      //-                                const G4Material*, const G4String& particleName);
 
       //! Get kinetic energy before a step in given material by given particle
-      inline G4double EnergyBeforeStep(G4double kinEnergy, G4double step,
-                                       const G4Material*, const G4String& particleName);
+      //- inline G4double EnergyBeforeStep(G4double kinEnergy, G4double step,
+      //-                                  const G4Material*, const G4String& particleName);
 
       //! Get average scattering angle after a step in given material by given particle
       inline G4double AverageScatteringAngle(G4double kinEnergy, G4double step,
@@ -76,24 +76,24 @@ namespace Belle2 {
                                              const G4ParticleDefinition* part);
 
       //! Get average scattering angle after a step in given material by given particle
-      inline G4double AverageScatteringAngle(G4double kinEnergy, G4double step,
-                                             const G4Material*,
-                                             const G4String& particleName);
+      //- inline G4double AverageScatteringAngle(G4double kinEnergy, G4double step,
+      //-                                        const G4Material*,
+      //-                                        const G4String& particleName);
 
       //! Get true step length for given particle and kinetic energy
       inline G4double ComputeTrueStep(const G4Material*, const G4ParticleDefinition* part,
                                       G4double kinEnergy, G4double stepLength);
 
       //! Get energy dispersion for a step in given material by given particle
-      inline G4double EnergyDispersion(G4double kinEnergy, G4double step,
-                                       const G4Material*, const G4ParticleDefinition*);
+      //- inline G4double EnergyDispersion(G4double kinEnergy, G4double step,
+      //-                                  const G4Material*, const G4ParticleDefinition*);
 
       //! Get energy dispersion for a step in given material by given particle
-      inline G4double EnergyDispersion(G4double kinEnergy, G4double step,
-                                       const G4Material*, const G4String& particleName);
+      //- inline G4double EnergyDispersion(G4double kinEnergy, G4double step,
+      //-                                  const G4Material*, const G4String& particleName);
 
       //! Change the GEANT4 verbosity for this class
-      inline void SetVerbose(G4int val);
+      //- inline void SetVerbose(G4int val);
 
       //! Change the minimum particle kinetic energy for this class (default is 1 MeV)
       inline void SetMinKinEnergy(G4double);
@@ -107,7 +107,7 @@ namespace Belle2 {
     private:
 
       //! Initialize tables used to calculate energy loss, fluctuation, and scattering
-      //! for electrons, positrons, muons, pions, kaons, and protons in all materials
+      //! for electrons, positrons, muons, pions, kaons, protons  and deuterons in all materials
       void Initialisation();
 
       //! Save current particle properties, kinetic energy and material in internal cached state
@@ -142,219 +142,217 @@ namespace Belle2 {
       EnergyLossForExtrapolator(const EnergyLossForExtrapolator&);
 
       //! Pointer to definition of the currently cached particle
-      const G4ParticleDefinition* currentParticle;
+      const G4ParticleDefinition* m_Particle;
 
       //! Pointer to definition of the electron
-      const G4ParticleDefinition* electron;
+      const G4ParticleDefinition* m_Electron;
 
       //! Pointer to definition of the positron
-      const G4ParticleDefinition* positron;
+      const G4ParticleDefinition* m_Positron;
 
       //! Pointer to definition of the positive muon
-      const G4ParticleDefinition* muonPlus;
+      const G4ParticleDefinition* m_MuonPlus;
 
       //! Pointer to definition of the negative muon
-      const G4ParticleDefinition* muonMinus;
+      const G4ParticleDefinition* m_MuonMinus;
 
       //! Pointer to definition of the positive pion
       const G4ParticleDefinition* pionPlus;
+      const G4ParticleDefinition* m_PionPlus;
 
       //! Pointer to definition of the negative pion
-      const G4ParticleDefinition* pionMinus;
+      const G4ParticleDefinition* m_PionMinus;
 
       //! Pointer to definition of the positive kaon
-      const G4ParticleDefinition* kaonPlus;
+      const G4ParticleDefinition* m_KaonPlus;
 
       //! Pointer to definition of the negative kaon
-      const G4ParticleDefinition* kaonMinus;
+      const G4ParticleDefinition* m_KaonMinus;
 
       //! Pointer to definition of the proton
-      const G4ParticleDefinition* proton;
+      const G4ParticleDefinition* m_Proton;
 
       //! Pointer to definition of the antiproton
-      const G4ParticleDefinition* antiproton;
+      const G4ParticleDefinition* m_AntiProton;
 
       //! Pointer to definition of the deuteron
-      const G4ParticleDefinition* deuteron;
+      const G4ParticleDefinition* m_Deuteron;
 
       //! Pointer to definition of the antideuteron
-      const G4ParticleDefinition* antideuteron;
+      const G4ParticleDefinition* m_AntiDeuteron;
 
       //! Vector of particle cuts
-      G4DataVector cuts;
+      G4DataVector m_Cuts;
 
       //! Pointer to the internal cache of default G4ProductionCuts
-      G4ProductionCuts* pcuts;
+      G4ProductionCuts* m_ProductionCuts;
 
       //! List of material-cuts pairings
-      std::vector<const G4MaterialCutsCouple*> couples;
-
-      //! Name of the internally cached particle
-      G4String currentParticleName;
+      std::vector<const G4MaterialCutsCouple*> m_Couples;
 
       //! Pointer to the electron's specific ionization energy loss vs KE table
-      G4PhysicsTable*          dedxElectron;
+      G4PhysicsTable*          m_DedxElectron;
 
       //! Pointer to the positron's specific ionization energy loss vs KE table
-      G4PhysicsTable*          dedxPositron;
+      G4PhysicsTable*          m_DedxPositron;
 
       //! Pointer to the muon's specific ionization energy loss vs KE table
-      G4PhysicsTable*          dedxMuon;
+      G4PhysicsTable*          m_DedxMuon;
 
       //! Pointer to the pion's specific ionization energy loss vs KE table
-      G4PhysicsTable*          dedxPion;
+      G4PhysicsTable*          m_DedxPion;
 
       //! Pointer to the kaon's specific ionization energy loss vs KE table
-      G4PhysicsTable*          dedxKaon;
+      G4PhysicsTable*          m_DedxKaon;
 
       //! Pointer to the proton's specific ionization energy loss vs KE table
-      G4PhysicsTable*          dedxProton;
+      G4PhysicsTable*          m_DedxProton;
 
       //! Pointer to the deuteron's specific ionization energy loss vs KE table
-      G4PhysicsTable*          dedxDeuteron;
+      G4PhysicsTable*          m_DedxDeuteron;
 
       //! Pointer to the electron's range vs KE table
-      G4PhysicsTable*          rangeElectron;
+      G4PhysicsTable*          m_RangeElectron;
 
       //! Pointer to the positron's range vs KE table
-      G4PhysicsTable*          rangePositron;
+      G4PhysicsTable*          m_RangePositron;
 
       //! Pointer to the muon's range vs KE table
-      G4PhysicsTable*          rangeMuon;
+      G4PhysicsTable*          m_RangeMuon;
 
       //! Pointer to the pion's range vs KE table
-      G4PhysicsTable*          rangePion;
+      G4PhysicsTable*          m_RangePion;
 
       //! Pointer to the kaon's range vs KE table
-      G4PhysicsTable*          rangeKaon;
+      G4PhysicsTable*          m_RangeKaon;
 
       //! Pointer to the proton's range vs KE table
-      G4PhysicsTable*          rangeProton;
+      G4PhysicsTable*          m_RangeProton;
 
       //! Pointer to the deuteron's range vs KE table
-      G4PhysicsTable*          rangeDeuteron;
+      G4PhysicsTable*          m_RangeDeuteron;
 
       //! Pointer to the electron's inverse-range vs KE table
-      G4PhysicsTable*          invRangeElectron;
+      G4PhysicsTable*          m_InvRangeElectron;
 
       //! Pointer to the positron's inverse-range vs KE table
-      G4PhysicsTable*          invRangePositron;
+      G4PhysicsTable*          m_InvRangePositron;
 
       //! Pointer to the muon's inverse-range vs KE table
-      G4PhysicsTable*          invRangeMuon;
+      G4PhysicsTable*          m_InvRangeMuon;
 
       //! Pointer to the pion's inverse-range vs KE table
-      G4PhysicsTable*          invRangePion;
+      G4PhysicsTable*          m_InvRangePion;
 
       //! Pointer to the kaon's inverse-range vs KE table
-      G4PhysicsTable*          invRangeKaon;
+      G4PhysicsTable*          m_InvRangeKaon;
 
       //! Pointer to the proton's inverse-range vs KE table
-      G4PhysicsTable*          invRangeProton;
+      G4PhysicsTable*          m_InvRangeProton;
 
       //! Pointer to the deuteron's inverse-range vs KE table
-      G4PhysicsTable*          invRangeDeuteron;
+      G4PhysicsTable*          m_InvRangeDeuteron;
 
       //! Pointer to the electron's multiple-scattering cross section vs KE table
-      G4PhysicsTable*          mscElectron;
+      G4PhysicsTable*          m_MscatElectron;
+
+      //! Flag to enable/disable spline interpolation of the above tables
+      G4bool m_SplineFlag;
 
       //! Pointer to internally cached material
-      const G4Material* currentMaterial;
+      const G4Material* m_Material;
 
       //! Cached material index
-      G4int       index;
+      G4int       m_MaterialIndex;
 
       //! Cached material electron density
-      G4double    electronDensity;
+      G4double    m_ElectronDensity;
 
       //! Cached material radiation length
-      G4double    radLength;
+      G4double    m_RadLength;
 
       //! Cached particle mass
-      G4double    mass;
+      G4double    m_Mass;
 
       //! Cached charge-squared (in units of e)
-      G4double    charge2;
+      G4double    m_ChargeSq;
 
       //! Cached particle kinetic energy
-      G4double    kineticEnergy;
+      G4double    m_KineticEnergy;
 
       //! Cached particle's gamma value
-      G4double    gam;
+      G4double    m_Gamma;
 
       //! Cached particle's beta*gamma squared
-      G4double    bg2;
+      G4double    m_BetaGammaSq;
 
       //! Cached particle's beta squared
-      G4double    beta2;
+      G4double    m_BetaSq;
 
       //! Cached particle's maximum kinetic-energy loss
-      G4double    tmax;
+      G4double    m_Tmax;
 
       //! Step-length limit in units of range (0.01); not modifiable by user
-      G4double    linLossLimit;
+      G4double    m_LinLossLimit;
 
       //! User's minimum kinetic energy for particles (default 1 MeV)
-      G4double    emin;
+      G4double    m_UserTmin;
 
-      //! User's maximum kinetic energy for particles (default 10 MeV)
-      G4double    emax;
+      //! User's maximum kinetic energy for particles (default 10 TeV)
+      G4double    m_UserTmax;
 
       //! User's upper limit on maximum kinetic-energy loss (default infinity)
-      G4double    maxEnergyTransfer;
+      G4double    m_UserMaxEnergyTransfer;
 
       //! Number of bins in each energy loss, fluctuation, and multiple-scattering table (70, fixed)
-      G4int       nbins;
+      G4int       m_Nbins;
 
       //! Number of materials in current geometry
-      G4int       nmat;
+      G4int       m_NMaterials;
 
-      //! GEANT4 verbosity for this class
-      G4int       verbose;
-
-      //! Flag to indicate that Initialisation() method has been called
-      G4bool      isInitialised;
+      //! UNUSED Flag to indicate that Initialisation() method has been called
+      G4bool      m_Initialised;
     };
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-    inline G4double EnergyLossForExtrapolator::EnergyAfterStep(G4double kinEnergy,
-                                                               G4double step,
-                                                               const G4Material* mat,
-                                                               const G4String& name)
-    {
-      return EnergyAfterStep(kinEnergy, step, mat, FindParticle(name));
-    }
+    //- inline G4double EnergyLossForExtrapolator::EnergyAfterStep(G4double kinEnergy,
+    //-                                                            G4double step,
+    //-                                                            const G4Material* mat,
+    //-                                                            const G4String& name)
+    //- {
+    //-   return EnergyAfterStep(kinEnergy, step, mat, FindParticle(name));
+    //- }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-    inline G4double EnergyLossForExtrapolator::EnergyBeforeStep(G4double kinEnergy,
-                                                                G4double step,
-                                                                const G4Material* mat,
-                                                                const G4String& name)
-    {
-      return EnergyBeforeStep(kinEnergy, step, mat, FindParticle(name));
-    }
+    //- inline G4double EnergyLossForExtrapolator::EnergyBeforeStep(G4double kinEnergy,
+    //-                                                             G4double step,
+    //-                                                             const G4Material* mat,
+    //-                                                             const G4String& name)
+    //- {
+    //-   return EnergyBeforeStep(kinEnergy, step, mat, FindParticle(name));
+    //- }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-    inline G4double EnergyLossForExtrapolator::AverageScatteringAngle(G4double kinEnergy,
-        G4double step,
-        const G4Material* mat,
-        const G4String& name)
-    {
-      return AverageScatteringAngle(kinEnergy, step, mat, FindParticle(name));
-    }
+    //- inline G4double EnergyLossForExtrapolator::AverageScatteringAngle(G4double kinEnergy,
+    //-     G4double step,
+    //-     const G4Material* mat,
+    //-     const G4String& name)
+    //- {
+    //-   return AverageScatteringAngle(kinEnergy, step, mat, FindParticle(name));
+    //- }
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-    inline G4double
-    EnergyLossForExtrapolator::EnergyDispersion(G4double kinEnergy,
-                                                G4double step,
-                                                const G4Material* mat,
-                                                const G4String& name)
-    {
-      return EnergyDispersion(kinEnergy, step, mat, FindParticle(name));
-    }
+    //- inline G4double
+    //- EnergyLossForExtrapolator::EnergyDispersion(G4double kinEnergy,
+    //-                                             G4double step,
+    //-                                             const G4Material* mat,
+    //-                                             const G4String& name)
+    //- {
+    //-   return EnergyDispersion(kinEnergy, step, mat, FindParticle(name));
+    //- }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
@@ -366,9 +364,9 @@ namespace Belle2 {
     {
       G4double theta = 0.0;
       if (SetupKinematics(part, mat, kinEnergy)) {
-        G4double t = stepLength / radLength;
+        G4double t = stepLength / m_RadLength;
         G4double y = std::max(0.001, t);
-        theta = 19.23 * CLHEP::MeV * std::sqrt(charge2 * t) * (1.0 + 0.038 * std::log(y)) / (beta2 * gam * mass);
+        theta = 19.23 * CLHEP::MeV * std::sqrt(m_ChargeSq * t) * (1.0 + 0.038 * std::log(y)) / (m_BetaSq * m_Gamma * m_Mass);
       }
       return theta;
     }
@@ -387,19 +385,19 @@ namespace Belle2 {
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-    inline
-    G4double EnergyLossForExtrapolator::EnergyDispersion(G4double kinEnergy,
-                                                         G4double stepLength,
-                                                         const G4Material* mat,
-                                                         const G4ParticleDefinition* part)
-    {
-      G4double sig2 = 0.0;
-      if (SetupKinematics(part, mat, kinEnergy)) {
-        G4double step = ComputeTrueStep(mat, part, kinEnergy, stepLength);
-        sig2 = (1.0 / beta2 - 0.5) * CLHEP::twopi_mc2_rcl2 * tmax * step * electronDensity * charge2;
-      }
-      return sig2;
-    }
+    //- inline
+    //- G4double EnergyLossForExtrapolator::EnergyDispersion(G4double kinEnergy,
+    //-                                                      G4double stepLength,
+    //-                                                      const G4Material* mat,
+    //-                                                      const G4ParticleDefinition* part)
+    //- {
+    //-   G4double sig2 = 0.0;
+    //-   if (SetupKinematics(part, mat, kinEnergy)) {
+    //-     G4double step = ComputeTrueStep(mat, part, kinEnergy, stepLength);
+    //-     sig2 = (1.0 / beta2 - 0.5) * CLHEP::twopi_mc2_rcl2 * tmax * step * electronDensity * charge2;
+    //-   }
+    //-   return sig2;
+    //- }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
@@ -408,36 +406,36 @@ namespace Belle2 {
     {
       G4double res = 0.0;
       G4bool b;
-      if (table) res = ((*table)[index])->GetValue(x, b);
+      if (table) res = ((*table)[m_MaterialIndex])->GetValue(x, b);
       return res;
     }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-    inline void EnergyLossForExtrapolator::SetVerbose(G4int val)
-    {
-      verbose = val;
-    }
+    //- inline void EnergyLossForExtrapolator::SetVerbose(G4int val)
+    //- {
+    //-   verbose = val;
+    //- }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
     inline void EnergyLossForExtrapolator::SetMinKinEnergy(G4double val)
     {
-      emin = val;
+      m_UserTmin = val;
     }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
     inline void EnergyLossForExtrapolator::SetMaxKinEnergy(G4double val)
     {
-      emax = val;
+      m_UserTmax = val;
     }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
     inline void EnergyLossForExtrapolator::SetMaxEnergyTransfer(G4double val)
     {
-      maxEnergyTransfer = val;
+      m_UserMaxEnergyTransfer = val;
     }
 
     //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....

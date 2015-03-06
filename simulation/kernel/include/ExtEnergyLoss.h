@@ -62,9 +62,11 @@ namespace Belle2 {
 
     };
 
-    inline G4bool ExtEnergyLoss::IsApplicable(const G4ParticleDefinition& aParticleType)
+    inline G4bool ExtEnergyLoss::IsApplicable(const G4ParticleDefinition& aParticle)
     {
-      return (aParticleType.GetPDGCharge() != 0); // this process applies to all charged particles
+      // This process applies to all geant4e-specific charged particles.
+      // (Verified that it is only called for these - but let's check anyway.)
+      return ((aParticle.GetPDGCharge() != 0) && (aParticle.GetParticleName().compare(0, 4, "g4e_") == 0));
     }
 
     inline G4double ExtEnergyLoss::GetStepLimit()

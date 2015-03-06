@@ -112,7 +112,7 @@ G4double ExtEnergyLoss::GetContinuousStepLimit(const G4Track& aTrack,
                                                G4double&)
 {
   G4double step = DBL_MAX;
-  if (m_StepLimit != 1.0) {
+  if (m_StepLimit < 1.0) {
     G4double kinEnergyStart = aTrack.GetKineticEnergy();
     G4double kinEnergyLoss = kinEnergyStart;
     const G4Material* aMaterial = aTrack.GetMaterial();

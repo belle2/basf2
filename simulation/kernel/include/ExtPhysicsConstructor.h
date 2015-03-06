@@ -18,6 +18,11 @@ namespace Belle2 {
 
   namespace Simulation {
 
+    class ExtStepLengthLimitProcess;
+    class ExtMagFieldLimitProcess;
+    class ExtEnergyLoss;
+    class ExtMessenger;
+
     /**
      * Define geant4e-specific physics
      */
@@ -38,6 +43,18 @@ namespace Belle2 {
       virtual void ConstructProcess();
 
     private:
+
+      /** Process that limits the geant4e step length */
+      ExtStepLengthLimitProcess* m_StepLengthLimitProcess;
+
+      /** Process that limits the geant4e step length in magnetic field */
+      ExtMagFieldLimitProcess* m_MagFieldLimitProcess;
+
+      /** Process that limits the geant4e step length due to energy loss */
+      ExtEnergyLoss* m_ELossProcess;
+
+      /** Pointer to the ExtMessenger that is used to control geant4e */
+      ExtMessenger* m_Messenger;
 
     };
 

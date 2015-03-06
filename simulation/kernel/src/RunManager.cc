@@ -90,6 +90,9 @@ void RunManager::destroy()
 {
   if (m_instance == nullptr) return;
 
+  for (G4AssemblyVolume * assemblyVolume : m_AssemblyVolumes) delete assemblyVolume;
+  m_AssemblyVolumes.clear();
+
   if (ProcHandler::parallelProcessingUsed() and !ProcHandler::isOutputProcess()) {
     //Attention, ugly:
     //Deleting the runmanager will cause Geant4 to open the geometry and clean up
@@ -123,7 +126,7 @@ void RunManager::destroy()
 
 RunManager::RunManager() : G4RunManager()
 {
-
+  m_AssemblyVolumes.clear();
 }
 
 

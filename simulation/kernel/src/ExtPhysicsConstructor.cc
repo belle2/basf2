@@ -33,7 +33,8 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-ExtPhysicsConstructor::ExtPhysicsConstructor() : G4VPhysicsConstructor("ExtPhysicsConstructor")
+ExtPhysicsConstructor::ExtPhysicsConstructor() : G4VPhysicsConstructor("ExtPhysicsConstructor"),
+  m_StepLengthLimitProcess(NULL), m_MagFieldLimitProcess(NULL), m_ELossProcess(NULL), m_Messenger(NULL)
 {
   if (false) {
     ConstructParticle();
@@ -43,6 +44,10 @@ ExtPhysicsConstructor::ExtPhysicsConstructor() : G4VPhysicsConstructor("ExtPhysi
 
 ExtPhysicsConstructor::~ExtPhysicsConstructor()
 {
+  if (m_StepLengthLimitProcess) delete m_StepLengthLimitProcess;
+  if (m_MagFieldLimitProcess) delete m_MagFieldLimitProcess;
+  if (m_ELossProcess) delete m_ELossProcess;
+  if (m_Messenger) delete m_Messenger;
 }
 
 void ExtPhysicsConstructor::ConstructParticle()
@@ -197,10 +202,10 @@ void ExtPhysicsConstructor::ConstructProcess()
 {
   // Define the limited set of processes that will be suffered by the
   // geant4e-specific particles
-  ExtStepLengthLimitProcess* stepLengthLimitProcess = new ExtStepLengthLimitProcess;
-  ExtMagFieldLimitProcess* magFieldLimitProcess = new ExtMagFieldLimitProcess;
-  ExtEnergyLoss* eLossProcess = new ExtEnergyLoss;
-  new ExtMessenger(stepLengthLimitProcess, magFieldLimitProcess, eLossProcess);
+  m_StepLengthLimitProcess = new ExtStepLengthLimitProcess;
+  m_MagFieldLimitProcess = new ExtMagFieldLimitProcess;
+  m_ELossProcess = new ExtEnergyLoss;
+  m_Messenger = new ExtMessenger(m_StepLengthLimitProcess, m_MagFieldLimitProcess, m_ELossProcess);
   G4ParticleTable* theParticleTable = G4ParticleTable::GetParticleTable();
   G4ParticleTable::G4PTblDicIterator* theParticleIterator = theParticleTable->GetIterator();
   theParticleIterator->reset();
@@ -208,15 +213,15 @@ void ExtPhysicsConstructor::ConstructProcess()
     G4ParticleDefinition* particle = theParticleIterator->value();
     G4ProcessManager* pmanager = particle->GetProcessManager();
     G4String particleName = particle->GetParticleName();
-    if (particleName.substr(0, 4) == "g4e_") {
+    if (particleName.compare(0, 4, "g4e_") == 0) {
       if (particleName == "g4e_gamma") {
         pmanager->AddDiscreteProcess(new G4GammaConversion());
         pmanager->AddDiscreteProcess(new G4ComptonScattering());
         pmanager->AddDiscreteProcess(new G4PhotoElectricEffect());
       } else {
-        pmanager->AddContinuousProcess(eLossProcess, 1);
-        pmanager->AddDiscreteProcess(stepLengthLimitProcess, 2);
-        pmanager->AddDiscreteProcess(magFieldLimitProcess, 3);
+        pmanager->AddContinuousProcess(m_ELossProcess, 1);
+        pmanager->AddDiscreteProcess(m_StepLengthLimitProcess, 2);
+        pmanager->AddDiscreteProcess(m_MagFieldLimitProcess, 3);
       }
     }
   }

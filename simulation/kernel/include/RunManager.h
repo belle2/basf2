@@ -12,6 +12,7 @@
 #define RUNMANAGER_H_
 
 #include <G4RunManager.hh>
+#include <G4AssemblyVolume.hh>
 
 #include <string>
 #include <map>
@@ -63,6 +64,9 @@ namespace Belle2 {
       /** Initialize the Kernel */
       void Initialize();
 
+      /** Register a G4AssemblyVolume */
+      inline void addAssemblyVolume(G4AssemblyVolume* vol) { m_AssemblyVolumes.push_back(vol); }
+
     private:
 
       /** The constructor is hidden to avoid that someone creates an instance of this class. */
@@ -78,6 +82,9 @@ namespace Belle2 {
       virtual ~RunManager();
 
       static RunManager* m_instance; /**< Pointer that saves the instance of this class. */
+
+      /** Vector of pointers to G4AssemblyVolumes */
+      std::vector<G4AssemblyVolume*> m_AssemblyVolumes;
 
       /** Destroyer class to delete the instance of the RunManager class when the program terminates. */
       class SingletonDestroyer {

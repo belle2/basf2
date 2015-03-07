@@ -40,7 +40,7 @@
       <DistanceFromFoamCenter unit="mm">1.0</DistanceFromFoamCenter>
       <GlueThickness unit="um">10.0</GlueThickness>
       <KaptonThickness unit="um">100.0</KaptonThickness>
-      <CupperThickness unit="um">40.0</CupperThickness>
+      <AluminiumThickness unit="um">20.0</AluminiumThickness>
     </Active>
 
 
@@ -68,7 +68,7 @@
       <DistanceFromFoamCenter unit="mm">1.0</DistanceFromFoamCenter>
       <GlueThickness unit="um">10.0</GlueThickness>
       <KaptonThickness unit="um">100.0</KaptonThickness>
-      <CupperThickness unit="um">40.0</CupperThickness>
+      <AluminiumThickness unit="um">20.0</AluminiumThickness>
     </Active>
 
   </Content>

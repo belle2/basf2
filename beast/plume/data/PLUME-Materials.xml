@@ -20,12 +20,6 @@
     </Components>
   </Material>
 
-  <Material name="Cupper">
-    <density unit="g/cm3">8.960</density>
-    <Components>
-      <Element fraction="1.0">Cu</Element>
-    </Components>
-  </Material>
 
   <Material name="Kapton">
     <density unit="g/cm3">1.42</density>
@@ -38,7 +32,7 @@
   </Material>
 
   <Material name="Glue">
-    <density unit="g/cm3">1.42</density>
+    <density unit="g/cm3">1.3</density>
     <Components>
       <Element fraction="0.084">H</Element>
       <Element fraction="0.279">C</Element>
@@ -48,13 +42,13 @@
   </Material>
   
   <Material name="SiC">
-    <density unit="g/cm3">0.256</density>
+    <density unit="g/cm3">0.1284</density>
     <Components>
       <Element fraction="0.5">Si</Element>
       <Element fraction="0.5">C</Element>
     </Components>
   </Material>
-   
+
   <Material name="Silicon">
     <density unit="g/cm3">2.3290</density>
     <Components>
@@ -72,7 +66,33 @@
       <Element fraction="0.001">Si</Element>
     </Components>
   </Material>
+
+  <Material name="Aluminium">
+    <density unit="g/cm3">2.70</density>
+    <Components>
+      <Element fraction="1.0">Al</Element>
+    </Components>
+  </Material>  
+
+  <Material name="SiO2">
+    <state>Solid</state>
+    <Components>   
+      <Material fraction="0.333333">Si</Material>     
+      <Material fraction="0.666667">O</Material> 
+    </Components>  
+  </Material>
   
+
+  <Material name="SiO2Al">
+    <density unit="g/cm3">2.3</density>
+    <Components>
+      <Material fraction="0.89">SiO2</Material>     
+      <Material fraction="0.11">Aluminium</Material> 
+    </Components>
+  </Material>
+
+
+
 
 </Materials>
   

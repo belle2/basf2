@@ -38,15 +38,19 @@ void NSMMessage::init(const NSMNode& node, const NSMVar& var) throw()
   m_nsm_msg.npar = 6;
   m_nsm_msg.pars[0] = (int)var.getType();
   m_nsm_msg.pars[1] = (int)var.getLength();
-  m_nsm_msg.pars[2] = var.getName().size();
-  m_nsm_msg.pars[3] = var.getId();
-  m_nsm_msg.pars[4] = var.getRevision();
-  m_nsm_msg.pars[5] = var.getNodeId();
+  m_nsm_msg.pars[2] = var.getNode().size();
+  m_nsm_msg.pars[3] = var.getName().size();
+  m_nsm_msg.pars[4] = var.getId();
+  m_nsm_msg.pars[5] = var.getRevision();
   if (var.getType() != NSMVar::NONE) {
-    int size = var.getName().size() + 1 + var.size();
+    int size = var.getNode().size() + 1 + var.getName().size() + 1 + var.size();
     m_data = Buffer(size);
     char* pdata = (char*)m_data.ptr();
     memset(pdata, 0, size);
+    memcpy(pdata, var.getNode().c_str(), var.getNode().size());
+    pdata += var.getNode().size();
+    *pdata = '\0';
+    pdata++;
     memcpy(pdata, var.getName().c_str(), var.getName().size());
     pdata += var.getName().size();
     *pdata = '\0';

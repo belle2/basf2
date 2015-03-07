@@ -50,7 +50,7 @@ bool StoragerCallback::configure(const DBObject& obj) throw()
     setUseSet("record.file.diskid", false);
     setUseSet("record.file.nfiles", false);
     setUseSet("record.file.dbtmp", false);
-    const DBObject& record(obj.getObject("record"));
+    const DBObject& record(obj("record"));
     const size_t nproc = record.getInt("nproc");
     m_con = std::vector<ProcessController>();
     for (size_t i = 0; i < 3 + nproc; i++) {
@@ -91,17 +91,17 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     }
   }
   if (is_up_all) return;
-  const DBObject& eb2rx(obj.getObject("eb2rx"));
-  const DBObject& input(obj.getObject("input"));
-  const DBObject& output(obj.getObject("output"));
-  const DBObject& record(obj.getObject("record"));
-  const DBObject& ibuf(input.getObject("buf"));
-  const DBObject& obuf(output.getObject("buf"));
-  const DBObject& rbuf(record.getObject("buf"));
-  const DBObject& isocket(input.getObject("socket"));
-  const DBObject& osocket(output.getObject("socket"));
-  const DBObject& file(record.getObject("file"));
-  if (eb2rx.getBool("used")) {
+  const DBObject& input(obj("input"));
+  const DBObject& output(obj("output"));
+  const DBObject& record(obj("record"));
+  const DBObject& ibuf(input("buf"));
+  const DBObject& obuf(output("buf"));
+  const DBObject& rbuf(record("buf"));
+  const DBObject& isocket(input("socket"));
+  const DBObject& osocket(output("socket"));
+  const DBObject& file(record("file"));
+  if (obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
+    const DBObject& eb2rx(obj("eb2rx"));
     m_eb2rx.clearArguments();
     m_eb2rx.setExecutable(eb2rx.getText("exe"));
     m_eb2rx.addArgument("-l");
@@ -113,6 +113,8 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     }
     m_eb2rx.load(0);
     LogFile::debug("Booted eb2rx");
+  } else {
+    LogFile::notice("eb2rx is off");
   }
 
   m_con[0].clearArguments();
@@ -162,7 +164,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     }
     LogFile::debug("Booted storageout");
   } else {
-    LogFile::notice("storageout gets OFF");
+    LogFile::notice("storageout is off");
   }
 
   for (size_t i = 3; i < m_con.size(); i++) {

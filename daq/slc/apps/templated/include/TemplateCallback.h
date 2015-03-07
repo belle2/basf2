@@ -1,13 +1,9 @@
-#ifndef _Belle2_TemplateCallback_hh
-#define _Belle2_TemplateCallback_hh
+#ifndef _Belle2_TemplateCallback_h
+#define _Belle2_TemplateCallback_h
 
 #include "daq/slc/readout/ProcessController.h"
 
 #include "daq/slc/runcontrol/RCCallback.h"
-
-#include <daq/slc/nsm/NSMData.h>
-
-#include <daq/slc/system/PThread.h>
 
 namespace Belle2 {
 

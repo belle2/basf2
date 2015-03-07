@@ -1,3 +1,0 @@
- nodename,  config, hostnode,      dataname,        format, revision
-   CDC_RC, default,   CPR002, CPR002_STATUS, ronode_status,        2
-   CDC_RC, default,   ROPC01, ROPC01_STATUS, ronode_status,        2

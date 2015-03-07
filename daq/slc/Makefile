@@ -1,4 +1,4 @@
-.PHONY : all clean base system database nsm readout dqm runcontrol hvcontrol apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold apps/eclshaperd apps/templated apps/ttdad
+.PHONY : all clean tools base system database nsm readout dqm runcontrol hvcontrol  apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold apps/eclshaperd apps/templated apps/ttdad 
 
 SRCDIR=./src
 INCDIR=./include/daq/slc/
@@ -6,11 +6,11 @@ LIBDIR=./lib
 BINDIR=./bin
 TMPDIR=./tmp
 
-APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold apps/eclshaperd apps/templated apps/ttdad
+APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/eclshaperd apps/templated apps/ttdad
 
 SUBPACKAGES = base system database nsm readout runcontrol hvcontrol $(APPS)
 
-all: copyinc $(SUBPACKAGES)
+all: copyinc $(SUBPACKAGES) tool
 	@ make -C tools/
 
 full: all
@@ -37,7 +37,10 @@ copyinc:
 
 $(SUBPACKAGES): %:
 	@ make -f Makefile.src TARGET=$@
-	@ if [ -f $@/tools/Makefile ]; then make -C $@/tools; fi
+
+tool: 
+	@ for dir in $(SUBPACKAGES); \
+	 do if [ -f $$dir/tools/Makefile ]; then make -C $$dir/tools; fi done
 
 clean:
 	@ rm -rf include $(LIBDIR) $(TMPDIR) bin

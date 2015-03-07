@@ -1,5 +1,0 @@
- nodename,  config, node
- ECL, RC:default,node:default
- ECL, RC:debug:dummycpu,node:debug:dummycpu
- ECL, RC:debug:dumhslb:020:rand4k,node:debug:dumhslb:020:rand4k
- ECL, RC:debug:yamadahslb:10kHz,node:debug:yamadahslb:10kHz

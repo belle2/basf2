@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-COPPERCallback::COPPERCallback(FEEController* fee[4])
+COPPERCallback::COPPERCallback(FEE* fee[4])
 {
   setTimeout(5);
   m_con.setCallback(this);
@@ -45,40 +45,60 @@ bool COPPERCallback::initialize(const DBObject& obj) throw()
   return configure(obj);
 }
 
-bool COPPERCallback::configure(const DBObject& /*obj*/) throw()
+bool COPPERCallback::configure(const DBObject& obj) throw()
 {
   try {
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
     add(new NSMVHandlerFifoFull(*this, "copper.err.fifofull"));
     add(new NSMVHandlerLengthFifoFull(*this, "copper.err.lengthfifofull"));
     add(new NSMVHandlerTTRXBelle2LinkError(*this, "ttrx.err.b2linkerr"));
-    add(new NSMVHandlerDownloadTTRXFirmware(*this, "ttrx.download.firmware"));
+    const DBObject& o_ttrx(obj("ttrx"));
+    add(new NSMVHandlerTTRXFirmware(*this, "ttrx.firm", 0,
+                                    o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
     for (int i = 0; i < 4; i++) {
+      const DBObject& o_hslb(obj("hslb", i));
+      if (!o_hslb.getBool("used")) continue;
       std::string vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerHSLBBelle2LinkDown(*this, vname + ".err.b2linkdown", i));
       add(new NSMVHandlerHSLBCOPPERFifoFull(*this, vname + ".err.cprfifofull", i));
       add(new NSMVHandlerHSLBCOPPERLengthFifoFull(*this, vname + ".err.cprlengthfifofull", i));
       add(new NSMVHandlerHSLBFifoFull(*this, vname + ".err.fifofull", i));
       add(new NSMVHandlerHSLBCRCError(*this, vname + ".err.crc", i));
-      add(new NSMVHandlerDownloadHSLBFirmware(*this, vname + ".download.firmware", i));
-      vname = StringUtil::form("hslb[%d].reg", i);
-      add(new NSMVHandlerInt(vname + ".adr", true, true, 0));
-      add(new NSMVHandlerHSLBRegValue(*this, vname + ".val", i));
-      if (!m_config.useHSLB(i)) continue;
-      FEEConfig::ParameterList& pars(m_config.getFEE(i).getParameters());
-      for (FEEConfig::ParameterList::iterator it = pars.begin();
-           it != pars.end(); it++) {
-        FEEConfig::Parameter& par(*it);
-        FEEConfig::Register& reg(*m_config.getFEE(i).getRegister(par.getName()));
-        int adr = reg.getAddress();
-        std::string pname = StringUtil::tolower(par.getName());
-        std::string vname = StringUtil::form("hslb[%d].reg.%s", i, pname.c_str());
-        add(new NSMVHandlerInt(vname + ".adr", true, false, adr));
-        add(new NSMVHandlerHSLBRegValue(*this, vname + ".val", i, adr));
+
+      add(new NSMVHandlerHSLBFirmware(*this, vname + ".firm", i,
+                                      o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
+      vname = StringUtil::form("hslb[%d]", i);
+      add(new NSMVHandlerInt(vname + ".reg.adr", true, true, 0));
+      add(new NSMVHandlerHSLBRegValue(*this, vname + "par.val", i));
+      FEEConfig fconf;
+      int j = 0;
+      const DBObject o_fee(obj("fee", i));
+      if (m_fee[i] != NULL && fconf.read(o_fee)) {
+        vname = StringUtil::form("fee[%d]", i);
+        add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
+        const FEEConfig::RegList& regs(fconf.getRegList());
+        for (FEEConfig::RegList::const_iterator it = regs.begin();
+             it != regs.end(); it++) {
+          const FEEConfig::Reg& reg(*it);
+          std::string pname = StringUtil::tolower(reg.name);
+          std::string vname = StringUtil::form("fee[%d].reg[%d].adr", i, j);
+          add(new NSMVHandlerInt(vname, true, false, reg.adr));
+          vname = StringUtil::form("fee[%d].par[%d].val", i, j++);
+          add(new NSMVHandlerHSLBRegValue(*this, vname, i, reg.adr));
+        }
+        vname = StringUtil::form("fee[%d]", i);
+        add(new NSMVHandlerFEEStream(*this, vname + ".stream", i,
+                                     o_fee.hasText("stream") ? o_fee.getText("stream") : ""));
+        add(new NSMVHandlerHSLBLinkFee(*this, vname + ".linkfee", i));
+        add(new NSMVHandlerHSLBUnLinkFee(*this, vname + ".unlinkfee", i));
+        add(new NSMVHandlerHSLBTrgOnFee(*this, vname + ".trgonfee", i));
+        add(new NSMVHandlerHSLBTrgOffFee(*this, vname + ".trgofffee", i));
       }
     }
     return true;
   } catch (const IOException& e) {
+    LogFile::error(e.what());
+  } catch (const std::out_of_range& e) {
     LogFile::error(e.what());
   }
   return false;
@@ -97,30 +117,36 @@ void COPPERCallback::term() throw()
 
 void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  m_config.read(obj);
   m_ttrx.open();
   if (m_ttrx.isError()) {
     m_ttrx.close();
     throw (RCHandlerException("TTRX Link error"));
   }
-  for (int i = 0; i < 4; i++) {
-    if (m_config.useHSLB(i)) {
-      HSLBController& hslb(m_hslb[i]);
-      hslb.open(i);
-      if (!hslb.load()) {
-        throw (RCHandlerException("Failed to load HSLB:%c", i + 'a'));
-      }
-      if (m_fee[i] != NULL) {
-        FEEController& fee(*m_fee[i]);
-        try {
-          fee.load(hslb, m_config.getFEE(i));
-        } catch (const IOException& e) {
-          throw (RCHandlerException(e.what()));
+  try {
+    for (int i = 0; i < 4; i++) {
+      const DBObject& o_hslb(obj("hslb", i));
+      if (o_hslb.getBool("used")) {
+        HSLB& hslb(m_hslb[i]);
+        hslb.open(i);
+        if (!hslb.load()) {
+          throw (RCHandlerException("Failed to load HSLB:%c", i + 'a'));
+        }
+        FEEConfig fconf;
+        if (m_fee[i] != NULL && obj.hasObject("fee") &&
+            fconf.read(obj("fee", i))) {
+          FEE& fee(*m_fee[i]);
+          try {
+            fee.load(hslb, fconf);
+          } catch (const IOException& e) {
+            throw (RCHandlerException(e.what()));
+          }
         }
       }
     }
+  } catch (const std::out_of_range& e) {
+    throw (RCHandlerException(e.what()));
   }
-  bootBasf2();
+  bootBasf2(obj);
 }
 
 void COPPERCallback::start(int expno, int runno) throw(RCHandlerException)
@@ -147,7 +173,6 @@ void COPPERCallback::recover() throw(RCHandlerException)
 void COPPERCallback::abort() throw(RCHandlerException)
 {
   m_con.abort();
-  setState(RCState::NOTREADY_S);
 }
 
 void COPPERCallback::logging(bool err, LogFile::Priority pri,
@@ -167,17 +192,27 @@ void COPPERCallback::logging(bool err, LogFile::Priority pri,
 
 void COPPERCallback::timeout(NSMCommunicator&) throw()
 {
-  RCState state = getNode().getState();
-  if (!m_dummymode) {
-    m_ttrx.monitor();
-    m_copper.monitor();
+  try {
+    RCState state = getNode().getState();
+    try {
+      m_ttrx.monitor();
+    } catch (const IOException& e) {
+      return;
+    }
+    try {
+      m_copper.monitor();
+    } catch (const IOException& e) {
+      return;
+    }
     if (state != RCState::NOTREADY_S && state.isStable()) {
       logging(m_copper.isFifoEmpty(), LogFile::NOTICE, "COPPER FIFO empty");
       logging(m_copper.isFifoFull(), LogFile::WARNING, "COPPER FIFO full");
       logging(m_copper.isLengthFifoFull(), LogFile::WARNING, "COPPER length FIFO full");
       for (int i = 0; i < 4; i++) {
-        if (m_config.useHSLB(i)) {
-          HSLBController hslb(m_hslb[i]);
+        int used = 0;
+        get(StringUtil::form("hslb[%d].used", i), used);
+        if (used) {
+          HSLB& hslb(m_hslb[i]);
           hslb.monitor();
           logging(hslb.isBelle2LinkDown(), LogFile::ERROR,
                   "HSLB %c Belle2 link down", (char)(i + 'a'));
@@ -192,48 +227,58 @@ void COPPERCallback::timeout(NSMCommunicator&) throw()
       logging(m_ttrx.isBelle2LinkError(), LogFile::ERROR, "TTRX Belle2 link error");
       logging(m_ttrx.isLinkUpError(), LogFile::ERROR, "TTRX Link up error");
     }
-  }
-  NSMData& data(getData());
-  if (data.isAvailable()) {
-    ronode_status* nsm = (ronode_status*)data.get();
-    if (m_flow.isAvailable()) {
-      ronode_status& status(m_flow.monitor());
-      memcpy(nsm, &status, sizeof(ronode_status));
+    NSMData& data(getData());
+    if (data.isAvailable()) {
+      ronode_status* nsm = (ronode_status*)data.get();
+      if (m_flow.isAvailable()) {
+        ronode_status& status(m_flow.monitor());
+        memcpy(nsm, &status, sizeof(ronode_status));
+      }
+      double loads[3];
+      if (getloadavg(loads, 3) > 0) {
+        nsm->loadavg = (float)loads[0];
+      } else {
+        nsm->loadavg = -1;
+      }
+      data.flush();
     }
-    double loads[3];
-    if (getloadavg(loads, 3) > 0) {
-      nsm->loadavg = (float)loads[0];
-    } else {
-      nsm->loadavg = -1;
-    }
-    data.flush();
+  } catch (const std::exception& e) {
+
   }
 }
 
-void COPPERCallback::bootBasf2() throw(RCHandlerException)
+void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
 {
   if (m_con.isAlive()) return;
-  int flag = 0;
-  for (size_t i = 0; i < 4; i++) {
-    if (m_config.useHSLB(i)) flag += 1 << i;
+  std::string script;
+  try {
+    int flag = 0;
+    for (size_t i = 0; i < 4; i++) {
+      const DBObject& o_hslb(obj.getObject("hslb", i));
+      if (o_hslb.getBool("use")) flag += 1 << i;
+    }
+    m_con.clearArguments();
+    m_con.setExecutable("basf2");
+    script = obj.getObject("basf2").getText("script");
+    m_con.addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+                      script.c_str());
+    m_con.addArgument(obj.getText("hostname"));
+    std::string copperid_s = obj.getText("copperid");
+    int copperid = atoi(copperid_s.substr(4).c_str());
+    int detectorid = atoi(copperid_s.substr(3).c_str()) / 1000;
+    char str[64];
+    sprintf(str, "0x%d000000", detectorid);
+    copperid += strtol(str, NULL, 0);
+    m_con.addArgument(StringUtil::form("%d", copperid));
+    m_con.addArgument(StringUtil::form("%d", flag));
+    m_con.addArgument("1");
+    m_con.addArgument("cprbasf2_" + getNode().getName());
+  } catch (const std::out_of_range& e) {
+    throw (RCHandlerException(e.what()));
   }
-  m_con.clearArguments();
-  m_con.setExecutable("basf2");
-  m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                                     m_config.getBasf2Script().c_str()));
-  m_con.addArgument(m_config.getHostname());
-  int copperid = atoi(m_config.getCopperId().substr(4).c_str());
-  int detectorid = atoi(m_config.getCopperId().substr(3).c_str()) / 1000;
-  char str[64];
-  sprintf(str, "0x%d000000", detectorid);
-  copperid += strtol(str, NULL, 0);
-  m_con.addArgument(StringUtil::form("%d", copperid));
-  m_con.addArgument(StringUtil::form("%d", flag));
-  m_con.addArgument("1");
-  m_con.addArgument("cprbasf2_" + getNode().getName());
   if (!m_con.load(10)) {
     LogFile::debug("load timeout");
-    throw (RCHandlerException("Failed to start readout : " + m_config.getBasf2Script()));
+    throw (RCHandlerException("Failed to start readout : " + script));
   }
   LogFile::debug("load succeded");
 }
@@ -242,8 +287,9 @@ bool COPPERCallback::isError() throw()
 {
   if (m_copper.isError()) return true;
   for (int i = 0; i < 4; i++) {
-    if (m_config.useHSLB(i) && m_hslb[i].isError())
-      return true;
+    int used = 0;
+    get(StringUtil::form("hslb[%d].used", i), used);
+    if (used && m_hslb[i].isError()) return true;
   }
   if (m_ttrx.isBelle2LinkError())
     return true;

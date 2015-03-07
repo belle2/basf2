@@ -1,9 +1,11 @@
 #ifndef _Belle2_RunControlMasterCallback_h
 #define _Belle2_RunControlMasterCallback_h
 
-#include "daq/slc/apps/runcontrold/RunControlCallback.h"
+#include <daq/slc/runcontrol/RCCallback.h>
 
 namespace Belle2 {
+
+  class RunControlCallback;
 
   class RunControlMasterCallback : public RCCallback {
 

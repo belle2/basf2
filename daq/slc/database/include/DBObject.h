@@ -43,6 +43,14 @@ namespace Belle2 {
     void addObject(const std::string& name, const DBObject& obj) throw();
 
   public:
+    DBObject& operator()(const std::string& name, int index = 0) throw(std::out_of_range) {
+      return getObject(name, index);
+    }
+    const DBObject& operator()(const std::string& name, int index = 0) const throw(std::out_of_range) {
+      return getObject(name, index);
+    }
+
+  public:
     StringList getNameList(bool isfull) const throw();
     void print(bool isfull = true) const throw();
     void printSQL(const std::string& table, std::ostream& out,

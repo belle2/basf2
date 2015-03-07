@@ -1,4 +1,5 @@
 #include "daq/slc/apps/runcontrold/RunControlMasterCallback.h"
+#include "daq/slc/apps/runcontrold/RunControlCallback.h"
 
 #include <daq/slc/runcontrol/RCNodeDaemon.h>
 

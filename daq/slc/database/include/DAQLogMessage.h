@@ -11,6 +11,8 @@
 
 namespace Belle2 {
 
+  class NSMMessage;
+
   class DAQLogMessage : public DBObject {
 
   private:
@@ -34,6 +36,7 @@ namespace Belle2 {
     virtual ~DAQLogMessage() throw() {}
 
   public:
+    bool read(const NSMMessage& msg) throw();
     void setPriority(const std::string& priority) throw();
     void setPriority(LogFile::Priority priority) throw();
     void setNodeName(const std::string& name) throw();

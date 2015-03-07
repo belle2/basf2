@@ -57,7 +57,6 @@ namespace Belle2 {
   RCHANDLER_TEXT_GET(NSMVHandlerRCState);
   RCHANDLER_TEXT(NSMVHandlerRCRequest);
   RCHANDLER_INT(NSMVHandlerRCUsed);
-  RCHANDLER_INT(NSMVHandlerRCExcluded);
 
 }
 

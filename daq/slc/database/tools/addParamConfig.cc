@@ -72,12 +72,14 @@ int main(int argc, char** argv)
       cobj.setIndex(index);
       obj_out.addObject(parname, cobj);
     } else {
-      DBObjectLoader::createDB(db, tablename, cobj);
+      cobj.print();
+      //DBObjectLoader::createDB(db, tablename, cobj);
     }
     index++;
   }
   if (argc > 4) {
-    DBObjectLoader::createDB(db, tablename, obj_out);
+    obj_out.print();
+    //DBObjectLoader::createDB(db, tablename, obj_out);
   }
   return 0;
 }

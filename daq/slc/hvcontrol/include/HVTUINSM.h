@@ -58,7 +58,7 @@ namespace Belle2 {
         NSMVar var = v;
         var.setId(0);
         var.setRevision(0);
-        var.setNodeId(0);
+        var.setNode("");
         NSMCallback::vset(com, var);
       }
 

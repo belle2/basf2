@@ -18,6 +18,8 @@ extern "C" {
 #include <nsm2/nsm2.h>
 }
 
+#include <math.h>
+
 #include <vector>
 #include <map>
 
@@ -33,7 +35,7 @@ namespace Belle2 {
     friend class NSMData;
 
   public:
-    static NSMCommunicator& select(int sec) throw(IOException);
+    static NSMCommunicator& select(double sec) throw(IOException);
     static NSMCommunicator& connected(const std::string& node)
     throw(NSMNotConnectedException);
     static NSMCommunicatorList& get() throw() { return g_comm; }
@@ -69,6 +71,7 @@ namespace Belle2 {
     int getPort() throw() { return m_port; }
     NSMCallback& getCallback() throw(std::out_of_range);
     bool isConnected(const std::string& node) throw();
+    const std::string getNodeNameById(int id) throw(NSMHandlerException);
 
   private:
     NSMcontext* getContext() { return m_nsmc; }

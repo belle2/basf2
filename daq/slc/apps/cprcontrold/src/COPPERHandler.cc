@@ -67,44 +67,46 @@ bool NSMVHandlerTTRXLinkUpError::handleGetInt(int& val)
   return true;
 }
 
-bool NSMVHandlerDownloadTTRXFirmware::handleSetInt(int val)
+bool NSMVHandlerTTRXFirmware::handleSetText(const std::string& firmware)
 {
-  if (val > 0) {
-    LogFile::debug("booting ttrx");
-    std::string firmware;
-    m_callback.get("setup.ttrx_firmware", firmware);
-    if (File::exist(firmware)) {
-      return m_callback.getTTRX().boot(firmware);
-    } else {
-      LogFile::error("TTRX firmware %s not exists", firmware.c_str());
-    }
+  if (File::exist(firmware)) {
+    return m_callback.getTTRX().boot(firmware);
+  } else {
+    LogFile::error("TTRX firmware %s not exists", firmware.c_str());
   }
-  return true;
+  return false;
 }
 
-bool NSMVHandlerDownloadHSLBFirmware::handleSetInt(int val)
+bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
 {
-  if (val > 0) {
-    LogFile::debug("booting hslb:%c", (m_hslb + 'a'));
-    std::string firmware;
-    m_callback.get("setup.hslb_firmware", firmware);
-    if (File::exist(firmware)) {
-      return m_callback.getHSLB(m_hslb).bootfpga(firmware);
-    } else {
-      LogFile::error("HSLB firmware %s not exists", firmware.c_str());
-    }
+  if (File::exist(firmware)) {
+    return m_callback.getHSLB(m_hslb).bootfpga(firmware);
+  } else {
+    LogFile::error("HSLB firmware %s not exists", firmware.c_str());
   }
-  return true;
+  return false;
+}
+
+bool NSMVHandlerFEEStream::handleSetText(const std::string& stream)
+{
+  if (File::exist(stream)) {
+    return m_callback.getHSLB(m_hslb).bootfpga(stream.c_str());
+  } else {
+    LogFile::error("Stream file %s not exists", stream.c_str());
+  }
+  return false;
 }
 
 bool NSMVHandlerHSLBRegValue::handleSetInt(int val)
 {
   try {
-    if (m_adr == 0) {
-      m_callback.get(StringUtil::replace(getName(), ".reg", ".adr"), m_adr);
+    std::string vname = StringUtil::replace(getName(), ".val", ".adr");
+    vname = StringUtil::replace(getName(), "par", "reg");
+    if (m_adr < 0) {
+      m_callback.get(vname, m_adr);
     }
     if (m_adr > 0) {
-      LogFile::debug("wrting %d-th HSLB : %d >> %s=%d", m_hslb, val, getName().c_str(), m_adr);
+      LogFile::debug("wrting %d-th HSLB : %d >> %s=%d", m_hslb, val, vname.c_str(), m_adr);
       return true;
     }
   } catch (const std::exception& e) {
@@ -115,15 +117,62 @@ bool NSMVHandlerHSLBRegValue::handleSetInt(int val)
 bool NSMVHandlerHSLBRegValue::handleGetInt(int& val)
 {
   try {
-    if (m_adr == 0) {
-      m_callback.get(StringUtil::replace(getName(), ".reg", ".adr"), m_adr);
+    std::string vname = StringUtil::replace(getName(), ".val", ".adr");
+    vname = StringUtil::replace(getName(), "par", "reg");
+    if (m_adr < 0) {
+      m_callback.get(vname, m_adr);
     }
     if (m_adr > 0) {
       val = rand() % 256;
-      LogFile::debug("reading %d-th HSLB : %d << %s=%d", m_hslb, val, getName().c_str(), m_adr);
+      LogFile::debug("reading %d-th HSLB : %d (%s=%d)", m_hslb, val, vname.c_str(), m_adr);
       return true;
     }
   } catch (const std::exception& e) {
   }
   return false;
 }
+
+bool NSMVHandlerHSLBLinkFee::handleSetInt(int val)
+{
+  if (val > 0) {
+    LogFile::info("link FEE (HSLB:%c)", m_hslb + 'a');
+    return m_callback.getHSLB(m_hslb).linkfee();
+  } else {
+    LogFile::error("Failed to link FEE (HSLB:%c)", m_hslb + 'a');
+  }
+  return false;
+}
+
+bool NSMVHandlerHSLBUnLinkFee::handleSetInt(int val)
+{
+  if (val > 0) {
+    LogFile::info("unlink FEE (HSLB:%c)", m_hslb + 'a');
+    return m_callback.getHSLB(m_hslb).linkfee();
+  } else {
+    LogFile::error("Failed to unlink FEE (HSLB:%c)", m_hslb + 'a');
+  }
+  return false;
+}
+
+bool NSMVHandlerHSLBTrgOnFee::handleSetInt(int val)
+{
+  if (val > 0) {
+    LogFile::info("trgon FEE (HSLB:%c)", m_hslb + 'a');
+    return m_callback.getHSLB(m_hslb).trgonfee();
+  } else {
+    LogFile::error("Failed to trig on FEE (HSLB:%c)", m_hslb + 'a');
+  }
+  return false;
+}
+
+bool NSMVHandlerHSLBTrgOffFee::handleSetInt(int val)
+{
+  if (val > 0) {
+    LogFile::info("trgoff FEE (HSLB:%c)", m_hslb + 'a');
+    return m_callback.getHSLB(m_hslb).trgofffee();
+  } else {
+    LogFile::error("Failed to trg off FEE (HSLB:%c)", m_hslb + 'a');
+  }
+  return false;
+}
+

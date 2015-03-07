@@ -53,7 +53,7 @@ bool ROCallback::initialize(const DBObject& obj) throw()
 bool ROCallback::configure(const DBObject& obj) throw()
 {
   try {
-    const DBObject& stream0(obj.getObject("stream0"));
+    const DBObject& stream0(obj("stream0"));
     const DBObjectList& senders(stream0.getObjects("sender"));
     m_eb0.init(this, 0, "eb0", obj);
     add(new NSMVHandlerROPID(m_eb0, "eb0.pid"));
@@ -132,13 +132,6 @@ void ROCallback::abort() throw(RCHandlerException)
     m_stream0[i].abort();
   }
   m_eb0.abort();
-  setState(RCState::NOTREADY_S);
-}
-
-void ROCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
-{
-  LogFile::debug("ROCallback::vset %s", var.getName().c_str());
-  NSMCallback::vset(com, var);
 }
 
 void ROCallback::timeout(NSMCommunicator&) throw()

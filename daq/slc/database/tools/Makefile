@@ -10,7 +10,8 @@ LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
 LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -lncurses
 LIBS    += -L$(PGSQL_LIB_PATH)/lib -lpq
-LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database 
+LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_nsm -ldaq_slc_database
+LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT
 CFLAGS  += -I$(INCDIR) -I$(PGSQL_LIB_PATH)/include -I.

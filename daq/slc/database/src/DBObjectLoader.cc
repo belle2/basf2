@@ -17,6 +17,11 @@ using namespace Belle2;
 DBObject DBObjectLoader::load(const std::string& filename)
 {
   ConfigFile config(filename);
+  return load(config);
+}
+
+DBObject DBObjectLoader::load(ConfigFile& config)
+{
   const std::string nodename = config.get("nodename");
   const std::string configname = config.get("config");
   DBObject obj;
@@ -55,6 +60,7 @@ DBObject DBObjectLoader::load(const std::string& filename)
       } else if (StringUtil::isdigit(value)) {
         type = DBField::INT;
       } else if (StringUtil::split(value, '.').size() < 3 &&
+                 StringUtil::isdigit(StringUtil::replace(value, ".", "")) &&
                  sscanf(value.c_str(), "%f", &vf) == 1) {
         type = DBField::FLOAT;
       } else {
@@ -122,10 +128,10 @@ DBObject DBObjectLoader::load(DBInterface& db,
         table_in = ss[0];
         config_in = ss[1];
       }
-      if (config_in.find("@") == std::string::npos) {
-        const std::string nodename = StringUtil::split(configname, '@')[0];
-        config_in = nodename + "@" + config_in;
-      }
+      //if (config_in.find("@") == std::string::npos) {
+      //  const std::string nodename = StringUtil::split(configname, '@')[0];
+      //  config_in = nodename + "@" + config_in;
+      //}
       if (table_in == tablename && config_in == configname) {
         LogFile::error("recursive call of %s/%s",
                        table_in.c_str(), config_in.c_str());
@@ -239,7 +245,7 @@ bool DBObjectLoader::setObject(DBObject& obj, StringList& str,
           cobj = DBObjectLoader::load(*db, table_in, config_in, true);
         }
         if (cobj.hasObject(name)) {
-          cobj.getObject(name).setPath(table_in + "@" + config_in);
+          cobj.getObject(name).setPath(table_in + "/" + config_in);
           obj.addObjects(name, cobj.getObjects(name));
         } else {
           cobj.setName(name);

@@ -31,7 +31,7 @@ RCCallback::RCCallback(int timeout) throw()
   m_showall = true;
 }
 
-void RCCallback::init(NSMCommunicator& com) throw()
+void RCCallback::init(NSMCommunicator&) throw()
 {
   NSMNode& node(getNode());
   node.setState(RCState::NOTREADY_S);
@@ -46,8 +46,21 @@ void RCCallback::init(NSMCommunicator& com) throw()
     const std::string config = node.getName() + "@RC:" + m_runtype;
     if (getDB()) {
       DBInterface& db(*getDB());
-      m_obj = DBObjectLoader::load(db, m_table, config, false);
+      m_obj = DBObjectLoader::load(db, m_table, config, m_showall);
       db.close();
+    } else if (m_provider_host.size() > 0 && m_provider_port > 0) {
+      TCPSocket socket(m_provider_host, m_provider_port);
+      try {
+        socket.connect();
+        TCPSocketWriter writer(socket);
+        writer.writeString(m_table + "/" + config);
+        TCPSocketReader reader(socket);
+        m_obj.readObject(reader);
+      } catch (const IOException& e) {
+        socket.close();
+        throw (IOException("Socket connection error : %s ", e.what()));
+      }
+      socket.close();
     } else {
       m_obj = DBObjectLoader::load("dbconf/" + m_table + "/" + config);
     }
@@ -127,19 +140,22 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
 
 void RCCallback::setState(const RCState& state) throw()
 {
-  LogFile::debug("state transit : %s >> %s",
-                 getNode().getState().getLabel(), state.getLabel());
-  getNode().setState(state);
-  try {
-    set("rcstate", state.getLabel());
-  } catch (const std::exception& e) {
-    LogFile::error(e.what());
+  if (getNode().getState() != state) {
+    LogFile::debug("state transit : %s >> %s",
+                   getNode().getState().getLabel(), state.getLabel());
+    getNode().setState(state);
+    try {
+      set("rcstate", state.getLabel());
+    } catch (const std::exception& e) {
+      LogFile::error(e.what());
+    }
   }
 }
 
 void RCCallback::dbload(NSMCommunicator& com)
 throw(IOException)
 {
+  remove(m_obj);
   const NSMMessage& msg(com.getMessage());
   if (msg.getLength() > 0 && strlen(msg.getData()) > 0) {
     StringList s = StringUtil::split(msg.getData(), '/');
@@ -160,37 +176,29 @@ throw(IOException)
     if (getDB()) {
       DBInterface& db(*getDB());
       try {
-        m_obj = DBObjectLoader::load(db, table, config, false);
+        m_obj = DBObjectLoader::load(db, table, config, m_showall);
         db.close();
       } catch (const DBHandlerException& e) {
         db.close();
         throw (e);
       }
-    } else {
-      const std::string hostname = com.getNodeHost(msg.getNodeName());
-      int port = msg.getParam(0);
-      if (port > 0) {
-        TCPSocket socket(hostname, port);
-        try {
-          socket.connect();
-          TCPSocketWriter writer(socket);
-          writer.writeString(table + "/" + config);
-          TCPSocketReader reader(socket);
-          m_obj.readObject(reader);
-        } catch (const IOException& e) {
-          socket.close();
-          throw (IOException("Socket connection error : %s ", e.what()));
-        }
+    } else if (m_provider_host.size() > 0 && m_provider_port > 0) {
+      TCPSocket socket(m_provider_host, m_provider_port);
+      try {
+        socket.connect();
+        TCPSocketWriter writer(socket);
+        writer.writeString(table + "/" + config);
+        TCPSocketReader reader(socket);
+        m_obj.readObject(reader);
+      } catch (const IOException& e) {
         socket.close();
+        throw (IOException("Socket connection error : %s ", e.what()));
       }
+      socket.close();
     }
   } else {
     LogFile::warning("No DB objects was loaded");
   }
   m_obj.print(m_showall);
-  reset();
-  add(new NSMVHandlerText("rcstate", true, false, getNode().getState().getLabel()));
-  add(new NSMVHandlerText("rcrequest", true, false, ""));
-  add(new NSMVHandlerText("rcconfig", true, false, m_obj.getName()));
   add(m_obj);
 }

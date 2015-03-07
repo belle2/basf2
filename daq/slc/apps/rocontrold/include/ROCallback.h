@@ -28,7 +28,6 @@ namespace Belle2 {
     virtual void abort() throw(RCHandlerException);
     virtual void timeout(NSMCommunicator& com) throw();
     virtual void term() throw();
-    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
 
   public:
     const NSMNode& getRC() const { return m_runcontrol; }

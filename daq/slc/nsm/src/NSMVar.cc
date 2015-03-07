@@ -22,7 +22,6 @@ NSMVar::NSMVar(const std::string& name, const std::vector<int>& value)
   m_value = v;
   m_id = 0;
   m_rev = 0;
-  m_nodeid = 0;
 }
 
 NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
@@ -36,7 +35,6 @@ NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
   m_value = v;
   m_id = 0;
   m_rev = 0;
-  m_nodeid = 0;
 }
 
 const NSMVar& NSMVar::operator=(const std::vector<int>& val)
@@ -93,14 +91,13 @@ const char* NSMVar::getTypeLabel() const
 
 void NSMVar::copy(const std::string& name,
                   Type type, int len, const void* value,
-                  int id, int rev, int nodeid)
+                  int id, int rev)
 {
   m_name = name;
   m_type = type;
   m_len = len;
   m_id = id;
   m_rev = rev;
-  m_nodeid = nodeid;
   int s = size();
   if (s > 0) {
     m_value = malloc(s);
@@ -120,12 +117,12 @@ NSMVar::~NSMVar() throw()
 
 void NSMVar::readObject(Reader& reader) throw(IOException)
 {
+  m_node = reader.readString();
   m_name = reader.readString();
   m_type = (Type)reader.readInt();
   m_len = reader.readInt();
   m_id = reader.readInt();
   m_rev = reader.readInt();
-  m_nodeid = reader.readInt();
   int len = (m_len > 0) ? m_len : 1;
   int s = size();
   if (s > 0) {
@@ -158,12 +155,12 @@ void NSMVar::readObject(Reader& reader) throw(IOException)
 
 void NSMVar::writeObject(Writer& writer) const throw(IOException)
 {
+  writer.writeString(m_node);
   writer.writeString(m_name);
   writer.writeInt((int)m_type);
   writer.writeInt(m_len);
   writer.writeInt(m_id);
   writer.writeInt(m_rev);
-  writer.writeInt(m_nodeid);
   int len = (m_len > 0) ? m_len : 1;
   switch (m_type) {
     case INT: {

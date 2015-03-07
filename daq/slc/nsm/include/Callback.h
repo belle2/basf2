@@ -31,6 +31,9 @@ namespace Belle2 {
     int reset();
     int add(const DBObject& obj);
     int add(NSMVHandler* handler);
+    void remove(const std::string& node, const std::string& name);
+    void remove(const std::string& name) { remove("", name); }
+    void remove(const DBObject& obj);
     NSMVHandlerList& getHandlers() { return m_handler; }
     NSMVHandler& getHandler(const std::string& name) throw(std::out_of_range) {
       return getHandler("", name);

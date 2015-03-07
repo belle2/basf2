@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <cstdlib>
 
 using namespace Belle2;
 
@@ -47,9 +48,10 @@ void LogFile::open(const std::string& filename, Priority threshold)
 {
   if (!g_opened) {
     ConfigFile config("slowcontrol");
+    system(("mkdir -p " + config.get("logfile.dir") + "/" + filename).c_str());
     g_filename = filename;
-    g_filepath = config.get("logfile.dir") + "/" + filename
-                 + Date().toString(".%Y.%m.%d.log");
+    g_filepath = config.get("logfile.dir") + "/" + filename + "/"
+                 + Date().toString("%Y.%m.%d.log");
     g_threshold = threshold;
     g_opened = true;
     open();
@@ -147,8 +149,8 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
     g_stream.close();
     ConfigFile config("slowcontrol");
     rename(g_filepath.c_str(),
-           (config.get("logfile.dir") + "/" + g_filename +
-            date.toString(".%Y.%m.%d.%H.%M.log")).c_str());
+           (config.get("logfile.dir") + "/" + g_filename + "/" +
+            date.toString("%Y.%m.%d.%H.%M.log")).c_str());
     g_mutex.unlock();
     open();
     g_mutex.lock();

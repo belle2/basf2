@@ -1,6 +1,8 @@
 #include "daq/slc/database/DAQLogMessage.h"
 
-#include "daq/slc/base/Date.h"
+#include <daq/slc/nsm/NSMMessage.h>
+
+#include <daq/slc/base/Date.h>
 
 using namespace Belle2;
 
@@ -45,6 +47,18 @@ DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()
   addText("nodename", "");
   addChar("priority", 0);
   addText("message", "");
+}
+
+bool DAQLogMessage::read(const NSMMessage& msg) throw()
+{
+  if (msg.getLength() > 0 && msg.getNParams() > 2) {
+    setPriority((LogFile::Priority)msg.getParam(0));
+    setDate(msg.getParam(1));
+    setNodeName(msg.getNodeName());
+    setMessage(msg.getData());
+    return true;
+  }
+  return false;
 }
 
 void DAQLogMessage::setPriority(LogFile::Priority priority) throw()

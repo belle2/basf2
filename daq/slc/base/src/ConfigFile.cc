@@ -12,6 +12,9 @@ using namespace Belle2;
 const std::string ConfigFile::getFilePath(const std::string& filename)
 {
   std::string file_path;
+  if (filename.find_last_of(".conf") == filename.size() - 1) {
+    return filename;
+  }
   if (filename.at(0) != '/') {
     char* path = getenv("BELLE2_DAQ_SLC");
     if (path == NULL) {
@@ -40,9 +43,15 @@ void ConfigFile::read(const std::string& filename, bool overload)
 {
   if (filename.size() == 0) return;
   std::ifstream fin(getFilePath(filename).c_str());
+  read(fin, overload);
+  fin.close();
+}
+
+void ConfigFile::read(std::istream& is, bool overload)
+{
   std::string s;
   std::string dir = "";
-  while (fin && getline(fin, s)) {
+  while (is && getline(is, s)) {
     if (s.size() == 0 || s.at(0) == '#') continue;
     std::vector<std::string> str_v = StringUtil::split(s, ':');
     if (str_v.size() >= 2) {
@@ -90,7 +99,6 @@ void ConfigFile::read(const std::string& filename, bool overload)
       add(label, ss.str(), overload);
     }
   }
-  fin.close();
 }
 
 void ConfigFile::clear()

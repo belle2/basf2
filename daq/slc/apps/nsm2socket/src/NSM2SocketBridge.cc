@@ -36,7 +36,7 @@ void NSM2SocketBridge::run() throw()
     NSMNode node(m_reader.readString());
     std::string host = m_reader.readString();
     int port = m_reader.readInt();
-    LogFile::open("nsm2socket." + StringUtil::tolower(node.getName()));
+    LogFile::open("nsm2socket/" + StringUtil::tolower(node.getName()));
     m_callback = new NSM2SocketCallback(node);
     m_callback->setBridge(this);
     PThread(new NSMNodeDaemon(m_callback, host, port));

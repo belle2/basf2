@@ -2,8 +2,6 @@
 #include <daq/slc/nsm/NSMData.h>
 #include <daq/slc/nsm/NSMCommunicator.h>
 
-#include <daq/slc/apps/storagerd/storage_status.h>
-
 #include <daq/slc/system/LogFile.h>
 
 #include <unistd.h>
@@ -17,7 +15,7 @@ int main(int argc, char** argv)
     return 1;
   }
   NSMData data(argv[1], argv[2], atoi(argv[3]));
-  data.parse();
+  data.parse(NULL, true);
   data.print();
   return 0;
 }

@@ -36,7 +36,7 @@ void HVTUINSM::initNSM(const std::string& cfilename,
                          cfile.get("database.password"),
                          cfile.getInt("database.port"));
   const std::string nodename = cfile.get("nsm.nodename");
-  LogFile::open("hvcui." + cuiname, LogFile::ERROR);
+  LogFile::open("hvcui/" + cuiname, LogFile::ERROR);
   StringList confignames = StringUtil::split(cfile.get("hv.confignames"), ',');
   const std::string configname = (StringUtil::find(confignames[0], "@")) ?
                                  confignames[0] : nodename + "@" + confignames[0];

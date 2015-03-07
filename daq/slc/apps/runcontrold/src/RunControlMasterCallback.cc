@@ -1,8 +1,7 @@
 #include "daq/slc/apps/runcontrold/RunControlMasterCallback.h"
 
-#include <daq/slc/nsm/NSMCommunicator.h>
+#include "daq/slc/apps/runcontrold/RunControlCallback.h"
 
-#include <cstring>
 
 using namespace Belle2;
 

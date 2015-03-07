@@ -102,6 +102,7 @@ bool StringUtil::find(const std::string& s, const std::string& str)
 
 bool StringUtil::isdigit(const std::string& s)
 {
+  if (s.find("0x") == 0) return true;
   for (size_t i = 0; i < s.size(); i++) {
     if (!::isdigit(s.at(i))) return false;
   }

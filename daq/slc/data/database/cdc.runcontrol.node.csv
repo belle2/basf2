@@ -1,3 +1,0 @@
- nodename,  config, used,                   runtype, type, dbmode, sequential
-   CDC_RC, default, true,   CPR002/copper/1/CDC:V03,  daq,      1,      false
-   CDC_RC, default, true, ROPC01/ropc/1/CDC:default,  daq,      1,       true

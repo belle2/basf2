@@ -22,7 +22,7 @@ namespace Belle2 {
     friend class RCMonitor;
 
   public:
-    RCCallback(int timeout = 5) throw();
+    RCCallback(int timeout = 4) throw();
     virtual ~RCCallback() throw() {}
 
   public:
@@ -50,6 +50,10 @@ namespace Belle2 {
     void setAutoReply(bool auto_reply) { m_auto = auto_reply; }
     void setDB(DBInterface* db, const std::string& table);
     DBInterface* getDB() { return m_db; }
+    void setProvider(const std::string& host, int port) {
+      m_provider_host = host;
+      m_provider_port = port;
+    }
 
   private:
     void dbload(NSMCommunicator& com) throw(IOException);
@@ -61,6 +65,8 @@ namespace Belle2 {
     std::string m_table;
     bool m_auto;
     std::string m_runtype;
+    std::string m_provider_host;
+    int m_provider_port;
 
   protected:
     bool m_showall;

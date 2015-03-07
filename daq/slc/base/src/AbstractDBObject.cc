@@ -73,7 +73,7 @@ void AbstractDBObject::add(const std::string& name, DBField::Property pro) throw
 }
 
 const std::string AbstractDBObject::getValueText(const std::string& name)
-const throw()
+const throw(std::out_of_range)
 {
   if (hasField(name)) {
     switch (getProperty(name).getType()) {
@@ -88,11 +88,11 @@ const throw()
       default: break;
     }
   }
-  return "";
+  throw (std::out_of_range(name + " not found"));
 }
 
 void AbstractDBObject::setValueText(const std::string& name,
-                                    const std::string& value) throw()
+                                    const std::string& value) throw(std::out_of_range)
 {
   if (hasField(name)) {
     switch (getProperty(name).getType()) {
@@ -121,6 +121,8 @@ void AbstractDBObject::setValueText(const std::string& name,
       case DBField::TEXT:       setText(name, value); break;
       default: break;
     }
+    return;
   }
+  throw (std::out_of_range(name + " not found"));
 }
 

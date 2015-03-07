@@ -31,7 +31,7 @@ namespace Belle2 {
     virtual bool configure(const DBObject& obj) throw();
     virtual void ok(const char* nodename, const char* data) throw();
     virtual void error(const char* nodename, const char* data) throw();
-    virtual void log(const DAQLogMessage&) throw();
+    virtual void log(const char* nodename, const DAQLogMessage& lmsg, bool recorded) throw();
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
     virtual void stop() throw(RCHandlerException);
@@ -88,61 +88,6 @@ namespace Belle2 {
       bool m_enabled;
 
     };
-
-  private:
-    class ConfigProvider {
-    public:
-      ConfigProvider(DBInterface& db, const std::string& dbtable, int port)
-        : m_db(db), m_dbtable(dbtable), m_port(port) {}
-
-    public:
-      void run();
-
-    private:
-      DBInterface& m_db;
-      const std::string m_dbtable;
-      int m_port;
-    };
-
-  private:
-    static bool handleGetNNodes(Callback* callback, int& v,
-                                const std::string& name, const void* pdata);
-    static bool handleGetExpNumber(Callback* callback, int& v,
-                                   const std::string& name, const void* pdata);
-    static bool handleGetRunNumber(Callback* callback, int& v,
-                                   const std::string& name, const void* pdata);
-    static bool handleGetSubNumber(Callback* callback, int& v,
-                                   const std::string& name, const void* pdata);
-    static bool handleGetTStart(Callback* callback, int& v,
-                                const std::string& name, const void* pdata);
-    static bool handleGetConfig(Callback* callback, std::string& v,
-                                const std::string& name, const void* pdata);
-    static bool handleGetState(Callback* callback, std::string& v,
-                               const std::string& name, const void* pdata);
-    static bool handleGetOperators(Callback* callback, std::string& v,
-                                   const std::string& name, const void* pdata);
-    static bool handleGetComment(Callback* callback, std::string& v,
-                                 const std::string& name, const void* pdata);
-    static bool handleGetName(Callback* callback, std::string& v,
-                              const std::string& name, const void* pdata);
-    static bool handleGetUsed(Callback* callback, int& v,
-                              const std::string& name, const void* pdata);
-    static bool handleGetExcluded(Callback* callback, int& v,
-                                  const std::string& name, const void* pdata);
-    static bool handleSetExpNumber(Callback* callback, int v,
-                                   const std::string& name, const void* pdata);
-    static bool handleSetConfig(Callback* callback, const std::string& v,
-                                const std::string& name, const void* pdata);
-    static bool handleSetOperators(Callback* callback, const std::string& v,
-                                   const std::string& name, const void* pdata);
-    static bool handleSetComment(Callback* callback, const std::string& v,
-                                 const std::string& name, const void* pdata);
-    static bool handleSetRequest(Callback* callback, const std::string& v,
-                                 const std::string& name, const void* pdata);
-    static bool handleSetUsed(Callback* callback, int v,
-                              const std::string& name, const void* pdata);
-    static bool handleSetExcluded(Callback* callback, int v,
-                                  const std::string& name, const void* pdata);
 
   };
 

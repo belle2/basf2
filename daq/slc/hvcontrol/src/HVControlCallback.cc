@@ -136,9 +136,9 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
       float vmon = getVoltageMonitor(crateid, slot, ch);
       float cmon = getCurrentMonitor(crateid, slot, ch);
       std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
-      notify(NSMVar(vname + "state", state));
-      notify(NSMVar(vname + "vmon", vmon));
-      notify(NSMVar(vname + "cmon", cmon));
+      set(vname + "state", state);
+      set(vname + "vmon", vmon);
+      set(vname + "cmon", cmon);
     }
   }
   update();

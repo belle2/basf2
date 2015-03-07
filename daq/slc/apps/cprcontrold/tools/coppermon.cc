@@ -1,6 +1,6 @@
-#include "daq/slc/apps/cprcontrold/HSLBController.h"
-#include "daq/slc/apps/cprcontrold/COPPERController.h"
-#include "daq/slc/apps/cprcontrold/TTRXController.h"
+#include "daq/slc/copper/HSLB.h"
+#include "daq/slc/copper/COPPER.h"
+#include "daq/slc/copper/TTRX.h"
 
 #include <unistd.h>
 #include <cstdio>
@@ -9,11 +9,11 @@ using namespace Belle2;
 
 int main()
 {
-  COPPERController copper;
+  COPPER copper;
   copper.open();
-  TTRXController ttrx;
+  TTRX ttrx;
   ttrx.open();
-  HSLBController hslb;
+  HSLB hslb;
   hslb.open(0);
 
   while (true) {

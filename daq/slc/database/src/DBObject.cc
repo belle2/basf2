@@ -199,7 +199,7 @@ const void* DBObject::getValue(const std::string& name) const throw(std::out_of_
   if (!hasValue(name)) return NULL;
   FieldValueList::const_iterator it = m_value_m.find(name);
   if (it != m_value_m.end()) return it->second;
-  else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
+  else throw (std::out_of_range(StringUtil::form("value %s not found", name.c_str())));
 }
 
 const std::string& DBObject::getText(const std::string& name) const throw(std::out_of_range)
@@ -207,7 +207,7 @@ const std::string& DBObject::getText(const std::string& name) const throw(std::o
   if (!hasText(name)) return m_empty;
   FieldTextList::const_iterator it = m_text_m.find(name);
   if (it != m_text_m.end()) return it->second;
-  else throw (std::out_of_range(StringUtil::form("%s:%d", __FILE__, __LINE__)));
+  else throw (std::out_of_range(StringUtil::form("text %s not found", name.c_str())));
 }
 
 void DBObject::addValue(const std::string& name, const void* value,
@@ -280,7 +280,7 @@ void DBObject::print(bool isfull) const throw()
     if (it->name.size() > length) length = it->name.size();
   }
   printf("#\n");
-  printf("# Config object (confname = %s)\n", getName().c_str());
+  printf("# DB object (confname = %s)\n", getName().c_str());
   printf("#\n");
   printf("\n");
   StringList s = StringUtil::split(getName(), '@');
@@ -377,7 +377,7 @@ const throw()
       }
     } else {
       std::string value = getValueText(name);
-      if (ptype.size() > 0) value = ptype + "(" + value + ")";
+      //if (ptype.size() > 0) value = ptype + "(" + value + ")";
       NameValue nv;
       nv.name = name_out;
       nv.value = value;

@@ -24,39 +24,70 @@ AbstractNSMCallback::AbstractNSMCallback(int timeout) throw()
 
 NSMCommunicator& AbstractNSMCallback::wait(const NSMNode& node,
                                            const NSMCommand& cmd,
-                                           int timeout) throw(IOException)
+                                           double timeout) throw(IOException)
 {
-  try {
-    double t0 = Time().get();
-    while (true) {
-      NSMCommunicator& com(NSMCommunicator::select(timeout));
-      NSMMessage msg = com.getMessage();
-      const std::string reqname = msg.getRequestName();
-      if ((cmd == NSMCommand::UNKNOWN || cmd == reqname) &&
-          (node.getName().size() == 0 || msg.getNodeName() == node.getName())) {
-        return com;
-      }
-      com.getCallback().perform(com);
-      double t = Time().get();
-      if (timeout > 0 && t - t0 >= timeout)
-        break;
+  double t0 = Time().get();
+  double t = Time().get();
+  while (true) {
+    double t1 = (timeout - (t - t0) > 0 ? timeout - (t - t0) : 0);
+    NSMCommunicator& com(NSMCommunicator::select(t1));
+    NSMMessage msg = com.getMessage();
+    const std::string reqname = msg.getRequestName();
+    if ((cmd == NSMCommand::UNKNOWN || cmd == reqname) &&
+        (node.getName().size() == 0 || msg.getNodeName() == node.getName())) {
+      return com;
     }
-  } catch (const TimeoutException& e) {}
-  throw (TimeoutException("timeout : waiting for %s from %s",
-                          cmd.getLabel(), node.getName().c_str()));
+    com.getCallback().perform(com);
+    t = Time().get();
+  }
 }
 
 void AbstractNSMCallback::readVar(const NSMMessage& msg, NSMVar& var)
 {
   const int* pars = msg.getParams();
-  const char* name = msg.getData();
-  const char* value = (msg.getData() + pars[2] + 1);
+  const char* node = msg.getData();
+  const char* name = (msg.getData() + pars[2] + 1);
+  const char* value = (msg.getData() + pars[2] + 1 + pars[3] + 1);
   var = NSMVar(name, (NSMVar::Type)pars[0], pars[1], value);
-  if (msg.getNParams() > 3) {
-    var.setId(pars[3]);
-    var.setRevision(pars[4]);
-    var.setNodeId(pars[5]);
+  var.setNode(node);
+  var.setId(pars[3]);
+  var.setRevision(pars[4]);
+}
+
+bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,
+                              int timeout) throw(IOException)
+{
+  if (handler && node.getName().size() > 0) {
+    NSMVar var(handler->get());
+    const std::string name = var.getName();
+    NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, name));
+    double t0 = Time().get();
+    double t = t0;
+    double tout = timeout;
+    while (true) {
+      double t1 = (tout - (t - t0) > 0 ? tout - (t - t0) : 0);
+      NSMCommunicator& com(wait(node, NSMCommand::VSET, t1));
+      NSMMessage msg = com.getMessage();
+      NSMCommand cmd(msg.getRequestName());
+      if (cmd == NSMCommand::VSET) {
+        if (node.getName() == msg.getData() &&
+            var.getName() == (msg.getData() + msg.getParam(2) + 1)) {
+          readVar(msg, var);
+          handler->setNode(node.getName());
+          bool ret = handler->handleSet(var);
+          if (ret) {
+            add(handler);
+          } else {
+            delete handler;
+          }
+          return ret;
+        }
+        com.getCallback().perform(com);
+        t = Time().get();
+      }
+    }
   }
+  return false;
 }
 
 bool AbstractNSMCallback::get(const NSMNode& node, NSMVar& var,
@@ -66,34 +97,32 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVar& var,
     const std::string name = var.getName();
     NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, name));
     double t0 = Time().get();
+    double t = t0;
+    double tout = timeout;
     while (true) {
-      try {
-        NSMCommunicator& com(wait(node, NSMCommand::VSET, timeout));
-        NSMMessage msg = com.getMessage();
-        NSMCommand cmd(msg.getRequestName());
-        if (cmd == NSMCommand::VSET) {
-          if (var.getName() == msg.getData()) {
-            readVar(msg, var);
-            NSMVHandler* handler = NSMVHandler::create(var);
-            if (handler) {
-              handler->setNode(node.getName());
-              bool ret = handler->handleSet(var);
-              if (ret) {
-                add(handler);
-              } else {
-                delete handler;
-              }
-              return ret;
+      double t1 = (tout - (t - t0) > 0 ? tout - (t - t0) : 0);
+      NSMCommunicator& com(wait(node, NSMCommand::VSET, t1));
+      NSMMessage msg = com.getMessage();
+      NSMCommand cmd(msg.getRequestName());
+      if (cmd == NSMCommand::VSET) {
+        if (node.getName() == msg.getData() &&
+            var.getName() == (msg.getData() + msg.getParam(2) + 1)) {
+          readVar(msg, var);
+          NSMVHandler* handler = NSMVHandler::create(var);
+          if (handler) {
+            handler->setNode(node.getName());
+            bool ret = handler->handleSet(var);
+            if (ret) {
+              add(handler);
+            } else {
+              delete handler;
             }
+            return ret;
           }
-          com.getCallback().perform(com);
         }
-      } catch (const IOException& e) {}
-      double t = Time().get();
-      if (timeout > 0 && t - t0 >= timeout) {
-        throw (TimeoutException("timeout : waiting for VSET:%s from %s",
-                                var.getName().c_str(), node.getName().c_str()));
       }
+      com.getCallback().perform(com);
+      t = Time().get();
     }
   }
   return false;
@@ -105,52 +134,18 @@ bool AbstractNSMCallback::set(const NSMNode& node, const NSMVar& var,
   if (node.getName().size() > 0) {
     NSMCommunicator::send(NSMMessage(node, var));
     double t0 = Time().get();
+    double t = t0;
+    double tout = timeout;
     while (true) {
-      try {
-        NSMCommunicator& com(wait(node, NSMCommand::VREPLY, timeout));
-        NSMMessage msg(com.getMessage());
-        NSMCommand cmd(msg.getRequestName());
-        if (cmd == NSMCommand::VREPLY && var.getName() == msg.getData()) {
-          return msg.getParam(0) > 0;
-        }
-        com.getCallback().perform(com);
-      } catch (const TimeoutException& e) {}
-      double t = Time().get();
-      if (timeout > 0 && t - t0 >= timeout) {
-        throw (TimeoutException("timeout : waiting for VSET:%s from %s",
-                                var.getName().c_str(), node.getName().c_str()));
+      double t1 = (tout - (t - t0) > 0 ? tout - (t - t0) : 0);
+      NSMCommunicator& com(wait(node, NSMCommand::VREPLY, t1));
+      NSMMessage msg(com.getMessage());
+      NSMCommand cmd(msg.getRequestName());
+      if (cmd == NSMCommand::VREPLY && var.getName() == msg.getData()) {
+        return msg.getParam(0) > 0;
       }
-    }
-  }
-  return false;
-}
-
-bool AbstractNSMCallback::get(const NSMNode& node, const NSMData& data,
-                              int timeout) throw(IOException)
-{
-  if (node.getName().size() > 0) {
-    const std::string name = data.getName() + "\n" + data.getFormat();
-    int pars[2] = {data.getRevision(), data.getSize()};
-    NSMCommunicator::send(NSMMessage(node, NSMCommand::DATAGET, 2, pars, name));
-    double t0 = Time().get();
-    while (true) {
-      try {
-        NSMCommunicator& com(wait(node, NSMCommand::DATASET, timeout));
-        NSMMessage msg = com.getMessage();
-        NSMCommand cmd(msg.getRequestName());
-        if (cmd == NSMCommand::DATASET) {
-          if (name == msg.getData()) {
-            com.getCallback().nsmdataset(com);
-            return true;
-          }
-          com.getCallback().perform(com);
-        }
-      } catch (const IOException& e) {}
-      double t = Time().get();
-      if (timeout > 0 && t - t0 >= timeout) {
-        throw (TimeoutException("timeout : waiting for DATASET:%s from %s",
-                                name.c_str(), node.getName().c_str()));
-      }
+      com.getCallback().perform(com);
+      t = Time().get();
     }
   }
   return false;
@@ -213,7 +208,6 @@ bool AbstractNSMCallback::set(const NSMNode& node, const std::string& name,
 bool AbstractNSMCallback::set(const NSMNode& node, const std::string& name,
                               const std::vector<float>& val, int timeout) throw(IOException)
 {
-
   return set(node, NSMVar(name, val), timeout);
 }
 
@@ -224,6 +218,7 @@ bool AbstractNSMCallback::get(DBObject& obj)
   for (DBObject::NameValueList::iterator it = list.begin();
        it != list.end(); it++) {
     const std::string& name(it->name);
+    if (name.size() == 0 || name.at(0) == '$') continue;
     int vi = 0;
     float vf = 0;
     std::string vs;

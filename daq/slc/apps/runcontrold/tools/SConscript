@@ -1,6 +1,5 @@
 Import('env')
 
 env['TOOLS_LIBS']['runcontrold'] = ['pthread', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
-env['TOOLS_LIBS']['rcrequest'] = ['pthread', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 
 Return('env')

@@ -9,16 +9,12 @@
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Time.h>
-#include <daq/slc/system/TCPServerSocket.h>
-#include <daq/slc/system/TCPSocketReader.h>
-#include <daq/slc/system/TCPSocketWriter.h>
 
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/Date.h>
 
 #include <cstring>
 #include <cstdlib>
-#include <sstream>
 #include <unistd.h>
 #include <algorithm>
 
@@ -43,18 +39,18 @@ bool RunControlCallback::initialize(const DBObject& obj) throw()
   }
   db.close();
   bool ret = addAll(obj);
-  if (m_port > 0) {
-    PThread(new ConfigProvider(db, getDBTable(), m_port));
-  }
   return ret;
 }
 
 bool RunControlCallback::configure(const DBObject& obj) throw()
 {
-  if (addAll(obj)) {
+  bool ret = false;
+  if ((ret = addAll(obj))) {
     distribute(NSMMessage(RCCommand::CONFIGURE, m_port));
+  } else {
+    LogFile::error("Failed to configure (config=%s)", obj.getName().c_str());
   }
-  return true;
+  return ret;
 }
 
 void RunControlCallback::setState(NSMNode& node, const RCState& state)
@@ -93,11 +89,20 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   update();
 }
 
-void RunControlCallback::log(const DAQLogMessage& lmsg) throw()
+void RunControlCallback::log(const char* nodename, const DAQLogMessage& lmsg,
+                             bool recorded) throw()
 {
   try {
+    RCNode& node(findNode(nodename));
+    logging_imp(node, lmsg.getPriority(), lmsg.getDate(),
+                "log form " + node.getName() + " : " +
+                lmsg.getMessage(), recorded);
     reply(NSMMessage(lmsg));
+  } catch (const std::out_of_range& e) {
+    LogFile::warning("Log from unknown node %s : %s", nodename,
+                     lmsg.getMessage().c_str());
   } catch (const NSMHandlerException& e) {
+    LogFile::error(e.what());
   }
 }
 
@@ -173,7 +178,7 @@ void RunControlCallback::update() throw()
   bool failed = false;
   for (RCNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
     RCNode& node(*it);
-    if (!node.isUsed() || node.isExcluded()) continue;
+    if (!node.isUsed()) continue;
     RCState cstate(node.getState());
     try {
       NSMCommunicator::connected(node.getName());
@@ -250,7 +255,7 @@ bool RunControlCallback::check(const std::string& node, const RCState& state) th
 {
   for (RCNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
     if (it->getName() == node) return true;
-    if (it->isUsed() && !it->isExcluded() && it->getState() != state) {
+    if (it->isUsed() && it->getState() != state) {
       return false;
     }
   }
@@ -272,7 +277,7 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
                                      bool recorded)
 {
   const DAQLogMessage log(node.getName(), pri, msg, date);
-  LogFile::put(pri, msg.c_str());
+  LogFile::put(pri, msg);
   DBInterface& db(*getDB());
   try {
     if (log.getPriority() >= m_priority_db && !recorded) {
@@ -292,23 +297,25 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
 {
   RCNodeList node_v;
   try {
-    //obj.print(false);
     const DBObjectList& objs(obj.getObjects("node"));
     for (DBObjectList::const_iterator it = objs.begin(); it != objs.end(); it++) {
-      const DBObject& cobj(*it);
-      if (!cobj.hasObject("runtype")) continue;
-      const DBObject runtype(cobj.getObject("runtype"));
-      const std::string path = runtype.getPath();
-      StringList s = StringUtil::split(path, '/');
-      if (s.size() > 1) s.erase(s.begin());
-      RCNode node(StringUtil::split(s[0], '@')[0]);
+      const DBObject& o_node(*it);
+      RCNode node(o_node.getText("name"));
       try {
         RCNode& node_i(findNode(node.getName()));
         node = node_i;
-      } catch (const std::out_of_range& e) {}
-      node.setUsed(cobj.getBool("used"));
-      node.setSequential(cobj.getBool("sequential"));
-      node.setConfig(path);
+      } catch (const std::out_of_range& e) {
+        LogFile::info("New node : " + node.getName());
+      }
+      node.setUsed(o_node.getBool("used"));
+      node.setSequential(o_node.getBool("sequential"));
+      if (o_node.hasObject("rcconfig")) {
+        const std::string path = o_node("rcconfig").getPath();
+        LogFile::info("found rcconfig :%s", path.c_str());
+        node.setConfig(path);
+      } else {
+        LogFile::warning("Not found rcconfig");
+      }
       node_v.push_back(node);
     }
   } catch (const DBHandlerException& e) {
@@ -332,13 +339,11 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCUsed(*this, vname + ".used", node));
-    add(new NSMVHandlerRCExcluded(*this, vname + ".excluded", node));
     vname = StringUtil::form("%s", StringUtil::tolower(node.getName()).c_str());
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCUsed(*this, vname + ".used", node));
-    add(new NSMVHandlerRCExcluded(*this, vname + ".excluded", node));
   }
   return true;
 }
@@ -348,8 +353,7 @@ void RunControlCallback::Distributer::operator()(RCNode& node) throw()
   if (!m_enabled) return;
   m_msg.setNodeName(node);
   RCCommand cmd(m_msg.getRequestName());
-  if (node.isUsed() && !node.isExcluded() &&
-      m_msg.getNodeName() == node.getName()) {
+  if (node.isUsed() && m_msg.getNodeName() == node.getName()) {
     if (cmd == RCCommand::CONFIGURE)
       m_msg.setData(node.getConfig());
     try {
@@ -383,34 +387,6 @@ void RunControlCallback::Distributer::operator()(RCNode& node) throw()
     m_callback.setState(RCState::NOTREADY_S);
     if (cmd == RCCommand::LOAD && node.isSequential())
       m_enabled = false;
-  }
-}
-
-void RunControlCallback::ConfigProvider::run()
-{
-  TCPServerSocket server("0.0.0.0", m_port);
-  try {
-    server.open();
-  } catch (const IOException& e) {
-    LogFile::error("failed to open server socket %d", m_port);
-    exit(1);
-  }
-  while (true) {
-    TCPSocket socket;
-    try {
-      socket = server.accept();
-      TCPSocketReader reader(socket);
-      const std::string path = reader.readString();
-      StringList s = StringUtil::split(path, '/');
-      const std::string table = (s.size() > 0) ? s[0] : m_dbtable;
-      const std::string config = (s.size() > 0) ? s[1] : path;
-      DBObject obj(DBObjectLoader::load(m_db, m_dbtable, config));
-      TCPSocketWriter writer(socket);
-      writer.writeObject(obj);
-    } catch (const IOException& e) {
-      LogFile::error(e.what());
-    }
-    socket.close();
   }
 }
 

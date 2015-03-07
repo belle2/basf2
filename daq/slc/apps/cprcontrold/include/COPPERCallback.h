@@ -1,11 +1,10 @@
 #ifndef _Belle2_COPPERCallback_h
 #define _Belle2_COPPERCallback_h
 
-#include "daq/slc/apps/cprcontrold/FEEController.h"
-#include "daq/slc/apps/cprcontrold/HSLBController.h"
-#include "daq/slc/apps/cprcontrold/TTRXController.h"
-#include "daq/slc/apps/cprcontrold/COPPERController.h"
-#include "daq/slc/apps/cprcontrold/COPPERConfig.h"
+#include "daq/slc/copper/FEE.h"
+#include "daq/slc/copper/HSLB.h"
+#include "daq/slc/copper/TTRX.h"
+#include "daq/slc/copper/COPPER.h"
 
 #include <daq/slc/readout/ProcessController.h>
 #include <daq/slc/readout/FlowMonitor.h>
@@ -21,7 +20,7 @@ namespace Belle2 {
   class COPPERCallback : public RCCallback {
 
   public:
-    COPPERCallback(FEEController* fee[4]);
+    COPPERCallback(FEE* fee[4]);
     virtual ~COPPERCallback() throw();
 
   public:
@@ -35,19 +34,18 @@ namespace Belle2 {
     virtual void term() throw();
     virtual void timeout(NSMCommunicator& com) throw();
   public:
-    HSLBController& getHSLB(int i) { return m_hslb[i]; }
-    FEEController* getFEE(int i) { return m_fee[i]; }
-    TTRXController& getTTRX() { return m_ttrx; }
-    COPPERController& getCopper() { return m_copper; }
+    HSLB& getHSLB(int i) { return m_hslb[i]; }
+    FEE* getFEE(int i) { return m_fee[i]; }
+    TTRX& getTTRX() { return m_ttrx; }
+    COPPER& getCopper() { return m_copper; }
 
   private:
     ProcessController m_con;
-    HSLBController m_hslb[4];
-    FEEController* m_fee[4];
-    TTRXController m_ttrx;
-    COPPERController m_copper;
+    HSLB m_hslb[4];
+    FEE* m_fee[4];
+    TTRX m_ttrx;
+    COPPER m_copper;
     FlowMonitor m_flow;
-    COPPERConfig m_config;
     NSMData m_data;
     bool m_dummymode;
     bool m_force_boothslb;
@@ -55,7 +53,7 @@ namespace Belle2 {
     bool m_iserr;
 
   private:
-    void bootBasf2() throw(RCHandlerException);
+    void bootBasf2(const DBObject& obj) throw(RCHandlerException);
     void logging(bool err, LogFile::Priority pri,
                  const char* str, ...) throw();
     bool isError() throw();

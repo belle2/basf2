@@ -35,29 +35,25 @@ namespace Belle2 {
     NSMVar(const std::string& name, const std::vector<int>& value);
     NSMVar(const std::string& name, const std::vector<float>& value);
     NSMVar(const std::string& name) : m_name(name), m_type(NONE), m_len(0), m_value(NULL) {}
-    //NSMVar(const std::string& value) { copy("", TEXT, value.size(), value.c_str()); }
-    //NSMVar(int value) { copy("", INT, 0, &value); }
-    //NSMVar(float value) { copy("", FLOAT, 0, &value); }
-    //NSMVar(int len, int* value) { copy("", INT, len, value); }
-    //NSMVar(int len, float* value) { copy("", FLOAT, len, value); }
     NSMVar(const NSMVar& var) { *this = var; }
     ~NSMVar() throw();
 
   public:
     const NSMVar& operator=(const NSMVar& var) {
-      copy(var.m_name, var.m_type, var.m_len, var.m_value, var.m_id, var.m_rev, var.m_nodeid);
+      copy(var.m_name, var.m_type, var.m_len, var.m_value, var.m_id, var.m_rev);
+      m_node = var.m_node;
       return *this;
     }
     const NSMVar& operator=(int val) {
-      copy(m_name, INT, 0, &val, m_id, m_rev, m_nodeid);
+      copy(m_name, INT, 0, &val, m_id, m_rev);
       return *this;
     }
     const NSMVar& operator=(float val) {
-      copy(m_name, FLOAT, 0, &val, m_id, m_rev, m_nodeid);
+      copy(m_name, FLOAT, 0, &val, m_id, m_rev);
       return *this;
     }
     const NSMVar& operator=(const std::string& val) {
-      copy(m_name, TEXT, val.size() + 1, val.c_str(), m_id, m_rev, m_nodeid);
+      copy(m_name, TEXT, val.size() + 1, val.c_str(), m_id, m_rev);
       return *this;
     }
     const NSMVar& operator=(const std::vector<int>& val);
@@ -69,10 +65,12 @@ namespace Belle2 {
     const NSMVar& operator>>(std::vector<float>& val) const;
 
   public:
+    void setNode(const std::string& node) { m_node = node; }
     void setName(const std::string& name) { m_name = name; }
     const void* get() const { return m_value; }
     void* get() { return m_value; }
     int size() const;
+    const std::string& getNode() const { return m_node; }
     const std::string& getName() const { return m_name; }
     Type getType() const { return m_type; }
     const char* getTypeLabel() const;
@@ -84,10 +82,8 @@ namespace Belle2 {
     float getFloat(int i) const;
     int getId() const { return m_id; }
     int getRevision() const { return m_rev; }
-    int getNodeId() const { return m_nodeid; }
     void setId(int id) { m_id = id; }
     void setRevision(int rev) { m_rev = rev; }
-    void setNodeId(int id) { m_nodeid = id; }
 
   public:
     virtual void readObject(Reader&) throw(IOException);
@@ -95,16 +91,16 @@ namespace Belle2 {
 
   public:
     void copy(const std::string& name, Type type, int len,
-              const void* value, int id = 0, int rev = 0, int nodeid = 0);
+              const void* value, int id = 0, int rev = 0);
 
   private:
+    std::string m_node;
     std::string m_name;
     Type m_type;
     int m_len;
     void* m_value;
     int m_id;
     int m_rev;
-    int m_nodeid;
 
   };
 

@@ -1,9 +1,0 @@
- nodename,  config, node
- ECL01, RC:default,node:default
- ECL02, RC:default,node:default
- ECL01, RC:debug:dummycpu,node:debug:dummycpu
- ECL02, RC:debug:dummycpu,node:debug:dummycpu
- ECL01, RC:debug:dumhslb:020:rand4k,node:debug:dumhslb:020:rand4k
- ECL02, RC:debug:dumhslb:020:rand4k,node:debug:dumhslb:020:rand4k
- ECL01, RC:debug:yamadahslb:10kHz,node:debug:yamadahslb:10kHz
- ECL02, RC:debug:yamadahslb:10kHz,node:debug:yamadahslb:10kHz

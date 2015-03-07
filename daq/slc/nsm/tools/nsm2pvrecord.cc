@@ -1,14 +1,8 @@
-#include <daq/slc/nsm/NSMNodeDaemon.h>
 #include <daq/slc/nsm/NSMData.h>
-#include <daq/slc/nsm/NSMCommunicator.h>
-
-#include <daq/slc/apps/storagerd/storage_status.h>
-
-#include <daq/slc/base/ConfigFile.h>
 
 #include <daq/slc/system/LogFile.h>
 
-#include <unistd.h>
+#include <cstdlib>
 
 using namespace Belle2;
 

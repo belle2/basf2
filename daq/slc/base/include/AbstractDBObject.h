@@ -37,17 +37,17 @@ namespace Belle2 {
     bool hasText(const std::string& name) const throw();
     bool hasObject(const std::string& name) const throw();
     void add(const std::string& name, DBField::Property pro) throw();
-    void setValue(const std::string& name, const std::string& value) throw();
-    void setText(const std::string& name, const std::string& value) throw() { addText(name, value); }
+    void setValue(const std::string& name, const std::string& value) throw(std::out_of_range);
+    void setText(const std::string& name, const std::string& value) throw(std::out_of_range) { addText(name, value); }
 
   public:
-    virtual bool getBool(const std::string& name, int index = 0) const throw();
-    virtual char getChar(const std::string& name, int index = 0) const throw();
-    virtual short getShort(const std::string& name, int index = 0) const throw();
-    virtual int getInt(const std::string& name, int index = 0) const throw();
-    virtual long long getLong(const std::string& name, int index = 0) const throw();
-    virtual float getFloat(const std::string& name, int index = 0) const throw();
-    virtual double getDouble(const std::string& name, int index = 0) const throw();
+    virtual bool getBool(const std::string& name, int index = 0) const throw(std::out_of_range);
+    virtual char getChar(const std::string& name, int index = 0) const throw(std::out_of_range);
+    virtual short getShort(const std::string& name, int index = 0) const throw(std::out_of_range);
+    virtual int getInt(const std::string& name, int index = 0) const throw(std::out_of_range);
+    virtual long long getLong(const std::string& name, int index = 0) const throw(std::out_of_range);
+    virtual float getFloat(const std::string& name, int index = 0) const throw(std::out_of_range);
+    virtual double getDouble(const std::string& name, int index = 0) const throw(std::out_of_range);
     virtual void addBool(const std::string& name, bool value) throw();
     virtual void addChar(const std::string& name, char value) throw();
     virtual void addShort(const std::string& name, short value) throw();
@@ -55,14 +55,14 @@ namespace Belle2 {
     virtual void addLong(const std::string& name, long long value) throw();
     virtual void addFloat(const std::string& name, float value) throw();
     virtual void addDouble(const std::string& name, double value) throw();
-    virtual void setBool(const std::string& name, bool value, int index = 0) throw();
-    virtual void setChar(const std::string& name, int value, int index = 0) throw();
-    virtual void setShort(const std::string& name, int value, int index = 0) throw();
-    virtual void setInt(const std::string& name, int value, int index = 0) throw();
-    virtual void setLong(const std::string& name, long long value, int index = 0) throw();
-    virtual void setFloat(const std::string& name, float value, int index = 0) throw();
-    virtual void setDouble(const std::string& name, double value, int index = 0) throw();
-    virtual const std::string getValueText(const std::string& name) const throw();
+    virtual void setBool(const std::string& name, bool value, int index = 0) throw(std::out_of_range);
+    virtual void setChar(const std::string& name, int value, int index = 0) throw(std::out_of_range);
+    virtual void setShort(const std::string& name, int value, int index = 0) throw(std::out_of_range);
+    virtual void setInt(const std::string& name, int value, int index = 0) throw(std::out_of_range);
+    virtual void setLong(const std::string& name, long long value, int index = 0) throw(std::out_of_range);
+    virtual void setFloat(const std::string& name, float value, int index = 0) throw(std::out_of_range);
+    virtual void setDouble(const std::string& name, double value, int index = 0) throw(std::out_of_range);
+    virtual const std::string getValueText(const std::string& name) const throw(std::out_of_range);
 
   public:
     virtual const void* getValue(const std::string& name) const throw(std::out_of_range) = 0;
@@ -71,7 +71,7 @@ namespace Belle2 {
     virtual void addValue(const std::string& name, const void* value,
                           DBField::Type type, int length) throw() = 0;
     virtual void setValue(const std::string& name, const void* value, int index) throw() = 0;
-    virtual void setValueText(const std::string& name, const std::string& value) throw();
+    virtual void setValueText(const std::string& name, const std::string& value) throw(std::out_of_range);
 
   protected:
     virtual void reset() throw();
@@ -86,80 +86,82 @@ namespace Belle2 {
 
   private:
     template<typename T>
-    T getD(const std::string& name, int index = 0) const throw() {
+    T getD(const std::string& name, int index = 0) const throw(std::out_of_range) {
       const void* value = getValue(name);
-      if (value == NULL && getProperty(name).getLength()) return 0;
+      if (value == NULL/* || index >= getProperty(name).getLength()*/) {
+        throw (std::out_of_range(name + " not found"));
+      }
       return ((T*)value)[index];
     }
 
   };
 
-  inline bool AbstractDBObject::getBool(const std::string& name, int index) const throw()
+  inline bool AbstractDBObject::getBool(const std::string& name, int index) const throw(std::out_of_range)
   {
     return getD<bool>(name, index);
   }
 
-  inline char AbstractDBObject::getChar(const std::string& name, int index) const throw()
+  inline char AbstractDBObject::getChar(const std::string& name, int index) const throw(std::out_of_range)
   {
     return getD<char>(name, index);
   }
 
-  inline short AbstractDBObject::getShort(const std::string& name, int index) const throw()
+  inline short AbstractDBObject::getShort(const std::string& name, int index) const throw(std::out_of_range)
   {
     return getD<short>(name, index);
   }
 
-  inline int AbstractDBObject::getInt(const std::string& name, int index) const throw()
+  inline int AbstractDBObject::getInt(const std::string& name, int index) const throw(std::out_of_range)
   {
     return getD<int>(name, index);
   }
 
-  inline long long AbstractDBObject::getLong(const std::string& name, int index) const throw()
+  inline long long AbstractDBObject::getLong(const std::string& name, int index) const throw(std::out_of_range)
   {
     return getD<long long>(name, index);
   }
 
-  inline float AbstractDBObject::getFloat(const std::string& name, int index) const throw()
+  inline float AbstractDBObject::getFloat(const std::string& name, int index) const throw(std::out_of_range)
   {
     return getD<float>(name, index);
   }
 
-  inline double AbstractDBObject::getDouble(const std::string& name, int index) const throw()
+  inline double AbstractDBObject::getDouble(const std::string& name, int index) const throw(std::out_of_range)
   {
     return getD<double>(name, index);
   }
 
-  inline void AbstractDBObject::setBool(const std::string& name, bool value, int index) throw()
+  inline void AbstractDBObject::setBool(const std::string& name, bool value, int index) throw(std::out_of_range)
   {
     setValue(name, &value, index);
   }
 
-  inline void AbstractDBObject::setChar(const std::string& name, int value, int index) throw()
+  inline void AbstractDBObject::setChar(const std::string& name, int value, int index) throw(std::out_of_range)
   {
     setValue(name, &value, index);
   }
 
-  inline void AbstractDBObject::setShort(const std::string& name, int value, int index) throw()
+  inline void AbstractDBObject::setShort(const std::string& name, int value, int index) throw(std::out_of_range)
   {
     setValue(name, &value, index);
   }
 
-  inline void AbstractDBObject::setInt(const std::string& name, int value, int index) throw()
+  inline void AbstractDBObject::setInt(const std::string& name, int value, int index) throw(std::out_of_range)
   {
     setValue(name, &value, index);
   }
 
-  inline void AbstractDBObject::setLong(const std::string& name, long long value, int index) throw()
+  inline void AbstractDBObject::setLong(const std::string& name, long long value, int index) throw(std::out_of_range)
   {
     setValue(name, &value, index);
   }
 
-  inline void AbstractDBObject::setFloat(const std::string& name, float value, int index) throw()
+  inline void AbstractDBObject::setFloat(const std::string& name, float value, int index) throw(std::out_of_range)
   {
     setValue(name, &value, index);
   }
 
-  inline void AbstractDBObject::setDouble(const std::string& name, double value, int index) throw()
+  inline void AbstractDBObject::setDouble(const std::string& name, double value, int index) throw(std::out_of_range)
   {
     setValue(name, &value, index);
   }

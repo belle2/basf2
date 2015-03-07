@@ -34,22 +34,19 @@ namespace Belle2 {
     virtual bool perform(NSMCommunicator& com) throw();
     virtual void ok(const char* /*node*/, const char* /*data*/) throw() {}
     virtual void error(const char* /*node*/, const char* /*data*/) throw() {}
-    virtual void log(const DAQLogMessage&) throw() {}
+    virtual void log(const char* /*node*/, const DAQLogMessage&, bool /*recorded*/) throw() {}
     virtual void vget(NSMCommunicator& com, const std::string& vname) throw();
     virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
     virtual void vlistget(NSMCommunicator& com) throw();
     virtual void vlistset(NSMCommunicator& com) throw();
     virtual void vreply(NSMCommunicator&, const std::string&, bool) throw() {}
-    virtual void nsmdataset(NSMCommunicator& com) throw();
+    virtual void nsmdataset(NSMCommunicator& com, NSMData& data) throw();
     virtual void nsmdataget(NSMCommunicator& com) throw();
 
   public:
     bool reply(const NSMMessage& msg) throw(NSMHandlerException);
 
   public:
-    NSMNode& getNode() throw() { return m_node; }
-    const NSMNode& getNode() const throw() { return m_node; }
-    void setNode(const NSMNode& node) throw() { m_node = node; }
     NSMDataMap& getDataMap() throw() { return m_datas; }
     NSMData& getData(const std::string& name) throw(std::out_of_range);
     NSMData& getData() throw() { return m_data; }
@@ -72,7 +69,6 @@ namespace Belle2 {
     void alloc_open(NSMCommunicator& com) throw();
 
   private:
-    NSMNode m_node;
     NSMCommandList m_cmd_v;
     NSMNodeMap m_nodes;
     NSMData m_data;

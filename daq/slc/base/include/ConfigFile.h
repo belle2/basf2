@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <istream>
 
 namespace Belle2 {
 
@@ -31,11 +32,15 @@ namespace Belle2 {
       read(file1, true);
       read(file2, true);
     }
+    ConfigFile(std::istream& is) {
+      read(is);
+    }
     ~ConfigFile() {}
 
   public:
     void clear();
     void read(const std::string& filename, bool overload = true);
+    void read(std::istream& is, bool overload = true);
     bool hasKey(const std::string& label);
     const std::string get(const std::string& label);
     int getInt(const std::string& label);

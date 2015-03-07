@@ -20,7 +20,7 @@ namespace Belle2 {
     NSMVHandler(const std::string& node, const std::string& name,
                 bool useget, bool useset)
       : m_id(0), m_timestamp(0), m_node(node), m_name(name),
-        m_useget(useget), m_useset(useset) {}
+        m_useget(useget), m_useset(useset), m_var(name) {}
     virtual ~NSMVHandler() throw() {}
 
   public:

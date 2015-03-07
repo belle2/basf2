@@ -5,6 +5,7 @@
 #include <daq/slc/database/DBInterface.h>
 
 #include <daq/slc/base/StringUtil.h>
+#include <daq/slc/base/ConfigFile.h>
 
 namespace Belle2 {
 
@@ -12,6 +13,7 @@ namespace Belle2 {
 
   public:
     static DBObject load(const std::string& filename);
+    static DBObject load(ConfigFile& config);
     static DBObject load(DBInterface& db,
                          const std::string& tablename,
                          const std::string& configname,

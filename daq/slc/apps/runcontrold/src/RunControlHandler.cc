@@ -19,6 +19,13 @@ bool NSMVHandlerRCConfig::handleGetText(std::string& val)
 bool NSMVHandlerRCConfig::handleSetText(const std::string& val)
 {
   m_rcnode.setConfig(val);
+  try {
+    NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::CONFIGURE, val));
+    LogFile::info("configured node : %s (config=%s)", m_rcnode.getName().c_str(), val.c_str());
+  } catch (const IOException& e) {
+    LogFile::error(e.what());
+    return false;
+  }
   return true;
 }
 
@@ -36,7 +43,7 @@ bool NSMVHandlerRCRequest::handleGetText(std::string& val)
 
 bool NSMVHandlerRCRequest::handleSetText(const std::string& val)
 {
-  std::string str = StringUtil::toupper(val);
+  std::string str = StringUtil::toupper(StringUtil::replace(val, ":", "_"));
   if (!StringUtil::find(str, "RC_")) str = "RC_" + str;
   RCCommand cmd(str);
   LogFile::debug("rcrequest %s to %s", str.c_str(), m_rcnode.getName().c_str());
@@ -65,17 +72,11 @@ bool NSMVHandlerRCUsed::handleGetInt(int& val)
 bool NSMVHandlerRCUsed::handleSetInt(int val)
 {
   m_rcnode.setUsed(val > 0);
-  return true;
-}
-
-bool NSMVHandlerRCExcluded::handleGetInt(int& val)
-{
-  val = m_rcnode.isExcluded();
-  return true;
-}
-
-bool NSMVHandlerRCExcluded::handleSetInt(int val)
-{
-  m_rcnode.setExcluded(val > 0);
+  m_rcnode.setState(NSMState::UNKNOWN);
+  try {
+    NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
+  } catch (const NSMHandlerException& e) {
+    LogFile::warning(e.what());
+  }
   return true;
 }

@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     return 1;
   }
   if (argc > 2) daemon(0, 0);
-  LogFile::open("nsm2socket");
+  LogFile::open("nsm2socket/nsm2scoket");
   TCPServerSocket server_socket("0.0.0.0", port);
   try {
     server_socket.open();

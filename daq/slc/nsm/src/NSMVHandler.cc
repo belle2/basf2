@@ -4,7 +4,7 @@ using namespace Belle2;
 
 NSMVHandler* NSMVHandler::create(const NSMVar& var)
 {
-  const std::string node = "";
+  const std::string node = var.getNode();
   const std::string name = var.getName();
   if (var.getType() == NSMVar::INT) {
     if (var.getLength() == 0) {

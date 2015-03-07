@@ -21,7 +21,7 @@ void HVControlDaemon::run()
                          config.get("database.password"),
                          config.getInt("database.port"));
   const std::string nodename = config.get("nsm.nodename");
-  LogFile::open("hvcontrold." + nodename, LogFile::DEBUG);
+  LogFile::open("hvcontrold/" + nodename, LogFile::DEBUG);
   m_callback->getNode().setName(nodename);
   m_callback->setDB(config.get("hv.tablename"), &db);
   m_callback->setTimeout(config.getInt("hv.interval"));

@@ -33,7 +33,7 @@ using namespace Belle2;
 NSMCommunicatorList NSMCommunicator::g_comm;
 Mutex NSMCommunicator::g_mutex;
 
-NSMCommunicator& NSMCommunicator::select(int sec) throw(IOException)
+NSMCommunicator& NSMCommunicator::select(double usec) throw(IOException)
 {
   fd_set fds;
   int ret;
@@ -50,8 +50,10 @@ NSMCommunicator& NSMCommunicator::select(int sec) throw(IOException)
   }
   while (true) {
     errno = 0;
-    if (sec >= 0) {
-      timeval t = {sec, 0};
+    if (usec >= 0) {
+      double s = 0;
+      double us = modf(usec, &s);
+      timeval t = {(long)s, (long)(us * 1000000)};
       ret = ::select(highest + 1, &fds, NULL, NULL, &t);
     } else {
       ret = ::select(highest + 1, &fds, NULL, NULL, NULL);
@@ -213,6 +215,14 @@ throw(NSMHandlerException)
 #else
   return -1;
 #endif
+}
+
+const std::string NSMCommunicator::getNodeNameById(int id)
+throw(NSMHandlerException)
+{
+  const char* name = nsmlib_nodename(m_nsmc, id);
+  if (name == NULL) return "";
+  return name;
 }
 
 int NSMCommunicator::getNodePidByName(const std::string& name)

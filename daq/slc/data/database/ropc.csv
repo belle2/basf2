@@ -1,2 +1,0 @@
- nodename,      config, host_from, port_from, host_to, port_to, ropc_nodeid, ropc_script
-   ROPC01, RC:default,    ropc01,      5101,  ropc01,   36000,           3, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvStream1.py

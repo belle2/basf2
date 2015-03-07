@@ -21,7 +21,11 @@ namespace Belle2 {
   public:
     virtual void init(NSMCommunicator& com) throw();
     virtual void timeout(NSMCommunicator& com) throw();
-    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
+    virtual void nsmdataset(NSMCommunicator& com, NSMData& data) throw();
+
+  public:
+    const StringList& getDataNames() const throw() { return m_datanames; }
+    const std::string& getDataName(int index) const throw() { return m_datanames[index]; }
 
   private:
     NSMNode m_runcontrol;

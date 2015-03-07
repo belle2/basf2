@@ -38,6 +38,19 @@ int Callback::add(NSMVHandler* handler)
   return 0;
 }
 
+void Callback::remove(const std::string& node, const std::string& name)
+{
+  for (NSMVHandlerList::iterator it = m_handler.begin();
+       it != m_handler.end(); it++) {
+    if (node == (*it)->getNode() &&
+        name == (*it)->getName()) {
+      if (*it != NULL) delete *it;
+      m_handler.erase(it);
+      return;
+    }
+  }
+}
+
 NSMVHandler& Callback::getHandler(const std::string& node,
                                   const std::string& name) throw(std::out_of_range)
 {
@@ -54,11 +67,12 @@ NSMVHandler& Callback::getHandler(const std::string& node,
 int Callback::add(const DBObject& obj)
 {
   DBObject::NameValueList list;
-  obj.search(list);
+  obj.search(list, "", true);
   int id = 0;
   for (DBObject::NameValueList::iterator it = list.begin();
        it != list.end(); it++) {
     const std::string& name(it->name);
+    if (name.size() == 0 || name.at(0) == '$') continue;
     switch (it->type) {
       case DBField::BOOL:
         id = add(new NSMVHandlerInt("", name, true, true, (int) * ((bool*)it->buf)));
@@ -91,3 +105,20 @@ int Callback::add(const DBObject& obj)
   return id;
 }
 
+void Callback::remove(const DBObject& obj)
+{
+  DBObject::NameValueList list;
+  obj.search(list, "", true);
+  for (DBObject::NameValueList::iterator it = list.begin();
+       it != list.end(); it++) {
+    const std::string& name(it->name);
+    if (name.size() == 0 || name.at(0) == '$') continue;
+    switch (it->type) {
+      case DBField::OBJECT:
+        break;
+      default:
+        remove(name);
+        break;
+    }
+  }
+}

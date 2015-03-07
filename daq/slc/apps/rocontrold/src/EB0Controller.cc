@@ -13,11 +13,11 @@ EB0Controller::~EB0Controller() throw()
 bool EB0Controller::initArguments(const DBObject& obj) throw()
 {
   try {
-    const DBObject& cobj(obj.getObject("eb0"));
+    const DBObject& cobj(obj("eb0"));
     int port = cobj.getInt("port");
     std::string executable = cobj.getText("executable");
-    const DBObjectList& objs(obj.getObject("stream0").getObjects("sender"));
-    bool used = obj.getObject("stream0").getBool("used");
+    const DBObjectList& objs(obj("stream0").getObjects("sender"));
+    bool used = obj("stream0").getBool("used");
     m_callback->add(new NSMVHandlerInt("stream0.used", true, true, (int)used));
     m_callback->add(new NSMVHandlerInt("stream0.nsenders", true, false, (int)objs.size()));
     m_callback->add(new NSMVHandlerInt("eb0.port", true, true, port));

@@ -180,7 +180,7 @@ throw(NSMHandlerException)
   parse(ptr, length, name_in);
   if (m_size > 0 && malloc_new) {
     m_allocated = true;
-    return malloc(m_size);
+    return (m_pdata = malloc(m_size));
   }
 #else
   throw (NSMHandlerException("too old nsmlib (nsmparse) : version = %d", NSM_PACKAGE_VERSION));

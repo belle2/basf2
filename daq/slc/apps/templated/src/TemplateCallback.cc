@@ -2,10 +2,6 @@
 
 #include <daq/slc/system/LogFile.h>
 
-#include <daq/slc/base/StringUtil.h>
-
-#include <unistd.h>
-
 using namespace Belle2;
 
 TemplateCallback::TemplateCallback()
@@ -59,6 +55,5 @@ void TemplateCallback::recover() throw(RCHandlerException)
 
 void TemplateCallback::abort() throw(RCHandlerException)
 {
-  setState(RCState::NOTREADY_S);
 }
 

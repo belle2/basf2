@@ -21,7 +21,7 @@ int main(int argc, char** argv)
   com.init(NSMNode(StringUtil::toupper(argv[1])),
            config.get("nsm.host"), config.getInt("nsm.port"));
   NSMNode node(StringUtil::toupper(argv[2]));
-  std::string request = StringUtil::toupper(argv[3]);
+  std::string request = StringUtil::toupper(StringUtil::replace(argv[3], ":", "_"));
   NSMCommand cmd(1000, request.c_str());
   if (argc > 4) {
     NSMCommunicator::send(NSMMessage(node, cmd, argv[4]));

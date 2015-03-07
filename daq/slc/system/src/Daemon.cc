@@ -28,7 +28,7 @@ bool Daemon::start(const char* title,
     LogFile::debug("Usage : %s %s [-d]", argv[0], msg);
     return false;
   }
-  LogFile::open(StringUtil::form("%s.%s", argv[0], title));
+  LogFile::open(StringUtil::form("%s/%s", argv[0], title));
   if (isdaemon) {
     daemon(0, 0);
   }

@@ -8,7 +8,7 @@ using namespace Belle2;
 
 bool Stream1Controller::initArguments(const DBObject& obj) throw()
 {
-  const DBObject& cobj(obj.getObject("stream1"));
+  const DBObject& cobj(obj("stream1"));
   int port = cobj.getInt("port");
   std::string script = cobj.getText("script");
   m_callback->add(new NSMVHandlerInt("stream1.port", true, true, port));

@@ -38,6 +38,7 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
   }
   std::string dbtable = config.get("dbtable");
   if (dbtable.size() > 0) {
+    LogFile::debug("database.use=%s", config.getBool("database.use") ? "TRUE" : "FALSE");
     if (config.getBool("database.use")) {
       callback->setDB(new PostgreSQLInterface(config.get("database.host"),
                                               config.get("database.dbname"),
@@ -47,6 +48,8 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
                       dbtable);
     } else {
       callback->setDBTable(dbtable);
+      callback->setProvider(config.get("provider.host"),
+                            config.getInt("provider.port"));
     }
   } else {
     LogFile::warning("dbtable is empty");

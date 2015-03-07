@@ -24,7 +24,9 @@
 namespace Belle2 {
   namespace csi {
 
+    /** Designed to hold a "continuous" (in time and amplitude) signal  */
     typedef std::vector<double> Signal;
+    /** Designed to hold a "digital" (limited by the DAQ board rate and resolution) signal  */
     typedef std::vector<int> DigitalSignal;
 
     /**
@@ -66,19 +68,24 @@ namespace Belle2 {
 
     private:
 
-      /** Generates a time signal for a given hit on a specific channel
+      /** Generates a time signal for a mean energy deposit
+       * The energy deposit is modelled at a Gaussian whose
+       * parameters are given as inputs.
        *
-       * param _energy: energy of the hit in GeV
-       * param _timeAvg: time at which the hit occured in ns (average weighted by energy deposited)
-       * param _timeRMS: RMS of all hit times in the event in ns
-       * param iChannel: Index of the channel (same as cellID)
-       * param _save: Set to 1 to save the trase in a root file (for debug purposes)
+       * @param TO BE COMPLETED
        */
       Signal genTimeSignal(double _energy, double _timeAvg, double _timeRMS, int iChannel, bool _save = 0);
 
-      Signal genTimeSignal(Signal _energies, Signal _times,  int _iChannel, int _dt, int _nsam, bool _save = 0);
+      /** Generates a time signal for a set of hits.
+       * The hits correspond to all CsiSimHits of  a single event,
+       * each are recorded at specific times so the energies and times
+       * vectors are given as inputs.
+       *
+       * @param TO BE COMPLETED
+       */
+      double genTimeSignal(Signal* _output, Signal _energies, Signal _times,  int _iChannel, int _dt, int _nsam, bool _save = 0);
 
-      /** Generates the template for a signal
+      /** Generates the template for a signal (obsolete)
        *
        * param _n: number of time samples in the signal to create
        * param _i0: index of the first input
@@ -96,22 +103,31 @@ namespace Belle2 {
        * param _dt: Integration step (in ns)
        * param _tau: Time constant of the system
        * param _delay: Time delay of the system (in ns)
+       *
+       * @return a Signal corresponding tot he time response
        */
       Signal firstOrderResponse(Signal _u, double _y0, double _dt, double _tau, double _delay = 0.0);
 
       /** Realizes the charge integration of the input signal
        *
-       * param _u: The input signal in Volts
-       * param _NsamBL: Number of samples to conduct the baseline measurement (8,32,128)
-       * param _Treshold: Treshold above which generate a trigger (in LSB)
-       * param _TriggerHoldoff: Width of signal integration (in ns)
-       * param _GateWidth: Width of signal integration (in ns)
-       * param _GateOffset: Width of signal integration (in ns)
+       * @param _u: The input signal in Volts
+       * @param _NsamBL: Number of samples to conduct the baseline measurement (8,32,128)
+       * @param BSL: A pointer to the value of the baseline (in LSB)
+       * @param Q: A pointer to the value holding the total charge (in LSB.sample)
+       * @param t: A pointer to the value holding the trigger time
+       * @param _Waveform: A pointer to the vector holding all waveform data points
+       * @param _DPPCIBits: A pointer to the vector holding the bits of the DPP-CI status. Order [MSB-LSB] is [stop,holdoff,gate,trigger]
+       * @param _Treshold: Treshold above which generate a trigger (in LSB)
+       * @param _TriggerHoldoff: Width of signal integration (in ns)
+       * @param _GateWidth: Width of signal integration (in ns)
+       * @param _GateOffset: Width of signal integration (in ns)
        *
-       * returnthe index of after the end of the holdoff (where to pick up if we have more peaks in the signal)
+       * @return The number of samples in the waveform
        */
-      int  doChargeIntegration(Signal _u, int _NsamBL, uint64_t* Q, uint* t, int _Treshold,
-                               double _TriggerHoldoff = 0.0, double _GateWidth = 320.0, double _GateOffset = 40.0);
+      int  doChargeIntegration(Signal _u, int _NsamBL, uint16_t* BSL, uint16_t* Q, uint32_t* t,
+                               std::vector<uint16_t>* _Waveform, std::vector<uint8_t>* _DPPCIBits,
+                               int _Treshold, double _TriggerHoldoff = 0.0, double _GateWidth = 320.0,
+                               double _GateOffset = 40.0, bool _recordTraces = false);
 
       /** Digitizes the signal the signal
        *
@@ -135,19 +151,47 @@ namespace Belle2 {
       double f(double fi, double u_i, double u_j, double y, double invtau);
 
 
+
+
+      /** Gets the number of points in the waveforms arrays
+       */
+      int getnSamples() const { return m_nSamples; }
+
+      /** Sets the number of points in the waveforms arrays
+       */
+      void setnSamples(int nsamples) { m_nSamples = nsamples; }
+
+
+    private:
+
+      /** index of csiHit */
+      int    m_hitNum;
+
       // Member data objects
+      double m_TrueEdep;          /**< Sum of the MC (true) deposited energies in the event-channel */
       double m_Resolution;  /**< Parameter: Resolution (in mV) of the ACD */
       double m_SampleRate;  /**< Parameter: Sample rate (in samples/sec) of the ADC */
       double m_dt;          /**< Time interval (in ns) (calculated from m_SampleRate */
+      int m_nWaveforms;     /**< Number of waveforms to save. 0: none, -1: all */
+      int m_nWFcounter;     /**< Counter for the number of waveforms to save*/
 
 
-      const double m_tRisePMT = 2.6;
-      const double m_tTransitPMT = 48;
-      const double m_tCsITl = 1220;
-      const double m_tCsIslow = 30;
-      const double m_tCsIfast =  6;
+      uint8_t   m_CellId;          /**< Cell ID */
+      uint16_t  m_Baseline;        /**< Baseline (pedestal) frozen during charge integration */
+      uint16_t  m_Charge;          /**< Integrated Charge */
+      uint32_t  m_Time;            /**< Trigger Time */
+      int       m_nSamples;               /**< Number of points requested in the waveform arrays */
+      std::vector<uint16_t>  m_Waveform;  /**< Saved waveform*/
+      std::vector<uint8_t>   m_DPPCIBits; /**< status of the DPP-CI */
 
-      const int m_seed = 0;
+
+      const double m_tRisePMT = 2.6;   /**< Rise time of the PMT signal (in ns) */
+      const double m_tTransitPMT = 48; /**< Mean transit time of the PMT signal (in ns) */
+      const double m_tCsITl = 1220;   /**< Time constant of the CsI(Tl) light deposition */
+      const double m_tCsIslow = 30;  /**< Time constant of the slow pure CsI light component */
+      const double m_tCsIfast =  6;  /**< Time constant of the fast pure CsI light component */
+
+      const int m_seed = 0;  /** Seed fot the random number generators */
       StoreArray<CsiHit> m_aHit; /**<  The result of each incoming particle in a crystal */
       StoreArray<CsiSimHit>  m_aSimHit; /**< Each simulated particle in the crystal */
       StoreArray<CsiDigiHit> m_aDigiHit; /**< Output: a digitized hit */
@@ -156,8 +200,8 @@ namespace Belle2 {
       Signal m_calibConstants; /**< Calibration constants for each channel (in V/keV)*/
       Signal m_noiseLevels; /**< Noise level for each channel (in V)*/
 
-      Signal m_SimHitTimes[12]; /**< Array of signals (each corresponding to one channel) */
-      Signal m_SimHitEdeps[12];  /**< Array of signals (each corresponding to one channel) */
+      Signal m_SimHitTimes[16]; /**< Array of signals (each corresponding to one channel) */
+      Signal m_SimHitEdeps[16];  /**< Array of signals (each corresponding to one channel) */
     };
 
   }

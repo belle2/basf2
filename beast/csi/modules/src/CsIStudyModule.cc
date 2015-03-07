@@ -94,7 +94,6 @@ void CsIStudyModule::event()
     int hitNum = m_hits.getEntries(); /**< Number of Crystal hits */
 
     double E_tmp[16] = {0};       /**< Sum energy deposited in each cell */
-    double edepSum = 0;           /**< Sum energy deposited in all cells */
 
     double Mass = 5;             /**< Mass of the crystal (to be replaced with data from the xml once actual mass is known)**/
     double edeptodose = GeVtoJ / Mass * usInYr / Sampletime; /**< Get dose in Gy/yr from Edep */
@@ -106,7 +105,6 @@ void CsIStudyModule::event()
       double edep = aCsIHit->getEnergyDep();     /**< Energy deposited in the current hit */
       //double hitTime = aCsIHit->getTimeAve();    /**< Time of the hit*/
 
-      edepSum += edep;
       E_tmp[m_cellID] += edep;
 
       // Fill histograms

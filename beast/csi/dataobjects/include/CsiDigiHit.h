@@ -13,6 +13,9 @@
 #define CSIDIGIT_H
 
 #include <framework/datastore/RelationsObject.h>
+
+#include <stdint.h> //< For fixed-size integers
+#include <vector> //< For fixed-size integers
 namespace Belle2 {
 
   /*! Class to store Csi digitized hits (output of CsIDigitizer)
@@ -24,60 +27,93 @@ namespace Belle2 {
   public:
     /** default constructor for ROOT */
     CsiDigiHit() {
-      m_CellId = 0;    /**< Cell ID */
-      m_Amp = 0;       /**< Fitting Amplitude */
-      m_TimeFit = 0;   /**< Fitting Time */
-      m_Quality = 0;   /**< Fitting Quality */
-
-      ;
+      m_CellId   = 0;
+      m_Charge   = 0;
+      m_Baseline = 0;
+      m_Time     = 0;
+      m_Waveform.clear();
+      m_StatusBits.clear();
     }
 
     /*! Set  Cell ID
      */
-    void setCellId(int CellId) { m_CellId = CellId; }
+    void setCellId(uint8_t CellId) { m_CellId = CellId; }
 
-    /*! Set Fitting Amplitude
+    /*! Set Integrated Charge
      */
-    void setAmp(int Amp) { m_Amp = Amp; }
+    void setCharge(uint64_t charge) { m_Charge = charge; }
 
 
-    /*! Set Fitting Time
+    /*! Set Trigger Time
      */
-    void setTimeFit(int TimeFit) { m_TimeFit = TimeFit; }
+    void setTime(uint64_t time) { m_Time = time; }
 
 
-    /*! Set Fitting Quality
-     */
-    void setQuality(int Quality) { m_Quality = Quality; }
 
 
     /*! Get Cell ID
      * @return cell ID
      */
-    int getCellId() const { return m_CellId; }
+    uint8_t getCellId() const { return m_CellId; }
 
 
-    /*! Get Fitting Amplitude
-     * @return Fitting Amplitude
+    /*! Get Integrated Charge
+     * @return Integrated Charge [ADC*sample]
      */
-    int getAmp() const { return m_Amp; }
+    uint32_t getCharge() const { return m_Charge; }
 
-    /*! Get Fitting Time
-     * @return Fitting Time
+    /*! Get Trigger Time
+     * @return Trigger Time
      */
-    int getTimeFit() const { return m_TimeFit; }
+    uint32_t getTime() const { return m_Time; }
 
-    /*! Get Fitting Quality
-     * @return Fitting Quality
+    /*! Get true deposited energy
+     * @return deposited energy in the event in GeV
      */
-    int getQuality() const { return m_Quality; }
+    double getTrueEdep() const { return m_TrueEdep; }
+
+    /*! Set True Edep
+     */
+    void setTrueEdep(double edep) { m_TrueEdep = edep; }
+
+
+    /*! Get Baseline
+     * @return Baseline
+     */
+    uint16_t getBaseline() const { return m_Baseline; }
+
+    /*! Set Baseline
+     */
+    void setBaseline(uint16_t baseline) { m_Baseline = baseline; }
+
+    /*! Get Waveform array
+     * @return A pointer to the std::vector containing the waveform
+     */
+    std::vector<uint16_t>* getWaveform() { return &m_Waveform; }
+
+    /*! Set Waveform Array
+     */
+    void setWaveform(std::vector<uint16_t>* waveform) { m_Waveform = *waveform; }
+
+    /*! Get Status bits array
+     * @return A pointer to the std::vector containing the status
+     */
+    std::vector<uint8_t>* getStatusBits() { return &m_StatusBits; }
+
+    /*! Set Status Bits Array
+     */
+    void setStatusBits(std::vector<uint8_t>* status) { m_StatusBits = *status; }
+
 
   private:
 
-    int m_CellId;      /**< Cell ID */
-    int m_Amp;         /**< Fitting Amplitude */
-    int m_TimeFit;     /**< Fitting Time */
-    int m_Quality;     /**< Fitting Quality */
+    uint8_t   m_CellId;                /**< Cell ID */
+    uint16_t  m_Baseline;              /**< Baseline (pedestal) frozen during charge integration */
+    uint16_t  m_Charge;                /**< Integrated Charge */
+    uint32_t  m_Time;                  /**< Trigger Time index*/
+    double    m_TrueEdep;              /**< True deposited energy per event-crystal */
+    std::vector<uint16_t>  m_Waveform; /**< Saved waveform*/
+    std::vector<uint8_t>   m_StatusBits; /**< Saved waveform*/
 
 
     ClassDef(CsiDigiHit, 1);/**< ClassDef */

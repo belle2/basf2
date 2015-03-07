@@ -16,10 +16,15 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <stdint.h> //< For fixed-size integers
 #include <vector>
+#include <TFile.h>
 #include <TGraph.h>
+#include <TH1F.h>
+#include <TH1I.h>
 #include <TRandom3.h>
 #include <TVector3.h>
+#include <TVectorD.h>
 #include <math.h>
 
 #define PI 3.14159265358979323846
@@ -37,9 +42,12 @@ REG_MODULE(CsIDigitizer)
 //-----------------------------------------------------------------
 
 //Calibration constants (hard-coded for now, put in the xml file for later)
-CsIDigitizerModule::CsIDigitizerModule() : Module(), m_aDigiHit("DigitizedHit"),
-  m_calibConstants(12, 5),
-  m_noiseLevels(12, 0.5e-3)
+CsIDigitizerModule::CsIDigitizerModule() : Module(), m_hitNum(0),
+  m_TrueEdep(0.0),
+  m_nWFcounter(0),
+  m_aDigiHit("CsiDigiHits"),
+  m_calibConstants(16, 5),
+  m_noiseLevels(16, 0.25e-3)
 {
   // Set module properties
   setDescription("Digitizer for the BEAST CsI system");
@@ -47,6 +55,7 @@ CsIDigitizerModule::CsIDigitizerModule() : Module(), m_aDigiHit("DigitizedHit"),
   // Parameter definitions
   addParam("Resolution", m_Resolution, "Resolution (in mV) of the ACD", 4.8828e-4);
   addParam("SampleRate", m_SampleRate, "Sample rate (in samples/sec) of the ADC", 250e6);
+  addParam("nWaveforms", m_nWaveforms, "Number of waveforms to save. 0: none, -1: all ", 0);
 }
 
 CsIDigitizerModule::~CsIDigitizerModule()
@@ -56,32 +65,31 @@ CsIDigitizerModule::~CsIDigitizerModule()
 void CsIDigitizerModule::initialize()
 {
 
-  B2INFO(" Initialize CsI Digitizer ");
+  B2DEBUG(100, "Initializing ");
 
   m_aHit.isRequired();
-  m_aSimHit.isOptional();
+  m_aSimHit.isRequired();
   m_aDigiHit.registerInDataStore();
 
   //Calculation of the derived paramaters
   m_dt = 1e9 / m_SampleRate;
-  m_CsITlSignalTemplate = genSignalTemplate(10240, 1024, m_tCsITl);
-
-  B2INFO("Template  length " << m_CsITlSignalTemplate.size());
-  B2INFO("Template  capacity " << m_CsITlSignalTemplate.capacity());;
-  B2INFO("dt = " << m_dt);
+  setnSamples(8192);
 
 }
 
 void CsIDigitizerModule::beginRun()
 {
-  Signal tempo = genTimeSignal(10, 10, 2, 0, 1);
+  //Signal tempo = genTimeSignal(10, 10, 2, 0, 1);
 }
 
 void CsIDigitizerModule::event()
 {
 
+
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   int m_currentEventNumber = eventMetaDataPtr->getEvent();
+
+  B2DEBUG(80, "Digiting event  " << m_currentEventNumber);
 
   //Loop over CsiHits
   if (m_aSimHit.getEntries() > 0) {
@@ -89,14 +97,15 @@ void CsIDigitizerModule::event()
 
     // double E_tmp[16] = {0};       /**< Sum energy deposited in each cell */
     // double edepSum = 0;           /**< Sum energy deposited in all cells */
-    double localPos = 0;          /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
-    double  propagTime = 0;          /**< Time when photons from the hit reach the PIN-diode (in ns).*/
-    for (int i = 0 ; i < 12 ; i++) {
+
+
+    for (int i = 0 ; i < 16 ; i++) {
       m_SimHitTimes[i].clear();
       m_SimHitEdeps[i].clear();
     }
 
 
+    B2DEBUG(150, "Looping over CsISimHits");
     for (int i = 0; i < hitNum; i++) { // Loop over CsISimHits
       CsiSimHit* aCsISimHit = m_aSimHit[i];
       int m_cellID = aCsISimHit->getCellId();       /**< Index of the Cell*/
@@ -110,10 +119,11 @@ void CsIDigitizerModule::event()
       TVector3 cellPos   = csip->GetPositionTV3(m_cellID);
       TVector3 cellAngle = csip->GetOrientationTV3(m_cellID);
 
-      localPos = (15. - (hitPos  - cellPos) * cellAngle);
+      double localPos = (15. - (hitPos  - cellPos) * cellAngle);  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
 
       // 0.06 is the speed of light in CsI(Tl)
-      propagTime = m_SampleRate * (0.0600 * localPos + (tof / CLHEP::ns)) * 1e-9;   ;
+      double  propagTime = m_SampleRate * (0.0600 * localPos + (tof / CLHEP::ns)) * 1e-9;  /**< Time when photons from the hit reach the PIN-diode (in ns).*/
+
 
       m_SimHitTimes[m_cellID].push_back(propagTime);
       m_SimHitEdeps[m_cellID].push_back(edep);
@@ -131,14 +141,42 @@ void CsIDigitizerModule::event()
 
     }
 
-    if (m_currentEventNumber == 6) {
-      int n = m_SimHitTimes[1].size();
-      TGraph* gPlot = new TGraph(n, &m_SimHitTimes[1].at(0), &m_SimHitEdeps[1].at(0));
-      gPlot->SaveAs("EventOut.root");
+    for (int iCh = 0; iCh < 16; iCh++) {
+
+      int n = m_SimHitTimes[iCh].size();
+
+      if (n > 0) {
+
+        B2DEBUG(140, "Generating Time signal");
+        Signal tempSignal;
+        m_TrueEdep = genTimeSignal(&tempSignal, m_SimHitEdeps[iCh], m_SimHitTimes[iCh],  1,  m_dt,  m_nSamples, false);
 
 
-      Signal tempo = genTimeSignal(m_SimHitEdeps[1], m_SimHitTimes[1],  1,  m_dt,  10240, true);
+        B2DEBUG(140, "Launching Charge integration");
+        bool  recordWaveform = false;
+        if ((m_nWaveforms == -1) || (m_nWFcounter < m_nWaveforms)) {
+          m_nWFcounter++;
+          recordWaveform = true;
+        }
+        doChargeIntegration(tempSignal, 128, &m_Baseline, &m_Charge, &m_Time, &m_Waveform,
+                            &m_DPPCIBits,  5, 1.2e4, 1e4, 1e3, recordWaveform);
 
+
+        if (m_Charge > 0) {
+
+          //StoreArray<CsiDigit> m_aDigiHit;
+          if (!m_aDigiHit) m_aDigiHit.create();
+          m_aDigiHit.appendNew();
+          m_hitNum = m_aDigiHit.getEntries() - 1;
+          m_aDigiHit[m_hitNum]->setCellId(iCh);
+          m_aDigiHit[m_hitNum]->setCharge(m_Charge);
+          m_aDigiHit[m_hitNum]->setTime(m_Time);
+          m_aDigiHit[m_hitNum]->setBaseline(m_Baseline);
+          m_aDigiHit[m_hitNum]->setTrueEdep(m_TrueEdep);
+          m_aDigiHit[m_hitNum]->setWaveform(&m_Waveform);
+          m_aDigiHit[m_hitNum]->setStatusBits(&m_DPPCIBits);
+        }
+      }
     }
   }
 }
@@ -152,48 +190,96 @@ void CsIDigitizerModule::terminate()
 {
 }
 
-int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint64_t* Q, uint* t,
-                                             int _Treshold, double _TriggerHoldoff,
-                                             double _GateWidth, double _GateOffset)
+int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16_t* _BSL, uint16_t* _Q,
+                                             uint32_t* _t, vector<uint16_t>* _Waveform,
+                                             vector<uint8_t>* _DPPCIBits, int _Treshold,
+                                             double _TriggerHoldoff, double _GateWidth,
+                                             double _GateOffset, bool _recordTraces)
 {
-  vector<int> x = doDigitization(_u, m_Resolution);
 
-  int baseline = 0;
+  B2DEBUG(80, "Arguments: " << &_u << ", " << _NsamBL << ", " << _BSL << ", " << _Q  << ", " <<  _t
+          << ", " << _Waveform << ", " <<  _Treshold  << ", " <<  _TriggerHoldoff  << ", " << _GateWidth
+          << ", " << _GateOffset << ", " <<  _recordTraces);
+
+  vector<int> x = doDigitization(_u, m_Resolution);
+  int nSam = x.size();
+
+  // Plots for debugging (see CAEN DPP-CI figs 2.2,2.3
+  TH1I h_trigger("h_trigger", "Trigger", nSam, 0, nSam - 1);
+  TH1I h_gate("h_gate", "Gate", nSam, 0, nSam - 1);
+  TH1I h_holdoff("h_holdoff", "Holdoff", nSam, 0, nSam - 1);
+  TH1I h_baseline("h_baseline", "Baseline", nSam, 0, nSam - 1);
+  TH1I h_charge("h_charge", "Charge", nSam, 0, nSam - 1);
+  TH1F h_signal("h_signal", "Continous signal", nSam, 0, nSam - 1);
+  TH1I h_digsig("h_digsig", "Digital signal", nSam, 0, nSam - 1);
+
 
   int max_gated  = (int) floor(_GateWidth / m_dt);
   int gate_offset = (int) floor(_GateOffset / m_dt);
   int max_holdoff = (int) floor(_TriggerHoldoff / m_dt);
 
+  int baseline  = 0;
   int charge    = 0;
   int n_holdoff = 0;
   int n_gated   = 0;
 
   bool gate = false;
   bool holdoff = false;
-  bool triggered = false;
   bool stop = false;
   bool trigger = false;
 
   // Find trigger position
   int i = 0;
   int iFirstTrigger = 0;
+  list<int> baselineBuffer;
   vector<int>::iterator it;
-  for (it = x.begin(); (it != x.end()) && !stop; ++it, ++i) {
+  float tempBaseline = 0.0;
+
+  _Waveform->resize(nSam, 0);
+  _DPPCIBits->resize(nSam, 0);
+
+  for (it = x.begin(); (it != x.end()); ++it, ++i) {
+
+    _Waveform->at(i) = *it;
+    _DPPCIBits->at(i) = trigger + (gate << 1) + (holdoff << 2) + (stop << 3);
+
+    if (_recordTraces) {
+
+      h_trigger.Fill(i, (int) trigger)  ;
+      h_gate.Fill(i, (int) gate)  ;
+      h_holdoff.Fill(i, (int) holdoff)  ;
+      h_baseline.Fill(i, baseline)  ;
+      h_charge.Fill(i, charge)  ;
+      h_digsig.Fill(i, *it)  ;
+      h_signal.Fill(i, _u.at(i))  ;
+    }
+
     if (!gate && !holdoff) {
-      for (vector<int>::iterator itbl = it ; (itbl > (it - _NsamBL)) && itbl != x.begin(); --itbl) {
-        baseline += *itbl;
-      }
+
+      baselineBuffer.push_back(*it);
+
+      if ((i + 1)  >  _NsamBL)
+        baselineBuffer.pop_front();
+
+      tempBaseline = 0;
+      for (list<int>::iterator itbl = baselineBuffer.begin(); itbl != baselineBuffer.end(); ++itbl)
+        tempBaseline += (float) * itbl;
+
+      tempBaseline /= baselineBuffer.size();
+
+      baseline = (int) round(tempBaseline);
 
       trigger = (*it - baseline) > _Treshold;
 
       //first time we see a trigger
-      if (trigger && !triggered && !iFirstTrigger)
+      if (trigger && !iFirstTrigger)
         iFirstTrigger = i;
 
     } else {
 
       if (gate) {
         charge += (*(it - gate_offset) - baseline);
+        *_BSL = baseline;
         n_gated++;
       }
 
@@ -210,10 +296,36 @@ int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint64_t* Q
     stop = iFirstTrigger && !gate && !holdoff;
   }
 
-  *Q = charge;
-  *t = (uint) iFirstTrigger;
+  *_Q = charge;
+  *_t = (uint) iFirstTrigger;
 
-  return i; //Where to resume in case more events per trace
+  if (not(_recordTraces)) {
+    _Waveform->clear();
+    _DPPCIBits->clear();
+  } else {
+    char rootfilename[100];
+    sprintf(rootfilename, "output/BEAST/plots/dpp-ci_WF%i.root", m_nWFcounter);
+
+    B2INFO("Writing to " << rootfilename);
+    TFile fs(rootfilename, "recreate");
+
+    h_trigger.Write();
+    h_gate.Write();
+    h_holdoff.Write();
+    h_baseline.Write();
+    h_charge.Write();
+    h_signal.Write();
+    h_digsig.Write();
+
+    TVectorD Edep(1);
+    Edep[0] = m_TrueEdep;
+    Edep.Write("Edep");
+
+    fs.Close();
+
+  }
+
+  return nSam;
 }
 
 vector<int>  CsIDigitizerModule::doDigitization(Signal _v, double _LSB)
@@ -229,14 +341,14 @@ vector<int>  CsIDigitizerModule::doDigitization(Signal _v, double _LSB)
   return  output;
 }
 
-Signal CsIDigitizerModule::genTimeSignal(Signal _energies, Signal _times,  int _iChannel, int _dt, int _nsam, bool _save)
+double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Signal _times, int _iChannel, int _dt, int _nsam, bool _save)
 {
 
   double invdt = 1.0 / _dt;
 
   double tf = 0;
   double t0 = 1e9;
-  int timeIndex = 0;
+  double sumEnergies = 0.0;
 
   TRandom3 noise(m_seed);
 
@@ -248,31 +360,32 @@ Signal CsIDigitizerModule::genTimeSignal(Signal _energies, Signal _times,  int _
       tf = *it;
   }
 
-  cout << "well, time interval is " << t0 << " -- " << tf << endl;
-  //_nsam = (int) (tf-t0)*invdt;
-  cout << "nample is " << _nsam << endl;
-
   Signal edepos(_nsam, 0.0);
 
   int i = 0;
-  int ioffset = 2048;
+  int ioffset = floor(_nsam * 0.25);
   for (Signal::iterator it = _times.begin() ; it != _times.end(); ++it, ++i) {
-    timeIndex = ((int)(*it - t0) * invdt + noise.Gaus(1, 20)) + ioffset;
+    // time index +/- 1 time bin
+    int timeIndex = ((int)(*it - t0) * invdt + 2.0 * (noise.Rndm() - 0.5) + ioffset);
     edepos.at(timeIndex) += _energies.at(i);
+    sumEnergies += _energies.at(i);
   }
 
-  cout << "here" << endl;
 
   Signal LightDep = firstOrderResponse(edepos, 0, _dt, m_tCsITl);
   Signal V = firstOrderResponse(LightDep, 0, _dt, m_tRisePMT, m_tTransitPMT);
 
-  for (Signal::iterator it = V.begin() ; it != V.end(); ++it) {
+  i = 0;
+  for (Signal::iterator it = V.begin() ; it != V.end(); ++it, i++) {
     *it *= m_calibConstants[_iChannel];
     *it += noise.Gaus(0, m_noiseLevels[_iChannel]);
-    *it  = floor(*it * (1.0 /  m_Resolution));
+    //Cancel next line: should be done afterwards!
+    //*it  = floor(*it * (1.0 /  m_Resolution));
+
+    //Add low frequency "noise"
+    *it += 0.01 + 5e-4 * sin((float)i * 5e-4);
   }
 
-  cout << "there" << endl;
 
   if (_save) {
     Signal t(_nsam, 0);
@@ -280,8 +393,6 @@ Signal CsIDigitizerModule::genTimeSignal(Signal _energies, Signal _times,  int _
 
     for (int i = 1; i < _nsam; i++)
       t.at(i) = t.at(i - 1) + _dt;
-
-    cout << "or there" << endl;
 
     TGraph gPlot1(_nsam, &t[0], &edepos[0]);
     gPlot1.SaveAs("EdeposOut.root");
@@ -293,68 +404,11 @@ Signal CsIDigitizerModule::genTimeSignal(Signal _energies, Signal _times,  int _
     gPlot3.SaveAs("VOut.root");
   }
 
-  return V;
+  *_output = V;
+
+  return sumEnergies;
 }
 
-Signal CsIDigitizerModule::genTimeSignal(double _energy, double _timeAvg, double _timeRMS,  int iChannel, bool _save)
-{
-  TRandom3 noise(m_seed);
-
-  int i0 = floor(_timeAvg / m_dt);
-  int ir = floor(_timeRMS / m_dt);
-  int n = 10240;
-
-  Signal _u(n, 0);
-
-  static const double invroottwopi = 1.0 / sqrt(2 * PI);
-  double invrms = 1.0 / ir;
-
-  for (int i = 0; i < n; i++) {
-    _u.at(i) = invrms * invroottwopi * exp(-0.5 * pow((i - i0) * invrms, 2)) ;
-  }
-
-  Signal LightDep = firstOrderResponse(_u, 0, m_dt, m_tCsITl);
-  Signal V = firstOrderResponse(LightDep, 0, m_dt, m_tRisePMT, m_tTransitPMT);
-
-  for (Signal::iterator it = V.begin() ; it != V.end(); ++it) {
-    *it *= (_energy * m_calibConstants[iChannel]);
-    *it += noise.Gaus(0, m_noiseLevels[iChannel]);
-  }
-
-  Signal t(n, 0);
-  for (int i = 1; i < n; i++)
-    t[i] = t[i - 1] + m_dt;
-
-  if (_save) {
-    TGraph* gPlot = new TGraph(n, &t[0], &V[0]);
-    gPlot->SaveAs("ScopeOut.root");
-  }
-
-  return V;
-}
-
-Signal CsIDigitizerModule::genSignalTemplate(int _n, int _i0, double _t1, double _t2, double _rFastTot)
-{
-  Signal _u(_n, 0);
-  for (int i = 0; i < 500; i++) {
-    _u.at(_i0 + i) = -1;
-  }
-  Signal y1 = firstOrderResponse(_u, 0, m_dt, _t1);
-
-  if (_rFastTot >= 1)
-    return y1;
-
-  Signal y2 = firstOrderResponse(_u, 0, m_dt, _t2);
-
-
-  Signal yout(y1);
-  int n = yout.size();
-  for (int i = 0; i < n; i++) {
-    yout[i] = _rFastTot * y1[i] + (1.0 - _rFastTot) * y2[i];
-
-  }
-  return yout;
-}
 
 /*
   int CsiDigitizerModule::addNoise(Signal * y, double rms, int seed)

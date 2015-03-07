@@ -117,12 +117,14 @@ namespace Belle2 {
       /** The slot index of the crystal in the enclosure*/
       std::vector<int> m_SlotID;
 
-      /** Position of the nominal centre of the crystal */
+      /** Position of the nominal centre of the crystal (as a HEP ThreeVector)*/
       std::vector<ThreeVector> m_Position;
+      /** Position of the nominal centre of the crystal (as a ROOT TVector3)*/
       std::vector<TVector3> m_PositionTV3;
 
-      /** Orientation of the crystal */
+      /** Orientation of the crystal (as a HEP ThreeVector)*/
       std::vector<ThreeVector> m_Orientation;
+      /** Orientation of the crystal (as ROOT TVector3)*/
       std::vector<TVector3> m_OrientationTV3;
 
       /** Pointer that saves the instance of this class. */

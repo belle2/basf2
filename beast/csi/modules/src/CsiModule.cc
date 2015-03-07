@@ -52,7 +52,7 @@ namespace Belle2 {
 
     void CsiModule::initialize()
     {
-      B2INFO("Csi: Initialize")
+      B2DEBUG(100, "Initializing")
       //Here you can do some stuff before processing starts. If you want to
       //write to some collections of the DataStore you have to register these
       //here by using StoreArray<T>::registerPersistent() for collections which
@@ -73,13 +73,13 @@ namespace Belle2 {
 
     void CsiModule::beginRun()
     {
-      B2INFO("Csi: Begin of new run");
+      B2DEBUG(200, "CsI: New run");
       //Here comes the initialisation specific to each run
     }
 
     void CsiModule::event()
     {
-      B2INFO("Csi: Event is being processed");
+      B2DEBUG(200, "Csi: Event is being processed");
       //Here comes the actual event processing
 
       StoreArray<MCParticle>   mcParticles;
@@ -112,8 +112,8 @@ namespace Belle2 {
         //The typedef is needed as BOOST_FOREACH is a macro and cannot handle anything including a comma
         typedef RelationIndex<MCParticle, CsiSimHit>::Element relMCSimHit_Element;
         BOOST_FOREACH(const relMCSimHit_Element & relation, relMCSimHit.getElementsFrom(mcp)) {
-          B2INFO("MCParticle #" << i << " created the AwesomSimHit #" << relation.indexTo
-                 << " which has an energy deposition of " << relation.to->getEnergyDep());
+          B2DEBUG(200, "MCParticle #" << i << " created the AwesomSimHit #" << relation.indexTo
+                  << " which has an energy deposition of " << relation.to->getEnergyDep());
         }
       }
     }

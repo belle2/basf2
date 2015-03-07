@@ -54,7 +54,7 @@ void RaveVertexFitter::initBeamSpotMember()
 
 RaveVertexFitter::~RaveVertexFitter()
 {
-  if (RaveSetup::getRawInstance()) delete RaveSetup::getRawInstance();
+
 }
 
 

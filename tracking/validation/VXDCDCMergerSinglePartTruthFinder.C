@@ -26,7 +26,7 @@ void VXDCDCMergerSinglePartTruthFinder(){
   //TCanvas *c1 = new TCanvas("c1","prova",10,10,700,500);
   //c1->SetFillColor(0);
 
-  TH1F *h1 = new TH1F("h1","Merged Tracks",10,0,10);
+  TH1F *h1 = new TH1F("h1","Merged Tracks Truth Track Finder",10,0,10);
   h1->GetXaxis()->SetTitle("# of merged tracks");
   h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for single 1GeV charged muon")); 
   h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 1"));
@@ -36,7 +36,7 @@ void VXDCDCMergerSinglePartTruthFinder(){
   //h1->Write();
   //c1->SaveAs("plots/MergedTracks_5GeV_muons_1000_Theta.jpg");
 
-  TH1F *h2 = new TH1F("h2","True Matched Tracks",10,0,10);
+  TH1F *h2 = new TH1F("h2","True Matched Tracks Truth Track Finder",10,0,10);
   tree->Draw("TrueMatchedTracks>>h2");
   //h2->Write();
   //c1->SaveAs("plots/TrueMatchedTracks_5GeV_muons_1000_Theta.jpg");
@@ -135,11 +135,11 @@ void VXDCDCMergerSinglePartTruthFinder(){
 
  /////////////SCANS//////////////
 
-  TH1F *h22 = new TH1F("h22","Eff vs Pt",100,0.,5.);
+  TH1F *h22 = new TH1F("h22","Eff vs Pt Truth Track Finder",100,0.,5.);
   h22->SetMaximum(1.1);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h22","TruthTag==1");
   h22->Sumw2();
-  TH1F *h23 = new TH1F("h23","Eff vs Pt",100,0.,5.);
+  TH1F *h23 = new TH1F("h23","Eff vs Pt Truth Track Finder",100,0.,5.);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h23","TruthTag==1&&GoodTag==1");
   h23->SetMaximum(1.1);
   h23->Sumw2();
@@ -147,7 +147,7 @@ void VXDCDCMergerSinglePartTruthFinder(){
   //h23->Divide(h22);
   //h23->GetYaxis()->SetRange(0,2);
   //h23->Draw("E");
-  TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt",100,0.,5.);
+  TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt Truth Track Finder",100,0.,5.);
   //TLegend *leg1= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. Pt");
   eff_pt->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt")); 
   eff_pt->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
@@ -166,11 +166,11 @@ void VXDCDCMergerSinglePartTruthFinder(){
   eff_pt->Write();
   delete eff_pt;
 
-  TH1F *h24 = new TH1F("h24","Eff vs Theta",50, -1, 1.);
+  TH1F *h24 = new TH1F("h24","Eff vs Theta Truth Track Finder",50, -1, 1.);
   h24->SetMaximum(1.1);
   tree->Draw("(Pz/(P))>>h24","TruthTag==1");
   h24->Sumw2();
-  TH1F *h25 = new TH1F("h25","Eff vs Theta",50, -1, 1.);
+  TH1F *h25 = new TH1F("h25","Eff vs Theta Truth Track Finder",50, -1, 1.);
   h25->SetMaximum(1.1);
   tree->Draw("(Pz/(P))>>h25","TruthTag==1&&GoodTag==1");
   h25->Sumw2();
@@ -178,7 +178,7 @@ void VXDCDCMergerSinglePartTruthFinder(){
   //h25->Divide(h24);
   //h25->GetYaxis()->SetRange(0,2);
   //h25->Draw("E");
-  TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta", 50, -1, 1.);
+  TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta Truth Track Finder", 50, -1, 1.);
   //TLegend *leg2= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. theta");
   eff_theta->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta")); 
   eff_theta->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));

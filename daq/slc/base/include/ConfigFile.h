@@ -28,10 +28,6 @@ namespace Belle2 {
       read(file2, true);
       read(file3, true);
     }
-    ConfigFile(const std::string& file1, const char* file2) {
-      read(file1, true);
-      read(file2, true);
-    }
     ConfigFile(std::istream& is) {
       read(is);
     }
@@ -51,6 +47,7 @@ namespace Belle2 {
     void add(const std::string& label,
              const std::string& value, bool overload);
     void write(const std::string& path);
+    void print();
 
   private:
     const std::string getFilePath(const std::string& filename);

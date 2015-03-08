@@ -55,6 +55,9 @@ namespace Belle2 {
     const DBObject& getObject() const throw() { return m_obj; }
 
   private:
+    NSMVHandler* getHandler_p(const std::string& node, const std::string& name);
+
+  private:
     int m_revision;
     DBObject m_obj;
     NSMVHandlerList m_handler;

@@ -13,6 +13,7 @@ include $(TOP)/configure/CONFIG
 #DB += xxx.db
 DB += nsmnode.db
 DB += nsmdata_storage.db
+DB += ropc.db
 
 #----------------------------------------------------
 # If <anyname>.db template is not named <anyname>*.template add

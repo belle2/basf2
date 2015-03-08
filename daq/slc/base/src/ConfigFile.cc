@@ -12,7 +12,8 @@ using namespace Belle2;
 const std::string ConfigFile::getFilePath(const std::string& filename)
 {
   std::string file_path;
-  if (filename.find_last_of(".conf") == filename.size() - 1) {
+  if (filename.size() > std::string("conf").size() &&
+      filename.find_last_of(".conf") == filename.size() - 1) {
     return filename;
   }
   if (filename.at(0) != '/') {
@@ -96,6 +97,7 @@ void ConfigFile::read(std::istream& is, bool overload)
         }
         ss << str_v[1].at(i);
       }
+      //std::cout << label << " : " << ss.str() << std::endl;
       add(label, ss.str(), overload);
     }
   }
@@ -165,4 +167,22 @@ void ConfigFile::write(const std::string& path)
      << "#" << std::endl;
   std::ofstream fout(getFilePath(path).c_str());
   fout << ss.str();
+}
+
+void ConfigFile::print()
+{
+  std::cout << "#" << std::endl
+            << "#" << std::endl
+            << "#" << std::endl
+            << "" << std::endl;
+  for (std::vector<std::string>::iterator it = m_label_v.begin();
+       it != m_label_v.end(); it++) {
+    std::string& label(*it);
+    std::string& value(m_value_m[label]);
+    std::cout << label << " : " << value << std::endl;
+  }
+  std::cout << "" << std::endl
+            << "#" << std::endl
+            << "#" << std::endl
+            << "#" << std::endl;
 }

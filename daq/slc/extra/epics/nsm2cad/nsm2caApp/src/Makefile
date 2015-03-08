@@ -24,6 +24,7 @@ nsm2cad_DBD += ioc_shell.dbd
 
 # nsm2cad_registerRecordDeviceDriver.cpp derives from nsm2cad.dbd
 nsm2cad_SRCS += nsm2cad_registerRecordDeviceDriver.cpp
+nsm2cad_SRCS += NSM2CACallback.cpp
 nsm2cad_SRCS += devNSM2CA.cpp
 nsm2cad_SRCS += deviceNSM2CA.c
 nsm2cad_SRCS += ioc_shell.c

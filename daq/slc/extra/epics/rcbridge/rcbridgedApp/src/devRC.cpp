@@ -3,6 +3,7 @@
 #include <daq/slc/runcontrol/RCCallback.h>
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
+#include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/PThread.h>
@@ -21,7 +22,7 @@
 static IOSCANPVT* g_pvt_expno = new IOSCANPVT;
 static IOSCANPVT* g_pvt_runno = new IOSCANPVT;
 static IOSCANPVT* g_pvt_subno = new IOSCANPVT;
-static IOSCANPVT* g_pvt_configid = new IOSCANPVT;
+static IOSCANPVT* g_pvt_config = new IOSCANPVT;
 static IOSCANPVT* g_pvt_request = new IOSCANPVT;
 
 namespace Belle2 {
@@ -29,40 +30,68 @@ namespace Belle2 {
   class RCEpicsCallback : public RCCallback {
 
   public:
-    RCEpicsCallback(const NSMNode& node) 
-      : RCCallback(node) { setAutoReply(false); }
+    RCEpicsCallback(const NSMNode& node) : RCCallback()
+    {
+      setNode(node);
+      setAutoReply(false);
+    }
     virtual ~RCEpicsCallback() throw() {}
 
   public:
-    const RCCommand& getCommand() const { return m_command; }
-    void setCommand(const RCCommand& cmd) { m_command = cmd; }
-
-  public:
-    virtual bool load() throw() {
-      scanIoRequest(*g_pvt_configid);
-      return setCommand();
+    virtual bool initialize(const DBObject&) throw()
+    {
+      add(new NSMVHandlerInt("expno", true, false));
+      add(new NSMVHandlerInt("runno", true, false));
+      add(new NSMVHandlerInt("subno", true, false));
+      return true;
     }
-    virtual bool start() throw() {
+    virtual bool configure(const DBObject& obj) throw()
+    {
+      scanIoRequest(*g_pvt_config);
+      setCommand(RCCommand::CONFIGURE);
+      return true;
+    }
+    virtual void load(const DBObject& obj) throw(RCHandlerException)
+    {
+      setCommand(RCCommand::LOAD);
+    }
+    virtual void start(int expno, int runno) throw(RCHandlerException)
+    {
+      set("expno", expno);
+      set("runno", runno);
+      set("subno", 0);
       scanIoRequest(*g_pvt_expno);
       scanIoRequest(*g_pvt_runno);
       scanIoRequest(*g_pvt_subno);
-      return setCommand();
+      setCommand(RCCommand::START);
     }
-    virtual bool stop() throw() { return setCommand(); }
-    virtual bool resume() throw() { return setCommand(); }
-    virtual bool pause() throw() { return setCommand(); }
-    virtual bool recover() throw() { return setCommand(); }
-    virtual bool abort() throw() { return setCommand(); }
+    virtual void stop() throw(RCHandlerException)
+    {
+      setCommand(RCCommand::STOP);
+    }
+    virtual void resume() throw(RCHandlerException)
+    {
+      setCommand(RCCommand::RESUME);
+    }
+    virtual void pause() throw(RCHandlerException)
+    {
+      setCommand(RCCommand::PAUSE);
+    }
+    virtual void recover() throw(RCHandlerException)
+    {
+      setCommand(RCCommand::RECOVER);
+    }
+    virtual void abort() throw(RCHandlerException)
+    {
+      setCommand(RCCommand::ABORT);
+    }
 
-  private:
-    bool setCommand() {
-      m_command = getMessage().getRequestName();
+  public:
+    void setCommand(const RCCommand& cmd)
+    {
+      set("rcrequest", cmd.getLabel());
       scanIoRequest(*g_pvt_request);
-      return true;
     }
-
-  private:
-    RCCommand m_command;
 
   };
 
@@ -169,7 +198,9 @@ long init_rc_expno_longin(longinRecord *record)
 
 long read_rc_expno_longin(longinRecord *record)
 {
-  return read_rc_longin(record, g_callback->getConfig().getExpNumber());
+  int expno = 0;
+  g_callback->get("expno", expno);
+  return read_rc_longin(record, expno);
 }
 
 long init_rc_runno_longin(longinRecord *record)
@@ -179,7 +210,9 @@ long init_rc_runno_longin(longinRecord *record)
 
 long read_rc_runno_longin(longinRecord *record)
 {
-  return read_rc_longin(record, g_callback->getConfig().getRunNumber());
+  int runno = 0;
+  g_callback->get("runno", runno);
+  return read_rc_longin(record, runno);
 }
 
 long init_rc_subno_longin(longinRecord *record)
@@ -189,17 +222,21 @@ long init_rc_subno_longin(longinRecord *record)
 
 long read_rc_subno_longin(longinRecord *record)
 {
-  return read_rc_longin(record, g_callback->getConfig().getSubNumber());
+  int subno = 0;
+  g_callback->get("subno", subno);
+  return read_rc_longin(record, subno);
 }
 
-long init_rc_configid_longin(longinRecord *record)
+long init_rc_config_stringin(stringinRecord *record)
 {
-  return init_rc_longin(record, g_pvt_configid);
+  return init_rc_stringin(record, g_pvt_config);
 }
 
-long read_rc_configid_longin(longinRecord *record)
+long read_rc_config_stringin(stringinRecord *record)
 {
-  return read_rc_longin(record, g_callback->getConfig().getConfigId());
+  std::string config;
+  g_callback->get("rcconfig", config);
+  return read_rc_stringin(record, config.c_str());
 }
 
 long init_rc_request_stringin(stringinRecord *record)
@@ -209,12 +246,13 @@ long init_rc_request_stringin(stringinRecord *record)
 
 long read_rc_request_stringin(stringinRecord *record)
 {
-  return read_rc_stringin(record, g_callback->getCommand().getLabel());
+  std::string request;
+  g_callback->get("rcrequest", request);
+  return read_rc_stringin(record, StringUtil::replace(request, "RC_", "").c_str());
 }
 
 long init_rc_state_stringout(stringoutRecord *record)
 {
-  std::cout << record->name << "=" << record->val << std::endl;
   return init_rc_stringout(record);
 }
 
@@ -222,14 +260,13 @@ long write_rc_state_stringout(stringoutRecord *record)
 {
   RCState state(record->val);
   if (state != RCState::UNKNOWN) {
-    NSMNode& node(g_callback->getNode());
-    node.setState(state);
+    g_callback->setState(state);
     try {
       if (state.isStable()) {
 	g_callback->setCommand(RCCommand::UNKNOWN);
 	scanIoRequest(*g_pvt_request);
       }
-      g_callback->getCommunicator()->replyOK(node);
+      g_callback->reply(NSMMessage(NSMCommand::OK, state.getLabel()));
     } catch (const NSMHandlerException& e) {
       LogFile::error("Failed to reply to NSM : %s", e.what());
       return 2;
@@ -240,4 +277,3 @@ long write_rc_state_stringout(stringoutRecord *record)
     return 1;
   }
 }
-

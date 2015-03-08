@@ -22,12 +22,12 @@ record(longin, "$(user):rc:subno")
 	field(DTYP, "rc_bridge_subno")
 }
 
-record(longin, "$(user):rc:configid")
+record(stringin, "$(user):rc:config")
 {
 	field(DESC, "Received Confid ID from NSM2")
 	field(SCAN, "I/O Intr")
-	field(VAL, "0")
-	field(DTYP, "rc_bridge_configid")
+	field(VAL, "UKNOWN")
+	field(DTYP, "rc_bridge_config")
 }
 
 record(stringin, "$(user):rc:request")

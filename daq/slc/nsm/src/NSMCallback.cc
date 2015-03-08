@@ -298,7 +298,7 @@ void NSMCallback::alloc_open(NSMCommunicator& com) throw()
     NSMData& data(it->second);
     try {
       if (!data.isAvailable() && data.getName().size() > 0 &&
-          data.getFormat().size() > 0 && data.getRevision() > 0) {
+          data.getFormat().size() > 0) {
         data.open(com);
       }
     } catch (const NSMHandlerException& e) {

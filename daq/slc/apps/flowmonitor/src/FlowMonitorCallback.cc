@@ -14,6 +14,7 @@
 #include <daq/slc/base/Date.h>
 
 namespace Belle2 {
+
   class NSMVHandlerNSMData : public NSMVHandlerInt {
   public:
     NSMVHandlerNSMData(const std::string& name,
@@ -44,6 +45,7 @@ namespace Belle2 {
     FlowMonitorCallback& m_callback;
     int m_index;
   };
+
 }
 
 using namespace Belle2;

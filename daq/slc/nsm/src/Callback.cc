@@ -54,14 +54,21 @@ void Callback::remove(const std::string& node, const std::string& name)
 NSMVHandler& Callback::getHandler(const std::string& node,
                                   const std::string& name) throw(std::out_of_range)
 {
+  NSMVHandler* p = getHandler_p(node, name);
+  if (p != NULL) return *p;
+  throw (std::out_of_range(StringUtil::form("no handler for %s:%s",
+                                            node.c_str(), name.c_str())));
+}
+
+NSMVHandler* Callback::getHandler_p(const std::string& node, const std::string& name)
+{
   for (size_t i = 0; i < m_handler.size(); i++) {
     if (node == m_handler[i]->getNode() &&
         name == m_handler[i]->getName()) {
-      return *m_handler[i];
+      return m_handler[i];
     }
   }
-  throw (std::out_of_range(StringUtil::form("no handler for %s:%s",
-                                            node.c_str(), name.c_str())));
+  return NULL;
 }
 
 int Callback::add(const DBObject& obj)

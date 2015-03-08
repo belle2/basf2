@@ -59,7 +59,8 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,
 {
   if (handler && node.getName().size() > 0) {
     NSMVar var(handler->get());
-    const std::string name = var.getName();
+    add(handler);
+    const std::string name = handler->getName();//var.getName();
     NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, name));
     double t0 = Time().get();
     double t = t0;
@@ -75,11 +76,6 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,
           readVar(msg, var);
           handler->setNode(node.getName());
           bool ret = handler->handleSet(var);
-          if (ret) {
-            add(handler);
-          } else {
-            delete handler;
-          }
           return ret;
         }
         com.getCallback().perform(com);
@@ -108,16 +104,14 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVar& var,
         if (node.getName() == msg.getData() &&
             var.getName() == (msg.getData() + msg.getParam(2) + 1)) {
           readVar(msg, var);
-          NSMVHandler* handler = NSMVHandler::create(var);
+          NSMVHandler* handler = getHandler_p(node.getName(), var.getName());
+          if (!handler) {
+            handler = NSMVHandler::create(var);
+            if (handler) add(handler);
+          }
           if (handler) {
             handler->setNode(node.getName());
-            bool ret = handler->handleSet(var);
-            if (ret) {
-              add(handler);
-            } else {
-              delete handler;
-            }
-            return ret;
+            return handler->handleSet(var);
           }
         }
       }

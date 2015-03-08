@@ -59,9 +59,8 @@ bool ProcessController::start(int expno, int runno)
   m_info.setRunNumber(runno);
   m_info.setSubNumber(0);
   if (m_info.getState() != RunInfoBuffer::RUNNING) {
-    throw (RCHandlerException(m_name + " is not running"));
     m_info.unlock();
-    return false;
+    throw (RCHandlerException(m_name + " is not running"));
   }
   m_info.unlock();
   return true;

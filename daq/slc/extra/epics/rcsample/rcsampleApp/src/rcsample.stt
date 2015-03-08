@@ -1,11 +1,11 @@
 program rcsample
 
 string rcrequest;
-assign rcrequest to "{USER}:rc:request";
+assign rcrequest to "PXD:rc:request";
 monitor rcrequest;
 
 string rcstate;
-assign rcstate to "{USER}:rc:state";
+assign rcstate to "PXD:rc:state";
 
 ss rcsample_control 
 {

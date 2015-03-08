@@ -14,10 +14,10 @@ struct
   DEVSUPFUN init;
   DEVSUPFUN init_record;
   DEVSUPFUN get_ioint_info;
-  DEVSUPFUN read_stringin;
-} dev_nsm2_request_in = {
-  5, NULL, NULL, init_nsm2_request_stringin,
-  get_ioint_info_nsm2_stringin, read_nsm2_request_stringin
+  DEVSUPFUN read_ai;
+} dev_nsm2_vget_ai = {
+  5, NULL, NULL, init_nsm2_vget_ai,
+  get_ioint_info_nsm2_ai, read_nsm2_vget_ai
 };
 
 struct
@@ -27,10 +27,49 @@ struct
   DEVSUPFUN init;
   DEVSUPFUN init_record;
   DEVSUPFUN get_ioint_info;
-  DEVSUPFUN write_stringin;
-} dev_nsm2_state_in = {
-  5, NULL, NULL, init_nsm2_state_stringin,
-  get_ioint_info_nsm2_stringin, read_nsm2_state_stringin
+  DEVSUPFUN read_longin;
+} dev_nsm2_vget_longin = {
+  5, NULL, NULL, init_nsm2_vget_longin,
+  get_ioint_info_nsm2_longin, read_nsm2_vget_longin
+};
+
+struct
+{
+  long number;
+  DEVSUPFUN dev_report;
+  DEVSUPFUN init;
+  DEVSUPFUN init_record;
+  DEVSUPFUN get_ioint_info;
+  DEVSUPFUN read_stringin;
+} dev_nsm2_vget_stringin = {
+  5, NULL, NULL, init_nsm2_vget_stringin,
+  get_ioint_info_nsm2_stringin, read_nsm2_vget_stringin
+};
+
+struct
+{
+  long number;
+  DEVSUPFUN dev_report;
+  DEVSUPFUN init;
+  DEVSUPFUN init_record;
+  DEVSUPFUN get_ioint_info;
+  DEVSUPFUN write_ao;
+} dev_nsm2_vset_ao = {
+  5, NULL, NULL, init_nsm2_vset_ao,
+  NULL, write_nsm2_vset_ao
+};
+
+struct
+{
+  long number;
+  DEVSUPFUN dev_report;
+  DEVSUPFUN init;
+  DEVSUPFUN init_record;
+  DEVSUPFUN get_ioint_info;
+  DEVSUPFUN write_longout;
+} dev_nsm2_vset_longout = {
+  5, NULL, NULL, init_nsm2_vset_longout,
+  NULL, write_nsm2_vset_longout
 };
 
 struct
@@ -41,9 +80,9 @@ struct
   DEVSUPFUN init_record;
   DEVSUPFUN get_ioint_info;
   DEVSUPFUN write_stringout;
-} dev_nsm2_request_out = {
-  5, NULL, NULL, init_nsm2_request_stringout,
-  NULL, write_nsm2_request_stringout
+} dev_nsm2_vset_stringout = {
+  5, NULL, NULL, init_nsm2_vset_stringout,
+  NULL, write_nsm2_vset_stringout
 };
 
 struct
@@ -74,8 +113,11 @@ struct
   NULL, read_nsm2_data_longin, NULL
 };
 
-epicsExportAddress(dset, dev_nsm2_request_in);
-epicsExportAddress(dset, dev_nsm2_state_in);
-epicsExportAddress(dset, dev_nsm2_request_out);
+epicsExportAddress(dset, dev_nsm2_vget_ai);
+epicsExportAddress(dset, dev_nsm2_vget_stringin);
+epicsExportAddress(dset, dev_nsm2_vget_longin);
+epicsExportAddress(dset, dev_nsm2_vset_ao);
+epicsExportAddress(dset, dev_nsm2_vset_stringout);
+epicsExportAddress(dset, dev_nsm2_vset_longout);
 epicsExportAddress(dset, dev_nsm2_data_ai);
 epicsExportAddress(dset, dev_nsm2_data_longin);

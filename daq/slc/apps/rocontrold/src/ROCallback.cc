@@ -104,7 +104,11 @@ void ROCallback::load(const DBObject&) throw(RCHandlerException)
 
 void ROCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  m_eb0.start(expno, runno);
+  try {
+    m_eb0.start(expno, runno);
+  } catch (const RCHandlerException& e) {
+    LogFile::warning("eb0 did not start : %s", e.what());
+  }
   for (size_t i = 0; i < m_stream0.size(); i++) {
     if (!m_stream0[i].start(expno, runno)) {
       throw (RCHandlerException("Faield to start stream0-%d", (int)i));

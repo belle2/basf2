@@ -16,6 +16,8 @@
 namespace Belle2 {
 
   class NSMCommunicator;
+  typedef std::map<std::string, NSMNode> NSMNodeMap;
+  typedef std::map<std::string, NSMNodeMap> NSMNodeMapMap;
 
   class AbstractNSMCallback : public Callback {
 
@@ -82,8 +84,6 @@ namespace Belle2 {
     int m_timeout;
 
   private:
-    typedef std::map<std::string, NSMNode> NSMNodeMap;
-    typedef std::map<std::string, NSMNodeMap> NSMNodeMapMap;
     NSMNodeMapMap m_node_v_m;
 
   public:

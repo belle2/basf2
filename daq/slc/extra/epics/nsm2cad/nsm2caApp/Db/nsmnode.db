@@ -1,24 +1,40 @@
-record(stringin, "nsm2:$(nodename):request_in")
-{
-	field(DESC, "Received request from NSM2 node")
-	field(SCAN, "I/O Intr")
-	field(VAL, "UNKNOWN")
-	field(DTYP, "nsm2_request_in")
-}
-
-record(stringout, "nsm2:$(nodename):request_out")
+record(stringout, "nsm2:set:$(nodename):rcrequest")
 {
 	field(DESC, "Sent request to NSM2 node")
 	field(SCAN, "Passive")
 	field(VAL, "UNKNOWN")
-	field(DTYP, "nsm2_request_out")
+	field(DTYP, "nsm2_vset_stringout")
 }
 
-record(stringin, "nsm2:$(nodename):state")
+record(stringin, "nsm2:get:$(nodename):rcstate")
 {
 	field(DESC, "RC state response to NSM2 request") 
 	field(SCAN, "I/O Intr")
 	field(VAL,  "NOTREADY") 
-	field(DTYP, "nsm2_state_in")
+	field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "nsm2:set:$(nodename):rcrequest")
+{
+	field(DESC, "Sent request to NSM2 node")
+	field(SCAN, "Passive")
+	field(VAL, "UNKNOWN")
+	field(DTYP, "nsm2_vset_stringout")
+}
+
+record(longin, "nsm2:get:$(nodename):stream0:sender[0]:pid")
+{
+	field(DESC, "RC state response to NSM2 request") 
+	field(SCAN, "I/O Intr")
+	field(VAL,  "0") 
+	field(DTYP, "nsm2_vget_longin")
+}
+
+record(stringin, "nsm2:get:$(nodename):stream0:sender[0]:script")
+{
+	field(DESC, "RC state response to NSM2 request") 
+	field(SCAN, "I/O Intr")
+	field(VAL,  "NOTREADY") 
+	field(DTYP, "nsm2_vget_stringin")
 }
 

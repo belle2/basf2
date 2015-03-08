@@ -1,10 +1,13 @@
 #ifndef _Belle2_PThread_hh
 #define _Belle2_PThread_hh
 
+#include <daq/slc/system/LogFile.h>
+
 #include <pthread.h>
 #include <signal.h>
 #include <cstdio>
 #include <exception>
+#include <iostream>
 
 namespace Belle2 {
 
@@ -25,7 +28,9 @@ namespace Belle2 {
       pthread_cleanup_push(destroy<WORKER>, arg);
       try {
         worker->run();
-      } catch (const std::exception& e) {}
+      } catch (const std::exception& e) {
+        LogFile::fatal(e.what());
+      }
       pthread_cleanup_pop(1);
       return NULL;
     }
@@ -36,7 +41,9 @@ namespace Belle2 {
       pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
       try {
         worker->run();
-      } catch (const std::exception& e) {}
+      } catch (const std::exception& e) {
+        LogFile::fatal(e.what());
+      }
       return NULL;
     }
 

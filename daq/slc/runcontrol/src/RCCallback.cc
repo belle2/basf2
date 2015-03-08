@@ -126,14 +126,22 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       }
     }
     RCState state = cmd.nextState();
-    if (state != Enum::UNKNOWN) {
+    if (state != Enum::UNKNOWN && m_auto) {
       setState(state);
       reply(NSMMessage(NSMCommand::OK, state.getLabel()));
     }
   } catch (const RCHandlerException& e) {
-    setState(RCState::NOTREADY_S);
-    LogFile::error(e.what());
-    reply(NSMMessage(NSMCommand::ERROR, e.what()));
+    std::string emsg = StringUtil::form("%s. aborting", e.what());
+    LogFile::error(emsg);
+    reply(NSMMessage(NSMCommand::ERROR, emsg));
+    try {
+      setState(RCState::ABORTING_RS);
+      abort();
+      setState(RCState::NOTREADY_S);
+    } catch (const RCHandlerException& e) {
+      std::string emsg = StringUtil::form("Failed to abort : %s", e.what());
+      LogFile::fatal(emsg);
+    }
   }
   return true;
 }

@@ -25,8 +25,9 @@ long init_rc_runno_longin(longinRecord* record);
 long read_rc_runno_longin(longinRecord* record);
 long init_rc_subno_longin(longinRecord* record);
 long read_rc_subno_longin(longinRecord* record);
-long init_rc_configid_longin(longinRecord* record);
-long read_rc_configid_longin(longinRecord* record);
+
+long init_rc_config_stringin(stringinRecord* record);
+long read_rc_config_stringin(stringinRecord* record);
 
 long init_rc_request_stringin(stringinRecord* record);
 long read_rc_request_stringin(stringinRecord* record);

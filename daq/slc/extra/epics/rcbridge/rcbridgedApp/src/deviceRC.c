@@ -53,10 +53,10 @@ struct
   DEVSUPFUN init;
   DEVSUPFUN init_record;
   DEVSUPFUN get_ioint_info;
-  DEVSUPFUN read_longin;
-} dev_rc_configid = {
-  5, NULL, NULL, init_rc_configid_longin,
-  get_ioint_info_rc_longin, read_rc_configid_longin
+  DEVSUPFUN read_stringin;
+} dev_rc_config = {
+  5, NULL, NULL, init_rc_config_stringin,
+  get_ioint_info_rc_stringin, read_rc_config_stringin
 };
 
 struct
@@ -88,6 +88,6 @@ struct
 epicsExportAddress(dset, dev_rc_expno);
 epicsExportAddress(dset, dev_rc_runno);
 epicsExportAddress(dset, dev_rc_subno);
-epicsExportAddress(dset, dev_rc_configid);
+epicsExportAddress(dset, dev_rc_config);
 epicsExportAddress(dset, dev_rc_request);
 epicsExportAddress(dset, dev_rc_state);

@@ -157,7 +157,6 @@ namespace Belle2 {
       const G4ParticleDefinition* m_MuonMinus;
 
       //! Pointer to definition of the positive pion
-      const G4ParticleDefinition* pionPlus;
       const G4ParticleDefinition* m_PionPlus;
 
       //! Pointer to definition of the negative pion

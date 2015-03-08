@@ -9,7 +9,14 @@
 # Contributors: Benjamin Oberhof
 # This steering file generates an ntuple for validation
 # purposes
-########################################################
+#######################################################
+
+"""
+<header>
+<output>ECLBkgOutput.root</output>
+<contact>Benjamin Oberhof, ecl2ml@bpost.kek.jp</contact>
+</header>
+"""
 
 import os
 import glob

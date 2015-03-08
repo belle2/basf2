@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+<output>ECLMuonOutput.root</output>
+<contact>Benjamin Oberhof, ecl2ml@bpost.kek.jp</contact>
+</header>
+"""
+
 import os
 from basf2 import *
 

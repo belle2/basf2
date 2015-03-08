@@ -9,6 +9,13 @@
 #
 ########################################################
 
+"""
+<header>
+<output>ECLClusterOutput_500mev.root</output>
+<contact>Elisa Manoni, ecl2ml@bpost.kek.jp</contact>
+</header>
+"""
+
 import os
 from basf2 import *
 from simulation import add_simulation

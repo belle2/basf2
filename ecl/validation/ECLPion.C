@@ -1,19 +1,9 @@
 /* ECLPion.C 
  * ROOT macro for ECL validation plots 
- * Author: Benjamin Oberhof 
- * 2014
-*/
-
-/*
-<header>
-<input>ECLPionOutput.root</input>
-<output>ECLPion.root</output>
-<contact>ecl2ml@bpost.kek.jp</contact>
-</header>
+ * Author Benjamin Oberhof
 */
 
 void ECLPion(){
-
 
   TFile* inputFile = TFile::Open("../ECLPionOutput.root");
   TTree* tree = (TTree*) inputFile->Get("m_tree");

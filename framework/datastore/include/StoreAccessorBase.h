@@ -151,31 +151,6 @@ namespace Belle2 {
      */
     std::string readableName() const;
 
-
-
-    //deprecated members:
-
-    /** Register the object/array in the DataStore and include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the object/array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsPersistent(bool errorIfExisting = false) __attribute__((deprecated("Please use registerInDataStore() instead"))) {
-      return registerInDataStore(errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
-    }
-
-    /** Register the object/array in the data store, but do not include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the object/array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsTransient(bool errorIfExisting = false) __attribute__((deprecated("Please use registerInDataStore(DataStore::c_DontWriteOut) instead"))) {
-      return registerInDataStore((errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0) | DataStore::c_DontWriteOut);
-    }
-
-
   protected:
     /** Store name under which this object/array is saved. */
     std::string m_name;

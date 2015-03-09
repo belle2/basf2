@@ -141,7 +141,7 @@ boost::shared_ptr<PathElement> Module::clone() const
 {
   ModulePtr newModule = ModuleManager::Instance().registerModule(getType());
   newModule->m_moduleParamList.setParameters(getParamList());
-  newModule->setModuleName(getName());
+  newModule->setName(getName());
   newModule->m_package = m_package;
   newModule->m_propertyFlags = m_propertyFlags;
   newModule->m_logConfig = m_logConfig;
@@ -270,7 +270,7 @@ void Module::exposePythonAPI()
   .def("__str__", &Module::getPathString)
   .def("name", &Module::getName, return_value_policy<copy_const_reference>())
   .def("type", &Module::getType, return_value_policy<copy_const_reference>())
-  .def("set_name", &Module::setModuleName)
+  .def("set_name", &Module::setName)
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
   .def("package", &Module::getPackage, return_value_policy<copy_const_reference>())
   .def("available_params", &_getParamInfoListPython)

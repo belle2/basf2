@@ -25,7 +25,7 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
   m_rbuf = rbuf;
   m_compressionLevel = 0;
   if (rbuf) {
-    setModuleName("Rx" + std::to_string(rbuf->shmid()));
+    setName("Rx" + std::to_string(rbuf->shmid()));
     B2INFO("Rx: Constructor with RingBuffer done.");
   }
 }

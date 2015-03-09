@@ -34,7 +34,7 @@ namespace Belle2 {
     PyModule(PyObject* p):
       Module(),
       m_self(p) {
-      setModuleName(p->ob_type->tp_name);
+      setName(p->ob_type->tp_name);
       setType("PyModule");
     }
 
@@ -42,7 +42,7 @@ namespace Belle2 {
     PyModule(PyObject* p, const Module& m):
       Module(m),
       m_self(p) {
-      setModuleName(p->ob_type->tp_name);
+      setName(p->ob_type->tp_name);
       setType("PyModule");
     }
 

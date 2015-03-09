@@ -47,7 +47,7 @@ void SubEventModule::initSubEvent(const std::string& objectName, const std::stri
   m_objectName = objectName;
   m_loopOverName = loopOver;
   m_path = path;
-  setModuleName("for_each(" + m_objectName + " : " + m_loopOverName + ")");
+  setName("for_each(" + m_objectName + " : " + m_loopOverName + ")");
 
   m_moduleList = m_path->buildModulePathList();
   //set c_ParallelProcessingCertified flag if _all_ modules have it set

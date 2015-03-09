@@ -400,15 +400,16 @@ namespace Belle2 {
     void setReturnValue(bool value);
 
     /**
-     * Set the name of the module just for internal use.
+     * Set the name of the module.
      *
      * \note
      * The module name is set when using the REG_MODULE macro,
-     * there is usually no need to call this function directly.
+     * but the module can be renamed before calling process()
+     * using the set_name() function in your steering file.
      *
      * @param name The name of the module
      */
-    void setModuleName(const std::string& name) { m_name = name; };
+    void setName(const std::string& name) { m_name = name; };
 
     /** Replace existing parameter list. */
     void setParamList(const ModuleParamList& params) { m_moduleParamList = params; }
@@ -577,7 +578,7 @@ namespace Belle2 {
     ModulePtr createModule() const {
       ModulePtr nm(new T());
       nm->setType(m_moduleType);
-      nm->setModuleName(m_moduleType);
+      nm->setName(m_moduleType);
       nm->m_package = m_package;
       return nm;
     }

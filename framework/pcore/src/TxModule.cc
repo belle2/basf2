@@ -28,7 +28,7 @@ TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_blocking
   m_compressionLevel = 0;
 
   if (rbuf) {
-    setModuleName("Tx" + std::to_string(rbuf->shmid()));
+    setName("Tx" + std::to_string(rbuf->shmid()));
     B2INFO("Tx: Constructor with RingBuffer done.");
   }
 }

@@ -140,7 +140,7 @@ bool Module::hasUnsetForcedParams() const
 boost::shared_ptr<PathElement> Module::clone() const
 {
   ModulePtr newModule = ModuleManager::Instance().registerModule(getType());
-  newModule->setParamList(getParamList());
+  newModule->m_moduleParamList.setParameters(getParamList());
   newModule->setModuleName(getName());
   newModule->m_package = m_package;
   newModule->m_propertyFlags = m_propertyFlags;

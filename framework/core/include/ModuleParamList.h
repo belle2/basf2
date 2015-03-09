@@ -17,9 +17,7 @@
 
 #include <framework/core/PyObjConvUtils.h>
 
-
 #include <map>
-#include <vector>
 #include <string>
 
 namespace boost {
@@ -100,6 +98,10 @@ namespace Belle2 {
      */
     template<typename T>
     void setParameter(const std::string& name, T& value);
+
+    /** Set values for parameters from other parameter list. */
+    void setParameters(const ModuleParamList& params);
+
 
     /**
      * Returns a reference to a parameter. The returned parameter has already the correct type.

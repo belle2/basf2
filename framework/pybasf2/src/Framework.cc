@@ -95,7 +95,13 @@ void Framework::process(PathPtr startPath, long maxEvent)
 
   static bool already_executed = false;
   if (already_executed) {
-    B2FATAL("You can only call process() once per steering file!")
+    B2WARNING("Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems")
+    if (startPath->buildModulePathList(true) != startPath->buildModulePathList(false)) {
+      B2FATAL("Your path contains the same module instance in multiple places. Calling process() multiple times is not implement for this case.");
+    }
+
+    //TODO only clone if modules have been run before?
+    startPath = boost::static_pointer_cast<Path>(startPath->clone());
   }
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if (numLogError != 0) {
@@ -103,6 +109,9 @@ void Framework::process(PathPtr startPath, long maxEvent)
   }
 
   try {
+    DataStore::Instance().reset();
+    DataStore::Instance().setInitializeActive(true);
+
     already_executed = true;
     if (Environment::Instance().getNumberProcesses() == 0) {
       EventProcessor processor;

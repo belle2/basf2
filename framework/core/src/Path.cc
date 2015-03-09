@@ -113,7 +113,7 @@ boost::shared_ptr<PathElement> Path::clone() const
   for (const auto & elem : m_elements) {
     const Module* m = dynamic_cast<const Module*>(elem.get());
     if (m and m->getType() == "PyModule") {
-      B2WARNING("Python module " << m->getName() << " encountered, please make sure it correctly reinitialises itself to ensure multiple process() calls work.");
+      //B2WARNING("Python module " << m->getName() << " encountered, please make sure it correctly reinitialises itself to ensure multiple process() calls work.");
       path->addModule(boost::static_pointer_cast<Module>(elem));
     } else {
       path->m_elements.push_back(elem->clone());

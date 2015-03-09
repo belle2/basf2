@@ -100,7 +100,11 @@ namespace Belle2 {
      * @param pyObject The python object which should be filled with the parameter value
      * @param defaultValues If true, the python object is set to the default value of this parameter.
      */
-    virtual void setValueToPythonObject(boost::python::object& pyObject, bool defaultValues = false) = 0;
+    virtual void setValueToPythonObject(boost::python::object& pyObject, bool defaultValues = false) const = 0;
+
+    /** Set value from other ModuleParam of same type. */
+    virtual void setValueFromParam(const ModuleParamBase& param) = 0;
+
 
   protected:
 
@@ -196,7 +200,18 @@ namespace Belle2 {
      * @param pyObject Reference to the python object which is set to the parameter value.
      * @param defaultValues If true returns default value otherwise parameter value.
      */
-    virtual void setValueToPythonObject(boost::python::object& pyObject, bool defaultValues = false) { pyObject = PyObjConvUtils::convertToPythonObject((defaultValues) ? getDefaultValue() : getValue()); }
+    virtual void setValueToPythonObject(boost::python::object& pyObject, bool defaultValues = false) const { pyObject = PyObjConvUtils::convertToPythonObject((defaultValues) ? m_defaultValue : m_paramVariable); }
+
+
+    /** Set value from other ModuleParam of same type. */
+    virtual void setValueFromParam(const ModuleParamBase& param) override {
+      const ModuleParam<T>* p = dynamic_cast<const ModuleParam<T>*>(&param);
+      if (p) {
+        m_defaultValue = p->m_defaultValue;
+        m_paramVariable = p->m_paramVariable;
+        m_setInSteering = p->m_setInSteering;
+      }
+    }
 
     /**
      * Resets the parameter value by assigning the default value to the parameter value.

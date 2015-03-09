@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from FEI.actorFunctions import *
-from FEI import Particle
+from fei.actorFunctions import *
+from fei import Particle
 
 from basf2 import *
 import unittest

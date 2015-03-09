@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from FEI.actorFramework import *
+from fei.actorFramework import *
 import os
 from basf2 import *
 import unittest

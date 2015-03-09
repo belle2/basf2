@@ -486,7 +486,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     hash = actorFramework.create_hash([placeholders])
     placeholders['texFile'] = removeJPsiSlash('{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
-        automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/ChannelTemplate.tex', placeholders)
+        automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/ChannelTemplate.tex', placeholders)
 
     B2INFO("Written analysis tex file for channel {c}.".format(c=channelName))
     return {'Placeholders_{c}'.format(c=channelName): placeholders, '__needed__': False}
@@ -576,7 +576,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
 
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
 
-    subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/FEI/templates/nordbert.pdf')), shell=True)
+    subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/fei/templates/nordbert.pdf')), shell=True)
     for i in range(0, 2):
         ret = subprocess.call(['pdflatex', '-halt-on-error', '-interaction=nonstopmode', placeholders['texFile']])
         if ret == 0:

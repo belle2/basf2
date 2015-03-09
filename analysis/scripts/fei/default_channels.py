@@ -1,4 +1,4 @@
-from FEI import Particle
+from fei import Particle
 
 
 def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True):

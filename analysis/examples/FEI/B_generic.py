@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Thomas Keck 2014
 
-from FEI import *
+from fei import *
 from basf2 import *
 from modularAnalysis import *
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from FEI import *
+from fei import *
 
 chargedTrackVars = [
     'eid',

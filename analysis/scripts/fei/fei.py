@@ -184,7 +184,6 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
     parser = argparse.ArgumentParser()
     parser.add_argument('-verbose', '--verbose', dest='verbose', action='store_true', help='Output additional information')
     parser.add_argument('-summary', '--make-summmary', dest='makeSummary', action='store_true', help='Create summary PDF file')
-    parser.add_argument('-nosignal', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
     parser.add_argument('-nproc', '--nProcesses', dest='nProcesses', type=int, default=1, help='Use n processes to execute actors parallel')
     parser.add_argument('-preload', '--preload', dest='preload', action='store_true', help='In conjuction with --cache, the basf2 modules used by cached actors are not executed, corresponding data are read from the input file.')
     parser.add_argument('-cache', '--cache', dest='cacheFile', type=str, default=None, help='Cache actor results in the given file. If an actor is found in the file, it is not executed a second time.')
@@ -302,49 +301,48 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               additionalDependencies=additionalDependencies)
 
     # The third act trains multivariate methods and provides signal probabilities
-    if not args.nosig:
-        for particle in particles:
-            if particle.isFSP:
+    for particle in particles:
+        if particle.isFSP:
+            play.addActor(SignalProbability,
+                          identifier='Identifier_{i}'.format(i=particle.identifier),
+                          mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
+                          particleList='RawParticleList_{i}'.format(i=particle.identifier),
+                          distribution='Distribution_{i}'.format(i=particle.identifier),
+                          additionalDependencies='None')
+        else:
+            for channel in particle.channels:
+                additionalDependencies = []
+                if any('SignalProbability' in variable for variable in channel.mvaConfig.variables):
+                    additionalDependencies += ['SignalProbability_{d}'.format(d=daughter) for daughter in channel.daughters]
+                if any(variable in ['dx', 'dy', 'dz', 'dr', 'chiProb', 'significanceOfDistance', 'distance',
+                                    'cosAngleBetweenMomentumAndVertexVector'] for variable in channel.mvaConfig.variables):
+                    additionalDependencies += ['VertexFit_{c}'.format(c=channel.name)]
                 play.addActor(SignalProbability,
-                              identifier='Identifier_{i}'.format(i=particle.identifier),
-                              mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
-                              particleList='RawParticleList_{i}'.format(i=particle.identifier),
-                              distribution='Distribution_{i}'.format(i=particle.identifier),
-                              additionalDependencies='None')
-            else:
-                for channel in particle.channels:
-                    additionalDependencies = []
-                    if any('SignalProbability' in variable for variable in channel.mvaConfig.variables):
-                        additionalDependencies += ['SignalProbability_{d}'.format(d=daughter) for daughter in channel.daughters]
-                    if any(variable in ['dx', 'dy', 'dz', 'dr', 'chiProb', 'significanceOfDistance', 'distance',
-                                        'cosAngleBetweenMomentumAndVertexVector'] for variable in channel.mvaConfig.variables):
-                        additionalDependencies += ['VertexFit_{c}'.format(c=channel.name)]
-                    play.addActor(SignalProbability,
-                                  identifier='Name_{c}'.format(c=channel.name),
-                                  mvaConfig='MVAConfig_{c}'.format(c=channel.name),
-                                  particleList='RawParticleList_{c}'.format(c=channel.name),
-                                  distribution='PreCut_{c}'.format(c=channel.name),
-                                  additionalDependencies=additionalDependencies)
+                              identifier='Name_{c}'.format(c=channel.name),
+                              mvaConfig='MVAConfig_{c}'.format(c=channel.name),
+                              particleList='RawParticleList_{c}'.format(c=channel.name),
+                              distribution='PreCut_{c}'.format(c=channel.name),
+                              additionalDependencies=additionalDependencies)
 
-                play.addCollection('SignalProbability_{i}'.format(i=particle.identifier), ['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
+            play.addCollection('SignalProbability_{i}'.format(i=particle.identifier), ['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
 
-            if particle.name != pdg.conjugate(particle.name):
-                play.addCollection('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), ['SignalProbability_{i}'.format(i=particle.identifier)])
-            extraVars = []
-            if particle in finalParticles:
-                play.addActor(TagUniqueSignal,
-                              particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
-                              particleList='ParticleList_{i}'.format(i=particle.identifier),
-                              signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
-                              target='MVAConfigTarget_{i}'.format(i=particle.identifier))
-                extraVars = ['TagUniqueSignal_{i}'.format(i=particle.identifier)]
-
-            play.addActor(VariablesToNTuple,
+        if particle.name != pdg.conjugate(particle.name):
+            play.addCollection('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), ['SignalProbability_{i}'.format(i=particle.identifier)])
+        extraVars = []
+        if particle in finalParticles:
+            play.addActor(TagUniqueSignal,
                           particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
                           particleList='ParticleList_{i}'.format(i=particle.identifier),
                           signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
-                          extraVars=extraVars,
                           target='MVAConfigTarget_{i}'.format(i=particle.identifier))
+            extraVars = ['TagUniqueSignal_{i}'.format(i=particle.identifier)]
+
+        play.addActor(VariablesToNTuple,
+                      particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
+                      particleList='ParticleList_{i}'.format(i=particle.identifier),
+                      signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
+                      extraVars=extraVars,
+                      target='MVAConfigTarget_{i}'.format(i=particle.identifier))
 
     # The last act creates the automatic reporting summary pdf
     play.addActor(SaveModuleStatistics,
@@ -382,7 +380,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
                               nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier))
 
-        #get channelName and corresponding inputList and placeholders (in separate lists, sadly)
+        # get channelName and corresponding inputList and placeholders (in separate lists, sadly)
         channelNames = ['Name_{i}'.format(i=p.identifier) for p in particles if p.isFSP]
         channelNames += ['Name_{c}'.format(c=channel.name) for p in particles for channel in p.channels]
         inputLists = ['RawParticleList_{i}'.format(i=p.identifier) for p in particles if p.isFSP]

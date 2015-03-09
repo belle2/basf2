@@ -99,6 +99,20 @@ bool Path::contains(std::string moduleType) const
   return std::find_if(modules.begin(), modules.end(), sameTypeFunc) != modules.end();
 }
 
+boost::shared_ptr<PathElement> Path::clone() const
+{
+  PathPtr path(new Path);
+  for (const auto & elem : m_elements) {
+    const Module* m = dynamic_cast<const Module*>(elem.get());
+    if (m and m->getType() == "PyModule") {
+      B2WARNING("Python module " << m->getName() << " encountered, please make sure it correctly reinitialises itself to ensure multiple process() calls work.");
+      path->addModule(boost::static_pointer_cast<Module>(elem));
+    } else {
+      path->m_elements.push_back(elem->clone());
+    }
+  }
+  return path;
+}
 
 
 //============================================================================

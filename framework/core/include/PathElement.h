@@ -36,6 +36,8 @@ namespace Belle2 {
     /** Return a string representation of the Modules in this path */
     virtual std::string getPathString() const = 0;
 
+    /** Create an independent copy of this element.  */
+    virtual boost::shared_ptr<PathElement> clone() const = 0;
 
     /** Returns a sequential list of Modules in this path element. */
     virtual std::list<boost::shared_ptr<Module> > getModules() const = 0;

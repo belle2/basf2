@@ -130,6 +130,13 @@ namespace Belle2 {
      */
     void forEach(std::string loopObjectName, std::string arrayName, PathPtr path);
 
+    /** Create an independent copy of this path, recreating all contained modules with the same parameters.
+     *
+     * Note that parameters are shared, so changing them on a module in the cloned path will also affect
+     * the module in the original path.
+     */
+    boost::shared_ptr<PathElement> clone() const;
+
 
     //--------------------------------------------------
     //                   Python API

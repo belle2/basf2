@@ -136,6 +136,28 @@ bool Module::hasUnsetForcedParams() const
   return m_moduleParamList.hasUnsetForcedParams();
 }
 
+
+boost::shared_ptr<PathElement> Module::clone() const
+{
+  ModulePtr newModule = ModuleManager::Instance().registerModule(getType());
+  newModule->setParamList(getParamList());
+  newModule->setModuleName(getName());
+  newModule->m_package = m_package;
+  newModule->m_propertyFlags = m_propertyFlags;
+  newModule->m_logConfig = m_logConfig;
+
+  newModule->m_hasCondition = m_hasCondition;
+  if (m_conditionPath) {
+    boost::shared_ptr<Path> p = boost::static_pointer_cast<Path>(m_conditionPath->clone());
+    newModule->m_conditionPath = p;
+  }
+  newModule->m_conditionOperator = m_conditionOperator;
+  newModule->m_conditionValue = m_conditionValue;
+  newModule->m_afterConditionPath = m_afterConditionPath;
+
+  return newModule;
+}
+
 //============================================================================
 //                          Protected methods
 //============================================================================

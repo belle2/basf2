@@ -310,6 +310,13 @@ namespace Belle2 {
     template<typename T>
     ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError);
 
+    /** Create an independent copy of this module.
+     *
+     * Note that parameters are shared, so changing them on a cloned module will also affect
+     * the original module.
+     */
+    boost::shared_ptr<PathElement> clone() const;
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API

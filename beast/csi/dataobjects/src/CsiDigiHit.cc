@@ -9,7 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <beast/csi/modules/CsIDigitizerModule.h>
+#include <beast/csi/dataobjects/CsiDigiHit.h>
 
 using namespace std;
 using namespace Belle2;

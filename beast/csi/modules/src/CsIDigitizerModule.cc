@@ -303,26 +303,28 @@ int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16_t* _
     _Waveform->clear();
     _DPPCIBits->clear();
   } else {
-    char rootfilename[100];
-    sprintf(rootfilename, "output/BEAST/plots/dpp-ci_WF%i.root", m_nWFcounter);
+    //Below is obsolete: recording now done in the study module
+    /*
+      char rootfilename[100];
+      sprintf(rootfilename, "output/BEAST/plots/dpp-ci_WF%i.root", m_nWFcounter);
 
-    B2INFO("Writing to " << rootfilename);
-    TFile fs(rootfilename, "recreate");
+      B2INFO("Writing to " << rootfilename);
+      TFile fs(rootfilename, "recreate");
 
-    h_trigger.Write();
-    h_gate.Write();
-    h_holdoff.Write();
-    h_baseline.Write();
-    h_charge.Write();
-    h_signal.Write();
-    h_digsig.Write();
+      h_trigger.Write();
+      h_gate.Write();
+      h_holdoff.Write();
+      h_baseline.Write();
+      h_charge.Write();
+      h_signal.Write();
+      h_digsig.Write();
 
-    TVectorD Edep(1);
-    Edep[0] = m_TrueEdep;
-    Edep.Write("Edep");
+      TVectorD Edep(1);
+      Edep[0] = m_TrueEdep;
+      Edep.Write("Edep");
 
-    fs.Close();
-
+      fs.Close();
+    */
   }
 
   return nSam;

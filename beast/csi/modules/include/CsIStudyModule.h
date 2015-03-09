@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
 #include <beast/csi/dataobjects/CsiHit.h>
+#include <beast/csi/dataobjects/CsiDigiHit.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -68,13 +69,32 @@ namespace Belle2 {
     */
     virtual void defineHisto();
 
+
+    /** Reads  and unpacks the status bits of the digitizer
+     * Unpacks in the appropriate booleans
+     *
+     * @param packedbits: a char containing the status bits in the following order [MSB-LSB] is [stop,holdoff,gate,trigger]
+     *
+     * @return : a pointer to the array of 8 bools;
+     */
+
+    bool* readDPPStatusBits(char packedbits);
+
   private:
 
     StoreArray<CsiSimHit> m_simhits; /**< Array of the simulated hits in the crystals (incl. each radiated photons..) */
     StoreArray<CsiHit> m_hits; /**< Array of the crystal hits (1 per event) */
 
+    StoreArray<CsiDigiHit> m_digihits; /**< Array of the crystal digitized hits (1 per event per fired crystal) */
+
     // Parameters
     double m_paramTemplate;  /**< Template of an input parameter. Noop for now. */
+    int m_nWFSamples ; /**< Number of samples in each of the waveforms (in the near future this should be imported from the digi module somehow */
+    std::string  m_waveformFilename ; /**< Path where to save the waveforms (root file) */
+
+
+    //Othe rmembers
+    TFile* fWF; /**< ROOT file to save waveforms */
 
     // Histograms
     TH1F* h_CrystalEdep;        /**< Energy deposited in each crystal*/
@@ -83,6 +103,12 @@ namespace Belle2 {
     TH1F* h_CrystalRadDoseSH;   /**< Yearly radiation dose deposited in each crystal (for hit-simhit check)*/
     TH1F* h_NhitCrystal;        /**< Number of hits in each crystal (to get hit rate)*/
     TH1F* h_LightYieldCrystal;  /**< Number of photons hits in each crystal (to validate light yield..) */
+    TH1S* h_Waveform;
+    TH1C* h_Gate;
+    TH1I* h_Charge ;
+    TH1F* h_TrueEdep;
+
+
 
     // Constants
     const double GeVtoJ = 1.6e-10; /**< Conversion between GeV to Joule */

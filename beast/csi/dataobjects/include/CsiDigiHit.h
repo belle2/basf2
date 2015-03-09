@@ -31,6 +31,7 @@ namespace Belle2 {
       m_Charge   = 0;
       m_Baseline = 0;
       m_Time     = 0;
+      m_TrueEdep = 0;
       m_Waveform.clear();
       m_StatusBits.clear();
     }

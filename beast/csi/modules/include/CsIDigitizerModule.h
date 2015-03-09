@@ -191,7 +191,7 @@ namespace Belle2 {
       const double m_tCsIslow = 30;  /**< Time constant of the slow pure CsI light component */
       const double m_tCsIfast =  6;  /**< Time constant of the fast pure CsI light component */
 
-      const int m_seed = 0;  /** Seed fot the random number generators */
+      const int m_seed = 0;  /**< Seed fot the random number generators */
       StoreArray<CsiHit> m_aHit; /**<  The result of each incoming particle in a crystal */
       StoreArray<CsiSimHit>  m_aSimHit; /**< Each simulated particle in the crystal */
       StoreArray<CsiDigiHit> m_aDigiHit; /**< Output: a digitized hit */

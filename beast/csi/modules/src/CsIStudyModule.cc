@@ -14,6 +14,7 @@
 #include <beast/csi/modules/CsiModule.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
 #include <beast/csi/dataobjects/CsiHit.h>
+#include <beast/csi/dataobjects/CsiDigiHit.h>
 #include <beast/csi/modules/CsIStudyModule.h>
 
 
@@ -44,13 +45,22 @@ CsIStudyModule::CsIStudyModule() : HistoModule(),
   h_CrystalRadDose(NULL),
   h_CrystalRadDoseSH(NULL),
   h_NhitCrystal(NULL),
-  h_LightYieldCrystal(NULL)
+  h_LightYieldCrystal(NULL),
+  h_Waveform(NULL),
+  h_Gate(NULL),
+  h_Charge(NULL),
+  h_TrueEdep(NULL)
+
 {
   // Set module properties
   setDescription("Analyze simulations of CsI readings in BEAST. Requires HistoManager module.");
 
   // Parameter definitions
+  addParam("nWFSamples", m_nWFSamples, "Number of samples in the saved waveforms", 8000);
   addParam("paramTemplate", m_paramTemplate, "Template of an input parameter. Noop for now.", 0.0);
+
+  string rootfilepath = "output/waveforms.root";
+  addParam("waveformFilename", m_waveformFilename, "Path to the root file to save waveforms", rootfilepath);
 
 }
 
@@ -66,14 +76,22 @@ void CsIStudyModule::defineHisto()
   h_CrystalRadDose      = new TH1F("Crystal_RadDose", "Crystal Radiation Dose;CellID;Gy/yr", 16, -0.5, 15.5);
   h_CrystalRadDoseSH    = new TH1F("Crystal_RadDose_SH", "Crystal Radiation Dose from SimHits;CellID;Gy/yr", 16, -0.5, 15.5);
   h_LightYieldCrystal   = new TH1F("Crystal_g_yield", "Light yield each crystal;CellID;gamma/sample", 16, -0.5, 15.5);
+  h_Waveform            = new TH1S("Waveform", "Recorded waveform;Time index;ADC bits", m_nWFSamples, 0, m_nWFSamples - 1);
+  h_Gate                = new TH1C("Gate", "Recorded gate;Time index;ADC bits", m_nWFSamples, 0, m_nWFSamples - 1);
+  h_Charge              = new TH1I("Charge", "Integrated Charge", 200, 0, 6);
+  h_TrueEdep            = new TH1F("TrueEdep", "True deposited energy", 200, -5, 1);
+
 }
 
 void CsIStudyModule::initialize()
 {
   REG_HISTOGRAM   // required to register histograms to HistoManager
 
-  m_hits.isRequired();
+  m_hits.isOptional();
   m_simhits.isRequired();
+  m_digihits.isOptional();
+
+  fWF = new TFile(m_waveformFilename.c_str(), "recreate");
 }
 
 void CsIStudyModule::beginRun()
@@ -139,11 +157,65 @@ void CsIStudyModule::event()
       }
     }
   }
+
+  //Loop over Digihits
+  if (m_digihits.getEntries() > 0) {
+    int hitNum = m_digihits.getEntries(); /**< Number of Crystal hits */
+
+    /// Actual looping over CsIDigiHits
+    for (int i = 0; i < hitNum; i++) {
+      CsiDigiHit* aCsIDigiHit = m_digihits[i];
+
+      int cellID = aCsIDigiHit->getCellId();
+      uint32_t charge = aCsIDigiHit->getCharge();
+      double trueEdep = aCsIDigiHit->getTrueEdep();
+      vector<uint16_t>* waveform = aCsIDigiHit->getWaveform();
+      vector<uint8_t>* status = aCsIDigiHit->getStatusBits();
+
+      h_TrueEdep->Fill(log10(trueEdep));
+      h_Charge->Fill(log10(charge));
+
+      char histoTitle[80];
+      sprintf(histoTitle, "Waveform Hit No. %i, Cell No %i", i, cellID);
+      h_Waveform->SetTitle(histoTitle);
+
+      // Write the wavforms. All have the same number in the TFile, but
+      // we can access them by their cycle number:
+      // root[] TFile *f1 = new TFile("filename.root")
+      // root[] TH1F *Waveform4; f1->GetObject("h_Waveform;4",Waveform4);
+
+
+      if (waveform->size()) {
+        for (uint iBin = 0; iBin < waveform->size(); iBin++) {
+          bool* statusBits = readDPPStatusBits(status->at(iBin));
+          h_Gate->Fill(iBin + 1, (int) statusBits[1]);
+          h_Waveform->Fill(iBin + 1, waveform->at(iBin));
+        }
+
+        fWF->cd();
+        h_Gate->Write();
+        h_Waveform->Write();
+      }
+    }
+  }
 }
 
 
 void CsIStudyModule::terminate()
 {
+  fWF->Close();
 }
 
 
+bool*  CsIStudyModule::readDPPStatusBits(char data)
+{
+
+  bool* bit  = new bool[8];
+
+  // fill data
+  for (int i = 0; i < 8; i++) {
+    bit[i] = ((data >> i) & 0x01);
+  }
+
+  return bit;
+}

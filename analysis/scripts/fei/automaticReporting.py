@@ -198,11 +198,18 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
         placeholders['combinedParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
         placeholders['combinedParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        has_usercut = (particlePlaceholder['particleNSignal'] != particlePlaceholder['particleNSignalAfterUserCut']) or (particlePlaceholder['particleNBackground'] != particlePlaceholder['particleNBackgroundAfterUserCut'])
+        if has_usercut:
+            placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        else:
+            placeholders['combinedParticleEPTable'] += ' & '
         placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNBackgroundAfterUserCut']) * 100) + ' & '
+        if has_usercut:
+            placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNBackgroundAfterUserCut']) * 100) + ' & '
+        else:
+            placeholders['combinedParticleEPTable'] += ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
@@ -660,13 +667,11 @@ def escapeForRegExp(someString):
 
 def makeOvertrainingPlot(tmvaFilename, plotName):
     subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
-    #subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
 def makeROCPlot(tmvaFilename, plotName):
     subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
-    #subprocess.call(['root -l -q -b "/home/belle2/tkeck/hack/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
@@ -960,7 +965,7 @@ def sendMail():
     msg.attach(pdf)
 
     server = smtplib.SMTP('smtp.kit.edu')
-    #server.login(fromMail, 'Not necessary for kit.edu :-)')
+    # server.login(fromMail, 'Not necessary for kit.edu :-)')
     server.sendmail(fromMail, toMails, msg.as_string())
     server.quit()
 
@@ -1018,7 +1023,7 @@ def getBranchingFractions(filename):
                 continue
             daughters = tuple(sorted(p for p in fields[1:]))
             if daughters in branching_fractions[mother]:
-                #print "WARNING: decay ", mother, " -> ", " ".join(daughters), "is specified twice"
+                # print "WARNING: decay ", mother, " -> ", " ".join(daughters), "is specified twice"
                 branching_fractions[mother][daughters] += float(fields[0])
             else:
                 branching_fractions[mother][daughters] = float(fields[0])

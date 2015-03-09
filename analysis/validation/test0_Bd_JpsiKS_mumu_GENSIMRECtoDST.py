@@ -11,6 +11,7 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from reconstruction import add_mdst_output
 from ROOT import Belle2
 
 set_random_seed(12345)
@@ -19,7 +20,7 @@ main = create_path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('evtNumList', [2])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
@@ -41,6 +42,8 @@ add_reconstruction(main)
 output = register_module('RootOutput')
 output.param('outputFileName', '../Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root')
 main.add_module(output)
+
+add_mdst_output(main, True, '../Bd_JpsiKS_mumu_GENSIMRECtoMDST.mdst.root')
 
 # Go!
 process(main)

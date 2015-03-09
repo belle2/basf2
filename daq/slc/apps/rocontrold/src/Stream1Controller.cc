@@ -6,22 +6,28 @@
 
 using namespace Belle2;
 
-bool Stream1Controller::initArguments(const DBObject& obj) throw()
+void Stream1Controller::readDB(const DBObject& obj, int& port,
+                               std::string& script)
 {
   const DBObject& cobj(obj("stream1"));
-  int port = cobj.getInt("port");
-  std::string script = cobj.getText("script");
-  m_callback->add(new NSMVHandlerInt("stream1.port", true, true, port));
-  m_callback->add(new NSMVHandlerText("stream1.script", true, true, script));
-  return true;
+  port = cobj.getInt("port");
+  script = cobj.getText("script");
 }
 
-void Stream1Controller::loadArguments() throw()
+void Stream1Controller::initArguments(const DBObject& obj)
 {
   int port = 0;
   std::string script;
-  m_callback->get("stream1.port", port);
-  m_callback->get("stream1.script", script);
+  readDB(obj, port, script);
+  m_callback->add(new NSMVHandlerInt("stream1.port", true, true, port));
+  m_callback->add(new NSMVHandlerText("stream1.script", true, true, script));
+}
+
+void Stream1Controller::loadArguments(const DBObject& obj)
+{
+  int port = 0;
+  std::string script;
+  readDB(obj, port, script);
   m_con.setExecutable("basf2");
   m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
                                      script.c_str()));

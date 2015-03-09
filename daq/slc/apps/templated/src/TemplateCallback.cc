@@ -48,9 +48,10 @@ void TemplateCallback::pause() throw(RCHandlerException)
 {
 }
 
-void TemplateCallback::recover() throw(RCHandlerException)
+void TemplateCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
-  setState(RCState::READY_S);
+  abort();
+  load(obj);
 }
 
 void TemplateCallback::abort() throw(RCHandlerException)

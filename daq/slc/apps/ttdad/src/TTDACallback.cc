@@ -111,7 +111,7 @@ void TTDACallback::resume() throw(RCHandlerException)
   send(NSMMessage(m_ttdnode, NSMCommand(15, "RESUME")));
 }
 
-void TTDACallback::recover() throw(RCHandlerException)
+void TTDACallback::recover(const DBObject&) throw(RCHandlerException)
 {
   send(NSMMessage(m_ttdnode, NSMCommand(16, "RECOVER")));
 }

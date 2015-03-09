@@ -98,6 +98,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       setState(tstate);
       if (cmd == RCCommand::CONFIGURE) {
         try {
+          abort();
           dbload(com);
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));
@@ -116,7 +117,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       } else if (cmd == RCCommand::STOP) {
         stop();
       } else if (cmd == RCCommand::RECOVER) {
-        recover();
+        recover(m_obj);
       } else if (cmd == RCCommand::RESUME) {
         resume();
       } else if (cmd == RCCommand::PAUSE) {

@@ -30,7 +30,7 @@ namespace Belle2 {
     virtual void load(const DBObject&) throw(RCHandlerException) {}
     virtual void start(int /*expno*/, int /*runno*/) throw(RCHandlerException) {}
     virtual void stop() throw(RCHandlerException) {}
-    virtual void recover() throw(RCHandlerException) {}
+    virtual void recover(const DBObject&) throw(RCHandlerException) {}
     virtual void resume() throw(RCHandlerException) {}
     virtual void pause() throw(RCHandlerException) {}
     virtual void abort() throw(RCHandlerException) {}

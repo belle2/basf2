@@ -270,7 +270,7 @@ namespace Belle2 {
   {
     std::string nodename, vname;
     if (find(record->name, "set", nodename, vname)) {
-      write_vset_out(record);
+      //write_vset_out(record);
       return init_out(record);
     }
     return 0;
@@ -278,6 +278,7 @@ namespace Belle2 {
 
   inline long NSM2CA::write_vset_out(aoRecord* record)
   {
+    LogFile::debug("%s << %f", record->name, record->val);
     std::string nodename, vname;
     if (find(record->name, "set", nodename, vname)) {
       NSMNode node(nodename);
@@ -289,7 +290,7 @@ namespace Belle2 {
 
   inline long NSM2CA::write_vset_out(longoutRecord* record)
   {
-    LogFile::debug("%s >> %d", record->name, record->val);
+    LogFile::debug("%s << %d", record->name, record->val);
     std::string nodename, vname;
     if (find(record->name, "set", nodename, vname)) {
       NSMNode node(nodename);
@@ -304,7 +305,7 @@ namespace Belle2 {
 
   inline long NSM2CA::write_vset_out(stringoutRecord* record)
   {
-    LogFile::debug("%s >> %s", record->name, record->val);
+    LogFile::debug("%s << %s", record->name, record->val);
     std::string nodename, vname;
     if (find(record->name, "set", nodename, vname)) {
       NSMNode node(nodename);

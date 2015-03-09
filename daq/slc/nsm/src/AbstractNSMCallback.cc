@@ -42,6 +42,16 @@ NSMCommunicator& AbstractNSMCallback::wait(const NSMNode& node,
   }
 }
 
+bool AbstractNSMCallback::try_wait() throw()
+{
+  try {
+    perform(wait(NSMNode(), NSMCommand::UNKNOWN, 0));
+  } catch (const std::exception& e) {
+    return false;
+  }
+  return true;
+}
+
 void AbstractNSMCallback::readVar(const NSMMessage& msg, NSMVar& var)
 {
   const int* pars = msg.getParams();

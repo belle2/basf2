@@ -22,7 +22,7 @@ namespace Belle2 {
 
   public:
     virtual void load(const DBObject& obj) throw(RCHandlerException);
-    virtual void recover() throw(RCHandlerException);
+    virtual void recover(const DBObject& obj) throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
 
   private:

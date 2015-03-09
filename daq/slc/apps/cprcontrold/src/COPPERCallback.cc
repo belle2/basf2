@@ -165,9 +165,10 @@ void COPPERCallback::stop() throw(RCHandlerException)
   m_con.stop();
 }
 
-void COPPERCallback::recover() throw(RCHandlerException)
+void COPPERCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
   abort();
+  load(obj);
 }
 
 void COPPERCallback::abort() throw(RCHandlerException)

@@ -48,7 +48,10 @@ namespace Belle2 {
     }
     bool wait(int opt = 0) {
       if (m_pid < 0) return false;
-      return ::waitpid(m_pid, NULL, opt);
+      if (::waitpid(m_pid, NULL, opt)) {
+        m_pid = -1;
+      }
+      return true;
     }
     bool cancel() { return kill(SIGINT); }
 

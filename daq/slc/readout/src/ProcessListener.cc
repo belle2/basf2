@@ -17,6 +17,7 @@ using namespace Belle2;
 void ProcessListener::run()
 {
   Fork& fork(m_con->getFork());
+  int pid = fork.get_id();
   std::string process_name = m_con->getName();
   if (fork.wait() < 0) {
     LogFile::fatal("Failed to wait forked process %s", process_name.c_str());
@@ -32,14 +33,14 @@ void ProcessListener::run()
         if (node.getState() == RCState::RUNNING_S ||
             node.getState() == RCState::LOADING_TS ||
             node.getState() == RCState::STARTING_TS) {
-          std::string emsg = StringUtil::form("Foked process %s was crashed", process_name.c_str());
+          std::string emsg = StringUtil::form("Foked process %s (pid = %d) was crashed", process_name.c_str(), pid);
           LogFile::error(emsg);
           callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
           m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
         }
         break;
       case RunInfoBuffer::READY: {
-        std::string emsg = StringUtil::form("Foked process %s was not started", process_name.c_str());
+        std::string emsg = StringUtil::form("Foked process %s (pid = %d) was not started", process_name.c_str(), pid);
         LogFile::error(emsg);
         callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
         m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
@@ -47,12 +48,12 @@ void ProcessListener::run()
       case RunInfoBuffer::NOTREADY:
       default: {
         if (node.getState() == RCState::LOADING_TS) {
-          std::string emsg = StringUtil::form("Foked process %s was not booted", process_name.c_str());
+          std::string emsg = StringUtil::form("Foked process %s (pid = %d) was not booted", process_name.c_str(), pid);
           LogFile::error(emsg);
           callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
           m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
         } else {
-          std::string emsg = StringUtil::form("Forked process %s was finished", process_name.c_str());
+          std::string emsg = StringUtil::form("Forked process %s (pid = %d) was finished", process_name.c_str(), pid);
           LogFile::debug(emsg);
           DAQLogMessage lmsg(node.getName(), LogFile::INFO, emsg);
           callback.reply(NSMMessage(lmsg));

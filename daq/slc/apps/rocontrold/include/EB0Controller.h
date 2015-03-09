@@ -11,8 +11,12 @@ namespace Belle2 {
     virtual ~EB0Controller() throw();
 
   protected:
-    virtual bool initArguments(const DBObject& obj) throw();
-    virtual void loadArguments() throw();
+    virtual void initArguments(const DBObject& obj);
+    virtual void loadArguments(const DBObject& obj);
+
+  private:
+    void readDB(const DBObject& obj, int& port,
+                std::string& executable, bool& used, int& nsenders);
 
   };
 

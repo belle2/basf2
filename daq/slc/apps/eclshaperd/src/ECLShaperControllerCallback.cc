@@ -33,22 +33,20 @@ void ECLShaperControllerCallback::load(const DBObject& obj) throw(RCHandlerExcep
       m_config.insert(ECLShaperConfig::value_type(sh_num, regs));
     }
     if (m_forced) {
-      recover();
+      recover(obj);
     }
   }
 }
 
-void ECLShaperControllerCallback::recover() throw(RCHandlerException)
+void ECLShaperControllerCallback::recover(const DBObject&) throw(RCHandlerException)
 {
   try {
     m_con.boot(m_config);
     m_con.init(m_config, 2);
   } catch (const IOException& e) {
     m_forced = true;
-    getNode().setState(RCState::NOTREADY_S);
     throw (RCHandlerException("Failed to revocer : %s", e.what()));
   }
-  getNode().setState(RCState::READY_S);
   m_forced = false;
 }
 

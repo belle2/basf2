@@ -113,6 +113,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     }
     m_eb2rx.load(0);
     LogFile::debug("Booted eb2rx");
+    try_wait();
   } else {
     LogFile::notice("eb2rx is off");
   }
@@ -131,6 +132,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     throw (RCHandlerException(emsg));
   }
   LogFile::debug("Booted storagein");
+  try_wait();
 
   m_con[1].clearArguments();
   m_con[1].setExecutable("storagerecord");
@@ -150,6 +152,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     throw (RCHandlerException(emsg));
   }
   LogFile::debug("Booted storagerecord");
+  try_wait();
 
   if (output.getBool("used")) {
     m_con[2].clearArguments();
@@ -163,6 +166,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       LogFile::warning("storageout: Not accepted connection from EXPRECO");
     }
     LogFile::debug("Booted storageout");
+    try_wait();
   } else {
     LogFile::notice("storageout is off");
   }
@@ -185,6 +189,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       throw (RCHandlerException(emsg));
     }
     LogFile::debug("Booted %d-th basf2", i - 3);
+    try_wait();
   }
   m_flow = std::vector<FlowMonitor>();
   for (size_t i = 0; i < m_con.size(); i++) {
@@ -218,9 +223,10 @@ void StoragerCallback::stop() throw(RCHandlerException)
 {
 }
 
-void StoragerCallback::recover() throw(RCHandlerException)
+void StoragerCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
   abort();
+  load(obj);
 }
 
 void StoragerCallback::abort() throw(RCHandlerException)

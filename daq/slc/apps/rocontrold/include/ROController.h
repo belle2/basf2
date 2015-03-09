@@ -20,15 +20,14 @@ namespace Belle2 {
     bool init(ROCallback* callback, int id,
               const std::string& name,
               const DBObject& obj) throw();
-    bool load(int timeout) throw(RCHandlerException);
+    bool load(const DBObject& obj, int timeout) throw(RCHandlerException);
     bool start(int expno, int runno) throw(RCHandlerException);
-    bool recover(int timeout) throw(RCHandlerException);
     bool abort() throw();
     bool term() throw();
 
   protected:
-    virtual bool initArguments(const DBObject&) throw() = 0;
-    virtual void loadArguments() throw() = 0;
+    virtual void initArguments(const DBObject&) = 0;
+    virtual void loadArguments(const DBObject&) = 0;
 
   public:
     bool isUsed() const throw() { return m_used; }

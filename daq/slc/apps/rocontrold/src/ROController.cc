@@ -15,14 +15,19 @@ bool ROController::init(ROCallback* callback, int id,
                         const std::string& name,
                         const DBObject& obj) throw()
 {
-  term();
-  m_callback = callback;
-  m_id = id;
-  m_name = name;
-  m_con.setCallback(m_callback);
-  m_con.init(m_name, m_id);
-  m_flow.open(&m_con.getInfo());
-  return initArguments(obj);
+  try {
+    term();
+    m_callback = callback;
+    m_id = id;
+    m_name = name;
+    m_con.setCallback(m_callback);
+    m_con.init(m_name, m_id);
+    m_flow.open(&m_con.getInfo());
+    initArguments(obj);
+    return true;
+  } catch (const std::exception& e) {
+    throw (RCHandlerException(e.what()));
+  }
 }
 
 bool ROController::term() throw()
@@ -32,22 +37,23 @@ bool ROController::term() throw()
   return true;
 }
 
-bool ROController::load(int timeout) throw(RCHandlerException)
+bool ROController::load(const DBObject& obj, int timeout)
+throw(RCHandlerException)
 {
   if (m_con.isAlive()) return true;
-  m_con.clearArguments();
-  loadArguments();
-  return m_con.load(timeout);
+  try {
+    m_con.clearArguments();
+    loadArguments(obj);
+    m_con.load(timeout);
+    return true;
+  } catch (const std::exception& e) {
+    throw (RCHandlerException(e.what()));
+  }
 }
 
 bool ROController::start(int expno, int runno) throw(RCHandlerException)
 {
   return m_con.start(expno, runno);
-}
-
-bool ROController::recover(int timeout) throw(RCHandlerException)
-{
-  return abort() && load(timeout);
 }
 
 bool ROController::abort() throw()

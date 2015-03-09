@@ -84,22 +84,25 @@ void ROCallback::term() throw()
   }
 }
 
-void ROCallback::load(const DBObject&) throw(RCHandlerException)
+void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  if (!m_eb0.load(0)) {
+  if (!m_eb0.load(obj, 0)) {
     throw (RCHandlerException("Failed to boot eb0"));
   }
   LogFile::debug("Booted eb0");
+  try_wait();
   for (size_t i = 0; i < m_stream0.size(); i++) {
-    if (!m_stream0[i].load(10)) {
+    if (!m_stream0[i].load(obj, 10)) {
       throw (RCHandlerException("Faield to boot stream0-%d", (int)i));
     }
     LogFile::debug("Booted %d-th stream0", i);
+    try_wait();
   }
-  if (!m_stream1.load(10)) {
+  if (!m_stream1.load(obj, 10)) {
     throw (RCHandlerException("Faield to boot stream1"));
   }
   LogFile::debug("Booted stream1");
+  try_wait();
 }
 
 void ROCallback::start(int expno, int runno) throw(RCHandlerException)
@@ -124,9 +127,10 @@ void ROCallback::stop() throw(RCHandlerException)
 {
 }
 
-void ROCallback::recover() throw(RCHandlerException)
+void ROCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
   abort();
+  load(obj);
 }
 
 void ROCallback::abort() throw(RCHandlerException)
@@ -136,6 +140,12 @@ void ROCallback::abort() throw(RCHandlerException)
     m_stream0[i].abort();
   }
   m_eb0.abort();
+  set("stream1.pid", -1);
+  for (size_t i = 0; i < m_stream0.size(); i++) {
+    std::string vname = StringUtil::form("stream0.sender[%d].pid", (int)i);
+    set(vname, -1);
+  }
+  set("eb0.pid", -1);
 }
 
 void ROCallback::timeout(NSMCommunicator&) throw()

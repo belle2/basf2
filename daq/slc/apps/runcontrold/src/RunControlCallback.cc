@@ -145,7 +145,7 @@ void RunControlCallback::stop() throw(RCHandlerException)
   distribute(NSMMessage(RCCommand::STOP));
 }
 
-void RunControlCallback::recover() throw(RCHandlerException)
+void RunControlCallback::recover(const DBObject&) throw(RCHandlerException)
 {
   distribute(NSMMessage(RCCommand::RECOVER));
 }

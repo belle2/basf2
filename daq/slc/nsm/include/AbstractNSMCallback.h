@@ -65,6 +65,7 @@ namespace Belle2 {
     NSMCommunicator& wait(const NSMNode& node, const NSMCommand& cmd,
                           double timeout = 5) throw(IOException);
     virtual void notify(const NSMVar& var) throw() = 0;
+    bool try_wait() throw();
 
   public:
     NSMNode& getNode() throw() { return m_node; }

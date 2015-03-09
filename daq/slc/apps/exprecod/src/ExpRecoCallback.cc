@@ -101,7 +101,7 @@ void ExpRecoCallback::stop() throw(RCHandlerException)
 {
 }
 
-void ExpRecoCallback::recover() throw(RCHandlerException)
+void ExpRecoCallback::recover(const DBObject&) throw(RCHandlerException)
 {
   // Kill processes
   int status;

@@ -38,3 +38,19 @@ record(stringin, "nsm2:get:$(nodename):stream0:sender[0]:script")
 	field(DTYP, "nsm2_vget_stringin")
 }
 
+record(stringout, "nsm2:set:$(nodename):stream1:script")
+{
+	field(DESC, "Setter of Basf2 script for stream1") 
+	field(SCAN, "Passive")
+	field(VAL,  "") 
+	field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "nsm2:get:$(nodename):stream1:script")
+{
+	field(DESC, "Setter of Basf2 script for stream1") 
+	field(SCAN, "I/O Intr")
+	field(VAL,  "") 
+	field(DTYP, "nsm2_vget_stringin")
+}
+

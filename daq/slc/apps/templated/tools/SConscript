@@ -1,7 +1,5 @@
 Import('env')
 
 env['TOOLS_LIBS']['templated'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
-env['TOOLS_LIBS']['masterd'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
-
 
 Return('env')

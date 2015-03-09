@@ -19,6 +19,7 @@ sed "s/Template/$classname/g" $dir/templated/tools/templated.cc | \
 sed "s/template/${name}/g" > $dir/${name}d/tools/${name}d.cc
 
 sed "s/template/${name}/g" $dir/templated/Makefile > $dir/${name}d/Makefile
+sed "s/template/${name}/g" $dir/templated/SConscript > $dir/${name}d/SConscript
 sed "s/template/${name}/g" $dir/templated/tools/Makefile > $dir/${name}d/tools/Makefile
 sed "s/template/${name}/g" $dir/templated/tools/SConscript > $dir/${name}d/tools/SConscript
 

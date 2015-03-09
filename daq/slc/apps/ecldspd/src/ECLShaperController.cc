@@ -1,4 +1,4 @@
-#include "daq/slc/apps/eclshaperd/ECLShaperController.h"
+#include "daq/slc/apps/ecldspd/ECLShaperController.h"
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/system/LogFile.h>

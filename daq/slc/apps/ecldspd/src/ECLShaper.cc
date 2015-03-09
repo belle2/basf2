@@ -1,4 +1,4 @@
-#include "daq/slc/apps/eclshaperd/ECLShaper.h"
+#include "daq/slc/apps/ecldspd/ECLShaper.h"
 
 extern "C" {
 #include <ecl/ecl_collector_lib.h>

@@ -1,8 +1,6 @@
 #ifndef _Belle2_TemplateCallback_h
 #define _Belle2_TemplateCallback_h
 
-#include "daq/slc/readout/ProcessController.h"
-
 #include "daq/slc/runcontrol/RCCallback.h"
 
 namespace Belle2 {

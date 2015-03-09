@@ -68,14 +68,22 @@ std::list<ModulePtr> Path::getModules() const
 }
 
 
-ModulePtrList Path::buildModulePathList() const
+ModulePtrList Path::buildModulePathList(bool unique) const
 {
-  ModulePtrList tmpModuleList;
+  ModulePtrList modList;
+  for (const ModulePtr & module : getModules()) {
+    if (!unique or find(modList.begin(), modList.end(), module) == modList.end()) {
+      modList.push_back(module);
 
-  //Build list of modules recursively by following the conditions of modules
-  this->fillModulePathList(tmpModuleList);
+      //If the module has a condition, call the method recursively
+      if (module->hasCondition()) {
+        const std::list<ModulePtr>& modulesInElem = module->getConditionPath()->buildModulePathList(unique);
+        modList.insert(modList.end(), modulesInElem.begin(), modulesInElem.end());
+      }
+    }
+  }
 
-  return tmpModuleList;
+  return modList;
 }
 
 void Path::putModules(const std::list<boost::shared_ptr<Module> >& mlist)
@@ -114,27 +122,6 @@ boost::shared_ptr<PathElement> Path::clone() const
   return path;
 }
 
-
-//============================================================================
-//                              Private methods
-//============================================================================
-
-void Path::fillModulePathList(ModulePtrList& modList) const
-{
-  for (const ModulePtr & module : getModules()) {
-
-    //If module was not already added to the list, add it.
-    ModulePtrList::iterator findIter = find(modList.begin(), modList.end(), module);
-    if (findIter == modList.end()) {
-      modList.push_back(module);
-
-      //If the module has a condition, call the method recursively
-      if (module->hasCondition()) {
-        module->getConditionPath()->fillModulePathList(modList);
-      }
-    }
-  }
-}
 
 //=====================================================================
 //                          Python API

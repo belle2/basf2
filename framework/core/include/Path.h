@@ -75,7 +75,7 @@ namespace Belle2 {
     bool isEmpty() const;
 
     /**
-     * Returns a list of the modules in this path.
+     * Returns a list of the modules in this path. (Recursively searches sub-paths)
      */
     std::list<boost::shared_ptr<Module> > getModules() const override;
 
@@ -85,11 +85,11 @@ namespace Belle2 {
      * The method starts with the current path, iterates over the modules in the path and
      * follows recursively module conditions to make sure the final list contains all
      * modules which could be executed while preserving their correct order.
-     * Special care is taken to avoid that a module is added more than once to the list.
      *
+     * @param unique If true, the list will be unique.
      * @return A list containing all modules which could be executed during the data processing.
      */
-    std::list<boost::shared_ptr<Module> > buildModulePathList() const;
+    std::list<boost::shared_ptr<Module> > buildModulePathList(bool unique = true) const;
 
     /**
      * Replaces all Modules and sub-Paths with the specified Module list
@@ -153,14 +153,6 @@ namespace Belle2 {
 
 
   private:
-    /**
-     * Fills the module list with the modules of this path.
-     *
-     * Calls itself recursively for modules having a condition
-     *
-     * @param modList The list of modules.
-     */
-    void fillModulePathList(std::list<boost::shared_ptr<Module> >& modList) const;
 
     std::list<boost::shared_ptr<PathElement> > m_elements; /**< The list of path elements (Modules and sub-Paths) */
 

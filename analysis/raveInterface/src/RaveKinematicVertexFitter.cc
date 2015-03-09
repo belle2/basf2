@@ -187,21 +187,33 @@ int RaveKinematicVertexFitter::fit()
         Particle* aParticlePtr = m_motherParticlePtr;
 
         rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(), aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());
-        TMatrixFSym cov = aParticlePtr->getMomentumVertexErrorMatrix();
+        TMatrixFSym covP = aParticlePtr->getMomentumVertexErrorMatrix();
 
         float chi2 = 1;
         float ndf = 1.;
 
-        rave::Covariance7D raveCov(cov(4, 4), cov(4, 5), cov(4, 6), // x x , x y, x z
-                                   cov(5, 5), cov(5, 6), cov(6, 6), // y y , y z, z z
-                                   cov(0, 4), cov(1, 4), cov(2, 4), // x px , x py, x pz
-                                   cov(0, 5), cov(1, 5), cov(2, 5), // y px , y py, y pz
-                                   cov(0, 6), cov(1, 6), cov(2, 6), // z px , z py, z pz
-                                   cov(0, 0), cov(1, 0), cov(2, 0), // px px , px py, px pz
-                                   cov(1, 1), cov(1, 2), cov(2, 2), // py py , py pz, pz pz
-                                   cov(4, 3), cov(5, 3), cov(6, 3), // x m , y m, z m
-                                   cov(0, 3), cov(1, 3), cov(2, 3), // px m, py m, pz m
-                                   cov(3, 3)); // mm
+        TMatrixDSym covE(7);
+        for (int i = 0; i < 7; i++) {
+          for (int j = 0; j < 7; j++) {
+            if (i < 3 && j < 3) covE(i, j) = covP(i + 4, j + 4);
+            if (i > 2 && j > 2) covE(i, j) = covP(i - 3, j - 3);
+            if (i < 3 && j > 2) covE(i, j) = covP(i + 4, j - 3);
+            if (i > 2 && j < 3) covE(i, j) = covP(i - 3, j + 4);
+          }
+        }
+
+        TMatrixDSym cov = ErrorMatrixEnergyToMass(aParticlePtr->get4Vector(), covE);
+
+        rave::Covariance7D raveCov(cov(0, 0), cov(0, 1), cov(0, 2), // x x , x y, x z
+                                   cov(1, 1), cov(1, 2), cov(2, 2), // y y , y z, z z
+                                   cov(0, 3), cov(0, 4), cov(0, 5), // x px , x py, x pz
+                                   cov(1, 3), cov(1, 4), cov(1, 5), // y px , y py, y pz
+                                   cov(2, 3), cov(2, 4), cov(2, 5), // z px , z py, z pz
+                                   cov(3, 3), cov(3, 4), cov(3, 5), // px px , px py, px pz
+                                   cov(4, 4), cov(4, 5), cov(5, 5), // py py , py pz, pz pz
+                                   cov(0, 6), cov(1, 6), cov(2, 6), // x m , y m, z m
+                                   cov(3, 6), cov(4, 6), cov(5, 6), // px m, py m, pz m
+                                   cov(6, 6)); // mm
 
         rave::TransientTrackKinematicParticle aRaveParticle(raveState, raveCov, rave::Charge(aParticlePtr->getCharge()), chi2, ndf);
 

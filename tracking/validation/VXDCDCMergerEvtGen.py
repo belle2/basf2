@@ -26,7 +26,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [10000])
+eventinfosetter.param('evtNumList', [1000])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # Fixed random seed

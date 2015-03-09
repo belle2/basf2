@@ -139,21 +139,21 @@ void VXDCDCMergerEvtGen(){
   h22->SetMaximum(1.1);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h22","TruthTag==1");
   h22->Sumw2();
-  TH1F *h23 = new TH1F("h23","Eff vs Pt EvtGen",100,0.,5.);
-  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h23","TruthTag==1&&GoodTag==1");
-  h23->SetMaximum(1.1);
-  h23->Sumw2();
+  TH1F *eff_thetaEG = new TH1F("eff_thetaEG","Eff vs Pt EvtGen",100,0.,5.);
+  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_thetaEG","TruthTag==1&&GoodTag==1");
+  eff_thetaEG->SetMaximum(1.1);
+  eff_thetaEG->Sumw2();
   gPad->RedrawAxis();
-  //h23->Divide(h22);
-  //h23->GetYaxis()->SetRange(0,2);
-  //h23->Draw("E");
+  //eff_thetaEG->Divide(h22);
+  //eff_thetaEG->GetYaxis()->SetRange(0,2);
+  //eff_thetaEG->Draw("E");
   TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt EvtGen",100,0.,5.);
   //TLegend *leg1= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. Pt");
   eff_pt->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt")); 
   eff_pt->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
   eff_pt->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_pt=h23;
-  eff_pt->Divide(h23, h22, 1.0, 1.0, "B");
+  eff_pt=eff_thetaEG;
+  eff_pt->Divide(eff_thetaEG, h22, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position
@@ -170,21 +170,21 @@ void VXDCDCMergerEvtGen(){
   h24->SetMaximum(1.1);
   tree->Draw("(Pz/(P))>>h24","TruthTag==1");
   h24->Sumw2();
-  TH1F *h25 = new TH1F("h25","Eff vs Theta Truth Track Finder",50, -1, 1.);
-  h25->SetMaximum(1.1);
-  tree->Draw("(Pz/(P))>>h25","TruthTag==1&&GoodTag==1");
-  h25->Sumw2();
+  TH1F *eff_ptEG = new TH1F("eff_ptEG","Eff vs Theta Truth Track Finder",50, -1, 1.);
+  eff_ptEG->SetMaximum(1.1);
+  tree->Draw("(Pz/(P))>>eff_ptEG","TruthTag==1&&GoodTag==1");
+  eff_ptEG->Sumw2();
   gPad->RedrawAxis();
-  //h25->Divide(h24);
-  //h25->GetYaxis()->SetRange(0,2);
-  //h25->Draw("E");
+  //eff_ptEG->Divide(h24);
+  //eff_ptEG->GetYaxis()->SetRange(0,2);
+  //eff_ptEG->Draw("E");
   TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta EvtGen", 50, -1, 1.);
   //TLegend *leg2= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. theta");
   eff_theta->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta")); 
   eff_theta->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));
   eff_theta->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_theta=h25;
-  eff_theta->Divide(h25, h24, 1.0, 1.0, "B");
+  eff_theta=eff_ptEG;
+  eff_theta->Divide(eff_ptEG, h24, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position

@@ -12,7 +12,6 @@
 #include <framework/core/Path.h>
 
 #include <framework/core/EventProcessor.h>
-#include <framework/core/PathManager.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
@@ -80,8 +79,7 @@ void AsyncWrapper::initialize()
     s_isAsync = true;
     s_currentRingBuffer = m_ringBuffer;
 
-    PathManager pathMgr;
-    PathPtr path = pathMgr.createPath();
+    PathPtr path(new Path);
     path->addModule(ModulePtr(m_rx));
     path->addModule(m_wrappedModule);
 

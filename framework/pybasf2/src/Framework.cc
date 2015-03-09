@@ -14,7 +14,6 @@
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/EventProcessor.h>
-#include <framework/core/PathManager.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/pcore/pEventProcessor.h>
 
@@ -36,7 +35,6 @@ Framework::Framework()
 {
   DataStore::s_DoCleanup = true;
   LogSystem::Instance().enableErrorSummary(true);
-  m_pathManager = new PathManager();
 
   RandomNumbers::initialize();
   Environment::Instance();
@@ -45,8 +43,6 @@ Framework::Framework()
 
 Framework::~Framework()
 {
-  delete m_pathManager;
-
   //empty module manager of modules
   //since modules may contain shared pointers of Path objects created in Python,
   //these shared pointers have special cleanup hooks that can cause crashes if run
@@ -82,7 +78,7 @@ ModulePtr Framework::registerModule(const string& moduleName, const string& shar
 
 PathPtr Framework::createPath()
 {
-  return m_pathManager->createPath();
+  return PathPtr(new Path);
 }
 
 

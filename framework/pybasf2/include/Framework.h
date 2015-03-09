@@ -22,8 +22,6 @@
 #include <string>
 
 namespace Belle2 {
-  class PathManager;
-
   /**
    * The main Framework class.
    * This class combines all subsystems of the framework.
@@ -87,11 +85,7 @@ namespace Belle2 {
     ModulePtr registerModule(const std::string& moduleName, const std::string& sharedLibPath) throw(ModuleManager::ModuleNotCreatedError);
 
     /**
-     * Creates a new path, adds it to the framework and returns a shared pointer.
-     *
-     * This method creates a new path and registers it to the framework.
-     *
-     * @return A shared pointer of the added and registered path.
+     * Creates a new path and returns a shared pointer.
      */
     PathPtr createPath();
 
@@ -167,8 +161,6 @@ namespace Belle2 {
 
 
   protected:
-
-    PathManager* m_pathManager;         /**< The path manager, which takes care of creating and handling paths. */
 
   };
 

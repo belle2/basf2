@@ -166,6 +166,10 @@ class Particle(object):
         return output
 
 
+## Simple object containing the output of fei
+FeiState = collections.namedtuple('FeiState', 'path, is_trained')
+
+
 def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
     """
     The Full Event Interpretation algorithm.
@@ -174,6 +178,7 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
         @param user_selection_path basf2 module path to execute before any tag-side reconstruction. Should load data, select signal side and create a 'RestOfEvents' list. Use None to do independent tag-side reconstruction.
         @param user_analysis_path basf2 module path to execute after training is finished
         @param particles list of particle objects which shall be reconstructed by this algorithm
+        @return FeiState object containing basf2 path to execute, plus status information
     """
 
     parser = argparse.ArgumentParser()
@@ -439,4 +444,4 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
 
     # with RestOfEvent path, this will be the first module inside for_each
     path.add_module('ProgressBar')
-    return path
+    return FeiState(path, is_trained=finished_training)

@@ -11,13 +11,11 @@ analysis_path = create_path()
 analysis_path.add_module('RootOutput')
 
 particles = get_default_channnels()
-main = fullEventInterpretation(None, analysis_path, particles)
+feistate = fullEventInterpretation(None, analysis_path, particles)
 
 # show constructed path
-print main
+print feistate.path
 
-process(main)
+process(feistate.path)
 B2WARNING('event() statistics:')
 print statistics
-B2WARNING('endRun() statistics:')
-print statistics(statistics.END_RUN)

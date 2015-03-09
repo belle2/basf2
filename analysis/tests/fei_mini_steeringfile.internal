@@ -62,11 +62,11 @@ particles.append(p)
 
 analysis_path = create_path()
 analysis_path.add_module('PrintCollections')
-main = fullEventInterpretation(None, analysis_path, particles)
+feistate = fullEventInterpretation(None, analysis_path, particles)
 
 # show constructed path
-print main
+print feistate.path
 
-process(main)
+process(feistate.path)
 
 print statistics

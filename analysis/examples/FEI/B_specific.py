@@ -21,13 +21,11 @@ analysis_path.add_module('RootOutput')
 
 # neutral B channels disabled, since we only intend to use B+/B- for our decay
 particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInRestOfEvent == 0', neutralB=False)
-main = fullEventInterpretation(selection_path, analysis_path, particles)
+feistate = fullEventInterpretation(selection_path, analysis_path, particles)
 
 # show constructed path
-print main
+print feistate.path
 
-process(main)
+process(feistate.path)
 B2WARNING('event() statistics:')
 print statistics
-B2WARNING('endRun() statistics:')
-print statistics(statistics.END_RUN)

@@ -41,11 +41,11 @@ particles.append(Particle('K+', mvaConfig_chargedFSP))
 
 analysis_path = create_path()
 analysis_path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
-main = fullEventInterpretation(None, analysis_path, particles)
+feistate = fullEventInterpretation(None, analysis_path, particles)
 
 # show constructed path
-print main
+print feistate.path
 
-process(main)
+process(feistate.path)
 
 print statistics

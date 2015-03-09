@@ -27,7 +27,7 @@ RunControlCallback::RunControlCallback(int port)
   m_showall = false;
 }
 
-bool RunControlCallback::initialize(const DBObject& obj) throw()
+void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   DBInterface& db(*getDB());
   try {
@@ -38,19 +38,18 @@ bool RunControlCallback::initialize(const DBObject& obj) throw()
   } catch (const DBHandlerException& e) {
   }
   db.close();
-  bool ret = addAll(obj);
-  return ret;
+  if (!addAll(obj)) {
+    throw (RCHandlerException("Failed to initialize (config=%s)", obj.getName().c_str()));
+  }
 }
 
-bool RunControlCallback::configure(const DBObject& obj) throw()
+void RunControlCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
-  bool ret = false;
-  if ((ret = addAll(obj))) {
+  if (addAll(obj)) {
     distribute(NSMMessage(RCCommand::CONFIGURE, m_port));
   } else {
-    LogFile::error("Failed to configure (config=%s)", obj.getName().c_str());
+    throw (RCHandlerException("Failed to configure (config=%s)", obj.getName().c_str()));
   }
-  return ret;
 }
 
 void RunControlCallback::setState(NSMNode& node, const RCState& state)
@@ -155,9 +154,9 @@ void RunControlCallback::pause() throw(RCHandlerException)
   distribute(NSMMessage(RCCommand::PAUSE));
 }
 
-void RunControlCallback::resume() throw(RCHandlerException)
+void RunControlCallback::resume(int subno) throw(RCHandlerException)
 {
-  distribute(NSMMessage(RCCommand::RESUME));
+  distribute(NSMMessage(RCCommand::RESUME, subno));
 }
 
 void RunControlCallback::abort() throw(RCHandlerException)

@@ -30,11 +30,15 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
     exit(1);
   }
   callback->setNode(NSMNode(name));
-  std::string runtype = config.get("runtype");
-  if (runtype.size() > 0) {
-    callback->setRuntype(runtype);
+  std::string rcconfig = config.get("rcconfig");
+  if (rcconfig.size() > 0) {
+    callback->setRCConfig(rcconfig);
   } else {
-    LogFile::warning("runtype is empty");
+    LogFile::notice("rcconfig is empty");
+  }
+  int timeout = config.getInt("timeout");
+  if (timeout > 0) {
+    callback->setTimeout(timeout);
   }
   std::string dbtable = config.get("dbtable");
   if (dbtable.size() > 0) {
@@ -52,7 +56,7 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
                             config.getInt("provider.port"));
     }
   } else {
-    LogFile::warning("dbtable is empty");
+    LogFile::notice("dbtable is empty");
   }
   m_daemon.add(callback, host, port);
   host = config.get("nsm.global.host");

@@ -31,7 +31,7 @@ namespace Belle2 {
     virtual void start(int /*expno*/, int /*runno*/) throw(RCHandlerException) {}
     virtual void stop() throw(RCHandlerException) {}
     virtual void recover(const DBObject&) throw(RCHandlerException) {}
-    virtual void resume() throw(RCHandlerException) {}
+    virtual void resume(int /*subno*/) throw(RCHandlerException) {}
     virtual void pause() throw(RCHandlerException) {}
     virtual void abort() throw(RCHandlerException) {}
 
@@ -39,12 +39,12 @@ namespace Belle2 {
     virtual bool perform(NSMCommunicator& com) throw();
 
   public:
-    virtual bool initialize(const DBObject&) throw() { return true; }
-    virtual bool configure(const DBObject&) throw() { return true; }
+    virtual void initialize(const DBObject&) throw(RCHandlerException) {}
+    virtual void configure(const DBObject&) throw(RCHandlerException) {}
 
   public:
     void setState(const RCState& state) throw();
-    void setRuntype(const std::string& runtype) { m_runtype = runtype; }
+    void setRCConfig(const std::string& rcconfig) { m_rcconfig = rcconfig; }
     void setDBTable(const std::string& table) { m_table = table; }
     const std::string& getDBTable() const { return m_table; }
     void setAutoReply(bool auto_reply) { m_auto = auto_reply; }
@@ -64,7 +64,7 @@ namespace Belle2 {
     DBInterface* m_db;
     std::string m_table;
     bool m_auto;
-    std::string m_runtype;
+    std::string m_rcconfig;
     std::string m_provider_host;
     int m_provider_port;
 

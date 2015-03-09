@@ -43,14 +43,14 @@ ROCallback::ROCallback(const NSMNode& runcontrol)
   system("killall basf2");
 }
 
-bool ROCallback::initialize(const DBObject& obj) throw()
+void ROCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   allocData(getNode().getName() + "_STATUS", "ronode_status",
             ronode_status_revision);
-  return configure(obj);
+  configure(obj);
 }
 
-bool ROCallback::configure(const DBObject& obj) throw()
+void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
     const DBObject& stream0(obj("stream0"));
@@ -68,11 +68,9 @@ bool ROCallback::configure(const DBObject& obj) throw()
       m_stream0[i].init(this, i + 2, name, obj);
       add(new NSMVHandlerROPID(m_stream0[i], StringUtil::form("stream0.sender[%d].pid", (int)i)));
     }
-    return true;
   } catch (const std::out_of_range& e) {
-    LogFile::error(e.what());
+    throw (RCHandlerException(e.what()));
   }
-  return false;
 }
 
 void ROCallback::term() throw()

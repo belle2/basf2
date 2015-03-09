@@ -38,16 +38,16 @@ void RCCallback::init(NSMCommunicator&) throw()
   reset();
   add(new NSMVHandlerText("rcstate", true, false, node.getState().getLabel()));
   add(new NSMVHandlerText("rcrequest", true, false, ""));
-  if (m_table.size() == 0 || m_runtype.size() == 0) {
-    LogFile::warning("dbtable or runtype is empty "
-                     "(dbtable='%s', runtype='%s')",
-                     m_table.c_str(), m_runtype.c_str());
+  if (m_table.size() == 0 || m_rcconfig.size() == 0) {
+    //LogFile::notice("dbtable or rcconfig is empty (dbtable='%s', runtype='%s')",
+    //        m_table.c_str(), m_rcconfig.c_str());
   } else {
-    const std::string config = node.getName() + "@RC:" + m_runtype;
+    const std::string config = node.getName() + "@RC:" + m_rcconfig;
     if (getDB()) {
       DBInterface& db(*getDB());
       m_obj = DBObjectLoader::load(db, m_table, config, m_showall);
       db.close();
+      m_obj.print(m_showall);
     } else if (m_provider_host.size() > 0 && m_provider_port > 0) {
       TCPSocket socket(m_provider_host, m_provider_port);
       try {
@@ -56,19 +56,25 @@ void RCCallback::init(NSMCommunicator&) throw()
         writer.writeString(m_table + "/" + config);
         TCPSocketReader reader(socket);
         m_obj.readObject(reader);
+        m_obj.print(m_showall);
       } catch (const IOException& e) {
         socket.close();
         throw (IOException("Socket connection error : %s ", e.what()));
       }
       socket.close();
     } else {
-      m_obj = DBObjectLoader::load("dbconf/" + m_table + "/" + config);
+      //m_obj = DBObjectLoader::load("dbconf/" + m_table + "/" + config);
     }
   }
-  m_obj.print(m_showall);
   add(new NSMVHandlerText("rcconfig", true, false, m_obj.getName()));
   add(m_obj);
-  initialize(m_obj);
+  try {
+    initialize(m_obj);
+  } catch (const RCHandlerException& e) {
+    LogFile::fatal("Failed to initialize. %s. terminating process", e.what());
+    term();
+    exit(1);
+  }
 }
 
 bool RCCallback::perform(NSMCommunicator& com) throw()
@@ -119,7 +125,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       } else if (cmd == RCCommand::RECOVER) {
         recover(m_obj);
       } else if (cmd == RCCommand::RESUME) {
-        resume();
+        resume(msg.getParam(0));
       } else if (cmd == RCCommand::PAUSE) {
         pause();
       } else if (cmd == RCCommand::ABORT) {
@@ -143,6 +149,8 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       std::string emsg = StringUtil::form("Failed to abort : %s", e.what());
       LogFile::fatal(emsg);
     }
+  } catch (const std::exception& e) {
+    LogFile::fatal("Unknown exception: %s. terminating process", e.what());
   }
   return true;
 }
@@ -187,6 +195,7 @@ throw(IOException)
       try {
         m_obj = DBObjectLoader::load(db, table, config, m_showall);
         db.close();
+        m_obj.print(m_showall);
       } catch (const DBHandlerException& e) {
         db.close();
         throw (e);
@@ -205,9 +214,9 @@ throw(IOException)
       }
       socket.close();
     }
+    m_obj.print(m_showall);
   } else {
     LogFile::warning("No DB objects was loaded");
   }
-  m_obj.print(m_showall);
   add(m_obj);
 }

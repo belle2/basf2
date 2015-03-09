@@ -5,10 +5,6 @@
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
 
-#include <iostream>
-#include <sstream>
-#include <cstdlib>
-
 using namespace Belle2;
 
 int main(int argc, char** argv)
@@ -17,6 +13,7 @@ int main(int argc, char** argv)
     LogFile::debug("usage: %s <rcnode> <configname> [<expno>]", argv[0]);
     return 1;
   }
+  /*
   const std::string rcnode = argv[1];
   const std::string configname = argv[2];
   int expno = (argc > 3) ? atoi(argv[3]) : 1;
@@ -31,5 +28,6 @@ int main(int argc, char** argv)
   rn = RunNumberTable(db).add(rn);
   LogFile::debug("runnumber : %03d.%05d.%03d",
                  rn.getExpNumber(), rn.getRunNumber(), rn.getSubNumber());
+  */
   return 0;
 }

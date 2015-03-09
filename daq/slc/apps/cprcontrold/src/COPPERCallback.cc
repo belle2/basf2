@@ -34,7 +34,7 @@ COPPERCallback::~COPPERCallback() throw()
 {
 }
 
-bool COPPERCallback::initialize(const DBObject& obj) throw()
+void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   allocData(getNode().getName() + "_STATUS", "ronode_status",
             ronode_status_revision);
@@ -42,10 +42,10 @@ bool COPPERCallback::initialize(const DBObject& obj) throw()
   m_ttrx.open();
   m_copper.open();
   m_flow.open(&m_con.getInfo());
-  return configure(obj);
+  configure(obj);
 }
 
-bool COPPERCallback::configure(const DBObject& obj) throw()
+void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
@@ -95,13 +95,9 @@ bool COPPERCallback::configure(const DBObject& obj) throw()
         add(new NSMVHandlerHSLBTrgOffFee(*this, vname + ".trgofffee", i));
       }
     }
-    return true;
-  } catch (const IOException& e) {
-    LogFile::error(e.what());
-  } catch (const std::out_of_range& e) {
-    LogFile::error(e.what());
+  } catch (const std::exception& e) {
+    throw (RCHandlerException(e.what()));
   }
-  return false;
 }
 
 void COPPERCallback::term() throw()

@@ -12,14 +12,27 @@ TemplateCallback::~TemplateCallback() throw()
 {
 }
 
-bool TemplateCallback::initialize(const DBObject& obj) throw()
+void TemplateCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
-  return true;
 }
 
-bool TemplateCallback::configure(const DBObject& obj) throw()
+void TemplateCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
-  return true;
+  if (obj.hasObject("value")) {
+    const DBObject& o_value(obj("value"));
+    if (o_value.hasValue("ival")) {
+      LogFile::debug("ival=%d", o_value.getInt("ival"));
+    }
+    if (o_value.hasValue("bval")) {
+      LogFile::debug("bval=%s", (o_value.getBool("bval") ? "true" : "false"));
+    }
+    if (o_value.hasValue("fval")) {
+      LogFile::debug("fval=%d", o_value.getFloat("fval"));
+    }
+    if (o_value.hasText("text")) {
+      LogFile::debug("text=%d", o_value.getText("text").c_str());
+    }
+  }
 }
 
 void TemplateCallback::timeout(NSMCommunicator&) throw()
@@ -28,7 +41,6 @@ void TemplateCallback::timeout(NSMCommunicator&) throw()
 
 void TemplateCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  obj.print();
 }
 
 void TemplateCallback::start(int expno, int runno) throw(RCHandlerException)
@@ -40,8 +52,9 @@ void TemplateCallback::stop() throw(RCHandlerException)
 {
 }
 
-void TemplateCallback::resume() throw(RCHandlerException)
+void TemplateCallback::resume(int subno) throw(RCHandlerException)
 {
+  LogFile::debug("sub run # = %03d", subno);
 }
 
 void TemplateCallback::pause() throw(RCHandlerException)

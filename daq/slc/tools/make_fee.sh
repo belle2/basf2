@@ -1,6 +1,6 @@
 name=`echo ${1,,}`
 bigname=`echo ${1^^}`
-classname=`echo ${name^}`
+classname=`echo ${name^^}`
 
 dir=${BELLE2_LOCAL_DIR}/daq/slc/copper
 

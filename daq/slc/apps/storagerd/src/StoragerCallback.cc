@@ -27,14 +27,14 @@ StoragerCallback::~StoragerCallback() throw()
   term();
 }
 
-bool StoragerCallback::initialize(const DBObject& obj) throw()
+void StoragerCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   allocData(getNode().getName() + "_STATUS", "storage_status",
             storage_status_revision);
-  return configure(obj);
+  configure(obj);
 }
 
-bool StoragerCallback::configure(const DBObject& obj) throw()
+void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   abort();
   term();
@@ -65,10 +65,8 @@ bool StoragerCallback::configure(const DBObject& obj) throw()
       m_con[i].init(StringUtil::form("storagebasf2_%d", i - 3), i + 2);
     }
   } catch (const std::out_of_range& e) {
-    LogFile::error("Bad configuration : %s", e.what());
-    return false;
+    throw (RCHandlerException("Bad configuration : %s", e.what()));
   }
-  return true;
 }
 
 void StoragerCallback::term() throw()

@@ -69,16 +69,16 @@ bool TTDACallback::setTriggerType(const std::string& type) throw()
   return false;
 }
 
-bool TTDACallback::initialize(const DBObject& obj) throw()
+void TTDACallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
-  return configure(obj);
+  configure(obj);
 }
 
-bool TTDACallback::configure(const DBObject& obj) throw()
+void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   add(new NSMVHandlerTrigft(*this, "trigft"));
-  add(new NSMVHandlerTriggerType(*this, "trigger_type", obj.getText("trigger_type")));
-  return true;
+  add(new NSMVHandlerTriggerType(*this, "trigger_type",
+                                 obj.getText("trigger_type")));
 }
 
 void TTDACallback::timeout(NSMCommunicator&) throw()
@@ -106,7 +106,7 @@ void TTDACallback::pause() throw(RCHandlerException)
   send(NSMMessage(m_ttdnode, NSMCommand(14, "PAUSE")));
 }
 
-void TTDACallback::resume() throw(RCHandlerException)
+void TTDACallback::resume(int subno) throw(RCHandlerException)
 {
   send(NSMMessage(m_ttdnode, NSMCommand(15, "RESUME")));
 }

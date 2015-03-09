@@ -6,10 +6,6 @@
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
 
-#include <fstream>
-#include <iostream>
-#include <cstdlib>
-
 using namespace Belle2;
 
 int main(int argc, char** argv)
@@ -73,13 +69,13 @@ int main(int argc, char** argv)
       obj_out.addObject(parname, cobj);
     } else {
       cobj.print();
-      //DBObjectLoader::createDB(db, tablename, cobj);
+      DBObjectLoader::createDB(db, tablename, cobj);
     }
     index++;
   }
   if (argc > 4) {
     obj_out.print();
-    //DBObjectLoader::createDB(db, tablename, obj_out);
+    DBObjectLoader::createDB(db, tablename, obj_out);
   }
   return 0;
 }

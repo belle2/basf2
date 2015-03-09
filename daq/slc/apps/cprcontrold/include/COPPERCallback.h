@@ -24,8 +24,8 @@ namespace Belle2 {
     virtual ~COPPERCallback() throw();
 
   public:
-    virtual bool initialize(const DBObject& obj) throw();
-    virtual bool configure(const DBObject& obj) throw();
+    virtual void initialize(const DBObject& obj) throw(RCHandlerException);
+    virtual void configure(const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
     virtual void stop() throw(RCHandlerException);

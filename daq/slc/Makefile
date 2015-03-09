@@ -12,6 +12,7 @@ SUBPACKAGES = base system database nsm readout copper runcontrol hvcontrol $(APP
 
 all: copyinc $(SUBPACKAGES) tool
 	@ make -C tools/
+	@ install -m 755 -p ./tools/*.sh ${BINDIR}/
 
 full: all
 

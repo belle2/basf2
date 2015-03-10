@@ -101,6 +101,11 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 
     /**
+     * return Zdistance of daughter tracks at vertex point
+     */
+    double VertexZDist(const Particle*);
+
+    /**
      * return distance relative to interaction point
      */
     double particleDistance(const Particle* part);
@@ -145,6 +150,13 @@ namespace Belle2 {
      * return mass (determined from particle's daughter 4-momentum vectors)
      */
     double particleInvariantMass(const Particle* part);
+
+    /**
+     * return mass (determined from particle's daughter 4-momentum vectors under proton mass assumption)
+     */
+    double particleInvariantMassLambda(const Particle* part);
+
+
 
     /**
      * return uncertainty of the invariant mass (determined from particle's daughter 4-momentum vectors)
@@ -313,6 +325,14 @@ namespace Belle2 {
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
      */
     double lambdaFlavor(const Particle* particle);
+
+    /**
+     * 0.0 if pdg-code for MCParticle is Lambda0, 0.0 if MCAnti-Lambda0, 1.0 else
+     *
+     */
+    double isLambda(const Particle* particle);
+
+
 
     /**
      * Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.

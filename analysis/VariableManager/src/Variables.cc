@@ -178,6 +178,44 @@ namespace Belle2 {
       return theta_Bd;
     }
 
+    double VertexZDist(const Particle* part)
+    {
+      double z0_daughters[2] = { -99., -99.};
+      const double alpha = 1.0 / (1.5 * TMath::C()) * 1E11;
+      const std::vector<Particle*> daughters = part->getDaughters();
+      for (unsigned i = 0; i <= 1; i++) {
+        TLorentzVector dt;
+        dt = daughters[i]-> get4Vector();
+        double charge = daughters[i] -> getCharge();
+
+        double x = dt.X(); double y = dt.Y(); double z = dt.Z();
+        double px = dt.Px(); double py = dt.Py(); double pz = dt.Pz();
+
+        // We find the perigee parameters by inverting this system of
+        // equations and solving for the six variables d0, phi, omega, z0,
+        // cotTheta, chi.
+
+        const double ptinv = 1 / hypot(px, py);
+        const double omega = charge * ptinv / alpha;
+        const double cotTheta = ptinv * pz;
+
+        const double cosphichi = charge * ptinv * px;  // cos(phi + chi)
+        const double sinphichi = charge * ptinv * py;  // sin(phi + chi)
+
+        // Helix center in the (x, y) plane:
+        const double helX = x + charge * py * alpha;
+        const double helY = y - charge * px * alpha;
+        const double phi = atan2(helY, helX) + charge * M_PI / 2;
+        const double sinchi = sinphichi * cos(phi) - cosphichi * sin(phi);
+        const double chi = asin(sinchi);
+        z0_daughters[i] = z + charge / omega * cotTheta * chi;
+      }
+
+      return abs(z0_daughters[1] - z0_daughters[0]);
+    }
+
+
+
     // vertex or POCA in respect to IP ------------------------------
 
     double particleDX(const Particle* part)
@@ -251,6 +289,35 @@ namespace Belle2 {
 
       return result;
     }
+
+    double particleInvariantMassLambda(const Particle* part)
+    {
+      double result = 0.0;
+
+      const std::vector<Particle*> daughters = part->getDaughters();
+      if (daughters.size() == 2) {
+        TLorentzVector dt1;
+        TLorentzVector dt2;
+        TLorentzVector dtsum;
+        double mpi = 0.1396;
+        double mpr = 0.9383;
+        dt1 = daughters[0]->get4Vector();
+        dt2 = daughters[1]->get4Vector();
+        double E1 = hypot(mpi, dt1.P());
+        double E2 = hypot(mpr, dt2.P());
+        dtsum = dt1 + dt2;
+        return sqrt((E1 + E2) * (E1 + E2) - dtsum.P() * dtsum.P());
+
+      } else {
+        result = part->getMass();
+      }
+
+      return result;
+    }
+
+
+
+
 
     double particleInvariantMassError(const Particle* part)
     {
@@ -735,6 +802,18 @@ namespace Belle2 {
       else if (particle->getPDGCode() == -3122) return -1.0; //Anti-Lambda0
       else return 0.0;
     }
+
+    double isLambda(const Particle* particle)
+    {
+      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      // if (mcparticle ==nullptr)
+      //  return 0.0;
+      if (mcparticle->getPDG() == 3122) return 0.0; //Lambda0
+      else if (mcparticle->getPDG() == -3122) return 0.0; //Anti-Lambda0
+      else return 1.0;
+    }
+
+
 
     double lambdaZError(const Particle* particle)
     {
@@ -1510,6 +1589,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB", cosThetaBetweenParticleAndTrueB, "cosine of angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector", cosAngleBetweenMomentumAndVertexVector, "cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
+    REGISTER_VARIABLE("VertexZDist"      , VertexZDist    , "Z-distance of two daughter tracks at vertex point");
+
     REGISTER_VARIABLE("distance", particleDistance, "3D distance relative to interaction point");
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance, "significance of distance relative to interaction point (-1 in case of numerical problems)");
     REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
@@ -1525,6 +1606,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
 
     REGISTER_VARIABLE("InvM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
+    REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda, "invariant mass (determined from particle's daughter 4-momentum vectors)");
+
     REGISTER_VARIABLE("ErrM", particleInvariantMassError, "uncertainty of invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance, "signed deviation of particle's invariant mass from its nominal mass");
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance, "signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass");
@@ -1550,6 +1633,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("NumberOfKShortinRemainingROEKaon", NumberOfKShortinRemainingROEKaon,  "Returns the number of K_S0 in the remainging Kaon ROE.");
     REGISTER_VARIABLE("NumberOfKShortinRemainingROELambda", NumberOfKShortinRemainingROELambda,  "Returns the number of K_S0 in the remainging Lambda ROE.");
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,  "1.0 if Lambda0, -1.0 if Anti-Lambda0, 0.0 else.");
+    REGISTER_VARIABLE("isLambda", isLambda,  "0.0 if MCLambda0, 1.0 else.");
     REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.");
     REGISTER_VARIABLE("MomentumOfSecondDaughter", MomentumOfSecondDaughter,  "Returns the Momentum of second daughter if existing, else 0.");
     REGISTER_VARIABLE("MomentumOfSecondDaughter_CMS", MomentumOfSecondDaughter_CMS,  "Returns the Momentum of second daughter if existing in CMS, else 0.");

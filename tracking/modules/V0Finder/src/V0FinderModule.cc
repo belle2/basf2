@@ -3,60 +3,81 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/V0.h>
 
 #include <TMath.h>
-#include <TGeoManager.h>
 #include <TLorentzVector.h>
-#include <TDecompChol.h>
 
 #include "genfit/Track.h"
-#include "genfit/RKTrackRep.h"
-#include "genfit/FieldManager.h"
-#include "genfit/SharedPlanePtr.h"
-#include "genfit/TGeoMaterialInterface.h"
-#include "genfit/MaterialEffects.h"
-#include "genfit/TGeoMaterialInterface.h"
 #include "genfit/GFRaveVertexFactory.h"
 #include "genfit/GFRaveTrackParameters.h"
 
+// The following includes can be retired once we disable the TGeo
+// stuff, genfit initialization should hopefully be centralized at
+// that time.
+#include "genfit/FieldManager.h"
+#include "genfit/MaterialEffects.h"
+#include "genfit/TGeoMaterialInterface.h"
+#include <TGeoManager.h>
+#include <geometry/GeometryManager.h>
+#include <geometry/bfieldmap/BFieldMap.h>
+#include <tracking/gfbfield/GFGeant4Field.h>
+
+
 using namespace Belle2;
 
-//this line registers the module with the framework and actually makes it available
-//in steering files or the the module list (basf2 -m).
-//Note that the 'Module' part of the class name is missing, this is also the way it
-//will be called in the module list.
 REG_MODULE(V0Finder);
 
 V0FinderModule::V0FinderModule() : Module()
 {
-  setDescription("This is a simple V0 finder which matches all positive tracks with all negative tracks.  The two main cuts are 'vertexChi2Cut' (which rejects really bad vertex fits) and 'distRfromIP' (which rejects vertices that happen too close to the IP in the perpendicular direction).");
+  setDescription("This is a simple V0 finder which matches all positive tracks "
+                 "with all negative tracks.  The two main cuts are "
+                 "'vertexChi2Cut' (which rejects really bad vertex fits) and "
+                 "'distRfromIP' (which rejects vertices that happen too close "
+                 "to the IP in the perpendicular direction).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input tracks
-  addParam("GFTrackColName",  m_GFTrackColName,  "genfit::Track collection name (input)", std::string(""));
-  addParam("TFRColName",  m_TFRColName,  "Belle2::TrackFitResult collection name (input).  Note that the V0s use pointers indices into these arrays, so all hell may break loose if you change this.", std::string(""));
-  addParam("TrackColName",  m_TrackColName,  "Belle2::Track collection name (input).  Note that the V0s use pointers indices into these arrays, so all hell may break loose if you change this.", std::string(""));
+  addParam("GFTrackColName", m_GFTrackColName,
+           "genfit::Track collection name (input)", std::string(""));
+  addParam("TFRColName", m_TFRColName,
+           "Belle2::TrackFitResult collection name (input).  Note that the V0s "
+           "use pointers indices into these arrays, so all hell may break loose "
+           "if you change this.", std::string(""));
+  addParam("TrackColName", m_TrackColName,
+           "Belle2::Track collection name (input).  Note that the V0s use "
+           "pointers indices into these arrays, so all hell may break loose "
+           "if you change this.", std::string(""));
 
   // output: V0s
-  addParam("V0ColName",  m_V0ColName,  "V0 collection name (output)", std::string(""));
+  addParam("V0ColName", m_V0ColName, "V0 collection name (output)", std::string(""));
 
-  addParam("vertexChi2Cut", m_vertexChi2Cut, "Maximum chi² for the vertex fit (NDF = 1)", 5.);
-  addParam("distRfromIP", m_distRfromIP, "Minimum separation of vertex from IP in R (logical or with distZfromIP cut)", 1.);
-  addParam("distZfromIP", m_distZfromIP, "Minimum separation of vertex from IP in Z (logical or with distRfromIP cut)", 0.);
-
+  addParam("beamPipeRadius", m_beamPipeRadius,
+           "Radius at which we switch between the two classes of cuts.  The "
+           "default is a little inside the beam pipe to allow some tolerance.",
+           1.);
+  addParam("vertexChi2CutInside", m_vertexChi2CutInside,
+           "Maximum chi² for the vertex fit (NDF = 1)", 50.);
+  // The mass window was agreed upon at the 2015-03-06 software
+  // developer meeting.  It matches the one used in Belle.
+  addParam("massWindowKshortInside", m_massWindowKshortInside,
+           "Half-width of symmetric mass window about the Kshort mass for "
+           "which Kshort candidates inside the beam pipe are stored (in MeV)",
+           30.);
+  addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
+           "Maximum chi² for the vertex fit (NDF = 1)", 50.);
 }
+
 
 V0FinderModule::~V0FinderModule()
 {
 }
+
 
 void V0FinderModule::initialize()
 {
@@ -67,7 +88,7 @@ void V0FinderModule::initialize()
   mcParticles.isOptional();
 
   StoreArray<V0> V0s(m_V0ColName);
-  V0s.registerInDataStore();
+  V0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
   V0s.registerRelationTo(mcParticles);
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
@@ -96,9 +117,6 @@ void V0FinderModule::initialize()
     genfit::FieldManager::getInstance()->init(new GFGeant4Field());
     genfit::FieldManager::getInstance()->useCache();
   }
-
-  std::unique_ptr<genfit::GFRaveVertexFactory> p(new genfit::GFRaveVertexFactory());
-  m_vertexFactory = std::move(p);
 }
 
 
@@ -115,25 +133,37 @@ void V0FinderModule::event()
   if (nTracks == 0)
     return;
 
+  B2DEBUG(200, nTracks << " tracks in event.");
+
   StoreArray<genfit::Track> GFTracks(m_GFTrackColName);
-  if (GFTracks.getEntries() != nTracks)
-    B2WARNING("No one-to-one correspondence between genfit::Tracks and Belle2::Tracks");
   StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
   RelationIndex<genfit::Track, TrackFitResult> gftracktotfr(GFTracks, trackFitResults);
 
   StoreArray<V0> V0s(m_V0ColName);
 
+  RelationArray GFTracksToTrackFitResults(GFTracks, trackFitResults);
+
   // Group tracks into positive and negative tracks.
+  //
+  //  Since the genfit::Tracks are not RelationObjects, we have to
+  // keep a list of their indices to be able to form relations between
+  // the TrackFitResults in the V0s and the GFTracks
   typedef std::pair<Track*, genfit::Track*> trackPair;
   std::vector<trackPair> tracksPlus;
+  std::vector<int> gfTrackIndexPlus;
   tracksPlus.reserve(nTracks);
   std::vector<trackPair> tracksMinus;
+  std::vector<int> gfTrackIndexMinus;
   tracksMinus.reserve(nTracks);
 
   for (int iTr = 0; iTr < nTracks; iTr++) {
     const TrackFitResult* tfr = Tracks[iTr]->getTrackFitResult(Const::pion);
     if (!tfr) {
       B2WARNING("No TrackFitResult for track");
+      continue;
+    }
+    if (tfr->getParticleType() != Const::pion) {
+      B2DEBUG(99, "Requested TrackFitResult for pion, got something else");
       continue;
     }
 
@@ -143,12 +173,31 @@ void V0FinderModule::event()
       continue;
     }
 
+    // Find StoreArray index for GFTracks.  Quadratic in number of tracks.
+    int index = -1;
+    for (int iGfTr = 0; iGfTr < GFTracks.getEntries(); ++iGfTr) {
+      if (GFTracks[iGfTr] == gfTrack) {
+        index = iGfTr;
+        break;
+      }
+    }
+    if (index == -1) {
+      B2ERROR("genfit::Track not found in StoreArray.");
+      continue;
+    }
+
     double charge = tfr->getChargeSign();
-    if (charge == +1)
-      tracksPlus.push_back(std::make_pair(Tracks[iTr], gfTrack));
-    else
-      tracksMinus.push_back(std::make_pair(Tracks[iTr], gfTrack));
+    if (charge == +1) {
+      tracksPlus.push_back({Tracks[iTr], gfTrack});
+      gfTrackIndexPlus.push_back(index);
+    } else {
+      tracksMinus.push_back({Tracks[iTr], gfTrack});
+      gfTrackIndexMinus.push_back(index);
+    }
   }
+
+  assert(tracksPlus.size() == gfTrackIndexPlus.size()
+         && tracksMinus.size() == gfTrackIndexMinus.size());
 
   // Reject boring events.
   if (tracksPlus.size() == 0 || tracksMinus.size() == 0) {
@@ -188,8 +237,8 @@ void V0FinderModule::event()
       // circle through the detector without hitting any detectors
       // then making it past Rstart without hitting the detector there
       // -- while still being part of the V0.  Unlikely, I didn't find
-      // an example in MC.  On the other hand, it rejects impossible
-      // candidates.
+      // a single example in MC.  On the other hand it rejects
+      // impossible candidates.
       double Rstart = std::min(posPlus.Perp(), posMinus.Perp());
       try {
         stPlus.extrapolateToCylinder(Rstart);
@@ -201,20 +250,22 @@ void V0FinderModule::event()
 
       class vertVect {
         // Need this container for exception-safe cleanup, GFRave's
-        // interface isn't exception-safe as is.
+        // interface isn't exception-safe as is.  I guess this could
+        // fail if delete throws an exception ...
       public:
-        ~vertVect() {
+        ~vertVect() noexcept {
           for (size_t i = 0; i < v.size(); ++i)
             delete v[i];
         }
-        size_t size() { return v.size(); }
+        size_t size() const noexcept { return v.size(); }
         genfit::GFRaveVertex*& operator[](int idx) { return v[idx]; }
         std::vector<genfit::GFRaveVertex*> v;
       } vertexVector;
-      std::vector<genfit::Track*> trackPair({gfTrackPlus, gfTrackMinus});
+      std::vector<genfit::Track*> trackPair {gfTrackPlus, gfTrackMinus};
 
       try {
-        m_vertexFactory->findVertices(&vertexVector.v, trackPair);
+        genfit::GFRaveVertexFactory vertexFactory;
+        vertexFactory.findVertices(&vertexVector.v, trackPair);
       } catch (...) {
         B2ERROR("Exception during vertex fit.");
         continue;
@@ -223,17 +274,53 @@ void V0FinderModule::event()
         continue;
 
       const genfit::GFRaveVertex& vert = *vertexVector[0];
-      if (vert.getChi2() > m_vertexChi2Cut)
-        continue;
-
       const TVector3& posVert(vert.getPos());
 
-      // One separation cut fulfilled is good enough, reject only if
-      // close in both directions.
-      if (posVert.Perp() < m_distRfromIP)
-        continue;
+      // Apply cuts.  We have one set of cuts inside the beam pipe,
+      // the other outside.
+      if (posVert.Perp() < m_beamPipeRadius) {
+        if (vert.getChi2() > m_vertexChi2CutInside) {
+          B2DEBUG(200, "Vertex inside beam pipe, chi^2 too large.");
+          continue;
+        }
 
-      vertices.push_back(std::make_pair(gfTrackPlus, gfTrackMinus));
+        // Reconstruct invariant mass.
+        //
+        // FIXME we assume that only the pion hypothesis is employed.
+        // Non-pion tracks are ignored at this point.
+        if (vert.getNTracks() != 2) {
+          B2ERROR("Wrong number of tracks in vertex.");
+          continue;
+        }
+
+        const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
+        const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
+
+        if (fabs(tr0->getPdg()) != Const::pion.getPDGCode()
+            || fabs(tr1->getPdg()) != Const::pion.getPDGCode()) {
+          B2ERROR("Unsupported particle hypothesis in V0.");
+          continue;
+        }
+
+        TLorentzVector lv0, lv1;
+        lv0.SetVectM(tr0->getMom(), Const::pionMass);
+        lv1.SetVectM(tr1->getMom(), Const::pionMass);
+
+        double mReco = (lv0 + lv1).M();
+        if (fabs(mReco - Const::K0Mass) > m_massWindowKshortInside * Unit::MeV) {
+          B2DEBUG(200, "Vertex inside beam pipe, outside Kshort mass window.");
+          continue;
+        }
+      } else {
+        if (vert.getChi2() > m_vertexChi2CutOutside) {
+          B2DEBUG(200, "Vertex outside beam pipe, chi^2 too large.");
+          continue;
+        }
+      }
+
+      B2DEBUG(200, "Vertex accepted.");
+
+      vertices.push_back({gfTrackPlus, gfTrackMinus});
 
       // Assemble V0s.
       try {
@@ -244,7 +331,7 @@ void V0FinderModule::event()
         // code trying several windings before giving up, so this
         // happens occasionally.  Something more stable would perhaps
         // be desirable.
-        B2ERROR("couldn't extrapolate track to vertex.");
+        B2ERROR("Could not extrapolate track to vertex.");
         continue;
       }
 
@@ -252,29 +339,38 @@ void V0FinderModule::event()
       genfit::FieldManager::getInstance()->getFieldVal(posVert.X(), posVert.Y(), posVert.Z(),
                                                        Bx, By, Bz);
 
-      TrackFitResult* tfrPlusVtx = trackFitResults.appendNew(stPlus.getPos(), stPlus.getMom(),
-                                                             stPlus.get6DCov(), stPlus.getCharge(),
-                                                             Const::pion,
-                                                             gfTrackPlus->getFitStatus()->getPVal(),
-                                                             Bz / 10., 0, 0);
-      TrackFitResult* tfrMinusVtx = trackFitResults.appendNew(stMinus.getPos(), stMinus.getMom(),
-                                                              stMinus.get6DCov(), stMinus.getCharge(),
-                                                              Const::pion,
-                                                              gfTrackMinus->getFitStatus()->getPVal(),
-                                                              Bz / 10., 0, 0);
+      TrackFitResult* tfrPlusVtx
+        = trackFitResults.appendNew(stPlus.getPos(), stPlus.getMom(),
+                                    stPlus.get6DCov(), stPlus.getCharge(),
+                                    Const::pion,
+                                    gfTrackPlus->getFitStatus()->getPVal(),
+                                    Bz / 10., 0, 0);
+      TrackFitResult* tfrMinusVtx
+        = trackFitResults.appendNew(stMinus.getPos(), stMinus.getMom(),
+                                    stMinus.get6DCov(), stMinus.getCharge(),
+                                    Const::pion,
+                                    gfTrackMinus->getFitStatus()->getPVal(),
+                                    Bz / 10., 0, 0);
 
+      GFTracksToTrackFitResults.add(gfTrackIndexPlus[iTrPlus], tfrPlusVtx->getArrayIndex());
+      GFTracksToTrackFitResults.add(gfTrackIndexMinus[iTrMinus], tfrMinusVtx->getArrayIndex());
+
+      B2DEBUG(100, "Creating new V0.");
       V0s.appendNew(std::make_pair(tracksPlus[iTrPlus].first, tfrPlusVtx),
                     std::make_pair(tracksMinus[iTrMinus].first, tfrMinusVtx));
-
     }
   }
 
+  B2DEBUG(200, "MC matching");
+
   // MC matching
-  StoreArray < MCParticle > mcParticles;
+  StoreArray<MCParticle> mcParticles;
   unsigned int nMCpart = mcParticles.getEntries();
 
-  if (nMCpart == 0)
+  if (nMCpart == 0) {
+    B2DEBUG(150, "No MC Particles.");
     return;
+  }
 
   for (size_t i = 0; i < nMCpart; ++i) {
     const MCParticle* MCpart = mcParticles[i];
@@ -290,10 +386,7 @@ void V0FinderModule::event()
       // and then looking whether the correct kind of decay took
       // place.  This approach is more general but it will miss decays
       // with an additional (soft) neutral which would also show as
-      // V0.  In particular Kshort can go to pi- pi+ gamma (BR = 1.8 x
-      // 10^-3).  A quick perusal of the PDG shows no other
-      // significant displaced decays to two charged particles +
-      // neutrals.
+      // V0.
       continue;
     const MCParticle* daughterPlus = 0;
     const MCParticle* daughterMinus = 0;
@@ -329,10 +422,15 @@ void V0FinderModule::event()
 
       if (daughterPlus == V0PartPlus && daughterMinus == V0PartMinus) {
         // Establish relation.
+        B2DEBUG(200, "MC matching successful.");
         V0s[j]->addRelationTo(MCpart);
+      } else {
+        B2DEBUG(200, "No MC match for V0");
       }
     }
   }
+
+  B2DEBUG(200, "MC matching finished.");
 }
 
 void V0FinderModule::endRun()

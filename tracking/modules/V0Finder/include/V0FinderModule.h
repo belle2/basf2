@@ -10,9 +10,21 @@
 namespace Belle2 {
   /** A V0 finder module.
    *
-   *  Pairs up all positive and negative tracks, tries ot find vertices between them,
-   *  stores found vertices fulfilling a chi^2 cut and a minimum separation from the IP
-   *  (both configurable) as Belle2:V0.
+   *  Pairs up all positive and negative tracks, tries to find vertices between them,
+   *  stores found vertices.  There are two sets of cuts, one intended
+   *  for use inside the beam pipe, one outside (the difference being
+   *  that B decay tracks can all be matched up to form a vertex, so
+   *  the number of V0s would be n_positiveTracks * n_negativeTracks,
+   *  and this module would be useless).
+   *
+   *  Cuts outside the beam pipe are maximum chi^2.
+   *  Cuts inside the beam pipe are a mass window around the Kshort
+   *  mass and a maximum chi^2.
+   *  The value used a beam pipe radius is also an option.
+   *  FIXME once particle hypotheses are thought through, we should
+   *  also deal with Lambda, photon conversion.
+   *
+   *  The resulting pairs of tracks are stored as mdst::V0.
    */
   class V0FinderModule : public Module {
   public:
@@ -58,13 +70,10 @@ namespace Belle2 {
     std::string m_TrackColName;
     std::string m_V0ColName;
 
-    double m_vertexChi2Cut;       // Maximum chi2 of vertex fit.
-    double m_distRfromIP;         // minimum required distance from IP in R
-    double m_distZfromIP;         // minimum required distance from IP in Z
-
-    // FIXME Rave leaks memory on initialization, so we only initialize this once.
-    // Unfortunately, there's a much bigger leak inside Rave::PropagatorWrapper.
-    std::unique_ptr<genfit::GFRaveVertexFactory> m_vertexFactory;
+    double m_beamPipeRadius;
+    double m_vertexChi2CutInside;
+    double m_massWindowKshortInside;
+    double m_vertexChi2CutOutside;
   };
 }
 #endif

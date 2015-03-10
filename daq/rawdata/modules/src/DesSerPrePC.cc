@@ -1380,3 +1380,41 @@ void DesSerPrePC::waitRestart()
   return;
 }
 #endif
+
+void DesSerPrePC::shmOpen(char*, char*)
+//(char* path_cfg, char* path_sta)
+{
+  errno = 0;
+  /*m_shmfd_cfg = shm_open( "/cpr_config2", O_CREAT | O_EXCL | O_RDWR, 0666);
+  if (m_shmfd_cfg < 0) {
+    if (errno != EEXIST) {
+      perror("shm_open1");
+      exit(1);
+    }
+  m_shmfd_cfg = shm_open(path_cfg, O_RDWR, 0666);
+  if (m_shmfd_cfg < 0) {
+    printf( "[DEBUG] %s\n", path_cfg);
+    perror("[ERROR] shm_open2");
+    exit(1);
+  }
+  */
+  //}
+  /*
+  m_shmfd_sta = shm_open( "/cpr_status2", O_CREAT | O_EXCL | O_RDWR, 0666);
+  if (m_shmfd_sta < 0) {
+    if (errno != EEXIST) {
+      perror("shm_open1");
+      exit(1);
+    }
+  m_shmfd_sta = shm_open(path_sta , O_RDWR, 0666);
+  if (m_shmfd_sta < 0) {
+    printf( "[DEBUG] %s\n", path_sta);
+    perror("[ERROR] shm_open2");
+    exit(1);
+  }
+  //}
+  int size = 4 * sizeof(int);
+  ftruncate(m_shmfd_cfg, size);
+  ftruncate(m_shmfd_sta, size);
+    */
+}

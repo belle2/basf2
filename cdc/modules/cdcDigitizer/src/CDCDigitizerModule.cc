@@ -102,12 +102,15 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
 void CDCDigitizerModule::initialize()
 {
-  StoreArray<CDCSimHit>::required(m_inputCDCSimHitsName);
+  StoreArray<CDCSimHit> cdcSimHits(m_inputCDCSimHitsName);
+  cdcSimHits.required();
 
   // Register the arrays in the DataStore, that are to be added in this module.
-  StoreArray<CDCHit>::registerPersistent(m_outputCDCHitsName);
-  RelationArray::registerPersistent<CDCSimHit, CDCHit>(m_inputCDCSimHitsName, m_outputCDCHitsName);
-  RelationArray::registerPersistent<MCParticle, CDCHit>("", m_outputCDCHitsName);
+  StoreArray<CDCHit> cdcHits(m_outputCDCHitsName);
+  cdcHits.registerPersistent();
+  cdcSimHits.registerRelationTo(cdcHits);
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.registerRelationTo(cdcHits);
 
   m_cdcp = &(CDCGeometryPar::Instance());
   CDCGeometryPar& cdcp = *m_cdcp;

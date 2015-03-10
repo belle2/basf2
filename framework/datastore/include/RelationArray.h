@@ -143,31 +143,6 @@ namespace Belle2 {
     };
 
 
-    /** Register a relation array, that should be written to the output by default, in the data store.
-     *  This must be called in the initialization phase.
-     *
-     *  @param fromName    Name of from-array ("" for default name)
-     *  @param toName      Name of to-array ("" for default name)
-     *  @param durability  Specifies lifetime of array in question.
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    template<class FROM, class TO> static bool __attribute__((deprecated("Please use StoreArray::registerRelationTo() instead"))) registerPersistent(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
-        bool errorIfExisting = false) {
-      const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
-      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
-    }
-    /** Register a relation array, that should be written to the output by default, in the data store.
-     *  This must be called in the initialization phase.
-     *
-     *  @param durability  Specifies lifetime of array in question.
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    template<class FROM, class TO> static bool __attribute__((deprecated("Please use StoreArray::registerRelationTo() instead"))) registerPersistent(DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
-      return registerPersistent<FROM, TO>("", "", durability, errorIfExisting);
-    }
-
     /** Create an empty relation array in the data store.
      *
      *  @param replace   Should an existing object be replaced?

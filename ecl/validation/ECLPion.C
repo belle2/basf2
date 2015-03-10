@@ -1,6 +1,15 @@
 /* ECLPion.C 
  * ROOT macro for ECL validation plots 
  * Author Benjamin Oberhof
+ * 2014
+*/
+
+/*
+<header>
+<input>ECLPi0Output.root</input>
+<output>ECLPi0.root</output>
+<contact>ecl2ml@bpost.kek.jp</contact>
+</header>
 */
 
 void ECLPion(){

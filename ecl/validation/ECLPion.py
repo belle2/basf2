@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-########################################################
-# This steering file generates an ntuple for validation
-# purposes
-# Author Benjamin Oberhof
-########################################################
+"""
+<header>
+<output>ECLPi0Output.root</output>
+<contact>Benjamin Oberhof, ecl2ml@bpost.kek.jp</contact>
+</header>
+"""
 
 import os
 from basf2 import *

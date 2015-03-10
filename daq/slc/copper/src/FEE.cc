@@ -18,9 +18,13 @@ bool FEE::load(HSLB& hslb, const FEEConfig& conf)
   for (FEEConfig::RegList::const_iterator it = regs.begin();
        it != regs.end(); it++) {
     const FEEConfig::Reg& reg(*it);
-    hslb.writefee(reg.adr, reg.val);
-    LogFile::debug("write address %s(%d) (val=%d)",
-                   reg.name.c_str(), reg.adr, reg.val);
+    if (reg.size == 1) {
+      hslb.writefee8(reg.adr, reg.val);
+    } else if (reg.size == 4) {
+      hslb.writefee32(reg.adr, reg.val);
+    }
+    LogFile::debug("write address %s(%d) (val=%d, size = %d)",
+                   reg.name.c_str(), reg.adr, reg.val, reg.size);
   }
   return true;
 }

@@ -69,7 +69,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
                                       o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
       vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerInt(vname + ".reg.adr", true, true, 0));
-      add(new NSMVHandlerHSLBRegValue(*this, vname + "par.val", i));
+      add(new NSMVHandlerHSLBRegValue(*this, vname + ".par.val", i));
       FEEConfig fconf;
       int j = 0;
       const DBObject o_fee(obj("fee", i));
@@ -84,11 +84,13 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
           std::string vname = StringUtil::form("fee[%d].reg[%d].adr", i, j);
           add(new NSMVHandlerInt(vname, true, false, reg.adr));
           vname = StringUtil::form("fee[%d].par[%d].val", i, j++);
-          add(new NSMVHandlerHSLBRegValue(*this, vname, i, reg.adr));
+          add(new NSMVHandlerHSLBRegValue(*this, vname, i, reg.adr, reg.size));
         }
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerFEEStream(*this, vname + ".stream", i,
                                      o_fee.hasText("stream") ? o_fee.getText("stream") : ""));
+        add(new NSMVHandlerFEEBoot(*this, vname + ".boot", i));
+        vname = StringUtil::form("hslb[%d]", i);
         add(new NSMVHandlerHSLBLinkFee(*this, vname + ".linkfee", i));
         add(new NSMVHandlerHSLBUnLinkFee(*this, vname + ".unlinkfee", i));
         add(new NSMVHandlerHSLBTrgOnFee(*this, vname + ".trgonfee", i));

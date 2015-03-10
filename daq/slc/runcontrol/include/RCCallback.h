@@ -54,6 +54,7 @@ namespace Belle2 {
       m_provider_host = host;
       m_provider_port = port;
     }
+    DBObject& getDBObject() throw() { return m_obj; }
 
   private:
     void dbload(NSMCommunicator& com) throw(IOException);

@@ -7,9 +7,9 @@
   class CLASS : public NSMVHandlerInt, HandlerCPR {     \
   public:                  \
     CLASS(COPPERCallback& callback, const std::string& name,     \
-          int hslb = -1, int adr = -1)             \
+          int hslb = -1, int adr = -1, int size = -1)        \
       : NSMVHandlerInt(name, true, false),           \
-      HandlerCPR(callback, hslb, adr) {}           \
+      HandlerCPR(callback, hslb, adr, size) {}       \
     virtual ~CLASS() throw() {}              \
     virtual bool handleGetInt(int& val);             \
   }
@@ -18,9 +18,9 @@
   class CLASS : public NSMVHandlerInt, HandlerCPR {     \
   public:                  \
     CLASS(COPPERCallback& callback, const std::string& name,     \
-          int hslb = -1, int adr = -1)             \
+          int hslb = -1, int adr = -1, int size = -1)        \
       : NSMVHandlerInt(name, false, true),           \
-      HandlerCPR(callback, hslb, adr) {}           \
+      HandlerCPR(callback, hslb, adr, size) {}       \
     virtual ~CLASS() throw() {}              \
     virtual bool handleSetInt(int val);            \
   }
@@ -29,9 +29,9 @@
   class CLASS : public NSMVHandlerInt, HandlerCPR {     \
   public:                  \
     CLASS(COPPERCallback& callback, const std::string& name,     \
-          int hslb = -1, int adr = -1)             \
+          int hslb = -1, int adr = -1, int size = -1)        \
       : NSMVHandlerInt(name, true, true),            \
-      HandlerCPR(callback, hslb, adr) {}           \
+      HandlerCPR(callback, hslb, adr, size) {}       \
     virtual ~CLASS() throw() {}              \
     virtual bool handleGetInt(int& val);             \
     virtual bool handleSetInt(int val);            \
@@ -43,7 +43,7 @@
     CLASS(COPPERCallback& callback, const std::string& name,     \
           int hslb, const std::string& str)        \
       : NSMVHandlerText(name, true, true, str),       \
-      HandlerCPR(callback, hslb, -1) {}           \
+      HandlerCPR(callback, hslb, -1, -1) {}       \
     virtual ~CLASS() throw() {}              \
     virtual bool handleSetText(const std::string& val); \
   }
@@ -54,13 +54,14 @@ namespace Belle2 {
 
   class HandlerCPR {
   public:
-    HandlerCPR(COPPERCallback& callback, int hslb, int adr)
-      : m_callback(callback), m_hslb(hslb), m_adr(adr) {}
+    HandlerCPR(COPPERCallback& callback, int hslb, int adr, int size)
+      : m_callback(callback), m_hslb(hslb), m_adr(adr), m_size(size) {}
     virtual ~HandlerCPR() throw() {}
   protected:
     COPPERCallback& m_callback;
     int m_hslb;
     int m_adr;
+    int m_size;
   };
 
   CPRHANDLER_INT_GET(NSMVHandlerFifoEmpty);
@@ -82,6 +83,7 @@ namespace Belle2 {
   CPRHANDLER_TEXT(NSMVHandlerTTRXFirmware);
   CPRHANDLER_TEXT(NSMVHandlerHSLBFirmware);
   CPRHANDLER_TEXT(NSMVHandlerFEEStream);
+  CPRHANDLER_INT_SET(NSMVHandlerFEEBoot);
 
 }
 

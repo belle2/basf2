@@ -164,6 +164,10 @@ void* NSMData::parse(const char* incpath, bool malloc_new)
 throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
+  if (getenv("NSM2_INCDIR") == NULL) {
+    ConfigFile file("slowcontrol");
+    setenv("NSM2_INCDIR", file.get("nsm.data.incpath").c_str(), 0);
+  }
   NSMparse* ptr = NULL;
   char fmtstr[256];
   int revision = 0;

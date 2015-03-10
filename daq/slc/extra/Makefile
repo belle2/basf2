@@ -1,7 +1,8 @@
 
 all:
-	@ make -C nsm2
-	@ make -C nsm2/daemon install
+	@ make -C mgt
+	@ make -C ttrx
+	@ make -C ecl
 
 clean:
 	@ make -C nsm2 clean

@@ -8,7 +8,7 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 1) {
+  if (argc < 3) {
     LogFile::debug("Usage : %s <dataname> <format> <revision> [incpath]", argv[0]);
     return 1;
   }

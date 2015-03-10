@@ -27,7 +27,7 @@ namespace Belle2 {
 
   public:
     void setStream(const std::string& stream) { m_stream = stream; }
-    const std::string& getStream() const { return m_stream; }
+    const char* getStream() const { return m_stream.c_str(); }
     RegList& getRegList() { return m_regs; }
     const RegList& getRegList() const { return m_regs; }
     bool read(const DBObject& obj);

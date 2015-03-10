@@ -90,9 +90,21 @@ bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
 bool NSMVHandlerFEEStream::handleSetText(const std::string& stream)
 {
   if (File::exist(stream)) {
-    return m_callback.getHSLB(m_hslb).bootfpga(stream.c_str());
+    return m_callback.getHSLB(m_hslb).writestream(stream.c_str());
   } else {
-    LogFile::error("Stream file %s not exists", stream.c_str());
+    LogFile::error("FEE stream file %s not exists", stream.c_str());
+  }
+  return false;
+}
+
+bool NSMVHandlerFEEBoot::handleSetInt(int val)
+{
+  FEEConfig fconf;
+  if (val > 0 && m_callback.getFEE(m_hslb) &&
+      fconf.read(m_callback.getDBObject())) {
+    FEE& fee(*m_callback.getFEE(m_hslb));
+    HSLB& hslb(m_callback.getHSLB(m_hslb));
+    return fee.boot(hslb, fconf);
   }
   return false;
 }
@@ -100,16 +112,23 @@ bool NSMVHandlerFEEStream::handleSetText(const std::string& stream)
 bool NSMVHandlerHSLBRegValue::handleSetInt(int val)
 {
   try {
-    std::string vname = StringUtil::replace(getName(), ".val", ".adr");
-    vname = StringUtil::replace(getName(), "par", "reg");
-    if (m_adr < 0) {
-      m_callback.get(vname, m_adr);
+    std::string vname = StringUtil::replace(getName(), ".par.val", ".reg.adr");
+    if (m_adr < 0) m_callback.get(vname, m_adr);
+    if (m_size > 0) {
+      std::string vname = StringUtil::replace(getName(), "par.val", "reg.size");
+      m_callback.get(vname, m_size);
     }
     if (m_adr > 0) {
+      if (m_size == 1) {
+        m_callback.getHSLB(m_hslb).writefee8(m_adr, val);
+      } else if (m_size == 4) {
+        m_callback.getHSLB(m_hslb).writefee32(m_adr, val);
+      }
       LogFile::debug("wrting %d-th HSLB : %d >> %s=%d", m_hslb, val, vname.c_str(), m_adr);
       return true;
     }
   } catch (const std::exception& e) {
+    LogFile::error(e.what());
   }
   return false;
 }
@@ -117,17 +136,23 @@ bool NSMVHandlerHSLBRegValue::handleSetInt(int val)
 bool NSMVHandlerHSLBRegValue::handleGetInt(int& val)
 {
   try {
-    std::string vname = StringUtil::replace(getName(), ".val", ".adr");
-    vname = StringUtil::replace(getName(), "par", "reg");
-    if (m_adr < 0) {
-      m_callback.get(vname, m_adr);
+    std::string vname = StringUtil::replace(getName(), ".par.val", ".reg.adr");
+    if (m_adr < 0) m_callback.get(vname, m_adr);
+    if (m_size > 0) {
+      std::string vname = StringUtil::replace(getName(), "par.val", "reg.size");
+      m_callback.get(vname, m_size);
     }
     if (m_adr > 0) {
-      val = rand() % 256;
+      if (m_size == 1) {
+        val = m_callback.getHSLB(m_hslb).readfee8(m_adr);
+      } else if (m_size == 4) {
+        m_callback.getHSLB(m_hslb).readfee32(m_adr, &val);
+      }
       LogFile::debug("reading %d-th HSLB : %d (%s=%d)", m_hslb, val, vname.c_str(), m_adr);
       return true;
     }
   } catch (const std::exception& e) {
+    LogFile::error(e.what());
   }
   return false;
 }

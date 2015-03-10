@@ -193,8 +193,8 @@ def draw_hit_counts(data_tree, pt_values):
 
     for key in hists:
         hists[key].Write()
-    hNweights.Write()
-    hWeights.Write()
+    # hNweights.Write()
+    # hWeights.Write()
     hWeightsProfile.Write()
 
 

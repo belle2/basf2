@@ -732,14 +732,16 @@ class GroupByRefiner(Refiner):
 class CdRefiner(Refiner):
     # Folder name to be used if a groupby selection is active.
     default_folder_name = ""
-    default_groupby_folder_name = "groupby_{groupby}_{groupby_value}"
+    default_groupby_addition = "groupby_{groupby}_{groupby_value}"
 
     def __init__(self,
                  wrapped_refiner,
-                 folder_name=None):
+                 folder_name=None,
+                 groupby_addition=None):
 
         self.wrapped_refiner = wrapped_refiner
         self.folder_name = folder_name
+        self.groupby_addition = groupby_addition
 
     def refine(self,
                harvesting_module,
@@ -753,11 +755,19 @@ class CdRefiner(Refiner):
         folder_name = self.folder_name
         if folder_name is None:
             if groupby_value is not None:
-                folder_name = self.default_groupby_folder_name
+                folder_name = "{groupby_addition}"
             else:
                 folder_name = self.default_folder_name
 
-        folder_name = folder_name.format(groupby=groupby_part_name,
+        groupby_addition = self.groupby_addition
+        if groupby_addition is None:
+            groupby_addition = self.default_groupby_addition
+
+        groupby_addition = groupby_addition.format(groupby=groupby_part_name,
+                                                   groupby_value=groupby_value)
+
+        folder_name = folder_name.format(groupby_addition=groupby_addition,
+                                         groupby=groupby_part_name,
                                          groupby_value=groupby_value)
 
         if folder_name:
@@ -833,7 +843,7 @@ def cd(refiner=None, **kwds):
 
 def context(refiner=None,
             above_expert_level=None, below_expert_level=None,
-            folder_name=None,
+            folder_name=None, folder_groupby_addition=None,
             filter=None, filter_on=None,
             groupby=None, exclude_groupby=None,
             select=None, exclude=None):
@@ -843,8 +853,8 @@ def context(refiner=None,
         if exclude is not None or select is not None:
             wrapped_refiner = SelectRefiner(wrapped_refiner, select=select, exclude=exclude)
 
-        if folder_name is not None or groupby is not None:
-            wrapped_refiner = CdRefiner(wrapped_refiner, folder_name=folder_name)
+        if folder_name is not None or groupby is not None or folder_groupby_addition is not None:
+            wrapped_refiner = CdRefiner(wrapped_refiner, folder_name=folder_name, groupby_addition=folder_groupby_addition)
 
         if groupby is not None:
             wrapped_refiner = GroupByRefiner(wrapped_refiner, by=groupby, exclude_by=exclude_groupby)
@@ -869,7 +879,7 @@ def context(refiner=None,
 def refiner_with_context(refiner_factory):
     @functools.wraps(refiner_factory)
     def module_decorator_with_context(above_expert_level=None, below_expert_level=None,
-                                      folder_name=None,
+                                      folder_name=None, folder_groupby_addition=None,
                                       filter=None, filter_on=None,
                                       groupby=None, exclude_groupby=None,
                                       select=None, exclude=None,
@@ -879,7 +889,7 @@ def refiner_with_context(refiner_factory):
 
         return context(refiner,
                        above_expert_level=above_expert_level, below_expert_level=below_expert_level,
-                       folder_name=folder_name,
+                       folder_name=folder_name, folder_groupby_addition=folder_groupby_addition,
                        filter=filter, filter_on=filter_on,
                        groupby=groupby, exclude_groupby=exclude_groupby,
                        select=select, exclude=exclude)

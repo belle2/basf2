@@ -6,6 +6,7 @@ import copy
 
 from tracking.validation.plot import ValidationPlot, compose_axis_label
 from tracking.validation.fom import ValidationFiguresOfMerit
+from tracking.validation.classification import ClassificationAnalysis
 from tracking.validation.pull import PullAnalysis
 
 from tracking.validation.utilities import root_cd, root_save_name
@@ -408,7 +409,61 @@ class SaveProfilesRefiner(Refiner):
             return False
 
 
-class SavePullAnalysis(Refiner):
+class SaveClassificationAnalysisRefiner(Refiner):
+    default_contact = "{module.contact}"
+
+    default_truth_name = "{part_name}_truth"
+    default_prediction_name = "{part_name}_prediction"
+
+    def __init__(self,
+                 part_name=None,
+                 contact=None,
+                 prediction_name=None,
+                 truth_name=None):
+
+        self.part_name = part_name
+        self.contact = contact
+        self.prediction_name = prediction_name
+        self.truth_name = truth_name
+
+    def refine(self,
+               harvesting_module,
+               crops,
+               tdirectory=None,
+               groupby_part_name=None,
+               groupby_value=None,
+               **kwds):
+
+        contact = self.contact or self.default_contact
+        contact = contact.format(refiner=self,
+                                 module=harvesting_module)
+
+        if self.truth_name is not None:
+            truth_name = self.truth_name
+        else:
+            truth_name = self.default_truth_name
+
+        if self.prediction_name is not None:
+            prediction_name = self.prediction_name
+        else:
+            prediction_name = self.default_prediction_name
+
+        truth_name = truth_name.format(part_name=self.part_name)
+        prediction_name = prediction_name.format(part_name=self.part_name)
+
+        predictions = crops[prediction_name]
+        truths = crops[truth_name]
+
+        classification_analysis = ClassificationAnalysis(prediction_name=prediction_name,
+                                                         contact=contact)
+
+        classification_analysis.analyse(predictions, truths)
+
+        if tdirectory:
+            classification_analysis.write(tdirectory)
+
+
+class SavePullAnalysisRefiner(Refiner):
     default_name = "{module.name}_{quantity_name}"
     default_contact = "{module.contact}"
     default_title_postfix = " in {module.name}"
@@ -848,8 +903,13 @@ def save_profiles(**kwds):
 
 
 @refiner_with_context
+def save_classification_analysis(**kwds):
+    return SaveClassificationAnalysisRefiner(**kwds)
+
+
+@refiner_with_context
 def save_pull_analysis(**kwds):
-    return SavePullAnalysis(**kwds)
+    return SavePullAnalysisRefiner(**kwds)
 
 
 @refiner_with_context

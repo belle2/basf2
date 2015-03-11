@@ -93,7 +93,7 @@ WireNeighborType CDCWireTopology::areNeighbors(const WireID& wireID, const WireI
 
   if (wireID.getISuperLayer() !=  otherID.getISuperLayer() and
       isValidISuperLayer(wireID.getISuperLayer())) {
-    return 0;
+    return NOT_NEIGHBORS;
   } else {
     const CDCWireSuperLayer& superlayer = getWireSuperLayer(wireID.getISuperLayer());
     return superlayer.areNeighbors(wireID.getILayer(), wireID.getIWire(), otherID.getILayer(), otherID.getIWire());

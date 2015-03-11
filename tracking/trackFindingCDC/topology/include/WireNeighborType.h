@@ -16,6 +16,8 @@ namespace Belle2 {
     /// Type for the neighbor relationship from in wire to an other, imagined in the clock
     typedef signed short WireNeighborType;
 
+    /// Constant to indicate that two wires are not neighbors.
+    const WireNeighborType NOT_NEIGHBORS = 0;
 
     /// Constant for clockwise outwards
     const WireNeighborType CW_OUT_NEIGHBOR = 1;

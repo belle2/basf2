@@ -11,5 +11,6 @@
 #include "BaseFacetFilter.h"
 #include "AllFacetFilter.h"
 #include "MCFacetFilter.h"
+#include "FitlessFacetFilter.h"
 #include "SimpleFacetFilter.h"
 

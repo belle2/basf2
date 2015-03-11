@@ -74,7 +74,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("AddInWirePropagationDelay4Bg",  m_addInWirePropagationDelay4Bg,
            "The same switch but for beam bg. hits.", true);
   addParam("AddTimeOfFlight",  m_addTimeOfFlight,
-           "A switch used to control adding time of flight into the final drift time or not; this is for signal hits.", false);
+           "A switch used to control adding time of flight into the final drift time or not; this is for signal hits.", true);
   addParam("AddTimeOfFlight4Bg",   m_addTimeOfFlight4Bg,
            "The same switch but for beam bg. hits.", true);
   addParam("OutputNegativeDriftTime", m_outputNegativeDriftTime, "Output hits with negative drift time", false);

@@ -633,22 +633,30 @@ class ValidationPlot(object):
                 if passes:
                     Fill(float(x), float(y), float(weight))
 
+        self.set_additional_stats_tf1(histogram)
+
     def add_nan_inf_stats(self, histogram, name, values):
         n_nans = np.isnan(values).sum()
         if n_nans > 0:
-            self.add_stats_entry(histogram, name + ' nan', n_nans)
+            self.add_stats_entry(name + ' nan', n_nans, histogram)
 
         n_positive_inf = np.sum(values == np.inf)
         if n_positive_inf > 0:
-            self.add_stats_entry(histogram, name + ' +inf', n_positive_inf)
+            self.add_stats_entry(name + ' +inf', n_positive_inf, histogram)
 
         n_negative_inf = np.sum(values == -np.inf)
         if n_negative_inf > 0:
-            self.add_stats_entry(histogram, name + ' -inf', n_negative_inf)
+            self.add_stats_entry(name + ' -inf', n_negative_inf, histogram)
 
-    def add_stats_entry(self, histogram, label, value):
+    def add_stats_entry(self, label, value, histogram=None):
+        if histogram is None:
+            if self.histograms:
+                histogram = self.histograms[-1]
+            else:
+                return
         stats_entry = StatsEntry(str(label), float(value))
         histogram.GetListOfFunctions().Add(stats_entry)
+        self.set_additional_stats_tf1(histogram)
 
     def get_additional_stats(self, histogram):
         additional_stats = {}
@@ -901,6 +909,10 @@ class ValidationPlot(object):
 
         return n_bins, lower_bound, upper_bound
 
+    def set_additional_stats_tf1(self, histogram):
+        additional_stats_tf1 = self.create_additional_stats_tf1(histogram)
+        self.set_tf1(histogram, additional_stats_tf1)
+
     def set_fit_tf1(self, histogram, fit_tf1):
         additional_stats_tf1 = self.create_additional_stats_tf1(histogram)
         combined_tf1 = self.combine_fit_and_additional_stats(fit_tf1, additional_stats_tf1)
@@ -909,8 +921,9 @@ class ValidationPlot(object):
     def set_tf1(self, histogram, tf1):
         # Delete any functions formally added
         self.delete_tf1(histogram)
-        tf1.SetName("FitAndStats")
-        histogram.GetListOfFunctions().Add(tf1)
+        if tf1 is not None:
+            tf1.SetName("FitAndStats")
+            histogram.GetListOfFunctions().Add(tf1)
 
     def delete_tf1(self, histogram):
         tf1 = histogram.FindObject("FitAndStats")

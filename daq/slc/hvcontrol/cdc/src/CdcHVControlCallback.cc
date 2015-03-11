@@ -101,11 +101,11 @@ float CdcHVControlCallback::getCurrentMonitor(int crate, int slot, int channel) 
 
 bool CdcHVControlCallback::getSwitch(int crate, int slot, int channel) throw(IOException)
 {
-  return false;
+  return true;
 }
 
 int CdcHVControlCallback::getState(int crate, int slot, int channel) throw(IOException)
 {
-  return HVMessage::OCP;
+  return HVMessage::ON;
 }
 

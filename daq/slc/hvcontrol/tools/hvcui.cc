@@ -10,7 +10,7 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
+  if (argc <= 2) {
     LogFile::debug("Usage : %s <config> <cuiname>", argv[0]);
     return 1;
   }

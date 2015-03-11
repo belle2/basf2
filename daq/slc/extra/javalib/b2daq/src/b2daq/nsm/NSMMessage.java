@@ -165,7 +165,9 @@ public final class NSMMessage implements Serializable {
             reader.readObject(_obj);
         } else if (command.equals(NSMCommand.VSET)) {
             _obj = new NSMVar();
+            System.out.println(getReqName());
             reader.readObject(_obj);
+            System.out.println("NSMVar "+((NSMVar)_obj).getName());
         }
     }
 

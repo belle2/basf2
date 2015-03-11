@@ -48,6 +48,7 @@ bool NSM2SocketCallback::perform(NSMCommunicator& com) throw()
 
 void NSM2SocketCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 {
+  LogFile::debug("NSM2SocketCallback::%s %s", var.getNode().c_str(), var.getName().c_str());
   NSMMessage& msg(com.getMessage());
   NSMNode node(msg.getNodeName());
   m_bridge->send(NSMMessage(node, NSMCommand::VSET), var);

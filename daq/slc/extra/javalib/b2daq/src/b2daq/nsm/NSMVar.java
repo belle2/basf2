@@ -21,6 +21,7 @@ public class NSMVar implements Serializable {
     public static final int FLOAT = 2;
     public static final int TEXT = 3;
 
+    private String m_node = "";
     private String m_name = "";
     private int m_type = NONE;
     private int[] m_var_i = null;
@@ -29,7 +30,6 @@ public class NSMVar implements Serializable {
     private int m_len = 0;
     private int m_id = 0;
     private int m_revision = 0;
-    private int m_nodeid = 0;
 
     public NSMVar() {
     }
@@ -95,6 +95,10 @@ public class NSMVar implements Serializable {
         m_name = name;
     }
 
+    public void setNode(String node) {
+        m_node = node;
+    }
+
     public int size() {
         int s = 1;
         switch (m_type) {
@@ -154,12 +158,15 @@ public class NSMVar implements Serializable {
 
     @Override
     public void readObject(Reader reader) throws IOException {
+        m_node = reader.readString();
+        System.out.println(m_node);
         m_name = reader.readString();
+        System.out.println(m_name);
         m_type = reader.readInt();
+        System.out.println(m_type);
         m_len = reader.readInt();
         m_id = reader.readInt();
         m_revision = reader.readInt();
-        m_nodeid = reader.readInt();
         int length = (m_len > 0) ? m_len : 1;
         m_var_i = null;
         m_var_f = null;
@@ -169,6 +176,7 @@ public class NSMVar implements Serializable {
                 m_var_i = new int[length];
                 for (int i = 0; i < length; i++) {
                     m_var_i[i] = reader.readInt();
+                System.out.println(m_var_i[i]);
                 }
                 return;
             case FLOAT:
@@ -191,12 +199,12 @@ public class NSMVar implements Serializable {
 
     @Override
     public void writeObject(Writer writer) throws IOException {
+        writer.writeString(m_node);
         writer.writeString(m_name);
         writer.writeInt(m_type);
         writer.writeInt(m_len);
         writer.writeInt(m_id);
         writer.writeInt(m_revision);
-        writer.writeInt(m_nodeid);
         switch (m_type) {
             case INT:
                 for (int v : m_var_i) {

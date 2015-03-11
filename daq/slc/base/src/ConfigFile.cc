@@ -12,8 +12,8 @@ using namespace Belle2;
 const std::string ConfigFile::getFilePath(const std::string& filename)
 {
   std::string file_path;
-  if (filename.size() > std::string("conf").size() &&
-      filename.find_last_of(".conf") == filename.size() - 1) {
+  if (filename.size() > std::string(".conf").size() + 1 &&
+      StringUtil::find(filename, ".conf")) {
     return filename;
   }
   if (filename.at(0) != '/') {
@@ -21,7 +21,6 @@ const std::string ConfigFile::getFilePath(const std::string& filename)
     if (path == NULL) {
       path = getenv("BELLE2_LOCAL_DIR");
       if (path == NULL) {
-        std::cerr << "[ERROR] Enveriment varialble : BELLE_LOCAL_DIR" << std::endl;
         exit(1);
       }
       file_path = path;
@@ -43,6 +42,7 @@ const std::string ConfigFile::getFilePath(const std::string& filename)
 void ConfigFile::read(const std::string& filename, bool overload)
 {
   if (filename.size() == 0) return;
+  std::cout << getFilePath(filename) << std::endl;
   std::ifstream fin(getFilePath(filename).c_str());
   read(fin, overload);
   fin.close();

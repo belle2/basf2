@@ -138,6 +138,27 @@ void TrackFitResult::cartesianToPerigee(const TVector3& position, const TVector3
   x =  d0 * sin(phi) + charge / omega * (sin(phi + chi) - sin(phi));
   y = -d0 * cos(phi) + charge / omega * (-cos(phi + chi) + cos(phi));
   z = z0 + charge / omega * cotTheta * chi;
+  // Expressed in terms of the track length from the POCA 's' and its
+  // projection into the x-y plane
+  S = s / hypot(1, cotTheta);
+  // we have chi = S*omega, and from this the formulae valid also for
+  // straight line tracks (for the constant direction of the
+  // straight-line track just take chi = 0, and for straight-line
+  // tracks charge just establishes a sign convention):
+  x = (d0 * sin(phi)
+       + charge * S * (sin(phi) * (cos(S * omega) - 1) / (S * omega)
+                       + cos(phi) * sin(S * omega) / (S * omega)));
+  y = (-d0 * cos(phi)
+       + charge * S * (sin(phi) * sin(S * omega) / (S * omega)
+                       - cos(phi) * (cos(S * omega) - 1) / (S * omega)));
+  z = charge * S * cotTheta;
+  // For omega -> 0, these reduce to straight lines, according to
+  x = (d0 * sin(phi)
+       + charge * S * cos(phi) + O(omega));
+  y = (-d0 * cos(phi)
+       + chargs * S * sin(phi) + O(omega));
+  z = charge * S * cotTheta;
+  // Billoir (loc.cit.) gives the first terms of a series in S.
 #endif
   double x = position.X(); double y = position.Y(); double z = position.Z();
   double px = momentum.X(); double py = momentum.Y(); double pz = momentum.Z();
@@ -159,9 +180,25 @@ void TrackFitResult::cartesianToPerigee(const TVector3& position, const TVector3
   const double rhoHel = hypot(helX, helY);
 
   const double d0 = charge * hypot(helX, helY) - 1 / omega;
-  const double phi = atan2(helY, helX) + charge * M_PI / 2;
-  const double sinchi = sinphichi * cos(phi) - cosphichi * sin(phi);
-  const double chi = asin(sinchi);
+  // remainder(..., 2*M_PI) reduces range to [-pi,pi].
+  const double phi = remainder(atan2(helY, helX) + charge * M_PI / 2, 2 * M_PI);
+  const double sinphi = sin(phi);
+  const double cosphi = cos(phi);
+  const double sinchi = sinphichi * cosphi - cosphichi * sinphi;
+  const double coschi = sinphichi * sinphi + cosphichi * cosphi; // Precision loss near IP!  See below.
+  // We usually need to evaluate chi close to the IP, i.e. chi small.
+  // Here the calculation of cos(chi) is fraught with numerical error.
+  // Therefore we go with asin(sinchi).  On the other hand for Kshort
+  // tracks, we may be farther from the IP.  There we need the full
+  // range of the helix, i.e. chi in [-pi,pi], whereas asin only
+  // returns angles in the range [-pi/2,pi/2].  The separation point
+  // between the formulae was chosen arbitrarily.
+  double chi = 0;
+  if (fabs(sinchi) > .5) {
+    chi = atan2(sinchi, coschi);
+  } else {
+    chi = asin(sinchi);
+  }
   const double z0 = z + charge / omega * cotTheta * chi;
 
   m_tau.reserve(5);
@@ -220,9 +257,9 @@ void TrackFitResult::cartesianToPerigee(const TVector3& position, const TVector3
   const double dphipx = dphihelY * dhelYpx;
   const double dphipy = dphihelX * dhelXpy;
 
-  const double dsinchisinphichi = cos(phi);
-  const double dsinchiphi = -sinphichi * sin(phi) - cosphichi * cos(phi);
-  const double dsinchicosphichi = -sin(phi);
+  const double dsinchisinphichi = cosphi;      // d(sin chi) / d(sin(phi+chi))
+  const double dsinchiphi = -coschi;  // See above concerning cos(chi)
+  const double dsinchicosphichi = -sinphi;     // d(sin chi) / d(cos(phi+chi))
   const double dsinchix = dsinchiphi * dphix;
   const double dsinchiy = dsinchiphi * dphiy;
   const double dsinchipx = dsinchisinphichi * dsinphichipx + dsinchiphi * dphipx + dsinchicosphichi * dcosphichipx;

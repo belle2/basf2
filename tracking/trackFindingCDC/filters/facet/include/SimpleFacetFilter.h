@@ -17,6 +17,8 @@
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
+#include "FitlessFacetFilter.h"
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Filter for the constuction of good facets based on simple criterions.
@@ -33,7 +35,11 @@ namespace Belle2 {
       virtual CellWeight isGoodFacet(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
 
     private:
-      const FloatType m_allowedDeviationCos; ///< Memory for the used direction of flight deviation.
+      /// Basic filter to implement a fitless preselection.
+      FitlessFacetFilter m_fitlessFacetFilter;
+
+      /// Memory for the used direction of flight deviation.
+      const FloatType m_allowedDeviationCos;
 
     }; // end class SimpleFacetFilter
   } //end namespace TrackFindingCDC

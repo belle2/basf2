@@ -24,6 +24,7 @@ using namespace TrackFindingCDC;
 
 
 SimpleFacetFilter::SimpleFacetFilter():
+  m_fitlessFacetFilter(true),
   m_allowedDeviationCos(cos(PI / 180.0 * 9))
 {
 }
@@ -33,6 +34,7 @@ SimpleFacetFilter::SimpleFacetFilter():
 
 
 SimpleFacetFilter::SimpleFacetFilter(FloatType allowedDeviationCos):
+  m_fitlessFacetFilter(true),
   m_allowedDeviationCos(allowedDeviationCos)
 {
 }
@@ -41,8 +43,10 @@ SimpleFacetFilter::SimpleFacetFilter(FloatType allowedDeviationCos):
 
 
 
-CellState SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
+CellWeight SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
 {
+  CellWeight fitlessWeight = m_fitlessFacetFilter.isGoodFacet(facet);
+  if (isNotACell(fitlessWeight)) return NOT_A_CELL;
 
   facet.adjustLines();
 

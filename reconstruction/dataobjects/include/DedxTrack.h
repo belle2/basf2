@@ -73,6 +73,22 @@ namespace Belle2 {
       m_length += distance;
     }
 
+    /** Get average dE/dx for given detector. */
+    float getDedx(Const::EDetector detector) const {
+      int iDet = (int)(detector - Const::PXD);
+      if (iDet < 0 or iDet > Dedx::c_CDC)
+        return 0.0;
+      return m_dedx_avg[iDet];
+    }
+
+    /** Get truncated average dE/dx for given detector. */
+    float getDedxTruncated(Const::EDetector detector) const {
+      int iDet = (int)(detector - Const::PXD);
+      if (iDet < 0 or iDet > Dedx::c_CDC)
+        return 0.0;
+      return m_dedx_avg_truncated[iDet];
+    }
+
   private:
     int m_event_id; /**< event this track was found in */
     int m_track_id; /**< equal to Track id. */

@@ -100,6 +100,7 @@ namespace Belle2 {
     bool m_realisticCDCGeoTranslator;                /**< Whether to use the realistic geometry translators.  */
     bool m_enableWireSag;                            /**< Wire sag in CDCGeometryTranslator.  */
     bool m_useTrackTime;                             /**< If true, CDCRecoHits will use the track propagation time.  */
+    bool m_estimateSeedTime;                         /**< If true, the starting time of each track will be estimated from its seed.  */
     std::vector<int> m_pdgCodes;                     /**< holds the PDG codes the user sets. If empty the PDG code from genfit::TrackCand will be written into it*/
     bool m_usePdgCodeFromTrackCand;                  /**< flag to indicate if PDG code will be taken from genfit::TrackCand or from user input in m_pdgCodes*/
     std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */

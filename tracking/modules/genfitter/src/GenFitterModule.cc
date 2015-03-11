@@ -45,6 +45,7 @@
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <cdc/dataobjects/WireID.h>
 
+#include <framework/dataobjects/Helix.h>
 #include <mdst/dataobjects/Track.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -113,7 +114,8 @@ GenFitterModule::GenFitterModule() :
   addParam("UseClusters", m_useClusters, "If set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
   addParam("RealisticCDCGeoTranslator", m_realisticCDCGeoTranslator, "If true, realistic CDC geometry translators will be used (wire sag, misalignment).", false);
   addParam("CDCWireSag", m_enableWireSag, "Whether to enable wire sag in the CDC geometry translation.  Needs to agree with simulation/digitization.", false);
-  addParam("UseTrackTime", m_useTrackTime, "Determines whether the realistic TDC track time converter and the CDCRecoHits will take the track propagation time into account.  The setting has to agree with those of the CDCDigitizer.", false);
+  addParam("UseTrackTime", m_useTrackTime, "Determines whether the realistic TDC track time converter and the CDCRecoHits will take the track propagation time into account.  The setting has to agree with those of the CDCDigitizer.  Requires EstimateSeedTime with current input (2015-03-11).", true);
+  addParam("EstimateSeedTime", m_estimateSeedTime, "If set, time for the seed will be recalculated based on a helix approximation.  Only makes a difference if UseTrackTime is set.", true);
   addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
   //output
   addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final genfit::Tracks (will be created by this module)", string(""));
@@ -347,13 +349,29 @@ void GenFitterModule::event()
       const TVector3& posSeed = aTrackCandPointer->getPosSeed();
       const TVector3& momentumSeed = aTrackCandPointer->getMomSeed();
 
+      // We reset the track's time after constructing it from the TrackCand.
+      double timeSeed = aTrackCandPointer->getTimeSeed();
+      if (m_estimateSeedTime) {
+        // Particle velocity in cm / ns.
+        const double m = part->Mass();
+        const double p = momentumSeed.Mag();
+        const double E = hypot(m, p);
+        const double beta = p / E;
+        const double v = beta / Const::speedOfLight;
+
+        // Arch length from IP to posSeed in cm.
+        const Helix h(posSeed, momentumSeed, part->Charge(), 1.5);
+        const double s = h.getArcLengthAtCylindricalR(posSeed.Perp());
+
+        // Time from trigger (= 0 ns) to posSeed assuming constant velocity in ns.
+        timeSeed = s / v;
+      }
+
       B2DEBUG(99, "Fit track with start values: ");
 
       B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
-      //B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed(3, 3)) << "  " << sqrt(covSeed(4, 4)) << "  " << sqrt(covSeed(5, 5)));
       B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
-      //B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed(0, 0)) << "  " << sqrt(covSeed(1, 1)) << "  " << sqrt(covSeed(2, 2)));
-      B2DEBUG(100, "Start values: pdg:      " << currentPdgCode);
+      B2DEBUG(100, "Start values: pdg:      " << currentPdgCode << " time: " << timeSeed);
 
       genfit::MeasurementFactory<genfit::AbsMeasurement> factory;
 
@@ -400,6 +418,8 @@ void GenFitterModule::event()
 
       genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
       genfit::Track gfTrack(*aTrackCandPointer, factory, trackRep); //create the track with the corresponding track representation
+      // Reset the time seed to deal with the case where we have recalculated it.
+      gfTrack.setTimeSeed(timeSeed);
 
       const int nHitsInTrack = gfTrack.getNumPointsWithMeasurement();
       B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);

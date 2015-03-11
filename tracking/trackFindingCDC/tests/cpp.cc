@@ -87,3 +87,24 @@ TEST(TrackFindingCDCTest, cpp_map_insert)
   EXPECT_EQ(2, concret[2]);
 
 }
+
+
+TEST(TrackFindingCDCTest, cpp_remainer)
+{
+  // Test if remainer brings a value to the range [-1, 1]
+  // Useful to transform
+  {
+    double value = 3.0 / 2.0;
+    double reduced_value = std::remainder(value, 2.0);
+
+    EXPECT_FLOAT_EQ(-1.0 / 2.0, reduced_value);
+  }
+
+  {
+    double value = -3.0 / 2.0;
+    double reduced_value = std::remainder(value, 2.0);
+
+    EXPECT_FLOAT_EQ(1.0 / 2.0, reduced_value);
+  }
+
+}

@@ -30,13 +30,27 @@ namespace Belle2 {
 
     public:
 
-      /// Enum of the different shapes of three neighboring hits (up to mirror and rotational symmetries).
-      enum Shape {
-        ILLSHAPED = 0,
-        ORTHO = 1,
-        META = 2,
-        PARA = 3,
-      };
+      /** Enum of the different shapes of three neighboring hits (up to mirror and rotational symmetries)
+       *  Note: The name is inspired by the xylene molecules. */
+      typedef signed int Shape;
+
+      /// Constant for an ill shaped triple
+      static const Shape ILLSHAPED = -999;
+
+      /// Constant for ortho arrangement with clockwise twist
+      static const Shape ORTHO_CW = -4;
+
+      /// Constant for meta arrangement with clockwise twist
+      static const Shape META_CW = -2;
+
+      /// Constant for para arrangement, no twist here
+      static const Shape PARA = 0;
+
+      /// Constant for meta arrangement with counterclockwise twist
+      static const Shape META_CCW = 2;
+
+      /// Constant for ortho arrangement with counterclockwise twist
+      static const Shape ORTHO_CCW = 4;
 
     public:
 

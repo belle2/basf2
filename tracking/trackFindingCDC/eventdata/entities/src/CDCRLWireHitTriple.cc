@@ -11,6 +11,7 @@
 #include "../include/CDCRLWireHitTriple.h"
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <assert.h>
 
 using namespace std;
 using namespace Belle2;
@@ -97,21 +98,25 @@ void CDCRLWireHitTriple::setEndRLInfo(const RightLeftInfo& endRLInfo)
 
 CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
 {
-
   const CDCWire& startWire = getStartWire();
   const CDCWire& middleWire = getMiddleWire();
   const CDCWire& endWire = getEndWire();
 
-  WireNeighborType middleToStartNeighborType = middleWire.isNeighborWith(startWire);
+  WireNeighborType startToMiddleNeighborType = startWire.isNeighborWith(middleWire);
   WireNeighborType middleToEndNeighborType   = middleWire.isNeighborWith(endWire);
 
-  if (middleToStartNeighborType and middleToEndNeighborType) {
-    if (startWire.isNeighborWith(endWire)) return ORTHO;
-    else if (abs(middleToStartNeighborType - middleToEndNeighborType) == 6) return PARA;
-    else return META;
+  if (startToMiddleNeighborType == NOT_NEIGHBORS or
+      middleToEndNeighborType == NOT_NEIGHBORS) {
+    return ILLSHAPED;
   }
-  //else
-  return Shape::ILLSHAPED;
+
+  // Neighbor types are marked on the clock. Difference is so to say an angular value apart from a 12 / (2 * pi) factor
+  const int clockDifference = (int)startToMiddleNeighborType - (int)middleToEndNeighborType;
+
+  // Difference on the clock modulus 12 such that it is between -6 and 6.
+  Shape shape = (clockDifference + 18) % 12 - 6;
+
+  return shape;
 }
 
 

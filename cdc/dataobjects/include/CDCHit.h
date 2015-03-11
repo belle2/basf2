@@ -31,7 +31,7 @@ namespace Belle2 {
   public:
     /** Empty constructor for ROOT IO. */
     CDCHit() :
-      m_eWire(65535), m_tdcCount(0), m_adcCount(0) {
+      m_status(0), m_eWire(65535), m_tdcCount(0), m_tdcCount2ndHit(0), m_adcCount(0) {
       B2DEBUG(250, "Empty CDCHit Constructor called.");
     }
 
@@ -56,6 +56,16 @@ namespace Belle2 {
       setWireID(wireID);
     }
 
+    /** Constructor using the WireID object including 2nd hit TDC. */
+    CDCHit(unsigned short status, unsigned short tdcCount, unsigned short tdcCount2nd, unsigned short adcCount, const WireID& wireID) {
+      setStatus(status);
+      setTDCCount(tdcCount);
+      setTDCCount2ndHit(tdcCount2nd);
+      setADCCount(adcCount);
+      setWireID(wireID);
+    }
+
+
     /** Setter for Wire ID.
      *
      *  The numbering scheme is the same as in the one used in
@@ -75,6 +85,16 @@ namespace Belle2 {
       m_eWire = wireID.getEWire();
     }
 
+
+    /** Setter for CDCHit status.
+     *
+     *  @param status  indicates the CDCHit object status.
+     */
+    void setStatus(short status) {
+      B2DEBUG(250, "setStatus called with " << status);
+      m_status = status;
+    }
+
     /** Setter for TDC count.
      *
      *  @param tdcCount  Information for timing of the hit.
@@ -82,6 +102,11 @@ namespace Belle2 {
     void setTDCCount(short tdcCount) {
       B2DEBUG(250, "setTDCCount called with " << tdcCount);
       m_tdcCount = tdcCount;
+    }
+
+    void setTDCCount2ndHit(short tdc) {
+      B2DEBUG(250, "setTDCCount called with " << tdc);
+      m_tdcCount2ndHit = tdc;
     }
 
     /** Setter for ADC count. */
@@ -112,9 +137,19 @@ namespace Belle2 {
       return m_eWire;
     }
 
-    /** Getter for Drift Time. */
+    /** Getter for CDCHit status. */
+    unsigned short getStatus() const {
+      return m_status;
+    }
+
+    /** Getter for TDC count. */
     short getTDCCount() const {
       return m_tdcCount;
+    }
+
+    /** Getter for TDC count of 2nd hit. */
+    short getTDCCount2ndHit() const {
+      return m_tdcCount2ndHit;
     }
 
     /** Getter for integrated charge.
@@ -128,6 +163,10 @@ namespace Belle2 {
     }
 
   protected:
+
+    /** Status of CDCHit. */
+    unsigned short  m_status;
+
     /** Wire encoding.
      *
      *  Details are now explained in the separate WireID object.
@@ -138,12 +177,15 @@ namespace Belle2 {
     /** Drift Time in ns. */
     unsigned short  m_tdcCount;
 
+    /** Drift Time in ns (2nd hit). */
+    unsigned short  m_tdcCount2ndHit;
+
     /** ADC count of the integrated charge in the cell. */
     unsigned short m_adcCount;
 
   private:
     /** ROOT Macro.*/
-    ClassDef(CDCHit, 3);
+    ClassDef(CDCHit, 4);
   };
 } // end namespace Belle2
 

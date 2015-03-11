@@ -35,6 +35,8 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "\"all\" (all facets are valid), "
            "\"mc\" (monte carlo truth), "
            "\"mc_symmetric\" (monte carlo truth and their mirror image), "
+           "\"fitless\" (only checking the feasability of right left passage information), "
+           "\"fitless_hard\" (also exclude the boarder line feasable combinations), "
            "\"simple\" (mc free with simple criteria).",
            string("simple"));
 
@@ -60,6 +62,10 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
     ptrFacetFilter = new MCFacetFilter(false);
   } else if (m_param_facetFilter == string("mc_symmetric")) {
     ptrFacetFilter = new MCFacetFilter(true);
+  } else if (m_param_facetFilter == string("fitless")) {
+    ptrFacetFilter = new FitlessFacetFilter(false);
+  } else if (m_param_facetFilter == string("fitless_hard")) {
+    ptrFacetFilter = new FitlessFacetFilter(true);
   } else if (m_param_facetFilter == string("simple")) {
     ptrFacetFilter = new SimpleFacetFilter();
   } else {

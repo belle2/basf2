@@ -460,25 +460,24 @@ class SavePullAnalysis(Refiner):
 
         name = self.name or self.default_name
 
-        if self.absolute:
-            quantity_name_for_name = 'absolute ' + self.quantity_name
-        else:
-            quantity_name_for_name = self.quantity_name
-
         name = name.format(refiner=self,
                            module=harvesting_module,
-                           quantity_name=quantity_name_for_name,
+                           quantity_name="{quantity_name}",  # leave that for the PullAnalysis to fill in
                            part_name=self.part_name,
                            groupby=groupby_part_name,
                            groupby_value=groupby_value)
 
+        plot_name = name + "_{subplot_name}"
+
         title_postfix = self.title_postfix or self.default_title_postfix
         title_postfix = title_postfix.format(refiner=self,
                                              module=harvesting_module,
-                                             quantity_name=quantity_name_for_name,
+                                             quantity_name="{quantity_name}",  # leave that for the PullAnalysis to fill in
                                              part_name=self.part_name,
                                              groupby=groupby_part_name,
                                              groupby_value=groupby_value)
+
+        plot_title = "{subplot_title} of {quantity_name}" + title_postfix
 
         if self.truth_name is not None:
             truth_name = self.truth_name
@@ -507,8 +506,8 @@ class SavePullAnalysis(Refiner):
                                      unit=self.unit,
                                      absolute=self.absolute,
                                      outlier_z_score=self.outlier_z_score,
-                                     plot_name_prefix=name,
-                                     plot_title_postfix=title_postfix)
+                                     plot_name=plot_name,
+                                     plot_title=plot_title)
 
         pull_analysis.analyse(truths, estimates, variances)
 

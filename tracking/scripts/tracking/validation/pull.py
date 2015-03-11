@@ -14,6 +14,8 @@ import numpy as np
 
 class PullAnalysis(object):
     default_outlier_z_score = 5.0
+    default_plot_name = "{plot_name_prefix}_{subplot_name}{plot_name_postfix}"
+    default_plot_title = "{subplot_title} of {quantity_name}{plot_title_postfix}"
 
     def __init__(
         self,
@@ -22,9 +24,11 @@ class PullAnalysis(object):
         outlier_z_score=None,
         absolute=False,
         contact='',
-        plot_name_prefix='',
-        plot_name_postfix='',
-        plot_title_postfix='',
+        plot_name=None,
+        plot_title=None,
+        plot_name_prefix='',  # depricated use plot_name instead
+        plot_name_postfix='',  # depricated use plot_name instead
+        plot_title_postfix='',  # depricated use plot_title instead
     ):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
@@ -37,6 +41,9 @@ class PullAnalysis(object):
             self.outlier_z_score = outlier_z_score
 
         self.absolute = absolute
+
+        self.plot_name = plot_name
+        self.plot_title = plot_title
 
         self.plot_name_prefix = plot_name_prefix or root_save_name(quantity_name)
         self.plot_name_postfix = plot_name_postfix
@@ -86,16 +93,33 @@ class PullAnalysis(object):
             pulls = np.divide(residuals, sigmas)
             p_values = 1.0 - erf(np.abs(pulls))
 
+        plot_name = self.plot_name
+        if plot_name is None:
+            plot_name = self.default_plot_name
+
+        plot_name = plot_name.format(subplot_name='{subplot_name}',
+                                     quantity_name=quantity_name,
+                                     plot_name_prefix=plot_name_prefix,
+                                     plot_name_postfix=self.plot_name_postfix)
+
+        plot_title = self.plot_title
+        if plot_title is None:
+            plot_title = self.default_plot_title
+
+        plot_title = plot_title.format(subplot_title='{subplot_title}',
+                                       quantity_name=quantity_name,
+                                       plot_title_postfix=self.plot_title_postfix)
+
         # Truths #
         ##########
 
         # Distribution of truths
-        truths_hist = ValidationPlot('%s_truths%s' % (plot_name_prefix,
-                                                      self.plot_name_postfix))
-        truths_hist.hist(truths, outlier_z_score=outlier_z_score)
+        truths_hist_name = plot_name.format(subplot_name="truths")
+        truths_hist = ValidationPlot(truths_hist_name)
+        truths_hist.hist(truths,
+                         outlier_z_score=outlier_z_score)
         truths_hist.xlabel = axis_label
-        truths_hist.title = 'True distribution of %s%s' % (quantity_name,
-                                                           self.plot_title_postfix)
+        truths_hist.title = plot_title.format(subplot_title='True distribution')
 
         self.plots['truths'] = truths_hist
 
@@ -103,12 +127,12 @@ class PullAnalysis(object):
         #############
 
         # Distribution of estimates
-        estimates_hist = ValidationPlot('%s_estimates%s' % (plot_name_prefix,
-                                                            self.plot_name_postfix))
-        estimates_hist.hist(estimates, outlier_z_score=outlier_z_score)
+        estimates_hist_name = plot_name.format(subplot_name="estimates")
+        estimates_hist = ValidationPlot(estimates_hist_name)
+        estimates_hist.hist(estimates,
+                            outlier_z_score=outlier_z_score)
         estimates_hist.xlabel = axis_label
-        estimates_hist.title = 'Distribution of %s estimates%s' \
-            % (quantity_name, self.plot_title_postfix)
+        estimates_hist.title = plot_title.format(subplot_title='Estimates distribution')
 
         self.plots['estimates'] = estimates_hist
 
@@ -116,27 +140,26 @@ class PullAnalysis(object):
         ##################
 
         # Estimates versus truths scatter plot
-        estimates_by_truths_scatter = ValidationPlot('%s_diag_scatter%s'
-                                                     % (plot_name_prefix, self.plot_name_postfix))
-        estimates_by_truths_scatter.scatter(truths, estimates,
+        estimates_by_truths_scatter_name = plot_name.format(subplot_name="diag_scatter")
+        estimates_by_truths_scatter = ValidationPlot(estimates_by_truths_scatter_name)
+        estimates_by_truths_scatter.scatter(truths,
+                                            estimates,
                                             outlier_z_score=outlier_z_score)
         estimates_by_truths_scatter.xlabel = 'True ' + axis_label
         estimates_by_truths_scatter.ylabel = 'Estimated ' + axis_label
-        estimates_by_truths_scatter.title = 'Diagonal %s scatter plot%s' \
-            % (quantity_name, self.plot_title_postfix)
+        estimates_by_truths_scatter.title = plot_title.format(subplot_title='Diagonal scatter plot')
 
         self.plots['diag_scatter'] = estimates_by_truths_scatter
 
         # Estimates versus truths profile plot
-        estimates_by_truths_profile = ValidationPlot('%s_diag_profile%s'
-                                                     % (plot_name_prefix, self.plot_name_postfix))
-        estimates_by_truths_profile.profile(truths, estimates,
+        estimates_by_truths_profile_name = plot_name.format(subplot_name="diag_profile")
+        estimates_by_truths_profile = ValidationPlot(estimates_by_truths_profile_name)
+        estimates_by_truths_profile.profile(truths,
+                                            estimates,
                                             outlier_z_score=outlier_z_score)
         estimates_by_truths_profile.xlabel = 'True ' + axis_label
         estimates_by_truths_profile.ylabel = 'Estimated ' + axis_label
-        estimates_by_truths_profile.title = 'Diagonal %s profile plot%s' \
-            % (quantity_name, self.plot_title_postfix)
-
+        estimates_by_truths_profile.title = plot_title.format(subplot_title='Diagonal profile')
         estimates_by_truths_profile.fit_diag()
 
         self.plots['diag_profile'] = estimates_by_truths_profile
@@ -145,12 +168,12 @@ class PullAnalysis(object):
         #############
 
         # Distribution of the residuals
-        residuals_hist = ValidationPlot('%s_residuals%s' % (plot_name_prefix,
-                                                            self.plot_name_postfix))
-        residuals_hist.hist(residuals, outlier_z_score=outlier_z_score)
+        residuals_hist_name = plot_name.format(subplot_name="residuals")
+        residuals_hist = ValidationPlot(residuals_hist_name)
+        residuals_hist.hist(residuals,
+                            outlier_z_score=outlier_z_score)
         residuals_hist.xlabel = axis_label
-        residuals_hist.title = 'Distribution of %s residuals%s' \
-            % (quantity_name, self.plot_title_postfix)
+        residuals_hist.title = plot_title.format(subplot_title='Residual distribution')
 
         self.plots['residuals'] = residuals_hist
 
@@ -159,13 +182,13 @@ class PullAnalysis(object):
         if variances is not None:
 
             # Distribution of sigmas
-            sigmas_hist = ValidationPlot('%s_sigmas%s' % (plot_name_prefix,
-                                                          self.plot_name_postfix))
-            sigmas_hist.hist(sigmas, lower_bound=0,
+            sigmas_hist_name = plot_name.format(subplot_name="sigmas")
+            sigmas_hist = ValidationPlot(sigmas_hist_name)
+            sigmas_hist.hist(sigmas,
+                             lower_bound=0,
                              outlier_z_score=outlier_z_score)
-            sigmas_hist.xlabel = axis_label
-            sigmas_hist.title = 'Distribution of #sigma(%s)%s' \
-                % (quantity_name, self.plot_title_postfix)
+            sigmas_hist.xlabel = "#sigma_" + axis_label
+            sigmas_hist.title = plot_title.format(subplot_title='Estimated variance distribution')
 
             self.plots['sigmas'] = sigmas_hist
 
@@ -174,13 +197,11 @@ class PullAnalysis(object):
         if variances is not None:
 
             # Distribution of pulls
-            pulls_hist = ValidationPlot('%s_pulls%s' % (plot_name_prefix,
-                                                        self.plot_name_postfix))
-            pulls_hist.xlabel = axis_label
-            pulls_hist.title = 'Distribution of %s pulls%s' % (quantity_name,
-                                                               self.plot_title_postfix)
+            pulls_hist_name = plot_name.format(subplot_name="pulls")
+            pulls_hist = ValidationPlot(pulls_hist_name)
             pulls_hist.hist(pulls, outlier_z_score=outlier_z_score)
-
+            pulls_hist.xlabel = axis_label
+            pulls_hist.title = plot_title.format(subplot_title='Pull distribution')
             pulls_hist.fit_gaus()
 
             self.plots['pulls'] = pulls_hist
@@ -190,13 +211,11 @@ class PullAnalysis(object):
         if variances is not None:
 
             # Distribution of p_values
-            p_values_hist = ValidationPlot('%s_p_values%s'
-                                           % (plot_name_prefix, self.plot_name_postfix))
+            p_values_hist_name = plot_name.format(subplot_name="p-values")
+            p_values_hist = ValidationPlot(p_values_hist_name)
             p_values_hist.hist(p_values, lower_bound=0, upper_bound=1)
             p_values_hist.xlabel = axis_label
-            p_values_hist.title = 'Distribution of %s p-values%s' \
-                % (quantity_name, self.plot_title_postfix)
-
+            p_values_hist.title = plot_title.format(subplot_title='P-value distribution')
             p_values_hist.fit_const()
 
             self.plots['p_values'] = p_values_hist

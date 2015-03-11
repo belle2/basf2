@@ -359,7 +359,7 @@ void GenFitterModule::event()
         const double beta = p / E;
         const double v = beta / Const::speedOfLight;
 
-        // Arch length from IP to posSeed in cm.
+        // Arc length from IP to posSeed in cm.
         const Helix h(posSeed, momentumSeed, part->Charge(), 1.5);
         const double s = h.getArcLengthAtCylindricalR(posSeed.Perp());
 

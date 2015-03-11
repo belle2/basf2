@@ -41,7 +41,7 @@ class FacetCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGe
     segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
     segment_finder_module.param({
         "WriteFacets": True,
-        "FacetFilter": "all",
+        "FacetFilter": "fitless_hard",
         "FacetNeighborChooser": "none",
     })
 
@@ -85,6 +85,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         super(FacetCreationValidationModule, self).initialize()
         self.mc_facet_filter = Belle2.TrackFindingCDC.MCFacetFilter()
         self.real_facet_filter = Belle2.TrackFindingCDC.SimpleFacetFilter()
+        self.real_fitless_facet_filter = Belle2.TrackFindingCDC.FitlessFacetFilter(True)
 
     def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
@@ -96,8 +97,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         crops = self.peel_target(facet)
         crops.update(self.peel_fit(facet))
 
-        real_select = self.real_select(facet)
-        crops["real_select"] = real_select
+        crops.update(self.real_select(facet))
 
         return crops
 
@@ -134,6 +134,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
             no_middle_max_cos=max(start_cos, end_cos),
             no_middle_min_cos=min(start_cos, end_cos),
         )
+        crops.update(fitless_crops)
 
         select = self.select(crops)
         crops["select"] = select
@@ -141,8 +142,44 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         return crops
 
     def peel_fitless(self, facet):
-        # There is some short cuts to investigate here. Find a bachelor to do it.
-        return {}
+        shape = facet.getShape()
+        start_rl_info = facet.getStartRLInfo()
+        middle_rl_info = facet.getMiddleRLInfo()
+        end_rl_info = facet.getEndRLInfo()
+
+        if shape == facet.ORTHO_CW or shape == facet.ORTHO_CCW:
+            # Middle hit must be on the other side of the track
+            # Track must at least cross ones between two hits
+            select_fitless = (middle_rl_info * shape > 0 and
+                              (middle_rl_info != start_rl_info or middle_rl_info != end_rl_info))
+            select_fitless_hard = select_fitless
+
+        elif shape == facet.META_CW or shape == facet.META_CCW:
+            select_fitless_hard = (middle_rl_info * shape > 0 and
+                                   (middle_rl_info != start_rl_info or middle_rl_info != end_rl_info))
+
+            select_fitless = (select_fitless_hard or
+                              (middle_rl_info == start_rl_info and middle_rl_info == end_rl_info))
+
+        elif shape == facet.PARA:
+            # Track must not cross between the hits twice
+            select_fitless = (start_rl_info == middle_rl_info) or (middle_rl_info == end_rl_info)
+            select_fitless_hard = select_fitless
+
+        else:
+            # ILLSHAPE
+            select_fitless = False
+            select_fitless_hard = False
+
+        return dict(
+            shape=shape,
+            abs_shape=abs(shape),
+            start_rl_info=start_rl_info,
+            middle_rl_info=middle_rl_info,
+            end_rl_info=end_rl_info,
+            select_fitless=select_fitless,
+            select_fitless_hard=select_fitless_hard,
+        )
 
     def fit(self, facet):
         facet.adjustLines()
@@ -151,11 +188,15 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         return True
 
     def select(self, crops):
-        return crops["no_middle_min_cos"] > self.cos_cut_value
+        return crops["no_middle_min_cos"] > self.cos_cut_value and crops["select_fitless_hard"]
 
     def real_select(self, facet):
         real_weigth = self.real_facet_filter.isGoodFacet(facet)
-        return np.isfinite(real_weigth)
+        real_weigth_fitless = self.real_fitless_facet_filter.isGoodFacet(facet)
+        return dict(
+            real_select=np.isfinite(real_weigth),
+            real_select_fitless=np.isfinite(real_weigth_fitless),
+        )
 
     # Refiners to be executed at the end of the harvesting / termination of the module
     save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True, folder_name="histograms")
@@ -183,11 +224,48 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         select=[
             "mc_decision",
             "select",
-            "real_select",
         ],
         stackby="mc_decision",
         allow_discrete=True,
-        folder_name="select_quality",
+        folder_name="quality"
+    )
+
+    save_compare_select_histograms = refiners.save_histograms(
+        select=[
+            "real_select",
+            "select",
+        ],
+        stackby="real_select",
+        allow_discrete=True,
+        folder_name="compare_real"
+    )
+
+    # Fitless preselection
+    # Validate that the c++ implementation is in sync with the python one
+    save_compare_fitless_select_histograms = refiners.save_histograms(
+        select=[
+            "real_select_fitless",
+            "select_fitless",
+            "select_fitless_hard",
+        ],
+        stackby="real_select_fitless",
+        allow_discrete=True,
+        folder_name="compare_real_fitless"
+    )
+
+    # Show how well this selects
+    save_fitless_select_quality_histograms = refiners.cd(
+        refiners.save_histograms(
+            select=[
+                "mc_decision",
+                "select_fitless",
+                "select_fitless_hard",
+            ],
+            stackby="mc_decision",
+            allow_discrete=True,
+            groupby=[None, "abs_shape"],
+        ),
+        folder_name="quality_fitless"
     )
 
     @refiners.context()

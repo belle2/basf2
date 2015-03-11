@@ -1,0 +1,13 @@
+import model MGMODEL
+generate MGGENERATE
+output MGOUTPUT
+launch
+MGRUNDCARD
+
+set WAp MGPARAMETERWAP
+set MAp MGPARAMETERMAP
+
+set ebeam1 MGBEAMENERGY
+set ebeam2 MGBEAMENERGY
+set nevents MGNEVENTS
+set iseed MGSEED

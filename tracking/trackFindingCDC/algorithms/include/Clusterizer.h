@@ -169,6 +169,24 @@ namespace Belle2 {
             getCellState(const NotConvertableToAutomaton& item) const
       { return m_cellStates[&item]; }
 
+      /// Setter for the cell weight if the Item inherits from AutomatonCell - use the cell weight internal to the AutomtonCell.
+      template<class ConvertableToAutomaton>
+      typename boost::enable_if <
+      boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
+            void >::type
+      setCellWeight(const ConvertableToAutomaton& item, const CellWeight& cellWeight) const {
+        const AutomatonCell& automatonCell = item;
+        automatonCell.setCellWeight(cellWeight);
+      }
+
+      /// Setter for the cell weight representing the number of neighbor, if the Item does not inherit from AutomatonCell.
+      template<class NotConvertableToAutomaton>
+      typename boost::disable_if <
+      boost::is_convertible<NotConvertableToAutomaton, const AutomatonCell& >,
+            void >::type
+            setCellWeight(const NotConvertableToAutomaton& item, const CellWeight& cellWeight) const
+      { m_cellWeights[&item] = cellWeight; }
+
 
     private:
       /// Helper function. Starting a new cluster and iterativelly (not recursively) expands it.
@@ -198,8 +216,11 @@ namespace Belle2 {
           itemsToCheckNext.clear();
           // Check registered items for neighbors
           BOOST_FOREACH(const Item *  clusterItem, itemsToCheckNow) {
+            size_t nNeighbors = 0;
+
             // Consider each neighbor
             for (const typename Neighborhood::WeightedRelation & relation : neighborhood.equal_range(clusterItem)) {
+              ++nNeighbors;
 
               const Item* neighborItem = getNeighbor(relation);
 
@@ -221,6 +242,8 @@ namespace Belle2 {
               }
             } //end for itNeighbor
 
+            setCellWeight(*clusterItem, nNeighbors);
+
           } //end for itItem
         } // end while  !itemsToCheckNext.empty()
 
@@ -228,6 +251,8 @@ namespace Belle2 {
 
     private:
       mutable std::map<const Item*, CellState> m_cellStates; ///< Memory for the cell state, if the Item does not inherit from AutomatonCell.
+
+      mutable std::map<const Item*, CellWeight> m_cellWeights; ///< Memory for the cell weight, if the Item does not inherit from AutomatonCell.
 
     }; // end class Clusterizer
 

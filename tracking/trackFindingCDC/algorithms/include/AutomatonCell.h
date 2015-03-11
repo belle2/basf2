@@ -77,7 +77,7 @@ namespace Belle2 {
       const CellState& getCellWeight() const { return m_weight; }
 
       /// Setter for the cell weight
-      void setCellWeight(CellState weight) { m_weight = weight; }
+      void setCellWeight(CellState weight) const { m_weight = weight; }
 
 
 
@@ -174,7 +174,7 @@ namespace Belle2 {
 
 
     private:
-      CellWeight m_weight; ///< Storage for the cell weight
+      mutable CellWeight m_weight; ///< Storage for the cell weight
       mutable CellFlags m_flags; ///< Storage for the cell status flags
       mutable CellState m_state; ///< Storage for the cell state set by the cellular automata
 

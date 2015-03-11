@@ -11,6 +11,10 @@ import collections
 
 import numpy as np
 
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
+
+formatter = TolerateMissingKeyFormatter()
+
 
 class PullAnalysis(object):
     default_outlier_z_score = 5.0
@@ -97,7 +101,7 @@ class PullAnalysis(object):
         if plot_name is None:
             plot_name = self.default_plot_name
 
-        plot_name = plot_name.format(subplot_name='{subplot_name}',
+        plot_name = formatter.format(plot_name,
                                      quantity_name=quantity_name,
                                      plot_name_prefix=plot_name_prefix,
                                      plot_name_postfix=self.plot_name_postfix)
@@ -106,20 +110,20 @@ class PullAnalysis(object):
         if plot_title is None:
             plot_title = self.default_plot_title
 
-        plot_title = plot_title.format(subplot_title='{subplot_title}',
-                                       quantity_name=quantity_name,
-                                       plot_title_postfix=self.plot_title_postfix)
+        plot_title = formatter.format(plot_title,
+                                      quantity_name=quantity_name,
+                                      plot_title_postfix=self.plot_title_postfix)
 
         # Truths #
         ##########
 
         # Distribution of truths
-        truths_hist_name = plot_name.format(subplot_name="truths")
+        truths_hist_name = formatter.format(plot_name, subplot_name="truths")
         truths_hist = ValidationPlot(truths_hist_name)
         truths_hist.hist(truths,
                          outlier_z_score=outlier_z_score)
         truths_hist.xlabel = axis_label
-        truths_hist.title = plot_title.format(subplot_title='True distribution')
+        truths_hist.title = formatter.format(plot_title, subplot_title='True distribution')
 
         self.plots['truths'] = truths_hist
 
@@ -127,12 +131,12 @@ class PullAnalysis(object):
         #############
 
         # Distribution of estimates
-        estimates_hist_name = plot_name.format(subplot_name="estimates")
+        estimates_hist_name = formatter.format(plot_name, subplot_name="estimates")
         estimates_hist = ValidationPlot(estimates_hist_name)
         estimates_hist.hist(estimates,
                             outlier_z_score=outlier_z_score)
         estimates_hist.xlabel = axis_label
-        estimates_hist.title = plot_title.format(subplot_title='Estimates distribution')
+        estimates_hist.title = formatter.format(plot_title, subplot_title='Estimates distribution')
 
         self.plots['estimates'] = estimates_hist
 
@@ -140,26 +144,26 @@ class PullAnalysis(object):
         ##################
 
         # Estimates versus truths scatter plot
-        estimates_by_truths_scatter_name = plot_name.format(subplot_name="diag_scatter")
+        estimates_by_truths_scatter_name = formatter.format(plot_name, subplot_name="diag_scatter")
         estimates_by_truths_scatter = ValidationPlot(estimates_by_truths_scatter_name)
         estimates_by_truths_scatter.scatter(truths,
                                             estimates,
                                             outlier_z_score=outlier_z_score)
         estimates_by_truths_scatter.xlabel = 'True ' + axis_label
         estimates_by_truths_scatter.ylabel = 'Estimated ' + axis_label
-        estimates_by_truths_scatter.title = plot_title.format(subplot_title='Diagonal scatter plot')
+        estimates_by_truths_scatter.title = formatter.format(plot_title, subplot_title='Diagonal scatter plot')
 
         self.plots['diag_scatter'] = estimates_by_truths_scatter
 
         # Estimates versus truths profile plot
-        estimates_by_truths_profile_name = plot_name.format(subplot_name="diag_profile")
+        estimates_by_truths_profile_name = formatter.format(plot_name, subplot_name="diag_profile")
         estimates_by_truths_profile = ValidationPlot(estimates_by_truths_profile_name)
         estimates_by_truths_profile.profile(truths,
                                             estimates,
                                             outlier_z_score=outlier_z_score)
         estimates_by_truths_profile.xlabel = 'True ' + axis_label
         estimates_by_truths_profile.ylabel = 'Estimated ' + axis_label
-        estimates_by_truths_profile.title = plot_title.format(subplot_title='Diagonal profile')
+        estimates_by_truths_profile.title = formatter.format(plot_title, subplot_title='Diagonal profile')
         estimates_by_truths_profile.fit_diag()
 
         self.plots['diag_profile'] = estimates_by_truths_profile
@@ -168,12 +172,12 @@ class PullAnalysis(object):
         #############
 
         # Distribution of the residuals
-        residuals_hist_name = plot_name.format(subplot_name="residuals")
+        residuals_hist_name = formatter.format(plot_name, subplot_name="residuals")
         residuals_hist = ValidationPlot(residuals_hist_name)
         residuals_hist.hist(residuals,
                             outlier_z_score=outlier_z_score)
         residuals_hist.xlabel = axis_label
-        residuals_hist.title = plot_title.format(subplot_title='Residual distribution')
+        residuals_hist.title = formatter.format(plot_title, subplot_title='Residual distribution')
 
         self.plots['residuals'] = residuals_hist
 
@@ -182,13 +186,13 @@ class PullAnalysis(object):
         if variances is not None:
 
             # Distribution of sigmas
-            sigmas_hist_name = plot_name.format(subplot_name="sigmas")
+            sigmas_hist_name = formatter.format(plot_name, subplot_name="sigmas")
             sigmas_hist = ValidationPlot(sigmas_hist_name)
             sigmas_hist.hist(sigmas,
                              lower_bound=0,
                              outlier_z_score=outlier_z_score)
             sigmas_hist.xlabel = "#sigma_" + axis_label
-            sigmas_hist.title = plot_title.format(subplot_title='Estimated variance distribution')
+            sigmas_hist.title = formatter.format(plot_title, subplot_title='Estimated variance distribution')
 
             self.plots['sigmas'] = sigmas_hist
 
@@ -197,11 +201,11 @@ class PullAnalysis(object):
         if variances is not None:
 
             # Distribution of pulls
-            pulls_hist_name = plot_name.format(subplot_name="pulls")
+            pulls_hist_name = formatter.format(plot_name, subplot_name="pulls")
             pulls_hist = ValidationPlot(pulls_hist_name)
             pulls_hist.hist(pulls, outlier_z_score=outlier_z_score)
             pulls_hist.xlabel = axis_label
-            pulls_hist.title = plot_title.format(subplot_title='Pull distribution')
+            pulls_hist.title = formatter.format(plot_title, subplot_title='Pull distribution')
             pulls_hist.fit_gaus()
 
             self.plots['pulls'] = pulls_hist
@@ -211,11 +215,11 @@ class PullAnalysis(object):
         if variances is not None:
 
             # Distribution of p_values
-            p_values_hist_name = plot_name.format(subplot_name="p-values")
+            p_values_hist_name = formatter.format(plot_name, subplot_name="p-values")
             p_values_hist = ValidationPlot(p_values_hist_name)
             p_values_hist.hist(p_values, lower_bound=0, upper_bound=1)
             p_values_hist.xlabel = axis_label
-            p_values_hist.title = plot_title.format(subplot_title='P-value distribution')
+            p_values_hist.title = formatter.format(plot_title, subplot_title='P-value distribution')
             p_values_hist.fit_const()
 
             self.plots['p_values'] = p_values_hist

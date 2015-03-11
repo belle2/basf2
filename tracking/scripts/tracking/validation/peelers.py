@@ -5,6 +5,9 @@ A set of common purose translators from complex framework objects to flat dictio
 import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
+
+formatter = TolerateMissingKeyFormatter()
 
 
 def peel_mc_particle(mc_particle):
@@ -130,10 +133,11 @@ def peel_fit_result(fit_result, key="{part_name}"):
         )
 
     if key:
-        fit_crops_with_keys = dict()
+        fit_crops_with_formatted_keys = dict()
         for part_name, value in fit_crops.items():
-            fit_crops_with_keys[key.format(part_name=part_name)] = value
-        return fit_crops_with_keys
+            formatted_key = formatter.format(key, part_name=part_name)
+            fit_crops_with_formatted_keys[formatted_key] = value
+        return fit_crops_with_formatted_keys
 
     else:
         return fit_crops

@@ -8,7 +8,7 @@ from tracking.validation.plot import ValidationPlot, compose_axis_label
 from tracking.validation.fom import ValidationFiguresOfMerit
 from tracking.validation.classification import ClassificationAnalysis
 from tracking.validation.pull import PullAnalysis
-
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 from tracking.validation.utilities import root_cd, root_save_name
 
 import ROOT
@@ -18,6 +18,9 @@ import logging
 
 def get_logger():
     return logging.getLogger(__name__)
+
+
+formatter = TolerateMissingKeyFormatter()
 
 
 class Refiner(object):
@@ -103,50 +106,31 @@ class SaveFiguresOfMeritRefiner(Refiner):
 
         aggregation = self.aggregation or self.default_aggregation
 
-        name = name.format(refiner=self,
-                           module=harvesting_module,
-                           aggregation=aggregation,
-                           groupby=groupby_part_name,
-                           groupby_value=groupby_value)
+        replacement_dict = dict(
+            refiner=self,
+            module=harvesting_module,
+            aggregation=aggregation,
+            groupby=groupby_part_name,
+            groupby_value=groupby_value
+        )
 
-        title = title.format(refiner=self,
-                             module=harvesting_module,
-                             aggregation=aggregation,
-                             groupby=groupby_part_name,
-                             groupby_value=groupby_value)
+        name = formatter.format(name, **replacement_dict)
+        title = formatter.format(title, **replacement_dict)
+        contact = formatter.format(contact, **replacement_dict)
 
-        contact = contact.format(refiner=self,
-                                 module=harvesting_module)
-
-        figures_of_merit = ValidationFiguresOfMerit(root_save_name(name),
+        figures_of_merit = ValidationFiguresOfMerit(name,
                                                     contact=contact,
                                                     title=title)
 
         for part_name, parts in iter_items_sorted_for_key(crops):
             key = self.key or self.default_key
-
-            key = key.format(refiner=self,
-                             module=harvesting_module,
-                             part_name=part_name,
-                             aggregation=aggregation)
-
+            key = formatter.format(key, part_name=part_name, **replacement_dict)
             figures_of_merit[key] = aggregation(parts)
 
         keys = list(figures_of_merit.keys())
 
-        description = description.format(refiner=self,
-                                         module=harvesting_module,
-                                         keys=keys,
-                                         aggregation=aggregation,
-                                         groupby=groupby_part_name,
-                                         groupby_value=groupby_value)
-
-        check = check.format(refiner=self,
-                             module=harvesting_module,
-                             keys=keys,
-                             aggregation=aggregation,
-                             groupby=groupby_part_name,
-                             groupby_value=groupby_value)
+        description = formatter.format(description, keys=keys, **replacement_dict)
+        check = formatter.format(check, keys=keys, **replacement_dict)
 
         figures_of_merit.description = description
         figures_of_merit.check = check
@@ -200,15 +184,23 @@ class SaveHistogramsRefiner(Refiner):
                groupby_value=None,
                **kwds):
 
-        contact = self.contact or self.default_contact
-        contact = contact.format(refiner=self,
-                                 module=harvesting_module)
-
         stackby = self.stackby
         if stackby:
             stackby_parts = crops[stackby]
         else:
             stackby_parts = None
+
+        replacement_dict = dict(
+            refiner=self,
+            module=harvesting_module,
+            stackby=stackby,
+            stacked_by_indication="_" if stackby else "",
+            groupby=groupby_part_name,
+            groupby_value=groupby_value
+        )
+
+        contact = self.contact or self.default_contact
+        contact = formatter.format(contact, **replacement_dict)
 
         for part_name, parts in iter_items_sorted_for_key(crops):
             name = self.name or self.default_name
@@ -216,39 +208,12 @@ class SaveHistogramsRefiner(Refiner):
             description = self.description or self.default_description
             check = self.check or self.default_check
 
-            name = name.format(refiner=self,
-                               module=harvesting_module,
-                               part_name=part_name,
-                               stackby=stackby,
-                               stacked_by_indication="_" if stackby else "",
-                               groupby=groupby_part_name,
-                               groupby_value=groupby_value)
+            name = formatter.format(name, part_name=part_name, **replacement_dict)
+            title = formatter.format(title, part_name=part_name, **replacement_dict)
+            description = formatter.format(description, part_name=part_name, **replacement_dict)
+            check = formatter.format(check, part_name=part_name, **replacement_dict)
 
-            title = title.format(refiner=self,
-                                 module=harvesting_module,
-                                 part_name=part_name,
-                                 stackby=stackby,
-                                 stacked_by_indication=" stacked by " if stackby else "",
-                                 groupby=groupby_part_name,
-                                 groupby_value=groupby_value)
-
-            description = description.format(refiner=self,
-                                             module=harvesting_module,
-                                             part_name=part_name,
-                                             stackby=stackby,
-                                             stacked_by_indication=" stacked by " if stackby else "",
-                                             groupby=groupby_part_name,
-                                             groupby_value=groupby_value)
-
-            check = check.format(refiner=self,
-                                 module=harvesting_module,
-                                 part_name=part_name,
-                                 stackby=stackby,
-                                 stacked_by_indication=" stacked by " if stackby else "",
-                                 groupby=groupby_part_name,
-                                 groupby_value=groupby_value)
-
-            histogram = ValidationPlot(root_save_name(name))
+            histogram = ValidationPlot(name)
             histogram.hist(parts,
                            lower_bound=self.lower_bound,
                            upper_bound=self.upper_bound,
@@ -321,9 +286,15 @@ class SaveProfilesRefiner(Refiner):
                groupby_value=None,
                **kwds):
 
+        replacement_dict = dict(
+            refiner=self,
+            module=harvesting_module,
+            groupby=groupby_part_name,
+            groupby_value=groupby_value
+        )
+
         contact = self.contact or self.default_contact
-        contact = contact.format(refiner=self,
-                                 module=harvesting_module)
+        contact = formatter.format(contact, **replacement_dict)
 
         y_crops = select_crop_parts(crops, select=self.y)
         x_crops = select_crop_parts(crops, select=self.x, exclude=self.y)
@@ -350,35 +321,27 @@ class SaveProfilesRefiner(Refiner):
                 description = self.description or self.default_description
                 check = self.check or self.default_check
 
-                name = name.format(refiner=self,
-                                   module=harvesting_module,
-                                   x_part_name=x_part_name,
-                                   y_part_name=y_part_name,
-                                   groupby=groupby_part_name,
-                                   groupby_value=groupby_value)
+                name = formatter.format(name,
+                                        x_part_name=x_part_name,
+                                        y_part_name=y_part_name,
+                                        **replacement_dict)
 
-                title = title.format(refiner=self,
-                                     module=harvesting_module,
-                                     x_part_name=x_part_name,
-                                     y_part_name=y_part_name,
-                                     groupby=groupby_part_name,
-                                     groupby_value=groupby_value)
+                title = formatter.format(title,
+                                         x_part_name=x_part_name,
+                                         y_part_name=y_part_name,
+                                         **replacement_dict)
 
-                description = description.format(refiner=self,
-                                                 module=harvesting_module,
-                                                 x_part_name=x_part_name,
-                                                 y_part_name=y_part_name,
-                                                 groupby=groupby_part_name,
-                                                 groupby_value=groupby_value)
+                description = formatter.format(description,
+                                               x_part_name=x_part_name,
+                                               y_part_name=y_part_name,
+                                               **replacement_dict)
 
-                check = check.format(refiner=self,
-                                     module=harvesting_module,
-                                     x_part_name=x_part_name,
-                                     y_part_name=y_part_name,
-                                     groupby=groupby_part_name,
-                                     groupby_value=groupby_value)
+                check = formatter.format(check,
+                                         x_part_name=x_part_name,
+                                         y_part_name=y_part_name,
+                                         **replacement_dict)
 
-                profile_plot = ValidationPlot(root_save_name(name))
+                profile_plot = ValidationPlot(name)
 
                 profile_plot.profile(x_parts,
                                      y_parts,
@@ -434,9 +397,15 @@ class SaveClassificationAnalysisRefiner(Refiner):
                groupby_value=None,
                **kwds):
 
+        replacement_dict = dict(
+            refiner=self,
+            module=harvesting_module,
+            groupby=groupby_part_name,
+            groupby_value=groupby_value
+        )
+
         contact = self.contact or self.default_contact
-        contact = contact.format(refiner=self,
-                                 module=harvesting_module)
+        contact = formatter.format(contact, **replacement_dict)
 
         if self.truth_name is not None:
             truth_name = self.truth_name
@@ -448,8 +417,8 @@ class SaveClassificationAnalysisRefiner(Refiner):
         else:
             prediction_name = self.default_prediction_name
 
-        truth_name = truth_name.format(part_name=self.part_name)
-        prediction_name = prediction_name.format(part_name=self.part_name)
+        truth_name = formatter.format(truth_name, part_name=self.part_name)
+        prediction_name = formatter.format(prediction_name, part_name=self.part_name)
 
         predictions = crops[prediction_name]
         truths = crops[truth_name]
@@ -509,29 +478,22 @@ class SavePullAnalysisRefiner(Refiner):
                groupby_value=None,
                **kwds):
 
+        replacement_dict = dict(
+            refiner=self,
+            module=harvesting_module,
+            groupby=groupby_part_name,
+            groupby_value=groupby_value
+        )
+
         contact = self.contact or self.default_contact
-        contact = contact.format(refiner=self,
-                                 module=harvesting_module)
+        contact = formatter.format(contact, **replacement_dict)
 
         name = self.name or self.default_name
-
-        name = name.format(refiner=self,
-                           module=harvesting_module,
-                           quantity_name="{quantity_name}",  # leave that for the PullAnalysis to fill in
-                           part_name=self.part_name,
-                           groupby=groupby_part_name,
-                           groupby_value=groupby_value)
-
+        name = formatter.format(name, part_name=self.part_name, **replacement_dict)
         plot_name = name + "_{subplot_name}"
 
         title_postfix = self.title_postfix or self.default_title_postfix
-        title_postfix = title_postfix.format(refiner=self,
-                                             module=harvesting_module,
-                                             quantity_name="{quantity_name}",  # leave that for the PullAnalysis to fill in
-                                             part_name=self.part_name,
-                                             groupby=groupby_part_name,
-                                             groupby_value=groupby_value)
-
+        title_postfix = formatter.format(title_postfix, part_name=self.part_name, **replacement_dict)
         plot_title = "{subplot_title} of {quantity_name}" + title_postfix
 
         if self.truth_name is not None:
@@ -549,9 +511,9 @@ class SavePullAnalysisRefiner(Refiner):
         else:
             variance_name = self.default_variance_name
 
-        truth_name = truth_name.format(part_name=self.part_name)
-        estimate_name = estimate_name.format(part_name=self.part_name)
-        variance_name = variance_name.format(part_name=self.part_name)
+        truth_name = formatter.format(truth_name, part_name=self.part_name)
+        estimate_name = formatter.format(estimate_name, part_name=self.part_name)
+        variance_name = formatter.format(variance_name, part_name=self.part_name)
 
         truths = crops[truth_name]
         estimates = crops[estimate_name]
@@ -573,7 +535,7 @@ class SavePullAnalysisRefiner(Refiner):
 
 
 class SaveTreeRefiner(Refiner):
-    default_name = "{module.name}"
+    default_name = "{module.name}_tree"
     default_title = "Tree of {module.name}"
 
     def __init__(self,
@@ -591,19 +553,19 @@ class SaveTreeRefiner(Refiner):
                groupby_value=None,
                **kwds):
 
+        replacement_dict = dict(
+            refiner=self,
+            module=harvesting_module,
+            groupby=groupby_part_name,
+            groupby_value=groupby_value
+        )
+
         with root_cd(tdirectory):
             name = self.name or self.default_name
             title = self.title or self.default_title
 
-            name = name.format(refiner=self,
-                               module=harvesting_module,
-                               groupby=groupby_part_name,
-                               groupby_value=groupby_value)
-
-            title = title.format(refiner=self,
-                                 module=harvesting_module,
-                                 groupby=groupby_part_name,
-                                 groupby_value=groupby_value)
+            name = formatter.format(name, **replacement_dict)
+            title = formatter.format(title, **replacement_dict)
 
             output_ttree = ROOT.TTree(root_save_name(name), title)
             for part_name, parts in iter_items_sorted_for_key(crops):
@@ -763,12 +725,14 @@ class CdRefiner(Refiner):
         if groupby_addition is None:
             groupby_addition = self.default_groupby_addition
 
-        groupby_addition = groupby_addition.format(groupby=groupby_part_name,
-                                                   groupby_value=groupby_value)
+        groupby_addition = formatter.format(groupby_addition,
+                                            groupby=groupby_part_name,
+                                            groupby_value=groupby_value)
 
-        folder_name = folder_name.format(groupby_addition=groupby_addition,
-                                         groupby=groupby_part_name,
-                                         groupby_value=groupby_value)
+        folder_name = formatter.format(folder_name,
+                                       groupby_addition=groupby_addition,
+                                       groupby=groupby_part_name,
+                                       groupby_value=groupby_value)
 
         if folder_name:
             with root_cd(tdirectory):

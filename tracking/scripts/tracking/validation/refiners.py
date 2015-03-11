@@ -768,6 +768,15 @@ def filter(refiner=None, **kwds):
         return filter_decorator(refiner)
 
 
+def cd(refiner=None, **kwds):
+    def filter_decorator(wrapped_refiner):
+        return CdRefiner(wrapped_refiner, **kwds)
+    if refiner is None:
+        return filter_decorator
+    else:
+        return filter_decorator(refiner)
+
+
 def context(refiner=None,
             above_expert_level=None, below_expert_level=None,
             folder_name=None,

@@ -32,6 +32,7 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            m_param_facetFilter,
            "Facet filter to be used during the construction of facets. "
            "Valid values are: "
+           "\"none\" (no facet is valid, stop at cluster generation.), "
            "\"all\" (all facets are valid), "
            "\"mc\" (monte carlo truth), "
            "\"mc_symmetric\" (monte carlo truth and their mirror image), "
@@ -56,7 +57,10 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
 {
   // Set the filters before they get initialized in the base module.
   BaseFacetFilter* ptrFacetFilter = nullptr;
-  if (m_param_facetFilter == string("all")) {
+
+  if (m_param_facetFilter == string("none")) {
+    ptrFacetFilter = new BaseFacetFilter();
+  } else if (m_param_facetFilter == string("all")) {
     ptrFacetFilter = new AllFacetFilter();
   } else if (m_param_facetFilter == string("mc")) {
     ptrFacetFilter = new MCFacetFilter(false);

@@ -25,7 +25,10 @@ class ClassificationAnalysis(object):
         quantity_name,
         cut_direction=None,
         cut=None,
-
+        lower_bound=None,
+        upper_bound=None,
+        outlier_z_score=None,
+        unit=None
     ):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
@@ -37,6 +40,11 @@ class ClassificationAnalysis(object):
 
         self.cut_direction = cut_direction
         self.cut = cut
+
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
+        self.outlier_z_score = outlier_z_score
+        self.unit = unit
 
     def analyse(
         self,
@@ -55,6 +63,7 @@ class ClassificationAnalysis(object):
         """
 
         quantity_name = self.quantity_name
+        axis_label = compose_axis_label(quantity_name, self.unit)
 
         # Some different things become presentable depending on the estimates
         estimate_is_binary = statistics.is_binary_series(estimates)
@@ -122,7 +131,11 @@ class ClassificationAnalysis(object):
         signal_background_histogram.hist(
             estimates,
             stackby=truths,
+            lower_bound=self.lower_bound,
+            upper_bound=self.upper_bound,
+            outlier_z_score=self.outlier_z_score
         )
+        signal_background_histogram.xlabel = axis_label
 
         self.plots['signal_background'] = signal_background_histogram
 
@@ -133,13 +146,22 @@ class ClassificationAnalysis(object):
 
         purity_profile = ValidationPlot(plot_name)
         purity_profile.profile(
-            estimates, truths
+            estimates,
+            truths,
+            lower_bound=self.lower_bound,
+            upper_bound=self.upper_bound,
+            outlier_z_score=self.outlier_z_score
         )
+
+        purity_profile.xlabel = axis_label
+        purity_profile.ylabel = 'purity'
 
         self.plots["purity"] = purity_profile
 
         if not estimate_is_binary and cut_direction is not None:
-            # Purity over efficiency.
+
+            # Purity over efficiency #
+            # ###################### #
             n_signal = scores.signal_amount(truths, estimates)
 
             sorting_indices = np.argsort(estimates)
@@ -161,6 +183,9 @@ class ClassificationAnalysis(object):
                 sorted_efficiencies, sorted_truths,
                 cumulation_direction=1,
             )
+
+            purity_over_efficiency_profile.xlabel = 'efficiency'
+            purity_over_efficiency_profile.ylabel = 'purity'
 
             self.plots["purity_over_efficiency"] = purity_over_efficiency_profile
 

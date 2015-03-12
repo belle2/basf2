@@ -86,7 +86,7 @@ def stdHighEPhoton(path=analysis_main):
 def stdKs(path=analysis_main):
 
     stdPi()
-    reconstructDecay('K_S0:all -> pi-:std pi+:std', '0.4 < M < 0.6', 1, True,
+    reconstructDecay('K_S0:all -> pi-:all pi+:all', '0.4 < M < 0.6', 1, True,
                      path)
     vertexKFit('K_S0:all', 0.0)
     applyCuts('K_S0:all', '0.477614<M<0.517614')

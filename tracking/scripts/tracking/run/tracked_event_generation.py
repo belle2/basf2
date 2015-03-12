@@ -56,20 +56,42 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
         return argument_parser
 
+    @staticmethod
+    def get_module_param(module, name):
+        parameters = module.available_params()
+        for parameter in parameters:
+            if name == parameter.name:
+                return parameter.values
+            else:
+                raise AttributeError('%s module does not have a parameter named %s' % (module, name))
+
     def determine_tracking_coverage(self, finder_module_or_name):
         finder_module_name = self.get_basf2_module_name(finder_module_or_name)
-        if finder_module_name in ('CDCLocalTracking', 'CDCLegendreTracking', 'CDCFullFinder') or finder_module_name.startswith('TrackFinderCDC'):
-            return {'UsePXDHits': False, 'UseSVDHits': False,
-                    'UseCDCHits': True}
-        elif finder_module_name == 'VXDTF':
-            return {'UsePXDHits': True, 'UseSVDHits': True,
-                    'UseCDCHits': False}
-        elif finder_module_name in {'StandardReco',
-                                    'StandardTrackingReconstruction'}:
 
+        if finder_module_name in ('CDCLocalTracking', 'CDCLegendreTracking', 'CDCFullFinder') or finder_module_name.startswith('TrackFinderCDC'):
+            return {'UsePXDHits': False,
+                    'UseSVDHits': False,
+                    'UseCDCHits': True}
+
+        elif finder_module_name == 'VXDTF':
+            return {'UsePXDHits': True,
+                    'UseSVDHits': True,
+                    'UseCDCHits': False}
+
+        elif finder_module_name in ('StandardReco', 'StandardTrackingReconstruction'):
             return {'UsePXDHits': 'PXD' in self.components,
                     'UseSVDHits': 'SVD' in self.components,
                     'UseCDCHits': 'CDC' in self.components}
+
+        elif finder_module_name == 'TrackFinderMCTruth':
+            if isinstance(finder_module_or_name, basf2.Module):
+                return {'UsePXDHits': self.get_module_param(finder_module_or_name, 'UsePXDHits'),
+                        'UseSVDHits': self.get_module_param(finder_module_or_name, 'UseSVDHits'),
+                        'UseCDCHits': self.get_module_param(finder_module_or_name, 'UseCDCHits')}
+            else:
+                return {'UsePXDHits': 'PXD' in self.components,
+                        'UseSVDHits': 'SVD' in self.components,
+                        'UseCDCHits': 'CDC' in self.components}
         else:
             get_logger().info('Could not determine tracking coverage for module name %s. Using value stored in self.tracking_coverage which is %s',
                               finder_module_name, self.tracking_coverage)

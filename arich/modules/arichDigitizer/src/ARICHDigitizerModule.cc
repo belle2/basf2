@@ -69,7 +69,7 @@ namespace Belle2 {
 
   ARICHDigitizerModule::~ARICHDigitizerModule()
   {
-    if (m_arichgp) delete m_arichgp;
+
   }
 
   void ARICHDigitizerModule::initialize()

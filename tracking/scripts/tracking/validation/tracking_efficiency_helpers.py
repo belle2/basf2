@@ -108,7 +108,7 @@ def additional_options(path):
 
     realisticCDCGeo = 1
     useInWirePropagation = 1
-    useTime = 0
+    useTime = 1
     useWireSag = 1
     for m in path.modules():
         if realisticCDCGeo:

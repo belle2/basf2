@@ -219,7 +219,7 @@ void GenFitterModule::initialize()
       B2WARNING("Wire sag requested, but using idealized translator which ignores this.");
     CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
                                new IdealCDCGeometryTranslator(),
-                               new RealisticTDCCountTranslator(),
+                               new RealisticTDCCountTranslator(m_useTrackTime),
                                m_useTrackTime);
   }
 }
@@ -357,11 +357,16 @@ void GenFitterModule::event()
         const double p = momentumSeed.Mag();
         const double E = hypot(m, p);
         const double beta = p / E;
-        const double v = beta / Const::speedOfLight;
+        const double v = beta * Const::speedOfLight;
 
         // Arc length from IP to posSeed in cm.
         const Helix h(posSeed, momentumSeed, part->Charge(), 1.5);
-        const double s = h.getArcLengthAtCylindricalR(posSeed.Perp());
+
+        // Arc length calculation doesn't work, do it ourselves until I can fix the Helix.
+        const double z0 = h.getZ0();
+        const double cotTh = h.getTanLambda();
+
+        const double s = fabs((posSeed.Z() - z0) * hypot(cotTh, 1.) / cotTh);
 
         // Time from trigger (= 0 ns) to posSeed assuming constant velocity in ns.
         timeSeed = s / v;

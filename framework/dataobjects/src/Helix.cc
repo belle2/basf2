@@ -389,7 +389,13 @@ void Helix::setCartesian(const TVector3& position,
   const double coschi =    cosphi0chi * cosPhi0 + sinphi0chi * sinPhi0;
   const double sinchi =  - cosphi0chi * sinPhi0 + sinphi0chi * cosPhi0;
 
-  const double chi = atan2(sinchi, coschi);
+  // Workaround to get reasonable helices.
+  double chi = 0;
+  if (fabs(sinchi) > .5) {
+    chi = atan2(sinchi, coschi);
+  } else {
+    chi = asin(sinchi);
+  }
 
   const double arcLength = -chi / omega;
   const double z0 = z - arcLength * tanLambda;

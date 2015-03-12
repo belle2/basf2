@@ -11,6 +11,8 @@ import ROOT
 
 from tracking.validation.utilities import root_cd, root_save_name
 
+import tracking.validation.statistics as statistics
+
 import logging
 
 
@@ -19,84 +21,6 @@ def get_logger():
 
 
 default_max_n_unique_for_discrete = 20
-
-
-def iqr(array_like):
-    """Computes the interquantile range, hence the distance from the 25% to 75% quantile."""
-
-    return np.percentile(array_like, 75) - np.percentile(array_like, 25)
-
-
-normal_iqr_to_std_factor = 2.0 * math.sqrt(2.0) * math.erf(0.5)
-
-
-def trimmed_std(array_like):
-    """A trimmed estimate for the standard deviation of a normal distribution
-    contaminated by outliers using the interquanitle range times the appropriate factor.
-    """
-
-    return normal_iqr_to_std_factor * iqr(array_like)
-
-
-def truncated_mean(array_like, r=0.23):
-    """Calculates the truncated mean, where 2r is the fraction of data to be taken into account.
-
-    The truncated mean is a robust estimator for the central value of a symmetric distribution.
-    The (1-r) upper and the (1-r) lower values are left out and only the central remaining 2r fraction enters
-    the normal calculation of the mean. The default value of r is the text book value, which produces an approximatelly
-    82%-efficient estimate of the mean for normal, central value of the cauchy and the double-exponential
-    distribution.
-    """
-
-    truncation = 1 - 2 * r
-
-    if truncation >= 1 or truncation <= 0:
-        raise ValueError('Value of r must be between 0 and 0.5')
-
-    array = np.array(array_like)
-
-    lower_percentile = 100 * truncation / 2.0
-    upper_percentile = 100 * (1.0 - truncation / 2.0)
-
-    (lower_bound, upper_bound) = np.percentile(array, (lower_percentile,
-                                                       upper_percentile))
-
-    weights = (array >= lower_bound) & (array <= upper_bound)
-
-    truncated_array = array[weights]
-
-    return np.mean(truncated_array)
-
-
-def cubic_root(x):
-    return pow(float(x), 1.0 / 3.0)
-
-
-def rice_n_bin(n_data):
-    return np.ceil(2.0 * cubic_root(n_data))
-
-
-def rice_exceptional_values(xs):
-    unique_xs, indices = np.unique(xs, return_inverse=True)
-    # Note: The indices are such that unique_xs[indices] == xs
-
-    unique_xs_count = np.bincount(indices)
-
-    exceptional_xs = []
-
-    while True:
-        n_data = np.sum(unique_xs_count)
-        n_exceptional = 1.0 * n_data / rice_n_bin(n_data)
-        excpetional_indices = unique_xs_count > n_exceptional
-
-        if np.any(excpetional_indices):
-            exceptional_xs.extend(unique_xs[excpetional_indices])
-            unique_xs_count[excpetional_indices] = 0
-        else:
-            break
-
-    return np.array(sorted(exceptional_xs))
-
 
 units_by_quantity_name = {
     'pt': 'GeV',
@@ -113,9 +37,14 @@ units_by_quantity_name = {
     'tan #lambda': None}
 
 
+def get_unit(quantity_name):
+    unit = units_by_quantity_name.get(quantity_name, None)
+    return unit
+
+
 def compose_axis_label(quantity_name, unit=None):
     if unit is None:
-        unit = units_by_quantity_name.get(quantity_name, None)
+        unit = get_unit(quantity_name)
 
     if unit is None:
         axis_label = quantity_name
@@ -153,7 +82,8 @@ class ValidationPlot(object):
              upper_bound=None,
              outlier_z_score=None,
              include_exceptionals=True,
-             allow_discrete=False):
+             allow_discrete=False,
+             cumulation_direction=None):
 
         th1_factory = ROOT.TH1D
 
@@ -166,9 +96,10 @@ class ValidationPlot(object):
                        upper_bound=upper_bound,
                        outlier_z_score=outlier_z_score,
                        include_exceptionals=include_exceptionals,
-                       allow_discrete=allow_discrete)
+                       allow_discrete=allow_discrete,
+                       cumulation_direction=cumulation_direction)
 
-        if self.ylabel is None:
+        if not self.ylabel:
             self.ylabel = 'Count'
 
         return self
@@ -182,7 +113,8 @@ class ValidationPlot(object):
                 upper_bound=None,
                 outlier_z_score=None,
                 include_exceptionals=True,
-                allow_discrete=False):
+                allow_discrete=False,
+                cumulation_direction=None):
 
         th1_factory = ROOT.TProfile
 
@@ -195,9 +127,10 @@ class ValidationPlot(object):
                        upper_bound=upper_bound,
                        outlier_z_score=outlier_z_score,
                        include_exceptionals=include_exceptionals,
-                       allow_discrete=allow_discrete)
+                       allow_discrete=allow_discrete,
+                       cumulation_direction=cumulation_direction)
 
-        if self.ylabel is None and self.is_binary(ys):
+        if not self.ylabel and self.is_binary(ys):
             self.ylabel = 'Probability'
 
         return self
@@ -462,27 +395,20 @@ class ValidationPlot(object):
 
     @staticmethod
     def is_binary(xs):
-        is_boolean = all(isinstance(x, bool) for x in xs)
-        is_one_or_zero = all(x == 0 or x == 1 or not np.isfinite(x)
-                             for x in xs)
-
-        return is_boolean or is_one_or_zero
+        return statistics.is_binary_series(xs)
 
     @staticmethod
     def is_discrete(xs, max_n_unique=default_max_n_unique_for_discrete):
-        # FIXME: improve test for discrete variable
-        unique_xs = np.unique(xs)
-        if len(unique_xs) < max_n_unique:
-            return True
+        return statistics.is_discrete_series(xs, max_n_unique=max_n_unique)
 
     @staticmethod
     def get_exceptional_values(xs):
-        return rice_exceptional_values(xs)
+        return statistics.rice_exceptional_values(xs)
 
     @staticmethod
     def get_robust_mean_and_std(xs):
-        x_mean = truncated_mean(xs)
-        x_std = trimmed_std(xs)
+        x_mean = statistics.truncated_mean(xs)
+        x_std = statistics.trimmed_std(xs)
         return x_mean, x_std
 
     @staticmethod
@@ -508,7 +434,8 @@ class ValidationPlot(object):
                   upper_bound=None,
                   outlier_z_score=None,
                   include_exceptionals=True,
-                  allow_discrete=False):
+                  allow_discrete=False,
+                  cumulation_direction=None):
 
         name = self.name
 
@@ -542,7 +469,8 @@ class ValidationPlot(object):
 
         if stackby is None:
             self.fill_into(histogram, xs, ys, weights=weights)
-
+            if cumulation_direction is not None:
+                histogram = self.cumulate(histogram, cumulation_direction=cumulation_direction)
             histograms.append(histogram)
             plot = histogram
 
@@ -554,6 +482,9 @@ class ValidationPlot(object):
             stackby = np.array(stackby, copy=False)
 
             histograms = self.fill_into_grouped(histogram, xs, ys, weights=weights, groupby=stackby)
+
+            if cumulation_direction is not None:
+                histograms = [self.cumulate(histogram, cumulation_direction=cumulation_direction) for histogram in histograms]
 
             plot = ROOT.THStack(name + "_stacked", '')
 
@@ -598,6 +529,71 @@ class ValidationPlot(object):
             histograms.append(histogram_for_value)
 
         return histograms
+
+    @staticmethod
+    def cumulate(histogram, cumulation_direction=None):
+        """Cumulates the histogram inplace"""
+        if cumulation_direction is None:
+            return histogram
+
+        cumulate_backward = cumulation_direction < 0
+        cumulate_forward = not cumulate_backward
+
+        if isinstance(histogram, ROOT.TH2):
+            raise ValueError("Cannot cumulate a two dimensional histogram.")
+
+        if isinstance(histogram, ROOT.TH3):
+            raise ValueError("Cannot cumulate a three dimensional histogram.")
+
+        if not isinstance(histogram, ROOT.TH1):
+            raise ValueError("Can only cumulate a one dimensional histogram.")
+
+        if isinstance(histogram, ROOT.TProfile):
+            tprofile = histogram
+            # Turn the profile histogram into normal histogram where we can set the new content and errors
+            histogram = tprofile.ProjectionX(tprofile.GetName())
+
+            n_bins = histogram.GetNbinsX()
+            cumulated_content = 0.0
+            cumulated_entries = 0
+            cumulated_std = 0.0
+
+            # Always include the overflow bins.
+            i_bins = range(0, n_bins + 2)
+            if not cumulate_forward:
+                i_bins = reversed(i_bins)
+
+            for i_bin in i_bins:
+                bin_content = tprofile.GetBinContent(i_bin)
+                bin_entries = tprofile.GetBinEffectiveEntries(i_bin)
+                bin_std = tprofile.GetBinError(i_bin)
+
+                if bin_entries != 0:
+                    cumulated_content = 1.0 * (cumulated_entries * cumulated_content + bin_entries * bin_content) / (cumulated_entries + bin_entries)
+                    cumulated_std = math.hypot(cumulated_entries * cumulated_std, bin_entries * bin_std) / (cumulated_entries + bin_entries)
+                    cumulated_entries = cumulated_entries + bin_entries
+                else:
+                    # empty bin does not add anything to the cumulation
+                    pass
+
+                histogram.SetBinContent(i_bin, cumulated_content)
+                histogram.SetBinError(i_bin, cumulated_std)
+
+        else:
+            # Always include the overflow bins.
+            n_bins = histogram.GetNbinsX()
+            cumulated_content = 0.0
+
+            i_bins = range(0, n_bins + 2)
+            if not cumulate_forward:
+                i_bins = reversed(i_bins)
+
+            for i_bin in i_bins:
+                bin_content = histogram.GetBinContent(i_bin)
+                cumulated_content += bin_content
+                histogram.SetBinContent(i_bin, cumulated_content)
+
+        return histogram
 
     def fill_into(self, histogram, xs, ys=None, weights=None, filter=None):
         # Save some ifs by introducing a dummy slicing as a non filter
@@ -658,7 +654,8 @@ class ValidationPlot(object):
         histogram.GetListOfFunctions().Add(stats_entry)
         self.set_additional_stats_tf1(histogram)
 
-    def get_additional_stats(self, histogram):
+    @staticmethod
+    def get_additional_stats(histogram):
         additional_stats = {}
         for tobject in histogram.GetListOfFunctions():
             if isinstance(tobject, StatsEntry):
@@ -897,7 +894,7 @@ class ValidationPlot(object):
             # Assume number of bins according to the rice rule.
             # The number of data points should not include outliers.
             n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
-            rice_n_bins = int(rice_n_bin(n_data))
+            rice_n_bins = int(statistics.rice_n_bin(n_data))
             n_bins = rice_n_bins
 
         else:
@@ -1047,8 +1044,17 @@ def test():
 
     validation_histogram = ValidationPlot('test_hist')
     validation_histogram.hist(normal_distributed_values)
+    validation_histogram.title = 'A normal distribution'
+    validation_histogram.xlabel = 'normal'
+    # validation_histogram.ylabel = 'frequency'
     validation_histogram.fit_gaus()
-    validation_histogram.show()
+
+    cumulated_histogram = ValidationPlot('test_cum_hist')
+    cumulated_histogram.hist(normal_distributed_values, cumulation_direction=1)
+    cumulated_histogram.title = 'A cumulated normal distribution'
+    cumulated_histogram.xlabel = 'normal'
+    cumulated_histogram.ylabel = 'cdf'
+    cumulated_histogram.show()
 
     # Test stacked plotting
     # Make a random selection of 10%
@@ -1064,12 +1070,18 @@ def test():
     diagonal_plot.profile(x, y, bins=50)
     diagonal_plot.fit_line()
 
+    # Test if cumulation works for profile plots
+    cumulated_profile = ValidationPlot('test_cum_profile')
+    cumulated_profile.profile(x, y, bins=50, cumulation_direction=1)
+
     tfile = ROOT.TFile('test.root', 'RECREATE')
 
     validation_histogram.write(tfile)
 
     with root_cd("expert") as tdirectory1:
         diagonal_plot.write(tdirectory1)
+        cumulated_profile.write(tdirectory1)
+        cumulated_histogram.write(tdirectory1)
 
     with root_cd("stacked") as tdirectory2:
         stacked_validation_histogram.write(tdirectory2)

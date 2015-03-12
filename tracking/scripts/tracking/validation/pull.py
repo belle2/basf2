@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tracking.validation.plot import ValidationPlot, compose_axis_label
+from tracking.validation.plot import ValidationPlot, compose_axis_label, get_unit
 
 # get error function as a np.ufunc vectorised for numpy array
 from tracking.validation.utilities import erf, root_save_name
@@ -37,7 +37,7 @@ class PullAnalysis(object):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
         self.quantity_name = quantity_name
-        self.unit = unit
+        self.unit = unit or get_unit(quantity_name)
 
         if outlier_z_score is None:
             self.outlier_z_score = self.default_outlier_z_score
@@ -191,7 +191,7 @@ class PullAnalysis(object):
             sigmas_hist.hist(sigmas,
                              lower_bound=0,
                              outlier_z_score=outlier_z_score)
-            sigmas_hist.xlabel = "#sigma_" + axis_label
+            sigmas_hist.xlabel = compose_axis_label("#sigma(" + quantity_name + ')', self.unit)
             sigmas_hist.title = formatter.format(plot_title, subplot_title='Estimated variance distribution')
 
             self.plots['sigmas'] = sigmas_hist

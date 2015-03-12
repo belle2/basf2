@@ -384,7 +384,11 @@ class SaveClassificationAnalysisRefiner(Refiner):
                  estimate_name=None,
                  truth_name=None,
                  cut_direction=None,
-                 cut=None):
+                 cut=None,
+                 lower_bound=None,
+                 upper_bound=None,
+                 outlier_z_score=None,
+                 unit=None):
 
         self.part_name = part_name
         self.contact = contact
@@ -393,6 +397,11 @@ class SaveClassificationAnalysisRefiner(Refiner):
 
         self.cut = cut
         self.cut_direction = cut_direction
+
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
+        self.outlier_z_score = outlier_z_score
+        self.unit = unit
 
     def refine(self,
                harvesting_module,
@@ -417,26 +426,36 @@ class SaveClassificationAnalysisRefiner(Refiner):
         else:
             truth_name = self.default_truth_name
 
+        truth_name = formatter.format(truth_name, part_name=self.part_name)
+        truths = crops[truth_name]
+
         if self.estimate_name is not None:
             estimate_name = self.estimate_name
         else:
             estimate_name = self.default_estimate_name
 
-        truth_name = formatter.format(truth_name, part_name=self.part_name)
-        estimate_name = formatter.format(estimate_name, part_name=self.part_name)
+        if isinstance(estimate_name, basestring):
+            estimate_names = [estimate_name, ]
+        else:
+            estimate_names = estimate_name
 
-        estimates = crops[estimate_name]
-        truths = crops[truth_name]
+        for estimate_name in estimate_names:
+            estimate_name = formatter.format(estimate_name, part_name=self.part_name)
+            estimates = crops[estimate_name]
 
-        classification_analysis = ClassificationAnalysis(quantity_name=estimate_name,
-                                                         contact=contact,
-                                                         cut_direction=self.cut_direction,
-                                                         cut=self.cut)
+            classification_analysis = ClassificationAnalysis(quantity_name=estimate_name,
+                                                             contact=contact,
+                                                             cut_direction=self.cut_direction,
+                                                             cut=self.cut,
+                                                             lower_bound=self.lower_bound,
+                                                             upper_bound=self.upper_bound,
+                                                             outlier_z_score=self.outlier_z_score,
+                                                             unit=self.unit)
 
-        classification_analysis.analyse(estimates, truths)
+            classification_analysis.analyse(estimates, truths)
 
-        if tdirectory:
-            classification_analysis.write(tdirectory)
+            if tdirectory:
+                classification_analysis.write(tdirectory)
 
 
 class SavePullAnalysisRefiner(Refiner):

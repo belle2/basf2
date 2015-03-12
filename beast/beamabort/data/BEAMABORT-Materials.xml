@@ -21,9 +21,10 @@
   </Material>
 
   <Material name="Diamond">
-    <density unit="g/cm3">3.53</density>
+    <state>Solid</state>
+    <density unit="g/cm3">3.515</density>
     <Components>
-       <Element fraction="1.0">C</Element>
+      <Material>C</Material>
     </Components>
   </Material>
 

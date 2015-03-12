@@ -8,9 +8,11 @@ import tracking.validation.scores as scores
 
 # get error function as a np.ufunc vectorised for numpy array
 from tracking.validation.utilities import erf, root_save_name
+import tracking.validation.statistics as statistics
 
 import math
 import collections
+import numbers
 
 import numpy as np
 
@@ -20,19 +22,25 @@ class ClassificationAnalysis(object):
     def __init__(
         self,
         contact,
-        prediction_name,
+        quantity_name,
+        cut_direction=None,
+        cut=None,
+
     ):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
         self._contact = contact
-        self.prediction_name = prediction_name
+        self.quantity_name = quantity_name
 
-        self.histogram = None
+        self.plots = {}
         self.fom = None
+
+        self.cut_direction = cut_direction
+        self.cut = cut
 
     def analyse(
         self,
-        predictions,
+        estimates,
         truths
     ):
         """Compares the concrete estimate to the truth and efficiency, purity and background rejection
@@ -40,60 +48,121 @@ class ClassificationAnalysis(object):
 
         Parameters
         ----------
-        predictions : array_like
+        estimates : array_like
             Selection variable to compare to the truths
         truths : array_like
             Binary true class values.
         """
 
-        prediction_name = self.prediction_name
+        quantity_name = self.quantity_name
 
-        plot_name = "{prediction_name}_classification_histogram".format(
-            prediction_name=prediction_name
+        # Some different things become presentable depending on the estimates
+        estimate_is_binary = statistics.is_binary_series(estimates)
+
+        if estimate_is_binary:
+            binary_estimates = estimates
+            cut_value = 0.5
+            cut_direction = -1  # reject low values
+
+        elif self.cut is not None:
+            if isinstance(self.cut, numbers.Number):
+                cut_value = self.cut
+                cut_direction = self.cut_direction
+                if self.cut_direction < 0:
+                    binary_estimates = estimates >= self.cut
+                else:
+                    binary_estimates = estimates <= self.cut
+
+            else:
+                raise ValueError("cut is not a number")
+        else:
+            cut_value = None
+            cut_direction = self.cut_direction
+
+        # Figures of merit
+        if cut_value is not None:
+            fom_name = "{quantity_name}_classification_figures_of_merits".format(
+                quantity_name=quantity_name
+            )
+
+            fom_description = "Efficiency, purity and background rejection of the classifiction with {quantity_name}".format(
+                quantity_name=quantity_name
+            )
+
+            fom_check = "Check that the classifcation quality stays stable."
+
+            fom_title = "Summary of the classification quality with {quantity_name}".format(
+                quantity_name=quantity_name
+            )
+
+            classification_fom = ValidationFiguresOfMerit(
+                name=fom_name,
+                title=fom_title,
+                description=fom_description,
+                check=fom_check,
+                contact=self.contact,
+            )
+
+            efficiency = scores.efficiency(truths, binary_estimates)
+            purity = scores.purity(truths, binary_estimates)
+            background_rejection = scores.background_rejection(truths, binary_estimates)
+
+            classification_fom['efficiency'] = efficiency
+            classification_fom['purity'] = purity
+            classification_fom['background_rejection'] = background_rejection
+
+            self.fom = classification_fom
+
+        # Stacked histogram
+        plot_name = "{quantity_name}_signal_background_histogram".format(
+            quantity_name=quantity_name
         )
 
-        classification_histogram = ValidationPlot(plot_name)
-        classification_histogram.hist(
-            predictions,
+        signal_background_histogram = ValidationPlot(plot_name)
+        signal_background_histogram.hist(
+            estimates,
             stackby=truths,
         )
 
-        fom_name = "{prediction_name}_classification_figures_of_merits".format(
-            prediction_name=prediction_name
+        self.plots['signal_background'] = signal_background_histogram
+
+        # Purity profile
+        plot_name = "{quantity_name}_purity_profile".format(
+            quantity_name=quantity_name
         )
 
-        fom_description = "Efficiency, purity and background rejection of the classifiction with {prediction_name}".format(
-            prediction_name=prediction_name
+        purity_profile = ValidationPlot(plot_name)
+        purity_profile.profile(
+            estimates, truths
         )
 
-        fom_check = "Check that the classifcation quality stays stable."
+        self.plots["purity"] = purity_profile
 
-        fom_title = "Summary of the classification quality with {prediction_name}".format(
-            prediction_name=prediction_name
-        )
+        if not estimate_is_binary and cut_direction is not None:
+            # Purity over efficiency.
+            n_signal = scores.signal_amount(truths, estimates)
 
-        classification_fom = ValidationFiguresOfMerit(
-            name=fom_name,
-            title=fom_title,
-            description=fom_description,
-            check=fom_check,
-            contact=self.contact,
-        )
+            sorting_indices = np.argsort(estimates)
+            if cut_direction < 0:  # reject low
+                # Keep a reference to keep the content alive
+                org_sorting_indices = sorting_indices
+                sorting_indices = sorting_indices[::-1]
 
-        efficiency = scores.efficiency(truths, predictions)
-        purity = scores.purity(truths, predictions)
-        background_rejection = scores.background_rejection(truths, predictions)
+            sorted_truths = truths[sorting_indices]
+            sorted_selected_signal = np.cumsum(sorted_truths, dtype=float)
+            sorted_efficiencies = sorted_selected_signal / n_signal
 
-        classification_fom['efficiency'] = efficiency
-        classification_fom['purity'] = purity
-        classification_fom['background_rejection'] = background_rejection
+            plot_name = "{quantity_name}_purity_over_efficiency_profile".format(
+                quantity_name=quantity_name
+            )
 
-        classification_histogram.add_stats_entry('eff.', efficiency)
-        classification_histogram.add_stats_entry('pur.', purity)
-        classification_histogram.add_stats_entry('bkg. rej.', background_rejection)
+            purity_over_efficiency_profile = ValidationPlot(plot_name)
+            purity_over_efficiency_profile.profile(
+                sorted_efficiencies, sorted_truths,
+                cumulation_direction=1,
+            )
 
-        self.histogram = classification_histogram
-        self.fom = classification_fom
+            self.plots["purity_over_efficiency"] = purity_over_efficiency_profile
 
     @property
     def contact(self):
@@ -103,15 +172,15 @@ class ClassificationAnalysis(object):
     def contact(self, contact):
         self._contact = contact
 
-        if self.histogram:
-            self.histogram.contact = contact
+        for plot in self.plots.values():
+            plot.contact = contact
 
         if self.fom:
             self.fom.contact = contact
 
     def write(self, tdirectory=None):
-        if self.histogram:
-            self.histogram.write(tdirectory)
+        for plot in self.plots.values():
+            plot.write(tdirectory)
 
         if self.fom:
             self.fom.write(tdirectory)

@@ -376,18 +376,23 @@ class SaveClassificationAnalysisRefiner(Refiner):
     default_contact = "{module.contact}"
 
     default_truth_name = "{part_name}_truth"
-    default_prediction_name = "{part_name}_prediction"
+    default_estimate_name = "{part_name}_estimate"
 
     def __init__(self,
                  part_name=None,
                  contact=None,
-                 prediction_name=None,
-                 truth_name=None):
+                 estimate_name=None,
+                 truth_name=None,
+                 cut_direction=None,
+                 cut=None):
 
         self.part_name = part_name
         self.contact = contact
-        self.prediction_name = prediction_name
+        self.estimate_name = estimate_name
         self.truth_name = truth_name
+
+        self.cut = cut
+        self.cut_direction = cut_direction
 
     def refine(self,
                harvesting_module,
@@ -412,21 +417,23 @@ class SaveClassificationAnalysisRefiner(Refiner):
         else:
             truth_name = self.default_truth_name
 
-        if self.prediction_name is not None:
-            prediction_name = self.prediction_name
+        if self.estimate_name is not None:
+            estimate_name = self.estimate_name
         else:
-            prediction_name = self.default_prediction_name
+            estimate_name = self.default_estimate_name
 
         truth_name = formatter.format(truth_name, part_name=self.part_name)
-        prediction_name = formatter.format(prediction_name, part_name=self.part_name)
+        estimate_name = formatter.format(estimate_name, part_name=self.part_name)
 
-        predictions = crops[prediction_name]
+        estimates = crops[estimate_name]
         truths = crops[truth_name]
 
-        classification_analysis = ClassificationAnalysis(prediction_name=prediction_name,
-                                                         contact=contact)
+        classification_analysis = ClassificationAnalysis(quantity_name=estimate_name,
+                                                         contact=contact,
+                                                         cut_direction=self.cut_direction,
+                                                         cut=self.cut)
 
-        classification_analysis.analyse(predictions, truths)
+        classification_analysis.analyse(estimates, truths)
 
         if tdirectory:
             classification_analysis.write(tdirectory)

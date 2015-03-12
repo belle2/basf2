@@ -315,10 +315,6 @@ namespace Belle2 {
       return result;
     }
 
-
-
-
-
     double particleInvariantMassError(const Particle* part)
     {
       float result = 0.0;
@@ -1026,6 +1022,28 @@ namespace Belle2 {
       } else return 0;
     }
 
+    // Flavor Information in Transition --------------------------------------------------
+    double hasCharmoniumDaughter(const Particle* particle)
+    {
+      int Status = 0;
+
+      if (!particle)
+        Status = -999;
+
+      int nDaughters = int(particle->getNDaughters());
+      if (nDaughters < 1)
+        Status = -999;
+
+      const std::vector<Particle*> daughters = particle->getDaughters();
+
+      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+        int daughterPDG = daughters[iDaughter]->getPDGCode();
+        if ((abs(daughterPDG) / 10) % 10 == 4 && (abs(daughterPDG) / 100) % 10 == 4) // charmonium state: b->c anti-c q transition
+          Status = 1;
+      }
+      return Status;
+    }
+
     // RestOfEvent related --------------------------------------------------
 
     double nRemainingTracksInRestOfEvent(const Particle* particle)
@@ -1646,6 +1664,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosKaonPion"  , cosKaonPion , "cosine of angle between kaon and slow pion momenta, i.e. between the momenta of the particles selected as target kaon and slow pion");
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
     REGISTER_VARIABLE("KaonPionHaveOpositeCharges", KaonPionHaveOpositeCharges, "Returns 1 if the particles selected as target kaon and slow pion have oposite charges, 0 else")
+    REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter, "Returns 1 if a b->c anti-c q or a anti-b -> anti-c c anti-q transition is present in a decay.");
+
 
     VARIABLE_GROUP("Event");
     REGISTER_VARIABLE("isContinuumEvent",  isContinuumEvent,  "[Eventbased] true if event doesn't contain an Y(4S)");

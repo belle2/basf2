@@ -467,6 +467,13 @@ namespace Belle2 {
     double KaonPionHaveOpositeCharges(const Particle* particle);
 
     /**
+     * returns information regarding the charm quark presence in the decay
+     *
+     * hasCharmoniumDaughter returns 1 if there is a b->c anti-c q or an anti-b->anti-c c anti-q transition present, 0 otherwise
+     */
+    double hasCharmoniumDaughter(const Particle* particle);
+
+    /**
      * return energy recoiling against given Particle
      */
     double recoilEnergy(const Particle* particle);

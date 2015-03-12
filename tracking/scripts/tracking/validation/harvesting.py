@@ -16,6 +16,8 @@ from tracking.utilities import coroutine
 from tracking.validation.utilities import root_cd
 from tracking.validation.refiners import Refiner
 
+import tracking.run.tracked_event_generation
+
 import tracking.metamodules as metamodules
 
 import logging
@@ -190,43 +192,31 @@ class HarvestingModule(basf2.Module):
 
     def run(self,
             input_root_file,
-            gearbox=False,
-            geometry=False,
             components=False,
             show=True,
             pyprofile=False):
 
-        main_path = basf2.create_path()
+        run = tracking.run.tracked_event_generation.ReadOrGenerateTrackedEventsRun()
 
-        root_input_module = basf2.register_module('RootInput')
-        root_input_module.param({
-            'inputFileName': input_root_file,
-        })
-        main_path.add_module(root_input_module)
+        if input_root_file:
+            run.root_input_file = input_root_file
 
-        progress_module = basf2.register_module('Progress')
-        main_path.add_module(progress_module)
+        if components:
+            run.components = components
 
-        if gearbox:
-            gearbox_module = basf2.register_module('Gearbox')
-            main_path.add_module(gearbox_module)
-            if geometry:
-                geometry_module = basf2.register_module('Geometry')
-                if components:
-                    geometry_module.param('components', components)
-                main_path.add_module(geometry_module)
+        run.configure_from_commandline()
+
+        if pyprofile:
+            run.add_module(metamodules.PyProfilingModule(self))
+        else:
+            run.add_module(self)
 
         # Display the root file on terminate
         if show and self.output_file_name:
-            main_path.add_module(BrowseTFileOnTerminateModule(self.output_file_name))
-
-        if pyprofile:
-            main_path.add_module(metamodules.PyProfilingModule(self))
-        else:
-            main_path.add_module(self)
+            run.add_module(BrowseTFileOnTerminateModule(self.output_file_name))
 
         get_logger().info("Processing...")
-        basf2.process(main_path)
+        run.execute()
 
     def initialize(self):
         if isinstance(self.output_file_name, basestring) and self.output_file_name.startswith("datastore://"):
@@ -389,14 +379,23 @@ def test():
     from tracking.validation.utilities import is_primary, is_stable_in_generator
     from tracking.validation.refiners import save_histograms, save_tree, save_fom
 
+    def primaries_seen_in_detector(mc_particle):
+        return (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and
+                mc_particle.hasStatus(Belle2.MCParticle.c_StableInGenerator) and
+                not mc_particle.hasStatus(Belle2.MCParticle.c_IsVirtual) and
+                (mc_particle.hasStatus(Belle2.MCParticle.c_LeftDetector) or
+                 mc_particle.hasStatus(Belle2.MCParticle.c_StoppedInDetector)))
+
     # Proposed syntax for quick generation of overview plots
     @save_fom(aggregation=np.mean, select=["energy", "pt"], name="physics", key="mean_{part_name}")
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, filter=lambda xs: xs != 0.0, filter_on="is_secondary", select=["pt", "is_secondary"], folder_name="secondary_pt")
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, groupby="status", select=["is_secondary", "pt"])
     @save_histograms(outlier_z_score=5.0, allow_discrete=True, select=["is_secondary", "pt"], stackby="is_secondary", folder_name="pt_stackby_is_secondary/nested_test")
-    @save_histograms(outlier_z_score=5.0, allow_discrete=True)
+    @save_histograms(outlier_z_score=5.0, allow_discrete=True, select={'pt': '$p_t$'}, title="Distribution of p_{t}")
     @save_tree()
-    @harvest(foreach="MCParticles", pick=lambda mc_particle: not mc_particle.hasStatus(Belle2.MCParticle.c_IsVirtual), output_file_name="MCParticleOverview.root")
+    @harvest(foreach="MCParticles",
+             pick=primaries_seen_in_detector,
+             output_file_name="MCParticleOverview.root")
     def MCParticleOverview(mc_particle):
         momentum_tvector3 = mc_particle.getMomentum()
         pdg_code = mc_particle.getPDG()

@@ -87,6 +87,9 @@ void ECLMCMatchingModule::initialize()
   ECLShowerArray.registerRelationTo(MCParticleArray);
   ECLClusterArray.registerRelationTo(MCParticleArray);
 
+  StoreArray<ECLSimHit> ECLSimHitArray;
+  ECLSimHitArray.registerRelationTo(ECLHitArray);
+
   // RelationArray::registerPersistent<ECLHit,MCParticle>("", ""); obsolete
   // RelationArray::registerPersistent<ECLDigit,MCParticle>("", ""); obsolete
   // RelationArray::registerPersistent<ECLShower,MCParticle>("", ""); obsolete
@@ -111,9 +114,9 @@ void ECLMCMatchingModule::event()
   PrimaryTrackMap eclPrimaryMap;
   eclPrimaryMap.clear();
   int nParticles = mcParticles.getEntries();
-  if (nParticles > 1000)nParticles = 1000; //skip many mcParticles from ROF to speed up
+  if (nParticles > 1000)nParticles = 1000; //skip mcParticles from to speed up
 
-  for (int iPart = 0; iPart < nParticles ; ++iPart) {
+  for (int iPart = 0; iPart < nParticles ; iPart++) {
     if (mcParticles[iPart]->getMother() == NULL
         && !mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
         && !mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator)) continue;
@@ -136,10 +139,13 @@ void ECLMCMatchingModule::event()
   RelationArray eclHitRel(mcParticles, eclHitArray);
   StoreArray<ECLDigit> eclDigiArray;
   RelationArray eclDigiToMCPart(eclDigiArray, mcParticles);
+  StoreArray<ECLSimHit> eclSimHitArray;
+  RelationArray eclHitToSimHit(eclHitArray, eclSimHitArray);
+  RelationArray eclSimHitRel(mcParticles, eclSimHitArray);
 
   for (int ii = 0; ii < eclDigiArray.getEntries(); ii++) {
     ECLDigit* aECLDigi = eclDigiArray[ii];
-    float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
+    float FitEnergy    = (aECLDigi->getAmp()) / 20000.; //ADC count to GeV
     int cId            = (aECLDigi->getCellId() - 1);
     if (FitEnergy < 0.) {
       continue;
@@ -151,16 +157,13 @@ void ECLMCMatchingModule::event()
     int PrimaryIndex = -1;
     map<int, int>::iterator iter = eclPrimaryMap.find(eclHitRel[index].getFromIndex());
     if (iter != eclPrimaryMap.end()) {
-      PrimaryIndex = iter->first;
-      //std::cout << "Primary Index: " << PrimaryIndex << endl;
-      //PrimaryIndex = iter->second;
-      //std::cout << "Dependent Index: " << PrimaryIndex << endl;
+      PrimaryIndex = iter->first; //it's the daughter
     } else continue;
 
     for (int hit = 0; hit < (int)eclHitRel[index].getToIndices().size(); hit++) {
       ECLHit* aECLHit = eclHitArray[eclHitRel[index].getToIndex(hit)];
       int hitCellId         = aECLHit->getCellId() - 1;
-      if (aECLHit->getBackgroundTag() != 0) continue;
+      if (aECLHit->getBackgroundTag() != 0) continue; //is it necessary with previous condition on primary map?
 
       if (DigiIndex[hitCellId] != -1 && DigiOldTrack[hitCellId] != PrimaryIndex) {
         eclDigiToMCPart.add(DigiIndex[hitCellId], PrimaryIndex);
@@ -173,72 +176,180 @@ void ECLMCMatchingModule::event()
   StoreArray<ECLShower> eclRecShowerArray;
   StoreArray<ECLHitAssignment> eclHitAssignmentArray;
   RelationArray  eclShowerToMCPart(eclRecShowerArray, mcParticles);
-  PrimaryTrackMap eclMCParticleContributionMap;//the cell could be below to several
-  eclMCParticleContributionMap.clear();
+  RelationArray  eclShowerToMCParts(eclRecShowerArray, mcParticles);
+  map<int, float> mc_relations;
 
+  //PrimaryTrackMap eclMCParticleContributionMap; //the cell could be below to several
+  map<int, float> eclMCParticleContributionMap;;
+  eclMCParticleContributionMap.clear();
+  mc_relations.clear();
+
+  //unsigned int jj=0;
+  //unsigned int kk=0;
   for (int iShower = 0; iShower < eclRecShowerArray.getEntries(); iShower++) {
     ECLShower* aECLShower = eclRecShowerArray[iShower];
     double showerId = aECLShower->getShowerId();
-    for (int iHA = 0; iHA <  eclHitAssignmentArray.getEntries(); iHA++) {
-      ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
-      int m_HAShowerId = aECLHitAssignment->getShowerId();
-      int m_HAcellId = aECLHitAssignment->getCellId() - 1 ;
-      if (m_HAShowerId != showerId)continue;
-      if (m_HAShowerId > showerId)break;
-
-      for (int index = 0; index < eclDigiToMCPart.getEntries(); index++) {
-        ECLDigit* aECLDigi = eclDigiArray[eclDigiToMCPart[index].getFromIndex()];
-        int cId          = (aECLDigi->getCellId() - 1);
-        if (cId != m_HAcellId)continue;
-        for (int iMCpart = 0; iMCpart < (int)eclDigiToMCPart[index].getToIndices().size(); iMCpart++) {
-          map<int, int>::iterator iter =  eclMCParticleContributionMap.find((int) eclDigiToMCPart[index].getToIndex(iMCpart));
-          if (iter == eclMCParticleContributionMap.end()) {
-            eclMCParticleContributionMap.insert(pair<int, int>((int) eclDigiToMCPart[index].getToIndex(iMCpart), aECLDigi->getAmp()));
-          } else {
-            iter->second += aECLDigi->getAmp();
-          }
-        }//loop MCparticle with same aECLDigi
-      }//loop aECLDigi to MCparticle
-    }//for HA hANum
-
-    int PrimaryIndex = -1;
-    int MaxContribution = 0;
-    for (map<int, int>::iterator i = eclMCParticleContributionMap.begin(); i != eclMCParticleContributionMap.end(); ++i) {
-      if ((*i).second > MaxContribution) {MaxContribution = (*i).second ;  PrimaryIndex = (*i).first; }
-    }
-
-    eclMCParticleContributionMap.clear();
-
-    if (PrimaryIndex == -1) {//Shower is not due to primary particles whcih is supposed due to BeamBG particles
-      /*//need more BeamBG  sample to test if CPU time consuming is acceptable
-
-      double MaxEnergy = 0;
+    //float ene=0.;
+    for (int iMCPart = 0; iMCPart < eclSimHitRel.getEntries(); iMCPart++) {
+      float ene = 0;
       for (int iHA = 0; iHA <  eclHitAssignmentArray.getEntries(); iHA++) {
+        //cout << "^^^^^^^^^^^^^^^" << eclHitAssignmentArray.getEntries() << "**************" << eclHitArray.getEntries() << "&&&&&&&&&&&&&&&&&&&&" << eclHitRel.getEntries() << endl;
         ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
         int m_HAShowerId = aECLHitAssignment->getShowerId();
         int m_HAcellId = aECLHitAssignment->getCellId() - 1 ;
         if (m_HAShowerId != showerId)continue;
         if (m_HAShowerId > showerId)break;
 
-        for (int iMCPart = 0; iMCPart < eclHitRel.getEntries(); iMCPart++) {
-          for (int hit = 0; hit < (int)eclHitRel[iMCPart].getToIndices().size(); hit++) {
-            ECLHit* aECLHit = eclHitArray[eclHitRel[iMCPart].getToIndex(hit)];
-            int hitCellId         = aECLHit->getCellId() - 1;
-            double hitE         =  aECLHit->getEnergyDep() / Unit::GeV;
-            if (hitCellId==m_HAcellId  &&hitE> MaxEnergy ) {
-              MaxEnergy=hitE;
-              PrimaryIndex =eclHitRel[iMCPart].getFromIndex();
+        //      float ene=0.;
+        //      for (int iMCPart = 0; iMCPart < eclSimHitRel.getEntries(); iMCPart++) {
+        for (int simhit = 0; simhit < (int)eclSimHitRel[iMCPart].getToIndices().size(); simhit++) { //pleonastico
+          //for (int simhit = 0; simhit < (int)eclHitRel[iMCPart].getToIndices().size(); simhit++)
+          ECLSimHit* aECLSimHit = eclSimHitArray[eclSimHitRel[iMCPart].getToIndex(simhit)];
+          int hitCellId         = aECLSimHit->getCellId() - 1;
+          //double hitE         =  aECLHit->getEnergyDep() / Unit::GeV;
+          if ((hitCellId != m_HAcellId)) continue;
 
-            }
-          }//for  hit
-        }//for iMCPart
+          map<int, float>::iterator iter =  eclMCParticleContributionMap.find((int) eclSimHitRel[iMCPart].getToIndex(simhit));
+          if (iter == eclMCParticleContributionMap.end()) {
+            ene = ene + aECLSimHit->getEnergyDep();
+            //iter->second += ene;
+            //eclMCParticleContributionMap.insert(pair<int, float>((int) eclSimHitRel[iMCPart].getFromIndex(), ene));
+            cout << "End, ShowerId: " << showerId << " MCParticle: " << iMCPart << " Energy dep: " << aECLSimHit->getEnergyDep() << " Ene: " << ene << " Crystal: " << aECLSimHit->getCellId() - 1 << endl;
+            cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+          } else {
+            ene = ene + aECLSimHit->getEnergyDep();
+            //iter->second += ene;
+            //iter->second += aECLSimHit->getEnergyDep();
+            cout << "ShowerId: " << showerId << " MCParticle: " << iMCPart << " Energy dep: " << aECLSimHit->getEnergyDep() << " Crystal: " << aECLSimHit->getCellId() - 1 << endl;
+            cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+          }
+          cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+        }//for simhit
+        //cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+      }//for hANum //iMCPart
+      if (ene > 0.) {
+        eclMCParticleContributionMap.insert(pair<int, float>((int) eclSimHitRel[iMCPart].getFromIndex(), ene));
+      }
+    }//for iMCPart //HA hANum
+
+    int PrimaryIndex = -1;
+    int MaxContribution = 0;
+    //cout << "Contributions to shower " << showerId << " : " << eclMCParticleContributionMap.size() << endl;
+    for (map<int, float>::iterator i = eclMCParticleContributionMap.begin(); i != eclMCParticleContributionMap.end(); ++i) {
+      cout << "ShowerID: " << showerId << " Energy: " << aECLShower->getEnergy() << " MCParticle: " << (*i).first << endl;
+      cout << "Cand.: " << (*i).first << " contribution (GeV): " << (*i).second << endl;
+      cout << "********************************************" << endl;
+      mc_relations[(*i).first] += (*i).second;///aECLShower->getEnergy();
+      //      eclShowerToMCParts.add(showerId,  mc_relations.begin(), mc_relations.end());
+      if ((*i).second > MaxContribution) {MaxContribution = (*i).second ;  PrimaryIndex = (*i).first ;}
+    }
+
+    for (map<int, float>::iterator i = mc_relations.begin(); i != mc_relations.end(); ++i) {
+      //if(mc_relations.size()>kk){
+      cout << "ShowerID: " << showerId << " MCParticle: " << (*i).first << endl;
+      cout << "Check cand.: " << (*i).first << " contribution (GeV): " << (*i).second << endl;
+      cout << "-----------------------------------------" << endl;
+      //mc_relations[(*i).first] += (*i).second;
+      //      eclShowerToMCParts.add(showerId,  mc_relations.begin(), mc_relations.end());
+      //kk++;
+      //}
+    }
+    cout << "-----------------------------------------" << endl;
+    //*/
+    eclMCParticleContributionMap.clear();
+
+    if (PrimaryIndex == -1) {
+      //Shower is not due to primary particles but is supposed due to BeamBG particles
+      //need more BeamBG  sample to test if CPU time consuming is acceptable
+      /*
+      double MaxEnergy = 0;
+      for (int iHA = 0; iHA <  eclHitAssignmentArray.getEntries(); iHA++) {
+      ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
+      int m_HAShowerId = aECLHitAssignment->getShowerId();
+      int m_HAcellId = aECLHitAssignment->getCellId() - 1;
+      ECLShower* aECLShower = eclRecShowerArray[m_HAShowerId];
+      float ShowerEnergy = (aECLShower ->getEnergy()) / 20000.;
+      if (m_HAShowerId != showerId)continue;
+      if (m_HAShowerId > showerId)break;
+
+      for (int iMCPart = 0; iMCPart < eclHitRel.getEntries(); iMCPart++) {
+      for (int hit = 0; hit < (int)eclHitRel[iMCPart].getToIndices().size(); hit++) {
+      //ECLDigit* aECLDigi = eclDigiArray[eclDigiToMCPart[index].getFromIndex()];
+      //ECLDigit* aECLDigi = eclDigiArray[eclDigiToMCPart[index].getFromIndex()];
+      //float ShowerEnergy    = (aECLDigi->getAmp()) / 20000.;
+      ECLHit* aECLHit = eclHitArray[eclHitRel[iMCPart].getToIndex(hit)];
+      int hitCellId         = aECLHit->getCellId() - 1;
+      double hitE         =  aECLHit->getEnergyDep() / Unit::GeV;
+      if (hitCellId==m_HAcellId  &&  hitE>MaxEnergy) {
+      MaxEnergy=hitE;
+      if(MaxEnergy>0.8*ShowerEnergy) {
+      PrimaryIndex =eclHitRel[iMCPart].getFromIndex();
+      }//if condition
+      }
+      }//for  hit
+      }//for iMCPart
       }//for HA hANum
       eclShowerToMCPart.add(showerId, PrimaryIndex);
-      *///need more BeamBG  sample to test if CPU time consuming is acceptable
+      //
+      */
     } else {
+      /*
+      double MaxEnergy = 0;
+      for (int iHA = 0; iHA <  eclHitAssignmentArray.getEntries(); iHA++) {
+      ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
+      int m_HAShowerId = aECLHitAssignment->getShowerId();
+      int m_HAcellId = aECLHitAssignment->getCellId() - 1;
+      ECLShower* aECLShower = eclRecShowerArray[m_HAShowerId];
+      float ShowerEnergy = (aECLShower ->getEnergy());
+        if (m_HAShowerId != showerId)continue;
+        if (m_HAShowerId > showerId)break;
+
+        for (int iMCPart = 0; iMCPart < eclHitRel.getEntries(); iMCPart++) {
+      for (int hit = 0; hit < (int)eclHitRel[iMCPart].getToIndices().size(); hit++) {
+      //ECLDigit* aECLDigi = eclDigiArray[eclDigiToMCPart[index].getFromIndex()];
+      //ECLDigit* aECLDigi = eclDigiArray[eclDigiToMCPart[index].getFromIndex()];
+      //float ShowerEnergy    = (aECLDigi->getAmp()) / 20000.;
+      ECLHit* aECLHit = eclHitArray[eclHitRel[iMCPart].getToIndex(hit)];
+      int hitCellId         = aECLHit->getCellId() - 1;
+      double hitE         =  aECLHit->getEnergyDep() / Unit::GeV;
+      if (hitCellId==m_HAcellId  &&  hitE>MaxEnergy) {
+      MaxEnergy=hitE;
+      if(MaxEnergy>0.25*ShowerEnergy) {
       eclShowerToMCPart.add(showerId, PrimaryIndex);
+      cout << "Max: " << MaxEnergy << " Shower: " << ShowerEnergy << endl;
+      //PrimaryIndex =eclHitRel[iMCPart].getFromIndex();
+      }//if condition
+      }
+      }//for  hit
+      }//for iMCPart
+      }//for HA hANum
+      */
+      //eclShowerToMCPart.add(showerId, PrimaryIndex);
+
+      for (map<int, float>::iterator i = mc_relations.begin(); i != mc_relations.end(); ++i) {
+        cout << "MC Relations: " << mc_relations.size() << endl;
+        //if((mc_relations.size())>(jj)){
+        cout << "ShowerID: " << showerId << " MCParticle: " << (*i).first << endl;
+        eclShowerToMCPart.add(showerId, (*i).first, (*i).second);
+        cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
+        //jj++;
+        //}
+      }
+      cout << "Winner, ShowerID: " << showerId << " MCParticle: " << PrimaryIndex << endl;
+      cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
     }
+    mc_relations.clear();
   }//ShowerNum
+
+  //Following FOR is for test purposes
+  for (int index = 0; index < eclShowerToMCPart.getEntries(); index++) {
+    cout << "Entries: " << eclShowerToMCPart.getEntries() << endl;
+    cout << "ShowerId: " << (int)eclShowerToMCPart[index].getFromIndex() << endl;
+    cout << "Cand.: " << (int)eclShowerToMCPart[index].getToIndex() << endl;
+    cout << "Weight: " << (float)eclShowerToMCPart[index].getWeight() << endl;
+    cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << endl;
+  }
+  cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << endl;
 
 
   //... Related ECLClustertoMCParticle
@@ -267,11 +378,6 @@ void ECLMCMatchingModule::event()
   } // imdst
 
   //.. End here ECLtoMCparticle relation
-
-
-
-
-
 
   /*
     StoreArray<ECLGamma> gammaArray;
@@ -342,6 +448,9 @@ void ECLMCMatchingModule::event()
       }//for all Pi0ToGamma relation
     }//if pi0Array exit
    */
+  cout << "Event: " << m_nEvent << endl;
+  cout << "-----------------------------------------" << endl;
+  cout << "-----------------------------------------" << endl;
   m_nEvent++;
 
 }

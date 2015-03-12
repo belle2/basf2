@@ -4,8 +4,8 @@
 # example file showing how to use the different modules to convert genfit::TrackCands from the TrackFinderMCTruth to SpacePointTrackCands
 # also shown in this example file: how to use some other modules (e.g. the SPTCReferee) to get 'clean' (i.e. fullfill some defined criteria) SpacePointTrackCands
 # NOTE: you might want to twist some of these pre-defined parameters to fit your purposes!
-# NOTE 2: the modules used here are currently under some redesign process, this example file is likely to change frequently
-# WARNING: something is apparently wrong with the CurlingTrackCandSplitter -> will not be fixed as it will be merged into the SPTCReferee!
+# NOTE: there is now the possibility of reading in previously simulated events
+# to override the root filename (e.g. when only reading but not writing is enabled use the -i option of basf2)
 
 import os
 from basf2 import *
@@ -16,6 +16,10 @@ numEvents = 100
 # want EvtGen or ParticleGun? (or both)
 useEvtGen = True
 usePGun = False
+
+# use RootIOModules?
+useRootInput = False
+useRootOutput = False
 
 # flags for the pGun
 numTracks = 2
@@ -32,8 +36,8 @@ phiMin = 0.  # degrees
 phiMax = 360.  # degrees
 
 # change the debug level for more than one module (currently set for: SpacePoint2TrueHitConnector, GFTC2SPTCConverter )
-MyLogLevel = LogLevel.INFO
-MyDebugLevel = 2  # some of the modules print some additional information in terminate if debug level is set to 1 or 2
+MyLogLevel = LogLevel.DEBUG
+MyDebugLevel = 1  # some of the modules print some additional information in terminate if debug level is set to 1 or 2
 
 # possibility of using another initial Value from the command line
 initialValue = 0  # 0 for random events
@@ -42,6 +46,17 @@ if len(argv) is 1:
 if len(argv) is 2:
     initialValue = int(argv[1])
     print 'using input value ' + str(initialValue) + ' as initialValue'
+
+# automatically generate root file name from tags above
+firstPart = ''
+if useEvtGen:
+    firstPart = 'EvtGen_'
+if usePGun:
+    firstPart = firstPart + 'PartGun_' + 'theta_' + str(int(thetaMin)) + '_' \
+        + str(int(thetaMax)) + '_'
+
+simulationFileName = firstPart + str(int(numEvents / 1000)) + 'k.root'
+print 'saving to/reading from: ' + simulationFileName
 
 ########################################################################################################################################################
 # module registration
@@ -102,6 +117,14 @@ svdDigitizer = register_module('SVDDigitizer')
 svdClusterizer = register_module('SVDClusterizer')
 # svdClusterizer.param('Clusters','mySVDClusters')
 
+## output module to have some simulated events available to not have to simulate the events everytime the following modules are invoked (takes less time)
+rootoutput = register_module('RootOutput')
+rootoutput.param('outputFileName', simulationFileName)
+
+rootinput = register_module('RootInput')
+rootinput.param('inputFileName', simulationFileName)
+rootinput.param('skipNEvents', int(0))
+
 # SpacePoint Creation (create only SpacePoints with a U & a V cluster)
 spCreatorSVD = register_module('SpacePointCreatorSVD')
 spCreatorSVD.logging.log_level = LogLevel.INFO
@@ -146,8 +169,7 @@ sp2thConnector = register_module('SpacePoint2TrueHitConnector')
 # sp2thConnector.logging.log_level = LogLevel.WARNING
 sp2thConnector.logging.log_level = MyLogLevel
 sp2thConnector.logging.debug_level = MyDebugLevel
-param_sp2thConnector = {  # still have to find the appropriate value
-                          # 'maxLocalPosDiff': 0.01,
+param_sp2thConnector = {
     'DetectorTypes': ['PXD', 'SVD'],
     'TrueHitNames': ['', ''],
     'ClusterNames': ['', ''],
@@ -157,6 +179,10 @@ param_sp2thConnector = {  # still have to find the appropriate value
     'registerAll': False,
     'maxGlobalPosDiff': 0.05,
     'maxPosSigma': 5,
+    'minWeight': 0,
+    'requirePrimary': True,
+    'positionAnalysis': False,
+    'rootFileName': ['PositionAnalysis_SP2TH', 'RECREATE'],
     }
 sp2thConnector.param(param_sp2thConnector)
 
@@ -226,26 +252,38 @@ sptcReferee.param(param_sptcReferee)
 
 # Path
 main = create_path()
-main.add_module(eventinfosetter)
+
+if useRootInput:
+    main.add_module(rootinput)
+else:
+    main.add_module(eventinfosetter)
+
 main.add_module(eventinfoprinter)
 main.add_module(progress)
 
-if useEvtGen:
-  ##following modules only for evtGen:
-    main.add_module(evtgeninput)
-    if usePGun:
+if not useRootInput:
+    if useEvtGen:
+    ##following modules only for evtGen:
+        main.add_module(evtgeninput)
+        if usePGun:
+            main.add_module(particlegun)
+    else:
+    ## following modules only for pGun:
         main.add_module(particlegun)
-else:
-  ## following modules only for pGun:
-    main.add_module(particlegun)
 
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(g4sim)
-main.add_module(pxdDigitizer)
-main.add_module(svdDigitizer)
-main.add_module(pxdClusterizer)
-main.add_module(svdClusterizer)
+
+if not useRootInput:
+    main.add_module(g4sim)
+    main.add_module(pxdDigitizer)
+    main.add_module(svdDigitizer)
+    main.add_module(pxdClusterizer)
+    main.add_module(svdClusterizer)
+
+if useRootOutput:
+    main.add_module(rootoutput)
+
 main.add_module(spCreatorPXD)
 main.add_module(spCreatorSVD)
 main.add_module(singleSpCreatorSVD)

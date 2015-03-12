@@ -98,17 +98,17 @@ namespace Belle2 {
     /** Calculates the x momentum of the particle at the perigee point.
      *  @param bZ            Z component of the magnetic field in Tesla
      */
-    double getMomentumX(const float bZ) const;
+    double getMomentumX(const double bZ) const;
 
     /** Calculates the y momentum of the particle at the perigee point.
      *  @param bZ            Z component of the magnetic field in Tesla
      */
-    double getMomentumY(const float bZ) const;
+    double getMomentumY(const double bZ) const;
 
     /** Calculates the z momentum of the particle at the perigee point.
      *  @param bZ            Z component of the magnetic field in Tesla
      */
-    double getMomentumZ(const float bZ) const;
+    double getMomentumZ(const double bZ) const;
 
     /** Getter for vector of momentum at the perigee position
      *
@@ -116,19 +116,19 @@ namespace Belle2 {
      *  of the magnetic field along the z-axis to give back the momentum.
      *  @param bZ            Magnetic field at the perigee.
      */
-    TVector3 getMomentum(const float bZ = 1.5) const;
+    TVector3 getMomentum(const double bZ = 1.5) const;
 
     /** Getter for the absolute value of the transverse momentum at the perigee.
      *
      *  @param bZ            Magnetic field at the perigee
      */
-    float getTransverseMomentum(const float bZ = 1.5) const;
+    double getTransverseMomentum(const double bZ = 1.5) const;
 
     /** Getter for kappa, which is charge / transverse momentum or equivalently omega * alpha */
-    float getKappa(const float bZ = 1.5) const;
+    double getKappa(const double bZ = 1.5) const;
 
     /** Calculates the alpha value for a given magnetic field in Tesla */
-    static double getAlpha(const float bZ);
+    static double getAlpha(const double bZ);
 
     /** Return track charge sign (1 or -1).*/
     short getChargeSign() const {
@@ -222,7 +222,7 @@ namespace Belle2 {
      *  @param phi             A angle in [-pi, pi]
      *  @return                The angle for the opposite direction in [-pi, pi]
      */
-    static float reversePhi(const float& phi) {
+    static double reversePhi(const double& phi) {
       return phi < 0 ? phi + M_PI : phi - M_PI;
     }
 
@@ -275,31 +275,31 @@ namespace Belle2 {
      *  if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
      *  d0 has the same sign as `getPerigee().Cross(getMomentum()).Z()`.
      */
-    float getD0() const { return m_d0; }
+    double getD0() const { return m_d0; }
 
     /** Getter for phi0, which is the azimuth angle of the transverse momentum at the perigee.
      *
      *  getMomentum().Phi() == getPhi0() holds.
      */
-    float getPhi0() const { return m_phi0; }
+    double getPhi0() const { return m_phi0; }
 
     /** Getter for the cosine of the azimuth angle of travel direction at the perigee. */
-    double getCosPhi0() const { return std::cos(double(getPhi0())); }
+    double getCosPhi0() const { return std::cos(getPhi0()); }
 
     /** Getter for the cosine of the azimuth angle of travel direction at the perigee. */
-    double getSinPhi0() const { return std::sin(double(getPhi0())); }
+    double getSinPhi0() const { return std::sin(getPhi0()); }
 
     /** Getter for omega, which is a signed curvature measure of the track. The sign is equivalent to the charge of the particle. */
-    float getOmega() const { return m_omega; }
+    double getOmega() const { return m_omega; }
 
     /** Getter for z0, which is the z coordinate of the perigee. */
-    float getZ0() const { return m_z0; }
+    double getZ0() const { return m_z0; }
 
     /** Getter for tan lambda, which is the z over arc length slope of the track. */
-    float getTanLambda() const { return m_tanLambda; }
+    double getTanLambda() const { return m_tanLambda; }
 
     /** Getter for cot theta, which is the z over arc length slope of the track. Synomym to tan lambda. */
-    float getCotTheta() const { return m_tanLambda; }
+    double getCotTheta() const { return m_tanLambda; }
     /// @}
 
     ///--------------------------------------------------------------------------------------------------------------------------
@@ -314,7 +314,7 @@ namespace Belle2 {
     void setCartesian(const TVector3& position,
                       const TVector3& momentum,
                       const short int charge,
-                      const float bZ);
+                      const double bZ);
 
     /** Memory for the signed distance to the perigee. The sign is the same as of the z component of getPerigee().Cross(getMomentum()).*/
     float m_d0;

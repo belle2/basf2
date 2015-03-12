@@ -64,37 +64,37 @@ TVector3 Helix::getPerigee() const
   return TVector3(getPerigeeX(), getPerigeeY(), getPerigeeZ());
 }
 
-double Helix::getMomentumX(const float bZ) const
+double Helix::getMomentumX(const double bZ) const
 {
   return getCosPhi0() * getTransverseMomentum(bZ);
 }
 
-double Helix::getMomentumY(const float bZ) const
+double Helix::getMomentumY(const double bZ) const
 {
   return getSinPhi0() * getTransverseMomentum(bZ);
 }
 
-double Helix::getMomentumZ(const float bZ) const
+double Helix::getMomentumZ(const double bZ) const
 {
   return getTanLambda() * getTransverseMomentum(bZ);
 }
 
-TVector3 Helix:: getMomentum(const float bZ) const
+TVector3 Helix:: getMomentum(const double bZ) const
 {
   return TVector3(getMomentumX(bZ), getMomentumY(bZ), getMomentumZ(bZ));
 }
 
-float Helix::getTransverseMomentum(const float bZ) const
+double Helix::getTransverseMomentum(const double bZ) const
 {
   return 1 / std::fabs(getAlpha(bZ) * getOmega());
 }
 
-float Helix::getKappa(const float bZ) const
+double Helix::getKappa(const double bZ) const
 {
   return getOmega() * getAlpha(bZ);
 }
 
-double Helix::getAlpha(const float bZ)
+double Helix::getAlpha(const double bZ)
 {
   return 1.0 / (bZ * TMath::C()) * 1E11;
 }
@@ -333,10 +333,12 @@ double Helix::calcArcLengthAtDeltaCylindricalRAndDr(const double& deltaCylindric
 void Helix::setCartesian(const TVector3& position,
                          const TVector3& momentum,
                          const short int charge,
-                         const float bZ)
+                         const double bZ)
 {
+  assert(abs(charge) == 1);  // Not prepared for doubly-charged particles.
   const double alpha = getAlpha(bZ);
 
+#if 0
   // We allow for the case that position, momentum are not given
   // exactly in the perigee.  Therefore we have to solve the
   // equations.  Any point on the helix, using the perigee parameters
@@ -344,13 +346,33 @@ void Helix::setCartesian(const TVector3& position,
   // - Billoir, Pierre et al. Nucl.Instrum.Meth. A311 (1992) 139-150"
   // named here omega, phi0, d0, tanLambda, z0 together with an angle
   // chi, can be written:
-#if 0
   px = cos(phi0 + chi) / alpha / omega;
   py = sin(phi0 + chi) / alpha / omega;
   pz = charge * tanLambda / alpha / omega;
   x =  d0 * sin(phi0) + charge / omega * (sin(phi0 + chi) - sin(phi0));
   y = -d0 * cos(phi0) + charge / omega * (-cos(phi0 + chi) + cos(phi0));
   z = z0 + charge / omega * tanLambda * chi;
+  // Expressed in terms of the track length from the POCA 's' and its
+  // projection into the x-y plane
+  S = s / hypot(1, cotTheta);
+  // we have chi = S*omega, and from this the formulae valid also for
+  // straight line tracks (for the constant direction of the
+  // straight-line track just take chi = 0, and for straight-line
+  // tracks charge just establishes a sign convention):
+  x = (d0 * sin(phi)
+       + charge * S * (sin(phi) * (cos(S * omega) - 1) / (S * omega)
+                       + cos(phi) * sin(S * omega) / (S * omega)));
+  y = (-d0 * cos(phi)
+       + charge * S * (sin(phi) * sin(S * omega) / (S * omega)
+                       - cos(phi) * (cos(S * omega) - 1) / (S * omega)));
+  z = charge * S * cotTheta;
+  // For omega -> 0, these reduce to straight lines, according to
+  x = (d0 * sin(phi)
+       + charge * S * cos(phi) + O(omega));
+  y = (-d0 * cos(phi)
+       + chargs * S * sin(phi) + O(omega));
+  z = charge * S * cotTheta;
+  // Billoir (loc.cit.) gives the first terms of a series in S.
 #endif
   const double x = position.X();
   const double y = position.Y();
@@ -371,31 +393,26 @@ void Helix::setCartesian(const TVector3& position,
   // Helix center in the (x, y) plane:
   const double helX = x + charge * py * alpha;
   const double helY = y - charge * px * alpha;
-  //const double rhoHel = hypot(helX, helY);
+  const double rhoHel = hypot(helX, helY);
 
-  const double d0 = charge * hypot(helX, helY) - 1 / omega;
+  const double d0 = charge * rhoHel - 1 / omega;
 
-  double phi0 = atan2(helY, helX) + charge * M_PI / 2;
+  // phi0 is the azimuth of momentum, in the POCA it is orthogonal to
+  // the vector pointing to the helix center.  The rotation by 90
+  // degrees is achieved by (x, y) -> (-y, x) and the opposite
+  // rotation for negative particles.
+  const double phi0 = atan2(charge * helX, -charge * helY);
 
-  // Bring phi0 to the interval [-pi, pi]
-  phi0 = remainder(phi0, 2 * M_PI);
-
-  const double cosPhi0 = cos(phi0);
-  const double sinPhi0 = sin(phi0);
+  const double cosPhi0 = (-charge * helY) / rhoHel;
+  const double sinPhi0 = (charge * helX) / rhoHel;
 
   const double cosphi0chi = ptinv * px;  // cos(phi0 + chi)
   const double sinphi0chi = ptinv * py;  // sin(phi0 + chi)
 
-  const double coschi =    cosphi0chi * cosPhi0 + sinphi0chi * sinPhi0;
-  const double sinchi =  - cosphi0chi * sinPhi0 + sinphi0chi * cosPhi0;
+  const double coschi =  cosphi0chi * cosPhi0 + sinphi0chi * sinPhi0;
+  const double sinchi = -cosphi0chi * sinPhi0 + sinphi0chi * cosPhi0;
 
-  // Workaround to get reasonable helices.
-  double chi = 0;
-  if (fabs(sinchi) > .5) {
-    chi = atan2(sinchi, coschi);
-  } else {
-    chi = asin(sinchi);
-  }
+  const double chi = atan2(sinchi, coschi);
 
   const double arcLength = -chi / omega;
   const double z0 = z - arcLength * tanLambda;
@@ -405,7 +422,6 @@ void Helix::setCartesian(const TVector3& position,
   m_d0 = d0;
   m_tanLambda = tanLambda;
   m_z0 = z0;
-
 }
 
 namespace Belle2 {

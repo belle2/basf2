@@ -360,7 +360,7 @@ void GenFitterModule::event()
         const double v = beta * Const::speedOfLight;
 
         // Arc length from IP to posSeed in cm.
-        const Helix h(posSeed, momentumSeed, part->Charge(), 1.5);
+        const Helix h(posSeed, momentumSeed, part->Charge() / 3, 1.5);
 
         // Arc length calculation doesn't work, do it ourselves until I can fix the Helix.
         const double z0 = h.getZ0();

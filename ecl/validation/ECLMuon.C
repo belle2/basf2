@@ -44,7 +44,5 @@ void ECLMuon()
   tree->Draw("ECLGammas.m_ShowerId>>hMuonsFake");
   hMuonsFake->Write();
 
-
-
   delete output;
 }

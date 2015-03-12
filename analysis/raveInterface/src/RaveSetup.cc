@@ -72,11 +72,11 @@ RaveSetup::~RaveSetup()
 void RaveSetup::reset()
 {
   //delete everything that could have potentially created with new in this class
-  delete m_raveVertexFactory;
+  //delete m_raveVertexFactory; // workaround to avoid crashes with V0 finder
+  //m_raveVertexFactory = nullptr;
   delete m_raveKinematicTreeFactory;
-  //    delete m_GFRaveVertexFactory;
-  m_raveVertexFactory = nullptr;
   m_raveKinematicTreeFactory = nullptr;
+  //    delete m_GFRaveVertexFactory;
 
   m_initialized = false;
 }

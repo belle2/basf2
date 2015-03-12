@@ -13,37 +13,38 @@
 #include "TMath.h"
 #include <cmath>
 #include <cassert>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-
-const FloatType& TrackFindingCDC::getBFieldZMagnitude(const Vector2D&)
+FloatType TrackFindingCDC::getBFieldZMagnitude(const Vector2D& pos2D)
 {
-  return c_bFieldZMagnitude;
+  return std::fabs(TrackFindingCDC::getBFieldZ(pos2D));
 }
 
 
 
-const SignType& TrackFindingCDC::getBFieldZSign()
+SignType TrackFindingCDC::getBFieldZSign()
 {
-  return c_bFieldZSign;
+  return sign(TrackFindingCDC::getBFieldZ());
 }
 
 
 
-const FloatType& TrackFindingCDC::getBFieldZ(const Vector2D&)
+FloatType TrackFindingCDC::getBFieldZ(const Vector2D& pos2D)
 {
-  return c_bFieldZ;
+  return getBFieldZ(Vector3D(pos2D, 0));
 }
 
 
 
-const FloatType& TrackFindingCDC::getBFieldZ(const Vector3D&)
+FloatType TrackFindingCDC::getBFieldZ(const Vector3D& pos3D)
 {
-  return c_bFieldZ;
+  TVector3 mag3D = BFieldMap::Instance().getBField(pos3D);
+  return mag3D.Z();
 }
 
 
@@ -82,24 +83,12 @@ CCWInfo TrackFindingCDC::chargeToCCWInfo(const FloatType& charge)
 }
 
 
-
-FloatType TrackFindingCDC::absMom2DToRadius(const FloatType& absMom2D,
-                                            const FloatType& charge,
-                                            const Vector2D& pos2D)
-{
-  return - absMom2D / (charge * getBFieldZ(pos2D) * 0.00299792458);
-}
-
-
-
 FloatType TrackFindingCDC::absMom2DToCurvature(const FloatType& absMom2D,
                                                const FloatType& charge,
                                                const Vector2D& pos2D)
 {
   return - charge * getBFieldZ(pos2D) * 0.00299792458 / absMom2D;
 }
-
-
 
 FloatType TrackFindingCDC::absMom2DToCurvature(const FloatType& absMom2D,
                                                const FloatType& charge,
@@ -108,12 +97,17 @@ FloatType TrackFindingCDC::absMom2DToCurvature(const FloatType& absMom2D,
   return - charge * getBFieldZ(pos3D) * 0.00299792458 / absMom2D;
 }
 
-
-
 FloatType TrackFindingCDC::curvatureToAbsMom2D(const FloatType& curvature,
                                                const Vector2D& pos2D)
 {
   return std::fabs(getBFieldZ(pos2D) * 0.00299792458 / curvature);
+}
+
+
+FloatType TrackFindingCDC::curvatureToAbsMom2D(const FloatType& curvature,
+                                               const Vector3D& pos3D)
+{
+  return std::fabs(getBFieldZ(pos3D) * 0.00299792458 / curvature);
 }
 
 

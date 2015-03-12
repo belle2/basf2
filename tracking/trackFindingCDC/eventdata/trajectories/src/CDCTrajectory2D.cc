@@ -77,7 +77,8 @@ SignType CDCTrajectory2D::getChargeSign() const
 
 FloatType CDCTrajectory2D::getAbsMom2D() const
 {
-  return curvatureToAbsMom2D(getLocalCircle().curvature());
+  Vector2D position = getSupport();
+  return curvatureToAbsMom2D(getLocalCircle().curvature(), position);
 }
 
 

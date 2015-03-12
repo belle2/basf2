@@ -22,34 +22,17 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    //const FloatType CDCTrajectory2D::c_bFieldZMagnitude = 1.5;
-    //const SignType CDCTrajectory2D::c_bFieldZSign = PLUS;
-    //const FloatType CDCTrajectory2D::c_bFieldZ = c_bFieldZSign * c_bFieldZMagnitude;
-
-    // this file should not really be the provider of this information.
-    // So these functions should eventually change to the correct
-    // information provider.
-
-    /// Constant for the magnetic field strength in z direction ( in Tesla )
-    const FloatType c_bFieldZMagnitude = 1.5;
-
-    /// Constant for the sign of the magnetic field in z direction. To be checked.
-    const SignType c_bFieldZSign = PLUS; // to be checked
-
-    /// Constant for the signed magnetic field strength in z direction ( in Tesla )
-    const FloatType c_bFieldZ = c_bFieldZSign* c_bFieldZMagnitude;
-
     /// Getter for the absolute magnetic field strength in z direction ( in Tesla )
-    const FloatType& getBFieldZMagnitude(const Vector2D& pos2D = Vector2D(0.0, 0.0));
+    FloatType getBFieldZMagnitude(const Vector2D& pos2D);
 
     /// Getter for the sign of the magnetic field in z direction
-    const SignType& getBFieldZSign();
+    SignType getBFieldZSign();
 
     /// Getter for the signed magnetic field stength in z direction ( in Tesla )
-    const FloatType& getBFieldZ(const Vector2D& pos2D = Vector2D(0.0, 0.0));
+    FloatType getBFieldZ(const Vector2D& pos2D);
 
     /// Getter for the signed magnetic field stength in z direction ( in Tesla )
-    const FloatType& getBFieldZ(const Vector3D& pos3D);
+    FloatType getBFieldZ(const Vector3D& pos3D = Vector3D(0.0, 0.0, 0.0));
 
     /// Translater from magnetic field strength in Tesla to the alpha value.
     FloatType getAlphaFromBField(const double& bField);
@@ -78,25 +61,28 @@ namespace Belle2 {
     /// Conversion help for charges to clockwise or counterclockwise travel.
     CCWInfo chargeToCCWInfo(const FloatType& charge);
 
-    /// Conversion helper for momenta to radii
-    FloatType absMom2DToRadius(const FloatType& absMom2D,
-                               const FloatType& charge,
-                               const Vector2D& pos2D = Vector2D(0.0, 0.0));
-
+    /// Conversion helper for momenta to two dimensional curvature
     FloatType absMom2DToCurvature(const FloatType& absMom2D,
                                   const FloatType& charge,
-                                  const Vector2D& pos2D = Vector2D(0.0, 0.0));
+                                  const Vector2D& pos2D);
 
+    /// Conversion helper for momenta to two dimensional curvature
     FloatType absMom2DToCurvature(const FloatType& absMom2D,
                                   const FloatType& charge,
-                                  const Vector3D& pos3D = Vector3D(0.0, 0.0, 0.0));
+                                  const Vector3D& pos3D);
 
+    /// Conversion helper for two dimensional curvature to momenta
     FloatType curvatureToAbsMom2D(const FloatType& curvature,
-                                  const Vector2D& pos2D = Vector2D(0.0, 0.0));
+                                  const Vector2D& pos2D);
 
+    /// Conversion helper for two dimensional curvature to momenta
+    FloatType curvatureToAbsMom2D(const FloatType& curvature,
+                                  const Vector3D& pos3D);
+
+    /// Conversion helper for two dimensional curvature to momenta
     FloatType curvatureToAbsMom2D(const FloatType& curvature,
                                   const FloatType& charge,
-                                  const Vector2D& pos2D = Vector2D(0.0, 0.0));
+                                  const Vector2D& pos2D);
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

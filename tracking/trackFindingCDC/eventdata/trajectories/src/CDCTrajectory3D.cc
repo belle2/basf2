@@ -250,13 +250,15 @@ SignType CDCTrajectory3D::getChargeSign() const
 
 FloatType CDCTrajectory3D::getAbsMom3D() const
 {
+  Vector3D position = getSupport();
+
   FloatType szSlope = getLocalHelix().szSlope();
 
   FloatType factor2DTo3D = hypot(1, szSlope);
 
   FloatType curvatureXY = getLocalHelix().curvatureXY();
 
-  FloatType absMom2D =  curvatureToAbsMom2D(curvatureXY);
+  FloatType absMom2D =  curvatureToAbsMom2D(curvatureXY, position);
 
   return factor2DTo3D * absMom2D;
 

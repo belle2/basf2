@@ -27,6 +27,10 @@
 
 #include <numeric> // std::accumulate
 
+// root output
+#include <TFile.h>
+#include <TTree.h>
+
 namespace Belle2 {
 
   /**
@@ -44,7 +48,7 @@ namespace Belle2 {
    * NOTE: It is not guaranteed that every SpacePoint gets related to a TrueHit if 'registerAll' is set to false! E.g. 'ghost hits' should be sorted out.
    * NOTE: Choosing the TrueHit with the biggest weight (or sum of weights) if there is more than one possible TrueHit does not guarantee that the 'right' TrueHit is chosen! It is possible that in such cases no relation will get registered in the future if this proves to be a source of errors!
    *
-   * NOTE: This module should be used to connect SpacePoints and TrueHits if MC information is needed afterwards (e.g. in the upcoming RefereeModule for SpacePointTrackCands) to avoid having to look up the relations to obtain these informations seperately in every Module. Furthermore some modules will no longer be able to do so after some rework!
+   * NOTE: This module should be used to connect SpacePoints and TrueHits if MC information is needed afterwards (e.g. in the SPTCRefereeModule for SpacePointTrackCands) to avoid having to look up the relations to obtain these informations seperately in every Module. Furthermore some modules are no longer able to determine the related TrueHits themselves (e.g. GFTC2SPTCConverter)
    */
   class SpacePoint2TrueHitConnectorModule : public Module {
 
@@ -58,6 +62,32 @@ namespace Belle2 {
 
     virtual void terminate(); /**< terminate: print some summary information */
 
+    BELLE2_DEFINE_EXCEPTION(NoTrueHitToCluster, "Found no related TrueHit for a Cluster!"); /**< Exception for when no related TrueHit can be found for a Cluster */
+
+    BELLE2_DEFINE_EXCEPTION(NoClusterToSpacePoint, "Found no related Cluster for a SpacePoint!"); /**< Exception for when no related Cluster can be found for a SpacePoint */
+
+    /** helper struct to access root variables inside the module */
+    struct RootVariables {
+      std::vector<double> SpacePointULocal; /**< SpacePoint local U-position */
+      std::vector<double> SpacePointVLocal; /**< SpacePoint local V-position */
+      std::vector<double> SpacePointXGlobal; /**< SpacePoint global X-position */
+      std::vector<double> SpacePointYGlobal; /**< SpacePoint global Y-position */
+      std::vector<double> SpacePointZGlobal; /**< SpacePoint global Z-position */
+
+      std::vector<double> TrueHitULocal; /**< TrueHit local U-position */
+      std::vector<double> TrueHitVLocal; /**< TrueHit local V-position */
+      std::vector<double> TrueHitXGlobal; /**< TrueHit global X-position */
+      std::vector<double> TrueHitYGlobal; /**< TrueHit global Y-position */
+      std::vector<double> TrueHitZGlobal; /**< TrueHit global Z-position */
+
+      std::vector<double> WeightU; /**< weight of the relation between the U-Cluster of the SpacePoint and the TrueHit */
+      std::vector<double> WeightV; /**< weight of the relation between the V-Cluster of the SpacePoint and the TrueHit */
+
+      std::vector<unsigned short int> HitVxdID; /**< VxdID of the SpacePoint/TrueHit */
+      std::vector<unsigned short int> RelationStatus; /**< different flags of the relation stored in here (see c_relationStatus) */
+      std::vector<unsigned int> NRelations; /**< Number of related TrueHits to a SpacePoint */
+    }; // end RootVariables
+
   protected:
 
     typedef std::unordered_multimap<int, double> baseMapT; /**< typedef to have the same type of map throughout the module */
@@ -70,6 +100,18 @@ namespace Belle2 {
       c_SVD = Belle2::VXD::SensorInfoBase::SVD, /**< SVD */
     };
 
+    /** enum for better code readability */
+    enum e_relationStatus {
+      c_clearHit = 1, //< bit 0: Only one TrueHit to SpacePoint
+      c_ghostHit = 2, //< bit 1: ghost hit as described in this module
+      c_SpacePointU = 4, //< bit 2: SpacePoint U-coordinate is set
+      c_SpacePointV = 8, //< bit 3: SpacePoint V-coordinate is set
+      c_primaryParticle = 16, //< bit 4: Particle related to TrueHit is primary
+      c_bgParticle = 32, //< bit 5: particle related to TrueHit is background
+      c_nonUniqueRelation = 64, //< bit 6: more than one TrueHit related to SpacePoint
+      c_registeredRelation = 128, //<bit 7: this relation got registered
+    }; // end e_relationStatus
+
     // ================================================== PARAMETERS ==============================================================
     std::string m_PARAMoutputSuffix; /**< suffix that will be appended to the StoreArray names of the output StoreArrays */
 
@@ -81,9 +123,15 @@ namespace Belle2 {
 
     std::vector<std::string> m_PARAMclusterNames; /**< names of containers of Clusters */
 
+    std::vector<std::string> m_PARAMrootFileName; /**< name and update status of root file */
+
     bool m_PARAMstoreSeparate; /**< switch for storing the SpacePoints that can be related to a TrueHit into separate StoreArrays, where only such SpacePoints are stored */
 
-    bool m_PARAMregisterAll; /**< switch for registereing all relations for all TrueHits for all SpacePoints (there can be more than 1 related TrueHit to each SpacePoint). The module can be used to get all TrueHits for a SpacePoint and then the user can decide what to do with it. */;
+    bool m_PARAMregisterAll; /**< switch for registereing all relations for all TrueHits for all SpacePoints (there can be more than 1 related TrueHit to each SpacePoint). The module can be used to get all TrueHits for a SpacePoint and then the user can decide what to do with it. */
+
+    bool m_PARAMpositionAnalysis; /**< switch for doing the analysis of positions of SpacePoints and TrueHits */
+
+    bool m_PARAMrequirePrimary; /**< require the TrueHit to be related to a primary particle in order for the relation to get registered! */
 
     double m_PARAMmaxGlobalDiff; /**< maximum difference of global position coordinates for each direction between TrueHit and SpacePoint */
 
@@ -91,36 +139,37 @@ namespace Belle2 {
 
     double m_PARAMmaxPosSigma; /**< defining th maximum difference of local coordinates in units of PitchSize / sqrt(12) */
 
+    double m_PARAMminWeight; /**< define a minimal weight a relation between Cluster and TrueHit. Below this limit the relation will not be registered */
+
     // ================================================= INTERMALLY USED MEMBERS ==================================================
-//     unsigned int m_OLDnContainers; /**< number of passed containers -> storing the size of an input vector for not having to obtain it every time */
 
-    unsigned int m_nContainers;
+    unsigned int m_nContainers; /**< number of passed containers -> storing the size of an input vector for not having to obtain it every time */
 
-    unsigned int m_nPXDarrays; /**< number of PXD StoreArrays */
+    std::vector<e_detTypes> m_detectorTypes; /**< storing the detector types for each container in vector, needed in initialize */
 
-    unsigned int m_nSVDarrays; /**< number os SVD StoreArrays */
+    Belle2::StoreArray<Belle2::SVDTrueHit> m_SVDTrueHits; /**< SVDTrueHits StoreArray used throughout the module */
 
-    std::vector<std::string> m_trueHitNames;
+    Belle2::StoreArray<Belle2::PXDTrueHit> m_PXDTrueHits; /**< PXDTrueHits StoreArray used throughout the module */
 
-    std::vector<std::string> m_spacePointNames;
+    Belle2::StoreArray<Belle2::PXDCluster> m_PXDClusters; /**< PXDTClusters StoreArray used throughout the module */
 
-    std::vector<e_detTypes> m_detectorTypes;
-
-    Belle2::StoreArray<Belle2::SVDTrueHit> m_SVDTrueHits;
-
-    Belle2::StoreArray<Belle2::PXDTrueHit> m_PXDTrueHits;
-
-    Belle2::StoreArray<Belle2::PXDCluster> m_PXDClusters;
-
-    Belle2::StoreArray<Belle2::SVDCluster> m_SVDClusters;
+    Belle2::StoreArray<Belle2::SVDCluster> m_SVDClusters; /**< PXDClusters StoreArray used throughout the module */
 
     std::vector<std::pair<Belle2::StoreArray<Belle2::SpacePoint>, e_detTypes> > m_inputSpacePoints; /**< StoreArray of all input SpacePoints */
 
     std::vector<Belle2::StoreArray<Belle2::SpacePoint> > m_outputSpacePoints; /**< StoreArray of all output SpacePoints */
 
-    double m_maxGlobalDiff;
+    double m_maxGlobalDiff; /**< storing the squared value of m_PARAMmaxGlobalDiff here to not alter the parameter input */
 
     unsigned int m_iCont; /**< 'helper variable' needed to not have to pass one integer down to processSpacePoint only to have a handle in cases where an exception gets caught! */
+
+    RootVariables m_rootVariables; /**< Root variables used for collecting data eventwise */
+
+    TFile* m_rootFilePtr; //< pointer to root file
+
+    TTree* m_treePtr; //< pointer to tree in root file
+
+
     // ================================================= COUNTERS =================================================================
     std::vector<unsigned int> m_SpacePointsCtr; /**< Number of SpacePoints presented to the module */
 
@@ -134,28 +183,33 @@ namespace Belle2 {
 
     std::vector<unsigned int> m_noTrueHitCtr; /**< Number of SpacePoints that contained a Cluster to which no TrueHit could be found (i.e. counts how many times the NoTrueHitToCluster exception gets thrown) */
 
+    std::vector<unsigned int> m_rejectedRelsCtr; /**< Number of SpacePoints that were not related to a TrueHit (i.e. getTHwithWeight returned NULL) */
+
+    unsigned int m_weightTooSmallCtr; /**< Count the omitted relations because of a too small weight */
+
+    unsigned int m_rejectedNoPrimaryCtr; /**< Count how many times a relation was rejected because TrueHit was not related to primary */
+
     // TODO: make these counters for every container not only for all together!
-    unsigned int m_negWeightCtr; /**< number of negative weights */
+//     unsigned int m_negWeightCtr; /**< number of negative weights */
 
-    unsigned int m_totWeightsCtr; /**< total number of weights */
+//     unsigned int m_totWeightsCtr; /**< total number of weights */
 
-    unsigned int m_single2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, but only one of them has two weights */
-
-    unsigned int m_nonSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, with more than one of them having two weights */
-
-    unsigned int m_all2WTHCtr; /**< Counter for SpacePoints where alle possible TrueHits have two weights */
-
-    unsigned int m_accSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, but only one of them has two weights, where a relation was registered to a TrueHit */
-
-    unsigned int m_accNonSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, with more than one of them having two weights where a relation was registered to a TrueHit */
-
-    unsigned int m_accAll2WTHCtr; /**< Counter for SpacePoints where alle possible TrueHits have two weights, where a relation was registered to a TrueHit */
-
-    unsigned int m_oneCluster2THCtr; /**< Counter for SpacePoints with only one Cluster but two possible TrueHits (in these cases, the one with the bigger weight gets automatically accepted) */
-
-    std::vector<float> m_weightDiffsByAvg; /**< To investigate how the difference of weigts divided by the average of the weights is distributed -> maybe learn something from it */
-
-    unsigned int m_moreThan2Weights; /**< Count the cases whith more than two weights */
+//     unsigned int m_single2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, but only one of them has two weights */
+//
+//     unsigned int m_nonSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, with more than one of them having two weights */
+//
+//     unsigned int m_all2WTHCtr; /**< Counter for SpacePoints where alle possible TrueHits have two weights */
+//
+//     unsigned int m_accSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, but only one of them has two weights, where a relation was registered to a TrueHit */
+//
+//     unsigned int m_accNonSingle2WTHCtr; /**< counter for SpacePoints with more than two possible TrueHits, with more than one of them having two weights where a relation was registered to a TrueHit */
+//
+//     unsigned int m_accAll2WTHCtr; /**< Counter for SpacePoints where alle possible TrueHits have two weights, where a relation was registered to a TrueHit */
+//
+//     unsigned int m_oneCluster2THCtr; /**< Counter for SpacePoints with only one Cluster but two possible TrueHits (in these cases, the one with the bigger weight gets automatically accepted) */
+//
+//     unsigned int m_moreThan2Weights; /**< Count the cases whith more than two weights */
+//
 
     void initializeCounters(); /**< initialize all counters to 0 */
 
@@ -192,6 +246,16 @@ namespace Belle2 {
     std::vector<typename MapType::mapped_type> getValuesToKey(const MapType& aMap, typename MapType::key_type aKey);
 
     /**
+     * get the key value pairs stored in the map, sorted after the following scheme (descending order)
+     * 1) the number of associated values to one key
+     * 2) the sum of the associated values to that key
+     * @returns a vector of tuples where get<0> is the key, get<1> is the sum of the values to the key and get<2> is the number of weights to the key
+     */
+    template <typename MapType>
+    std::vector<std::tuple<typename MapType::key_type, typename MapType::mapped_type, unsigned int> >
+    getSortedKeyValuePairs(const MapType& aMap);
+
+    /**
      * get the TrueHit from information that is stored in the map (conditions are checked in the following order):
      * + if there is only one TrueHit in the map, return a pointer to it and as weight the sum of the weights of the relations between the Clusters and the TrueHits
      * + if there is only one TrueHit in the map with two weights associated (and all other TrueHits have only one weight or there is no other TrueHit), return a pointer to it and the weight is again the sum of the weights in the map
@@ -201,7 +265,7 @@ namespace Belle2 {
      * NOTE: the possible return of a NULL pointer has to be handled!
      */
     template <typename MapType, typename TrueHitType>
-    std::pair<TrueHitType*, double> getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits, Belle2::SpacePoint* spacePoint);
+    std::pair<TrueHitType*, double> getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits, Belle2::SpacePoint* spacePoint, e_detTypes detType);
 
     /**
      * compares the TrueHit and the SpacePoint positions (global) to decide whether they are compatible
@@ -259,14 +323,57 @@ namespace Belle2 {
     template<typename TrueHitType>
     void registerTrueHitRelation(Belle2::SpacePoint* spacePoint, int index, double weight, Belle2::StoreArray<TrueHitType> trueHits);
 
-    BELLE2_DEFINE_EXCEPTION(NoTrueHitToCluster, "Found no related TrueHit for a Cluster!"); /**< Exception for when no related TrueHit can be found for a Cluster */
-
-    BELLE2_DEFINE_EXCEPTION(NoClusterToSpacePoint, "Found no related Cluster for a SpacePoint!"); /**< Exception for when no related Cluster can be found for a SpacePoint */
+    /**
+     * Analyze the position of SpacePoints and corresponding TrueHits
+     * @param spacePoint pointer to the SpacePoint
+     * @param trueHitMap map with the information to the (possibly) related TrueHits
+     * @param index (StoreArray) index of the TrueHit to which the relation actually got registered (if < 0 it is assumed that all possible relations were registered)
+     * @param detType the detector type
+     */
+    template<typename MapType>
+    void positionAnalysis(Belle2::SpacePoint* spacePoint, MapType trueHitMap, int index, e_detTypes detType);
 
     /** increase the appropriate counter to the exception */
     void increaseExceptionCounter(std::runtime_error& exception);
 
     /** get the local position of a SpacePoint */
     std::pair<double, double> getLocalPos(Belle2::SpacePoint* spacePoint);
-  };
-}
+
+    /** get the local (.first) and global (.second) position of a TrueHit (passed by index) */
+    template<typename TrueHitType>
+    std::pair<TVector3, TVector3> getTrueHitPositions(TrueHitType* trueHit);
+
+    /** initialize the root file that is used for output */
+    void initializeRootFile();
+
+    /** close root file */
+    void closeRootFile();
+  }; // end module
+
+  /** helper class for setting up a bitfield that can be used to store several flags in one variable
+  * TODO: move this from this header (possibly to some helperStuff header) and make some tests!
+  */
+  template<typename T>
+  class simpleBitfield {
+
+  public:
+    simpleBitfield() { __bits = T(); } //< default constructor
+    simpleBitfield(const simpleBitfield<T>& __otherBitfield) { __bits = __otherBitfield.__bits; } //< constructor from other bitfield
+
+    /** check if a certain status has been set to the bitfield */
+    const T hasStatus(T __statusBits) const { return (__bits & __statusBits) == __statusBits; }
+    /** get the status of the bitfield */
+    const T getStatus() const { return __bits; }
+    /** set the status of the bitfield (CAUTION: overwrites any previously defined status!) */
+    void setStatus(T __statusBits) { __bits = __statusBits; }
+    /** add a status to the bitfield (if it has not already been added) */
+    void addStatus(T __statusBits) { __bits |= __statusBits; }
+    /** remove a status from the bitfield */
+    void removeStatus(T __statusBits) { __bits &= __statusBits; }
+    /** reset bitfield */
+    void clear() { __bits = T(); }
+
+  private:
+    T __bits; /**< member holding the bits that are maniuplated */
+  }; // end class bitfield
+} // end namespace Belle2

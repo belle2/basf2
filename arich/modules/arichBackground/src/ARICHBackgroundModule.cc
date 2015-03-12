@@ -65,7 +65,7 @@ namespace Belle2 {
 
     ARICHBackgroundModule::~ARICHBackgroundModule()
     {
-      if (m_arichgp) delete m_arichgp;
+
     }
 
     void ARICHBackgroundModule::initialize()

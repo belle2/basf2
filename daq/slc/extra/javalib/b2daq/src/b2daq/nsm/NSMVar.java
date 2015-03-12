@@ -159,11 +159,8 @@ public class NSMVar implements Serializable {
     @Override
     public void readObject(Reader reader) throws IOException {
         m_node = reader.readString();
-        System.out.println(m_node);
         m_name = reader.readString();
-        System.out.println(m_name);
         m_type = reader.readInt();
-        System.out.println(m_type);
         m_len = reader.readInt();
         m_id = reader.readInt();
         m_revision = reader.readInt();
@@ -176,7 +173,6 @@ public class NSMVar implements Serializable {
                 m_var_i = new int[length];
                 for (int i = 0; i < length; i++) {
                     m_var_i[i] = reader.readInt();
-                System.out.println(m_var_i[i]);
                 }
                 return;
             case FLOAT:

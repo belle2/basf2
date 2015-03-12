@@ -15,7 +15,7 @@
 
 using namespace Belle2;
 
-bool RFMasterCallback::initialize(const DBObject& obj) throw()
+void RFMasterCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   if (obj.hasObject("dqmserver")) {
     m_nodes.push_back(NSMNode(obj.getObject("dqmserver").getText("nodename")));
@@ -42,10 +42,10 @@ bool RFMasterCallback::initialize(const DBObject& obj) throw()
     }
   }
   m_nodes.push_back(NSMNode(nodename));
-  return configure(obj);
+  configure(obj);
 }
 
-bool RFMasterCallback::configure(const DBObject&) throw()
+void RFMasterCallback::configure(const DBObject&) throw(RCHandlerException)
 {
   for (NSMNodeList::iterator it = m_nodes.begin();
        it != m_nodes.end(); it++) {
@@ -54,7 +54,6 @@ bool RFMasterCallback::configure(const DBObject&) throw()
     std::string vname = StringUtil::tolower(node.getName()) + ".rcstate";
     add(new NSMVHandlerText(vname, true, false, s.getLabel()));
   }
-  return true;
 }
 
 void RFMasterCallback::setState(NSMNode& node, const RCState& state)
@@ -130,15 +129,24 @@ void RFMasterCallback::load(const DBObject&) throw(RCHandlerException)
     if (NSMCommunicator::send(NSMMessage(node, RFCommand::UNCONFIGURE))) {
       setState(node, RCState::LOADING_TS);
       while (true) {
-        NSMCommunicator& com(wait(node, NSMCommand::UNKNOWN));
-        NSMMessage msg(com.getMessage());
-        NSMCommand cmd(msg.getRequestName());
-        if (cmd == NSMCommand::OK) {
-          ok(msg.getNodeName(), msg.getData());
-          break;
-        } else {
-          LogFile::debug("Unexpected reqeust : %s", msg.getRequestName());
-          perform(com);
+        try {
+          NSMCommunicator& com(wait(node, NSMCommand::UNKNOWN, 30));
+          NSMMessage msg(com.getMessage());
+          NSMCommand cmd(msg.getRequestName());
+          if (cmd == NSMCommand::OK) {
+            ok(msg.getNodeName(), msg.getData());
+            break;
+          } else if (cmd == NSMCommand::ERROR) {
+            error(msg.getNodeName(), msg.getData());
+            throw (RCHandlerException("Failed to configure %s due to error %s",
+                                      node.getName().c_str(), msg.getData()));
+          } else {
+            LogFile::debug("Unexpected reqeust : %s", msg.getRequestName());
+            perform(com);
+          }
+        } catch (const TimeoutException& e) {
+          throw (RCHandlerException("Failed to configure due to timeout from %s",
+                                    node.getName().c_str()));
         }
       }
     } else {
@@ -184,12 +192,14 @@ void RFMasterCallback::pause() throw(RCHandlerException)
 {
 }
 
-void RFMasterCallback::resume() throw(RCHandlerException)
+void RFMasterCallback::resume(int /*subno*/) throw(RCHandlerException)
 {
 }
 
-void RFMasterCallback::recover() throw(RCHandlerException)
+void RFMasterCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
+  abort();
+  load(obj);
 }
 
 

@@ -44,7 +44,9 @@ namespace Belle2 {
     virtual void nsmdataget(NSMCommunicator& com) throw();
 
   public:
-    bool reply(const NSMMessage& msg) throw(NSMHandlerException);
+    void reply(const NSMMessage& msg) throw(NSMHandlerException);
+    void replyError(const char* format, ...) throw(NSMHandlerException);
+    void replyLog(LogFile::Priority pri, const char* format, ...) throw(NSMHandlerException);
 
   public:
     NSMDataMap& getDataMap() throw() { return m_datas; }

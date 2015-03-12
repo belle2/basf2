@@ -27,6 +27,8 @@
 #include <cstring>
 #include <unistd.h>
 
+#define CAPITAL "B2_nsm"
+
 namespace Belle2 {
 
   class NSM2CA {
@@ -126,7 +128,7 @@ namespace Belle2 {
   inline long NSM2CA::init_data_in(T* record)
   {
     StringList str = StringUtil::split(record->name, ':');
-    if (str.size() >= 3 || str[0] == "nsm2") {
+    if (str.size() >= 3 || str[0] == CAPITAL) {
       IOSCANPVT* pvt = new IOSCANPVT;
       std::string name = StringUtil::toupper(str[1]);
       std::string format = str[2];
@@ -152,7 +154,7 @@ namespace Belle2 {
   inline long NSM2CA::read_data_in(aiRecord* record)
   {
     StringList str = StringUtil::split(record->name, ':');
-    if (str.size() >= 3 || str[0] == "nsm2") {
+    if (str.size() >= 3 || str[0] == CAPITAL) {
       std::string name = StringUtil::toupper(str[1]);
       NSMData& data(NSM2CACallback::get().getData(name));
       if (!data.isAvailable()) return 1;
@@ -170,7 +172,7 @@ namespace Belle2 {
   inline long NSM2CA::read_data_in(longinRecord* record)
   {
     StringList str = StringUtil::split(record->name, ':');
-    if (str.size() >= 3 || str[0] == "nsm2") {
+    if (str.size() >= 3 || str[0] == CAPITAL) {
       std::string name = StringUtil::toupper(str[1]);
       NSMData& data(NSM2CACallback::get().getData(name));
       if (!data.isAvailable()) {
@@ -204,7 +206,7 @@ namespace Belle2 {
                            std::string& node, std::string& vname)
   {
     StringList str = StringUtil::split(name, ':');
-    if (str.size() > 3 && str[0] == "nsm2" && str[1] == sufix) {
+    if (str.size() > 3 && str[0] == CAPITAL && str[1] == sufix) {
       node = str[2];
       vname = StringUtil::join(str, ".", 3);
       return true;

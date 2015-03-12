@@ -17,14 +17,14 @@ DQMViewCallback::DQMViewCallback(const NSMNode& node,
 {
   setNode(node);
   m_runcontrol = NSMNode(m_config.get("dqm.runcontrol"));
-  const std::string map_path = m_config.get("dqm.tmap.dir");
+  const std::string map_path = m_config.get("dqm.tmapdir");
   const std::string host = m_config.get("dqm.host");
   const int port = m_config.getInt("dqm.port");
-  StringList dqmlist = StringUtil::split(m_config.get("dqm.tmap.list"), ',');
-  m_dump_path = m_config.get("dqm.rootfiles.dir");
-  for (size_t i = 0; i < dqmlist.size(); i++) {
-    const std::string pack_name = m_config.get(StringUtil::form("dqm.%s.name", dqmlist[i].c_str()));
-    const std::string map_name = m_config.get(StringUtil::form("dqm.%s.file", dqmlist[i].c_str()));
+  int ntmap = m_config.getInt("dqm.ntmap");
+  m_dump_path = m_config.get("dqm.rootdir");
+  for (int i = 0; i < ntmap; i++) {
+    const std::string pack_name = m_config.get(StringUtil::form("dqm[%d].name", i));
+    const std::string map_name = m_config.get(StringUtil::form("dqm[%d].file", i));
     std::string mapfile = map_path + "/" + map_name;
     addReader(pack_name, mapfile);
   }
@@ -34,20 +34,21 @@ DQMViewCallback::DQMViewCallback(const NSMNode& node,
 
 void DQMViewCallback::init(NSMCommunicator&) throw()
 {
-  const std::string map_path = m_config.get("dqm.tmap.dir");
+  const std::string map_path = m_config.get("dqm.tmapdir");
   const std::string host = m_config.get("dqm.host");
   const int port = m_config.getInt("dqm.port");
-  StringList dqmlist = StringUtil::split(m_config.get("dqm.tmap.list"), ',');
-  add(new NSMVHandlerText("map_dir", true, false, map_path));
+  int ntmap = m_config.getInt("dqm.ntmap");
+  add(new NSMVHandlerText("tmapdir", true, false, map_path));
   add(new NSMVHandlerText("host", true, false, host));
   add(new NSMVHandlerInt("port", true, false, port));
-  add(new NSMVHandlerInt("npackages", true, false, dqmlist.size()));
+  add(new NSMVHandlerInt("npackages", true, false, ntmap));
   add(new NSMVHandlerText("runcontrol", true, false, m_runcontrol.getName()));
-  for (size_t i = 0; i < dqmlist.size(); i++) {
-    const std::string pack_name = m_config.get(StringUtil::form("dqm.%s.name", dqmlist[i].c_str()));
-    const std::string map_name = m_config.get(StringUtil::form("dqm.%s.file", dqmlist[i].c_str()));
+  for (int i = 0; i < ntmap; i++) {
+    std::string vname = StringUtil::form("dqm[%d]", i);
+    const std::string pack_name = m_config.get(vname + ".name");
+    const std::string map_name = m_config.get(vname + "file");
     std::string mapfile = map_path + "/" + map_name;
-    std::string vname = StringUtil::form("package[%d]", (int)i);
+    vname = StringUtil::form("package[%d]", i);
     add(new NSMVHandlerText(vname + ".name", true, false, pack_name));
     add(new NSMVHandlerText(vname + ".map", true, false, map_name));
     add(new NSMVHandlerText(vname + ".mapfile", true, false, mapfile));

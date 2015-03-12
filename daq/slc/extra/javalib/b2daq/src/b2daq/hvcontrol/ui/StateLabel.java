@@ -116,6 +116,8 @@ public final class StateLabel extends Pane {
         } else if (state.equals(HVState.PEAK_S)) {
             //set(state.getLabel(), Color.LIGHTGREEN, Color.LIMEGREEN, Color.WHITE);
             set(state.getLabel(), Color.CYAN, Color.CYAN, Color.BLACK);
+        } else if (state.equals(HVState.ON_S)) {
+            set(state.getLabel(), Color.LIGHTGREEN, Color.LIMEGREEN, Color.WHITE);
         } else if (state.isTransition()) {
             set(state.getLabel(), Color.ORANGE, Color.ORANGE, Color.BLACK);
         } else if (state.isError()) {

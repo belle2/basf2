@@ -101,11 +101,8 @@ public class PSSettingMainPanelController implements NSMObserver {
     @Override
     public void handleOnReceived(NSMMessage msg) {
         NSMCommand cmd = new NSMCommand(msg.getReqName());
-            System.out.println(msg.getNodeName()+" " + msg.getReqName());
-            System.out.println(msg.getNodeName()+" " + cmd.getLabel());
         if (cmd.equals(NSMCommand.VSET)) {
             NSMVar var = (NSMVar) msg.getObject();
-            System.out.println(var.getName());
             switch (var.getType()) {
                 case NSMVar.INT:
                     if (var.getName().contains("ncrates")) {

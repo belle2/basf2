@@ -1,4 +1,4 @@
-record(stringout, "nsm2:set:$(nodename):rcrequest")
+record(stringout, "B2_nsm:set:$(nodename):rcrequest")
 {
 	field(DESC, "Sent request to NSM2 node")
 	field(SCAN, "Passive")
@@ -6,7 +6,7 @@ record(stringout, "nsm2:set:$(nodename):rcrequest")
 	field(DTYP, "nsm2_vset_stringout")
 }
 
-record(stringin, "nsm2:get:$(nodename):rcstate")
+record(stringin, "B2_nsm:get:$(nodename):rcstate")
 {
 	field(DESC, "RC state response to NSM2 request") 
 	field(SCAN, "I/O Intr")
@@ -14,7 +14,7 @@ record(stringin, "nsm2:get:$(nodename):rcstate")
 	field(DTYP, "nsm2_vget_stringin")
 }
 
-record(stringout, "nsm2:set:$(nodename):rcrequest")
+record(stringout, "B2_nsm:set:$(nodename):rcrequest")
 {
 	field(DESC, "Sent request to NSM2 node")
 	field(SCAN, "Passive")
@@ -22,7 +22,7 @@ record(stringout, "nsm2:set:$(nodename):rcrequest")
 	field(DTYP, "nsm2_vset_stringout")
 }
 
-record(longin, "nsm2:get:$(nodename):stream0:sender[0]:pid")
+record(longin, "B2_nsm:get:$(nodename):stream0:sender[0]:pid")
 {
 	field(DESC, "RC state response to NSM2 request") 
 	field(SCAN, "I/O Intr")
@@ -30,7 +30,7 @@ record(longin, "nsm2:get:$(nodename):stream0:sender[0]:pid")
 	field(DTYP, "nsm2_vget_longin")
 }
 
-record(stringin, "nsm2:get:$(nodename):stream0:sender[0]:script")
+record(stringin, "B2_nsm:get:$(nodename):stream0:sender[0]:script")
 {
 	field(DESC, "RC state response to NSM2 request") 
 	field(SCAN, "I/O Intr")
@@ -38,7 +38,7 @@ record(stringin, "nsm2:get:$(nodename):stream0:sender[0]:script")
 	field(DTYP, "nsm2_vget_stringin")
 }
 
-record(stringout, "nsm2:set:$(nodename):stream1:script")
+record(stringout, "B2_nsm:set:$(nodename):stream1:script")
 {
 	field(DESC, "Setter of Basf2 script for stream1") 
 	field(SCAN, "Passive")
@@ -46,7 +46,7 @@ record(stringout, "nsm2:set:$(nodename):stream1:script")
 	field(DTYP, "nsm2_vset_stringout")
 }
 
-record(stringin, "nsm2:get:$(nodename):stream1:script")
+record(stringin, "B2_nsm:get:$(nodename):stream1:script")
 {
 	field(DESC, "Setter of Basf2 script for stream1") 
 	field(SCAN, "I/O Intr")

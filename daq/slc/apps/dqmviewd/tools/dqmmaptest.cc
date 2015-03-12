@@ -2,9 +2,14 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TRandom.h>
+#include <cstdio>
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    printf("Usage : %s <path_to_tmapfile>\n", argv[0]);
+    return 1;
+  }
   TMapFile* file = TMapFile::Create(argv[1], "recreate", 512000000, "test");
   TH1F* hx1 = new TH1F("FirstDet/h_HitXPositionCh01", "Hit X position (Ch-01);X [mm];Entires", 1000, -20, 20);
   TH1F* hy1 = new TH1F("FirstDet/h_HitYPositionCh01", "Hit Y position (Ch-01);Y [mm];Entires", 1000, -30, 30);

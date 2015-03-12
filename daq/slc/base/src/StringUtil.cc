@@ -59,7 +59,7 @@ std::string StringUtil::replace(const std::string& source,
 std::string StringUtil::form(const std::string& str, ...)
 {
   va_list ap;
-  static char ss[1024];
+  static char ss[1024 * 10];
   va_start(ap, str);
   vsprintf(ss, str.c_str(), ap);
   va_end(ap);

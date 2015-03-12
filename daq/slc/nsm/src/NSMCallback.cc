@@ -11,6 +11,8 @@
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
+#include <cstdarg>
+#include <cctype>
 
 using namespace Belle2;
 
@@ -37,7 +39,7 @@ void NSMCallback::addNode(const NSMNode& node)
   }
 }
 
-bool NSMCallback::reply(const NSMMessage& msg)
+void NSMCallback::reply(const NSMMessage& msg)
 throw(NSMHandlerException)
 {
   NSMMessage msg_out = msg;
@@ -51,7 +53,28 @@ throw(NSMHandlerException)
       m_nodes.erase(it++);
     }
   }
-  return true;
+}
+
+void NSMCallback::replyError(const char* format, ...)
+throw(NSMHandlerException)
+{
+  va_list ap;
+  char ss[1024 * 10];
+  va_start(ap, format);
+  vsprintf(ss, format, ap);
+  va_end(ap);
+  reply(NSMMessage(NSMCommand::ERROR, ss));
+}
+
+void NSMCallback::replyLog(LogFile::Priority pri, const char* format, ...)
+throw(NSMHandlerException)
+{
+  va_list ap;
+  char ss[1024 * 10];
+  va_start(ap, format);
+  vsprintf(ss, format, ap);
+  va_end(ap);
+  reply(NSMMessage(DAQLogMessage(getNode().getName(), pri, ss)));
 }
 
 bool NSMCallback::perform(NSMCommunicator& com) throw()

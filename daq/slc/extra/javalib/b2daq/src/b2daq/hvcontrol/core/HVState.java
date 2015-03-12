@@ -5,6 +5,7 @@ import b2daq.nsm.NSMState;
 public class HVState extends NSMState {
 
     final static public HVState UNKNOWN = new HVState(0, "UNKNOWN");
+    final static public HVState ON_S = new HVState(1, "ON");
     final static public HVState OFF_S = new HVState(2, "OFF");
     final static public HVState STABLE_S = new HVState(11, "STABLE");
     final static public HVState STANDBY_S = new HVState(12, "STANDBY");
@@ -60,6 +61,8 @@ public class HVState extends NSMState {
     public final void copy(String label) {
         if (label.matches(OFF_S._label)) {
             copy(OFF_S);
+        } else if (label.matches(ON_S._label)) {
+            copy(ON_S);
         } else if (label.matches(STABLE_S._label)) {
             copy(STABLE_S);
         } else if (label.matches(STANDBY_S._label)) {
@@ -91,6 +94,8 @@ public class HVState extends NSMState {
     public void copy(int id) {
         if (id == OFF_S._id) {
             copy(OFF_S);
+        } else if (id == ON_S._id) {
+            copy(ON_S);
         } else if (id == STABLE_S._id) {
             copy(STABLE_S);
         } else if (id == STANDBY_S._id) {

@@ -498,7 +498,6 @@ void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spa
 
       if (key == index) relationStatus.addStatus(c_registeredRelation);
 
-    cout << key << " " << index << endl;
     m_rootVariables.SpacePointULocal.push_back(spLocalPos.first);
     m_rootVariables.SpacePointVLocal.push_back(spLocalPos.second);
     m_rootVariables.SpacePointXGlobal.push_back(spacePoint->X());

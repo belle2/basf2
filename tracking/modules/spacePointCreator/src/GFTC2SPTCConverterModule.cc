@@ -116,6 +116,7 @@ void GFTC2SPTCConverterModule::event()
       std::pair<const SpacePointTrackCand, conversionStatus> spacePointTC = createSpacePointTC(trackCand, pxdClusters, svdClusters);
       // check if the SPTC contains enough SpacePoints
       if (spacePointTC.second == 0) {
+        if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME())) spacePointTC.first.print(50);
         SpacePointTrackCand* newSPTC = spacePointTrackCands.appendNew(spacePointTC.first);
         m_SpacePointTCCtr++;
         newSPTC->addRelationTo(trackCand);
@@ -188,6 +189,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
     fHitIDs.push_back(aPair);
   }
 
+  bool usedSingleCluster = false;
   // now loop over all hits and add them appropriately
   for (int iTCHit = 0; iTCHit < nHits; ++iTCHit) {
     genfit::TrackCandHit* aTCHit = genfitTC->getHit(iTCHit);
@@ -199,7 +201,8 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
     } else {
       std::pair<SpacePoint*, conversionStatus> aSpacePoint = processTrackCandHit(aTCHit, pxdClusters, svdClusters, fHitIDs, iTCHit);
 
-      if (aSpacePoint.first != NULL && (aSpacePoint.second == c_noFail || aSpacePoint.second == c_nonSingleSP)) { // if there is more than one single Cluster SpacePoint related to a Cluster, add one
+      if (aSpacePoint.first != NULL && (aSpacePoint.second >= 0 || aSpacePoint.second == c_nonSingleSP)) {  // if there is more than one single Cluster SpacePoint related to a Cluster, add one
+        if (aSpacePoint.second == c_singleClusterSP) usedSingleCluster = true;
         tcSpacePoints.push_back({sortingParam, aSpacePoint.first});
         B2DEBUG(60, "Added SpacePoint " << aSpacePoint.first->getArrayIndex() << " from Array " << aSpacePoint.first->getArrayName() << " to tcSpacePoints");
         m_NDF += getNDF(aSpacePoint.first);
@@ -207,7 +210,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
         convStatus = aSpacePoint.second;
         B2DEBUG(60, "There was an error during conversion: for Hit " << iTCHit << ": " << convStatus)
         if (!m_PARAMskipCluster) {
-          B2DEBUG(10, "There was an error during conversion for a GFTC.  'splitCurlers' is set to false, hence this trackCand will not be converted!")
+          B2DEBUG(10, "There was an error during conversion for a GFTC. 'splitCurlers' is set to false, hence this trackCand will not be converted!")
           return std::make_pair(SpacePointTrackCand(), convStatus); // return empty SPTC if there is a conversion error and splitCurlers is set to false
         }
       }
@@ -242,6 +245,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
 
   if (m_PARAMcheckTrueHits) { spacePointTC.addRefereeStatus(SpacePointTrackCand::c_checkedTrueHits); }
   if (!usedAllHits) { spacePointTC.addRefereeStatus(SpacePointTrackCand::c_omittedClusters); }
+  if (usedSingleCluster) { spacePointTC.addRefereeStatus(SpacePointTrackCand::c_singleClustersSPs); }
 
   return std::make_pair(spacePointTC, c_noFail);
 }
@@ -262,6 +266,7 @@ GFTC2SPTCConverterModule::processTrackCandHit(genfit::TrackCandHit* hit, const S
     const PXDCluster* aCluster = pxdClusters[hitID];
     returnSP = getSpacePoint<PXDCluster, PXDTrueHit>(aCluster, flaggedHitIDs, iHit, true, m_PXDClusterSPName);
     if (m_PARAMskipCluster) { increaseSkippedCounter(returnSP.second, aCluster); } // have to do this here at the moment -> COULDDO; change increaseSkippedCounter, such that it can be used without a Cluster
+    if (returnSP.second == c_singleClusterSP) returnSP.second = c_noFail; // getSpacePoint returns singleClusterSP for PXDs!
   } else if (detID == Const::SVD) {
     const SVDCluster* aCluster = svdClusters[hitID];
     returnSP = getSpacePoint<SVDCluster, SVDTrueHit>(aCluster, flaggedHitIDs, iHit, false, m_NoSingleClusterSVDSPName);
@@ -295,6 +300,7 @@ GFTC2SPTCConverterModule::getSpacePoint(const ClusterType* cluster, std::vector<
       m_nonSingleSPCtr++;
     }
     spacePoint.first = spacePoints[0];
+    spacePoint.second = c_singleClusterSP;
     markHitAsUsed(flaggedHitIDs, iHit); // mark hit as used
   } else {
     spacePoint = findAppropriateSpacePoint<ClusterType>(spacePoints, flaggedHitIDs); // try to get the appropriate double Cluster SVD SpacePoint
@@ -479,14 +485,17 @@ int GFTC2SPTCConverterModule::getAppropriateSpacePointIndex(const std::vector<st
 // =============================================================================== CHECK USED ALL HITS ==========================================================================
 bool GFTC2SPTCConverterModule::checkUsedAllHits(std::vector<flaggedPair<int> >& flaggedHitIDs)
 {
+  bool usedAll = true; // defining variable here so that all hits are checked (debug output)
   for (unsigned int i = 0; i < flaggedHitIDs.size(); ++i) {
     flaggedPair<int> fPair = flaggedHitIDs[i];
     B2DEBUG(200, "Hit " << i << " with (detID,hitID): (" << fPair.get<1>() << "," << fPair.get<2>() << ") has been used: " << fPair.get<0>());
     if (!fPair.get<0>()) {
-      return false;
+//       return false;
+      usedAll = false;
     }
   }
-  return true;
+//   return true;
+  return usedAll;
 }
 
 // ================================================== FOUND RELATED TRUEHIT =================================================================

@@ -29,14 +29,15 @@ namespace Belle2 {
    * NOTE: requires:
    * + a StoreArray with PXD only SpacePoints
    * + a StoreArray with SVD SpacePoints, where only SpacePoints with a U & a V Cluster are present
-   * + a StoreArray with SVD SpacePoints, where every Cluster has its own SpacePoint
+   * + a StoreArray with SVD SpacePoints, where every Cluster has its own SpacePoint (if 'useSingleClusterSP' is set to true)
    *
    * Intended Behaviour: The Module takes a genfit::TrackCand and converts it to a SpacePointTrackCand by taking the TrackCandHits of the TrackCand and searching the DataStore for the according Clusters and then look for Relations of these Clusters to SpacePoints (without loosing any information of the genfit::TrackCand, such that every hit in the genfit::TrackCand can be found in a SpacePoint in the SpacePointTrackCand). Employing a somewhat sloppy notation below regarding Clusters and TrackCandHits, since they are essentially the same for this Module.
    *
-   * NOTE: There are cases where the conversion cannot be done properly, in this case the genfit::TrackCand is skipped and will not be converted!
+   * NOTE: There are cases where the conversion cannot be done properly, in this case the genfit::TrackCand is skipped and will not be converted (by default, there are parameters that can change this behavior to only skip problematic Clusters)!
    * Problems only occur, when a Cluster is not unambiguously related to a SpacePoint (i.e. a Cluster is related to more than one SpacePoint), because:
    * + the decision which SpacePoint to use is not trivial in most cases. If no well defined decision can be made, the TrackCand will be skipped (see below how this decision is made, and when it is considered 'well defined')
    * + If no decision can be made and every SpacePoint would be added, problems would only be postponed to the conversion of SpacePointTrackCand to genfit::TrackCand, where it is even harder to decide what is right and what is wrong.
+   * + To have a handle later on SpacePointTrackCands now have some flags to check what problems occured during conversion
    *
    * Some statements on how the module works for a given (SVD) Cluster (TrackCandHit)
    * 1) Check if the Cluster (TrackCandHit) has already been used (i.e. it is already contained in the SpacePointTrackCand via a SpacePoint). If not used
@@ -51,9 +52,7 @@ namespace Belle2 {
    *
    * If no SpacePoint can be found for any Cluster in the genfit::TrackCand, an exception is thrown, and the conversion is skipped.
    *
-   * Some Statements on how TrueHits are checked (if activated)
-   * 1) for PXD SpacePoints or single Cluster SVD SpacePoints it is only checked if a relation to ONLY ONE TrueHits exists
-   * 2) for double Cluster SVD SpacePoints, all TrueHits related to both SVDClusters are collected. The collection is then searched for TrueHits appearing twice. All TrueHits appearing twice are removed (such that they appear only once now). If ONLY one TrueHit is left after this, the SpacePoint passes the check
+   * If 'checkTrueHits' is enabled the module only checks the DataStore if there is an existing relation to a TrueHit. Depending on the parameters the conversion of the genfit::TrackCand is aborted or only the Cluster is skipped from Conversion. (The registering of the relation has to be done with the SpacePoint2TrueHitConnector)
    *
    * TODO: clean-up and bring in line with coding conventions!
    */
@@ -76,6 +75,7 @@ namespace Belle2 {
      * negative values mean fail!
      */
     enum conversionStatus {
+      c_singleClusterSP = 1, /**< had to use a singleCluster SpacePoint (also returned if PXD is passed! */
       c_noFail = 0, /**< conversion without any problems */
       c_foundNoSpacePoint = -1, /**< conversion failed because no related SpacePoint was found to a Cluster/Hit of the GFTC */
       c_foundNoTrueHit = -2, /**< conversion failed because there was no related SpacePoint to a TrueHit */
@@ -89,6 +89,7 @@ namespace Belle2 {
     /** get the enum representation of an integer */
     conversionStatus getFailEnum(int intToConvert) {
       switch (intToConvert) {
+        case 1: return c_singleClusterSP;
         case 0: return c_noFail;
         case -1: return c_foundNoSpacePoint;
         case -2: return c_foundNoTrueHit;
@@ -218,6 +219,8 @@ namespace Belle2 {
       if (layerNumber > 6) throw SpacePointTrackCand::UnsupportedDetType();
       switch (status) {
         case c_noFail:
+          break;
+        case c_singleClusterSP:
           break;
         case c_foundNoSpacePoint:
           if (layerNumber < 3) m_skippedPXDnoSPCtr++;

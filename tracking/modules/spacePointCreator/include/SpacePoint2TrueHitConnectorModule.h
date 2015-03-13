@@ -165,9 +165,9 @@ namespace Belle2 {
 
     RootVariables m_rootVariables; /**< Root variables used for collecting data eventwise */
 
-    TFile* m_rootFilePtr; //< pointer to root file
+    TFile* m_rootFilePtr; /**< pointer to root file */
 
-    TTree* m_treePtr; //< pointer to tree in root file
+    TTree* m_treePtr; /**< pointer to tree in root file */
 
 
     // ================================================= COUNTERS =================================================================
@@ -357,8 +357,8 @@ namespace Belle2 {
   class simpleBitfield {
 
   public:
-    simpleBitfield() { __bits = T(); } //< default constructor
-    simpleBitfield(const simpleBitfield<T>& __otherBitfield) { __bits = __otherBitfield.__bits; } //< constructor from other bitfield
+    simpleBitfield() { __bits = T(); } /**< default constructor */
+    simpleBitfield(const simpleBitfield<T>& __otherBitfield) { __bits = __otherBitfield.__bits; } /**< constructor from other bitfield */
 
     /** check if a certain status has been set to the bitfield */
     const T hasStatus(T __statusBits) const { return (__bits & __statusBits) == __statusBits; }

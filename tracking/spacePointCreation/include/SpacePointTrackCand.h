@@ -62,6 +62,7 @@ namespace Belle2 {
       c_checkedMinDistance =  128, /**< bit 7: It has been checked if two consecutive SpacePoints are far enough apart */
       c_curlingTrack = 256, /**< bit 8: SpacePointTrackCand is curling (resp. is part of a curling SpacePointTrackCand) */
       c_omittedClusters = 512, /**< bit 9: Not all Clusters of the genfit::TrackCand have been used to create this SpacePointTrackCand */
+      c_singleClustersSPs = 1024, /**< bit 10: The SpacePointTrackCand contains single Cluster SpacePoints */
     };
 
     /**

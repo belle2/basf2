@@ -214,16 +214,16 @@ void ECLMCMatchingModule::event()
             ene = ene + aECLSimHit->getEnergyDep();
             //iter->second += ene;
             //eclMCParticleContributionMap.insert(pair<int, float>((int) eclSimHitRel[iMCPart].getFromIndex(), ene));
-            cout << "End, ShowerId: " << showerId << " MCParticle: " << iMCPart << " Energy dep: " << aECLSimHit->getEnergyDep() << " Ene: " << ene << " Crystal: " << aECLSimHit->getCellId() - 1 << endl;
-            cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+            //cout << "End, ShowerId: " << showerId << " MCParticle: " << iMCPart << " Energy dep: " << aECLSimHit->getEnergyDep() << " Ene: " << ene << " Crystal: " << aECLSimHit->getCellId()-1 << endl;
+            //cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
           } else {
             ene = ene + aECLSimHit->getEnergyDep();
             //iter->second += ene;
             //iter->second += aECLSimHit->getEnergyDep();
-            cout << "ShowerId: " << showerId << " MCParticle: " << iMCPart << " Energy dep: " << aECLSimHit->getEnergyDep() << " Crystal: " << aECLSimHit->getCellId() - 1 << endl;
-            cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+            //cout << "ShowerId: " << showerId << " MCParticle: " << iMCPart << " Energy dep: " << aECLSimHit->getEnergyDep() << " Crystal: " << aECLSimHit->getCellId()-1 << endl;
+            //cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
           }
-          cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+          //cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
         }//for simhit
         //cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
       }//for hANum //iMCPart
@@ -236,25 +236,25 @@ void ECLMCMatchingModule::event()
     int MaxContribution = 0;
     //cout << "Contributions to shower " << showerId << " : " << eclMCParticleContributionMap.size() << endl;
     for (map<int, float>::iterator i = eclMCParticleContributionMap.begin(); i != eclMCParticleContributionMap.end(); ++i) {
-      cout << "ShowerID: " << showerId << " Energy: " << aECLShower->getEnergy() << " MCParticle: " << (*i).first << endl;
-      cout << "Cand.: " << (*i).first << " contribution (GeV): " << (*i).second << endl;
-      cout << "********************************************" << endl;
+      //cout << "ShowerID: " << showerId << " Energy: " << aECLShower->getEnergy() << " MCParticle: " << (*i).first << endl;
+      //cout << "Cand.: " << (*i).first << " contribution (GeV): " << (*i).second << endl;
+      //cout << "********************************************" << endl;
       mc_relations[(*i).first] += (*i).second;///aECLShower->getEnergy();
       //      eclShowerToMCParts.add(showerId,  mc_relations.begin(), mc_relations.end());
       if ((*i).second > MaxContribution) {MaxContribution = (*i).second ;  PrimaryIndex = (*i).first ;}
     }
 
-    for (map<int, float>::iterator i = mc_relations.begin(); i != mc_relations.end(); ++i) {
-      //if(mc_relations.size()>kk){
-      cout << "ShowerID: " << showerId << " MCParticle: " << (*i).first << endl;
-      cout << "Check cand.: " << (*i).first << " contribution (GeV): " << (*i).second << endl;
-      cout << "-----------------------------------------" << endl;
-      //mc_relations[(*i).first] += (*i).second;
-      //      eclShowerToMCParts.add(showerId,  mc_relations.begin(), mc_relations.end());
-      //kk++;
-      //}
-    }
-    cout << "-----------------------------------------" << endl;
+    //for (map<int, float>::iterator i = mc_relations.begin(); i != mc_relations.end(); ++i) {
+    //if(mc_relations.size()>kk){
+    //cout << "ShowerID: " << showerId << " MCParticle: " << (*i).first << endl;
+    //cout << "Check cand.: " << (*i).first << " contribution (GeV): " << (*i).second << endl;
+    //cout << "-----------------------------------------" << endl;
+    //mc_relations[(*i).first] += (*i).second;
+    //      eclShowerToMCParts.add(showerId,  mc_relations.begin(), mc_relations.end());
+    //kk++;
+    //}
+    //  }
+    //cout << "-----------------------------------------" << endl;
     //*/
     eclMCParticleContributionMap.clear();
 
@@ -327,29 +327,30 @@ void ECLMCMatchingModule::event()
       //eclShowerToMCPart.add(showerId, PrimaryIndex);
 
       for (map<int, float>::iterator i = mc_relations.begin(); i != mc_relations.end(); ++i) {
-        cout << "MC Relations: " << mc_relations.size() << endl;
+        //cout << "MC Relations: " << mc_relations.size() << endl;
         //if((mc_relations.size())>(jj)){
-        cout << "ShowerID: " << showerId << " MCParticle: " << (*i).first << endl;
+        //cout << "ShowerID: " << showerId << " MCParticle: " << (*i).first << endl;
         eclShowerToMCPart.add(showerId, (*i).first, (*i).second);
-        cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
+        //cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
         //jj++;
         //}
       }
-      cout << "Winner, ShowerID: " << showerId << " MCParticle: " << PrimaryIndex << endl;
-      cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
+      //cout << "Winner, ShowerID: " << showerId << " MCParticle: " << PrimaryIndex << endl;
+      //cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
     }
     mc_relations.clear();
   }//ShowerNum
 
   //Following FOR is for test purposes
+  /*
   for (int index = 0; index < eclShowerToMCPart.getEntries(); index++) {
     cout << "Entries: " << eclShowerToMCPart.getEntries() << endl;
     cout << "ShowerId: " << (int)eclShowerToMCPart[index].getFromIndex() << endl;
     cout << "Cand.: " << (int)eclShowerToMCPart[index].getToIndex() << endl;
     cout << "Weight: " << (float)eclShowerToMCPart[index].getWeight() << endl;
     cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << endl;
-  }
-  cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << endl;
+    }*/
+  //cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << endl;
 
 
   //... Related ECLClustertoMCParticle
@@ -448,9 +449,9 @@ void ECLMCMatchingModule::event()
       }//for all Pi0ToGamma relation
     }//if pi0Array exit
    */
-  cout << "Event: " << m_nEvent << endl;
-  cout << "-----------------------------------------" << endl;
-  cout << "-----------------------------------------" << endl;
+  //cout << "Event: " << m_nEvent << endl;
+  //cout << "-----------------------------------------" << endl;
+  //cout << "-----------------------------------------" << endl;
   m_nEvent++;
 
 }

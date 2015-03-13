@@ -71,77 +71,88 @@ void SPTC2GFTCConverterModule::event()
     const SpacePointTrackCand* trackCand = spacePointTCs[iTC];
     m_SpacePointTCCtr += 1;
 
-    try {
-      genfit::TrackCand genfitTC;
-      B2DEBUG(20, "SpacePointTrackCand " << iTC << " contains " << trackCand->getNHits() << " SpacePoints")
+    genfit::TrackCand genfitTC;
+    B2DEBUG(20, "SpacePointTrackCand " << iTC << " contains " << trackCand->getNHits() << " SpacePoints")
 
-      std::vector<const SpacePoint*> tcSpacePoints = trackCand->getHits();
-      std::vector<double> sortingParams = trackCand->getSortingParameters();
+    std::vector<const SpacePoint*> tcSpacePoints = trackCand->getHits();
+    std::vector<double> sortingParams = trackCand->getSortingParameters();
 
-      // loop over all SpacePoints and look at their relations
-      for (unsigned int iTCSP = 0; iTCSP < tcSpacePoints.size(); ++iTCSP) {
-        const SpacePoint* aSP = tcSpacePoints[iTCSP];
-        double sortingParam = sortingParams[iTCSP];
+    // loop over all SpacePoints and look at their relations
+    for (unsigned int iTCSP = 0; iTCSP < tcSpacePoints.size(); ++iTCSP) {
+      const SpacePoint* aSP = tcSpacePoints[iTCSP];
+      double sortingParam = sortingParams[iTCSP];
 
-        auto detType = aSP->getType();
+      auto detType = aSP->getType();
+      int detID = detType == VXD::SensorInfoBase::SVD ? Const::SVD : Const::PXD;
+      vector<int> clusterInds;
 
-        if (detType == VXD::SensorInfoBase::PXD) {
-          // the relation between SpacePoints & PXDClusters is bijective, hence it is unecessary to search for more than one relations
-          PXDCluster* pxdCluster = aSP->getRelatedTo<PXDCluster>(m_PXDClustersName);
-          if (pxdCluster == NULL) {
-            B2ERROR("Found no relation to a PXDCluster in StoreArray" << m_PXDClustersName << " for SpacePoint " << aSP->getArrayIndex() << " from StoreArray" << aSP->getArrayName() << ". This SpacePoint will be skipped and will not be contained in the genfit::TrackCand");
-            throw (ClusterNotFound());
-          }
-          int hitID = pxdCluster->getArrayIndex();
-          genfitTC.addHit(Const::PXD, hitID, -1, sortingParam); // setting PlaneID to -1
-          B2DEBUG(60, "Added PXDCluster " << hitID << " from StoreArray " << pxdCluster->getArrayName() << " to genfit::TrackCand");
-        } else if (detType == VXD::SensorInfoBase::SVD) {
-          // More than one SVD Cluster can be related from a SpacePoint (maximum two), hence get all related Clusters and add them
-          RelationVector<SVDCluster> svdClusters = aSP->getRelationsTo<SVDCluster>(m_SVDClustersName);
-          if (svdClusters.size() > 2) { throw SpacePoint::InvalidNumberOfClusters(); }
-          else if (svdClusters.size() == 0) {
-            B2ERROR("Found no relation to a SVDCluster in StoreArray" << m_SVDClustersName << " for SpacePoint " << aSP->getArrayIndex() << " from StoreArray" << aSP->getArrayName() << ". This SpacePoint will be skipped and will not be contained in the genfit::TrackCand");
-            throw (ClusterNotFound());
-          }
-          B2DEBUG(70, "Found " << svdClusters.size() << " SVD Clusters related to SpacePoint");
-          for (const SVDCluster & aCluster : svdClusters) {
-            int hitID = aCluster.getArrayIndex();
-            genfitTC.addHit(Const::SVD, hitID, -1, sortingParam); // setting PlaneID to -1
-            B2DEBUG(60, "Added SVDCluster " << hitID << " from StoreArray " << aCluster.getArrayName()  << " to genfit::TrackCand");
-          }
-        } else {
-          throw SpacePointTrackCand::UnsupportedDetType();
-        }
+      try {
+
+        if (detType == VXD::SensorInfoBase::PXD) { clusterInds = getRelatedClusters<PXDCluster>(aSP, m_PXDClustersName); }
+        else if (detType == VXD::SensorInfoBase::SVD) { clusterInds = getRelatedClusters<SVDCluster>(aSP, m_SVDClustersName); }
+        else throw SpacePointTrackCand::UnsupportedDetType();
+
+      } catch (std::runtime_error& anE) {
+        B2WARNING("Caught exception during creation of a genfit::TrackCand: " << anE.what())
+        m_skippedSPsCtr++;
+        continue; // with next SpacePoint
+      } catch (...) {
+        B2WARNING("Caught unknown exception during conversion from SPTC to GFTC!")
+        throw;
       }
 
-      // set other properties of TrackCand
-      genfitTC.set6DSeedAndPdgCode(trackCand->getStateSeed(), trackCand->getPdgCode());
-      genfitTC.setCovSeed(trackCand->getCovSeed());
-      genfitTC.setMcTrackId(trackCand->getMcTrackID());
-
-      // add genfit::TrackCand to StoreArray
-      m_genfitTCCtr += 1;
-//       genfitTC.Print(); // debug purposes
-      B2DEBUG(15, "genfit::TrackCand contains " << genfitTC.getNHits() << "TrackCandHits.");
-      genfit::TrackCand* newTC = genfitTCs.appendNew(genfitTC);
-      trackCand->addRelationTo(newTC);
-    } catch (SpacePointTrackCand::UnsupportedDetType& anException) {
-      B2WARNING("Caught exception during conversion from SpacePointTrackCand to genfit::TrackCand: " << anException.what() << ". This SpacePointTrackCand was skipped!")
-    } catch (SpacePoint::InvalidNumberOfClusters& anException) {
-      B2WARNING("Caught exception during conversion from SpacePointTrackCand to genfit::TrackCand: " << anException.what() << ". This SpacePointTrackCand was skipped!")
-    } catch (ClusterNotFound& anException) {
-      B2WARNING("Caught exception during conversion from SpacePointTrackCand to genfit::TrackCand: " << anException.what() << ". This SpacePointTrackCand was skipped!")
+      for (int hitID : clusterInds) {
+        genfitTC.addHit(detID, hitID, -1, sortingParam);
+        B2DEBUG(60, "Added Cluster " << hitID << " with detID " << detID << " to genfit::TrackCand")
+      }
     }
+
+    // set other properties of TrackCand
+    genfitTC.set6DSeedAndPdgCode(trackCand->getStateSeed(), trackCand->getPdgCode());
+    genfitTC.setCovSeed(trackCand->getCovSeed());
+    genfitTC.setMcTrackId(trackCand->getMcTrackID());
+
+    // add genfit::TrackCand to StoreArray
+    m_genfitTCCtr++;
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 150, PACKAGENAME())) genfitTC.Print(); // debug purposes
+    B2DEBUG(15, "genfit::TrackCand contains " << genfitTC.getNHits() << " TrackCandHits.");
+    genfit::TrackCand* newTC = genfitTCs.appendNew(genfitTC);
+    trackCand->addRelationTo(newTC);
+    B2DEBUG(15, "Added relation between SPTC " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() << " and GFTC.")
   }
 }
 
 void SPTC2GFTCConverterModule::terminate()
 {
-  B2INFO("SPTC2GFTCConverter::terminate: got " << m_SpacePointTCCtr << " SpacePointTrackCands and created " << m_genfitTCCtr << " genfit::TrackCands");
+  stringstream output;
+  output << "SPTC2GFTCConverter::terminate: got " << m_SpacePointTCCtr << " SpacePointTrackCands and created " << m_genfitTCCtr << " genfit::TrackCands";
+  if (m_skippedSPsCtr) output << ". " << m_skippedSPsCtr << " SpacePoints were skipped!";
+  B2INFO(output.str());
+}
+
+// ========================================== GET RELATED CLUSTERS ================================================================
+template<typename ClusterType>
+std::vector<int> SPTC2GFTCConverterModule::getRelatedClusters(const Belle2::SpacePoint* spacePoint, const std::string& clusterNames)
+{
+  std::vector<int> clusterInds;
+
+  RelationVector<ClusterType> relatedClusters = spacePoint->getRelationsTo<ClusterType>(clusterNames);
+  if (relatedClusters.size() == 0) {
+    B2DEBUG(1, "Found no related Clusters for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
+    throw ClusterNotFound();
+  } else if (relatedClusters.size() > 2) throw SpacePoint::InvalidNumberOfClusters();
+
+  for (const ClusterType & cluster : relatedClusters) {
+    clusterInds.push_back(cluster.template getArrayIndex());
+    B2DEBUG(60, "Cluster " << cluster.template getArrayIndex() << " from Array " << cluster.template getArrayName() << " is related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
+  }
+
+  return clusterInds;
 }
 
 void SPTC2GFTCConverterModule::initializeCounters()
 {
   m_SpacePointTCCtr = 0;
   m_genfitTCCtr = 0;
+  m_skippedSPsCtr = 0;
 }

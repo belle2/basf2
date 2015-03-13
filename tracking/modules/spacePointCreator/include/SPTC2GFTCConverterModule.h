@@ -11,6 +11,10 @@
 
 #include <framework/core/Module.h>
 
+// #include <framework/datastore/RelationVector.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <genfit/TrackCand.h>
+
 namespace Belle2 {
   /**
    * Module for converting SpacePointTrackCands to genfit::SpacePointTrackCands.
@@ -43,7 +47,15 @@ namespace Belle2 {
 
     unsigned int m_genfitTCCtr; /**< Counter for genfit::TrackCands that were actually created by the module */
 
+    unsigned int m_skippedSPsCtr; /**< Counter for SpacePoints that were not converted */
+
     void initializeCounters(); /**< reset counters to 0 to avoid indeterministic behaviour */
+
+    /** get all related Clusters to a SpacePoint
+     * @param clusterNames the Name of the StoreArray where Clusters shall be looked for
+     */
+    template<typename ClusterType>
+    std::vector<int> getRelatedClusters(const Belle2::SpacePoint* spacePoint, const std::string& clusterNames = "ALL");
 
     BELLE2_DEFINE_EXCEPTION(ClusterNotFound, "No related Cluster to a SpacePoint was found."); /**< Exception thrown, when no related Cluster can be found for a SpacePoint */
   };

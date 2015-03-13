@@ -143,8 +143,8 @@ std::vector<int> SPTC2GFTCConverterModule::getRelatedClusters(const Belle2::Spac
   } else if (relatedClusters.size() > 2) throw SpacePoint::InvalidNumberOfClusters();
 
   for (const ClusterType & cluster : relatedClusters) {
-    clusterInds.push_back(cluster.template getArrayIndex());
-    B2DEBUG(60, "Cluster " << cluster.template getArrayIndex() << " from Array " << cluster.template getArrayName() << " is related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
+    clusterInds.push_back(cluster.getArrayIndex());
+    B2DEBUG(60, "Cluster " << cluster.getArrayIndex() << " from Array " << cluster.getArrayName() << " is related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
   }
 
   return clusterInds;

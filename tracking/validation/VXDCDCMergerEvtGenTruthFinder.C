@@ -26,9 +26,9 @@ void VXDCDCMergerEvtGenTruthFinder(){
   //TCanvas *c1 = new TCanvas("c1","prova",10,10,700,500);
   //c1->SetFillColor(0);
 
-  TH1F *h1 = new TH1F("h1","Merged Tracks Truth Track Finder",10,0,10);
+  TH1F *h1 = new TH1F("h1","Merged Tracks EvtGenTruthFinder",10,0,10);
   h1->GetXaxis()->SetTitle("# of merged tracks");
-  h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for single 1GeV charged muon")); 
+  h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for EvtGen events")); 
   h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 1"));
   h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //tree->Draw("eclClusterEnergy>>hClusterE","eclClusterEnergy>0");
@@ -135,25 +135,27 @@ void VXDCDCMergerEvtGenTruthFinder(){
 
  /////////////SCANS//////////////
 
-  TH1F *h22 = new TH1F("h22","Eff vs Pt Truth Track Finder",100,0.,5.);
+  TH1F *h22 = new TH1F("h22","Eff vs Theta EvtGenTruthFinder",100,0.,3.);
   h22->SetMaximum(1.1);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h22","TruthTag==1");
   h22->Sumw2();
-  TH1F *eff_thetaEgtt = new TH1F("eff_thetaEgtt","Eff vs Pt Truth Track Finder",100,0.,5.);
-  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_thetaEgtt","TruthTag==1&&GoodTag==1");
-  eff_thetaEgtt->SetMaximum(1.1);
-  eff_thetaEgtt->Sumw2();
+  TH1F *eff_ptEG = new TH1F("eff_ptEG","Eff vs Pt EvtGen Truth Track Finder",100,0.,3.);
+  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_ptEG","TruthTag==1&&GoodTag==1");
+  eff_ptEG->SetMaximum(1.1);
+  eff_ptEG->Sumw2();
   gPad->RedrawAxis();
-  //eff_thetaEgtt->Divide(h22);
-  //eff_thetaEgtt->GetYaxis()->SetRange(0,2);
-  //eff_thetaEgtt->Draw("E");
-  TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt Truth Track Finder",100,0.,5.);
+  //eff_ptEG->Divide(h22);
+  //eff_ptEG->GetYaxis()->SetRange(0,2);
+  //eff_ptEG->Draw("E");
+  TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt EvtGen Truth Track Finder",100,0.,3.);
   //TLegend *leg1= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. Pt");
-  eff_pt->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt")); 
-  eff_pt->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
-  eff_pt->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_pt=eff_thetaEgtt;
-  eff_pt->Divide(eff_thetaEgtt, h22, 1.0, 1.0, "B");
+  eff_ptEG->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt")); 
+  eff_ptEG->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
+  eff_ptEG->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_ptEG->GetXaxis()->SetTitle("Pt (GeV)");
+  eff_ptEG->GetYaxis()->SetTitle("Efficiency");
+  eff_pt=eff_ptEG;
+  eff_pt->Divide(eff_ptEG, h22, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position
@@ -162,29 +164,31 @@ void VXDCDCMergerEvtGenTruthFinder(){
   gPad->RedrawAxis();
   eff_pt->Draw("E");
   //leg1->Draw();
-    //c1->SaveAs("plots/EffvsPt_5GeV_muons_1000_Theta.jpg");
+    //c1->SaveAs("plots/EffvsPt_5GeV_muons_1000_Pt.jpg");
   eff_pt->Write();
-  delete eff_pt;
+  //delete eff_pt;
 
-  TH1F *h24 = new TH1F("h24","Eff vs Theta EvtGen Truth Track Finder",50, -1, 1.);
+  TH1F *h24 = new TH1F("h24","Eff vs Theta Truth Track Finder",50, -1, 1.);
   h24->SetMaximum(1.1);
   tree->Draw("(Pz/(P))>>h24","TruthTag==1");
   h24->Sumw2();
-  TH1F *eff_ptEGtt = new TH1F("eff_ptEGtt","Eff vs Theta Truth Track Finder",50, -1, 1.);
-  eff_ptEGtt->SetMaximum(1.1);
-  tree->Draw("(Pz/(P))>>eff_ptEGtt","TruthTag==1&&GoodTag==1");
-  eff_ptEGtt->Sumw2();
+  TH1F *eff_thetaEG = new TH1F("eff_thetaEG","Eff vs Theta EvtGen Truth Track Finder",50, -1, 1.);
+  eff_thetaEG->SetMaximum(1.1);
+  tree->Draw("(Pz/(P))>>eff_thetaEG","TruthTag==1&&GoodTag==1");
+  eff_thetaEG->Sumw2();
   gPad->RedrawAxis();
-  //eff_ptEGtt->Divide(h24);
-  //eff_ptEGtt->GetYaxis()->SetRange(0,2);
-  //eff_ptEGtt->Draw("E");
+  //eff_thetaEG->Divide(h24);
+  //eff_thetaEG->GetYaxis()->SetRange(0,2);
+  //eff_thetaEG->Draw("E");
   TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta EvtGen Truth Track Finder", 50, -1, 1.);
   //TLegend *leg2= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. theta");
-  eff_theta->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta")); 
-  eff_theta->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));
-  eff_theta->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_theta=eff_ptEGtt;
-  eff_theta->Divide(eff_ptEGtt, h24, 1.0, 1.0, "B");
+  eff_thetaEG->GetXaxis()->SetTitle("Polar Angle (rad)");
+  eff_thetaEG->GetYaxis()->SetTitle("Efficiency");
+  eff_thetaEG->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs thetaEG")); 
+  eff_thetaEG->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));
+  eff_thetaEG->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_theta=eff_thetaEG;
+  eff_theta->Divide(eff_thetaEG, h24, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position
@@ -196,7 +200,7 @@ void VXDCDCMergerEvtGenTruthFinder(){
   eff_theta->Draw("E");
     //c1->SaveAs("plots/EffvsTheta_5GeV_muons_1000_Theta.jpg");
   eff_theta->Write();
-  delete eff_theta;
+  //delete eff_theta;
 
   h2->SetLineWidth(3);
   h2->SetLineColor(1);

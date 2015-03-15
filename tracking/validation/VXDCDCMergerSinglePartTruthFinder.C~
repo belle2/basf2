@@ -1,32 +1,26 @@
-/* VXDCDCMergerSinglePart.C 
- * ROOT macro for ECL validation plots 
- * Author: Benjamin Oberhof 
- * 2014
-*/
-
 /*
 <header>
-<input>VXDCDCMergerSinglePart.root</input>
-<output>VXDCDCMergerSinglePartHist.root</output>
+<input>VXDCDCMergerSinglePartTruthFinder.root</input>
+<output>VXDCDCMergerSinglePartTruthFinderHist.root</output>
 <contact>tracking@belle2.kek.jp</contact>
 </header>
 */
 
-void VXDCDCMergerSinglePart(){
+void VXDCDCMergerSinglePartTruthFinder(){
 
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
 
-  TFile* inputFile = TFile::Open("../VXDCDCMergerSinglePart.root");
+  TFile* inputFile = TFile::Open("../VXDCDCMergerSinglePartTruthFinder.root");
   TTree* tree = (TTree*) inputFile->Get("Stats");
 
   // write output file for the validation histograms
-  TFile* output = TFile::Open("VXDCDCMergerSinglePartHist.root", "recreate");
+  TFile* output = TFile::Open("VXDCDCMergerSinglePartTruthFinderHist.root", "recreate");
 
   //TCanvas *c1 = new TCanvas("c1","prova",10,10,700,500);
   //c1->SetFillColor(0);
 
-  TH1F *h1 = new TH1F("h1","Merged Tracks VXDTF+Trasan",10,0,10);
+  TH1F *h1 = new TH1F("h1","Merged Tracks",10,0,10);
   h1->GetXaxis()->SetTitle("# of merged tracks");
   h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for single 1GeV charged muon")); 
   h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 1"));
@@ -36,7 +30,7 @@ void VXDCDCMergerSinglePart(){
   //h1->Write();
   //c1->SaveAs("plots/MergedTracks_5GeV_muons_1000_Theta.jpg");
 
-  TH1F *h2 = new TH1F("h2","True Matched Tracks  VXDTF+Trasan",10,0,10);
+  TH1F *h2 = new TH1F("h2","True Matched Tracks",10,0,10);
   tree->Draw("TrueMatchedTracks>>h2");
   //h2->Write();
   //c1->SaveAs("plots/TrueMatchedTracks_5GeV_muons_1000_Theta.jpg");
@@ -135,60 +129,56 @@ void VXDCDCMergerSinglePart(){
 
  /////////////SCANS//////////////
 
-  TH1F *h22 = new TH1F("h22","Eff vs Pt VXDTF+Trasan",100,0.,5.);
+  TH1F *h22 = new TH1F("h22","Eff vs Pt",100,0.,5.);
   h22->SetMaximum(1.1);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h22","TruthTag==1");
   h22->Sumw2();
-  TH1F *eff_pt = new TH1F("eff_pt","Eff vs Pt VXDTF+Trasan Single Muon",100,0.,5.);
-  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_pt","TruthTag==1&&GoodTag==1");
-  eff_pt->SetMaximum(1.1);
-  eff_pt->Sumw2();
+  TH1F *h23 = new TH1F("h23","Eff vs Pt",100,0.,5.);
+  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h23","TruthTag==1&&GoodTag==1");
+  h23->SetMaximum(1.1);
+  h23->Sumw2();
   gPad->RedrawAxis();
-  //eff_thetasp->Divide(h22);
-  //eff_thetasp->GetYaxis()->SetRange(0,2);
-  //eff_thetasp->Draw("E");
-  TH1F *eff_ptsp = new TH1F("eff_ptsp", "Eff vs Pt VXDTF+Trasan Single Muon",100,0.,5.);
+  //h23->Divide(h22);
+  //h23->GetYaxis()->SetRange(0,2);
+  //h23->Draw("E");
+  TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt",100,0.,5.);
   //TLegend *leg1= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. Pt");
-  eff_pt->GetXaxis()->SetTitle("Pt (GeV)");
-  eff_pt->GetYaxis()->SetTitle("Efficiency");
-  eff_pt->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt VXDTF+Trasan")); 
+  eff_pt->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt")); 
   eff_pt->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
   eff_pt->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_ptsp=eff_pt;
-  eff_ptsp->Divide(eff_pt, h22, 1.0, 1.0, "B");
+  eff_pt=h23;
+  eff_pt->Divide(h23, h22, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position
   gStyle->SetOptStat("e");
-  eff_ptsp->GetYaxis()->SetRangeUser(0,1.1);
+  eff_pt->GetYaxis()->SetRangeUser(0,1.1);
   gPad->RedrawAxis();
-  eff_ptsp->Draw("E");
+  eff_pt->Draw("E");
   //leg1->Draw();
     //c1->SaveAs("plots/EffvsPt_5GeV_muons_1000_Theta.jpg");
-  eff_ptsp->Write();
-  //delete eff_pt;
+  eff_pt->Write();
+  delete eff_pt;
 
-  TH1F *h24 = new TH1F("h24","Eff vs Theta VXDTF+Trasan",50, -1, 1.);
+  TH1F *h24 = new TH1F("h24","Eff vs Theta",50, -1, 1.);
   h24->SetMaximum(1.1);
   tree->Draw("(Pz/(P))>>h24","TruthTag==1");
   h24->Sumw2();
-  TH1F *eff_thetasp = new TH1F("eff_thetasp","Eff vs Theta VXDTF+Trasan Single Muon",50, -1, 1.);
-  eff_thetasp->SetMaximum(1.1);
-  tree->Draw("(Pz/(P))>>eff_thetasp","TruthTag==1&&GoodTag==1");
-  eff_thetasp->Sumw2();
+  TH1F *h25 = new TH1F("h25","Eff vs Theta",50, -1, 1.);
+  h25->SetMaximum(1.1);
+  tree->Draw("(Pz/(P))>>h25","TruthTag==1&&GoodTag==1");
+  h25->Sumw2();
   gPad->RedrawAxis();
-  //eff_thetasp->Divide(h24);
-  //eff_thetasp->GetYaxis()->SetRange(0,2);
-  //eff_thetasp->Draw("E");
-  TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta VXDTF+Trasan Single Muon", 50, -1, 1.);
+  //h25->Divide(h24);
+  //h25->GetYaxis()->SetRange(0,2);
+  //h25->Draw("E");
+  TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta", 50, -1, 1.);
   //TLegend *leg2= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. theta");
-  eff_thetasp->GetXaxis()->SetTitle("Theta (rad)");
-  eff_thetasp->GetYaxis()->SetTitle("Efficiency");
-  eff_thetasp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta for [0, 5] GeV Muon")); 
-  eff_thetasp->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));
-  eff_thetasp->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_theta=eff_thetasp;
-  eff_theta->Divide(eff_thetasp, h24, 1.0, 1.0, "B");
+  eff_theta->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta")); 
+  eff_theta->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));
+  eff_theta->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_theta=h25;
+  eff_theta->Divide(h25, h24, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position
@@ -200,7 +190,7 @@ void VXDCDCMergerSinglePart(){
   eff_theta->Draw("E");
     //c1->SaveAs("plots/EffvsTheta_5GeV_muons_1000_Theta.jpg");
   eff_theta->Write();
-  //delete eff_theta;
+  delete eff_theta;
 
   h2->SetLineWidth(3);
   h2->SetLineColor(1);

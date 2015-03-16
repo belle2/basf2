@@ -57,7 +57,7 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 
   // Check for the parameters of the track candidates
   // The actual hit numbers are more than 50, but this is somewhat a lower bound
-  EXPECT_GE(candidateNodes[0]->getNItems(), 51);
+  EXPECT_GE(candidateNodes[0]->getNItems(), 50);
   EXPECT_GE(candidateNodes[1]->getNItems(), 50);
 }
 

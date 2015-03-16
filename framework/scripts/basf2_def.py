@@ -4,13 +4,13 @@
 from basf2_env import *
 
 import os
-from subprocess import Popen, PIPE
 
 
 def get_terminal_width():
     """
     Returns width of terminal in characters, or 80 if unknown.
     """
+    from subprocess import Popen, PIPE
 
     try:
         pipe = Popen('stty size', shell=True, stdout=PIPE, stderr=PIPE)
@@ -55,10 +55,10 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
             # handled after other fields are set
             long_column = col
             continue
-        elif type(opt) is int and opt > 0:
+        elif isinstance(opt, int) and opt > 0:
             # fixed width
             act_column_widths[col] = opt
-        elif type(opt) is int and opt < 0:
+        elif isinstance(opt, int) and opt < 0:
             # width may be at most 'opt'
             act_column_widths[col] = min(act_column_widths[col], -opt)
         else:
@@ -76,7 +76,7 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
         act_column_widths[long_column] = remaining_space
 
     format_string = ' '.join(['%%-%ss' % length for length in
-                             act_column_widths[:-1]])
+                              act_column_widths[:-1]])
     # don't print extra spaces at end of each line
     format_string += ' %s'
 
@@ -286,7 +286,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
                 paramItem.description])
         else:
             output.append([forceString + paramItem.name, paramItem.type,
-                          defaultStr, paramItem.description])
+                           defaultStr, paramItem.description])
 
     column_widths = [-25] * len(output[0])
     column_widths[2] = -20  # default values
@@ -426,14 +426,17 @@ def deserialize_value(module, parameter_state):
 
 def serialize_module(module):
     if module.type() == '':
-        raise RuntimeError("Module '%s' doesn't have a type! Note that --dump-path cannot work properly with basf2 modules written in Python." % (module.name()))
+        raise RuntimeError(
+            "Module '%s' doesn't have a type! Note that --dump-path cannot work properly with basf2 modules written in Python." %
+            (module.name()))
     if module.has_condition():
         raise RuntimeError("Module '%s' has a condition set. --dump-path currently does not support this" % (module.name()))
-    return {
-        'name': module.name(),
-        'type': module.type(),
-        'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
-        'parameters': [{'name': parameter.name, 'values': serialize_value(module, parameter)} for parameter in module.available_params() if parameter.setInSteering or module.type() == 'SubEvent']}
+    params = [{'name': parameter.name, 'values': serialize_value(module, parameter)}
+              for parameter in module.available_params() if parameter.setInSteering or module.type() == 'SubEvent']
+    return {'name': module.name(),
+            'type': module.type(),
+            'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
+            'parameters': params}
 
 
 def deserialize_module(module_state):

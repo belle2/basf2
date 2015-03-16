@@ -70,7 +70,7 @@ void DeSerializerPrePCModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerPersistent();
 
   raw_datablkarray.registerPersistent();
   rawcprarray.registerPersistent();
@@ -144,7 +144,8 @@ int DeSerializerPrePCModule::Connect()
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
       char err_buf[100];
-      sprintf(err_buf, "hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(), strerror(errno));
+      sprintf(err_buf, "hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(),
+              strerror(errno));
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
@@ -204,7 +205,8 @@ int DeSerializerPrePCModule::Connect()
 
 
 
-int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, int* num_events_in_sendblock, int* num_nodes_in_sendblock)
+int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, int* num_events_in_sendblock,
+                                       int* num_nodes_in_sendblock)
 {
 
   int* temp_buf = NULL; // buffer for data-body
@@ -268,7 +270,8 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
       printf("[DEBUG] *******HDR**********\n");
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
+      sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes,
+              send_hdr.GetTotalNwords());
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(123456);
       exit(1);
@@ -361,7 +364,8 @@ void DeSerializerPrePCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int
   int num_entries = temp_raw_datablk->GetNumEntries();
   if (num_entries != num_events_in_sendblock * num_nodes_in_sendblock) {
     char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
+    sprintf(err_buf,
+            "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
             num_nodes_in_sendblock, num_events_in_sendblock, num_entries);
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);

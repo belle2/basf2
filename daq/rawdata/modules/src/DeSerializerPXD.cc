@@ -61,7 +61,7 @@ void DeSerializerPXDModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerPersistent();
 
   // Initialize Array of RawCOPPER
   StoreArray<RawPXD>::registerPersistent();
@@ -79,7 +79,7 @@ void DeSerializerPXDModule::event()
 
   // Get a record from socket
   int stat = 0;
-  for (auto  & it : m_recvs) {
+  for (auto&   it : m_recvs) {
     do {
       stat = it->recv_pxd_buffer((char*)m_buffer);
       if (stat <= 0) {

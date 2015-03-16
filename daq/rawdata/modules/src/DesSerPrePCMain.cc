@@ -47,7 +47,7 @@ DesSerPrePCMainModule::~DesSerPrePCMainModule()
 void DesSerPrePCMainModule::initialize()
 {
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerPersistent();
   // Open message handler
 
 

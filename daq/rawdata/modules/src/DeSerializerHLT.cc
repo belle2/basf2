@@ -69,7 +69,7 @@ void DeSerializerHLTModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerPersistent();
 
   // Initialize Array of RawCOPPER
   raw_datablkarray.registerPersistent();

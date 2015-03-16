@@ -62,10 +62,10 @@ void GenRawSendModule::initialize()
   // Initialize EventMetaData
   //  StoreObjPtr<EventMetaData>::registerPersistent();
   //Register the EventMetaData in the data store
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerPersistent();
 
   // Initialize RawCOPPER
-  m_rawcopper.registerAsPersistent();
+  m_rawcopper.registerPersistent();
 
   // Open Socket
   m_sock = new EvtSocketSend(m_dest, m_port);

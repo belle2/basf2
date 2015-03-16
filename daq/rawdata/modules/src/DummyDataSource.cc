@@ -55,7 +55,7 @@ void DummyDataSourceModule::initialize()
   //  m_msghandler = new MsgHandler(m_compressionLevel);
 
   /// Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerPersistent();
 
 #ifdef USE_RAWDATABLOCK
   raw_datablkarray.registerPersistent();

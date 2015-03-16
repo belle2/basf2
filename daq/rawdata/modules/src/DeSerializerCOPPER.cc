@@ -81,7 +81,7 @@ void DeSerializerCOPPERModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerPersistent();
 
   // Initialize Array of RawCOPPER
   //  rawcprarray.registerPersistent();
@@ -238,7 +238,8 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
       }
     } else {
       recvd_byte += read_size;
-      if (recvd_byte - (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int) > (int)(sizeof(int) * (m_pre_rawcpr.POS_DATA_LENGTH + 1)))break;
+      if (recvd_byte - (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int) > (int)(sizeof(int) *
+          (m_pre_rawcpr.POS_DATA_LENGTH + 1)))break;
     }
   }
 
@@ -247,7 +248,8 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   //
   *m_size_word = m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH + (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) ]
                  + m_pre_rawcpr.SIZE_COPPER_DRIVER_HEADER + m_pre_rawcpr.SIZE_COPPER_DRIVER_TRAILER
-                 + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS + m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
+                 + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS +
+                 m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
 
   //
   // Allocate buffer if needed

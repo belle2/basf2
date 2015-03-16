@@ -24,43 +24,54 @@ namespace Belle2 {
 
       const unsigned int numberOfPossibleTrackCandidate = 2;
 
-      void SetUp() {
+      void SetUp()
+      {
         m_trackCandidates.reserve(numberOfPossibleTrackCandidate);
 
         for (unsigned int counter = 0; counter < numberOfPossibleTrackCandidate; counter++) {
           TrackCandidate* trackCandidate = createTestTrackCandidate(counter);
           m_trackCandidates.push_back(trackCandidate);
 
-          for (TrackHit * hit : trackCandidate->getTrackHits()) {
+          for (TrackHit* hit : trackCandidate->getTrackHits()) {
             m_hitSet.insert(hit);
           }
         }
       }
 
-      void TearDown() {
-        for (TrackCandidate * trackCandidate : m_trackCandidates) {
+      void TearDown() override
+      {
+        for (TrackCandidate* trackCandidate : m_trackCandidates) {
           deleteTrackCandidate(trackCandidate);
         }
-
-        m_hitSet.clear();
         m_trackCandidates.clear();
+
+        // clean-up hits. Here the assuption is use that
+        // no testing code modifiets the m_hitSet
+        for (TrackHit* pHit : m_hitSet) {
+          delete pHit;
+        }
+        m_hitSet.clear();
       }
 
-      std::set<TrackHit*>& getHitSet() {
+      std::set<TrackHit*>& getHitSet()
+      {
         return m_hitSet;
       }
 
-      void markAllHitsAsUnused() {
-        for (TrackHit * hit : m_hitSet) {
+      void markAllHitsAsUnused()
+      {
+        for (TrackHit* hit : m_hitSet) {
           hit->setHitUsage(TrackHit::not_used);
         }
       }
 
-      TrackCandidate* getTrackCandidate(unsigned int index) {
+      TrackCandidate* getTrackCandidate(unsigned int index)
+      {
         return m_trackCandidates[index % numberOfPossibleTrackCandidate];
       }
 
-      std::vector<TrackHit*> getSomeHits(TrackCandidate* otherTrackCandidate) {
+      std::vector<TrackHit*> getSomeHits(TrackCandidate* otherTrackCandidate)
+      {
         std::vector<TrackHit*> someHits;
 
         unsigned int numberOfHitsBefore = otherTrackCandidate->getNHits();
@@ -78,12 +89,12 @@ namespace Belle2 {
           }
         }
 
-        for (TrackHit * trackHit : someHits)  {
+        for (TrackHit* trackHit : someHits)  {
           trackHit->setHitUsage(TrackHit::bad);
         }
 
         trackHitList.clear();
-        for (TrackHit * trackHit : newTrackHitList)  {
+        for (TrackHit* trackHit : newTrackHitList)  {
           trackHitList.push_back(trackHit);
         }
 
@@ -97,7 +108,8 @@ namespace Belle2 {
       std::vector<TrackCandidate*> m_trackCandidates;
       std::set<TrackHit*> m_hitSet;
 
-      TrackCandidate* createTestTrackCandidate(unsigned int number) {
+      TrackCandidate* createTestTrackCandidate(unsigned int number)
+      {
         std::vector<TrackHit*> emptyHitList;
         TrackCandidate* resultTrackCandidate = new TrackCandidate(0, 0, 1, emptyHitList);
 
@@ -304,14 +316,15 @@ namespace Belle2 {
         return resultTrackCandidate;
       }
 
-      void deleteTrackCandidate(TrackCandidate* trackCandidate) {
-        // release TrackHits
-        std::for_each(trackCandidate->getTrackHits().begin(), trackCandidate->getTrackHits().end(), [](TrackHit * ht) { delete ht;});
+      void deleteTrackCandidate(TrackCandidate* trackCandidate)
+      {
+        // TrackHits are released in TearDown by iterating over the HitSet
         // release candidate
         delete trackCandidate;
       }
 
-      void fitTrackCandidate(TrackCandidate* trackCandidate) {
+      void fitTrackCandidate(TrackCandidate* trackCandidate)
+      {
         // Fit the track to get good parameter assumptions
         TrackFitter fitter;
         std::pair<double, double> track_par;
@@ -335,7 +348,7 @@ namespace Belle2 {
         EXPECT_FALSE(std::isnan(trackCandidate->getReferencePoint().Y()));
         EXPECT_FALSE(std::isnan(trackCandidate->getReferencePoint().Z()));
 
-        for (TrackHit * trackHit : trackCandidate->getTrackHits()) {
+        for (TrackHit* trackHit : trackCandidate->getTrackHits()) {
           trackHit->setHitUsage(TrackHit::used_in_track);
         }
       }

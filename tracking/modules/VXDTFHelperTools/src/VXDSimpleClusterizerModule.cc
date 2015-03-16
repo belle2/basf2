@@ -44,12 +44,20 @@ VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
 
   setDescription("The VXDSimpleClusterizerModule generates PXD/SVD Clusters using TrueHits. Energy-deposit threshold and gaussian smearing can be chosen, non-primary-particles can be filtered as well. Its purpose is fast clusterizing for tracking test procedures, using standardized PXD/SVD-Cluster");
 
-  addParam("energyThresholdU", m_energyThresholdU, "particles with energy deposit in U lower than this will not create a cluster in SVD (GeV)", double(17.4E-6));
-  addParam("energyThresholdV", m_energyThresholdV, "particles with energy deposit in V lower than this will not create a cluster in SVD (GeV)", double(28.6E-6));
-  addParam("energyThreshold", m_energyThreshold, "particles with energy deposit lower than this will not create a cluster in PXD (GeV)", double(7E-6));
-  addParam("onlyPrimaries", m_onlyPrimaries, "if true use only primary particles from the generator no particles created by Geant4", false);
-  addParam("uniSigma", m_uniSigma, "you can define the sigma of the smearing. Standard value is the sigma of the unifom distribution for 0-1: 1/sqrt(12)", double(1. / sqrt(12.)));
-  addParam("setMeasSigma", m_setMeasSigma, "if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/uniSigma will be used", -1.0);
+  addParam("energyThresholdU", m_energyThresholdU,
+           "particles with energy deposit in U lower than this will not create a cluster in SVD (GeV)", double(17.4E-6));
+  addParam("energyThresholdV", m_energyThresholdV,
+           "particles with energy deposit in V lower than this will not create a cluster in SVD (GeV)", double(28.6E-6));
+  addParam("energyThreshold", m_energyThreshold,
+           "particles with energy deposit lower than this will not create a cluster in PXD (GeV)", double(7E-6));
+  addParam("onlyPrimaries", m_onlyPrimaries, "if true use only primary particles from the generator no particles created by Geant4",
+           false);
+  addParam("uniSigma", m_uniSigma,
+           "you can define the sigma of the smearing. Standard value is the sigma of the unifom distribution for 0-1: 1/sqrt(12)",
+           double(1. / sqrt(12.)));
+  addParam("setMeasSigma", m_setMeasSigma,
+           "if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/uniSigma will be used",
+           -1.0);
   addParam("PXDTrueHits", m_pxdTrueHitsName,
            "PXDTrueHit collection name", string(""));
   addParam("SVDTrueHits", m_svdTrueHitsName,
@@ -217,7 +225,8 @@ void VXDSimpleClusterizerModule::event()
     newCluster->addRelationTo(m_pxdTrueHits[currentTrueHit]);
     newCluster->addRelationTo(m_mcParticles[particleID]);
 
-    B2DEBUG(20, "mcParticle " << particleID << " has " << aMcParticle->getRelationsTo<PXDCluster>().size() << " relations to PXD clusters");
+    B2DEBUG(20, "mcParticle " << particleID << " has " << aMcParticle->getRelationsTo<PXDCluster>().size() <<
+            " relations to PXD clusters");
   }
 
 
@@ -289,7 +298,8 @@ void VXDSimpleClusterizerModule::event()
      * @param seedCharge The charge of the seed strip in electrons.
      * @param clsSize The size of the cluster in the corresponding strip pitch units.
      */
-    SVDCluster* newClusterU =  m_svdClusters.appendNew(aVXDId, true, u, sigmaU, timeStamp, 0, 1, 1, 3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
+    SVDCluster* newClusterU =  m_svdClusters.appendNew(aVXDId, true, u, sigmaU, timeStamp, 0, 1, 1,
+                                                       3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
     // add relations to u-cluster
     newClusterU->addRelationTo(m_svdTrueHits[currentTrueHit]);
     newClusterU->addRelationTo(m_mcParticles[particleID]);
@@ -299,7 +309,8 @@ void VXDSimpleClusterizerModule::event()
     newClusterV->addRelationTo(m_svdTrueHits[currentTrueHit]);
     newClusterV->addRelationTo(m_mcParticles[particleID]);
 
-    B2DEBUG(20, "mcParticle " << particleID << " has " << aMcParticle->getRelationsTo<SVDCluster>().size() << " relations to SVD clusters");
+    B2DEBUG(20, "mcParticle " << particleID << " has " << aMcParticle->getRelationsTo<SVDCluster>().size() <<
+            " relations to SVD clusters");
   }
 
   B2DEBUG(10, "------------------------------------------------------");
@@ -311,12 +322,17 @@ void VXDSimpleClusterizerModule::event()
   B2DEBUG(10, "svdClusters.getEntries()" << m_svdClusters.getEntries());
   B2DEBUG(10, "------------------------------------------------------");
 
-  B2DEBUG(1, "VXDSimpleClusterizer - event " << eventMetaDataPtr->getEvent() << ":\n" << "of " << nPxdTrueHits << "/" << nSvdTrueHits << " PXD-/SVDTrueHits, " << discardedPXDEdeposit << "/" << discardedSVDEdeposit << " hits were discarded bec. of low E-deposit & " << discardedPXDFake << "/" << discardedSVDFake << " hits were discarded bec. of being a fake. " << m_pxdClusters.getEntries() << "/" << m_svdClusters.getEntries() << " Clusters were stored.\n");
+  B2DEBUG(1, "VXDSimpleClusterizer - event " << eventMetaDataPtr->getEvent() << ":\n" << "of " << nPxdTrueHits << "/" << nSvdTrueHits
+          << " PXD-/SVDTrueHits, " << discardedPXDEdeposit << "/" << discardedSVDEdeposit << " hits were discarded bec. of low E-deposit & "
+          << discardedPXDFake << "/" << discardedSVDFake << " hits were discarded bec. of being a fake. " << m_pxdClusters.getEntries() << "/"
+          << m_svdClusters.getEntries() << " Clusters were stored.\n");
 }
 
 
 
 void VXDSimpleClusterizerModule::endRun()
 {
-  B2INFO("VXDSimpleClusterizerModule::EndRun:\nSimpleClusterizerModule discarded " << m_weakPXDHitCtr << " PXDTrueHits and " << m_weakSVDHitCtr << " SVDTrueHits because of low E-deposit-threshold and discarded "  << m_fakePXDHitCtr << " PXDTrueHits and " << m_fakeSVDHitCtr << " SVDTrueHits because they were fake");
+  B2INFO("VXDSimpleClusterizerModule::EndRun:\nSimpleClusterizerModule discarded " << m_weakPXDHitCtr << " PXDTrueHits and " <<
+         m_weakSVDHitCtr << " SVDTrueHits because of low E-deposit-threshold and discarded "  << m_fakePXDHitCtr << " PXDTrueHits and " <<
+         m_fakeSVDHitCtr << " SVDTrueHits because they were fake");
 }

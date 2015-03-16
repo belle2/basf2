@@ -57,7 +57,8 @@ namespace Belle2 {
     virtual void endRun();
 
     /** initialize variables to avoid nondeterministic behavior */
-    void InitializeVariables() {
+    void InitializeVariables()
+    {
       m_weakSVDHitCtr = 0;
       m_weakPXDHitCtr = 0;
       m_fakeSVDHitCtr = 0;
@@ -66,15 +67,20 @@ namespace Belle2 {
 
   protected:
     std::string m_pxdTrueHitsName; /**< PXDTrueHit collection name */
-    StoreArray<PXDTrueHit> m_pxdTrueHits; /**< the storeArray for pxdTrueHits as member, is faster than recreating link for each event */
+    StoreArray<PXDTrueHit>
+    m_pxdTrueHits; /**< the storeArray for pxdTrueHits as member, is faster than recreating link for each event */
     std::string m_svdTrueHitsName; /**< SVDTrueHit collection name */
-    StoreArray<SVDTrueHit> m_svdTrueHits; /**< the storeArray for svdTrueHits as member, is faster than recreating link for each event */
+    StoreArray<SVDTrueHit>
+    m_svdTrueHits; /**< the storeArray for svdTrueHits as member, is faster than recreating link for each event */
     std::string m_mcParticlesName; /**< MCParticle collection name */
-    StoreArray<MCParticle> m_mcParticles; /**< the storeArray for mcParticles as member, is faster than recreating link for each event */
+    StoreArray<MCParticle>
+    m_mcParticles; /**< the storeArray for mcParticles as member, is faster than recreating link for each event */
     std::string m_pxdClustersName; /**< PXDCluster collection name */
-    StoreArray<PXDCluster> m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
+    StoreArray<PXDCluster>
+    m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
     std::string m_svdClustersName; /**< SVDCluster collection name */
-    StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
+    StoreArray<SVDCluster>
+    m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
 
     double m_energyThresholdU; /**< set energy threshold for SVDClusters in u-direction in GeV (standard is 17.4E-6) */
     double m_energyThresholdV; /**< set energy threshold for SVDClusters in v-direction in GeV (standard is 28.6E-6) */

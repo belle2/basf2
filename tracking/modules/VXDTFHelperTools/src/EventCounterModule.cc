@@ -40,8 +40,10 @@ EventCounterModule::EventCounterModule() : Module()
   setDescription("Highlights current event and does some minimal statistics for VXD Clusters");
 
   addParam("stepSize", m_PARAMstepSize, "e.g. 100 will highlight every 100th event", int(100));
-  addParam("showClusterStatistics", m_PARAMshowClusterStatistics, "if activated, some statistics for SVD and PXD Clusters are measured", bool(true));
-  addParam("allowMultiThreaded", m_PARAMallowMultiThreaded, "if false, the module suppresses multithreaded execution of this and its following modules in the module-path", bool(true));
+  addParam("showClusterStatistics", m_PARAMshowClusterStatistics,
+           "if activated, some statistics for SVD and PXD Clusters are measured", bool(true));
+  addParam("allowMultiThreaded", m_PARAMallowMultiThreaded,
+           "if false, the module suppresses multithreaded execution of this and its following modules in the module-path", bool(true));
 
   if (m_PARAMallowMultiThreaded) { setPropertyFlags(c_ParallelProcessingCertified); }
 }
@@ -58,7 +60,8 @@ void EventCounterModule::initialize()
 
 void EventCounterModule::beginRun()
 {
-  B2INFO("################## eventCounter enabled, highlighting every " << m_PARAMstepSize << " event ######################\n" << "extended infos you can get by activating parameter 'showClusterStatistics', and/or setting debug level to 1 (runWise extra) or 2 (event wise extra)")
+  B2INFO("################## eventCounter enabled, highlighting every " << m_PARAMstepSize << " event ######################\n" <<
+         "extended infos you can get by activating parameter 'showClusterStatistics', and/or setting debug level to 1 (runWise extra) or 2 (event wise extra)")
 
   InitializeCounters();
 
@@ -69,7 +72,8 @@ void EventCounterModule::beginRun()
   m_countedPixelsAndStrips.m_svdClusterCounter.fill(1);
   m_countedPixelsAndStrips.m_svdClusterCombinationsCounter.fill(1);
 
-  unsigned int knownLayers = 0, knownLadders = 0, knownSensors = 0, nUnknownLayers = 0, nUnknownLadders = 0, nUnknownSensors = 0, pos = 0; // pos is position in corresponding array in the countedStuff instance
+  unsigned int knownLayers = 0, knownLadders = 0, knownSensors = 0, nUnknownLayers = 0, nUnknownLadders = 0, nUnknownSensors = 0,
+               pos = 0; // pos is position in corresponding array in the countedStuff instance
 
 
   // import information of number of strips/pixels for each sensor in the VXD (unrecognized detector types are ignored (like Tel)):
@@ -113,7 +117,9 @@ void EventCounterModule::beginRun()
     }
   }
 
-  B2INFO("eventCounter - beginRun with m_PARAMshowClusterStatistics == true. Total number of Pixels per PXDsensor and u/vStrips per SVDSensor:\n" << m_countedPixelsAndStrips.PrintStuff(false) << "counted number of known and unrecognized layers/ladders/sensors: " << knownLayers << "/" << knownLadders << "/" << knownSensors << ", " << nUnknownLayers << "/" << nUnknownLadders << "/" << nUnknownSensors)
+  B2INFO("eventCounter - beginRun with m_PARAMshowClusterStatistics == true. Total number of Pixels per PXDsensor and u/vStrips per SVDSensor:\n"
+         << m_countedPixelsAndStrips.PrintStuff(false) << "counted number of known and unrecognized layers/ladders/sensors: " << knownLayers
+         << "/" << knownLadders << "/" << knownSensors << ", " << nUnknownLayers << "/" << nUnknownLadders << "/" << nUnknownSensors)
 }
 
 
@@ -150,7 +156,8 @@ void EventCounterModule::event()
 
 
   /** Clusters: accepts a sensorID and searches for existing entries (which are increased, if found or created if not) */
-  auto lambdaCheckSVDSensor4Clusters = [&svdSensorIDsOccured, &sensorsAndClustersU, &sensorsAndClustersV](unsigned short iD, bool isUCluster) {
+  auto lambdaCheckSVDSensor4Clusters = [&svdSensorIDsOccured, &sensorsAndClustersU, &sensorsAndClustersV](unsigned short iD,
+  bool isUCluster) {
     auto foundPos = std::find(svdSensorIDsOccured.begin(), svdSensorIDsOccured.end(), iD);
     if (foundPos == svdSensorIDsOccured.end()) { svdSensorIDsOccured.push_back(iD); }
 
@@ -178,7 +185,8 @@ void EventCounterModule::event()
 
 
   /** Sptrips: accepts a sensorID and searches for existing entries (which are increased, if found or created if not) */
-  auto lambdaCheckSVDSensor4Strips = [&sensorsAndStripsU, &sensorsAndStripsV](unsigned short iD, bool isUCluster, unsigned short size) {
+  auto lambdaCheckSVDSensor4Strips = [&sensorsAndStripsU, &sensorsAndStripsV](unsigned short iD, bool isUCluster,
+  unsigned short size) {
     if (isUCluster == true) {
       auto foundU = sensorsAndStripsU.find(iD);
       if (foundU == sensorsAndStripsU.end()) { sensorsAndStripsU.insert({iD, size}); }
@@ -200,23 +208,23 @@ void EventCounterModule::event()
 
 
   // collect Infos from PXD and SVD
-  for (const PXDCluster & aCluster : aPxdClusterArray) {
+  for (const PXDCluster& aCluster : aPxdClusterArray) {
     lambdaCheckPXDSensor4Clusters(aCluster.getSensorID());
     lambdaCheckPXDSensor4Pixels(aCluster.getSensorID(), aCluster.getSize());
   }
-  for (const SVDCluster & aCluster : aSvdClusterArray) {
+  for (const SVDCluster& aCluster : aSvdClusterArray) {
     lambdaCheckSVDSensor4Clusters(aCluster.getRawSensorID(), aCluster.isUCluster());
     lambdaCheckSVDSensor4Strips(aCluster.getRawSensorID(), aCluster.isUCluster(), aCluster.getSize());
   }
 
 
   // PXD:
-  for (auto & infoPair : sensorsAndClusters) {
+  for (auto& infoPair : sensorsAndClusters) {
     unsigned short layerID = VxdID(infoPair.first).getLayerNumber();
 
     thisEventCounted.m_pxdClusterCounter.at(layerID - c_nInnermostPXDLayer) += infoPair.second;
   }
-  for (auto & infoPair : sensorsAndPixels) {
+  for (auto& infoPair : sensorsAndPixels) {
     unsigned short layerID = VxdID(infoPair.first).getLayerNumber();
 
     thisEventCounted.m_pxdPixelCounter.at(layerID - c_nInnermostPXDLayer) += infoPair.second;
@@ -247,9 +255,11 @@ void EventCounterModule::event()
 
 
   if (m_eventCounter % m_PARAMstepSize == 0) {
-    B2INFO("EventCounterModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" << aSvdClusterArray.getEntries() << " pxd/svdClusters. Detailed info: \n" << thisEventCounted.PrintStuff());
+    B2INFO("EventCounterModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" <<
+           aSvdClusterArray.getEntries() << " pxd/svdClusters. Detailed info: \n" << thisEventCounted.PrintStuff());
   } else {
-    B2DEBUG(2, "EventCounterModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" << aSvdClusterArray.getEntries() << " pxd/svdClusters. Detailed info: \n" << thisEventCounted.PrintStuff())
+    B2DEBUG(2, "EventCounterModule - Event: " << m_eventCounter << " having " << aPxdClusterArray.getEntries() << "/" <<
+            aSvdClusterArray.getEntries() << " pxd/svdClusters. Detailed info: \n" << thisEventCounted.PrintStuff())
   }
 
   m_allEventsCounted.push_back(thisEventCounted);
@@ -261,20 +271,25 @@ void EventCounterModule::endRun()
 {
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
-  B2INFO("EventCounterModule: after " << m_eventCounter << " events there were " << m_pxdClusterCounter << "/" << m_svdClusterCounter << " pxd/svdClusters total and " << double(m_pxdClusterCounter)*invEvents << "/" << double(m_svdClusterCounter)*invEvents << " pxd/svdClusters per event");
+  B2INFO("EventCounterModule: after " << m_eventCounter << " events there were " << m_pxdClusterCounter << "/" << m_svdClusterCounter
+         << " pxd/svdClusters total and " << double(m_pxdClusterCounter)*invEvents << "/" << double(m_svdClusterCounter)*invEvents <<
+         " pxd/svdClusters per event");
 
 
-  vector<CountStuff<unsigned int>> logEventsCopy = m_allEventsCounted; // copying original since we want to change the internal order now for several times and do not want to break the original
+  vector<CountStuff<unsigned int>> logEventsCopy =
+                                  m_allEventsCounted; // copying original since we want to change the internal order now for several times and do not want to break the original
 
   unsigned nQuantiles = 5;
-  vector<CountStuff<unsigned int> > numberQuantiles(nQuantiles); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
-  vector<CountStuff<double> > occupancyQuantiles(nQuantiles); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max WARNING: xxxCluster-entries are to be ignored! they do not carry relevant data!
+  vector<CountStuff<unsigned int> > numberQuantiles(
+    nQuantiles); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
+  vector<CountStuff<double> > occupancyQuantiles(
+    nQuantiles); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max WARNING: xxxCluster-entries are to be ignored! they do not carry relevant data!
 
 
 
   // determining mean of results:
   CountStuff<unsigned int> collectedValues;
-  for (auto & anEvent : logEventsCopy) {
+  for (auto& anEvent : logEventsCopy) {
     collectedValues += anEvent;
   }
   CountStuff<double> meanValues, meanOccupancy;
@@ -480,7 +495,8 @@ void EventCounterModule::endRun()
     numberQuantiles.at(1).m_svdClusterCombinationsCounter.at(i) = logEventsCopy.at(q25).m_svdClusterCombinationsCounter.at(i);
     numberQuantiles.at(2).m_svdClusterCombinationsCounter.at(i) = logEventsCopy.at(median).m_svdClusterCombinationsCounter.at(i);
     numberQuantiles.at(3).m_svdClusterCombinationsCounter.at(i) = logEventsCopy.at(q75).m_svdClusterCombinationsCounter.at(i);
-    numberQuantiles.at(4).m_svdClusterCombinationsCounter.at(i) = logEventsCopy.at(numLoggedEvents - 1).m_svdClusterCombinationsCounter.at(i);
+    numberQuantiles.at(4).m_svdClusterCombinationsCounter.at(i) = logEventsCopy.at(numLoggedEvents -
+        1).m_svdClusterCombinationsCounter.at(i);
   }
 //   std::sort(
 //       logEventsCopy.begin(),

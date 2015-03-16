@@ -49,7 +49,8 @@ namespace Belle2 {
     template <class StoreType> class CountStuff {
     public:
       /** standard constructor setting all members to 0 */
-      CountStuff() {
+      CountStuff()
+      {
         m_pxdPixelCounter.fill(0);
         m_pxdClusterCounter.fill(0);
         m_svdStripCounter4U.fill(0);
@@ -81,7 +82,8 @@ namespace Belle2 {
 
 
       /** assignment operator */
-      CountStuff& operator= (const CountStuff& other) {
+      CountStuff& operator= (const CountStuff& other)
+      {
         for (unsigned int i = 0; i < c_nPXDLayers; i++) {
           m_pxdPixelCounter[i] = other.m_pxdPixelCounter[i];
           m_pxdClusterCounter[i] = other.m_pxdClusterCounter[i];
@@ -99,7 +101,8 @@ namespace Belle2 {
 
 
       /** '+' operator */
-      CountStuff operator+ (const CountStuff& other) {
+      CountStuff operator+ (const CountStuff& other)
+      {
         CountStuff result;
         for (unsigned int i = 0; i < c_nPXDLayers; i++) {
           result.m_pxdPixelCounter[i] = m_pxdPixelCounter[i] + other.m_pxdPixelCounter[i];
@@ -119,7 +122,8 @@ namespace Belle2 {
 
       /** '*=' operator for a simple type*/
       template<class T>
-      CountStuff& operator*= (const T& value) {
+      CountStuff& operator*= (const T& value)
+      {
         for (unsigned int i = 0; i < c_nPXDLayers; i++) {
           m_pxdPixelCounter[i] *= value;
           m_pxdClusterCounter[i] *= value;
@@ -137,7 +141,8 @@ namespace Belle2 {
 
 
       /** '+=' operator */
-      CountStuff& operator+= (const CountStuff& other) {
+      CountStuff& operator+= (const CountStuff& other)
+      {
         for (unsigned int i = 0; i < c_nPXDLayers; i++) {
           m_pxdPixelCounter[i] += other.m_pxdPixelCounter[i];
           m_pxdClusterCounter[i] += other.m_pxdClusterCounter[i];
@@ -155,7 +160,8 @@ namespace Belle2 {
 
 
       /** '/' operator */
-      CountStuff operator/ (const CountStuff& other) {
+      CountStuff operator/ (const CountStuff& other)
+      {
         CountStuff result;
         for (unsigned int i = 0; i < c_nPXDLayers; i++) {
           result.m_pxdPixelCounter[i] = m_pxdPixelCounter[i] / other.m_pxdPixelCounter[i];
@@ -175,7 +181,8 @@ namespace Belle2 {
 
       /** overloaded NewType cast */
       template < class NewType >
-      operator CountStuff< NewType >() {
+      operator CountStuff< NewType >()
+      {
         CountStuff< NewType > result;
         for (unsigned int i = 0; i < c_nPXDLayers; i++) {
           result.m_pxdPixelCounter[i] = NewType(m_pxdPixelCounter[i]);
@@ -194,7 +201,8 @@ namespace Belle2 {
 
 
       /** for readable output of the info if printEverything == true, the whole object will be printed. If == false, only Strip/Pixel-Infos are printed, if calcOccupancy == false: nStripsTotal = nUStrips + nVStrips, if == true: nStripsTotal = 0.5*(nUStrips + nVStrips) */
-      std::string PrintStuff(bool printEverything = true) {
+      std::string PrintStuff(bool printEverything = true)
+      {
         std::stringstream output;
         CountStuff<double> overallResult; // only innermost entry filled. Used for mean calculation
 
@@ -297,7 +305,8 @@ namespace Belle2 {
 
 
       template<std::size_t SIZE>
-      static StoreType sumUpArray(const std::array<StoreType, SIZE>& aContainer) {
+      static StoreType sumUpArray(const std::array<StoreType, SIZE>& aContainer)
+      {
         StoreType sumTotal = 0;
         for (const StoreType entry : aContainer) { sumTotal += entry; }
         return sumTotal;
@@ -306,7 +315,8 @@ namespace Belle2 {
 
 /// WARNING compiles but can't be used:
       template < typename EntryType, template <typename...> class ContainerType >
-      EntryType sumUpVT(ContainerType<EntryType>& aContainer) {
+      EntryType sumUpVT(ContainerType<EntryType>& aContainer)
+      {
         EntryType sumTotal = 0;
         for (EntryType entry : aContainer) { sumTotal += entry; }
         return sumTotal;
@@ -315,7 +325,8 @@ namespace Belle2 {
 
       /// WARNING compiles but can't be used:
       template < typename EntryType, typename...OtherArguments, template <typename, typename...> class ContainerType >
-      EntryType sumUpVT2(ContainerType<EntryType, OtherArguments...>& aContainer) {
+      EntryType sumUpVT2(ContainerType<EntryType, OtherArguments...>& aContainer)
+      {
         EntryType sumTotal = 0;
         for (EntryType entry : aContainer) { sumTotal += entry; }
         return sumTotal;
@@ -329,7 +340,8 @@ namespace Belle2 {
       std::array<StoreType, c_nSVDLayers> m_svdStripCounter4V; /**< counts total number of illuminated v strips in the svd */
       std::array<StoreType, c_nSVDLayers> m_svdStripCounterTotal; /**< counts total number of illuminated strips in the svd */
       std::array<StoreType, c_nSVDLayers> m_svdClusterCounter; /**< counts total number of svd clusters occured */
-      std::array<StoreType, c_nSVDLayers> m_svdClusterCombinationsCounter; /**< counts total number of svd clusters combinations occured */
+      std::array<StoreType, c_nSVDLayers>
+      m_svdClusterCombinationsCounter; /**< counts total number of svd clusters combinations occured */
     };
 
 
@@ -376,7 +388,8 @@ namespace Belle2 {
     int m_svdClusterCombinationsCounter; /**< counts total number of svd clusters combinations occured */
 
     std::vector<CountStuff<unsigned int> > m_allEventsCounted; /**< collects detailed info of each event */
-    CountStuff<double> m_countedPixelsAndStrips; /**< store total number of pixels, uStrips and vStrips in a CountStuff-container, unrecognized detector types are ignored (like Tel) */
+    CountStuff<double>
+    m_countedPixelsAndStrips; /**< store total number of pixels, uStrips and vStrips in a CountStuff-container, unrecognized detector types are ignored (like Tel) */
   private:
 
   };

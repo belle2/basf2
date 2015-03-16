@@ -117,6 +117,7 @@ TCanvas* make_plot(double data[][6], TString title, int type)
 int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2/background_files/feb2015/arich_")
 {
 
+  gROOT->SetBatch(kTRUE);
   TGraph2D* dteb = new TGraph2D(420);
   TGraph2D* dtnb = new TGraph2D(420);
   TGraph2D* dteh = new TGraph2D(420);
@@ -205,11 +206,12 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
     pdg = -1;
     modID = -1;
     mom->SetXYZ(0., 0., 0.);
-    source = -1;
+    source = 1;
 
     tree->GetEvent(e);
 
     source--;
+    if (source < 0) continue;
 
     // read the corresponding module (HAPD) x,y coordinates
     if (modID > 0) {
@@ -346,6 +348,12 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   edist->Write();
   nenergy->Write();
   f->Close();
+
+  delete c1;
+  delete c2;
+  delete c3;
+  delete c4;
+  delete c5;
 
   return 0;
 }

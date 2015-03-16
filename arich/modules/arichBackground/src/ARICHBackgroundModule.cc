@@ -18,15 +18,15 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <arich/dataobjects/ARICHDigit.h>
-#include <top/dataobjects/TOPSimHit.h>
-#include <pxd/dataobjects/PXDSimHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationArray.h>
+
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -51,8 +51,11 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    ARICHBackgroundModule::ARICHBackgroundModule() : Module(),
-      m_arichgp(ARICHGeometryPar::Instance())
+    ARICHBackgroundModule::ARICHBackgroundModule() : Module(), phpos(TVector3()), phmom(TVector3()),
+      phVtx(TVector3()), phMmom(TVector3()), phMvtx(TVector3()), phPvtx(TVector3()), phPmom(TVector3()),
+      phGMvtx(TVector3()), phGMmom(TVector3()), modOrig(TVector3()), source(0), phPDG(0), phMPDG(0), phPPDG(0),
+      phGMPDG(0), type(0), edep(0.0), ttime(0.0), moduleID(0), phnw(0.0), trlen(0.0), en(0.0), ff(NULL),
+      TrHits(NULL), m_arichgp(ARICHGeometryPar::Instance())
     {
       // Set description()
       setDescription("ARICHBackground module. Used to extract information relevant for ARICH background from background files");
@@ -60,6 +63,7 @@ namespace Belle2 {
       // Add parameters
       addParam("FileName", m_filename, "output file name", string("mytree.root"));
       addParam("BkgType", m_bkgType, "source of background (RBB_HER(LER),Touschek_HER(LER),Coulomb_HER(LER),other", string("RBB_HER"));
+
 
     }
 

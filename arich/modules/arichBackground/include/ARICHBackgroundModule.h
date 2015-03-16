@@ -82,13 +82,9 @@ namespace Belle2 {
 
     private:
 
-      TFile* ff;                     /**< Output root file.   */
-
       std::string m_filename;          /**< Output file name.   */
       std::string m_bkgType;           /**< background source.  */
 
-      ARICHGeometryPar* m_arichgp;     /**< Geometry parametrization */
-      TTree* TrHits;                   /**< Output tree */
       TVector3 phpos;                  /**< hit position */
       TVector3 phmom;                  /**< hit momentum */
       TVector3 phVtx;                  /**< hit particle vertex position */
@@ -99,18 +95,23 @@ namespace Belle2 {
       TVector3 phGMvtx;                /**< hit particle grand mother vertex */
       TVector3 phGMmom;                /**< hit particle grand mother momentum */
       TVector3 modOrig;                /**< HAPD module position */
+      int source;                      /**< hit source (RBB_HER, ...) */
       int phPDG;                       /**< hit particle PDG code */
       int phMPDG;                      /**< hit particle mother PDG code */
       int phPPDG;                      /**< hit particle primary PDG code */
       int phGMPDG;                     /**< hit particle grand mother PDG code */
       int type;                        /**< hit particle type; 0 hit in board, 1 hit in HAPD bottom, 2 photon hit */
-      int moduleID;                    /**< hit module ID */
-      int source;                      /**< hit source (RBB_HER, ...) */
       double edep;                     /**< hit deposited energy */
       double ttime;                    /**< hit global time */
+      int moduleID;                    /**< hit module ID */
       double phnw;                     /**< neutron 1MeV equiv. weight */
-      double en;                       /**< energy of particle */
       double trlen;                    /**< particle track lenght in hit volume */
+      double en;                       /**< energy of particle */
+      TFile* ff;                       /**< Output root file.   */
+      TTree* TrHits;                   /**< Output tree */
+      ARICHGeometryPar* m_arichgp;     /**< Geometry parametrization */
+
+
 
     };
 

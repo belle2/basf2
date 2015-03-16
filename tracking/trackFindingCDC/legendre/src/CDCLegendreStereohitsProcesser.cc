@@ -33,7 +33,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
   double trackCharge;
   int vote_pos(0), vote_neg(0);
 
-  for (TrackHit * Hit : cand->getTrackHits()) {
+  for (TrackHit* Hit : cand->getTrackHits()) {
     int curve_sign = Hit->getCurvatureSignWrt(cand->getXc(), cand->getYc());
 
     if (curve_sign == TrackCandidate::charge_positive)
@@ -55,7 +55,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
 
 
-  for (TrackHit * hit : stereohits) {
+  for (TrackHit* hit : stereohits) {
 
 //    if (hit->getHitUsage() == TrackHit::used_in_track) continue;
 
@@ -69,7 +69,8 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
     }
 
     double lWire = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z());
-    double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
+    double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(
+                          hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
 
     stereoHitPair.first.setRWire(rWire);
     stereoHitPair.first.setLWire(lWire);
@@ -123,9 +124,12 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
     stereoHitPair.first.computePolarAngle();
     stereoHitPair.second.computePolarAngle();
 
-    B2DEBUG(100, "SLayerID: " << sLayer <<  "; delta_phi: " << delta_phi << "; alpha: " <<  stereoHitPair.first.getAlpha() << "; sign_final: " << sign_final
-            << "; lWire: " << lWire  << "; rWire: " << rWire << ";   Dist_1: " <<  stereoHitPair.first.getDisplacement() << "; Dist_2: " << stereoHitPair.second.getDisplacement()
-            << "; theta1: " << stereoHitPair.first.getPolarAngle() * 180. / 3.1415 << "; theta2: " << stereoHitPair.first.getPolarAngle() * 180. / 3.1415);
+    B2DEBUG(100, "SLayerID: " << sLayer <<  "; delta_phi: " << delta_phi << "; alpha: " <<  stereoHitPair.first.getAlpha() <<
+            "; sign_final: " << sign_final
+            << "; lWire: " << lWire  << "; rWire: " << rWire << ";   Dist_1: " <<  stereoHitPair.first.getDisplacement() << "; Dist_2: " <<
+            stereoHitPair.second.getDisplacement()
+            << "; theta1: " << stereoHitPair.first.getPolarAngle() * 180. / 3.1415 << "; theta2: " << stereoHitPair.first.getPolarAngle() *
+            180. / 3.1415);
 
     hits_to_add.push_back(stereoHitPair);
 
@@ -135,7 +139,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
   MaxFastHoughStereofinding(stereohitsForCandidate, hits_to_add, 0, tan(-75.*3.1415 / 180.), tan(75.*3.1415 / 180.), -20., 20.);
 
-  for (TrackHit * hit : stereohitsForCandidate) {
+  for (TrackHit* hit : stereohitsForCandidate) {
     cand->addHit(hit);
     hit->setHitUsage(TrackHit::used_in_track);
   }
@@ -259,13 +263,16 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
     //setting Z coordinate according to provided polar angle and comparing updated position of stereohit on consistency with track
     hit->setZReference(stereoHitPair.first.getAlpha() * Rcand / tan(meanTheta));
-    double dist1 = Rcand - sqrt(SQR(hit->getWirePosition().X() - cand->getXc()) + SQR(hit->getWirePosition().Y() - cand->getYc())) + stereoHitPair.first.getInnerOuter() * hit->getDriftLength();
+    double dist1 = Rcand - sqrt(SQR(hit->getWirePosition().X() - cand->getXc()) + SQR(hit->getWirePosition().Y() - cand->getYc())) +
+                   stereoHitPair.first.getInnerOuter() * hit->getDriftLength();
 
     hit->setZReference(stereoHitPair.second.getAlpha() * Rcand / tan(meanTheta));
-    double dist2 = Rcand - sqrt(SQR(hit->getWirePosition().X() - cand->getXc()) + SQR(hit->getWirePosition().Y() - cand->getYc())) + stereoHitPair.second.getInnerOuter() * hit->getDriftLength();
+    double dist2 = Rcand - sqrt(SQR(hit->getWirePosition().X() - cand->getXc()) + SQR(hit->getWirePosition().Y() - cand->getYc())) +
+                   stereoHitPair.second.getInnerOuter() * hit->getDriftLength();
 
 
-    if (((fabs(dist1) < 1.5) || (fabs(dist2) < 1.5)) && (hit->getZReference() > hit->getBackwardWirePosition().Z() && hit->getZReference() < hit->getForwardWirePosition().Z())) {
+    if (((fabs(dist1) < 1.5) || (fabs(dist2) < 1.5)) && (hit->getZReference() > hit->getBackwardWirePosition().Z()
+                                                         && hit->getZReference() < hit->getForwardWirePosition().Z())) {
       cand->addHit(hit);
       hit->setHitUsage(TrackHit::used_in_track);
 
@@ -296,7 +303,8 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 }
 
 
-void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0)
+void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* cand, double theta,
+    std::vector<TrackHit*>& stereohits, double Z0)
 {
   B2INFO("Tree stereo tracklet finding");
   std::sort(stereohits.begin(), stereohits.end());
@@ -307,7 +315,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   int vote_pos(0), vote_neg(0);
 
   //estimation of charge of the track candidate
-  for (TrackHit * Hit : cand->getTrackHits()) {
+  for (TrackHit* Hit : cand->getTrackHits()) {
     int curve_sign = Hit->getCurvatureSignWrt(cand->getXc(), cand->getYc());
 
     if (curve_sign == TrackCandidate::charge_positive)
@@ -332,7 +340,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
   std::set<TrackHit*> hits_set;
   std::set<TrackHit*>::iterator it = hits_set.begin();
-  for (TrackHit * trackHit : stereohits) {
+  for (TrackHit* trackHit : stereohits) {
     if (trackHit->getHitUsage() == TrackHit::used_in_track) continue;
 
 
@@ -348,14 +356,17 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
     //setting Z coordinate according to provided polar angle and comparing updated position of stereohit on consistency with track
     trackHit->setZReference(stereoHitPair.first.getAlpha() * Rcand / tan(theta) + Z0);
-    double dist1 = Rcand - sqrt(SQR(trackHit->getWirePosition().X() - cand->getXc()) + SQR(trackHit->getWirePosition().Y() - cand->getYc())) + stereoHitPair.first.getInnerOuter() * trackHit->getDriftLength();
+    double dist1 = Rcand - sqrt(SQR(trackHit->getWirePosition().X() - cand->getXc()) + SQR(trackHit->getWirePosition().Y() -
+                                cand->getYc())) + stereoHitPair.first.getInnerOuter() * trackHit->getDriftLength();
 
     trackHit->setZReference(stereoHitPair.second.getAlpha() * Rcand / tan(theta) + Z0);
-    double dist2 = Rcand - sqrt(SQR(trackHit->getWirePosition().X() - cand->getXc()) + SQR(trackHit->getWirePosition().Y() - cand->getYc())) + stereoHitPair.second.getInnerOuter() * trackHit->getDriftLength();
+    double dist2 = Rcand - sqrt(SQR(trackHit->getWirePosition().X() - cand->getXc()) + SQR(trackHit->getWirePosition().Y() -
+                                cand->getYc())) + stereoHitPair.second.getInnerOuter() * trackHit->getDriftLength();
 
 
 //    double lWire = fabs(trackHit->getBackwardWirePosition().Z() - trackHit->getForwardWirePosition().Z());
-    double rWire = sqrt(SQR(trackHit->getBackwardWirePosition().x() - trackHit->getForwardWirePosition().x()) + SQR(trackHit->getBackwardWirePosition().y() - trackHit->getForwardWirePosition().y()));
+    double rWire = sqrt(SQR(trackHit->getBackwardWirePosition().x() - trackHit->getForwardWirePosition().x()) + SQR(
+                          trackHit->getBackwardWirePosition().y() - trackHit->getForwardWirePosition().y()));
 
     if ((fabs(dist1) > rWire / 0.9) || (fabs(dist2) > rWire / 0.9)) continue;
 
@@ -379,22 +390,26 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   std::vector<QuadTreeLegendre*> nodeList;
 
   int lastlevel(0);
-  lastlevel = m_cdcLegendreQuadTree.getLastLevel();
-  m_cdcLegendreQuadTree.setLastLevel(9);
+  //lastlevel = m_cdcLegendreQuadTree.getLastLevel();
+  //m_cdcLegendreQuadTree.setLastLevel(9);
 
-  m_cdcLegendreQuadTree.provideItemsSet<QuadTreeProcessor>(hits_set);
+  QuadTreeProcessor qtProcessor(9);
+  m_cdcLegendreQuadTree.provideItemsSet(qtProcessor, hits_set);
   B2INFO("Number of stereohits = " << hits_set.size());
 //  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
-  m_cdcLegendreQuadTree.setNItemsThreshold(limit);
+  //m_cdcLegendreQuadTree.setNItemsThreshold(limit);
 
   // store all candidates in a simple vector
   QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [&nodeList](QuadTreeLegendre * qt) -> void {
     nodeList.push_back(qt);
   };
 
-  m_cdcLegendreQuadTree.startFillingTree<QuadTreeProcessor>(lmdCandidateProcessing);
+  // todo: move usage to fillGivenTree
+  //m_cdcLegendreQuadTree.startFillingTree(qtProcessor,lmdCandidateProcessing);
+  qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing,
+                            limit);
 
-  m_cdcLegendreQuadTree.setLastLevel(lastlevel);
+  //m_cdcLegendreQuadTree.setLastLevel(lastlevel);
 
 
   if (nodeList.size() != 0) {
@@ -402,7 +417,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
     QuadTreeLegendre* nodeWithMostHits = nullptr;
 
-    for (QuadTreeLegendre * node : nodeList) {
+    for (QuadTreeLegendre* node : nodeList) {
       if (nodeWithMostHits == nullptr) {
         nodeWithMostHits = node;
       } else {
@@ -411,7 +426,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
       }
     }
 
-    for (TrackHit * hit : nodeWithMostHits->getItemsVector()) {
+    for (TrackHit* hit : nodeWithMostHits->getItemsVector()) {
       cand->addHit(hit);
       hit->setHitUsage(TrackHit::used_in_track);
     }
@@ -453,7 +468,7 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
   int vote_pos(0), vote_neg(0);
 
   //estimation of charge of the track candidate
-  for (TrackHit * Hit : cand->getTrackHits()) {
+  for (TrackHit* Hit : cand->getTrackHits()) {
     int curve_sign = Hit->getCurvatureSignWrt(cand->getXc(), cand->getYc());
 
     if (curve_sign == TrackCandidate::charge_positive)
@@ -475,7 +490,7 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
 
   double Rcand = cand->getRadius();
 
-  for (TrackHit * hit : stereohits) {
+  for (TrackHit* hit : stereohits) {
 
 
     if (hit->getHitUsage() == TrackHit::used_in_track) continue;
@@ -491,14 +506,17 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
 
     //setting Z coordinate according to provided polar angle and comparing updated position of stereohit on consistency with track
     hit->setZReference(stereoHitPair.first.getAlpha() * Rcand / tan(theta) + Z0);
-    double dist1 = Rcand - sqrt(SQR(hit->getWirePosition().X() - cand->getXc()) + SQR(hit->getWirePosition().Y() - cand->getYc())) + stereoHitPair.first.getInnerOuter() * hit->getDriftLength();
+    double dist1 = Rcand - sqrt(SQR(hit->getWirePosition().X() - cand->getXc()) + SQR(hit->getWirePosition().Y() - cand->getYc())) +
+                   stereoHitPair.first.getInnerOuter() * hit->getDriftLength();
 
     hit->setZReference(stereoHitPair.second.getAlpha() * Rcand / tan(theta) + Z0);
-    double dist2 = Rcand - sqrt(SQR(hit->getWirePosition().X() - cand->getXc()) + SQR(hit->getWirePosition().Y() - cand->getYc())) + stereoHitPair.second.getInnerOuter() * hit->getDriftLength();
+    double dist2 = Rcand - sqrt(SQR(hit->getWirePosition().X() - cand->getXc()) + SQR(hit->getWirePosition().Y() - cand->getYc())) +
+                   stereoHitPair.second.getInnerOuter() * hit->getDriftLength();
 
 
     //TODO: set reasonable values instead of "1.5"
-    if (((fabs(dist1) < 1.5) || (fabs(dist2) < 1.5)) && (hit->getZReference() > hit->getBackwardWirePosition().Z() && hit->getZReference() < hit->getForwardWirePosition().Z())) {
+    if (((fabs(dist1) < 1.5) || (fabs(dist2) < 1.5)) && (hit->getZReference() > hit->getBackwardWirePosition().Z()
+                                                         && hit->getZReference() < hit->getForwardWirePosition().Z())) {
       cand->addHit(hit);
       hit->setHitUsage(TrackHit::used_in_track);
 
@@ -536,7 +554,7 @@ std::pair<StereoHit, StereoHit> StereohitsProcesser::getDisplacements(TrackCandi
     int vote_pos(0), vote_neg(0);
 
     //estimation of charge of the track candidate
-    for (TrackHit * Hit : cand->getTrackHits()) {
+    for (TrackHit* Hit : cand->getTrackHits()) {
       int curve_sign = Hit->getCurvatureSignWrt(cand->getXc(), cand->getYc());
 
       if (curve_sign == TrackCandidate::charge_positive)
@@ -569,7 +587,8 @@ std::pair<StereoHit, StereoHit> StereohitsProcesser::getDisplacements(TrackCandi
     throw "Alpha is NAN!" ;
 
 //  double lWire = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z());
-  double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
+  double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(
+                        hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
 
   if ((fabs(stereoHitInner.getDisplacement()) > rWire) && (fabs(stereoHitOuter.getDisplacement()) > rWire))
     throw "Displacement exceeds wire lenght of wire projection!" ;
@@ -584,7 +603,9 @@ StereoHit StereohitsProcesser::getDisplacement(TrackCandidate* cand, TrackHit* h
   double Rcand = cand->getRadius();
 
   //-------- drift time correction factor! should be discussed --------
-  double driftLenghtCorr = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z()) / sqrt(SQR(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z()) + SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
+  double driftLenghtCorr = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z()) / sqrt(SQR(
+                             hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z()) + SQR(hit->getBackwardWirePosition().x() -
+                                 hit->getForwardWirePosition().x()) + SQR(hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
 
   //------------------------------
   // here we are solving system of equations:
@@ -607,22 +628,33 @@ StereoHit StereohitsProcesser::getDisplacement(TrackCandidate* cand, TrackHit* h
 
   double A = hit->getForwardWirePosition().Y() - hit->getBackwardWirePosition().Y();
   double B = hit->getBackwardWirePosition().X() - hit->getForwardWirePosition().X();
-  double C = hit->getForwardWirePosition().X() * hit->getBackwardWirePosition().Y() - hit->getBackwardWirePosition().X() * hit->getForwardWirePosition().Y();
+  double C = hit->getForwardWirePosition().X() * hit->getBackwardWirePosition().Y() - hit->getBackwardWirePosition().X() *
+             hit->getForwardWirePosition().Y();
 
   double x0circle = cand->getXc();
   double y0circle = cand->getYc();
 
   double R_outer = Rcand + InnerOuter * hit->getDriftLength() * driftLenghtCorr;
 
-  double x1 = 1. / (A * A + B * B) * (-1.*pow(-1.*B * B * (A * A * x0circle * x0circle - A * A * R_outer * R_outer + 2.*A * B * x0circle * y0circle + 2.*A * C * x0circle + B * B * y0circle * y0circle - B * B * R_outer * R_outer + 2.*B * C * y0circle + C * C) , 0.5) - A * B * y0circle - A * C + B * B * x0circle);
-  double y1 = 1. / (B * (A * A + B * B)) * (A * pow(-1.*B * B * (A * A * x0circle * x0circle - A * A * R_outer * R_outer + 2.*A * B * x0circle * y0circle + 2.*A * C * x0circle + B * B * y0circle * y0circle - B * B * R_outer * R_outer + 2.*B * C * y0circle + C * C) , 0.5) + A * A * B * y0circle - A * B * B * x0circle - B * B * C);
+  double x1 = 1. / (A * A + B * B) * (-1.*pow(-1.*B * B * (A * A * x0circle * x0circle - A * A * R_outer * R_outer + 2.*A * B *
+                                                           x0circle * y0circle + 2.*A * C * x0circle + B * B * y0circle * y0circle - B * B * R_outer * R_outer + 2.*B * C * y0circle + C * C) ,
+                                              0.5) - A * B * y0circle - A * C + B * B * x0circle);
+  double y1 = 1. / (B * (A * A + B * B)) * (A * pow(-1.*B * B * (A * A * x0circle * x0circle - A * A * R_outer * R_outer + 2.*A * B *
+                                                    x0circle * y0circle + 2.*A * C * x0circle + B * B * y0circle * y0circle - B * B * R_outer * R_outer + 2.*B * C * y0circle + C * C) ,
+                                                    0.5) + A * A * B * y0circle - A * B * B * x0circle - B * B * C);
 
-  double x2 = 1. / (A * A + B * B) * (pow(-1.*B * B * (A * A * x0circle * x0circle - A * A * R_outer * R_outer + 2.*A * B * x0circle * y0circle + 2.*A * C * x0circle + B * B * y0circle * y0circle - B * B * R_outer * R_outer + 2.*B * C * y0circle + C * C) , 0.5) - A * B * y0circle - A * C + B * B * x0circle);
-  double y2 = 1. / (B * (A * A + B * B)) * (-1.*A * pow(-1.*B * B * (A * A * x0circle * x0circle - A * A * R_outer * R_outer + 2.*A * B * x0circle * y0circle + 2.*A * C * x0circle + B * B * y0circle * y0circle - B * B * R_outer * R_outer + 2.*B * C * y0circle + C * C) , 0.5) + A * A * B * y0circle - A * B * B * x0circle - B * B * C);
+  double x2 = 1. / (A * A + B * B) * (pow(-1.*B * B * (A * A * x0circle * x0circle - A * A * R_outer * R_outer + 2.*A * B * x0circle *
+                                                       y0circle + 2.*A * C * x0circle + B * B * y0circle * y0circle - B * B * R_outer * R_outer + 2.*B * C * y0circle + C * C) ,
+                                          0.5) - A * B * y0circle - A * C + B * B * x0circle);
+  double y2 = 1. / (B * (A * A + B * B)) * (-1.*A * pow(-1.*B * B * (A * A * x0circle * x0circle - A * A * R_outer * R_outer + 2.*A *
+                                                        B * x0circle * y0circle + 2.*A * C * x0circle + B * B * y0circle * y0circle - B * B * R_outer * R_outer + 2.*B * C * y0circle + C *
+                                                        C) , 0.5) + A * A * B * y0circle - A * B * B * x0circle - B * B * C);
 
 
-  double dist_to_hit1 = sqrt((x1 - hit->getOriginalWirePosition().X()) * (x1 - hit->getOriginalWirePosition().X()) + (y1 - hit->getOriginalWirePosition().Y()) * (y1 - hit->getOriginalWirePosition().Y()));
-  double dist_to_hit2 = sqrt((x2 - hit->getOriginalWirePosition().X()) * (x2 - hit->getOriginalWirePosition().X()) + (y2 - hit->getOriginalWirePosition().Y()) * (y2 - hit->getOriginalWirePosition().Y()));
+  double dist_to_hit1 = sqrt((x1 - hit->getOriginalWirePosition().X()) * (x1 - hit->getOriginalWirePosition().X()) +
+                             (y1 - hit->getOriginalWirePosition().Y()) * (y1 - hit->getOriginalWirePosition().Y()));
+  double dist_to_hit2 = sqrt((x2 - hit->getOriginalWirePosition().X()) * (x2 - hit->getOriginalWirePosition().X()) +
+                             (y2 - hit->getOriginalWirePosition().Y()) * (y2 - hit->getOriginalWirePosition().Y()));
 
   B2DEBUG(100, "OUTER distances from track to hit: " << dist_to_hit1 << "; " << dist_to_hit2);
 
@@ -640,10 +672,12 @@ StereoHit StereohitsProcesser::getDisplacement(TrackCandidate* cand, TrackHit* h
 
   double alpha = getAlpha(cand, std::make_pair(hitProjectionX, hitProjectionY));
 
-  double dist = Rcand - sqrt(SQR(hit->getOriginalWirePosition().X() - cand->getXc()) + SQR(hit->getOriginalWirePosition().Y() - cand->getYc())) + InnerOuter * hit->getDriftLength() * driftLenghtCorr;
+  double dist = Rcand - sqrt(SQR(hit->getOriginalWirePosition().X() - cand->getXc()) + SQR(hit->getOriginalWirePosition().Y() -
+                             cand->getYc())) + InnerOuter * hit->getDriftLength() * driftLenghtCorr;
   dist = dist / fabs(dist) * fabs(dist_to_hit);
 
-  B2DEBUG(100, "A = " << A << "; B = " << B << "; C = " << C << "; x0circle = " << x0circle << "; y0circle = " << y0circle << "; R_outer = " << R_outer);
+  B2DEBUG(100, "A = " << A << "; B = " << B << "; C = " << C << "; x0circle = " << x0circle << "; y0circle = " << y0circle <<
+          "; R_outer = " << R_outer);
 
   return StereoHit(alpha, hitProjectionX, hitProjectionY, InnerOuter, hit, dist);
 
@@ -653,7 +687,8 @@ StereoHit StereohitsProcesser::getDisplacement(TrackCandidate* cand, TrackHit* h
 double StereohitsProcesser::getAlpha(TrackCandidate* cand, std::pair<double, double> pos)
 {
 
-  double alpha = acos(1. - (SQR(pos.first - cand->getReferencePoint().X()) + SQR(pos.second - cand->getReferencePoint().Y())) / (2.*SQR(cand->getRadius())));
+  double alpha = acos(1. - (SQR(pos.first - cand->getReferencePoint().X()) + SQR(pos.second - cand->getReferencePoint().Y())) /
+                      (2.*SQR(cand->getRadius())));
 
   double hitPhi = 0.;
   hitPhi = atan(pos.second / pos.first);
@@ -735,9 +770,11 @@ void StereohitsProcesser::MaxFastHoughStereofinding(
     for (int z0_index = 0; z0_index < 2; ++z0_index) {
       for (int lambda_index = 0; lambda_index < 2; ++lambda_index) {
         //curves are assumed to be straight lines, might be a reasonable assumption locally
-        if (!sameSign(dist_1[z0_index][lambda_index], dist_1[z0_index][lambda_index + 1], dist_1[z0_index + 1][lambda_index], dist_1[z0_index + 1][lambda_index + 1]))
+        if (!sameSign(dist_1[z0_index][lambda_index], dist_1[z0_index][lambda_index + 1], dist_1[z0_index + 1][lambda_index],
+                      dist_1[z0_index + 1][lambda_index + 1]))
           voted_hits[z0_index][lambda_index].push_back(hit);
-        else if (!sameSign(dist_2[z0_index][lambda_index], dist_2[z0_index][lambda_index + 1], dist_2[z0_index + 1][lambda_index], dist_2[z0_index + 1][lambda_index + 1]))
+        else if (!sameSign(dist_2[z0_index][lambda_index], dist_2[z0_index][lambda_index + 1], dist_2[z0_index + 1][lambda_index],
+                           dist_2[z0_index + 1][lambda_index + 1]))
           voted_hits[z0_index][lambda_index].push_back(hit);
       }
     }
@@ -788,7 +825,8 @@ void StereohitsProcesser::MaxFastHoughStereofinding(
 
       } else {
         //Recursive calling of the function with higher level and smaller box
-        MaxFastHoughStereofinding(hitsToAdd, voted_hits[z0_index][lambda_index], level + 1, lambdaBin[lambda_index], lambdaBin[lambda_index + 1],
+        MaxFastHoughStereofinding(hitsToAdd, voted_hits[z0_index][lambda_index], level + 1, lambdaBin[lambda_index],
+                                  lambdaBin[lambda_index + 1],
                                   z0[z0_index], z0[z0_index + 1]);
 
       }

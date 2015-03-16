@@ -23,7 +23,8 @@ using namespace TrackFindingCDC;
 REG_MODULE(CDCLegendreTracking)
 
 CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
-  Module(), m_cdcLegendreTrackFitter(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr), m_cdcLegendreTrackProcessor(),
+  Module(), m_cdcLegendreTrackFitter(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr),
+  m_cdcLegendreTrackProcessor(),
   m_cdcLegendreFastHough(nullptr), m_cdcLegendreTrackDrawer(nullptr)
 {
   setDescription(
@@ -89,9 +90,6 @@ void CDCLegendreTrackingModule::initialize()
 
   // set parameters of track processor
   m_cdcLegendreTrackProcessor.setTrackDrawer(m_cdcLegendreTrackDrawer);
-
-  // set parameter of quad tree
-  m_cdcLegendreQuadTree.setLastLevel(m_maxLevel);
 }
 
 void CDCLegendreTrackingModule::event()
@@ -132,7 +130,7 @@ void CDCLegendreTrackingModule::findTracks()
 
 void CDCLegendreTrackingModule::outputObjects()
 {
-  for (TrackCandidate * cand : m_cdcLegendreTrackProcessor.getTrackList()) {
+  for (TrackCandidate* cand : m_cdcLegendreTrackProcessor.getTrackList()) {
     B2DEBUG(100, "R value: " << cand->getR() << "; theta: " << cand->getTheta() << "; radius: " << cand->getRadius() << "; phi: "
             << cand->getPhi() << "; charge: " << cand->getChargeSign() << "; Xc = " << cand->getXc() << "; Yc = " << cand->getYc() <<
             "Hitsize: " << cand->getNHits());
@@ -151,8 +149,9 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
   std::set<TrackHit*> hits_set = m_cdcLegendreTrackProcessor.createHitSet();
 
+  QuadTreeProcessor qtProcessor(m_maxLevel);
   m_cdcLegendreQuadTree.clearTree();
-  m_cdcLegendreQuadTree.provideItemsSet<QuadTreeProcessor>(hits_set);
+  m_cdcLegendreQuadTree.provideItemsSet(qtProcessor, hits_set);
   int nSteps = 0;
 
   // this lambda function will forward the found candidates to the CandidateCreate for further processing
@@ -162,7 +161,8 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     TrackCandidate* trackCandidate = m_cdcLegendreTrackProcessor.createLegendreTrackCandidateFromQuadNode(qt);
 
     unsigned int numberOfUsedHits = 0;
-    for (TrackHit * hit : hits_set) {
+    for (TrackHit* hit : hits_set)
+    {
       if (hit->getHitUsage() == TrackHit::used_in_track)
         numberOfUsedHits++;
     }
@@ -172,15 +172,18 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     // Postprocessing of one track candidate
     m_cdcLegendreTrackProcessor.fitOneTrack(trackCandidate);
 
-    if (m_deleteHitsWhileFinding) {
+    if (m_deleteHitsWhileFinding)
+    {
       m_cdcLegendreTrackProcessor.deleteBadHitsOfOneTrack(trackCandidate);
     }
 
-    if (m_mergeTracksWhileFinding) {
+    if (m_mergeTracksWhileFinding)
+    {
       m_cdcLegendreTrackProcessor.mergeOneTrack(trackCandidate);
     }
 
-    if (m_appendHitsWhileFinding) {
+    if (m_appendHitsWhileFinding)
+    {
       m_cdcLegendreTrackProcessor.appendHitsOfAllTracks();
     }
 
@@ -191,12 +194,12 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
 
 
-  QuadTreeProcessor::fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 50, 0.011);
-  QuadTreeProcessor::fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 70, 0.02);
+  qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 50, 0.011);
+  qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 70, 0.02);
 
   // Start loop, where tracks are searched for
   do {
-    QuadTreeProcessor::fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
+    qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
 
     limit = limit * m_stepScale;
 

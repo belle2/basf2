@@ -16,12 +16,15 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<typename typeX, typename typeY, class typeData>
-    class QuadTreeTemplate;
+    /* Class disabled because the QuadTree data structure has been stripped of the neighbourhood
+     * members.
+     * If you need the NeighborFinder functionality again, add the appropriate data members
+     * to the QuadTree and uncomment this lines.
+     */
 
     class QuadTreeNeighborFinder {
     public:
-      typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
+      //typedef QuadTreeTemplate<int, double, TrackHit> QuadTreeLegendre;
 
       QuadTreeNeighborFinder() {};
       ~QuadTreeNeighborFinder() {};

@@ -35,9 +35,8 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 
   QuadTreeLegendre::NodeList candidateNodes;
 
-  qt.provideItemsSet<QuadTreeProcessor>(hits_set);
-  qt.setLastLevel(13);
-  qt.setNItemsThreshold(50);
+  QuadTreeProcessor qtProcessor(13);
+  qt.provideItemsSet(qtProcessor, hits_set);
 
   QuadTreeLegendre::CandidateProcessorLambda lmdProcessor = [&candidateNodes](QuadTreeLegendre * qt) {
     std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](TrackHit * th) {th->setHitUsage(TrackHit::used_in_track);});
@@ -47,7 +46,7 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   auto now = std::chrono::high_resolution_clock::now();
 
   // actual filling of the hits into the quad tree structure
-  qt.startFillingTree<QuadTreeProcessor>(lmdProcessor);
+  qtProcessor.fillGivenTree(&qt, lmdProcessor, 55);
   auto later = std::chrono::high_resolution_clock::now();
 
   EXPECT_EQ(numberOfPossibleTrackCandidate, candidateNodes.size());

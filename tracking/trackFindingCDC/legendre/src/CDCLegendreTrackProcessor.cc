@@ -26,18 +26,19 @@ using namespace TrackFindingCDC;
 
 TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromQuadNode(QuadTreeLegendre* node)
 {
+  QuadTreeProcessor qtProcessor(13);
   // Remove used or bad hits
-  node->cleanUpItems<QuadTreeProcessor>();
+  node->cleanUpItems(qtProcessor);
 
   // Clean hits in the neighborhood
   std::vector<QuadTreeLegendre*> nodeList;
   nodeList.push_back(node);
 
-  node->findNeighbors();
-  for (QuadTreeLegendre * nodeNeighbor : node->getNeighborsVector()) {
-    if (nodeNeighbor->getNItems() == 0) nodeNeighbor->fillChildrenForced<QuadTreeProcessor>();
-    nodeNeighbor->cleanUpItems<QuadTreeProcessor>();
-  }
+  /*  node->findNeighbors();
+    for (QuadTreeLegendre * nodeNeighbor : node->getNeighborsVector()) {
+      if (nodeNeighbor->getNItems() == 0) nodeNeighbor->fillChildrenForced<QuadTreeProcessor>();
+      nodeNeighbor->cleanUpItems<QuadTreeProcessor>();
+    }*/
 
   // Create the legendre Track Candidate from the nodes
   TrackCandidate* trackCandidate = createLegendreTrackCandidateFromQuadNodeList(nodeList);
@@ -66,7 +67,7 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
 
     m_cdcLegendreTrackDrawer->drawTrackCand(trackCandidate);
 
-    for (TrackHit * hit : trackCandidate->getTrackHits()) {
+    for (TrackHit* hit : trackCandidate->getTrackHits()) {
       hit->setHitUsage(TrackHit::used_in_track);
     }
 
@@ -76,7 +77,7 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
   }
 
   else {
-    for (TrackHit * hit : trackCandidate->getTrackHits()) {
+    for (TrackHit* hit : trackCandidate->getTrackHits()) {
       hit->setHitUsage(TrackHit::bad);
     }
 
@@ -99,7 +100,7 @@ void TrackProcessor::createGFTrackCandidates(const string& m_gfTrackCandsColName
 
   int createdTrackCandidatesCounter = 0;
 
-  for (TrackCandidate * trackCand : m_trackList) {
+  for (TrackCandidate* trackCand : m_trackList) {
     if (trackCand->getTrackHits().size() < 5) continue;
     genfit::TrackCand* newTrackCandidate = gfTrackCandidates.appendNew();
 
@@ -124,7 +125,7 @@ void TrackProcessor::createGFTrackCandidates(const string& m_gfTrackCandsColName
     sortHits(trackHitVector, trackCand->getChargeSign());
 
     unsigned int sortingParameter = 0;
-    for (TrackHit * trackHit : trackHitVector) {
+    for (TrackHit* trackHit : trackHitVector) {
       int hitID = trackHit->getStoreIndex();
       // TODO: Can we determine the plane?
       newTrackCandidate->addHit(Const::CDC, hitID, -1, sortingParameter);
@@ -142,15 +143,15 @@ void TrackProcessor::sortHits(std::vector<TrackHit*>& hits, int charge)
 
 std::set<TrackHit*> TrackProcessor::createHitSet()
 {
-  for (TrackCandidate * cand : m_trackList) {
-    for (TrackHit * hit : cand->getTrackHits()) {
+  for (TrackCandidate* cand : m_trackList) {
+    for (TrackHit* hit : cand->getTrackHits()) {
       hit->setHitUsage(TrackHit::used_in_track);
     }
   }
   std::sort(m_axialHitList.begin(), m_axialHitList.end());
   std::set<TrackHit*> hits_set;
   std::set<TrackHit*>::iterator it = hits_set.begin();
-  for (TrackHit * trackHit : m_axialHitList) {
+  for (TrackHit* trackHit : m_axialHitList) {
     if ((trackHit->getHitUsage() != TrackHit::used_in_track)
         && (trackHit->getHitUsage() != TrackHit::background))
       it = hits_set.insert(it, trackHit);
@@ -164,7 +165,7 @@ void TrackProcessor::deleteTracksWithASmallNumberOfHits()
   // Delete a track if we have to few hits left
   m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(), [](TrackCandidate * trackCandidate) {
     if (trackCandidate->getNHits() < 3) {
-      for (TrackHit * trackHit : trackCandidate->getTrackHits()) {
+      for (TrackHit* trackHit : trackCandidate->getTrackHits()) {
         trackHit->setHitUsage(TrackHit::not_used);
       }
       return true;
@@ -177,7 +178,7 @@ void TrackProcessor::deleteTracksWithASmallNumberOfHits()
 
 void TrackProcessor::fitAllTracks()
 {
-  for (TrackCandidate * cand : m_trackList) {
+  for (TrackCandidate* cand : m_trackList) {
     fitOneTrack(cand);
   }
 }
@@ -206,7 +207,7 @@ void TrackProcessor::deleteHitsOfAllBadTracks()
 {
   SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
   fitAllTracks();
-  for (TrackCandidate * trackCandidate : m_trackList) {
+  for (TrackCandidate* trackCandidate : m_trackList) {
     SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
   }
   fitAllTracks();
@@ -233,7 +234,7 @@ void TrackProcessor::mergeOneTrack(TrackCandidate* trackCandidate)
   if (trackCandidate == nullptr)
     return;
 
-  for (TrackCandidate * cand : m_trackList) {
+  for (TrackCandidate* cand : m_trackList) {
     SimpleFilter::deleteWrongHitsOfTrack(cand, 0.8);
     m_cdcLegendreTrackFitter.fitTrackCandidateFast(cand);
     cand->reestimateCharge();
@@ -243,7 +244,7 @@ void TrackProcessor::mergeOneTrack(TrackCandidate* trackCandidate)
 void TrackProcessor::mergeAllTracks()
 {
   TrackMerger::doTracksMerging(m_trackList);
-  for (TrackCandidate * trackCandidate : m_trackList) {
+  for (TrackCandidate* trackCandidate : m_trackList) {
     SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
   }
   fitAllTracks();
@@ -255,7 +256,7 @@ void TrackProcessor::appendHitsOfAllTracks()
   fitAllTracks();
   SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.90);
   fitAllTracks();
-  for (TrackCandidate * trackCandidate : m_trackList) {
+  for (TrackCandidate* trackCandidate : m_trackList) {
     SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
     fitOneTrack(trackCandidate);
   }

@@ -15,6 +15,7 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <string>
+#include <array>
 
 namespace Belle2 {
 

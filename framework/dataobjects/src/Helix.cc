@@ -357,16 +357,7 @@ void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLe
 double Helix::calcArcLengthAtDeltaCylindricalRAndDr(const double& deltaCylindricalR, const double& dr) const
 {
   const double omega = getOmega();
-
-  // When cylindricalR and d0 are approximatly the same and the resulting difference of the squares turns out
-  // to be -10^-18 in double precision, which makes the sqrt return nan.
-  // Do calculation in single precision here to negating these rounding errors of order -10^-18.
-  float deltaCylindricalRSquared = deltaCylindricalR * deltaCylindricalR;
-  float drSquared = dr * dr;
-  double secantLength = sqrt((deltaCylindricalRSquared - drSquared) / (1 + dr * omega));
-  // Note : The above line results from simplifications for the normal n_0, n_1, n_2, n_3 representation
-  // It might have an geometrical interpretation. If you have one please insert it here.
-
+  double secantLength = sqrt((deltaCylindricalR + dr) * (deltaCylindricalR - dr) / (1 + dr * omega));
   return calcArcLengthFromSecantLength(secantLength);
 }
 

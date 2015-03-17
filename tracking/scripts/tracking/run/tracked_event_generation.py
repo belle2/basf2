@@ -40,6 +40,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                                                 'TrackFinderCDCLegendre',
                                                 'CDCLegendreTracking',
                                                 'CDCLocalTracking',
+                                                'Trasan',
                                                 'CDCFullFinder',
                                                 ]),
             default=self.finder_module,
@@ -68,7 +69,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     def determine_tracking_coverage(self, finder_module_or_name):
         finder_module_name = self.get_basf2_module_name(finder_module_or_name)
 
-        if finder_module_name in ('CDCLocalTracking', 'CDCLegendreTracking', 'CDCFullFinder') or finder_module_name.startswith('TrackFinderCDC'):
+        if (finder_module_name in ('CDCLocalTracking', 'CDCLegendreTracking', 'CDCFullFinder', 'Trasan') or
+                finder_module_name.startswith('TrackFinderCDC')):
             return {'UsePXDHits': False,
                     'UseSVDHits': False,
                     'UseCDCHits': True}
@@ -93,7 +95,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                         'UseSVDHits': 'SVD' in self.components,
                         'UseCDCHits': 'CDC' in self.components}
         else:
-            get_logger().info('Could not determine tracking coverage for module name %s. Using value stored in self.tracking_coverage which is %s',
+            get_logger().info('Could not determine tracking coverage for module name %s. '
+                              'Using value stored in self.tracking_coverage which is %s',
                               finder_module_name, self.tracking_coverage)
             return self.tracking_coverage
 

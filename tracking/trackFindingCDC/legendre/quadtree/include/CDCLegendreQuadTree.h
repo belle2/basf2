@@ -181,7 +181,7 @@ namespace Belle2 {
       inline Children* getChildren() const {return m_children.get();};
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
-      inline int getLevel() const {return m_level;};
+      inline unsigned char getLevel() const {return m_level;};
 
       /** Copy information about hits into member of class (node at level 0 should be used  because other levels fills by parents) */
       template<class processor>
@@ -235,7 +235,7 @@ namespace Belle2 {
       inline typeX getXMean() const {return m_xBins[1];};
 
       /** Get number of bins in "r" direction */
-      inline constexpr int getXNbins() {return binCountX;}
+      inline constexpr int getXNbins() const {return binCountX;}
 
       /** Get minimal "r" value of the node */
       inline typeX getXMin() const {return m_xBins[0];};
@@ -247,7 +247,7 @@ namespace Belle2 {
       inline typeX getXBin(int bin) const { return static_cast<typeX>(m_xBins[bin]); };
 
       /** Get number of bins in "Theta" direction */
-      inline constexpr int getYNbins() {return binCountY;}
+      inline constexpr int getYNbins() const {return binCountY;}
 
       /** Get minimal "Theta" value of the node */
       inline typeY getYMin() const {return m_yBins[0];};

@@ -380,7 +380,8 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   }
 
 
-  TrackCandidate* stereoPart = nullptr;
+  // used only by commented code
+  //TrackCandidate* stereoPart = nullptr;
 
   m_cdcLegendreQuadTree.clearTree();
 
@@ -389,7 +390,8 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
   std::vector<QuadTreeLegendre*> nodeList;
 
-  int lastlevel(0);
+  // used only by commented code
+  //int lastlevel(0);
   //lastlevel = m_cdcLegendreQuadTree.getLastLevel();
   //m_cdcLegendreQuadTree.setLastLevel(9);
 

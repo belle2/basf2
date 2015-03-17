@@ -20,7 +20,8 @@ QuadTreeNeighborFinder& QuadTreeNeighborFinder::Instance()
   return *s_cdcLegendreQuadTreeNeighborFinder;
 }
 
-void QuadTreeNeighborFinder::controller(QuadTreeLegendre* origin_node, QuadTreeLegendre* caller_node, QuadTreeLegendre* node)
+void QuadTreeNeighborFinder::controller(QuadTreeLegendre* /*origin_node*/, QuadTreeLegendre* /*caller_node*/,
+                                        QuadTreeLegendre* /*node*/)
 {
   // commented because the QuadTree data structure has been stripped of the neighbourhood
   // members.
@@ -52,12 +53,12 @@ void QuadTreeNeighborFinder::controller(QuadTreeLegendre* origin_node, QuadTreeL
   */
 }
 
-void QuadTreeNeighborFinder::levelUp(QuadTreeLegendre* origin_node, QuadTreeLegendre* caller_node)
+void QuadTreeNeighborFinder::levelUp(QuadTreeLegendre* /*origin_node*/, QuadTreeLegendre* /*caller_node*/)
 {
 // controller(origin_node, caller_node, caller_node->getParent());
 }
 
-void QuadTreeNeighborFinder::levelDown(QuadTreeLegendre* origin_node, QuadTreeLegendre* node)
+void QuadTreeNeighborFinder::levelDown(QuadTreeLegendre* /*origin_node*/, QuadTreeLegendre* /*node*/)
 {
   /* for (int t_index = 0; t_index < node->getYNbins(); ++t_index) {
      for (int r_index = 0; r_index < node->getXNbins(); ++r_index) {
@@ -79,7 +80,8 @@ void QuadTreeNeighborFinder::levelDown(QuadTreeLegendre* origin_node, QuadTreeLe
 
 
 
-void QuadTreeNeighborFinder::findNeighbors(QuadTreeLegendre* origin_node, QuadTreeLegendre* caller_node, QuadTreeLegendre* node)
+void QuadTreeNeighborFinder::findNeighbors(QuadTreeLegendre* /*origin_node*/, QuadTreeLegendre* /*caller_node*/,
+                                           QuadTreeLegendre* /*node*/)
 {
   /* for (int t_index = 0; t_index < node->getYNbins(); ++t_index) {
      for (int r_index = 0; r_index < node->getXNbins(); ++r_index) {

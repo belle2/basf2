@@ -39,12 +39,13 @@ namespace Belle2 {
      * This method is called only once before the actual event processing starts.
      * Use this method to initialize variables, open files etc.
      */
-    void initialize();
+    void initialize() override;
 
     /** Called when entering a new run;
      * Called at the beginning of each run, the method gives you the chance to change run dependent constants like alignment parameters, etc.
      */
-    void beginRun() {
+    void beginRun() override
+    {
       eventNumber = 0;
       m_treeFinder = 0;
       m_steppedFinder = 0;
@@ -53,17 +54,17 @@ namespace Belle2 {
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.
      */
-    void event();
+    void event() override;
 
     /** This method is called if the current run ends.
      * Use this method to store information, which should be aggregated over one run.
      */
-    void endRun();
+    void endRun() override;
 
     /** This method is called at the end of the event processing.
      *  Use this method for cleaning up, closing files, etc.
      */
-    void terminate();
+    void terminate() override;
 
 
   protected:
@@ -72,7 +73,8 @@ namespace Belle2 {
 
     const double m_rMin = -0.15; /**< Minimum in r direction*/
     const double m_rMax = 0.15; /**< Maximum in r direction*/
-    const int m_nbinsTheta = 8192; /**< hardcoded value!!! temporary solution, for avoiding segfaults only  //static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping; */
+    const int m_nbinsTheta =
+      8192; /**< hardcoded value!!! temporary solution, for avoiding segfaults only  //static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping; */
 
     TrackFindingCDC::TrackFitter m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
     TrackFindingCDC::QuadTreeLegendre m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */

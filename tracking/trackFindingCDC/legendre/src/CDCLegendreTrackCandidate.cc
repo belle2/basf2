@@ -47,7 +47,7 @@ TrackCandidate::TrackCandidate(double theta, double r, int charge,
 
   //only accepts hits, which support the correct curvature
 
-  for (TrackHit * hit : trackHitList) {
+  for (TrackHit* hit : trackHitList) {
     if (/*(m_charge != charge_tracklet) &&*/ ((m_charge == charge_positive || m_charge == charge_negative)
                                               && hit->getCurvatureSignWrt(getXc(), getYc()) != m_charge))
       continue;
@@ -70,10 +70,10 @@ TrackCandidate::TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList) :
 {
   m_TrackHits.reserve(256);
 
-  int nHitsNodeMax = 0;
+  size_t nHitsNodeMax = 0;
   //only accepts hits, which support the correct curvature
-  for (QuadTreeLegendre * node : nodeList) {
-    for (TrackHit * hit : node->getItemsVector()) {
+  for (QuadTreeLegendre* node : nodeList) {
+    for (TrackHit* hit : node->getItemsVector()) {
 //            if ((m_charge == charge_positive || m_charge == charge_negative)
 //                && hit->getCurvatureSignWrt(getXc(), getYc()) != m_charge)
 //              continue;
@@ -112,7 +112,7 @@ void TrackCandidate::determineHitNumbers()
 {
   m_axialHits = 0;
   m_stereoHits = 0;
-  for (TrackHit * hit : m_TrackHits) {
+  for (TrackHit* hit : m_TrackHits) {
     if (hit->getIsAxial())
       ++m_axialHits;
     else
@@ -179,11 +179,12 @@ double TrackCandidate::getZMomentumEstimation(TVector2 mom2) const
   double theta_mean = 0;
   int nStereo = 0;
 
-  for (TrackHit * hit : m_TrackHits) {
+  for (TrackHit* hit : m_TrackHits) {
     if (hit->getIsAxial())
       continue;
 
-    double alpha = acos(1. - (SQR(hit->getOriginalWirePosition().X() - m_ref_x) + SQR(hit->getOriginalWirePosition().Y() - m_ref_y)) / (2.*SQR(1. / m_r)));
+    double alpha = acos(1. - (SQR(hit->getOriginalWirePosition().X() - m_ref_x) + SQR(hit->getOriginalWirePosition().Y() - m_ref_y)) /
+                        (2.*SQR(1. / m_r)));
 
     double theta = atan(alpha * fabs(1. / m_r) / hit->getWirePosition().Z()) + TMath::Pi();
     nStereo++;
@@ -255,7 +256,7 @@ int TrackCandidate::getChargeAssumption(
   int vote_pos = 0;
   int vote_neg = 0;
 
-  for (TrackHit * Hit : trackHits) {
+  for (TrackHit* Hit : trackHits) {
     int curve_sign = Hit->getCurvatureSignWrt(xc, yc);
 
     if (curve_sign == TrackCandidate::charge_positive)
@@ -286,7 +287,7 @@ int TrackCandidate::getChargeSign() const
     double trackCharge;
     int vote_pos(0), vote_neg(0);
 
-    for (TrackHit * Hit : m_TrackHits) {
+    for (TrackHit* Hit : m_TrackHits) {
       int curve_sign = Hit->getCurvatureSignWrt(m_xc, m_yc);
 
       if (curve_sign == TrackCandidate::charge_positive)
@@ -369,7 +370,8 @@ int TrackCandidate::getInnermostSLayer(bool forced, int minNHits)
       if (m_hitPattern.hasSLayer(minSLayer)) {
         if (m_hitPattern.getSLayerNHits(minSLayer) < minNHits) {
           //using lambda functions for erase-remove idiom
-          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&minSLayer](TrackHit * hit) {return hit->getSuperlayerId() == minSLayer;}), m_TrackHits.end());
+          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&minSLayer](TrackHit * hit) {return hit->getSuperlayerId() == minSLayer;}),
+          m_TrackHits.end());
         } else {
           m_innermostAxialSLayer = minSLayer;
           break;
@@ -393,7 +395,8 @@ int TrackCandidate::getOutermostSLayer(bool forced, int minNHits)
       if (m_hitPattern.hasSLayer(maxSLayer)) {
         if (m_hitPattern.getSLayerNHits(maxSLayer) < minNHits) {
           //using lambda functions for erase-remove idiom
-          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&maxSLayer](TrackHit * hit) {return hit->getSuperlayerId() == maxSLayer;}), m_TrackHits.end());
+          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&maxSLayer](TrackHit * hit) {return hit->getSuperlayerId() == maxSLayer;}),
+          m_TrackHits.end());
         } else {
           m_outermostAxialSLayer = maxSLayer;
           break;
@@ -413,7 +416,7 @@ void TrackCandidate::makeHitPattern()
 {
   m_hitPattern.resetPattern();
 
-  for (TrackHit * hit : m_TrackHits) {
+  for (TrackHit* hit : m_TrackHits) {
     m_hitPattern.setLayer(hit->getLayerId());
   }
 
@@ -458,7 +461,7 @@ void TrackCandidate::CheckStereoHits()
   double phi_track = atan2(mom.Z(), mom_r);
   m_stereoHits = 0;
 
-  for (TrackHit * hit : m_TrackHits) {
+  for (TrackHit* hit : m_TrackHits) {
     if (hit->getIsAxial())
       replace_vector.push_back(hit);
     else {

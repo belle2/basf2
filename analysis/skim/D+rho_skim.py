@@ -50,10 +50,10 @@ stdLoosePi()
 stdLooseK()
 # reconstruct D0 -> pi+ K- decay
 # keep only candidates with 1.5 < M(pi+K-) < 2.2 GeV
-reconDecay('D0 -> pi+:loose K-:loose', '1.5 < M < 2.2', True)
+reconstructDecay('D0 -> pi+:loose K-:loose', '1.5 < M < 2.2', True)
 # reconstruct rho0 -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.2 GeV
-reconDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.2', True)
+reconstructDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.2', True)
 
 # Skim 1
 # The new algorithm

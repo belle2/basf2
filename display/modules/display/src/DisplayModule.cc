@@ -26,19 +26,38 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
   setDescription("Interactive visualisation of MCParticles, genfit::Tracks and various SimHits (plus geometry). See https://belle2.cc.kek.jp/~twiki/bin/view/Software/EventDisplay for detailed documentation.");
 
-  addParam("options", m_options, "Drawing options for genfit::Tracks, a combination of DHMPS. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MH"));
+  addParam("options", m_options,
+           "Drawing options for genfit::Tracks, a combination of DHMPS. See EVEVisualization::setOptions or the display.py example for an explanation.",
+           std::string("MH"));
   addParam("showMCInfo", m_showMCInfo, "Show Monte Carlo information (MCParticles, SimHits)", true);
-  addParam("assignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (after scattering, decay-in-flight, ...) will be assigned to the original primary particle.", false);
-  addParam("showAllPrimaries", m_showAllPrimaries, "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", true);
-  addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
-  addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
-  addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
-  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted Tracks (+genfit::Track), GFRave Vertices and ECLCluster objects will be shown in the display.", true);
-  addParam("showTrackCandidates", m_showTrackCandidates, "If true, track candidates (genfit::TrackCand) and reconstructed hitso will be shown in the display.", false);
+  addParam("assignHitsToPrimaries", m_assignToPrimaries,
+           "If true, hits created by secondary particles (after scattering, decay-in-flight, ...) will be assigned to the original primary particle.",
+           false);
+  addParam("showAllPrimaries", m_showAllPrimaries,
+           "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", true);
+  addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.",
+           false);
+  addParam("showCharged", m_showCharged,
+           "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.",
+           false);
+  addParam("showNeutrals", m_showNeutrals,
+           "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.",
+           false);
+  addParam("showTrackLevelObjects", m_showTrackLevelObjects,
+           "If true, fitted Tracks (+genfit::Track), GFRave Vertices and ECLCluster objects will be shown in the display.", true);
+  addParam("showTrackCandidates", m_showTrackCandidates,
+           "If true, track candidates (genfit::TrackCand) and reconstructed hitso will be shown in the display.", false);
+  addParam("showCDCHits", m_showCDCHits,
+           "If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero).", false);
   addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate & hit visualisation (instead of TrueHits).", true);
-  addParam("automatic", m_automatic, "Non-interactively save visualisations for each event. Note that this still requires an X server, but you can use the 'Xvfb' dummy server by running basf2 using 'xvfb-run -s \"-screen 0 640x480x24\" basf2 ...' to run headless.", false);
-  addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
-  addParam("hideObjects", m_hideObjects, "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
+  addParam("automatic", m_automatic,
+           "Non-interactively save visualisations for each event. Note that this still requires an X server, but you can use the 'Xvfb' dummy server by running basf2 using 'xvfb-run -s \"-screen 0 640x480x24\" basf2 ...' to run headless.",
+           false);
+  addParam("fullGeometry", m_fullGeometry,
+           "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.",
+           false);
+  addParam("hideObjects", m_hideObjects,
+           "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
   if ((!gApplication) || (gApplication && gApplication->TestBit(TApplication::kDefaultApplication))) {
@@ -130,7 +149,7 @@ void DisplayModule::event()
     //gather MC particles
     StoreArray<MCParticle> mcparticles;
     if (m_showAllPrimaries or m_showCharged or m_showNeutrals) {
-      for (const MCParticle & part : mcparticles) {
+      for (const MCParticle& part : mcparticles) {
         if ((m_showAllPrimaries and part.hasStatus(MCParticle::c_PrimaryParticle))
             or (m_showCharged and TMath::Nint(part.getCharge()) != 0)
             or (m_showNeutrals and TMath::Nint(part.getCharge()) == 0)) {
@@ -180,25 +199,31 @@ void DisplayModule::event()
 
     //special VXDTF objects
     StoreArray<TrackCandidateTFInfo> tfcandTFInfo;
-    for (auto & currentTC : tfcandTFInfo) {
+    for (auto& currentTC : tfcandTFInfo) {
       m_visualizer->addTrackCandidateTFInfo(&currentTC);
     }
 
     StoreArray<CellTFInfo> cellTFInfo;
-    for (auto & currentCell : cellTFInfo) {
+    for (auto& currentCell : cellTFInfo) {
       m_visualizer->addCellTFInfo(&currentCell);
     }
 
     StoreArray<SectorTFInfo> sectorTFInfo;
-    for (auto & currentSector : sectorTFInfo) {
+    for (auto& currentSector : sectorTFInfo) {
       m_visualizer->addSectorTFInfo(&currentSector);
     }
+  }
+
+  if (m_showCDCHits) {
+    StoreArray<CDCHit> cdchits;
+    for (auto& hit : cdchits)
+      m_visualizer->addCDCHit(&hit);
   }
 
   if (m_showTrackLevelObjects) {
     //gather track-level objects
     StoreArray<Track> tracks;
-    for (const Track & track : tracks)
+    for (const Track& track : tracks)
       m_visualizer->addTrack(&track);
 
     StoreArray<genfit::GFRaveVertex> vertices;
@@ -208,7 +233,7 @@ void DisplayModule::event()
     }
 
     StoreArray<ECLCluster> clusters;
-    for (const ECLCluster & cluster : clusters) {
+    for (const ECLCluster& cluster : clusters) {
       if (m_showMCInfo) {
         //make sure we add particles producing these
         const MCParticle* mcpart = cluster.getRelated<MCParticle>();

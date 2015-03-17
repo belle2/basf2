@@ -84,6 +84,9 @@ namespace Belle2 {
     /** Wether to show genfit::TrackCands */
     bool m_showTrackCandidates;
 
+    /** If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero). */
+    bool m_showCDCHits;
+
     /** Wether to use cluster hits for track candidates */
     bool m_useClusters;
 

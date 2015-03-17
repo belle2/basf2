@@ -93,7 +93,8 @@ namespace Belle2 {
       virtual ~EveVisBField() { }
 
       /** return field strength at given coordinates, using Eve conventions. */
-      virtual TEveVector GetField(Float_t x, Float_t y, Float_t z) const override {
+      virtual TEveVector GetField(Float_t x, Float_t y, Float_t z) const override
+      {
         TEveVector v;
 
         v.Set(BFieldMap::Instance().getBField(TVector3(x, y, z)));
@@ -133,7 +134,8 @@ namespace Belle2 {
     void addTrack(const Belle2::Track* belle2Track);
 
     /** Add a genfit::TrackCand, to evaluate track finding. */
-    template<class PXDType, class SVDType> void addTrackCandidate(const std::string& collectionName, const genfit::TrackCand* trackCand, const TString& label,
+    template<class PXDType, class SVDType> void addTrackCandidate(const std::string& collectionName, const genfit::TrackCand* trackCand,
+        const TString& label,
         const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits);
 
     /** Add VXDTF track candidate. */
@@ -144,7 +146,8 @@ namespace Belle2 {
     void addSectorTFInfo(SectorTFInfo* info);
 
     /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
-    template <class T> void addSimHits(const StoreArray<T>& hits) {
+    template <class T> void addSimHits(const StoreArray<T>& hits)
+    {
       const int numHits = hits.getEntries();
       for (int i = 0; i < numHits; i++) {
         const RelationsObject* rel = hits[i];
@@ -189,7 +192,8 @@ namespace Belle2 {
     void addROI(const ROIid* roi, const TString& name);
 
     /** After adding recohits for tracks/candidates, this function adds the remaining hits in a global collection. */
-    template <class T> void addUnassignedRecoHits(const StoreArray<T>& hits) {
+    template <class T> void addUnassignedRecoHits(const StoreArray<T>& hits)
+    {
       if (hits.getEntries() == 0)
         return;
       if (!m_unassignedRecoHits) {
@@ -200,12 +204,15 @@ namespace Belle2 {
         m_unassignedRecoHits->SetMarkerStyle(6);
         //m_unassignedRecoHits->SetMainTransparency(60);
       }
-      for (const T & hit : hits) {
+      for (const T& hit : hits) {
         if (m_shownRecohits.count(&hit) == 0) {
           addRecoHit(&hit, m_unassignedRecoHits);
         }
       }
     }
+
+    /** show CDCHits directly. */
+    void addCDCHit(const CDCHit* hit);
 
     /** Generic function to keep track of which objects have which visual representation.
      *
@@ -276,11 +283,13 @@ namespace Belle2 {
     TEveBox* boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth);
 
     /** Create hit visualisation for the given options, and add them to 'eveTrack'. */
-    void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
+    void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
+                   const genfit::AbsTrackRep* rep,
                    TEvePathMark::EType_e markType, bool drawErrors, int markerPos = 1);
 
     /** adds given VXD hit to lines. */
-    template <class SomeVXDHit> void addRecoHit(const SomeVXDHit* hit, TEveStraightLineSet* lines) {
+    template <class SomeVXDHit> void addRecoHit(const SomeVXDHit* hit, TEveStraightLineSet* lines)
+    {
       static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
       const TVector3 local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
@@ -354,7 +363,8 @@ namespace Belle2 {
     static constexpr double c_minPCut = 0.00;
   };
 
-  template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const std::string& collectionName, const genfit::TrackCand* trackCand, const TString& label,
+  template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const std::string& collectionName,
+      const genfit::TrackCand* trackCand, const TString& label,
       const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits)
   {
     // parse the option string ------------------------------------------------------------------------

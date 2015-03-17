@@ -27,6 +27,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <genfit/AbsMeasurement.h>
@@ -695,7 +696,8 @@ TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v,
   return box;
 }
 
-void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
+void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
+                                 const genfit::AbsTrackRep* rep,
                                  TEvePathMark::EType_e markType, bool drawErrors, int markerPos)
 {
   using namespace genfit;
@@ -962,7 +964,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
       //This will force the track propagation to visit all points in order but
       //provide smooth helix interpolation between the points
       const MCParticleTrajectory& trajectory = dynamic_cast<const MCParticleTrajectory&>(*rel.object);
-      for (const MCTrajectoryPoint & p : trajectory) {
+      for (const MCTrajectoryPoint& p : trajectory) {
         m_mcparticleTracks[particle].track->AddPathMark(
           TEvePathMark(
             //Add the last trajectory point as decay point to prevent TEve to
@@ -1115,7 +1117,8 @@ void EVEVisualization::makeTracks()
 
   m_eclData->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclData->Empty()) {
-    m_eclData->SetAxisFromBins(0.0, 0.0); //epsilon_x/y = 0 so we don't merge neighboring bins. This avoids some rendering issues with projections of small clusters.
+    m_eclData->SetAxisFromBins(0.0,
+                               0.0); //epsilon_x/y = 0 so we don't merge neighboring bins. This avoids some rendering issues with projections of small clusters.
     m_calo3d->SetData(m_eclData);
   }
   gEve->AddElement(m_calo3d);
@@ -1131,7 +1134,7 @@ void EVEVisualization::clearEvent()
     return;
 
   m_visualRepMap->clear();
-  for (auto & groupPair : m_groups) {
+  for (auto& groupPair : m_groups) {
     //store visibility, invalidate pointers
     if (groupPair.second.group)
       groupPair.second.visible = groupPair.second.group->GetRnrState();
@@ -1157,7 +1160,8 @@ void EVEVisualization::clearEvent()
   m_eclData->RefSliceInfo(0).Setup("ECL", ecl_threshold, kRed);
 
   delete m_unassignedRecoHits;
-  m_unassignedRecoHits = 0;
+  m_unassignedRecoHits = nullptr;
+
 
   gEve->GetSelection()->RemoveElements();
   gEve->GetHighlight()->RemoveElements();
@@ -1186,8 +1190,10 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex, const TStri
   det_shape->SetShape(new TGeoSphere(0., 1.));   //Initially created as a sphere, then "scaled" into an ellipsoid.
   TMatrixT<double> ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
   TMatrixT<double> eVec = eigen_values.GetEigenValues();  //Assigns the eigenvalues into the "eVec" matrix.
-  TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));   //Define the 3 eigenvectors of the covariance matrix as objects of the TVector3 class using constructor.
-  TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));   //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
+  TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2,
+                                              0));   //Define the 3 eigenvectors of the covariance matrix as objects of the TVector3 class using constructor.
+  TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2,
+                                              1));   //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
   TVector3 eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
   // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix accquired!
 
@@ -1199,14 +1205,16 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex, const TStri
   // set the scaled eigenvalues -------------------------------------------------
   double pseudo_res_0 = std::sqrt(ev(0, 0));
   double pseudo_res_1 = std::sqrt(ev(1, 1));
-  double pseudo_res_2 = std::sqrt(ev(2, 2));    //"Scaled" eigenvalues pseudo_res (lengths of the semi axis) are the sqrt of the real eigenvalues.
+  double pseudo_res_2 = std::sqrt(ev(2,
+                                     2));    //"Scaled" eigenvalues pseudo_res (lengths of the semi axis) are the sqrt of the real eigenvalues.
 
   //B2INFO("The pseudo_res_0/1/2 are " << pseudo_res_0 << "," << pseudo_res_1 << "," << pseudo_res_2); //shows the scaled eigenvalues
 
 
 
   // rotate and translate -------------------------------------------------------
-  TGeoGenTrans det_trans(v(0), v(1), v(2), pseudo_res_0, pseudo_res_1, pseudo_res_2, &det_rot); //Puts the ellipsoid at the position of the vertex, v(0)=v.x(), operator () overloaded.
+  TGeoGenTrans det_trans(v(0), v(1), v(2), pseudo_res_0, pseudo_res_1, pseudo_res_2,
+                         &det_rot); //Puts the ellipsoid at the position of the vertex, v(0)=v.x(), operator () overloaded.
   det_shape->SetTransMatrix(det_trans);
   // finished rotating and translating ------------------------------------------
 
@@ -1306,11 +1314,54 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 
   lines->AddLine(wire_pos_f.x(), wire_pos_f.y(), wire_pos_f.z(), wire_pos_b.x(), wire_pos_b.y(), wire_pos_b.z());
   m_shownRecohits.insert(hit);
+
+}
+
+void EVEVisualization::addCDCHit(const CDCHit* hit)
+{
+  static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+  const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
+  const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
+  static CDC::RealisticTDCCountTranslator tdcTranslator;
+  TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
+  cov_shape->IncDenyDestroy();
+  //TODO: leftrightflag not set! (same for other parameters, unsure which ones should be set)
+  double driftLength = tdcTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
+  double driftLengthRes = tdcTranslator.getDriftLengthResolution(hit->getTDCCount(), WireID(hit->getID()));
+  driftLengthRes = std::max(driftLengthRes, 0.005);
+  const double lengthOfWireSection = 3.0;
+
+  //z in wire direction, x,y orthogonal
+  const TVector3 zaxis = wire_pos_b - wire_pos_f;
+  const TVector3 xaxis = zaxis.Orthogonal();
+  const TVector3 yaxis = xaxis.Cross(zaxis);
+
+  // move to z=0
+  const TVector3 midPoint = wire_pos_f - zaxis * (wire_pos_f.z() / zaxis.z());
+
+  cov_shape->SetShape(new TGeoTube(std::max(0., (double)(driftLength - driftLengthRes)), driftLength + driftLengthRes,
+                                   lengthOfWireSection));
+
+  TGeoRotation det_rot("det_rot",
+                       xaxis.Theta() * 180 / TMath::Pi(), xaxis.Phi() * 180 / TMath::Pi(),
+                       yaxis.Theta() * 180 / TMath::Pi(), yaxis.Phi() * 180 / TMath::Pi(),
+                       zaxis.Theta() * 180 / TMath::Pi(), zaxis.Phi() * 180 / TMath::Pi()
+                      );
+
+  TGeoCombiTrans det_trans(midPoint(0), midPoint(1), midPoint(2), &det_rot);
+  cov_shape->SetTransMatrix(det_trans);
+
+  cov_shape->SetMainColor(kOrange - 3);
+  cov_shape->SetMainTransparency(50);
+  cov_shape->SetName(TString::Format("CDCHit %d", hit->getArrayIndex()));
+  cov_shape->SetTitle(TString::Format("CDCHit %d\nWire ID: %d\nADC: %d\nTDC: %d", hit->getArrayIndex(), hit->getID(),
+                                      hit->getADCCount(), hit->getTDCCount()));
+  addToGroup("CDCHits", cov_shape);
 }
 
 void EVEVisualization::showUserData(const DisplayData& displayData)
 {
-  for (const auto & labelPair : displayData.m_labels) {
+  for (const auto& labelPair : displayData.m_labels) {
     TEveText* text = new TEveText(labelPair.first.c_str());
     text->SetName(labelPair.first.c_str());
     text->SetTitle(labelPair.first.c_str());
@@ -1320,19 +1371,19 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     addToGroup("DisplayData", text);
   }
 
-  for (const auto & pointPair : displayData.m_pointSets) {
+  for (const auto& pointPair : displayData.m_pointSets) {
     TEvePointSet* points = new TEvePointSet(pointPair.first.c_str());
     points->SetTitle(pointPair.first.c_str());
     points->SetMarkerStyle(7);
     points->SetMainColor(kGreen);
-    for (const TVector3 & p : pointPair.second) {
+    for (const TVector3& p : pointPair.second) {
       points->SetNextPoint(p.x(), p.y(), p.z());
     }
     addToGroup("DisplayData", points);
   }
 
   int randomColor = 2; //primary colours, changing rapidly with index
-  for (const auto & arrow : displayData.m_arrows) {
+  for (const auto& arrow : displayData.m_arrows) {
     const TVector3 pos = arrow.start;
     const TVector3 dir = arrow.end - pos;
     TEveArrow* eveArrow = new TEveArrow(dir.x(), dir.y(), dir.z(), pos.x(), pos.y(), pos.z());
@@ -1394,7 +1445,7 @@ void EVEVisualization::addTrackCandidateTFInfo(TrackCandidateTFInfo* info)
   line->SetName(TString::Format("VXDTF TC: %d", info->getOwnID()));
   line->SetTitle(info->getDisplayInformation());
   line->SetMainColor(info->getColor());
-  for (auto & v : info->getCoordinates()) {
+  for (auto& v : info->getCoordinates()) {
     line->SetNextPoint(v.x(), v.y(), v.z());
   }
 
@@ -1408,7 +1459,7 @@ void EVEVisualization::addCellTFInfo(CellTFInfo* info)
   line->SetName(TString::Format("Cell idx %d", info->getArrayIndex()));
   line->SetTitle(info->getDisplayInformation());
   line->SetMainColor(info->getColor());
-  for (auto & v : info->getCoordinates()) {
+  for (auto& v : info->getCoordinates()) {
     line->SetNextPoint(v.x(), v.y(), v.z());
   }
 

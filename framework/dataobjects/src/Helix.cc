@@ -322,16 +322,11 @@ void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLe
   const double omega = getOmega();
   const double cosPhi0 = getCosPhi0();
   const double sinPhi0 = getSinPhi0();
+  const double d0 = getD0();
 
-  const double perigeeX = getPerigeeX();
-  const double perigeeY = getPerigeeY();
-
-  const double deltaX = x - perigeeX;
-  const double deltaY = y - perigeeY;
-
-  const double deltaParallel = deltaX * cosPhi0 + deltaY * sinPhi0;
-  const double deltaOrthogonal = deltaY * cosPhi0 - deltaX * sinPhi0;
-  const double deltaCylindricalR = hypot(deltaX, deltaY);
+  const double deltaParallel = x * cosPhi0 + y * sinPhi0;
+  const double deltaOrthogonal = y * cosPhi0 - x * sinPhi0 + d0;
+  const double deltaCylindricalR = hypot(deltaOrthogonal, deltaParallel);
   const double deltaCylindricalRSquared = deltaCylindricalR * deltaCylindricalR;
 
   // Calculate dr

@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'panther', 'mdst_dataobjects', 'b2bii']
+
+Return('env')

@@ -100,7 +100,7 @@ class ValidationPlot(object):
                        cumulation_direction=cumulation_direction)
 
         if not self.ylabel:
-            self.ylabel = 'Count'
+            self.ylabel = 'count'
 
         return self
 
@@ -131,7 +131,7 @@ class ValidationPlot(object):
                        cumulation_direction=cumulation_direction)
 
         if not self.ylabel and self.is_binary(ys):
-            self.ylabel = 'Probability'
+            self.ylabel = 'probability'
 
         return self
 
@@ -551,7 +551,8 @@ class ValidationPlot(object):
         if isinstance(histogram, ROOT.TProfile):
             tprofile = histogram
             # Turn the profile histogram into normal histogram where we can set the new content and errors
-            histogram = tprofile.ProjectionX(tprofile.GetName())
+            histogram = tprofile.ProjectionX()
+            histogram.SetName(tprofile.GetName())
 
             n_bins = histogram.GetNbinsX()
             cumulated_content = 0.0
@@ -569,8 +570,16 @@ class ValidationPlot(object):
                 bin_std = tprofile.GetBinError(i_bin)
 
                 if bin_entries != 0:
-                    cumulated_content = 1.0 * (cumulated_entries * cumulated_content + bin_entries * bin_content) / (cumulated_entries + bin_entries)
-                    cumulated_std = math.hypot(cumulated_entries * cumulated_std, bin_entries * bin_std) / (cumulated_entries + bin_entries)
+                    cumulated_content = (
+                        1.0 * (cumulated_entries * cumulated_content + bin_entries * bin_content) /
+                        (cumulated_entries + bin_entries)
+                    )
+
+                    cumulated_std = (
+                        math.hypot(cumulated_entries * cumulated_std, bin_entries * bin_std) /
+                        (cumulated_entries + bin_entries)
+                    )
+
                     cumulated_entries = cumulated_entries + bin_entries
                 else:
                     # empty bin does not add anything to the cumulation
@@ -1016,7 +1025,7 @@ class ValidationPlot(object):
         if not belle2_validation_tstyle:
             belle2_validation_tstyle = ROOT.TStyle(belle2_validation_style_name, belle2_validation_style_name)
 
-            opt_fit = 0112
+            opt_fit = 112
             belle2_validation_tstyle.SetOptFit(opt_fit)
 
             opt_stat = 111111

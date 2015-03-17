@@ -45,36 +45,46 @@ namespace Belle2 {
     /**
      * Exception thrown, when trying to access SpacePoints by their index inside of SpacePointTrackCand, but index is out of bounds
      */
-    BELLE2_DEFINE_EXCEPTION(SPTCIndexOutOfBounds, "Trying to acces a SpacePoint from a SpacePointTrackCand via an index that is out of bounds!");
+    BELLE2_DEFINE_EXCEPTION(SPTCIndexOutOfBounds, "Trying to acces a SpacePoint from a SpacePointTrackCand via an"\
+                            " index that is out of bounds!");
 
     /** Status information that can be set to indicate several properties of the SpacePointTrackCand
-     * NOTE: there are some properties that are at the moment stored in other members of the SpacePointTrackCand but can be moved into here if memory usage is an issue
+     * NOTE: there are some properties that are at the moment stored in other members of the SpacePointTrackCand but can be moved
+     * into here if memory usage is an issue
      * NOTE: if you add something here, it should also be added in the 'getRefereeStatusString' method!
      */
     enum RefereeStatusBit {
       c_checkedByReferee = 1, /**< bit 0: SpacePointTrackCand has been checked by a Referee (all possible tests) */
       c_checkedClean = 2, /**< bit 1: The SpacePointTrackCand shows no 'problematic' behaviour */
       c_hitsOnSameSensor = 4, /**< bit 2: SpacePointTrackCand has two (or more) SpacePoints on same sensor */
-      c_hitsLowDistance = 8, /**< bit 3: SpacePointTrackCand has two (or more) SpacePoints that are not far enough apart. NOTE: distance is judged by referee (and also set there) */
+      /** bit 3: SpacePointTrackCand has two (or more) SpacePoints that are not far enough apart.
+       * NOTE: distance is judged by referee (and also set there) */
+      c_hitsLowDistance = 8,
       c_removedHits = 16, /**< bit 4: SpacePoints were removed from this SpacePointTrackCand */
-      c_checkedTrueHits =  32, /**< bit 5: All of the SpacePoints of the SpacePointTrackCand have a relation to (at least one) TrueHit(s) */
-      c_checkedSameSensors = 64, /**< bit 6: It has been checked if two consecutive SpacePoints are on the same sensor for this SpacePointTrackCand */
+      /** bit 5: All of the SpacePoints of the SpacePointTrackCand have a relation to (at least one) TrueHit(s) */
+      c_checkedTrueHits =  32,
+      /** bit 6: It has been checked if two consecutive SpacePoints are on the same sensor for this SpacePointTrackCand */
+      c_checkedSameSensors = 64,
       c_checkedMinDistance =  128, /**< bit 7: It has been checked if two consecutive SpacePoints are far enough apart */
       c_curlingTrack = 256, /**< bit 8: SpacePointTrackCand is curling (resp. is part of a curling SpacePointTrackCand) */
-      c_omittedClusters = 512, /**< bit 9: Not all Clusters of the genfit::TrackCand have been used to create this SpacePointTrackCand */
+      /** bit 9: Not all Clusters of the genfit::TrackCand have been used to create this SpacePointTrackCand */
+      c_omittedClusters = 512,
       c_singleClustersSPs = 1024, /**< bit 10: The SpacePointTrackCand contains single Cluster SpacePoints */
     };
 
     /**
-     * empty constructor sets pdg code to zero, such that it is possible to determine whether a particle hyptohesis has been asigned to the track candidate or not
+     * empty constructor sets pdg code to zero, such that it is possible to determine whether a particle hyptohesis has been asigned
+     * to the track candidate or not
      * Also MCTrackID is initialized to -1,
      */
     SpacePointTrackCand();
 
     /**
-     * constructor from a vector<SpacePoint*> and some additional information: pdg code and charge estimate as well as the MCTrackID of the track candidate
+     * constructor from a vector<SpacePoint*> and some additional information:
+     * pdg code and charge estimate as well as the MCTrackID of the track candidate
      */
-    SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0, int mcTrackID = -1);
+    SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
+                        int mcTrackID = -1);
 
     // destructor
     virtual ~SpacePointTrackCand();
@@ -85,7 +95,8 @@ namespace Belle2 {
     const std::vector<const Belle2::SpacePoint*>& getHits() const { return m_trackSpacePoints; }
 
     /**
-     * get hits (SpacePoints) in range (indices of SpacePoint inside SpacePointTrackCand) including first index and excluding last index (the SpacePoint on firstInd but not the one on lastIndex wil be returned!).
+     * get hits (SpacePoints) in range (indices of SpacePoint inside SpacePointTrackCand)
+     * including first index and excluding last index (the SpacePoint on firstInd but not the one on lastIndex wil be returned!).
      * NOTE: For all hits range is from 0 to getNHits(). throws an exception when trying to access hits outside the allowed range!
      */
     const std::vector<const Belle2::SpacePoint*> getHitsInRange(int firstInd, int lastInd) const;
@@ -123,7 +134,8 @@ namespace Belle2 {
     const std::vector<double>& getSortingParameters() const { return m_sortingParameters; }
 
     /**
-     * get the sorting parameters in range (indices of SpacePoints inside SpacePointTrackCand) including firstIndex and excluding lastIndex
+     * get the sorting parameters in range (indices of SpacePoints inside SpacePointTrackCand)
+     * including firstIndex and excluding lastIndex
      * NOTE: for all hits range is from zero to getNHits(). throws an exception when trying to access hits outside the allowed range!
      */
     const std::vector<double> getSortingParametersInRange(int firstIndex, int lastIndex) const;
@@ -135,6 +147,11 @@ namespace Belle2 {
      * get the MC Track ID
      */
     int getMcTrackID() const { return m_MCTrackID; }
+
+    /**
+     * get the MC Track ID (same writing as in genfit::TrackCand)
+     */
+    int getMcTrackId() const { return m_MCTrackID; }
 
     /**
      * Return the refere status code of the SpacePointTrackCand.
@@ -170,7 +187,8 @@ namespace Belle2 {
     bool checkedMinDistance() const { return hasRefereeStatus(c_checkedMinDistance); }
 
     /**
-     * Check if a SpacePointTrackCand has removed hits (i.e. at some point it contained more hits than it does when this function is called, removal of hits e.g. by a referee module)
+     * Check if a SpacePointTrackCand has removed hits
+     * (i.e. at some point it contained more hits than it does when this function is called, removal of hits e.g. by a referee module)
      */
     bool hasRemovedHits() const { return hasRefereeStatus(c_removedHits); }
 
@@ -192,7 +210,8 @@ namespace Belle2 {
     bool isPartOfCurlingTrack() const { return m_iTrackStub > 0; }
 
     /**
-     * print the Track Candidate in its "full beauty". NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
+     * print the Track Candidate in its "full beauty".
+     * NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */
     void print(int debuglevel = 150, const Option_t* = "") const;
 
@@ -204,7 +223,8 @@ namespace Belle2 {
     std::string getRefereeStatusString(std::string delimiter = " ") const;
 
     /**
-     * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!), NOTE: returns false if both TrackCands do not contain any SpacePoints
+     * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!)
+     * NOTE: returns false if both TrackCands do not contain any SpacePoints
      */
     bool operator == (const SpacePointTrackCand& rhs);
 
@@ -236,7 +256,11 @@ namespace Belle2 {
     /**
      * add a new SpacePoint and its according sorting parameter to the track candidate
      */
-    void addSpacePoint(const SpacePoint* newSP, double sortParam) { m_trackSpacePoints.push_back(newSP); m_sortingParameters.push_back(sortParam); }
+    void addSpacePoint(const SpacePoint* newSP, double sortParam)
+    {
+      m_trackSpacePoints.push_back(newSP);
+      m_sortingParameters.push_back(sortParam);
+    }
 
     /**
      * set the direction of flight (true is outgoing, false is ingoing). Initialized to true by default!
@@ -273,7 +297,9 @@ namespace Belle2 {
     std::vector<unsigned int> m_trackSpacePointIndices;
 
     /**
-     * sorting Parameters, can be used to sort the SpacePoints. Also needed to store the sorting parameters of e.g. a genfit::TrackCand if the SpacePointTrackCand is generated by a conversion from a genfit::TrackCand
+     * sorting Parameters, can be used to sort the SpacePoints.
+     * Also needed to store the sorting parameters of e.g. a genfit::TrackCand if the SpacePointTrackCand is
+     * generated by a conversion from a genfit::TrackCand
      */
     std::vector<double> m_sortingParameters;
 
@@ -308,7 +334,11 @@ namespace Belle2 {
     bool m_flightDirection;
 
     /**
-     * Index of TrackStub in a curling Track Candidate. If the TrackCandidate is not curling this value is set to 0. If it is not yet checked if the TrackCand is curling it is set to -1. If it is a curling TrackCand the counter starts at 1, indicating that this is the first outgoing part of the TrackCand. COULDDO: implement such a feature via something like a linked list (would be much nicer, but for the moment this little workaround works)
+     * Index of TrackStub in a curling Track Candidate.
+     * + If the TrackCandidate is not curling this value is set to 0.
+     * + If it is not yet checked if the TrackCand is curling it is set to -1.
+     * + If it is a curling TrackCand the counter starts at 1, indicating that this is the first outgoing part of the TrackCand.
+     * COULDDO: implement such a feature via something like a linked list (would be much nicer, but for the moment this little workaround works)sv
      */
     int m_iTrackStub;
 
@@ -317,6 +347,7 @@ namespace Belle2 {
      */
     unsigned short int m_refereeStatus;
 
-    ClassDef(SpacePointTrackCand, 5) // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2)
+    // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2)
+    ClassDef(SpacePointTrackCand, 5)
   };
 }

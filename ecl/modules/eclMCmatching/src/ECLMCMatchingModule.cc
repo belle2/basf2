@@ -245,16 +245,22 @@ void ECLMCMatchingModule::event()
     for (auto eclShower : cluster->getRelationsTo<ECLShower>()) {
       ECLShower* veclShower = eclRecShowerArray[eclShower.getShowerId()];
       for (auto MCpart : veclShower->getRelationsTo<MCParticle>()) {
-        //float yu=veclShower->getWeight<float>();
-        //RelationElement* ShowerToMC = eclShowerToMCPart[eclShower.getShowerId()].getToIndex();
-        ECLClustertoMCPart.add(imdst, MCpart.getArrayIndex());
+        for (int i = 0; i < eclShowerToMCPart.getEntries(); i++) {
+          if ((int)eclShowerToMCPart[i].getFromIndex() == eclShower.getShowerId()
+              && (int)eclShowerToMCPart[i].getToIndex() == MCpart.getArrayIndex()) {
+            cout << "From: " << (int)eclShowerToMCPart[i].getFromIndex() << " To: " << (int)eclShowerToMCPart[i].getToIndex() << endl;
+            ECLClustertoMCPart.add(imdst, MCpart.getArrayIndex(), eclShowerToMCPart[i].getWeight());
+          }
+        }
       }
     }
-    //for(int ii=0; ii<eclShowerToMCPart.getEntries(); ii++){
-    //  cout << "ShowerID: " << imdst << " Energy: " << cluster->getEnergy() << " MCParticle: " << ECLClustertoMCPart[ii].getToIndex() << " Weight: " << ECLClustertoMCPart[ii].getWeight() << endl;
-    //}
   } // imdst
 
+  for (int ii = 0; ii < ECLClustertoMCPart.getEntries(); ii++) {
+    cout << "ClusterID: " << ECLClustertoMCPart[ii].getFromIndex() << " Energy: " <<
+         eclClusterArray[ECLClustertoMCPart[ii].getFromIndex()]->getEnergy() << " MCParticle: " << ECLClustertoMCPart[ii].getToIndex() <<
+         " Weight: " << ECLClustertoMCPart[ii].getWeight() << endl;
+  }
   m_nEvent++;
 }
 

@@ -178,7 +178,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   nenergy->SetStats(0);
   // set variables from input tree files
   int type = -1;
-  int modID = -1;
+  int modID = 1;
   int pdg = -1;
   int source = -1;
   double edep = 0;
@@ -212,6 +212,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
 
     source--;
     if (source < 0) continue;
+    if (modID < 1) continue;
 
     // read the corresponding module (HAPD) x,y coordinates
     if (modID > 0) {

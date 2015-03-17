@@ -11,12 +11,13 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 
-#include <boost/shared_ptr.hpp>
-
 #include <list>
 #include <string>
 #include <vector>
 
+namespace boost {
+  template<class T> class shared_ptr;
+}
 
 namespace Belle2 {
   class Path;
@@ -95,7 +96,8 @@ namespace Belle2 {
      *
      * @return  The number of processors used for the parallel processing.
      */
-    int getNumberProcesses() const {
+    int getNumberProcesses() const
+    {
       if (m_numberProcessesOverride >= 0)
         return m_numberProcessesOverride;
       else
@@ -114,9 +116,7 @@ namespace Belle2 {
      *
      * @return  The path to the file where the pickled path is stored.
      */
-    std::string getPicklePath() const {
-      return m_picklePath;
-    }
+    std::string getPicklePath() const { return m_picklePath; }
 
     /**
      * Sets the steering file content.
@@ -145,7 +145,7 @@ namespace Belle2 {
     bool getDryRun() const { return m_dryRun; }
 
     /** Set info from path executed by the framework. */
-    void setJobInformation(boost::shared_ptr<Path> path);
+    void setJobInformation(const boost::shared_ptr<Path>& path);
 
     /** Print information on input/output files in current steering file, used by --dry-run.
      *

@@ -15,6 +15,7 @@
 #include <framework/logging/LogConfig.h>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <iostream>
 #include <cstdlib>
@@ -95,7 +96,7 @@ Environment::~Environment()
 {
 }
 
-void Environment::setJobInformation(boost::shared_ptr<Path> path)
+void Environment::setJobInformation(const boost::shared_ptr<Path>& path)
 {
   const std::list<ModulePtr>& modules = path->getModules();
 

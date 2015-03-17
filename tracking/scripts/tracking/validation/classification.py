@@ -16,6 +16,11 @@ import numbers
 
 import numpy as np
 
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
+
+
+formatter = TolerateMissingKeyFormatter()
+
 
 class ClassificationAnalysis(object):
 
@@ -65,6 +70,9 @@ class ClassificationAnalysis(object):
         quantity_name = self.quantity_name
         axis_label = compose_axis_label(quantity_name, self.unit)
 
+        plot_name = "{quantity_name}_{subplot_name}"
+        plot_name = formatter.format(plot_name, quantity_name=quantity_name)
+
         # Some different things become presentable depending on the estimates
         estimate_is_binary = statistics.is_binary_series(estimates)
 
@@ -90,10 +98,7 @@ class ClassificationAnalysis(object):
 
         # Figures of merit
         if cut_value is not None:
-            fom_name = "{quantity_name}_classification_figures_of_merits".format(
-                quantity_name=quantity_name
-            )
-
+            fom_name = formatter.format(plot_name, subplot_name="classification_figures_of_merits")
             fom_description = "Efficiency, purity and background rejection of the classifiction with {quantity_name}".format(
                 quantity_name=quantity_name
             )
@@ -123,28 +128,23 @@ class ClassificationAnalysis(object):
             self.fom = classification_fom
 
         # Stacked histogram
-        plot_name = "{quantity_name}_signal_background_histogram".format(
-            quantity_name=quantity_name
-        )
-
-        signal_background_histogram = ValidationPlot(plot_name)
-        signal_background_histogram.hist(
+        signal_bkg_histogram_name = formatter.format(plot_name, subplot_name="signal_bkg_histogram")
+        signal_bkg_histogram = ValidationPlot(signal_bkg_histogram_name)
+        signal_bkg_histogram.hist(
             estimates,
             stackby=truths,
             lower_bound=self.lower_bound,
             upper_bound=self.upper_bound,
             outlier_z_score=self.outlier_z_score
         )
-        signal_background_histogram.xlabel = axis_label
+        signal_bkg_histogram.xlabel = axis_label
 
-        self.plots['signal_background'] = signal_background_histogram
+        self.plots['signal_bkg'] = signal_bkg_histogram
 
         # Purity profile
-        plot_name = "{quantity_name}_purity_profile".format(
-            quantity_name=quantity_name
-        )
+        purity_profile_name = formatter.format(plot_name, subplot_name="purity_profile")
 
-        purity_profile = ValidationPlot(plot_name)
+        purity_profile = ValidationPlot(purity_profile_name)
         purity_profile.profile(
             estimates,
             truths,
@@ -159,35 +159,95 @@ class ClassificationAnalysis(object):
         self.plots["purity"] = purity_profile
 
         if not estimate_is_binary and cut_direction is not None:
-
-            # Purity over efficiency #
-            # ###################### #
-            n_signal = scores.signal_amount(truths, estimates)
+            n_data = len(estimates)
+            n_signals = scores.signal_amount(truths, estimates)
+            n_bkgs = n_data - n_signals
 
             sorting_indices = np.argsort(estimates)
             if cut_direction < 0:  # reject low
                 # Keep a reference to keep the content alive
-                org_sorting_indices = sorting_indices
+                orginal_sorting_indices = sorting_indices
                 sorting_indices = sorting_indices[::-1]
 
             sorted_truths = truths[sorting_indices]
-            sorted_selected_signal = np.cumsum(sorted_truths, dtype=float)
-            sorted_efficiencies = sorted_selected_signal / n_signal
+            sorted_estimates = estimates[sorting_indices]
 
-            plot_name = "{quantity_name}_purity_over_efficiency_profile".format(
-                quantity_name=quantity_name
+            sorted_n_accepted_signals = np.cumsum(sorted_truths, dtype=float)
+            sorted_efficiencies = sorted_n_accepted_signals / n_signals
+
+            sorted_n_rejected_signals = n_signals - sorted_n_accepted_signals
+            sorted_n_rejects = np.arange(len(estimates) + 1, 1, -1)
+            sorted_n_rejected_bkgs = sorted_n_rejects - sorted_n_rejected_signals
+            sorted_bkg_rejections = sorted_n_rejected_bkgs / n_bkgs
+
+            # Efficiency by cut value #
+            # ####################### #
+            efficiency_by_cut_profile_name = formatter.format(plot_name, subplot_name="efficiency_by_cut")
+
+            efficiency_by_cut_profile = ValidationPlot(efficiency_by_cut_profile_name)
+            efficiency_by_cut_profile.profile(
+                sorted_estimates,
+                sorted_efficiencies,
+                lower_bound=self.lower_bound,
+                upper_bound=self.upper_bound,
+                outlier_z_score=self.outlier_z_score,
             )
 
-            purity_over_efficiency_profile = ValidationPlot(plot_name)
+            efficiency_by_cut_profile.xlabel = "cut " + axis_label
+            efficiency_by_cut_profile.ylabel = "efficiency"
+
+            self.plots["efficiency_by_cut"] = efficiency_by_cut_profile
+
+            # Background rejection over cut value #
+            # ################################### #
+            bkg_rejection_by_cut_profile_name = formatter.format(plot_name, subplot_name="bkg_rejection_by_cut")
+            bkg_rejection_by_cut_profile = ValidationPlot(bkg_rejection_by_cut_profile_name)
+            bkg_rejection_by_cut_profile.profile(
+                sorted_estimates,
+                sorted_bkg_rejections,
+                lower_bound=self.lower_bound,
+                upper_bound=self.upper_bound,
+                outlier_z_score=self.outlier_z_score,
+            )
+
+            bkg_rejection_by_cut_profile.xlabel = "cut " + axis_label
+            bkg_rejection_by_cut_profile.ylabel = "background rejection"
+
+            self.plots["bkg_rejection_by_cut"] = bkg_rejection_by_cut_profile
+
+            # Purity over efficiency #
+            # ###################### #
+            purity_over_efficiency_profile_name = formatter.format(plot_name, subplot_name="purity_over_efficiency")
+            purity_over_efficiency_profile = ValidationPlot(purity_over_efficiency_profile_name)
             purity_over_efficiency_profile.profile(
-                sorted_efficiencies, sorted_truths,
+                sorted_efficiencies,
+                sorted_truths,
                 cumulation_direction=1,
+                lower_bound=0,
+                upper_bound=1
             )
-
             purity_over_efficiency_profile.xlabel = 'efficiency'
             purity_over_efficiency_profile.ylabel = 'purity'
 
             self.plots["purity_over_efficiency"] = purity_over_efficiency_profile
+
+            # Efficiency over background rejection #
+            # #################################### #
+            efficiency_over_bkg_rejection_profile_name = formatter.format(plot_name, subplot_name="efficiency_over_bkg_rejection")
+            efficiency_over_bkg_rejection_profile = ValidationPlot(efficiency_over_bkg_rejection_profile_name)
+            efficiency_over_bkg_rejection_profile.profile(
+                sorted_bkg_rejections,
+                sorted_efficiencies,
+                lower_bound=0,
+                upper_bound=1
+            )
+
+            efficiency_over_bkg_rejection_profile.xlabel = "bkg rejection"
+            efficiency_over_bkg_rejection_profile.ylabel = "efficiency"
+
+            self.plots["efficiency_over_bkg_rejection"] = efficiency_over_bkg_rejection_profile
+
+        self.contact = self.contact
 
     @property
     def contact(self):

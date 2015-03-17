@@ -12,13 +12,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
-#include <genfit/TrackCand.h>
-
-#include <boost/tuple/tuple.hpp>
-#include <boost/tuple/tuple_comparison.hpp>
-#include <boost/concept_check.hpp>
+// #include <tracking/spacePointCreation/SpacePointTrackCand.h> // already in header
+// #include <genfit/TrackCand.h> // already in header
 
 using namespace Belle2;
 using namespace std;
@@ -127,23 +123,20 @@ void TCConvertersTestModule::event()
       convertedTC->Print();
     }
 
-    if (!analyzeMisMatch(genfitTC, convertedTC, trackCand)) B2ERROR("PENG")
-
-      // compare the two genfit::TrackCands
-      if (*genfitTC == *convertedTC) {
-        B2DEBUG(20, "The two genfit::TrackCands are equal!")
-        continue;
+    // compare the two genfit::TrackCands
+    if (*genfitTC == *convertedTC) {
+      B2DEBUG(20, "The two genfit::TrackCands are equal!")
+      continue;
+    } else {
+      B2DEBUG(20, "The two genfit::TrackCands differ!")
+      if (analyzeMisMatch(genfitTC, convertedTC, trackCand)) {
+        B2DEBUG(20, "It is OK for the two TrackCands to differ (i.e. the hits that miss are due to their absence in the SPTC!)")
+        m_differButOKCtr++;
       } else {
-        B2DEBUG(20, "The two genfit::TrackCands differ!")
-        if (analyzeMisMatch(genfitTC, convertedTC, trackCand)) {
-          B2DEBUG(20, "It is OK for the two TrackCands to differ!")
-          m_differButOKCtr++;
-        } else {
-          B2ERROR("PENGFAIL")
-          B2WARNING("Two genfit::TrackCands differ but there is no appearant reason why they should be allowed to do so!")
-          m_failedOther++;
-        }
+        B2WARNING("Two genfit::TrackCands differ but there is no appearant reason why they should be allowed to do so!")
+        m_failedOther++;
       }
+    }
   }
 }
 
@@ -157,7 +150,7 @@ void TCConvertersTestModule::terminate()
   B2INFO("TCConverterTest::terminate(): Got " << m_genfitTCCtr << " 'original' genfit::TrackCands, " << \
          m_convertedTCCtr << " genfit::TrackCands to compare and " << m_SpacePointTCCtr << " SpacePointTrackCands. " << results.str())
 
-  if (m_failedOther) { B2WARNING("There were cases during comparison that need to be looked at!") }
+  if (m_failedOther) { B2WARNING("There were cases during comparison that need to be looked at!") } // should not happen anymore
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME())) {
     stringstream verbose;
@@ -207,7 +200,7 @@ bool TCConvertersTestModule::analyzeMisMatch(const genfit::TrackCand* origTC, co
     return false;
   } else { // NOTE: for the moment only checking the order and the sorting params, but not the planeIDs!
     if (!foundHits[1]) { // if all hits are present, but they are in the wrong order
-      B2WARNING("The hits appear in the wrong order in the converted GFTC compared to the original GFTC!") // same as above
+      B2DEBUG(1, "The hits appear in the wrong order in the converted GFTC compared to the original GFTC!")
       m_failedWrongOrder++;
     }
     if (!foundHits[3]) { // sorting params not matching
@@ -251,9 +244,9 @@ std::array<bool, 4> TCConvertersTestModule::checkHits(const std::vector<trackCan
     stringstream hitOut;
     hitOut << "Checking hit " << get<0>(hit) << " " << get<1>(hit) << " " << get<2>(hit) << " " << get<3>(hit) << " -> ";
     vectorIt foundIt = find(origHits.begin(), origHits.end(), hit);
-    if (foundIt == origHits.end()) { // check if a hit can be found without comparing the sorting parameters
-      hitOut << "not found, now checking if omitting planeID and sortingParams helps: " << endl;
 
+    if (foundIt == origHits.end()) { // check if a hit can be found without comparing the sorting parameters
+      hitOut << "not found, now checking if omitting planeID and sortingParams helps:" << endl;
       vectorIt foundOnlyHitsIt = checkEntries<0, 1>(origHits, hit);
       if (foundOnlyHitsIt != origHits.end()) {
         pos = foundOnlyHitsIt - origHits.begin();

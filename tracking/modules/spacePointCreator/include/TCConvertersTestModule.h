@@ -16,6 +16,9 @@
 
 #include <string>
 #include <array>
+#include <vector>
+#include <tuple>
+#include <algorithm> // for find_if
 
 namespace Belle2 {
 
@@ -134,7 +137,7 @@ namespace Belle2 {
       return std::find_if(hits.begin(), hits.end(),
       [&hit](const trackCandHit & oHit) {
         return std::get<p1>(hit) == std::get<p1>(oHit) &&
-               std::get<p2>(hit) == std::get<2>(oHit) &&
+               std::get<p2>(hit) == std::get<p2>(oHit) &&
                std::get<p3>(hit) == std::get<p3>(oHit);
       }
                          );

@@ -138,33 +138,42 @@ int RFProcessManager::CheckOutput()
 {
   // Setup select parameter
   fd_set fdset;
-  FD_ZERO(&fdset);
-  if (m_iopipe[0] > 0) FD_SET(m_iopipe[0], &fdset);
-  int highest = m_iopipe[0];
-  NSMcontext* nsmc = RFNSM::GetContext();
-  if (nsmc->sock > highest) highest = nsmc->sock;
-  FD_SET(nsmc->sock, &fdset);
-
-  // Time out parameter
-  struct timeval tv;
-  tv.tv_sec = 1;
-  tv.tv_usec = 1; // omajinai
 
   // Fetch fd
   int nfd;
   for (;;) {
+    FD_ZERO(&fdset);
+    int highest = 0;
+    if (m_iopipe[0] > 0) {
+      FD_SET(m_iopipe[0], &fdset);
+      highest = m_iopipe[0];
+    } else {
+      printf("Pipe for log is not availablle\n");
+    }
+    NSMcontext* nsmc = RFNSM::GetContext();
+    if (nsmc) {
+      if (nsmc->sock > highest) highest = nsmc->sock;
+      FD_SET(nsmc->sock, &fdset);
+    } else {
+      printf("No NSM context is available\n");
+    }
+    // Time out parameter
+    struct timeval tv;
+    tv.tv_sec = 1;
+    tv.tv_usec = 1; // omajinai
+
     if ((nfd = select(highest + 1, &fdset, NULL, NULL, &tv)) < 0) {
       switch (errno) {
         case EINTR: continue;
         case EAGAIN: continue;
         default:
-          close(m_iopipe[0]);
-          m_iopipe[0] = -1;
+          //close(m_iopipe[0]);
+          //m_iopipe[0] = -1;
           return 0;
       }
       if (errno == EINTR) continue;
     } else {
-      if (FD_ISSET(nsmc->sock, &fdset)) {
+      if (nsmc && FD_ISSET(nsmc->sock, &fdset)) {
         NSMCommunicator(nsmc).callContext();
       }
       if (m_iopipe[0] > 0 &&

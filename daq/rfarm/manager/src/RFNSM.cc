@@ -7,14 +7,19 @@
 //-
 
 #include "daq/rfarm/manager/RFNSM.h"
-#include "daq/slc/system/PThread.h"
+
+extern "C" {
+#include <nsm2/nsm2.h>
+#include <nsm2/nsmlib2.h>
+#include <nsm2/belle2nsm.h>
+}
 
 #define RFNSMOUT stdout
 
 using namespace std;
 using namespace Belle2;
 
-extern "C" void nsmlib_debuglevel(int);
+//extern "C" void nsmlib_debuglevel(int);
 
 // Global variable to contain server instance
 RFServerBase* g_nsmserver = 0;
@@ -35,7 +40,9 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
     //if (!(g_context = b2nsm_init(nodename))) {
     fprintf(RFNSMOUT, "RFNSM : %s initialization failure, %s\n",
             nodename, b2nsm_strerror());
+    g_context = 0;
   }
+  nsmlib_usesig(g_context, 0);
   m_nodename = nodename;
 
   // Redirect log message to standard output

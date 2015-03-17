@@ -79,8 +79,10 @@ def LoadHistogramsFromFiles(files, variable, channelNames, preCutHistograms):
     @param variable the variable which defines the x-axis of the histograms
     @param channels the channels for which the histograms are loaded
     """
-    signal = dict([(channel, file.GetKey('signal' + key).ReadObj()) for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
-    all = dict([(channel, file.GetKey('all' + key).ReadObj()) for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
+    signal = dict([(channel, file.GetKey('signal' + key).ReadObj())
+                   for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
+    all = dict([(channel, file.GetKey('all' + key).ReadObj())
+                for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
 
     if any([hist is None for hist in signal.values() + all.values()]):
         raise RuntimeError('Error while opening ROOT file with preCut Histograms')
@@ -117,7 +119,8 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
         return {channel: [0, 0] for channel in signal.iterkeys()}
 
     def pythonEfficiencyFunc(ycut):
-        return sum([GetNumberOfEventsInRange(s, ycut_to_xcuts(channel, ycut[0])) for (channel, s) in signal.iteritems()]) / float(nSignal)
+        return sum([GetNumberOfEventsInRange(s, ycut_to_xcuts(channel, ycut[0]))
+                    for (channel, s) in signal.iteritems()]) / float(nSignal)
 
     def pythonPurityFunc(ycut):
         s = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in signal.iteritems()])
@@ -138,7 +141,7 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
     return {channel: ycut_to_xcuts(channel, ycut) for channel in signal.iterkeys()}
 
 
-def GetNumberOfEventsInRange(histogram, (a, b)):
+def GetNumberOfEventsInRange(histogram, rangeTuple):
     """
     Calculates the number of events in the given histograms between a and b
     Beware of nasty bug here, if b is exactly the upper edge of a bin, we had to make sure
@@ -147,6 +150,7 @@ def GetNumberOfEventsInRange(histogram, (a, b)):
     @param a lower boundary
     @param b upper boundary
     """
+    (a, b) = rangeTuple
     low = histogram.FindBin(a)
     if histogram.FindBin(a + histogram.GetBinWidth(low) / 2.0) != low:
         low += 1
@@ -173,5 +177,6 @@ def GetIgnoredChannels(signal, bckgrd, cuts):
     @param cuts cuts on the x-axis of the channels
     """
     def isIgnored(channel):
-        return GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 1000 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 1000
+        return (GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 1000
+                or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 1000)
     return [channel for channel in signal.iterkeys() if isIgnored(channel)]

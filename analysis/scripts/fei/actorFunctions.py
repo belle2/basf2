@@ -7,7 +7,8 @@
 # To create your own actor:
 #   1. Write a normal function which takes the needed arguments and returns a dictonary of provided values.
 #      E.g. def foo(path, particleList) ... return {'Stuff': x}
-#   2. Make sure your return value depends on all the used arguments, easiest way to accomplish this is the automatic provided hash parameter.
+#   2. Make sure your return value depends on all the used arguments, easiest way to
+#      accomplish this is the automatic provided hash parameter.
 #   3. Add the function to the sequence object like this (in FullEventInterpretation.py):
 #      seq.addFunction(foo, path='Path', particleList='K+')
 
@@ -51,7 +52,8 @@ def CountMCParticles(path, names, gearbox):
 
     rootfile = ROOT.TFile(filename)
     countNtuple = rootfile.Get('mccounts')
-    getpdg = lambda x: x[len('NumberOfMCParticlesInEvent'):]  # makeROOTCompatible removes parenthesis from variable so we don't worry about them here
+    # makeROOTCompatible removes parenthesis from variable so we don't worry about them here
+    getpdg = lambda x: x[len('NumberOfMCParticlesInEvent'):]
 
     counter = {}
     for branch in [str(k.GetName()) for k in countNtuple.GetListOfBranches()]:
@@ -89,7 +91,15 @@ def FSPDistribution(path, hash, identifier, inputList, mvaConfigTarget, gearbox)
 
     rootfile = ROOT.TFile(filename)
     distribution = rootfile.Get('distribution')
-    result = {'nSignal': int(distribution.GetEntries(mvaConfigTarget + ' == 1')), 'nBackground': int(distribution.GetEntries(mvaConfigTarget + ' == 0'))}
+    result = {
+        'nSignal': int(
+            distribution.GetEntries(
+                mvaConfigTarget +
+                ' == 1')),
+        'nBackground': int(
+            distribution.GetEntries(
+                mvaConfigTarget +
+                ' == 0'))}
     B2INFO("Calculated signal and background candiates of FSP {i}".format(i=inputList))
     return {'Distribution_{i}'.format(i=identifier): result, '__cache__': True}
 
@@ -102,7 +112,8 @@ def SelectParticleList(path, hash, particleName, particleLabel, runs_in_ROE):
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param runs_in_ROE boolean determines if particles are selected from ROE
-        @return Resource named RawParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
+        @return Resource named RawParticleList_{particleName}:{particleLabel} corresponding
+                ParticleList is stored as {particleName}:{hash}
     """
     B2INFO("Enter: Select Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     outputList = particleName + ':' + hash
@@ -121,22 +132,37 @@ def MakeAndMatchParticleList(path, hash, particleName, particleLabel, channelNam
         @param particleLabel user defined label
         @param channelName unique name describing the channel
         @param daughterParticleLists list of ParticleList name of every daughter particles
-        @param preCut dictionary containing 'cutstring', a string which defines the cut which is applied before the combination of the daughter particles.
+        @param preCut dictionary containing 'cutstring', a string which defines the cut which is applied
+               before the combination of the daughter particles.
         @param decayModeID integer ID of this decay channel, added to extra-info of Particles
         @return Resource named RawParticleList_{channelName} corresponding list is stored as {particleName}:{hash}
     """
-    B2INFO("Enter: Make and Match Particle List {p} with label {l} for channel {c}".format(p=particleName, l=particleLabel, c=channelName))
+    B2INFO(
+        "Enter: Make and Match Particle List {p} with label {l} for channel {c}".format(
+            p=particleName,
+            l=particleLabel,
+            c=channelName))
     outputList = particleName + ':' + hash
 
     # If preCut is None this channel is ignored
     if preCut is None:
-        B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
+        B2INFO(
+            "Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(
+                p=particleName,
+                l=particleLabel,
+                c=channelName,
+                o=outputList))
         return {'RawParticleList_{c}'.format(c=channelName): None, '__cache__': True}
 
     decayString = outputList + ' ==> ' + ' '.join(daughterParticleLists)
     modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], decayModeID, writeOut=True, path=path)
     modularAnalysis.matchMCTruth(outputList, path=path)
-    B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
+    B2INFO(
+        "Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(
+            p=particleName,
+            l=particleLabel,
+            c=channelName,
+            o=outputList))
     return {'RawParticleList_{c}'.format(c=channelName): outputList, '__cache__': True}
 
 
@@ -149,21 +175,31 @@ def CopyParticleLists(path, hash, particleName, particleLabel, inputLists, postC
         @param particleLabel user defined label
         @param inputLists list of ParticleLists name defning which ParticleLists are copied to the new list
         @param postCut dictionary containing 'cutstring'
-        @return Resource named ParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
+        @return Resource named ParticleList_{particleName}:{particleLabel} corresponding ParticleList is
+                stored as {particleName}:{hash}
     """
     B2INFO("Enter: Gather Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     outputList = particleName + ':' + hash
 
     inputLists = filter(None, inputLists)
     if inputLists == []:
-        B2INFO("Gather Particle List {p} with label {l} in list {o}. But there are no particles to gather :-(.".format(p=particleName, l=particleLabel, o=outputList))
+        B2INFO(
+            "Gather Particle List {p} with label {l} in list {o}. But there are no particles to gather :-(.".format(
+                p=particleName,
+                l=particleLabel,
+                o=outputList))
         return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): None,
                 'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None,
                 '__cache__': True}
 
-    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'] if postCut is not None else '', writeOut=True, path=path)
+    modularAnalysis.cutAndCopyLists(
+        outputList,
+        inputLists,
+        postCut['cutstring'] if postCut is not None else '',
+        writeOut=True,
+        path=path)
     modularAnalysis.cutAndCopyLists(particleName + ':' + particleLabel, outputList, '', writeOut=True, path=path)
-    #modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
+    # modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
     return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
@@ -230,7 +266,15 @@ def FitVertex(path, hash, channelName, particleList, daughterVertices, geometry)
     return {'VertexFit_{c}'.format(c=channelName): hash, '__cache__': True}
 
 
-def CreatePreCutHistogram(path, hash, particleName, channelName, mvaConfigTarget, preCutConfig, daughterParticleLists, additionalDependencies):
+def CreatePreCutHistogram(
+        path,
+        hash,
+        particleName,
+        channelName,
+        mvaConfigTarget,
+        preCutConfig,
+        daughterParticleLists,
+        additionalDependencies):
     """
     Creates ROOT file with chosen pre cut variable histogram of this channel (signal/background)
     for a given particle, before any intermediate cuts are applied.
@@ -243,7 +287,8 @@ def CreatePreCutHistogram(path, hash, particleName, channelName, mvaConfigTarget
         @return Resource named PreCutHistogram_{channelName} providing root filename 'CutHistograms_{channelName}:{hash}.root'
     """
     B2INFO("Enter: Create pre cut histogram for channel {c}.".format(c=channelName))
-    if any([daughterParticleList is None for daughterParticleList in daughterParticleLists]) or any([x is None for x in additionalDependencies]):
+    if any([daughterParticleList is None for daughterParticleList in daughterParticleLists]) or any(
+            [x is None for x in additionalDependencies]):
         B2INFO("Create pre cut histogram for channel {c}. But channel is ignored.".format(c=channelName))
         return {'PreCutHistogram_{c}'.format(c=channelName): None, '__cache__': True}
 
@@ -316,7 +361,16 @@ def PostCutDetermination(identifier, postCutConfig, signalProbabilities):
         return {'PostCut_{i}'.format(i=identifier): None, '__needed__': False, '__cache__': True}
     else:
         B2INFO("Calculate post cut for {i}".format(i=identifier))
-        return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < extraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}, '__cache__': True}
+        return {
+            'PostCut_{i}'.format(
+                i=identifier): {
+                'cutstring': str(
+                    postCutConfig.value) +
+                ' < extraInfo(SignalProbability)',
+                'range': (
+                    postCutConfig.value,
+                    1)},
+            '__cache__': True}
 
 
 def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribution, additionalDependencies):
@@ -366,19 +420,33 @@ def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribut
         teacher.param('inverseSamplingRates', inverseSamplingRates)
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
-        B2INFO("Calculate SignalProbability for {i}. Create root file with variables first with prefix {p}.".format(i=identifier, p=removeJPsiSlash(particleList + '_' + hash)))
+        B2INFO(
+            "Calculate SignalProbability for {i}. Create root file with variables first with prefix {p}.".format(
+                i=identifier,
+                p=removeJPsiSlash(
+                    particleList +
+                    '_' +
+                    hash)))
         return {}
 
     if not os.path.isfile(configFilename):
         B2INFO("Calculate SignalProbability for {i}. Run Teacher in extern process.".format(i=identifier))
-        command = ("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
-                   " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
-                   " --maxEventsPerClass {maxEvents}"
-                   " > '{prefix}'.log 2>&1".format(name=mvaConfig.name, type=mvaConfig.type, config='CreateMVAPdfs:' + Nbins + mvaConfig.config,
-                                                   target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
-                                                   foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                                                   poption='SplitMode=random:!V', maxEvents=maxEvents,
-                                                   prefix=removeJPsiSlash(particleList + '_' + hash)))
+        command = (
+            "externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
+            " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
+            " --maxEventsPerClass {maxEvents}"
+            " > '{prefix}'.log 2>&1".format(
+                name=mvaConfig.name,
+                type=mvaConfig.type,
+                config='CreateMVAPdfs:' + Nbins + mvaConfig.config,
+                target=mvaConfig.target,
+                variables="' '".join(
+                    mvaConfig.variables),
+                foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
+                poption='SplitMode=random:!V',
+                maxEvents=maxEvents,
+                prefix=removeJPsiSlash(
+                    particleList + '_' + hash)))
         B2INFO("Use following command to invoke teacher\n" + command)
         actorFramework.global_lock.release()
         subprocess.call(command, shell=True)
@@ -390,7 +458,7 @@ def SignalProbability(path, hash, identifier, particleList, mvaConfig, distribut
         expert.param('prefix', removeJPsiSlash(particleList + '_' + hash))
         expert.param('method', mvaConfig.name)
         expert.param('signalFraction', -2)  # Use signalFraction from training
-        #expert.param('signalFraction', -1)  # No transformation of output
+        # expert.param('signalFraction', -1)  # No transformation of output
         expert.param('expertOutputName', 'SignalProbability')
         expert.param('signalClass', 1)
         expert.param('inverseSamplingRates', inverseSamplingRates)
@@ -427,14 +495,21 @@ def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbab
         output = register_module('VariablesToNtuple')
         output.set_name('VariablesToNtuple_' + particleList)
         output.param('particleList', particleList)
-        output.param('variables', [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'cosThetaBetweenParticleAndTrueB'] + extraVars)
+        output.param('variables',
+                     [target,
+                      'extraInfo(SignalProbability)',
+                      'Mbc',
+                      'mcErrors',
+                      'cosThetaBetweenParticleAndTrueB'] + extraVars)
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)
         B2INFO("Write variables to ntuple for particle {i}.".format(i=particleIdentifier))
         return {}
 
-    B2INFO("Write variables to ntuple for particle {i}. But file already exists, so nothing to do here.".format(i=particleIdentifier))
+    B2INFO(
+        "Write variables to ntuple for particle {i}. But file already exists, so nothing to do here.".format(
+            i=particleIdentifier))
     return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): filename, '__cache__': True}
 
 
@@ -457,7 +532,17 @@ def TagUniqueSignal(path, hash, particleIdentifier, particleList, signalProbabil
     return {'TagUniqueSignal_{i}'.format(i=particleIdentifier): 'extraInfo(uniqueSignal)', '__cache__': True}
 
 
-def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCutConfig, preCut, preCutHistogram, mvaConfig, signalProbability, postCutConfig, postCut):
+def WriteAnalysisFileForChannel(
+        particleName,
+        particleLabel,
+        channelName,
+        preCutConfig,
+        preCut,
+        preCutHistogram,
+        mvaConfig,
+        signalProbability,
+        postCutConfig,
+        postCut):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName valid pdg particle name
@@ -486,13 +571,25 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     hash = actorFramework.create_hash([placeholders])
     placeholders['texFile'] = removeJPsiSlash('{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
-        automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/ChannelTemplate.tex', placeholders)
+        automaticReporting.createTexFile(
+            placeholders['texFile'],
+            'analysis/scripts/fei/templates/ChannelTemplate.tex',
+            placeholders)
 
     B2INFO("Written analysis tex file for channel {c}.".format(c=channelName))
     return {'Placeholders_{c}'.format(c=channelName): placeholders, '__needed__': False}
 
 
-def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signalProbability, postCutConfig, postCut, distribution, nTuple, mcCounts):
+def WriteAnalysisFileForFSParticle(
+        particleName,
+        particleLabel,
+        mvaConfig,
+        signalProbability,
+        postCutConfig,
+        postCut,
+        distribution,
+        nTuple,
+        mcCounts):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName valid pdg particle name
@@ -542,7 +639,14 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, '__needed__': False}
 
 
-def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticleNTuples, finalParticleTargets, cpuTimeSummaryPlaceholders, mcCounts, particles):
+def WriteAnalysisFileSummary(
+        finalStateParticlePlaceholders,
+        combinedParticlePlaceholders,
+        finalParticleNTuples,
+        finalParticleTargets,
+        cpuTimeSummaryPlaceholders,
+        mcCounts,
+        particles):
     """
     Creates a pdf summarizing all networks trained.
         @param finalStateParticlePlaceholders list of all tex placeholder dictionaries of fsp
@@ -569,12 +673,18 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
             uniqueSignal = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(uniqueSignal)')
             nUniqueSignal = int(tree.GetEntries(target + ' && ' + uniqueSignal))
 
-            #add nUniqueSignal back in corresponding combined particle placeholder
+            # add nUniqueSignal back in corresponding combined particle placeholder
             for i, cplaceholder in enumerate(combinedParticlePlaceholders):
                 if cplaceholder['particleName'] == plot['particleName']:
                     combinedParticlePlaceholders[i]['particleNUniqueSignalAfterPostCut'] = nUniqueSignal
 
-    placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles)
+    placeholders = automaticReporting.createSummaryTexFile(
+        finalStateParticlePlaceholders,
+        combinedParticlePlaceholders,
+        finalParticlePlaceholders,
+        cpuTimeSummaryPlaceholders,
+        mcCounts,
+        particles)
 
     subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/fei/templates/nordbert.pdf')), shell=True)
     for i in range(0, 2):
@@ -587,7 +697,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     if ret == 0:
         filename = 'sent_mail'
         if not os.path.isfile(filename):
-            #automaticReporting.sendMail()
+            # automaticReporting.sendMail()
             open(filename, 'w').close()
 
     B2INFO("Created analysis summary pdf file.")
@@ -627,6 +737,12 @@ def WriteCPUTimeSummary(channelNames, inputLists, channelPlaceholders, mcCounts,
         @return dictionary of placeholders used in the .tex file
     """
     stats = automaticReporting.getModuleStatsFromFile(moduleStatisticsFile)
-    placeholders = automaticReporting.createCPUTimeTexFile(channelNames, inputLists, channelPlaceholders, mcCounts, moduleStatisticsFile, stats)
+    placeholders = automaticReporting.createCPUTimeTexFile(
+        channelNames,
+        inputLists,
+        channelPlaceholders,
+        mcCounts,
+        moduleStatisticsFile,
+        stats)
 
     return {'CPUTimeSummary': placeholders}

@@ -166,7 +166,13 @@ def createTexFile(filename, templateFilename, placeholders):
     B2INFO("Write tex file " + filename + ".")
 
 
-def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, cpuTimeSummaryPlaceholders, mcCounts, particles):
+def createSummaryTexFile(
+        finalStateParticlePlaceholders,
+        combinedParticlePlaceholders,
+        finalParticlePlaceholders,
+        cpuTimeSummaryPlaceholders,
+        mcCounts,
+        particles):
     """
     Creates combined summary .tex file for FEIR
 
@@ -187,31 +193,69 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     for particlePlaceholder in finalStateParticlePlaceholders:
         placeholders['finalStateParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
         placeholders['finalStateParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
+        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(
+            efficiency(
+                particlePlaceholder['particleNSignal'],
+                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(
+            efficiency(
+                particlePlaceholder['particleNSignalAfterPostCut'],
+                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(
+            purity(
+                particlePlaceholder['particleNSignal'],
+                particlePlaceholder['particleNBackground']) * 100) + ' & '
+        placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(
+            purity(
+                particlePlaceholder['particleNSignalAfterPostCut'],
+                particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
     placeholders['combinedParticleInputs'] = ""
     placeholders['combinedParticleEPTable'] = ""
     for particlePlaceholder in combinedParticlePlaceholders:
         placeholders['combinedParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
         placeholders['combinedParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        has_usercut = (particlePlaceholder['particleNSignal'] != particlePlaceholder['particleNSignalAfterUserCut']) or (particlePlaceholder['particleNBackground'] != particlePlaceholder['particleNBackgroundAfterUserCut'])
+        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
+            efficiency(
+                particlePlaceholder['particleNSignal'],
+                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        has_usercut = (
+            particlePlaceholder['particleNSignal'] != particlePlaceholder['particleNSignalAfterUserCut']) or (
+            particlePlaceholder['particleNBackground'] != particlePlaceholder['particleNBackgroundAfterUserCut'])
         if has_usercut:
-            placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+            placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
+                efficiency(
+                    particlePlaceholder['particleNSignalAfterUserCut'],
+                    particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         else:
             placeholders['combinedParticleEPTable'] += ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
+            efficiency(
+                particlePlaceholder['particleNSignalAfterPreCut'],
+                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
+            efficiency(
+                particlePlaceholder['particleNSignalAfterPostCut'],
+                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(
+            purity(
+                particlePlaceholder['particleNSignal'],
+                particlePlaceholder['particleNBackground']) * 100) + ' & '
         if has_usercut:
-            placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNBackgroundAfterUserCut']) * 100) + ' & '
+            placeholders['combinedParticleEPTable'] += '{:.3f}'.format(
+                purity(
+                    particlePlaceholder['particleNSignalAfterUserCut'],
+                    particlePlaceholder['particleNBackgroundAfterUserCut']) * 100) + ' & '
         else:
             placeholders['combinedParticleEPTable'] += ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(
+            purity(
+                particlePlaceholder['particleNSignalAfterPreCut'],
+                particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(
+            purity(
+                particlePlaceholder['particleNSignalAfterPostCut'],
+                particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
     placeholders['finalParticleInputs'] = ''
     finalParticleNames = set()
@@ -231,7 +275,11 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
             placeholders['NUniqueSignal'] += int(bPlaceholder['particleNUniqueSignalAfterPostCut'])
             placeholders['NBackground'] += int(bPlaceholder['particleNBackgroundAfterPostCut'])
 
-    placeholders['overallSignalEfficiencyInPercent'] = '{:.2f}'.format(efficiency(placeholders['NUniqueSignal'], placeholders['NEvents']) * 100)
+    placeholders['overallSignalEfficiencyInPercent'] = '{:.2f}'.format(
+        efficiency(
+            placeholders['NUniqueSignal'],
+            placeholders['NEvents']) *
+        100)
 
     hash = actorFramework.create_hash([placeholders])
     placeholders['texFile'] = 'FEIsummary.tex'
@@ -292,7 +340,10 @@ def createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution, mvaCon
     placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!isSignal'))
 
     hash = actorFramework.create_hash([placeholders])
-    placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
+    placeholders['particleDiagPlot'] = removeJPsiSlash(
+        '{name}_combined_{hash}_diag.png'.format(
+            name=placeholders['particleName'],
+            hash=hash))
     if not os.path.isfile(placeholders['particleDiagPlot']):
         makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'], mvaConfig)
     placeholders['texFile'] = '{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
@@ -314,10 +365,13 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
 
     placeholders['channelListAsItems'] = ""
     for channelPlaceholder in channelPlaceholders:
+        niceDecayChannel = prettifyDecayString(channelPlaceholder['channelName'])
         if channelPlaceholder['isIgnored']:
-            placeholders['channelListAsItems'] += "\\item {name} was ignored\n".format(name=prettifyDecayString(channelPlaceholder['channelName']))
+            placeholders[
+                'channelListAsItems'] += "\\item {name} was ignored\n".format(name=niceDecayChannel)
         else:
-            placeholders['channelListAsItems'] += "\\item {name}\n".format(name=prettifyDecayString(channelPlaceholder['channelName']))
+            placeholders[
+                'channelListAsItems'] += "\\item {name}\n".format(name=niceDecayChannel)
 
     placeholders['channelInputs'] = ""
     placeholders['particleNSignal'] = 0
@@ -331,12 +385,14 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
     placeholders['particleNTrueSignal'] = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
 
     if placeholders['NUsedChannels'] > 0:
-        ranges = [channelPlaceholder['postCutRange'] for channelPlaceholder in channelPlaceholders if channelPlaceholder['postCutRange'] != 'Ignored']
+        ranges = [channelPlaceholder['postCutRange']
+                  for channelPlaceholder in channelPlaceholders if channelPlaceholder['postCutRange'] != 'Ignored']
         if len(ranges) == 0:
             placeholders['postCutRange'] = 'Deactivated'
         else:
             if not all(ranges[0] == r for r in ranges):
-                B2WARNING("Showing different post cuts for channels of the same particle in the summary file, isn't supported at the moment. Show only first cut.")
+                B2WARNING("Showing different post cuts for channels of the same particle in"
+                          "the summary file, isn't supported at the moment. Show only first cut.")
             placeholders['postCutRange'] = ranges[0]
     else:
         placeholders['postCutRange'] = 'Ignored'
@@ -361,7 +417,10 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
         placeholders['channelInputs'] += '\input{' + channelPlaceholder['texFile'] + '}\n'
 
     hash = actorFramework.create_hash([placeholders])
-    placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
+    placeholders['particleDiagPlot'] = removeJPsiSlash(
+        '{name}_combined_{hash}_diag.png'.format(
+            name=placeholders['particleName'],
+            hash=hash))
     if not os.path.isfile(placeholders['particleDiagPlot']):
         makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'], mvaConfig)
     placeholders['texFile'] = removeJPsiSlash('{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
@@ -382,7 +441,10 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
     """
     if preCutHistogram is None:
         hash = actorFramework.create_hash([placeholders])
-        placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['preCutTexFile'] = removeJPsiSlash(
+            '{name}_preCut_{hash}.tex'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         placeholders['preCutTemplateFile'] = 'analysis/scripts/fei/templates/MissingPreCutTemplate.tex'
         placeholders['isIgnored'] = True
         placeholders['channelPurity'] = 0
@@ -413,15 +475,23 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
 
         placeholders['channelNSignalAfterUserCut'] = preCutDetermination.GetNumberOfEvents(signal_hist)
         placeholders['channelNBackgroundAfterUserCut'] = preCutDetermination.GetNumberOfEvents(background_hist)
-        placeholders['channelAfterUserPurity'] = '{:.5f}'.format(purity(placeholders['channelNSignalAfterUserCut'], placeholders['channelNBackgroundAfterUserCut']))
+        placeholders['channelAfterUserPurity'] = '{:.5f}'.format(
+            purity(
+                placeholders['channelNSignalAfterUserCut'],
+                placeholders['channelNBackgroundAfterUserCut']))
 
         if preCut is not None:
             lc, uc = preCut['range']
             placeholders['preCutRange'] = '({:.2f},'.format(lc) + ' {:.2f}'.format(uc) + ')'
             placeholders['channelNSignalAfterPreCut'] = preCutDetermination.GetNumberOfEventsInRange(signal_hist, (lc, uc))
             placeholders['channelNBackgroundAfterPreCut'] = preCutDetermination.GetNumberOfEventsInRange(background_hist, (lc, uc))
-            placeholders['channelPurityAfterPreCut'] = '{:.5f}'.format(purity(placeholders['channelNSignalAfterPreCut'], placeholders['channelNBackgroundAfterPreCut']))
-            placeholders['channelEfficiencyAfterPreCut'] = '{:.5f}'.format(placeholders['channelNSignalAfterPreCut'] / placeholders['channelNSignal'])
+            placeholders['channelPurityAfterPreCut'] = '{:.5f}'.format(
+                purity(
+                    placeholders['channelNSignalAfterPreCut'],
+                    placeholders['channelNBackgroundAfterPreCut']))
+            placeholders['channelEfficiencyAfterPreCut'] = '{:.5f}'.format(
+                placeholders['channelNSignalAfterPreCut'] /
+                placeholders['channelNSignal'])
         else:
             placeholders['preCutRange'] = '---'
             placeholders['channelNSignalAfterPreCut'] = 0
@@ -437,23 +507,38 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
 
         ROOT.gROOT.SetBatch(True)
 
-        placeholders['preCutAllPlot'] = removeJPsiSlash('{name}_preCut_{hash}_all.png'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['preCutAllPlot'] = removeJPsiSlash(
+            '{name}_preCut_{hash}_all.png'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         if not os.path.isfile(placeholders['preCutAllPlot']):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutAllPlot'], 'all', preCut, preCutConfig)
 
-        placeholders['preCutSignalPlot'] = removeJPsiSlash('{name}_preCut_{hash}_signal.png'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['preCutSignalPlot'] = removeJPsiSlash(
+            '{name}_preCut_{hash}_signal.png'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         if not os.path.isfile(placeholders['preCutSignalPlot']):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutSignalPlot'], 'signal', preCut, preCutConfig)
 
-        placeholders['preCutBackgroundPlot'] = removeJPsiSlash('{name}_preCut_{hash}_background.png'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['preCutBackgroundPlot'] = removeJPsiSlash(
+            '{name}_preCut_{hash}_background.png'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         if not os.path.isfile(placeholders['preCutBackgroundPlot']):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutBackgroundPlot'], 'bckgrd', preCut, preCutConfig)
 
-        placeholders['preCutRatioPlot'] = removeJPsiSlash('{name}_preCut_{hash}_ratio.png'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['preCutRatioPlot'] = removeJPsiSlash(
+            '{name}_preCut_{hash}_ratio.png'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         if not os.path.isfile(placeholders['preCutRatioPlot']):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutRatioPlot'], 'ratio', preCut, preCutConfig)
 
-        placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['preCutTexFile'] = removeJPsiSlash(
+            '{name}_preCut_{hash}.tex'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         placeholders['preCutTemplateFile'] = 'analysis/scripts/fei/templates/PreCutTemplate.tex'
 
     if not os.path.isfile(placeholders['preCutTexFile']):
@@ -535,8 +620,9 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaNSignalAfterPostCut'] = 0
         placeholders['mvaNBackgroundAfterPostCut'] = 0
         if 'ignoreReason' not in placeholders:
-            placeholders['ignoreReason'] = """Due too low statistics after the pre cut, we didn\'t perfom a training in this channel.
-                                              This means there were less than 1000 signal or 1000 background events in the given sample."""
+            placeholders['ignoreReason'] = ("Due too low statistics after the pre cut, we didn\'t perfom a training in"
+                                            " this channel. This means there were less than 1000 signal or"
+                                            " 1000 background events in the given sample.")
     else:
         ROOT.gROOT.SetBatch(True)
 
@@ -565,7 +651,9 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
             varName = addHyphenations(escapeForLatex(v))
             description = escapeForLatex(variables.getVariable(v).description)
             if rank in lines_by_rank:
-                raise RuntimeError("Rank %d occurs more than once! Something is wrong in TMVA or in our parsing of the variable ranking." % (rank))
+                raise RuntimeError(
+                    "Rank %d occurs more than once! Something is wrong in TMVA or in our parsing of the variable ranking." %
+                    (rank))
             lines_by_rank[rank] = varName + ' & ' + description + ' & ' + rankStr + '& ' + value + r' \\'
 
         placeholders['mvaVariables'] = ''
@@ -583,10 +671,15 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaNTestBackground'] = int(testTree.GetEntries('className == "Background"'))
 
         variablefile = ROOT.TFile(placeholders['mvaROOTFilename'])
-        keys = [key for key in variablefile.GetListOfKeys() if re.match('^{name}.*_tree$'.format(name=removeJPsiSlash(escapeForRegExp(placeholders['particleName']))), key.GetName()) is not None]
+        escapedName = removeJPsiSlash(escapeForRegExp(placeholders['particleName']))
+        keys = [key for key in variablefile.GetListOfKeys()
+                if re.match('^{name}.*_tree$'.format(name=escapedName), key.GetName()) is not None]
         if len(keys) != 1:
             print [k for k in variablefile.GetListOfKeys()]
-            raise RuntimeError("Couldn't find original tree for particle {name} in root file {f} created by tmva".format(name=placeholders['particleName'], f=placeholders['mvaROOTFilename']))
+            raise RuntimeError(
+                "Couldn't find original tree for particle {name} in root file {f} created by tmva".format(
+                    name=placeholders['particleName'],
+                    f=placeholders['mvaROOTFilename']))
         originalTree = keys[0].ReadObj()
         placeholders['mvaNCandidates'] = originalTree.GetEntries()
 
@@ -600,14 +693,21 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
             placeholders['postCutRange'] = '({:.5f},'.format(a) + ' {:.5f}'.format(b) + ')'
             postCutSelector = '(prob_{name} > {postCut})'.format(name=placeholders['mvaName'], postCut=postCut['range'][0])
             placeholders['mvaNTestSignalAfterPostCut'] = testTree.GetEntries('className == "Signal"' + ' && ' + postCutSelector)
-            placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries('className == "Background"' + ' && ' + postCutSelector)
+            placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries(
+                'className == "Background"' +
+                ' && ' +
+                postCutSelector)
         else:
             placeholders['postCutRange'] = 'Ignored'
             placeholders['mvaNTestSignalAfterPostCut'] = testTree.GetEntries('className == "Signal"')
             placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries('className == "Background"')
 
-        placeholders['mvaPostCutSignalEfficiency'] = efficiency(placeholders['mvaNTestSignalAfterPostCut'], placeholders['mvaNTestSignal'])
-        placeholders['mvaPostCutBackgroundEfficiency'] = efficiency(placeholders['mvaNTestBackgroundAfterPostCut'], placeholders['mvaNTestBackground'])
+        placeholders['mvaPostCutSignalEfficiency'] = efficiency(
+            placeholders['mvaNTestSignalAfterPostCut'],
+            placeholders['mvaNTestSignal'])
+        placeholders['mvaPostCutBackgroundEfficiency'] = efficiency(
+            placeholders['mvaNTestBackgroundAfterPostCut'],
+            placeholders['mvaNTestBackground'])
 
         placeholders['mvaNSignalAfterPostCut'] = placeholders['mvaPostCutSignalEfficiency'] * placeholders['mvaNSignal']
         placeholders['mvaNBackgroundAfterPostCut'] = placeholders['mvaPostCutBackgroundEfficiency'] * placeholders['mvaNBackground']
@@ -615,15 +715,24 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         # Create plots and texfile if hash changed
         hash = actorFramework.create_hash([placeholders])
 
-        placeholders['mvaOvertrainingPlot'] = removeJPsiSlash('{name}_mva_{hash}_overtraining.png'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['mvaOvertrainingPlot'] = removeJPsiSlash(
+            '{name}_mva_{hash}_overtraining.png'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         if not os.path.isfile(placeholders['mvaOvertrainingPlot']):
             makeOvertrainingPlot(placeholders['mvaTMVAFilename'], placeholders['mvaOvertrainingPlot'])
 
-        placeholders['mvaROCPlot'] = removeJPsiSlash('{name}_mva_{hash}_roc.png'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['mvaROCPlot'] = removeJPsiSlash(
+            '{name}_mva_{hash}_roc.png'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         if not os.path.isfile(placeholders['mvaROCPlot']):
             makeROCPlot(placeholders['mvaTMVAFilename'], placeholders['mvaROCPlot'])
 
-        placeholders['mvaDiagPlot'] = removeJPsiSlash('{name}_mva_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
+        placeholders['mvaDiagPlot'] = removeJPsiSlash(
+            '{name}_mva_{hash}_diag.png'.format(
+                name=placeholders['particleName'],
+                hash=hash))
         if not os.path.isfile(placeholders['mvaDiagPlot']):
             makeDiagPlotPerChannel(placeholders['mvaTMVAFilename'], placeholders['mvaDiagPlot'], placeholders['mvaName'])
 
@@ -666,12 +775,14 @@ def escapeForRegExp(someString):
 
 
 def makeOvertrainingPlot(tmvaFilename, plotName):
-    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
+    subprocess.call(
+        ['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
 def makeROCPlot(tmvaFilename, plotName):
-    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
+    subprocess.call(
+        ['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
@@ -780,11 +891,21 @@ def makeCosBDLPlot(fileName, outputFileName, targetVar):
     for cut in [0.01, 0.1, 0.5]:
         testTree.SetLineColor(int(color))
         testTree.SetLineStyle(ROOT.kSolid)
-        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' + str(cut), '' if first_plot else 'same')
+        testTree.Draw(
+            'cosThetaBetweenParticleAndTrueB',
+            'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' +
+            str(cut),
+            '' if first_plot else 'same')
         first_plot = False
 
         testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('cosThetaBetweenParticleAndTrueB', 'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' + str(cut) + ' && !' + targetVar, 'same')
+        testTree.Draw(
+            'cosThetaBetweenParticleAndTrueB',
+            'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' +
+            str(cut) +
+            ' && !' +
+            targetVar,
+            'same')
         color -= 1
 
     l = canvas.GetListOfPrimitives()
@@ -931,9 +1052,25 @@ def sendMail():
     StateOfMind = ['happy', 'cheerful', 'joyful', 'delighted', 'lucky']
     VerbAnnounce = ['announce', 'declare', 'make public', 'make known', 'report', 'publicize', 'broadcast', 'publish']
     PossesivePronoun = ['our', 'my', 'your']
-    Adjective = ['awesome', 'revolutionary', 'gorgeous', 'beautiful', 'spectacular', 'splendid', 'superb', 'wonderful', 'impressive', 'amazing', 'stunning', 'breathtaking', 'incredible']
+    Adjective = [
+        'awesome',
+        'revolutionary',
+        'gorgeous',
+        'beautiful',
+        'spectacular',
+        'splendid',
+        'superb',
+        'wonderful',
+        'impressive',
+        'amazing',
+        'stunning',
+        'breathtaking',
+        'incredible']
     VerbFinished = ('has', ['finished', 'completed', 'terminated', 'concluded'])
-    Motivation = [('Keep on your', Adjective, 'work!'), (Person, 'so proud of you!'), (['Enjoy this', 'Relax a'], 'moment and have a', ['cookie', '\bn ice', 'bath', 'day off'], '\b.')]
+    Motivation = [
+        ('Keep on your', Adjective, 'work!'), (Person, 'so proud of you!'), ([
+            'Enjoy this', 'Relax a'], 'moment and have a', [
+            'cookie', '\bn ice', 'bath', 'day off'], '\b.')]
     ClicheEnd = ['Best regards', 'Yours sincerely', 'Kind regards', 'Yours faithfully', 'See you', 'cu']
 
     def generate_sentence(term):
@@ -945,8 +1082,29 @@ def sendMail():
             return " ".join([generate_sentence(subterm) for subterm in term])
         raise RuntimeError('Invalid type received in sentence generator')
 
-    sentence = (ClicheBegin, '\n\n', Person, StateOfMind, 'to', VerbAnnounce, 'that', PossesivePronoun, Adjective, 'Full Event Interpretation', VerbFinished,
-                '\b.\n\nThat\'s', Adjective, '\b!\n', Motivation, '\n\n', ClicheEnd, '\b,\n', ['', ('the', [Adjective, StateOfMind])], 'Nordbert')
+    sentence = (ClicheBegin,
+                '\n\n',
+                Person,
+                StateOfMind,
+                'to',
+                VerbAnnounce,
+                'that',
+                PossesivePronoun,
+                Adjective,
+                'Full Event Interpretation',
+                VerbFinished,
+                '\b.\n\nThat\'s',
+                Adjective,
+                '\b!\n',
+                Motivation,
+                '\n\n',
+                ClicheEnd,
+                '\b,\n',
+                ['',
+                 ('the',
+                  [Adjective,
+                   StateOfMind])],
+                'Nordbert')
 
     text = MIMEText(re.sub('.\b', '', generate_sentence(sentence)))
 
@@ -1040,7 +1198,13 @@ def getBranchingFractions(filename):
     return branching_fractions
 
 
-def getCoveredBranchingFraction(particles, identifier, include_daughter_fractions=False, branching_fractions=getBranchingFractions(os.getenv('BELLE2_EXTERNALS_DIR') + '/share/evtgen/DECAY.DEC')):
+def getCoveredBranchingFraction(
+    particles,
+    identifier,
+    include_daughter_fractions=False,
+    branching_fractions=getBranchingFractions(
+        os.getenv('BELLE2_EXTERNALS_DIR') +
+        '/share/evtgen/DECAY.DEC')):
     n, l = identifier.split(':')
     particle = [p for p in particles if p.identifier == identifier or p.identifier == pdg.conjugate(n) + ':' + l][0]
     if len(particle.channels) == 0:
@@ -1143,9 +1307,17 @@ def createCPUTimeTexFile(channelNames, inputLists, channelPlaceholders, mcCounts
         bargraph = '\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % tuple(cpuPerModuleType[key] for key in moduleTypes)
         timePerCandidate = formatTime(row[1] * 1.0 / row[4]) + ' (' + formatTime(row[1] * 1.0 / row[3]) + ')'
         timePercent = row[1] / sum_time_seconds * 100
-        placeholders['cpuTimeStatistics'] += rowString.format(name=row[0], bargraph=bargraph, time=formatTime(row[1]), timePerCandidate=timePerCandidate, timePercent=timePercent)
+        placeholders['cpuTimeStatistics'] += rowString.format(name=row[0],
+                                                              bargraph=bargraph,
+                                                              time=formatTime(row[1]),
+                                                              timePerCandidate=timePerCandidate,
+                                                              timePercent=timePercent)
     placeholders['cpuTimeStatistics'] += '\\bottomrule\n'
-    placeholders['cpuTimeStatistics'] += rowString.format(name='Total', bargraph='', time=formatTime(sum_time_seconds), timePerCandidate='', timePercent=100)
+    placeholders['cpuTimeStatistics'] += rowString.format(name='Total',
+                                                          bargraph='',
+                                                          time=formatTime(sum_time_seconds),
+                                                          timePerCandidate='',
+                                                          timePercent=100)
 
     placeholders['texFile'] = 'CPUTimeSummary_' + moduleStatisticsFile + '.tex'
     if not os.path.isfile(placeholders['texFile']):

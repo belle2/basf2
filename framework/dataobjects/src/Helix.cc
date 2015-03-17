@@ -284,6 +284,38 @@ double Helix::calcASinXDividedByX(const double& x)
 
 }
 
+double Helix::calcATanXDividedByX(const double& x)
+{
+  // Approximation of atan(x) / x
+  // Inspired by BOOST's sinc
+
+  BOOST_MATH_STD_USING;
+
+  double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
+
+  if (abs(x) >= taylor_n_bound) {
+    return atan(x) / x;
+
+  } else {
+    // approximation by taylor series in x at 0 up to order 0
+    double result = 1.0;
+
+    double const taylor_0_bound = boost::math::tools::epsilon<double>();
+    if (abs(x) >= taylor_0_bound) {
+      double x2 = x * x;
+      // approximation by taylor series in x at 0 up to order 2
+      result -= x2 / 3.0;
+
+      double const taylor_2_bound = boost::math::tools::root_epsilon<double>();
+      if (abs(x) >= taylor_2_bound) {
+        // approximation by taylor series in x at 0 up to order 4
+        result += x2 * x2 * (1.0 / 5.0);
+      }
+    }
+    return result;
+  }
+}
+
 void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLength, double& dr) const
 {
   // Prepare common variables
@@ -308,10 +340,18 @@ void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLe
   dr = A / (1 + U);
 
   // Calculate the absolute value of the arc length
-  const double absArcLength = calcArcLengthAtDeltaCylindricalRAndDr(deltaCylindricalR, dr);
+  const double reducedDeltaOrthogonal = omega * deltaOrthogonal;
+  const double reducedDeltaParallel = omega * deltaParallel;
 
-  // Fixing the sign looking if the new origin lies in the forward direction in the xy projection.
-  arcLength = std::copysign(absArcLength, deltaParallel);
+  if (1 + reducedDeltaOrthogonal > 0) {
+    // Close side of the circle
+    double principleArcLength = deltaParallel / (1 + reducedDeltaOrthogonal);
+    arcLength = principleArcLength * calcATanXDividedByX(principleArcLength * omega);
+  } else {
+    // Far side of the circle
+    // If the far side of the circle is a well definied concept meaning that we have big enough omega.
+    arcLength = atan2(reducedDeltaParallel, 1 + reducedDeltaOrthogonal) / omega;
+  }
 }
 
 double Helix::calcArcLengthAtDeltaCylindricalRAndDr(const double& deltaCylindricalR, const double& dr) const

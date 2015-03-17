@@ -131,7 +131,8 @@ namespace Belle2 {
     static double getAlpha(const double bZ);
 
     /** Return track charge sign (1 or -1).*/
-    short getChargeSign() const {
+    short getChargeSign() const
+    {
       return getOmega() >= 0 ? 1 : -1;
     }
     /// @}
@@ -222,7 +223,8 @@ namespace Belle2 {
      *  @param phi             A angle in [-pi, pi]
      *  @return                The angle for the opposite direction in [-pi, pi]
      */
-    static double reversePhi(const double& phi) {
+    static double reversePhi(const double& phi)
+    {
       return phi < 0 ? phi + M_PI : phi - M_PI;
     }
 
@@ -238,9 +240,12 @@ namespace Belle2 {
     double calcSecantLengthToArcLengthFactor(const double& secantLength) const;
     /// @}
 
-  private:
+  protected:
     /** Implementation of the function asin(x) / x which handles small x values smoothly. */
     static double calcASinXDividedByX(const double& x);
+
+    /** Implementation of the function atan(x) / x which handles small x values smoothly. */
+    static double calcATanXDividedByX(const double& x);
 
     /** Helper method to calculate the signed circle arc length and the signed distance to the circle of a point in the xy projection.
      *

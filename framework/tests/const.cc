@@ -63,7 +63,7 @@ namespace {
 
     int size = 0;
     //note: iterating over the restricted type (ParticleType would work, too)
-    for (const Const::ChargedStable & c : set) {
+    for (const Const::ChargedStable& c : set) {
 
       int pdg = c.getPDGCode();
       unsigned int index = c.getIndex();
@@ -138,7 +138,7 @@ namespace {
 
   TEST(ConstTest, FindInParticleSet)
   {
-    for (const Const::ChargedStable & c : Const::chargedStableSet) {
+    for (const Const::ChargedStable& c : Const::chargedStableSet) {
       int pdg = c.getPDGCode();
       EXPECT_EQ(pdg, Const::chargedStableSet.find(pdg).getPDGCode());
     }
@@ -182,6 +182,7 @@ namespace {
 
 
     EXPECT_TRUE(Const::invalidParticle.getParticlePDG() == NULL);
+    EXPECT_TRUE(Const::unspecifiedParticle.getParticlePDG() == NULL);
   }
 
   /** Check DetectorSet. */

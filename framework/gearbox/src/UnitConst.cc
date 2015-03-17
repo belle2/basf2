@@ -41,7 +41,8 @@ namespace {
                 Int_t Anti,
                 Int_t TrackingCode,
                 Double_t Lifetime,
-                Double_t Spin): TParticlePDG(name, title, mass, stable, width, charge, ParticleClass, PDGcode, Anti, TrackingCode) {
+                Double_t Spin): TParticlePDG(name, title, mass, stable, width, charge, ParticleClass, PDGcode, Anti, TrackingCode)
+    {
       //and finally overwrite base class members
       fLifetime = Lifetime;
       fSpin = Spin;
@@ -68,7 +69,8 @@ namespace {
                                                  Int_t TrackingCode,
                                                  Double_t Lifetime,
                                                  Double_t Spin
-                                                ) {
+                                                )
+    {
       //
       //  Particle definition normal constructor. If the particle is set to be
       //  stable, the decay width parameter does have no meaning and can be set to
@@ -442,7 +444,9 @@ double Const::ParticleType::getMass() const
   return getParticlePDG()->Mass();
 }
 
-const Const::ParticleSet Const::chargedStableSet = Const::ParticleType(11) + Const::ParticleType(13) + Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020);
+const Const::ParticleSet Const::chargedStableSet =
+  Const::ParticleType(11) + Const::ParticleType(13) + Const::ParticleType(211)
+  + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020);
 
 const Const::ChargedStable Const::electron = Const::chargedStableSet.find(11);
 const Const::ChargedStable Const::muon = Const::chargedStableSet.find(13);
@@ -459,7 +463,8 @@ const Const::ParticleType Const::Klong = Const::ParticleType(130);
 const Const::ParticleType Const::lambda = Const::ParticleType(3122);
 const Const::ParticleType Const::lambda_ = lambda;
 const Const::ParticleType Const::antiLambda = Const::ParticleType(-3122);
-const Const::ParticleType Const::invalidParticle = Const::ParticleType(9900000);
+const Const::ParticleType Const::invalidParticle = Const::ParticleType(9900000); // codes beginning with 99... are reserved
+const Const::ParticleType Const::unspecifiedParticle = Const::ParticleType(9900001); // codes beginning with 99... are reserved
 
 const double Const::electronMass = Const::electron.getMass();
 const double Const::muonMass = Const::muon.getMass();

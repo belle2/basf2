@@ -250,7 +250,8 @@ namespace Belle2 {
        * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
        * @param index   Index of this particle in 'set'.
        */
-      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set), m_index(index)  {};
+      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set),
+        m_index(index)  {};
 
       /** Copy constructor.
        *
@@ -352,7 +353,8 @@ namespace Belle2 {
       ParticleSet() { };
 
       /** Copy constructor to make sure particles belong to correct set. */
-      ParticleSet(const ParticleSet& other) {
+      ParticleSet(const ParticleSet& other)
+      {
         for (ParticleType pdgIter : other) {
           add(pdgIter);
         }
@@ -371,26 +373,30 @@ namespace Belle2 {
       unsigned int size() const { return m_particles.size(); }
 
       /** Return particle at given index, or end() if out of range. */
-      const ParticleType& at(unsigned int index) const {
+      const ParticleType& at(unsigned int index) const
+      {
         if (index < m_particles.size())
           return m_particles[index];
         return invalidParticle;
       }
 
       /** Returns first particle. */
-      ParticleType begin() const {
+      ParticleType begin() const
+      {
         if (m_particles.empty())
           return end();
         return m_particles[0];
       }
 
       /** Returns an invalid particle to check if iteration should be stopped. */
-      ParticleType end() const {
+      ParticleType end() const
+      {
         return invalidParticle;
       }
 
       /** Returns particle in set with given PDG code, or invalidParticle if not found. */
-      const ParticleType& find(int pdg) const {
+      const ParticleType& find(int pdg) const
+      {
         for (ParticleType pdgIter : *this) {
           if (pdgIter.getPDGCode() == pdg)
             return m_particles[pdgIter.getIndex()];
@@ -414,7 +420,8 @@ namespace Belle2 {
        * Throws a runtime_error if p is not in chargedStableSet.
        */
       ChargedStable(const ParticleType& p)
-        : ParticleType(chargedStableSet.find(p.getPDGCode())) {
+        : ParticleType(chargedStableSet.find(p.getPDGCode()))
+      {
         if ((*this) == invalidParticle) {
           throw std::runtime_error("Given ParticleType is not a charged stable particle!");
         }
@@ -425,7 +432,8 @@ namespace Belle2 {
        * Throws a runtime_error if pdg is not in chargedStableSet.
        */
       explicit ChargedStable(int pdg)
-        : ParticleType(chargedStableSet.find(pdg)) {
+        : ParticleType(chargedStableSet.find(pdg))
+      {
         if ((*this) == invalidParticle) {
           throw std::runtime_error("Given PDG code is not a charged stable particle!");
         }
@@ -452,6 +460,8 @@ namespace Belle2 {
     static const ParticleType lambda_; /**< same as 'lambda', but that's a keyword in Python. */
     static const ParticleType antiLambda; /**< Anti-Lambda particle */
     static const ParticleType invalidParticle;     /**< Invalid particle, used internally. */
+    /** Unspecified particle, used when no other particle type fits. (no valid PDG code, but different from invalidParticle) */
+    static const ParticleType unspecifiedParticle;
 
     static const double electronMass;    /**< electron mass */
     static const double muonMass;        /**< muon mass */

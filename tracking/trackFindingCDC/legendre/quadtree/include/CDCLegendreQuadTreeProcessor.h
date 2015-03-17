@@ -59,7 +59,7 @@ namespace Belle2 {
 
     public:
 
-      QuadTreeProcessor(size_t lastLevel) : m_lastLevel(lastLevel) {}
+      QuadTreeProcessor(unsigned char lastLevel) : m_lastLevel(lastLevel) {}
 
       // version with a threshold on r
       void fillGivenTree(QuadTreeLegendre* node, QuadTreeLegendre::CandidateProcessorLambda& lmdProcessor,
@@ -208,10 +208,17 @@ namespace Belle2 {
           if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold)  && (fabs(node->getYMax()) > rThreshold))
             return;
         }
-        if (node->getLevel() == m_lastLevel) {
+
+        unsigned char level_diff = 0;
+        if (fabs(node->getYMean()) > 0.07) level_diff = 2;
+        else if ((fabs(node->getYMean()) < 0.07) && (fabs(node->getYMean()) > 0.04))
+          level_diff = 1;
+        if (node->getLevel() >= (m_lastLevel - level_diff)) {
           lmdProcessor(node);
           return;
         }
+
+
 
         if (node->getChildren() == nullptr)
           node->initializeChildren(*this);
@@ -252,7 +259,7 @@ namespace Belle2 {
         }
       }
 
-      size_t m_lastLevel;
+      unsigned char m_lastLevel;
     };
   }
 }

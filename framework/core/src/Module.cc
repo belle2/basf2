@@ -158,6 +158,30 @@ boost::shared_ptr<PathElement> Module::clone() const
   return newModule;
 }
 
+std::string Module::getPathString() const
+{
+
+  std::string output = getName();
+
+  if (m_hasCondition) {
+    output += "(? ";
+    switch (m_conditionOperator) {
+      case Belle2::CondParser::c_GT: output += ">"; break;
+      case Belle2::CondParser::c_ST: output += "<"; break;
+      case Belle2::CondParser::c_GE: output += ">="; break;
+      case Belle2::CondParser::c_SE: output += "<="; break;
+      case Belle2::CondParser::c_NE: output += "!="; break;
+      case Belle2::CondParser::c_EQ: output += "=="; break;
+      default: output += "???";
+    }
+    output += std::to_string(m_conditionValue);
+    output += m_conditionPath->getPathString();
+    output += " )";
+  }
+
+  return output;
+}
+
 //============================================================================
 //                          Protected methods
 //============================================================================
@@ -256,6 +280,7 @@ void Module::exposePythonAPI()
   .value("CONTINUE", Module::EAfterConditionPath::c_Continue)
   ;
 
+  /* Do not change the names of >, <, ... we use them to serialize conditional pathes */
   enum_<Belle2::CondParser::EConditionOperators>("ConditionOperator")
   .value(">", Belle2::CondParser::EConditionOperators::c_GT)
   .value("<", Belle2::CondParser::EConditionOperators::c_ST)

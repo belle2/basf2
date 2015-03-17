@@ -451,9 +451,8 @@ namespace Belle2 {
     //                    Python API
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
     /** return the module name. */
-    std::string getPathString() const override { return getName(); }
+    std::string getPathString() const override;
 
     /**
      * Implements a method for setting boost::python objects.

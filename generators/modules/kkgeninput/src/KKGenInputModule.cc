@@ -107,11 +107,14 @@ void KKGenInputModule::initialize()
 {
   B2INFO("starting initialisation of KKGen Input Module. ");
   FILE* fp;
-  if (fp = fopen(m_KKMCOutputFileName.c_str(), "r")) {
+
+  fp = fopen(m_KKMCOutputFileName.c_str(), "r");
+  if (fp) {
     fclose(fp);
     remove(m_KKMCOutputFileName.c_str());
   } else {
-    if (fp = fopen(m_KKMCOutputFileName.c_str(), "w")) {
+    fp = fopen(m_KKMCOutputFileName.c_str(), "w");
+    if (fp) {
       fclose(fp);
       remove(m_KKMCOutputFileName.c_str());
     } else {
@@ -119,7 +122,6 @@ void KKGenInputModule::initialize()
       exit(1);
     }
   }
-
 
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
                  m_taudecaytableFileName, m_EvtPDLFileName, m_KKMCOutputFileName);

@@ -262,8 +262,10 @@ TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expan
   const double A = 2 * deltaOrthogonal + omega * deltaCylindricalRSquared;
   const double USquared = 1 + omega * A;
   const double U = sqrt(USquared);
-  const double nu = 1 + omega * deltaOrthogonal;
-  const double u = 1 + omega * d0;
+  const double UOrthogonal = 1 + omega * deltaOrthogonal; // called nu in the Karimaki paper.
+  const double UParallel = omega * deltaParallel;
+  // Note U is a vector pointing from the middle of the projected circle scaled by a factor omega.
+  const double u = 1 + omega * d0; // just called u in the Karimaki paper.
 
   // ---------------------------------------------------------------------------------------
   // 1. Set the parts related to the xy coordinates
@@ -278,17 +280,17 @@ TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expan
 
   jacobian(iD0, iOmega) = (deltaCylindricalR + new_d0) * (deltaCylindricalR - new_d0) / 2 / U;
   jacobian(iD0, iPhi0) = - u * deltaParallel / U;
-  jacobian(iD0, iD0) =  nu / U;
+  jacobian(iD0, iD0) =  UOrthogonal / U;
 
   // c. Calculate the row related to phi0
   // Also calculate the derivatives of the arc length
   // which are need for the row related to z.
-  const double dArcLength_dD0 = - deltaParallel * omega / USquared;
-  const double dArcLength_dPhi0 = (omega * deltaCylindricalRSquared + deltaOrthogonal - d0 * nu) / USquared;
+  const double dArcLength_dD0 = - UParallel / USquared;
+  const double dArcLength_dPhi0 = (omega * deltaCylindricalRSquared + deltaOrthogonal - d0 * UOrthogonal) / USquared;
 
   jacobian(iPhi0, iD0) = - dArcLength_dD0 * omega;
-  //jacobian(iPhi0, iPhi0) = 1.0 - jacobianArcLength[iPhi0] * omega;
-  jacobian(iPhi0, iPhi0) = u * nu / USquared;
+  jacobian(iPhi0, iPhi0) = u * UOrthogonal / USquared;
+  jacobian(iPhi0, iOmega) =  -deltaParallel / U / U;
 
   // For jacobian(iPhi0, iOmega) we have to dig deeper
   // since the normal equations have a divergence for omega -> 0.
@@ -297,34 +299,29 @@ TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expan
   // To have a smooth transition in this limit we have to carefully
   // factor out the divergent quotents and approximate them with their taylor series.
 
-  const double chi = -atan2(omega * deltaParallel, nu);
+  const double chi = -atan2(UParallel, UOrthogonal);
   double arcLength = 0;
   double dArcLength_dOmega = 0;
 
   if (fabs(chi) < std::min(expandBelowChi, M_PI / 2.0)) {
     // Never expand for the far side of the circle by limiting the expandBelow to maximally half a pi.
     // Close side of the circle
-    double principleArcLength = deltaParallel / nu;
-    const double dPrincipleArcLength_dOmega = - principleArcLength * deltaOrthogonal / nu;
+    double principleArcLength = deltaParallel / UOrthogonal;
+    const double dPrincipleArcLength_dOmega = - principleArcLength * deltaOrthogonal / UOrthogonal;
 
     const double x = principleArcLength * omega;
     const double f = calcATanXDividedByX(x);
-    const double arcLength = principleArcLength * f;
     const double df_dx = calcDerivativeOfATanXDividedByX(x);
 
+    arcLength = principleArcLength * f;
     dArcLength_dOmega = (f + x * df_dx) * dPrincipleArcLength_dOmega + principleArcLength * df_dx * principleArcLength;
-    jacobian(iPhi0, iOmega) = - (dArcLength_dOmega * omega + arcLength);
-
   } else {
     // Far side of the circle
     // If the far side of the circle is a well definied concept, omega is high enough that
     // we can divide by it.
     // Otherwise nothing can rescue us since the far side of the circle is so far away that no reasonable extrapolation can be made.
-
-    const double dChi_dOmega = -deltaParallel / U / U;
     arcLength = - chi / omega;
-    dArcLength_dOmega = (-arcLength - dChi_dOmega) / omega;
-    jacobian(iPhi0, iOmega) = dChi_dOmega;
+    dArcLength_dOmega = (-arcLength - jacobian(iPhi0, iOmega)) / omega;
   }
 
   // ---------------------------------------------------------------------------------------
@@ -472,20 +469,21 @@ void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLe
   const double deltaCylindricalR = hypot(deltaOrthogonal, deltaParallel);
   const double deltaCylindricalRSquared = deltaCylindricalR * deltaCylindricalR;
 
-  // Calculate dr
   const double A = 2 * deltaOrthogonal + omega * deltaCylindricalRSquared;
   const double U = sqrt(1 + omega * A);
+  const double UOrthogonal = 1 + omega * deltaOrthogonal; // called nu in the Karimaki paper.
+  const double UParallel = omega * deltaParallel;
+  // Note U is a vector pointing from the middle of the projected circle scaled by a factor omega.
+
+  // Calculate dr
   dr = A / (1 + U);
 
   // Calculate the absolute value of the arc length
-  const double reducedDeltaOrthogonal = omega * deltaOrthogonal;
-  const double reducedDeltaParallel = omega * deltaParallel;
-
-  const double chi = -atan2(reducedDeltaParallel, 1 + reducedDeltaOrthogonal);
+  const double chi = -atan2(UParallel, UOrthogonal);
 
   if (fabs(chi) < M_PI / 8) { // Rough guess where the critical zone for approximations begins
     // Close side of the circle
-    double principleArcLength = deltaParallel / (1 + reducedDeltaOrthogonal);
+    double principleArcLength = deltaParallel / UOrthogonal;
     arcLength = principleArcLength * calcATanXDividedByX(principleArcLength * omega);
   } else {
     // Far side of the circle

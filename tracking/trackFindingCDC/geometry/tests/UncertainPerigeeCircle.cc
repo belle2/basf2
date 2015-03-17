@@ -20,6 +20,25 @@ using namespace TrackFindingCDC;
 
 
 
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
+{
+  UncertainPerigeeCircle circle(1.0, -PI / 2, 0);
+
+  TMatrixD moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, 0.0));
+  EXPECT_NEAR(1.0, moveByOneJacobian(0, 0), 10e-7);
+  EXPECT_NEAR(0.0, moveByOneJacobian(0, 1), 10e-7);
+  EXPECT_NEAR(0.0, moveByOneJacobian(0, 2), 10e-7);
+
+  EXPECT_NEAR(0.0, moveByOneJacobian(1, 0), 10e-7);
+  EXPECT_NEAR(1.0, moveByOneJacobian(1, 1), 10e-7);
+  EXPECT_NEAR(0.0, moveByOneJacobian(1, 2), 10e-7);
+
+  EXPECT_NEAR(0.0, moveByOneJacobian(2, 0), 10e-7);
+  EXPECT_NEAR(0.0, moveByOneJacobian(2, 1), 10e-7);
+  EXPECT_NEAR(1.0, moveByOneJacobian(2, 2), 10e-7);
+}
+
+
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 {
   UncertainPerigeeCircle circle(1.0, -PI / 2, 0);

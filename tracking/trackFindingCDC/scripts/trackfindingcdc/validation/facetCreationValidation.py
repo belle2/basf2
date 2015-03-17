@@ -36,6 +36,12 @@ def get_logger():
 
 CONTACT = "oliver.frost@desy.de"
 
+hypot = math.hypot
+
+
+def hypot3(x, y, z):
+    return hypot(hypot(x, y), z)
+
 
 class FacetCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
@@ -150,13 +156,34 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         end_phi = math.acos(end_cos)
 
         # Unexact sigmas up to a common factor equivalent to the simple drift length std
-        start_phi_pseudo_sigma = math.hypot(1.0 / start_to_middle_length, 1.0 / start_to_end_length)
-        middle_phi_pseudo_sigma = math.hypot(1.0 / start_to_middle_length, 1.0 / middle_to_end_length)
-        end_phi_pseudo_sigma = math.hypot(1.0 / start_to_end_length, 1.0 / middle_to_end_length)
+        start_phi_pseudo_sigma = hypot(1.0 / start_to_middle_length, 1.0 / start_to_end_length)
+        middle_phi_pseudo_sigma = hypot(1.0 / start_to_middle_length, 1.0 / middle_to_end_length)
+        end_phi_pseudo_sigma = hypot(1.0 / start_to_end_length, 1.0 / middle_to_end_length)
 
-        start_phi_sigma = math.hypot(start_drift_length_std / start_to_middle_length, start_drift_length_std / start_to_end_length)
-        middle_phi_sigma = math.hypot(middle_drift_length_std / start_to_middle_length, middle_drift_length_std / middle_to_end_length)
-        end_phi_sigma = math.hypot(end_drift_length_std / start_to_end_length, end_drift_length_std / middle_to_end_length)
+        # start_phi_sigma = hypot(start_drift_length_std / start_to_middle_length, start_drift_length_std / start_to_end_length)
+        # middle_phi_sigma = hypot(middle_drift_length_std / start_to_middle_length, middle_drift_length_std / middle_to_end_length)
+        # end_phi_sigma = hypot(end_drift_length_std / start_to_end_length, end_drift_length_std / middle_to_end_length)
+
+        start_to_middle_sigma_phi = start_drift_length_std / start_to_middle_length
+        start_to_end_sigma_phi = start_drift_length_std / start_to_end_length
+
+        middle_to_start_sigma_phi = middle_drift_length_std / start_to_middle_length
+        middle_to_end_sigma_phi = middle_drift_length_std / middle_to_end_length
+
+        end_to_start_sigma_phi = end_drift_length_std / start_to_end_length
+        end_to_middle_sigma_phi = end_drift_length_std / middle_to_end_length
+
+        start_phi_sigma = hypot3(start_to_end_sigma_phi - start_to_middle_sigma_phi,
+                                 middle_to_start_sigma_phi,
+                                 end_to_start_sigma_phi)
+
+        middle_phi_sigma = hypot3(start_to_middle_sigma_phi,
+                                  middle_to_start_sigma_phi + middle_to_end_sigma_phi,
+                                  end_to_middle_sigma_phi)
+
+        end_phi_sigma = hypot3(start_to_end_sigma_phi,
+                               middle_to_end_sigma_phi,
+                               end_to_start_sigma_phi - end_to_middle_sigma_phi)
 
         start_phi_pseudo_pull = start_phi / start_phi_pseudo_sigma
         middle_phi_pseudo_pull = start_phi / middle_phi_pseudo_sigma
@@ -201,6 +228,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         start_rl_info = facet.getStartRLInfo()
         middle_rl_info = facet.getMiddleRLInfo()
         end_rl_info = facet.getEndRLInfo()
+        superlayer_id = facet.getISuperLayer()
 
         if shape == facet.ORTHO_CW or shape == facet.ORTHO_CCW:
             # Middle hit must be on the other side of the track
@@ -227,6 +255,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
             select_fitless_hard = False
 
         return dict(
+            superlayer_id=superlayer_id,
             shape=shape,
             abs_shape=abs(shape),
             start_rl_info=start_rl_info,
@@ -240,7 +269,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         facet.adjustLines()
 
     def select_fitless(self, fitless_crops):
-        return True
+        return crops["select_fitless_hard"]
 
     def select(self, crops):
         return (
@@ -302,7 +331,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
     # Classification curves #
     #########################
     save_select_phi_pull = refiners.save_classification_analysis(
-        groupby=[None, "abs_shape"],
+        groupby=[None, "abs_shape", 'superlayer_id', ],
         folder_name="quality_phi_pull/{groupby_addition}",
         truth_name="mc_decision",
         estimate_name=["start_phi_pull", "middle_phi_pull", "end_phi_pull", ],
@@ -312,7 +341,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
     )
 
     save_select_phi_pseudo_pull = refiners.save_classification_analysis(
-        groupby=[None, "abs_shape"],
+        groupby=[None, "abs_shape", 'superlayer_id', ],
         folder_name="quality_phi_pseudo_pull/{groupby_addition}",
         truth_name="mc_decision",
         estimate_name=["start_phi_pseudo_pull", "middle_phi_pseudo_pull", "end_phi_pseudo_pull", ],

@@ -228,7 +228,8 @@ namespace Belle2 {
      * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
+    void if_value(const std::string& expression, boost::shared_ptr<Path> path,
+                  EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * A simplified version to set the condition of the module.
@@ -279,6 +280,12 @@ namespace Belle2 {
     /** Returns the path of the condition.  */
     boost::shared_ptr<Path> getConditionPath() const {return m_conditionPath; };
 
+    /** Returns the value of the condition.  */
+    int getConditionValue() const {return m_conditionValue; };
+
+    /** Returns the value of the condition.  */
+    Belle2::CondParser::EConditionOperators getConditionOperator() const {return m_conditionOperator; };
+
 
     /** What to do after a conditional path is finished. */
     EAfterConditionPath getAfterConditionPath() const { return m_afterConditionPath; }
@@ -308,7 +315,8 @@ namespace Belle2 {
      * @return A reference to a module parameter having the correct type.
      */
     template<typename T>
-    ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError);
+    ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
+        ModuleParamList::ModuleParameterTypeError);
 
     /** Create an independent copy of this module.
      *
@@ -434,7 +442,8 @@ namespace Belle2 {
 
     bool m_hasCondition;     /**< True, if a condition was set for the module. */
     boost::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */
-    Belle2::CondParser::EConditionOperators m_conditionOperator;  /**< The operator of the condition (set by parsing the condition expression). */
+    Belle2::CondParser::EConditionOperators
+    m_conditionOperator;  /**< The operator of the condition (set by parsing the condition expression). */
     int m_conditionValue;                    /**< Numeric value used in the condition (set by parsing the condition expression). */
     EAfterConditionPath m_afterConditionPath; /**< What to do after a conditional path is finished. */
 
@@ -489,7 +498,8 @@ namespace Belle2 {
   }
 
   template<typename T>
-  ModuleParam<T>& Module::getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError, ModuleParamList::ModuleParameterTypeError)
+  ModuleParam<T>& Module::getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
+      ModuleParamList::ModuleParameterTypeError)
   {
     return m_moduleParamList.getParameter<T>(name);
   }
@@ -575,7 +585,8 @@ namespace Belle2 {
      * Creates a new module and returns a shared pointer to it.
      * Instances of modules should only be created by this method.
      */
-    ModulePtr createModule() const {
+    ModulePtr createModule() const
+    {
       ModulePtr nm(new T());
       nm->setType(m_moduleType);
       nm->setName(m_moduleType);

@@ -424,24 +424,38 @@ def deserialize_value(module, parameter_state):
         return parameter_state['values']
 
 
+def serialize_condition(module):
+    return {'value': module.get_condition_value(),
+            'operator': int(module.get_condition_operator()),
+            'path': serialize_path(module.get_condition_path()),
+            'option': int(module.get_condition_option())}
+
+
+def deserialize_condition(module, module_state):
+    cond = module_state['condition']
+    module.if_value(str(ConditionOperator.values[cond['operator']]) + str(cond['value']),
+                    deserialize_path(cond['path']), AfterConditionPath.values[cond['option']])
+
+
 def serialize_module(module):
     if module.type() == '':
-        raise RuntimeError(
-            "Module '%s' doesn't have a type! Note that --dump-path cannot work properly with basf2 modules written in Python." %
-            (module.name()))
-    if module.has_condition():
-        raise RuntimeError("Module '%s' has a condition set. --dump-path currently does not support this" % (module.name()))
-    params = [{'name': parameter.name, 'values': serialize_value(module, parameter)}
-              for parameter in module.available_params() if parameter.setInSteering or module.type() == 'SubEvent']
-    return {'name': module.name(),
-            'type': module.type(),
-            'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
-            'parameters': params}
+        raise RuntimeError("Module '%s' doesn't have a type! Note that --dump-path cannot work"
+                           "properly with basf2 modules written in Python." % (module.name()))
+    return {
+        'name': module.name(),
+        'type': module.type(),
+        'flag': module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED),
+        'parameters': [{'name': parameter.name, 'values': serialize_value(module, parameter)}
+                       for parameter in module.available_params()
+                       if parameter.setInSteering or module.type() == 'SubEvent'],
+        'condition': serialize_condition(module) if module.has_condition() else None}
 
 
 def deserialize_module(module_state):
     module = fw.register_module(module_state['type'])
     module.set_name(module_state['name'])
+    if module_state['condition'] is not None:
+        deserialize_condition(module, module_state)
     if module_state['flag']:
         # for some modules, this flag might be changed from the default
         module.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)

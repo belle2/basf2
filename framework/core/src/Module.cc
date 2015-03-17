@@ -256,6 +256,15 @@ void Module::exposePythonAPI()
   .value("CONTINUE", Module::EAfterConditionPath::c_Continue)
   ;
 
+  enum_<Belle2::CondParser::EConditionOperators>("ConditionOperator")
+  .value(">", Belle2::CondParser::EConditionOperators::c_GT)
+  .value("<", Belle2::CondParser::EConditionOperators::c_ST)
+  .value(">=", Belle2::CondParser::EConditionOperators::c_GE)
+  .value("<=", Belle2::CondParser::EConditionOperators::c_SE)
+  .value("==", Belle2::CondParser::EConditionOperators::c_EQ)
+  .value("!=", Belle2::CondParser::EConditionOperators::c_NE)
+  ;
+
   enum_<Module::EModulePropFlags>("ModulePropFlags")
   .value("INPUT", Module::EModulePropFlags::c_Input)
   .value("OUTPUT", Module::EModulePropFlags::c_Output)
@@ -281,6 +290,9 @@ void Module::exposePythonAPI()
   .def("if_true", &Module::if_true, if_true_overloads())
   .def("has_condition", &Module::hasCondition)
   .def("get_condition_path", &Module::getConditionPath)
+  .def("get_condition_option", &Module::getAfterConditionPath)
+  .def("get_condition_value", &Module::getConditionValue)
+  .def("get_condition_operator", &Module::getConditionOperator)
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)
@@ -308,7 +320,8 @@ void Module::exposePythonAPI()
 //                          ModuleProxyBase
 //=====================================================================
 
-ModuleProxyBase::ModuleProxyBase(const std::string& moduleType, const std::string& package) : m_moduleType(moduleType), m_package(package)
+ModuleProxyBase::ModuleProxyBase(const std::string& moduleType, const std::string& package) : m_moduleType(moduleType),
+  m_package(package)
 {
   ModuleManager::Instance().registerModuleProxy(this);
 }

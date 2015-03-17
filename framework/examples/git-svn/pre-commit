@@ -26,7 +26,7 @@ then
     fail=0
     for file in $files_modified; do
         #Suppressing output since the path would be wrong anyways
-        fixstyle -c "$tmpdir/$file" > /dev/null
+        checkstyle "$tmpdir/$file" > /dev/null
         if [ $? -ne 0 ]; then
             echo "checkstyle failed for $file"
             fail=1

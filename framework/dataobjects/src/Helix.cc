@@ -316,6 +316,42 @@ double Helix::calcATanXDividedByX(const double& x)
   }
 }
 
+double Helix::calcDerivativeOfATanXDividedByX(const double& x)
+{
+  // Approximation of atan(x) / x
+  // Inspired by BOOST's sinc
+
+  BOOST_MATH_STD_USING;
+
+  double const taylor_n_bound = boost::math::tools::forth_root_epsilon<double>();
+
+  const double x2 = x * x;
+  if (abs(x) >= taylor_n_bound) {
+    const double chi = atan(x);
+    return ((1 - chi / x) / x - chi) / (1 + x2);
+
+  } else {
+    // approximation by taylor series in x at 0 up to order 0
+    double result = 1.0;
+
+    double const taylor_0_bound = boost::math::tools::epsilon<double>();
+    if (abs(x) >= taylor_0_bound) {
+      // approximation by taylor series in x at 0 up to order 2
+      result -= 2.0 * x / 3.0;
+
+      double const taylor_2_bound = boost::math::tools::root_epsilon<double>();
+      if (abs(x) >= taylor_2_bound) {
+        // approximation by taylor series in x at 0 up to order 4
+        result += x2 * x * (4.0 / 5.0);
+      }
+    }
+    return result;
+  }
+}
+
+
+
+
 void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLength, double& dr) const
 {
   // Prepare common variables
@@ -338,14 +374,16 @@ void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLe
   const double reducedDeltaOrthogonal = omega * deltaOrthogonal;
   const double reducedDeltaParallel = omega * deltaParallel;
 
-  if (1 + reducedDeltaOrthogonal > 0) {
+  const double chi = -atan2(reducedDeltaParallel, 1 + reducedDeltaOrthogonal);
+
+  if (fabs(chi) < M_PI / 8) { // Rough guess where the critical zone for approximations begins
     // Close side of the circle
     double principleArcLength = deltaParallel / (1 + reducedDeltaOrthogonal);
     arcLength = principleArcLength * calcATanXDividedByX(principleArcLength * omega);
   } else {
     // Far side of the circle
     // If the far side of the circle is a well definied concept meaning that we have big enough omega.
-    arcLength = atan2(reducedDeltaParallel, 1 + reducedDeltaOrthogonal) / omega;
+    arcLength = -chi / omega;
   }
 }
 

@@ -18,6 +18,17 @@
 
 namespace Belle2 {
 
+  namespace HelixParameterIndex {
+    // Helix parameter index in covariance and parameter vector
+    enum HelixParameterIndex {
+      iD0 = 0,
+      iPhi0 = 1,
+      iOmega = 2,
+      iZ0 = 3,
+      iTanLambda = 4,
+    };
+  }
+
   /** This class represents an ideal helix in perigee parameterization.
    *  The used perigee parameters are:
    *
@@ -29,11 +40,11 @@ namespace Belle2 {
    *  4. **@f$ z_0 @f$** - z coordinate of the perigee
    *  5. **@f$ \tan \lambda @f$** - the slope of the track in the sz plane (dz/ds)
    *
-   *  Each point on the helix can adressed by the arc length s, which has to be traversed to get to it from the perigee.
+   *  Each point on the helix can be adressed by the arc length s, which has to be traversed to get to it from the perigee.
    *  More precisely the arc length means the transverse part of the particles travel distance,
    *  hence the arc length of the circle in the xy projection.
    *
-   *  If you need different kind of methods / interfaces to the Helix please do not hesitate to contract oliver.frost@desy.de
+   *  If you need different kind of methods / interfaces to the helix please do not hesitate to contact oliver.frost@desy.de
    *  Contributions are always welcome.
    *
    */
@@ -45,13 +56,13 @@ namespace Belle2 {
 
     /** Constructor initializing class with a fit result.
      *
-     *  The give n position and momentum are extrapolated to the perigee given a homogeneous magnetic field in the z direction
+     *  The given position and momentum are extrapolated to the perigee assuming a homogeneous magnetic field in the z direction.
      *
      *  @param position      Position of the track at the perigee.
      *  @param momentum      Momentum of the track at the perigee.
      *  @param charge        Charge of the particle.
      *  @param bZ            Magnetic field to be used for the calculation of the curvature.
-                             It is assumed, that the B-field is homogeneous parallel to the z axis.
+     *                       It is assumed, that the B-field is homogeneous parallel to the z axis.
      */
     Helix(const TVector3& position,
           const TVector3& momentum,
@@ -63,10 +74,10 @@ namespace Belle2 {
      *  @param d0            The signed distance from the origin to the perigee. The sign is positive (negative),
      *                       if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
      *                       d0 has the same sign as `getPosition().Cross(getMomentum()).Z()`.
-     *  @param phi0          The angle between the transverse momentum and the x axis and in [-pi, pi]
-     *  @param omega         The signed curvature of the track where the sign is given by the charge of the particle
+     *  @param phi0          The angle between the transverse momentum and the x axis and in [-pi, pi].
+     *  @param omega         The signed curvature of the track where the sign is given by the charge of the particle.
      *  @param z0            The z coordinate of the perigee.
-     *  @param tanLambda     The slope of the track in the sz plane (dz/ds)
+     *  @param tanLambda     The slope of the track in the sz plane (dz/ds).
      */
     Helix(const float& d0,
           const float& phi0,
@@ -246,6 +257,9 @@ namespace Belle2 {
 
     /** Implementation of the function atan(x) / x which handles small x values smoothly. */
     static double calcATanXDividedByX(const double& x);
+
+    /** Implementation of the function d / dx (atan(x) / x) which handles small x values smoothly. */
+    static double calcDerivativeOfATanXDividedByX(const double& x);
 
     /** Helper method to calculate the signed circle arc length and the signed distance to the circle of a point in the xy projection.
      *

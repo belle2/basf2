@@ -16,6 +16,7 @@
 #include <boost/math/tools/precision.hpp>
 
 using namespace Belle2;
+using namespace HelixParameterIndex;
 
 ClassImp(Helix);
 
@@ -231,6 +232,112 @@ float Helix::passiveMoveBy(const TVector3& by)
   m_z0 = new_z0;
 
   return arcLength;
+}
+
+TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi) const
+{
+  // 0. Preparations
+  // Initialise the return value to a unit matrix
+  TMatrixD jacobian(5, 5);
+  jacobian.UnitMatrix();
+
+  // Fetch the helix parameters
+  const double omega = getOmega();
+  const double cosPhi0 = getCosPhi0();
+  const double sinPhi0 = getSinPhi0();
+  const double d0 = getD0();
+  const double tanLambda = getTanLambda();
+
+  // Prepare a delta vector, which is the vector from the perigee point to the new origin
+  // Split it in component parallel and a component orthogonal to tangent at the perigee.
+  const double x = by.X();
+  const double y = by.Y();
+
+  const double deltaParallel = x * cosPhi0 + y * sinPhi0;
+  const double deltaOrthogonal = y * cosPhi0 - x * sinPhi0 + d0;
+  const double deltaCylindricalR = hypot(deltaOrthogonal, deltaParallel);
+  const double deltaCylindricalRSquared = deltaCylindricalR * deltaCylindricalR;
+
+  // Some commonly used terms - compare Karimaki 1990
+  const double A = 2 * deltaOrthogonal + omega * deltaCylindricalRSquared;
+  const double USquared = 1 + omega * A;
+  const double U = sqrt(USquared);
+  const double nu = 1 + omega * deltaOrthogonal;
+  const double u = 1 + omega * d0;
+
+  // ---------------------------------------------------------------------------------------
+  // 1. Set the parts related to the xy coordinates
+  // Fills the upper left 3x3 corner of the jacobain
+
+  // a. Calculate the row related to omega
+  // The row related to omega is not different from the unit jacobian initialised above.
+  // jacobian(iOmega, iOmega) = 1.0; // From UnitMatrix above.
+
+  // b. Calculate the row related to d0
+  const double new_d0 = A / (1 + U);
+
+  jacobian(iD0, iOmega) = (deltaCylindricalR + new_d0) * (deltaCylindricalR - new_d0) / 2 / U;
+  jacobian(iD0, iPhi0) = - u * deltaParallel / U;
+  jacobian(iD0, iD0) =  nu / U;
+
+  // c. Calculate the row related to phi0
+  // Also calculate the derivatives of the arc length
+  // which are need for the row related to z.
+  const double dArcLength_dD0 = - deltaParallel * omega / USquared;
+  const double dArcLength_dPhi0 = (omega * deltaCylindricalRSquared + deltaOrthogonal - d0 * nu) / USquared;
+
+  jacobian(iPhi0, iD0) = - dArcLength_dD0 * omega;
+  //jacobian(iPhi0, iPhi0) = 1.0 - jacobianArcLength[iPhi0] * omega;
+  jacobian(iPhi0, iPhi0) = u * nu / USquared;
+
+  // For jacobian(iPhi0, iOmega) we have to dig deeper
+  // since the normal equations have a divergence for omega -> 0.
+  // This hinders not only the straight line case but extrapolations between points which are close together,
+  // like it happens when the current perigee is very close the new perigee.
+  // To have a smooth transition in this limit we have to carefully
+  // factor out the divergent quotents and approximate them with their taylor series.
+
+  const double chi = -atan2(omega * deltaParallel, nu);
+  double arcLength = 0;
+  double dArcLength_dOmega = 0;
+
+  if (fabs(chi) < std::min(expandBelowChi, M_PI / 2.0)) {
+    // Never expand for the far side of the circle by limiting the expandBelow to maximally half a pi.
+    // Close side of the circle
+    double principleArcLength = deltaParallel / nu;
+    const double dPrincipleArcLength_dOmega = - principleArcLength * deltaOrthogonal / nu;
+
+    const double x = principleArcLength * omega;
+    const double f = calcATanXDividedByX(x);
+    const double arcLength = principleArcLength * f;
+    const double df_dx = calcDerivativeOfATanXDividedByX(x);
+
+    dArcLength_dOmega = (f + x * df_dx) * dPrincipleArcLength_dOmega + principleArcLength * df_dx * principleArcLength;
+    jacobian(iPhi0, iOmega) = - (dArcLength_dOmega * omega + arcLength);
+
+  } else {
+    // Far side of the circle
+    // If the far side of the circle is a well definied concept, omega is high enough that
+    // we can divide by it.
+    // Otherwise nothing can rescue us since the far side of the circle is so far away that no reasonable extrapolation can be made.
+
+    const double dChi_dOmega = -deltaParallel / U / U;
+    arcLength = - chi / omega;
+    dArcLength_dOmega = (-arcLength - dChi_dOmega) / omega;
+    jacobian(iPhi0, iOmega) = dChi_dOmega;
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // 2. Set the parts related to the z coordinate
+  // Since tanLambda stays the same there are no entries for tanLambda in the jacobian matrix
+  // For the new z0' = z0 + arcLength * tanLambda
+  jacobian(iZ0, iD0) = tanLambda * dArcLength_dD0;
+  jacobian(iZ0, iPhi0) = tanLambda * dArcLength_dPhi0;
+  jacobian(iZ0, iOmega) = tanLambda * dArcLength_dOmega;
+  //jacobian(iZ0, iZ0) = 1.0; // From UnitMatrix above.
+  jacobian(iZ0, iTanLambda) = arcLength;
+
+  return jacobian;
 }
 
 double Helix::calcArcLengthFromSecantLength(const double& secantLength) const

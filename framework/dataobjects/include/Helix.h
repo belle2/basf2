@@ -12,6 +12,7 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
+#include <TMatrixD.h>
 
 #include <cstdlib>
 #include <cmath>
@@ -33,12 +34,14 @@ namespace Belle2 {
    *  The used perigee parameters are:
    *
    *  1. **@f$ d_0 @f$** - the signed distance from the origin to the perigee. The sign is positive (negative),
-                           if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
-                           @f$d_0@F$ has the same sign as `getPerigee().Cross(getMomentum()).Z()`.
+   *                       if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
+   *                       @f$d_0@F$ has the same sign as `getPerigee().Cross(getMomentum()).Z()`.
    *  2. **@f$ \phi_0 @f$** - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
    *  3. **@f$ \omega @f$** - the signed curvature of the track where the sign is given by the charge of the particle
    *  4. **@f$ z_0 @f$** - z coordinate of the perigee
    *  5. **@f$ \tan \lambda @f$** - the slope of the track in the sz plane (dz/ds)
+   *
+   *  in that exact order.
    *
    *  Each point on the helix can be adressed by the arc length s, which has to be traversed to get to it from the perigee.
    *  More precisely the arc length means the transverse part of the particles travel distance,
@@ -219,6 +222,17 @@ namespace Belle2 {
      *  @return                The float value is the arc length which as the be traversed from the old perigee to the new.
      */
     float passiveMoveBy(const TVector3& by);
+
+    /** Calculate the jacobian matrix for the transport of the helix parameters when moving the origin of the coordinate system to a new location.
+     *  Does not update the helix parameters in any way.
+     *
+     *  @param by              Vector by which the origin of the coordinate system should be moved.
+     *  @param expandBelowChi  Control parameter below, which absolute value of chi an expansion of divergent terms shall be used.
+     *                         This parameter exists for testing the consistency of the expansion with the closed form.
+     *                         In other applications the parameter should remain at its default value.
+     *  @return                The double value is the arc length which as the be traversed from the old perigee to the new.
+     */
+    TMatrixD calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi = M_PI / 8) const;
 
     /** Reverses the direction of travel of the helix in place.
      *

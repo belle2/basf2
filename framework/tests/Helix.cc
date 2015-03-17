@@ -11,6 +11,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace HelixParameterIndex;
 
 // Additional tests
 /// Expectation macro for combound structures like vectors to be close to each other
@@ -25,12 +26,23 @@ using namespace Belle2;
 /// Assertation macro for angle values that should not care for a multiple of 2 * PI difference between the values
 #define ASSERT_ANGLE_NEAR(expected, actual, delta) ASSERT_PRED3(angleNear, expected, actual, delta)
 
-/// Assertation macro that two values carry the same sign.
+/// Expectation macro that two values carry the same sign.
 #define EXPECT_SAME_SIGN(expected, actual) EXPECT_PRED2(sameSign, expected, actual)
 
 /// Assertation macro that two values carry the same sign.
 #define ASSERT_SAME_SIGN(expected, actual) ASSERT_PRED2(sameSign, expected, actual)
 
+/// Expectation macro that a value is bigger than zero.
+#define EXPECT_POSITIVE(expected) EXPECT_PRED1(isPositive, expected)
+
+/// Assertation macro that a value is bigger than zero.
+#define ASSERT_POSITIVE(expected) ASSERT_PRED1(isPositive, expected)
+
+/// Expectation macro that a value is smaller than zero.
+#define EXPECT_NEGATIVE(expected) EXPECT_PRED1(isNegative, expected)
+
+/// Assertation macro that a value is smaller than zero.
+#define ASSERT_NEGATIVE(expected) ASSERT_PRED1(isNegative, expected)
 
 
 /// Sting output operator for a TVector3 for gtest print support.
@@ -102,6 +114,17 @@ namespace {
     return expectedSign == actualSign;
   }
 
+  /** Predicate checking that a value is bigger than zero. */
+  bool isPositive(const float& expected)
+  {
+    return expected > 0;
+  }
+
+  /** Predicate checking that a value is smaller than zero. */
+  bool isNegative(const float& expected)
+  {
+    return expected < 0;
+  }
 
   Belle2::Helix helixFromCenter(const TVector3& center, const float& radius, const float& tanLambda)
   {
@@ -633,4 +656,184 @@ namespace {
       }
     }
   }
+
+
+
+
+  TEST_F(HelixTest, calcPassiveMoveByJacobian_identity)
+  {
+    TVector3 center(0.0, 1.0, 0.0);
+    float radius = -1;
+    float tanLambda = 3;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+
+    TMatrixD noMoveJacobian = helix.calcPassiveMoveByJacobian(TVector3(0.0, 0.0, 0.0));
+
+    EXPECT_NEAR(1.0, noMoveJacobian(0, 0), 10e-7);
+    EXPECT_NEAR(0.0, noMoveJacobian(0, 1), 10e-7);
+    EXPECT_NEAR(0.0, noMoveJacobian(0, 2), 10e-7);
+
+    EXPECT_NEAR(0.0, noMoveJacobian(1, 0), 10e-7);
+    EXPECT_NEAR(1.0, noMoveJacobian(1, 1), 10e-7);
+    EXPECT_NEAR(0.0, noMoveJacobian(1, 2), 10e-7);
+
+    EXPECT_NEAR(0.0, noMoveJacobian(2, 0), 10e-7);
+    EXPECT_NEAR(0.0, noMoveJacobian(2, 1), 10e-7);
+    EXPECT_NEAR(1.0, noMoveJacobian(2, 2), 10e-7);
+  }
+
+
+
+  TEST_F(HelixTest, calcPassiveMoveByJacobian_orthogonalToPhi0)
+  {
+    TVector3 center(0.0, 1.0, 0.0);
+    float radius = -1;
+    float tanLambda = 3;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+
+    TMatrixD moveByOneJacobian = helix.calcPassiveMoveByJacobian(TVector3(0.0, -1.0, 0.0));
+
+    EXPECT_NEAR(1.0, moveByOneJacobian(iD0, iD0), 10e-7);
+    EXPECT_NEAR(0.0, moveByOneJacobian(iD0, iPhi0), 10e-7);
+    EXPECT_NEAR(0.0, moveByOneJacobian(iD0, iOmega), 10e-7);
+
+    EXPECT_NEAR(0.0, moveByOneJacobian(iPhi0, iD0), 10e-7);
+    EXPECT_NEAR(1.0 / 2.0, moveByOneJacobian(iPhi0, iPhi0), 10e-7);
+    EXPECT_NEAR(0.0, moveByOneJacobian(iPhi0, iOmega), 10e-7);
+
+    EXPECT_NEAR(0.0, moveByOneJacobian(iOmega, iD0), 10e-7);
+    EXPECT_NEAR(0.0, moveByOneJacobian(iOmega, iPhi0), 10e-7);
+    EXPECT_NEAR(1.0, moveByOneJacobian(iOmega, iOmega), 10e-7);
+  }
+
+
+  TEST_F(HelixTest, calcPassiveMoveByJacobian_parallelToPhi0_conjugated_with_reverse)
+  {
+    TVector3 center(0.0, 1.0, 0.0);
+    float radius = -1;
+    float tanLambda = 3;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+
+    TMatrixD moveByPlusTwoXJacobian = helix.calcPassiveMoveByJacobian(TVector3(2.0, 0.0, 0.0));
+    TMatrixD moveByMinusTwoXJacobian = helix.calcPassiveMoveByJacobian(TVector3(-2.0, 0.0, 0.0));
+
+    EXPECT_NEAR(1.0, moveByPlusTwoXJacobian(iOmega, iOmega), 10e-7);
+    EXPECT_NEAR(0.0, moveByPlusTwoXJacobian(iOmega, iPhi0), 10e-7);
+    EXPECT_NEAR(0.0, moveByPlusTwoXJacobian(iOmega, iD0), 10e-7);
+
+    EXPECT_NEAR(1.0, moveByMinusTwoXJacobian(iOmega, iOmega), 10e-7);
+    EXPECT_NEAR(0.0, moveByMinusTwoXJacobian(iOmega, iPhi0), 10e-7);
+    EXPECT_NEAR(0.0, moveByMinusTwoXJacobian(iOmega, iD0), 10e-7);
+
+    // Symmetric effects
+    EXPECT_NEAR(moveByMinusTwoXJacobian(iD0, iOmega), moveByPlusTwoXJacobian(iD0, iOmega), 10e-7);
+    EXPECT_NEAR(moveByMinusTwoXJacobian(iPhi0, iPhi0), moveByPlusTwoXJacobian(iPhi0, iPhi0), 10e-7);
+    EXPECT_NEAR(moveByMinusTwoXJacobian(iD0, iD0), moveByPlusTwoXJacobian(iD0, iD0), 10e-7);
+
+    // Asymmetric effects
+    EXPECT_NEAR(moveByMinusTwoXJacobian(iD0, iPhi0), -moveByPlusTwoXJacobian(iD0, iPhi0), 10e-7);
+    EXPECT_NEAR(moveByMinusTwoXJacobian(iPhi0, iD0), -moveByPlusTwoXJacobian(iPhi0, iD0), 10e-7);
+    EXPECT_NEAR(moveByMinusTwoXJacobian(iPhi0, iOmega), -moveByPlusTwoXJacobian(iPhi0, iOmega), 10e-7);
+
+    // Signs
+    EXPECT_NEGATIVE(moveByPlusTwoXJacobian(iD0, iPhi0));
+    EXPECT_POSITIVE(moveByPlusTwoXJacobian(iD0, iOmega));
+    EXPECT_POSITIVE(moveByPlusTwoXJacobian(iPhi0, iD0));
+    EXPECT_NEGATIVE(moveByPlusTwoXJacobian(iPhi0, iOmega));
+
+    EXPECT_NEGATIVE(moveByPlusTwoXJacobian(iD0, iD0) - 1);
+    EXPECT_NEGATIVE(moveByPlusTwoXJacobian(iPhi0, iPhi0) - 1);
+  }
+
+
+  TEST_F(HelixTest, calcPassiveMoveByJacobian_parallelToPhi0)
+  {
+    TVector3 center(1.0, 0.0, 0.0);
+    float radius = -1;
+    float tanLambda = 3;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+
+    TMatrixD moveByTwoYJacobian = helix.calcPassiveMoveByJacobian(TVector3(0.0, 2.0, 0.0));
+
+    // Hand caluclated intermediate quantities;
+    double deltaParallel = 2;
+    double A = 4;
+    double u = 1;
+
+    double nu = 1;
+    //double xi = 1.0 / 5.0;
+    double lambda = 1.0 / (5.0 + 3.0 * sqrt(5.0));
+    double mu = sqrt(5.0) / 10.0;
+    double zeta = 4;
+
+    EXPECT_NEAR(1.0, moveByTwoYJacobian(iOmega, iOmega), 10e-7);
+    EXPECT_NEAR(0.0, moveByTwoYJacobian(iOmega, iPhi0), 10e-7);
+    EXPECT_NEAR(0.0, moveByTwoYJacobian(iOmega, iD0), 10e-7);
+
+    EXPECT_NEAR(2.0 / 5.0, moveByTwoYJacobian(iPhi0, iOmega), 10e-7);
+    EXPECT_NEAR(1.0 / 5.0, moveByTwoYJacobian(iPhi0, iPhi0), 10e-7);
+    EXPECT_NEAR(-2.0 / 5.0, moveByTwoYJacobian(iPhi0, iD0), 10e-7);
+
+    EXPECT_NEAR(mu * zeta - A * lambda, moveByTwoYJacobian(iD0, iOmega), 10e-7);
+    EXPECT_NEAR(2.0 * mu * u * deltaParallel, moveByTwoYJacobian(iD0, iPhi0), 10e-7);
+    EXPECT_NEAR(2.0 * mu * nu, moveByTwoYJacobian(iD0, iD0), 10e-7);
+
+  }
+
+
+  TEST_F(HelixTest, calcPassiveMoveByJacobian_consistency_of_expansion)
+  {
+    TVector3 center(0.0, 1.0, 0.0);
+    float radius = -1;
+    float tanLambda = 3;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+
+    std::vector<TVector3> bys = {
+      TVector3(-2.0, 0.5, 0.0),
+      TVector3(-1.0, 0.5, 0.0),
+      TVector3(0.0, 0.5, 0.0),
+      TVector3(1.0, 0.5, 0.0),
+      TVector3(2.0, 0.5, 0.0),
+
+      TVector3(-2.0, 0.0, 0.0),
+      TVector3(-1.0, 0.0, 0.0),
+      TVector3(0.0, 0.0, 0.0),
+      TVector3(1.0, 0.0, 0.0),
+      TVector3(2.0, 0.0, 0.0),
+
+      TVector3(-2.0, -1.0, 0.0),
+      TVector3(-1.0, -1.0, 0.0),
+      TVector3(0.0, -1.0, 0.0),
+      TVector3(1.0, -1.0, 0.0),
+      TVector3(2.0, -1.0, 0.0),
+    };
+
+    for (const TVector3& by : bys) {
+      TMatrixD jacobian = helix.calcPassiveMoveByJacobian(by);
+      TMatrixD jacobianWithExpansion = helix.calcPassiveMoveByJacobian(by, 10000);
+
+      EXPECT_NEAR(1.0, jacobian(iOmega, iOmega), 10e-7);
+      EXPECT_NEAR(0.0, jacobian(iOmega, iPhi0), 10e-7);
+      EXPECT_NEAR(0.0, jacobian(iOmega, iD0), 10e-7);
+
+      EXPECT_NEAR(1.0, jacobianWithExpansion(iOmega, iOmega), 10e-7);
+      EXPECT_NEAR(0.0, jacobianWithExpansion(iOmega, iPhi0), 10e-7);
+      EXPECT_NEAR(0.0, jacobianWithExpansion(iOmega, iD0), 10e-7);
+
+      EXPECT_NEAR(jacobianWithExpansion(iD0, iD0), jacobian(iD0, iD0), 10e-7);
+      EXPECT_NEAR(jacobianWithExpansion(iD0, iPhi0), jacobian(iD0, iPhi0), 10e-7);
+      EXPECT_NEAR(jacobianWithExpansion(iD0, iOmega), jacobian(iD0, iOmega), 10e-7);
+
+      EXPECT_NEAR(jacobianWithExpansion(iPhi0, iD0), jacobian(iPhi0, iD0), 10e-7);
+      EXPECT_NEAR(jacobianWithExpansion(iPhi0, iPhi0), jacobian(iPhi0, iPhi0), 10e-7);
+      EXPECT_NEAR(jacobianWithExpansion(iPhi0, iOmega), jacobian(iPhi0, iOmega), 10e-7);
+    }
+  }
+
+
 }

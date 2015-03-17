@@ -17,5 +17,6 @@
 #pragma link C++ class Belle2::SimpleVec<char>+;
 
 #pragma link C++ class Belle2::Helix+;
+#pragma link C++ class Belle2::UncertainHelix+;
 
 #endif

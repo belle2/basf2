@@ -27,6 +27,11 @@ using namespace Belle2;
 
 RFProcessManager::RFProcessManager(char* nodename)
 {
+  // Create IO pipe for output logging
+  if (pipe(m_iopipe) < 0) {
+    perror("pipe");
+    m_iopipe[0] = -1; m_iopipe[1] = -1;
+  }
 }
 
 RFProcessManager::~RFProcessManager()
@@ -40,12 +45,6 @@ void RFProcessManager::signal_handler(int num)
 
 int RFProcessManager::Execute(char* scr, int nargs, char** args)
 {
-
-  // Create IO pipe for output logging
-  if (pipe(m_iopipe) < 0) {
-    perror("pipe");
-    m_iopipe[0] = -1; m_iopipe[1] = -1;
-  }
 
   printf("RFProcessManager : Execute : scr=%s, nargs=%d\n", scr, nargs);
   // Fork processes

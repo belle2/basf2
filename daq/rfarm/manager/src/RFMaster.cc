@@ -53,7 +53,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   b2nsm_sendreq(dqmserver, "RF_CONFIGURE", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 0) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
   printf("RFMaster:: dqmserver configured\n");
   //  sleep(2);
 
@@ -61,7 +61,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   char* distributor = m_conf->getconf("distributor", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   b2nsm_sendreq(distributor, "RF_CONFIGURE", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 0) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
   printf("RFMaster:: distributor configured\n");
 
   //  sleep(2);
@@ -84,7 +84,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
       nnodes++;
     }
   }
-  //  while (RFNSM_Status::Instance().get_flag() != nnodes) sleep(1);
+  //  while (RFNSM_Status::Instance().get_flag() != nnodes) b2nsm_wait(1);
   sleep(10);
 
   printf("RFMaster:: distributor configured\n");
@@ -93,7 +93,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   char* collector = m_conf->getconf("collector", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   b2nsm_sendreq(collector, "RF_CONFIGURE", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 0) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
   printf("RFMaster:: collector configured\n");
   //  sleep ( 5 );
 
@@ -101,7 +101,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   char* roisender = m_conf->getconf("roisender", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   b2nsm_sendreq(roisender, "RF_CONFIGURE", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 0) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
   printf("RFMaster:: roisender configured\n");
 
   return 0;
@@ -114,13 +114,13 @@ int RFMaster::UnConfigure(NSMmsg*, NSMcontext*)
   char* roisender = m_conf->getconf("roisender", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   b2nsm_sendreq(roisender, "RF_UNCONFIGURE", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 1) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() == 1) b2nsm_wait(1);
 
   // Unconfigure collector
   char* collector = m_conf->getconf("collector", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   b2nsm_sendreq(collector, "RF_UNCONFIGURE", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 1) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() == 1) b2nsm_wait(1);
 
   // Unconfigure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
@@ -141,22 +141,22 @@ int RFMaster::UnConfigure(NSMmsg*, NSMcontext*)
     }
   }
 #ifdef DESY
-  sleep(5);
+  b2nsm_wait(5);
 #else
-  while (RFNSM_Status::Instance().get_flag() != nnodes) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() != nnodes) b2nsm_wait(1);
 #endif
 
   // Unconfigure distributor
   char* distributor = m_conf->getconf("distributor", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   b2nsm_sendreq(distributor, "RF_UNCONFIGURE", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 0) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
 
   // Unconfigure DqmServer
   char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   b2nsm_sendreq(dqmserver, "RF_UNCONFIGURE", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 0) sleep(1);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
 
   //  sleep ( 5 );
   return 0;

@@ -217,7 +217,7 @@ int RFMaster::Restart(NSMmsg*, NSMcontext*)
 void RFMaster::monitor_loop()
 {
   while (true) {
-    sleep(10);
+    b2nsm_wait(10);
   }
 }
 

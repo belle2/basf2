@@ -58,19 +58,25 @@ DedxPIDModule::DedxPIDModule() : Module(),
   setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC, SVD and PXD.");
 
   //Parameter definitions
-  addParam("useIndividualHits", m_useIndividualHits, "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
-  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded if useIndividualHits is false", double(0.0));
-  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded if useIndividualHits is false", double(0.8));
+  addParam("useIndividualHits", m_useIndividualHits,
+           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
+  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded if useIndividualHits is false",
+           double(0.0));
+  addParam("removeHighest", m_removeHighest,
+           "portion of events with high dE/dx that should be discarded if useIndividualHits is false", double(0.8));
 
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
   addParam("useCDC", m_useCDC, "Use CDCHits for dE/dx calculation", true);
 
-  addParam("trackDistanceThreshold", m_trackDistanceThreshhold, "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
-  addParam("enableDebugOutput", m_enableDebugOutput, "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
+  addParam("trackDistanceThreshold", m_trackDistanceThreshhold,
+           "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
+  addParam("enableDebugOutput", m_enableDebugOutput,
+           "Wether to save information on tracks and associated hits and dE/dx values in DedxTrack objects.", false);
 
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r14253_400k_events_including_deuterons.root"));
+  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
+           std::string("/data/reconstruction/dedxPID_PDFs_r14253_400k_events_including_deuterons.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -317,7 +323,8 @@ void DedxPIDModule::event()
         //add data
         const int layer = cdcHits[cdc_idx]->getILayer();
         const int superlayer = cdcHits[cdc_idx]->getISuperLayer();
-        const int current_layer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer); //this is essentially the layer ID you'd get from a CDCRecoHit
+        const int current_layer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 +
+                                                               layer); //this is essentially the layer ID you'd get from a CDCRecoHit
         const int wire = cdcHits[cdc_idx]->getIWire();
 
         static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -332,7 +339,9 @@ void DedxPIDModule::event()
           last_path_length = path_length;
 #endif
 
-        //get actual hit coordinates by taking z from the helix and x/y from wire (with stereo angle correction)
+        // THIS IS NOT CURRENTLY IN USE!
+        // get actual hit coordinates by taking z from the helix and x/y from wire
+        // (with stereo angle correction)
         double where = (hit_pos_helix.z() - wire_pos_f.z()) / (wire_pos_b.z() - wire_pos_f.z());
         const double tolerance = 0.1; //some deviation is ok
         if (where < 0.0 - tolerance or where > 1.0 + tolerance) {
@@ -342,7 +351,10 @@ void DedxPIDModule::event()
         TVector3 hit_pos = wire_pos_f + where * (wire_pos_b - wire_pos_f);
 
         //was the helix position close enough to the hit?
-        const bool helix_accurate = (hit_pos - hit_pos_helix).Perp() <= m_trackDistanceThreshhold;
+        //        const bool helix_accurate = (hit_pos - hit_pos_helix).Perp() <= m_trackDistanceThreshhold;
+
+        // deactivate the helix helper due to bugs...
+        const bool helix_accurate = false;
 
         if (!track_extrapolation_failed && !helix_accurate) {
           try {
@@ -361,7 +373,8 @@ void DedxPIDModule::event()
             hit_pos_helix = poca;
             hit_pos = poca_on_wire;
           } catch (genfit::Exception) {
-            B2WARNING("Event " << m_eventID << ", Track: " << iTrack << ": genfit::Track extrapolation failed (in CDC), further hits will be less accurate");
+            B2WARNING("Event " << m_eventID << ", Track: " << iTrack <<
+                      ": genfit::Track extrapolation failed (in CDC), further hits will be less accurate");
 
             //if extrapolation fails once, it's unlikely to work again
             track_extrapolation_failed = true;
@@ -374,7 +387,8 @@ void DedxPIDModule::event()
         const float hit_charge = cdcHits[cdc_idx]->getADCCount();
 
         if (m_enableDebugOutput)
-          dedxTrack->addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, track_extrapolation_failed, cdcHits[cdc_idx]->getTDCCount());
+          dedxTrack->addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, track_extrapolation_failed,
+                            cdcHits[cdc_idx]->getTDCCount());
 
         num_hits_in_current_layer++;
         layer_charge += hit_charge;
@@ -529,7 +543,8 @@ void DedxPIDModule::calculateMeans(float* mean, float* truncatedMean, float* tru
   *truncatedMean = truncatedMeanTmp;
 
   if (numValuesTrunc > 1) {
-    *truncatedMeanErr = sqrt(sum_of_squares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(numValuesTrunc - 1);
+    *truncatedMeanErr = sqrt(sum_of_squares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
+                          numValuesTrunc - 1);
   } else {
     *truncatedMeanErr = 0;
   }
@@ -586,7 +601,8 @@ double DedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHelpe
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
 }
 
-template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass>& hits, const std::vector<int>& hit_indices) const
+template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const HelixHelper& helix,
+                                                         const StoreArray<HitClass>& hits, const std::vector<int>& hit_indices) const
 {
   const int num_hits = hit_indices.size();
   if (num_hits == 0)

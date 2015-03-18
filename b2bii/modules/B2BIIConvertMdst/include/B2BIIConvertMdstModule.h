@@ -26,7 +26,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include "mdst/dataobjects/MCParticleGraph.h"
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
@@ -44,6 +44,10 @@ namespace Belle2 {
    *
    * o) Mdst_ecl and Mdst_ecl_aux -> ECLCluster
    *
+   *
+   * The following relations are created:
+   *
+   * o) ECLCluster -> MCParticle
    */
 
   class B2BIIConvertMdstModule : public Module {
@@ -91,6 +95,11 @@ namespace Belle2 {
      */
     void convertMdstECLTable();
 
+    /**
+     * Reads and converts all entries of Mdst_charged (Mdst_trk and Mdst_trk_fit) Panther table to Track (TrackFitResult) dataobjects and adds them to StoreArray<Track> (StoreArray<TrackFitResult>).
+     */
+    void convertMdstChargedTable();
+
     //-----------------------------------------------------------------------------
     // CONVERT OBJECTS
     //-----------------------------------------------------------------------------
@@ -102,8 +111,23 @@ namespace Belle2 {
 
     /**
      * Converts Mdst_ecl(_aux) record to ECLCluster object.
+     * If running on MC, the ECLCluster -> MCParticle relation is set as well.
      */
     void convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux, ECLCluster* eclCluster);
+
+    /**
+     * Converts Mdst_charged (Mdst_trk(_fit)) record to Track (TrackFitResult) object.
+     * If running on MC, the Track -> MCParticle relation is set as well.
+     */
+    void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
+
+    //
+    // RELATIONS
+    //
+    /**
+     * Sets ECLCluster -> Track relations
+     */
+    void setECLClustersToTracksRelations();
 
     //-----------------------------------------------------------------------------
     // MISC
@@ -113,6 +137,16 @@ namespace Belle2 {
      * Helper function to recover falsely set idhep info in GenHepEvt list
      */
     int recoverMoreThan24bitIDHEP(int id);
+
+    /**
+     * Compares the track momentum and position values for pion hypothesis.
+     */
+    void testTrackConversion(const Belle::Mdst_charged& belleTrack, const TrackFitResult* tfr);
+
+    /**
+     * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle
+     */
+    void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName);
 
     //! MCParticle Graph to build Belle2 MC Particles
     Belle2::MCParticleGraph m_particleGraph;

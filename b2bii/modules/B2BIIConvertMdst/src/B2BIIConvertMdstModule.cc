@@ -28,6 +28,9 @@
 #include "framework/gearbox/Const.h"
 #include "framework/gearbox/Unit.h"
 
+// ROOT
+#include <TVector3.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -108,16 +111,69 @@ void B2BIIConvertMdstModule::event()
   else
     m_realData = true;  // <- this is real data sample
 
-  // 2. Convert MC information
+  // 1. Convert MC information
   convertGenHepEvtTable();
 
-  // 3. Convert ECL information
+  // 2. Convert ECL information
   convertMdstECLTable();
+
+  // 3. Convert Tracking information
+  convertMdstChargedTable();
+
+  // 4. Set ECLCluster -> Track relations
+  setECLClustersToTracksRelations();
 }
 
 //-----------------------------------------------------------------------------
 // CONVERT TABLES
 //-----------------------------------------------------------------------------
+void B2BIIConvertMdstModule::convertMdstChargedTable()
+{
+  // at this point MCParticles StoreArray should already exist
+  StoreArray<MCParticle> mcParticles;
+
+  // StoreArrays
+  StoreArray<Track> tracks;
+  StoreArray<TrackFitResult> trackFitResults;
+  tracks.create();
+  trackFitResults.create();
+
+  // Relations
+  RelationArray tracksToMCParticles(tracks, mcParticles);
+
+  // Loop over all Belle charged tracks
+  Belle::Mdst_charged_Manager& m = Belle::Mdst_charged_Manager::get_manager();
+  for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); chargedIterator++) {
+    Belle::Mdst_charged belleTrack = *chargedIterator;
+
+    auto track = tracks.appendNew();
+
+    // convert MDST_Charged -> Track
+    convertMdstChargedObject(belleTrack, track);
+
+    if (m_realData)
+      continue;
+
+    // create Track -> MCParticle relation
+    // step 1: MDSTCharged -> Gen_hepevt
+    const Belle::Gen_hepevt& hep(gen_level(get_hepevt(belleTrack)));
+    if (hep) {
+      // step 2: Gen_hepevt -> MCParticle
+      if (genHepevtToMCParticle.count(hep.get_ID()) > 0) {
+        int matchedMCParticle = genHepevtToMCParticle[hep.get_ID()];
+
+        // step 3: set the relation
+        tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
+
+        testMCRelation(hep, mcParticles[matchedMCParticle], "Track");
+      } else {
+        B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
+        B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
+      }
+    }
+  }
+}
+
 void B2BIIConvertMdstModule::convertGenHepEvtTable()
 {
   // create MCParticle StoreArray
@@ -242,7 +298,7 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
     auto B2EclCluster = eclClusters.appendNew();
 
-    // convert Belle::MDST_ECL -> Belle2::ECLCluster
+    // convert Belle::MDST_ECL -> ECLCluster
     convertMdstECLObject(mdstEcl, mdstEclAux, B2EclCluster);
 
     if (m_realData)
@@ -257,9 +313,11 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
         int matchedMCParticle = genHepevtToMCParticle[hep.get_ID()];
         // step 3: set the relation
         eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticle);
+
+        testMCRelation(hep, mcParticles[matchedMCParticle], "ECLCluster");
       } else {
-        B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
-        B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
+        B2DEBUG(79, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
+        B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
       }
     }
   }
@@ -269,9 +327,118 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 // CONVERT OBJECTS
 //-----------------------------------------------------------------------------
 
+void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track)
+{
+  StoreArray<TrackFitResult> trackFitResults;
+
+  Belle::Mdst_trk& trk = belleTrack.trk();
+
+  for (int mhyp = 0 ; mhyp < 5; ++mhyp) {
+    std::shared_ptr<Const::ParticleType> pType;
+
+    if (mhyp == 0) {
+      pType = std::make_shared<Const::ParticleType>(Const::electron);
+    } else if (mhyp == 1) {
+      pType = std::make_shared<Const::ParticleType>(Const::muon);
+    } else if (mhyp == 2) {
+      pType = std::make_shared<Const::ParticleType>(Const::pion);
+    } else if (mhyp == 3) {
+      pType = std::make_shared<Const::ParticleType>(Const::kaon);
+    } else {
+      pType = std::make_shared<Const::ParticleType>(Const::proton);
+    }
+
+    Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
+
+    // Convert helix parameters
+    std::vector<float> helixParam(5);
+
+    // param 0: d_0 = d_rho
+    helixParam[0] = trk_fit.helix(0);
+
+    // param 1: phi = phi_0 + pi/2
+    helixParam[1] = trk_fit.helix(1) +  TMath::Pi() / 2.0;
+
+    // param 2: omega = Kappa * alpha = Kappa * B[Tesla] * speed_of_light[m/s] * 1e-11
+    helixParam[2] = trk_fit.helix(2) * 1.5 * TMath::C() * 1E-11;
+
+    // param 3: d_z = z0
+    helixParam[3] = trk_fit.helix(3);
+
+    // param 4: tan(Lambda) = cotTheta
+    helixParam[4] = trk_fit.helix(4);
+
+    // Convert helix error matrix
+    // only elements related with omega (Kappa) need to be scaled by 1.5 * TMath::C() * 1E-11;
+    /*
+       Belle's definition of the error matrix array
+       Ea[0][0] = trk_fit.error(0);
+       Ea[1][0] = trk_fit.error(1);
+       Ea[1][1] = trk_fit.error(2);
+       Ea[2][0] = trk_fit.error(3);
+       Ea[2][1] = trk_fit.error(4);
+       Ea[2][2] = trk_fit.error(5);
+       Ea[3][0] = trk_fit.error(6);
+       Ea[3][1] = trk_fit.error(7);
+       Ea[3][2] = trk_fit.error(8);
+       Ea[3][3] = trk_fit.error(9);
+       Ea[4][0] = trk_fit.error(10);
+       Ea[4][1] = trk_fit.error(11);
+       Ea[4][2] = trk_fit.error(12);
+       Ea[4][3] = trk_fit.error(13);
+       Ea[4][4] = trk_fit.error(14);
+
+       Belle II's definition of the error matrix array
+       Ea[0][0] = helixError(0);
+       Ea[0][1] = helixError(1);
+       Ea[0][2] = helixError(2);  *
+       Ea[0][3] = helixError(3);
+       Ea[0][4] = helixError(4);
+       Ea[1][1] = helixError(5);
+       Ea[1][2] = helixError(6);  *
+       Ea[1][3] = helixError(7);
+       Ea[1][4] = helixError(8);
+       Ea[2][2] = helixError(9);  *
+       Ea[2][3] = helixError(10); *
+       Ea[2][4] = helixError(11); *
+       Ea[3][3] = helixError(12);
+       Ea[3][4] = helixError(13);
+       Ea[4][4] = helixError(14);
+    */
+
+    std::vector<float> helixError(15);
+    helixError[0]  = trk_fit.error(0);
+    helixError[1]  = trk_fit.error(1);
+    helixError[2]  = trk_fit.error(3) * 1.5 * TMath::C() * 1E-11;
+    helixError[3]  = trk_fit.error(6);
+    helixError[4]  = trk_fit.error(10);
+    helixError[5]  = trk_fit.error(2);
+    helixError[6]  = trk_fit.error(4) * 1.5 * TMath::C() * 1E-11;
+    helixError[7]  = trk_fit.error(7);
+    helixError[8]  = trk_fit.error(11);
+    helixError[9]  = trk_fit.error(5) * 1.5 * TMath::C() * 1E-11;
+    helixError[10] = trk_fit.error(8) * 1.5 * TMath::C() * 1E-11;
+    helixError[11] = trk_fit.error(12) * 1.5 * TMath::C() * 1E-11;
+    helixError[12] = trk_fit.error(9);
+    helixError[13] = trk_fit.error(13);
+    helixError[14] = trk_fit.error(14);
+
+    double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+
+    //TODO what are hitPatternCDCInitializer and hitPatternVXDInitializer?
+    auto trackFit = trackFitResults.appendNew(helixParam, helixError, *pType, pValue, -1, -1);
+
+    track->setTrackFitResultIndex(*pType, trackFit->getArrayIndex());
+
+    // test conversion (pion hypothesis only)
+    if (mhyp == 2)
+      testTrackConversion(belleTrack, trackFit);
+  }
+}
+
 void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& genHepevt, MCParticleGraph::GraphParticle* mcParticle)
 {
-  B2DEBUG(80, "Gen_ehepevt: idhep " << genHepevt.idhep() << " (" << genHepevt.isthep() << ") with ID = " << genHepevt.get_ID());
+  //B2DEBUG(80, "Gen_ehepevt: idhep " << genHepevt.idhep() << " (" << genHepevt.isthep() << ") with ID = " << genHepevt.get_ID());
 
   // updating the GraphParticle information from the Gen_hepevt information
   const int idHep = recoverMoreThan24bitIDHEP(genHepevt.idhep());
@@ -284,7 +451,7 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
   }
 
   if (genHepevt.isthep() > 0) {
-    mcParticle->setStatus(Belle2::MCParticle::c_PrimaryParticle);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
   }
 
   mcParticle->setMass(genHepevt.M());
@@ -293,13 +460,13 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
   mcParticle->set4Vector(p4);
 
   mcParticle->setProductionVertex(genHepevt.VX()*Unit::mm, genHepevt.VY()*Unit::mm, genHepevt.VZ()*Unit::mm);
-  mcParticle->setProductionTime(genHepevt.T()*Unit::mm / Belle2::Const::speedOfLight);
+  mcParticle->setProductionTime(genHepevt.T()*Unit::mm / Const::speedOfLight);
 
   // decay time of this particle is production time of the daughter particle
   if (genHepevt.daFirst() > 0) {
     Belle::Gen_hepevt_Manager& genMgr = Belle::Gen_hepevt_Manager::get_manager();
     Belle::Gen_hepevt daughterParticle = genMgr(Belle::Panther_ID(genHepevt.daFirst()));
-    mcParticle->setDecayTime(daughterParticle.T()*Unit::mm / Belle2::Const::speedOfLight);
+    mcParticle->setDecayTime(daughterParticle.T()*Unit::mm / Const::speedOfLight);
     mcParticle->setDecayVertex(daughterParticle.VX()*Unit::mm, daughterParticle.VY()*Unit::mm, daughterParticle.VZ()*Unit::mm);
   }
 
@@ -335,6 +502,44 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   eclCluster->setHighestE(eclAux.seed());
   eclCluster->setTiming(eclAux.property(0));
   eclCluster->setNofCrystals(eclAux.nhits());
+}
+
+//-----------------------------------------------------------------------------
+// RELATIONS
+//-----------------------------------------------------------------------------
+void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
+{
+  StoreArray<Track> tracks;
+  StoreArray<ECLCluster> eclClusters;
+
+  // Relations
+  RelationArray eclClustersToTracks(eclClusters, tracks);
+
+  Belle::Mdst_ecl_trk_Manager& m = Belle::Mdst_ecl_trk_Manager::get_manager();
+  Belle::Mdst_charged_Manager& chgMg = Belle::Mdst_charged_Manager::get_manager();
+  for (Belle::Mdst_ecl_trk_Manager::iterator ecltrkIterator = m.begin(); ecltrkIterator != m.end(); ecltrkIterator++) {
+    Belle::Mdst_ecl_trk mECLTRK = *ecltrkIterator;
+
+    Belle::Mdst_ecl mdstEcl = mECLTRK.ecl();
+    Belle::Mdst_trk mTRK    = mECLTRK.trk();
+
+    if (!mdstEcl)
+      continue;
+
+    // the numbering in mdst_charged
+    // not necessarily the same as in mdst_trk
+    // therfore have to find corresponding mdst_charged
+    for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); chgIterator++) {
+      Belle::Mdst_charged mChar = *chgIterator;
+      Belle::Mdst_trk mTRK_in_charged = mChar.trk();
+
+      if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
+        // found the correct  mdst_charged
+        eclClustersToTracks.add(mdstEcl.get_ID() - 1, mChar.get_ID() - 1, mECLTRK.type() * 1.0);
+        break;
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -381,6 +586,49 @@ int B2BIIConvertMdstModule::recoverMoreThan24bitIDHEP(int id)
     case   7776783: return      -9000433; // D_sj(2700)-
     default:
       return id;
+  }
+}
+
+void B2BIIConvertMdstModule::testTrackConversion(const Belle::Mdst_charged& belleTrack, const TrackFitResult* trackFit)
+{
+
+  double belle2Momentum[] = { trackFit->getMomentum().X(), trackFit->getMomentum().Y(), trackFit->getMomentum().Z() };
+  double belleMomentum[] =  { belleTrack.px(), belleTrack.py(), belleTrack.pz() };
+
+  for (unsigned i = 0; i < 3; i++) {
+    double relDev = (belle2Momentum[i] - belleMomentum[i]) / belleMomentum[i];
+
+    if (relDev > 1e-3) {
+      B2WARNING("[B2BIIConvertMdstModule] conversion of Belle's track #" << belleTrack.get_ID() << " momentum has large deviation: " <<
+                relDev);
+      B2INFO(" - MDST_Charged   px/py/pz = " << belleTrack.px() << "/" << belleTrack.py() << "/" << belleTrack.pz());
+      B2INFO(" - TrackFitResult px/py/pz = " << trackFit->getMomentum().X() << "/" << trackFit->getMomentum().Y() << "/" <<
+             trackFit->getMomentum().Z());
+    }
+  }
+}
+
+void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName)
+{
+  int bellePDGCode   = belleMC.idhep();
+  int belleIIPDGCode = mcP->getPDG();
+
+  if (bellePDGCode != belleIIPDGCode && bellePDGCode != 911)
+    B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to different MCParticle! " << bellePDGCode << " vs. " <<
+              belleIIPDGCode);
+
+  double belleMomentum[]  = { belleMC.PX(), belleMC.PY(), belleMC.PZ() };
+  double belle2Momentum[] = { mcP->get4Vector().Px(),  mcP->get4Vector().Py(),  mcP->get4Vector().Pz() };
+
+  for (unsigned i = 0; i < 3; i++) {
+    double relDev = (belle2Momentum[i] - belleMomentum[i]) / belleMomentum[i];
+
+    if (relDev > 1e-3) {
+      B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to different MCParticle!");
+      B2INFO(" - Gen_hepevt     [" << bellePDGCode << "] px/py/pz = " << belleMC.PX() << "/" << belleMC.PY() << "/" << belleMC.PZ());
+      B2INFO(" - TrackFitResult [" << belleIIPDGCode << "] px/py/pz = " << mcP->get4Vector().Px() << "/" << mcP->get4Vector().Py() << "/"
+             << mcP->get4Vector().Pz());
+    }
   }
 }
 

@@ -19,6 +19,7 @@ env['LIBS'] = [
     'framework_pybasf2',
     'genfit2',
     '$ROOT_LIBS',
+    'TMVA',
     ]
 
 Return('env')

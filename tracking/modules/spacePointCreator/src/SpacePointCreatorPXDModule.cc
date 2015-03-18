@@ -38,7 +38,8 @@ SpacePointCreatorPXDModule::SpacePointCreatorPXDModule() :
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
-           "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module", string("PXDSpacePoints"));
+           "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module",
+           string("PXDSpacePoints"));
 }
 
 

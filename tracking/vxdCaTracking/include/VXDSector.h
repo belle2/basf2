@@ -49,23 +49,27 @@ namespace Belle2 {
 
 
     /** useful constructor both cases: sectors treated by fullSecID (parameter 1) and distance2origin (parameter 2) if you use this constructor, sorting by distance is activated automatically but can be set by parameter 3 */
-    VXDSector(unsigned int secID, double distance2origin, bool sortByDistance = true): m_sectorID(secID), m_distance2Origin(distance2origin), m_useDistance4sort(sortByDistance) { m_friends.clear(); }
+    VXDSector(unsigned int secID, double distance2origin, bool sortByDistance = true): m_sectorID(secID),
+      m_distance2Origin(distance2origin), m_useDistance4sort(sortByDistance) { m_friends.clear(); }
 
 
 
-    bool operator<(const VXDSector& b)  const {
+    bool operator<(const VXDSector& b)  const
+    {
       if (m_useDistance4sort == false) { /*B2WARNING("'<'-sort of VXDSector using secID");*/ return getSecID() < b.getSecID(); }
 //      B2WARNING("'<'-sort of VXDSector using distance2origin");
       return getDistance() < b.getDistance();
     } /**< overloaded '<'-operator for sorting algorithms sorts by distance2origin or fullSecID depending on setting */
 
-    bool operator==(const VXDSector& b) const {
+    bool operator==(const VXDSector& b) const
+    {
       if (m_useDistance4sort == false) { /*B2WARNING("'=='-sort of VXDSector using secID");*/ return getSecID() == b.getSecID(); }
 //      B2WARNING("'=='-sort of VXDSector using distance2origin");
       return getDistance() == b.getDistance();
     } /**< overloaded '=='-operator for sorting algorithms */
 
-    bool operator>(const VXDSector& b)  const {
+    bool operator>(const VXDSector& b)  const
+    {
       if (m_useDistance4sort == false) { /*B2WARNING("'>'-sort of VXDSector using secID");*/ return getSecID() > b.getSecID(); }
 //      B2WARNING("'>'-sort of VXDSector using distance2origin");
       return getDistance() > b.getDistance();
@@ -79,7 +83,8 @@ namespace Belle2 {
 
 
     /** setter - addFriend adds friend addresses to current sector. Friends are compatible sectors defined by the currently loaded sectorMap */
-    void addFriend(unsigned int newSector) {
+    void addFriend(unsigned int newSector)
+    {
       m_friends.push_back(newSector);
       m_friendMap.insert(std::make_pair(newSector, SectorFriends(newSector, m_sectorID)));
     } // should be called only at the beginning of a new run
@@ -87,7 +92,8 @@ namespace Belle2 {
 
 
     /** setter - addFriendPointer adds friend pointers to current sector. Friends are compatible sectors defined by the currently loaded sectorMap */
-    void addFriendPointer(VXDSector* newSector) {
+    void addFriendPointer(VXDSector* newSector)
+    {
       if (newSector != NULL) m_friendPointers.push_back(newSector);
     } // should be called only at the beginning of a new run
 
@@ -160,7 +166,8 @@ namespace Belle2 {
 
 
     /** getter - return the cutoff. To get it, you have to know which friendSector and which CutoffType you want to have */
-    const Cutoff* getCutoff(int cutOffType, unsigned int aFriend) {
+    const Cutoff* getCutoff(int cutOffType, unsigned int aFriend)
+    {
       FriendMap::iterator mapIter = m_friendMap.find(aFriend);
       if (mapIter == m_friendMap.end()) { // not found
         return NULL;
@@ -176,13 +183,16 @@ namespace Belle2 {
 
 
   protected:
-    unsigned int m_sectorID; /**< secID allows identification of sector. Current definition ABCD, A: layerNumber(1-6), B: subLayerNumber(0,1)-defines whether sector has friends on same layer (=1) or not (=0), C:uniID, D: sectorID on sensor (0-X), whole info stored in an int, can be converted to human readable code by using FullSecID-class */
+    unsigned int
+    m_sectorID; /**< secID allows identification of sector. Current definition ABCD, A: layerNumber(1-6), B: subLayerNumber(0,1)-defines whether sector has friends on same layer (=1) or not (=0), C:uniID, D: sectorID on sensor (0-X), whole info stored in an int, can be converted to human readable code by using FullSecID-class */
 
     std::vector<unsigned int> m_friends; /**< vector of addresses of compatible sectors (where neighbouring hits can be retrieved) */
-    std::vector<VXDSector*> m_friendPointers;  /**< vector of pointers to compatible sectors (where neighbouring hits can be retrieved) */
+    std::vector<VXDSector*>
+    m_friendPointers;  /**< vector of pointers to compatible sectors (where neighbouring hits can be retrieved) */
     std::vector<VXDTFHit*> m_hits; /**< vector of hits lying on current sector area */
     std::vector<VXDSegmentCell*> m_innerSegmentCells; /**< vector of VXDSegmentCells connected to this sector pointing toward the IP */
-    std::vector<VXDSegmentCell*> m_outerSegmentCells; /**< vector of VXDSegmentCells connected to this sector pointing away from the IP */
+    std::vector<VXDSegmentCell*>
+    m_outerSegmentCells; /**< vector of VXDSegmentCells connected to this sector pointing away from the IP */
     FriendMap m_friendMap; /**< map of compatible sectors (where neighbouring hits can be retrieved) */
     double m_distance2Origin; /**< especially relevant for testbeam- and other testing scenarios. Defines distance of the sector to the origin defined by the sectorMap. Needed for the CA (directed graph) if layerNumbers are not consecutive */
     bool m_useDistance4sort; /**< if activated, sectors are sorted by distance to origin, if false, they are sorted by layerID */

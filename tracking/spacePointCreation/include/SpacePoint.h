@@ -60,8 +60,8 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     SpacePoint() :
-      m_clustersAssigned({false, false}),
-                       m_qualityIndicator(0.5),
+      m_clustersAssigned( {false, false}),
+                        m_qualityIndicator(0.5),
     m_isAssigned(false) {}
 
 
@@ -212,7 +212,8 @@ namespace Belle2 {
     *
     * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      */
-    static B2Vector3F getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static B2Vector3F getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID,
+                                           const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -226,7 +227,8 @@ namespace Belle2 {
      * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      * The normalized coordinates are independent of wedged-sensor-issues
        */
-    static std::pair<SpBaseType, SpBaseType> convertLocalToNormalizedCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<SpBaseType, SpBaseType> convertLocalToNormalizedCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal,
+        VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -240,7 +242,8 @@ namespace Belle2 {
     * third parameter, a sensorInfo can be passed for testing purposes.
     *  If no sensorInfo is passed, the member gets its own pointer to it.
     */
-    static std::pair<SpBaseType, SpBaseType> convertNormalizedToLocalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitNormalized, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<SpBaseType, SpBaseType> convertNormalizedToLocalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitNormalized,
+        Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -251,7 +254,9 @@ namespace Belle2 {
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      *
      */
-    static SpBaseType getUWedged(const std::pair<SpBaseType, SpBaseType> hitLocalUnwedged, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL) {
+    static SpBaseType getUWedged(const std::pair<SpBaseType, SpBaseType> hitLocalUnwedged, VxdID::baseType vxdID,
+                                 const VXD::SensorInfoBase* aSensorInfo = NULL)
+    {
       if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }
       return (aSensorInfo->getWidth(hitLocalUnwedged.second) / aSensorInfo->getWidth()) * hitLocalUnwedged.first;
     }
@@ -264,7 +269,9 @@ namespace Belle2 {
      * The returned value shall be like the value delivered by a uCluster without information of v (== aCluster.getPosition() ).
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      */
-    static SpBaseType getUUnwedged(const std::pair<SpBaseType, SpBaseType> hitLocalWedged, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL) {
+    static SpBaseType getUUnwedged(const std::pair<SpBaseType, SpBaseType> hitLocalWedged, VxdID::baseType vxdID,
+                                   const VXD::SensorInfoBase* aSensorInfo = NULL)
+    {
       if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }
       return (aSensorInfo->getWidth() / aSensorInfo->getWidth(hitLocalWedged.second)) * hitLocalWedged.first;
     }
@@ -276,7 +283,8 @@ namespace Belle2 {
      * does take second/third argument for checking for lower/upper boundary.
      * if boundary is crossed, value gets reset to boundary value
      * */
-    static void boundaryCheck(SpBaseType& value, SpBaseType lower = 0, SpBaseType higher = 1) {
+    static void boundaryCheck(SpBaseType& value, SpBaseType lower = 0, SpBaseType higher = 1)
+    {
       if (value < lower) {
         B2WARNING("SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower)
         value = lower;
@@ -311,7 +319,8 @@ namespace Belle2 {
      *
      * It takes care for the transformation of the local sigmas to global error values.
      */
-    void setPositionError(SpBaseType uSigma, SpBaseType vSigma, const VXD::SensorInfoBase* aSensorInfo) {
+    void setPositionError(SpBaseType uSigma, SpBaseType vSigma, const VXD::SensorInfoBase* aSensorInfo)
+    {
       //As only variances, but not the sigmas transform linearly,
       // we need to use some acrobatics
       // (and some more (abs) since we do not really transform a vector).

@@ -34,11 +34,14 @@ namespace Belle2 {
     /** getters */
     std::pair<double, double> exportFilters(int aFilter); /**< exports filters stored in member */
     const Cutoff* getCutOff(int aFilter); /**< returns chosen type of cutoff */
-    void getSupportedCutoffs(std::vector<int>& supportedCutoffs); /**< returns list of cutoffs supported by current sector-friend-combination */
+    void getSupportedCutoffs(std::vector<int>&
+                             supportedCutoffs); /**< returns list of cutoffs supported by current sector-friend-combination */
 
   protected:
     std::vector<Cutoff> m_filters; /**< a vector carrying all cutoffs stored in current sector-friend-combination */
-    unsigned int m_friendName; /**< the name of the sector representing this friend. Info is encoded as an int, if you want to have human readable values, you have to convert it using FullSecId */
-    unsigned int m_sectorName; /**< the name of the sector having this friend. Info is encoded as an int, if you want to have human readable values, you have to convert it using FullSecId */
+    unsigned int
+    m_friendName; /**< the name of the sector representing this friend. Info is encoded as an int, if you want to have human readable values, you have to convert it using FullSecId */
+    unsigned int
+    m_sectorName; /**< the name of the sector having this friend. Info is encoded as an int, if you want to have human readable values, you have to convert it using FullSecId */
   };
 } //Belle2 namespace

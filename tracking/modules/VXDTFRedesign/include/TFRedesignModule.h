@@ -79,14 +79,19 @@ namespace Belle2 {
 
 
     typedef std::pair<unsigned int, VXDSector* > secMapEntry; /**< represents an entry of the MapOfSectors */
-    typedef std::map<unsigned int, SensorStruct> ActiveSensorsOfEvent; /**< is map where adresses to each activated sensor (key->int = uniID/vxdID) are stored and all clusters which can be found on them */
-    typedef std::list<unsigned int> BrokenSensorsOfEvent; /**< atm a list containing the keys to all sensors where number of u and v clusters don't fit */
+    typedef std::map<unsigned int, SensorStruct>
+    ActiveSensorsOfEvent; /**< is map where adresses to each activated sensor (key->int = uniID/vxdID) are stored and all clusters which can be found on them */
+    typedef std::list<unsigned int>
+    BrokenSensorsOfEvent; /**< atm a list containing the keys to all sensors where number of u and v clusters don't fit */
 
     typedef std::vector<PassData*> PassSetupVector; /**< contains all passes used for track reconstruction */
-    typedef boost::chrono::high_resolution_clock boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
-    typedef boost::chrono::microseconds boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
+    typedef boost::chrono::high_resolution_clock
+    boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
+    typedef boost::chrono::microseconds
+    boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
 
-    typedef boost::tuple<double, double, VXDTFHit*> HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
+    typedef boost::tuple<double, double, VXDTFHit*>
+    HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
 
     /// will be moved to an extra file REDESIGN:
     /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */
@@ -109,7 +114,8 @@ namespace Belle2 {
       /** constructor */
       TimeInfo() {}
 
-      TimeInfo& operator+=(const TimeInfo& b) {
+      TimeInfo& operator+=(const TimeInfo& b)
+      {
         this->baselineTF += b.baselineTF;
         this->hitSorting += b.hitSorting;
         this->segFinder += b.segFinder;
@@ -170,7 +176,8 @@ namespace Belle2 {
       std::string Print();
 
       /** clearing entries, nice after initialisation */
-      void clear() {
+      void clear()
+      {
         evtNumber = 0;
         nPXDClusters = 0;
         nSVDClusters = 0;
@@ -188,7 +195,8 @@ namespace Belle2 {
       }
 
       /** prepare everything for new Belle2-event */
-      void startEvent(unsigned int nEvent) {
+      void startEvent(unsigned int nEvent)
+      {
         clear();
         newTic();
         beginEvent = startTimer;
@@ -264,7 +272,8 @@ namespace Belle2 {
 
     /** works with VXDSegmentCells: checks state of inner neighbours and removes incompatible and virtual ones   */
     void delFalseFriends(PassData* currentPass,
-                         TVector3 primaryVertex) {
+                         TVector3 primaryVertex)
+    {
       /** REDESIGNCOMMENT DELFALSEFRIENDS 1:
        * * short:
        *
@@ -278,8 +287,8 @@ namespace Belle2 {
        *
        ** in-module-function-calls:
        */
-      for (VXDSector * aSector : currentPass->sectorVector) {
-        for (VXDSegmentCell * segment : aSector->getInnerSegmentCells()) {
+      for (VXDSector* aSector : currentPass->sectorVector) {
+        for (VXDSegmentCell* segment : aSector->getInnerSegmentCells()) {
           segment->kickFalseFriends(primaryVertex);
         }
       }
@@ -391,7 +400,8 @@ namespace Belle2 {
 
 
     /** reset all reused containers and delete others which are existing only for one event. */
-    void cleanEvent(PassData* currentPass) {
+    void cleanEvent(PassData* currentPass)
+    {
       /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
        * * short:
        *
@@ -408,7 +418,7 @@ namespace Belle2 {
        */
       currentPass->cleanPass();
 
-      for (VXDTFTrackCandidate * aTC : m_allTCsOfEvent) { delete  aTC; }
+      for (VXDTFTrackCandidate* aTC : m_allTCsOfEvent) { delete  aTC; }
       m_allTCsOfEvent.clear();
 
       m_tcVectorOverlapped.clear();
@@ -417,7 +427,8 @@ namespace Belle2 {
 
 
     /** general Function to write data into a root file*/
-    void writeToRootFile(double pValue, double chi2, double circleRadius, int ndf) {
+    void writeToRootFile(double pValue, double chi2, double circleRadius, int ndf)
+    {
       /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
        * * short:
        *
@@ -467,7 +478,8 @@ namespace Belle2 {
     void reserveHits(TCsOfEvent& tcVector, PassData* currentPass);
 
 
-    void resetCountersAtBeginRun() {
+    void resetCountersAtBeginRun()
+    {
       /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
        * * short:
        *
@@ -559,7 +571,8 @@ namespace Belle2 {
     }
 
     // Methods for Collector
-    int importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2);  /**< generates Information and imports a Cell for the Collector */
+    int importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters,
+                            int hit1, int hit2);  /**< generates Information and imports a Cell for the Collector */
 
 
 
@@ -727,15 +740,18 @@ namespace Belle2 {
 
 
   protected:
-    TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
-    TCsOfEvent m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/
+    TCsOfEvent
+    m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
+    TCsOfEvent
+    m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/
     TCsOfEvent m_tcVectorOverlapped; /**< links only to track candidates which share at least one cluster with others*/
 
     std::vector<ClusterInfo> m_clustersOfEvent; /**< stores the clusterInfos of the current event */
 
     /// module_parameters:
     bool m_PARAMDebugMode; /**< some code will only be executed if this mode is enabled */
-    std::vector<std::string> m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row */
+    std::vector<std::string>
+    m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row */
 
     std::vector<int> m_PARAMhighestAllowedLayer; /**< set value below 6 if you want to exclude outer layers (standard is 6) */
     std::vector<int> m_PARAMminLayer; /**< determines lowest layer considered by track candidate collector */
@@ -752,67 +768,113 @@ namespace Belle2 {
     std::vector<bool> m_PARAMactivateDeltaSlopeRZ; /**< activates/deactivates current filter dslopeRZ for each pass individually */
     std::vector<bool> m_PARAMactivateDistance2IP; /**< activates/deactivates current filter d2IP for each pass individually */
     std::vector<bool> m_PARAMactivatePT; /**< activates/deactivates current filter PT for each pass individually */
-    std::vector<bool> m_PARAMactivateHelixParameterFit; /**< activates/deactivates current filter HelixParameterFit for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateHelixParameterFit; /**< activates/deactivates current filter HelixParameterFit for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaSOverZ; /**< activates/deactivates current filter DeltaSOverZ for each pass individually */
-    std::vector<bool> m_PARAMactivateDeltaSlopeZOverS; /**< activates/deactivates current filter DeltaSlopeZOverS for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateDeltaSlopeZOverS; /**< activates/deactivates current filter DeltaSlopeZOverS for each pass individually */
     std::vector<bool> m_PARAMactivateZigZagXY; /**< activates/deactivates current filter zzXY for each pass individually */
-    std::vector<bool> m_PARAMactivateZigZagXYWithSigma; /**< activates/deactivates current filter zzXY with sigmas for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateZigZagXYWithSigma; /**< activates/deactivates current filter zzXY with sigmas for each pass individually */
     std::vector<bool> m_PARAMactivateZigZagRZ; /**< activates/deactivates current filter zzRZ for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaPt; /**< activates/deactivates current filter dPt for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaDistance2IP; /**< activates/deactivates current filter dd2IP for each pass individually*/
     std::vector<bool> m_PARAMactivateCircleFit; /**< activates/deactivates current filter CircleFit for each pass individually */
-    std::vector<bool> m_PARAMactivateAngles3DHioC; /**< activates/deactivates current filter a3D (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivateAnglesXYHioC; /**< activates/deactivates current filter aXY (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivateAnglesRZHioC; /**< activates/deactivates current filter aRZ (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivateDeltaSlopeRZHioC; /**< activates/deactivates current filter dslopeRZ (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivateDistance2IPHioC; /**< activates/deactivates current filter d2IP (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivatePTHioC; /**< activates/deactivates current filter PT (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivateHelixParameterFitHioC; /**< activates/deactivates current filter HelixParameterFit (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivateDeltaPtHioC; /**< activates/deactivates current filter dPt (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivateDeltaDistance2IPHioC; /**< activates/deactivates current filter dd2IP (high occupancy mode) for each pass individually*/
+    std::vector<bool>
+    m_PARAMactivateAngles3DHioC; /**< activates/deactivates current filter a3D (high occupancy mode) for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateAnglesXYHioC; /**< activates/deactivates current filter aXY (high occupancy mode) for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateAnglesRZHioC; /**< activates/deactivates current filter aRZ (high occupancy mode) for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateDeltaSlopeRZHioC; /**< activates/deactivates current filter dslopeRZ (high occupancy mode) for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateDistance2IPHioC; /**< activates/deactivates current filter d2IP (high occupancy mode) for each pass individually */
+    std::vector<bool>
+    m_PARAMactivatePTHioC; /**< activates/deactivates current filter PT (high occupancy mode) for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateHelixParameterFitHioC; /**< activates/deactivates current filter HelixParameterFit (high occupancy mode) for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateDeltaPtHioC; /**< activates/deactivates current filter dPt (high occupancy mode) for each pass individually */
+    std::vector<bool>
+    m_PARAMactivateDeltaDistance2IPHioC; /**< activates/deactivates current filter dd2IP (high occupancy mode) for each pass individually*/
 
     // debugging tests:
-    std::vector<bool> m_PARAMactivateAlwaysTrue2Hit; /**< activates/deactivates current filter AlwaysTrue2Hit for each pass individually*/
-    std::vector<bool> m_PARAMactivateAlwaysFalse2Hit; /**< activates/deactivates current filter AlwaysFalse2Hit for each pass individually*/
+    std::vector<bool>
+    m_PARAMactivateAlwaysTrue2Hit; /**< activates/deactivates current filter AlwaysTrue2Hit for each pass individually*/
+    std::vector<bool>
+    m_PARAMactivateAlwaysFalse2Hit; /**< activates/deactivates current filter AlwaysFalse2Hit for each pass individually*/
     std::vector<bool> m_PARAMactivateRandom2Hit; /**< activates/deactivates current filter Random2Hit for each pass individually*/
-    std::vector<bool> m_PARAMactivateAlwaysTrue3Hit; /**< activates/deactivates current filter AlwaysTrue3Hit for each pass individually*/
-    std::vector<bool> m_PARAMactivateAlwaysFalse3Hit; /**< activates/deactivates current filter AlwaysFalse3Hit for each pass individually*/
+    std::vector<bool>
+    m_PARAMactivateAlwaysTrue3Hit; /**< activates/deactivates current filter AlwaysTrue3Hit for each pass individually*/
+    std::vector<bool>
+    m_PARAMactivateAlwaysFalse3Hit; /**< activates/deactivates current filter AlwaysFalse3Hit for each pass individually*/
     std::vector<bool> m_PARAMactivateRandom3Hit; /**< activates/deactivates current filter Random3Hit for each pass individually*/
-    std::vector<bool> m_PARAMactivateAlwaysTrue4Hit; /**< activates/deactivates current filter AlwaysTrue4Hit for each pass individually*/
-    std::vector<bool> m_PARAMactivateAlwaysFalse4Hit; /**< activates/deactivates current filter AlwaysFalse4Hit for each pass individually*/
+    std::vector<bool>
+    m_PARAMactivateAlwaysTrue4Hit; /**< activates/deactivates current filter AlwaysTrue4Hit for each pass individually*/
+    std::vector<bool>
+    m_PARAMactivateAlwaysFalse4Hit; /**< activates/deactivates current filter AlwaysFalse4Hit for each pass individually*/
     std::vector<bool> m_PARAMactivateRandom4Hit; /**< activates/deactivates current filter Random4Hit for each pass individually*/
 
     // tuning parameters:
-    std::vector<double> m_PARAMtuneDistance3D; /**< tunes current filter d3D for each pass individually, formula: min: cut = cut-tuneValue*cut, max: cut = cut + tuneValue*cut -> tuneValue of 0, no changes, 1, stretch by 100% of own size... */
-    std::vector<double> m_PARAMtuneDistanceXY; /**< tunes current filter dXY for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDistanceZ; /**< tunes current filter dZ for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneNormedDistance3D; /**< tunes current nd3D filter for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneSlopeRZ; /**< tunes current filter slopeRZ for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneAngles3D; /**< tunes current filter a3D for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneAnglesXY; /**< tunes current filter aXY for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneAnglesRZ; /**< tunes current filter aRZ for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDeltaSlopeRZ; /**< tunes current filter dslopeRZ for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDistance2IP; /**< tunes current filter d2IP for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDistance3D; /**< tunes current filter d3D for each pass individually, formula: min: cut = cut-tuneValue*cut, max: cut = cut + tuneValue*cut -> tuneValue of 0, no changes, 1, stretch by 100% of own size... */
+    std::vector<double>
+    m_PARAMtuneDistanceXY; /**< tunes current filter dXY for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDistanceZ; /**< tunes current filter dZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneNormedDistance3D; /**< tunes current nd3D filter for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneSlopeRZ; /**< tunes current filter slopeRZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneAngles3D; /**< tunes current filter a3D for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneAnglesXY; /**< tunes current filter aXY for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneAnglesRZ; /**< tunes current filter aRZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDeltaSlopeRZ; /**< tunes current filter dslopeRZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDistance2IP; /**< tunes current filter d2IP for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtunePT; /**< tunes current filter PT for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneHelixParameterFit; /**< tunes current filter HelixParameterFit for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDeltaSOverZ; /**< tunes current filter DeltaSOverZ for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDeltaSlopeZOverS; /**< tunes current filter DeltaSlopeZOverS for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneZigZagXY; /**< tunes current filter zzXY for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneHelixParameterFit; /**< tunes current filter HelixParameterFit for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDeltaSOverZ; /**< tunes current filter DeltaSOverZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDeltaSlopeZOverS; /**< tunes current filter DeltaSlopeZOverS for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneZigZagXY; /**< tunes current filter zzXY for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneZigZagXYWithSigma; /**< tunes current filter zzXY with sigmas for each pass individually */
-    std::vector<double> m_PARAMtuneZigZagRZ; /**< tunes current filter zzRZ for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDeltaPt; /**< tunes current filter dPt for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDeltaDistance2IP; /**< tunes current filter dd2IP for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneCircleFit; /**< tunes current filter CircleFit for each pass individually, here it is the global threshold value for the chi2-values produced by the fit which is stored */
-    std::vector<double> m_PARAMtuneAngles3DHioC; /**< tunes current filter a3D (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneAnglesXYHioC; /**< tunes current filter aXY (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneAnglesRZHioC; /**< tunes current filter aRZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDeltaSlopeRZHioC; /**< tunes current filter dslopeRZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDistanceDeltaZHioC; /**< tunes current filter ddZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDistance2IPHioC; /**< tunes current filter d2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtunePTHioC; /**< tunes current filter PT (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneHelixParameterFitHioC; /**< tunes current filter HelixParameterFit (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDeltaPtHioC; /**< tunes current filter dPt (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneDeltaDistance2IPHioC; /**< tunes current filter dd2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneZigZagRZ; /**< tunes current filter zzRZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDeltaPt; /**< tunes current filter dPt for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDeltaDistance2IP; /**< tunes current filter dd2IP for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneCircleFit; /**< tunes current filter CircleFit for each pass individually, here it is the global threshold value for the chi2-values produced by the fit which is stored */
+    std::vector<double>
+    m_PARAMtuneAngles3DHioC; /**< tunes current filter a3D (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneAnglesXYHioC; /**< tunes current filter aXY (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneAnglesRZHioC; /**< tunes current filter aRZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDeltaSlopeRZHioC; /**< tunes current filter dslopeRZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDistanceDeltaZHioC; /**< tunes current filter ddZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDistance2IPHioC; /**< tunes current filter d2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtunePTHioC; /**< tunes current filter PT (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneHelixParameterFitHioC; /**< tunes current filter HelixParameterFit (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDeltaPtHioC; /**< tunes current filter dPt (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double>
+    m_PARAMtuneDeltaDistance2IPHioC; /**< tunes current filter dd2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
 
     std::vector<double> m_PARAMtuneAlwaysTrue2Hit; /**< tunes current filter AlwaysTrue2Hit for each pass individually*/
     std::vector<double> m_PARAMtuneAlwaysFalse2Hit; /**< tunes current filter AlwaysFalse2Hit for each pass individually*/
@@ -825,7 +887,8 @@ namespace Belle2 {
     std::vector<double> m_PARAMtuneRandom4Hit; /**< tunes current filter Random4Hit for each pass individually*/
 
 
-    std::vector<double> m_PARAMsetupWeigh; /**< allows to individually weigh (level of surpression) each setup/pass. Please choose between 0 and -100 (%), higher momentum setups are more reliable, therefore should be weighed best */
+    std::vector<double>
+    m_PARAMsetupWeigh; /**< allows to individually weigh (level of surpression) each setup/pass. Please choose between 0 and -100 (%), higher momentum setups are more reliable, therefore should be weighed best */
 
     /// needed for pass handling:
     PassSetupVector m_passSetupVector; /**< contains information for each pass */
@@ -856,23 +919,27 @@ namespace Belle2 {
     bool m_highOccupancyCase; /**< is determined by a userdefined threshold. If there are more hits in the event than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
     int m_PARAMhighOccupancyThreshold; /**< If there are more hits in a sensor than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
     int m_PARAMkillBecauseOfOverlappsThreshold; /**< if there are more TCs overlapping than threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted */
-    unsigned int m_PARAMkillEventForHighOccupancyThreshold; /**< if there are more segments than threshold value, the complete event gets aborted */
+    unsigned int
+    m_PARAMkillEventForHighOccupancyThreshold; /**< if there are more segments than threshold value, the complete event gets aborted */
 
     double m_PARAMomega; /**< tuning parameter for hopfield network */
     double m_tcThreshold;   /**< defines threshold for hopfield network. neurons having values below threshold are discarded */
-    std::vector<double> m_PARAMreserveHitsThreshold; /**< tuning parameter for passes, valid values 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior) */
+    std::vector<double>
+    m_PARAMreserveHitsThreshold; /**< tuning parameter for passes, valid values 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior) */
 
     bool m_PARAMqiSmear; /**<  allows to smear QIs via qqq-Interface, needed when having more than one TC with the same QI */
     bool m_PARAMcleanOverlappingSet; /**< when true, TCs which are found more than once (possible because of multipass) will get filtered */
 
-    std::string m_PARAMfilterOverlappingTCs; /**< defines which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none' */
+    std::string
+    m_PARAMfilterOverlappingTCs; /**< defines which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none' */
     int m_filterOverlappingTCs; /**< is set by m_PARAMfilterOverlappingTCs and defines which technique shall be used for filtering overlapping TCs */
     double m_PARAMsmearMean; /**< allows to introduce a bias for QI (e.g. surpressing all values, ...)*/
     double m_PARAMsmearSigma; /**< bigger values deliver broader distribution*/
     bool m_PARAMstoreBrokenQI;/**< if true, TC survives QI-calculation-process even if fit was not possible */
     bool m_TESTERexpandedTestingRoutines; /**< set true if you want to export expanded infos of TCs for further analysis */
     bool m_PARAMwriteToRoot; /**< if true, a rootFile named by m_PARAMrootFileName will be filled with info */
-    std::vector<std::string> m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
+    std::vector<std::string>
+    m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
 
     TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
     TTree* m_treeHitWisePtr; /**< pointer at root tree used for information stored once per hit (e.g. positions) */
@@ -882,65 +949,112 @@ namespace Belle2 {
     double m_rootChi2; /**< used for storing chi2values in a root file */
     double m_rootCircleRadius; /**< used for storing the circle radii calculated by the circle fitter in a root file */
     long long int m_rootTimeConsumption; /**< used for storing duration of event in a root file */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosSMX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosSMY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosSMZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosSMR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosSFX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosSFY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosSFZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosSFR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosNFX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosNFY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosNFZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosNFR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosTCCX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosTCCY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosTCCZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosTCCR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosFTCX; /**< used for storing the global x-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosFTCY; /**< used for storing the global y-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosFTCZ; /**< used for storing the global z-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
-    std::array<std::vector<double>, 6> m_rootGoodHitPosFTCR; /**< used for storing the global r-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosSMX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosSMY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosSMZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosSMR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the secMap, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosSFX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosSFY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosSFZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosSFR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the segFinder, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosNFX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosNFY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosNFZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosNFR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the neighborFinder, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosTCCX; /**< used for storing the global x-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosTCCY; /**< used for storing the global y-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosTCCZ; /**< used for storing the global z-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosTCCR; /**< used for storing the global r-variables of all hits (layerwise) accepted by the tcc, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosFTCX; /**< used for storing the global x-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosFTCY; /**< used for storing the global y-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosFTCZ; /**< used for storing the global z-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
+    std::array<std::vector<double>, 6>
+    m_rootGoodHitPosFTCR; /**< used for storing the global r-variables of all hits (layerwise) accepted as final tcs, filled to root once per event */
 
-    std::vector<double> m_rootAllGoodHitPosSMX; /**< used for storing the global x-variables of all hits accepted by the secMap, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosSMY; /**< used for storing the global y-variables of all hits accepted by the secMap, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosSMZ; /**< used for storing the global z-variables of all hits accepted by the secMap, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosSMR; /**< used for storing the global r-variables of all hits accepted by the secMap, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosSFX; /**< used for storing the global x-variables of all hits accepted by the segFinder, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosSFY; /**< used for storing the global y-variables of all hits accepted by the segFinder, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosSFZ; /**< used for storing the global z-variables of all hits accepted by the segFinder, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosSFR; /**< used for storing the global r-variables of all hits accepted by the segFinder, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosNFX; /**< used for storing the global x-variables of all hits accepted by the neighborFinder, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosNFY; /**< used for storing the global y-variables of all hits accepted by the neighborFinder, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosNFZ; /**< used for storing the global z-variables of all hits accepted by the neighborFinder, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosNFR; /**< used for storing the global r-variables of all hits accepted by the neighborFinder, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosTCCX; /**< used for storing the global x-variables of all hits accepted by the tcc, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosTCCY; /**< used for storing the global y-variables of all hits accepted by the tcc, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosTCCZ; /**< used for storing the global z-variables of all hits accepted by the tcc, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosTCCR; /**< used for storing the global r-variables of all hits accepted by the tcc, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosFTCX; /**< used for storing the global x-variables of all hits accepted as final tcs, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosFTCY; /**< used for storing the global y-variables of all hits accepted as final tcs, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosFTCZ; /**< used for storing the global z-variables of all hits accepted as final tcs, filled to root once per event */
-    std::vector<double> m_rootAllGoodHitPosFTCR; /**< used for storing the global r-variables of all hits accepted as final tcs, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosSMX; /**< used for storing the global x-variables of all hits accepted by the secMap, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosSMY; /**< used for storing the global y-variables of all hits accepted by the secMap, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosSMZ; /**< used for storing the global z-variables of all hits accepted by the secMap, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosSMR; /**< used for storing the global r-variables of all hits accepted by the secMap, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosSFX; /**< used for storing the global x-variables of all hits accepted by the segFinder, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosSFY; /**< used for storing the global y-variables of all hits accepted by the segFinder, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosSFZ; /**< used for storing the global z-variables of all hits accepted by the segFinder, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosSFR; /**< used for storing the global r-variables of all hits accepted by the segFinder, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosNFX; /**< used for storing the global x-variables of all hits accepted by the neighborFinder, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosNFY; /**< used for storing the global y-variables of all hits accepted by the neighborFinder, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosNFZ; /**< used for storing the global z-variables of all hits accepted by the neighborFinder, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosNFR; /**< used for storing the global r-variables of all hits accepted by the neighborFinder, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosTCCX; /**< used for storing the global x-variables of all hits accepted by the tcc, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosTCCY; /**< used for storing the global y-variables of all hits accepted by the tcc, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosTCCZ; /**< used for storing the global z-variables of all hits accepted by the tcc, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosTCCR; /**< used for storing the global r-variables of all hits accepted by the tcc, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosFTCX; /**< used for storing the global x-variables of all hits accepted as final tcs, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosFTCY; /**< used for storing the global y-variables of all hits accepted as final tcs, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosFTCZ; /**< used for storing the global z-variables of all hits accepted as final tcs, filled to root once per event */
+    std::vector<double>
+    m_rootAllGoodHitPosFTCR; /**< used for storing the global r-variables of all hits accepted as final tcs, filled to root once per event */
 
     int m_rootNdf; /**< used for storing numbers of degrees of freedom in a root file */
 
-    std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
+    std::string
+    m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */
-    std::string m_PARAMcalcSeedType; /**< allows you to chose the way, the seed-mometa of the TC's shall be calculated. currently supported: 'helixFit', 'straightLine' */
+    std::string
+    m_PARAMcalcSeedType; /**< allows you to chose the way, the seed-mometa of the TC's shall be calculated. currently supported: 'helixFit', 'straightLine' */
     int m_calcSeedType; /**< is set by m_PARAMcalcSeedType and defines which seed type shall be calculated */
     std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
     std::string m_PARAMpxdClustersName;         /**< name of storeArray containing pxd clusters */
     std::string m_PARAMsvdClustersName;         /**< name of storeArray containing svd clusters */
 
-    StoreArray<PXDCluster> m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
-    StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
-    StoreArray<genfit::TrackCand> m_finalTrackCandidates; /**< the storeArray for the genfit::TrackCand output as member, is faster than recreating link for each event */
-    StoreArray<VXDTFInfoBoard> m_extraInfo4GFTCs; /**< interface to the InfoBoard. This allows the TFAnalyzerModule to retrieve essential info for checking efficiency and stuff. That interface is only set, if m_TESTERexpandedTestingRoutines is set to true */
+    StoreArray<PXDCluster>
+    m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
+    StoreArray<SVDCluster>
+    m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
+    StoreArray<genfit::TrackCand>
+    m_finalTrackCandidates; /**< the storeArray for the genfit::TrackCand output as member, is faster than recreating link for each event */
+    StoreArray<VXDTFInfoBoard>
+    m_extraInfo4GFTCs; /**< interface to the InfoBoard. This allows the TFAnalyzerModule to retrieve essential info for checking efficiency and stuff. That interface is only set, if m_TESTERexpandedTestingRoutines is set to true */
 
-    std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
+    std::string
+    m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
 
 
     /// the following variables are nimimal testing routines within the TF
@@ -977,7 +1091,8 @@ namespace Belle2 {
     std::vector<int> m_TESTERSVDOccupancy; /**< counts number of hits per sensor (inclusive ghost hits) */
     int m_TESTERkalmanSkipped; /**< counts number of times when there were too many overlapped TCs for kalman filtering */
     TimeInfo m_TESTERtimeConsumption; /**< a struct to store amount of time needed for special blocks of the program */
-    std::vector<EventInfoPackage> m_TESTERlogEvents; /**< a list containing some information about each event (time consumption and quality) */
+    std::vector<EventInfoPackage>
+    m_TESTERlogEvents; /**< a list containing some information about each event (time consumption and quality) */
     int m_TESTERbadSectorRangeCounterForClusters; /**< counts number of times when only 1 cluster has been found on a complete sensor (therefore no 2D hits possible) */
     int m_TESTERclustersPersSectorNotMatching; /**< counts number of times when numofUclusters and nVclusters per sensor do not match */
     int m_TESTERhighOccupancyCtr; /**< counts number of times when high occupancy mode was activated */
@@ -994,9 +1109,11 @@ namespace Belle2 {
     /// NEW event wise variables
     /////////////////////////////
 
-    unsigned int m_badSectorRangeCtr; /**< counts cases where a PXDCluster or a SVDCluster-combination could not be assigned to a sector of a given pass */
+    unsigned int
+    m_badSectorRangeCtr; /**< counts cases where a PXDCluster or a SVDCluster-combination could not be assigned to a sector of a given pass */
 
-    EventInfoPackage m_evInfoPack; /**< stores meta info like counters and time consumption for current event (will be reset for each event */
+    EventInfoPackage
+    m_evInfoPack; /**< stores meta info like counters and time consumption for current event (will be reset for each event */
   private:
 
   };

@@ -39,7 +39,8 @@ const vector<int> VXDSector::getSupportedCutoffs(unsigned int aFriend)
   FriendMap::iterator mapIter = m_friendMap.find(aFriend);
   if (mapIter == m_friendMap.end()) {
     FullSecID aFullSecID = FullSecID(aFriend);
-    B2FATAL("VXDSector::getSupportedCudoffs - friend int/string" << aFriend << "/" << aFullSecID << " not found!"); // includes a total break, therefore no return needed
+    B2FATAL("VXDSector::getSupportedCudoffs - friend int/string" << aFriend << "/" << aFullSecID <<
+            " not found!"); // includes a total break, therefore no return needed
   }
   vector<int> supportedCutoffs;
   mapIter->second.getSupportedCutoffs(supportedCutoffs);

@@ -91,14 +91,16 @@ namespace Belle2 {
 
 
     /** incompatible neighbours get kicked when new information about the situation recommends that step */
-    std::list<Belle2::VXDSegmentCell*>::iterator eraseInnerNeighbour(std::list<VXDSegmentCell*>::iterator it) {
+    std::list<Belle2::VXDSegmentCell*>::iterator eraseInnerNeighbour(std::list<VXDSegmentCell*>::iterator it)
+    {
       it = m_innerNeighbours.erase(it);
       return it;
     } //items.erase(i++);  or  i = items.erase(i);
 
 
     /** checks whether the segment has got any neighbours. If not, it dies (ActivationState = false)*/
-    bool dieIfNoNeighbours() {
+    bool dieIfNoNeighbours()
+    {
       /** ATTENTION sep19th, 2014:
        *
        * at the moment it is not clear, which of the following if-cases shall be used.
@@ -169,7 +171,8 @@ namespace Belle2 {
     bool m_stateUpgrade; /**< sets flag whether Cell is allowed to increase state during update step within CA */
     bool m_seed; /**< sets flag whether Cell is allowed to be the seed of a new track candidate or not */
 
-    std::list<VXDSegmentCell*> m_innerNeighbours; /**< segments attached at the inner end of current segment. Since this list gets reduced during CA process, a copy is made before that step. If you want to see all neighbours, use getAllInnerNeighbours */
+    std::list<VXDSegmentCell*>
+    m_innerNeighbours; /**< segments attached at the inner end of current segment. Since this list gets reduced during CA process, a copy is made before that step. If you want to see all neighbours, use getAllInnerNeighbours */
     std::list<VXDSegmentCell*> m_allInnerNeighbours; /**< carries full list of all inner neighbour-Cells. */
     std::list<VXDSegmentCell*> m_outerNeighbours; /**< carries list of outer neighbour-Cells */
 

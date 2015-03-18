@@ -40,32 +40,30 @@ if len(argv) > 4:
     print '4th argument given, new value for numTracks: ' + str(numTracks)
 
 tuneValue = 0.06
-#### old geometry for SVD:
+# old geometry for SVD:
 # secSetup = ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
-            # 'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
-            # 'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD']
-#### new 2.2 geometry for SVD:
-secSetup = \
-    ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD'
-     , 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD'
-     , 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
+# 'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
+# 'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD']
+# new 2.2 geometry for SVD:
+secSetup = [
+    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
+    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
+    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
 
 if usePXD:
-  #### new 2.2 geometry for SVD:
+  # new 2.2 geometry for SVD:
     secSetup = \
-        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
-         ,
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
-         ,
+        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
          'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
          ]
-  #### old geometry for SVD:
+  # old geometry for SVD:
   # secSetup = ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
-                # 'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
-                # 'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD']
+    # 'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
+    # 'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD']
     tuneValue = 0.22
 print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
-        theSeed=initialValue)
+                                                                        theSeed=initialValue)
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
@@ -102,12 +100,12 @@ param_pGun = {  # 13: muons, 211: charged pions
     'xVertexParams': [-0.01, 0.01],
     'yVertexParams': [-0.01, 0.01],
     'zVertexParams': [-0.5, 0.5],
-    }
+}
 particlegun.param(param_pGun)
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
-               'PXD', 'SVD'])
+                              'PXD', 'SVD'])
 
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
@@ -118,9 +116,9 @@ vxdtf.logging.debug_level = 1
 param_vxdtf = {'sectorSetup': secSetup,
                'GFTrackCandidatesColName': 'caTracks',
                'tuneCutoffs': tuneValue}  # 'writeToRoot': True,
-                                          # 'activateSlopeRZ': False,
-                                          # 'activateDistanceXY': False,
-                                          # 'activateDistance3D': False,
+# 'activateSlopeRZ': False,
+# 'activateDistanceXY': False,
+# 'activateDistance3D': False,
 # , 'calcQIType': 'kalman'
 vxdtf.param(param_vxdtf)
 
@@ -141,7 +139,7 @@ param_track_finder_mc_truth = {
     'MinimalNDF': 6,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 trackfitter = register_module('GenFitter')
@@ -172,12 +170,12 @@ main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 if useEvtGen:
-  ##following modules only for evtGen:
+  # following modules only for evtGen:
     main.add_module(evtgeninput)
     if usePGun:
         main.add_module(particlegun)
 else:
-  ## following modules only for pGun:
+  # following modules only for pGun:
     main.add_module(particlegun)
 main.add_module(g4sim)
 main.add_module(pxdDigitizer)

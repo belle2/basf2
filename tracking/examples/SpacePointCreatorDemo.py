@@ -31,7 +31,7 @@ evtgeninput.logging.log_level = LogLevel.WARNING
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
-               'PXD', 'SVD'])
+                              'PXD', 'SVD'])
 
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
@@ -62,8 +62,7 @@ spCreatorTest.logging.debug_level = 20
 spCreatorTest.param('NameOfInstance', 'SPTester')
 # spCreatorTest.param('SpacePoints', 'couplesAllowed')
 # spCreatorTest.param('AllSpacePointContainers', [ 'pxdOnly'] )
-spCreatorTest.param('AllSpacePointContainers', ['singlesOnly', 'couplesAllowed'
-                    , 'pxdOnly'])
+spCreatorTest.param('AllSpacePointContainers', ['singlesOnly', 'couplesAllowed', 'pxdOnly'])
 
 # Create paths
 main = create_path()

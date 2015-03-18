@@ -40,7 +40,8 @@ SpacePointCreatorSVDModule::SpacePointCreatorSVDModule() :
   addParam("NameOfInstance", m_nameOfInstance,
            "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module", string(""));
   addParam("OnlySingleClusterSpacePoints", m_onlySingleClusterSpacePoints,
-           "standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more", bool(false));
+           "standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more",
+           bool(false));
 }
 
 
@@ -71,13 +72,15 @@ void SpacePointCreatorSVDModule::event()
 {
 
   if (m_onlySingleClusterSpacePoints == true) {
-    provideSVDClusterSingles(m_svdClusters, m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
+    provideSVDClusterSingles(m_svdClusters,
+                             m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints);
   }
 
 
-  B2DEBUG(1, "SpacePointCreatorSVDModule(" << m_nameOfInstance << ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
+  B2DEBUG(1, "SpacePointCreatorSVDModule(" << m_nameOfInstance <<
+          ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
           ", svdClusters: " << m_svdClusters.getEntries() <<
           ", spacePoints: " << m_spacePoints.getEntries())
 

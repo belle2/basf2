@@ -39,7 +39,8 @@ namespace Belle2 {
   class ExportSectorMapModule : public Module {
 
   public:
-    typedef boost::chrono::high_resolution_clock boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
+    typedef boost::chrono::high_resolution_clock
+    boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
     //       typedef boost::chrono::microseconds boostNsec; /**< defines time resolution (currently mictroseconds) */ // microseconds, milliseconds
     typedef boost::chrono::nanoseconds boostNsec; /**< defines time resolution (currently nanoseconds) */ // microseconds, milliseconds
     typedef std::pair< double, double> CutoffValue; /**< .first is minValue, .second is maxValue */
@@ -92,20 +93,29 @@ namespace Belle2 {
 
 
 
-    std::vector<double> m_PARAMsectorConfigU; /**< only needed if importROOTorXML = false:  allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
-    std::vector<double> m_PARAMsectorConfigV; /**< only needed if importROOTorXML = false:  allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
-    std::vector<double> m_PARAMsetOrigin; /**< only needed if importROOTorXML = false:  allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
+    std::vector<double>
+    m_PARAMsectorConfigU; /**< only needed if importROOTorXML = false:  allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+    std::vector<double>
+    m_PARAMsectorConfigV; /**< only needed if importROOTorXML = false:  allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+    std::vector<double>
+    m_PARAMsetOrigin; /**< only needed if importROOTorXML = false:  allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
     double m_PARAMmagneticFieldStrength; /**< only needed if importROOTorXML = false:  strength of magnetic field in Tesla, standard is 1.5T */
     std::string m_PARAMdetectorType; /**< only needed if importROOTorXML = false:  defines which detector type has to be exported */
-    std::string m_PARAMsectorSetup; /**< only needed if importROOTorXML = false:  lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) */
-    std::string m_PARAMadditionalInfo; /**< only needed if importROOTorXML = false:  this variable is reserved for extra info which shall be stored in the container, e.g. date of production or other useful info for the user(it shall be formatted before storing it), this info will be displayed by the VXDTF on Info-level */
+    std::string
+    m_PARAMsectorSetup; /**< only needed if importROOTorXML = false:  lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) */
+    std::string
+    m_PARAMadditionalInfo; /**< only needed if importROOTorXML = false:  this variable is reserved for extra info which shall be stored in the container, e.g. date of production or other useful info for the user(it shall be formatted before storing it), this info will be displayed by the VXDTF on Info-level */
 
 
 
-    std::vector<int> m_PARAMsampleThreshold; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: minimal sample size for sector-combination, second: threshold for 'small samples' where behavior is less strict. If sampleSize is bigger than second, normal behavior is chosen */
-    std::vector<double> m_PARAMsmallSampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of small sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
-    std::vector<double> m_PARAMsampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of normal sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
-    std::vector<double> m_PARAMstretchFactor; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly */
+    std::vector<int>
+    m_PARAMsampleThreshold; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: minimal sample size for sector-combination, second: threshold for 'small samples' where behavior is less strict. If sampleSize is bigger than second, normal behavior is chosen */
+    std::vector<double>
+    m_PARAMsmallSampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of small sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
+    std::vector<double>
+    m_PARAMsampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of normal sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
+    std::vector<double>
+    m_PARAMstretchFactor; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly */
     bool m_PARAMsortByDistance2origin; /**< only needed if importROOTorXML = true: if set to true, sectors are not treated by layerID but by distance to origin. This has an effect on filtering bad sector combinations. Recommendation: use false for normal Belle2-VXD-case and true for beam test situations where layerIDs are mixed up */
     std::string m_PARAMrootFileName; /**< only needed if importROOTorXML = true: sets the root filename */
     bool m_PARAMprintFinalMaps; /**< if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen */

@@ -46,7 +46,8 @@ namespace Belle2 {
    */
   std::vector< std::pair<double, double> > getHitErrors();
 
-  template<typename T_type1> void expandRootBranch(const T_type1& variable, const std::string& branchName, const std::string& treeName, const std::string& rootFileName); /**< can be used for exporting data into a branch of a rootFile */
+  template<typename T_type1> void expandRootBranch(const T_type1& variable, const std::string& branchName,
+                                                   const std::string& treeName, const std::string& rootFileName); /**< can be used for exporting data into a branch of a rootFile */
 
 
   /** simple printFunction for root library Matrices */
@@ -72,7 +73,7 @@ ss << std::endl;
   std::string printMyStdVector(const std::vector< TEntry >& aVector)
   {
     std::stringstream printOut;
-    for (const TEntry & anEntry : aVector) {
+    for (const TEntry& anEntry : aVector) {
       printOut << anEntry << '\t';
     }
     printOut << std::endl;

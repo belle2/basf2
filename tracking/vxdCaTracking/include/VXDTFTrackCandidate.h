@@ -45,7 +45,8 @@ namespace Belle2 {
       m_passIndex(-1),
       m_fitSucceeded(false),
       m_trackNumber(-1),
-      m_initialValuesSet(false) {
+      m_initialValuesSet(false)
+    {
       m_attachedHits.reserve(12);
       m_attachedCells.reserve(10);
       m_pxdHitIndices.reserve(4);
@@ -75,8 +76,9 @@ namespace Belle2 {
       m_initialHit((*other).m_initialHit),
       m_initialMomentum((*other).m_initialMomentum),
       m_initialValuesSet((*other).m_initialValuesSet),
-      m_collector_id((*other).m_collector_id) {
-      if (m_alive == true) { for (VXDTFHit * aHit : m_attachedHits) { aHit->addTrackCandidate(); } }  // each time it gets copied, its hits have to be informed about that step
+      m_collector_id((*other).m_collector_id)
+    {
+      if (m_alive == true) { for (VXDTFHit* aHit : m_attachedHits) { aHit->addTrackCandidate(); } }   // each time it gets copied, its hits have to be informed about that step
       /*m_neuronValue = 0; m_overlapping = false; m_alive = true; m_qualityIndex = 1.0;*/
     }
 
@@ -87,11 +89,12 @@ namespace Belle2 {
     const std::vector<VXDTFHit*>& getHits() { return m_attachedHits; } /**< returns hits forming current TC. Currently, the first hit in the vector is the outermost hit  */
 
 
-    const std::vector<PositionInfo*>* getPositionInfos() {
+    const std::vector<PositionInfo*>* getPositionInfos()
+    {
       if (m_attachedPositionInfos.size() == m_attachedHits.size()) { return &m_attachedPositionInfos; }
       m_attachedPositionInfos.clear();
       m_attachedPositionInfos.reserve(m_attachedHits.size());
-      for (auto * aHit : m_attachedHits) { m_attachedPositionInfos.push_back(aHit->getPositionInfo()); }
+      for (auto* aHit : m_attachedHits) { m_attachedPositionInfos.push_back(aHit->getPositionInfo()); }
 //         for (std::vector<VXDTFHit*>::iterator it = m_attachedHits.begin(); it != m_attachedHits.end(); ++it) {
 //           m_attachedPositionInfos.push_back((*it)->getPositionInfo());
 //         }
@@ -99,21 +102,23 @@ namespace Belle2 {
     } /**< returns position infos (global hit coordinates and errors for x and y coordinates) forming current TC. Currently, the first hit in the vector is the outermost hit  */
 
 
-    std::vector<TVector3*> getHitCoordinates() { /**< returns hit positions forming current TC */
+    std::vector<TVector3*> getHitCoordinates()   /**< returns hit positions forming current TC */
+    {
       std::vector<TVector3*> coordinates;
       coordinates.reserve(m_attachedHits.size());
-      for (VXDTFHit * hit : m_attachedHits) {
+      for (VXDTFHit* hit : m_attachedHits) {
         coordinates.push_back(hit->getHitCoordinates());
       }
       return coordinates;
     }
 
 
-    const std::vector<int>& getSVDHitIndices() {
+    const std::vector<int>& getSVDHitIndices()
+    {
       m_svdHitIndices.clear();
       m_svdHitIndices.reserve(m_attachedHits.size());
       int index;
-      for (VXDTFHit * aHit : m_attachedHits) {
+      for (VXDTFHit* aHit : m_attachedHits) {
         if (aHit->getDetectorType() == Const::SVD) { /* SVD */
           index = aHit->getClusterIndexU();
           if (index != -1) { m_svdHitIndices.push_back(index); }
@@ -125,11 +130,12 @@ namespace Belle2 {
     }  /**< returns real indices of svdClusters forming current TC */
 
 
-    const std::vector<int>& getPXDHitIndices() {
+    const std::vector<int>& getPXDHitIndices()
+    {
       m_pxdHitIndices.clear();
       m_pxdHitIndices.reserve(m_attachedHits.size());
       int index;
-      for (VXDTFHit * aHit : m_attachedHits) {
+      for (VXDTFHit* aHit : m_attachedHits) {
         if (aHit->getDetectorType() == Const::PXD) { /* PXD */
           index = aHit->getClusterIndexUV();
           if (index != -1) { m_pxdHitIndices.push_back(index); }
@@ -139,11 +145,12 @@ namespace Belle2 {
     } /**< returns real indices of pxdClusters forming current TC */
 
 
-    const std::vector<int>& getTELHitIndices() {
+    const std::vector<int>& getTELHitIndices()
+    {
       m_telHitIndices.clear();
       m_telHitIndices.reserve(m_attachedHits.size());
       int index;
-      for (VXDTFHit * aHit : m_attachedHits) {
+      for (VXDTFHit* aHit : m_attachedHits) {
         if (aHit->getDetectorType() == Const::TEST) { /* Telescope */
           index = aHit->getClusterIndexUV();
           if (index != -1) { m_telHitIndices.push_back(index); }
@@ -154,7 +161,8 @@ namespace Belle2 {
 
 
     //     std::list<int> getHopfieldHitIndices() { return m_hopfieldHitIndices; } /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
-    std::list<int> getHopfieldHitIndices(); /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
+    std::list<int>
+    getHopfieldHitIndices(); /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
 
 
     const std::vector<VXDTFTrackCandidate*>& getBookingRivals() { return m_bookingRivals; } /**< returns all TCs sharing hits with current one */
@@ -163,9 +171,10 @@ namespace Belle2 {
     bool getOverlappingState() { return m_overlapping; } /**< returns flag whether TC is sharing hits with other TCs or not (no manual check) */
 
 
-    bool checkOverlappingState() { /**< returns flag whether TC is sharing hits with other TCs or not, after manual check, whether its rivals are still alive */
+    bool checkOverlappingState()   /**< returns flag whether TC is sharing hits with other TCs or not, after manual check, whether its rivals are still alive */
+    {
       m_overlapping = false;
-      for (VXDTFTrackCandidate * rival : m_bookingRivals) {
+      for (VXDTFTrackCandidate* rival : m_bookingRivals) {
         if (rival->getCondition() != false) { m_overlapping = true; return true; }
       }
       return false;
@@ -228,8 +237,9 @@ namespace Belle2 {
     void addTELClusterIndex(int anIndex) { m_telHitIndices.push_back(anIndex); } /**< add index number of TELCluster attached to current TC */
 
 
-    void addBookingRival(VXDTFTrackCandidate* aTC) { /**< adds a TC sharing hits with current one */
-      for (VXDTFTrackCandidate * rival : m_bookingRivals) { if (aTC == rival) { return; } } // filter double entries
+    void addBookingRival(VXDTFTrackCandidate* aTC)   /**< adds a TC sharing hits with current one */
+    {
+      for (VXDTFTrackCandidate* rival : m_bookingRivals) { if (aTC == rival) { return; } }  // filter double entries
       m_overlapping = true;
       m_bookingRivals.push_back(aTC);
     }
@@ -259,14 +269,15 @@ namespace Belle2 {
     void setQQQ(double qqqScore, double maxScore) { m_qqq = sqrt(qqqScore / maxScore); } /**< set estimated extended quality of TC (a potential minimal replacement for kalman filter, interesting for online-use) */
 
 
-    void setCondition(bool newCondition) {
+    void setCondition(bool newCondition)
+    {
       if (m_alive == true && newCondition == false) {   // in this case, the TC will be deactivated
-        for (VXDTFHit * aHit : m_attachedHits) {
+        for (VXDTFHit* aHit : m_attachedHits) {
           aHit->removeTrackCandidate();
           // TODO: for each ClusterInfo in aHit-> removeTrackCandidate(this);
         }
       } else if (m_alive == false && newCondition == true) {   // in this case the TC will be (re)activated
-        for (VXDTFHit * aHit : m_attachedHits) {
+        for (VXDTFHit* aHit : m_attachedHits) {
           aHit->addTrackCandidate();
         }
       }
@@ -301,14 +312,17 @@ namespace Belle2 {
     void setCollectorID(int value) { m_collector_id = value; }
 
   protected:
-    std::vector<VXDTFHit*> m_attachedHits; /**< contains pointer to all VXDTFHits attached to current TC. Currently, the first hit in the vector is the outermost hit */
+    std::vector<VXDTFHit*>
+    m_attachedHits; /**< contains pointer to all VXDTFHits attached to current TC. Currently, the first hit in the vector is the outermost hit */
     std::vector<PositionInfo*> m_attachedPositionInfos; /**< contains positionInfos (coordinates, sigmaValues) for each hit */
-    std::vector<VXDSegmentCell*> m_attachedCells; /**< contains pointer to all VXDSegmentCells attached to current TC, first cell is outermost cell */
+    std::vector<VXDSegmentCell*>
+    m_attachedCells; /**< contains pointer to all VXDSegmentCells attached to current TC, first cell is outermost cell */
     std::vector<VXDTFTrackCandidate*> m_bookingRivals; /**< contains all TCs sharing hits with current one */
     std::vector<int> m_svdHitIndices;  /**< to be able to export TCs */
     std::vector<int> m_pxdHitIndices;  /**< to be able to export TCs */
     std::vector<int> m_telHitIndices;  /**< to be able to export TCs */
-    std::list<int> m_hopfieldHitIndices;  /**< slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
+    std::list<int>
+    m_hopfieldHitIndices;  /**< slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
 
     bool m_overlapping;  /**< defines whether TC shares Hits with another valid TC or not */
     bool m_alive; /**< only tcs which are alive can leave the TF as final TCs */

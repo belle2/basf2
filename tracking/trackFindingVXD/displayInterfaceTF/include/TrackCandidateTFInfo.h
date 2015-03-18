@@ -36,7 +36,8 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    TrackCandidateTFInfo() {
+    TrackCandidateTFInfo()
+    {
       m_ownId = -1;
       m_assignedCellIds.clear();
       m_assignedCellCoordinates.clear();
@@ -49,7 +50,8 @@ namespace Belle2 {
     }
 
     /** Standard constructor */
-    TrackCandidateTFInfo(int parPassIndex, int parOwnId): BaseTFInfo(parPassIndex) {
+    TrackCandidateTFInfo(int parPassIndex, int parOwnId): BaseTFInfo(parPassIndex)
+    {
       m_ownId = parOwnId;
       m_assignedCellIds.clear();
       m_assignedCellCoordinates.clear();
@@ -71,7 +73,8 @@ namespace Belle2 {
     std::vector<int>& getAssignedCell()  { return m_assignedCellIds; }
 
     /** add new int to AssignedCell */
-    void push_back_AssignedCell(int newMember, std::vector<TVector3> newCoordinates) {
+    void push_back_AssignedCell(int newMember, std::vector<TVector3> newCoordinates)
+    {
       m_assignedCellIds.push_back(newMember);
       m_assignedCellCoordinates.insert(m_assignedCellCoordinates.end(), newCoordinates.begin(), newCoordinates.end());
     }
@@ -108,12 +111,14 @@ namespace Belle2 {
     std::vector<std::pair<int, double>>& getUsedParticles()  { return m_usedParticles; }
 
     /** add new to used_particles */
-    void push_back_UsedParticles(std::pair<int, double> newMember) {
+    void push_back_UsedParticles(std::pair<int, double> newMember)
+    {
       m_usedParticles.push_back(newMember);
     }
 
     /** getter - Particle with highest purity*/
-    std::pair<int, double> getMainParticle() const {
+    std::pair<int, double> getMainParticle() const
+    {
 
       int maxPos = 0;
 
@@ -127,7 +132,8 @@ namespace Belle2 {
     }
 
     /** getter - gets Particle with particleID*/
-    std::pair<int, double> getInfoParticle(int particleID)  {
+    std::pair<int, double> getInfoParticle(int particleID)
+    {
 
       for (uint i = 0; i < m_usedParticles.size(); i++) {
         if (m_usedParticles.at(i).first == particleID) {
@@ -140,7 +146,8 @@ namespace Belle2 {
 
 
     /** containsParticle - if Particle with particleID here */
-    bool containsParticle(int particleID)  {
+    bool containsParticle(int particleID)
+    {
 
       for (uint i = 0; i < m_usedParticles.size(); i++) {
         if (m_usedParticles.at(i).first == particleID) {
@@ -155,12 +162,14 @@ namespace Belle2 {
     int sizeUsedParticles() { return m_usedParticles.size(); }
 
     /** returns Coordinates of the Assigned Cell */
-    const std::vector<TVector3> getCoordinates() const {
+    const std::vector<TVector3> getCoordinates() const
+    {
       return m_assignedCellCoordinates;
     }
 
     /** returns the String for the display - Information */
-    const TString getDisplayInformation() const {
+    const TString getDisplayInformation() const
+    {
 
       int cell1 = -1;
       if (m_assignedCellIds.size() > 0) { cell1 = m_assignedCellIds.at(0); }
@@ -171,16 +180,19 @@ namespace Belle2 {
     }
 
     /** returns the String for the display - AlternativeBox */
-    const TString getDisplayAlternativeBox() const {
+    const TString getDisplayAlternativeBox() const
+    {
 
       std::pair<int, double> mainParticle = getMainParticle();
       std::string diedAt = getDiedAt();
 
-      return TString::Format("PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Probability: %.3f, GTFC: %d", getPassIndex(), diedAt.c_str(), m_isReal, mainParticle.first, mainParticle.second, m_probValue, m_assignedGFTC);
+      return TString::Format("PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Probability: %.3f, GTFC: %d",
+                             getPassIndex(), diedAt.c_str(), m_isReal, mainParticle.first, mainParticle.second, m_probValue, m_assignedGFTC);
     }
 
     /** returns the Color of the Object for the display */
-    Color_t getColor() const {
+    Color_t getColor() const
+    {
       if (getActive()) {
         return kGreen;
       } else {

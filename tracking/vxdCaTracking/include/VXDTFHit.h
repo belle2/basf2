@@ -56,7 +56,8 @@ namespace Belle2 {
      *      //      * @param VxdID ID of sensor containing parent clusterHit(s)
      *      //      * @param timeStamp time of birth (only set when SVD hit, else 0).
      *      //      */
-    VXDTFHit(PositionInfo hitPos, int passIndex, ClusterInfo* clusterIndexU, ClusterInfo* clusterIndexV, ClusterInfo* clusterIndexUV, int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp):
+    VXDTFHit(PositionInfo hitPos, int passIndex, ClusterInfo* clusterIndexU, ClusterInfo* clusterIndexV, ClusterInfo* clusterIndexUV,
+             int detectorType, unsigned int papaSector, VxdID aVxdID, float timeStamp):
       m_hit(hitPos),
       m_passIndex(passIndex),
       m_clusterInfoU(clusterIndexU), // SVD only
@@ -104,14 +105,16 @@ namespace Belle2 {
       return -1;
   } *//**< returns index position of clusterInfo in container, only set for SVDHits */
 
-    ClusterInfo* getClusterInfoU() const; /*{ return m_clusterInfoU; }*/ /**< returns pointer to ClusterInfo U, is NULL if value is not set */
+    ClusterInfo* getClusterInfoU()
+    const; /*{ return m_clusterInfoU; }*/ /**< returns pointer to ClusterInfo U, is NULL if value is not set */
 
     int getClusterIndexV() const; /*{
     if (m_clusterInfoV != NULL ) { return m_clusterInfoV->getOwnIndex(); }
     return -1;
   }*/ /**< returns index position of clusterInfo in container,  only set for SVDHits */
 
-    ClusterInfo* getClusterInfoV() const;/* { return m_clusterInfoUV; }*/ /**< returns pointer to ClusterInfo V, is NULL if value is not set */
+    ClusterInfo* getClusterInfoV()
+    const;/* { return m_clusterInfoUV; }*/ /**< returns pointer to ClusterInfo V, is NULL if value is not set */
 
     /** returns index position of clusterInfo in container,  only set for PXDHits and TELHits*/
     int getClusterIndexUV() const; /*{
@@ -119,13 +122,15 @@ namespace Belle2 {
     return -1;
   }*/
 
-    ClusterInfo* getClusterInfoUV() const;/* { return m_clusterInfoUV; }*/  /**< returns pointer to ClusterInfo UV, is NULL if value is not set */
+    ClusterInfo* getClusterInfoUV()
+    const;/* { return m_clusterInfoUV; }*/  /**< returns pointer to ClusterInfo UV, is NULL if value is not set */
 
     int getDetectorType() const { return m_detectorType; } /**< returns detectorType IP=Const::IR,PXD=Const::PXD,SVD=Const::SVD, TEL = Const::TEST */
 
     unsigned int getSectorName() const { return m_papaSector; } /**< returns name of sectors containing current hit (sectors are passDependent), in speed optimized int */
 
-    std::string getSectorString() const; /**< returns name of sectors containing current hit (sectors are passDependent), in human readable string */
+    std::string getSectorString()
+    const; /**< returns name of sectors containing current hit (sectors are passDependent), in human readable string */
 
     const VxdID getVxdID() const { return m_VxdID; } /**< returns VxdID of sensor carrying current sector */
 

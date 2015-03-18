@@ -25,7 +25,8 @@ namespace Belle2 {
       m_x2(0.),
       m_y2(0.),
       m_z2(0.),
-      m_dz(0.) {
+      m_dz(0.)
+    {
       m_hitA.SetXYZ(0., 0., 0.);
       m_hitB.SetXYZ(0., 0., 0.);
     }
@@ -40,7 +41,8 @@ namespace Belle2 {
     ~TwoHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3& outerHit, TVector3& innerHit) {
+    void resetValues(TVector3& outerHit, TVector3& innerHit)
+    {
       m_hitA = outerHit;
       m_hitB = innerHit;
 
@@ -63,7 +65,8 @@ namespace Belle2 {
     double calcDistZ() const { return m_dz; } // return unit: cm
 
     /** calculates the angle of the slope of the hits in RZ, returnValue = theta = atan(r/z) */
-    double calcSlopeRZ() const {
+    double calcSlopeRZ() const
+    {
       //double slope = atan (calcDistXY() / m_dz) ;
       double slope = atan(fullDistXY() / m_dz) ;    //since calcDistXY() returns cm ^2
       return filterNan(slope);
@@ -73,7 +76,8 @@ namespace Belle2 {
     double fullSlopeRZ() const { return calcSlopeRZ(); }
 
     /** calculates the normed distance between the hits (3D), return unit: none */
-    double calcNormedDist3D() const {
+    double calcNormedDist3D() const
+    {
       double normedVal = calcDistXY() / calcDist3D();
       return filterNan(normedVal);
     } // return unit: none
@@ -84,7 +88,8 @@ namespace Belle2 {
   protected:
 
     /** initializer function, sets values */
-    void initializeMe(TVector3& outerHit, TVector3& innerHit) {
+    void initializeMe(TVector3& outerHit, TVector3& innerHit)
+    {
       m_x2 = outerHit[0] - innerHit[0]; // not x2 yet, reusing member
       m_y2 = outerHit[1] - innerHit[1];
       m_dz = outerHit[2] - innerHit[2];

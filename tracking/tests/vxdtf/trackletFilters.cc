@@ -706,8 +706,10 @@ namespace Belle2 {
 
     hit1.hitPosition = TVector3(4. - 4.5, 6., 0.);
     hit1.hitSigma = TVector3(.1, .1, .1);
-    hit2.hitPosition = TVector3(4. - 4.5 * cos(5. / 180.*M_PI), 6. + 4.5 * sin(5. / 180.*M_PI), 0.);    hit2.hitSigma = TVector3(.1, .1, .1);
-    hit3.hitPosition = TVector3(4. - 4.5 * cos(10. / 180.*M_PI), 6. + 4.5 * sin(10. / 180.*M_PI), 0.);  hit3.hitSigma = TVector3(.1, .1, .1);
+    hit2.hitPosition = TVector3(4. - 4.5 * cos(5. / 180.*M_PI), 6. + 4.5 * sin(5. / 180.*M_PI), 0.);
+    hit2.hitSigma = TVector3(.1, .1, .1);
+    hit3.hitPosition = TVector3(4. - 4.5 * cos(10. / 180.*M_PI), 6. + 4.5 * sin(10. / 180.*M_PI), 0.);
+    hit3.hitSigma = TVector3(.1, .1, .1);
     v.push_back(&hit1);
     v.push_back(&hit2);
     v.push_back(&hit3);
@@ -737,7 +739,8 @@ namespace Belle2 {
 
     vector<PositionInfo*> v1, v4, v5, v6;
 
-    hit1.hitPosition = TVector3(0., 0., 0.);  hit1.hitSigma = TVector3(.1, .1, .1); //hits 1 2 4 and 1 2 5 are circles with radius 1 and m=(1,0) in (x,y)
+    hit1.hitPosition = TVector3(0., 0., 0.);
+    hit1.hitSigma = TVector3(.1, .1, .1); //hits 1 2 4 and 1 2 5 are circles with radius 1 and m=(1,0) in (x,y)
     hit2.hitPosition = TVector3(1., 1., 2.);  hit2.hitSigma = TVector3(.1, .1, .1);
     hit4.hitPosition = TVector3(2., 0, 4.); hit4.hitSigma = TVector3(.1, .1, .1);
 
@@ -772,7 +775,8 @@ namespace Belle2 {
     aFilter.resetValues(&v1);
     EXPECT_FLOAT_EQ(-aFilter.calcPt(4. / M_PI), aFilter.helixFit().second[2]);
 
-    hit21.hitPosition = TVector3(0., 0., 0.); hit21.hitSigma = TVector3(.1, .1, .1); //hits 1 2 4 and 1 2 5 are circles with radius 1 and m=(1,0) in (x,y)
+    hit21.hitPosition = TVector3(0., 0., 0.);
+    hit21.hitSigma = TVector3(.1, .1, .1); //hits 1 2 4 and 1 2 5 are circles with radius 1 and m=(1,0) in (x,y)
     hit22.hitPosition = TVector3(1., 1., 1.); hit22.hitSigma = TVector3(.1, .1, .1);
     hit23.hitPosition = TVector3(.5, 1., 1.8);  hit23.hitSigma = TVector3(.1, .1, .1); //hit 3 is off
     hit24.hitPosition = TVector3(2., 0, 2.);  hit24.hitSigma = TVector3(.1, .1, .1);
@@ -794,7 +798,8 @@ namespace Belle2 {
 
     EXPECT_DOUBLE_EQ(1, aFilter.helixFit().first);          // Returns the Radius (as of Feb 2014)
     EXPECT_DOUBLE_EQ(0, aFilter.helixFit().second[0]);
-    EXPECT_DOUBLE_EQ(aFilter.calcPt(), aFilter.helixFit().second[1]);     // pt*PVector, the unit vector in (x,y); which is (0,1) in our case.
+    EXPECT_DOUBLE_EQ(aFilter.calcPt(),
+                     aFilter.helixFit().second[1]);     // pt*PVector, the unit vector in (x,y); which is (0,1) in our case.
     EXPECT_DOUBLE_EQ(-aFilter.calcPt(2. / M_PI), aFilter.helixFit().second[2]); // pz = pt / tan (Theta)
     //on the unit circle, the s-distance from hit (0,0) to (1,1) is Pi/2. The z distance is 1. -> Theta = Atan (Pi/2)
 
@@ -820,7 +825,8 @@ namespace Belle2 {
     EXPECT_LT(0, aFilter.circleFit(pocaPtPhi, pocaR, curvature));       // Returns Chi^2
 
     /** v5 */
-    hit31.hitPosition = TVector3(-1., 1., 0.);    hit31.hitSigma = TVector3(.1, .1, .1); // hits 1 2 3 4 ... circle: m=(-3,4), r=2*sqrt(2)
+    hit31.hitPosition = TVector3(-1., 1., 0.);
+    hit31.hitSigma = TVector3(.1, .1, .1); // hits 1 2 3 4 ... circle: m=(-3,4), r=2*sqrt(2)
     hit32.hitPosition = TVector3(2 * sqrt(2) - 3, 3, 1.); hit32.hitSigma = TVector3(.1, .1, .1);
     hit33.hitPosition = TVector3(-1., 5., 2.);   hit33.hitSigma = TVector3(.1, .1, .1);
     hit34.hitPosition = TVector3(-3., 2 * sqrt(2) + 3, 3.); hit34.hitSigma = TVector3(.1, .1, .1);
@@ -864,7 +870,8 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(-2 * sqrt(2), 1. / curvature);
 
     EXPECT_FLOAT_EQ(2 * sqrt(2), aFilter.helixFit().first);     //why is it less precise with hits in the other order. (?)
-    EXPECT_FLOAT_EQ(aFilter.calcPt(2), aFilter.helixFit().second[0]);     //= aFilter.calcPt(2*sqrt(2)) /sqrt(2), where r=2*sqrt(2) and 1/sqrt(2) comes from the norm
+    EXPECT_FLOAT_EQ(aFilter.calcPt(2),
+                    aFilter.helixFit().second[0]);     //= aFilter.calcPt(2*sqrt(2)) /sqrt(2), where r=2*sqrt(2) and 1/sqrt(2) comes from the norm
     EXPECT_FLOAT_EQ(aFilter.calcPt(2), aFilter.helixFit().second[1]);
 //     //   sthg is wrong here. factor rho=radius missing.
 //     EXPECT_FLOAT_EQ(-aFilter.calcPt(1.)*sqrt(2)/M_PI, aFilter.helixFit().second[2]); // pz = pt / tan (Theta)
@@ -907,7 +914,8 @@ namespace Belle2 {
 
     B2INFO("Test: right circle, decreasing" << "pocaR " << pocaR << " pocaPtPhi " << pocaPtPhi << ", curvature " << curvature);
 
-    hit51.hitPosition = TVector3(-1., 0., 0.);  hit51.hitSigma = TVector3(.1, .1, .1); //hits 1 2 3 = circle with radius 2 and m=(1,0) in (x,y)
+    hit51.hitPosition = TVector3(-1., 0., 0.);
+    hit51.hitSigma = TVector3(.1, .1, .1); //hits 1 2 3 = circle with radius 2 and m=(1,0) in (x,y)
     hit52.hitPosition = TVector3(1., 2., 1.); hit52.hitSigma = TVector3(.1, .1, .1);
     hit53.hitPosition = TVector3(3., 0., 2.); hit53.hitSigma = TVector3(.1, .1, .1);
 
@@ -931,7 +939,8 @@ namespace Belle2 {
     EXPECT_NEAR(0, aFilter.circleFit(pocaPtPhi, pocaR, curvature), somewherenear);  // Returns Chi^2
 //     B2WARNING("circle with radius 2 and m=(1,0) counterclockwise " << "ClapR " <<pocaR << " ClapPhi " << pocaPtPhi << ", Radius " << radius );
 
-    hit51.hitPosition = TVector3(1., 0., 0.); hit51.hitSigma = TVector3(.1, .1, .1); //hits 1 2 3 = circle with radius 2 and m=(3,0) in (x,y)
+    hit51.hitPosition = TVector3(1., 0., 0.);
+    hit51.hitSigma = TVector3(.1, .1, .1); //hits 1 2 3 = circle with radius 2 and m=(3,0) in (x,y)
     hit52.hitPosition = TVector3(3., 2., 1.); hit52.hitSigma = TVector3(.1, .1, .1);
     hit53.hitPosition = TVector3(5., 0., 2.); hit53.hitSigma = TVector3(.1, .1, .1);
 
@@ -955,7 +964,8 @@ namespace Belle2 {
     EXPECT_NEAR(0, aFilter.circleFit(pocaPtPhi, pocaR, curvature), somewherenear);  // Returns Chi^2
 //     B2WARNING("circle with radius 2 and m=(3,0) counterclockwise " << "ClapR " <<pocaR << " ClapPhi " << pocaPtPhi << ", Radius " << radius );
 
-    hit51.hitPosition = TVector3(-5., 0., 0.);  hit51.hitSigma = TVector3(.1, .1, .1); //hits 1 2 3 = circle with radius 2 and m=(-3,0) in (x,y)
+    hit51.hitPosition = TVector3(-5., 0., 0.);
+    hit51.hitSigma = TVector3(.1, .1, .1); //hits 1 2 3 = circle with radius 2 and m=(-3,0) in (x,y)
     hit52.hitPosition = TVector3(-3., 2., 1.);  hit52.hitSigma = TVector3(.1, .1, .1);
     hit53.hitPosition = TVector3(-1., 0., 2.);  hit53.hitSigma = TVector3(.1, .1, .1);
 
@@ -981,7 +991,8 @@ namespace Belle2 {
 
     /** Circle Fit produces nan <-> m= (0,0) */
     B2WARNING("Circle Fit produces nan <-> m= (0,0)");    //TODO decide if m= (0,0) can happen in any real life situation -- probably not.
-    hit51.hitPosition = TVector3(-1., 0., 0.);  hit51.hitSigma = TVector3(.1, .1, .1); //hits 1 2 3 = circle with radius 1 and m=(0,0) in (x,y)
+    hit51.hitPosition = TVector3(-1., 0., 0.);
+    hit51.hitSigma = TVector3(.1, .1, .1); //hits 1 2 3 = circle with radius 1 and m=(0,0) in (x,y)
     hit52.hitPosition = TVector3(0., 1., 1.); hit52.hitSigma = TVector3(.1, .1, .1);
     hit53.hitPosition = TVector3(1., 0., 2.); hit53.hitSigma = TVector3(.1, .1, .1);
 
@@ -1059,7 +1070,9 @@ namespace Belle2 {
     double slope1to4Y = 1.1, slope5to8Y = 0.1, slope9to13Y = 85,
            intercept1to4Y = 0.1, intercept5to8Y = -3, intercept9to13Y = 10,
            slope1to4Z = 3, slope5to8Z = 42, slope9to13Z = 0.5,
-           intercept1to4Z = 0, intercept5to8Z = 23, intercept9to13Z = -2; // 1to4, 5to8 and 9to13 are all using line1-4, using different 3D-lines for testing the same setup subsequently
+           intercept1to4Z = 0, intercept5to8Z = 23,
+           intercept9to13Z =
+             -2; // 1to4, 5to8 and 9to13 are all using line1-4, using different 3D-lines for testing the same setup subsequently
 
     // now storing values in an array for fast access (upper lines are simply for better readability)
     std::array<double, 6> parametersY { { slope1to4Y, slope5to8Y, slope9to13Y, intercept1to4Y, intercept5to8Y, intercept9to13Y } };
@@ -1077,7 +1090,8 @@ namespace Belle2 {
     // doing  small lambdas for better readability: calcVal, clearVecs and fillValues
     auto calcVal = [&](bool useY) -> double { /// c++11 lambda function...
       double val = 0;
-      if (useY == true) {
+      if (useY == true)
+      {
         val = xVal * parametersY.at(testCase) + parametersY.at(testCase + 3); // y=a*x+b
         val = gRandom->Gaus(val, sigmaY);
       } else { // -> useZ
@@ -1164,7 +1178,8 @@ namespace Belle2 {
       EXPECT_NEAR(parametersZ.at(testCase), estFitParams.at(2), 0.5);
       EXPECT_NEAR(parametersY.at(testCase + 3), estFitParams.at(1), 0.5);
       EXPECT_NEAR(parametersZ.at(testCase + 3), estFitParams.at(3), 0.5);
-      EXPECT_NEAR(parametersY[testCase], estFitParams[0], 0.05 * (1. + abs(parametersY[testCase]))); // accepting deviation of 5% plus, for small paramters + 0.05, since 0.05*0=0
+      EXPECT_NEAR(parametersY[testCase], estFitParams[0],
+                  0.05 * (1. + abs(parametersY[testCase]))); // accepting deviation of 5% plus, for small paramters + 0.05, since 0.05*0=0
       EXPECT_NEAR(parametersZ[testCase], estFitParams[2], 0.05 * (1. + abs(parametersZ[testCase])));
       EXPECT_NEAR(parametersY[testCase + 3], estFitParams[1], 0.05 * (1. + abs(parametersY[testCase + 3])));
       EXPECT_NEAR(parametersZ[testCase + 3], estFitParams[3], 0.05 * (1. + abs(parametersZ[testCase + 3])));
@@ -1180,7 +1195,8 @@ namespace Belle2 {
       EXPECT_NEAR(parametersY.at(testCase), estFitParams.at(2), 0.5);
       EXPECT_NEAR(parametersZ.at(testCase + 3), estFitParams.at(1), 0.5);
       EXPECT_NEAR(parametersY.at(testCase + 3), estFitParams.at(3), 0.5);
-      EXPECT_NEAR(parametersZ[testCase], estFitParams[0], 0.05 * (1. + abs(parametersY[testCase]))); // accepting deviation of 5% plus, for small paramters + 0.05, since 0.05*0=0
+      EXPECT_NEAR(parametersZ[testCase], estFitParams[0],
+                  0.05 * (1. + abs(parametersY[testCase]))); // accepting deviation of 5% plus, for small paramters + 0.05, since 0.05*0=0
       EXPECT_NEAR(parametersY[testCase], estFitParams[2], 0.05 * (1. + abs(parametersZ[testCase])));
       EXPECT_NEAR(parametersZ[testCase + 3], estFitParams[1], 0.05 * (1. + abs(parametersY[testCase + 3])));
       EXPECT_NEAR(parametersY[testCase + 3], estFitParams[3], 0.05 * (1. + abs(parametersZ[testCase + 3])));
@@ -1257,7 +1273,8 @@ namespace Belle2 {
     hit1, hit2, hit3, hit4,
           hit5, hit6, hit7;
 
-    hit1.hitPosition = TVector3(3.00001, -1.9999, 0.);  hit1.hitSigma = TVector3(.01, .01, .01); //near perfect circle with m= (3,1), r=3
+    hit1.hitPosition = TVector3(3.00001, -1.9999, 0.);
+    hit1.hitSigma = TVector3(.01, .01, .01); //near perfect circle with m= (3,1), r=3
     hit2.hitPosition = TVector3(-0.00001, 1.00001, 0.); hit2.hitSigma = TVector3(.01, .01, .01);
     hit3.hitPosition = TVector3(3 * (1 - 1 / sqrt(2)), (1 + 3. / sqrt(2)), 0.); hit3.hitSigma = TVector3(.01, .01, .01);
     hit4.hitPosition = TVector3(2.999998, 3.999999, 0.);  hit4.hitSigma = TVector3(.01, .01, .01);
@@ -1291,7 +1308,8 @@ namespace Belle2 {
     aFilter.resetValues(&v1);
     EXPECT_NEAR(-aFilter.calcPt(), aFilter.helixFit().second[0], somewherenear);
     aFilter.resetValues(&v1);
-    EXPECT_NEAR(0, aFilter.helixFit().second[1], somewherenear); // at the point where we want to calculate the Momentum vector, the vector points parallel to the x-axis
+    EXPECT_NEAR(0, aFilter.helixFit().second[1],
+                somewherenear); // at the point where we want to calculate the Momentum vector, the vector points parallel to the x-axis
 
     aFilter.resetValues(&v1);
     EXPECT_NEAR(0, aFilter.helixFit().second[1], somewherenear);
@@ -1347,7 +1365,8 @@ namespace Belle2 {
     EXPECT_NEAR(aFilter.calcPt(3), resultsReverse.second.Mag(), somewherenear);
     EXPECT_NEAR(aFilter.calcPt(3), resultsReverse.second.Perp(), somewherenear);
     EXPECT_NEAR(aFilter.calcPt(3), resultsReverse.second[0], somewherenear);
-    B2WARNING("resultsReverse pt: X/Y/Z: " << resultsReverse.second[0] << "/" << resultsReverse.second[1] << "/" << resultsReverse.second[2])
+    B2WARNING("resultsReverse pt: X/Y/Z: " << resultsReverse.second[0] << "/" << resultsReverse.second[1] << "/" <<
+              resultsReverse.second[2])
 //    The difference between aFilter.calcPt(3) and results.second.X() is 0.0074555377781446441, which exceeds somewherenear, where
 // aFilter.calcPt(3) evaluates to 0.013486950000000001,
 // results.second.X() evaluates to 0.0060314122218553569, and
@@ -1481,7 +1500,8 @@ namespace Belle2 {
 
 
     /**< WARNING Main test function: test the trackletFilters-results */
-    auto testStuff = [&](pair<vector<PositionInfo*>, TrackletFilters>& aQuadrantFilterCombi, CircleCollection & aCircle) { /// c++11 lambda function...
+    auto testStuff = [&](pair<vector<PositionInfo*>, TrackletFilters>& aQuadrantFilterCombi,
+    CircleCollection & aCircle) { /// c++11 lambda function...
       aQuadrantFilterCombi.second.resetValues(&aQuadrantFilterCombi.first);
       EXPECT_THROW(aQuadrantFilterCombi.second.calcPt(near), FilterExceptions::Circle_too_small);
 
@@ -1597,9 +1617,9 @@ namespace Belle2 {
     }
 
     // safety check to be sure that filling went okay
-    for (const auto & aCircle : allCircles) {
-      for (const auto & aQuadrant : aCircle.myQuadrantsAndFilters) {
-        for (const auto & aHit : aQuadrant.first) {
+    for (const auto& aCircle : allCircles) {
+      for (const auto& aQuadrant : aCircle.myQuadrantsAndFilters) {
+        for (const auto& aHit : aQuadrant.first) {
           EXPECT_EQ(sigmaVec, aHit->hitSigma);
         }
       }
@@ -1620,8 +1640,8 @@ namespace Belle2 {
 
     // execute the tests defined in testStuff:
     uint countCircles = 0, countQuadrants = 0;
-    for (auto & aCircle : allCircles) {
-      for (auto & aQuadrantFilterCombi : aCircle.myQuadrantsAndFilters) {
+    for (auto& aCircle : allCircles) {
+      for (auto& aQuadrantFilterCombi : aCircle.myQuadrantsAndFilters) {
         /// activate the following warning to be able to distinguish between the results (only feasible for debugging):
         B2INFO(" circle: " << countCircles << ", quadrant: " << countQuadrants)
 
@@ -1633,8 +1653,8 @@ namespace Belle2 {
       ++countCircles;
     }
 
-    for (auto & aCircle : allReversedCircles) {
-      for (auto & aQuadrantFilterCombi : aCircle.myQuadrantsAndFilters) {
+    for (auto& aCircle : allReversedCircles) {
+      for (auto& aQuadrantFilterCombi : aCircle.myQuadrantsAndFilters) {
         /// activate the following warning to be able to distinguish between the results (only feasible for debugging):
         B2INFO("reversed circle: " << countCircles << ", quadrant: " << countQuadrants)
 
@@ -1660,9 +1680,9 @@ namespace Belle2 {
 //    EXPECT_NEAR(POCA12.Phi() + M_PI*0.5, phiVal, somewherenear); // estimated phi of pT vector at pocaR
 
     // final cleanup
-    for (auto & aCircle : allCircles) {
-      for (auto & aQuadrant : aCircle.myQuadrantsAndFilters) {
-        for (auto & aHit : aQuadrant.first) {
+    for (auto& aCircle : allCircles) {
+      for (auto& aQuadrant : aCircle.myQuadrantsAndFilters) {
+        for (auto& aHit : aQuadrant.first) {
           delete aHit;
         }
         aQuadrant.first.clear();

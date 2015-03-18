@@ -111,7 +111,8 @@ namespace VXDTFObserversTest {
   protected:
 
     /** prepare related storearrays of SpacePoints, SVD- and PXDClusters and MCParticles */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       spacePointData.registerInDataStore();
       pxdClusterData.registerInDataStore();
       svdClusterData.registerInDataStore();
@@ -168,13 +169,15 @@ namespace VXDTFObserversTest {
         newSP->addRelationTo(clusterV);
       }
 
-      B2INFO("ObserversTest:SetUP: created " << mcParticleData.getEntries() << "/" << pxdClusterData.getEntries() << "/" << svdClusterData.getEntries() << "/" << spacePointData.getEntries() << " mcParticles/pxdClusters/svdClusters/SpacePoints")
+      B2INFO("ObserversTest:SetUP: created " << mcParticleData.getEntries() << "/" << pxdClusterData.getEntries() << "/" <<
+             svdClusterData.getEntries() << "/" << spacePointData.getEntries() << " mcParticles/pxdClusters/svdClusters/SpacePoints")
     }
 
 
 
     /** clear datastore */
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
       DataStore::Instance().reset();
     }
 
@@ -199,7 +202,8 @@ namespace VXDTFObserversTest {
     static unsigned int wasNan; /**< count number of times result was nan */
     counter() {};
     ~counter() {};
-    static void resetCounter() {
+    static void resetCounter()
+    {
       counter<T>::used = 0;
       counter<T>::accepted = 0;
       counter<T>::rejected = 0;
@@ -231,7 +235,8 @@ namespace VXDTFObserversTest {
     struct AcceptRejectPair {
       AcceptRejectPair() : accept(0), reject(0) {}
 
-      void Increase(bool accepted) {
+      void Increase(bool accepted)
+      {
         if (accepted) {
           accept += 1;
         } else {
@@ -253,7 +258,8 @@ namespace VXDTFObserversTest {
 
 
     /** cleans a container of double entries */
-    template<class ContainerType> static void uniqueIdentifier(ContainerType& particles) {
+    template<class ContainerType> static void uniqueIdentifier(ContainerType& particles)
+    {
       std::sort(particles.begin(), particles.end());
       auto newEndIterator = std::unique(particles.begin(), particles.end());
       particles.resize(std::distance(particles.begin(), newEndIterator));
@@ -261,7 +267,8 @@ namespace VXDTFObserversTest {
 
 
     /** accepts a key (first parameter) and if given key was accepted by the filter (second parameter) */
-    bool IncreaseCounter(Key& aKey, bool accepted) {
+    bool IncreaseCounter(Key& aKey, bool accepted)
+    {
       bool keyAlreadyExisted = true;
       auto foundPos = m_container.find(aKey);
       if (foundPos == m_container.end())  {
@@ -278,7 +285,8 @@ namespace VXDTFObserversTest {
 
 
     /** for given key, the function returns the result found. If key was not found in container, a AcceptRejectPair with 0, 0 is returned */
-    AcceptRejectPair ReturnResult(const Key& givenKey) {
+    AcceptRejectPair ReturnResult(const Key& givenKey)
+    {
 
       auto foundPos =  m_container.find(givenKey);
 
@@ -292,9 +300,11 @@ namespace VXDTFObserversTest {
 
 
     /** for given key, the function returns the result found. If key was not found in container, a AcceptRejectPair with 0, 0 is returned */
-    AcceptRejectPair ReturnResult(const Particles& givenKey) {
-      for (const auto & aKey : m_container) {
-        B2DEBUG(100, "comparing given particles: " << vec2str(givenKey) << " with entry: " << vec2str(aKey.first.second) << " with result " << (aKey.first.second == givenKey))
+    AcceptRejectPair ReturnResult(const Particles& givenKey)
+    {
+      for (const auto& aKey : m_container) {
+        B2DEBUG(100, "comparing given particles: " << vec2str(givenKey) << " with entry: " << vec2str(
+                  aKey.first.second) << " with result " << (aKey.first.second == givenKey))
         if (aKey.first.second == givenKey) { return aKey.second; }
       }
 
@@ -304,8 +314,9 @@ namespace VXDTFObserversTest {
 
 
     /** for easy printing of results collected so far */
-    void PrintResults(string identifier = "unknown") {
-      for (auto & entry : m_container) {
+    void PrintResults(string identifier = "unknown")
+    {
+      for (auto& entry : m_container) {
         B2WARNING(" for " << identifier << "-combination: " <<
                   key2str(entry.first) <<
                   ", combi was accepted/rejected: " <<
@@ -318,13 +329,15 @@ namespace VXDTFObserversTest {
 
 
     /** small helper for easily printing vectors */
-    static std::string key2str(const Key& aKey) {
+    static std::string key2str(const Key& aKey)
+    {
       return key2str(&aKey);
     }
 
 
     /** small helper for easily printing vectors */
-    static std::string key2str(const Key* aKey) {
+    static std::string key2str(const Key* aKey)
+    {
       string output;
 
       if (aKey->first == true) { output += "GoodCombi: "; }
@@ -337,10 +350,11 @@ namespace VXDTFObserversTest {
 
 
     /** small helper for easily printing vectors */
-    template<class Type> static std::string vec2str(const vector<Type>& vec) {
+    template<class Type> static std::string vec2str(const vector<Type>& vec)
+    {
       string output;
 
-      for (const auto & entry : vec) {
+      for (const auto& entry : vec) {
         output += " " + std::to_string(entry);
       }
 
@@ -356,11 +370,14 @@ namespace VXDTFObserversTest {
   template < class T>
   class counterMC {
   public:
-    static CountContainer pdGacceptedRejected; /** map for pdgCodes (key: vector of pdgCodes found for given hits, sorted) storing how often it was accepted/rejected  value.first/value.second */
-    static CountContainer mcIDacceptedRejected; /** map for mcParticleIDs (key, vector of mcParticleIDs (pair: first: true, if combination was from the same particle which was primary, found for given hits, sorted), storing how often it was accepted/rejected value.first/value.second */
+    static CountContainer
+    pdGacceptedRejected; /** map for pdgCodes (key: vector of pdgCodes found for given hits, sorted) storing how often it was accepted/rejected  value.first/value.second */
+    static CountContainer
+    mcIDacceptedRejected; /** map for mcParticleIDs (key, vector of mcParticleIDs (pair: first: true, if combination was from the same particle which was primary, found for given hits, sorted), storing how often it was accepted/rejected value.first/value.second */
     counterMC() {};
     ~counterMC() {};
-    static void resetCounter() {
+    static void resetCounter()
+    {
       counterMC<T>::pdGacceptedRejected.clear();
       counterMC<T>::mcIDacceptedRejected.clear();
     }
@@ -375,8 +392,10 @@ namespace VXDTFObserversTest {
   template<class T> unsigned int counter<T>::wasInf(0);
   template<class T> unsigned int counter<T>::wasNan(0);
 
-  template<class T> CountContainer counterMC< T >::pdGacceptedRejected = CountContainer(); /**< counts nCases accepted/rejected for each pdgCode-combination occured */
-  template<class T> CountContainer counterMC< T >::mcIDacceptedRejected = CountContainer(); /**< counts nCases accepted/rejected for each particleID-combination occured */
+  template<class T> CountContainer counterMC< T >::pdGacceptedRejected =
+    CountContainer(); /**< counts nCases accepted/rejected for each pdgCode-combination occured */
+  template<class T> CountContainer counterMC< T >::mcIDacceptedRejected =
+    CountContainer(); /**< counts nCases accepted/rejected for each particleID-combination occured */
 
 
 
@@ -387,8 +406,9 @@ namespace VXDTFObserversTest {
   public:
     /** notifier counting how often a SelectionVariable was used */
     template<class Var, typename ... otherTypes>
-    static void notify(const Var& ,
-                       otherTypes ...) {
+    static void notify(const Var&,
+                       otherTypes ...)
+    {
       counter<Var>::used ++ ;
     }
   };
@@ -406,7 +426,8 @@ namespace VXDTFObserversTest {
                        typename Var::variableType fResult,
                        const typename Var::argumentType&,
                        const typename Var::argumentType&,
-                       const RangeType& range) {
+                       const RangeType& range)
+    {
       if (range.contains(fResult)) {
         counter<Var>::accepted ++;
       } else {
@@ -426,7 +447,8 @@ namespace VXDTFObserversTest {
     template<class Var, typename ... otherTypes>
     static void notify(const Var&,
                        typename Var::variableType fResult,
-                       otherTypes ...) {
+                       otherTypes ...)
+    {
       if (std::isinf(fResult)) {
         counter<Var>::wasInf ++;
       } else if (std::isnan(fResult)) {
@@ -448,7 +470,8 @@ namespace VXDTFObserversTest {
                        typename Var::variableType fResult,
                        const typename Var::argumentType& outerHit,
                        const typename Var::argumentType& innerHit,
-                       const RangeType& range) {
+                       const RangeType& range)
+    {
 
       stringstream outputStream;
       outputStream << filterType.name()
@@ -490,11 +513,12 @@ namespace VXDTFObserversTest {
 
     /** notifier producing a info message if SelectionVariable was accepted and a Warning if otherwise */
     template<class Var, class RangeType>
-    static void notify(const Var& ,
+    static void notify(const Var&,
                        typename Var::variableType fResult,
                        const typename Var::argumentType& outerHit,
                        const typename Var::argumentType& innerHit,
-                       const RangeType& range) {
+                       const RangeType& range)
+    {
 
       // we use the pdgCodes of the particles as identifier (not unique, since more than one primary particle can have the same PDG-code) and count their acceptance rate:
       CountContainer::Key myPDGs = createKey(outerHit, innerHit, true);
@@ -519,13 +543,14 @@ namespace VXDTFObserversTest {
     * second parameter is the vector for collecting the PDGcodes found.
     * */
     template <class hitType>
-    static void collectPDGs(const hitType& aHit, vector< pair< bool, int> >& collectedPDGs) {
+    static void collectPDGs(const hitType& aHit, vector< pair< bool, int> >& collectedPDGs)
+    {
 
       std::vector<const MCParticle*> collectedParticles;
 
       collectMCParticles(aHit, collectedParticles);
 
-      for (const MCParticle * aParticle : collectedParticles) {
+      for (const MCParticle* aParticle : collectedParticles) {
         collectedPDGs.push_back({aParticle->hasStatus(MCParticle::c_PrimaryParticle), aParticle->getPDG()});
       }
     }
@@ -540,20 +565,22 @@ namespace VXDTFObserversTest {
     * second parameter is the vector for collecting the PDGcodes found.
     * */
     template <class hitType>
-    static void collectParticleIDs(const hitType& aHit, vector< pair< bool, int> >& collectedIDS) {
+    static void collectParticleIDs(const hitType& aHit, vector< pair< bool, int> >& collectedIDS)
+    {
 
       std::vector<const MCParticle*> collectedParticles;
 
       collectMCParticles(aHit, collectedParticles);
 
-      for (const MCParticle * aParticle : collectedParticles) {
+      for (const MCParticle* aParticle : collectedParticles) {
         collectedIDS.push_back({aParticle->hasStatus(MCParticle::c_PrimaryParticle), aParticle->getIndex()});
       }
     }
 
     /** for two hits given, a key for the CountContainer is returned. if usePDG == true, PDGcode will be used as identifyer, if false, the ParticleID will be used */
     template <class hitType>
-    static CountContainer::Key createKey(const hitType& hitA, const hitType& hitB, bool usePDG) {
+    static CountContainer::Key createKey(const hitType& hitA, const hitType& hitB, bool usePDG)
+    {
       CountContainer::Key newKey;
 
       vector< pair< bool, int> > collectedIDS;
@@ -576,7 +603,7 @@ namespace VXDTFObserversTest {
 
       newKey.first = false;
 
-      for (auto & entry : collectedIDS) {
+      for (auto& entry : collectedIDS) {
         newKey.second.push_back(entry.second);
       }
 
@@ -592,18 +619,19 @@ namespace VXDTFObserversTest {
     * second parameter is the vector for collecting the PDGcodes found.
     * */
     template <class hitType>
-    static void collectMCParticles(const hitType& aHit, std::vector<const MCParticle*>& collectedParticles) {
+    static void collectMCParticles(const hitType& aHit, std::vector<const MCParticle*>& collectedParticles)
+    {
       RelationVector<PXDCluster> relatedToPXDClusters = aHit.template getRelationsTo<PXDCluster>();
       RelationVector<SVDCluster> relatedToSVDClusters = aHit.template getRelationsTo<SVDCluster>();
 
-      for (const PXDCluster & aCluster : relatedToPXDClusters) {
-        for (const MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
+      for (const PXDCluster& aCluster : relatedToPXDClusters) {
+        for (const MCParticle& aParticle : aCluster.getRelationsTo<MCParticle>()) {
           collectedParticles.push_back(&aParticle);
         }
       }
 
-      for (const SVDCluster & aCluster : relatedToSVDClusters) {
-        for (const MCParticle & aParticle : aCluster.getRelationsTo<MCParticle>()) {
+      for (const SVDCluster& aCluster : relatedToSVDClusters) {
+        for (const MCParticle& aParticle : aCluster.getRelationsTo<MCParticle>()) {
           collectedParticles.push_back(&aParticle);
         }
       }
@@ -612,10 +640,11 @@ namespace VXDTFObserversTest {
 
 
     /** small helper for easily printing vectors */
-    template<class Type> static std::string vec2str(const vector<Type>& vec) {
+    template<class Type> static std::string vec2str(const vector<Type>& vec)
+    {
       string output;
 
-      for (const auto & entry : vec) {
+      for (const auto& entry : vec) {
         output += " " + std::to_string(entry);
       }
 
@@ -632,7 +661,8 @@ namespace VXDTFObserversTest {
                        typename Var::variableType fResult,
                        const typename Var::argumentType& outerHit,
                        const typename Var::argumentType& innerHit,
-                       const RangeType& range) {
+                       const RangeType& range)
+    {
       CountUsedObserver::notify(filterType);
       CountAcceptRejectObserver::notify(filterType, fResult, outerHit, innerHit, range);
       CountBadCaseObserver::notify(filterType, fResult, outerHit, innerHit);
@@ -662,10 +692,12 @@ namespace VXDTFObserversTest {
   public:
 
     /** a typedef to make the stuff more readable */
-    typedef std::function< void (const FilterType&, typename FilterType::variableType, const typename FilterType::argumentType&, const typename FilterType::argumentType&)> observerFunction;
+    typedef std::function< void (const FilterType&, typename FilterType::variableType, const typename FilterType::argumentType&, const typename FilterType::argumentType&)>
+    observerFunction;
 
     /** a typedef to make the c-style pointer more readable (can not be done with classic typedef) */
-    using CStyleFunctionPointer = void(*)(const typename FilterType::argumentType&, const typename FilterType::argumentType&, const FilterType&, typename FilterType::variableType) ;
+    using CStyleFunctionPointer = void(*)(const typename FilterType::argumentType&, const typename FilterType::argumentType&,
+                                          const FilterType&, typename FilterType::variableType) ;
 
     /** iterate over all stored Observers and execute their notify-function */
     template<typename ... otherTypes>
@@ -673,9 +705,14 @@ namespace VXDTFObserversTest {
                        typename FilterType::variableType filterResult,
                        const typename FilterType::argumentType& outerHit,
                        const typename FilterType::argumentType& innerHit,
-                       otherTypes ...) {
-      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" << innerHit.getPosition().Mag() << " got result of " << filterResult << " and Observer-Vector sm_collectedObservers got " << VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected")
-      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" << innerHit.getPosition().Mag() << " got result of " << filterResult << " and Observer-Vector sm_collectedObserversCSTYLE got " << VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected")
+                       otherTypes ...)
+    {
+      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" <<
+             innerHit.getPosition().Mag() << " got result of " << filterResult << " and Observer-Vector sm_collectedObservers got " <<
+             VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected")
+      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" <<
+             innerHit.getPosition().Mag() << " got result of " << filterResult << " and Observer-Vector sm_collectedObserversCSTYLE got " <<
+             VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected")
 
       /// the idea of the following three lines have to work in the end (I basically want to loop over all attached observers and execute their notify function):
       //    for(auto& anObserver : CollectedObservers<FilterType>::collectedObservers) {
@@ -688,8 +725,10 @@ namespace VXDTFObserversTest {
 
     /** collects observers to be executed during notify (can not be used so far, but is long-term goal) */
     template <typename ObserverType>
-    static void addObserver(observerFunction newObserver) {
-      VectorOfObservers<FilterType>::sm_collectedObservers.push_back(std::bind(&newObserver, std::placeholders::_1, std::placeholders::_2, FilterType(), std::placeholders::_3));
+    static void addObserver(observerFunction newObserver)
+    {
+      VectorOfObservers<FilterType>::sm_collectedObservers.push_back(std::bind(&newObserver, std::placeholders::_1, std::placeholders::_2,
+          FilterType(), std::placeholders::_3));
     }
 
 
@@ -705,9 +744,11 @@ namespace VXDTFObserversTest {
 
 
   /** initialize static member of variant A*/
-  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::observerFunction > VectorOfObservers<FilterType>::sm_collectedObservers  = {};
+  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::observerFunction >
+  VectorOfObservers<FilterType>::sm_collectedObservers  = {};
   /** initialize static member of variant B*/
-  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::CStyleFunctionPointer > VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE  = {};
+  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::CStyleFunctionPointer >
+  VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE  = {};
   /** initialize static member of variant Try2*/
 //   template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::CStyleFunctionPointer > VectorOfObservers<FilterType>::sm_collectedObserversTry2  = {};
 
@@ -720,10 +761,10 @@ namespace VXDTFObserversTest {
   {
     EXPECT_EQ(6, spacePointData.getEntries());
 
-    for (SpacePoint & aSP : spacePointData) {
+    for (SpacePoint& aSP : spacePointData) {
       unsigned nullptrTrap = 0;
       RelationVector<PXDCluster> pxDClusters = aSP.getRelationsTo<PXDCluster>();
-      for (PXDCluster & aCluster : pxDClusters) {
+      for (PXDCluster& aCluster : pxDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
         if (aParticle == NULL) { nullptrTrap = 1; }
         EXPECT_EQ(0, nullptrTrap);
@@ -738,7 +779,7 @@ namespace VXDTFObserversTest {
       }
 
       RelationVector<SVDCluster> svDClusters = aSP.getRelationsTo<SVDCluster>();
-      for (SVDCluster & aCluster : svDClusters) {
+      for (SVDCluster& aCluster : svDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
         if (aParticle == NULL) { nullptrTrap = 2; }
         EXPECT_EQ(0, nullptrTrap);
@@ -765,12 +806,14 @@ namespace VXDTFObserversTest {
   TEST_F(ObserversTest, TestMCDataAccess)
   {
     Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > unobservedFilter(Range<float, float>(2.5, 3.5));
-    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilter(unobservedFilter);
+    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilter(
+      unobservedFilter);
 
     for (int i = 1 ; i < spacePointData.getEntries(); i++) {
       SpacePoint& spA = *spacePointData[i];
       SpacePoint& spB = *spacePointData[i - 1];
-      B2DEBUG(10, "spData-Sps got arraIndices: " << spacePointData[i]->getArrayIndex() << "/" << spacePointData[i - 1]->getArrayIndex() << " and VxdIDs " << spacePointData[i]->getVxdID() << "/" << spacePointData[i - 1]->getVxdID())
+      B2DEBUG(10, "spData-Sps got arraIndices: " << spacePointData[i]->getArrayIndex() << "/" << spacePointData[i - 1]->getArrayIndex() <<
+              " and VxdIDs " << spacePointData[i]->getVxdID() << "/" << spacePointData[i - 1]->getVxdID())
       observedFilter.accept(spA, spB);
     }
 
@@ -803,7 +846,8 @@ namespace VXDTFObserversTest {
 
     // now we set the filter using values which are too strict
     Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > unobservedFilterStrict(Range<float, float>(3.1, 3.5));
-    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilterStrict(unobservedFilterStrict);
+    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilterStrict(
+      unobservedFilterStrict);
 
     for (int i = 1 ; i < spacePointData.getEntries(); i++) {
       SpacePoint& spA = *spacePointData[i];
@@ -856,7 +900,8 @@ namespace VXDTFObserversTest {
     //  VectorOfObservers<Distance3DSquared>::sm_collectedObservers.push_back(storeFuncVariantA);
 
     /// variant B:
-    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint>>::CStyleFunctionPointer) &CountUsedObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(), std::placeholders::_3);
+    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint>>::CStyleFunctionPointer)
+                                        &CountUsedObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(), std::placeholders::_3);
 
     char* realname(NULL);
     int status(0);

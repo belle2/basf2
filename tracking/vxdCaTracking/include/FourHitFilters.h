@@ -43,7 +43,8 @@ namespace Belle2 {
     ~FourHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner) {
+    void resetValues(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner)
+    {
       m_hitA = outer;
       m_hitB = outerCenter;
       m_hitC = innerCenter;
@@ -74,7 +75,8 @@ namespace Belle2 {
   protected:
 
     /** calculates an estimation of circleCenter position including an estimation for the circle radius */
-    void calcCircle() {
+    void calcCircle()
+    {
       m_threeHitFilter.calcCircleCenter(m_hitA, m_hitB, m_hitC, m_centerABC);
       m_radiusABC = m_threeHitFilter.calcRadius(m_hitA, m_hitB, m_hitC, m_centerABC);
       m_threeHitFilter.calcCircleCenter(m_hitB, m_hitC, m_hitD, m_centerBCD);

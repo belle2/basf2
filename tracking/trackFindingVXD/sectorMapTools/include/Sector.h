@@ -73,7 +73,8 @@ namespace Belle2 {
 
 
     /** overloaded assignment operator */
-    Sector& operator=(const Sector& aSector) {
+    Sector& operator=(const Sector& aSector)
+    {
       m_myActiveSector = aSector.getMyActiveSector();
       m_sectorID = aSector.getSecID();
       m_distance2Origin = aSector.getDistance();
@@ -83,21 +84,24 @@ namespace Belle2 {
 
 
     /** overloaded '<'-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
-    bool operator<(const Sector& b)  const {
+    bool operator<(const Sector& b)  const
+    {
       if (m_useDistance4sort == false) { return getSecID() < b.getSecID(); }
       return getDistance() < b.getDistance();
     }
 
 
     /** overloaded '=='-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
-    bool operator==(const Sector& b) const {
+    bool operator==(const Sector& b) const
+    {
       if (useDistance4sort() == false) { return getSecID() == b.getSecID(); }
       return getDistance() == b.getDistance();
     }
 
 
     /** overloaded '>'-operator for sorting algorithms - sorts by distance2origin or fullSecID depending on setting */
-    bool operator>(const Sector& b)  const {
+    bool operator>(const Sector& b)  const
+    {
       if (useDistance4sort() == false) { return getSecID() > b.getSecID(); }
       return getDistance() > b.getDistance();
     }

@@ -44,7 +44,8 @@ namespace Belle2 {
 
   public:
     /** this is a small helper function to create a sensorInfo to be used */
-    VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, float width = 1., float length = 1., float width2 = -1.) {
+    VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, float width = 1., float length = 1., float width2 = -1.)
+    {
       // (SensorType type, VxdID id, float width, float length, float thickness, int uCells, int vCells, float width2=-1, double splitLength=-1, int vCells2=0)
       VXD::SensorInfoBase sensorInfoBase(VXD::SensorInfoBase::PXD, aVxdID, width, length, 0.3, 2, 4, width2);
 

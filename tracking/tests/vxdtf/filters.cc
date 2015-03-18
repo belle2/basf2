@@ -30,7 +30,8 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance3D-filter */
   class SquaredDistance3D : public SelectionVariable< spacePoint , float > {
   public:
-    static float value(const spacePoint& p1, const spacePoint& p2) {
+    static float value(const spacePoint& p1, const spacePoint& p2)
+    {
       return
         pow(get<0>(p1) - get<0>(p2) , 2) +
         pow(get<1>(p1) - get<1>(p2) , 2) +
@@ -42,7 +43,8 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance2D-filter in XY */
   class SquaredDistance2Dxy : public SelectionVariable< spacePoint , float > {
   public:
-    static float value(const spacePoint& p1, const spacePoint& p2) {
+    static float value(const spacePoint& p1, const spacePoint& p2)
+    {
       return
         pow(get<0>(p1) - get<0>(p2) , 2) +
         pow(get<1>(p1) - get<1>(p2) , 2) ;
@@ -53,7 +55,8 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance1D-filter in X */
   class SquaredDistance1Dx : public SelectionVariable< spacePoint , float > {
   public:
-    static float value(const spacePoint& p1, const spacePoint& p2) {
+    static float value(const spacePoint& p1, const spacePoint& p2)
+    {
       return
         pow(get<0>(p1) - get<0>(p2) , 2);
     }
@@ -63,7 +66,8 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a filter which is compatible with boolean comparisons */
   class BooleanVariable : public SelectionVariable< spacePoint , bool > {
   public:
-    static float value(const spacePoint& p1, const spacePoint& p2) {
+    static float value(const spacePoint& p1, const spacePoint& p2)
+    {
       return
         get<0>(p1) - get<0>(p2) == 0.;
     }
@@ -95,8 +99,9 @@ namespace VXDTFfilterTest {
   class Observer : public VoidObserver {
   public:
     template<class Var, typename ... otherTypes>
-    static void notify(const Var& ,
-                       otherTypes ...) {
+    static void notify(const Var&,
+                       otherTypes ...)
+    {
       counter<Var>::N ++ ;
     }
 

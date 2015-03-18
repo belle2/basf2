@@ -71,21 +71,24 @@ namespace Belle2 {
 
 
     /** overloaded '=='-operator for sorting algorithms */
-    bool operator==(const TrackNode& b) const {
+    bool operator==(const TrackNode& b) const
+    {
       B2WARNING("somebody is using the '=='-operator of TrackNode, this should not be used at the moment!");
       return (getSpacePoint() == b.getSpacePoint());
     }
 
 
     /** overloaded '<'-operator for sorting algorithms */
-    bool operator<(const TrackNode& b) const {
+    bool operator<(const TrackNode& b) const
+    {
       B2WARNING("somebody is using the '=='-operator of TrackNode, this should not be used at the moment!");
       return (getFullSecID() < b.getFullSecID());
     }
 
 
     /** overloaded '>'-operator for sorting algorithms */
-    bool operator>(const TrackNode& b) const {
+    bool operator>(const TrackNode& b) const
+    {
       B2WARNING("somebody is using the '=='-operator of TrackNode, this should not be used at the moment!");
       return (getFullSecID() > b.getFullSecID());
     }
@@ -109,12 +112,13 @@ namespace Belle2 {
 
 
     /** returns number of segments alive connected to this hit (hits without attached segments are ignored during TF process) */
-    unsigned int getNumberOfSegmentsAlive() const {
+    unsigned int getNumberOfSegmentsAlive() const
+    {
       unsigned int foundAlive = 0;
-      for (auto * seg : m_attachedInnerSegments) {
+      for (auto* seg : m_attachedInnerSegments) {
         foundAlive += seg->getState() ? 1 : 0;
       }
-      for (auto * seg : m_attachedOuterSegments) {
+      for (auto* seg : m_attachedOuterSegments) {
         foundAlive += seg->getState() ? 1 : 0;
       }
       return foundAlive;
@@ -159,7 +163,8 @@ namespace Belle2 {
 
 
     /** decrease number of TCs using this hit */
-    inline void removeTrackCandidate() {
+    inline void removeTrackCandidate()
+    {
       if (m_attachedTrackCandidates == 0) {
         B2ERROR("TrackNode::removeTrackCandidate: can not have less than 0 track candidates! Value stays at 0...")
       } else {

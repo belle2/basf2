@@ -23,7 +23,8 @@ namespace Belle2 {
   /** bundles filter methods using 4 hits (using FourHitFilters-class). and compares with entries of sector min and max */
   class TcFourHitFilters : public FourHitFilters {
   public:
-    typedef std::pair <int, int> SuccessAndFailCounter; /**<  first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
+    typedef std::pair <int, int>
+    SuccessAndFailCounter; /**<  first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
 
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
@@ -36,8 +37,10 @@ namespace Belle2 {
 
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available, optional parameter sets strength of magnetic field (standard is 1.5T) */
-    TcFourHitFilters(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector, unsigned int friendID, double magneticFieldStrength = 1.5):
-      FourHitFilters(outer, outerCenter, innerCenter, inner, magneticFieldStrength),  // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
+    TcFourHitFilters(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector,
+                     unsigned int friendID, double magneticFieldStrength = 1.5):
+      FourHitFilters(outer, outerCenter, innerCenter, inner,
+                     magneticFieldStrength),  // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
       m_thisSector(thisSector),
       m_friendID(friendID),
       m_deltaPtCtr(std::make_pair(0, 0)),
@@ -49,7 +52,9 @@ namespace Belle2 {
 
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector, unsigned int friendID) {
+    void resetValues(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, VXDSector* thisSector,
+                     unsigned int friendID)
+    {
       FourHitFilters::resetValues(outer, outerCenter, innerCenter, inner); // resetValues of baseClass
       m_thisSector = thisSector;
       m_friendID = friendID;
@@ -126,12 +131,17 @@ namespace Belle2 {
 
   protected:
 
-    VXDSector* m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
+    VXDSector*
+    m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
     unsigned int m_friendID; /**< is a key used for determine the currently needed filterSet */
     SuccessAndFailCounter m_deltaPtCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltapT */
-    SuccessAndFailCounter m_deltaDistCircleCenterCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaDistCircleCenter */
-    SuccessAndFailCounter m_AlwaysTrue4HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says True */
-    SuccessAndFailCounter m_AlwaysFalse4HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says False */
-    SuccessAndFailCounter m_Random4HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which randomly throws True or False */
+    SuccessAndFailCounter
+    m_deltaDistCircleCenterCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaDistCircleCenter */
+    SuccessAndFailCounter
+    m_AlwaysTrue4HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says True */
+    SuccessAndFailCounter
+    m_AlwaysFalse4HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says False */
+    SuccessAndFailCounter
+    m_Random4HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which randomly throws True or False */
   }; //end class TcFourHitFilters
 } //end namespace Belle2

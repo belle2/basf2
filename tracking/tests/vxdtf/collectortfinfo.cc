@@ -171,11 +171,11 @@ namespace Belle2 {
 
       B2DEBUG(1, "PassNr. " << i << "Size of Sector Map: " << sector_map.size());
 
-      for (auto & akt_sector : sector_map) {
+      for (auto& akt_sector : sector_map) {
         sectors_display_friends.clear();
 
         // Friends read and store in second vector
-        for (auto & akt_friend : akt_sector.second) {
+        for (auto& akt_friend : akt_sector.second) {
           sectors_display_friends.push_back(akt_friend);
         }
 
@@ -232,15 +232,18 @@ namespace Belle2 {
     // ID 0 - 4
     // Sector Overlap => Hitid 3,4
     // Cluster Overlap => Hitid 7,8
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({1, 2, 3}), 0, TVector3(), TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({1, 2, 3}), 0, TVector3(),
+                          TVector3());
     m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({4}), 2, TVector3(), TVector3());
     m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({7}), 4, TVector3(), TVector3());
     m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({9}), 5, TVector3(), TVector3());
     m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({10}), 5, TVector3(), TVector3());
 
     // ID 5 - 9
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({11, 12, 13}), 6, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({14, 15}), 7, TVector3(), TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({11, 12, 13}), 6, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({14, 15}), 7, TVector3(),
+                          TVector3());
     m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({17}), 8, TVector3(), TVector3());
     m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({17}), 9, TVector3(), TVector3());
     m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({18}), 1, TVector3(), TVector3());
@@ -385,7 +388,9 @@ namespace Belle2 {
   {
 
     for (uint i = 0; i <  m_collector.m_cellTF.size(); i++) {
-      B2INFO("* Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() << ", died_at: " << m_collector.m_cellTF[i].getDiedAt() << "; m_assigned_hits_ids - size: " << m_collector.m_cellTF[i].getAssignedHits().size() << "; Neighbours - size: " << m_collector.m_cellTF[i].getNeighbours().size() << "; State: " << m_collector.m_cellTF[i].getState() <<
+      B2INFO("* Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() << ", died_at: " <<
+             m_collector.m_cellTF[i].getDiedAt() << "; m_assigned_hits_ids - size: " << m_collector.m_cellTF[i].getAssignedHits().size() <<
+             "; Neighbours - size: " << m_collector.m_cellTF[i].getNeighbours().size() << "; State: " << m_collector.m_cellTF[i].getState() <<
              "; use counter: " << m_collector.m_cellTF[i].getUseCounter());
     }
 
@@ -397,7 +402,9 @@ namespace Belle2 {
   {
 
     for (uint i = 0; i <  m_collector.m_hitTF.size(); i++) {
-      B2INFO("* Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive() << ", died_at: " << m_collector.m_hitTF[i].getDiedAt() << "; m_assigned_cluster - size: " << m_collector.m_hitTF[i].getAssignedCluster().size() << "; UseTC IDs - size: " << m_collector.m_hitTF[i].getUseCounterTCIDs().size() <<
+      B2INFO("* Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive() << ", died_at: " <<
+             m_collector.m_hitTF[i].getDiedAt() << "; m_assigned_cluster - size: " << m_collector.m_hitTF[i].getAssignedCluster().size() <<
+             "; UseTC IDs - size: " << m_collector.m_hitTF[i].getUseCounterTCIDs().size() <<
              "; use counter: " << m_collector.m_hitTF[i].getUseCounter() << "; SectorID: " << m_collector.m_hitTF[i].getSectorID());
     }
 
@@ -408,7 +415,8 @@ namespace Belle2 {
   {
 
     for (uint i = 0; i <  m_collector.m_clustersTF.size(); i++) {
-      B2INFO("* Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() << ", died_at: " << m_collector.m_clustersTF[i].getDiedAt() << "; Real Cluster ID: " <<
+      B2INFO("* Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() << ", died_at: " <<
+             m_collector.m_clustersTF[i].getDiedAt() << "; Real Cluster ID: " <<
              m_collector.m_clustersTF[i].getRealClusterID() << "; Detector Type: "
              << m_collector.m_clustersTF[i].getDetectorType() << "; use counter: " << m_collector.m_clustersTF[i].getUseCounter());
     }
@@ -421,7 +429,8 @@ namespace Belle2 {
   {
 
     for (uint i = 0; i <  m_collector.m_tfCandTF.size(); i++) {
-      B2INFO("* TC ID: " << i << "; active: " << m_collector.m_tfCandTF[i].getActive() << ", died_at: " << m_collector.m_tfCandTF[i].getDiedAt() << "; Own ID: " <<
+      B2INFO("* TC ID: " << i << "; active: " << m_collector.m_tfCandTF[i].getActive() << ", died_at: " <<
+             m_collector.m_tfCandTF[i].getDiedAt() << "; Own ID: " <<
              m_collector.m_tfCandTF[i].getOwnID() << "; AssignedCells - size: " <<
              m_collector.m_tfCandTF[i].getAssignedCell().size());
     }
@@ -434,8 +443,9 @@ namespace Belle2 {
   void CollectorTFInfoTest::getAllSectors()
   {
 
-    for (auto & akt_sector : m_collector.m_sectorTF) {
-      B2INFO("* Sector ID: " << akt_sector.second.getSectorID() << "; active: " << akt_sector.second.getActive() << ", died_at: " << akt_sector.second.getDiedAt() << "; is only friend: " <<
+    for (auto& akt_sector : m_collector.m_sectorTF) {
+      B2INFO("* Sector ID: " << akt_sector.second.getSectorID() << "; active: " << akt_sector.second.getActive() << ", died_at: " <<
+             akt_sector.second.getDiedAt() << "; is only friend: " <<
              akt_sector.second.getIsOnlyFriend() << "; Friends - size: "
              << akt_sector.second.getFriends().size() << "; use counter: " << akt_sector.second.getUseCounter());
     }

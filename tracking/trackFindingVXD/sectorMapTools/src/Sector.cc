@@ -22,7 +22,7 @@ ClassImp(Sector);
 
 void Sector::segmentMaker()
 {
-  for (SectorFriendship * aFriend : m_myFriends) {
+  for (SectorFriendship* aFriend : m_myFriends) {
     aFriend->applySegmentFilters();
   }
 }

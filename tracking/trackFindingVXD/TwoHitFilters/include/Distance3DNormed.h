@@ -29,7 +29,8 @@ namespace Belle2 {
     *
     * ATTENTION: returns 0 if inf or nan is provoked (this is the behavior of the old code)
     */
-    static float value(const PointType& outerHit, const PointType& innerHit) {
+    static float value(const PointType& outerHit, const PointType& innerHit)
+    {
 
       float result =
         (std::pow(outerHit.X() - innerHit.X() , 2)

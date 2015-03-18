@@ -29,7 +29,8 @@ namespace Belle2 {
   public:
 
     /** calculates the distance between the hits in z (1D), returning unit: cm */
-    static float value(const PointType& outerHit, const PointType& innerHit) {
+    static float value(const PointType& outerHit, const PointType& innerHit)
+    {
       float result = atan(
                        std::sqrt(
                          std::pow((outerHit.X() - innerHit.X()), 2)

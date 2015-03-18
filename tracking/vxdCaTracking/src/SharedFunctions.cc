@@ -42,7 +42,8 @@ namespace Belle2 {
         TVector3 globalError = aSensorInfo.vectorToGlobal(localError);
 
         layerErrors.push_back(make_pair(globalError.X(), globalError.Y()));
-        B2DEBUG(175, " getGlobalizedHitErrors at layer " << layer << ", ladder " << ladder << ", sigmaX/Y/Z" << globalError.X() << "/" << globalError.Y() << "/" << globalError.Z() <<  " [unit cm?]")
+        B2DEBUG(175, " getGlobalizedHitErrors at layer " << layer << ", ladder " << ladder << ", sigmaX/Y/Z" << globalError.X() << "/" <<
+                globalError.Y() << "/" << globalError.Z() <<  " [unit cm?]")
       }
 
       errorContainer.push_back(layerErrors);

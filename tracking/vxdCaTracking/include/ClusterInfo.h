@@ -48,7 +48,8 @@ namespace Belle2 {
       m_collector_id(-1) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
-    ClusterInfo(int clusterIndex, int ownIndex, bool isPXD, bool isSVD, bool isTEL, const PXDCluster* pCluster, const SVDCluster* sCluster, const TelCluster* tCluster = NULL):
+    ClusterInfo(int clusterIndex, int ownIndex, bool isPXD, bool isSVD, bool isTEL, const PXDCluster* pCluster,
+                const SVDCluster* sCluster, const TelCluster* tCluster = NULL):
       m_bossTC(NULL),
       m_clusterIndex(clusterIndex),
       m_ownPositionInIndex(ownIndex),
@@ -59,7 +60,8 @@ namespace Belle2 {
       m_pxdCluster(pCluster),
       m_svdCluster(sCluster),
       m_telCluster(tCluster),
-      m_collector_id(-1) {
+      m_collector_id(-1)
+    {
       /*
         if ( pCluster != NULL ) { m_isPXD = true; }
         else if ( sCluster != NULL ) { m_isSVD = true; }
@@ -71,7 +73,8 @@ namespace Belle2 {
     ~ClusterInfo() {}
 
     /** removes a track candidate from container */
-    void removeTrackCandidate(VXDTFTrackCandidate* aTC) {
+    void removeTrackCandidate(VXDTFTrackCandidate* aTC)
+    {
       TcContainer::iterator tcIt = m_attachedTCs.begin();
       for (; tcIt != m_attachedTCs.end(); ++tcIt) {
         if (isSameTC((*tcIt), aTC) == true) { tcIt = m_attachedTCs.erase(tcIt); return; }
@@ -79,8 +82,9 @@ namespace Belle2 {
     }
 
     /** adds a pointer to a track candidate using this cluster */
-    void addTrackCandidate(VXDTFTrackCandidate* aTC) {
-      for (VXDTFTrackCandidate * anotherTC : m_attachedTCs) {
+    void addTrackCandidate(VXDTFTrackCandidate* aTC)
+    {
+      for (VXDTFTrackCandidate* anotherTC : m_attachedTCs) {
         if (isSameTC(aTC, anotherTC) == true) { return; }
       }
       m_attachedTCs.push_back(aTC);
@@ -130,7 +134,8 @@ namespace Belle2 {
 
   protected:
     /** internal shortcut for comparing 2 track candidates */
-    bool isSameTC(const VXDTFTrackCandidate* a1, const VXDTFTrackCandidate* a2) {
+    bool isSameTC(const VXDTFTrackCandidate* a1, const VXDTFTrackCandidate* a2)
+    {
       if (a1 == a2) { return true; } else { return false; }
     }
 

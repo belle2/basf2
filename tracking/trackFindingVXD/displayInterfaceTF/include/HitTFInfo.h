@@ -59,7 +59,8 @@ namespace Belle2 {
     std::vector<int>& getAssignedCluster()  { return m_assignedClusterIDs; }
 
     /** add new int to Assigned Hits */
-    void push_back_AssignedCluster(int newMember) {
+    void push_back_AssignedCluster(int newMember)
+    {
       m_assignedClusterIDs.push_back(newMember);
     }
 
@@ -74,7 +75,8 @@ namespace Belle2 {
     int getMaxCounter()  { return m_maxCounter; }
 
     /** setter - UseCounter */
-    void setUseCounter(int value) {
+    void setUseCounter(int value)
+    {
       m_useCounter = value;
       if (m_useCounter > m_maxCounter) {
         m_maxCounter = m_useCounter;
@@ -82,7 +84,8 @@ namespace Belle2 {
     }
 
     /** UseCounte add / minus */
-    void changeUseCounter(int value) {
+    void changeUseCounter(int value)
+    {
       m_useCounter = m_useCounter + value;
       if (m_useCounter > m_maxCounter) {
         m_maxCounter = m_useCounter;
@@ -93,7 +96,8 @@ namespace Belle2 {
     std::vector<int>& getUseCounterCell()  { return m_useCounterCell; }
 
     /** add new int to UseCounterCell */
-    void push_back_UseCounterCell(int newMember) {
+    void push_back_UseCounterCell(int newMember)
+    {
       m_useCounterCell.push_back(newMember);
     }
 
@@ -160,7 +164,8 @@ namespace Belle2 {
     std::vector<std::pair<int, double>>& getUsedParticles() { return m_usedParticles; }
 
     /** getter - Particle with highest purity*/
-    std::pair<int, double> getMainParticle() {
+    std::pair<int, double> getMainParticle()
+    {
 
       int maxPos = 0;
 
@@ -174,7 +179,8 @@ namespace Belle2 {
     }
 
     /** getter - Particle with particleID*/
-    std::pair<int, double> getInfoParticle(int particleID) {
+    std::pair<int, double> getInfoParticle(int particleID)
+    {
 
       for (uint i = 0; i < m_usedParticles.size(); i++) {
         if (m_usedParticles.at(i).first == particleID) {
@@ -187,7 +193,8 @@ namespace Belle2 {
 
 
     /** containsParticle - Particle with particleID */
-    bool containsParticle(int particleID) {
+    bool containsParticle(int particleID)
+    {
 
       for (uint i = 0; i < m_usedParticles.size(); i++) {
         if (m_usedParticles.at(i).first == particleID) {
@@ -199,7 +206,8 @@ namespace Belle2 {
     }
 
     /** add new to used_particles */
-    void push_back_UsedParticles(std::pair<int, double> newMember) {
+    void push_back_UsedParticles(std::pair<int, double> newMember)
+    {
       m_usedParticles.push_back(newMember);
     }
 

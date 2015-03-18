@@ -102,12 +102,13 @@ namespace Belle2 {
 
 
     /** destructor does the cleanup */
-    ~SegmentNetwork() {
-      for (auto * aSector : m_activatedSectors.second) { delete aSector; }
+    ~SegmentNetwork()
+    {
+      for (auto* aSector : m_activatedSectors.second) { delete aSector; }
 
-      for (auto * aNode : m_nodes.second) { delete aNode; }
+      for (auto* aNode : m_nodes.second) { delete aNode; }
 
-      for (auto * aSegment : m_segments.second) { delete aSegment; }
+      for (auto* aSegment : m_segments.second) { delete aSegment; }
     }
 
 
@@ -125,7 +126,8 @@ namespace Belle2 {
 
 
     /** adding single trackNode to the network */
-    void addTrackNode(SpacePoint* spIndex, ActiveSector* activatedSector, FullSecID::BaseType aFullSecID) {
+    void addTrackNode(SpacePoint* spIndex, ActiveSector* activatedSector, FullSecID::BaseType aFullSecID)
+    {
       TrackNode* newNode = new TrackNode(spIndex, activatedSector, aFullSecID);
       m_nodes.second.push_back(newNode);
       activatedSector->addTrackNode(newNode);
@@ -139,7 +141,8 @@ namespace Belle2 {
      * the outer- and innerSector-Entries carry the indices for the associated sectors, respectively
      * It therefore should only be filled, if nodes already exist
      */
-    void addSegment(TrackNode* outerNode, TrackNode* innerNode, ActiveSector* outerSector, ActiveSector* innerSector) {
+    void addSegment(TrackNode* outerNode, TrackNode* innerNode, ActiveSector* outerSector, ActiveSector* innerSector)
+    {
       Segment* newSeg = new Segment(outerNode, innerNode, outerSector, innerSector);
       m_segments.second.push_back(newSeg);
       outerNode->addInnerSegment(newSeg);
@@ -153,7 +156,8 @@ namespace Belle2 {
 
 
     /** connecting sector of given secID with friend sector of given friendSecID */
-    void connectSectors(FullSecID::BaseType secID, FullSecID::BaseType friendSecID) {
+    void connectSectors(FullSecID::BaseType secID, FullSecID::BaseType friendSecID)
+    {
       // indices to be found for main and friend sector
       unsigned int mainIndex = std::numeric_limits<unsigned int>::max();
       unsigned int friendIndex = std::numeric_limits<unsigned int>::max();
@@ -162,7 +166,8 @@ namespace Belle2 {
       try {
         friendIndex = findActiveSector(friendSecID);
       } catch (SectorNotFound& anException) {
-        B2WARNING("SegmentNetwork::connectSectors exception thrown for friend secID " << FullSecID(friendSecID) << ", " << anException.what());
+        B2WARNING("SegmentNetwork::connectSectors exception thrown for friend secID " << FullSecID(friendSecID) << ", " <<
+                  anException.what());
         return;
       }
 
@@ -179,7 +184,8 @@ namespace Belle2 {
 
 
     /** connecting sectors directly */
-    void connectSectors(ActiveSector* mainSector, ActiveSector* friendSector) {
+    void connectSectors(ActiveSector* mainSector, ActiveSector* friendSector)
+    {
       mainSector->addActiveFriend(friendSector);
     }
 
@@ -188,7 +194,8 @@ namespace Belle2 {
      * return value is found index number if sector has been found,
      * return value is std::numeric_limits<unsigned int>::max(), if no sector was found
      * */
-    unsigned int findActiveSector(FullSecID::BaseType iD) {
+    unsigned int findActiveSector(FullSecID::BaseType iD)
+    {
 
       for (unsigned int index = 0; index < m_activatedSectors.second.size(); index++) {
         if (m_activatedSectors.second[index]->getFullSecID() == iD) {
@@ -206,7 +213,8 @@ namespace Belle2 {
      * This also affects other elements of the network!
      * Segments, TrackNodes can be deactivated during the process if removed ActiveSector affects them.
      * */
-    void deactivateSector(FullSecID::BaseType iD) {
+    void deactivateSector(FullSecID::BaseType iD)
+    {
       ActiveSector* dyingSector = m_activatedSectors(findActiveSector(iD));
       dyingSector->deactivateSector();
       /* TODO */

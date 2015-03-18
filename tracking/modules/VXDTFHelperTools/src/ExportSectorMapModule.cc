@@ -79,34 +79,59 @@ ExportSectorMapModule::ExportSectorMapModule() : Module()
   std::string rootFileName = "FilterCalculatorResults";
 
 
-  addParam("importROOTorXML", m_PARAMimportROOTorXML, "if true, sectorMap is imported via rootFile, if false, it is imported via XML-file", bool(true));
+  addParam("importROOTorXML", m_PARAMimportROOTorXML,
+           "if true, sectorMap is imported via rootFile, if false, it is imported via XML-file", bool(true));
 
 
   /// following parameters only needed if importing from xml file (-> importROOTorXML = false):
-  addParam("detectorType", m_PARAMdetectorType, "only needed if importROOTorXML = false: defines which detector type has to be exported. Allowed values: 'VXD', 'PXD', 'SVD'", string("SVD"));
-  addParam("sectorSetup", m_PARAMsectorSetup, "only needed if importROOTorXML = false: lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row", string("std"));
-  addParam("sectorConfigU", m_PARAMsectorConfigU, "only needed if importROOTorXML = false: allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0", defaultConfigU);
-  addParam("sectorConfigV", m_PARAMsectorConfigV, "only needed if importROOTorXML = false: allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0", defaultConfigV);
-  addParam("setOrigin", m_PARAMsetOrigin, "only needed if importROOTorXML = false: standard origin is (0,0,0). If you want to have the map calculated for another origin, set here(x,y,z)", originVec);
-  addParam("magneticFieldStrength", m_PARAMmagneticFieldStrength, "only needed if importROOTorXML = false: set strength of magnetic field in Tesla, standard is 1.5T", double(1.5));
+  addParam("detectorType", m_PARAMdetectorType,
+           "only needed if importROOTorXML = false: defines which detector type has to be exported. Allowed values: 'VXD', 'PXD', 'SVD'",
+           string("SVD"));
+  addParam("sectorSetup", m_PARAMsectorSetup,
+           "only needed if importROOTorXML = false: lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row",
+           string("std"));
+  addParam("sectorConfigU", m_PARAMsectorConfigU,
+           "only needed if importROOTorXML = false: allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0",
+           defaultConfigU);
+  addParam("sectorConfigV", m_PARAMsectorConfigV,
+           "only needed if importROOTorXML = false: allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0",
+           defaultConfigV);
+  addParam("setOrigin", m_PARAMsetOrigin,
+           "only needed if importROOTorXML = false: standard origin is (0,0,0). If you want to have the map calculated for another origin, set here(x,y,z)",
+           originVec);
+  addParam("magneticFieldStrength", m_PARAMmagneticFieldStrength,
+           "only needed if importROOTorXML = false: set strength of magnetic field in Tesla, standard is 1.5T", double(1.5));
 
-  addParam("additionalInfo", m_PARAMadditionalInfo, "only needed if importROOTorXML = false: this variable is reserved for extra info which shall be stored in the container, e.g. date of production or other useful info for the user(it shall be formatted before storing it), this info will be displayed by the VXDTF on Info-level", string(""));
+  addParam("additionalInfo", m_PARAMadditionalInfo,
+           "only needed if importROOTorXML = false: this variable is reserved for extra info which shall be stored in the container, e.g. date of production or other useful info for the user(it shall be formatted before storing it), this info will be displayed by the VXDTF on Info-level",
+           string(""));
 
 
   /// following parameters only needed if importing from root file (-> importROOTorXML = true):
-  addParam("sampleThreshold", m_PARAMsampleThreshold, "only needed if importROOTorXML = true: exactly two entries allowed: first: minimal sample size for sector-combination, second: threshold for 'small samples' where behavior is less strict. If sampleSize is bigger than second, normal behavior is chosen", sampleThreshold);
+  addParam("sampleThreshold", m_PARAMsampleThreshold,
+           "only needed if importROOTorXML = true: exactly two entries allowed: first: minimal sample size for sector-combination, second: threshold for 'small samples' where behavior is less strict. If sampleSize is bigger than second, normal behavior is chosen",
+           sampleThreshold);
 
-  addParam("smallSampleQuantiles", m_PARAMsmallSampleQuantiles, "only needed if importROOTorXML = true: behiavior of small sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed", smallSampleQuantiles);
+  addParam("smallSampleQuantiles", m_PARAMsmallSampleQuantiles,
+           "only needed if importROOTorXML = true: behiavior of small sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed",
+           smallSampleQuantiles);
 
-  addParam("sampleQuantiles", m_PARAMsampleQuantiles, "only needed if importROOTorXML = true: behiavior of normal sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed", sampleQuantiles);
+  addParam("sampleQuantiles", m_PARAMsampleQuantiles,
+           "only needed if importROOTorXML = true: behiavior of normal sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed",
+           sampleQuantiles);
 
-  addParam("stretchFactor", m_PARAMstretchFactor, "only needed if importROOTorXML = true: exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly", stretchFactor);
+  addParam("stretchFactor", m_PARAMstretchFactor,
+           "only needed if importROOTorXML = true: exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly",
+           stretchFactor);
 
-  addParam("sortByDistance2origin", m_PARAMsortByDistance2origin, "only needed if importROOTorXML = true: if set to true, sectors are not treated by layerID but by distance to origin. This has an effect on filtering bad sector combinations. Recommendation: use false for normal Belle2-VXD-case and true for beam test situations where layerIDs are mixed up", false);
+  addParam("sortByDistance2origin", m_PARAMsortByDistance2origin,
+           "only needed if importROOTorXML = true: if set to true, sectors are not treated by layerID but by distance to origin. This has an effect on filtering bad sector combinations. Recommendation: use false for normal Belle2-VXD-case and true for beam test situations where layerIDs are mixed up",
+           false);
 
   addParam("rootFileName", m_PARAMrootFileName, "only needed if importROOTorXML = true: sets the root filename", rootFileName);
 
-  addParam("printFinalMaps", m_PARAMprintFinalMaps, "if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen", bool(true));
+  addParam("printFinalMaps", m_PARAMprintFinalMaps,
+           "if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen", bool(true));
 }
 
 
@@ -135,7 +160,8 @@ void ExportSectorMapModule::initialize()
       m_PARAMsetOrigin.push_back(0);
       m_PARAMsetOrigin.push_back(0);
     }
-    B2INFO("ExportSectorMapModule::terminate: origin is set to: (x,y,z) (" << m_PARAMsetOrigin[0] << "," << m_PARAMsetOrigin[1] << "," << m_PARAMsetOrigin[2] << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
+    B2INFO("ExportSectorMapModule::terminate: origin is set to: (x,y,z) (" << m_PARAMsetOrigin[0] << "," << m_PARAMsetOrigin[1] << ","
+           << m_PARAMsetOrigin[2] << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
   }
 }
 
@@ -154,13 +180,18 @@ void ExportSectorMapModule::terminate()
 
     pair<int, int> countedStuff = importXMLMap();             /// importXMLMap
 
-    B2INFO("Imported via XML-file: number of Sector-Entries: " << m_fullSectorMapCopy.size() << ", of friend-entries: " << countedStuff.first << ", of filter-entries: " << countedStuff.second << ", mField: " << m_PARAMmagneticFieldStrength << "T, and additional Info:\n" << m_PARAMadditionalInfo)
+    B2INFO("Imported via XML-file: number of Sector-Entries: " << m_fullSectorMapCopy.size() << ", of friend-entries: " <<
+           countedStuff.first << ", of filter-entries: " << countedStuff.second << ", mField: " << m_PARAMmagneticFieldStrength <<
+           "T, and additional Info:\n" << m_PARAMadditionalInfo)
   } else { // import via root file
 
     pair<int, int> countedStuff = importROOTMap();              /// importROOTMap
 
-    for (auto & aMap : m_importedSectorMaps) {
-      B2INFO("Imported via ROOT-file of a total of " << countedStuff.first << "/" << countedStuff.second << " sectors/totalEntries, to XML converted number of Sector-Entries: " << aMap.size() << ", of friend-entries: " << aMap.getNumOfFriends() << ", of final cutoffValues: " << aMap.getNumOfValues() << ", mField: " << aMap.getMagneticFieldStrength() << "T, and additional Info:\n" << aMap.getAdditionalInfo())
+    for (auto& aMap : m_importedSectorMaps) {
+      B2INFO("Imported via ROOT-file of a total of " << countedStuff.first << "/" << countedStuff.second <<
+             " sectors/totalEntries, to XML converted number of Sector-Entries: " << aMap.size() << ", of friend-entries: " <<
+             aMap.getNumOfFriends() << ", of final cutoffValues: " << aMap.getNumOfValues() << ", mField: " << aMap.getMagneticFieldStrength() <<
+             "T, and additional Info:\n" << aMap.getAdditionalInfo())
     }
   }
 
@@ -168,7 +199,8 @@ void ExportSectorMapModule::terminate()
   boostClock::time_point stopTimer = boostClock::now();
   m_fillStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
-  B2INFO("ExportSectorMapModule::terminate: importing the map took " << (m_fillStuff.count()) << "/" << int(m_fillStuff.count() * 0.000001) << " nano-/milliseconds")
+  B2INFO("ExportSectorMapModule::terminate: importing the map took " << (m_fillStuff.count()) << "/" << int(
+           m_fillStuff.count() * 0.000001) << " nano-/milliseconds")
 }
 
 
@@ -202,25 +234,27 @@ std::pair<int, int> ExportSectorMapModule::importXMLMap()
   B2INFO("importing sectors, using " << chosenSetup << " > " << sectorList.getNumberNodes("aSector") << " sectors found");
 
   if (sectorList.getNumberNodes("aSector") == 0) {
-    B2FATAL("Failed to import sector map " << chosenSetup << "! No track finding possible. Please check ../tracking/data/VXDTFindex.xml whether your chosen sector maps are uncommented (and files linked there are not zipped) and recompile if you change entries...")
+    B2FATAL("Failed to import sector map " << chosenSetup <<
+            "! No track finding possible. Please check ../tracking/data/VXDTFindex.xml whether your chosen sector maps are uncommented (and files linked there are not zipped) and recompile if you change entries...")
   }
 
   double cutoffMinValue, cutoffMaxValue;
   int countFriends = 0, countFilters = 0;
   string aSectorName, aFriendName, aFilterName, min = "Min", max = "Max";
 
-  for (const GearDir & aSector : sectorList.getNodes("aSector")) {
+  for (const GearDir& aSector : sectorList.getNodes("aSector")) {
 
     aSectorName = aSector.getString("secID");
     FullSecID secID = FullSecID(aSectorName); // same as aSectorName but info stored in an int
 
     GearDir friendList(aSector, "friendList/");
 
-    B2DEBUG(5, " > > importing sector: " << aSectorName << " (named " << secID.getFullSecID() << " as an int) including " << friendList.getNumberNodes("aFriend") << " friends. ");
+    B2DEBUG(5, " > > importing sector: " << aSectorName << " (named " << secID.getFullSecID() << " as an int) including " <<
+            friendList.getNumberNodes("aFriend") << " friends. ");
 
     SectorValue sectorValue;
 
-    for (const GearDir & aFriend : friendList.getNodes("aFriend")) {
+    for (const GearDir& aFriend : friendList.getNodes("aFriend")) {
 
       aFriendName = aFriend.getString("friendID");
       FullSecID friendID = FullSecID(aFriendName); // same as aFriendName but info stored in an int
@@ -229,7 +263,7 @@ std::pair<int, int> ExportSectorMapModule::importXMLMap()
 
       GearDir filterList(aFriend, "filterList/");
 
-      for (const GearDir & aFilter : filterList.getNodes("aFilter")) {
+      for (const GearDir& aFilter : filterList.getNodes("aFilter")) {
 
         aFilterName = aFilter.getString("filterID");
         GearDir cuts(aFilter, "cuts/");
@@ -342,11 +376,13 @@ std::pair<int, int> ExportSectorMapModule::importXMLMap()
         countFilters++;
         Cutoff cutoff = make_pair(filterID, cutoffValue);
         friendValue.push_back(cutoff);
-        B2DEBUG(50, " > > importing filter: " << aFilterName << " (named " << filterID << " as an int and " << FilterID().getFilterString(filterID) << " as a recoded string) with min/max: " << cutoffMinValue << "/" << cutoffMaxValue << " filters. ");
+        B2DEBUG(50, " > > importing filter: " << aFilterName << " (named " << filterID << " as an int and " << FilterID().getFilterString(
+                  filterID) << " as a recoded string) with min/max: " << cutoffMinValue << "/" << cutoffMaxValue << " filters. ");
       }
       Friend thisFriend = make_pair(friendID.getFullSecID(), friendValue);
       countFriends++;
-      B2DEBUG(10, " > > importing friend: " << friendID.getFullSecString() << " (named " << friendID.getFullSecID() << " as an int) including " << friendValue.size() << " filters. ");
+      B2DEBUG(10, " > > importing friend: " << friendID.getFullSecString() << " (named " << friendID.getFullSecID() <<
+              " as an int) including " << friendValue.size() << " filters. ");
       sectorValue.push_back(thisFriend);
     }
     Sector thisSector = make_pair(secID.getFullSecID(), sectorValue);
@@ -377,7 +413,8 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
 {
   int countSectors = 0,
       countExternalMaps = 0,
-      countTotalValues = 0;// values are all the values measured for each cutoff-type which are used for calculating the cutoffs afterwards
+      countTotalValues =
+        0;// values are all the values measured for each cutoff-type which are used for calculating the cutoffs afterwards
 
   string fileName =  m_PARAMrootFileName + "SecMap.root";
   B2DEBUG(1, "importROOTMap: reading file " << fileName)
@@ -396,32 +433,42 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
     while ((key = (TKey*)next())) {
 
       try {
-        retrievedVector = dynamic_cast<SecMapVector*>(key->ReadObj()); // not very performant, but here, the performance is not an issue, especially since there is only a relatively small number of vectors imported - compared the size of their objects
+        retrievedVector = dynamic_cast<SecMapVector*>
+                          (key->ReadObj()); // not very performant, but here, the performance is not an issue, especially since there is only a relatively small number of vectors imported - compared the size of their objects
       } catch (exception& e) {
         B2WARNING("Key was not a SecMapVector, therefore error message: " << e.what() << "\n Skipping this key...")
         continue;
       }
 
       countSecMapVectors++;
-      B2INFO(" current secMapVector has " << retrievedVector->size() << " secMaps stored, this vector is number " << countSecMapVectors << "!")
+      B2INFO(" current secMapVector has " << retrievedVector->size() << " secMaps stored, this vector is number " << countSecMapVectors <<
+             "!")
       countExternalMaps += retrievedVector->size();
 //      std::vector< Belle2::SecMapVector::MapPack>
-      for (SecMapVector::MapPack & tempSecMap : retrievedVector->getFullVector()) { // full VXDTFRawSecMap including name
+      for (SecMapVector::MapPack& tempSecMap : retrievedVector->getFullVector()) {  // full VXDTFRawSecMap including name
         countMaps++;
         B2INFO("opening new map " << tempSecMap.second.getMapName() <<  " (number " << countMaps << " so far), with " <<
-               tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() << " friends and " << tempSecMap.second.getNumOfValues() << " total values" << endl;)
+               tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() << " friends and " <<
+               tempSecMap.second.getNumOfValues() << " total values" << endl;)
 
 
         /// merging intermediate maps to one map of each type:
         bool partnerMapFound = false;
-        for (SecMapVector::MapPack & anotherMap : importedMaps.getFullVector()) { // loop over already existing maps
+        for (SecMapVector::MapPack& anotherMap : importedMaps.getFullVector()) {  // loop over already existing maps
           ++countNumberOfComparisons;
-          B2INFO("Iteration " << countNumberOfComparisons << "current retrieved map: " << tempSecMap.first << ", current imported map: " << anotherMap.first << " taken from SecMapVector with size of " << importedMaps.size())
-          B2DEBUG(5, "tempSecMap.second, anotherMap.second:\ndetectorType: " << tempSecMap.second.getDetectorType() << ", " << anotherMap.second.getDetectorType() << ",  size: " << tempSecMap.second.size() << ", " << anotherMap.second.size() << ",  MapName: " << tempSecMap.second.getMapName() << ", " << anotherMap.second.getMapName() << ",  MagneticField: " << tempSecMap.second.getMagneticFieldStrength() << ", " << anotherMap.second.getMagneticFieldStrength() << ",  origin: " << tempSecMap.second.getOrigin().Mag() << ", " << anotherMap.second.getOrigin().Mag())
+          B2INFO("Iteration " << countNumberOfComparisons << "current retrieved map: " << tempSecMap.first << ", current imported map: " <<
+                 anotherMap.first << " taken from SecMapVector with size of " << importedMaps.size())
+          B2DEBUG(5, "tempSecMap.second, anotherMap.second:\ndetectorType: " << tempSecMap.second.getDetectorType() << ", " <<
+                  anotherMap.second.getDetectorType() << ",  size: " << tempSecMap.second.size() << ", " << anotherMap.second.size() << ",  MapName: "
+                  << tempSecMap.second.getMapName() << ", " << anotherMap.second.getMapName() << ",  MagneticField: " <<
+                  tempSecMap.second.getMagneticFieldStrength() << ", " << anotherMap.second.getMagneticFieldStrength() << ",  origin: " <<
+                  tempSecMap.second.getOrigin().Mag() << ", " << anotherMap.second.getOrigin().Mag())
 
           if (tempSecMap.second == anotherMap.second) {  // compares VXDTFRawSecMaps
             countMatches++;
-            B2INFO("Partner found for " << anotherMap.first << " and will now be merged " << tempSecMap.first << ", there were " << countMatches << " matches for maps so far")            anotherMap.second.addSectorMap(tempSecMap.second.getSectorMap()); // INFO: removes entries from imported map and adds it to existing one ( more precisely: if sector-friend-combination already exists and current filterType too, then all values of added map will be moved to the existing one. If the sector, or the sector-friend-combination or the filterType in that combi does not exist yet, then the data gets copied, not moved)
+            B2INFO("Partner found for " << anotherMap.first << " and will now be merged " << tempSecMap.first << ", there were " << countMatches
+                   << " matches for maps so far")            anotherMap.second.addSectorMap(
+                     tempSecMap.second.getSectorMap()); // INFO: removes entries from imported map and adds it to existing one ( more precisely: if sector-friend-combination already exists and current filterType too, then all values of added map will be moved to the existing one. If the sector, or the sector-friend-combination or the filterType in that combi does not exist yet, then the data gets copied, not moved)
             anotherMap.second.addDistances(tempSecMap.second.getDistances()); // after adding sectors, the sector-distaces are added separately
             B2INFO("Map: " << anotherMap.first << " has been merged with " << tempSecMap.first)
             partnerMapFound = true;
@@ -434,28 +481,31 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
         }
 
         B2INFO("ExportSectorMapModule::importROOTMap: finishing import of new map " << tempSecMap.second.getMapName())
-        B2DEBUG(5, ", with " << tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() << " friends and " << tempSecMap.second.getNumOfValues() << " total values" << endl;)
+        B2DEBUG(5, ", with " << tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() <<
+                " friends and " << tempSecMap.second.getNumOfValues() << " total values" << endl;)
       }
     }
     importedRootFile.Close();
 
     // some checks:
     stringstream importedMapsCounted;
-    for (SecMapVector::MapPack & aMap : importedMaps.getFullVector()) {
+    for (SecMapVector::MapPack& aMap : importedMaps.getFullVector()) {
       importedMapsCounted << "Imported map: " << aMap.second.getMapName() <<  ", with " <<
-                          aMap.second.getNumOfSectors() << " sectors, " << aMap.second.getNumOfFriends() << " friends and " << aMap.second.getNumOfValues() << " total values" << endl;
+                          aMap.second.getNumOfSectors() << " sectors, " << aMap.second.getNumOfFriends() << " friends and " << aMap.second.getNumOfValues() <<
+                          " total values" << endl;
 //      ++countInternalMaps;
       countSectors += aMap.second.getNumOfSectors();
       countTotalValues += aMap.second.getNumOfValues();
     }
 
     B2INFO("counted manually afterwards: " << endl << importedMapsCounted.str() << endl)
-    B2INFO("got " << countExternalMaps << "/" << importedMaps.size() << " external/imported maps inhabiting " << countTotalValues << " total values")
+    B2INFO("got " << countExternalMaps << "/" << importedMaps.size() << " external/imported maps inhabiting " << countTotalValues <<
+           " total values")
   } // end root-check
 
 
   // convert to final map(s) and export:
-  for (SecMapVector::MapPack & aRawMapPack : importedMaps.getFullVector()) {
+  for (SecMapVector::MapPack& aRawMapPack : importedMaps.getFullVector()) {
     // feed rawMaps with some extra info first (needed for rawMap-import):
     aRawMapPack.second.setCutoffQuantiles(make_pair(m_PARAMsampleQuantiles.at(0), m_PARAMsampleQuantiles.at(1)));
     aRawMapPack.second.setSmallCutoffQuantiles(make_pair(m_PARAMsmallSampleQuantiles.at(0), m_PARAMsmallSampleQuantiles.at(1)));
@@ -485,21 +535,23 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
       unsigned sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0;
       const VXDTFSecMap::FriendValue* currentCutOffTypes; // used only for counting cutoffTypes
 
-      for (const VXDTFSecMap::Sector & sectorEntry : newMap.getSectorMap()) { // looping through sectors
+      for (const VXDTFSecMap::Sector& sectorEntry : newMap.getSectorMap()) {  // looping through sectors
         const VXDTFSecMap::SectorValue& currentFriends = sectorEntry.second;
         int nFriends = currentFriends.size();
 
         B2INFO("Opening sector " << FullSecID(sectorEntry.first) << " which has got " << nFriends << " friends");
 
-        for (const VXDTFSecMap::Friend & friendEntry : currentFriends) { // looping through friends
+        for (const VXDTFSecMap::Friend& friendEntry : currentFriends) {  // looping through friends
           currentCutOffTypes = &friendEntry.second;
-          B2DEBUG(1, " > Opening sectorFriend " << FullSecID(friendEntry.first) << " having " << currentCutOffTypes->size() << " cutoffTypes.");
+          B2DEBUG(1, " > Opening sectorFriend " << FullSecID(friendEntry.first) << " having " << currentCutOffTypes->size() <<
+                  " cutoffTypes.");
           cutoffTypesCtr += currentCutOffTypes->size();
           ++friendCtr;
         }
         ++sectorCtr;
       }
-      B2INFO("printFinalMaps: secMap " << newMap.getMapName() << ": manually counted a total of " << sectorCtr << "/" << friendCtr << "/" << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap");
+      B2INFO("printFinalMaps: secMap " << newMap.getMapName() << ": manually counted a total of " << sectorCtr << "/" << friendCtr << "/"
+             << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap");
     }
   }
 

@@ -67,18 +67,21 @@ namespace Belle2 {
     // Data members
     std::string m_pxdClustersName; /**< PXDCluster collection name */
 
-    StoreArray<PXDCluster> m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
+    StoreArray<PXDCluster>
+    m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
 
     std::string m_svdClustersName; /**< SVDCluster collection name */
 
-    StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
+    StoreArray<SVDCluster>
+    m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
 
     std::vector< StoreArray<SpacePoint> > m_allSpacePointStoreArrays; /**< a vector full of StoreArray carrying spacePoints. */
 
     std::vector< std::string > m_containerSpacePointsName; /**< intermediate storage for the names of the loaded storeArrays. */
 
     // modification parameters
-    std::string m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+    std::string
+    m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
 
   };
 } // end namespace Belle2

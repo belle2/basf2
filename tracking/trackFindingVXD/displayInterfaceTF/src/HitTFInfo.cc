@@ -83,7 +83,7 @@ bool HitTFInfo::isOverlappedByCellsOrTCs()
   int allOkFoundCells = 0;
 
   // Search if hit is overlapped because of the cell
-  for (auto & currentCell : m_useCounterCell) {
+  for (auto& currentCell : m_useCounterCell) {
 
     //B2DEBUG(100,"Akt_cell" << currentCell);
 

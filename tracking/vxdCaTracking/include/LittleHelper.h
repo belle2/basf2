@@ -36,7 +36,8 @@ namespace Belle2 {
 
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(double mean, double sigma) {
+    void resetValues(double mean, double sigma)
+    {
       m_meanValue = mean;
       m_sigmaValue = sigma;
     }
@@ -51,7 +52,8 @@ namespace Belle2 {
 
 
     template<class Tmpl>
-    static void checkBoundaries(Tmpl& number, Tmpl lowerThreshold, Tmpl higherThreshold) {
+    static void checkBoundaries(Tmpl& number, Tmpl lowerThreshold, Tmpl higherThreshold)
+    {
       if (higherThreshold < lowerThreshold) {
         Tmpl tempVal = lowerThreshold;
         lowerThreshold = higherThreshold;

@@ -66,7 +66,7 @@ using namespace Belle2;
 list<int> VXDTFTrackCandidate::getHopfieldHitIndices()
 {
   list<int> indices;
-  for (VXDTFHit * aHit : m_attachedHits) {
+  for (VXDTFHit* aHit : m_attachedHits) {
     if ((aHit->getDetectorType() == Const::PXD) or (aHit->getDetectorType() == Const::TEST)) { /*PXD or Telescope */
       indices.push_back(aHit->getClusterInfoUV()->getOwnIndex());
     } else { /* SVD */
@@ -149,7 +149,7 @@ bool VXDTFTrackCandidate::checkReserved()
 {
   int countSuccessfull = 0, countTotal = 0, alreadyReservedByMe = 0, alreadyReservedByAnother = 0;
   bool successfull;
-  for (VXDTFHit * aHit : m_attachedHits) {
+  for (VXDTFHit* aHit : m_attachedHits) {
     if ((aHit->getDetectorType() == Const::PXD) or (aHit->getDetectorType() == Const::TEST)) { /*PXD or Telescope*/
       countTotal++;
 
@@ -183,10 +183,14 @@ bool VXDTFTrackCandidate::checkReserved()
     }
   }
   if ((countSuccessfull + alreadyReservedByMe) != countTotal) {
-    B2INFO("VXDTFTrackCandidate:checkReserved: TC " << getTrackNumber() << " failed to reserve Clusters! successfull: " << countSuccessfull << ", alreadyReservedByMe: " << alreadyReservedByMe << ", alreadyReservedByAnother: " << alreadyReservedByAnother << ", total: " << countTotal)
+    B2INFO("VXDTFTrackCandidate:checkReserved: TC " << getTrackNumber() << " failed to reserve Clusters! successfull: " <<
+           countSuccessfull << ", alreadyReservedByMe: " << alreadyReservedByMe << ", alreadyReservedByAnother: " << alreadyReservedByAnother
+           << ", total: " << countTotal)
     return false;
   }
-  B2INFO("VXDTFTrackCandidate:checkReserved: TC " << getTrackNumber() << " reserved Clusters! successfull: " << countSuccessfull << ", alreadyReservedByMe: " << alreadyReservedByMe << ", alreadyReservedByAnother: " << alreadyReservedByAnother << ", total: " << countTotal)
+  B2INFO("VXDTFTrackCandidate:checkReserved: TC " << getTrackNumber() << " reserved Clusters! successfull: " << countSuccessfull <<
+         ", alreadyReservedByMe: " << alreadyReservedByMe << ", alreadyReservedByAnother: " << alreadyReservedByAnother << ", total: " <<
+         countTotal)
   return true;
 }
 
@@ -196,14 +200,15 @@ bool VXDTFTrackCandidate::setReserved()
 {
   int countSuccessfull = 0, countTotal = 0;
   bool successfull;
-  for (VXDTFHit * aHit : m_attachedHits) {
+  for (VXDTFHit* aHit : m_attachedHits) {
     if (aHit->getDetectorType() == Const::PXD) { /*PXD */
       countTotal++;
       if (aHit->getClusterInfoUV() != NULL) {
         successfull = aHit->getClusterInfoUV()->setReserved(this);
         if (successfull == true) { ++countSuccessfull; }
       } else {
-        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken PXDCluster id/pointer" << aHit->getClusterIndexUV() << "/" << aHit->getClusterInfoUV())
+        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken PXDCluster id/pointer" << aHit->getClusterIndexUV() << "/" <<
+                  aHit->getClusterInfoUV())
       }
     } else if (aHit->getDetectorType() == Const::TEST) { /*Telescope */
       countTotal++;
@@ -211,7 +216,8 @@ bool VXDTFTrackCandidate::setReserved()
         successfull = aHit->getClusterInfoUV()->setReserved(this);
         if (successfull == true) { ++countSuccessfull; }
       } else {
-        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken TELCluster id/pointer" << aHit->getClusterIndexUV() << "/" << aHit->getClusterInfoUV())
+        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken TELCluster id/pointer" << aHit->getClusterIndexUV() << "/" <<
+                  aHit->getClusterInfoUV())
       }
     } else { /* SVD */
       countTotal += 2;
@@ -219,19 +225,22 @@ bool VXDTFTrackCandidate::setReserved()
         successfull = aHit->getClusterInfoU()->setReserved(this);
         if (successfull == true) { ++countSuccessfull; }
       } else {
-        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken SVDClusterU id/pointer" << aHit->getClusterIndexUV() << "/" << aHit->getClusterInfoUV())
+        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken SVDClusterU id/pointer" << aHit->getClusterIndexUV() << "/"
+                  << aHit->getClusterInfoUV())
       }
 
       if (aHit->getClusterInfoV() != NULL) {
         successfull = aHit->getClusterInfoV()->setReserved(this);
         if (successfull == true) { ++countSuccessfull; }
       } else {
-        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken SVDClusterV id/pointer" << aHit->getClusterIndexUV() << "/" << aHit->getClusterInfoUV())
+        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken SVDClusterV id/pointer" << aHit->getClusterIndexUV() << "/"
+                  << aHit->getClusterInfoUV())
       }
     }
   }
   if (countSuccessfull != countTotal) {
-    B2WARNING("VXDTFTrackCandidate:setReserved: TC " << getTrackNumber() << " failed to reserve Clusters! " << countSuccessfull << " of " << countTotal << " clusters could be reserved")
+    B2WARNING("VXDTFTrackCandidate:setReserved: TC " << getTrackNumber() << " failed to reserve Clusters! " << countSuccessfull <<
+              " of " << countTotal << " clusters could be reserved")
     return false;
   }
   m_reserved = true;

@@ -114,9 +114,10 @@ namespace Belle2 {
 
 
     /** returns number of inner neighbours which are currently alive */
-    unsigned int sizeOfInnerNeighbours() const {
+    unsigned int sizeOfInnerNeighbours() const
+    {
       unsigned int nbsAlive = 0;
-      for (auto * nb : m_innerNeighbours) {
+      for (auto* nb : m_innerNeighbours) {
         nbsAlive += nb->getState() ? 1 : 0;
       }
       return nbsAlive;
@@ -128,9 +129,10 @@ namespace Belle2 {
 
 
     /** returns number of outer neighbours which are currently alive */
-    unsigned int sizeOfOuterNeighbours() const {
+    unsigned int sizeOfOuterNeighbours() const
+    {
       unsigned int nbsAlive = 0;
-      for (auto * nb : m_outerNeighbours) {
+      for (auto* nb : m_outerNeighbours) {
         nbsAlive += nb->getState() ? 1 : 0;
       }
       return nbsAlive;
@@ -176,7 +178,8 @@ namespace Belle2 {
 
 
     /** checks whether the segment has got any neighbours. If not, it dies (ActivationState = false)*/
-    bool dieIfNoNeighbours() {
+    bool dieIfNoNeighbours()
+    {
       if (sizeOfInnerNeighbours() == 0 and sizeOfOuterNeighbours() == 0) { setActivationState(false); }
 
       return m_activated;

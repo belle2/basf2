@@ -58,19 +58,22 @@ namespace Belle2 {
 
 
     /** overloaded '=='-operator for sorting algorithms */
-    bool operator==(const ActiveSector& b) const {
+    bool operator==(const ActiveSector& b) const
+    {
       return (getFullSecID() == b.getFullSecID());
     }
 
 
     /** overloaded '<'-operator for sorting algorithms */
-    bool operator<(const ActiveSector& b) const {
+    bool operator<(const ActiveSector& b) const
+    {
       return (getFullSecID() < b.getFullSecID());
     }
 
 
     /** overloaded '>'-operator for sorting algorithms */
-    bool operator>(const ActiveSector& b) const {
+    bool operator>(const ActiveSector& b) const
+    {
       return (getFullSecID() > b.getFullSecID());
     }
 

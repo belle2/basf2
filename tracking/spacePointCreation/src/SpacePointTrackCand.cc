@@ -40,7 +40,8 @@ SpacePointTrackCand::SpacePointTrackCand() :
 
 }
 
-SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode, double charge, int mcTrackID) :
+SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode, double charge,
+                                         int mcTrackID) :
   m_state6D(6),
   m_cov6D(6),
   m_flightDirection(true),
@@ -51,7 +52,7 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
   m_q = charge;
   m_MCTrackID = mcTrackID;
 
-  for (const SpacePoint * spacePoint : spacePoints) {
+  for (const SpacePoint* spacePoint : spacePoints) {
     m_trackSpacePoints.push_back(spacePoint);
     m_trackSpacePointIndices.push_back(spacePoint->getArrayIndex());
   }
@@ -97,7 +98,8 @@ const std::vector<double> SpacePointTrackCand::getSortingParametersInRange(int f
     lastIndex = tmp;
   }
   // check if the indices are in range!
-  if (firstIndex < 0 || uint(lastIndex) > m_trackSpacePoints.size() || uint(firstIndex) > m_trackSpacePoints.size() || lastIndex < 0) {
+  if (firstIndex < 0 || uint(lastIndex) > m_trackSpacePoints.size() || uint(firstIndex) > m_trackSpacePoints.size()
+      || lastIndex < 0) {
     throw SPTCIndexOutOfBounds();
   }
   std::vector<double> sortingParams;
@@ -189,7 +191,8 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
 
     const SpacePoint* spacePoint = m_trackSpacePoints[i];
     // COULDDO: implement a print method for SpacePoints
-    output << "SpacePoint " << i << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() << ". Sorting Parameter: " << m_sortingParameters[i] << "\n";
+    output << "SpacePoint " << i << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() <<
+           ". Sorting Parameter: " << m_sortingParameters[i] << "\n";
   }
   B2DEBUG(debuglevel, output.str());
 
@@ -198,11 +201,16 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   output.clear();
 
   output << "referee properties of this SPTC:\n";
-  output << "checked for SPs on same sensors: " << this->hasRefereeStatus(c_checkedSameSensors) << " -> result: " << this->hasRefereeStatus(c_hitsOnSameSensor) << "\n";
-  output << "checked for min distance between SPs: " << this->hasRefereeStatus(c_checkedMinDistance) << " -> result: " << this->hasRefereeStatus(c_hitsLowDistance) << "\n";
-  output << "checked for curling: " << this->checkedForCurling() << " -> result: " << this->isCurling() << ", part of a curling SPTC: " << this->isPartOfCurlingTrack() << "\n";
-  output << "direction of flight: " << m_flightDirection << ", removed SpacePoints: " << this->hasRefereeStatus(c_removedHits) << "\n";
-  output << "omitted Clusters: " << hasRefereeStatus(c_omittedClusters) << ", single Cluster SPs: " << hasRefereeStatus(c_singleClustersSPs) << "\n";
+  output << "checked for SPs on same sensors: " << this->hasRefereeStatus(c_checkedSameSensors) << " -> result: " <<
+         this->hasRefereeStatus(c_hitsOnSameSensor) << "\n";
+  output << "checked for min distance between SPs: " << this->hasRefereeStatus(c_checkedMinDistance) << " -> result: " <<
+         this->hasRefereeStatus(c_hitsLowDistance) << "\n";
+  output << "checked for curling: " << this->checkedForCurling() << " -> result: " << this->isCurling() <<
+         ", part of a curling SPTC: " << this->isPartOfCurlingTrack() << "\n";
+  output << "direction of flight: " << m_flightDirection << ", removed SpacePoints: " << this->hasRefereeStatus(
+           c_removedHits) << "\n";
+  output << "omitted Clusters: " << hasRefereeStatus(c_omittedClusters) << ", single Cluster SPs: " << hasRefereeStatus(
+           c_singleClustersSPs) << "\n";
   B2DEBUG(debuglevel, output.str())
 }
 
@@ -224,6 +232,7 @@ std::string SpacePointTrackCand::getRefereeStatusString(std::string delimiter) c
   if (hasRefereeStatus(c_omittedClusters)) statusString += "omittedClusters" + delimiter;
   if (hasRefereeStatus(c_singleClustersSPs)) statusString += "singleClusterSPs" + delimiter;
 
-  statusString.erase(statusString.end() - delimiter.size(), statusString.end()); // remove last delimiter -> no error catching SHOULD be neccessary since the case of an empty (==0) refereeStatus is already dealt with above!
+  statusString.erase(statusString.end() - delimiter.size(),
+                     statusString.end()); // remove last delimiter -> no error catching SHOULD be neccessary since the case of an empty (==0) refereeStatus is already dealt with above!
   return statusString;
 }

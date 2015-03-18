@@ -21,10 +21,10 @@ ClassImp(SpacePoint)
 
 SpacePoint::SpacePoint(const Belle2::PXDCluster* pxdCluster,
                        const Belle2::VXD::SensorInfoBase* aSensorInfo) :
-  m_clustersAssigned({true, true}),
-                   m_vxdID(pxdCluster->getSensorID()),
-                   m_qualityIndicator(0.5),
-                   m_isAssigned(false)
+  m_clustersAssigned( {true, true}),
+                    m_vxdID(pxdCluster->getSensorID()),
+                    m_qualityIndicator(0.5),
+                    m_isAssigned(false)
 {
   if (pxdCluster == NULL) { throw InvalidNumberOfClusters(); }
 
@@ -53,10 +53,10 @@ SpacePoint::SpacePoint(const Belle2::PXDCluster* pxdCluster,
 
 SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
                        const Belle2::VXD::SensorInfoBase* aSensorInfo) :
-  m_clustersAssigned({false, false}),
-                   m_vxdID(clusters.at(0)->getSensorID()),
-                   m_qualityIndicator(0.5),
-                   m_isAssigned(false)
+  m_clustersAssigned( {false, false}),
+m_vxdID(clusters.at(0)->getSensorID()),
+m_qualityIndicator(0.5),
+m_isAssigned(false)
 {
   unsigned int nClusters = clusters.size();
   SpacePoint::SpBaseType uCoord = 0; // 0 = center of Sensor
@@ -70,7 +70,7 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
   } else {
     vector<VxdID::baseType> vxdIDs;
     vector<bool> isUType;
-    for (const SVDCluster * aCluster : clusters) {
+    for (const SVDCluster* aCluster : clusters) {
       if (aCluster == NULL) throw InvalidNumberOfClusters();
       vxdIDs.push_back(aCluster->getSensorID());
       isUType.push_back(aCluster->isUCluster());
@@ -92,7 +92,7 @@ SpacePoint::SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
   }
 
   // retrieve position and sigma-values
-  for (const SVDCluster * aCluster : clusters) {
+  for (const SVDCluster* aCluster : clusters) {
     if (aCluster->isUCluster() == true) {
       m_clustersAssigned.first = true;
       uCoord = aCluster->getPosition();
@@ -171,7 +171,9 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 
 
 
-std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertLocalToNormalizedCoordinates(const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitLocal, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
+std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertLocalToNormalizedCoordinates(
+  const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitLocal, Belle2::VxdID::baseType vxdID,
+  const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -186,7 +188,8 @@ std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertLoc
   SpacePoint::SpBaseType sensorSizeU =  aSensorInfo->getUSize(hitLocal.second); // this deals with the case of trapezoidal sensors too
   SpacePoint::SpBaseType sensorSizeV =  aSensorInfo->getVSize();
 
-  SpacePoint::SpBaseType normalizedUPosition = (hitLocal.first +  0.5 * sensorSizeU) / sensorSizeU; // indepedent of the trapezoidal sensor-issue by definition
+  SpacePoint::SpBaseType normalizedUPosition = (hitLocal.first +  0.5 * sensorSizeU) /
+                                               sensorSizeU; // indepedent of the trapezoidal sensor-issue by definition
   boundaryCheck(normalizedUPosition, 0, 1);
 
   SpacePoint::SpBaseType normalizedVPosition = (hitLocal.second +  0.5 * sensorSizeV) / sensorSizeV;
@@ -197,7 +200,9 @@ std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertLoc
 
 
 
-std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertNormalizedToLocalCoordinates(const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitNormalized, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
+std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertNormalizedToLocalCoordinates(
+  const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitNormalized, Belle2::VxdID::baseType vxdID,
+  const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -219,7 +224,8 @@ std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertNor
 
 
 
-B2Vector3<SpacePoint::SpBaseType> SpacePoint::getGlobalCoordinates(const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitLocal, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
+B2Vector3<SpacePoint::SpBaseType> SpacePoint::getGlobalCoordinates(const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>&
+    hitLocal, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.

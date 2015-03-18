@@ -60,7 +60,8 @@ namespace Belle2 {
 
     // now we are using the third constructor using an encoded fullSecID (string) as input:
     stringstream aSecIDString;
-    aSecIDString << aFullSecID.getLayerID() << aFullSecID.getSubLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" << aFullSecID.getSecID();
+    aSecIDString << aFullSecID.getLayerID() << aFullSecID.getSubLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" <<
+                 aFullSecID.getSecID();
 
     FullSecID aThirdFullSecID = FullSecID(aSecIDString.str());
 
@@ -117,7 +118,8 @@ namespace Belle2 {
     unsigned short sectorID = 15;
     FullSecID aFullSecID = FullSecID(vxdID, subLayerID, sectorID);
     stringstream aSecIDString;
-    aSecIDString << aFullSecID.getLayerID() << aFullSecID.getSubLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" << aFullSecID.getSecID();
+    aSecIDString << aFullSecID.getLayerID() << aFullSecID.getSubLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" <<
+                 aFullSecID.getSecID();
 
     FullSecID aFullSecID2 = FullSecID(aSecIDString.str());
 

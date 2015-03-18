@@ -48,7 +48,8 @@ namespace Belle2 {
      * suffixes for the m_sup value.
      */
 
-    void persist(TTree* t, const string& branchName, const string& variableName) {
+    void persist(TTree* t, const string& branchName, const string& variableName)
+    {
 
       string leafList;
       leafList += variableName;

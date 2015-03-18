@@ -38,7 +38,8 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    ClusterTFInfo() {
+    ClusterTFInfo()
+    {
       m_realClusterId = -1;
       m_detectorType = -1;
       m_useCounter = 0;
@@ -50,7 +51,8 @@ namespace Belle2 {
     }
 
     /** Standard constructor */
-    ClusterTFInfo(int par_pass_index, int par_cluster_id, int par_detector): BaseTFInfo(par_pass_index) {
+    ClusterTFInfo(int par_pass_index, int par_cluster_id, int par_detector): BaseTFInfo(par_pass_index)
+    {
       m_realClusterId = par_cluster_id;
       m_detectorType = par_detector;
       m_useCounter = 0;
@@ -87,7 +89,8 @@ namespace Belle2 {
     int getMaxCounter()  { return m_maxCounter; }
 
     /** setter - UseCounter */
-    void setUseCounter(int value) {
+    void setUseCounter(int value)
+    {
       m_useCounter = value;
       if (m_useCounter > m_maxCounter) {
         m_maxCounter = m_useCounter;
@@ -95,7 +98,8 @@ namespace Belle2 {
     }
 
     /** UseCounte add / minus */
-    void changeUseCounter(int value) {
+    void changeUseCounter(int value)
+    {
       m_useCounter = m_useCounter + value;
       if (m_useCounter > m_maxCounter) {
         m_maxCounter = m_useCounter;
@@ -104,7 +108,8 @@ namespace Belle2 {
 
     // Cluster is overlapped if it is used more then one time
     /** if the Cluster is overlaped */
-    bool isOverlapped()  {
+    bool isOverlapped()
+    {
       if (m_useCounter > 1) {
         return true;
       } else {

@@ -27,7 +27,8 @@ namespace Belle2 {
     typedef unsigned int uInt;
 
     /** Standard constructor. */
-    ExporterHitInfo(TVector3 globalHitPosition, TVector3 covValues, int layerID, uShort vID, uInt sID, double angleOfSensor, int hitID, int hitType, int classification = -1, int particleID = -1, int pdg = -1):
+    ExporterHitInfo(TVector3 globalHitPosition, TVector3 covValues, int layerID, uShort vID, uInt sID, double angleOfSensor, int hitID,
+                    int hitType, int classification = -1, int particleID = -1, int pdg = -1):
       m_hitPos(globalHitPosition),
       m_covVal(covValues),
       m_layerID(layerID - 1), // they start at layer 0!

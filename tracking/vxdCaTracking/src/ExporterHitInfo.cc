@@ -21,14 +21,17 @@ using boost::lexical_cast;
 /** Output of position in a string file: it is a line with Xpos[empty space]Ypos[empty space]Zpos. */
 std::string ExporterHitInfo::getPositionFormatted()
 {
-  string output = lexical_cast<string>(m_hitPos.X()) + " " + lexical_cast<string>(m_hitPos.Y()) + " " + lexical_cast<string>(m_hitPos.Z()) + "\n";
+  string output = lexical_cast<string>(m_hitPos.X()) + " " + lexical_cast<string>(m_hitPos.Y()) + " " + lexical_cast<string>
+                  (m_hitPos.Z()) + "\n";
   return output;
 }
 
 
 std::string ExporterHitInfo::getSimpleHitFormatted()
 {
-  string output = lexical_cast<string>(getParticleID()) + " " + lexical_cast<string>(float(m_hitPos.X())) + " " + lexical_cast<string>(float(m_hitPos.Y())) + " " + lexical_cast<string>(float(m_hitPos.Z())) + " " + lexical_cast<string>(FullSecID(m_sectorID)) + "\n";
+  string output = lexical_cast<string>(getParticleID()) + " " + lexical_cast<string>(float(m_hitPos.X())) + " " +
+                  lexical_cast<string>(float(m_hitPos.Y())) + " " + lexical_cast<string>(float(m_hitPos.Z())) + " " + lexical_cast<string>(FullSecID(
+                        m_sectorID)) + "\n";
   return output;
 }
 
@@ -36,7 +39,8 @@ std::string ExporterHitInfo::getSimpleHitFormatted()
 /** Output of covValues in a string file: it is a line with CovUU[empty space]CovUV[empty space]CovVV */
 std::string ExporterHitInfo::getCovValuesFormatted()
 {
-  string output = lexical_cast<string>(m_covVal.X()) + " " + lexical_cast<string>(m_covVal.Y()) + " " + lexical_cast<string>(m_covVal.Z()) + "\n";
+  string output = lexical_cast<string>(m_covVal.X()) + " " + lexical_cast<string>(m_covVal.Y()) + " " + lexical_cast<string>
+                  (m_covVal.Z()) + "\n";
   return output;
 }
 
@@ -44,6 +48,7 @@ std::string ExporterHitInfo::getCovValuesFormatted()
 /** Output of additional information in a string file: it is a line with layerID[empty space]hitID[empty space]sensorAngle */
 std::string ExporterHitInfo::getAdditionalInfoFormatted()
 {
-  string output = lexical_cast<string>(m_layerID) + " " + lexical_cast<string>(m_hitID) + " " + lexical_cast<string>(m_sensorAngle) + "\n";
+  string output = lexical_cast<string>(m_layerID) + " " + lexical_cast<string>(m_hitID) + " " + lexical_cast<string>
+                  (m_sensorAngle) + "\n";
   return output;
 }

@@ -63,12 +63,14 @@ namespace Belle2 {
 
     EXPECT_DOUBLE_EQ(1., aFilter.calcDistZ());
 
-    EXPECT_DOUBLE_EQ(atan(sqrt(2.)), aFilter.calcSlopeRZ()); // normal slope is fullDistXY/calcDistZ = sqrt(2), here atan of slope is calculated
+    EXPECT_DOUBLE_EQ(atan(sqrt(2.)),
+                     aFilter.calcSlopeRZ()); // normal slope is fullDistXY/calcDistZ = sqrt(2), here atan of slope is calculated
 
     EXPECT_DOUBLE_EQ(2. / 3., aFilter.calcNormedDist3D());
 
 
-    TwoHitFilters bFilter = TwoHitFilters(); // initialising an empty filter first to check whether the resetting function is doing its job...
+    TwoHitFilters bFilter =
+      TwoHitFilters(); // initialising an empty filter first to check whether the resetting function is doing its job...
 
     bFilter.resetValues(innerHit, outerHit); // wrong order
 
@@ -122,7 +124,8 @@ namespace Belle2 {
   }
 
   /** And now possibly the only case where TwoHitFilters produces wrong results. However, (1e300, 0, 1e300) will never happen. */
-  TEST_F(TwoHitFiltersTest, TestOutOfRangeNormedDistFilter) //FAILS, because both calcDistXY() and calcDist3D() are too large to be stored in a double.
+  TEST_F(TwoHitFiltersTest,
+         TestOutOfRangeNormedDistFilter) //FAILS, because both calcDistXY() and calcDist3D() are too large to be stored in a double.
   {
     TVector3 innerHit(1e300, 0, 1e300);
     TVector3 outerHit(0, 0, 0);

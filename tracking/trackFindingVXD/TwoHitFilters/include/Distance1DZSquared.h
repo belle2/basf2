@@ -24,7 +24,8 @@ namespace Belle2 {
   public:
 
     /** calculates the squared distance between the hits in Z (in 1D), returning unit: cm^2 */
-    static float value(const PointType& outerHit, const PointType& innerHit) {
+    static float value(const PointType& outerHit, const PointType& innerHit)
+    {
       return
         std::pow(outerHit.Z() - innerHit.Z(), 2);
     }

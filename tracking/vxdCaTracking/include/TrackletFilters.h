@@ -32,7 +32,8 @@ namespace Belle2 {
     TrackletFilters():
       m_radius(0),
       m_chi2(0),
-      m_numHits(0) {
+      m_numHits(0)
+    {
       m_lineParameters.clear();
       m_hits = NULL;
       using namespace boost::assign;
@@ -45,7 +46,8 @@ namespace Belle2 {
     TrackletFilters(const std::vector<PositionInfo*>* hits, double magneticFieldStrength = 1.5):
       m_hits(hits),
       m_radius(0),
-      m_chi2(0) {
+      m_chi2(0)
+    {
       m_lineParameters.clear();
       m_numHits = m_hits->size();
       resetMagneticField(magneticFieldStrength);
@@ -61,7 +63,8 @@ namespace Belle2 {
 
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one. expects a vector of PostitionInof-structs (TVector3 formatted hits + their sigmaU and sigmaV) ordered by magnitude in x-y where the first entry should be the outermost hit */
-    void resetValues(const std::vector<PositionInfo*>* hits) {
+    void resetValues(const std::vector<PositionInfo*>* hits)
+    {
       m_lineParameters.clear();
       m_hits = hits;
       m_numHits = hits->size();
@@ -97,7 +100,8 @@ namespace Belle2 {
      * Pt-vector is for the innermost hit (= the last hit in 'hits', useBackwards = false)
      * or the outermost one (useBackwards = true)
      * */
-    std::pair<double, TVector3> circleFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false, double setMomentumMagnitude = 0);
+    std::pair<double, TVector3> circleFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false,
+                                          double setMomentumMagnitude = 0);
 
 
 
@@ -127,7 +131,8 @@ namespace Belle2 {
 
 
     /** does a complete helixFit of the given hits */
-    std::pair<double, TVector3> helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false, double setMomentumMagnitude = 0);
+    std::pair<double, TVector3> helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false,
+                                         double setMomentumMagnitude = 0);
 
 
 
@@ -143,7 +148,8 @@ namespace Belle2 {
 
 
     /** straight line fits expecting the hits stored in a vector of PositionInfo */
-    std::pair<double, TVector3> simpleLineFit3D(const std::vector<PositionInfo*>* hits, bool useBackwards = false, double setMomentumMagnitude = 0);
+    std::pair<double, TVector3> simpleLineFit3D(const std::vector<PositionInfo*>* hits, bool useBackwards = false,
+                                                double setMomentumMagnitude = 0);
 
 
 
@@ -153,7 +159,8 @@ namespace Belle2 {
 
 
     /** producing a reasonable guess for the abs(pT) of the tracklet, not compatible with setups of very small values for magnetic field, if a radius is already known, the value can be passed and shortens the process */
-    double calcPt(double r = 0) {
+    double calcPt(double r = 0)
+    {
       if (r != 0) { return m_3hitFilterBox.calcPt(r); }
 
       if (m_radius == 0.) {m_chi2 = circleFit().first; }

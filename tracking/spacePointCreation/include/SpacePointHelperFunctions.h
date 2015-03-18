@@ -36,7 +36,8 @@ namespace Belle2 {
   public:
 
     /** member function to automatically add the cluster to its corresponding entry */
-    inline void addCluster(const SVDCluster* entry) {
+    inline void addCluster(const SVDCluster* entry)
+    {
       vxdID = entry->getSensorID();
       if (entry->isUCluster() == true) { clustersU.push_back(entry); return; }
       clustersV.push_back(entry);
@@ -108,8 +109,8 @@ namespace Belle2 {
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
                                        std::vector< std::vector<const SVDCluster*> >& foundCombinations)
   {
-    for (const SVDCluster * uCluster : aSensor.clustersU) {
-      for (const SVDCluster * vCluster : aSensor.clustersV) {
+    for (const SVDCluster* uCluster : aSensor.clustersU) {
+      for (const SVDCluster* vCluster : aSensor.clustersV) {
         foundCombinations.push_back({uCluster, vCluster});
       }
     }
@@ -126,8 +127,10 @@ namespace Belle2 {
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints)
   {
-    std::unordered_map<VxdID::baseType, ClustersOnSensor> activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
-    std::vector<std::vector<const SVDCluster*> > foundCombinations; // collects all combinations of Clusters which were possible (condition: 1u+1v-Cluster on the same sensor)
+    std::unordered_map<VxdID::baseType, ClustersOnSensor>
+    activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
+    std::vector<std::vector<const SVDCluster*> >
+    foundCombinations; // collects all combinations of Clusters which were possible (condition: 1u+1v-Cluster on the same sensor)
 
 
     // sort Clusters by sensor. After the loop, each entry of activatedSensors contains all U and V-type clusters on that sensor
@@ -138,14 +141,14 @@ namespace Belle2 {
     }
 
 
-    for (auto & aSensor : activatedSensors) {
+    for (auto& aSensor : activatedSensors) {
       findPossibleCombinations(aSensor.second, foundCombinations);
     }
 
 
-    for (auto & clusterCombi : foundCombinations) {
+    for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
-      for (auto * cluster : clusterCombi) {
+      for (auto* cluster : clusterCombi) {
         newSP->addRelationTo(cluster);
       }
     }

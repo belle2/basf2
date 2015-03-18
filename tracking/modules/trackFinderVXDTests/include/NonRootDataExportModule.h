@@ -79,19 +79,24 @@ namespace Belle2 {
 
   protected:
 
-    std::string m_PARAMExportTrueHits; /**< allows you to export true hits. here, various values will be set at once, first part will determine whether you want to export PXD, SVD or VXD hits, second part says whether you want to export 'real' hits or 'background' hits, full example: 'SVDreal'. Wrong input values will cause fatal error. If you don't want to export trueHits, use 'none' */
+    std::string
+    m_PARAMExportTrueHits; /**< allows you to export true hits. here, various values will be set at once, first part will determine whether you want to export PXD, SVD or VXD hits, second part says whether you want to export 'real' hits or 'background' hits, full example: 'SVDreal'. Wrong input values will cause fatal error. If you don't want to export trueHits, use 'none' */
     bool m_PARAMExportGFTCs; /**< allows you to export mcInformation about whole tracks, set true for tcOutput */
-    std::string m_PARAMDetectorType; /**< set detectorype. Please choose between 'PXD', 'SVD' (standard) or 'VXD'. Wrong input values will set to SVD with an error. */
+    std::string
+    m_PARAMDetectorType; /**< set detectorype. Please choose between 'PXD', 'SVD' (standard) or 'VXD'. Wrong input values will set to SVD with an error. */
     int m_PARAMeventCounter; /**< adds this number to the m_eventCounter (useful for looping shell scripts) */
     int m_PARAMminTCLength;  /**< tracks with less than minTCLength hits will be neglected */
     bool m_PARAMsmearTrueHits; /**< when using trueHits, hits and mcPoints have got exactly the same position. If you activate the smearing, the hits will be smeared using the sensor resolution */
-    std::string m_PARAMoutputFormat; /**< this module can produce output-files with different styles, currently supported are 'gsi' and 'simpleMatlab'. */
+    std::string
+    m_PARAMoutputFormat; /**< this module can produce output-files with different styles, currently supported are 'gsi' and 'simpleMatlab'. */
     HitExporter m_exportContainer; /**< container storing storing hit infos */
     int m_eventCounter; /**< knows current event number */
     int m_runCounter; /**< knows current run number */
-    std::vector<std::string> m_PARAMwriteSecMaps; /**< if you want to output an extra file for secMaps (sector-relations) simply write the names of the sectorMaps into that list of names here (same coding as for VXDTF) */
+    std::vector<std::string>
+    m_PARAMwriteSecMaps; /**< if you want to output an extra file for secMaps (sector-relations) simply write the names of the sectorMaps into that list of names here (same coding as for VXDTF) */
     PassSetupVector m_passSetupVector; /**< contains information for each pass */
-    std::vector<HitExporter> m_exportContainerVector; /**< vector of HitExporters (has to be same amount as passes stored in the PassSetupVector) */
+    std::vector<HitExporter>
+    m_exportContainerVector; /**< vector of HitExporters (has to be same amount as passes stored in the PassSetupVector) */
 
   private:
 

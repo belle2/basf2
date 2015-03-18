@@ -62,15 +62,18 @@ namespace Belle2 {
     // Data members
     std::string m_svdClustersName; /**< SVDCluster collection name */
 
-    StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
+    StoreArray<SVDCluster>
+    m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
 
     std::string m_spacePointsName; /**< SpacePoints collection name */
 
-    StoreArray<SpacePoint> m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
+    StoreArray<SpacePoint>
+    m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
 
 
     // modification parameters
-    std::string m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+    std::string
+    m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
 
     bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
 

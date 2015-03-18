@@ -75,7 +75,8 @@ namespace Belle2 {
 //  B2Vector3(DataType coordinates[3]): m_coordinates(coordinates) {};
 
     /** Constructor using a reference */
-    B2Vector3(const DataType(& coordinates)[3]) {
+    B2Vector3(const DataType(& coordinates)[3])
+    {
       for (unsigned i = 0 ; i < 3; ++i) {
         m_coordinates[i] = coordinates[i];
       }
@@ -83,7 +84,8 @@ namespace Belle2 {
 
 
     /** Constructor using a pointer */
-    B2Vector3(const DataType(* coordinates)[3]) {
+    B2Vector3(const DataType(* coordinates)[3])
+    {
       for (unsigned i = 0 ; i < 3; ++i) {
         m_coordinates[i] = (*coordinates)[i];
       }
@@ -129,7 +131,8 @@ namespace Belle2 {
 
 
     /** Assignment via B2Vector3 */
-    inline B2Vector3<DataType>& operator = (const B2Vector3<DataType>& b) {
+    inline B2Vector3<DataType>& operator = (const B2Vector3<DataType>& b)
+    {
       m_coordinates[0] = b.X();
       m_coordinates[1] = b.Y();
       m_coordinates[2] = b.Z();
@@ -138,7 +141,8 @@ namespace Belle2 {
 
 
     /** Assignment via TVector3 */
-    inline B2Vector3<DataType>& operator = (const TVector3& b) {
+    inline B2Vector3<DataType>& operator = (const TVector3& b)
+    {
       m_coordinates[0] = b.X();
       m_coordinates[1] = b.Y();
       m_coordinates[2] = b.Z();
@@ -153,31 +157,36 @@ namespace Belle2 {
 
 
     /** Comparison for equality with a B2Vector3 */
-    inline Bool_t operator == (const B2Vector3<DataType>& b) const {
+    inline Bool_t operator == (const B2Vector3<DataType>& b) const
+    {
       return (this->X() == b.X() && this->Y() == b.Y() && this->Z() == b.Z());
     }
 
 
     /** Comparison for equality with a TVector3 */
-    inline Bool_t operator == (const TVector3& b) const {
+    inline Bool_t operator == (const TVector3& b) const
+    {
       return (this->X() == b.X() && this->Y() == b.Y() && this->Z() == b.Z());
     }
 
 
     /** Comparison != with a B2Vector3 */
-    inline Bool_t operator != (const B2Vector3<DataType>& b) const {
+    inline Bool_t operator != (const B2Vector3<DataType>& b) const
+    {
       return (this->X() != b.X() || this->Y() != b.Y() || this->Z() != b.Z());
     }
 
 
     /** Comparison != with a TVector3 */
-    inline Bool_t operator != (const TVector3& b) const {
+    inline Bool_t operator != (const TVector3& b) const
+    {
       return (this->X() != b.X() || this->Y() != b.Y() || this->Z() != b.Z());
     }
 
 
     /** addition */
-    inline B2Vector3<DataType>& operator += (const B2Vector3<DataType>& b) {
+    inline B2Vector3<DataType>& operator += (const B2Vector3<DataType>& b)
+    {
       m_coordinates[0] += b.X();
       m_coordinates[1] += b.Y();
       m_coordinates[2] += b.Z();
@@ -186,7 +195,8 @@ namespace Belle2 {
 
 
     /** subtraction */
-    inline B2Vector3<DataType>& operator -= (const B2Vector3<DataType>& b) {
+    inline B2Vector3<DataType>& operator -= (const B2Vector3<DataType>& b)
+    {
       m_coordinates[0] -= b.X();
       m_coordinates[1] -= b.Y();
       m_coordinates[2] -= b.Z();
@@ -195,14 +205,16 @@ namespace Belle2 {
 
 
     /** unary minus */
-    inline B2Vector3<DataType> operator - () const {
+    inline B2Vector3<DataType> operator - () const
+    {
 //    return std::move(B2Vector3<DataType>(-X(), -Y(), -Z())); // C++11-version
       return B2Vector3<DataType>(-X(), -Y(), -Z());
     }
 
 
     /** scaling with real numbers */
-    inline B2Vector3<DataType>& operator *= (DataType a) {
+    inline B2Vector3<DataType>& operator *= (DataType a)
+    {
       m_coordinates[0] *= a;
       m_coordinates[1] *= a;
       m_coordinates[2] *= a;
@@ -211,28 +223,32 @@ namespace Belle2 {
 
 
     /**  Addition of 3-vectors. */
-    B2Vector3<DataType> operator + (const B2Vector3<DataType>& b) const {
+    B2Vector3<DataType> operator + (const B2Vector3<DataType>& b) const
+    {
 //    return std::move(B2Vector3<DataType>(X() + X(), Y() + Y(), Z() + b.Z())); // C++11-version
       return B2Vector3<DataType>(X() + b.X(), Y() + b.Y(), Z() + b.Z());
     }
 
 
     /**  Subtraction of 3-vectors */
-    B2Vector3<DataType> operator - (const B2Vector3<DataType>& b) const {
+    B2Vector3<DataType> operator - (const B2Vector3<DataType>& b) const
+    {
 //    return std::move(B2Vector3<DataType>(X() - b.X(), Y() - b.Y(), Z() - b.Z())); // C++11-version
       return B2Vector3<DataType>(X() - b.X(), Y() - b.Y(), Z() - b.Z());
     }
 
 
     /**  Scaling of 3-vectors with a real number */
-    B2Vector3<DataType> operator * (DataType a) const {
+    B2Vector3<DataType> operator * (DataType a) const
+    {
 //    return std::move(B2Vector3<DataType>(a * X(), a * Y(), a * Z())); // C++11-version
       return B2Vector3<DataType>(a * X(), a * Y(), a * Z()); // C++11-version
     }
 
 
     /**  Scalar product of 3-vectors. */
-    DataType operator * (const B2Vector3<DataType>& b) const {
+    DataType operator * (const B2Vector3<DataType>& b) const
+    {
       return Dot(b);
     }
 
@@ -242,19 +258,22 @@ namespace Belle2 {
 
 
     /**  The azimuth angle. returns phi from -pi to pi  */
-    inline DataType Phi() const {
+    inline DataType Phi() const
+    {
       return X() == 0 && Y() == 0 ? 0 : TMath::ATan2(X(), Y());
     }
 
 
     /**  The polar angle. */
-    inline DataType Theta() const {
+    inline DataType Theta() const
+    {
       return X() == 0 && Y() == 0 && Z() == 0 ? 0 : TMath::ATan2(Perp(), Z());
     }
 
 
     /**  Cosine of the polar angle. */
-    inline DataType CosTheta() const {
+    inline DataType CosTheta() const
+    {
       DataType pTot = Mag();
       return pTot == 0 ? 1 : Z() / pTot;
     }
@@ -269,7 +288,8 @@ namespace Belle2 {
 
 
     /**  Set phi keeping mag and theta constant. */
-    inline void SetPhi(DataType phi) {
+    inline void SetPhi(DataType phi)
+    {
       DataType xy   = Perp();
       SetX(xy * TMath::Cos(phi));
       SetY(xy * TMath::Sin(phi));
@@ -277,7 +297,8 @@ namespace Belle2 {
 
 
     /**  Set theta keeping mag and phi constant. */
-    inline void SetTheta(DataType theta) {
+    inline void SetTheta(DataType theta)
+    {
       DataType ma   = Mag();
       DataType ph   = Phi();
       SetX(ma * TMath::Sin(theta)*TMath::Cos(ph));
@@ -287,7 +308,8 @@ namespace Belle2 {
 
 
     /**  Set magnitude keeping theta and phi constant. */
-    inline void SetMag(DataType mag) {
+    inline void SetMag(DataType mag)
+    {
       DataType factor = Mag();
       if (factor == 0) {
         B2WARNING(name() << "::SetMag: zero vector can't be stretched");
@@ -312,7 +334,8 @@ namespace Belle2 {
     inline DataType Perp() const { return TMath::Sqrt(Perp2()); }
 
     /**  Set the transverse component keeping phi and z constant. */
-    inline void SetPerp(DataType r) {
+    inline void SetPerp(DataType r)
+    {
       DataType p = Perp();
       if (p != 0.0) {
         m_coordinates[0] *= r / p;
@@ -322,7 +345,8 @@ namespace Belle2 {
 
 
     /**  The transverse component w.r.t. given axis squared. */
-    inline DataType Perp2(const B2Vector3<DataType>& axis)  const {
+    inline DataType Perp2(const B2Vector3<DataType>& axis)  const
+    {
       DataType tot = axis.Mag2();
       DataType ss  = Dot(axis);
       DataType per = Mag2();
@@ -333,25 +357,29 @@ namespace Belle2 {
 
 
     /**  The transverse component w.r.t. given axis. */
-    inline DataType Pt(const B2Vector3<DataType>& axis) const {
+    inline DataType Pt(const B2Vector3<DataType>& axis) const
+    {
       return Perp(axis);
     }
 
 
     /**  The transverse component w.r.t. given axis. */
-    inline DataType Perp(const B2Vector3<DataType>& axis) const {
+    inline DataType Perp(const B2Vector3<DataType>& axis) const
+    {
       return TMath::Sqrt(Perp2(axis));
     }
 
 
     /** returns phi in the interval [-PI,PI) */
-    inline DataType DeltaPhi(const B2Vector3<DataType>& v) const {
+    inline DataType DeltaPhi(const B2Vector3<DataType>& v) const
+    {
       return Mpi_pi(Phi() - v.Phi());
     }
 
 
     /** returns given angle in the interval [-PI,PI) */
-    DataType Mpi_pi(DataType angle) const {
+    DataType Mpi_pi(DataType angle) const
+    {
       if (TMath::IsNaN(angle)) {
         B2ERROR(name() << "::Mpi_pi: function called with NaN");
         return angle;
@@ -363,7 +391,8 @@ namespace Belle2 {
 
 
     /** return deltaR with respect to input-vector */
-    inline DataType DeltaR(const B2Vector3<DataType>& v) const {
+    inline DataType DeltaR(const B2Vector3<DataType>& v) const
+    {
       DataType deta = Eta() - v.Eta();
       DataType dphi = Mpi_pi(Phi() - v.Phi());
       return TMath::Sqrt(deta * deta + dphi * dphi);
@@ -371,13 +400,15 @@ namespace Belle2 {
 
 
     /** return DrEtaPhi with respect to input-vector */
-    inline DataType DrEtaPhi(const B2Vector3<DataType>& v) const {
+    inline DataType DrEtaPhi(const B2Vector3<DataType>& v) const
+    {
       return DeltaR(v);
     }
 
 
     //setter with mag, theta, phi
-    inline void SetMagThetaPhi(DataType mag, DataType theta, DataType phi) {
+    inline void SetMagThetaPhi(DataType mag, DataType theta, DataType phi)
+    {
       DataType amag = TMath::Abs(mag);
       DataType sinTheta = TMath::Sin(theta);
       m_coordinates[0] = amag * sinTheta * TMath::Cos(phi);
@@ -387,7 +418,8 @@ namespace Belle2 {
 
 
     /**  Unit vector parallel to this. */
-    inline B2Vector3<DataType> Unit() const {
+    inline B2Vector3<DataType> Unit() const
+    {
       DataType  tot = Mag2();
       B2Vector3<DataType> p(X(), Y(), Z());
       return tot > 0.0 ? p *= (1.0 / TMath::Sqrt(tot)) : p;
@@ -395,7 +427,8 @@ namespace Belle2 {
 
 
     /**  Vector orthogonal to this one. */
-    inline B2Vector3<DataType> Orthogonal() const {
+    inline B2Vector3<DataType> Orthogonal() const
+    {
       DataType x = X() < 0.0 ? -X() : X();
       DataType y = Y() < 0.0 ? -Y() : Y();
       DataType z = Z() < 0.0 ? -Z() : Z();
@@ -408,20 +441,23 @@ namespace Belle2 {
 
 
     /**  Scalar product. */
-    inline DataType Dot(const B2Vector3<DataType>& p) const {
+    inline DataType Dot(const B2Vector3<DataType>& p) const
+    {
       return X() * p.X() + Y() * p.Y() + Z() * p.Z();
     }
 
 
     /**  Cross product. */
-    inline B2Vector3<DataType> Cross(const B2Vector3<DataType>& p) const {
+    inline B2Vector3<DataType> Cross(const B2Vector3<DataType>& p) const
+    {
 //    return std::move(B2Vector3<DataType>(Y() * p.Z() - p.Y() * Z(), Z() * p.X() - p.Z() * X(), X() * p.Y() - p.X() * Y())); // C++11-version
       return B2Vector3<DataType>(Y() * p.Z() - p.Y() * Z(), Z() * p.X() - p.Z() * X(), X() * p.Y() - p.X() * Y()); // C++11-version
     }
 
 
     /**  The angle w.r.t. another B2Vector3. */
-    inline DataType Angle(const B2Vector3<DataType>& q) const {
+    inline DataType Angle(const B2Vector3<DataType>& q) const
+    {
       DataType ptot2 = Mag2() * q.Mag2();
       if (ptot2 <= 0) {
         return 0.0;
@@ -438,7 +474,8 @@ namespace Belle2 {
      *
      * for the sake of keeping compatibility to TVector3, the hardcoded values are not replaced by something more intelligent
      */
-    DataType PseudoRapidity() const {
+    DataType PseudoRapidity() const
+    {
       DataType cosTheta = CosTheta();
       if (cosTheta * cosTheta < 1) return -0.5 * TMath::Log((1.0 - cosTheta) / (1.0 + cosTheta));
       if (Z()  == 0) return 0;
@@ -449,13 +486,15 @@ namespace Belle2 {
 
 
     /** Returns the pseudo-rapidity */
-    inline DataType Eta() const {
+    inline DataType Eta() const
+    {
       return PseudoRapidity();
     }
 
 
     /**  Rotates the B2Vector3 around the x-axis. */
-    void RotateX(DataType angle) {
+    void RotateX(DataType angle)
+    {
       //rotate vector around X
       DataType s = TMath::Sin(angle);
       DataType c = TMath::Cos(angle);
@@ -466,7 +505,8 @@ namespace Belle2 {
 
 
     /**  Rotates the B2Vector3 around the y-axis. */
-    void RotateY(DataType angle) {
+    void RotateY(DataType angle)
+    {
       //rotate vector around Y
       DataType s = TMath::Sin(angle);
       DataType c = TMath::Cos(angle);
@@ -477,7 +517,8 @@ namespace Belle2 {
 
 
     /**  Rotates the B2Vector3 around the z-axis. */
-    void RotateZ(DataType angle) {
+    void RotateZ(DataType angle)
+    {
       //rotate vector around Z
       DataType s = TMath::Sin(angle);
       DataType c = TMath::Cos(angle);
@@ -488,7 +529,8 @@ namespace Belle2 {
 
 
     /**  Rotates reference frame from Uz to newUz (unit vector). */
-    void RotateUz(const B2Vector3<DataType>& NewUzVector) {
+    void RotateUz(const B2Vector3<DataType>& NewUzVector)
+    {
       // NewUzVector must be normalized !
 
       DataType u1 = NewUzVector.X();
@@ -521,7 +563,8 @@ namespace Belle2 {
 
 
     /** calculates the absolute value of the coordinates element-wise */
-    inline void Abs() {
+    inline void Abs()
+    {
       m_coordinates[0] = std::abs(m_coordinates[0]);
       m_coordinates[1] = std::abs(m_coordinates[1]);
       m_coordinates[2] = std::abs(m_coordinates[2]);
@@ -529,7 +572,8 @@ namespace Belle2 {
 
 
     /** calculates the square root of the absolute values of the coordinates element-wise */
-    inline void Sqrt() {
+    inline void Sqrt()
+    {
       Abs();
       m_coordinates[0] = std::sqrt(m_coordinates[0]);
       m_coordinates[1] = std::sqrt(m_coordinates[1]);
@@ -584,7 +628,8 @@ namespace Belle2 {
 
 
     /** directly copies coordinates to an array of double */
-    inline void GetXYZ(Double_t* carray) const {
+    inline void GetXYZ(Double_t* carray) const
+    {
       carray[0] = static_cast<Double_t>(X());
       carray[1] = static_cast<Double_t>(Y());
       carray[2] = static_cast<Double_t>(Z());
@@ -592,7 +637,8 @@ namespace Belle2 {
 
 
     /** directly copies coordinates to an array of float */
-    inline void GetXYZ(Float_t* carray) const {
+    inline void GetXYZ(Float_t* carray) const
+    {
       carray[0] = static_cast<Float_t>(X());
       carray[1] = static_cast<Float_t>(Y());
       carray[2] = static_cast<Float_t>(Z());
@@ -600,7 +646,8 @@ namespace Belle2 {
 
 
     /** directly copies coordinates to a TVector3 */
-    inline void GetXYZ(TVector3* tVec) const {
+    inline void GetXYZ(TVector3* tVec) const
+    {
       tVec->SetXYZ(static_cast<Double_t>(X()),
                    static_cast<Double_t>(Y()),
                    static_cast<Double_t>(Z()));
@@ -608,7 +655,8 @@ namespace Belle2 {
 
 
     /** returns a TVector3 containing the same coordinates */
-    inline TVector3 GetTVector3(void) const {
+    inline TVector3 GetTVector3(void) const
+    {
       return
 //       std::move( // C++11-version
 //           TVector3(
@@ -641,7 +689,8 @@ namespace Belle2 {
 
 
     /** set all coordinates using data type */
-    inline void SetXYZ(DataType xx, DataType yy, DataType zz) {
+    inline void SetXYZ(DataType xx, DataType yy, DataType zz)
+    {
       m_coordinates[0] = xx;
       m_coordinates[1] = yy;
       m_coordinates[2] = zz;
@@ -649,7 +698,8 @@ namespace Belle2 {
 
 
     /** set all coordinates using a reference to TVector3 */
-    inline void SetXYZ(const TVector3& tVec) {
+    inline void SetXYZ(const TVector3& tVec)
+    {
       m_coordinates[0] = static_cast<Double_t>(tVec.X());
       m_coordinates[1] = static_cast<Double_t>(tVec.Y());
       m_coordinates[2] = static_cast<Double_t>(tVec.Z());
@@ -657,7 +707,8 @@ namespace Belle2 {
 
 
     /** set all coordinates using a pointer to TVector3 */
-    inline void SetXYZ(const TVector3* tVec) {
+    inline void SetXYZ(const TVector3* tVec)
+    {
       m_coordinates[0] = static_cast<Double_t>(tVec->X());
       m_coordinates[1] = static_cast<Double_t>(tVec->Y());
       m_coordinates[2] = static_cast<Double_t>(tVec->Z());
@@ -696,12 +747,14 @@ namespace Belle2 {
 //  }
 
     /** create a string containing vectorParameters */
-    std::string PrintString() const {
+    std::string PrintString() const
+    {
       return name() + PrintStringXYZ() + " " + PrintStringCyl();
     }
 
     /** create a string containing vectorParameters */
-    std::string PrintStringXYZ(unsigned precission = 4) const {
+    std::string PrintStringXYZ(unsigned precission = 4) const
+    {
       std::ostringstream output;
       output  << "(x,y,z)=("
               << std::fixed
@@ -715,7 +768,8 @@ namespace Belle2 {
     }
 
     /** create a string containing vectorParameters */
-    std::string PrintStringCyl(unsigned precission = 4) const {
+    std::string PrintStringCyl(unsigned precission = 4) const
+    {
       std::ostringstream output;
       output  << "(rho, theta, phi)=("
               << std::fixed
@@ -730,7 +784,8 @@ namespace Belle2 {
     }
 
     /** just for backward compatibility, should not be used with new code */
-    void Print() {
+    void Print()
+    {
       {
         //print vector parameters
         Printf(PrintString().c_str());

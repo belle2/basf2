@@ -38,7 +38,9 @@ const Cutoff* SectorFriends::getCutOff(int aFilter)
   if (m_filters.at(aFilter).getType() != -1) {
     return &m_filters[aFilter];
   }
-  B2DEBUG(50, " cutoffType  (int/string) " << aFilter << "/" << FilterID().getFilterString(aFilter) << " does not exist within Friend (int/string) " << m_friendName << "/" << FullSecID(m_friendName).getFullSecString() << " of " << m_sectorName << "/" << FullSecID(m_sectorName).getFullSecString() << "!");
+  B2DEBUG(50, " cutoffType  (int/string) " << aFilter << "/" << FilterID().getFilterString(aFilter) <<
+          " does not exist within Friend (int/string) " << m_friendName << "/" << FullSecID(m_friendName).getFullSecString() << " of " <<
+          m_sectorName << "/" << FullSecID(m_sectorName).getFullSecString() << "!");
   return NULL;
 }
 
@@ -51,5 +53,6 @@ void SectorFriends::getSupportedCutoffs(std::vector<int>& supportedCutoffs)
       supportedCutoffs.push_back(filter);
     }
   }
-  B2DEBUG(500, "Friend " << m_friendName << "/" << FullSecID(m_friendName).getFullSecString() << " of " << m_sectorName << "/" << FullSecID(m_sectorName).getFullSecString() << ": after boost loop is size of cutOffs: " << supportedCutoffs.size());
+  B2DEBUG(500, "Friend " << m_friendName << "/" << FullSecID(m_friendName).getFullSecString() << " of " << m_sectorName << "/" <<
+          FullSecID(m_sectorName).getFullSecString() << ": after boost loop is size of cutOffs: " << supportedCutoffs.size());
 }

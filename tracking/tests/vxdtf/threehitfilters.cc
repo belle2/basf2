@@ -94,7 +94,8 @@ namespace Belle2 {
   /** test sign, helixFit and calcDeltaSlopeRZ filters */
   TEST_F(ThreeHitFiltersTest, TestSignAndOtherFilters)
   {
-    TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.), sigma(.01, .01, .01), unrealsigma(2, 2, 2), outerhighHit(4., 6., 1.);
+    TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.), sigma(.01, .01, .01), unrealsigma(2, 2, 2),
+             outerhighHit(4., 6., 1.);
 
     ThreeHitFilters aFilter = ThreeHitFilters(outerHit, centerHit, innerHit);
 
@@ -105,7 +106,8 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(1., aFilter.calcSign(outerHit, centerHit, innerHit, sigma, sigma, sigma));
     EXPECT_DOUBLE_EQ(-1., aFilter.calcSign(outerhighHit, centerHit, innerHit, sigma, sigma, sigma));
     EXPECT_DOUBLE_EQ(-1., aFilter.calcSign(innerHit, centerHit, outerHit, sigma, sigma, sigma));
-    EXPECT_DOUBLE_EQ(0., aFilter.calcSign(outerHit, centerHit, innerHit, unrealsigma, unrealsigma, unrealsigma)); //for very large sigma, this track is approximately straight.
+    EXPECT_DOUBLE_EQ(0., aFilter.calcSign(outerHit, centerHit, innerHit, unrealsigma, unrealsigma,
+                                          unrealsigma)); //for very large sigma, this track is approximately straight.
 
     EXPECT_LT(0., aFilter.calcSign(outerHit, centerHit, innerHit));
     EXPECT_GT(0., aFilter.calcSign(outerhighHit, centerHit, innerHit));

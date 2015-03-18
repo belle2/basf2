@@ -22,7 +22,8 @@ namespace Belle2 {
   /** bundles filter methods using 3 hits (using ThreeHitFilter-class). and compares with entries of sector min and max */
   class NbFinderFilters : public ThreeHitFilters {
   public:
-    typedef std::pair <int, int> SuccessAndFailCounter; /**< first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
+    typedef std::pair <int, int>
+    SuccessAndFailCounter; /**< first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
     NbFinderFilters():
@@ -40,8 +41,10 @@ namespace Belle2 {
       m_deltaSlopeZOverSCtr(std::make_pair(0, 0)) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available, optional parameter sets strength of magnetic field (standard is 1.5T) */
-    NbFinderFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID, double magneticFieldStrength = 1.5):
-      ThreeHitFilters(outerHit, centerHit, innerHit, magneticFieldStrength),  // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
+    NbFinderFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID,
+                    double magneticFieldStrength = 1.5):
+      ThreeHitFilters(outerHit, centerHit, innerHit,
+                      magneticFieldStrength),  // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
       m_thisSector(thisSector),
       m_friendID(friendID),
       m_angle3DCtr(std::make_pair(0, 0)),
@@ -59,7 +62,8 @@ namespace Belle2 {
     ~NbFinderFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID) {
+    void resetValues(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID)
+    {
       ThreeHitFilters::resetValues(outerHit, centerHit, innerHit); // resetValues of baseClass
       m_thisSector = thisSector;
       m_friendID = friendID;
@@ -229,7 +233,8 @@ namespace Belle2 {
 
 
     /** returns cutoff-values of given filter */
-    std::pair <double, double> getCutoffs(int aFilter) {
+    std::pair <double, double> getCutoffs(int aFilter)
+    {
       const Cutoff* pCutoff = m_thisSector->getCutoff(aFilter, m_friendID);
       if (pCutoff != NULL) return std::make_pair(pCutoff->getMinValue(), pCutoff->getMaxValue());
       return std::make_pair(0., 0.);
@@ -238,20 +243,27 @@ namespace Belle2 {
 
   protected:
 
-    VXDSector* m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
+    VXDSector*
+    m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
     unsigned int m_friendID; /**< is a key used for determine the currently needed filterSet */
     SuccessAndFailCounter m_angle3DCtr; /**< counts number of successful (.first) and neglected (.second) tests for angle3D */
     SuccessAndFailCounter m_angleXYCtr; /**< counts number of successful (.first) and neglected (.second) tests for angleXY */
     SuccessAndFailCounter m_angleRZCtr; /**< counts number of successful (.first) and neglected (.second) tests for angleRZ */
-    SuccessAndFailCounter m_circleDist2IPCtr; /**< counts number of successful (.first) and neglected (.second) tests for circleDist2IP */
+    SuccessAndFailCounter
+    m_circleDist2IPCtr; /**< counts number of successful (.first) and neglected (.second) tests for circleDist2IP */
     SuccessAndFailCounter m_deltaSlopeRZCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSlopeRZ */
     SuccessAndFailCounter m_pTCtr; /**< counts number of successful (.first) and neglected (.second) tests for pT */
-    SuccessAndFailCounter m_helixParameterFitCtr; /**< counts number of successful (.first) and neglected (.second) tests for helixParameterFit */
+    SuccessAndFailCounter
+    m_helixParameterFitCtr; /**< counts number of successful (.first) and neglected (.second) tests for helixParameterFit */
     SuccessAndFailCounter m_deltaSOverZCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSOverZ */
-    SuccessAndFailCounter m_deltaSlopeZOverSCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSlopeZOverS */
-    SuccessAndFailCounter m_AlwaysTrue3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says True */
-    SuccessAndFailCounter m_AlwaysFalse3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says False */
-    SuccessAndFailCounter m_Random3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which randomly throws True or False */
+    SuccessAndFailCounter
+    m_deltaSlopeZOverSCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSlopeZOverS */
+    SuccessAndFailCounter
+    m_AlwaysTrue3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says True */
+    SuccessAndFailCounter
+    m_AlwaysFalse3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says False */
+    SuccessAndFailCounter
+    m_Random3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which randomly throws True or False */
   }; //end class NbFinderFilters
 } //end namespace Belle2
 

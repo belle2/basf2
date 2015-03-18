@@ -99,15 +99,19 @@ namespace Belle2 {
 
 
     /** event wise call expected: Expects pointer to the PXDTrueHit to be stored. It stores its entries to hits. Returns string containing error message if something went wrong */
-    std::string storePXDTrueHit(VXD::GeoCache& geometry, const PXDTrueHit* aHit, int storeArrayID, bool doSmear, int isPrimaryBackgroundOrGhost = -1, int particleID = -1, int pdg = -1); // default arguments are only allowed for .h-files, not in the .cc- version of the memberfunction
+    std::string storePXDTrueHit(VXD::GeoCache& geometry, const PXDTrueHit* aHit, int storeArrayID, bool doSmear,
+                                int isPrimaryBackgroundOrGhost = -1, int particleID = -1,
+                                int pdg = -1); // default arguments are only allowed for .h-files, not in the .cc- version of the memberfunction
 
 
     /** event wise call expected: Expects pointer to the SVDTrueHit to be stored. It stores its entries to hits. Returns string containing error message if something went wrong */
-    std::string storeSVDTrueHit(VXD::GeoCache& geometry, const SVDTrueHit* aHit, int storeArrayID, bool doSmear, int isPrimaryBackgroundOrGhost = -1, int particleID = -1, int pdg = -1);
+    std::string storeSVDTrueHit(VXD::GeoCache& geometry, const SVDTrueHit* aHit, int storeArrayID, bool doSmear,
+                                int isPrimaryBackgroundOrGhost = -1, int particleID = -1, int pdg = -1);
 
 
     /** event wise call expected: It stores GFTrackCands and its containing TrueHits(as McPoints) */
-    std::string storeGFTC(VXD::GeoCache& geometry, const genfit::TrackCand* aTC, int tcFileIndex, int tcSimIndex, std::vector<const PXDTrueHit*> pxdHits, std::vector<const SVDTrueHit*> svdHits, std::vector<int> hitIDs);
+    std::string storeGFTC(VXD::GeoCache& geometry, const genfit::TrackCand* aTC, int tcFileIndex, int tcSimIndex,
+                          std::vector<const PXDTrueHit*> pxdHits, std::vector<const SVDTrueHit*> svdHits, std::vector<int> hitIDs);
 
 
     /** expected to be called at the end of a run: exports every TC and every hit stored.
@@ -126,7 +130,8 @@ namespace Belle2 {
   protected:
 
     /** feeded by storePXDTrueHit or storeSVDTrueHit and does all the calculations and storing */
-    std::string storeTrueHit(VXD::SensorInfoBase aSensorInfo, double u, double v, int type, int storeArrayID, int isPrimaryBackgroundOrGhost, int aLayerID, int particleID, int pdg, bool doSmear);
+    std::string storeTrueHit(VXD::SensorInfoBase aSensorInfo, double u, double v, int type, int storeArrayID,
+                             int isPrimaryBackgroundOrGhost, int aLayerID, int particleID, int pdg, bool doSmear);
 
 
     int m_eventNumber; /**< stores current event number */

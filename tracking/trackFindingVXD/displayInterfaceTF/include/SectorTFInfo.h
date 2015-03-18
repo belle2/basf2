@@ -37,7 +37,8 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    SectorTFInfo() {
+    SectorTFInfo()
+    {
       m_points[0].SetXYZ(0., 0., 0.);
       m_points[1].SetXYZ(0., 0., 0.);
       m_points[2].SetXYZ(0., 0., 0.);
@@ -51,7 +52,8 @@ namespace Belle2 {
 
 
     /** Standard constructor */
-    SectorTFInfo(int parPassIndex, int parSectorid): BaseTFInfo(parPassIndex) {
+    SectorTFInfo(int parPassIndex, int parSectorid): BaseTFInfo(parPassIndex)
+    {
       m_sectorID = parSectorid;
       m_points[0].SetXYZ(0., 0., 0.);
       m_points[1].SetXYZ(0., 0., 0.);
@@ -64,13 +66,15 @@ namespace Belle2 {
     }
 
     /** getter - getPoint Point int (from POINT 0 to POINT 3 */
-    TVector3 getPoint(int valuePoint)  {
+    TVector3 getPoint(int valuePoint)
+    {
       if (valuePoint < 0 or valuePoint > 3) { throw 10; }
       return m_points[valuePoint];
     }
 
     /** setter - Point */
-    void setPoint(int valuePoint, TVector3 value) {
+    void setPoint(int valuePoint, TVector3 value)
+    {
       if (valuePoint < 0 or valuePoint > 3) { throw 10; }
       m_points[valuePoint] = value;
     }
@@ -85,12 +89,14 @@ namespace Belle2 {
     std::vector<unsigned int> getFriends() const  { return m_friends; }
 
     /** add new int to Friends */
-    void push_back_Friends(unsigned int newMember) {
+    void push_back_Friends(unsigned int newMember)
+    {
       m_friends.push_back(newMember);
     }
 
     /** set all Friends */
-    void setAllFriends(std::vector<unsigned int> parFriends) {
+    void setAllFriends(std::vector<unsigned int> parFriends)
+    {
       m_friends = parFriends;
     }
 
@@ -110,7 +116,8 @@ namespace Belle2 {
     int getMaxCounter()  { return m_maxCounter; }
 
     /** setter - UseCounter */
-    void setUseCounter(int value) {
+    void setUseCounter(int value)
+    {
       m_useCounter = value;
       if (m_useCounter > m_maxCounter) {
         m_maxCounter = m_useCounter;
@@ -118,7 +125,8 @@ namespace Belle2 {
     }
 
     /** UseCounte add / minus */
-    void changeUseCounter(int value) {
+    void changeUseCounter(int value)
+    {
       m_useCounter = m_useCounter + value;
       if (m_useCounter > m_maxCounter) {
         m_maxCounter = m_useCounter;
@@ -128,7 +136,8 @@ namespace Belle2 {
 
     // Sector is overlapped if it is used more then one time
     /** if the sector is overlaped */
-    bool isOverlapped()  {
+    bool isOverlapped()
+    {
       if (m_useCounter > 1) {
         return true;
       } else {
@@ -137,17 +146,22 @@ namespace Belle2 {
     }
 
     /** returns the String for the display - Information */
-    const TString getDisplayInformation() const {
+    const TString getDisplayInformation() const
+    {
 
-      return TString::Format("Point 1: (%.3f, %.3f, %.3f) Point 2: (%.3f, %.3f, %.3f) Point 3: (%.3f, %.3f, %.3f) Point 4: (%.3f, %.3f, %.3f)\n Friend Only: %s\n Died_ID: %d ", m_points[0].X(), m_points[0].Y(), m_points[0].Z(), m_points[1].X(), m_points[1].Y(), m_points[1].Z(), m_points[2].X(), m_points[2].Y(), m_points[2].Z(), m_points[3].X(), m_points[3].Y(), m_points[3].Z(), m_isOnlyFriend ? "true" : "false", getDiedID());
+      return TString::Format("Point 1: (%.3f, %.3f, %.3f) Point 2: (%.3f, %.3f, %.3f) Point 3: (%.3f, %.3f, %.3f) Point 4: (%.3f, %.3f, %.3f)\n Friend Only: %s\n Died_ID: %d ",
+                             m_points[0].X(), m_points[0].Y(), m_points[0].Z(), m_points[1].X(), m_points[1].Y(), m_points[1].Z(), m_points[2].X(),
+                             m_points[2].Y(), m_points[2].Z(), m_points[3].X(), m_points[3].Y(), m_points[3].Z(), m_isOnlyFriend ? "true" : "false",
+                             getDiedID());
 
     }
 
     /** returns Coordinates of a Sector, Point 1 = Point 5 to draw Sector */
-    const std::vector<TVector3> getCoordinates() const {
+    const std::vector<TVector3> getCoordinates() const
+    {
       std::vector<TVector3> coordinates;
 
-      for (auto & currentPoint : m_points) {
+      for (auto& currentPoint : m_points) {
         coordinates.insert(coordinates.end(), currentPoint);
       }
 
@@ -157,15 +171,18 @@ namespace Belle2 {
     }
 
     /** returns the String for the display - AlternativeBox */
-    const TString getDisplayAlternativeBox() const {
+    const TString getDisplayAlternativeBox() const
+    {
 
       std::string diedAt = getDiedAt();
 
-      return TString::Format("SectorID: %d, PassIndex: %d\n Died_ID: %s, Count Friend Sectors: %d", m_sectorID, getPassIndex(), diedAt.c_str(), sizeFriends());
+      return TString::Format("SectorID: %d, PassIndex: %d\n Died_ID: %s, Count Friend Sectors: %d", m_sectorID, getPassIndex(),
+                             diedAt.c_str(), sizeFriends());
     }
 
     /** returns the Color of the Object for the display */
-    Color_t getColor() const {
+    Color_t getColor() const
+    {
       if (getActive()) {
         return kBlue;
       } else {

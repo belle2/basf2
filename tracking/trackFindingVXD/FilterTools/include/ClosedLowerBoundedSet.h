@@ -49,7 +49,8 @@ namespace Belle2 {
      * The leaves will be named as the selection variable name with the "_min"
      * suffix for the min value.
      */
-    void persist(TTree* t, const string& branchName, const string& variableName) {
+    void persist(TTree* t, const string& branchName, const string& variableName)
+    {
 
       string leafList;
       leafList += variableName;

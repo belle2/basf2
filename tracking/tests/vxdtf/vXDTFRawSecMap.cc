@@ -214,7 +214,8 @@ namespace Belle2 {
     VXDTFRawSecMap::CutoffValues::reverse_iterator higherIter = sample.rbegin();
     for (int i = 0 ; i < (sampleSize - 1 - higherIndex); i++) { ++higherIter; }
 
-    B2INFO("findQuantilesInSample: sampleSize: " << sampleSize << ", quantiles: " << quantiles.first << "/" << quantiles.second << ", found indices: " << lowerIndex << "/" << higherIndex << ", found values: " << *lowerIter << "/" << *higherIter)
+    B2INFO("findQuantilesInSample: sampleSize: " << sampleSize << ", quantiles: " << quantiles.first << "/" << quantiles.second <<
+           ", found indices: " << lowerIndex << "/" << higherIndex << ", found values: " << *lowerIter << "/" << *higherIter)
     return make_pair(*lowerIter, *higherIter);
   }
 }

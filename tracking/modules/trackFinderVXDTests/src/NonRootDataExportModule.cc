@@ -59,14 +59,25 @@ NonRootDataExportModule::NonRootDataExportModule() : Module()
   int minTCLength = 1;
   std::vector<string> writeSecMaps;
 
-  addParam("exportTrueHits", m_PARAMExportTrueHits, "allows you to export true hits. Please choose between 'all' hits, 'real' hits, 'background' hits or 'none', which is standard. Wrong input values will set to none with an error.", string("none"));
-  addParam("exportGFTCs", m_PARAMExportGFTCs, "allows you to export mcInformation about whole tracks, set true for tcOutput", bool(false));
-  addParam("detectorType", m_PARAMDetectorType, "set detectorype. Please choose between 'PXD', 'SVD' (standard) or 'VXD'. Wrong input values will set to SVD with an error.", string("SVD"));
+  addParam("exportTrueHits", m_PARAMExportTrueHits,
+           "allows you to export true hits. Please choose between 'all' hits, 'real' hits, 'background' hits or 'none', which is standard. Wrong input values will set to none with an error.",
+           string("none"));
+  addParam("exportGFTCs", m_PARAMExportGFTCs, "allows you to export mcInformation about whole tracks, set true for tcOutput",
+           bool(false));
+  addParam("detectorType", m_PARAMDetectorType,
+           "set detectorype. Please choose between 'PXD', 'SVD' (standard) or 'VXD'. Wrong input values will set to SVD with an error.",
+           string("SVD"));
   addParam("minTCLength", m_PARAMminTCLength, "tracks with less than minTCLength hits will be neglected", minTCLength);
-  addParam("smearTrueHits", m_PARAMsmearTrueHits, "when using trueHits, hits and mcPoints have got exactly the same position. If you activate the smearing, the hits will be smeared using the sensor resolution", bool(false));
-  addParam("outputFormat", m_PARAMoutputFormat, "this module can produce output-files with different styles, currently supported are 'gsi' and 'simpleMatlab'.", string("simpleMatlab"));
+  addParam("smearTrueHits", m_PARAMsmearTrueHits,
+           "when using trueHits, hits and mcPoints have got exactly the same position. If you activate the smearing, the hits will be smeared using the sensor resolution",
+           bool(false));
+  addParam("outputFormat", m_PARAMoutputFormat,
+           "this module can produce output-files with different styles, currently supported are 'gsi' and 'simpleMatlab'.",
+           string("simpleMatlab"));
   // note to myself. Format needed by gsi is listed at personal log p.91, format needed by rudi (simpleMatlab) is listed in p. 162,165
-  addParam("writeSecMaps", m_PARAMwriteSecMaps, "if you want to output an extra file for secMaps (sector-relations) simply write the names of the sectorMaps into that list of names here (same coding as for VXDTF)", writeSecMaps);
+  addParam("writeSecMaps", m_PARAMwriteSecMaps,
+           "if you want to output an extra file for secMaps (sector-relations) simply write the names of the sectorMaps into that list of names here (same coding as for VXDTF)",
+           writeSecMaps);
   addParam("eventCounter", m_PARAMeventCounter, "adds this number to the m_eventCounter (useful for looping shell scripts)", int(0));
 
   m_eventCounter = 0;
@@ -117,7 +128,9 @@ void NonRootDataExportModule::initialize()
     B2ERROR("NonRootDataExport: eventCounter is set on illegal value, resetting to 0!")
   }
   StoreArray<MCParticle>::required();
-  B2INFO("NonRootDataExportModule: chosen detectorType: " << m_PARAMDetectorType << ", exporting TrueHits: " << m_PARAMExportTrueHits << " and exporting GFTrackCands: " << m_PARAMExportGFTCs << ", minimal ndf number of hits for tcs: " << m_PARAMminTCLength << " while using '" << m_PARAMoutputFormat << "/" << m_exportContainer.getOutputFormat() << "' as outputFormat")
+  B2INFO("NonRootDataExportModule: chosen detectorType: " << m_PARAMDetectorType << ", exporting TrueHits: " << m_PARAMExportTrueHits
+         << " and exporting GFTrackCands: " << m_PARAMExportGFTCs << ", minimal ndf number of hits for tcs: " << m_PARAMminTCLength <<
+         " while using '" << m_PARAMoutputFormat << "/" << m_exportContainer.getOutputFormat() << "' as outputFormat")
 }
 
 
@@ -143,7 +156,7 @@ void NonRootDataExportModule::event()
   m_eventCounter = eventMetaDataPtr->getEvent();
   m_eventCounter += m_PARAMeventCounter;
   m_exportContainer.prepareEvent(m_eventCounter);
-  for (HitExporter & aContainer : m_exportContainerVector) {
+  for (HitExporter& aContainer : m_exportContainerVector) {
     aContainer.prepareEvent(m_eventCounter);
   }
 
@@ -168,7 +181,7 @@ void NonRootDataExportModule::event()
       for (int i = 0; i < nPXDTrueHits; ++i) {
         const PXDTrueHit* aTrueHit = pxdTrueHits[i];
 
-        for (const RelationElement & rel : mcParticlesToPxdTrueHits.getElementsTo(aTrueHit)) {
+        for (const RelationElement& rel : mcParticlesToPxdTrueHits.getElementsTo(aTrueHit)) {
           const MCParticle* particle = rel.from;
           if (m_PARAMoutputFormat == "gsi") {
             particleID = particle->getIndex(); // 1-based index of Particle.
@@ -183,16 +196,18 @@ void NonRootDataExportModule::event()
             break; // if there are any other true or background particles, they shall be ignored
           }
         }
-        B2DEBUG(10, " PXDTrueHit with ID " << i << " is attached to mcParticles with ID " << particleID << " and hasStatusPrimary (0 = true) " << isPrimary)
+        B2DEBUG(10, " PXDTrueHit with ID " << i << " is attached to mcParticles with ID " << particleID <<
+                " and hasStatusPrimary (0 = true) " << isPrimary)
 
-        if ((m_PARAMExportTrueHits == "real" and isPrimary != 0) or (m_PARAMExportTrueHits == "background" and isPrimary != 1) or (m_PARAMExportTrueHits == "all" and isPrimary == -1)) {
+        if ((m_PARAMExportTrueHits == "real" and isPrimary != 0) or (m_PARAMExportTrueHits == "background" and isPrimary != 1)
+            or (m_PARAMExportTrueHits == "all" and isPrimary == -1)) {
           isPrimary = 1;
           particleID = -1;
           B2DEBUG(10, " PXD hit " << i << " neglected")
           continue;
         }
         string errorMessage = m_exportContainer.storePXDTrueHit(aGeometry, aTrueHit, i, m_PARAMsmearTrueHits, isPrimary, particleID, pdg);
-        for (HitExporter & aContainer : m_exportContainerVector) {
+        for (HitExporter& aContainer : m_exportContainerVector) {
           errorMessage += aContainer.storePXDTrueHit(aGeometry, aTrueHit, i, m_PARAMsmearTrueHits, isPrimary, particleID, pdg);
         }
         if (errorMessage != "") { B2DEBUG(1, "event " << m_eventCounter << ": " << errorMessage); }
@@ -212,7 +227,7 @@ void NonRootDataExportModule::event()
       for (int i = 0; i < nSVDTrueHits; ++i) {
         const SVDTrueHit* aTrueHit = svdTrueHits[i];
 
-        for (const RelationElement & rel : mcParticlesToSvdTrueHits.getElementsTo(aTrueHit)) {
+        for (const RelationElement& rel : mcParticlesToSvdTrueHits.getElementsTo(aTrueHit)) {
           const MCParticle* particle = rel.from;
           if (m_PARAMoutputFormat == "gsi") {
             particleID = particle->getIndex(); // 1-based index of Particle.
@@ -226,18 +241,21 @@ void NonRootDataExportModule::event()
             break; // if there are any other true or background particles, they shall be ignored
           }
         }
-        B2DEBUG(10, " SVDTrueHit with ID " << i << " is attached to mcParticles with ID " << particleID << " and hasStatusPrimary (0 = true) " << isPrimary)
+        B2DEBUG(10, " SVDTrueHit with ID " << i << " is attached to mcParticles with ID " << particleID <<
+                " and hasStatusPrimary (0 = true) " << isPrimary)
 
-        if ((m_PARAMExportTrueHits == "real" and isPrimary != 0) or (m_PARAMExportTrueHits == "background" and isPrimary != 1) or (m_PARAMExportTrueHits == "all" and isPrimary == -1)) {
+        if ((m_PARAMExportTrueHits == "real" and isPrimary != 0) or (m_PARAMExportTrueHits == "background" and isPrimary != 1)
+            or (m_PARAMExportTrueHits == "all" and isPrimary == -1)) {
           isPrimary = 1;
           particleID = -1;
           B2DEBUG(10, " SVD hit " << i << " neglected")
           continue;
         }
 
-        string errorMessage = m_exportContainer.storeSVDTrueHit(aGeometry, aTrueHit, i + nPXDTrueHits, m_PARAMsmearTrueHits, isPrimary, particleID, pdg); // nPXDTrueHits is 0 if detectorType is SVD, therefore no check here
+        string errorMessage = m_exportContainer.storeSVDTrueHit(aGeometry, aTrueHit, i + nPXDTrueHits, m_PARAMsmearTrueHits, isPrimary,
+                                                                particleID, pdg); // nPXDTrueHits is 0 if detectorType is SVD, therefore no check here
 
-        for (HitExporter & aContainer : m_exportContainerVector) {
+        for (HitExporter& aContainer : m_exportContainerVector) {
           errorMessage += aContainer.storeSVDTrueHit(aGeometry, aTrueHit, i + nPXDTrueHits, m_PARAMsmearTrueHits, isPrimary, particleID, pdg);
         }
         if (errorMessage != "") { B2DEBUG(1, "event " << m_eventCounter << ": " << errorMessage); }
@@ -266,7 +284,8 @@ void NonRootDataExportModule::event()
       B2DEBUG(10, "event " << m_eventCounter << ": TC " << i << " has got " << nHits << " hits")
 
       if (int(aTC->getNHits()) < m_PARAMminTCLength) {
-        B2WARNING("NonRootDataExportModule - event " << m_eventCounter << ": GfTrackcand " << i << " has only " << nHits << " hits (threshold is " << m_PARAMminTCLength << "), neglecting tc...")
+        B2WARNING("NonRootDataExportModule - event " << m_eventCounter << ": GfTrackcand " << i << " has only " << nHits <<
+                  " hits (threshold is " << m_PARAMminTCLength << "), neglecting tc...")
         continue;
       }
 
@@ -287,7 +306,7 @@ void NonRootDataExportModule::event()
       }
       B2DEBUG(10, "storing GFTC " << i << " with " << pxdHits.size() << " pxd hits and " << svdHits.size() << " svd hits")
       m_exportContainer.storeGFTC(aGeometry, aTC, countedTCs, i, pxdHits, svdHits, hitIDs);
-      for (HitExporter & aContainer : m_exportContainerVector) {
+      for (HitExporter& aContainer : m_exportContainerVector) {
         aContainer.storeGFTC(aGeometry, aTC, countedTCs, i, pxdHits, svdHits, hitIDs);
       }
       ++countedTCs;
@@ -295,7 +314,10 @@ void NonRootDataExportModule::event()
     }
   }
 
-  B2DEBUG(5, " event " << m_eventCounter << " got ID " << m_eventCounter << ", internal eventID of " << m_exportContainer.getCurrentEventNumber() << " and got internal hits: " << m_exportContainer.getNumberOfHits() << " hits, of these were " << m_exportContainer.getNumberOfPXDTrueHits() << " PXDTrueHits, and " << m_exportContainer.getNumberOfSVDTrueHits() << " were SVDTrueHits")
+  B2DEBUG(5, " event " << m_eventCounter << " got ID " << m_eventCounter << ", internal eventID of " <<
+          m_exportContainer.getCurrentEventNumber() << " and got internal hits: " << m_exportContainer.getNumberOfHits() <<
+          " hits, of these were " << m_exportContainer.getNumberOfPXDTrueHits() << " PXDTrueHits, and " <<
+          m_exportContainer.getNumberOfSVDTrueHits() << " were SVDTrueHits")
 }
 
 
@@ -304,10 +326,11 @@ void NonRootDataExportModule::endRun()
 {
   m_runCounter++;
   if (m_PARAMoutputFormat == "gsi") {
-    string extendedInfoOfExport = m_exportContainer.exportGsi(m_runCounter, 15.0); // second entry is the strength of the magnetic field in kiloGauss
+    string extendedInfoOfExport = m_exportContainer.exportGsi(m_runCounter,
+                                                              15.0); // second entry is the strength of the magnetic field in kiloGauss
     B2INFO("exportGsi: run " << m_runCounter << ": " << extendedInfoOfExport)
   } else if (m_PARAMoutputFormat == "simpleMatlab") {
-    for (HitExporter & aContainer : m_exportContainerVector) {
+    for (HitExporter& aContainer : m_exportContainerVector) {
       string extendedInfoOfExport = aContainer.exportSimpleMatlab(m_runCounter);
       B2INFO("exportSimpleMatlab: run " << m_runCounter << ": " << extendedInfoOfExport)
     }
@@ -318,7 +341,7 @@ void NonRootDataExportModule::endRun()
   }
 
   // cleanUp
-  for (PassData * currentPass : m_passSetupVector) {
+  for (PassData* currentPass : m_passSetupVector) {
     for (secMapEntry aSector : currentPass->sectorMap) {
       delete aSector.second;
     }
@@ -349,7 +372,8 @@ void NonRootDataExportModule::loadSecMap(std::vector<std::string> secMaps)
     try {
       newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
     } catch (exception& e) {
-      B2ERROR("NonRootDataExportModule::loadSecMap: could not load sectorMap: " << aMapName << ". Reason: exception thrown: " << e.what() << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available! Skipping current map...")
+      B2ERROR("NonRootDataExportModule::loadSecMap: could not load sectorMap: " << aMapName << ". Reason: exception thrown: " << e.what()
+              << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available! Skipping current map...")
       continue;
     }
 
@@ -360,7 +384,9 @@ void NonRootDataExportModule::loadSecMap(std::vector<std::string> secMaps)
     /// importing sectorMap including friend Information and friend specific cutoffs
     std::pair<int, int> countedFriendsAndCutoffs = newPass->importSectorMap(newMap->getSectorMap(), newMap->getDistances(), false);
 
-    B2INFO("NonRootDataExportModule::loadSecMap: Pass-setup " << aMapName << ": importing secMap with " << newMap->getSectorMap().size() << " sectors -> imported: " << newPass->sectorMap.size() << "/" << countedFriendsAndCutoffs.first << "/" << countedFriendsAndCutoffs.second << " sectors/friends/(friends w/o existing filters), a hitExporter has been attached to it...");
+    B2INFO("NonRootDataExportModule::loadSecMap: Pass-setup " << aMapName << ": importing secMap with " << newMap->getSectorMap().size()
+           << " sectors -> imported: " << newPass->sectorMap.size() << "/" << countedFriendsAndCutoffs.first << "/" <<
+           countedFriendsAndCutoffs.second << " sectors/friends/(friends w/o existing filters), a hitExporter has been attached to it...");
 
     m_passSetupVector.push_back(newPass);
 
@@ -376,20 +402,21 @@ void NonRootDataExportModule::loadSecMap(std::vector<std::string> secMaps)
 void NonRootDataExportModule::printSecMap()
 {
   ofstream secMapFileStream;
-  for (PassData * aPass : m_passSetupVector) {
+  for (PassData* aPass : m_passSetupVector) {
     vector<int> currentCutOffTypes;
 
     secMapFileStream.open((aPass->sectorSetup + ".data").c_str(), std::ios_base::trunc); // trunc=overwrite app=append
 
     int sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0; // counters
-    for (auto & mapEntry : aPass->sectorMap) { // looping through sectors
+    for (auto& mapEntry : aPass->sectorMap) {  // looping through sectors
       const vector<unsigned int> currentFriends = mapEntry.second->getFriends();
       int nFriends = currentFriends.size();
 
       secMapFileStream << FullSecID(mapEntry.first) << " ";
       B2DEBUG(1, "Opening sector " << FullSecID(mapEntry.first) << " which has got " << nFriends << " friends");
       if (nFriends != mapEntry.second->getFriendMapSize()) {
-        B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) << ": friends by friendVector vs nEntries in FriendMa: " << nFriends << "/" << mapEntry.second->getFriendMapSize())
+        B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) <<
+                  ": friends by friendVector vs nEntries in FriendMa: " << nFriends << "/" << mapEntry.second->getFriendMapSize())
       }
 
       for (auto friendName : currentFriends) {  // looping through friends
@@ -405,7 +432,8 @@ void NonRootDataExportModule::printSecMap()
     }
 
     secMapFileStream.close();
-    B2DEBUG(1, "NonRootDataExportModule::loadSecMap: Pass-setup " << aPass->sectorSetup << ": manually counted a total of " << sectorCtr << "/" << friendCtr << "/" << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap");
+    B2DEBUG(1, "NonRootDataExportModule::loadSecMap: Pass-setup " << aPass->sectorSetup << ": manually counted a total of " << sectorCtr
+            << "/" << friendCtr << "/" << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap");
   }
 }
 
@@ -427,7 +455,8 @@ void NonRootDataExportModule::importGeometry(HitExporter* hitExporter)
       const set<VxdID>& sensors = aGeometry.getSensors(ladder);
       for (VxdID sensor : sensors) {
         const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-        if ((aSensorInfo.getType() == 0 and m_PARAMDetectorType == "SVD") or (aSensorInfo.getType() == 1 and m_PARAMDetectorType == "PXD")) {
+        if ((aSensorInfo.getType() == 0 and m_PARAMDetectorType == "SVD") or (aSensorInfo.getType() == 1
+            and m_PARAMDetectorType == "PXD")) {
           stopLoop = true;
           break;
         }

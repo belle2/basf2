@@ -53,13 +53,15 @@ namespace Belle2 {
      * nFriends = how many friends per sector shall this map contain?, not higher than ~6
      * nSectors = how many sectors shall this map contain? not higher than ~10000
      * */
-    static VXDTFRawSecMapTypedef::StrippedRawSecMap randomFillRawSecMap(unsigned nCuts = 50, unsigned nFilters = 2, unsigned nFriends = 5, unsigned nSectors = 10);
+    static VXDTFRawSecMapTypedef::StrippedRawSecMap randomFillRawSecMap(unsigned nCuts = 50, unsigned nFilters = 2,
+        unsigned nFriends = 5, unsigned nSectors = 10);
   protected:
   };
 
 
 
-  VXDTFRawSecMapTypedef::StrippedRawSecMap SecMapVectorTest::randomFillRawSecMap(unsigned nCuts, unsigned nFilters, unsigned nFriends, unsigned nSectors)
+  VXDTFRawSecMapTypedef::StrippedRawSecMap SecMapVectorTest::randomFillRawSecMap(unsigned nCuts, unsigned nFilters, unsigned nFriends,
+      unsigned nSectors)
   {
     VXDTFRawSecMapTypedef::StrippedRawSecMap strippedRawSecMap;
 
@@ -118,7 +120,9 @@ namespace Belle2 {
     aSecMap.addSectorMap(thisMap);
     SecMapVector::MapPack firstPack = make_pair(aSecMapName, aSecMap);
     aSecMapVector.push_back(firstPack);
-    B2INFO("creating a secMap named " << aSecMap.getMapName() << " having " << aSecMap.getMaxDistance2origin() << " as maxDistance2Origin- and " << aSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " << aSecMap.getNumOfValues())
+    B2INFO("creating a secMap named " << aSecMap.getMapName() << " having " << aSecMap.getMaxDistance2origin() <<
+           " as maxDistance2Origin- and " << aSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " <<
+           aSecMap.getNumOfValues())
 
     nCuts++; nSectors++;
     std::string anotherSecMapName = "anotherSecMap";
@@ -129,10 +133,13 @@ namespace Belle2 {
     anotherSecMap.addSectorMap(thisMap);
     SecMapVector::MapPack secondPack = make_pair(anotherSecMapName, anotherSecMap);
     aSecMapVector.push_back(secondPack);
-    B2INFO("creating a secMap named " << anotherSecMap.getMapName() << " having " << anotherSecMap.getMaxDistance2origin() << " as maxDistance2Origin- and " << anotherSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " << anotherSecMap.getNumOfValues())
+    B2INFO("creating a secMap named " << anotherSecMap.getMapName() << " having " << anotherSecMap.getMaxDistance2origin() <<
+           " as maxDistance2Origin- and " << anotherSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " <<
+           anotherSecMap.getNumOfValues())
 
-    for (SecMapVector::MapPack & aMap : aSecMapVector.getFullVector()) {
-      B2INFO("vector stored map with name " << aMap.second.getMapName() << " and lower threshold " << aMap.second.getLowerMomentumThreshold() << " and nValues: " << aMap.second.getNumOfValues())
+    for (SecMapVector::MapPack& aMap : aSecMapVector.getFullVector()) {
+      B2INFO("vector stored map with name " << aMap.second.getMapName() << " and lower threshold " <<
+             aMap.second.getLowerMomentumThreshold() << " and nValues: " << aMap.second.getNumOfValues())
     }
 
     /// create root file, fill SecMapVector into file, store it, close
@@ -154,7 +161,9 @@ namespace Belle2 {
     aThirdSecMap.addSectorMap(thisMap);
     SecMapVector::MapPack thirdPack = make_pair(aThirdSecMapName, aThirdSecMap);
     aSecMapVector2.push_back(thirdPack);
-    B2INFO("creating a secMap named " << aThirdSecMap.getMapName() << " having " << aThirdSecMap.getMaxDistance2origin() << " as maxDistance2Origin- and " << aThirdSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " << aThirdSecMap.getNumOfValues())
+    B2INFO("creating a secMap named " << aThirdSecMap.getMapName() << " having " << aThirdSecMap.getMaxDistance2origin() <<
+           " as maxDistance2Origin- and " << aThirdSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " <<
+           aThirdSecMap.getNumOfValues())
 
     nCuts++; nSectors++;
     string aFourthSecMapName = "aFourthSecMap";
@@ -165,7 +174,9 @@ namespace Belle2 {
     aFourthSecMap.addSectorMap(thisMap);
     SecMapVector::MapPack fourthPack = make_pair(aFourthSecMapName, aFourthSecMap);
     aSecMapVector2.push_back(fourthPack);
-    B2INFO("creating a secMap named " << aFourthSecMap.getMapName() << " having " << aFourthSecMap.getMaxDistance2origin() << " as maxDistance2Origin- and " << aFourthSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " << aFourthSecMap.getNumOfValues())
+    B2INFO("creating a secMap named " << aFourthSecMap.getMapName() << " having " << aFourthSecMap.getMaxDistance2origin() <<
+           " as maxDistance2Origin- and " << aFourthSecMap.getLowerMomentumThreshold() << " for lowerMomentum-threshold. nValues: " <<
+           aFourthSecMap.getNumOfValues())
 
     /// reopen root file, fill SecMapVector into file, store it, close
     B2INFO("opening root file:");
@@ -193,7 +204,7 @@ namespace Belle2 {
           continue;
         }
 
-        for (SecMapVector::MapPack & entry : retrievedVector->getFullVector()) {
+        for (SecMapVector::MapPack& entry : retrievedVector->getFullVector()) {
           EXPECT_FLOAT_EQ(-1, entry.second.getMaxDistance2origin());
           EXPECT_FLOAT_EQ(1.5, entry.second.getMagneticFieldStrength());
           EXPECT_FLOAT_EQ(0.23, entry.second.getLowerMomentumThreshold());

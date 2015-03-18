@@ -38,7 +38,8 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    CellTFInfo() {
+    CellTFInfo()
+    {
       m_state = 0;
       m_useCounter = 0;
       m_maxCounter = 0;
@@ -46,7 +47,8 @@ namespace Belle2 {
     };
 
     /** Standard constructor */
-    CellTFInfo(int parPassIndex): BaseTFInfo(parPassIndex) {
+    CellTFInfo(int parPassIndex): BaseTFInfo(parPassIndex)
+    {
       m_state = 0;
       m_neighbours.clear();
       m_assignedHitsIds.clear();
@@ -71,12 +73,14 @@ namespace Belle2 {
     std::vector<int> getNeighbours() const { return m_neighbours; }
 
     /** add new int to Neighbours */
-    void push_back_Neighbours(int newMember) {
+    void push_back_Neighbours(int newMember)
+    {
       m_neighbours.push_back(newMember);
     }
 
     /** add new int to Neighbours */
-    void insert_Neighbours(std::vector<int> newMember) {
+    void insert_Neighbours(std::vector<int> newMember)
+    {
       if (int(newMember.size()) != 0) {
         m_neighbours.insert(m_neighbours.end(), newMember.begin(), newMember.end());
       }
@@ -92,7 +96,8 @@ namespace Belle2 {
     std::vector<int>& getAssignedHits()  { return m_assignedHitsIds; }
 
     /** add new int to Assigned Hits */
-    void push_back_AssignedHits(int newMember, TVector3 newCoordinates) {
+    void push_back_AssignedHits(int newMember, TVector3 newCoordinates)
+    {
       m_assignedHitsIds.push_back(newMember);
       m_assignedHitsCoordinates.push_back(newCoordinates);
     }
@@ -108,7 +113,8 @@ namespace Belle2 {
     int getMaxCounter()  { return m_maxCounter; }
 
     /** setter - UseCounter */
-    void setUseCounter(int value) {
+    void setUseCounter(int value)
+    {
       m_useCounter = value;
       if (m_useCounter > m_maxCounter) {
         m_maxCounter = m_useCounter;
@@ -116,7 +122,8 @@ namespace Belle2 {
     }
 
     /** UseCounte add / minus */
-    void changeUseCounter(int value) {
+    void changeUseCounter(int value)
+    {
       m_useCounter = m_useCounter + value;
       if (m_useCounter > m_maxCounter) {
         m_maxCounter = m_useCounter;
@@ -125,7 +132,8 @@ namespace Belle2 {
 
     // Cell is overlapped if it is used more then one time by a TC
     /** if the Cell is overlaped */
-    bool isOverlappedByTC()  {
+    bool isOverlappedByTC()
+    {
       if (m_useCounter > 1) {
         return true;
       } else {
@@ -144,12 +152,14 @@ namespace Belle2 {
     std::vector<std::pair<int, double>>& getUsedParticles()  { return m_usedParticles; }
 
     /** add new to used_particles */
-    void push_back_UsedParticles(std::pair<int, double> newMember) {
+    void push_back_UsedParticles(std::pair<int, double> newMember)
+    {
       m_usedParticles.push_back(newMember);
     }
 
     /** getter - Particle with highest purity*/
-    std::pair<int, double> getMainParticle() const {
+    std::pair<int, double> getMainParticle() const
+    {
 
       int maxPos = 0;
 
@@ -163,7 +173,8 @@ namespace Belle2 {
     }
 
     /** getter - Particle with particleID*/
-    std::pair<int, double> getInfoParticle(int particleID)  {
+    std::pair<int, double> getInfoParticle(int particleID)
+    {
 
       for (uint i = 0; i < m_usedParticles.size(); i++) {
         if (m_usedParticles.at(i).first == particleID) {
@@ -176,7 +187,8 @@ namespace Belle2 {
 
 
     /** containsParticle - Particle with particleID */
-    bool containsParticle(int particleID)  {
+    bool containsParticle(int particleID)
+    {
 
       for (uint i = 0; i < m_usedParticles.size(); i++) {
         if (m_usedParticles.at(i).first == particleID) {
@@ -192,7 +204,8 @@ namespace Belle2 {
     int sizeUsedParticles() { return m_usedParticles.size(); }
 
     /** returns the String for the display - Information */
-    const TString getDisplayInformation() const {
+    const TString getDisplayInformation() const
+    {
 
       int outerHit = -1;
       if (m_assignedHitsIds.size() > 0) { outerHit = m_assignedHitsIds.at(0); }
@@ -204,22 +217,26 @@ namespace Belle2 {
 
 
     /** returns Coordinates of the Assigned Hits */
-    const std::vector<TVector3> getCoordinates() const {
+    const std::vector<TVector3> getCoordinates() const
+    {
       return m_assignedHitsCoordinates;
     }
 
 
     /** returns the String for the display - AlternativeBox */
-    const TString getDisplayAlternativeBox() const {
+    const TString getDisplayAlternativeBox() const
+    {
 
       std::pair<int, double> mainParticle = getMainParticle();
       std::string diedAt = getDiedAt();
 
-      return TString::Format("State: %d, PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Count NB-Cells: %d", m_state, getPassIndex(), diedAt.c_str(), m_isReal, mainParticle.first, mainParticle.second, sizeNeighbours());
+      return TString::Format("State: %d, PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Count NB-Cells: %d",
+                             m_state, getPassIndex(), diedAt.c_str(), m_isReal, mainParticle.first, mainParticle.second, sizeNeighbours());
     }
 
     /** returns the Color of the Object for the display */
-    Color_t getColor() const {
+    Color_t getColor() const
+    {
       if (getActive()) {
         return (kRed - m_state); // different Red for different State
       } else {
@@ -234,7 +251,8 @@ namespace Belle2 {
     std::vector<int> m_neighbours;  /**<Position of the Neighbour-Cells in the same Vector  */
 
     std::vector<int> m_assignedHitsIds; /**< Assigned Hit IDs using this Cells, (outer hit  = Index 0, inner hit = Index 1) */
-    std::vector<TVector3> m_assignedHitsCoordinates; /**< Assigned Hit Coordinates using this Cells, (outer hit  = Index 0, inner hit = Index 1) */
+    std::vector<TVector3>
+    m_assignedHitsCoordinates; /**< Assigned Hit Coordinates using this Cells, (outer hit  = Index 0, inner hit = Index 1) */
 
     int m_useCounter;  /**< Countes the TC (alive and connected) */
     int m_maxCounter;  /**< Max. Counts of TC (max. m_useCounter)  */

@@ -83,11 +83,14 @@ void SpacePointCreatorTestModule::initialize()
 
 void SpacePointCreatorTestModule::event()
 {
-  B2DEBUG(1, "SpacePointCreatorTestModule(" << m_nameOfInstance << " event " << StoreObjPtr<EventMetaData>("EventMetaData", DataStore::c_Event)->getEvent() << ")): got " << m_pxdClusters.getEntries() << "/" << m_svdClusters.getEntries() << " pxd/SVDClusters in this event")
+  B2DEBUG(1, "SpacePointCreatorTestModule(" << m_nameOfInstance << " event " << StoreObjPtr<EventMetaData>("EventMetaData",
+          DataStore::c_Event)->getEvent() << ")): got " << m_pxdClusters.getEntries() << "/" << m_svdClusters.getEntries() <<
+          " pxd/SVDClusters in this event")
 
 
   for (StoreArray<SpacePoint>& aStoreArrayInterface : m_allSpacePointStoreArrays) {
-    B2DEBUG(1, " Entering storeArray<SpacePoint> " << aStoreArrayInterface.getName() << " with " << aStoreArrayInterface.getEntries() << " spacePoints")
+    B2DEBUG(1, " Entering storeArray<SpacePoint> " << aStoreArrayInterface.getName() << " with " << aStoreArrayInterface.getEntries() <<
+            " spacePoints")
 
     for (unsigned int i = 0; i < uint(aStoreArrayInterface.getEntries()); ++i) {
       B2DEBUG(2, " Executing SpacePoint " << i)
@@ -99,7 +102,7 @@ void SpacePointCreatorTestModule::event()
       if (sp->getType() == VXD::SensorInfoBase::SensorType::SVD) {
         B2DEBUG(2, " SpacePoint " << i << " is attached to SVDCluster(s) of StoreArray " << sp->getArrayName())
 
-        for (const SVDCluster & aCluster : sp->getRelationsTo<SVDCluster>()) {
+        for (const SVDCluster& aCluster : sp->getRelationsTo<SVDCluster>()) {
           indices.push_back(aCluster.getArrayIndex());
           clusterContainer = aCluster.getArrayName();
 
@@ -110,7 +113,7 @@ void SpacePointCreatorTestModule::event()
       } else if (sp->getType() == VXD::SensorInfoBase::SensorType::PXD) {
         B2DEBUG(2, " SpacePoint " << i << " is attached to PXDCluster of StoreArray " << sp->getArrayName())
 
-        for (const PXDCluster & aCluster : sp->getRelationsTo<PXDCluster>()) {
+        for (const PXDCluster& aCluster : sp->getRelationsTo<PXDCluster>()) {
 
           indices.push_back(aCluster.getArrayIndex());
 
@@ -139,10 +142,10 @@ void SpacePointCreatorTestModule::event()
     // is rather complicated since the assignment operator is protected:
     std::vector< std::pair<VXD::SensorInfoBase::SensorType, genfit::AbsMeasurement*> > hitOutput;
 
-    for (auto & aSP : aStoreArrayInterface) {
+    for (auto& aSP : aStoreArrayInterface) {
       std::vector<genfit::PlanarMeasurement> tempMeasurements = aSP.getGenfitCompatible();
 
-      for (genfit::PlanarMeasurement & measurement : tempMeasurements) {
+      for (genfit::PlanarMeasurement& measurement : tempMeasurements) {
         hitOutput.push_back({aSP.getType(), measurement.clone()});
       }
     }

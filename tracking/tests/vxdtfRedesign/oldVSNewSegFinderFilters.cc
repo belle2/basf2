@@ -268,7 +268,8 @@ namespace VXDTFsegFinderTest {
   TEST_F(OldVSNewSegFinderFiltersTest, CompareSlopeRZ)
   {
     bool remindMeThatIAmNotDoneYet(false);
-    EXPECT_FALSE(remindMeThatIAmNotDoneYet); /// meta test, which tests whether I have approved my own test (if not done yet = true -> test fails)
+    EXPECT_FALSE(
+      remindMeThatIAmNotDoneYet); /// meta test, which tests whether I have approved my own test (if not done yet = true -> test fails)
 
     // prepare old stuff:
     TVector3 innerHit(1, 2, 3);
@@ -313,12 +314,14 @@ namespace VXDTFsegFinderTest {
     EXPECT_FALSE(filter.accept(innerSP, outerSP2)); // reverse order not same result (because of z)
     segFinderBox.resetValues(outerHit2, innerHit, &testSector, 11);
     EXPECT_FALSE(segFinderBox.checkDist3D(FilterID::slopeRZ)); // !
-    EXPECT_NE(segFinderBox.checkDist3D(FilterID::slopeRZ), filter.accept(outerSP2, innerSP)); // ATTENTION: rounding errors! the old filtering calculates in double precission, the new one in float precission -> float value is lower than cut,  therefore not accepted
+    EXPECT_NE(segFinderBox.checkDist3D(FilterID::slopeRZ), filter.accept(outerSP2,
+              innerSP)); // ATTENTION: rounding errors! the old filtering calculates in double precission, the new one in float precission -> float value is lower than cut,  therefore not accepted
 
     twoHitFilterBox.resetValues(outerHit2, innerHit);
 //  B2WARNING(" outerHit2 vs innerHit old/new: " << twoHitFilterBox.calcSlopeRZ() << "/" << SlopeRZ().value(outerSP2, innerSP))
     EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP2, innerSP));
-    EXPECT_NE(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP2, innerSP)); // they are float equal but not double equal
+    EXPECT_NE(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP2,
+              innerSP)); // they are float equal but not double equal
 
 
     EXPECT_FALSE(filter.accept(outerSP3, innerSP));
@@ -349,7 +352,8 @@ namespace VXDTFsegFinderTest {
     EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP5, innerSP));
 
 
-    EXPECT_EQ(filter.accept(outerSP1, innerSP), filter.accept(outerSP7, innerSP)); // (direction of r-vector not relevant, only its length)
+    EXPECT_EQ(filter.accept(outerSP1, innerSP), filter.accept(outerSP7,
+                                                              innerSP)); // (direction of r-vector not relevant, only its length)
     segFinderBox.resetValues(outerHit7, innerHit, &testSector, 11);
     EXPECT_FALSE(segFinderBox.checkDist3D(FilterID::slopeRZ));
     EXPECT_EQ(segFinderBox.checkDist3D(FilterID::slopeRZ), filter.accept(outerSP7, innerSP));
@@ -363,7 +367,8 @@ namespace VXDTFsegFinderTest {
   TEST_F(OldVSNewSegFinderFiltersTest, CompareNormedDistance3D)
   {
     bool remindMeThatIAmNotDoneYet(false);
-    EXPECT_FALSE(remindMeThatIAmNotDoneYet); /// meta test, which tests whether I have approved my own test (if not done yet = true -> test fails)
+    EXPECT_FALSE(
+      remindMeThatIAmNotDoneYet); /// meta test, which tests whether I have approved my own test (if not done yet = true -> test fails)
 
     // prepare old stuff:
     TVector3 innerHit(1, 2, 3);

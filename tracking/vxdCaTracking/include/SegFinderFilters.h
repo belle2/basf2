@@ -24,7 +24,8 @@ namespace Belle2 {
   /** bundles filter methods using 2 hits (using TwhoHitFilter-class). and compares with entries of sector min and max */
   class SegFinderFilters : public TwoHitFilters {
   public:
-    typedef std::pair <int, int> SuccessAndFailCounter; /**<  first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
+    typedef std::pair <int, int>
+    SuccessAndFailCounter; /**<  first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
 
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
@@ -41,7 +42,8 @@ namespace Belle2 {
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use TwoHitFilters when no sectormap is available */
     SegFinderFilters(TVector3 outerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID):
-      TwoHitFilters(outerHit, innerHit), // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
+      TwoHitFilters(outerHit,
+                    innerHit), // calls constructor of base class. Needed since base class does not use standard constructor, therefore we have to carry the hits manually into the base class
       m_thisSector(thisSector),
       m_friendID(friendID),
       m_dist3DCtr(std::make_pair(0, 0)),
@@ -56,7 +58,8 @@ namespace Belle2 {
 
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3 outerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID) {
+    void resetValues(TVector3 outerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID)
+    {
       TwoHitFilters::resetValues(outerHit, innerHit);
       m_thisSector = thisSector;
       m_friendID = friendID;
@@ -165,15 +168,20 @@ namespace Belle2 {
 
   protected:
 
-    VXDSector* m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
+    VXDSector*
+    m_thisSector; /**< contains cutoffs for all filters available in this sector, together with the friendID the return values are unique */
     unsigned int m_friendID; /**< is a key used for determine the currently needed filterSet */
     SuccessAndFailCounter m_dist3DCtr; /**< counts number of successful (.first) and neglected (.second) tests for distance3D */
     SuccessAndFailCounter m_distXYCtr; /**< counts number of successful (.first) and neglected (.second) tests for distanceXY */
     SuccessAndFailCounter m_distZCtr; /**< counts number of successful (.first) and neglected (.second) tests for distanceZ */
-    SuccessAndFailCounter m_normDist3DCtr; /**< counts number of successful (.first) and neglected (.second) tests for normedDistance3D */
+    SuccessAndFailCounter
+    m_normDist3DCtr; /**< counts number of successful (.first) and neglected (.second) tests for normedDistance3D */
     SuccessAndFailCounter m_slopeRZCtr; /**< counts number of successful (.first) and neglected (.second) tests for slopeRZ */
-    SuccessAndFailCounter m_AlwaysTrue2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says True */
-    SuccessAndFailCounter m_AlwaysFalse2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says False */
-    SuccessAndFailCounter m_Random2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which randomly throws True or False */
+    SuccessAndFailCounter
+    m_AlwaysTrue2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says True */
+    SuccessAndFailCounter
+    m_AlwaysFalse2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says False */
+    SuccessAndFailCounter
+    m_Random2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which randomly throws True or False */
   }; //end class SegFinderFilters
 } //end namespace Belle2

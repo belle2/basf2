@@ -33,7 +33,8 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    BaseTFInfo(): m_diedAt("") {
+    BaseTFInfo(): m_diedAt("")
+    {
       m_accepted.clear();
       m_rejected.clear();
       m_passIndex = -1;
@@ -41,7 +42,8 @@ namespace Belle2 {
     };
 
     /** Standard constructor */
-    BaseTFInfo(int par_pass_index): m_diedAt("") {
+    BaseTFInfo(int par_pass_index): m_diedAt("")
+    {
       m_accepted.clear();
       m_rejected.clear();
       m_passIndex = par_pass_index;
@@ -49,7 +51,8 @@ namespace Belle2 {
     };
 
     /** getter - getActive Active*/
-    bool getActive() const {
+    bool getActive() const
+    {
       if (m_diedAt.size() == 0) {
         return true;
       } else {
@@ -61,7 +64,8 @@ namespace Belle2 {
     std::string getDiedAt() const { return m_diedAt; }
 
     /** setter - Died At */
-    void setDiedAt(std::string value) {
+    void setDiedAt(std::string value)
+    {
 
       if (value.size() > 0) {
 
@@ -85,14 +89,16 @@ namespace Belle2 {
     std::vector<int>& getRejected()  { return m_rejected; }
 
     /** add new int to Accepted */
-    void insert_Accepted(std::vector<int> newMember) {
+    void insert_Accepted(std::vector<int> newMember)
+    {
       if (int(newMember.size()) != 0) {
         m_accepted.insert(m_accepted.end(), newMember.begin(), newMember.end());
       }
     }
 
     /** add new int to Rejected */
-    void insert_Rejected(std::vector<int> newMember) {
+    void insert_Rejected(std::vector<int> newMember)
+    {
       if (int(newMember.size()) != 0) {
         m_rejected.insert(m_rejected.end(), newMember.begin(), newMember.end());
       }
@@ -107,7 +113,8 @@ namespace Belle2 {
 
 
     /** clear all maps */
-    void clear() {
+    void clear()
+    {
       m_accepted.clear();
       m_rejected.clear();
     }

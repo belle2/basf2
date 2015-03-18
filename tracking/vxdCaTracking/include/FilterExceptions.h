@@ -24,7 +24,8 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(Straight_Line, "The hits are on a straight Line (or indistinguishably near to being on it).");
 
     /** this exception is thrown by the TrackletFilters::CalcCurvature, when the track is ziggzagging all the time */
-    BELLE2_DEFINE_EXCEPTION(Calculating_Curvature_Failed, "It was not possible to determine the curvature of the track (number of times for left handed and right handed curvature was identical)");
+    BELLE2_DEFINE_EXCEPTION(Calculating_Curvature_Failed,
+                            "It was not possible to determine the curvature of the track (number of times for left handed and right handed curvature was identical)");
 
     /** this exception is thrown by the StraightLineFit, which currently has a weakness for tracks pointing parallel to the y-axis */
     BELLE2_DEFINE_EXCEPTION(Straight_Up, "The line is straight up, so the parametrization y=kx+d makes no sense.");

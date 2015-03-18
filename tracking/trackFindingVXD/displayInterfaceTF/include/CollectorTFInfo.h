@@ -85,7 +85,8 @@ namespace Belle2 {
 //     void setOutputFlag(int value) { m_outputFlag = value; }
 
     /** Sectors safe for all events */
-    virtual void initSectors(const std::vector< std::pair< std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV);
+    virtual void initSectors(const std::vector< std::pair< std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > >&
+                             sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV);
 
     /** registerPersistence (StoreArrays & RelationArray) for the Collector */
     virtual void initPersistent();  // Init Persistence
@@ -94,39 +95,49 @@ namespace Belle2 {
     virtual void intEvent();
 
     /** Import of a cluster */
-    virtual int importCluster(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int detectorType, int relativePosition);
+    virtual int importCluster(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected,
+                              int detectorType, int relativePosition);
 
     /** Sectors update after update / import Hit
     Reload Sector if not in current Sectors
     Also checks Friends sectors (possible reload) */
-    virtual void updateSectors(unsigned int sectorID, int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter);  //Sector update
+    virtual void updateSectors(unsigned int sectorID, int passIndex, std::string diedAt, int diedId, std::vector<int> accepted,
+                               std::vector<int> rejected, int deltaUseCounter);  //Sector update
 
     /** Cluster Update */
-    virtual void updateClusters(int clusterId, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter);   //Cluster Update
+    virtual void updateClusters(int clusterId, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected,
+                                int deltaUseCounter);   //Cluster Update
 
     /** Import Hit (return hitID) */
-    virtual int importHit(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assignedClusterIDs, int secId, TVector3 hitPosition, TVector3 hitSigma);  // Hit import
+    virtual int importHit(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected,
+                          std::vector<int> assignedClusterIDs, int secId, TVector3 hitPosition, TVector3 hitSigma);  // Hit import
 
     /** Hit Update */
-    virtual void updateHit(int hitId, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int addTCID, int removeTCID, std::vector<int> deltaUseCounterCell);  // Hit update
+    virtual void updateHit(int hitId, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int addTCID,
+                           int removeTCID, std::vector<int> deltaUseCounterCell);  // Hit update
 
     /** Cell Import */
-    virtual int importCell(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assignedHitIDs);  // Cell Import
+    virtual int importCell(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected,
+                           std::vector<int> assignedHitIDs);  // Cell Import
 
     /** Update Cell */
-    virtual void updateCell(int cellID, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int addTCID, int removeTCID, int changeCellState, std::vector<int> neighbours);  // Cell Update
+    virtual void updateCell(int cellID, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected,
+                            int addTCID, int removeTCID, int changeCellState, std::vector<int> neighbours);  // Cell Update
 
     /** TC Import, return = tc id */
-    virtual int importTC(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs);  // TC Import
+    virtual int importTC(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected,
+                         const std::vector<std::pair<int, unsigned int>> assignedCellIDs);  // TC Import
 
     /** update TCand */
     virtual void updateTC(int tcid, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected);  // TC Update
 
     /** Tracklet Import, return = tracklet id */
-    virtual void updateTracklet(int trackletID, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected);  // Tracklet Updates
+    virtual void updateTracklet(int trackletID, std::string diedAt, int diedId, std::vector<int> accepted,
+                                std::vector<int> rejected);  // Tracklet Updates
 
     /** update Tracklet */
-    virtual int importTracklet(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs);
+    virtual int importTracklet(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected,
+                               const std::vector<std::pair<int, unsigned int>> assignedCellIDs);
 
     /** Update Fit Information (fitSuccessful, probabilityValue, assignedGTFC) of TC */
     virtual void updateTCFitInformation(int tcid, bool fitSuccessful, double probabilityValue, int assignedGTFC);

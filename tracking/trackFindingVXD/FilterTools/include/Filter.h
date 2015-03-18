@@ -54,10 +54,10 @@ namespace Belle2 {
    * The Observer will be notified of the actions via its static method notify
    */
   template <
-  class Variable,
-        class Range,
-        class Observer
-        >
+    class Variable,
+    class Range,
+    class Observer
+    >
   class Filter < Variable, Range, Observer  > {
   public:
 
@@ -81,7 +81,8 @@ namespace Belle2 {
 
     /** All the real computations are occuring here */
     bool accept(const argumentType& arg1,
-                const argumentType& arg2) const {
+                const argumentType& arg2) const
+    {
       typename Variable::variableType value = Variable::value(arg1, arg2);
       Observer::notify(Variable(), value, arg1, arg2, m_range);
       return m_range.contains(value);
@@ -92,7 +93,8 @@ namespace Belle2 {
      * @param t is the TTree under which the TBranch will be created
      * @param branchname is the name of the TBranch holding m_range
      */
-    void persist(TTree* t, const string& branchName) {
+    void persist(TTree* t, const string& branchName)
+    {
       m_range.persist(t, branchName , Variable().name());
     }
 
@@ -128,19 +130,22 @@ namespace Belle2 {
      * true
      */
     Filter< Variable, Range, BypassableFilter, Observer>
-    bypass(const bool& bypassVariable) {
+    bypass(const bool& bypassVariable)
+    {
       return Filter< Variable, Range, BypassableFilter, Observer>(m_range, bypassVariable);
     }
 
     Filter< Variable, Range, ActivableFilter, Observer>
     __attribute__((deprecated("Please use the bypass( const bool &) method instead")))
-    enable(const bool& enableVariable) {
+    enable(const bool& enableVariable)
+    {
       return Filter< Variable, Range, ActivableFilter, Observer>(m_range, enableVariable);
     }
 
     template< class otherObserver >
     Filter< Variable, Range, otherObserver>
-    observe(const otherObserver&) {
+    observe(const otherObserver&)
+    {
       return Filter< Variable , Range, otherObserver>(m_range);
     }
 
@@ -194,10 +199,10 @@ namespace Belle2 {
      */
 
   template <
-  class Variable,
-        class Range,
-        class Observer
-        >
+    class Variable,
+    class Range,
+    class Observer
+    >
   class Filter < Variable, Range, BypassableFilter, Observer  >:
     public Filter< Variable, Range, Observer> {
   public:
@@ -219,7 +224,8 @@ namespace Belle2 {
 
     /** All the real computations are occuring here */
     bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
-                const typename Filter< Variable, Range, Observer>::argumentType& arg2) const {
+                const typename Filter< Variable, Range, Observer>::argumentType& arg2) const
+    {
       typename Variable::variableType value = Variable::value(arg1, arg2);
       Observer::notify(Variable(), value, arg1, arg2, Filter< Variable, Range, Observer >::m_range);
       return m_bypass || Filter< Variable, Range, Observer >::m_range.contains(value);
@@ -270,10 +276,10 @@ namespace Belle2 {
      */
 
   template <
-  class Variable,
-        class Range,
-        class Observer
-        >
+    class Variable,
+    class Range,
+    class Observer
+    >
   class Filter < Variable, Range, ActivableFilter, Observer  >:
     public Filter< Variable, Range, Observer> {
   public:
@@ -295,7 +301,8 @@ namespace Belle2 {
 
     /** All the real computations are occuring here */
     bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
-                const typename Filter< Variable, Range, Observer>::argumentType& arg2) const {
+                const typename Filter< Variable, Range, Observer>::argumentType& arg2) const
+    {
       typename Variable::variableType value = Variable::value(arg1, arg2);
       Observer::notify(Variable(), value, arg1, arg2, Filter< Variable, Range, Observer >::m_range);
       return (! m_enable) || Filter< Variable, Range, Observer >::m_range.contains(value);
@@ -315,21 +322,23 @@ namespace Belle2 {
   class OperatorNot;
 
   template <
-  class someFilter,
-        class templateObserverType
-        >
+    class someFilter,
+    class templateObserverType
+    >
   class Filter < OperatorNot, someFilter, templateObserverType > {
   public:
 
     typedef  typename someFilter::argumentType argumentType;
 
     bool accept(const argumentType& arg1,
-                const argumentType& arg2) const {
+                const argumentType& arg2) const
+    {
       return ! m_filter.accept(arg1, arg2);
 
     }
 
-    void persist(TTree* t, const string& branchName) {
+    void persist(TTree* t, const string& branchName)
+    {
 
       string nameOfFilter(branchName);
       nameOfFilter += "_not";
@@ -361,23 +370,25 @@ namespace Belle2 {
   class OperatorAnd;
 
   template <
-  class FilterA,
-        class FilterB,
-        class templateObserverType
-        >
+    class FilterA,
+    class FilterB,
+    class templateObserverType
+    >
   class Filter < OperatorAnd, FilterA, FilterB, templateObserverType > {
   public:
 
     typedef  typename FilterA::argumentType argumentType;
 
     bool accept(const argumentType& arg1,
-                const argumentType& arg2) const {
+                const argumentType& arg2) const
+    {
 
       return m_filterA.accept(arg1, arg2) && m_filterB.accept(arg1, arg2);
 
     }
 
-    void persist(TTree* t, const string& branchName) {
+    void persist(TTree* t, const string& branchName)
+    {
       string nameOfFilterA(branchName);
       nameOfFilterA += "_and_A";
       m_filterA.persist(t, nameOfFilterA);
@@ -400,9 +411,9 @@ namespace Belle2 {
   };
 
   template <
-  typename ... types1,
-           typename ... types2
-           >
+    typename ... types1,
+    typename ... types2
+    >
   Filter< OperatorAnd, Filter< types1...>, Filter< types2...> , VoidObserver >
   operator &&(const Filter< types1...>& filter1 , const Filter< types2...>& filter2)
   {
@@ -419,17 +430,18 @@ namespace Belle2 {
   class OperatorOr;
 
   template <
-  class FilterA,
-        class FilterB,
-        class templateObserverType
-        >
+    class FilterA,
+    class FilterB,
+    class templateObserverType
+    >
   class Filter < OperatorOr, FilterA, FilterB, templateObserverType > {
   public:
 
     typedef  typename FilterA::argumentType argumentType;
 
     bool accept(const argumentType& arg1,
-                const argumentType& arg2) const {
+                const argumentType& arg2) const
+    {
 
       return m_filterA.accept(arg1, arg2) || m_filterB.accept(arg1, arg2);
 
@@ -440,7 +452,8 @@ namespace Belle2 {
     Filter(const FilterA& filterA, const FilterB& filterB):
       m_filterA(filterA), m_filterB(filterB) { };
 
-    void persist(TTree* t, const string& branchName) {
+    void persist(TTree* t, const string& branchName)
+    {
       string nameOfFilterA(branchName);
       nameOfFilterA += "_or_A";
       m_filterA.persist(t, nameOfFilterA);
@@ -458,9 +471,9 @@ namespace Belle2 {
   };
 
   template <
-  typename ... types1,
-           typename ... types2
-           >
+    typename ... types1,
+    typename ... types2
+    >
   Filter< OperatorOr, Filter< types1...>, Filter< types2...> , VoidObserver >
   operator ||(const Filter< types1...>& filter1 , const Filter< types2...>& filter2)
   {

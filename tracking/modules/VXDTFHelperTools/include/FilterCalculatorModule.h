@@ -105,14 +105,16 @@ namespace Belle2 {
 
 
     /** setHit to vertex*/
-    void setVertex() {
+    void setVertex()
+    {
       m_type = Const::IR;
       m_timeStamp = 0.;
     }
 
   protected:
     /** checks whether particle was flying towards the IR/origin or away from IR/origin when producing this hit*/
-    void checkDirectionOfFlight(TVector3 origin, TVector3 hitPos, TVector3 momVec) {
+    void checkDirectionOfFlight(TVector3 origin, TVector3 hitPos, TVector3 momVec)
+    {
       m_hitPos = hitPos;
       TVector3 vectororiginToHit = hitPos - origin;
 //       origin -= hitPos; // vector hit <-> origin
@@ -161,7 +163,8 @@ namespace Belle2 {
     const std::list<VXDHit> getTrack() { return m_hitList; }
 
     /** returns pointer to last hit added, is NULL if no hit added so far */
-    const VXDHit* getLastHit() {
+    const VXDHit* getLastHit()
+    {
       int hitPos = m_hitList.size();
       if (hitPos != 0) {
         std::list<VXDHit>::iterator thisPos = m_hitList.end(); --thisPos;
@@ -219,7 +222,8 @@ namespace Belle2 {
     VXDTFRawSecMapTypedef::CutoffValues getValues() { return m_valuePack; } // returns std::list<double>
 
     /** writes values in text File */
-    void exportValues(std::string aFileName) {
+    void exportValues(std::string aFileName)
+    {
       m_fileName = aFileName;
       m_valuePack.sort();
       m_exportValues.open(m_fileName.c_str(), std::ios_base::app);
@@ -249,7 +253,8 @@ namespace Belle2 {
       m_friendName(myName) {}
 
     /** addsValue to specified filter type */
-    void addValue(unsigned int aFilterType, double aValue) {
+    void addValue(unsigned int aFilterType, double aValue)
+    {
       if (m_filterMap.find(aFilterType) == m_filterMap.end()) {
         HitFilter* aFilterPointer =  new HitFilter(aFilterType);
         m_filterMap.insert(std::make_pair(aFilterType, aFilterPointer));
@@ -258,7 +263,8 @@ namespace Belle2 {
     }
 
     /** export filters to text file (used at endrun) */
-    void exportFilters(std::string secName, std::string setupName) {
+    void exportFilters(std::string secName, std::string setupName)
+    {
       m_fileName = (boost::format("%1%/%1%-Sector%2%Friend%3%.txt") % setupName % secName % m_friendName).str();
       for (MapEntry thisEntry : m_filterMap) {
         thisEntry.second->exportValues(m_fileName);
@@ -266,7 +272,8 @@ namespace Belle2 {
     }
 
     /** export filters to root file (used at endrun) */
-    VXDTFRawSecMapTypedef::FriendValues exportFiltersRoot() {
+    VXDTFRawSecMapTypedef::FriendValues exportFiltersRoot()
+    {
       //        std::vector< std::pair<unsigned int, std::list<double> > >
       VXDTFRawSecMapTypedef::FriendValues completeInfoOfFriend;
       for (MapEntry thisEntry : m_filterMap) {
@@ -276,14 +283,16 @@ namespace Belle2 {
     }
 
     /** clears info of all filters stored in current friend */
-    void clearFilters() {
+    void clearFilters()
+    {
       for (MapEntry thisEntry : m_filterMap) {
         delete(thisEntry.second);
       }
     }
 
   protected:
-    std::map<unsigned int, HitFilter*> m_filterMap; /**< map of filters attached to current friend, is coded in FilterID which can be treated as unsigned int */
+    std::map<unsigned int, HitFilter*>
+    m_filterMap; /**< map of filters attached to current friend, is coded in FilterID which can be treated as unsigned int */
     std::string m_friendName; /**< name of current friend */
     std::string m_fileName; /**< file name of exported file */
   };
@@ -296,19 +305,22 @@ namespace Belle2 {
     typedef std::pair<double, double> LocalCoordinates; /**< stores u and v in local coordinates */
 
     /** constructor */
-    Sector(std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV, double distance):
+    Sector(std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV,
+           double distance):
       m_usageCounter(1),
       m_secName(myName),
       m_edgeO(edge0),
       m_edgeU(edgeU),
       m_edgeV(edgeV),
       m_edgeUV(edgeUV),
-      m_distanceToOrigin(distance) {
+      m_distanceToOrigin(distance)
+    {
       m_friendMap.clear();
     }
 
     /** adds new value of specified filter type for given friend */
-    void addValue(std::string aFriend, unsigned int aFilterType, double aValue) {
+    void addValue(std::string aFriend, unsigned int aFilterType, double aValue)
+    {
       std::map<std::string, FMSectorFriends>::iterator friendPos = m_friendMap.find(aFriend);
       if (friendPos == m_friendMap.end()) {
         FMSectorFriends newFriend(aFriend);
@@ -318,21 +330,24 @@ namespace Belle2 {
     }
 
     /** exports Friends including info to text file */
-    void exportFriends(std::string setupName) {
+    void exportFriends(std::string setupName)
+    {
       for (MapEntry thisEntry : m_friendMap) {
         thisEntry.second.exportFilters(m_secName, setupName);
       }
     }
 
     /** clears info of all friends stored in current sector */
-    void clearFriends() {
+    void clearFriends()
+    {
       for (MapEntry thisEntry : m_friendMap) {
         thisEntry.second.clearFilters();
       }
     }
 
     /** exports Friends including info to root file */
-    VXDTFRawSecMapTypedef::SectorValues exportFriendsRoot() {
+    VXDTFRawSecMapTypedef::SectorValues exportFriendsRoot()
+    {
       VXDTFRawSecMapTypedef::SectorValues completeInfoOfSector;
       for (MapEntry thisEntry : m_friendMap) {
         completeInfoOfSector.push_back(make_pair(FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.exportFiltersRoot()));
@@ -407,7 +422,8 @@ namespace Belle2 {
     virtual void terminate();
 
     /** initialize variables to avoid nondeterministic behavior */
-    void InitializeVariables() {
+    void InitializeVariables()
+    {
       m_pxdHitCounter = 0;
       m_svdHitCounter = 0;
       m_telHitCounter = 0;
@@ -429,20 +445,25 @@ namespace Belle2 {
     }
 
     template<class Tmpl>
-    bool createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* aSiTrueHitPtr, VXDTrack& newTrack, MapOfSectors* thisSecMap); /**< internal member - takes hit, calculates sector (and creates it if it is not existing yet) and creates internal VXDHit for further calculation. If return value is true, everything worked fine. If not, then hit was not created (no info about the sector-creation) */
+    bool createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* aSiTrueHitPtr, VXDTrack& newTrack,
+                            MapOfSectors*
+                            thisSecMap); /**< internal member - takes hit, calculates sector (and creates it if it is not existing yet) and creates internal VXDHit for further calculation. If return value is true, everything worked fine. If not, then hit was not created (no info about the sector-creation) */
 
     /** return chosen origin for secMap-creation */
     TVector3 getOrigin() { return m_origin; }
   protected:
     MapOfSectors m_sectorMap; /**< sectormap contains full info about sectors (will always be calculated) */
-    std::vector <MapOfSectors*>  m_sectorMaps; /**< vector contains sectormap for each range of transverse momentum chosen by m_pTcuts */
-    std::vector <double> m_PARAMpTcuts; /**< minimal number of entries is 1. first entry defines lower threshold for pT in GeV/c. Each further value defines a momentum range for a new sectorMap */
+    std::vector <MapOfSectors*>
+    m_sectorMaps; /**< vector contains sectormap for each range of transverse momentum chosen by m_pTcuts */
+    std::vector <double>
+    m_PARAMpTcuts; /**< minimal number of entries is 1. first entry defines lower threshold for pT in GeV/c. Each further value defines a momentum range for a new sectorMap */
 
 
     int m_PARAMtracksPerEvent; /**< contains number of tracks per event */
     int m_eventCounter; /**< knows current event number */
 //     int m_PARAMdetectorType; /**< sets detector type -1 for VXD, Const::PXD for PXD and Const::SVD for SVD */ WARNING OLD!
-    std::vector<std::string>  m_PARAMdetectorType; /**< defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD, VXD and TEL */
+    std::vector<std::string>
+    m_PARAMdetectorType; /**< defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD, VXD and TEL */
     int m_longTrackCounter; /**< counts number of tracks having more than 30 hits */
     std::string m_detectorName; /**< string of accepted detector names */
     int m_longTrackletCounter; /**< counts tracklets having more than the theoretically possible number of hits (should therefore always be 0 )*/
@@ -462,10 +483,12 @@ namespace Belle2 {
     bool m_PARAMuseEvtgen; /**< set true if evtGen is used for filtergeneration, set false for pGun  */
     double m_PARAMmaxXYvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (XY-plane) */
     double m_PARAMmaxZvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (z-dist) */
-    std::vector<double> m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
+    std::vector<double>
+    m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
     int m_PARAMtestBeam; /**< some things which are important for the real detector are a problem for testbeams, if you want to use the filterCalculator and the testBeam = false does not work, then try setting the parameter to true */
     bool m_PARAMmultiHitsAllowed; /**< if this parameter is true, the FilterCalculatorModule ignores tracks which have more than one hit on the same sensor. If false, these tracks get filtered. There will be a warning, if parameter 'testBeam' is != 0 and this parameter is true, since there curlers shouldn't be possible */
-    std::vector<double> m_PARAMacceptedRegionForSensors;  /**< accepts pair of input values. first one defines minimal distance for sectors to the origin and second one defines maximum accepted distance for sectors. If anyone of these values is above 0, sectors will be sorted using their distance2Origin parameter, not their layerID */
+    std::vector<double>
+    m_PARAMacceptedRegionForSensors;  /**< accepts pair of input values. first one defines minimal distance for sectors to the origin and second one defines maximum accepted distance for sectors. If anyone of these values is above 0, sectors will be sorted using their distance2Origin parameter, not their layerID */
     double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
 
     bool m_PARAMsecMapWriteToAscii; /**< if true, secMap data is stored to ascii files (standard setting is true)*/
@@ -473,7 +496,8 @@ namespace Belle2 {
 
     bool m_PARAMsecMapWriteToRoot; /**< if true, secMap data is stored to root file with file name chosen by 'rootFileName' + 'SecMap.root' */
     bool m_PARAManalysisWriteToRoot; /**< if true, analysis data is stored to root file with file name chosen by 'rootFileName' + 'Analysis.root'*/
-    std::vector<std::string> m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
+    std::vector<std::string>
+    m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
     TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
     TTree* m_treeEventWisePtr; /**< pointer at root tree used for p-value-output, will be filled eventWise */
     std::vector<double> m_rootpTValuesInLayer1; /**< used to store all pT values of tracks passing layer 1 */
@@ -529,15 +553,19 @@ namespace Belle2 {
     bool m_PARAMuseOldSecCalc; /**< WARNING DEBUG - if true, old way to calc secID is used April15th-2014 */
 
     std::string m_PARAMsectorSetupFileName; /**< enables personal sector setups (can be loaded by the vxd track finder) */
-    std::vector<std::string> m_PARAMsecMapNames; /**< enables personal sector setups (can be loaded by the vxd track finder), import one for each chosen momentum range */
+    std::vector<std::string>
+    m_PARAMsecMapNames; /**< enables personal sector setups (can be loaded by the vxd track finder), import one for each chosen momentum range */
 
     TwoHitFilters m_twoHitFilterBox; /**< includes all filters using 2 hits */
     ThreeHitFilters m_threeHitFilterBox; /**< includes all filters using 3 hits */
     FourHitFilters m_fourHitFilterBox; /**< includes all filters using 4 hits */
 
-    std::vector<double> m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
-    std::vector<double> m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
-    std::vector<int> m_trackletLengthCounter; /**< counts the number of tracklets of each possible tracklet-length occured during process */
+    std::vector<double>
+    m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+    std::vector<double>
+    m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
+    std::vector<int>
+    m_trackletLengthCounter; /**< counts the number of tracklets of each possible tracklet-length occured during process */
     std::vector<int> m_trackLengthCounter; /**< counts the number of tracklets of each possible track-length occured during process */
     int m_pxdHitCounter; /**< counts total number of pxd true hits */
     int m_svdHitCounter; /**< counts total number of svd true hits */

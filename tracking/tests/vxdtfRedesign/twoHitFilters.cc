@@ -81,7 +81,8 @@ namespace VXDTFtwoHitFilterTest {
     static unsigned int wasNan; /**< count number of times result was nan */
     counter() {};
     ~counter() {};
-    static void resetCounter() {
+    static void resetCounter()
+    {
       counter<T>::used = 0;
       counter<T>::accepted = 0;
       counter<T>::rejected = 0;
@@ -111,7 +112,8 @@ namespace VXDTFtwoHitFilterTest {
   public:
     template<class Var, typename ... otherTypes>
     static void notify(const Var&,
-                       otherTypes ...) {
+                       otherTypes ...)
+    {
       counter<Var>::used ++ ;
     }
 
@@ -129,7 +131,8 @@ namespace VXDTFtwoHitFilterTest {
                        typename Var::variableType fResult,
                        const typename Var::argumentType& outerHit,
                        const typename Var::argumentType& innerHit,
-                       otherTypes ...) {
+                       otherTypes ...)
+    {
       B2ERROR(" Filter " << filterType.name() << " got result of " << fResult)
     }
 
@@ -147,8 +150,10 @@ namespace VXDTFtwoHitFilterTest {
                        typename Var::variableType fResult,
                        const typename Var::argumentType& outerHit,
                        const typename Var::argumentType& innerHit,
-                       otherTypes ...) {
-      B2WARNING(" Filter " << filterType.name() << " with outerhit/innerhit: " << outerHit.getPosition().PrintStringXYZ() << "/" << innerHit.getPosition().PrintStringXYZ() << " got result of " << fResult)
+                       otherTypes ...)
+    {
+      B2WARNING(" Filter " << filterType.name() << " with outerhit/innerhit: " << outerHit.getPosition().PrintStringXYZ() << "/" <<
+                innerHit.getPosition().PrintStringXYZ() << " got result of " << fResult)
     }
 
   };
@@ -161,10 +166,12 @@ namespace VXDTFtwoHitFilterTest {
   public:
 
     /** a typedef to make the stuff more readable */
-    typedef std::function< void (const typename FilterType::argumentType&, const typename FilterType::argumentType&, const FilterType&, typename FilterType::variableType)> observerFunction;
+    typedef std::function< void (const typename FilterType::argumentType&, const typename FilterType::argumentType&, const FilterType&, typename FilterType::variableType)>
+    observerFunction;
 
     /** a typedef to make the c-style pointer more readable (can not be done with classic typedef) */
-    using CStyleFunctionPointer = void(*)(const typename FilterType::argumentType&, const typename FilterType::argumentType&, const FilterType&, typename FilterType::variableType) ;
+    using CStyleFunctionPointer = void(*)(const typename FilterType::argumentType&, const typename FilterType::argumentType&,
+                                          const FilterType&, typename FilterType::variableType) ;
 
     /** iterate over all stored Observers and execute their notify-function */
     template<typename ... otherTypes>
@@ -172,9 +179,14 @@ namespace VXDTFtwoHitFilterTest {
                        typename FilterType::variableType fResult,
                        const typename FilterType::argumentType& outerHit,
                        const typename FilterType::argumentType& innerHit,
-                       otherTypes ...) {
-      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" << innerHit.getPosition().Mag() << " got result of " << fResult << " and Observer-Vector sm_collectedObservers got " << VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected")
-      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" << innerHit.getPosition().Mag() << " got result of " << fResult << " and Observer-Vector sm_collectedObserversCSTYLE got " << VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected")
+                       otherTypes ...)
+    {
+      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" <<
+             innerHit.getPosition().Mag() << " got result of " << fResult << " and Observer-Vector sm_collectedObservers got " <<
+             VectorOfObservers<FilterType>::sm_collectedObservers.size() << " observers collected")
+      B2INFO(" Filter " << filterType.name() << " with Mag of outer-/innerHit " << outerHit.getPosition().Mag() << "/" <<
+             innerHit.getPosition().Mag() << " got result of " << fResult << " and Observer-Vector sm_collectedObserversCSTYLE got " <<
+             VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE.size() << " observers collected")
 
       /// the idea of the following three lines have to work in the end (I basically want to loop over all attached observers and execute their notify function):
       //    for(auto& anObserver : CollectedObservers<FilterType>::collectedObservers) {
@@ -186,8 +198,10 @@ namespace VXDTFtwoHitFilterTest {
 
     /** collects observers to be executed during notify (can not be used so far, but is long-term goal) */
     template <typename ObserverType>
-    static void addObserver(observerFunction newObserver) {
-      VectorOfObservers<FilterType>::sm_collectedObservers.push_back(std::bind(&newObserver, std::placeholders::_1, std::placeholders::_2, FilterType(), std::placeholders::_3));
+    static void addObserver(observerFunction newObserver)
+    {
+      VectorOfObservers<FilterType>::sm_collectedObservers.push_back(std::bind(&newObserver, std::placeholders::_1, std::placeholders::_2,
+          FilterType(), std::placeholders::_3));
     }
 
 
@@ -201,9 +215,11 @@ namespace VXDTFtwoHitFilterTest {
   };
 
   /** initialize static member of variant A*/
-  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::observerFunction > VectorOfObservers<FilterType>::sm_collectedObservers  = {};
+  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::observerFunction >
+  VectorOfObservers<FilterType>::sm_collectedObservers  = {};
   /** initialize static member of variant B*/
-  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::CStyleFunctionPointer > VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE  = {};
+  template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::CStyleFunctionPointer >
+  VectorOfObservers<FilterType>::sm_collectedObserversCSTYLE  = {};
   /** initialize static member of variant Try2*/
 //   template<typename FilterType> std::vector< typename VectorOfObservers<FilterType>::CStyleFunctionPointer > VectorOfObservers<FilterType>::sm_collectedObserversTry2  = {};
 
@@ -227,7 +243,8 @@ namespace VXDTFtwoHitFilterTest {
     //  VectorOfObservers<Distance3DSquared>::sm_collectedObservers.push_back(storeFuncVariantA);
 
     /// variant B:
-    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint>>::CStyleFunctionPointer) &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(), std::placeholders::_3);
+    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint>>::CStyleFunctionPointer)
+                                        &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(), std::placeholders::_3);
 
     char* realname(NULL);
     int status(0);
@@ -405,19 +422,22 @@ namespace VXDTFtwoHitFilterTest {
     EXPECT_FALSE(filter.accept(outerSP3, innerSP));
     EXPECT_TRUE(filter.accept(outerSP4, innerSP));
     EXPECT_FALSE(filter.accept(outerSP5, innerSP));
-    EXPECT_EQ(filter.accept(outerSP1, innerSP), filter.accept(outerSP7, innerSP)); // (direction of r-vector not relevant, only its length)
+    EXPECT_EQ(filter.accept(outerSP1, innerSP), filter.accept(outerSP7,
+                                                              innerSP)); // (direction of r-vector not relevant, only its length)
 
 
     EXPECT_FLOAT_EQ(0., SlopeRZ<SpacePoint>().value(innerSP, innerSP));
     EXPECT_FLOAT_EQ(atan(2.), SlopeRZ<SpacePoint>().value(outerSP1, innerSP));
     EXPECT_FLOAT_EQ(atan(2. / 0.95), SlopeRZ<SpacePoint>().value(outerSP2, innerSP));
-    EXPECT_FLOAT_EQ(- SlopeRZ<SpacePoint>().value(outerSP2, innerSP), SlopeRZ<SpacePoint>().value(innerSP, outerSP2)); // reverse order changes sign
+    EXPECT_FLOAT_EQ(- SlopeRZ<SpacePoint>().value(outerSP2, innerSP), SlopeRZ<SpacePoint>().value(innerSP,
+                    outerSP2)); // reverse order changes sign
     EXPECT_FLOAT_EQ(atan(2. / 1.05), SlopeRZ<SpacePoint>().value(outerSP3, innerSP));
     EXPECT_FLOAT_EQ(atan(1. / 0.45), SlopeRZ<SpacePoint>().value(outerSP4, innerSP));
     EXPECT_FLOAT_EQ(atan(1. / 0.55), SlopeRZ<SpacePoint>().value(outerSP5, innerSP));
     EXPECT_FLOAT_EQ(M_PI * 0.5, SlopeRZ<SpacePoint>().value(outerSP6, innerSP)); // no problem with division by 0 in Z
     EXPECT_FLOAT_EQ(atan(2. / 1.05), SlopeRZ<SpacePoint>().value(outerSP3, innerSP));
-    EXPECT_FLOAT_EQ(SlopeRZ<SpacePoint>().value(outerSP1, innerSP), SlopeRZ<SpacePoint>().value(outerSP7, innerSP)); // (direction of r-vector not relevant, only its length)
+    EXPECT_FLOAT_EQ(SlopeRZ<SpacePoint>().value(outerSP1, innerSP), SlopeRZ<SpacePoint>().value(outerSP7,
+                    innerSP)); // (direction of r-vector not relevant, only its length)
 
   }
 

@@ -28,7 +28,8 @@ namespace Belle2 {
       m_radius(0.),
       m_x2(0.),
       m_y2(0.),
-      m_z2(0.) {
+      m_z2(0.)
+    {
       m_hitA.SetXYZ(0., 0., 0.);
       m_hitB.SetXYZ(0., 0., 0.);
       m_hitC.SetXYZ(0., 0., 0.);
@@ -46,7 +47,8 @@ namespace Belle2 {
       m_hitB(centerHit),
       m_hitC(innerHit),
       m_vecAB(outerHit - centerHit),
-      m_vecBC(centerHit - innerHit) {
+      m_vecBC(centerHit - innerHit)
+    {
       m_x2 = m_vecAB[0] * m_vecBC[0]; /// x-part of m_vecAB.Dot(m_vecBC)
       m_y2 = m_vecAB[1] * m_vecBC[1]; /// y-part of m_vecAB.Dot(m_vecBC)
       m_z2 = m_vecAB[2] * m_vecBC[2]; /// z-part of m_vecAB.Dot(m_vecBC)
@@ -58,7 +60,8 @@ namespace Belle2 {
     ~ThreeHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3& outerHit, TVector3& centerHit, TVector3& innerHit) {
+    void resetValues(TVector3& outerHit, TVector3& centerHit, TVector3& innerHit)
+    {
       m_radiusCalculated = false;
       m_circleCenterCalculated = false;
       m_radius = 0.;
@@ -95,15 +98,18 @@ namespace Belle2 {
 
 
     /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead) */
-    double calcAngle3D() {
-      double angle = ((m_x2 + m_y2 + m_z2) / (m_vecAB.Mag2() * m_vecBC.Mag2())); // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag())
+    double calcAngle3D()
+    {
+      double angle = ((m_x2 + m_y2 + m_z2) / (m_vecAB.Mag2() *
+                                              m_vecBC.Mag2())); // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag())
       return filterNan(angle);
     } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead)
 
 
 
     /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */
-    double fullAngle3D() {
+    double fullAngle3D()
+    {
       double angle = acos(m_vecAB.Dot(m_vecBC) / (m_vecAB.Mag() * m_vecBC.Mag())); // 0-pi
       angle = (angle * (180. / M_PI));
       return filterNan(angle);
@@ -112,7 +118,8 @@ namespace Belle2 {
 
 
     /** calculates the angle between the hits/vectors (XY), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleXY instead) */
-    double calcAngleXY() {
+    double calcAngleXY()
+    {
       double angle = ((m_x2 + m_y2) / (m_vecAB.Perp2() * m_vecBC.Perp2())); // fullAngle:
       return filterNan(angle);
     } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleXY instead)
@@ -120,7 +127,8 @@ namespace Belle2 {
 
 
     /** calculates the angle between the hits/vectors (XY), returning unit: angle in degrees */
-    double fullAngleXY() {
+    double fullAngleXY()
+    {
       double angle = fullAngle2D(m_vecAB, m_vecBC); // 0-pi
       angle = (angle * (180. / M_PI));
       return filterNan(angle);
@@ -129,7 +137,8 @@ namespace Belle2 {
 
 
     /** calculates the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleRZ instead) */
-    double calcAngleRZ() {
+    double calcAngleRZ()
+    {
       TVector3 rzVecAB(m_vecAB.Perp(), m_vecAB[2], 0.);
       TVector3 rzVecBC(m_vecBC.Perp(), m_vecBC[2], 0.);
       return calcAngle2D(rzVecAB, rzVecBC);
@@ -138,7 +147,8 @@ namespace Belle2 {
 
 
     /** calculates the angle between the hits/vectors (RZ), returning unit: angle in degrees */
-    double fullAngleRZ() {
+    double fullAngleRZ()
+    {
       TVector3 rzVecAB(m_vecAB.Perp(), m_vecAB[2], 0.);
       TVector3 rzVecBC(m_vecBC.Perp(), m_vecBC[2], 0.);
       double angle = fullAngle2D(rzVecAB, rzVecBC); // 0-pi
@@ -149,7 +159,8 @@ namespace Belle2 {
 
 
     /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
-    double calcCircleDist2IP() {
+    double calcCircleDist2IP()
+    {
       checkCalcRadius();
 
       return (fabs(m_centerABC.Perp() - m_radius)); // distance of closest approach of circle to the IP
@@ -158,7 +169,8 @@ namespace Belle2 {
 
 
     /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
-    double calcPt() {
+    double calcPt()
+    {
       checkCalcRadius();
 
       return calcPt(m_radius);
@@ -167,7 +179,8 @@ namespace Belle2 {
 
 
     /** calculates the estimation of the transverse momentum of given radius using defined strength of magnetic field, returning unit: GeV/c */
-    double calcPt(double radius) {
+    double calcPt(double radius)
+    {
       sanityCheckRadius(radius);
 
       return (m_magneticFieldFactor * radius);
@@ -176,7 +189,8 @@ namespace Belle2 {
 
 
     /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
-    double calcDeltaSlopeRZ() {
+    double calcDeltaSlopeRZ()
+    {
       m_twoHitFilter.resetValues(m_hitA, m_hitB);
       double slopeAB = m_twoHitFilter.calcSlopeRZ();
       m_twoHitFilter.resetValues(m_hitB, m_hitC);
@@ -191,7 +205,8 @@ namespace Belle2 {
      *
      * returning unit: radians*cm
      */
-    double calcDeltaSOverZ() {
+    double calcDeltaSOverZ()
+    {
       checkCalcCircleCenter();
 
       TVector3 points2hitA = m_hitA - m_centerABC;
@@ -200,13 +215,15 @@ namespace Belle2 {
       double alfaAB = fullAngle2D(points2hitA, points2hitB);
       double alfaBC = fullAngle2D(points2hitB, points2hitC);
       //return filterNan( (alfaAB * m_vecBC[2]) - (alfaBC *m_vecAB[2]) );
-      return (alfaAB * m_vecBC[2]) - (alfaBC * m_vecAB[2]); // equals to alfaAB/dZAB and alfaBC/dZBC, but this solution here can not produce a division by zero
+      return (alfaAB * m_vecBC[2]) - (alfaBC *
+                                      m_vecAB[2]); // equals to alfaAB/dZAB and alfaBC/dZBC, but this solution here can not produce a division by zero
     } // return unit: radians*cm
 
 
 
     /** compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane. */
-    double calcDeltaSlopeZOverS() {
+    double calcDeltaSlopeZOverS()
+    {
       checkCalcRadius();
 
       TVector3 points2hitA = m_hitA - m_centerABC;
@@ -221,7 +238,8 @@ namespace Belle2 {
 
 
     /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
-    double calcHelixParameterFit() {
+    double calcHelixParameterFit()
+    {
       checkCalcCircleCenter();
       TVector3 points2hitA = m_hitA - m_centerABC;
       TVector3 points2hitB = m_hitB - m_centerABC;
@@ -240,7 +258,8 @@ namespace Belle2 {
 
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none. used by calcAngleRZ and calcHelixFit (angleXY could use it too, but this one profits from other optimizations instead) */
-    double calcAngle2D(TVector3& vecA, TVector3& vecB) {
+    double calcAngle2D(TVector3& vecA, TVector3& vecB)
+    {
       double angle = ((vecA[0] * vecB[0] + vecA[1] * vecB[1]) / sqrt(vecA.Perp2() * vecB.Perp2()));
       return filterNan(angle);
     }
@@ -248,7 +267,8 @@ namespace Belle2 {
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: angle in radians
      * WARNING it is radians, which is incompatible to fullAngle3D (°))
      */
-    double fullAngle2D(TVector3& vecA, TVector3& vecB) {
+    double fullAngle2D(TVector3& vecA, TVector3& vecB)
+    {
       return acos(calcAngle2D(vecA, vecB));
       //return filterNan(angle);
     }
@@ -256,14 +276,17 @@ namespace Belle2 {
 
 
     /** calculates an estimation of the radius of given hits and existing estimation of circleCenter, returning unit: radius in [cm] (positive value)*/
-    double calcRadius(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter) {
-      return ((circleCenter - a).Perp() + (circleCenter - b).Perp() + (circleCenter - c).Perp()) / 3.;   // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
+    double calcRadius(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter)
+    {
+      return ((circleCenter - a).Perp() + (circleCenter - b).Perp() + (circleCenter - c).Perp()) /
+             3.;   // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
     } // used by calcPt() and calcCircleDist2IP()
 
 
 
     /** calculates an estimation of circleCenter position, result is written into the 4th input-parameter */
-    void calcCircleCenter(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter) {
+    void calcCircleCenter(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter)
+    {
       // calculates the intersection point using Cramer's rule.
       // x_1+s*n_1==x_2+t*n_2 --> n_1 *s - n_2 *t == x_2 - x_1 --> http://en.wikipedia.org/wiki/Cramer%27s_rule
       double inX = b[0] - c[0]; // x value of the normal vector of the inner segment (b-c)
@@ -294,11 +317,13 @@ namespace Belle2 {
 
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet. +1 represents a left-oriented curvature, -1 means having a right-oriented curvature. 0 means it is approximately straight. first vector should be outer hit, second = center hit, third is inner hit*/
-    int calcSign(TVector3& a, TVector3& b, TVector3& c, TVector3& sigma_a, TVector3& sigma_b, TVector3& sigma_c) {
+    int calcSign(TVector3& a, TVector3& b, TVector3& c, TVector3& sigma_a, TVector3& sigma_b, TVector3& sigma_c)
+    {
       TVector3 c2b = b - c;   c2b.SetZ(0.);
       TVector3 b2a = a - b;   b2a.SetZ(0.);
       double angle = atan2(b2a[0], b2a[1]) - atan2(c2b[0], c2b[1]);
-      double sigmaan = (sigma_a.Mag() + sigma_b.Mag() + sigma_c.Mag()) / (3.*(c2b.Mag() + b2a.Mag())); //TODO 1/3...mean of the sigmas. Possible improvement: Use a parameter instead, and determine with simulated events.
+      double sigmaan = (sigma_a.Mag() + sigma_b.Mag() + sigma_c.Mag()) / (3.*(c2b.Mag() +
+                       b2a.Mag())); //TODO 1/3...mean of the sigmas. Possible improvement: Use a parameter instead, and determine with simulated events.
       if (angle < (-sigmaan)) { return -1; }
       else if (angle > sigmaan)  {return 1; }
       else  { return 0; }
@@ -310,7 +335,8 @@ namespace Belle2 {
 
 
     /** checks whether the calcCircleCenter()-Member has been executed already and executes it if not */
-    void checkCalcCircleCenter() {
+    void checkCalcCircleCenter()
+    {
       if (m_circleCenterCalculated == false) {
         calcCircleCenter(m_hitA, m_hitB, m_hitC, m_centerABC);
         m_circleCenterCalculated = true;
@@ -319,7 +345,8 @@ namespace Belle2 {
 
 
     /** checks whether the calcRadius()-Member has been executed already and executes it if not */
-    void checkCalcRadius() {
+    void checkCalcRadius()
+    {
       checkCalcCircleCenter();
       if (m_radiusCalculated == false) {
         m_radius = calcRadius(m_hitA, m_hitB, m_hitC, m_centerABC);
@@ -330,8 +357,10 @@ namespace Belle2 {
 
 
     /** check Radius for bad values and throw exception if the value is bad */
-    void sanityCheckRadius(double radius) {
-      if (fabs(radius) < 0.0000001) { // WARNING hardcoded value, is there a quasi-global value for such cases (this case, minimal accepted radius)
+    void sanityCheckRadius(double radius)
+    {
+      if (fabs(radius) <
+          0.0000001) { // WARNING hardcoded value, is there a quasi-global value for such cases (this case, minimal accepted radius)
         m_radiusCalculated = false;
         m_circleCenterCalculated = false;
         m_radius = 0.;

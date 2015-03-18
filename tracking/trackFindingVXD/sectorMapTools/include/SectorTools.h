@@ -48,7 +48,8 @@ namespace Belle2 {
 
 
     /** exception shall be thrown if value is not between 0-1 and therefore not normalized */
-    BELLE2_DEFINE_EXCEPTION(Out_of_bounds, "The normalized coordinates (sectorConfig or coordinates themselves) are not defined between 0-1!");
+    BELLE2_DEFINE_EXCEPTION(Out_of_bounds,
+                            "The normalized coordinates (sectorConfig or coordinates themselves) are not defined between 0-1!");
 
 
 
@@ -56,7 +57,8 @@ namespace Belle2 {
      * for given configuration for u and v coordinates, it takes a hit in normalized coordinates (sensor-independent within sensor-boundaries) and calculates the sectorID.
      * if no secID is found, it returns unsigned short :: max
      */
-    static uShort calcSecID(const std::vector<double>& uConfig, const std::vector<double>& vConfig, NormCoords coords) {
+    static uShort calcSecID(const std::vector<double>& uConfig, const std::vector<double>& vConfig, NormCoords coords)
+    {
       // safety checks
       throwBoundary(coords.first);
       throwBoundary(coords.second);
@@ -115,7 +117,9 @@ namespace Belle2 {
      *   Example2: the sector-edges can be retrieved by using e.g.: (0,0), (0,1), (1,0) and (1,1)
      *  the return value is in normalized Coordinates of the _sensor_ again
      */
-    static NormCoords calcNormalizedSectorPoint(const std::vector<double>& uConfig, const std::vector<double>& vConfig, uShort secID, NormCoords coords) {
+    static NormCoords calcNormalizedSectorPoint(const std::vector<double>& uConfig, const std::vector<double>& vConfig, uShort secID,
+                                                NormCoords coords)
+    {
       // safety checks
       throwBoundary(coords.first);
       throwBoundary(coords.second);
@@ -173,7 +177,8 @@ namespace Belle2 {
 
   protected:
     /** returns true if value is between 0-1, false if not */
-    static void throwBoundary(double value) {
+    static void throwBoundary(double value)
+    {
       if (value < 0. or value > 1.) {
         throw Out_of_bounds();
       }
@@ -181,7 +186,8 @@ namespace Belle2 {
 
 
     /** returns true if value is between 0-1, false if not */
-    static void throwBoundaryVector(const std::vector<double>& vec) {
+    static void throwBoundaryVector(const std::vector<double>& vec)
+    {
       for (double value : vec) throwBoundary(value);
     }
 

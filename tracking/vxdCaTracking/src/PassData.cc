@@ -17,7 +17,8 @@ using namespace std;
 using namespace Belle2;
 
 
-std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCopy& rawSecMap, const  VXDTFRawSecMapTypedef::SectorDistancesMap& distancesMap, bool useDistances)
+std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCopy& rawSecMap,
+                                              const  VXDTFRawSecMapTypedef::SectorDistancesMap& distancesMap, bool useDistances)
 {
   this->sectorMap.clear();
   int totalFriendCounter = 0;
@@ -26,10 +27,11 @@ std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCo
   double cutoffMinValue, cutoffMaxValue;
   VXDTFSecMapTypedef::CutoffValue cutoff; // will be rewritten for each cutoff to be imported
 
-  for (const VXDTFSecMapTypedef::Sector & aSector : rawSecMap) {
+  for (const VXDTFSecMapTypedef::Sector& aSector : rawSecMap) {
     FullSecID currentSecID = aSector.first, newSecID;
 
-    B2DEBUG(110, "PassData::importSectorMap: importing sector: " << currentSecID << " including " << aSector.second.size() << " friends. ");
+    B2DEBUG(110, "PassData::importSectorMap: importing sector: " << currentSecID << " including " << aSector.second.size() <<
+            " friends. ");
     totalFriendCounter += aSector.second.size();
 
     VXDSector* pSector;
@@ -57,12 +59,14 @@ std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCo
     }
 
     // importing friends and filters
-    for (const VXDTFSecMapTypedef::Friend & aFriend : aSector.second) {
+    for (const VXDTFSecMapTypedef::Friend& aFriend : aSector.second) {
       FullSecID currentFriendID = aFriend.first;
-      B2DEBUG(120, "PassData::importSectorMap: importing friend: " << currentFriendID << " including " << aFriend.second.size() << " filters. ");
+      B2DEBUG(120, "PassData::importSectorMap: importing friend: " << currentFriendID << " including " << aFriend.second.size() <<
+              " filters. ");
 
-      for (const VXDTFSecMapTypedef::Cutoff & aFilter : aFriend.second) {
-        B2DEBUG(130, "PassData::importSectorMap: importing filter: " << FilterID().getFilterString(aFilter.first) << " (named " << aFilter.first << " as an int) including Min/Max: " << aFilter.second.first << "/" << aFilter.second.second);
+      for (const VXDTFSecMapTypedef::Cutoff& aFilter : aFriend.second) {
+        B2DEBUG(130, "PassData::importSectorMap: importing filter: " << FilterID().getFilterString(aFilter.first) << " (named " <<
+                aFilter.first << " as an int) including Min/Max: " << aFilter.second.first << "/" << aFilter.second.second);
         // aFilter.first is filterID, .second is cutoff, where .second.first is min, .second.second is max
         unsigned int filterID = aFilter.first;
         bool doNotStore = false;
@@ -235,7 +239,8 @@ std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCo
   unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
   VXDSector* pCenterSector = new VXDSector(centerSecID);
   this->sectorMap.insert(make_pair(centerSecID, pCenterSector));
-  B2DEBUG(10, "PassData::importSectorMap: adding virtual centerSector with " << this->sectorMap.find(centerSecID)->second->getFriends().size() << " friends. SecMap got " << this->sectorMap.size() << " entries now");
+  B2DEBUG(10, "PassData::importSectorMap: adding virtual centerSector with " << this->sectorMap.find(
+            centerSecID)->second->getFriends().size() << " friends. SecMap got " << this->sectorMap.size() << " entries now");
 
   linkSectorsToFriends();
 

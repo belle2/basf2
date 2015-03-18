@@ -21,8 +21,8 @@ ClassImp(AlwaysYesFilter)
 
 void AlwaysYesFilter::checkSpacePoints(const SectorFriendship* thisFriendship, CompatibilityTable& compatibilityTable)
 {
-  for (auto & aVector : compatibilityTable) {
-    for (auto & aValue : aVector) {
+  for (auto& aVector : compatibilityTable) {
+    for (auto& aValue : aVector) {
       B2DEBUG(1000, "there are currently " << thisFriendship->checkCombinationsAlive() << " alive");
       aValue++;
     }

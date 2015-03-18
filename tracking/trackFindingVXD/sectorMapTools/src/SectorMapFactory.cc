@@ -71,7 +71,7 @@ void SectorMapFactory::importRootMap()
   //direct construction
 //         EventMetaData* newobj = evtData.appendNew();
 //         newobj->setEvent(10 + i);
-  for (auto & rawSectorData : newMap->getSectorMap()) {
+  for (auto& rawSectorData : newMap->getSectorMap()) {
     Sector* aSector = sectorArray.appendNew(rawSectorData.first);
     aSector->setDistance(0.1);
   }

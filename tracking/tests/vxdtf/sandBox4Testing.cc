@@ -20,7 +20,8 @@ namespace Belle2 {
 
 
     /** should behave differently for different verbosity-levels given - function */
-    void SomeCleverMethod() {
+    void SomeCleverMethod()
+    {
       double bla = 5;
 
       VerbosityClass<Verbosity>::GiveVerboseOutput(bla);
@@ -52,7 +53,8 @@ namespace Belle2 {
   public:
 
     /** just a small dummy-function to test the expected behavior */
-    bool doStuffHere(vector<double> testVector = { 42}) {
+    bool doStuffHere(vector<double> testVector = { 42})
+    {
       if (testVector[0] == 42) return true;
       return false;
     }

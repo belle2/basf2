@@ -150,10 +150,12 @@ void TestMapModule::FillMaps()
 
   std::sort(seccopy.begin(), seccopy.end());
   vector<VXDSector>::iterator newEndOfVector;
-  newEndOfVector = std::unique(seccopy.begin(), seccopy.end()); /// WARNING: std:unique does delete double entries but does NOT resize the vector! This means that for every removed element, at the end of the vector remains one random value stored
+  newEndOfVector = std::unique(seccopy.begin(),
+                               seccopy.end()); /// WARNING: std:unique does delete double entries but does NOT resize the vector! This means that for every removed element, at the end of the vector remains one random value stored
   int vSize = std::distance(seccopy.begin(), newEndOfVector);
   seccopy.resize(vSize);
-  B2INFO("TestMapModule::FillMaps: m_sectorAdresses has " << m_sectorAdresses.size() << ", sectors has " << sectors.size() << ", seccopy has " << seccopy.size() << " entries...")
+  B2INFO("TestMapModule::FillMaps: m_sectorAdresses has " << m_sectorAdresses.size() << ", sectors has " << sectors.size() <<
+         ", seccopy has " << seccopy.size() << " entries...")
   // stl-map
   vector<VXDSector>::iterator secIt = sectors.begin();
   boostClock::time_point beginEvent = boostClock::now();
@@ -181,7 +183,8 @@ void TestMapModule::FillMaps()
   /*boostClock::time_point*/ stopTimer = boostClock::now();
   m_fillUnorderedMapStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
-  B2INFO("TestFlatMapModule::FillMap: map has " << m_testMap.size() << "/" << m_testFlatMap.size() << "/" << m_testUnorderedMap.size() << " entries...")
+  B2INFO("TestFlatMapModule::FillMap: map has " << m_testMap.size() << "/" << m_testFlatMap.size() << "/" << m_testUnorderedMap.size()
+         << " entries...")
 }/*{
   LittleHelper littleHelperBox = LittleHelper();
 

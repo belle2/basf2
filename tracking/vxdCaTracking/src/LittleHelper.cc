@@ -28,7 +28,8 @@ bool LittleHelper::checkSanity(double low, double high, double mean, double sigm
 
 
 
-double LittleHelper::smearValueGauss(double low, double high, double mean, double sigma) /// double mean = m_meanValue, double sigma = m_sigmaValue
+double LittleHelper::smearValueGauss(double low, double high, double mean,
+                                     double sigma) /// double mean = m_meanValue, double sigma = m_sigmaValue
 {
   if (sigma < 0) { sigma = -sigma; }
   bool isSane = checkSanity(low, high, mean, sigma);

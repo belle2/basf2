@@ -132,8 +132,10 @@ namespace Belle2 {
         G4double sA_hole = 0.*deg;
         G4double spA_hole = 360.*deg;
         G4VSolid* s_hole = new G4Tubs("s_hole", ir_hole, or_hole, h_hole, sA_hole, spA_hole);
-        s_base = new G4SubtractionSolid("s_base_hole1", s_base, s_hole, 0, G4ThreeVector((0.5 - 0.315)*InchtoCm, (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));
-        s_base = new G4SubtractionSolid("s_base_hole2", s_base, s_hole, 0, G4ThreeVector(-(0.5 - 0.315)*InchtoCm, (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));
+        s_base = new G4SubtractionSolid("s_base_hole1", s_base, s_hole, 0, G4ThreeVector((0.5 - 0.315)*InchtoCm,
+                                        (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));
+        s_base = new G4SubtractionSolid("s_base_hole2", s_base, s_hole, 0, G4ThreeVector(-(0.5 - 0.315)*InchtoCm,
+                                        (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));
 
         G4LogicalVolume* l_base = new G4LogicalVolume(s_base, G4Material::GetMaterial("Al6061"), "l_base");
         l_base->SetVisAttributes(yellow);
@@ -149,8 +151,10 @@ namespace Belle2 {
         G4double dx_shole = (0.563 - 0.406) / 2. * InchtoCm;
         G4VSolid* s_shole = new G4Box("s_shole", dx_shole, dy_cover1, dx_shole);
 
-        s_cover1 = new G4SubtractionSolid("s_cover1_hole1", s_cover1, s_shole, 0, G4ThreeVector((0.5 - 0.392)*InchtoCm + dx_shole, 0, (0.563 / 2. - 0.406)*InchtoCm + dx_shole));
-        s_cover1 = new G4SubtractionSolid("s_cover1_hole2", s_cover1, s_shole, 0, G4ThreeVector(-(0.5 - 0.392)*InchtoCm - dx_shole, 0, (0.563 / 2. - 0.406)*InchtoCm + dx_shole));
+        s_cover1 = new G4SubtractionSolid("s_cover1_hole1", s_cover1, s_shole, 0, G4ThreeVector((0.5 - 0.392)*InchtoCm + dx_shole, 0,
+                                          (0.563 / 2. - 0.406)*InchtoCm + dx_shole));
+        s_cover1 = new G4SubtractionSolid("s_cover1_hole2", s_cover1, s_shole, 0, G4ThreeVector(-(0.5 - 0.392)*InchtoCm - dx_shole, 0,
+                                          (0.563 / 2. - 0.406)*InchtoCm + dx_shole));
 
         G4LogicalVolume* l_cover1 = new G4LogicalVolume(s_cover1, G4Material::GetMaterial("Al6061"), "l_cover1");
         l_cover1->SetVisAttributes(yellow);
@@ -175,11 +179,11 @@ namespace Belle2 {
         G4VSolid* s_pinsubtrate = new G4Tubs("s_pinsubtrate", ir_hole, or_hole, h_hole, sA_hole, spA_hole);
         G4LogicalVolume* l_pinsubtrate = new G4LogicalVolume(s_pinsubtrate, geometry::Materials::get("G4_POLYSTYRENE"), "l_pinsubtrate");
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D((0.5 - 0.315) * InchtoCm, (0.187 - 0.250 / 2.) * InchtoCm, -(0.5 - 0.382) * InchtoCm) * G4RotateZ3D(180.0);
-        new G4PVPlacement(transform, l_pinsubtrate, "p_pinsubtrate_1", &topVolume, false, 0);
+                    G4Translate3D((0.5 - 0.315) * InchtoCm, (0.187 - 0.250 / 2.) * InchtoCm, -(0.5 - 0.382) * InchtoCm) * G4RotateZ3D(360.0);
+        //new G4PVPlacement(transform, l_pinsubtrate, "p_pinsubtrate_1", &topVolume, false, 0);
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D(-(0.5 - 0.315) * InchtoCm, (0.187 - 0.250 / 2.) * InchtoCm, -(0.5 - 0.382) * InchtoCm) * G4RotateZ3D(180.0);
-        new G4PVPlacement(transform, l_pinsubtrate, "p_pinsubtrate_2", &topVolume, false, 0);
+                    G4Translate3D(-(0.5 - 0.315) * InchtoCm, (0.187 - 0.250 / 2.) * InchtoCm, -(0.5 - 0.382) * InchtoCm) * G4RotateZ3D(360.0);
+        //new G4PVPlacement(transform, l_pinsubtrate, "p_pinsubtrate_2", &topVolume, false, 0);
 
 
         //Sensitive area
@@ -192,10 +196,12 @@ namespace Belle2 {
         l_pin->SetVisAttributes(yellow);
         l_pin->SetUserLimits(new G4UserLimits(stepSize));
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin, (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - 0. - dz_pin);
+                    G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+                                  (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - 0. - dz_pin);
         new G4PVPlacement(transform, l_pin, "p_pin_1", &topVolume, false, detID * 2);
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin, (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+                    G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+                                  (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
         new G4PVPlacement(transform, l_pin, "p_pin_2", &topVolume, false, detID * 2 + 1);
 
         G4double dx_layer = 2.65 / 2.*CLHEP::mm;
@@ -205,7 +211,8 @@ namespace Belle2 {
         G4LogicalVolume* l_layer1 = new G4LogicalVolume(s_layer1, geometry::Materials::get("G4_Au"), "l_layer1");
         l_layer1->SetVisAttributes(red);
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + dy_pin, (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+                    G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + dy_pin,
+                                  (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
         new G4PVPlacement(transform, l_layer1, "p_layer1", &topVolume, false, 0);
 
         G4double dy_layer2 = 0.001 / 2.*InchtoCm;
@@ -213,7 +220,8 @@ namespace Belle2 {
         G4LogicalVolume* l_layer2 = new G4LogicalVolume(s_layer2, geometry::Materials::get("Aluminum"), "l_layer2");
         l_layer2->SetVisAttributes(green);
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + dy_pin, (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+                    G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + dy_pin,
+                                  (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
         new G4PVPlacement(transform, l_layer2, "p_layer2", &topVolume, false, 0);
 
         detID++;

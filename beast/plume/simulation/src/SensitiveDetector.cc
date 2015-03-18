@@ -1,12 +1,12 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Igal Jaegle                               *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/***************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                      *
+ * Copyright(C) 2010 - Belle II Collaboration                              *
+ *                                                                         *
+ * Author: The Belle II Collaboration                                      *
+ * Contributors: Martin Ritter, Igal Jaegle, Jerome Baudot, Isabelle Ripp  *
+ *                                                                         *
+ * This software is provided "as is" without any warranty.                 *
+ ***************************************************************************/
 
 #include <beast/plume/simulation/SensitiveDetector.h>
 #include <beast/plume/dataobjects/PlumeSimHit.h>
@@ -19,6 +19,10 @@
 #include <G4Track.hh>
 #include <G4Step.hh>
 
+#include <iostream>
+using namespace std;
+
+
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the PLUME detector */
   namespace plume {
@@ -26,25 +30,28 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("PlumeSensitiveDetector", Const::invalidDetector)
     {
-      m_simhitNumber = 0;
-      m_hitNum = 0;
-      m_EvnetNumber = 0;
-      m_oldEvnetNumber = 0;
-      m_trackID = 0;
-      m_startTime = 0;
-      m_endTime = 0;
-      m_WightedTime = 0;
-      m_startEnergy = 0;
-      m_energyDeposit = 0;
-      m_trackLength = 0;
-      iECLCell = 0;
-      TimeIndex = 0;
-      local_pos = 0;
-      T_ave = 0;
-      firstcall = 0;
-      m_phiID = 0;
-      m_thetaID = 0;
-      m_cellID = 0;
+      current_trackID = 0;
+      current_pdgID = 0;
+      current_sensorID = 0;
+      current_posIN_u = 0.; // mm  z_global for each sensor (-1 -> + 1 mm)
+      current_posIN_v = 0.;  // -5 -> +5 mm
+      current_posIN_w = 0.;   // w (epi layer + foam width + etc.)
+      current_posIN_x = 0.;
+      current_posIN_y = 0.;
+      current_posIN_z = 0.;
+      current_posOUT_u = 0.;
+      current_posOUT_v = 0.;
+      current_posOUT_w = 0.;
+      current_posOUT_x = 0.;
+      current_posOUT_y = 0.;
+      current_posOUT_z = 0.;
+      current_momentum_x = 0.;  // GeV
+      current_momentum_y = 0.;
+      current_momentum_z = 0.;
+      current_energyDep = 0.;  // GeV
+      current_nielDep = 0.;
+      current_thetaAngle = 0.;   // local sensor frame - degree
+      current_phiAngle = 0.;
 
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
@@ -68,145 +75,113 @@ namespace Belle2 {
 
     }
 
+
     bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
     {
-      const G4StepPoint& preStep  = *step->GetPreStepPoint();
-      const G4StepPoint& postStep = *step->GetPostStepPoint();
 
-      G4Track& track  = *step->GetTrack();
-      if (m_trackID != track.GetTrackID()) {
-        //TrackID changed, store track informations
-        m_trackID = track.GetTrackID();
-        //Get momentum
-        m_momentum = preStep.GetMomentum() ;
-        //Get energy
-        m_startEnergy =  preStep.GetKineticEnergy() ;
-        //Reset energy deposit;
-        m_energyDeposit = 0;
-        //Reset Wighted Time;
-        m_WightedTime = 0;
-        //Reset m_WightedPos;
-        m_WightedPos.SetXYZ(0, 0, 0);
+      //Get track information
+      const G4Track& track = *step->GetTrack();
+      const G4StepPoint& preStepPoint = *step->GetPreStepPoint();
+      const G4StepPoint& postStepPoint = *step->GetPostStepPoint();
 
-      }
-      //Update energy deposit
-      m_energyDeposit += step->GetTotalEnergyDeposit() ;
+      // If new track, store general information from this first step
+      if (current_trackID != track.GetTrackID()) { // if new track
+        current_trackID = track.GetTrackID();
+        current_pdgID = track.GetDefinition()->GetPDGEncoding();
+        current_sensorID = track.GetVolume()->GetCopyNo();
 
-      m_startTime = preStep.GetGlobalTime();
-      m_endTime = postStep.GetGlobalTime();
-      m_WightedTime += (m_startTime + m_endTime) / 2 * (step->GetTotalEnergyDeposit());
+        // since this is first step in volume store track incidence and momentum
+        G4ThreeVector preStepPointPosition = preStepPoint.GetPosition();
+        G4ThreeVector trackMomentum = track.GetMomentum();
 
-      m_startPos =  preStep.GetPosition();
-      m_endPos = postStep.GetPosition();
-      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / CLHEP::cm, (m_startPos.getY() + m_endPos.getY()) / 2 / CLHEP::cm, (m_startPos.getZ() + m_endPos.getZ()) / 2 / CLHEP::cm);
-      m_WightedPos += position * (step->GetTotalEnergyDeposit());
+        current_posIN_x = preStepPointPosition.x();  //mm
+        current_posIN_y = preStepPointPosition.y();
+        current_posIN_z = preStepPointPosition.z();
+        current_momentum_x = trackMomentum.x();  // MeV
+        current_momentum_y = trackMomentum.y();
+        current_momentum_z = trackMomentum.z();
 
-      //Save Hit if track leaves volume or is killed
-      if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
-        int pdgCode = track.GetDefinition()->GetPDGEncoding();
+        // We want the track angles of incidence on the local volume and the local position
+        G4TouchableHandle theINTouchable = preStepPoint.GetTouchableHandle();
+        G4ThreeVector worldDirection = preStepPoint.GetMomentumDirection();
+        G4ThreeVector localDirection = theINTouchable->GetHistory()->GetTopTransform().TransformPoint(worldDirection);
+        current_thetaAngle = localDirection.theta() / CLHEP::degree;
+        current_phiAngle = localDirection.phi() / CLHEP::degree;
 
-        const G4VPhysicalVolume& v = * track.GetVolume();
-        G4ThreeVector posCell = v.GetTranslation();
-        // Get layer ID
+        G4ThreeVector localINPosition = theINTouchable->GetHistory()->GetTopTransform().TransformPoint(preStepPointPosition);
+        current_posIN_v = localINPosition.x();
+        current_posIN_u = localINPosition.y();
+        current_posIN_w = localINPosition.z();
 
-        //if (v.GetName().find("Crystal") != std::string::npos) {
-        //CsiGeometryPar* eclp = CsiGeometryPar::Instance();
-        m_cellID = step->GetTrack()->GetVolume()->GetCopyNo();
+        current_globalTime = step->GetPreStepPoint()->GetGlobalTime(); // not sure this is relevant
 
-        double dTotalEnergy = 1 / m_energyDeposit; //avoid the error  no match for 'operator/'
-        if (m_energyDeposit > 0.) {
-          saveSimHit(m_cellID, m_trackID, pdgCode, m_WightedTime / m_energyDeposit,
-                     m_energyDeposit, m_momentum, m_WightedPos * dTotalEnergy);
-          //}
-        }
+      }  // end if new track
+
+      // Update information for any step
+      current_energyDep += step->GetTotalEnergyDeposit();  // MeV
+      current_nielDep += step->GetNonIonizingEnergyDeposit();
+
+      // If track leaves volume or is killed, store final step info and save simHit
+      if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) { // if last step
+
+        G4ThreeVector postStepPointPosition = postStepPoint.GetPosition();
+
+        current_posOUT_x = postStepPointPosition.x();
+        current_posOUT_y = postStepPointPosition.y();
+        current_posOUT_z = postStepPointPosition.z();
+        G4ThreeVector localOUTPosition = preStepPoint.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(
+                                           postStepPointPosition);
+        current_posOUT_v = localOUTPosition.x(); // mm
+        current_posOUT_u = localOUTPosition.y();
+        current_posOUT_w = localOUTPosition.z();
+
+        //Get the datastore arrays
+        StoreArray<MCParticle>  mcParticles;
+
+        StoreArray<PlumeSimHit> plumeHits;
+        if (!plumeHits.isValid()) plumeHits.create();
+        RelationArray plumeSimHitRel(mcParticles, plumeHits);
+        PlumeSimHit* hit = plumeHits.appendNew(
+                             current_pdgID,
+                             current_sensorID,
+                             current_trackID,
+                             current_energyDep,
+                             current_nielDep,
+                             current_posIN_x,
+                             current_posIN_y,
+                             current_posIN_z,
+                             current_posIN_u,
+                             current_posIN_v,
+                             current_posIN_w,
+                             current_posOUT_u,
+                             current_posOUT_v,
+                             current_posOUT_w,
+                             current_momentum_x / CLHEP::GeV,
+                             current_momentum_y / CLHEP::GeV,
+                             current_momentum_z / CLHEP::GeV,
+                             current_thetaAngle,
+                             current_phiAngle,
+                             current_globalTime
+                           );
+
+        //Add Relation between SimHit and MCParticle with a weight of 1. Since
+        //the MCParticle index is not yet defined we use the trackID from Geant4
+        plumeSimHitRel.add(current_trackID, hit->getArrayIndex(), 1.0);
 
         //Reset TrackID
-        m_trackID = 0;
-      }
+        current_trackID = 0;
+        current_energyDep = 0.;
 
-      return true;
-    }
-    /*
-      //Get Track information
-      const G4Track& track    = *step->GetTrack();
-      const int trackID       = track.GetTrackID();
-      const double depEnergy  = step->GetTotalEnergyDeposit() * CLHEP::MeV;
-      const double nielEnergy = step->GetNonIonizingEnergyDeposit() * CLHEP::MeV;
-      const G4ThreeVector G4tkPos = step->GetTrack()->GetPosition();
-      float tkPos[3];
-      tkPos[0] = G4tkPos.x() * CLHEP::cm;
-      tkPos[1] = G4tkPos.y() * CLHEP::cm;
-      tkPos[2] = G4tkPos.z() * CLHEP::cm;
-      const G4ThreeVector G4tkMom = step->GetTrack()->GetMomentum();
-      float tkMom[3];
-      tkMom[0] = G4tkMom.x() * CLHEP::MeV;
-      tkMom[1] = G4tkMom.y() * CLHEP::MeV;
-      tkMom[2] = G4tkMom.z() * CLHEP::MeV;
-      const G4ThreeVector G4tkMomDir = step->GetTrack()->GetMomentumDirection();
-      float tkMomDir[3];
-      tkMomDir[0] = G4tkMomDir.x() * CLHEP::MeV;
-      tkMomDir[1] = G4tkMomDir.y() * CLHEP::MeV;
-      tkMomDir[2] = G4tkMomDir.z() * CLHEP::MeV;
-      const int tkPDG = step->GetTrack()->GetDefinition()->GetPDGEncoding();
-      const double tkKEnergy = step->GetTrack()->GetKineticEnergy();
-      const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
-      const double GlTime = step->GetPreStepPoint()->GetGlobalTime();
+      } // end if last
+
+
       //Ignore everything below 1eV
-      if (depEnergy < CLHEP::eV) return false;
+      // do we need this ???
+      // if (depEnergy < CLHEP::eV) return false;
 
-      //Get the datastore arrays
-      StoreArray<MCParticle>  mcParticles;
-      StoreArray<PlumeSimHit> simHits;
-      RelationArray relMCSimHit(mcParticles, simHits);
-
-      StoreArray<PlumeSimHit> PlumeHits;
-      if (!PlumeHits.isValid()) PlumeHits.create();
-      PlumeSimHit* hit = PlumeHits.appendNew(
-                               depEnergy,
-                               nielEnergy,
-                               tkPDG,
-                               tkKEnergy,
-                               detNb,
-                               GlTime,
-                               tkPos,
-                               tkMom,
-                               tkMomDir
-                             );
-
-      //Add Relation between SimHit and MCParticle with a weight of 1. Since
-      //the MCParticle index is not yet defined we use the trackID from Geant4
-      relMCSimHit.add(trackID, hit->getArrayIndex(), 1.0);
 
       return true;
     }
-    */
-
-    int SensitiveDetector::saveSimHit(
-      const G4int cellId,
-      const G4int trackID,
-      const G4int pid,
-      const G4double tof,
-      const G4double edep,
-      G4ThreeVector mom,
-      TVector3 posAve)
-    {
-
-      //Get the datastore arraus
-      StoreArray<MCParticle>   mcParticles;
-      StoreArray<PlumeSimHit>  simHits;
-      RelationArray relMPlumemHit(mcParticles, simHits);
-
-      StoreArray<PlumeSimHit> PlumeHits;
-      if (!PlumeHits.isValid()) PlumeHits.create();
-      RelationArray plumeSimHitRel(mcParticles, PlumeHits);
-      TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
-      PlumeHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
-      B2DEBUG(150, "HitNumber: " << m_simhitNumber);
-      int m_simhitNumber = PlumeHits.getEntries() - 1;
-      plumeSimHitRel.add(trackID, m_simhitNumber);
-      return (m_simhitNumber);
-    }//saveSimHit
-
 
   } //plume namespace
 } //Belle2 namespace

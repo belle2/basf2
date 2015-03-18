@@ -32,7 +32,7 @@ namespace Belle2 {
 
     PlumeModule::PlumeModule() : Module(), m_intParameter(0), m_doubleParameter(0), m_stringParameter("")
     {
-      setDescription("Creates PLUME crystals - sub-detector of BEASTII");
+      setDescription("Creates PLUME - sub-detector of BEASTII");
 
       //We can define parameters which can be set from the steering file. The arguments are:
       // name, reference to the veriable where the value will be stored, description, default value
@@ -98,7 +98,7 @@ namespace Belle2 {
       //for (; range.first != range.second; ++range.first) {
       //And Print something about the relation
       //const RelationIndex<MCParticle, PlumeSimHit>::Element& relation = *range.to;
-      //B2INFO("PlumeSimHit #" << i << " has an energy deposition of " << hit.getEnergyDep()
+      //B2INFO("PlumeSimHit #" << i << " has an energy deposition of " << hit.getenergyDep()
       //       << " and is related to MCParticle #" << relation.indexFrom
       //       << " which has an PDG code of " << relation.from->getPDG());
       //}
@@ -113,7 +113,7 @@ namespace Belle2 {
         typedef RelationIndex<MCParticle, PlumeSimHit>::Element relMCSimHit_Element;
         BOOST_FOREACH(const relMCSimHit_Element & relation, relMCSimHit.getElementsFrom(mcp)) {
           B2INFO("MCParticle #" << i << " created the AwesomSimHit #" << relation.indexTo
-                 << " which has an energy deposition of " << relation.to->getEnergyDep());
+                 << " which has an energy deposition of " << relation.to->getenergyDep());
         }
       }
     }

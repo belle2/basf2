@@ -54,6 +54,7 @@
 #include <genfit/RKTrackRep.h>
 #include <genfit/AbsKalmanFitter.h>
 #include <genfit/KalmanFitter.h>
+#include <genfit/KalmanFitterInfo.h>
 #include <genfit/KalmanFitterRefTrack.h>
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/DAF.h>
@@ -80,6 +81,18 @@
 #include <TFile.h>
 #include <TH1.h>
 
+#include <genfit/DAF.h>
+#include <genfit/AbsFitter.h>
+
+#include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/translators/RealisticCDCGeometryTranslator.h>
+
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
+#include <cdc/dataobjects/WireID.h>
+
+#include <framework/dataobjects/Helix.h>
 
 using namespace std;
 using namespace Belle2;
@@ -102,7 +115,8 @@ GBLfitModule::GBLfitModule() :
 
   //input
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
-           "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)", string(""));
+           "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)",
+           string(""));
   addParam("CDCHitsColName", m_cdcHitsColName, "CDCHits collection", string(""));
   addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
@@ -110,30 +124,61 @@ GBLfitModule::GBLfitModule() :
 
   addParam("MCParticlesColName", m_mcParticlesColName,
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
-  addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
-  addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
+  addParam("UseClusters", m_useClusters,
+           "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
+  addParam("PDGCodes", m_pdgCodes,
+           "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)",
+           vector<int>(0));
 
-  addParam("resolveWireHitAmbi", m_resolveWireHitAmbi, "Determines how the ambiguity in wire hits is to be dealt with.  This only makes sense for the Kalman fitters.  Values are either 'default' (use the default for the respective fitter algorithm), 'weightedAverage', 'unweightedClosestToReference' (default for the Kalman filter), or 'unweightedClosestToPrediction' (default for the Kalman filter without reference track).", string("default"));
+  addParam("resolveWireHitAmbi", m_resolveWireHitAmbi,
+           "Determines how the ambiguity in wire hits is to be dealt with.  This only makes sense for the Kalman fitters.  Values are either 'default' (use the default for the respective fitter algorithm), 'weightedAverage', 'unweightedClosestToReference' (default for the Kalman filter), or 'unweightedClosestToPrediction' (default for the Kalman filter without reference track).",
+           string("default"));
 
-  addParam("beamSpot", m_beamSpot, "point to which the fitted track will be extrapolated in order to put together the TrackFitResults", vector<double>(3, 0.0));
+  addParam("beamSpot", m_beamSpot,
+           "point to which the fitted track will be extrapolated in order to put together the TrackFitResults", vector<double>(3, 0.0));
 
   addParam("suppressGFExceptionOutput", m_suppressGFExceptionOutput, "Suppress error messages in GenFit.", true);
-  addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
+  addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output",
+           bool(false));
   // keep GFExceptions quiet or not
   genfit::Exception::quiet(m_suppressGFExceptionOutput);
 
-  addParam("internalIterations", m_gblInternalIterations, "GBL: internal downweighting setting (separatd by ',' for each external iteration, e.g ',,Hh'", std::string(""));
-  addParam("externalIterations", m_gblExternalIterations, "GBL: Number of times the GBL trajectory should be fitted and updated with results", int(1));
+  addParam("internalIterations", m_gblInternalIterations,
+           "GBL: internal downweighting setting (separatd by ',' for each external iteration, e.g ',,Hh'", std::string(""));
+  addParam("externalIterations", m_gblExternalIterations,
+           "GBL: Number of times the GBL trajectory should be fitted and updated with results", int(1));
   addParam("pValueCut", m_gblPvalueCut, "GBL: p-value cut to output track to millepede file", 0.0);
   addParam("minNdf", m_gblMinNdf, "GBL: minimum NDF to output track to millepede file", 1);
-  addParam("milleFileName", m_gblMilleFileName, "GBL: Name of the mille binary file to be produced for alignment", std::string("millefile.dat"));
+  addParam("milleFileName", m_gblMilleFileName, "GBL: Name of the mille binary file to be produced for alignment",
+           std::string("millefile.dat"));
   addParam("chi2Cut", m_chi2Cut, "GBL: Cut on single measurement Chi2", double(50.));
   addParam("enableScatterers", m_enableScatterers, "GBL: Enable scattering in GBL trajectory", bool(true));
-  addParam("enableIntermediateScatterer", m_enableIntermediateScatterer, "GBL: Enable intermediate scatterers for simulation of thick scatterer", bool(true));
-  addParam("resortHits", m_resortHits, "GBL: Sort hits by extrapolation before fit. Turn on if you see a lot of 'Extrapolation stepped back by ...' errors. The candidates should be already sorted!", bool(true));
-  addParam("recalcJacobians", m_recalcJacobians, "GBL: Recalculate Jacobians/planes: 0=do not recalc, 1=after 1st fit, 2=1 & after 2nd fit, etc. Use '1' for 1 iteration + output to mille or if iteration>=2 ", int(0));
+  addParam("enableIntermediateScatterer", m_enableIntermediateScatterer,
+           "GBL: Enable intermediate scatterers for simulation of thick scatterer", bool(true));
+  addParam("resortHits", m_resortHits,
+           "GBL: Sort hits by extrapolation before fit. Turn on if you see a lot of 'Extrapolation stepped back by ...' errors. The candidates should be already sorted!",
+           bool(true));
+  addParam("recalcJacobians", m_recalcJacobians,
+           "GBL: Recalculate Jacobians/planes: 0=do not recalc, 1=after 1st fit, 2=1 & after 2nd fit, etc. Use '1' for 1 iteration + output to mille or if iteration>=2 ",
+           int(0));
 
   addParam("useOldGbl", m_useOldGbl, "GBL: Use old GBL interface ", bool(false));
+  addParam("seedFromDAF", m_seedFromDAF, "Prefit track with DAF to get better seed", bool(false));
+
+  addParam("PruneFlags", m_pruneFlags,
+           "Determine which information to keep after track fit, by default we keep everything, but please note that add_reconstruction prunes track after all other reconstruction is processed.  See genfit::Track::prune for options.",
+           std::string(""));
+
+  addParam("RealisticCDCGeoTranslator", m_realisticCDCGeoTranslator,
+           "If true, realistic CDC geometry translators will be used (wire sag, misalignment).", false);
+  addParam("CDCWireSag", m_enableWireSag,
+           "Whether to enable wire sag in the CDC geometry translation.  Needs to agree with simulation/digitization.", false);
+  addParam("UseTrackTime", m_useTrackTime,
+           "Determines whether the realistic TDC track time converter and the CDCRecoHits will take the track propagation time into account.  The setting has to agree with those of the CDCDigitizer.  Requires EstimateSeedTime with current input (2015-03-11).",
+           true);
+  addParam("EstimateSeedTime", m_estimateSeedTime,
+           "If set, time for the seed will be recalculated based on a helix approximation.  Only makes a difference if UseTrackTime is set.",
+           true);
 
 
   m_failedFitCounter = 0;
@@ -225,10 +270,24 @@ void GBLfitModule::initialize()
 
   // Create new Translators and give them to the CDCRecoHits.
   // The way, I'm going to do it here will produce some small resource leak, but this will stop, once we go to ROOT 6 and have the possibility to use sharead_ptr
-  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
+  //CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new RealisticCDCGeometryTranslator(true), new RealisticTDCCountTranslator(true));
+  if (m_realisticCDCGeoTranslator) {
+    CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
+                               new RealisticCDCGeometryTranslator(m_enableWireSag),
+                               new RealisticTDCCountTranslator(m_useTrackTime),
+                               m_useTrackTime);
+  } else {
+    if (m_enableWireSag)
+      B2WARNING("Wire sag requested, but using idealized translator which ignores this.");
+    CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
+                               new IdealCDCGeometryTranslator(),
+                               new RealisticTDCCountTranslator(m_useTrackTime),
+                               m_useTrackTime);
+  }
 
   // Set GBL parameters
-  m_gbl.setOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer, m_gblExternalIterations, m_recalcJacobians);
+  m_gbl.setOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer, m_gblExternalIterations,
+                   m_recalcJacobians);
   m_oldGbl.setGBLOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer);
   m_oldGbl.setMP2Options(m_gblPvalueCut, m_gblMinNdf, m_gblMilleFileName, m_chi2Cut);
 
@@ -301,11 +360,14 @@ void GBLfitModule::event()
 
   //StoreArrays to store the fit results
   StoreArray < Track > tracks;
-  tracks.create();
+  if (!tracks.isValid())
+    tracks.create();
   StoreArray <TrackFitResult> trackFitResults;
-  trackFitResults.create();
+  if (!trackFitResults.isValid())
+    trackFitResults.create();
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
-  gfTracks.create();
+  if (!gfTracks.isValid())
+    gfTracks.create();
 
   //Relations for Tracks
   RelationArray mcParticlesToTracks(mcParticles, tracks);
@@ -343,17 +405,21 @@ void GBLfitModule::event()
     bool candFitted = false;   //boolean to mark if the track candidates was fitted successfully with at least one PDG hypothesis
 
     for (int iPdg = 0; iPdg != nPdg; ++iPdg) {  // loop over all pdg hypothesises
-      //make sure the track fit starts with the correct PDG code because the sign of the PDG code will also set the charge in the TrackRep
+      // Make sure the track fit starts with the correct PDG code
+      // because the sign of the PDG code will also set the charge in
+      // the TrackRep.
       TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(m_pdgCodes[iPdg]);
-      B2DEBUG(99, "GBLfit: current PDG code: " << m_pdgCodes[iPdg]);
-      int currentPdgCode = boost::math::sign(aTrackCandPointer->getChargeSeed()) * m_pdgCodes[iPdg];
-      if (currentPdgCode == 0) {
-        B2FATAL("Either the charge of the current genfit::TrackCand is 0 or you set 0 as a PDG code");
-      }
-      if (part->Charge() < 0.0) {
-        currentPdgCode *= -1; //swap sign
-      }
-
+      B2DEBUG(99, "GenFitter: current PDG code: " << m_pdgCodes[iPdg]);
+      int currentPdgCode = m_pdgCodes[iPdg];
+      // Note that for leptons positive PDG codes correspond to the
+      // negatively charged particles.
+      if (std::signbit(part->Charge()) != std::signbit(aTrackCandPointer->getChargeSeed()))
+        currentPdgCode *= -1;
+      // Charges in the PDG tables are counted in multiples of 1/3e.
+      if (TDatabasePDG::Instance()->GetParticle(currentPdgCode)->Charge()
+          != aTrackCandPointer->getChargeSeed() * 3)
+        B2FATAL("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).");
+      //std::cout << "fitting with pdg " << currentPdgCode << " for charge " << aTrackCandPointer->getChargeSeed() << std::endl;
       //Find the particle with the correct PDG Code;
       Const::ChargedStable chargedStable = Const::pion;
       try {
@@ -367,9 +433,33 @@ void GBLfitModule::event()
       const TVector3& posSeed = aTrackCandPointer->getPosSeed();
       const TVector3& momentumSeed = aTrackCandPointer->getMomSeed();
 
+      // We reset the track's time after constructing it from the TrackCand.
+      double timeSeed = aTrackCandPointer->getTimeSeed();
+      if (m_estimateSeedTime) {
+        // Particle velocity in cm / ns.
+        const double m = part->Mass();
+        const double p = momentumSeed.Mag();
+        const double E = hypot(m, p);
+        const double beta = p / E;
+        const double v = beta * Const::speedOfLight;
+
+        // Arc length from IP to posSeed in cm.
+        const Helix h(posSeed, momentumSeed, part->Charge() / 3, 1.5);
+
+        // Arc length calculation doesn't work, do it ourselves until I can fix the Helix.
+        const double z0 = h.getZ0();
+        const double cotTh = h.getTanLambda();
+
+        const double s = fabs((posSeed.Z() - z0) * hypot(cotTh, 1.) / cotTh);
+
+        // Time from trigger (= 0 ns) to posSeed assuming constant velocity in ns.
+        timeSeed = s / v;
+      }
+
       B2DEBUG(99, "Fit track with start values: ");
 
-      B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
+      B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() <<
+              " " << momentumSeed.Mag());
       //B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed(3, 3)) << "  " << sqrt(covSeed(4, 4)) << "  " << sqrt(covSeed(5, 5)));
       B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
       //B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed(0, 0)) << "  " << sqrt(covSeed(1, 1)) << "  " << sqrt(covSeed(2, 2)));
@@ -378,7 +468,6 @@ void GBLfitModule::event()
       //initialize track representation and give the seed helix parameters and cov and the pdg code to the track fitter
       // Do this in two steps, because for now we use the genfit::TrackCand from Genfit 1.
       genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
-
 
       genfit::MeasurementFactory<genfit::AbsMeasurement> factory;
 
@@ -441,6 +530,8 @@ void GBLfitModule::event()
       //aTrackCandPointer->Print();
 
       genfit::Track gfTrack(*aTrackCandPointer, factory, trackRep); //create the track with the corresponding track representation
+      // Reset the time seed to deal with the case where we have recalculated it.
+      gfTrack.setTimeSeed(timeSeed);
 
       const int nHitsInTrack = gfTrack.getNumPointsWithMeasurement();
       B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
@@ -470,7 +561,8 @@ void GBLfitModule::event()
 
       B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ", Tel: " << nTel << ")");
 
-      if (aTrackCandPointer->getNHits() < 3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
+      if (aTrackCandPointer->getNHits() <
+          3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
         B2WARNING("GBLfit: only " << aTrackCandPointer->getNHits() << " were assigned to the Track! This Track will not be fitted!");
         ++m_failedFitCounter;
         continue;
@@ -482,8 +574,10 @@ void GBLfitModule::event()
           for (unsigned int i = 0; i < gfTrack.getNumPoints() - 1; ++i) {
             //if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 1)
             //  continue;
-            genfit::PlanarMeasurement* planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i)->getRawMeasurement(0));
-            genfit::PlanarMeasurement* planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i + 1)->getRawMeasurement(0));
+            genfit::PlanarMeasurement* planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
+                                                       i)->getRawMeasurement(0));
+            genfit::PlanarMeasurement* planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
+                                                       i + 1)->getRawMeasurement(0));
 
             if (planarMeas1 != NULL && planarMeas2 != NULL &&
                 planarMeas1->getDetId() == planarMeas2->getDetId() &&
@@ -566,6 +660,22 @@ void GBLfitModule::event()
       }
 
       */
+      if (m_seedFromDAF) {
+        try {
+          genfit::AbsFitter* dafFitter = new genfit::DAF();
+          dafFitter->processTrack(&gfTrack);
+          genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
+          TVector3 poca(0., 0., 0.); //point of closest approach
+          TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
+          TMatrixDSym cov(6);
+          mop.getPosMomCov(poca, dirInPoca, cov);
+          //get fit starting values from the from the track candidate
+          gfTrack.deleteFitterInfo();
+          gfTrack.setStateSeed(mop.getPos(), mop.getMom());
+        } catch (...) {
+          B2WARNING("GBLfit: DAF prefit to determine seed failed");
+        }
+      }
 
       //now fit the track
       try {
@@ -667,6 +777,7 @@ void GBLfitModule::event()
             ++trackCounter;
 
             //Create output tracks
+            gfTrack.prune(m_pruneFlags.c_str());
             gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
             tracks.appendNew(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
 
@@ -751,7 +862,7 @@ void GBLfitModule::event()
             // +/- predictions of GBL are the same at 1st point, so no matter if we take forward state for
             // most likely backward propagation (to interaction point)
             genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
-            mop.extrapolateToLine(pos, lineDirection);
+            //mop.extrapolateToLine(pos, lineDirection);
             mop.getPosMomCov(poca, dirInPoca, cov);
 
             B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
@@ -767,9 +878,19 @@ void GBLfitModule::event()
             genfit::FitStatus* fs = gfTrack.getFitStatus();
             int charge = fs->getCharge();
             double pVal = fs->getPVal();
-            float bField = 1.5; //TODO: get magnetic field from genfit
+            double Bx, By, Bz;
+            genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(),
+                                                             Bx, By, Bz);
 
-            trackFitResults.appendNew(TrackFitResult(poca, dirInPoca, cov, charge, chargedStable, pVal, bField, 0, 0));
+            //fill hit patterns VXD and CDC
+            HitPatternVXD theHitPatternVXD =  getHitPatternVXD(gfTrack);
+            uint32_t hitPatternVXDInitializer = (uint32_t)theHitPatternVXD.getInteger();
+
+            HitPatternCDC theHitPatternCDC =  getHitPatternCDC(gfTrack);
+            long long int hitPatternCDCInitializer = (long long int)theHitPatternCDC.getInteger();
+
+            trackFitResults.appendNew(poca, dirInPoca, cov, charge, chargedStable,
+                                      pVal, Bz / 10.,  hitPatternCDCInitializer, hitPatternVXDInitializer);
 
             gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
             gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
@@ -896,3 +1017,130 @@ void GBLfitModule::terminate()
   //delete m_milleFile;
 }
 
+HitPatternVXD GBLfitModule::getHitPatternVXD(genfit::Track track)
+{
+
+  Int_t PXD_Hits[2] = {0, 0};
+  Int_t SVD_uHits[4] = {0, 0, 0, 0};
+  Int_t SVD_vHits[4] = {0, 0, 0, 0};
+
+  HitPatternVXD aHitPatternVXD;
+
+  //hits used in the fit
+  int nHits = track.getNumPointsWithMeasurement();
+
+  for (int i = 0; i < nHits; i++) {
+    genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
+
+    int nMea = tp->getNumRawMeasurements();
+    for (int mea = 0; mea < nMea; mea++) {
+
+      genfit::AbsMeasurement* absMeas = tp->getRawMeasurement(mea);
+
+      //double weight = 0;
+      //std::vector<double> weights;
+      genfit::AbsFitterInfo* kalmanInfo = tp->getFitterInfo();
+      if (kalmanInfo) {
+        //weights = kalmanInfo->getWeights();
+        //weight = weights.at(mea);
+      } else {
+        B2WARNING(" No KalmanFitterInfo associated to the TrackPoint, not filling the HitPatternVXD");
+        continue;
+      }
+
+      //if (weight == 0)
+      //  continue;
+
+      PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
+      SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
+      SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
+
+      if (pxdHit) {
+        VxdID sensor = pxdHit->getSensorID();
+        if (sensor.getLayerNumber() > 2)
+          B2WARNING("wrong PXD layer (>2)");
+        PXD_Hits[ sensor.getLayerNumber() - 1 ]++;
+      } else if (svdHit2D) {
+        VxdID sensor = svdHit2D->getSensorID();
+        if (sensor.getLayerNumber() < 2 ||  sensor.getLayerNumber() > 6)
+          B2WARNING("wrong SVD layer (<2 || >6)");
+        SVD_uHits[ sensor.getLayerNumber() - 3]++;
+        SVD_vHits[ sensor.getLayerNumber() - 3]++;
+
+      } else if (svdHit) {
+        VxdID sensor = svdHit->getSensorID();
+        if (sensor.getLayerNumber() < 2 ||  sensor.getLayerNumber() > 6)
+          B2WARNING("wrong SVD layer (<2 || >6)");
+        if (svdHit->isU())
+          SVD_uHits[ sensor.getLayerNumber() - 3]++;
+        else
+          SVD_vHits[ sensor.getLayerNumber() - 3]++;
+      }
+    }
+  }
+
+  //fill PXD hits
+  for (int l = 0; l < 2; l++)
+    //maximum number of hits checked inside the HitPatternVXD
+    aHitPatternVXD.setPXDLayer(l, PXD_Hits[l], 0); //normal/gated mode not retireved
+
+
+  //fill SVD hits
+  for (int l = 0; l < 4; l++)
+    //maximum number of hits checked inside the HitPatternVXD
+    aHitPatternVXD.setSVDLayer(l, SVD_uHits[l], SVD_vHits[l]);
+
+
+  return aHitPatternVXD;
+}
+
+HitPatternCDC GBLfitModule::getHitPatternCDC(genfit::Track track)
+{
+
+  HitPatternCDC aHitPatternCDC(0);
+
+  //hits used in the fit
+  int nHits = track.getNumPointsWithMeasurement();
+  int nCDChits = 0;
+
+  for (int i = 0; i < nHits; i++) {
+    genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
+
+    int nMea = tp->getNumRawMeasurements();
+    for (int mea = 0; mea < nMea; mea++) {
+
+      genfit::AbsMeasurement* absMeas = tp->getRawMeasurement(mea);
+
+      //double weight = 0;
+      //std::vector<double> weights;
+      genfit::AbsFitterInfo* kalmanInfo = tp->getFitterInfo();
+
+      if (kalmanInfo) {
+        //weights = kalmanInfo->getWeights();
+        //weight = weights.at(mea);
+      } else {
+        B2WARNING(" No KalmanFitterInfo associated to the TrackPoint, not filling the HitPatternCDC");
+        continue;
+      }
+
+      //if (weight == 0)
+      //  continue;
+
+      CDCRecoHit* cdcHit =  dynamic_cast<CDCRecoHit*>(absMeas);
+
+      if (cdcHit) {
+        WireID wire = cdcHit->getWireID();
+
+        //maximum number of hits checked inside the HitPatternCDC
+        aHitPatternCDC.setLayer(wire.getICLayer());
+        nCDChits++;
+      }
+    }
+
+  }
+
+  aHitPatternCDC.setNHits(nCDChits);
+
+  return aHitPatternCDC;
+
+}

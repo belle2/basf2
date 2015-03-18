@@ -13,9 +13,11 @@
 
 #include <genfit/KalmanFitter.h>
 #include <genfit/KalmanFitterRefTrack.h>
-#include <genfit/DAF.h>
 #include <genfit/GblFitter.h>
 #include <genfit/GFGbl.h>
+
+#include <mdst/dataobjects/HitPatternVXD.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 
 #include <fstream>
 #include <string>
@@ -85,15 +87,20 @@ namespace Belle2 {
     int m_failedGFTrackCandFitCounter;               /**< Number of genfit::TrackCands with failed fits. */
     int m_successfulGFTrackCandFitCounter;           /**< Number of genfit::TracksCands with successfully fitted tracks. */
 
-    std::string m_filterId;                          /**< Select the filter: 'Kalman' for Kalman, 'DAF for DAF, 'simpleKalman' for the simple Kalman. */
+    std::string
+    m_filterId;                          /**< Select the filter: 'Kalman' for Kalman, 'DAF for DAF, 'simpleKalman' for the simple Kalman. */
 
     bool m_useClusters;                              /**< Boolean to mark if PXD/SVD cluster hits should be used instead of true hits in the.*/
-    std::vector<int> m_pdgCodes;                     /**< holds the PDG codes the user sets. If empty the PDG code from genfit::TrackCand will be written into it*/
+    std::vector<int>
+    m_pdgCodes;                     /**< holds the PDG codes the user sets. If empty the PDG code from genfit::TrackCand will be written into it*/
     bool m_usePdgCodeFromTrackCand;                  /**< flag to indicate if PDG code will be taken from genfit::TrackCand or from user input in m_pdgCodes*/
     std::ofstream HelixParam;                        /**< Text output file name */
-    std::vector<double> m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
-    std::string m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF is, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
-    std::vector<double> m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
+    std::vector<double>
+    m_dafTemperatures;           /**< holds the annealing scheme for the DAF. The number of vector elements is the number of DAF iterations */
+    std::string
+    m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF is, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
+    std::vector<double>
+    m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
     genfit::GblFitter m_gbl;                         /**< General Broken Line interface class object. */
     genfit::GFGbl m_oldGbl;                          /**< General Broken Line interface class object. Old version*/
 
@@ -110,8 +117,17 @@ namespace Belle2 {
     int m_recalcJacobians;                           /**< Recalculate Jacobians: 0=do not recalc, 1=after 1st fit, 2=1+after 2nd fit, etc. */
     bool m_storeFailed;                              /**< Store tracks where the fit failed */
     bool m_useOldGbl;                                /**< Use old GBL interface version */
+    bool m_seedFromDAF;                              /**< Prefit track with DAF to get better seed */
 
+    HitPatternCDC getHitPatternCDC(genfit::Track); /**< returns HitPatternCDC of the Track */
+    HitPatternVXD getHitPatternVXD(genfit::Track); /**< returns the HitPatternVXD of the Track*/
+    std::string
+    m_pruneFlags;                        /**< Describes which information to keep after the track fit, see genfit::Track::prune for possible settings. */
 
+    bool m_realisticCDCGeoTranslator;                /**< Whether to use the realistic geometry translators.  */
+    bool m_enableWireSag;                            /**< Wire sag in CDCGeometryTranslator.  */
+    bool m_useTrackTime;                             /**< If true, CDCRecoHits will use the track propagation time.  */
+    bool m_estimateSeedTime;                         /**< If true, the starting time of each track will be estimated from its seed.  */
   };
 }
 

@@ -126,7 +126,8 @@ void ECLMCMatchModule::event()
     } else {
       if (mcParticles[iPart]->getMother() == NULL) continue;
       if (eclPrimaryMap.find(mcParticles[iPart]->getMother()->getArrayIndex()) != eclPrimaryMap.end()) {
-        eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex()]));
+        eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(),
+                                            eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex()]));
       }//if mother of mcParticles is stored.
     }//if c_StableInGenerator and c_PrimaryParticle
   }//for mcParticles
@@ -214,6 +215,7 @@ void ECLMCMatchModule::event()
       //      eclShowerToMCParts.add(showerId,  mc_relations.begin(), mc_relations.end());
       if ((*i).second > MaxContribution) {MaxContribution = (*i).second ;  PrimaryIndex = (*i).first ;}
     }
+    //cout << "-----------------------------------------" << endl;
     /*
     for (map<int, float>::iterator i = mc_relations.begin(); i != mc_relations.end(); ++i) {
       //cout << "ShowerID: " << showerId << " MCParticle: " << (*i).first << endl;
@@ -282,7 +284,7 @@ void ECLMCMatchModule::event()
               MaxEnergy = hitE;
               if (MaxEnergy > 0.25 * ShowerEnergy) {
                 eclShowerToMCPart.add(showerId, PrimaryIndex);
-                cout << "Max: " << MaxEnergy << " Shower: " << ShowerEnergy << endl;
+                //cout << "Max: " << MaxEnergy << " Shower: " << ShowerEnergy << endl;
                 //PrimaryIndex =eclHitRel[iMCPart].getFromIndex();
               }//if condition
             }
@@ -410,9 +412,9 @@ void ECLMCMatchModule::event()
       }//for all Pi0ToGamma relation
     }//if pi0Array exit
    */
-  cout << "Event: " << m_nEvent << endl;
-  cout << "-----------------------------------------" << endl;
-  cout << "-----------------------------------------" << endl;
+  //cout << "Event: " << m_nEvent << endl;
+  //cout << "-----------------------------------------" << endl;
+  //cout << "-----------------------------------------" << endl;
   m_nEvent++;
 
 }

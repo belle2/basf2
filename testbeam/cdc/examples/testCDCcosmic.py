@@ -40,7 +40,7 @@ main.add_module(particlegun)
 gearbox = register_module('Gearbox')
 gearbox.param('fileName', 'geometry/CDCcosmicTests.xml')
 gearbox.param('override', [("/DetectorComponent[@name='TOP']//Nbar", '1', ''),
-              ("/DetectorComponent[@name='TOP']//Phi0", '90', 'deg')])
+                           ("/DetectorComponent[@name='TOP']//Phi0", '90', 'deg')])
 main.add_module(gearbox)
 
 # detector geometry
@@ -94,9 +94,9 @@ trackfitter.param('PDGCodes', [13])
 main.add_module(trackfitter)
 
 # display
-# draw = register_module('CDCNiceDrawing')
-# draw.param('StoreDirectory', 'zzSmeti/')
-# main.add_module(draw)
+# display = main.add_module('Display') # or AsyncDisplay
+#display.param('showCDCHits', True)
+#display.param('fullGeometry', True)
 
 # Output
 output = register_module('RootOutput')

@@ -33,6 +33,7 @@
 #include <analysis/NtupleTools/NtupleMCDeltaTTool.h>
 #include <analysis/NtupleTools/NtupleContinuumSuppressionTool.h>
 #include <analysis/NtupleTools/NtupleFlavorTaggingTool.h>
+#include <analysis/NtupleTools/NtupleFlavorTagInfoTool.h>
 #include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
 #include <analysis/NtupleTools/NtupleFlightInfoTool.h>
 #include <analysis/NtupleTools/NtupleMCFlightInfoTool.h>
@@ -110,6 +111,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "MCDeltaT") return new NtupleMCDeltaTTool(tree, d);
   else if (strToolName == "ContinuumSuppression") return new NtupleContinuumSuppressionTool(tree, d, strOption);
   else if (strToolName == "FlavorTagging") return new NtupleFlavorTaggingTool(tree, d);
+  else if (strToolName == "FlavorTagInfo") return new NtupleFlavorTagInfoTool(tree, d);
   else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
   else if (strToolName == "FlightInfo") return new NtupleFlightInfoTool(tree, d);
   else if (strToolName == "MCFlightInfo") return new NtupleMCFlightInfoTool(tree, d);

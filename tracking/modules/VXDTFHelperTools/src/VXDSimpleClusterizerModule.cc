@@ -145,6 +145,7 @@ void VXDSimpleClusterizerModule::event()
   //SVD
   int nSvdTrueHits = m_svdTrueHits.getEntries();
   if (nSvdTrueHits == 0) {B2DEBUG(100, "MCTrackFinder: SVDHitsCollection is empty!");}
+  B2DEBUG(175, "found " << nMcParticles << "/" << nPxdTrueHits << "/" << nSvdTrueHits << " mcParticles, pxdTrueHits, svdTrueHits")
 
 
   double sigmaU = m_setMeasSigma;
@@ -153,28 +154,32 @@ void VXDSimpleClusterizerModule::event()
 
 ///////////////////////////////////////////////// NOW THE PXD
   for (unsigned int currentTrueHit = 0; int (currentTrueHit) not_eq nPxdTrueHits; ++currentTrueHit) {
+    B2DEBUG(175, "begin PXD current TrueHit: " << currentTrueHit << " of nPxdTrueHits total: " << nPxdTrueHits)
 
     const PXDTrueHit* aPxdTrueHit = m_pxdTrueHits[currentTrueHit];
     const MCParticle* aMcParticle = aPxdTrueHit->getRelatedFrom<MCParticle>();
+    unsigned int particleID = std::numeric_limits<unsigned int>::max();
 
-    unsigned int particleID = aMcParticle->getArrayIndex();
+    if (aMcParticle != NULL) { particleID = aMcParticle->getArrayIndex(); }
 
     double energy = aPxdTrueHit->getEnergyDep();
 
-    B2DEBUG(100, " PXD, current TrueHit has an energy deposit of " << energy * 1000.0 << "MeV ")
+
+    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
+      if (aMcParticle == NULL or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+        m_fakePXDHitCtr++;
+        discardedPXDFake++;
+        continue; // jump to next pxdTrueHit
+      }
+    }
+
+    B2DEBUG(100, " PXD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<
+            energy * 1000.0 << "MeV ")
     if (energy < m_energyThreshold) { //ignore hit if energy deposit is too small
       B2DEBUG(100, " PXD, TrueHit discarded because of energy deposit too small")
       m_weakPXDHitCtr++;
       discardedPXDEdeposit++;
       continue;
-    }
-
-    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
-      if (aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
-        m_fakePXDHitCtr++;
-        discardedPXDFake++;
-        continue; // jump to next pxdTrueHit
-      }
     }
 
     //smear the pxdTrueHit and get needed variables for storing
@@ -188,7 +193,7 @@ void VXDSimpleClusterizerModule::event()
       sigmaU = sensorInfo->getUPitch(uTrue) * m_uniSigma;
       sigmaV = sensorInfo->getVPitch(vTrue) * m_uniSigma;
     }
-    B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
+    B2DEBUG(175, "sigU sigV: " << sigmaU << " " << sigmaV);
 
     if (m_setMeasSigma != 0) {
       u = gRandom->Gaus(uTrue, sigmaU);
@@ -223,25 +228,37 @@ void VXDSimpleClusterizerModule::event()
     PXDCluster* newCluster = m_pxdClusters.appendNew(aVXDId, u, v, sigmaU, sigmaV, 0, 1, 1, 1, 1, 1, 1, 1);
     // add relations
     newCluster->addRelationTo(m_pxdTrueHits[currentTrueHit]);
-    newCluster->addRelationTo(m_mcParticles[particleID]);
 
-    B2DEBUG(20, "mcParticle " << particleID << " has " << aMcParticle->getRelationsTo<PXDCluster>().size() <<
-            " relations to PXD clusters");
+    if (particleID != std::numeric_limits<unsigned int>::max()) {
+      newCluster->addRelationTo(m_mcParticles[particleID]);
+      B2DEBUG(20, "mcParticle " << particleID << " has " << aMcParticle->getRelationsTo<PXDCluster>().size() <<
+              " relations to PXD clusters");
+    }
   }
 
 
 
 ////////////////////////////////////////////////  NOW THE SVD
   for (unsigned int currentTrueHit = 0; int (currentTrueHit) not_eq nSvdTrueHits; ++currentTrueHit) {
+    B2DEBUG(175, "begin SVD current TrueHit: " << currentTrueHit << " of nSvdTrueHits total: " << nSvdTrueHits)
 
     const SVDTrueHit* aSvdTrueHit = m_svdTrueHits[currentTrueHit];
     const MCParticle* aMcParticle = aSvdTrueHit->getRelatedFrom<MCParticle>();
+    unsigned int particleID = std::numeric_limits<unsigned int>::max();
 
-    unsigned int particleID = aMcParticle->getArrayIndex();
+    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
+      if (aMcParticle == NULL or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+        m_fakeSVDHitCtr++;
+        discardedSVDFake++;
+        continue; // jump to next svdTrueHit
+      }
+    }
 
+    if (aMcParticle != NULL) { particleID = aMcParticle->getArrayIndex(); }
     double energy = aSvdTrueHit->getEnergyDep();
 
-    B2DEBUG(100, " SVD, current TrueHit has an energy deposit of " << energy * 1000.0 << "MeV ")
+    B2DEBUG(100, " SVD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<
+            energy * 1000.0 << "MeV ")
     if (energy < (m_energyThresholdU + m_energyThresholdV)) { //ignore hit if energy deposity is too snall
       m_weakSVDHitCtr++;
       discardedSVDEdeposit++;
@@ -249,13 +266,6 @@ void VXDSimpleClusterizerModule::event()
       continue;
     }
 
-    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
-      if (aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
-        m_fakeSVDHitCtr++;
-        discardedSVDFake++;
-        continue; // jump to next svdTrueHit
-      }
-    }
 
     // smear the SvdTrueHit and get needed variables for storing
     VxdID aVXDId = aSvdTrueHit->getSensorID();
@@ -268,7 +278,7 @@ void VXDSimpleClusterizerModule::event()
       sigmaU = sensorInfo->getUPitch(uTrue) * m_uniSigma;
       sigmaV = sensorInfo->getVPitch(vTrue) * m_uniSigma;
     }
-    B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
+    B2DEBUG(150, "sigU sigV: " << sigmaU << " " << sigmaV);
 
     if (m_setMeasSigma != 0) {
       u = gRandom->Gaus(uTrue, sigmaU);
@@ -302,15 +312,18 @@ void VXDSimpleClusterizerModule::event()
                                                        3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
     // add relations to u-cluster
     newClusterU->addRelationTo(m_svdTrueHits[currentTrueHit]);
-    newClusterU->addRelationTo(m_mcParticles[particleID]);
 
     SVDCluster* newClusterV = m_svdClusters.appendNew(aVXDId, false, v, sigmaV, timeStamp, 0, 1, 1, 3);
     // add relations to v-cluster
     newClusterV->addRelationTo(m_svdTrueHits[currentTrueHit]);
-    newClusterV->addRelationTo(m_mcParticles[particleID]);
 
-    B2DEBUG(20, "mcParticle " << particleID << " has " << aMcParticle->getRelationsTo<SVDCluster>().size() <<
-            " relations to SVD clusters");
+    if (particleID != std::numeric_limits<unsigned int>::max()) {
+      newClusterU->addRelationTo(m_mcParticles[particleID]);
+      newClusterV->addRelationTo(m_mcParticles[particleID]);
+      B2DEBUG(20, "mcParticle " << particleID << " has " << aMcParticle->getRelationsTo<SVDCluster>().size() <<
+              " relations to SVD clusters");
+    }
+
   }
 
   B2DEBUG(10, "------------------------------------------------------");

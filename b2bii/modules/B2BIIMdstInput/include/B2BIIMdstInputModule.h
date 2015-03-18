@@ -12,8 +12,8 @@
 #include <framework/core/Module.h>
 
 #define BELLE_TARGET_H "belle-x86_64-unknown-linux-gnu-g++.h"
-#include "panther/panther.h"
-#include "panther/panther_group.h"
+#include "belle_legacy/panther/panther.h"
+#include "belle_legacy/panther/panther_group.h"
 
 #include <string>
 

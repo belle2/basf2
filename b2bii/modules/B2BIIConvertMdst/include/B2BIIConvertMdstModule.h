@@ -14,12 +14,12 @@
 #include <framework/core/Module.h>
 
 #define BELLE_TARGET_H "belle-x86_64-unknown-linux-gnu-g++.h"
-#include "panther/panther.h"
-#include "panther/panther_group.h"
+#include "belle_legacy/panther/panther.h"
+#include "belle_legacy/panther/panther_group.h"
 
 // Belle objects (Panther tables)
-#include "panther/belletdf.h"
-#include "panther/mdst.h"
+#include "belle_legacy/tables/belletdf.h"
+#include "belle_legacy/tables/mdst.h"
 
 // Belle2 objects
 #include <mdst/dataobjects/V0.h>

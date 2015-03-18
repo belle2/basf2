@@ -54,8 +54,8 @@
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 
-#include "belle_legacy/run_info.h"
 #include "belle_legacy/belle.h"
+#include "belle_legacy/tables/run_info.h"
 
 #include <string>
 

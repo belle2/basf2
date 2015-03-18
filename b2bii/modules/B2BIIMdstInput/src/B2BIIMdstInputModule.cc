@@ -15,7 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // Belle tables
-#include "panther/belletdf.h"
+#include "belle_legacy/tables/belletdf.h"
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>

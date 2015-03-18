@@ -26,13 +26,13 @@
 #include <queue>
 
 // Belle tables
-#include "panther/mdst.h"
-#include "panther/belletdf.h"
-#include "panther/hepevt.h"
+#include "belle_legacy/tables/mdst.h"
+#include "belle_legacy/tables/belletdf.h"
+#include "belle_legacy/tables/hepevt.h"
+#include "belle_legacy/tables/run_info.h"
 
-#include "panther/TPntFDDB.h"
-#include "panther/TPntDB.h"
-#include "panther/run_info.h"
+#include "belle_legacy/pntdb/TPntFDDB.h"
+#include "belle_legacy/pntdb/TPntDB.h"
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>

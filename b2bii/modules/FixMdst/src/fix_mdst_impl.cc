@@ -129,21 +129,21 @@
 
 #include <b2bii/modules/FixMdst/FixMdst.h>
 
-#include "panther/belle.h"
-#include "panther/panther.h"
+#include "belle_legacy/belle.h"
+#include "belle_legacy/panther.h"
 
 #include <iostream>
 #include <string>
 
-#include "panther/IpProfile.h"
+#include "belle_legacy/IpProfile.h"
 
-#include "panther/BeamEnergy.h"
+#include "belle_legacy/BeamEnergy.h"
 
-#include "panther/mdst.h"
-#include "panther/belletdf.h"
-#include "panther/evtcls.h"
-#include "panther/dEdxCalib.h"
-#include "panther/level4.h"
+#include "belle_legacy/mdst.h"
+#include "belle_legacy/belletdf.h"
+#include "belle_legacy/evtcls.h"
+#include "belle_legacy/dEdxCalib.h"
+#include "belle_legacy/level4.h"
 
 namespace Belle2 {
 

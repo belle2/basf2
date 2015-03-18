@@ -27,9 +27,9 @@
 //
 //
 
-#include "panther/belle.h"
+#include "belle_legacy/belle.h"
 #include <b2bii/modules/FixMdst/FixMdst.h>
-#include "panther/panther.h"
+#include "belle_legacy/panther.h"
 
 #include <cmath>
 #include <cfloat>
@@ -39,8 +39,8 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "panther/mdst.h"
-#include "panther/belletdf.h"
+#include "belle_legacy/mdst.h"
+#include "belle_legacy/belletdf.h"
 
 namespace Belle2 {
 

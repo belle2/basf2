@@ -5,7 +5,7 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 16 - Feb - 2015
 //
-// Contributors: Anze Zupanc,
+// Contributors: Anze Zupanc, Thomas Keck
 //-
 
 #include <b2bii/modules/PantherInput/PantherInputModule.h>
@@ -30,10 +30,9 @@
 #include "panther/belletdf.h"
 #include "panther/hepevt.h"
 
-// PNTDB: Uncomment if you have pntdb in your externals
-#include "pntdb/TPntFDDB.h"
-#include "pntdb/TPntDB.h"
-#include "tables/run_info.h"
+#include "panther/TPntFDDB.h"
+#include "panther/TPntDB.h"
+#include "panther/run_info.h"
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
@@ -88,8 +87,6 @@ PantherInputModule::~PantherInputModule()
 void PantherInputModule::test_pntdb()
 {
 
-  // PNTDB: Uncomment if you have pntdb in your externals
-  /*
   Belle::Beam_energy_Manager& Beam_mgr = Belle::Beam_energy_Manager::get_manager();
   Beam_mgr.remove();
 
@@ -104,19 +101,19 @@ void PantherInputModule::test_pntdb()
 
   // Read out beam-energy of off-resonance data experiment 71!
   // exp: 71: run: 1 (run indepent number is stored in 1, NOT 0), version: 2
-  if(constant.Get(71, 1 , 2) <= 0){
+  if (constant.Get(71, 1 , 2) <= 0) {
     B2ERROR("PantherInput: Cannot get data from database correctly.");
     return;
   }
 
   Belle::Beam_energy_Manager::iterator beit = Beam_mgr.begin();
-  if( beit == Beam_mgr.end()){
+  if (beit == Beam_mgr.end()) {
     B2ERROR("PantherInput: There is no Beam Energy data.");
     return;
   } else {
     B2INFO("PantherInput: BeamEnergy is" << beit->E_beam());
   }
-  */
+
 
 }
 
@@ -236,7 +233,8 @@ bool PantherInputModule::convertBelleEventObject()
   // set generated weight (>0 for MC; <0 for real DATA)
   evtmetadata->setGeneratedWeight((evt.ExpMC() == 2) ? 1.0 : -1.0);
 
-  B2DEBUG(90, "[PantherInputModule] Convert exp/run/evt: " << evt.ExpNo() << "/" << evt.RunNo() << "/" << int(evt.EvtNo() & 0x0fffffff));
+  B2DEBUG(90, "[PantherInputModule] Convert exp/run/evt: " << evt.ExpNo() << "/" << evt.RunNo() << "/" << int(
+            evt.EvtNo() & 0x0fffffff));
 
   return (evt.ExpMC() == 2) ? true : false;
 }

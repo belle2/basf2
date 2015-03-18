@@ -54,8 +54,8 @@
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 
-#include "panther/run_info.h"
-#include "panther/belle.h"
+#include "belle_legacy/run_info.h"
+#include "belle_legacy/belle.h"
 
 #include <string>
 

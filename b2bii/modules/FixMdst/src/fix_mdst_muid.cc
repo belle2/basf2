@@ -29,10 +29,10 @@
 // my include file -- should always be first!
 
 #include <b2bii/modules/FixMdst/FixMdst.h>
-#include "panther/panther.h"
-#include "panther/mdst.h"
-#include "panther/belletdf.h"
-#include "panther/belutil.h"
+#include "belle_legacy/panther.h"
+#include "belle_legacy/mdst.h"
+#include "belle_legacy/belletdf.h"
+#include "belle_legacy/belutil.h"
 
 // system include files
 #include <cmath>

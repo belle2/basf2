@@ -102,10 +102,10 @@
 #include <cfloat>
 
 #include <b2bii/modules/FixMdst/FixMdst.h>
-#include "panther/panther.h"
+#include "belle_legacy/panther.h"
 
-#include "panther/mdst.h"
-#include "panther/belletdf.h"
+#include "belle_legacy/mdst.h"
+#include "belle_legacy/belletdf.h"
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/LorentzVector.h"

@@ -161,12 +161,12 @@
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Matrix/Vector.h"
 
-#include "panther/Helix.h"
+#include "belle_legacy/Helix.h"
 
-#include "panther/mdst.h"
-#include "panther/belletdf.h"
-#include "panther/evtvtx.h"
-#include "panther/IpProfile.h"
+#include "belle_legacy/mdst.h"
+#include "belle_legacy/belletdf.h"
+#include "belle_legacy/evtvtx.h"
+#include "belle_legacy/IpProfile.h"
 //#include "particle/utility.h"
 
 // kfitter
@@ -2810,7 +2810,7 @@ namespace Belle2 {
     if (result != result_before) {
       switch (result) {
         case 0: {
-          B2ERROR(
+          B2INFO(
             "scale_error: info: scale error is properly applied.");
           break;
         }

@@ -9,9 +9,9 @@
 
 #define BELLE_TARGET_H "belle-x86_64-unknown-linux-gnu-g++.h"
 
-#include "panther/hepevt.h"
-#include "panther/mdst.h"
-#include "panther/mdst_obs.h"
+#include "belle_legacy/hepevt.h"
+#include "belle_legacy/mdst.h"
+#include "belle_legacy/mdst_obs.h"
 
 /*
 class Belle::Mdst_charged;

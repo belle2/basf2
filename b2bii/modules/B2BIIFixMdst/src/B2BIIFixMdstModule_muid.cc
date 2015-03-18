@@ -298,7 +298,7 @@ namespace Belle2 {
     while ((pathname == "") && (expNo >= 5)) {
       std::sprintf(dbname, "%s%s%s%06d%s", "muid_", dbtemplate,
                    "_e", expNo, ".dat");
-      pathname = belfnm(dbname, 0, "share/data-files/muid");
+      pathname = belfnm(dbname, 0, "share/belle_legacy/data-files/muid");
       expNo -= 2;
     }
     (void)set_belfnm_verbose(tmp);

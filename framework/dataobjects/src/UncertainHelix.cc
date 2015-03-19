@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/dataobjects/UncertainHelix.h>
-#include <TVectorD.h>
 
+#include <assert.h>
 
 using namespace Belle2;
 using namespace HelixParameterIndex;
@@ -43,7 +43,6 @@ UncertainHelix::UncertainHelix(const TVector3& position,
   const int iPy = 4;
   const int iPz = 5;
 
-  TMatrixDSym& cov6 = m_covariance;
   // We initialised the m_covariance to the cartesian covariance and
   // reduce it now to the real 5x5 matrix that should be there.
 
@@ -53,16 +52,9 @@ UncertainHelix::UncertainHelix(const TVector3& position,
 
   const double px = momentum.X();
   const double py = momentum.Y();
-  const double pz = momentum.Z();
-
   const double pt = hypot(px, py);
-  const double invPt = 1 / pt;
-  const double invPtSquared = invPt * invPt;
-
   const double cosPhi0 = px / pt;
   const double sinPhi0 = py / pt;
-
-  const double alpha = getAlpha(bZ);
 
   // Passive rotation matrix by phi0:
   jacobianRot(iX, iX) = cosPhi0;
@@ -77,26 +69,37 @@ UncertainHelix::UncertainHelix(const TVector3& position,
   jacobianRot(iPy, iPy) = cosPhi0;
   jacobianRot(iPz, iPz) = 1.0;
 
-  cov6.Similarity(jacobianRot);
+  m_covariance.Similarity(jacobianRot);
 
   // 2. Translate to perigee parameters
-  TMatrixD jacobianReduce(5, 6);
-  jacobianReduce.Zero();
+  const double pz = momentum.Z();
+  const double invPt = 1 / pt;
+  const double invPtSquared = invPt * invPt;
+  const double omega = getOmega();
+  const double alpha = getAlpha(bZ);
 
-  jacobianReduce(iD0, iY) = -1;
-  jacobianReduce(iPhi0, iPy) = invPt;
-  jacobianReduce(iOmega, iPx) = charge * invPtSquared / alpha ;
-  jacobianReduce(iTanLambda, iPx) = - pz * invPtSquared;
-  jacobianReduce(iTanLambda, iPz) = invPt;
-  jacobianReduce(iZ0, iZ) = 1;
-  // Note the column corresponding to iX is completely zero as expectable.
+  TMatrixD jacobianToHelixParameters(5, 6);
+  jacobianToHelixParameters.Zero();
 
-  cov6.Similarity(jacobianReduce);
+  jacobianToHelixParameters(iD0, iY) = charge;
+  jacobianToHelixParameters(iPhi0, iX) = omega;
+  jacobianToHelixParameters(iPhi0, iPy) = invPt;
+  jacobianToHelixParameters(iOmega, iPx) = charge * invPtSquared / alpha ;
+  jacobianToHelixParameters(iTanLambda, iPx) = - pz * invPtSquared;
+  jacobianToHelixParameters(iTanLambda, iPz) = invPt;
+  jacobianToHelixParameters(iZ0, iZ) = 1;
+  m_covariance.Similarity(jacobianToHelixParameters);
+
+  // 3. Extrapolate to the origin.
+  TVector3 by(-position.X(), -position.Y(), 0.0);
+  TMatrixD jacobianPassiveMove(5, 5);
+  calcPassiveMoveByJacobian(by, jacobianPassiveMove);
+
+  m_covariance.Similarity(jacobianPassiveMove);
+  /*const double arcLength2D = */ Helix::passiveMoveBy(TVector3(-position.X(), -position.Y(), 0.0));
 
   // The covariance m_covariance is now the correct 5x5 covariance matrix.
-
-  // Final step move to the right position
-  passiveMoveBy(TVector3(-position.X(), -position.Y(), 0.0));
+  assert(m_covariance.GetNrows() == 5);
 }
 
 
@@ -117,15 +120,6 @@ UncertainHelix::UncertainHelix(const float& d0,
 
 TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ) const
 {
-  const double& d0 = getD0();
-  // const double& impactXY = localHelix.impactXY();
-
-  const double& cosPhi0 = getCosPhi0();
-  const double& sinPhi0 = getSinPhi0();
-  const double& omega = getOmega();
-  const double& tanLambda = getTanLambda();
-  const short& charge = getChargeSign();
-
   // 0. Define indices
   // Maybe push these out of this function:
   // Indices of the cartesian coordinates
@@ -136,10 +130,29 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ) const
   const int iPy = 4;
   const int iPz = 5;
 
-  // 1. Inflat the perigee covariance to a cartesian covariance where phi0 = 0 is assumed
-  // Jacobian matrix for the translation
+  // Transform covariance matrix
+  TMatrixDSym cov6 = m_covariance; //copy
+
+  // 1. Move the reference point to the perigee
+  // In this way we are making sure that all covariance entries related to component parallel to phi are zero.
+  TVector3 perigee = getPerigee();
+  TVector3 by(perigee);
+  TMatrixD jacobianPassiveMove(5, 5);
+  calcPassiveMoveByJacobian(by, jacobianPassiveMove);
+  cov6.Similarity(jacobianPassiveMove);
+
   TMatrixD jacobianInflate(6, 5);
   jacobianInflate.Zero();
+
+  // 2. Inflate the perigee covariance to a cartesian covariance where phi0 == 0 and d0 == 0 is assumed
+  // d0 == 0 because we moved the reference point into the perigee point first.
+  // The real phi0 is a simple rotation which can be handled in the next step.
+  // Jacobian matrix for the translation
+
+  //const double& d0 = getD0(); // == 0 since we moved to the perigee point first.
+  const double& omega = getOmega();
+  const double& tanLambda = getTanLambda();
+  const short& charge = getChargeSign();
 
   const double alpha = getAlpha(bZ);
   const double chargeAlphaOmega = charge * alpha * omega;
@@ -148,22 +161,22 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ) const
   const double invChargeAlphaOmega = 1.0 / chargeAlphaOmega;
   const double invChargeAlphaOmega2 = 1.0 / chargeAlphaOmega2;
 
-  // Position
-  jacobianInflate(iX, iPhi0) = d0;
-  jacobianInflate(iY, iD0) = -1.0;
+  // Position after the move.
+  jacobianInflate(iX, iPhi0) = 0.0; //charge * d0 == 0 after moving
+  jacobianInflate(iY, iD0) = charge;
   jacobianInflate(iZ, iZ0) = 1.0;
 
   // Momentum
-  jacobianInflate(iPx, iOmega) = -invChargeAlphaOmega2;
+  jacobianInflate(iPx, iOmega) = invChargeAlphaOmega2;
   jacobianInflate(iPy, iPhi0) = invChargeAlphaOmega;
-  jacobianInflate(iPz, iOmega) = -tanLambda * invChargeAlphaOmega2;
+  jacobianInflate(iPz, iOmega) = tanLambda * invChargeAlphaOmega2;
   jacobianInflate(iPz, iTanLambda) = invChargeAlphaOmega;
-
-  // Transform
-  TMatrixDSym cov6 = m_covariance; //copy
   cov6.Similarity(jacobianInflate);
 
-  /// 2. Rotate to the right phi0
+  /// 3. Rotate to the right phi0
+  const double& cosPhi0 = getCosPhi0();
+  const double& sinPhi0 = getSinPhi0();
+
   TMatrixD jacobianRot(6, 6);
   jacobianRot.Zero();
 

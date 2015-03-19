@@ -24,7 +24,7 @@ StereohitsProcesser::~StereohitsProcesser()
 void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<TrackHit*>& stereohits)
 {
 
-  B2INFO("Processing new track; assigning stereohits.");
+  B2DEBUG(100, "Processing new track; assigning stereohits.");
 
   double Rcand = cand->getRadius();
 
@@ -306,7 +306,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* cand, double theta,
     std::vector<TrackHit*>& stereohits, double Z0)
 {
-  B2INFO("Tree stereo tracklet finding");
+  B2DEBUG(100, "Tree stereo tracklet finding");
   std::sort(stereohits.begin(), stereohits.end());
 
 //  m_cdcLegendreQuadTree->setLastLevel(10);
@@ -397,7 +397,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
   QuadTreeProcessor qtProcessor(9);
   m_cdcLegendreQuadTree.provideItemsSet(qtProcessor, hits_set);
-  B2INFO("Number of stereohits = " << hits_set.size());
+  B2DEBUG(100, "Number of stereohits = " << hits_set.size());
 //  m_cdcLegendreQuadTree->setRThreshold(rThreshold);
   //m_cdcLegendreQuadTree.setNItemsThreshold(limit);
 
@@ -823,7 +823,7 @@ void StereohitsProcesser::MaxFastHoughStereofinding(
           hitsToAdd.push_back(hit.first.getTrackHit());
         }
 
-        B2INFO("Theta: " << lambdaBin[lambda_index] << "; Z0: " << z0[z0_index] << "; nhits: " << hitsToAdd.size());
+        B2DEBUG(100, "Theta: " << lambdaBin[lambda_index] << "; Z0: " << z0[z0_index] << "; nhits: " << hitsToAdd.size());
 
       } else {
         //Recursive calling of the function with higher level and smaller box

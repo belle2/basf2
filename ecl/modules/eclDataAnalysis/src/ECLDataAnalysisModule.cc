@@ -45,7 +45,14 @@ REG_MODULE(ECLDataAnalysis)
 //-----------------------------------------------------------------
 
 ECLDataAnalysisModule::ECLDataAnalysisModule()
-  : Module()
+  : Module(),
+    m_eclDigitMultip(0),
+    m_eclDigitIdx(0),
+    m_eclDigitToMc(0),
+    m_eclDigitCellId(0),
+    m_eclDigitAmp(0),
+    m_eclDigitTimeFit(0),
+    m_eclDigitFitQuality(0)
 {
   //Set module properties
   setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
@@ -129,7 +136,6 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
   m_eclClusterDeltaL->clear();
   m_eclClusterBeta->clear();
 
-
   m_eclGammaMultip=0;
   m_eclGammaIdx->clear();
   m_eclGammaEnergy->clear();
@@ -142,7 +148,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
 
   m_eclPi0Multip=0;
   m_eclPi0Idx->clear();
-  m_eclPi0ToGamma->clear();
+  //m_eclPi0ToGamma->clear();
   m_eclPi0ShowerId1->clear();
   m_eclPi0ShowerId2->clear();
   m_eclPi0Energy->clear();
@@ -183,7 +189,6 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
   m_trkY->clear();
   m_trkZ->clear();
   */
-
 }
 
 ECLDataAnalysisModule::~ECLDataAnalysisModule()

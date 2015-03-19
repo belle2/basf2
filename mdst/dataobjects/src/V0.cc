@@ -18,32 +18,35 @@ ClassImp(V0);
 V0::V0():
   m_trackIndexPositive(-1),
   m_trackIndexNegative(-1),
-  m_trackFitResultIndexPiPlus(-1),
-  m_trackFitResultIndexProton(-1),
-  m_trackFitResultIndexPiMinus(-1),
-  m_trackFitResultIndexAProton(-1)
+  m_trackFitResultIndexPositive(-1),
+  m_trackFitResultIndexNegative(-1)
 {}
-
-V0::V0(const std::pair<Track*, std::pair<TrackFitResult*, TrackFitResult*> >& trackPairPositive,
-       const std::pair<Track*, std::pair<TrackFitResult*, TrackFitResult*> >& trackPairNegative) :
-  m_trackIndexPositive(trackPairPositive.first->getArrayIndex()),
-  m_trackIndexNegative(trackPairNegative.first->getArrayIndex()),
-  m_trackFitResultIndexPiPlus(trackPairPositive.second.first->getArrayIndex()),
-  m_trackFitResultIndexProton(trackPairPositive.second.second->getArrayIndex()),
-  m_trackFitResultIndexPiMinus(trackPairNegative.second.first->getArrayIndex()),
-  m_trackFitResultIndexAProton(trackPairNegative.second.second->getArrayIndex())
-
-{}
-
 
 V0::V0(const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairPositive,
        const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairNegative) :
   m_trackIndexPositive(trackPairPositive.first->getArrayIndex()),
   m_trackIndexNegative(trackPairNegative.first->getArrayIndex()),
-  m_trackFitResultIndexPiPlus(trackPairPositive.second->getArrayIndex()),
-  m_trackFitResultIndexProton(-1),
-  m_trackFitResultIndexPiMinus(trackPairNegative.second->getArrayIndex()),
-  m_trackFitResultIndexAProton(-1)
+  m_trackFitResultIndexPositive(trackPairPositive.second->getArrayIndex()),
+  m_trackFitResultIndexNegative(trackPairNegative.second->getArrayIndex())
+{}
+
+Const::ParticleType V0::getV0Hypothesis()
 {
-  B2WARNING("Deprecated, use the new constructor instead.")
+  StoreArray<TrackFitResult> trackFitResults;
+  const auto posParticleType = trackFitResults[m_trackFitResultIndexPositive]->getParticleType();
+  const auto negParticleType = trackFitResults[m_trackFitResultIndexNegative]->getParticleType();
+
+  if ((posParticleType == Const::pion) && (negParticleType == Const::pion)) {
+    return Const::Kshort;
+  }
+  if ((posParticleType == Const::proton) && (negParticleType == Const::pion)) {
+    return Const::lambda;
+  }
+  if ((posParticleType == Const::pion) && (negParticleType == Const::proton)) {
+    return Const::antiLambda;
+  }
+  if ((posParticleType == Const::electron) && (negParticleType == Const::electron)) {
+    return Const::photon;
+  }
+  return Const::unspecifiedParticle;
 }

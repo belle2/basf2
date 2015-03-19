@@ -12,6 +12,7 @@
 
 #include <framework/logging/Logger.h>
 
+#include <boost/math/special_functions/sign.hpp>
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
 
@@ -100,6 +101,11 @@ double Helix::getAlpha(const double bZ)
   return 1.0 / (bZ * TMath::C()) * 1E11;
 }
 
+short Helix::getChargeSign() const
+{
+  return boost::math::sign(getOmega());
+}
+
 void Helix::reverse()
 {
   // All except z0 have to be taken to their opposites
@@ -109,7 +115,7 @@ void Helix::reverse()
   m_tanLambda = -m_tanLambda;
 }
 
-float Helix::getArcLengthAtCylindricalR(const float& cylindricalR) const
+float Helix::getArcLength2DAtCylindricalR(const float& cylindricalR) const
 {
   // Slight trick here
   // Since the sought point is on the helix we treat it as the perigee
@@ -118,19 +124,19 @@ float Helix::getArcLengthAtCylindricalR(const float& cylindricalR) const
   // The direct distance from the origin to the imaginary perigee is just the given cylindricalR.
   const float dr = getD0();
   const float deltaCylindricalR = cylindricalR;
-  const double absArcLength = calcArcLengthAtDeltaCylindricalRAndDr(deltaCylindricalR, dr);
-  return absArcLength;
+  const double absArcLength2D = calcArcLength2DAtDeltaCylindricalRAndDr(deltaCylindricalR, dr);
+  return absArcLength2D;
 }
 
-float Helix::getArcLengthAtXY(const float& x, const float& y) const
+float Helix::getArcLength2DAtXY(const float& x, const float& y) const
 {
   double dr = 0;
-  double arcLength = 0;
-  calcArcLengthAndDrAtXY(x, y, arcLength, dr);
-  return arcLength;
+  double arcLength2D = 0;
+  calcArcLength2DAndDrAtXY(x, y, arcLength2D, dr);
+  return arcLength2D;
 }
 
-TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
+TVector3 Helix::getPositionAtArcLength2D(const float& arcLength2D) const
 {
   /*
     /   \     /                      \     /                              \
@@ -143,9 +149,9 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
 
     z = tanLambda * arclength + z0;
 
-    where chi = -arcLength * omega
+    where chi = -arcLength2D * omega
 
-    Here arcLength means the arc length of the circle in the xy projection
+    Here arcLength2D means the arc length of the circle in the xy projection
     traversed in the forward direction.
 
     // Old definition identical?
@@ -159,16 +165,16 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
   // Using the sinus cardinalis yields expressions that are smooth in the limit of omega -> 0
 
   // Do calculations in double
-  const double chi = -arcLength * getOmega();
+  const double chi = -arcLength2D * getOmega();
   const double chiHalf = chi / 2.0;
 
   using boost::math::sinc_pi;
 
-  const double x = arcLength * sinc_pi(chi);
-  const double y = arcLength * sinc_pi(chiHalf) * sin(chiHalf) - getD0();
+  const double x = arcLength2D * sinc_pi(chi);
+  const double y = arcLength2D * sinc_pi(chiHalf) * sin(chiHalf) - getD0();
 
   // const double z = s * tan lambda + z0
-  const double z = fma((double)arcLength, getTanLambda(),  getZ0());
+  const double z = fma((double)arcLength2D, getTanLambda(),  getZ0());
 
   // Unrotated position
   TVector3 position(x, y, z);
@@ -179,13 +185,13 @@ TVector3 Helix::getPositionAtArcLength(const float& arcLength) const
   return position;
 }
 
-TVector3 Helix::getTangentialAtArcLength(const float& arcLength) const
+TVector3 Helix::getTangentialAtArcLength2D(const float& arcLength2D) const
 {
   const double omega = getOmega();
   const double phi0 = getPhi0();
   const double tanLambda = getTanLambda();
 
-  const double chi = - omega * arcLength;
+  const double chi = - omega * arcLength2D;
 
   const double tx = cos(chi + phi0);
   const double ty = sin(chi + phi0);
@@ -196,18 +202,18 @@ TVector3 Helix::getTangentialAtArcLength(const float& arcLength) const
 }
 
 
-TVector3 Helix::getUnitTangentialAtArcLength(const float& arcLength) const
+TVector3 Helix::getUnitTangentialAtArcLength2D(const float& arcLength2D) const
 {
-  TVector3 unitTangential = getTangentialAtArcLength(arcLength);
+  TVector3 unitTangential = getTangentialAtArcLength2D(arcLength2D);
   const double norm = hypot(1, getTanLambda());
   const double invNorm = 1 / norm;
   unitTangential *= invNorm;
   return unitTangential;
 }
 
-TVector3 Helix::getMomentumAtArcLength(const float& arcLength, const float& bz) const
+TVector3 Helix::getMomentumAtArcLength2D(const float& arcLength2D, const float& bz) const
 {
-  TVector3 momentum = getTangentialAtArcLength(arcLength);
+  TVector3 momentum = getTangentialAtArcLength2D(arcLength2D);
   const double pr = getTransverseMomentum(bz);
   momentum *= pr;
 
@@ -218,20 +224,20 @@ float Helix::passiveMoveBy(const TVector3& by)
 {
   // First calculate the distance of the new origin to the helix in the xy projection
   double new_d0 = 0;
-  double arcLength = 0;
-  calcArcLengthAndDrAtXY(by.X(), by.Y(), arcLength, new_d0);
+  double arcLength2D = 0;
+  calcArcLength2DAndDrAtXY(by.X(), by.Y(), arcLength2D, new_d0);
 
   // Third the new phi0 and z0 can be calculated from the arc length
-  double chi = -arcLength * getOmega();
+  double chi = -arcLength2D * getOmega();
   double new_phi0 = m_phi0 + chi;
-  double new_z0 = getZ0() - by.Z() + getTanLambda() * arcLength;
+  double new_z0 = getZ0() - by.Z() + getTanLambda() * arcLength2D;
 
   /// Update the parameters inplace. Omega and tan lambda are unchanged
   m_d0 = new_d0;
   m_phi0 = new_phi0;
   m_z0 = new_z0;
 
-  return arcLength;
+  return arcLength2D;
 }
 
 TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi) const
@@ -285,10 +291,10 @@ TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expan
   // c. Calculate the row related to phi0
   // Also calculate the derivatives of the arc length
   // which are need for the row related to z.
-  const double dArcLength_dD0 = - UParallel / USquared;
-  const double dArcLength_dPhi0 = (omega * deltaCylindricalRSquared + deltaOrthogonal - d0 * UOrthogonal) / USquared;
+  const double dArcLength2D_dD0 = - UParallel / USquared;
+  const double dArcLength2D_dPhi0 = (omega * deltaCylindricalRSquared + deltaOrthogonal - d0 * UOrthogonal) / USquared;
 
-  jacobian(iPhi0, iD0) = - dArcLength_dD0 * omega;
+  jacobian(iPhi0, iD0) = - dArcLength2D_dD0 * omega;
   jacobian(iPhi0, iPhi0) = u * UOrthogonal / USquared;
   jacobian(iPhi0, iOmega) =  -deltaParallel / U / U;
 
@@ -300,50 +306,55 @@ TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expan
   // factor out the divergent quotents and approximate them with their taylor series.
 
   const double chi = -atan2(UParallel, UOrthogonal);
-  double arcLength = 0;
-  double dArcLength_dOmega = 0;
+  double arcLength2D = 0;
+  double dArcLength2D_dOmega = 0;
 
   if (fabs(chi) < std::min(expandBelowChi, M_PI / 2.0)) {
     // Never expand for the far side of the circle by limiting the expandBelow to maximally half a pi.
     // Close side of the circle
-    double principleArcLength = deltaParallel / UOrthogonal;
-    const double dPrincipleArcLength_dOmega = - principleArcLength * deltaOrthogonal / UOrthogonal;
+    double principleArcLength2D = deltaParallel / UOrthogonal;
+    const double dPrincipleArcLength2D_dOmega = - principleArcLength2D * deltaOrthogonal / UOrthogonal;
 
-    const double x = principleArcLength * omega;
+    const double x = principleArcLength2D * omega;
     const double f = calcATanXDividedByX(x);
     const double df_dx = calcDerivativeOfATanXDividedByX(x);
 
-    arcLength = principleArcLength * f;
-    dArcLength_dOmega = (f + x * df_dx) * dPrincipleArcLength_dOmega + principleArcLength * df_dx * principleArcLength;
+    arcLength2D = principleArcLength2D * f;
+    dArcLength2D_dOmega = (f + x * df_dx) * dPrincipleArcLength2D_dOmega + principleArcLength2D * df_dx * principleArcLength2D;
   } else {
     // Far side of the circle
     // If the far side of the circle is a well definied concept, omega is high enough that
     // we can divide by it.
     // Otherwise nothing can rescue us since the far side of the circle is so far away that no reasonable extrapolation can be made.
-    arcLength = - chi / omega;
-    dArcLength_dOmega = (-arcLength - jacobian(iPhi0, iOmega)) / omega;
+    arcLength2D = - chi / omega;
+    dArcLength2D_dOmega = (-arcLength2D - jacobian(iPhi0, iOmega)) / omega;
   }
 
   // ---------------------------------------------------------------------------------------
   // 2. Set the parts related to the z coordinate
   // Since tanLambda stays the same there are no entries for tanLambda in the jacobian matrix
-  // For the new z0' = z0 + arcLength * tanLambda
-  jacobian(iZ0, iD0) = tanLambda * dArcLength_dD0;
-  jacobian(iZ0, iPhi0) = tanLambda * dArcLength_dPhi0;
-  jacobian(iZ0, iOmega) = tanLambda * dArcLength_dOmega;
+  // For the new z0' = z0 + arcLength2D * tanLambda
+  jacobian(iZ0, iD0) = tanLambda * dArcLength2D_dD0;
+  jacobian(iZ0, iPhi0) = tanLambda * dArcLength2D_dPhi0;
+  jacobian(iZ0, iOmega) = tanLambda * dArcLength2D_dOmega;
   //jacobian(iZ0, iZ0) = 1.0; // From UnitMatrix above.
-  jacobian(iZ0, iTanLambda) = arcLength;
+  jacobian(iZ0, iTanLambda) = arcLength2D;
 
   return jacobian;
 }
 
-double Helix::calcArcLengthFromSecantLength(const double& secantLength) const
+double Helix::reversePhi(const double& phi)
 {
-  return secantLength * calcSecantLengthToArcLengthFactor(secantLength);
+  return std::remainder(phi + M_PI, 2 * M_PI);
+}
+
+double Helix::calcArcLength2DFromSecantLength(const double& secantLength) const
+{
+  return secantLength * calcSecantLengthToArcLength2DFactor(secantLength);
 }
 
 
-double Helix::calcSecantLengthToArcLengthFactor(const double& secantLength) const
+double Helix::calcSecantLengthToArcLength2DFactor(const double& secantLength) const
 {
   double x = secantLength * getOmega() / 2.0;
   return calcASinXDividedByX(x);
@@ -456,7 +467,7 @@ double Helix::calcDerivativeOfATanXDividedByX(const double& x)
 
 
 
-void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLength, double& dr) const
+void Helix::calcArcLength2DAndDrAtXY(const float& x, const float& y, double& arcLength2D, double& dr) const
 {
   // Prepare common variables
   const double omega = getOmega();
@@ -483,20 +494,20 @@ void Helix::calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLe
 
   if (fabs(chi) < M_PI / 8) { // Rough guess where the critical zone for approximations begins
     // Close side of the circle
-    double principleArcLength = deltaParallel / UOrthogonal;
-    arcLength = principleArcLength * calcATanXDividedByX(principleArcLength * omega);
+    double principleArcLength2D = deltaParallel / UOrthogonal;
+    arcLength2D = principleArcLength2D * calcATanXDividedByX(principleArcLength2D * omega);
   } else {
     // Far side of the circle
     // If the far side of the circle is a well definied concept meaning that we have big enough omega.
-    arcLength = -chi / omega;
+    arcLength2D = -chi / omega;
   }
 }
 
-double Helix::calcArcLengthAtDeltaCylindricalRAndDr(const double& deltaCylindricalR, const double& dr) const
+double Helix::calcArcLength2DAtDeltaCylindricalRAndDr(const double& deltaCylindricalR, const double& dr) const
 {
   const double omega = getOmega();
   double secantLength = sqrt((deltaCylindricalR + dr) * (deltaCylindricalR - dr) / (1 + dr * omega));
-  return calcArcLengthFromSecantLength(secantLength);
+  return calcArcLength2DFromSecantLength(secantLength);
 }
 
 void Helix::setCartesian(const TVector3& position,
@@ -583,8 +594,8 @@ void Helix::setCartesian(const TVector3& position,
 
   const double chi = atan2(sinchi, coschi);
 
-  const double arcLength = -chi / omega;
-  const double z0 = z - arcLength * tanLambda;
+  const double arcLength2D = -chi / omega;
+  const double z0 = z - arcLength2D * tanLambda;
 
   m_omega = omega;
   m_phi0 = phi0;

@@ -43,8 +43,8 @@ namespace Belle2 {
    *
    *  in that exact order.
    *
-   *  Each point on the helix can be adressed by the arc length s, which has to be traversed to get to it from the perigee.
-   *  More precisely the arc length means the transverse part of the particles travel distance,
+   *  Each point on the helix can be adressed by the two dimensional arc length s, which has to be traversed to get to it from the perigee.
+   *  More precisely the two dimensional arc length means the transverse part of the particles travel distance,
    *  hence the arc length of the circle in the xy projection.
    *
    *  If you need different kind of methods / interfaces to the helix please do not hesitate to contact oliver.frost@desy.de
@@ -144,11 +144,8 @@ namespace Belle2 {
     /** Calculates the alpha value for a given magnetic field in Tesla */
     static double getAlpha(const double bZ);
 
-    /** Return track charge sign (1 or -1).*/
-    short getChargeSign() const
-    {
-      return getOmega() >= 0 ? 1 : -1;
-    }
+    /** Return track charge sign (1, 0 or -1).*/
+    short getChargeSign() const;
     /// @}
 
 
@@ -159,85 +156,89 @@ namespace Belle2 {
   public:
     /** Calculates the transverse travel distance at the point the helix first reaches the given cylindrical radius.
      *
-     *  Gives the circle arc length in the forward direction that is traversed until a certain cylindrical radius is reached.
+     *  Gives the two dimensional arc length in the forward direction that is traversed until a certain cylindrical radius is reached.
      *  Returns NAN, if the cylindrical radius can not be reached, either because it is to far outside or inside of the perigee.
      *
-     *  Forward the result to getPositionAtArcLength() or getMomentumAtArcLength() in order to extrapolate to the cylinder detector boundaries.
+     *  Forward the result to getPositionAtArcLength2D() or getMomentumAtArcLength2D() in order to extrapolate to the cylinder detector boundaries.
      *
      *  The result always has a positive sign. Hence it refers to the forward direction.
      *  Adding a minus sign yields the point at the same cylindrical radius but in the backward direction.
      *
      *  @param cylindricalR  The cylinder radius to extrapolate to.
-     *  @return              The circle arc length traversed to reach the cylindrical radius. NAN if it can not be reached.
+     *  @return              The two dimensional arc length traversed to reach the cylindrical radius. NAN if it can not be reached.
      */
-    float getArcLengthAtCylindricalR(const float& cylindricalR) const;
+    float getArcLength2DAtCylindricalR(const float& cylindricalR) const;
+    float getArcLengthAtCylindricalR(const float& cylindricalR) const __attribute__((deprecated)) { return getArcLength2DAtCylindricalR(cylindricalR); }
 
-    /** Calculates the circle arc length at which the circle in the xy projection is closest to the point
+    /** Calculates the two dimensional arc length at which the circle in the xy projection is closest to the point
      *
-     *  This calculates the arc length to the closest approach in xy projection.
+     *  This calculates the dimensional arc length to the closest approach in xy projection.
      *  Hence, it only optimizes the distance in x and y.
      *  This is sufficent to extrapolate to an axial wire.
      *  For stereo wires this is not optimal, since the distance in the z direction also plays a role.
      *
      *  @param x        X coordinate of the point to which to extrapolate
      *  @param y        Y coordinate of the point to which to extrapolate
-     *  @return         The circle arc length from the perigee at which the closest approach is reached
+     *  @return         The two dimensional arc length from the perigee at which the closest approach is reached
      */
-    float getArcLengthAtXY(const float& x, const float& y) const;
+    float getArcLength2DAtXY(const float& x, const float& y) const;
 
-    /** Calculates the position on the helix at the given arc length
+    /** Calculates the position on the helix at the given two dimensional arc length
      *
-     *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
+     *  @param arcLength2D       Two dimensional arc length to be traversed.
      */
-    TVector3 getPositionAtArcLength(const float& arcLength) const;
+    TVector3 getPositionAtArcLength2D(const float& arcLength2D) const;
+    TVector3 getPositionAtArcLength(const float& arcLength2D) const __attribute__((deprecated)) { return getPositionAtArcLength2D(arcLength2D); }
 
-    /** Calculates the tangential vector to the helix curve at the given circle arc length.
+    /** Calculates the tangential vector to the helix curve at the given two dimensional arc length.
      *
-     *  The tangential vector is the derivative of the position with respect to the circle arc length
+     *  The tangential vector is the derivative of the position with respect to the two dimensional arc length
      *  It is normalised such that the cylindrical radius of the result is 1
      *
-     *  getTangentialAtArcLength(arcLength).Perp() == 1 holds.
+     *  getTangentialAtArcLength2D(arcLength2D).Perp() == 1 holds.
      *
-     *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
-     *  @return                Tangential vector normalised to unit transverse component / cylindrical radius.
+     *  @param arcLength2D       Two dimensional arc length to be traversed.
+     *  @return                  Tangential vector normalised to unit transverse component / cylindrical radius.
      */
-    TVector3 getTangentialAtArcLength(const float& arcLength) const;
+    TVector3 getTangentialAtArcLength2D(const float& arcLength2D) const;
 
-    /** Calculates the unit tangential vector to the helix curve at the given circle arc length
+    /** Calculates the unit tangential vector to the helix curve at the given two dimensional arc length.
      *
-     *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
+     *  @param arcLength2D       Two dimensional arc length to be traversed.
      */
-    TVector3 getUnitTangentialAtArcLength(const float& arcLength) const;
+    TVector3 getUnitTangentialAtArcLength2D(const float& arcLength2D) const;
 
-    /** Calculates the momentum vector at the given arc length.
+    /** Calculates the momentum vector at the given two dimensional arc length.
      *
-     *  @param arcLength       Transverse travel distance on the helix, which is the length of the circle arc as seen in the xy projection.
-     *  @param bz              Magnetic field strength in the z direction.
+     *  @param arcLength2D       Two dimensional arc length to be traversed.
+     *  @param bz                Magnetic field strength in the z direction.
      */
-    TVector3 getMomentumAtArcLength(const float& arcLength, const float& bz) const;
+    TVector3 getMomentumAtArcLength2D(const float& arcLength2D, const float& bz) const;
+    TVector3 getMomentumAtArcLength(const float& arcLength2D, const float& bz) const __attribute__((deprecated)) { return getMomentumAtArcLength2D(arcLength2D, bz); }
 
     /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace.
      *
-     *  @param by              Vector by which the origin of the coordinate system should be moved.
-     *  @return                The float value is the arc length which as the be traversed from the old perigee to the new.
+     *  @param by            Vector by which the origin of the coordinate system should be moved.
+     *  @return              The float value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
      */
     float passiveMoveBy(const TVector3& by);
 
-    /** Calculate the jacobian matrix for the transport of the helix parameters when moving the origin of the coordinate system to a new location.
+    /** Calculate the 5x5 jacobian matrix for the transport of the helix parameters,
+     *  when moving the origin of the coordinate system to a new location.
      *  Does not update the helix parameters in any way.
      *
      *  @param by              Vector by which the origin of the coordinate system should be moved.
      *  @param expandBelowChi  Control parameter below, which absolute value of chi an expansion of divergent terms shall be used.
      *                         This parameter exists for testing the consistency of the expansion with the closed form.
      *                         In other applications the parameter should remain at its default value.
-     *  @return                The double value is the arc length which as the be traversed from the old perigee to the new.
+     *  @return                The jacobian matrix containing the derivatives of the five helix parameters after the move relative the orignal parameters.
      */
     TMatrixD calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi = M_PI / 8) const;
 
     /** Reverses the direction of travel of the helix in place.
      *
-     *  The same points are located on the helix stay the same after the transformation,
-     *  but have the opposite arc length.
+     *  The same points that are located on the helix stay the same after the transformation,
+     *  but have the opposite two dimensional arc length.
      *  The momentum at each point is reversed.
      *  The charge sign is changed to its opposite by this transformation.
      */
@@ -248,21 +249,18 @@ namespace Belle2 {
      *  @param phi             A angle in [-pi, pi]
      *  @return                The angle for the opposite direction in [-pi, pi]
      */
-    static double reversePhi(const double& phi)
-    {
-      return phi < 0 ? phi + M_PI : phi - M_PI;
-    }
+    static double reversePhi(const double& phi);
 
-    /** Helper function to calculate the circle arc length from the length of a secant.
+    /** Helper function to calculate the two dimensional arc length from the length of a secant.
      *
-     *  Translates the direct length between two point on the circle in the xy projection to the arc length on the circle
+     *  Translates the direct length between two point on the circle in the xy projection to the two dimensional arc length on the circle
      *  Behaves smoothly in the limit of vanishing curvature.
      */
-    double calcArcLengthFromSecantLength(const double& secantLength) const;
+    double calcArcLength2DFromSecantLength(const double& secantLength2D) const;
 
-    /** Helper function to calculate the factor between the secant length and the circle arc length as seen in xy projection of the helix
+    /** Helper function to calculate the factor between the dimensional secant length and the two dimensional arc length as seen in xy projection of the helix
      */
-    double calcSecantLengthToArcLengthFactor(const double& secantLength) const;
+    double calcSecantLengthToArcLength2DFactor(const double& secantLength2D) const;
     /// @}
 
   protected:
@@ -275,26 +273,26 @@ namespace Belle2 {
     /** Implementation of the function d / dx (atan(x) / x) which handles small x values smoothly. */
     static double calcDerivativeOfATanXDividedByX(const double& x);
 
-    /** Helper method to calculate the signed circle arc length and the signed distance to the circle of a point in the xy projection.
+    /** Helper method to calculate the signed two dimensional arc length and the signed distance to the circle of a point in the xy projection.
      *
      *  This function is an implementation detail that prevents some code duplication.
      *
      *  @param x                   X coordinate of the point to which to extrapolate
      *  @param y                   Y coordinate of the point to which to extrapolate
-     *  @param arcLength[out]      The circle arc length from the perigee at which the closest approach is reached
+     *  @param arcLength2D[out]    The two dimensional arc length from the perigee at which the closest approach is reached
      *  @param dr[out]             Signed distance of the point to circle in the xy projection.
      */
-    void calcArcLengthAndDrAtXY(const float& x, const float& y, double& arcLength, double& dr) const;
+    void calcArcLength2DAndDrAtXY(const float& x, const float& y, double& arcLength2D, double& dr) const;
 
-    /** Helper method to calculate the circle arc length *from the perigee* to a point at cylindrical radius, which also has the distance dr from the circle in the xy projection
+    /** Helper method to calculate the two dimensional arc length *from the perigee* to a point at cylindrical radius, which also has the distance dr from the circle in the xy projection
      *
      *  This function is an implementation detail that prevents some code duplication.
      *
      *  @param deltaCylindricalR             The absolute distance of the point in question to the perigee in the xy projection
      *  @param dr                            Signed distance of the point to circle in the xy projection.
-     *  @return                              The absolute arc length from the perigee to the point.
+     *  @return                              The absolute two dimensional arc length from the perigee to the point.
      */
-    double calcArcLengthAtDeltaCylindricalRAndDr(const double& deltaCylindricalR, const double& dr) const;
+    double calcArcLength2DAtDeltaCylindricalRAndDr(const double& deltaCylindricalR, const double& dr) const;
 
 
     //---------------------------------------------------------------------------------------------------------------------------
@@ -328,10 +326,10 @@ namespace Belle2 {
     /** Getter for z0, which is the z coordinate of the perigee. */
     double getZ0() const { return m_z0; }
 
-    /** Getter for tan lambda, which is the z over arc length slope of the track. */
+    /** Getter for tan lambda, which is the z over two dimensional arc length slope of the track. */
     double getTanLambda() const { return m_tanLambda; }
 
-    /** Getter for cot theta, which is the z over arc length slope of the track. Synomym to tan lambda. */
+    /** Getter for cot theta, which is the z over two dimensional arc length slope of the track. Synomym to tan lambda. */
     double getCotTheta() const { return m_tanLambda; }
     /// @}
 
@@ -361,7 +359,7 @@ namespace Belle2 {
     /** Memory for the z coordinate of the perigee. */
     float m_z0;
 
-    /** Memory for the slope of the track in the z coordinate over the arclength (dz/ds)*/
+    /** Memory for the slope of the track in the z coordinate over the two dimensional arc length (dz/ds)*/
     float m_tanLambda;
 
     /** Streamer version 1. */

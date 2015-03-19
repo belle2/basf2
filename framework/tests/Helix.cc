@@ -281,34 +281,34 @@ namespace {
     // Positions on the helix
     {
       // Start point
-      float arcLength = 0;
-      TVector3 position = helix.getPositionAtArcLength(arcLength);
-      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      float arcLength2D = 0;
+      TVector3 position = helix.getPositionAtArcLength2D(arcLength2D);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
 
       EXPECT_ALL_NEAR(TVector3(0.0, -1.0, 0.0), position, absError);
       EXPECT_ANGLE_NEAR(-M_PI, tangential.Phi(), absError);
     }
 
     {
-      float arcLength = M_PI / 2;
-      TVector3 position = helix.getPositionAtArcLength(arcLength);
-      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      float arcLength2D = M_PI / 2;
+      TVector3 position = helix.getPositionAtArcLength2D(arcLength2D);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
       EXPECT_ALL_NEAR(TVector3(-1.0, -2.0, 0.0), position, absError);
       EXPECT_ANGLE_NEAR(-M_PI / 2, tangential.Phi(), absError);
     }
 
     {
-      float arcLength = M_PI;
-      TVector3 position = helix.getPositionAtArcLength(arcLength);
-      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      float arcLength2D = M_PI;
+      TVector3 position = helix.getPositionAtArcLength2D(arcLength2D);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
       EXPECT_ALL_NEAR(TVector3(0.0, -3.0, 0.0), position, absError);
       EXPECT_ANGLE_NEAR(0, tangential.Phi(), absError);
     }
 
     {
-      float arcLength = 3 * M_PI / 2 ;
-      TVector3 position = helix.getPositionAtArcLength(arcLength);
-      TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+      float arcLength2D = 3 * M_PI / 2 ;
+      TVector3 position = helix.getPositionAtArcLength2D(arcLength2D);
+      TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
       EXPECT_ALL_NEAR(TVector3(1.0, -2.0, 0.0), position, absError);
       EXPECT_ANGLE_NEAR(M_PI / 2, tangential.Phi(), absError);
     }
@@ -326,7 +326,7 @@ namespace {
           Helix helix(d0, phi0, omega, z0, tanLambda);
           TEST_CONTEXT("Failed for " << helix);
 
-          TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
+          TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength2D(0.0);
 
           EXPECT_ANGLE_NEAR(phi0, tangentialAtPerigee.Phi(), absError);
           EXPECT_FLOAT_EQ(1.0, tangentialAtPerigee.Mag());
@@ -336,15 +336,15 @@ namespace {
 
             if (omega == 0) {
               // Use chi as the arc length in the straight line case
-              float arcLength = chi;
+              float arcLength2D = chi;
 
               // Tangential vector shall not change along the line
-              TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+              TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
               EXPECT_ALL_NEAR(tangentialAtPerigee, tangential, absError);
 
             } else {
-              float arcLength = -chi / omega;
-              TVector3 tangential = helix.getUnitTangentialAtArcLength(arcLength);
+              float arcLength2D = -chi / omega;
+              TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
 
               float actualChi = tangential.DeltaPhi(tangentialAtPerigee);
               EXPECT_ANGLE_NEAR(chi, actualChi, absError);
@@ -374,8 +374,8 @@ namespace {
             TVector3 momentumAtPerigee = helix.getMomentum();
             for (const float chi : chis) {
 
-              float arcLength = -chi / omega;
-              TVector3 extrapolatedMomentum = helix.getMomentumAtArcLength(arcLength, nominalBz);
+              float arcLength2D = -chi / omega;
+              TVector3 extrapolatedMomentum = helix.getMomentumAtArcLength2D(arcLength2D, nominalBz);
 
               float actualChi = extrapolatedMomentum.DeltaPhi(momentumAtPerigee);
               EXPECT_ANGLE_NEAR(chi, actualChi, absError);
@@ -404,7 +404,7 @@ namespace {
           Helix helix(d0, phi0, omega, z0, tanLambda);
           TVector3 perigee = helix.getPerigee();
 
-          TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength(0.0);
+          TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength2D(0.0);
           TEST_CONTEXT("Failed for " << helix);
 
           //continue;
@@ -414,19 +414,19 @@ namespace {
 
             // In the cases where omega is 0 (straight line case) chi become undefined.
             // Use chi sample as transverse travel distance instead.
-            float expectedArcLength = omega != 0 ? -chi / omega : chi;
-            TVector3 pointOnHelix = helix.getPositionAtArcLength(expectedArcLength);
+            float expectedArcLength2D = omega != 0 ? -chi / omega : chi;
+            TVector3 pointOnHelix = helix.getPositionAtArcLength2D(expectedArcLength2D);
 
             float cylindricalR = pointOnHelix.Perp();
-            float arcLength = helix.getArcLengthAtCylindricalR(cylindricalR);
+            float arcLength2D = helix.getArcLength2DAtCylindricalR(cylindricalR);
 
             // Only the absolute value is returned.
-            EXPECT_NEAR(fabs(expectedArcLength), arcLength, absError);
+            EXPECT_NEAR(fabs(expectedArcLength2D), arcLength2D, absError);
 
             // Also check it the extrapolation lies in the forward direction.
             TVector3 secantVector = pointOnHelix - perigee;
 
-            if (expectedArcLength == 0) {
+            if (expectedArcLength2D == 0) {
               EXPECT_NEAR(0, secantVector.Mag(), absError);
             } else {
               TVector2 secantVectorXY = secantVector.XYvector();
@@ -435,7 +435,7 @@ namespace {
               float coalignment = secantVectorXY * tangentialXY ;
 
               bool extrapolationIsForward = coalignment > 0;
-              bool expectedIsForward = expectedArcLength > 0;
+              bool expectedIsForward = expectedArcLength2D > 0;
               EXPECT_EQ(expectedIsForward, extrapolationIsForward);
             }
           }
@@ -459,14 +459,14 @@ namespace {
             Helix expectedHelix(d0, phi0, omega, z0, tanLambda);
 
             for (const float chi : chis) {
-              float arcLength = -chi / omega;
-              TVector3 position = expectedHelix.getPositionAtArcLength(arcLength);
-              TVector3 momentum = expectedHelix.getMomentumAtArcLength(arcLength, nominalBz);
+              float arcLength2D = -chi / omega;
+              TVector3 position = expectedHelix.getPositionAtArcLength2D(arcLength2D);
+              TVector3 momentum = expectedHelix.getMomentumAtArcLength2D(arcLength2D, nominalBz);
               int chargeSign = expectedHelix.getChargeSign();
 
               EXPECT_NEAR(tanLambda, 1 / tan(momentum.Theta()), absError);
               EXPECT_ANGLE_NEAR(phi0 + chi, momentum.Phi(), absError);
-              EXPECT_NEAR(z0 + tanLambda * arcLength, position.Z(), absError);
+              EXPECT_NEAR(z0 + tanLambda * arcLength2D, position.Z(), absError);
 
               //B2INFO("chi out " << chi);
               Helix helix(position, momentum, chargeSign, nominalBz);
@@ -540,10 +540,10 @@ namespace {
             for (const float newD0 : d0s) {
               // In the line case use the chi value directly as the arc length
 
-              float arcLength = omega == 0 ? chi : -chi / omega;
-              TVector3 positionOnHelix = helix.getPositionAtArcLength(arcLength);
+              float arcLength2D = omega == 0 ? chi : -chi / omega;
+              TVector3 positionOnHelix = helix.getPositionAtArcLength2D(arcLength2D);
 
-              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength(arcLength);
+              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength2D(arcLength2D);
 
               TVector3 perpendicularToHelix = tangentialToHelix;
               perpendicularToHelix.RotateZ(M_PI / 2.0);
@@ -588,11 +588,11 @@ namespace {
     // (To the right of the circle)
     TVector3 by(1.0, 1.0, 0.0);
 
-    float arcLength = helix.passiveMoveBy(by);
+    float arcLength2D = helix.passiveMoveBy(by);
 
     // The right of the circle lies in the counterclockwise direction
     // The forward direction is counterclockwise, so we expect to move forward.
-    ASSERT_NEAR(M_PI / 2, arcLength, absError);
+    ASSERT_NEAR(M_PI / 2, arcLength2D, absError);
 
     ASSERT_NEAR(0, helix.getD0(), absError);
     ASSERT_ANGLE_NEAR(M_PI / 2, helix.getPhi0(), absError);
@@ -602,9 +602,9 @@ namespace {
     ASSERT_NEAR(3, helix.getTanLambda(), absError);
 
     // Now transform back to the original point
-    float arcLengthBackward = helix.passiveMoveBy(-by);
+    float arcLength2DBackward = helix.passiveMoveBy(-by);
 
-    ASSERT_NEAR(arcLength, -arcLengthBackward, absError);
+    ASSERT_NEAR(arcLength2D, -arcLength2DBackward, absError);
     ASSERT_ALL_NEAR(expectedHelix, helix, absError);
   }
 
@@ -624,9 +624,9 @@ namespace {
 
               // In the line case use the chi value directly as the arc length
 
-              float expectedArcLength = omega == 0 ? chi : -chi / omega;
-              TVector3 positionOnHelix = helix.getPositionAtArcLength(expectedArcLength);
-              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength(expectedArcLength);
+              float expectedArcLength2D = omega == 0 ? chi : -chi / omega;
+              TVector3 positionOnHelix = helix.getPositionAtArcLength2D(expectedArcLength2D);
+              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength2D(expectedArcLength2D);
 
               TVector3 perpendicularToHelix = tangentialToHelix;
               perpendicularToHelix.RotateZ(M_PI / 2.0);
@@ -644,9 +644,9 @@ namespace {
               TEST_CONTEXT("Failed for perpendicular to helix " << perpendicularToHelix);
               TEST_CONTEXT("Failed for test position " << testPosition);
 
-              float arcLength = helix.passiveMoveBy(testPosition);
+              float arcLength2D = helix.passiveMoveBy(testPosition);
 
-              ASSERT_NEAR(expectedArcLength, arcLength, absError);
+              ASSERT_NEAR(expectedArcLength2D, arcLength2D, absError);
 
               ASSERT_ALL_NEAR(expectedPerigee, helix.getPerigee(), absError);
 

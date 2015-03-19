@@ -12,7 +12,6 @@
 </header>
 */
 
-
 void ECLMuon()
 {
   // open the file with simulated and reconstructed EvtGen particles

@@ -14,10 +14,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Track.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLGamma.h>
@@ -26,12 +28,12 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 //#include <ecl/dataobjects/ECLTrig.h>
-#include <mdst/dataobjects/Track.h>
 #include <list>
 #include <iostream>
 
 using namespace std;
 using namespace Belle2;
+//using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -219,7 +221,7 @@ void ECLDataAnalysisModule::initialize()
   m_eclTriggerCellId = new std::vector<int>();
   m_eclTriggerTime = new std::vector<double>();
   */
-  /*
+
   m_eclDigitMultip = 0;
   m_eclDigitIdx = new std::vector<int>();
   m_eclDigitToMc = new std::vector<int>();
@@ -227,7 +229,7 @@ void ECLDataAnalysisModule::initialize()
   m_eclDigitAmp = new std::vector<int>();
   m_eclDigitTimeFit = new std::vector<int>();
   m_eclDigitFitQuality = new std::vector<int>();
-
+  /*
   m_eclSimHitMultip = 0;
   m_eclSimHitIdx = new std::vector<int>();
   m_eclSimHitToMc = new std::vector<int>();
@@ -504,9 +506,11 @@ void ECLDataAnalysisModule::event()
 
   //m_eclTriggerCellId->clear();  m_eclTriggerTime->clear();   m_eclTriggerIdx->clear();
 
-  m_eclDigitCellId->clear();  m_eclDigitAmp->clear();  m_eclDigitTimeFit->clear();  m_eclDigitFitQuality->clear();  m_eclDigitIdx->clear();   m_eclDigitToMc->clear();
+  m_eclDigitCellId->clear();  m_eclDigitAmp->clear();  m_eclDigitTimeFit->clear();  m_eclDigitFitQuality->clear();
+  m_eclDigitIdx->clear();   m_eclDigitToMc->clear();
 
-  m_eclSimHitCellId->clear(); m_eclSimHitPdg->clear(); m_eclSimHitEnergyDep->clear(); m_eclSimHitFlightTime->clear(); m_eclSimHitIdx->clear();   m_eclSimHitToMc->clear();
+  m_eclSimHitCellId->clear(); m_eclSimHitPdg->clear(); m_eclSimHitEnergyDep->clear(); m_eclSimHitFlightTime->clear();
+  m_eclSimHitIdx->clear();   m_eclSimHitToMc->clear();
   m_eclSimHitX->clear(); m_eclSimHitY->clear(); m_eclSimHitZ->clear();
   m_eclSimHitPx->clear(); m_eclSimHitPy->clear(); m_eclSimHitPz->clear();
 
@@ -535,7 +539,8 @@ void ECLDataAnalysisModule::event()
 
   m_mcIdx->clear();  m_mcPdg->clear();  m_mcMothPdg->clear();  m_mcGMothPdg->clear();  m_mcGGMothPdg->clear();
   m_mcEnergy->clear();  m_mcPx->clear();  m_mcPy->clear();  m_mcPz->clear();
-  m_mcDecayVtxX->clear();  m_mcDecayVtxY->clear();  m_mcDecayVtxZ->clear();  m_mcProdVtxX->clear();  m_mcProdVtxY->clear();  m_mcProdVtxZ->clear();
+  m_mcDecayVtxX->clear();  m_mcDecayVtxY->clear();  m_mcDecayVtxZ->clear();  m_mcProdVtxX->clear();  m_mcProdVtxY->clear();
+  m_mcProdVtxZ->clear();
   m_mcSecondaryPhysProc->clear();
 
   m_trkIdx->clear();
@@ -729,11 +734,16 @@ void ECLDataAnalysisModule::event()
     m_eclShowerR->push_back(aECLshowers->getR());
     m_eclShowerNHits->push_back(aECLshowers->getNHits());
     m_eclShowerE9oE25->push_back(aECLshowers->getE9oE25());
-    m_eclShowerUncEnergy->push_back(aECLshowers->getUncEnergy());
+    //m_eclShowerUncEnergy->push_back(aECLshowers->getUncEnergy());
 
     if (aECLshowers->getRelated<MCParticle>() != (nullptr)) {
-      const MCParticle* mc_shower = aECLshowers->getRelated<MCParticle>();
-      m_eclShowerToMc->push_back(mc_shower->getArrayIndex());
+      RelationVector<MCParticle> mcParticleRelations = aECLshowers->getRelationsTo<MCParticle>();
+      //RelationVector<MCParticle> mcParticleRelations = aECLshowers->getRelationsTo<MCParticle>();
+      for (unsigned int i = 0; i < mcParticleRelations.size() ; i++) {
+        //const MCParticle* mc_shower = aECLshowers->getRelationsTo<MCParticle>();
+        m_eclShowerToMc->push_back(mcParticleRelations[i]->getIndex());
+        m_eclShowerUncEnergy->push_back(mcParticleRelations.weight(i));
+      }
     } else
       m_eclShowerToMc->push_back(-1);
 
@@ -747,14 +757,15 @@ void ECLDataAnalysisModule::event()
   m_mcMultip = mcParticles.getEntries();
   for (int imcpart = 0; imcpart < mcParticles.getEntries(); imcpart++) {
     MCParticle* amcParticle = mcParticles[imcpart];
-
     m_mcIdx->push_back(amcParticle->getArrayIndex());
     m_mcPdg->push_back(amcParticle->getPDG());
     if (amcParticle->getMother() != NULL) m_mcMothPdg->push_back(amcParticle->getMother()->getPDG());
     else m_mcMothPdg->push_back(-999);
-    if (amcParticle->getMother() != NULL && amcParticle->getMother()->getMother() != NULL) m_mcGMothPdg->push_back(amcParticle->getMother()->getMother()->getPDG());
+    if (amcParticle->getMother() != NULL
+        && amcParticle->getMother()->getMother() != NULL) m_mcGMothPdg->push_back(amcParticle->getMother()->getMother()->getPDG());
     else m_mcGMothPdg->push_back(-999);
-    if (amcParticle->getMother() != NULL && amcParticle->getMother()->getMother() != NULL && amcParticle->getMother()->getMother()->getMother() != NULL)
+    if (amcParticle->getMother() != NULL && amcParticle->getMother()->getMother() != NULL
+        && amcParticle->getMother()->getMother()->getMother() != NULL)
       m_mcGGMothPdg->push_back(amcParticle->getMother()->getMother()->getMother()->getPDG());
     else m_mcGGMothPdg->push_back(-999);
     m_mcEnergy->push_back(amcParticle->getEnergy());

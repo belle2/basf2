@@ -131,7 +131,7 @@ void ECLGamma::getErrorMatrix(TMatrixFSym& m_errorMatrix) const
   //std::cout<<std::endl;
 }
 
-
+/*
 void ECLGamma::getErrorMatrix7x7(TMatrixFSym& m_errorMatrix) const
 {
 
@@ -188,7 +188,7 @@ void ECLGamma::getErrorMatrix7x7(TMatrixFSym& m_errorMatrix) const
   //std::cout<<std::endl;
 }
 
-
+*/
 
 
 ClassImp(ECLGamma)

@@ -12,6 +12,13 @@
 </header>
 */
 
+#include <TFile.h>
+#include <TTree.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TNtuple.h>
+#include <TCut.h>
+
 void ECLPion(){
 
   TFile* inputFile = TFile::Open("../ECLPionOutput.root");

@@ -23,35 +23,35 @@ void ECLCluster()
   hMultip_500->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
   hMultip_500->GetXaxis()->SetTitle("Cluster Multiplicity");
   hMultip_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  m_tree->Draw("eclClusterMultip>>hMultip_500");
+  tree->Draw("eclClusterMultip>>hMultip_500");
 
   TH1F* hEnergy_500 = new TH1F("hEnergy_500","Reconstructed Cluster Energy", 100, 0., 0.55);
   hEnergy_500->GetListOfFunctions()->Add(new TNamed("Description", "Deposited energy for 500 MeV/c single photons"));
   hEnergy_500->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 0.5 GeV and left-side tail.")); 
   hEnergy_500->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   hEnergy_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
-  m_tree->Draw("eclClusterEnergy>>hEnergy_500");
+  tree->Draw("eclClusterEnergy>>hEnergy_500");
 
   TH1F* hEnDepSum_500 = new TH1F("hEnDepSum_500","Uncorrected Reconstructed Cluster Energy", 100, 0., 0.55);
   hEnDepSum_500->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 500 MeV/c single photons"));
   hEnDepSum_500->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 0.5 GeV and left-side tail.")); 
   hEnDepSum_500->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   hEnDepSum_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
-  m_tree->Draw("eclClusterEnergyDepSum>>hEnDepSum_500");
+  tree->Draw("eclClusterEnergyDepSum>>hEnDepSum_500");
 
   TH1F* hHighestE_500 = new TH1F("hHighestE_500","Highest Energy Deposit", 100, 0., 0.55);
   hHighestE_500->GetListOfFunctions()->Add(new TNamed("Description", "Highest energy deposited in a crystal for 500 MeV/c single photons"));
   hHighestE_500->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
   hHighestE_500->GetXaxis()->SetTitle("Deposited Energy(GeV)");
   hHighestE_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
-  m_tree->Draw("eclClusterHighestE>>hHighestE_500");
+  tree->Draw("eclClusterHighestE>>hHighestE_500");
 
   TH1F* hE9oE25_500 = new TH1F("hE9oE25_500","E9/E25", 100, 0., 1.05);
   hE9oE25_500->GetListOfFunctions()->Add(new TNamed("Description", "Energy deposited in 3x3 matrix around most energetic deposit over energy deposited in 5x5 matrix around most energetic deposit 500 MeV/c single photons"));
   hE9oE25_500->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
   hE9oE25_500->GetXaxis()->SetTitle("E9oE25");
   hE9oE25_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
-  m_tree->Draw("eclClusterE9oE25>>hE9oE25_500");
+  tree->Draw("eclClusterE9oE25>>hE9oE25_500");
 
   TH1F* hphi_500 = new TH1F("hphi_500", "Reconstructed #phi Angle", 100,-3.155,3.155);
   hphi_500->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed #phi angle of the cluster for 500 MeV/c single photons"));
@@ -59,7 +59,7 @@ void ECLCluster()
   hphi_500->GetXaxis()->SetTitle("#phi (rad)");
   hphi_500->SetMinimum(.0);
   hphi_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
-  m_tree->Draw("eclClusterPhi>>hphi_500");
+  tree->Draw("eclClusterPhi>>hphi_500");
 
   // open the output file for the validation histograms
   TFile* output = TFile::Open("ECLCluster.root", "recreate");

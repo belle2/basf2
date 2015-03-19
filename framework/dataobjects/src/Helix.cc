@@ -16,6 +16,8 @@
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
 
+#include <assert.h>
+
 using namespace Belle2;
 using namespace HelixParameterIndex;
 
@@ -242,10 +244,19 @@ float Helix::passiveMoveBy(const TVector3& by)
 
 TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi) const
 {
+  TMatrixD jacobian(5, 5);
+  calcPassiveMoveByJacobian(by, expandBelowChi, jacobian);
+  return jacobian;
+}
+
+
+void Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi, TMatrixD& jacobian) const
+{
   // 0. Preparations
   // Initialise the return value to a unit matrix
-  TMatrixD jacobian(5, 5);
   jacobian.UnitMatrix();
+  assert(jacobian.GetNrows() == jacobian.GetNcols());
+  assert(jacobian.GetNrows() == 5 or jacobian.GetNrows() == 6);
 
   // Fetch the helix parameters
   const double omega = getOmega();
@@ -340,7 +351,15 @@ TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expan
   //jacobian(iZ0, iZ0) = 1.0; // From UnitMatrix above.
   jacobian(iZ0, iTanLambda) = arcLength2D;
 
-  return jacobian;
+  if (jacobian.GetNrows() == 6) {
+    // Also write the derivates of arcLength2D to the jacobian if the matrix size has space for them.
+    jacobian(iArcLength2D, iD0) = dArcLength2D_dD0;
+    jacobian(iArcLength2D, iPhi0) = dArcLength2D_dPhi0;
+    jacobian(iArcLength2D, iOmega) = dArcLength2D_dOmega;
+    jacobian(iArcLength2D, iArcLength2D) = 0.0;
+    jacobian(iArcLength2D, iTanLambda) = 0;
+    jacobian(iArcLength2D, iArcLength2D) = 1.0;
+  }
 }
 
 double Helix::reversePhi(const double& phi)

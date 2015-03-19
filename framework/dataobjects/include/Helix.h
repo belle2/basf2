@@ -20,13 +20,17 @@
 namespace Belle2 {
 
   namespace HelixParameterIndex {
-    // Helix parameter index in covariance and parameter vector
+    /// Helix parameter index in covariance and parameter vector.
     enum HelixParameterIndex {
       iD0 = 0,
       iPhi0 = 1,
       iOmega = 2,
       iZ0 = 3,
       iTanLambda = 4,
+      /// Dummy parameter to refer to the two dimensional arc length.
+      /// Technically this is not a parameter of the fundamental helix representation, but it is essential for translating between the cartesian parameters and helix parameters to be exact.
+      /// Only after the translation has been performed completely this additional parameter can be dropped.
+      iArcLength2D = 5,
     };
   }
 
@@ -235,6 +239,27 @@ namespace Belle2 {
      */
     TMatrixD calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi = M_PI / 8) const;
 
+
+  protected:
+    /** Calculate the jacobian matrix for the transport of the helix parameters,
+     *  when moving the origin of the coordinate system to a new location.
+     *  Does not update the helix parameters in any way.
+     *
+     *  The jacobian matrix is written into the output parameter 'jacobian'.
+     *  If output parameter is a 5x5 matrix only the derivatives of the 5 helix parameters are written
+     *  If output parameter is a 6x6 matrix the derivatives of the 5 helix parameters *and* derivates of the two dimensional arc length are written.
+     *  The derivatives of the arcLength2D are in the 6th row of the matrix.
+     *
+     *  @param by              Vector by which the origin of the coordinate system should be moved.
+     *  @param expandBelowChi  Control parameter below, which absolute value of chi an expansion of divergent terms shall be used.
+     *                         This parameter exists for testing the consistency of the expansion with the closed form.
+     *                         In other applications the parameter should remain at its default value.
+     *  @param jacobian[out]   The jacobian matrix containing the derivatives of the five helix parameters after the move relative the orignal parameters.
+     *
+     */
+    void calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi, TMatrixD& jacobian) const;
+
+  public:
     /** Reverses the direction of travel of the helix in place.
      *
      *  The same points that are located on the helix stay the same after the transformation,

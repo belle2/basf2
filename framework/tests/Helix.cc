@@ -172,6 +172,26 @@ namespace {
     //std::vector<float> d0s {0.5};
     std::vector<float> chis = linspace(-5 * M_PI / 6, 5 * M_PI / 6, 11);
 
+    std::vector<TVector3> bys = {
+      TVector3(-2.0, 0.5, 0.0),
+      TVector3(-1.0, 0.5, 0.0),
+      TVector3(0.0, 0.5, 0.0),
+      TVector3(1.0, 0.5, 0.0),
+      TVector3(2.0, 0.5, 0.0),
+
+      TVector3(-2.0, 0.0, 0.0),
+      TVector3(-1.0, 0.0, 0.0),
+      TVector3(0.0, 0.0, 0.0),
+      TVector3(1.0, 0.0, 0.0),
+      TVector3(2.0, 0.0, 0.0),
+
+      TVector3(-2.0, -1.0, 0.0),
+      TVector3(-1.0, -1.0, 0.0),
+      TVector3(0.0, -1.0, 0.0),
+      TVector3(1.0, -1.0, 0.0),
+      TVector3(2.0, -1.0, 0.0),
+    };
+
   };
 
   /** Test simple Setters and Getters. */
@@ -657,9 +677,6 @@ namespace {
     }
   }
 
-
-
-
   TEST_F(HelixTest, calcPassiveMoveByJacobian_identity)
   {
     TVector3 center(0.0, 1.0, 0.0);
@@ -682,8 +699,6 @@ namespace {
     EXPECT_NEAR(0.0, noMoveJacobian(2, 1), 10e-7);
     EXPECT_NEAR(1.0, noMoveJacobian(2, 2), 10e-7);
   }
-
-
 
   TEST_F(HelixTest, calcPassiveMoveByJacobian_orthogonalToPhi0)
   {
@@ -709,7 +724,7 @@ namespace {
   }
 
 
-  TEST_F(HelixTest, calcPassiveMoveByJacobian_parallelToPhi0_conjugated_with_reverse)
+  TEST_F(HelixTest, calcPassiveMoveByJacobian_parallelToPhi0_compare_opposite_transformation)
   {
     TVector3 center(0.0, 1.0, 0.0);
     float radius = -1;
@@ -746,6 +761,37 @@ namespace {
 
     EXPECT_NEGATIVE(moveByPlusTwoXJacobian(iD0, iD0) - 1);
     EXPECT_NEGATIVE(moveByPlusTwoXJacobian(iPhi0, iPhi0) - 1);
+  }
+
+  TEST_F(HelixTest, calcPassiveMoveByJacobian_roundtrip)
+  {
+    for (const TVector3& by : bys) {
+      TVector3 center(0.0, 1.0, 0.0);
+      float radius = -1;
+      float tanLambda = 3;
+
+      Helix helix = helixFromCenter(center, radius, tanLambda);
+
+      TMatrixD jacobian = helix.calcPassiveMoveByJacobian(by);
+      helix.passiveMoveBy(by);
+
+      TMatrixD reverseJacobian = helix.calcPassiveMoveByJacobian(-by);
+
+      TMatrixD unitMatrix = reverseJacobian * jacobian;
+
+      for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 5; ++j) {
+          if (i == j) {
+            // Diagonal is one.
+            EXPECT_NEAR(1, unitMatrix(i, j), 10e-7);
+          } else {
+            // Off diagonal is zero.
+            EXPECT_NEAR(0, unitMatrix(i, j), 10e-7);
+          }
+        }
+      }
+    }
+
   }
 
 
@@ -792,26 +838,6 @@ namespace {
     float tanLambda = 3;
 
     Helix helix = helixFromCenter(center, radius, tanLambda);
-
-    std::vector<TVector3> bys = {
-      TVector3(-2.0, 0.5, 0.0),
-      TVector3(-1.0, 0.5, 0.0),
-      TVector3(0.0, 0.5, 0.0),
-      TVector3(1.0, 0.5, 0.0),
-      TVector3(2.0, 0.5, 0.0),
-
-      TVector3(-2.0, 0.0, 0.0),
-      TVector3(-1.0, 0.0, 0.0),
-      TVector3(0.0, 0.0, 0.0),
-      TVector3(1.0, 0.0, 0.0),
-      TVector3(2.0, 0.0, 0.0),
-
-      TVector3(-2.0, -1.0, 0.0),
-      TVector3(-1.0, -1.0, 0.0),
-      TVector3(0.0, -1.0, 0.0),
-      TVector3(1.0, -1.0, 0.0),
-      TVector3(2.0, -1.0, 0.0),
-    };
 
     for (const TVector3& by : bys) {
       TMatrixD jacobian = helix.calcPassiveMoveByJacobian(by);

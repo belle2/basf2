@@ -25,10 +25,11 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosM
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
   SignType newChargeSign = PLUS;
+  FloatType bZ = 2.0;
 
-  CDCTrajectory3D trajectory(newPos3D, newMom3D, newChargeSign);
+  CDCTrajectory3D trajectory(newPos3D, newMom3D, newChargeSign, bZ);;
 
-  Vector3D mom3D = trajectory.getMom3DAtSupport();
+  Vector3D mom3D = trajectory.getMom3DAtSupport(bZ);
   Vector3D pos3D = trajectory.getSupport();
   SignType chargeSign = trajectory.getChargeSign();
 
@@ -87,6 +88,7 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
   Vector3D expectedMomentum(1.0, 0.0, 0.0);
   Vector3D expectedPosition(0.0, 1.0, 0.0);
   SignType expectedCharge = PLUS;
+  FloatType bZ = 2;
 
   genfit::TrackCand expectedGFTrackCand;
   expectedGFTrackCand.setPosMomSeed(expectedPosition,
@@ -104,10 +106,10 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
   expectedGFTrackCand.setCovSeed(expectedCov6);
 
 
-  CDCTrajectory3D trajectory3D(expectedGFTrackCand);
+  CDCTrajectory3D trajectory3D(expectedGFTrackCand, bZ);
 
   genfit::TrackCand gfTrackCand;
-  trajectory3D.fillInto(gfTrackCand);
+  trajectory3D.fillInto(gfTrackCand, bZ);
 
   Vector3D position = gfTrackCand.getPosSeed();
   Vector3D momentum = gfTrackCand.getMomSeed();
@@ -125,8 +127,8 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
 
   EXPECT_EQ(expectedCharge, charge);
 
-  for (int i : irange(0, 5)) {
-    for (int j : irange(0, 5)) {
+  for (int i : irange(0, 6)) {
+    for (int j : irange(0, 6)) {
       EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 10e-7);
     }
   }

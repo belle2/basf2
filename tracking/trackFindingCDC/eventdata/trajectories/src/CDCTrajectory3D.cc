@@ -39,6 +39,26 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
 }
 
 
+CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
+                                 const Vector3D& mom3D,
+                                 const FloatType& charge,
+                                 const FloatType& bZ) :
+  m_localOrigin(pos3D),
+  m_localHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
+               mom3D.xy().unit(),
+               0.0,
+               mom3D.cotTheta(),
+               0.0)
+{
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle, const FloatType& bZ) :
+  CDCTrajectory3D(mcParticle.getProductionVertex(),
+                  mcParticle.getMomentum(),
+                  mcParticle.getCharge(),
+                  bZ)
+{
+}
 
 CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle) :
   CDCTrajectory3D(mcParticle.getProductionVertex(),
@@ -61,11 +81,17 @@ CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D) :
 {
 }
 
-
 CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
+  CDCTrajectory3D(gfTrackCand,
+                  getBFieldZ(gfTrackCand.getPosSeed()))
+{
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const FloatType& bZ) :
   CDCTrajectory3D(gfTrackCand.getPosSeed(),
                   gfTrackCand.getMomSeed(),
-                  gfTrackCand.getChargeSeed())
+                  gfTrackCand.getChargeSeed(),
+                  bZ)
 {
   // Maybe push these out of this function:
   // Indices of the cartesian coordinates
@@ -111,7 +137,7 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
   const double invPt = 1 / pt;
   const double invPtSquared = invPt * invPt;
   const double pz = gfTrackCand.getStateSeed()[iPz];
-  const double alpha = getAlphaZ(gfTrackCand.getPosSeed());
+  const double alpha = getAlphaFromBField(bZ);
   const double charge = gfTrackCand.getChargeSeed();
 
   jacobianReduce(iCurv, iPx) = charge * invPtSquared / alpha ;
@@ -144,11 +170,19 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
 
 
 
+
+
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
+{
+  Vector3D position = getSupport();
+  return fillInto(gfTrackCand, getBFieldZ(position));
+}
+
+bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const FloatType& bZ) const
 {
   // Set the start parameters
   Vector3D position = getSupport();
-  Vector3D momentum = getMom3DAtSupport();
+  Vector3D momentum = getMom3DAtSupport(bZ);
   SignType charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
@@ -191,7 +225,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
   TMatrixD jacobianInflate(6, 5);
   jacobianInflate.Zero();
 
-  const double alpha = getAlphaZ(position);
+  const double alpha = getAlphaFromBField(bZ);
   const double chargeAlphaCurv = charge * alpha * curvatureXY;
   const double chargeAlphaCurv2 = charge * alpha * std::pow(curvatureXY, 2);
 
@@ -246,7 +280,22 @@ SignType CDCTrajectory3D::getChargeSign() const
   return ccwInfoToChargeSign(getLocalHelix().circleXY().orientation());
 }
 
+FloatType CDCTrajectory3D::getAbsMom3D(const FloatType& bZ) const
+{
+  FloatType szSlope = getLocalHelix().szSlope();
 
+  FloatType factor2DTo3D = hypot(1, szSlope);
+
+  FloatType curvatureXY = getLocalHelix().curvatureXY();
+
+  FloatType absMom2D =  curvatureToAbsMom2D(curvatureXY, bZ);
+
+  return factor2DTo3D * absMom2D;
+
+  FloatType absMomZ = absMom2D * szSlope;
+
+  return hypot(absMom2D, absMomZ);
+}
 
 FloatType CDCTrajectory3D::getAbsMom3D() const
 {

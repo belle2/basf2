@@ -64,12 +64,21 @@ namespace Belle2 {
     /// Conversion helper for momenta to two dimensional curvature
     FloatType absMom2DToCurvature(const FloatType& absMom2D,
                                   const FloatType& charge,
+                                  const FloatType& bZ);
+
+    /// Conversion helper for momenta to two dimensional curvature
+    FloatType absMom2DToCurvature(const FloatType& absMom2D,
+                                  const FloatType& charge,
                                   const Vector2D& pos2D);
 
     /// Conversion helper for momenta to two dimensional curvature
     FloatType absMom2DToCurvature(const FloatType& absMom2D,
                                   const FloatType& charge,
                                   const Vector3D& pos3D);
+
+    /// Conversion helper for two dimensional curvature to momenta
+    FloatType curvatureToAbsMom2D(const FloatType& curvature,
+                                  const FloatType& bZ);
 
     /// Conversion helper for two dimensional curvature to momenta
     FloatType curvatureToAbsMom2D(const FloatType& curvature,

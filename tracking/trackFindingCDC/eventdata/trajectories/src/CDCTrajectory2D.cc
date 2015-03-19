@@ -24,6 +24,15 @@ using namespace TrackFindingCDC;
 TRACKFINDINGCDC_SwitchableClassImp(CDCTrajectory2D)
 
 
+CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
+                                 const Vector2D& mom2D,
+                                 const FloatType& charge,
+                                 const FloatType& bZ) :
+  m_localOrigin(pos2D),
+  m_localPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, bZ), mom2D.unit(), 0.0)
+
+{
+}
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const Vector2D& mom2D,
@@ -74,6 +83,10 @@ SignType CDCTrajectory2D::getChargeSign() const
 }
 
 
+FloatType CDCTrajectory2D::getAbsMom2D(const FloatType& bZ) const
+{
+  return curvatureToAbsMom2D(getLocalCircle().curvature(), bZ);
+}
 
 FloatType CDCTrajectory2D::getAbsMom2D() const
 {
@@ -160,7 +173,8 @@ Vector2D CDCTrajectory2D::getExit() const
 
 
 
-ISuperLayerType CDCTrajectory2D::getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward, const ForwardBackwardInfo& forwardBackwardInfo) const
+ISuperLayerType CDCTrajectory2D::getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward,
+                                                     const ForwardBackwardInfo& forwardBackwardInfo) const
 {
   if (forwardBackwardInfo != FORWARD and forwardBackwardInfo != BACKWARD) return INVALID_ISUPERLAYER;
   if (fromISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;

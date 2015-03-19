@@ -57,7 +57,15 @@ namespace Belle2 {
       {;}
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
-      CDCTrajectory2D(const Vector2D& startPoint, const Vector2D& startMomentum, const FloatType& charge);
+      CDCTrajectory2D(const Vector2D& startPoint,
+                      const Vector2D& startMomentum,
+                      const FloatType& charge,
+                      const FloatType& bZ);
+
+      /// Construct a trajectory with given start point, momentum at the start point and given charge.
+      CDCTrajectory2D(const Vector2D& startPoint,
+                      const Vector2D& startMomentum,
+                      const FloatType& charge);
 
       /// Empty destructor
       ~CDCTrajectory2D() {;}
@@ -158,7 +166,8 @@ namespace Belle2 {
 
     private:
       /// Indicates which superlayer is traversed after the given one, considering if you want to follow the trajectory in the forward or backward direction and if the trajectory is currently moving outward or inward (interpreted in the forward direction) or might curling back in the current layer.
-      ISuperLayerType getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward,  const ForwardBackwardInfo& forwardBackwardInfo) const;
+      ISuperLayerType getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward,
+                                          const ForwardBackwardInfo& forwardBackwardInfo) const;
       /// Indicates which superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
       ISuperLayerType getISuperLayerAfterStart(const ForwardBackwardInfo& forwardBackwardInfo) const;
 
@@ -193,7 +202,8 @@ namespace Belle2 {
       /// Calculates the perpendicular travel distance from the last position of the fromEntity to the first position of the toEntity.
       /** Entities can be all eventdata/entities , segments and tracks **/
       template<class FromEntity, class ToEntity>
-      FloatType getPerpSGap(const FromEntity& fromEntity, const ToEntity& toEntity) const {
+      FloatType getPerpSGap(const FromEntity& fromEntity, const ToEntity& toEntity) const
+      {
         Vector2D fromRecoPos2D = fromEntity.getBackRecoPos2D(*this);
         Vector2D toRecoPos2D = toEntity.getFrontRecoPos2D(*this);
         return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
@@ -203,7 +213,8 @@ namespace Belle2 {
       /// Calculates the perpendicular travel distance from the first position of the fromEntity to the first position of the toEntity.
       /** Entities can be all eventdata/entities , segments and tracks **/
       template<class FromEntity, class ToEntity>
-      FloatType getPerpSFrontOffset(const FromEntity& fromEntity, const ToEntity& toEntity) const {
+      FloatType getPerpSFrontOffset(const FromEntity& fromEntity, const ToEntity& toEntity) const
+      {
         Vector2D fromRecoPos2D = fromEntity.getFrontRecoPos2D(*this);
         Vector2D toRecoPos2D = toEntity.getFrontRecoPos2D(*this);
         return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
@@ -212,7 +223,8 @@ namespace Belle2 {
       /// Calculates the perpendicular travel distance from the last position of the fromEntity to the last position of the toEntity.
       /** Entities can be all eventdata/entities , segments and tracks **/
       template<class FromEntity, class ToEntity>
-      FloatType getPerpSBackOffset(const FromEntity& fromEntity, const ToEntity& toEntity) const {
+      FloatType getPerpSBackOffset(const FromEntity& fromEntity, const ToEntity& toEntity) const
+      {
         Vector2D fromRecoPos2D = fromEntity.getBackRecoPos2D(*this);
         Vector2D toRecoPos2D = toEntity.getBackRecoPos2D(*this);
         return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
@@ -221,7 +233,8 @@ namespace Belle2 {
       /// Calculates the perpendicular travel distance from the first position of the entity to the last position of the entity.
       /** Entities can be all eventdata/entities , segments and tracks **/
       template<class Entity>
-      FloatType getTotalPerpS(const Entity& entity) const {
+      FloatType getTotalPerpS(const Entity& entity) const
+      {
         Vector2D frontRecoPos2D = entity.getFrontRecoPos2D(*this);
         Vector2D backRecoPos2D = entity.getBackRecoPos2D(*this);
         return calcPerpSBetween(frontRecoPos2D, backRecoPos2D);
@@ -230,7 +243,8 @@ namespace Belle2 {
       /// Calculates if this trajectory and the entity are coaligned
       /** Returns the sign of the total perpendicular travel distance of the trajectory */
       template<class Entity>
-      ForwardBackwardInfo isForwardOrBackwardTo(const Entity& entity) const {
+      ForwardBackwardInfo isForwardOrBackwardTo(const Entity& entity) const
+      {
         FloatType totalPerpS = getTotalPerpS(entity);
         if (totalPerpS > 0) return FORWARD;
         else if (totalPerpS < 0) return BACKWARD;
@@ -305,7 +319,14 @@ namespace Belle2 {
       { return getLocalCircle().tangential(point - getLocalOrigin()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
+      FloatType getAbsMom2D(const FloatType& bZ) const;
+
+      /// Get the estimation for the absolute value of the transvers momentum
       FloatType getAbsMom2D() const;
+
+      /// Get the momentum at the support point of the trajectory
+      inline Vector2D getMom2DAtSupport(const FloatType& bZ) const
+      { return  getStartUnitMom2D() *= getAbsMom2D(bZ);  }
 
       /// Get the momentum at the support point of the trajectory
       inline Vector2D getMom2DAtSupport() const
@@ -328,7 +349,8 @@ namespace Belle2 {
 
 
       /// Clears all information from this trajectoy
-      void clear() {
+      void clear()
+      {
         m_localOrigin.set(0.0, 0.0);
         m_localPerigeeCircle.setNull();
       }
@@ -350,7 +372,8 @@ namespace Belle2 {
 
 
       /// Getter for the circle in global coordinates
-      GeneralizedCircle getGlobalCircle() const {
+      GeneralizedCircle getGlobalCircle() const
+      {
         // Down cast since we do not necessarily wont the covariance matrix transformed as well
         GeneralizedCircle result(m_localPerigeeCircle);
         result.passiveMoveBy(-getLocalOrigin());
@@ -358,7 +381,8 @@ namespace Belle2 {
       }
 
       /// Setter for the generalized circle that describes the trajectory.
-      void setGlobalCircle(const UncertainPerigeeCircle& perigeeCircle) {
+      void setGlobalCircle(const UncertainPerigeeCircle& perigeeCircle)
+      {
         m_localPerigeeCircle = perigeeCircle;
         m_localPerigeeCircle.passiveMoveBy(getLocalOrigin());
       }
@@ -405,7 +429,8 @@ namespace Belle2 {
        *  (if they are not to far away from the reference points, up to the discontinuity at the \n
        *  far point on the circle) \n
        *  @return Travel distance from the old to the new origin point */
-      FloatType setLocalOrigin(const Vector2D& localOrigin) {
+      FloatType setLocalOrigin(const Vector2D& localOrigin)
+      {
         FloatType result = calcPerpS(localOrigin);
         m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
         m_localOrigin = localOrigin;
@@ -417,7 +442,8 @@ namespace Belle2 {
 
     public:
       /// Output helper for debugging
-      friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D) {
+      friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D)
+      {
         return output << "Local origin : " << trajectory2D.getLocalOrigin() <<  ", "
                << "local circle : " << trajectory2D.getLocalCircle();
       }

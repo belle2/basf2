@@ -63,6 +63,16 @@ namespace Belle2 {
                       const Vector3D& startMomentum,
                       const FloatType& charge);
 
+      /// Construct a trajectory with given start point, momentum at the start point and given charge.
+      /// Additionally this can takes an explicit bZ value instead of a field value from the instance BFieldMap.
+      CDCTrajectory3D(const Vector3D& startPoint,
+                      const Vector3D& startMomentum,
+                      const FloatType& charge,
+                      const FloatType& bZ);
+
+      /// Construct a trajectory from the MCParticles vertex and momentum.
+      CDCTrajectory3D(const MCParticle& mcParticle, const FloatType& bZ);
+
       /// Construct a trajectory from the MCParticles vertex and momentum.
       CDCTrajectory3D(const MCParticle& mcParticle);
 
@@ -72,6 +82,9 @@ namespace Belle2 {
 
       /// Construct a trajectory from a two dimensional circular trajectory filling the remaining two parameters and covariance matrix with default values.
       explicit CDCTrajectory3D(const CDCTrajectory2D& trajectory2D);
+
+      /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
+      CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const FloatType& bZ);
 
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
       explicit CDCTrajectory3D(const genfit::TrackCand& gfTrackCand);
@@ -91,6 +104,10 @@ namespace Belle2 {
       { return not isNull(); }
 
     public:
+
+      /// Copies the trajectory information to the Genfit track candidate
+      bool fillInto(genfit::TrackCand& trackCand, const FloatType& bZ) const;
+
       /// Copies the trajectory information to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand) const;
 
@@ -142,7 +159,14 @@ namespace Belle2 {
       //{ return getLocalCircle().tangential(point - getLocalOrigin().xy()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
+      FloatType getAbsMom3D(const FloatType& bZ) const;
+
+      /// Get the estimation for the absolute value of the transvers momentum
       FloatType getAbsMom3D() const;
+
+      /// Get the momentum at the start point of the trajectory
+      inline Vector3D getMom3DAtSupport(const FloatType& bZ) const
+      { return  getUnitMom3DAtSupport() *= getAbsMom3D(bZ);  }
 
       /// Get the momentum at the start point of the trajectory
       inline Vector3D getMom3DAtSupport() const
@@ -162,7 +186,8 @@ namespace Belle2 {
       void setPosMom3D(const Vector3D& pos3D, const Vector3D& mom3D, const FloatType& charge);
 
       /// Clears all information from this trajectoy
-      void clear() {
+      void clear()
+      {
         m_localOrigin.set(0.0, 0.0, 0.0);
         m_localHelix.setNull();
       }
@@ -196,7 +221,8 @@ namespace Belle2 {
 
 
       /// Getter for the circle in global coordinates.
-      GeneralizedCircle getGlobalCircle() const {
+      GeneralizedCircle getGlobalCircle() const
+      {
         // Down cast since we do not necessarily wont the covariance matrix transformed as well
         GeneralizedCircle result(getLocalHelix().circleXY());
         result.passiveMoveBy(-getLocalOrigin().xy());
@@ -225,8 +251,6 @@ namespace Belle2 {
       void setNDF(const size_t& ndf)
       { return m_localHelix.setNDF(ndf); }
 
-
-
       /// Getter for the two dimensional trajectory
       CDCTrajectory2D getTrajectory2D() const
       { return CDCTrajectory2D(getLocalOrigin().xy(), getLocalHelix().uncertainCircleXY()); }
@@ -250,7 +274,8 @@ namespace Belle2 {
       /// Setter for the origin of the local coordinate system.
       /** This sets the origin point the local helix representation is subjected.
        *  The local helix is changed such that the set of points in global space is not changed.*/
-      void setLocalOrigin(const Vector3D& localOrigin) {
+      void setLocalOrigin(const Vector3D& localOrigin)
+      {
         m_localHelix.passiveMoveBy(localOrigin - m_localOrigin);
         m_localOrigin = localOrigin;
       }

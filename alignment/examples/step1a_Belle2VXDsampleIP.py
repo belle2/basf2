@@ -87,9 +87,8 @@ param_mctrackfinder = {
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'UseClusters': True,
-    'GFTrackCandidatesColName': 'caTracks',
     'WhichParticles': ['SVD'],
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 # ----------------------------
@@ -97,7 +96,6 @@ mctrackfinder.param(param_mctrackfinder)
 # ----------------------------
 genfit = register_module('GenFitter')
 genfit.param('UseClusters', True)
-genfit.param('GFTrackCandidatesColName', 'caTracks')
 
 # ---------------------------------------
 # Data Output of collections to ROOT file
@@ -117,7 +115,6 @@ progress = register_module('Progress')
 # Add event display module
 display = register_module('Display')
 # display.param('fullGeometry', True)
-display.param('GFTrackCandidatesColName', 'caTracks')
 display.param('options', 'DHMPS')
 
 # ----------------------------

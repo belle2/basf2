@@ -71,7 +71,12 @@ process(main)
 #      from alignment_tools import *
 #      write_alignment( sum_xmltxt_alignment( 'your_initial_alignment.xml', 'millepede.res' ) )
 #
-write_alignment(sum_xmltxt_alignment(alignment_xml_path=alignment,
-                alignment_txt_path='millepede.res'), output_alignment)
+try:
+    write_alignment(sum_xmltxt_alignment(alignment_xml_path=alignment,
+                                         alignment_txt_path='millepede.res'), output_alignment)
+except:
+    print '\n\n\n\n\n\n\n'
+    print 'Millepede II did not finish properly. Output alignment xml was not created!!!'
+    print '\n\n\n\n\n\n\n'
 
 print statistics

@@ -39,18 +39,17 @@ input = register_module('RootInput')
 input.param('inputFileName', input_root)
 input.param('excludeBranchNames', [
     'Tracks',
-    'caTracksToTrackFitResults',
-    'caTracksToGF2Tracks',
+    'TrackCandsToTrackFitResults',
+    'TrackCandsToGF2Tracks',
     'MCParticlesToTracks',
     'TrackFitResults',
     'GF2Tracks',
     'GF2TracksToMCParticles',
     'GF2TracksToTrackFitResults',
-    ])
+])
 
 # Kalman fitting
 genfit = register_module('GenFitter')
-genfit.param('GFTrackCandidatesColName', 'caTracks')
 
 # Display progress of processing
 progress = register_module('Progress')
@@ -58,7 +57,6 @@ progress = register_module('Progress')
 # Event display (comment in path if not needed)
 display = register_module('Display')
 display.param('fullGeometry', True)
-display.param('GFTrackCandidatesColName', 'caTracks')
 display.param('options', 'DHMPS')
 
 # Add output module

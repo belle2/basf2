@@ -43,24 +43,21 @@ input = register_module('RootInput')
 input.param('inputFileName', input_root)
 input.param('excludeBranchNames', [
     'Tracks',
-    'caTracksToTrackFitResults',
-    'caTracksToGF2Tracks',
+    'TrackCandsToTrackFitResults',
+    'TrackCandsToGF2Tracks',
     'MCParticlesToTracks',
     'TrackFitResults',
     'GF2Tracks',
     'GF2TracksToMCParticles',
     'GF2TracksToTrackFitResults',
-    ])
+])
 
 # GBL fitting -> produces binary data for alignment
 gbl = register_module('GBLfit')
-gbl.param('GFTrackCandidatesColName', 'caTracks')
 gbl.param('milleFileName', alignment_binary)
-gbl.logging.log_level = LogLevel.ERROR
+gbl.param('chi2Cut', 0.0)
 
-# Kalman fitting
-genfit = register_module('GenFitter')
-genfit.param('GFTrackCandidatesColName', 'caTracks')
+gbl.logging.log_level = LogLevel.ERROR
 
 # Display progress of processing
 progress = register_module('Progress')
@@ -68,7 +65,6 @@ progress = register_module('Progress')
 # Event display (comment in path if not needed)
 display = register_module('Display')
 display.param('fullGeometry', True)
-display.param('GFTrackCandidatesColName', 'caTracks')
 display.param('options', 'DHMPS')
 
 # Add output module
@@ -84,7 +80,6 @@ main.add_module(input)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(gbl)
-main.add_module(genfit)
 # main.add_module(display)
 main.add_module(output)
 main.add_module(progress)

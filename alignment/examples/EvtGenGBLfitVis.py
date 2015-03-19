@@ -57,7 +57,7 @@ param_track_finder_mc_truth = {  # select which particles to use: primary partic
     'UsePXDHits': 1,
     'UseClusters': False,
     'WhichParticles': ['primary'],
-    }
+}
 track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 # fitting

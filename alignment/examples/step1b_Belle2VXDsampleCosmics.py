@@ -91,16 +91,14 @@ param_mctrackfinder = {
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'UseClusters': True,
-    'GFTrackCandidatesColName': 'caTracks',
     'WhichParticles': ['SVD'],
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 # ----------------------------
 # Kalman fitting
 # ----------------------------
 genfit = register_module('GenFitter')
-genfit.param('GFTrackCandidatesColName', 'caTracks')
 
 # ---------------------------------------
 # Data Output of collections to ROOT file
@@ -121,7 +119,6 @@ progress = register_module('Progress')
 display = register_module('Display')
 # Use this parameter to display TB geometry (not Belle2 geometry extract)
 display.param('fullGeometry', True)
-display.param('GFTrackCandidatesColName', 'caTracks')
 display.param('options', 'DHMPS')
 
 # ----------------------------

@@ -115,7 +115,8 @@ genfit::SharedPlanePtr CDCRecoHit::constructPlane(const genfit::StateOnPlane& st
 
   // check if direction is parallel to wire
   if (fabs(wireDirection.Angle(dirInPoca)) < 0.01) {
-    genfit::Exception exc("CDCRecoHit::constructPlane(): Cannot construct detector plane, direction is parallel to wire", __LINE__, __FILE__);
+    genfit::Exception exc("CDCRecoHit::constructPlane(): Cannot construct detector plane, direction is parallel to wire", __LINE__,
+                          __FILE__);
     throw exc;
   }
 

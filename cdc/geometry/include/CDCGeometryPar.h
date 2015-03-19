@@ -266,7 +266,8 @@ namespace Belle2 {
       const TVector3 wireForwardPosition(int layerId, int cellId, EWirePosition set = c_Base) const;
 
       /** The same function but in a different input format. */
-      const TVector3 wireForwardPosition(const WireID& wireID, EWirePosition set = c_Base) const {
+      const TVector3 wireForwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
+      {
         return wireForwardPosition(wireID.getICLayer(), wireID.getIWire(), set);
       }
 
@@ -281,7 +282,8 @@ namespace Belle2 {
       const TVector3 wireForwardPosition(int layerId, int cellId, double z, EWirePosition set = c_Base) const;
       /** The same function but in a different input format. */
       const TVector3 wireForwardPosition(const WireID& wireID, double z,
-                                         EWirePosition set = c_Base) const {
+                                         EWirePosition set = c_Base) const
+      {
         return wireForwardPosition(wireID.getICLayer(), wireID.getIWire(), z, set);
       }
 
@@ -295,7 +297,8 @@ namespace Belle2 {
       const TVector3 wireBackwardPosition(int layerId, int cellId, EWirePosition set = c_Base) const;
 
       /** The same function but in a different input format. */
-      const TVector3 wireBackwardPosition(const WireID& wireID, EWirePosition set = c_Base) const {
+      const TVector3 wireBackwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
+      {
         return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire(), set);
       }
 
@@ -309,7 +312,8 @@ namespace Belle2 {
       */
       const TVector3 wireBackwardPosition(int layerId, int cellId, double z, EWirePosition set = c_Base) const;
       /** The same function but in a different input format. */
-      const TVector3 wireBackwardPosition(const WireID& wireID, double z, EWirePosition set = c_Base) const {
+      const TVector3 wireBackwardPosition(const WireID& wireID, double z, EWirePosition set = c_Base) const
+      {
         return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire(), z, set);
       }
 
@@ -415,7 +419,8 @@ namespace Belle2 {
        * Return TDC offset value (default = 0 ch).
        */
 
-      inline unsigned short getTdcOffset() const {
+      inline unsigned short getTdcOffset() const
+      {
         return m_tdcOffset;
       }
 
@@ -423,7 +428,8 @@ namespace Belle2 {
        * Return TDC bin width (default: 1 nsec).
        */
 
-      inline double getTdcBinWidth() const {
+      inline double getTdcBinWidth() const
+      {
         return m_tdcBinWidth;
       }
 
@@ -432,7 +438,8 @@ namespace Belle2 {
        * (default: 4.0x10^-3 cm/nsec).
        */
 
-      inline double getNominalDriftV() const {
+      inline double getNominalDriftV() const
+      {
         return m_nominalDriftV;
       }
 
@@ -441,7 +448,8 @@ namespace Belle2 {
        * (default: 27.25 cm/nsec).
        */
 
-      inline double getNominalPropSpeed() const {
+      inline double getNominalPropSpeed() const
+      {
         return m_nominalPropSpeed;
       }
 
@@ -450,7 +458,8 @@ namespace Belle2 {
        * (default: 130 um defined in CDC.xml).
        */
 
-      inline double getNominalSpaceResol() const {
+      inline double getNominalSpaceResol() const
+      {
         return m_nominalSpaceResol;
       }
 
@@ -464,7 +473,8 @@ namespace Belle2 {
        *
        */
 
-      inline int getMaterialDefinitionMode() const {
+      inline int getMaterialDefinitionMode() const
+      {
         return m_materialDefinitionMode;
       }
 
@@ -474,7 +484,8 @@ namespace Belle2 {
        *
        */
 
-      inline void setNominalSpaceResol(double resol) {
+      inline void setNominalSpaceResol(double resol)
+      {
         m_nominalSpaceResol = resol;
       }
 
@@ -484,7 +495,8 @@ namespace Belle2 {
        *
        */
 
-      inline double getPropSpeedInv(const unsigned int layerID) const {
+      inline double getPropSpeedInv(const unsigned int layerID) const
+      {
         return m_PropSpeedInv[layerID];
       }
 
@@ -606,7 +618,8 @@ namespace Belle2 {
        * @param wirePosition[out] wire position corresp. to the closetst distance
        */
 
-      double ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut, TVector3& hitPosition, TVector3& wirePosition) const;
+      double ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut, TVector3& hitPosition,
+                             TVector3& wirePosition) const;
 
       /**
        * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
@@ -625,7 +638,8 @@ namespace Belle2 {
        * @param[in] otherWireId another wire-id. in question
        */
 
-      unsigned short areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, const WireID otherWireId) const;
+      unsigned short areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire,
+                                  const WireID otherWireId) const;
 
       /**
        * Set the desizend wire parameters.

@@ -91,7 +91,8 @@ namespace Belle2 {
                 int trackId,
                 int pdg,
                 double edep,
-                TVector3 momentum) {
+                TVector3 momentum)
+    {
       m_layerId = layerId;
       m_phi = phi;
       m_trackId = trackId;

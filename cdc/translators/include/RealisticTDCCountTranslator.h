@@ -28,7 +28,8 @@ namespace Belle2 {
       ~RealisticTDCCountTranslator() {};
 
       /** If trigger jitter was simulated, in every event one has to give an estimate of the effect. */
-      void setEventTime(short eventTime = 0) {
+      void setEventTime(short eventTime = 0)
+      {
         m_eventTime = eventTime;
       }
 

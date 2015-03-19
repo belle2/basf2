@@ -31,7 +31,8 @@ namespace Belle2 {
   public:
     /** Empty constructor for ROOT IO. */
     CDCHit() :
-      m_status(0), m_eWire(65535), m_tdcCount(0), m_tdcCount2ndHit(0), m_adcCount(0) {
+      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_tdcCount2ndHit(0), m_status(0)
+    {
       B2DEBUG(250, "Empty CDCHit Constructor called.");
     }
 
@@ -45,26 +46,23 @@ namespace Belle2 {
      *  @param iSuperLayer Super Layer of the wire.
      *  @param iLayer      Layer number inside the Super Layer.
      *  @param iWire       Wire number in the Layer.
+     *  @param tdcCount2ndHit 2nd timing measurement.
+     *  @param status         Status of the hit.
      */
     CDCHit(unsigned short tdcCount, unsigned short adcCount,
-           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire);
+           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short tdcCont2ndHit = 0,
+           unsigned short status = 0);
 
     /** Constructor using the WireID object. */
-    CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID) {
+    CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID, unsigned short tdcCount2ndHit = 0,
+           unsigned short status = 0)
+    {
       setTDCCount(tdcCount);
       setADCCount(adcCount);
       setWireID(wireID);
-    }
-
-    /** Constructor using the WireID object including 2nd hit TDC. */
-    CDCHit(unsigned short status, unsigned short tdcCount, unsigned short tdcCount2nd, unsigned short adcCount, const WireID& wireID) {
+      setTDCCount2ndHit(tdcCount2ndHit);
       setStatus(status);
-      setTDCCount(tdcCount);
-      setTDCCount2ndHit(tdcCount2nd);
-      setADCCount(adcCount);
-      setWireID(wireID);
     }
-
 
     /** Setter for Wire ID.
      *
@@ -75,13 +73,15 @@ namespace Belle2 {
      *  @param iLayer      Values should be between [0,   7], depending on the SuperLayer.
      *  @param iWire       Values should be between [0, 511], depending on the SuperLayer.
      */
-    void setWireID(unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire) {
+    void setWireID(unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire)
+    {
       B2DEBUG(250, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
       m_eWire = WireID(iSuperLayer, iLayer, iWire).getEWire();
     }
 
     /** Setter for Wire ID using the WireID object directly. */
-    void setWireID(const WireID& wireID) {
+    void setWireID(const WireID& wireID)
+    {
       m_eWire = wireID.getEWire();
     }
 
@@ -90,7 +90,8 @@ namespace Belle2 {
      *
      *  @param status  indicates the CDCHit object status.
      */
-    void setStatus(short status) {
+    void setStatus(unsigned short status)
+    {
       B2DEBUG(250, "setStatus called with " << status);
       m_status = status;
     }
@@ -99,33 +100,40 @@ namespace Belle2 {
      *
      *  @param tdcCount  Information for timing of the hit.
      */
-    void setTDCCount(short tdcCount) {
+    void setTDCCount(short tdcCount)
+    {
       B2DEBUG(250, "setTDCCount called with " << tdcCount);
       m_tdcCount = tdcCount;
     }
 
-    void setTDCCount2ndHit(short tdc) {
-      B2DEBUG(250, "setTDCCount called with " << tdc);
+    /** Setter for 2nd TDC count. */
+    void setTDCCount2ndHit(short tdc)
+    {
+      B2DEBUG(250, "setTDCCount2ndHit called with " << tdc);
       m_tdcCount2ndHit = tdc;
     }
 
     /** Setter for ADC count. */
-    void setADCCount(unsigned short adcCount) {
+    void setADCCount(unsigned short adcCount)
+    {
       m_adcCount = adcCount;
     }
 
     /** Getter for iWire. */
-    unsigned short getIWire() const {
+    unsigned short getIWire() const
+    {
       return WireID(m_eWire).getIWire();
     }
 
     /** Getter for iLayer. */
-    unsigned short getILayer() const {
+    unsigned short getILayer() const
+    {
       return WireID(m_eWire).getILayer();
     }
 
     /** Getter for iSuperLayer. */
-    unsigned short getISuperLayer() const {
+    unsigned short getISuperLayer() const
+    {
       return WireID(m_eWire).getISuperLayer();
     }
 
@@ -133,22 +141,26 @@ namespace Belle2 {
      *
      *  This number can be used directly e.g. with the = operator to create a WireID object.
      */
-    unsigned short getID() const {
+    unsigned short getID() const
+    {
       return m_eWire;
     }
 
     /** Getter for CDCHit status. */
-    unsigned short getStatus() const {
+    unsigned short getStatus() const
+    {
       return m_status;
     }
 
     /** Getter for TDC count. */
-    short getTDCCount() const {
+    short getTDCCount() const
+    {
       return m_tdcCount;
     }
 
     /** Getter for TDC count of 2nd hit. */
-    short getTDCCount2ndHit() const {
+    short getTDCCount2ndHit() const
+    {
       return m_tdcCount2ndHit;
     }
 
@@ -158,14 +170,12 @@ namespace Belle2 {
      *        In principle, this charge can come from more than just the
      *        track, this hit belongs to.
      */
-    unsigned short getADCCount() const {
+    unsigned short getADCCount() const
+    {
       return m_adcCount;
     }
 
   protected:
-
-    /** Status of CDCHit. */
-    unsigned short  m_status;
 
     /** Wire encoding.
      *
@@ -174,18 +184,22 @@ namespace Belle2 {
      */
     unsigned short m_eWire;
 
-    /** Drift Time in ns. */
+    /** TDC count in ns. */
     unsigned short  m_tdcCount;
-
-    /** Drift Time in ns (2nd hit). */
-    unsigned short  m_tdcCount2ndHit;
 
     /** ADC count of the integrated charge in the cell. */
     unsigned short m_adcCount;
 
+    /** TDC count in ns (2nd hit). */
+    unsigned short  m_tdcCount2ndHit;
+
+    /** Status of CDCHit. */
+    unsigned short  m_status;
+
+
   private:
     /** ROOT Macro.*/
-    ClassDef(CDCHit, 4);
+    ClassDef(CDCHit, 5);
   };
 } // end namespace Belle2
 

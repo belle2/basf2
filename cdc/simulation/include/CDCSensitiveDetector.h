@@ -88,7 +88,8 @@ namespace Belle2 {
     private:
 
       //! Assume line track to calculate  distance between track and wire (drift length).
-      G4double ClosestApproach(G4ThreeVector bwp, G4ThreeVector fwp, G4ThreeVector posIn, G4ThreeVector posOut, G4ThreeVector& hitPosition, G4ThreeVector& wirePosition);//,G4double& transferT);
+      G4double ClosestApproach(G4ThreeVector bwp, G4ThreeVector fwp, G4ThreeVector posIn, G4ThreeVector posOut,
+                               G4ThreeVector& hitPosition, G4ThreeVector& wirePosition);//,G4double& transferT);
 
       //! Calculate intersection of track with cell boundary.
       /*!
@@ -330,7 +331,8 @@ namespace Belle2 {
 
       CDCGeometryPar* m_ptrToCDCGeo; /**< Pointer to CDCGeometry object. */
 
-      std::multimap<unsigned short, CDCSimHit*> m_hitWithPosWeight; /**< Map containing hits with positive weight. Map may be replaced by vector, which may make the job speed faster... Try later. */
+      std::multimap<unsigned short, CDCSimHit*>
+      m_hitWithPosWeight; /**< Map containing hits with positive weight. Map may be replaced by vector, which may make the job speed faster... Try later. */
 
       std::vector<CDCSimHit*> m_hitWithNegWeight; /**< Vector containing hits with negative weight. */
 

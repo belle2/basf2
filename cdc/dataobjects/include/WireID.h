@@ -43,12 +43,14 @@ namespace Belle2 {
     */
 
 
-    explicit WireID(unsigned short eWire = 65535) {
+    explicit WireID(unsigned short eWire = 65535)
+    {
       m_eWire = eWire;
     }
 
     /** Copy constructor. */
-    WireID(const WireID& wireID) : RelationsObject(wireID) {
+    WireID(const WireID& wireID) : RelationsObject(wireID)
+    {
       m_eWire = wireID.m_eWire;
     }
 
@@ -70,7 +72,8 @@ namespace Belle2 {
 
     //--- Operators for various purposes. ---------------------------------------------------------------------------------------
     /** Assignment operator. */
-    WireID& operator=(const WireID& wireID) {
+    WireID& operator=(const WireID& wireID)
+    {
       m_eWire = wireID.m_eWire;
       static_cast<RelationsObject>(*this) = wireID;
       return *this;
@@ -80,30 +83,35 @@ namespace Belle2 {
      *
      *  @param eWire  This parameter should be the wire number in the encoded format.
      */
-    WireID& operator=(unsigned short eWire) {
+    WireID& operator=(unsigned short eWire)
+    {
       m_eWire = eWire;
       return *this;
     }
 
     /** Convert to unsigned short. */
-    operator unsigned short() const {
+    operator unsigned short() const
+    {
       return getEWire();
     }
 
     /** Check for equality. */
-    bool operator==(const WireID& rhs) const {
+    bool operator==(const WireID& rhs) const
+    {
       return getEWire() == rhs.getEWire();
     }
 
     /** Order by unique id */
-    bool operator<(const WireID& rhs) const {
+    bool operator<(const WireID& rhs) const
+    {
       return getEWire() < rhs.getEWire();
     }
 
 
     //--- Setters ---------------------------------------------------------------------------------------------------------------
     /** Setter using official numbering. */
-    void setWireID(unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire) {
+    void setWireID(unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire)
+    {
       B2DEBUG(250, "setWireID called with " << iSuperLayer << ", " << iLayer << ", " << iWire);
       m_eWire = iWire + 512 * iLayer + 4096 * iSuperLayer;
     }
@@ -112,19 +120,22 @@ namespace Belle2 {
     void setWireID(unsigned short iCLayer, unsigned short iWire);
 
     /** Setter using the encoded wire number. */
-    void setWireID(unsigned short eWire) {
+    void setWireID(unsigned short eWire)
+    {
       B2DEBUG(250, "setWireID called with " << eWire);
       m_eWire = eWire;
     }
 
     //--- Getters -------------------------------------------------------------------------------------------------
     /** Getter for Super-Layer. */
-    unsigned short getISuperLayer() const {
+    unsigned short getISuperLayer() const
+    {
       return (m_eWire / 4096);
     }
 
     /** Getter for layer within the Super-Layer. */
-    unsigned short getILayer() const {
+    unsigned short getILayer() const
+    {
       return ((m_eWire % 4096) / 512);
     }
 
@@ -132,7 +143,8 @@ namespace Belle2 {
      *
      *  This getter works for the official numbering scheme as well as the one used in the geometry build-up.
      */
-    unsigned short getIWire() const {
+    unsigned short getIWire() const
+    {
       return (m_eWire % 512);
     }
 
@@ -140,7 +152,8 @@ namespace Belle2 {
     unsigned short getICLayer() const;
 
     /** Getter for encoded wire number. */
-    unsigned short getEWire() const {
+    unsigned short getEWire() const
+    {
       return m_eWire;
     }
 

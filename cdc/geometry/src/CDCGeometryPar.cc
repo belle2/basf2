@@ -275,7 +275,8 @@ void CDCGeometryPar::read()
 
   //Replace xt etc. with those for reconstriction
   m_XTetc4Recon = gbxParams.getBool("XTetc4Recon");
-  B2INFO("CDCGeometryPar: Load x-t etc. params. for reconstruction (=1); not load and use the same ones for digitization (=0):" << m_XTetc4Recon);
+  B2INFO("CDCGeometryPar: Load x-t etc. params. for reconstruction (=1); not load and use the same ones for digitization (=0):" <<
+         m_XTetc4Recon);
   if (m_XTetc4Recon) {
     readXT(gbxParams, 1);
     readSigma(gbxParams, 1);
@@ -357,7 +358,8 @@ void CDCGeometryPar::readWirePositionParams(const GearDir gbxParams, EWirePositi
 
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readWirePositionParams: #lines read-in (=" << nRead << ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readWirePositionParams: #lines read-in (=" << nRead <<
+                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
 
   ifs.close();
 }
@@ -465,7 +467,8 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
 
   }
 
-  if (nRead != 2 * 18 * 7 * MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readXT: #lines read-in (=" << nRead << ") is inconsistent with 2*18*7 x total #layers (=" << 2 * 18 * 7 * MAX_N_SLAYERS << ") !");
+  if (nRead != 2 * 18 * 7 * MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readXT: #lines read-in (=" << nRead <<
+                                                     ") is inconsistent with 2*18*7 x total #layers (=" << 2 * 18 * 7 * MAX_N_SLAYERS << ") !");
 
   ifs.close();
 
@@ -579,7 +582,8 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
     }
   }
 
-  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readSigma: #lines read-in (=" << nRead << ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
+  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readSigma: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
 
   ifs.close();
 }
@@ -619,7 +623,8 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
     if (m_debug) cout << iL << " " << speed << endl;
   }
 
-  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead << ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
+  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
 
   ifs.close();
 }
@@ -786,16 +791,26 @@ void CDCGeometryPar::generateXML(const string& of)
     B2ERROR("CDCGeometryPar::read !!! can not open file : "
             << of);
   }
-  ofs << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"                                                                                                << endl
-      << "<Subdetector type=\"CDC\">"                                                                                                                << endl
-      << "  <Name>CDC BelleII </Name>"                                                                                                               << endl
-      << "  <Description>CDC geometry parameters</Description>"                                                                                      << endl
-      << "  <Version>0</Version>"                                                                                                                    << endl
-      << "  <GeoCreator>CDCBelleII</GeoCreator>"                                                                                                     << endl
-      << "  <Content>"                                                                                                                               << endl
-      << "    <Rotation desc=\"Rotation of the whole cdc detector (should be the same as beampipe)\" unit=\"mrad\">0.0</Rotation>"                   << endl
-      << "    <OffsetZ desc=\"The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)\" unit=\"mm\">0.0</OffsetZ>"  << endl
-      << "    <Material>CDCGas</Material>"                                                                                                           << endl
+  ofs << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+      << endl
+      << "<Subdetector type=\"CDC\">"
+      << endl
+      << "  <Name>CDC BelleII </Name>"
+      << endl
+      << "  <Description>CDC geometry parameters</Description>"
+      << endl
+      << "  <Version>0</Version>"
+      << endl
+      << "  <GeoCreator>CDCBelleII</GeoCreator>"
+      << endl
+      << "  <Content>"
+      << endl
+      << "    <Rotation desc=\"Rotation of the whole cdc detector (should be the same as beampipe)\" unit=\"mrad\">0.0</Rotation>"
+      << endl
+      << "    <OffsetZ desc=\"The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)\" unit=\"mm\">0.0</OffsetZ>"
+      << endl
+      << "    <Material>CDCGas</Material>"
+      << endl
       << endl;
 
   ofs << "    <SLayers>" << endl;
@@ -803,11 +818,14 @@ void CDCGeometryPar::generateXML(const string& of)
   for (int i = 0; i < m_nSLayer; i++) {
     ofs << "      <SLayer id=\"" << i << "\">" << endl;
     ofs << "        <Radius desc=\"Radius of wires in this layer\" unit=\"mm\">" << senseWireR(i) << "</Radius>" << endl;
-    ofs << "        <BackwardZ desc=\"z position of this wire layer at backward endplate\" unit=\"mm\">" << senseWireBZ(i) << "</BackwardZ>" << endl;
-    ofs << "        <ForwardZ desc=\"z position of this wire layer at forward endplate\" unit=\"mm\">" << senseWireFZ(i) << "</ForwardZ>" << endl;
+    ofs << "        <BackwardZ desc=\"z position of this wire layer at backward endplate\" unit=\"mm\">" << senseWireBZ(
+          i) << "</BackwardZ>" << endl;
+    ofs << "        <ForwardZ desc=\"z position of this wire layer at forward endplate\" unit=\"mm\">" << senseWireFZ(
+          i) << "</ForwardZ>" << endl;
 //    ofs << "        <BackwardPhi desc=\"azimuth angle of the first wire in this layer at backward endplate\" unit=\"rad\">" << wireBackwardPosition(i).phi() << "</BackwardPhi>" << endl;
 //    ofs << "        <ForwardPhi desc=\"azimuth angle of the first wire in this layer at forward endplate\" unit=\"rad\">" << wireForwardPosition(i).phi() << "</ForwardPhi>" << endl;
-    ofs << "        <NHoles desc=\"the number of holes in this layer, 2*(cell number)\">" << nWiresInLayer(i) * 2 << "</NHoles>" << endl;
+    ofs << "        <NHoles desc=\"the number of holes in this layer, 2*(cell number)\">" << nWiresInLayer(
+          i) * 2 << "</NHoles>" << endl;
     ofs << "        <NShift desc=\"the shifted hole number of each wire in this layer\">" << nShifts(i) << "</NShift>" << endl;
     ofs << "        <Offset desc=\"wire offset in phi direction at endplate\">" << m_offSet[i] << "</Offset>" << endl;
     ofs << "      </SLayer>" << endl;
@@ -819,8 +837,10 @@ void CDCGeometryPar::generateXML(const string& of)
   for (int i = 0; i < m_nFLayer; i++) {
     ofs << "      <FLayer id=\"" << i << "\">" << endl;
     ofs << "        <Radius desc=\"Radius of field wires in this layer\" unit=\"mm\">" << fieldWireR(i) << "</Radius>" << endl;
-    ofs << "        <BackwardZ desc=\"z position of this field wire layer at backward endplate\" unit=\"mm\">" << fieldWireBZ(i) << "</BackwardZ>" << endl;
-    ofs << "        <ForwardZ desc=\"z position of this field wire layer at forward endplate\" unit=\"mm\">" << fieldWireFZ(i) << "</ForwardZ>" << endl;
+    ofs << "        <BackwardZ desc=\"z position of this field wire layer at backward endplate\" unit=\"mm\">" << fieldWireBZ(
+          i) << "</BackwardZ>" << endl;
+    ofs << "        <ForwardZ desc=\"z position of this field wire layer at forward endplate\" unit=\"mm\">" << fieldWireFZ(
+          i) << "</ForwardZ>" << endl;
     ofs << "      </FLayer>" << endl;
   }
 
@@ -844,7 +864,8 @@ void CDCGeometryPar::generateXML(const string& of)
       << "</Subdetector>"                                       << endl;
 }
 
-void CDCGeometryPar::getWireSagEffect(const EWirePosition set, const unsigned layerID, const unsigned cellID, const double Z, double& Yb_sag, double& Yf_sag) const
+void CDCGeometryPar::getWireSagEffect(const EWirePosition set, const unsigned layerID, const unsigned cellID, const double Z,
+                                      double& Yb_sag, double& Yf_sag) const
 {
   //Input
   //       set    : c_Base, c_Misaligned or c_Aligned
@@ -990,7 +1011,8 @@ void CDCGeometryPar::outputDesignWirParam(const unsigned layerID, const unsigned
   ofs << endl;
 }
 
-double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha, const double theta) const
+double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
+                                 const double theta) const
 {
 
   double dDdt;
@@ -1020,7 +1042,8 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 
 }
 
-double CDCGeometryPar::getDriftLength(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha, const double theta) const
+double CDCGeometryPar::getDriftLength(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
+                                      const double theta) const
 {
 
   double dist = 0.;
@@ -1052,7 +1075,8 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 
 }
 
-double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLayer, const unsigned short lr, const double alpha, const double theta) const
+double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLayer, const unsigned short lr, const double alpha,
+                                    const double theta) const
 {
   //to be replaced with a smarter algorithm...
 
@@ -1088,7 +1112,8 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   }
 
   if (i >= maxTrials - 1 || time > maxTime) {
-    B2WARNING("CDCGeometryPar::getDriftTime " << dist << " " << iCLayer << " " << alpha << " " << lr << " " << t0 << " " << t1 << " " << time << " " << d0);
+    B2WARNING("CDCGeometryPar::getDriftTime " << dist << " " << iCLayer << " " << alpha << " " << lr << " " << t0 << " " << t1 << " " <<
+              time << " " << d0);
   }
 
   return time;
@@ -1126,7 +1151,8 @@ double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLaye
   return sigma;
 }
 
-unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const
+unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack,
+                                               const TVector3& momentum) const
 {
   unsigned short lr = 0;
   double wCrossT = (posOnWire.Cross(posOnTrack)).z();
@@ -1160,7 +1186,8 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
   return lr;
 }
 
-unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const
+unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack,
+                                                  const TVector3& momentum) const
 {
   const double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).z();
   unsigned short int lr = (distanceCrossP > 0.) ? 1 : 0;
@@ -1224,7 +1251,8 @@ int CDCGeometryPar::getThetaBin(const double theta) const
   return itheta;
 }
 
-double CDCGeometryPar::ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut, TVector3& hitPosition, TVector3& wirePosition) const
+double CDCGeometryPar::ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut,
+                                       TVector3& hitPosition, TVector3& wirePosition) const
 {
   //----------------------------------------------------------
   /* For two lines r=r1+t1.v1 & r=r2+t2.v2
@@ -1236,7 +1264,7 @@ double CDCGeometryPar::ClosestApproach(const TVector3 bwp, const TVector3 fwp, c
      d=|(r2-r1) x v1|/|v1|
   */
 
-  double t1, t2, distance, dInOut, dHitIn, dHitOut;
+  double t2, distance;
 
   //--------------------------
   // Get wirepoint @ endplate
@@ -1263,13 +1291,13 @@ double CDCGeometryPar::ClosestApproach(const TVector3 bwp, const TVector3 fwp, c
     hitPosition = posIn;
     t2 = (posIn - fwp).Dot(wireLine) / wireLine.Mag2();
   } else {
-    t1 = hitXwire.Dot(wire2hit.Cross(wireLine)) / hitXwire.Mag2();
+    double t1 = hitXwire.Dot(wire2hit.Cross(wireLine)) / hitXwire.Mag2();
     hitPosition = posOut + t1 * hitLine;
     t2 = hitXwire.Dot(wire2hit.Cross(hitLine)) / hitXwire.Mag2();
 
-    dInOut = (posOut - posIn).Mag();
-    dHitIn = (hitPosition - posIn).Mag();
-    dHitOut = (hitPosition - posOut).Mag();
+    double dInOut = (posOut - posIn).Mag();
+    double dHitIn = (hitPosition - posIn).Mag();
+    double dHitOut = (hitPosition - posOut).Mag();
     if (dHitIn <= dInOut && dHitOut <= dInOut) { //Between point in & out
       distance = fabs(wire2hit.Dot(hitXwire) / hitXwire.Mag());
     } else if (dHitOut > dHitIn) { // out posIn
@@ -1327,7 +1355,8 @@ unsigned short CDCGeometryPar::areNeighbors(const WireID wireId, const WireID ot
     else return 0;
   } else if (iLayerDifference == -1) {
     //    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
-    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] - m_shiftInSuperLayer[wireId.getISuperLayer()][wireId.getILayer()];
+    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] -
+                                    m_shiftInSuperLayer[wireId.getISuperLayer()][wireId.getILayer()];
     //    std::cout <<"in deltaShift,iOtherWire,iWire= " << deltaShift <<" "<< iOtherWire <<" "<< iWire << std::endl;
     if (iWire == iOtherWire) {
       if (deltaShift ==  CW) return  CW_IN_NEIGHBOR;
@@ -1342,7 +1371,8 @@ unsigned short CDCGeometryPar::areNeighbors(const WireID wireId, const WireID ot
     } else return 0;
   } else if (iLayerDifference == 1) {
     //    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
-    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] - m_shiftInSuperLayer[wireId.getISuperLayer()][wireId.getILayer()];
+    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] -
+                                    m_shiftInSuperLayer[wireId.getISuperLayer()][wireId.getILayer()];
     //    std::cout <<"out deltaShift,iOtherWire,iWire= " << deltaShift <<" "<< iOtherWire <<" "<< iWire << std::endl;
     if (iWire == iOtherWire) {
       if (deltaShift ==  CW) return  CW_OUT_NEIGHBOR;
@@ -1359,7 +1389,8 @@ unsigned short CDCGeometryPar::areNeighbors(const WireID wireId, const WireID ot
 
 }
 
-unsigned short CDCGeometryPar::areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, const WireID otherWireId) const
+unsigned short CDCGeometryPar::areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer,
+                                            unsigned short iWire, const WireID otherWireId) const
 {
   //require within the same super-layer
   if (otherWireId.getISuperLayer() != iSuperLayer) return 0;
@@ -1385,7 +1416,8 @@ unsigned short CDCGeometryPar::areNeighbors(unsigned short iCLayer, unsigned sho
     else return 0;
   } else if (iLayerDifference == -1) {
     //    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
-    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] - m_shiftInSuperLayer[iSuperLayer][iLayer];
+    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] -
+                                    m_shiftInSuperLayer[iSuperLayer][iLayer];
     //    std::cout <<"in deltaShift,iOtherWire,iWire= " << deltaShift <<" "<< iOtherWire <<" "<< iWire << std::endl;
     if (iWire == iOtherWire) {
       if (deltaShift ==  CW) return  CW_IN_NEIGHBOR;
@@ -1400,7 +1432,8 @@ unsigned short CDCGeometryPar::areNeighbors(unsigned short iCLayer, unsigned sho
     } else return 0;
   } else if (iLayerDifference == 1) {
     //    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
-    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] - m_shiftInSuperLayer[iSuperLayer][iLayer];
+    const signed short deltaShift = m_shiftInSuperLayer[otherWireId.getISuperLayer()][otherWireId.getILayer()] -
+                                    m_shiftInSuperLayer[iSuperLayer][iLayer];
     //    std::cout <<"out deltaShift,iOtherWire,iWire= " << deltaShift <<" "<< iOtherWire <<" "<< iWire << std::endl;
     if (iWire == iOtherWire) {
       if (deltaShift ==  CW) return  CW_OUT_NEIGHBOR;

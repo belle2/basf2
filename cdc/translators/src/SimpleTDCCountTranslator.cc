@@ -57,7 +57,7 @@ sigma_translationError is an additional (non-gaussian) smearing is introduced du
 can be (partially) corrected by adding sigma_translationError^2 = (40/sqrt(12) µm)^2 to sigam_cdcHit^2
 see Ozaki's mail: [belle2_tracking:0515] */
 float SimpleTDCCountTranslator::getDriftLengthResolution(float,
-                                                         const WireID& ,
+                                                         const WireID&,
                                                          bool,
                                                          float,
                                                          float,

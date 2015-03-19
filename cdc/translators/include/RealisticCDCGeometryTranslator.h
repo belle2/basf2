@@ -26,12 +26,14 @@ namespace Belle2 {
       ~RealisticCDCGeometryTranslator() {}
 
       /** Get wire position at forward end. */
-      const TVector3 getWireForwardPosition(const WireID& wireID) {
+      const TVector3 getWireForwardPosition(const WireID& wireID)
+      {
         return CDCGeometryPar::Instance().wireForwardPosition(wireID, CDCGeometryPar::c_Aligned);
       }
 
       /** Get virtual wire position at forward end, corresponding to tangent line to wire at input z-position. */
-      const TVector3 getWireForwardPosition(const WireID& wireID, float z) {
+      const TVector3 getWireForwardPosition(const WireID& wireID, float z)
+      {
         TVector3 wPos = (m_wireSag) ?
                         CDCGeometryPar::Instance().wireForwardPosition(wireID, z, CDCGeometryPar::c_Aligned) :
                         CDCGeometryPar::Instance().wireForwardPosition(wireID,    CDCGeometryPar::c_Aligned);
@@ -39,12 +41,14 @@ namespace Belle2 {
       }
 
       /** Get wire position at backward end. */
-      const TVector3 getWireBackwardPosition(const WireID& wireID) {
+      const TVector3 getWireBackwardPosition(const WireID& wireID)
+      {
         return CDCGeometryPar::Instance().wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
       }
 
       /** Get virtual wire position at backward end, corresponding to tangent line to wire at input z-position. */
-      const TVector3 getWireBackwardPosition(const WireID& wireID, float z) {
+      const TVector3 getWireBackwardPosition(const WireID& wireID, float z)
+      {
         TVector3 wPos = m_wireSag ?
                         CDCGeometryPar::Instance().wireBackwardPosition(wireID, z, CDCGeometryPar::c_Aligned) :
                         CDCGeometryPar::Instance().wireBackwardPosition(wireID,    CDCGeometryPar::c_Aligned);

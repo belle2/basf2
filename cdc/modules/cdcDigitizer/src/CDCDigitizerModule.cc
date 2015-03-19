@@ -318,7 +318,8 @@ void CDCDigitizerModule::event()
     }
 
 //N.B. The real TDC module rounds down the measured time (information from KEK electronics division via N.Taniguchi).
-    cdcHits.appendNew(static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv), getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first);
+    unsigned short tdcCount = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
+    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first, tdcCount);
 
     /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
     float driftTimeFromTDC = static_cast<float>(m_tdcOffset - (tdcInCommonStop + 0.5)) * m_tdcBinWidth;

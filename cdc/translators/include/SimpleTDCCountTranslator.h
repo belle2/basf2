@@ -23,7 +23,8 @@ namespace Belle2 {
     public:
       /** Constructor, with the additional information, if propagation in the wire shall be considered. */
       SimpleTDCCountTranslator(bool useInWirePropagationDelay = false) :
-        m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0) {
+        m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0)
+      {
         B2FATAL("This translator is disabled; please use realisticTDCCountTranslator instead.");
       }
 
@@ -31,7 +32,8 @@ namespace Belle2 {
       ~SimpleTDCCountTranslator() {};
 
       /** If trigger jitter was simulated, in every event one has to give an estimate of the effect. */
-      void setEventTime(short eventTime = 0) {
+      void setEventTime(short eventTime = 0)
+      {
         m_eventTime = eventTime;
       }
 

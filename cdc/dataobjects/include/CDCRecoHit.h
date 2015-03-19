@@ -45,7 +45,8 @@ namespace Belle2 {
     CDCRecoHit* clone() const;
 
     /** Getter for WireID object. */
-    WireID getWireID() const {
+    WireID getWireID() const
+    {
       return m_wireID;
     }
 
@@ -77,7 +78,8 @@ namespace Belle2 {
     /** get the pointer to the CDCHit object that was used to create this CDCRecoHit object.
      * Can be NULL if CDCRecoHit was not created with the CDCRecoHit(const CDCHit* cdcHit) constructor
      */
-    const CDCHit* getCDCHit() const {
+    const CDCHit* getCDCHit() const
+    {
       return m_cdcHit;
     }
 

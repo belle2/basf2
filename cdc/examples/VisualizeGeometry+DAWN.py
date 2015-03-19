@@ -23,8 +23,8 @@ eventinfosetter.param('evtNumList', [1])
 
 g4sim.param('EnableVisualization', True)
 g4sim.param('UICommands', ['/vis/open DAWNFILE', '/vis/drawVolume',
-            '/vis/viewer/set/lineSegmentsPerCircle 100',
-            '/vis/scene/add/axes 0 0 0 100 mm'])
+                           '/vis/viewer/set/lineSegmentsPerCircle 100',
+                           '/vis/scene/add/axes 0 0 0 100 mm'])
 #            '/vis/scene/add/axes 0 0 0 100 mm',
 #            '/vis/scene/add/trajectories smooth',
 #            '/vis/modeling/trajectories/create/drawByCharge'])

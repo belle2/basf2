@@ -82,7 +82,8 @@ namespace Belle2 {
      *  @param iCLayerID   number of layer with continuous counting method.
      *  @param iWireID     number of wire within the layer.
      */
-    void setWireID(int iCLayerID, int iWireID) {
+    void setWireID(int iCLayerID, int iWireID)
+    {
       m_wireID.setWireID(iCLayerID, iWireID);
     }
 
@@ -108,35 +109,40 @@ namespace Belle2 {
     void setStepLength(double stepLength) { m_stepLength = stepLength; }
 
     //! The method to set momentum
-    void setMomentum(TVector3 momentum) {
+    void setMomentum(TVector3 momentum)
+    {
       m_momentum[0] = momentum.X();
       m_momentum[1] = momentum.Y();
       m_momentum[2] = momentum.Z();
     }
 
     //! The method to set position on wire
-    void setPosWire(TVector3 posWire) {
+    void setPosWire(TVector3 posWire)
+    {
       m_posWire[0] = posWire.X();
       m_posWire[1] = posWire.Y();
       m_posWire[2] = posWire.Z();
     }
 
     //! The method to set position of pre-step
-    void setPosIn(TVector3 posIn) {
+    void setPosIn(TVector3 posIn)
+    {
       m_posIn[0] = posIn.X();
       m_posIn[1] = posIn.Y();
       m_posIn[2] = posIn.Z();
     }
 
     //! The method to set position of post-step.
-    void setPosOut(TVector3 posOut) {
+    void setPosOut(TVector3 posOut)
+    {
       m_posOut[0] = posOut.X();
       m_posOut[1] = posOut.Y();
       m_posOut[2] = posOut.Z();
     }
 
     //! The method to set position on the track.
-    void setPosTrack(TVector3 posTrack) {
+    void setPosTrack(TVector3 posTrack)
+    {
       m_posTrack[0] = posTrack.X();
       m_posTrack[1] = posTrack.Y();
       m_posTrack[2] = posTrack.Z();
@@ -146,20 +152,23 @@ namespace Belle2 {
      * The method to set position flag.
      */
 
-    void setPosFlag(int zeroOrOne) {
+    void setPosFlag(int zeroOrOne)
+    {
       m_leftRight &= 0x6;
       m_leftRight = (m_leftRight | (unsigned char)zeroOrOne);
     }
 
     //! The method to set new left/right info. for digitization
-    void setLeftRightPassageRaw(int minusOneOrZeroOrOne) {
+    void setLeftRightPassageRaw(int minusOneOrZeroOrOne)
+    {
       int zeroOrOne = (minusOneOrZeroOrOne <= 0) ? 0 : 1;
       m_leftRight &= 0x5;
       m_leftRight = (m_leftRight | ((unsigned char)zeroOrOne << 1));
     }
 
     //! The method to set new left/right info. for tracking
-    void setLeftRightPassage(int minusOneOrZeroOrOne) {
+    void setLeftRightPassage(int minusOneOrZeroOrOne)
+    {
       int zeroOrOne = (minusOneOrZeroOrOne <= 0) ? 0 : 1;
       m_leftRight &= 0x3;
       m_leftRight = (m_leftRight | ((unsigned char)zeroOrOne << 2));
@@ -187,37 +196,44 @@ namespace Belle2 {
     double getStepLength() const { return m_stepLength; }
 
     //! The method to get momentum.
-    TVector3 getMomentum() const {
+    TVector3 getMomentum() const
+    {
       return TVector3(m_momentum[0], m_momentum[1], m_momentum[2]);
     }
 
     //! The method to get position on wire.
-    TVector3 getPosWire() const {
+    TVector3 getPosWire() const
+    {
       return TVector3(m_posWire[0], m_posWire[1], m_posWire[2]);
     }
 
     //! The method to get position of pre-step.
-    TVector3 getPosIn() const {
+    TVector3 getPosIn() const
+    {
       return TVector3(m_posIn[0], m_posIn[1], m_posIn[2]);
     }
 
     //! The method to get position of post-step.
-    TVector3 getPosOut() const {
+    TVector3 getPosOut() const
+    {
       return TVector3(m_posOut[0], m_posOut[1], m_posOut[2]);
     }
 
     //! The method to get position on the track
-    TVector3 getPosTrack() const {
+    TVector3 getPosTrack() const
+    {
       return TVector3(m_posTrack[0], m_posTrack[1], m_posTrack[2]);
     }
 
     //! The method to get old left/right info.
-    int getPosFlag() const {
+    int getPosFlag() const
+    {
       return (int)(m_leftRight & 0x1);
     }
 
     //! The method to get new left/right info. for digitization
-    int getLeftRightPassageRaw() const {
+    int getLeftRightPassageRaw() const
+    {
       //      int minusOneOrOne = (int((m_leftRight & 0x2) >> 1) == 0) ? -1 : 1;
       //      return minusOneOrOne;
       int zeroOrOne = (int((m_leftRight & 0x2) >> 1) == 0) ? 0 : 1;
@@ -225,7 +241,8 @@ namespace Belle2 {
     }
 
     //! The method to get new left/right info. for tracking
-    int getLeftRightPassage() const {
+    int getLeftRightPassage() const
+    {
       //      int minusOneOrOne = (int((m_leftRight & 0x4) >> 2) == 0) ? -1 : 1;
       //      return minusOneOrOne;
       int zeroOrOne = (int((m_leftRight & 0x4) >> 2) == 0) ? 0 : 1;
@@ -263,7 +280,8 @@ namespace Belle2 {
               TVector3 posOut,
               TVector3 posTrack,
               int leftRight,
-              double globalTime): SimHitBase() {
+              double globalTime): SimHitBase()
+    {
 
       m_wireID.setWireID(layerId, wireId);
       m_trackId = trackId;
@@ -294,7 +312,8 @@ namespace Belle2 {
     /** Shift the SimHit in time
      * @param delta The value of the time shift.
      */
-    virtual void shiftInTime(float delta) {
+    virtual void shiftInTime(float delta)
+    {
       m_globalTime = m_flightTime + delta;
     }
 

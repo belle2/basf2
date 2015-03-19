@@ -111,7 +111,4 @@ def stdKs(path=analysis_main):
     path.add_module(expert_l)
 
     cutAndCopyList('K_S0:good', 'K_S0:all',
-                   '0.51 < extraInfo(BDT_v0) < 1.0 and 0.91 < extraInfo(BDT_l) < 1.0'
-                   , True, path)
-
-
+                   '0.51 < extraInfo(BDT_v0) < 1.0 and 0.91 < extraInfo(BDT_l) < 1.0', True, path)

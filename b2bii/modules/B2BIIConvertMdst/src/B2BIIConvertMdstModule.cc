@@ -207,6 +207,8 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
 
   // at this stage (before all other particles) all "motherless" particles (i.e. beam background)
   // have to be added to Particle graph
+  /*
+  // if this is uncommented then beam background hits will be added to the MCParticle array
   for (Belle::Gen_hepevt_Manager::iterator genIterator = genMgr.begin(); genIterator != genMgr.end(); ++genIterator) {
     Belle::Gen_hepevt hep = *genIterator;
     if (hep.moFirst() == 0 && hep.moLast() == 0 && hep.get_ID() > 1) {
@@ -220,6 +222,7 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
       convertGenHepevtObject(hep, graphParticle);
     }
   }
+  */
 
   typedef std::pair<MCParticleGraph::GraphParticle*, Belle::Gen_hepevt> halfFamily;
   halfFamily currFamily;
@@ -244,6 +247,10 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
 
     MCParticleGraph::GraphParticle* currMother = currFamily.first;
     Belle::Gen_hepevt& currDaughter = currFamily.second;
+
+    // skip particle with idhep = 0
+    if (currDaughter.idhep() == 0)
+      continue;
 
     //putting the daughter in the graph:
     position = m_particleGraph.size();
@@ -307,7 +314,7 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
     // create ECLCluster -> MCParticle relation
     // step 1: MDST_ECL -> Gen_hepevt
     const Belle::Gen_hepevt hep(get_hepevt(mdstEcl, 0));
-    if (hep) {
+    if (hep && hep.idhep() != 911) {
       // step 2: Gen_hepevt -> MCParticle
       if (genHepevtToMCParticle.count(hep.get_ID()) > 0) {
         int matchedMCParticle = genHepevtToMCParticle[hep.get_ID()];
@@ -445,6 +452,7 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 
   // TODO: do not change 911 to 22
   if (idHep == 0 || idHep == 911) {
+    B2WARNING("[B2BIIConvertMdstModule] Trying to convert Gen_hepevt with idhep = " << idHep << ". This should enver happen.")
     mcParticle->setPDG(22);
   } else {
     mcParticle->setPDG(idHep);
@@ -612,6 +620,9 @@ void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, co
 {
   int bellePDGCode   = belleMC.idhep();
   int belleIIPDGCode = mcP->getPDG();
+
+  if (bellePDGCode == 0)
+    B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to Gen_hepevt with idhep = 0.");
 
   if (bellePDGCode != belleIIPDGCode && bellePDGCode != 911)
     B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to different MCParticle! " << bellePDGCode << " vs. " <<

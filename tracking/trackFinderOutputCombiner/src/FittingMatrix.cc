@@ -254,13 +254,13 @@ FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCReco
   } else {
 
     // the segment lays in the track. We try to fit.
-    int beginningIndex = perpSList.size();
-    int endIndex = perpSList.size();
+    std::list<double>::size_type beginningIndex = perpSList.size();
+    std::list<double>::size_type endIndex = perpSList.size();
 
     unsigned int iter = 0;
 
     for (double perpS : perpSList) {
-      if (beginningIndex == perpSList.size() and perpS > beginningOfSegment) {
+      if (static_cast<unsigned int>(beginningIndex) == perpSList.size() and perpS > beginningOfSegment) {
         if (iter == 0)
           beginningIndex = iter;
         else
@@ -273,8 +273,8 @@ FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCReco
     }
 
     if (segment.getStereoType() == AXIAL) {
-      beginningIndex = std::max(0, beginningIndex - 5);
-      endIndex = std::min(static_cast<int>(perpSList.size()), endIndex + 5);
+      beginningIndex = std::max(0lu, beginningIndex - 5);
+      endIndex = std::min(perpSList.size(), endIndex + 5);
 
       for (unsigned int counter = beginningIndex; counter < endIndex; counter++) {
         CDCHit* cdcHit = cdcHits[hitIDs[counter]];

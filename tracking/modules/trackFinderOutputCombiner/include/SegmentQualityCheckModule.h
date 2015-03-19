@@ -67,7 +67,6 @@ namespace Belle2 {
     bool isGoodSegment(const TrackFindingCDC::CDCRecoSegment2D& segment);
 
     double m_param_maximalMeanOfDriftLength;    /**< Maximal mean of the drift length for a segment to be used later. */
-    std::string m_param_badTrackCands;          /**< Name of the Store Array for the bad segments for testing. */
     std::string m_param_recoSegments;           /**< Name of the Store Array for the segments from the local track finder. */
   };
 }

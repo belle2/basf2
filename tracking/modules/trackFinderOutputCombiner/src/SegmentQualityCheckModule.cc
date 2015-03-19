@@ -17,9 +17,6 @@ SegmentQualityCheckModule::SegmentQualityCheckModule()
            m_param_maximalMeanOfDriftLength,
            "Maximal mean of the drift length for a segment to be used later.",
            0.8);
-  addParam("BadTrackCands",
-           m_param_badTrackCands,
-           "Name of the Store Array for the bad segments for testing.");
   addParam("RecoSegments",
            m_param_recoSegments,
            "Name of the Store Array for the segments from the local track finder.");
@@ -30,9 +27,6 @@ void SegmentQualityCheckModule::initialize()
 {
   StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> recoSegments(m_param_recoSegments);
   recoSegments.isRequired();
-
-  StoreArray<genfit::TrackCand> badTrackCands(m_param_badTrackCands);
-  badTrackCands.registerInDataStore();
 }
 
 void SegmentQualityCheckModule::event()
@@ -42,16 +36,9 @@ void SegmentQualityCheckModule::event()
   std::vector<CDCRecoSegment2D> goodRecoSegments;
   goodRecoSegments.reserve(recoSegments.size());
 
-  StoreArray<genfit::TrackCand> badTrackCands(m_param_badTrackCands);
-  badTrackCands.create();
-
-  genfit::TrackCand* badTrackCand = badTrackCands.appendNew();
-
-  for (const CDCRecoSegment2D & segment : recoSegments) {
+  for (const CDCRecoSegment2D& segment : recoSegments) {
     if (isGoodSegment(segment)) {
       goodRecoSegments.push_back(segment);
-    } else {
-      FittingMatrix::fillHitsInto(segment, badTrackCand);
     }
   }
 
@@ -68,7 +55,7 @@ bool SegmentQualityCheckModule::isGoodSegment(const CDCRecoSegment2D& segment)
   bool hasOnlyOneLayer = true;
   ILayerType firstLayer = segment[0].getWire().getILayer();
 
-  for (const CDCRecoHit2D & recoHit2D : segment) {
+  for (const CDCRecoHit2D& recoHit2D : segment) {
     meanOfDriftLengths += recoHit2D.getRefDriftLength();
     if (recoHit2D.getWire().getILayer() != firstLayer)
       hasOnlyOneLayer = false;

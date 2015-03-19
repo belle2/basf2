@@ -7,7 +7,6 @@
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/V0.h>
 
 #include <TMath.h>
@@ -84,12 +83,9 @@ void V0FinderModule::initialize()
   StoreArray<Track>::required(m_TrackColName);
   StoreArray<genfit::Track>::required(m_GFTrackColName);
   StoreArray<TrackFitResult>::required(m_TFRColName);
-  StoreArray < MCParticle > mcParticles;
-  mcParticles.isOptional();
 
   StoreArray<V0> V0s(m_V0ColName);
   V0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-  V0s.registerRelationTo(mcParticles);
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
@@ -253,7 +249,8 @@ void V0FinderModule::event()
         // interface isn't exception-safe as is.  I guess this could
         // fail if delete throws an exception ...
       public:
-        ~vertVect() noexcept {
+        ~vertVect() noexcept
+        {
           for (size_t i = 0; i < v.size(); ++i)
             delete v[i];
         }
@@ -360,77 +357,6 @@ void V0FinderModule::event()
                     std::make_pair(tracksMinus[iTrMinus].first, tfrMinusVtx));
     }
   }
-
-  B2DEBUG(200, "MC matching");
-
-  // MC matching
-  StoreArray<MCParticle> mcParticles;
-  unsigned int nMCpart = mcParticles.getEntries();
-
-  if (nMCpart == 0) {
-    B2DEBUG(150, "No MC Particles.");
-    return;
-  }
-
-  for (size_t i = 0; i < nMCpart; ++i) {
-    const MCParticle* MCpart = mcParticles[i];
-    if (!MCpart) {
-      B2ERROR("MC particle is NULL.");
-      continue;
-    }
-
-    const std::vector<Belle2::MCParticle*>& daughters = MCpart->getDaughters();
-    if (daughters.size() != 2)
-      // We match V0 candidates by looking for particles decaying into
-      // two oppositely charged particles instead of listing the possible PDG ids
-      // and then looking whether the correct kind of decay took
-      // place.  This approach is more general but it will miss decays
-      // with an additional (soft) neutral which would also show as
-      // V0.
-      continue;
-    const MCParticle* daughterPlus = 0;
-    const MCParticle* daughterMinus = 0;
-    if (daughters[0]->getCharge() == +1)
-      daughterPlus = daughters[0];
-    else if (daughters[0]->getCharge() == -1)
-      daughterMinus = daughters[0];
-    if (daughters[1]->getCharge() == +1)
-      daughterPlus = daughters[1];
-    else if (daughters[1]->getCharge() == -1)
-      daughterMinus = daughters[1];
-
-    if (!daughterPlus || !daughterMinus) {
-      // Not a V0, need both positively charged and negatively charged
-      // daughter.
-      continue;
-    }
-
-    // MC particle is a V0, see if we found it.
-    for (int j = 0; j < V0s.getEntries(); ++j) {
-      // Try to match the tracks of each V0 with the MC V0.
-      auto trackPtrs = V0s[j]->getTrackPtrs();
-      const Track* trPlus = trackPtrs.first;
-      const Track* trMinus = trackPtrs.second;
-
-      const MCParticle* V0PartPlus = trPlus->getRelatedTo<MCParticle>();
-      const MCParticle* V0PartMinus = trMinus->getRelatedTo<MCParticle>();
-
-      if (!V0PartPlus || !V0PartMinus) {
-        B2WARNING("No MCParticles for V0 tracks.");
-        continue;
-      }
-
-      if (daughterPlus == V0PartPlus && daughterMinus == V0PartMinus) {
-        // Establish relation.
-        B2DEBUG(200, "MC matching successful.");
-        V0s[j]->addRelationTo(MCpart);
-      } else {
-        B2DEBUG(200, "No MC match for V0");
-      }
-    }
-  }
-
-  B2DEBUG(200, "MC matching finished.");
 }
 
 void V0FinderModule::endRun()

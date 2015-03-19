@@ -91,11 +91,200 @@ void NotAssignedHitsCombinerModule::initialize()
   resultTrackCands.registerInDataStore();
 
   StoreArray<genfit::TrackCand> badTrackCands(m_param_badTrackCands);
-  badTrackCands.isRequired();
+  badTrackCands.registerInDataStore();
 
   StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> recoSegments(m_param_recoSegments);
   recoSegments.isRequired();
 }
+
+void NotAssignedHitsCombinerModule::createBadTrackCandsForTesting(
+  std::vector<CDCRecoSegment2D>& recoSegments,
+  const StoreArray<genfit::TrackCand>& resultTrackCands)
+{
+  // For the segments ending up here there are basically two possibilities:
+  // (1) they are background -> actually these segments should be deleted before with the SegmentQualityCheckModule. We will not assume this case here!
+  // (2) they form a new track - a track the legendre track finder has not found at all.
+  // (3) the matching routine has not worked properly and they belong to an already found track
+  // The question is not only if some of the segments are background - the question is also whether we should merge them in one ore more tracks
+  // Just for testing: add all the segments + found tracks to the bad track cands
+  StoreArray<genfit::TrackCand> badTrackCands(m_param_badTrackCands);
+  badTrackCands.create();
+  for (const genfit::TrackCand& resultTrackCand : resultTrackCands) {
+    badTrackCands.appendNew(resultTrackCand);
+  }
+  unsigned int numberOfLeftSegments = 0;
+  for (FittingMatrix::SegmentCounter counterOuter = 0;
+       counterOuter < recoSegments.size(); counterOuter++) {
+    if (!m_fittingMatrix.isSegmentUsed(counterOuter)) {
+      genfit::TrackCand* badTrackCand = badTrackCands.appendNew();
+      numberOfLeftSegments++;
+      const CDCRecoSegment2D& recoSegment = recoSegments[counterOuter];
+      m_fittingMatrix.fillHitsInto(recoSegment, badTrackCand);
+    }
+  }
+  B2DEBUG(100, numberOfLeftSegments << " segments left.")
+}
+
+void NotAssignedHitsCombinerModule::event()
+{
+  B2DEBUG(100, "########## NotAssignedHitsCombinerModule ############")
+
+  StoreArray<genfit::TrackCand> resultTrackCands(m_param_resultTrackCands);
+  StoreArray<genfit::TrackCand> legendreTrackCands(m_param_tracksFromLegendreFinder);
+  StoreArray<CDCHit> cdcHits(m_param_cdcHits);
+
+  StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_recoSegments);
+  std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
+
+  resultTrackCands.create();
+
+  B2DEBUG(100, "Length of CDCSegments: " << recoSegments.size())
+
+
+  // Add the legendre tracks to the output. They are assumed to be good at this stage.
+  for (const genfit::TrackCand& legendreTrackCand : legendreTrackCands) {
+    resultTrackCands.appendNew(legendreTrackCand);
+  }
+
+  // Go through all the reco segments
+  // There are three different cases for a segment:
+  // (1) It fits good to an already found legendre track candidate. We merge them.
+  // (2) It does not fit good to a track candidate. Then:
+  // (2a) It can be a new track
+  // (2b) It can be background
+  // As in most of the cases these segments are stereo segments, case (1) is the most common
+
+  m_fittingMatrix.calculateMatrices(recoSegments, resultTrackCands, cdcHits);
+  m_fittingMatrix.print();
+
+  // Find all "easy" possibilities:
+  findEasyCandidates(recoSegments, resultTrackCands, legendreTrackCands, cdcHits);
+
+
+  // For the segments ending up here there are basically two possibilities:
+  // (1) they are background -> actually these segments should be deleted before with the SegmentQualityCheckModule. We will not assume this case here!
+  // (2) they form a new track - a track the legendre track finder has not found at all.
+  // (3) the matching routine has not worked properly and they belong to an already found track
+  // The question is not only if some of the segments are background - the question is also whether we should merge them in one ore more tracks
+
+  // Just for testing: add all the segments + found tracks to the bad track cands
+  createBadTrackCandsForTesting(recoSegments, resultTrackCands);
+  m_fittingMatrix.print();
+
+  // Delete all segments, that are used
+  std::vector<CDCRecoSegment2D> notUsedRecoSegments;
+  for (FittingMatrix::SegmentCounter segmentCounter = 0; segmentCounter < recoSegments.size(); segmentCounter++) {
+    if (not m_fittingMatrix.isSegmentUsed(segmentCounter)) {
+      notUsedRecoSegments.push_back(recoSegments[segmentCounter]);
+    }
+  }
+
+  // Recalculate the matrices
+  m_fittingMatrix.calculateMatrices(notUsedRecoSegments, resultTrackCands, cdcHits);
+
+  // Testing purposes:
+  // Use all segments with a very low pt.
+  // TODO
+
+  // Check if the segments would fit into a whole in a track pattern of a result track candidate
+  for (FittingMatrix::SegmentCounter segmentCounter = 0; segmentCounter < notUsedRecoSegments.size(); segmentCounter++) {
+    const CDCRecoSegment2D& recoSegment = notUsedRecoSegments[segmentCounter];
+
+    StereoType stereoType = recoSegment.getStereoType();
+
+    std::vector<FittingMatrix::SegmentStatus> status;
+    status.reserve(resultTrackCands.getEntries());
+
+    for (const genfit::TrackCand& resultTrackCand : resultTrackCands) {
+      double meanDistanceToTrack = 0;
+      CDCTrajectory3D trajectory(resultTrackCand.getPosSeed(), resultTrackCand.getMomSeed(), resultTrackCand.getChargeSeed());
+      const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
+
+      // if it is axial, we can check the mean distance to the track in the xy-plane
+      if (stereoType == AXIAL) {
+        for (const CDCRecoHit2D& recoHit : recoSegment) {
+          meanDistanceToTrack += recoHit.getSquaredDist2D(trajectory2D);
+        }
+
+        if (meanDistanceToTrack / recoSegment.size() > 100) {
+          status.push_back(FittingMatrix::SegmentStatus::NAN_IN_CALCULATION);
+          continue;
+        }
+      }
+
+      FittingMatrix::SegmentStatus segmentStatus = FittingMatrix::calculateSegmentStatus(recoSegment, resultTrackCand, cdcHits);
+      status.push_back(segmentStatus);
+    }
+
+    unsigned int numberOfInMatches = std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool { return s == FittingMatrix::SegmentStatus::IN_TRACK or s == FittingMatrix::SegmentStatus::MIX_WITH_TRACK; });
+    if (stereoType == AXIAL) {
+      if (numberOfInMatches >= 1) {
+
+        FittingMatrix::TrackCounter bestFitPartner = -1;
+        double maximumChi2 = -1;
+
+        for (FittingMatrix::TrackCounter trackCounter = 0; trackCounter < resultTrackCands.getEntries(); trackCounter++) {
+          if (status[trackCounter] == FittingMatrix::SegmentStatus::IN_TRACK
+              or status[trackCounter] == FittingMatrix::SegmentStatus::MIX_WITH_TRACK) {
+            if (m_fittingMatrix.getChi2(segmentCounter, trackCounter) > maximumChi2) {
+              maximumChi2 = m_fittingMatrix.getChi2(segmentCounter, trackCounter);
+              bestFitPartner = trackCounter;
+            }
+          }
+        }
+
+        if (numberOfInMatches == 1 or status[bestFitPartner] == FittingMatrix::SegmentStatus::IN_TRACK or maximumChi2 > 0) {
+          B2DEBUG(100, "Adding " << segmentCounter << " to " << bestFitPartner << " with: " << maximumChi2);
+          m_fittingMatrix.addSegmentToResultTrack(segmentCounter, bestFitPartner, notUsedRecoSegments, resultTrackCands);
+        }
+      }
+    }
+
+    B2INFO("Above: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::ABOVE_TRACK; }))
+    B2INFO("Below: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::BENEATH_TRACK; }))
+    B2INFO("In: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::IN_TRACK; }))
+    B2INFO("Mix: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::MIX_WITH_TRACK; }))
+
+    B2INFO("Axial: " << (recoSegment.getStereoType() == AXIAL))
+  }
+
+  m_fittingMatrix.print();
+}
+
+double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(genfit::TrackCand* trackCand,
+    const StoreArray<CDCHit>& cdcHits)
+{
+  const CDCSZFitter& zFitter = CDCSZFitter::getFitter();
+
+  CDCTrajectory3D trajectory(trackCand->getPosSeed(), trackCand->getMomSeed(), trackCand->getChargeSeed());
+  CDCObservations2D observationsSZ;
+
+  // Add the hits from the segment to the sz fit
+  for (int cdcHitID : trackCand->getHitIDs(Const::CDC)) {
+    CDCHit* cdcHit = cdcHits[cdcHitID];
+    if (cdcHit->getISuperLayer() % 2 != 0) {
+      // we do not know the right-left information
+      CDCWireHit cdcWireHit(cdcHit);
+      CDCRLWireHit cdcRLWireHit(cdcWireHit);
+      const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(cdcRLWireHit, trajectory.getTrajectory2D());
+      if (recoHit3D.isInCDC()) {
+        observationsSZ.append(recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z());
+      }
+    }
+  }
+
+  if (observationsSZ.size() > 3) {
+    // Fit the sz trajectory
+    CDCTrajectorySZ trajectorySZ;
+    zFitter.update(trajectorySZ, observationsSZ);
+    return TMath::ATan(trajectorySZ.getSZSlope());
+  } else {
+    // just a dummy value: this means the track is more or less axial only
+    B2WARNING("Axial only")
+    return 100;
+  }
+}
+
 
 void NotAssignedHitsCombinerModule::findEasyCandidates(
   std::vector<CDCRecoSegment2D>& recoSegments,
@@ -154,95 +343,5 @@ void NotAssignedHitsCombinerModule::findEasyCandidates(
         }
       }
     }
-  }
-}
-
-void NotAssignedHitsCombinerModule::event()
-{
-  B2DEBUG(100, "########## NotAssignedHitsCombinerModule ############")
-
-  StoreArray<genfit::TrackCand> resultTrackCands(m_param_resultTrackCands);
-  StoreArray<genfit::TrackCand> badTrackCands(m_param_badTrackCands);
-  StoreArray<genfit::TrackCand> legendreTrackCands(m_param_tracksFromLegendreFinder);
-  StoreArray<CDCHit> cdcHits(m_param_cdcHits);
-
-  StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_recoSegments);
-  std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
-
-  resultTrackCands.create();
-
-  B2DEBUG(100, "Length of CDCSegments: " << recoSegments.size())
-
-
-  // Add the legendre tracks to the output. They are assumed to be good at this stage.
-  for (const genfit::TrackCand & legendreTrackCand : legendreTrackCands) {
-    resultTrackCands.appendNew(legendreTrackCand);
-  }
-
-  // Go through all the reco segments
-  // There are three different cases for a segment:
-  // (1) It fits good to an already found legendre track candidate. We merge them.
-  // (2) It does not fit good to a track candidate. Then:
-  // (2a) It can be a new track
-  // (2b) It can be background
-  // As in most of the cases these segments are stereo segments, case (1) is the most common
-
-  m_fittingMatrix.calculateMatrices(recoSegments, resultTrackCands, cdcHits);
-  m_fittingMatrix.print();
-
-  // Find all "easy" possibilities:
-  findEasyCandidates(recoSegments, resultTrackCands, legendreTrackCands, cdcHits);
-
-
-  // For the segments ending up here there are basically two possibilities:
-  // (1) they are background -> actually these segments should be deleted before with the SegmentQualityCheckModule. We will not assume this case here!
-  // (2) they form a new track - a track the legendre track finder has not found at all.
-  // (3) the matching routine has not worked properly and they belong to an already found track
-  // The question is not only if some of the segments are background - the question is also whether we should merge them in one ore more tracks
-
-  unsigned int numberOfLeftSegments = 0;
-  genfit::TrackCand* badTrackCand = badTrackCands.appendNew();
-  for (FittingMatrix::SegmentCounter counterOuter = 0; counterOuter < recoSegments.size(); counterOuter++) {
-    if (not m_fittingMatrix.isSegmentUsed(counterOuter)) {
-      numberOfLeftSegments++;
-      const CDCRecoSegment2D& recoSegment = recoSegments[counterOuter];
-      m_fittingMatrix.fillHitsInto(recoSegment, badTrackCand);
-    }
-  }
-
-  B2DEBUG(100, numberOfLeftSegments << " segments left.")
-
-  m_fittingMatrix.print();
-}
-
-double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(genfit::TrackCand* trackCand, const StoreArray<CDCHit>& cdcHits)
-{
-  const CDCSZFitter& zFitter = CDCSZFitter::getFitter();
-
-  CDCTrajectory3D trajectory(trackCand->getPosSeed(), trackCand->getMomSeed(), trackCand->getChargeSeed());
-  CDCObservations2D observationsSZ;
-
-  // Add the hits from the segment to the sz fit
-  for (int cdcHitID : trackCand->getHitIDs(Const::CDC)) {
-    CDCHit* cdcHit = cdcHits[cdcHitID];
-    if (cdcHit->getISuperLayer() % 2 != 0) {
-      // we do not know the right-left information
-      CDCWireHit cdcWireHit(cdcHit);
-      CDCRLWireHit cdcRLWireHit(cdcWireHit);
-      const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(cdcRLWireHit, trajectory.getTrajectory2D());
-      if (recoHit3D.isInCDC()) {
-        observationsSZ.append(recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z());
-      }
-    }
-  }
-
-  if (observationsSZ.size() > 3) {
-    // Fit the sz trajectory
-    CDCTrajectorySZ trajectorySZ;
-    zFitter.update(trajectorySZ, observationsSZ);
-    return TMath::ATan(trajectorySZ.getSZSlope());
-  } else {
-    // just a dummy value: this means the track is more or less axial only
-    return 100;
   }
 }

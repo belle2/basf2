@@ -35,10 +35,15 @@ namespace Belle2 {
     typedef unsigned int SegmentCounter;
     typedef int TrackCounter;
 
+    enum SegmentStatus {
+      ABOVE_TRACK, BENEATH_TRACK, IN_TRACK, MIX_WITH_TRACK, NAN_IN_CALCULATION
+    };
+
     /**
      * Set the given cell to zero in all matrices.
      */
-    void resetEntry(SegmentCounter segmentCounter, TrackCounter trackCounter) {
+    void resetEntry(SegmentCounter segmentCounter, TrackCounter trackCounter)
+    {
       m_fittingMatrix(segmentCounter, trackCounter) = 0;
       m_zMatrix(segmentCounter, trackCounter) = 0;
       m_zDistMatrix(segmentCounter, trackCounter) = 0;
@@ -52,12 +57,14 @@ namespace Belle2 {
     /**
      * Calculate all matrices with the fitting procedure. Must be called before accessing the matrices.
      */
-    void calculateMatrices(const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands, const StoreArray<CDCHit>& cdcHits);
+    void calculateMatrices(const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments,
+                           const StoreArray<genfit::TrackCand>& resultTrackCands, const StoreArray<CDCHit>& cdcHits);
 
     /**
      * Check if the given cell is good to work with. Checks for low theta-values and low z-distances and high chi2.
      */
-    inline bool isGoodEntry(SegmentCounter counterSegments, TrackCounter counterTracks)  {
+    inline bool isGoodEntry(SegmentCounter counterSegments, TrackCounter counterTracks)
+    {
       return (m_fittingMatrix(counterSegments, counterTracks) > m_param_minimal_chi2_stereo and
               std::abs(m_zMatrix(counterSegments, counterTracks)) < m_param_maximum_theta and
               std::abs(m_zDistMatrix(counterSegments, counterTracks)) < m_param_maximum_distance_z);
@@ -67,7 +74,8 @@ namespace Belle2 {
     /**
      * Checks if a given cell has parameters in the range of the given reference parameters.
      */
-    inline bool segmentHasTheSameParameters(SegmentCounter segmentCounter, SegmentCounter referenceSegment, TrackCounter trackCounter) {
+    inline bool segmentHasTheSameParameters(SegmentCounter segmentCounter, SegmentCounter referenceSegment, TrackCounter trackCounter)
+    {
       double zReference = getZ(referenceSegment, trackCounter);
       double zDistReference = getDistZ(referenceSegment, trackCounter);
 
@@ -81,16 +89,19 @@ namespace Belle2 {
     /**
      * Add a given segment to a track candidate and reset all entries of this segment.
      */
-    void addSegmentToResultTrack(FittingMatrix::SegmentCounter counterSegment, FittingMatrix::TrackCounter counterTrack, const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands);
+    void addSegmentToResultTrack(FittingMatrix::SegmentCounter counterSegment, FittingMatrix::TrackCounter counterTrack,
+                                 const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands);
 
-    bool isSegmentUsed(SegmentCounter segmentCounter) {
+    bool isSegmentUsed(SegmentCounter segmentCounter)
+    {
       return m_segmentIsUsed[segmentCounter];
     }
 
     /**
      * Debug print
      */
-    void print() {
+    void print()
+    {
       B2DEBUG(100, "Fitting Matrix:\n" << m_fittingMatrix)
       B2DEBUG(100, "z Matrix:\n" << m_zMatrix)
       B2DEBUG(100, "z Dist Matrix:\n" << m_zDistMatrix)
@@ -99,63 +110,72 @@ namespace Belle2 {
     /**
      * Return the chi2 of a given cell.
      */
-    double getChi2(SegmentCounter segmentCounter, TrackCounter trackCounter) const {
+    double getChi2(SegmentCounter segmentCounter, TrackCounter trackCounter) const
+    {
       return m_fittingMatrix(segmentCounter, trackCounter);
     }
 
     /**
-     * Return the theta of a given cell.
+     * Return the theta of a given cell (only for stereo).
      */
-    double getZ(SegmentCounter segmentCounter, TrackCounter trackCounter) const {
+    double getZ(SegmentCounter segmentCounter, TrackCounter trackCounter) const
+    {
       return m_zMatrix(segmentCounter, trackCounter);
     }
 
     /**
-     * Return the z distance of a given cell.
+     * Return the z distance of a given cell (only for stereo).
      */
-    double getDistZ(SegmentCounter segmentCounter, TrackCounter trackCounter) const {
+    double getDistZ(SegmentCounter segmentCounter, TrackCounter trackCounter) const
+    {
       return m_zDistMatrix(segmentCounter, trackCounter);
     }
 
     /**
      * Parameter
      */
-    double& getParamMaximumDistanceZ() {
+    double& getParamMaximumDistanceZ()
+    {
       return m_param_maximum_distance_z;
     }
 
     /**
      * Parameter
      */
-    double& getParamMaximumTheta() {
+    double& getParamMaximumTheta()
+    {
       return m_param_maximum_theta;
     }
 
     /**
      * Parameter
      */
-    double& getParamMinimalChi2() {
+    double& getParamMinimalChi2()
+    {
       return m_param_minimal_chi2;
     }
 
     /**
      * Parameter
      */
-    double& getParamMinimalChi2Stereo() {
+    double& getParamMinimalChi2Stereo()
+    {
       return m_param_minimal_chi2_stereo;
     }
 
     /**
      * Parameter
      */
-    double& getParamMinimalThetaDifference() {
+    double& getParamMinimalThetaDifference()
+    {
       return m_param_minimal_theta_difference;
     }
 
     /**
      * Parameter
      */
-    double& getParamMinimalZDifference() {
+    double& getParamMinimalZDifference()
+    {
       return m_param_minimal_z_difference;
     }
 
@@ -164,9 +184,13 @@ namespace Belle2 {
      */
     static void fillHitsInto(const TrackFindingCDC::CDCRecoSegment2D& recoSegment, genfit::TrackCand* bestTrackCand);
 
+    static SegmentStatus calculateSegmentStatus(const TrackFindingCDC::CDCRecoSegment2D& segment,
+                                                const genfit::TrackCand& resultTrackCand, const StoreArray<CDCHit>& cdcHits);
+
   private:
 
-    Eigen::MatrixXf m_fittingMatrix;  /*< The matrix with the chi2. One column corresponds to one track candiate and one row to a reco segement. */
+    Eigen::MatrixXf
+    m_fittingMatrix;  /*< The matrix with the chi2. One column corresponds to one track candiate and one row to a reco segement. */
     Eigen::MatrixXf m_zMatrix;        /*< The matrix with the theta values */
     Eigen::MatrixXf m_zDistMatrix;    /*< The matrix with the z distances */
 

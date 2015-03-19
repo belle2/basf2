@@ -59,9 +59,11 @@ namespace Belle2 {
     std::string m_param_tracksFromTrackFinder;        /**< TrackCandidates store array name from the track finder. */
     std::string m_param_splittedTracks;               /**< TrackCandidates store array name for the splitted tracks. */
     std::string m_param_cdcHits;                      /**< Name of the store array containing the hits. */
-    std::string m_param_notAssignedCDCHits;           /**< Name of the store array containing the hits not used by the track finding algorithm. This store array is created by this module. */
+    std::string
+    m_param_notAssignedCDCHits;           /**< Name of the store array containing the hits not used by the track finding algorithm. This store array is created by this module. */
 
     double m_param_minimumDistanceToSplit;            /**< Minimal distance to split up a track. This distance is measured in percentage of the whole track length. */
     bool m_param_initialAssignmentValue;              /**< If true, not add the now unassigned hits to the NotAssignedCDCHits StoreArray but only the hits from splitting. If false, add the hits from splitting and the now unassigned hits. */
+    unsigned int m_param_minimalHits;                 /**< . */
   };
 }

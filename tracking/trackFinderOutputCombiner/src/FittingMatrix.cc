@@ -32,7 +32,8 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands, const StoreArray<CDCHit>& cdcHits)
+void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoSegments,
+                                      const StoreArray<genfit::TrackCand>& resultTrackCands, const StoreArray<CDCHit>& cdcHits)
 {
   // the functions to calculate the tree parameters probability for a good fit, z-momentum, start-z-distance to IP
   const CDCSZFitter& zFitter = CDCSZFitter::getFitter();
@@ -41,12 +42,13 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
   m_fittingMatrix = Eigen::MatrixXf(recoSegments.size(), resultTrackCands.getEntries());
   m_zMatrix = Eigen::MatrixXf(recoSegments.size(), resultTrackCands.getEntries());
   m_zDistMatrix = Eigen::MatrixXf(recoSegments.size(), resultTrackCands.getEntries());
+  m_segmentIsUsed.clear();
   m_segmentIsUsed.resize(recoSegments.size(), false);
 
   TrackCounter counterTracks = 0;
-  for (const genfit::TrackCand & trackCand : resultTrackCands) {
+  for (const genfit::TrackCand& trackCand : resultTrackCands) {
     SegmentCounter counterSegment = 0;
-    for (const CDCRecoSegment2D & segment : recoSegments) {
+    for (const CDCRecoSegment2D& segment : recoSegments) {
 
       m_fittingMatrix(counterSegment, counterTracks) = 0;
       m_zMatrix(counterSegment, counterTracks) = 0;
@@ -79,7 +81,7 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
         CDCObservations2D observationsCircle;
 
         // Add the hits from the segment to the circle fit
-        for (const CDCRecoHit2D & recoHit2D : segment) {
+        for (const CDCRecoHit2D& recoHit2D : segment) {
           double currentAngle = recoHit2D.getPerpS(trajectory.getTrajectory2D());
           if (currentAngle < 1.5 * maximumAngle and currentAngle > 0.5 * minimumAngle)
             observationsCircle.append(recoHit2D);
@@ -104,7 +106,7 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
         CDCObservations2D observationsSZ;
 
         // Add the hits from the segment to the sz fit
-        for (const CDCRecoHit2D & recoHit2D : segment) {
+        for (const CDCRecoHit2D& recoHit2D : segment) {
           const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory.getTrajectory2D());
           double currentAngle = recoHit3D.getPerpS(trajectory.getTrajectory2D());
           if (recoHit3D.isInCDC() and currentAngle < 1.5 * maximumAngle and currentAngle > 0.5 * minimumAngle) {
@@ -131,7 +133,7 @@ void FittingMatrix::fillHitsInto(const CDCRecoSegment2D& recoSegment, genfit::Tr
 {
   // the sorting parameter is just used to reinforce the order in the range.
   int sortingParameter = -1;
-  for (const auto & genHit : recoSegment) {
+  for (const auto& genHit : recoSegment) {
     ++sortingParameter;
     const CDCRLWireHit& rlWireHit = genHit->getRLWireHit();
     const CDCWireHit& wireHit = rlWireHit.getWireHit();
@@ -156,7 +158,8 @@ void FittingMatrix::fillHitsInto(const CDCRecoSegment2D& recoSegment, genfit::Tr
 }
 
 
-void FittingMatrix::addSegmentToResultTrack(FittingMatrix::SegmentCounter counterSegment, FittingMatrix::TrackCounter counterTrack, const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands)
+void FittingMatrix::addSegmentToResultTrack(FittingMatrix::SegmentCounter counterSegment, FittingMatrix::TrackCounter counterTrack,
+                                            const std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, const StoreArray<genfit::TrackCand>& resultTrackCands)
 {
   const TrackFindingCDC::CDCRecoSegment2D& recoSegment = recoSegments[counterSegment];
   genfit::TrackCand* trackCandidate = resultTrackCands[counterTrack];
@@ -169,5 +172,136 @@ void FittingMatrix::resetSegment(SegmentCounter counterSegment)
 {
   for (TrackCounter counterTracks = 0; counterTracks < m_fittingMatrix.cols(); counterTracks++) {
     resetEntry(counterSegment, counterTracks);
+  }
+}
+
+
+FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCRecoSegment2D& segment,
+    const genfit::TrackCand& resultTrackCand, const StoreArray<CDCHit>& cdcHits)
+{
+
+  std::list<double> perpSList;
+  std::list<double> perpSListOfSegment;
+
+  CDCTrajectory3D trajectory(resultTrackCand.getPosSeed(), resultTrackCand.getMomSeed(), resultTrackCand.getChargeSeed());
+  const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
+  double radius = trajectory2D.getGlobalCircle().absRadius();
+
+  const CDCRiemannFitter& circleFitter = CDCRiemannFitter::getFitter();
+
+  std::vector<int> hitIDs = resultTrackCand.getHitIDs(Const::CDC);
+
+  // calculate all circle segments lengths
+  for (unsigned int cdcHitID : hitIDs) {
+    CDCHit* cdcHit = cdcHits[cdcHitID];
+    CDCWireHit wireHit(cdcHit);
+    double perpS;
+    if (wireHit.getStereoType() == AXIAL) {
+      perpS = wireHit.getPerpS(trajectory2D);
+    } else {
+      TrackFindingCDC::CDCRecoHit3D recoHit3D = TrackFindingCDC::CDCRecoHit3D::reconstruct(TrackFindingCDC::CDCRLWireHit(wireHit),
+                                                trajectory2D);
+      if (not recoHit3D.isInCDC())
+        return SegmentStatus::NAN_IN_CALCULATION;
+      perpS = recoHit3D.getPerpS();
+    }
+
+    if (perpS < 0) {
+      perpS = perpS + 2 * TMath::Pi() * radius;
+    }
+
+    perpSList.push_back(perpS);
+  }
+
+  // sort the hits according to their segment length
+  perpSList.sort();
+
+
+  double endOfTrack = perpSList.back();
+  double beginningOfTrack = perpSList.front();
+
+  CDCObservations2D observationsCircle;
+  for (const CDCRecoHit2D& recoHit : segment) {
+    double perpS;
+    if (recoHit.getStereoType() == AXIAL) {
+      perpS = recoHit.getPerpS(trajectory2D);
+      observationsCircle.append(recoHit);
+    } else {
+      TrackFindingCDC::CDCRecoHit3D recoHit3D = TrackFindingCDC::CDCRecoHit3D::reconstruct(recoHit, trajectory2D);
+      perpS = recoHit3D.getPerpS();
+    }
+
+    if (perpS < 0) {
+      perpS = perpS + 2 * TMath::Pi() * radius;
+    }
+
+    perpSListOfSegment.push_back(perpS);
+  }
+
+  // sort the hits according to their segment length
+  perpSListOfSegment.sort();
+
+  // does segment fit good to track?
+  double endOfSegment = perpSListOfSegment.back();
+  double beginningOfSegment = perpSListOfSegment.front();
+
+  if (std::isnan(endOfSegment) or std::isnan(beginningOfSegment)) {
+    return SegmentStatus::NAN_IN_CALCULATION;
+  } else if (endOfSegment > endOfTrack) {
+    return SegmentStatus::ABOVE_TRACK;
+  } else if (beginningOfSegment < beginningOfTrack) {
+    return SegmentStatus::BENEATH_TRACK;
+  } else {
+
+    // the segment lays in the track. We try to fit.
+    int beginningIndex = perpSList.size();
+    int endIndex = perpSList.size();
+
+    unsigned int iter = 0;
+
+    for (double perpS : perpSList) {
+      if (beginningIndex == perpSList.size() and perpS > beginningOfSegment) {
+        if (iter == 0)
+          beginningIndex = iter;
+        else
+          beginningIndex = iter - 1;
+      }
+      if (perpS < endOfSegment)
+        endIndex = iter;
+
+      iter++;
+    }
+
+    if (segment.getStereoType() == AXIAL) {
+      beginningIndex = std::max(0, beginningIndex - 5);
+      endIndex = std::min(static_cast<int>(perpSList.size()), endIndex + 5);
+
+      for (unsigned int counter = beginningIndex; counter < endIndex; counter++) {
+        CDCHit* cdcHit = cdcHits[hitIDs[counter]];
+        CDCWireHit wireHit(cdcHit);
+        if (wireHit.getStereoType() == AXIAL) {
+          observationsCircle.append(wireHit);
+        } else {
+          TrackFindingCDC::CDCRecoHit3D recoHit3D = TrackFindingCDC::CDCRecoHit3D::reconstruct(TrackFindingCDC::CDCRLWireHit(wireHit),
+                                                    trajectory2D);
+          observationsCircle.append(recoHit3D);
+        }
+      }
+
+      CDCTrajectory2D segmentTrajectory;
+      circleFitter.update(segmentTrajectory, observationsCircle);
+
+      if (TMath::Prob(segmentTrajectory.getChi2(), segmentTrajectory.getNDF()) > 0)
+        return SegmentStatus::IN_TRACK;
+      else
+        return SegmentStatus::NAN_IN_CALCULATION;
+
+    } else {
+      if (endIndex - beginningIndex == 0)
+        return SegmentStatus::IN_TRACK;
+      else
+        return SegmentStatus::MIX_WITH_TRACK;
+    }
+
   }
 }

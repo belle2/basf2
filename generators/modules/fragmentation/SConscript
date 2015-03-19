@@ -1,5 +1,7 @@
 Import('env')
 
+env['CONTINUE'] = False
+
 env['LIBS'] = ['mdst_dataobjects', 'framework', 'EvtGenExternal', 'EvtGen']
 
 Return('env')

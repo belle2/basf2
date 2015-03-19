@@ -489,12 +489,12 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   // TODO: check
   // TODO: ECLCluster is an unclear mess
   float covarianceMatrix[6];
-  covarianceMatrix[0] = ecl.error(0);
+  covarianceMatrix[0] = sqrt(ecl.error(0)); // error on energy
   covarianceMatrix[1] = ecl.error(1);
-  covarianceMatrix[2] = ecl.error(2);
+  covarianceMatrix[2] = sqrt(ecl.error(2)); // error on phi
   covarianceMatrix[3] = ecl.error(3);
   covarianceMatrix[4] = ecl.error(4);
-  covarianceMatrix[5] = ecl.error(5);
+  covarianceMatrix[5] = sqrt(ecl.error(5)); // error on theta
   eclCluster->setError(covarianceMatrix);
 
   eclCluster->setEnedepSum(eclAux.mass());

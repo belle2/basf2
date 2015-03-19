@@ -68,16 +68,14 @@ class CDCLegendre(StandardEventGenerationRun):
         background_hit_finder_module.param("TMVACut", float(self.tmva_cut))
 
         cdctracking = basf2.register_module('CDCLegendreTracking')
-        cdctracking.param({
-            'CDCHitsColName': "GoodCDCHits"
-        })
-
         cdctracking.set_log_level(basf2.LogLevel.WARNING)
 
+        if self.tmva_cut > 0:
+            cdctracking.param('CDCHitsColName', "GoodCDCHits")
+
         cdc_stereo_combiner = basf2.register_module('CDCLegendreHistogramming')
-        cdc_stereo_combiner.param({
-            'CDCHitsColName': "GoodCDCHits"
-        })
+        if self.tmva_cut > 0:
+            cdc_stereo_combiner.param('CDCHitsColName', "GoodCDCHits")
 
         cdc_stereo_combiner.set_log_level(basf2.LogLevel.WARNING)
 
@@ -107,16 +105,17 @@ class CDCLegendre(StandardEventGenerationRun):
 
         main_path.add_module(track_finder_mc_truth_module)
 
-        if(self.tmva_cut > 0):
+        if self.tmva_cut > 0:
             main_path.add_module(background_hit_finder_module)
 
         main_path.add_module(cdctracking)
         main_path.add_module(cdc_stereo_combiner)
-        main_path.add_module(
-            ReassignHits(
-                old_cdc_hits_store_array_name="GoodCDCHits",
-                new_cdc_hits_store_array_name="CDCHits",
-                track_cands_store_array_name="TrackCands"))
+        if self.tmva_cut > 0:
+            main_path.add_module(
+                ReassignHits(
+                    old_cdc_hits_store_array_name="GoodCDCHits",
+                    new_cdc_hits_store_array_name="CDCHits",
+                    track_cands_store_array_name="TrackCands"))
         main_path.add_module(mc_track_matcher_module)
 
         main_path.add_module(validation_module)
@@ -125,7 +124,7 @@ class CDCLegendre(StandardEventGenerationRun):
 
 
 def run_many_times():
-    for tmva_cut in np.arange(0.6, 1.0, 0.1):
+    for tmva_cut in np.arange(0, 1.0, 0.1):
         run = CDCLegendre()
         run.tmva_cut = tmva_cut
         run.configure_and_execute_from_commandline()

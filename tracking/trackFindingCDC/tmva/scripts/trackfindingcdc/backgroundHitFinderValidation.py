@@ -86,9 +86,6 @@ class BackgroundHitFinderValidationModule(harvesting.HarvestingModule):
 
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
 
-    def initialize(self):
-        super(BackgroundHitFinderValidationModule, self).initialize()
-
     def prepare(self):
         self.mc_hit_lookup.fill()
 

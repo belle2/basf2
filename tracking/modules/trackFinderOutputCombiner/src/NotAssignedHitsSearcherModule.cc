@@ -65,13 +65,14 @@ void NotAssignedHitsSearcherModule::initialize()
 {
   StoreArray<genfit::TrackCand> trackCands(m_param_tracksFromTrackFinder);
   StoreArray<CDCHit> cdcHits(m_param_cdcHits);
+  StoreArray<CDCHit> originalCDCHits;
 
   trackCands.isRequired();
   cdcHits.isRequired();
 
   StoreArray<CDCHit> notAssignedCDCHits(m_param_notAssignedCDCHits);
   notAssignedCDCHits.registerInDataStore();
-  notAssignedCDCHits.registerRelationTo(cdcHits);
+  notAssignedCDCHits.registerRelationTo(originalCDCHits);
 
   StoreArray<genfit::TrackCand> splittedTrackCands(m_param_splittedTracks);
   splittedTrackCands.registerInDataStore();
@@ -82,6 +83,7 @@ void NotAssignedHitsSearcherModule::event()
   StoreArray<genfit::TrackCand> trackCands(m_param_tracksFromTrackFinder);
   StoreArray<genfit::TrackCand> splittedTrackCands(m_param_splittedTracks);
   StoreArray<CDCHit> cdcHits(m_param_cdcHits);
+  StoreArray<CDCHit> originalCDCHits;
   StoreArray<CDCHit> notAssignedCDCHits(m_param_notAssignedCDCHits);
 
   splittedTrackCands.create();
@@ -218,7 +220,13 @@ void NotAssignedHitsSearcherModule::event()
     if (not isAssigned[cdcHitID]) {
       CDCHit* oldCDCHit = cdcHits[cdcHitID];
       CDCHit* newCDCHit = notAssignedCDCHits.appendNew(*oldCDCHit);
-      newCDCHit->addRelationTo(oldCDCHit);
+
+      if (m_param_cdcHits != "CDCHits") {
+        CDCHit* originalCDCHit = oldCDCHit->getRelated<CDCHit>("CDCHits");
+        newCDCHit->addRelationTo(originalCDCHit);
+      } else {
+        newCDCHit->addRelationTo(oldCDCHit);
+      }
     }
   }
 }

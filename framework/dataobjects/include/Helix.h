@@ -251,13 +251,13 @@ namespace Belle2 {
      *  The derivatives of the arcLength2D are in the 6th row of the matrix.
      *
      *  @param by              Vector by which the origin of the coordinate system should be moved.
+     *  @param jacobian[out]   The jacobian matrix containing the derivatives of the five helix parameters after the move relative the orignal parameters.
      *  @param expandBelowChi  Control parameter below, which absolute value of chi an expansion of divergent terms shall be used.
      *                         This parameter exists for testing the consistency of the expansion with the closed form.
      *                         In other applications the parameter should remain at its default value.
-     *  @param jacobian[out]   The jacobian matrix containing the derivatives of the five helix parameters after the move relative the orignal parameters.
      *
      */
-    void calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi, TMatrixD& jacobian) const;
+    void calcPassiveMoveByJacobian(const TVector3& by, TMatrixD& jacobian, const double expandBelowChi = M_PI / 8) const;
 
   public:
     /** Reverses the direction of travel of the helix in place.

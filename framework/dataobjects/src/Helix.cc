@@ -245,12 +245,12 @@ float Helix::passiveMoveBy(const TVector3& by)
 TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi) const
 {
   TMatrixD jacobian(5, 5);
-  calcPassiveMoveByJacobian(by, expandBelowChi, jacobian);
+  calcPassiveMoveByJacobian(by, jacobian, expandBelowChi);
   return jacobian;
 }
 
 
-void Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi, TMatrixD& jacobian) const
+void Helix::calcPassiveMoveByJacobian(const TVector3& by, TMatrixD& jacobian, const double expandBelowChi) const
 {
   // 0. Preparations
   // Initialise the return value to a unit matrix
@@ -307,7 +307,7 @@ void Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBel
 
   jacobian(iPhi0, iD0) = - dArcLength2D_dD0 * omega;
   jacobian(iPhi0, iPhi0) = u * UOrthogonal / USquared;
-  jacobian(iPhi0, iOmega) =  -deltaParallel / U / U;
+  jacobian(iPhi0, iOmega) =  -deltaParallel / USquared;
 
   // For jacobian(iPhi0, iOmega) we have to dig deeper
   // since the normal equations have a divergence for omega -> 0.

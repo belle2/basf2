@@ -56,6 +56,8 @@ void BackgroundHitFinderModule::initialize()
   // initialize the reader object
   m_expert.initializeReader([&](TMVA::Reader & reader) {
     reader.AddVariable("avg_n_neignbors", &tmvaVariables.meanNNeighbors);
+    reader.AddVariable("distance_to_superlayer_center", &tmvaVariables.distanceToSuperlayerCenter);
+    reader.AddVariable("is_stereo", &tmvaVariables.isStereo);
     reader.AddVariable("mean_drift_length", &tmvaVariables.meanDriftLength);
     reader.AddVariable("mean_inner_distance", &tmvaVariables.meanInnerDistance);
     reader.AddVariable("size", &tmvaVariables.size);
@@ -83,6 +85,17 @@ void BackgroundHitFinderModule::event()
   deleteBadSegmentsUsingTMVAMethod();
 }
 
+void BackgroundHitFinderModule::prepareSuperLayerCenterArray(const CDCWireTopology& wireTopology)
+{
+
+  m_superLayerCenters.clear();
+  m_superLayerCenters.reserve(wireTopology.getNSuperLayers());
+
+  for (const CDCWireSuperLayer& superLayer : wireTopology.getWireSuperLayers()) {
+    m_superLayerCenters.push_back(0.5 * (superLayer.getInnerPolarR() + superLayer.getOuterPolarR()));
+  }
+}
+
 void BackgroundHitFinderModule::deleteBadSegmentsUsingTMVAMethod()
 {
   StoreArray<CDCHit> goodCDCHits(m_param_goodCDCHitsStoreObjName);
@@ -105,7 +118,8 @@ void BackgroundHitFinderModule::deleteBadSegmentsUsingTMVAMethod()
 
 void BackgroundHitFinderModule::setVariables(struct TMVAVariables& tmvaVariables, const CDCWireHitCluster& cluster)
 {
-  tmvaVariables.superlayerID = cluster.getISuperLayer();
+  unsigned int superlayerID = cluster.getISuperLayer();
+  tmvaVariables.isStereo = static_cast<float>(superlayerID % 2 == 1);
   tmvaVariables.size = cluster.size();
 
   tmvaVariables.totalNNeighbors = 0;
@@ -139,6 +153,10 @@ void BackgroundHitFinderModule::setVariables(struct TMVAVariables& tmvaVariables
     tmvaVariables.varianceDriftLength = -1;
   }
 
+
+  tmvaVariables.distanceToSuperlayerCenter =  m_superLayerCenters[superlayerID] - 1.0 * tmvaVariables.totalInnerDistance /
+                                              tmvaVariables.size;
+  tmvaVariables.superlayerID = superlayerID;
   tmvaVariables.meanDriftLength = tmvaVariables.totalDriftLength / tmvaVariables.size;
   tmvaVariables.meanInnerDistance = tmvaVariables.totalInnerDistance / tmvaVariables.size;
   tmvaVariables.meanNNeighbors = tmvaVariables.totalNNeighbors / tmvaVariables.size;
@@ -148,6 +166,8 @@ void BackgroundHitFinderModule::generateClustersWithAutomaton()
 {
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+
+  prepareSuperLayerCenterArray(wireTopology);
 
   m_clusters.clear();
   m_clusters.reserve(100);

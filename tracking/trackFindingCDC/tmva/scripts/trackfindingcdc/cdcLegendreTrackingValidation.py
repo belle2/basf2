@@ -106,7 +106,10 @@ class CDCLegendre(StandardEventGenerationRun):
             expert_level=2)
 
         main_path.add_module(track_finder_mc_truth_module)
-        main_path.add_module(background_hit_finder_module)
+
+        if(self.tmva_cut > 0):
+            main_path.add_module(background_hit_finder_module)
+
         main_path.add_module(cdctracking)
         main_path.add_module(cdc_stereo_combiner)
         main_path.add_module(

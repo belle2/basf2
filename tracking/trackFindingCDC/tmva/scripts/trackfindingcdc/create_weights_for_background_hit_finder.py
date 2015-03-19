@@ -59,12 +59,23 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
                                                             output_file_name=output_file_name)
 
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
+        self.superlayer_centers = list()
 
     def initialize(self):
         super(ClusterFilterValidationModule, self).initialize()
 
     def prepare(self):
         self.mc_hit_lookup.fill()
+
+        # fill super layer look up
+        wireTopology = Belle2.TrackFindingCDC.CDCWireTopology.getInstance()
+
+        self.superlayer_centers = [
+            0.5 *
+            (
+                wireTopology.getWireSuperLayer(superlayerID).getInnerPolarR() +
+                wireTopology.getWireSuperLayer(superlayerID).getOuterPolarR()) for superlayerID in xrange(
+                wireTopology.getNSuperLayers())]
 
     def pick(self, facet):
         return True
@@ -106,6 +117,10 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
         else:
             variance_drift_length = -1
 
+        is_stereo = superlayer_id % 2 == 1
+
+        distance_to_superlayer_center = self.superlayer_centers[superlayer_id] - 1.0 * total_inner_distance / size
+
         return dict(
             superlayer_id=superlayer_id,
             size=size,
@@ -118,6 +133,8 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
             variance_drift_length=variance_drift_length,
             total_inner_distance=total_inner_distance,
             mean_inner_distance=1.0 * total_inner_distance / size,
+            is_stereo=is_stereo,
+            distance_to_superlayer_center=distance_to_superlayer_center
         )
 
     save_tree = refiners.save_tree(folder_name="tree")

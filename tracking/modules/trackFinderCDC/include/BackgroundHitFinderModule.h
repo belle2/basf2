@@ -20,6 +20,7 @@ namespace Belle2 {
     class CDCWireHitCluster;
     class CDCWireHit;
     class Expert;
+    class CDCWireTopology;
   }
 
   class BackgroundHitFinderModule: public Belle2::TrackFinderCDCBaseModule {
@@ -36,6 +37,8 @@ namespace Belle2 {
 
       float totalInnerDistance;
       float meanInnerDistance;
+      float isStereo;
+      float distanceToSuperlayerCenter;
     } tmvaVariables;
 
   public:
@@ -58,6 +61,8 @@ namespace Belle2 {
     /// Before using the TMVA we should set the variables calculated from the cluster
     void setVariables(struct TMVAVariables& tmvaVariables, const TrackFindingCDC::CDCWireHitCluster& cluster);
 
+    // Prepare the super layer center array with information coming from the CDCWireTopology object.
+    void prepareSuperLayerCenterArray(const TrackFindingCDC::CDCWireTopology& wireTopology);
 
     // parameters
     std::string m_param_clustersStoreObjName;   /**< Name of the output StoreObjPtr of the clusters generated within this module. */
@@ -74,7 +79,10 @@ namespace Belle2 {
     /// Vector with the found clusters
     std::vector<TrackFindingCDC::CDCWireHitCluster> m_clusters;
 
-    // TMVA Expert
+    /// TMVA Expert to decide if a cluster is background or not
     TrackFindingCDC::Expert m_expert;
+
+    /// the polar R of the super layer centers
+    std::vector<double> m_superLayerCenters;
   };
 }

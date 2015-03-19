@@ -215,5 +215,5 @@ def plot_many_times():
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
-    # run_many_times()
+    run_many_times()
     plot_many_times()

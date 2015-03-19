@@ -56,14 +56,18 @@ namespace Belle2 {
     std::vector<std::tuple<std::string, Variable::Cut::Parameter>> emptyDecayStringsAndCuts;
 
     addParam("decayStringsWithCuts", m_decayStringsWithCuts,
-             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString and https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions).", emptyDecayStringsAndCuts);
+             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString and https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions).",
+             emptyDecayStringsAndCuts);
 
-    addParam("useMCParticles", m_useMCParticles, "Use MCParticles instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+    addParam("useMCParticles", m_useMCParticles,
+             "Use MCParticles instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
-    addParam("addDaughters", m_addDaughters, "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set", false);
+    addParam("addDaughters", m_addDaughters,
+             "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set",
+             false);
   }
 
   ParticleLoaderModule::~ParticleLoaderModule()
@@ -252,8 +256,8 @@ namespace Belle2 {
       // TODO: make it const once V0 dataobject is corrected (const qualifier properly applied)
       V0* v0 = V0s[i];
 
-      std::pair<Track*, Track*> v0Tracks = v0->getTrackPtrs();
-      std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResultPtrs();
+      std::pair<Track*, Track*> v0Tracks = v0->getTracks();
+      std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
 
       // load Kshort -> pi- pi+
       Particle piP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, Const::pion);

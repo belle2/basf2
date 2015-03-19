@@ -86,7 +86,7 @@ namespace Belle2 {
         tau.push_back(1);
       }
       std::vector<float> cov(15);
-      for (auto & element : cov) {
+      for (auto& element : cov) {
         element = generator.Gaus(1e-4);
       }
       Belle2::TrackFitResult myResult(tau, cov, pType, pValue, 0, 0);

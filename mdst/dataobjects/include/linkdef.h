@@ -57,4 +57,11 @@
     }\
   }"
 
+#pragma read sourceClass="Belle2::TrackFitResult" version="[4]" \
+  source="const uint32_t m_hitPatternCDCInitializer; const uint32_t m_hitPatternCDCInitializer_part2" \
+  targetClass="Belle2::TrackFitResult" target="m_hitPatternCDCInitializer" \
+  code="{ \
+		m_hitPatternCDCInitializer = ((long long int) onfile.m_hitPatternCDCInitializer_part2 << 32) | onfile.m_hitPatternCDCInitializer; \
+	}"
+
 #endif

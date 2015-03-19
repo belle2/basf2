@@ -22,7 +22,6 @@
 #include <TMatrixDSym.h>
 
 #include <stdint.h>
-#include <cstdlib>
 #include <vector>
 
 namespace Belle2 {
@@ -62,7 +61,7 @@ namespace Belle2 {
     TrackFitResult(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
                    const short int charge, const Const::ParticleType& particleType, const float pValue,
                    const float bField,
-                   const long long int hitPatternCDCInitializer, const uint32_t hitPatternVXDInitializer);
+                   const uint64_t hitPatternCDCInitializer, const uint32_t hitPatternVXDInitializer);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -74,7 +73,7 @@ namespace Belle2 {
      */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                    const Const::ParticleType& particleType, const float pValue,
-                   const long long int hitPatternCDCInitializer, const uint32_t hitPatternVXDInitializer);
+                   const uint64_t hitPatternCDCInitializer, const uint32_t hitPatternVXDInitializer);
 
     /** Getter for vector of position at closest approach of track in r/phi projection. */
     TVector3 getPosition() const;
@@ -104,7 +103,8 @@ namespace Belle2 {
     TMatrixDSym getCovariance6(const float bField = 1.5) const;
 
     /** Getter for ParticleCode of the mass hypothesis of the track fit. */
-    Const::ParticleType getParticleType() const {
+    Const::ParticleType getParticleType() const
+    {
       return Const::ParticleType(m_pdg);
     }
 
@@ -112,12 +112,14 @@ namespace Belle2 {
      *
      *  @TODO For very small values, we might be unsure and return zero.
      */
-    short getChargeSign() const {
+    short getChargeSign() const
+    {
       return getOmega() >= 0 ? 1 : -1;
     }
 
     /** Getter for Chi2 Probability of the track fit. */
-    float getPValue() const {
+    float getPValue() const
+    {
       return m_pValue;
     }
 
@@ -173,13 +175,14 @@ namespace Belle2 {
     TMatrixDSym getCovariance5() const;
 
     /** Getter for the hit pattern in the CDC; @sa HitPatternCDC */
-    HitPatternCDC getHitPatternCDC()const {
-      long long int hitPatternCDCInitializer = ((long long int) m_hitPatternCDCInitializer_part2 << 32) | m_hitPatternCDCInitializer;
-      return HitPatternCDC(hitPatternCDCInitializer);
+    HitPatternCDC getHitPatternCDC() const
+    {
+      return HitPatternCDC(m_hitPatternCDCInitializer);
     }
 
     /** Getter for the hit pattern in the VXD; @sa HitPatternVXD */
-    HitPatternVXD getHitPatternVXD()const {
+    HitPatternVXD getHitPatternVXD() const
+    {
       return HitPatternVXD(m_hitPatternVXDInitializer);
     }
 
@@ -306,9 +309,7 @@ namespace Belle2 {
      *
      *  @sa HitPatternCDC
      */
-    const uint32_t m_hitPatternCDCInitializer; /**< Member for initializing the information about hits in the CDC, from bit 0 to 31*/
-    const uint32_t m_hitPatternCDCInitializer_part2; /**< Member for initializing the information about hits in the CDC, from bit 32 to 63*/
-
+    uint64_t m_hitPatternCDCInitializer;
     /** Member for initializing the information about hits in the VXD.
      *
      *  @sa HitPatternVXD
@@ -316,7 +317,7 @@ namespace Belle2 {
     const uint32_t m_hitPatternVXDInitializer;
 
     /** Streamer version. */
-    ClassDef(TrackFitResult, 4);
+    ClassDef(TrackFitResult, 5);
   };
 }
 

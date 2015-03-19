@@ -41,7 +41,7 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
 # Magnetic field turned off
-geometry.param('components', ['BeamPipe', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD'])
 
 # Cosmics generator
 # to run the framework the used modules need to be registered
@@ -96,9 +96,12 @@ param_mctrackfinder = {
 mctrackfinder.param(param_mctrackfinder)
 
 # ----------------------------
-# Kalman fitting
+# GBL fitting
 # ----------------------------
-genfit = register_module('GenFitter')
+gbl = register_module('GBLfit')
+gbl.param('UseClusters', True)
+gbl.param('milleFileName', 'cosmicsVXDideal.mille')
+gbl.param('chi2Cut', 0.0)
 
 # ---------------------------------------
 # Data Output of collections to ROOT file
@@ -137,7 +140,7 @@ main.add_module(SVDDigi)
 main.add_module(PXDClust)
 main.add_module(SVDClust)
 main.add_module(mctrackfinder)
-main.add_module(genfit)
+main.add_module(gbl)
 main.add_module(output)
 # main.add_module(display)
 main.add_module(progress)

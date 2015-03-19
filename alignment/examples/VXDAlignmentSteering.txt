@@ -1,6 +1,8 @@
 Cfiles
 ipVXD.mille ! file with binary data (one per line)
 cosmicsVXD.mille ! file with binary data (one per line)
+!ipVXDideal.mille ! file with binary data (one per line)
+!cosmicsVXDideal.mille ! file with binary data (one per line)
 
 Parameter ! fix some parameters
 1 0. -1. ! fix parameter 1

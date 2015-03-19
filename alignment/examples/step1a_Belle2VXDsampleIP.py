@@ -92,10 +92,12 @@ param_mctrackfinder = {
 mctrackfinder.param(param_mctrackfinder)
 
 # ----------------------------
-# Kalman fitting
+# GBL fitting
 # ----------------------------
-genfit = register_module('GenFitter')
-genfit.param('UseClusters', True)
+gbl = register_module('GBLfit')
+gbl.param('UseClusters', True)
+gbl.param('milleFileName', 'ipVXDideal.mille')
+gbl.param('chi2Cut', 0.0)
 
 # ---------------------------------------
 # Data Output of collections to ROOT file
@@ -133,7 +135,7 @@ main.add_module(SVDDigi)
 main.add_module(PXDClust)
 main.add_module(SVDClust)
 main.add_module(mctrackfinder)
-main.add_module(genfit)
+main.add_module(gbl)
 main.add_module(output)
 # main.add_module(display)
 main.add_module(progress)

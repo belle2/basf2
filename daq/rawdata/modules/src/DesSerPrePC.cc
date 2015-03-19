@@ -30,7 +30,7 @@ using namespace Belle2;
 //                 Implementation
 //----------------------------------------------------------------
 
-DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send)
+DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send, int shmflag)
 {
   m_num_connections = 1;
 
@@ -44,6 +44,7 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
   //  m_hostname_local = "localhost";
   m_hostname_local = host_send;
 
+  m_shmflag = shmflag;
 
   B2INFO("DeSerializerPrePC: Constructor done.");
 }
@@ -64,7 +65,8 @@ int* DesSerPrePC::getPreAllocBuf()
     m_num_usedbuf++;
   } else {
     char err_buf[500];
-    sprintf(err_buf, "No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
+    sprintf(err_buf,
+            "No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
             m_num_usedbuf, NUM_PREALLOC_BUF);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -178,7 +180,8 @@ int DesSerPrePC::Connect()
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
       char err_buf[100];
-      sprintf(err_buf, "hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(), strerror(errno));
+      sprintf(err_buf, "hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(),
+              strerror(errno));
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
@@ -302,7 +305,8 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
       printf("[DEBUG] *******HDR**********\n");
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
+      sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes,
+              send_hdr.GetTotalNwords());
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(123456);
       exit(1);
@@ -395,7 +399,8 @@ void DesSerPrePC::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* delete_fla
   int num_entries = temp_raw_datablk->GetNumEntries();
   if (num_entries != num_events_in_sendblock * num_nodes_in_sendblock) {
     char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
+    sprintf(err_buf,
+            "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
             num_nodes_in_sendblock, num_events_in_sendblock, num_entries);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);

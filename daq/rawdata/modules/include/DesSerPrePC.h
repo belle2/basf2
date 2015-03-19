@@ -60,7 +60,7 @@ namespace Belle2 {
   public:
 
     //! Constructor / Destructor
-    DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send);
+    DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send, int shmflag);
     //    DesSerPrePC();
     virtual ~DesSerPrePC();
 
@@ -136,7 +136,8 @@ namespace Belle2 {
     //! calculate checksum
     unsigned int calcXORChecksum(int* buf, int nwords);
 
-    void clearNumUsedBuf() {
+    void clearNumUsedBuf()
+    {
       m_num_usedbuf = 0;
       return ;
     }

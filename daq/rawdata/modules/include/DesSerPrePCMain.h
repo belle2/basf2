@@ -82,6 +82,8 @@ namespace Belle2 {
     //! Compression Level
     int m_compressionLevel;
 
+    //! Use Network shared memory -> 1; Without Nshm -> 0
+    int m_shmflag;
 
     // Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;

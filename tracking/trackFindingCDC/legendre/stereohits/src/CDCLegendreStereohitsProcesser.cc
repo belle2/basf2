@@ -1,4 +1,4 @@
-#include <tracking/trackFindingCDC/legendre/CDCLegendreStereohitsProcesser.h>
+#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
 
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 

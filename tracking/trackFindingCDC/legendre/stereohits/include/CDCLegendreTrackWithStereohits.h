@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreStereohit.h>
+#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohit.h>
 
 #include "genfit/TrackCand.h"
 
@@ -36,7 +36,8 @@ namespace Belle2 {
     class TrackCandidateWithStereoHits : public TrackCandidate {
     public:
 
-      TrackCandidateWithStereoHits(double theta, double r, int charge, const std::vector<TrackHit*>& trackHitList, genfit::TrackCand* trackCand):
+      TrackCandidateWithStereoHits(double theta, double r, int charge, const std::vector<TrackHit*>& trackHitList,
+                                   genfit::TrackCand* trackCand):
         TrackCandidate(theta, r, charge, trackHitList), m_trackCand(trackCand), m_polarAngle(0) {};
 
       ~TrackCandidateWithStereoHits() {};

@@ -12,7 +12,7 @@
 
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreStereohit.h>
+#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>

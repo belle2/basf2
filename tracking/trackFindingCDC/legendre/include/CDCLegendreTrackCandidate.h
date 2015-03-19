@@ -67,12 +67,14 @@ namespace Belle2 {
                      const std::vector<TrackHit*>& trackHitList);
 
       /** Return vector of assigned hits.*/
-      inline std::vector<TrackHit*>& getTrackHits() {
+      inline std::vector<TrackHit*>& getTrackHits()
+      {
         return m_TrackHits;
       }
 
       /** Return pattern of assigned axial and stereo hits.*/
-      inline HitPatternCDC getHitPattern() const {
+      inline HitPatternCDC getHitPattern() const
+      {
         return m_hitPattern;
       }
 
@@ -80,7 +82,8 @@ namespace Belle2 {
        * Return theta value of track.
        * Important: this theta angle is value given by Legendre finding, not an azimuthal (phi) angle; mainly used in estimation of center of track trajectory
        */
-      inline double getTheta() const {
+      inline double getTheta() const
+      {
         return m_theta;
       }
 
@@ -88,32 +91,44 @@ namespace Belle2 {
        * Return r value of track.
        * Important: this r value is signed curvature of track; mainly used in estimation of center of track trajectory
        */
-      inline double getR() const {
+      inline double getR() const
+      {
         return m_r;
       }
 
       /** Return radius of track trajectory */
-      inline double getRadius() const {
+      inline double getRadius() const
+      {
         return fabs(1. / m_r);
       }
 
       /** Return pT of the track candidate */
-      inline double getPt() const {
+      inline double getPt() const
+      {
         return fabs(1 / m_r) * 1.5 * 0.00299792458;
       }
 
       /** Return azimuthal angle of the track (phi) */
-      double getPhi() const {
+      double getPhi() const
+      {
         return (m_r > 0.) ? (m_theta + m_PI * getChargeSign() / 2.) : (m_theta + m_PI * getChargeSign() / 2. + m_PI);
       }
 
+      /** convert rho (one of the axis in legendre phase-space) to Pt (in GeV) */
+      static double convertRhoToPt(double rho) {return 1.5 * 0.00299792458 / rho; };
+
+      /** convert rho (one of the axis in legendre phase-space) to Pt (in GeV) */
+      static double convertPtToRho(double Pt) {return 1.5 * 0.00299792458 / Pt; };
+
       /** Return Xc value of track - X projection of track's trajectory center.*/
-      inline double getXc() const {
+      inline double getXc() const
+      {
         return m_xc;
       }
 
       /** Return Yc value of track - Y projection of track's trajectory center.*/
-      inline double getYc() const {
+      inline double getYc() const
+      {
         return m_yc;
       }
 
@@ -121,13 +136,15 @@ namespace Belle2 {
        * Return charge hypotheses of track.
        * Might also be curler or two tracks.
        */
-      inline int getCharge() const {
+      inline int getCharge() const
+      {
         return m_charge;
       }
 
 
       /** Reestimate charge sign */
-      void reestimateCharge() {
+      void reestimateCharge()
+      {
         m_charge = getChargeAssumption(m_theta, m_r, m_TrackHits);
       }
 
@@ -138,17 +155,20 @@ namespace Belle2 {
       int getChargeSign() const;
 
       /** Return number of assigned hits.*/
-      inline int getNHits() const {
+      inline int getNHits() const
+      {
         return static_cast<int>(m_TrackHits.size());
       }
 
       /** Return number of assigned axial hits.*/
-      inline int getNAxialHits() const {
+      inline int getNAxialHits() const
+      {
         return m_axialHits;
       }
 
       /** Return number of assigned stereo hits.*/
-      inline int getNStereoHits() const {
+      inline int getNStereoHits() const
+      {
         return m_stereoHits;
       }
 
@@ -232,12 +252,14 @@ namespace Belle2 {
       void clearBadHits();
 
       /** set chi2 after fitting */
-      void setChi2(double chi2) {
+      void setChi2(double chi2)
+      {
         m_chi2 = chi2;
       }
 
       /** Get chi2 square of circular fit */
-      double getChi2() const {
+      double getChi2() const
+      {
         return m_chi2;
       }
 

@@ -26,7 +26,7 @@ namespace Belle2 {
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
    */
-  class CDCLegendreTrackingModule: public Module {
+  class CDCLegendreTrackingModule: public virtual  Module {
 
   public:
 
@@ -137,6 +137,13 @@ namespace Belle2 {
      * Write the objects to the store array.
      */
     void outputObjects();
+
+    /**
+     * Create candidates using vector of quadtree nodes.
+     */
+    void processNodes(std::vector<TrackFindingCDC::QuadTreeLegendre*>&, TrackFindingCDC::QuadTreeLegendre::CandidateProcessorLambda&,
+                      int);
+
   };
 
 

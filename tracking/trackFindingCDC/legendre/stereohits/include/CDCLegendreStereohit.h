@@ -86,7 +86,8 @@ namespace Belle2 {
 
       inline double getZ0() const { return m_Z0; };
 
-      double computePolarAngle() {
+      double computePolarAngle()
+      {
         assert(m_lWire != -999);
         assert(m_rWire != -999);
         assert(m_sign_final != -999);

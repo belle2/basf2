@@ -117,7 +117,7 @@ void CDCLegendreTrackingModule::findTracks()
   B2DEBUG(100, "Perform track finding");
 
   // The first case is somewhat special
-  doTreeTrackFinding(100, 0.07, false);
+  doTreeTrackFinding(50, 0.07, false);
   if (m_treeFindingNumber == 1 || m_doPostprocessingOften)
     postprocessTracks();
 
@@ -140,12 +140,38 @@ void CDCLegendreTrackingModule::outputObjects()
   m_cdcLegendreTrackDrawer->finalizeFile();
 }
 
+
+void CDCLegendreTrackingModule::processNodes(std::vector<QuadTreeLegendre*>& listOfCandidates,
+                                             QuadTreeLegendre::CandidateProcessorLambda& lmdFunct, int limit)
+{
+  if (listOfCandidates.size() == 0) return;
+  QuadTreeProcessor qtProcessor(m_maxLevel);
+
+  do {
+    //sort nodes by number of hits
+    std::sort(listOfCandidates.begin(), listOfCandidates.end(), [](const QuadTreeLegendre * a, const QuadTreeLegendre * b) {
+      return static_cast <bool>(a->getNItems() > b->getNItems());
+    });
+
+    lmdFunct(listOfCandidates.front());
+
+    for (QuadTreeLegendre* qt : listOfCandidates) qt->cleanUpItems(qtProcessor);
+
+    listOfCandidates.erase(std::remove_if(listOfCandidates.begin(), listOfCandidates.end(),
+    [&](QuadTreeLegendre * qt) { return qt->getNItems() < limit; }),
+    listOfCandidates.end());
+
+  } while (listOfCandidates.size() > 0);
+}
+
 void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, double rThreshold, bool increaseThreshold)
 {
   B2DEBUG(100, "Performing tree track finding");
   m_treeFinder++;
 
   unsigned int limit = limitInitial;
+
+  double rCDC = 113.;
 
   std::set<TrackHit*> hits_set = m_cdcLegendreTrackProcessor.createHitSet();
 
@@ -154,10 +180,14 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   m_cdcLegendreQuadTree.provideItemsSet(qtProcessor, hits_set);
   int nSteps = 0;
 
+  std::vector<QuadTreeLegendre*> listOfCandidates;
+
+
   // this lambda function will forward the found candidates to the CandidateCreate for further processing
   // hits belonging to found candidates will be marked as used and ignored for further
   // filling iterations
-  QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [&](QuadTreeLegendre * qt) -> void {
+
+  QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](QuadTreeLegendre * qt) -> void {
     TrackCandidate* trackCandidate = m_cdcLegendreTrackProcessor.createLegendreTrackCandidateFromQuadNode(qt);
 
     unsigned int numberOfUsedHits = 0;
@@ -192,22 +222,39 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
   };
 
+  QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [&](QuadTreeLegendre * qt) -> void {
+    if (TrackCandidate::convertRhoToPt(fabs(qt->getYMean())) > 0.4) lmdCandidateProcessingFinal(qt);
+    else listOfCandidates.push_back(qt);
+  };
 
 
-  qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 50, 0.011);
-  qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 70, 0.02);
+  listOfCandidates.clear();
+  //find high-pt tracks (not-curlers: diameter of the track higher than radius of CDC -- 2*Rtrk > rCDC => Rtrk < 2./rCDC, r(legendre) = 1/Rtrk =>  r(legendre) < 2./rCDC)
+  qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 50, 2. / rCDC);
+  if (listOfCandidates.size() > 0) processNodes(listOfCandidates, lmdCandidateProcessingFinal, 50);
+
+  listOfCandidates.clear();
+  //find curlers with diameter higher than half of radius of CDC (see calculations above)
+  qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, 70, 4. / rCDC);
+  if (listOfCandidates.size() > 0) processNodes(listOfCandidates, lmdCandidateProcessingFinal, 70);
+
 
   // Start loop, where tracks are searched for
   do {
+    listOfCandidates.clear();
     qtProcessor.fillGivenTree(&m_cdcLegendreQuadTree, lmdCandidateProcessing, limit, rThreshold);
 
-    limit = limit * m_stepScale;
+    if (listOfCandidates.size() > 0) {
+      processNodes(listOfCandidates, lmdCandidateProcessingFinal, limit);
+    } else {
 
-    if (increaseThreshold) {
-      rThreshold *= 2.;
-      if (rThreshold > 0.15) rThreshold = 0.15;
+      limit = limit * m_stepScale;
+
+      if (increaseThreshold) {
+        rThreshold *= 2.;
+        if (rThreshold > 0.15) rThreshold = 0.15;
+      }
     }
-
     nSteps++;
     //perform search until found track has too few hits or threshold is too small and no tracks are found
   } while (limit >= m_param_threshold && hits_set.size() >= m_param_threshold);

@@ -131,8 +131,7 @@ TVector3 TrackCandidate::getMomentumEstimation(bool force_calculation) const
 
 void TrackCandidate::calculateMomentumEstimation()
 {
-  double R = fabs(1 / m_r);
-  double pt = R * 1.5 * 0.00299792458;
+  double pt = TrackCandidate::convertRhoToPt(m_r);
 
   TVector2 mom2 = (TVector2(m_xc, m_yc).Rotate(TMath::Pi() / 2).Unit()) * pt * getChargeSign();
 

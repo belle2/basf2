@@ -150,28 +150,34 @@ namespace Belle2 {
         for (int i = 0; i < 2; ++i) {
           //m_children[i] = new QuadTreeTemplate*[m_nbins_r];
           for (int j = 0; j < 2; ++j) {
-            if ((node->getLevel() > (m_lastLevel - 6)) && (fabs(node->getYMean()) > 0.006)) {
-              float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
-              float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
-              //        double r1 = m_r[j];
-              //        double r2 = m_r[j+1];
-              //            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
-              //            theta_2_overlap = thetaBin[t_index + 1]/* + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
-              //            theta_1_overlap = thetaBin[t_index] - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
-              //            theta_2_overlap = thetaBin[t_index + 1] + fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.;
-              int theta1 = node->getXBin(i) - abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 4);
-              int theta2 = node->getXBin(i + 1)
-                           + abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 4);
-              //        typeY theta1 = m_thetaBin[i];
-              //        int theta2 = m_thetaBin[i + 1];
+            if ((node->getLevel() > (m_lastLevel - 7)) && (fabs(node->getYMean()) > 0.005)) {
+              if (node->getLevel() < (m_lastLevel - 5)) {
+                float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
+                float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 4.;
+                int theta1 = node->getXBin(i) - abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 4.);
+                int theta2 = node->getXBin(i + 1) + abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 4.);
 
-              if (theta1 < 0)
-                theta1 = node->getXBin(i);
-              if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
-                theta2 = node->getXBin(i + 1);
+                if (theta1 < 0)
+                  theta1 = node->getXBin(i);
+                if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
+                  theta2 = node->getXBin(i + 1);
 
-              m_children->set(i, j, new QuadTreeTemplate<int, float, TrackHit>(theta1, theta2, r1, r2, node->getLevel() + 1,
-                              node));
+                m_children->set(i, j, new QuadTreeTemplate<int, float, TrackHit>(theta1, theta2, r1, r2, node->getLevel() + 1,
+                                node));
+              } else {
+                float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
+                float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 8.;
+                int theta1 = node->getXBin(i) - abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 8.);
+                int theta2 = node->getXBin(i + 1) + abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 8.);
+
+                if (theta1 < 0)
+                  theta1 = node->getXBin(i);
+                if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
+                  theta2 = node->getXBin(i + 1);
+
+                m_children->set(i, j, new QuadTreeTemplate<int, float, TrackHit>(theta1, theta2, r1, r2, node->getLevel() + 1,
+                                node));
+              }
             } else {
               m_children->set(i, j, new QuadTreeTemplate<int, float, TrackHit>(node->getXBin(i), node->getXBin(i + 1), node->getYBin(j),
                               node->getYBin(j + 1), node->getLevel() + 1, node));

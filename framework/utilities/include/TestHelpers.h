@@ -2,6 +2,8 @@
 
 #include <framework/logging/LogSystem.h>
 
+#include <gtest/gtest.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -13,6 +15,29 @@ namespace Belle2 {
      \endcode
    */
   namespace TestHelpers {
+
+    /** This class provides a test fixture managing the opening and closing
+     *  of the Gearbox with the default geometry file.
+     *
+     * Use like
+     \code
+     TEST_F(TestWithGearBox, MyTest)
+     {
+
+     }
+     \endcode
+     *
+     */
+    class TestWithGearbox : public ::testing::Test {
+
+    public:
+      /// Sets up the Gearbox once for all test in this TestCase.
+      static void SetUpTestCase();
+
+      /// Closes the Gearbox once for all test in this TestCase.
+      static void TearDownTestCase();
+    };
+
     /** changes working directory into a newly created directory, and removes it (and contents) on destruction.
      *
      * Example:
@@ -71,3 +96,130 @@ namespace Belle2 {
  *  command x should print at least one B2WARNING.
  */
 #define EXPECT_B2WARNING(x) EXPECT_LOGMESSAGE(x, Belle2::LogConfig::c_Warning);
+
+/** \def TEST_CONTEXT(x)
+ *
+ *  Adds a message to all EXCEPTS and ASSERT in the current scope and any called or nested scopes
+ *
+ *  The macro sets up for the following EXCEPTS and ASSERTS, hence it must be placed before the tests.
+ *
+ *  The message can be composed in a B2INFO style manner with addtional << between
+ *  individual strings and values to be concatenated.
+ *
+ *  @example TEST_CONTEXT("for my value set to "  << myValue);
+ */
+#define TEST_CONTEXT(message) SCOPED_TRACE([&](){std::ostringstream messageStream; messageStream << message; return messageStream.str();}());
+
+
+/** \def EXPECT_ANGLE_NEAR(expected, actual, tolerance)
+ *  Expectation macro for angle values that should not care for a multiple of 2 * PI difference between the values
+ */
+#define EXPECT_ANGLE_NEAR(expected, actual, tolerance) EXPECT_PRED3(::Belle2::TestHelpers::angleNear, expected, actual, tolerance)
+
+/** \def ASSERT_ANGLE_NEAR(expected, actual, tolerance)
+ *  Assertation macro for angle values that should not care for a multiple of 2 * PI difference between the values
+ */
+#define ASSERT_ANGLE_NEAR(expected, actual, tolerance) ASSERT_PRED3(::Belle2::TestHelpers::angleNear, expected, actual, tolerance)
+
+/** \def EXPECT_SAME_SIGN(expected, actual)
+ *  Expectation macro that two values carry the same sign.
+ */
+#define EXPECT_SAME_SIGN(expected, actual) EXPECT_PRED2(::Belle2::TestHelpers::sameSign, expected, actual)
+
+/** \def ASSERT_SAME_SIGN(expected, actual)
+ * Assertation macro that two values carry the same sign.
+ */
+#define ASSERT_SAME_SIGN(expected, actual) ASSERT_PRED2(::Belle2::TestHelpers::sameSign, expected, actual)
+
+
+/** \def EXPECT_POSITIVE(expected, actual)
+ *  Expectation macro that a value is bigger than zero.
+ */
+#define EXPECT_POSITIVE(expected) EXPECT_PRED1(::Belle2::TestHelpers::isPositive, expected)
+
+/** \def ASSERT_POSITIVE(expected, actual)
+ *  Assertation macro that a value is bigger than zero.
+ */
+#define ASSERT_POSITIVE(expected) ASSERT_PRED1(::Belle2::TestHelpers::isPositive, expected)
+
+/** \def EXPECT_NEGATIVE(expected, actual)
+ *   Expectation macro that a value is smaller than zero.
+ */
+#define EXPECT_NEGATIVE(expected) EXPECT_PRED1(::Belle2::TestHelpers::isNegative, expected)
+
+/** \def ASSERT_NEGATIVE(expected, actual)
+ *  Assertation macro that a value is smaller than zero.
+ */
+#define ASSERT_NEGATIVE(expected) ASSERT_PRED1(::Belle2::TestHelpers::isNegative, expected)
+
+/**
+ * Expectation macro for combound structures containing floating point values like TVector3, etc. to be close to each other.
+ *
+ * Generally it compares each contained floating point value to be no less than the tolerance apart.
+ *
+ * The macro uses the templated predicate template<class T> allNear(const T& expected, const T& actual, double tolerance)
+ * to compute whether the two structures are close to each other.
+ *
+ * Currently it has been specialised for TVector3.
+ *
+ * You may specialise the template for other combound types like has been done for TVector3 below or
+ * in framework/tests/Helix.cc to compare two helices.
+ *
+ * Note for the google test framework to properly print your type either a operator<< or PrintTo(const T& expected, std::ostream* out)
+ * has to be defined.
+ */
+#define EXPECT_ALL_NEAR(expected, actual, tolerance) EXPECT_PRED3(::Belle2::TestHelpers::allNear<decltype(expected)>, expected, actual, tolerance)
+
+/**
+ * Assertation macro for combound structures containing floating point values like TVector3, etc. to be close to each other.
+ *
+ * Generally it compares each contained floating point value to be no less than the tolerance apart.
+ *
+ * The macro uses the templated predicate template<class T> allNear(const T& expected, const T& actual, double tolerance)
+ * to compute whether the two structures are close to each other.
+ *
+ * Currently it has been specialised for TVector3.
+ *
+ * You may specialise the template for other combound types like has been done for TVector3 below or
+ * in framework/tests/Helix.cc to compare two helices.
+ *
+ * Note for the google test framework to properly print your type either a operator<< or PrintTo(const T& expected, std::ostream* out)
+ * has to be defined.
+ */
+#define ASSERT_ALL_NEAR(expected, actual, tolerance) ASSERT_PRED3(::Belle2::TestHelpers::allNear<decltype(expected)>, expected, actual, tolerance)
+
+class TVector3;
+namespace Belle2 {
+  namespace  TestHelpers {
+    /** Predicate checking that two angular values are close to each other modulus a 2 * PI difference. */
+    bool angleNear(double expected, double actual, double tolerance);
+
+    /** Predicate checking that two values have the same sign. Returns nan if any of the values is nan. */
+    bool sameSign(double expected, double actual);
+
+    /** Predicate checking that a value is bigger than zero. */
+    bool isPositive(double expected);
+
+    /** Predicate checking that a value is smaller than zero. */
+    bool isNegative(double expected);
+
+    /** Templated version of predicate checking if two combound object containing some floating point are near each other by maximum deviation.
+     *  Concrete implementations can be given as simple overloads of the allNear function.
+     */
+    template<class T>
+    bool allNear(const T& expected, const T& actual, double tolerance)
+    {
+      return fabs(expected - actual) < tolerance;
+    }
+
+    /** Predicate checking that all three components of TVector3 are close by a maximal error of tolerance. */
+    template<>
+    bool allNear<TVector3>(const TVector3& expected, const TVector3& actual, double tolerance);
+
+    /** Print function for the google test framework to print a TVector3 to an output stream */
+    void PrintTo(const TVector3& tVector3, ::std::ostream& output);
+  }
+}
+
+
+

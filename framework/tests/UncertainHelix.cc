@@ -117,7 +117,6 @@ TEST(UncertainHelixTest, CartesianCovarianceRoundtripAtPerigeeBesidesCurve)
 
   for (int i : irange(0, 6)) {
     for (int j : irange(0, 6)) {
-      B2INFO("i " << i << " j " << j);
       EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 10e-7);
     }
   }

@@ -155,11 +155,6 @@ TVector3 Helix::getPositionAtArcLength2D(const double& arcLength2D) const
 
     Here arcLength2D means the arc length of the circle in the xy projection
     traversed in the forward direction.
-
-    // Old definition identical?
-    x =  d0 * sin(phi0) + charge / omega * (sin(phi0 + chi) - sin(phi0));
-    y = -d0 * cos(phi0) + charge / omega * (-cos(phi0 + chi) + cos(phi0));
-    // Actually no - have to talk back to Markus about this.
   */
 
   // First calculating the position assuming the circle center lies on the y axes (phi0 = 0)
@@ -203,7 +198,6 @@ TVector3 Helix::getTangentialAtArcLength2D(const double& arcLength2D) const
   return tangential;
 }
 
-
 TVector3 Helix::getUnitTangentialAtArcLength2D(const double& arcLength2D) const
 {
   TVector3 unitTangential = getTangentialAtArcLength2D(arcLength2D);
@@ -222,17 +216,19 @@ TVector3 Helix::getMomentumAtArcLength2D(const double& arcLength2D, const double
   return momentum;
 }
 
-double Helix::passiveMoveBy(const TVector3& by)
+double Helix::passiveMoveBy(const double& byX,
+                            const double& byY,
+                            const double& byZ)
 {
   // First calculate the distance of the new origin to the helix in the xy projection
   double new_d0 = 0;
   double arcLength2D = 0;
-  calcArcLength2DAndDrAtXY(by.X(), by.Y(), arcLength2D, new_d0);
+  calcArcLength2DAndDrAtXY(byX, byY, arcLength2D, new_d0);
 
   // Third the new phi0 and z0 can be calculated from the arc length
   double chi = -arcLength2D * getOmega();
   double new_phi0 = m_phi0 + chi;
-  double new_z0 = getZ0() - by.Z() + getTanLambda() * arcLength2D;
+  double new_z0 = getZ0() - byZ + getTanLambda() * arcLength2D;
 
   /// Update the parameters inplace. Omega and tan lambda are unchanged
   m_d0 = new_d0;
@@ -245,12 +241,15 @@ double Helix::passiveMoveBy(const TVector3& by)
 TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi) const
 {
   TMatrixD jacobian(5, 5);
-  calcPassiveMoveByJacobian(by, jacobian, expandBelowChi);
+  calcPassiveMoveByJacobian(by.X(), by.Y(), jacobian, expandBelowChi);
   return jacobian;
 }
 
 
-void Helix::calcPassiveMoveByJacobian(const TVector3& by, TMatrixD& jacobian, const double expandBelowChi) const
+void Helix::calcPassiveMoveByJacobian(const double& byX,
+                                      const double& byY,
+                                      TMatrixD& jacobian,
+                                      const double expandBelowChi) const
 {
   // 0. Preparations
   // Initialise the return value to a unit matrix
@@ -267,11 +266,8 @@ void Helix::calcPassiveMoveByJacobian(const TVector3& by, TMatrixD& jacobian, co
 
   // Prepare a delta vector, which is the vector from the perigee point to the new origin
   // Split it in component parallel and a component orthogonal to tangent at the perigee.
-  const double x = by.X();
-  const double y = by.Y();
-
-  const double deltaParallel = x * cosPhi0 + y * sinPhi0;
-  const double deltaOrthogonal = y * cosPhi0 - x * sinPhi0 + d0;
+  const double deltaParallel = byX * cosPhi0 + byY * sinPhi0;
+  const double deltaOrthogonal = byY * cosPhi0 - byX * sinPhi0 + d0;
   const double deltaCylindricalR = hypot(deltaOrthogonal, deltaParallel);
   const double deltaCylindricalRSquared = deltaCylindricalR * deltaCylindricalR;
 
@@ -314,7 +310,7 @@ void Helix::calcPassiveMoveByJacobian(const TVector3& by, TMatrixD& jacobian, co
   // This hinders not only the straight line case but extrapolations between points which are close together,
   // like it happens when the current perigee is very close the new perigee.
   // To have a smooth transition in this limit we have to carefully
-  // factor out the divergent quotents and approximate them with their taylor series.
+  // factor out the divergent quotients and approximate them with their taylor series.
 
   const double chi = -atan2(UParallel, UOrthogonal);
   double arcLength2D = 0;
@@ -537,42 +533,11 @@ void Helix::setCartesian(const TVector3& position,
   assert(abs(charge) == 1);  // Not prepared for doubly-charged particles.
   const double alpha = getAlpha(bZ);
 
-#if 0
   // We allow for the case that position, momentum are not given
-  // exactly in the perigee.  Therefore we have to solve the
-  // equations.  Any point on the helix, using the perigee parameters
-  // as in "Fast vertex fitting with a local parametrization of tracks
-  // - Billoir, Pierre et al. Nucl.Instrum.Meth. A311 (1992) 139-150"
-  // named here omega, phi0, d0, tanLambda, z0 together with an angle
-  // chi, can be written:
-  px = cos(phi0 + chi) / alpha / omega;
-  py = sin(phi0 + chi) / alpha / omega;
-  pz = charge * tanLambda / alpha / omega;
-  x =  d0 * sin(phi0) + charge / omega * (sin(phi0 + chi) - sin(phi0));
-  y = -d0 * cos(phi0) + charge / omega * (-cos(phi0 + chi) + cos(phi0));
-  z = z0 + charge / omega * tanLambda * chi;
-  // Expressed in terms of the track length from the POCA 's' and its
-  // projection into the x-y plane
-  S = s / hypot(1, cotTheta);
-  // we have chi = S*omega, and from this the formulae valid also for
-  // straight line tracks (for the constant direction of the
-  // straight-line track just take chi = 0, and for straight-line
-  // tracks charge just establishes a sign convention):
-  x = (d0 * sin(phi)
-       + charge * S * (sin(phi) * (cos(S * omega) - 1) / (S * omega)
-                       + cos(phi) * sin(S * omega) / (S * omega)));
-  y = (-d0 * cos(phi)
-       + charge * S * (sin(phi) * sin(S * omega) / (S * omega)
-                       - cos(phi) * (cos(S * omega) - 1) / (S * omega)));
-  z = charge * S * cotTheta;
-  // For omega -> 0, these reduce to straight lines, according to
-  x = (d0 * sin(phi)
-       + charge * S * cos(phi) + O(omega));
-  y = (-d0 * cos(phi)
-       + chargs * S * sin(phi) + O(omega));
-  z = charge * S * cotTheta;
-  // Billoir (loc.cit.) gives the first terms of a series in S.
-#endif
+  // exactly in the perigee.  Therefore we have to transform the momentum
+  // with the position as the reference point and then move the coordinate system
+  // to the origin.
+
   const double x = position.X();
   const double y = position.Y();
   const double z = position.Z();
@@ -581,46 +546,20 @@ void Helix::setCartesian(const TVector3& position,
   const double py = momentum.Y();
   const double pz = momentum.Z();
 
-  // We find the perigee parameters by inverting this system of
-  // equations and solving for the six variables d0, phi0, omega, z0,
-  // tanLambda, chi.
-
   const double ptinv = 1 / hypot(px, py);
   const double omega = charge * ptinv / alpha;
   const double tanLambda = ptinv * pz;
-
-  // Helix center in the (x, y) plane:
-  const double helX = x + charge * py * alpha;
-  const double helY = y - charge * px * alpha;
-  const double rhoHel = hypot(helX, helY);
-
-  const double d0 = charge * rhoHel - 1 / omega;
-
-  // phi0 is the azimuth of momentum, in the POCA it is orthogonal to
-  // the vector pointing to the helix center.  The rotation by 90
-  // degrees is achieved by (x, y) -> (-y, x) and the opposite
-  // rotation for negative particles.
-  const double phi0 = atan2(charge * helX, -charge * helY);
-
-  const double cosPhi0 = (-charge * helY) / rhoHel;
-  const double sinPhi0 = (charge * helX) / rhoHel;
-
-  const double cosphi0chi = ptinv * px;  // cos(phi0 + chi)
-  const double sinphi0chi = ptinv * py;  // sin(phi0 + chi)
-
-  const double coschi =  cosphi0chi * cosPhi0 + sinphi0chi * sinPhi0;
-  const double sinchi = -cosphi0chi * sinPhi0 + sinphi0chi * cosPhi0;
-
-  const double chi = atan2(sinchi, coschi);
-
-  const double arcLength2D = -chi / omega;
-  const double z0 = z - arcLength2D * tanLambda;
+  const double phi0 = atan2(py, px);
+  const double z0 = z;
+  const double d0 = 0;
 
   m_omega = omega;
   m_phi0 = phi0;
   m_d0 = d0;
   m_tanLambda = tanLambda;
   m_z0 = z0;
+
+  passiveMoveBy(-x, -y, 0);
 }
 
 namespace Belle2 {

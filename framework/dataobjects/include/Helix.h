@@ -225,7 +225,21 @@ namespace Belle2 {
      *  @param by            Vector by which the origin of the coordinate system should be moved.
      *  @return              The double value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
      */
-    double passiveMoveBy(const TVector3& by);
+    double passiveMoveBy(const TVector3& by)
+    { return passiveMoveBy(by.X(), by.Y(), by.Z()); }
+
+    /** Moves origin of the coordinate system (passive transformation) orthogonal to the z axis by the given vector. Updates the helix inplace.
+     *
+     *  @param byX           X displacement by which the origin of the coordinate system should be moved.
+     *  @param byY           Y displacement by which the origin of the coordinate system should be moved.
+     *  @param byZ           Z displacement by which the origin of the coordinate system should be moved.
+     *  @return              The double value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
+     *
+     */
+    double passiveMoveBy(const double& byX,
+                         const double& byY,
+                         const double& byZ);
+
 
     /** Calculate the 5x5 jacobian matrix for the transport of the helix parameters,
      *  when moving the origin of the coordinate system to a new location.
@@ -250,20 +264,26 @@ namespace Belle2 {
      *  If output parameter is a 6x6 matrix the derivatives of the 5 helix parameters *and* derivates of the two dimensional arc length are written.
      *  The derivatives of the arcLength2D are in the 6th row of the matrix.
      *
-     *  @param by              Vector by which the origin of the coordinate system should be moved.
-     *  @param jacobian[out]   The jacobian matrix containing the derivatives of the five helix parameters after the move relative the orignal parameters.
-     *  @param expandBelowChi  Control parameter below, which absolute value of chi an expansion of divergent terms shall be used.
-     *                         This parameter exists for testing the consistency of the expansion with the closed form.
-     *                         In other applications the parameter should remain at its default value.
+     *  @param byX           X displacement by which the origin of the coordinate system should be moved.
+     *  @param byY           Y displacement by which the origin of the coordinate system should be moved.
+     *  @param jacobian[out] The jacobian matrix containing the derivatives of the five helix parameters
+     *                       after the move relative the orignal parameters.
+     *  @param expandBelowChi Control parameter below, which absolute value of chi an expansion of
+     *                        divergent terms shall be used. This parameter exists for testing the
+     *                        consistency of the expansion with the closed form.
+     *                        In other applications the parameter should remain at its default value.
      *
      */
-    void calcPassiveMoveByJacobian(const TVector3& by, TMatrixD& jacobian, const double expandBelowChi = M_PI / 8) const;
+    void calcPassiveMoveByJacobian(const double& byX,
+                                   const double& byY,
+                                   TMatrixD& jacobian,
+                                   const double expandBelowChi = M_PI / 8) const;
 
   public:
     /** Reverses the direction of travel of the helix in place.
      *
-     *  The same points that are located on the helix stay the same after the transformation,
-     *  but have the opposite two dimensional arc length.
+     *  The same points that are located on the helix stay are the same after the transformation,
+     *  but have the opposite two dimensional arc length associated to them.
      *  The momentum at each point is reversed.
      *  The charge sign is changed to its opposite by this transformation.
      */

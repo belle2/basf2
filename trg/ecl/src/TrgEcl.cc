@@ -24,9 +24,13 @@
 #include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEcl.h"
 #include "trg/ecl/TrgEclCluster.h"
+#include "trg/ecl/TrgEclMapping.h"
 
 #include "trg/ecl/dataobjects/TRGECLDigi.h"
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
+#include "trg/ecl/dataobjects/TRGECLHit.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
+
 //
 #include <math.h>
 #include <TRandom3.h>
@@ -40,6 +44,16 @@ using namespace Belle2;
 TrgEcl::TrgEcl():
   bitECLtoGDL(0)
 {
+  for (int iTCId = 0; iTCId < 576; iTCId++) {
+    for (int iTimeindex = 0; iTimeindex < 80; iTimeindex++) {
+      Timing[iTCId][iTimeindex] = 0;
+      Energy[iTCId][iTimeindex] = 0;
+      for (int ibin = 0; ibin < 160; ibin++) {
+        HitTC[ibin][iTCId][iTimeindex] = 0;
+      }
+    }
+  }
+
 }
 //
 //
@@ -92,7 +106,7 @@ TrgEcl::getTrgEcl(void)
 //
 //
 void
-TrgEcl::setPRS(TrgEclFAM* obj_trgeclfam, int hitTC[][20])
+TrgEcl::setPRS(int iBin)
 {
   //
   //
@@ -106,22 +120,19 @@ TrgEcl::setPRS(TrgEclFAM* obj_trgeclfam, int hitTC[][20])
   //----------------------------------------
   //
   for (int iTCThetaId = 0; iTCThetaId < 17; iTCThetaId++) {
-    _PhiRingSum[iTCThetaId] = 0;
+    for (int itime = 0; itime < 80 ; itime++) {
+      _PhiRingSum[iTCThetaId] = 0;
+    }
   }
+  TrgEclMapping* map = new TrgEclMapping();
 
+  for (int iTCId = 0; iTCId < 576; iTCId++) {
+    for (int itime = 0; itime < 80; itime++) {
+      for (int iTCThetaId = 0; iTCThetaId < 17; iTCThetaId++) {
+        if (HitTC[iBin][iTCId][itime] == 1) {
+          if (iTCThetaId == map ->getTCThetaIdFromTCId(iTCId + 1)) {
 
-  for (int iTCId = 1; iTCId <= 576; iTCId++) {
-
-
-    //   cout <<"check_1"<< endl;
-    int ntcoutput = obj_trgeclfam->getTCNoOutput(iTCId);
-    //  cout << ntcoutput << endl;
-    for (int iTCThetaId = 0; iTCThetaId < 17; iTCThetaId++) {
-      if (iTCThetaId == obj_trgeclfam->getTCThetaId(iTCId)) {
-        //    cout <<"check_2"<< endl;
-        for (int intcoutput = 0 ; intcoutput < ntcoutput ; intcoutput++) {
-          if (hitTC[iTCId][intcoutput] > 0) {
-            _PhiRingSum[iTCThetaId] += obj_trgeclfam->getTCEnergy(iTCId, intcoutput);
+            _PhiRingSum[iTCThetaId] += Energy[iTCId][iBin];
           }
         }
       }
@@ -137,8 +148,8 @@ TrgEcl::setPRS(TrgEclFAM* obj_trgeclfam, int hitTC[][20])
 void
 TrgEcl::simulate(int m_nEvent)
 {
-  TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
-  obj_trgeclfam->setup(m_nEvent, 1);
+//  TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
+//   obj_trgeclfam->setup(m_nEvent, 1);
   // setPRS(obj_trgeclfam);
   //
   //----------
@@ -155,16 +166,46 @@ TrgEcl::simulate(int m_nEvent)
   //-----------------------------------------
   // Calculate event timing
   //-----------------------------------------
-  for (int iBin = 0; iBin < 160 ; iBin ++) {
+
+  for (int iTCId = 0; iTCId < 576; iTCId++) {
+    for (int iTimeindex = 0; iTimeindex < 80; iTimeindex++) {
+      Timing[iTCId][iTimeindex] = 0;
+      Energy[iTCId][iTimeindex] = 0;
+      for (int ibin = 0; ibin < 160; ibin++) {
+        HitTC[ibin][iTCId][iTimeindex] = 0;
+      }
+    }
+  }
+
+  StoreArray<TRGECLHit> trgeclHitArray;
+  for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
+
+    TRGECLHit* aTRGECLHit = trgeclHitArray[ii];
+    int TCID = (aTRGECLHit->getCellId() - 1);
+    double TCHitTiming    = aTRGECLHit ->getTimeAve();
+    double TCHitEnergy =  aTRGECLHit -> getEnergyDep();
+    int itimeindex = (int)(TCHitTiming / 100 + 40);
+
+    Timing[TCID][itimeindex] = TCHitTiming;
+    Energy[TCID][itimeindex] = TCHitEnergy;
+
+  }
+
+
+
+
+  for (int iBin = 0; iBin < 80 ; iBin ++) {
     EventTiming[iBin] = 0;
   }
-  getEventTiming(obj_trgeclfam, 3); //1: belle , 2: Energetic , 3 : Energy weighted
 
+  getEventTiming(1); //1: belle , 2: Energetic , 3 : Energy weighted
 
-  for (int iBin = 0 ; iBin < 160; iBin ++) {
+  for (int iBin = 0 ; iBin < 80; iBin ++) {
 
     if (EventTiming[iBin] == 0) {continue;}
-    setPRS(obj_trgeclfam, HitTC[iBin]);
+    //  cout << "hmm???" << endl;
+    setPRS(iBin);
+
 
     //--------------------------------------------------
 
@@ -177,32 +218,28 @@ TrgEcl::simulate(int m_nEvent)
     //
     // // Threshold for each combination of PRS
     // //
-    // //   5.0,  // (1)  F1 + F2 + B1 + B2
-    // //   5.5,  // (2)  F2 + F3 + B1 + B2 + C11 + C12
-    // //   5.0,  // (3)  F2 :: backward gap
-    // //   5.0,  // (4)  F3 + C10 + C11 + C12
-    // //   5.0,  // (5)  C1 + C9 + C10
-    // //   5.0,  // (6)  C1 + C2 + C9
-    // //   5.0,  // (7)  C2 + C8 + C9
-    // //   5.0,  // (8)  C3 + C7 + C8
-    // //   5.0,  // (9)  C4 + C6 + C7z
-    // //   5.0,  // (10) C5 + C6
-    // //   3.0   // (11) C10 :: forward gap
-    //
-    int k01[] = {4,  1, 2, 16, 17};     // (1)  F1+F2 + B1+B2
-    int k02[] = {6,  2, 3, 14, 15, 16, 17}; // (2)  F2+F3 + C11+C12 + B1+B2
-    int k03[] = {1,  2};                // (3)  F2
-    int k04[] = {4,  3, 13, 14, 15};    // (4)  F3 + C10+C11+C12
-    int k05[] = {3,  4, 12, 13};        // (5)  C1+C9+C10
-    int k06[] = {3,  4, 5, 12};         // (6)  C1+C2+C9
-    int k07[] = {3,  5, 11, 12};        // (7)  C2+C8+C9
-    int k08[] = {3,  6, 10, 11};        // (8)  C3+C7+C8
-    int k09[] = {3,  7, 9, 10};         // (9)  C4+C6+C7
-    int k10[] = {2,  8, 9};             // (10) C5+C6
-    int k11[] = {1, 13};                // (11) C10
 
-    double vct_bhabha[11];
-    for (int iii = 0; iii < 11; iii++) {vct_bhabha[iii] = 0.0;}
+    int k01[] = {5,  1, 2, 3 , 16, 17};    // (1)  F1+F2 + F3 + B1+B2
+    int k02[] = {2,  3, 15}; // (2)  F3 + C12
+    int k03[] = {2,  2, 3};                // (3)  F2 + F3
+    int k04[] = {1,  4};    // (4)  C1 + backward gap
+    int k05[] = {3,  4, 14, 15};        // (5)  C1+C11+C12
+    int k06[] = {3,  5, 14, 15};         // (6)  C2+C11+C12
+    int k07[] = {3,  4, 5, 14};        // (7)  C1+C2+C11
+    int k08[] = {3,  5, 13, 14};        // (8)  C2+C10+C11
+    int k09[] = {3,  5, 12, 13};         // (9)  C2+C9+C10
+    int k10[] = {3,  5, 6, 13};             // (10) C2+C3+C10
+    int k11[] = {3,  5, 6, 12};                // (11) C2+C3+C9
+    int k12[] = {3,  6, 7, 12};         // (9)  C3+C4+C9
+    int k13[] = {3,  6, 7, 11};             // (10) C3+C4+C8
+    int k14[] = {3,  7, 8, 11};                // (11) C4+C5+C8
+    int k15[] = {3,  8, 10, 11};         // (9)  C5+C7+C8
+    int k16[] = {2,  8, 9, 10};             // (10) C5+C6+C7
+    int k17[] = {1, 14, 15};                // (11) C11+C12 +forward gap
+    int k18[] = {1, 16};                // (11) B1 + forward gap
+
+    double vct_bhabha[18];
+    for (int iii = 0; iii < 18; iii++) {vct_bhabha[iii] = 0.0;}
     for (int iii = 1; iii <= k01[0]; iii++) { vct_bhabha[0]  += _PhiRingSum[k01[iii] - 1];}
     for (int iii = 1; iii <= k02[0]; iii++) { vct_bhabha[1]  += _PhiRingSum[k02[iii] - 1]; }
     for (int iii = 1; iii <= k03[0]; iii++) { vct_bhabha[2]  += _PhiRingSum[k03[iii] - 1]; }
@@ -214,32 +251,78 @@ TrgEcl::simulate(int m_nEvent)
     for (int iii = 1; iii <= k09[0]; iii++) { vct_bhabha[8]  += _PhiRingSum[k09[iii] - 1]; }
     for (int iii = 1; iii <= k10[0]; iii++) { vct_bhabha[9]  += _PhiRingSum[k10[iii] - 1]; }
     for (int iii = 1; iii <= k11[0]; iii++) { vct_bhabha[10] += _PhiRingSum[k11[iii] - 1]; }
+    for (int iii = 1; iii <= k12[0]; iii++) { vct_bhabha[11] += _PhiRingSum[k11[iii] - 1]; }
+    for (int iii = 1; iii <= k13[0]; iii++) { vct_bhabha[12] += _PhiRingSum[k11[iii] - 1]; }
+    for (int iii = 1; iii <= k14[0]; iii++) { vct_bhabha[13] += _PhiRingSum[k11[iii] - 1]; }
+    for (int iii = 1; iii <= k15[0]; iii++) { vct_bhabha[14] += _PhiRingSum[k11[iii] - 1]; }
+    for (int iii = 1; iii <= k16[0]; iii++) { vct_bhabha[15] += _PhiRingSum[k11[iii] - 1]; }
+    for (int iii = 1; iii <= k17[0]; iii++) { vct_bhabha[16] += _PhiRingSum[k11[iii] - 1]; }
+    for (int iii = 1; iii <= k18[0]; iii++) { vct_bhabha[17] += _PhiRingSum[k11[iii] - 1]; }
+
+
+
     bool boolBhabhaStar =
       (vct_bhabha[0]  > 5.0 ||
-       vct_bhabha[1]  > 5.5 ||
+       vct_bhabha[1]  > 3.0 ||
        vct_bhabha[2]  > 5.0 ||
-       vct_bhabha[3]  > 5.0 ||
+       vct_bhabha[3]  > 4.0 ||
        vct_bhabha[4]  > 5.0 ||
        vct_bhabha[5]  > 5.0 ||
        vct_bhabha[6]  > 5.0 ||
        vct_bhabha[7]  > 5.0 ||
        vct_bhabha[8]  > 5.0 ||
        vct_bhabha[9]  > 5.0 ||
-       vct_bhabha[10] > 3.0);
+       vct_bhabha[10] > 5.0 ||
+       vct_bhabha[11] > 5.0 ||
+       vct_bhabha[12] > 5.0 ||
+       vct_bhabha[13] > 5.0 ||
+       vct_bhabha[14] > 5.0 ||
+       vct_bhabha[15] > 5.0 ||
+       vct_bhabha[16] > 3.0 ||
+       vct_bhabha[17] > 3.0);
     //----------
     // ICN
     //----------
     //
     TrgEclCluster objCluster;
-    objCluster.setICN(obj_trgeclfam, HitTC[iBin]);
-    //  int BarrelICN =
-    //  int ForwardICN =
-    //  int BackwardICN = objCluster.getBackwardICN(&obj_trgeclfam);
-    //  std::cout << "ICN = "<< BarrelICN << " + "<< ForwardICN << std::endl;
+    objCluster.setICN(HitTC[iBin]);
+
+
     int ICN = objCluster.getICNFwBr();
     int ICNForward  = objCluster.getICNSub(0);
     int ICNBarrel   = objCluster.getICNSub(1);
     int ICNBackward = objCluster.getICNSub(2);
+
+
+    int m_hitNum = 0;
+    int NofCluster =  objCluster.getNofCluster();
+    for (int incluster = 0; incluster < NofCluster ; incluster++) {
+
+      int NofTCinCluster = objCluster.getNofTCinCluster(incluster);
+      double ClusterEnergy = objCluster.getClusterEnergy(incluster);
+      double ClusterTiming = objCluster.getClusterTiming(incluster);
+      double ClusterPositionX = (objCluster.getClusterPosition(incluster)).X();
+      double ClusterPositionY = (objCluster.getClusterPosition(incluster)).Y();
+      double ClusterPositionZ = (objCluster.getClusterPosition(incluster)).Z();
+
+      if (ClusterEnergy == 0 && ClusterTiming == 0) {continue;}
+
+      StoreArray<TRGECLCluster> ClusterArray;
+      if (!ClusterArray) ClusterArray.create();
+      ClusterArray.appendNew();
+      m_hitNum = ClusterArray.getEntries() - 1;
+      ClusterArray[m_hitNum]->setEventId(m_nEvent);
+      ClusterArray[m_hitNum]->setClusterId(incluster);
+      ClusterArray[m_hitNum]->setNofTCinCluster(NofTCinCluster);
+      ClusterArray[m_hitNum]->setEnergyDep(ClusterEnergy);
+      ClusterArray[m_hitNum]->setTimeAve(ClusterTiming);
+      ClusterArray[m_hitNum]->setPositionX(ClusterPositionX);
+      ClusterArray[m_hitNum]->setPositionY(ClusterPositionY);
+      ClusterArray[m_hitNum]->setPositionZ(ClusterPositionZ);
+
+    }
+
+
     //--------------
     // ECL trigger
     //--------------
@@ -274,7 +357,7 @@ TrgEcl::simulate(int m_nEvent)
     int bitForwardICN  = 0x0100;
     int bitBeamBkgVeto = 0x0200;
     int bitTiming      = 0x0400;
-    //if (E_tot > 0.1){continue;}
+
     bool boolEtot[3] = {false};
     if (E_tot > 1.0) boolEtot[1] = true;
     bool boolBhabha = (boolBhabhaStar && ICN > 4);
@@ -304,24 +387,23 @@ TrgEcl::simulate(int m_nEvent)
     //
     //  printf("bitECLtoGDL = %i \n", bitECLtoGDL);
     //----------------------
-//   if (0){ // check bit by "binary" output
-//     int xxx = bitECLtoGDL;
-//     int yyy = 0;
-//     int iii = 0;
-//     int ans = 0;
-//     while (xxx > 0) {
-//       yyy = xxx % 2;
-//       ans = ans + yyy * pow(10,iii);
-//       xxx = xxx / 2;
-//       iii = iii++;
-//     }
-//     printf("xxx = %i \n", ans);
-//   }
+    //   if (0){ // check bit by "binary" output
+    //     int xxx = bitECLtoGDL;
+    //     int yyy = 0;
+    //     int iii = 0;
+    //     int ans = 0;
+    //     while (xxx > 0) {
+    //       yyy = xxx % 2;
+    //       ans = ans + yyy * pow(10,iii);
+    //       xxx = xxx / 2;
+    //       iii = iii++;
+    //     }
+    //     printf("xxx = %i \n", ans);
+    //   }
     int BeamBkgVeto = 0;
     if (boolBeamBkgVeto) {BeamBkgVeto = 1;}
 
 
-    //cout << vct_bhabha[0] << "  " << vct_bhabha[1] << "  " << vct_bhabha[2] << "  " << vct_bhabha[3] << "  " << vct_bhabha[4] << "  " << vct_bhabha[5] << "  " << vct_bhabha[6] << "  " << vct_bhabha[7] << "  " << vct_bhabha[8] << "  " << vct_bhabha[9] << "  " << vct_bhabha[10] << endl;
     //----------------------
     //
     //-------------
@@ -370,17 +452,16 @@ TrgEcl::simulate(int m_nEvent)
     trgEcltrgArray[m_hitEneNum]->setICNBr(ICNBarrel);
     trgEcltrgArray[m_hitEneNum]->setICNBw(ICNBackward);
     //
-    // cout << itimebin << endl;
     trgEcltrgArray[m_hitEneNum]->setECLtoGDL(bitECLtoGDL);
     trgEcltrgArray[m_hitEneNum]->setBeamBkgVeto(BeamBkgVeto);
     trgEcltrgArray[m_hitEneNum]->setEventTiming(EventTiming[iBin]);
 
+
   }
   return;
 }
-void TrgEcl::getEventTiming(TrgEclFAM* obj_trgeclfam, int method)
+void TrgEcl::getEventTiming(int method)
 {
-
   //-----------------------------------------------------------------------------
   //  Calculate Eventtiming
   //  1 : Belle methpd  Event-timing = Fastest TC timing
@@ -392,6 +473,15 @@ void TrgEcl::getEventTiming(TrgEclFAM* obj_trgeclfam, int method)
   //
   // Please see B2GM slide "Tsim ecl status(Insoo Lee)"  2014 JUN ECL or Trigger session, if you want to know in detail.
   //-------------------------------------------------------------------------------------------------------
+
+  for (int iTCId = 0; iTCId < 576; iTCId++) {
+    for (int iTimeindex = 0; iTimeindex < 80; iTimeindex++) {
+      for (int ibin = 0; ibin < 80; ibin++) {
+        HitTC[ibin][iTCId][iTimeindex] = 0;
+      }
+    }
+  }
+
 
   double TimeWindow = 0;
   double OverlapWindow = 0;
@@ -410,41 +500,38 @@ void TrgEcl::getEventTiming(TrgEclFAM* obj_trgeclfam, int method)
     nBin = 0;
     TimeWindow = 500;
     WindowStart = -4000;
-    WindowEnd = 0;
+    WindowEnd = WindowStart;// + TimeWindow;
 
     while (WindowEnd < 4000) {
       FastestTCHit = 9999;
       EventTiming[nBin] = 0;
-      for (int iTCId = 1; iTCId <= 576; iTCId++) {//Find fastest TC Hit
-        int nTCOutput = obj_trgeclfam->getTCNoOutput(iTCId);// the # of hit per TC
-        for (int inTCOutput = 0 ; inTCOutput < nTCOutput ; inTCOutput++) {
-          if ((obj_trgeclfam->getTCTiming(iTCId, inTCOutput)) > WindowEnd) {
-            if ((obj_trgeclfam->getTCTiming(iTCId, inTCOutput)) < FastestTCHit) {
-              //     cout << FastestTCHit << endl;
-              FastestTCHit = obj_trgeclfam->getTCTiming(iTCId, inTCOutput);
+      for (int iTCId = 0; iTCId < 576; iTCId++) {//Find fastest TC Hit
+        for (int itime = 0 ; itime < 80 ; itime++) {
+          if (Timing[iTCId][itime] == 0 && Energy[iTCId][itime] == 0) {continue;}
+          if (Timing[iTCId][itime] > WindowEnd) {
+            if (Timing[iTCId][itime] < FastestTCHit) {
+              FastestTCHit =  Timing[iTCId][itime];
               EventTiming[nBin] = FastestTCHit;
             }
           }
         }
       }  // Find
-
       WindowStart = FastestTCHit;
       WindowEnd = WindowStart + TimeWindow;
-      for (int iTCId = 1; iTCId <= 576; iTCId++) {
-        int nTCOutput = obj_trgeclfam->getTCNoOutput(iTCId);// the # of hit per TC
-        for (int inTCOutput = 0 ; inTCOutput < nTCOutput ; inTCOutput++) {
-          if ((obj_trgeclfam->getTCTiming(iTCId, inTCOutput)) >= WindowStart && (obj_trgeclfam->getTCTiming(iTCId, inTCOutput)) < WindowEnd) {
-            if ((obj_trgeclfam->getTCEnergy(iTCId, inTCOutput)) > 0.1) {
-              HitTC[nBin][iTCId][inTCOutput] = 1;
+      for (int iTCId = 0; iTCId < 576; iTCId++) {
+        for (int itime = 0 ; itime < 80 ; itime++) {
+          if (Timing[iTCId][itime] >= WindowStart &&  Timing[iTCId][itime] < WindowEnd) {
+            if (Energy[iTCId][itime] > 0.1) {
+              HitTC[nBin][iTCId][itime] = 1;
             }
           }
         }
       }
-      if (EventTiming[nBin] != 0) { nBin ++;}
-      //  cout << EventTiming[nBin] << endl;
+      if (EventTiming[nBin] != 0) {
+        nBin ++;
+      }
     }
   }
-
 
 
   if (method == 2) { // Energetic TC
@@ -462,26 +549,26 @@ void TrgEcl::getEventTiming(TrgEclFAM* obj_trgeclfam, int method)
       if (iTime == 0) {WindowStart = - 4000 + fluctuation;}
       WindowEnd  = WindowStart + TimeWindow;
 
-      for (int iTCId = 1; iTCId <= 576; iTCId++) {
+      for (int iTCId = 0; iTCId < 576; iTCId++) {
 
-        int ntcoutput = obj_trgeclfam->getTCNoOutput(iTCId);
-        for (int intcoutput = 0 ; intcoutput < ntcoutput ; intcoutput++) {
+        for (int itime = 0 ; itime < 80 ; itime++) {
 
-          if ((obj_trgeclfam->getTCTiming(iTCId, intcoutput)) > (WindowStart) &&
-              (obj_trgeclfam->getTCTiming(iTCId, intcoutput)) < (WindowEnd)) {
+          if (Timing[iTCId][itime] > (WindowStart) &&
+              Timing[iTCId][itime] < (WindowEnd)) {
 
 
-            HitTC[iTime][iTCId][intcoutput] = 1;
-            if ((obj_trgeclfam->getTCEnergy(iTCId, intcoutput)) > MaxE) {
-              MaxE = (obj_trgeclfam->getTCEnergy(iTCId, intcoutput));
-              EventTiming[iTime] = obj_trgeclfam->getTCTiming(iTCId, intcoutput);
+            HitTC[iTime][iTCId][itime] = 1;
+            if (Energy[iTCId][itime] > MaxE) {
+              MaxE = Energy[iTCId][itime];
+              EventTiming[iTime] = Timing[iTCId][itime];
             }
           }
         }
       }
 
       if (iTime > 1) {
-        if (EventTiming[iTime] < EventTiming[iTime - 1] + 5 && EventTiming[iTime] > EventTiming[iTime - 1] - 5 && EventTiming[iTime] < EventTiming[iTime - 2] + 5 && EventTiming[iTime] > EventTiming[iTime - 2] - 5) {
+        if (EventTiming[iTime] < EventTiming[iTime - 1] + 5 && EventTiming[iTime] > EventTiming[iTime - 1] - 5
+            && EventTiming[iTime] < EventTiming[iTime - 2] + 5 && EventTiming[iTime] > EventTiming[iTime - 2] - 5) {
           EventTiming[iTime - 1] = 0;
           EventTiming[iTime] = 0;
         }
@@ -512,31 +599,31 @@ void TrgEcl::getEventTiming(TrgEclFAM* obj_trgeclfam, int method)
       if (iTime == 0) {WindowStart = - 4000 + fluctuation;}
       WindowEnd  = WindowStart + TimeWindow;
 
-      for (int iTCId = 1; iTCId <= 576; iTCId++) {
+      for (int iTCId = 0; iTCId < 576; iTCId++) {
 
-        int ntcoutput = obj_trgeclfam->getTCNoOutput(iTCId);
-        for (int intcoutput = 0 ; intcoutput < ntcoutput ; intcoutput++) {
+        for (int itime = 0 ; itime < 80 ; itime++) {
 
-          if ((obj_trgeclfam->getTCTiming(iTCId, intcoutput)) > (WindowStart) &&
-              (obj_trgeclfam->getTCTiming(iTCId, intcoutput)) < (WindowEnd)) {
+          if (Timing[iTCId][itime] > (WindowStart) &&
+              Timing[iTCId][itime] < (WindowEnd)) {
+            if (Energy[iTCId][itime] < 0.1) {continue;}
 
-
-            HitTC[iTime][iTCId][intcoutput] = 1;
-            if (obj_trgeclfam->getTCEnergy(iTCId, intcoutput) > Etop5[0]) {
-              Etop5[0] = obj_trgeclfam->getTCEnergy(iTCId, intcoutput);
-              Ttop5[0] = obj_trgeclfam->getTCTiming(iTCId, intcoutput);
-            } else if (obj_trgeclfam->getTCEnergy(iTCId, intcoutput) > Etop5[1]) {
-              Etop5[1] = obj_trgeclfam->getTCEnergy(iTCId, intcoutput);
-              Ttop5[1] = obj_trgeclfam->getTCTiming(iTCId, intcoutput);
-            } else if (obj_trgeclfam->getTCEnergy(iTCId, intcoutput) > Etop5[2]) {
-              Etop5[2] = obj_trgeclfam->getTCEnergy(iTCId, intcoutput);
-              Ttop5[2] = obj_trgeclfam->getTCTiming(iTCId, intcoutput);
-            } else if (obj_trgeclfam->getTCEnergy(iTCId, intcoutput) > Etop5[3]) {
-              Etop5[3] = obj_trgeclfam->getTCEnergy(iTCId, intcoutput);
-              Ttop5[3] = obj_trgeclfam->getTCTiming(iTCId, intcoutput);
-            } else if (obj_trgeclfam->getTCEnergy(iTCId, intcoutput) > Etop5[4]) {
-              Etop5[4] = obj_trgeclfam->getTCEnergy(iTCId, intcoutput);
-              Ttop5[4] = obj_trgeclfam->getTCTiming(iTCId, intcoutput);
+            HitTC[iTime][iTCId][itime] = 1;
+            //      cout << iTCId << endl;
+            if (Energy[iTCId][itime] > Etop5[0]) {
+              Etop5[0] = Energy[iTCId][itime];
+              Ttop5[0] = Timing[iTCId][itime];
+            } else if (Energy[iTCId][itime] > Etop5[1]) {
+              Etop5[1] = Energy[iTCId][itime];
+              Ttop5[1] = Timing[iTCId][itime];
+            } else if (Energy[iTCId][itime] > Etop5[2]) {
+              Etop5[2] = Energy[iTCId][itime];
+              Ttop5[2] = Timing[iTCId][itime];
+            } else if (Energy[iTCId][itime] > Etop5[3]) {
+              Etop5[3] = Energy[iTCId][itime];
+              Ttop5[3] = Timing[iTCId][itime];
+            } else if (Energy[iTCId][itime] > Etop5[4]) {
+              Etop5[4] = Energy[iTCId][itime];
+              Ttop5[4] = Timing[iTCId][itime];
             }
           }
         }
@@ -548,7 +635,8 @@ void TrgEcl::getEventTiming(TrgEclFAM* obj_trgeclfam, int method)
       if (MaxE == 0) {continue;}
       EventTiming[iTime] = EventTiming[iTime] / MaxE;
       if (iTime > 1) {
-        if (EventTiming[iTime] < EventTiming[iTime - 1] + 5 && EventTiming[iTime] > EventTiming[iTime - 1] - 5 && EventTiming[iTime] < EventTiming[iTime - 2] + 5 && EventTiming[iTime] > EventTiming[iTime - 2] - 5) {
+        if (EventTiming[iTime] < EventTiming[iTime - 1] + 5 && EventTiming[iTime] > EventTiming[iTime - 1] - 5
+            && EventTiming[iTime] < EventTiming[iTime - 2] + 5 && EventTiming[iTime] > EventTiming[iTime - 2] - 5) {
           EventTiming[iTime - 1] = 0;
           EventTiming[iTime] = 0;
         }

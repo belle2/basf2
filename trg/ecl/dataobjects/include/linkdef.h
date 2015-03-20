@@ -11,5 +11,6 @@
 #pragma link C++ class Belle2::TRGECLTrg+;
 #pragma link C++ class Belle2::TRGECLDigi0MC+;
 #pragma link C++ class Belle2::TRGECLHitMC+;
+#pragma link C++ class Belle2::TRGECLCluster+;
 
 #endif

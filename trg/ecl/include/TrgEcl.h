@@ -63,14 +63,17 @@ namespace Belle2 {
     int getECLtoGDL(void) { return bitECLtoGDL; }
 
     //
-    void setPRS(TrgEclFAM*, int HitTC[][20]);
-    void getEventTiming(TrgEclFAM*, int);
+    void setPRS(int iBin);
+    void getEventTiming(int option);
 
 
   private:
-
-    int HitTC[160][576][20];
+    int   HitTC[160][576][80];
     double EventTiming[160];
+    double Timing[576][80];
+    double Energy[576][80];
+
+
 
     static TrgEcl* _ecl;
 

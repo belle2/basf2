@@ -177,7 +177,8 @@ namespace Belle2 {
       double maxTCEnergy
 
 
-    ) {
+    )
+    {
       m_eventId = eventId;
       //
       m_prs01 = prs01;

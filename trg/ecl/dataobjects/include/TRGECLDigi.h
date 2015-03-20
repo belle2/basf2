@@ -84,7 +84,8 @@ namespace Belle2 {
       double raw_timing_tot,
       double fit_energy,
       double fit_timing
-    ) {
+    )
+    {
       m_eventid = eventid;
       m_tcid    = tcid;
       m_phiid   = phiid;

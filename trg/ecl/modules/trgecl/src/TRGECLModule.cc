@@ -29,6 +29,7 @@
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -101,6 +102,7 @@ namespace Belle2 {
     StoreArray<TRGECLDigi0>::registerPersistent();
     StoreArray<TRGECLHit>::registerPersistent();
     StoreArray<TRGECLTrg>::registerPersistent();
+    StoreArray<TRGECLCluster>::registerPersistent();
 
 
 

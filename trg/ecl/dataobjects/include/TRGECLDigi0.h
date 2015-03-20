@@ -62,7 +62,8 @@ namespace Belle2 {
       int ibintime,
       double raw_energy,
       double raw_timing
-    ) {
+    )
+    {
       m_eventid = eventid;
       m_tcid    = tcid;
       m_ibintime = ibintime;

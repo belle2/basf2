@@ -43,17 +43,17 @@ namespace Belle2 {
     //! The method to set hit average time
     void setTimeAve(double TimeAve) { m_TimeAve = TimeAve; }
 
-    // The method to get TC id
-    std::vector<int> TCId(void) const { return _tcid; }
-    std::vector<int> TCThetaId(void) const { return _tcthetaid; }
-    std::vector<int> TCPhiId(void) const { return _tcphiid; }
+    /* // The method to get TC id */
+    /* std::vector<int> TCId(void) const { return _tcid; } */
+    /* std::vector<int> TCThetaId(void) const { return _tcthetaid; } */
+    /* std::vector<int> TCPhiId(void) const { return _tcphiid; } */
 
 
-    int getTCThetaId(int tcid) const { return _tcthetaid[tcid - 1]; }
-    int getTCPhiId(int tcid) const { return _tcphiid[tcid - 1]; }
-    int getTCNoOutput(int tcid) const { return _tcnoutput[tcid - 1]; }
-    double getTCEnergy(int tcid, int noutput) const {return TCFitEnergy[tcid - 1][noutput]; }
-    double getTCTiming(int tcid, int noutput) const {return TCFitTiming[tcid - 1][noutput];}
+    /* int getTCThetaId(int tcid) const { return _tcthetaid[tcid - 1]; } */
+    /* int getTCPhiId(int tcid) const { return _tcphiid[tcid - 1]; } */
+    /* int getTCNoOutput(int tcid) const { return _tcnoutput[tcid - 1]; } */
+    /* double getTCEnergy(int tcid, int noutput) const {return TCFitEnergy[tcid - 1][noutput]; } */
+    /* double getTCTiming(int tcid, int noutput) const {return TCFitTiming[tcid - 1][noutput];} */
 
     // return PDF of shaping based on ShapeF
     double FADC(int, double);
@@ -103,11 +103,11 @@ namespace Belle2 {
     double TCRawEnergy[576][60]; // Input  TC energy[GeV]
     double TCRawTiming[576][60]; // Input  TC timing[ns]
 
-    std::vector<int>    _tcid;
-    std::vector<int>    _tcphiid;
-    std::vector<int>    _tcthetaid;
-    std::vector<int>    _tcnoutput;
-    std::vector<double> _tcenergy;
+    /* std::vector<int>    _tcid; */
+    /* std::vector<int>    _tcphiid; */
+    /* std::vector<int>    _tcthetaid; */
+    /* std::vector<int>    _tcnoutput; */
+    /* std::vector<double> _tcenergy; */
 
     TrgEclMapping* _TCMap;
 

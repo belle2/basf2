@@ -202,6 +202,7 @@ TrgEclMapping::getTCThetaIdFromTCId(int TCId)
   if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> input TCId is wrong!!!");
     return -1;
+
   }
   int TCId0 = TCId - 1;
   // forward-endcap  [Xtal=   1-1152, TC=  1- 80(80)]
@@ -228,6 +229,7 @@ TrgEclMapping::getTCPhiIdFromTCId(int TCId)
   if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> input TCId is wrong!!!");
     return -1;
+
   }
   int TCId0 = TCId - 1;
   // forward-endcap  [Xtal=   1-1152, TC=  1- 80(80)]
@@ -249,6 +251,7 @@ TVector3 TrgEclMapping::getTCPosition(int TCId)
 {
   if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> input TCId is wrong!!!");
+
   }
 
 

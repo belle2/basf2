@@ -103,6 +103,18 @@ double const ECLCrystalData::BarrelZ[46] = {210.15, 200.14, 190.44, 181.05, 171.
 ECLCrystalData::ECLCrystalData()
 {
   m_cell_ID = -1;
+  m_phi_ID = -1;
+  m_theta_ID = -1;
+  m_phi_idx = -1;
+  m_theta_idx = -1;
+
+  m_mass = -1;
+  m_volume = -1;
+  m_PosR = -1;
+  m_PosP = -1;
+  m_PosX = -1;
+  m_PosY = -1;
+  m_PosZ = -1;
 }
 
 ECLCrystalData::ECLCrystalData(int cid)

@@ -17,12 +17,13 @@
 #include <fstream>
 
 #include <framework/dataobjects/Helix.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 #include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
 
-// #define DEBUG
+//#define DEBUG
 #ifdef DEBUG
 ofstream ofs_cosmic1g("cosmic1g.out");
 ofstream ofs_cosmic1c("cosmic1c.out");
@@ -103,7 +104,10 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
 #endif
 
     // Simulate helix parameter at perigee
-    const float bz = 1.5; // Magnetic field
+    TVector3 bfield = BFieldMap::Instance().getBField(TVector3(0., 0., 0.)); // Magnetic field
+    float bz = bfield[2];
+    const float EPS = 0.0001; // Avoid using zero magnetic field
+    if (fabs(bz) < EPS) bz = EPS; // Set the value of the magnetic field to a small number
     float d0, phi0, omega, z0, tanLambda; // The definition is the same as in the Helix class
     d0 = dr;
     phi0 = phi;

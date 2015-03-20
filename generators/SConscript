@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework',
+env['LIBS'] = ['framework', 'geometry',
                '$ROOT_LIBS','EvtGen','pythia8','PhotosCxxInterface.a', 'HepMC',
                'TauolaCxxInterface', 'TauolaFortran', 'lhapdfdummy',
                'PhotosFortran', 'EvtGenExternal', 'Geom', 'CLHEP',

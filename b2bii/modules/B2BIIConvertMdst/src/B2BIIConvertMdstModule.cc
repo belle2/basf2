@@ -16,8 +16,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <queue>
-
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -30,6 +28,10 @@
 
 // ROOT
 #include <TVector3.h>
+
+#include <limits>
+#include <queue>
+
 
 using namespace Belle2;
 
@@ -476,6 +478,9 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
     Belle::Gen_hepevt daughterParticle = genMgr(Belle::Panther_ID(genHepevt.daFirst()));
     mcParticle->setDecayTime(daughterParticle.T()*Unit::mm / Const::speedOfLight);
     mcParticle->setDecayVertex(daughterParticle.VX()*Unit::mm, daughterParticle.VY()*Unit::mm, daughterParticle.VZ()*Unit::mm);
+  } else {
+    //otherwise, assume it's stable
+    mcParticle->setDecayTime(std::numeric_limits<float>::infinity());
   }
 
   mcParticle->setValidVertex(true);

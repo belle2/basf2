@@ -22,6 +22,7 @@
 #include <functional>
 #include <map>
 #include <G4String.hh>
+#include <G4Material.hh>
 
 #include <CLHEP/Geometry/Transform3D.h>
 #include <CLHEP/Vector/ThreeVector.h>
@@ -71,14 +72,21 @@ namespace Belle2 {
       //! Clears
       void clear();
 
-      //! Print some debug information
-      void Print(const int cid);
+      //! Print crystal information
+      void Print(const int cid, int debuglevel = 80);
+
+      //! Print all crystals information
+      void PrintAll(int debuglevel = 80);
+
 
       //! Gets geometry parameters from gearbox.
       void read();
 
       /** Get Cell Id */
       int CsiVolNameToCellID(const G4String VolumeName);//Mapping from VolumeName to Crystal CellID
+
+      /** Get pointer to the Geant4 Material */
+      G4Material* GetMaterial(int cid);
 
       /** Get the position of the crystal*/
       ThreeVector GetPosition(int cid) { return m_Position.at(cid); };
@@ -93,10 +101,26 @@ namespace Belle2 {
       TVector3 GetOrientationTV3(int cid) { return m_OrientationTV3.at(cid); };
 
       /** Converts to a ROOT TVector3 */
-      TVector3 ConvertToTVector3(ThreeVector _hepTV) {
+      TVector3 ConvertToTVector3(ThreeVector _hepTV)
+      {
         TVector3 pos(_hepTV.x(), _hepTV.y(), _hepTV.z());
         return pos;
       };
+
+      /** Get Enclosure ID from cell ID*/
+      int GetEnclosureID(int cid) { return m_BoxID.at(cid); };
+
+      /** Get Slot ID in the Enclosure from cell ID*/
+      int GetSlotID(int cid) { return m_SlotID.at(cid); };
+
+      /** Get material property*/
+      double GetMaterialProperty(int cid, const char* propertyname);
+
+      /** Get crystal fast time constant*/
+      double GetTauFast(int cid) { return GetMaterialProperty(cid, "FASTTIMECONSTANT"); };
+
+      /** Get crystal slow time constant*/
+      double GetTauSlow(int cid) { return GetMaterialProperty(cid, "SLOWTIMECONSTANT"); };
 
 
     private:

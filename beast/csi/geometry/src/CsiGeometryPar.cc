@@ -7,7 +7,8 @@
  *               Alexandre Beaulieu                                       *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+#include <geometry/Materials.h>
+//#include <G4MaterialPropertiesTable.hh>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -20,6 +21,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+
 
 using namespace std;
 using namespace boost;
@@ -41,6 +43,8 @@ CsiGeometryPar::CsiGeometryPar()
 {
   clear();
   read();
+
+  PrintAll();
 }
 
 CsiGeometryPar::~CsiGeometryPar()
@@ -75,12 +79,8 @@ void CsiGeometryPar::read()
 
   for (int iEnc = 1; iEnc <= nEnc; iEnc++) {
     // Build the box (same for all)
-//      double width  = content.getLength("Enclosures/Width") * CLHEP::cm;
     double length = content.getLength("Enclosures/Length") * CLHEP::cm;
-//      double depth  = content.getLength("Enclosures/Depth") * CLHEP::cm;
     double thk    = content.getLength("Enclosures/Thickness") * CLHEP::cm;
-//      double fold   = content.getLength("Enclosures/Fold") * CLHEP::cm;
-//      double lidthk = content.getLength("Enclosures/LidThickness") * CLHEP::cm;
     double halflength = 15.0 * CLHEP::cm;
     double zshift = 0.5 * length - thk - halflength; /*< Shift of the box along z-axis (cry touches panel) **/
 
@@ -105,7 +105,6 @@ void CsiGeometryPar::read()
     Transform3D m2 = RotateY3D(Theta);
     Transform3D m3 = RotateZ3D(Phi2);
     Transform3D position = Translate3D(PosR * cos(PosT), PosR * sin(PosT), PosZ);
-//      Transform3D lidpos   = Translate3D(0, 0.5 * (depth + lidthk), 0);
 
     /** Position of the nominal centre of crystals in the box **/
     Transform3D Tr    = position * m3 * m2 * m1;
@@ -124,8 +123,6 @@ void CsiGeometryPar::read()
       double SlotY = slotContent.getLength("PosY") * CLHEP::cm;
       double SlotZ = slotContent.getLength("PosZ") * CLHEP::cm;
       Transform3D Pos = Translate3D(SlotX, SlotY, SlotZ);
-
-//       int    CryID  = enclosureContent.getInt((boost::format("/CrystalInSlot[%1%]") % iSlot).str());
 
       Transform3D CrystalPos = Tr * Pos;
       RotationMatrix CrystalRot = CrystalPos.getRotation();
@@ -178,15 +175,64 @@ int CsiGeometryPar::CsiVolNameToCellID(const G4String VolumeName)
 }
 
 
-void CsiGeometryPar::Print(int cid)
+
+G4Material* CsiGeometryPar::GetMaterial(int cid)
 {
-  B2INFO("Cell ID : " << cid);
+  int iEnclosure = GetEnclosureID(cid) + 1;
+  int iSlot      = GetSlotID(cid) + 1;
 
-  B2INFO("   Position  x : " << GetPosition(cid).x());
-  B2INFO("   Position  y : " << GetPosition(cid).y());
-  B2INFO("   Position  z : " << GetPosition(cid).z());
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CSI\"]/Content/");
 
-  B2INFO("   Orientation  x : " << GetOrientation(cid).x());
-  B2INFO("   Orientation  y : " << GetOrientation(cid).y());
-  B2INFO("   Orientation  z : " << GetOrientation(cid).z());
+  GearDir enclosureContent(content);
+  string gearPath = "Enclosures/Enclosure";
+  string enclosurePath = (format("/%1%[%2%]") % gearPath % iEnclosure).str();
+  enclosureContent.append(enclosurePath);
+
+  string slotName = (format("CrystalInSlot[%1%]") % iSlot).str();
+  int iCry = enclosureContent.getInt(slotName);
+
+
+  GearDir crystalContent(content);
+  crystalContent.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
+  string strMatCrystal = crystalContent.getString("Material", "Air");
+
+  return geometry::Materials::get(strMatCrystal);
+
+}
+
+
+double CsiGeometryPar::GetMaterialProperty(int cid, const char* propertyname)
+{
+  G4Material* mat = GetMaterial(cid);
+  G4MaterialPropertiesTable* properties = mat->GetMaterialPropertiesTable();
+  G4MaterialPropertyVector* property = properties->GetProperty(propertyname);
+
+  return property->Value(0);
+}
+
+void CsiGeometryPar::Print(int cid, int debuglevel)
+{
+  B2DEBUG(debuglevel, "Cell ID : " << cid);
+
+  B2DEBUG(debuglevel, "   Position  x : " << GetPosition(cid).x());
+  B2DEBUG(debuglevel, "   Position  y : " << GetPosition(cid).y());
+  B2DEBUG(debuglevel, "   Position  z : " << GetPosition(cid).z());
+
+  B2DEBUG(debuglevel, "   Orientation  x : " << GetOrientation(cid).x());
+  B2DEBUG(debuglevel, "   Orientation  y : " << GetOrientation(cid).y());
+  B2DEBUG(debuglevel, "   Orientation  z : " << GetOrientation(cid).z());
+
+  B2DEBUG(debuglevel, "   Material : " << GetMaterial(cid)->GetName());
+
+  B2DEBUG(debuglevel, "   Slow time constatnt : " << GetMaterialProperty(cid, "SLOWTIMECONSTANT"));
+  B2DEBUG(debuglevel, "   Fast time constatnt : " << GetMaterialProperty(cid, "FASTTIMECONSTANT"));
+  B2DEBUG(debuglevel, "   Light yield : "         << GetMaterialProperty(cid, "SCINTILLATIONYIELD"));
+
+  //GetMaterial(cid)->GetMaterialPropertiesTable()->DumpTable();
+}
+
+void CsiGeometryPar::PrintAll(int debuglevel)
+{
+  for (uint i = 0; i < m_thetaID.size(); i++)
+    Print(i, debuglevel);
 }

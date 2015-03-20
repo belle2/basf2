@@ -89,7 +89,8 @@ namespace Belle2 {
 
     // Parameters
     double m_paramTemplate;  /**< Template of an input parameter. Noop for now. */
-    int m_nWFSamples ; /**< Number of samples in each of the waveforms (in the near future this should be imported from the digi module somehow */
+    int m_nWFSamples
+    ; /**< Number of samples in each of the waveforms (in the near future this should be imported from the digi module somehow */
     std::string  m_waveformFilename ; /**< Path where to save the waveforms (root file) */
 
 
@@ -103,10 +104,11 @@ namespace Belle2 {
     TH1F* h_CrystalRadDoseSH;   /**< Yearly radiation dose deposited in each crystal (for hit-simhit check)*/
     TH1F* h_NhitCrystal;        /**< Number of hits in each crystal (to get hit rate)*/
     TH1F* h_LightYieldCrystal;  /**< Number of photons hits in each crystal (to validate light yield..) */
-    TH1S* h_Waveform;
-    TH1C* h_Gate;
-    TH1I* h_Charge ;
-    TH1F* h_TrueEdep;
+    TH1S* h_Waveform;           /**< Contains the digitized waveform (if enabled in the digitizer) */
+    TH1C* h_Gate;               /**< Contains the integration gate (if waveforms are enabled in the digitizer) */
+    TH1F* h_Charge ;            /**< Distribution of the integrated charge from the pulse processing algorithm*/
+    TH1F* h_TrueEdep;           /**< Distribution of the true total deposited energy in the event*/
+    TH1F* h_Height;           /**< Max height of the peak signa( */
 
 
 

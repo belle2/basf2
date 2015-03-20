@@ -22,7 +22,7 @@
 #include <TGraph.h>
 #include <TH1F.h>
 #include <TH1I.h>
-#include <TRandom3.h>
+#include <framework/core/RandomNumbers.h>
 #include <TVector3.h>
 #include <TVectorD.h>
 #include <math.h>
@@ -47,7 +47,14 @@ CsIDigitizerModule::CsIDigitizerModule() : Module(), m_hitNum(0),
   m_nWFcounter(0),
   m_aDigiHit("CsiDigiHits"),
   m_calibConstants(16, 5),
-  m_noiseLevels(16, 0.25e-3)
+  m_noiseLevels(16, 0.25e-3),
+  m_LY(16, 40e6),
+  m_tRatio(16, 0),
+  m_tFast(16, 1),
+  m_tSlow(16, 1),
+  m_LCE(16, 0.1),
+  m_PmtQE(16, 0.05),
+  m_PmtGain(16, 1e5)
 {
   // Set module properties
   setDescription("Digitizer for the BEAST CsI system");
@@ -75,6 +82,17 @@ void CsIDigitizerModule::initialize()
   m_dt = 1e9 / m_SampleRate;
   setnSamples(8192);
 
+  //Get crystal and PMT constants from xml files
+  CsiGeometryPar* csip = CsiGeometryPar::Instance();
+  for (uint i = 0; i != m_LY.size(); ++i) {
+    csip->Print(i, 80);
+
+    m_LY.at(i)     = 1e3 * csip->GetMaterialProperty(i, "SCINTILLATIONYIELD");
+    m_tFast.at(i)  = csip->GetMaterialProperty(i, "FASTTIMECONSTANT");
+    m_tSlow.at(i)  = csip->GetMaterialProperty(i, "SLOWTIMECONSTANT");
+    m_tRatio.at(i) = csip->GetMaterialProperty(i, "YIELDRATIO");
+  }
+
 }
 
 void CsIDigitizerModule::beginRun()
@@ -84,12 +102,10 @@ void CsIDigitizerModule::beginRun()
 
 void CsIDigitizerModule::event()
 {
-
-
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   int m_currentEventNumber = eventMetaDataPtr->getEvent();
 
-  B2DEBUG(80, "Digiting event  " << m_currentEventNumber);
+  B2DEBUG(80, "Digitingevent  " << m_currentEventNumber);
 
   //Loop over CsiHits
   if (m_aSimHit.getEntries() > 0) {
@@ -97,7 +113,6 @@ void CsIDigitizerModule::event()
 
     // double E_tmp[16] = {0};       /**< Sum energy deposited in each cell */
     // double edepSum = 0;           /**< Sum energy deposited in all cells */
-
 
     for (int i = 0 ; i < 16 ; i++) {
       m_SimHitTimes[i].clear();
@@ -119,10 +134,12 @@ void CsIDigitizerModule::event()
       TVector3 cellPos   = csip->GetPositionTV3(m_cellID);
       TVector3 cellAngle = csip->GetOrientationTV3(m_cellID);
 
-      double localPos = (15. - (hitPos  - cellPos) * cellAngle);  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
+      double localPos = (15. - (hitPos  - cellPos) *
+                         cellAngle);  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
 
       // 0.06 is the speed of light in CsI(Tl)
-      double  propagTime = m_SampleRate * (0.0600 * localPos + (tof / CLHEP::ns)) * 1e-9;  /**< Time when photons from the hit reach the PIN-diode (in ns).*/
+      double  propagTime = m_SampleRate * (0.0600 * localPos + (tof / CLHEP::ns)) * 1e
+                           - 9; /**< Time when photons from the hit reach the PIN-diode (in ns).*/
 
 
       m_SimHitTimes[m_cellID].push_back(propagTime);
@@ -149,7 +166,7 @@ void CsIDigitizerModule::event()
 
         B2DEBUG(140, "Generating Time signal");
         Signal tempSignal;
-        m_TrueEdep = genTimeSignal(&tempSignal, m_SimHitEdeps[iCh], m_SimHitTimes[iCh],  1,  m_dt,  m_nSamples, false);
+        m_TrueEdep = genTimeSignal(&tempSignal, m_SimHitEdeps[iCh], m_SimHitTimes[iCh], iCh,  m_dt,  m_nSamples, false);
 
 
         B2DEBUG(140, "Launching Charge integration");
@@ -157,9 +174,10 @@ void CsIDigitizerModule::event()
         if ((m_nWaveforms == -1) || (m_nWFcounter < m_nWaveforms)) {
           m_nWFcounter++;
           recordWaveform = true;
+          B2DEBUG(80, "Recording WF");
         }
-        doChargeIntegration(tempSignal, 128, &m_Baseline, &m_Charge, &m_Time, &m_Waveform,
-                            &m_DPPCIBits,  5, 1.2e4, 1e4, 1e3, recordWaveform);
+        uint16_t max = doChargeIntegration(tempSignal, 128, &m_Baseline, &m_Charge, &m_Time, &m_Waveform,
+                                           &m_DPPCIBits,  5, 1.2e4, 1e4, 1e3, recordWaveform);
 
 
         if (m_Charge > 0) {
@@ -173,6 +191,9 @@ void CsIDigitizerModule::event()
           m_aDigiHit[m_hitNum]->setTime(m_Time);
           m_aDigiHit[m_hitNum]->setBaseline(m_Baseline);
           m_aDigiHit[m_hitNum]->setTrueEdep(m_TrueEdep);
+
+          m_aDigiHit[m_hitNum]->setMaxVal(max);
+
           m_aDigiHit[m_hitNum]->setWaveform(&m_Waveform);
           m_aDigiHit[m_hitNum]->setStatusBits(&m_DPPCIBits);
         }
@@ -190,11 +211,11 @@ void CsIDigitizerModule::terminate()
 {
 }
 
-int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16_t* _BSL, uint16_t* _Q,
-                                             uint32_t* _t, vector<uint16_t>* _Waveform,
-                                             vector<uint8_t>* _DPPCIBits, int _Treshold,
-                                             double _TriggerHoldoff, double _GateWidth,
-                                             double _GateOffset, bool _recordTraces)
+uint16_t  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16_t* _BSL, uint32_t* _Q,
+                                                  uint32_t* _t, vector<uint16_t>* _Waveform,
+                                                  vector<uint8_t>* _DPPCIBits, int _Treshold,
+                                                  double _TriggerHoldoff, double _GateWidth,
+                                                  double _GateOffset, bool _recordTraces)
 {
 
   B2DEBUG(80, "Arguments: " << &_u << ", " << _NsamBL << ", " << _BSL << ", " << _Q  << ", " <<  _t
@@ -238,7 +259,14 @@ int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16_t* _
   _Waveform->resize(nSam, 0);
   _DPPCIBits->resize(nSam, 0);
 
+  B2DEBUG(140, "Scanning vector: all should have nSam=" << nSam);
+
+  uint16_t maxval = 0;
+
   for (it = x.begin(); (it != x.end()); ++it, ++i) {
+
+    if (*it > maxval)
+      maxval = *it;
 
     _Waveform->at(i) = *it;
     _DPPCIBits->at(i) = trigger + (gate << 1) + (holdoff << 2) + (stop << 3);
@@ -297,7 +325,8 @@ int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16_t* _
   }
 
   *_Q = charge;
-  *_t = (uint) iFirstTrigger;
+  // from the doc: 2 sample uncertainty.
+  *_t = (uint)(iFirstTrigger  + 2.0 * (gRandom->Rndm() - 0.5));
 
   if (not(_recordTraces)) {
     _Waveform->clear();
@@ -327,7 +356,7 @@ int  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16_t* _
     */
   }
 
-  return nSam;
+  return maxval;
 }
 
 vector<int>  CsIDigitizerModule::doDigitization(Signal _v, double _LSB)
@@ -343,7 +372,8 @@ vector<int>  CsIDigitizerModule::doDigitization(Signal _v, double _LSB)
   return  output;
 }
 
-double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Signal _times, int _iChannel, int _dt, int _nsam, bool _save)
+double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Signal _times, int _iChannel, int _dt, int _nsam,
+                                         bool _save)
 {
 
   double invdt = 1.0 / _dt;
@@ -351,8 +381,6 @@ double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Sign
   double tf = 0;
   double t0 = 1e9;
   double sumEnergies = 0.0;
-
-  TRandom3 noise(m_seed);
 
   for (Signal::iterator it = _times.begin() ; it != _times.end(); ++it) {
     if (*it < t0)
@@ -366,28 +394,45 @@ double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Sign
 
   int i = 0;
   int ioffset = floor(_nsam * 0.25);
+  B2DEBUG(150, "Filling edepos vector. Container length is " << _nsam);
+
   for (Signal::iterator it = _times.begin() ; it != _times.end(); ++it, ++i) {
     // time index +/- 1 time bin
-    int timeIndex = ((int)(*it - t0) * invdt + 2.0 * (noise.Rndm() - 0.5) + ioffset);
-    edepos.at(timeIndex) += _energies.at(i);
-    sumEnergies += _energies.at(i);
+    int timeIndex = ((int)(*it - t0) * invdt  + ioffset);
+    if ((timeIndex - 1) > (int) edepos.size()) {
+      B2WARNING(" genTimeSignal: TimeIndex greater than length of signal container. Skipping deposit of " << _energies.at(i) << "GeV");
+    } else {
+      edepos.at(timeIndex) += _energies.at(i);
+      sumEnergies += _energies.at(i);
+    }
   }
 
+  B2DEBUG(80, "Generating time responses for channel " << _iChannel);
+  B2DEBUG(80, "    Fast time constant  " << m_tFast[_iChannel]);
+  B2DEBUG(80, "    Slow time constant  " << m_tSlow[_iChannel]);
+  /*
+    Signal Qcathode = firstOrderResponse(m_LY[_iChannel] * m_LCE[_iChannel] * m_PmtQE[_iChannel],
+    edepos, 0, _dt, m_tSlow[_iChannel], 0.0, m_tRatio[_iChannel], m_tFast[_iChannel]);
+  */
 
-  Signal LightDep = firstOrderResponse(edepos, 0, _dt, m_tCsITl);
-  Signal V = firstOrderResponse(LightDep, 0, _dt, m_tRisePMT, m_tTransitPMT);
+  Signal Qcathode = firstOrderResponse((1 - m_tRatio[_iChannel]) * m_LY[_iChannel] * m_LCE[_iChannel] * m_PmtQE[_iChannel], edepos, 0,
+                                       _dt, m_tSlow[_iChannel], 0.0);
+
+
+  if (m_tRatio[_iChannel]) {
+    Signal QcathodeF = firstOrderResponse(m_tRatio[_iChannel] * m_LY[_iChannel] * m_LCE[_iChannel] * m_PmtQE[_iChannel], edepos, 0, _dt,
+                                          m_tFast[_iChannel], 0.0);
+
+    int j = 0;
+    for (Signal::iterator it = Qcathode.begin() ; it != Qcathode.end(); ++it, ++j)
+      *it += QcathodeF.at(j);
+  }
+
+  Signal Vanode   = firstOrderResponse(1.602e-10 * m_Zl * invdt * m_PmtGain[_iChannel], Qcathode, 0, _dt, m_tRisePMT, m_tTransitPMT);
 
   i = 0;
-  for (Signal::iterator it = V.begin() ; it != V.end(); ++it, i++) {
-    *it *= m_calibConstants[_iChannel];
-    *it += noise.Gaus(0, m_noiseLevels[_iChannel]);
-    //Cancel next line: should be done afterwards!
-    //*it  = floor(*it * (1.0 /  m_Resolution));
-
-    //Add low frequency "noise"
-    *it += 0.01 + 5e-4 * sin((float)i * 5e-4);
-  }
-
+  B2DEBUG(150, "Adding noise. Container length is " << Vanode.size());
+  addNoise(&Vanode, m_noiseLevels[_iChannel], 5e-3 * gRandom->Rndm() + 1e-2);
 
   if (_save) {
     Signal t(_nsam, 0);
@@ -399,33 +444,57 @@ double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Sign
     TGraph gPlot1(_nsam, &t[0], &edepos[0]);
     gPlot1.SaveAs("EdeposOut.root");
 
-    TGraph gPlot2(_nsam, &t[0], &LightDep[0]);
-    gPlot2.SaveAs("LightDepoOut.root");
+    TGraph gPlot2(_nsam, &t[0], &Qcathode[0]);
+    gPlot2.SaveAs("QOut.root");
 
-    TGraph gPlot3(_nsam, &t[0], &V[0]);
+    TGraph gPlot3(_nsam, &t[0], &Vanode[0]);
     gPlot3.SaveAs("VOut.root");
   }
 
-  *_output = V;
+  *_output = Vanode;
 
   return sumEnergies;
 }
 
 
-/*
-  int CsiDigitizerModule::addNoise(Signal * y, double rms, int seed)
-  {
-  TRandom3 noise(seed);
+int CsIDigitizerModule::addNoise(Signal* y, double _rms, double  _offset)
+{
   for (Signal::iterator it = y->begin() ; it != y->end(); ++it)
-  *it += noise.Gaus(0,rms);
+    *it += _offset + gRandom->Gaus(0, _rms);
 
   return y->size();
+}
+
+/*
+Signal CsIDigitizerModule::firstOrderResponse(double _gain, Signal _u, double _y0, double _dt, double _tSlow, double _delay, double _tRatio, double _tFast)
+{
+
+  Signal slowLight = firstOrderResponse(_gain*(1-_tRatio), _u, _y0, _dt, _tFast, _delay);
+
+  if (_tRatio>0) {
+    Signal fastLight = firstOrderResponse(_gain*   _tRatio , _u, _y0, _dt, _tFast, _delay);
+    int i=0;
+     for (Signal::iterator it = slowLight.begin() ; it != slowLight.end(); ++it, ++i)
+          *it += fastLight.at(i);
   }
+  B2WARNING("You shouldn't see this!");
+  return slowLight;
+
+}
 */
 
-
-Signal CsIDigitizerModule::firstOrderResponse(Signal _u, double _y0, double _dt, double _tau, double _delay)
+Signal CsIDigitizerModule::firstOrderResponse(double _gain, Signal _u, double _y0, double _dt, double _tau, double _delay)
 {
+
+  B2DEBUG(80, "Generating 1st order response with arguments");
+  B2DEBUG(80, "       _gain: " << _gain);
+  B2DEBUG(80, "  length(_u): " << _u.size());
+  B2DEBUG(80, "         _y0: " << _y0);
+  B2DEBUG(80, "         _dt: " << _dt);
+  B2DEBUG(80, "        _tau: " << _tau);
+  B2DEBUG(80, "      _delay: " << _delay);
+
+
   // First skip everything if the time constant in infinitely short.
   if (_tau == 0)
     return _u;
@@ -436,7 +505,6 @@ Signal CsIDigitizerModule::firstOrderResponse(Signal _u, double _y0, double _dt,
 
   static const double invSix = 1.0 / 6.0;
   double invtau = 1.0 / _tau;
-  double y_max = 0.0;
   y.push_back(_y0);
 
   // Apply delay to input
@@ -449,30 +517,26 @@ Signal CsIDigitizerModule::firstOrderResponse(Signal _u, double _y0, double _dt,
   // Apply that input to the good old Runge-Kutta 4 routine.
   for (int i = 0, j = 0; i < (n - 1); i++) {
     j = i + 1;
-    k[0] = f(i      , _u[i], _u[j], y[i]              , invtau);
+    k[0] = f(i      , _u[i], _u[j], y[i]                   , invtau);
     k[1] = f(i + 0.5, _u[i], _u[j], y[i] + 0.5 * _dt * k[0], invtau);
     k[2] = f(i + 0.5, _u[i], _u[j], y[i] + 0.5 * _dt * k[1], invtau);
-    k[3] = f(j      , _u[i], _u[j], y[i] +     _dt * k[2], invtau);
+    k[3] = f(j      , _u[i], _u[j], y[i] +       _dt * k[2], invtau);
 
     y.push_back(y[i] + _dt * invSix * (k[0] + 2 * k[1] + 2 * k[2] + k[3]));
-
-    if (fabs(y.back()) > y_max) y_max = fabs(y.back());
   }
 
 
-  /*
-
-  //Normalize the response peak (remember this is only a template fo a signal..)
-  double inv_max = 1.0 / y_max;
-  for (Signal::iterator it = y.begin() ; it != y.end(); ++it)
-    *it *= inv_max;
-    */
+  // Apply gain
+  if (_gain != 1) {
+    for (Signal::iterator it = y.begin() ; it != y.end(); ++it)
+      *it *= _gain;
+  }
 
   return y;
 }
 
 
-inline double CsIDigitizerModule::f(double fi, double u_i, double u_j, double y, double invtau)
+double CsIDigitizerModule::f(double fi, double u_i, double u_j, double y, double invtau)
 {
   //linear interpolation of the input at fractional index fi
   double u = u_i * (fi - floor(fi)) + u_j * (ceil(fi) - fi);

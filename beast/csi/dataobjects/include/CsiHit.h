@@ -25,7 +25,8 @@ namespace Belle2 {
   class CsiHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    CsiHit(): SimHitBase() {
+    CsiHit(): SimHitBase()
+    {
       m_CellId = 0;    /**< Cell ID */
       m_Edep = 0;    /**< deposited energy */
       m_TimeAve = 0; /**< average time */
@@ -39,7 +40,8 @@ namespace Belle2 {
       float Edep,
       float TimeAve,
       float TimeVar
-    ): SimHitBase() {
+    ): SimHitBase()
+    {
       m_CellId = CellId;
       m_Edep = Edep;
       m_TimeAve = TimeAve;

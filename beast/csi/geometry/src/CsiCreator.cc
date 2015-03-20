@@ -235,10 +235,10 @@ namespace Belle2 {
       double halflength = 15.0 * CLHEP::cm;
       double zshift = 0.5 * length - thk - halflength; /*< Shift of the box along z-axis to make crystal tough the panel **/
 
-      string strMatEnclosure = content.getString("Enclosures/Material", "Air");
+      string strMatEnclosure = content.getString("Enclosures/Material", "5052-Alloy");
       G4Material* EnclosureMat = geometry::Materials::get(strMatEnclosure);
 
-      string strMatEncloLid = content.getString("Enclosures/LidMaterial", "Air");
+      string strMatEncloLid = content.getString("Enclosures/LidMaterial", "5052-Alloy");
       G4Material* EncloLidMat = geometry::Materials::get(strMatEncloLid);
 
       G4Box* outer   = new G4Box("Outer", 0.5 * width, 0.5 * depth, 0.5 * length);
@@ -298,7 +298,6 @@ namespace Belle2 {
 
 
       int nSlots = enclosureContent.getNumberNodes("CrystalInSlot");
-
 
       for (int iSlot = 1; iSlot <= nSlots; iSlot++) {
         //Thread the strings

@@ -26,7 +26,8 @@ namespace Belle2 {
   class CsiDigiHit : public RelationsObject {
   public:
     /** default constructor for ROOT */
-    CsiDigiHit() {
+    CsiDigiHit()
+    {
       m_CellId   = 0;
       m_Charge   = 0;
       m_Baseline = 0;
@@ -87,6 +88,15 @@ namespace Belle2 {
      */
     void setBaseline(uint16_t baseline) { m_Baseline = baseline; }
 
+    /*! Get Maximal Value
+     */
+    uint16_t getMaxVal() const { return m_MaxVal; }
+
+    /*! Set Maximal Value
+     */
+    void setMaxVal(uint16_t maxval) { m_MaxVal = maxval; }
+
+
     /*! Get Waveform array
      * @return A pointer to the std::vector containing the waveform
      */
@@ -106,13 +116,19 @@ namespace Belle2 {
     void setStatusBits(std::vector<uint8_t>* status) { m_StatusBits = *status; }
 
 
+    /*! Set incoming particle PDG code
+     */
+    void setPDG(int pdg) {m_PDG = pdg;}
+
   private:
 
     uint8_t   m_CellId;                /**< Cell ID */
     uint16_t  m_Baseline;              /**< Baseline (pedestal) frozen during charge integration */
-    uint16_t  m_Charge;                /**< Integrated Charge */
+    uint16_t  m_MaxVal;                /**< Maximal value */
+    uint32_t  m_Charge;                /**< Integrated Charge */
     uint32_t  m_Time;                  /**< Trigger Time index*/
     double    m_TrueEdep;              /**< True deposited energy per event-crystal */
+    int       m_PDG;                   /**< PDG code of the initial particle */
     std::vector<uint16_t>  m_Waveform; /**< Saved waveform*/
     std::vector<uint8_t>   m_StatusBits; /**< Saved waveform*/
 

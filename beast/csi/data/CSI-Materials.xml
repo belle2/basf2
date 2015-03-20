@@ -49,33 +49,52 @@
      </Components>
    </Material>
 
-  <Material name="CsI">
+  <Material name="PureCsI">
     <density unit="g/cm3">4.510</density>
     <Components>
        <Element fraction="0.4885">I</Element>
        <Element fraction="0.5115">Cs</Element>
     </Components>
+    <!-- Yield per MeV photon -->
+    <Property name="SCINTILLATIONYIELD">
+	<value energy="1.0">1.9E+03</value> 
+    </Property>
+    <!-- Yield ratio fast/slow components -->
+    <Property name="YIELDRATIO">
+      <value energy="1.0">0.306</value>
+    </Property>
+    <Property name="FASTTIMECONSTANT">
+      <value energy="1.0" unit="ns">6</value>
+    </Property>
+    <Property name="SLOWTIMECONSTANT">
+      <value energy="1.0" unit="ns">36</value>
+    </Property>
   </Material>
-
-  <Material name="CsI-Mistake">
-    <density unit="g/cm3">4.510</density>
-    <Components>
-       <Element fraction="0.4885">Cs</Element>
-       <Element fraction="0.5115">I</Element>
-    </Components>
-  </Material>
-
-
+  
   <Material name="CsI-Tl">
     <density unit="g/cm3">4.510</density>
     <Components>
-       <Element fraction="0.511307">Cs</Element>
-       <Element fraction="0.488221">I</Element>
-       <!-- doped with 0.3mol% of Thallium-->
-       <Element fraction="0.000472">Tl</Element>
+      <Element fraction="0.511307">Cs</Element>
+      <Element fraction="0.488221">I</Element>
+      <!-- doped with 0.3mol% of Thallium-->
+      <Element fraction="0.000472">Tl</Element>
     </Components>
+    <!-- Yield per MeV photon -->
+    <Property name="SCINTILLATIONYIELD">
+      <value energy="1.0">66E+03</value>
+    </Property>
+    <!-- Yield ratio fast/slow components -->
+    <Property name="YIELDRATIO">
+      <value energy="1.0">0.0</value>
+    </Property>
+    <Property name="FASTTIMECONSTANT">
+      <value energy="1.0" unit="ns">1</value>
+    </Property>
+    <Property name="SLOWTIMECONSTANT">
+      <value energy="1.0" unit="ns">1220</value>
+    </Property>
   </Material>
-
+  
   <Material name="AlTeflon">
     <density unit="g/cm3">2.256</density>
     <Components>

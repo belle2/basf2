@@ -40,6 +40,7 @@ REG_MODULE(CsIStudy)
 //-----------------------------------------------------------------
 
 CsIStudyModule::CsIStudyModule() : HistoModule(),
+  fWF(NULL),
   h_CrystalEdep(NULL),
   h_CrystalSpectrum(NULL),
   h_CrystalRadDose(NULL),
@@ -49,7 +50,8 @@ CsIStudyModule::CsIStudyModule() : HistoModule(),
   h_Waveform(NULL),
   h_Gate(NULL),
   h_Charge(NULL),
-  h_TrueEdep(NULL)
+  h_TrueEdep(NULL),
+  h_Height(NULL)
 
 {
   // Set module properties
@@ -78,8 +80,10 @@ void CsIStudyModule::defineHisto()
   h_LightYieldCrystal   = new TH1F("Crystal_g_yield", "Light yield each crystal;CellID;gamma/sample", 16, -0.5, 15.5);
   h_Waveform            = new TH1S("Waveform", "Recorded waveform;Time index;ADC bits", m_nWFSamples, 0, m_nWFSamples - 1);
   h_Gate                = new TH1C("Gate", "Recorded gate;Time index;ADC bits", m_nWFSamples, 0, m_nWFSamples - 1);
-  h_Charge              = new TH1I("Charge", "Integrated Charge", 200, 0, 6);
-  h_TrueEdep            = new TH1F("TrueEdep", "True deposited energy", 200, -5, 1);
+  h_Charge              = new TH1F("Charge", "log_{10} of integrated Charge", 200, 0, 10);
+  h_TrueEdep            = new TH1F("TrueEdep", "log_{10} of true deposited energy/GeV", 200, -6, 0);
+
+  h_Height              = new TH1F("Height", "log10 of pulse height", 200, 0, 6);
 
 }
 
@@ -167,25 +171,32 @@ void CsIStudyModule::event()
       CsiDigiHit* aCsIDigiHit = m_digihits[i];
 
       int cellID = aCsIDigiHit->getCellId();
-      uint32_t charge = aCsIDigiHit->getCharge();
+      // cast to double before taking the log
+      double charge = (double) aCsIDigiHit->getCharge();
+      double height = (double) aCsIDigiHit->getMaxVal();
+      double baseline = (double) aCsIDigiHit->getBaseline();
       double trueEdep = aCsIDigiHit->getTrueEdep();
       vector<uint16_t>* waveform = aCsIDigiHit->getWaveform();
       vector<uint8_t>* status = aCsIDigiHit->getStatusBits();
 
       h_TrueEdep->Fill(log10(trueEdep));
-      h_Charge->Fill(log10(charge));
-
-      char histoTitle[80];
-      sprintf(histoTitle, "Waveform Hit No. %i, Cell No %i", i, cellID);
-      h_Waveform->SetTitle(histoTitle);
+      h_Charge->Fill(log10(charge - baseline));
+      h_Height->Fill(log10(height));
 
       // Write the wavforms. All have the same number in the TFile, but
       // we can access them by their cycle number:
       // root[] TFile *f1 = new TFile("filename.root")
       // root[] TH1F *Waveform4; f1->GetObject("h_Waveform;4",Waveform4);
 
-
       if (waveform->size()) {
+        h_Gate->Reset();
+        h_Waveform->Reset();
+
+        char histoTitle[80];
+        sprintf(histoTitle, "Waveform Hit No. %i, Cell No %i", i, cellID);
+        h_Waveform->SetTitle(histoTitle);
+
+
         for (uint iBin = 0; iBin < waveform->size(); iBin++) {
           bool* statusBits = readDPPStatusBits(status->at(iBin));
           h_Gate->Fill(iBin + 1, (int) statusBits[1]);

@@ -39,7 +39,7 @@
 
        <!-- Fictitious '2' crystal: replace with pure CsI dims-->
        <EndCapCrystal id="2">
-	 <Material>CsI</Material>
+	 <Material>PureCsI</Material>
 	 <k_HalfLength unit="cm">15.0</k_HalfLength>
          <K_h1 unit="cm">2.646800</K_h1>
          <K_h2 unit="cm">3.066002</K_h2>

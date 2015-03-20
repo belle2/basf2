@@ -98,15 +98,25 @@ namespace Belle2 {
 
       /** Calculates the time response of a first order system (such as crystal, PMT, etc)
        *
-       * param _u: The input to the system
-       * param _y0: Initial value of the output
-       * param _dt: Integration step (in ns)
-       * param _tau: Time constant of the system
-       * param _delay: Time delay of the system (in ns)
+       * @param _gain: Overall gain applied to the ouput
+       * @param _u: The input to the system
+       * @param _y0: Initial value of the output
+       * @param _dt: Integration step (in ns)
+       * @param _tau: Time constant of the system
+       * @param _delay: Time delay of the system (in ns)
        *
        * @return a Signal corresponding tot he time response
        */
-      Signal firstOrderResponse(Signal _u, double _y0, double _dt, double _tau, double _delay = 0.0);
+      Signal firstOrderResponse(double _gain, Signal _u, double _y0, double _dt, double _tSlow, double _delay);
+
+
+      /** Method to use when crystal has two light components
+       * @param _tRatio: For crystal with two light components: ratio fast light / slow light
+       * @param _tFast: For crystal with two light components: fast time constant
+       */
+      //      Signal firstOrderResponse(double _gain, Signal _u, double _y0, double _dt, double _tSlow, double _delay, double _tRatio, double _tFast);
+
+
 
       /** Realizes the charge integration of the input signal
        *
@@ -122,12 +132,23 @@ namespace Belle2 {
        * @param _GateWidth: Width of signal integration (in ns)
        * @param _GateOffset: Width of signal integration (in ns)
        *
-       * @return The number of samples in the waveform
+       * @return The maximum ADC value (to check for saturations)
        */
-      int  doChargeIntegration(Signal _u, int _NsamBL, uint16_t* BSL, uint16_t* Q, uint32_t* t,
-                               std::vector<uint16_t>* _Waveform, std::vector<uint8_t>* _DPPCIBits,
-                               int _Treshold, double _TriggerHoldoff = 0.0, double _GateWidth = 320.0,
-                               double _GateOffset = 40.0, bool _recordTraces = false);
+      uint16_t  doChargeIntegration(Signal _u, int _NsamBL, uint16_t* BSL, uint32_t* Q, uint32_t* t,
+                                    std::vector<uint16_t>* _Waveform, std::vector<uint8_t>* _DPPCIBits,
+                                    int _Treshold, double _TriggerHoldoff = 0.0, double _GateWidth = 320.0,
+                                    double _GateOffset = 40.0, bool _recordTraces = false);
+
+
+      /** Adds noise to the signal
+       *
+       * @param y: a pointer to the signal to noisify
+       * @param _rms: the rms of the high-frequency noise to add
+       * @param _offset: the offset to apply to the signal (e.g. to simulate low-frew noise)
+       *
+       * @return The number of samples in the signal
+       */
+      int addNoise(Signal* y, double _rms, double  _offset);
 
       /** Digitizes the signal the signal
        *
@@ -178,27 +199,32 @@ namespace Belle2 {
 
       uint8_t   m_CellId;          /**< Cell ID */
       uint16_t  m_Baseline;        /**< Baseline (pedestal) frozen during charge integration */
-      uint16_t  m_Charge;          /**< Integrated Charge */
+      uint32_t  m_Charge;          /**< Integrated Charge */
+      uint16_t  m_MaxADC;          /**< Max ACD of the hit (to check saturations) */
       uint32_t  m_Time;            /**< Trigger Time */
       int       m_nSamples;               /**< Number of points requested in the waveform arrays */
       std::vector<uint16_t>  m_Waveform;  /**< Saved waveform*/
       std::vector<uint8_t>   m_DPPCIBits; /**< status of the DPP-CI */
 
+      const double m_tRisePMT = 2;   /**< 2.6 Rise time of the PMT signal (in ns) */
+      const double m_tTransitPMT = 48; /**< 48Mean transit time of the PMT signal (in ns) */
+      const double m_Zl = 50;    /**< Line impedance of the analog chain (to get voltage from anode current) */
 
-      const double m_tRisePMT = 2.6;   /**< Rise time of the PMT signal (in ns) */
-      const double m_tTransitPMT = 48; /**< Mean transit time of the PMT signal (in ns) */
-      const double m_tCsITl = 1220;   /**< Time constant of the CsI(Tl) light deposition */
-      const double m_tCsIslow = 30;  /**< Time constant of the slow pure CsI light component */
-      const double m_tCsIfast =  6;  /**< Time constant of the fast pure CsI light component */
-
-      const int m_seed = 0;  /**< Seed fot the random number generators */
       StoreArray<CsiHit> m_aHit; /**<  The result of each incoming particle in a crystal */
       StoreArray<CsiSimHit>  m_aSimHit; /**< Each simulated particle in the crystal */
       StoreArray<CsiDigiHit> m_aDigiHit; /**< Output: a digitized hit */
 
       Signal m_CsITlSignalTemplate; /**< Template Signal of a CsITl trace */
-      Signal m_calibConstants; /**< Calibration constants for each channel (in V/keV)*/
-      Signal m_noiseLevels; /**< Noise level for each channel (in V)*/
+
+      std::vector<double> m_calibConstants; /**< Calibration constants for each channel (in V/keV)*/
+      std::vector<double> m_noiseLevels;    /**< Noise level for each channel (in V)*/
+      std::vector<double> m_LY;
+      std::vector<double> m_tRatio;
+      std::vector<double> m_tFast;
+      std::vector<double> m_tSlow;
+      std::vector<double> m_LCE;
+      std::vector<double> m_PmtQE;
+      std::vector<double> m_PmtGain;
 
       Signal m_SimHitTimes[16]; /**< Array of signals (each corresponding to one channel) */
       Signal m_SimHitEdeps[16];  /**< Array of signals (each corresponding to one channel) */

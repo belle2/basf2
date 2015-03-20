@@ -42,12 +42,26 @@ namespace Belle2 {
 
     /** The status information for the MCParticle. */
     enum StatusBit {
-      c_PrimaryParticle   = 1,   /**< bit 0:  Particle is primary particle. For example, All the particles from the generator.  */
-      c_StableInGenerator = 2,   /**< bit 1:  Particle is stable, i.e., not decaying in the generator.  */
-      c_LeftDetector      = 4,   /**< bit 2:  Particle left the detector (the simulation volume). */
-      c_StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in the detector (the simulation volume). */
-      c_IsVirtual         = 16,  /**< bit 4:  Particle is virtual and not going to Geant4. Exchange boson, off-shell, unknown to Geant4, etc. */
-      c_Initial           = 32   /**< bit 5:  Particle is initial such as e+ or e- and not going to Geant4 */
+      /** bit 0:  Particle is primary particle. For example, All the particles from the generator.  */
+      c_PrimaryParticle   = 1 << 0,
+      /** bit 1:  Particle is stable, i.e., not decaying in the generator.  */
+      c_StableInGenerator = 1 << 1,
+      /** bit 2:  Particle left the detector (the simulation volume). */
+      c_LeftDetector      = 1 << 2,
+      /** bit 3:  Particle was stopped in the detector (the simulation volume). */
+      c_StoppedInDetector = 1 << 3,
+      /** bit 4:  Particle is virtual and not going to Geant4. Exchange boson, off-shell, unknown to Geant4, etc. */
+      c_IsVirtual         = 1 << 4,
+      /** bit 5:  Particle is initial such as e+ or e- and not going to Geant4 */
+      c_Initial           = 1 << 5,
+      /** bit 6: Particle is from initial state radiation */
+      c_IsISRPhoton       = 1 << 6,
+      /** bit 7: Particle is from finial state radiation */
+      c_IsFSRPhoton       = 1 << 7,
+      /** bit 8: Particle is an radiative photon from PHOTOS */
+      c_IsPHOTOSPhoton    = 1 << 8,
+      /** combined flag to test whether the particle is radiative */
+      c_IsRadiativePhoton = c_IsFSRPhoton | c_IsFSRPhoton | c_IsPHOTOSPhoton,
     };
 
 
@@ -171,7 +185,8 @@ namespace Belle2 {
      * Return production vertex position.
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    TVector3 getProductionVertex() const {
+    TVector3 getProductionVertex() const
+    {
       return TVector3(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z);
     }
 
@@ -179,7 +194,8 @@ namespace Belle2 {
      * Return momentum.
      * @return The momentum of the MonteCarlo particle in GeV.
      */
-    TVector3 getMomentum() const {
+    TVector3 getMomentum() const
+    {
       return TVector3(m_momentum_x, m_momentum_y, m_momentum_z);
     }
 
@@ -187,7 +203,8 @@ namespace Belle2 {
      * Return 4Vector of particle.
      * @return The 4-vector of the MonteCarlo particle.
      */
-    TLorentzVector get4Vector() const {
+    TLorentzVector get4Vector() const
+    {
       TLorentzVector vec; vec.SetXYZM(m_momentum_x, m_momentum_y, m_momentum_z, m_mass); return vec;
     }
 
@@ -198,7 +215,8 @@ namespace Belle2 {
      *         If the particle crosses the simulation volume boundary,
      *         it is set to the crossing position.
      */
-    TVector3 getDecayVertex() const {
+    TVector3 getDecayVertex() const
+    {
       return TVector3(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z);
     }
 
@@ -364,7 +382,8 @@ namespace Belle2 {
      * Set production vertex position.
      * @param vertex The position of the production vertex given as TVector3.
      */
-    void setProductionVertex(const TVector3& vertex) {
+    void setProductionVertex(const TVector3& vertex)
+    {
       m_productionVertex_x = vertex.X(); m_productionVertex_y = vertex.Y(), m_productionVertex_z = vertex.Z();
     }
 
@@ -375,7 +394,8 @@ namespace Belle2 {
      * @param y The y position of the production vertex.
      * @param z The z position of the production vertex.
      */
-    void setProductionVertex(float x, float y, float z) {
+    void setProductionVertex(float x, float y, float z)
+    {
       m_productionVertex_x = x; m_productionVertex_y = y; m_productionVertex_z = z;
     }
 
@@ -383,7 +403,8 @@ namespace Belle2 {
      * Set particle momentum.
      * @param momentum The momentum of the MonteCarlo particle given as TVector3.
      */
-    void setMomentum(const TVector3& momentum) {
+    void setMomentum(const TVector3& momentum)
+    {
       m_momentum_x = momentum.X(); m_momentum_y = momentum.Y(), m_momentum_z = momentum.Z();
     }
 
@@ -394,7 +415,8 @@ namespace Belle2 {
      * @param py The y component of the momentum vector.
      * @param pz The z component of the momentum vector.
      */
-    void setMomentum(float px, float py, float pz) {
+    void setMomentum(float px, float py, float pz)
+    {
       m_momentum_x = px, m_momentum_y = py; m_momentum_z = pz;
     }
 
@@ -408,7 +430,8 @@ namespace Belle2 {
      * Set decay vertex.
      * @param vertex The position of the decay vertex given as TVector3.
      */
-    void setDecayVertex(const TVector3& vertex) {
+    void setDecayVertex(const TVector3& vertex)
+    {
       m_decayVertex_x = vertex.X(); m_decayVertex_y = vertex.Y(), m_decayVertex_z = vertex.Z();
     }
 
@@ -419,7 +442,8 @@ namespace Belle2 {
      * @param y The y position of the decay vertex.
      * @param z The z position of the decay vertex.
      */
-    void setDecayVertex(float x, float y, float z) {
+    void setDecayVertex(float x, float y, float z)
+    {
       m_decayVertex_x = x; m_decayVertex_y = y; m_decayVertex_z = z;
     }
 

@@ -12,6 +12,8 @@
 
 #include <gtest/gtest.h>
 
+#include <framework/utilities/TestHelpers.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -38,7 +40,7 @@ namespace Belle2 {
 
        as a seperate executable.
     */
-    class TrackFindingCDCTestWithTopology : public ::testing::Test {
+    class TrackFindingCDCTestWithTopology : public TestHelpers::TestWithGearbox {
 
     public:
       static void SetUpTestCase();

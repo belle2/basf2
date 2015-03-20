@@ -28,29 +28,17 @@ using namespace TrackFindingCDC;
 
 void TrackFindingCDCTestWithTopology::SetUpTestCase()
 {
-
   //Setup the gearbox
-  Gearbox& gearbox = Gearbox::getInstance();
-
-  vector<string> backends;
-  backends.push_back("file:");
-  gearbox.setBackends(backends);
-
-  B2INFO("Start open gearbox.");
-  gearbox.open("geometry/Belle2.xml");
-  B2INFO("Finished open gearbox.");
+  TestHelpers::TestWithGearbox::SetUpTestCase();
 
   //Also preload the CDCGeometry
   const CDCWireTopology& wireTopology __attribute__((unused)) = CDCWireTopology::getInstance();
-
 }
 
 void TrackFindingCDCTestWithTopology::TearDownTestCase()
 {
-
-  Gearbox& gearbox = Gearbox::getInstance();
-  gearbox.close();
-
+  //Close the gearbox
+  TestHelpers::TestWithGearbox::TearDownTestCase();
 }
 
 

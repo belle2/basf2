@@ -30,16 +30,16 @@ Helix::Helix()
 Helix::Helix(const TVector3& position,
              const TVector3& momentum,
              const short int charge,
-             const float bZ)
+             const double bZ)
 {
   setCartesian(position, momentum, charge, bZ);
 }
 
-Helix::Helix(const float& d0,
-             const float& phi0,
-             const float& omega,
-             const float& z0,
-             const float& tanLambda)
+Helix::Helix(const double& d0,
+             const double& phi0,
+             const double& omega,
+             const double& z0,
+             const double& tanLambda)
   : m_d0(d0),
     m_phi0(phi0),
     m_omega(omega),
@@ -117,20 +117,20 @@ void Helix::reverse()
   m_tanLambda = -m_tanLambda;
 }
 
-float Helix::getArcLength2DAtCylindricalR(const float& cylindricalR) const
+double Helix::getArcLength2DAtCylindricalR(const double& cylindricalR) const
 {
   // Slight trick here
   // Since the sought point is on the helix we treat it as the perigee
   // and the origin as the point to extrapolate to.
   // We know the distance of the origin to the circle, which is just d0
   // The direct distance from the origin to the imaginary perigee is just the given cylindricalR.
-  const float dr = getD0();
-  const float deltaCylindricalR = cylindricalR;
+  const double dr = getD0();
+  const double deltaCylindricalR = cylindricalR;
   const double absArcLength2D = calcArcLength2DAtDeltaCylindricalRAndDr(deltaCylindricalR, dr);
   return absArcLength2D;
 }
 
-float Helix::getArcLength2DAtXY(const float& x, const float& y) const
+double Helix::getArcLength2DAtXY(const double& x, const double& y) const
 {
   double dr = 0;
   double arcLength2D = 0;
@@ -138,7 +138,7 @@ float Helix::getArcLength2DAtXY(const float& x, const float& y) const
   return arcLength2D;
 }
 
-TVector3 Helix::getPositionAtArcLength2D(const float& arcLength2D) const
+TVector3 Helix::getPositionAtArcLength2D(const double& arcLength2D) const
 {
   /*
     /   \     /                      \     /                              \
@@ -187,7 +187,7 @@ TVector3 Helix::getPositionAtArcLength2D(const float& arcLength2D) const
   return position;
 }
 
-TVector3 Helix::getTangentialAtArcLength2D(const float& arcLength2D) const
+TVector3 Helix::getTangentialAtArcLength2D(const double& arcLength2D) const
 {
   const double omega = getOmega();
   const double phi0 = getPhi0();
@@ -204,7 +204,7 @@ TVector3 Helix::getTangentialAtArcLength2D(const float& arcLength2D) const
 }
 
 
-TVector3 Helix::getUnitTangentialAtArcLength2D(const float& arcLength2D) const
+TVector3 Helix::getUnitTangentialAtArcLength2D(const double& arcLength2D) const
 {
   TVector3 unitTangential = getTangentialAtArcLength2D(arcLength2D);
   const double norm = hypot(1, getTanLambda());
@@ -213,7 +213,7 @@ TVector3 Helix::getUnitTangentialAtArcLength2D(const float& arcLength2D) const
   return unitTangential;
 }
 
-TVector3 Helix::getMomentumAtArcLength2D(const float& arcLength2D, const float& bz) const
+TVector3 Helix::getMomentumAtArcLength2D(const double& arcLength2D, const double& bz) const
 {
   TVector3 momentum = getTangentialAtArcLength2D(arcLength2D);
   const double pr = getTransverseMomentum(bz);
@@ -222,7 +222,7 @@ TVector3 Helix::getMomentumAtArcLength2D(const float& arcLength2D, const float& 
   return momentum;
 }
 
-float Helix::passiveMoveBy(const TVector3& by)
+double Helix::passiveMoveBy(const TVector3& by)
 {
   // First calculate the distance of the new origin to the helix in the xy projection
   double new_d0 = 0;
@@ -486,7 +486,7 @@ double Helix::calcDerivativeOfATanXDividedByX(const double& x)
 
 
 
-void Helix::calcArcLength2DAndDrAtXY(const float& x, const float& y, double& arcLength2D, double& dr) const
+void Helix::calcArcLength2DAndDrAtXY(const double& x, const double& y, double& arcLength2D, double& dr) const
 {
   // Prepare common variables
   const double omega = getOmega();

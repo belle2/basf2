@@ -56,9 +56,9 @@ namespace Belle2 {
     UncertainHelix(const TVector3& position,
                    const TVector3& momentum,
                    const short int charge,
-                   const float bZ,
+                   const double bZ,
                    const TMatrixDSym& cartesianCovariance,
-                   const float pValue);
+                   const double pValue);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -71,13 +71,13 @@ namespace Belle2 {
      *  @param tanLambda     The slope of the track in the sz plane (dz/ds)
      *  @param covariance    5x5 Covariance matrix for the five helix parameters. Indices correspond to the order d0, phi0, omega, z0, tanLambda.
      */
-    UncertainHelix(const float& d0,
-                   const float& phi0,
-                   const float& omega,
-                   const float& z0,
-                   const float& tanLambda,
+    UncertainHelix(const double& d0,
+                   const double& phi0,
+                   const double& omega,
+                   const double& z0,
+                   const double& tanLambda,
                    const TMatrixDSym& covariance,
-                   const float pValue);
+                   const double pValue);
 
     /** Getter for the position and Momentum Covariance Matrix.
      *
@@ -86,7 +86,7 @@ namespace Belle2 {
     TMatrixDSym getCartesianCovariance(const double bZ = 1.5) const;
 
     /** Getter for Chi2 Probability of the track fit. */
-    float getPValue() const
+    double getPValue() const
     { return m_pValue; }
 
     /** Getter for covariance matrix of perigee parameters in matrix form.

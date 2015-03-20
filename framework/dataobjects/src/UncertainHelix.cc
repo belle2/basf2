@@ -27,9 +27,9 @@ UncertainHelix::UncertainHelix() :
 UncertainHelix::UncertainHelix(const TVector3& position,
                                const TVector3& momentum,
                                const short int charge,
-                               const float bZ,
+                               const double bZ,
                                const TMatrixDSym& cartesianCovariance,
-                               const float pValue) :
+                               const double pValue) :
   Helix(TVector3(0.0, 0.0, position.Z()), momentum, charge, bZ),
   m_covariance(cartesianCovariance), // Initialize the covariance matrix to the 6x6 covariance and reduce it afterwards
   m_pValue(pValue)
@@ -103,13 +103,13 @@ UncertainHelix::UncertainHelix(const TVector3& position,
 }
 
 
-UncertainHelix::UncertainHelix(const float& d0,
-                               const float& phi0,
-                               const float& omega,
-                               const float& z0,
-                               const float& tanLambda,
+UncertainHelix::UncertainHelix(const double& d0,
+                               const double& phi0,
+                               const double& omega,
+                               const double& z0,
+                               const double& tanLambda,
                                const TMatrixDSym& covariance,
-                               const float pValue) :
+                               const double pValue) :
   Helix(d0, phi0, omega, z0, tanLambda),
   m_covariance(covariance),
   m_pValue(pValue)

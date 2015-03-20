@@ -74,7 +74,7 @@ namespace Belle2 {
     Helix(const TVector3& position,
           const TVector3& momentum,
           const short int charge,
-          const float bZ);
+          const double bZ);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -86,11 +86,11 @@ namespace Belle2 {
      *  @param z0            The z coordinate of the perigee.
      *  @param tanLambda     The slope of the track in the sz plane (dz/ds).
      */
-    Helix(const float& d0,
-          const float& phi0,
-          const float& omega,
-          const float& z0,
-          const float& tanLambda);
+    Helix(const double& d0,
+          const double& phi0,
+          const double& omega,
+          const double& z0,
+          const double& tanLambda);
 
     /** Output operator for debugging and the generation of unittest error messages.*/
     friend std::ostream& operator<<(std::ostream& output, const Helix& helix);
@@ -171,8 +171,8 @@ namespace Belle2 {
      *  @param cylindricalR  The cylinder radius to extrapolate to.
      *  @return              The two dimensional arc length traversed to reach the cylindrical radius. NAN if it can not be reached.
      */
-    float getArcLength2DAtCylindricalR(const float& cylindricalR) const;
-    float getArcLengthAtCylindricalR(const float& cylindricalR) const __attribute__((deprecated)) { return getArcLength2DAtCylindricalR(cylindricalR); }
+    double getArcLength2DAtCylindricalR(const double& cylindricalR) const;
+    double getArcLengthAtCylindricalR(const double& cylindricalR) const __attribute__((deprecated)) { return getArcLength2DAtCylindricalR(cylindricalR); }
 
     /** Calculates the two dimensional arc length at which the circle in the xy projection is closest to the point
      *
@@ -185,14 +185,14 @@ namespace Belle2 {
      *  @param y        Y coordinate of the point to which to extrapolate
      *  @return         The two dimensional arc length from the perigee at which the closest approach is reached
      */
-    float getArcLength2DAtXY(const float& x, const float& y) const;
+    double getArcLength2DAtXY(const double& x, const double& y) const;
 
     /** Calculates the position on the helix at the given two dimensional arc length
      *
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      */
-    TVector3 getPositionAtArcLength2D(const float& arcLength2D) const;
-    TVector3 getPositionAtArcLength(const float& arcLength2D) const __attribute__((deprecated)) { return getPositionAtArcLength2D(arcLength2D); }
+    TVector3 getPositionAtArcLength2D(const double& arcLength2D) const;
+    TVector3 getPositionAtArcLength(const double& arcLength2D) const __attribute__((deprecated)) { return getPositionAtArcLength2D(arcLength2D); }
 
     /** Calculates the tangential vector to the helix curve at the given two dimensional arc length.
      *
@@ -204,28 +204,28 @@ namespace Belle2 {
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      *  @return                  Tangential vector normalised to unit transverse component / cylindrical radius.
      */
-    TVector3 getTangentialAtArcLength2D(const float& arcLength2D) const;
+    TVector3 getTangentialAtArcLength2D(const double& arcLength2D) const;
 
     /** Calculates the unit tangential vector to the helix curve at the given two dimensional arc length.
      *
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      */
-    TVector3 getUnitTangentialAtArcLength2D(const float& arcLength2D) const;
+    TVector3 getUnitTangentialAtArcLength2D(const double& arcLength2D) const;
 
     /** Calculates the momentum vector at the given two dimensional arc length.
      *
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      *  @param bz                Magnetic field strength in the z direction.
      */
-    TVector3 getMomentumAtArcLength2D(const float& arcLength2D, const float& bz) const;
-    TVector3 getMomentumAtArcLength(const float& arcLength2D, const float& bz) const __attribute__((deprecated)) { return getMomentumAtArcLength2D(arcLength2D, bz); }
+    TVector3 getMomentumAtArcLength2D(const double& arcLength2D, const double& bz) const;
+    TVector3 getMomentumAtArcLength(const double& arcLength2D, const double& bz) const __attribute__((deprecated)) { return getMomentumAtArcLength2D(arcLength2D, bz); }
 
     /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace.
      *
      *  @param by            Vector by which the origin of the coordinate system should be moved.
-     *  @return              The float value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
+     *  @return              The double value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
      */
-    float passiveMoveBy(const TVector3& by);
+    double passiveMoveBy(const TVector3& by);
 
     /** Calculate the 5x5 jacobian matrix for the transport of the helix parameters,
      *  when moving the origin of the coordinate system to a new location.
@@ -307,7 +307,7 @@ namespace Belle2 {
      *  @param arcLength2D[out]    The two dimensional arc length from the perigee at which the closest approach is reached
      *  @param dr[out]             Signed distance of the point to circle in the xy projection.
      */
-    void calcArcLength2DAndDrAtXY(const float& x, const float& y, double& arcLength2D, double& dr) const;
+    void calcArcLength2DAndDrAtXY(const double& x, const double& y, double& arcLength2D, double& dr) const;
 
     /** Helper method to calculate the two dimensional arc length *from the perigee* to a point at cylindrical radius, which also has the distance dr from the circle in the xy projection
      *
@@ -373,22 +373,22 @@ namespace Belle2 {
                       const double bZ);
 
     /** Memory for the signed distance to the perigee. The sign is the same as of the z component of getPerigee().Cross(getMomentum()).*/
-    float m_d0;
+    Double32_t m_d0;
 
     /** Memory for the azimuth angle between the transverse momentum and the x axis, which is in [-pi, pi]. */
-    float m_phi0;
+    Double32_t m_phi0;
 
     /** Memory for the curvature of the signed curvature*/
-    float m_omega;
+    Double32_t m_omega;
 
     /** Memory for the z coordinate of the perigee. */
-    float m_z0;
+    Double32_t m_z0;
 
     /** Memory for the slope of the track in the z coordinate over the two dimensional arc length (dz/ds)*/
-    float m_tanLambda;
+    Double32_t m_tanLambda;
 
     /** Streamer version 1. */
-    ClassDef(Helix, 1);
+    ClassDef(Helix, 2);
   };
 }
 

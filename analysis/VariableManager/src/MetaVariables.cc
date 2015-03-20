@@ -38,7 +38,8 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle * particle) -> double {
-          if (particle == nullptr) {
+          if (particle == nullptr)
+          {
             StoreObjPtr<EventExtraInfo> eventExtraInfo;
             return eventExtraInfo->getExtraInfo(extraInfoName);
           }
@@ -80,7 +81,8 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           double product = 1.0;
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          {
             product *= var->function(particle->getDaughter(j));
           }
           return product;
@@ -97,7 +99,8 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           double sum = 0.0;
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          {
             sum += var->function(particle->getDaughter(j));
           }
           return sum;
@@ -174,38 +177,39 @@ namespace Belle2 {
     {
       if (arguments.size() == 3) {
         auto particleListName = arguments[0];
-        auto extraInfoRightClass = arguments[1];
-        auto extraInfoFromB = arguments[2];
-        auto func = [particleListName, extraInfoRightClass, extraInfoFromB](const Particle*) -> double {
+        auto extraInfoRightCategory = arguments[1];
+        auto extraInfoRightTrack = arguments[2];
+        auto func = [particleListName, extraInfoRightCategory, extraInfoRightTrack](const Particle*) -> double {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
           Particle* target = nullptr; //Particle selected as target
           float maximum_p_track = 0; //Probability of being the target track from the track level
           float prob = 0; //The probability of beeing right classified flavor from the event level
           float maximum_q = 0; //Flavour of the track selected as target
-          if (ListOfParticles->getListSize() > 0) {
+          if (ListOfParticles->getListSize() > 0)
+          {
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* particle = ListOfParticles->getParticle(i);
               double x = 0;
-              if (extraInfoFromB == "IsFromB(MaximumP*)") {
+              if (extraInfoRightTrack == "IsRightTrack(MaximumP*)") {
                 x = (T.rotateLabToCms() * particle->get4Vector()).P();
-              } else x = particle->getExtraInfo(extraInfoFromB);
+              } else x = particle->getExtraInfo(extraInfoRightTrack);
               if (x > maximum_p_track) {
                 maximum_p_track = x;
                 target = particle;
               }
             }
             if (target != nullptr) {
-              prob = target -> getExtraInfo(extraInfoRightClass); //Gets the probability of beeing right classified flavor from the event level
+              prob = target -> getExtraInfo(extraInfoRightCategory); //Gets the probability of beeing right classified flavor from the event level
               maximum_q = target -> getCharge(); //Gets the flavor of the track selected as target
-              if (extraInfoFromB == "IsFromB(Lambda)") {
+              if (extraInfoRightTrack == "IsRightTrack(Lambda)") {
                 maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
               }
             }
           }
           //float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */
           //return 0.5 * (maximum_q * r + 1);
-//            if (extraInfoFromB == ("IsFromB(IntermediateElectron)" || "IsFromB(IntermediateMuon)" || "IsFromB(SlowPion)" || "IsFromB(FSC)" || "IsFromB(Lambda)")) return -1 * maximum_q * prob;
+//            if (extraInfoRightTrack == ("IsRightTrack(IntermediateElectron)" || "IsRightTrack(IntermediateMuon)" || "IsRightTrack(SlowPion)" || "IsRightTrack(FSC)" || "IsRightTrack(Lambda)")) return -1 * maximum_q * prob;
           return maximum_q * prob;
         };
         return func;
@@ -219,19 +223,20 @@ namespace Belle2 {
       //used by simple_flavor_tagger
       if (arguments.size() == 3) {
         auto particleListName = arguments[0];
-        auto extraInfoRightClass = arguments[1];
-        auto extraInfoFromB = arguments[2];
-        auto func = [particleListName, extraInfoRightClass, extraInfoFromB](const Particle*) -> double {
-          if (particleListName == "K+:ROE" || particleListName == "Lambda0:ROE") {
+        auto extraInfoRightCategory = arguments[1];
+        auto extraInfoRightTrack = arguments[2];
+        auto func = [particleListName, extraInfoRightCategory, extraInfoRightTrack](const Particle*) -> double {
+          if (particleListName == "K+:KaonROE" || particleListName == "Lambda0:LambdaROE")
+          {
             double flavor = 0.0;
             double r = 0.0;
             double qr = 0.0;
             double final_value = 0.0;
             double val1 = 1.0;
             double val2 = 1.0;
-            auto compare = [extraInfoFromB](const Particle * part1, const Particle * part2)-> bool {
-              double info1 = part1->getExtraInfo(extraInfoFromB);
-              double info2 = part2->getExtraInfo(extraInfoFromB);
+            auto compare = [extraInfoRightTrack](const Particle * part1, const Particle * part2)-> bool {
+              double info1 = part1->getExtraInfo(extraInfoRightTrack);
+              double info2 = part2->getExtraInfo(extraInfoRightTrack);
               return (info1 > info2);
             };
             StoreObjPtr<ParticleList> ListOfParticles(particleListName);
@@ -241,7 +246,7 @@ namespace Belle2 {
               ParticleVector.push_back(ListOfParticles->getParticle(i));
             }
             std::sort(ParticleVector.begin(), ParticleVector.end(), compare);
-            if (particleListName == "Lambda0:ROE") {
+            if (particleListName == "Lambda0:LambdaROE") {
               //Loop over Lambda vector until 3 or empty
               if (ParticleVector.size() != 0) final_value = 1.0;
               for (unsigned int i = 0; i < ParticleVector.size(); ++i) {
@@ -249,18 +254,18 @@ namespace Belle2 {
                 if (ParticleVector[i]->getPDGCode() == 3122) flavor = -1.0;
                 else if (ParticleVector[i]->getPDGCode() == -3122) flavor = 1.0;
                 else {flavor = 0.0;}
-                r = ParticleVector[i]->getExtraInfo(extraInfoFromB);
+                r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
                 qr = (flavor * r);
                 val1 = val1 * (1 + qr);
                 val2 = val2 * (1 - qr);
               }
               final_value = (val1 - val2) / (val1 + val2);
-            } else if (particleListName == "K+:ROE") {
+            } else if (particleListName == "K+:KaonROE") {
               //Loop over K+ vector until 3 or empty
               if (ParticleVector.size() != 0) final_value = 1.0;
               for (unsigned int i = 0; i < ParticleVector.size(); i++) {
                 flavor = ParticleVector[i]->getCharge();
-                r = ParticleVector[i]->getExtraInfo(extraInfoFromB);
+                r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
                 qr = (flavor * r);
                 val1 = val1 * (1 + qr);
                 val2 = val2 * (1 - qr);
@@ -278,15 +283,18 @@ namespace Belle2 {
             double flavor = 0.0; //Flavour of the track selected as target
             double maximum_p_track = 0.0; //Probability of being the target track from the track level
             double final_value = 0.0;
-            for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++)
+            {
               Particle* p = ListOfParticles->getParticle(i);
-              double x = p->getExtraInfo(extraInfoFromB);
+              double x = p->getExtraInfo(extraInfoRightTrack);
               if (x > maximum_p_track) {
                 maximum_p_track = x;
                 //In case of slowPions and intermediate momentum leptons sign is flipped
-                if (particleListName == "pi+:ROE" && extraInfoFromB == "IsFromB(SlowPion)") flavor = (-1.0) * p->getCharge();
-                else if (particleListName == "e+:ROE" && extraInfoFromB == "IsFromB(IntermediateElectron)") flavor = (-1.0) * p->getCharge();
-                else if (particleListName == "mu+:ROE" && extraInfoFromB == "IsFromB(IntermediateMuon)") flavor = (-1.0) * p->getCharge();
+                if (particleListName == "pi+:SlowPionROE" && extraInfoRightTrack == "IsRightTrack(SlowPion)") flavor = (-1.0) * p->getCharge();
+                else if (particleListName == "e+:IntermediateElectronROE"
+                && extraInfoRightTrack == "IsRightTrack(IntermediateElectron)") flavor = (-1.0) * p->getCharge();
+                else if (particleListName == "mu+:IntermediateMuonROE"
+                && extraInfoRightTrack == "IsRightTrack(IntermediateMuon)") flavor = (-1.0) * p->getCharge();
                 else flavor = p->getCharge();
               }
             }
@@ -300,7 +308,7 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr IsRightClass(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr IsRightCategory(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         auto particleName = arguments[0];
@@ -312,11 +320,14 @@ namespace Belle2 {
           int maximum_PDG_Mother_Mother = 0;
           const MCParticle* MCp = particle ->getRelated<MCParticle>();
           maximum_q = particle -> getCharge();
-          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
+          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr)
+          {
             maximum_PDG = TMath::Abs(MCp->getPDG());
             maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
             //for Kaons and SlowPions we need the mother of the mother for the particle
-            if (particleName == "Kaon" || particleName == "SlowPion" || particleName == "Lambda" || particleName == "IntermediateElectron" || particleName == "IntermediateMuon" || particleName == "FastPion" || particleName == "FSC") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
+            if (particleName == "Kaon" || particleName == "SlowPion" || particleName == "Lambda" || particleName == "IntermediateElectron"
+            || particleName == "IntermediateMuon" || particleName == "FastPion"
+            || particleName == "FSC") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
           } else {
             maximum_PDG = 0;
             maximum_PDG_Mother = 0;
@@ -324,13 +335,14 @@ namespace Belle2 {
 //           float SlowPion_q = 0;
           int SlowPion_PDG = 0;
           int SlowPion_PDG_Mother = 0;
-          if (particleName == "KaonPion") {
-            StoreObjPtr<ParticleList> SlowPionList("pi+:ROE");
+          if (particleName == "KaonPion")
+          {
+            StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
             double maximum_prob_pi = 0;
             Particle* TargetSlowPion = nullptr;
             for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
               Particle* p_pi = SlowPionList->getParticle(i);
-              double prob_pi = p_pi->getExtraInfo("IsFromB(SlowPion)");
+              double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
               if (prob_pi > maximum_prob_pi) {
                 maximum_prob_pi = prob_pi;
                 TargetSlowPion = p_pi;
@@ -345,8 +357,9 @@ namespace Belle2 {
           }
 //           float FastParticle_q = 0;
           int FastParticle_PDG_Mother = 0;
-          if (particleName == "FSC") {
-            StoreObjPtr<ParticleList> FastParticleList("pi+:ROE");
+          if (particleName == "FSC")
+          {
+            StoreObjPtr<ParticleList> FastParticleList("pi+:FastPionROE");
             PCmsLabTransform T;
             double maximum_prob_fast = 0;
             Particle* TargetFastParticle = nullptr;
@@ -366,47 +379,59 @@ namespace Belle2 {
           }
           if (particleName == "Electron"
               && ((maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511)
-                  || (maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511))) {
+                  || (maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511)))
+          {
             return 1.0;
           } else if (particleName == "IntermediateElectron"
-                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511) {
+                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511)
+          {
             return 1.0;
           } else if (particleName == "Muon"
                      && ((maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511)
-                         || (maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511))) {
+                         || (maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511)))
+          {
             return 1.0;
           } else if (particleName == "IntermediateMuon"
-                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511) {
+                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511)
+          {
             return 1.0;
           }  else if (particleName == "KinLepton"
-                      && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && (maximum_PDG == 11 || maximum_PDG == 13) && maximum_PDG_Mother == 511) {
+                      && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && (maximum_PDG == 11 || maximum_PDG == 13) && maximum_PDG_Mother == 511)
+          {
             return 1.0;
           } else if (particleName == "Kaon"
                      && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-                     && maximum_PDG == 321 && maximum_PDG_Mother > 400 && maximum_PDG_Mother < 500 && maximum_PDG_Mother_Mother == 511) {
+                     && maximum_PDG == 321 && maximum_PDG_Mother > 400 && maximum_PDG_Mother < 500 && maximum_PDG_Mother_Mother == 511)
+          {
             return 1.0;
           } else if (particleName == "SlowPion"
                      && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-                     && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511) {
+                     && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511)
+          {
             return 1.0;
           } else if (particleName == "KaonPion"
                      && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-                     && maximum_PDG == 321 && SlowPion_PDG == 211 && maximum_PDG_Mother == SlowPion_PDG_Mother) {
+                     && maximum_PDG == 321 && SlowPion_PDG == 211 && maximum_PDG_Mother == SlowPion_PDG_Mother)
+          {
             return 1.0;
           } else if (particleName == "FastPion"
                      && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-                     && maximum_PDG == 211 && maximum_PDG_Mother == 511) {
+                     && maximum_PDG == 211 && maximum_PDG_Mother == 511)
+          {
             return 1.0;
           } else if (particleName == "MaximumP*"
-                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)) {
+                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart))
+          {
             return 1.0;
           } else if (particleName == "FSC"
                      && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-                     && maximum_PDG == 211 && FastParticle_PDG_Mother == 511) {
+                     && maximum_PDG == 211 && FastParticle_PDG_Mother == 511)
+          {
             return 1.0;
           } else if (particleName == "Lambda"
                      && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-                     && maximum_PDG == 3122) {
+                     && maximum_PDG == 3122)
+          {
             return 1.0;
           } else {
             return 0.0;
@@ -414,11 +439,11 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function IsRightClass");
+        B2FATAL("Wrong number of arguments (1 required) for meta function IsRightCategory");
       }
     }
 
-    Manager::FunctionPtr IsFromB(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr IsRightTrack(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         auto particleName = arguments[0];
@@ -433,14 +458,16 @@ namespace Belle2 {
           || (mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 11
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511))) {
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)))
+          {
             return 1.0;
             //intermediate electron
           } else if (particleName == "IntermediateElectron"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 11
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          {
             return 1.0;
             //direct muon
           } else if (particleName == "Muon"
@@ -451,21 +478,24 @@ namespace Belle2 {
           && mcParticle->getMother()->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 13
           && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511))
-                    ) {
+                    )
+          {
             return 1.0;
             //intermediate muon
           } else if (particleName == "IntermediateMuon"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 13
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          {
             return 1.0;
             //KinLepton
           } else if (particleName == "KinLepton"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
           && (TMath::Abs(mcParticle->getPDG()) == 13 || TMath::Abs(mcParticle->getPDG()) == 11)
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          {
             return 1.0;
             //kaon
           } else if (particleName == "Kaon"
@@ -474,7 +504,8 @@ namespace Belle2 {
           && TMath::Abs(mcParticle->getPDG()) == 321
           && TMath::Abs(mcParticle->getMother()->getPDG()) > 400
           && TMath::Abs(mcParticle->getMother()->getPDG()) < 500
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          {
             return 1.0;
             //slow pion
           } else if (particleName == "SlowPion"
@@ -482,25 +513,28 @@ namespace Belle2 {
           && mcParticle->getMother()->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 211
           && TMath::Abs(mcParticle->getMother()->getPDG()) == 413
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          {
             return 1.0;
             //high momentum pions
           } else if (particleName == "FastPion"
           && mcParticle->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 211
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511)
+          {
             return 1.0;
             //lambdas
           } else if (particleName == "Lambda"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 3122) {
+          && TMath::Abs(mcParticle->getPDG()) == 3122)
+          {
             return 1.0;
           } else return 0.0;
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function IsFromB");
+        B2FATAL("Wrong number of arguments (1 required) for meta function IsRightTrack");
       }
     }
 
@@ -513,18 +547,20 @@ namespace Belle2 {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
           double maximum_prob = 0;
-          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
+          {
             Particle* p = ListOfParticles->getParticle(i);
             double prob = 0;
-            if (extraInfoName == "IsFromB(MaximumP*)") {
+            if (extraInfoName == "IsRightTrack(MaximumP*)") {
               prob = (T.rotateLabToCms() * p->get4Vector()).P();
             } else prob = p->getExtraInfo(extraInfoName);
             if (prob > maximum_prob) {
               maximum_prob = prob;
             }
           }
-          if ((extraInfoName == "IsFromB(MaximumP*)" && (T.rotateLabToCms() * particle -> get4Vector()).P() == maximum_prob) ||
-              (extraInfoName != "IsFromB(MaximumP*)" && particle -> getExtraInfo(extraInfoName) == maximum_prob)) {
+          if ((extraInfoName == "IsRightTrack(MaximumP*)" && (T.rotateLabToCms() * particle -> get4Vector()).P() == maximum_prob) ||
+              (extraInfoName != "IsRightTrack(MaximumP*)" && particle -> getExtraInfo(extraInfoName) == maximum_prob))
+          {
             return 1.0;
           } else return 0.0;
         };
@@ -542,7 +578,8 @@ namespace Belle2 {
         auto func = [particleListName, extraInfoName](const Particle*) -> double {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           double maximum_prob = 0;
-          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
+          {
             Particle* p = ListOfParticles->getParticle(i);
             double prob = p->getExtraInfo(extraInfoName);
             if (prob > maximum_prob) {
@@ -569,19 +606,22 @@ namespace Belle2 {
           TLorentzVector momTarget = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Mu in CMS-System
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
           const auto& tracks = roe->getTracks();
-          for (auto & x : tracks) {
+          for (auto& x : tracks)
+          {
             const TrackFitResult* tracki = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
             if (tracki == nullptr || particle->getTrack() == x) continue;
             TLorentzVector momtrack(tracki->getMomentum(), 0);
             momXchargedtracks += T.rotateLabToCms() * momtrack;
           }
           const auto& ecl = roe->getECLClusters();
-          for (auto & x : ecl) {
+          for (auto& x : ecl)
+          {
             if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
             if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
           }
           const auto& klm = roe->getKLMClusters();
-          for (auto & x : klm) {
+          for (auto& x : klm)
+          {
             if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
               momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
             }
@@ -592,10 +632,11 @@ namespace Belle2 {
           if (requestedVariable == "recoilMass") return momX.M();
           else if (requestedVariable == "p_missing_CMS") return momMiss.Vect().Mag();
           else if (requestedVariable == "CosTheta_missing_CMS") return TMath::Cos(momTarget.Angle(momMiss.Vect()));
-          else if (requestedVariable == "EW90") {
+          else if (requestedVariable == "EW90")
+          {
             TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
             float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
-            for (auto & i : ecl) {
+            for (auto& i : ecl) {
               if ((T.rotateLabToCms() * i -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += i -> getEnergy();
             }
 //       for (auto & i : klm) {
@@ -617,11 +658,12 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
-          StoreObjPtr<ParticleList> FastParticleList("pi+:ROE");
+          StoreObjPtr<ParticleList> FastParticleList("pi+:FastPionROE");
           PCmsLabTransform T;
           double maximum_prob_fast = 0;
           Particle* TargetFastParticle = nullptr;
-          for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
+          for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i)
+          {
             Particle* p_fast = FastParticleList->getParticle(i);
             double prob_fast = (T.rotateLabToCms() * p_fast -> get4Vector()).P();
             if (prob_fast > maximum_prob_fast) {
@@ -635,7 +677,8 @@ namespace Belle2 {
           if (requestedVariable == "p_CMS_Fast") return momFastParticle.P();
           else if (requestedVariable == "cosSlowFast") return TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
           else if (requestedVariable == "cosTPTO_Fast") return Variable::Manager::Instance().getVariable("cosTPTO")->function(TargetFastParticle);
-          else if (requestedVariable == "SlowFastHaveOpositeCharges") {
+          else if (requestedVariable == "SlowFastHaveOpositeCharges")
+          {
             if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
               return 1;
             } else return 0;
@@ -655,7 +698,8 @@ namespace Belle2 {
         auto ListName = arguments[0];
         auto requestedVariable = arguments[1];
         auto func = [requestedVariable, ListName](const Particle*) -> double {
-          if (requestedVariable == "getListSize") {
+          if (requestedVariable == "getListSize")
+          {
             StoreObjPtr<ParticleList> ListOfParticles(ListName);
             return ListOfParticles->getListSize();
           } else {
@@ -675,14 +719,16 @@ namespace Belle2 {
 
         StoreObjPtr<ParticleList> Y(motherlist);
         std::vector<Particle*> daughters;
-        for (unsigned int i = 0; i < Y->getListSize(); ++i) {
+        for (unsigned int i = 0; i < Y->getListSize(); ++i)
+        {
           const auto& x = Y->getParticle(i)->getDaughters();
           daughters.insert(daughters.end(), x.begin(), x.end());
         }
 
-        while (!daughters.empty()) {
+        while (!daughters.empty())
+        {
           std::vector<Particle*> tmpdaughters;
-          for (auto & d : daughters) {
+          for (auto& d : daughters) {
             if (d == particle)
               return 1.0;
             const auto& x = d->getDaughters();
@@ -749,7 +795,8 @@ namespace Belle2 {
         }
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName, low, high](const Particle * particle) -> double {
-          if (particle == nullptr) {
+          if (particle == nullptr)
+          {
             StoreObjPtr<EventExtraInfo> eventExtraInfo;
             return eventExtraInfo->getExtraInfo(extraInfoName);
           }
@@ -763,27 +810,40 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("MetaFunctions");
-    REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion, "Returns 1 if given variable is inside a given region. Otherwise 0.");
+    REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion,
+                      "Returns 1 if given variable is inside a given region. Otherwise 0.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf, "Returns product of a variable over all daughters.");
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf, "Returns sum of a variable over all daughters.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo, "Returns extra info stored under the given name.");
     REGISTER_VARIABLE("abs(variable)", abs, "Returns absolute value of the given variable.");
-    REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing, "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
+    REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing,
+                      "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
-    REGISTER_VARIABLE("KSFWVariables(variable,finalState)", KSFWVariables, "Returns et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If finalState is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
-    REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
+    REGISTER_VARIABLE("KSFWVariables(variable,finalState)", KSFWVariables,
+                      "Returns et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If finalState is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
+    REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
+                      "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
 
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
-    REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightClass, extraInfoFromB)", InputQrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
-    REGISTER_VARIABLE("QrOf(particleListName, extraInfoRightClass, extraInfoFromB)", QrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
-    REGISTER_VARIABLE("IsRightClass(particleName)", IsRightClass, "FlavorTagging: returns 1 if the class track by particleName category has the same flavor as the MC target track 0 else also if there is no target track");
-    REGISTER_VARIABLE("IsFromB(particleName)", IsFromB, "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, "Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName. The probability is accessed via extraInfoName.");
-    REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables, "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90) assuming a semileptonic decay with the given particle as target.");
-    REGISTER_VARIABLE("FSCVariables(requestedVariable)", FSCVariables, "FlavorTagging:[Eventbased] Kinematical variables for FastSlowCorrelated category (p_CMS_Fast, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTO_Fast).");
-    REGISTER_VARIABLE("CheckingVariables(ListName, requestedVariable)", CheckingVariables, "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");
-    REGISTER_VARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat, "Returns the highest probability value for the given category")
+    REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightCategory, extraInfoRightTrack)", InputQrOf,
+                      "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
+    REGISTER_VARIABLE("QrOf(particleListName, extraInfoRightCategory, extraInfoRightTrack)", QrOf,
+                      "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
+    REGISTER_VARIABLE("IsRightCategory(particleName)", IsRightCategory,
+                      "FlavorTagging: returns 1 if the class track by particleName category has the same flavor as the MC target track 0 else also if there is no target track");
+    REGISTER_VARIABLE("IsRightTrack(particleName)", IsRightTrack,
+                      "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
+    REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat,
+                      "Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName. The probability is accessed via extraInfoName.");
+    REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables,
+                      "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90) assuming a semileptonic decay with the given particle as target.");
+    REGISTER_VARIABLE("FSCVariables(requestedVariable)", FSCVariables,
+                      "FlavorTagging:[Eventbased] Kinematical variables for FastSlowCorrelated category (p_CMS_Fast, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTO_Fast).");
+    REGISTER_VARIABLE("CheckingVariables(ListName, requestedVariable)", CheckingVariables,
+                      "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");
+    REGISTER_VARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat,
+                      "Returns the highest probability value for the given category")
 
   }
 }

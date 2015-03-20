@@ -79,13 +79,13 @@ namespace Belle2 {
      * Returns 1 if the class track by particleName category has the same flavour as the MC target track,
      * 0 else; also if there is no target track. This is a Flavor Tagging specific variable!
      */
-    Manager::FunctionPtr IsRightClass(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr IsRightCategory(const std::vector<std::string>& arguments);
 
     /**
     * Checks if the given Particle was really a Particle from a B. 1.0 if true otherwise 0.0.
     * This is a Flavor Tagging specific variable!
     */
-    Manager::FunctionPtr IsFromB(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr IsRightTrack(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName (argument[0]).

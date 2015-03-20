@@ -33,11 +33,11 @@ from stdFSParticles import *
 from stdLooseFSParticles import *
 
 # Add 10 signal MC files (each containing 1000 generated events)
-# filelistSIG = \
-    # ['/group/belle2/MC/signal/B2JpsiKs_mu/mcprod1405/BGx1/mc35_B2JpsiKs_mu_BGx1_s00/B2JpsiKs_mu_e0001r001*_s00_BGx1.mdst.root'
-     # ]
+filelistSIG = \
+    ['/group/belle2/MC/signal/B2JpsiKs_mu/mcprod1405/BGx1/mc35_B2JpsiKs_mu_BGx1_s00/B2JpsiKs_mu_e0001r001*_s00_BGx1.mdst.root'
+     ]
 
-# inputMdstList(filelistSIG)
+inputMdstList(filelistSIG)
 
 # use standard final state particle lists
 #
@@ -72,9 +72,15 @@ buildContinuumSuppression('B0:jspiks')
 # into your local release under analysis/data/.
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
-FlavorTagger(mode='Expert', weightFiles='B2JpsiKs_mu')
+# FlavorTagger(mode='Expert', weightFiles='B2JpsiKs_mu')
+FlavorTagger(
+    recoParticle='B0:jspiks',
+    mode='Expert',
+    weightFiles='B2JpsiKs_mu',
+    categories=['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumP*', 'KaonPion'])
 #
-# If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories you want to use like:
+# If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
+# you want to use like:
 #
 # FlavorTagger(mode = 'Teacher', weightFiles='B2JpsiKs_mu', categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
@@ -84,16 +90,20 @@ FlavorTagger(mode='Expert', weightFiles='B2JpsiKs_mu')
 # ['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumP*', 'KaonPion']
 #
 # All available categories are:
-# ['Electron', 'IntermediateElectron', 'Muon', 'IntermediateMuon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumP*', 'KaonPion']
+# ['Electron', 'IntermediateElectron', 'Muon', 'IntermediateMuon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion',
+# 'Lambda', 'FSC', 'MaximumP*', 'KaonPion']
 #
-# If you train by yourself you need to run this file 3 times (in order to train track, event and combiner levels) with 3 different samples of 500k events.
+# If you train by yourself you need to run this file 3 times (in order to train track, event and combiner levels)
+# with 3 different samples of 500k events.
 # Three different 500k events samples are needed in order to avoid biases between levels.
-# You can also train track and event level for all categories (1st and 2nd runs) and then train the combiner for a specific combination (3rd run).
+# You can also train track and event level for all categories (1st and 2nd runs) and then train the combiner
+# for a specific combination (3rd run).
 # It is also possible to train different combiners consecutively using the same weightFiles name.
 # You just need always to specify the desired category combination while using the expert mode as:
 #
 # FlavorTagger(mode = 'Expert', weightFiles='B2JpsiKs_mu', categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
+# Another possibility is to train a combiner for a specific category combination using the default weight files
 
 # create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
 toolsDST = ['EventMetaData', '^B0']
@@ -105,6 +115,7 @@ toolsDST += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['FlavorTagging', '^B0']
+#  Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
 
 # write out the flat ntuples
 ntupleFile('B2A801-FlavorTagger.root')

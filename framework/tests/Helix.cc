@@ -6,6 +6,7 @@
 #include <TMath.h>
 
 #include <boost/math/special_functions/sign.hpp>
+#include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
 
@@ -13,40 +14,8 @@ using namespace std;
 using namespace Belle2;
 using namespace HelixParameterIndex;
 
-// Additional tests
-/// Expectation macro for combound structures like vectors to be close to each other
-#define EXPECT_ALL_NEAR(expected, actual, delta) EXPECT_PRED3(allNearTemplate<decltype(expected)>, expected, actual, delta)
-
-/// Assertation macro for combound structures like vectors to be close to each other
-#define ASSERT_ALL_NEAR(expected, actual, delta) ASSERT_PRED3(allNearTemplate<decltype(expected)>, expected, actual, delta)
-
-/// Expectation macro for angle values that should not care for a multiple of 2 * PI difference between the values
-#define EXPECT_ANGLE_NEAR(expected, actual, delta) EXPECT_PRED3(angleNear, expected, actual, delta)
-
-/// Assertation macro for angle values that should not care for a multiple of 2 * PI difference between the values
-#define ASSERT_ANGLE_NEAR(expected, actual, delta) ASSERT_PRED3(angleNear, expected, actual, delta)
-
-/// Expectation macro that two values carry the same sign.
-#define EXPECT_SAME_SIGN(expected, actual) EXPECT_PRED2(sameSign, expected, actual)
-
-/// Assertation macro that two values carry the same sign.
-#define ASSERT_SAME_SIGN(expected, actual) ASSERT_PRED2(sameSign, expected, actual)
-
-/// Expectation macro that a value is bigger than zero.
-#define EXPECT_POSITIVE(expected) EXPECT_PRED1(isPositive, expected)
-
-/// Assertation macro that a value is bigger than zero.
-#define ASSERT_POSITIVE(expected) ASSERT_PRED1(isPositive, expected)
-
-/// Expectation macro that a value is smaller than zero.
-#define EXPECT_NEGATIVE(expected) EXPECT_PRED1(isNegative, expected)
-
-/// Assertation macro that a value is smaller than zero.
-#define ASSERT_NEGATIVE(expected) ASSERT_PRED1(isNegative, expected)
-
-
-/// Sting output operator for a TVector3 for gtest print support.
-std::ostream& operator<<(std::ostream& output, const TVector3& tVector3)
+/// String output operator for a TVector3 for gtest print support.
+std::ostream& operator<<(::std::ostream& output, const TVector3& tVector3)
 {
   return output
          << "TVector3("
@@ -55,77 +24,27 @@ std::ostream& operator<<(std::ostream& output, const TVector3& tVector3)
          << tVector3.Z() << ")";
 }
 
-/** Adds message to all EXCEPTS and ASSERT in the current and any called or nested scopes
- *
- *  The macro sets up for the following EXCEPTS and ASSERTS, hence it must be placed before the tests.
- *
- *  The message can be composed in a B2INFO style manner with addtional << between
- *  individual strings and values to be concatenated.
- *
- *  @example TEST_CONTEXT("for my value set to "  << myValue);
- */
-#define TEST_CONTEXT(message) SCOPED_TRACE([&](){std::ostringstream messageStream; messageStream << message; return messageStream.str();}());
+namespace Belle2 {
+  /** Predicate checking that all five components of the Helix are close by a maximal error of absError.*/
+  namespace TestHelpers {
+
+    template<>
+    bool allNear<Belle2::Helix>(const Belle2::Helix& expected,
+                                const Belle2::Helix& actual,
+                                double tolerance)
+    {
+      bool d0Near = fabs(expected.getD0() - actual.getD0()) < tolerance;
+      bool phi0Near = angleNear(expected.getPhi0(), actual.getPhi0(), tolerance);
+      bool omegaNear = fabs(expected.getOmega() - actual.getOmega()) < tolerance;
+      bool z0Near = fabs(expected.getZ0() - actual.getZ0()) < tolerance;
+      bool tanLambdaNear = fabs(expected.getTanLambda() - actual.getTanLambda()) < tolerance;
+
+      return d0Near and phi0Near and omegaNear and z0Near and tanLambdaNear;
+    }
+  }
+}
 
 namespace {
-  /** Predicate checking that all three components of TVector are close by a maximal error of absError. */
-  bool allNear(const TVector3& expected, const TVector3& actual, const float& absError)
-  {
-
-    bool xNear = fabs(expected.X() - actual.X()) < absError;
-    bool yNear = fabs(expected.Y() - actual.Y()) < absError;
-    bool zNear = fabs(expected.Z() - actual.Z()) < absError;
-    return xNear and yNear and zNear;
-  }
-
-  /** Predicate checking that all five components of the Helix are close by a maximal error of absError. */
-  bool allNear(const Belle2::Helix& expected, const Belle2::Helix& actual, const float& absError)
-  {
-    bool d0Near = fabs(expected.getD0() - actual.getD0()) < absError;
-    bool phi0Near = fabs(remainder(expected.getPhi0() - actual.getPhi0(), 2 * M_PI)) < absError; // Identical modulo 2 * PI
-    bool omegaNear = fabs(expected.getOmega() - actual.getOmega()) < absError;
-    bool z0Near = fabs(expected.getZ0() - actual.getZ0()) < absError;
-    bool tanLambdaNear = fabs(expected.getTanLambda() - actual.getTanLambda()) < absError;
-
-    return d0Near and phi0Near and omegaNear and z0Near and tanLambdaNear;
-  }
-
-  /** Templated version of predicate checking if two combound object containing some floating point are near each other by maximum deviation.
-   *  Concrete implementations can be given as simple overloads of the allNear function.
-   */
-  template<class T>
-  bool allNearTemplate(const T& expected, const T& actual, const float& absError)
-  {
-    return allNear(expected, actual, absError);
-  }
-
-  /** Predicate checking that two angular values are close to each other modulus a 2 * PI difference. */
-  bool angleNear(const float& expected, const float& actual, const float& absError)
-  {
-    return fabs(remainder(expected - actual, 2 * M_PI)) < absError;
-  }
-
-  /** Predicate checking that two values have the same sign. Returns nan if any of the values is nan. */
-  bool sameSign(const float& expected, const float& actual)
-  {
-    if (isnan(expected) or isnan(actual)) return false;
-    using boost::math::sign;
-    int expectedSign = sign(expected);
-    int actualSign = sign(actual);
-    return expectedSign == actualSign;
-  }
-
-  /** Predicate checking that a value is bigger than zero. */
-  bool isPositive(const float& expected)
-  {
-    return expected > 0;
-  }
-
-  /** Predicate checking that a value is smaller than zero. */
-  bool isNegative(const float& expected)
-  {
-    return expected < 0;
-  }
-
   Belle2::Helix helixFromCenter(const TVector3& center, const float& radius, const float& tanLambda)
   {
     double omega = 1 / radius;
@@ -135,7 +54,6 @@ namespace {
 
     return Belle2::Helix(d0, phi0, omega, z0, tanLambda);
   }
-
 
   /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
   vector<float> linspace(const float& start, const float& end, const int n)
@@ -153,7 +71,6 @@ namespace {
     return result;
   }
 }
-
 
 namespace {
 

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Poyuan Chen, Benjamin Oberhof                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -48,7 +48,26 @@ REG_MODULE(ECLPi0Reconstructor)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLPi0ReconstructorModule::ECLPi0ReconstructorModule() : Module()
+ECLPi0ReconstructorModule::ECLPi0ReconstructorModule() :
+  Module(),
+  m_timeCPU(0),
+  m_nRun(0),
+  m_nEvent(0),
+  m_Pi0Num(0),
+  m_showerId1(0),
+  m_showerId2(0),
+  m_px1(0),
+  m_py1(0),
+  m_pz1(0),
+  m_px2(0),
+  m_py2(0),
+  m_pz2(0),
+  m_pi0E(0),
+  m_pi0px(0),
+  m_pi0py(0),
+  m_pi0pz(0),
+  m_pi0mass(0),
+  m_pi0chi2(0)
 {
   //Set module properties
   setDescription("Creates ECL_pi0 from ECL_gamma.");
@@ -100,7 +119,8 @@ void ECLPi0ReconstructorModule::event()
 
   for (int iGamma = 0; iGamma < eclGammaToShower.getEntries(); iGamma++) {
     if (eclGammaToShower[iGamma].getToIndices().size() != 1) {
-      B2ERROR("Relation Gamma To Shower is not only one in event " << m_nEvent << " nShower " << eclGammaToShower[iGamma].getToIndices().size());
+      B2ERROR("Relation Gamma To Shower is not only one in event " << m_nEvent << " nShower " <<
+              eclGammaToShower[iGamma].getToIndices().size());
     }
   }
 
@@ -417,7 +437,8 @@ double ECLPi0ReconstructorModule::errorPhi(CLHEP::HepLorentzVector shower)
 }
 
 /* Obtains the fitted 4-momentum (after mass constrained fit) */
-unsigned ECLPi0ReconstructorModule::fillFitted4Vector(MassFitKFit& km, CLHEP::HepLorentzVector& fitMom, CLHEP::HepSymMatrix& covMatrix)
+unsigned ECLPi0ReconstructorModule::fillFitted4Vector(MassFitKFit& km, CLHEP::HepLorentzVector& fitMom,
+                                                      CLHEP::HepSymMatrix& covMatrix)
 {
   unsigned n = km.getTrackCount();
 

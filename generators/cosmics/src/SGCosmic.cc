@@ -119,16 +119,16 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
     const float cylindricalR = 125.0; // radius (cm) of ToP
     float arcLength;
     // Get arc length at ToP radius
-    arcLength = CosmicMCHelix.getArcLengthAtCylindricalR(cylindricalR);
+    arcLength = CosmicMCHelix.getArcLength2DAtCylindricalR(cylindricalR);
     if (isnan(arcLength)) continue;
 
     // Calculate coordinates and momentum at ToP radius
     TVector3 vector;
-    vector = CosmicMCHelix.getPositionAtArcLength(arcLength);
+    vector = CosmicMCHelix.getPositionAtArcLength2D(arcLength);
     double vx = vector[0];
     double vy = vector[1];
     double vz = vector[2];
-    vector = CosmicMCHelix.getMomentumAtArcLength(arcLength, bz);
+    vector = CosmicMCHelix.getMomentumAtArcLength2D(arcLength, bz);
     double px = - vector[0];
     double py = - vector[1];
     double pz = - vector[2];

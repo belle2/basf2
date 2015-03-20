@@ -52,7 +52,115 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclDigitCellId(0),
     m_eclDigitAmp(0),
     m_eclDigitTimeFit(0),
-    m_eclDigitFitQuality(0)
+    m_eclDigitFitQuality(0),
+    m_eclSimHitMultip(0),
+    m_eclSimHitIdx(0),
+    m_eclSimHitToMc(0),
+    m_eclSimHitCellId(0),
+    m_eclSimHitPdg(0),
+    m_eclSimHitEnergyDep(0),
+    m_eclSimHitFlightTime(0),
+    m_eclSimHitX(0),
+    m_eclSimHitY(0),
+    m_eclSimHitZ(0),
+    m_eclSimHitPx(0),
+    m_eclSimHitPy(0),
+    m_eclSimHitPz(0),
+    m_eclHitMultip(0),
+    m_eclHitIdx(0),
+    m_eclHitToMc(0),
+    m_eclHitCellId(0),
+    m_eclHitEnergyDep(0),
+    m_eclHitTimeAve(0),
+    m_eclShowerMultip(0),
+    m_eclShowerIdx(0),
+    m_eclShowerToMc(0),
+    m_eclShowerToGamma(0),
+    m_eclShowerEnergy(0),
+    m_eclShowerTheta(0),
+    m_eclShowerPhi(0),
+    m_eclShowerR(0),
+    m_eclShowerNHits(0),
+    m_eclShowerE9oE25(0),
+    m_eclShowerUncEnergy(0),
+    m_eclClusterMultip(0),
+    m_eclClusterIdx(0),
+    m_eclClusterToMc(0),
+    m_eclClusterToShower(0),
+    m_eclClusterToTrack(0),
+    m_eclClusterEnergy(0),
+    m_eclClusterEnergyError(0),
+    m_eclClusterTheta(0),
+    m_eclClusterThetaError(0),
+    m_eclClusterPhi(0),
+    m_eclClusterPhiError(0),
+    m_eclClusterR(0),
+    m_eclClusterEnergyDepSum(0),
+    m_eclClusterTiming(0),
+    m_eclClusterTimingError(0),
+    m_eclClusterE9oE25(0),
+    m_eclClusterHighestE(0),
+    m_eclClusterLat(0),
+    m_eclClusterNofCrystals(0),
+    m_eclClusterCrystalHealth(0),
+    m_eclClusterMergedPi0(0),
+    m_eclClusterPx(0),
+    m_eclClusterPy(0),
+    m_eclClusterPz(0),
+    m_eclClusterIsTrack(0),
+    m_eclClusterPi0Likel(0),
+    m_eclClusterEtaLikel(0),
+    m_eclClusterDeltaL(0),
+    m_eclClusterBeta(0),
+    m_eclGammaMultip(0),
+    m_eclGammaIdx(0),
+    m_eclGammaEnergy(0),
+    m_eclGammaTheta(0),
+    m_eclGammaPhi(0),
+    m_eclGammaPx(0),
+    m_eclGammaPy(0),
+    m_eclGammaPz(0),
+    m_eclGammaR(0),
+    m_eclPi0Multip(0),
+    m_eclPi0Idx(0),
+    //m_eclPi0ToGamma(0),
+    m_eclPi0ShowerId1(0),
+    m_eclPi0ShowerId2(0),
+    m_eclPi0Energy(0),
+    m_eclPi0Px(0),
+    m_eclPi0Py(0),
+    m_eclPi0Pz(0),
+    m_eclPi0Mass(0),
+    m_eclPi0MassFit(0),
+    m_eclPi0Chi2(0),
+    m_eclPi0PValue(0),
+    m_mcMultip(0),
+    m_mcIdx(0),
+    m_mcPdg(0),
+    m_mcMothPdg(0),
+    m_mcGMothPdg(0),
+    m_mcGGMothPdg(0),
+    m_mcEnergy(0),
+    m_mcPx(0),
+    m_mcPy(0),
+    m_mcPz(0),
+    m_mcDecayVtxX(0),
+    m_mcDecayVtxY(0),
+    m_mcDecayVtxZ(0),
+    m_mcProdVtxX(0),
+    m_mcProdVtxY(0),
+    m_mcProdVtxZ(0),
+    m_mcSecondaryPhysProc(0),
+    m_trkMultip(0),
+    m_trkPdg(0),
+    m_trkIdx(0),
+    m_trkCharge(0),
+    m_trkPx(0),
+    m_trkPy(0),
+    m_trkPz(0),
+    m_trkX(0),
+    m_trkY(0),
+    m_trkZ(0)
 {
   //Set module properties
   setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
@@ -65,33 +173,12 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
   addParam("doTracking", m_doTracking,
            "set true if you want to save the informations from TrackFitResults'rootFileName'", bool(true));
   /*
-  m_eclDigitMultip=0;
-  m_eclDigitIdx->clear();
-  m_eclDigitToMc->clear();
-  m_eclDigitCellId->clear();
-  m_eclDigitAmp->clear();
-  m_eclDigitTimeFit->clear();
-  m_eclDigitFitQuality->clear();
-
-  m_eclSimHitMultip=0;
-  m_eclSimHitIdx->clear();
-  m_eclSimHitToMc->clear();
-  m_eclSimHitCellId->clear();
-  m_eclSimHitPdg->clear();
-  m_eclSimHitEnergyDep->clear();
-  m_eclSimHitFlightTime->clear();
-  m_eclSimHitX->clear();
-  m_eclSimHitY->clear();
-  m_eclSimHitZ->clear();
-  m_eclSimHitPx->clear();
-  m_eclSimHitPy->clear();
-  m_eclSimHitPz->clear();
 
   m_eclHitMultip=0;
-  m_eclHitIdx->clear();
-  m_eclHitToMc->clear();
-  m_eclHitCellId->clear();
-  m_eclHitEnergyDep->clear();
+  m_eclHitIdx(0),
+  m_eclHitToMc(0),
+  m_eclHitCellId(0),
+  m_eclHitEnergyDep(0),
   m_eclHitTimeAve->clear();
 
   m_eclShowerMultip=0;

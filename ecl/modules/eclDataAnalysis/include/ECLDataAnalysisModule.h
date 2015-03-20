@@ -154,11 +154,11 @@ namespace Belle2 {
     int m_eclGammaMultip;
     std::vector<int>* m_eclGammaIdx;
     std::vector<double>* m_eclGammaEnergy;
+    std::vector<double>* m_eclGammaTheta;
+    std::vector<double>* m_eclGammaPhi;
     std::vector<double>* m_eclGammaPx;
     std::vector<double>* m_eclGammaPy;
     std::vector<double>* m_eclGammaPz;
-    std::vector<double>* m_eclGammaTheta;
-    std::vector<double>* m_eclGammaPhi;
     std::vector<double>* m_eclGammaR;
     std::vector<int>* m_eclGammaToPi0;
 
@@ -196,8 +196,8 @@ namespace Belle2 {
 
     int m_trkMultip;
     std::vector<int>* m_trkPdg;
-    std::vector<int>* m_trkCharge;
     std::vector<int>* m_trkIdx;
+    std::vector<int>* m_trkCharge;
     std::vector<double>* m_trkPx;
     std::vector<double>* m_trkPy;
     std::vector<double>* m_trkPz;

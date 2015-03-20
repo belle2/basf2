@@ -139,33 +139,33 @@ void VXDCDCMergerSinglePart(){
   h22->SetMaximum(1.1);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h22","TruthTag==1");
   h22->Sumw2();
-  TH1F *eff_pt = new TH1F("eff_pt","Eff vs Pt VXDTF+Trasan Single Muon",100,0.,5.);
-  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_pt","TruthTag==1&&GoodTag==1");
-  eff_pt->SetMaximum(1.1);
-  eff_pt->Sumw2();
+  TH1F *eff_ptsp = new TH1F("eff_ptsp","Eff vs Pt VXDTF+Trasan Single Muon",100,0.,5.);
+  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_ptsp","TruthTag==1&&GoodTag==1");
+  eff_ptsp->SetMaximum(1.1);
+  eff_ptsp->Sumw2();
   gPad->RedrawAxis();
   //eff_thetasp->Divide(h22);
   //eff_thetasp->GetYaxis()->SetRange(0,2);
   //eff_thetasp->Draw("E");
-  TH1F *eff_ptsp = new TH1F("eff_ptsp", "Eff vs Pt VXDTF+Trasan Single Muon",100,0.,5.);
+  TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt VXDTF+Trasan Single Muon",100,0.,5.);
   //TLegend *leg1= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. Pt");
-  eff_pt->GetXaxis()->SetTitle("Pt (GeV)");
-  eff_pt->GetYaxis()->SetTitle("Efficiency");
-  eff_pt->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt VXDTF+Trasan")); 
-  eff_pt->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
-  eff_pt->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_ptsp=eff_pt;
-  eff_ptsp->Divide(eff_pt, h22, 1.0, 1.0, "B");
+  eff_ptsp->GetXaxis()->SetTitle("Pt (GeV)");
+  eff_ptsp->GetYaxis()->SetTitle("Efficiency");
+  eff_ptsp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt VXDTF+Trasan")); 
+  eff_ptsp->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
+  eff_ptsp->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_pt=eff_ptsp;
+  eff_pt->Divide(eff_ptsp, h22, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position
   gStyle->SetOptStat("e");
-  eff_ptsp->GetYaxis()->SetRangeUser(0,1.1);
+  eff_pt->GetYaxis()->SetRangeUser(0,1.1);
   gPad->RedrawAxis();
-  eff_ptsp->Draw("E");
+  eff_pt->Draw("E");
   //leg1->Draw();
     //c1->SaveAs("plots/EffvsPt_5GeV_muons_1000_Theta.jpg");
-  eff_ptsp->Write();
+  eff_pt->Write();
   //delete eff_pt;
 
   TH1F *h24 = new TH1F("h24","Eff vs Theta VXDTF+Trasan",50, -1, 1.);

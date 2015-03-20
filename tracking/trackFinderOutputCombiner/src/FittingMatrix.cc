@@ -273,7 +273,7 @@ FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCReco
     }
 
     if (segment.getStereoType() == AXIAL) {
-      beginningIndex = std::max(0lu, beginningIndex - 5);
+      beginningIndex = std::max(static_cast<std::list<double>::size_type>(0), beginningIndex - 5);
       endIndex = std::min(perpSList.size(), endIndex + 5);
 
       for (unsigned int counter = beginningIndex; counter < endIndex; counter++) {

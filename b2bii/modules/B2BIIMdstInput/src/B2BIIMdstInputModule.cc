@@ -62,12 +62,9 @@ void B2BIIMdstInputModule::initialize()
   // Open data file
   m_fd = new Belle::Panther_FileIO(m_inputFileName.c_str(), BBS_READ);
 
-  // Read first event (note that this is not a real event)
+  // Read first record (does not contain event data)
   m_fd->read();
   m_nevt++;
-
-  // Process first event
-  // currently nothing is done for the first event
 
   B2DEBUG(1, "B2BIIMdstInput: initialized.");
 }
@@ -93,9 +90,6 @@ void B2BIIMdstInputModule::event()
 {
   m_nevt++;
 
-  // First event is already loaded (skip it)
-  if (m_nevt == 0) return;
-
   // Fill EventMetaData
   StoreObjPtr<EventMetaData> evtmetadata;
   evtmetadata.create();
@@ -106,6 +100,9 @@ void B2BIIMdstInputModule::event()
     //clear all previous event data before reading!
     BsClrTab(BBS_CLEAR);
     rectype = m_fd->read();
+    if (rectype == -1) {
+      B2ERROR("Error while reading panther tables! Record skipped.");
+    }
   }
   if (rectype == -2) {   // EoF detected
     evtmetadata->setEndOfData(); // stop event processing

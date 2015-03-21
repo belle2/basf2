@@ -107,7 +107,8 @@ namespace Belle2 {
       ReplaceMap(MapType& replace): m_replace(replace) {}
 
       /** Take old index and return the new index */
-      consolidation_type operator()(index_type old) const {
+      consolidation_type operator()(index_type old) const
+      {
         typename MapType::const_iterator iter = m_replace.find(old);
         if (iter != m_replace.end()) {
           return iter->second;
@@ -148,7 +149,8 @@ namespace Belle2 {
      *  @param replace   Should an existing object be replaced?
      *  @return          True if the creation succeeded.
      **/
-    bool create(bool replace = false) {
+    bool create(bool replace = false)
+    {
       bool result = DataStore::Instance().createObject(0, replace, *this);
       m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(*this));
       if (result) {
@@ -174,10 +176,12 @@ namespace Belle2 {
      */
     template <class FROM, class TO> RelationArray(const StoreArray<FROM>& from, const StoreArray<TO>& to, const std::string& name = "",
                                                   DataStore::EDurability durability = DataStore::c_Event):
-      StoreAccessorBase(name.empty() ? DataStore::relationName(from.getName(), to.getName()) : name, durability, RelationContainer::Class(), false),
+      StoreAccessorBase(name.empty() ? DataStore::relationName(from.getName(), to.getName()) : name, durability,
+                        RelationContainer::Class(), false),
       m_accessorFrom(from.getAccessorParams()),
       m_accessorTo(to.getAccessorParams()),
-      m_relations(0) {
+      m_relations(0)
+    {
       if (m_accessorFrom.second > m_durability || m_accessorTo.second > m_durability) {
         B2FATAL("Tried to create RelationArray '" << m_name << "' with a durability larger than the StoreArrays it relates");
       }
@@ -195,7 +199,8 @@ namespace Belle2 {
       StoreAccessorBase(DataStore::relationName(fromAccessor.first, toAccessor.first), durability, RelationContainer::Class(), false),
       m_accessorFrom(fromAccessor),
       m_accessorTo(toAccessor),
-      m_relations(nullptr) {
+      m_relations(nullptr)
+    {
       if (m_accessorFrom.second > m_durability || m_accessorTo.second > m_durability) {
         B2FATAL("Tried to create RelationArray '" << m_name << "' with a durability larger than the StoreArrays it relates");
       }
@@ -211,7 +216,8 @@ namespace Belle2 {
      */
     explicit RelationArray(const std::string& name, DataStore::EDurability durability = DataStore::c_Event):
       StoreAccessorBase(name, durability, RelationContainer::Class(), false),
-      m_relations(0) {
+      m_relations(0)
+    {
       if (name.empty()) {
         B2FATAL("Cannot guess relation name, please supply correct name");
       }
@@ -235,10 +241,10 @@ namespace Belle2 {
     int getEntries() const { return isValid() ? ((*m_relations)->getEntries()) : 0; }
 
     /** Return the AccessorParams the attached relation points from. */
-    const AccessorParams getFromAccessorParams() const { ensureAttached(); return m_accessorFrom; }
+    const AccessorParams& getFromAccessorParams() const { ensureAttached(); return m_accessorFrom; }
 
     /** Return the AccessorParams the attached relation points to. */
-    const AccessorParams getToAccessorParams() const { ensureAttached(); return m_accessorTo; }
+    const AccessorParams& getToAccessorParams() const { ensureAttached(); return m_accessorTo; }
 
     /** Get modified flag of underlying container. */
     bool getModified() const { assertValid(); return (*m_relations)->getModified(); }
@@ -247,7 +253,8 @@ namespace Belle2 {
     void setModified(bool modified) { assertCreated(); (*m_relations)->setModified(modified); }
 
     /** Clear all elements from the relation. */
-    void clear() override {
+    void clear() override
+    {
       setModified(true);
       (*m_relations)->elements().Delete();
     }
@@ -258,7 +265,8 @@ namespace Belle2 {
      *  @param to      index to point to
      *  @param weight  weight of the relation
      */
-    void add(index_type from, index_type to, weight_type weight = 1.0) {
+    void add(index_type from, index_type to, weight_type weight = 1.0)
+    {
       setModified(true);
       new(next()) RelationElement(from, to, weight);
     }
@@ -269,7 +277,8 @@ namespace Belle2 {
      *  @param to      indices to point to
      *  @param weight  weight for all relations
      */
-    void add(index_type from, const std::vector<index_type>& to, weight_type weight = 1.0) {
+    void add(index_type from, const std::vector<index_type>& to, weight_type weight = 1.0)
+    {
       setModified(true);
       std::vector<weight_type> weights(to.size(), weight);
       new(next()) RelationElement(from, to, weights);
@@ -281,7 +290,8 @@ namespace Belle2 {
      *  @param to      indices to point to
      *  @param weights weights of the relations
      */
-    void add(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights) {
+    void add(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights)
+    {
       setModified(true);
       new(next()) RelationElement(from, to, weights);
     }
@@ -294,7 +304,8 @@ namespace Belle2 {
      *  @param end     iterator pointing to the end of a sequence of
      *                 std::pair<index_type,weight_type> or compatible
      */
-    template <class InputIterator> void add(index_type from, const InputIterator& begin, const InputIterator& end) {
+    template <class InputIterator> void add(index_type from, const InputIterator& begin, const InputIterator& end)
+    {
       setModified(true);
       new(next()) RelationElement(from, begin, end);
     }
@@ -356,7 +367,8 @@ namespace Belle2 {
      */
     explicit RelationArray(const AccessorParams& params):
       StoreAccessorBase(params.first, params.second, RelationContainer::Class(), false),
-      m_relations(0) {
+      m_relations(0)
+    {
       if (params.first.empty()) {
         B2FATAL("Cannot guess relation name, please supply correct name");
       }
@@ -364,13 +376,15 @@ namespace Belle2 {
 
 
     /** Return address where the next RelationElement should be created. */
-    RelationElement* next() {
+    RelationElement* next()
+    {
       int index = (*m_relations)->elements().GetLast() + 1;
       return static_cast<RelationElement*>((*m_relations)->elements().AddrAt(index));
     }
 
     /** Check that the AccessorParams stored in the relation and the one given to the constructor are the same. */
-    void checkRelation(const std::string& direction, const AccessorParams& array, const AccessorParams& rel) const {
+    void checkRelation(const std::string& direction, const AccessorParams& array, const AccessorParams& rel) const
+    {
       if (array.second == 0 && array.first.empty())
         return; //no information to check against...
 
@@ -383,7 +397,8 @@ namespace Belle2 {
     }
 
     /** Attach to relation, if necessary. */
-    void ensureAttached() const {
+    void ensureAttached() const
+    {
       if (m_relations) return;
 
       const_cast<RelationArray*>(this)->m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(*this));
@@ -412,7 +427,8 @@ namespace Belle2 {
      *
      *  After this function returns, the relation is guaranteed to be writeable.
      */
-    void assertCreated() {
+    void assertCreated()
+    {
       if (!isValid()) {
         if (!create()) {
           B2FATAL("Couldn't create relation " << m_name << "!");

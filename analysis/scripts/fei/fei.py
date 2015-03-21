@@ -3,7 +3,7 @@
 #
 # Thomas Keck 2014
 #
-# This FullEventInterpretation algorithm uses a functional approach (see actorFramework.py).
+# The Full Event Interpretation algorithm uses a functional approach (see actorFramework.py).
 # All tasks are implemented in Functions called actors.
 # Each Actor has requirements and provides return values.
 # E.g. SignalProbability requires the path, a method, variables and a ParticleList.
@@ -15,13 +15,15 @@
 #      MakeAndMatchParticleList requires among others PreCuts
 # ... and so on ...
 #
-# The actors are added to the Sequence of actors in the FullEventInterpretation function at the end of this file.
-# Afterwards the dependencies between the Actors are solved, and the Actors are called in the correct order, with the required parameters.
+# The actors are added to the Sequence of actors in the Full Event Interpretation function at the end of this file.
+# Afterwards the dependencies between the Actors are solved, and the Actors are called in the correct order,
+# with the required parameters.
 # If no further Actors can be called without satisfying all their requirements, the FullReoncstruction function returns.
-# Therefore the end user has to run the FullEventInterpretation several times, until all Histograms, Classifiers, ... are created.
+# Therefore the end user has to run the Full Event Interpretation several times, until all Histograms, Classifiers, ... are created.
 #
 
 from ROOT import PyConfig
+from functools import reduce
 PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
 import ROOT
@@ -41,43 +43,45 @@ import itertools
 
 
 class Particle(object):
+
     """
     The Particle class is the only class the end-user gets into contact with.
     The user creates an instance of this class for every particle he wants to reconstruct with the FullReconstruction algorithm,
-    and provides MVAConfiguration, PreCutConfiguration and PostCutConfiguration. These configurations can be overwritten per channel.
+    and provides MVAConfiguration, PreCutConfiguration and PostCutConfiguration. These can be overwritten per channel.
     """
 
-    ## Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
+    # Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
     MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target')
-    ## Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
+    # Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
     PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity, userCut')
-    ## Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
+    # Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
     PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
-    ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
+    # Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig, decayModeID')
 
     def __init__(self, identifier, mvaConfig, preCutConfig=None, postCutConfig=None):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
-            @param identifier is the correct pdg name of the particle as a string with an optional additional user label seperated by :
+            @param identifier is the pdg name of the particle as a string with an optional additional
+                   user label seperated by ':'
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig intermediate pre cut configuration
             @param postCutConfig post cut configuration
         """
-        ## Is the correct pdg name as a string of the particle with an optional additional user label seperated by :
+        # Is the correct pdg name as a string of the particle with an optional additional user label seperated by :
         self.identifier = identifier + ':generic' if len(identifier.split(':')) < 2 else identifier
         v = self.identifier.split(':')
-        ## The name of the particle as correct pdg name e.g. K+, pi-, D*0.
+        # The name of the particle as correct pdg name e.g. K+, pi-, D*0.
         self.name = v[0]
-        ## Additional label like hasMissing or has2Daughters
+        # Additional label like hasMissing or has2Daughters
         self.label = v[1]
-        ## multivariate analysis configuration (see MVAConfiguration)
+        # multivariate analysis configuration (see MVAConfiguration)
         self.mvaConfig = mvaConfig
-        ## DecayChannel objects added by addChannel() method.
+        # DecayChannel objects added by addChannel() method.
         self.channels = []
-        ## intermediate cut configuration (see PreCutConfiguration)
+        # intermediate cut configuration (see PreCutConfiguration)
         self.preCutConfig = preCutConfig
-        ## post cut configuration (see PostCutConfiguration)
+        # post cut configuration (see PostCutConfiguration)
         self.postCutConfig = postCutConfig
 
     @property
@@ -129,20 +133,25 @@ class Particle(object):
                 output += '    PostCutConfiguration: None\n'
             else:
                 output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
-            output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(m=self.mvaConfig)
+            output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(
+                m=self.mvaConfig)
             output += '    Variables: ' + ', '.join(self.mvaConfig.variables) + '\n'
         else:
             samePreCutConfig = all(compareCutConfig(channel.preCutConfig, self.preCutConfig) for channel in self.channels)
             sameMVAConfig = all(compareMVAConfig(channel.mvaConfig, self.mvaConfig) for channel in self.channels)
-            commonVariables = reduce(lambda x, y: set(x).intersection(y), [channel.mvaConfig.variables for channel in self.channels])
+            commonVariables = reduce(
+                lambda x, y: set(x).intersection(y), [
+                    channel.mvaConfig.variables for channel in self.channels])
             if sameMVAConfig:
                 output += '    All channels use the same MVA configuration\n'
-                output += '    MVAConfiguration: name={m.name}, type={m.type}, target={m.target}, config={m.config}\n'.format(m=self.mvaConfig)
+                output += '    MVAConfiguration: name={m.name}, type={m.type}, target={m.target}, config={m.config}\n'.format(
+                    m=self.mvaConfig)
             output += '    Shared Variables: ' + ', '.join(commonVariables) + '\n'
 
             if samePreCutConfig:
                 output += '    All channels use the same PreCut configuration\n'
-                output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
+                output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
+                    p=self.preCutConfig)
                 output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=self.preCutConfig)
                 output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=self.preCutConfig)
 
@@ -157,25 +166,32 @@ class Particle(object):
                     if self.postCutConfig is None:
                         output += '    PreCutConfiguration: None\n'
                     else:
-                        output += '    PreCutConfiguration: variable={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=channel.preCutConfig)
+                        output += ('    PreCutConfiguration: '
+                                   'variable={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
+                                       p=channel.preCutConfig))
                         output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=channel.preCutConfig)
                         output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=channel.preCutConfig)
                 if not sameMVAConfig:
-                    output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(m=channel.mvaConfig)
-                output += '        Individual Variables: ' + ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'
+                    output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(
+                        m=channel.mvaConfig)
+                output += '        Individual Variables: ' + \
+                    ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'
         return output
 
 
-## Simple object containing the output of fei
+# Simple object containing the output of fei
 FeiState = collections.namedtuple('FeiState', 'path, is_trained')
 
 
 def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
     """
     The Full Event Interpretation algorithm.
-    Actors determined by the configuration of each particle are added to the play and are executed in an order which fulfills all requirements.
+    Actors determined by the configuration of each particle are added to the play and are executed in an order which
+    fulfills all requirements.
     This function returns if no more Actors can be called without violating some requirements.
-        @param user_selection_path basf2 module path to execute before any tag-side reconstruction. Should load data, select signal side and create a 'RestOfEvents' list. Use None to do independent tag-side reconstruction.
+        @param user_selection_path basf2 module path to execute before any tag-side reconstruction. Should load data, select a
+               signal-side B and create a 'RestOfEvents' list. Use None to perform independent tag-side reconstruction.
+               (equivalent to Belle FR)
         @param user_analysis_path basf2 module path to execute after training is finished
         @param particles list of particle objects which shall be reconstructed by this algorithm
         @return FeiState object containing basf2 path to execute, plus status information
@@ -184,9 +200,27 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
     parser = argparse.ArgumentParser()
     parser.add_argument('-verbose', '--verbose', dest='verbose', action='store_true', help='Output additional information')
     parser.add_argument('-summary', '--make-summmary', dest='makeSummary', action='store_true', help='Create summary PDF file')
-    parser.add_argument('-nproc', '--nProcesses', dest='nProcesses', type=int, default=1, help='Use n processes to execute actors parallel')
-    parser.add_argument('-preload', '--preload', dest='preload', action='store_true', help='In conjuction with --cache, the basf2 modules used by cached actors are not executed, corresponding data are read from the input file.')
-    parser.add_argument('-cache', '--cache', dest='cacheFile', type=str, default=None, help='Cache actor results in the given file. If an actor is found in the file, it is not executed a second time.')
+    parser.add_argument(
+        '-nproc',
+        '--nProcesses',
+        dest='nProcesses',
+        type=int,
+        default=1,
+        help='Use n processes to execute actors parallel')
+    parser.add_argument(
+        '-preload',
+        '--preload',
+        dest='preload',
+        action='store_true',
+        help=('In conjuction with --cache, the basf2 modules used by cached actors are not executed, '
+              'corresponding data are read from the input file.'))
+    parser.add_argument(
+        '-cache',
+        '--cache',
+        dest='cacheFile',
+        type=str,
+        default=None,
+        help='Cache actor results in the given file. If an actor is found in the file, it is not executed a second time.')
     args = parser.parse_args()
 
     if args.preload and args.cacheFile is None:
@@ -196,7 +230,12 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
     play = actorFramework.Play()
 
     # Than add the properties of the particles to the play
-    finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
+    finalParticles = [
+        particle for particle in particles if all(
+            particle.identifier not in o.daughters and pdg.conjugate(
+                particle.name) +
+            ':' +
+            particle.label not in o.daughters for o in particles)]
     for particle in particles:
         play.addProperty('Name_{i}'.format(i=particle.identifier), particle.name)
         play.addProperty('Label_{i}'.format(i=particle.identifier), particle.label)
@@ -222,7 +261,9 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
             if commonTarget is None:
                 commonTarget = channel.mvaConfig.target
             if channel.mvaConfig.target != commonTarget:
-                B2FATAL('Particle %s has common target %s, while channel %s has %s. Each particle must have exactly one target!' % (particle.identifier, commonTarget, channel.name, channel.mvaConfig.target))
+                B2FATAL(
+                    'Particle %s has common target %s, while channel %s has %s. Each particle must have exactly one target!' %
+                    (particle.identifier, commonTarget, channel.name, channel.mvaConfig.target))
         play.addProperty('MVAConfigTarget_{i}'.format(i=particle.identifier), commonTarget)
 
     # Add top-level actors
@@ -256,7 +297,11 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               channelName='Name_{c}'.format(c=channel.name),
                               particleList='RawParticleList_{c}'.format(c=channel.name),
                               daughterVertices=['VertexFit_{d}'.format(d=daughter) for daughter in channel.daughters])
-            play.addCollection('VertexFit_{i}'.format(i=particle.identifier), ['VertexFit_{c}'.format(c=channel.name) for channel in particle.channels])
+            play.addCollection(
+                'VertexFit_{i}'.format(
+                    i=particle.identifier), [
+                    'VertexFit_{c}'.format(
+                        c=channel.name) for channel in particle.channels])
 
             play.addActor(CopyParticleLists,
                           particleName='Name_{i}'.format(i=particle.identifier),
@@ -264,7 +309,12 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                           inputLists=['RawParticleList_{c}'.format(c=channel.name) for channel in particle.channels],
                           postCut='PostCut_{i}'.format(i=particle.identifier))
         if particle.name != pdg.conjugate(particle.name):
-            play.addCollection('VertexFit_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), ['VertexFit_{i}'.format(i=particle.identifier)])
+            play.addCollection(
+                'VertexFit_{p}:{l}'.format(
+                    p=pdg.conjugate(
+                        particle.name), l=particle.label), [
+                    'VertexFit_{i}'.format(
+                        i=particle.identifier)])
 
     # In the second act pre and post cuts are calculated
     for particle in particles:
@@ -324,10 +374,14 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                               distribution='PreCut_{c}'.format(c=channel.name),
                               additionalDependencies=additionalDependencies)
 
-            play.addCollection('SignalProbability_{i}'.format(i=particle.identifier), ['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
+            play.addCollection(
+                'SignalProbability_{i}'.format(i=particle.identifier),
+                ['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
 
         if particle.name != pdg.conjugate(particle.name):
-            play.addCollection('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), ['SignalProbability_{i}'.format(i=particle.identifier)])
+            play.addCollection(
+                'SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label),
+                ['SignalProbability_{i}'.format(i=particle.identifier)])
         extraVars = []
         if particle in finalParticles:
             play.addActor(TagUniqueSignal,
@@ -345,8 +399,10 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                       target='MVAConfigTarget_{i}'.format(i=particle.identifier))
 
     # The last act creates the automatic reporting summary pdf
-    play.addActor(SaveModuleStatistics,
-                  finalParticleSignalProbabilities=['SignalProbability_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles])
+    play.addActor(
+        SaveModuleStatistics,
+        finalParticleSignalProbabilities=[
+            'SignalProbability_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles])
 
     if args.makeSummary:
         for particle in particles:
@@ -394,14 +450,17 @@ def fullEventInterpretation(user_selection_path, user_analysis_path, particles):
                       mcCounts='mcCounts',
                       moduleStatisticsFile='ModuleStatisticsFile')
 
-        play.addActor(WriteAnalysisFileSummary,
-                      finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],
-                      combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if not particle.isFSP],
-                      finalParticleNTuples=['VariablesToNTuple_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
-                      finalParticleTargets=['MVAConfigTarget_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
-                      cpuTimeSummaryPlaceholders='CPUTimeSummary',
-                      mcCounts='mcCounts',
-                      particles=['Object_{i}'.format(i=particle.identifier) for particle in particles])
+        play.addActor(
+            WriteAnalysisFileSummary,
+            finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier)
+                                            for particle in particles if particle.isFSP],
+            combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier)
+                                          for particle in particles if not particle.isFSP],
+            finalParticleNTuples=['VariablesToNTuple_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
+            finalParticleTargets=['MVAConfigTarget_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
+            cpuTimeSummaryPlaceholders='CPUTimeSummary',
+            mcCounts='mcCounts',
+            particles=['Object_{i}'.format(i=particle.identifier) for particle in particles])
         play.addNeeded('FEIsummary.pdf')
 
     # Finally we add the final particles (normally B+ B0) as needed to the play

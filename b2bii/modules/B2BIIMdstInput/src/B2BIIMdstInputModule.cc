@@ -103,11 +103,13 @@ void B2BIIMdstInputModule::event()
   // read event
   int rectype = -1;
   while (rectype < 0 && rectype != -2) {
+    //clear all previous event data before reading!
+    BsClrTab(BBS_CLEAR);
     rectype = m_fd->read();
   }
   if (rectype == -2) {   // EoF detected
     evtmetadata->setEndOfData(); // stop event processing
-    B2DEBUG(99, "[B2BIIMdstInputModule::Coversion] Conversion stopped at event #" << m_nevt << ". EOF detected!");
+    B2DEBUG(99, "[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << m_nevt << ". EOF detected!");
     return;
   }
 

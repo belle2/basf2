@@ -10,21 +10,19 @@
 
 #include <b2bii/modules/B2BIIConvertMdst/B2BIIConvertMdstModule.h>
 
-#include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+
+// Belle II utilities
+#include <framework/gearbox/Const.h>
+#include <framework/gearbox/Unit.h>
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
 
 // Belle utilities
-#include "b2bii/utility/BelleMdstToGenHepevt.h"
-
-// Belle II utilities
-#include "framework/gearbox/Const.h"
-#include "framework/gearbox/Unit.h"
+#include <b2bii/utility/BelleMdstToGenHepevt.h>
 
 // ROOT
 #include <TVector3.h>
@@ -48,7 +46,6 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module()
 {
   //Set module properties
   setDescription("Converts Belle mdst objects (Panther tables and records) to Belle II msdt objects.");
-  setPropertyFlags(c_Input);
 
   m_realData = false;
 

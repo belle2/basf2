@@ -138,8 +138,8 @@ void CsIDigitizerModule::event()
                          cellAngle);  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
 
       // 0.06 is the speed of light in CsI(Tl)
-      double  propagTime = m_SampleRate * (0.0600 * localPos + (tof / CLHEP::ns)) * 1e
-                           - 9; /**< Time when photons from the hit reach the PIN-diode (in ns).*/
+      double  propagTime = m_SampleRate *
+                           (0.0600 * localPos + (tof / CLHEP::ns)) * 1E-9; /**< Time when photons from the hit reach the PIN-diode (in ns).*/
 
 
       m_SimHitTimes[m_cellID].push_back(propagTime);

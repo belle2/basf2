@@ -14,6 +14,7 @@
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/EventProcessor.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/pcore/pEventProcessor.h>
 
@@ -64,13 +65,13 @@ void Framework::setExternalsPath(const std::string& path)
 }
 
 
-ModulePtr Framework::registerModule(const string& moduleName) throw(ModuleManager::ModuleNotCreatedError)
+ModulePtr Framework::registerModule(const string& moduleName)
 {
   return ModuleManager::Instance().registerModule(moduleName);
 }
 
 
-ModulePtr Framework::registerModule(const string& moduleName, const string& sharedLibPath) throw(ModuleManager::ModuleNotCreatedError)
+ModulePtr Framework::registerModule(const string& moduleName, const string& sharedLibPath)
 {
   return ModuleManager::Instance().registerModule(moduleName, sharedLibPath);
 }
@@ -93,7 +94,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
   if (already_executed) {
     B2WARNING("Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems")
     if (startPath->buildModulePathList(true) != startPath->buildModulePathList(false)) {
-      B2FATAL("Your path contains the same module instance in multiple places. Calling process() multiple times is not implement for this case.");
+      B2FATAL("Your path contains the same module instance in multiple places. Calling process() multiple times is not implemented for this case.");
     }
 
     //TODO only clone if modules have been run before?

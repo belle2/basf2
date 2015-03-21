@@ -16,7 +16,6 @@
 #include <boost/python/dict.hpp>
 
 #include <framework/core/Module.h>
-#include <framework/core/ModuleManager.h>
 #include <framework/core/Path.h>
 
 #include <string>
@@ -67,7 +66,7 @@ namespace Belle2 {
      * @param moduleName The unique name of the module which should be created.
      * @return A shared pointer of the newly created and registered module.
      */
-    ModulePtr registerModule(const std::string& moduleName) throw(ModuleManager::ModuleNotCreatedError);
+    ModulePtr registerModule(const std::string& moduleName);
 
     /**
      * Registers a new module to the framework and returns a shared pointer.
@@ -82,7 +81,7 @@ namespace Belle2 {
      * @param sharedLibPath Optional: The shared library from which the module should be registered (not a map file !).
      * @return A shared pointer of the newly created and registered module.
      */
-    ModulePtr registerModule(const std::string& moduleName, const std::string& sharedLibPath) throw(ModuleManager::ModuleNotCreatedError);
+    ModulePtr registerModule(const std::string& moduleName, const std::string& sharedLibPath);
 
     /**
      * Creates a new path and returns a shared pointer.

@@ -58,7 +58,7 @@ void SeqRootInputModule::initialize()
   const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
   if (!inputFiles.empty()) {
     if (inputFiles.size() > 1) {
-      B2FATAL("SeqRootInput only accepts a single input file.")
+      B2FATAL("SeqRootInput only accepts a single input file.");
       return;
     }
     m_inputFileName = inputFiles[0];
@@ -82,7 +82,7 @@ void SeqRootInputModule::initialize()
     evtmsg = new EvtMessage(evtbuf);
     m_streamer->restoreDataStore(evtmsg);
   } else {
-    B2FATAL("SeqRootInput : Error in reading first event")
+    B2FATAL("SeqRootInput : Error in reading first event");
   }
 
   delete evtmsg;
@@ -168,6 +168,6 @@ void SeqRootInputModule::terminate()
 {
   delete m_streamer;
   //  delete m_file;
-  B2INFO("SeqRootInput: terminate called")
+  B2INFO("SeqRootInput: terminate called");
 }
 

@@ -153,7 +153,7 @@ Int_t ConditionsService::CommitPayload(std::string PayloadTag,
     }
 
   } else {
-    B2ERROR("Error commiting payload; payload tag " << PayloadTag << " not started or already committed.")
+    B2ERROR("Error commiting payload; payload tag " << PayloadTag << " not started or already committed.");
   }
 
   m_buffer = PayloadTag + SubsystemTag + AlgorithmName + AlgorithmVersion + InitialRun + FinalRun;
@@ -201,7 +201,7 @@ Int_t ConditionsService::WritePayloadObject(TObject* payload,
   if (m_current_payloads.count(PayloadTag)) {
     m_current_payloads[PayloadTag]->Add(payload);
   } else {
-    B2ERROR("Error adding object to payload; payload tag " << PayloadTag << " not started or already commited.")
+    B2ERROR("Error adding object to payload; payload tag " << PayloadTag << " not started or already commited.");
   }
   m_buffer = PayloadTag + SubsystemTag + AlgorithmName + AlgorithmVersion + InitialRun + FinalRun;
   return 0; // Check the errors.
@@ -218,7 +218,9 @@ TList* ConditionsService::GetPayloadList(std::string GlobalTag,
 
   B2INFO("Payload retrieval " << m_buffer);
 
-  std::string query(Form("select payload_url from detector_tag, payload, payload_iov, algorithm where payload_iov.payload_id = payload.payload_id and algorithm.name='%s' and initial_run_id<=(select run_id from run where name='%s') and final_run_id>=(select run_id from run where name='%s') and tag_id = detector_tag.detector_tag_id;", (char*)AlgorithmName.c_str(), (char*)RunNumber.c_str(), (char*)RunNumber.c_str()));
+  std::string query(
+    Form("select payload_url from detector_tag, payload, payload_iov, algorithm where payload_iov.payload_id = payload.payload_id and algorithm.name='%s' and initial_run_id<=(select run_id from run where name='%s') and final_run_id>=(select run_id from run where name='%s') and tag_id = detector_tag.detector_tag_id;",
+         (char*)AlgorithmName.c_str(), (char*)RunNumber.c_str(), (char*)RunNumber.c_str()));
 
   B2INFO("Payload retrieval " << query);
 

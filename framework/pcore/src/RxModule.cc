@@ -82,6 +82,6 @@ void RxModule::endRun() { }
 
 void RxModule::terminate()
 {
-  B2INFO("Rx: terminate called")
+  B2INFO("Rx: terminate called");
   delete m_streamer;
 }

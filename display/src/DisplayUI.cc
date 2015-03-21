@@ -131,7 +131,8 @@ void DisplayUI::updateUI()
   if (!eventMetaData) {
     m_eventLabel->SetText("No EventMetaData object available.");
   } else {
-    m_eventLabel->SetText(TString::Format("Event: \t\t%lu\nRun: \t\t%lu\nExperiment: \t%lu", eventMetaData->getEvent(), eventMetaData->getRun(), eventMetaData->getExperiment()));
+    m_eventLabel->SetText(TString::Format("Event: \t\t%lu\nRun: \t\t%lu\nExperiment: \t%lu", eventMetaData->getEvent(),
+                                          eventMetaData->getRun(), eventMetaData->getExperiment()));
   }
   m_eventLabel->Resize();
 }
@@ -258,7 +259,7 @@ void DisplayUI::selectionHandler(TEveElement* eveObj)
     //representedObject->Dump();
 
     const RelationVector<TObject>& relatedObjects = DataStore::Instance().getRelationsWithObj<TObject>(representedObject, "ALL");
-    for (const TObject & relObj : relatedObjects) {
+    for (const TObject& relObj : relatedObjects) {
       //relObj.Print();
       TEveElement* relObjRep = m_visualRepMap->getEveElement(&relObj);
       if (relObjRep and !gEve->GetSelection()->HasChild(relObjRep)) {
@@ -271,7 +272,7 @@ void DisplayUI::selectionHandler(TEveElement* eveObj)
 }
 void DisplayUI::handleEvent(Event_t* event)
 {
-  //B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode)
+  //B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode);
   if (event->fType != kGKeyPress) {
     switch (event->fCode) {
       case 117: //Page Down
@@ -684,9 +685,11 @@ void DisplayUI::savePicture(bool highres)
   }
 
   if (success) {
-    B2INFO("Saved image in: " << fi.fFilename)
+    B2INFO("Saved image in: " << fi.fFilename);
   } else {
-    new TGMsgBox(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(), "Saving image failed", TString::Format("Couldn't save to '%s'! Please verify you used an appropriate image file extension in the file name. Check console output for further information.", fi.fFilename));
+    new TGMsgBox(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(), "Saving image failed",
+                 TString::Format("Couldn't save to '%s'! Please verify you used an appropriate image file extension in the file name. Check console output for further information.",
+                                 fi.fFilename));
   }
 
   //file dialog leaves empty box, redraw
@@ -722,7 +725,8 @@ void DisplayUI::automaticEvent()
     projectionName.ReplaceAll(" viewer", "");
     projectionName.ReplaceAll("/", "");
     const int width = m_autoPictureWidth->GetIntNumber();
-    glv->SavePictureWidth(TString::Format("%s_%s_%d.png", m_autoFileNamePrefix->GetText(), projectionName.Data(), i), width, false); // don't scale pixel objects
+    glv->SavePictureWidth(TString::Format("%s_%s_%d.png", m_autoFileNamePrefix->GetText(), projectionName.Data(), i), width,
+                          false); // don't scale pixel objects
   }
 
   i++;
@@ -767,7 +771,7 @@ void DisplayUI::showUserData(const DisplayData& displayData)
 {
   static TGFileBrowser* fileBrowser = NULL;
   static std::map<std::string, BrowsableWrapper*> wrapperMap;
-  for (auto & entry : wrapperMap) {
+  for (auto& entry : wrapperMap) {
     //doesn't do anything
     //fileBrowser->RecursiveRemove(wrappers[i]);
 
@@ -793,7 +797,7 @@ void DisplayUI::showUserData(const DisplayData& displayData)
     //invert pad -> name map
     const std::map<TVirtualPad*, std::string>& padMap = BrowsableWrapper::getPads();
     std::map<std::string, TVirtualPad*> nameMap;
-    for (const auto & entry : padMap) {
+    for (const auto& entry : padMap) {
       nameMap[entry.second] = entry.first;
     }
 
@@ -819,7 +823,7 @@ void DisplayUI::showUserData(const DisplayData& displayData)
     }
   }
 
-  for (const auto & pair : displayData.m_selectedObjects) {
+  for (const auto& pair : displayData.m_selectedObjects) {
     //convert the name, index pair back into pointer
     StoreArray<TObject> array(pair.first);
     const TObject* obj = array[pair.second];

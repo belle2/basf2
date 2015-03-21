@@ -44,7 +44,8 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
 
   addParam("expList",      m_expList,      "List of experiment numbers.", defaultExpRunList);
   addParam("runList",      m_runList,      "List of run numbers.",        defaultExpRunList);
-  addParam("evtNumList",   m_evtNumList,   "List of the number of events which should be processed. Can be overridden via -n argument to basf2.", defaultEvtNum);
+  addParam("evtNumList",   m_evtNumList,
+           "List of the number of events which should be processed. Can be overridden via -n argument to basf2.", defaultEvtNum);
 }
 
 
@@ -71,15 +72,16 @@ void EventInfoSetterModule::initialize()
   //Make sure all lists have the same size
   unsigned int defListSize = m_expList.size();
   if ((m_runList.size() != defListSize) || (m_evtNumList.size() != defListSize)) {
-    B2ERROR("Parameters are inconsistent. The exp, run and evt lists must have the same number of entries.")
+    B2ERROR("Parameters are inconsistent. The exp, run and evt lists must have the same number of entries.");
   } else if (defListSize == 0) {
-    B2ERROR("There are no events to be processed!")
+    B2ERROR("There are no events to be processed!");
   } else {
     set<pair<int, int>> expRunSet;
     for (unsigned int i = 0; i < defListSize; i++) {
       auto ret = expRunSet.insert(make_pair(m_expList[i], m_runList[i]));
       if (!ret.second) {
-        B2ERROR("Exp " << ret.first->first << ", run " << ret.first->second << " used more than once! Please make sure all experiment/run combinations are unique.");
+        B2ERROR("Exp " << ret.first->first << ", run " << ret.first->second <<
+                " used more than once! Please make sure all experiment/run combinations are unique.");
       }
     }
   }

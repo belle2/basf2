@@ -36,7 +36,9 @@ SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nul
   vector<string> emptyvector;
   //Parameter definition
   addParam("outputFileName"  , m_outputFileName, "SeqRoot file name.", string("SeqRootOutput.sroot"));
-  addParam("compressionLevel", m_compressionLevel, "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug ( https://sft.its.cern.ch/jira/browse/ROOT-4550 ), this option currently causes memory leaks and is disabled.", 0);
+  addParam("compressionLevel", m_compressionLevel,
+           "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug ( https://sft.its.cern.ch/jira/browse/ROOT-4550 ), this option currently causes memory leaks and is disabled.",
+           0);
   addParam("saveObjs", m_saveObjs, "List of objects/arrays to be saved", emptyvector);
 
   B2DEBUG(1, "SeqRootOutput: Constructor done.");
@@ -130,5 +132,5 @@ void SeqRootOutputModule::terminate()
   delete m_streamer;
   delete m_file;
 
-  B2INFO("terminate called")
+  B2INFO("terminate called");
 }

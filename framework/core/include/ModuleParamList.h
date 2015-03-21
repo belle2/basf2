@@ -44,9 +44,11 @@ namespace Belle2 {
 
     //Define exceptions
     /** Exception is thrown if the requested parameter could not be found. */
-    BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError, "Could not find the parameter with the name '%1%'! The value of the parameter could NOT be set.")
+    BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError,
+                            "Could not find the parameter with the name '%1%'! The value of the parameter could NOT be set.")
     /** Exception is thrown if the type of the requested parameter is different from the expected type. */
-    BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError, "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%)!")
+    BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError,
+                            "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%)!")
 
     /**
      * Constructor.
@@ -212,7 +214,7 @@ namespace Belle2 {
       ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(newParam.get());
       explModParam->setDefaultValue(defaultValue);
     } else {
-      B2ERROR("A parameter with the name '" + name + "' already exists! The name of a module parameter must be unique within a module.")
+      B2ERROR("A parameter with the name '" + name + "' already exists! The name of a module parameter must be unique within a module.");
     }
   }
 
@@ -229,7 +231,7 @@ namespace Belle2 {
     if (mapIter == m_paramMap.end()) {
       m_paramMap.insert(std::make_pair(name, newParam));
     } else {
-      B2ERROR("A parameter with the name '" + name + "' already exists! The name of a module parameter must be unique within a module.")
+      B2ERROR("A parameter with the name '" + name + "' already exists! The name of a module parameter must be unique within a module.");
     }
   }
 
@@ -241,15 +243,16 @@ namespace Belle2 {
       ModuleParam<T>& explModParam = getParameter<T>(name);
       explModParam.setValue(value);
     } catch (ModuleParameterNotFoundError& exc) {
-      B2ERROR(exc.what())
+      B2ERROR(exc.what());
     } catch (ModuleParameterTypeError& exc) {
-      B2ERROR(exc.what())
+      B2ERROR(exc.what());
     }
   }
 
 
   template<typename T>
-  ModuleParam<T>& ModuleParamList::getParameter(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError)
+  ModuleParam<T>& ModuleParamList::getParameter(const std::string& name) const throw(ModuleParameterNotFoundError,
+      ModuleParameterTypeError)
   {
     //Check if a parameter with the given name exists
     std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
@@ -287,7 +290,7 @@ namespace Belle2 {
       ModuleParamPtr p = getParameterPtr(name);
       p->setValueToPythonObject(pyOutput, defaultValues);
     } catch (ModuleParamList::ModuleParameterNotFoundError& exc) {
-      B2ERROR(exc.what())
+      B2ERROR(exc.what());
     }
   }
 

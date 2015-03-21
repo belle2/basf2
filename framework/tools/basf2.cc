@@ -99,14 +99,14 @@ int main(int argc, char* argv[])
   const char* belle2LocalDir = getenv("BELLE2_LOCAL_DIR");
   const char* belle2ReleaseDir = getenv("BELLE2_RELEASE_DIR");
   if (!belle2LocalDir && !belle2ReleaseDir) {
-    B2ERROR("The basf2 environment is not set up. Please execute the 'setuprel' script first.")
+    B2ERROR("The basf2 environment is not set up. Please execute the 'setuprel' script first.");
     return 1;
   }
 
   //also set when just sourcing setup_belle2.sh (which is why we also check for local/release dir)
   const char* belle2SubDir = getenv("BELLE2_SUBDIR");
   if (!belle2SubDir) {
-    B2ERROR("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.")
+    B2ERROR("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.");
     return 1;
   }
 
@@ -131,7 +131,8 @@ int main(int argc, char* argv[])
     ("help,h", "print all available options")
     ("version,v", "print version string")
     ("info", "print information about basf2")
-    ("modules,m", prog::value<string>()->implicit_value(""), "print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
+    ("modules,m", prog::value<string>()->implicit_value(""),
+     "print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
     ;
 
     // Declare a group of options that will be
@@ -141,19 +142,27 @@ int main(int argc, char* argv[])
     config.add_options()
     ("steering", prog::value<string>(), "the python steering file")
     ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
-    ("log_level,l", prog::value<string>(), "set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("log_level,l", prog::value<string>(),
+     "set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
     ("events,n", prog::value<int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
-    ("input,i", prog::value<vector<string> >(), "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file.")
+    ("input,i", prog::value<vector<string> >(),
+     "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
     ("processes,p", prog::value<int>(), "override number of parallel processes (0 to disable parallel processing)")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
-    ("module-io", prog::value<string>(), "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
-    ("no-stats", "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
-    ("dry-run", "Read steering file, but do not start any actually start any event processing. Prints information on input/output files that would be used during normal execution.")
-    ("dump-path", prog::value<string>(), "Read steering file, but do not actually start any event processing. The module path the steering file would execute is instead pickled (serialized) into the given file.")
-    ("execute-path", prog::value<string>(), "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
+    ("module-io", prog::value<string>(),
+     "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
+    ("no-stats",
+     "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
+    ("dry-run",
+     "Read steering file, but do not start any actually start any event processing. Prints information on input/output files that would be used during normal execution.")
+    ("dump-path", prog::value<string>(),
+     "Read steering file, but do not actually start any event processing. The module path the steering file would execute is instead pickled (serialized) into the given file.")
+    ("execute-path", prog::value<string>(),
+     "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
 #ifdef HAS_CALLGRIND
-    ("profile", prog::value<string>(), "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
+    ("profile", prog::value<string>(),
+     "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
 #endif
     ;
 

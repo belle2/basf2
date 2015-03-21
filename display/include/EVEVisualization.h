@@ -426,7 +426,7 @@ namespace Belle2 {
           }
           addRecoHit(hit, lines);
         } else {
-          B2ERROR("Got invalid detector ID from track candidate, skipping hit!")
+          B2ERROR("Got invalid detector ID from track candidate, skipping hit!");
           continue;
         }
       }

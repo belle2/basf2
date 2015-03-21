@@ -118,7 +118,7 @@ TDatabasePDG* EvtGenDatabasePDG::Instance()
   static bool instanceCreated = false;
   if (!instanceCreated) {
     if (fgInstance) {
-      B2ERROR("TDatabasePDG instance found? Replacing existing instance...")
+      B2ERROR("TDatabasePDG instance found? Replacing existing instance...");
     }
     //let's set the instance pointer to ourselves
     EvtGenDatabasePDG* instance = new EvtGenDatabasePDG();

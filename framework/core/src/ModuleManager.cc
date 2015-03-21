@@ -39,7 +39,8 @@ void ModuleManager::registerModuleProxy(ModuleProxyBase* moduleProxy)
   if (m_registeredProxyMap.count(moduleProxy->getModuleName()) == 0) {
     m_registeredProxyMap.insert(make_pair(moduleProxy->getModuleName(), moduleProxy));
   } else {
-    B2ERROR("There seems to be more than one module called '" << moduleProxy->getModuleName() << "'. Since module names are unique, you must rename one of them!");
+    B2ERROR("There seems to be more than one module called '" << moduleProxy->getModuleName() <<
+            "'. Since module names are unique, you must rename one of them!");
   }
 }
 
@@ -65,7 +66,7 @@ void ModuleManager::addModuleSearchPath(const string& path)
       }
     }
     //put modules into central map, if they haven't been  added yet
-    for (auto & entry : moduleNameLibMap) {
+    for (auto& entry : moduleNameLibMap) {
       if (m_moduleNameLibMap.count(entry.first) == 0) {
         m_moduleNameLibMap[entry.first] = entry.second;
       }
@@ -121,7 +122,7 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, const std::str
           B2ERROR("The shared library " + libIter->second + " does not contain the module " + moduleName + "!");
         }
       } else {
-        B2ERROR("The module " + moduleName + " is not known to the framework!")
+        B2ERROR("The module " + moduleName + " is not known to the framework!");
       }
     }
   }
@@ -160,12 +161,13 @@ ModulePtrList ModuleManager::getModulesByProperties(const ModulePtrList& moduleP
 //                              Private methods
 //============================================================================
 
-void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap, const boost::filesystem::directory_entry& mapPath)
+void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap,
+                                         const boost::filesystem::directory_entry& mapPath)
 {
   //Check if the associated shared library file exists
   string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();
   if (!FileSystem::fileExists(sharedLibPath)) {
-    B2WARNING("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.path().string())
+    B2WARNING("The shared library file: " << sharedLibPath << " doesn't exist, but is required by " << mapPath.path().string());
     return;
   }
 
@@ -192,10 +194,11 @@ void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& mod
       if (moduleNameLibMap.count(moduleName) == 0) {
         moduleNameLibMap.insert(make_pair(moduleName, sharedLibPath));
       } else {
-        B2ERROR("There seems to be more than one module called '" << moduleName << "'. Since module names are unique, you must rename one of them!");
+        B2ERROR("There seems to be more than one module called '" << moduleName <<
+                "'. Since module names are unique, you must rename one of them!");
       }
     } else {
-      B2ERROR("Regular expression did not work. Is the module map file well formatted?")
+      B2ERROR("Regular expression did not work. Is the module map file well formatted?");
     }
   }
 

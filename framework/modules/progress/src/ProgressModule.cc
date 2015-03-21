@@ -36,7 +36,7 @@ void ProgressModule::initialize()
 void ProgressModule::beginRun()
 {
   ++m_runNr;
-  B2INFO("Begin of new run")
+  B2INFO("Begin of new run");
 }
 
 void ProgressModule::event()

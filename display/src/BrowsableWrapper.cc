@@ -27,7 +27,7 @@ void BrowsableWrapper::padClosed()
 {
   TVirtualPad* pad = dynamic_cast<TVirtualPad*>(static_cast<TQObject*>(gTQSender));
   if (!pad) {
-    B2ERROR("Sender is not a pad?")
+    B2ERROR("Sender is not a pad?");
     return;
   }
 

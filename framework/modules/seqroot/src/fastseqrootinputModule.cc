@@ -79,7 +79,7 @@ void FastSeqRootInputModule::initialize()
   const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
   if (!inputFiles.empty()) {
     if (inputFiles.size() > 1) {
-      B2FATAL("FastSeqRootInput only accepts a single input file.")
+      B2FATAL("FastSeqRootInput only accepts a single input file.");
       return;
     }
     m_inputFileName = inputFiles[0];
@@ -106,7 +106,7 @@ void FastSeqRootInputModule::initialize()
     EvtMessage evtmsg(evtbuf);
     m_streamer->restoreDataStore(&evtmsg);
   } else {
-    B2FATAL("SeqRootInput : Error in reading first event")
+    B2FATAL("SeqRootInput : Error in reading first event");
   }
   delete[] evtbuf;
 
@@ -207,6 +207,6 @@ void FastSeqRootInputModule::terminate()
   pthread_join(m_thr_input, NULL);
   //  delete m_streamer;
   //  delete m_file;
-  B2INFO("FastSeqRootInput: terminate called")
+  B2INFO("FastSeqRootInput: terminate called");
 }
 

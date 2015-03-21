@@ -34,7 +34,7 @@ namespace Belle2 {
     from ROOT import Belle2
     evtmetadata = Belle2.PyStoreObj('EventMetaData')
     if not evtmetadata:
-      B2ERROR("No EventMetaData found")
+      B2ERROR("No EventMetaData found");
     else:
       event = evtmetadata.obj().getEvent()
     \endcode

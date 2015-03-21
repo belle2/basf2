@@ -22,7 +22,8 @@ namespace Belle2 {
       return this->resultSet;
     }
 
-    void GBResult::submitNodeVariant(QryResultSet& parent, nodeExistenceState existState, const std::string label, const nodeValue_t value, nodeId_t uniqueId, nodeId_t refNodeId, bool isAttrib)
+    void GBResult::submitNodeVariant(QryResultSet& parent, nodeExistenceState existState, const std::string label,
+                                     const nodeValue_t value, nodeId_t uniqueId, nodeId_t refNodeId, bool isAttrib)
     {
 
       std::map<nodeId_t, QryResultSet*>::iterator idIt = this->nodeIdMap.end();
@@ -74,7 +75,8 @@ namespace Belle2 {
 
     }
 
-    QryResultSet& GBResult::createNodeVariant(QryResultSet& parent, std::string label, nodeValue_t value, nodeId_t uniqueId = genRandomString(16), bool isAttrib = false)
+    QryResultSet& GBResult::createNodeVariant(QryResultSet& parent, std::string label, nodeValue_t value,
+                                              nodeId_t uniqueId = genRandomString(16), bool isAttrib = false)
     {
 
 
@@ -179,20 +181,22 @@ namespace Belle2 {
     {
 
       if (header) {
-        B2INFO("                                                         ")
-        B2INFO("=========================================================")
+        B2INFO("                                                         ");
+        B2INFO("=========================================================");
         B2INFO("Printing boost::property_tree using the following format:");
         B2INFO("Node: '<path>' : '<value>' (<uniqueNodeID>)");
         B2INFO("=========================================================");
 
         // The Result-Component Root-Node
-        B2INFO("Node: '' : '" + res.get_value<std::string>("<unspecified>") + "': (" + getUniqueNodeId(res) + ") [THE_RESULT_COMPONENT_ROOT_NODE]");
+        B2INFO("Node: '' : '" + res.get_value<std::string>("<unspecified>") + "': (" + getUniqueNodeId(
+                 res) + ") [THE_RESULT_COMPONENT_ROOT_NODE]");
       }
 
       for (auto childIt = res.begin(); childIt != res.end();  ++childIt) {
 
         // a child of the node
-        B2INFO("Node: '" + prefix + childIt->first + "' : '" + childIt->second.get_value<std::string>("<unspecified>") + "' (" + getUniqueNodeId(childIt->second) + ")");
+        B2INFO("Node: '" + prefix + childIt->first + "' : '" + childIt->second.get_value<std::string>("<unspecified>") + "' (" +
+               getUniqueNodeId(childIt->second) + ")");
 
         // children of this child node
         printResultSet(childIt->second, prefix + childIt->first + ".", false);

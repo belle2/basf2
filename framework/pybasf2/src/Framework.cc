@@ -92,7 +92,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
 
   static bool already_executed = false;
   if (already_executed) {
-    B2WARNING("Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems")
+    B2WARNING("Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems");
     if (startPath->buildModulePathList(true) != startPath->buildModulePathList(false)) {
       B2FATAL("Your path contains the same module instance in multiple places. Calling process() multiple times is not implemented for this case.");
     }

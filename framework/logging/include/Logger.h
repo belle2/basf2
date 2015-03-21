@@ -17,6 +17,11 @@
 
 #include <sstream>
 
+/**
+ * \def _B2_DO_NOTHING()
+ * Used when things are compiled out.
+ */
+#define _B2_DO_NOTHING { }
 
 /**
  * \def PACKAGENAME()
@@ -57,7 +62,7 @@
  * Send a debug message, use lower values for level for more important messages.
  */
 #ifdef LOG_NO_B2DEBUG
-#define B2DEBUG(level, streamText)
+#define B2DEBUG(level, streamText) _B2_DO_NOTHING
 #else
 #define B2DEBUG(level, streamText) \
   B2LOGMESSAGE_IFENABLED(Belle2::LogConfig::c_Debug, level, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
@@ -68,7 +73,7 @@
  * Send an info message.
  */
 #ifdef LOG_NO_B2INFO
-#define B2INFO(streamText)
+#define B2INFO(streamText) _B2_DO_NOTHING
 #else
 #define B2INFO(streamText) \
   B2LOGMESSAGE_IFENABLED(Belle2::LogConfig::c_Info, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
@@ -79,7 +84,7 @@
  * Send result message (meant for or informational summary messages, e.g. about number of selected events).
  */
 #ifdef LOG_NO_B2RESULT
-#define B2RESULT(streamText)
+#define B2RESULT(streamText) _B2_DO_NOTHING
 #else
 #define B2RESULT(streamText) \
   B2LOGMESSAGE_IFENABLED(Belle2::LogConfig::c_Result, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
@@ -90,7 +95,7 @@
  * Send a warning message.
  */
 #ifdef LOG_NO_B2WARNING
-#define B2WARNING(streamText)
+#define B2WARNING(streamText) _B2_DO_NOTHING
 #else
 #define B2WARNING(streamText) \
   B2LOGMESSAGE_IFENABLED(Belle2::LogConfig::c_Warning, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
@@ -113,7 +118,7 @@
   }
 
 #ifdef LOG_NO_B2ASSERT
-#define B2ASSERT(message, condition)
+#define B2ASSERT(message, condition) _B2_DO_NOTHING
 #else
 /**
  * if 'condition' is false, abort execution with a B2FATAL.

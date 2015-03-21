@@ -109,7 +109,8 @@ namespace Belle2 {
      *
      *  @param params pair of name and durability
      */
-    RelationIndexContainer(const AccessorParams& params): m_storeRel(params), m_valid(false) {
+    RelationIndexContainer(const AccessorParams& params): m_storeRel(params), m_valid(false)
+    {
       rebuild(true);
     }
 
@@ -200,7 +201,7 @@ namespace Belle2 {
         m_index.insert(Element(idxFrom, idxTo, from, to, *itWgt));
       }
     }
-  };
+  }
 
 } // end namespace Belle2
 

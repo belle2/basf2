@@ -67,9 +67,9 @@ namespace Belle2 {
  * leaves the current block.
  */
 #ifdef LOG_NO_B2METHOD
-#define B2METHOD()
+#define B2METHOD() _B2_DO_NOTHING
 #else
-#define B2METHOD() Belle2::LogMethod logMethod(PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
+#define B2METHOD() Belle2::LogMethod logMethod(PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 #endif
 
 #endif /* LOGMETHOD_H_ */

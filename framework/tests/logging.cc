@@ -1,4 +1,5 @@
 #include <framework/logging/Logger.h>
+#include <framework/logging/LogMethod.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
@@ -16,6 +17,28 @@ namespace {
     B2ASSERT("this should be compiled out", true);
     B2ASSERT("this should be compiled out", false);
 #endif
+
+  }
+
+  TEST(LoggingTest, LogMethod)
+  {
+    B2METHOD();
+  }
+
+  //mostly to test compilation when some logging macros are compiled out.
+  TEST(LoggingTest, MacroSyntax)
+  {
+    B2DEBUG(100, "test");
+    B2WARNING("test");
+
+    //sadly, these only work without semicolon after macro (breaking the indentation as a consequence)
+    if (true)
+      B2WARNING("test")
+      else { /* ... */ }
+
+    if (true)
+      B2DEBUG(100, "test")
+      else { /* .. */ }
 
   }
 }  // namespace

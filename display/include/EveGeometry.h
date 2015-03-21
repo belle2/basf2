@@ -18,6 +18,9 @@ namespace Belle2 {
     /** set fill color of the volume 'name' to 'col'. */
     void setVolumeColor(const char* name, Color_t col);
 
+    /** Recursively set transparency of geometry (0: opaque, 100: fully transparent). */
+    void setTransparency(int percent);
+
     /** find a point that is inside the top node. */
     double getMaxR();
 

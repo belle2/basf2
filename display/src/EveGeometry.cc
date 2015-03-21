@@ -23,12 +23,7 @@ void EveGeometry::addGeometry(bool fullgeo)
   //set colours by atomic mass number
   gGeoManager->DefaultColors();
 
-  //Set transparency of geometry
-  TObjArray* volumes = gGeoManager->GetListOfVolumes();
-  for (int i = 0; i < volumes->GetEntriesFast(); i++) {
-    TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
-    volume->SetTransparency(70); //0: opaque, 100: fully transparent
-  }
+  setTransparency(90);
 
   /*
   //disable display of especially detailed subdetectors
@@ -68,14 +63,6 @@ void EveGeometry::addGeometry(bool fullgeo)
   setVolumeColor("BKLM.EnvelopeLogical", kGreen + 3);
   setVolumeColor("Endcap_1", kGreen + 3);
   setVolumeColor("Endcap_2", kGreen + 3);
-
-  //make magnets more transparent
-  for (int i = 0; i < volumes->GetEntriesFast(); i++) {
-    TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
-    if (TString(volume->GetName()).BeginsWith("Magnet_")) {
-      volume->SetTransparency(97); //0: opaque, 100: fully transparent
-    }
-  }
 
   TGeoNode* top_node = gGeoManager->GetTopNode();
   assert(top_node != NULL);
@@ -131,6 +118,15 @@ void EveGeometry::setVolumeColor(const char* name, Color_t col)
     vol->SetLineColor(col);
   } else {
     B2DEBUG(100, "Volume " << name << " not found?");
+  }
+}
+
+void EveGeometry::setTransparency(int percent)
+{
+  TObjArray* volumes = gGeoManager->GetListOfVolumes();
+  for (int i = 0; i < volumes->GetEntriesFast(); i++) {
+    TGeoVolume* volume = static_cast<TGeoVolume*>(volumes->At(i));
+    volume->SetTransparency(percent);
   }
 }
 

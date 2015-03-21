@@ -56,9 +56,10 @@ namespace Belle2 {
     virtual void terminate();
 
     /** Get list of input files, taking -i command line overrides into account. */
-    std::vector<std::string> getInputFiles() const {
+    std::vector<std::string> getInputFiles() const
+    {
       std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
-      if (!inputFiles.empty()) {
+      if (!m_ignoreCommandLineOverride and !inputFiles.empty()) {
         return inputFiles;
       }
       inputFiles = m_inputFileNames;
@@ -104,6 +105,10 @@ namespace Belle2 {
 
     /** Files to read from. */
     std::vector<std::string> m_inputFileNames;
+
+    /** Ignore filename override from command line
+     */
+    bool m_ignoreCommandLineOverride;
 
     /** Array for names of branches, that shall be written out. */
     /** Empty vector results in all branches being read.

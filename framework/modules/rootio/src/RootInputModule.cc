@@ -42,19 +42,31 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
 
   //Parameter definition
   vector<string> emptyvector;
-  addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames or wildcards instead. Can be overridden using the -i argument to basf2.", string(""));
-  addParam("inputFileNames", m_inputFileNames, "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.", emptyvector);
+  addParam("inputFileName", m_inputFileName,
+           "Input file name. For multiple files, use inputFileNames or wildcards instead. Can be overridden using the -i argument to basf2.",
+           string(""));
+  addParam("inputFileNames", m_inputFileNames,
+           "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.",
+           emptyvector);
+  addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,
+           "Ignore override of file name via command line argument -i.", false);
 
   addParam("skipNEvents", m_skipNEvents, "Skip this number of events before starting.", 0);
 
-  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of event durability branches to be read. Empty means all branches. (EventMetaData is always read)", emptyvector);
-  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of persistent durability branches to be read. Empty means all branches. (FileMetaData is always read)", emptyvector);
+  addParam(c_SteerBranchNames[0], m_branchNames[0],
+           "Names of event durability branches to be read. Empty means all branches. (EventMetaData is always read)", emptyvector);
+  addParam(c_SteerBranchNames[1], m_branchNames[1],
+           "Names of persistent durability branches to be read. Empty means all branches. (FileMetaData is always read)", emptyvector);
 
-  addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of event durability branches NOT to be read. Takes precedence over branchNames.", emptyvector);
+  addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0],
+           "Names of event durability branches NOT to be read. Takes precedence over branchNames.", emptyvector);
   vector<string> excludePersistent({"ProcessStatistics"});
-  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of persistent durability branches NOT to be read. Takes precedence over branchNamesPersistent.", excludePersistent);
+  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1],
+           "Names of persistent durability branches NOT to be read. Takes precedence over branchNamesPersistent.", excludePersistent);
 
-  addParam("parentLevel", m_parentLevel, "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/ParentFiles for details.", 0);
+  addParam("parentLevel", m_parentLevel,
+           "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/ParentFiles for details.",
+           0);
 }
 
 
@@ -83,7 +95,7 @@ void RootInputModule::initialize()
 
   //Open TFile
   TDirectory* dir = gDirectory;
-  for (const string & fileName : m_inputFileNames) {
+  for (const string& fileName : m_inputFileNames) {
     TFile* f = TFile::Open(fileName.c_str(), "READ");
     if (!f || !f->IsOpen()) {
       B2FATAL("Couldn't open input file " + fileName);
@@ -95,7 +107,7 @@ void RootInputModule::initialize()
   //Get TTree
   m_persistent = new TChain(c_treeNames[DataStore::c_Persistent].c_str());
   m_tree = new TChain(c_treeNames[DataStore::c_Event].c_str());
-  for (const string & fileName : m_inputFileNames) {
+  for (const string& fileName : m_inputFileNames) {
     m_persistent->AddFile(fileName.c_str());
     m_tree->AddFile(fileName.c_str());
     B2INFO("Added file " + fileName);
@@ -134,8 +146,10 @@ void RootInputModule::event()
   if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
     B2INFO("RootInput: will read entry " << nextEntry << " next.");
     m_nextEntry = nextEntry;
-  } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0 && InputController::getNextEvent() >= 0) {
-    const long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(m_tree->GetTree(), InputController::getNextEvent(), InputController::getNextRun(), InputController::getNextExperiment());
+  } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0
+             && InputController::getNextEvent() >= 0) {
+    const long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(m_tree->GetTree(), InputController::getNextEvent(),
+                       InputController::getNextRun(), InputController::getNextExperiment());
     if (entry >= 0) {
       const long chainentry = m_tree->GetChainEntryNumber(entry);
       B2INFO("RootInput: will read entry " << chainentry << " (entry " << entry << " in current file) next.");
@@ -178,7 +192,8 @@ void RootInputModule::readTree()
   if (localEntryNumber == -2) {
     return; //end of file
   } else if (localEntryNumber < 0) {
-    B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. (TChain::LoadTree() returned error " << localEntryNumber << ")");
+    B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. (TChain::LoadTree() returned error " <<
+            localEntryNumber << ")");
   }
 
   B2DEBUG(200, "Reading file entry " << m_nextEntry);
@@ -449,7 +464,8 @@ void RootInputModule::entryNotFound(std::string entryOrigin, std::string name)
   if (name == "ProcessStatistics" or DataStore::Instance().getDependencyMap().isUsedAs(name, DependencyMap::c_Input)) {
     B2FATAL(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain required object " << name << ", aborting.")
   } else {
-    B2WARNING(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name << " that was present in a previous entry.")
+    B2WARNING(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name <<
+              " that was present in a previous entry.")
   }
 }
 

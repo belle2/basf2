@@ -48,18 +48,31 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   }
 
   //Parameter definition
-  addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.", string("RootOutput.root"));
-  addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride, "Ignore override of filname via command line argument -o. Useful if you have multiple output modules in one path.", false);
-  addParam("compressionLevel", m_compressionLevel, "0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by >50%, higher levels have no noticeable effect. On typical hard disks, disabling compression reduces write time by 10-20 %, but almost doubles read time, so you probably should leave this turned on.", 1);
-  addParam("splitLevel", m_splitLevel, "Branch split level: determines up to which depth object members will be saved in separate sub-branches in the tree. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used. The default (99) usually gives the highest read performance with RootInput.", 99);
-  addParam("updateFileCatalog", m_updateFileCatalog, "Flag that specifies whether the file metadata catalog (Belle2FileCatalog.xml) is updated.", true);
+  addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.",
+           string("RootOutput.root"));
+  addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,
+           "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
+  addParam("compressionLevel", m_compressionLevel,
+           "0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by >50%, higher levels have no noticeable effect. On typical hard disks, disabling compression reduces write time by 10-20 %, but almost doubles read time, so you probably should leave this turned on.",
+           1);
+  addParam("splitLevel", m_splitLevel,
+           "Branch split level: determines up to which depth object members will be saved in separate sub-branches in the tree. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used. The default (99) usually gives the highest read performance with RootInput.",
+           99);
+  addParam("updateFileCatalog", m_updateFileCatalog,
+           "Flag that specifies whether the file metadata catalog (Belle2FileCatalog.xml) is updated.", true);
 
   vector<string> emptyvector;
-  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of event durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (EventMetaData is always saved)", emptyvector);
-  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of persistent durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (FileMetaData is always saved)", emptyvector);
+  addParam(c_SteerBranchNames[0], m_branchNames[0],
+           "Names of event durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (EventMetaData is always saved)",
+           emptyvector);
+  addParam(c_SteerBranchNames[1], m_branchNames[1],
+           "Names of persistent durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (FileMetaData is always saved)",
+           emptyvector);
 
-  addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of event durability branches NOT to be saved. Branches also in branchNames are not saved.", emptyvector);
-  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of persistent durability branches NOT to be saved. Branches also in branchNamesPersistent are not saved.", emptyvector);
+  addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0],
+           "Names of event durability branches NOT to be saved. Branches also in branchNames are not saved.", emptyvector);
+  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1],
+           "Names of persistent durability branches NOT to be saved. Branches also in branchNamesPersistent are not saved.", emptyvector);
 }
 
 
@@ -95,7 +108,8 @@ void RootOutputModule::initialize()
     for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
       //skip transient entries (allow overriding via branchNames)
-      if (iter->second.dontWriteOut && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end())
+      if (iter->second.dontWriteOut
+          && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end())
         continue;
       //skip branches the user doesn't want
       if (branchList.count(branchName) == 0) {
@@ -157,12 +171,14 @@ void RootOutputModule::event()
     m_runLow = m_runHigh = run;
     m_eventLow = m_eventHigh = event;
   } else {
-    if ((experiment < m_experimentLow) || ((experiment == m_experimentLow) && ((run < m_runLow) || ((run == m_runLow) && (event < m_eventLow))))) {
+    if ((experiment < m_experimentLow) || ((experiment == m_experimentLow) && ((run < m_runLow) || ((run == m_runLow)
+                                           && (event < m_eventLow))))) {
       m_experimentLow = experiment;
       m_runLow = run;
       m_eventLow = event;
     }
-    if ((experiment > m_experimentHigh) || ((experiment == m_experimentHigh) && ((run > m_runHigh) || ((run == m_runHigh) && (event > m_eventHigh))))) {
+    if ((experiment > m_experimentHigh) || ((experiment == m_experimentHigh) && ((run > m_runHigh) || ((run == m_runHigh)
+                                            && (event > m_eventHigh))))) {
       m_experimentHigh = experiment;
       m_runHigh = run;
       m_eventHigh = event;

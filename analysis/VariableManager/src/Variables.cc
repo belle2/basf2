@@ -443,7 +443,7 @@ namespace Belle2 {
       }
       s << ", mdst-source " << p->getMdstSource();
       B2INFO(s.str())
-      for (const auto * daughter : p->getDaughters()) {
+      for (const auto* daughter : p->getDaughters()) {
         printParticleInternal(daughter, depth + 1);
       }
     }
@@ -556,7 +556,7 @@ namespace Belle2 {
     {
       int vote = 0;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      for (auto & track : roe->getTracks()) {
+      for (auto& track : roe->getTracks()) {
         const MCParticle* mcParticle = track->getRelated<MCParticle>();
         while (mcParticle != nullptr) {
           if (mcParticle->getPDG() == 511) {
@@ -577,7 +577,7 @@ namespace Belle2 {
     {
       int vote = 0;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      for (auto & track : roe->getTracks()) {
+      for (auto& track : roe->getTracks()) {
         const MCParticle* mcParticle = track->getRelated<MCParticle>();
         while (mcParticle != nullptr) {
           if (mcParticle->getPDG() == 511) {
@@ -637,7 +637,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       float q_MC = 0; //Flavor of B
       if (roe-> getNTracks() != 0) {
-        for (auto & track : roe->getTracks()) {
+        for (auto& track : roe->getTracks()) {
           const MCParticle* mcParticle = track->getRelated<MCParticle>();
           while (mcParticle != nullptr) {
             if (mcParticle->getPDG() == 511) {
@@ -652,7 +652,7 @@ namespace Belle2 {
           }
         }
       } else if (roe-> getNECLClusters() != 0) {
-        for (auto & cluster : roe-> getECLClusters()) {
+        for (auto& cluster : roe-> getECLClusters()) {
           const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
           while (mcParticle != nullptr) {
             if (mcParticle->getPDG() == 511) {
@@ -667,7 +667,7 @@ namespace Belle2 {
           }
         }
       } else if (roe-> getNKLMClusters() != 0) {
-        for (auto & klmcluster : roe-> getKLMClusters()) {
+        for (auto& klmcluster : roe-> getKLMClusters()) {
           const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
           while (mcParticle != nullptr) {
             if (mcParticle->getPDG() == 511) {
@@ -695,7 +695,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       float q_MC = 0; //Flavor of B
       if (roe-> getNTracks() != 0) {
-        for (auto & track : roe->getTracks()) {
+        for (auto& track : roe->getTracks()) {
           const MCParticle* mcParticle = track->getRelated<MCParticle>();
           while (mcParticle != nullptr) {
             if (mcParticle->getPDG() == 511) {
@@ -710,7 +710,7 @@ namespace Belle2 {
           }
         }
       } else if (roe-> getNECLClusters() != 0) {
-        for (auto & cluster : roe-> getECLClusters()) {
+        for (auto& cluster : roe-> getECLClusters()) {
           const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
           while (mcParticle != nullptr) {
             if (mcParticle->getPDG() == 511) {
@@ -725,7 +725,7 @@ namespace Belle2 {
           }
         }
       } else if (roe-> getNKLMClusters() != 0) {
-        for (auto & klmcluster : roe-> getKLMClusters()) {
+        for (auto& klmcluster : roe-> getKLMClusters()) {
           const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
           while (mcParticle != nullptr) {
             if (mcParticle->getPDG() == 511) {
@@ -863,7 +863,7 @@ namespace Belle2 {
 
       double sum = 0.0;
       double pt = 0.0;
-      for (const auto & track : roe->getTracks()) {
+      for (const auto& track : roe->getTracks()) {
         if (part->getTrack() == track)
           continue;
         if (track->getTrackFitResult(Const::pion) == nullptr)
@@ -879,7 +879,7 @@ namespace Belle2 {
     double McFlavorOfTagSide(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
-      for (auto & track : roe->getTracks()) {
+      for (auto& track : roe->getTracks()) {
         const MCParticle* mcParticle = track->getRelated<MCParticle>();
         while (mcParticle != nullptr) {
           if (mcParticle->getPDG() == 511) return 511;
@@ -922,7 +922,7 @@ namespace Belle2 {
 
       for (unsigned int i = 0; i < MuonList->getListSize(); ++i) {
         Particle* p_mu = MuonList->getParticle(i);
-        double prob_mu = p_mu->getExtraInfo("IsFromB(Muon)");
+        double prob_mu = p_mu->getExtraInfo("IsRightTrack(Muon)");
         if (prob_mu > maximum_prob_mu) {
           maximum_prob_mu = prob_mu;
           track_target_mu = p_mu -> getTrack();
@@ -931,7 +931,7 @@ namespace Belle2 {
       for (unsigned int i = 0; i < ElectronList->getListSize(); ++i) {
         Particle* p_el = ElectronList->getParticle(i);
 //             const Particle* p_el = p ->getRelated<PartList>();
-        double prob_el = p_el->getExtraInfo("IsFromB(Electron)");
+        double prob_el = p_el->getExtraInfo("IsRightTrack(Electron)");
         if (prob_el > maximum_prob_el) {
           maximum_prob_el = prob_el;
           track_target_el = p_el -> getTrack();
@@ -946,7 +946,7 @@ namespace Belle2 {
     {
 
 //       StoreObjPtr<ParticleList> KaonList("K+:ROE");
-      StoreObjPtr<ParticleList> SlowPionList("pi+:ROE");
+      StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
 //       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
 //       double maximum_prob_K = 0;
@@ -958,7 +958,7 @@ namespace Belle2 {
 
 //       for (unsigned int i = 0; i < KaonList->getListSize(); ++i) {
 //         Particle* p_K = KaonList->getParticle(i);
-//         double prob_K = p_K->getExtraInfo("IsFromB(Kaon)");
+//         double prob_K = p_K->getExtraInfo("IsRightTrack(Kaon)");
 //         if (prob_K > maximum_prob_K) {
 //           maximum_prob_K = prob_K;
 //           momTarget_K = T.rotateLabToCms() * p_K -> get4Vector();
@@ -966,7 +966,7 @@ namespace Belle2 {
 //       }
       for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
         Particle* p_pi = SlowPionList->getParticle(i);
-        double prob_pi = p_pi->getExtraInfo("IsFromB(SlowPion)");
+        double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
         if (prob_pi > maximum_prob_pi) {
           maximum_prob_pi = prob_pi;
           momTarget_pi = T.rotateLabToCms() * p_pi -> get4Vector();
@@ -1000,7 +1000,7 @@ namespace Belle2 {
     {
 
 //       StoreObjPtr<ParticleList> KaonList("K+:ROE");
-      StoreObjPtr<ParticleList> SlowPionList("pi+:ROE");
+      StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
 //       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
 //       double maximum_prob_K = 0;
@@ -1011,7 +1011,7 @@ namespace Belle2 {
 
       for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
         Particle* p_pi = SlowPionList->getParticle(i);
-        double prob_pi = p_pi->getExtraInfo("IsFromB(SlowPion)");
+        double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
         if (prob_pi > maximum_prob_pi) {
           maximum_prob_pi = prob_pi;
           chargeTarget_pi =  p_pi -> getCharge();
@@ -1054,7 +1054,7 @@ namespace Belle2 {
       int roe_tracks = roe->getTracks().size();
       int par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
-      for (const auto & daughter : daughters) {
+      for (const auto& daughter : daughters) {
         int pdg = abs(daughter->getPDGCode());
         if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
           par_tracks++;
@@ -1605,12 +1605,15 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosTheta_CMS", particleCosTheta_CMS, "CMS momentum cosine of polar angle");
     REGISTER_VARIABLE("phi_CMS", particlePhi_CMS, "CMS momentum azimuthal angle in degrees");
 
-    REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB", cosThetaBetweenParticleAndTrueB, "cosine of angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
-    REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector", cosAngleBetweenMomentumAndVertexVector, "cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
+    REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB", cosThetaBetweenParticleAndTrueB,
+                      "cosine of angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
+    REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector", cosAngleBetweenMomentumAndVertexVector,
+                      "cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
     REGISTER_VARIABLE("VertexZDist"      , VertexZDist    , "Z-distance of two daughter tracks at vertex point");
 
     REGISTER_VARIABLE("distance", particleDistance, "3D distance relative to interaction point");
-    REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance, "significance of distance relative to interaction point (-1 in case of numerical problems)");
+    REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
+                      "significance of distance relative to interaction point (-1 in case of numerical problems)");
     REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
     REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
     REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
@@ -1624,47 +1627,68 @@ namespace Belle2 {
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
 
     REGISTER_VARIABLE("InvM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
-    REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda, "invariant mass (determined from particle's daughter 4-momentum vectors)");
+    REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
+                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
 
-    REGISTER_VARIABLE("ErrM", particleInvariantMassError, "uncertainty of invariant mass (determined from particle's daughter 4-momentum vectors)");
+    REGISTER_VARIABLE("ErrM", particleInvariantMassError,
+                      "uncertainty of invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance, "signed deviation of particle's invariant mass from its nominal mass");
-    REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance, "signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass");
+    REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
+                      "signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass");
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,               "Check the PDG code of a particles MC mother particle");
-    REGISTER_VARIABLE("isSignalAcceptMissingNeutrino", isSignalAcceptMissingNeutrino, "same as isSignal, but also accept missing neutrino");
-    REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("isSignalAcceptMissingNeutrino", isSignalAcceptMissingNeutrino,
+                      "same as isSignal, but also accept missing neutrino");
+    REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode,
+                      "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
-    REGISTER_VARIABLE("mcErrors", particleMCErrors,  "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
+    REGISTER_VARIABLE("mcErrors", particleMCErrors,
+                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
 
     VARIABLE_GROUP("Flavour tagging");
-    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0.");
-    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar.");
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0,
+                      "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0.");
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar,
+                      "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar.");
     REGISTER_VARIABLE("isRestOfEventOfB0", isRestOfEventOfB0,  "[Eventbased] Check if current RestOfEvent is related to a B0.");
-    REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,  "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar.");
-    REGISTER_VARIABLE("isRestOfEventEmpty", isRestOfEventEmpty,  "-1 (1), -2 if current RestOfEvent is related to a B0bar (B0). But is used for checking if RoE empty.");
+    REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,
+                      "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar.");
+    REGISTER_VARIABLE("isRestOfEventEmpty", isRestOfEventEmpty,
+                      "-1 (1), -2 if current RestOfEvent is related to a B0bar (B0). But is used for checking if RoE empty.");
     REGISTER_VARIABLE("isRestOfEventB0Flavor", isRestOfEventB0Flavor,  "-1 (1) if current RestOfEvent is related to a B0bar (B0).");
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor_Norm,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
     REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
-    REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
-    REGISTER_VARIABLE("NumberOfKShortinRemainingROEKaon", NumberOfKShortinRemainingROEKaon,  "Returns the number of K_S0 in the remainging Kaon ROE.");
-    REGISTER_VARIABLE("NumberOfKShortinRemainingROELambda", NumberOfKShortinRemainingROELambda,  "Returns the number of K_S0 in the remainging Lambda ROE.");
+    REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
+                      "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
+    REGISTER_VARIABLE("NumberOfKShortinRemainingROEKaon", NumberOfKShortinRemainingROEKaon,
+                      "Returns the number of K_S0 in the remainging Kaon ROE.");
+    REGISTER_VARIABLE("NumberOfKShortinRemainingROELambda", NumberOfKShortinRemainingROELambda,
+                      "Returns the number of K_S0 in the remainging Lambda ROE.");
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,  "1.0 if Lambda0, -1.0 if Anti-Lambda0, 0.0 else.");
     REGISTER_VARIABLE("isLambda", isLambda,  "0.0 if MCLambda0, 1.0 else.");
     REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.");
-    REGISTER_VARIABLE("MomentumOfSecondDaughter", MomentumOfSecondDaughter,  "Returns the Momentum of second daughter if existing, else 0.");
-    REGISTER_VARIABLE("MomentumOfSecondDaughter_CMS", MomentumOfSecondDaughter_CMS,  "Returns the Momentum of second daughter if existing in CMS, else 0.");
-    REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,  "Returns the q*(highest PID_Likelihood for Kaons), else 0.");
-    REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,  "Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.");
+    REGISTER_VARIABLE("MomentumOfSecondDaughter", MomentumOfSecondDaughter,
+                      "Returns the Momentum of second daughter if existing, else 0.");
+    REGISTER_VARIABLE("MomentumOfSecondDaughter_CMS", MomentumOfSecondDaughter_CMS,
+                      "Returns the Momentum of second daughter if existing in CMS, else 0.");
+    REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
+                      "Returns the q*(highest PID_Likelihood for Kaons), else 0.");
+    REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,
+                      "Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.");
     REGISTER_VARIABLE("McFlavorOfTagSide",  McFlavorOfTagSide, "Flavour of tag side from MC extracted from the RoE");
     REGISTER_VARIABLE("BtagClassFlavor",  particleClassifiedFlavor,    "Flavour of Btag from trained Method");
     REGISTER_VARIABLE("BtagMCFlavor",  particleMCFlavor,    "Flavour of Btag from MC");
-    REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,  "Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 else.");
-    REGISTER_VARIABLE("cosKaonPion"  , cosKaonPion , "cosine of angle between kaon and slow pion momenta, i.e. between the momenta of the particles selected as target kaon and slow pion");
+    REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,
+                      "Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 else.");
+    REGISTER_VARIABLE("cosKaonPion"  , cosKaonPion ,
+                      "cosine of angle between kaon and slow pion momenta, i.e. between the momenta of the particles selected as target kaon and slow pion");
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
-    REGISTER_VARIABLE("KaonPionHaveOpositeCharges", KaonPionHaveOpositeCharges, "Returns 1 if the particles selected as target kaon and slow pion have oposite charges, 0 else")
-    REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter, "Returns 1 if a b->c anti-c q or a anti-b -> anti-c c anti-q transition is present in a decay.");
+    REGISTER_VARIABLE("KaonPionHaveOpositeCharges", KaonPionHaveOpositeCharges,
+                      "Returns 1 if the particles selected as target kaon and slow pion have oposite charges, 0 else")
+    REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter,
+                      "Returns 1 if a b->c anti-c q or a anti-b -> anti-c c anti-q transition is present in a decay.");
 
 
     VARIABLE_GROUP("Event");
@@ -1677,9 +1701,12 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nROEECLClusters", nROEECLClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters, "number of remaining KLM clusters as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent, "Returns number of tracks in ROE - number of tracks of given particle");
+    REGISTER_VARIABLE("nROEECLClusters", nROEECLClusters,
+                      "number of remaining ECL clusters as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
+                      "number of remaining KLM clusters as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
+                      "Returns number of tracks in ROE - number of tracks of given particle");
 
     VARIABLE_GROUP("TDCPV");
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
@@ -1695,7 +1722,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
     REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
-    REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex, "StoreArray index (0-based) of the MDST object from which the Particle was created");
+    REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
+                      "StoreArray index (0-based) of the MDST object from which the Particle was created");
 
     REGISTER_VARIABLE("pRecoil",  recoilMomentum,    "magnitude of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,   "energy recoiling against given Particle");
@@ -1704,15 +1732,20 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
 
-    REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
-    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus, "Returns status bits of related MCParticle or -1 if MCParticle relation is not set.");
-    REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle, "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("printParticle", printParticle,
+                      "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
+    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
+                      "Returns status bits of related MCParticle or -1 if MCParticle relation is not set.");
+    REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
+                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("False", False, "returns always 0, used for testing and debugging.");
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("goodGamma",         goodGamma, "1.0 if photon candidate passes good photon selection criteria");
-    REGISTER_VARIABLE("goodGammaUnCal",    goodGammaUncalibrated, "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
-    REGISTER_VARIABLE("clusterReg",        eclClusterDetectionRegion, "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
+    REGISTER_VARIABLE("goodGammaUnCal",    goodGammaUncalibrated,
+                      "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
+    REGISTER_VARIABLE("clusterReg",        eclClusterDetectionRegion,
+                      "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
     REGISTER_VARIABLE("clusterE9E25",      eclClusterE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
     REGISTER_VARIABLE("clusterTiming",     eclClusterTiming,           "timing");
     REGISTER_VARIABLE("clusterNHits",      eclClusterNHits,           "number of hits associated to this cluster");

@@ -161,16 +161,13 @@ size_t TrackFinderCDCBaseModule::copyRemainingHits()
 {
   if (m_param_remainingCDCHitsStoreArrayName == "") return 0;
 
-  B2INFO("Copying remaining hits");
-
   StoreArray<CDCHit> storedRemainingCDCHits(m_param_remainingCDCHitsStoreArrayName);
-  storedRemainingCDCHits.create();
+  storedRemainingCDCHits.create(true); //override if filled by the first stage.
 
   for (const CDCWireHit& wireHit : CDCWireHitTopology::getInstance().getWireHits()) {
     const AutomatonCell& automatonCell = wireHit.getAutomatonCell();
     if (not automatonCell.hasDoNotUseFlag()) {
       const CDCHit* hit = wireHit.getHit();
-      B2INFO("Copy hit" << hit);
       if (hit) {
         const CDCHit* newAddedCDCHit = storedRemainingCDCHits.appendNew(*hit);
         newAddedCDCHit->addRelationTo(hit);

@@ -85,16 +85,10 @@ CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslat
   m_refDriftLengthVariance = translator.getDriftLengthResolution(m_refDriftLength,
                              getWireID(),
                              false, //bool leftRight ?
-                             -999.9, // meaning unclear ?
-                             -999.9 // meaning unclear ?
-                                                                );
+                             getWire().getRefZ());
 
 
 }
-
-
-
-
 
 CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
   m_wire(CDCWire::getInstance(wireID)),

@@ -29,9 +29,11 @@ muon_pdg_code = 13
 # PDG code of a tau
 tau_pdg_code = 15
 
-# Generator module names hashed by shorthand menomics. Includes None as a special value for background only simulation
+# Generator module names hashed by shorthand menomics. Includes
+# None as a special value for background only simulation
 generator_module_names_by_short_name = {
     'gun': 'ParticleGun',
+    'single_gun': 'ParticleGun',
     'simple_gun': 'ParticleGun',
     'forward_gun': 'ParticleGun',
     'generic': 'EvtGenInput',
@@ -48,6 +50,15 @@ valid_generator_names.remove(None)
 
 # Default parameters of the generator modules hashed by their respective module name
 default_generator_params_by_generator_name = {
+    'single_gun': {
+        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
+        'nTracks': 1,
+        'varyNTracks': False,
+        'momentumGeneration': 'uniform',
+        'momentumParams': [0.6, 1.4],
+        'thetaGeneration': 'uniform',
+        'thetaParams': [17., 150.],
+    },
     'simple_gun': {
         'pdgCodes': [muon_pdg_code, -muon_pdg_code],
         'nTracks': 10,
@@ -111,7 +122,8 @@ class ReadOrGenerateEventsRun(MinimalRun):
             default=self.bkg_files,
             action='append',
             metavar='BACKGROUND_DIRECTORY',
-            help='Path to folder of files or to a file containing the background to be used. Can be given multiple times.',
+            help='Path to folder of files or to a file containing the background to be used. ' +
+                 'Can be given multiple times.',
         )
 
         return argument_parser
@@ -137,9 +149,11 @@ class ReadOrGenerateEventsRun(MinimalRun):
                                       components=components,
                                       bkgfiles=bkg_file_paths)
 
-            # Catch if no generator is added, no background should be simulated and events are not read from a file.
+            # Catch if no generator is added, no background should be simulated and events
+            # are not read from a file.
             if not bkg_file_paths and generator_module is None:
-                raise RuntimeError('Need at least one of root_input_file, generator_module or bkg_files specified.')
+                raise RuntimeError('Need at least one of root_input_file,'
+                                   ' generator_module or bkg_files specified.')
 
         return main_path
 
@@ -160,12 +174,14 @@ def is_bkg_file(bkg_file_path):
 
 
 def get_bkg_file_paths(bkg_dir_or_file_paths):
-    """Unpacks the content of a single or a list of directories and/or files filtering for files containing background mixins.
+    """Unpacks the content of a single or a list of directories and/or files filtering for
+    files containing background mixins.
 
     Parameters
     ----------
     bkg_dir_or_file_paths : string or iterable of strings
-        Single file or single directory in which background files are located or a list of files and/or directories.
+        Single file or single directory in which background files are located or
+        a list of files and/or directories.
 
     Returns
     -------
@@ -236,7 +252,8 @@ def get_generator_module_name(generator_name):
 
 
 def update_default_generator_params(generator_name, additional_params):
-    """Takes to default parameters of the generator module and returns a copy updated with the explicitly given additional parameters.
+    """Takes to default parameters of the generator module and
+    returns a copy updated with the explicitly given additional parameters.
 
     Parameters
     ----------
@@ -248,7 +265,8 @@ def update_default_generator_params(generator_name, additional_params):
     Returns
     -------
     dict
-        Parameters updated with the additional parameters from the defaults. Usable with module.param()
+        Parameters updated with the additional parameters from the defaults.
+        Usable with module.param()
     """
 
     return params

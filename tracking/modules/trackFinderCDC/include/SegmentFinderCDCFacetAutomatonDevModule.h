@@ -29,9 +29,20 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+    /** Parameter: Cluster filter to be used during the construction of clusters.
+    Valid values are:
+    + "all" (all hits are valid),
+    + "tmva"
+    */
+    std::string m_param_clusterFilter;
+
+    /** Parameter: Cluster filter parameters forwarded to the cluster filter
+     *  Meaning of the Key - Value pairs depend on the cluster filter
+     */
+    std::map<std::string, std::string> m_param_clusterFilterParameters;
+
     /** Parameter: Facet filter to be used during the construction of facets.
     Valid values are:
-
     + "none" (no facet is valid, stop at cluster generation.)
     + "all" (all facets are valid)
     + "mc" (monte carlo truth)

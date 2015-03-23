@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 #include <tracking/trackFindingCDC/creators/FacetCreator.h>
 #include <tracking/trackFindingCDC/filters/wirehit_wirehit/WholeWireHitNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet_facet/SimpleFacetNeighborChooser.h>
 
@@ -34,23 +35,28 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Forward declaration of the module implementing the segment generation by cellular automaton on facets using specific filter instances.
-    template<class FacetFilter = BaseFacetFilter, class FacetNeighborChooser = BaseFacetNeighborChooser>
+    template<class ClusterFilter = BaseClusterFilter,
+             class FacetFilter = BaseFacetFilter,
+             class FacetNeighborChooser = BaseFacetNeighborChooser>
     class SegmentFinderCDCFacetAutomatonImplModule;
   }
 
   /// Module specialisation using the default Monte Carlo free filters. To be used in production.
-  typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule <TrackFindingCDC::RealisticFacetFilter,
-          TrackFindingCDC::SimpleFacetNeighborChooser
-          > SegmentFinderCDCFacetAutomatonModule;
+  typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule <
+  TrackFindingCDC::AllClusterFilter,
+                  TrackFindingCDC::RealisticFacetFilter,
+                  TrackFindingCDC::SimpleFacetNeighborChooser >
+                  SegmentFinderCDCFacetAutomatonModule;
 
   namespace TrackFindingCDC {
-    template<class FacetFilter, class FacetNeighborChooser>
+    template<class ClusterFilter, class FacetFilter, class FacetNeighborChooser>
     class SegmentFinderCDCFacetAutomatonImplModule : public SegmentFinderCDCBaseModule {
 
     public:
       /// Default constructor initialising the filters with the default settings
       SegmentFinderCDCFacetAutomatonImplModule(ETrackOrientation segmentOrientation = c_None) :
         SegmentFinderCDCBaseModule(segmentOrientation),
+        m_ptrClusterFilter(new ClusterFilter()),
         m_ptrFacetFilter(new FacetFilter()),
         m_ptrFacetNeighborChooser(new FacetNeighborChooser()),
         m_param_writeSuperClusters(false),
@@ -106,16 +112,6 @@ namespace Belle2 {
                  std::string("CDCRecoTangentSegmentVector"));
       }
 
-      /// Destructor deleting the filters.
-      ~SegmentFinderCDCFacetAutomatonImplModule()
-      {
-        if (m_ptrFacetFilter) delete m_ptrFacetFilter;
-        m_ptrFacetFilter = nullptr;
-
-        if (m_ptrFacetNeighborChooser) delete m_ptrFacetNeighborChooser;
-        m_ptrFacetNeighborChooser = nullptr;
-      }
-
       ///  Initialize the Module before event processing
       virtual void initialize() override
       {
@@ -137,6 +133,10 @@ namespace Belle2 {
           StoreWrappedObjPtr< std::vector<CDCRecoTangentSegment> >::registerTransient(m_param_tangentSegmentsStoreObjName);
         }
 
+        if (m_ptrClusterFilter) {
+          m_ptrClusterFilter->initialize();
+        }
+
         if (m_ptrFacetFilter) {
           m_ptrFacetFilter->initialize();
         }
@@ -154,6 +154,10 @@ namespace Belle2 {
 
       virtual void terminate() override
       {
+        if (m_ptrClusterFilter) {
+          m_ptrClusterFilter->terminate();
+        }
+
         if (m_ptrFacetFilter) {
           m_ptrFacetFilter->terminate();
         }
@@ -166,38 +170,51 @@ namespace Belle2 {
       }
 
     public:
+      /// Getter for the current cluster filter. The module keeps ownership of the pointer.
+      ClusterFilter* getClusterFilter()
+      {
+        return m_ptrClusterFilter.get();
+      }
+
+      /// Setter for the cluster filter used in the cluster creation. The module takes ownership of the pointer.
+      void setClusterFilter(std::unique_ptr<ClusterFilter> ptrClusterFilter)
+      {
+        m_ptrClusterFilter = std::move(ptrClusterFilter);
+      }
+
       /// Getter for the current facet filter. The module keeps ownership of the pointer.
       FacetFilter* getFacetFilter()
       {
-        return m_ptrFacetFilter;
+        return m_ptrFacetFilter.get();
       }
 
       /// Setter for the facet filter used in the facet creation. The module takes ownership of the pointer.
-      void setFacetFilter(FacetFilter* ptrFacetFilter)
+      void setFacetFilter(std::unique_ptr<FacetFilter> ptrFacetFilter)
       {
-        if (m_ptrFacetFilter) delete m_ptrFacetFilter;
-        m_ptrFacetFilter = ptrFacetFilter;
+        m_ptrFacetFilter = std::move(ptrFacetFilter);
       }
 
       /// Getter for the current facet filter. The module keeps ownership of the pointer.
       FacetNeighborChooser* getFacetNeighborChooser()
       {
-        return m_ptrFacetNeighborChooser;
+        return m_ptrFacetNeighborChooser.get();
       }
 
       /// Setter for the facet neighbor chooser used to connect facets in a network. The module takes ownership of the pointer.
-      void setFacetNeighborChooser(FacetNeighborChooser* ptrFacetNeighborChooser)
+      void setFacetNeighborChooser(std::unique_ptr<FacetNeighborChooser> ptrFacetNeighborChooser)
       {
-        if (m_ptrFacetNeighborChooser) delete m_ptrFacetNeighborChooser;
-        m_ptrFacetNeighborChooser = ptrFacetNeighborChooser;
+        m_ptrFacetNeighborChooser = std::move(ptrFacetNeighborChooser);
       }
 
     private:
       /// Reference to the filter to be used for the facet generation.
-      FacetFilter* m_ptrFacetFilter;
+      std::unique_ptr<ClusterFilter> m_ptrClusterFilter;
+
+      /// Reference to the filter to be used for the facet generation.
+      std::unique_ptr<FacetFilter> m_ptrFacetFilter;
 
       /// Reference to the chooser to be used to construct the facet network.
-      FacetNeighborChooser* m_ptrFacetNeighborChooser;
+      std::unique_ptr<FacetNeighborChooser> m_ptrFacetNeighborChooser;
 
     private:
       /// Parameter: Switch if superclusters shall be written to the DataStore
@@ -223,7 +240,6 @@ namespace Belle2 {
 
       /// Parameter: Name of the output StoreObjPtr of the tangent segments generated within this module.
       std::string m_param_tangentSegmentsStoreObjName;
-
 
     private:
       //object pools
@@ -271,8 +287,12 @@ namespace Belle2 {
     }; // end class SegmentFinderCDCFacetAutomatonImplModule
 
 
-    template<class FacetFilter, class FacetNeighborChooser>
-    void SegmentFinderCDCFacetAutomatonImplModule<FacetFilter, FacetNeighborChooser>::generate(std::vector<CDCRecoSegment2D>& segments)
+    template<class ClusterFilter, class FacetFilter, class FacetNeighborChooser>
+    void SegmentFinderCDCFacetAutomatonImplModule <
+    ClusterFilter,
+    FacetFilter,
+    FacetNeighborChooser
+    >::generate(std::vector<CDCRecoSegment2D>& segments)
     {
       /// Attain super cluster vector on the DataStore if needed.
       std::vector<CDCWireHitCluster>* ptrSuperClusters = nullptr;
@@ -355,6 +375,17 @@ namespace Belle2 {
           for (CDCWireHitCluster& cluster : m_clustersInSuperCluster) {
             std::sort(std::begin(cluster), std::end(cluster));
             assert(std::is_sorted(std::begin(cluster), std::end(cluster)));
+
+            B2DEBUG(100, "Analyse the cluster for background");
+            CellWeight clusterWeight = m_ptrClusterFilter->isGoodCluster(cluster);
+            if (isNotACell(clusterWeight)) {
+              // Cluster detected as background
+              for (const CDCWireHit* wireHit : cluster) {
+                wireHit->getAutomatonCell().setDoNotUseFlag();
+              }
+              // skip to next cluster
+              continue;
+            }
 
             B2DEBUG(100, "Cluster size: " << cluster.size());
             B2DEBUG(100, "Wire hit neighborhood size: " << m_wirehitNeighborhood.size());

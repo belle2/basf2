@@ -10,6 +10,7 @@
 
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonDevModule.h>
 
+#include <tracking/trackFindingCDC/filters/cluster/ClusterFilters.h>
 #include <tracking/trackFindingCDC/filters/facet/FacetFilters.h>
 #include <tracking/trackFindingCDC/filters/facet_facet/FacetNeighborChoosers.h>
 
@@ -23,10 +24,24 @@ REG_MODULE(SegmentFinderCDCFacetAutomatonDev);
 
 SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule() :
   SegmentFinderCDCFacetAutomatonImplModule<>(c_Symmetric),
-  m_param_facetFilter("simple"),
+  m_param_clusterFilter("all"),
+  m_param_facetFilter("realistic"),
   m_param_facetNeighborChooser("simple")
 {
   setDescription("Versatile module with adjustable filters for segment generation.");
+
+  addParam("ClusterFilter",
+           m_param_clusterFilter,
+           "Cluster filter investigates hit clusters and lets only hits pass that that are not background."
+           "Valid values are: "
+           "\"all\" (all hits are valid), "
+           "\"tmva\" (test clusters for background with a tmva method).",
+           string("simple"));
+
+  addParam("ClusterFilterParameters",
+           m_param_clusterFilterParameters,
+           "Key - Value pairs depending on the cluster filter",
+           map<string, string>());
 
   addParam("FacetFilter",
            m_param_facetFilter,
@@ -56,6 +71,25 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
 
 void SegmentFinderCDCFacetAutomatonDevModule::initialize()
 {
+  // Set the filters before they get initialized in the base module.
+  BaseClusterFilter* ptrClusterFilter = nullptr;
+
+  if (m_param_clusterFilter == string("all")) {
+    ptrClusterFilter = new AllClusterFilter();
+  } else if (m_param_clusterFilter == string("tmva")) {
+    ptrClusterFilter = new TMVAClusterFilter();
+  } else {
+    B2ERROR("Unrecognised ClusterFilter option " << m_param_clusterFilter <<
+            ". Allowed values are " <<
+            "\"all\", " <<
+            "\"tmva\"."
+           );
+  }
+
+  // Takes ownership
+  setClusterFilter(std::unique_ptr<BaseClusterFilter>(ptrClusterFilter));
+  getClusterFilter()->setParameters(m_param_clusterFilterParameters);
+
   // Set the filters before they get initialized in the base module.
   BaseFacetFilter* ptrFacetFilter = nullptr;
 
@@ -90,7 +124,7 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
 
   if (ptrFacetFilter) {
     // Takes ownership
-    setFacetFilter(ptrFacetFilter);
+    setFacetFilter(std::unique_ptr<BaseFacetFilter>(ptrFacetFilter));
   }
 
   BaseFacetNeighborChooser* ptrFacetNeighborChooser = nullptr;
@@ -110,7 +144,7 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
   }
   if (ptrFacetNeighborChooser) {
     // Takes ownership
-    setFacetNeighborChooser(ptrFacetNeighborChooser);
+    setFacetNeighborChooser(std::unique_ptr<BaseFacetNeighborChooser>(ptrFacetNeighborChooser));
   }
 
   SegmentFinderCDCFacetAutomatonImplModule<>::initialize();

@@ -88,11 +88,6 @@ namespace Belle2 {
     FloatType curvatureToAbsMom2D(const FloatType& curvature,
                                   const Vector3D& pos3D);
 
-    /// Conversion helper for two dimensional curvature to momenta
-    FloatType curvatureToAbsMom2D(const FloatType& curvature,
-                                  const FloatType& charge,
-                                  const Vector2D& pos2D);
-
   } // namespace TrackFindingCDC
 } // namespace Belle2
 #endif // CDCBFIELD_H

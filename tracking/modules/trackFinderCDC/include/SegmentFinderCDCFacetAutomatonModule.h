@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 #include <tracking/trackFindingCDC/creators/FacetCreator.h>
 #include <tracking/trackFindingCDC/filters/wirehit_wirehit/WireHitNeighborChooser.h>
-#include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet_facet/SimpleFacetNeighborChooser.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -39,10 +39,9 @@ namespace Belle2 {
   }
 
   /// Module specialisation using the default Monte Carlo free filters. To be used in production.
-  typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule <
-  TrackFindingCDC::SimpleFacetFilter,
-                  TrackFindingCDC::SimpleFacetNeighborChooser
-                  > SegmentFinderCDCFacetAutomatonModule;
+  typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule <TrackFindingCDC::RealisticFacetFilter,
+          TrackFindingCDC::SimpleFacetNeighborChooser
+          > SegmentFinderCDCFacetAutomatonModule;
 
   namespace TrackFindingCDC {
     template<class FacetFilter, class FacetNeighborChooser>
@@ -59,7 +58,8 @@ namespace Belle2 {
         m_param_writeFacets(false),
         m_param_facetsStoreObjName("CDCFacetVector"),
         m_param_writeTangentSegments(false),
-        m_param_tangentSegmentsStoreObjName("CDCRecoTangentSegmentVector") {
+        m_param_tangentSegmentsStoreObjName("CDCRecoTangentSegmentVector")
+      {
 
         setDescription("Generates segments from hits using a cellular automaton build from hit triples (facets).");
 
@@ -95,7 +95,8 @@ namespace Belle2 {
       }
 
       /// Destructor deleting the filters.
-      ~SegmentFinderCDCFacetAutomatonImplModule() {
+      ~SegmentFinderCDCFacetAutomatonImplModule()
+      {
         if (m_ptrFacetFilter) delete m_ptrFacetFilter;
         m_ptrFacetFilter = nullptr;
 
@@ -104,7 +105,8 @@ namespace Belle2 {
       }
 
       ///  Initialize the Module before event processing
-      virtual void initialize() override {
+      virtual void initialize() override
+      {
         SegmentFinderCDCBaseModule::initialize();
 
         if (m_param_writeClusters) {
@@ -134,7 +136,8 @@ namespace Belle2 {
       // implementation below
 
 
-      virtual void terminate() override {
+      virtual void terminate() override
+      {
         if (m_ptrFacetFilter) {
           m_ptrFacetFilter->terminate();
         }
@@ -148,23 +151,27 @@ namespace Belle2 {
 
     public:
       /// Getter for the current facet filter. The module keeps ownership of the pointer.
-      FacetFilter* getFacetFilter() {
+      FacetFilter* getFacetFilter()
+      {
         return m_ptrFacetFilter;
       }
 
       /// Setter for the facet filter used in the facet creation. The module takes ownership of the pointer.
-      void setFacetFilter(FacetFilter* ptrFacetFilter) {
+      void setFacetFilter(FacetFilter* ptrFacetFilter)
+      {
         if (m_ptrFacetFilter) delete m_ptrFacetFilter;
         m_ptrFacetFilter = ptrFacetFilter;
       }
 
       /// Getter for the current facet filter. The module keeps ownership of the pointer.
-      FacetNeighborChooser* getFacetNeighborChooser() {
+      FacetNeighborChooser* getFacetNeighborChooser()
+      {
         return m_ptrFacetNeighborChooser;
       }
 
       /// Setter for the facet neighbor chooser used to connect facets in a network. The module takes ownership of the pointer.
-      void setFacetNeighborChooser(FacetNeighborChooser* ptrFacetNeighborChooser) {
+      void setFacetNeighborChooser(FacetNeighborChooser* ptrFacetNeighborChooser)
+      {
         if (m_ptrFacetNeighborChooser) delete m_ptrFacetNeighborChooser;
         m_ptrFacetNeighborChooser = ptrFacetNeighborChooser;
       }
@@ -267,7 +274,7 @@ namespace Belle2 {
       const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
       const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
-      for (const CDCWireSuperLayer & wireSuperLayer : wireTopology.getWireSuperLayers()) {
+      for (const CDCWireSuperLayer& wireSuperLayer : wireTopology.getWireSuperLayers()) {
 
         const CDCWireHitTopology::CDCWireHitRange wireHitsInSuperlayer = wireHitTopology.getWireHits(wireSuperLayer);
         //create the neighborhood
@@ -302,7 +309,7 @@ namespace Belle2 {
         m_wirehitClusterizer.create(wireHitsInSuperlayer, m_wirehitNeighborhood, m_clustersInSuperLayer);
         B2DEBUG(100, "Created " << m_clustersInSuperLayer.size() << " CDCWireHit clusters in superlayer");
 
-        for (CDCWireHitCluster & cluster : m_clustersInSuperLayer) {
+        for (CDCWireHitCluster& cluster : m_clustersInSuperLayer) {
           B2DEBUG(100, "Cluster size: " << cluster.size());
           B2DEBUG(100, "Wire hit neighborhood size: " << m_wirehitNeighborhood.size());
 
@@ -315,7 +322,7 @@ namespace Belle2 {
           // Copy facets to the DataStore
           if (m_param_writeFacets and ptrFacets) {
             std::vector<CDCRecoFacet>& facets = *ptrFacets;
-            for (const CDCRecoFacet & facet : m_facets) {
+            for (const CDCRecoFacet& facet : m_facets) {
               facets.push_back(facet);
             }
           }

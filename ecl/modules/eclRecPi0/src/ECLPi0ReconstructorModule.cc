@@ -50,6 +50,11 @@ REG_MODULE(ECLPi0Reconstructor)
 
 ECLPi0ReconstructorModule::ECLPi0ReconstructorModule() :
   Module(),
+  gamma_energy_threshold(0),
+  opening_angle_cut_margin(0),
+  pi0_mass_min(0.08),
+  pi0_mass_max(0.18),
+  chi2_max(15.),
   m_timeCPU(0),
   m_nRun(0),
   m_nEvent(0),

@@ -13,6 +13,7 @@ import tracking.validation.statistics as statistics
 import math
 import collections
 import numbers
+import copy
 
 import numpy as np
 
@@ -85,13 +86,21 @@ class ClassificationAnalysis(object):
             if isinstance(self.cut, numbers.Number):
                 cut_value = self.cut
                 cut_direction = self.cut_direction
-                if self.cut_direction < 0:
-                    binary_estimates = estimates >= self.cut
-                else:
-                    binary_estimates = estimates <= self.cut
+                cut_classifier = CutClassifier(cut_direction=cut_direction, cut_value=cut_value)
 
             else:
-                raise ValueError("cut is not a number")
+                cut_classifier = self.cut
+                cut_classifier = cut_classifier.clone()
+
+            cut_classifier.fit(estimates, truths)
+            binary_estimates = cut_classifier.predict(estimates)
+            cut_direction = cut_classifier.cut_direction
+            cut_value = cut_classifier.cut_value
+
+            if not isinstance(self.cut, numbers.Number):
+                print formatter.format(plot_name, subplot_name="cut_classifier"), "summary"
+                cut_classifier.describe(estimates, truths)
+
         else:
             cut_value = None
             cut_direction = self.cut_direction
@@ -121,6 +130,8 @@ class ClassificationAnalysis(object):
             purity = scores.purity(truths, binary_estimates)
             background_rejection = scores.background_rejection(truths, binary_estimates)
 
+            classification_fom['cut_value'] = cut_value
+            classification_fom['cut_direction'] = cut_direction
             classification_fom['efficiency'] = efficiency
             classification_fom['purity'] = purity
             classification_fom['background_rejection'] = background_rejection
@@ -269,3 +280,95 @@ class ClassificationAnalysis(object):
 
         if self.fom:
             self.fom.write(tdirectory)
+
+
+class CutClassifier(object):
+
+    """Simple classifier cutting on a single variable"""
+
+    def __init__(self, cut_direction=1, cut_value=np.nan):
+        self.cut_direction_ = cut_direction
+        self.cut_value_ = cut_value
+
+    @property
+    def cut_direction(self):
+        return self.cut_direction_
+
+    @property
+    def cut_value(self):
+        return self.cut_value_
+
+    def clone(self):
+        return copy.copy(self)
+
+    def determine_cut_value(self, estimates, truths):
+        return self.cut_value_  # do not change cut value from constructed one
+
+    def fit(self, estimates, truths):
+        self.cut_value_ = self.determine_cut_value(estimates, truths)
+        return self
+
+    def predict(self, estimates):
+        if self.cut_value_ is None:
+            raise ValueError("Cut value not set. Forgot to fit?")
+
+        if self.cut_direction_ < 0:
+            binary_estimates = estimates >= self.cut_value_
+        else:
+            binary_estimates = estimates <= self.cut_value_
+
+        return binary_estimates
+
+    def describe(self, estimates, truths):
+        if self.cut_direction_ < 0:
+            print "Cut accepts >= ", self.cut_value_, 'with'
+        else:
+            print "Cut accepts <= ", self.cut_value_, 'with'
+
+        binary_estimates = self.predict(estimates)
+
+        efficiency = scores.efficiency(truths, binary_estimates)
+        purity = scores.purity(truths, binary_estimates)
+        background_rejection = scores.background_rejection(truths, binary_estimates)
+
+        print "efficiency", efficiency
+        print "purity", purity
+        print "background_rejection", background_rejection
+
+
+def cut_at_background_rejection(background_rejection=0.5, cut_direction=1):
+    return CutAtBackgroundRejectionClassifier(background_rejection, cut_direction)
+
+
+class CutAtBackgroundRejectionClassifier(CutClassifier):
+
+    def __init__(self, background_rejection=0.5, cut_direction=1):
+        super(CutAtBackgroundRejectionClassifier, self).__init__(cut_direction=cut_direction, cut_value=np.nan)
+        self.background_rejection = background_rejection
+
+    def determine_cut_value(self, estimates, truths):
+        n_data = len(estimates)
+        n_signals = scores.signal_amount(truths, estimates)
+        n_bkgs = n_data - n_signals
+
+        sorting_indices = np.argsort(estimates)
+        if self.cut_direction_ < 0:  # reject low
+            # Keep a reference to keep the content alive
+            orginal_sorting_indices = sorting_indices
+            sorting_indices = sorting_indices[::-1]
+
+        sorted_truths = truths[sorting_indices]
+        sorted_estimates = estimates[sorting_indices]
+
+        sorted_n_accepted_signals = np.cumsum(sorted_truths, dtype=float)
+        sorted_efficiencies = sorted_n_accepted_signals / n_signals
+
+        sorted_n_rejected_signals = n_signals - sorted_n_accepted_signals
+        sorted_n_rejects = np.arange(len(estimates) + 1, 1, -1)
+        sorted_n_rejected_bkgs = sorted_n_rejects - sorted_n_rejected_signals
+        sorted_bkg_rejections = sorted_n_rejected_bkgs / n_bkgs
+
+        cut_index, = np.searchsorted(sorted_bkg_rejections[::-1], (self.background_rejection,), side='right')
+
+        cut_value = sorted_estimates[-cut_index - 1]
+        return cut_value

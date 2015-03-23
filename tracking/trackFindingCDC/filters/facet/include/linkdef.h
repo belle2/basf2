@@ -16,6 +16,7 @@
 #pragma link C++ class Belle2::TrackFindingCDC::AllFacetFilter-;
 #pragma link C++ class Belle2::TrackFindingCDC::FitlessFacetFilter-;
 #pragma link C++ class Belle2::TrackFindingCDC::SimpleFacetFilter-;
+#pragma link C++ class Belle2::TrackFindingCDC::RealisticFacetFilter-;
 
 #endif
 

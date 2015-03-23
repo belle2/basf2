@@ -1,0 +1,121 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oliver Frost                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#include "../include/RealisticFacetFilter.h"
+
+#include <cmath>
+#include <framework/logging/Logger.h>
+
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+namespace {
+  double hypot3(double x, double y, double z)
+  {
+    return hypot(hypot(x, y), z);
+  }
+}
+
+RealisticFacetFilter::RealisticFacetFilter():
+  m_fitlessFacetFilter(true),
+  m_phiPullCut(11)
+{
+}
+
+RealisticFacetFilter::RealisticFacetFilter(FloatType phiPullCut):
+  m_fitlessFacetFilter(true),
+  m_phiPullCut(phiPullCut)
+{
+}
+
+CellWeight RealisticFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
+{
+  CellWeight fitlessWeight = m_fitlessFacetFilter.isGoodFacet(facet);
+  if (isNotACell(fitlessWeight)) return NOT_A_CELL;
+
+  facet.adjustLines();
+
+  const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
+  const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();
+  const double startDriftLengthStd = sqrt(startDriftLengthVar);
+
+  const CDCRLWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
+  const double middleDriftLengthVar = middleRLWirehit.getRefDriftLengthVariance();
+  const double middleDriftLengthStd = sqrt(middleDriftLengthVar);
+
+  const CDCRLWireHit& endRLWirehit = facet.getEndRLWireHit();
+  const double endDriftLengthVar = endRLWirehit.getRefDriftLengthVariance();
+  const double endDriftLengthStd = sqrt(endDriftLengthVar);
+
+  const ParameterLine2D& startToMiddleLine = facet.getStartToMiddleLine();
+  const ParameterLine2D& startToEndLine = facet.getStartToEndLine();
+  const ParameterLine2D& middleToEndLine = facet.getMiddleToEndLine();
+
+  const Vector2D& startToMiddleTangentialVector = startToMiddleLine.tangential();
+  const Vector2D& startToEndTangentialVector = startToEndLine.tangential();
+  const Vector2D& middleToEndTangentialVector = middleToEndLine.tangential();
+
+  const double startToMiddleLength = startToMiddleTangentialVector.norm();
+  const double startToEndLength = startToEndTangentialVector.norm();
+  const double middleToEndLength = middleToEndTangentialVector.norm();
+
+  const FloatType startCos = startToMiddleTangentialVector.cosWith(startToEndTangentialVector);
+  const FloatType middleCos = startToMiddleTangentialVector.cosWith(middleToEndTangentialVector);
+  const FloatType endCos = startToEndTangentialVector.cosWith(middleToEndTangentialVector);
+
+  const double startPhi = acos(startCos);
+  const double middlePhi = acos(middleCos);
+  const double endPhi = acos(endCos);
+
+  const double startToMiddleSigmaPhi = startDriftLengthStd / startToMiddleLength;
+  const double startToEndSigmaPhi = startDriftLengthStd / startToEndLength;
+
+  const double middleToStartSigmaPhi = middleDriftLengthStd / startToMiddleLength;
+  const double middleToEndSigmaPhi = middleDriftLengthStd / middleToEndLength;
+
+  const double endToStartSigmaPhi = endDriftLengthStd / startToEndLength;
+  const double endToMiddleSigmaPhi = endDriftLengthStd / middleToEndLength;
+
+  const double startPhiSigma = hypot3(startToEndSigmaPhi - startToMiddleSigmaPhi,
+                                      middleToStartSigmaPhi,
+                                      endToStartSigmaPhi);
+
+  const double middlePhiSigma = hypot3(startToMiddleSigmaPhi,
+                                       middleToStartSigmaPhi + middleToEndSigmaPhi,
+                                       endToMiddleSigmaPhi);
+
+  const double endPhiSigma = hypot3(startToEndSigmaPhi,
+                                    middleToEndSigmaPhi,
+                                    endToStartSigmaPhi - endToMiddleSigmaPhi);
+
+  double startPhiPull = startPhi / startPhiSigma;
+  double middlePhiPull = middlePhi / middlePhiSigma;
+  double endPhiPull = endPhi / endPhiSigma;
+
+  /* cut on the angle of */
+  if (startPhiPull < m_phiPullCut and
+      middlePhiPull <  m_phiPullCut and
+      endPhiPull < m_phiPullCut) {
+
+    //Good facet contains three points of the track
+    // the amount carried by this facet can the adjusted more realistically
+    return 3;
+
+  } else {
+
+    //B2DEBUG(200,"Rejected facet because flight directions do not match");
+    return NOT_A_CELL;
+
+  }
+
+}

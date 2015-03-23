@@ -38,7 +38,8 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "\"mc_symmetric\" (monte carlo truth and their mirror image), "
            "\"fitless\" (only checking the feasability of right left passage information), "
            "\"fitless_hard\" (also exclude the boarder line feasable combinations), "
-           "\"simple\" (mc free with simple criteria).",
+           "\"simple\" (mc free with simple criteria)."
+           "\"realistic\" (mc free with more realistic criteria).",
            string("simple"));
 
   addParam("FacetNeighborChooser",
@@ -72,8 +73,19 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
     ptrFacetFilter = new FitlessFacetFilter(true);
   } else if (m_param_facetFilter == string("simple")) {
     ptrFacetFilter = new SimpleFacetFilter();
+  } else if (m_param_facetFilter == string("realistic")) {
+    ptrFacetFilter = new RealisticFacetFilter();
   } else {
-    B2ERROR("Unrecognised FacetFilter option " << m_param_facetFilter << ". Allowed values are \"all\", \"mc\", \"mc_symmetric\" and \"simple\".");
+    B2ERROR("Unrecognised FacetFilter option " << m_param_facetFilter <<
+            ". Allowed values are " <<
+            "\"all\", " <<
+            "\"mc\", " <<
+            "\"mc_symmetric\", " <<
+            "\"fitless\", " <<
+            "\"fitless_hard\", " <<
+            "\"realistic\" or " <<
+            "\"simple\"."
+           );
   }
 
   if (ptrFacetFilter) {
@@ -93,7 +105,8 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
   } else if (m_param_facetNeighborChooser == string("simple")) {
     ptrFacetNeighborChooser = new SimpleFacetNeighborChooser();
   } else {
-    B2ERROR("Unrecognised FacetNeighborChooser option " << m_param_facetNeighborChooser << ". Allowed values are \"none\", \"all\", \"mc\", \"mc_symmetric\" and \"simple\".");
+    B2ERROR("Unrecognised FacetNeighborChooser option " << m_param_facetNeighborChooser <<
+            ". Allowed values are \"none\", \"all\", \"mc\", \"mc_symmetric\" and \"simple\".");
   }
   if (ptrFacetNeighborChooser) {
     // Takes ownership

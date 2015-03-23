@@ -50,6 +50,7 @@ namespace Belle2 {
     + "mc" (monte carlo truth)
     + "mc_symmetric" (monte carlo truth and the reversed version are excepted)
     + "simple" (mc free with simple criteria)
+    + "realistic" (mc free with more realistic criteria)
     */
     std::string m_param_facetNeighborChooser;
 

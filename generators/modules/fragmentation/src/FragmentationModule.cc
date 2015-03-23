@@ -37,8 +37,13 @@ FragmentationModule::FragmentationModule() : Module()
   setDescription("Fragmention of light (u/d/s/c) quarks using PYTHIA8");
 
   //Parameter definition
-  addParam("ParameterFile", m_parameterfile, "Input parameter file for PYTHIA", std::string("../modules/fragmentation/data/pythia_default.dat"));
+  addParam("ParameterFile", m_parameterfile, "Input parameter file for PYTHIA",
+           std::string("../modules/fragmentation/data/pythia_default.dat"));
   addParam("ListPYTHIAEvent", m_listEvent, "List event record of PYTHIA after hadronization", 0);
+  addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific deays", 0);
+  addParam("EvtPdl", m_EvtPdl, "EvtGen particle data (e.g. evt.pdl)", std::string(""));
+  addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
+  addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string("../modules/fragmentation/data/ccbar.dec"));
 }
 
 //-----------------------------------------------------------------
@@ -64,6 +69,15 @@ void FragmentationModule::initialize()
 
   // Initialization
   pythia.init();
+
+  // Set EvtGen (after pythia.init())
+  evtgen = 0;
+
+  if (m_useEvtGen) {
+    B2INFO("Using PYTHIA EvtGen Interface");
+    evtgen = new EvtGenDecays(&pythia, m_DecFile, m_EvtPdl);
+    evtgen->readDecayFile(m_UserDecFile);
+  }
 
   // List variable(s) that differ from their defaults
   pythia.settings.listChanged();
@@ -113,9 +127,12 @@ void FragmentationModule::event()
 
   // Do the fragmentation using PYTHIA
   if (!pythia.next()) {
-    B2WARNING("pythia.next() failed, event generation aborted prematurely!");
+    B2WARNING("pythia.next() failed, event generation aborted prematurely! Printing PythiaEvent.list():");
     PythiaEvent.list();
   }
+
+  // use evtgen to perform the decay
+  if (m_useEvtGen) evtgen->decay();
 
   // Loop over the PYTHIA list and assign the mother-daughter relation
   // Might not work if the mother appear below the daughter in the event record
@@ -137,13 +154,14 @@ void FragmentationModule::event()
 
       // from PYTHIA manual: "<1: an empty entry, with no meaningful information and
       // therefore to be skipped unconditionally (should not occur in PYTHIA)"
-      if (pythia.event.statusHepMC(iPythiaPart) < 1)  continue;
+      if (pythia.event[iPythiaPart].statusHepMC() < 1)  continue;
 
       // Set PDG code
       p->setPDG(pythia.event[iPythiaPart].id());
 
       // Set four vector
-      TLorentzVector p4(pythia.event[iPythiaPart].px(), pythia.event[iPythiaPart].py(), pythia.event[iPythiaPart].pz(), pythia.event[iPythiaPart].e());
+      TLorentzVector p4(pythia.event[iPythiaPart].px(), pythia.event[iPythiaPart].py(), pythia.event[iPythiaPart].pz(),
+                        pythia.event[iPythiaPart].e());
       p->set4Vector(p4);
       p->setMass(pythia.event[iPythiaPart].m());
 
@@ -156,7 +174,7 @@ void FragmentationModule::event()
       p->addStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
 
       // Set stable at generator level
-      if (pythia.event.statusHepMC(iPythiaPart) == 1) {
+      if (pythia.event[iPythiaPart].statusHepMC() == 1) {
         p->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
       }
 
@@ -187,7 +205,8 @@ void FragmentationModule::event()
   if (m_listEvent) PythiaEvent.list();
 
   // Create new ParticleGraph
-  mcParticleGraph.generateList(m_particleList, MCParticleGraph::c_clearParticles | MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+  mcParticleGraph.generateList(m_particleList,
+                               MCParticleGraph::c_clearParticles | MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
 }
 

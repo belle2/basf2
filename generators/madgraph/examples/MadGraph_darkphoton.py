@@ -13,6 +13,7 @@
 
 from basf2 import *
 import os
+import subprocess
 
 # parameters that can be modified
 mg_nevents = '100'

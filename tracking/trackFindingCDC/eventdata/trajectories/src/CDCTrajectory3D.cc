@@ -182,7 +182,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const FloatType& 
 {
   // Set the start parameters
   Vector3D position = getSupport();
-  Vector3D momentum = getMom3DAtSupport(bZ);
+  Vector3D momentum = bZ == 0 ? getUnitMom3DAtSupport() : getMom3DAtSupport(bZ);
   SignType charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
@@ -238,11 +238,17 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const FloatType& 
   jacobianInflate(iZ, iZ0) = 1.0;
 
   // Momentum
-  jacobianInflate(iPx, iCurv) = invChargeAlphaCurv2;
-  jacobianInflate(iPy, iPhi0) = - invChargeAlphaCurv;
-  jacobianInflate(iPz, iCurv) = tanLambda * invChargeAlphaCurv2;
-  jacobianInflate(iPz, iSZ) = - invChargeAlphaCurv;
-
+  if (bZ == 0) {
+    jacobianInflate(iPx, iCurv) = 0;
+    jacobianInflate(iPy, iPhi0) = momentum.polarR();
+    jacobianInflate(iPz, iCurv) = 0;
+    jacobianInflate(iPz, iSZ) = momentum.polarR();
+  } else {
+    jacobianInflate(iPx, iCurv) = invChargeAlphaCurv2;
+    jacobianInflate(iPy, iPhi0) = - invChargeAlphaCurv;
+    jacobianInflate(iPz, iCurv) = tanLambda * invChargeAlphaCurv2;
+    jacobianInflate(iPz, iSZ) = - invChargeAlphaCurv;
+  }
   // Transform
   TMatrixDSym cov6 = cov5; //copy
   cov6.Similarity(jacobianInflate);

@@ -493,27 +493,38 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
     if (TCFire[iii] == 0) { continue; }
 
     int quad_sec = (iii / 24);
-
-
-    _FwCluster[_FWDICN][0] = TCFire[iii];
-    _FwCluster[_FWDICN][1] = TCFire[iii - 1]; // top
-    _FwCluster[_FWDICN][2] = TCFire[iii - 33]; // right top
-    _FwCluster[_FWDICN][3] = TCFire[iii - 32]; //right
-    _FwCluster[_FWDICN][4] = TCFire[iii - 31]; //right bottom
-    _FwCluster[_FWDICN][5] = TCFire[iii + 1]; //bottom
-    _FwCluster[_FWDICN][6] = TCFire[iii + 33]; //bottom left
-    _FwCluster[_FWDICN][7] = TCFire[iii + 32]; // left
-    _FwCluster[_FWDICN][8] = TCFire[iii + 31]; //top left
     if (iii == 32 || iii == 33) {
+      _FwCluster[_FWDICN][0] = TCFire[iii];
       _FwCluster[_FWDICN][1] = TCFire[64]; // top
       _FwCluster[_FWDICN][2] = TCFire[31];// right top
+      _FwCluster[_FWDICN][3] = TCFire[iii - 32]; //right
+      _FwCluster[_FWDICN][4] = TCFire[iii - 31]; //right bottom
+      _FwCluster[_FWDICN][5] = TCFire[iii + 1]; //bottom
+      _FwCluster[_FWDICN][6] = TCFire[iii + 33]; //bottom left
+      _FwCluster[_FWDICN][7] = TCFire[iii + 32]; // left
       _FwCluster[_FWDICN][8] = TCFire[95]; //top left
-    }
-    if (iii == 63 || iii == 62) {
+    } else if (iii == 63 || iii == 62) {
+      _FwCluster[_FWDICN][0] = TCFire[iii];
+      _FwCluster[_FWDICN][1] = TCFire[iii - 1]; // top
+      _FwCluster[_FWDICN][2] = TCFire[iii - 33]; // right top
+      _FwCluster[_FWDICN][3] = TCFire[iii - 32]; //right
       _FwCluster[_FWDICN][4] = TCFire[0]; //right bottom
       _FwCluster[_FWDICN][5] = TCFire[32]; //bottom
       _FwCluster[_FWDICN][6] = TCFire[64]; //bottom left
+      _FwCluster[_FWDICN][7] = TCFire[iii + 32]; // left
+      _FwCluster[_FWDICN][8] = TCFire[iii + 31]; //top left
+    } else {
+      _FwCluster[_FWDICN][0] = TCFire[iii];
+      _FwCluster[_FWDICN][1] = TCFire[iii - 1]; // top
+      _FwCluster[_FWDICN][2] = TCFire[iii - 33]; // right top
+      _FwCluster[_FWDICN][3] = TCFire[iii - 32]; //right
+      _FwCluster[_FWDICN][4] = TCFire[iii - 31]; //right bottom
+      _FwCluster[_FWDICN][5] = TCFire[iii + 1]; //bottom
+      _FwCluster[_FWDICN][6] = TCFire[iii + 33]; //bottom left
+      _FwCluster[_FWDICN][7] = TCFire[iii + 32]; // left
+      _FwCluster[_FWDICN][8] = TCFire[iii + 31]; //top left
     }
+
 
     if (!(_FwCluster[_FWDICN][1] != 0 || _FwCluster[_FWDICN][7] != 0))
       if (!(_FwCluster[_FWDICN][5] != 0 && _FwCluster[_FWDICN][6] != 0)) {
@@ -551,25 +562,38 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
 
     int quad_sec = (iii / 24);
 
-
-    _FwCluster[_FWDICN][0] = TCFire[iii];
-    _FwCluster[_FWDICN][1] = TCFire[iii - 1]; // top
-    _FwCluster[_FWDICN][2] = TCFire[iii - 33]; // right top
-    _FwCluster[_FWDICN][3] = TCFire[iii - 32]; //right
-    _FwCluster[_FWDICN][4] = TCFire[iii - 31]; //right bottom
-    _FwCluster[_FWDICN][5] = TCFire[iii + 1]; //bottom
-    _FwCluster[_FWDICN][6] = 0; //bottom left
-    _FwCluster[_FWDICN][7] = 0; // left
-    _FwCluster[_FWDICN][8] = 0; //top left
     if (iii == 64) {
+      _FwCluster[_FWDICN][0] = TCFire[iii];
       _FwCluster[_FWDICN][1] = TCFire[95]; // top
       _FwCluster[_FWDICN][2] = TCFire[63];// right top
-    }
-    if (iii == 95) {
+      _FwCluster[_FWDICN][3] = TCFire[iii - 32]; //right
+      _FwCluster[_FWDICN][4] = TCFire[iii - 31]; //right bottom
+      _FwCluster[_FWDICN][5] = TCFire[iii + 1]; //bottom
+      _FwCluster[_FWDICN][6] = 0; //bottom left
+      _FwCluster[_FWDICN][7] = 0; // left
+      _FwCluster[_FWDICN][8] = 0; //top left
+    } else if (iii == 95) {
+      _FwCluster[_FWDICN][0] = TCFire[iii];
+      _FwCluster[_FWDICN][1] = TCFire[iii - 1]; // top
+      _FwCluster[_FWDICN][2] = TCFire[iii - 33]; // right top
+      _FwCluster[_FWDICN][3] = TCFire[iii - 32]; //right
       _FwCluster[_FWDICN][4] = TCFire[32]; //right bottom
       _FwCluster[_FWDICN][5] = TCFire[64]; //bottom
-    }
+      _FwCluster[_FWDICN][6] = 0; //bottom left
+      _FwCluster[_FWDICN][7] = 0; // left
+      _FwCluster[_FWDICN][8] = 0; //top left
 
+    } else {
+      _FwCluster[_FWDICN][0] = TCFire[iii];
+      _FwCluster[_FWDICN][1] = TCFire[iii - 1]; // top
+      _FwCluster[_FWDICN][2] = TCFire[iii - 33]; // right top
+      _FwCluster[_FWDICN][3] = TCFire[iii - 32]; //right
+      _FwCluster[_FWDICN][4] = TCFire[iii - 31]; //right bottom
+      _FwCluster[_FWDICN][5] = TCFire[iii + 1]; //bottom
+      _FwCluster[_FWDICN][6] = 0; //bottom left
+      _FwCluster[_FWDICN][7] = 0; // left
+      _FwCluster[_FWDICN][8] = 0; //top left
+    }
 
 
     if (!(_FwCluster[_FWDICN][1] != 0)) {

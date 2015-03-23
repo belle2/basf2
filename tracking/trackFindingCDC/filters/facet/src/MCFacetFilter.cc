@@ -123,9 +123,9 @@ bool MCFacetFilter::isCorrect(const CDCRLWireHitTriple& rlWireHitTriple, int inT
 
 
   if (startRLInfo == mcStartRLInfo and middleRLInfo == mcMiddleRLInfo and endRLInfo == mcEndRLInfo) {
-    //return true;
+    return true;
   } else {
-    return false;
+    //return false;
   }
 
 

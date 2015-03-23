@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import basf2
 
 from trackfindingcdc.run.display import CDCDisplayRun
 
@@ -8,8 +9,14 @@ import logging
 
 
 class CDCDebugDisplayRun(CDCDisplayRun):
-    finder_module = "TrackFinderCDCAutomatonDev"
-    show_all_drawoptions = True  # Also show draw options that are related to the cellular automaton track finder on the command line!
+    finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
+    finder_module.param({
+        "WriteSuperClusters": True,
+        "WriteClusters": True,
+    })
+    show_all_drawoptions = True
+    # Also show draw options that are related to the cellular automaton track finder
+    # on the command line!
 
 
 def main():

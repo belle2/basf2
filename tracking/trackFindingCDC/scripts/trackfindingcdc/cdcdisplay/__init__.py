@@ -69,6 +69,9 @@ class CDCSVGDisplayModule(Module):
         # Switch to draw the CDCHits. Default: active
         self.draw_hits = True  # and False
 
+        # Switch to draw the CDCHits. Default: active
+        self.draw_donotuseflag = True and False
+
         # Switch to draw the interaction point. Default: active
         self.draw_interaction_point = True  # and False
 
@@ -323,6 +326,11 @@ class CDCSVGDisplayModule(Module):
                          'stroke-width': attributemaps.ZeroDriftLengthStrokeWidthMap()}
             plotter.draw_storearray('CDCHits', **styleDict)
 
+        # Draw the CDCHits do not use flag
+        if self.draw_donotuseflag:
+            styleDict = {'stroke': attributemaps.DoNotUseFlagColorMap(), }
+            plotter.draw_storearray('CDCHits', **styleDict)
+
         # Draw mcparticle id
         if self.draw_mcparticle_id:
             styleDict = {'stroke': attributemaps.MCParticleColorMap()}
@@ -501,17 +509,18 @@ class CDCSVGDisplayModule(Module):
         # Mimic axial to axial pair selection
         if self.draw_mcaxialaxialpairs:
             print 'Draw axial to axial segment pairs'
-            segment_storearray = Belle2.PyStoreArray('CDCRecoSegment2Ds')
-            if segment_storearray:
-                print '#Segment', segment_storearray.getEntries()
-                axial_segments = [segment for segment in segment_storearray
+            segment_storevector = Belle2.PyStoreObj('CDCRecoSegment2DVector')
+            if segment_storevector:
+                segments = segment_storevector.obj().unwrap()
+                print '#Segment', segments.size()
+                axial_segments = [segment for segment in segments
                                   if segment.getStereoType() == 0]
 
                 mc_axial_axial_segment_filter = \
                     Belle2.TrackFindingCDC.MCAxialAxialSegmentPairFilter()
                 axial_axial_segment_pairs = \
-                    (Belle2.TrackFindingCDC.CDCAxialAxialSegmentPair(startSegment,
-                                                                     endSegment) for startSegment in axial_segments
+                    (Belle2.TrackFindingCDC.CDCAxialAxialSegmentPair(startSegment, endSegment)
+                     for startSegment in axial_segments
                      for endSegment in axial_segments)
 
                 def is_good_pair(pair):
@@ -532,13 +541,14 @@ class CDCSVGDisplayModule(Module):
 
         if self.draw_mcsegmenttriples:
             print 'Draw axial to axial segment pairs'
-            segment_storearray = Belle2.PyStoreArray('CDCRecoSegment2Ds')
-            if segment_storearray:
-                print '#Segment', segment_storearray.getEntries()
-                axial_segments = [segment for segment in segment_storearray
+            segment_storevector = Belle2.PyStoreObj('CDCRecoSegment2DVector')
+            if segment_storevector:
+                segments = segment_storevector.obj().unwrap()
+                print '#Segment', segments.size()
+                axial_segments = [segment for segment in segments
                                   if segment.getStereoType() == 0]
 
-                stereo_segments = [segment for segment in segment_storearray
+                stereo_segments = [segment for segment in segments
                                    if segment.getStereoType() != 0]
 
                 # Misuse this a bit but still does what we want
@@ -644,13 +654,14 @@ class CDCSVGDisplayModule(Module):
         # Draw the fits to the segments
         if self.draw_segment_trajectories:
             print 'Drawing the fits to the selected RecoHit2DSegments'
-            segment_storearray = Belle2.PyStoreArray('CDCRecoSegment2Ds')
-            if segment_storearray:
-                print '#2D Trajectories', segment_storearray.getEntries(), \
-                    'from segments'
-                iterSegments = iter(segment_storearray)
+
+            segment_storevector = Belle2.PyStoreObj('CDCRecoSegment2DVector')
+            if segment_storevector:
+                segments = segment_storevector.obj().unwrap()
+                print '#2D Trajectories', segments.size(), 'from segments'
+
                 iterTrajectories = (segment.getTrajectory2D() for segment in
-                                    iterSegments)
+                                    segments)
                 plotter.draw_iterable(iterTrajectories)
 
         # Draw the trajectories of the genfit track candidates

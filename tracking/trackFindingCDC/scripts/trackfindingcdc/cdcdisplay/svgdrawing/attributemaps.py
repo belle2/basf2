@@ -15,7 +15,7 @@ from ROOT import genfit
 
 import colorsys
 
-## Standard color map for id types
+# Standard color map for id types
 listColors = [  # 'magenta',
                 # 'gold',
                 # 'yellow',
@@ -33,7 +33,7 @@ listColors = [  # 'magenta',
     'mediumspringgreen',
     'darkgreen',
     'indigo',
-    ]
+]
 
 
 def timeOfFlightToColor(timeOfFlight):
@@ -107,7 +107,7 @@ class CDCHitColorMap:
     Base class for CDCHit to color map functional objects.
     """
 
-    ## Default color to be used
+    # Default color to be used
     bkgHitColor = 'orange'
 
     def __call__(self, iCDCHit, cdcHit):
@@ -131,6 +131,26 @@ class ZeroDriftLengthColorMap(CDCHitColorMap):
 
         wirehit = Belle2.TrackFindingCDC.CDCWireHit(cdcHit)
         if wirehit.getRefDriftLength() == 0.0:
+            return 'red'
+        else:
+            return self.bkgHitColor
+
+
+class DoNotUseFlagColorMap(CDCHitColorMap):
+
+    """
+    CDCHit to color map highlighting the CDCHits that posses the do not use flag.
+    """
+
+    def __call__(self, iCDCHit, cdcHit):
+        """
+        Function call to map the CDCHit id and object to a color.
+        """
+
+        wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
+
+        wirehit = wireHitTopology.getWireHit(cdcHit)
+        if wirehit.getAutomatonCell().hasDoNotUseFlag():
             return 'red'
         else:
             return self.bkgHitColor
@@ -221,7 +241,7 @@ class BackgroundTagColorMap(CDCHitColorMap):
         SimHitBase.bg_SynchRad_LER: 'bg_SynchRad_LER',
         SimHitBase.bg_SynchRad_HER: 'bg_SynchRad_HER',
         SimHitBase.bg_other: 'bg_other',
-        }
+    }
 
     color_by_bkgtag = {
         SimHitBase.bg_none: 'orange',
@@ -240,7 +260,7 @@ class BackgroundTagColorMap(CDCHitColorMap):
         SimHitBase.bg_SynchRad_LER: 'goldenrod',
         SimHitBase.bg_SynchRad_HER: 'darkgoldenrod',
         SimHitBase.bg_other: 'orange',
-        }
+    }
 
     def __call__(self, iCDCHit, cdcHit):
         """
@@ -274,7 +294,7 @@ class BackgroundTagColorMap(CDCHitColorMap):
         bkgname_and_color = sorted(color_by_bkgname.items())
 
         message = 'Background tag color coding is \n%s' % '\n'.join(name
-                + ' -> ' + color for (name, color) in bkgname_and_color)
+                                                                    + ' -> ' + color for (name, color) in bkgname_and_color)
         return message
 
 
@@ -301,7 +321,7 @@ class MCSegmentIdColorMap(CDCHitColorMap):
             lightness = 0.5
 
             (red, green, blue) = colorsys.hls_to_rgb(hue, lightness,
-                    saturation)
+                                                     saturation)
 
             color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
             return color
@@ -358,7 +378,7 @@ class MCParticleColorMap(CDCHitColorMap):
         as new during the event.
         """
 
-        ## Dictionary mapping the MCParticle ids to colors for consistent and contious use of the available colors
+        # Dictionary mapping the MCParticle ids to colors for consistent and contious use of the available colors
         self.color_by_mcparticleId = {-1: self.bkgHitColor}
 
     def __call__(self, iCDCHit, cdcHit):
@@ -395,7 +415,7 @@ class MCPDGCodeColorMap(CDCHitColorMap):
     CDCHit to color map by the assoziated MCParticle::getPDG()
     """
 
-    ## Dictionary to define the color for the most relevant
+    # Dictionary to define the color for the most relevant
     color_by_pdgcode = {
         -999: CDCHitColorMap.bkgHitColor,
         11: 'blue',
@@ -410,9 +430,9 @@ class MCPDGCodeColorMap(CDCHitColorMap):
         -321: 'olive',
         2212: 'red',
         -2212: 'red',
-        }
+    }
 
-    ## Color for the case a particle a pdg code not mentioned in the color_by_pdgcode map
+    # Color for the case a particle a pdg code not mentioned in the color_by_pdgcode map
     missing_pdg_color = 'lime'
 
     def __call__(self, iCDCHit, cdcHit):
@@ -467,7 +487,7 @@ class MCPrimaryColorMap(CDCHitColorMap):
         Constuction method setting up a dictionary to count the hits for each secondary type.
         """
 
-        ## Dictionary keeping track of the number of hits with a specific secondary process type.
+        # Dictionary keeping track of the number of hits with a specific secondary process type.
         self.n_hits_by_secondary_type = {}
 
     def __call__(self, iCDCHit, cdcHit):
@@ -494,7 +514,7 @@ class MCPrimaryColorMap(CDCHitColorMap):
             if isPrimary:
                 return 'blue'
             elif secondaryProcess > 200:
-                                          # decay in flight
+                # decay in flight
                 return 'green'
             else:
                 return 'red'
@@ -522,7 +542,7 @@ class CDCSegmentColorMap:
     Base class for Segments to color map functional objects.
     """
 
-    ## Default color to be used
+    # Default color to be used
     bkgSegmentColor = 'orange'
 
     def __call__(self, iSegment, segment):
@@ -677,5 +697,3 @@ class SegmentLastNPassedSuperLayersColorMap(CDCSegmentColorMap):
             return self.bkgSegmentColor
 
         return inTrackIdToColor(lastNPassedSuperLayers)
-
-

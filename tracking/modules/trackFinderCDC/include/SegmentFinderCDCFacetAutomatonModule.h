@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 #include <tracking/trackFindingCDC/creators/FacetCreator.h>
-#include <tracking/trackFindingCDC/filters/wirehit_wirehit/WireHitNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/wirehit_wirehit/WholeWireHitNeighborChooser.h>
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet_facet/SimpleFacetNeighborChooser.h>
 
@@ -53,6 +53,8 @@ namespace Belle2 {
         SegmentFinderCDCBaseModule(segmentOrientation),
         m_ptrFacetFilter(new FacetFilter()),
         m_ptrFacetNeighborChooser(new FacetNeighborChooser()),
+        m_param_writeSuperClusters(false),
+        m_param_superClustersStoreObjName("CDCWireHitSuperClusterVector"),
         m_param_writeClusters(false),
         m_param_clustersStoreObjName("CDCWireHitClusterVector"),
         m_param_writeFacets(false),
@@ -62,6 +64,16 @@ namespace Belle2 {
       {
 
         setDescription("Generates segments from hits using a cellular automaton build from hit triples (facets).");
+
+        addParam("WriteSuperClusters",
+                 m_param_writeSuperClusters,
+                 "Switch if superclusters shall be written to the DataStore",
+                 false);
+
+        addParam("SuperClustersStoreObjName",
+                 m_param_clustersStoreObjName,
+                 "Name of the output StoreObjPtr of the super clusters generated within this module.",
+                 std::string("CDCWireHitSuperClusterVector"));
 
         addParam("WriteClusters",
                  m_param_writeClusters,
@@ -108,6 +120,10 @@ namespace Belle2 {
       virtual void initialize() override
       {
         SegmentFinderCDCBaseModule::initialize();
+
+        if (m_param_writeSuperClusters) {
+          StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >::registerTransient(m_param_superClustersStoreObjName);
+        }
 
         if (m_param_writeClusters) {
           StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >::registerTransient(m_param_clustersStoreObjName);
@@ -184,6 +200,12 @@ namespace Belle2 {
       FacetNeighborChooser* m_ptrFacetNeighborChooser;
 
     private:
+      /// Parameter: Switch if superclusters shall be written to the DataStore
+      bool m_param_writeSuperClusters;
+
+      /// Parameter: Name of the output StoreObjPtr of the superclusters generated within this module.
+      std::string m_param_superClustersStoreObjName;
+
       /// Parameter: Switch if clusters shall be written to the DataStore
       bool m_param_writeClusters;
 
@@ -217,8 +239,14 @@ namespace Belle2 {
       /// Memory for the facet paths generated from the graph.
       std::vector< std::vector<const CDCRecoFacet*> > m_facetPaths;
 
-      /// Memory for the hit clusters in the current superlayer
-      std::vector<CDCWireHitCluster> m_clustersInSuperLayer;
+      /** Memory for the hit superclusters in the current superlayer
+       *  Superclusters generated from the secondary neighborhood
+       *  of hits and allow for hit inefficiencies along the trajectory.
+       */
+      std::vector<CDCWireHitCluster> m_superClustersInSuperLayer;
+
+      /// Memory for the hit clusters in the current supercluster
+      std::vector<CDCWireHitCluster> m_clustersInSuperCluster;
 
       /// Instance of the hit cluster generator
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
@@ -230,8 +258,11 @@ namespace Belle2 {
       /// Neighborhood type for wire hits
       typedef WeightedNeighborhood<const CDCWireHit> CDCWireHitNeighborhood;
 
-      /// Memory for the wire hit neighborhood.
+      /// Memory for the wire hit neighborhood in a super cluster.
       CDCWireHitNeighborhood m_wirehitNeighborhood;
+
+      /// Memory for the secondary wire hit neighborhood in a super layer.
+      CDCWireHitNeighborhood m_secondaryWirehitNeighborhood;
 
       //cellular automaton
       /// Instance of the cellular automaton path finder
@@ -243,6 +274,14 @@ namespace Belle2 {
     template<class FacetFilter, class FacetNeighborChooser>
     void SegmentFinderCDCFacetAutomatonImplModule<FacetFilter, FacetNeighborChooser>::generate(std::vector<CDCRecoSegment2D>& segments)
     {
+      /// Attain super cluster vector on the DataStore if needed.
+      std::vector<CDCWireHitCluster>* ptrSuperClusters = nullptr;
+      if (m_param_writeSuperClusters) {
+        StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedSuperClusters(m_param_superClustersStoreObjName);
+        storedSuperClusters.create();
+        std::vector<CDCWireHitCluster>& superClusters = *storedSuperClusters;
+        ptrSuperClusters = &superClusters;
+      }
 
       /// Attain cluster vector on the DataStore if needed.
       std::vector<CDCWireHitCluster>* ptrClusters = nullptr;
@@ -277,104 +316,122 @@ namespace Belle2 {
       for (const CDCWireSuperLayer& wireSuperLayer : wireTopology.getWireSuperLayers()) {
 
         const CDCWireHitTopology::CDCWireHitRange wireHitsInSuperlayer = wireHitTopology.getWireHits(wireSuperLayer);
-        //create the neighborhood
-        B2DEBUG(100, "Creating the CDCWireHit neighborhood");
-        m_wirehitNeighborhood.clear();
 
-        B2DEBUG(100, "  Append clockwise neighborhood");
-        m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CW_NEIGHBOR>>(wireHitsInSuperlayer);
+        //create the secondary neighborhood of wire hits
+        B2DEBUG(100, "Creating the secondary CDCWireHit neighborhood");
+        m_secondaryWirehitNeighborhood.clear();
 
-        B2DEBUG(100, "  Append clockwise out neighborhood");
-        m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CW_OUT_NEIGHBOR>>(wireHitsInSuperlayer);
+        const bool withSecondaryNeighborhood = true;
+        m_secondaryWirehitNeighborhood.appendUsing<WholeWireHitNeighborChooser<withSecondaryNeighborhood>>(wireHitsInSuperlayer);
+        assert(m_secondaryWirehitNeighborhood.isSymmetric());
 
-        B2DEBUG(100, "  Append clockwise in neighborhood");
-        m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CW_IN_NEIGHBOR>>(wireHitsInSuperlayer);
+        B2DEBUG(100, "  seconaryWirehitNeighborhood.size() = " << m_secondaryWirehitNeighborhood.size());
 
-        B2DEBUG(100, "  Append counter clockwise neighborhood");
-        m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CCW_NEIGHBOR>>(wireHitsInSuperlayer);
+        // create the super clusters
+        B2DEBUG(100, "Creating the CDCWireHit super clusters");
+        m_superClustersInSuperLayer.clear();
+        m_wirehitClusterizer.create(wireHitsInSuperlayer, m_secondaryWirehitNeighborhood, m_superClustersInSuperLayer);
+        B2DEBUG(100, "Created " << m_superClustersInSuperLayer.size() << " CDCWireHit superclusters in superlayer");
 
-        B2DEBUG(100, "  Append counter clockwise out neighborhood");
-        m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CCW_OUT_NEIGHBOR>>(wireHitsInSuperlayer);
+        for (CDCWireHitCluster& superCluster : m_superClustersInSuperLayer) {
+          std::sort(std::begin(superCluster), std::end(superCluster));
+          assert(std::is_sorted(std::begin(superCluster), std::end(superCluster)));
 
-        B2DEBUG(100, "  Append counter clockwise in neighborhood");
-        m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CCW_IN_NEIGHBOR>>(wireHitsInSuperlayer);
+          // create the neighborhood
+          B2DEBUG(100, "Creating the CDCWireHit neighborhood");
+          m_wirehitNeighborhood.clear();
 
-        assert(m_wirehitNeighborhood.isSymmetric());
+          const bool primaryNeighborhoodOnly = false;
+          m_wirehitNeighborhood.appendUsing<WholeWireHitNeighborChooser<primaryNeighborhoodOnly>>(superCluster);
+          assert(m_wirehitNeighborhood.isSymmetric());
+          B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
 
-        B2DEBUG(100, "  allWirehitNeighbors.size() = " << m_wirehitNeighborhood.size());
+          //create the clusters
+          B2DEBUG(100, "Creating the CDCWireHit clusters");
+          m_clustersInSuperCluster.clear();
+          m_wirehitClusterizer.createFromPointers(superCluster, m_wirehitNeighborhood, m_clustersInSuperCluster);
+          B2DEBUG(100, "Created " << m_clustersInSuperCluster.size() << " CDCWireHit clusters with super cluster");
 
-        //create the clusters
-        B2DEBUG(100, "Creating the CDCWireHit clusters");
-        m_clustersInSuperLayer.clear();
-        m_wirehitClusterizer.create(wireHitsInSuperlayer, m_wirehitNeighborhood, m_clustersInSuperLayer);
-        B2DEBUG(100, "Created " << m_clustersInSuperLayer.size() << " CDCWireHit clusters in superlayer");
+          for (CDCWireHitCluster& cluster : m_clustersInSuperCluster) {
+            std::sort(std::begin(cluster), std::end(cluster));
+            assert(std::is_sorted(std::begin(cluster), std::end(cluster)));
 
-        for (CDCWireHitCluster& cluster : m_clustersInSuperLayer) {
-          B2DEBUG(100, "Cluster size: " << cluster.size());
-          B2DEBUG(100, "Wire hit neighborhood size: " << m_wirehitNeighborhood.size());
+            B2DEBUG(100, "Cluster size: " << cluster.size());
+            B2DEBUG(100, "Wire hit neighborhood size: " << m_wirehitNeighborhood.size());
 
-          // Create the facets
-          B2DEBUG(100, "Creating the CDCRecoFacets");
-          m_facets.clear();
-          m_facetCreator.createFacets(*m_ptrFacetFilter, cluster, m_wirehitNeighborhood, m_facets);
-          B2DEBUG(100, "  Created " << m_facets.size()  << " CDCRecoFacets");
+            // Create the facets
+            B2DEBUG(100, "Creating the CDCRecoFacets");
+            m_facets.clear();
+            m_facetCreator.createFacets(*m_ptrFacetFilter, cluster, m_wirehitNeighborhood, m_facets);
+            B2DEBUG(100, "  Created " << m_facets.size()  << " CDCRecoFacets");
 
-          // Copy facets to the DataStore
-          if (m_param_writeFacets and ptrFacets) {
-            std::vector<CDCRecoFacet>& facets = *ptrFacets;
-            for (const CDCRecoFacet& facet : m_facets) {
-              facets.push_back(facet);
+            // Copy facets to the DataStore
+            if (m_param_writeFacets and ptrFacets) {
+              std::vector<CDCRecoFacet>& facets = *ptrFacets;
+              for (const CDCRecoFacet& facet : m_facets) {
+                facets.push_back(facet);
+              }
             }
-          }
 
-          // Create the facet neighborhood
-          B2DEBUG(100, "Creating the CDCRecoFacet neighborhood");
-          m_facetsNeighborhood.clear();
-          m_facetsNeighborhood.createUsing(*m_ptrFacetNeighborChooser, m_facets);
-          B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
+            // Create the facet neighborhood
+            B2DEBUG(100, "Creating the CDCRecoFacet neighborhood");
+            m_facetsNeighborhood.clear();
+            m_facetsNeighborhood.createUsing(*m_ptrFacetNeighborChooser, m_facets);
+            B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
 
-          if (m_facetsNeighborhood.size() == 0) {
-            continue; //No neighborhood generated. Next cluster.
-          }
+            if (m_facetsNeighborhood.size() == 0) {
+              continue; //No neighborhood generated. Next cluster.
+            }
 
-          // Apply the cellular automaton in a multipass manner
-          m_facetPaths.clear();
-          m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetPaths);
+            // Apply the cellular automaton in a multipass manner
+            m_facetPaths.clear();
+            m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetPaths);
 
-          segments.reserve(segments.size() + m_facetPaths.size());
-          for (const std::vector<const CDCRecoFacet*>& facetPath : m_facetPaths) {
-            segments.push_back(CDCRecoSegment2D::condense(facetPath));
-          }
-
-          // Copy tangent segments to the DataStore
-          if (m_param_writeTangentSegments and ptrTangentSegments) {
-            std::vector<CDCRecoTangentSegment>& tangentSegments = *ptrTangentSegments;
+            segments.reserve(segments.size() + m_facetPaths.size());
             for (const std::vector<const CDCRecoFacet*>& facetPath : m_facetPaths) {
-              tangentSegments.push_back(CDCRecoTangentSegment::condense(facetPath));
+              segments.push_back(CDCRecoSegment2D::condense(facetPath));
             }
+
+            // Copy tangent segments to the DataStore
+            if (m_param_writeTangentSegments and ptrTangentSegments) {
+              std::vector<CDCRecoTangentSegment>& tangentSegments = *ptrTangentSegments;
+              for (const std::vector<const CDCRecoFacet*>& facetPath : m_facetPaths) {
+                tangentSegments.push_back(CDCRecoTangentSegment::condense(facetPath));
+              }
+            }
+
+            m_facetPaths.clear();
+            m_facetsNeighborhood.clear();
+            m_facets.clear();
+
+            B2DEBUG(100, "  Created " << segments.size()  << " selected CDCRecoSegment2Ds");
+          } // end for cluster loop
+
+          // Move clusters to the DataStore
+          if (m_param_writeClusters and ptrClusters) {
+            std::vector<CDCWireHitCluster>& clusters = *ptrClusters;
+            clusters.insert(clusters.end(),
+                            std::make_move_iterator(m_clustersInSuperCluster.begin()),
+                            std::make_move_iterator(m_clustersInSuperCluster.end()));
           }
 
-          m_facetPaths.clear();
-          m_facetsNeighborhood.clear();
-          m_facets.clear();
+          m_clustersInSuperCluster.clear();
+          m_wirehitNeighborhood.clear();
 
           //TODO: combine matching segments here
 
-          B2DEBUG(100, "  Created " << segments.size()  << " selected CDCRecoSegment2Ds");
-        } // end for cluster loop
+        } // end super cluster loop
 
         // Move clusters to the DataStore
-        if (m_param_writeClusters and ptrClusters) {
-          std::vector<CDCWireHitCluster>& clusters = *ptrClusters;
-          clusters.insert(clusters.end(),
-                          std::make_move_iterator(m_clustersInSuperLayer.begin()),
-                          std::make_move_iterator(m_clustersInSuperLayer.end()));
+        if (m_param_writeSuperClusters and ptrSuperClusters) {
+          std::vector<CDCWireHitCluster>& superClusters = *ptrSuperClusters;
+          superClusters.insert(superClusters.end(),
+                               std::make_move_iterator(m_superClustersInSuperLayer.begin()),
+                               std::make_move_iterator(m_superClustersInSuperLayer.end()));
         }
 
-        m_clustersInSuperLayer.clear();
-        m_wirehitNeighborhood.clear();
-
-        //TODO: or combine matching segments here
+        m_superClustersInSuperLayer.clear();
+        m_secondaryWirehitNeighborhood.clear();
 
       } // end for superlayer loop
 

@@ -46,6 +46,13 @@ REG_MODULE(ECLDataAnalysis)
 
 ECLDataAnalysisModule::ECLDataAnalysisModule()
   : Module(),
+    m_rootFilePtr(0),
+    m_writeToRoot(1),
+    m_doTracking(1),
+    m_tree(0),
+    m_iExperiment(0),
+    m_iRun(0),
+    m_iEvent(0),
     m_eclDigitMultip(0),
     m_eclDigitIdx(0),
     m_eclDigitToMc(0),

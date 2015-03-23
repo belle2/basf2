@@ -7,6 +7,7 @@ import basf2
 import simulation
 
 import tracking.utilities as utilities
+import tracking.metamodules as metamodules
 
 import logging
 
@@ -161,9 +162,13 @@ class MinimalRun(object):
         self.configure_from_commandline()
         self.execute()
 
-    @staticmethod
-    def get_basf2_module(module_or_module_name):
-        if isinstance(module_or_module_name, str):
+    @classmethod
+    def get_basf2_module(cls, module_or_module_name):
+        if isinstance(module_or_module_name, list):
+            modules = module_or_module_name
+            modules = [cls.get_basf2_module(m) for m in modules]
+            return metamodules.PathModule(modules=modules)
+        elif isinstance(module_or_module_name, str):
             module_name = module_or_module_name
             module = basf2.register_module(module_name)
             return module
@@ -176,9 +181,11 @@ class MinimalRun(object):
             raise ValueError(message_template % (module_or_module_name,
                                                  type(module_or_module_name)))
 
-    @staticmethod
-    def get_basf2_module_name(module_or_module_name):
-        if isinstance(module_or_module_name, str):
+    @classmethod
+    def get_basf2_module_name(cls, module_or_module_name):
+        if isinstance(module_or_module_name, list):
+            return "PathModule"
+        elif isinstance(module_or_module_name, str):
             module_name = module_or_module_name
             return module_name
         elif isinstance(module_or_module_name, basf2.Module):

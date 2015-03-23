@@ -128,6 +128,8 @@ ECLCrystalData::ECLCrystalData(int cid)
 
 ECLCrystalData::ECLCrystalData(int tid, int pid)
 {
+  m_phi_idx = -1;
+  m_theta_idx = -1;
   m_theta_ID = tid;
   m_phi_ID   = pid;
   m_cell_ID  = GetCellID(tid, pid);

@@ -25,6 +25,8 @@
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
+#include <assert.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -81,7 +83,8 @@ namespace Belle2 {
 
 
       /// Total ordering relation based on the wire and the hit id.
-      bool operator<(const CDCWireHit& other) const {
+      bool operator<(const CDCWireHit& other) const
+      {
         return (getWire() < other.getWire() or (
                   getWire() == other.getWire() and getStoreIHit() < other.getStoreIHit()));
       }
@@ -93,6 +96,14 @@ namespace Belle2 {
       /// Defines wires and wire hits to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCWire& wire, const CDCWireHit& wireHit)
       { return wire < wireHit.getWire(); }
+
+      /// Defines wires and wire hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWireHit* wireHit, const CDCWire& wire)
+      { assert(wireHit); return  wireHit->getWire() < wire; }
+
+      /// Defines wires and wire hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWire& wire, const CDCWireHit* wireHit)
+      { assert(wireHit); return wire < wireHit->getWire(); }
 
       /// Defines wire hits and raw hits to be coaligned.
       friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit)
@@ -150,7 +161,8 @@ namespace Belle2 {
       { return trajectory2D.calcPerpS(getRefPos2D()); }
 
       /// Reconstuct the wire reference position onto the given trajectory
-      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const {
+      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      {
         StereoType stereoType = getStereoType();
         if (stereoType == AXIAL) {
           return trajectory2D.getClosest(getRefPos2D());
@@ -236,7 +248,8 @@ namespace Belle2 {
       { return getRecoPos2D(trajectory2D); }
 
       /// Calculates the squared distance of the wire hit to a circle as see from the transvers plane
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const {
+      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
+      {
         FloatType distance = trajectory2D.getDist2D(getRefPos2D());
         distance = distance > 0 ? distance - getRefDriftLength() : distance + getRefDriftLength();
         return distance * distance;
@@ -244,7 +257,8 @@ namespace Belle2 {
       /**@}*/
 
       /// Sting output operator for wire hit objects to help debugging
-      friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit) {
+      friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit)
+      {
         return output << "CDCWireHit(" << wirehit.getWire() << ",dl=" << wirehit.getRefDriftLength() << ")";
       }
 

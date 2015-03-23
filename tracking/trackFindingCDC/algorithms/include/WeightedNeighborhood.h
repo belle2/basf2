@@ -10,12 +10,16 @@
 #ifndef WEIGHTEDNEIGHBORHOOD_H
 #define WEIGHTEDNEIGHBORHOOD_H
 
-#include <iostream>
-#include <map>
-
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include "NeighborWeight.h"
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <utility>
+
+#include <assert.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -28,15 +32,14 @@ namespace Belle2 {
      *  retrival works solely by the memory address of the items. So you have to give \n
      *  the \a same objects for retrival of neighbors and not just one comparing equal \n
      *  to it. Internally the neighbor relations are sorted by their pointer address first and \n
-     *  by the weight second, but you should not rely on that to heavily since the neighborhood \n
-     *  might get reworked to use an unordered_multimap instead of a multimap in c++11. */
+     *  by the weight second.*/
     template<class Item>
     class WeightedNeighborhood {
 
     private:
 
       /// Structure keeping a pointer to the item and the weight
-      /** Structure that is used as key for the multimap that stores the neighbor relations
+      /** Structure that is used as key of the neighbor relations
        *  It keeps a pointer to the item to be stored and uses the pointer address to sort for.
        *  Secondly it also stores the weight for sorting, so that the neighbors to one item are
        *  sorted with increasing weights */
@@ -66,8 +69,8 @@ namespace Belle2 {
 
 
     private:
-      /// Multimap that stores the neighborhood relations
-      typedef std::multimap<WeightedItemPtr, const Item*> Container;
+      /// Container type that stores the neighborhood relations
+      typedef std::vector<std::pair<WeightedItemPtr, const Item*>> Container;
 
 
     public:
@@ -95,14 +98,14 @@ namespace Belle2 {
 
 
     private:
-      /// Iterator type of the multimap to be wrapped by a more expressive iterator
+      /// Iterator type of the container to be wrapped by a more expressive iterator.
       typedef typename Container::const_iterator container_const_iterator;
 
     public:
 
       /// Expressive iterator type of the neighborhood relations
       /** The iterator type of relations in this neighborhood. It inherits for \n
-       *  the underlying multimap::iterator and adds some more expressive names \n
+       *  the underlying container iterator and adds some more expressive names \n
        *  for the value parts in it */
       class iterator : public container_const_iterator {
       public:
@@ -145,8 +148,18 @@ namespace Belle2 {
       ~WeightedNeighborhood() {;}
 
     private:
+      /// Operator to compare key types WeightedItemPtr to the relations in the vector for lookup.
+      friend bool operator<(const WeightedItemPtr& weightedItemPtr,
+                            const WeightedRelation& weightedRelation)
+      {  return weightedItemPtr < weightedRelation.first; }
 
-      Container m_neighbors; ///< Memory of the multimap storing the neighborhood relations.
+      /// Operator to compare key types WeightedItemPtr to the relations in the vector for lookup.
+      friend bool operator<(const WeightedRelation& weightedRelation,
+                            const WeightedItemPtr& weightedItemPtr)
+      {  return weightedRelation.first < weightedItemPtr; }
+
+    private:
+      Container m_neighbors; ///< Memory of the neighborhood relations.
 
     public:
 
@@ -158,33 +171,36 @@ namespace Belle2 {
 
       /// Inserts a new relation
       /** Inserts a new relation. The item and neighbor are given by pointer. \n
-       *  Copys of the pointers are stored in the underlying multimap. \n
+       *  Copys of the pointers are stored in the underlying container. \n
        *  Additionally a weight can be given. If omited the weight defaults to one. \n
        */
       inline void insert(const Item* itemPtr,
                          const Item* neighborPtr,
-                         const NeighborWeight& weight = 1) {
-        if (not isNotANeighbor(weight)) {
-          m_neighbors.insert(WeightedRelation(WeightedItemPtr(itemPtr, weight) , neighborPtr));
-        }
+                         const NeighborWeight& weight = 1)
+      {
+        insert(itemPtr, weight, neighborPtr);
       }
 
       /// Inserts a new relation by pointers
       /** Inserts a new relation. The item and neighbor are given by pointer. \n
-       *  Copys of the pointers are stored in the underlying multimap. \n
+       *  Copys of the pointers are stored in the underlying container. \n
        *  Additionally a weight must be given in the middle.
        */
       inline void insert(const Item* itemPtr,
                          const NeighborWeight& weight,
-                         const Item* neighborPtr) {
+                         const Item* neighborPtr)
+      {
         if (not isNotANeighbor(weight)) {
-          m_neighbors.insert(WeightedRelation(WeightedItemPtr(itemPtr, weight) , neighborPtr));
+          WeightedRelation newRelation(WeightedItemPtr(itemPtr, weight), neighborPtr);
+          auto itInsertAt = std::lower_bound(std::begin(m_neighbors), std::end(m_neighbors), newRelation);
+          m_neighbors.insert(itInsertAt, newRelation);
         }
+        //assert(std::is_sorted(std::begin(m_neighbors), std::end(m_neighbors)));
       }
 
 
       /** @name Retrival of neigbors
-       *  Important since the multimap stores pointers the _same_ object address that have been \n
+       *  Important: Since the underlying container stores pointers the _same_ object address that have been \n
        *  used to store the items have to be used for the retrival.
        *  This should not be a problem since the memory holding the items should still be available. \n
        *  If the memory was already freed the pointers are rendered invalid anyways and now valid object \n
@@ -200,8 +216,9 @@ namespace Belle2 {
       /** If the item given by pointer has neighbors in the neighborhood return \n
        *  an iterator pointing to the one with the smallest weight. \n
        *  If their are no neighbors to the item given return the end() of the neighborhood. */
-      iterator getLightestNeighbor(const Item* itemPtr) const {
-        iterator lowerBound = m_neighbors.lower_bound(WeightedItemPtr(itemPtr, LOWEST_WEIGHT));
+      iterator getLightestNeighbor(const Item* itemPtr) const
+      {
+        iterator lowerBound = std::lower_bound(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, LOWEST_WEIGHT));
         return lowerBound.getItem() == itemPtr ? lowerBound : m_neighbors.end();
 
       }
@@ -210,10 +227,9 @@ namespace Belle2 {
       /** If the item given by pointer has neighbors in the neighborhood return \n
        *  an iterator pointing to the one with the highest weight. \n
        *  If their are no neighbors to the item given return the end() of the neighborhood. */
-      iterator getHeaviestNeighbor(const Item* itemPtr) const {
-
-        iterator upperBound = m_neighbors.upper_bound(WeightedItemPtr(itemPtr, HIGHEST_WEIGHT));
-
+      iterator getHeaviestNeighbor(const Item* itemPtr) const
+      {
+        iterator upperBound = std::upper_bound(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, HIGHEST_WEIGHT));
         if (upperBound == m_neighbors.begin()) return m_neighbors.end();
         --upperBound;
         return upperBound.getItem() == itemPtr ? upperBound : m_neighbors.end();
@@ -229,14 +245,15 @@ namespace Belle2 {
        *  The range is sorted internally by the weight of the neighbor from smallest to biggest. \n
        *  If there are no neighbor an empty range will be returned.
        *  @return a pair of iterators for the range of neighbors */
-      range equal_range(const Item* itemPtr) const {
-        iterator lowerBound(m_neighbors.lower_bound(WeightedItemPtr(itemPtr, LOWEST_WEIGHT)));
-        iterator upperBound(m_neighbors.upper_bound(WeightedItemPtr(itemPtr, HIGHEST_WEIGHT)));
+      range equal_range(const Item* itemPtr) const
+      {
+        iterator lowerBound = std::lower_bound(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, LOWEST_WEIGHT));
+        iterator upperBound = std::upper_bound(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, HIGHEST_WEIGHT));
         return range(lowerBound, upperBound);
       }
 
       range equal_range(const Item* itemPtr, const NeighborWeight& weight) const
-      { return range(m_neighbors.equal_range(WeightedItemPtr(itemPtr, weight))); }
+      { return range(std::equal_range(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, weight))); }
       /**@}*/
 
       /// Returns the begin of all neighborhood relations
@@ -258,8 +275,9 @@ namespace Belle2 {
       /// Checks if the two given elements are registered as neighbors with the given weight.
       bool areNeighborsWithWeight(const Item* itemPtr,
                                   const NeighborWeight& weight,
-                                  const Item* neighborPtr) const {
-        for (const WeightedRelation & relation : equal_range(itemPtr, weight)) {
+                                  const Item* neighborPtr) const
+      {
+        for (const WeightedRelation& relation : equal_range(itemPtr, weight)) {
           if (getNeighbor(relation) == neighborPtr) {
             return true;
           }
@@ -268,8 +286,9 @@ namespace Belle2 {
       }
 
       /// Checks if the two given elements are registered as neighbors with any weight.
-      bool areNeighbors(const Item* itemPtr, const Item* neighborPtr) const {
-        for (const WeightedRelation & relation : equal_range(itemPtr)) {
+      bool areNeighbors(const Item* itemPtr, const Item* neighborPtr) const
+      {
+        for (const WeightedRelation& relation : equal_range(itemPtr)) {
           if (getNeighbor(relation) == neighborPtr) {
             return true;
           }
@@ -280,9 +299,10 @@ namespace Belle2 {
       /// Checks for the symmetry of the neighborhood
       /** Explicitly checks for each neighborhood relation, if their is an inverse relation \n
        *  with the same weight. Returns true if all such inverse relations exist. */
-      bool isSymmetric() const {
+      bool isSymmetric() const
+      {
         bool result = true;
-        for (const WeightedRelation & relation : *this) {
+        for (const WeightedRelation& relation : *this) {
           const Item* itemPtr = getItem(relation);
           const NeighborWeight& weight = getWeight(relation);
           const Item* neighborPtr = getNeighbor(relation);
@@ -322,50 +342,63 @@ namespace Belle2 {
       /**@{*/
       /// Clears the neighborhood and creates relations between elements in the given range using an instance of the NeighborChooser given as first template argument.
       template<class NeighborChooser, class ItemRange>
-      void createUsing(const ItemRange& itemRange) {
+      void createUsing(const ItemRange& itemRange)
+      {
         clear();
         appendUsing<NeighborChooser>(itemRange);
       }
 
       /// Clears the neighborhood and creates relations between elements in the given range using the NeighborChooser given as first function argument.
       template<class NeighborChooser, class ItemRange>
-      void createUsing(NeighborChooser& chooser, const ItemRange& itemRange) {
+      void createUsing(NeighborChooser& chooser, const ItemRange& itemRange)
+      {
         clear();
         appendUsing(chooser, itemRange);
       }
 
       /// Appends relations between elements in the given range using an instance of the NeighborChooser given as first template argument to the existing neighborhood.
       template<class NeighborChooser, class ItemRange>
-      void appendUsing(const ItemRange& itemRange) {
+      void appendUsing(const ItemRange& itemRange)
+      {
         NeighborChooser chooser;
         appendUsing(chooser, itemRange);
       }
 
       /// Appends relations between elements in the given range using the NeighborChooser given as first function argument to the existing neighborhood.
       template<class NeighborChooser, class ItemRange>
-      void appendUsing(NeighborChooser& chooser, const ItemRange& itemRange) {
+      void appendUsing(NeighborChooser& chooser, const ItemRange& itemRange)
+      {
         //forget everything from former creations
         chooser.clear();
-        for (const Item & item : itemRange) {
-          for (const Item & possibleNeighbor : chooser.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
+        for (const auto& item : itemRange) {
+          for (const auto& possibleNeighbor : chooser.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
 
             NeighborWeight weight = chooser.isGoodNeighbor(item, possibleNeighbor);
 
             if (not isNotANeighbor(weight)) {
               // The neighborhood takes references and keeps them
-              insert(item, possibleNeighbor, weight);
+
+              // Make a push_back here and sort the whole vector afterwards
+              m_neighbors.push_back(WeightedRelation(WeightedItemPtr(item, weight), possibleNeighbor));
+              //insert(item, possibleNeighbor, weight);
             }
 
           } //end for possibleNeighbor
 
-        }
+        } // end for item
+
+        // sort everything afterwards
+        std::sort(std::begin(m_neighbors), std::end(m_neighbors));
+        //assert(std::is_sorted(std::begin(m_neighbors), std::end(m_neighbors)));
+
       }
       /**@}*/
 
 
       /// Output operator to help debugging
-      friend std::ostream& operator<<(std::ostream& output, const WeightedNeighborhood& neighborhood) {
-        for (const WeightedRelation & relation : neighborhood) {
+      friend std::ostream& operator<<(std::ostream& output, const WeightedNeighborhood& neighborhood)
+      {
+        for (const WeightedRelation& relation : neighborhood) {
           const Item* ptrItem = getItem(relation);
           const NeighborWeight weight = getWeight(relation);
           const Item* ptrNeighbor = getNeighbor(relation);

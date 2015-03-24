@@ -77,12 +77,13 @@ void BackgroundHitFinderModule::event()
   // Generate the clusters
   generateClustersWithAutomaton();
   StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedClusters(m_param_clustersStoreObjName);
-  storedClusters.create();
-  *storedClusters = m_clusters;
 
   // Use TMVA to differ between good and bad hit clusters and
   // save the good hit clusters in the store array
   deleteBadSegmentsUsingTMVAMethod();
+
+  storedClusters.create();
+  *storedClusters = m_clusters;
 }
 
 void BackgroundHitFinderModule::prepareSuperLayerCenterArray(const CDCWireTopology& wireTopology)
@@ -101,11 +102,15 @@ void BackgroundHitFinderModule::deleteBadSegmentsUsingTMVAMethod()
   StoreArray<CDCHit> goodCDCHits(m_param_goodCDCHitsStoreObjName);
   goodCDCHits.create();
 
+  std::vector<CDCWireHitCluster> goodCDCClusters;
+  goodCDCClusters.reserve(m_clusters.size());
+
   unsigned int clusterNumber = 0;
   for (CDCWireHitCluster& cluster : m_clusters) {
     setVariables(tmvaVariables, cluster);
     double tmvaOutput = m_expert.useWeight();
     if (tmvaOutput > m_param_tmvaCut) {
+      goodCDCClusters.push_back(cluster);
       for (const CDCWireHit*  wireHit : cluster) {
         const CDCHit* cdcHit = wireHit->getHit();
         CDCHit* newAddedCDCHit = goodCDCHits.appendNew(*cdcHit);
@@ -114,6 +119,11 @@ void BackgroundHitFinderModule::deleteBadSegmentsUsingTMVAMethod()
     }
     clusterNumber++;
   }
+
+  m_clusters.clear();
+  m_clusters.reserve(goodCDCClusters.size());
+
+  m_clusters.insert(m_clusters.end(), goodCDCClusters.begin(), goodCDCClusters.end());
 }
 
 void BackgroundHitFinderModule::setVariables(struct TMVAVariables& tmvaVariables, const CDCWireHitCluster& cluster)

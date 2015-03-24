@@ -37,7 +37,7 @@ CONTACT = "ucddn@student.kit.edu"
 
 class AddValidationMethod:
 
-    def create_validation(self, main_path, track_candidates_store_array_name, output_file_name):
+    def create_matcher_module(self, track_candidates_store_array_name):
         mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
         mc_track_matcher_module.param({
             'UseCDCHits': True,
@@ -48,6 +48,9 @@ class AddValidationMethod:
             'PRGFTrackCandsColName': track_candidates_store_array_name,
         })
 
+        return mc_track_matcher_module
+
+    def create_validation(self, main_path, track_candidates_store_array_name, output_file_name):
         validation_module = SeparatedTrackingValidationModule(
             name="",
             contact="",
@@ -55,7 +58,7 @@ class AddValidationMethod:
             trackCandidatesColumnName=track_candidates_store_array_name,
             expert_level=2)
 
-        main_path.add_module(mc_track_matcher_module)
+        main_path.add_module(self.create_matcher_module(track_candidates_store_array_name))
         main_path.add_module(validation_module)
 
 
@@ -174,6 +177,8 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
 class CombinerTrackFinderRun(LegendreTrackFinderRun):
 
     local_track_cands_store_array_name = "LocalTrackCands"
+    use_segment_quality_check = True
+    do_combining = True
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
@@ -185,7 +190,8 @@ class CombinerTrackFinderRun(LegendreTrackFinderRun):
             "GFTrackCandsStoreArrayName": self.local_track_cands_store_array_name,
             "UseOnlyCDCHitsRelatedFrom": self.not_assigned_cdc_hits_store_array_name,
             "SegmentsStoreObjName": "RecoSegments",
-            "CreateGFTrackCands": True
+            "CreateGFTrackCands": True,
+            "FitSegments": True,
         })
 
         segment_quality_check = basf2.register_module("SegmentQualityCheck")
@@ -208,6 +214,26 @@ class CombinerTrackFinderRun(LegendreTrackFinderRun):
                                                   "UseMCInformation": False
                                                   })
 
+        mc_track_matcher_module_local = basf2.register_module('MCTrackMatcher')
+        mc_track_matcher_module_local.param({
+            'UseCDCHits': True,
+            'UseSVDHits': False,
+            'UsePXDHits': False,
+            'RelateClonesToMCParticles': True,
+            'MCGFTrackCandsColName': "MCTrackCands",
+            'PRGFTrackCandsColName': self.legendre_track_cands_store_array_name,
+        })
+
+        mc_track_matcher_module_legendre = basf2.register_module('MCTrackMatcher')
+        mc_track_matcher_module_legendre.param({
+            'UseCDCHits': True,
+            'UseSVDHits': False,
+            'UsePXDHits': False,
+            'RelateClonesToMCParticles': True,
+            'MCGFTrackCandsColName': "MCTrackCands",
+            'PRGFTrackCandsColName': self.local_track_cands_store_array_name,
+        })
+
         track_finder_output_combiner_mc = basf2.register_module("NaiveCombiner")
         track_finder_output_combiner_mc.param({"TracksFromLegendreFinder": self.legendre_track_cands_store_array_name,
                                                "NotAssignedTracksFromLocalFinder": self.local_track_cands_store_array_name,
@@ -216,15 +242,36 @@ class CombinerTrackFinderRun(LegendreTrackFinderRun):
                                                })
 
         main_path.add_module(local_track_finder)
-        main_path.add_module(segment_quality_check)
-        main_path.add_module(not_assigned_hits_combiner)
-        main_path.add_module(track_finder_output_combiner_naive)
-        # main_path.add_module(track_finder_output_combiner_mc)
+        if self.use_segment_quality_check:
+            main_path.add_module(segment_quality_check)
+
+        if self.do_combining:
+            main_path.add_module(not_assigned_hits_combiner)
+            main_path.add_module(track_finder_output_combiner_naive)
+            main_path.add_module(mc_track_matcher_module_legendre)
+            main_path.add_module(mc_track_matcher_module_local)
+            main_path.add_module(track_finder_output_combiner_mc)
 
         return main_path
 
 
-class CombinerValidationRun(CombinerTrackFinderRun, AddValidationMethod):
+class TrasanTrackFinderRun(CombinerTrackFinderRun):
+    trasan_track_cands_store_array_name = "TrasanTrackCands"
+
+    def create_path(self):
+        main_path = super(TrasanTrackFinderRun, self).create_path()
+
+        cdctracking = basf2.register_module('Trasan')
+        cdctracking.param({
+            'GFTrackCandidatesColName': self.trasan_track_cands_store_array_name,
+        })
+
+        main_path.add_module(cdctracking)
+
+        return main_path
+
+
+class CombinerValidationRun(TrasanTrackFinderRun, AddValidationMethod):
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
@@ -248,6 +295,16 @@ class CombinerValidationRun(CombinerTrackFinderRun, AddValidationMethod):
             main_path,
             track_candidates_store_array_name=self.legendre_track_cands_store_array_name,
             output_file_name="evaluation/legendre_%.2f%s.root" % (self.tmva_cut, suffix))
+
+        self.create_validation(
+            main_path,
+            track_candidates_store_array_name=self.trasan_track_cands_store_array_name,
+            output_file_name="evaluation/trasan_%.2f%s.root" % (self.tmva_cut, suffix))
+
+        self.create_validation(
+            main_path,
+            track_candidates_store_array_name="BestResultTrackCands",
+            output_file_name="evaluation/mc_%.2f%s.root" % (self.tmva_cut, suffix))
 
         return main_path
 
@@ -282,9 +339,11 @@ def plot(tmva_cut, splitting):
 
     dataframe = pandas.DataFrame()
 
-    #dataframe = dataframe.append(catch_rates("naive"), ignore_index=True)
+    dataframe = dataframe.append(catch_rates("trasan"), ignore_index=True)
     dataframe = dataframe.append(catch_rates("legendre"), ignore_index=True)
     dataframe = dataframe.append(catch_rates("result"), ignore_index=True)
+    dataframe = dataframe.append(catch_rates("naive"), ignore_index=True)
+    dataframe = dataframe.append(catch_rates("mc"), ignore_index=True)
 
     return dataframe
 

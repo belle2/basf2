@@ -22,7 +22,7 @@ from root_pandas import read_root
 import pandas
 import matplotlib.pyplot as plt
 import seaborn as sb
-sb.set_context("talk")
+sb.set_context("talk", font_scale=1.5)
 
 
 class ReassignHits(basf2.Module):
@@ -158,10 +158,11 @@ def plot_many_times():
     plt.plot(results.index, 100.0 * results.hit_efficiency / results.hit_efficiency[0] - 100.0, label="Hit Efficiency")
     plt.plot(results.index, 100.0 * results.fake_rate / results.fake_rate[0] - 100.0, label="Fake Rate")
     plt.plot(results.index, 100.0 * results.clone_rate / results.clone_rate[0] - 100.0, label="Clone Rate")
-    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=4, mode="expand", borderaxespad=0.)
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
     plt.xlabel("tmva cut")
     plt.ylabel("Deviation in %")
     plt.xticks(results.index)
+    plt.subplots_adjust(top=0.85, bottom=0.15)
     plt.savefig("tracking_validation.pdf")
 
     plt.clf()
@@ -169,10 +170,11 @@ def plot_many_times():
     plt.plot(results.index, 100.0 * results.hit_efficiency, label="Hit Efficiency")
     plt.plot(results.index, 100.0 * results.fake_rate, label="Fake Rate")
     plt.plot(results.index, 100.0 * results.clone_rate, label="Clone Rate")
-    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=4, mode="expand", borderaxespad=0.)
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
     plt.xlabel("tmva cut")
     plt.ylabel("Rates in %")
     plt.xticks(results.index)
+    plt.subplots_adjust(top=0.85, bottom=0.15)
     plt.savefig("tracking_validation_rates.pdf")
 
 

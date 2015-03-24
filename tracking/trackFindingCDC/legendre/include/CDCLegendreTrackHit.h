@@ -10,7 +10,10 @@
 
 #pragma once
 
+#ifndef __CINT__
 #include <tuple>
+#endif
+
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -35,6 +38,8 @@ namespace Belle2 {
         background = 4
       };
 
+      // For root:
+      TrackHit() { }
 
       /** Constructor to create a CDCTrackHit from a CDCHit object.
        * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
@@ -65,8 +70,10 @@ namespace Belle2 {
       /** Assigns values for conformal coordinates by transforming the wire coordinates. */
       void performConformalTransformation();
 
+#ifndef __CINT__
       /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. */
       std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0);
+#endif
 
       /** Return the index in the store array of the original CDCHit*/
       inline int getStoreIndex() const {return m_cdcHitIndex;}
@@ -125,7 +132,8 @@ namespace Belle2 {
       bool approach2(const TrackCandidate&);
 
       /** Sets the position of the hit to given point in 3D space.*/
-      void setPosition(const TVector3 position) {
+      void setPosition(const TVector3 position)
+      {
         m_wirePosition = position;
         performConformalTransformation();
       }

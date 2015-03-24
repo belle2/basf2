@@ -10,6 +10,7 @@
 
 #pragma once
 #include <framework/datastore/StoreArray.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <TVector3.h>
 #include <string>
@@ -20,7 +21,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class TrackCandidate;
-    class TrackHit;
 
     class TrackFitter {
     public:
@@ -32,7 +32,7 @@ namespace Belle2 {
        * @param with_drift_time Parameter which allows to perform fitting with taking into account drift time of hits; Not stable!
        */
       double fitTrackCandidateFast(
-        std::vector<TrackHit*>& hits,
+        std::vector<Belle2::TrackFindingCDC::TrackHit*>& hits,
         std::pair<double, double>& track_par,
         std::pair<double, double>& ref_point,
         bool with_drift_time = false);

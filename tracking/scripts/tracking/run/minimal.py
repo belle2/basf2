@@ -10,6 +10,7 @@ import tracking.utilities as utilities
 import tracking.metamodules as metamodules
 
 import logging
+from ROOT import Belle2
 
 
 def get_logger():
@@ -120,6 +121,9 @@ class MinimalRun(object):
             root_input_module = basf2.register_module('RootInput')
             root_input_module.param({'inputFileName': self.root_input_file})
             main_path.add_module(root_input_module)
+
+            environment = Belle2.Environment.Instance()
+            environment.setNumberEventsOverride(self.n_events)
 
         # gearbox & geometry needs to be registered any way
         gearbox_module = basf2.register_module('Gearbox')

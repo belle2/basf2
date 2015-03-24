@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <cmath>
 #include <cstdlib>

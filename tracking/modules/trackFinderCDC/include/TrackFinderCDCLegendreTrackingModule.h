@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
@@ -76,7 +75,6 @@ namespace Belle2 {
     const int m_nbinsTheta =
       8192; /**< hardcoded value!!! temporary solution, for avoiding segfaults only  //static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping; */
 
-    TrackFindingCDC::TrackFitter m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
     TrackFindingCDC::QuadTreeLegendre m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
     TrackFindingCDC::TrackProcessor m_cdcLegendreTrackProcessor; /**< Object for creating tracks */
 
@@ -90,7 +88,6 @@ namespace Belle2 {
     double m_stepScale;           /**< Scale of steps for SteppedHough*/
     int m_maxLevel;               /**< Maximum Level of FastHough Algorithm*/
     bool m_reconstructCurler;     /**< Stores, curlers shall be reconstructed*/
-    bool m_earlyMerge;            /**< Apply fitting for candidates or not*/
     bool m_drawCandidates;        /**< Draw each candidate in interactive mode*/
     bool m_drawCandInfo;          /**< Set whether TrackDrawer class will bw used at all*/
     bool m_deleteHitsWhileFinding;    /**< Try to delete bad hits from track candidate */
@@ -142,7 +139,7 @@ namespace Belle2 {
      * Create candidates using vector of quadtree nodes.
      */
     void processNodes(std::vector<TrackFindingCDC::QuadTreeLegendre*>&, TrackFindingCDC::QuadTreeLegendre::CandidateProcessorLambda&,
-                      int);
+                      unsigned int);
 
   };
 

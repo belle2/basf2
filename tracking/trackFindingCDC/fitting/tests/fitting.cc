@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
@@ -52,12 +52,12 @@ namespace {
 
     CDCObservations2D observations2D;
     if (withDriftLength) {
-      for (const Vector2D & observationCenter : observationCenters) {
+      for (const Vector2D& observationCenter : observationCenters) {
         FloatType distance = generalCircle.distance(observationCenter);
         observations2D.append(observationCenter, distance);
       }
     } else {
-      for (const Vector2D & observationCenter : observationCenters) {
+      for (const Vector2D& observationCenter : observationCenters) {
         Vector2D onCircle = generalCircle.closest(observationCenter);
         observations2D.append(onCircle, 0.0);
       }

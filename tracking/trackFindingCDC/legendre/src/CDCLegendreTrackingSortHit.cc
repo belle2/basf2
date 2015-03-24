@@ -1,5 +1,5 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackingSortHit.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <boost/tuple/tuple.hpp>
 
 using namespace std;

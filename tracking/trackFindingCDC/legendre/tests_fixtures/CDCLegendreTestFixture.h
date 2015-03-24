@@ -11,9 +11,9 @@
 #include <vector>
 #include <gtest/gtest.h>
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
+#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

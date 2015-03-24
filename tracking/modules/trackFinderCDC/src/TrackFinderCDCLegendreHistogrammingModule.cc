@@ -7,6 +7,7 @@
 #include <framework/gearbox/Const.h>
 #include <cdc/dataobjects/CDCHit.h>
 
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 
@@ -85,7 +86,7 @@ void CDCLegendreHistogrammingModule::event()
   for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
     //vector with TrackHit objects belonging to the same track
     std::vector<TrackHit*> trackHits;
-    for (TrackHit * hit : m_AxialHitList) {
+    for (TrackHit* hit : m_AxialHitList) {
       for (unsigned int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
         if (hit->getStoreIndex() == gfTrackCands[iCand]->getHit(iHit)->getHitId()) {
           trackHits.push_back(hit);
@@ -115,7 +116,8 @@ void CDCLegendreHistogrammingModule::event()
     else charge = TrackCandidate::charge_negative;
 
     //create legendre track candidate; this object holds axial and stereo hits
-    TrackCandidateWithStereoHits* trackCandidate = new TrackCandidateWithStereoHits(track_par.first, track_par.second, charge, trackHits, gfTrackCands[iCand]);
+    TrackCandidateWithStereoHits* trackCandidate = new TrackCandidateWithStereoHits(track_par.first, track_par.second, charge,
+        trackHits, gfTrackCands[iCand]);
     //  trackCandidate->clearBadHits(ref_point);
     //    appendNewHits(trackCandidate);
 //    trackCandidate->setChi2(chi2);
@@ -123,7 +125,9 @@ void CDCLegendreHistogrammingModule::event()
     //set reference point of the track
     trackCandidate->setReferencePoint(gfTrackCands[iCand]->getPosSeed().X(), gfTrackCands[iCand]->getPosSeed().Y());
 
-    B2DEBUG(100, "R value: " << trackCandidate->getR() << "; theta: " << trackCandidate->getTheta() << "; radius: " << trackCandidate->getRadius() << "; phi: " << trackCandidate->getPhi() << "; charge: " << trackCandidate->getChargeSign() << "; Xc = " << trackCandidate->getXc() << "; Yc = " << trackCandidate->getYc());
+    B2DEBUG(100, "R value: " << trackCandidate->getR() << "; theta: " << trackCandidate->getTheta() << "; radius: " <<
+            trackCandidate->getRadius() << "; phi: " << trackCandidate->getPhi() << "; charge: " << trackCandidate->getChargeSign() << "; Xc = "
+            << trackCandidate->getXc() << "; Yc = " << trackCandidate->getYc());
 
     //  for (TrackHit * hit : trackCandidate->getTrackHits()) {
     //    hit->setHitUsage(TrackHit::not_used);
@@ -148,7 +152,7 @@ void CDCLegendreHistogrammingModule::event()
   //create object which will add stereohits to tracks
   StereohitsProcesser stereohitsProcesser;
 
-  for (TrackCandidate * cand : m_trackList) {
+  for (TrackCandidate* cand : m_trackList) {
     tracknr++;
     B2INFO("Processing new track; assigning stereohits.");
 
@@ -158,7 +162,7 @@ void CDCLegendreHistogrammingModule::event()
 
 
   //extend genfit candidates (from StoreArray) with new stereohits
-  for (TrackCandidateWithStereoHits * trackCand : m_trackList) {
+  for (TrackCandidateWithStereoHits* trackCand : m_trackList) {
     for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
       if (trackCand->getGfTrackCand() != gfTrackCands[iCand]) continue;
 
@@ -174,7 +178,7 @@ void CDCLegendreHistogrammingModule::event()
 
       std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
 
-      for (TrackHit * trackHit : trackHitVector) {
+      for (TrackHit* trackHit : trackHitVector) {
         //add only stereohits
         if (trackHit->getIsAxial()) continue;
         int hitID = trackHit->getStoreIndex();
@@ -193,17 +197,17 @@ void CDCLegendreHistogrammingModule::event()
 void CDCLegendreHistogrammingModule::clear_pointer_vectors()
 {
 
-  for (TrackHit * hit : m_AxialHitList) {
+  for (TrackHit* hit : m_AxialHitList) {
     delete hit;
   }
   m_AxialHitList.clear();
 
-  for (TrackHit * hit : m_StereoHitList) {
+  for (TrackHit* hit : m_StereoHitList) {
     delete hit;
   }
   m_StereoHitList.clear();
 
-  for (TrackCandidateWithStereoHits * track : m_trackList) {
+  for (TrackCandidateWithStereoHits* track : m_trackList) {
     delete track;
   }
   m_trackList.clear();

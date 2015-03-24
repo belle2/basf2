@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
 #include <algorithm>
 #include <cmath>
@@ -98,7 +98,7 @@ void FastHough::FastHoughNormal(
   double dist_2[3][3];
 
   //Voting within the four bins
-  for (TrackHit * hit : hits) {
+  for (TrackHit* hit : hits) {
     for (int t_index = 0; t_index < 3; ++t_index) {
 
 //      r_temp = CDCLegendreConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
@@ -119,10 +119,12 @@ void FastHough::FastHoughNormal(
     for (int t_index = 0; t_index < 2; ++t_index) {
       for (int r_index = 0; r_index < 2; ++r_index) {
         //curves are assumed to be straight lines, might be a reasonable assumption locally
-        if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) &&
+        if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index],
+                       dist_1[t_index + 1][r_index + 1])) &&
             (hit->getHitUsage() == TrackHit::not_used))
           voted_hits[t_index][r_index].push_back(hit);
-        else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) &&
+        else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index],
+                            dist_2[t_index + 1][r_index + 1])) &&
                  (hit->getHitUsage() == TrackHit::not_used))
           voted_hits[t_index][r_index].push_back(hit);
       }
@@ -179,9 +181,11 @@ void FastHough::FastHoughNormal(
     //"trick" which allows to use wider bins for higher r values (lower pt tracks)
     int level_diff = 0;
     if (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 4.)) level_diff = 3;
-    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
+    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.))
+             && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
       level_diff = 2;
-    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
+    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.))
+             && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
       level_diff = 1;
     level_diff = 0;
 
@@ -238,9 +242,11 @@ void FastHough::FastHoughNormal(
       } else {
         //Recursive calling of the function with higher level and smaller box
         //          if (allow_overlap) { //if overlapping allowed make bin borders wider
-        if (allow_overlap  && (level >= (m_maxLevel - level_diff - 2)) && max_value_bin == std::make_pair(t_index, r_index)) { //if overlapping allowed make bin borders wider
+        if (allow_overlap  && (level >= (m_maxLevel - level_diff - 2))
+            && max_value_bin == std::make_pair(t_index, r_index)) { //if overlapping allowed make bin borders wider
           double r_1_overlap, r_2_overlap;
-          int theta_1_overlap, theta_2_overlap; // here we involve new variables which allows to change bin borders for positive and negative r independently
+          int theta_1_overlap,
+              theta_2_overlap; // here we involve new variables which allows to change bin borders for positive and negative r independently
           r_1_overlap = r[r_index] - fabs(r[r_index + 1] - r[r_index]) / 2.;
           r_2_overlap = r[r_index + 1] + fabs(r[r_index + 1] - r[r_index]) / 2.;
           //            theta_1_overlap = thetaBin[t_index]/* - fabs(thetaBin[t_index + 1] - thetaBin[t_index]) / 2.*/;
@@ -296,7 +302,7 @@ void FastHough::FastHoughCustomReferencePoint(
   double dist_2[3][3];
 
   //Voting within the four bins
-  for (TrackHit * hit : hits) {
+  for (TrackHit* hit : hits) {
     for (int t_index = 0; t_index < 3; ++t_index) {
 
       std::tuple<double, double, double> confPoint = hit->performConformalTransformWithRespectToPoint(refPoint.first, refPoint.second);
@@ -319,10 +325,12 @@ void FastHough::FastHoughCustomReferencePoint(
     for (int t_index = 0; t_index < 2; ++t_index) {
       for (int r_index = 0; r_index < 2; ++r_index) {
         //curves are assumed to be straight lines, might be a reasonable assumption locally
-        if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) /*&&
+        if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index],
+                       dist_1[t_index + 1][r_index + 1])) /*&&
             (hit->getHitUsage() == TrackHit::not_used)*/)
           voted_hits[t_index][r_index].push_back(hit);
-        else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1]))/* &&
+        else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index],
+                            dist_2[t_index + 1][r_index + 1]))/* &&
                  (hit->getHitUsage() == TrackHit::not_used)*/)
           voted_hits[t_index][r_index].push_back(hit);
       }
@@ -419,7 +427,7 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
   double dist_2[3][3];
 
   //Voting within the four bins
-  for (TrackHit * hit : hits) {
+  for (TrackHit* hit : hits) {
     if (hit->getHitUsage() != TrackHit::not_used) continue;
     for (int t_index = 0; t_index < 3; ++t_index) {
 
@@ -440,9 +448,11 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
     for (int t_index = 0; t_index < 2; ++t_index) {
       for (int r_index = 0; r_index < 2; ++r_index) {
         //curves are assumed to be straight lines, might be a reasonable assumption locally
-        if (!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1]))
+        if (!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index],
+                      dist_1[t_index + 1][r_index + 1]))
           voted_hits[t_index][r_index].push_back(hit);
-        else if (!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1]))
+        else if (!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index],
+                           dist_2[t_index + 1][r_index + 1]))
           voted_hits[t_index][r_index].push_back(hit);
       }
     }
@@ -477,9 +487,11 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
     //"trick" which allows to use wider bins for higher r values (lower pt tracks)
     int level_diff = 0;
     if (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 4.)) level_diff = 3;
-    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
+    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (m_rMax / 4.))
+             && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (2.*m_rMax / 3.)))
       level_diff = 2;
-    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
+    else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.))
+             && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
       level_diff = 1;
 
 //      level_diff = 0;
@@ -504,9 +516,11 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
             && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
           return;
 
-        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), voted_hits[t_index][r_index].end());
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(),
+        voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}),
+        voted_hits[t_index][r_index].end());
 
-        for (TrackHit * hit : voted_hits[t_index][r_index]) {
+        for (TrackHit* hit : voted_hits[t_index][r_index]) {
           hit->setHitUsage(TrackHit::used_in_cand);
         }
 
@@ -669,7 +683,9 @@ void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int
 
   delta_r = 4. * Rcell / (4. / ((r_max + r_min) * (r_max + r_min)) - 4.*Rcell * Rcell);
 
-  if ((delta_r < 0) || (delta_r > 1))B2FATAL("Bad delta_r value: " << delta_r << ". Please check limits in FastHough::MaxFastHoughHighPt() or switch to FastHough::MaxFastHough()");
+  if ((delta_r < 0)
+      || (delta_r > 1))B2FATAL("Bad delta_r value: " << delta_r <<
+                                 ". Please check limits in FastHough::MaxFastHoughHighPt() or switch to FastHough::MaxFastHough()");
 
   //B2DEBUG(100, "DELTA r: " << delta_r << "; r_max-r_min: " << fabs(r_max - r_min));
 
@@ -735,7 +751,7 @@ void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int
 
   int hit_counter = 0;
   //Voting within the four bins
-  for (TrackHit * hit : hits) {
+  for (TrackHit* hit : hits) {
     hit_counter++;
     //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
     if (hit->getHitUsage() != TrackHit::not_used) continue;
@@ -758,10 +774,12 @@ void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int
     for (int t_index = 0; t_index < nbins_theta; ++t_index) {
       for (int r_index = 0; r_index < nbins_r; ++r_index) {
         //curves are assumed to be straight lines, might be a reasonable assumption locally
-        if (!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) {
+        if (!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index],
+                      dist_1[t_index + 1][r_index + 1])) {
           //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
           voted_hits[t_index][r_index].push_back(hit);
-        } else if (!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) {
+        } else if (!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index],
+                             dist_2[t_index + 1][r_index + 1])) {
           //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
           voted_hits[t_index][r_index].push_back(hit);
         }
@@ -841,9 +859,11 @@ void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int
           return;
         }
 
-        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), voted_hits[t_index][r_index].end());
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(),
+        voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}),
+        voted_hits[t_index][r_index].end());
 
-        for (TrackHit * hit : voted_hits[t_index][r_index]) {
+        for (TrackHit* hit : voted_hits[t_index][r_index]) {
           hit->setHitUsage(TrackHit::used_in_cand);
         }
 

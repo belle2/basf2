@@ -8,11 +8,14 @@
 
 #include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreTrackWithStereohits.h>
 #include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
 namespace Belle2 {
+
+  namespace TrackFindingCDC {
+    class TrackHit;
+  }
 
 //  class TrackCandidateWithStereoHit;
 

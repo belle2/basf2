@@ -23,7 +23,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(CDCLegendreTracking)
 
 CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
-  Module(), m_cdcLegendreTrackFitter(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr),
+  Module(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr),
   m_cdcLegendreTrackProcessor(),
   m_cdcLegendreFastHough(nullptr), m_cdcLegendreTrackDrawer(nullptr)
 {
@@ -142,7 +142,7 @@ void CDCLegendreTrackingModule::outputObjects()
 
 
 void CDCLegendreTrackingModule::processNodes(std::vector<QuadTreeLegendre*>& listOfCandidates,
-                                             QuadTreeLegendre::CandidateProcessorLambda& lmdFunct, int limit)
+                                             QuadTreeLegendre::CandidateProcessorLambda& lmdFunct, unsigned int limit)
 {
   if (listOfCandidates.size() == 0) return;
   QuadTreeProcessor qtProcessor(m_maxLevel);

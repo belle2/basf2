@@ -1,5 +1,5 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendrePatternChecker.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
@@ -23,7 +23,7 @@ void PatternChecker::checkCurler(
 
 
   // Make two patterns: for "positive" and "negative" parts of track (curler)
-  for (TrackHit * hit : track->first) {
+  for (TrackHit* hit : track->first) {
     if (hit->getCurvatureSignWrt(center.first, center.second) == TrackCandidate::charge_positive) {
       pattern_P.setLayer(hit->getLayerId());
       nhits_P++;
@@ -151,7 +151,7 @@ bool PatternChecker::checkCandidate(TrackCandidate* track, int minNHitsSLayer)
   unsigned int index_longest = 0;
   int ii = 0;
 
-  for (HitPatternCDC & pattern : patterns) {
+  for (HitPatternCDC& pattern : patterns) {
     B2DEBUG(100, "Tracklet pattern: " << pattern.getBitSet());
     int nHits_current = 0;
     for (int sLayer = 8; sLayer >= 0; sLayer -= 2) {
@@ -168,14 +168,16 @@ bool PatternChecker::checkCandidate(TrackCandidate* track, int minNHitsSLayer)
   trackletHits.clear();
   for (unsigned int ii = 0; ii < patterns.size(); ii++) {
     if (ii == index_longest) continue;
-    for (TrackHit * hit : track->getTrackHits()) {
+    for (TrackHit* hit : track->getTrackHits()) {
       if (patterns[ii].hasLayer(hit->getLayerId())) trackletHits.push_back(hit);
     }
-    if (trackletHits.size() > 0) m_cdcLegendreTrackProcessor->createLegendreTracklet(trackletHits)->setCandidateType(TrackCandidate::tracklet);
+    if (trackletHits.size() > 0) m_cdcLegendreTrackProcessor->createLegendreTracklet(trackletHits)->setCandidateType(
+        TrackCandidate::tracklet);
     trackletHits.clear();
   }
 
-  track->getTrackHits().erase(std::remove_if(track->getTrackHits().begin(), track->getTrackHits().end(), [&patterns, &index_longest](TrackHit * hit) {return not patterns[index_longest].hasLayer(hit->getLayerId());}), track->getTrackHits().end());
+  track->getTrackHits().erase(std::remove_if(track->getTrackHits().begin(), track->getTrackHits().end(), [&patterns,
+  &index_longest](TrackHit * hit) {return not patterns[index_longest].hasLayer(hit->getLayerId());}), track->getTrackHits().end());
 
   track->setCandidateType(TrackCandidate::tracklet);
 
@@ -282,7 +284,7 @@ bool PatternChecker::isTrackComplete(TrackCandidate* track)
 {
   int nPositiveHits(0), nNegativeHits(0);
   // Make two patterns: for "positive" and "negative" parts of track (curler)
-  for (TrackHit * hit : track->getTrackHits()) {
+  for (TrackHit* hit : track->getTrackHits()) {
     if (hit->getCurvatureSignWrt(track->getXc(), track->getYc()) == TrackCandidate::charge_positive) {
       nPositiveHits++;
     } else {

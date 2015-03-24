@@ -24,7 +24,7 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <framework/logging/Logger.h>
 
@@ -154,8 +154,8 @@ namespace Belle2 {
               if (node->getLevel() < (m_lastLevel - 5)) {
                 float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
                 float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 4.;
-                int theta1 = node->getXBin(i) - abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 4.);
-                int theta2 = node->getXBin(i + 1) + abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 4.);
+                int theta1 = node->getXBin(i) - std::abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 4.);
+                int theta2 = node->getXBin(i + 1) + std::abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 4.);
 
                 if (theta1 < 0)
                   theta1 = node->getXBin(i);
@@ -167,8 +167,8 @@ namespace Belle2 {
               } else {
                 float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
                 float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 8.;
-                int theta1 = node->getXBin(i) - abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 8.);
-                int theta2 = node->getXBin(i + 1) + abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 8.);
+                int theta1 = node->getXBin(i) - std::abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 8.);
+                int theta2 = node->getXBin(i + 1) + std::abs(pow(2, m_lastLevel + 0 - node->getLevel()) / 8.);
 
                 if (theta1 < 0)
                   theta1 = node->getXBin(i);

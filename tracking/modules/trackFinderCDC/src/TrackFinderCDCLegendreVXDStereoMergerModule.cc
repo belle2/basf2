@@ -22,6 +22,7 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 
 using namespace std;
@@ -94,7 +95,7 @@ void CDCLegendreVXDStereoMergerModule::event()
 
   for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
     std::vector<TrackHit*> trackHits;
-    for (TrackHit * hit : m_AxialHitList) {
+    for (TrackHit* hit : m_AxialHitList) {
       for (unsigned int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
         if (hit->getStoreIndex() == gfTrackCands[iCand]->getHit(iHit)->getHitId()) {
           trackHits.push_back(hit);
@@ -121,14 +122,17 @@ void CDCLegendreVXDStereoMergerModule::event()
     if (gfTrackCands[iCand]->getChargeSeed() > 0) charge = TrackCandidate::charge_positive;
     else charge = TrackCandidate::charge_negative;
 
-    TrackCandidateWithStereoHits* trackCandidate = new TrackCandidateWithStereoHits(track_par.first, track_par.second, charge, trackHits, gfTrackCands[iCand]);
+    TrackCandidateWithStereoHits* trackCandidate = new TrackCandidateWithStereoHits(track_par.first, track_par.second, charge,
+        trackHits, gfTrackCands[iCand]);
     //  trackCandidate->clearBadHits(ref_point);
     //    appendNewHits(trackCandidate);
 //    trackCandidate->setChi2(chi2);
 
     trackCandidate->setReferencePoint(gfTrackCands[iCand]->getPosSeed().X(), gfTrackCands[iCand]->getPosSeed().Y());
 
-    B2DEBUG(100, "R value: " << trackCandidate->getR() << "; theta: " << trackCandidate->getTheta() << "; radius: " << trackCandidate->getRadius() << "; phi: " << trackCandidate->getPhi() << "; charge: " << trackCandidate->getChargeSign() << "; Xc = " << trackCandidate->getXc() << "; Yc = " << trackCandidate->getYc());
+    B2DEBUG(100, "R value: " << trackCandidate->getR() << "; theta: " << trackCandidate->getTheta() << "; radius: " <<
+            trackCandidate->getRadius() << "; phi: " << trackCandidate->getPhi() << "; charge: " << trackCandidate->getChargeSign() << "; Xc = "
+            << trackCandidate->getXc() << "; Yc = " << trackCandidate->getYc());
 
     //  for (TrackHit * hit : trackCandidate->getTrackHits()) {
     //    hit->setHitUsage(TrackHit::not_used);
@@ -171,7 +175,7 @@ void CDCLegendreVXDStereoMergerModule::event()
 
   B2INFO("Number of VXD tracks: " << VXDGFTracks.getEntries());
 
-  for (TrackCandidate * cand : m_trackList) {
+  for (TrackCandidate* cand : m_trackList) {
 
     TVector3 mom;
     TVector3 pos;
@@ -181,7 +185,7 @@ void CDCLegendreVXDStereoMergerModule::event()
     //Here we choose innermost hit of track candidate and then extrapolate VXD track onto it
     double dist_hit_min = 999.;
     double driftLength_hit_min = 999;
-    for (TrackHit * hit : cand->getTrackHits()) {
+    for (TrackHit* hit : cand->getTrackHits()) {
       if (not hit->getIsAxial()) continue;
 
       double dist_hit = hit->getOriginalWirePosition().Pt();
@@ -291,7 +295,8 @@ void CDCLegendreVXDStereoMergerModule::event()
       std::string m_VXDGFTracksCandColName("VXDTracksCand");
 //      genfit::TrackCand* vxdTrackCandRel = fitResult->getRelatedFrom<genfit::TrackCand>(m_VXDGFTracksCandColName);
 
-      const genfit::TrackCand* vxdTrackCandRel = DataStore::getRelatedToObj<genfit::TrackCand>(bestVXDTrackToMerge, m_VXDGFTracksCandColName);
+      const genfit::TrackCand* vxdTrackCandRel = DataStore::getRelatedToObj<genfit::TrackCand>(bestVXDTrackToMerge,
+                                                 m_VXDGFTracksCandColName);
       B2INFO("Done!");
 
 //      if(not vxdTrackCandRel)continue;
@@ -332,7 +337,7 @@ void CDCLegendreVXDStereoMergerModule::event()
   }
 
 
-  for (TrackCandidateWithStereoHits * trackCand : m_trackList) {
+  for (TrackCandidateWithStereoHits* trackCand : m_trackList) {
     for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
       if (trackCand->getGfTrackCand() != gfTrackCands[iCand]) continue;
 
@@ -348,7 +353,7 @@ void CDCLegendreVXDStereoMergerModule::event()
 
       std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
 
-      for (TrackHit * trackHit : trackHitVector) {
+      for (TrackHit* trackHit : trackHitVector) {
         if (trackHit->getIsAxial()) continue;
         int hitID = trackHit->getStoreIndex();
         gfTrackCands[iCand]->addHit(Const::CDC, hitID);
@@ -365,17 +370,17 @@ void CDCLegendreVXDStereoMergerModule::event()
 void CDCLegendreVXDStereoMergerModule::clear_pointer_vectors()
 {
 
-  for (TrackHit * hit : m_AxialHitList) {
+  for (TrackHit* hit : m_AxialHitList) {
     delete hit;
   }
   m_AxialHitList.clear();
 
-  for (TrackHit * hit : m_StereoHitList) {
+  for (TrackHit* hit : m_StereoHitList) {
     delete hit;
   }
   m_StereoHitList.clear();
 
-  for (TrackCandidateWithStereoHits * track : m_trackList) {
+  for (TrackCandidateWithStereoHits* track : m_trackList) {
     delete track;
   }
   m_trackList.clear();

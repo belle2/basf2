@@ -11,19 +11,21 @@
 #include <tracking/trackFinderOutputCombiner/TrackFinderOutputCombiner.h>
 #include <framework/gearbox/Const.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
+#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <cdc/geometry/GeoCDCCreator.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackFinderOutputCombiner::resetLocalTrackCandsToCorrectCDCHits(StoreArray<genfit::TrackCand>& trackCands, const StoreArray<CDCHit>& notAssignedCDCHits, std::string m_param_cdcHits)
+void TrackFinderOutputCombiner::resetLocalTrackCandsToCorrectCDCHits(StoreArray<genfit::TrackCand>& trackCands,
+    const StoreArray<CDCHit>& notAssignedCDCHits, std::string m_param_cdcHits)
 {
-  for (genfit::TrackCand & trackCand2 : trackCands) {
+  for (genfit::TrackCand& trackCand2 : trackCands) {
 
     std::vector<int> hitIDOfTrackCand2;
 
@@ -97,12 +99,13 @@ double TrackFinderOutputCombiner::constructTrackCandidate(genfit::TrackCand* new
   return TMath::Prob(chi2, hitsAxial.size() - 4);
 }
 
-std::vector<TrackFinderOutputCombiner::HitSegment> TrackFinderOutputCombiner::collectHitSegmentsOfLocalTracks(const StoreArray<genfit::TrackCand>& localTrackCands, const StoreArray<CDCHit>& cdcHits, int m_param_minimumDistanceBetweenHits)
+std::vector<TrackFinderOutputCombiner::HitSegment> TrackFinderOutputCombiner::collectHitSegmentsOfLocalTracks(
+  const StoreArray<genfit::TrackCand>& localTrackCands, const StoreArray<CDCHit>& cdcHits, int m_param_minimumDistanceBetweenHits)
 {
   const int notFoundID = -1;
   std::vector<HitSegment> hitSegmentList;
 
-  for (const genfit::TrackCand & localTrackCand : localTrackCands) {
+  for (const genfit::TrackCand& localTrackCand : localTrackCands) {
     std::vector<int> hitIDs;
     TVector2 lastWirePosition(0, 0);
     TVector2 currentWirePosition;

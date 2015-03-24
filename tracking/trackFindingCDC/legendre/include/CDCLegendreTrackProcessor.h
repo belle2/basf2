@@ -12,9 +12,8 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
+#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 
 #include <list>
 #include <vector>
@@ -30,6 +29,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class TrackDrawer;
+    class TrackHit;
 
     class TrackProcessor {
     public:
@@ -70,14 +70,16 @@ namespace Belle2 {
       /**
        * Get the list with currently processed tracks.
        */
-      list<TrackCandidate*>& getTrackList() {
+      list<TrackCandidate*>& getTrackList()
+      {
         return m_trackList;
       }
 
       /**
        * Get the list with currently stored axial hits.
        */
-      std::vector<TrackHit*>& getAxialHitsList() {
+      std::vector<TrackHit*>& getAxialHitsList()
+      {
         return m_axialHitList;
       }
 
@@ -90,13 +92,14 @@ namespace Belle2 {
       /**
        * After each event the created hits and trackCandidates should be deleted.
        */
-      void clearVectors() {
-        for (TrackHit * hit : m_axialHitList) {
+      void clearVectors()
+      {
+        for (TrackHit* hit : m_axialHitList) {
           delete hit;
         }
         m_axialHitList.clear();
 
-        for (TrackCandidate * track : m_trackList) {
+        for (TrackCandidate* track : m_trackList) {
           delete track;
         }
         m_trackList.clear();
@@ -136,7 +139,8 @@ namespace Belle2 {
        * Fits one track and reestimates the charge.
        * @param trackCandidate
        */
-      void fitOneTrack(TrackCandidate* trackCandidate) {
+      void fitOneTrack(TrackCandidate* trackCandidate)
+      {
         m_cdcLegendreTrackFitter.fitTrackCandidateFast(trackCandidate);
         trackCandidate->reestimateCharge();
       }
@@ -144,7 +148,8 @@ namespace Belle2 {
       /**
        * Sets the track drawer.
        */
-      void setTrackDrawer(TrackDrawer* cdcLegendreTrackDrawer) {
+      void setTrackDrawer(TrackDrawer* cdcLegendreTrackDrawer)
+      {
         m_cdcLegendreTrackDrawer = cdcLegendreTrackDrawer;
       }
 

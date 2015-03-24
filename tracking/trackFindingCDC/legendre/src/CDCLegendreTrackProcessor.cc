@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackingSortHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <genfit/TrackCand.h>

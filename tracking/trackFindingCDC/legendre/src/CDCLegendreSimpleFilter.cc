@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 using namespace std;
 
@@ -28,7 +28,8 @@ double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* trac
 
   double x0_hit = hit->getOriginalWirePosition().X();
   double y0_hit = hit->getOriginalWirePosition().Y();
-  double dist = fabs(fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength());
+  double dist = fabs(fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) *
+                                   (y0_track - y0_hit))) - hit->getDriftLength());
 
   return 1.0 - exp(-1 / dist);
 }
@@ -40,20 +41,20 @@ void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_tra
 
   B2DEBUG(100, "NCands = " << m_trackList.size());
 
-  for (TrackCandidate * cand : m_trackList) {
-    for (TrackHit * hit : cand->getTrackHits()) {
+  for (TrackCandidate* cand : m_trackList) {
+    for (TrackHit* hit : cand->getTrackHits()) {
       hit->setHitUsage(TrackHit::used_in_track);
     }
 
     if (cand->getTrackHits().size() == 0) continue;
 
-    for (TrackHit * hit : cand->getTrackHits()) {
+    for (TrackHit* hit : cand->getTrackHits()) {
       double prob = getAssigmentProbability(hit, cand);
 
       double bestHitProb = prob;
       TrackCandidate* bestCandidate = NULL;
 
-      for (TrackCandidate * candInner : m_trackList) {
+      for (TrackCandidate* candInner : m_trackList) {
         if (candInner == cand) continue;
         double probTemp = getAssigmentProbability(hit, candInner);
 
@@ -72,8 +73,8 @@ void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_tra
     deleteAllMarkedHits(cand);
   }
 
-  for (TrackCandidate * cand : m_trackList) {
-    for (TrackHit * hit : cand->getTrackHits()) {
+  for (TrackCandidate* cand : m_trackList) {
+    for (TrackHit* hit : cand->getTrackHits()) {
       hit->setHitUsage(TrackHit::used_in_track);
     }
   }
@@ -88,17 +89,18 @@ void SimpleFilter::deleteAllMarkedHits(TrackCandidate* trackCandidate)
 
 }
 
-void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& axialHitList, double minimal_assignment_probability)
+void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& axialHitList,
+                                    double minimal_assignment_probability)
 {
 
-  for (TrackHit * hit : axialHitList) {
+  for (TrackHit* hit : axialHitList) {
     if (hit->getHitUsage() == TrackHit::used_in_track or hit->getHitUsage() == TrackHit::used_in_cand) continue;
 
     // Search for best candidate to assign to
     double bestHitProb = 0;
     TrackCandidate* BestCandidate = nullptr;
 
-    for (TrackCandidate * cand : trackList) {
+    for (TrackCandidate* cand : trackList) {
       double probTemp = getAssigmentProbability(hit, cand);
 
       if (probTemp > bestHitProb) {
@@ -121,7 +123,7 @@ void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double
 
   if (trackHits.size() == 0) return;
 
-  for (TrackHit * hit : trackHits) {
+  for (TrackHit* hit : trackHits) {
     hit->setHitUsage(TrackHit::used_in_track);
   }
 

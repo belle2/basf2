@@ -18,6 +18,7 @@
 #include <genfit/MeasurementFactory.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <TDatabasePDG.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
@@ -95,7 +96,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
   for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
     std::vector<TrackHit*> trackHits;
-    for (TrackHit * hit : m_AxialHitList) {
+    for (TrackHit* hit : m_AxialHitList) {
       for (unsigned int iHit = 0; iHit < gfTrackCands[iCand]->getNHits(); iHit++) {
         if (hit->getStoreIndex() == gfTrackCands[iCand]->getHit(iHit)->getHitId()) {
           trackHits.push_back(hit);
@@ -122,14 +123,17 @@ void CDCLegendreDAFStereoAssigningModule::event()
     if (gfTrackCands[iCand]->getChargeSeed() > 0) charge = TrackCandidate::charge_positive;
     else charge = TrackCandidate::charge_negative;
 
-    TrackCandidateWithStereoHits* trackCandidate = new TrackCandidateWithStereoHits(track_par.first, track_par.second, charge, trackHits, gfTrackCands[iCand]);
+    TrackCandidateWithStereoHits* trackCandidate = new TrackCandidateWithStereoHits(track_par.first, track_par.second, charge,
+        trackHits, gfTrackCands[iCand]);
     //  trackCandidate->clearBadHits(ref_point);
     //    appendNewHits(trackCandidate);
 //    trackCandidate->setChi2(chi2);
 
     trackCandidate->setReferencePoint(gfTrackCands[iCand]->getPosSeed().X(), gfTrackCands[iCand]->getPosSeed().Y());
 
-    B2DEBUG(100, "R value: " << trackCandidate->getR() << "; theta: " << trackCandidate->getTheta() << "; radius: " << trackCandidate->getRadius() << "; phi: " << trackCandidate->getPhi() << "; charge: " << trackCandidate->getChargeSign() << "; Xc = " << trackCandidate->getXc() << "; Yc = " << trackCandidate->getYc());
+    B2DEBUG(100, "R value: " << trackCandidate->getR() << "; theta: " << trackCandidate->getTheta() << "; radius: " <<
+            trackCandidate->getRadius() << "; phi: " << trackCandidate->getPhi() << "; charge: " << trackCandidate->getChargeSign() << "; Xc = "
+            << trackCandidate->getXc() << "; Yc = " << trackCandidate->getYc());
 
     //  for (TrackHit * hit : trackCandidate->getTrackHits()) {
     //    hit->setHitUsage(TrackHit::not_used);
@@ -163,7 +167,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
   std::vector<std::pair<std::shared_ptr<genfit::Track>, double>> gfTracksWithPVal;
 
 
-  for (TrackCandidate * cand : m_trackList) {
+  for (TrackCandidate* cand : m_trackList) {
     //there is different information from mctracks and 'real' pattern recognition tracks, e.g. for PR tracks the PDG is unknown
 
     double theta = 0;
@@ -183,7 +187,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
     int vote_pos(0), vote_neg(0);
 
     //estimation of charge of the track candidate
-    for (TrackHit * Hit : cand->getTrackHits()) {
+    for (TrackHit* Hit : cand->getTrackHits()) {
       int curve_sign = Hit->getCurvatureSignWrt(cand->getXc(), cand->getYc());
 
       if (curve_sign == TrackCandidate::charge_positive)
@@ -210,13 +214,13 @@ void CDCLegendreDAFStereoAssigningModule::event()
     //find indices of the Hits
     std::vector<TrackHit*> trackHitVector;// = cand->getTrackHits();
 
-    for (TrackHit * hit : cand->getTrackHits()) {
+    for (TrackHit* hit : cand->getTrackHits()) {
       trackHitVector.push_back(hit);
     }
 
 //    double Rcand = cand->getRadius();
 
-    for (TrackHit * hit : m_StereoHitList) {
+    for (TrackHit* hit : m_StereoHitList) {
 
 
       if (hit->getHitUsage() == TrackHit::used_in_track) continue;
@@ -238,7 +242,8 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
 
 //     double lWire = fabs(hit->getBackwardWirePosition().Z() - hit->getForwardWirePosition().Z());
-      double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
+      double rWire = sqrt(SQR(hit->getBackwardWirePosition().x() - hit->getForwardWirePosition().x()) + SQR(
+                            hit->getBackwardWirePosition().y() - hit->getForwardWirePosition().y()));
 
       if ((fabs(dist_1) > rWire / 3.) || (fabs(dist_2) > rWire / 3.)) continue;
 
@@ -251,7 +256,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
     TrackFindingCDC::TrackProcessor::sortHits(trackHitVector, cand->getChargeSign());
 
 
-    for (TrackHit * trackHit : trackHitVector) {
+    for (TrackHit* trackHit : trackHitVector) {
       int hitID = trackHit->getStoreIndex();
       aTrackCandPointer->addHit(Const::CDC, hitID);
     }
@@ -299,7 +304,8 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
       B2DEBUG(99, "Fit track with start values: ");
 
-      B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
+      B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() <<
+              " " << momentumSeed.Mag());
       //B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed(3, 3)) << "  " << sqrt(covSeed(4, 4)) << "  " << sqrt(covSeed(5, 5)));
       B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
       //B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed(0, 0)) << "  " << sqrt(covSeed(1, 1)) << "  " << sqrt(covSeed(2, 2)));
@@ -335,7 +341,8 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
       B2DEBUG(100, " Creating Track");
 
-      std::shared_ptr<genfit::Track> gfTrack(new genfit::Track(*aTrackCandPointer, factory, trackRep)); //create the track with the corresponding track representation
+      std::shared_ptr<genfit::Track> gfTrack(new genfit::Track(*aTrackCandPointer, factory,
+                                                               trackRep)); //create the track with the corresponding track representation
 
       B2DEBUG(100, " Checking Track");
 
@@ -364,7 +371,8 @@ void CDCLegendreDAFStereoAssigningModule::event()
       }
       B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ")");
 
-      if (aTrackCandPointer->getNHits() < 3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
+      if (aTrackCandPointer->getNHits() <
+          3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
         B2WARNING("Genfit2Module: only " << aTrackCandPointer->getNHits() << " were assigned to the Track! This Track will not be fitted!");
         ++m_failedFitCounter;
         continue;
@@ -512,7 +520,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
 
 
-  for (TrackCandidateWithStereoHits * trackCand : m_trackList) {
+  for (TrackCandidateWithStereoHits* trackCand : m_trackList) {
     for (int iCand = 0; iCand < gfTrackCands.getEntries(); iCand++) {
       if (trackCand->getGfTrackCand() != gfTrackCands[iCand]) continue;
 
@@ -528,7 +536,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
       std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
 
-      for (TrackHit * trackHit : trackHitVector) {
+      for (TrackHit* trackHit : trackHitVector) {
         if (trackHit->getIsAxial()) continue;
         int hitID = trackHit->getStoreIndex();
         gfTrackCands[iCand]->addHit(Const::CDC, hitID);
@@ -545,17 +553,17 @@ void CDCLegendreDAFStereoAssigningModule::event()
 void CDCLegendreDAFStereoAssigningModule::clear_pointer_vectors()
 {
 
-  for (TrackHit * hit : m_AxialHitList) {
+  for (TrackHit* hit : m_AxialHitList) {
     delete hit;
   }
   m_AxialHitList.clear();
 
-  for (TrackHit * hit : m_StereoHitList) {
+  for (TrackHit* hit : m_StereoHitList) {
     delete hit;
   }
   m_StereoHitList.clear();
 
-  for (TrackCandidateWithStereoHits * track : m_trackList) {
+  for (TrackCandidateWithStereoHits* track : m_trackList) {
     delete track;
   }
   m_trackList.clear();

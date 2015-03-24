@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
+#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <cmath>
 #include <TMath.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
@@ -40,7 +40,7 @@ double TrackFitter::fitTrackCandidateFast(
     // if with_drift_time if true, uses drift time information in fitting procedure
     if (!with_drift_time) {
       // looping over all hits and do the division afterwards
-      for (TrackHit * hit : hits) {
+      for (TrackHit* hit : hits) {
         if (hit->getDriftLength() != 0.)weight =  1. / hit->getDriftLength();
         else weight = 1.;
         //      if (nhits < 15) weight = 1.;
@@ -66,7 +66,7 @@ double TrackFitter::fitTrackCandidateFast(
       //    yc_track = track->getYc();
       double xc_track = cos(track_par.first) / track_par.second + ref_point.first;
       double yc_track = sin(track_par.first) / track_par.second + ref_point.second;
-      for (TrackHit * hit : hits) {
+      for (TrackHit* hit : hits) {
         //      if (hit->getDriftLength() != 0.)weight =  1. / hit->getDriftLength();
         //      else continue;
         weight = 1.;
@@ -128,7 +128,8 @@ double TrackFitter::fitTrackCandidateFast(
     double q1 = covR2R2 * covXY - covXR2 * covYR2;
     double q2 = covR2R2 * (covXX - covYY) - covXR2 * covXR2 + covYR2 * covYR2;
 
-    double clapPhi = 0.5 * atan2(2. * q1 , q2); // physical meaning: phi value of the point of closest approach of the fitted circle to the origin
+    double clapPhi = 0.5 * atan2(2. * q1 ,
+                                 q2); // physical meaning: phi value of the point of closest approach of the fitted circle to the origin
 
     double sinPhi = sin(clapPhi);
     double cosPhi = cos(clapPhi);
@@ -152,7 +153,8 @@ double TrackFitter::fitTrackCandidateFast(
     track_par.second = -1. * rho;
     B2DEBUG(100, "After:  theta: " << track_par.first << "; r: " << track_par.second);
 
-    chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
+    chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi *
+           cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
     B2DEBUG(100, "chi2: " << chi2);
 
     //  chi2 = estimateChi2( hits, track_par, ref_point);
@@ -274,7 +276,7 @@ double TrackFitter::fitTrackCandidateFast(
 
 
     double x(0), x2(0), y(0), y2(0), xy(0), r2(0), r4(0), xr2(0), yr2(0), sum_w(0);
-    for (TrackHit * hit : hits) {
+    for (TrackHit* hit : hits) {
       ;
       TVector3 hitPosition = hit->getWirePosition();
 
@@ -368,7 +370,7 @@ double TrackFitter::fitTrackCandidateFast(
     x2 = 0;
     y2 = 0;
     sum_w = 0;
-    for (TrackHit * hit : hits) {
+    for (TrackHit* hit : hits) {
       ;
       TVector3 hitPosition = hit->getWirePosition();
 
@@ -406,7 +408,7 @@ double TrackFitter::fitTrackCandidateFast(
     r2 = 0;
     r4 = 0;
     sum_w = 0;
-    for (TrackHit * hit : hits) {
+    for (TrackHit* hit : hits) {
       ;
       TVector3 hitPosition = hit->getWirePosition();
 
@@ -504,7 +506,8 @@ double TrackFitter::fitTrackCandidateFast(
     track_par.second = -1. * rho;
     B2DEBUG(100, "After:  theta: " << track_par.first << "; r: " << track_par.second);
 
-    chi2 = sum_w * (1. + rho * dist) * (1. + rho * dist) * (sin(phi) * sin(phi) * Cxx - 2.*sin(phi) * cos(phi) * Cxy + cos(phi) * cos(phi) * Cyy - kappa * kappa * Cr2r2); /// returns chi2
+    chi2 = sum_w * (1. + rho * dist) * (1. + rho * dist) * (sin(phi) * sin(phi) * Cxx - 2.*sin(phi) * cos(phi) * Cxy + cos(phi) * cos(
+                                                              phi) * Cyy - kappa * kappa * Cr2r2); /// returns chi2
     //B2INFO( "chi2: " << chi2);
 
     //  B2INFO("x: " << x << "; y: " << y << "; xy: " << xy << "; atan(xy): " << atan(xy));

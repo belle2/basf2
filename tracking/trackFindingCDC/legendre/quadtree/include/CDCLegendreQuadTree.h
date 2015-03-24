@@ -23,7 +23,7 @@
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>

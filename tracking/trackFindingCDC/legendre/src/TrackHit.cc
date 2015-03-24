@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 
 #include <TMath.h>
@@ -63,10 +63,12 @@ TrackHit::TrackHit(CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIW
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
   //forward end of the wire
-  m_wireForwardPosition.SetXYZ(cdcg.wireForwardPosition(m_layerId, m_wireId).x(), cdcg.wireForwardPosition(m_layerId, m_wireId).y(), cdcg.wireForwardPosition(m_layerId, m_wireId).z());
+  m_wireForwardPosition.SetXYZ(cdcg.wireForwardPosition(m_layerId, m_wireId).x(), cdcg.wireForwardPosition(m_layerId, m_wireId).y(),
+                               cdcg.wireForwardPosition(m_layerId, m_wireId).z());
 
   //backward end of the wire
-  m_wireBackwardPosition.SetXYZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).x(), cdcg.wireBackwardPosition(m_layerId, m_wireId).y(), cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
+  m_wireBackwardPosition.SetXYZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).x(), cdcg.wireBackwardPosition(m_layerId,
+                                m_wireId).y(), cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
 
 }
 
@@ -286,7 +288,8 @@ bool TrackHit::approach(const TrackCandidate& track)
     m_wirePosition.SetX(backwardWirePoint.x() + parameter[i] * wireVector.x());
     m_wirePosition.SetY(backwardWirePoint.y() + parameter[i] * wireVector.y());
 
-    double distance = track.DistanceTo(*this); //distance between the hit und the intersection point ( = shortest distance from hit to "track line")
+    double distance = track.DistanceTo(
+                        *this); //distance between the hit und the intersection point ( = shortest distance from hit to "track line")
 
     //search for the wire point which gives the shortest distance
     if (distance < distanceMax) {
@@ -343,7 +346,8 @@ bool TrackHit::approach2(const TrackCandidate& track)
   double r_t = sqrt(tx * tx + ty * ty);
   double r_h = m_driftLength;
 
-  double d = sqrt((m_wirePositionOrig.X() - tx) * (m_wirePositionOrig.X() - tx) + (m_wirePositionOrig.Y() - ty) * (m_wirePositionOrig.Y() - ty));
+  double d = sqrt((m_wirePositionOrig.X() - tx) * (m_wirePositionOrig.X() - tx) + (m_wirePositionOrig.Y() - ty) *
+                  (m_wirePositionOrig.Y() - ty));
   double radii;
 
   if (d > max(r_t, r_h))

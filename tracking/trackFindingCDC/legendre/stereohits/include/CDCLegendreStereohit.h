@@ -12,7 +12,7 @@
 
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include "TVector3.h"
 #include "TVector2.h"
@@ -25,9 +25,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    class TrackHit;
-    class TrackCandidate;
 
     class StereoHit {
     public:

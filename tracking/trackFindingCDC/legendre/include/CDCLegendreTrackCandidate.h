@@ -10,8 +10,6 @@
 
 #pragma once
 
-
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 

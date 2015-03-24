@@ -23,7 +23,7 @@
 #include <genfit/TrackCand.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackHit.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -133,7 +133,7 @@ void TrackDrawer::drawTrackCand(TrackCandidate* TrackCand)
 
   drawAnyTrack(ss, momentum, charge, trackColor, position);
 
-  for (TrackHit * hit : TrackCand->getTrackHits()) {
+  for (TrackHit* hit : TrackCand->getTrackHits()) {
     CDCHit* TrackHit = HitArray[hit->getStoreIndex()];
 
     drawCDCHit(ss, TrackHit, trackColor);
@@ -167,7 +167,8 @@ void TrackDrawer::drawListOfTrackCands(std::list<TrackCandidate*>& trackList)
 
   fig.open(ss.str().c_str());
 
-  fig << "<?xml version=\"1.0\" ?> \n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"" << m_max << "pt\" height=\"" << m_max << "pt\" viewBox=\"0 0 " << m_max << " " << m_max << "\" version=\"1.1\">\n";
+  fig << "<?xml version=\"1.0\" ?> \n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\""
+      << m_max << "pt\" height=\"" << m_max << "pt\" viewBox=\"0 0 " << m_max << " " << m_max << "\" version=\"1.1\">\n";
 
   fig << m_wireString.str();
 
@@ -184,7 +185,7 @@ void TrackDrawer::drawListOfTrackCands(std::list<TrackCandidate*>& trackList)
   fig << ss.str();
 
 
-  for (TrackCandidate * TrackCand : trackList) {
+  for (TrackCandidate* TrackCand : trackList) {
     std::string trackColor = getColor(iTrack);
     TVector2 momentum(TrackCand->getMomentumEstimation().X(), TrackCand->getMomentumEstimation().Y());
     TVector2 position(TrackCand->getReferencePoint().X(), TrackCand->getReferencePoint().Y());
@@ -192,7 +193,7 @@ void TrackDrawer::drawListOfTrackCands(std::list<TrackCandidate*>& trackList)
 
     drawAnyTrack(ss, momentum, charge, trackColor, position);
 
-    for (TrackHit * hit : TrackCand->getTrackHits()) {
+    for (TrackHit* hit : TrackCand->getTrackHits()) {
       CDCHit* TrackHit = HitArray[hit->getStoreIndex()];
 
       drawCDCHit(ss, TrackHit, trackColor);
@@ -231,12 +232,12 @@ void TrackDrawer::finalizeROOTFile(std::vector<TrackHit*>& hits_vector)
   drawConformalHits(hits_vector, -1, true);
   drawLegendreHits(hits_vector, -1, true);
 
-  for (TEllipse * hit_conformal : m_hitsConformal) {
+  for (TEllipse* hit_conformal : m_hitsConformal) {
     delete hit_conformal;
   }
   m_hitsConformal.clear();
 
-  for (TF1 * hit_legendre : m_hitsLegendre) {
+  for (TF1* hit_legendre : m_hitsLegendre) {
     delete hit_legendre;
   }
   m_hitsLegendre.clear();
@@ -312,7 +313,7 @@ void TrackDrawer::drawConformalHits(std::vector<TrackHit*> trackHitList, int ntr
     Color_t trackColor;
     if (ntrack >= 0)trackColor = getRootColor(ntrack);
     else trackColor = kBlue;
-    for (TrackHit * hit : trackHitList) {
+    for (TrackHit* hit : trackHitList) {
       double x0 = hit->getConformalX();
       double y0 = hit->getConformalY();
       double R = hit->getConformalDriftLength();
@@ -330,7 +331,7 @@ void TrackDrawer::drawConformalHits(std::vector<TrackHit*> trackHitList, int ntr
     TCanvas* canv = new TCanvas("canv", "conformal space", 0, 0, 600, 600);
     canv->Range(0, 0, 1, 1);
 
-    for (TEllipse * hit_conformal : m_hitsConformal) {
+    for (TEllipse* hit_conformal : m_hitsConformal) {
       hit_conformal->Draw();
     }
 
@@ -356,7 +357,7 @@ void TrackDrawer::drawLegendreHits(std::vector<TrackHit*> trackHitList, int ntra
     Color_t trackColor;
     if (ntrack >= 0)trackColor = getRootColor(ntrack);
     else trackColor = kBlue;
-    for (TrackHit * hit : trackHitList) {
+    for (TrackHit* hit : trackHitList) {
       TF1* funct1 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)+[2]", 0, m_PI);
       TF1* funct2 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)-[2]", 0, m_PI);
       funct1->SetLineWidth(1);

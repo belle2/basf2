@@ -218,16 +218,17 @@ namespace Belle2 {
 
       std::vector<double> m_calibConstants; /**< Calibration constants for each channel (in V/keV)*/
       std::vector<double> m_noiseLevels;    /**< Noise level for each channel (in V)*/
-      std::vector<double> m_LY;
-      std::vector<double> m_tRatio;
-      std::vector<double> m_tFast;
-      std::vector<double> m_tSlow;
-      std::vector<double> m_LCE;
-      std::vector<double> m_PmtQE;
-      std::vector<double> m_PmtGain;
+      std::vector<double> m_LY;  /**< Light yield for each channel (gamma per GeV) */
+      std::vector<double> m_tRatio; /**< Ratio fast light / slow light for each channel */
+      std::vector<double> m_tFast; /**< Fast time constant for each channel (ns) */
+      std::vector<double> m_tSlow; /**< Slow time constant for each channel (ns) */
+      std::vector<double> m_LCE; /**< Light collection efficiency for each channel */
+      std::vector<double> m_PmtQE; /**<PMT quantum efficiency for each channel */
+      std::vector<double> m_PmtGain; /**< PMT gain for each channel */
 
       Signal m_SimHitTimes[16]; /**< Array of signals (each corresponding to one channel) */
       Signal m_SimHitEdeps[16];  /**< Array of signals (each corresponding to one channel) */
+
     };
 
   }

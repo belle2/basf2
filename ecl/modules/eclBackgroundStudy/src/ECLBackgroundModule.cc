@@ -80,6 +80,7 @@ ECLBackgroundModule::ECLBackgroundModule() :
   T_event{0},
   T_energy{0},
   T_1us{0},
+  Crystal{0},
   m_arichgp(0),
   nHAPDperRing{0},
   hEMDose(0),

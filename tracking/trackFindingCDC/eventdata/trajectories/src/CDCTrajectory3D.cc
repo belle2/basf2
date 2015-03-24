@@ -240,9 +240,9 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const FloatType& 
   // Momentum
   if (bZ == 0) {
     jacobianInflate(iPx, iCurv) = 0;
-    jacobianInflate(iPy, iPhi0) = momentum.polarR();
+    jacobianInflate(iPy, iPhi0) = momentum.cylindricalR();
     jacobianInflate(iPz, iCurv) = 0;
-    jacobianInflate(iPz, iSZ) = momentum.polarR();
+    jacobianInflate(iPz, iSZ) = momentum.cylindricalR();
   } else {
     jacobianInflate(iPx, iCurv) = invChargeAlphaCurv2;
     jacobianInflate(iPy, iPhi0) = - invChargeAlphaCurv;

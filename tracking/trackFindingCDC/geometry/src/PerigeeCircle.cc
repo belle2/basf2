@@ -179,7 +179,7 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian
   //B2INFO("B = " << B);
   //B2INFO("C = " << C);
 
-  FloatType u = 1 + curvature() * impact(); //= n12().polarR()
+  FloatType u = 1 + curvature() * impact(); //= n12().cylindricalR()
 
   FloatType U = sqrt(1 + curvature() * A);
 

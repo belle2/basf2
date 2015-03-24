@@ -39,17 +39,17 @@ bool TrackFindingCDC::isLogicISuperLayer(const ISuperLayerType& iSuperLayer)
 
 
 
-ISuperLayerType TrackFindingCDC::getISuperLayerAtPolarR(const FloatType& polarR)
+ISuperLayerType TrackFindingCDC::getISuperLayerAtCylindricalR(const FloatType& cylindricalR)
 {
   const CDCWireTopology& cdcWireTopology = CDCWireTopology::getInstance();
   const std::vector<CDCWireSuperLayer>& wireSuperLayers = cdcWireTopology.getWireSuperLayers();
 
-  if (std::isnan(polarR) or polarR < 0) return INVALID_ISUPERLAYER;
+  if (std::isnan(cylindricalR) or cylindricalR < 0) return INVALID_ISUPERLAYER;
 
-  if (polarR < cdcWireTopology.getWireSuperLayer(0).getInnerPolarR()) return INNER_ISUPERLAYER;
+  if (cylindricalR < cdcWireTopology.getWireSuperLayer(0).getInnerCylindricalR()) return INNER_ISUPERLAYER;
 
-  for (const CDCWireSuperLayer & wireSuperLayer : wireSuperLayers) {
-    if (polarR <= wireSuperLayer.getOuterPolarR()) {
+  for (const CDCWireSuperLayer& wireSuperLayer : wireSuperLayers) {
+    if (cylindricalR <= wireSuperLayer.getOuterCylindricalR()) {
       return wireSuperLayer.getISuperLayer();
     }
   }

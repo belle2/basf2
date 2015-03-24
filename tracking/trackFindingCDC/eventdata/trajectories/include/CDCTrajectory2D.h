@@ -110,12 +110,12 @@ namespace Belle2 {
       Vector2D getClosest(const Vector2D& point) const
       { return getLocalCircle().closest(point - getLocalOrigin()) + getLocalOrigin(); }
 
-      /// Calculates the close point with the same polarR on the trajectory to the given point
+      /// Calculates the close point with the same cylindricalR on the trajectory to the given point
       /** This returns the point where the trajectory reaches as certain distance from the origin \n
        *  ( in the xy projection ). It is useful to estimate where the trajectory reaches a  \n
        *  specific wire layer. */
-      Vector2D getCloseSamePolarR(const Vector2D& point) const
-      { return getGlobalCircle().samePolarR(point); }
+      Vector2D getCloseSameCylindricalR(const Vector2D& point) const
+      { return getGlobalCircle().sameCylindricalR(point); }
 
       /// Calculates the point where the trajectory meets the outer wall of the CDC.
       /** This method returns the first point in forward flight direction from the start
@@ -149,12 +149,12 @@ namespace Belle2 {
       { return getLocalCircle().isRightOrLeft(point - getLocalOrigin()); }
 
       /// Getter for the maximal distance from the origin
-      FloatType getMaximalPolarR() const
-      { return  getGlobalCircle().maximalPolarR(); }
+      FloatType getMaximalCylindricalR() const
+      { return  getGlobalCircle().maximalCylindricalR(); }
 
       /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
-      FloatType getMinimalPolarR() const
-      { return  getGlobalCircle().minimalPolarR(); }
+      FloatType getMinimalCylindricalR() const
+      { return  getGlobalCircle().minimalCylindricalR(); }
 
       /// Getter for the signed impact parameter of the trajectory
       FloatType getGlobalImpact() const

@@ -76,7 +76,7 @@ namespace Belle2 {
                                                      const Vector2D& tangential,
                                                      const FloatType& impact);
 
-      /// Constructor of a generalized circle from perigee parameters. Tangential at perigee given as polar angle.
+      /// Constructor of a generalized circle from perigee parameters. Tangential at perigee given as azimuth angle.
       static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
                                                      const FloatType& tangentialPhi,
                                                      const FloatType& impact);
@@ -170,7 +170,8 @@ namespace Belle2 {
        *  norm. If the normalization of the cirlce is negativ or zero all circle
        *  parameters are not changed.
        */
-      inline void normalize() {
+      inline void normalize()
+      {
         FloatType normalization_squared = normalizationSquared();
         if (normalization_squared  > 0) scaleN(1.0 / std::sqrt(normalization_squared));
       }
@@ -282,7 +283,8 @@ namespace Belle2 {
        *  * BACKWARD in case the to vector is closer against the orientation.
        *  * UNKNOWN_INFO if neither can be determined.
        */
-      ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const {
+      ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
+      {
         Vector2D difference = to - from;
         Vector2D tangentialAtFrom = tangential(from);
         return tangentialAtFrom.isForwardOrBackwardOf(difference);
@@ -300,30 +302,31 @@ namespace Belle2 {
        */
       Vector2D chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const;
 
-      /// Calculates the two points with the given polar radius on the generalised circle
-      std::pair<Belle2::TrackFindingCDC::Vector2D, Belle2::TrackFindingCDC::Vector2D> samePolarR(const FloatType& polarR) const;
+      /// Calculates the two points with the given cylindrical radius on the generalised circle
+      std::pair<Belle2::TrackFindingCDC::Vector2D, Belle2::TrackFindingCDC::Vector2D> sameCylindricalR(
+        const FloatType& cylindricalR) const;
 
-      ///Approach with the same polar radius on the circle to the point
+      ///Approach with the same cylindrical radius on the circle to the point
       /**
-       * Calculates the point on the circle with the same polar radius as the given point.
+       * Calculates the point on the circle with the same cylindrical radius as the given point.
        * This is particularly useful to extraplotate within  a certain layer.
-       * In case on intersection with this polar radius exists the function return Vector2D(NAN,NAN)
-       * @param point Point in the plane to calculate the same polar radius point on the circle
-       * @return Close point with same polar radius on the circle
+       * In case on intersection with this cylindrical radius exists the function return Vector2D(NAN,NAN)
+       * @param point Point in the plane to calculate the same cylindrical radius point on the circle
+       * @return Close point with same cylindrical radius on the circle
        */
-      Vector2D samePolarR(const Vector2D& point) const;
+      Vector2D sameCylindricalR(const Vector2D& point) const;
 
-      ///Approach on the circle with the given polar radius that lies in the forward direction of a start point
+      ///Approach on the circle with the given cylindrical radius that lies in the forward direction of a start point
       /**
-       * Calculates the point on the circle with polar radius polarR,
+       * Calculates the point on the circle with cylindrical radius cylindricalR,
        * which is closest following the circle in the direction of positive forward orientation
        * This is particularly useful to extraplotate into a certain layer.
-       * In case on intersection with this polar radius exists the function return Vector2D(NAN,NAN)
+       * In case on intersection with this cylindrical radius exists the function return Vector2D(NAN,NAN)
        * @param startPoint Start point from which to follow in the circle in the forward direction
-       * @param polarR Polar radius of interest
-       * @return Close point in forward direction with same polar radius on the circle.
+       * @param cylindricalR Cylindrical radius of interest
+       * @return Close point in forward direction with same cylindrical radius on the circle.
        */
-      Vector2D samePolarRForwardOf(const Vector2D& startPoint, const FloatType& polarR) const;
+      Vector2D sameCylindricalRForwardOf(const Vector2D& startPoint, const FloatType& cylindricalR) const;
 
       /// Approximate distance
       /**
@@ -357,16 +360,16 @@ namespace Belle2 {
       inline Vector2D tangential() const
       { return tangential(Vector2D(0.0, 0.0)).unit(); }
 
-      /// Gives to polar phi of the direction of flight at the perigee
+      /// Gives to azimuth angle phi of the direction of flight at the perigee
       inline FloatType tangentialPhi() const
       { return tangential().phi(); }
 
-      /// Gives the minimal polar r the circle reaches (unsigned)
-      inline FloatType minimalPolarR() const
+      /// Gives the minimal cylindrical radius the circle reaches (unsigned)
+      inline FloatType minimalCylindricalR() const
       { return std::fabs(impact()); }
 
-      /// Gives the maximal polar r the circle reaches
-      inline FloatType maximalPolarR() const
+      /// Gives the maximal cylindrical radius the circle reaches
+      inline FloatType maximalCylindricalR() const
       { return std::fabs(impact() + 2 * radius()); }
 
       /// Gives the proper absolute distance of the point to the circle line.
@@ -466,7 +469,8 @@ namespace Belle2 {
 
     public:
       /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const GeneralizedCircle& circle) {
+      friend std::ostream& operator<<(std::ostream& output, const GeneralizedCircle& circle)
+      {
         if (circle.isLine()) {
           output << "Line support point = " << circle.perigee();
           return output;

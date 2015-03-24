@@ -93,7 +93,7 @@ void BackgroundHitFinderModule::prepareSuperLayerCenterArray(const CDCWireTopolo
   m_superLayerCenters.reserve(wireTopology.getNSuperLayers());
 
   for (const CDCWireSuperLayer& superLayer : wireTopology.getWireSuperLayers()) {
-    m_superLayerCenters.push_back(0.5 * (superLayer.getInnerPolarR() + superLayer.getOuterPolarR()));
+    m_superLayerCenters.push_back(0.5 * (superLayer.getInnerCylindricalR() + superLayer.getOuterCylindricalR()));
   }
 }
 

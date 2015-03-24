@@ -202,22 +202,22 @@ namespace Belle2 {
       const FloatType& getSkew() const { return m_skew; }
 
       /// Getter for the average stereo angle of all wires in this layer
-      FloatType getStereoAngle() const { return std::atan(getSkew() * getMinPolarR()); }
+      FloatType getStereoAngle() const { return std::atan(getSkew() * getMinCylindricalR()); }
 
       /// Getter for the closest distance to the beamline ( z-axes ) of all wires in this layer
-      const FloatType& getMinPolarR() const { return m_minPolarR; }
+      const FloatType& getMinCylindricalR() const { return m_minCylindricalR; }
 
-      /// Getter for the  common (averaged) polar radius at the wire reference point
-      const FloatType& getRefPolarR() const { return m_refPolarR; }
+      /// Getter for the  common (averaged) cylindrical radius at the wire reference point
+      const FloatType& getRefCylindricalR() const { return m_refCylindricalR; }
 
       /// Getter for the common (averaged) z component of the wire reference point
       const FloatType& getRefZ() const { return m_refZ; }
 
       /// Getter for the average distance to the beamline ( z-axes ) at the forward joint points of all wires in this layer
-      const FloatType& getForwardPolarR() const { return m_forwardPolarR; };
+      const FloatType& getForwardCylindricalR() const { return m_forwardCylindricalR; };
 
       /// Getter for the average distance to the beamline ( z-axes ) at the backward joint points of all wires in this layer
-      const FloatType& getBackwardPolarR() const { return m_backwardPolarR; };
+      const FloatType& getBackwardCylindricalR() const { return m_backwardCylindricalR; };
 
       /// Getter for the average z coordinate at the forward joint points of all wires in this layer
       const FloatType& getForwardZ() const { return m_forwardZ; }
@@ -225,16 +225,16 @@ namespace Belle2 {
       /// Getter for the average z coordinate at the backward joint points of all wires in this layer
       const FloatType& getBackwardZ() const { return m_backwardZ; }
 
-      /// Getter for the average polar angle of the forward joint points of the wires relativ to their references
+      /// Getter for the average azimuth angle of the forward joint points of the wires relativ to their references
       const FloatType& getForwardPhiToRef() const { return m_forwardPhiToRef; }
 
-      /// Getter for the average polar angle of the backward joint points of the wires relativ to their references
+      /// Getter for the average azimuth angle of the backward joint points of the wires relativ to their references
       const FloatType& getBackwardPhiToRef() const { return m_backwardPhiToRef; }
 
-      /// Getter for the average polar angle range covered by the wires relativ to their respective reference points.
-      /** Gives the range of polar angles the stereo wires cover relativ to their reference positions. \n
+      /// Getter for the average azimuth angle range covered by the wires relativ to their respective reference points.
+      /** Gives the range of azimuth angles the stereo wires cover relativ to their reference positions. \n
        *  A stereo wire has a certain extension visible as a stretch in the xy projection. \n
-       *  This translates to a range of polar angles, which can be used for a quick check \n
+       *  This translates to a range of azimuth angles, which can be used for a quick check \n
        *  if an xy projected track could have hit a wire or not. Taking the average of all wires \n
        *  in the layer makes this value more relieable. \n
        *  The range covers reaches from negativ to positiv values since the references is somewhere \n
@@ -251,10 +251,10 @@ namespace Belle2 {
         */
       /**@{*/
       ///Getter for inner radius of the layer as taken from the CDCGeometryPar
-      const FloatType& getInnerPolarR() const { return m_innerPolarR; }
+      const FloatType& getInnerCylindricalR() const { return m_innerCylindricalR; }
 
       ///Getter for outer radius of the layer as taken from the CDCGeometryPar
-      const FloatType& getOuterPolarR() const { return m_outerPolarR; }
+      const FloatType& getOuterCylindricalR() const { return m_outerCylindricalR; }
       /**@}*/
 
     private:
@@ -280,13 +280,13 @@ namespace Belle2 {
        */
       //@{
       FloatType m_skew; ///< Storage for average skew
-      FloatType m_minPolarR; ///< Storage for minimal distance from beamline
+      FloatType m_minCylindricalR; ///< Storage for minimal distance from beamline
 
-      FloatType m_refPolarR; ///< Storage for common (averaged) polar radius of all wire reference positions.
+      FloatType m_refCylindricalR; ///< Storage for common (averaged) cylindrical radius of all wire reference positions.
       FloatType m_refZ; ///< Storage for common (averaged) z coordinate of all wire reference positions.
 
-      FloatType m_forwardPolarR; ///< Storage for average distance from beamline of forward wire ends
-      FloatType m_backwardPolarR; ///< Storage for average distance from beamline of backward wire ends
+      FloatType m_forwardCylindricalR; ///< Storage for average distance from beamline of forward wire ends
+      FloatType m_backwardCylindricalR; ///< Storage for average distance from beamline of backward wire ends
 
       FloatType m_forwardZ; ///< Storage for z position of forward wire ends
       FloatType m_backwardZ; ///< Storage for z position of backward wire ends
@@ -294,7 +294,8 @@ namespace Belle2 {
       FloatType m_forwardPhiToRef; ///< Storage of the average angle between forward and ref position in the xy projection (see getPhiRangeToRef() for details)
       FloatType m_backwardPhiToRef;///< Storage of the average angle between backward and ref position in the xy projection (see getPhiRangeToRef() for details)
 
-      std::pair<FloatType, FloatType> m_phiRangeToRef; ///< Storage of the angle range to ref positions in the xy projection (see getPhiRangeToRef() for details)
+      std::pair<FloatType, FloatType>
+      m_phiRangeToRef; ///< Storage of the angle range to ref positions in the xy projection (see getPhiRangeToRef() for details)
       //@}
 
       /** @name Property averages CDCGeometryPar
@@ -302,8 +303,8 @@ namespace Belle2 {
        *  on initialization of the CDCWireLayer.
        */
       //@{
-      FloatType m_innerPolarR; ///< Storage of the inner radius of the wire layer as taken from the CDCGeometryPar instance
-      FloatType m_outerPolarR; ///< Storage of the outer radius of the wire layer as taken from the CDCGeometryPar instance
+      FloatType m_innerCylindricalR; ///< Storage of the inner radius of the wire layer as taken from the CDCGeometryPar instance
+      FloatType m_outerCylindricalR; ///< Storage of the outer radius of the wire layer as taken from the CDCGeometryPar instance
       //@}
 
       /** ROOT Macro to make CDCWireLayer a ROOT class.*/

@@ -75,7 +75,8 @@ namespace Belle2 {
       ~Helix() {;}
 
       /// Sets all circle parameters to zero.
-      void setNull() {
+      void setNull()
+      {
         m_circleXY.setNull();
         m_lineSZ.setNull();
       }
@@ -84,7 +85,8 @@ namespace Belle2 {
       { return circleXY().isNull() and lineSZ().isNull(); }
 
       /// Flips the travel direction of the helix in place, pivot point is unchanged.
-      inline void reverse() {
+      inline void reverse()
+      {
         m_circleXY.reverse();
         //Invert the travel distance scale, but not the z scale.
         m_lineSZ.flipFirst();
@@ -99,18 +101,20 @@ namespace Belle2 {
       FloatType arcLengthAtClosest(const Vector3D& point) const;
 
       /// Calculates the point of closest approach on the helix to the given point.
-      Vector3D closest(const Vector3D& point) const {
+      Vector3D closest(const Vector3D& point) const
+      {
         FloatType arcLength = arcLengthAtClosest(point);
         return atArcLength(arcLength);
       }
 
       //FloatType distance(const Vector3D& point) const;
       //FloatType lengthOnCurve(const Vector3D& from, const Vector3D& to) const;
-      //Vector3D samePolarR(const Vector3D& point) const;
-      //Vector3D samePolarRForwardOf(const Vector3D& startPoint, const FloatType& polarR) const;
+      //Vector3D sameCylindricalR(const Vector3D& point) const;
+      //Vector3D sameCylindricalRForwardOf(const Vector3D& startPoint, const FloatType& cylindricalR) const;
 
       /// Moves the coordinates system by the given vector. Updates support point in place.
-      void passiveMoveBy(const Vector3D& by) {
+      void passiveMoveBy(const Vector3D& by)
+      {
         // First keep the necessary shift of the perpendicular travel distance to the new support point.
         FloatType byS = circleXY().arcLengthBetween(perigeeXY(), by.xy());
         m_circleXY.passiveMoveBy(by.xy());
@@ -123,7 +127,8 @@ namespace Belle2 {
       TMatrixD passiveMoveByJacobian(const Vector3D& by) const;
 
       /// Shifts the szSlope and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftSZSlopeIntercept(const FloatType& szSlopeShift, const FloatType& zShift) {
+      void shiftSZSlopeIntercept(const FloatType& szSlopeShift, const FloatType& zShift)
+      {
         FloatType z0 = m_lineSZ.intercept();
         FloatType szSlope = m_lineSZ.slope();
         m_lineSZ.setSlopeIntercept(szSlope + szSlopeShift, z0 + zShift);
@@ -142,13 +147,13 @@ namespace Belle2 {
       { return Vector2D(circleXY().atArcLength(lineSZ().inverseMap(z))); }
 
 
-      /// Gives the minimal polar r the circle reaches (unsigned)
-      inline FloatType minimalPolarR() const
-      { return circleXY().minimalPolarR(); }
+      /// Gives the minimal cylindrical radius the circle reaches (unsigned)
+      inline FloatType minimalCylindricalR() const
+      { return circleXY().minimalCylindricalR(); }
 
-      /// Gives the maximal polar r the circle reaches
-      inline FloatType maximalPolarR() const
-      { return circleXY().maximalPolarR(); }
+      /// Gives the maximal cylindrical radius the circle reaches
+      inline FloatType maximalCylindricalR() const
+      { return circleXY().maximalCylindricalR(); }
 
       /// Getter for the signed curvature in the xy projection.
       inline const FloatType& curvatureXY() const
@@ -198,7 +203,8 @@ namespace Belle2 {
       { return circleXY().perimeter(); }
 
       /// Getter for the unit three dimensional tangential vector at the support point of the helix.
-      Vector3D tangential() const {
+      Vector3D tangential() const
+      {
         Vector3D result(tangentialXY(), szSlope());
         result.normalize();
         return result;
@@ -208,16 +214,17 @@ namespace Belle2 {
       const Vector2D& tangentialXY() const
       { return circleXY().tangential(); }
 
-      /// Getter for the polar angle of the tangential vector at the support point of the helix.
+      /// Getter for the azimuth angle of the tangential vector at the support point of the helix.
       const FloatType& tangentialPhi() const
       { return circleXY().tangentialPhi(); }
 
-      /// Getter for the polar angle of the tangential vector at the support point of the helix.
+      /// Getter for the azimuth angle of the tangential vector at the support point of the helix.
       const  FloatType& phi0() const
       { return tangentialPhi(); }
 
       /// Getter for the five helix parameters in the order defined by HelixParameterIndex.h and PerigeeParameterIndex.h
-      TVectorD parameters() const {
+      TVectorD parameters() const
+      {
         TVectorD result(iCurv, iZ0);
         result(iCurv) = curvatureXY();
         result(iPhi0) = phi0();

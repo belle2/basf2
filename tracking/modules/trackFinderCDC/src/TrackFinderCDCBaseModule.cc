@@ -209,7 +209,7 @@ void TrackFinderCDCBaseModule::event()
       CDCTrack& lastTrack = outputTracks.back();
       const CDCRecoHit3D& firstHit = lastTrack.front();
       const CDCRecoHit3D& lastHit = lastTrack.back();
-      if (lastHit.getRecoPos3D().polarR() > firstHit.getRecoPos3D().polarR()) {
+      if (lastHit.getRecoPos3D().cylindricalR() > firstHit.getRecoPos3D().cylindricalR()) {
         lastTrack.reverse();
       }
     }

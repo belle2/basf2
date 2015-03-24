@@ -42,12 +42,12 @@ namespace Belle2 {
                     const Vector2D& tangential,
                     const FloatType& impact);
 
-      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as polar angle
+      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as azimuth angle
       PerigeeCircle(const FloatType& curvature,
                     const FloatType& tangentialPhi,
                     const FloatType& impact);
 
-      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as polar angle
+      /// Constructor from the perigee parammeters.
       PerigeeCircle(const TVectorD& parameters);
 
 
@@ -95,7 +95,8 @@ namespace Belle2 {
 
     protected:
       /// Caches the perigee parameters from the underlying generalized circle parameters.
-      void receivePerigeeParameters() {
+      void receivePerigeeParameters()
+      {
         m_impact = GeneralizedCircle::impact();
         m_curvature = GeneralizedCircle::curvature();
         m_tangential = GeneralizedCircle::tangential();
@@ -107,7 +108,8 @@ namespace Belle2 {
       /// Setter for the circle center and radius
       void setCenterAndRadius(const Vector2D& center,
                               const FloatType& absRadius,
-                              const CCWInfo& orientation = CCW) {
+                              const CCWInfo& orientation = CCW)
+      {
         GeneralizedCircle::setCenterAndRadius(center, absRadius, orientation);
         receivePerigeeParameters();
       }
@@ -115,7 +117,8 @@ namespace Belle2 {
       /// Setter for the perigee parameters
       void setPerigeeParameters(const FloatType& curvature,
                                 const Vector2D& tangential,
-                                const FloatType& impact) {
+                                const FloatType& impact)
+      {
         m_impact = impact;
         m_tangentialPhi = tangential.phi();
         m_tangential = tangential;
@@ -127,7 +130,8 @@ namespace Belle2 {
       /// Setter for the perigee parameters
       inline void setPerigeeParameters(const FloatType& curvature,
                                        const FloatType& tangentialPhi,
-                                       const FloatType& impact) {
+                                       const FloatType& impact)
+      {
         m_impact = impact;
         m_tangentialPhi = tangentialPhi;
         m_tangential = Vector2D::Phi(tangentialPhi);
@@ -137,58 +141,67 @@ namespace Belle2 {
 
       /// Setter for all four circle parameters.
       /// The normal representation of a line leave out the last parameter
-      void setN(const FloatType& n0, const FloatType& n1, const FloatType& n2, const FloatType& n3 = 0.0) {
+      void setN(const FloatType& n0, const FloatType& n1, const FloatType& n2, const FloatType& n3 = 0.0)
+      {
         GeneralizedCircle::setN(n0, n1, n2, n3);
         receivePerigeeParameters();
       }
 
       /// Setter for all four circle parameters.
       /// The normal representation of a line leave out the last parameter
-      void setN(const FloatType& n0, const Vector2D& n12, const FloatType& n3 = 0.0) {
+      void setN(const FloatType& n0, const Vector2D& n12, const FloatType& n3 = 0.0)
+      {
         GeneralizedCircle::setN(n0, n12, n3);
         receivePerigeeParameters();
       }
 
       /// Setter for all four circle parameters from a line.
-      void setN(const Line2D& n012) {
+      void setN(const Line2D& n012)
+      {
         GeneralizedCircle::setN(n012);
         receivePerigeeParameters();
       }
 
       /// Setter for all four circle parameters from another circle
-      void setN(const GeneralizedCircle& n0123) {
+      void setN(const GeneralizedCircle& n0123)
+      {
         GeneralizedCircle::setN(n0123);
         receivePerigeeParameters();
       }
 
       /// Setter for signed curvature.
-      inline void setCurvature(const FloatType& curvature) {
+      inline void setCurvature(const FloatType& curvature)
+      {
         m_curvature = curvature;
         GeneralizedCircle::setPerigeeParameters(m_curvature, m_tangential, m_impact);
       }
 
-      /// Sets the polar angle of the direction of flight at the perigee.
-      inline void setTangentialPhi(const FloatType& tangentialPhi) {
+      /// Sets the azimuth angle of the direction of flight at the perigee.
+      inline void setTangentialPhi(const FloatType& tangentialPhi)
+      {
         m_tangentialPhi = tangentialPhi;
         m_tangential = Vector2D::Phi(tangentialPhi);
         GeneralizedCircle::setPerigeeParameters(m_curvature, m_tangential, m_impact);
       }
 
       /// Sets the unit direction of flight at the perigee
-      inline void setTangential(const Vector2D& tangential) {
+      inline void setTangential(const Vector2D& tangential)
+      {
         m_tangentialPhi = tangential.phi();
         m_tangential = tangential.unit();
         GeneralizedCircle::setPerigeeParameters(m_curvature, m_tangential, m_impact);
       }
 
       /// Sets the impact parameter of the circle.
-      inline void setImpact(const FloatType& impact) {
+      inline void setImpact(const FloatType& impact)
+      {
         m_impact = impact;
         GeneralizedCircle::setPerigeeParameters(m_curvature, m_tangential, m_impact);
       }
 
       /// Sets all circle parameters to zero
-      void setNull() {
+      void setNull()
+      {
         GeneralizedCircle::setNull();
         m_curvature = 0.0;
         m_tangentialPhi = NAN;
@@ -197,7 +210,8 @@ namespace Belle2 {
       }
 
       /// Flips the orientation of the circle in place
-      inline void reverse() {
+      inline void reverse()
+      {
         GeneralizedCircle::reverse();
         m_curvature = -m_curvature;
         m_tangentialPhi = reversedPhi(m_tangentialPhi);
@@ -206,7 +220,8 @@ namespace Belle2 {
       }
 
       /// Returns a copy of the circle with opposite orientation.
-      inline PerigeeCircle reversed() const {
+      inline PerigeeCircle reversed() const
+      {
         return PerigeeCircle(GeneralizedCircle::reversed(),
                              -m_curvature,
                              reversedPhi(m_tangentialPhi),
@@ -216,7 +231,7 @@ namespace Belle2 {
       }
 
     private:
-      /// Returns the polar angle associated with the reverse vector
+      /// Returns the azimuth angle associated with the reverse vector
       inline FloatType reversedPhi(const FloatType& phi) const
       { return phi > 0 ? phi - PI : phi + PI; }
 
@@ -225,7 +240,8 @@ namespace Belle2 {
       /// Transforms the generalized circle to conformal space inplace
       /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
        *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
-      inline void conformalTransform() {
+      inline void conformalTransform()
+      {
         GeneralizedCircle::conformalTransform();
         receivePerigeeParameters();
       }
@@ -233,13 +249,15 @@ namespace Belle2 {
       /// Returns a copy of the circle in conformal space
       /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) and returns the result as a new GeneralizedCircle
        *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
-      inline PerigeeCircle conformalTransformed() const {
+      inline PerigeeCircle conformalTransformed() const
+      {
         return PerigeeCircle::fromN(n3(), n12(), n0());
       }
 
 
       /// Moves the coordinates system by the given vector. Updates perigee parameters in place
-      void passiveMoveBy(const Vector2D& by) {
+      void passiveMoveBy(const Vector2D& by)
+      {
         GeneralizedCircle::passiveMoveBy(by);
         receivePerigeeParameters();
       }
@@ -260,7 +278,7 @@ namespace Belle2 {
       inline FloatType impact() const
       { return m_impact; }
 
-      /// Gets the polar angle of the direction of flight at the perigee
+      /// Gets the azimuth angle of the direction of flight at the perigee
       inline const FloatType& tangentialPhi() const
       { return m_tangentialPhi; }
 
@@ -268,7 +286,7 @@ namespace Belle2 {
       inline const Vector2D& tangential() const
       { return m_tangential; }
 
-      /// Gets the polar angle of the direction of flight at the perigee
+      /// Gets the azimuth angle of the direction of flight at the perigee
       inline const FloatType& phi0() const
       { return tangentialPhi(); }
 
@@ -281,7 +299,8 @@ namespace Belle2 {
       { return tangential().orthogonal() * impact(); }
 
       /// Getter for the three perigee parameters in the order defined by PerigeeParameterIndex.h
-      TVectorD parameters() const {
+      TVectorD parameters() const
+      {
         TVectorD result(iCurv, iI);
         result(iCurv) = curvature();
         result(iPhi0) = phi0();
@@ -290,17 +309,18 @@ namespace Belle2 {
       }
 
 
-      /// Gives the minimal polar r the circle reaches (unsigned)
-      inline FloatType minimalPolarR() const
+      /// Gives the minimal cylindrical radius the circle reaches (unsigned)
+      inline FloatType minimalCylindricalR() const
       { return fabs(impact()); }
 
-      /// Gives the maximal polar r the circle reaches
-      inline FloatType maximalPolarR() const
+      /// Gives the maximal cylindrical radius the circle reaches
+      inline FloatType maximalCylindricalR() const
       { return fabs(impact() + 2 * radius()); }
 
 
       /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const PerigeeCircle& circle) {
+      friend std::ostream& operator<<(std::ostream& output, const PerigeeCircle& circle)
+      {
         return output <<
                "PerigeeCircle(" <<
                "curvature=" << circle.curvature() << "," <<
@@ -312,7 +332,7 @@ namespace Belle2 {
 
     private:
       FloatType m_curvature; ///< Memory for the signed curvature
-      FloatType m_tangentialPhi; ///< Memory for the polar angle of the direction of flight at the perigee
+      FloatType m_tangentialPhi; ///< Memory for the azimuth angle of the direction of flight at the perigee
       Vector2D m_tangential; ///< Cached unit direction of flight at the perigee
       FloatType m_impact; ///< Memory for the signed impact parameter
 

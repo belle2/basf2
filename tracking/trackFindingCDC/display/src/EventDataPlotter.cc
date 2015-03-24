@@ -201,7 +201,7 @@ void EventDataPlotter::drawInnerCDCWall(const AttributeMap& attributeMap)
 
   float centerX = 0.0;
   float centerY = 0.0;
-  float innerR = wireSuperLayer.getInnerPolarR();
+  float innerR = wireSuperLayer.getInnerCylindricalR();
 
   primitivePlotter.drawCircle(centerX, centerY, innerR, attributeMap);
 }
@@ -217,7 +217,7 @@ void EventDataPlotter::drawOuterCDCWall(const AttributeMap& attributeMap)
 
   float centerX = 0.0;
   float centerY = 0.0;
-  float outerR = wireSuperLayer.getOuterPolarR();
+  float outerR = wireSuperLayer.getOuterCylindricalR();
 
   primitivePlotter.drawCircle(centerX, centerY, outerR, attributeMap);
 }
@@ -262,8 +262,8 @@ void EventDataPlotter::draw(const CDCWireSuperLayer& wireSuperLayer, const Attri
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
   primitivePlotter.startGroup(attributeMap);
-  for (const CDCWireLayer & wireLayer : wireSuperLayer) {
-    for (const CDCWire & wire : wireLayer) {
+  for (const CDCWireLayer& wireLayer : wireSuperLayer) {
+    for (const CDCWire& wire : wireLayer) {
       draw(wire);
     }
   }
@@ -274,7 +274,7 @@ void EventDataPlotter::draw(const CDCWireSuperLayer& wireSuperLayer, const Attri
 /// --------------------- Draw CDCWireTopology------------------------
 void EventDataPlotter::draw(const CDCWireTopology& wireTopology, AttributeMap attributeMap)
 {
-  for (const CDCWireSuperLayer & wireSuperLayer : wireTopology.getWireSuperLayers()) {
+  for (const CDCWireSuperLayer& wireSuperLayer : wireTopology.getWireSuperLayers()) {
     AttributeMap defaultSuperLayerAttributeMap {
       {"fill" , wireSuperLayer.isAxial() ? "black" : "gray"},
       {"stroke" , "none"}

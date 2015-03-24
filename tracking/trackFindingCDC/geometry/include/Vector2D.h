@@ -51,7 +51,7 @@ namespace Belle2 {
         m_x(coordinateVec.x() * parallelCoor - coordinateVec.y() * orthoCoor),
         m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor) {;}
 
-      /// Constucts a unit vector with polar angle equal to phi
+      /// Constucts a unit vector with azimuth angle equal to phi
       static inline Vector2D Phi(const FloatType& phi)
       { return isNAN(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi)); }
 
@@ -70,7 +70,8 @@ namespace Belle2 {
       /** Computes the average of two vectors
        *  If one vector contains NAN the average is the other vector, since the former is not considered a valid value.
        **/
-      static inline Vector2D average(const Vector2D& one , const Vector2D& two) {
+      static inline Vector2D average(const Vector2D& one , const Vector2D& two)
+      {
         if (one.hasNAN()) {
           return two;
         } else if (two.hasNAN()) {
@@ -86,7 +87,8 @@ namespace Belle2 {
        *  it is not considered a valid value for the average and is therefore left out.
        *  The average() of the other two vectors is then returned.
        **/
-      static inline Vector2D average(const Vector2D& one , const Vector2D& two , const Vector2D& three) {
+      static inline Vector2D average(const Vector2D& one , const Vector2D& two , const Vector2D& three)
+      {
 
         if (one.hasNAN()) {
           return average(two, three);
@@ -109,13 +111,14 @@ namespace Belle2 {
       inline bool operator==(const Vector2D& rhs) const
       { return x() == rhs.x() and y() == rhs.y(); }
 
-      /// Total ordering based on polar radius first and polar angle second
-      /** Total order achiving a lower bound. By first taking the polar radius \n
+      /// Total ordering based on cylindrical radius first and azimuth angle second
+      /** Total order achiving a absolute lower bound Vector2D(0.0, 0.0). By first taking the cylindrical radius \n
        *  for comparision the null vector is smaller than all other possible \n
-       *  vectors. Secondly the polar angle is considered to have a total ordering \n
-       *  for all vectors. The polar angle however is quite costly to compute.\n
-       *  This can be optimized if necessary to a different form */
-      inline bool operator<(const Vector2D& rhs) const {
+       *  vectors. Secondly the azimuth angle is considered to have a total ordering \n
+       *  for all vectors.\n
+       */
+      inline bool operator<(const Vector2D& rhs) const
+      {
         return normSquared() < rhs.normSquared() or (
                  normSquared() == rhs.normSquared() and (
                    phi() < rhs.phi())) ;
@@ -162,7 +165,8 @@ namespace Belle2 {
       ///@}
 
       /// Calculates the distance of this point to the rhs
-      inline FloatType distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const {
+      inline FloatType distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const
+      {
         FloatType deltaX = x() - rhs.x();
         FloatType deltaY = y() - rhs.y();
         return hypot(deltaX, deltaY);
@@ -327,14 +331,14 @@ namespace Belle2 {
       /// Swaps the coordinates in place
       inline void swapCoordinates() { std::swap(m_x, m_y); }
 
-      /// Gives the polar radius of the vector. Same as norm()
-      inline FloatType polarR() const { return hypot(x(), y()); }
+      /// Gives the cylindrical radius of the vector. Same as norm()
+      inline FloatType cylindricalR() const { return hypot(x(), y()); }
 
-      /// Set the polar radius while keeping the polar angle phi the same
-      inline void setPolarR(const FloatType& polar_r)
-      { scale(polar_r / norm()); }
+      /// Set the cylindrical radius while keeping the azimuth angle phi the same
+      inline void setCylindricalR(const FloatType& cylindricalR)
+      { scale(cylindricalR / norm()); }
 
-      /// Gives the polar radius being the angle to the x axes ( range -PI to PI )
+      /// Gives the azimuth angle being the angle to the x axes ( range -PI to PI )
       inline FloatType phi() const { return isNull() ? NAN : atan2(y(), x()) ; }
 
 
@@ -389,4 +393,4 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // VECTOR2D_WITHROOT_H
+#endif // VECTOR2D_H

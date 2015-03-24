@@ -145,19 +145,19 @@ namespace Belle2 {
       StereoType getStereoType() const { return first().getStereoType(); }
 
       /// Getter for the inner radius of the layer as retrived from the CDCGeometryPar by the inner most layer
-      FloatType getInnerPolarR() const { return first().getInnerPolarR(); }
+      FloatType getInnerCylindricalR() const { return first().getInnerCylindricalR(); }
 
       /// Getter for the outer radius of the layer as retrived from the CDCGeometryPar by the outer most layer
-      FloatType getOuterPolarR() const { return last().getOuterPolarR(); }
+      FloatType getOuterCylindricalR() const { return last().getOuterCylindricalR(); }
 
-      /// Getter for the (fitted) z of the reference wire reference points at the inner polarR of this super layer.
+      /// Getter for the (fitted) z of the reference wire reference points at the inner cylindricalR of this super layer.
       FloatType getInnerRefZ() const { return m_innerRefZ; }
 
-      /// Getter for the (fitted) z of the reference wire reference points at the outer polarR of this super layer.
+      /// Getter for the (fitted) z of the reference wire reference points at the outer cylindricalR of this super layer.
       FloatType getOuterRefZ() const { return m_outerRefZ; }
 
-      /// Getter for (fitted) proporitionality factor between the increasing polar radius and the refernce z coordinate in this superlayer.
-      FloatType getRefPolarRZSlope() const { return m_refPolarRZSlope; }
+      /// Getter for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
+      FloatType getRefTanLambda() const { return m_refTanLambda; }
       /**@}*/
 
       /** @name Closest neighborhood
@@ -298,14 +298,14 @@ namespace Belle2 {
       /** Stores iterator pointing to the stored vector<CDCWireLayer> in the related CDCWireTopology object. */
       const_iterator m_end;
 
-      /// Memory for the (fitted) z of the reference wire reference points at the inner polarR of this super layer.
+      /// Memory for the (fitted) z of the reference wire reference points at the inner cylindricalR of this super layer.
       FloatType m_innerRefZ;
 
-      /// Memory for the (fitted) z of the reference wire reference points at the outer polarR of this super layer.
+      /// Memory for the (fitted) z of the reference wire reference points at the outer cylindricalR of this super layer.
       FloatType m_outerRefZ;
 
-      /// Memory for (fitted) proporitionality factor between the increasing polar radius and the refernce z coordinate in this superlayer.
-      FloatType m_refPolarRZSlope;
+      /// Memory for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
+      FloatType m_refTanLambda;
 
       /** ROOT Macro to make CDCWireSuperLayer a ROOT class.*/
       TRACKFINDINGCDC_SwitchableClassDef(CDCWireSuperLayer, 1);

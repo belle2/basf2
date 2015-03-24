@@ -34,9 +34,6 @@ namespace Belle2 {
     class Vector3D : public TrackFindingCDC::SwitchableRootificationBase {
 
     public:
-
-
-
       /// Default constructor for ROOT compatibility.
       Vector3D(): m_xy(0.0, 0.0), m_z(0.0) {;}
 
@@ -56,7 +53,8 @@ namespace Belle2 {
       /** Computes the average of two vectors.
        *  If one vector contains NAN the average is the other vector, since the former is not considered a valid value.
        **/
-      static inline Vector3D average(const Vector3D& one , const Vector3D& two) {
+      static inline Vector3D average(const Vector3D& one , const Vector3D& two)
+      {
         if (one.hasNAN()) {
           return two;
         } else if (two.hasNAN()) {
@@ -73,7 +71,8 @@ namespace Belle2 {
        *  it is not considered a valid value for the average and is therefore left out.
        *  The average() of the other two vectors is then returned.
        **/
-      static inline Vector3D average(const Vector3D& one , const Vector3D& two , const Vector3D& three) {
+      static inline Vector3D average(const Vector3D& one , const Vector3D& two , const Vector3D& three)
+      {
 
         if (one.hasNAN()) {
           return average(two, three);
@@ -99,16 +98,15 @@ namespace Belle2 {
       inline bool operator==(const Vector3D& rhs) const
       { return x() == rhs.x() and y() == rhs.y() and z() == rhs.z(); }
 
-      /// Total ordering based on polar radius first and polar angle second
-      /** Total order achiving a lower bound. By first taking the norm \n
+      /// Total ordering based on cylindrical radius first the z component second and azimuth angle third.
+      /** Total order achiving a lower bound Vector3D(0.0, 0.0, 0.0). By first taking the norm \n
        *  for comparision the null vector is smaller than all other possible \n
-       *  vectors. Secondly the theta ( equivalently z ) and finally the polar \n
-       *  angle is considered to have a total ordering for all vectors. \n
-       *  The polar angle however is quite costly to compute.\n
-       *  This can be optimized if necessary to a different form.
-       *  Note does not commute with the projection to xy space
+       *  vectors. Secondly the polar angle theta ( equivalently z ) and finally the azimuth \n
+       *  angle phi is considered to have a total ordering for all vectors. \n
+       *  Note does not commute with the projection to xy space.
        **/
-      inline bool operator<(const Vector3D& rhs) const {
+      inline bool operator<(const Vector3D& rhs) const
+      {
         return norm() < rhs.norm() or (
                  norm() == rhs.norm() and (
                    z() < rhs.z() or (
@@ -137,7 +135,8 @@ namespace Belle2 {
       inline FloatType dotXY(const Vector3D& rhs) const { return x() * rhs.x() + y() * rhs.y() ; }
 
       /// Calculated the three dimensional cross product.
-      inline Vector3D cross(const Vector3D& rhs)const {
+      inline Vector3D cross(const Vector3D& rhs)const
+      {
         return Vector3D(
                  y() * rhs.z() - z() * rhs.y(),
                  z() * rhs.x() - x() * rhs.z(),
@@ -155,12 +154,9 @@ namespace Belle2 {
 
       /// Calculates the squared length of the vector
       inline FloatType normSquared() const { return x() * x() + y() * y() + z() * z(); }
+
       /// Calculates the length of the vector
       inline FloatType norm() const { return hypot(hypot(x(), y()), z()); }
-
-
-
-
 
       /** @name Angle functions
        *  These functions measure the angle between two vectors from *this* to rhs. \n
@@ -179,7 +175,8 @@ namespace Belle2 {
 
 
       /// Calculates the distance of this point to the rhs
-      inline FloatType distance(const Vector3D& rhs = Vector3D(0.0, 0.0, 0.0)) const {
+      inline FloatType distance(const Vector3D& rhs = Vector3D(0.0, 0.0, 0.0)) const
+      {
         FloatType deltaX = x() - rhs.x();
         FloatType deltaY = y() - rhs.y();
         FloatType deltaZ = z() - rhs.z();
@@ -296,23 +293,27 @@ namespace Belle2 {
       Vector3D passiveMovedBy(const Vector3D& by)
       { return *this - by; }
 
-
-
       /// Getter for the x coordinate
       inline const FloatType& x() const { return m_xy.x(); }
+
       /// Setter for the x coordinate
       inline void setX(const FloatType& x) { m_xy.setX(x); }
+
       /// Getter for the y coordinate
       inline const FloatType& y() const { return m_xy.y(); }
+
       /// Setter for the y coordinate
       inline void setY(const FloatType& y) { m_xy.setY(y); }
+
       /// Getter for the z coordinate
       inline const FloatType& z() const { return m_z; }
+
       /// Setter for the z coordinate
       inline void setZ(const FloatType& z) { m_z = z; }
 
       /// Getter for the xy projected vector ( reference ! )
       inline const Vector2D& xy() const { return m_xy; }
+
       /// Setter for the xy projected vector
       inline void setXY(const Vector2D& xy) { m_xy = xy; }
 
@@ -322,29 +323,35 @@ namespace Belle2 {
                       const FloatType& third)
       { setX(first); setY(second); setZ(third);}
 
+      /// Getter for the squared cylindrical radius ( xy projected squared norm )
+      inline FloatType cylindricalRSquared() const { return xy().normSquared() ; }
 
-      /// Getter for the squared polar radius ( xy projected squared norm )
-      inline FloatType polarRSquared() const { return xy().normSquared() ; }
-      /// Getter for the polar radius ( xy projected norm )
-      inline FloatType polarR() const { return xy().norm(); }
-      /// Getter for the polar angle ( xy projected polar angle )
+      /// Getter for the cylindrical radius ( xy projected norm )
+      inline FloatType cylindricalR() const { return xy().norm(); }
+
+      /// Getter for the azimuth angle
       inline FloatType phi() const { return xy().phi(); }
 
-      //inline FloatType rho() const{ return norm(); }
+      /// Getter for the polar angle
+      inline FloatType theta() const { return atan2(cylindricalR(), z()); }
 
-      /// Getter for the azimuthal angle
-      inline FloatType theta() const { return atan2(polarR(), z()); }
+      /// Getter for lambda
+      inline FloatType lambda() const { return atan2(z(), cylindricalR()); }
 
-      /// Getter for the cotangents of the azimuthal angle
-      inline FloatType cotTheta() const { return z() / polarR(); }
+      /// Getter for the cotangent of the polar angle
+      inline FloatType cotTheta() const { return z() / cylindricalR(); }
 
+      /// Getter for the tangent of lambda equivalent to cotTheta()
+      inline FloatType tanLambda() const { return z() / cylindricalR(); }
 
     private:
-      Vector2D m_xy; ///< Memory for the first and second coordinate available as a vector
-      FloatType m_z; ///< Memory for the third coordinate
+      /// Memory for the first and second coordinate available as a vector
+      Vector2D m_xy;
+
+      /// Memory for the third coordinate
+      FloatType m_z;
 
     private:
-
       /// ROOT Macro to make Vector3D a ROOT class.
       TRACKFINDINGCDC_SwitchableClassDef(Vector3D, 1);
 

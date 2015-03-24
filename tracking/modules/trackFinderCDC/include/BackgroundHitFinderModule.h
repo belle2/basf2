@@ -82,7 +82,7 @@ namespace Belle2 {
     /// TMVA Expert to decide if a cluster is background or not
     TrackFindingCDC::Expert m_expert;
 
-    /// the polar R of the super layer centers
+    /// the cylinder radius of the super layer centers
     std::vector<double> m_superLayerCenters;
   };
 }

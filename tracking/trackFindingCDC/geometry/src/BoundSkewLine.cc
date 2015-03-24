@@ -32,10 +32,10 @@ BoundSkewLine::BoundSkewLine(
 
   Vector3D vectorAlongLine = forwardIn - backwardIn;
 
-  FloatType weight_forward   =  forwardIn.dotXY(vectorAlongLine);
-  FloatType weight_backward  = -backwardIn.dotXY(vectorAlongLine);
+  FloatType weightForward   =  forwardIn.dotXY(vectorAlongLine);
+  FloatType weightBackward  = -backwardIn.dotXY(vectorAlongLine);
 
-  if (weight_forward + weight_backward == 0) {
+  if (weightForward + weightBackward == 0) {
     //line is aligned along the z axes us the position in the xy plane as the reference
 
     m_skew = 0.0;
@@ -44,13 +44,13 @@ BoundSkewLine::BoundSkewLine(
 
   } else {
 
-    vectorAlongLine *= (weight_backward / (weight_forward + weight_backward));
+    vectorAlongLine *= (weightBackward / (weightForward + weightBackward));
     //m_referencePosition was initialized as a copy of backwardIn
     m_referencePosition += vectorAlongLine;
 
     m_skew = (m_referencePosition.crossXY(vectorAlongLine.xy())) /
              /*---------------------------------------------------------*/
-             (m_referencePosition.polarRSquared() * vectorAlongLine.z());
+             (m_referencePosition.cylindricalRSquared() * vectorAlongLine.z());
 
   }
 }

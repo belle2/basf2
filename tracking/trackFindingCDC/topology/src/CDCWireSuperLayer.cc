@@ -30,7 +30,7 @@ CDCWireSuperLayer::CDCWireSuperLayer(const const_iterator& begin, const const_it
   m_end(end),
   m_innerRefZ(0.0),
   m_outerRefZ(0.0),
-  m_refPolarRZSlope(0.0)
+  m_refTanLambda(0.0)
 {
   initialize();
 }
@@ -45,14 +45,14 @@ void CDCWireSuperLayer::initialize()
   const Vector3D& layerZeroRef3D = layerZero.first().getRefPos3D();
   const Vector2D& layerZeroRef2D = layerZeroRef3D.xy();
 
-  // Prepare a fit to z versus the polarR slope at the reference coordinates
+  // Prepare a fit to z versus the cylindricalR slope at the reference coordinates
   CDCObservations2D observations2D;
   CDCSZFitter szFitter;
 
   observations2D.clear();
   observations2D.reserve(size());
 
-  for (const CDCWireLayer & layer : *this) {
+  for (const CDCWireLayer& layer : *this) {
     // Set the numbering shift of each layer within this superlayer
     if (isEven(layer.getILayer())) {
       layer.setShift(ZERO);
@@ -63,18 +63,18 @@ void CDCWireSuperLayer::initialize()
       layer.setShift(layerRefPos2D.isCCWOrCWOf(layerZeroRef2D));
     }
 
-    observations2D.append(layer.getRefPolarR(), layer.getRefZ());
+    observations2D.append(layer.getRefCylindricalR(), layer.getRefZ());
 
   }
 
-  CDCTrajectorySZ zVersusPolarR;
-  szFitter.update(zVersusPolarR, observations2D);
+  CDCTrajectorySZ zVersusArcLength2D;
+  szFitter.update(zVersusArcLength2D, observations2D);
 
-  const UncertainSZLine& polarRZLine = zVersusPolarR.getSZLine();
+  const UncertainSZLine& arcLength2DZLine = zVersusArcLength2D.getSZLine();
 
-  m_refPolarRZSlope = polarRZLine.slope();
-  m_innerRefZ = polarRZLine.map(getInnerPolarR());
-  m_outerRefZ = polarRZLine.map(getOuterPolarR());
+  m_refTanLambda = arcLength2DZLine.slope();
+  m_innerRefZ = arcLength2DZLine.map(getInnerCylindricalR());
+  m_outerRefZ = arcLength2DZLine.map(getOuterCylindricalR());
 
 
   /*

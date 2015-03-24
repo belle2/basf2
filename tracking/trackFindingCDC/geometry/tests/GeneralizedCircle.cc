@@ -91,8 +91,8 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthFactor)
   FloatType smallAngle = PI / 100;
   Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
 
-  FloatType expectedArcLengthFactor = smallAngle / near.polarR();
-  EXPECT_NEAR(expectedArcLengthFactor, circle.arcLengthFactor(near.polarR()), 10e-7);
+  FloatType expectedArcLengthFactor = smallAngle / near.cylindricalR();
+  EXPECT_NEAR(expectedArcLengthFactor, circle.arcLengthFactor(near.cylindricalR()), 10e-7);
 
 }
 

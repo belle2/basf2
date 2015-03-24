@@ -168,7 +168,7 @@ namespace Belle2 {
           return trajectory2D.getClosest(getRefPos2D());
         } else {
           // TODO replace with something better if at all possible
-          return trajectory2D.getCloseSamePolarR(getRefPos2D());
+          return trajectory2D.getCloseSameCylindricalR(getRefPos2D());
         }
       }
 

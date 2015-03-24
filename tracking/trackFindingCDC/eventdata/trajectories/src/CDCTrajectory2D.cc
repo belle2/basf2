@@ -126,19 +126,19 @@ Vector2D CDCTrajectory2D::getInnerExit() const
 {
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
-  FloatType innerPolarR = innerMostLayer.getInnerPolarR();
+  FloatType innerCylindricalR = innerMostLayer.getInnerCylindricalR();
 
   const Vector2D support = getSupport();
   const GeneralizedCircle globalCircle = getGlobalCircle();
-  if (support.polarR() < innerPolarR) {
+  if (support.cylindricalR() < innerCylindricalR) {
     // If we start inside of the volume of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the inner wall.
     // Therefore we take the inner exit that comes after the apogee (far point of the circle).
     const Vector2D apogee = globalCircle.apogee();
-    return globalCircle.samePolarRForwardOf(apogee, innerPolarR);
+    return globalCircle.sameCylindricalRForwardOf(apogee, innerCylindricalR);
 
   } else {
-    return globalCircle.samePolarRForwardOf(support, innerPolarR);
+    return globalCircle.sameCylindricalRForwardOf(support, innerCylindricalR);
   }
 }
 
@@ -148,19 +148,19 @@ Vector2D CDCTrajectory2D::getOuterExit() const
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& outerMostLayer = topology.getWireLayers().back();
 
-  FloatType outerPolarR = outerMostLayer.getOuterPolarR();
+  FloatType outerCylindricalR = outerMostLayer.getOuterCylindricalR();
 
   const Vector2D support = getSupport();
   const GeneralizedCircle globalCircle = getGlobalCircle();
-  if (support.polarR() > outerPolarR) {
+  if (support.cylindricalR() > outerCylindricalR) {
     // If we start outside of the volume of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the outer wall.
     // Therefore we take the outer exit that comes after the perigee.
     const Vector2D perigee = globalCircle.perigee();
-    return globalCircle.samePolarRForwardOf(perigee, outerPolarR);
+    return globalCircle.sameCylindricalRForwardOf(perigee, outerCylindricalR);
 
   } else {
-    return getGlobalCircle().samePolarRForwardOf(support, outerPolarR);
+    return getGlobalCircle().sameCylindricalRForwardOf(support, outerCylindricalR);
   }
 }
 
@@ -275,23 +275,23 @@ ISuperLayerType CDCTrajectory2D::getPreviousAxialISuperLayer() const
 
 ISuperLayerType CDCTrajectory2D::getMaximalISuperLayer() const
 {
-  FloatType maximalPolarR = getMaximalPolarR();
-  return getISuperLayerAtPolarR(maximalPolarR);
+  FloatType maximalCylindricalR = getMaximalCylindricalR();
+  return getISuperLayerAtCylindricalR(maximalCylindricalR);
 }
 
 
 ISuperLayerType CDCTrajectory2D::getStartISuperLayer() const
 {
-  FloatType startPolarR = getLocalOrigin().polarR();
-  return getISuperLayerAtPolarR(startPolarR);
+  FloatType startCylindricalR = getLocalOrigin().cylindricalR();
+  return getISuperLayerAtCylindricalR(startCylindricalR);
 }
 
 
 
 ISuperLayerType CDCTrajectory2D::getMinimalISuperLayer() const
 {
-  FloatType minimalPolarR = getMinimalPolarR();
-  return getISuperLayerAtPolarR(minimalPolarR);
+  FloatType minimalCylindricalR = getMinimalCylindricalR();
+  return getISuperLayerAtCylindricalR(minimalCylindricalR);
 }
 
 

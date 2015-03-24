@@ -28,7 +28,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWInwards)
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire & wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology) {
     const CDCWire* neighbor = wire.getNeighborCWInwards();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCCWOutwards();
@@ -42,7 +42,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWInwards
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire & wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology) {
     const CDCWire* neighbor = wire.getNeighborCCWInwards();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCWOutwards();
@@ -56,7 +56,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWOutwards
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire & wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology) {
     const CDCWire* neighbor = wire.getNeighborCWOutwards();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCCWInwards();
@@ -70,7 +70,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWOutward
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire & wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology) {
     const CDCWire* neighbor = wire.getNeighborCCWOutwards();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCWInwards();
@@ -84,7 +84,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCW)
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire & wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology) {
     const CDCWire* neighbor = wire.getNeighborCCW();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCW();
@@ -98,7 +98,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CW)
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire & wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology) {
     const CDCWire* neighbor = wire.getNeighborCW();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCCW();
@@ -114,27 +114,27 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireSkew)
 
   FloatType skewByICLayer[CDCWireTopology::N_LAYERS];
   FloatType stereoAngleByICLayer[CDCWireTopology::N_LAYERS];
-  FloatType refPolarRByICLayer[CDCWireTopology::N_LAYERS];
+  FloatType refCylindricalRByICLayer[CDCWireTopology::N_LAYERS];
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
-  for (const CDCWireLayer & wireLayer : theWireTopology.getWireLayers()) {
+  for (const CDCWireLayer& wireLayer : theWireTopology.getWireLayers()) {
     const ILayerType iCLayer = wireLayer.getICLayer();
 
     const CDCWire& firstWire = wireLayer.first();
     skewByICLayer[iCLayer] = firstWire.getSkew();
     stereoAngleByICLayer[iCLayer] = firstWire.getStereoAngle();
-    refPolarRByICLayer[iCLayer] = firstWire.getRefPolarR();
+    refCylindricalRByICLayer[iCLayer] = firstWire.getRefCylindricalR();
 
-    for (const CDCWire & wire : wireLayer) {
+    for (const CDCWire& wire : wireLayer) {
       EXPECT_NEAR(skewByICLayer[iCLayer], wire.getSkew(), 10e-6);
       EXPECT_NEAR(stereoAngleByICLayer[iCLayer], wire.getStereoAngle(), 10e-6);
-      EXPECT_NEAR(refPolarRByICLayer[iCLayer], wire.getRefPolarR(), 10e-6);
+      EXPECT_NEAR(refCylindricalRByICLayer[iCLayer], wire.getRefCylindricalR(), 10e-6);
     }
 
     B2INFO("ICLayer : " << iCLayer <<
            " Skew : " << skewByICLayer[iCLayer] <<
            " Stereo angle : " << stereoAngleByICLayer[iCLayer] <<
-           " Ref. polarR : " << refPolarRByICLayer[iCLayer]
+           " Ref. cylindricalR : " << refCylindricalRByICLayer[iCLayer]
           );
 
   }
@@ -143,18 +143,18 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireSkew)
 
 
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_RefPolarRVersusZInSuperLayers)
+TEST_F(TrackFindingCDCTestWithTopology, topology_RefCylindricalRVersusZInSuperLayers)
 {
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
-  for (const CDCWireSuperLayer & wireSuperLayer : theWireTopology.getWireSuperLayers()) {
+  for (const CDCWireSuperLayer& wireSuperLayer : theWireTopology.getWireSuperLayers()) {
     if (wireSuperLayer.getStereoType() == AXIAL) {
-      EXPECT_EQ(0.0, wireSuperLayer.getRefPolarRZSlope());
+      EXPECT_EQ(0.0, wireSuperLayer.getRefTanLambda());
     }
 
     B2INFO("ISuperLayer : " << wireSuperLayer.getISuperLayer() <<
            " Inner ref. z : " << wireSuperLayer.getInnerRefZ() <<
            " Outer ref. z : " << wireSuperLayer.getOuterRefZ() <<
-           " PolarR Z slope : " << wireSuperLayer.getRefPolarRZSlope()
+           " CylindricalR Z slope : " << wireSuperLayer.getRefTanLambda()
           );
 
   }

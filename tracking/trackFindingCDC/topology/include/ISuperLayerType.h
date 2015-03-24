@@ -38,7 +38,7 @@ namespace Belle2 {
     bool isLogicISuperLayer(const ISuperLayerType& iSuperLayer);
 
     /// Returns the logical superlayer number at the given radius
-    ISuperLayerType getISuperLayerAtPolarR(const FloatType& polarR);
+    ISuperLayerType getISuperLayerAtCylindricalR(const FloatType& cylindricalR);
 
     /// Returns the logical superlayer number at the given radius
     ISuperLayerType isAxialISuperLayer(const ISuperLayerType& iSuperLayer);

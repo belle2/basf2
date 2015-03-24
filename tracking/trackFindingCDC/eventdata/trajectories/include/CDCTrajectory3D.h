@@ -118,12 +118,12 @@ namespace Belle2 {
       { return getGlobalCircle().perigee(); }
 
       /// Getter for the maximal distance from the origin
-      FloatType getMaximalPolarR() const
-      { return  getGlobalCircle().maximalPolarR(); }
+      FloatType getMaximalCylindricalR() const
+      { return  getGlobalCircle().maximalCylindricalR(); }
 
       /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
-      FloatType getMinimalPolarR() const
-      { return  getGlobalCircle().minimalPolarR(); }
+      FloatType getMinimalCylindricalR() const
+      { return  getGlobalCircle().minimalCylindricalR(); }
 
       /// Getter for the signed impact parameter of the trajectory
       FloatType getGlobalImpact() const

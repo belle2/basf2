@@ -61,7 +61,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 }
 
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalPolarR)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
 {
   FloatType curvature = 1.0 / 2.0;
   FloatType tangtialPhi = PI / 4.0;
@@ -70,11 +70,11 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalPolarR)
   // Checks if the normal parameters n follow the same sign convention
   PerigeeCircle perigeeCircle = PerigeeCircle::fromPerigeeParameters(curvature, tangtialPhi, impact);
 
-  EXPECT_EQ(1, perigeeCircle.minimalPolarR());
+  EXPECT_EQ(1, perigeeCircle.minimalCylindricalR());
 }
 
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalPolarR)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
 {
   FloatType curvature = 1.0 / 2.0;
   FloatType tangtialPhi = PI / 4.0;
@@ -83,7 +83,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalPolarR)
   // Checks if the normal parameters n follow the same sign convention
   PerigeeCircle perigeeCircle = PerigeeCircle::fromPerigeeParameters(curvature, tangtialPhi, impact);
 
-  EXPECT_EQ(3, perigeeCircle.maximalPolarR());
+  EXPECT_EQ(3, perigeeCircle.maximalCylindricalR());
 }
 
 

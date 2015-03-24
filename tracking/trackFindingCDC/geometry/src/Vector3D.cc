@@ -16,5 +16,4 @@ using namespace TrackFindingCDC;
 
 TRACKFINDINGCDC_SwitchableClassImp(Vector3D)
 
-// Implement all functions
 

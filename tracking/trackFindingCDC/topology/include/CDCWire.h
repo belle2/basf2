@@ -170,7 +170,8 @@ namespace Belle2 {
        *  The stereo type is shared by all wires in the same superlayer
        *  The superlayer pattern for Belle II is AUAVAUAVA according the TDR
        */
-      inline StereoType getStereoType() const {
+      inline StereoType getStereoType() const
+      {
         if ((getISuperLayer() % 2) == 0)  return AXIAL;
         else if ((getISuperLayer() % 4) == 1)  return STEREO_U;
         else return STEREO_V;
@@ -208,7 +209,7 @@ namespace Belle2 {
       const FloatType& getSkew() const { return getSkewLine().skew(); }
 
       /// Getter for the tangents of the stereo angle of the wire.
-      FloatType getTanStereoAngle() const { return getSkew() * getMinPolarR(); }
+      FloatType getTanStereoAngle() const { return getSkew() * getMinCylindricalR(); }
 
       /// Getter for the stereo angle of the wire.
       FloatType getStereoAngle() const { return std::atan(getTanStereoAngle()); }
@@ -216,17 +217,17 @@ namespace Belle2 {
       /// Getter for the vector pointing from the back end ofthe wire to the front end of the wire
       Vector3D getWireVector() const { return getSkewLine().tangential3D(); }
 
-      /// Getter for the polar radius at the wire reference position
-      FloatType getRefPolarR() const { return getRefPos2D().norm(); }
+      /// Getter for the cylindrical radius at the wire reference position
+      FloatType getRefCylindricalR() const { return getRefPos2D().norm(); }
 
       /// Getter for the closest distance to the beamline ( z-axes )
-      FloatType getMinPolarR() const { return getRefPos2D().norm(); }
+      FloatType getMinCylindricalR() const { return getRefPos2D().norm(); }
 
       ///Getter for the distance to the beamline ( z-axes ) at the forward joint point
-      FloatType getForwardPolarR() const { return getSkewLine().forwardPolarR(); };
+      FloatType getForwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };
 
       ///Getter for the distance to the beamline ( z-axes ) at the backward joint point
-      FloatType getBackwardPolarR() const { return getSkewLine().forwardPolarR(); };
+      FloatType getBackwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };
 
       /// Getter for the z coordinate at the forward joint points of the wires
       FloatType getForwardZ() const { return getSkewLine().forwardZ(); }
@@ -234,16 +235,16 @@ namespace Belle2 {
       /// Getter for the z coordinate at the backward joint points of the wires
       FloatType  getBackwardZ() const { return getSkewLine().backwardZ(); }
 
-      /// Getter for the polar angle of the forward joint point of the wire relativ to its reference
+      /// Getter for the azimuth angle of the forward joint point of the wire relativ to its reference
       const FloatType& getForwardPhiToRef() const { return m_forwardPhiToRef; }
 
-      /// Getter for the polar angle of the backward joint point of the wire relativ to its reference
+      /// Getter for the azimuth angle of the backward joint point of the wire relativ to its reference
       const FloatType& getBackwardPhiToRef() const { return m_backwardPhiToRef; }
 
-      /// Getter for polar angle range covered by the wire relativ to the reference point.
-      /** Gives the range of polar angles a stereo wires covers relativ to its reference position. \n
+      /// Getter for azimuth angle range covered by the wire relativ to the reference point.
+      /** Gives the range of azimuth angles a stereo wires covers relativ to its reference position. \n
        *  A stereo wire has a certain extension visible as a stretch in the xy projection. \n
-       *  This translates to a range of polar angles, which can be used for a quick check \n
+       *  This translates to a range of azimuth angles, which can be used for a quick check \n
        *  if an xy projected track could have hit a wire or not. \n
        *  The range covers reaches from negativ to positiv values since the reference is somewhere \n
        *  in the middle of the wire. \n
@@ -342,7 +343,8 @@ namespace Belle2 {
       /**@}*/
 
       /// Sting output operator for wire objects to help debugging
-      friend std::ostream& operator<<(std::ostream& output, const CDCWire& wire) {
+      friend std::ostream& operator<<(std::ostream& output, const CDCWire& wire)
+      {
         output << "CDCWire(" << wire.getISuperLayer() << "," << wire.getILayer() << "," << wire.getIWire() << ")" ;
         return output;
       }
@@ -359,7 +361,8 @@ namespace Belle2 {
 
       FloatType m_forwardPhiToRef; ///< Storage of the angle between forward and ref position in the xy projection (see getPhiRangeToRef() for details)
       FloatType m_backwardPhiToRef;///< Storage of the angle between backward and ref position in the xy projection (see getPhiRangeToRef() for details)
-      std::pair<FloatType, FloatType> m_phiRangeToRef; ///< Storage of the angle range to ref position in the xy projection (see getPhiRangeToRef() for details)
+      std::pair<FloatType, FloatType>
+      m_phiRangeToRef; ///< Storage of the angle range to ref position in the xy projection (see getPhiRangeToRef() for details)
 
     private:
 

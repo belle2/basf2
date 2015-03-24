@@ -368,7 +368,7 @@ namespace Belle2 {
       EigenObservationMatrix getObservationMatrix();
 
       /// Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengts as relevant for circle fits.
-      /** Cumulates weights, x positions, y positions, quadratic polar radii and signed drift legnths and products thereof
+      /** Cumulates weights, x positions, y positions, quadratic cylindrical radii and signed drift legnths and products thereof
        *  Returns symmetric matrix s with the following:
        *  * \f$ s_{00} = \sum w \f$
        *  * \f$ s_{01} = \sum x * w \f$
@@ -414,7 +414,7 @@ namespace Belle2 {
       Eigen::Matrix<FloatType, 4, 4> getWXYLSumMatrix();
 
       /// Constructs a symmetric matrix of weighted sums of x, y, r^2 as relevant for circle fits.
-      /** Cumulates weights, x positions, y positions, quadratic polar radii and products thereof
+      /** Cumulates weights, x positions, y positions, quadratic cylindrical radii and products thereof
        *  Returns symmetric matrix s with the following:
        *  * \f$ s_{00} = \sum w \f$
        *  * \f$ s_{01} = \sum x * w \f$

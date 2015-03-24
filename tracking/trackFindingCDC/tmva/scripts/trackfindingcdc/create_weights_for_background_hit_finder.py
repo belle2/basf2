@@ -81,8 +81,8 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
         self.superlayer_centers = [
             0.5 *
             (
-                wireTopology.getWireSuperLayer(superlayerID).getInnerPolarR() +
-                wireTopology.getWireSuperLayer(superlayerID).getOuterPolarR()) for superlayerID in xrange(
+                wireTopology.getWireSuperLayer(superlayerID).getInnerCylindricalR() +
+                wireTopology.getWireSuperLayer(superlayerID).getOuterCylindricalR()) for superlayerID in xrange(
                 wireTopology.getNSuperLayers())]
 
     def pick(self, facet):

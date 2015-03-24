@@ -91,8 +91,8 @@ CellWeight SimpleSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple
     Vector2D firstPosition = firstHit.getRecoPos2D();
     Vector2D lastPosition  = lastHit.getRecoPos2D();
 
-    Vector2D firstReconstructed = startFit.getCloseSamePolarR(firstPosition);
-    Vector2D lastReconstructed = endFit.getCloseSamePolarR(lastPosition);
+    Vector2D firstReconstructed = startFit.getCloseSameCylindricalR(firstPosition);
+    Vector2D lastReconstructed = endFit.getCloseSameCylindricalR(lastPosition);
 
     FloatType first_refToReconstructedAngle = firstPosition.angleWith(firstReconstructed);
     FloatType last_refToReconstructedAngle = lastPosition.angleWith(lastReconstructed);

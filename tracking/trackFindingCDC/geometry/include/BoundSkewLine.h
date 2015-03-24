@@ -49,19 +49,22 @@ namespace Belle2 {
       ~BoundSkewLine() {;}
 
       /// Returns a copy of the skew line moved by a three dimensional offset
-      inline BoundSkewLine movedBy(const Vector3D& offset) const {
+      inline BoundSkewLine movedBy(const Vector3D& offset) const
+      {
         //simple but not optional in computation steps
         return BoundSkewLine(forward3D().add(offset), backward3D().add(offset));
       }
 
       /// Returns a copy of the skew line moved by a two dimensional offset
-      inline BoundSkewLine movedBy(const Vector2D& offset) const {
+      inline BoundSkewLine movedBy(const Vector2D& offset) const
+      {
         //simple but not optional in computation steps
         return BoundSkewLine(forward3D().add(offset), backward3D().add(offset));
       }
 
       /// Gives the three dimensional position of the line at the given z value
-      inline Vector3D pos3DAtZ(const FloatType& z) const {
+      inline Vector3D pos3DAtZ(const FloatType& z) const
+      {
 
         FloatType deltaZTimesSkew = (z - refZ()) * skew();
 
@@ -72,7 +75,8 @@ namespace Belle2 {
       }
 
       /// Gives the two dimensional position of the line at the given z value
-      inline Vector2D pos2DAtZ(const FloatType& z) const {
+      inline Vector2D pos2DAtZ(const FloatType& z) const
+      {
 
         FloatType deltaZTimesSkew = (z - refZ()) * skew();
 
@@ -81,7 +85,8 @@ namespace Belle2 {
 
       }
       /// Gives the three dimensional position of the line at the given ( z - reference z ) * skew value
-      inline Vector3D pos3DAtDeltaZTimesSkew(const FloatType& deltaZTimesSkew) const {
+      inline Vector3D pos3DAtDeltaZTimesSkew(const FloatType& deltaZTimesSkew) const
+      {
 
         return Vector3D(1 * refX() - deltaZTimesSkew * refY() ,
                         deltaZTimesSkew * refX() + 1 * refY() ,
@@ -114,7 +119,8 @@ namespace Belle2 {
       { return pos2DAtZ((forwardZ() + backwardZ()) / 2) ; }
 
       /// Gives the tangential vector to the line
-      inline Vector3D tangential3D() const {
+      inline Vector3D tangential3D() const
+      {
         FloatType deltaZ = forwardZ() - backwardZ();
         return Vector3D(- deltaZ * skew() * refY(),
                         deltaZ * skew() * refX(),
@@ -122,7 +128,8 @@ namespace Belle2 {
       }
 
       /// Gives the tangential xy vector to the line
-      inline Vector2D tangential2D() const {
+      inline Vector2D tangential2D() const
+      {
         FloatType deltaZ = forwardZ() - backwardZ();
         return Vector2D(- deltaZ * skew() * refY(),
                         deltaZ * skew() * refX());
@@ -136,31 +143,31 @@ namespace Belle2 {
       inline FloatType backwardZ() const
       { return m_backwardZ; }
 
-      /// Gives the forward polar angle
+      /// Gives the forward azimuth angle
       inline FloatType forwardPhi() const
       { return  forward2D().phi(); }
 
-      /// Gives the backward polar angle
+      /// Gives the backward azimuth angle
       inline FloatType backwardPhi() const
       { return backward2D().phi(); }
 
-      /// Gives the polar radius of the forward position
-      inline FloatType forwardPolarR() const
-      { return  forward2D().polarR(); }
+      /// Gives the cylindrical radius of the forward position
+      inline FloatType forwardCylindricalR() const
+      { return  forward2D().cylindricalR(); }
 
-      /// Gives the polar radius of the backward position
-      inline FloatType backwardPolarR() const
-      { return backward2D().polarR(); }
+      /// Gives the cylindrical radius of the backward position
+      inline FloatType backwardCylindricalR() const
+      { return backward2D().cylindricalR(); }
 
-      /// Gives the polar angle of the forward position relative to the reference position
+      /// Gives the azimuth angle of the forward position relative to the reference position
       inline FloatType forwardPhiToRef() const
       { return  forward2D().angleWith(refPos2D()); }
 
-      /// Gives the polar angle of the backward position relative to the reference position
+      /// Gives the azimuth angle of the backward position relative to the reference position
       inline FloatType backwardPhiToRef() const
       { return backward2D().angleWith(refPos2D()); }
 
-      /// Gives the polar angle difference from backward to forward position
+      /// Gives the azimuth angle difference from backward to forward position
       /* backwardToForwardAngle means how far the backward position has to be rotated in the xy projection
          in the mathematical positiv sense that it seems to be coaligned with the forward position. */
       inline FloatType backwardToForwardAngle() const
@@ -168,7 +175,8 @@ namespace Belle2 {
 
       /// Returns the closest approach to the give point
       /** This calculates the point of closest approach on the line. It does not care about the boundaries of the line. */
-      inline Vector3D closest3D(const Vector3D& point) const {
+      inline Vector3D closest3D(const Vector3D& point) const
+      {
         Vector3D unitLineVector = tangential3D();
         unitLineVector.normalize();
 
@@ -182,7 +190,8 @@ namespace Belle2 {
       }
 
       /// Returns the point of closest approach to the origin on the line
-      inline Vector3D closestToOrigin3D() const {
+      inline Vector3D closestToOrigin3D() const
+      {
         Vector3D unitLineVector = tangential3D();
         unitLineVector.normalize();
 
@@ -209,9 +218,9 @@ namespace Belle2 {
       inline const FloatType& refZ() const
       { return m_referencePosition.z(); }
 
-      /// Returns the polar radius of the reference position
-      inline FloatType refPolarRSquared() const
-      { return m_referencePosition.polarRSquared(); }
+      /// Returns the cylindrical radius of the reference position
+      inline FloatType refCylindricalRSquared() const
+      { return m_referencePosition.cylindricalRSquared(); }
 
       /// Returns the xy vector of the reference position
       inline const Vector2D& refPos2D() const

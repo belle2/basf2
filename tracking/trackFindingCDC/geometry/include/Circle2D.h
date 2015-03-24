@@ -65,7 +65,8 @@ namespace Belle2 {
        *  This is only stable for off origin circles. The numerical stability of the transformation
        *  is subjected to the denominator center().normSquared() - signedRadius() * signedRadius()
        **/
-      inline void conformalTransform() {
+      inline void conformalTransform()
+      {
         FloatType denominator = center().normSquared() - radius() * radius();
         m_center /= denominator;
         m_radius /= denominator;
@@ -76,7 +77,8 @@ namespace Belle2 {
        *  This is only stable for off origin circles. The numerical stability of the transformation
        *  is subjected to the denominator center().normSquared() - signedRadius() * signedRadius()
        **/
-      inline Circle2D conformalTransformed() const {
+      inline Circle2D conformalTransformed() const
+      {
         FloatType denominator = center().normSquared() - radius() * radius();
         return Circle2D(center() / denominator, radius() / denominator);
       }
@@ -110,7 +112,8 @@ namespace Belle2 {
       { return isRightOrLeft(rhs) == RIGHT; }
 
       /// Calculates the point of closest approach on the line to the point
-      Vector2D closest(const Vector2D& point) const {
+      Vector2D closest(const Vector2D& point) const
+      {
         Vector2D connection = point - center();
         connection.normalizeTo(absRadius());
         connection += center();
@@ -118,7 +121,8 @@ namespace Belle2 {
       }
 
       /// Returns the point closest to the origin
-      Vector2D perigee() const {
+      Vector2D perigee() const
+      {
         Vector2D connection = center();
         connection.normalizeTo(-absRadius());
         connection += center();
@@ -130,7 +134,7 @@ namespace Belle2 {
       { return tangential(Vector2D(0.0, 0.0)).unit(); }
 
 
-      /// Gives to polar phi of the direction of flight at the perigee
+      /// Gives to azimuth phi of the direction of flight at the perigee
       inline FloatType tangentialPhi() const
       { return tangential().phi(); }
 
@@ -140,7 +144,8 @@ namespace Belle2 {
        * @param point Point in the plane to calculate the gradient
        * @return Gradient of the distance field
        */
-      inline Vector2D gradient(const Vector2D& point) const {
+      inline Vector2D gradient(const Vector2D& point) const
+      {
         Vector2D connection = (point - center()) * orientation();
         return connection.unit();
       }

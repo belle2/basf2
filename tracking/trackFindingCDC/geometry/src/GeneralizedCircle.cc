@@ -134,7 +134,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   //                     1.0                   * m_n0 +
   //                     point.x()             * m_n1 +
   //                     point.y()             * m_n2 +
-  //                     point.polarRSquared() * m_n3 == 0
+  //                     point.cylindricalRSquared() * m_n3 == 0
 
   //solved with a lagrangian muliplicator for the constraint
 
@@ -174,14 +174,14 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
 Vector2D GeneralizedCircle::perigee() const
 {
   Vector2D result(n12());
-  result.setPolarR(-impact());
+  result.setCylindricalR(-impact());
   return result;
 }
 
 Vector2D GeneralizedCircle::apogee() const
 {
   Vector2D result(n12());
-  result.setPolarR(- impact() - 2 * radius());
+  result.setCylindricalR(- impact() - 2 * radius());
   return result;
 }
 
@@ -208,7 +208,7 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start, const Vec
       //both lengths on curve have a negative sign
       //the candidate with the lesser length on curve wins because of the discontinuaty
       //unless the generalized circle is a line
-      //in this case their is no forward intersection with the same polar radius
+      //in this case their is no forward intersection with the same cylindrical radius
       if (isLine()) {
         return Vector2D(NAN, NAN);
       } else {
@@ -222,7 +222,7 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start, const Vec
 
 }
 
-pair<Vector2D, Vector2D> GeneralizedCircle::samePolarR(const FloatType& R) const
+pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const FloatType& R) const
 {
   //extraploted to r
   //solve
@@ -234,22 +234,22 @@ pair<Vector2D, Vector2D> GeneralizedCircle::samePolarR(const FloatType& R) const
   const Vector2D nUnit = n12().unit();
 
   // parallel component
-  const FloatType samePolarRParallel = -(n0() + n3() * R * R) / n12().norm();
+  const FloatType sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
 
   //orthogonal component
-  const FloatType samePolarROrthogonal = sqrt(R * R - samePolarRParallel * samePolarRParallel);
+  const FloatType sameCylindricalROrthogonal = sqrt(R * R - sameCylindricalRParallel * sameCylindricalRParallel);
 
   /// Two versions in this case
-  Vector2D samePolarR1 = Vector2D::compose(nUnit, samePolarRParallel, samePolarROrthogonal);
-  Vector2D samePolarR2 = Vector2D::compose(nUnit, samePolarRParallel, -samePolarROrthogonal);
+  Vector2D sameCylindricalR1 = Vector2D::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
+  Vector2D sameCylindricalR2 = Vector2D::compose(nUnit, sameCylindricalRParallel, -sameCylindricalROrthogonal);
 
-  pair<Vector2D, Vector2D> result(samePolarR1, samePolarR2);
+  pair<Vector2D, Vector2D> result(sameCylindricalR1, sameCylindricalR2);
   return result;
 
 }
 
 
-Vector2D GeneralizedCircle::samePolarR(const Vector2D& point) const
+Vector2D GeneralizedCircle::sameCylindricalR(const Vector2D& point) const
 {
   const FloatType R = point.norm();
 
@@ -263,23 +263,24 @@ Vector2D GeneralizedCircle::samePolarR(const Vector2D& point) const
   const Vector2D nUnit = n12().unit();
 
   // parallel component
-  const FloatType samePolarRParallel = -(n0() + n3() * R * R) / n12().norm();
+  const FloatType sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
 
   //orthogonal component
   const FloatType pointOrthogonal = point.unnormalizedOrthogonalComp(nUnit);
 
   //orthoganal component of the solution takes to sign of the orthogonal component of the point
-  const FloatType samePolarROrthogonal = sign(pointOrthogonal) * sqrt(R * R - samePolarRParallel * samePolarRParallel);
+  const FloatType sameCylindricalROrthogonal = sign(pointOrthogonal) * sqrt(R * R - sameCylindricalRParallel *
+                                               sameCylindricalRParallel);
 
   //combine parallel and orthogonal components
-  return Vector2D::compose(nUnit, samePolarRParallel, samePolarROrthogonal);
+  return Vector2D::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
 
 }
 
-Vector2D GeneralizedCircle::samePolarRForwardOf(const Vector2D& startPoint, const FloatType& polarR) const
+Vector2D GeneralizedCircle::sameCylindricalRForwardOf(const Vector2D& startPoint, const FloatType& cylindricalR) const
 {
 
-  pair<Vector2D, Vector2D> candidatePoints = samePolarR(polarR);
+  pair<Vector2D, Vector2D> candidatePoints = sameCylindricalR(cylindricalR);
   return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
 
 }

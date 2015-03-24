@@ -37,7 +37,8 @@ namespace Belle2 {
       void createFacets(FacetFilter& facetFilter,
                         const CDCWireHitMayBePtrRange& wirehits,
                         const Neighborhood& neighborhood,
-                        SortableVector<CDCRecoFacet>& facets) const {
+                        SortableVector<CDCRecoFacet>& facets) const
+      {
         createFacetsGeneric(facetFilter, wirehits, neighborhood, facets);
         facets.sort();
 
@@ -49,9 +50,10 @@ namespace Belle2 {
       void createFacetsGeneric(FacetFilter& facetFilter,
                                const CDCWireHitMayBePtrRange& wirehits,
                                const Neighborhood& neighborhood,
-                               GenericFacetCollection& facets) const {
+                               GenericFacetCollection& facets) const
+      {
 
-        for (const auto & mayBePtrMiddleWireHit : wirehits) {
+        for (const auto& mayBePtrMiddleWireHit : wirehits) {
 
           Neighborhood::range nextNeighborRange = neighborhood.equal_range(mayBePtrMiddleWireHit);
 
@@ -60,7 +62,7 @@ namespace Belle2 {
             const CDCWireHit* ptrMiddleWireHit = nextNeighborRange.first.getItem();
             if (not ptrMiddleWireHit) continue;
             const CDCWireHit& middleWireHit = *ptrMiddleWireHit;
-            if (middleWireHit.getAutomatonCell().hasDoNotUseFlag()) continue;
+            if (middleWireHit.getAutomatonCell().hasTakenFlag()) continue;
 
             for (Neighborhood::iterator itStartWireHit = nextNeighborRange.first;
                  itStartWireHit != nextNeighborRange.second; ++itStartWireHit) {
@@ -68,7 +70,7 @@ namespace Belle2 {
               const CDCWireHit* ptrStartWireHit = itStartWireHit.getNeighbor();
               if (not ptrStartWireHit) continue;
               const CDCWireHit& startWireHit = *ptrStartWireHit;
-              if (startWireHit.getAutomatonCell().hasDoNotUseFlag()) continue;
+              if (startWireHit.getAutomatonCell().hasTakenFlag()) continue;
 
 
               for (Neighborhood::iterator itEndWireHit = nextNeighborRange.first;
@@ -77,7 +79,7 @@ namespace Belle2 {
                 const CDCWireHit* ptrEndWireHit = itEndWireHit.getNeighbor();
                 if (not ptrEndWireHit) continue;
                 const CDCWireHit& endWireHit = *ptrEndWireHit;
-                if (endWireHit.getAutomatonCell().hasDoNotUseFlag()) continue;
+                if (endWireHit.getAutomatonCell().hasTakenFlag()) continue;
 
                 //skip combinations where the facet starts and ends on the same wire
                 if (not(ptrStartWireHit->getWire() ==  ptrEndWireHit->getWire())) {
@@ -101,7 +103,8 @@ namespace Belle2 {
                                     const CDCWireHit& startWireHit,
                                     const CDCWireHit& middleWireHit,
                                     const CDCWireHit& endWireHit,
-                                    GenericFacetCollection& facets) const {
+                                    GenericFacetCollection& facets) const
+      {
 
         const CDCWireHitTopology& cdcWireHitTopology = CDCWireHitTopology::getInstance();
 
@@ -109,9 +112,9 @@ namespace Belle2 {
         CDCWireHitTopology::CDCRLWireHitRange middleRLWireHits = cdcWireHitTopology.getRLWireHits(middleWireHit);
         CDCWireHitTopology::CDCRLWireHitRange endRLWireHits = cdcWireHitTopology.getRLWireHits(endWireHit);
 
-        for (const CDCRLWireHit & startRLWireHit : startRLWireHits) {
-          for (const CDCRLWireHit & middleRLWireHit : middleRLWireHits) {
-            for (const CDCRLWireHit & endRLWireHit : endRLWireHits) {
+        for (const CDCRLWireHit& startRLWireHit : startRLWireHits) {
+          for (const CDCRLWireHit& middleRLWireHit : middleRLWireHits) {
+            for (const CDCRLWireHit& endRLWireHit : endRLWireHits) {
 
               CDCRecoFacet facet(&startRLWireHit, &middleRLWireHit, &endRLWireHit, ParameterLine2D());
               // do not set the lines yet. The filter shall do that if it wants to.

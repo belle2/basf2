@@ -54,12 +54,14 @@ namespace Belle2 {
       ~CDCSegmentTriple();
 
       /// Equality comparision based on the pointers to the stored segments
-      bool operator==(CDCSegmentTriple const& rhs) const {
+      bool operator==(CDCSegmentTriple const& rhs) const
+      {
         return CDCAxialAxialSegmentPair::operator==(rhs) and getMiddle() == rhs.getMiddle();
       }
 
       /// Total ordering sheme based on the two axial segments first and the stereo segments second
-      bool operator<(CDCSegmentTriple const& rhs) const {
+      bool operator<(CDCSegmentTriple const& rhs) const
+      {
         return  CDCAxialAxialSegmentPair::operator<(rhs) or (CDCAxialAxialSegmentPair::operator==(rhs) and getMiddle() < rhs.getMiddle());
       }
 
@@ -112,23 +114,25 @@ namespace Belle2 {
       void clearTrajectories() const
       { clearTrajectorySZ(); CDCAxialAxialSegmentPair::clearTrajectory2D(); }
 
-      /// Sets the do not use flag of the segment triple's automaton cell. Also forward the do not use flag to the contained segments and the contained wire hits.
-      void setAndForwardDoNotUseFlag() const {
-        getAutomatonCell().setDoNotUseFlag();
-        CDCAxialAxialSegmentPair::setAndForwardDoNotUseFlag();
-        getMiddle()->setAndForwardDoNotUseFlag();
+      /// Sets the taken flag of the segment triple's automaton cell. Also forward the taken to the contained segments and the contained wire hits.
+      void setAndForwardTakenFlag() const
+      {
+        getAutomatonCell().setTakenFlag();
+        CDCAxialAxialSegmentPair::setAndForwardTakenFlag();
+        getMiddle()->setAndForwardTakenFlag();
       }
 
-      /// If one of the contained segments is marked as do not use this segment triple is set be not usable as well - returns an indicator, if this cell is not usable anymore.
-      void receiveDoNotUse() const {
-        CDCAxialAxialSegmentPair::receiveDoNotUseFlag();
-        getMiddle()->receiveDoNotUseFlag();
+      /// If one of the contained segments is marked as taken this segment triple is set be taken as well.
+      void receiveTaken() const
+      {
+        CDCAxialAxialSegmentPair::receiveTakenFlag();
+        getMiddle()->receiveTakenFlag();
 
-        if (getStart()->getAutomatonCell().hasDoNotUseFlag() or
-            getMiddle()->getAutomatonCell().hasDoNotUseFlag() or
-            getEnd()->getAutomatonCell().hasDoNotUseFlag()) {
+        if (getStart()->getAutomatonCell().hasTakenFlag() or
+            getMiddle()->getAutomatonCell().hasTakenFlag() or
+            getEnd()->getAutomatonCell().hasTakenFlag()) {
 
-          getAutomatonCell().setDoNotUseFlag();
+          getAutomatonCell().setTakenFlag();
 
         }
       }

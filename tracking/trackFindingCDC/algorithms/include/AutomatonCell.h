@@ -33,10 +33,11 @@ namespace Belle2 {
       static const CellFlags ASSIGNED = 1; ///< Constant for a already updated cell
       static const CellFlags START = 2; ///< Constant for a cell that marks the start of a path
       static const CellFlags CYCLE = 4; ///< Constant marker for the detection of cycles in the cellular automata
-      static const CellFlags DO_NOT_USE = 8; ///< Constant for a cell that should not be used
+      static const CellFlags TAKEN = 8; ///< Constant for a cell that has been taken by a segment / track
+      static const CellFlags BACKGROUND = 16; ///< Constant for a cell that is marked as background.
 
       /// Constant summing all possible cell flags
-      static const CellFlags ALL_FLAGS = ASSIGNED + START + CYCLE + DO_NOT_USE;
+      static const CellFlags ALL_FLAGS = ASSIGNED + START + CYCLE + TAKEN + BACKGROUND;
 
 
     public:
@@ -128,22 +129,38 @@ namespace Belle2 {
 
 
 
-      /// Sets the do not use flag to the given value. Default value true.
-      void setDoNotUseFlag(bool setTo = true) const
-      { setFlags<DO_NOT_USE>(setTo); }
+      /// Sets the taken flag to the given value. Default value true.
+      void setTakenFlag(bool setTo = true) const
+      { setFlags<TAKEN>(setTo); }
 
-      /// Resets the do not use flag to false.
-      void unsetDoNotUseFlag() const
-      { setFlags<DO_NOT_USE>(false); }
+      /// Resets the taken flag to false.
+      void unsetTakenFlag() const
+      { setFlags<TAKEN>(false); }
+
+      /// Gets the current state of the taken marker flag.
+      bool hasTakenFlag() const
+      { return hasAnyFlags(TAKEN); }
+
+
+
+      /// Sets the background flag to the given value. Default value true.
+      void setBackgroundFlag(bool setTo = true) const
+      { setFlags<BACKGROUND>(setTo); }
+
+      /// Resets the background flag to false.
+      void unsetBackgroundFlag() const
+      { setFlags<BACKGROUND>(false); }
 
       /// Gets the current state of the do not use flag marker flag.
-      bool hasDoNotUseFlag() const
-      { return hasAnyFlags(DO_NOT_USE); }
+      bool hasBackgroundFlag() const
+      { return hasAnyFlags(BACKGROUND); }
+
 
 
       /// Setting accessing the flag by tag.
       template<CellFlags cellFlag>
-      void setFlags(bool setTo) const {
+      void setFlags(bool setTo) const
+      {
         if (setTo) setFlags(cellFlag);
         else clearFlags(cellFlag);
       }
@@ -157,7 +174,8 @@ namespace Belle2 {
        *  const CellFlags ASSIGNED = 1; \n
        *  const CellFlags START = 2; \n
        *  const CellFlags CYCLE = 4; \n
-       *  const CellFlags DO_NOT_USE = 8; \n
+       *  const CellFlags TAKEN = 8; \n
+       *  const CellFlags BACKGROUND = 16; \n
        *  Use rather hasAnyFlags() to retrieve stats even for single state values.
        */
       const CellFlags& getFlags() const { return m_flags; }

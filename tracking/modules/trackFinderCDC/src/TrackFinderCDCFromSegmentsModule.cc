@@ -67,9 +67,9 @@ void TrackFinderCDCFromSegmentsModule::generate(std::vector<CDCTrack>& tracks)
   generate(segments, tracks);
 
   if (not m_minimalHitsForSingleSegmentTrackBySuperLayerId.empty()) {
-    /// Instance of the leftover single segment tracks creator.
-    for (const CDCRecoSegment2D & segment : segments) {
-      if (segment.getAutomatonCell().hasDoNotUseFlag()) continue;
+    // Instance of the leftover single segment tracks creator.
+    for (const CDCRecoSegment2D& segment : segments) {
+      if (segment.getAutomatonCell().hasTakenFlag()) continue;
 
       ISuperLayerType iSuperLayer = segment.getISuperLayer();
       if (m_minimalHitsForSingleSegmentTrackBySuperLayerId.count(iSuperLayer) and
@@ -77,9 +77,9 @@ void TrackFinderCDCFromSegmentsModule::generate(std::vector<CDCTrack>& tracks)
 
         if (segment.getTrajectory2D().isFitted()) {
           tracks.push_back(CDCTrack(segment));
-          segment.setAndForwardDoNotUseFlag();
-          for (const CDCRecoSegment2D & segment : segments) {
-            segment.receiveDoNotUseFlag();
+          segment.setAndForwardTakenFlag();
+          for (const CDCRecoSegment2D& segment : segments) {
+            segment.receiveTakenFlag();
           }
         }
       }

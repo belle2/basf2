@@ -292,7 +292,7 @@ namespace Belle2 {
           const Vector2D& wirePos = wireHit.getRefPos2D();
           const FloatType driftLength = 0.0;
           // Try out using weighting the observations by the squared drift length.
-          // Reduces the distance measure to a relative measure counting din drift lengths.
+          // Reduces the distance measure to a relative measure counting in drift lengths.
           // Using the squared drift length makes the chi2 unitless.
           // Limited at the bottom by the nominal uncertainty of the drift time (as introduced in CDC::SimpleTDCCountTranslator)
           const FloatType pseudoVariance = (usePosition ? 0.0 : wireHit.getRefDriftLength() * wireHit.getRefDriftLength()) +

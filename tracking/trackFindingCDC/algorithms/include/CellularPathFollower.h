@@ -61,14 +61,15 @@ namespace Belle2 {
       template<class ItemRange>
       std::vector<Path>&&  followAll(const ItemRange& itemRange,
                                      const WeightedNeighborhood<const Item>& neighborhood,
-                                     CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const {
+                                     CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+      {
 
         m_paths.clear();
 
         // Segment to work on
         Path path;
 
-        for (const Item & item : itemRange) {
+        for (const Item& item : itemRange) {
           const AutomatonCell& cell = item.getAutomatonCell();
 
           if (validStartCell(cell, minStateToFollow)) {
@@ -99,7 +100,8 @@ namespace Belle2 {
       /// Follows a single maximal path starting with the given start item. If the start item is nullptr or has a state lower than the minimum state to follow an empty vector is returned.
       Path followSingle(const Item* ptrStartItem,
                         const WeightedNeighborhood<const Item>& neighborhood,
-                        CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const {
+                        CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+      {
 
         Path path;
 
@@ -131,12 +133,13 @@ namespace Belle2 {
       /// Helper function for recursively growing paths. If growMany is true it will follow all highest continuations and store the paths in the m_paths class member.
       void growPath(Path& path,
                     const Neighborhood& neighborhood,
-                    bool growMany = false) const {
+                    bool growMany = false) const
+      {
 
         const Item* lastItem = path.back();
 
         bool grew = false;
-        for (const typename Neighborhood::WeightedRelation & relation : neighborhood.equal_range(lastItem)) {
+        for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(lastItem)) {
           if (isHighestContinuation(relation)) {
 
             const Item* ptrNeighbor = getNeighbor(relation);
@@ -163,10 +166,11 @@ namespace Belle2 {
 
       /// Helper function to determine, if the cell has all flags
       /// indicating to be a start cell and that its state exceeds the minimal requirement.
-      static bool validStartCell(const AutomatonCell& cell, const CellState& minStateToFollow) {
+      static bool validStartCell(const AutomatonCell& cell, const CellState& minStateToFollow)
+      {
         return
           cell.hasStartFlag() and
-          not cell.hasDoNotUseFlag() and
+          not cell.hasTakenFlag() and
           not cell.hasCycleFlag() and
           minStateToFollow <= cell.getCellState();
       }
@@ -174,7 +178,8 @@ namespace Belle2 {
 
 
       /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternatives is necessary.
-      static bool isHighestContinuation(const typename Neighborhood::WeightedRelation& relation) {
+      static bool isHighestContinuation(const typename Neighborhood::WeightedRelation& relation)
+      {
         const Item* ptrItem = getItem(relation);
         const Item* ptrNeighbor = getNeighbor(relation);
 
@@ -191,13 +196,14 @@ namespace Belle2 {
 
 
       /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternatives is necessary.
-      static bool isHighestContinuation(const Item& item, const NeighborWeight& weight, const Item& neighbor) {
+      static bool isHighestContinuation(const Item& item, const NeighborWeight& weight, const Item& neighbor)
+      {
         const AutomatonCell& itemCell = item.getAutomatonCell();
         const AutomatonCell& neighborCell = neighbor.getAutomatonCell();
 
         return (
                  not neighborCell.hasCycleFlag() and
-                 not neighborCell.hasDoNotUseFlag() and
+                 not neighborCell.hasTakenFlag() and
                  (itemCell.getCellState() == (neighborCell.getCellState() + weight + itemCell.getCellWeight()))
                );
       }

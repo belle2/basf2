@@ -166,7 +166,7 @@ size_t TrackFinderCDCBaseModule::copyRemainingHits()
 
   for (const CDCWireHit& wireHit : CDCWireHitTopology::getInstance().getWireHits()) {
     const AutomatonCell& automatonCell = wireHit.getAutomatonCell();
-    if (not automatonCell.hasDoNotUseFlag()) {
+    if (not automatonCell.hasTakenFlag()) {
       const CDCHit* hit = wireHit.getHit();
       if (hit) {
         const CDCHit* newAddedCDCHit = storedRemainingCDCHits.appendNew(*hit);

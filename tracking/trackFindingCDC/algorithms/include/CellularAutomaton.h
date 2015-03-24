@@ -60,7 +60,8 @@ namespace Belle2 {
        *  @param itemRange the range based iterable containing the items that should acquire the cell states
        *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
       template<class ItemRange>
-      const Item*  applyTo(const ItemRange& itemRange, const Neighborhood& neighborhood) const {
+      const Item*  applyTo(const ItemRange& itemRange, const Neighborhood& neighborhood) const
+      {
         return applyWithRecursion(itemRange, neighborhood);
       }
 
@@ -72,15 +73,16 @@ namespace Belle2 {
        *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
       template<class ItemRange>
       const Item* applyWithRecursion(const ItemRange& itemRange,
-                                     const Neighborhood& neighborhood) const {
+                                     const Neighborhood& neighborhood) const
+      {
         // Set all cell states to -inf and the non permanent flags to unset.
         prepareCellFlags(itemRange);
 
         const Item* ptrHighestItem = nullptr;
 
-        for (const Item & item : itemRange) {
+        for (const Item& item : itemRange) {
           const AutomatonCell& automatonCell = item.getAutomatonCell();
-          if (automatonCell.hasDoNotUseFlag()) continue;
+          if (automatonCell.hasTakenFlag()) continue;
           if (automatonCell.hasCycleFlag()) continue;
 
           if (not automatonCell.hasAssignedFlag()) {
@@ -115,7 +117,8 @@ namespace Belle2 {
     private:
 
       /// Gets the cell state of the item. Determines it if necessary traversing the graph. Throws CYCLE_DETECTED if it encounters a cycle in the graph.
-      const CellState& getFinalCellState(const Item& item, const Neighborhood& neighborhood) const {
+      const CellState& getFinalCellState(const Item& item, const Neighborhood& neighborhood) const
+      {
         const AutomatonCell& automatonCell = item.getAutomatonCell();
         // Throw if this cell has already been traversed in this recursion cycle
         if (automatonCell.hasCycleFlag()) {
@@ -142,9 +145,10 @@ namespace Belle2 {
 
 
       /// Updates the state of a cell considering all continuations recursively
-      const CellState& updateState(const Item& item, const Neighborhood& neighborhood) const {
+      const CellState& updateState(const Item& item, const Neighborhood& neighborhood) const
+      {
         //--- blocked cells do not contribute a continuation ---
-        if (item.getAutomatonCell().hasDoNotUseFlag()) {
+        if (item.getAutomatonCell().hasTakenFlag()) {
           item.getAutomatonCell().setCellState(NAN);
           item.getAutomatonCell().setAssignedFlag();
           return item.getAutomatonCell().getCellState();
@@ -155,10 +159,10 @@ namespace Belle2 {
         CellState maxStateWithContinuation = -std::numeric_limits<CellState>::infinity();
 
         // Check neighbors now
-        for (const typename Neighborhood::WeightedRelation & relation : neighborhood.equal_range(&item)) {
+        for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(&item)) {
           //advance to valid neighbor
           const Item* ptrNeighbor = getNeighbor(relation);
-          if (ptrNeighbor and not ptrNeighbor->getAutomatonCell().hasDoNotUseFlag()) {
+          if (ptrNeighbor and not ptrNeighbor->getAutomatonCell().hasTakenFlag()) {
 
             const Item& neighbor = *ptrNeighbor;
 
@@ -174,7 +178,7 @@ namespace Belle2 {
             // Remember only the maximum value of all neighbors
             maxStateWithContinuation = std::max(maxStateWithContinuation, stateWithContinuation);
 
-          } //end if hasDoNotUse()
+          } //end if hasTaken()
         } // end for relations
 
         if (maxStateWithContinuation == -std::numeric_limits<CellState>::infinity()) {
@@ -312,8 +316,9 @@ namespace Belle2 {
       /// Helper function to prepare the stats
       /** Clears all flags but DO_NOT_USE and sets the cell state to minus infinity. */
       template<class ItemRange>
-      void prepareCellFlags(const ItemRange& itemRange) const {
-        for (const Item & item : itemRange) {
+      void prepareCellFlags(const ItemRange& itemRange) const
+      {
+        for (const Item& item : itemRange) {
 
           item.getAutomatonCell().unsetTemporaryFlags();
           item.getAutomatonCell().setCellState(-std::numeric_limits<CellState>::infinity());

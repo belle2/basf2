@@ -45,7 +45,8 @@ namespace Belle2 {
       { return getStart() == rhs.getStart() and getEnd() == rhs.getEnd(); }
 
       /// Total ordering sheme comparing the segment pointers.
-      bool operator<(CDCAxialAxialSegmentPair const& rhs) const {
+      bool operator<(CDCAxialAxialSegmentPair const& rhs) const
+      {
         return (getStart() < rhs.getStart()  or
                 (getStart() == rhs.getStart() and getEnd() < rhs.getEnd()));
       }
@@ -109,21 +110,23 @@ namespace Belle2 {
       void clearTrajectory2D() const
       { getTrajectory2D().clear(); }
 
-      /// Sets the do not use flag of the segment pair's automaton cell. Also forward the don not use flag to the contained segments and the contained wire hits.
-      void setAndForwardDoNotUseFlag() const {
-        getAutomatonCell().setDoNotUseFlag();
-        getStart()->setAndForwardDoNotUseFlag();
-        getEnd()->setAndForwardDoNotUseFlag();
+      /// Sets the taken flag of the segment pair's automaton cell. Also forward the taken flag to the contained segments and the contained wire hits.
+      void setAndForwardTakenFlag() const
+      {
+        getAutomatonCell().setTakenFlag();
+        getStart()->setAndForwardTakenFlag();
+        getEnd()->setAndForwardTakenFlag();
       }
 
-      /// If one of the contained segments is marked as do not use this segment triple is set be not usable as well
-      void receiveDoNotUseFlag() const {
-        getStart()->receiveDoNotUseFlag();
-        getEnd()->receiveDoNotUseFlag();
+      /// If one of the contained segments is marked as taken this segment triple is set be taken as well.
+      void receiveTakenFlag() const
+      {
+        getStart()->receiveTakenFlag();
+        getEnd()->receiveTakenFlag();
 
-        if (getStart()->getAutomatonCell().hasDoNotUseFlag() or
-            getEnd()->getAutomatonCell().hasDoNotUseFlag()) {
-          getAutomatonCell().setDoNotUseFlag();
+        if (getStart()->getAutomatonCell().hasTakenFlag() or
+            getEnd()->getAutomatonCell().hasTakenFlag()) {
+          getAutomatonCell().setTakenFlag();
         }
 
       }
@@ -133,7 +136,8 @@ namespace Belle2 {
        *  * FORWARD if the last entity lies behind the first.
        *  * BACKWARD if the last entity lies before the first.
        */
-      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const {
+      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
+      {
         ForwardBackwardInfo startIsCoaligned = getStart()->isCoaligned(trajectory2D);
         ForwardBackwardInfo endIsCoaligned = getEnd()->isCoaligned(trajectory2D);
 

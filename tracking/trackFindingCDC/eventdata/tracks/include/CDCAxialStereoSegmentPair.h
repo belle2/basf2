@@ -47,7 +47,8 @@ namespace Belle2 {
 
 
       /// Total ordering sheme comparing the segment pointers.
-      bool operator<(CDCAxialStereoSegmentPair const& rhs) const {
+      bool operator<(CDCAxialStereoSegmentPair const& rhs) const
+      {
         return (getStartSegment() < rhs.getStartSegment()  or
                 (getStartSegment() == rhs.getStartSegment() and getEndSegment() < rhs.getEndSegment()));
       }
@@ -141,7 +142,8 @@ namespace Belle2 {
 
 
       /// Setter for both segments simultaniously
-      void setSegments(const CDCRecoSegment2D* startSegment, const CDCRecoSegment2D* endSegment) {
+      void setSegments(const CDCRecoSegment2D* startSegment, const CDCRecoSegment2D* endSegment)
+      {
         m_startSegment = startSegment;
         m_endSegment = endSegment;
         if (not checkSegmentsNonNullptr()) B2WARNING("CDCAxialStereoSegmentPair: one segment set to nullptr");
@@ -178,7 +180,8 @@ namespace Belle2 {
        *  * FORWARD if the last entity lies behind the first.
        *  * BACKWARD if the last entity lies before the first.
        */
-      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const {
+      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
+      {
         ForwardBackwardInfo startIsCoaligned = getStartSegment()->isCoaligned(trajectory2D);
         ForwardBackwardInfo endIsCoaligned = getEndSegment()->isCoaligned(trajectory2D);
 
@@ -207,21 +210,23 @@ namespace Belle2 {
       void clearTrajectory3D() const
       { getTrajectory3D().clear(); }
 
-      /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
-      void setAndForwardDoNotUseFlag() const {
-        getAutomatonCell().setDoNotUseFlag();
-        getStartSegment()->setAndForwardDoNotUseFlag();
-        getEndSegment()->setAndForwardDoNotUseFlag();
+      /// Sets the taken flag of the segment triple's automaton cell and of the three contained segments.
+      void setAndForwardTakenFlag() const
+      {
+        getAutomatonCell().setTakenFlag();
+        getStartSegment()->setAndForwardTakenFlag();
+        getEndSegment()->setAndForwardTakenFlag();
       }
 
-      /// If one of the contained segments is marked as do not use this segment triple is set be not usable as well
-      void receiveDoNotUseFlag() const {
-        getStartSegment()->receiveDoNotUseFlag();
-        getEndSegment()->receiveDoNotUseFlag();
+      /// If one of the contained segments is marked as taken this segment triple is set be taken as well.
+      void receiveTakenFlag() const
+      {
+        getStartSegment()->receiveTakenFlag();
+        getEndSegment()->receiveTakenFlag();
 
-        if (getStartSegment()->getAutomatonCell().hasDoNotUseFlag() or
-            getEndSegment()->getAutomatonCell().hasDoNotUseFlag()) {
-          getAutomatonCell().setDoNotUseFlag();
+        if (getStartSegment()->getAutomatonCell().hasTakenFlag() or
+            getEndSegment()->getAutomatonCell().hasTakenFlag()) {
+          getAutomatonCell().setTakenFlag();
         }
       }
 

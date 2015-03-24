@@ -52,7 +52,8 @@ namespace Belle2 {
       template<class ItemRange>
       void apply(const ItemRange& itemRange,
                  const Neighborhood& neighborhood,
-                 std::vector<Path>& paths) const {
+                 std::vector<Path>& paths) const
+      {
 
         // multiple passes of the cellular automat
         // one segment is created at a time denying all knots it picked up,
@@ -75,13 +76,13 @@ namespace Belle2 {
           } else {
 
             //Block the used items
-            for (const Item * item : newPath) {
-              item->setAndForwardDoNotUseFlag();
+            for (const Item* item : newPath) {
+              item->setAndForwardTakenFlag();
             }
 
             //Block the items that have already used components
-            for (const Item & item : itemRange) {
-              item.receiveDoNotUseFlag();
+            for (const Item& item : itemRange) {
+              item.receiveTakenFlag();
             }
 
             paths.push_back(std::move(newPath));

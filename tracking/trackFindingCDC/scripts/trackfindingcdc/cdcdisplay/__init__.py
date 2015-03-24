@@ -69,8 +69,8 @@ class CDCSVGDisplayModule(Module):
         # Switch to draw the CDCHits. Default: active
         self.draw_hits = True  # and False
 
-        # Switch to draw the CDCHits. Default: active
-        self.draw_donotuseflag = True and False
+        # Switch to draw the CDCHits colored by the associated CDCWireHit taken flag. Default: active
+        self.draw_takenflag = True and False
 
         # Switch to draw the interaction point. Default: active
         self.draw_interaction_point = True  # and False
@@ -326,9 +326,9 @@ class CDCSVGDisplayModule(Module):
                          'stroke-width': attributemaps.ZeroDriftLengthStrokeWidthMap()}
             plotter.draw_storearray('CDCHits', **styleDict)
 
-        # Draw the CDCHits do not use flag
-        if self.draw_donotuseflag:
-            styleDict = {'stroke': attributemaps.DoNotUseFlagColorMap(), }
+        # Draw the CDCHits colored by the taken flag from the CDCWireHit.
+        if self.draw_takenflag:
+            styleDict = {'stroke': attributemaps.TakenFlagColorMap(), }
             plotter.draw_storearray('CDCHits', **styleDict)
 
         # Draw mcparticle id

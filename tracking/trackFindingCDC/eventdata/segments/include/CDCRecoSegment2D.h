@@ -56,7 +56,8 @@ namespace Belle2 {
       static CDCRecoSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
       ///Implements the standard swap idiom
-      friend void swap(CDCRecoSegment2D& lhs, CDCRecoSegment2D& rhs) {
+      friend void swap(CDCRecoSegment2D& lhs, CDCRecoSegment2D& rhs)
+      {
         SortableVector<CDCRecoHit2D>& rawLHS = lhs;
         SortableVector<CDCRecoHit2D>& rawRHS = rhs;
         rawLHS.swap(rawRHS);
@@ -74,27 +75,30 @@ namespace Belle2 {
       { return wireSuperLayer.getISuperLayer() < segment.getISuperLayer(); }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const {
+      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const
+      {
         std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
-        for (const CDCRecoHit2D & recoHit2D : *this) {
+        for (const CDCRecoHit2D& recoHit2D : *this) {
           wireSegment.push_back(&(recoHit2D.getWire()));
         }
         return wireSegment;
       }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      CDCWireHitSegment getWireHitSegment() const {
+      CDCWireHitSegment getWireHitSegment() const
+      {
         CDCWireHitSegment wireHitSegment;
-        for (const CDCRecoHit2D & recoHit2D : *this) {
+        for (const CDCRecoHit2D& recoHit2D : *this) {
           wireHitSegment.push_back(&(recoHit2D.getWireHit()));
         }
         return wireHitSegment;
       }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      CDCRLWireHitSegment getRLWireHitSegment() const {
+      CDCRLWireHitSegment getRLWireHitSegment() const
+      {
         CDCRLWireHitSegment rlWireHitSegment;
-        for (const CDCRecoHit2D & recoHit2D : *this) {
+        for (const CDCRecoHit2D& recoHit2D : *this) {
           rlWireHitSegment.push_back(&(recoHit2D.getRLWireHit()));
         }
         return rlWireHitSegment;
@@ -104,11 +108,12 @@ namespace Belle2 {
       bool fillInto(genfit::TrackCand& gfTrackCand) const;
 
       /// Makes a copy of the segment with the reversed hits in the opposite order.
-      CDCRecoSegment2D reversed() const {
+      CDCRecoSegment2D reversed() const
+      {
 
         CDCRecoSegment2D reverseSegment;
         reverseSegment.reserve(size());
-        for (const CDCRecoHit2D & recohit : reverseRange()) {
+        for (const CDCRecoHit2D& recohit : reverseRange()) {
           reverseSegment.push_back(recohit.reversed());
         }
 
@@ -118,12 +123,13 @@ namespace Belle2 {
       }
 
       /// Reverses the order of hits and their right left passage hypotheses inplace
-      void reverse() {
+      void reverse()
+      {
         // Reverse the trajectory
         m_trajectory2D.reverse();
 
         // Reverse the left right passage hypotheses
-        for (CDCRecoHit2D & recoHit2D : *this) {
+        for (CDCRecoHit2D& recoHit2D : *this) {
           recoHit2D.reverse();
         }
         // Reverse the arrangement of hits.
@@ -136,24 +142,26 @@ namespace Belle2 {
       /// Constant getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
-      /// Set the do not use flag of the automaton cell of this segment and forward the do not use flag to all contained wire hits.
-      void setAndForwardDoNotUseFlag() const {
-        getAutomatonCell().setDoNotUseFlag();
-        for (const CDCRecoHit2D & recoHit2D : *this) {
+      /// Set the taken flag of the automaton cell of this segment and forward the taken flag to all contained wire hits.
+      void setAndForwardTakenFlag() const
+      {
+        getAutomatonCell().setTakenFlag();
+        for (const CDCRecoHit2D& recoHit2D : *this) {
           const CDCWireHit& wireHit = recoHit2D.getWireHit();
 
-          wireHit.getAutomatonCell().setDoNotUseFlag();
+          wireHit.getAutomatonCell().setTakenFlag();
 
         }
       }
 
-      /// Check all contained wire hits if one has the do not use flag. Set the do not use flag of this segment in case at least one of the contained wire hits is flagged as do not use.
-      void receiveDoNotUseFlag() const {
-        for (const CDCRecoHit2D & recoHit2D : *this) {
+      /// Check all contained wire hits if one has the taken flag. Set the taken flag of this segment in case at least one of the contained wire hits is flagged as taken.
+      void receiveTakenFlag() const
+      {
+        for (const CDCRecoHit2D& recoHit2D : *this) {
           const CDCWireHit& wireHit = recoHit2D.getWireHit();
 
-          if (wireHit.getAutomatonCell().hasDoNotUseFlag()) {
-            getAutomatonCell().setDoNotUseFlag();
+          if (wireHit.getAutomatonCell().hasTakenFlag()) {
+            getAutomatonCell().setTakenFlag();
             return;
           }
 
@@ -193,7 +201,8 @@ namespace Belle2 {
 
 
     private:
-      mutable AutomatonCell m_automatonCell; ///< Memory for the automaton cell. It is declared mutable because it can vary rather freely despite of the hit content might be required fixed
+      mutable AutomatonCell
+      m_automatonCell; ///< Memory for the automaton cell. It is declared mutable because it can vary rather freely despite of the hit content might be required fixed
       mutable CDCTrajectory2D m_trajectory2D; ///< Memory for the two dimensional trajectory fitted to this segment
 
     private:

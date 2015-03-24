@@ -136,7 +136,7 @@ class ZeroDriftLengthColorMap(CDCHitColorMap):
             return self.bkgHitColor
 
 
-class DoNotUseFlagColorMap(CDCHitColorMap):
+class TakenFlagColorMap(CDCHitColorMap):
 
     """
     CDCHit to color map highlighting the CDCHits that posses the do not use flag.
@@ -150,7 +150,7 @@ class DoNotUseFlagColorMap(CDCHitColorMap):
         wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
 
         wirehit = wireHitTopology.getWireHit(cdcHit)
-        if wirehit.getAutomatonCell().hasDoNotUseFlag():
+        if wirehit.getAutomatonCell().hasTakenFlag():
             return 'red'
         else:
             return self.bkgHitColor

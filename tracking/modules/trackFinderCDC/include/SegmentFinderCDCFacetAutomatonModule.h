@@ -381,7 +381,8 @@ namespace Belle2 {
             if (isNotACell(clusterWeight)) {
               // Cluster detected as background
               for (const CDCWireHit* wireHit : cluster) {
-                wireHit->getAutomatonCell().setDoNotUseFlag();
+                wireHit->getAutomatonCell().setBackgroundFlag();
+                wireHit->getAutomatonCell().setTakenFlag();
               }
               // skip to next cluster
               continue;

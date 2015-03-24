@@ -157,22 +157,24 @@ namespace Belle2 {
       /// Calculates the sum of squared distances of the trajectory to the three hits.
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;
 
-      /// Sets the do not use flag of the facet's automaton cell and of the three contained wire hits
-      void setAndForwardDoNotUseFlag() const {
-        getAutomatonCell().setDoNotUseFlag();
-        getStartWireHit().getAutomatonCell().setDoNotUseFlag();
-        getMiddleWireHit().getAutomatonCell().setDoNotUseFlag();
-        getEndWireHit().getAutomatonCell().setDoNotUseFlag();
+      /// Sets the taken flag of the facet's automaton cell and of the three contained wire hits
+      void setAndForwardTakenFlag() const
+      {
+        getAutomatonCell().setTakenFlag();
+        getStartWireHit().getAutomatonCell().setTakenFlag();
+        getMiddleWireHit().getAutomatonCell().setTakenFlag();
+        getEndWireHit().getAutomatonCell().setTakenFlag();
       }
 
-      /// If one of the contained wire hits is marked as do not use this facet is set be not usable as well
-      void receiveDoNotUseFlag() const {
+      /// If one of the contained wire hits is marked as taken this facet is set be taken as well.
+      void receiveTakenFlag() const
+      {
 
-        if (getStartWireHit().getAutomatonCell().hasDoNotUseFlag() or
-            getMiddleWireHit().getAutomatonCell().hasDoNotUseFlag() or
-            getEndWireHit().getAutomatonCell().hasDoNotUseFlag()) {
+        if (getStartWireHit().getAutomatonCell().hasTakenFlag() or
+            getMiddleWireHit().getAutomatonCell().hasTakenFlag() or
+            getEndWireHit().getAutomatonCell().hasTakenFlag()) {
 
-          getAutomatonCell().setDoNotUseFlag();
+          getAutomatonCell().setTakenFlag();
         }
       }
 

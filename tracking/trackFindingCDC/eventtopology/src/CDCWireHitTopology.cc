@@ -42,7 +42,7 @@ namespace {
   {
     unordered_set<unsigned short> hitEWires;
 
-    for (const CDCHit & hit : storedHits) {
+    for (const CDCHit& hit : storedHits) {
       unsigned short eWire = hit.getID();
       if (hitEWires.count(eWire)) {
         return false;
@@ -101,8 +101,8 @@ size_t CDCWireHitTopology::useAll()
   event();
 
   // Unblock every wire hit
-  for (const CDCWireHit & wireHit : m_wireHits) {
-    wireHit.getAutomatonCell().unsetDoNotUseFlag();
+  for (const CDCWireHit& wireHit : m_wireHits) {
+    wireHit.getAutomatonCell().unsetTakenFlag();
   }
 
   return m_wireHits.size();
@@ -117,14 +117,14 @@ size_t CDCWireHitTopology::dontUse(const std::vector<int>& iHits)
   int nHits = storedHits.getEntries();
 
   size_t nBlockedHits = 0;
-  for (const int & iHit : iHits) {
+  for (const int& iHit : iHits) {
     if (iHit >= 0 and iHit < nHits) {
       const CDCHit* ptrHit = storedHits[iHit];
       const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
       if (ptrWireHit) {
         const CDCWireHit& wireHit = *ptrWireHit;
-        if (wireHit.getAutomatonCell().hasDoNotUseFlag()) {
-          wireHit.getAutomatonCell().setDoNotUseFlag();
+        if (wireHit.getAutomatonCell().hasTakenFlag()) {
+          wireHit.getAutomatonCell().setTakenFlag();
           ++nBlockedHits;
         }
       } else {
@@ -151,20 +151,20 @@ size_t CDCWireHitTopology::useOnly(const std::vector<int>& iHits)
   event();
 
   // Block every wire hit first
-  for (const CDCWireHit & wireHit : m_wireHits) {
-    wireHit.getAutomatonCell().setDoNotUseFlag();
+  for (const CDCWireHit& wireHit : m_wireHits) {
+    wireHit.getAutomatonCell().setTakenFlag();
   }
 
   StoreArray<CDCHit> storedHits;
   int nHits = storedHits.getEntries();
 
-  for (const int & iHit : iHits) {
+  for (const int& iHit : iHits) {
     if (iHit >= 0 and iHit < nHits) {
       const CDCHit* ptrHit = storedHits[iHit];
       const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
       if (ptrWireHit) {
         const CDCWireHit& wireHit = *ptrWireHit;
-        wireHit.getAutomatonCell().unsetDoNotUseFlag();
+        wireHit.getAutomatonCell().unsetTakenFlag();
       } else {
         B2WARNING("No CDCWireHit for CDCHit");
       }
@@ -251,7 +251,7 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
     B2ERROR("Wire hits are not sorted after creation");
   }
 
-  for (const CDCWireHit & wireHit : m_wireHits) {
+  for (const CDCWireHit& wireHit : m_wireHits) {
     m_rlWireHits.push_back(CDCRLWireHit(&wireHit, LEFT));
     m_rlWireHits.push_back(CDCRLWireHit(&wireHit, RIGHT));
   }
@@ -337,7 +337,8 @@ std::pair<const CDCRLWireHit*, const CDCRLWireHit*> CDCWireHitTopology::getRLWir
   }
 }
 
-const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit, const RightLeftInfo& rlInfo) const
+const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
+    const RightLeftInfo& rlInfo) const
 {
 
   std::pair<const CDCRLWireHit*, const CDCRLWireHit*> rlWireHitPair = getRLWireHitPair(wireHit);
@@ -350,7 +351,8 @@ const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(co
 }
 
 
-const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const
+const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit,
+    const RightLeftInfo& rlInfo) const
 {
   const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
   return  ptrWireHit ? getRLWireHit(*ptrWireHit, rlInfo) : nullptr;

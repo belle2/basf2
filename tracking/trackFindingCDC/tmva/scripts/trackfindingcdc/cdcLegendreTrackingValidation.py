@@ -161,10 +161,19 @@ def plot_many_times():
     plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=4, mode="expand", borderaxespad=0.)
     plt.xlabel("tmva cut")
     plt.ylabel("Deviation in %")
-    plt.xlim([0, 0.3])
     plt.xticks(results.index)
     plt.savefig("tracking_validation.pdf")
-    print results
+
+    plt.clf()
+    plt.plot(results.index, 100.0 * results.finding_efficiency, label="Finding Efficiency")
+    plt.plot(results.index, 100.0 * results.hit_efficiency, label="Hit Efficiency")
+    plt.plot(results.index, 100.0 * results.fake_rate, label="Fake Rate")
+    plt.plot(results.index, 100.0 * results.clone_rate, label="Clone Rate")
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=4, mode="expand", borderaxespad=0.)
+    plt.xlabel("tmva cut")
+    plt.ylabel("Rates in %")
+    plt.xticks(results.index)
+    plt.savefig("tracking_validation_rates.pdf")
 
 
 def run():
@@ -172,5 +181,5 @@ def run():
     validation_run.configure_and_execute_from_commandline()
 
 if __name__ == '__main__':
-    run_many_times()
+    # run_many_times()
     plot_many_times()

@@ -6,6 +6,7 @@
 import basf2
 
 from ROOT import gSystem
+from matplotlib.gridspec import GridSpec
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
@@ -17,6 +18,13 @@ import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
 
 from tracking.run.event_generation import StandardEventGenerationRun
+
+import root_pandas
+import pandas
+import matplotlib.pyplot as plt
+import seaborn as sb
+sb.set_context("talk")
+from matplotlib.gridspec import GridSpec
 
 CONTACT = "ucddn@student.kit.edu"
 
@@ -203,6 +211,36 @@ def create_weights():
     weight_creator.train()
 
 
+def plot():
+
+    data = root_pandas.read_root("weights.root", tree_key="TrainTree")
+    grouped = data.groupby("classID")
+    grouped = DataFrame({"signal": grouped.get_group(0), "background": grouped.get_group(1)})
+    print data
+
+    exit()
+
+    gs = GridSpec(4, 3)
+    gs.update(wspace=0.5, hspace=0.8)
+    index = 0
+
+    for column in data.columns:
+        ax = plt.subplot(gs[index])
+        if column not in ["classID", "className", "weight"]:
+            max_data = np.r_[signal[column], background[column]].max()
+            bins = np.linspace(0, max_data, max_data + 1)
+            plt.hist(signal[column].values, bins, alpha=0.5)
+            plt.hist(background[column].values, bins, alpha=0.5)
+            plt.yticks([])
+            plt.ylabel("Number", fontsize=8)
+            plt.title(column)
+            plt.tick_params(labelsize=8)
+            index = index + 1
+
+    plt.savefig("all.pdf")
+
+
 if __name__ == "__main__":
-    create_events()
-    create_weights()
+    # create_events()
+    # create_weights()
+    plot()

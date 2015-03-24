@@ -100,12 +100,20 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
         )
 
         argument_parser.add_argument(
-            '-s',
             '--splitting',
             dest='splitting',
-            default=self.splitting,
+            action="store_true",
             help='Split the tracks before searching for not assigned hits.'
         )
+
+        argument_parser.add_argument(
+            '--no-splitting',
+            dest='splitting',
+            action="store_false",
+            help='Split the tracks before searching for not assigned hits.'
+        )
+
+        argument_parser.set_defaults(splitting=self.splitting)
 
         return argument_parser
 
@@ -223,23 +231,23 @@ class CombinerValidationRun(CombinerTrackFinderRun, AddValidationMethod):
         # based on the properties in the base class.
         main_path = super(CombinerValidationRun, self).create_path()
 
+        if self.splitting:
+            suffix = ""
+        else:
+            suffix = "_no_splitting"
+
         self.create_validation(
             main_path,
             track_candidates_store_array_name="ResultTrackCands",
-            output_file_name="evaluation/result_%.2f.root" %
-            self.tmva_cut)
+            output_file_name="evaluation/result_%.2f%s.root" % (self.tmva_cut, suffix))
         self.create_validation(
             main_path,
             track_candidates_store_array_name="NaiveResultTrackCands",
-            output_file_name="evaluation/naive_%.2f.root" %
-            self.tmva_cut)
+            output_file_name="evaluation/naive_%.2f%s.root" % (self.tmva_cut, suffix))
         self.create_validation(
             main_path,
             track_candidates_store_array_name=self.legendre_track_cands_store_array_name,
-            output_file_name="evaluation/legendre_%.2f.root" %
-            self.tmva_cut)
-
-        print main_path
+            output_file_name="evaluation/legendre_%.2f%s.root" % (self.tmva_cut, suffix))
 
         return main_path
 
@@ -247,34 +255,72 @@ class CombinerValidationRun(CombinerTrackFinderRun, AddValidationMethod):
 def main():
     run = CombinerValidationRun()
     run.configure_and_execute_from_commandline()
+    print basf2.statistics
 
 
-def plot(tmva_cut):
+def plot(tmva_cut, splitting):
+    if splitting:
+        suffix = ""
+    else:
+        suffix = "_no_splitting"
+
     def catch_rates(prefix):
         fom = root_pandas.read_root(
-            "evaluation/" +
-            prefix +
-            "_%.2f.root" %
-            tmva_cut,
+            "evaluation/%s_%.2f%s.root" % (prefix, tmva_cut, suffix),
             tree_key="ExpertMCSideTrackingValidationModule_overview_figures_of_merit")
         rates = root_pandas.read_root(
-            "evaluation/" +
-            prefix +
-            "_%.2f.root" %
-            tmva_cut,
+            "evaluation/%s_%.2f%s.root" % (prefix, tmva_cut, suffix),
             tree_key="ExpertPRSideTrackingValidationModule_overview_figures_of_merit")
 
         return {"tmva_cut": tmva_cut,
+                "splitting": splitting,
                 "finding_efficiency": fom.finding_efficiency[0],
                 "hit_efficiency": fom.hit_efficiency[0],
                 "fake_rate": rates.fake_rate[0],
-                "clone_rate": rates.clone_rate[0]}
+                "clone_rate": rates.clone_rate[0],
+                "prefix": prefix}
 
-    print "naive", catch_rates("naive")
-    print "legendre", catch_rates("legendre")
-    print "results", catch_rates("result")
+    dataframe = pandas.DataFrame()
+
+    #dataframe = dataframe.append(catch_rates("naive"), ignore_index=True)
+    dataframe = dataframe.append(catch_rates("legendre"), ignore_index=True)
+    dataframe = dataframe.append(catch_rates("result"), ignore_index=True)
+
+    return dataframe
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
-    main()
-    plot(0.0)
+    # main()
+    results = pandas.DataFrame()
+    for tmva_cut in np.arange(0, 0.6, 0.1):
+        results = results.append(plot(tmva_cut=tmva_cut, splitting=False), ignore_index=True)
+        results = results.append(plot(tmva_cut=tmva_cut, splitting=True), ignore_index=True)
+
+    results.sort_index(by=["prefix", "splitting", "tmva_cut"], inplace=True)
+    results.index = range(1, len(results) + 1)
+
+    plt.clf()
+    plt.plot(results.index, 100.0 * results.finding_efficiency, label="Finding Efficiency")
+    plt.plot(results.index, 100.0 * results.hit_efficiency, label="Hit Efficiency")
+    plt.plot(results.index, 100.0 * results.fake_rate, label="Fake Rate")
+    plt.plot(results.index, 100.0 * results.clone_rate, label="Clone Rate")
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=4, mode="expand", borderaxespad=0.)
+    plt.ylabel("Rates in %")
+    plt.xticks(results.index, ["splitting " + str(t) + " " + str(l) if s
+                               else "no splitting " + str(t) + " " + str(l)
+                               for (s, t, l) in zip(results.splitting, results.tmva_cut, results.prefix)], rotation="vertical")
+    plt.subplots_adjust(bottom=0.5)
+    plt.savefig("tracking_validation.pdf")
+
+    plt.clf()
+    plt.plot(results.index, 100.0 * results.finding_efficiency / results.iloc[0].finding_efficiency, label="Finding Efficiency")
+    plt.plot(results.index, 100.0 * results.hit_efficiency / results.iloc[0].hit_efficiency, label="Hit Efficiency")
+    plt.plot(results.index, 100.0 * results.fake_rate / results.iloc[0].fake_rate, label="Fake Rate")
+    plt.plot(results.index, 100.0 * results.clone_rate / results.iloc[0].clone_rate, label="Clone Rate")
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=4, mode="expand", borderaxespad=0.)
+    plt.ylabel("Deviation in %")
+    plt.xticks(results.index, ["splitting " + str(t) + " " + str(l) if s
+                               else "no splitting " + str(t) + " " + str(l)
+                               for (s, t, l) in zip(results.splitting, results.tmva_cut, results.prefix)], rotation="vertical")
+    plt.subplots_adjust(bottom=0.5)
+    plt.savefig("tracking_validation_rates.pdf")

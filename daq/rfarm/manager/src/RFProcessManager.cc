@@ -88,7 +88,7 @@ int RFProcessManager::Execute(char* scr, int nargs, char** args)
   }
   // Parent process (pid>0 : success, pid<0 : error )
   printf("RFProcessManager : forked. pid=%d\n", pid);
-  close(m_iopipe[1]);
+  //close(m_iopipe[1]);
 
   return pid;
 }

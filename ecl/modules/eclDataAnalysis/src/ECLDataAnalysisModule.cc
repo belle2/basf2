@@ -128,6 +128,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclGammaPy(0),
     m_eclGammaPz(0),
     m_eclGammaR(0),
+    m_eclGammaToPi0(0),
     m_eclPi0Multip(0),
     m_eclPi0Idx(0),
     //m_eclPi0ToGamma(0),

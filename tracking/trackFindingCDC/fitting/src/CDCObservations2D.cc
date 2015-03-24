@@ -16,21 +16,6 @@ using namespace Eigen;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCObservations2D)
-
-
-CDCObservations2D::CDCObservations2D()
-{
-}
-
-
-
-CDCObservations2D::~CDCObservations2D()
-{
-}
-
-
-
 size_t CDCObservations2D::getNObservationsWithDriftRadius() const
 {
   size_t result = 0;

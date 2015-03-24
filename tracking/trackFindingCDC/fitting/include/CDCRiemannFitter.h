@@ -7,15 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCRIEMANNFITTER_H
-#define CDCRIEMANNFITTER_H
+#pragma once
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
-
-#include "CDCObservations2D.h"
 #include "CDCFitter2D.h"
+#include "ExtendedRiemannsMethod.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -24,27 +19,15 @@ namespace Belle2 {
     class CDCRiemannFitter : public CDCFitter2D<Belle2::TrackFindingCDC::ExtendedRiemannsMethod> {
 
     public:
-      ///Static getter for a general Riemann fitter
+      /// Static getter for a general Riemann fitter
       static const CDCRiemannFitter& getFitter();
 
-      ///Static getter for a line fitter
+      /// Static getter for a line fitter
       static const CDCRiemannFitter& getLineFitter();
 
-      ///Static getter for an origin circle fitter
+      /// Static getter for an origin circle fitter
       static const CDCRiemannFitter& getOriginCircleFitter();
-
-    public:
-      ///Empty constructor
-      CDCRiemannFitter();
-
-      ///Empty destructor
-      ~CDCRiemannFitter();
-
-    public:
-      /** ROOT Macro to make CDCRiemannFitter a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRiemannFitter, 1);
-    }; //class
+    }; // class
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCRIEMANNFITTER

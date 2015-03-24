@@ -7,11 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include "../include/CDCFitter2D.h"
 
-using namespace std;
-using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace Belle2::TrackFindingCDC;
 
-//TRACKFINDINGCDC_SwitchableClassImp(CDCFitter2D)
+

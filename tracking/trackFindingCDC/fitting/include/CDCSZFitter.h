@@ -7,10 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCSZFITTER_H
-#define CDCSZFITTER_H
+#pragma once
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
@@ -20,37 +18,30 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class implementing the z coordinate over travel distance line fit.
-    class CDCSZFitter : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCSZFitter {
     public:
-
-      /// Default constructor for ROOT.
-      CDCSZFitter();
-
-      /// Empty destructor.
-      ~CDCSZFitter();
-
       /// Getter for a standard sz line fitter instance.
       static const CDCSZFitter& getFitter();
 
       /// Returns a fitted trajectory
       CDCTrajectorySZ fit(const CDCStereoRecoSegment2D& stereoSegment,
-                          const CDCTrajectory2D& axialTrajectory2D) const {
+                          const CDCTrajectory2D& axialTrajectory2D) const
+      {
         CDCTrajectorySZ trajectorySZ;
         update(trajectorySZ, stereoSegment, axialTrajectory2D);
         return trajectorySZ;
       }
 
       /// Fits a linear sz trajectory to the z and s coordinates in the stereo segment.
-      CDCTrajectorySZ fit(const CDCRecoSegment3D& segment3D) const {
+      CDCTrajectorySZ fit(const CDCRecoSegment3D& segment3D) const
+      {
         CDCTrajectorySZ trajectorySZ;
         update(trajectorySZ, segment3D);
         return trajectorySZ;
       }
 
-
       /// Updates the trajectory of the axial stereo segment pair inplace
       void update(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) const;
-
 
       /// Update the given sz trajectory reconstructing the stereo segment with a near by axial segment
       void update(CDCTrajectorySZ& trajectorySZ,
@@ -59,7 +50,8 @@ namespace Belle2 {
 
       /// Update the trajectory with a fit in the sz direction to the three dimensional hits
       void update(CDCTrajectorySZ& trajectory,
-                  const CDCRecoHit3DVector& recoHits3D) const {
+                  const CDCRecoHit3DVector& recoHits3D) const
+      {
         CDCObservations2D observationsSZ;
         appendSZ(observationsSZ, recoHits3D);
         update(trajectory, observationsSZ);
@@ -70,14 +62,15 @@ namespace Belle2 {
     private:
       /// Appends the s and z values of all given hits to the observation matrix
       void appendSZ(CDCObservations2D& observationsSZ, const CDCRecoHit3DVector& recoHits3D) const
-      { for (const CDCRecoHit3D & recoHit3D : recoHits3D) appendSZ(observationsSZ, recoHit3D); }
+      { for (const CDCRecoHit3D& recoHit3D : recoHits3D) appendSZ(observationsSZ, recoHit3D); }
 
       /** Appends the s and z value of the given hit to the observation matrix
        *
        *  In case the hit do contains a NaN value it will not be appended to the observations
        *
        *  @return   The number of hits appended which is 0 or 1 here.*/
-      size_t appendSZ(CDCObservations2D& observationsSZ, const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D) const {
+      size_t appendSZ(CDCObservations2D& observationsSZ, const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D) const
+      {
         // Translate the drift length uncertainty to a uncertainty in z
         // by the taking the projected wire vector part parallel to the displacement
         // as a proportionality factor to the z direction.
@@ -119,21 +112,10 @@ namespace Belle2 {
       size_t appendSZ(CDCObservations2D& observationsSZ, const FloatType& s, const FloatType& z, const FloatType& weight = 1.0) const
       { return observationsSZ.append(s, z, 0.0, weight); }
 
-
-
     public:
       /// Update the trajectory with a fit to the observations.
       void update(CDCTrajectorySZ& trajectorySZ, CDCObservations2D& observationsSZ) const;
 
-
-
-    private:
-      /// ROOT Macro to make CDCSZFitter a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCSZFitter, 1);
-
-
-
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCSZFITTER_H

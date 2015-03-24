@@ -7,68 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include "../include/CDCKarimakiFitter.h"
 
-#include <Eigen/Dense>
-
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
-
-
-using namespace std;
-using namespace Belle2;
-using namespace Eigen;
-
-using namespace TrackFindingCDC;
-
-TRACKFINDINGCDC_SwitchableClassImp(CDCKarimakiFitter)
-
-
-namespace {
-  CDCKarimakiFitter* g_fitter = nullptr;
-  //CDCKarimakiFitter* g_lineFitter = nullptr;
-  //CDCKarimakiFitter* g_originCircleFitter = nullptr;
-}
-
-
+using namespace Belle2::TrackFindingCDC;
 
 const CDCKarimakiFitter& CDCKarimakiFitter::getFitter()
 {
-  if (not g_fitter) {
-    g_fitter = new CDCKarimakiFitter();
-  }
-  return *g_fitter;
+  static CDCKarimakiFitter fitter;
+  return fitter;
 }
 
-
-
-// const CDCKarimakiFitter& CDCKarimakiFitter::getLineFitter()
-// {
-//   if (not g_lineFitter) {
-//     g_lineFitter = new CDCKarimakiFitter();
-//     g_lineFitter->setLineConstrained();
-//   }
-//   return *g_lineFitter;
-// }
-
-
-
-// const CDCKarimakiFitter& CDCKarimakiFitter::getOriginCircleFitter()
-// {
-//   if (not g_originCircleFitter) {
-//     g_originCircleFitter = new CDCKarimakiFitter();
-//     g_originCircleFitter->setOriginConstrained();
-//   }
-//   return *g_originCircleFitter;
-// }
-
-
-CDCKarimakiFitter::CDCKarimakiFitter()
+const CDCKarimakiFitter& CDCKarimakiFitter::getLineFitter()
 {
-
-}
-
-CDCKarimakiFitter::~CDCKarimakiFitter()
-{
-
+  static CDCKarimakiFitter lineFitter;
+  lineFitter.setLineConstrained();
+  return lineFitter;
 }

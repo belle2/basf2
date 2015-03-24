@@ -7,33 +7,28 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef KARIMAKISMETHOD_H
-#define KARIMAKISMETHOD_H
-
-
-
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#pragma once
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /// Forward declarations.
+    class CDCTrajectory2D;
+    class CDCObservations2D;
+    class UncertainPerigeeCircle;
 
     /// Class implementing the Karimaki fit for two dimensional trajectory circle
-    class KarimakisMethod : public TrackFindingCDC::SwitchableRootificationBase {
+    class KarimakisMethod {
 
     public:
-      ///Empty constructor
+      /// Constructor setting the default constraints.
       KarimakisMethod();
-
-      ///Empty destructor
-      ~KarimakisMethod();
 
       /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
       void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 
-
     private:
       /// Internal method doing the heavy work.
-      UncertainPerigeeCircle fit(CDCObservations2D&) const;
+      UncertainPerigeeCircle fitInternal(CDCObservations2D&) const;
 
     public:
       /// Getter for the indictor that lines should be fitted by this fitter
@@ -47,11 +42,6 @@ namespace Belle2 {
     protected:
       bool m_lineConstrained; ///< Memory for the flag indicating that lines should be fitted
 
-    public:
-      /** ROOT Macro to make KarimakisMethod a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(KarimakisMethod, 1);
-
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // KARIMAKISMETHOD

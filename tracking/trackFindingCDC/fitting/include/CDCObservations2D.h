@@ -7,8 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCOBSERVATIONS2D_H
-#define CDCOBSERVATIONS2D_H
+#pragma once
 
 #ifndef __CINT__
 #include <Eigen/Dense>
@@ -32,12 +31,6 @@ namespace Belle2 {
       /// Matrix type used to wrap the raw memory chunk of values generated from the various hit types for structured vectorized access.
       typedef Eigen::Map< Eigen::Matrix< FloatType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
 #endif
-
-      /// Empty constructor.
-      CDCObservations2D();
-
-      /// Empty destructor.
-      ~CDCObservations2D();
 
       /// Returns the number of observations stored
       size_t size() const
@@ -123,10 +116,10 @@ namespace Belle2 {
       @param wireHit      Hit information to be appended as observation. XY position, drift length and inverse variance are taken at the wire reference position.
       @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
       */
-      size_t append(const Belle2::TrackFindingCDC::CDCWireHit& wireHit)
+      size_t append(const Belle2::TrackFindingCDC::CDCWireHit& wireHit, const RightLeftInfo& rlInfo = ZERO)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
-        const FloatType driftLength = wireHit.getRefDriftLength();
+        const FloatType driftLength = isValidInfo(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
         const FloatType weight = 1.0 / wireHit.getRefDriftLengthVariance();
         size_t appended_hit = append(wireRefPos2D, driftLength, weight);
         // if (not appended_hit){
@@ -463,4 +456,3 @@ namespace Belle2 {
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCOBSERVATIONS2D_H

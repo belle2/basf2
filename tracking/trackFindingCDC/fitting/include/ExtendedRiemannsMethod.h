@@ -7,34 +7,29 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef EXTENDEDRIEMANNSMETHOD_H
-#define EXTENDEDRIEMANNSMETHOD_H
+#pragma once
 
-#include "TMatrixDSym.h"
-#include "TVectorD.h"
-
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /// Forward declarations.
+    class CDCTrajectory2D;
+    class CDCObservations2D;
+    class UncertainPerigeeCircle;
+
     /// Class implementing the Riemann fit for two dimensional trajectory circle
-    class ExtendedRiemannsMethod : public TrackFindingCDC::SwitchableRootificationBase {
+    class ExtendedRiemannsMethod {
 
     public:
-      ///Empty constructor
+      /// Constructor setting the default constraints.
       ExtendedRiemannsMethod();
-
-      ///Empty destructor
-      ~ExtendedRiemannsMethod();
 
       /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
       void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 
-
     private:
       /// Internal method doing the heavy work.
-      UncertainPerigeeCircle fit(CDCObservations2D&) const;
-
+      UncertainPerigeeCircle fitInternal(CDCObservations2D&) const;
 
     public:
       /// Getter for the indictor that lines should be fitted by this fitter
@@ -54,14 +49,12 @@ namespace Belle2 {
       { m_originConstrained = constrained; }
 
     protected:
-      bool m_lineConstrained; ///< Memory for the flag indicating that lines should be fitted
-      bool m_originConstrained; ///< Memory for the flag indicating that curves through the origin shall be fitter
+      /// Memory for the flag indicating that lines should be fitted
+      bool m_lineConstrained;
 
-    public:
-      /** ROOT Macro to make ExtendedRiemannsMethod a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(ExtendedRiemannsMethod, 1);
+      /// Memory for the flag indicating that curves through the origin shall be fitter
+      bool m_originConstrained;
 
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // EXTENDEDRIEMANNSMETHOD

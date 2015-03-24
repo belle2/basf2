@@ -14,6 +14,8 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
+#include <tracking/trackFindingCDC/fitting/RiemannsMethod.h>
+
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
@@ -23,10 +25,8 @@
 #include <gtest/gtest.h>
 
 using namespace std;
-
 using namespace Belle2;
-using namespace TrackFindingCDC;
-
+using namespace Belle2::TrackFindingCDC;
 
 namespace {
   const Vector2D generalCenter(6.0, 0);
@@ -210,9 +210,8 @@ TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_LineFit_WithDriftLength)
 
 TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
 {
-
-  const std::vector<TrackFindingCDC::TrackHit*> legendreTrackHits;
-  const std::vector<TrackFindingCDC::TrackHit*> legendreTrackHits2;
+  const std::vector<TrackHit*> legendreTrackHits;
+  const std::vector<TrackHit*> legendreTrackHits2;
 
   {
     CDCRiemannFitter riemannFitter = CDCRiemannFitter::getFitter();

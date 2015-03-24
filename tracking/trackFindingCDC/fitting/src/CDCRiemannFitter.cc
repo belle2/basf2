@@ -7,68 +7,26 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include "../include/CDCRiemannFitter.h"
 
-#include <Eigen/Dense>
-
-
-using namespace std;
-using namespace Belle2;
-using namespace Eigen;
-
-using namespace TrackFindingCDC;
-
-TRACKFINDINGCDC_SwitchableClassImp(CDCRiemannFitter)
-
-
-namespace {
-  CDCRiemannFitter* g_fitter = nullptr;
-  CDCRiemannFitter* g_lineFitter = nullptr;
-  CDCRiemannFitter* g_originCircleFitter = nullptr;
-}
-
-
+using namespace Belle2::TrackFindingCDC;
 
 const CDCRiemannFitter& CDCRiemannFitter::getFitter()
 {
-  if (not g_fitter) {
-    g_fitter = new CDCRiemannFitter();
-  }
-  return *g_fitter;
+  static CDCRiemannFitter fitter;
+  return fitter;
 }
-
-
 
 const CDCRiemannFitter& CDCRiemannFitter::getLineFitter()
 {
-  if (not g_lineFitter) {
-    g_lineFitter = new CDCRiemannFitter();
-    g_lineFitter->setLineConstrained();
-  }
-  return *g_lineFitter;
+  static CDCRiemannFitter lineFitter;
+  lineFitter.setLineConstrained();
+  return lineFitter;
 }
-
-
 
 const CDCRiemannFitter& CDCRiemannFitter::getOriginCircleFitter()
 {
-  if (not g_originCircleFitter) {
-    g_originCircleFitter = new CDCRiemannFitter();
-    g_originCircleFitter->setOriginConstrained();
-  }
-  return *g_originCircleFitter;
+  static CDCRiemannFitter originCircleFitter;
+  originCircleFitter.setOriginConstrained();
+  return originCircleFitter;
 }
-
-
-
-CDCRiemannFitter::CDCRiemannFitter()
-{
-}
-
-
-
-CDCRiemannFitter::~CDCRiemannFitter()
-{
-}
-

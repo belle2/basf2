@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include "../include/CDCSZFitter.h"
-
 
 #include <Eigen/Dense>
 
@@ -19,45 +17,13 @@ using namespace TrackFindingCDC;
 
 using namespace Eigen;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCSZFitter)
-
-
-
-
-
-CDCSZFitter::CDCSZFitter()
-{
-}
-
-
-
-
-
-CDCSZFitter::~CDCSZFitter()
-{
-}
-
-
-
-
-
-namespace {
-  CDCSZFitter* g_szFitter = nullptr;
-}
-
-
-
 
 
 const CDCSZFitter& CDCSZFitter::getFitter()
 {
-  if (not g_szFitter) {
-    g_szFitter = new CDCSZFitter();
-  }
-  return *g_szFitter;
+  static CDCSZFitter szFitter;
+  return szFitter;
 }
-
-
 
 
 
@@ -181,7 +147,7 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
 {
   //recostruct the stereo segment
   CDCObservations2D observationsSZ;
-  for (const CDCRecoHit2D & recoHit2D : stereoSegment) {
+  for (const CDCRecoHit2D& recoHit2D : stereoSegment) {
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, axialTrajectory2D);
     appendSZ(observationsSZ, recoHit3D);
   }

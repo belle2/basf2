@@ -7,39 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCKARIMAKIFITTER_H
-#define CDCKARIMAKIFITTER_H
+#pragma once
 
 #include "CDCFitter2D.h"
+#include "KarimakisMethod.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Class implementing the Karimaki fit for two dimensional trajectory circle
+    /// Class implementing the fitter using Karimakis method.
     class CDCKarimakiFitter : public CDCFitter2D<Belle2::TrackFindingCDC::KarimakisMethod> {
 
     public:
-      ///Static getter for a general riemann fitter
+      /// Static getter for a general fitter instance with Karimakis method.
       static const CDCKarimakiFitter& getFitter();
 
-      ///Static getter for a line fitter
-      //static const CDCKarimakiFitter& getLineFitter();
+      // Static getter for a line fitter
+      static const CDCKarimakiFitter& getLineFitter();
 
-      ///Static getter for an origin circle fitter
-      //static const CDCKarimakiFitter& getOriginCircleFitter();
-
-    public:
-      ///Empty constructor
-      CDCKarimakiFitter();
-
-      ///Empty destructor
-      ~CDCKarimakiFitter();
-
-    public:
-      /** ROOT Macro to make CDCKarimakiFitter a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCKarimakiFitter, 1);
-
-    }; //class
+    }; // class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCKARIMAKIFITTER

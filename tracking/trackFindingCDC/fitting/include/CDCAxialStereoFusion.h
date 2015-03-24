@@ -7,11 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCAXIALSTEREOFUSION_H
-#define CDCAXIALSTEREOFUSION_H
-
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#pragma once
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
@@ -20,11 +16,12 @@
 #include "TMatrixD.h"
 #include "TVectorD.h"
 
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class CDCAxialStereoFusion : public SwitchableRootificationBase {
-
+    class CDCAxialStereoFusion {
 
     public:
       static FloatType average(const TVectorD& startParameters,
@@ -85,11 +82,6 @@ namespace Belle2 {
       static void reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
                                               bool priorityOnSZ = true);
 
-
-      /** ROOT Macro to make CDCAxialStereoFusion a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCAxialStereoFusion, 1);
-
     }; // end class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCAXIALSTEREOFUSION_H

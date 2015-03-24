@@ -7,32 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include "../include/ExtendedRiemannsMethod.h"
 
-#include <Eigen/Dense>
-
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
+#include "TMatrixDSym.h"
+#include <Eigen/Dense>
 
 using namespace std;
-using namespace Belle2;
+using namespace Belle2::TrackFindingCDC;
 using namespace Eigen;
 
-using namespace TrackFindingCDC;
-
-TRACKFINDINGCDC_SwitchableClassImp(ExtendedRiemannsMethod)
 
 
 ExtendedRiemannsMethod::ExtendedRiemannsMethod() :
   m_lineConstrained(false),
   m_originConstrained(false)
-{
-}
-
-
-
-ExtendedRiemannsMethod::~ExtendedRiemannsMethod()
 {
 }
 
@@ -49,12 +41,9 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
   Vector2D centralPoint = observations2D.getCentralPoint();
 
   const Vector2D& ref = isOriginConstrained() ? origin : centralPoint;
-  //const Vector2D& ref = origin;
-  //const Vector2D& ref = centralPoint;
-
   observations2D.passiveMoveBy(ref);
 
-  UncertainPerigeeCircle perigeeCircle = fit(observations2D);
+  UncertainPerigeeCircle perigeeCircle = fitInternal(observations2D);
 
   FloatType frontX = observations2D.getX(0);
   FloatType frontY = observations2D.getY(0);
@@ -66,17 +55,11 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
 
   FloatType totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
   if (totalPerps < 0) {
-    //B2INFO("Reversed");
     perigeeCircle.reverse();
   }
 
   trajectory2D.setLocalOrigin(ref);
   trajectory2D.setLocalCircle(perigeeCircle);
-
-  //perigeeCircle.passiveMoveBy(-ref);
-  //trajectory2D.setCircle(perigeeCircle);
-  // Logical start position of the travel distance scale
-  //trajectory2D.setStartPos2D(cenralPoint);
 }
 
 
@@ -187,24 +170,16 @@ namespace {
 
       } else {
         Matrix< FloatType, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
-        //B2INFO("Matrix is :" << endl << X);
-
         SelfAdjointEigenSolver< Matrix<FloatType, 4, 4> > eigensolver(X);
         Matrix<FloatType, 4, 1> n = eigensolver.eigenvectors().col(0);
         if (eigensolver.info() != Success) {
           B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
         }
 
-        //B2INFO("Eigenvalues are :" << endl << eigensolver.eigenvalues());
-        //B2INFO("Eigenvector is :" << endl << n);
         return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
-
       }
     }
-
   }
-
-
 
   // Declare function as currently unused to avoid compiler warning
   PerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
@@ -387,7 +362,7 @@ namespace {
 
 
 
-UncertainPerigeeCircle ExtendedRiemannsMethod::fit(CDCObservations2D& observations2D) const
+UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& observations2D) const
 {
   // Matrix of weighted sums
   Matrix< FloatType, 5, 5 > s = observations2D.getWXYRLSumMatrix();
@@ -412,7 +387,6 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fit(CDCObservations2D& observatio
     perigeeCovariance = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
 
   } else {
-    // B2INFO("Fit without drift radii.");
     if (not isOriginConstrained()) {
       // Alternative implementation for comparision
       // Matrix of averages
@@ -421,7 +395,6 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fit(CDCObservations2D& observatio
       Matrix< FloatType, 4, 1> meansNoL = aNoL.row(iW);
       // Covariance matrix
       Matrix< FloatType, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
-      // B2INFO("Not origin constrained.");
       resultCircle = fitSeperateOffset(meansNoL, cNoL, isLineConstrained());
 
     } else {

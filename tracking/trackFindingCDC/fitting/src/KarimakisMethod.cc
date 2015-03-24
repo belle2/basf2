@@ -7,14 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include "../include/KarimakisMethod.h"
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
 #include "TMatrixDSym.h"
 #include <Eigen/Dense>
-
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -22,17 +22,8 @@ using namespace Eigen;
 
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(KarimakisMethod)
-
-
 KarimakisMethod::KarimakisMethod() :
   m_lineConstrained(false)
-{
-}
-
-
-
-KarimakisMethod::~KarimakisMethod()
 {
 }
 
@@ -46,11 +37,9 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   if (not nObservations) return;
 
   Vector2D ref = observations2D.getCentralPoint();
-  //B2INFO("Reference point " << ref);
-
   observations2D.passiveMoveBy(ref);
 
-  UncertainPerigeeCircle perigeeCircle = fit(observations2D);
+  UncertainPerigeeCircle perigeeCircle = fitInternal(observations2D);
 
   FloatType frontX = observations2D.getX(0);
   FloatType frontY = observations2D.getY(0);
@@ -62,16 +51,11 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
 
   FloatType totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
   if (totalPerps < 0) {
-    //B2INFO("Reversed");
     perigeeCircle.reverse();
   }
 
-  //perigeeCircle.passiveMoveBy(-ref);
   trajectory2D.setLocalOrigin(ref);
   trajectory2D.setLocalCircle(perigeeCircle);
-
-  // Logical start position of the travel distance scale
-
 }
 
 
@@ -156,7 +140,8 @@ namespace {
       const FloatType u = 1 + d * rho;
       const FloatType kappa = 0.5 * rho / u;
 
-      FloatType chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY) - kappa * kappa * c(iR2, iR2));
+      FloatType chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY,
+                                      iY) - kappa * kappa * c(iR2, iR2));
       return chi2;
     }
 
@@ -238,7 +223,7 @@ namespace {
 
 
 
-UncertainPerigeeCircle KarimakisMethod::fit(CDCObservations2D& observations2D) const
+UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observations2D) const
 {
   // Matrix of weighted sums
   Matrix< FloatType, 4, 4> sNoL = observations2D.getWXYRSumMatrix();

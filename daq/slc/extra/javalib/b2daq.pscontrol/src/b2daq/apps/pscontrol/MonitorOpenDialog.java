@@ -36,10 +36,10 @@ public class MonitorOpenDialog {
                 dialog.centerOnScreen();
             }
             dialog.initModality(Modality.WINDOW_MODAL);
-            //dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setResizable(false);
             dialog.setTitle("Open crate monitor");
             dialog.showAndWait();
+            dialog.hide();
         } catch (IOException ex) {
             Logger.getLogger(MonitorOpenDialog.class.getName()).log(Level.SEVERE, null, ex);
         }

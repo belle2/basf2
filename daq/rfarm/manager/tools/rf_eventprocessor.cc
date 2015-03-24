@@ -23,10 +23,11 @@ int main(int argc, char** argv)
   RFEventProcessor* evproc = new RFEventProcessor(argv[1]);
 
   char nodename[256];
-  strcpy(nodename, "evp_");
-#ifndef DESY
+  strcpy(nodename, "evp_wk01");
+  /*
+  #ifndef DESY
   gethostname(&nodename[4], sizeof(nodename));
-#else
+  #else
   // Special treatment for DESY test nodes!!
   char hostnamebuf[256];
   gethostname(hostnamebuf, sizeof(hostnamebuf));
@@ -37,8 +38,8 @@ int main(int argc, char** argv)
   strncpy(&nodename[lend - 1], "0", 1);
   printf("DESY node name = %s\n", nodename);
   // End of DESY special treatment
-#endif
-
+  #endif
+  */
   RFNSM nsm(nodename, evproc);
   nsm.AllocMem(conf.getconf("system", "nsmdata"));
   evproc->SetNodeInfo(nsm.GetNodeInfo());

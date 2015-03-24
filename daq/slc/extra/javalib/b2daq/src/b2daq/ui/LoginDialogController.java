@@ -43,10 +43,9 @@ public class LoginDialogController implements Initializable {
     @FXML
     private Button cancelButton;
     @FXML
-    private NSMConfig config;// = new NSMConfig();
-//    <fx:define> 
-//        <NSMConfig fx:id="config" hostname="b2slow2.kek.jp" />
-//    </fx:define>
+    private TextField guinode;
+
+    private final NSMConfig config = new NSMConfig();
 
     private boolean isOK = false;
 
@@ -65,9 +64,6 @@ public class LoginDialogController implements Initializable {
         label.getScene().getWindow().hide();
     }
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         config.hostnameProperty().bind(hostname.textProperty());
@@ -80,6 +76,7 @@ public class LoginDialogController implements Initializable {
             }
         });
         config.nsmNodeProperty().bind(nsmnode.textProperty());
+        config.guiNodeProperty().bind(guinode.textProperty());
         config.nsmHostProperty().bind(nsmhost.textProperty());
         nsmport.textProperty().addListener(new ChangeListener() {
             @Override
@@ -108,12 +105,13 @@ public class LoginDialogController implements Initializable {
     }
 
     public void set(String hostname, int port, 
-            String nsmhost, String nsmnode, int nsmport) {
+            String nsmhost, String nsmnode, int nsmport, String guinode) {
         this.hostname.setText(hostname);
         this.port.setText(""+port);
         this.nsmhost.setText(nsmhost);
         this.nsmnode.setText(nsmnode);
         this.nsmport.setText(""+nsmport);
+        this.guinode.setText(guinode);
     }
 
     public NSMConfig getNSMConfig() {

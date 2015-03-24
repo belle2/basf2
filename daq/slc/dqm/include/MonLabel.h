@@ -16,7 +16,8 @@ namespace Belle2 {
   public:
     virtual std::string getDataType() const throw() { return "MLB"; }
     virtual void reset() throw() {}
-    void setFontColor(int r, int g, int b) throw() {
+    void setFontColor(int r, int g, int b) throw()
+    {
       m_font_color = MonColor(r, g, b);
     }
     void setFontColor(const MonColor& color) throw() { m_font_color = color; }

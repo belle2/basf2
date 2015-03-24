@@ -8,7 +8,8 @@ namespace Belle2 {
   class RWLock {
 
   public:
-    static size_t size() throw() {
+    static size_t size() throw()
+    {
       return sizeof(pthread_rwlock_t);
     }
 

@@ -10,7 +10,7 @@
     CLASS(RunControlCallback& callback,          \
           const std::string& name, RCNode& node)       \
       : NSMVHandlerText(name, true, false),        \
-      HandlerRC(callback, node) {}         \
+        HandlerRC(callback, node) {}         \
     virtual ~CLASS() throw() {}            \
     virtual bool handleGetText(std::string& val);        \
   }
@@ -21,7 +21,7 @@
     CLASS(RunControlCallback& callback,          \
           const std::string& name, RCNode& node)       \
       : NSMVHandlerText(name, true, true),         \
-      HandlerRC(callback, node) {}         \
+        HandlerRC(callback, node) {}         \
     virtual ~CLASS() throw() {}            \
     virtual bool handleGetText(std::string& val);        \
     virtual bool handleSetText(const std::string& val);      \
@@ -33,7 +33,7 @@
     CLASS(RunControlCallback& callback,          \
           const std::string& name, RCNode& node)       \
       : NSMVHandlerInt(name, true, true),          \
-      HandlerRC(callback, node) {}         \
+        HandlerRC(callback, node) {}         \
     virtual ~CLASS() throw() {}            \
     virtual bool handleGetInt(int& val);         \
     virtual bool handleSetInt(int val);          \

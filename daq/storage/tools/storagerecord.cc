@@ -76,18 +76,21 @@ private:
   std::string m_path;
 
 public:
-  FileHandler() {
+  FileHandler()
+  {
     m_file = NULL;
     m_buf = NULL;
     m_id = 0;
   }
-  FileHandler(const std::string& dir, int ndisks, int expno, int runno) {
+  FileHandler(const std::string& dir, int ndisks, int expno, int runno)
+  {
     open(dir, ndisks, expno, runno);
   }
   ~FileHandler() throw() {}
 
 public:
-  bool open(const std::string& dir, int ndisks, int expno, int runno) {
+  bool open(const std::string& dir, int ndisks, int expno, int runno)
+  {
     char filename[1024];
     g_mutex.lock();
     bool available = true;
@@ -166,7 +169,8 @@ public:
     return available;
   }
 
-  void close() {
+  void close()
+  {
     if (m_file != NULL) {
       fclose(m_file);
       insertdb(StringUtil::form("update fileinfo set time_close = "
@@ -181,11 +185,13 @@ public:
     m_buf = NULL;
   }
 
-  int write(char* evbuf, int nbyte) {
+  int write(char* evbuf, int nbyte)
+  {
     return fwrite(evbuf, nbyte, 1, m_file);
   }
 
-  operator bool() {
+  operator bool()
+  {
     return m_file != NULL;
   }
 
@@ -194,7 +200,8 @@ public:
 class FileCloser {
 
 public:
-  static FileHandler getFile() {
+  static FileHandler getFile()
+  {
     g_mutex.lock();
     while (g_file_q.empty()) {
       g_cond.wait(g_mutex);
@@ -206,7 +213,8 @@ public:
   }
 
 public:
-  static void closeAll() {
+  static void closeAll()
+  {
     while (!g_file_q.empty()) {
       g_file_q.front().close();
       g_file_q.pop();
@@ -233,7 +241,8 @@ public:
       m_ndisks(ndisks), m_expno(expno), m_runno(runno) {}
 
 public:
-  void run() {
+  void run()
+  {
     g_mutex.lock();
     g_file_q.push(FileHandler(m_dir, m_ndisks, m_expno, m_runno));
     g_cond.signal();
@@ -256,9 +265,9 @@ void signalHandler(int)
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    printf("rawfile2rb : ibufname ibufsize path "
+    printf("%s : ibufname ibufsize path "
            "filepath_diskid filepath_nfile filepath_dbtmp "
-           "ndisk obufname obufsize [nodename, nodeid]\n");
+           "ndisk obufname obufsize [nodename, nodeid]\n", argv[0]);
     return 1;
   }
   signal(SIGINT, signalHandler);
@@ -320,7 +329,6 @@ int main(int argc, char** argv)
       }
       obuf.lock();
       SharedEventBuffer::Header* oheader = ibuf.getHeader();
-
       oheader->expno = expno;
       oheader->runno = runno;
       obuf.unlock();

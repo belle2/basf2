@@ -20,10 +20,12 @@ namespace Belle2 {
     void setRows(int rows) throw() { m_rows = rows; }
     int getCols() const throw() { return m_cols; }
     int getRows() const throw() { return m_rows; }
-    void setWidthRatio(const std::string& width_ratio) throw() {
+    void setWidthRatio(const std::string& width_ratio) throw()
+    {
       m_width_ratio = width_ratio;
     }
-    void setHeightRatio(const std::string& height_ratio) throw() {
+    void setHeightRatio(const std::string& height_ratio) throw()
+    {
       m_height_ratio = height_ratio;
     }
     const std::string& getWidthRatio() const throw() { return m_width_ratio; }

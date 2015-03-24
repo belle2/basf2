@@ -6,6 +6,7 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
 #include <daq/slc/database/DBObjectLoader.h>
+#include <daq/slc/database/DAQLogDB.h>
 #include <daq/slc/database/PostgreSQLInterface.h>
 
 #include <daq/slc/runcontrol/RCCommand.h>
@@ -59,7 +60,8 @@ void NSM2SocketBridge::run() throw()
             StringList ss = StringUtil::split(s[1], '@');
             NSMNode node(ss[0]);
             if (cmd == NSMCommand::DBGET) {
-              dbget(table, config, node);
+              bool isfull = msg.getNParams() > 0 && msg.getParam(0) > 0;
+              dbget(table, config, node, isfull);
             } else if (cmd == NSMCommand::DBLISTGET) {
               dblistget(table, node, (ss.size() > 1) ? ss[1] : "");
             }
@@ -71,6 +73,12 @@ void NSM2SocketBridge::run() throw()
           m_reader.readObject(obj);
           dbset(msg.getData(), obj);
         }
+      } else if (cmd == NSMCommand::LOGLIST) {
+        StringList s = StringUtil::split(msg.getData(), '/');
+        const std::string table = s[0];
+        const NSMNode node((s.size() > 1) ? s[1] : "");
+        int max = msg.getParam(0);
+        loglist(table, node, max);
       } else if (cmd == NSMCommand::DATAGET) {
         if (msg.getLength() > 0) {
           StringList argv = StringUtil::split(msg.getData(), ' ');
@@ -89,18 +97,18 @@ void NSM2SocketBridge::run() throw()
       }
     }
   } catch (const IOException& e) {
-    LogFile::warning("Connection failed for reading");
+    LogFile::warning("IO error. close connection: %s", e.what());
     m_socket.close();
   }
 }
 
 void NSM2SocketBridge::dbget(const std::string& table,
                              const std::string& config,
-                             const NSMNode& node)
+                             const NSMNode& node, bool isfull)
 {
   DBInterface& db(getDB());
   try {
-    DBObject obj(DBObjectLoader::load(db, table, config, false));
+    DBObject obj(DBObjectLoader::load(db, table, config, isfull));
     send(NSMMessage(node, NSMCommand::DBSET), obj);
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());
@@ -115,8 +123,23 @@ void NSM2SocketBridge::dblistget(const std::string& table,
   DBInterface& db(getDB());
   try {
     StringList ss = DBObjectLoader::getDBlist(db, table, node.getName(), grep);
-    send(NSMMessage(NSMNode(node), NSMCommand::DBLISTSET,
-                    ss.size(), StringUtil::join(ss, "\n")));
+    std::string list = StringUtil::join(ss, "\n");
+    send(NSMMessage(NSMNode(node), NSMCommand::DBLISTSET, ss.size(), list));
+  } catch (const DBHandlerException& e) {
+    LogFile::error(e.what());
+  }
+  db.close();
+}
+
+void NSM2SocketBridge::loglist(const std::string& table,
+                               const NSMNode& node, int max)
+{
+  DBInterface& db(getDB());
+  try {
+    DAQLogMessageList logs = DAQLogDB::getLogs(db, table, node.getName(), max);
+    for (size_t i = logs.size(); i > 0; i--) {
+      send(NSMMessage(logs[i - 1]));
+    }
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());
   }

@@ -6,23 +6,18 @@
 
 using namespace Belle2;
 
-RCHandlerException::RCHandlerException(const std::string& format, ...) throw()
+RCHandlerException::RCHandlerException(const std::string& comment) throw()
+{
+  m_comment = comment;
+}
+
+RCHandlerException::RCHandlerException(const char* format, ...) throw()
 {
   va_list ap;
   char ss[1024 * 100];
   va_start(ap, format);
-  vsprintf(ss, format.c_str(), ap);
+  vsprintf(ss, format, ap);
   va_end(ap);
   m_comment = ss;
 }
 
-RCHandlerException::RCHandlerException(int err, const std::string& format, ...) throw()
-{
-  m_err = err;
-  va_list ap;
-  char ss[1024 * 100];
-  va_start(ap, format);
-  vsprintf(ss, format.c_str(), ap);
-  va_end(ap);
-  m_comment = ss;
-}

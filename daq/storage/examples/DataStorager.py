@@ -36,8 +36,6 @@ roiprod = register_module('PXDDataReduction')
 roipayload = register_module('ROIPayloadAssembler')
 
 # Modules
-# deserializer = register_module('FastRbuf2Ds')
-# deserializer.param('RingBufferName', argv[1])
 deserializer = register_module('StorageDeserializer')
 deserializer.param('InputBufferName', argv[1])
 deserializer.param('InputBufferSize', int(argv[2]))
@@ -51,21 +49,12 @@ output.param('OutputBufferName', argv[3])
 output.param('OutputBufferSize', int(argv[4]))
 output.param('compressionLevel', 0)
 
-# histo = register_module('DqmHistoManager')
-# histo.param('HostName', 'belle-rpc2')
-# histo.param('Port', 40010)
-
-# Monitor module
-# monitor = register_module('MonitorStorage')
-
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(deserializer)
 main.add_module(output)
-# main.add_module(histo)
-# main.add_module(monitor)
 
 # Process all events
 process(main)

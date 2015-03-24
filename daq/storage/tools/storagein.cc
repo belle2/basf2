@@ -41,8 +41,8 @@ int main(int argc, char** argv)
   }
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atoi(argv[2]) * 1000000, true);
+  info.reportReady();
   TCPSocket socket(argv[3], atoi(argv[4]));
-  B2INFO("storagein: Connected to eb2.");
   int* evtbuf = new int[10000000];
   BinData data;
   data.setBuffer(evtbuf);
@@ -51,11 +51,12 @@ int main(int argc, char** argv)
   int runno = 0;
   int subno = 0;
   int ntried = 0;
-  File tmpfile(Date().toString("/rawdata/disk01/%Y-%m-%d-%H-%M-%S.dat"), "rw");
+  //File tmpfile(Date().toString("/rawdata/disk01/%Y-%m-%d-%H-%M-%S.dat"), "rw");
   while (true) {
     while (socket.get_fd() <= 0) {
       try {
         socket.connect();
+        B2INFO("storagein: Connected to eb2.");
         socket.setBufferSize(32 * 1024 * 1024);
         ntried = 0;
         if (info.isAvailable()) {
@@ -69,7 +70,8 @@ int main(int argc, char** argv)
           info.setInputPort(0);
           info.setInputAddress(0);
         }
-        B2WARNING("storagein: failed to connect to eb2 (try=" << ntried++ << ")");
+        if (ntried < 5)
+          B2WARNING("storagein: failed to connect to eb2 (try=" << ntried++ << ")");
         sleep(5);
       }
     }
@@ -83,7 +85,7 @@ int main(int argc, char** argv)
         int nword = data.getWordSize();
         reader.read((data.getBuffer() + 1), nbyte);
         nbyte += sizeof(int);
-        tmpfile.write(data.getBuffer(), nbyte);
+        //tmpfile.write(data.getBuffer(), nbyte);
         if (info.isAvailable()) {
           info.addInputCount(1);
           info.addInputNBytes(nbyte);

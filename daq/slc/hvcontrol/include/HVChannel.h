@@ -96,7 +96,8 @@ namespace Belle2 {
     void setUsed(bool used) { m_used = used; }
     void setName(const std::string& name) { m_name = name; }
     void clearChannel() { m_channel = HVChannelList(); }
-    void addChannel(const HVChannel& channel) {
+    void addChannel(const HVChannel& channel)
+    {
       m_channel.push_back(channel);
     }
     const std::string& getHost() const throw() { return m_host; }

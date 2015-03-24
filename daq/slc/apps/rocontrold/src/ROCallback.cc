@@ -25,8 +25,9 @@ namespace Belle2 {
     NSMVHandlerROPID(ROController& con, const std::string& name)
       : NSMVHandlerInt(name, true, false), m_con(con) {}
     virtual ~NSMVHandlerROPID() throw() {}
-    bool handleGetInt(int& val) {
-      val = m_con.getControl().getFork().get_id();
+    bool handleGetInt(int& val)
+    {
+      val = m_con.getControl().getProcess().get_id();
       return true;
     }
   private:
@@ -87,18 +88,22 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
   if (!m_eb0.load(obj, 0)) {
     throw (RCHandlerException("Failed to boot eb0"));
   }
+  set("eb0.pid", m_eb0.getControl().getProcess().get_id());
   LogFile::debug("Booted eb0");
   try_wait();
   for (size_t i = 0; i < m_stream0.size(); i++) {
     if (!m_stream0[i].load(obj, 10)) {
       throw (RCHandlerException("Faield to boot stream0-%d", (int)i));
     }
+    std::string vname = StringUtil::form("stream0.sender[%d].pid", (int)i);
+    set(vname, m_stream0[i].getControl().getProcess().get_id());
     LogFile::debug("Booted %d-th stream0", i);
     try_wait();
   }
   if (!m_stream1.load(obj, 10)) {
     throw (RCHandlerException("Faield to boot stream1"));
   }
+  set("stream1.pid", m_stream1.getControl().getProcess().get_id());
   LogFile::debug("Booted stream1");
   try_wait();
 }
@@ -146,7 +151,7 @@ void ROCallback::abort() throw(RCHandlerException)
   set("eb0.pid", -1);
 }
 
-void ROCallback::timeout(NSMCommunicator&) throw()
+void ROCallback::monitor() throw(RCHandlerException)
 {
   if (getNode().getState() != RCState::RUNNING_S) {
     for (size_t i = 0; i < m_stream0.size(); i++) {

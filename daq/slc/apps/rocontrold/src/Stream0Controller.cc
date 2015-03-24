@@ -33,7 +33,7 @@ void Stream0Controller::initArguments(const DBObject& obj)
   m_callback->add(new NSMVHandlerText(vname + ".script", true, true, script));
 }
 
-void Stream0Controller::loadArguments(const DBObject& obj)
+bool Stream0Controller::loadArguments(const DBObject& obj)
 {
   int port = 0;
   std::string host, script;
@@ -55,6 +55,7 @@ void Stream0Controller::loadArguments(const DBObject& obj)
     m_con.addArgument(port);
     m_con.addArgument(m_name);
   }
+  return used > 0;
 }
 
 void Stream0Controller::check() throw()

@@ -19,7 +19,8 @@ namespace Belle2 {
     };
 
   public:
-    EventBuffer() {
+    EventBuffer()
+    {
       m_buf = 0;
       m_nword = 0;
     }

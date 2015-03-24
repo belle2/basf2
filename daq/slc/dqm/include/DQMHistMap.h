@@ -13,7 +13,8 @@ namespace Belle2 {
   class DQMHistMap {
 
   public:
-    DQMHistMap(const std::string& file_name = "") {
+    DQMHistMap(const std::string& file_name = "")
+    {
       m_file_name = file_name;
       m_ndirs = 0;
     }
@@ -28,7 +29,8 @@ namespace Belle2 {
     const TH1Map& getHists() const { return m_hist_m; }
     size_t getNDirectories() const { return m_ndirs; }
     std::map<std::string, std::string>& getDirectories() { return m_dir_m; }
-    const std::string& getDirectory(const std::string& name) {
+    const std::string& getDirectory(const std::string& name)
+    {
       return m_dir_m[name];
     }
     void clear();

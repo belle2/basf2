@@ -13,7 +13,8 @@ namespace Belle2 {
   class FlowMonitor {
 
   public:
-    FlowMonitor() {
+    FlowMonitor()
+    {
       m_ioinfo.push_back(IOInfo());
       m_ioinfo.push_back(IOInfo());
       m_info = NULL;

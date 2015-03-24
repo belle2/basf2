@@ -37,7 +37,8 @@ namespace Belle2 {
       void setType(Type type) throw() { m_type = type; }
       void setLength(int length) throw() { m_length = length; }
 
-      int getTypeSize() const throw() {
+      int getTypeSize() const throw()
+      {
         switch (m_type) {
           case BOOL:   return sizeof(bool);
           case CHAR:   return sizeof(char);
@@ -51,7 +52,8 @@ namespace Belle2 {
         return 0;
       }
 
-      const std::string getTypeText() const throw() {
+      const std::string getTypeText() const throw()
+      {
         switch (m_type) {
           case BOOL: return "bool";
           case CHAR: return "char";

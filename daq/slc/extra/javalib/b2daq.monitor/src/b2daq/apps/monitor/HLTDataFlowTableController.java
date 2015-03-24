@@ -83,7 +83,7 @@ public class HLTDataFlowTableController implements Initializable, NSMObserver {
         }
         try {
             NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.NSMDATASET)) {
+            if (command.equals(NSMCommand.DATASET)) {
                 NSMData data = NSMListenerService.getData(label_nodename.getText()+"_STATUS");
                 ConfigObject cobj = NSMListenerService.getDB(label_nodename.getText());
                 if (data == null || !data.getFormat().matches("rfunitinfo")) {

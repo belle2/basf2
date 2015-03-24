@@ -35,10 +35,12 @@ namespace Belle2 {
     void setTickLength(float length) throw() { m_tick_length = length; }
     void setTitleOffset(float offset) throw() { m_title_offset = offset; }
     void setLabelOffset(float offset) throw() { m_label_offset = offset; }
-    void setTimeFormat(const std::string& time_format) throw() {
+    void setTimeFormat(const std::string& time_format) throw()
+    {
       m_time_format = time_format;
     }
-    void setPosition(const std::string& position) throw() {
+    void setPosition(const std::string& position) throw()
+    {
       m_position = position;
     }
     void setX(float x) throw() { m_x = x; }

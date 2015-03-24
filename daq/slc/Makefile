@@ -1,4 +1,4 @@
-.PHONY : all clean tools base system database nsm readout copper dqm runcontrol hvcontrol  apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold apps/templated 
+.PHONY : all clean tools base system database nsm readout copper dqm runcontrol hvcontrol apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold apps/templated 
 
 SRCDIR=./src
 INCDIR=./include/daq/slc/
@@ -9,6 +9,9 @@ TMPDIR=./tmp
 APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold apps/templated 
 
 SUBPACKAGES = base system database nsm readout copper runcontrol hvcontrol $(APPS)
+
+## set NOT_USE_PSQL yes if postreSQL is not available
+#NOT_USE_PSQL = yes
 
 all: copyinc $(SUBPACKAGES) tool
 	@ make -C tools/
@@ -37,11 +40,11 @@ copyinc:
 	@ make -C extra/ecl BELLE2_EXTERNALS_DIR=$(PWD)
 
 $(SUBPACKAGES): %:
-	@ make -f Makefile.src TARGET=$@
+	@ make -f Makefile.src TARGET=$@ NOT_USE_PSQL=$(NOT_USE_PSQL)
 
 tool: 
 	@ for dir in $(SUBPACKAGES); \
-	 do if [ -f $$dir/tools/Makefile ]; then make -C $$dir/tools; fi done
+	 do if [ -f $$dir/tools/Makefile ]; then make -C $$dir/tools NOT_USE_PSQL=$(NOT_USE_PSQL); fi done
 
 clean:
 	@ rm -rf include $(LIBDIR) $(TMPDIR) bin
@@ -49,4 +52,4 @@ clean:
 	@ make -C ./extra/nsm2/example clean
 	@ rm -rf *~ \#*~ .*~ */*~ */*/*~
 
-# LocalWords:  gui
+

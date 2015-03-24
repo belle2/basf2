@@ -27,7 +27,7 @@ namespace Belle2 {
 
   protected:
     virtual void initArguments(const DBObject&) = 0;
-    virtual void loadArguments(const DBObject&) = 0;
+    virtual bool loadArguments(const DBObject&) = 0;
 
   public:
     bool isUsed() const throw() { return m_used; }

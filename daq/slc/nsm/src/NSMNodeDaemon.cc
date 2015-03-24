@@ -10,6 +10,8 @@
 
 #include <unistd.h>
 #include <cstdlib>
+#include <cstdio>
+#include <fstream>
 
 using namespace Belle2;
 
@@ -32,6 +34,24 @@ void NSMNodeDaemon::run() throw()
 {
   NSMCommunicatorList& com_v(NSMCommunicator::get());
   try {
+    {
+      std::string nodename = com_v[0]->getCallback().getNode().getName();
+      std::string filename = ("/tmp/nsmvget." + StringUtil::tolower(nodename));
+      std::ifstream fin(filename.c_str());
+      std::vector<std::string> nodes, vnames;
+      std::string node, vname;
+      while (fin >> node >> vname) {
+        nodes.push_back(node);
+        vnames.push_back(vname);
+      }
+      ::remove(filename.c_str());
+      for (size_t i = 0; i < com_v.size(); i++) {
+        NSMCommunicator& com(*com_v[i]);
+        for (size_t j = 0; j < nodes.size(); j++) {
+          com.getCallback().vget(nodes[j], vnames[j]);
+        }
+      }
+    }
     double t0 = Time().get();
     while (true) {
       try {

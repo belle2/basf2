@@ -32,13 +32,15 @@ namespace Belle2 {
 
   public:
     DataStorePackage(unsigned int serial = 0)
-      : m_serial(serial) {
+      : m_serial(serial)
+    {
       m_buf = new int [MAX_BUFFER_WORDS];
       m_data.setBuffer(m_buf);
       m_data_hlt.setBuffer(NULL);
       m_data_pxd.setBuffer(NULL);
     }
-    ~DataStorePackage() {
+    ~DataStorePackage()
+    {
       delete[] m_buf;
     }
 

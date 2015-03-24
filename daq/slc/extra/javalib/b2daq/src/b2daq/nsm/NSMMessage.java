@@ -160,7 +160,7 @@ public final class NSMMessage implements Serializable {
         } else if (command.equals(NSMCommand.DBSET)) {
             _obj = new ConfigObject();
             reader.readObject(_obj);
-        } else if (command.equals(NSMCommand.NSMDATASET)) {
+        } else if (command.equals(NSMCommand.DATASET)) {
             _obj = new NSMData();
             reader.readObject(_obj);
         } else if (command.equals(NSMCommand.VSET)) {

@@ -23,11 +23,13 @@ namespace Belle2 {
     };
 
   public:
-    SharedEventBuffer() {
+    SharedEventBuffer()
+    {
       m_buf = NULL;
       m_nword = 0;
     }
-    ~SharedEventBuffer() {
+    ~SharedEventBuffer()
+    {
       if (m_buf != NULL) m_memory.close();
     }
 

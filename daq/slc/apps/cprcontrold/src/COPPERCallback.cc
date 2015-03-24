@@ -189,7 +189,7 @@ void COPPERCallback::logging(bool err, LogFile::Priority pri,
   }
 }
 
-void COPPERCallback::timeout(NSMCommunicator&) throw()
+void COPPERCallback::monitor() throw(RCHandlerException)
 {
   try {
     RCState state = getNode().getState();

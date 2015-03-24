@@ -58,4 +58,3 @@ main.add_module(elapsed)
 # Process events
 set_nprocesses(int(argvs[4]))
 process(main)
-

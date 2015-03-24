@@ -18,13 +18,15 @@ namespace Belle2 {
 
   public:
     NSMVSETCallback(const NSMNode& node, int argc, char** argv)
-      : NSMCallback(5), m_argc(argc), m_argv(argv) {
+      : NSMCallback(5), m_argc(argc), m_argv(argv)
+    {
       setNode(node);
     }
     virtual ~NSMVSETCallback() throw() {}
 
   public:
-    virtual void init(NSMCommunicator&) throw() {
+    virtual void init(NSMCommunicator&) throw()
+    {
       std::string type = m_argv[4];
       try {
         bool result = true;

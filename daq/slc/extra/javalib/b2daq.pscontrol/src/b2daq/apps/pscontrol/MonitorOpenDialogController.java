@@ -9,11 +9,9 @@ import b2daq.dqm.core.TimedGraph1D;
 import b2daq.dqm.ui.CanvasPanel;
 import b2daq.hvcontrol.core.HVState;
 import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMCommand;
-import b2daq.nsm.NSMMessage;
-import b2daq.nsm.NSMObserver;
+import b2daq.nsm.NSMCommunicator;
+import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
-import b2daq.nsm.ui.NSMListenerGUIHandler;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -34,7 +32,7 @@ import javafx.stage.Stage;
  *
  * @author tkonno
  */
-public class MonitorOpenDialogController implements Initializable, NSMObserver {
+public class MonitorOpenDialogController implements Initializable {
 
     @FXML
     private Button openButton;
@@ -46,7 +44,7 @@ public class MonitorOpenDialogController implements Initializable, NSMObserver {
     private boolean isOpen = false;
     private PSSettingMainPanelController m_pmain;
     private CanvasPanel canvas;
-    private HashMap<String, TimedGraph1D> gr = new HashMap<>();
+    private final HashMap<String, TimedGraph1D> gr = new HashMap<>();
     private Color[] color = {
         Color.BLACK, Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA, Color.LIGHTGRAY,
         Color.ORANGE, Color.LIGHTSTEELBLUE, Color.DARKSLATEBLUE, Color.ORANGERED,
@@ -56,48 +54,51 @@ public class MonitorOpenDialogController implements Initializable, NSMObserver {
     public boolean isOpened() {
         return isOpen;
     }
-    
+
     public void setSettingMainPanel(PSSettingMainPanelController pmain) {
         m_pmain = pmain;
         for (PSCrateSettingPanelController c : m_pmain.getCrates()) {
             String name = c.getName();
-            System.out.println("konno:"+name);
+            System.out.println("konno:" + name);
             combo.getItems().add(name);
         }
     }
 
     @FXML
     protected void handleOpenButton() {
-        try {
-            String name = (String) combo.getSelectionModel().getSelectedItem();
-            PSCrateSettingPanelController pcrate = m_pmain.getCrate(name);
-            if (pcrate != null) {
-                canvas = new CanvasPanel();
-                for (PSChannelSettingPanelController ch : pcrate.getChannels()) {
-                    String vname = ch.getVName("vmon");
-                    TimedGraph1D g = new TimedGraph1D(vname, ";Time;Voltage [V]", 1000, 0, 3600);
-                    g.setLineColor(color[gr.keySet().size()]);
-                    gr.put(vname, g);
-                    canvas.getCanvas().addHisto(g);
-                    canvas.getCanvas().setFillColor(Color.LIGHTGRAY);
-                    canvas.getCanvas().getPad().setY(0.07);
-                    canvas.getCanvas().getAxisX().setNdivisions(10);
-                }
-                canvas.setPrefSize(520, 440);
-                Scene scene = new Scene(canvas);
-                scene.getStylesheets().add(LogMessage.getCSSPath());
-                scene.getStylesheets().add(HVState.getCSSPath());
-                Stage dialog = new Stage();//StageStyle.UTILITY);
-                dialog.setScene(scene);
-                dialog.initModality(Modality.WINDOW_MODAL);
-                dialog.setTitle(name);
-                dialog.centerOnScreen();
-                dialog.show();
-                NSMListenerGUIHandler.get().add(this);
+        String name = (String) combo.getSelectionModel().getSelectedItem();
+        PSCrateSettingPanelController pcrate = m_pmain.getCrate(name);
+        if (pcrate != null) {
+            canvas = new CanvasPanel();
+            for (PSChannelSettingPanelController ch : pcrate.getChannels()) {
+                String vname = ch.getVName("vmon");
+                TimedGraph1D g = new TimedGraph1D(vname, ";Time;Voltage [V]", 1000, 0, 3600);
+                g.setLineColor(color[gr.keySet().size()]);
+                gr.put(vname, g);
+                canvas.getCanvas().addHisto(g);
+                canvas.getCanvas().setFillColor(Color.LIGHTGRAY);
+                canvas.getCanvas().getPad().setY(0.07);
+                canvas.getCanvas().getAxisX().setNdivisions(10);
+                NSMCommunicator.get().add(new NSMVSetHandler(false, m_pmain.getNode().getName(), vname, NSMVar.FLOAT) {
+                    @Override
+                    public boolean handleVSet(NSMVar var) {
+                        gr.get(var.getName()).addPoint(var.getFloat());
+                        canvas.update();
+                        return true;
+                    }
+                });
             }
-        } catch (Exception e) {
         }
-        handleCloseAction(true);
+        canvas.setPrefSize(520, 440);
+        Scene scene = new Scene(canvas);
+        scene.getStylesheets().add(LogMessage.getCSSPath());
+        scene.getStylesheets().add(HVState.getCSSPath());
+        Stage dialog = new Stage();//StageStyle.UTILITY);
+        dialog.setScene(scene);
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.setTitle(name);
+        dialog.centerOnScreen();
+        dialog.show();
     }
 
     @FXML
@@ -110,9 +111,6 @@ public class MonitorOpenDialogController implements Initializable, NSMObserver {
         openButton.getScene().getWindow().hide();
     }
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         openButton.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -131,36 +129,6 @@ public class MonitorOpenDialogController implements Initializable, NSMObserver {
                 }
             }
         });
-    }
-
-    @Override
-    public void handleOnConnected() {
-    }
-
-    @Override
-    public void handleOnReceived(NSMMessage msg) {
-        NSMCommand cmd = new NSMCommand(msg.getReqName());
-        if (cmd.equals(NSMCommand.VSET)) {
-            NSMVar var = (NSMVar) msg.getObject();
-            switch (var.getType()) {
-                case NSMVar.FLOAT:
-                    if (var.getName().contains("vmon")) {
-                        if (!gr.containsKey(var.getName())) {
-                        }
-                        gr.get(var.getName()).addPoint(var.getFloat());
-                        canvas.update();
-                    }
-                    break;
-            }
-        }
-    }
-
-    @Override
-    public void handleOnDisConnected() {
-    }
-
-    @Override
-    public void log(LogMessage log) {
     }
 
 }

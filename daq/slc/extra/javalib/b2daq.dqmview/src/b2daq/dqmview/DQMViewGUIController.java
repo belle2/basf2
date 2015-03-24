@@ -8,7 +8,7 @@ package b2daq.dqmview;
 import b2daq.dqm.core.HistoPackage;
 import b2daq.dqm.io.DQMObserver;
 import b2daq.dqm.io.PackageInfo;
-import b2daq.hvcontrol.ui.StateLabel;
+import b2daq.hvcontrol.ui.HVStateLabel;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class DQMViewGUIController implements Initializable, DQMObserver {
     @FXML
     private Label label_directory;
     @FXML
-    private StateLabel slabel;
+    private HVStateLabel slabel;
     @FXML
     private StackPane tabpane;
 

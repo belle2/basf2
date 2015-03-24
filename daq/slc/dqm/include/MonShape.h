@@ -18,11 +18,13 @@ namespace Belle2 {
 
   public:
     void setBounds(float x, float y, float width, float height) throw();
-    void setFillColor(int r, int g, int b) throw() {
+    void setFillColor(int r, int g, int b) throw()
+    {
       m_fill_color = MonColor(r, g, b);
     }
     void setFillColor(const MonColor& color) throw() { m_fill_color = color; }
-    void setLineColor(int r, int g, int b) throw() {
+    void setLineColor(int r, int g, int b) throw()
+    {
       m_line_color = MonColor(r, g, b);
     }
     void setLineColor(const MonColor& color) throw() { m_line_color = color; }

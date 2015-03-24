@@ -18,7 +18,8 @@ namespace Belle2 {
   public:
     virtual size_t write(const void* v, size_t count)
     throw(IOException) { return _fd.write(v, count);  }
-    virtual bool available() throw(IOException) {
+    virtual bool available() throw(IOException)
+    {
       return _fd.select();
     }
 

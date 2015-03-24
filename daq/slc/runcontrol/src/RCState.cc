@@ -10,7 +10,7 @@ const RCState RCState::PAUSED_S(5, "PAUSED");
 const RCState RCState::LOADING_TS(6, "LOADING");
 const RCState RCState::STARTING_TS(7, "STARTING");
 const RCState RCState::STOPPING_TS(8, "STOPPING");
-const RCState RCState::CONFIGURING_TS(9, "CONFIGUREING");
+const RCState RCState::CONFIGURING_TS(9, "CONFIGURING");
 const RCState RCState::ERROR_ES(10, "ERROR");
 const RCState RCState::FATAL_ES(11, "FATAL");
 const RCState RCState::RECOVERING_RS(12, "RECOVERING");

@@ -24,11 +24,13 @@ namespace Belle2 {
     virtual ~NSMVHandler() throw() {}
 
   public:
-    virtual bool handleGet(NSMVar& var) {
+    virtual bool handleGet(NSMVar& var)
+    {
       var = m_var;
       return true;
     }
-    virtual bool handleSet(const NSMVar& var) {
+    virtual bool handleSet(const NSMVar& var)
+    {
       m_var = var;
       return true;
     }
@@ -73,12 +75,14 @@ namespace Belle2 {
   public:
     NSMVHandlerInt(const std::string& name,
                    bool useget, bool useset, int val = 0)
-      : NSMVHandler("", name, useget, useset) {
+      : NSMVHandler("", name, useget, useset)
+    {
       m_var = val;
     }
     NSMVHandlerInt(const std::string& node, const std::string& name,
                    bool useget, bool useset, int val = 0)
-      : NSMVHandler(node, name, useget, useset) {
+      : NSMVHandler(node, name, useget, useset)
+    {
       m_var = val;
     }
     virtual ~NSMVHandlerInt() throw() {}
@@ -88,11 +92,13 @@ namespace Belle2 {
     virtual bool handleSet(const NSMVar& var);
 
   public:
-    virtual bool handleGetInt(int& val) {
+    virtual bool handleGetInt(int& val)
+    {
       val = m_var.getInt();
       return true;
     }
-    virtual bool handleSetInt(int val) {
+    virtual bool handleSetInt(int val)
+    {
       m_var = val;
       return true;
     }
@@ -104,12 +110,14 @@ namespace Belle2 {
   public:
     NSMVHandlerFloat(const std::string& name,
                      bool useget, bool useset, float val = 0)
-      : NSMVHandler("", name, useget, useset) {
+      : NSMVHandler("", name, useget, useset)
+    {
       m_var = val;
     }
     NSMVHandlerFloat(const std::string& node, const std::string& name,
                      bool useget, bool useset, float val = 0)
-      : NSMVHandler(node, name, useget, useset) {
+      : NSMVHandler(node, name, useget, useset)
+    {
       m_var = val;
     }
     virtual ~NSMVHandlerFloat() throw() {}
@@ -119,11 +127,13 @@ namespace Belle2 {
     virtual bool handleSet(const NSMVar& var);
 
   public:
-    virtual bool handleGetFloat(float& val) {
+    virtual bool handleGetFloat(float& val)
+    {
       val = m_var.getFloat();
       return true;
     }
-    virtual bool handleSetFloat(float val) {
+    virtual bool handleSetFloat(float val)
+    {
       m_var = val;
       return true;
     }
@@ -135,12 +145,14 @@ namespace Belle2 {
   public:
     NSMVHandlerText(const std::string& name,
                     bool useget, bool useset, const std::string& val = "")
-      : NSMVHandler("", name, useget, useset) {
+      : NSMVHandler("", name, useget, useset)
+    {
       m_var = val;
     }
     NSMVHandlerText(const std::string& node, const std::string& name,
                     bool useget, bool useset, const std::string& val = "")
-      : NSMVHandler(node, name, useget, useset) {
+      : NSMVHandler(node, name, useget, useset)
+    {
       m_var = val;
     }
     virtual ~NSMVHandlerText() throw() {}
@@ -150,11 +162,13 @@ namespace Belle2 {
     virtual bool handleSet(const NSMVar& var);
 
   public:
-    virtual bool handleGetText(std::string& val) {
+    virtual bool handleGetText(std::string& val)
+    {
       val = m_var.getText();
       return true;
     }
-    virtual bool handleSetText(const std::string& val) {
+    virtual bool handleSetText(const std::string& val)
+    {
       m_var = val;
       return true;
     }
@@ -167,13 +181,15 @@ namespace Belle2 {
     NSMVHandlerIntArray(const std::string& name,
                         bool useget, bool useset,
                         const std::vector<int>& val = std::vector<int>())
-      : NSMVHandler("", name, useget, useset) {
+      : NSMVHandler("", name, useget, useset)
+    {
       m_var = val;
     }
     NSMVHandlerIntArray(const std::string& node, const std::string& name,
                         bool useget, bool useset,
                         const std::vector<int>& val = std::vector<int>())
-      : NSMVHandler(node, name, useget, useset) {
+      : NSMVHandler(node, name, useget, useset)
+    {
       m_var = val;
     }
     virtual ~NSMVHandlerIntArray() throw() {}
@@ -184,7 +200,8 @@ namespace Belle2 {
 
   public:
     virtual bool handleGetIntArray(std::vector<int>& val);
-    virtual bool handleSetIntArray(const std::vector<int>& val) {
+    virtual bool handleSetIntArray(const std::vector<int>& val)
+    {
       m_var = val;
       return true;
     }
@@ -197,13 +214,15 @@ namespace Belle2 {
     NSMVHandlerFloatArray(const std::string& name,
                           bool useget, bool useset,
                           const std::vector<float>& val = std::vector<float>())
-      : NSMVHandler("", name, useset, useget) {
+      : NSMVHandler("", name, useset, useget)
+    {
       m_var = val;
     }
     NSMVHandlerFloatArray(const std::string& node, const std::string& name,
                           bool useget, bool useset,
                           const std::vector<float>& val = std::vector<float>())
-      : NSMVHandler(node, name, useset, useget) {
+      : NSMVHandler(node, name, useset, useget)
+    {
       m_var = val;
     }
     virtual ~NSMVHandlerFloatArray() throw() {}
@@ -214,7 +233,8 @@ namespace Belle2 {
 
   public:
     virtual bool handleGetFloatArray(std::vector<float>& val);
-    virtual bool handleSetFloatArray(const std::vector<float>& val) {
+    virtual bool handleSetFloatArray(const std::vector<float>& val)
+    {
       m_var = val;
       return true;
     }

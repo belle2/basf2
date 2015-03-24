@@ -31,7 +31,8 @@ namespace Belle2 {
 
     // Execute script in a child process
     int Execute(char* script, int nargs, char** args);
-    int Execute(char* scr, char* arg0 = NULL, char* arg1 = NULL, char* arg2 = NULL, char* arg3 = NULL, char* arg4 = NULL, char* arg5 = NULL, char* arg6 = NULL, char* arg7 = NULL);
+    int Execute(char* scr, char* arg0 = NULL, char* arg1 = NULL, char* arg2 = NULL, char* arg3 = NULL, char* arg4 = NULL,
+                char* arg5 = NULL, char* arg6 = NULL, char* arg7 = NULL);
 
     // Check Output Request from child
     int CheckOutput();

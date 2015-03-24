@@ -7,20 +7,20 @@ import java.io.IOException;
 
 public class FileDataReader extends DataReader {
 
-	public FileDataReader() {
-		super();
-	}
-	
-	public FileDataReader(String path) throws FileNotFoundException {
-		super(new FileInputStream(path));
-	}
-	
-	public FileDataReader(File path) throws FileNotFoundException {
-		super(new FileInputStream(path));
-	}
+    public FileDataReader() {
+        super();
+    }
 
-	public void close() throws IOException {
-		_stream.close();
-	}
-	
+    public FileDataReader(String path) throws FileNotFoundException {
+        super(new FileInputStream(path));
+    }
+
+    public FileDataReader(File path) throws FileNotFoundException {
+        super(new FileInputStream(path));
+    }
+
+    public void close() throws IOException {
+        _stream.close();
+    }
+
 }

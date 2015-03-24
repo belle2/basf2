@@ -46,7 +46,8 @@ namespace Belle2 {
     Listener(int max_unit, int interval, ArichHVCommunicator& comm)
       : m_max_unit(max_unit), m_interval(interval), m_comm(comm) {}
     ~Listener() throw() {}
-    void run() {
+    void run()
+    {
       std::list<ArichHVMessage> msg_l;
       while (true) {
         if (msg_l.empty()) msg_l = m_comm.read();
@@ -117,7 +118,8 @@ namespace Belle2 {
     Monitor(int max_unit, int interval, ArichHVCommunicator& comm)
       : m_max_unit(max_unit), m_interval(interval), m_comm(comm) {}
     ~Monitor() throw() {}
-    void run() {
+    void run()
+    {
       while (true) {
         m_comm.requestSwitch(0, 0);
         m_comm.requestVoltageMonitor(0, 0);
@@ -161,7 +163,8 @@ namespace Belle2 {
     Brigde(int max_unit, TCPSocket& socket, ArichHVCommunicator& comm)
       : m_max_unit(max_unit), m_socket(socket), m_comm(comm) {}
     ~Brigde() throw() {}
-    void run() {
+    void run()
+    {
       TCPSocketWriter writer(m_socket);
       TCPSocketReader reader(m_socket);
       while (true) {

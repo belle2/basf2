@@ -26,15 +26,15 @@ int main(int argc, char** argv)
   while (fin && getline(fin, s)) {
     if (s.size() == 0) continue;
     if (s.at(0) == '#') {
-      sout << count1 << StringUtil::form("$%d:", count1) << "\"" << s.substr(1) << "\"" << std::endl;
+      sout << StringUtil::form("$%d:", count1) << "\"" << s.substr(1) << "\"" << std::endl;
     } else if (s.find("#") > 2) {
       StringList ss = StringUtil::split(s, '#');
-      sout << count1 << ss[0] << std::endl;
+      sout << ss[0] << std::endl;
       if (ss.size() > 1) {
         sout << StringUtil::form("$$%d:", count1) << "\"" << ss[1] << "\"" << std::endl;
       }
     } else {
-      sout << count1 << s << std::endl;
+      sout << s << std::endl;
     }
     s = StringUtil::replace(StringUtil::split(s, ':')[0], " ", "");
     if (!(s == "config" || s == "nodename")) {
@@ -42,7 +42,6 @@ int main(int argc, char** argv)
     }
   }
   std::cout << sout.str();
-  return 0;
   ConfigFile config("slowcontrol");
   PostgreSQLInterface db(config.get("database.host"),
                          config.get("database.dbname"),

@@ -42,7 +42,6 @@ const std::string ConfigFile::getFilePath(const std::string& filename)
 void ConfigFile::read(const std::string& filename, bool overload)
 {
   if (filename.size() == 0) return;
-  std::cout << getFilePath(filename) << std::endl;
   std::ifstream fin(getFilePath(filename).c_str());
   read(fin, overload);
   fin.close();
@@ -97,7 +96,6 @@ void ConfigFile::read(std::istream& is, bool overload)
         }
         ss << str_v[1].at(i);
       }
-      //std::cout << label << " : " << ss.str() << std::endl;
       add(label, ss.str(), overload);
     }
   }

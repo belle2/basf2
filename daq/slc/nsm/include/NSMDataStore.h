@@ -10,7 +10,8 @@ namespace Belle2 {
   class NSMDataStore {
 
   public:
-    static NSMDataStore& getStore() {
+    static NSMDataStore& getStore()
+    {
       return g_store;
     }
 
@@ -36,7 +37,8 @@ namespace Belle2 {
     };
 
   private:
-    NSMDataStore() {
+    NSMDataStore()
+    {
       m_buf = NULL;
       m_header = NULL;
       m_entries = NULL;
@@ -59,7 +61,8 @@ namespace Belle2 {
     Entry* get(unsigned int addr, unsigned int rid);
     void lock() { m_mutex.lock(); }
     void unlock() { m_mutex.unlock(); }
-    bool wait(int second) {
+    bool wait(int second)
+    {
       return m_cond.wait(m_mutex, second, 0);
     }
     void signal() { m_cond.broadcast(); }

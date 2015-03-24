@@ -27,7 +27,7 @@ components = [
     'ARICH',
     'BKLM',
     'ECL',
-    ]
+]
 
 # Register modules to declare objects
 # register_simulation(components)
@@ -83,4 +83,3 @@ main.add_module(ds2rbuf)
 
 # Run
 process(main)
-

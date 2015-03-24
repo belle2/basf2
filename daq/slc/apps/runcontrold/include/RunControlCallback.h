@@ -31,6 +31,7 @@ namespace Belle2 {
     virtual void configure(const DBObject& obj) throw(RCHandlerException);
     virtual void ok(const char* nodename, const char* data) throw();
     virtual void error(const char* nodename, const char* data) throw();
+    virtual void fatal(const char* nodename, const char* data) throw();
     virtual void log(const char* nodename, const DAQLogMessage& lmsg, bool recorded) throw();
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
@@ -45,6 +46,7 @@ namespace Belle2 {
     void setPriorityToDB(LogFile::Priority pri) { m_priority_db = pri; }
     void setPriorityToGlobal(LogFile::Priority pri) { m_priority_global = pri; }
     void setExcludedNodes(const StringList& excluded) { m_excluded_v = excluded; }
+    void setLogTable(const std::string table) { m_logtable = table; }
     void setCallback(RCCallback* callback) { m_callback = callback; }
 
   private:
@@ -60,7 +62,10 @@ namespace Belle2 {
                      const Date& date, const std::string& msg, bool recorded);
     bool addAll(const DBObject& obj) throw();
     using RCCallback::setState;
+
+  public:
     void setState(NSMNode& node, const RCState& state) throw();
+    void setConfig(RCNode& node, const std::string& config) throw();
 
   private:
     RCCallback* m_callback;
@@ -68,6 +73,7 @@ namespace Belle2 {
     RunNumber m_runno;
     std::string m_operators;
     std::string m_comment;
+    std::string m_logtable;
     LogFile::Priority m_priority_db;
     LogFile::Priority m_priority_global;
     StringList m_excluded_v;

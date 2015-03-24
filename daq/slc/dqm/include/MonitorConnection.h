@@ -24,10 +24,12 @@ namespace Belle2 {
     const MonitorConnection& operator=(const MonitorConnection& connection) throw();
     bool operator==(int value) const throw();
     bool operator==(const MonitorConnection& connection) const throw();
-    bool operator!=(int value) const throw() {
+    bool operator!=(int value) const throw()
+    {
       return !(*this == value);
     }
-    bool operator!=(const MonitorConnection& connection) const throw() {
+    bool operator!=(const MonitorConnection& connection) const throw()
+    {
       return !(*this == connection);
     }
 

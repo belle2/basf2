@@ -13,7 +13,8 @@ namespace Belle2 {
     NSMVHandlerTrigft(TTDACallback& callback, const std::string& name)
       : NSMVHandlerInt(name, false, true), m_callback(callback) {}
     virtual ~NSMVHandlerTrigft() throw() {}
-    bool handleSetInt(int val) {
+    bool handleSetInt(int val)
+    {
       LogFile::debug("trigft");
       try {
         if (val > 0)
@@ -34,7 +35,8 @@ namespace Belle2 {
                            const std::string& name, const std::string& type)
       : NSMVHandlerText(name, true, true, type), m_callback(callback) {}
     virtual ~NSMVHandlerTriggerType() throw() {}
-    bool handleSetText(const std::string& val) {
+    bool handleSetText(const std::string& val)
+    {
       return m_callback.setTriggerType(val);
     }
   private:
@@ -81,7 +83,7 @@ void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
                                  obj.getText("trigger_type")));
 }
 
-void TTDACallback::timeout(NSMCommunicator&) throw()
+void TTDACallback::monitor() throw(RCHandlerException)
 {
 }
 

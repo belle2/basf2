@@ -185,7 +185,7 @@ void NSMVar::writeObject(Writer& writer) const throw(IOException)
 
 int NSMVar::getInt() const
 {
-  return (m_type == INT && m_len == 0) ? *(int*)m_value : 0;
+  return (m_type == INT&& m_len == 0) ? *(int*)m_value : 0;
 }
 
 float NSMVar::getFloat() const
@@ -200,7 +200,7 @@ const char* NSMVar::getText() const
 
 int NSMVar::getInt(int i) const
 {
-  return (m_type == INT && i < m_len) ? ((int*)m_value)[i] : 0;
+  return (m_type == INT&& i < m_len) ? ((int*)m_value)[i] : 0;
 }
 
 float NSMVar::getFloat(int i) const

@@ -91,7 +91,7 @@ void dump_ttrx_fpga(int prgm, char* str);
 int boot_ttrx_fpga(ttrx_t* ttxx, int reg_prgm, const char* file,
                    int verbose, int forced);
 #if defined(__cplusplus)
-  int trgdelay_ttrx(ttrx_t*, int delay_in_sclk_unit = -1);
+int trgdelay_ttrx(ttrx_t*, int delay_in_sclk_unit = -1);
 }
 #else
   int trgdelay_ttrx(ttrx_t*, int delay_in_sclk_unit);

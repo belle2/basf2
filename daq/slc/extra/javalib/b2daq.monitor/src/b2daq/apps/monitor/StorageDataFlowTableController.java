@@ -74,11 +74,9 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
     private TableView table_disk;
     @FXML
     private Label label_nodename;
+    
     static private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss yyyy/MM/dd");
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         table_stat.getStyleClass().add("dataflow-table");
@@ -120,7 +118,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
         }
         try {
             NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.NSMDATASET)) {
+            if (command.equals(NSMCommand.DATASET)) {
                 NSMData data = NSMListenerService.getData(label_nodename.getText() + "_STATUS");
                 if (data == null || !data.getFormat().matches("storage_status")) {
                     return;
@@ -189,7 +187,6 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 label_ctime.setText(dateformat.format(new Date(ctime)));
                 int connected_in = 1;
                 int connected_out = 0;
-                //System.out.println(data.getInt("nnodes"));
                 for (int i = 0; i < data.getInt("nnodes"); i++) {
                     NSMData cdata = (NSMData) data.getObject("node", i);
                     if (i == 0) {
@@ -197,7 +194,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                     }
                     DataFlow flow = (DataFlow) table_stat.getItems().get(i);
                     if (flow.getNode().isEmpty()) {
-                        String name = "";
+                        String name;
                         if (i == 0) {
                             name = "in";
                         } else if (i == 1) {
@@ -225,14 +222,12 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 setConnection(c_out, connected_out);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Logger.getLogger(StorageDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
     @Override
     public void handleOnDisConnected() {
-        //h1.setLineColor(Color.DEEPPINK);
     }
 
     @Override

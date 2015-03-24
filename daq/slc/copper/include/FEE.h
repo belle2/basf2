@@ -13,8 +13,8 @@ namespace Belle2 {
     virtual ~FEE() throw() {}
 
   public:
-    virtual bool boot(HSLB& hslb, const FEEConfig& conf);
-    virtual bool load(HSLB& hslb, const FEEConfig& conf);
+    virtual void boot(HSLB& hslb, const FEEConfig& conf) = 0;
+    virtual void load(HSLB& hslb, const FEEConfig& conf) = 0;
 
   public:
     void setName(const std::string& name) { m_name = name; }

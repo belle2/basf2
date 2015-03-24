@@ -36,6 +36,7 @@ NSMData::NSMData()
 throw() : DBObject(), m_allocated(false),
   m_pdata(NULL), m_size(0), m_offset(0)
 {
+  setRevision(-1);
 }
 
 NSMData::NSMData(const NSMData& data) throw()
@@ -195,7 +196,6 @@ throw(NSMHandlerException)
 void NSMData::flush() throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
-  //nsmlib_flushmem(m_com->getContext(), get(), getSize());
   m_tstamp = Time().getSecond();
   sleep(1);
   m_com->getCallback().set("nsmdata.tstamp", m_tstamp);
@@ -366,9 +366,6 @@ void NSMData::print(const std::string& name_in) const throw()
     size_t length = pro.getLength();
     std::string name_out = name_in;
     if (name_in.size() > 0) name_out += ".";
-    else {
-      //name_out += (getName() + "@") + (getFormat() + ".");
-    }
     name_out += name;
     std::string pvtype;
     if (length > 0) {

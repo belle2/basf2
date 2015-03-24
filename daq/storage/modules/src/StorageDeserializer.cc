@@ -80,7 +80,6 @@ void StorageDeserializerModule::initialize()
     m_info.reportRunning();
   }
   m_count = 0;
-  //rawcprarray.registerPersistent();
   while (true) {
     m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), true));
     if (m_package.restore()) {
@@ -97,7 +96,6 @@ void StorageDeserializerModule::initialize()
 void StorageDeserializerModule::event()
 {
   m_count++;
-  //printf("StorageDeserializerModule::event(1) %d\n", m_count);
   if (m_count == 1) return;
   while (true) {
     m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), true));
@@ -109,7 +107,6 @@ void StorageDeserializerModule::event()
       break;
     }
   }
-  //printf("StorageDeserializerModule::event(2) %d\n", m_count);
   StoreObjPtr<EventMetaData> evtmetadata;
   if (evtmetadata.isValid()) {
     if (m_expno != evtmetadata->getExperiment() ||
@@ -123,7 +120,6 @@ void StorageDeserializerModule::event()
     if (m_info.isAvailable()) {
       m_info.setExpNumber(m_expno);
       m_info.setRunNumber(m_runno);
-      //m_info.setSubNumber(m_subno);
     }
   } else {
     B2WARNING("NO event meta data " << m_package.getData().getExpNumber() << "." <<
@@ -133,7 +129,6 @@ void StorageDeserializerModule::event()
     B2WARNING("Last event meta data " << m_expno << "." << m_runno << "." << m_evtno);
     DataStore::Instance().reset();
   }
-  //printf("StorageDeserializerModule::event(3) %d\n", m_count);
 }
 
 void StorageDeserializerModule::beginRun()

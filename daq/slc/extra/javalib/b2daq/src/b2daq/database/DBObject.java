@@ -8,12 +8,9 @@ import b2daq.core.Serializable;
 public abstract class DBObject implements Serializable {
 
     private int m_index;
+    private String m_path = "";
     private int m_id;
-    private int m_revision;
     private String m_name = "";
-    private String m_node = "";
-    private String m_table = "";
-    private boolean m_isconfig;
     private ArrayList<String> m_name_v = new ArrayList<>();
     private HashMap<String, FieldInfo.Property> m_pro_m = new HashMap<>();
 
@@ -25,6 +22,14 @@ public abstract class DBObject implements Serializable {
         m_id = id;
     }
 
+    public String getPath() {
+        return m_path;
+    }
+
+    public void setPath(String path) {
+        m_path = path;
+    }
+
     public String getName() {
         return m_name;
     }
@@ -33,40 +38,12 @@ public abstract class DBObject implements Serializable {
         m_name = name;
     }
 
-    public String getNode() {
-        return m_node;
-    }
-
-    public void setNode(String node) {
-        m_node = node;
-    }
-
-    public String getTable() {
-        return m_table;
-    }
-
-    public void setTable(String table) {
-        m_table = table;
-    }
-
     public int getIndex() {
         return m_index;
     }
 
     public void setIndex(int index) {
         m_index = index;
-    }
-
-    public int getRevision() {
-        return m_revision;
-    }
-
-    public void setRevision(int revision) {
-        m_revision = revision;
-    }
-
-    public void setConfig(boolean isconfig) {
-        m_isconfig = isconfig;
     }
 
     public ArrayList<String> getFieldNames() {
@@ -90,8 +67,7 @@ public abstract class DBObject implements Serializable {
     public boolean hasValue(String name) {
         return hasField(name)
                 && m_pro_m.get(name).getType() != FieldInfo.TEXT
-                && m_pro_m.get(name).getType() != FieldInfo.OBJECT
-                && m_pro_m.get(name).getType() != FieldInfo.NSM_OBJECT;
+                && m_pro_m.get(name).getType() != FieldInfo.OBJECT;
     }
 
     public boolean hasText(String name) {
@@ -99,8 +75,7 @@ public abstract class DBObject implements Serializable {
     }
 
     public boolean hasObject(String name, int index) {
-        return hasField(name) && (m_pro_m.get(name).getType() == FieldInfo.OBJECT
-                || m_pro_m.get(name).getType() == FieldInfo.NSM_OBJECT)
+        return hasField(name) && (m_pro_m.get(name).getType() == FieldInfo.OBJECT)
                 && (index < 0 || index < getNObjects(name));
     }
 
@@ -132,26 +107,6 @@ public abstract class DBObject implements Serializable {
                     return "" + getFloat(name);
                 case FieldInfo.DOUBLE:
                     return "" + getDouble(name);
-                case FieldInfo.NSM_CHAR:
-                    return "" + (int) getChar(name);
-                case FieldInfo.NSM_INT16:
-                    return "" + (int) getShort(name);
-                case FieldInfo.NSM_INT32:
-                    return "" + (int) getInt(name);
-                case FieldInfo.NSM_INT64:
-                    return "" + getLong(name);
-                case FieldInfo.NSM_BYTE8:
-                    return "" + (int) getChar(name);
-                case FieldInfo.NSM_UINT16:
-                    return "" + (int) getShort(name);
-                case FieldInfo.NSM_UINT32:
-                    return "" + getInt(name);
-                case FieldInfo.NSM_UINT64:
-                    return "" + getLong(name);
-                case FieldInfo.NSM_FLOAT:
-                    return "" + getFloat(name);
-                case FieldInfo.NSM_DOUBLE:
-                    return "" + getDouble(name);
                 default:
                     break;
             }
@@ -165,31 +120,21 @@ public abstract class DBObject implements Serializable {
                 case FieldInfo.BOOL:
                     setBool(name, (value == "true" || value == "t"));
                     break;
-                case FieldInfo.NSM_CHAR:
-                case FieldInfo.NSM_BYTE8:
                 case FieldInfo.CHAR:
                     setChar(name, (char) Integer.parseInt(value));
                     break;
-                case FieldInfo.NSM_INT16:
-                case FieldInfo.NSM_UINT16:
                 case FieldInfo.SHORT:
                     setShort(name, (short) Integer.parseInt(value));
                     break;
-                case FieldInfo.NSM_INT32:
-                case FieldInfo.NSM_UINT32:
                 case FieldInfo.INT:
                     setInt(name, (int) Integer.parseInt(value));
                     break;
-                case FieldInfo.NSM_INT64:
-                case FieldInfo.NSM_UINT64:
                 case FieldInfo.LONG:
                     setLong(name, (long) Integer.parseInt(value));
                     break;
-                case FieldInfo.NSM_FLOAT:
                 case FieldInfo.FLOAT:
                     setFloat(name, (float) Double.parseDouble(value));
                     break;
-                case FieldInfo.NSM_DOUBLE:
                 case FieldInfo.DOUBLE:
                     setDouble(name, Double.parseDouble(value));
                     break;
@@ -204,10 +149,6 @@ public abstract class DBObject implements Serializable {
 
     public void setText(String name, String value) {
         addText(name, value);
-    }
-
-    public boolean isConfig() {
-        return m_isconfig;
     }
 
     public void reset() {
@@ -367,53 +308,13 @@ public abstract class DBObject implements Serializable {
                     int nobj = getNObjects(name);
                     if (nobj > 0) {
                         DBObject obj = getObject(name);
-                        System.out.println(obj.getTable() + " (" + obj.getRevision() + ")");
+                        System.out.println(obj.getPath());
                         System.out.println("-------------------------");
                         for (int i = 0; i < nobj; i++) {
                             System.out.println("index : " + i);
                             getObject(name, i).print();
                             System.out.println("-------------------------");
                         }
-                    }
-                    break;
-                }
-                case FieldInfo.NSM_CHAR:
-                    System.out.print(getChar(name));
-                    break;
-                case FieldInfo.NSM_INT16:
-                    System.out.print(getShort(name));
-                    break;
-                case FieldInfo.NSM_INT32:
-                    System.out.print(getInt(name));
-                    break;
-                case FieldInfo.NSM_INT64:
-                    System.out.print(getLong(name));
-                    break;
-                case FieldInfo.NSM_BYTE8:
-                    System.out.print(getChar(name));
-                    break;
-                case FieldInfo.NSM_UINT16:
-                    System.out.print(getShort(name));
-                    break;
-                case FieldInfo.NSM_UINT32:
-                    System.out.print(getInt(name));
-                    break;
-                case FieldInfo.NSM_UINT64:
-                    System.out.print(getLong(name));
-                    break;
-                case FieldInfo.NSM_FLOAT:
-                    System.out.print(getFloat(name));
-                    break;
-                case FieldInfo.NSM_DOUBLE:
-                    System.out.print(getDouble(name));
-                    break;
-                case FieldInfo.NSM_OBJECT: {
-                    int nobj = getNObjects(name);
-                    System.out.println();
-                    System.out.println("-------------------------");
-                    for (int i = 0; i < nobj; i++) {
-                        getObject(name, i).print();
-                        System.out.println("-------------------------");
                     }
                     break;
                 }

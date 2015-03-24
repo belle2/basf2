@@ -9,7 +9,7 @@
     CLASS(HVCallback& callback, const std::string& name,    \
           int crate, int slot, int channel)       \
       : NSMVHandlerText(name, true, true),        \
-      HandlerHV(callback, crate, slot, channel) {}      \
+        HandlerHV(callback, crate, slot, channel) {}      \
     virtual ~CLASS() throw() {}           \
     virtual bool handleGetText(std::string& val);     \
     virtual bool handleSetText(const std::string& val);     \
@@ -21,7 +21,7 @@
     CLASS(HVCallback& callback, const std::string& name,    \
           int crate, int slot, int channel)       \
       : NSMVHandlerFloat(name, true, true),       \
-      HandlerHV(callback, crate, slot, channel) {}      \
+        HandlerHV(callback, crate, slot, channel) {}      \
     virtual ~CLASS() throw() {}           \
     virtual bool handleGetFloat(float& val);        \
     virtual bool handleSetFloat(float val);       \

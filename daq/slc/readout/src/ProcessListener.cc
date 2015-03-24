@@ -6,7 +6,7 @@
 #include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/system/LogFile.h>
-#include <daq/slc/system/Fork.h>
+#include <daq/slc/system/Process.h>
 
 #include <daq/slc/base/StringUtil.h>
 
@@ -16,11 +16,11 @@ using namespace Belle2;
 
 void ProcessListener::run()
 {
-  Fork& fork(m_con->getFork());
-  int pid = fork.get_id();
+  Process& process(m_con->getProcess());
+  int pid = process.get_id();
   std::string process_name = m_con->getName();
-  if (fork.wait() < 0) {
-    LogFile::fatal("Failed to wait forked process %s", process_name.c_str());
+  if (process.wait() < 0) {
+    LogFile::fatal("Failed to wait processed process %s", process_name.c_str());
     return;
   }
   m_con->lock();
@@ -35,14 +35,14 @@ void ProcessListener::run()
             node.getState() == RCState::STARTING_TS) {
           std::string emsg = StringUtil::form("Foked process %s (pid = %d) was crashed", process_name.c_str(), pid);
           LogFile::error(emsg);
-          callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
+          callback.replyLog(LogFile::ERROR, emsg);
           m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
         }
         break;
       case RunInfoBuffer::READY: {
         std::string emsg = StringUtil::form("Foked process %s (pid = %d) was not started", process_name.c_str(), pid);
         LogFile::error(emsg);
-        callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
+        callback.replyLog(LogFile::ERROR, emsg);
         m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
       } break;
       case RunInfoBuffer::NOTREADY:
@@ -50,17 +50,16 @@ void ProcessListener::run()
         if (node.getState() == RCState::LOADING_TS) {
           std::string emsg = StringUtil::form("Foked process %s (pid = %d) was not booted", process_name.c_str(), pid);
           LogFile::error(emsg);
-          callback.reply(NSMMessage(NSMCommand::ERROR, emsg));
+          callback.replyLog(LogFile::ERROR, emsg);
           m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
         } else {
-          std::string emsg = StringUtil::form("Forked process %s (pid = %d) was finished", process_name.c_str(), pid);
+          std::string emsg = StringUtil::form("Processed process %s (pid = %d) was finished", process_name.c_str(), pid);
           LogFile::debug(emsg);
-          DAQLogMessage lmsg(node.getName(), LogFile::INFO, emsg);
-          callback.reply(NSMMessage(lmsg));
+          callback.replyLog(LogFile::INFO, emsg);
         }
       } break;
     }
   }
-  fork.set_id(-1);
+  process.set_id(-1);
   m_con->unlock();
 }

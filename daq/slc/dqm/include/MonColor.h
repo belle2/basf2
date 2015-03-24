@@ -40,7 +40,8 @@ namespace Belle2 {
 
   public:
     const MonColor& operator=(const MonColor& c) throw();
-    bool operator==(const MonColor& c) const throw() {
+    bool operator==(const MonColor& c) const throw()
+    {
       return m_red == c.m_red && m_green == c.m_green && m_blue == c.m_blue;
     };
 

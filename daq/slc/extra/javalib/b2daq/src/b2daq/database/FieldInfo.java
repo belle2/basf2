@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 public class FieldInfo {
 
+    static public final int NONE = 0;
     static public final int BOOL = 1;
     static public final int CHAR = 2;
     static public final int SHORT = 3;
@@ -13,17 +14,6 @@ public class FieldInfo {
     static public final int DOUBLE = 7;
     static public final int TEXT = 8;
     static public final int OBJECT = 9;
-    static public final int NSM_CHAR = 10;
-    static public final int NSM_INT16 = 11;
-    static public final int NSM_INT32 = 12;
-    static public final int NSM_INT64 = 13;
-    static public final int NSM_BYTE8 = 14;
-    static public final int NSM_UINT16 = 15;
-    static public final int NSM_UINT32 = 16;
-    static public final int NSM_UINT64 = 17;
-    static public final int NSM_FLOAT = 18;
-    static public final int NSM_DOUBLE = 19;
-    static public final int NSM_OBJECT = 20;
 
     public static class Property {
 
@@ -63,26 +53,6 @@ public class FieldInfo {
                 case FLOAT:
                     return 4;
                 case DOUBLE:
-                    return 8;
-                case NSM_CHAR:
-                    return 1;
-                case NSM_INT16:
-                    return 2;
-                case NSM_INT32:
-                    return 4;
-                case NSM_INT64:
-                    return 8;
-                case NSM_BYTE8:
-                    return 1;
-                case NSM_UINT16:
-                    return 2;
-                case NSM_UINT32:
-                    return 4;
-                case NSM_UINT64:
-                    return 8;
-                case NSM_FLOAT:
-                    return 4;
-                case NSM_DOUBLE:
                     return 8;
                 default:
                     break;

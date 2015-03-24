@@ -26,7 +26,7 @@ namespace Belle2 {
     virtual void stop() throw(RCHandlerException);
     virtual void recover(const DBObject& obj) throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
-    virtual void timeout(NSMCommunicator& com) throw();
+    virtual void monitor() throw(RCHandlerException);
     virtual void term() throw();
 
   public:

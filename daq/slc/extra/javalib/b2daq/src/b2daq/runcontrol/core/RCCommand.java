@@ -5,14 +5,14 @@ import b2daq.nsm.NSMState;
 
 public class RCCommand extends NSMCommand {
 
-    final static public RCCommand CONFIGURE = new RCCommand(101, "CONFIGURE");
-    final static public RCCommand LOAD = new RCCommand(102, "LOAD");
-    final static public RCCommand START = new RCCommand(103, "START");
-    final static public RCCommand STOP = new RCCommand(104, "STOP");
-    final static public RCCommand RESUME = new RCCommand(105, "RESUMEN");
-    final static public RCCommand PAUSE = new RCCommand(106, "PAUSE");
-    final static public RCCommand RECOVER = new RCCommand(107, "RECOVER");
-    final static public RCCommand ABORT = new RCCommand(108, "ABORT");
+    final static public RCCommand CONFIGURE = new RCCommand(101, "RC_CONFIGURE");
+    final static public RCCommand LOAD = new RCCommand(102, "RC_LOAD");
+    final static public RCCommand START = new RCCommand(103, "RC_START");
+    final static public RCCommand STOP = new RCCommand(104, "RC_STOP");
+    final static public RCCommand RESUME = new RCCommand(105, "RC_RESUMEN");
+    final static public RCCommand PAUSE = new RCCommand(106, "RC_PAUSE");
+    final static public RCCommand RECOVER = new RCCommand(107, "RC_RECOVER");
+    final static public RCCommand ABORT = new RCCommand(108, "RC_ABORT");
 
     public RCCommand() {
         copy(RCCommand.UNKNOWN);
@@ -75,7 +75,7 @@ public class RCCommand extends NSMCommand {
         } else if (equals(RESUME) && state.equals(RCState.PAUSED_S)) {
             return SUGGESTED;
         } else if (equals(OK) || equals(ERROR) || equals(ABORT) || equals(RECOVER)
-                || equals(NSMDATAGET) || equals(NSMDATASET) || equals(DBGET) || equals(DBSET)) {
+                || equals(DATAGET) || equals(DATASET) || equals(DBGET) || equals(DBSET)) {
             return ENABLED;
         } else {
             return DISABLED;

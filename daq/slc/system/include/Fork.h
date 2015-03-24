@@ -13,7 +13,8 @@ namespace Belle2 {
 
   public:
     template <class WORKER>
-    static void g_handler_exit(int, void* worker) {
+    static void g_handler_exit(int, void* worker)
+    {
       delete(WORKER*)worker;
       exit(0);
     }
@@ -23,7 +24,8 @@ namespace Belle2 {
     Fork() throw() : m_pid(-1) {}
 
     template<class WORKER>
-    Fork(WORKER* worker, bool detached = true) throw() {
+    Fork(WORKER* worker, bool detached = true) throw()
+    {
       m_pid = fork();
       if (m_pid == 0) {
         signal(SIGINT, g_handler_int);
@@ -42,11 +44,13 @@ namespace Belle2 {
     pid_t get_id() const { return m_pid; }
     void set_id(pid_t id) { m_pid = id; }
     bool isAlive() const { return kill(0); }
-    bool kill(int signo) const {
+    bool kill(int signo) const
+    {
       if (m_pid < 0) return false;
       return ::kill(m_pid, signo) == 0;
     }
-    bool wait(int opt = 0) {
+    bool wait(int opt = 0)
+    {
       if (m_pid < 0) return false;
       if (::waitpid(m_pid, NULL, opt)) {
         m_pid = -1;

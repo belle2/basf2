@@ -28,10 +28,12 @@ namespace Belle2 {
     const MonitorState& operator=(const MonitorState& state) throw();
     bool operator==(int value) const throw();
     bool operator==(const MonitorState& state) const throw();
-    bool operator!=(int value) const throw() {
+    bool operator!=(int value) const throw()
+    {
       return !(*this == value);
     }
-    bool operator!=(const MonitorState& state) const throw() {
+    bool operator!=(const MonitorState& state) const throw()
+    {
       return !(*this == state);
     }
 

@@ -33,9 +33,10 @@ namespace Belle2 {
     virtual void timeout(NSMCommunicator&) throw() {}
     virtual bool perform(NSMCommunicator& com) throw();
     virtual void ok(const char* /*node*/, const char* /*data*/) throw() {}
+    virtual void fatal(const char* /*node*/, const char* /*data*/) throw() {}
     virtual void error(const char* /*node*/, const char* /*data*/) throw() {}
     virtual void log(const char* /*node*/, const DAQLogMessage&, bool /*recorded*/) throw() {}
-    virtual void vget(NSMCommunicator& com, const std::string& vname) throw();
+    virtual void vget(const std::string& nodename, const std::string& vname) throw();
     virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
     virtual void vlistget(NSMCommunicator& com) throw();
     virtual void vlistset(NSMCommunicator& com) throw();
@@ -45,8 +46,8 @@ namespace Belle2 {
 
   public:
     void reply(const NSMMessage& msg) throw(NSMHandlerException);
-    void replyError(const char* format, ...) throw(NSMHandlerException);
-    void replyLog(LogFile::Priority pri, const char* format, ...) throw(NSMHandlerException);
+    void replyLog(LogFile::Priority pri, const char* format, ...);
+    void replyLog(LogFile::Priority pri, const std::string& msg);
 
   public:
     NSMDataMap& getDataMap() throw() { return m_datas; }

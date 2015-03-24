@@ -17,7 +17,8 @@ namespace Belle2 {
 
   public:
     double getTransparency() const throw() { return m_transparency; }
-    void setTransparency(double transparency) throw() {
+    void setTransparency(double transparency) throw()
+    {
       m_transparency = transparency;
     }
     virtual std::string toString() const throw();

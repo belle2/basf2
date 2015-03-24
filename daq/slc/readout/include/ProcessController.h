@@ -5,7 +5,7 @@
 
 #include "daq/slc/runcontrol/RCCallback.h"
 
-#include "daq/slc/system/Fork.h"
+#include "daq/slc/system/Process.h"
 #include "daq/slc/system/Mutex.h"
 #include "daq/slc/system/Cond.h"
 
@@ -20,10 +20,12 @@ namespace Belle2 {
 
   public:
     ProcessController() throw() {}
-    ProcessController(RCCallback* callback) throw() {
+    ProcessController(RCCallback* callback) throw()
+    {
       m_callback = callback;
     }
-    ~ProcessController() throw() {
+    ~ProcessController() throw()
+    {
       m_info.close();
     }
 
@@ -38,8 +40,8 @@ namespace Belle2 {
     const std::string& getExecutable() { return m_exename; }
     RunInfoBuffer& getInfo() { return m_info; }
     RCCallback* getCallback() { return m_callback; }
-    const Fork& getFork() const { return  m_fork; }
-    Fork& getFork() { return  m_fork; }
+    const Process& getProcess() const { return  m_process; }
+    Process& getProcess() { return  m_process; }
     void setCallback(RCCallback* callback) { m_callback = callback; }
     void setName(const std::string& name) { m_name = name; }
     void setExecutable(const std::string& exe) { m_exename = exe; }
@@ -48,7 +50,7 @@ namespace Belle2 {
     template<typename T>
     void addArgument(T arg);
     void clearArguments() { m_arg_v = std::vector<std::string>(); }
-    bool isAlive() throw() { return m_fork.isAlive(); }
+    bool isAlive() throw() { return m_process.isAlive(); }
 
   public:
     void lock() { m_mutex.lock(); }
@@ -60,7 +62,7 @@ namespace Belle2 {
     RCCallback* m_callback;
     std::string m_exename;
     std::vector<std::string> m_arg_v;
-    Fork m_fork;
+    Process m_process;
     Mutex m_mutex;
     std::string m_message;
 
@@ -77,7 +79,8 @@ namespace Belle2 {
 
   public:
     ProcessSubmitter(ProcessController* con, int iopipe[2])
-      : m_con(con) {
+      : m_con(con)
+    {
       m_iopipe[0] = iopipe[0];
       m_iopipe[1] = iopipe[1];
     }

@@ -171,8 +171,6 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
   vsprintf(s, msg.c_str(), ap);
   ss << s << std::endl;
   std::string str = ss.str();
-  //if (g_stderr)
-  //  std::cerr << color << str << "\x1b[49m\x1b[39m";
   std::cerr << color << str << "\x1b[49m\x1b[39m";
   if (g_opened) {
     g_stream << str;

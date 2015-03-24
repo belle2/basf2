@@ -35,31 +35,30 @@ namespace Belle2 {
     void remove(const std::string& name) { remove("", name); }
     void remove(const DBObject& obj);
     NSMVHandlerList& getHandlers() { return m_handler; }
-    NSMVHandler& getHandler(const std::string& name) throw(std::out_of_range) {
+    NSMVHandler& getHandler(const std::string& name) throw(std::out_of_range)
+    {
       return getHandler("", name);
     }
     NSMVHandler& getHandler(const std::string& node, const std::string& name)
     throw(std::out_of_range);
-    void setUseGet(const std::string& name, bool use) throw(std::out_of_range) {
+    void setUseGet(const std::string& name, bool use) throw(std::out_of_range)
+    {
       getHandler(name).setUseGet(use);
     }
-    void setUseSet(const std::string& name, bool use) throw(std::out_of_range) {
+    void setUseSet(const std::string& name, bool use) throw(std::out_of_range)
+    {
       getHandler(name).setUseSet(use);
     }
 
   public:
     void setRevision(int revision) throw () { m_revision = revision; }
-    void setObject(const DBObject& obj) throw() { m_obj = obj; }
     int getRevision() const throw () { return m_revision; }
-    DBObject& getObject() throw() { return m_obj; }
-    const DBObject& getObject() const throw() { return m_obj; }
 
   private:
     NSMVHandler* getHandler_p(const std::string& node, const std::string& name);
 
   private:
     int m_revision;
-    DBObject m_obj;
     NSMVHandlerList m_handler;
 
   };

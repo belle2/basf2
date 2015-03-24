@@ -5,12 +5,9 @@
  */
 package b2daq.apps.pscontrol;
 
-import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMCommand;
-import b2daq.nsm.NSMListenerService;
-import b2daq.nsm.NSMMessage;
+import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMNode;
-import b2daq.nsm.NSMObserver;
+import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
 import java.io.IOException;
 import java.net.URL;
@@ -28,14 +25,14 @@ import javafx.scene.layout.VBox;
  *
  * @author tkonno
  */
-public class PSCrateSettingPanelController implements NSMObserver {
+public class PSCrateSettingPanelController {
 
     @FXML
     VBox vbox;
     private int m_crateid;
 
     private final ArrayList<PSChannelSettingPanelController> channel = new ArrayList();
-    private NSMNode m_node;
+    private NSMNode m_hvnode;
     private String m_name = "";
 
     public String getName() {
@@ -55,7 +52,8 @@ public class PSCrateSettingPanelController implements NSMObserver {
     }
 
     public void setNode(NSMNode node) {
-        m_node = node;
+        m_hvnode = node;
+        NSMCommunicator.get().add(new CrateNChannelHandler(m_hvnode.getName(), "crate[" + m_crateid + "].nchannels"));
     }
 
     public void allOn(boolean allon) {
@@ -64,77 +62,36 @@ public class PSCrateSettingPanelController implements NSMObserver {
         }
     }
 
-    @Override
-    public void handleOnConnected() {
-        NSMListenerService.requestVGet(m_node.getName(), "crate[" + m_crateid + "].nchannels");
-        NSMListenerService.requestVGet(m_node.getName(), "crate[" + m_crateid + "].name");
-    }
+    private class CrateNChannelHandler extends NSMVSetHandler {
 
-    @Override
-    public void handleOnReceived(NSMMessage msg) {
-        NSMCommand cmd = new NSMCommand(msg.getReqName());
-        if (cmd.equals(NSMCommand.VSET)) {
-            NSMVar var = (NSMVar) msg.getObject();
-            switch (var.getType()) {
-                case NSMVar.INT:
-                    if (var.getName().contains("crate[" + m_crateid + "].nchannels")) {
-                        try {
-                            int nchannels = var.getInt();
-                            for (int i = 0; i < nchannels; i++) {
-                                URL location = getClass().getResource("PSChannelSettingPanel.fxml");
-                                FXMLLoader loader = new FXMLLoader();
-                                loader.setLocation(location);
-                                loader.setBuilderFactory(new JavaFXBuilderFactory());
-                                Parent root = (Parent) loader.load(location.openStream());
-                                PSChannelSettingPanelController controller
-                                        = ((PSChannelSettingPanelController) loader.getController());
-                                vbox.getChildren().add(root);
-                                controller.setNode(m_node);
-                                controller.setCrateId(m_crateid);
-                                controller.setIndex(i);
-                                controller.handleOnConnected();
-                                channel.add(controller);
-                            }
-                            requestUpdate();
-                        } catch (IOException ex) {
-                            Logger.getLogger(PSCrateSettingPanelController.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+        public CrateNChannelHandler(String node, String name) {
+            super(true, node, name, NSMVar.INT);
+        }
 
-                    }
-                    for (PSChannelSettingPanelController ch : channel) {
-                        ch.handleOnReceived(msg);
-                    }
-                    break;
-                case NSMVar.FLOAT:
-                    for (PSChannelSettingPanelController ch : channel) {
-                        ch.handleOnReceived(msg);
-                    }
-                    break;
-                case NSMVar.TEXT:
-                    if (var.getName().contains("crate[" + m_crateid + "].name")) {
-                        m_name = var.getText();
-                    } else {
-                        for (PSChannelSettingPanelController ch : channel) {
-                            ch.handleOnReceived(msg);
-                        }
-                    }
-                    break;
+        @Override
+        public boolean handleVSet(NSMVar var) {
+            try {
+                int nchannels = var.getInt();
+                for (int i = 0; i < nchannels; i++) {
+                    URL location = getClass().getResource("PSChannelSettingPanel.fxml");
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(location);
+                    loader.setBuilderFactory(new JavaFXBuilderFactory());
+                    Parent root = (Parent) loader.load(location.openStream());
+                    PSChannelSettingPanelController controller
+                            = ((PSChannelSettingPanelController) loader.getController());
+                    vbox.getChildren().add(root);
+                    controller.setCrateId(m_crateid);
+                    controller.setIndex(i);
+                    controller.setNode(m_hvnode);
+                    channel.add(controller);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(PSCrateSettingPanelController.class.getName()).log(Level.SEVERE, null, ex);
             }
+            return true;
         }
-    }
 
-    public void requestUpdate() {
-        for (PSChannelSettingPanelController ch : channel) {
-            ch.requestUpdate();
-        }
-    }
-
-    @Override
-    public void handleOnDisConnected() {
-    }
-
-    @Override
-    public void log(LogMessage log) {
     }
 
 }

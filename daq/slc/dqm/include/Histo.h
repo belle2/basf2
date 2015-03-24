@@ -102,10 +102,12 @@ namespace Belle2 {
     virtual std::string getTag() const throw();
     virtual std::string toXML() const throw();
     virtual std::string toString() const throw();
-    void setDrawOption(const std::string& option) {
+    void setDrawOption(const std::string& option)
+    {
       m_draw_option = option;
     }
-    void setLinkedAxis(GAxis* axis) {
+    void setLinkedAxis(GAxis* axis)
+    {
       m_linked_axis = axis;
     }
 

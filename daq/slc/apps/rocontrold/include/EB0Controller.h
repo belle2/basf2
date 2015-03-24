@@ -12,7 +12,7 @@ namespace Belle2 {
 
   protected:
     virtual void initArguments(const DBObject& obj);
-    virtual void loadArguments(const DBObject& obj);
+    virtual bool loadArguments(const DBObject& obj);
 
   private:
     void readDB(const DBObject& obj, int& port,

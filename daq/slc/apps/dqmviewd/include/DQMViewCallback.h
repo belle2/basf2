@@ -31,7 +31,8 @@ namespace Belle2 {
 
   public:
     void addReader(const std::string& pack_name,
-                   const std::string& file_path) {
+                   const std::string& file_path)
+    {
       m_reader_v.push_back(DQMFileReader(pack_name, file_path));
     }
     std::vector<DQMFileReader>& getReaders() { return m_reader_v; }

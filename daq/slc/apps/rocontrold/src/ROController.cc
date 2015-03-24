@@ -43,8 +43,9 @@ throw(RCHandlerException)
   if (m_con.isAlive()) return true;
   try {
     m_con.clearArguments();
-    loadArguments(obj);
-    m_con.load(timeout);
+    if (loadArguments(obj)) {
+      m_con.load(timeout);
+    }
     return true;
   } catch (const std::exception& e) {
     throw (RCHandlerException(e.what()));

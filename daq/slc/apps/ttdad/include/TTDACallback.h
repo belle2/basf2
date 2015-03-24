@@ -26,7 +26,7 @@ namespace Belle2 {
     virtual void resume(int subno) throw(RCHandlerException);
     virtual void recover(const DBObject&) throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
-    virtual void timeout(NSMCommunicator& com) throw();
+    virtual void monitor() throw(RCHandlerException);
     void trigft() throw(RCHandlerException);
     bool setTriggerType(const std::string& type) throw();
 

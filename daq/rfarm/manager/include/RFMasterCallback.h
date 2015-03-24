@@ -20,13 +20,13 @@ namespace Belle2 {
   class RFMasterCallback : public RCCallback {
 
   public:
-    RFMasterCallback() : m_callback(NULL) {}
+    RFMasterCallback() throw();
     virtual ~RFMasterCallback() throw() {}
 
   public:
     virtual void initialize(const DBObject& obj) throw(RCHandlerException);
     virtual void configure(const DBObject& obj) throw(RCHandlerException);
-    virtual void timeout(NSMCommunicator& com) throw();
+    virtual void monitor() throw(RCHandlerException);
     virtual void ok(const char* node, const char* data) throw();
     virtual void error(const char* node, const char* data) throw();
     virtual void load(const DBObject& obj) throw(RCHandlerException);
@@ -36,14 +36,16 @@ namespace Belle2 {
     virtual void resume(int subno) throw(RCHandlerException);
     virtual void pause() throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
+    virtual bool perform(NSMCommunicator& com) throw();
 
   public:
     void setState(NSMNode& node, const RCState& state);
     void setCallback(RFRunControlCallback* callback) { m_callback = callback; }
+    void addData(const std::string& dataname, const std::string& format);
 
   private:
     RFRunControlCallback* m_callback;
-    NSMDataList m_datas;
+    StringList m_dataname;
     typedef std::vector<NSMNode> NSMNodeList;
     NSMNodeList m_nodes;
 

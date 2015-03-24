@@ -235,7 +235,7 @@ void StoragerCallback::abort() throw(RCHandlerException)
   m_eb2rx.abort();
 }
 
-void StoragerCallback::timeout(NSMCommunicator&) throw()
+void StoragerCallback::monitor() throw(RCHandlerException)
 {
   NSMData& data(getData());
   if (!data.isAvailable()) return;

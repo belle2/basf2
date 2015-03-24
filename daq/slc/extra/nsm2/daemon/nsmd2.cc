@@ -581,7 +581,7 @@ nsmd_destroy(int code = NSMD_EUNEXPCT)
   NSMmem& mem = *nsmd_memp;
 
   switch (code) {
-      // internal errors
+    // internal errors
     case NSMD_EOK:      strcpy(str, ""); break;
     case NSMD_ESYSERR:  strcpy(str, " by syscall");    exit_code = -code; break;
     case NSMD_EINUSE:   strcpy(str, " by adrs-in-use"); exit_code = -code; break;
@@ -590,7 +590,7 @@ nsmd_destroy(int code = NSMD_EUNEXPCT)
     case NSMD_ESHMPERM: strcpy(str, " by shmperm");    exit_code = -code; break;
     case NSMD_ENONETIF: strcpy(str, " by no-net-if");  exit_code = -code; break;
     case NSMD_ETIME:    strcpy(str, " by wrong-time"); exit_code = -code; break;
-      // signals
+    // signals
     case SIGTERM:      strcpy(str, " by SIGTERM"); break;
     case SIGINT:       strcpy(str, " by SIGINT");  break;
     case SIGCHLD:      strcpy(str, " by SIGCHLD"); break;
@@ -706,7 +706,7 @@ nsmd_logtime(char* buf)
   timeval now;
   tm* cur;
   static int lastday = -1;
-  extern void nsmd_printlog(const char * prompt, const char * str);
+  extern void nsmd_printlog(const char* prompt, const char* str);
 
   gettimeofday(&now, 0);
   cur = localtime((time_t*)&now.tv_sec);

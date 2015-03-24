@@ -15,7 +15,8 @@ namespace Belle2 {
     virtual ~MonLine() throw() {}
 
   public:
-    void set(double x1, double y1, double x2, double y2) throw() {
+    void set(double x1, double y1, double x2, double y2) throw()
+    {
       m_x1 = x1; m_y1 = y1; m_x2 = x2; m_y2 = y2;
     }
 

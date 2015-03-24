@@ -195,6 +195,9 @@ void NSMCommunicator::setCallback(NSMCallback* callback) throw(NSMHandlerExcepti
 void NSMCommunicator::callContext() throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
+  if (!m_nsmc) {
+    throw (NSMHandlerException("No NSM context is available"));
+  }
   char buf[NSM_TCPMSGSIZ];
   NSMcontext* nsmc = m_nsmc;
   if (nsmlib_recv(nsmc, (NSMtcphead*)buf, 1000) < 0) {

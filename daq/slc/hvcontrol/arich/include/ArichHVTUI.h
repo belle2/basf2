@@ -37,7 +37,8 @@ namespace Belle2 {
     virtual void requestCurrentLimit(int crate, int slot, int channel) throw(IOException);
     virtual void requestVoltageMonitor(int crate, int slot, int channel) throw(IOException);
     virtual void requestCurrentMonitor(int crate, int slot, int channel) throw(IOException);
-    virtual void requestState(int crate, int slot, int channel) throw(IOException) {
+    virtual void requestState(int crate, int slot, int channel) throw(IOException)
+    {
       requestSwitch(crate, slot, channel);
     }
     virtual HVMessage wait() throw(IOException);

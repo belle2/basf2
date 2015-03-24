@@ -37,15 +37,23 @@ int main(int argc, char** argv)
       try {
         socket = server.accept();
         TCPSocketReader reader(socket);
-        const std::string path = reader.readString();
-        StringList s = StringUtil::split(path, '/');
-        const std::string table = (s.size() > 0) ? s[0] : dbtable;
-        const std::string config = (s.size() > 0) ? s[1] : path;
-        DBObject obj(DBObjectLoader::load(db, dbtable, config));
-        LogFile::debug("loaded %s from %s", obj.getName().c_str(), table.c_str());
-        obj.print();
-        TCPSocketWriter writer(socket);
-        writer.writeObject(obj);
+        int flag = reader.readInt();
+        if (flag == 1) {
+          const std::string path = reader.readString();
+          StringList s = StringUtil::split(path, '/');
+          const std::string table = (s.size() > 0) ? s[0] : dbtable;
+          const std::string config = (s.size() > 0) ? s[1] : path;
+          DBObject obj(DBObjectLoader::load(db, dbtable, config));
+          LogFile::debug("loaded %s from %s", obj.getName().c_str(), table.c_str());
+          obj.print();
+          TCPSocketWriter writer(socket);
+          writer.writeObject(obj);
+        } else if (flag == 2) {
+          DBObject obj;
+          const std::string table = reader.readString();
+          reader.readObject(obj);
+          DBObjectLoader::createDB(db, table, obj);
+        }
       } catch (const IOException& e) {
         LogFile::error(e.what());
       }

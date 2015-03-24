@@ -5,11 +5,11 @@ import java.net.Socket;
 
 public class SocketDataReader extends DataReader {
 
-	public SocketDataReader() {
-		super();
-	}
-	
-	public SocketDataReader(Socket socket) throws IOException {
-		super(socket.getInputStream());
-	}
+    public SocketDataReader() {
+        super();
+    }
+
+    public SocketDataReader(Socket socket) throws IOException {
+        super(socket.getInputStream());
+    }
 }

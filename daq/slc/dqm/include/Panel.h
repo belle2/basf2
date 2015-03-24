@@ -16,7 +16,8 @@ namespace Belle2 {
     virtual ~Panel() throw();
 
   public:
-    virtual void add(Panel* panel) throw() {
+    virtual void add(Panel* panel) throw()
+    {
       if (panel != NULL) m_sub_panel_v.push_back(panel);
     }
     std::vector<Panel*>& getPanels() throw() { return m_sub_panel_v; }

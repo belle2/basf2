@@ -15,13 +15,15 @@ namespace Belle2 {
 
   private:
     template<class WORKER>
-    static void destroy(void* arg) {
+    static void destroy(void* arg)
+    {
       WORKER* worker = (WORKER*)arg;
       delete worker;
       worker = NULL;
     }
     template<class WORKER>
-    static void* create_destroy(void* arg) {
+    static void* create_destroy(void* arg)
+    {
       WORKER* worker = (WORKER*)arg;
       pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
       pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
@@ -35,7 +37,8 @@ namespace Belle2 {
       return NULL;
     }
     template<class WORKER>
-    static void* create(void* arg) {
+    static void* create(void* arg)
+    {
       WORKER* worker = (WORKER*)arg;
       pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
       pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
@@ -54,7 +57,8 @@ namespace Belle2 {
     PThread() throw() : m_th(0) {}
 
     template<class WORKER>
-    PThread(WORKER* worker, bool destroy = true, bool detached = true) throw() {
+    PThread(WORKER* worker, bool destroy = true, bool detached = true) throw()
+    {
       m_th = 0;
       if (destroy) {
         if (pthread_create(&m_th, NULL, PThread::create_destroy<WORKER>,
@@ -73,20 +77,24 @@ namespace Belle2 {
 
   public:
     pthread_t get_id() { return m_th; }
-    bool kill(int signo) {
+    bool kill(int signo)
+    {
       if (m_th == 0) return false;
       return ::pthread_kill(m_th, signo) == 0;
     }
     bool is_alive() { return this->kill(0); }
-    bool detach() {
+    bool detach()
+    {
       if (m_th == 0) return false;
       return ::pthread_detach(m_th) == 0;
     }
-    bool join() {
+    bool join()
+    {
       if (m_th == 0) return false;
       return ::pthread_join(m_th, NULL) == 0;
     }
-    bool cancel() {
+    bool cancel()
+    {
       if (m_th == 0) return false;
       return ::pthread_cancel(m_th) == 0;
     }

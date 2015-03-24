@@ -16,10 +16,12 @@ namespace Belle2 {
 
   public:
     void setRunNumber(const RunNumber& info);
-    void setOperators(const std::string& operators) {
+    void setOperators(const std::string& operators)
+    {
       setText("operators", operators);
     }
-    void setComment(const std::string& comment) {
+    void setComment(const std::string& comment)
+    {
       setText("comment", comment);
     }
     void setRunControl(const DBObject& obj);

@@ -18,15 +18,15 @@ bool NSMVHandlerRCConfig::handleGetText(std::string& val)
 
 bool NSMVHandlerRCConfig::handleSetText(const std::string& val)
 {
-  m_rcnode.setConfig(val);
+  m_callback.setConfig(m_rcnode, val);
   try {
     NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::CONFIGURE, val));
     LogFile::info("configured node : %s (config=%s)", m_rcnode.getName().c_str(), val.c_str());
+    return true;
   } catch (const IOException& e) {
     LogFile::error(e.what());
-    return false;
   }
-  return true;
+  return false;
 }
 
 bool NSMVHandlerRCState::handleGetText(std::string& val)
@@ -57,6 +57,15 @@ bool NSMVHandlerRCRequest::handleSetText(const std::string& val)
                      str.c_str(), m_rcnode.getName().c_str());
       return false;
     }
+    RCState tstate = cmd.nextTState();
+    if (tstate != Enum::UNKNOWN) {
+      m_callback.setState(m_rcnode, tstate);
+      if (tstate == RCState::ABORTING_RS) {
+        m_callback.RCCallback::setState(RCState::NOTREADY_S);
+      } else {
+        m_callback.RCCallback::setState(tstate);
+      }
+    }
   } catch (const NSMHandlerException& e) {
     LogFile::error(e.what());
   }
@@ -72,11 +81,25 @@ bool NSMVHandlerRCUsed::handleGetInt(int& val)
 bool NSMVHandlerRCUsed::handleSetInt(int val)
 {
   m_rcnode.setUsed(val > 0);
-  m_rcnode.setState(NSMState::UNKNOWN);
-  try {
-    NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
-  } catch (const NSMHandlerException& e) {
-    LogFile::warning(e.what());
+  if (val == 0) {
+    m_callback.setState(m_rcnode, RCState::OFF_S);
+    try {
+      NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
+    } catch (const NSMHandlerException& e) {
+      LogFile::warning(e.what());
+    }
+  } else {
+    std::string state;
+    try {
+      m_callback.get(m_rcnode, "rcstate", state);
+      m_callback.setState(m_rcnode, RCState(state));
+    } catch (const NSMHandlerException& e) {
+      LogFile::warning(e.what());
+    } catch (const TimeoutException& e) {
+      LogFile::warning(e.what());
+      m_callback.setState(m_rcnode, NSMState::UNKNOWN);
+    }
   }
+  LogFile::info("set %s.used to %d", m_rcnode.getName().c_str(), val);
   return true;
 }

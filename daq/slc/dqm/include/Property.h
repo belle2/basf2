@@ -16,15 +16,18 @@ namespace Belle2 {
 
   public:
     const MonColor& getColor() const throw() { return m_color; }
-    void setColor(int r, int g, int b) throw() {
+    void setColor(int r, int g, int b) throw()
+    {
       m_use_color = true;
       m_color.setRGB(r, g, b);
     }
-    void setColor(const MonColor& color) throw() {
+    void setColor(const MonColor& color) throw()
+    {
       m_use_color = true;
       m_color = color;
     }
-    void setLabel(const std::string& label) throw() {
+    void setLabel(const std::string& label) throw()
+    {
       m_label = label;
     }
 

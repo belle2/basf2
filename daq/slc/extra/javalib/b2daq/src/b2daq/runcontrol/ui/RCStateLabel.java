@@ -110,8 +110,6 @@ public final class RCStateLabel extends Pane {
             set(state.getLabel(), Color.WHITESMOKE, Color.LIGHTGRAY, Color.BLACK);
         } else if (state.equals(RCState.READY_S)) {
             set(state.getLabel(), Color.YELLOW, Color.YELLOW, Color.BLACK);
-        //} else if (state.equals(RCState.CONFIGURED_S)) {
-        //    set(state.getLabel(), Color.rgb(0, 176, 80), Color.rgb(0, 176, 80), Color.BLACK);
         } else if (state.equals(RCState.NOTREADY_S)) {
             set(state.getLabel(), Color.RED, Color.RED, Color.BLACK);
         } else if (state.equals(RCState.RUNNING_S)) {

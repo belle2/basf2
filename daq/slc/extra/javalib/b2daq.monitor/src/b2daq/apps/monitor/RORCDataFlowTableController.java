@@ -83,7 +83,7 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
         }
         try {
             NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.NSMDATASET)) {
+            if (command.equals(NSMCommand.DATASET)) {
                 NSMData data = NSMListenerService.getData(label_nodename.getText()+"_STATUS");
                 ConfigObject cobj = NSMListenerService.getDB(label_nodename.getText());
                 if (cobj == null) {
@@ -128,7 +128,7 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
                     }
                     DataFlow flow = (DataFlow)table_stat.getItems().get(i);
                     if (cobj != null && flow.getNode().isEmpty()) {
-                        flow.setNode(cobj.getObject("node", i).getObject("runtype").getNode());
+                        //flow.setNode(cobj.getObject("node", i).getObject("runtype").getNode());
                     }
                     flow.setLoadavg(cdata.getFloat("loadavg"));
                     flow.setNqueueIn(cdata.getInt("nqueue_in"));

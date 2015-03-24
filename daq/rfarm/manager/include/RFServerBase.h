@@ -26,11 +26,13 @@ namespace Belle2 {
     virtual int Restart(NSMmsg*, NSMcontext*) { return 0; };
     virtual int Status(NSMmsg*, NSMcontext*) { return 0; };
 
-    virtual void SetNodeInfo(RfNodeInfo* ptr) {
+    virtual void SetNodeInfo(RfNodeInfo* ptr)
+    {
       m_nsmmem = ptr;
     };
 
-    virtual RfNodeInfo* GetNodeInfo() {
+    virtual RfNodeInfo* GetNodeInfo()
+    {
       return m_nsmmem;
     };
 

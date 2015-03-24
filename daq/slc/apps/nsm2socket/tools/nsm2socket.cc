@@ -4,7 +4,7 @@
 
 #include <daq/slc/system/TCPServerSocket.h>
 #include <daq/slc/system/PThread.h>
-#include <daq/slc/system/Fork.h>
+#include <daq/slc/system/Process.h>
 #include <daq/slc/system/LogFile.h>
 
 #include <cstdlib>
@@ -16,7 +16,8 @@ namespace Belle2 {
 
   class ProcessMonitor {
   public:
-    void run() {
+    void run()
+    {
       int status;
       wait(&status);
     }
@@ -41,7 +42,7 @@ int main(int argc, char** argv)
     server_socket.open();
     while (true) {
       TCPSocket socket = server_socket.accept();
-      Fork(new NSM2SocketBridge(socket));
+      Process(new NSM2SocketBridge(socket));
       socket.close();
       PThread(new ProcessMonitor());
     }

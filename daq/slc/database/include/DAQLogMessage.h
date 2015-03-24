@@ -13,7 +13,7 @@ namespace Belle2 {
 
   class NSMMessage;
 
-  class DAQLogMessage : public DBObject {
+  class DAQLogMessage {
 
   private:
     static const std::string g_tablename;
@@ -47,10 +47,16 @@ namespace Belle2 {
     LogFile::Priority getPriority() const throw();
     int getPriorityInt() const throw();
     const std::string getPriorityText() const throw();
-    const std::string getNodeName() const throw();
-    const std::string getMessage() const throw();
+    const std::string& getNodeName() const throw();
+    const std::string& getMessage() const throw();
     int getDateInt() const throw();
     const Date getDate() const throw();
+
+  private:
+    int m_date;
+    std::string m_nodename;
+    int m_priority;
+    std::string m_message;
 
   };
 

@@ -16,7 +16,8 @@ namespace Belle2 {
   public:
     XMLElement(const std::string tag = "")
       : m_tag(tag) {}
-    ~XMLElement() throw() {
+    ~XMLElement() throw()
+    {
       for (size_t i = 0; i < m_el_v.size(); i++) {
         delete m_el_v[i];
       }
@@ -25,21 +26,26 @@ namespace Belle2 {
   public:
     void setTag(const std::string& tag) { m_tag = tag; }
     const std::string& getTag() const { return m_tag; }
-    bool hasAttribute(const std::string& name) {
+    bool hasAttribute(const std::string& name)
+    {
       return (m_attr_m.find(name) != m_attr_m.end());
     }
-    void addAttribute(const std::string& name, const std::string& value) {
+    void addAttribute(const std::string& name, const std::string& value)
+    {
       if (hasAttribute(name)) m_attr_m[name] = value;
       else m_attr_m.insert(AttributeList::value_type(name, value));
     }
-    void setAttribute(const std::string& name, const std::string& value) {
+    void setAttribute(const std::string& name, const std::string& value)
+    {
       if (hasAttribute(name)) m_attr_m[name] = value;
       else addAttribute(name, value);
     }
-    const std::string& getAttribute(const std::string& name) {
+    const std::string& getAttribute(const std::string& name)
+    {
       return operator[](name);
     }
-    std::string& operator[](const std::string& name) {
+    std::string& operator[](const std::string& name)
+    {
       if (!hasAttribute(name)) addAttribute(name, "");
       return m_attr_m[name];
     }

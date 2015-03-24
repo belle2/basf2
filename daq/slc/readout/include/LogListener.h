@@ -9,7 +9,8 @@ namespace Belle2 {
 
   public:
     LogListener(ProcessController* con, int pipe[2])
-      : m_con(con) {
+      : m_con(con)
+    {
       m_pipe[0] = pipe[0];
       m_pipe[1] = pipe[1];
     }

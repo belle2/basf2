@@ -80,7 +80,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
             if (cobj != null) {
                 networkconfigController.add(cobj);
             }
-        } else if (command.equals(NSMCommand.NSMDATASET)) {
+        } else if (command.equals(NSMCommand.DATASET)) {
             String dataname = msg.getNodeName();
             NSMData data = NSMListenerService.getData(dataname);
             Tab tab = null;

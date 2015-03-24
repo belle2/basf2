@@ -16,6 +16,7 @@ int main(int argc, char** argv)
     callback->setPriorityToDB(LogFile::getPriority(config.get("log.priority.db")));
     callback->setPriorityToGlobal(LogFile::getPriority(config.get("log.priority.global")));
     callback->setExcludedNodes(StringUtil::split(config.get("node.excluded"), ','));
+    callback->setLogTable(config.get("log.dbtable"));
     RCCallback* callback2 = new RunControlMasterCallback(callback);
     RCNodeDaemon(config, callback, callback2).run();
   }

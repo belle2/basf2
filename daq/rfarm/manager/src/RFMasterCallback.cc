@@ -15,20 +15,40 @@
 
 using namespace Belle2;
 
+RFMasterCallback::RFMasterCallback() throw() : m_callback(NULL)
+{
+  reg(RFCommand::CONFIGURE);
+  reg(RFCommand::UNCONFIGURE);
+  reg(RFCommand::START);
+  reg(RFCommand::STOP);
+  reg(RFCommand::RESUME);
+  reg(RFCommand::PAUSE);
+  reg(RFCommand::RESTART);
+  reg(RFCommand::STATUS);
+}
+
 void RFMasterCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
+  configure(obj);
+}
+
+void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
+{
+  m_nodes = NSMNodeList();
+  m_dataname = StringList();
   if (obj.hasObject("dqmserver")) {
-    m_nodes.push_back(NSMNode(obj.getObject("dqmserver").getText("nodename")));
+    m_nodes.push_back(NSMNode(obj("dqmserver").getText("nodename")));
   }
-  const std::string format = obj.getObject("system").getText("nsmdata");
-  std::string nodename = obj.getObject("distributor").getText("nodename");
+  const std::string format = obj("system").getText("nsmdata");
+  std::string nodename = obj("distributor").getText("nodename");
   m_nodes.push_back(NSMNode(nodename));
-  m_datas.push_back(NSMData(nodename, format, 1));
-  nodename = obj.getObject("collector").getText("nodename");
+  addData(nodename, format);
+  nodename = obj("collector").getText("nodename");
   m_nodes.push_back(NSMNode(nodename));
-  m_datas.push_back(NSMData(nodename, format, 1));
-  const DBObject& processor(obj.getObject("processor"));
+  addData(nodename, format);
+  const DBObject& processor(obj("processor"));
   int maxnodes = processor.getInt("nnodes");
+  add(new NSMVHandlerInt("nnodes", true, false, maxnodes));
   int idbase = processor.getInt("idbase");
   std::string hostbase = processor.getText("nodebase");
   std::string badlist = processor.getText("badlist");
@@ -38,20 +58,19 @@ void RFMasterCallback::initialize(const DBObject& obj) throw(RCHandlerException)
     if (badlist.size() == 0 || StringUtil::find(badlist, idname)) {
       nodename = StringUtil::form("evp_%s%2.2d", hostbase.c_str(), idbase + i);
       m_nodes.push_back(NSMNode(nodename));
-      m_datas.push_back(NSMData(nodename, format, 1));
+      addData(nodename, format);
     }
   }
   m_nodes.push_back(NSMNode(nodename));
-  configure(obj);
-}
-
-void RFMasterCallback::configure(const DBObject&) throw(RCHandlerException)
-{
+  int i = 0;
   for (NSMNodeList::iterator it = m_nodes.begin();
        it != m_nodes.end(); it++) {
     NSMNode& node(*it);
     RCState s(node.getState());
-    std::string vname = StringUtil::tolower(node.getName()) + ".rcstate";
+    std::string vname = StringUtil::form("node[%d].name", i++);
+    add(new NSMVHandlerText(vname, true, false,
+                            StringUtil::tolower(node.getName())));
+    vname = StringUtil::tolower(node.getName()) + ".rcstate";
     add(new NSMVHandlerText(vname, true, false, s.getLabel()));
   }
 }
@@ -63,26 +82,26 @@ void RFMasterCallback::setState(NSMNode& node, const RCState& state)
   set(vname, state.getLabel());
 }
 
-void RFMasterCallback::timeout(NSMCommunicator& com) throw()
+void RFMasterCallback::monitor() throw(RCHandlerException)
 {
   if (!m_callback->getData().isAvailable()) return;
   RfUnitInfo* unitinfo = (RfUnitInfo*)m_callback->getData().get();
-  unitinfo->nnodes = m_datas.size();
+  unitinfo->nnodes = m_dataname.size();
   unitinfo->updatetime = Time().get();
   unitinfo->rcstate = getNode().getState().getId();
-  try {
-    int i = 0;
-    for (NSMDataList::iterator it = m_datas.begin();
-         it != m_datas.end(); it++) {
-      NSMData& data(*it);
-      if (!data.isAvailable()) data.open(com);
+  int i = 0;
+  for (StringList::iterator it = m_dataname.begin();
+       it != m_dataname.end(); it++) {
+    NSMData& data(getData(*it));
+    try {
       if (data.isAvailable()) {
-        RfUnitInfo::RfNodeInfo* nodeinfo_o = &unitinfo->nodeinfo[i++];
+        RfUnitInfo::RfNodeInfo* nodeinfo_o = &unitinfo->nodeinfo[i];
         RfNodeInfo* nodeinfo_i = (RfNodeInfo*)data.get();
         memcpy(nodeinfo_o, nodeinfo_i, sizeof(RfNodeInfo));
       }
-    }
-  } catch (const NSMHandlerException& e) {}
+    } catch (const NSMHandlerException& e) {}
+    i++;
+  }
 }
 
 void RFMasterCallback::ok(const char* nodename, const char* data) throw()
@@ -202,6 +221,58 @@ void RFMasterCallback::recover(const DBObject& obj) throw(RCHandlerException)
   load(obj);
 }
 
+void RFMasterCallback::addData(const std::string& dataname, const std::string& format)
+{
+  openData(dataname, format);
+  int i = (int)m_dataname.size();
+  std::string vname = StringUtil::form("data[%d].name", i);
+  add(new NSMVHandlerText(vname, true, false, StringUtil::tolower(dataname)));
+  vname = StringUtil::form("data[%d].format", i);
+  add(new NSMVHandlerText(vname, true, false, format));
+  m_dataname.push_back(dataname);
+}
 
-
-
+bool RFMasterCallback::perform(NSMCommunicator& com) throw()
+{
+  const NSMMessage msg = com.getMessage();
+  if (RCCallback::perform(com)) {
+    return true;
+  }
+  const RFCommand cmd = msg.getRequestName();
+  try {
+    if (cmd == RFCommand::CONFIGURE) {
+      load(getDBObject());
+      return true;
+    } else if (cmd == RFCommand::UNCONFIGURE) {
+      abort();
+      return true;
+    } else if (cmd == RFCommand::START) {
+      return true;
+    } else if (cmd == RFCommand::STOP) {
+      return true;
+    } else if (cmd == RFCommand::RESTART) {
+      return true;
+    } else if (cmd == RFCommand::PAUSE) {
+      return true;
+    } else if (cmd == RFCommand::RESUME) {
+      return true;
+    } else if (cmd == RFCommand::STATUS) {
+      return true;
+    }
+  } catch (const RCHandlerException& e) {
+    std::string emsg = StringUtil::form("%s. aborting", e.what());
+    LogFile::error(emsg);
+    reply(NSMMessage(NSMCommand::ERROR, emsg));
+    try {
+      RCCallback::setState(RCState::ABORTING_RS);
+      abort();
+      RCCallback::setState(RCState::NOTREADY_S);
+    } catch (const RCHandlerException& e) {
+      std::string emsg = StringUtil::form("Failed to abort : %s", e.what());
+      LogFile::fatal(emsg);
+    }
+  } catch (const std::exception& e) {
+    LogFile::fatal("Unknown exception: %s. terminating process", e.what());
+  }
+  return false;
+}

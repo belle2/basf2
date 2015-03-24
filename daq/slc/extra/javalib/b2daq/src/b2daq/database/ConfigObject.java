@@ -24,11 +24,8 @@ public class ConfigObject extends DBObject {
     public void readObject(Reader reader) throws IOException {
         try {
             reset();
-            setId(reader.readInt());
+            setPath(reader.readString());
             setName(reader.readString());
-            setNode(reader.readString());
-            setTable(reader.readString());
-            setRevision(reader.readInt());
             int npar = reader.readInt();
             for (int i = 0; i < npar; i++) {
                 String name = reader.readString();
@@ -87,11 +84,8 @@ public class ConfigObject extends DBObject {
 
     @Override
     public void writeObject(Writer writer) throws IOException {
-        writer.writeInt(getId());
+        writer.writeString(getPath());
         writer.writeString(getName());
-        writer.writeString(getNode());
-        writer.writeString(getTable());
-        writer.writeInt(getRevision());
         ArrayList<String> name_v = getFieldNames();
         writer.writeInt(name_v.size());
         for (String name : name_v) {

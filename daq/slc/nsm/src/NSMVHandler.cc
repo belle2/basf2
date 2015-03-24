@@ -34,7 +34,7 @@ bool NSMVHandlerInt::handleGet(NSMVar& var)
 
 bool NSMVHandlerInt::handleSet(const NSMVar& var)
 {
-  if (var.getType() == NSMVar::INT && var.getLength() == 0) {
+  if (var.getType() == NSMVar::INT&& var.getLength() == 0) {
     if (handleSetInt(var.getInt())) {
       m_var = var.getInt();
       return true;
@@ -107,7 +107,7 @@ bool NSMVHandlerIntArray::handleGet(NSMVar& var)
 
 bool NSMVHandlerIntArray::handleSet(const NSMVar& var)
 {
-  if (var.getType() == NSMVar::INT && var.getLength() > 0) {
+  if (var.getType() == NSMVar::INT&& var.getLength() > 0) {
     const int* pv = (const int*)var.get();
     std::vector<int> val;
     for (int i = 0; i < var.getLength(); i++) {

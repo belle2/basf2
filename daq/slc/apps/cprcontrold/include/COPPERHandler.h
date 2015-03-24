@@ -9,7 +9,7 @@
     CLASS(COPPERCallback& callback, const std::string& name,     \
           int hslb = -1, int adr = -1, int size = -1)        \
       : NSMVHandlerInt(name, true, false),           \
-      HandlerCPR(callback, hslb, adr, size) {}       \
+        HandlerCPR(callback, hslb, adr, size) {}       \
     virtual ~CLASS() throw() {}              \
     virtual bool handleGetInt(int& val);             \
   }
@@ -20,7 +20,7 @@
     CLASS(COPPERCallback& callback, const std::string& name,     \
           int hslb = -1, int adr = -1, int size = -1)        \
       : NSMVHandlerInt(name, false, true),           \
-      HandlerCPR(callback, hslb, adr, size) {}       \
+        HandlerCPR(callback, hslb, adr, size) {}       \
     virtual ~CLASS() throw() {}              \
     virtual bool handleSetInt(int val);            \
   }
@@ -31,7 +31,7 @@
     CLASS(COPPERCallback& callback, const std::string& name,     \
           int hslb = -1, int adr = -1, int size = -1)        \
       : NSMVHandlerInt(name, true, true),            \
-      HandlerCPR(callback, hslb, adr, size) {}       \
+        HandlerCPR(callback, hslb, adr, size) {}       \
     virtual ~CLASS() throw() {}              \
     virtual bool handleGetInt(int& val);             \
     virtual bool handleSetInt(int val);            \
@@ -43,7 +43,7 @@
     CLASS(COPPERCallback& callback, const std::string& name,     \
           int hslb, const std::string& str)        \
       : NSMVHandlerText(name, true, true, str),       \
-      HandlerCPR(callback, hslb, -1, -1) {}       \
+        HandlerCPR(callback, hslb, -1, -1) {}       \
     virtual ~CLASS() throw() {}              \
     virtual bool handleSetText(const std::string& val); \
   }

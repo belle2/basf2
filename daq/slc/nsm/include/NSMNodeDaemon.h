@@ -13,7 +13,8 @@ namespace Belle2 {
                   const std::string host1, int port1,
                   NSMCallback* callback2 = NULL,
                   const std::string host2 = "", int port2 = 0)
-      : m_timeout(0) {
+      : m_timeout(0)
+    {
       add(callback1, host1, port1);
       add(callback2, host2, port2);
     }

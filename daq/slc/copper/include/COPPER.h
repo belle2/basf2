@@ -19,14 +19,16 @@ namespace Belle2 {
     int read(int request) throw(IOException);
     copper_info& monitor() throw(IOException);
     void print() throw();
-    const copper_info& getInfo() const throw() {
+    const copper_info& getInfo() const throw()
+    {
       return m_info;
     }
     bool isOpened() throw() { return m_fd > 0; }
     bool isFifoFull() throw();
     bool isFifoEmpty() throw();
     bool isLengthFifoFull() throw();
-    bool isError() throw() {
+    bool isError() throw()
+    {
       return isFifoFull() || isLengthFifoFull();
     }
 

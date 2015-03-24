@@ -9,12 +9,14 @@ namespace Belle2 {
   public:
     NSMTemplateVHandler(const std::string& name, const std::string& val)
       : NSMVHandlerText(name, true, true, val) {}
-    bool handleGetText(std::string& val) {
+    bool handleGetText(std::string& val)
+    {
       NSMVHandlerText::handleGetText(val);
       LogFile::info("%s is read : %s", getName().c_str(), val.c_str());
       return true;
     }
-    bool handleSetText(const std::string& val) {
+    bool handleSetText(const std::string& val)
+    {
       LogFile::info("%s is written : %s", getName().c_str(), val.c_str());
       return NSMVHandlerText::handleSetText(val);
     }
@@ -36,7 +38,7 @@ NSMTemplateCallback::~NSMTemplateCallback() throw()
 
 void NSMTemplateCallback::init(NSMCommunicator&) throw()
 {
-  add(new NSMVHandlerInt("ival", true, true, 10));
+  add(new NSMVHandlerInt("ival", true, false, 10));
   add(new NSMVHandlerFloat("fval", true, true, 0.1));
   add(new NSMTemplateVHandler("tval", "example"));
 }

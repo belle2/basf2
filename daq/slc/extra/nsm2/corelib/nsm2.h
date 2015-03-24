@@ -143,13 +143,13 @@ typedef struct NSMcontext_struct NSMcontext;
 
 /* NSMmsg (in host byte order) */
 typedef struct {
-uint16_t req;
-uint16_t seq;
-int16_t  node; /* source/destination nodeid, or (-1) if not an NSM client */
-uint8_t  npar;
-uint16_t len;
-int32_t  pars[256]; /* signed */
-const char* datap;
+  uint16_t req;
+  uint16_t seq;
+  int16_t  node; /* source/destination nodeid, or (-1) if not an NSM client */
+  uint8_t  npar;
+  uint16_t len;
+  int32_t  pars[256]; /* signed */
+  const char* datap;
 } NSMmsg;
 
 typedef void (*NSMcallback_t)(NSMmsg* msg, NSMcontext* nsmc);

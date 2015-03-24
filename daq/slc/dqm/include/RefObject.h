@@ -17,7 +17,8 @@ namespace Belle2 {
     virtual ~RefObject() throw() {}
 
   public:
-    void setObject(Histo* histo) throw() {
+    void setObject(Histo* histo) throw()
+    {
       m_histo = histo;
     }
     virtual std::string getTag() const throw() { return ELEMENT_TAG; }

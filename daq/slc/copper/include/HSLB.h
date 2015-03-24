@@ -55,7 +55,8 @@ namespace Belle2 {
 
   public:
     bool boot(const std::string& firmware) throw();
-    const std::string getErrMessage() {
+    const std::string getErrMessage()
+    {
       return m_errmsg;
     }
 

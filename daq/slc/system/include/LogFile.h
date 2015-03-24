@@ -46,7 +46,8 @@ namespace Belle2 {
     static void error(const std::string& msg, ...);
     static void fatal(const std::string& msg, ...);
     static void put(Priority priority, const std::string& msg, ...);
-    static void setStdErr(bool stderr) {
+    static void setStdErr(bool stderr)
+    {
       g_stderr = stderr;
     }
 

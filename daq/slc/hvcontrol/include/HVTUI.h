@@ -20,7 +20,8 @@ namespace Belle2 {
 
   public:
     void run();
-    void addChannel(int crate, int slot, int ch) {
+    void addChannel(int crate, int slot, int ch)
+    {
       Raw raw;
       raw.crate = crate;
       raw.slot = slot;

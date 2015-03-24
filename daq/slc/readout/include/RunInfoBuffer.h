@@ -31,7 +31,8 @@ namespace Belle2 {
     };
 
   public:
-    RunInfoBuffer() {
+    RunInfoBuffer()
+    {
       m_info = NULL;
     }
     ~RunInfoBuffer() {}

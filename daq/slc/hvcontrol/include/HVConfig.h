@@ -13,7 +13,8 @@ namespace Belle2 {
   public:
     HVConfig() throw() { reset(); }
     HVConfig(DBObject& obj) throw() { set(obj); }
-    HVConfig(const HVConfig& config) throw() {
+    HVConfig(const HVConfig& config) throw()
+    {
       set(config.m_obj);
       m_crate_v = config.m_crate_v;
     }

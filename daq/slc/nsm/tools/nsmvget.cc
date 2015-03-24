@@ -18,13 +18,15 @@ namespace Belle2 {
 
   public:
     NSMVGETCallback(const NSMNode& node, int argc, char** argv)
-      : NSMCallback(5), m_argc(argc), m_argv(argv) {
+      : NSMCallback(5), m_argc(argc), m_argv(argv)
+    {
       setNode(node);
     }
     virtual ~NSMVGETCallback() throw() {}
 
   public:
-    virtual void init(NSMCommunicator&) throw() {
+    virtual void init(NSMCommunicator&) throw()
+    {
       try {
         NSMNode node(m_argv[2]);
         NSMCommunicator::connected(node.getName());

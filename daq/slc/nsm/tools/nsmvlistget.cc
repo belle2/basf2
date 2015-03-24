@@ -18,13 +18,15 @@ namespace Belle2 {
 
   public:
     NSMVLISTGETCallback(const NSMNode& node, int argc, char** argv)
-      : NSMCallback(5), m_argc(argc), m_argv(argv) {
+      : NSMCallback(5), m_argc(argc), m_argv(argv)
+    {
       setNode(node);
     }
     virtual ~NSMVLISTGETCallback() throw() {}
 
   public:
-    virtual void init(NSMCommunicator&) throw() {
+    virtual void init(NSMCommunicator&) throw()
+    {
       NSMNode node(m_argv[2]);
       try {
         NSMCommunicator::connected(node.getName());
@@ -34,11 +36,13 @@ namespace Belle2 {
       }
       NSMCommunicator::send(NSMMessage(node, NSMCommand::VLISTGET));
     }
-    virtual void timeout(NSMCommunicator&) throw() {
+    virtual void timeout(NSMCommunicator&) throw()
+    {
       printf("timeout\n");
       exit(1);
     }
-    virtual void vlistset(NSMCommunicator& com) throw() {
+    virtual void vlistset(NSMCommunicator& com) throw()
+    {
       NSMCallback::vlistset(com);
       exit(1);
     }

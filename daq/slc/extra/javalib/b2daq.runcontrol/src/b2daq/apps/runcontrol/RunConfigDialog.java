@@ -145,7 +145,7 @@ public class RunConfigDialog extends VBox {
         Scene scene = new Scene(dialog);
         Stage stage = new Stage(StageStyle.UTILITY);
         stage.setScene(scene);
-        if (pscene == null) {
+        if (pscene != null) {
             stage.initOwner(pscene.getWindow());
         }
         stage.initModality(Modality.WINDOW_MODAL);

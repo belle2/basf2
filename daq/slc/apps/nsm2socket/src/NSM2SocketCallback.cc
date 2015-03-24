@@ -2,9 +2,6 @@
 
 #include "daq/slc/apps/nsm2socket/NSM2SocketBridge.h"
 
-#include <daq/slc/runcontrol/RCCommand.h>
-#include <daq/slc/hvcontrol/HVCommand.h>
-
 #include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/system/LogFile.h>
@@ -17,20 +14,6 @@ NSM2SocketCallback::NSM2SocketCallback(const NSMNode& node)
 throw() : NSMCallback(1)
 {
   setNode(node);
-  reg(RCCommand::CONFIGURE);
-  reg(RCCommand::LOAD);
-  reg(RCCommand::START);
-  reg(RCCommand::STOP);
-  reg(RCCommand::RECOVER);
-  reg(RCCommand::RESUME);
-  reg(RCCommand::PAUSE);
-  reg(RCCommand::ABORT);
-  reg(HVCommand::CONFIGURE);
-  reg(HVCommand::STANDBY);
-  reg(HVCommand::SHOULDER);
-  reg(HVCommand::PEAK);
-  reg(HVCommand::TURNON);
-  reg(HVCommand::TURNOFF);
   setTimeout(1);
 }
 
@@ -40,6 +23,8 @@ bool NSM2SocketCallback::perform(NSMCommunicator& com) throw()
   NSMCommand cmd(msg.getRequestName());
   if (cmd == NSMCommand::VSET) {
     NSMCallback::perform(com);
+  } else if (cmd == NSMCommand::LOG) {
+    m_bridge->send(msg);
   } else {
     m_bridge->send(msg);
   }
@@ -48,7 +33,6 @@ bool NSM2SocketCallback::perform(NSMCommunicator& com) throw()
 
 void NSM2SocketCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 {
-  LogFile::debug("NSM2SocketCallback::%s %s", var.getNode().c_str(), var.getName().c_str());
   NSMMessage& msg(com.getMessage());
   NSMNode node(msg.getNodeName());
   m_bridge->send(NSMMessage(node, NSMCommand::VSET), var);

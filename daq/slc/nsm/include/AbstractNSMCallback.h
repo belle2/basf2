@@ -94,8 +94,10 @@ namespace Belle2 {
   private:
     template<typename T>
     bool get_t(const NSMNode& node, const std::string& name,
-               T& val, int timeout, NSMVar::Type type = NSMVar::NONE, int len = 0) throw(IOException) {
+               T& val, int timeout, NSMVar::Type type = NSMVar::NONE, int len = 0) throw(IOException)
+    {
       NSMVar var(name);
+      var.setNode(node.getName());
       if (get(node, var, timeout)) {
         if (type == NSMVar::NONE ||
             (type == var.getType() &&
@@ -108,11 +110,13 @@ namespace Belle2 {
       return false;
     }
     template<typename T>
-    bool get_t(const std::string& node, const std::string& name, T& val) {
+    bool get_t(const std::string& node, const std::string& name, T& val)
+    {
       for (size_t i = 0; i < m_handler.size(); i++) {
         if (node == m_handler[i]->getNode() &&
             name == m_handler[i]->getName()) {
-          const NSMVar& var(m_handler[i]->get());
+          NSMVar var;
+          m_handler[i]->handleGet(var);
           var >> val;
           return true;
         }
@@ -120,7 +124,8 @@ namespace Belle2 {
       return false;
     }
     template<typename T>
-    bool set_t(const std::string& node, const std::string& name, const T& val) {
+    bool set_t(const std::string& node, const std::string& name, const T& val)
+    {
       for (size_t i = 0; i < m_handler.size(); i++) {
         if (node == m_handler[i]->getNode() &&
             name == m_handler[i]->getName()) {

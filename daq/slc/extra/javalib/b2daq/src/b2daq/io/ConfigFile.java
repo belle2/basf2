@@ -53,9 +53,9 @@ public final class ConfigFile {
 
     public void add(String name, String value) {
         if (_dir.length() > 0) {
-           _map.put(_dir+"."+name, value);
+            _map.put(_dir + "." + name, value);
         } else {
-           _map.put(name, value);
+            _map.put(name, value);
         }
     }
 
@@ -216,7 +216,7 @@ public final class ConfigFile {
         Iterator<String> iter = _map.keySet().iterator();
         StringBuilder ss = new StringBuilder();
         if (promptMessage.length() > 0) {
-            ss.append("#\n# ").append(promptMessage.replace("\n","\n# ")).append("\n#\n");
+            ss.append("#\n# ").append(promptMessage.replace("\n", "\n# ")).append("\n#\n");
         }
         ss.append("\n");
         while (iter.hasNext()) {

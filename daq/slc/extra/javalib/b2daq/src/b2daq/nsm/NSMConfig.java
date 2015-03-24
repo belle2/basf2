@@ -16,10 +16,10 @@ public class NSMConfig  {
 
     private final SimpleStringProperty hostname = new SimpleStringProperty();
     private final SimpleIntegerProperty port = new SimpleIntegerProperty();
-    private final SimpleStringProperty nsmNode = new SimpleStringProperty();
+    private final SimpleStringProperty guiNode = new SimpleStringProperty();
     private final SimpleStringProperty nsmHost = new SimpleStringProperty();
     private final SimpleIntegerProperty nsmPort = new SimpleIntegerProperty();
-    private final SimpleStringProperty nsmTarget = new SimpleStringProperty();
+    private final SimpleStringProperty nsmNode = new SimpleStringProperty();
 
     public SimpleStringProperty hostnameProperty() {
         return hostname;
@@ -29,8 +29,8 @@ public class NSMConfig  {
         return port;
     }
 
-    public SimpleStringProperty nsmNodeProperty() {
-        return nsmNode;
+    public SimpleStringProperty guiNodeProperty() {
+        return guiNode;
     }
 
     public SimpleStringProperty nsmHostProperty() {
@@ -41,8 +41,8 @@ public class NSMConfig  {
         return nsmPort;
     }
 
-    public SimpleStringProperty nsmTargetProperty() {
-        return nsmTarget;
+    public SimpleStringProperty nsmNodeProperty() {
+        return nsmNode;
     }
 
     public String getHostname() {
@@ -53,8 +53,8 @@ public class NSMConfig  {
         return port.get();
     }
 
-    public String getNsmNode() {
-        return nsmNode.get();
+    public String getGuiNode() {
+        return guiNode.get().toUpperCase();
     }
 
     public String getNsmHost() {
@@ -65,8 +65,8 @@ public class NSMConfig  {
         return nsmPort.get();
     }
 
-    public String getNsmTarget() {
-        return nsmTarget.get();
+    public String getNsmNode() {
+        return nsmNode.get().toUpperCase();
     }
 
     public void setHostname(String hostname) {
@@ -77,8 +77,8 @@ public class NSMConfig  {
         this.port.set(port);
     }
 
-    public void setNsmNode(String nsmNode) {
-        this.nsmNode.set(nsmNode);
+    public void setGuimNode(String nsmNode) {
+        this.guiNode.set(nsmNode);
     }
 
     public void setNsmHost(String nsmHost) {
@@ -89,8 +89,8 @@ public class NSMConfig  {
         this.nsmPort.set(nsmPort);
     }
 
-    public void setNsmTarget(String nsmNode) {
-        this.nsmTarget.set(nsmNode);
+    public void setNsmNode(String nsmNode) {
+        this.nsmNode.set(nsmNode);
     }
 
 }

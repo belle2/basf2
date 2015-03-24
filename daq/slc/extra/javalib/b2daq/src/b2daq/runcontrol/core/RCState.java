@@ -52,9 +52,15 @@ public class RCState extends NSMState {
         super(state.getId(), state.getLabel());
     }
 
+    public RCState(String state) {
+        copy(state);
+    }
+
     @Override
     public void copy(String label) {
-        if (label.equals(NOTREADY_S.getLabel())) {
+        if (label.equals(OFF_S.getLabel())) {
+            copy(OFF_S);
+        } else if (label.equals(NOTREADY_S.getLabel())) {
             copy(NOTREADY_S);
         } else if (label.equals(READY_S.getLabel())) {
             copy(READY_S);
@@ -97,7 +103,9 @@ public class RCState extends NSMState {
 
     @Override
     public void copy(int id) {
-        if (id == NOTREADY_S._id) {
+        if (id == OFF_S._id) {
+            copy(OFF_S);
+        } else if (id == NOTREADY_S._id) {
             copy(NOTREADY_S);
         } else if (id == READY_S._id) {
             copy(READY_S);

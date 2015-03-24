@@ -30,7 +30,8 @@ namespace Belle2 {
     void setSubNumber(int subno) throw() { m_subno = subno; }
     void setStart(bool isstart) throw() { m_isstart = isstart; }
     void setId(int id) throw() { m_id = id; }
-    void setRecordTime(long long record_time) throw() {
+    void setRecordTime(long long record_time) throw()
+    {
       m_record_time = record_time;
     }
 

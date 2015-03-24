@@ -47,6 +47,10 @@ public class NSMState extends Enum {
         super(id, label);
     }
 
+    protected NSMState(String label) {
+        copy(label);
+    }
+
     public NSMState(NSMState state) {
         super(state.getId(), state.getLabel());
     }

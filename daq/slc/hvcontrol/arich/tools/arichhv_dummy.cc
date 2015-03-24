@@ -36,7 +36,8 @@ namespace Belle2 {
     Monitor(int max_unit, int interval, ArichHVCommunicator& comm)
       : m_max_unit(max_unit), m_interval(interval), m_comm(comm) {}
     ~Monitor() throw() {}
-    void run() {
+    void run()
+    {
       while (true) {
         for (int i = 0; i < m_comm.getNUnits(); i++) {
           ArichHVUnit& unit(m_comm.getUnit(i));
@@ -84,7 +85,8 @@ namespace Belle2 {
     Brigde(int max_unit, TCPSocket& socket, ArichHVCommunicator& comm)
       : m_max_unit(max_unit), m_socket(socket), m_comm(comm) {}
     ~Brigde() throw() {}
-    void run() {
+    void run()
+    {
       TCPSocketWriter writer(m_socket);
       TCPSocketReader reader(m_socket);
       while (true) {

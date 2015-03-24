@@ -32,14 +32,14 @@ void ProcessController::clear()
 bool ProcessController::load(int timeout)
 {
   m_info.clear();
-  m_fork.cancel();
-  m_fork.kill(SIGQUIT);
+  m_process.cancel();
+  m_process.kill(SIGQUIT);
   int iopipe[2];
   if (pipe(iopipe) < 0) {
     perror("pipe");
     return false;
   }
-  m_fork = Fork(new ProcessSubmitter(this, iopipe));
+  m_process = Process(new ProcessSubmitter(this, iopipe));
   PThread(new LogListener(this, iopipe));
   PThread(new ProcessListener(this));
   close(iopipe[1]);
@@ -74,11 +74,11 @@ bool ProcessController::stop()
 bool ProcessController::abort()
 {
   m_info.clear();
-  m_fork.kill(SIGINT);
+  m_process.kill(SIGINT);
   if (getExecutable() == "basf2") {
     usleep(10000);
-    m_fork.kill(SIGQUIT);
-    m_fork.kill(SIGKILL);
+    m_process.kill(SIGQUIT);
+    m_process.kill(SIGKILL);
   }
   return true;
 }

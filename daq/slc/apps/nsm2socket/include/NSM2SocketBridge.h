@@ -34,14 +34,16 @@ namespace Belle2 {
               const Serializable& obj) throw();
 
   protected:
-    void dbget(const std::string& table,
-               const std::string& config,
-               const NSMNode& node);
+    void dbget(const std::string& table, const std::string& config,
+               const NSMNode& node, bool isfull);
     void dblistget(const std::string& table,
                    const NSMNode& node, const std::string& grep);
     void dbset(const std::string& table, const DBObject& obj);
     void nsmdataget(int revision, const std::string& name,
                     const std::string& format);
+    void loglist(const std::string& table,
+                 const NSMNode& node, int max);
+
     DBInterface& getDB() { return *m_db; }
 
   private:

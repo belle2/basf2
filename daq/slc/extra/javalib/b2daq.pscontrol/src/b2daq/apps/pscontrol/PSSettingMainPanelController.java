@@ -5,12 +5,9 @@
  */
 package b2daq.apps.pscontrol;
 
-import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMCommand;
-import b2daq.nsm.NSMListenerService;
-import b2daq.nsm.NSMMessage;
+import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMNode;
-import b2daq.nsm.NSMObserver;
+import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
 import java.io.IOException;
 import java.net.URL;
@@ -29,12 +26,12 @@ import javafx.scene.control.TabPane;
  *
  * @author tkonno
  */
-public class PSSettingMainPanelController implements NSMObserver {
+public class PSSettingMainPanelController {
 
     @FXML
     TabPane tabpane;
 
-    private NSMNode m_node;
+    private NSMNode m_hvnode;
 
     private final ArrayList<PSCrateSettingPanelController> crate = new ArrayList();
 
@@ -57,14 +54,66 @@ public class PSSettingMainPanelController implements NSMObserver {
         }
     }
 
-    public void requestUpdate() {
-        for (PSCrateSettingPanelController c : crate) {
-            c.requestUpdate();
-        }
+    public NSMNode getNode()  {
+        return m_hvnode;
+    }
+    
+    public void setNode(NSMNode node) throws IOException {
+        m_hvnode = node;
+        NSMCommunicator.get().add(new NSMVSetHandler(true, m_hvnode.getName(), "ncrates", NSMVar.INT) {
+            @Override
+            public boolean handleVSet(NSMVar var) {
+                System.out.println(m_node+" " + var.getName());
+                int ncrates = var.getInt();
+                for (int i = 0; i < ncrates; i++) {
+                    try {
+                        URL location = getClass().getResource("PSCrateSettingPanel.fxml");
+                        FXMLLoader loader = new FXMLLoader();
+                        loader.setLocation(location);
+                        loader.setBuilderFactory(new JavaFXBuilderFactory());
+                        Parent root = (Parent) loader.load(location.openStream());
+                        PSCrateSettingPanelController controller
+                                = ((PSCrateSettingPanelController) loader.getController());
+                        Tab tab = new Tab();
+                        tab.setText("crate:" + i);
+                        tab.setContent(root);
+                        tab.setClosable(false);
+                        tabpane.getTabs().add(tab);
+                        controller.setCrateId(i + 1);
+                        controller.setNode(m_hvnode);
+                        crate.add(controller);
+                    } catch (IOException ex) {
+                        Logger.getLogger(PSSettingMainPanelController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                int i = 1;
+                for (Tab tab : tabpane.getTabs()) {
+                    NSMCommunicator.get().add(new CrateNameHandler(m_node, "crate[" + i + "].name", tab, crate.get(i-1)));
+                    i++;
+                }
+                return true;
+            }
+        });
     }
 
-    public void setNode(NSMNode node) {
-        m_node = node;
+    private class CrateNameHandler extends NSMVSetHandler {
+
+        private final Tab m_tab;
+        private final PSCrateSettingPanelController m_crate;
+
+        public CrateNameHandler(String node, String name, Tab tab, PSCrateSettingPanelController crate) {
+            super(true, node, name, NSMVar.TEXT);
+            m_tab = tab;
+            m_crate = crate;
+        }
+
+        @Override
+        public boolean handleVSet(NSMVar var) {
+            m_tab.setText(var.getText());
+            m_crate.setName(var.getText());
+            return true;
+        }
+
     }
 
     public ArrayList<PSCrateSettingPanelController> getCrates() {
@@ -78,95 +127,6 @@ public class PSSettingMainPanelController implements NSMObserver {
             }
         }
         return null;
-    }
-
-    @Override
-    public void handleOnConnected() {
-        NSMListenerService.requestVGet(m_node.getName(), "ncrates");
-        /*
-         Timeline timer = new Timeline(new KeyFrame(Duration.millis(3000), new EventHandler<ActionEvent>() {
-
-         @Override
-         public void handle(ActionEvent event) {
-         requestUpdate();
-         }
-
-         }));
-         timer.setCycleCount(Timeline.INDEFINITE);
-         timer.play();
-         */
-        requestUpdate();
-    }
-
-    @Override
-    public void handleOnReceived(NSMMessage msg) {
-        NSMCommand cmd = new NSMCommand(msg.getReqName());
-        if (cmd.equals(NSMCommand.VSET)) {
-            NSMVar var = (NSMVar) msg.getObject();
-            switch (var.getType()) {
-                case NSMVar.INT:
-                    if (var.getName().contains("ncrates")) {
-                        try {
-                            int ncrates = var.getInt();
-                            for (int i = 0; i < ncrates; i++) {
-                                URL location = getClass().getResource("PSCrateSettingPanel.fxml");
-                                FXMLLoader loader = new FXMLLoader();
-                                loader.setLocation(location);
-                                loader.setBuilderFactory(new JavaFXBuilderFactory());
-                                Parent root = (Parent) loader.load(location.openStream());
-                                PSCrateSettingPanelController controller
-                                        = ((PSCrateSettingPanelController) loader.getController());
-                                Tab tab = new Tab();
-                                tab.setText("crate:" + i);
-                                tab.setContent(root);
-                                tab.setClosable(false);
-                                tabpane.getTabs().add(tab);
-                                controller.setNode(m_node);
-                                controller.setCrateId(i + 1);
-                                controller.handleOnConnected();
-                                crate.add(controller);
-
-                            }
-                        } catch (IOException ex) {
-                            Logger.getLogger(PSCrateSettingPanelController.class
-                                    .getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                    }
-                    for (PSCrateSettingPanelController c : crate) {
-                        c.handleOnReceived(msg);
-                    }
-                    break;
-                case NSMVar.FLOAT:
-                    for (PSCrateSettingPanelController c : crate) {
-                        c.handleOnReceived(msg);
-                    }
-                    break;
-                case NSMVar.TEXT: {
-                    int i = 1;
-                    for (Tab tab : tabpane.getTabs()) {
-                        if (var.getName().equals("crate[" + i + "].name")) {
-                            tab.setText(var.getText());
-                            crate.get(i - 1).setName(var.getText());
-                            return;
-                        }
-                        i++;
-                    }
-                    for (PSCrateSettingPanelController c : crate) {
-                        c.handleOnReceived(msg);
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void handleOnDisConnected() {
-    }
-
-    @Override
-    public void log(LogMessage log) {
     }
 
 }

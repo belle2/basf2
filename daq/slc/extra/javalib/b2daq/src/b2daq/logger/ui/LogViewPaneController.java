@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package b2daq.logger.ui;
 
 import b2daq.logger.core.LogMessage;
@@ -42,30 +41,29 @@ public class LogViewPaneController implements Initializable {
     private TableColumn col_date;
     @FXML
     private TableColumn col_message;
-    
+
     private final ObservableList<LogMessage> data = FXCollections.observableArrayList();
 
     public void add(LogMessage log) {
         data.add(log);
     }
-    
+
     public void add(String log) {
         data.add(new LogMessage("LOCAL", LogLevel.DEBUG, log));
     }
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         table.setItems(data);
-        col_from.setCellValueFactory(
-                new PropertyValueFactory<>("from"));
-        col_level.setCellValueFactory(
-                new PropertyValueFactory<>("level"));
+        col_from.setCellValueFactory(new PropertyValueFactory<>("from"));
+        col_level.setCellValueFactory(new PropertyValueFactory<>("level"));
         col_level.setComparator(new Comparator<LogLevel>() {
             @Override
             public int compare(LogLevel t, LogLevel t1) {
-                return t.hiegher(t1)?1:0;
+                return t.hiegher(t1) ? 1 : 0;
             }
         });
         col_level.setCellFactory(new Callback<TableColumn<LogMessage, LogLevel>, TableCell<LogMessage, LogLevel>>() {
@@ -73,6 +71,7 @@ public class LogViewPaneController implements Initializable {
             public TableCell<LogMessage, LogLevel> call(TableColumn<LogMessage, LogLevel> param) {
                 return new TableCell<LogMessage, LogLevel>() {
                     private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+
                     @Override
                     protected void updateItem(LogLevel item, boolean empty) {
                         super.updateItem(item, empty);
@@ -85,8 +84,7 @@ public class LogViewPaneController implements Initializable {
                 };
             }
         });
-        col_date.setCellValueFactory(
-                new PropertyValueFactory<>("date"));
+        col_date.setCellValueFactory(new PropertyValueFactory<>("date"));
         col_date.setComparator(new Comparator<Date>() {
             @Override
             public int compare(Date t, Date t1) {
@@ -98,6 +96,7 @@ public class LogViewPaneController implements Initializable {
             public TableCell<LogMessage, Date> call(TableColumn<LogMessage, Date> param) {
                 return new TableCell<LogMessage, Date>() {
                     private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+
                     @Override
                     protected void updateItem(Date item, boolean empty) {
                         super.updateItem(item, empty);
@@ -110,8 +109,7 @@ public class LogViewPaneController implements Initializable {
                 };
             }
         });
-        col_message.setCellValueFactory(
-                new PropertyValueFactory<>("message"));
+        col_message.setCellValueFactory(new PropertyValueFactory<>("message"));
         table.getItems().addListener((ListChangeListener<LogMessage>) (c -> {
             c.next();
             final int size = table.getItems().size();
@@ -149,6 +147,6 @@ public class LogViewPaneController implements Initializable {
                 return row;
             }
         });
-    }    
-    
+    }
+
 }

@@ -8,8 +8,8 @@ namespace Belle2 {
   class RCHandlerException : public NSMHandlerException {
 
   public:
-    RCHandlerException(const std::string& comment, ...) throw();
-    RCHandlerException(int err, const std::string& comment, ...) throw();
+    RCHandlerException(const std::string& comment = "") throw();
+    RCHandlerException(const char* comment, ...) throw();
     ~RCHandlerException() throw() {}
 
   };

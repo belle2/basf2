@@ -11,21 +11,20 @@ const int DAQLogMessage::g_revision = 1;
 
 DAQLogMessage::DAQLogMessage() throw()
 {
-  addInt("date", Date().get());
-  addText("nodename", "");
-  addChar("priority", 0);
-  addText("message", "");
+  m_date = Date().get();
+  m_nodename = "";
+  m_priority = 0;
+  m_message = "";
 }
 
 DAQLogMessage::DAQLogMessage(const std::string& nodename,
                              LogFile::Priority priority,
                              const std::string& message) throw()
 {
-  addInt("date", Date().get());
-  addText("nodename", nodename);
-  addChar("priority", 0);
-  setPriority(priority);
-  addText("message", message);
+  m_date = Date().get();
+  m_nodename = nodename;
+  m_priority = (int)priority;
+  m_message = message;
 }
 
 DAQLogMessage::DAQLogMessage(const std::string& nodename,
@@ -33,20 +32,18 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
                              const std::string& message,
                              const Date& date) throw()
 {
-  addInt("date", date.get());
-  addText("nodename", nodename);
-  addChar("priority", 0);
-  setPriority(priority);
-  addText("message", message);
+  m_date = date.get();
+  m_nodename = nodename;
+  m_priority = (int)priority;
+  m_message = message;
 }
 
 DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()
-  : DBObject(log)
 {
-  addInt("date", 0);
-  addText("nodename", "");
-  addChar("priority", 0);
-  addText("message", "");
+  m_date = log.getDateInt();
+  m_nodename = log.getNodeName();
+  m_priority = log.getPriorityInt();
+  m_message = log.getMessage();
 }
 
 bool DAQLogMessage::read(const NSMMessage& msg) throw()
@@ -54,8 +51,13 @@ bool DAQLogMessage::read(const NSMMessage& msg) throw()
   if (msg.getLength() > 0 && msg.getNParams() > 2) {
     setPriority((LogFile::Priority)msg.getParam(0));
     setDate(msg.getParam(1));
-    setNodeName(msg.getNodeName());
-    setMessage(msg.getData());
+    StringList s = StringUtil::split(msg.getData(), '\n');
+    if (s[0].size() == 0) {
+      setNodeName(msg.getNodeName());
+    } else {
+      setNodeName(s[0]);
+    }
+    setMessage(StringUtil::join(s, "<br/>", 1));
     return true;
   }
   return false;
@@ -63,17 +65,17 @@ bool DAQLogMessage::read(const NSMMessage& msg) throw()
 
 void DAQLogMessage::setPriority(LogFile::Priority priority) throw()
 {
-  setChar("priority", (char)priority);
+  m_priority = (int)priority;
 }
 
 void DAQLogMessage::setNodeName(const std::string& name) throw()
 {
-  setText("nodename", name);
+  m_nodename = name;
 }
 
 void DAQLogMessage::setMessage(const std::string& message) throw()
 {
-  setText("message", message);
+  m_message = message;
 }
 
 void DAQLogMessage::setDate() throw()
@@ -83,41 +85,55 @@ void DAQLogMessage::setDate() throw()
 
 void DAQLogMessage::setDate(int date) throw()
 {
-  setInt("date", date);
+  m_date = date;
 }
 
 void DAQLogMessage::setDate(const Date& date) throw()
 {
-  setDate(date.get());
+  m_date = date.get();
 }
 
 LogFile::Priority DAQLogMessage::getPriority() const throw()
 {
-  return (LogFile::Priority) getChar("priority");
+  return (LogFile::Priority) m_priority;
 }
 
 int DAQLogMessage::getPriorityInt() const throw()
 {
-  return getChar("priority");
+  return m_priority;
 }
 
-const std::string DAQLogMessage::getNodeName() const throw()
+const std::string& DAQLogMessage::getNodeName() const throw()
 {
-  return getText("nodename");
+  return m_nodename;
 }
 
-const std::string DAQLogMessage::getMessage() const throw()
+const std::string& DAQLogMessage::getMessage() const throw()
 {
-  return getText("message");
+  return m_message;
 }
 
 int DAQLogMessage::getDateInt() const throw()
 {
-  return getInt("date");
+  return m_date;
 }
 
 const Date DAQLogMessage::getDate() const throw()
 {
-  return Date(getInt("date"));
+  return Date(m_date);
 }
 
+const std::string DAQLogMessage::getPriorityText() const throw()
+{
+  switch (getPriority()) {
+    case LogFile::DEBUG:   return "DEBUG";
+    case LogFile::INFO:    return "INFO";
+    case LogFile::NOTICE:  return "NOTICE";
+    case LogFile::WARNING: return "WARNING";
+    case LogFile::ERROR: return "ERROR";
+    case LogFile::FATAL: return "FATAL";
+    default:
+      break;
+  }
+  return "UNKNOWN";
+}

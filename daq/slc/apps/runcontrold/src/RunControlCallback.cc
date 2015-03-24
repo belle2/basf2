@@ -4,6 +4,7 @@
 
 #include <daq/slc/database/DBInterface.h>
 #include <daq/slc/database/DBObjectLoader.h>
+#include <daq/slc/database/DAQLogDB.h>
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 
@@ -13,9 +14,6 @@
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/Date.h>
 
-#include <cstring>
-#include <cstdlib>
-#include <unistd.h>
 #include <algorithm>
 
 using namespace Belle2;
@@ -41,6 +39,7 @@ void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerExceptio
   if (!addAll(obj)) {
     throw (RCHandlerException("Failed to initialize (config=%s)", obj.getName().c_str()));
   }
+  distribute_r(NSMMessage(RCCommand::ABORT));
 }
 
 void RunControlCallback::configure(const DBObject& obj) throw(RCHandlerException)
@@ -52,12 +51,25 @@ void RunControlCallback::configure(const DBObject& obj) throw(RCHandlerException
   }
 }
 
-void RunControlCallback::setState(NSMNode& node, const RCState& state)
-throw()
+void RunControlCallback::setState(NSMNode& node, const RCState& state) throw()
 {
   node.setState(state);
   std::string vname = StringUtil::tolower(node.getName()) + ".rcstate";
   set(vname, state.getLabel());
+}
+
+void RunControlCallback::setConfig(RCNode& node, const std::string& config) throw()
+{
+  node.setConfig(config);
+  DBObjectList& objs(getDBObject().getObjects("node"));
+  for (DBObjectList::iterator it = objs.begin(); it != objs.end(); it++) {
+    DBObject& o_node(*it);
+    if (node.getName() == o_node.getText("name")) {
+      if (o_node.hasObject("rcconfig")) {
+        o_node("rcconfig").setPath(config);
+      }
+    }
+  }
 }
 
 void RunControlCallback::ok(const char* nodename, const char* data) throw()
@@ -66,10 +78,12 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
   RCState state(data);
   try {
     RCNode& node(findNode(nodename));
-    if (state == NSMState::UNKNOWN) {
-      LogFile::warning("got unknown state (%s) from %s", data, nodename);
-    } else {
-      setState(node, state);
+    if (node.isUsed()) {
+      if (state == NSMState::UNKNOWN) {
+        LogFile::warning("got unknown state (%s) from %s", data, nodename);
+      } else {
+        setState(node, state);
+      }
     }
   } catch (const std::out_of_range& e) {}
   update();
@@ -80,8 +94,22 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
-    setState(node, RCState::NOTREADY_S);
-    setState(RCState::NOTREADY_S);
+    NSMCommunicator::send(NSMMessage(node, RCCommand::RECOVER));
+    setState(node, RCState::RECOVERING_RS);
+    setState(RCState::RECOVERING_RS);
+  } catch (const std::out_of_range& e) {
+    LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
+  }
+  update();
+}
+
+void RunControlCallback::fatal(const char* nodename, const char* data) throw()
+{
+  try {
+    RCNode& node(findNode(nodename));
+    logging(node, LogFile::FATAL, data);
+    setState(RCState::ABORTING_RS);
+    abort();
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
@@ -94,9 +122,7 @@ void RunControlCallback::log(const char* nodename, const DAQLogMessage& lmsg,
   try {
     RCNode& node(findNode(nodename));
     logging_imp(node, lmsg.getPriority(), lmsg.getDate(),
-                "log form " + node.getName() + " : " +
                 lmsg.getMessage(), recorded);
-    reply(NSMMessage(lmsg));
   } catch (const std::out_of_range& e) {
     LogFile::warning("Log from unknown node %s : %s", nodename,
                      lmsg.getMessage().c_str());
@@ -107,8 +133,10 @@ void RunControlCallback::log(const char* nodename, const DAQLogMessage& lmsg,
 
 void RunControlCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
+  obj.print();
   m_runno.setConfig(obj.getName());
   distribute(NSMMessage(RCCommand::LOAD));
+  obj.print();
 }
 
 void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
@@ -123,6 +151,14 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         runno = m_runno.getRunNumber();
         set("tstart", (int)m_runno.getRecordTime());
         set("ismaster", (int)true);
+        DBObject& obj(getDBObject());
+        std::string comment;
+        get("comment", comment);
+        obj.addText("comment", comment);
+        std::string operators;
+        get("operators", operators);
+        obj.addText("opeeators", operators);
+        dbrecord(obj, expno, runno);
       } else {
         throw (RCHandlerException("DB is not available"));
       }
@@ -196,7 +232,7 @@ void RunControlCallback::update() throw()
       }
     } catch (const NSMNotConnectedException&) {
       if (cstate != Enum::UNKNOWN) {
-        logging(getNode(), LogFile::WARNING, "%s got down.", node.getName().c_str());
+        logging(getNode(), LogFile::ERROR, "%s got down.", node.getName().c_str());
         setState(node, Enum::UNKNOWN);
         failed = true;
       }
@@ -275,13 +311,13 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
                                      const Date& date, const std::string& msg,
                                      bool recorded)
 {
-  const DAQLogMessage log(node.getName(), pri, msg, date);
+  DAQLogMessage log(node.getName(), pri, msg, date);
   LogFile::put(pri, msg);
   DBInterface& db(*getDB());
   try {
     if (log.getPriority() >= m_priority_db && !recorded) {
       if (!db.isConnected()) db.connect();
-      //LoggerObjectTable(getDB()).add(log, true);
+      DAQLogDB::createLog(db, m_logtable, log);
     }
   } catch (const DBHandlerException& e) {
     db.close();
@@ -296,6 +332,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
 {
   RCNodeList node_v;
   try {
+    obj.print();
     const DBObjectList& objs(obj.getObjects("node"));
     for (DBObjectList::const_iterator it = objs.begin(); it != objs.end(); it++) {
       const DBObject& o_node(*it);
@@ -310,7 +347,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
       node.setSequential(o_node.getBool("sequential"));
       if (o_node.hasObject("rcconfig")) {
         const std::string path = o_node("rcconfig").getPath();
-        LogFile::info("found rcconfig :%s", path.c_str());
+        LogFile::info("found rcconfig :%s %s", node.getName().c_str(), path.c_str());
         node.setConfig(path);
       } else {
         LogFile::warning("Not found rcconfig");
@@ -329,7 +366,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
   add(new NSMVHandlerInt("tstart", true, false, (int)m_runno.getRecordTime()));
   add(new NSMVHandlerInt("ismaster", true, false, (int)true));
   add(new NSMVHandlerText("operators", true, true, m_operators));
-  add(new NSMVHandlerText("comment",  true, true, m_comment));
+  add(new NSMVHandlerText("comment", true, true, m_comment));
   for (size_t i = 0; i < m_node_v.size(); i++) {
     RCNode& node(m_node_v[i]);
     std::string vname = StringUtil::form("node[%d]", (int)i);
@@ -344,6 +381,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCUsed(*this, vname + ".used", node));
   }
+  add(new NSMVHandlerText("log.dbtable",  true, false, m_logtable));
   return true;
 }
 
@@ -352,40 +390,46 @@ void RunControlCallback::Distributer::operator()(RCNode& node) throw()
   if (!m_enabled) return;
   m_msg.setNodeName(node);
   RCCommand cmd(m_msg.getRequestName());
-  if (node.isUsed() && m_msg.getNodeName() == node.getName()) {
-    if (cmd == RCCommand::CONFIGURE)
-      m_msg.setData(node.getConfig());
-    try {
-      while (cmd == RCCommand::LOAD && node.isSequential() &&
-             !m_callback.check(node.getName(), RCState::READY_S)) {
-        try {
-          m_callback.wait(node, RCCommand::OK, 1);
-        } catch (const TimeoutException& e) {
-          continue;
-        } catch (const IOException& e) {
-          LogFile::error(e.what());
-          m_enabled = false;
-          return;
+  if (m_msg.getNodeName() == node.getName()) {
+    if (node.isUsed()) {
+      if (cmd == RCCommand::CONFIGURE)
+        m_msg.setData(node.getConfig());
+      try {
+        while (cmd == RCCommand::LOAD && node.isSequential() &&
+               !m_callback.check(node.getName(), RCState::READY_S)) {
+          try {
+            m_callback.wait(node, RCCommand::OK, 1);
+          } catch (const TimeoutException& e) {
+            continue;
+          } catch (const IOException& e) {
+            LogFile::error(e.what());
+            m_enabled = false;
+            return;
+          }
         }
+        if (NSMCommunicator::send(m_msg)) {
+          RCState tstate = RCCommand(m_msg.getRequestName()).nextTState();
+          if (tstate != Enum::UNKNOWN)
+            m_callback.setState(node, tstate);
+        } else {
+          if (node.getState() != RCState::UNKNOWN) {
+            m_callback.logging(m_callback.getNode(), LogFile::ERROR,
+                               "%s is down.", node.getName().c_str());
+          }
+          m_callback.setState(node, RCState::UNKNOWN);
+          m_callback.setState(RCState::NOTREADY_S);
+          if (cmd == RCCommand::LOAD && node.isSequential())
+            m_enabled = false;
+        }
+      } catch (const NSMHandlerException& e) {
+        LogFile::fatal("Failed to NSM2 request");
+        m_enabled = false;
+      } catch (const IOException& e) {
+        LogFile::error(e.what());
+        m_enabled = false;
+        m_callback.setState(RCState::NOTREADY_S);
       }
-      NSMCommunicator::send(m_msg);
-      RCState tstate = RCCommand(m_msg.getRequestName()).nextTState();
-      if (tstate != Enum::UNKNOWN)
-        m_callback.setState(node, tstate);
-    } catch (const NSMHandlerException& e) {
-      LogFile::fatal("Failed to NSM2 request");
-      m_enabled = false;
-    } catch (const IOException& e) {
-      LogFile::error(e.what());
-      m_enabled = false;
-      m_callback.setState(RCState::NOTREADY_S);
     }
-  } else {
-    LogFile::warning("Node '%s' is OFFLINE", node.getName().c_str());
-    m_callback.setState(node, RCState::UNKNOWN);
-    m_callback.setState(RCState::NOTREADY_S);
-    if (cmd == RCCommand::LOAD && node.isSequential())
-      m_enabled = false;
   }
 }
 

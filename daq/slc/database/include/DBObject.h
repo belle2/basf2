@@ -43,10 +43,12 @@ namespace Belle2 {
     void addObject(const std::string& name, const DBObject& obj) throw();
 
   public:
-    DBObject& operator()(const std::string& name, int index = 0) throw(std::out_of_range) {
+    DBObject& operator()(const std::string& name, int index = 0) throw(std::out_of_range)
+    {
       return getObject(name, index);
     }
-    const DBObject& operator()(const std::string& name, int index = 0) const throw(std::out_of_range) {
+    const DBObject& operator()(const std::string& name, int index = 0) const throw(std::out_of_range)
+    {
       return getObject(name, index);
     }
 

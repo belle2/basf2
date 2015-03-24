@@ -38,18 +38,16 @@ namespace Belle2 {
     virtual ~RCEpicsCallback() throw() {}
 
   public:
-    virtual bool initialize(const DBObject&) throw()
+    virtual void initialize(const DBObject&) throw(RCHandlerException)
     {
       add(new NSMVHandlerInt("expno", true, false));
       add(new NSMVHandlerInt("runno", true, false));
       add(new NSMVHandlerInt("subno", true, false));
-      return true;
     }
-    virtual bool configure(const DBObject& obj) throw()
+    virtual void configure(const DBObject& obj) throw(RCHandlerException)
     {
       scanIoRequest(*g_pvt_config);
       setCommand(RCCommand::CONFIGURE);
-      return true;
     }
     virtual void load(const DBObject& obj) throw(RCHandlerException)
     {

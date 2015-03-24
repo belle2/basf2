@@ -33,7 +33,7 @@ void EB0Controller::initArguments(const DBObject& obj)
   m_callback->add(new NSMVHandlerText("eb0.executable", true, true, executable));
 }
 
-void EB0Controller::loadArguments(const DBObject& obj)
+bool EB0Controller::loadArguments(const DBObject& obj)
 {
   int port = 0, nsenders = 0;
   std::string executable;
@@ -52,4 +52,5 @@ void EB0Controller::loadArguments(const DBObject& obj)
       m_con.addArgument("%s:%d", (stream0_used ? "localhost" : host.c_str()), port);
     }
   }
+  return true;
 }

@@ -32,7 +32,7 @@ namespace Belle2 {
     virtual void recover(const DBObject& obj) throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
     virtual void term() throw();
-    virtual void timeout(NSMCommunicator& com) throw();
+    virtual void monitor() throw(RCHandlerException);
   public:
     HSLB& getHSLB(int i) { return m_hslb[i]; }
     FEE* getFEE(int i) { return m_fee[i]; }

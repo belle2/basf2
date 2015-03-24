@@ -86,7 +86,8 @@ namespace Belle2 {
 
   private:
     template<typename T>
-    T getD(const std::string& name, int index = 0) const throw(std::out_of_range) {
+    T getD(const std::string& name, int index = 0) const throw(std::out_of_range)
+    {
       const void* value = getValue(name);
       if (value == NULL/* || index >= getProperty(name).getLength()*/) {
         throw (std::out_of_range(name + " not found"));

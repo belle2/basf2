@@ -8,7 +8,7 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
+  if (argc < 3) {
     LogFile::debug("usage: %s <dbtabe> <config>", argv[0]);
     return 1;
   }

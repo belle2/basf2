@@ -35,22 +35,26 @@ namespace Belle2 {
     int getSubNumber() const { return (m_header->exp_run & 0x3FFFFF) & 0xFF; };
     int getEventNumber() const { return m_header->event_number; };
     int setEventNumber(int number) { return m_header->event_number = number; };
-    int setExpNumber(int exp_no) {
+    int setExpNumber(int exp_no)
+    {
       m_header->exp_run = ((exp_no & 0x3FF) << 22) | (m_header->exp_run & 0x3FFFFF);
       return getExpNumber();
     };
-    int setRunNumber(int run_no, int sub_no) {
+    int setRunNumber(int run_no, int sub_no)
+    {
       m_header->exp_run = (m_header->exp_run & 0xFFC00000) |
                           (run_no & 0x3FFFFF) << 8 | (sub_no & 0xFF);
       return getRunNumber();
     };
     int getNEvent() const { return (m_header->nevent_nboard >> 16); };
     int getNBoard() const { return (m_header->nevent_nboard & 0xFFFF); };
-    int setNEvent(int nev) {
+    int setNEvent(int nev)
+    {
       m_header->nevent_nboard = ((nev & 0xFFFF) << 16) | (m_header->nevent_nboard & 0xFFFF);
       return getNEvent();
     };
-    int setNBoard(int nb) {
+    int setNBoard(int nb)
+    {
       m_header->nevent_nboard = (m_header->nevent_nboard & 0xFFFF0000) | (nb & 0xFFFF);
       return getNBoard();
     };
@@ -59,16 +63,19 @@ namespace Belle2 {
     int getByteSize() const { return m_header->nword * 4; };
     int getHeaderWordSize() const { return m_header->nword_in_header; };
     int getHeaderByteSize() const { return m_header->nword_in_header * 4; };
-    int getBodyByteSize() const {
+    int getBodyByteSize() const
+    {
       return getByteSize() - sizeof(BinHeader) - sizeof(BinTrailer);
     }
-    void setBodyWordSize(int nword) {
+    void setBodyWordSize(int nword)
+    {
       setWordSize(nword + (sizeof(BinHeader) + sizeof(BinTrailer)) / 4);
       m_trailer = (BinTrailer*)(m_body + getBodyWordSize());
       m_trailer->magic = TRAILER_MAGIC;
     }
     int getBodyWordSize() const { return (getBodyByteSize() / 4); };
-    unsigned int getTrailerMagic() {
+    unsigned int getTrailerMagic()
+    {
       m_trailer = (BinTrailer*)(m_body + getBodyWordSize());
       return m_trailer->magic;
     }

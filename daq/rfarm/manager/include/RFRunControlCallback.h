@@ -15,6 +15,7 @@ namespace Belle2 {
     virtual ~RFRunControlCallback() throw() {}
 
   public:
+    virtual void initialize(const DBObject& obj) throw(RCHandlerException);
     virtual bool perform(NSMCommunicator& com) throw();
 
   private:

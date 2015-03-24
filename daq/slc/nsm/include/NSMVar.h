@@ -22,10 +22,12 @@ namespace Belle2 {
 
   public:
     NSMVar() : m_name(), m_type(NONE), m_len(0), m_value(NULL) {}
-    NSMVar(const std::string& name, Type type, int len, const void* value) {
+    NSMVar(const std::string& name, Type type, int len, const void* value)
+    {
       copy(name, type, len, value);
     }
-    NSMVar(const std::string& name, const std::string& value) {
+    NSMVar(const std::string& name, const std::string& value)
+    {
       copy(name, TEXT, value.size(), value.c_str());
     }
     NSMVar(const std::string& name, int value) { copy(name, INT, 0, &value); }
@@ -39,20 +41,24 @@ namespace Belle2 {
     ~NSMVar() throw();
 
   public:
-    const NSMVar& operator=(const NSMVar& var) {
+    const NSMVar& operator=(const NSMVar& var)
+    {
       copy(var.m_name, var.m_type, var.m_len, var.m_value, var.m_id, var.m_rev);
       m_node = var.m_node;
       return *this;
     }
-    const NSMVar& operator=(int val) {
+    const NSMVar& operator=(int val)
+    {
       copy(m_name, INT, 0, &val, m_id, m_rev);
       return *this;
     }
-    const NSMVar& operator=(float val) {
+    const NSMVar& operator=(float val)
+    {
       copy(m_name, FLOAT, 0, &val, m_id, m_rev);
       return *this;
     }
-    const NSMVar& operator=(const std::string& val) {
+    const NSMVar& operator=(const std::string& val)
+    {
       copy(m_name, TEXT, val.size() + 1, val.c_str(), m_id, m_rev);
       return *this;
     }

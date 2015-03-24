@@ -8,9 +8,12 @@ import b2daq.core.Reader;
 import b2daq.core.Writer;
 import b2daq.database.DBObject;
 import b2daq.database.FieldInfo;
+import java.util.Arrays;
 
 public class NSMData extends DBObject {
 
+    private int m_revision;
+    private String m_format = "";
     private int m_size = 0;
     private HashMap<String, ArrayList<Object>> m_data_m = new HashMap<>();
 
@@ -19,18 +22,25 @@ public class NSMData extends DBObject {
     }
 
     public NSMData(String dataname, String format, int revision) {
-        setConfig(false);
         setName(dataname);
         setFormat(format);
         setRevision(revision);
     }
 
     public String getFormat() {
-        return getTable();
+        return m_format;
     }
 
-    public void setFormat(String format) {
-        setTable(format);
+    public final void setFormat(String format) {
+        m_format = format;
+    }
+
+    public int getRevision() {
+        return m_revision;
+    }
+
+    public final void setRevision(int revision) {
+        m_revision = revision;
     }
 
     @Override
@@ -43,7 +53,7 @@ public class NSMData extends DBObject {
         if (size <= 0) {
             System.out.println("size error : " + size);
         }
-        m_data_m = new HashMap<String, ArrayList<Object>>();
+        m_data_m = new HashMap<>();
         int npars = reader.readInt();
         for (int n = 0; n < npars; n++) {
             String name = reader.readString();
@@ -53,7 +63,7 @@ public class NSMData extends DBObject {
             if (length == 0) {
                 length = 1;
             }
-            if (type == FieldInfo.NSM_OBJECT) {
+            if (type == FieldInfo.OBJECT) {
                 ArrayList<Object> data_v = new ArrayList<>();
                 try {
                     for (int i = 0; i < length; i++) {
@@ -68,26 +78,22 @@ public class NSMData extends DBObject {
             } else {
                 for (int i = 0; i < length; i++) {
                     switch (type) {
-                        case FieldInfo.NSM_INT64:
-                        case FieldInfo.NSM_UINT64:
+                        case FieldInfo.LONG:
                             addValue(name, type, reader.readLong());
                             break;
-                        case FieldInfo.NSM_INT32:
-                        case FieldInfo.NSM_UINT32:
+                        case FieldInfo.INT:
                             addValue(name, type, reader.readInt());
                             break;
-                        case FieldInfo.NSM_INT16:
-                        case FieldInfo.NSM_UINT16:
+                        case FieldInfo.SHORT:
                             addValue(name, type, reader.readShort());
                             break;
-                        case FieldInfo.NSM_CHAR:
-                        case FieldInfo.NSM_BYTE8:
+                        case FieldInfo.CHAR:
                             addValue(name, type, reader.readChar());
                             break;
-                        case FieldInfo.NSM_FLOAT:
+                        case FieldInfo.FLOAT:
                             addValue(name, type, reader.readFloat());
                             break;
-                        case FieldInfo.NSM_DOUBLE:
+                        case FieldInfo.DOUBLE:
                             addValue(name, type, reader.readDouble());
                             break;
                         default:
@@ -98,6 +104,7 @@ public class NSMData extends DBObject {
         }
     }
 
+    @Override
     public void writeObject(Writer writer) throws IOException {
         writer.writeString(getName());
         writer.writeString(getFormat());
@@ -116,42 +123,24 @@ public class NSMData extends DBObject {
             if (length == 0) {
                 length = 1;
             }
-            if (pro.getType() == FieldInfo.NSM_OBJECT) {
+            if (pro.getType() == FieldInfo.OBJECT) {
                 for (int i = 0; i < length; i++) {
                     writer.writeObject(getObject(name, i));
                 }
             } else {
                 for (int i = 0; i < length; i++) {
                     switch (pro.getType()) {
-                        case FieldInfo.NSM_CHAR:
+                        case FieldInfo.CHAR:
                             writer.writeChar((Character) buf.get(i));
                             break;
-                        case FieldInfo.NSM_INT16:
+                        case FieldInfo.SHORT:
                             writer.writeShort((Short) buf.get(i));
                             break;
-                        case FieldInfo.NSM_INT64:
+                        case FieldInfo.LONG:
                             writer.writeLong((Long) buf.get(i));
                             break;
-                        case FieldInfo.NSM_INT32:
+                        case FieldInfo.INT:
                             writer.writeInt((Integer) buf.get(i));
-                            break;
-                        case FieldInfo.NSM_BYTE8:
-                            writer.writeChar((Character) buf.get(i));
-                            break;
-                        case FieldInfo.NSM_UINT16:
-                            writer.writeShort((Short) buf.get(i));
-                            break;
-                        case FieldInfo.NSM_UINT32:
-                            writer.writeInt((Integer) buf.get(i));
-                            break;
-                        case FieldInfo.NSM_UINT64:
-                            writer.writeLong((Long) buf.get(i));
-                            break;
-                        case FieldInfo.NSM_FLOAT:
-                            writer.writeFloat((Float) buf.get(i));
-                            break;
-                        case FieldInfo.NSM_DOUBLE:
-                            writer.writeDouble((Double) buf.get(i));
                             break;
                         default:
                             break;
@@ -171,9 +160,9 @@ public class NSMData extends DBObject {
 
     @Override
     public String getText(String name) {
-        if (getProperty(name).getType() == FieldInfo.NSM_CHAR
+        if (getProperty(name).getType() == FieldInfo.CHAR
                 && getProperty(name).getLength() > 0) {
-            return m_data_m.get(name).toArray().toString();
+            return Arrays.toString(m_data_m.get(name).toArray());
         } else {
             return "";
         }
@@ -182,6 +171,10 @@ public class NSMData extends DBObject {
     @Override
     public DBObject getObject(String name, int i) {
         return (DBObject) m_data_m.get(name).get(i);
+    }
+
+    public ArrayList<Object> getObjects(String name) {
+        return m_data_m.get(name);
     }
 
     @Override
@@ -278,6 +271,32 @@ public class NSMData extends DBObject {
             return 0;
         }
         return (Double) value;
+    }
+
+    public Object find(String name_in) {
+        String name_out = name_in;
+        if (name_out.contains(".")) {
+            String[] str = name_out.split("\\.");
+            String[] sstr = str[0].split("\\[");
+            ArrayList<Object> data_v = getObjects(sstr[0]);
+            int index = 0;
+            if (sstr.length > 1) {
+                String s = sstr[1].split("\\]")[0];
+                index = Integer.parseInt(s);
+            }
+            name_out = name_in.substring(name_in.indexOf(".") + 1);
+            return ((NSMData) data_v.get(index)).find(name_out);
+        }
+        int index = 0;
+        if (name_out.contains("[")) {
+            String[] str = name_out.split("\\[");
+            name_out = str[0];
+            index = Integer.parseInt(str[1].split("\\]")[0]);
+        }
+        if (!hasValue(name_out)) {
+            return null;
+        }
+        return getValue(name_out, index);
     }
 
 }

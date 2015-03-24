@@ -23,7 +23,8 @@ namespace Belle2 {
       : NSMVHandlerInt(name, false, true), m_com(com),
         m_callback(callback), m_index(index) {}
     virtual ~NSMVHandlerNSMData() throw() {}
-    virtual bool handleSetInt(int) {
+    virtual bool handleSetInt(int)
+    {
       try {
         std::string dataname, vname = StringUtil::form("node[%d].", m_index);
         m_callback.get(vname + "data", dataname);

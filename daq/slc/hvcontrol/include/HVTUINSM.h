@@ -54,7 +54,8 @@ namespace Belle2 {
 
     public:
       virtual void init(NSMCommunicator&) throw();
-      virtual void vset(NSMCommunicator& com, const NSMVar& v) throw() {
+      virtual void vset(NSMCommunicator& com, const NSMVar& v) throw()
+      {
         NSMVar var = v;
         var.setId(0);
         var.setRevision(0);

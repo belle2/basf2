@@ -104,7 +104,12 @@ bool NSMVHandlerFEEBoot::handleSetInt(int val)
       fconf.read(m_callback.getDBObject())) {
     FEE& fee(*m_callback.getFEE(m_hslb));
     HSLB& hslb(m_callback.getHSLB(m_hslb));
-    return fee.boot(hslb, fconf);
+    try {
+      fee.boot(hslb, fconf);
+      return true;
+    } catch (const IOException& e) {
+      LogFile::error(e.what());
+    }
   }
   return false;
 }

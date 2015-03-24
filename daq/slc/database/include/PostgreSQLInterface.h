@@ -1,9 +1,10 @@
 #ifndef _Belle2_PostgreSQLInterface_hh
 #define _Belle2_PostgreSQLInterface_hh
-///*
+
 #include "daq/slc/database/DBInterface.h"
 
-#include <libpq-fe.h>
+typedef struct pg_conn PGconn;
+typedef struct pg_result PGresult;
 
 namespace Belle2 {
 
@@ -36,5 +37,4 @@ namespace Belle2 {
 
 }
 
-//*/
 #endif

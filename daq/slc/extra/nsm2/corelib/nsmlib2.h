@@ -47,63 +47,63 @@ typedef enum NSMfunctype_enum {
 } NSMfunctype;
 
 typedef struct {
-int req;
-NSMfunctype functype;
-NSMfunc_t callback;
-char name[64];
+  int req;
+  NSMfunctype functype;
+  NSMfunc_t callback;
+  char name[64];
 } NSMrequest;
 
 typedef struct NSMrecvqueue_struct {
-struct NSMrecvqueue_struct* next;
-NSMtcphead h;
+  struct NSMrecvqueue_struct* next;
+  NSMtcphead h;
 } NSMrecvqueue;
 
 struct NSMcontext_struct {
-/* seq */
-int  seq;
+  /* seq */
+  int  seq;
 
-/* error code (when can't be returned) */
-int  errc;
-char errs[1024]; /* error string in case of NSMEUNEXPECTED */
+  /* error code (when can't be returned) */
+  int  errc;
+  char errs[1024]; /* error string in case of NSMEUNEXPECTED */
 
-/* initnet (network related) */
-int  initnet_done;
-int  sock;
-int  port;
-int  shmkey;
-SOCKAD_IN sa;
-char nodename[NSMSYS_NAME_SIZ + 1];
-char hostname[1024];
+  /* initnet (network related) */
+  int  initnet_done;
+  int  sock;
+  int  port;
+  int  shmkey;
+  SOCKAD_IN sa;
+  char nodename[NSMSYS_NAME_SIZ + 1];
+  char hostname[1024];
 
-/* initshm (shared memory related) */
-int  initshm_done;
-int  sysid;
-NSMsys* sysp;
-int  memid;
-NSMmem* memp;
+  /* initshm (shared memory related) */
+  int  initshm_done;
+  int  sysid;
+  NSMsys* sysp;
+  int  memid;
+  NSMmem* memp;
 
-/* initsig (signal handler related) */
-int  usesig;
-int  initsig_done;
-int  pipe_rd;
-int  pipe_wr;
-int  reqwait;
-int  nreq;
-NSMrequest req[NSMLIB_MAX_CALLBACK];
+  /* initsig (signal handler related) */
+  int  usesig;
+  int  initsig_done;
+  int  pipe_rd;
+  int  pipe_wr;
+  int  reqwait;
+  int  nreq;
+  NSMrequest req[NSMLIB_MAX_CALLBACK];
 
-/* initcli (client related) */
-int  nodeid;
-struct NSMcontext_struct* next;
+  /* initcli (client related) */
+  int  nodeid;
+  struct NSMcontext_struct* next;
 
-/* recv queue */
-NSMrecvqueue* recvqueue;
+  /* recv queue */
+  NSMrecvqueue* recvqueue;
 
-/* callback hook */
-NSMhook_t hook;
-const void* hookptr;
+  /* callback hook */
+  NSMhook_t hook;
+  const void* hookptr;
 
-/* more pointer to be used by a wrapper */
-const void* wrapptr;
+  /* more pointer to be used by a wrapper */
+  const void* wrapptr;
 };
 
 

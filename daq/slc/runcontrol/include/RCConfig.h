@@ -28,7 +28,8 @@ namespace Belle2 {
 
   public:
     int getConfigId() const throw() { return m_obj.getId(); }
-    const std::string& getConfigName() const throw() {
+    const std::string& getConfigName() const throw()
+    {
       return m_obj.getName();
     }
 

@@ -116,6 +116,10 @@ public class NSMVar implements Serializable {
         return 0;
     }
 
+    public String getNode() {
+        return m_node;
+    }
+
     public String getName() {
         return m_name;
     }

@@ -128,10 +128,6 @@ DBObject DBObjectLoader::load(DBInterface& db,
         table_in = ss[0];
         config_in = ss[1];
       }
-      //if (config_in.find("@") == std::string::npos) {
-      //  const std::string nodename = StringUtil::split(configname, '@')[0];
-      //  config_in = nodename + "@" + config_in;
-      //}
       if (table_in == tablename && config_in == configname) {
         LogFile::error("recursive call of %s/%s",
                        table_in.c_str(), config_in.c_str());
@@ -278,7 +274,7 @@ bool DBObjectLoader::createDB(DBInterface& db,
                "check (replace(name, '.', '') = name) not null, \n"
                "path varchar(256) not null, \n"
                "id bigserial, \n"
-               "record_time timestamp default current_timestamp, \n"
+               "record_time timestamp with time zone default current_timestamp, \n"
                "value_b boolean default NULL, \n"
                "value_c char default NULL, \n"
                "value_s smallint default NULL, \n"

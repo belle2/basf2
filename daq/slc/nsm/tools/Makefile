@@ -9,15 +9,18 @@ TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
 LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -lncurses
+ifneq ($(NOT_USE_PSQL),yes)
 LIBS    += -L$(PGSQL_LIB_PATH)/lib -lpq
+endif
 LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm 
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
-CFLAGS   = -g -Wall -fPIC -D_REENTRANT
-CFLAGS  += -I$(INCDIR) -I$(PGSQL_LIB_PATH)/include -I.
+CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I$(INCDIR)
+ifneq ($(NOT_USE_PSQL),yes)
+CFLAGS  += -I$(PGSQL_LIB_PATH)/include
+endif
 
 MAINS   = $(wildcard *.cc)
-#MAINS   = nsmvget.cc nsmvset.cc nsmvlistget.cc
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)
 
 SRCS   = $(wildcard $(SRCDIR)/*.cc)
@@ -27,7 +30,6 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 .PHONY : all clean 
 
 all: $(TARGETS)
-#	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin
 
 force:
 	@ $(RM) $(BINDIR)/*

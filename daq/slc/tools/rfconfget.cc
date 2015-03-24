@@ -17,8 +17,9 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
+  if (argc < 3) {
     std::cout << "Usage : " << argv[0] << " <table> <confname> [<outputfile>]" << std::endl;
+    return 1;
   }
   std::string table = argv[1];
   std::string confname = argv[2];

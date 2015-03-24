@@ -14,11 +14,17 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -lncurses -L/usr/pgsql-9.2/lib -lpq
+LIBS    += -lm -lpthread -ldl -lz -lrt
+ifneq ($(NOT_USE_PSQL),yes)
+LIBS    += -L$(PGSQL_LIB_PATH)/lib -lpq
+endif
 LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout -ldaq_slc_apps_storagerd
 LIBS    += -L$(BELLE2EX_LIB) -lnsm2_corelib -lnsm2_b2lib
 
-CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I/usr/pgsql-9.2/include
+CFLAGS   = -g -Wall -fPIC -D_REENTRANT
+ifneq ($(NOT_USE_PSQL),yes)
+CFLAGS  += -I$(PGSQL_LIB_PATH)/include
+endif
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 CFLAGS  += -I$(BELLE2_INC)
 CFLAGS  += -I$(BELLE2EX_INC)

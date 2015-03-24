@@ -45,16 +45,19 @@ private:
   char* buf;
 
 public:
-  FileHandler() {
+  FileHandler()
+  {
     file = NULL;
     buf = NULL;
   }
-  FileHandler(const std::string& dir, int expno, int runno) {
+  FileHandler(const std::string& dir, int expno, int runno)
+  {
     open(dir, expno, runno);
   }
 
 public:
-  void open(const std::string& dir, int expno, int runno) {
+  void open(const std::string& dir, int expno, int runno)
+  {
     if (file != NULL) {
       close();
     }
@@ -77,7 +80,8 @@ public:
     }
   }
 
-  void close() {
+  void close()
+  {
     if (file != NULL) {
       fclose(file);
     }
@@ -88,11 +92,13 @@ public:
     buf = NULL;
   }
 
-  int write(char* evbuf, int nbyte) {
+  int write(char* evbuf, int nbyte)
+  {
     return fwrite(evbuf, nbyte, 1, file);
   }
 
-  operator bool() {
+  operator bool()
+  {
     return file != NULL;
   }
 
@@ -101,7 +107,8 @@ public:
 class FileCloser {
 
 public:
-  static FileHandler getFile() {
+  static FileHandler getFile()
+  {
     g_mutex.lock();
     while (g_file_q.empty()) {
       g_cond.wait(g_mutex);
@@ -131,7 +138,8 @@ public:
       m_expno(expno), m_runno(runno) {}
 
 public:
-  void run() {
+  void run()
+  {
     g_mutex.lock();
     g_file_q.push(FileHandler(m_dir, m_expno, m_runno));
     g_cond.signal();

@@ -17,12 +17,13 @@ public class NSMCommand extends Enum {
     final static public NSMCommand VLISTGET = new NSMCommand(13, "VLISTGET");
     final static public NSMCommand VLISTSET = new NSMCommand(14, "VLISTSET");
     final static public NSMCommand VREPLY = new NSMCommand(15, "VREPLY");
-    final static public NSMCommand NSMDATASET = new NSMCommand(401, "NSMDATASET");
-    final static public NSMCommand NSMDATAGET = new NSMCommand(402, "NSMDATAGET");
+    final static public NSMCommand DATASET = new NSMCommand(401, "DATASET");
+    final static public NSMCommand DATAGET = new NSMCommand(402, "DATAGET");
     final static public NSMCommand DBSET = new NSMCommand(403, "DBSET");
     final static public NSMCommand DBGET = new NSMCommand(404, "DBGET");
     final static public NSMCommand DBLISTSET = new NSMCommand(405, "DBLISTSET");
-    final static public NSMCommand DBLISTGET = new NSMCommand(406, "LISTGET");
+    final static public NSMCommand DBLISTGET = new NSMCommand(406, "DBLISTGET");
+    final static public NSMCommand LOGLIST = new NSMCommand(407, "LOGLIST");
 
     public NSMCommand() {
         copy(NSMCommand.UNKNOWN);
@@ -68,11 +69,11 @@ public class NSMCommand extends Enum {
         } else if (msg.equals(VREPLY.getLabel())) {
             copy(VREPLY);
             return true;
-        } else if (msg.equals(NSMDATAGET.getLabel())) {
-            copy(NSMDATAGET);
+        } else if (msg.equals(DATAGET.getLabel())) {
+            copy(DATAGET);
             return true;
-        } else if (msg.equals(NSMDATASET.getLabel())) {
-            copy(NSMDATASET);
+        } else if (msg.equals(DATASET.getLabel())) {
+            copy(DATASET);
             return true;
         } else if (msg.equals(DBGET.getLabel())) {
             copy(DBGET);
@@ -85,6 +86,9 @@ public class NSMCommand extends Enum {
             return true;
         } else if (msg.equals(DBLISTSET.getLabel())) {
             copy(DBLISTSET);
+            return true;
+        } else if (msg.equals(LOGLIST.getLabel())) {
+            copy(LOGLIST);
             return true;
         }
         return false;
@@ -118,11 +122,11 @@ public class NSMCommand extends Enum {
         } else if (id == VREPLY.getId()) {
             copy(VREPLY);
             return true;
-        } else if (id == NSMDATAGET.getId()) {
-            copy(NSMDATAGET);
+        } else if (id == DATAGET.getId()) {
+            copy(DATAGET);
             return true;
-        } else if (id == NSMDATASET.getId()) {
-            copy(NSMDATASET);
+        } else if (id == DATASET.getId()) {
+            copy(DATASET);
             return true;
         } else if (id == DBGET.getId()) {
             copy(DBGET);
@@ -135,6 +139,9 @@ public class NSMCommand extends Enum {
             return true;
         } else if (id == DBLISTSET.getId()) {
             copy(DBLISTSET);
+            return true;
+        } else if (id == LOGLIST.getId()) {
+            copy(LOGLIST);
             return true;
         }
         return false;

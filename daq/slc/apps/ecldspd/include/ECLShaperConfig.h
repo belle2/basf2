@@ -10,7 +10,8 @@ namespace Belle2 {
 
   public:
     ECLShaperRegister() {}
-    ECLShaperRegister(int adr, int val, const char* name) {
+    ECLShaperRegister(int adr, int val, const char* name)
+    {
       this->adr = adr;
       this->val = val;
       this->name = name;

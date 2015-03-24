@@ -5,6 +5,7 @@
 #include "daq/slc/runcontrol/RCCommand.h"
 #include "daq/slc/runcontrol/RCConfig.h"
 #include "daq/slc/runcontrol/RCHandlerException.h"
+#include "daq/slc/runcontrol/RCHandlerFatalException.h"
 
 #include <daq/slc/nsm/NSMCallback.h>
 #include <daq/slc/nsm/NSMData.h>
@@ -34,9 +35,11 @@ namespace Belle2 {
     virtual void resume(int /*subno*/) throw(RCHandlerException) {}
     virtual void pause() throw(RCHandlerException) {}
     virtual void abort() throw(RCHandlerException) {}
+    virtual void monitor() throw(RCHandlerException) {}
 
   public:
     virtual bool perform(NSMCommunicator& com) throw();
+    virtual void timeout(NSMCommunicator& com) throw();
 
   public:
     virtual void initialize(const DBObject&) throw(RCHandlerException) {}
@@ -50,7 +53,8 @@ namespace Belle2 {
     void setAutoReply(bool auto_reply) { m_auto = auto_reply; }
     void setDB(DBInterface* db, const std::string& table);
     DBInterface* getDB() { return m_db; }
-    void setProvider(const std::string& host, int port) {
+    void setProvider(const std::string& host, int port)
+    {
       m_provider_host = host;
       m_provider_port = port;
     }
@@ -58,6 +62,9 @@ namespace Belle2 {
 
   private:
     void dbload(NSMCommunicator& com) throw(IOException);
+
+  protected:
+    void dbrecord(DBObject obj, int expno, int runno) throw(IOException);
 
   private:
     RCState m_state_demand;

@@ -17,7 +17,8 @@ namespace Belle2 {
 
   public:
     HVControlCallback(const NSMNode& node)
-    throw() : HVCallback(), m_db(NULL) {
+    throw() : HVCallback(), m_db(NULL)
+    {
       setNode(node);
     }
     virtual ~HVControlCallback() throw() {}
@@ -35,7 +36,8 @@ namespace Belle2 {
     virtual void timeout(NSMCommunicator&) throw();
 
   public:
-    void setDB(const std::string& table, DBInterface* db) throw() {
+    void setDB(const std::string& table, DBInterface* db) throw()
+    {
       m_table = table;
       m_db = db;
     }

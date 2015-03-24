@@ -245,10 +245,3 @@ int RFNSM_Status::get_flag()
 {
   return m_flag;
 }
-
-void RFNSM::RFNSMListener::run() throw()
-{
-  while (true) {
-    b2nsm_wait(5);
-  }
-}

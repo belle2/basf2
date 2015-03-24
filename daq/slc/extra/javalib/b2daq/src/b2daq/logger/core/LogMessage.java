@@ -22,7 +22,7 @@ public class LogMessage {
     private final SimpleObjectProperty level;
     private final SimpleObjectProperty date;
     private final SimpleStringProperty message;
-    static private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");//"yyyy/MM/dd HH:mm:ss"
+    static private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
     
     static public final String getCSSPath() {
         return LogMessage.class.getResource("LogMessage.css").toExternalForm();

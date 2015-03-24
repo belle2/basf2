@@ -74,7 +74,7 @@ xprintlog(const char* fmt, ...)
 {
   va_list ap;
   char datebuf[32];
-  void xlogtime(char * buf);
+  void xlogtime(char* buf);
 
   if (master_logfp) {
     va_start(ap, fmt);

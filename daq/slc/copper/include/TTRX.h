@@ -25,13 +25,16 @@ namespace Belle2 {
     bool close() throw();
     bool boot(const std::string& file) throw();
     ttrx_info& monitor() throw();
-    const ttrx_info& getInfo() const throw() {
+    const ttrx_info& getInfo() const throw()
+    {
       return m_info;
     }
-    ttrx_info& getInfo() throw() {
+    ttrx_info& getInfo() throw()
+    {
       return m_info;
     }
-    bool isError() throw() {
+    bool isError() throw()
+    {
       return isBelle2LinkError() || isLinkUpError();
     }
     bool isBelle2LinkError() throw();

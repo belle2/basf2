@@ -14,21 +14,25 @@ namespace Belle2 {
 
   public:
     ConfigFile() {}
-    ConfigFile(const std::string& file1) {
+    ConfigFile(const std::string& file1)
+    {
       read(file1, true);
     }
-    ConfigFile(const std::string& file1, const std::string& file2) {
+    ConfigFile(const std::string& file1, const std::string& file2)
+    {
       read(file1, true);
       read(file2, true);
     }
     ConfigFile(const std::string& file1,
                const std::string& file2,
-               const std::string& file3) {
+               const std::string& file3)
+    {
       read(file1, true);
       read(file2, true);
       read(file3, true);
     }
-    ConfigFile(std::istream& is) {
+    ConfigFile(std::istream& is)
+    {
       read(is);
     }
     ~ConfigFile() {}

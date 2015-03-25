@@ -113,7 +113,7 @@ namespace Belle2 {
       }
 
       /** convert rho (one of the axis in legendre phase-space) to Pt (in GeV) */
-      static double convertRhoToPt(double rho) {return 1.5 * 0.00299792458 / rho; };
+      static double convertRhoToPt(double rho) {return 1.5 * 0.00299792458 / fabs(rho); };
 
       /** convert rho (one of the axis in legendre phase-space) to Pt (in GeV) */
       static double convertPtToRho(double Pt) {return 1.5 * 0.00299792458 / Pt; };
@@ -137,6 +137,14 @@ namespace Belle2 {
       inline int getCharge() const
       {
         return m_charge;
+      }
+
+      /**
+       * Set charge estimation of the track.
+       */
+      void setCharge(int charge)
+      {
+        m_charge = charge;
       }
 
 

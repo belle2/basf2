@@ -13,12 +13,15 @@
 #include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/utilities/FileSystem.h>
 
 // Belle tables
 #include "belle_legacy/tables/belletdf.h"
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
+
+#include <cstdlib>
 
 using namespace std;
 using namespace Belle2;
@@ -53,6 +56,18 @@ B2BIIMdstInputModule::~B2BIIMdstInputModule()
 
 void B2BIIMdstInputModule::initialize()
 {
+  // check environment
+  const char* table_dir = getenv("PANTHER_TABLE_DIR");
+  if (!table_dir or !FileSystem::isDir(table_dir)) {
+    string fixed_table_dir = Environment::Instance().getExternalsPath() + "/share/belle_legacy/panther";
+    B2WARNING("PANTHER_TABLE_DIR environment variable not set correctly. This is a known problem with externals v00-05-09, using " <<
+              fixed_table_dir << " instead.");
+    if (!FileSystem::isDir(fixed_table_dir))
+      B2FATAL("Path " << fixed_table_dir << " does not exist, your externals setup seems broken.");
+    setenv("PANTHER_TABLE_DIR", fixed_table_dir.c_str(), 1); //overwrite existing value
+  }
+
+
   // Initialize Panther
   BsInit(0);
 

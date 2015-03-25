@@ -24,7 +24,7 @@ namespace Belle2 {
 
       const unsigned int numberOfPossibleTrackCandidate = 2;
 
-      void SetUp()
+      void SetUp() override
       {
         m_trackCandidates.reserve(numberOfPossibleTrackCandidate);
 

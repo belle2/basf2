@@ -6,9 +6,16 @@
 
 using namespace Belle2;
 
-void TemplateHVControlCallback::initialize(const HVConfig&) throw()
+/*
+  Setting parameters from database at beginings of process
+*/
+void TemplateHVControlCallback::initialize(const HVConfig& config) throw()
 {
-
+  try {
+    load(config, false, true);
+  } catch (const HVHandlerException& e) {
+    LogFile::error(e.what());
+  }
 }
 
 void TemplateHVControlCallback::update() throw(HVHandlerException)

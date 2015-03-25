@@ -28,7 +28,7 @@ namespace Belle2 {
     const HVState& getStateDemand() const throw() { return m_state_demand; }
     virtual void store(int /*index*/) throw(IOException) {}
     virtual void recall(int /*index*/) throw(IOException) {}
-    virtual void configure(const HVConfig&) throw() {}
+    virtual void configure(const HVConfig&) throw(HVHandlerException) {}
     virtual void initialize(const HVConfig&) throw() {}
 
   public:

@@ -24,6 +24,7 @@ namespace Belle2 {
     virtual ~HVControlCallback() throw() {}
 
   public:
+    virtual void configure(const HVConfig&) throw(HVHandlerException);
     virtual void turnon() throw(HVHandlerException);
     virtual void turnoff() throw(HVHandlerException);
     virtual void standby() throw(HVHandlerException);

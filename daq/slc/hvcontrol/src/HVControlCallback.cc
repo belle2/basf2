@@ -24,7 +24,11 @@ void HVControlCallback::turnon() throw(HVHandlerException)
 void HVControlCallback::turnoff() throw(HVHandlerException)
 {
   load(getConfig(0), true, false);
-  //setSwitch(0, 0, 0, false);
+}
+
+void HVControlCallback::configure(const HVConfig& config) throw(HVHandlerException)
+{
+  load(config, false, true);
 }
 
 void HVControlCallback::standby() throw(HVHandlerException)

@@ -208,15 +208,15 @@ namespace Belle2 {
 
     /** A helix has five parameters and the covariance matrix is a
      *  symmetric five-by-five matrix.  */
-    static const int c_NPars = 5;
-    static const int c_NCovEntries = 5 * 6 / 2;
+    static const unsigned int c_NPars = 5;
+    static const unsigned int c_NCovEntries = 5 * 6 / 2;
 
     /** Names for the parameter indices.  */
-    static const int iD0 = 0;
-    static const int iPhi0 = 1;
-    static const int iOmega = 2;
-    static const int iZ0 = 3;
-    static const int iTanLambda = 4;
+    static const unsigned int iD0 = 0;
+    static const unsigned int iPhi0 = 1;
+    static const unsigned int iOmega = 2;
+    static const unsigned int iZ0 = 3;
+    static const unsigned int iTanLambda = 4;
 
     /** perigee helix parameters; tau = d0, phi0, omega, z0, tanLambda. */
     Double32_t m_tau[c_NPars];

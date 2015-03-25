@@ -6,6 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ namespace Belle2::Stream-;
-#pragma link C++ class Belle2::FileSystem-;
+#pragma link C++ namespace Belle2::FileSystem-;
 
 #endif

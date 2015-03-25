@@ -4,16 +4,15 @@
 
 namespace Belle2 {
   /** Utility functions related to filename validation and filesystem access */
-  class FileSystem {
-  public:
+  namespace FileSystem {
     /** Check if a given filename exits */
-    static bool fileExists(const std::string& filename);
+    bool fileExists(const std::string& filename);
     /** Check if the dir containing the filename exists */
-    static bool fileDirExists(const std::string& filename);
+    bool fileDirExists(const std::string& filename);
     /** Check if filename points to an existing file */
-    static bool isFile(const std::string& filename);
+    bool isFile(const std::string& filename);
     /** Check if filename points to an existing directory */
-    static bool isDir(const std::string& filename);
+    bool isDir(const std::string& filename);
 
     /**
      * Load a shared library.
@@ -25,7 +24,7 @@ namespace Belle2 {
      *                 like given to the compiler with -l. It will be expanded
      *                 to lib<library>.so
      */
-    static bool loadLibrary(std::string library, bool fullname = true);
+    bool loadLibrary(std::string library, bool fullname = true);
 
     /**
      * Search for given file in local or central release directory, and return
@@ -40,10 +39,6 @@ namespace Belle2 {
      *         otherwise abs. path to file in central release directory,
      *         or empty if file wasn't found.
      */
-    static std::string findFile(const std::string& path);
-  private:
-    /** no instances. */
-    FileSystem() {}
-  };
-
+    std::string findFile(const std::string& path);
+  }
 }

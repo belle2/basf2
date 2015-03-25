@@ -91,6 +91,11 @@ namespace Belle2 {
       }
       Belle2::TrackFitResult myResult(tau, cov, pType, pValue, 0, 0);
       TMatrixDSym covariance(myResult.getCovariance6());
+
+      for (int i = 0; i < 5; ++i)
+        for (int j = i; j < 5; ++j)
+          EXPECT_EQ(covariance(i, j), covariance(j, i));
+
       TMatrixDSym cov6(6);
       for (unsigned int row = 0; row < 6; ++row) {
         for (unsigned int col = 0; col < 6; ++col) {

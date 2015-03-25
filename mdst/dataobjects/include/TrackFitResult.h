@@ -96,7 +96,7 @@ namespace Belle2 {
      *
      * @param bField Magnetic field at the perigee
      */
-    float getTransverseMomentum(const float bField = 1.5) const
+    Double32_t getTransverseMomentum(const float bField = 1.5) const
     { return getHelix().getTransverseMomentum(bField); }
 
     /** Position and Momentum Covariance Matrix.  */
@@ -113,7 +113,7 @@ namespace Belle2 {
     short getChargeSign() const { return getOmega() >= 0 ? 1 : -1; }
 
     /** Getter for Chi2 Probability of the track fit. */
-    float getPValue() const { return m_pValue; }
+    Double32_t getPValue() const { return m_pValue; }
 
     //------------------------------------------------------------------------
     // --- Getters for perigee helix parameters
@@ -122,50 +122,50 @@ namespace Belle2 {
      *
      *  @return
      */
-    float getD0() const { return m_tau.at(0); }
+    Double32_t getD0() const { return m_tau[iD0]; }
 
     /** Getter for phi0. This is the angle of the transverse momentum in the r-phi plane.
      *
      *  @return
      */
-    float getPhi0() const { return m_tau.at(1); }
+    Double32_t getPhi0() const { return m_tau[iPhi0]; }
 
     /** Getter for phi0 with CDF naming convention.  */
-    float getPhi() const { return getPhi0(); }
+    Double32_t getPhi() const { return getPhi0(); }
 
     /** Getter for omega. This is the curvature of the track. It's
      * sign is defined by the charge of the particle.
      *
      *  @return
      */
-    float getOmega() const { return m_tau.at(2); }
+    Double32_t getOmega() const { return m_tau[iOmega]; }
 
     /** Getter for z0. This is the z coordinate of the perigee.
      *
      *  @return
      */
-    float getZ0() const { return m_tau.at(3); }
+    Double32_t getZ0() const { return m_tau[iZ0]; }
 
     /** Getter for tanLambda. This is the slope of the track in the r-z plane.
      *
      *  @return
      */
-    float getTanLambda() const { return m_tau.at(4); }
+    Double32_t getTanLambda() const { return m_tau[iTanLambda]; }
 
     /** Getter for tanLambda with CDF naming convention.  */
-    float getCotTheta() const { return getTanLambda(); }
+    Double32_t getCotTheta() const { return getTanLambda(); }
 
     /** Getter for all perigee parameters
      *
      *  @return vector with 5 elements
      */
-    std::vector<float> getTau() const { return m_tau; }
+    std::vector<float> getTau() const { return std::vector<float>(m_tau, m_tau + c_NPars); }
 
     /** Getter for all covariance matrix elements of perigee parameters
      *
      *  @return vector with 15 elements
      */
-    std::vector<float> getCov() const { return m_cov5; }
+    std::vector<float> getCov() const { return std::vector<float>(m_cov5, m_cov5 + c_NCovEntries); }
 
     /** Getter for covariance matrix of perigee parameters in matrix form.
      *
@@ -204,16 +204,28 @@ namespace Belle2 {
     const unsigned int m_pdg;
 
     /** Chi2 Probability of the fit. */
-    const float m_pValue;
+    const Double32_t m_pValue;
 
-    /** perigee helix parameters; tau = d0, phi, omega, z0, cotTheta. */
-    std::vector<float> m_tau;
+    /** A helix has five parameters and the covariance matrix is a
+     *  symmetric five-by-five matrix.  */
+    static const int c_NPars = 5;
+    static const int c_NCovEntries = 5 * 6 / 2;
 
-    /** covariance matrix elements.
+    /** Names for the parameter indices.  */
+    static const int iD0 = 0;
+    static const int iPhi0 = 1;
+    static const int iOmega = 2;
+    static const int iZ0 = 3;
+    static const int iTanLambda = 4;
+
+    /** perigee helix parameters; tau = d0, phi0, omega, z0, tanLambda. */
+    Double32_t m_tau[c_NPars];
+
+    /** The 15 = 5*(5+1)/2 covariance matrix elements.
      *
      *  (0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...
      */
-    std::vector<float> m_cov5;
+    Double32_t m_cov5[c_NCovEntries];
 
     /** Member for initializing the information about hits in the CDC.
      *
@@ -227,6 +239,10 @@ namespace Belle2 {
     const uint32_t m_hitPatternVXDInitializer;
 
     /** Streamer version. */
-    ClassDef(TrackFitResult, 5);
+    ClassDef(TrackFitResult, 6);
+    /* Version history:
+       ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.
+       ver 5: CDC Hit Pattern now a single variable (add schema evolution rule).
+    */
   };
 }

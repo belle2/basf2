@@ -57,11 +57,33 @@
     }\
   }"
 
+// ----------------------------------------------------------------------------
+// TrackFitResult evolution
+// As of version 5 the CDC hit pattern was merged into a single variable.
 #pragma read sourceClass="Belle2::TrackFitResult" version="[4]" \
   source="const uint32_t m_hitPatternCDCInitializer; const uint32_t m_hitPatternCDCInitializer_part2" \
   targetClass="Belle2::TrackFitResult" target="m_hitPatternCDCInitializer" \
   code="{ \
 		m_hitPatternCDCInitializer = ((long long int) onfile.m_hitPatternCDCInitializer_part2 << 32) | onfile.m_hitPatternCDCInitializer; \
 	}"
+
+// As of version 6 the data is no longer kept in vectors, but in fixed-size arrays.
+#pragma read sourceClass="Belle2::TrackFitResult" version="[-5]" \
+  source="std::vector<float> m_tau" \
+  targetClass="Belle2::TrackFitResult" target="m_tau" \
+  code = "{ \
+            memset(m_tau, 0, 5*sizeof(Double32_t)); \
+            for (size_t i = 0; i < std::min(onfile.m_tau.size(), (size_t)5); ++i) \
+               m_tau[i] = onfile.m_tau[i]; \
+          }"
+#pragma read sourceClass="Belle2::TrackFitResult" version="[-5]" \
+  source="std::vector<float> m_cov5" \
+  targetClass="Belle2::TrackFitResult" target="m_cov5" \
+  code = "{ \
+            memset(m_cov5, 0, 15*sizeof(Double32_t)); \
+            for (size_t i = 0; i < std::min(onfile.m_cov5.size(), (size_t)15); ++i) \
+               m_cov5[i] = onfile.m_cov5[i]; \
+          }"
+
 
 #endif

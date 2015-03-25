@@ -13,7 +13,11 @@ using namespace Belle2;
 
 REG_MODULE(VXDCDCTrackMerger)
 
-VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() : Module()
+VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
+  Module(),
+  m_CDC_wall_radius(16.25),
+  m_total_pairs(0),
+  m_total_matched_pairs(0)
 {
   setDescription("This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC");
 

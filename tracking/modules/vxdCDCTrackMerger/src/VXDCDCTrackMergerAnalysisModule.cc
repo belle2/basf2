@@ -16,7 +16,43 @@ using namespace Belle2;
 
 REG_MODULE(VXDCDCTrackMergerAnalysis)
 
-VXDCDCTrackMergerAnalysisModule::VXDCDCTrackMergerAnalysisModule() : Module()
+VXDCDCTrackMergerAnalysisModule::VXDCDCTrackMergerAnalysisModule() :
+  Module(),
+  m_CDC_wall_radius(16.25),
+  m_root_file(0),
+  m_total_pairs(0),
+  m_total_matched_pairs(0),
+  m_nevent(0),
+  m_npair(0),
+  m_ntruepair(0),
+  m_ncdc_trk(0),
+  m_nvxd_trk(0),
+  m_trk_mrg_eff(0),
+  m_match_vec(0),
+  m_true_match_vec(0),
+  m_right_match_vec(0),
+  m_loop_match_vec(0),
+  m_chi2_vec(0),
+  m_dist_vec(0),
+  m_dx_vec(0),
+  m_dy_vec(0),
+  m_dz_vec(0),
+  m_x_vec(0),
+  m_y_vec(0),
+  m_z_vec(0),
+  m_pos_vec(0),
+  m_dmom_vec(0),
+  m_dmomx_vec(0),
+  m_dmomy_vec(0),
+  m_dmomz_vec(0),
+  m_momx_vec(0),
+  m_momy_vec(0),
+  m_momz_vec(0),
+  m_mom_vec(0),
+  m_vxdmomx_vec(0),
+  m_vxdmomy_vec(0),
+  m_vxdmomz_vec(0),
+  m_vxdmom_vec(0)
 {
   setDescription("Analysis module for VXDCDCTrackMerger. This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC and creates a root file.");
 
@@ -31,7 +67,8 @@ VXDCDCTrackMergerAnalysisModule::VXDCDCTrackMergerAnalysisModule() : Module()
   addParam("chi2_max", m_chi2_max, "Chi^2 cut for matching", double(100.0));
   addParam("merge_radius", m_merge_radius, "Maximum distance between extrapolated tracks on the CDC wall", double(2.0));
 
-  addParam("root_output_filename", m_root_output_filename, "ROOT file for tracks merger analysis", std::string("VXD_CDC_trackmerger.root"));
+  addParam("root_output_filename", m_root_output_filename, "ROOT file for tracks merger analysis",
+           std::string("VXD_CDC_trackmerger.root"));
 }
 
 

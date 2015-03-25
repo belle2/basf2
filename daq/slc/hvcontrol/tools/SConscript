@@ -1,7 +1,17 @@
 Import('env')
 
-env['TOOLS_LIBS']['hvcui'] = ['pthread', 'ncurses', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['hv2db'] = ['pthread', 'ncurses', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+import commands
+import os.path
+if os.path.exists("/etc/redhat-release"):
+   osver = commands.getoutput("cat /etc/redhat-release | awk '{print $4}'")
+   if osver < 6:
+      env['TOOLS_LIBS']['hvcui'] = ['pthread', 'ncurses', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+   elif osver > 6:
+      env['TOOLS_LIBS']['hvcui'] = ['pthread', 'ncurses', 'tinfo', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+else:
+      env['TOOLS_LIBS']['hvcui'] = ['pthread', 'ncurses', 'tinfo', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
+env['TOOLS_LIBS']['hv2db'] = ['pthread', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 env['TOOLS_LIBS']['db2hv'] = ['pthread', 'ncurses', '$ROOT_LIBS', 'libNew', 'Geom',
 			      '$GEANT4_LIBS', 'CLHEP', 'readline', '$PGSQL_LIBS', 
 			      'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']

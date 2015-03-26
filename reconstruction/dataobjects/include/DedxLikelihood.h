@@ -22,7 +22,8 @@ namespace Belle2 {
   class DedxLikelihood : public RelationsObject {
   public:
     /** default constructor */
-    DedxLikelihood(): RelationsObject() {
+    DedxLikelihood(): RelationsObject()
+    {
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         m_cdcLogl[i] = 0.0;
@@ -31,7 +32,8 @@ namespace Belle2 {
     }
 
     /** actually const float (&logl)[Const::ChargedStable::c_SetSize], but CINT complains. */
-    DedxLikelihood(const float* cdcLogl, const float* svdLogl): RelationsObject() {
+    DedxLikelihood(const float* cdcLogl, const float* svdLogl): RelationsObject()
+    {
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         m_cdcLogl[i] = cdcLogl[i];

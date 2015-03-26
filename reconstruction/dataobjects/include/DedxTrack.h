@@ -38,7 +38,8 @@ namespace Belle2 {
       m_chi2(0),
       m_mother_pdg(0),
       m_last_layer(-1),
-      m_length(0.0) {
+      m_length(0.0)
+    {
       //for all detectors
       for (int i = 0; i < Dedx::c_num_detectors; i++)
         m_dedx_avg[i] = m_dedx_avg_truncated[i] = m_dedx_avg_truncated_err[i] = 0.0;
@@ -51,7 +52,8 @@ namespace Belle2 {
     }
 
     /** add a single hit to the object */
-    void addHit(const TVector3& pos, int layer, int sensorid, float phi, float energydep, bool extrapFailed, float drift_length = 0.0) {
+    void addHit(const TVector3& pos, int layer, int sensorid, float phi, float energydep, bool extrapFailed, float drift_length = 0.0)
+    {
       wx.push_back(pos.X());
       wy.push_back(pos.Y());
       wz.push_back(pos.Z());
@@ -66,7 +68,8 @@ namespace Belle2 {
     }
 
     /** add a dE/dx value (one per layer for non-curling tracks) */
-    void addDedx(int layer, float distance, float dedx_value) {
+    void addDedx(int layer, float distance, float dedx_value)
+    {
       dedx_flayer.push_back(layer);
       dist.push_back(distance);
       dedx.push_back(dedx_value);
@@ -74,7 +77,8 @@ namespace Belle2 {
     }
 
     /** Get average dE/dx for given detector. */
-    float getDedx(Const::EDetector detector) const {
+    float getDedx(Const::EDetector detector) const
+    {
       int iDet = (int)(detector - Const::PXD);
       if (iDet < 0 or iDet > Dedx::c_CDC)
         return 0.0;
@@ -82,7 +86,8 @@ namespace Belle2 {
     }
 
     /** Get truncated average dE/dx for given detector. */
-    float getDedxTruncated(Const::EDetector detector) const {
+    float getDedxTruncated(Const::EDetector detector) const
+    {
       int iDet = (int)(detector - Const::PXD);
       if (iDet < 0 or iDet > Dedx::c_CDC)
         return 0.0;

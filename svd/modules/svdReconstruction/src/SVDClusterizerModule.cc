@@ -37,9 +37,9 @@ REG_MODULE(SVDClusterizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
+SVDClusterizerModule::SVDClusterizerModule() : Module(),
   m_minADC(-96000), m_maxADC(386000), m_bitsADC(10), m_unitADC(375), m_cutSeed(5.0),
-  m_cutAdjacent(2.5), m_cutCluster(8.0), m_sizeHeadTail(3), c_minSamples(1),
+  m_cutAdjacent(3.0), m_cutCluster(5.0), m_sizeHeadTail(3), c_minSamples(1),
   m_timeTolerance(30), m_shapingTimeElectrons(55), m_shapingTimeHoles(60),
   m_samplingTime(31.44), m_refTime(-31.44), m_assumeSorted(true)
 {
@@ -67,10 +67,7 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
   addParam("TanLorentz_holes", m_tanLorentzAngle_holes,
            "Tangent of the Lorentz angle for holes", double(-1.0));
 
-  // 3. Noise
-  addParam("ElectronicNoise", m_elNoise,
-           "RMS signal noise, set in ENC", m_elNoise);
-  // 5. Processing
+  // 3. Processing
   addParam("ADC", m_applyADC, "Signals in ADU?", bool(true));
   addParam("ADCLow", m_minADC, "Low end of ADC range", double(-96000.0));
   addParam("ADCHigh", m_maxADC, "High end of ADC range", double(288000.0));
@@ -107,7 +104,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
            "Size of the acceptance window following the trigger", double(100));
 
   /** Cluster charge calculation. */
-  addParam("calClsChargeCal", m_calClsCharge, "Type of Cluster Charge Calculation (0: use maximum charge sample, 1: use quadratic fit)", int(0));
+  addParam("calClsChargeCal", m_calClsCharge,
+           "Type of Cluster Charge Calculation (0: use maximum charge sample, 1: use quadratic fit)", int(0));
 }
 
 void SVDClusterizerModule::initialize()
@@ -151,7 +149,7 @@ void SVDClusterizerModule::initialize()
   // Convert things to appropriate units:
   if (m_applyADC) {
     m_unitADC = (m_maxADC - m_minADC) / pow(2, m_bitsADC);
-    m_elNoise = m_elNoise / m_unitADC;
+    m_noiseMap.setADU(m_unitADC);
   }
   // Warn if tanLorentz set
   if (m_tanLorentzAngle_holes > 0 or m_tanLorentzAngle_electrons > 0)
@@ -169,12 +167,11 @@ void SVDClusterizerModule::initialize()
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
+  B2INFO(" 2. INPOT DATA:");
   B2INFO(" -->  AssumeSorted:       " << (m_assumeSorted ? "true" : "false"));
+  B2INFO(" 3. OBSOLETE - NOT USED:");
   B2INFO(" -->  TanLorentz (e-):    " << m_tanLorentzAngle_electrons);
   B2INFO(" -->  TanLorentz (h+):    " << m_tanLorentzAngle_holes);
-
-  B2INFO(" 3. NOISE:");
-  B2INFO(" -->  RMS signal noise:   " << m_elNoise);
 
   B2INFO(" 4. CLUSTERING:");
   B2INFO(" -->  Neighbour cut:      " << m_cutAdjacent);
@@ -191,11 +188,6 @@ void SVDClusterizerModule::initialize()
   B2INFO(" -->  Trigger time:       " << m_triggerTime);
   B2INFO(" -->  Acceptance w. size: " << m_acceptance);
 
-
-  //FIXME: This is still static noise for all pixels, can be elaborated on in the
-  // right time. E.g., do we have different noise levels on the two sides of a
-  // a sensor? on different sensor types?
-  m_noiseMap.setNoiseLevel(m_elNoise);
 
   // Discourage users from using this option.
   if (!m_assumeSorted)
@@ -286,8 +278,8 @@ void SVDClusterizerModule::event()
     //Now we loop over sensors and cluster each sensor in turn
     for (SensorIterator it = sensors.begin(); it != sensors.end(); it++) {
       for (int iSide = 0; iSide < 2; ++iSide) {
-        m_noiseMap.setSensorID(it->first);
-        for (const SVD::Sample & sample : it->second[iSide]) {
+        m_noiseMap.setSensorID(it->first, iSide == 0);
+        for (const SVD::Sample& sample : it->second[iSide]) {
           if (!m_noiseMap(sample, m_cutAdjacent)) continue;
           findCluster(sample);
         }
@@ -325,11 +317,11 @@ void SVDClusterizerModule::event()
         lastStrip = 0;
         lastTime = 0;
         //Load the correct noise map for the new sensor
-        m_noiseMap.setSensorID(sensorID);
+        m_noiseMap.setSensorID(sensorID, thisSide);
       }
 
       //Load the correct noise map for the first pixel
-      if (i == 0) m_noiseMap.setSensorID(thisSensorID);
+      if (i == 0) m_noiseMap.setSensorID(thisSensorID, thisSide);
       //Ignore digits with insufficient signal
       if (!m_noiseMap(sample, m_cutAdjacent)) {
         B2DEBUG(3, "continue");
@@ -377,13 +369,17 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
   //Get Geometry information
   const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
   bool isU = (side == 0);
+  // Just to be sure
+  m_noiseMap.setSensorID(sensorID, isU);
   double pitch = isU ? info.getUPitch() : info.getVPitch();
 
-  for (ClusterCandidate & cls : m_clusters) {
+  for (ClusterCandidate& cls : m_clusters) {
     //Check for noise cuts
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
     const Sample& clusterSeed = cls.getSeed();
+    // FIXME: This is only provisional. Below, there are no noise-weighted formulas.
+    double elNoise = m_noiseMap.getNoise(clusterSeed.getCellID());
     //double clusterCharge = cls.getCharge();
     //double clusterCharge = cls.getQFCharge();
     double clusterCharge = 0;
@@ -425,11 +421,11 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       // Compute position error
       if (clusterSize == 1) {
         // Add a strip charge equal to the zero-suppression threshold to compute the error
-        double phantomCharge = m_cutAdjacent * m_elNoise;
+        double phantomCharge = m_cutAdjacent * elNoise;
         clusterPositionError = pitch * phantomCharge / (clusterCharge + phantomCharge);
       } else {
         double a = (clusterSize == 2) ? 1.414 : (clusterSize - 1);
-        double sn = clusterCharge / m_elNoise;
+        double sn = clusterCharge / elNoise;
         clusterPositionError = a * pitch / sn;
       }
     } else { // Head-tail
@@ -439,7 +435,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       double minPos = isU ? info.getUCellPosition(minStrip) : info.getVCellPosition(minStrip);
       double maxPos = isU ? info.getUCellPosition(maxStrip) : info.getVCellPosition(maxStrip);
       clusterPosition = 0.5 * (minPos + maxPos + (maxStripCharge - minStripCharge) / centreCharge * pitch);
-      double sn = centreCharge / m_cutAdjacent / m_elNoise;
+      double sn = centreCharge / m_cutAdjacent / elNoise;
       // Rough estimates of Landau noise
       double landauHead = minStripCharge / centreCharge;
       double landauTail = maxStripCharge / centreCharge;
@@ -514,12 +510,12 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     vector<pair<int, float> > digit_weights;
     digit_weights.reserve(cls.size());
 
-    for (const SVD::Sample & sample : cls.samples()) {
+    for (const SVD::Sample& sample : cls.samples()) {
 
       //Fill map with MCParticle relations
       if (relDigitMCParticle) {
         typedef const RelationIndex<SVDDigit, MCParticle>::Element relMC_type;
-        for (relMC_type & mcRel : relDigitMCParticle.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
+        for (relMC_type& mcRel : relDigitMCParticle.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
           //negative weights are from ignored particles, we don't like them and
           //thus ignore them :D
           if (mcRel.weight < 0) continue;
@@ -529,7 +525,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       //Fill map with SVDTrueHit relations
       if (relDigitTrueHit) {
         typedef const RelationIndex<SVDDigit, SVDTrueHit>::Element relTrueHit_type;
-        for (relTrueHit_type & trueRel : relDigitTrueHit.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
+        for (relTrueHit_type& trueRel : relDigitTrueHit.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
           //negative weights are from ignored particles, we don't like them and
           //thus ignore them :D
           if (trueRel.weight < 0) continue;

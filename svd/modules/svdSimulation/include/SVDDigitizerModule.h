@@ -60,9 +60,11 @@ namespace Belle2 {
       void driftCharge(const TVector3& position, double carriers);
 
       /** Calculate the noise contribution to one strip with given charge.
+       * @param charge the original charge on the strip
+       * @param noise the standard RMS noise on the strip
        * @return the new charge of the strip.
        */
-      double addNoise(double charge);
+      double addNoise(double charge, double noise);
 
       /** Save digits to the DataStore
        * Saves samples of generated waveforms.
@@ -86,7 +88,8 @@ namespace Belle2 {
     protected:
 
       /** A small helper function to convert between electons and ADU */
-      inline double eToADU(double charge) const {
+      inline double eToADU(double charge) const
+      {
         return round(std::min(m_maxADC, std::max(m_minADC, charge)) / m_unitADC);
       }
       // Members holding module parameters:
@@ -120,8 +123,6 @@ namespace Belle2 {
       bool   m_applyPoisson;
       /** Whether or not to apply Gaussian noise */
       bool  m_applyNoise;
-      /** Electronic noise. */
-      double m_elNoise;
       /** Zero-suppression cut. */
       double m_SNAdjacent;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
@@ -197,6 +198,10 @@ namespace Belle2 {
       double m_interstripCapacitance;
       /** The coupling capacitance for the sensor. */
       double m_couplingCapacitance;
+      /** Electronic noise for u-strips. */
+      double m_elNoiseU;
+      /** Electronic noise for v-strips. */
+      double m_elNoiseV;
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */

@@ -48,7 +48,7 @@ namespace Belle2 {
 
     GeoSVDCreator::~GeoSVDCreator()
     {
-      for (SensorInfo * sensorInfo : m_SensorInfo) delete sensorInfo;
+      for (SensorInfo* sensorInfo : m_SensorInfo) delete sensorInfo;
       m_SensorInfo.clear();
     }
 
@@ -69,7 +69,9 @@ namespace Belle2 {
         sensor.getWithUnit("BiasVoltage"),
         sensor.getDouble("BackplaneCapacitance") * unit_pF,
         sensor.getDouble("InterstripCapacitance") * unit_pF,
-        sensor.getDouble("CouplingCapacitance") * unit_pF
+        sensor.getDouble("CouplingCapacitance") * unit_pF,
+        sensor.getWithUnit("ElectronicNoiseU"),
+        sensor.getWithUnit("ElectronicNoiseV")
       );
 
       m_SensorInfo.push_back(info);
@@ -128,7 +130,8 @@ namespace Belle2 {
           double angle = asin(gapWidth / innerRadius);
           G4VSolid* endringSolid = new G4Tubs("OuterEndring", innerRadius, outerRadius, length, -M_PI / 2 + angle, M_PI - 2 * angle);
           angle = asin(gapWidth / baseRadius);
-          G4VSolid* endringBase  = new G4Tubs("InnerEndring", baseRadius, baseRadius + baseThickness, length, -M_PI / 2 + angle, M_PI - 2 * angle);
+          G4VSolid* endringBase  = new G4Tubs("InnerEndring", baseRadius, baseRadius + baseThickness, length, -M_PI / 2 + angle,
+                                              M_PI - 2 * angle);
           endringSolid = new G4UnionSolid("Endring", endringSolid, endringBase);
 
           //Now we need the bars which connect the two rings
@@ -178,18 +181,22 @@ namespace Belle2 {
         // Last pipe may be closer, thus we need additional bending
         if (pipes.exists("deltaL")) {
           double deltaL = pipes.getLength("deltaL") / Unit::mm;
-          G4Torus* bendSolidLast = new G4Torus("CoolingBendLast", innerRadius, outerRadius, sin(deltaPhi / 2.0) * radius - deltaL / 2.0, -M_PI / 2, M_PI);
-          G4LogicalVolume* bendVolumeLast = new G4LogicalVolume(bendSolidLast, geometry::Materials::get(material), (boost::format("%1%.Layer%2%.CoolingBendLast") % m_prefix % layer).str());
+          G4Torus* bendSolidLast = new G4Torus("CoolingBendLast", innerRadius, outerRadius, sin(deltaPhi / 2.0) * radius - deltaL / 2.0,
+                                               -M_PI / 2, M_PI);
+          G4LogicalVolume* bendVolumeLast = new G4LogicalVolume(bendSolidLast, geometry::Materials::get(material),
+                                                                (boost::format("%1%.Layer%2%.CoolingBendLast") % m_prefix % layer).str());
           --nPipes;
 
           // Place the last straight pipe
-          G4Transform3D placement_pipe = G4RotateZ3D(startPhi + (nPipes - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius, sin(deltaPhi / 2.0) * radius - deltaL, zstart + zlength);
+          G4Transform3D placement_pipe = G4RotateZ3D(startPhi + (nPipes - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius,
+                                         sin(deltaPhi / 2.0) * radius - deltaL, zstart + zlength);
           supportAssembly.add(pipeVolume, placement_pipe);
 
           // Place forward or backward bend
           double zpos = nPipes % 2 > 0 ? zend : zstart;
           // Calculate transformation
-          G4Transform3D placement = G4RotateZ3D(startPhi + (nPipes - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius, -deltaL / 2.0, zpos) * G4RotateY3D(M_PI / 2);
+          G4Transform3D placement = G4RotateZ3D(startPhi + (nPipes - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius,
+                                    -deltaL / 2.0, zpos) * G4RotateY3D(M_PI / 2);
           // If we are at the forward side we rotate the bend by 180 degree
           if (nPipes % 2 > 0) {
             placement = placement * G4RotateZ3D(M_PI);
@@ -208,7 +215,8 @@ namespace Belle2 {
             // Place forward or backward bend
             double zpos = i % 2 > 0 ? zend : zstart;
             // Calculate transformation
-            G4Transform3D placement = G4RotateZ3D(startPhi + (i - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius, 0, zpos) * G4RotateY3D(M_PI / 2);
+            G4Transform3D placement = G4RotateZ3D(startPhi + (i - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius, 0,
+                                      zpos) * G4RotateY3D(M_PI / 2);
             // If we are at the forward side we rotate the bend by 180 degree
             if (i % 2 > 0) {
               placement = placement * G4RotateZ3D(M_PI);
@@ -284,8 +292,10 @@ namespace Belle2 {
         double rpos = endmount.getLength("r") / Unit::mm;
         G4VSolid* endmountBox = new G4Box("endmountBox", height, width, length);
         if (outer) { // holes for the ribs
-          endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(-spacing)*placement * G4Translate3D(-rpos, 0, -zpos));
-          endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(spacing)*placement * G4Translate3D(-rpos, 0, -zpos));
+          endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(-spacing)*placement * G4Translate3D(-rpos, 0,
+                                               -zpos));
+          endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(spacing)*placement * G4Translate3D(-rpos, 0,
+                                               -zpos));
         }
         G4LogicalVolume* endmountVolume = new G4LogicalVolume(
           endmountBox, geometry::Materials::get(support.getString("SupportRibs/endmount/Material")),

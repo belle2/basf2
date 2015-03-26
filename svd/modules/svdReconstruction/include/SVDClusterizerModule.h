@@ -100,8 +100,10 @@ namespace Belle2 {
       double m_tanLorentzAngle_holes;
 
       //3. Noise and ADC
-      /** Noise in number of electrons */
-      double m_elNoise;
+      /** Noise in e- on u (short) strips, read from SensorInfo */
+      double m_elNoiseU;
+      /** Noise in e- on v (long) strips, read from SensorInfo */
+      double m_elNoiseV;
       /** Apply ADC conversion? */
       bool m_applyADC;
       /** Low limit of ADC range in electrons. */

@@ -82,8 +82,6 @@ SVDDigitizerModule::SVDDigitizerModule() :
            "Apply Poisson smearing on chargelets", true);
   addParam("ElectronicEffects", m_applyNoise, "Apply electronic effects?",
            true);
-  addParam("ElectronicNoise", m_elNoise,
-           "Electronic noise on strip signals in e-", double(2000.0));
   addParam("ZeroSuppressionCut", m_SNAdjacent,
            "Zero suppression cut in sigmas of strip noise", double(2.5));
 
@@ -144,7 +142,6 @@ void SVDDigitizerModule::initialize()
   //Convert parameters to correct units
   m_segmentLength *= Unit::mm;
   m_noiseFraction = TMath::Freq(m_SNAdjacent); // 0.9... !
-  m_elNoise *= Unit::e;
   m_minADC = m_minADC * Unit::e;
   m_maxADC = m_maxADC * Unit::e;
   m_unitADC = (m_maxADC - m_minADC) / (pow(2.0, m_bitsADC) - 1);
@@ -172,7 +169,6 @@ void SVDDigitizerModule::initialize()
   B2INFO(" NOISE: ");
   B2INFO(" -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
   B2INFO(" -->  Add Gaussian noise: " << (m_applyNoise ? "true" : "false"));
-  B2INFO(" -->  Gaussian noise:     " << m_elNoise);
   B2INFO(" -->  Zero suppression cut" << m_SNAdjacent);
   B2INFO(" -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
   B2INFO(" TIMING: ");
@@ -253,7 +249,7 @@ void SVDDigitizerModule::beginRun()
 void SVDDigitizerModule::event()
 {
   //Clear sensors and process SimHits
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
@@ -327,6 +323,8 @@ void SVDDigitizerModule::event()
       m_backplaneCapacitance = info.getBackplaneCapacitance();
       m_interstripCapacitance = info.getInterstripCapacitance();
       m_couplingCapacitance = info.getCouplingCapacitance();
+      m_elNoiseU = info.getElectronicNoiseU();
+      m_elNoiseV = info.getElectronicNoiseV();
 
       m_currentSensor = &m_sensors[sensorID];
       B2DEBUG(20,
@@ -341,7 +339,11 @@ void SVDDigitizerModule::event()
               << " --> Bias voltage:   " << m_currentSensorInfo->getBiasVoltage() << endl
               << " --> Backplane cap.: " << m_currentSensorInfo->getBackplaneCapacitance() << endl
               << " --> Interstrip cap.:" << m_currentSensorInfo->getInterstripCapacitance() << endl
-              << " --> Coupling cap.:  " << m_currentSensorInfo->getCouplingCapacitance() << endl);
+              << " --> Coupling cap.:  " << m_currentSensorInfo->getCouplingCapacitance() << endl
+              << " --> El. noise U:    " << m_currentSensorInfo->getElectronicNoiseU() << endl
+              << " --> El. noise V:    " << m_currentSensorInfo->getElectronicNoiseV() << endl
+             );
+
     }
     B2DEBUG(10,
             "Processing hit " << i << " in Sensor " << sensorID << ", related to MCParticle " << m_currentParticle);
@@ -388,7 +390,7 @@ void SVDDigitizerModule::processHit()
     double lastFraction {0};
     double lastElectrons {0};
 
-    for (auto & segment : segments) {
+    for (auto& segment : segments) {
       //Simhit returns step fraction and cumulative electrons. We want the
       //center of these steps and electrons in this step
       const double f = (segment.first + lastFraction) / 2;
@@ -633,15 +635,15 @@ void SVDDigitizerModule::driftCharge(const TVector3& position,
 #undef NORMAL_CDF
 }
 
-double SVDDigitizerModule::addNoise(double charge)
+double SVDDigitizerModule::addNoise(double charge, double noise)
 {
   if (charge < 0) {
     //Noise Pixel, add noise to exceed Noise Threshold;
     double p = gRandom->Uniform(m_noiseFraction, 1.0);
-    charge = TMath::NormQuantile(p) * m_elNoise;
+    charge = TMath::NormQuantile(p) * noise;
   } else {
     if (m_applyNoise) {
-      charge += gRandom->Gaus(0., m_elNoise);
+      charge += gRandom->Gaus(0., noise);
     }
   }
   return charge;
@@ -657,8 +659,6 @@ void SVDDigitizerModule::saveDigits()
   RelationArray relDigitTrueHit(storeDigits, storeTrueHits,
                                 m_relDigitTrueHitName);
 
-  //Zero suppression cut in electrons
-  double charge_threshold = m_SNAdjacent * m_elNoise;
 
   //Set time of the first sample
   double initTime = m_startSampling;
@@ -668,11 +668,13 @@ void SVDDigitizerModule::saveDigits()
 
   // Take samples at the desired times, add noise, zero-suppress and save digits.
 
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     int sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
+    double elNoiseU = info.getElectronicNoiseU();
+    double charge_thresholdU = m_SNAdjacent * elNoiseU;
     // Add noisy digits
     if (m_applyNoise) {
       double fraction = 1.0 - m_noiseFraction;
@@ -684,7 +686,7 @@ void SVDDigitizerModule::saveDigits()
       } // for ns
     } // Add noise digits
     // Cycle through signals and generate samples
-    for (StripSignals::value_type & stripSignal : sensor.second.first) {
+    for (StripSignals::value_type& stripSignal : sensor.second.first) {
       short int iStrip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
       // Now generate samples in time and save as digits.
@@ -694,21 +696,21 @@ void SVDDigitizerModule::saveDigits()
         double pSelect = 1.0 / m_nAPV25Samples;
         for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
           if (gRandom->Uniform() < pSelect)
-            samples.push_back(addNoise(-1));
+            samples.push_back(addNoise(-1, elNoiseU));
           else
-            samples.push_back(gRandom->Gaus(0, m_elNoise));
+            samples.push_back(gRandom->Gaus(0, elNoiseU));
         }
       } else {
         double t = initTime;
         for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
-          samples.push_back(addNoise(s(t)));
+          samples.push_back(addNoise(s(t), elNoiseU));
           t += m_samplingTime;
         }
       }
       // Check that at least one sample is over threshold
       bool isOverThreshold = false;
       for (double value : samples)
-        isOverThreshold = isOverThreshold || (value > charge_threshold);
+        isOverThreshold = isOverThreshold || (value > charge_thresholdU);
       if (!isOverThreshold) continue;
       // Save samples and relations
       SVDSignal::relations_map particles = s.getMCParticleRelations();
@@ -747,6 +749,8 @@ void SVDDigitizerModule::saveDigits()
       } // for iSample
     } // for stripSignals
     // v-side digits:
+    double elNoiseV = info.getElectronicNoiseV();
+    double charge_thresholdV = m_SNAdjacent * elNoiseV;
     // Add noisy digits
     if (m_applyNoise) {
       double fraction = 1.0 - m_noiseFraction;
@@ -758,7 +762,7 @@ void SVDDigitizerModule::saveDigits()
       } // for ns
     } // Add noise digits
     // Cycle through signals and generate samples
-    for (StripSignals::value_type & stripSignal : sensor.second.second) {
+    for (StripSignals::value_type& stripSignal : sensor.second.second) {
       short int iStrip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
       // Now generate samples in time and save as digits.
@@ -768,21 +772,21 @@ void SVDDigitizerModule::saveDigits()
         double pSelect = 1.0 / m_nAPV25Samples;
         for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
           if (gRandom->Uniform() < pSelect)
-            samples.push_back(addNoise(-1));
+            samples.push_back(addNoise(-1, elNoiseV));
           else
-            samples.push_back(gRandom->Gaus(0, m_elNoise));
+            samples.push_back(gRandom->Gaus(0, elNoiseV));
         }
       } else {
         double t = initTime;
         for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
-          samples.push_back(addNoise(s(t)));
+          samples.push_back(addNoise(s(t), elNoiseV));
           t += m_samplingTime;
         }
       }
       // Check that at least one sample is over threshold
       bool isOverThreshold = false;
       for (double value : samples)
-        isOverThreshold = isOverThreshold || (value > charge_threshold);
+        isOverThreshold = isOverThreshold || (value > charge_thresholdV);
       if (!isOverThreshold) continue;
       // Save samples and relations
       SVDSignal::relations_map particles = s.getMCParticleRelations();
@@ -825,18 +829,18 @@ void SVDDigitizerModule::saveDigits()
 
 void SVDDigitizerModule::saveWaveforms()
 {
-  //Only store large enough signals
-  double charge_threshold = 3. * m_elNoise;
-
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     tree_vxdID = sensor.first;
+    const SensorInfo& info =
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
     // u-side digits:
     tree_uv = 1;
-    for (StripSignals::value_type & stripSignal : sensor.second.first) {
+    double thresholdU = 3.0 * info.getElectronicNoiseU();
+    for (StripSignals::value_type& stripSignal : sensor.second.first) {
       tree_strip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
       // Read the value only if the signal is large enough.
-      if (s.getCharge() < charge_threshold)
+      if (s.getCharge() < thresholdU)
         continue;
       for (int iTime = 0; iTime < 20; ++iTime) {
         tree_signal[iTime] = s(10 * iTime);
@@ -845,11 +849,12 @@ void SVDDigitizerModule::saveWaveforms()
     } // FOREACH stripSignal
     // v-side digits:
     tree_uv = 0;
-    for (StripSignals::value_type & stripSignal : sensor.second.second) {
+    double thresholdV = 3.0 * info.getElectronicNoiseV();
+    for (StripSignals::value_type& stripSignal : sensor.second.second) {
       tree_strip = stripSignal.first;
       SVDSignal& s = stripSignal.second;
       // Read the values only if the signal is large enough
-      if (s.getCharge() < charge_threshold)
+      if (s.getCharge() < thresholdV)
         continue;
       for (int iTime = 0; iTime < 20; ++iTime) {
         tree_signal[iTime] = s(10. * iTime);

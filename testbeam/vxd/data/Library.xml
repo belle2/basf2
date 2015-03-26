@@ -76,6 +76,8 @@
       <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
       <InterstripCapacitance unit="pF">6</InterstripCapacitance>
       <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+      <ElectronicNoiseU unit="e">650</ElectronicNoiseU>
+      <ElectronicNoiseV unit="e">1100</ElectronicNoiseV>
    </Snippet>
    <Snippet name="SVD_active_layer3">
      <DetectorType>SVD</DetectorType>
@@ -88,6 +90,8 @@
      <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
      <InterstripCapacitance unit="pF">6</InterstripCapacitance>
      <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+     <ElectronicNoiseU unit="e">480</ElectronicNoiseU>
+     <ElectronicNoiseV unit="e">850</ElectronicNoiseV>
    </Snippet>
    <Snippet name="PXD6-S_active_L1">
       <DetectorType>PXD</DetectorType>

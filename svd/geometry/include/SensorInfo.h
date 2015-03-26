@@ -52,7 +52,7 @@ namespace Belle2 {
         VXD::SensorInfoBase(SensorInfo::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
         m_temperature(300), m_depletionVoltage(0), m_biasVoltage(0),
         m_backplaneCapacitance(0), m_interstripCapacitance(0),
-        m_couplingCapacitance(0)
+        m_couplingCapacitance(0), m_electronicNoiseU(0), m_electronicNoiseV(0)
       { }
 
       /** Change the SensorID. Useful to copy the SensorInfo from one sensor and use it for another.
@@ -68,12 +68,16 @@ namespace Belle2 {
        * @param coupling capacitance Coupling capacitance for the strips.
        */
       void setSensorParams(double depletionVoltage, double biasVoltage,
-                           double backplaneCapacitance, double interstripCapacitance, double couplingCapacitance) {
+                           double backplaneCapacitance, double interstripCapacitance, double couplingCapacitance, double electronicNoiseU,
+                           double electronicNoiseV)
+      {
         m_depletionVoltage = depletionVoltage;
         m_biasVoltage = biasVoltage;
         m_backplaneCapacitance = backplaneCapacitance;
         m_interstripCapacitance = interstripCapacitance;
         m_couplingCapacitance = couplingCapacitance;
+        m_electronicNoiseU = electronicNoiseU;
+        m_electronicNoiseV = electronicNoiseV;
       }
 
       /** Return the sensor temperature.*/
@@ -88,6 +92,10 @@ namespace Belle2 {
       double getInterstripCapacitance() const { return m_interstripCapacitance; }
       /** Return the coupling capacitance of the sensor strips */
       double getCouplingCapacitance() const { return m_couplingCapacitance; }
+      /** Return electronic noise in e- for u (short) strips */
+      double getElectronicNoiseU() const {return m_electronicNoiseU; }
+      /** Return electronic noise in e- for v (long) strips */
+      double getElectronicNoiseV() const {return m_electronicNoiseV; }
       /** Calculate electron mobility at a given electric field.
        * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
        * @param eField Electric field, V/cm
@@ -117,7 +125,8 @@ namespace Belle2 {
        * @param carrier electron or hole, SVD::SensorInfo::CarrierType
        * @return The Hall factor for the actual sensor temperature.
        */
-      double getHallFactor(CarrierType carrier) const {
+      double getHallFactor(CarrierType carrier) const
+      {
         if (carrier == electron)
           return (1.13 + 0.0008 * (m_temperature - 273));
         else
@@ -162,6 +171,10 @@ namespace Belle2 {
       double m_interstripCapacitance;
       /** The coupling capacitance for the sensor. */
       double m_couplingCapacitance;
+      /** The electronic noise for u (short, n-side) strips. */
+      double m_electronicNoiseU;
+      /** The electronic noise for v (long, p-side) strips. */
+      double m_electronicNoiseV;
     }; // Class SVD::SensorInfo
 
   } // SVD namespace

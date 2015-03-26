@@ -129,7 +129,8 @@ namespace Belle2 {
 
         BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
           G4LogicalVolume* toSubtract = getLogicalVolume(sub_volume);
-          G4VSolid* subtracted = new G4SubtractionSolid(G4String(volName + "_subtracted_" + toSubtract->GetName()), g4vol->GetSolid(), toSubtract->GetSolid(), getTransform(sub_volume));
+          G4VSolid* subtracted = new G4SubtractionSolid(G4String(volName + "_subtracted_" + toSubtract->GetName()), g4vol->GetSolid(),
+                                                        toSubtract->GetSolid(), getTransform(sub_volume));
           delete g4vol;
           delete toSubtract;
           g4vol = new G4LogicalVolume(subtracted, volG4Material, volName);
@@ -142,7 +143,8 @@ namespace Belle2 {
 
         BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
           G4LogicalVolume* toUnion = getLogicalVolume(sub_volume);
-          G4VSolid* united = new G4UnionSolid(G4String(volName + "_united_" + toUnion->GetName()), g4vol->GetSolid(), toUnion->GetSolid(), getTransform(sub_volume));
+          G4VSolid* united = new G4UnionSolid(G4String(volName + "_united_" + toUnion->GetName()), g4vol->GetSolid(), toUnion->GetSolid(),
+                                              getTransform(sub_volume));
           delete g4vol;
           delete toUnion;
           g4vol = new G4LogicalVolume(united, volG4Material, volName);
@@ -155,7 +157,8 @@ namespace Belle2 {
 
         BOOST_FOREACH(const GearDir & sub_volume, boolVolumes) {
           G4LogicalVolume* toIntersect = getLogicalVolume(sub_volume);
-          G4VSolid* intersected = new G4IntersectionSolid(G4String(volName + "_intersected_" + toIntersect->GetName()), g4vol->GetSolid(), toIntersect->GetSolid(), getTransform(sub_volume));
+          G4VSolid* intersected = new G4IntersectionSolid(G4String(volName + "_intersected_" + toIntersect->GetName()), g4vol->GetSolid(),
+                                                          toIntersect->GetSolid(), getTransform(sub_volume));
           delete g4vol;
           delete toIntersect;
           g4vol = new G4LogicalVolume(intersected, volG4Material, volName);
@@ -207,7 +210,8 @@ namespace Belle2 {
       unsigned short sensorID = content.getInt("SensorID");
       unsigned short ladder = content.getInt("Ladder");
       unsigned short layer = content.getInt("Layer");
-      if (sensorID == 0 || ladder == 0 || layer == 0) B2FATAL("Do not use 0-based id/ladder/layer in your XML, it is incompatible with VXD geometry cache.");
+      if (sensorID == 0 || ladder == 0
+          || layer == 0) B2FATAL("Do not use 0-based id/ladder/layer in your XML, it is incompatible with VXD geometry cache.");
 
       double stepSize = content.getLength("stepSize") ;// Unit::mm;
       string detectorType = content.getString("DetectorType", "Unknown");
@@ -260,7 +264,9 @@ namespace Belle2 {
           content.getWithUnit("BiasVoltage"), // Unit::V,
           content.getDouble("BackplaneCapacitance")* unit_pF,
           content.getDouble("InterstripCapacitance")* unit_pF,
-          content.getDouble("CouplingCapacitance")* unit_pF
+          content.getDouble("CouplingCapacitance")* unit_pF,
+          content.getWithUnit("ElectronicNoiseU"),
+          content.getWithUnit("ElectronicNoiseV")
         );
 
         SVD::SensorInfo* newInfo = new SVD::SensorInfo(sensorInfo);

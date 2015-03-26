@@ -66,7 +66,9 @@
 			<BiasVoltage unit="V">150</BiasVoltage>
 			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
 			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
-			<CouplingCapacitance unit="pF">120</CouplingCapacitance>
+                        <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+                        <ElectronicNoiseU unit="e">650</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">1100</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -92,6 +94,8 @@
 			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
 			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
 			<CouplingCapacitance unit="pF">120</CouplingCapacitance>
+                        <ElectronicNoiseU unit="e">650</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">1100</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -117,6 +121,8 @@
 			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
 			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
 			<CouplingCapacitance unit="pF">120</CouplingCapacitance>
+                        <ElectronicNoiseU unit="e">480</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">850</ElectronicNoiseV>
 		</Active>
 		<!-- For now, layer 3 only has a flex on top -->
 		<Component name="KaptonLayer3">

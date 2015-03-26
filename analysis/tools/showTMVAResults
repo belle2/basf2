@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# showTMVAResults.sh TMVA.root
+#
 # Shows Control Plots for a training stored in root file created by TMVATeacher
 
 printUsage() {
@@ -23,12 +23,12 @@ fi
 #get full path
 FILE=`readlink -f "$1"`
 
-cd $BELLE2_EXTERNALS_DIR/src/root/tmva/test/
+cd $BELLE2_EXTERNALS_DIR/share/root/tmva/
 if [ $? -ne 0 ]
 then
-  echo "Directory src/root/tmva/test not found in externals. Please re-install from source."
+  echo "Directory share/root/tmva not found in externals. Please update to at least version v00-05-04"
   exit 1
 fi
 
 #set TMVASYS to avoid some (noncritical) errors
-TMVASYS="$ROOTSYS" root -l "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/TMVAGui.C(\"$FILE\")"
+TMVASYS="$ROOTSYS" root -l "$BELLE2_EXTERNALS_DIR/share/root/tmva/TMVAGui.C(\"$FILE\")"

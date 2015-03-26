@@ -776,13 +776,13 @@ def escapeForRegExp(someString):
 
 def makeOvertrainingPlot(tmvaFilename, plotName):
     subprocess.call(
-        ['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
+        ['root -l -q -b "$BELLE2_EXTERNALS_DIR/share/root/tmva/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
 def makeROCPlot(tmvaFilename, plotName):
     subprocess.call(
-        ['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
+        ['root -l -q -b "$BELLE2_EXTERNALS_DIR/share/root/tmva/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 

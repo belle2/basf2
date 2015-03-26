@@ -107,11 +107,10 @@ void DedxCorrectionModule::event()
       dedxCell->setDedx(i, newdedx);
     } // end loop over hits
 
-    calculateMeans(
-      &(dedxCell->m_dedx_avg),
-      &(dedxCell->m_dedx_avg_truncated),
-      &(dedxCell->m_dedx_avg_truncated_err),
-      dedxCell->m_dEdx);
+    calculateMeans(&(dedxCell->m_dedx_avg[c_CDC]),
+                   &(dedxCell->m_dedx_avg_truncated[c_CDC]),
+                   &(dedxCell->m_dedx_avg_truncated_err[c_CDC]),
+                   dedxCell->dedx);
   } // end loop over tracks
 }
 
@@ -230,7 +229,8 @@ double DedxCorrectionModule::I2D(const double& cosTheta, const double& I) const
 }
 
 
-void DedxCorrectionModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const
+void DedxCorrectionModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,
+                                          const std::vector<double>& dedx) const
 {
   // Calculate the truncated average by skipping the lowest & highest
   // events in the array of dE/dx values
@@ -266,7 +266,8 @@ void DedxCorrectionModule::calculateMeans(double* mean, double* truncatedMean, d
   *truncatedMean = truncatedMeanTmp;
 
   if (numValuesTrunc > 1) {
-    *truncatedMeanErr = sqrt(sum_of_squares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(numValuesTrunc - 1);
+    *truncatedMeanErr = sqrt(sum_of_squares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
+                          numValuesTrunc - 1);
   } else {
     *truncatedMeanErr = 0;
   }

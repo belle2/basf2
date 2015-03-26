@@ -46,13 +46,15 @@ namespace Belle2 {
     double getY() const { return m_y; }
 
     /** Set the x and y coordinates of a Point */
-    void setPoint(double x, double y) {
+    void setPoint(double x, double y)
+    {
       m_x = x;
       m_y = y;
     }
 
     /** Calculate the distance between this and another point */
-    double length(const Point& p) {
+    double length(const Point& p)
+    {
       // horizontal line
       if (m_y == p.getY()) return abs(m_x - p.getX());
       // vertical line
@@ -98,7 +100,8 @@ namespace Belle2 {
     Line(const Point& p, const double slope) : m_p1(p), m_p2(p), m_m(slope), m_vertical(false) {}
 
     /** Construct a Line from two Points */
-    Line(const Point& p1, const Point& p2) : m_p1(p1), m_p2(p2), m_vertical(false) {
+    Line(const Point& p1, const Point& p2) : m_p1(p1), m_p2(p2), m_vertical(false)
+    {
       //check if the line is vertical (set vertical flag if it is)
       if (p1.getX() == p2.getX()) {
         m_m = -10000.0;
@@ -111,7 +114,8 @@ namespace Belle2 {
     double getSlope() const { return m_m; }
 
     /** Find the intersection of this and another line */
-    Point intersection(const Line& l) {
+    Point intersection(const Line& l)
+    {
       double x, y;
       Point intP;
 
@@ -143,7 +147,7 @@ namespace Belle2 {
       // This is the point of intersection
       intP.setPoint(x, y);
 
-      // Check if the point falls outside the endpoints of each line.
+      // Check if the point falls outside the endpoints of the line.
       // This is useful for calculating the track length (dx).
       if ((x > m_p1.getX() && x > m_p2.getX()) ||
           (x < m_p1.getX() && x < m_p2.getX()))
@@ -151,6 +155,16 @@ namespace Belle2 {
       if ((y > m_p1.getY() && y > m_p2.getY()) ||
           (y < m_p1.getY() && y < m_p2.getY()))
         intP.setInvalid();
+
+      // Check if the Line was made from a point and make sure the
+      // point is not outside the cell
+      if (l.m_p1.getX() == l.m_p2.getX() && l.m_p1.getY() == l.m_p2.getY() &&
+          ((l.m_p1.getX() > m_p1.getX() && l.m_p1.getX() > m_p2.getX()) ||
+           (l.m_p1.getX() < m_p1.getX() && l.m_p1.getX() < m_p2.getX())) &&
+          ((l.m_p1.getY() > m_p1.getY() && l.m_p1.getY() > m_p2.getY()) ||
+           (l.m_p1.getY() < m_p1.getY() && l.m_p1.getY() < m_p2.getY())))
+        intP.setInvalid();
+
       return intP;
     }
 
@@ -180,10 +194,12 @@ namespace Belle2 {
   public:
 
     /** Construct a Cell from four different Lines (sides) */
-    Cell(const Line& left, const Line& top, const Line& right, const Line& bot) : m_Left(left), m_Top(top), m_Right(right), m_Bot(bot), m_isValid(true) {}
+    Cell(const Line& left, const Line& top, const Line& right, const Line& bot) : m_Left(left), m_Top(top), m_Right(right), m_Bot(bot),
+      m_isValid(true) {}
 
     /** Construct a Cell from four different Points (corners) */
-    Cell(const Point& tl, const Point& tr, const Point& br, const Point& bl) {
+    Cell(const Point& tl, const Point& tr, const Point& br, const Point& bl)
+    {
       m_Left    = Line(bl, tl);
       m_Top     = Line(tl, tr);
       m_Right   = Line(tr, br);
@@ -196,7 +212,8 @@ namespace Belle2 {
 
     /** Calculate the path length through this cell for a track with a given
      * Point Of Closest Approach (poca) and entrance angle (entAng) */
-    double dx(const Point& poca, double entAng) {
+    double dx(const Point& poca, double entAng)
+    {
       // The path length (dx) is the length of the track in this cell.
       double Dx = 0;
 
@@ -237,7 +254,8 @@ namespace Belle2 {
 
     /** Calculate the path length through this cell for a track with a given
      * Distance Of Closest Approach (doca) and entrance angle (entAng) */
-    double dx(double doca, double entAng) {
+    double dx(double doca, double entAng)
+    {
       // The path length (dx) is the length of the track in this cell.
       double Dx = 0;
 

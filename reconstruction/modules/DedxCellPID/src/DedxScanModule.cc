@@ -137,7 +137,7 @@ void DedxScanModule::event()
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxCell->addHit(i, 0, doca, entAng, 0.0, celldx, 0.0, cellHeight, cellHalfWidth);
+        dedxCell->addHit(Dedx::c_CDC, i, 0, doca, entAng, 0, celldx, 0.0, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0);
       }
     }
     dedxArray.appendNew(*dedxCell);
